@@ -161,6 +161,16 @@ class Flow(Sandbox):
         self.assertTrue(os.path.exists(os.path.join(self.root, "src", "a.py")))
         self.assertFalse(os.path.isdir(wt))
 
+    def test_commit_command_commits_the_worktree(self):
+        self.pm("start", "A-1")
+        wt = self.worktree("A-1")
+        self.assertIn("nothing to commit", self.pm("commit", "A-1", "-m", "x").stdout)
+        os.makedirs(os.path.join(wt, "src"))
+        with open(os.path.join(wt, "src", "a.py"), "w") as f:
+            f.write("x = 1\n")
+        done = self.pm("commit", "A-1", "-m", "test(A-1): x [red]", cwd=wt)
+        self.assertIn("test(A-1): x [red]", done.stdout)
+
     def test_engineer_cannot_approve_and_lead_cannot_decide(self):
         self.pm("start", "A-1")
         self.assertIn("belongs to", self.pm("approve", "A-1").stdout)

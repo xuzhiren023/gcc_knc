@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """The project board. Tickets in work/tickets/ are the only channel between agents.
 
-Engineer:  start ID | red ID --note N | submit ID --note N [--override WHY] | ask ID TEXT
+Engineer:  start ID | commit ID -m M | red ID --note N | submit ID --note N [--override WHY] | ask ID TEXT
 Lead:      approve ID [--note N] | changes ID TEXT | answer ID TEXT
 Owner:     decide ID TEXT
 Anyone:    board | show ID | inbox | usage | escalate ID TEXT
@@ -245,6 +245,20 @@ def cmd_start(board, args):
     print("worktree: " + path)
 
 
+def cmd_commit(board, args):
+    """Commit the worktree. Codex's sandbox protects .git and exempts only plain commands, so
+    git add or git commit inside a longer script fails."""
+    require_role("engineer")
+    ticket = board.load(args.id)
+    require_state(ticket, "doing")
+    worktree = board.worktree(ticket)
+    run_git("add", "-A", cwd=worktree)
+    if not run_git("status", "--porcelain", cwd=worktree):
+        raise Refused("nothing to commit")
+    run_git("commit", "-q", "-m", args.message, cwd=worktree)
+    print(run_git("log", "-1", "--format=%h %s", cwd=worktree))
+
+
 def cmd_red(board, args):
     require_role("engineer")
     ticket = board.load(args.id)
@@ -409,6 +423,7 @@ def parser():
     add("usage", cmd_usage)
     add("show", cmd_show, ident)
     add("start", cmd_start, ident)
+    add("commit", cmd_commit, ident, ("-m", {"dest": "message", "required": True}))
     add("red", cmd_red, ident, ("--note", {"required": True}))
     add("submit", cmd_submit, ident, ("--note", {"required": True}), ("--override", {}))
     add("approve", cmd_approve, ident, ("--note", {}))
