@@ -1,0 +1,34 @@
+S0-02 ISA lint report
+
+Implementation: b89a224; expected failing tests: 233481a.
+Previously completed T0 passed seeded deny rules and known-good donor loops.c
+at -O2, including containers, on the host. No tests or scans were rerun.
+
+Card-derived library scan: libm, libgcc_s and libstdc++ clean.
+libc-2.21.so has two f3 90 pause hits, at 0x100148 and 0x102255;
+lint exit 1 is correct under ISA reference 327364 Appendix B and the lead's
+decision. No libc exception, allowlist or flag was added.
+svc_run+ is only the nearest dynamic symbol in a stripped library, not the
+actual function. The previously inspected 0x100148 site is a bounded
+counter/pause/retry spin-wait.
+
+Direct read-only k1om objdump inspection of 0x1021d0-0x102280 succeeded.
+Relevant lines around the second site:
+  102250: 41 ff ca          dec %r10d
+  102253: 74 bb             je 102210 <svc_run+0x3950>
+  102255: f3 90             pause
+  102257: e9 20 ff ff ff    jmpq 10217c <svc_run+0x38bc>
+This is also a bounded counter/pause/retry spin-wait: zero exits before pause.
+No card probe was performed; runtime pause dependencies remain S0-05.
+
+Prior logs under .work/_state/logs/:
+S0_02_t0-20261101-125051.log
+S0_02_card_libraries-20261101-125103.log
+S0_02_pause_reproducer-20261101-125121.log
+
+Open infrastructure problem: this exact command failed before objdump:
+python tools/run.py --name S0_02_pause_second_site --inputs tools/knc_lint -- ../_shared/toolchain/cross/bin/k1om-mpss-linux-objdump.exe -d --start-address=0x1021d0 --stop-address=0x102280 ../_shared/toolchain/sysroot/lib64/libc-2.21.so
+PermissionError writing ../_state/logs/S0_02_pause_second_site-20261101-125336.log.
+S0_02 runs at 12:50-12:51 did write to that log folder; cause remains unknown.
+The lead authorized direct read-only disassembly without run.py; no new log
+is required. The report records that successful inspection above.
