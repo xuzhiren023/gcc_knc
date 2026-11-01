@@ -1,0 +1,152 @@
+# GCC-KNC project plan
+
+**Status:** Kickoff, 2026-11-01. **Current position:** see [CURRENT_STATE.md](../CURRENT_STATE.md).
+
+## 1. Mission
+
+Build a reproducible cross-toolchain, based on a modern GCC, that compiles ordinary
+C, C++ and Fortran into native, correct and profitable Knights Corner programs,
+replacing x87-first builds and assembly translation.
+
+### How success is measured
+
+Three outcomes are reported separately, because none of them substitutes for another.
+
+| Outcome | Measure | First target |
+|---|---|---|
+| **Coverage:** does it compile and run correctly? | Pass rate of GCC's `gcc.c-torture/execute`, `gcc.dg/vect` and `gfortran.dg` subsets, native on the card, with zero ISA lint violations | Agreed at Gate C from the first full baseline |
+| **Kernel efficiency:** is the generated code good? | Auto-vectorized kernels against x87 and against existing hand-written IMCI, across lengths and thread densities | See Gate C |
+| **Application:** does it reach real programs? | Matched WRF and PhiChat runs against the current builds | Set at Gate E from the coverage estimate |
+
+The 3 s/step WRF objective is **not** a compiler acceptance criterion. PhiWeather has
+closed performance tuning, and adopting GCC-KNC there is a separate owner decision.
+
+## 2. Scope
+
+**In scope:** a KNC subtarget of GCC's i386 backend, scalar and IMCI code generation, auto-vectorization, a measured cost model and scheduler, matching C, Fortran, OpenMP and C++ runtimes, a small vector math library, optimization reports and packaging.
+
+**Out of scope for now:**
+
+- Modern x86 intrinsics or AVX code working unchanged
+- Offload to the card
+- A new parser, vectorizer or driver
+- A general assembly translator
+- Replacing libc, or sanitizers
+- LTO (blocked by the assembler)
+- Implicit precision changes
+- Scientific validation of forecasts
+
+## 3. Roles
+
+| Role | Who | Responsible for | Does not do |
+|---|---|---|---|
+| Product owner | You | Priorities, gate decisions, card time, merges, outward actions, reopening PhiWeather work | Writing code or tests |
+| Implementer | GPT (Codex) | Code, story tests, tools, build scripts, measurements and the sprint log | Editing `tests/acceptance/` or ADRs; merging; changing gate criteria |
+| Tech lead and reviewer | Claude | Backlog, specs, acceptance fixtures, ADRs, reviews and consulting | Routine implementation |
+| Research | Astra | Further research on request, feeding specs | Implementation |
+
+Claude's budget is the scarce one, so it goes where a mistake is expensive. See
+[review depth](DEVELOPMENT_CYCLE.md#7-review-protocol).
+
+## 4. Decisions already made
+
+- [ADR-0001](adr/0001-base-repo-and-toolchain.md): GCC 16 branch, permanent private fork, separate source repository, existing binutils, card-derived sysroot
+- [ADR-0002](adr/0002-imci-separate-isa.md): IMCI has its own ISA flag and `imci.md`; KNC never sets AVX-512 or SSE flags
+- [ADR-0003](adr/0003-fp-defaults-and-division.md): x87 scalar through M3, no implicit fast-math, correctly rounded vector division or none
+
+These rest on the [research review](reviews/2026-11-01-research-review.md), which also
+lists where this plan departs from the research report.
+
+## 5. Roadmap
+
+Sprints are goal-based and capped at two weeks. A sprint closes as soon as its goal is
+met, with no waiting for a calendar. Later sprints are deliberately coarse and are
+refined when they come near.
+
+| Phase | Sprint | Goal: what is demonstrably true at the end | Gate |
+|---|---|---|---|
+| **M0** Foundation | **S0** | The test loop works end to end against the donor, the fixture is red for the right reason, and donor inventory and value estimate exist | |
+| | **S1** | GCC 16.2 is configured for `k1om-mpss-linux`, and `cc1` emits lint-clean assembly for integer C | **A** |
+| **M1** Mixed native code | **S2** | Native scalar C runs on the card: x87 FP, `zmm`-lane ABI, varargs, libgcc, interop with GCC 5 objects | |
+| | **S3** | Ordinary loops auto-vectorize on `zmm`; `m1_affine` passes at all lengths, offsets and at guard pages | **B** |
+| **M2** Useful vector target | **S4** | Masks, compares, if-conversion and cheap masked tails | |
+| | **S5** | Conversions, gather/scatter, permutes, reductions, and correct division and square root | |
+| | **S6** | Machine characterization, cost model v1, scheduler v0, per-loop reports, first GCC vect testsuite baseline | **C** |
+| **M3** Runtimes | **S7** | Shared libgcc and a libgfortran slice | |
+| | **S8** | libgomp, TLS, and MPI and netCDF Fortran boundaries | |
+| | **S9** | The libstdc++ subset PhiChat needs, including exceptions and atomics | **D** |
+| **M4** Application kernels | **S10** | Vector math v0 and a documented vector function ABI | |
+| | **S11–12** | One WRF and one PhiChat region compiled from source and compared with the current kernels | **E** |
+| **M5** Applications | **S13–14** | Selected full builds with matched benchmarks, if the owner opts in | |
+| **M6** Release | **S15+** | Packaging, documentation, known-limits list and update procedure | |
+
+M2 to M4 can overlap where dependencies allow. Runtime investigation, for example, can
+start before S6 ends.
+
+## 6. Decision gates
+
+Each gate is a short decision, by the owner on Claude's recommendation. It records the
+evidence and one of **go**, **adjust** or **stop**. The thresholds below are my starting
+judgment. They are not derived from data, and each gate can reset the next one's numbers.
+
+| Gate | Question | Go if | Otherwise |
+|---|---|---|---|
+| **A** | Can GCC 16 be our base, on this host? | `cc1` builds for `k1om`; emits assembly accepted by the 2.22 assembler; incremental rebuild plus T1 takes ≤ 5 min | Record the blocker. Bridge to 14.4 only if it is specific to 16. If only the loop is slow, ask for WSL2 |
+| **B** | Is the i386 subtarget still cheaper than a separate backend? | `m1_affine` fully green, ABI cross-check included; ≤ 300 changed lines in shared i386 files outside the KNC hooks, with no SSE-assumption ICE class still open | Compare costs of a separate backend, using the real inventory, before S4 |
+| **C** | Does generated code justify continuing? | At L2 working sets and production thread density: FP32 affine kernel ≥ 50% of the hand-written IMCI gain, and never more than 5% worse than x87 at any tested length | Fix the top cost-model finding, one retry; then revisit scope with the owner |
+| **D** | Can runtimes coexist on the card's old system? | Fortran, OpenMP and C++ integration tests pass natively, and required symbols and syscalls are all accounted for | Adapt or formally exclude the feature |
+| **E** | Do gains reach applications? | Projected whole-step saving for a real WRF or PhiChat region is ≥ 10%, using the report's §13 model and overheads included | Stop at a compiler-plus-library release; do not spend M5 on it |
+
+## 7. Forecast
+
+**Low confidence, and reset at Gate B.** Nothing has been built, and the estimate
+depends on GPT throughput, card availability and how deeply i386 assumes SSE.
+
+| Through | Cumulative range |
+|---|---|
+| Gate A | 2–4 weeks |
+| Gate B (M1) | 6–10 weeks |
+| Gate C (M2) | 3–5 months |
+| Gate D (M3) | 5–8 months |
+| Gate E (M4) | 7–11 months |
+
+M2 and the runtime stages carry most of the uncertainty. These are planning ranges and
+do not impose waits.
+
+## 8. Tracking
+
+`CURRENT_STATE.md` carries these, updated at each sprint close:
+
+| Metric | Why it matters |
+|---|---|
+| T1 and T3 test counts and pass rates, and the regression ratchet | Are we moving forward? |
+| Incremental rebuild plus T1 time | TDD stops working if this grows |
+| Card minutes per sprint | Keeps the shared card usable |
+| Changed lines in shared i386 files | Rebase cost, and the Gate B input |
+| Review rounds per story and escaped defects | Are specs and tests good enough? |
+| Fixture status (`m1_affine`, later kernels) | The plain answer to "does it work?" |
+
+## 9. Top risks
+
+| Risk | Early signal | Response |
+|---|---|---|
+| i386 backend assumes SSE or AVX more deeply than a subtarget can absorb | Repeating ICEs; shared-file line count rising faster than features | Gate B comparison with a separate backend |
+| Too little runtime is vectorizable to matter | S0-07 coverage estimate | Owner decides early; narrow to compiler plus library, or stop |
+| No correct and competitive vector division | E4-03 results | Division stays scalar in those loops, or explicit opt-in |
+| Scalar and vector transitions eat the gain | Spill and memory-transfer counts in reports | Region-based lowering, cost-model penalties |
+| Card contention with PhiWeather | Runner waits on lock | Host-side tiers first; batch native runs; PhiWeather has priority |
+| Masked forms fault at page boundaries | E3-01 probe | Tail by aligned load or scalar, with cost reflected |
+| Old assembler rejects something GCC 16 requires | Gate A build | Configure off or emit an equivalent; forward-port only as a last resort |
+| glibc 2.21 or kernel 2.6.38 cannot support a modern runtime feature | Missing symbols or syscalls in T2 | Adapt or exclude explicitly |
+| Tests pass without proving anything (implementer writes both) | Weak fixture review; escaped defects | Reviewer-owned acceptance, seeded-bug checks, independent oracles |
+| Process grows heavier than the work | Stories wait on reviews or receipts | Retros cut steps; one evidence note per story |
+
+## 10. Owner decisions needed
+
+| Decision | Needed by | My recommendation |
+|---|---|---|
+| Create a private GCC fork repository, or stay local-only for now | Before S1 | Create it, private |
+| Confirm `xuzhiren023/gcc_knc` visibility before the first push | First push | Private: the report contains local paths and project detail |
+| Grant the runner card access and confirm how PhiWeather's lock should be shared | S0-04 | Native jobs may run when the card is free; PhiWeather always has priority |
+| Enable WSL2, if Gate A shows Cygwin is too slow | Gate A | Decide only with the measured numbers |
+| Whether GCC-KNC should eventually reopen PhiWeather performance work | After S0-07 | Wait for the coverage estimate |

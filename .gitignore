@@ -1,0 +1,24 @@
+# Build trees and installs
+/build/
+/install/
+/.tools/
+
+# Generated test output (keep small summaries in tests/baseline/)
+*.o
+*.s
+!/tests/**/*.s
+*.mic
+*.exe
+*.sum
+*.log
+*.su
+/tests/out/
+
+# Restricted or bulky inputs never enter git
+/toolchain/sysroot/
+/vendor-docs/
+
+# Local tool state
+__pycache__/
+*.pyc
+.codex/
