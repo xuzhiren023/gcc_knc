@@ -2,6 +2,8 @@
 
 Agile delivery with test-driven development, adapted to a compiler project that has
 one shared test card. GPT implements. Claude specifies and reviews. The owner decides.
+Who talks to whom is in [COLLABORATION.md](COLLABORATION.md), and the cost limits are in
+[HARNESS.md](HARNESS.md).
 
 **Keep it light.** Everything here has to earn its place: one evidence note per story,
 no routine receipts, no test projects for housekeeping. If a step stops helping, cut it
@@ -17,10 +19,10 @@ flowchart LR
     G --> F[REFACTOR<br/>tests stay green]
     F --> V[Review<br/>Claude]
     V -->|changes| G
-    V -->|approved| M[Owner merges]
+    V -->|approved| M[Lead merges]
     M --> N{Sprint goal met?}
     N -->|no| S
-    N -->|yes| D[Sprint close<br/>native demo, retro, gate]
+    N -->|yes| D[Sprint close<br/>native demo, retro, milestone review]
     D --> P
 ```
 
@@ -28,11 +30,11 @@ flowchart LR
 
 | Event | When | Who | Output |
 |---|---|---|---|
-| Sprint planning | Start of sprint | Claude drafts, owner approves | `docs/sprints/SPRINT-NN.md` with one goal and ready stories |
-| Work session | Any time | GPT | Reads `CURRENT_STATE.md` and the sprint file; appends to the sprint log |
-| Story review | When a story is ready | Claude | Verdict in the sprint log |
-| Consult | When blocked | GPT asks, Claude answers | Reduced reproducer plus question, in the sprint log |
-| Sprint close | Goal met, or at the two-week cap | All | Native demo, metrics, three-line retro, gate decision if due |
+| Sprint planning | Start of sprint | Claude drafts, owner approves | `docs/sprints/SPRINT-NN.md` with one goal, and tickets in `work/tickets/` |
+| Work session | When the dispatcher starts one | GPT | One fresh session on one ticket |
+| Story review | When a ticket is submitted | Claude | Approve, or numbered findings, on the ticket |
+| Consult | When blocked | GPT asks, Claude answers | Reduced reproducer plus question, on the ticket |
+| Sprint close | Goal met, or at the two-week cap | All | Native demo, metrics, three-line retro, milestone review if due |
 
 Sprints end when the goal is met. There are no waiting periods. If the cap arrives first,
 the unfinished stories return to the backlog and the sprint closes honestly as missed.
@@ -54,7 +56,7 @@ if it does not.
 1. **RED** — `test(S1-03): ... [red]`. Add tests only and run them. The evidence note shows the failure and why it is the *expected* failure. A test that fails for the wrong reason, such as a build error in the test itself, is not red.
 2. **GREEN** — `feat(S1-03): ...`. Make the smallest change that passes the test.
 3. **REFACTOR** — `refactor(S1-03): ...`. Optional; all tests stay green.
-4. **Evidence note**, in the sprint log: what ran, tier, pass counts, red and green excerpts, and card minutes.
+4. **Evidence note**, one short `submit` note on the ticket: what ran, tier, pass counts, card minutes, and the log path for anything longer.
 
 Tools and non-code stories follow the same pattern with the appropriate test. Research
 stories have no red step; their acceptance criterion is a reviewed conclusion.
@@ -66,7 +68,7 @@ stories have no red step; their acceptance criterion is a reviewed conclusion.
 - [ ] `tools/knc_lint` is clean, and the regression ratchet shows no new failures
 - [ ] Any new `xfail` or skip has a linked backlog item and a reason
 - [ ] Rationale and sources are in the commit message or adjacent comments
-- [ ] Claude approved, and the owner merged
+- [ ] Claude approved and merged
 
 ## 4. Test tiers
 
@@ -79,8 +81,8 @@ The tiers are what make TDD workable here: most of the loop runs without the car
 | **T2** | Links; ELF machine 181; loader; symbol versions; no undefined symbols; lint over linked objects, runtimes included | Host | < 5 min | Every change touching link or runtime |
 | **T3** | Native execution of the story's tests and acceptance fixtures | Card, not exclusive | ≤ 10 min | Before review of anything that affects semantics |
 | **T4** | Native GCC testsuite subsets through a DejaGnu board | Card, not exclusive | Hours; batched | Sprint close, and on demand |
-| **T5** | Kernel performance: matched repeats, thermals recorded | Card, **exclusive** | Scheduled | Stories that claim a performance result; gates |
-| **T6** | Corpus program builds and matched runs | Card, **exclusive** | Owner-approved | Gates D, E and M5 |
+| **T5** | Kernel performance: matched repeats, thermals recorded | Card, **exclusive** | Scheduled | Stories that claim a performance result; milestone reviews |
+| **T6** | Corpus program builds and matched runs | Card, **exclusive** | Owner-approved | Milestones M3, M4 and M5 |
 
 ## 5. TDD rules for compiler work
 
@@ -136,7 +138,7 @@ to undo.
 
 | Depth | Applies to | What happens |
 |---|---|---|
-| **Deep** | ABI, calling convention, FP semantics, register allocation and reloads, default option changes, runtime contracts, gates | Claude approves the spec *and* the red tests before GREEN starts, then does a full diff review |
+| **Deep** | ABI, calling convention, FP semantics, register allocation and reloads, default option changes, runtime contracts, milestone reviews | Claude approves the spec *and* the red tests before GREEN starts, then does a full diff review |
 | **Standard** | New patterns, expanders, cost changes | Claude reviews tests and diff once GREEN and T3 are done |
 | **Light** | Tools, docs, refactors with no output change | Batched at sprint close |
 
@@ -148,37 +150,30 @@ to undo.
 4. Does it hide a cost, such as hidden spills or helper calls that look cheap to the optimizer?
 5. Does it follow the ADRs? Is the shared-file change as small as possible? Are provenance and sources recorded?
 
-**Verdict**, one line in the sprint log, with findings listed below it:
-
-```text
-S1-03 review: APPROVED | CHANGES (n findings) | ESCALATE-TO-OWNER — depth, commit range
-```
-
-Claude reviews evidence, then reruns only what looks doubtful. Claude may also ask for a
-seeded-bug run. GPT resolves findings with new commits and does not rewrite the reviewed
+**Verdict:** `tools/pm.py approve`, or `tools/pm.py changes` with numbered findings, each with
+`file:line`. Over-testing and needless validation count as findings, and the fix is to
+delete them. Claude reviews the evidence, then reruns only what looks doubtful. GPT resolves findings with new commits and does not rewrite the reviewed
 history.
 
-### Handoff mechanics
+### Handoff
 
-`gh` is not installed on this machine, so the default is local branches: GPT works on
-`s<sprint>/<story>-<slug>` and records the head commit in the sprint log; the owner asks
-Claude to review the branch. Once the owner installs `gh` and approves pushing, GitHub
-PRs replace this using `.github/pull_request_template.md`. The owner merges, or tells
-Claude to. **Neither agent pushes or merges on its own.**
+Nobody relays anything. The dispatcher starts the review when a ticket is submitted,
+and the lead reads the branch directly. See [COLLABORATION.md](COLLABORATION.md).
+**Agents never push.** The lead merges approved work to local `main`.
 
 ## 8. Consulting and escalation
 
 GPT stops and asks when any of these is true:
 
 - **Two real attempts failed** on the same problem. Provide a reduced reproducer, the dumps that matter and the question.
-- A change would need an ADR to change, a fixture to change, or a new gate criterion.
+- A change would need an ADR to change, a fixture to change, or a new milestone exit criterion.
 - A change touches a shared i386 path broadly, or needs an SSE or AVX flag to be true.
 - A native result contradicts the ISA manual.
 
 GPT does not widen the scope, weaken a test, or relabel a failure to keep moving.
 
 Claude escalates to the owner for decisions in the plan's list, anything outward-facing,
-or when a gate threshold is in question.
+or when a milestone threshold is in question.
 
 ## 9. Card discipline
 
@@ -200,16 +195,17 @@ goes through `tools/card_run`, which does the following:
 - Screening uses matched runs. A speedup claim needs repeats, and setup costs count when the application pays them.
 - Kernel gains are not added to one another or projected onto whole programs without the §13 model from the report.
 - No tuning rule may be justified by a single program. Check it against the wider corpus, including held-out programs.
-- Negative results are kept in the sprint log. They are useful, and they should not be rerun unchanged.
+- Negative results are kept on the ticket. They are useful, and they should not be rerun unchanged.
 
 ## 11. Documentation weight
 
 | Kind | Place | Rule |
 |---|---|---|
 | Current truth | `CURRENT_STATE.md` | One page; replace lines rather than appending history |
-| Sprint working record | `docs/sprints/` | Plan, log, evidence notes, verdicts, retro |
+| Sprint goal and retro | `docs/sprints/` | One short file per sprint |
+| Working record | `work/tickets/` | Brief, notes, questions and verdicts for one ticket |
 | Lasting decisions | `docs/adr/` | Short; changed only by Claude or the owner |
 | Research conclusions | `docs/research/` | Conclusion first, with sources and limits |
 | Large outputs | Outside git | Build trees, dumps, `.sum` history and installs. Keep a small text summary |
 
-Failed attempts are summarized in the sprint log, and then their files are deleted.
+Failed attempts are summarized on the ticket, and then their files are deleted.

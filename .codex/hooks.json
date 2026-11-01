@@ -1,0 +1,17 @@
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"$(git rev-parse --show-toplevel)/harness/hook_policy.py\"",
+            "commandWindows": "python harness/hook_policy.py",
+            "statusMessage": "Checking project policy"
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -1,0 +1,7 @@
+# Commits and board updates write outside the worktree, so they run outside the sandbox.
+prefix_rule(pattern = ["git", ["add", "commit"]], decision = "allow")
+prefix_rule(pattern = ["python", "tools/pm.py"], decision = "allow")
+prefix_rule(pattern = ["python", "tools/card_run.py"], decision = "allow")
+
+prefix_rule(pattern = ["git", ["push", "merge"]], decision = "forbidden", justification = "The tech lead merges after review, and the owner controls pushes.")
+prefix_rule(pattern = [["sha256sum", "sha1sum", "sha512sum", "md5sum", "certutil", "Get-FileHash"]], decision = "forbidden", justification = "Hashing is not part of this project's process.")

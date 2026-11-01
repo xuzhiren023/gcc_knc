@@ -96,7 +96,7 @@ Fairborn result (2.574× kernel, 0.869% step saving), that kernel covered roughl
 closed, with a 5.228 s/step baseline rather than the report's 5.243.
 *Effect:* the question widens to programs in general. S0-07 proposes a public corpus and
 estimates vectorizable coverage from compile reports before heavy backend work, and
-Gate E measures whole programs against GCC 5.1.1.
+Milestone M4 measures whole programs against GCC 5.1.1.
 
 ### Medium
 
@@ -123,10 +123,10 @@ practice, WSL is not set up, the Docker daemon is not running, the system Cygwin
 no `gcc`, and the working GCC 14.4 lives in PhiWeather's private Cygwin. Its cross
 tools need that Cygwin's DLLs on `PATH`, or `cc1` fails on `cygmpc-3.dll`. The
 machine has 12 threads and about 16 GB of memory. *Effect:* S0-06 measures the TDD
-loop on Cygwin, and Gate A decides whether to ask for WSL2.
+loop on Cygwin, and Milestone M0 decides whether to ask for WSL2.
 
 **F13. Milestones have no exit criteria.** They say what to deliver, not when to stop
-or change course. *Effect:* decision gates A to E with numeric triggers.
+or change course. *Effect:* milestones with exit criteria and numeric triggers.
 
 **F14. Provenance limits what can ship.** The lock file records that sysroot
 redistribution review is still open, and the report notes confidentiality footers

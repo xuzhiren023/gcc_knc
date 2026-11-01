@@ -8,12 +8,14 @@ the host. Programs run on the card.
 
 | Start here | For |
 |---|---|
-| [Project plan](docs/PROJECT_PLAN.md) | Goals, roadmap, gates, forecast, risks, owner decisions |
+| [Project plan](docs/PROJECT_PLAN.md) | Goals, roadmap, milestones, forecast, risks, owner decisions |
+| [Collaboration](docs/COLLABORATION.md) | How the agents work together, and what you do |
+| [Cost harness](docs/HARNESS.md) | Enforced limits on wasted credit |
 | [Development cycle](docs/DEVELOPMENT_CYCLE.md) | Agile and TDD process, test tiers, review, card discipline |
 | [Research review](docs/reviews/2026-11-01-research-review.md) | What the research got right, and what changes the plan |
-| [Backlog](docs/BACKLOG.md) and [Sprint 0](docs/sprints/SPRINT-00.md) | The work |
+| [Backlog](docs/BACKLOG.md), [Sprint 0](docs/sprints/SPRINT-00.md), `work/tickets/` | The work |
 | [ADRs](docs/adr/) | Base, ISA and floating-point decisions |
-| [GPT kickoff](docs/handoff/GPT_KICKOFF.md) | How to start the implementer |
+| [Kickoff](docs/handoff/GPT_KICKOFF.md) | How to start the work |
 | [Research report](GCC_KNC_TECHNICAL_RESEARCH_REPORT_20261101.md) | Background |
 | [`AGENTS.md`](AGENTS.md), [`CLAUDE.md`](CLAUDE.md) | Agent rules |
 

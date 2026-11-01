@@ -10,14 +10,14 @@ Last updated: 2026-11-01, kickoff.
 | Phase | M0 Foundation, Sprint 0 ready to start |
 | Compiler | Nothing built yet. Donor GCC 5.1.1 is the reference |
 | Acceptance | `m1_affine`: logic validated on host; donor expected red at T1. Not yet run on the card |
-| Next gate | Gate A, at the end of Sprint 1 |
-| Next step | GPT starts S0-01 (`docs/handoff/GPT_KICKOFF.md`) |
+| Next milestone | Milestone M0, at the end of Sprint 1 |
+| Next step | Run the dispatcher (`docs/handoff/GPT_KICKOFF.md`); `python tools/pm.py board` shows progress |
 
 ## Metrics
 
 | Metric | Value |
 |---|---|
-| Tests T0 / T1 / T2 / T3 | None automated yet |
+| Tests T0 / T1 / T2 / T3 | Harness self-tests only; compiler tiers arrive in S0-03 |
 | Incremental rebuild + T1 | Not measured (S0-06) |
 | Card minutes this sprint | 0 |
 | Shared i386 lines changed | 0 |

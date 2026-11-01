@@ -21,19 +21,19 @@ where that leads: its `-mavx512f` output on an ordinary loop uses `vfmadd132ss`,
 
 1. KNC keeps its own flag, `TARGET_ISA_KNC`. **It never sets `TARGET_AVX512F`, or any
    SSE or AVX flag**, and `-mavx512f` and similar options are rejected on this target.
-2. Vector patterns go in a new `gcc/config/i386/imci.md`, gated on `TARGET_KNC`. Patterns
+2. Vector patterns go in a new `gcc/config/i386/imci.md`, conditioned on `TARGET_KNC`. Patterns
    in `sse.md` are not reused by widening their conditions.
 3. V16SF, V8DF, V16SI and V8DI are the vector modes. A KNC-specific predicate makes them
    valid; no AVX-512 check is relaxed to allow them.
 4. Shared i386 code changes only where the feature is truly common. Each change is a
-   small, separately reviewable commit. S3 starts counting these changes for Gate B.
+   small, separately reviewable commit. S3 starts counting these changes for Milestone M1.
 
 ## Consequences
 
 - The vector backend is new work, written from the ISA manual. The donor does not
   shorten it.
 - Mode-generic i386 code that assumes SSE or AVX will show up as ICEs and wrong
-  alternatives. That is the cost being measured for Gate B, which decides whether a
+  alternatives. That is the cost being measured for Milestone M1, which decides whether a
   separate backend would have been cheaper.
 - Existing `_mm512_*` intrinsics are not inherited. An IMCI intrinsics header is its
   own backlog item (E6-05), driven by real use.

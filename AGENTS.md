@@ -1,78 +1,56 @@
-# AGENTS.md: GCC-KNC implementer rules
+# AGENTS.md: GCC-KNC engineer rules
 
-You are the implementer. Claude is tech lead and reviewer, and the owner makes decisions.
+You work on **one ticket** in a fresh session, in its own worktree. Your ticket is your brief:
+`python tools/pm.py show <ID>`. Do not read the plan or other documents unless the ticket
+points to them. You talk to the tech lead only through the ticket, and to nobody else.
 
-**Read first, every session:** `CURRENT_STATE.md`, then the current sprint file in
-`docs/sprints/`. The process is in `docs/DEVELOPMENT_CYCLE.md`. The decisions are in
-`docs/adr/`.
+## Finish with one command
 
-## Non-negotiable
+- `python tools/pm.py submit <ID> --note "<what ran, results, log path>"` when acceptance is met
+- `python tools/pm.py red <ID> --note "..."` on deep code tickets, after the failing test commit
+- `python tools/pm.py ask <ID> "<reduced reproducer and specific question>"` after two real failed attempts, or if a rule below blocks you
 
-1. **Test first.** One story at a time, one branch per story (`s<sprint>/<story>-<slug>`): a `[red]` test commit with evidence of the expected failure, then the smallest passing change, then an optional refactor. Tests must be able to fail.
-2. **Do not edit `tests/acceptance/` or `docs/adr/`,** or change gate criteria. Raise a consult if you think one is wrong.
-3. **Do not weaken, skip or `xfail` a test to make progress.** Any `xfail` needs a reason and a backlog item, and is subject to review.
-4. **Report results as they are.** Say what ran, and where. A test that has not run on the card has not passed natively. Never invent or extrapolate results. Infrastructure failures are reported as infrastructure failures.
-5. **Do not push or merge.** Do not take any action outside this repository unless a story says so.
-6. **Stop and ask** after two real attempts at the same problem, or when a rule in `DEVELOPMENT_CYCLE.md` section 8 applies. Bring a reduced reproducer and a specific question.
+Then stop. Do not write a summary, and do not start another ticket.
 
-## Compiler rules (ADR-0002, ADR-0003)
+## Spend carefully
 
-- KNC never sets `TARGET_AVX512F` or any SSE or AVX flag. New vector patterns go in `gcc/config/i386/imci.md`, gated on `TARGET_KNC`.
-- Do not copy old GCC code across without checking the mechanism still exists. The donor is a reference; write against current GCC conventions.
-- Keep changes to shared i386 files minimal and in separate commits. Their line count is a Gate B measure.
-- No implicit fast-math or precision change. Vector division or square root stays scalar until proven correct in its mode.
-- Do not hide a cost. Anything that expands to spills, helper calls or memory transfers must have that cost visible to the optimizer.
-- Every generated object must pass `tools/knc_lint`.
+- **Test what the ticket asks for, once.** Do not re-verify passing work, add tests beyond the acceptance criteria, or check the same thing a second way.
+- **No hashing, checksums, manifests of hashes, receipts or provenance files.** Git identifies content.
+- **Builds and tests go through** `python tools/run.py --name <name> --inputs <paths> -- <command>`. It keeps output short and skips repeats. Do not read whole logs: search them, or read the tail.
+- Read files in parts, and search before you open anything large.
+- Hooks enforce most of this. If one refuses a command, do not look for a way around it. Change approach, or ask.
+
+## Test first
+
+Code tickets: a `test(<ID>): ... [red]` commit that fails for the expected reason, then the
+smallest passing change, then an optional refactor. Tests must be able to fail. Do not weaken,
+skip or `xfail` a test to make progress.
+
+## Report results as they are
+
+A test that has not run on the card has not passed natively. Never invent or extrapolate a
+result. Report infrastructure failures as infrastructure failures.
+
+## Do not change
+
+`tests/acceptance/`, `docs/adr/`, `harness/`, `.codex/`, `work/tickets/`, this file, or
+milestone criteria. Ask if you think one is wrong. Do not push or merge.
+
+## Compiler rules
+
+- KNC never sets `TARGET_AVX512F` or any SSE or AVX flag. Vector patterns go in `gcc/config/i386/imci.md`, conditioned on `TARGET_KNC`.
+- The donor GCC is a reference. Check that a mechanism still exists before porting anything.
+- Keep shared i386 changes minimal and in separate commits.
+- No implicit fast-math or precision change. Vector divide and square root stay scalar until proven correct for that mode.
+- Do not hide a cost. Spills, helper calls and memory transfers must be visible to the optimizer.
 - Do not emit opaque bytes to get around the assembler's architecture checks.
-
-## Scope
-
-This is a general-purpose compiler project for any program that builds with GCC. It is not
-part of PhiWeather or PhiChat. Do not tune to one program or justify a rule with one
-program's result. Where the research report centres on those applications, treat that as
-background evidence, not as requirements.
-
-## Hardware and other projects
-
-- **The card may also be used by unrelated work.** Use it only through `tools/card_run`, and only after S0-04 is approved. Never touch foreign processes. Timing runs are exclusive.
-- **Compilers run on the host, and programs run on the card.** A host run is allowed only for fixture logic or test-vector generation. It is never a stand-in for a native result.
-- **Other projects' folders are read-only,** including PhiWeather's `.tools`, which holds the bootstrap tools until S0-01 gives this project its own copy.
-- Do not install or change system files on the card.
+- Do not tune to one program. This is a general-purpose compiler.
 
 ## Environment
 
-- Windows 10, 12 threads, about 16 GB of memory. Keep `make -j` at 8 or below, and watch memory.
-- Build shell: for now, the private Cygwin under PhiWeather's `.tools`. Put its `knc-bootstrap/cross/bin` and `knc-bootstrap/cygwin/bin` on `PATH`. The system Cygwin has no `gcc`, and Windows Python is 3.8, so use the Cygwin `python3` for tools.
-- Git checkouts of GCC need `core.autocrlf=false` and `core.fileMode=false`.
-
-## Repository
-
-```text
-compiler/gcc/      GCC fork (submodule, ADR-0001)
-toolchain/         manifests for assembler, linker and sysroot
-runtime/           target adapters and math library
-tests/acceptance/  reviewer-owned fixtures (read-only for you)
-tests/regress/     story regression tests
-tests/tools/       T0 tests for tools
-tests/baseline/    recorded baselines and summaries
-benchmarks/        kernels and extracted regions
-tuning/            measured cost tables
-tools/             doctor, knc_lint, check, card_run
-docs/              plan, cycle, ADRs, sprints, research, reviews
-```
-
-Keep build trees, installs, dumps, sysroots, vendor documents and application outputs out
-of git; keep small text summaries instead. Delete failed-attempt files once summarized.
-Do not add routine receipts, hash checks on local transfers, or tests for housekeeping.
-
-## Commits
-
-`test(S1-03): ... [red]`, `feat(S1-03): ...`, `fix(...)`, `refactor(...)`, `docs(...)`.
-Record the why, and any source (ISA section, paper, donor file) in the message or next to
-the code. Published ideas are implemented independently; do not copy code whose license
-you have not checked.
-
-## End of session
-
-Append to the sprint log: the evidence note, what is ready for review with its branch and
-head commit, and open questions. Update `CURRENT_STATE.md` if the facts changed.
+- Compilers run on the host, and programs run on the card. Use the card only through `tools/card_run`. It may be in use by other work, and other projects' folders are read-only.
+- Windows 10, 12 threads, about 16 GB of memory. Use `make -j8` at most.
+- Until S0-01 is done, tools are in `C:\Users\xuzhi\Documents\PhiWeather\.tools\knc-bootstrap`. Put its `cross\bin` and `cygwin\bin` on `PATH`, and use that Cygwin's `python3`, `gcc` and `make`.
+- GCC checkouts need `core.autocrlf=false` and `core.fileMode=false`.
+- Keep build trees, dumps, sysroots and vendor documents out of git.
+- Commits are `test(ID): ... [red]`, `feat(ID): ...`, `fix(ID): ...`, `refactor(ID): ...`, or `docs(ID): ...`. Give the reason, and the source (ISA section, paper or donor file) where relevant.

@@ -1,6 +1,6 @@
 # ADR-0003: Floating-point defaults and vector division
 
-**Status:** Accepted for M1–M3; revisit at Gate C. **Date:** 2026-11-01. **Decider:** Claude; the owner may overrule.
+**Status:** Accepted for M1–M3; revisit at Milestone M2. **Date:** 2026-11-01. **Decider:** Claude; the owner may overrule.
 
 ## Decision
 
@@ -41,4 +41,4 @@ and MXCSR state it documents.
 
 If correctly rounded FP64 division is too slow to help, loops that depend on it stay
 scalar unless the user opts in to approximate forms. How often this matters across the
-corpus is a Gate C input.
+corpus is a Milestone M2 input.
