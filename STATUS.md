@@ -2,7 +2,7 @@
 
 Updated automatically at every ticket change. Last update: 2026-11-01 12:55.
 
-**Next: GPT-6.1, on S0-02 (ISA lint).** Start a new session and paste the prompt from `KICKOFF.md`.
+**Next: the tech lead, on S0-02.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[##------------------]` 1 of 7
 
@@ -23,7 +23,7 @@ Current tickets: `[##------------------]` 1 of 7
 | Ticket | What | State | Latest |
 |---|---|---|---|
 | S0-01 | Toolchain manifest and doctor | Done | Reviewed: red commit real; tests fail on the missing-tool cases; doctor rerun OK, required tools present, d... |
-| S0-02 | ISA lint | In progress | No sandbox change: the owner would have to decide on widening it, and this step does not need it. run.py is... |
+| S0-02 | ISA lint | Question for the tech lead | Submit refused: 22 new test files; budget is 4. Existing implementation b89a224 and red 233481a were retain... |
 | S0-03 | Test runner and red baseline | Not started |  |
 | S0-04 | Card runner | Not started |  |
 | S0-05 | Donor inventory | Not started |  |
@@ -32,6 +32,7 @@ Current tickets: `[##------------------]` 1 of 7
 
 ## Recent activity
 
+- 2026-11-01 12:55 **S0-02** engineer ask: Submit refused: 22 new test files; budget is 4. Existing implementation b89a224 and red 233481a were retained; only S0-02-report.txt added in 80ed3...
 - 2026-11-01 12:55 **S0-02** lead answer: No sandbox change: the owner would have to decide on widening it, and this step does not need it. run.py is for builds and tests, and this is a sin...
 - 2026-11-01 12:53 **S0-02** engineer ask: Required runner blocked before objdump: python tools/run.py --name S0_02_pause_second_site --inputs tools/knc_lint -- ../_shared/toolchain/cross/bi...
 - 2026-11-01 12:53 **S0-02** lead answer: Keep f3 90 a hard error: no libc exception, allowlist or flag in the tool. The manual lists PAUSE as unsupported, and a donor library containing it...
@@ -39,12 +40,11 @@ Current tickets: `[##------------------]` 1 of 7
 - 2026-11-01  **S0-01** lead approve: Reviewed: red commit real; tests fail on the missing-tool cases; doctor rerun OK, required tools present, dejagnu and expect absent as allowed; LTO...
 - 2026-11-01  **S0-01** engineer submit: Submitted by the lead on the engineer's behalf, to save a session. Unit tests 2 pass; doctor rc 0 (run by the lead). | OVER BUDGET (211 changed lin...
 - 2026-11-01  **S0-01** lead answer: Budget: do not split. 98 of the 211 lines are the manifest, which is data, so the limit is too tight rather than the ticket too big. Lead will subm...
-- 2026-11-01  **S0-01** engineer ask: Commit d73fb9f implements the lead-approved manifest trim. Doctor passed once: .work/_state/logs/S0_01_doctor-20261101-123520.log in this worktree....
 
 ## Cost
 
 - engineer: 1 sessions, 0.2M input tokens
-- lead: 1 sessions, 0.3M input tokens
+- lead: 2 sessions, 0.7M input tokens
 - Counts dispatcher sessions only, not sessions you start by hand.
 
 ## Disk
