@@ -2,6 +2,7 @@
 /build/
 /install/
 /.tools/
+/.work/
 
 # Generated test output (keep small summaries in tests/baseline/)
 *.o

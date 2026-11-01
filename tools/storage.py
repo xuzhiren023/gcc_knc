@@ -60,8 +60,31 @@ def main_root(cwd=None):
 
 
 def work_area(root):
-    """Ticket worktrees and the shared build area sit beside the main checkout."""
-    return root + "-work"
+    """Ticket worktrees, the shared build area and agent state. Git-ignored, and inside the
+    project folder so that Codex's sandbox can write to it."""
+    return os.path.join(root, ".work")
+
+
+def state_dir(root):
+    return os.path.join(work_area(root), "_state")
+
+
+def worktree(root, ticket_id):
+    return os.path.join(work_area(root), ticket_id)
+
+
+def active_ticket(root):
+    """Fields of the ticket being worked on, for sessions the dispatcher did not start."""
+    tickets = os.path.join(root, "work", "tickets")
+    if not os.path.isdir(tickets):
+        return {}
+    for name in sorted(os.listdir(tickets)):
+        with open(os.path.join(tickets, name), encoding="utf8") as f:
+            front = f.read().split("---\n")[1] if name.endswith(".md") else ""
+        fields = dict(line.split(": ", 1) for line in front.splitlines() if ": " in line)
+        if fields.get("state") == "doing":
+            return fields
+    return {}
 
 
 def shared_area(root):
@@ -69,8 +92,7 @@ def shared_area(root):
 
 
 def project_bytes(root):
-    seen = set()
-    return tree_size(root, seen) + tree_size(work_area(root), seen)
+    return tree_size(root)
 
 
 def load_policy(root):
@@ -118,7 +140,7 @@ def finished_worktrees(root):
     found = []
     for name in os.listdir(area):
         ticket = os.path.join(tickets, name + ".md")
-        if name != "_shared" and os.path.exists(ticket):
+        if not name.startswith("_") and os.path.exists(ticket):
             with open(ticket, encoding="utf8") as f:
                 if re.search(r"^state: done$", f.read(), re.M):
                     found.append(os.path.join(area, name))
@@ -127,17 +149,15 @@ def finished_worktrees(root):
 
 def report(root, policy):
     seen = set()
-    rows = []
-    pm_dir = os.path.join(root, ".git", "pm")
-    rows.append(("Agent logs (.git/pm)", tree_size(pm_dir, set())))
-    rows.append(("Git history", tree_size(os.path.join(root, ".git"), seen) - rows[0][1]))
+    rows = [("Git history", tree_size(os.path.join(root, ".git"), seen))]
     tracked = sum(tree_size(e.path, seen) if e.is_dir(follow_symlinks=False) else e.stat().st_size
-                  for e in os.scandir(root) if e.name != ".git")
+                  for e in os.scandir(root) if e.name not in (".git", ".work"))
     rows.append(("Main checkout", tracked))
     area = work_area(root)
     if os.path.isdir(area):
         for entry in os.scandir(area):
-            label = "Shared build area" if entry.name == "_shared" else "Worktree " + entry.name
+            labels = {"_shared": "Shared build area", "_state": "Agent logs"}
+            label = labels.get(entry.name, "Worktree " + entry.name)
             rows.append((label, tree_size(entry.path, seen)))
     for label, size in sorted(rows, key=lambda r: -r[1]):
         print("%8.2f GiB  %s" % (size / GIB, label))
@@ -152,7 +172,7 @@ def main(argv=None):
     root = main_root()
     policy = load_policy(root)
     if args.prune:
-        freed = prune_logs(os.path.join(root, ".git", "pm"), policy["storage"]["logs_keep_mb"])
+        freed = prune_logs(state_dir(root), policy["storage"]["logs_keep_mb"])
         print("Old logs removed: %.1f MiB" % (freed / MIB))
         for path in finished_worktrees(root):
             subprocess.run(["git", "worktree", "remove", "--force", path], cwd=root)

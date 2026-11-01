@@ -30,8 +30,7 @@ def git(*args):
 
 
 def state_dir():
-    common = git("rev-parse", "--path-format=absolute", "--git-common-dir")
-    path = os.path.join(common or ".", "pm")
+    path = storage.state_dir(storage.main_root())
     os.makedirs(os.path.join(path, "logs"), exist_ok=True)
     return path
 

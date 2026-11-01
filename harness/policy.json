@@ -4,6 +4,7 @@
   "note_max_chars": 600,
   "ticket_body_max_lines": 80,
   "session_timeout_minutes": 90,
+  "engineer_model": "gpt-6.1-sol",
   "budgets": {
     "light":    {"tool_calls": 60,  "test_runs": 6,  "sessions": 2, "input_tokens": 2000000,  "changed_lines": 200, "new_test_files": 2, "disk_gib": 2,  "effort": "low"},
     "standard": {"tool_calls": 150, "test_runs": 15, "sessions": 3, "input_tokens": 6000000,  "changed_lines": 500, "new_test_files": 4, "disk_gib": 10, "effort": "medium"},

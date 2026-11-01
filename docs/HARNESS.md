@@ -46,7 +46,7 @@ Git cannot see any of it, so the limits measure the disk itself:
 | Control | What it does |
 |---|---|
 | **Disposable by design** | A ticket's worktree is deleted when it merges, with everything in it. Output only survives by being committed, and files over 1 MiB cannot be committed |
-| **One shared build area** | One GCC checkout, toolchain and build tree in `../gcc_knc-work/_shared`, never one per ticket |
+| **One shared build area** | One GCC checkout, toolchain and build tree in `.work/_shared`, never one per ticket |
 | **Project limit** | Warns at 60 GiB. At 100 GiB, or under 100 GiB free on the drive, no session starts, and running sessions can only delete and hand over |
 | **Ticket limit** | 2, 10 or 20 GiB per worktree by depth. Going over sends the ticket to you, and blocks submit |
 | **No bulk copies** | Tree copies, archives, clones and downloads are refused unless the ticket allows them |
@@ -92,7 +92,8 @@ change a decision, not to reduce testing as such.
 
 ## Setup and limits
 
-- **Codex loads a project's hooks and rules only when the project is trusted.** The dispatcher handles this for each of its sessions, without changing your settings. For sessions you start yourself in the Codex app, trust this folder once when asked.
+- **Codex loads a project's hooks and rules only when the project is trusted.** The dispatcher handles this for each of its sessions, without changing your settings. For sessions you start yourself, trust this folder once when asked, or the limits do not apply.
+- **Sessions you start yourself** get the same limits from the board, but the token and session budgets are only counted by the dispatcher.
 - **`.git` is protected inside the Codex sandbox,** so `.codex/rules/default.rules` lets `git add`, `git commit` and `tools/pm.py` run outside it. Nothing else gets that exception.
 - **Compiler changes will need one extension.** Submit checks read this repository's diff, so S1 must also apply them to `compiler/gcc`, which is a separate repository.
 - **Disk is checked every 25 tool calls and between sessions,** so one very large build could overshoot before it is stopped. `tools/run.py` also refuses to start on a nearly full drive.

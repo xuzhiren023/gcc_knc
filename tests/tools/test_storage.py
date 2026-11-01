@@ -103,6 +103,26 @@ class Limits(Sandbox):
             json.dump(policy, f)
         self.assertIn("worktree uses", self.pm("submit", "A-1", "--note", "n", cwd=wt).stdout)
 
+    def test_hand_started_session_gets_the_active_tickets_limits(self):
+        """No PM_ variables, as in a Codex session started by hand."""
+        env = {k: v for k, v in os.environ.items() if not k.startswith("PM_")}
+        event = json.dumps({"session_id": "unit-hand", "tool_name": "Bash", "cwd": self.root,
+                            "tool_input": {"command": "git clone x"}})
+        hook = os.path.join(self.root, "harness", "hook_policy.py")
+
+        def clone_decision():
+            done = subprocess.run([sys.executable, hook], input=event, cwd=self.root, env=env,
+                                  stdout=subprocess.PIPE, universal_newlines=True)
+            return "deny" in done.stdout
+
+        self.assertTrue(clone_decision())
+        path = os.path.join(self.root, "work", "tickets", "A-1.md")
+        with open(path, encoding="utf8") as f:
+            text = f.read()
+        with open(path, "w", encoding="utf8", newline="\n") as f:
+            f.write(text.replace("state: ready", "state: doing\nallow_bulk: yes"))
+        self.assertFalse(clone_decision())
+
     def test_run_wrapper_refuses_on_a_full_drive_and_trims_logs(self):
         self.set_limits(min_drive_free_gib=10 ** 9)
         done = subprocess.run([sys.executable, os.path.join(self.root, "tools", "run.py"), "--name", "t", "--",

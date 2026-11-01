@@ -103,7 +103,7 @@ Claude session and ask it to act as tech lead on the board.
 
 ## Parallel work between agents
 
-Engineers work in separate git worktrees, in `../gcc_knc-work/<ticket>`, on their own branches.
+Engineers work in separate git worktrees, in `.work/<ticket>`, on their own branches.
 The ticket files change only on `main`, through `tools/pm.py`, which runs from any worktree.
 The lead reviews a branch with `git diff main...<branch>`, so nothing needs to be copied.
 

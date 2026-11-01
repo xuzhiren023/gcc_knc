@@ -105,6 +105,8 @@ class Sandbox(unittest.TestCase):
             shutil.copytree(os.path.join(REPO, sub), os.path.join(self.root, sub),
                             ignore=shutil.ignore_patterns("__pycache__"))
         os.makedirs(os.path.join(self.root, "work", "tickets"))
+        with open(os.path.join(self.root, ".gitignore"), "w", newline="\n") as f:
+            f.write("/.work/\n__pycache__/\n")
         self.git("init", "-q", "-b", "main")
         self.git("config", "user.email", "t@example.invalid")
         self.git("config", "user.name", "t")
@@ -129,7 +131,7 @@ class Sandbox(unittest.TestCase):
                               universal_newlines=True)
 
     def worktree(self, ident):
-        return os.path.join(self.top, "proj-work", ident)
+        return os.path.join(self.root, ".work", ident)
 
     def commit_file(self, path, text, message, cwd):
         full = os.path.join(cwd, path)
@@ -147,6 +149,7 @@ class Flow(Sandbox):
     def test_ticket_goes_from_ready_to_merged_without_any_relay(self):
         self.assertEqual(self.pm("start", "A-1").returncode, 0)
         wt = self.worktree("A-1")
+        self.assertTrue(os.path.isdir(os.path.join(self.root, ".work", "_shared")))
         self.commit_file("tests/regress/t.py", "assert False\n", "test(A-1): x [red]", wt)
         self.commit_file("src/a.py", "x = 1\n", "feat(A-1): x", wt)
         done = self.pm("submit", "A-1", "--note", "T0 1 pass", cwd=wt)

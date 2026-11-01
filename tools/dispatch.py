@@ -48,11 +48,10 @@ def engineer_command(board, ticket, worktree):
     codex = newest(r"%LOCALAPPDATA%\OpenAI\Codex\bin\*\codex.exe") or "codex"
     effort = board.budget(ticket)["effort"]
     trust = 'projects."%s".trust_level="trusted"' % worktree.replace("\\", "\\\\")
-    shared = storage.shared_area(board.root)
-    os.makedirs(shared, exist_ok=True)
-    roots = 'sandbox_workspace_write.writable_roots=["%s"]' % shared.replace("\\", "\\\\")
-    return [codex, "exec", "--json", "--ephemeral", "-C", worktree, "--sandbox", "workspace-write",
-            "--dangerously-bypass-hook-trust", "-c", trust, "-c", roots, "-c", 'approval_policy="never"',
+    os.makedirs(storage.shared_area(board.root), exist_ok=True)
+    model = board.policy.get("engineer_model")
+    return [codex, "exec"] + (["-m", model] if model else []) + ["--json", "--ephemeral", "-C", worktree, "--sandbox", "workspace-write",
+            "--dangerously-bypass-hook-trust", "-c", trust, "-c", 'approval_policy="never"',
             "-c", 'model_reasoning_effort="%s"' % effort,
             ENGINEER_PROMPT.format(id=ticket.id)]
 
@@ -70,8 +69,7 @@ def lead_command(board, ticket):
 def session_env(board, ticket, role):
     env = {k: v for k, v in os.environ.items() if not k.startswith("CLAUDE")}
     env.update(PM_ROLE=role, PM_TICKET=ticket.id, PM_DEPTH=ticket.fields.get("depth", "standard"),
-               PM_ALLOW_TIERS=ticket.fields.get("allow_tiers", ""), PM_ALLOW_BULK=ticket.fields.get("allow_bulk", ""),
-               PM_SHARED=storage.shared_area(board.root))
+               PM_ALLOW_TIERS=ticket.fields.get("allow_tiers", ""), PM_ALLOW_BULK=ticket.fields.get("allow_bulk", ""))
     return env
 
 

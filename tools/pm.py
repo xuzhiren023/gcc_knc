@@ -72,10 +72,10 @@ class Board:
         return self.policy["budgets"][ticket.fields.get("depth", "standard")]
 
     def worktree(self, ticket):
-        return os.path.join(os.path.dirname(self.root), os.path.basename(self.root) + "-work", ticket.id)
+        return storage.worktree(self.root, ticket.id)
 
     def state_dir(self):
-        path = os.path.join(self.root, ".git", "pm")
+        path = storage.state_dir(self.root)
         os.makedirs(path, exist_ok=True)
         return path
 
@@ -232,6 +232,7 @@ def cmd_start(board, args):
         if action is None or action[1].id != ticket.id:
             raise Refused("%s cannot start now: its dependencies or the WIP limit prevent it" % ticket.id)
     path = board.worktree(ticket)
+    os.makedirs(storage.shared_area(board.root), exist_ok=True)
     branch = ticket.fields.setdefault("branch", "%s/%s" % (ticket.fields.get("sprint", "s0"), ticket.id))
     if not os.path.isdir(path):
         os.makedirs(os.path.dirname(path), exist_ok=True)

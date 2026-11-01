@@ -23,7 +23,7 @@ Then stop. Do not write a summary, and do not start another ticket.
 ## Keep the disk small
 
 - Everything in your worktree is deleted when the ticket merges. Keep nothing there that must outlive the ticket.
-- The GCC checkout, toolchain and build trees live once, in the shared build area (`PM_SHARED`). Never copy them.
+- The GCC checkout, toolchain and build trees live once, in the shared build area (`.work/_shared`). Never copy them.
 - No per-attempt, per-run or dated output folders. Overwrite the previous output, and delete what you no longer need.
 - Large inputs and outputs stay out of git. Ask the lead if something truly must be kept.
 

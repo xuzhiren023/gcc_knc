@@ -91,16 +91,35 @@ def measure_disk(policy, env, cwd):
     import storage
     advice = " Delete your own build outputs, then continue, or use tools/pm.py ask."
     try:
-        level, message = storage.check(storage.main_root(cwd), policy)
+        root = storage.main_root(cwd)
+        level, message = storage.check(root, policy)
         if level == "hard":
             return message + advice
         limit = budget_for(policy, env)["disk_gib"]
-        used = storage.tree_size(cwd or os.getcwd()) / storage.GIB
+        if not env.get("PM_TICKET"):
+            return None
+        used = storage.tree_size(storage.worktree(root, env["PM_TICKET"])) / storage.GIB
         if used > limit:
             return "This worktree uses %.1f GiB; the ticket budget is %d GiB." % (used, limit) + advice
     except OSError:
         pass
     return None
+
+
+def ticket_env(env, cwd):
+    """Sessions started by hand get the active ticket's limits from the board."""
+    if env.get("PM_TICKET"):
+        return env
+    sys.path.insert(0, os.path.join(os.path.dirname(os.path.dirname(POLICY)), "tools"))
+    import storage
+    try:
+        fields = storage.active_ticket(storage.main_root(cwd))
+    except (OSError, IndexError, ValueError):
+        return env
+    merged = dict(env)
+    merged.update(PM_TICKET=fields.get("id", ""), PM_DEPTH=fields.get("depth", "standard"),
+                  PM_ALLOW_TIERS=fields.get("allow_tiers", ""), PM_ALLOW_BULK=fields.get("allow_bulk", ""))
+    return merged
 
 
 def main():
@@ -110,7 +129,8 @@ def main():
     # apply_patch also uses tool_input.command, but that text is file content.
     is_shell = event.get("tool_name", "Bash") != "apply_patch"
     command = command_text(event.get("tool_input")) if is_shell else ""
-    reason = check_command(command, policy, os.environ)
+    env = ticket_env(os.environ, event.get("cwd"))
+    reason = check_command(command, policy, env)
     if reason is None:
         state_dir = os.path.join(tempfile.gettempdir(), "gcc_knc_hook")
         path = os.path.join(state_dir, re.sub(r"\W", "_", str(event.get("session_id", "none"))) + ".json")
@@ -119,9 +139,9 @@ def main():
                 counts = json.load(f)
         except (OSError, ValueError):
             counts = {}
-        reason = check_budget(command, counts, policy, os.environ)
-        reason = reason or check_storage(command, counts, policy, os.environ,
-                                         lambda: measure_disk(policy, os.environ, event.get("cwd")))
+        reason = check_budget(command, counts, policy, env)
+        reason = reason or check_storage(command, counts, policy, env,
+                                         lambda: measure_disk(policy, env, event.get("cwd")))
         try:
             os.makedirs(state_dir, exist_ok=True)
             with open(path, "w", encoding="utf8") as f:

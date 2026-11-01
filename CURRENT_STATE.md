@@ -11,7 +11,7 @@ Last updated: 2026-11-01, kickoff.
 | Compiler | Nothing built yet. Donor GCC 5.1.1 is the reference |
 | Acceptance | `m1_affine`: logic validated on host; donor expected red at T1. Not yet run on the card |
 | Next milestone | Milestone M0, at the end of Sprint 1 |
-| Next step | Run the dispatcher (`docs/handoff/GPT_KICKOFF.md`); `python tools/pm.py board` shows progress |
+| Next step | Start GPT-6.1 or the dispatcher (`KICKOFF.md`); `python tools/pm.py board` shows progress |
 
 ## Metrics
 
