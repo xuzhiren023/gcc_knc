@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-01 12:42.
+Updated automatically at every ticket change. Last update: 2026-11-01 12:47.
 
 **Next: GPT-6.1, on S0-02 (ISA lint).** Start a new session and paste the prompt from `KICKOFF.md`.
 
@@ -23,7 +23,7 @@ Current tickets: `[##------------------]` 1 of 7
 | Ticket | What | State | Latest |
 |---|---|---|---|
 | S0-01 | Toolchain manifest and doctor | Done | Reviewed: red commit real; tests fail on the missing-tool cases; doctor rerun OK, required tools present, d... |
-| S0-02 | ISA lint | Not started |  |
+| S0-02 | ISA lint | In progress |  |
 | S0-03 | Test runner and red baseline | Not started |  |
 | S0-04 | Card runner | Not started |  |
 | S0-05 | Donor inventory | Not started |  |
@@ -45,4 +45,4 @@ No dispatcher sessions yet. Sessions you start by hand show their use in the app
 
 ## Disk
 
-The project uses 1.8 GiB of 100 GiB. 378 GiB free on the drive.
+The project uses 1.8 GiB of 100 GiB. 377 GiB free on the drive.
