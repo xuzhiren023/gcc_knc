@@ -27,8 +27,7 @@
 
 IMCI has no vector divide or square root, and FP64 has no hardware estimate at all, so
 FP64 sequences must start from an FP32 estimate or a table. Taking the fast path by
-default would quietly change numerics in programs that never asked for it, which is
-exactly what the F/P evidence warns about. Falling back to scalar is safe and easy to
+default would quietly change numerics in programs that never asked for it. Falling back to scalar is safe and easy to
 see in reports, and the cost is measurable, so the decision can be revisited with data.
 
 ## Verification
@@ -40,6 +39,6 @@ and MXCSR state it documents.
 
 ## Open question
 
-If correctly rounded FP64 division is too slow to help, the WRF kernels that depend on it
-need either explicit opt-in or an application-side change. That is a Gate C input, and
-the compiler does not decide it alone.
+If correctly rounded FP64 division is too slow to help, loops that depend on it stay
+scalar unless the user opts in to approximate forms. How often this matters across the
+corpus is a Gate C input.

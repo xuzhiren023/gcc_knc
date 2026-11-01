@@ -3,6 +3,11 @@
 **Reviewer:** Claude. **Date:** 2026-11-01.
 **Subject:** Astra's [technical research report](../../GCC_KNC_TECHNICAL_RESEARCH_REPORT_20261101.md).
 
+**Scope correction from the owner, same day:** GCC-KNC is a new, general-purpose project
+for any program that builds with GCC. It has nothing to do with PhiWeather or PhiChat.
+The report's application measurements are background evidence about the hardware, not
+goals. The plan has been updated; F8's effect below reflects this.
+
 ## Verdict
 
 **Adopt the direction, with corrections.** A KNC subtarget in the i386 backend of
@@ -46,7 +51,7 @@ entries, and the assembler rejects `vdivps` and `vsqrtpd`. The only hardware
 estimates are `vrcp23ps` and `vrsqrt23ps`, and they are FP32 only. The report
 treats division as part of a math library, but it also forbids implicit fast-math.
 So plain `a / b` in a vectorized loop needs a correctly rounded sequence, or it
-must stay scalar. Weather physics divides often, so this decides whether many
+must stay scalar. Numeric code divides often, so this decides whether many
 loops vectorize at all.
 *Effect:* [ADR-0003](../adr/0003-fp-defaults-and-division.md); its own story, E4-03.
 
@@ -77,7 +82,7 @@ atomics, `__float128`, SSE build flags); S0-05 replaces that expectation with a 
 is a Sprint 0 deliverable and a permanent test tier.
 
 **F7. Test-driven development needs a design the report does not give.** There is
-one card, it is shared with PhiWeather, and timing runs are exclusive. I know of no
+one card, it may be used by other work, and timing runs are exclusive. I know of no
 usable KNC emulator (S0-01 confirms that). The report lists validation layers, but
 not a loop fast enough to run on every change.
 *Effect:* seven test tiers, of which the three used on every change need no card. See
@@ -89,9 +94,9 @@ accelerated. But no retained evidence shows that share is reachable. From the
 Fairborn result (2.574× kernel, 0.869% step saving), that kernel covered roughly
 1.4% of the step, assuming its gain carried through fully. PhiWeather's `CURRENT_STATE.md` also lists performance tuning as
 closed, with a 5.228 s/step baseline rather than the report's 5.243.
-*Effect:* S0-07 estimates vectorizable coverage from compile reports and the
-retained profile before heavy backend work. Adoption by PhiWeather stays a separate
-owner decision.
+*Effect:* the question widens to programs in general. S0-07 proposes a public corpus and
+estimates vectorizable coverage from compile reports before heavy backend work, and
+Gate E measures whole programs against GCC 5.1.1.
 
 ### Medium
 

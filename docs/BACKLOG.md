@@ -17,7 +17,7 @@ Full details are in [SPRINT-00](sprints/SPRINT-00.md).
 | S0-04 | Card runner and shared-lock behaviour | Deep |
 | S0-05 | Donor inventory, including runtime libraries | Standard |
 | S0-06 | GCC 16.2 fork and measured build and TDD-loop times | Standard |
-| S0-07 | WRF and PhiChat coverage estimate | Standard |
+| S0-07 | Benchmark corpus and coverage estimate | Standard |
 
 ## E1 GCC 16 skeleton (S1, Gate A)
 
@@ -73,7 +73,7 @@ Full details are in [SPRINT-00](sprints/SPRINT-00.md).
 | E5-03 | Per-loop reports: vector factor, checks, tail cost, helper calls, spills, and reasons for rejection | Standard |
 | E5-04 | Evaluate source-format scalar in `zmm` against x87 (ADR-0003) | Deep |
 | E5-05 | U/V scheduler v0, tested at production thread density | Standard |
-| E5-06 | Gate C kernels: short-row flux and data-reuse fixtures from PhiWeather and PhiChat | Deep |
+| E5-06 | Gate C kernels: short-loop, stencil and small-matrix kernels drawn from the corpus, plus hand-written IMCI references written for this project | Deep |
 
 ## E6 Runtimes (S7–S9, Gate D)
 
@@ -82,24 +82,24 @@ Full details are in [SPRINT-00](sprints/SPRINT-00.md).
 | E6-01 | Shared libgcc; symbol-version ceiling tied to glibc 2.21 and kernel 2.6.38 | Deep |
 | E6-02 | libgfortran slice: descriptors, allocation, formatted I/O, modules; `real(16)` and libquadmath decision | Deep |
 | E6-03 | libgomp with futex; TLS models; a single OpenMP runtime in the process | Deep |
-| E6-04 | MPI and netCDF Fortran boundaries rebuilt or adapted; old `.mod` files never reused | Deep |
+| E6-04 | MPI Fortran bindings rebuilt or adapted, and common corpus libraries built; old `.mod` files never reused | Deep |
 | E6-05 | IMCI intrinsics header, only for operations with real demand | Standard |
-| E6-06 | libstdc++ subset: exceptions, RTTI, atomics, enough for pinned PhiChat. GCC 16's default C++ standard is checked against that code | Standard |
+| E6-06 | libstdc++: exceptions, RTTI, atomics, threads, with coverage measured by its own testsuite and the corpus. Check GCC 16's default C++ standard against corpus code | Standard |
 
-## E7 Math and kernels (S10–S12, Gate E)
+## E7 Math and broad optimization (S10–S12, Gate E)
 
 | ID | Story | Depth |
 |---|---|---|
-| E7-01 | Pick functions from actual use; vector function ABI, with its own mangling (ADR required; do not reuse AVX-512's `_ZGVe`, since the code is not AVX-512) | Deep |
+| E7-01 | Pick functions from corpus use, starting with common libm calls; vector function ABI, with its own mangling (ADR required; do not reuse AVX-512's `_ZGVe`, since the code is not AVX-512) | Deep |
 | E7-02 | Accurate `exp`, `log`, `pow` first; relaxed entry points separate; exceptional-lane repair compared | Deep |
-| E7-03 | WRF representative region from source, carried through GIMPLE, RTL and assembly | Standard |
-| E7-04 | PhiChat representative region from source | Standard |
-| E7-05 | Gate E projection using the §13 model, overheads included | Deep |
+| E7-03 | Rank missed optimizations by corpus-wide profile and carry the top regions through GIMPLE, RTL and assembly | Standard |
+| E7-04 | Scalar and integer code quality for the in-order core: scheduling, inlining, code size, branches without CMOV | Standard |
+| E7-05 | Gate E: corpus comparison against GCC 5.1.1, including held-out programs | Deep |
 
-## E8 Applications and release (M5–M6, opt-in)
+## E8 Program corpus and release (M5–M6)
 
-Selected WRF and PhiChat builds; matched benchmarks; broader suites; packaging without
-restricted sysroot content; user manual and support matrix; update procedure.
+Full corpus builds; matched benchmarks; broader suites; packaging without restricted
+sysroot content; user manual and support matrix; update procedure.
 
 ## Parked research
 

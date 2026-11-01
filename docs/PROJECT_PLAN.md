@@ -16,10 +16,11 @@ Three outcomes are reported separately, because none of them substitutes for ano
 |---|---|---|
 | **Coverage:** does it compile and run correctly? | Pass rate of GCC's `gcc.c-torture/execute`, `gcc.dg/vect` and `gfortran.dg` subsets, native on the card, with zero ISA lint violations | Agreed at Gate C from the first full baseline |
 | **Kernel efficiency:** is the generated code good? | Auto-vectorized kernels against x87 and against existing hand-written IMCI, across lengths and thread densities | See Gate C |
-| **Application:** does it reach real programs? | Matched WRF and PhiChat runs against the current builds | Set at Gate E from the coverage estimate |
+| **Programs:** does it reach real software? | A public corpus of unmodified C, C++ and Fortran programs: how many build and run correctly, and whole-program speed against GCC 5.1.1 | See Gates D and E |
 
-The 3 s/step WRF objective is **not** a compiler acceptance criterion. PhiWeather has
-closed performance tuning, and adopting GCC-KNC there is a separate owner decision.
+This is a general-purpose compiler project, independent of any one application. Work is
+prioritized by benefit across the corpus and never tuned to a single program. That
+includes integer and branch-heavy code, not only floating-point loops.
 
 ## 2. Scope
 
@@ -34,13 +35,13 @@ closed performance tuning, and adopting GCC-KNC there is a separate owner decisi
 - Replacing libc, or sanitizers
 - LTO (blocked by the assembler)
 - Implicit precision changes
-- Scientific validation of forecasts
+- Application-specific tuning or source changes
 
 ## 3. Roles
 
 | Role | Who | Responsible for | Does not do |
 |---|---|---|---|
-| Product owner | You | Priorities, gate decisions, card time, merges, outward actions, reopening PhiWeather work | Writing code or tests |
+| Product owner | You | Priorities, gate decisions, card time, merges, outward actions | Writing code or tests |
 | Implementer | GPT (Codex) | Code, story tests, tools, build scripts, measurements and the sprint log | Editing `tests/acceptance/` or ADRs; merging; changing gate criteria |
 | Tech lead and reviewer | Claude | Backlog, specs, acceptance fixtures, ADRs, reviews and consulting | Routine implementation |
 | Research | Astra | Further research on request, feeding specs | Implementation |
@@ -73,11 +74,11 @@ refined when they come near.
 | | **S5** | Conversions, gather/scatter, permutes, reductions, and correct division and square root | |
 | | **S6** | Machine characterization, cost model v1, scheduler v0, per-loop reports, first GCC vect testsuite baseline | **C** |
 | **M3** Runtimes | **S7** | Shared libgcc and a libgfortran slice | |
-| | **S8** | libgomp, TLS, and MPI and netCDF Fortran boundaries | |
-| | **S9** | The libstdc++ subset PhiChat needs, including exceptions and atomics | **D** |
-| **M4** Application kernels | **S10** | Vector math v0 and a documented vector function ABI | |
-| | **S11–12** | One WRF and one PhiChat region compiled from source and compared with the current kernels | **E** |
-| **M5** Applications | **S13–14** | Selected full builds with matched benchmarks, if the owner opts in | |
+| | **S8** | libgomp, TLS, and MPI Fortran bindings | |
+| | **S9** | The libstdc++ the corpus needs, including exceptions and atomics | **D** |
+| **M4** Broad optimization | **S10** | Vector math v0 and a documented vector function ABI | |
+| | **S11–12** | Optimization work ranked by corpus-wide profiles, scalar and vector, compared with GCC 5.1.1 | **E** |
+| **M5** Program corpus | **S13–14** | The full corpus built and run, with matched benchmarks, and the corpus widened | |
 | **M6** Release | **S15+** | Packaging, documentation, known-limits list and update procedure | |
 
 M2 to M4 can overlap where dependencies allow. Runtime investigation, for example, can
@@ -93,9 +94,9 @@ judgment. They are not derived from data, and each gate can reset the next one's
 |---|---|---|---|
 | **A** | Can GCC 16 be our base, on this host? | `cc1` builds for `k1om`; emits assembly accepted by the 2.22 assembler; incremental rebuild plus T1 takes ≤ 5 min | Record the blocker. Bridge to 14.4 only if it is specific to 16. If only the loop is slow, ask for WSL2 |
 | **B** | Is the i386 subtarget still cheaper than a separate backend? | `m1_affine` fully green, ABI cross-check included; ≤ 300 changed lines in shared i386 files outside the KNC hooks, with no SSE-assumption ICE class still open | Compare costs of a separate backend, using the real inventory, before S4 |
-| **C** | Does generated code justify continuing? | At L2 working sets and production thread density: FP32 affine kernel ≥ 50% of the hand-written IMCI gain, and never more than 5% worse than x87 at any tested length | Fix the top cost-model finding, one retry; then revisit scope with the owner |
+| **C** | Does generated code justify continuing? | At L2 working sets and production thread density: FP32 affine kernel ≥ 50% of the gain of a hand-written IMCI reference kernel, and never more than 5% worse than x87 at any tested length | Fix the top cost-model finding, one retry; then revisit scope with the owner |
 | **D** | Can runtimes coexist on the card's old system? | Fortran, OpenMP and C++ integration tests pass natively, and required symbols and syscalls are all accounted for | Adapt or formally exclude the feature |
-| **E** | Do gains reach applications? | Projected whole-step saving for a real WRF or PhiChat region is ≥ 10%, using the report's §13 model and overheads included | Stop at a compiler-plus-library release; do not spend M5 on it |
+| **E** | Do gains reach whole programs? | Across the corpus, median whole-program speedup over GCC 5.1.1 is ≥ 1.25×, and no program is more than 5% slower without a known cause | Fix the top corpus-wide cause, one retry; then release with documented limits rather than chase M5 |
 
 ## 7. Forecast
 
@@ -131,10 +132,11 @@ do not impose waits.
 | Risk | Early signal | Response |
 |---|---|---|
 | i386 backend assumes SSE or AVX more deeply than a subtarget can absorb | Repeating ICEs; shared-file line count rising faster than features | Gate B comparison with a separate backend |
-| Too little runtime is vectorizable to matter | S0-07 coverage estimate | Owner decides early; narrow to compiler plus library, or stop |
+| Typical programs spend too little time in vectorizable loops | S0-07 corpus estimate | Shift effort to scalar code quality, scheduling and inlining; owner decides early |
+| Tuning to the benchmarks regresses other programs | Held-out programs slow down | Keep a held-out part of the corpus; narrow rules or use a conservative default |
 | No correct and competitive vector division | E4-03 results | Division stays scalar in those loops, or explicit opt-in |
 | Scalar and vector transitions eat the gain | Spill and memory-transfer counts in reports | Region-based lowering, cost-model penalties |
-| Card contention with PhiWeather | Runner waits on lock | Host-side tiers first; batch native runs; PhiWeather has priority |
+| Card contention with other work on this machine | Runner refuses to start | Host-side tiers first; batch native runs |
 | Masked forms fault at page boundaries | E3-01 probe | Tail by aligned load or scalar, with cost reflected |
 | Old assembler rejects something GCC 16 requires | Gate A build | Configure off or emit an equivalent; forward-port only as a last resort |
 | glibc 2.21 or kernel 2.6.38 cannot support a modern runtime feature | Missing symbols or syscalls in T2 | Adapt or exclude explicitly |
@@ -147,6 +149,6 @@ do not impose waits.
 |---|---|---|
 | Create a private GCC fork repository, or stay local-only for now | Before S1 | Create it, private |
 | Confirm `xuzhiren023/gcc_knc` visibility before the first push | First push | Private: the report contains local paths and project detail |
-| Grant the runner card access and confirm how PhiWeather's lock should be shared | S0-04 | Native jobs may run when the card is free; PhiWeather always has priority |
+| Grant the runner card access, and say whether other work on the card needs protecting | S0-04 | Native jobs run only when the card is idle |
+| Approve the benchmark corpus | After S0-07 | Mix of integer, floating-point, C, C++, Fortran and OpenMP |
 | Enable WSL2, if Gate A shows Cygwin is too slow | Gate A | Decide only with the measured numbers |
-| Whether GCC-KNC should eventually reopen PhiWeather performance work | After S0-07 | Wait for the coverage estimate |

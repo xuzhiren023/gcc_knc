@@ -25,17 +25,24 @@ You are the implementer. Claude is tech lead and reviewer, and the owner makes d
 - Every generated object must pass `tools/knc_lint`.
 - Do not emit opaque bytes to get around the assembler's architecture checks.
 
-## Hardware and sibling projects
+## Scope
 
-- **The card is shared, and PhiWeather has priority.** Use the card only through `tools/card_run`, and only after S0-04 is approved. Check the lock and running processes first. Never touch foreign processes. Timing runs are exclusive.
-- **Compilers run on the host, and programs run on the card.** A host run is allowed only for fixture logic or test-vector generation. It is never a stand-in for a native result. WRF never runs on the host.
-- **`PhiWeather` and `PhiChat` are read-only,** including their `.tools`. Do not move PhiWeather's lock path.
+This is a general-purpose compiler project for any program that builds with GCC. It is not
+part of PhiWeather or PhiChat. Do not tune to one program or justify a rule with one
+program's result. Where the research report centres on those applications, treat that as
+background evidence, not as requirements.
+
+## Hardware and other projects
+
+- **The card may also be used by unrelated work.** Use it only through `tools/card_run`, and only after S0-04 is approved. Never touch foreign processes. Timing runs are exclusive.
+- **Compilers run on the host, and programs run on the card.** A host run is allowed only for fixture logic or test-vector generation. It is never a stand-in for a native result.
+- **Other projects' folders are read-only,** including PhiWeather's `.tools`, which holds the bootstrap tools until S0-01 gives this project its own copy.
 - Do not install or change system files on the card.
 
 ## Environment
 
 - Windows 10, 12 threads, about 16 GB of memory. Keep `make -j` at 8 or below, and watch memory.
-- Build shell: PhiWeather's private Cygwin. Put `.tools/knc-bootstrap/cross/bin` and `.tools/knc-bootstrap/cygwin/bin` on `PATH`. The system Cygwin has no `gcc`, and Windows Python is 3.8, so use the Cygwin `python3` for tools.
+- Build shell: for now, the private Cygwin under PhiWeather's `.tools`. Put its `knc-bootstrap/cross/bin` and `knc-bootstrap/cygwin/bin` on `PATH`. The system Cygwin has no `gcc`, and Windows Python is 3.8, so use the Cygwin `python3` for tools.
 - Git checkouts of GCC need `core.autocrlf=false` and `core.fileMode=false`.
 
 ## Repository

@@ -2,7 +2,7 @@
 
 **Goal:** the test loop runs end to end against the donor compiler, `m1_affine` is
 recorded red for the right reason, and we know the donor's real contents, GCC 16's real
-build cost and the project's likely value.
+build cost and the likely value across a general program corpus.
 
 **Cap:** two weeks. **Implementer:** GPT. **Reviewer:** Claude.
 
@@ -17,7 +17,8 @@ afterwards, and they do not depend on each other.
 
 ### S0-01 Toolchain manifest and doctor (Light)
 
-Read-only reuse of existing tools. Inputs from PhiWeather (never modified):
+This project is independent of PhiWeather, but the only local builds of these tools
+happen to live in its folder. Use them read-only to bootstrap:
 
 - Cross tools: `C:\Users\xuzhi\Documents\PhiWeather\.tools\knc-bootstrap\cross\bin` (donor GCC 5.1.1, `as` 2.22)
 - Private Cygwin: `...\knc-bootstrap\cygwin\bin` (GCC 14.4). Must be on `PATH`, or `cc1` fails looking for `cygmpc-3.dll`
@@ -26,6 +27,7 @@ Read-only reuse of existing tools. Inputs from PhiWeather (never modified):
 Acceptance:
 
 - [ ] `toolchain/manifest.json` names each tool, path, version and role
+- [ ] By sprint exit, the tools and sysroot are copied or rebuilt into this project's git-ignored `.tools/`, so nothing depends on the PhiWeather folder
 - [ ] `tools/doctor` runs each tool, reports versions, and fails with a useful message on anything missing
 - [ ] Also checks for `dejagnu` and `expect` availability; reports them as absent if so, and it is not a Sprint 0 failure
 - [ ] Confirms in a sentence whether any usable KNC emulator exists (Intel SDE is the one to check), for `docs/research/`
@@ -61,16 +63,16 @@ Acceptance:
 
 ### S0-04 Card runner (Deep)
 
-**Spec and red tests are reviewed before GREEN.** Read how PhiWeather's card access and
-lock work first (`scripts/AppScientificExecution.py` and `K1OM_REMOTE` are the starting
-points) and post the proposed behaviour as a consult.
+**Spec and red tests are reviewed before GREEN.** Existing card access on this machine is
+a useful reference for connection details (`K1OM_REMOTE` in PhiWeather's scripts). Post the
+proposed behaviour as a consult.
 
 Acceptance:
 
 - [ ] `tools/card_run` implements section 9 of the development cycle: lock and process checks, private directory, time limit, cleanup, boot ID, card minutes
 - [ ] T0 tests with a fake transport cover: lock present, foreign process, timeout, card unreachable, reboot during a run, nonzero exit, and cleanup after failure
 - [ ] It never takes action on a foreign process. It reports and refuses
-- [ ] **Decision raised to the owner:** whether our runner should also hold PhiWeather's lock while running, so the app's dispatcher waits. Check what the app does if the lock appears, and do not write to that path until the owner agrees
+- [ ] External locks are configuration, and the runner only reads them. It never writes to another project's lock path
 - [ ] Once approved and the card is free: run the donor-built `m1_affine` at T3 and a `hello`. The expected output for `m1_affine` is `ACCEPT-PASS`, because scalar x87 loops should compute correctly. **That result validates the fixture and runner on real hardware, including guard pages**
 
 ### S0-05 Donor inventory (Standard)
@@ -103,26 +105,29 @@ Acceptance:
 - [ ] Recommendation: does the T1 budget (≤ 5 min) look reachable on Cygwin? This feeds Gate A
 - [ ] Does `config.sub` in GCC 16.2 still accept `k1om-mpss-linux`? Note the result without patching
 
-### S0-07 Coverage estimate (Standard, research)
+### S0-07 Benchmark corpus and coverage estimate (Standard, research)
 
-A cheap answer to "how much could this help?" before heavy investment. **Compile-only on
-the host; no WRF execution on the host.**
+A cheap answer to "what would help most programs?" before heavy investment. Propose a
+public corpus, then estimate compile-side coverage on the host. **Compile-only; corpus
+programs are not benchmarked on the host.**
 
-Use the existing GCC 14 build (`.tools/project-host/compiler.json`), with AVX-512 flags as
-a *proxy* for what a 512-bit target could vectorize, and `-fopt-info-vec-all` on WRF hot
-files. Combine with whatever sampled profile is retained in PhiWeather. Some evidence was
-cleaned up on 2026-11-01, so check what exists, and if nothing usable remains say so and
-request a sampling run from the owner rather than guessing. Do the same at smaller scale
-for a PhiChat region.
+Candidates to evaluate, not yet chosen: PolyBench/C, STREAM, NAS Parallel Benchmarks, HPCG
+(numeric, C, Fortran, C++, OpenMP), and zlib, SQLite and a compression or parsing workload
+(integer and branch-heavy). Check each license and whether it builds without modern x86
+intrinsics or newer OS features.
 
-Deliverable: `docs/research/coverage-estimate.md`
+Use a stock modern GCC with AVX-512 flags as a *proxy* for what a 512-bit target could
+vectorize, with `-fopt-info-vec-all`.
+
+Deliverable: `docs/research/corpus-and-coverage.md`
 
 Acceptance:
 
-- [ ] For the top hot regions: share of step time, whether GCC vectorizes the loops, reason if not, whether the loops divide or call math functions, and typical trip counts where known
-- [ ] An estimate of `f`, the accelerable fraction, as a range with assumptions spelled out, then run through the report's §13 model at plausible `S`
+- [ ] Proposed corpus with license, language, workload type, and a held-out part never used for tuning
+- [ ] For each program: share of loops vectorized, top reasons for rejection, how many loops divide or call math functions, and use of unsupported intrinsics or OS features
+- [ ] Runtime share per region is taken from card profiles later, in S6. Until then, say plainly that loop counts do not equal time
 - [ ] Clear limits: AVX-512 vectorizes operations IMCI lacks, so this is an upper bound for legality and says nothing about profitability
-- [ ] One-paragraph conclusion the owner can act on
+- [ ] One-paragraph conclusion on where broad gains are likely to come from, vector or scalar
 
 ## Sprint exit
 
@@ -130,7 +135,7 @@ Acceptance:
 - [ ] `CURRENT_STATE.md` updated
 - [ ] Sprint 1 refined from E1, using S0-05 and S0-06 findings
 - [ ] Three-line retro below
-- [ ] Owner has read the S0-07 conclusion, and confirms proceeding to S1
+- [ ] Owner has approved the corpus and read the S0-07 conclusion, and confirms proceeding to S1
 
 ## Log
 

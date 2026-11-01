@@ -24,7 +24,7 @@ Last updated: 2026-11-01, kickoff.
 
 ## Card
 
-Shared with PhiWeather, which has priority. This project has not used it. Rules are in
+May also be used by unrelated work on this machine. This project has not used it. Rules are in
 `docs/DEVELOPMENT_CYCLE.md` section 9, and no access is allowed before S0-04 is approved.
 
 ## Open owner decisions

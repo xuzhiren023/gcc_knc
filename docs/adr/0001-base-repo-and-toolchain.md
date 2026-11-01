@@ -10,9 +10,9 @@
 | Fallback | GCC 14.4 only if Gate A records a concrete blocker in 16.2. Being merely harder is not a blocker. |
 | Fork lifetime | Permanent private fork. Pick up 16.x fixes when needed. Move to a new major version only for a concrete need, not on a schedule. |
 | Source location | A GCC fork in its own repository, checked out at `compiler/gcc` as a git submodule. This repository holds tests, tools, docs and runtime code. |
-| Assembler and linker | MPSS binutils 2.22+mpss3.8.6, as already built. Read-only reuse from PhiWeather in Sprint 0; a project-owned rebuild later. |
-| Link sysroot | The card-derived `.tools/project-host/sysroot` (glibc 2.21). Native tests run against the card's installed libraries. |
-| Build host | PhiWeather's private Cygwin with GCC 14.4, pending Gate A. If the TDD loop misses its budget, ask the owner to enable WSL2. |
+| Assembler and linker | MPSS binutils 2.22+mpss3.8.6. Bootstrapped from the existing local build; this project has its own copy or rebuild by the end of Sprint 0. |
+| Link sysroot | The sysroot derived from the card (glibc 2.21). Native tests run against the card's installed libraries. |
+| Build host | Cygwin with GCC 14.4, pending Gate A. If the TDD loop misses its budget, ask the owner to enable WSL2. |
 | Target triple | `k1om-mpss-linux`, matching the existing tools. |
 | LTO | Disabled. It needs a newer binutils than we can use. |
 
@@ -39,4 +39,4 @@ benefits from a recent base. The bridge option stays open until Gate A has real 
   checkout on this machine shows every file modified because of line endings, so its
   `git status` cannot be trusted.
 - A GCC source tree on Windows also has case-sensitivity concerns. S0-06 checks this.
-- PhiWeather's `.tools` is reused read-only, and nothing in this project may change it.
+- This project is independent of PhiWeather. Its `.tools` folder is read-only bootstrap input until Sprint 0 ends.

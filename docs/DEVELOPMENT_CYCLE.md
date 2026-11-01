@@ -80,7 +80,7 @@ The tiers are what make TDD workable here: most of the loop runs without the car
 | **T3** | Native execution of the story's tests and acceptance fixtures | Card, not exclusive | ≤ 10 min | Before review of anything that affects semantics |
 | **T4** | Native GCC testsuite subsets through a DejaGnu board | Card, not exclusive | Hours; batched | Sprint close, and on demand |
 | **T5** | Kernel performance: matched repeats, thermals recorded | Card, **exclusive** | Scheduled | Stories that claim a performance result; gates |
-| **T6** | Application builds and matched runs | Card, **exclusive** | Owner-approved | Gates D, E and M5 |
+| **T6** | Corpus program builds and matched runs | Card, **exclusive** | Owner-approved | Gates D, E and M5 |
 
 ## 5. TDD rules for compiler work
 
@@ -108,11 +108,11 @@ something independent of the code under test:
 | Donor GCC 5.1.1 object in the same link | ABI cross-checks; scalar references |
 | MPFR or SoftFloat, generated on the host, vectors shipped to the card | Math, division, conversions |
 | ISA manual pseudo-code, hand-derived | Instruction semantics |
-| Hand-written IMCI kernels from PhiWeather and PhiChat | Performance comparison only |
+| Hand-written IMCI reference kernels, written for this project | Performance comparison only |
 
 x87 output is not a general oracle for vector FP, because excess precision can
 legitimately change results. Host execution here means test-vector generation or
-fixture logic. It is never a substitute for the card and never a forecast fallback.
+fixture logic. It is never a substitute for the card.
 
 ### Regression ratchet
 
@@ -182,23 +182,24 @@ or when a gate threshold is in question.
 
 ## 9. Card discipline
 
-There is one card, and PhiWeather has priority. All access goes through `tools/card_run`,
-which does the following:
+There is one card, and it may also be used by unrelated work on this machine. All access
+goes through `tools/card_run`, which does the following:
 
-1. Refuses to run if `PhiWeather/artifacts/test-state/g5-narrow14/native-session.lock` exists, or if foreign card processes are running. That lock path is fixed in PhiWeather's code, so it must not be moved.
+1. Refuses to run if a foreign job is on the card: any configured external lock file is present, or foreign processes are running. It never touches them. Today's one external lock is `PhiWeather/artifacts/test-state/g5-narrow14/native-session.lock`, kept only because that app can use the same physical card.
 2. Runs in a private temporary directory, with a time limit, and cleans up afterwards.
 3. Records the boot ID and the card minutes used. A reboot wipes `/var/volatile/tmp`, so the runner restores what it needs and does not treat a reboot as a test failure.
 
 - Batch T3 and T4 runs. Run them when a story is otherwise ready, not on every edit.
 - T5 and T6 runs are exclusive and thermally recorded; no other card job overlaps them.
-- Do not install system files on the card or change anything PhiWeather uses.
+- Do not install system files on the card.
 - Failures caused by the card state are infrastructure failures, reported as such. They are not retried silently, and they are not counted as test passes.
 
 ## 10. Performance claims
 
 - A number is a claim only if it names the compiler commit, options, inputs, thread density, working set and clock boundaries.
 - Screening uses matched runs. A speedup claim needs repeats, and setup costs count when the application pays them.
-- Kernel gains are not added to one another or projected onto applications without the §13 model from the report.
+- Kernel gains are not added to one another or projected onto whole programs without the §13 model from the report.
+- No tuning rule may be justified by a single program. Check it against the wider corpus, including held-out programs.
 - Negative results are kept in the sprint log. They are useful, and they should not be rerun unchanged.
 
 ## 11. Documentation weight

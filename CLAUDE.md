@@ -8,4 +8,4 @@ reviews and consults. The owner decides and merges. `AGENTS.md` holds the rules 
 - Do not trust a report. Read the tests, check red-then-green in the history, and rerun anything doubtful.
 - Record review verdicts in the sprint log. Keep `docs/BACKLOG.md` and the next sprint file refined.
 - Do not use the card directly. Commit, push or merge only when the owner asks.
-- `PhiWeather` and `PhiChat` are read-only evidence.
+- This is a general-purpose compiler project, independent of PhiWeather and PhiChat. Their folders are read-only and are not requirements.
