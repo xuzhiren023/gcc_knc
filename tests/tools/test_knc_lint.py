@@ -40,7 +40,7 @@ class Lint(unittest.TestCase):
             result = self.lint(obj)
             self.assertEqual(result.returncode, 1, result.stdout)
             self.assertIn('seed:0x0:', result.stdout)
-            self.assertIn('repz nop', result.stdout)
+            self.assertRegex(result.stdout, r'forbidden: (?:pause|repz\s+nop)')
 
     def test_donor_loops_and_containers(self):
         with tempfile.TemporaryDirectory() as temp:
@@ -54,8 +54,8 @@ class Lint(unittest.TestCase):
             archive, shared, executable = (temp / n for n in ('loops.a', 'loops.so', 'loops.elf'))
             for command in (
                 (TC / 'cross/bin/k1om-mpss-linux-ar.exe', 'rcs', archive, obj),
-                (TC / 'cross/bin/k1om-mpss-linux-ld.exe', '-shared', obj, '-o', shared),
-                (TC / 'cross/bin/k1om-mpss-linux-ld.exe', '-e', 'affine_f32', obj, '-o', executable),
+                (TC / 'cross/bin/k1om-mpss-linux-ld.exe', '-m', 'elf_k1om', '-shared', obj, '-o', shared),
+                (TC / 'cross/bin/k1om-mpss-linux-ld.exe', '-m', 'elf_k1om', '-e', 'affine_f32', obj, '-o', executable),
             ):
                 result = self.run_command(*command)
                 self.assertEqual(result.returncode, 0, result.stdout)
