@@ -97,7 +97,7 @@ Claude session and ask it to act as tech lead on the board.
 
 - `board` shows all tickets in one line each, and what is next.
 - `inbox` shows only what needs you. Answer with `PM_ROLE=owner python tools/pm.py decide <ID> "<decision>"`.
-- `usage` shows tokens per ticket.
+- `usage` shows tokens per ticket, and `python tools/storage.py` shows disk use.
 - Agents commit and merge locally. They never push. Pushing stays yours.
 - You can read a ticket or any session whenever you like, but nothing depends on you relaying it.
 

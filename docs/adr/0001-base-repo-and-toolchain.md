@@ -9,7 +9,7 @@
 | Compiler base | The GCC 16 release branch, starting at tag `releases/gcc-16.2.0`. |
 | Fallback | GCC 14.4 only if Milestone M0 records a concrete blocker in 16.2. Being merely harder is not a blocker. |
 | Fork lifetime | Permanent private fork. Pick up 16.x fixes when needed. Move to a new major version only for a concrete need, not on a schedule. |
-| Source location | A GCC fork in its own repository, checked out at `compiler/gcc` as a git submodule. This repository holds tests, tools, docs and runtime code. |
+| Source location | A GCC fork in its own repository, with one checkout and one build tree in the shared build area, never one per ticket. This repository holds tests, tools, docs and runtime code. |
 | Assembler and linker | MPSS binutils 2.22+mpss3.8.6. Bootstrapped from the existing local build; this project has its own copy or rebuild by the end of Sprint 0. |
 | Link sysroot | The sysroot derived from the card (glibc 2.21). Native tests run against the card's installed libraries. |
 | Build host | Cygwin with GCC 14.4, pending Milestone M0. If the TDD loop misses its budget, ask the owner to enable WSL2. |

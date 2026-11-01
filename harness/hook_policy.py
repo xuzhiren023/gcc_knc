@@ -45,6 +45,8 @@ def check_command(command, policy, env):
     if re.search(policy["wrappers"], command):
         return None
     for rule in policy["hook_rules"]:
+        if rule.get("unless_env") and env.get(rule["unless_env"]):
+            continue
         if re.search(COMMAND_POSITION + "(?:" + rule["command"] + ")", command):
             return rule["reason"]
         if rule.get("anywhere") and re.search(rule["anywhere"], command):
@@ -69,6 +71,38 @@ def check_budget(command, counts, policy, env):
     return None
 
 
+def check_storage(command, counts, policy, env, measure):
+    """Measure the disk now and then. Over a limit, only finishing and deleting still work."""
+    if re.search(policy["exempt"], command):
+        return None
+    if re.search(policy["removal"], command):
+        counts["recheck"] = True
+        return None
+    calls = counts.get("tool_calls", 0)
+    every = policy["storage"]["hook_check_every_calls"]
+    if counts.pop("recheck", False) or (calls and calls % every == 0):
+        counts["over_limit"] = measure()
+    return counts.get("over_limit")
+
+
+def measure_disk(policy, env, cwd):
+    """A reason to stop, or None. Fails open: a measuring problem must not stop the work."""
+    sys.path.insert(0, os.path.join(os.path.dirname(os.path.dirname(POLICY)), "tools"))
+    import storage
+    advice = " Delete your own build outputs, then continue, or use tools/pm.py ask."
+    try:
+        level, message = storage.check(storage.main_root(cwd), policy)
+        if level == "hard":
+            return message + advice
+        limit = budget_for(policy, env)["disk_gib"]
+        used = storage.tree_size(cwd or os.getcwd()) / storage.GIB
+        if used > limit:
+            return "This worktree uses %.1f GiB; the ticket budget is %d GiB." % (used, limit) + advice
+    except OSError:
+        pass
+    return None
+
+
 def main():
     # Windows hosts may add a byte-order mark. A crash here would silently allow the call.
     event = json.loads(sys.stdin.buffer.read().decode("utf-8-sig"))
@@ -86,6 +120,8 @@ def main():
         except (OSError, ValueError):
             counts = {}
         reason = check_budget(command, counts, policy, os.environ)
+        reason = reason or check_storage(command, counts, policy, os.environ,
+                                         lambda: measure_disk(policy, os.environ, event.get("cwd")))
         try:
             os.makedirs(state_dir, exist_ok=True)
             with open(path, "w", encoding="utf8") as f:

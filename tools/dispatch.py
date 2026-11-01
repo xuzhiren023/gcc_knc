@@ -13,11 +13,13 @@ import datetime
 import glob
 import json
 import os
+import shutil
 import subprocess
 import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import pm  # noqa: E402
+import storage  # noqa: E402
 
 ENGINEER_PROMPT = """You are an engineer on GCC-KNC, working on ticket {id} only, in this worktree.
 Run: python tools/pm.py show {id}
@@ -46,8 +48,11 @@ def engineer_command(board, ticket, worktree):
     codex = newest(r"%LOCALAPPDATA%\OpenAI\Codex\bin\*\codex.exe") or "codex"
     effort = board.budget(ticket)["effort"]
     trust = 'projects."%s".trust_level="trusted"' % worktree.replace("\\", "\\\\")
+    shared = storage.shared_area(board.root)
+    os.makedirs(shared, exist_ok=True)
+    roots = 'sandbox_workspace_write.writable_roots=["%s"]' % shared.replace("\\", "\\\\")
     return [codex, "exec", "--json", "--ephemeral", "-C", worktree, "--sandbox", "workspace-write",
-            "--dangerously-bypass-hook-trust", "-c", trust, "-c", 'approval_policy="never"',
+            "--dangerously-bypass-hook-trust", "-c", trust, "-c", roots, "-c", 'approval_policy="never"',
             "-c", 'model_reasoning_effort="%s"' % effort,
             ENGINEER_PROMPT.format(id=ticket.id)]
 
@@ -65,7 +70,8 @@ def lead_command(board, ticket):
 def session_env(board, ticket, role):
     env = {k: v for k, v in os.environ.items() if not k.startswith("CLAUDE")}
     env.update(PM_ROLE=role, PM_TICKET=ticket.id, PM_DEPTH=ticket.fields.get("depth", "standard"),
-               PM_ALLOW_TIERS=ticket.fields.get("allow_tiers", ""))
+               PM_ALLOW_TIERS=ticket.fields.get("allow_tiers", ""), PM_ALLOW_BULK=ticket.fields.get("allow_bulk", ""),
+               PM_SHARED=storage.shared_area(board.root))
     return env
 
 
@@ -127,6 +133,8 @@ def run_session(board, ticket, role, dry_run):
     else:
         command, cwd = lead_command(board, ticket), board.root
     timeout = board.policy["session_timeout_minutes"] * 60
+    project_before = storage.project_bytes(board.root)
+    free_before = shutil.disk_usage(board.root).free
     before = (ticket.state, ticket.fields.get("head"))
     try:
         # codex exec waits for end of input on an inherited stdin.
@@ -152,7 +160,21 @@ def run_session(board, ticket, role, dry_run):
     with open(os.path.join(board.state_dir(), "ledger.jsonl"), "a", encoding="utf8") as f:
         f.write(json.dumps(entry) + "\n")
     print("  exit %s, %d input tokens, %d output; log: %s" % (code, entry["input_tokens"], entry["output_tokens"], log_path))
+    storage.prune_logs(board.state_dir(), board.policy["storage"]["logs_keep_mb"])
+    project_growth = storage.project_bytes(board.root) - project_before
+    elsewhere = (free_before - shutil.disk_usage(board.root).free - project_growth) / storage.GIB
+    if elsewhere > board.policy["storage"]["leak_warn_gib"]:
+        print("  WARNING: the drive lost %.1f GiB outside this project during the session. "
+              "Something else may be running, or files were written elsewhere." % elsewhere)
     after = board.load(ticket.id)
+    if role == "engineer" and after.state in ("doing", "review", "changes", "blocked"):
+        worktree_gib = storage.tree_size(board.worktree(after)) / storage.GIB
+        if worktree_gib > board.budget(after)["disk_gib"]:
+            print("  worktree over its disk budget, sending to the owner")
+            after.fields.update(state="owner", resume=after.state)
+            after.save("escalate", "worktree uses %.1f GiB; the budget is %d GiB"
+                       % (worktree_gib, board.budget(after)["disk_gib"]))
+            return True
     if (after.state, after.fields.get("head")) == before and role == "lead":
         print("  the lead did not change the ticket, sending to the owner")
         after.fields.update(state="owner", resume=after.state)
@@ -168,6 +190,12 @@ def main(argv=None):
     board = pm.Board()
     for _ in range(args.max_sessions):
         if any(t.state == "owner" for t in board.tickets()):
+            break
+        level, message = storage.check(board.root, board.policy)
+        if level != "ok":
+            print(message)
+        if level == "hard":
+            print("No session started. See: python tools/storage.py")
             break
         action = pm.next_action(board)
         if action is None or not run_session(board, action[1], action[0], args.dry_run):

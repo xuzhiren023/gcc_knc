@@ -5,13 +5,23 @@
   "ticket_body_max_lines": 80,
   "session_timeout_minutes": 90,
   "budgets": {
-    "light":    {"tool_calls": 60,  "test_runs": 6,  "sessions": 2, "input_tokens": 2000000,  "changed_lines": 200, "new_test_files": 2, "effort": "low"},
-    "standard": {"tool_calls": 150, "test_runs": 15, "sessions": 3, "input_tokens": 6000000,  "changed_lines": 500, "new_test_files": 4, "effort": "medium"},
-    "deep":     {"tool_calls": 300, "test_runs": 25, "sessions": 4, "input_tokens": 12000000, "changed_lines": 800, "new_test_files": 8, "effort": "high"}
+    "light":    {"tool_calls": 60,  "test_runs": 6,  "sessions": 2, "input_tokens": 2000000,  "changed_lines": 200, "new_test_files": 2, "disk_gib": 2,  "effort": "low"},
+    "standard": {"tool_calls": 150, "test_runs": 15, "sessions": 3, "input_tokens": 6000000,  "changed_lines": 500, "new_test_files": 4, "disk_gib": 10, "effort": "medium"},
+    "deep":     {"tool_calls": 300, "test_runs": 25, "sessions": 4, "input_tokens": 12000000, "changed_lines": 800, "new_test_files": 8, "disk_gib": 20, "effort": "high"}
+  },
+  "storage": {
+    "project_soft_gib": 60,
+    "project_hard_gib": 100,
+    "min_drive_free_gib": 100,
+    "logs_keep_mb": 500,
+    "max_file_mb": 1,
+    "max_diff_mb": 5,
+    "hook_check_every_calls": 25,
+    "leak_warn_gib": 5
   },
   "test_to_code_ratio": 1.5,
   "test_ratio_min_lines": 100,
-  "protected_paths": ["tests/acceptance/", "docs/adr/", "harness/", ".codex/", "work/tickets/", "docs/COLLABORATION.md", "AGENTS.md", "CLAUDE.md"],
+  "protected_paths": ["tests/acceptance/", "docs/adr/", "harness/", ".codex/", "work/tickets/", "docs/COLLABORATION.md", "AGENTS.md", "CLAUDE.md", ".gitignore"],
   "test_paths": ["tests/"],
   "hash_in_diff": "hashlib|file_digest|\\bsha(1|256|512)(sum)?\\b|\\bmd5(sum)?\\b|Get-FileHash|certutil",
   "receipt_files": "(?i)(receipt|attestation|evidence|provenance|checksums?|sha256sums?)[^/]*$",
@@ -33,6 +43,13 @@
       "reason": "Use the card only through tools/card_run."
     },
     {
+      "name": "bulk-copy",
+      "command": "(cp\\s+-\\S*[rRa]|Copy-Item\\b[^;|&]*-Recurse|robocopy|xcopy|rsync|tar|Compress-Archive|git\\s+clone|git\\s+worktree\\s+add|curl|wget|Invoke-WebRequest|iwr)\\b",
+      "anywhere": "copytree",
+      "unless_env": "PM_ALLOW_BULK",
+      "reason": "Copying trees and downloading are how this project would run out of space. Reuse the shared build area, or ask the lead to allow it on this ticket."
+    },
+    {
       "name": "raw-build-test",
       "command": "(make|\\./configure|configure|runtest|pytest|ctest|ninja)\\b|python\\S*\\s+-m\\s+(unittest|pytest)\\b",
       "reason": "Run builds and tests through: python tools/run.py --name <name> -- <command>. It keeps output short and skips repeats."
@@ -45,6 +62,7 @@
   ],
   "test_run_pattern": "tools[/\\\\]run\\.py\\s+--name\\s+t\\S*|tools[/\\\\]check",
   "full_tier_pattern": "tools[/\\\\]check\\S*\\s+[^;|&]*\\b(t[456])\\b",
+  "removal": "(?:^|[;&|(]\\s*|-Command\\s+[\"']?)(rm|del|rmdir|Remove-Item)\\b",
   "wrappers": "tools[/\\\\](run|card_run)(\\.py)?\\b",
   "exempt": "tools[/\\\\]pm\\.py|git\\s+(add|commit|status|diff|log|show)\\b"
 }

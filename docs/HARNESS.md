@@ -29,6 +29,42 @@ So hashing is the most visible habit, but session length is the most expensive o
 The review adds a fifth, human-style check: over-testing and needless validation count as
 review findings, and the fix is to delete them.
 
+## Keeping the disk small
+
+PhiWeather reached 375.9 GiB and is 115 GiB now. Git history was never the problem: it is only
+155 MiB. Today's space is in git-ignored output that accumulates:
+
+| Pattern | Size today |
+|---|---|
+| Per-campaign test folders, kept after use | 29 GiB in `artifacts/test-state` |
+| Full copies of every release | 12 GiB in `artifacts/release`, about 0.3 GiB each |
+| Near-identical build trees | Five `wrf-*-real` folders, 0.7 GiB each |
+| Retained reference runs and data | 33 GiB in `reference`, 29 GiB in `wps-geography` |
+
+Git cannot see any of it, so the limits measure the disk itself:
+
+| Control | What it does |
+|---|---|
+| **Disposable by design** | A ticket's worktree is deleted when it merges, with everything in it. Output only survives by being committed, and files over 1 MiB cannot be committed |
+| **One shared build area** | One GCC checkout, toolchain and build tree in `../gcc_knc-work/_shared`, never one per ticket |
+| **Project limit** | Warns at 60 GiB. At 100 GiB, or under 100 GiB free on the drive, no session starts, and running sessions can only delete and hand over |
+| **Ticket limit** | 2, 10 or 20 GiB per worktree by depth. Going over sends the ticket to you, and blocks submit |
+| **No bulk copies** | Tree copies, archives, clones and downloads are refused unless the ticket allows them |
+| **Commit limits** | 1 MiB per file and 5 MiB per change. `.gitignore` is protected, so it cannot be widened to hide output |
+| **Logs capped** | Agent logs stay under 500 MiB, oldest removed first |
+| **Leak warning** | Flags a session if the drive shrinks by over 5 GiB more than the project grew, which catches writes elsewhere |
+
+The limits are my starting judgment, sized for one GCC checkout and build. Check where the space is,
+or clear old logs and finished worktrees:
+
+```bash
+python tools/storage.py
+```
+
+```bash
+python tools/storage.py --prune
+```
+
 ## Budgets per ticket depth
 
 | | Light | Standard | Deep |
@@ -39,6 +75,7 @@ review findings, and the fix is to delete them.
 | Input tokens per ticket | 2M | 6M | 12M |
 | Changed lines | 200 | 500 | 800 |
 | New test files | 2 | 4 | 8 |
+| Disk per worktree | 2 GiB | 10 GiB | 20 GiB |
 | Reasoning effort | low | medium | high |
 
 These are starting judgments, set against the session data above. Check `tools/pm.py usage`
@@ -58,4 +95,5 @@ change a decision, not to reduce testing as such.
 - **Codex loads a project's hooks and rules only when the project is trusted.** The dispatcher handles this for each of its sessions, without changing your settings. For sessions you start yourself in the Codex app, trust this folder once when asked.
 - **`.git` is protected inside the Codex sandbox,** so `.codex/rules/default.rules` lets `git add`, `git commit` and `tools/pm.py` run outside it. Nothing else gets that exception.
 - **Compiler changes will need one extension.** Submit checks read this repository's diff, so S1 must also apply them to `compiler/gcc`, which is a separate repository.
+- **Disk is checked every 25 tool calls and between sessions,** so one very large build could overshoot before it is stopped. `tools/run.py` also refuses to start on a nearly full drive.
 - **Token budgets are checked between sessions.** The tool-call budget is what stops a session partway through.

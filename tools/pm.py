@@ -14,6 +14,8 @@ import re
 import subprocess
 import sys
 
+import storage
+
 STATES_ACTIVE = ("doing", "red-review", "review", "changes", "blocked")
 ROLES = {"engineer", "lead", "owner"}
 
@@ -176,6 +178,24 @@ def submit_problems(board, ticket, cwd):
             hard.append("receipt-style file added: %s (put one short note on the ticket instead)" % path)
         if is_new and any(path.startswith(p) for p in policy["test_paths"]):
             new_tests += 1
+
+    limits = policy["storage"]
+    total_bytes = 0
+    for line in names:
+        parts = line.split("\t")
+        if parts[0].startswith(("A", "M", "R", "C")):
+            size = int(run_git("cat-file", "-s", "HEAD:" + parts[-1], cwd=cwd))
+            total_bytes += size
+            if size > limits["max_file_mb"] * storage.MIB:
+                hard.append("%s is %.1f MiB; the limit is %d MiB. Large data stays out of git."
+                            % (parts[-1], size / storage.MIB, limits["max_file_mb"]))
+    if total_bytes > limits["max_diff_mb"] * storage.MIB:
+        hard.append("this change adds %.1f MiB of files; the limit is %d MiB"
+                    % (total_bytes / storage.MIB, limits["max_diff_mb"]))
+    worktree_gib = storage.tree_size(cwd) / storage.GIB
+    if worktree_gib > budget["disk_gib"]:
+        hard.append("the worktree uses %.1f GiB; the budget is %d GiB. Delete build outputs first."
+                    % (worktree_gib, budget["disk_gib"]))
 
     test_added = code_added = 0
     for line in run_git("diff", "--numstat", base + "...HEAD", cwd=cwd).splitlines():

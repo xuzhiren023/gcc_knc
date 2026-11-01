@@ -20,6 +20,7 @@ Last updated: 2026-11-01, kickoff.
 | Tests T0 / T1 / T2 / T3 | Harness self-tests only; compiler tiers arrive in S0-03 |
 | Incremental rebuild + T1 | Not measured (S0-06) |
 | Card minutes this sprint | 0 |
+| Disk used | Under 1 GiB, of the 100 GiB limit (`python tools/storage.py`) |
 | Shared i386 lines changed | 0 |
 
 ## Card

@@ -12,9 +12,12 @@ import datetime
 import json
 import os
 import re
+import shutil
 import subprocess
 import sys
 import time
+
+import storage
 
 TAIL_LINES = 12
 ERROR_LINES = 8
@@ -69,6 +72,13 @@ def main(argv=None):
     if not command:
         parser.error("no command given")
 
+    root = storage.main_root()
+    limits = storage.load_policy(root)["storage"]
+    free = shutil.disk_usage(root).free / storage.GIB
+    if free < limits["min_drive_free_gib"]:
+        print("REFUSED: the drive has %.0f GiB free; the project stops below %d GiB." % (free, limits["min_drive_free_gib"]))
+        return 3
+
     state = state_dir()
     cache_path = os.path.join(state, "run-cache.json")
     cache = load_cache(cache_path)
@@ -93,6 +103,7 @@ def main(argv=None):
     print("\n".join(line[:200] for line in tail))
     print("--- log: " + log_path)
 
+    storage.prune_logs(state, limits["logs_keep_mb"])
     if key and code == 0:
         cache[key] = stamp
         with open(cache_path, "w", encoding="utf8") as f:
