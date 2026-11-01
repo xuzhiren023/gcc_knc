@@ -4,6 +4,12 @@ You work on **one ticket** in a fresh session, in its own worktree. Your ticket 
 `python tools/pm.py show <ID>`. Do not read the plan or other documents unless the ticket
 points to them. You talk to the tech lead only through the ticket, and to nobody else.
 
+## Commit with one command
+
+Always commit with `python tools/pm.py commit <ID> -m "<message>"`, alone in its command. It
+stages everything in your worktree. `git add` and `git commit` inside a longer script fail on
+the sandbox's protection of `.git`.
+
 ## Finish with one command
 
 - `python tools/pm.py submit <ID> --note "<what ran, results, log path>"` when acceptance is met
