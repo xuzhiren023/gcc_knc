@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-01 12:47.
+Updated automatically at every ticket change. Last update: 2026-11-01 12:52.
 
-**Next: GPT-6.1, on S0-02 (ISA lint).** Start a new session and paste the prompt from `KICKOFF.md`.
+**Next: the tech lead, on S0-02.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[##------------------]` 1 of 7
 
@@ -23,7 +23,7 @@ Current tickets: `[##------------------]` 1 of 7
 | Ticket | What | State | Latest |
 |---|---|---|---|
 | S0-01 | Toolchain manifest and doctor | Done | Reviewed: red commit real; tests fail on the missing-tool cases; doctor rerun OK, required tools present, d... |
-| S0-02 | ISA lint | In progress |  |
+| S0-02 | ISA lint | Question for the tech lead | Required consult: keep f3 90 (pause/rep; nop) a hard error, or allow a libc exception? Commits: red 233481a... |
 | S0-03 | Test runner and red baseline | Not started |  |
 | S0-04 | Card runner | Not started |  |
 | S0-05 | Donor inventory | Not started |  |
@@ -32,6 +32,7 @@ Current tickets: `[##------------------]` 1 of 7
 
 ## Recent activity
 
+- 2026-11-01 12:52 **S0-02** engineer ask: Required consult: keep f3 90 (pause/rep; nop) a hard error, or allow a libc exception? Commits: red 233481a, implementation b89a224. T0 passed seed...
 - 2026-11-01  **S0-01** lead approve: Reviewed: red commit real; tests fail on the missing-tool cases; doctor rerun OK, required tools present, dejagnu and expect absent as allowed; LTO...
 - 2026-11-01  **S0-01** engineer submit: Submitted by the lead on the engineer's behalf, to save a session. Unit tests 2 pass; doctor rc 0 (run by the lead). | OVER BUDGET (211 changed lin...
 - 2026-11-01  **S0-01** lead answer: Budget: do not split. 98 of the 211 lines are the manifest, which is data, so the limit is too tight rather than the ticket too big. Lead will subm...
@@ -45,4 +46,4 @@ No dispatcher sessions yet. Sessions you start by hand show their use in the app
 
 ## Disk
 
-The project uses 1.8 GiB of 100 GiB. 377 GiB free on the drive.
+The project uses 1.8 GiB of 100 GiB. 375 GiB free on the drive.
