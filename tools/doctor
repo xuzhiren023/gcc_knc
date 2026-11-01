@@ -1,0 +1,60 @@
+#!/usr/bin/env python3
+"""Check the S0-01 shared bootstrap tools: python3 tools/doctor."""
+import json
+import os
+from pathlib import Path
+import subprocess
+import sys
+
+
+def check(manifest, root):
+    env = os.environ.copy()
+    env["PATH"] = os.pathsep.join(str(root / p) for p in
+                                  ("cross/bin", "cygwin/bin")) + os.pathsep + env.get("PATH", "")
+    failed = False
+    for tool in manifest["tools"]:
+        path = root / tool["path"]
+        required = tool.get("required", True)
+        if not path.is_file():
+            print("%s %s: %s (%s)" % ("MISSING" if required else "ABSENT",
+                  tool["name"], path, tool["role"]))
+            failed |= required
+            continue
+        try:
+            result = subprocess.run([str(path), *tool.get("args", ["--version"])],
+                                    env=env, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
+                                    text=True, errors="replace", timeout=15)
+            output = result.stdout.strip()
+            if result.returncode or not output:
+                raise ValueError("exit %s: %s" % (result.returncode, output[:300]))
+            if tool["version"] and tool["version"] not in output:
+                raise ValueError("expected %s; got %s" % (tool["version"], output[:300]))
+            print("OK %s: %s" % (tool["name"], output.splitlines()[0]))
+        except (OSError, subprocess.TimeoutExpired, ValueError) as error:
+            print("FAILED %s: %s: %s" % (tool["name"], path, error))
+            failed = True
+    sysroot = root / manifest["sysroot"]
+    sysroot_failed = False
+    for relative in ("usr/include", "lib64"):
+        if not (sysroot / relative).is_dir():
+            print("MISSING sysroot directory: %s" % (sysroot / relative))
+            sysroot_failed = True
+    failed |= sysroot_failed
+    print("%s sysroot: %s" % ("FAILED" if sysroot_failed else "OK", sysroot))
+    return int(failed)
+
+
+def main():
+    checkout = Path(__file__).resolve().parents[1]
+    # pm.py puts ticket worktrees under the main checkout's .work directory.
+    project = checkout.parent.parent if checkout.parent.name == ".work" else checkout
+    try:
+        manifest = json.loads((checkout / "toolchain/manifest.json").read_text())
+        return check(manifest, project / manifest["root"])
+    except (OSError, ValueError, KeyError) as error:
+        print("FAILED toolchain manifest: %s" % error)
+        return 1
+
+
+if __name__ == "__main__":
+    sys.exit(main())

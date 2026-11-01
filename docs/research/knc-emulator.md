@@ -1,0 +1,3 @@
+As of 2026-11-01, no usable public KNC/IMCI emulator was identified: Intel SDE documents AVX-512/Knights Landing support, which does not provide KNC binary execution; native KNC results still require the card.
+
+This is a conclusion from the documented supported architectures, not a native or emulator execution result. Intel's [current SDE overview](https://www.intel.com/content/www/us/en/developer/articles/tool/software-development-emulator.html) lists supported extensions without KNC/IMCI; Intel's [AVX-512 introduction](https://www.intel.com/content/www/us/en/developer/articles/technical/intel-avx-512-instructions.html) distinguishes Knights Corner from Knights Landing and describes SDE's AVX-512 support.
