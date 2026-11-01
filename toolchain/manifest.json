@@ -1,0 +1,98 @@
+{
+  "root": ".work/_shared/toolchain",
+  "sysroot": "sysroot",
+  "tools": [
+    {
+      "name": "k1om-mpss-linux-ar",
+      "path": "cross/bin/k1om-mpss-linux-ar.exe",
+      "version": "2.22",
+      "role": "KNC binutils"
+    },
+    {
+      "name": "k1om-mpss-linux-as",
+      "path": "cross/bin/k1om-mpss-linux-as.exe",
+      "version": "2.22",
+      "role": "KNC binutils"
+    },
+    {
+      "name": "k1om-mpss-linux-g++",
+      "path": "cross/bin/k1om-mpss-linux-g++.exe",
+      "version": "5.1.1",
+      "role": "KNC donor compiler"
+    },
+    {
+      "name": "k1om-mpss-linux-gcc",
+      "path": "cross/bin/k1om-mpss-linux-gcc.exe",
+      "version": "5.1.1",
+      "role": "KNC donor compiler"
+    },
+    {
+      "name": "k1om-mpss-linux-gfortran",
+      "path": "cross/bin/k1om-mpss-linux-gfortran.exe",
+      "version": "5.1.1",
+      "role": "KNC donor compiler"
+    },
+    {
+      "name": "k1om-mpss-linux-ld",
+      "path": "cross/bin/k1om-mpss-linux-ld.exe",
+      "version": "2.22",
+      "role": "KNC binutils"
+    },
+    {
+      "name": "k1om-mpss-linux-nm",
+      "path": "cross/bin/k1om-mpss-linux-nm.exe",
+      "version": "2.22",
+      "role": "KNC binutils"
+    },
+    {
+      "name": "k1om-mpss-linux-objdump",
+      "path": "cross/bin/k1om-mpss-linux-objdump.exe",
+      "version": "2.22",
+      "role": "KNC binutils"
+    },
+    {
+      "name": "k1om-mpss-linux-readelf",
+      "path": "cross/bin/k1om-mpss-linux-readelf.exe",
+      "version": "2.22",
+      "role": "KNC binutils"
+    },
+    {
+      "name": "gcc",
+      "path": "cygwin/bin/gcc.exe",
+      "version": "14.4.0",
+      "role": "host C compiler"
+    },
+    {
+      "name": "make",
+      "path": "cygwin/bin/make.exe",
+      "version": "4.4.1",
+      "role": "build driver"
+    },
+    {
+      "name": "python3",
+      "path": "cygwin/bin/python3.12.exe",
+      "version": "3.12.12",
+      "role": "project scripts"
+    },
+    {
+      "name": "dejagnu",
+      "path": "cygwin/bin/runtest",
+      "version": null,
+      "role": "optional GCC testsuite driver",
+      "required": false,
+      "args": [
+        "--version"
+      ]
+    },
+    {
+      "name": "expect",
+      "path": "cygwin/bin/expect.exe",
+      "version": null,
+      "role": "optional GCC testsuite driver",
+      "required": false,
+      "args": [
+        "-v"
+      ]
+    }
+  ]
+}
