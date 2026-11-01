@@ -123,6 +123,27 @@ class Limits(Sandbox):
             f.write(text.replace("state: ready", "state: doing\nallow_bulk: yes"))
         self.assertFalse(clone_decision())
 
+    def test_missing_claude_stops_cleanly_and_leaves_the_ticket(self):
+        self.pm("start", "A-1")
+        wt = self.worktree("A-1")
+        self.commit_file("src/a.py", "x = 1\n", "test(A-1): x [red]", wt)
+        self.pm("submit", "A-1", "--note", "n", cwd=wt)
+        with tempfile.TemporaryDirectory() as empty:
+            env = dict(os.environ, APPDATA=empty, LOCALAPPDATA=empty, PM_ROLE="owner")
+            done = subprocess.run([sys.executable, os.path.join(self.root, "tools", "dispatch.py")], cwd=self.root,
+                                  env=env, stdin=subprocess.DEVNULL, stdout=subprocess.PIPE,
+                                  stderr=subprocess.STDOUT, universal_newlines=True)
+        self.assertEqual(done.returncode, 0, done.stdout)
+        self.assertIn("Could not find", done.stdout)
+        self.assertEqual(self.state("A-1"), "review")
+
+    def test_finding_the_project_without_git(self):
+        with tempfile.TemporaryDirectory() as top:
+            path = os.path.join(top, "proj", ".work", "T-1")
+            os.makedirs(path)
+            found = storage.main_root(path)
+            self.assertEqual(os.path.normcase(found), os.path.normcase(os.path.join(top, "proj")))
+
     def test_run_wrapper_refuses_on_a_full_drive_and_trims_logs(self):
         self.set_limits(min_drive_free_gib=10 ** 9)
         done = subprocess.run([sys.executable, os.path.join(self.root, "tools", "run.py"), "--name", "t", "--",

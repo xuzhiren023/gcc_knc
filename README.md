@@ -8,6 +8,7 @@ the host. Programs run on the card.
 
 | Start here | For |
 |---|---|
+| [Status](STATUS.md) | Where the project stands right now |
 | [Kickoff](KICKOFF.md) | How to start the work, with the GPT-6.1 prompt |
 | [Project plan](docs/PROJECT_PLAN.md) | Goals, roadmap, milestones, forecast, risks, owner decisions |
 | [Collaboration](docs/COLLABORATION.md) | How the agents work together, and what you do |

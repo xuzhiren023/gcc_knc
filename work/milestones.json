@@ -1,0 +1,9 @@
+[
+  {"id": "M0", "name": "Foundation", "sprints": ["s0", "s1"]},
+  {"id": "M1", "name": "Mixed native code", "sprints": ["s2", "s3"]},
+  {"id": "M2", "name": "Useful vector target", "sprints": ["s4", "s5", "s6"]},
+  {"id": "M3", "name": "Runtimes", "sprints": ["s7", "s8", "s9"]},
+  {"id": "M4", "name": "Broad optimization", "sprints": ["s10", "s11", "s12"]},
+  {"id": "M5", "name": "Program corpus", "sprints": ["s13", "s14"]},
+  {"id": "M6", "name": "Release", "sprints": ["s15"]}
+]

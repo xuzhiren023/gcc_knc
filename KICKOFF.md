@@ -5,11 +5,13 @@ are the only one who pushes. `python tools/pm.py board` shows where everything s
 
 ## Before the first session
 
-1. **Log Claude's command line in once,** so reviews can run unattended. Type `/login` in the session this opens:
+1. **Optional: log Claude's command line in once,** so reviews can run unattended. Type `/login` in the session this opens:
 
    ```powershell
-   & (Get-ChildItem "$env:APPDATA\Claude\claude-code\*\*\claude.exe" | Sort-Object LastWriteTime | Select-Object -Last 1).FullName
+   & (Get-ChildItem "$env:LOCALAPPDATA\Packages\*Claude*\LocalCache\Roaming\Claude\claude-code\*\*\claude.exe" | Sort-Object LastWriteTime | Select-Object -Last 1).FullName
    ```
+
+   Without this, ask a Claude session to review instead (see below).
 
 2. **In Codex, open this folder and choose GPT-6.1.** If Codex asks you to review the project's hooks, approve them (`/hooks` in the command line). They are the limits on cost and disk use, and the prompt below checks they are active.
 
@@ -32,17 +34,22 @@ Claude is the tech lead. You talk to the lead only through your ticket.
 4. Run: python tools/pm.py show <ID>, and read AGENTS.md. Do only what the ticket asks.
    Read other documents only if the ticket points to them.
 5. End with one tools/pm.py command: submit, red, ask or escalate. Then stop. Do not start
-   another ticket or write a summary.
+   another ticket. Your final message is only the "PM update:" line that command prints.
 ```
 
 ## After each session
 
-Run the review. It uses Claude, and merges approved work to local `main`:
+GPT-6.1 ends with one `PM update:` line, and you get a desktop notification. The full picture
+is in `STATUS.md`.
+
+Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs." Or, if you
+logged Claude's command line in, run this instead:
 
 ```bash
 python tools/dispatch.py --max-sessions 1
 ```
 
+Either way, the lead answers questions, or reviews and merges approved work to local `main`.
 Then check the board. If it says `Next: engineer on ...`, start a new GPT-6.1 session with the
 same prompt:
 
@@ -72,7 +79,13 @@ python tools/dispatch.py --max-sessions 6
 
 Pick one way at a time. Do not run the dispatcher while a hand-started session is working.
 
-## Check on cost and disk
+## See how the project is going
+
+**Open [`STATUS.md`](STATUS.md).** It updates itself at every ticket change: what happens next, whether
+anything is waiting for you, milestones, tickets, recent activity, cost and disk. You also get a Windows
+notification when a ticket is finished, approved, blocked, or needs you.
+
+For more detail on cost and disk:
 
 ```bash
 python tools/pm.py usage

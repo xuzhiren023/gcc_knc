@@ -71,6 +71,12 @@ fresh session. It finishes open work before it starts new tickets.
 6. **Two review rounds, then a person.** A third round of requested changes goes to the owner, because something is wrong with the ticket or the design.
 7. **Escalate up, one level at a time.** Engineer asks the lead. The lead answers or escalates to the owner.
 
+## What you see
+
+You should not have to ask anyone for an update. `STATUS.md` updates itself at every ticket change, a
+Windows notification appears when a ticket finishes or needs you, and each session ends with a one-line
+`PM update:`.
+
 ## What you do
 
 ```bash
@@ -89,7 +95,7 @@ python tools/dispatch.py --max-sessions 6
 needs its own login. Run it once, and type `/login` in the session that opens:
 
 ```powershell
-& (Get-ChildItem "$env:APPDATA\Claude\claude-code\*\*\claude.exe" | Sort-Object LastWriteTime | Select-Object -Last 1).FullName
+& (Get-ChildItem "$env:LOCALAPPDATA\Packages\*Claude*\LocalCache\Roaming\Claude\claude-code\*\*\claude.exe" | Sort-Object LastWriteTime | Select-Object -Last 1).FullName
 ```
 
 Until then, the dispatcher stops at reviews without changing the ticket. You can also open a

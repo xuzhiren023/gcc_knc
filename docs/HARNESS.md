@@ -73,7 +73,7 @@ python tools/storage.py --prune
 | Test runs per session | 6 | 15 | 25 |
 | Engineer sessions per ticket | 2 | 3 | 4 |
 | Input tokens per ticket | 2M | 6M | 12M |
-| Changed lines | 200 | 500 | 800 |
+| Changed lines | 300 | 500 | 800 |
 | New test files | 2 | 4 | 8 |
 | Disk per worktree | 2 GiB | 10 GiB | 20 GiB |
 | Reasoning effort | low | medium | high |

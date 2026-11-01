@@ -4,7 +4,7 @@
 Engineer:  start ID | commit ID -m M | red ID --note N | submit ID --note N [--override WHY] | ask ID TEXT
 Lead:      approve ID [--note N] | changes ID TEXT | answer ID TEXT
 Owner:     decide ID TEXT
-Anyone:    board | show ID | inbox | usage | escalate ID TEXT
+Anyone:    board | status | show ID | inbox | usage | escalate ID TEXT
 """
 import argparse
 import datetime
@@ -14,6 +14,7 @@ import re
 import subprocess
 import sys
 
+import status
 import storage
 
 STATES_ACTIVE = ("doing", "red-review", "review", "changes", "blocked")
@@ -93,7 +94,7 @@ class Ticket:
 
     def save(self, verb, entry=None):
         if entry:
-            today = datetime.date.today().isoformat()
+            today = datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
             role = os.environ.get("PM_ROLE", "engineer")
             self.body = self.body.rstrip("\n") + "\n\n- %s %s %s: %s\n" % (today, role, verb, entry)
         path = os.path.join(self.board.dir, self.id + ".md")
@@ -101,8 +102,20 @@ class Ticket:
         with open(path, "w", encoding="utf8", newline="\n") as f:
             f.write("---\n%s\n---\n%s" % (front, self.body))
         root = self.board.root
-        run_git("add", "--", path, cwd=root)
-        run_git("commit", "-q", "-m", "pm: %s %s -> %s" % (self.id, verb, self.state), "--", path, cwd=root)
+        paths = [path]
+        try:
+            paths.append(status.write(self.board, next_action(self.board)))
+        except Exception as problem:  # The status page must never stop the work.
+            print("Status page not updated: %s" % problem)
+        run_git("add", "--", *paths, cwd=root)
+        run_git("commit", "-q", "-m", "pm: %s %s -> %s" % (self.id, verb, self.state), "--", *paths, cwd=root)
+        line = status.update_line(self)
+        print("PM update: " + line)
+        if self.state in status.NOTIFY_STATES:
+            try:
+                status.notify("GCC-KNC", line)
+            except OSError:
+                pass
 
 
 def require_role(*allowed):
@@ -375,6 +388,10 @@ def cmd_board(board, _args):
         print("Waiting for the owner: " + ", ".join(waiting))
 
 
+def cmd_status(board, _args):
+    print(status.write(board, next_action(board)))
+
+
 def cmd_show(board, args):
     ticket = board.load(args.id)
     print("\n".join("%s: %s" % item for item in ticket.fields.items()))
@@ -421,6 +438,7 @@ def parser():
     add("board", cmd_board)
     add("inbox", cmd_inbox)
     add("usage", cmd_usage)
+    add("status", cmd_status)
     add("show", cmd_show, ident)
     add("start", cmd_start, ident)
     add("commit", cmd_commit, ident, ("-m", {"dest": "message", "required": True}))

@@ -56,7 +56,10 @@ def main_root(cwd=None):
     for line in out.splitlines():
         if line.startswith("worktree "):
             return os.path.normpath(line[len("worktree "):])
-    return os.path.normpath(cwd or os.getcwd())
+    # Git is not always on PATH in agent shells. A ticket worktree is at <root>/.work/<ticket>.
+    path = os.path.normpath(cwd or os.getcwd())
+    parent = os.path.dirname(path)
+    return os.path.dirname(parent) if os.path.basename(parent) == ".work" else path
 
 
 def work_area(root):

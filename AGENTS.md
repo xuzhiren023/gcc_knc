@@ -16,7 +16,7 @@ the sandbox's protection of `.git`.
 - `python tools/pm.py red <ID> --note "..."` on deep code tickets, after the failing test commit
 - `python tools/pm.py ask <ID> "<reduced reproducer and specific question>"` after two real failed attempts, or if a rule below blocks you
 
-Then stop. Do not write a summary, and do not start another ticket.
+Then stop. Your final message is only the `PM update:` line that command prints: no other summary. Do not start another ticket.
 
 ## Spend carefully
 

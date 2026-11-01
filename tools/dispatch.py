@@ -24,13 +24,13 @@ import storage  # noqa: E402
 ENGINEER_PROMPT = """You are an engineer on GCC-KNC, working on ticket {id} only, in this worktree.
 Run: python tools/pm.py show {id}
 Do only what that ticket asks. Rules are in AGENTS.md. Read other documents only if the ticket points to them.
-End the session with one pm.py command: submit, red, ask or escalate. Do not write a summary."""
+End the session with one pm.py command: submit, red, ask or escalate. Your final message is only the "PM update:" line it prints."""
 
 LEAD_PROMPT = """You are the tech lead on GCC-KNC. Ticket {id} is in state {state}, on branch {branch}.
 Run: python tools/pm.py show {id}
 {task}
 Read only what you need: the ticket, git log and git diff main...{branch}. Rerun something only if you doubt it.
-Finish with one pm.py command. Do not write a summary."""
+Finish with one pm.py command. On approve, the --note is read by the project manager: say in one plain sentence what now works. Your final message is only the "PM update:" line it prints."""
 
 LEAD_TASKS = {
     "review": "Review per docs/DEVELOPMENT_CYCLE.md section 7, then run pm.py approve, or pm.py changes with numbered findings, each with file:line.",
@@ -39,8 +39,8 @@ LEAD_TASKS = {
 }
 
 
-def newest(pattern):
-    found = glob.glob(os.path.expandvars(pattern))
+def newest(*patterns):
+    found = [path for pattern in patterns for path in glob.glob(os.path.expandvars(pattern))]
     return max(found, key=os.path.getmtime) if found else None
 
 
@@ -57,7 +57,9 @@ def engineer_command(board, ticket, worktree):
 
 
 def lead_command(board, ticket):
-    claude = newest(r"%APPDATA%\Claude\claude-code\*\*\claude.exe") or "claude"
+    # A Microsoft Store install keeps %APPDATA% in its package folder, which only the app sees as %APPDATA%.
+    claude = newest(r"%LOCALAPPDATA%\Packages\*Claude*\LocalCache\Roaming\Claude\claude-code\*\*\claude.exe",
+                    r"%APPDATA%\Claude\claude-code\*\*\claude.exe") or "claude"
     state = ticket.state
     prompt = LEAD_PROMPT.format(id=ticket.id, state=state, branch=ticket.fields.get("branch", ""),
                                 task=LEAD_TASKS[state])
@@ -143,6 +145,10 @@ def run_session(board, ticket, role, dry_run):
         output, code = done.stdout, done.returncode
     except subprocess.TimeoutExpired as expired:
         output, code = str(expired.stdout or ""), "timeout"
+    except FileNotFoundError:
+        print("  Could not find the %s command line, so no session ran and the ticket is unchanged.\n"
+              "  Ask a Claude or Codex session to take this ticket instead (see KICKOFF.md)." % role)
+        return False
     entry = {"at": datetime.datetime.now().isoformat(timespec="seconds"), "ticket": ticket.id, "role": role,
              "exit": code}
     entry.update(parse_usage(role, output))

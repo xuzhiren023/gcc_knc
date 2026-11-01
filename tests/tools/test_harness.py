@@ -7,6 +7,7 @@ import sys
 import tempfile
 import unittest
 
+os.environ["PM_NO_NOTIFY"] = "1"
 REPO = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 sys.path.insert(0, os.path.join(REPO, "harness"))
 sys.path.insert(0, os.path.join(REPO, "tools"))
@@ -160,6 +161,33 @@ class Flow(Sandbox):
         self.assertEqual(self.state("A-1"), "done")
         self.assertTrue(os.path.exists(os.path.join(self.root, "src", "a.py")))
         self.assertFalse(os.path.isdir(wt))
+
+    def test_status_page_follows_every_ticket_change_without_anyone_asking(self):
+        page = os.path.join(self.root, "STATUS.md")
+        done = self.pm("start", "A-1")
+        self.assertIn("PM update: A-1 is in progress", done.stdout)
+        wt = self.worktree("A-1")
+        with open(page, encoding="utf8") as f:
+            self.assertIn("| A-1 | Demo | In progress |", f.read())
+        self.commit_file("src/a.py", "x = 1\n", "test(A-1): x [red]", wt)
+        self.pm("submit", "A-1", "--note", "first version works", cwd=wt)
+        with open(page, encoding="utf8") as f:
+            text = f.read()
+        self.assertIn("Next: the tech lead, on A-1", text)
+        self.assertIn("first version works", text)
+        self.pm("escalate", "A-1", "which option?", role="lead")
+        with open(page, encoding="utf8") as f:
+            self.assertIn("Waiting for you:** A-1", f.read())
+        status = subprocess.run(["git", "status", "--short"], cwd=self.root, stdout=subprocess.PIPE,
+                                universal_newlines=True).stdout
+        self.assertEqual(status, "", "the page is committed with the ticket")
+
+    def test_broken_status_page_does_not_stop_the_work(self):
+        os.makedirs(os.path.join(self.root, "STATUS.md"))
+        done = self.pm("start", "A-1")
+        self.assertEqual(done.returncode, 0, done.stdout)
+        self.assertIn("Status page not updated", done.stdout)
+        self.assertEqual(self.state("A-1"), "doing")
 
     def test_commit_command_commits_the_worktree(self):
         self.pm("start", "A-1")

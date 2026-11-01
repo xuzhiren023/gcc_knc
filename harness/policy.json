@@ -6,7 +6,7 @@
   "session_timeout_minutes": 90,
   "engineer_model": "gpt-6.1-sol",
   "budgets": {
-    "light":    {"tool_calls": 60,  "test_runs": 6,  "sessions": 2, "input_tokens": 2000000,  "changed_lines": 200, "new_test_files": 2, "disk_gib": 2,  "effort": "low"},
+    "light":    {"tool_calls": 60,  "test_runs": 6,  "sessions": 2, "input_tokens": 2000000,  "changed_lines": 300, "new_test_files": 2, "disk_gib": 2,  "effort": "low"},
     "standard": {"tool_calls": 150, "test_runs": 15, "sessions": 3, "input_tokens": 6000000,  "changed_lines": 500, "new_test_files": 4, "disk_gib": 10, "effort": "medium"},
     "deep":     {"tool_calls": 300, "test_runs": 25, "sessions": 4, "input_tokens": 12000000, "changed_lines": 800, "new_test_files": 8, "disk_gib": 20, "effort": "high"}
   },
@@ -22,7 +22,7 @@
   },
   "test_to_code_ratio": 1.5,
   "test_ratio_min_lines": 100,
-  "protected_paths": ["tests/acceptance/", "docs/adr/", "harness/", ".codex/", "work/tickets/", "docs/COLLABORATION.md", "AGENTS.md", "CLAUDE.md", ".gitignore"],
+  "protected_paths": ["tests/acceptance/", "docs/adr/", "harness/", ".codex/", "work/tickets/", "docs/COLLABORATION.md", "AGENTS.md", "CLAUDE.md", ".gitignore", "STATUS.md", "KICKOFF.md", "work/milestones.json"],
   "test_paths": ["tests/"],
   "hash_in_diff": "hashlib|file_digest|\\bsha(1|256|512)(sum)?\\b|\\bmd5(sum)?\\b|Get-FileHash|certutil",
   "receipt_files": "(?i)(receipt|attestation|evidence|provenance|checksums?|sha256sums?)[^/]*$",
