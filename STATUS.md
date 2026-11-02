@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-02 07:51.
+Updated automatically at every ticket change. Last update: 2026-11-02 07:52.
 
-**Next: the tech lead, on S0-07.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Waiting for you:** S0-07. Run `python tools/pm.py inbox`.
 
 Current tickets: `[###########---------]` 5 of 9
 
@@ -28,12 +28,13 @@ Current tickets: `[###########---------]` 5 of 9
 | S0-04 | Card runner | Not started |  |
 | S0-05 | Donor inventory | Done | The donor inventory now covers the whole tree with port/rewrite/drop decisions, the GCC 16.2 runtime audit ... |
 | S0-06 | GCC 16.2 fork and timing | Done | GCC 16.2 is checked out on branch knc in the shared build area and builds stock x86_64 C+Fortran on Cygwin ... |
-| S0-07 | Benchmark corpus and coverage estimate | Question for the tech lead | Blocked by sandbox network permissions: Python urllib.request.urlopen on https://www.cs.virginia.edu/stream... |
+| S0-07 | Benchmark corpus and coverage estimate | **Waiting for you** | Engineer sandbox has no network, so S0-07 cannot fetch the corpus; nothing is on the branch yet. Owner choi... |
 | S0-08 | Toolchain independent of PhiWeather | Not started | Also in scope, from the S0-03 review: nothing recreates the hand-made sysroot files (crt1.o, crti.o, crtn.o... |
 | S0-09 | T1 scan sees KNC mask-branch loops | Not started |  |
 
 ## Recent activity
 
+- 2026-11-02 07:52 **S0-07** lead escalate: Engineer sandbox has no network, so S0-07 cannot fetch the corpus; nothing is on the branch yet. Owner choice: either place versioned source archiv...
 - 2026-11-02 07:51 **S0-07** engineer ask: Blocked by sandbox network permissions: Python urllib.request.urlopen on https://www.cs.virginia.edu/stream/FTP/Code/stream.c fails with URLError /...
 - 2026-11-02 07:50 **S0-06** lead approve: GCC 16.2 is checked out on branch knc in the shared build area and builds stock x86_64 C+Fortran on Cygwin (full 45 min, i386.cc rebuild 2.8 min, i...
 - 2026-11-02 07:49 **S0-06** engineer submit: Acceptance met; commit aba96eb. GCC tag on knc, remotes configured, clean status, no case collisions or push. Cygwin GCC 14.4 C+Fortran all-gcc pas...
@@ -41,7 +42,6 @@ Current tickets: `[###########---------]` 5 of 9
 - 2026-11-02 06:50 **S0-05** engineer submit: 09ba98c: inventory and self-contained drive_channel reproducer complete. Both compile-only checks exit 0; donor drops 4 address setups on 3 stores,...
 - 2026-11-02 06:50 **S0-05** lead answer: No split and no budget change. The 979 lines are one research document plus the reduced reproducer, which I approved at any size. Submit 09ba98c wi...
 - 2026-11-02 06:50 **S0-05** engineer ask: 09ba98c completes inventory and self-contained drive_channel reproducer. Both compilers exit 0; donor drops 4 address setups on 3 stores, reference...
-- 2026-11-02 06:44 **S0-05** lead changes: (1) docs/research/donor-inventory.md: the benign conclusion is wrong. drive_channel_rsl is benign, but the donor drops the address reload on 4 dele...
 
 ## Cost
 
