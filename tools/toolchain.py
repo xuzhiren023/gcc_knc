@@ -35,7 +35,18 @@ def rebuild(args):
     build = SHARED / 'gcc-donor-build'
     if not (source / 'configure').is_file():
         raise RuntimeError('missing shared gcc-donor source; ask the lead')
-    build.mkdir(exist_ok=True)
+    # Configure caches from an earlier host attempt must not survive a rebuild.
+    expected = SHARED.resolve() / 'gcc-donor-build'
+    if build.resolve() != expected or build.is_symlink():
+        raise RuntimeError('refusing to clean unexpected build directory: ' + str(build))
+    if build.exists():
+        shutil.rmtree(build)
+    build.mkdir()
+    # GCC 5 libiberty probes dup3 successfully on modern Cygwin, but its host
+    # source lacks the declaration. Use its existing dup2 fallback (S0-08).
+    os.environ['ac_cv_func_dup3'] = 'no'
+    print('Host configure override: ac_cv_func_dup3=no (libiberty dup2 fallback)',
+          flush=True)
     # Installed donor's final configure invocation, with only its source location,
     # prefix, sysroot, assembler and linker relocated (S0-08 lead instruction).
     flags = [
