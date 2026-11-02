@@ -27,6 +27,7 @@ class FakeTransport:
         self.staged = False
         self.processes = []
         self.late_processes = []
+        self.foreign_path = None
         self.unreachable = False
         self.stage_failure = False
         self.timed_out = False
@@ -50,6 +51,13 @@ class FakeTransport:
         if self.staged:
             processes += self.late_processes
         if self.run_dir:
+            if self.foreign_path == "prefix-cwd":
+                processes += [{"pid": 44, "name": "other-job", "exe": "/opt/other/job",
+                               "cwd": self.run_dir + "0"}]
+            elif self.foreign_path == "other-run-exe":
+                other_dir = self.run_dir[:-1] + ("0" if self.run_dir[-1] != "0" else "1")
+                processes += [{"pid": 45, "name": "other-job", "exe": other_dir + "/job",
+                               "cwd": "/opt/other"}]
             # A runner helper is owned by cwd, even though its exe is /bin/sh.
             processes += [{"pid": 80, "name": "sh", "exe": "/bin/sh", "cwd": self.run_dir}]
         return {"boot_id": self.boot, "processes": processes}
@@ -162,13 +170,18 @@ class CardRun(unittest.TestCase):
                     lock.unlink()
 
     def test_foreign_or_unknown_process_refuses_before_staging_or_exec(self):
-        for late, process in ((False, FOREIGN), (False, UNKNOWN), (True, FOREIGN)):
-            with self.subTest(late=late, pid=process["pid"]):
+        cases = ((False, FOREIGN, None), (False, UNKNOWN, None), (True, FOREIGN, None),
+                 (False, {"pid": 44}, "prefix-cwd"),
+                 (False, {"pid": 45}, "other-run-exe"))
+        for late, process, foreign_path in cases:
+            with self.subTest(late=late, pid=process["pid"], foreign_path=foreign_path):
                 self.transport = FakeTransport()
-                if late:
-                    self.transport.late_processes = [process]
-                else:
-                    self.transport.processes = [process]
+                self.transport.foreign_path = foreign_path
+                if foreign_path is None:
+                    if late:
+                        self.transport.late_processes = [process]
+                    else:
+                        self.transport.processes = [process]
                 result = self.run_card()
                 self.assert_result(result, "refused", self.runner["REFUSED_EXIT"])
                 self.assertIn(str(process["pid"]), result["detail"])
