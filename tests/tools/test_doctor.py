@@ -26,7 +26,11 @@ class Doctor(unittest.TestCase):
                     (root / "sysroot" / relative).mkdir()
             if startup:
                 (root / "sysroot/usr/lib64").mkdir()
-                for name in ("crt1.o", "crti.o", "crtn.o", "libc.so", "libc_nonshared.a"):
+                for name in ("crt1.o", "crti.o", "crtn.o", "libc.so", "libc_nonshared.a",
+                             "Scrt1.o", "gcrt1.o", "Mcrt1.o", "libpthread_nonshared.a",
+                             "libm.so", "libpthread.so", "libdl.so", "librt.so",
+                             "libcrypt.so", "libutil.so", "libresolv.so", "libnsl.so",
+                             "libanl.so", "libthread_db.so"):
                     if name != missing_file:
                         (root / "sysroot/usr/lib64" / name).touch()
             manifest = {"sysroot": "sysroot", "tools": [
@@ -95,11 +99,22 @@ class Doctor(unittest.TestCase):
             self.assertIn(query, output)
 
     def test_missing_development_files_name_recreation_step(self):
-        for name in ("crti.o", "crtn.o", "libc.so", "libc_nonshared.a"):
+        for name in ("crti.o", "crtn.o", "libc.so", "libc_nonshared.a",
+                     "Scrt1.o", "gcrt1.o", "Mcrt1.o", "libpthread_nonshared.a"):
             with self.subTest(name=name):
                 result, output = self.check(False, missing_file=name)
                 self.assertNotEqual(result, 0)
                 self.assertIn(name, output)
+                self.assertIn("tools/toolchain.py sysroot", output)
+
+    def test_missing_development_link_names_sysroot_step(self):
+        for library in ("m", "pthread", "dl", "rt", "crypt", "util", "resolv",
+                        "nsl", "anl", "thread_db"):
+            name = "lib" + library + ".so"
+            with self.subTest(name=name):
+                result, output = self.check(False, missing_file=name)
+                self.assertNotEqual(result, 0)
+                self.assertIn("usr/lib64/" + name, output.replace("\\", "/"))
                 self.assertIn("tools/toolchain.py sysroot", output)
 
 
