@@ -31,16 +31,47 @@ class Lint(unittest.TestCase):
                 self.assertRegex(result.stdout, r':(?:0x[0-9a-f]+|line-\d+):')
                 self.assertIn('forbidden', result.stdout)
 
-    def test_pause_in_object(self):
+    def test_encoded_rules(self):
+        encodings = {
+            'xmm': '0f 28 c8', 'ymm': 'c5 fc 28 c8', 'mmx': '0f 6f c8',
+            'emms': '0f 77', 'femms': '0f 0e', 'cmov': '48 0f 44 d8',
+            'fcmov': 'da c1', 'fcomi': 'db f1', 'fcomip': 'df f1',
+            'fucomi': 'db e9', 'fucomip': 'df e9', 'cmpxchg16b': '48 0f c7 08',
+            'pause': 'f3 90', 'rep_nop': 'f3 90', 'mfence': '0f ae f0',
+            'lfence': '0f ae e8', 'sfence': '0f ae f8', 'monitor': '0f 01 c8',
+            'mwait': '0f 01 c9', 'sysenter': '0f 34', 'sysexit': '0f 35',
+            'bad': '0f ff', 'rex_pause': 'f3 40 90', 'rex_w_pause': 'f3 48 90',
+        }
         with tempfile.TemporaryDirectory() as temp:
-            obj = Path(temp) / 'pause.o'
-            result = self.run_command(TC / 'cross/bin/k1om-mpss-linux-as.exe',
-                                      '-march=k1om', ROOT / 'tests/isa/pause.s', '-o', obj)
+            source, obj = Path(temp) / 'encoded.s', Path(temp) / 'encoded.o'
+            for rule, encoding in encodings.items():
+                with self.subTest(rule=rule):
+                    source.write_text('.text\n.globl seed\nseed:\n.byte ' +
+                                      ','.join('0x' + b for b in encoding.split()) + '\nret\n')
+                    result = self.run_command(TC / 'cross/bin/k1om-mpss-linux-as.exe',
+                                              '-march=k1om', source, '-o', obj)
+                    self.assertEqual(result.returncode, 0, result.stdout)
+                    result = self.lint(obj)
+                    self.assertEqual(result.returncode, 1, result.stdout)
+                    self.assertIn(str(obj) + ':seed:0x0: forbidden:', result.stdout)
+
+    def test_symbol_names_and_strings(self):
+        with tempfile.TemporaryDirectory() as temp:
+            source, obj, linked = (Path(temp) / n for n in ('names.s', 'names.o', 'names.elf'))
+            source.write_text('.text\n.globl seed\nseed:\nmovl mm1(%rip),%eax\n'
+                              'call xmm0\nret\nxmm0:\nret\n.data\nmm1:\n.long 0\n'
+                              '.string "wait; pause; xmm0 cmove"\n'
+                              '.string "escaped \\"; pause; # xmm0"\n')
+            result = self.lint(source)
             self.assertEqual(result.returncode, 0, result.stdout)
-            result = self.lint(obj)
-            self.assertEqual(result.returncode, 1, result.stdout)
-            self.assertIn('seed:0x0:', result.stdout)
-            self.assertRegex(result.stdout, r'forbidden: (?:pause|repz\s+nop)')
+            result = self.run_command(TC / 'cross/bin/k1om-mpss-linux-as.exe',
+                                      '-march=k1om', source, '-o', obj)
+            self.assertEqual(result.returncode, 0, result.stdout)
+            result = self.run_command(TC / 'cross/bin/k1om-mpss-linux-ld.exe',
+                                      '-m', 'elf_k1om', '-e', 'seed', obj, '-o', linked)
+            self.assertEqual(result.returncode, 0, result.stdout)
+            result = self.lint(linked)
+            self.assertEqual(result.returncode, 0, result.stdout)
 
     def test_donor_loops_and_containers(self):
         with tempfile.TemporaryDirectory() as temp:
