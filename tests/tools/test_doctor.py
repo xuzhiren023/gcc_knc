@@ -88,6 +88,12 @@ class Doctor(unittest.TestCase):
                 self.assertIn(query, output)
                 self.assertIn("outside shared toolchain", output)
 
+    def test_shared_compiler_paths_succeed(self):
+        result, output = self.check(False, outside="")
+        self.assertEqual(result, 0)
+        for query in ("-print-prog-name=as", "-print-prog-name=ld", "-print-sysroot"):
+            self.assertIn(query, output)
+
     def test_missing_development_files_name_recreation_step(self):
         for name in ("crti.o", "crtn.o", "libc.so", "libc_nonshared.a"):
             with self.subTest(name=name):
