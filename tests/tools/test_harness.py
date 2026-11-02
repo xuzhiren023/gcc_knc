@@ -382,6 +382,19 @@ class Dispatcher(Sandbox):
         self.assertIn('model_reasoning_effort="low"', command)
         self.assertFalse([arg for arg in command if arg.startswith("service_tier=")])
 
+    def test_engineer_git_trusts_the_shared_gcc_checkout(self):
+        # The sandbox user does not own the shared checkout, so git refuses it as dubious.
+        # Codex drops variables containing KEY, so GIT_CONFIG_KEY_0 cannot carry the setting.
+        import dispatch
+        import storage
+        ticket = mock.Mock(id="A-1", fields={})
+        board = mock.Mock(root=self.root, policy=POLICY)
+        gcc = os.path.join(storage.shared_area(self.root), "gcc").replace("\\", "/")
+        env = dispatch.session_env(board, ticket, "engineer")
+        self.assertEqual(env.get("GIT_CONFIG_PARAMETERS"), "'safe.directory'='%s'" % gcc)
+        self.assertFalse([k for k in env if k.startswith("GIT_CONFIG_KEY")])
+        self.assertNotIn("GIT_CONFIG_PARAMETERS", dispatch.session_env(board, ticket, "lead"))
+
     def test_ticket_can_raise_its_session_limit(self):
         import dispatch
         import pm
