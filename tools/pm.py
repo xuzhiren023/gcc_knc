@@ -170,6 +170,21 @@ def added_lines(diff):
             yield current, line[1:]
 
 
+def gcc_checkout(board, ticket):
+    """WIP is one: the shared checkout may belong only to this ticket or knc."""
+    if ticket.fields.get("gcc") != "yes":
+        return None
+    path = os.path.join(storage.shared_area(board.root), "gcc")
+    if not os.path.isdir(os.path.join(path, ".git")):
+        raise Refused("GCC checkout missing: " + path)
+    if run_git("status", "--porcelain", cwd=path):
+        raise Refused("uncommitted changes in the GCC checkout")
+    branch = run_git("branch", "--show-current", cwd=path)
+    if branch not in ("knc", ticket.fields["branch"]):
+        raise Refused("GCC checkout is on another branch: " + branch)
+    return path
+
+
 def submit_problems(board, ticket, cwd):
     """Return (hard problems, budget problems) for this branch against main."""
     policy = board.policy
@@ -179,6 +194,10 @@ def submit_problems(board, ticket, cwd):
         hard.append("uncommitted changes in the worktree")
     base = run_git("merge-base", "main", "HEAD", cwd=cwd)
     subjects = run_git("log", "--format=%s", base + "..HEAD", cwd=cwd).splitlines()
+    gcc = gcc_checkout(board, ticket)
+    gcc_diff = "knc..." + ticket.fields["branch"] if gcc else None
+    if gcc:
+        subjects += run_git("log", "--format=%s", "knc.." + ticket.fields["branch"], cwd=gcc).splitlines()
     if not subjects:
         hard.append("no commits on this branch")
     if ticket.fields.get("type", "code") == "code" and not any("[red]" in s for s in subjects):
@@ -224,6 +243,11 @@ def submit_problems(board, ticket, cwd):
             test_added += int(added)
         else:
             code_added += int(added) + int(removed)
+    if gcc:
+        for line in run_git("diff", "--numstat", gcc_diff, cwd=gcc).splitlines():
+            added, removed, _ = line.split("\t", 2)
+            if added != "-":
+                code_added += int(added) + int(removed)
     if test_added + code_added > budget["changed_lines"]:
         soft.append("%d changed lines; the budget is %d, so split the ticket"
                     % (test_added + code_added, budget["changed_lines"]))
@@ -252,6 +276,11 @@ def cmd_start(board, args):
     path = board.worktree(ticket)
     os.makedirs(storage.shared_area(board.root), exist_ok=True)
     branch = ticket.fields.setdefault("branch", "%s/%s" % (ticket.fields.get("sprint", "s0"), ticket.id))
+    gcc = gcc_checkout(board, ticket)
+    if gcc:
+        exists = run_git("branch", "--list", branch, cwd=gcc)
+        target = (branch,) if exists else ("-b", branch, "knc")
+        run_git("checkout", "-q", *target, cwd=gcc)
     if not os.path.isdir(path):
         os.makedirs(os.path.dirname(path), exist_ok=True)
         exists = run_git("branch", "--list", branch, cwd=board.root)
@@ -305,6 +334,8 @@ def cmd_submit(board, args):
         note += " | OVER BUDGET (%s): %s" % ("; ".join(soft), args.override)
     ticket.fields["state"] = "review"
     ticket.fields["head"] = run_git("rev-parse", "--short", "HEAD", cwd=worktree)
+    if ticket.fields.get("gcc") == "yes":
+        ticket.fields["gcc_head"] = run_git("rev-parse", ticket.fields["branch"], cwd=gcc_checkout(board, ticket))
     ticket.save("submit", note)
     print("%s submitted at %s. End this session." % (ticket.id, ticket.fields["head"]))
 
@@ -336,8 +367,29 @@ def cmd_approve(board, args):
     branch = ticket.fields["branch"]
     worktree = board.worktree(ticket)
     note = limit_text(board, args.note or "merged") + machine_check(worktree)
-    run_git("merge", "--no-ff", "-q", "-m", "Merge %s: %s" % (ticket.id, ticket.fields.get("title", "")), branch,
-            cwd=board.root)
+    message = "Merge %s: %s" % (ticket.id, ticket.fields.get("title", ""))
+    gcc = gcc_checkout(board, ticket)
+    if gcc:
+        if run_git("rev-parse", branch, cwd=gcc) != ticket.fields.get("gcc_head"):
+            raise Refused("GCC branch moved since submit; submit again before approval")
+        if run_git("status", "--porcelain", cwd=board.root) or \
+                run_git("branch", "--show-current", cwd=board.root) != "main":
+            raise Refused("main checkout must be clean and on main before merging a GCC ticket")
+        main_head = run_git("rev-parse", "HEAD", cwd=board.root)
+        knc_head = run_git("rev-parse", "knc", cwd=gcc)
+        previous = run_git("branch", "--show-current", cwd=gcc)
+        run_git("checkout", "-q", "knc", cwd=gcc)
+        try:
+            run_git("merge", "--no-ff", "-q", "-m", message, branch, cwd=gcc)
+            run_git("merge", "--no-ff", "-q", "-m", message, branch, cwd=board.root)
+        except Refused:
+            # Both checkouts were clean. Restore both integration tips and clear conflicts.
+            run_git("reset", "--hard", main_head, cwd=board.root)
+            run_git("reset", "--hard", knc_head, cwd=gcc)
+            run_git("checkout", "-q", previous, cwd=gcc)
+            raise
+    else:
+        run_git("merge", "--no-ff", "-q", "-m", message, branch, cwd=board.root)
     if os.path.isdir(worktree):
         run_git("worktree", "remove", "--force", worktree, cwd=board.root)
     ticket.fields["state"] = "done"
