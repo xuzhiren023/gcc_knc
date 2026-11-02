@@ -368,6 +368,20 @@ class Dispatcher(Sandbox):
         roots = json.loads(setting[0].split("=", 1)[1])
         self.assertEqual(roots, [storage.state_dir(self.root), storage.shared_area(self.root)])
 
+    def test_policy_can_set_engineer_effort_and_service_tier(self):
+        import dispatch
+        ticket = mock.Mock(fields={"depth": "light"})
+        policy = dict(POLICY, engineer_effort="high", engineer_service_tier="priority")
+        board = mock.Mock(root=self.root, policy=policy, budget=lambda _t: POLICY["budgets"]["light"])
+        command = dispatch.engineer_command(board, ticket, self.worktree("A-1"))
+        self.assertIn('model_reasoning_effort="high"', command)
+        self.assertIn('service_tier="priority"', command)
+        unset = {k: v for k, v in policy.items() if k not in ("engineer_effort", "engineer_service_tier")}
+        board.policy = unset
+        command = dispatch.engineer_command(board, ticket, self.worktree("A-1"))
+        self.assertIn('model_reasoning_effort="low"', command)
+        self.assertFalse([arg for arg in command if arg.startswith("service_tier=")])
+
     def test_ticket_can_raise_its_session_limit(self):
         import dispatch
         import pm
