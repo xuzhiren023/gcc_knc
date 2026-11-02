@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-01 23:39.
+Updated automatically at every ticket change. Last update: 2026-11-01 23:44.
 
-**Next: GPT-6.1, on S0-05 (Donor inventory).** Run `python tools/dispatch.py`, or ask the tech lead to.
+**Next: the tech lead, on S0-05.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[######--------------]` 3 of 9
 
@@ -26,7 +26,7 @@ Current tickets: `[######--------------]` 3 of 9
 | S0-02 | ISA lint | Done | knc_lint now rejects the listed non-KNC instructions in .s, .o, archives, shared objects and executables, a... |
 | S0-03 | Test runner and red baseline | Done | tools/check now runs t0, t1 and t2 on the donor in about 16 seconds and records the expected baseline, with... |
 | S0-04 | Card runner | Not started |  |
-| S0-05 | Donor inventory | In progress | Unblocked: finish both open items on this branch. (1) Source: GCC 16.2 is at .work/_shared/gcc, read-only f... |
+| S0-05 | Donor inventory | Question for the tech lead | Committed b04e492: GCC 16.2 F6 and LRA source audit complete; register-only guard excludes donor memory cas... |
 | S0-06 | GCC 16.2 fork and timing | Not started | Engineer sessions have no network, so do not clone. The owner or lead creates .work/_shared/gcc outside the... |
 | S0-07 | Benchmark corpus and coverage estimate | Not started |  |
 | S0-08 | Toolchain independent of PhiWeather | Not started | Also in scope, from the S0-03 review: nothing recreates the hand-made sysroot files (crt1.o, crti.o, crtn.o... |
@@ -34,6 +34,7 @@ Current tickets: `[######--------------]` 3 of 9
 
 ## Recent activity
 
+- 2026-11-01 23:44 **S0-05** engineer ask: Committed b04e492: GCC 16.2 F6 and LRA source audit complete; register-only guard excludes donor memory case. Reproducer unticked: two donor -O1 -S...
 - 2026-11-01 23:39 **S0-05** lead answer: Unblocked: finish both open items on this branch. (1) Source: GCC 16.2 is at .work/_shared/gcc, read-only for you; do the F6 audit from it with fil...
 - 2026-11-01 23:37 **S0-05** owner decide: Owner approved on 2026-11-01. GCC 16.2 is now at .work/_shared/gcc, at tag releases/gcc-16.2.0 (78d4ac7), with a clean status. The lead cloned it w...
 - 2026-11-01 23:03 **S0-08** lead note: Also in scope, from the S0-03 review: nothing recreates the hand-made sysroot files (crt1.o, crti.o, crtn.o, libc.so and libc_nonshared.a in usr/li...
@@ -41,7 +42,6 @@ Current tickets: `[######--------------]` 3 of 9
 - 2026-11-01 22:57 **S0-05** lead escalate: Owner action: the engineer sandbox has no network, so S0-05 and S0-06 cannot get GCC 16.2. Keeping it closed, run once from the repo root, then pm....
 - 2026-11-01 22:54 **S0-05** engineer ask: Committed partial inventory d8d073c: docs/research/donor-inventory.md (85 changed paths against recorded gcc-5 r222343 base). Blocked: direct relea...
 - 2026-11-01 22:49 **S0-03** lead approve: tools/check now runs t0, t1 and t2 on the donor in about 16 seconds and records the expected baseline, with T0, assembly, lint and T2 passing and o...
-- 2026-11-01 22:47 **S0-03** engineer submit: Review fixes complete: red e6cb86a, fix 9b04025. Donor run 15.85s: 14 T0 tests, assembly/lint/T2 PASS, only expected T1 vectorization red; baseline...
 
 ## Cost
 
