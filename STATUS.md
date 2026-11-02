@@ -28,7 +28,7 @@ Current tickets: `[###########---------]` 5 of 9
 | S0-04 | Card runner | Not started |  |
 | S0-05 | Donor inventory | Done | The donor inventory now covers the whole tree with port/rewrite/drop decisions, the GCC 16.2 runtime audit ... |
 | S0-06 | GCC 16.2 fork and timing | Done | GCC 16.2 is checked out on branch knc in the shared build area and builds stock x86_64 C+Fortran on Cygwin ... |
-| S0-07 | Benchmark corpus and coverage estimate | Not started |  |
+| S0-07 | Benchmark corpus and coverage estimate | In progress |  |
 | S0-08 | Toolchain independent of PhiWeather | Not started | Also in scope, from the S0-03 review: nothing recreates the hand-made sysroot files (crt1.o, crti.o, crtn.o... |
 | S0-09 | T1 scan sees KNC mask-branch loops | Not started |  |
 
