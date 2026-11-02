@@ -22,13 +22,15 @@ Full details are in [SPRINT-00](sprints/SPRINT-00.md).
 
 ## E1 GCC 16 skeleton (S1, Milestone M0)
 
+Refined into tickets S1-01 to S1-07; see [SPRINT-01](sprints/SPRINT-01.md).
+
 | ID | Story | Acceptance | Depth |
 |---|---|---|---|
 | E1-01 | `k1om-mpss-linux` configures in GCC 16.2 | `configure` succeeds with `--with-as`, `--with-ld` and `--with-sysroot`; `all-gcc` builds; `-dumpmachine` is right | Standard |
 | E1-02 | `-march=knc` and `TARGET_ISA_KNC`, with no SSE, AVX, CMOV, FCOMI or MFENCE-type features | T1 tests: predefined macros and feature set; `-mavx512f`, `-msse2` are rejected on this target | Deep |
 | E1-03 | Output syntax and directives acceptable to `as` 2.22 | A corpus of integer C at `-O0`, `-O2`, `-g` assembles with `--march=k1om` and lints clean | Standard |
 | E1-04 | Integer C without SSE assumptions: moves, calls, branches, no CMOV | T1: no `cmov` even in patterns that favour it; integer `gcc.c-torture/compile` subset without ICE | Standard |
-| E1-05 | Port the K1OM defaults: loader path, link spec, 128-bit `long double`, assembler flags | T2: links against the sysroot; correct loader and ELF machine | Standard |
+| E1-05 | Port the K1OM defaults: loader path, link spec, `long double` as x87 80-bit in 16 bytes, assembler flags | T2: links against the sysroot; correct loader and ELF machine | Standard |
 | E1-06 | Milestone M0 evidence note | Times measured; blockers recorded; recommendation | Deep |
 
 ## E2 Scalar native (S2)
