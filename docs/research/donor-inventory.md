@@ -1,10 +1,16 @@
-# Donor inventory (S0-05, incomplete)
+# Donor inventory (S0-05)
 
-Status: donor history and full-tree changed-path inventory inspected. Acceptance is
-**not met**: GCC 16.2 runtime sources and `lra-constraints.cc` were not available
-locally or retrievable, and the original patch 0002 reproducer was not located.
-The destination paths below are proposed landing locations, not a verified GCC
-16.2 source audit. No compilation or card execution was performed.
+Status: full-tree donor inventory and GCC 16.2 runtime/LRA source review complete.
+**Acceptance remains incomplete:** no reduced patch 0002 reproducer was obtained.
+The attempted Fortran compilations stopped before LRA; no failure/passing pair,
+GCC 16 execution, or card result is claimed.
+
+- [x] Entire donor tree covered against its recorded gcc-5 branch baseline.
+- [x] Donor changes classified with reasons and GCC 16 landing locations.
+- [x] Separate GCC 16.2 runtime dependency audit (F6), with file:line evidence.
+- [x] Vector code generation scope and tuning recorded.
+- [x] GCC 16 secondary-reload mechanism inspected.
+- [ ] Reduced 0002 reproducer in `tests/regress/` (blocked before LRA).
 
 ## Comparison boundary
 
@@ -124,41 +130,151 @@ Details worth retaining as reference:
 - Misalignment handling and TFmode push splitting are correctness mechanisms,
   not proof that wider loads/stores or floating-point reassociation are safe.
 
-## Patch 0002: identified failure, GCC 16 answer pending
+## Patch 0002: mechanism survives, memory fast path does not
 
 Inspected local patch:
 `C:/Users/xuzhi/Documents/PhiWeather/native/patches/gcc-knc/0002-preserve-secondary-move-address-reloads.patch`.
 It moves `check_and_process_move` ahead of address processing in
-`curr_insn_transform`. The documented failure is that a secondary move deletes
-the original instruction after `process_address` accumulates BEFORE/AFTER
+`curr_insn_transform`. The documented donor failure is that a secondary move
+deletes the original instruction after `process_address` accumulates BEFORE/AFTER
 reloads; an early return loses those reloads and the replacement store uses an
-uninitialized address pseudo. The replacement instructions are queued for their
-own address processing.
+uninitialized address pseudo. New instructions are queued for their own processing.
 
-Required GCC 16 inspection: find `check_and_process_move`,
-`targetm.secondary_reload`, `process_address`, the BEFORE/AFTER sequence handling
-and deletion/early-return paths in `gcc/lra-constraints.cc`. Neither continued
-existence nor removal of this exact mechanism has been established here.
-No substitute reproducer was invented, and no test was added or claimed to
-fail. The original reduced source must be supplied or located and preserved in
-`tests/regress/` before this acceptance item can be closed.
+GCC 16.2 source reviewed read-only at `../_shared/gcc`, release tag
+`releases/gcc-16.2.0`, commit `78d4ac7` (owner-provided identity). All line numbers
+in the rest of this report refer to that tree, not the donor.
 
-## Separate GCC 16.2 runtime audit (F6): blocked
+In `gcc/lra-constraints.cc`:
 
-These are explicit outstanding source-review questions, **not verified GCC
-16.2 findings**. Donor routing cannot answer them.
+- Lines 4496-4505 initialize local `before`/`after` and call `process_address`.
+- Lines 4512-4514 call `check_and_process_move` and return immediately on true.
+- Lines 1470-1486 still call `targetm.secondary_reload` in both directions.
+- Lines 1507-1520 emit the secondary instruction sequence and insert its own
+  local `before` with `lra_process_new_insns`. This is a different local from
+  the address reload list in `curr_insn_transform`.
+- Lines 1522-1532 delete `curr_insn` and return true if no intermediate register
+  was needed (`new_reg == NULL_RTX`, i.e. an instruction-code secondary reload).
+- The ordinary final insertion of the outer address sequences is at line 5173;
+  the early return bypasses it. Thus deletion and loss of those outer sequences
+  remain structurally possible if both transformations occur on the same insn.
+- **Critical difference:** lines 1445-1446 reject the fast path unless both source
+  and destination are registers (after stripping SUBREGs). The donor inventory's
+  memory-output secondary-reload extension is not present. A simple register move
+  has no memory operand to reload; the donor memory-store failure cannot be
+  inferred from the surviving ordering alone. Extending this guard for KNC would
+  require preserving the pending address reloads or processing the replacement
+  before address transformation, justified by a failing test.
 
-| Dependency | Required GCC 16.2 source inspection |
+Recommendation: **rewrite** any required memory-output support and **do not port
+0002 blindly**. The secondary-reload hook, code-generation path, deletion and
+caller early return still exist; this review does not demonstrate a live GCC 16
+bug. No shared allocator modification is made by this research ticket.
+
+### Reproducer attempts and remaining blocker
+
+Copied only the ticket-specified
+`PhiWeather/.tools/knc-bootstrap/hydro-knc/src/Routing/module_channel_routing.F90`
+to ignored `tests/out/module_channel_routing.F90`. PhiWeather was read-only.
+Commands below ran through `tools/run.py` using the bootstrap Cygwin
+`python3.12.exe`; bootstrap `cross/bin` and `cygwin/bin` were prepended to PATH.
+No card or assembler was invoked (`-S` is compile only).
+
+```text
+python3.12.exe tools/run.py --name S0-05-donor-routing --inputs tests/out/module_channel_routing.F90 -- k1om-mpss-linux-gfortran -O1 -S -cpp -ffree-line-length-none -J tests/out tests/out/module_channel_routing.F90 -o tests/out/routing.s
+python3.12.exe tools/run.py --name S0-05-reference-routing --inputs tests/out/module_channel_routing.F90 -- k1om-mpss-linux-gfortran -BC:/Users/xuzhi/Documents/PhiWeather/.tools/knc-bootstrap/reference/gcc-lra-diagnostic/ -O1 -S -cpp -ffree-line-length-none -J tests/out tests/out/module_channel_routing.F90 -o tests/out/routing.s
+python3.12.exe tools/run.py --name S0-05-donor-routing-modules --inputs tests/out/module_channel_routing.F90 -- k1om-mpss-linux-gfortran -O1 -S -cpp -DMPP_LAND -ffree-line-length-none -I /cygdrive/c/Users/xuzhi/Documents/PhiWeather/.tools/knc-bootstrap/hydro-knc/src/mod -J tests/out tests/out/module_channel_routing.F90 -o tests/out/routing.s
+```
+
+Results, all exit 1:
+
+| Attempt | Actual result | Log under `.work/_state/logs/` |
+| --- | --- | --- |
+| Donor, no defines | `int64` has no implicit type, reservoir CALL syntax errors, then missing `module_rt_data.mod` at line 1544; never reached LRA. | `S0_05_donor_routing-20261101-234024.log` |
+| Reference selection | Driver rejected `/Users/xuzhi/Documents/PhiWeather/.tools/knc-bootstrap/reference/gcc-lra-diagnostic/` as nonexistent: Windows drive-letter prefix was not a usable Cygwin `-B` argument. Reference f951 did not run. | `S0_05_reference_routing-20261101-234032.log` |
+| Donor, MPP_LAND and module include | Missing `module_mpp_land.mod` at line 3; never reached LRA. | `S0_05_donor_routing_modules-20261101-234044.log` |
+
+Earlier PowerShell launches using the Cygwin symlink names `python`/`python3`
+were rejected by Windows file association before the runner started; selecting
+`python3.12.exe` resolved that launcher issue. There is no compiler result from
+those launches. After two source-compilation failures, stop and request the
+original preprocessing definitions and matching module include directories (or
+a self-contained preprocessed input). A corrected reference selection must use
+Cygwin path syntax. Neither executable's patch status has been established by
+behavior. No substitute regression test was committed; the copied source was
+removed after recording these results. The reproducer criterion stays unticked.
+
+## Separate GCC 16.2 runtime audit (F6)
+
+This is a source dependency audit of the new compiler's own runtimes, separate
+from the donor diff. Listed dependencies are conditional on configuration,
+macros and selected code paths; they are not claims that every library always
+executes every instruction. A future KNC configuration must select safe paths
+without defining SSE/AVX feature macros. No runtime was built or run here.
+
+### SSE (and adjacent AVX assumptions)
+
+| Source evidence | Dependency and disposition |
 | --- | --- |
-| SSE | `libgcc/config/i386` CRT/helper assembly, `libitm` x86 paths, libstdc++ CPU-specific primitives, and libatomic x86 alternatives: establish all target-selected SSE uses and safe replacements. |
-| `pause` | Inspect libgomp x86 futex/spin paths, libstdc++ atomic wait/spin helpers, libitm locks and libatomic spin implementations; use a KNC-safe hint or scalar fallback. |
-| 16-byte atomics | Inspect libatomic x86 dispatch/assembly and generic lock fallback, libstdc++ lock-free queries, and libitm wide operations; do not assume x86-64 implies CX16 or advertise unsupported lock freedom. |
-| `__float128` | Inspect libquadmath configuration/ABI, libgcc TFmode and complex helpers, libgfortran kind selection and quadmath calls, and libstdc++ float128 integration; establish software arithmetic and calling convention requirements. |
-| MXCSR | Inspect libgcc fast-math CRT and soft-float exception support, libgfortran FPU/IEEE handling and libquadmath floating-environment code; distinguish control-register access from SSE arithmetic and preserve default precision/modes. |
+| `libgcc/config/i386/t-softfp:15-32` | Explicit `-msse2` flags on half/bfloat conversion and bitint helpers. **rewrite** the KNC makefile selection; soft-float naming does not imply an SSE-free build. |
+| `libgcc/config/i386/sfp-exceptions.c:44-50` | SSE-math branch forces `x` operands; alternate branch forces x87 `t`/`f`. **rewrite** exception raising for KNC, rather than enabling SSE to satisfy constraints. |
+| `libgcc/config/i386/t-msabi:2-13`, `i386-asm.h:100-104,119-121`; selected for Linux x86 by `libgcc/config.host:1600` | MS-to-SysV save/restore helpers contain XMM/YMM transfers, including MOVAPS/VMOVAPS. **drop** this unsupported optional calling-convention machinery from initial KNC configuration. |
+| `libitm/Makefile.am:71-78`, `libitm/libitm.h:234-240`, `libitm/config/x86/x86_sse.cc:31-40` | ARCH_X86 adds SSE/AVX barrier units and explicitly appends `-msse` (and `-mavx` when enabled). **drop** initial libitm enablement; its 128-bit transactional transfers are not proof of 16-byte lock-free atomics. |
+| `libstdc++-v3/config/cpu/i486/opt/bits/opt_random.h:33,45,70-73`, `opt/ext/opt_random.h:37,47-54` | SSE3/SSE2 optimized random routines are macro-gated. **port** scalar fallbacks and keep those feature macros off for KNC; do not advertise SIMD headers as supported IMCI implementations. |
+| `libatomic/config/x86/fenv.c:50-56`, `libgfortran/config/fpu-387.h:94-104` | Exception raising chooses SSE-register arithmetic or x87 constraints. **rewrite** KNC exception paths in these locations; do not select x86 SSE arithmetic merely because KNC has MXCSR. |
+| `libatomic/config/x86/host-config.h:117-136` | AVX `vmovdqa` and `mfence` in the dispatched 16-byte load/store alternative. **drop** that alternative for KNC; see atomics below. |
 
-Local shell retrieval of the release-tagged `gcc/lra-constraints.cc` failed with
-`WinError 10051` (unreachable network). Web retrieval of release-tagged GitHub
-raw/blob, Google Git and gcc.gnu.org source endpoints also failed (cache miss or
-inaccessible URL). The release announcement alone cannot establish source
-behavior. Supply a shared GCC 16.2.0 source tree/archive and the patch 0002
-reproducer to complete the two blocked acceptance items.
+### `pause`
+
+| Source evidence | Dependency and disposition |
+| --- | --- |
+| `libgomp/config/linux/x86/futex.h:120-123`; routing at `libgomp/configure.tgt:88-89` | `cpu_relax` unconditionally uses `__builtin_ia32_pause`. **rewrite** KNC relaxation/routing; a Linux/x86 alias imports the hint. |
+| `libstdc++-v3/include/bits/atomic_wait.h:141-148` | Architecture macro check alone selects `pause`; alternate branch yields. **rewrite** guard for KNC or select its supported relaxation behavior. |
+| `libstdc++-v3/src/c++11/random.cc:117-133` | RDSEED retry loop uses `pause` in a separately targeted function. **drop** unsupported hardware random alternatives for KNC; retain software/OS fallback. |
+| `libitm/config/x86/target.h:61-65` | Unconditional pause in x86 cpu_relax. **drop** initial libitm configuration; any future port must rewrite it. |
+
+The inspected libatomic POSIX lock implementation uses pthread mutexes, not an
+inline x86 pause loop (`libatomic/config/posix/lock.c:68-76,94-99`). That fallback
+still depends on the target pthread implementation, outside this GCC source tree.
+
+### 16-byte atomics
+
+`libatomic/configure.tgt:86-117` maps x86-64 to the x86 implementation and requests
+IFUNC for 16-byte loads. `config/x86/host-config.h:58-60` distinguishes AVX+CX16
+and CX16-only alternatives; lines 72-87 advertise their atomic capabilities.
+Lines 102-114 use `__sync_val_compare_and_swap_16`; lines 117-136 implement the
+AVX aligned load/store alternative. **rewrite** KNC selection so neither CX16
+nor AVX is assumed. Feature dispatch is conditional, not a reason to claim the
+base implementation intrinsically requires CX16.
+
+The generic CAS fallback remains at `libatomic/cas_n.c:98-121`, using
+`protect_start`/`protect_end`; POSIX locks live in `config/posix/lock.c:48-76`.
+**port** the lock-backed requirement, with scalar transfers visible to the
+compiler. KNC 16-byte atomic operations may be library calls and need not be
+lock-free. `libstdc++-v3/include/std/atomic:280-294` delegates runtime and compile
+time lock-free answers to `__atomic_is_lock_free` and
+`__atomic_always_lock_free`; **port** those queries without falsely enabling
+CX16 or promising lock freedom. libitm's M128 barriers above are transactional
+memory ABI functions, not a substitute for these atomic guarantees.
+
+### `__float128` / TFmode
+
+| Source evidence | Dependency and disposition |
+| --- | --- |
+| `libquadmath/quadmath.h:30-47`, `libquadmath/math/acosq.c:150-153` | Public binary128/complex ABI and arithmetic implemented using `__float128`. **rewrite** KNC enablement only after TFmode argument/result ABI and software helpers are correct; no silent replacement with double/long double. |
+| `libgcc/config/i386/32/tf-signs.c:26-53`, `libgcc/config/i386/t-softfp:9-11` | Explicit float128 sign helpers and TF conversion families. **rewrite** target helper selection/ABI in libgcc configuration; do not infer correctness from the donor's scalar TF moves. |
+| `libgfortran/mk-kinds-h.sh:71-75`, `kinds-override.h:28-30`, `libgfortran.h:61-62`, `configure.ac:679-696`, `acinclude.m4:264-314` | Fortran kind 16 may be `_Float128`; configuration probes usable binary128 and selects quadmath or IEC libc support. **port** honest probes and only expose kinds supported by the KNC compiler/runtime pair. |
+| `libstdc++-v3/include/bits/cpp_type_traits.h:316-323`, `include/bits/std_abs.h:149-157` | Conditional float128 type traits/operations. **port** feature gating after ABI/helper support; presence in headers alone does not establish KNC binary128 support. |
+
+### MXCSR and floating environment
+
+| Source evidence | Dependency and disposition |
+| --- | --- |
+| `libgcc/config/i386/crtfastmath.c:28-33,82-97` | Assumes every x86-64 target has SSE/DAZ; constructor reads/writes MXCSR and sets DAZ/FTZ. **rewrite** KNC selection/control access; do not link this to change default precision or denormal handling implicitly. |
+| `libgcc/config/i386/64/sfp-machine.h:26-38`, `64/dfp-machine.h:6,16-19` | Soft-float rounding reads MXCSR; decimal code also restores it. **rewrite** KNC control-register access and keep rounding/exception semantics. Turning off SSE macros is insufficient to remove these dependencies. |
+| `libgfortran/config/fpu-387.h:30-42,174-194` and later IEEE environment routines | `has_sse` tests SSE availability and uses it to gate MXCSR access; x87 state is handled separately. **rewrite** KNC FPU selection (`configure.host:46-51`) so MXCSR support is independent of SSE arithmetic and valid KNC control state is preserved. |
+| `libquadmath/quadmath-imp.h:274-299,309-330`, `quadmath-rounding-mode.h:27-34` | Uses target libc fenv/rounding services, with degraded fallbacks if unavailable. No direct MXCSR assembly was found in libquadmath sources. **port** the fenv dependency and verify target libc semantics in the eventual port; the GCC source audit cannot establish libc's instruction safety. |
+
+MXCSR support is a control-state requirement, not authorization to set
+`TARGET_AVX512F`, SSE/AVX flags, fast-math, or reduced precision. libgomp and
+libitm dependencies above are independently relevant even without floating-point
+work. These findings identify port work; they claim no native runtime passes.
