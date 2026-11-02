@@ -386,6 +386,24 @@ class Dispatcher(Sandbox):
             f.write(text.replace("depth: standard", "depth: standard\nsessions: 4"))
         self.assertIsNone(dispatch.over_budget(board, board.load("A-1")))
 
+    def test_the_lead_can_raise_a_ticket_token_budget(self):
+        import dispatch
+        import pm
+        os.makedirs(os.path.join(self.root, ".work", "_state"))
+        with open(os.path.join(self.root, ".work", "_state", "ledger.jsonl"), "w", encoding="utf8") as f:
+            f.write(json.dumps({"ticket": "A-1", "role": "engineer", "input_tokens": 7000000}) + "\n")
+        path = os.path.join(self.root, "work", "tickets", "A-1.md")
+        cwd = os.getcwd()
+        os.chdir(self.root)
+        self.addCleanup(os.chdir, cwd)
+        board = pm.Board()
+        self.assertIn("7000000 input tokens", dispatch.over_budget(board, board.load("A-1")))
+        with open(path, encoding="utf8") as f:
+            text = f.read()
+        with open(path, "w", encoding="utf8", newline="\n") as f:
+            f.write(text.replace("depth: standard", "depth: standard\ninput_tokens: 12000000"))
+        self.assertIsNone(dispatch.over_budget(board, board.load("A-1")))
+
     def test_status_page_shows_a_session_as_soon_as_it_is_recorded(self):
         import dispatch
         import pm
