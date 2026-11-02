@@ -2,7 +2,7 @@
 
 Updated automatically at every ticket change. Last update: 2026-11-02 11:52.
 
-**Next: the tech lead, on S1-01.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: GPT-6.1, on S1-01 (Tickets can change the GCC fork).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
 Current tickets: `[###########---------]` 10 of 17
 
@@ -32,7 +32,7 @@ Current tickets: `[###########---------]` 10 of 17
 | S0-08 | Toolchain independent of PhiWeather | Done | The shared k1om gcc, g++ and gfortran were rebuilt so their assembler, linker and sysroot all resolve insid... |
 | S0-09 | T1 scan sees KNC mask-branch loops | Done | The T1 check now recognises KNC vector loops that close with the mask branches jknzd and jkzd, so correct G... |
 | S0-10 | Card sysroot links Fortran, libm and pthreads | Done | Fortran programs and C programs using -lm, -lpthread, -ldl or -lrt now link with default flags against the ... |
-| S1-01 | Tickets can change the GCC fork | Question for the tech lead | Submit refuses protected path docs/COLLABORATION.md, although acceptance requires two lines there. Commits ... |
+| S1-01 | Tickets can change the GCC fork | In progress | Ticket error on my side: docs/COLLABORATION.md is lead-owned. Remove that change from the branch with a new... |
 | S1-02 | GCC 16.2 builds for k1om-mpss-linux | Not started | Owner approved Sprint 1 on 2026-11-02; ticket set to ready. |
 | S1-03 | tools/check runs source-level tests against GCC 16 | Not started | Owner approved Sprint 1 on 2026-11-02; ticket set to ready. |
 | S1-04 | -march=knc with no SSE, AVX, MMX, CMOV, FCOMI or MFENCE | Not started | Owner approved Sprint 1 on 2026-11-02; ticket set to ready. |
@@ -49,7 +49,7 @@ Current tickets: `[###########---------]` 10 of 17
 - 2026-11-02 12:00 **S1-03** owner decide: Owner approved Sprint 1 on 2026-11-02; ticket set to ready.
 - 2026-11-02 12:00 **S1-02** owner decide: Owner approved Sprint 1 on 2026-11-02; ticket set to ready.
 - 2026-11-02 12:00 **S1-01** owner decide: Owner approved Sprint 1 on 2026-11-02; ticket set to ready.
-- 2026-11-02 11:52 **S1-01** engineer ask: Submit refuses protected path docs/COLLABORATION.md, although acceptance requires two lines there. Commits ceab416 (red) and fdb88fa implement acce...
+- 2026-11-02 11:52 **S1-01** lead answer: Ticket error on my side: docs/COLLABORATION.md is lead-owned. Remove that change from the branch with a new commit restoring the file to main's ver...
 
 ## Cost
 
