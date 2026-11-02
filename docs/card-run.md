@@ -24,10 +24,13 @@ C:/Windows/System32/OpenSSH/ssh.exe -F NUL -i <identity>
 
 Copy `config/card.example.json` to the local file and fill in the owner paths.
 Configure `externalLocks` with every other project's lock for this card and
-`baselineNames` with reviewed system daemon/kernel thread names. The empty
-allowlist in the example fails closed. Do not allow general job/interpreter
-names such as `sh`. Optional `ownLock` must be inside this worktree (default
-`.card.lock`); existing locks require owner intervention. CLI options are
+`baselineNames` with exact user-space daemon names from an owner-reviewed idle
+snapshot (including sshd). Kernel threads are identified by PID/PPID, never by
+name. The empty allowlist in the example fails closed. Do not allow general
+job/interpreter names such as `sh`. The default own lock is the shared
+`<main>/.work/_state/card.lock`, for main and all `<main>/.work/<ticket>`
+worktrees. Optional `ownLock` must be inside this worktree or be that exact
+shared path; existing locks require owner intervention. CLI options are
 `--config`, `--lock`, repeated `--external-lock` and `--baseline-name`,
 `--timeout`, `--transport-timeout`, and `--receipt`, before PROGRAM.
 The default overwritten result is `tests/out/card-result.json`.
@@ -39,7 +42,8 @@ are base64 chunks over the control session. Program output is read in bounded
 chunks from private files, decoded and written to the corresponding host
 stdout/stderr stream without text conversion. Their interleaving is not kept.
 If transport becomes unavailable, the result reports incomplete cleanup;
-it does not claim the remote program stopped.
+the independent card-side watchdog still enforces the execution limit plus
+`max(5 seconds, 2 * transport_timeout)` of grace. No immediate stop is claimed.
 
 Host file paths and remote arguments must be passed without shell interpolation.
 The production transport must bound connecting, snapshots, staging, execution,
@@ -49,7 +53,7 @@ that the remote program stopped.
 
 ## Locks, process policy, and lifecycle
 
-1. Exclusively create the configured own lock inside our tree. If already
+1. Exclusively create the configured own lock (shared state by default). If already
    present, report and refuse, including when stale. Do not remove a lock this
    invocation did not acquire. Hold an acquired lock through cleanup and release
    it on all exit paths.
@@ -67,8 +71,9 @@ that the remote program stopped.
    directory even if the first process check refuses. Do not install system files.
 4. Before staging inputs and again immediately before execution, check all card
    processes. A process is ours only if its resolved exe or cwd is inside that
-   exact directory (component boundary required). Otherwise it must have a name
-   in the configured baseline allowlist of system daemons. Missing/unknown
+   exact directory (component boundary required). PID 2 and children of PID 2
+   are kernel threads. Every other process must have an exact name in the
+   configured baseline allowlist of user-space system daemons. Missing/unknown
    identity is foreign. Report offending PIDs/names and refuse. Never signal or
    otherwise act on a foreign process. A process appearing after staging still
    prevents execution. The pre-execution check and launch share the SSH session.
@@ -79,6 +84,12 @@ that the remote program stopped.
 6. On timeout, stop only processes whose exe or cwd is inside this invocation's
    exact directory. Never kill by name or broad process group. Bounded TERM/KILL
    escalation may target only those processes while the boot ID still matches.
+   Before launching the program, start a separate HUP-ignoring watchdog shell
+   from the private directory. It sleeps for the card-side limit then calls
+   the same guarded TERM/KILL helper, even after SSH has gone away. Owned child
+   processes are covered too. Normal cleanup stops the watchdog along with any
+   other owned processes. Control polls receive the full transport timeout;
+   crossing the host program deadline produces timeout on the next loop check.
 7. Clean up that exact directory on success and failure, but only on the
    original boot. Validate directory shape and ownership before every destructive
    operation; the boot check must also be enforced by the remote operation.
@@ -122,10 +133,11 @@ constructs it or needs connection configuration.
 enters it, and returns a single session supporting:
 
 - `snapshot(timeout=...)`: dict with `boot_id` and `processes`; each process has
-  `pid`, `name`, `exe`, `cwd` (identity fields may be null).
+  `pid`, `ppid`, `name`, `exe`, `cwd` (identity fields may be null).
 - `stage(run_dir, program, timeout=...)`: copies the input into the private dir.
-- `execute(run_dir, argv, timeout=...)`: returns the program's integer status;
-  streams output; raises `TimeoutError` only for the program deadline.
+- `execute(run_dir, argv, timeout=..., card_timeout=...)`: arms the independent
+  watchdog with `card_timeout` before launching; returns the program's integer
+  status; streams output; raises `TimeoutError` only for the program deadline.
 - `signal_owned(run_dir, boot_id, timeout=...)`: stops only owned processes,
   enforcing the boot guard remotely too.
 - `cleanup(run_dir, boot_id, timeout=...)`: removes only that directory, enforcing
@@ -136,9 +148,12 @@ Other transport errors raise `OSError`. Operations are bounded by
 `transport_timeout`, except execution, which uses `timeout`. The transport
 must not add retries. Snapshots and destructive operations fail closed.
 
-T0's seven cases cover existing own/external locks, foreign processes before
+T0 cases cover existing own/external locks, foreign processes before
 staging and before execution, timeout, unreachable card, reboot during a run,
-nonzero program exit, and cleanup after staging failure. Assertions inspect
+nonzero program exit, and cleanup after staging failure. Lead-requested revision
+cases cover shared lock resolution, kernel PID/PPID versus misleading names,
+link loss during execute with a card-side limit, and full-budget control polls
+near the deadline. Assertions inspect
 operation order, boundaries, boot IDs, lock release, result JSON, and card time.
 At RED, missing `tools/card_run` was the expected failure.
 

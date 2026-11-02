@@ -33,9 +33,18 @@ def inside(path, directory):
     return isinstance(path, str) and (path == directory or path.startswith(directory + "/"))
 
 
+def default_lock(root):
+    # Project worktrees live at <main>/.work/<ticket>, like storage.main_root's
+    # fallback. Both main and every ticket must contend on this one state file.
+    root = Path(root).resolve()
+    main = root.parent.parent if root.parent.name == ".work" else root
+    return main / ".work/_state/card.lock"
+
+
 def check_idle(snapshot, run_dir, baseline_names):
     foreign = [p for p in snapshot["processes"]
                if not (inside(p.get("exe"), run_dir) or inside(p.get("cwd"), run_dir))
+               and str(p.get("pid")) != "2" and str(p.get("ppid")) != "2"
                and (not p.get("name") or p["name"] not in baseline_names)]
     if foreign:
         raise Refused("foreign/unknown processes: " + ", ".join(
@@ -69,7 +78,8 @@ def run(program, argv, *, lock_path, external_locks, baseline_names, timeout,
         if any(not math.isfinite(n) or n <= 0 for n in (timeout, transport_timeout)):
             raise ValueError("limits must be finite and positive")
         lock_path = Path(lock_path).absolute()
-        lock_path.parent.resolve().relative_to(ROOT.resolve())
+        if lock_path.resolve() != default_lock(ROOT):
+            lock_path.parent.resolve().relative_to(ROOT.resolve())
         # O_EXCL is intentional: stale locks require an owner's intervention.
         try:
             fd = os.open(str(lock_path), os.O_CREAT | os.O_EXCL | os.O_WRONLY, 0o600)
@@ -92,7 +102,8 @@ def run(program, argv, *, lock_path, external_locks, baseline_names, timeout,
         started = monotonic()
         execution_started = True
         try:
-            status = session.execute(run_dir, argv, timeout=timeout)
+            status = session.execute(run_dir, argv, timeout=timeout,
+                                     card_timeout=timeout + max(5.0, 2 * transport_timeout))
             result.update(result_class="program", exit_code=status, program_exit_code=status)
         except TimeoutError as error:
             failure("timeout", TIMEOUT_EXIT, error)
@@ -243,9 +254,10 @@ class SSHSession:
         processes = []
         for line in records[1:]:
             fields = line.split("\t")
-            if len(fields) != 5 or fields[0] != "PROC" or not fields[1].isdigit():
+            if (len(fields) != 6 or fields[0] != "PROC" or not fields[1].isdigit()
+                    or not fields[2].isdigit()):
                 raise OSError("unknown process identity in snapshot")
-            processes.append(dict(zip(("pid", "name", "exe", "cwd"), fields[1:])))
+            processes.append(dict(zip(("pid", "ppid", "name", "exe", "cwd"), fields[1:])))
         if self.boot_id is None:
             self.boot_id = boot
         return dict(boot_id=boot, processes=processes)
@@ -263,6 +275,14 @@ class SSHSession:
                          "' >> program.b64", self.remaining(deadline))
         self.rpc("guard_dir && base64 -d program.b64 > program && chmod 700 program && rm program.b64",
                  self.remaining(deadline))
+        # A separate shell has its own $$, so stop_owned spares the watchdog
+        # itself. Ignore HUP before exec; losing SSH must not disarm the timer.
+        watchdog = ((ROOT / "tools/card_run_remote.sh").read_text(encoding="utf8") +
+                    '\nrun_dir=$1\nboot_id=$2\nguard_boot || exit 92\n'
+                    'sleep "$3"\nstop_owned\n')
+        encoded = base64.b64encode(watchdog.encode("utf8")).decode("ascii")
+        self.rpc("guard_dir && printf '%s' '" + encoded + "' | base64 -d > watchdog.sh",
+                 self.remaining(deadline))
 
     @staticmethod
     def remaining(deadline):
@@ -275,14 +295,14 @@ class SSHSession:
         if run_dir != self.run_dir or not RUN_DIR.fullmatch(run_dir):
             raise OSError("operation outside this exact run directory")
 
-    def execute(self, run_dir, argv, *, timeout):
+    def execute(self, run_dir, argv, *, timeout, card_timeout):
         self.validate(run_dir)
         deadline = time.monotonic() + timeout
         def operation(script):
-            return self.rpc(script, min(self.transport_timeout, self.remaining(deadline)))
+            return self.rpc(script, self.transport_timeout)
         command = " ".join(shlex.quote(str(arg)) for arg in argv)
-        operation("boot_id=%s\nguard_boot && { : > stdout; : > stderr; ( ./program %s < /dev/null > stdout 2> stderr; "
-                  "printf '%%s\\n' \"$?\" > status ) & }" % (shlex.quote(self.boot_id), command))
+        operation("boot_id=%s\nstart_job %s %s" %
+                  (shlex.quote(self.boot_id), shlex.quote(str(card_timeout)), command))
         offsets = [0, 0]
         status = None
         while True:
@@ -354,7 +374,7 @@ def main():
         transport_timeout = (args.transport_timeout if args.transport_timeout is not None
                              else config.get("transportTimeout", 10.0))
         result = run(args.program, args.args,
-                     lock_path=args.lock or Path(config.get("ownLock", str(ROOT / ".card.lock"))),
+                     lock_path=args.lock or Path(config.get("ownLock", str(default_lock(ROOT)))),
                      external_locks=[Path(p) for p in config.get("externalLocks", [])] + args.external_lock,
                      baseline_names=set(config.get("baselineNames", [])) | set(args.baseline_name),
                      timeout=timeout, transport_timeout=transport_timeout, receipt_path=args.receipt,

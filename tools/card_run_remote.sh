@@ -33,8 +33,12 @@ snapshot() {
         proc_cwd=$(readlink "$proc/cwd" 2>/dev/null)
         proc_name=
         IFS= read -r proc_name < "$proc/comm" 2>/dev/null
+        proc_ppid=
+        while read -r proc_key proc_value proc_rest; do
+            if [ "$proc_key" = PPid: ]; then proc_ppid=$proc_value; break; fi
+        done < "$proc/status" 2>/dev/null
         [ -d "$proc" ] || continue
-        printf 'PROC\t%s\t%s\t%s\t%s\n' "$proc_pid" "$proc_name" "$proc_exe" "$proc_cwd"
+        printf 'PROC\t%s\t%s\t%s\t%s\t%s\n' "$proc_pid" "$proc_ppid" "$proc_name" "$proc_exe" "$proc_cwd"
     done
 }
 stop_owned() {
@@ -62,4 +66,18 @@ cleanup() {
     stop_owned && guard_boot || return 92
     # No computed parent path, glob, symlink, or directory from another boot.
     rm -rf -- "$run_dir"
+}
+start_job() {
+    guard_boot && [ -f watchdog.sh ] || return 92
+    job_limit=$1
+    shift
+    : > stdout
+    : > stderr
+    # Both background shells detach their SSH file descriptors and ignore HUP.
+    # The watchdog survives a broken control connection and applies the same
+    # exact-directory and boot guards as host-requested termination.
+    (trap '' HUP; exec sh ./watchdog.sh "$run_dir" "$boot_id" "$job_limit") \
+        < /dev/null > /dev/null 2>&1 &
+    (trap '' HUP; ./program "$@"; printf '%s\n' "$?" > status) \
+        < /dev/null > stdout 2> stderr &
 }
