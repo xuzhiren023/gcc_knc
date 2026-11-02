@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
-"""Shared donor toolchain maintenance (run builds through tools/run.py).
+"""Shared compiler maintenance (run builds through tools/run.py).
 
+gcc16: replace the stock shared build with the KNC C compiler; do not install it.
 rebuild: configure the read-only shared donor, then all-gcc/install-gcc only.
          --install-only resumes installation from the completed shared build.
 sysroot: overlay a card-derived tree, if supplied, and restore development files.
@@ -17,6 +18,7 @@ import shutil
 import subprocess
 import sys
 import tempfile
+import time
 
 ROOT = Path(__file__).resolve().parents[1]
 PROJECT = ROOT.parent.parent if ROOT.parent.name == '.work' else ROOT
@@ -37,6 +39,45 @@ INSTALL_STAGE = '/tmp/knc-stage'
 def command(*args, **kwargs):
     print('+ ' + ' '.join(map(str, args)), flush=True)
     subprocess.run(list(map(str, args)), check=True, **kwargs)
+
+
+def gcc16(args):
+    """Replace the shared stock build with the KNC C compiler, without installing."""
+    source = SHARED / 'gcc'
+    build = SHARED / 'gcc-build'
+    if not (source / 'configure').is_file():
+        raise RuntimeError('missing shared GCC source; ask the lead')
+    if build.resolve() != SHARED.resolve() / 'gcc-build' or build.is_symlink():
+        raise RuntimeError('refusing to clean unexpected build directory: ' + str(build))
+    if build.exists():
+        shutil.rmtree(build)
+    build.mkdir()
+    # As in S0-06, keep host compiler temporaries in the shared area.
+    os.environ['TMPDIR'] = str(SHARED / 'tmp')
+    Path(os.environ['TMPDIR']).mkdir(exist_ok=True)
+    flags = [
+        '--target=k1om-mpss-linux', '--prefix=' + str(SHARED / 'gcc-install'),
+        '--with-sysroot=' + str(SYSROOT),
+        '--with-as=' + str(TC / 'cross/bin/k1om-mpss-linux-as'),
+        '--with-ld=' + str(TC / 'cross/bin/k1om-mpss-linux-ld'),
+        '--enable-languages=c', '--disable-bootstrap', '--disable-multilib',
+        '--disable-nls', '--without-isl',
+        '--disable-libssp', '--disable-libquadmath', '--disable-libquadmath-support',
+        '--disable-libsanitizer', '--disable-libitm', '--disable-libcilkrts',
+        '--disable-libvtv', '--disable-libmpx', '--disable-libgomp',
+    ]
+    for label, argv in (('configure', ('bash', source / 'configure', *flags)),
+                        ('full all-gcc', ('make', '-j8', 'all-gcc'))):
+        start = time.monotonic()
+        try:
+            command(*argv, cwd=build)
+        finally:
+            print('MEASURE gcc16 %s: seconds=%.3f' %
+                  (label, time.monotonic() - start), flush=True)
+    compiler = build / 'gcc/xgcc'
+    for flag in ('-dumpmachine', '-print-prog-name=as', '-print-prog-name=ld',
+                 '-print-sysroot'):
+        command(compiler, flag)
 
 
 def rebuild(args):
@@ -224,7 +265,7 @@ def main():
         return result
     os.environ['PATH'] = ':'.join(str(TC / p) for p in ('cross/bin', 'cygwin/bin')) + ':' + os.environ.get('PATH', '')
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('step', choices=('rebuild', 'sysroot', 'verify'))
+    parser.add_argument('step', choices=('rebuild', 'sysroot', 'verify', 'gcc16'))
     parser.add_argument('--card-root')
     parser.add_argument('--development-files')
     parser.add_argument('--install-only', action='store_true',
