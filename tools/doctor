@@ -63,7 +63,10 @@ def check(manifest, root):
             print("MISSING sysroot directory: %s; run python tools/toolchain.py sysroot" %
                   (sysroot / relative))
             sysroot_failed = True
-    for name in ("crt1.o", "crti.o", "crtn.o", "libc.so", "libc_nonshared.a"):
+    for name in ("crt1.o", "crti.o", "crtn.o", "libc.so", "libc_nonshared.a",
+                 "libpthread_nonshared.a", "Scrt1.o", "gcrt1.o", "Mcrt1.o",
+                 "libm.so", "libpthread.so", "libdl.so", "librt.so", "libcrypt.so",
+                 "libutil.so", "libresolv.so", "libnsl.so", "libanl.so", "libthread_db.so"):
         if not (sysroot / "usr/lib64" / name).is_file():
             print("MISSING sysroot development file: %s; run python tools/toolchain.py sysroot" %
                   (sysroot / "usr/lib64" / name))

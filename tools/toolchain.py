@@ -5,7 +5,7 @@ rebuild: configure the read-only shared donor, then all-gcc/install-gcc only.
          --install-only resumes installation from the completed shared build.
 sysroot: overlay a card-derived tree, if supplied, and restore development files.
          --development-files seeds the retained development input directory once.
-verify: check default driver paths and a verbose C link against the card libc.
+verify: check default driver paths and verbose C/Fortran links against card libraries.
 
 Example: python tools/run.py --name donor-rebuild --inputs tools/toolchain.py --
          python tools/toolchain.py rebuild
@@ -23,7 +23,14 @@ PROJECT = ROOT.parent.parent if ROOT.parent.name == '.work' else ROOT
 SHARED = PROJECT / '.work/_shared'
 TC = SHARED / 'toolchain'
 SYSROOT = TC / 'sysroot'
-DEVELOPMENT = ('crt1.o', 'crti.o', 'crtn.o', 'libc.so', 'libc_nonshared.a')
+DEVELOPMENT = ('crt1.o', 'crti.o', 'crtn.o', 'libc.so', 'libc_nonshared.a',
+               'libpthread_nonshared.a', 'Scrt1.o', 'gcrt1.o', 'Mcrt1.o')
+RUNTIME_LINKS = {
+    'm': 'libm.so.6', 'dl': 'libdl.so.2', 'rt': 'librt.so.1',
+    'crypt': 'libcrypt.so.1', 'util': 'libutil.so.1', 'resolv': 'libresolv.so.2',
+    'nsl': 'libnsl.so.1', 'anl': 'libanl.so.1', 'thread_db': 'libthread_db.so.1',
+    'pthread': 'libpthread.so.0',
+}
 INSTALL_STAGE = '/tmp/knc-stage'
 
 
@@ -118,32 +125,69 @@ def sysroot(args):
     for relative in ('usr/include', 'lib64'):
         if not (SYSROOT / relative).is_dir():
             raise RuntimeError('missing card sysroot; supply --card-root <extracted card tree>')
+    for runtime in RUNTIME_LINKS.values():
+        if not (SYSROOT / 'lib64' / runtime).is_file():
+            raise RuntimeError('missing card runtime: ' + str(SYSROOT / 'lib64' / runtime))
     for relative in ('lib', 'usr/lib', 'usr/lib64'):
         (SYSROOT / relative).mkdir(parents=True, exist_ok=True)
     for name in DEVELOPMENT:
         shutil.copy2(development / name, SYSROOT / 'usr/lib64' / name)
         print('Restored ' + str(SYSROOT / 'usr/lib64' / name), flush=True)
+    for library, runtime in RUNTIME_LINKS.items():
+        link = SYSROOT / 'usr/lib64' / ('lib' + library + '.so')
+        # GNU ld roots absolute script paths in its sysroot. Ordinary text files
+        # work with both native Windows and Cygwin tools, unlike Cygwin symlinks.
+        if link.is_symlink():
+            link.unlink()
+        group = '/lib64/' + runtime
+        if library == 'pthread':
+            group += ' /usr/lib64/libpthread_nonshared.a'
+        link.write_text('GROUP ( ' + group + ' )\n')
+        print('Created ' + str(link), flush=True)
 
 
 def verify(args):
     command(sys.executable, ROOT / 'tools/doctor')
-    cc = TC / 'cross/bin/k1om-mpss-linux-gcc'
     (SHARED / 'tmp').mkdir(exist_ok=True)
     with tempfile.TemporaryDirectory(dir=SHARED / 'tmp', prefix='donor-link-') as directory:
-        source = Path(directory) / 'hello.c'
-        source.write_text('#include <stdio.h>\nint main(void) { return puts("KNC"); }\n')
-        result = subprocess.run([str(cc), '-v', '-Wl,--trace', str(source),
-                                 '-o', str(Path(directory) / 'hello.mic')],
-                                stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
-        print(result.stdout, flush=True)
-        if result.returncode:
-            raise RuntimeError('verbose C link exited %d' % result.returncode)
-        if 'phiweather' in result.stdout.lower():
-            raise RuntimeError('verbose C link still uses PhiWeather')
-        for library in ('libc.so.6', 'ld-linux-k1om.so.2'):
-            if str(SYSROOT / 'lib64' / library) not in result.stdout:
-                raise RuntimeError('link trace missing card-derived ' + library)
-    print('PASS default paths and verbose C link against card-derived libc')
+        probes = (
+            ('gcc', 'hello.c', '''#include <stdio.h>
+#include <math.h>
+#include <pthread.h>
+#include <dlfcn.h>
+#include <time.h>
+static void *worker(void *arg) { return arg; }
+int main(int argc, char **argv) {
+    pthread_t thread;
+    struct timespec now;
+    void *handle = dlopen(0, RTLD_NOW);
+    if (pthread_create(&thread, 0, worker, argv)) return 1;
+    if (pthread_join(thread, 0)) return 2;
+    if (clock_gettime(CLOCK_REALTIME, &now)) return 3;
+    printf("KNC %f\\n", cos((double)argc));
+    return handle ? dlclose(handle) : 4;
+}
+''', ['-lm', '-lpthread', '-ldl', '-lrt'],
+             ('libm.so.6', 'libpthread.so.0', 'libdl.so.2', 'librt.so.1')),
+            ('gfortran', 'hello.f90', 'program hello\nprint *, "KNC"\nend program hello\n',
+             [], ('libm.so.6',)),
+        )
+        for driver, filename, text, flags, libraries in probes:
+            source = Path(directory) / filename
+            source.write_text(text)
+            compiler = TC / ('cross/bin/k1om-mpss-linux-' + driver)
+            result = subprocess.run([str(compiler), '-v', '-Wl,--trace', str(source),
+                                     *flags, '-o', str(source.with_suffix('.mic'))],
+                                    stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
+            print(result.stdout, flush=True)
+            if result.returncode:
+                raise RuntimeError('verbose %s link exited %d' % (driver, result.returncode))
+            if 'phiweather' in result.stdout.lower():
+                raise RuntimeError('verbose %s link still uses PhiWeather' % driver)
+            for library in (*libraries, 'libc.so.6', 'ld-linux-k1om.so.2'):
+                if str(SYSROOT / 'lib64' / library) not in result.stdout:
+                    raise RuntimeError('%s link trace missing card-derived %s' % (driver, library))
+            print('PASS default %s link against card-derived libraries' % driver, flush=True)
 
 
 def main():
