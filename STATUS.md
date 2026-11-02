@@ -1,16 +1,16 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-02 06:51.
+Updated automatically at every ticket change. Last update: 2026-11-02 06:52.
 
-**Next: the tech lead, on S0-05.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: GPT-6.1, on S0-06 (GCC 16.2 fork and timing).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
-Current tickets: `[######--------------]` 3 of 9
+Current tickets: `[########------------]` 4 of 9
 
 ## Milestones
 
 | | Milestone | State | Progress |
 |---|---|---|---|
-| M0 | Foundation | In progress | 3 of 9 tickets |
+| M0 | Foundation | In progress | 4 of 9 tickets |
 | M1 | Mixed native code | Not started | Not planned in detail yet |
 | M2 | Useful vector target | Not started | Not planned in detail yet |
 | M3 | Runtimes | Not started | Not planned in detail yet |
@@ -26,7 +26,7 @@ Current tickets: `[######--------------]` 3 of 9
 | S0-02 | ISA lint | Done | knc_lint now rejects the listed non-KNC instructions in .s, .o, archives, shared objects and executables, a... |
 | S0-03 | Test runner and red baseline | Done | tools/check now runs t0, t1 and t2 on the donor in about 16 seconds and records the expected baseline, with... |
 | S0-04 | Card runner | Not started |  |
-| S0-05 | Donor inventory | Waiting for review | 09ba98c: inventory and self-contained drive_channel reproducer complete. Both compile-only checks exit 0; d... |
+| S0-05 | Donor inventory | Done | The donor inventory now covers the whole tree with port/rewrite/drop decisions, the GCC 16.2 runtime audit ... |
 | S0-06 | GCC 16.2 fork and timing | Not started | Engineer sessions have no network, so do not clone. The owner or lead creates .work/_shared/gcc outside the... |
 | S0-07 | Benchmark corpus and coverage estimate | Not started |  |
 | S0-08 | Toolchain independent of PhiWeather | Not started | Also in scope, from the S0-03 review: nothing recreates the hand-made sysroot files (crt1.o, crti.o, crtn.o... |
@@ -34,6 +34,7 @@ Current tickets: `[######--------------]` 3 of 9
 
 ## Recent activity
 
+- 2026-11-02 06:52 **S0-05** lead approve: The donor inventory now covers the whole tree with port/rewrite/drop decisions, the GCC 16.2 runtime audit for SSE, pause, 16-byte atomics, __float...
 - 2026-11-02 06:50 **S0-05** engineer submit: 09ba98c: inventory and self-contained drive_channel reproducer complete. Both compile-only checks exit 0; donor drops 4 address setups on 3 stores,...
 - 2026-11-02 06:50 **S0-05** lead answer: No split and no budget change. The 979 lines are one research document plus the reduced reproducer, which I approved at any size. Submit 09ba98c wi...
 - 2026-11-02 06:50 **S0-05** engineer ask: 09ba98c completes inventory and self-contained drive_channel reproducer. Both compilers exit 0; donor drops 4 address setups on 3 stores, reference...
@@ -41,7 +42,6 @@ Current tickets: `[######--------------]` 3 of 9
 - 2026-11-02 06:44 **S0-05** owner decide: Owner on 2026-11-02: yes, send S0-05 back for changes per the lead note at 00:20, and run the remaining 10 of the 12 sessions.
 - 2026-11-02 00:20 **S0-05** lead note: Verdict: changes requested, once this leaves the inbox. The 00:16 review reached this but could not record it. The lead compiled the full source wi...
 - 2026-11-02 00:16 **S0-05** lead escalate: lead session ended without a decision (exit 0)
-- 2026-11-02 00:13 **S0-05** engineer submit: aa2a98f: both full-source -O1 -mknc -S reload-dump compiles exit 0; compared all 18 functions. Missing prologue load is in drive_channel_rsl: donor...
 
 ## Cost
 
