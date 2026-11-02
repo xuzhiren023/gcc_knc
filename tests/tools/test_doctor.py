@@ -15,7 +15,8 @@ doctor = runpy.run_path(str(ROOT / "tools" / "doctor"))
 
 
 class Doctor(unittest.TestCase):
-    def check(self, required, startup=True, missing_directory=None):
+    def check(self, required, startup=True, missing_directory=None,
+              outside=None, missing_file=None):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
             (root / "sysroot/usr/include").mkdir(parents=True)
@@ -25,18 +26,34 @@ class Doctor(unittest.TestCase):
                     (root / "sysroot" / relative).mkdir()
             if startup:
                 (root / "sysroot/usr/lib64").mkdir()
-                (root / "sysroot/usr/lib64/crt1.o").touch()
+                for name in ("crt1.o", "crti.o", "crtn.o", "libc.so", "libc_nonshared.a"):
+                    if name != missing_file:
+                        (root / "sysroot/usr/lib64" / name).touch()
             manifest = {"sysroot": "sysroot", "tools": [
                 {"name": "gcc", "path": "gcc", "version": "14.4.0",
                  "role": "host compiler", "required": True},
                 {"name": "expect", "path": "expect", "version": None,
                  "role": "optional test driver", "required": required}]}
             (root / "gcc").touch()
+            if outside is not None:
+                manifest["tools"].append({"name": "k1om-mpss-linux-gcc",
+                    "path": "cross-gcc", "version": "5.1.1", "role": "donor"})
+                (root / "cross-gcc").touch()
+
+            def response(command, **kwargs):
+                query = command[-1]
+                if query.startswith("-print-"):
+                    value = root / ("sysroot" if query == "-print-sysroot" else "bin/tool")
+                    if query == outside:
+                        value = root.parent / "foreign-toolchain" / "tool"
+                    return subprocess.CompletedProcess(command, 0, str(value) + "\n")
+                return subprocess.CompletedProcess(command, 0, "gcc 14.4.0 5.1.1\n")
             output = io.StringIO()
             with contextlib.redirect_stdout(output), patch("subprocess.run") as run:
-                run.return_value = subprocess.CompletedProcess([], 0, "gcc 14.4.0\n")
+                run.side_effect = response
                 result = doctor["check"](manifest, root)
-                run.assert_called_once()
+                if outside is None:
+                    run.assert_called_once()
             return result, output.getvalue()
 
     def test_optional_absence_reports_version_and_succeeds(self):
@@ -62,6 +79,28 @@ class Doctor(unittest.TestCase):
                 result, output = self.check(False, missing_directory=relative)
                 self.assertNotEqual(result, 0)
                 self.assertIn("sysroot/" + relative, output.replace("\\", "/"))
+
+    def test_compiler_paths_must_stay_in_shared_toolchain(self):
+        for query in ("-print-prog-name=as", "-print-prog-name=ld", "-print-sysroot"):
+            with self.subTest(query=query):
+                result, output = self.check(False, outside=query)
+                self.assertNotEqual(result, 0)
+                self.assertIn(query, output)
+                self.assertIn("outside shared toolchain", output)
+
+    def test_shared_compiler_paths_succeed(self):
+        result, output = self.check(False, outside="")
+        self.assertEqual(result, 0)
+        for query in ("-print-prog-name=as", "-print-prog-name=ld", "-print-sysroot"):
+            self.assertIn(query, output)
+
+    def test_missing_development_files_name_recreation_step(self):
+        for name in ("crti.o", "crtn.o", "libc.so", "libc_nonshared.a"):
+            with self.subTest(name=name):
+                result, output = self.check(False, missing_file=name)
+                self.assertNotEqual(result, 0)
+                self.assertIn(name, output)
+                self.assertIn("tools/toolchain.py sysroot", output)
 
 
 if __name__ == "__main__":

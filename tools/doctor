@@ -30,6 +30,29 @@ def check(manifest, root):
             if tool["version"] and tool["version"] not in output:
                 raise ValueError("expected %s; got %s" % (tool["version"], output[:300]))
             print("OK %s: %s" % (tool["name"], output.splitlines()[0]))
+            if tool["name"] in ("k1om-mpss-linux-gcc", "k1om-mpss-linux-g++",
+                                "k1om-mpss-linux-gfortran"):
+                for query in ("-print-prog-name=as", "-print-prog-name=ld", "-print-sysroot"):
+                    answer = subprocess.run([str(path), query], env=env,
+                                            stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
+                                            text=True, errors="replace", timeout=15)
+                    value = answer.stdout.strip()
+                    if answer.returncode or not value:
+                        raise ValueError("%s failed: %s" % (query, value))
+                    if os.name == "nt" and value.startswith("/"):
+                        value = subprocess.check_output(
+                            [str(root / "cygwin/bin/cygpath.exe"), "-w", value],
+                            env=env, text=True, timeout=15).strip()
+                    resolved = Path(value).resolve()
+                    try:
+                        resolved.relative_to(root.resolve())
+                    except ValueError:
+                        raise ValueError("%s resolves outside shared toolchain: %s; "
+                                         "run python tools/toolchain.py rebuild" % (query, value))
+                    if query == "-print-sysroot" and resolved != (root / manifest["sysroot"]).resolve():
+                        raise ValueError("%s is not the card-derived sysroot: %s; "
+                                         "run python tools/toolchain.py rebuild" % (query, value))
+                    print("OK %s %s: %s" % (tool["name"], query, value))
         except (OSError, subprocess.TimeoutExpired, ValueError) as error:
             print("FAILED %s: %s: %s" % (tool["name"], path, error))
             failed = True
@@ -37,11 +60,14 @@ def check(manifest, root):
     sysroot_failed = False
     for relative in ("usr/include", "lib64", "lib", "usr/lib"):
         if not (sysroot / relative).is_dir():
-            print("MISSING sysroot directory: %s" % (sysroot / relative))
+            print("MISSING sysroot directory: %s; run python tools/toolchain.py sysroot" %
+                  (sysroot / relative))
             sysroot_failed = True
-    if not (sysroot / "usr/lib64/crt1.o").is_file():
-        print("MISSING sysroot startup object: %s" % (sysroot / "usr/lib64/crt1.o"))
-        sysroot_failed = True
+    for name in ("crt1.o", "crti.o", "crtn.o", "libc.so", "libc_nonshared.a"):
+        if not (sysroot / "usr/lib64" / name).is_file():
+            print("MISSING sysroot development file: %s; run python tools/toolchain.py sysroot" %
+                  (sysroot / "usr/lib64" / name))
+            sysroot_failed = True
     failed |= sysroot_failed
     print("%s sysroot: %s" % ("FAILED" if sysroot_failed else "OK", sysroot))
     return int(failed)
