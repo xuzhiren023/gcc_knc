@@ -4,6 +4,7 @@ from pathlib import Path
 import struct
 import unittest
 from unittest.mock import Mock, patch
+from types import SimpleNamespace
 
 ROOT = Path(__file__).resolve().parents[2]
 spec = importlib.util.spec_from_file_location('knc_check', ROOT / 'tools/check.py')
@@ -94,7 +95,7 @@ class Runner(unittest.TestCase):
 
     def test_only_t0_can_cache_project_inputs(self):
         for tiers in (['t0'], ['t1'], ['t2'], ['t0', 't1', 't2']):
-            with self.subTest(tiers=tiers), patch.object(check.os, 'name', 'posix'), \
+            with self.subTest(tiers=tiers), patch.object(check, 'os', SimpleNamespace(name='posix')), \
                     patch.object(check.sys, 'argv', ['tools/check', *tiers]), \
                     patch.object(check.subprocess, 'call', return_value=0) as call:
                 self.assertEqual(check.main(), 0)

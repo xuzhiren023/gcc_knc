@@ -197,8 +197,18 @@ class Runner:
         trace = self.command(self.cc, '--sysroot=' + str(self.sysroot), driver, loops_obj,
                              '-Wl,--trace', '-o', elf)
         for library in ('libc.so.6', 'ld-linux-k1om.so.2'):
-            paths = [line.strip() for line in trace.splitlines() if line.strip().endswith('/' + library)]
-            if not paths or any(not path.startswith(str(self.sysroot) + '/') for path in paths):
+            paths = []
+            for line in trace.splitlines():
+                resolved = re.search(r'\(([^()]+)\)\s*$', line)
+                path = resolved[1] if resolved else line.strip()
+                if path.endswith('/' + library):
+                    paths.append(path)
+            try:
+                for path in paths:
+                    Path(path).resolve().relative_to(self.sysroot.resolve())
+            except ValueError:
+                raise RuntimeError('link trace outside shared sysroot for ' + library + ': ' + repr(paths))
+            if not paths:
                 raise RuntimeError('link trace outside shared sysroot or missing ' + library + ': ' + repr(paths))
             self.say('T2 link trace: ' + '; '.join(paths))
         self.result('t2 ELF machine and interpreter', scan_elf(elf.read_bytes()))
@@ -272,9 +282,11 @@ def main():
     if args.worker:
         return Runner(args).run()
     command = [sys.executable, str(ROOT / 'tools/run.py'), '--name',
-               'check-' + args.compiler + '-' + '-'.join(args.tiers),
-               '--inputs', 'tools', 'tests/acceptance', 'tests/regress', 'tests/tools', 'toolchain',
-               '--', sys.executable, str(Path(__file__).resolve()), *sys.argv[1:], '--worker']
+               'check-' + args.compiler + '-' + '-'.join(args.tiers)]
+    # External compiler and sysroot changes are not tracked by project inputs.
+    if args.tiers == ['t0']:
+        command += ['--inputs', 'tools', 'tests/acceptance', 'tests/regress', 'tests/tools', 'toolchain']
+    command += ['--', sys.executable, str(Path(__file__).resolve()), *sys.argv[1:], '--worker']
     return subprocess.call(command)
 
 

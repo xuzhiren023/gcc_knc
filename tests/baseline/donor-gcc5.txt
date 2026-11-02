@@ -4,26 +4,13 @@ Compiler as: /cygdrive/c/Users/xuzhi/Documents/PhiWeather/.tools/knc-bootstrap/c
 Flags: -O2 -ftree-vectorize -ffp-contract=off / fast; separate driver translation unit
 T2 ABI reference: /cygdrive/c/Users/xuzhi/Documents/gcc_knc/.work/_shared/toolchain/sysroot (no native card execution in t0-t2)
 Development files: crt1.o, crti.o, crtn.o, libc.so, libc_nonshared.a from PhiWeather/.tools/knc-bootstrap/sysroot/usr/lib64; origin differs from card runtime. Runtime libraries and loader retained from card; T3 on card is the final proof.
-PASS t0 tests/regress/test_*.py: Ran 3 tests in 0.019s  OK
-PASS t0 tests/tools/test_doctor.py: Ran 3 tests in 0.040s  OK
-PASS t0 tests/tools/test_knc_lint.py: Ran 4 tests in 13.680s  OK
-PASS t1 off assembly --march=k1om
-PASS t1 off knc_lint
-FAIL t1 off function scans: affine_f32: no packed `zmm` arithmetic; affine_f32: no -fopt-info-vec report for this loop; affine_f64: no packed `zmm` arithmetic; affine_f64: no -fopt-info-vec report for this loop
-PASS t1 fast assembly --march=k1om
-PASS t1 fast knc_lint
-FAIL t1 fast function scans: affine_f32: no packed `zmm` arithmetic; affine_f32: no -fopt-info-vec report for this loop; affine_f64: no packed `zmm` arithmetic; affine_f64: no -fopt-info-vec report for this loop
-FAIL t2 infrastructure: command /cygdrive/c/Users/xuzhi/Documents/gcc_knc/.work/_shared/toolchain/cross/bin/k1om-mpss-linux-gcc.exe --sysroot=/cygdrive/c/Users/xuzhi/Documents/gcc_knc/.work/_shared/toolchain/sysroot /cygdrive/c/Users/xuzhi/Documents/gcc_knc/.work/_shared/check/donor/driver.o /cygdrive/c/Users/xuzhi/Documents/gcc_knc/.work/_shared/check/donor/loops-off.o -Wl,--trace -o /cygdrive/c/Users/xuzhi/Documents/gcc_knc/.work/_shared/check/donor/m1_affine.mic exited 1: /cygdrive/c/Users/xuzhi/Documents/PhiWeather/.tools/knc-bootstrap/cross/bin/k1om-mpss-linux-ld: mode elf_k1om
-/cygdrive/c/Users/xuzhi/Documents/gcc_knc/.work/_shared/toolchain/cross/bin/../lib/gcc/k1om-mpss-linux/5.1.1/crtbegin.o
-/cygdrive/c/Users/xuzhi/Documents/gcc_knc/.work/_shared/check/donor/driver.o
-/cygdrive/c/Users/xuzhi/Documents/gcc_knc/.work/_shared/check/donor/loops-off.o
--lgcc_s (/cygdrive/c/Users/xuzhi/Documents/gcc_knc/.work/_shared/toolchain/cross/bin/../lib/gcc/k1om-mpss-linux/5.1.1/../../../../k1om-mpss-linux/lib/../lib64/libgcc_s.so)
--lgcc_s (/cygdrive/c/Users/xuzhi/Documents/gcc_knc/.work/_shared/toolchain/cross/bin/../lib/gcc/k1om-mpss-linux/5.1.1/../../../../k1om-mpss-linux/lib/../lib64/libgcc_s.so)
-/cygdrive/c/Users/xuzhi/Documents/gcc_knc/.work/_shared/toolchain/cross/bin/../lib/gcc/k1om-mpss-linux/5.1.1/crtend.o/cygdrive/c/Users/xuzhi/Documents/PhiWeather/.tools/knc-bootstrap/cross/bin/k1om-mpss-linux-ld: cannot find crt1.o: No such file or directory
-/cygdrive/c/Users/xuzhi/Documents/PhiWeather/.tools/knc-bootstrap/cross/bin/k1om-mpss-linux-ld: cannot find crti.o: No such file or directory
-/cygdrive/c/Users/xuzhi/Documents/PhiWeather/.tools/knc-bootstrap/cross/bin/k1om-mpss-linux-ld: cannot find -lc
-/cygdrive/c/Users/xuzhi/Documents/PhiWeather/.tools/knc-bootstrap/cross/bin/k1om-mpss-linux-ld: cannot find crtn.o: No such file or directory
-collect2: error: ld returned 1 exit status
+PASS t0 tests/regress/test_*.py: Ran 5 tests in 0.029s  OK
+PASS t0 tests/tools/test_doctor.py: Ran 4 tests in 0.076s  OK
+PASS t0 tests/tools/test_knc_lint.py: Ran 4 tests in 15.000s  OK
+FAIL t1 infrastructure: command /cygdrive/c/Users/xuzhi/Documents/gcc_knc/.work/_shared/toolchain/cross/bin/k1om-mpss-linux-as.exe --march=k1om /cygdrive/c/Users/xuzhi/Documents/gcc_knc/.work/_shared/check/donor/loops-off.s -o /cygdrive/c/Users/xuzhi/Documents/gcc_knc/.work/_shared/check/donor/loops-off.o exited 1: Assembler messages:
+Fatal error: can't create /cygdrive/c/Users/xuzhi/Documents/gcc_knc/.work/_shared/check/donor/loops-off.o: Permission denied
 
+FAIL t2 infrastructure: command /cygdrive/c/Users/xuzhi/Documents/gcc_knc/.work/_shared/toolchain/cross/bin/k1om-mpss-linux-gcc.exe -O2 -ftree-vectorize --sysroot=/cygdrive/c/Users/xuzhi/Documents/gcc_knc/.work/_shared/toolchain/sysroot -ffp-contract=off -c /cygdrive/c/Users/xuzhi/Documents/gcc_knc/.work/S0-03/tests/acceptance/m1_affine/loops.c -o /cygdrive/c/Users/xuzhi/Documents/gcc_knc/.work/_shared/check/donor/loops-off.o exited 1: Assembler messages:
+Fatal error: can't create /cygdrive/c/Users/xuzhi/Documents/gcc_knc/.work/_shared/check/donor/loops-off.o: Permission denied
 
-Elapsed: 17.43 seconds
+Elapsed: 16.76 seconds
