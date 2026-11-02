@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-02 11:25.
+Updated automatically at every ticket change. Last update: 2026-11-02 11:27.
 
-**Next: the tech lead, on S0-04.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: GPT-6.1, on S0-04 (Card runner).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
 Current tickets: `[##############------]` 7 of 10
 
@@ -25,7 +25,7 @@ Current tickets: `[##############------]` 7 of 10
 | S0-01 | Toolchain manifest and doctor | Done | Reviewed: red commit real; tests fail on the missing-tool cases; doctor rerun OK, required tools present, d... |
 | S0-02 | ISA lint | Done | knc_lint now rejects the listed non-KNC instructions in .s, .o, archives, shared objects and executables, a... |
 | S0-03 | Test runner and red baseline | Done | tools/check now runs t0, t1 and t2 on the donor in about 16 seconds and records the expected baseline, with... |
-| S0-04 | Card runner | Waiting for review | RED 8787e21 failed as expected for missing shared lock resolver, kernel classification and card-side limit.... |
+| S0-04 | Card runner | Changes requested | Lock, idle policy, boot guards, kernel-thread rule and the seven cases are sound. Two card-side fixes, both... |
 | S0-05 | Donor inventory | Done | The donor inventory now covers the whole tree with port/rewrite/drop decisions, the GCC 16.2 runtime audit ... |
 | S0-06 | GCC 16.2 fork and timing | Done | GCC 16.2 is checked out on branch knc in the shared build area and builds stock x86_64 C+Fortran on Cygwin ... |
 | S0-07 | Benchmark corpus and coverage estimate | Done | We now have a proposed public benchmark corpus (PolyBench, STREAM, NPB, HPCG, zlib, SQLite, with bzip2 and ... |
@@ -35,6 +35,7 @@ Current tickets: `[##############------]` 7 of 10
 
 ## Recent activity
 
+- 2026-11-02 11:27 **S0-04** lead changes: Lock, idle policy, boot guards, kernel-thread rule and the seven cases are sound. Two card-side fixes, both small, same test file, red then green: ...
 - 2026-11-02 11:24 **S0-04** engineer submit: RED 8787e21 failed as expected for missing shared lock resolver, kernel classification and card-side limit. GREEN 9c96b5e: nine T0 cases passed onc...
 - 2026-11-02 11:14 **S0-04** lead answer: Both answered. (1) The two ignore lines are approved, but .gitignore is protected and an engineer cannot submit a change to it. Drop the .gitignore...
 - 2026-11-02 11:13 **S0-04** engineer ask: GREEN commit 9fa9ab4: seven T0 cases passed once via s0-04-green; log .work/_state/logs/s0_04_green-20261102-111228.log. Native acceptance remains ...
@@ -42,7 +43,6 @@ Current tickets: `[##############------]` 7 of 10
 - 2026-11-02 11:05 **S0-04** engineer red: Review before GREEN: 476e656 adds requested cwd=run_dir+0 and other-run exe subcases, built from self.run_dir in the fake. Both require refused wit...
 - 2026-11-02 11:03 **S0-04** lead changes: Spec and seven cases are sound and fail for the right reason. Both questions approved: creating the empty control dir before the first process chec...
 - 2026-11-02 11:02 **S0-04** engineer red: Review requested before GREEN: 216f1ad adds docs/card-run.md and seven fake-transport T0 cases. Ran once with bootstrap Cygwin python3 through tool...
-- 2026-11-02 10:55 **S0-04** lead note: Card hold from the owner: the card is busy with another WRF IMCI optimization run. No native job, including the hello and m1_affine acceptance runs...
 
 ## Cost
 
