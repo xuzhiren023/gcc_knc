@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-01 22:49.
+Updated automatically at every ticket change. Last update: 2026-11-01 22:54.
 
-**Next: GPT-6.1, on S0-05 (Donor inventory).** Run `python tools/dispatch.py`, or ask the tech lead to.
+**Next: the tech lead, on S0-05.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[#######-------------]` 3 of 8
 
@@ -26,13 +26,14 @@ Current tickets: `[#######-------------]` 3 of 8
 | S0-02 | ISA lint | Done | knc_lint now rejects the listed non-KNC instructions in .s, .o, archives, shared objects and executables, a... |
 | S0-03 | Test runner and red baseline | Done | tools/check now runs t0, t1 and t2 on the donor in about 16 seconds and records the expected baseline, with... |
 | S0-04 | Card runner | Not started |  |
-| S0-05 | Donor inventory | In progress |  |
+| S0-05 | Donor inventory | Question for the tech lead | Committed partial inventory d8d073c: docs/research/donor-inventory.md (85 changed paths against recorded gc... |
 | S0-06 | GCC 16.2 fork and timing | Not started |  |
 | S0-07 | Benchmark corpus and coverage estimate | Not started |  |
 | S0-08 | Toolchain independent of PhiWeather | Not started | Tested: `gcc -v` shows `--with-as`, `--with-ld` and `--with-sysroot` compiled in with PhiWeather paths, and... |
 
 ## Recent activity
 
+- 2026-11-01 22:54 **S0-05** engineer ask: Committed partial inventory d8d073c: docs/research/donor-inventory.md (85 changed paths against recorded gcc-5 r222343 base). Blocked: direct relea...
 - 2026-11-01 22:49 **S0-03** lead approve: tools/check now runs t0, t1 and t2 on the donor in about 16 seconds and records the expected baseline, with T0, assembly, lint and T2 passing and o...
 - 2026-11-01 22:47 **S0-03** engineer submit: Review fixes complete: red e6cb86a, fix 9b04025. Donor run 15.85s: 14 T0 tests, assembly/lint/T2 PASS, only expected T1 vectorization red; baseline...
 - 2026-11-01 22:47 **S0-03** owner decide: Owner raised sessions to 8 on 2026-11-01 and approved the remaining 10 sessions of the 12-session run. Change no code: submit with --override, as t...
@@ -40,7 +41,6 @@ Current tickets: `[#######-------------]` 3 of 8
 - 2026-11-01 22:21 **S0-03** lead escalate: budget: 6 engineer sessions used; the budget is 6
 - 2026-11-01 22:21 **S0-03** lead answer: No budget raise. The 500-line budget is a soft limit that the override is built for: tools/pm.py:300 lets it through when you pass --override, and ...
 - 2026-11-01 22:20 **S0-03** engineer ask: Both review fixes complete: red e6cb86a, fix 9b04025. Donor run 15.85s: 14 T0 tests, assembly/lint/T2 PASS, only expected T1 vectorization red; bas...
-- 2026-11-01 22:19 **S0-03** lead note: Correction: the lead misread the owner. 12 is the cap on the dispatch run, not this ticket's limit, so the 'sessions to 12' decision entry above is...
 
 ## Cost
 
@@ -52,4 +52,4 @@ Current tickets: `[#######-------------]` 3 of 8
 
 ## Disk
 
-The project uses 1.8 GiB of 100 GiB. 366 GiB free on the drive.
+The project uses 1.8 GiB of 100 GiB. 368 GiB free on the drive.
