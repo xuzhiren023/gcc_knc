@@ -75,6 +75,9 @@ Last updated: 2026-11-02, during Sprint 0.
 Approved by the owner on 2026-11-01. Native jobs run only when the card is idle, and only through
 `tools/card_run` once S0-04 has reached that step. Rules are in `docs/DEVELOPMENT_CYCLE.md` section 9.
 
+**On hold since 2026-11-02 10:55:** the owner is using the card for a WRF IMCI optimization
+run. No native job until the owner says it has finished.
+
 ## Known limits
 
 - Upstream binutils has no K1OM support, so LTO is out of scope.
