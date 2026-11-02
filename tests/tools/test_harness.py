@@ -391,7 +391,9 @@ class Dispatcher(Sandbox):
         board = mock.Mock(root=self.root, policy=POLICY)
         gcc = os.path.join(storage.shared_area(self.root), "gcc").replace("\\", "/")
         env = dispatch.session_env(board, ticket, "engineer")
-        self.assertEqual(env.get("GIT_CONFIG_PARAMETERS"), "'safe.directory'='%s'" % gcc)
+        cygwin = "/cygdrive/%s%s" % (gcc[0].lower(), gcc[2:])
+        self.assertEqual(env.get("GIT_CONFIG_PARAMETERS"),
+                         "'safe.directory'='%s' 'safe.directory'='%s'" % (gcc, cygwin))
         self.assertFalse([k for k in env if k.startswith("GIT_CONFIG_KEY")])
         self.assertNotIn("GIT_CONFIG_PARAMETERS", dispatch.session_env(board, ticket, "lead"))
 
