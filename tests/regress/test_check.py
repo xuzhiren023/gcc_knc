@@ -2,6 +2,9 @@
 import importlib.util
 from pathlib import Path
 import struct
+import subprocess
+import sys
+import tempfile
 import unittest
 from unittest.mock import Mock, patch
 from types import SimpleNamespace
@@ -141,6 +144,98 @@ class Runner(unittest.TestCase):
                     patch.object(check.subprocess, 'call', return_value=0) as call:
                 self.assertEqual(check.main(), 0)
                 self.assertEqual('--inputs' in call.call_args.args[0], tiers == ['t0'])
+
+
+class SourceTests(unittest.TestCase):
+    """Compile seeded sources with a fake compiler, without a GCC build."""
+
+    ASSEMBLY = ('smoke:\n .L1:\n movl $7, %eax\n ret\n .size smoke, .-smoke\n'
+                'other:\n forbidden\n .size other, .-other\n')
+
+    def setUp(self):
+        directory = tempfile.TemporaryDirectory()
+        self.addCleanup(directory.cleanup)
+        self.directory = Path(directory.name)
+        self.source_dir = self.directory / 'sources'
+        self.source_dir.mkdir()
+        self.source = self.source_dir / 'seed.c'
+        self.compiler = self.directory / 'compiler.py'
+        self.runner = check.Runner(SimpleNamespace(compiler='gcc16', cc=None))
+        self.addCleanup(self.runner._output.cleanup)
+        self.runner.cc = Path(sys.executable)
+        self.runner.cc_flags = [str(self.compiler)]
+        self.runner.source_dir = self.source_dir
+        self.runner.say = Mock()
+        command = self.runner.command
+
+        def dispatch(*args):
+            if args[0] == self.runner.cc:
+                return command(*args)
+            return ''  # Seed assembler and lint success; inspect their calls below.
+
+        self.runner.command = Mock(side_effect=dispatch)
+
+    def run_seed(self, header, required=('-O2',), code=0, diagnostic=''):
+        self.source.write_text(header + '\nint smoke(void) { return 7; }\n')
+        self.compiler.write_text(
+            'import pathlib, sys\n'
+            'args = sys.argv[1:]\n'
+            'if not all(flag in args for flag in %r):\n'
+            '    print("error: missing seeded option")\n'
+            '    sys.exit(2)\n'
+            'print(%r)\n'
+            'if %d == 0:\n'
+            '    pathlib.Path(args[args.index("-o") + 1]).write_text(%r)\n'
+            'sys.exit(%d)\n' % (required, diagnostic, code, self.ASSEMBLY, code))
+        self.runner.failed = False
+        self.runner.say.reset_mock()
+        self.runner.command.reset_mock()
+        self.runner.t1_sources()
+        lines = [call.args[0] for call in self.runner.say.call_args_list]
+        self.assertEqual(len(lines), 1, lines)
+        return lines[0]
+
+    def test_options(self):
+        for header, required, passed in (
+                ('', ('-O2',), True),
+                ('// options: -O0 -DNAME="two words"', ('-O0', '-DNAME=two words'), True),
+                ('// options: -O0', ('-O2',), False)):
+            with self.subTest(header=header, required=required):
+                line = self.run_seed(header, required)
+                self.assertEqual(line.startswith('PASS '), passed, line)
+
+    def test_scan_asm(self):
+        self.assertTrue(self.run_seed('// scan-asm: movl.*%eax').startswith('PASS '))
+        self.assertIn('scan-asm: absent', self.run_seed('// scan-asm: absent'))
+        calls = self.runner.command.call_args_list
+        self.assertTrue(any('--march=k1om' in call.args for call in calls))
+        self.assertTrue(any(str(check.ROOT / 'tools/knc_lint') in
+                            [str(arg) for arg in call.args] for call in calls))
+
+    def test_scan_asm_not(self):
+        self.assertTrue(self.run_seed('// scan-asm-not: absent').startswith('PASS '))
+        line = self.run_seed('// scan-asm-not: forbidden\n// scan-asm: absent')
+        self.assertIn('scan-asm-not: forbidden', line)
+        self.assertNotIn('scan-asm: absent', line)
+
+    def test_scan_asm_func(self):
+        self.assertTrue(self.run_seed('// scan-asm-func smoke: movl.*%eax').startswith('PASS '))
+        for directive in ('// scan-asm-func smoke: forbidden',
+                          '// scan-asm-func missing: movl'):
+            with self.subTest(directive=directive):
+                self.assertIn(directive[3:], self.run_seed(directive))
+
+    def test_error(self):
+        directive = '// error: unsupported.*KNC'
+        self.assertTrue(self.run_seed(directive, code=1,
+                                      diagnostic='error: unsupported mode on KNC').startswith('PASS '))
+        self.assertEqual(self.runner.command.call_count, 1)
+        for code, diagnostic in ((0, 'unsupported mode on KNC'), (1, 'unrelated error')):
+            with self.subTest(code=code):
+                line = self.run_seed(directive, code=code, diagnostic=diagnostic)
+                self.assertTrue(line.startswith('FAIL '), line)
+                self.assertIn('error: unsupported.*KNC', line)
+                self.assertEqual(self.runner.command.call_count, 1)
 
 
 if __name__ == '__main__':
