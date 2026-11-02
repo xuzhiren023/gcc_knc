@@ -83,8 +83,10 @@ def session_env(board, ticket, role):
     if role == "engineer":
         # The sandbox user does not own the shared GCC checkout, so git calls it dubious. Command-line
         # scope is trusted for safe.directory; Codex would drop GIT_CONFIG_KEY_0 because it contains KEY.
+        # Git for Windows and Cygwin git spell the same path differently, so trust both.
         gcc = os.path.join(storage.shared_area(board.root), "gcc").replace("\\", "/")
-        env["GIT_CONFIG_PARAMETERS"] = "'safe.directory'='%s'" % gcc
+        cygwin = "/cygdrive/%s%s" % (gcc[0].lower(), gcc[2:])
+        env["GIT_CONFIG_PARAMETERS"] = "'safe.directory'='%s' 'safe.directory'='%s'" % (gcc, cygwin)
     return env
 
 
