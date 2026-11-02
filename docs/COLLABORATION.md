@@ -112,8 +112,6 @@ Claude session and ask it to act as tech lead on the board.
 Engineers work in separate git worktrees, in `.work/<ticket>`, on their own branches.
 The ticket files change only on `main`, through `tools/pm.py`, which runs from any worktree.
 The lead reviews a branch with `git diff main...<branch>`, so nothing needs to be copied.
-With `gcc: yes`, start also checks out the ticket branch from `knc` in `.work/_shared/gcc`; keep that checkout clean for start and submit.
-Submit records the GCC head and counts both diffs; approval reviews and merges both repositories, restoring both integration branches if either merge fails.
 
 ## Sources
 
