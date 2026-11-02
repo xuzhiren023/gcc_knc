@@ -1,19 +1,19 @@
 # Donor inventory (S0-05)
 
-Status: full-tree donor inventory and GCC 16.2 runtime/LRA source review complete.
-The targeted full-source follow-up shows that the previously suspected missing
-`1320(%rsp)` load is benign: the donor reloads the descriptor before both uses.
-Submission follows the owner's 2026-11-02 decision allowing function-level
-benign-load evidence. **No reduced patch 0002 reproducer is claimed**; that
-original acceptance item remains unticked. No GCC 16 execution or card result
-is claimed.
+Status: full-tree donor inventory, GCC 16.2 runtime/LRA source review and reduced
+patch 0002 reproducer complete. The original donor drops address reloads on four
+stores; the diagnostic reference drops none. The earlier benign conclusion was
+too broad: it covered only the `1320(%rsp)` descriptor-load chain, missing the
+broken stores. `tests/regress/knc-secondary-reload.f90` preserves the failure in
+a self-contained extraction of `drive_channel`. No GCC 16 execution or card
+result is claimed.
 
 - [x] Entire donor tree covered against its recorded gcc-5 branch baseline.
 - [x] Donor changes classified with reasons and GCC 16 landing locations.
 - [x] Separate GCC 16.2 runtime dependency audit (F6), with file:line evidence.
 - [x] Vector code generation scope and tuning recorded.
 - [x] GCC 16 secondary-reload mechanism inspected.
-- [ ] Reduced 0002 reproducer in `tests/regress/` (suspected full-source load difference is benign; see follow-up).
+- [x] Reduced 0002 reproducer in `tests/regress/knc-secondary-reload.f90`, with exact commands and donor/reference RTL results.
 
 ## Comparison boundary
 
@@ -359,10 +359,10 @@ work. These findings identify port work; they claim no native runtime passes.
 
 ## Targeted function-level follow-up (2026-11-02)
 
-The owner required the full-source difference to be traced before further
-reduction, and authorized submission once function-level evidence shows that
-load difference is benign. This pass reaches that alternative. It does not
-establish whole-program correctness or a passing/failing patch 0002 pair.
+The earlier pass below traced only one descriptor-load chain. Its benign result
+does not cover the four broken stores found in review and independently
+reproduced in the corrective pass below. Submission on the earlier evidence was
+incorrect; a donor/reference patch 0002 regression is now preserved.
 
 Copied the same ticket-specified original into
 `tests/out/module_channel_routing.F90`, and ran the exact complete-flags command
@@ -394,8 +394,8 @@ The two functions with other differences were:
 
 | Symbol | Observation |
 | --- | --- |
-| `__module_channel_routing_MOD_drive_channel_rsl` | Holds the reported missing prologue load. Register allocation, reload placement and spill-slot offsets differ; the specific descriptor setup is preserved, as traced below. |
-| `__module_channel_routing_MOD_drive_channel` | Different register allocation, stack frame (1256 vs 1240 bytes), spill offsets and instruction sequences. This separate difference is not evidence of a dropped setup, and has not been proved globally benign. It is not the function holding the reported prologue load. |
+| `__module_channel_routing_MOD_drive_channel_rsl` | Holds the benign missing prologue load traced below, but also has a separate dropped store-address setup at insn 2761. |
+| `__module_channel_routing_MOD_drive_channel` | Has three dropped store-address setups: insns 1456, 2219 and 3101. Insn 2219 is the `QLINK(i,1)=DIFFUSION(...)` assignment at original lines 1050-1052; this function supplies the reduced regression. |
 
 ### The reported load is preserved at its uses
 
@@ -447,11 +447,79 @@ of the reference's early `%r14` load is benign for this chain. It cannot justify
 extracting `SUBMUSKINGCUNGE`, or treating any mere assembly difference or
 `Deleting move` diagnostic as a patch 0002 failure.
 
-Step 3 therefore did not find the alleged dropped setup; step 4 (extracting a
-function with a demonstrated failure) has no established symptom to preserve.
-No substitute regression was added. The reduced-reproducer checkbox remains
-unticked, explicitly using the owner's benign-load submission condition. The
-GCC 16 register-only guard finding above remains unchanged. Temporary full
-source, modules, assembly, dumps and comparison files were removed after this
-inspection. No additional compile, compiler build, assembler, or card run was
-performed.
+The earlier pass stopped at that benign chain and missed the failing stores.
+Its temporary outputs were removed at the time. The following corrective pass
+supersedes its submission conclusion. The GCC 16 register-only guard finding
+above remains unchanged.
+
+### Corrective pass: dropped store-address setups and self-contained reduction
+
+Repeated the complete-flags full-source compile above, using runner names
+`S0-05-address-reload-donor` and `S0-05-address-reload-reference`. Both exited 0.
+For each `Deleting move N`, examined the preceding 14 lines for
+`Creating newreg=R from oldreg=O ... to address rR`, then searched the whole
+function dump for `rR:mode=rO:mode`. The following donor setups were absent;
+the reference had **no** such missing setups:
+
+| Function | Deleted store | Missing setup | Replacement address |
+| --- | --- | --- | --- |
+| `drive_channel_rsl` | 2761 | `r3017:DI=r367:DI` | `r853*4+r3017` |
+| `drive_channel` | 1456 | `r2831:DI=r285:DI` | `r537*4+r2831` |
+| `drive_channel` | 2219 | `r2968:DI=r771:DI` | `r2968*4+r2274` |
+| `drive_channel` | 3101 | `r3099:DI=r2184:DI` | `r998*4+r3099` |
+
+For example, donor insn 2219 is replaced with mask setup 5284/5285 and masked
+store 5286 through the newly created `r2968`, but its required copy from `r771`
+never appears. The reference's corresponding masked store 5285 retains `r771`
+as the index. This is a lost address setup, independently of the benign
+descriptor load. A `Deleting move` diagnostic by itself remains insufficient.
+
+Preprocessed the original with `-cpp -DMPP_LAND -DWRF_HYDRO -DPRECIP_DOUBLE -E`.
+Extracted only `drive_channel`, stripped comments/blank lines, and replaced its
+sibling functions with external real declarations. The initial extraction
+needed a missing `MUSKING` declaration; after that correction both compilers
+exited 0 and only the donor lost address setups. Removed project imports and
+the two reservoir type-bound calls, retained process IDs as module variables,
+and supplied interfaces for the three assumed-shape external procedures.
+This self-contained cut also preserved the donor-only failure. Retained the
+420-line module, including surrounding branches, calls and array descriptors,
+to preserve register pressure rather than risk losing the spilled index.
+
+Committed input: `tests/regress/knc-secondary-reload.f90`. Its opening comment
+gives exact donor/reference commands, requiring only the compiler toolchain,
+with no project module include paths. External callees need no definitions for
+this compile-only test. The final command pair was run through:
+
+```text
+python3.12.exe tools/run.py --name S0-05-final-secondary-reload --inputs tests/regress/knc-secondary-reload.f90 tests/out/compile-final.sh -- bash tests/out/compile-final.sh
+```
+
+The temporary script invokes each command from the regression comment, moves
+its reload dump to `tests/out/donor.reload` or `reference.reload`, and prints
+the missing address-copy pairs using the search described above. Both final
+compiles exited 0. The donor **fails** the RTL property, while the reference
+**passes**: donor store 2063 replaces the original diffusion-result store with
+4947 through `r2608*4+r1914`, without `r2608:DI=r758:DI` anywhere in its dump;
+reference replacement 4946 retains the original `r758*4+r1914` address.
+The donor also drops two copies at store 1291 (`2470<-309`, `2471<-523`) and
+one at store 2765 (`2727<-1825`); the reference drops none. The final input has
+the same instruction IDs as the self-contained cut. Compilation success does
+not mean generated-code correctness, and no native execution is claimed.
+
+Logs under `.work/_state/logs/`:
+
+| Run | Result | Log |
+| --- | --- | --- |
+| Full donor | Exit 0; four broken stores above. | `S0_05_address_reload_donor-20261102-064535.log` |
+| Full reference | Exit 0; no dropped setups. | `S0_05_address_reload_reference-20261102-064539.log` |
+| Preprocessing | Exit 0. | `S0_05_address_preprocess-20261102-064606.log` |
+| Initial extraction | Exit 1; missing external `MUSKING` declaration. | `S0_05_extract_drive-20261102-064650.log` |
+| Corrected extraction, both compilers | Exit 0; donor-only dropped setups. | `S0_05_extract_drive-20261102-064656.log` |
+| Self-contained cut, both compilers | Exit 0; donor-only dropped setups. | `S0_05_selfcontained_drive-20261102-064735.log` |
+| Initial final script | Infrastructure failure, exit 2: Windows CRLF in shell script, before compilation. Corrected script to LF. | `S0_05_final_secondary_reload-20261102-064820.log` |
+| Final regression, both compilers, no project include paths | Exit 0; donor fails RTL property, reference passes. | `S0_05_final_secondary_reload-20261102-064830.log` |
+
+Cleanup of temporary copies, scripts, modules, assembly and reload dumps was
+rejected by execution policy. They remain in ignored `tests/out/` (about 8 MiB),
+outside the commit, and can be discarded with this worktree. No harness wiring,
+compiler build, GCC 16 execution, assembler, linker or card run was performed.
