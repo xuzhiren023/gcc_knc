@@ -18,6 +18,7 @@ Last updated: 2026-11-01, during Sprint 0.
 | S0-05's change count against the donor's recorded base: 85 files, 1498 insertions, 278 deletions | Lead reran the same diff in the donor checkout | `git diff --shortstat cfd753e87 af7cc04` in the donor checkout |
 | GCC 16.2 is at `.work/_shared/gcc`, at tag `releases/gcc-16.2.0` (`78d4ac7`), with a clean status, autocrlf and fileMode off, and permissions the sandbox can write | Lead checks on 2026-11-01 after the clone. `origin` and `knc` are not set up yet; S0-06 does that | `git -C .work/_shared/gcc describe --tags --exact-match`, `icacls` on a file |
 | GCC 16's secondary-move path only runs when both operands are registers, so the donor's memory-store failure cannot happen there unmodified | Lead read `gcc/lra-constraints.cc:1442-1443` and `4512-4514`. Source reading only, nothing compiled | Read those lines |
+| The `0002` failure is real in the donor: on `module_channel_routing.F90` at `-O1`, it drops the address reload on 4 deleted stores (insns 2761, 1456, 2219, 3101), and the reference compiler drops none | Lead compiled both on 2026-11-02 with the commands in the S0-05 inventory, in a throwaway folder. Insn 2219 matches PhiWeather's retained dumps. Compile only; no failing run on the card | Compile with `-fdump-rtl-reload`, then for each `Deleting move` look for a `Creating newreg=N from oldreg=M ... to address rN` with no `rN=rM` anywhere in the dump |
 | The donor T2 symbol scan really checks something | On a real binary from the same objects it finds 8 required symbols at GLIBC_2.14 from `libc.so.6` | `readelf --dyn-syms` and `--version-info` on the linked program |
 | The shared sysroot has five startup files byte-identical to the bootstrap copies, and its libc and loader differ from them | Lead byte comparison on 2026-11-01 | Compare `usr/lib64/crt1.o` and `lib64/libc-2.21.so` against the bootstrap sysroot |
 | Empty `lib` and `usr/lib` fix the donor link failure | Applied to the shared sysroot by S0-03, and the link passes in the lead's rerun | `gcc --sysroot=<sysroot> -print-file-name=crt1.o` |
@@ -26,8 +27,8 @@ Last updated: 2026-11-01, during Sprint 0.
 
 - **No GCC 16 has been built yet.** This project has produced tools, not compiler code. Milestone M0 is the first compiler result. The source is here, but S0-06 has not started, so there is no build, no measured time and nothing to push.
 - **Nothing has run on the card.** S0-04 is the first native result. `tools/card_run` does not exist. Card minutes so far: 0.
-- **S0-05 is unmerged and has no review.** Its branch answers everything except the `0002` reproducer. The lead checked the change count and spot-checked the LRA lines and five runtime citations, all correct, but did not review the port, rewrite or drop calls.
-- **The `0002` reproducer does not exist.** Two reduction attempts lost the donor and reference difference, and nothing shows yet whether that difference is a bug. Nothing about it has been shown on GCC 16. E2-02 already requires the reproducer.
+- **S0-05 is unmerged, and its inventory is wrong on one point.** It calls the donor and reference difference benign after tracing `drive_channel_rsl`, but the dropped reloads include `drive_channel`, which it did not trace. The lead spot-checked the LRA lines and five runtime citations, all correct. The Claude review read the port, rewrite and drop table and found no error, but did not check it against the 85 paths.
+- **The `0002` reproducer does not exist yet.** The failure now reproduces in the full source file. It has not been reduced, and nothing about it has been shown on GCC 16, where the guard above blocks the path unmodified. E2-02 still requires it.
 - **T1 cannot yet recognise a real KNC vector loop.** A correct loop closed by `jknzd` or `jkzd` fails the scan. S0-09 fixes this.
 - **The toolchain still depends on PhiWeather's folder.** On 2026-11-01, `as`, `ld` and the default sysroot all still resolved there, and every link runs PhiWeather's `ld`. They are compiled in, and `-B` does not override them. S0-08 fixes this, and S0-04 waits for it.
 - **The startup files from S0-03** come from the bootstrap sysroot. Only a run on the card will prove they suit the card's libc.
@@ -38,7 +39,8 @@ Last updated: 2026-11-01, during Sprint 0.
 - The merge check misses harness tests. `pm.py approve` runs only `tools/check t0`, which leaves out `tests/tools/test_harness.py` by the lead's own scoping, so S0-03 merged with 2 harness tests failing. Lead-run sessions should run the whole `tests/tools` suite after a merge, or the check should include it.
 - `tests/regress` needs Python 3.10 or later, because of `ignore_cleanup_errors`. It passes through `tools/check`, which uses Cygwin's 3.12, and errors under this machine's native Python 3.8. Run it through `tools/check`.
 - A session limit raised on a ticket gets used up by questions as well as review rounds: each `pm.py ask` ends a session. S0-03 took 7 sessions against a limit that started at 3, and S0-05 used all 3 with an extra pass still asked for.
-- Lead answers can keep a ticket going past what it needs. On 2026-11-01, script answers sent S0-05 back twice for a reproducer that the GCC 16 guard makes irrelevant until E2-02, which used 5 of the 12 approved sessions. Close optional items early, and bound them to one attempt.
+- Compare evidence before calling a difference benign. S0-05 traced one function and called the difference benign, and the lead recommended dropping the reproducer on the same evidence. The owner kept it in, and the failure turned out to be real. Scan the whole dump for the exact symptom before deciding.
+- A script review can fail to record its verdict. S0-05's review on 2026-11-02 reached one but tried `PM_ROLE=lead python tools/pm.py ...`, which its permissions refuse, though the role was already set. The dispatcher sent it to the owner and the verdict survived only in that session's final message. `LEAD_PROMPT` now says to run plain commands. Not yet shown working in a real session.
 - `pm.py submit` refuses an over-budget branch without saying `--override` exists (`tools/pm.py:303`). S0-03's engineer spent a session asking, despite two earlier answers telling it to use the flag. Have the refusal name the flag.
 - The board takes tickets in ID order: S0-05, S0-06, S0-07, S0-08, S0-09, then S0-04, which waits for S0-08. With two sessions per ticket, reaching the card takes about 10 sessions.
 - The dispatcher stops all work when any ticket needs the owner, by design. On 2026-11-01 this blocked S0-06 and S0-07 while they were free to run. `pm.py board` still names a next ticket, which the dispatcher will not start.
@@ -49,7 +51,7 @@ Last updated: 2026-11-01, during Sprint 0.
 - `ldmxcsr` and `stmxcsr` pass the lint, because Intel manual 327364 is not on this machine. Decide once someone has Appendix B.
 - `f3 2e 90`, a `pause` with a stray prefix in the middle, passes the lint. Hand-written code only.
 - Script reviews cannot run tests, by design. `pm.py approve` now runs the branch's `tools/check t0` itself, once that tool exists on the branch.
-- Script sessions have read 8.1M input tokens for GPT and 7.8M for Claude after 29 sessions. Review the balance at the Sprint 0 retro.
+- Script sessions have read 8.8M input tokens for GPT and 9.3M for Claude after 31 sessions. Review the balance at the Sprint 0 retro.
 - Submit checks do not see `compiler/gcc`, which is a separate repository. Extend them in Sprint 1.
 
 ## Repositories

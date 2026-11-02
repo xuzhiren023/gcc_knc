@@ -31,7 +31,7 @@ LEAD_PROMPT = """You are the tech lead on GCC-KNC. Ticket {id} is in state {stat
 Run: python tools/pm.py show {id}
 {task}
 Read only what you need: the ticket, git log and git diff main...{branch}. Rerun something only if you doubt it.
-Finish with one pm.py command. On approve, the --note is read by the project manager: say in one plain sentence what now works. Your final message is only the "PM update:" line it prints."""
+Finish with one pm.py command, run as plain `python tools/pm.py ...`: PM_ROLE is already set, and a prefix is refused. On approve, the --note is read by the project manager: say in one plain sentence what now works. Your final message is only the "PM update:" line it prints."""
 
 LEAD_TASKS = {
     "review": "Review per docs/DEVELOPMENT_CYCLE.md section 7, then run pm.py approve, or pm.py changes with numbered findings, each with file:line.",
