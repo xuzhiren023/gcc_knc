@@ -58,7 +58,7 @@ Last updated: 2026-11-02, during Sprint 0.
 - `ldmxcsr` and `stmxcsr` pass the lint, because Intel manual 327364 is not on this machine. Decide once someone has Appendix B.
 - `f3 2e 90`, a `pause` with a stray prefix in the middle, passes the lint. Hand-written code only.
 - Script reviews cannot run tests, by design. `pm.py approve` now runs the branch's `tools/check t0` itself, once that tool exists on the branch.
-- Script sessions have read 18.6M input tokens for GPT and 10.6M for Claude after 41 sessions. S0-06's one build session alone read 6.1M. Review the balance at the Sprint 0 retro.
+- Script sessions have read 19.1M input tokens for GPT and 10.8M for Claude after 45 sessions. S0-06's one build session alone read 6.1M. Review the balance at the Sprint 0 retro.
 - Submit checks do not see `compiler/gcc`, which is a separate repository. Extend them in Sprint 1.
 
 ## Repositories
