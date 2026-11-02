@@ -2,6 +2,7 @@
 """Shared donor toolchain maintenance (run builds through tools/run.py).
 
 rebuild: configure the read-only shared donor, then all-gcc/install-gcc only.
+         --install-only resumes installation from the completed shared build.
 sysroot: overlay a card-derived tree, if supplied, and restore development files.
          --development-files seeds the retained development input directory once.
 verify: check default driver paths and a verbose C link against the card libc.
@@ -23,6 +24,7 @@ SHARED = PROJECT / '.work/_shared'
 TC = SHARED / 'toolchain'
 SYSROOT = TC / 'sysroot'
 DEVELOPMENT = ('crt1.o', 'crti.o', 'crtn.o', 'libc.so', 'libc_nonshared.a')
+INSTALL_STAGE = '/tmp/knc-stage'
 
 
 def command(*args, **kwargs):
@@ -35,6 +37,13 @@ def rebuild(args):
     build = SHARED / 'gcc-donor-build'
     if not (source / 'configure').is_file():
         raise RuntimeError('missing shared gcc-donor source; ask the lead')
+    if not os.environ.get('KNC_WINDOWS_INSTALL'):
+        raise RuntimeError('run rebuild through Windows Python for the staged overlay')
+    if args.install_only:
+        if not (build / 'gcc/xgcc.exe').is_file():
+            raise RuntimeError('missing completed shared compiler build')
+        command('make', 'install-gcc', 'DESTDIR=' + INSTALL_STAGE, cwd=build)
+        return
     # Configure caches from an earlier host attempt must not survive a rebuild.
     expected = SHARED.resolve() / 'gcc-donor-build'
     if build.resolve() != expected or build.is_symlink():
@@ -67,7 +76,18 @@ def rebuild(args):
     ]
     command('bash', source / 'configure', *flags, cwd=build)
     command('make', '-j8', 'all-gcc', cwd=build)
-    command('make', 'install-gcc', cwd=build)
+    command('make', 'install-gcc', 'DESTDIR=' + INSTALL_STAGE, cwd=build)
+
+
+def install_stage(cygpath, env):
+    """Resolve and guard the one shared staging tree before copying or deleting."""
+    stage = Path(subprocess.check_output(
+        [cygpath, '-w', INSTALL_STAGE], env=env, text=True).strip()).resolve()
+    expected = (TC / 'cygwin/tmp/knc-stage').resolve()
+    if stage != expected or stage.is_symlink():
+        raise RuntimeError('unexpected install stage: ' + str(stage))
+    print('Install stage: %s -> %s' % (INSTALL_STAGE, stage), flush=True)
+    return stage
 
 
 def sysroot(args):
@@ -139,13 +159,32 @@ def main():
             if flag in arguments:
                 index = arguments.index(flag) + 1
                 arguments[index] = posix(arguments[index])
-        return subprocess.call([str(TC / 'cygwin/bin/python3.12.exe'),
-                                posix(__file__), *arguments], env=env)
+        stage = None
+        if arguments[:1] == ['rebuild']:
+            stage = install_stage(cygpath, env)
+            if stage.exists():
+                shutil.rmtree(stage)
+            env['KNC_WINDOWS_INSTALL'] = '1'
+        result = subprocess.call([str(TC / 'cygwin/bin/python3.12.exe'),
+                                  posix(__file__), *arguments], env=env)
+        if result == 0 and stage is not None:
+            # DESTDIR contains the absolute POSIX prefix as ordinary directories.
+            # Overlay only install-gcc's files, retaining the target libraries.
+            staged_prefix = stage / posix(TC / 'cross').lstrip('/')
+            if not (staged_prefix / 'bin/k1om-mpss-linux-gcc.exe').is_file():
+                raise RuntimeError('staged compiler missing: ' + str(staged_prefix))
+            print('Overlay %s -> %s' % (staged_prefix, TC / 'cross'), flush=True)
+            shutil.copytree(staged_prefix, TC / 'cross', dirs_exist_ok=True)
+            shutil.rmtree(stage)
+            print('Installed compiler; removed stage; retained target libraries', flush=True)
+        return result
     os.environ['PATH'] = ':'.join(str(TC / p) for p in ('cross/bin', 'cygwin/bin')) + ':' + os.environ.get('PATH', '')
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('step', choices=('rebuild', 'sysroot', 'verify'))
     parser.add_argument('--card-root')
     parser.add_argument('--development-files')
+    parser.add_argument('--install-only', action='store_true',
+                        help='resume rebuild at staged install-gcc without rebuilding')
     args = parser.parse_args()
     try:
         globals()[args.step](args)
