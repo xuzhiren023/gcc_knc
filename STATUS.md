@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-02 15:28.
+Updated automatically at every ticket change. Last update: 2026-11-02 15:39.
 
 **Next: GPT-6.1, on S1-03 (tools/check runs source-level tests against GCC 16).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
@@ -34,31 +34,31 @@ Current tickets: `[##############------]` 12 of 17
 | S0-10 | Card sysroot links Fortran, libm and pthreads | Done | Fortran programs and C programs using -lm, -lpthread, -ldl or -lrt now link with default flags against the ... |
 | S1-01 | Tickets can change the GCC fork | Done | Tickets marked gcc: yes now get their own branch in the GCC fork, count its changes in the size budget, sho... |
 | S1-02 | GCC 16.2 builds for k1om-mpss-linux | Done | GCC 16.2 now configures and builds its C compiler for k1om-mpss-linux, using the shared KNC assembler, link... |
-| S1-03 | tools/check runs source-level tests against GCC 16 | Not started | Owner approved Sprint 1 on 2026-11-02; ticket set to ready. |
-| S1-04 | -march=knc with no SSE, AVX, MMX, CMOV, FCOMI or MFENCE | Not started | Owner approved Sprint 1 on 2026-11-02; ticket set to ready. |
-| S1-05 | Integer C assembles with as 2.22 and lints clean | Not started | Owner approved Sprint 1 on 2026-11-02; ticket set to ready. |
-| S1-06 | K1OM link defaults | Not started | Owner approved Sprint 1 on 2026-11-02; ticket set to ready. |
-| S1-07 | Milestone M0 evidence note | Not started | Owner approved Sprint 1 on 2026-11-02; ticket set to ready. |
+| S1-03 | tools/check runs source-level tests against GCC 16 | In progress | Owner approved Sprint 1 on 2026-11-02; ticket set to ready. |
+| S1-04 | -march=knc with no SSE, AVX, MMX, CMOV, FCOMI or MFENCE | Not started | Rebuild GCC with the logged gcc16 step of tools/toolchain.py as ONE blocking foreground shell call with a t... |
+| S1-05 | Integer C assembles with as 2.22 and lints clean | Not started | Rebuild GCC with the logged gcc16 step of tools/toolchain.py as ONE blocking foreground shell call with a t... |
+| S1-06 | K1OM link defaults | Not started | Rebuild GCC with the logged gcc16 step of tools/toolchain.py as ONE blocking foreground shell call with a t... |
+| S1-07 | Milestone M0 evidence note | Not started | Rebuild GCC with the logged gcc16 step of tools/toolchain.py as ONE blocking foreground shell call with a t... |
 
 ## Recent activity
 
+- 2026-11-02 15:45 **S1-07** lead note: Rebuild GCC with the logged gcc16 step of tools/toolchain.py as ONE blocking foreground shell call with a timeout of at least 75 minutes, never in ...
+- 2026-11-02 15:45 **S1-06** lead note: Rebuild GCC with the logged gcc16 step of tools/toolchain.py as ONE blocking foreground shell call with a timeout of at least 75 minutes, never in ...
+- 2026-11-02 15:45 **S1-05** lead note: Rebuild GCC with the logged gcc16 step of tools/toolchain.py as ONE blocking foreground shell call with a timeout of at least 75 minutes, never in ...
+- 2026-11-02 15:45 **S1-04** lead note: Rebuild GCC with the logged gcc16 step of tools/toolchain.py as ONE blocking foreground shell call with a timeout of at least 75 minutes, never in ...
 - 2026-11-02 15:28 **S1-02** lead approve: GCC 16.2 now configures and builds its C compiler for k1om-mpss-linux, using the shared KNC assembler, linker and sysroot, and the donor toolchain ...
 - 2026-11-02 15:26 **S1-02** engineer submit: GCC ba8912b3148: config.host routes KNC driver-i386.o. Configure 80.202s. all-gcc: failed 2363.706s (GOTOFF); resume interrupted 13:02:12-13:26:55 ...
 - 2026-11-02 14:22 **S1-02** lead answer: Yes. Add k1om-*-linux* to the inner target case at gcc/config.host:130 (keep the outer host case unchanged), commit with pm.py commit --gcc, and le...
 - 2026-11-02 14:21 **S1-02** engineer ask: Second compiler build failure: foreground gcc16 --resume (-j8) failed linking xgcc.exe/cpp.exe: undefined host_detect_local_cpu; 1572.646s, no Win3...
-- 2026-11-02 13:53 **S1-02** owner decide: Owner on 2026-11-02: raise S1-02 to 24M input tokens and 5 sessions, and continue. Build in one blocking call per the lead note at 13:40.
-- 2026-11-02 13:40 **S1-02** lead note: Replaces the 13:27 answer's background-and-poll advice, which is what used 150 calls and 15.5M tokens: every poll resends the whole conversation. N...
-- 2026-11-02 13:27 **S1-02** lead escalate: budget: 15925309 input tokens used; the budget is 6000000
-- 2026-11-02 13:27 **S1-02** lead answer: The resumed build did not survive: the log ends at 13:26:55, when your session closed, with 'unable to load user32.dll, Win32 error 8' and make 'Ha...
 
 ## Cost
 
 - From the script, engineer: 41 sessions, 52.5M input tokens
 - From the script, lead: 42 sessions, 15.8M input tokens
-- Started by hand, Claude: 3 sessions, 129.5M input tokens
+- Started by hand, Claude: 3 sessions, 134.0M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 9.3 GiB of 100 GiB. 336 GiB free on the drive.
+The project uses 9.3 GiB of 100 GiB. 335 GiB free on the drive.
