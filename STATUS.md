@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-02 11:32.
+Updated automatically at every ticket change. Last update: 2026-11-02 11:37.
 
 **Next: GPT-6.1, on S0-10 (Card sysroot links Fortran, libm and pthreads).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
@@ -31,7 +31,7 @@ Current tickets: `[##################--]` 9 of 10
 | S0-07 | Benchmark corpus and coverage estimate | Done | We now have a proposed public benchmark corpus (PolyBench, STREAM, NPB, HPCG, zlib, SQLite, with bzip2 and ... |
 | S0-08 | Toolchain independent of PhiWeather | Done | The shared k1om gcc, g++ and gfortran were rebuilt so their assembler, linker and sysroot all resolve insid... |
 | S0-09 | T1 scan sees KNC mask-branch loops | Done | The T1 check now recognises KNC vector loops that close with the mask branches jknzd and jkzd, so correct G... |
-| S0-10 | Card sysroot links Fortran, libm and pthreads | Not started |  |
+| S0-10 | Card sysroot links Fortran, libm and pthreads | In progress |  |
 
 ## Recent activity
 
@@ -48,7 +48,7 @@ Current tickets: `[##################--]` 9 of 10
 
 - From the script, engineer: 33 sessions, 29.4M input tokens
 - From the script, lead: 34 sessions, 13.7M input tokens
-- Started by hand, Claude: 3 sessions, 94.4M input tokens
+- Started by hand, Claude: 3 sessions, 98.5M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
