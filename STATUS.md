@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-02 17:18.
+Updated automatically at every ticket change. Last update: 2026-11-02 17:19.
 
-**Next: the tech lead, on S1-04.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Waiting for you:** S1-04. Run `python tools/pm.py inbox`.
 
 Current tickets: `[###############-----]` 13 of 17
 
@@ -35,13 +35,14 @@ Current tickets: `[###############-----]` 13 of 17
 | S1-01 | Tickets can change the GCC fork | Done | Tickets marked gcc: yes now get their own branch in the GCC fork, count its changes in the size budget, sho... |
 | S1-02 | GCC 16.2 builds for k1om-mpss-linux | Done | GCC 16.2 now configures and builds its C compiler for k1om-mpss-linux, using the shared KNC assembler, link... |
 | S1-03 | tools/check runs source-level tests against GCC 16 | Done | tools/check t1 --compiler gcc16 now compiles each tests/t1/*.c test and checks its scan, scan-not, per-func... |
-| S1-04 | -march=knc with no SSE, AVX, MMX, CMOV, FCOMI or MFENCE | Question for the tech lead | Current shell is exec_command: no execution-timeout argument, Windows yield_time_ms capped at 30000 ms; lon... |
+| S1-04 | -march=knc with no SSE, AVX, MMX, CMOV, FCOMI or MFENCE | **Waiting for you** | GPT's only shell (exec_command) returns within 30 s and needs write_stdin polling, so the 1-hour GCC rebuil... |
 | S1-05 | Integer C assembles with as 2.22 and lints clean | Not started | Rebuild GCC with the logged gcc16 step of tools/toolchain.py as ONE blocking foreground shell call with a t... |
 | S1-06 | K1OM link defaults | Not started | Rebuild GCC with the logged gcc16 step of tools/toolchain.py as ONE blocking foreground shell call with a t... |
 | S1-07 | Milestone M0 evidence note | Not started | Rebuild GCC with the logged gcc16 step of tools/toolchain.py as ONE blocking foreground shell call with a t... |
 
 ## Recent activity
 
+- 2026-11-02 17:19 **S1-04** lead escalate: GPT's only shell (exec_command) returns within 30 s and needs write_stdin polling, so the 1-hour GCC rebuild means about 120 polls, the pattern tha...
 - 2026-11-02 17:18 **S1-04** engineer ask: Current shell is exec_command: no execution-timeout argument, Windows yield_time_ms capped at 30000 ms; long commands return session_id and require...
 - 2026-11-02 17:17 **S1-04** owner decide: Owner on 2026-11-02: send S1-04 back to GPT with 6 sessions. Build with the shell tool and seed in i386-options.cc, per the lead notes at 16:25 and...
 - 2026-11-02 16:35 **S1-04** lead note: Read ee7278c9dac and 7d860fac47a before any build: no defects found. The sync.md change is needed, not optional: on x86-64 GCC emits mfence wheneve...
@@ -49,7 +50,6 @@ Current tickets: `[###############-----]` 13 of 17
 - 2026-11-02 16:16 **S1-04** lead escalate: The engineer's shell tool stops every call at 300 s, so the required single blocking GCC rebuild (up to 75 min) cannot finish there; S1_04_gcc16_se...
 - 2026-11-02 16:10 **S1-04** engineer ask: GCC implementation: ee7278c9dac; shared CMOV/MFENCE guards: 7d860fac47a. Foreground logged gcc16 --resume via spawnSync(timeout=4500000), tool time...
 - 2026-11-02 16:00 **S1-04** lead approve-red: The S1-04 red tests are approved: they fail today because -march=knc does not exist yet, and they check its defaults, its macros, the five rejected...
-- 2026-11-02 16:00 **S1-04** engineer red: Red commit 429a9c1 accepts or[lq] per lead correction and retains scan-asm-not mfence. Ran only the changed fence source through check.Runner.t1_so...
 
 ## Cost
 
