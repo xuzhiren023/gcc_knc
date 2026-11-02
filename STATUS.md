@@ -1,16 +1,16 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-02 11:55.
+Updated automatically at every ticket change. Last update: 2026-11-02 11:56.
 
-**Next: the tech lead, on S1-01.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: GPT-6.1, on S1-02 (GCC 16.2 builds for k1om-mpss-linux).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
-Current tickets: `[###########---------]` 10 of 17
+Current tickets: `[############--------]` 11 of 17
 
 ## Milestones
 
 | | Milestone | State | Progress |
 |---|---|---|---|
-| M0 | Foundation | In progress | 10 of 17 tickets |
+| M0 | Foundation | In progress | 11 of 17 tickets |
 | M1 | Mixed native code | Not started | Not planned in detail yet |
 | M2 | Useful vector target | Not started | Not planned in detail yet |
 | M3 | Runtimes | Not started | Not planned in detail yet |
@@ -32,7 +32,7 @@ Current tickets: `[###########---------]` 10 of 17
 | S0-08 | Toolchain independent of PhiWeather | Done | The shared k1om gcc, g++ and gfortran were rebuilt so their assembler, linker and sysroot all resolve insid... |
 | S0-09 | T1 scan sees KNC mask-branch loops | Done | The T1 check now recognises KNC vector loops that close with the mask branches jknzd and jkzd, so correct G... |
 | S0-10 | Card sysroot links Fortran, libm and pthreads | Done | Fortran programs and C programs using -lm, -lpthread, -ldl or -lrt now link with default flags against the ... |
-| S1-01 | Tickets can change the GCC fork | Waiting for review | Recorded T0 run: 45 tests passed (OK); inspected existing log without rerunning passing tests. Log: .work/_... |
+| S1-01 | Tickets can change the GCC fork | Done | Tickets marked gcc: yes now get their own branch in the GCC fork, count its changes in the size budget, sho... |
 | S1-02 | GCC 16.2 builds for k1om-mpss-linux | Not started | Owner approved Sprint 1 on 2026-11-02; ticket set to ready. |
 | S1-03 | tools/check runs source-level tests against GCC 16 | Not started | Owner approved Sprint 1 on 2026-11-02; ticket set to ready. |
 | S1-04 | -march=knc with no SSE, AVX, MMX, CMOV, FCOMI or MFENCE | Not started | Owner approved Sprint 1 on 2026-11-02; ticket set to ready. |
@@ -49,7 +49,7 @@ Current tickets: `[###########---------]` 10 of 17
 - 2026-11-02 12:00 **S1-03** owner decide: Owner approved Sprint 1 on 2026-11-02; ticket set to ready.
 - 2026-11-02 12:00 **S1-02** owner decide: Owner approved Sprint 1 on 2026-11-02; ticket set to ready.
 - 2026-11-02 12:00 **S1-01** owner decide: Owner approved Sprint 1 on 2026-11-02; ticket set to ready.
-- 2026-11-02 11:55 **S1-01** engineer submit: Recorded T0 run: 45 tests passed (OK); inspected existing log without rerunning passing tests. Log: .work/_state/logs/s1_01_t0-20261102-115002.log....
+- 2026-11-02 11:56 **S1-01** lead approve: Tickets marked gcc: yes now get their own branch in the GCC fork, count its changes in the size budget, show it to the reviewer, and merge it into ...
 
 ## Cost
 
