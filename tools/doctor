@@ -35,10 +35,13 @@ def check(manifest, root):
             failed = True
     sysroot = root / manifest["sysroot"]
     sysroot_failed = False
-    for relative in ("usr/include", "lib64"):
+    for relative in ("usr/include", "lib64", "lib", "usr/lib"):
         if not (sysroot / relative).is_dir():
             print("MISSING sysroot directory: %s" % (sysroot / relative))
             sysroot_failed = True
+    if not (sysroot / "usr/lib64/crt1.o").is_file():
+        print("MISSING sysroot startup object: %s" % (sysroot / "usr/lib64/crt1.o"))
+        sysroot_failed = True
     failed |= sysroot_failed
     print("%s sysroot: %s" % ("FAILED" if sysroot_failed else "OK", sysroot))
     return int(failed)
