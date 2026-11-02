@@ -81,6 +81,11 @@ python tools/storage.py --prune
 These are starting judgments, set against the session data above. Check `tools/pm.py usage`
 at each retro and adjust them.
 
+When acceptance needs many small test files, such as one fixture per rule, the lead sets
+`new_test_files: N` on the ticket when writing it. If harness faults used up a ticket's sessions,
+the lead can set `sessions: N` the same way. Tickets are protected, so an engineer cannot raise
+its own limits.
+
 When a session hits a budget, commits and `tools/pm.py` still work, so it can always hand
 over what it has. A session never loses work to a budget.
 
@@ -93,7 +98,8 @@ change a decision, not to reduce testing as such.
 ## Setup and limits
 
 - **Codex loads a project's hooks and rules only when the project is trusted.** The dispatcher handles this for each of its sessions, without changing your settings. For sessions you start yourself, trust this folder once when asked, or the limits do not apply.
-- **Sessions you start yourself** get the same limits from the board, but the token and session budgets are only counted by the dispatcher.
+- **Sessions you start yourself** get the same limits from the board. `STATUS.md` and `tools/pm.py usage` show their tokens for the whole project, but the per-ticket token and session budgets are only counted by the dispatcher.
+- **Dispatcher sessions can write to their worktree, `.work/_state` and `.work/_shared`,** and nowhere else.
 - **`.git` is protected inside the Codex sandbox,** so `.codex/rules/default.rules` lets `git add`, `git commit` and `tools/pm.py` run outside it. Nothing else gets that exception.
 - **Compiler changes will need one extension.** Submit checks read this repository's diff, so S1 must also apply them to `compiler/gcc`, which is a separate repository.
 - **Disk is checked every 25 tool calls and between sessions,** so one very large build could overshoot before it is stopped. `tools/run.py` also refuses to start on a nearly full drive.

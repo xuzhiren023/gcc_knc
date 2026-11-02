@@ -1,11 +1,13 @@
 """Tests for the board, the hook and the run wrapper. Reviewer-owned, like the harness."""
 import json
 import os
+import re
 import shutil
 import subprocess
 import sys
 import tempfile
 import unittest
+from unittest import mock
 
 os.environ["PM_NO_NOTIFY"] = "1"
 REPO = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -272,6 +274,20 @@ class SubmitChecks(Sandbox):
         self.assertEqual(done.returncode, 0, done.stdout)
         self.assertIn("OVER BUDGET", self.pm("show", "A-1").stdout)
 
+    def test_ticket_can_declare_the_test_files_its_acceptance_needs(self):
+        for i in range(6):
+            self.commit_file("tests/isa/f%d.s" % i, "nop\n", "test(A-1): f%d [red]" % i, self.wt)
+        self.assertIn("6 new test files", self.refused())
+        path = os.path.join(self.root, "work", "tickets", "A-1.md")
+        with open(path, encoding="utf8") as f:
+            text = f.read()
+        with open(path, "w", encoding="utf8", newline="\n") as f:
+            f.write(text.replace("depth: standard", "depth: standard\nnew_test_files: 6"))
+        self.git("commit", "-qam", "declare")
+        done = self.pm("submit", "A-1", "--note", "n", cwd=self.wt)
+        self.assertEqual(done.returncode, 0, done.stdout)
+        self.assertNotIn("OVER BUDGET", self.pm("show", "A-1").stdout)
+
     def test_long_notes_are_refused(self):
         self.commit_file("src/a.py", "x = 1\n", "test(A-1): x [red]", self.wt)
         done = self.pm("submit", "A-1", "--note", "x" * 700, cwd=self.wt)
@@ -313,9 +329,96 @@ class Dispatcher(Sandbox):
     def test_usage_parsing_handles_both_agents(self):
         import dispatch
         codex = '{"type":"turn.completed","usage":{"input_tokens":10,"cached_input_tokens":4,"output_tokens":2}}'
-        claude = '{"usage":{"input_tokens":1,"cache_read_input_tokens":9,"output_tokens":3}}'
+        claude = '{"usage":{"input_tokens":1,"cache_read_input_tokens":9,"cache_creation_input_tokens":5,"output_tokens":3}}'
         self.assertEqual(dispatch.parse_usage("engineer", codex), {"input_tokens": 10, "output_tokens": 2})
-        self.assertEqual(dispatch.parse_usage("lead", claude), {"input_tokens": 10, "output_tokens": 3})
+        self.assertEqual(dispatch.parse_usage("lead", claude), {"input_tokens": 15, "output_tokens": 3})
+
+    def test_engineer_can_write_logs_and_shared_builds_outside_its_worktree(self):
+        import dispatch
+        import pm
+        import storage
+        ticket = mock.Mock(fields={"depth": "standard"})
+        board = mock.Mock(root=self.root, policy=POLICY, budget=lambda _t: POLICY["budgets"]["standard"])
+        self.assertTrue(pm)
+        command = dispatch.engineer_command(board, ticket, self.worktree("A-1"))
+        setting = [arg for arg in command if arg.startswith("sandbox_workspace_write.writable_roots=")]
+        self.assertEqual(len(setting), 1)
+        roots = json.loads(setting[0].split("=", 1)[1])
+        self.assertEqual(roots, [storage.state_dir(self.root), storage.shared_area(self.root)])
+
+    def test_ticket_can_raise_its_session_limit(self):
+        import dispatch
+        import pm
+        os.makedirs(os.path.join(self.root, ".work", "_state"))
+        with open(os.path.join(self.root, ".work", "_state", "ledger.jsonl"), "w", encoding="utf8") as f:
+            f.write((json.dumps({"ticket": "A-1", "role": "engineer"}) + "\n") * 3)
+        path = os.path.join(self.root, "work", "tickets", "A-1.md")
+        cwd = os.getcwd()
+        os.chdir(self.root)
+        self.addCleanup(os.chdir, cwd)
+        board = pm.Board()
+        self.assertIn("3 engineer sessions", dispatch.over_budget(board, board.load("A-1")))
+        with open(path, encoding="utf8") as f:
+            text = f.read()
+        with open(path, "w", encoding="utf8", newline="\n") as f:
+            f.write(text.replace("depth: standard", "depth: standard\nsessions: 4"))
+        self.assertIsNone(dispatch.over_budget(board, board.load("A-1")))
+
+    def test_status_page_shows_a_session_as_soon_as_it_is_recorded(self):
+        import dispatch
+        import pm
+        self.pm("start", "A-1")
+        os.environ["PM_ROLE"] = "engineer"
+        self.addCleanup(os.environ.pop, "PM_ROLE", None)
+        cwd = os.getcwd()
+        os.chdir(self.root)
+        self.addCleanup(os.chdir, cwd)
+        board = pm.Board()
+        with open(os.path.join(board.state_dir(), "ledger.jsonl"), "w", encoding="utf8") as f:
+            f.write(json.dumps({"ticket": "A-1", "role": "engineer", "input_tokens": 2500000}) + "\n")
+        dispatch.refresh_status(board)
+        with open(os.path.join(self.root, "STATUS.md"), encoding="utf8") as f:
+            self.assertIn("engineer: 1 sessions, 2.5M", f.read())
+        left = subprocess.run(["git", "status", "--short"], cwd=self.root, stdout=subprocess.PIPE,
+                              universal_newlines=True).stdout
+        self.assertEqual(left, "", "the page is committed")
+
+
+class HandStartedUsage(unittest.TestCase):
+    def setUp(self):
+        import status
+        self.status = status
+        self.top = tempfile.mkdtemp()
+        self.addCleanup(shutil.rmtree, self.top, ignore_errors=True)
+        self.root = os.path.join(self.top, "my_proj")
+        patch = mock.patch.dict(os.environ, CODEX_HOME=os.path.join(self.top, "codex"),
+                                CLAUDE_CONFIG_DIR=os.path.join(self.top, "claude"))
+        patch.start()
+        self.addCleanup(patch.stop)
+
+    def write(self, parts, lines):
+        path = os.path.join(self.top, *parts)
+        os.makedirs(os.path.dirname(path), exist_ok=True)
+        with open(path, "w", encoding="utf8") as f:
+            f.write("".join(json.dumps(line) + "\n" for line in lines))
+
+    def rollout(self, name, cwd, *totals):
+        counts = [{"type": "event_msg", "payload": {"type": "token_count", "info": {"total_token_usage": {"input_tokens": n}}}}
+                  for n in totals]
+        self.write(("codex", "sessions", "2026", name), [{"type": "session_meta", "payload": {"cwd": cwd}}] + counts)
+
+    def test_gpt_sessions_in_this_project_count_their_last_total(self):
+        self.rollout("rollout-a.jsonl", self.root, 10, 40)
+        self.rollout("rollout-b.jsonl", os.path.join(self.root, ".work", "A-1"), 5)
+        self.rollout("rollout-c.jsonl", self.root + "_other", 999)
+        self.assertEqual(self.status.hand_usage(self.root), {"GPT": (2, 45)})
+
+    def test_claude_calls_count_once_each_across_content_blocks(self):
+        usage = {"input_tokens": 1, "cache_read_input_tokens": 2, "cache_creation_input_tokens": 3}
+        call = {"type": "assistant", "message": {"id": "m1", "usage": usage}}
+        folder = re.sub(r"[^A-Za-z0-9]", "-", os.path.normpath(self.root))
+        self.write(("claude", "projects", folder, "s.jsonl"), [call, call, {"type": "user", "message": {"content": "usage"}}])
+        self.assertEqual(self.status.hand_usage(self.root), {"Claude": (1, 6)})
 
 
 if __name__ == "__main__":

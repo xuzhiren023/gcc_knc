@@ -70,7 +70,12 @@ class Board:
         return Ticket(self, ticket_id, fields, match.group(2))
 
     def budget(self, ticket):
-        return self.policy["budgets"][ticket.fields.get("depth", "standard")]
+        budget = dict(self.policy["budgets"][ticket.fields.get("depth", "standard")])
+        # The lead can raise these on a ticket: many small test files, or sessions lost to harness faults.
+        for limit in ("new_test_files", "sessions"):
+            if ticket.fields.get(limit):
+                budget[limit] = int(ticket.fields[limit])
+        return budget
 
     def worktree(self, ticket):
         return storage.worktree(self.root, ticket.id)
@@ -421,6 +426,8 @@ def cmd_usage(board, _args):
     print("%-7s %-9s %8s %14s %10s" % ("ticket", "role", "sessions", "input tokens", "output"))
     for (ticket, role), (count, tokens_in, tokens_out) in sorted(totals.items()):
         print("%-7s %-9s %8d %14d %10d" % (ticket, role, count, tokens_in, tokens_out))
+    for agent, (count, tokens_in) in sorted(status.hand_usage(board.root).items()):
+        print("%-7s %-9s %8d %14d" % ("by hand", agent, count, tokens_in))
 
 
 def parser():

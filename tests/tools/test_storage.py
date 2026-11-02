@@ -127,9 +127,13 @@ class Limits(Sandbox):
         self.pm("start", "A-1")
         wt = self.worktree("A-1")
         self.commit_file("src/a.py", "x = 1\n", "test(A-1): x [red]", wt)
-        self.pm("submit", "A-1", "--note", "n", cwd=wt)
+        submitted = self.pm("submit", "A-1", "--note", "n", cwd=wt)
+        self.assertEqual(submitted.returncode, 0, submitted.stdout)
         with tempfile.TemporaryDirectory() as empty:
-            env = dict(os.environ, APPDATA=empty, LOCALAPPDATA=empty, PM_ROLE="owner")
+            # A real claude on PATH would start a real, paid review of this test ticket.
+            path = os.pathsep.join(d for d in os.environ["PATH"].split(os.pathsep) if not any(
+                os.path.exists(os.path.join(d, tool)) for tool in ("claude.exe", "claude.cmd", "claude", "codex.exe", "codex.cmd", "codex")))
+            env = dict(os.environ, APPDATA=empty, LOCALAPPDATA=empty, PM_ROLE="owner", PATH=path)
             done = subprocess.run([sys.executable, os.path.join(self.root, "tools", "dispatch.py")], cwd=self.root,
                                   env=env, stdin=subprocess.DEVNULL, stdout=subprocess.PIPE,
                                   stderr=subprocess.STDOUT, universal_newlines=True)

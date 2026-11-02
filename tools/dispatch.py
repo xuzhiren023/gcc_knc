@@ -19,6 +19,7 @@ import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import pm  # noqa: E402
+import status  # noqa: E402
 import storage  # noqa: E402
 
 ENGINEER_PROMPT = """You are an engineer on GCC-KNC, working on ticket {id} only, in this worktree.
@@ -50,8 +51,10 @@ def engineer_command(board, ticket, worktree):
     trust = 'projects."%s".trust_level="trusted"' % worktree.replace("\\", "\\\\")
     os.makedirs(storage.shared_area(board.root), exist_ok=True)
     model = board.policy.get("engineer_model")
+    # Logs and the shared build area sit beside the worktree, outside what workspace-write allows by itself.
+    writable = "sandbox_workspace_write.writable_roots=" + json.dumps([storage.state_dir(board.root), storage.shared_area(board.root)])
     return [codex, "exec"] + (["-m", model] if model else []) + ["--json", "--ephemeral", "-C", worktree, "--sandbox", "workspace-write",
-            "--dangerously-bypass-hook-trust", "-c", trust, "-c", 'approval_policy="never"',
+            "--dangerously-bypass-hook-trust", "-c", trust, "-c", writable, "-c", 'approval_policy="never"',
             "-c", 'model_reasoning_effort="%s"' % effort,
             ENGINEER_PROMPT.format(id=ticket.id)]
 
@@ -86,7 +89,8 @@ def parse_usage(role, output):
         found = event.get("usage") if isinstance(event, dict) else None
         if not isinstance(found, dict):
             continue
-        usage["input_tokens"] += found.get("input_tokens", 0) + found.get("cache_read_input_tokens", 0)
+        usage["input_tokens"] += (found.get("input_tokens", 0) + found.get("cache_read_input_tokens", 0)
+                                  + found.get("cache_creation_input_tokens", 0))
         usage["output_tokens"] += found.get("output_tokens", 0)
     return usage
 
@@ -112,6 +116,16 @@ def over_budget(board, ticket):
     if tokens >= budget["input_tokens"]:
         return "%d input tokens used; the budget is %d" % (tokens, budget["input_tokens"])
     return None
+
+
+def refresh_status(board):
+    """The session's last ticket change came before its tokens were recorded, so show them now."""
+    try:
+        path = status.write(board, pm.next_action(board))
+        pm.run_git("add", "--", path, cwd=board.root)
+        pm.run_git("commit", "-q", "-m", "pm: status after session", "--", path, cwd=board.root)
+    except Exception as problem:  # The status page must never stop the work.
+        print("  Status page not updated: %s" % problem)
 
 
 def run_session(board, ticket, role, dry_run):
@@ -163,6 +177,7 @@ def run_session(board, ticket, role, dry_run):
         return False
     with open(os.path.join(board.state_dir(), "ledger.jsonl"), "a", encoding="utf8") as f:
         f.write(json.dumps(entry) + "\n")
+    refresh_status(board)
     print("  exit %s, %d input tokens, %d output; log: %s" % (code, entry["input_tokens"], entry["output_tokens"], log_path))
     storage.prune_logs(board.state_dir(), board.policy["storage"]["logs_keep_mb"])
     project_growth = storage.project_bytes(board.root) - project_before

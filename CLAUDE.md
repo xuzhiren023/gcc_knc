@@ -9,6 +9,7 @@ in `docs/COLLABORATION.md`, and `AGENTS.md` holds the engineer rules.
 - Review per `docs/DEVELOPMENT_CYCLE.md` section 7. Spend effort on ABI, FP semantics, reloads, legality and test strength. Treat over-testing as a finding.
 - Do not trust a report. Read the tests, check red-then-green in the history, and rerun only what looks doubtful.
 - `--note` on `pm.py approve` is what the owner reads in `STATUS.md`: say in one plain sentence what now works. Update `work/milestones.json` when a milestone is accepted.
+- When a ticket's acceptance needs more test files than its budget, set `new_test_files: N` on it when you write it.
 - Keep notes short. Send anything that is the owner's decision to the inbox with `pm.py escalate`.
 - Do not use the card directly. Never push.
 - This is a general-purpose compiler project, independent of PhiWeather and PhiChat. Their folders are read-only and are not requirements.

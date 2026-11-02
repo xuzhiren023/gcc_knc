@@ -4,6 +4,7 @@ tools/pm.py calls this on every ticket change, so nobody has to ask for an updat
 step is allowed to stop the work if it fails.
 """
 import datetime
+import glob
 import json
 import os
 import re
@@ -92,6 +93,65 @@ def milestone_rows(board, tickets):
     return rows
 
 
+def inside(path, root):
+    path, root = os.path.normcase(os.path.normpath(path)), os.path.normcase(os.path.normpath(root))
+    return path == root or path.startswith(root + os.sep)
+
+
+def hand_codex_usage(root):
+    """GPT sessions started by hand keep a rollout file; the dispatcher's are ephemeral and have none."""
+    home = os.environ.get("CODEX_HOME") or os.path.join(os.path.expanduser("~"), ".codex")
+    sessions = tokens = 0
+    for path in glob.glob(os.path.join(home, "sessions", "**", "rollout-*.jsonl"), recursive=True):
+        try:
+            with open(path, encoding="utf8", errors="replace") as f:
+                meta = json.loads(f.readline()).get("payload") or {}
+                if not inside(meta.get("cwd", ""), root):
+                    continue
+                last = 0
+                for line in f:
+                    if '"token_count"' in line:
+                        info = (json.loads(line).get("payload") or {}).get("info") or {}
+                        last = (info.get("total_token_usage") or {}).get("input_tokens", last)
+        except (OSError, ValueError):
+            continue
+        sessions += 1
+        tokens += last
+    return sessions, tokens
+
+
+def hand_claude_usage(root):
+    """Claude sessions started by hand; dispatcher sessions run with --no-session-persistence."""
+    home = os.environ.get("CLAUDE_CONFIG_DIR") or os.path.join(os.path.expanduser("~"), ".claude")
+    folder = os.path.join(home, "projects", re.sub(r"[^A-Za-z0-9]", "-", os.path.normpath(root)))
+    sessions = tokens = 0
+    seen = set()  # One API call is written once per content block, with the same usage.
+    for path in glob.glob(os.path.join(folder, "*.jsonl")):
+        counted = False
+        try:
+            with open(path, encoding="utf8", errors="replace") as f:
+                for line in f:
+                    if '"usage"' not in line:
+                        continue
+                    message = json.loads(line).get("message")
+                    usage = message.get("usage") if isinstance(message, dict) else None
+                    if not usage or message.get("id") in seen:
+                        continue
+                    seen.add(message.get("id"))
+                    counted = True
+                    tokens += (usage.get("input_tokens", 0) + usage.get("cache_read_input_tokens", 0)
+                               + usage.get("cache_creation_input_tokens", 0))
+        except (OSError, ValueError):
+            continue
+        sessions += counted
+    return sessions, tokens
+
+
+def hand_usage(root):
+    found = {"GPT": hand_codex_usage(root), "Claude": hand_claude_usage(root)}
+    return {agent: item for agent, item in found.items() if item[0]}
+
+
 def usage_lines(board):
     path = os.path.join(board.state_dir(), "ledger.jsonl")
     totals = {}
@@ -102,10 +162,13 @@ def usage_lines(board):
                 item = totals.setdefault(entry["role"], [0, 0])
                 item[0] += 1
                 item[1] += entry.get("input_tokens", 0)
-    if not totals:
-        return ["No dispatcher sessions yet. Sessions you start by hand show their use in the app, not here."]
-    rows = ["- %s: %d sessions, %.1fM input tokens" % (role, n, tokens / 1e6) for role, (n, tokens) in sorted(totals.items())]
-    return rows + ["- Counts dispatcher sessions only, not sessions you start by hand."]
+    rows = ["- From the script, %s: %d sessions, %.1fM input tokens" % (role, n, tokens / 1e6)
+            for role, (n, tokens) in sorted(totals.items())]
+    rows += ["- Started by hand, %s: %d sessions, %.1fM input tokens" % (agent, n, tokens / 1e6)
+             for agent, (n, tokens) in sorted(hand_usage(board.root).items())]
+    if not rows:
+        return ["No sessions yet."]
+    return rows + ["- Input tokens include the context re-read on every turn, most of it cached and cheap."]
 
 
 def render(board, action):
