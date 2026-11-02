@@ -43,7 +43,8 @@ chunks from private files, decoded and written to the corresponding host
 stdout/stderr stream without text conversion. Their interleaving is not kept.
 If transport becomes unavailable, the result reports incomplete cleanup;
 the independent card-side watchdog still enforces the execution limit plus
-`max(5 seconds, 2 * transport_timeout)` of grace. No immediate stop is claimed.
+`max(5 seconds, 2 * transport_timeout)` of grace, rounded up to whole seconds.
+No immediate stop is claimed.
 
 Host file paths and remote arguments must be passed without shell interpolation.
 The production transport must bound connecting, snapshots, staging, execution,
@@ -85,10 +86,12 @@ that the remote program stopped.
    exact directory. Never kill by name or broad process group. Bounded TERM/KILL
    escalation may target only those processes while the boot ID still matches.
    Before launching the program, start a separate HUP-ignoring watchdog shell
-   from the private directory. It sleeps for the card-side limit then calls
-   the same guarded TERM/KILL helper, even after SSH has gone away. Owned child
-   processes are covered too. Normal cleanup stops the watchdog along with any
-   other owned processes. Control polls receive the full transport timeout;
+   from the private directory. It sleeps for the integer card-side limit then
+   calls guarded cleanup, even after SSH has gone away, stopping owned processes
+   and removing the private directory. If sleep fails, the watchdog exits without
+   signalling or removal. Owned child processes are covered too. Normal cleanup
+   stops the watchdog along with any other owned processes. Control polls
+   receive the full transport timeout;
    crossing the host program deadline produces timeout on the next loop check.
 7. Clean up that exact directory on success and failure, but only on the
    original boot. Validate directory shape and ownership before every destructive

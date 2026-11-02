@@ -103,7 +103,7 @@ def run(program, argv, *, lock_path, external_locks, baseline_names, timeout,
         execution_started = True
         try:
             status = session.execute(run_dir, argv, timeout=timeout,
-                                     card_timeout=timeout + max(5.0, 2 * transport_timeout))
+                                     card_timeout=math.ceil(timeout + max(5.0, 2 * transport_timeout)))
             result.update(result_class="program", exit_code=status, program_exit_code=status)
         except TimeoutError as error:
             failure("timeout", TIMEOUT_EXIT, error)
@@ -279,7 +279,7 @@ class SSHSession:
         # itself. Ignore HUP before exec; losing SSH must not disarm the timer.
         watchdog = ((ROOT / "tools/card_run_remote.sh").read_text(encoding="utf8") +
                     '\nrun_dir=$1\nboot_id=$2\nguard_boot || exit 92\n'
-                    'sleep "$3"\nstop_owned\n')
+                    'sleep "$3" || exit 95\ncleanup\n')
         encoded = base64.b64encode(watchdog.encode("utf8")).decode("ascii")
         self.rpc("guard_dir && printf '%s' '" + encoded + "' | base64 -d > watchdog.sh",
                  self.remaining(deadline))

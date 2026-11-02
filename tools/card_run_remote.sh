@@ -54,7 +54,7 @@ stop_owned() {
                 fi
             fi
         done
-        [ "$sig" = KILL ] || sleep 0.1
+        [ "$sig" = KILL ] || sleep 1
     done
     # A surviving owned process makes removal unsafe (e.g. uninterruptible I/O).
     for proc in /proc/[0-9]*; do
