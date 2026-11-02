@@ -2,6 +2,7 @@
 import json
 import os
 import subprocess
+from unittest import mock
 
 from test_harness import Sandbox
 import dispatch
@@ -79,6 +80,22 @@ class GccTickets(Sandbox):
         done = self.pm("start", "A-1")
         self.assertNotEqual(done.returncode, 0, done.stdout)
         self.assertEqual(self.output("branch", "--show-current"), "s0/A-2")
+
+    def test_start_keeps_uncommitted_work_on_its_own_branch(self):
+        # A session can end with reviewed GCC edits not yet committed; the next one resumes them.
+        self.start()
+        with open(os.path.join(self.gcc, "gcc", "imci.md"), "w") as f:
+            f.write("unfinished\n")
+        self.start()
+        self.assertEqual(self.output("branch", "--show-current"), self.branch)
+        self.assertEqual(self.output("status", "--porcelain"), "M gcc/imci.md")
+
+    def test_dispatcher_stops_cleanly_when_start_is_refused(self):
+        ticket = mock.Mock(id="A-1", state="doing", fields={})
+        refused = dispatch.pm.Refused("uncommitted changes in the GCC checkout")
+        with mock.patch.dict(os.environ), mock.patch.object(dispatch, "over_budget", return_value=None), \
+                mock.patch.object(dispatch.pm, "cmd_start", side_effect=refused):
+            self.assertFalse(dispatch.run_session(mock.Mock(), ticket, "engineer", False))
 
     def test_submit_refuses_dirty_gcc(self):
         self.changes()
