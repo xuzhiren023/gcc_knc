@@ -37,7 +37,7 @@ Last updated: 2026-11-02, during Sprint 0.
 - **The `0002` reproducer is compile-only and not wired in.** It shows the dropped setup in the RTL dump; no wrong result has been run on the card, nothing about it has been shown on GCC 16 (where the guard above blocks the path unmodified), and no test runs it. E2-02 wires it in.
 - **The corpus coverage numbers are a host proxy only.** S0-07 compiled with GCC 14.4 for AVX-512, nothing was run, and loop counts are not time. NPB FT, one HPCG file and three zlib gzip files did not compile and are left out. Runtime share waits for card profiles in S6.
 - **T1 cannot yet recognise a real KNC vector loop.** A correct loop closed by `jknzd` or `jkzd` fails the scan. S0-09 fixes this.
-- **The toolchain still depends on PhiWeather's folder.** On 2026-11-01, `as`, `ld` and the default sysroot all still resolved there, and every link runs PhiWeather's `ld`. They are compiled in, and `-B` does not override them. S0-08 fixes this, and S0-04 waits for it.
+- **The toolchain still depends on PhiWeather's folder.** On 2026-11-01, `as`, `ld` and the default sysroot all still resolved there, and every link runs PhiWeather's `ld`. They are compiled in: neither `-B` nor a specs file changes them (S0-08 tried specs on 2026-11-02), so the donor driver must be rebuilt. Its only source is `PhiWeather/.tools/knc-bootstrap/gcc-source`, at `af7cc04` plus one uncommitted host fix in `gcc/wide-int.h`. S0-08 waits on the owner to choose how to get that source; S0-04 waits for S0-08.
 - **The startup files from S0-03** come from the bootstrap sysroot. Only a run on the card will prove they suit the card's libc.
 
 ## Open items not on a ticket
