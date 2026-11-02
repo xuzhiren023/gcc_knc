@@ -14,6 +14,7 @@ import re
 import struct
 import subprocess
 import sys
+import tempfile
 import time
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -131,8 +132,12 @@ class Runner:
         self.cc = Path(args.cc) if args.cc else self.tool('gcc')
         self.env = os.environ.copy()
         self.env['PATH'] = os.pathsep.join(str(self.tc / p) for p in ('cross/bin', 'cygwin/bin')) + os.pathsep + self.env.get('PATH', '')
-        self.out = PROJECT / '.work/_shared/check' / args.compiler
-        self.out.mkdir(parents=True, exist_ok=True)
+        output_root = PROJECT / '.work/_shared/check'
+        output_root.mkdir(parents=True, exist_ok=True)
+        self._output = tempfile.TemporaryDirectory(dir=output_root,
+                                                  prefix=args.compiler + '-',
+                                                  ignore_cleanup_errors=True)
+        self.out = Path(self._output.name)
         self.lines = []
         self.failed = False
         self.fixture = ROOT / 'tests/acceptance/m1_affine'
@@ -232,6 +237,10 @@ class Runner:
         self.result('t2 symbol versions against card sysroot', failures)
 
     def run(self):
+        with self._output:
+            return self._run()
+
+    def _run(self):
         start = time.monotonic()
         self.say('Compiler: ' + self.command(self.cc, '--version').splitlines()[0])
         for program in ('ld', 'as'):
