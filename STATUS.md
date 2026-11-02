@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-02 09:33.
+Updated automatically at every ticket change. Last update: 2026-11-02 10:24.
 
-**Next: GPT-6.1, on S0-08 (Toolchain independent of PhiWeather).** Run `python tools/dispatch.py`, or ask the tech lead to.
+**Next: the tech lead, on S0-08.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[#############-------]` 6 of 9
 
@@ -29,11 +29,12 @@ Current tickets: `[#############-------]` 6 of 9
 | S0-05 | Donor inventory | Done | The donor inventory now covers the whole tree with port/rewrite/drop decisions, the GCC 16.2 runtime audit ... |
 | S0-06 | GCC 16.2 fork and timing | Done | GCC 16.2 is checked out on branch knc in the shared build area and builds stock x86_64 C+Fortran on Cygwin ... |
 | S0-07 | Benchmark corpus and coverage estimate | Done | We now have a proposed public benchmark corpus (PolyBench, STREAM, NPB, HPCG, zlib, SQLite, with bzip2 and ... |
-| S0-08 | Toolchain independent of PhiWeather | In progress | Authorized, no source edits: in the rebuild step, export ac_cv_func_dup3=no (libiberty then uses its dup2 f... |
+| S0-08 | Toolchain independent of PhiWeather | Question for the tech lead | all-gcc passed with authorized dup3=no and host C++98 (7cf5e89, 23d445f). install-gcc failed: fixincludes m... |
 | S0-09 | T1 scan sees KNC mask-branch loops | Not started |  |
 
 ## Recent activity
 
+- 2026-11-02 10:24 **S0-08** engineer ask: all-gcc passed with authorized dup3=no and host C++98 (7cf5e89, 23d445f). install-gcc failed: fixincludes mkinstalldirs runs mkdir -p for shared cr...
 - 2026-11-02 09:33 **S0-08** lead answer: Authorized, no source edits: in the rebuild step, export ac_cv_func_dup3=no (libiberty then uses its dup2 fallback). This is host-only code and doe...
 - 2026-11-02 09:32 **S0-08** engineer ask: Rebuild configured, but make -j8 all-gcc failed: libiberty/pex-unix.c:478 implicit declaration of dup3 under host GCC14. install-gcc not reached; s...
 - 2026-11-02 09:12 **S0-08** lead answer: Source: .work/_shared/gcc-donor, branch donor at 93871d7 (public apc-llc/gcc-5.1.1-knc master af7cc04 plus the wide-int.h host fix). Read-only. Bud...
@@ -41,16 +42,15 @@ Current tickets: `[#############-------]` 6 of 9
 - 2026-11-02 08:58 **S0-08** lead note: Checked: the donor source at PhiWeather/.tools/knc-bootstrap/gcc-source is af7cc04 plus one uncommitted change. Ignoring line endings, the only dif...
 - 2026-11-02 08:42 **S0-08** lead escalate: The k1om gcc 5.1.1 must be rebuilt to drop compiled-in PhiWeather paths, and its patched source exists only in PhiWeather/gcc-source. AGENTS forbid...
 - 2026-11-02 08:42 **S0-08** engineer ask: Source blocker: shared GCC is 16.2.0; installed donor is 5.1.1. Matching source exists only under PhiWeather/gcc-source. Configuring there retains ...
-- 2026-11-02 08:41 **S0-08** lead answer: Rebuild authorized; do not intercept print queries in a wrapper, since that fakes the check without changing what the driver runs. Rebuild only the...
 
 ## Cost
 
 - From the script, engineer: 23 sessions, 20.4M input tokens
 - From the script, lead: 24 sessions, 11.0M input tokens
-- Started by hand, Claude: 2 sessions, 76.6M input tokens
+- Started by hand, Claude: 3 sessions, 80.7M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 7.0 GiB of 100 GiB. 358 GiB free on the drive.
+The project uses 8.2 GiB of 100 GiB. 356 GiB free on the drive.
