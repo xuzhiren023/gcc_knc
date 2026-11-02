@@ -15,11 +15,14 @@ doctor = runpy.run_path(str(ROOT / "tools" / "doctor"))
 
 
 class Doctor(unittest.TestCase):
-    def check(self, required):
+    def check(self, required, startup=True):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
             (root / "sysroot/usr/include").mkdir(parents=True)
             (root / "sysroot/lib64").mkdir()
+            if startup:
+                (root / "sysroot/usr/lib64").mkdir()
+                (root / "sysroot/usr/lib64/crt1.o").touch()
             manifest = {"sysroot": "sysroot", "tools": [
                 {"name": "gcc", "path": "gcc", "version": "14.4.0",
                  "role": "host compiler", "required": True},
@@ -44,6 +47,11 @@ class Doctor(unittest.TestCase):
         self.assertNotEqual(result, 0)
         self.assertIn("MISSING expect", output)
         self.assertIn("expect", output)
+
+    def test_missing_startup_object_fails_with_path(self):
+        result, output = self.check(False, startup=False)
+        self.assertNotEqual(result, 0)
+        self.assertIn("usr/lib64/crt1.o", output.replace("\\", "/"))
 
 
 if __name__ == "__main__":
