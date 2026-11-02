@@ -1,16 +1,16 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-02 11:31.
+Updated automatically at every ticket change. Last update: 2026-11-02 11:32.
 
-**Next: the tech lead, on S0-09.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: GPT-6.1, on S0-10 (Card sysroot links Fortran, libm and pthreads).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
-Current tickets: `[################----]` 8 of 10
+Current tickets: `[##################--]` 9 of 10
 
 ## Milestones
 
 | | Milestone | State | Progress |
 |---|---|---|---|
-| M0 | Foundation | In progress | 8 of 10 tickets |
+| M0 | Foundation | In progress | 9 of 10 tickets |
 | M1 | Mixed native code | Not started | Not planned in detail yet |
 | M2 | Useful vector target | Not started | Not planned in detail yet |
 | M3 | Runtimes | Not started | Not planned in detail yet |
@@ -30,11 +30,12 @@ Current tickets: `[################----]` 8 of 10
 | S0-06 | GCC 16.2 fork and timing | Done | GCC 16.2 is checked out on branch knc in the shared build area and builds stock x86_64 C+Fortran on Cygwin ... |
 | S0-07 | Benchmark corpus and coverage estimate | Done | We now have a proposed public benchmark corpus (PolyBench, STREAM, NPB, HPCG, zlib, SQLite, with bzip2 and ... |
 | S0-08 | Toolchain independent of PhiWeather | Done | The shared k1om gcc, g++ and gfortran were rebuilt so their assembler, linker and sysroot all resolve insid... |
-| S0-09 | T1 scan sees KNC mask-branch loops | Waiting for review | Added direct loops cases for jne, je, jknzd and jkzd plus seeded mask-branch T1 cases and missing-backedge ... |
+| S0-09 | T1 scan sees KNC mask-branch loops | Done | The T1 check now recognises KNC vector loops that close with the mask branches jknzd and jkzd, so correct G... |
 | S0-10 | Card sysroot links Fortran, libm and pthreads | Not started |  |
 
 ## Recent activity
 
+- 2026-11-02 11:32 **S0-09** lead approve: The T1 check now recognises KNC vector loops that close with the mask branches jknzd and jkzd, so correct GCC 16 vector loops will no longer be wro...
 - 2026-11-02 11:31 **S0-09** engineer submit: Added direct loops cases for jne, je, jknzd and jkzd plus seeded mask-branch T1 cases and missing-backedge mutation. Red run: 8 tests, 4 expected m...
 - 2026-11-02 11:29 **S0-04** lead approve: The card runner now safely runs one program on the card with a shared lock, refuses if anything foreign is running, enforces a card-side time limit...
 - 2026-11-02 11:28 **S0-04** engineer submit: RED 07590f2 failed as expected: card_timeout 35.0 was not an int. GREEN ade6efe: nine T0 tests passed once through bootstrap Cygwin python3.12.exe ...
@@ -42,7 +43,6 @@ Current tickets: `[################----]` 8 of 10
 - 2026-11-02 11:24 **S0-04** engineer submit: RED 8787e21 failed as expected for missing shared lock resolver, kernel classification and card-side limit. GREEN 9c96b5e: nine T0 cases passed onc...
 - 2026-11-02 11:14 **S0-04** lead answer: Both answered. (1) The two ignore lines are approved, but .gitignore is protected and an engineer cannot submit a change to it. Drop the .gitignore...
 - 2026-11-02 11:13 **S0-04** engineer ask: GREEN commit 9fa9ab4: seven T0 cases passed once via s0-04-green; log .work/_state/logs/s0_04_green-20261102-111228.log. Native acceptance remains ...
-- 2026-11-02 11:06 **S0-04** lead approve-red: The card runner's safety contract and seven fake-card tests are approved, including the check that a process just outside our private run directory...
 
 ## Cost
 
