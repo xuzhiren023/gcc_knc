@@ -47,6 +47,10 @@ def rebuild(args):
     os.environ['ac_cv_func_dup3'] = 'no'
     print('Host configure override: ac_cv_func_dup3=no (libiberty dup2 fallback)',
           flush=True)
+    # GCC 5 uses bool increment in reload1.c, removed in the modern host's
+    # default C++17 mode. This flag applies only to building host executables.
+    os.environ['CXXFLAGS'] = '-g -O2 -std=gnu++98'
+    print('Host CXXFLAGS: ' + os.environ['CXXFLAGS'], flush=True)
     # Installed donor's final configure invocation, with only its source location,
     # prefix, sysroot, assembler and linker relocated (S0-08 lead instruction).
     flags = [
