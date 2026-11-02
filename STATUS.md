@@ -26,7 +26,7 @@ Current tickets: `[######--------------]` 3 of 9
 | S0-02 | ISA lint | Done | knc_lint now rejects the listed non-KNC instructions in .s, .o, archives, shared objects and executables, a... |
 | S0-03 | Test runner and red baseline | Done | tools/check now runs t0, t1 and t2 on the donor in about 16 seconds and records the expected baseline, with... |
 | S0-04 | Card runner | Not started |  |
-| S0-05 | Donor inventory | Changes requested | (1) docs/research/donor-inventory.md: the benign conclusion is wrong. drive_channel_rsl is benign, but the ... |
+| S0-05 | Donor inventory | In progress | (1) docs/research/donor-inventory.md: the benign conclusion is wrong. drive_channel_rsl is benign, but the ... |
 | S0-06 | GCC 16.2 fork and timing | Not started | Engineer sessions have no network, so do not clone. The owner or lead creates .work/_shared/gcc outside the... |
 | S0-07 | Benchmark corpus and coverage estimate | Not started |  |
 | S0-08 | Toolchain independent of PhiWeather | Not started | Also in scope, from the S0-03 review: nothing recreates the hand-made sysroot files (crt1.o, crti.o, crtn.o... |
@@ -47,7 +47,7 @@ Current tickets: `[######--------------]` 3 of 9
 
 - From the script, engineer: 15 sessions, 8.8M input tokens
 - From the script, lead: 16 sessions, 9.3M input tokens
-- Started by hand, Claude: 2 sessions, 63.8M input tokens
+- Started by hand, Claude: 2 sessions, 64.0M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
