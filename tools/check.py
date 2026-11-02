@@ -160,13 +160,16 @@ class Runner:
         return result.stdout
 
     def t0(self):
-        # All maintained Python regressions, including seeded scanner mutations.
-        for directory in ('tests/regress', 'tests/tools'):
+        # Compiler regressions only; pm/git/dispatch suites have separate runners.
+        for directory, pattern in (('tests/regress', 'test_*.py'),
+                                   ('tests/tools', 'test_doctor.py'),
+                                   ('tests/tools', 'test_knc_lint.py')):
+            label = directory + '/' + pattern
             try:
-                output = self.command(sys.executable, '-m', 'unittest', 'discover', '-s', directory, '-p', 'test_*.py')
-                self.say('PASS t0 ' + directory + ': ' + ' '.join(output.strip().splitlines()[-3:]))
+                output = self.command(sys.executable, '-m', 'unittest', 'discover', '-s', directory, '-p', pattern)
+                self.say('PASS t0 ' + label + ': ' + ' '.join(output.strip().splitlines()[-3:]))
             except (OSError, RuntimeError, subprocess.TimeoutExpired) as error:
-                self.result('t0 ' + directory, [str(error)])
+                self.result('t0 ' + label, [str(error)])
 
     def t1(self):
         source = (self.fixture / 'loops.c').read_text()
@@ -191,7 +194,13 @@ class Runner:
         driver = self.out / 'driver.o'
         elf = self.out / 'm1_affine.mic'
         self.command(self.cc, *self.flags, '-ffp-contract=off', '-c', self.fixture / 'driver.c', '-o', driver)
-        self.command(self.cc, '--sysroot=' + str(self.sysroot), driver, loops_obj, '-o', elf)
+        trace = self.command(self.cc, '--sysroot=' + str(self.sysroot), driver, loops_obj,
+                             '-Wl,--trace', '-o', elf)
+        for library in ('libc.so.6', 'ld-linux-k1om.so.2'):
+            paths = [line.strip() for line in trace.splitlines() if line.strip().endswith('/' + library)]
+            if not paths or any(not path.startswith(str(self.sysroot) + '/') for path in paths):
+                raise RuntimeError('link trace outside shared sysroot or missing ' + library + ': ' + repr(paths))
+            self.say('T2 link trace: ' + '; '.join(paths))
         self.result('t2 ELF machine and interpreter', scan_elf(elf.read_bytes()))
         required = versioned_symbols(self.command(self.tool('readelf'), '--dyn-syms', '--wide', elf), True)
         # Resolve version requirements against each named library in the card sysroot,
@@ -215,8 +224,12 @@ class Runner:
     def run(self):
         start = time.monotonic()
         self.say('Compiler: ' + self.command(self.cc, '--version').splitlines()[0])
+        for program in ('ld', 'as'):
+            self.say('Compiler ' + program + ': ' + self.command(self.cc, '-print-prog-name=' + program).strip())
         self.say('Flags: -O2 -ftree-vectorize -ffp-contract=off / fast; separate driver translation unit')
         self.say('T2 ABI reference: ' + str(self.sysroot) + ' (no native card execution in t0-t2)')
+        if self.args.compiler == 'donor':
+            self.say('Development files: crt1.o, crti.o, crtn.o, libc.so, libc_nonshared.a from PhiWeather/.tools/knc-bootstrap/sysroot/usr/lib64; origin differs from card runtime. Runtime libraries and loader retained from card; T3 on card is the final proof.')
         for tier in self.args.tiers:
             try:
                 getattr(self, tier)()
