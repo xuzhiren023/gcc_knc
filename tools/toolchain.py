@@ -49,9 +49,14 @@ def gcc16(args):
         raise RuntimeError('missing shared GCC source; ask the lead')
     if build.resolve() != SHARED.resolve() / 'gcc-build' or build.is_symlink():
         raise RuntimeError('refusing to clean unexpected build directory: ' + str(build))
-    if build.exists():
-        shutil.rmtree(build)
-    build.mkdir()
+    resume = getattr(args, 'resume', False)
+    if resume:
+        if not (build / 'config.status').is_file():
+            raise RuntimeError('missing configured shared GCC build to resume')
+    else:
+        if build.exists():
+            shutil.rmtree(build)
+        build.mkdir()
     # As in S0-06, keep host compiler temporaries in the shared area.
     os.environ['TMPDIR'] = str(SHARED / 'tmp')
     Path(os.environ['TMPDIR']).mkdir(exist_ok=True)
@@ -66,8 +71,10 @@ def gcc16(args):
         '--disable-libsanitizer', '--disable-libitm', '--disable-libcilkrts',
         '--disable-libvtv', '--disable-libmpx', '--disable-libgomp',
     ]
-    for label, argv in (('configure', ('bash', source / 'configure', *flags)),
-                        ('full all-gcc', ('make', '-j8', 'all-gcc'))):
+    steps = [('configure', ('bash', source / 'configure', *flags))] if not resume else []
+    steps.append(('resumed all-gcc' if resume else 'full all-gcc',
+                  ('make', '-j8', 'all-gcc')))
+    for label, argv in steps:
         start = time.monotonic()
         try:
             command(*argv, cwd=build)
@@ -270,6 +277,8 @@ def main():
     parser.add_argument('--development-files')
     parser.add_argument('--install-only', action='store_true',
                         help='resume rebuild at staged install-gcc without rebuilding')
+    parser.add_argument('--resume', action='store_true',
+                        help='resume gcc16 in its existing configured shared build')
     args = parser.parse_args()
     try:
         globals()[args.step](args)
