@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-02 10:26.
+Updated automatically at every ticket change. Last update: 2026-11-02 10:27.
 
-**Next: the tech lead, on S0-08.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: GPT-6.1, on S0-08 (Toolchain independent of PhiWeather).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
 Current tickets: `[#############-------]` 6 of 9
 
@@ -29,11 +29,12 @@ Current tickets: `[#############-------]` 6 of 9
 | S0-05 | Donor inventory | Done | The donor inventory now covers the whole tree with port/rewrite/drop decisions, the GCC 16.2 runtime audit ... |
 | S0-06 | GCC 16.2 fork and timing | Done | GCC 16.2 is checked out on branch knc in the shared build area and builds stock x86_64 C+Fortran on Cygwin ... |
 | S0-07 | Benchmark corpus and coverage estimate | Done | We now have a proposed public benchmark corpus (PolyBench, STREAM, NPB, HPCG, zlib, SQLite, with bzip2 and ... |
-| S0-08 | Toolchain independent of PhiWeather | Question for the tech lead | Staging scope conflict: cygpath -w /tmp/knc-stage resolves to C:\Users\xuzhi\Documents\gcc_knc\.work\_share... |
+| S0-08 | Toolchain independent of PhiWeather | In progress | Authorized: use /tmp/knc-stage in the shared Cygwin. My 'outside C:\Users' was imprecise; what matters is t... |
 | S0-09 | T1 scan sees KNC mask-branch loops | Not started |  |
 
 ## Recent activity
 
+- 2026-11-02 10:27 **S0-08** lead answer: Authorized: use /tmp/knc-stage in the shared Cygwin. My 'outside C:\Users' was imprecise; what matters is that the Cygwin path mkdir -p walks does ...
 - 2026-11-02 10:26 **S0-08** engineer ask: Staging scope conflict: cygpath -w /tmp/knc-stage resolves to C:\Users\xuzhi\Documents\gcc_knc\.work\_shared\toolchain\cygwin\tmp\knc-stage. TEMP/T...
 - 2026-11-02 10:24 **S0-08** lead answer: Not an environment problem to escalate: Cygwin mkdir -p walks every path component and gets EACCES on C:\Users\xuzhi, which already exists. Install...
 - 2026-11-02 10:24 **S0-08** engineer ask: all-gcc passed with authorized dup3=no and host C++98 (7cf5e89, 23d445f). install-gcc failed: fixincludes mkinstalldirs runs mkdir -p for shared cr...
@@ -41,7 +42,6 @@ Current tickets: `[#############-------]` 6 of 9
 - 2026-11-02 09:32 **S0-08** engineer ask: Rebuild configured, but make -j8 all-gcc failed: libiberty/pex-unix.c:478 implicit declaration of dup3 under host GCC14. install-gcc not reached; s...
 - 2026-11-02 09:12 **S0-08** lead answer: Source: .work/_shared/gcc-donor, branch donor at 93871d7 (public apc-llc/gcc-5.1.1-knc master af7cc04 plus the wide-int.h host fix). Read-only. Bud...
 - 2026-11-02 09:12 **S0-08** owner decide: Owner on 2026-11-02: option (a). One-time exception to the never-copy rule: the lead copies the donor GCC source into .work/_shared/gcc-donor; afte...
-- 2026-11-02 08:58 **S0-08** lead note: Checked: the donor source at PhiWeather/.tools/knc-bootstrap/gcc-source is af7cc04 plus one uncommitted change. Ignoring line endings, the only dif...
 
 ## Cost
 
