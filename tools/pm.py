@@ -71,8 +71,8 @@ class Board:
 
     def budget(self, ticket):
         budget = dict(self.policy["budgets"][ticket.fields.get("depth", "standard")])
-        # The lead can raise these on a ticket: many small test files, or sessions lost to harness faults.
-        for limit in ("new_test_files", "sessions"):
+        # The lead can raise these on a ticket: many small test files, sessions lost to harness faults, or owner-granted room.
+        for limit in ("new_test_files", "sessions", "input_tokens"):
             if ticket.fields.get(limit):
                 budget[limit] = int(ticket.fields[limit])
         return budget
