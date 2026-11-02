@@ -26,7 +26,7 @@ Current tickets: `[#######-------------]` 3 of 8
 | S0-02 | ISA lint | Done | knc_lint now rejects the listed non-KNC instructions in .s, .o, archives, shared objects and executables, a... |
 | S0-03 | Test runner and red baseline | Done | tools/check now runs t0, t1 and t2 on the donor in about 16 seconds and records the expected baseline, with... |
 | S0-04 | Card runner | Not started |  |
-| S0-05 | Donor inventory | Not started |  |
+| S0-05 | Donor inventory | In progress |  |
 | S0-06 | GCC 16.2 fork and timing | Not started |  |
 | S0-07 | Benchmark corpus and coverage estimate | Not started |  |
 | S0-08 | Toolchain independent of PhiWeather | Not started | Tested: `gcc -v` shows `--with-as`, `--with-ld` and `--with-sysroot` compiled in with PhiWeather paths, and... |
