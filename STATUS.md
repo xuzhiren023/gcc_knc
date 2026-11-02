@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-02 11:29.
+Updated automatically at every ticket change. Last update: 2026-11-02 11:30.
 
 **Next: GPT-6.1, on S0-09 (T1 scan sees KNC mask-branch loops).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
@@ -30,7 +30,7 @@ Current tickets: `[################----]` 8 of 10
 | S0-06 | GCC 16.2 fork and timing | Done | GCC 16.2 is checked out on branch knc in the shared build area and builds stock x86_64 C+Fortran on Cygwin ... |
 | S0-07 | Benchmark corpus and coverage estimate | Done | We now have a proposed public benchmark corpus (PolyBench, STREAM, NPB, HPCG, zlib, SQLite, with bzip2 and ... |
 | S0-08 | Toolchain independent of PhiWeather | Done | The shared k1om gcc, g++ and gfortran were rebuilt so their assembler, linker and sysroot all resolve insid... |
-| S0-09 | T1 scan sees KNC mask-branch loops | Not started |  |
+| S0-09 | T1 scan sees KNC mask-branch loops | In progress |  |
 | S0-10 | Card sysroot links Fortran, libm and pthreads | Not started |  |
 
 ## Recent activity
