@@ -22,3 +22,6 @@
 # Local tool state
 __pycache__/
 *.pyc
+
+# Owner-supplied card connection settings (S0-04)
+/config/card.local.json
