@@ -23,6 +23,9 @@ The work is in tickets, in `work/tickets/S1-*.md`, in this order:
 - [ ] All stories approved and merged, or explicitly returned to the backlog
 - [ ] `CURRENT_STATE.md` updated, and the GCC `knc` branch is ready for the owner to push
 - [ ] Milestone M0 review held: go, adjust or stop, decided by the owner
+- [ ] On go, with every M0 requirement met and all tests passing in the lead's own rerun: a local
+  milestone commit updating `work/milestones.json`, and a local `milestone/M0` tag here and on the
+  GCC fork's `knc` branch. Nothing is pushed (owner, 2026-11-02)
 - [ ] Sprint 2 refined from E2
 - [ ] Three-line retro below
 
