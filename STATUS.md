@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-02 15:54.
+Updated automatically at every ticket change. Last update: 2026-11-02 15:57.
 
-**Next: GPT-6.1, on S1-04 (-march=knc with no SSE, AVX, MMX, CMOV, FCOMI or MFENCE).** Run `python tools/dispatch.py`, or ask the tech lead to.
+**Next: the tech lead, on S1-04.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[###############-----]` 13 of 17
 
@@ -35,13 +35,14 @@ Current tickets: `[###############-----]` 13 of 17
 | S1-01 | Tickets can change the GCC fork | Done | Tickets marked gcc: yes now get their own branch in the GCC fork, count its changes in the size budget, sho... |
 | S1-02 | GCC 16.2 builds for k1om-mpss-linux | Done | GCC 16.2 now configures and builds its C compiler for k1om-mpss-linux, using the shared KNC assembler, link... |
 | S1-03 | tools/check runs source-level tests against GCC 16 | Done | tools/check t1 --compiler gcc16 now compiles each tests/t1/*.c test and checks its scan, scan-not, per-func... |
-| S1-04 | -march=knc with no SSE, AVX, MMX, CMOV, FCOMI or MFENCE | In progress | Rebuild GCC with the logged gcc16 step of tools/toolchain.py as ONE blocking foreground shell call with a t... |
+| S1-04 | -march=knc with no SSE, AVX, MMX, CMOV, FCOMI or MFENCE | Tests waiting for review | Red commit d49055b: 11 T1 sources. tools/check t1 --compiler gcc16 failed on missing KNC macros, unknown ma... |
 | S1-05 | Integer C assembles with as 2.22 and lints clean | Not started | Rebuild GCC with the logged gcc16 step of tools/toolchain.py as ONE blocking foreground shell call with a t... |
 | S1-06 | K1OM link defaults | Not started | Rebuild GCC with the logged gcc16 step of tools/toolchain.py as ONE blocking foreground shell call with a t... |
 | S1-07 | Milestone M0 evidence note | Not started | Rebuild GCC with the logged gcc16 step of tools/toolchain.py as ONE blocking foreground shell call with a t... |
 
 ## Recent activity
 
+- 2026-11-02 15:57 **S1-04** engineer red: Red commit d49055b: 11 T1 sources. tools/check t1 --compiler gcc16 failed on missing KNC macros, unknown march=knc, five option-conflict diagnostic...
 - 2026-11-02 15:50 **S1-03** lead approve: tools/check t1 --compiler gcc16 now compiles each tests/t1/*.c test and checks its scan, scan-not, per-function and expected-error directives, and ...
 - 2026-11-02 15:50 **S1-03** owner decide: Owner on 2026-11-02: approve and merge S1-03 on the lead verification at 15:45 (smoke.c passes with GCC 16, donor matches baseline). No further eng...
 - 2026-11-02 15:45 **S1-07** lead note: Rebuild GCC with the logged gcc16 step of tools/toolchain.py as ONE blocking foreground shell call with a timeout of at least 75 minutes, never in ...
@@ -49,7 +50,6 @@ Current tickets: `[###############-----]` 13 of 17
 - 2026-11-02 15:45 **S1-05** lead note: Rebuild GCC with the logged gcc16 step of tools/toolchain.py as ONE blocking foreground shell call with a timeout of at least 75 minutes, never in ...
 - 2026-11-02 15:45 **S1-04** lead note: Rebuild GCC with the logged gcc16 step of tools/toolchain.py as ONE blocking foreground shell call with a timeout of at least 75 minutes, never in ...
 - 2026-11-02 15:44 **S1-03** lead escalate: budget: 2 engineer sessions used; the budget is 2
-- 2026-11-02 15:44 **S1-03** lead changes: 1. tests/t1/smoke.c:1 - gcc16 smoke acceptance is unverified: the lead's run of 'python tools/check t1 --compiler gcc16' was refused by the session...
 
 ## Cost
 
@@ -61,4 +61,4 @@ Current tickets: `[###############-----]` 13 of 17
 
 ## Disk
 
-The project uses 9.3 GiB of 100 GiB. 335 GiB free on the drive.
+The project uses 9.3 GiB of 100 GiB. 333 GiB free on the drive.
