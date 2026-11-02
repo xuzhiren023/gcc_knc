@@ -1,17 +1,19 @@
 # Donor inventory (S0-05)
 
 Status: full-tree donor inventory and GCC 16.2 runtime/LRA source review complete.
-**Acceptance remains incomplete:** no reduced patch 0002 reproducer was obtained.
-The corrected Fortran compilations reached LRA and produced differing assembly;
-a self-contained extraction lost that difference. No demonstrated wrong-code
-failure/passing pair, GCC 16 execution, or card result is claimed.
+The targeted full-source follow-up shows that the previously suspected missing
+`1320(%rsp)` load is benign: the donor reloads the descriptor before both uses.
+Submission follows the owner's 2026-11-02 decision allowing function-level
+benign-load evidence. **No reduced patch 0002 reproducer is claimed**; that
+original acceptance item remains unticked. No GCC 16 execution or card result
+is claimed.
 
 - [x] Entire donor tree covered against its recorded gcc-5 branch baseline.
 - [x] Donor changes classified with reasons and GCC 16 landing locations.
 - [x] Separate GCC 16.2 runtime dependency audit (F6), with file:line evidence.
 - [x] Vector code generation scope and tuning recorded.
 - [x] GCC 16 secondary-reload mechanism inspected.
-- [ ] Reduced 0002 reproducer in `tests/regress/` (extraction lost the difference).
+- [ ] Reduced 0002 reproducer in `tests/regress/` (suspected full-source load difference is benign; see follow-up).
 
 ## Comparison boundary
 
@@ -274,8 +276,9 @@ Logs under `.work/_state/logs/`:
 
 Temporary source copies, scripts, module files, assembly and RTL dumps were
 removed after inspection. No compiler build, assembler, GCC 16 compiler execution
-or card test ran. The lead's session bound applies: the reduced reproducer remains
-unticked for review; neither executable's patch status is proven by these runs.
+or card test ran. At that point the lead's session bound applied; the owner later lifted it. The
+reduced reproducer remains unticked; neither executable's patch status is proven
+by those runs.
 
 ## Separate GCC 16.2 runtime audit (F6)
 
@@ -352,3 +355,103 @@ MXCSR support is a control-state requirement, not authorization to set
 `TARGET_AVX512F`, SSE/AVX flags, fast-math, or reduced precision. libgomp and
 libitm dependencies above are independently relevant even without floating-point
 work. These findings identify port work; they claim no native runtime passes.
+
+
+## Targeted function-level follow-up (2026-11-02)
+
+The owner required the full-source difference to be traced before further
+reduction, and authorized submission once function-level evidence shows that
+load difference is benign. This pass reaches that alternative. It does not
+establish whole-program correctness or a passing/failing patch 0002 pair.
+
+Copied the same ticket-specified original into
+`tests/out/module_channel_routing.F90`, and ran the exact complete-flags command
+in **Corrected compilation and bounded reduction**, including
+`-S -fdump-rtl-reload`, with `name=donor` / `reference`. After each compile the
+script moved `tests/out/module_channel_routing.F90.*reload` to
+`tests/out/$name.reload`, preserving both dumps for comparison. Module output
+and assembly stayed in this worktree; PhiWeather was read-only.
+
+Exact runner commands (bootstrap `cross/bin` and `cygwin/bin` on PATH, bootstrap
+Cygwin `python3.12.exe`):
+
+```text
+python3.12.exe tools/run.py --name S0-05-donor-trace --inputs tests/out/module_channel_routing.F90 tests/out/compile-routing.sh -- bash tests/out/compile-routing.sh donor
+python3.12.exe tools/run.py --name S0-05-reference-trace --inputs tests/out/module_channel_routing.F90 tests/out/compile-routing.sh -- bash tests/out/compile-routing.sh reference
+```
+
+Both exited 0 with no diagnostics. Logs under `.work/_state/logs/`:
+`S0_05_donor_trace-20261102-001047.log` and
+`S0_05_reference_trace-20261102-001057.log`. These successes mean compilation
+completed, not that either generated program ran correctly.
+
+### Function comparison
+
+Split each assembly at `.type <symbol>, @function` through its matching `.size`.
+Of 18 functions, 15 were byte-for-byte identical. `checkreach_` differed only in
+local numeric labels (identical after renaming labels in order of occurrence).
+The two functions with other differences were:
+
+| Symbol | Observation |
+| --- | --- |
+| `__module_channel_routing_MOD_drive_channel_rsl` | Holds the reported missing prologue load. Register allocation, reload placement and spill-slot offsets differ; the specific descriptor setup is preserved, as traced below. |
+| `__module_channel_routing_MOD_drive_channel` | Different register allocation, stack frame (1256 vs 1240 bytes), spill offsets and instruction sequences. This separate difference is not evidence of a dropped setup, and has not been proved globally benign. It is not the function holding the reported prologue load. |
+
+### The reported load is preserved at its uses
+
+The reference's `reference.s:3894`, `movq 1320(%rsp), %r14`, belongs to
+`drive_channel_rsl`. Final reload RTL identifies it as insn **38**, loading the
+`typel` descriptor (argument 10), not a missing address setup for a masked
+floating store. Its `REG_EQUIV` is `[argp+24]`. Both functions have the same
+1240-byte local frame and CFA offset 1296, so `[rsp+1320]` names the same
+incoming argument in each.
+
+The reference keeps that descriptor in `%r14` through its two descriptor reads.
+The donor rematerializes it in `%rax` immediately before each read, with no
+intervening branch or clobber. The matching original instruction IDs and source
+annotations identify the same operations:
+
+| Operation | Donor final reload RTL | Reference final reload RTL |
+| --- | --- | --- |
+| Descriptor stride at source line 1615 | **6253**: `ax = [sp+1320]` (`typel`); immediately **288**: `ax = [ax+24]` (`typel.dim[0].stride`) | **38**: `r14 = [sp+1320]` in entry block; **288**: `ax = [r14+24]` |
+| Save stride | **6046**: `[sp+280] = ax` | **6046**: `[sp+280] = ax` |
+| Descriptor data pointer at source line 1615 | **6252**: `ax = [sp+1320]` (`typel`); immediately **294**: `ax = [ax]` (`typel.data`) | **294**: `ax = [r14]`, still using entry load **38** |
+| Save data pointer | **5325**: `[sp+32] = ax` | **5325**: `[sp+16] = ax` |
+| First later element use, source line 1952 | **5821** loads `typel.0` from `[sp+32]`; **2447** forms `r9 = bx + ax*4`; **2448** compares `[r9]` with 2 | Same original IDs, using `[sp+16]` for the pointer spill |
+| Second later element use, source line 2067 | **5238** loads `typel.0` from `[sp+32]` into `r8`; **3033** compares `[r8+r11*4]` with 2 | Same original IDs, using `[sp+16]` for the pointer spill |
+
+For locating these in regenerated full dumps, this run's donor positions were
+`donor.reload:220918` (6253), `220922` (288), `220948` (6252), `220952` (294),
+`220955` (5325), `230337` (5821), and `232612` (5238). Reference positions were
+`reference.reload:189585` (38), `190149` (288), `190175` (294), `190178` (5325),
+`199315` (5821), and `201594` (5238). Instruction IDs and the expressions above
+are the durable comparison evidence; dump line numbers depend on the command.
+
+The matching donor assembly reads:
+
+```asm
+movq 1320(%rsp), %rax
+movq 24(%rax), %rax
+movq %rax, 280(%rsp)
+# stride-zero test and possible replacement by 1
+movq 1320(%rsp), %rax
+movq (%rax), %rax
+movq %rax, 32(%rsp)
+```
+
+Thus there is no store with an uninitialized address attributable to the
+reported missing load: its two uses are descriptor **loads**, and both have
+explicit, preserved address setup in the donor. The resulting data pointer is
+saved and reloaded at the later element comparisons in both variants. Absence
+of the reference's early `%r14` load is benign for this chain. It cannot justify
+extracting `SUBMUSKINGCUNGE`, or treating any mere assembly difference or
+`Deleting move` diagnostic as a patch 0002 failure.
+
+Step 3 therefore did not find the alleged dropped setup; step 4 (extracting a
+function with a demonstrated failure) has no established symptom to preserve.
+No substitute regression was added. The reduced-reproducer checkbox remains
+unticked, explicitly using the owner's benign-load submission condition. The
+GCC 16 register-only guard finding above remains unchanged. Temporary full
+source, modules, assembly, dumps and comparison files were removed after this
+inspection. No additional compile, compiler build, assembler, or card run was
+performed.
