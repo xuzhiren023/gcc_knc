@@ -1,0 +1,18 @@
+Compiler: k1om-mpss-linux-gcc (GCC) 5.1.1
+Flags: -O2 -ftree-vectorize -ffp-contract=off / fast; separate driver translation unit
+T2 ABI reference: /cygdrive/c/Users/xuzhi/Documents/gcc_knc/.work/_shared/toolchain/sysroot (no native card execution in t0-t2)
+PASS t0 tests/regress: Ran 3 tests in 0.014s  OK
+FAIL t0 tests/tools: Command '['/usr/bin/python3.12.exe', '-m', 'unittest', 'discover', '-s', 'tests/tools', '-p', 'test_*.py']' timed out after 60 seconds
+PASS t1 off assembly --march=k1om
+PASS t1 off knc_lint
+FAIL t1 off function scans: affine_f32: no packed `zmm` arithmetic; affine_f32: no -fopt-info-vec report for this loop; affine_f64: no packed `zmm` arithmetic; affine_f64: no -fopt-info-vec report for this loop
+PASS t1 fast assembly --march=k1om
+PASS t1 fast knc_lint
+FAIL t1 fast function scans: affine_f32: no packed `zmm` arithmetic; affine_f32: no -fopt-info-vec report for this loop; affine_f64: no packed `zmm` arithmetic; affine_f64: no -fopt-info-vec report for this loop
+FAIL t2 infrastructure: command /cygdrive/c/Users/xuzhi/Documents/gcc_knc/.work/_shared/toolchain/cross/bin/k1om-mpss-linux-gcc.exe --sysroot=/cygdrive/c/Users/xuzhi/Documents/gcc_knc/.work/_shared/toolchain/sysroot /cygdrive/c/Users/xuzhi/Documents/gcc_knc/.work/_shared/check/donor/driver.o /cygdrive/c/Users/xuzhi/Documents/gcc_knc/.work/_shared/check/donor/loops-off.o -o /cygdrive/c/Users/xuzhi/Documents/gcc_knc/.work/_shared/check/donor/m1_affine.mic exited 1: /cygdrive/c/Users/xuzhi/Documents/PhiWeather/.tools/knc-bootstrap/cross/bin/k1om-mpss-linux-ld: cannot find crt1.o: No such file or directory
+/cygdrive/c/Users/xuzhi/Documents/PhiWeather/.tools/knc-bootstrap/cross/bin/k1om-mpss-linux-ld: cannot find crti.o: No such file or directory
+/cygdrive/c/Users/xuzhi/Documents/PhiWeather/.tools/knc-bootstrap/cross/bin/k1om-mpss-linux-ld: cannot find -lc
+/cygdrive/c/Users/xuzhi/Documents/PhiWeather/.tools/knc-bootstrap/cross/bin/k1om-mpss-linux-ld: cannot find crtn.o: No such file or directory
+collect2: error: ld returned 1 exit status
+
+Elapsed: 62.38 seconds
