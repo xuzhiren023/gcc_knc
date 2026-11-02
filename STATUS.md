@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-02 08:42.
+Updated automatically at every ticket change. Last update: 2026-11-02 09:12.
 
-**Waiting for you:** S0-08. Run `python tools/pm.py inbox`.
+**Next: the tech lead, on S0-08.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[#############-------]` 6 of 9
 
@@ -29,28 +29,28 @@ Current tickets: `[#############-------]` 6 of 9
 | S0-05 | Donor inventory | Done | The donor inventory now covers the whole tree with port/rewrite/drop decisions, the GCC 16.2 runtime audit ... |
 | S0-06 | GCC 16.2 fork and timing | Done | GCC 16.2 is checked out on branch knc in the shared build area and builds stock x86_64 C+Fortran on Cygwin ... |
 | S0-07 | Benchmark corpus and coverage estimate | Done | We now have a proposed public benchmark corpus (PolyBench, STREAM, NPB, HPCG, zlib, SQLite, with bzip2 and ... |
-| S0-08 | Toolchain independent of PhiWeather | **Waiting for you** | The k1om gcc 5.1.1 must be rebuilt to drop compiled-in PhiWeather paths, and its patched source exists only... |
+| S0-08 | Toolchain independent of PhiWeather | Question for the tech lead | Owner on 2026-11-02: option (a). One-time exception to the never-copy rule: the lead copies the donor GCC s... |
 | S0-09 | T1 scan sees KNC mask-branch loops | Not started |  |
 
 ## Recent activity
 
+- 2026-11-02 09:12 **S0-08** owner decide: Owner on 2026-11-02: option (a). One-time exception to the never-copy rule: the lead copies the donor GCC source into .work/_shared/gcc-donor; afte...
+- 2026-11-02 08:58 **S0-08** lead note: Checked: the donor source at PhiWeather/.tools/knc-bootstrap/gcc-source is af7cc04 plus one uncommitted change. Ignoring line endings, the only dif...
 - 2026-11-02 08:42 **S0-08** lead escalate: The k1om gcc 5.1.1 must be rebuilt to drop compiled-in PhiWeather paths, and its patched source exists only in PhiWeather/gcc-source. AGENTS forbid...
 - 2026-11-02 08:42 **S0-08** engineer ask: Source blocker: shared GCC is 16.2.0; installed donor is 5.1.1. Matching source exists only under PhiWeather/gcc-source. Configuring there retains ...
 - 2026-11-02 08:41 **S0-08** lead answer: Rebuild authorized; do not intercept print queries in a wrapper, since that fakes the check without changing what the driver runs. Rebuild only the...
 - 2026-11-02 08:40 **S0-08** engineer ask: Reserved specs attempt failed: ../_shared/s0_08_specs_probe.py overrides *linker and *invoke_as to shared paths and passes --sysroot. Both print-pr...
 - 2026-11-02 08:34 **S0-07** lead approve: We now have a proposed public benchmark corpus (PolyBench, STREAM, NPB, HPCG, zlib, SQLite, with bzip2 and two PolyBench kernels held out) and a co...
 - 2026-11-02 08:32 **S0-07** engineer submit: d620e4a: corpus report and measurement scripts. GCC 14.4 compile-only proxy via tools/run.py: STREAM, 8 PolyBench, NPB CG/EP/MG/IS, SQLite, bzip2 c...
-- 2026-11-02 08:14 **S0-07** lead answer: Sources are in .work/_shared/corpus/, read-only, with SHA-256, size and URL for each in SOURCES.txt: polybench-c-4.2.1-beta.tar.gz, stream.c (5.10)...
-- 2026-11-02 08:14 **S0-07** owner decide: Owner on 2026-11-02: yes, the lead downloads the benchmark sources into .work/_shared/corpus/.
 
 ## Cost
 
 - From the script, engineer: 22 sessions, 19.1M input tokens
 - From the script, lead: 23 sessions, 10.8M input tokens
-- Started by hand, Claude: 2 sessions, 71.0M input tokens
+- Started by hand, Claude: 2 sessions, 75.5M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 6.4 GiB of 100 GiB. 361 GiB free on the drive.
+The project uses 7.0 GiB of 100 GiB. 361 GiB free on the drive.
