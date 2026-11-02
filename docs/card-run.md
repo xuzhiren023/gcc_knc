@@ -1,8 +1,8 @@
-# S0-04 card runner contract (RED review)
+# S0-04 card runner
 
 Source: `docs/DEVELOPMENT_CYCLE.md`, section 9, and the S0-04 lead answer
-of 2026-11-02 10:39. This change proposes the interface and failing T0 tests;
-implementation and native runs wait for review approval.
+of 2026-11-02 10:39. The spec and RED tests were approved on 2026-11-02.
+Native acceptance remains subject to the owner's card hold.
 
 ## Entry point and configuration
 
@@ -21,6 +21,25 @@ C:/Windows/System32/OpenSSH/ssh.exe -F NUL -i <identity>
   -o GlobalKnownHostsFile=NUL -o UserKnownHostsFile=<knownHosts>
   -o HostKeyAlgorithms=ssh-ed25519 -o ConnectTimeout=5 root@<host>
 ```
+
+Copy `config/card.example.json` to the local file and fill in the owner paths.
+Configure `externalLocks` with every other project's lock for this card and
+`baselineNames` with reviewed system daemon/kernel thread names. The empty
+allowlist in the example fails closed. Do not allow general job/interpreter
+names such as `sh`. Optional `ownLock` must be inside this worktree (default
+`.card.lock`); existing locks require owner intervention. CLI options are
+`--config`, `--lock`, repeated `--external-lock` and `--baseline-name`,
+`--timeout`, `--transport-timeout`, and `--receipt`, before PROGRAM.
+The default overwritten result is `tests/out/card-result.json`.
+
+The remote card needs a POSIX `sh`, Linux `/proc`, and standard utilities
+`readlink`, `stat`, `id`, `cat`, `base64`, `chmod`, `tail`, `head`, `sleep`,
+`mkdir`, and `rm`. No remote Python or installed runner is required. Inputs
+are base64 chunks over the control session. Program output is read in bounded
+chunks from private files, decoded and written to the corresponding host
+stdout/stderr stream without text conversion. Their interleaving is not kept.
+If transport becomes unavailable, the result reports incomplete cleanup;
+it does not claim the remote program stopped.
 
 Host file paths and remote arguments must be passed without shell interpolation.
 The production transport must bound connecting, snapshots, staging, execution,
@@ -83,7 +102,7 @@ for runner failures. `program_exit_code` is null if no program status was
 obtained. Infrastructure takes precedence if boot changed or cleanup failed.
 A process exit status alone cannot distinguish all 256 program statuses from
 runner errors; `result_class` is authoritative when the numbers overlap.
-Reviewer: confirm this status-collision policy before GREEN.
+The lead approved this status-collision policy before GREEN.
 
 ## Fake transport seam for T0
 
@@ -121,8 +140,7 @@ T0's seven cases cover existing own/external locks, foreign processes before
 staging and before execution, timeout, unreachable card, reboot during a run,
 nonzero program exit, and cleanup after staging failure. Assertions inspect
 operation order, boundaries, boot IDs, lock release, result JSON, and card time.
-At RED, missing `tools/card_run` is the expected failure; the fake scenarios are
-ready for implementation but have not passed.
+At RED, missing `tools/card_run` was the expected failure.
 
 After review and GREEN, when the card is free, run donor-built `m1_affine` and
 `hello` through `tools/run.py` and this runner at T3. `m1_affine` must print

@@ -22,3 +22,7 @@
 # Local tool state
 __pycache__/
 *.pyc
+
+# Owner-supplied card connection and runner lock
+/config/card.local.json
+/.card.lock
