@@ -1,0 +1,148 @@
+#!/usr/bin/env python3
+"""Reject KNC-incompatible instructions (Intel 327364, Appendix B).
+
+Usage: python tools/knc_lint FILE [...]
+Exit 0: no violations, 1: forbidden instructions, 2: input/tool error.
+Assembly is checked before assembly, then decoded just like binary inputs.
+The deny list is deliberately also applied after --march=k1om assembly:
+binutils 2.22 accepts f3 90 (pause, also spelled repz nop).
+"""
+import argparse
+import json
+import os
+from pathlib import Path
+import re
+import subprocess
+import sys
+import tempfile
+
+DENIED = {
+    'emms', 'femms', 'fcomi', 'fcomip', 'fucomi', 'fucomip',
+    'cmpxchg16b', 'pause', 'mfence', 'lfence', 'sfence',
+    'monitor', 'mwait', 'sysenter', 'sysexit',
+}
+REGISTERS = re.compile(r'%(?:[xy]mm\d+|mm[0-7])\b', re.I)
+INSTRUCTION = re.compile(r'^\s*([0-9a-f]+):\s+((?:[0-9a-f]{2}\s+)+)(.*?)\s*$', re.I)
+SYMBOL = re.compile(r'^\s*[0-9a-f]+ <(.+)>:$', re.I)
+PREFIXES = {'rep', 'repe', 'repz', 'repne', 'repnz', 'lock', 'data16', 'addr32'}
+
+
+def is_prefix(word):
+    return word in PREFIXES or word == 'rex' or word.startswith('rex.')
+
+
+def forbidden(instruction, raw=()):
+    # Objdump annotations describe symbols, not instruction operands.
+    text = re.sub(r'<[^>]*>', '', instruction.split('#', 1)[0]).lower()
+    if '(bad)' in text or REGISTERS.search(text):
+        return True
+    words = text.replace(';', ' ').split()
+    prefixes = []
+    while words and is_prefix(words[0]):
+        prefixes.append(words.pop(0))
+    mnemonic = words[0] if words else ''
+    if mnemonic in DENIED or mnemonic.startswith(('cmov', 'fcmov')):
+        return True
+    if mnemonic in {'nop', 'nopl', 'nopw'} and any(p in {'rep', 'repe', 'repz'} for p in prefixes):
+        return True
+    # Keep the encoding check independent of the disassembler's mnemonic alias.
+    return list(raw) == ['f3', '90']
+
+
+def source_violations(path):
+    symbol = '<assembly>'
+    contents = path.read_text()
+    # Strings can contain comment and statement delimiters (including escaped quotes).
+    contents = re.sub(r'"(?:\\.|[^"\\])*"',
+                      lambda m: '\n' * m[0].count('\n'), contents)
+    contents = re.sub(r'/\*.*?\*/', lambda m: '\n' * m[0].count('\n'), contents, flags=re.S)
+    pending = ''
+    for number, line in enumerate(contents.splitlines(), 1):
+        for statement in line.split('#', 1)[0].split(';'):
+            statement = statement.strip()
+            label = re.match(r'^([\w.$]+):\s*(.*)$', statement)
+            if label:
+                if not label[1].startswith('.L') and not label[1].isdigit():
+                    symbol = label[1]
+                statement = label[2]
+            if not statement or statement.startswith('.'):
+                continue
+            instruction = (pending + ' ' + statement).strip()
+            if is_prefix(statement.lower()):
+                pending = instruction
+                continue
+            pending = ''
+            if forbidden(instruction):
+                yield str(path), symbol, 'line-%d' % number, instruction
+
+
+def decoded_violations(path, objdump, env, display=None):
+    display = str(display or path)
+    member = display
+    symbol = '<no-symbol>'
+    with tempfile.TemporaryFile(mode='w+t') as errors:
+        process = subprocess.Popen([str(objdump), '-d', '--insn-width=16', str(path)],
+                                   env=env, stdout=subprocess.PIPE, stderr=errors,
+                                   universal_newlines=True, errors='replace')
+        for line in process.stdout:
+            header = re.match(r'^(.+):\s+file format\s+', line)
+            if header:
+                name = header[1]
+                member = display if name == str(path) else '%s(%s)' % (display, name)
+                symbol = '<no-symbol>'
+            label = SYMBOL.match(line.strip())
+            if label:
+                symbol = label[1]
+            match = INSTRUCTION.match(line)
+            if match and forbidden(match[3], match[2].lower().split()):
+                yield member, symbol, '0x' + match[1], match[3]
+        process.stdout.close()
+        if process.wait():
+            errors.seek(0)
+            raise ValueError('%s: objdump failed: %s' % (display, errors.read().strip()))
+
+
+def lint(path, toolchain, env):
+    objdump = toolchain / 'cross/bin/k1om-mpss-linux-objdump.exe'
+    if path.suffix.lower() != '.s':
+        yield from decoded_violations(path, objdump, env)
+        return
+    violations = list(source_violations(path))
+    if violations:
+        yield from violations
+        return
+    with tempfile.TemporaryDirectory() as directory:
+        obj = Path(directory) / 'input.o'
+        result = subprocess.run([str(toolchain / 'cross/bin/k1om-mpss-linux-as.exe'),
+                                 '-march=k1om', str(path), '-o', str(obj)], env=env,
+                                stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
+                                universal_newlines=True, errors='replace')
+        if result.returncode:
+            raise ValueError('%s: assembler failed: %s' % (path, result.stdout.strip()))
+        yield from decoded_violations(obj, objdump, env, display=path)
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('files', nargs='+', type=Path)
+    args = parser.parse_args()
+    checkout = Path(__file__).resolve().parents[1]
+    project = checkout.parent.parent if checkout.parent.name == '.work' else checkout
+    manifest = json.loads((checkout / 'toolchain/manifest.json').read_text())
+    toolchain = project / manifest['root']
+    env = os.environ.copy()
+    env['PATH'] = os.pathsep.join(str(toolchain / p) for p in ('cross/bin', 'cygwin/bin')) + os.pathsep + env.get('PATH', '')
+    status = 0
+    for path in args.files:
+        try:
+            for file, symbol, address, instruction in lint(path, toolchain, env):
+                print('%s:%s:%s: forbidden: %s' % (file, symbol, address, instruction))
+                status = max(status, 1)
+        except (OSError, ValueError) as error:
+            print('ERROR: %s' % error, file=sys.stderr)
+            status = 2
+    return status
+
+
+if __name__ == '__main__':
+    sys.exit(main())
