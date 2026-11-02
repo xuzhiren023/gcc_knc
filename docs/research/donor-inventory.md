@@ -2,15 +2,16 @@
 
 Status: full-tree donor inventory and GCC 16.2 runtime/LRA source review complete.
 **Acceptance remains incomplete:** no reduced patch 0002 reproducer was obtained.
-The attempted Fortran compilations stopped before LRA; no failure/passing pair,
-GCC 16 execution, or card result is claimed.
+The corrected Fortran compilations reached LRA and produced differing assembly;
+a self-contained extraction lost that difference. No demonstrated wrong-code
+failure/passing pair, GCC 16 execution, or card result is claimed.
 
 - [x] Entire donor tree covered against its recorded gcc-5 branch baseline.
 - [x] Donor changes classified with reasons and GCC 16 landing locations.
 - [x] Separate GCC 16.2 runtime dependency audit (F6), with file:line evidence.
 - [x] Vector code generation scope and tuning recorded.
 - [x] GCC 16 secondary-reload mechanism inspected.
-- [ ] Reduced 0002 reproducer in `tests/regress/` (blocked before LRA).
+- [ ] Reduced 0002 reproducer in `tests/regress/` (extraction lost the difference).
 
 ## Comparison boundary
 
@@ -148,16 +149,16 @@ In `gcc/lra-constraints.cc`:
 
 - Lines 4496-4505 initialize local `before`/`after` and call `process_address`.
 - Lines 4512-4514 call `check_and_process_move` and return immediately on true.
-- Lines 1470-1486 still call `targetm.secondary_reload` in both directions.
-- Lines 1507-1520 emit the secondary instruction sequence and insert its own
+- Lines 1465-1483 still call `targetm.secondary_reload` in both directions.
+- Lines 1502-1518 emit the secondary instruction sequence and insert its own
   local `before` with `lra_process_new_insns`. This is a different local from
   the address reload list in `curr_insn_transform`.
-- Lines 1522-1532 delete `curr_insn` and return true if no intermediate register
+- Lines 1521-1530 delete `curr_insn` and return true if no intermediate register
   was needed (`new_reg == NULL_RTX`, i.e. an instruction-code secondary reload).
 - The ordinary final insertion of the outer address sequences is at line 5173;
   the early return bypasses it. Thus deletion and loss of those outer sequences
   remain structurally possible if both transformations occur on the same insn.
-- **Critical difference:** lines 1445-1446 reject the fast path unless both source
+- **Critical difference:** lines 1442-1443 reject the fast path unless both source
   and destination are registers (after stripping SUBREGs). The donor inventory's
   memory-output secondary-reload extension is not present. A simple register move
   has no memory operand to reload; the donor memory-store failure cannot be
@@ -170,7 +171,7 @@ Recommendation: **rewrite** any required memory-output support and **do not port
 caller early return still exist; this review does not demonstrate a live GCC 16
 bug. No shared allocator modification is made by this research ticket.
 
-### Reproducer attempts and remaining blocker
+### Earlier reproducer attempts (before corrected flags and module paths)
 
 Copied only the ticket-specified
 `PhiWeather/.tools/knc-bootstrap/hydro-knc/src/Routing/module_channel_routing.F90`
@@ -202,6 +203,79 @@ a self-contained preprocessed input). A corrected reference selection must use
 Cygwin path syntax. Neither executable's patch status has been established by
 behavior. No substitute regression test was committed; the copied source was
 removed after recording these results. The reproducer criterion stays unticked.
+
+### Corrected compilation and bounded reduction
+
+The lead supplied the original command location:
+`PhiWeather/artifacts/native/hydro-0bfbfddab62748249fdc0f108bdbb158.json:1296-1329`.
+On the next attempt, both compilers successfully compiled the full source with
+the missing definitions, `-mknc`, and module paths. These commands ran from this
+worktree through `tools/run.py`, with the bootstrap Cygwin `python3.12.exe`.
+In the shell commands below, `base` is the read-only bootstrap directory:
+
+```sh
+base=/cygdrive/c/Users/xuzhi/Documents/PhiWeather/.tools/knc-bootstrap
+export PATH="$base/cross/bin:/usr/bin:/bin"
+# Donor: extra is empty. Reference: extra=(-B"$base/reference/gcc-lra-diagnostic/").
+"$base/scientific-mpich/bin/mpif90" "${extra[@]}" \
+  -cpp -DMPP_LAND -DWRF_HYDRO -DPRECIP_DOUBLE -w \
+  -ffree-form -ffree-line-length-none -fconvert=big-endian -frecord-marker=4 \
+  -std=legacy -O1 -mknc -fno-tree-vectorize \
+  -I"$base/hydro-knc/src/Routing" -I"$base/hydro-knc/src/Data_Rec" \
+  -I"$base/hydro-knc/src/MPP" -I"$base/hydro-knc/src/mod" \
+  -I"$base/scientific-netcdf4/include" -Jtests/out -S -fdump-rtl-reload \
+  -o "tests/out/$name.s" tests/out/module_channel_routing.F90
+```
+
+Runner invocations used names `S0-05-donor-routing-complete` and
+`S0-05-reference-routing-complete`, inputs
+`tests/out/module_channel_routing.F90 tests/out/compile-routing.sh`, and command
+`bash tests/out/compile-routing.sh donor` or `reference`. The script expanded
+the command above with the selected name and extra argument. Both exited 0
+without diagnostics. The original assembly differed: for example, the reference
+loaded `1320(%rsp)` into `%r14` where the donor did not, and later stack offsets
+and register choices differed. These differences alone do **not** demonstrate
+wrong code or identify either executable as failing patch 0002.
+
+Preprocessing the full source with the same command plus `-E` succeeded. From
+that output, extracted only `SUBMUSKINGCUNGE` into a module with the original
+module name and `use iso_fortran_env, only: int64`. Removed comments, line
+directives and blank lines. Its first compile failed on the diagnostic print
+using imported `linkls_s(my_id+1)`; removed that print to eliminate its module
+dependency. The resulting source was self-contained (about 280 lines).
+
+Compiled that extraction once with each compiler using:
+
+```sh
+"$base/scientific-mpich/bin/mpif90" "${extra[@]}" -w \
+  -ffree-form -ffree-line-length-none -fconvert=big-endian -frecord-marker=4 \
+  -std=legacy -O1 -mknc -fno-tree-vectorize -Jtests/out -S -fdump-rtl-reload \
+  -o "tests/out/$name.s" tests/out/reduced.f90
+```
+
+Both exited 0, and the two assembly files were identical. Both reload dumps
+deleted memory move 1935, `[r2106:DI]=r2107:SF`, replacing it with masked store
+3271. Crucially, **both retained** address load 3267,
+`r2106:DI=[argp:DI+0x2b8]`, in the final RTL before store 3271. Thus a
+`Deleting move` message on a memory store is insufficient evidence of the bug.
+This extraction does not preserve the original difference and is not a valid
+regression reproducer. It was not committed to `tests/regress/` as a substitute.
+
+Logs under `.work/_state/logs/`:
+
+| Run | Result | Log |
+| --- | --- | --- |
+| Corrected donor, initial script launch | Exit 1: CRLF shell script passed a trailing carriage return in the input filename; compiler did not read the source. Fixed script line endings. | `S0_05_donor_routing_complete-20261101-234659.log` |
+| Corrected donor full source | Exit 0, no diagnostics. | `S0_05_donor_routing_complete-20261101-234707.log` |
+| Corrected reference full source | Exit 0, no diagnostics. | `S0_05_reference_routing_complete-20261101-234717.log` |
+| Full source preprocessing | Exit 0, no diagnostics. | `S0_05_preprocess_routing-20261101-234804.log` |
+| First extracted routine | Exit 1: `my_id` has no implicit type in imported diagnostic expression. | `S0_05_reduced_routing-20261101-234904.log` |
+| Extraction with imported diagnostic removed, both compilers | Both exit 0; identical assembly and preserved address load in both final reload dumps. Runner success records compilation only, not reproduction of the bug. | `S0_05_reduced_routing-20261101-234915.log` |
+
+Temporary source copies, scripts, module files, assembly and RTL dumps were
+removed after inspection. No compiler build, assembler, GCC 16 compiler execution
+or card test ran. The lead's session bound applies: the reduced reproducer remains
+unticked for review; neither executable's patch status is proven by these runs.
 
 ## Separate GCC 16.2 runtime audit (F6)
 
