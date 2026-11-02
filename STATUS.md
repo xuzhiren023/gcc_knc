@@ -2,7 +2,7 @@
 
 Updated automatically at every ticket change. Last update: 2026-11-02 00:16.
 
-**Next: the tech lead, on S0-05.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Waiting for you:** S0-05. Run `python tools/pm.py inbox`.
 
 Current tickets: `[######--------------]` 3 of 9
 
@@ -26,7 +26,7 @@ Current tickets: `[######--------------]` 3 of 9
 | S0-02 | ISA lint | Done | knc_lint now rejects the listed non-KNC instructions in .s, .o, archives, shared objects and executables, a... |
 | S0-03 | Test runner and red baseline | Done | tools/check now runs t0, t1 and t2 on the donor in about 16 seconds and records the expected baseline, with... |
 | S0-04 | Card runner | Not started |  |
-| S0-05 | Donor inventory | Waiting for review | aa2a98f: both full-source -O1 -mknc -S reload-dump compiles exit 0; compared all 18 functions. Missing prol... |
+| S0-05 | Donor inventory | **Waiting for you** | lead session ended without a decision (exit 0) |
 | S0-06 | GCC 16.2 fork and timing | Not started | Engineer sessions have no network, so do not clone. The owner or lead creates .work/_shared/gcc outside the... |
 | S0-07 | Benchmark corpus and coverage estimate | Not started |  |
 | S0-08 | Toolchain independent of PhiWeather | Not started | Also in scope, from the S0-03 review: nothing recreates the hand-made sysroot files (crt1.o, crti.o, crtn.o... |
@@ -34,6 +34,7 @@ Current tickets: `[######--------------]` 3 of 9
 
 ## Recent activity
 
+- 2026-11-02 00:16 **S0-05** lead escalate: lead session ended without a decision (exit 0)
 - 2026-11-02 00:13 **S0-05** engineer submit: aa2a98f: both full-source -O1 -mknc -S reload-dump compiles exit 0; compared all 18 functions. Missing prologue load is in drive_channel_rsl: donor...
 - 2026-11-02 00:10 **S0-05** owner decide: Owner on 2026-11-02: gave 12 more sessions to solve S0-05 first. The 0002 reproducer stays in scope and is not moved to E2-02, so the lead recommen...
 - 2026-11-01 23:54 **S0-05** lead recommend: Owner: raise `sessions` to 4 for one submit-only session, and drop the extra pass in the 23:52 answer. The lead read gcc/lra-constraints.cc:1442-14...
@@ -41,7 +42,6 @@ Current tickets: `[######--------------]` 3 of 9
 - 2026-11-01 23:52 **S0-05** lead answer: Decision: one more targeted pass, then submit whatever the result; no further ask on this item. Citations and the F6 and GCC 16 guard findings stan...
 - 2026-11-01 23:51 **S0-05** engineer ask: Committed 3fec5cc: fixed GCC 16 citations; complete-flag full-source donor/reference compiles exit 0 with differing assembly. Extracted SUBMUSKINGC...
 - 2026-11-01 23:46 **S0-05** lead answer: Do not wait on the owner: everything you asked for is on disk, read-only. Exact original compile command is recorded in C:/Users/xuzhi/Documents/Ph...
-- 2026-11-01 23:44 **S0-05** engineer ask: Committed b04e492: GCC 16.2 F6 and LRA source audit complete; register-only guard excludes donor memory case. Reproducer unticked: two donor -O1 -S...
 
 ## Cost
 
