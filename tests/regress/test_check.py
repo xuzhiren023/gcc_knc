@@ -2,7 +2,6 @@
 import importlib.util
 from pathlib import Path
 import struct
-import subprocess
 import sys
 import tempfile
 import unittest
@@ -95,6 +94,7 @@ class Runner(unittest.TestCase):
         runner.sysroot = Path('/shared/sysroot')
         runner.out = Path('/shared/check')
         runner.cc = Path('/shared/gcc')
+        runner.cc_flags = []
         runner.flags = []
         runner.fixture = Path('/fixture')
         runner.off_object = Path('/shared/check/loops.o')
@@ -168,9 +168,9 @@ class SourceTests(unittest.TestCase):
         self.runner.say = Mock()
         command = self.runner.command
 
-        def dispatch(*args):
+        def dispatch(*args, **kwargs):
             if args[0] == self.runner.cc:
-                return command(*args)
+                return command(*args, **kwargs)
             return ''  # Seed assembler and lint success; inspect their calls below.
 
         self.runner.command = Mock(side_effect=dispatch)

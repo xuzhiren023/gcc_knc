@@ -3,7 +3,7 @@
 
 Usage: python tools/check t0 t1 t2 --compiler donor
 Use --record tests/baseline/donor-gcc5.txt to record a measured baseline.
-gcc16 requires --cc pointing at its installed compiler. T3 is reserved for
+gcc16 uses the shared build tree's xgcc driver. T3 is reserved for
 tools/card_run; this runner never executes target programs on the host.
 """
 import argparse
@@ -11,6 +11,7 @@ import json
 import os
 from pathlib import Path
 import re
+import shlex
 import struct
 import subprocess
 import sys
@@ -39,6 +40,7 @@ def loop_lines(source):
 
 def function_body(assembly, name):
     # Local labels and other functions must never donate instructions to a scan.
+    name = re.escape(name)
     match = re.search(r'^' + name + r':\s*\n(.*?)^\s*\.size\s+' + name + r'\s*,',
                       assembly, re.M | re.S)
     return match[1] if match else None
@@ -130,7 +132,9 @@ class Runner:
         manifest = json.loads((ROOT / 'toolchain/manifest.json').read_text())
         self.tc = PROJECT / manifest['root']
         self.sysroot = self.tc / manifest['sysroot']
-        self.cc = Path(args.cc) if args.cc else self.tool('gcc')
+        build = PROJECT / '.work/_shared/gcc-build/gcc'
+        self.cc = Path(args.cc) if args.cc else (build / 'xgcc' if args.compiler == 'gcc16' else self.tool('gcc'))
+        self.cc_flags = ['-B' + str(build) + '/'] if args.compiler == 'gcc16' else []
         self.env = os.environ.copy()
         self.env['PATH'] = os.pathsep.join(str(self.tc / p) for p in ('cross/bin', 'cygwin/bin')) + os.pathsep + self.env.get('PATH', '')
         output_root = PROJECT / '.work/_shared/check'
@@ -142,6 +146,7 @@ class Runner:
         self.lines = []
         self.failed = False
         self.fixture = ROOT / 'tests/acceptance/m1_affine'
+        self.source_dir = ROOT / 'tests/t1'
         self.flags = ['-O2', '-ftree-vectorize', '--sysroot=' + str(self.sysroot)]
         self.off_object = None
 
@@ -156,10 +161,12 @@ class Runner:
         self.failed |= bool(failures)
         self.say(('FAIL ' if failures else 'PASS ') + label + (': ' + '; '.join(failures) if failures else ''))
 
-    def command(self, *args):
+    def command(self, *args, check=True):
         result = subprocess.run([str(a) for a in args], env=self.env, cwd=ROOT,
                                 text=True, errors='replace', stdout=subprocess.PIPE,
                                 stderr=subprocess.STDOUT, timeout=60)
+        if not check:
+            return result
         if result.returncode:
             raise RuntimeError('command %s exited %d: %s' %
                                (' '.join(str(a) for a in args), result.returncode, result.stdout[-2500:]))
@@ -178,11 +185,13 @@ class Runner:
                 self.result('t0 ' + label, [str(error)])
 
     def t1(self):
+        if self.args.compiler == 'gcc16':
+            self.t1_sources()
         source = (self.fixture / 'loops.c').read_text()
         for mode in ('off', 'fast'):
             asm = self.out / ('loops-' + mode + '.s')
             obj = self.out / ('loops-' + mode + '.o')
-            report = self.command(self.cc, *self.flags, '-ffp-contract=' + mode,
+            report = self.command(self.cc, *self.cc_flags, *self.flags, '-ffp-contract=' + mode,
                                   '-fopt-info-vec-all', '-S', self.fixture / 'loops.c', '-o', asm)
             (self.out / ('loops-' + mode + '.vec')).write_text(report)
             self.command(self.tool('as'), '--march=k1om', asm, '-o', obj)
@@ -193,14 +202,61 @@ class Runner:
             if mode == 'off':
                 self.off_object = obj
 
+    def t1_sources(self):
+        for source in sorted(self.source_dir.glob('*.c')):
+            label = 't1 ' + source.name
+            try:
+                directives = []
+                options = ['-O2']
+                for line in source.read_text().splitlines():
+                    match = re.match(r'^\s*//\s*(options|scan-asm|scan-asm-not|error):\s*(.*)$', line)
+                    function = re.match(r'^\s*//\s*scan-asm-func\s+(\S+):\s*(.*)$', line)
+                    if match:
+                        kind, pattern = match.groups()
+                        if kind == 'options':
+                            options = shlex.split(pattern)
+                        else:
+                            directives.append((kind, None, pattern))
+                    elif function:
+                        directives.append(('scan-asm-func', *function.groups()))
+                errors = [directive for directive in directives if directive[0] == 'error']
+                asm = self.out / (source.stem + '.s')
+                obj = self.out / (source.stem + '.o')
+                compiled = self.command(self.cc, *self.cc_flags, *options,
+                                        '--sysroot=' + str(self.sysroot), '-S', source, '-o', asm,
+                                        check=False)
+                failures = []
+                if errors:
+                    for kind, name, pattern in errors:
+                        if compiled.returncode == 0 or not re.search(pattern, compiled.stdout, re.M):
+                            failures.append('error: ' + pattern)
+                            break
+                else:
+                    if compiled.returncode:
+                        raise RuntimeError('compile exited %d: %s' %
+                                           (compiled.returncode, compiled.stdout[-2500:]))
+                    self.command(self.tool('as'), '--march=k1om', asm, '-o', obj)
+                    self.command(sys.executable, ROOT / 'tools/knc_lint', asm, obj)
+                    assembly = asm.read_text()
+                    for kind, name, pattern in directives:
+                        body = function_body(assembly, name) if name else assembly
+                        found = body is not None and re.search(pattern, body, re.M) is not None
+                        if (found if kind == 'scan-asm-not' else not found):
+                            failures.append(kind + (' ' + name if name else '') + ': ' + pattern)
+                            break
+                self.result(label, failures)
+            except (OSError, RuntimeError, subprocess.TimeoutExpired, ValueError, re.error) as error:
+                self.failed = True
+                self.say('ERROR ' + label + ': ' + str(error))
+
     def t2(self):
         loops_obj = self.off_object or self.out / 'loops-off.o'
         if not self.off_object:
-            self.command(self.cc, *self.flags, '-ffp-contract=off', '-c', self.fixture / 'loops.c', '-o', loops_obj)
+            self.command(self.cc, *self.cc_flags, *self.flags, '-ffp-contract=off', '-c', self.fixture / 'loops.c', '-o', loops_obj)
         driver = self.out / 'driver.o'
         elf = self.out / 'm1_affine.mic'
-        self.command(self.cc, *self.flags, '-ffp-contract=off', '-c', self.fixture / 'driver.c', '-o', driver)
-        trace = self.command(self.cc, '--sysroot=' + str(self.sysroot), driver, loops_obj,
+        self.command(self.cc, *self.cc_flags, *self.flags, '-ffp-contract=off', '-c', self.fixture / 'driver.c', '-o', driver)
+        trace = self.command(self.cc, *self.cc_flags, '--sysroot=' + str(self.sysroot), driver, loops_obj,
                              '-Wl,--trace', '-o', elf)
         for library in ('libc.so.6', 'ld-linux-k1om.so.2'):
             paths = []
@@ -243,9 +299,9 @@ class Runner:
 
     def _run(self):
         start = time.monotonic()
-        self.say('Compiler: ' + self.command(self.cc, '--version').splitlines()[0])
+        self.say('Compiler: ' + self.command(self.cc, *self.cc_flags, '--version').splitlines()[0])
         for program in ('ld', 'as'):
-            self.say('Compiler ' + program + ': ' + self.command(self.cc, '-print-prog-name=' + program).strip())
+            self.say('Compiler ' + program + ': ' + self.command(self.cc, *self.cc_flags, '-print-prog-name=' + program).strip())
         self.say('Flags: -O2 -ftree-vectorize -ffp-contract=off / fast; separate driver translation unit')
         self.say('T2 ABI reference: ' + str(self.sysroot) + ' (no native card execution in t0-t2)')
         if self.args.compiler == 'donor':
@@ -267,12 +323,10 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('tiers', nargs='+', choices=('t0', 't1', 't2'))
     parser.add_argument('--compiler', choices=('donor', 'gcc16'), default='donor')
-    parser.add_argument('--cc', help='installed gcc16 compiler path')
+    parser.add_argument('--cc', help='override compiler path')
     parser.add_argument('--record', help='small baseline result file')
     parser.add_argument('--worker', action='store_true', help=argparse.SUPPRESS)
     args = parser.parse_args()
-    if args.compiler == 'gcc16' and not args.cc:
-        parser.error('--compiler gcc16 requires --cc')
     if os.name == 'nt':
         # Cygwin git emits POSIX paths; GCC/ld also need a POSIX sysroot.
         # Keep the complete run (including run.py and regressions) in that runtime.
