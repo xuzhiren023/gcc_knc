@@ -68,6 +68,15 @@ class Scans(unittest.TestCase):
 
 
 class Runner(unittest.TestCase):
+    def test_runners_use_distinct_temporary_output_directories(self):
+        args = SimpleNamespace(compiler='donor', cc=None)
+        first, second = check.Runner(args), check.Runner(args)
+        for runner in (first, second):
+            if hasattr(runner, '_output'):
+                self.addCleanup(runner._output.cleanup)
+            self.assertNotEqual(runner.out, check.PROJECT / '.work/_shared/check/donor')
+        self.assertNotEqual(first.out, second.out)
+
     def test_link_trace_resolves_parenthesized_sysroot_paths(self):
         runner = check.Runner.__new__(check.Runner)
         runner.sysroot = Path('/shared/sysroot')
