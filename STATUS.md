@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-01 19:44.
+Updated automatically at every ticket change. Last update: 2026-11-01 20:06.
 
 **Next: GPT-6.1, on S0-02 (ISA lint).** Start a new session and paste the prompt from `KICKOFF.md`.
 
@@ -23,7 +23,7 @@ Current tickets: `[##------------------]` 1 of 7
 | Ticket | What | State | Latest |
 |---|---|---|---|
 | S0-01 | Toolchain manifest and doctor | Done | Reviewed: red commit real; tests fail on the missing-tool cases; doctor rerun OK, required tools present, d... |
-| S0-02 | ISA lint | Changes requested | Good work: all 21 fixtures, the binary path for every listed rule, error exits and the library scan all hol... |
+| S0-02 | ISA lint | In progress | Good work: all 21 fixtures, the binary path for every listed rule, error exits and the library scan all hol... |
 | S0-03 | Test runner and red baseline | Not started |  |
 | S0-04 | Card runner | Not started |  |
 | S0-05 | Donor inventory | Not started |  |
@@ -45,10 +45,10 @@ Current tickets: `[##------------------]` 1 of 7
 
 - From the script, engineer: 3 sessions, 0.6M input tokens
 - From the script, lead: 3 sessions, 1.0M input tokens
-- Started by hand, Claude: 1 sessions, 42.1M input tokens
+- Started by hand, Claude: 1 sessions, 42.8M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 1.8 GiB of 100 GiB. 377 GiB free on the drive.
+The project uses 1.8 GiB of 100 GiB. 376 GiB free on the drive.
