@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-01 20:11.
+Updated automatically at every ticket change. Last update: 2026-11-01 20:16.
 
-**Next: GPT-6.1, on S0-03 (Test runner and red baseline).** Start a new session and paste the prompt from `KICKOFF.md`.
+**Next: the tech lead, on S0-03.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[#####---------------]` 2 of 7
 
@@ -24,7 +24,7 @@ Current tickets: `[#####---------------]` 2 of 7
 |---|---|---|---|
 | S0-01 | Toolchain manifest and doctor | Done | Reviewed: red commit real; tests fail on the missing-tool cases; doctor rerun OK, required tools present, d... |
 | S0-02 | ISA lint | Done | knc_lint now rejects the listed non-KNC instructions in .s, .o, archives, shared objects and executables, a... |
-| S0-03 | Test runner and red baseline | In progress |  |
+| S0-03 | Test runner and red baseline | Question for the tech lead | Two attempts; commits b1ba718/035f80a. Cygwin run 62.38s: scanner seeds PASS, assembly/lint PASS, T1 expect... |
 | S0-04 | Card runner | Not started |  |
 | S0-05 | Donor inventory | Not started |  |
 | S0-06 | GCC 16.2 fork and timing | Not started |  |
@@ -32,6 +32,7 @@ Current tickets: `[#####---------------]` 2 of 7
 
 ## Recent activity
 
+- 2026-11-01 20:16 **S0-03** engineer ask: Two attempts; commits b1ba718/035f80a. Cygwin run 62.38s: scanner seeds PASS, assembly/lint PASS, T1 expected red (no packed zmm arithmetic); tests...
 - 2026-11-01 20:11 **S0-02** lead approve: knc_lint now rejects the listed non-KNC instructions in .s, .o, archives, shared objects and executables, and correctly flags 2 pause sites in libc...
 - 2026-11-01 20:09 **S0-02** engineer submit: Parser regressions failed then passed; encoded rules and inline source/linked cases pass. Log: .work/_state/logs/S0_02_parser_green-20261101-200843...
 - 2026-11-01 19:44 **S0-02** lead changes: Good work: all 21 fixtures, the binary path for every listed rule, error exits and the library scan all hold up on my rerun. Four fixes, all reprod...
@@ -39,13 +40,12 @@ Current tickets: `[#####---------------]` 2 of 7
 - 2026-11-01 12:56 **S0-02** lead answer: Keep all the fixtures: 'one seeded file per rule' is my acceptance criterion, so the budget is the wrong limit here. Do not merge or drop any to ge...
 - 2026-11-01 12:55 **S0-02** engineer ask: Submit refused: 22 new test files; budget is 4. Existing implementation b89a224 and red 233481a were retained; only S0-02-report.txt added in 80ed3...
 - 2026-11-01 12:55 **S0-02** lead answer: No sandbox change: the owner would have to decide on widening it, and this step does not need it. run.py is for builds and tests, and this is a sin...
-- 2026-11-01 12:53 **S0-02** engineer ask: Required runner blocked before objdump: python tools/run.py --name S0_02_pause_second_site --inputs tools/knc_lint -- ../_shared/toolchain/cross/bi...
 
 ## Cost
 
 - From the script, engineer: 4 sessions, 1.0M input tokens
 - From the script, lead: 4 sessions, 1.5M input tokens
-- Started by hand, Claude: 1 sessions, 43.0M input tokens
+- Started by hand, Claude: 1 sessions, 43.7M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
