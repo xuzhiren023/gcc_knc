@@ -43,7 +43,7 @@ Current tickets: `[#####---------------]` 2 of 7
 
 ## Cost
 
-- From the script, engineer: 4 sessions, 1.0M input tokens
+- From the script, engineer: 5 sessions, 2.1M input tokens
 - From the script, lead: 4 sessions, 1.5M input tokens
 - Started by hand, Claude: 1 sessions, 43.7M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
