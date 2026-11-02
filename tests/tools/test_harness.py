@@ -106,7 +106,7 @@ class Sandbox(unittest.TestCase):
         self.root = os.path.join(self.top, "proj")
         for sub in ("tools", "harness"):
             shutil.copytree(os.path.join(REPO, sub), os.path.join(self.root, sub),
-                            ignore=shutil.ignore_patterns("__pycache__"))
+                            ignore=shutil.ignore_patterns("__pycache__", "check", "check.py"))
         os.makedirs(os.path.join(self.root, "work", "tickets"))
         with open(os.path.join(self.root, ".gitignore"), "w", newline="\n") as f:
             f.write("/.work/\n__pycache__/\n")
