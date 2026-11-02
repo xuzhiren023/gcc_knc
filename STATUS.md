@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-02 15:43.
+Updated automatically at every ticket change. Last update: 2026-11-02 15:44.
 
-**Next: GPT-6.1, on S1-03 (tools/check runs source-level tests against GCC 16).** Run `python tools/dispatch.py`, or ask the tech lead to.
+**Next: the tech lead, on S1-03.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[##############------]` 12 of 17
 
@@ -34,7 +34,7 @@ Current tickets: `[##############------]` 12 of 17
 | S0-10 | Card sysroot links Fortran, libm and pthreads | Done | Fortran programs and C programs using -lm, -lpthread, -ldl or -lrt now link with default flags against the ... |
 | S1-01 | Tickets can change the GCC fork | Done | Tickets marked gcc: yes now get their own branch in the GCC fork, count its changes in the size budget, sho... |
 | S1-02 | GCC 16.2 builds for k1om-mpss-linux | Done | GCC 16.2 now configures and builds its C compiler for k1om-mpss-linux, using the shared KNC assembler, link... |
-| S1-03 | tools/check runs source-level tests against GCC 16 | In progress | No budget increase. Do not rerun: hand the ticket to review as it stands, with the donor baseline and gcc16... |
+| S1-03 | tools/check runs source-level tests against GCC 16 | Waiting for review | Handed to review as directed by the lead; no tests rerun. Commits: e3bc9a5 (red tests), afed5af (implementa... |
 | S1-04 | -march=knc with no SSE, AVX, MMX, CMOV, FCOMI or MFENCE | Not started | Rebuild GCC with the logged gcc16 step of tools/toolchain.py as ONE blocking foreground shell call with a t... |
 | S1-05 | Integer C assembles with as 2.22 and lints clean | Not started | Rebuild GCC with the logged gcc16 step of tools/toolchain.py as ONE blocking foreground shell call with a t... |
 | S1-06 | K1OM link defaults | Not started | Rebuild GCC with the logged gcc16 step of tools/toolchain.py as ONE blocking foreground shell call with a t... |
@@ -46,10 +46,10 @@ Current tickets: `[##############------]` 12 of 17
 - 2026-11-02 15:45 **S1-06** lead note: Rebuild GCC with the logged gcc16 step of tools/toolchain.py as ONE blocking foreground shell call with a timeout of at least 75 minutes, never in ...
 - 2026-11-02 15:45 **S1-05** lead note: Rebuild GCC with the logged gcc16 step of tools/toolchain.py as ONE blocking foreground shell call with a timeout of at least 75 minutes, never in ...
 - 2026-11-02 15:45 **S1-04** lead note: Rebuild GCC with the logged gcc16 step of tools/toolchain.py as ONE blocking foreground shell call with a timeout of at least 75 minutes, never in ...
+- 2026-11-02 15:44 **S1-03** engineer submit: Handed to review as directed by the lead; no tests rerun. Commits: e3bc9a5 (red tests), afed5af (implementation). Recorded T0 results: 14 regressio...
 - 2026-11-02 15:43 **S1-03** lead answer: No budget increase. Do not rerun: hand the ticket to review as it stands, with the donor baseline and gcc16 smoke items marked unverified, and the ...
 - 2026-11-02 15:43 **S1-03** engineer ask: Committed red tests e3bc9a5 and implementation afed5af. T0 passed (14 regressions, 8 doctor, 4 lint): .work/_state/logs/check_donor_t0-20261102-154...
 - 2026-11-02 15:28 **S1-02** lead approve: GCC 16.2 now configures and builds its C compiler for k1om-mpss-linux, using the shared KNC assembler, linker and sysroot, and the donor toolchain ...
-- 2026-11-02 15:26 **S1-02** engineer submit: GCC ba8912b3148: config.host routes KNC driver-i386.o. Configure 80.202s. all-gcc: failed 2363.706s (GOTOFF); resume interrupted 13:02:12-13:26:55 ...
 
 ## Cost
 
