@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-01 22:21.
+Updated automatically at every ticket change. Last update: 2026-11-01 22:23.
 
 **Waiting for you:** S0-03. Run `python tools/pm.py inbox`.
 
@@ -24,7 +24,7 @@ Current tickets: `[#####---------------]` 2 of 8
 |---|---|---|---|
 | S0-01 | Toolchain manifest and doctor | Done | Reviewed: red commit real; tests fail on the missing-tool cases; doctor rerun OK, required tools present, d... |
 | S0-02 | ISA lint | Done | knc_lint now rejects the listed non-KNC instructions in .s, .o, archives, shared objects and executables, a... |
-| S0-03 | Test runner and red baseline | **Waiting for you** | budget: 6 engineer sessions used; the budget is 6 |
+| S0-03 | Test runner and red baseline | **Waiting for you** | Owner: raise `sessions` to 8. Both review fixes are verified by the lead: red e6cb86a fails, 9b04025 passes... |
 | S0-04 | Card runner | Not started |  |
 | S0-05 | Donor inventory | Not started |  |
 | S0-06 | GCC 16.2 fork and timing | Not started |  |
@@ -33,6 +33,7 @@ Current tickets: `[#####---------------]` 2 of 8
 
 ## Recent activity
 
+- 2026-11-01 22:24 **S0-03** lead recommend: Owner: raise `sessions` to 8. Both review fixes are verified by the lead: red e6cb86a fails, 9b04025 passes, and four deliberate breaks were caught...
 - 2026-11-01 22:21 **S0-03** lead escalate: budget: 6 engineer sessions used; the budget is 6
 - 2026-11-01 22:21 **S0-03** lead answer: No budget raise. The 500-line budget is a soft limit that the override is built for: tools/pm.py:300 lets it through when you pass --override, and ...
 - 2026-11-01 22:20 **S0-03** engineer ask: Both review fixes complete: red e6cb86a, fix 9b04025. Donor run 15.85s: 14 T0 tests, assembly/lint/T2 PASS, only expected T1 vectorization red; bas...
@@ -40,13 +41,12 @@ Current tickets: `[#####---------------]` 2 of 8
 - 2026-11-01 22:18 **S0-03** owner decide: Owner set sessions to 12 on 2026-11-01 and approved one more run. Make the two 22:01 review fixes, per the 22:03 lead note. This replaces the 22:03...
 - 2026-11-01 22:03 **S0-03** lead recommend: Owner: raise `sessions` to 6 for the two confirmed review fixes. The session approved for review changes went on a permissions failure that the lea...
 - 2026-11-01 22:03 **S0-03** lead note: Both 22:01 findings are now executed, not just read. (1) PACKED does not match vsubrps, vaddnps, vrcp23ps or vrsqrt23ps on zmm. (2) versioned_symbo...
-- 2026-11-01 22:01 **S0-03** lead escalate: budget: 5 engineer sessions used; the budget is 5
 
 ## Cost
 
 - From the script, engineer: 10 sessions, 4.7M input tokens
 - From the script, lead: 10 sessions, 5.3M input tokens
-- Started by hand, Claude: 2 sessions, 50.9M input tokens
+- Started by hand, Claude: 2 sessions, 51.7M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 

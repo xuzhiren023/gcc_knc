@@ -13,7 +13,8 @@ Last updated: 2026-11-01, during Sprint 0.
 | The lint rejects the listed instructions and passes legal code | Rerun on `main`; four deliberate breaks to the lint were all caught by its tests | `python -m unittest tests.tools.test_knc_lint` |
 | The harness enforces its limits | 49 tests in temporary repositories passed on the 2026-11-01 handoff, including the approve check | `python -m unittest discover -s tests/tools -p "test_*.py"` |
 | Script sessions can write logs and shared builds | Two real Codex sessions, before and after the fix | Read `tools/dispatch.py`, `engineer_command` |
-| S0-03 branch, not merged: T0 and T2 pass, T1 assembly and lint pass, T1 scans are red for "no packed `zmm` arithmetic", in 15 s; the T2 link traces libc and the loader under the shared sysroot | Lead rerun on 2026-11-01 at `d89111e`. The script review asked for two more fixes | In `.work/S0-03`: `python tools/check t0 t1 t2` |
+| S0-03 branch, not merged: T0 and T2 pass, T1 assembly and lint pass, T1 scans are red for "no packed `zmm` arithmetic", in 15 s; the T2 link traces libc and the loader under the shared sysroot | Lead rerun on 2026-11-01 at `9b04025`. Not submitted or re-reviewed yet | In `.work/S0-03`: `python tools/check t0 t1 t2` |
+| The T1 and T2 scans can fail: `vsubrps` on `zmm`, an empty requirement list, a missing symbol and an unknown version all go red | Red commit `e6cb86a` fails and `9b04025` passes. Four deliberate breaks to `tools/check.py` in exported copies were all caught | `python -m unittest discover -s tests/regress -p "test_*.py"` |
 | The donor T2 symbol scan really checks something | On a real binary from the same objects it finds 8 required symbols at GLIBC_2.14 from `libc.so.6` | `readelf --dyn-syms` and `--version-info` on the linked program |
 | The shared sysroot has five startup files byte-identical to the bootstrap copies, and its libc and loader differ from them | Lead byte comparison on 2026-11-01 | Compare `usr/lib64/crt1.o` and `lib64/libc-2.21.so` against the bootstrap sysroot |
 | Empty `lib` and `usr/lib` fix the donor link failure | Applied to the shared sysroot by S0-03, and the link passes in the lead's rerun | `gcc --sysroot=<sysroot> -print-file-name=crt1.o` |
@@ -22,15 +23,16 @@ Last updated: 2026-11-01, during Sprint 0.
 
 - **No GCC 16 exists yet.** This project has produced tools, not compiler code. Milestone M0 is the first compiler result. S0-06 has not started, so there is no checkout and no measured build time.
 - **Nothing has run on the card.** S0-04 is the first native result. `tools/card_run` does not exist. Card minutes so far: 0.
-- **S0-03 is not merged.** Two scan weaknesses are confirmed and on the ticket: the legality scan misses KNC-only instructions such as `vsubrps`, and nothing proves the T2 symbol scan can fail. Until they are fixed, a green T1 recurrence check or T2 symbol check cannot be fully trusted.
+- **S0-03 is not merged.** Its code is finished on the branch, but it has not been submitted or re-reviewed. Submitting needs one command with `--override`, because the branch is 510 changed lines against a budget of 500.
 - **The toolchain still depends on PhiWeather's folder.** On 2026-11-01, `as`, `ld` and the default sysroot all still resolved there, and every link runs PhiWeather's `ld`. They are compiled in, and `-B` does not override them. S0-08 fixes this, and S0-04 waits for it.
 - **The startup files from S0-03** come from the bootstrap sysroot. Only a run on the card will prove they suit the card's libc.
 
 ## Open items not on a ticket
 
 - A lead rerun outside the Codex sandbox can leave files a sandboxed engineer cannot replace. The 21:33 rerun on 2026-11-01 cost one engineer session this way. S0-03's per-run output directory fixes it for `tools/check`, so prefer a throwaway copy for other shared paths. `.work/_shared/check/donor` is stale and unused once S0-03 merges.
-- A session limit raised on a ticket gets used up by questions as well as review rounds: each `pm.py ask` ends a session. S0-03 went from 3 to 5 and needs 6.
-- After S0-03, the board takes tickets in ID order, so S0-05 and S0-06 run before S0-08 and S0-04. A 6-session run will not reach the card.
+- A session limit raised on a ticket gets used up by questions as well as review rounds: each `pm.py ask` ends a session. S0-03 has gone from 3 to 6 and still needs at least one more.
+- `pm.py submit` refuses an over-budget branch without saying `--override` exists (`tools/pm.py:303`). S0-03's engineer spent a session asking, despite two earlier answers telling it to use the flag. Have the refusal name the flag.
+- After S0-03, the board takes tickets in ID order: S0-05, S0-06, S0-07, S0-08, then S0-04. With two sessions per ticket, a run needs about 12 sessions after S0-03 to finish S0-04's first pass, so card work is further off than S0-08.
 - The dispatcher stops all work when any ticket needs the owner, by design. On 2026-11-01 this left 4 of 6 sessions unused while S0-05, S0-06 and S0-07 were free to run. `pm.py board` still says "Next: engineer on S0-05", which the dispatcher will not do.
 - `pm.py decide` on a ticket over its session budget does not free it: the next dispatch sends it straight back. Raise `sessions` on the ticket as well.
 - `dispatch.py --dry-run` can change the board: the over-budget branch escalates and saves before the dry-run check (`tools/dispatch.py:133`). Found by reading, not run. Its test covers only a ticket under budget.
@@ -39,7 +41,7 @@ Last updated: 2026-11-01, during Sprint 0.
 - `ldmxcsr` and `stmxcsr` pass the lint, because Intel manual 327364 is not on this machine. Decide once someone has Appendix B.
 - `f3 2e 90`, a `pause` with a stray prefix in the middle, passes the lint. Hand-written code only.
 - Script reviews cannot run tests, by design. `pm.py approve` now runs the branch's `tools/check t0` itself, once that tool exists on the branch.
-- Claude's script sessions read more tokens than GPT's: 5.0M against 4.2M after 18 sessions. Review this at the Sprint 0 retro.
+- Claude's script sessions read more tokens than GPT's: 5.3M against 4.7M after 20 sessions. Review this at the Sprint 0 retro.
 - Submit checks do not see `compiler/gcc`, which is a separate repository. Extend them in Sprint 1.
 
 ## Repositories
