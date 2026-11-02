@@ -170,6 +170,13 @@ def added_lines(diff):
             yield current, line[1:]
 
 
+def gcc_current_branch(board, ticket):
+    path = os.path.join(storage.shared_area(board.root), "gcc")
+    if ticket.fields.get("gcc") != "yes" or not os.path.isdir(os.path.join(path, ".git")):
+        return None
+    return run_git("branch", "--show-current", cwd=path)
+
+
 def gcc_checkout(board, ticket, allow_dirty=False):
     """WIP is one: the shared checkout may belong only to this ticket or knc."""
     if ticket.fields.get("gcc") != "yes":
@@ -276,7 +283,8 @@ def cmd_start(board, args):
     path = board.worktree(ticket)
     os.makedirs(storage.shared_area(board.root), exist_ok=True)
     branch = ticket.fields.setdefault("branch", "%s/%s" % (ticket.fields.get("sprint", "s0"), ticket.id))
-    gcc = gcc_checkout(board, ticket)
+    # Resuming keeps this ticket's own uncommitted GCC work; any other checkout must be clean.
+    gcc = gcc_checkout(board, ticket, allow_dirty=gcc_current_branch(board, ticket) == branch)
     if gcc:
         exists = run_git("branch", "--list", branch, cwd=gcc)
         target = (branch,) if exists else ("-b", branch, "knc")

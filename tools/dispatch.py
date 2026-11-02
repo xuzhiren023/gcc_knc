@@ -153,7 +153,11 @@ def run_session(board, ticket, role, dry_run):
         return False
     os.environ["PM_ROLE"] = role
     if role == "engineer":
-        pm.cmd_start(board, argparse.Namespace(id=ticket.id))
+        try:
+            pm.cmd_start(board, argparse.Namespace(id=ticket.id))
+        except pm.Refused as refused:
+            print("  %s could not start, so no session ran: %s" % (ticket.id, refused))
+            return False
         ticket = board.load(ticket.id)
         command, cwd = engineer_command(board, ticket, board.worktree(ticket)), board.worktree(ticket)
     else:
