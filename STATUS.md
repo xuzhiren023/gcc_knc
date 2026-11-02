@@ -1,16 +1,16 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-02 08:33.
+Updated automatically at every ticket change. Last update: 2026-11-02 08:34.
 
-**Next: the tech lead, on S0-07.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: GPT-6.1, on S0-08 (Toolchain independent of PhiWeather).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
-Current tickets: `[###########---------]` 5 of 9
+Current tickets: `[#############-------]` 6 of 9
 
 ## Milestones
 
 | | Milestone | State | Progress |
 |---|---|---|---|
-| M0 | Foundation | In progress | 5 of 9 tickets |
+| M0 | Foundation | In progress | 6 of 9 tickets |
 | M1 | Mixed native code | Not started | Not planned in detail yet |
 | M2 | Useful vector target | Not started | Not planned in detail yet |
 | M3 | Runtimes | Not started | Not planned in detail yet |
@@ -28,12 +28,13 @@ Current tickets: `[###########---------]` 5 of 9
 | S0-04 | Card runner | Not started |  |
 | S0-05 | Donor inventory | Done | The donor inventory now covers the whole tree with port/rewrite/drop decisions, the GCC 16.2 runtime audit ... |
 | S0-06 | GCC 16.2 fork and timing | Done | GCC 16.2 is checked out on branch knc in the shared build area and builds stock x86_64 C+Fortran on Cygwin ... |
-| S0-07 | Benchmark corpus and coverage estimate | Waiting for review | d620e4a: corpus report and measurement scripts. GCC 14.4 compile-only proxy via tools/run.py: STREAM, 8 Pol... |
+| S0-07 | Benchmark corpus and coverage estimate | Done | We now have a proposed public benchmark corpus (PolyBench, STREAM, NPB, HPCG, zlib, SQLite, with bzip2 and ... |
 | S0-08 | Toolchain independent of PhiWeather | Not started | Also in scope, from the S0-03 review: nothing recreates the hand-made sysroot files (crt1.o, crti.o, crtn.o... |
 | S0-09 | T1 scan sees KNC mask-branch loops | Not started |  |
 
 ## Recent activity
 
+- 2026-11-02 08:34 **S0-07** lead approve: We now have a proposed public benchmark corpus (PolyBench, STREAM, NPB, HPCG, zlib, SQLite, with bzip2 and two PolyBench kernels held out) and a co...
 - 2026-11-02 08:32 **S0-07** engineer submit: d620e4a: corpus report and measurement scripts. GCC 14.4 compile-only proxy via tools/run.py: STREAM, 8 PolyBench, NPB CG/EP/MG/IS, SQLite, bzip2 c...
 - 2026-11-02 08:14 **S0-07** lead answer: Sources are in .work/_shared/corpus/, read-only, with SHA-256, size and URL for each in SOURCES.txt: polybench-c-4.2.1-beta.tar.gz, stream.c (5.10)...
 - 2026-11-02 08:14 **S0-07** owner decide: Owner on 2026-11-02: yes, the lead downloads the benchmark sources into .work/_shared/corpus/.
@@ -41,7 +42,6 @@ Current tickets: `[###########---------]` 5 of 9
 - 2026-11-02 07:51 **S0-07** engineer ask: Blocked by sandbox network permissions: Python urllib.request.urlopen on https://www.cs.virginia.edu/stream/FTP/Code/stream.c fails with URLError /...
 - 2026-11-02 07:50 **S0-06** lead approve: GCC 16.2 is checked out on branch knc in the shared build area and builds stock x86_64 C+Fortran on Cygwin (full 45 min, i386.cc rebuild 2.8 min, i...
 - 2026-11-02 07:49 **S0-06** engineer submit: Acceptance met; commit aba96eb. GCC tag on knc, remotes configured, clean status, no case collisions or push. Cygwin GCC 14.4 C+Fortran all-gcc pas...
-- 2026-11-02 06:52 **S0-05** lead approve: The donor inventory now covers the whole tree with port/rewrite/drop decisions, the GCC 16.2 runtime audit for SSE, pause, 16-byte atomics, __float...
 
 ## Cost
 
