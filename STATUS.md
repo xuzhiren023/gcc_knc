@@ -2,7 +2,7 @@
 
 Updated automatically at every ticket change. Last update: 2026-11-01 23:52.
 
-**Next: GPT-6.1, on S0-05 (Donor inventory).** Run `python tools/dispatch.py`, or ask the tech lead to.
+**Waiting for you:** S0-05. Run `python tools/pm.py inbox`.
 
 Current tickets: `[######--------------]` 3 of 9
 
@@ -26,7 +26,7 @@ Current tickets: `[######--------------]` 3 of 9
 | S0-02 | ISA lint | Done | knc_lint now rejects the listed non-KNC instructions in .s, .o, archives, shared objects and executables, a... |
 | S0-03 | Test runner and red baseline | Done | tools/check now runs t0, t1 and t2 on the donor in about 16 seconds and records the expected baseline, with... |
 | S0-04 | Card runner | Not started |  |
-| S0-05 | Donor inventory | In progress | Decision: one more targeted pass, then submit whatever the result; no further ask on this item. Citations a... |
+| S0-05 | Donor inventory | **Waiting for you** | budget: 3 engineer sessions used; the budget is 3 |
 | S0-06 | GCC 16.2 fork and timing | Not started | Engineer sessions have no network, so do not clone. The owner or lead creates .work/_shared/gcc outside the... |
 | S0-07 | Benchmark corpus and coverage estimate | Not started |  |
 | S0-08 | Toolchain independent of PhiWeather | Not started | Also in scope, from the S0-03 review: nothing recreates the hand-made sysroot files (crt1.o, crti.o, crtn.o... |
@@ -34,6 +34,7 @@ Current tickets: `[######--------------]` 3 of 9
 
 ## Recent activity
 
+- 2026-11-01 23:52 **S0-05** lead escalate: budget: 3 engineer sessions used; the budget is 3
 - 2026-11-01 23:52 **S0-05** lead answer: Decision: one more targeted pass, then submit whatever the result; no further ask on this item. Citations and the F6 and GCC 16 guard findings stan...
 - 2026-11-01 23:51 **S0-05** engineer ask: Committed 3fec5cc: fixed GCC 16 citations; complete-flag full-source donor/reference compiles exit 0 with differing assembly. Extracted SUBMUSKINGC...
 - 2026-11-01 23:46 **S0-05** lead answer: Do not wait on the owner: everything you asked for is on disk, read-only. Exact original compile command is recorded in C:/Users/xuzhi/Documents/Ph...
@@ -41,7 +42,6 @@ Current tickets: `[######--------------]` 3 of 9
 - 2026-11-01 23:39 **S0-05** lead answer: Unblocked: finish both open items on this branch. (1) Source: GCC 16.2 is at .work/_shared/gcc, read-only for you; do the F6 audit from it with fil...
 - 2026-11-01 23:37 **S0-05** owner decide: Owner approved on 2026-11-01. GCC 16.2 is now at .work/_shared/gcc, at tag releases/gcc-16.2.0 (78d4ac7), with a clean status. The lead cloned it w...
 - 2026-11-01 23:03 **S0-08** lead note: Also in scope, from the S0-03 review: nothing recreates the hand-made sysroot files (crt1.o, crti.o, crtn.o, libc.so and libc_nonshared.a in usr/li...
-- 2026-11-01 23:03 **S0-06** lead note: Engineer sessions have no network, so do not clone. The owner or lead creates .work/_shared/gcc outside the sandbox with Git for Windows, which kee...
 
 ## Cost
 
