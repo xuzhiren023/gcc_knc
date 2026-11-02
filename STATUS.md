@@ -2,7 +2,7 @@
 
 Updated automatically at every ticket change. Last update: 2026-11-02 09:12.
 
-**Next: the tech lead, on S0-08.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: GPT-6.1, on S0-08 (Toolchain independent of PhiWeather).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
 Current tickets: `[#############-------]` 6 of 9
 
@@ -29,11 +29,12 @@ Current tickets: `[#############-------]` 6 of 9
 | S0-05 | Donor inventory | Done | The donor inventory now covers the whole tree with port/rewrite/drop decisions, the GCC 16.2 runtime audit ... |
 | S0-06 | GCC 16.2 fork and timing | Done | GCC 16.2 is checked out on branch knc in the shared build area and builds stock x86_64 C+Fortran on Cygwin ... |
 | S0-07 | Benchmark corpus and coverage estimate | Done | We now have a proposed public benchmark corpus (PolyBench, STREAM, NPB, HPCG, zlib, SQLite, with bzip2 and ... |
-| S0-08 | Toolchain independent of PhiWeather | Question for the tech lead | Owner on 2026-11-02: option (a). One-time exception to the never-copy rule: the lead copies the donor GCC s... |
+| S0-08 | Toolchain independent of PhiWeather | In progress | Source: .work/_shared/gcc-donor, branch donor at 93871d7 (public apc-llc/gcc-5.1.1-knc master af7cc04 plus ... |
 | S0-09 | T1 scan sees KNC mask-branch loops | Not started |  |
 
 ## Recent activity
 
+- 2026-11-02 09:12 **S0-08** lead answer: Source: .work/_shared/gcc-donor, branch donor at 93871d7 (public apc-llc/gcc-5.1.1-knc master af7cc04 plus the wide-int.h host fix). Read-only. Bud...
 - 2026-11-02 09:12 **S0-08** owner decide: Owner on 2026-11-02: option (a). One-time exception to the never-copy rule: the lead copies the donor GCC source into .work/_shared/gcc-donor; afte...
 - 2026-11-02 08:58 **S0-08** lead note: Checked: the donor source at PhiWeather/.tools/knc-bootstrap/gcc-source is af7cc04 plus one uncommitted change. Ignoring line endings, the only dif...
 - 2026-11-02 08:42 **S0-08** lead escalate: The k1om gcc 5.1.1 must be rebuilt to drop compiled-in PhiWeather paths, and its patched source exists only in PhiWeather/gcc-source. AGENTS forbid...
@@ -41,7 +42,6 @@ Current tickets: `[#############-------]` 6 of 9
 - 2026-11-02 08:41 **S0-08** lead answer: Rebuild authorized; do not intercept print queries in a wrapper, since that fakes the check without changing what the driver runs. Rebuild only the...
 - 2026-11-02 08:40 **S0-08** engineer ask: Reserved specs attempt failed: ../_shared/s0_08_specs_probe.py overrides *linker and *invoke_as to shared paths and passes --sysroot. Both print-pr...
 - 2026-11-02 08:34 **S0-07** lead approve: We now have a proposed public benchmark corpus (PolyBench, STREAM, NPB, HPCG, zlib, SQLite, with bzip2 and two PolyBench kernels held out) and a co...
-- 2026-11-02 08:32 **S0-07** engineer submit: d620e4a: corpus report and measurement scripts. GCC 14.4 compile-only proxy via tools/run.py: STREAM, 8 PolyBench, NPB CG/EP/MG/IS, SQLite, bzip2 c...
 
 ## Cost
 
