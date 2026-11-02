@@ -51,7 +51,8 @@ def loops(body):
         label = re.match(r'\s*([\w.$]+):', line)
         if label:
             labels[label[1]] = i
-        branch = re.match(r'\s*j\w+\s+([\w.$]+)\s*$', line)
+        # KNC mask branches put a mask register before the target label.
+        branch = re.match(r'\s*j\w+\s+(?:%k[0-7]\s*,\s*)?([\w.$]+)\s*$', line)
         if branch and branch[1] in labels:
             yield '\n'.join(lines[labels[branch[1]]:i + 1])
 
