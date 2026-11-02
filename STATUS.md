@@ -24,7 +24,7 @@ Current tickets: `[#####---------------]` 2 of 8
 |---|---|---|---|
 | S0-01 | Toolchain manifest and doctor | Done | Reviewed: red commit real; tests fail on the missing-tool cases; doctor rerun OK, required tools present, d... |
 | S0-02 | ISA lint | Done | knc_lint now rejects the listed non-KNC instructions in .s, .o, archives, shared objects and executables, a... |
-| S0-03 | Test runner and red baseline | Changes requested | Owner set sessions to 12 on 2026-11-01 and approved one more run. Make the two 22:01 review fixes, per the ... |
+| S0-03 | Test runner and red baseline | In progress | Owner set sessions to 12 on 2026-11-01 and approved one more run. Make the two 22:01 review fixes, per the ... |
 | S0-04 | Card runner | Not started |  |
 | S0-05 | Donor inventory | Not started |  |
 | S0-06 | GCC 16.2 fork and timing | Not started |  |
@@ -46,7 +46,7 @@ Current tickets: `[#####---------------]` 2 of 8
 
 - From the script, engineer: 9 sessions, 4.2M input tokens
 - From the script, lead: 9 sessions, 5.0M input tokens
-- Started by hand, Claude: 2 sessions, 50.0M input tokens
+- Started by hand, Claude: 2 sessions, 50.1M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
