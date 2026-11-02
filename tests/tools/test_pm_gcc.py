@@ -54,6 +54,20 @@ class GccTickets(Sandbox):
         self.start()
         self.assertEqual(self.output("rev-parse", "HEAD"), head)
 
+    def test_commit_gcc_leaves_worktree_untouched(self):
+        self.start()
+        host_head = self.output("rev-parse", "HEAD", cwd=self.wt)
+        with open(os.path.join(self.wt, "host-dirty"), "w") as f:
+            f.write("keep uncommitted\n")
+        with open(os.path.join(self.gcc, "gcc", "imci.md"), "w") as f:
+            f.write("ticket\n")
+        done = self.pm("commit", "A-1", "--gcc", "-m", "feat(A-1): GCC", cwd=self.wt)
+        self.assertEqual(done.returncode, 0, done.stdout)
+        self.assertEqual(self.output("log", "-1", "--format=%s"), "feat(A-1): GCC")
+        self.assertEqual(self.output("status", "--porcelain"), "")
+        self.assertEqual(self.output("rev-parse", "HEAD", cwd=self.wt), host_head)
+        self.assertEqual(self.output("status", "--porcelain", cwd=self.wt), "?? host-dirty")
+
     def test_start_refuses_dirty_checkout_and_other_ticket(self):
         with open(os.path.join(self.gcc, "untracked"), "w") as f:
             f.write("dirty")
