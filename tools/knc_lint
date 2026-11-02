@@ -21,19 +21,24 @@ DENIED = {
     'cmpxchg16b', 'pause', 'mfence', 'lfence', 'sfence',
     'monitor', 'mwait', 'sysenter', 'sysexit',
 }
-REGISTERS = re.compile(r'\b(?:[xy]mm\d+|mm[0-7])\b', re.I)
+REGISTERS = re.compile(r'%(?:[xy]mm\d+|mm[0-7])\b', re.I)
 INSTRUCTION = re.compile(r'^\s*([0-9a-f]+):\s+((?:[0-9a-f]{2}\s+)+)(.*?)\s*$', re.I)
 SYMBOL = re.compile(r'^\s*[0-9a-f]+ <(.+)>:$', re.I)
-PREFIXES = {'rep', 'repe', 'repz', 'repne', 'repnz', 'lock', 'data16', 'addr32', 'rex.w'}
+PREFIXES = {'rep', 'repe', 'repz', 'repne', 'repnz', 'lock', 'data16', 'addr32'}
+
+
+def is_prefix(word):
+    return word in PREFIXES or word == 'rex' or word.startswith('rex.')
 
 
 def forbidden(instruction, raw=()):
-    text = instruction.lower()
+    # Objdump annotations describe symbols, not instruction operands.
+    text = re.sub(r'<[^>]*>', '', instruction.split('#', 1)[0]).lower()
     if '(bad)' in text or REGISTERS.search(text):
         return True
     words = text.replace(';', ' ').split()
     prefixes = []
-    while words and words[0] in PREFIXES:
+    while words and is_prefix(words[0]):
         prefixes.append(words.pop(0))
     mnemonic = words[0] if words else ''
     if mnemonic in DENIED or mnemonic.startswith(('cmov', 'fcmov')):
@@ -47,6 +52,9 @@ def forbidden(instruction, raw=()):
 def source_violations(path):
     symbol = '<assembly>'
     contents = path.read_text()
+    # Strings can contain comment and statement delimiters (including escaped quotes).
+    contents = re.sub(r'"(?:\\.|[^"\\])*"',
+                      lambda m: '\n' * m[0].count('\n'), contents)
     contents = re.sub(r'/\*.*?\*/', lambda m: '\n' * m[0].count('\n'), contents, flags=re.S)
     pending = ''
     for number, line in enumerate(contents.splitlines(), 1):
@@ -60,7 +68,7 @@ def source_violations(path):
             if not statement or statement.startswith('.'):
                 continue
             instruction = (pending + ' ' + statement).strip()
-            if statement.lower() in PREFIXES:
+            if is_prefix(statement.lower()):
                 pending = instruction
                 continue
             pending = ''

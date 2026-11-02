@@ -62,8 +62,9 @@ class Lint(unittest.TestCase):
                               'call xmm0\nret\nxmm0:\nret\n.data\nmm1:\n.long 0\n'
                               '.string "wait; pause; xmm0 cmove"\n'
                               '.string "escaped \\"; pause; # xmm0"\n')
-            result = self.lint(source)
-            self.assertEqual(result.returncode, 0, result.stdout)
+            with self.subTest(path='source'):
+                result = self.lint(source)
+                self.assertEqual(result.returncode, 0, result.stdout)
             result = self.run_command(TC / 'cross/bin/k1om-mpss-linux-as.exe',
                                       '-march=k1om', source, '-o', obj)
             self.assertEqual(result.returncode, 0, result.stdout)
