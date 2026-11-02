@@ -3,6 +3,7 @@ import importlib.util
 from pathlib import Path
 import struct
 import unittest
+from unittest.mock import Mock, patch
 
 ROOT = Path(__file__).resolve().parents[2]
 spec = importlib.util.spec_from_file_location('knc_check', ROOT / 'tools/check.py')
@@ -63,6 +64,41 @@ class Scans(unittest.TestCase):
         self.assertEqual(required - provided, set())
         newer = check.versioned_symbols('  1: 000000 0 FUNC GLOBAL DEFAULT UND printf@GLIBC_99.0 (2)', True)
         self.assertTrue(newer - provided)
+
+
+class Runner(unittest.TestCase):
+    def test_link_trace_resolves_parenthesized_sysroot_paths(self):
+        runner = check.Runner.__new__(check.Runner)
+        runner.sysroot = Path('/shared/sysroot')
+        runner.out = Path('/shared/check')
+        runner.cc = Path('/shared/gcc')
+        runner.flags = []
+        runner.fixture = Path('/fixture')
+        runner.off_object = Path('/shared/check/loops.o')
+        runner.say = Mock()
+        runner.result = Mock()
+        runner.tool = Mock(return_value='readelf')
+        for provider in ('/shared/sysroot', '/outside'):
+            with self.subTest(provider=provider):
+                trace = '\n'.join('/lib64/%s (%s/lib64/%s)' % (name, provider, name)
+                                  for name in ('libc.so.6', 'ld-linux-k1om.so.2'))
+                runner.command = Mock(side_effect=lambda *args: trace if '-Wl,--trace' in args else '')
+                with patch.object(Path, 'read_bytes', return_value=b''), patch.object(check, 'scan_elf', return_value=[]):
+                    if provider == '/outside':
+                        with self.assertRaisesRegex(RuntimeError, 'outside shared sysroot'):
+                            runner.t2()
+                    else:
+                        runner.t2()
+                        self.assertTrue(any('/shared/sysroot/lib64/libc.so.6' in call.args[0]
+                                            for call in runner.say.call_args_list))
+
+    def test_only_t0_can_cache_project_inputs(self):
+        for tiers in (['t0'], ['t1'], ['t2'], ['t0', 't1', 't2']):
+            with self.subTest(tiers=tiers), patch.object(check.os, 'name', 'posix'), \
+                    patch.object(check.sys, 'argv', ['tools/check', *tiers]), \
+                    patch.object(check.subprocess, 'call', return_value=0) as call:
+                self.assertEqual(check.main(), 0)
+                self.assertEqual('--inputs' in call.call_args.args[0], tiers == ['t0'])
 
 
 if __name__ == '__main__':
