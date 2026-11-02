@@ -1,16 +1,16 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-02 15:26.
+Updated automatically at every ticket change. Last update: 2026-11-02 15:28.
 
-**Next: the tech lead, on S1-02.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: GPT-6.1, on S1-03 (tools/check runs source-level tests against GCC 16).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
-Current tickets: `[############--------]` 11 of 17
+Current tickets: `[##############------]` 12 of 17
 
 ## Milestones
 
 | | Milestone | State | Progress |
 |---|---|---|---|
-| M0 | Foundation | In progress | 11 of 17 tickets |
+| M0 | Foundation | In progress | 12 of 17 tickets |
 | M1 | Mixed native code | Not started | Not planned in detail yet |
 | M2 | Useful vector target | Not started | Not planned in detail yet |
 | M3 | Runtimes | Not started | Not planned in detail yet |
@@ -33,7 +33,7 @@ Current tickets: `[############--------]` 11 of 17
 | S0-09 | T1 scan sees KNC mask-branch loops | Done | The T1 check now recognises KNC vector loops that close with the mask branches jknzd and jkzd, so correct G... |
 | S0-10 | Card sysroot links Fortran, libm and pthreads | Done | Fortran programs and C programs using -lm, -lpthread, -ldl or -lrt now link with default flags against the ... |
 | S1-01 | Tickets can change the GCC fork | Done | Tickets marked gcc: yes now get their own branch in the GCC fork, count its changes in the size budget, sho... |
-| S1-02 | GCC 16.2 builds for k1om-mpss-linux | Waiting for review | GCC ba8912b3148: config.host routes KNC driver-i386.o. Configure 80.202s. all-gcc: failed 2363.706s (GOTOFF... |
+| S1-02 | GCC 16.2 builds for k1om-mpss-linux | Done | GCC 16.2 now configures and builds its C compiler for k1om-mpss-linux, using the shared KNC assembler, link... |
 | S1-03 | tools/check runs source-level tests against GCC 16 | Not started | Owner approved Sprint 1 on 2026-11-02; ticket set to ready. |
 | S1-04 | -march=knc with no SSE, AVX, MMX, CMOV, FCOMI or MFENCE | Not started | Owner approved Sprint 1 on 2026-11-02; ticket set to ready. |
 | S1-05 | Integer C assembles with as 2.22 and lints clean | Not started | Owner approved Sprint 1 on 2026-11-02; ticket set to ready. |
@@ -42,6 +42,7 @@ Current tickets: `[############--------]` 11 of 17
 
 ## Recent activity
 
+- 2026-11-02 15:28 **S1-02** lead approve: GCC 16.2 now configures and builds its C compiler for k1om-mpss-linux, using the shared KNC assembler, linker and sysroot, and the donor toolchain ...
 - 2026-11-02 15:26 **S1-02** engineer submit: GCC ba8912b3148: config.host routes KNC driver-i386.o. Configure 80.202s. all-gcc: failed 2363.706s (GOTOFF); resume interrupted 13:02:12-13:26:55 ...
 - 2026-11-02 14:22 **S1-02** lead answer: Yes. Add k1om-*-linux* to the inner target case at gcc/config.host:130 (keep the outer host case unchanged), commit with pm.py commit --gcc, and le...
 - 2026-11-02 14:21 **S1-02** engineer ask: Second compiler build failure: foreground gcc16 --resume (-j8) failed linking xgcc.exe/cpp.exe: undefined host_detect_local_cpu; 1572.646s, no Win3...
@@ -49,7 +50,6 @@ Current tickets: `[############--------]` 11 of 17
 - 2026-11-02 13:40 **S1-02** lead note: Replaces the 13:27 answer's background-and-poll advice, which is what used 150 calls and 15.5M tokens: every poll resends the whole conversation. N...
 - 2026-11-02 13:27 **S1-02** lead escalate: budget: 15925309 input tokens used; the budget is 6000000
 - 2026-11-02 13:27 **S1-02** lead answer: The resumed build did not survive: the log ends at 13:26:55, when your session closed, with 'unable to load user32.dll, Win32 error 8' and make 'Ha...
-- 2026-11-02 13:26 **S1-02** engineer ask: 150-call hook limit reached. Please continue to collect the running resumed all-gcc result and xgcc path outputs, without restarting. Changes commi...
 
 ## Cost
 
