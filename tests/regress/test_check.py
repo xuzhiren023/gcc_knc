@@ -30,6 +30,7 @@ class Scans(unittest.TestCase):
             with self.subTest(mutation=old):
                 self.assertTrue(self.scan(self.asm.replace(old, new)))
         self.assertTrue(self.scan(self.asm.replace('fsubs (%rax)', 'vsubps %zmm0, %zmm1, %zmm2')))
+        self.assertTrue(self.scan(self.asm.replace('fsubs (%rax)', 'vsubrps %zmm0, %zmm1, %zmm2')))
         self.assertTrue(self.scan(report=''))
         # A report for the recurrence or one affine cannot stand in for the other.
         self.assertTrue(self.scan(report=self.report.splitlines()[0]))
@@ -60,11 +61,6 @@ class Scans(unittest.TestCase):
         self.assertTrue(check.scan_elf(wrong))
         self.assertTrue(check.scan_elf(data.replace(b'k1om', b'x866')))
         self.assertTrue(check.scan_elf(b'not ELF'))
-        required = check.versioned_symbols('  1: 000000 0 FUNC GLOBAL DEFAULT UND printf@GLIBC_2.0 (2)', True)
-        provided = check.versioned_symbols('  2: 000100 0 FUNC GLOBAL DEFAULT 12 printf@@GLIBC_2.0', False)
-        self.assertEqual(required - provided, set())
-        newer = check.versioned_symbols('  1: 000000 0 FUNC GLOBAL DEFAULT UND printf@GLIBC_99.0 (2)', True)
-        self.assertTrue(newer - provided)
 
 
 class Runner(unittest.TestCase):
@@ -88,17 +84,39 @@ class Runner(unittest.TestCase):
         runner.say = Mock()
         runner.result = Mock()
         runner.tool = Mock(return_value='readelf')
-        for provider in ('/shared/sysroot', '/outside'):
-            with self.subTest(provider=provider):
+        cases = [('/outside', 'GLIBC_2.14', 'GLIBC_2.14', None),
+                 ('/shared/sysroot', 'GLIBC_2.14', 'GLIBC_2.14', []),
+                 ('/shared/sysroot', 'GLIBC_99.0', 'GLIBC_99.0', ['libc.so.6 lacks printf@GLIBC_99.0']),
+                 ('/shared/sysroot', 'GLIBC_99.0', 'GLIBC_2.14', ['unresolved version requirement printf@GLIBC_99.0']),
+                 ('/shared/sysroot', None, 'GLIBC_2.14', ['no versioned symbol requirements found'])]
+        for provider, required, version, failures in cases:
+            with self.subTest(provider=provider, required=required, version=version):
                 trace = '\n'.join('/lib64/%s (%s/lib64/%s)' % (name, provider, name)
                                   for name in ('libc.so.6', 'ld-linux-k1om.so.2'))
-                runner.command = Mock(side_effect=lambda *args: trace if '-Wl,--trace' in args else '')
-                with patch.object(Path, 'read_bytes', return_value=b''), patch.object(check, 'scan_elf', return_value=[]):
+                def command(*args):
+                    if '-Wl,--trace' in args:
+                        return trace
+                    if '--version-info' in args:
+                        return ('Version needs section .gnu.version_r contains 1 entry:\n'
+                                '  000000: Version: 1  File: libc.so.6  Cnt: 1\n'
+                                '  0x0010: Name: %s  Flags: none  Version: 2\n' % version)
+                    if '--dyn-syms' in args:
+                        if args[-1] == runner.out / 'm1_affine.mic':
+                            return ('  1: 0000000000000000 0 FUNC GLOBAL DEFAULT UND printf@%s (2)\n'
+                                    % required) if required else ''
+                        return '  2: 0000000000010000 0 FUNC GLOBAL DEFAULT 12 printf@@GLIBC_2.14\n'
+                    return ''
+                runner.command = Mock(side_effect=command)
+                runner.result.reset_mock()
+                with patch.object(Path, 'read_bytes', return_value=b''), \
+                        patch.object(Path, 'is_file', return_value=True), \
+                        patch.object(check, 'scan_elf', return_value=[]):
                     if provider == '/outside':
                         with self.assertRaisesRegex(RuntimeError, 'outside shared sysroot'):
                             runner.t2()
                     else:
                         runner.t2()
+                        runner.result.assert_called_with('t2 symbol versions against card sysroot', failures)
                         self.assertTrue(any('/shared/sysroot/lib64/libc.so.6' in call.args[0]
                                             for call in runner.say.call_args_list))
 
