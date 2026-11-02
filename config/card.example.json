@@ -1,0 +1,9 @@
+{
+  "host": "192.168.1.100",
+  "identity": "C:/replace/with/owner/key",
+  "knownHosts": "C:/replace/with/owner/known_hosts",
+  "externalLocks": [],
+  "baselineNames": [],
+  "timeout": 60.0,
+  "transportTimeout": 10.0
+}

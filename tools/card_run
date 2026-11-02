@@ -1,0 +1,390 @@
+#!/usr/bin/env python3
+"""S0-04 card runner; see docs/card-run.md for the reviewed safety contract.
+
+No native run is permitted while the owner's card hold remains in effect.
+The fake transport seam does not connect to a card.
+"""
+import argparse
+import base64
+import json
+import math
+import os
+from pathlib import Path
+import queue
+import re
+import shlex
+import subprocess
+import sys
+import threading
+import time
+import uuid
+
+
+ROOT = Path(__file__).resolve().parent.parent
+RUN_DIR = re.compile(r"/var/volatile/tmp/gcc-knc-[0-9a-f]{32}\Z")
+REFUSED_EXIT, TIMEOUT_EXIT, INFRA_EXIT = 125, 124, 126
+
+
+class Refused(OSError):
+    pass
+
+
+def inside(path, directory):
+    return isinstance(path, str) and (path == directory or path.startswith(directory + "/"))
+
+
+def default_lock(root):
+    # Project worktrees live at <main>/.work/<ticket>, like storage.main_root's
+    # fallback. Both main and every ticket must contend on this one state file.
+    root = Path(root).resolve()
+    main = root.parent.parent if root.parent.name == ".work" else root
+    return main / ".work/_state/card.lock"
+
+
+def check_idle(snapshot, run_dir, baseline_names):
+    foreign = [p for p in snapshot["processes"]
+               if not (inside(p.get("exe"), run_dir) or inside(p.get("cwd"), run_dir))
+               and str(p.get("pid")) != "2" and str(p.get("ppid")) != "2"
+               and (not p.get("name") or p["name"] not in baseline_names)]
+    if foreign:
+        raise Refused("foreign/unknown processes: " + ", ".join(
+            "%s (%s)" % (p.get("pid", "?"), p.get("name") or "unknown") for p in foreign))
+
+
+def run(program, argv, *, lock_path, external_locks, baseline_names, timeout,
+        transport_timeout, receipt_path, transport, monotonic=time.monotonic):
+    result = dict(result_class="infrastructure", exit_code=INFRA_EXIT,
+                  program_exit_code=None, boot_id_before=None, boot_id_after=None,
+                  card_minutes=0.0, detail="")
+    session, acquired, execution_started, execution_finished = None, False, False, False
+    run_dir = "/var/volatile/tmp/gcc-knc-" + uuid.uuid4().hex
+
+    def failure(kind, code, detail):
+        result.update(result_class=kind, exit_code=code, detail=str(detail))
+
+    def snapshot():
+        snap = session.snapshot(timeout=transport_timeout)
+        boot = snap.get("boot_id")
+        if not isinstance(boot, str) or not boot.strip():
+            raise OSError("unknown boot ID; cannot establish card state")
+        result["boot_id_after"] = boot
+        if result["boot_id_before"] is None:
+            result["boot_id_before"] = boot
+        elif result["boot_id_before"] != boot:
+            raise OSError("card boot ID changed; no signalling or cleanup permitted")
+        return snap
+
+    try:
+        if any(not math.isfinite(n) or n <= 0 for n in (timeout, transport_timeout)):
+            raise ValueError("limits must be finite and positive")
+        lock_path = Path(lock_path).absolute()
+        if lock_path.resolve() != default_lock(ROOT):
+            lock_path.parent.resolve().relative_to(ROOT.resolve())
+        # O_EXCL is intentional: stale locks require an owner's intervention.
+        try:
+            fd = os.open(str(lock_path), os.O_CREAT | os.O_EXCL | os.O_WRONLY, 0o600)
+        except FileExistsError:
+            raise Refused("own lock present: %s" % lock_path)
+        acquired = True
+        os.close(fd)
+        for external in external_locks:
+            try:
+                os.lstat(str(external))
+            except FileNotFoundError:
+                continue
+            except OSError as error:
+                raise Refused("cannot stat external lock %s: %s" % (external, error))
+            raise Refused("external lock present: %s" % external)
+        session = transport.connect(run_dir, timeout=transport_timeout)
+        check_idle(snapshot(), run_dir, baseline_names)
+        session.stage(run_dir, program, timeout=transport_timeout)
+        check_idle(snapshot(), run_dir, baseline_names)
+        started = monotonic()
+        execution_started = True
+        try:
+            status = session.execute(run_dir, argv, timeout=timeout,
+                                     card_timeout=math.ceil(timeout + max(5.0, 2 * transport_timeout)))
+            result.update(result_class="program", exit_code=status, program_exit_code=status)
+        except TimeoutError as error:
+            failure("timeout", TIMEOUT_EXIT, error)
+        finally:
+            result["card_minutes"] = (monotonic() - started) / 60.0
+        execution_finished = True
+    except Refused as error:
+        failure("refused", REFUSED_EXIT, error)
+    except (OSError, ValueError) as error:
+        failure("infrastructure", INFRA_EXIT, error)
+    except KeyboardInterrupt:
+        failure("infrastructure", INFRA_EXIT, "host interrupted")
+    finally:
+        if session is not None:
+            try:
+                # This check runs after success, refusal, timeout, or partial staging.
+                if result["boot_id_before"] is None:
+                    raise OSError("initial boot ID unknown; no cleanup permitted")
+                snapshot()
+                if execution_started and (not execution_finished or result["result_class"] == "timeout"):
+                    session.signal_owned(run_dir, result["boot_id_before"], timeout=transport_timeout)
+                session.cleanup(run_dir, result["boot_id_before"], timeout=transport_timeout)
+            except (OSError, ValueError) as error:
+                failure("infrastructure", INFRA_EXIT, "%s; cleanup incomplete: %s" % (result["detail"], error))
+            finally:
+                try:
+                    session.close()
+                except OSError as error:
+                    failure("infrastructure", INFRA_EXIT, "session close failed: %s" % error)
+        if acquired:
+            try:
+                lock_path.unlink()
+            except OSError as error:
+                failure("infrastructure", INFRA_EXIT, "own lock release failed: %s" % error)
+    # One overwritten runtime result, not a committed run history.
+    try:
+        receipt_path = Path(receipt_path)
+        receipt_path.parent.mkdir(parents=True, exist_ok=True)
+        receipt_path.write_text(json.dumps(result, sort_keys=True) + "\n", encoding="utf8")
+    except OSError as error:
+        failure("infrastructure", INFRA_EXIT, "cannot write result: %s" % error)
+    return result
+
+
+class SSHTransport:
+    """One bounded OpenSSH shell, with no connection or operation retries."""
+
+    def __init__(self, config, transport_timeout):
+        self.config = config
+        self.transport_timeout = transport_timeout
+
+    def connect(self, run_dir, *, timeout):
+        if not RUN_DIR.fullmatch(run_dir):
+            raise OSError("invalid private directory")
+        c = self.config
+        host = c["host"]
+        if not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9.:-]*", host):
+            raise OSError("invalid card hostname/address")
+        command = ["C:/Windows/System32/OpenSSH/ssh.exe", "-F", "NUL", "-i", c["identity"],
+                   "-o", "IdentitiesOnly=yes", "-o", "BatchMode=yes",
+                   "-o", "StrictHostKeyChecking=yes", "-o", "GlobalKnownHostsFile=NUL",
+                   "-o", "UserKnownHostsFile=" + c["knownHosts"],
+                   "-o", "HostKeyAlgorithms=ssh-ed25519", "-o", "ConnectTimeout=5",
+                   "root@" + host, "exec sh"]
+        session = SSHSession(command, run_dir, self.transport_timeout)
+        try:
+            session.rpc("umask 077\nrun_dir=%s\nmkdir -- \"$run_dir\" && cd -- \"$run_dir\"" %
+                        shlex.quote(run_dir), timeout)
+            session.rpc((ROOT / "tools/card_run_remote.sh").read_text(encoding="utf8"), timeout)
+            session.rpc("check_tools() { for tool in readlink stat id cat base64 chmod tail head sleep mkdir rm; "
+                        "do command -v \"$tool\" >/dev/null || return 94; done; }; check_tools", timeout)
+            return session
+        except BaseException:
+            session.close()
+            raise
+
+
+class SSHSession:
+    def __init__(self, command, run_dir, transport_timeout):
+        self.run_dir, self.transport_timeout = run_dir, transport_timeout
+        self.process = subprocess.Popen(command, stdin=subprocess.PIPE, stdout=subprocess.PIPE,
+                                        stderr=subprocess.PIPE)
+        self.lines = queue.Queue()
+        self.token = uuid.uuid4().hex.encode("ascii")
+        self.boot_id = None
+        self.broken = False
+        threading.Thread(target=self.read_stdout, daemon=True).start()
+        threading.Thread(target=self.read_stderr, daemon=True).start()
+
+    def read_stdout(self):
+        try:
+            for line in iter(self.process.stdout.readline, b""):
+                self.lines.put(line)
+        finally:
+            self.lines.put(None)
+
+    def read_stderr(self):
+        for data in iter(lambda: self.process.stderr.read(4096), b""):
+            sys.stderr.buffer.write(data)
+            sys.stderr.buffer.flush()
+
+    def rpc(self, script, timeout):
+        if self.broken:
+            raise OSError("SSH session unavailable; no retry")
+        # Use a writer thread so a full SSH input pipe is bounded too.
+        payload = (script + "\ncard_rc=$?\nprintf '\\n%s:%%s\\n' \"$card_rc\"\n" %
+                   self.token.decode()).encode("utf8")
+        deadline = time.monotonic() + timeout
+        written = queue.Queue()
+
+        def write():
+            try:
+                self.process.stdin.write(payload)
+                self.process.stdin.flush()
+                written.put(None)
+            except OSError as error:
+                written.put(error)
+
+        threading.Thread(target=write, daemon=True).start()
+        try:
+            error = written.get(timeout=max(0.001, deadline - time.monotonic()))
+            if error:
+                raise error
+            output = []
+            while True:
+                line = self.lines.get(timeout=max(0.001, deadline - time.monotonic()))
+                if line is None:
+                    raise OSError("card unreachable: SSH session ended")
+                if line.startswith(self.token + b":"):
+                    status = int(line.split(b":", 1)[1])
+                    if status:
+                        raise OSError("remote operation failed (status %s): %s" %
+                                      (status, b"".join(output).decode("utf8", "replace")[:500]))
+                    return b"".join(output).rstrip(b"\n")
+                output.append(line)
+        except (queue.Empty, OSError, ValueError) as error:
+            self.broken = True
+            raise OSError("SSH transport failure: %s" % (error or "operation deadline"))
+
+    def snapshot(self, *, timeout):
+        try:
+            records = self.rpc("snapshot", timeout).decode("utf8", "strict").splitlines()
+        except UnicodeError as error:
+            raise OSError("unknown process identity: %s" % error)
+        if not records or not records[0].startswith("BOOT\t"):
+            raise OSError("malformed process/boot snapshot")
+        boot = records[0][5:]
+        processes = []
+        for line in records[1:]:
+            fields = line.split("\t")
+            if (len(fields) != 6 or fields[0] != "PROC" or not fields[1].isdigit()
+                    or not fields[2].isdigit()):
+                raise OSError("unknown process identity in snapshot")
+            processes.append(dict(zip(("pid", "ppid", "name", "exe", "cwd"), fields[1:])))
+        if self.boot_id is None:
+            self.boot_id = boot
+        return dict(boot_id=boot, processes=processes)
+
+    def stage(self, run_dir, program, *, timeout):
+        self.validate(run_dir)
+        deadline = time.monotonic() + timeout
+        self.rpc("guard_dir && : > program.b64", self.remaining(deadline))
+        with open(program, "rb") as source:
+            while True:
+                chunk = source.read(48 * 1024)
+                if not chunk:
+                    break
+                self.rpc("printf '%s' '" + base64.b64encode(chunk).decode("ascii") +
+                         "' >> program.b64", self.remaining(deadline))
+        self.rpc("guard_dir && base64 -d program.b64 > program && chmod 700 program && rm program.b64",
+                 self.remaining(deadline))
+        # A separate shell has its own $$, so stop_owned spares the watchdog
+        # itself. Ignore HUP before exec; losing SSH must not disarm the timer.
+        watchdog = ((ROOT / "tools/card_run_remote.sh").read_text(encoding="utf8") +
+                    '\nrun_dir=$1\nboot_id=$2\nguard_boot || exit 92\n'
+                    'sleep "$3" || exit 95\ncleanup\n')
+        encoded = base64.b64encode(watchdog.encode("utf8")).decode("ascii")
+        self.rpc("guard_dir && printf '%s' '" + encoded + "' | base64 -d > watchdog.sh",
+                 self.remaining(deadline))
+
+    @staticmethod
+    def remaining(deadline):
+        left = deadline - time.monotonic()
+        if left <= 0:
+            raise OSError("SSH operation deadline")
+        return left
+
+    def validate(self, run_dir):
+        if run_dir != self.run_dir or not RUN_DIR.fullmatch(run_dir):
+            raise OSError("operation outside this exact run directory")
+
+    def execute(self, run_dir, argv, *, timeout, card_timeout):
+        self.validate(run_dir)
+        deadline = time.monotonic() + timeout
+        def operation(script):
+            return self.rpc(script, self.transport_timeout)
+        command = " ".join(shlex.quote(str(arg)) for arg in argv)
+        operation("boot_id=%s\nstart_job %s %s" %
+                  (shlex.quote(self.boot_id), shlex.quote(str(card_timeout)), command))
+        offsets = [0, 0]
+        status = None
+        while True:
+            if time.monotonic() >= deadline:
+                raise TimeoutError("card program deadline exceeded")
+            for index, (name, stream) in enumerate((("stdout", sys.stdout.buffer),
+                                                     ("stderr", sys.stderr.buffer))):
+                # Finite chunks keep arbitrary program bytes out of the control protocol.
+                encoded = operation("guard_dir && { tail -c +%d %s | head -c 65536 | base64; }" %
+                                    (offsets[index] + 1, name))
+                data = base64.b64decode(encoded)
+                stream.write(data)
+                stream.flush()
+                offsets[index] += len(data)
+                if status is not None and data:
+                    break
+            else:
+                if status is not None:
+                    return status
+            answer = operation("guard_dir && if [ -f status ]; then cat status; else echo running; fi")
+            if answer != b"running":
+                try:
+                    status = int(answer)
+                except ValueError:
+                    raise OSError("missing program exit status")
+            time.sleep(min(0.05, max(0, deadline - time.monotonic())))
+
+    def guarded(self, operation, run_dir, boot_id, timeout):
+        self.validate(run_dir)
+        if not boot_id or boot_id != self.boot_id:
+            raise OSError("boot guard mismatch")
+        self.rpc("boot_id=%s\n%s" % (shlex.quote(boot_id), operation), timeout)
+
+    def signal_owned(self, run_dir, boot_id, *, timeout):
+        self.guarded("stop_owned", run_dir, boot_id, timeout)
+
+    def cleanup(self, run_dir, boot_id, *, timeout):
+        self.guarded("cleanup", run_dir, boot_id, timeout)
+
+    def close(self):
+        # Closing local SSH cannot authorize any remote signal/removal.
+        if self.process.poll() is None:
+            self.process.terminate()
+            try:
+                self.process.wait(timeout=1)
+            except subprocess.TimeoutExpired:
+                self.process.kill()
+                self.process.wait(timeout=1)
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--config", type=Path, default=ROOT / "config/card.local.json")
+    parser.add_argument("--lock", type=Path)
+    parser.add_argument("--external-lock", action="append", type=Path, default=[])
+    parser.add_argument("--baseline-name", action="append", default=[])
+    parser.add_argument("--timeout", type=float)
+    parser.add_argument("--transport-timeout", type=float)
+    parser.add_argument("--receipt", type=Path, default=ROOT / "tests/out/card-result.json")
+    parser.add_argument("program", type=Path)
+    parser.add_argument("args", nargs=argparse.REMAINDER)
+    args = parser.parse_args()
+    try:
+        config = json.loads(args.config.read_text(encoding="utf8"))
+        for key in ("host", "identity", "knownHosts"):
+            if not isinstance(config[key], str) or not config[key]:
+                raise ValueError("missing connection setting: " + key)
+        timeout = args.timeout if args.timeout is not None else config.get("timeout", 60.0)
+        transport_timeout = (args.transport_timeout if args.transport_timeout is not None
+                             else config.get("transportTimeout", 10.0))
+        result = run(args.program, args.args,
+                     lock_path=args.lock or Path(config.get("ownLock", str(default_lock(ROOT)))),
+                     external_locks=[Path(p) for p in config.get("externalLocks", [])] + args.external_lock,
+                     baseline_names=set(config.get("baselineNames", [])) | set(args.baseline_name),
+                     timeout=timeout, transport_timeout=transport_timeout, receipt_path=args.receipt,
+                     transport=SSHTransport(config, transport_timeout))
+        print(json.dumps(result, sort_keys=True))
+        return result["exit_code"]
+    except (OSError, ValueError, KeyError, TypeError) as error:
+        print("card runner infrastructure: %s" % error, file=sys.stderr)
+        return INFRA_EXIT
+
+
+if __name__ == "__main__":
+    sys.exit(main())
