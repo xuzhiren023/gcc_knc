@@ -36,7 +36,7 @@ Full details are in [SPRINT-00](sprints/SPRINT-00.md).
 | ID | Story | Acceptance | Depth |
 |---|---|---|---|
 | E2-01 | KNC ABI: SF and DF arguments and returns in `zmm` lane 0, varargs with `%al`, and x87 bodies | ABI fixture cross-linked with donor objects in both directions, including overflow arguments, structs and callbacks; T3 | Deep |
-| E2-02 | Scalar transfer lowering: `vpackstore`/`vbroadcast` through memory with no direct GPR moves; mask scratch handling | T1 and T3 mixed-pressure tests; the donor's secondary-reload failure reproducer passes, whether or not its mechanism still exists (not reduced yet: start from S0-05's record in `docs/research/donor-inventory.md`) | Deep |
+| E2-02 | Scalar transfer lowering: `vpackstore`/`vbroadcast` through memory with no direct GPR moves; mask scratch handling | T1 and T3 mixed-pressure tests; the donor's secondary-reload failure reproducer passes, whether or not its mechanism still exists (`tests/regress/knc-secondary-reload.f90`, compile-only; its header gives the RTL symptom check to wire in) | Deep |
 | E2-03 | x87 compare and branch without `fcomi`, and stack-alignment rules for `zmm` spills | T3 with NaN, signed zero and unordered cases; T1 no `fcomi` | Deep |
 | E2-04 | Memory barriers and atomics without `mfence` and without `cmpxchg16b`; spin hint via `delay` where appropriate | T1 lint; T3 threaded smoke test | Standard |
 | E2-05 | Build static libgcc: disable SSE-dependent parts, keep soft-float helpers working | T2 lint across `libgcc.a`; T3 helpers | Standard |
