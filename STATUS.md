@@ -24,7 +24,7 @@ Current tickets: `[#####---------------]` 2 of 7
 |---|---|---|---|
 | S0-01 | Toolchain manifest and doctor | Done | Reviewed: red commit real; tests fail on the missing-tool cases; doctor rerun OK, required tools present, d... |
 | S0-02 | ISA lint | Done | knc_lint now rejects the listed non-KNC instructions in .s, .o, archives, shared objects and executables, a... |
-| S0-03 | Test runner and red baseline | Not started |  |
+| S0-03 | Test runner and red baseline | In progress |  |
 | S0-04 | Card runner | Not started |  |
 | S0-05 | Donor inventory | Not started |  |
 | S0-06 | GCC 16.2 fork and timing | Not started |  |
