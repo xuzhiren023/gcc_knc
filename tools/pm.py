@@ -170,14 +170,14 @@ def added_lines(diff):
             yield current, line[1:]
 
 
-def gcc_checkout(board, ticket):
+def gcc_checkout(board, ticket, allow_dirty=False):
     """WIP is one: the shared checkout may belong only to this ticket or knc."""
     if ticket.fields.get("gcc") != "yes":
         return None
     path = os.path.join(storage.shared_area(board.root), "gcc")
     if not os.path.isdir(os.path.join(path, ".git")):
         raise Refused("GCC checkout missing: " + path)
-    if run_git("status", "--porcelain", cwd=path):
+    if not allow_dirty and run_git("status", "--porcelain", cwd=path):
         raise Refused("uncommitted changes in the GCC checkout")
     branch = run_git("branch", "--show-current", cwd=path)
     if branch not in ("knc", ticket.fields["branch"]):
@@ -293,12 +293,23 @@ def cmd_start(board, args):
 
 
 def cmd_commit(board, args):
-    """Commit the worktree. Codex's sandbox protects .git and exempts only plain commands, so
+    """Commit the worktree or shared GCC. Codex's sandbox protects .git and exempts only plain commands, so
     git add or git commit inside a longer script fails."""
     require_role("engineer")
     ticket = board.load(args.id)
     require_state(ticket, "doing")
     worktree = board.worktree(ticket)
+    if args.gcc:
+        worktree = gcc_checkout(board, ticket, allow_dirty=True)
+        if worktree is None:
+            raise Refused("--gcc requires a gcc: yes ticket")
+        if not run_git("branch", "--list", "knc", cwd=worktree):
+            run_git("branch", "knc", "releases/gcc-16.2.0", cwd=worktree)
+        branch = ticket.fields["branch"]
+        if run_git("branch", "--show-current", cwd=worktree) == "knc":
+            exists = run_git("branch", "--list", branch, cwd=worktree)
+            target = (branch,) if exists else ("-b", branch, "knc")
+            run_git("checkout", "-q", *target, cwd=worktree)
     run_git("add", "-A", cwd=worktree)
     if not run_git("status", "--porcelain", cwd=worktree):
         raise Refused("nothing to commit")
@@ -516,7 +527,8 @@ def parser():
     add("status", cmd_status)
     add("show", cmd_show, ident)
     add("start", cmd_start, ident)
-    add("commit", cmd_commit, ident, ("-m", {"dest": "message", "required": True}))
+    add("commit", cmd_commit, ident, ("--gcc", {"action": "store_true"}),
+        ("-m", {"dest": "message", "required": True}))
     add("red", cmd_red, ident, ("--note", {"required": True}))
     add("submit", cmd_submit, ident, ("--note", {"required": True}), ("--override", {}))
     add("approve", cmd_approve, ident, ("--note", {}))
