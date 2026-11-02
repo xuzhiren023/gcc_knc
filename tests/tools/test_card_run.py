@@ -233,8 +233,10 @@ class CardRun(unittest.TestCase):
         self.assertLess(names.index("signal_owned"), names.index("cleanup"))
         self.assertEqual([e for e in self.transport.events if e[0] == "signal_owned"],
                          [("signal_owned", self.transport.run_dir, BOOT, 1.0)])
+        execute = next(e for e in self.transport.events if e[0] == "execute")
+        self.assertIsInstance(execute[4], int, "card sleep requires whole seconds")
         self.assertEqual([e for e in self.transport.events if e[0] == "execute"],
-                         [("execute", self.transport.run_dir, ["argument with spaces"], 30.0, 35.0)])
+                         [("execute", self.transport.run_dir, ["argument with spaces"], 30.0, 35)])
         self.assert_cleaned()
 
         # A control poll started just before the deadline gets its full transport
@@ -248,9 +250,9 @@ class CardRun(unittest.TestCase):
                                side_effect=[0.0, 29.9, 30.0, 30.0]), \
                 mock.patch.object(self.runner["time"], "sleep"):
             with self.assertRaises(TimeoutError):
-                session.execute(session.run_dir, [], timeout=30.0, card_timeout=35.0)
+                session.execute(session.run_dir, [], timeout=30.0, card_timeout=35)
         self.assertTrue(all(call.args[1] == 1.0 for call in session.rpc.call_args_list))
-        self.assertIn("start_job 35", session.rpc.call_args_list[0].args[0])
+        self.assertIn("start_job 35 ", session.rpc.call_args_list[0].args[0])
 
     def test_unreachable_is_infrastructure_without_retry(self):
         for phase in (True, "execute"):
