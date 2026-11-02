@@ -61,6 +61,11 @@ stateDiagram-v2
 The dispatcher reads the board without using any model, picks the next action and starts one
 fresh session. It finishes open work before it starts new tickets.
 
+A ticket with `gcc: yes` also changes the GCC fork in `.work/_shared/gcc`: `start` puts that
+checkout on a branch of the same name from `knc`, and `submit` counts that branch's diff too.
+The review reads `git -C .work/_shared/gcc diff knc...<branch>`, and `approve` merges both
+branches, into `main` and `knc`, or neither. Nothing is pushed.
+
 ## Rules that keep context small
 
 1. **Agents do not message each other.** The only channel is the ticket. `tools/pm.py` is the only thing that writes to it.

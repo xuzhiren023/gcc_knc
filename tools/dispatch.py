@@ -80,6 +80,11 @@ def session_env(board, ticket, role):
     env = {k: v for k, v in os.environ.items() if not k.startswith("CLAUDE")}
     env.update(PM_ROLE=role, PM_TICKET=ticket.id, PM_DEPTH=ticket.fields.get("depth", "standard"),
                PM_ALLOW_TIERS=ticket.fields.get("allow_tiers", ""), PM_ALLOW_BULK=ticket.fields.get("allow_bulk", ""))
+    if role == "engineer":
+        # The sandbox user does not own the shared GCC checkout, so git calls it dubious. Command-line
+        # scope is trusted for safe.directory; Codex would drop GIT_CONFIG_KEY_0 because it contains KEY.
+        gcc = os.path.join(storage.shared_area(board.root), "gcc").replace("\\", "/")
+        env["GIT_CONFIG_PARAMETERS"] = "'safe.directory'='%s'" % gcc
     return env
 
 
