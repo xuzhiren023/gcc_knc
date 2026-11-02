@@ -5,13 +5,14 @@ import re
 import runpy
 import tempfile
 import unittest
+from unittest import mock
 
 
 ROOT = Path(__file__).resolve().parents[2]
 BOOT = "00000000-0000-0000-0000-000000000001"
 REBOOT = "00000000-0000-0000-0000-000000000002"
 RUN_DIR = re.compile(r"/var/volatile/tmp/gcc-knc-[0-9a-f]{32}\Z")
-DAEMON = {"pid": 1, "name": "sshd", "exe": "/usr/sbin/sshd", "cwd": "/"}
+DAEMON = {"pid": 1, "ppid": 0, "name": "sshd", "exe": "/usr/sbin/sshd", "cwd": "/"}
 FOREIGN = {"pid": 42, "name": "other-job", "exe": "/opt/other/job", "cwd": "/opt/other"}
 UNKNOWN = {"pid": 43, "name": None, "exe": None, "cwd": None}
 
@@ -29,6 +30,7 @@ class FakeTransport:
         self.late_processes = []
         self.foreign_path = None
         self.unreachable = False
+        self.link_broken = False
         self.stage_failure = False
         self.timed_out = False
         self.reboot = False
@@ -40,13 +42,15 @@ class FakeTransport:
     def connect(self, run_dir, *, timeout):
         self._directory(run_dir)
         self.events.append(("connect", run_dir, timeout))
-        if self.unreachable:
+        if self.unreachable is True:
             raise OSError("fake card unreachable")
         self.run_dir = run_dir
         return self
 
     def snapshot(self, *, timeout):
         self.events.append(("snapshot", timeout))
+        if self.link_broken:
+            raise OSError("fake SSH link broken")
         processes = [DAEMON] + self.processes
         if self.staged:
             processes += self.late_processes
@@ -71,10 +75,13 @@ class FakeTransport:
         if self.stage_failure:
             raise OSError("fake partial staging failure")
 
-    def execute(self, run_dir, argv, *, timeout):
+    def execute(self, run_dir, argv, *, timeout, card_timeout=None):
         self._owned(run_dir, BOOT)
-        self.events.append(("execute", run_dir, list(argv), timeout))
+        self.events.append(("execute", run_dir, list(argv), timeout, card_timeout))
         self.now += timeout if self.timed_out else 12.0
+        if self.unreachable == "execute":
+            self.link_broken = True
+            raise OSError("fake SSH link broken during execute")
         if self.reboot:
             self.boot = REBOOT
         if self.timed_out:
@@ -169,8 +176,18 @@ class CardRun(unittest.TestCase):
                     # Test fixture teardown only; the runner may not remove it.
                     lock.unlink()
 
+    def test_worktree_roots_share_default_lock(self):
+        main = self.directory / "project"
+        expected = main / ".work/_state/card.lock"
+        roots = (main, main / ".work/S0-04", main / ".work/another-ticket")
+        for root in roots:
+            with self.subTest(root=root):
+                self.assertEqual(self.runner["default_lock"](root), expected)
+
     def test_foreign_or_unknown_process_refuses_before_staging_or_exec(self):
         cases = ((False, FOREIGN, None), (False, UNKNOWN, None), (True, FOREIGN, None),
+                 (False, {"pid": 46, "ppid": 1, "name": "kworker/0:1",
+                          "exe": None, "cwd": None}, None),
                  (False, {"pid": 44}, "prefix-cwd"),
                  (False, {"pid": 45}, "other-run-exe"))
         for late, process, foreign_path in cases:
@@ -197,6 +214,14 @@ class CardRun(unittest.TestCase):
                     self.assertNotIn("stage", self.names())
                     self.assert_cleaned()
 
+    def test_kernel_threads_are_allowed_by_parent_not_name(self):
+        self.transport.processes = [
+            {"pid": 2, "ppid": 0, "name": "kthreadd", "exe": None, "cwd": None},
+            {"pid": 47, "ppid": 2, "name": "kworker/0:1", "exe": None, "cwd": None}]
+        result = self.run_card()
+        self.assert_result(result, "program", 0, seconds=12.0, program_status=0)
+        self.assert_cleaned()
+
     def test_timeout_signals_only_owned_directory_then_cleans_up(self):
         self.transport.timed_out = True
         result = self.run_card()
@@ -209,18 +234,48 @@ class CardRun(unittest.TestCase):
         self.assertEqual([e for e in self.transport.events if e[0] == "signal_owned"],
                          [("signal_owned", self.transport.run_dir, BOOT, 1.0)])
         self.assertEqual([e for e in self.transport.events if e[0] == "execute"],
-                         [("execute", self.transport.run_dir, ["argument with spaces"], 30.0)])
+                         [("execute", self.transport.run_dir, ["argument with spaces"], 30.0, 35.0)])
         self.assert_cleaned()
 
+        # A control poll started just before the deadline gets its full transport
+        # budget; expiry is then a program timeout, not a broken SSH connection.
+        session = object.__new__(self.runner["SSHSession"])
+        session.run_dir = self.transport.run_dir
+        session.boot_id = BOOT
+        session.transport_timeout = 1.0
+        session.rpc = mock.Mock(side_effect=[b"", b"", b"", b"running"])
+        with mock.patch.object(self.runner["time"], "monotonic",
+                               side_effect=[0.0, 29.9, 30.0, 30.0]), \
+                mock.patch.object(self.runner["time"], "sleep"):
+            with self.assertRaises(TimeoutError):
+                session.execute(session.run_dir, [], timeout=30.0, card_timeout=35.0)
+        self.assertTrue(all(call.args[1] == 1.0 for call in session.rpc.call_args_list))
+        self.assertIn("start_job 35", session.rpc.call_args_list[0].args[0])
+
     def test_unreachable_is_infrastructure_without_retry(self):
-        self.transport.unreachable = True
-        result = self.run_card()
-        self.assert_result(result, "infrastructure", self.runner["INFRA_EXIT"],
-                           before=None, after=None)
-        self.assertEqual(self.names(), ["connect"])
-        self.assertEqual(self.transport.events[0][2], 1.0)
-        self.assertFalse(self.lock.exists())
-        self.assertIn("unreachable", result["detail"].lower())
+        for phase in (True, "execute"):
+            with self.subTest(phase=phase):
+                self.transport = FakeTransport()
+                self.transport.unreachable = phase
+                result = self.run_card()
+                self.assertEqual(result["result_class"], "infrastructure")
+                self.assertEqual(result["exit_code"], self.runner["INFRA_EXIT"])
+                self.assertFalse(self.lock.exists())
+                self.assertEqual(self.names().count("connect"), 1)
+                self.assertNotIn("signal_owned", self.names())
+                self.assertNotIn("cleanup", self.names())
+                if phase is True:
+                    self.assert_result(result, "infrastructure", self.runner["INFRA_EXIT"],
+                                       before=None, after=None)
+                    self.assertEqual(self.names(), ["connect"])
+                    self.assertEqual(self.transport.events[0][2], 1.0)
+                    self.assertIn("unreachable", result["detail"].lower())
+                else:
+                    self.assert_result(result, "infrastructure", self.runner["INFRA_EXIT"], seconds=12.0)
+                    execute = next(e for e in self.transport.events if e[0] == "execute")
+                    self.assertEqual(execute[4], 35.0, "watchdog armed before a link can break")
+                    self.assertIn("link broken", result["detail"])
+                    self.assert_released()
 
     def test_reboot_during_run_is_infrastructure_and_forbids_cleanup(self):
         self.transport.reboot = True
