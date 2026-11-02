@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-02 15:58.
+Updated automatically at every ticket change. Last update: 2026-11-02 15:59.
 
 **Next: GPT-6.1, on S1-04 (-march=knc with no SSE, AVX, MMX, CMOV, FCOMI or MFENCE).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
@@ -54,7 +54,7 @@ Current tickets: `[###############-----]` 13 of 17
 ## Cost
 
 - From the script, engineer: 44 sessions, 53.8M input tokens
-- From the script, lead: 44 sessions, 16.3M input tokens
+- From the script, lead: 45 sessions, 16.6M input tokens
 - Started by hand, Claude: 3 sessions, 141.0M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
