@@ -68,7 +68,7 @@ def next_step(board, action, tickets):
     if role == "lead":
         return ("**Next: the tech lead, on %s.** Ask a Claude session in this folder: "
                 "\"Act as tech lead. Handle what the board needs.\"" % ticket.id)
-    return "**Next: GPT-6.1, on %s (%s).** Start a new session and paste the prompt from `KICKOFF.md`." % (
+    return "**Next: GPT-6.1, on %s (%s).** Run `python tools/dispatch.py`, or ask the tech lead to." % (
         ticket.id, ticket.fields.get("title", ""))
 
 

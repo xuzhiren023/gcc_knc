@@ -18,6 +18,7 @@ Full details are in [SPRINT-00](sprints/SPRINT-00.md).
 | S0-05 | Donor inventory, including runtime libraries | Standard |
 | S0-06 | GCC 16.2 fork and measured build and TDD-loop times | Standard |
 | S0-07 | Benchmark corpus and coverage estimate | Standard |
+| S0-08 | Toolchain independent of PhiWeather | Light |
 
 ## E1 GCC 16 skeleton (S1, Milestone M0)
 

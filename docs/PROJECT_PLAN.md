@@ -148,8 +148,8 @@ do not impose waits.
 
 | Decision | Needed by | My recommendation |
 |---|---|---|
-| Create a private GCC fork repository, or stay local-only for now | Before S1 | Create it, private |
-| Confirm `xuzhiren023/gcc_knc` visibility before the first push | First push | Private: the report contains local paths and project detail |
-| Grant the runner card access, and say whether other work on the card needs protecting | S0-04 | Native jobs run only when the card is idle |
+| ~~Create a private GCC fork repository~~ **Created 2026-11-01:** `xuzhiren023/gcc_16_knc` | Before S1 | Done |
+| ~~Confirm `xuzhiren023/gcc_knc` visibility~~ **Owner says private, 2026-11-01** | First push | Done |
+| ~~Grant the runner card access~~ **Approved 2026-11-01:** native jobs run only when the card is idle | S0-04 | Done |
 | Approve the benchmark corpus | After S0-07 | Mix of integer, floating-point, C, C++, Fortran and OpenMP |
 | Enable WSL2, if Milestone M0 shows Cygwin is too slow | Milestone M0 | Decide only with the measured numbers |

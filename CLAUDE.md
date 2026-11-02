@@ -4,6 +4,8 @@ GPT (Codex) implements, because it has more usage available. Claude plans, write
 reviews, answers and merges to local `main`. The owner decides and pushes. How this works is
 in `docs/COLLABORATION.md`, and `AGENTS.md` holds the engineer rules.
 
+- Start each session by reading `STATUS.md` and `CURRENT_STATE.md`, and check anything important with a command rather than trusting memory or a summary.
+- Write down a finding as soon as you have it: on a ticket if someone must act on it, otherwise in `CURRENT_STATE.md`. Update "Proven" and "Not proven yet" there before you end a session. If it is only in the conversation, it will be lost.
 - Work through the board: `python tools/pm.py board`. Set `PM_ROLE=lead` for lead actions. The ticket is the only channel; do not read session transcripts.
 - Do not take on routine implementation. Write tickets, `tests/acceptance/`, `docs/adr/`, `harness/` and review findings, unless the owner asks otherwise.
 - Review per `docs/DEVELOPMENT_CYCLE.md` section 7. Spend effort on ABI, FP semantics, reloads, legality and test strength. Treat over-testing as a finding.

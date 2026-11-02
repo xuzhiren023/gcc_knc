@@ -294,6 +294,28 @@ class SubmitChecks(Sandbox):
         self.assertIn("characters", done.stdout)
 
 
+class MachineCheck(Sandbox):
+    def submitted_with_check(self, code):
+        self.pm("start", "A-1")
+        self.wt = self.worktree("A-1")
+        self.commit_file("tools/check", "raise SystemExit(%d)\n" % code, "test(A-1): x [red]", self.wt)
+        self.assertEqual(self.pm("submit", "A-1", "--note", "n", cwd=self.wt).returncode, 0)
+
+    def test_failing_check_stops_the_merge(self):
+        self.submitted_with_check(1)
+        done = self.pm("approve", "A-1", "--note", "looks fine", role="lead")
+        self.assertEqual(done.returncode, 1, done.stdout)
+        self.assertIn("tools/check t0 failed", done.stdout)
+        self.assertEqual(self.state("A-1"), "review")
+        self.assertTrue(os.path.isdir(self.wt))
+
+    def test_passing_check_merges_and_says_so(self):
+        self.submitted_with_check(0)
+        self.assertEqual(self.pm("approve", "A-1", "--note", "works", role="lead").returncode, 0)
+        self.assertEqual(self.state("A-1"), "done")
+        self.assertIn("Machine check: tools/check t0 passed", self.pm("show", "A-1").stdout)
+
+
 class RunWrapper(Sandbox):
     def run_tool(self, *args):
         return subprocess.run([sys.executable, os.path.join(self.root, "tools", "run.py")] + list(args),

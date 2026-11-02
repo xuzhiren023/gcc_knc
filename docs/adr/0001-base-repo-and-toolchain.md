@@ -33,8 +33,9 @@ benefits from a recent base. The bridge option stays open until Milestone M0 has
 
 ## Consequences
 
-- The owner must create the fork repository before S1 (or accept a local-only fork
-  for now).
+- The fork repository is `https://github.com/xuzhiren023/gcc_16_knc.git`, created by the owner on
+  2026-11-01. It is a separate private repository, not a GitHub fork, because a fork of a public
+  repository cannot be private. It holds `releases/gcc-16`, the `releases/gcc-16.2.0` tag and our `knc` branch.
 - Set `core.autocrlf=false` and `core.fileMode=false` in the GCC checkout. The donor
   checkout on this machine shows every file modified because of line endings, so its
   `git status` cannot be trusted.

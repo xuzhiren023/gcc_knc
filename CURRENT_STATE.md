@@ -1,36 +1,44 @@
 # GCC-KNC: current state
 
-Single source of truth. Replace lines when facts change; history lives in git.
-Last updated: 2026-11-01, kickoff.
+The handoff between sessions. `STATUS.md` holds tickets, cost and disk, and updates itself. This
+file holds what only a person or an agent can know. Replace lines when facts change, and do not
+trust anything here that a quick command can check instead.
 
-## Status
+Last updated: 2026-11-01, during Sprint 0.
 
-| Area | State |
-|---|---|
-| Phase | M0 Foundation, Sprint 0 ready to start |
-| Compiler | Nothing built yet. Donor GCC 5.1.1 is the reference |
-| Acceptance | `m1_affine`: logic validated on host; donor expected red at T1. Not yet run on the card |
-| Next milestone | Milestone M0, at the end of Sprint 1 |
-| Next step | Start GPT-6.1 or the dispatcher (`KICKOFF.md`); `python tools/pm.py board` shows progress |
+## Proven, and how
 
-## Metrics
+| Claim | Evidence | Rerun with |
+|---|---|---|
+| The lint rejects the listed instructions and passes legal code | Rerun on `main`; four deliberate breaks to the lint were all caught by its tests | `python -m unittest tests.tools.test_knc_lint` |
+| The harness enforces its limits | 40+ tests in temporary repositories | `python -m unittest discover -s tests/tools -p "test_*.py"` |
+| Script sessions can write logs and shared builds | Two real Codex sessions, before and after the fix | Read `tools/dispatch.py`, `engineer_command` |
 
-| Metric | Value |
-|---|---|
-| Tests T0 / T1 / T2 / T3 | Harness self-tests only; compiler tiers arrive in S0-03 |
-| Incremental rebuild + T1 | Not measured (S0-06) |
-| Card minutes this sprint | 0 |
-| Disk used | Under 1 GiB, of the 100 GiB limit (`python tools/storage.py`) |
-| Shared i386 lines changed | 0 |
+## Not proven yet
+
+- **No GCC 16 exists yet.** This project has produced tools, not compiler code. Milestone M0 is the first compiler result.
+- **Nothing has run on the card.** S0-04 is the first native result. Card minutes so far: 0.
+- **The toolchain still depends on PhiWeather's folder.** S0-08 fixes this, and S0-04 waits for it.
+- **The startup files from S0-03** come from the bootstrap sysroot. Only a run on the card will prove they suit the card's libc.
+
+## Open items not on a ticket
+
+- `ldmxcsr` and `stmxcsr` pass the lint, because Intel manual 327364 is not on this machine. Decide once someone has Appendix B.
+- `f3 2e 90`, a `pause` with a stray prefix in the middle, passes the lint. Hand-written code only.
+- Script reviews cannot run tests, by design. `pm.py approve` now runs the branch's `tools/check t0` itself, once that tool exists on the branch.
+- Claude's script sessions read more tokens than GPT's: 3.1M against 2.3M after 12 sessions. Review this at the Sprint 0 retro.
+- Submit checks do not see `compiler/gcc`, which is a separate repository. Extend them in Sprint 1.
+
+## Repositories
+
+- This one: `xuzhiren023/gcc_knc`, private per the owner.
+- GCC: `xuzhiren023/gcc_16_knc`, private per the owner, and empty until the owner pushes after S0-06.
+- Only the owner pushes.
 
 ## Card
 
-May also be used by unrelated work on this machine. This project has not used it. Rules are in
-`docs/DEVELOPMENT_CYCLE.md` section 9, and no access is allowed before S0-04 is approved.
-
-## Open owner decisions
-
-See `docs/PROJECT_PLAN.md` section 10.
+Approved by the owner on 2026-11-01. Native jobs run only when the card is idle, and only through
+`tools/card_run` once S0-04 has reached that step. Rules are in `docs/DEVELOPMENT_CYCLE.md` section 9.
 
 ## Known limits
 

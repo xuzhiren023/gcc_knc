@@ -1,16 +1,16 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-01 20:22.
+Updated automatically at every ticket change. Last update: 2026-11-01 20:42.
 
-**Next: GPT-6.1, on S0-03 (Test runner and red baseline).** Start a new session and paste the prompt from `KICKOFF.md`.
+**Next: GPT-6.1, on S0-03 (Test runner and red baseline).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
-Current tickets: `[#####---------------]` 2 of 7
+Current tickets: `[#####---------------]` 2 of 8
 
 ## Milestones
 
 | | Milestone | State | Progress |
 |---|---|---|---|
-| M0 | Foundation | In progress | 2 of 7 tickets |
+| M0 | Foundation | In progress | 2 of 8 tickets |
 | M1 | Mixed native code | Not started | Not planned in detail yet |
 | M2 | Useful vector target | Not started | Not planned in detail yet |
 | M3 | Runtimes | Not started | Not planned in detail yet |
@@ -29,6 +29,7 @@ Current tickets: `[#####---------------]` 2 of 7
 | S0-05 | Donor inventory | Not started |  |
 | S0-06 | GCC 16.2 fork and timing | Not started |  |
 | S0-07 | Benchmark corpus and coverage estimate | Not started |  |
+| S0-08 | Toolchain independent of PhiWeather | Not started |  |
 
 ## Recent activity
 
@@ -45,10 +46,10 @@ Current tickets: `[#####---------------]` 2 of 7
 
 - From the script, engineer: 6 sessions, 2.3M input tokens
 - From the script, lead: 6 sessions, 3.1M input tokens
-- Started by hand, Claude: 1 sessions, 43.7M input tokens
+- Started by hand, Claude: 1 sessions, 45.2M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 1.8 GiB of 100 GiB. 376 GiB free on the drive.
+The project uses 1.8 GiB of 100 GiB. 375 GiB free on the drive.

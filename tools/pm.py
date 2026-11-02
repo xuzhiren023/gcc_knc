@@ -309,6 +309,21 @@ def cmd_submit(board, args):
     print("%s submitted at %s. End this session." % (ticket.id, ticket.fields["head"]))
 
 
+def machine_check(worktree):
+    """Run the branch's own T0 before it can merge, so approval never rests on a report alone."""
+    if not os.path.exists(os.path.join(worktree, "tools", "check")):
+        return ""
+    try:
+        done = subprocess.run([sys.executable, os.path.join("tools", "check"), "t0"], cwd=worktree, stdin=subprocess.DEVNULL,
+                              stdout=subprocess.PIPE, stderr=subprocess.STDOUT, universal_newlines=True,
+                              errors="replace", timeout=600)
+    except subprocess.TimeoutExpired:
+        raise Refused("not merged: tools/check t0 ran past 10 minutes. Use pm.py changes.")
+    if done.returncode != 0:
+        raise Refused("not merged: tools/check t0 failed. Use pm.py changes.\n" + done.stdout[-1500:])
+    return " Machine check: tools/check t0 passed."
+
+
 def cmd_approve(board, args):
     require_role("lead", "owner")
     ticket = board.load(args.id)
@@ -319,13 +334,14 @@ def cmd_approve(board, args):
         print(ticket.id + ": failing tests approved")
         return
     branch = ticket.fields["branch"]
+    worktree = board.worktree(ticket)
+    note = limit_text(board, args.note or "merged") + machine_check(worktree)
     run_git("merge", "--no-ff", "-q", "-m", "Merge %s: %s" % (ticket.id, ticket.fields.get("title", "")), branch,
             cwd=board.root)
-    worktree = board.worktree(ticket)
     if os.path.isdir(worktree):
         run_git("worktree", "remove", "--force", worktree, cwd=board.root)
     ticket.fields["state"] = "done"
-    ticket.save("approve", limit_text(board, args.note or "merged"))
+    ticket.save("approve", note)
     print(ticket.id + ": approved and merged")
 
 
