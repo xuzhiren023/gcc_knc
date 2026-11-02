@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-02 18:13.
+Updated automatically at every ticket change. Last update: 2026-11-02 18:15.
 
-**Next: the tech lead, on S1-04.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: GPT-6.1, on S1-04 (-march=knc with no SSE, AVX, MMX, CMOV, FCOMI or MFENCE).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
 Current tickets: `[###############-----]` 13 of 17
 
@@ -35,13 +35,14 @@ Current tickets: `[###############-----]` 13 of 17
 | S1-01 | Tickets can change the GCC fork | Done | Tickets marked gcc: yes now get their own branch in the GCC fork, count its changes in the size budget, sho... |
 | S1-02 | GCC 16.2 builds for k1om-mpss-linux | Done | GCC 16.2 now configures and builds its C compiler for k1om-mpss-linux, using the shared KNC assembler, link... |
 | S1-03 | tools/check runs source-level tests against GCC 16 | Done | tools/check t1 --compiler gcc16 now compiles each tests/t1/*.c test and checks its scan, scan-not, per-func... |
-| S1-04 | -march=knc with no SSE, AVX, MMX, CMOV, FCOMI or MFENCE | Question for the tech lead | Repaired zero-byte generic-match-6.o; rebuild passed. Restored T1 fails defaults/macros/code; five option e... |
+| S1-04 | -march=knc with no SSE, AVX, MMX, CMOV, FCOMI or MFENCE | In progress | Use: python tools/pm.py commit S1-04 --gcc -m '<message>' (plain command; it commits .work/_shared/gcc on s... |
 | S1-05 | Integer C assembles with as 2.22 and lints clean | Not started | Rebuild GCC with the logged gcc16 step of tools/toolchain.py as ONE blocking foreground shell call with a t... |
 | S1-06 | K1OM link defaults | Not started | Rebuild GCC with the logged gcc16 step of tools/toolchain.py as ONE blocking foreground shell call with a t... |
 | S1-07 | Milestone M0 evidence note | Not started | Rebuild GCC with the logged gcc16 step of tools/toolchain.py as ONE blocking foreground shell call with a t... |
 
 ## Recent activity
 
+- 2026-11-02 18:15 **S1-04** lead answer: Use: python tools/pm.py commit S1-04 --gcc -m '<message>' (plain command; it commits .work/_shared/gcc on s1/S1-04). Both unbuilt fixes are reviewe...
 - 2026-11-02 18:13 **S1-04** engineer ask: Repaired zero-byte generic-match-6.o; rebuild passed. Restored T1 fails defaults/macros/code; five option errors and smoke pass. Log: .work/_state/...
 - 2026-11-02 17:30 **S1-04** lead note: Correction to 16:25: your shell does return after 30 s, and S1-02's 59-minute build was polled too, at about 3.5M tokens, which is acceptable. So p...
 - 2026-11-02 17:26 **S1-04** owner decide: Owner on 2026-11-02: yes, let GPT poll the rebuild quietly per the lead note at 17:30, and run 4 sessions.
@@ -49,7 +50,6 @@ Current tickets: `[###############-----]` 13 of 17
 - 2026-11-02 17:18 **S1-04** engineer ask: Current shell is exec_command: no execution-timeout argument, Windows yield_time_ms capped at 30000 ms; long commands return session_id and require...
 - 2026-11-02 17:17 **S1-04** owner decide: Owner on 2026-11-02: send S1-04 back to GPT with 6 sessions. Build with the shell tool and seed in i386-options.cc, per the lead notes at 16:25 and...
 - 2026-11-02 16:35 **S1-04** lead note: Read ee7278c9dac and 7d860fac47a before any build: no defects found. The sync.md change is needed, not optional: on x86-64 GCC emits mfence wheneve...
-- 2026-11-02 16:25 **S1-04** lead note: The 300 s limit is the node_repl MCP tool you used (spawnSync), not your shell. S1-02 ran its 59-minute build as an ordinary shell command: powersh...
 
 ## Cost
 
