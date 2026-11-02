@@ -20,7 +20,7 @@ import time
 ROOT = Path(__file__).resolve().parents[1]
 PROJECT = ROOT.parent.parent if ROOT.parent.name == '.work' else ROOT
 FUNCTIONS = ('affine_f32', 'affine_f64', 'recurrence_f32')
-PACKED = re.compile(r'\bv(?:add|sub|mul|div|max|min|sqrt|rcp|rsqrt|fmadd\w*|fmsub\w*|fnmadd\w*|fnmsub\w*)(?:ps|pd)\b.*%zmm\d+\b')
+PACKED = re.compile(r'\bv(?:addn?|subr?|mul|div|max|min|sqrt|rcp(?:23)?|rsqrt(?:23)?|fmadd\w*|fmsub\w*|fnmadd\w*|fnmsub\w*)(?:ps|pd)\b.*%zmm\d+\b')
 
 
 def loop_lines(source):
@@ -221,7 +221,7 @@ class Runner:
         # Resolve version requirements against each named library in the card sysroot,
         # never against host libraries or just a numeric maximum GLIBC version.
         versions = self.command(self.tool('readelf'), '--version-info', '--wide', elf)
-        failures = []
+        failures = [] if required else ['no versioned symbol requirements found']
         for library, section in re.findall(r'File:\s+(\S+)(.*?)(?=\n\s*0x[0-9a-f]+:\s+Version:|\Z)', versions, re.S):
             names = set(re.findall(r'Name:\s+(\S+)', section))
             needed = {symbol for symbol in required if symbol.split('@', 1)[1] in names}

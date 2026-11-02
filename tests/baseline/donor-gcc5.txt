@@ -4,9 +4,9 @@ Compiler as: /cygdrive/c/Users/xuzhi/Documents/PhiWeather/.tools/knc-bootstrap/c
 Flags: -O2 -ftree-vectorize -ffp-contract=off / fast; separate driver translation unit
 T2 ABI reference: /cygdrive/c/Users/xuzhi/Documents/gcc_knc/.work/_shared/toolchain/sysroot (no native card execution in t0-t2)
 Development files: crt1.o, crti.o, crtn.o, libc.so, libc_nonshared.a from PhiWeather/.tools/knc-bootstrap/sysroot/usr/lib64; origin differs from card runtime. Runtime libraries and loader retained from card; T3 on card is the final proof.
-PASS t0 tests/regress/test_*.py: Ran 6 tests in 0.058s  OK
-PASS t0 tests/tools/test_doctor.py: Ran 4 tests in 0.079s  OK
-PASS t0 tests/tools/test_knc_lint.py: Ran 4 tests in 15.119s  OK
+PASS t0 tests/regress/test_*.py: Ran 6 tests in 0.048s  OK
+PASS t0 tests/tools/test_doctor.py: Ran 4 tests in 0.056s  OK
+PASS t0 tests/tools/test_knc_lint.py: Ran 4 tests in 12.784s  OK
 PASS t1 off assembly --march=k1om
 PASS t1 off knc_lint
 FAIL t1 off function scans: affine_f32: no packed `zmm` arithmetic; affine_f32: no -fopt-info-vec report for this loop; affine_f64: no packed `zmm` arithmetic; affine_f64: no -fopt-info-vec report for this loop
@@ -17,4 +17,4 @@ T2 link trace: /cygdrive/c/Users/xuzhi/Documents/gcc_knc/.work/_shared/toolchain
 T2 link trace: /cygdrive/c/Users/xuzhi/Documents/gcc_knc/.work/_shared/toolchain/sysroot/lib64/ld-linux-k1om.so.2
 PASS t2 ELF machine and interpreter
 PASS t2 symbol versions against card sysroot
-Elapsed: 18.63 seconds
+Elapsed: 15.85 seconds
