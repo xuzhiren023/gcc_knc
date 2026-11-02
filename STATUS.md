@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-01 20:19.
+Updated automatically at every ticket change. Last update: 2026-11-01 20:20.
 
-**Next: GPT-6.1, on S0-03 (Test runner and red baseline).** Start a new session and paste the prompt from `KICKOFF.md`.
+**Next: the tech lead, on S0-03.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[#####---------------]` 2 of 7
 
@@ -24,7 +24,7 @@ Current tickets: `[#####---------------]` 2 of 7
 |---|---|---|---|
 | S0-01 | Toolchain manifest and doctor | Done | Reviewed: red commit real; tests fail on the missing-tool cases; doctor rerun OK, required tools present, d... |
 | S0-02 | ISA lint | Done | knc_lint now rejects the listed non-KNC instructions in .s, .o, archives, shared objects and executables, a... |
-| S0-03 | Test runner and red baseline | In progress | Sysroot: yes, and the fault is in S0-01, which named the wrong source. project-host/sysroot has no developm... |
+| S0-03 | Test runner and red baseline | Question for the tech lead | Blocked by the lead's explicit sysroot comparison gate: direct byte comparisons (Path.read_bytes equality, ... |
 | S0-04 | Card runner | Not started |  |
 | S0-05 | Donor inventory | Not started |  |
 | S0-06 | GCC 16.2 fork and timing | Not started |  |
@@ -32,6 +32,7 @@ Current tickets: `[#####---------------]` 2 of 7
 
 ## Recent activity
 
+- 2026-11-01 20:20 **S0-03** engineer ask: Blocked by the lead's explicit sysroot comparison gate: direct byte comparisons (Path.read_bytes equality, no hashes) of PhiWeather/.tools/knc-boot...
 - 2026-11-01 20:19 **S0-03** lead answer: Sysroot: yes, and the fault is in S0-01, which named the wrong source. project-host/sysroot has no development files. PhiWeather/.tools/knc-bootstr...
 - 2026-11-01 20:16 **S0-03** engineer ask: Two attempts; commits b1ba718/035f80a. Cygwin run 62.38s: scanner seeds PASS, assembly/lint PASS, T1 expected red (no packed zmm arithmetic); tests...
 - 2026-11-01 20:11 **S0-02** lead approve: knc_lint now rejects the listed non-KNC instructions in .s, .o, archives, shared objects and executables, and correctly flags 2 pause sites in libc...
@@ -39,7 +40,6 @@ Current tickets: `[#####---------------]` 2 of 7
 - 2026-11-01 19:44 **S0-02** lead changes: Good work: all 21 fixtures, the binary path for every listed rule, error exits and the library scan all hold up on my rerun. Four fixes, all reprod...
 - 2026-11-01 12:57 **S0-02** engineer submit: Prior T0 passed seeded rules and donor loops -O2 (host only); no reruns. Logs: .work/_state/logs/S0_02_t0-20261101-125051.log, S0_02_card_libraries...
 - 2026-11-01 12:56 **S0-02** lead answer: Keep all the fixtures: 'one seeded file per rule' is my acceptance criterion, so the budget is the wrong limit here. Do not merge or drop any to ge...
-- 2026-11-01 12:55 **S0-02** engineer ask: Submit refused: 22 new test files; budget is 4. Existing implementation b89a224 and red 233481a were retained; only S0-02-report.txt added in 80ed3...
 
 ## Cost
 
