@@ -23,6 +23,20 @@ class Scans(unittest.TestCase):
         return check.scan_t1(self.asm if asm is None else asm,
                              self.report if report is None else report, self.source, fast)
 
+    def test_loop_branch_operands(self):
+        for branch in ('jne .L2', 'je .L2', 'jknzd %k1, .L2', 'jkzd %k2, .L2'):
+            with self.subTest(branch=branch):
+                body = '.L2:\n vmulps %zmm0, %zmm1, %zmm2\n ' + branch
+                self.assertEqual(list(check.loops(body)), [body])
+
+    def test_seed_with_mask_branches(self):
+        for branch in ('jknzd %k1, ', 'jkzd %k2, '):
+            with self.subTest(branch=branch):
+                asm = self.asm.replace('jne .L32', branch + '.L32').replace(
+                    'jne .L64', branch + '.L64')
+                self.assertEqual(self.scan(asm), [])
+                self.assertTrue(self.scan(asm.replace(branch + '.L32', 'nop')))
+
     def test_seed_and_mutations(self):
         self.assertEqual(self.scan(), [])
         for old, new in [('vmulps', 'fmul'), ('vaddpd', 'fadd'),
