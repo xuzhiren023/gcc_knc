@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-01 21:54.
+Updated automatically at every ticket change. Last update: 2026-11-01 21:55.
 
-**Next: the tech lead, on S0-03.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: GPT-6.1, on S0-03 (Test runner and red baseline).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
 Current tickets: `[#####---------------]` 2 of 8
 
@@ -24,7 +24,7 @@ Current tickets: `[#####---------------]` 2 of 8
 |---|---|---|---|
 | S0-01 | Toolchain manifest and doctor | Done | Reviewed: red commit real; tests fail on the missing-tool cases; doctor rerun OK, required tools present, d... |
 | S0-02 | ISA lint | Done | knc_lint now rejects the listed non-KNC instructions in .s, .o, archives, shared objects and executables, a... |
-| S0-03 | Test runner and red baseline | Question for the tech lead | Red e9f46ee; fix a3b8aad implements directory checks, trace parser and cache fix. Created empty lib and usr... |
+| S0-03 | Test runner and red baseline | In progress | Yes, but through the runner: no ACL edits, and no cleanup by hand. Likely cause, inferred and not proved be... |
 | S0-04 | Card runner | Not started |  |
 | S0-05 | Donor inventory | Not started |  |
 | S0-06 | GCC 16.2 fork and timing | Not started |  |
@@ -33,6 +33,7 @@ Current tickets: `[#####---------------]` 2 of 8
 
 ## Recent activity
 
+- 2026-11-01 21:55 **S0-03** lead answer: Yes, but through the runner: no ACL edits, and no cleanup by hand. Likely cause, inferred and not proved because this session could not run icacls:...
 - 2026-11-01 21:54 **S0-03** engineer ask: Red e9f46ee; fix a3b8aad implements directory checks, trace parser and cache fix. Created empty lib and usr/lib. Two donor runs (15.70s/16.76s), in...
 - 2026-11-01 21:50 **S0-03** owner decide: Owner approved on 2026-11-01: sessions raised to 5, one to finish and one for review changes. Follow the 21:35 lead note.
 - 2026-11-01 21:35 **S0-08** lead note: Tested: `gcc -v` shows `--with-as`, `--with-ld` and `--with-sysroot` compiled in with PhiWeather paths, and `-B<shared>/cross/bin/` does not change...
@@ -40,7 +41,6 @@ Current tickets: `[#####---------------]` 2 of 8
 - 2026-11-01 21:35 **S0-03** lead note: Tested from the lead session in a throwaway sysroot, so do not re-derive it. Adding empty lib and usr/lib makes the link exit 0: K1OM machine, inte...
 - 2026-11-01 21:31 **S0-03** lead escalate: budget: 3 engineer sessions used; the budget is 3
 - 2026-11-01 21:31 **S0-03** lead answer: Neither as asked: no explicit search flags, and no S0-01 rebuild for this. Likely cause, from reading only (I could not run the compiler here): the...
-- 2026-11-01 21:29 **S0-03** engineer ask: Copied only five approved dev files; runtime untouched. Added red-tested doctor check and scoped T0. tools/check t0 t1 t2: 17.43s, T0/assembly/lint...
 
 ## Cost
 
