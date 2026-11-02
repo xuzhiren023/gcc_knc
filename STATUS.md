@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-02 08:34.
+Updated automatically at every ticket change. Last update: 2026-11-02 08:39.
 
 **Next: GPT-6.1, on S0-08 (Toolchain independent of PhiWeather).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
@@ -29,7 +29,7 @@ Current tickets: `[#############-------]` 6 of 9
 | S0-05 | Donor inventory | Done | The donor inventory now covers the whole tree with port/rewrite/drop decisions, the GCC 16.2 runtime audit ... |
 | S0-06 | GCC 16.2 fork and timing | Done | GCC 16.2 is checked out on branch knc in the shared build area and builds stock x86_64 C+Fortran on Cygwin ... |
 | S0-07 | Benchmark corpus and coverage estimate | Done | We now have a proposed public benchmark corpus (PolyBench, STREAM, NPB, HPCG, zlib, SQLite, with bzip2 and ... |
-| S0-08 | Toolchain independent of PhiWeather | Not started | Also in scope, from the S0-03 review: nothing recreates the hand-made sysroot files (crt1.o, crti.o, crtn.o... |
+| S0-08 | Toolchain independent of PhiWeather | In progress | Also in scope, from the S0-03 review: nothing recreates the hand-made sysroot files (crt1.o, crti.o, crtn.o... |
 | S0-09 | T1 scan sees KNC mask-branch loops | Not started |  |
 
 ## Recent activity
@@ -47,7 +47,7 @@ Current tickets: `[#############-------]` 6 of 9
 
 - From the script, engineer: 20 sessions, 18.6M input tokens
 - From the script, lead: 21 sessions, 10.6M input tokens
-- Started by hand, Claude: 2 sessions, 68.8M input tokens
+- Started by hand, Claude: 2 sessions, 70.6M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
