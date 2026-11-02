@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-02 13:26.
+Updated automatically at every ticket change. Last update: 2026-11-02 13:27.
 
-**Next: the tech lead, on S1-02.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: GPT-6.1, on S1-02 (GCC 16.2 builds for k1om-mpss-linux).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
 Current tickets: `[############--------]` 11 of 17
 
@@ -33,7 +33,7 @@ Current tickets: `[############--------]` 11 of 17
 | S0-09 | T1 scan sees KNC mask-branch loops | Done | The T1 check now recognises KNC vector loops that close with the mask branches jknzd and jkzd, so correct G... |
 | S0-10 | Card sysroot links Fortran, libm and pthreads | Done | Fortran programs and C programs using -lm, -lpthread, -ldl or -lrt now link with default flags against the ... |
 | S1-01 | Tickets can change the GCC fork | Done | Tickets marked gcc: yes now get their own branch in the GCC fork, count its changes in the size budget, sho... |
-| S1-02 | GCC 16.2 builds for k1om-mpss-linux | Question for the tech lead | 150-call hook limit reached. Please continue to collect the running resumed all-gcc result and xgcc path ou... |
+| S1-02 | GCC 16.2 builds for k1om-mpss-linux | In progress | The resumed build did not survive: the log ends at 13:26:55, when your session closed, with 'unable to load... |
 | S1-03 | tools/check runs source-level tests against GCC 16 | Not started | Owner approved Sprint 1 on 2026-11-02; ticket set to ready. |
 | S1-04 | -march=knc with no SSE, AVX, MMX, CMOV, FCOMI or MFENCE | Not started | Owner approved Sprint 1 on 2026-11-02; ticket set to ready. |
 | S1-05 | Integer C assembles with as 2.22 and lints clean | Not started | Owner approved Sprint 1 on 2026-11-02; ticket set to ready. |
@@ -42,6 +42,7 @@ Current tickets: `[############--------]` 11 of 17
 
 ## Recent activity
 
+- 2026-11-02 13:27 **S1-02** lead answer: The resumed build did not survive: the log ends at 13:26:55, when your session closed, with 'unable to load user32.dll, Win32 error 8' and make 'Ha...
 - 2026-11-02 13:26 **S1-02** engineer ask: 150-call hook limit reached. Please continue to collect the running resumed all-gcc result and xgcc path outputs, without restarting. Changes commi...
 - 2026-11-02 12:15 **S1-02** lead note: Two updates to the 11:59 answer. (1) Ownership is fixed in the dispatcher: engineer sessions now get safe.directory for .work/_shared/gcc through G...
 - 2026-11-02 12:00 **S1-07** owner decide: Owner approved Sprint 1 on 2026-11-02; ticket set to ready.
@@ -49,7 +50,6 @@ Current tickets: `[############--------]` 11 of 17
 - 2026-11-02 12:00 **S1-05** owner decide: Owner approved Sprint 1 on 2026-11-02; ticket set to ready.
 - 2026-11-02 12:00 **S1-04** owner decide: Owner approved Sprint 1 on 2026-11-02; ticket set to ready.
 - 2026-11-02 12:00 **S1-03** owner decide: Owner approved Sprint 1 on 2026-11-02; ticket set to ready.
-- 2026-11-02 12:00 **S1-02** owner decide: Owner approved Sprint 1 on 2026-11-02; ticket set to ready.
 
 ## Cost
 
@@ -61,4 +61,4 @@ Current tickets: `[############--------]` 11 of 17
 
 ## Disk
 
-The project uses 7.0 GiB of 100 GiB. 353 GiB free on the drive.
+The project uses 7.0 GiB of 100 GiB. 354 GiB free on the drive.
