@@ -16,7 +16,7 @@ goal and the exit conditions.
 - [x] `CURRENT_STATE.md` updated
 - [x] Sprint 1 refined from E1, using S0-05 and S0-06 findings (`SPRINT-01.md`, tickets in draft)
 - [x] Three-line retro below
-- [ ] Owner has approved the corpus and read the S0-07 conclusion, and confirms proceeding to S1
+- [x] Owner has approved the corpus and read the S0-07 conclusion, and confirms proceeding to S1 (2026-11-02)
 
 ## Retro
 
