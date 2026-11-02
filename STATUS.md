@@ -1,16 +1,16 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-02 11:42.
+Updated automatically at every ticket change. Last update: 2026-11-02 11:46.
 
-All current tickets are done. The tech lead plans the next sprint.
+**Next: GPT-6.1, on S1-01 (Tickets can change the GCC fork).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
-Current tickets: `[####################]` 10 of 10
+Current tickets: `[###########---------]` 10 of 17
 
 ## Milestones
 
 | | Milestone | State | Progress |
 |---|---|---|---|
-| M0 | Foundation | In progress | 10 of 10 tickets |
+| M0 | Foundation | In progress | 10 of 17 tickets |
 | M1 | Mixed native code | Not started | Not planned in detail yet |
 | M2 | Useful vector target | Not started | Not planned in detail yet |
 | M3 | Runtimes | Not started | Not planned in detail yet |
@@ -32,26 +32,33 @@ Current tickets: `[####################]` 10 of 10
 | S0-08 | Toolchain independent of PhiWeather | Done | The shared k1om gcc, g++ and gfortran were rebuilt so their assembler, linker and sysroot all resolve insid... |
 | S0-09 | T1 scan sees KNC mask-branch loops | Done | The T1 check now recognises KNC vector loops that close with the mask branches jknzd and jkzd, so correct G... |
 | S0-10 | Card sysroot links Fortran, libm and pthreads | Done | Fortran programs and C programs using -lm, -lpthread, -ldl or -lrt now link with default flags against the ... |
+| S1-01 | Tickets can change the GCC fork | In progress | Owner approved Sprint 1 on 2026-11-02; ticket set to ready. |
+| S1-02 | GCC 16.2 builds for k1om-mpss-linux | Not started | Owner approved Sprint 1 on 2026-11-02; ticket set to ready. |
+| S1-03 | tools/check runs source-level tests against GCC 16 | Not started | Owner approved Sprint 1 on 2026-11-02; ticket set to ready. |
+| S1-04 | -march=knc with no SSE, AVX, MMX, CMOV, FCOMI or MFENCE | Not started | Owner approved Sprint 1 on 2026-11-02; ticket set to ready. |
+| S1-05 | Integer C assembles with as 2.22 and lints clean | Not started | Owner approved Sprint 1 on 2026-11-02; ticket set to ready. |
+| S1-06 | K1OM link defaults | Not started | Owner approved Sprint 1 on 2026-11-02; ticket set to ready. |
+| S1-07 | Milestone M0 evidence note | Not started | Owner approved Sprint 1 on 2026-11-02; ticket set to ready. |
 
 ## Recent activity
 
+- 2026-11-02 12:00 **S1-07** owner decide: Owner approved Sprint 1 on 2026-11-02; ticket set to ready.
+- 2026-11-02 12:00 **S1-06** owner decide: Owner approved Sprint 1 on 2026-11-02; ticket set to ready.
+- 2026-11-02 12:00 **S1-05** owner decide: Owner approved Sprint 1 on 2026-11-02; ticket set to ready.
+- 2026-11-02 12:00 **S1-04** owner decide: Owner approved Sprint 1 on 2026-11-02; ticket set to ready.
+- 2026-11-02 12:00 **S1-03** owner decide: Owner approved Sprint 1 on 2026-11-02; ticket set to ready.
+- 2026-11-02 12:00 **S1-02** owner decide: Owner approved Sprint 1 on 2026-11-02; ticket set to ready.
+- 2026-11-02 12:00 **S1-01** owner decide: Owner approved Sprint 1 on 2026-11-02; ticket set to ready.
 - 2026-11-02 11:42 **S0-10** lead approve: Fortran programs and C programs using -lm, -lpthread, -ldl or -lrt now link with default flags against the card sysroot, and doctor names the sysro...
-- 2026-11-02 11:40 **S0-10** engineer submit: Acceptance met; commits 854b4f0 (14 expected red failures), 86c0344 (fix). sysroot installs four extra seeded files and ten plain linker scripts. v...
-- 2026-11-02 11:32 **S0-09** lead approve: The T1 check now recognises KNC vector loops that close with the mask branches jknzd and jkzd, so correct GCC 16 vector loops will no longer be wro...
-- 2026-11-02 11:31 **S0-09** engineer submit: Added direct loops cases for jne, je, jknzd and jkzd plus seeded mask-branch T1 cases and missing-backedge mutation. Red run: 8 tests, 4 expected m...
-- 2026-11-02 11:29 **S0-04** lead approve: The card runner now safely runs one program on the card with a shared lock, refuses if anything foreign is running, enforces a card-side time limit...
-- 2026-11-02 11:28 **S0-04** engineer submit: RED 07590f2 failed as expected: card_timeout 35.0 was not an int. GREEN ade6efe: nine T0 tests passed once through bootstrap Cygwin python3.12.exe ...
-- 2026-11-02 11:27 **S0-04** lead changes: Lock, idle policy, boot guards, kernel-thread rule and the seven cases are sound. Two card-side fixes, both small, same test file, red then green: ...
-- 2026-11-02 11:24 **S0-04** engineer submit: RED 8787e21 failed as expected for missing shared lock resolver, kernel classification and card-side limit. GREEN 9c96b5e: nine T0 cases passed onc...
 
 ## Cost
 
 - From the script, engineer: 34 sessions, 30.1M input tokens
 - From the script, lead: 35 sessions, 13.8M input tokens
-- Started by hand, Claude: 3 sessions, 103.1M input tokens
+- Started by hand, Claude: 3 sessions, 107.2M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 8.7 GiB of 100 GiB. 354 GiB free on the drive.
+The project uses 8.7 GiB of 100 GiB. 353 GiB free on the drive.
