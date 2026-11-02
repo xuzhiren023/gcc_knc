@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-02 11:46.
+Updated automatically at every ticket change. Last update: 2026-11-02 11:52.
 
-**Next: GPT-6.1, on S1-01 (Tickets can change the GCC fork).** Run `python tools/dispatch.py`, or ask the tech lead to.
+**Next: the tech lead, on S1-01.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[###########---------]` 10 of 17
 
@@ -32,7 +32,7 @@ Current tickets: `[###########---------]` 10 of 17
 | S0-08 | Toolchain independent of PhiWeather | Done | The shared k1om gcc, g++ and gfortran were rebuilt so their assembler, linker and sysroot all resolve insid... |
 | S0-09 | T1 scan sees KNC mask-branch loops | Done | The T1 check now recognises KNC vector loops that close with the mask branches jknzd and jkzd, so correct G... |
 | S0-10 | Card sysroot links Fortran, libm and pthreads | Done | Fortran programs and C programs using -lm, -lpthread, -ldl or -lrt now link with default flags against the ... |
-| S1-01 | Tickets can change the GCC fork | In progress | Owner approved Sprint 1 on 2026-11-02; ticket set to ready. |
+| S1-01 | Tickets can change the GCC fork | Question for the tech lead | Submit refuses protected path docs/COLLABORATION.md, although acceptance requires two lines there. Commits ... |
 | S1-02 | GCC 16.2 builds for k1om-mpss-linux | Not started | Owner approved Sprint 1 on 2026-11-02; ticket set to ready. |
 | S1-03 | tools/check runs source-level tests against GCC 16 | Not started | Owner approved Sprint 1 on 2026-11-02; ticket set to ready. |
 | S1-04 | -march=knc with no SSE, AVX, MMX, CMOV, FCOMI or MFENCE | Not started | Owner approved Sprint 1 on 2026-11-02; ticket set to ready. |
@@ -49,16 +49,16 @@ Current tickets: `[###########---------]` 10 of 17
 - 2026-11-02 12:00 **S1-03** owner decide: Owner approved Sprint 1 on 2026-11-02; ticket set to ready.
 - 2026-11-02 12:00 **S1-02** owner decide: Owner approved Sprint 1 on 2026-11-02; ticket set to ready.
 - 2026-11-02 12:00 **S1-01** owner decide: Owner approved Sprint 1 on 2026-11-02; ticket set to ready.
-- 2026-11-02 11:42 **S0-10** lead approve: Fortran programs and C programs using -lm, -lpthread, -ldl or -lrt now link with default flags against the card sysroot, and doctor names the sysro...
+- 2026-11-02 11:52 **S1-01** engineer ask: Submit refuses protected path docs/COLLABORATION.md, although acceptance requires two lines there. Commits ceab416 (red) and fdb88fa implement acce...
 
 ## Cost
 
 - From the script, engineer: 34 sessions, 30.1M input tokens
 - From the script, lead: 35 sessions, 13.8M input tokens
-- Started by hand, Claude: 3 sessions, 107.2M input tokens
+- Started by hand, Claude: 3 sessions, 108.8M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 8.7 GiB of 100 GiB. 353 GiB free on the drive.
+The project uses 8.7 GiB of 100 GiB. 352 GiB free on the drive.
