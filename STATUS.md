@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-03 11:19.
+Updated automatically at every ticket change. Last update: 2026-11-03 11:21.
 
-**Next: GPT-6.1, on S2-11 (card_run follows the shared card rules and runs hello on the card).** Run `python tools/dispatch.py`, or ask the tech lead to.
+**Next: the tech lead, on S2-11.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[################----]` 23 of 28
 
@@ -49,10 +49,11 @@ Current tickets: `[################----]` 23 of 28
 | S2-08 | hello, scalar FP and printf on the card | draft | Owner approved Sprint 2 on 2026-11-03; this ticket stays draft until the card hold ends. |
 | S2-09 | GCC 16 builds gfortran, and the secondary-reload reproducer passes | Not started | Reconfiguring means one full rebuild: use `make -j8` with `CFLAGS=-O2 -g1 CXXFLAGS=-O2 -g1` as `tools/toolc... |
 | S2-10 | First card runs for the queued native checks | Not started | Owner's decision of 2026-11-03: the interactive lead runs every card job; engineer sessions have no card ac... |
-| S2-11 | card_run follows the shared card rules and runs hello on the card | In progress | The corrected pinning test now fails on the constant 'PIN yes' itself, so with db52e6b the red tests pin do... |
+| S2-11 | card_run follows the shared card rules and runs hello on the card | Waiting for review | GREEN 61a8a62 addresses all three 11:13 findings against approved RED db52e6b and cc2afae. Five focused T0 ... |
 
 ## Recent activity
 
+- 2026-11-03 11:21 **S2-11** engineer submit: GREEN 61a8a62 addresses all three 11:13 findings against approved RED db52e6b and cc2afae. Five focused T0 cases passed in .work/_state/logs/S2_11_...
 - 2026-11-03 11:20 **S2-10** lead note: Owner's decision of 2026-11-03: the interactive lead runs every card job; engineer sessions have no card access. So this ticket's engineer prepares...
 - 2026-11-03 11:18 **S2-11** lead approve-red: The corrected pinning test now fails on the constant 'PIN yes' itself, so with db52e6b the red tests pin down all three review findings (helper mar...
 - 2026-11-03 11:18 **S2-11** engineer red: Corrected RED cc2afae per 11:16 review: fake boot_id, cpuinfo, meminfo and /proc path replacement let test_snapshot_does_not_claim_untested_pinning...
@@ -60,7 +61,6 @@ Current tickets: `[################----]` 23 of 28
 - 2026-11-03 11:16 **S2-11** lead escalate: budget: 5 engineer sessions used; the budget is 5
 - 2026-11-03 11:16 **S2-11** lead changes: Red db52e6b is right for findings (1) marker, (2) control-shell snapshot and (3) empty /tmp/claude, but test_snapshot_does_not_claim_untested_pinni...
 - 2026-11-03 11:15 **S2-11** engineer red: RED db52e6b for the 11:13 review. tools/run.py --name S2-11-review-red wrapped Cygwin unittest: 5 focused T0 tests, 7 expected assertion failures, ...
-- 2026-11-03 11:13 **S2-11** lead changes: Review of 17b75b4. The ledger schema, core mapping, memory admission, staging without base64 and the config path are sound, and the size override i...
 
 ## Cost
 
