@@ -172,8 +172,10 @@ format. It lists nine jobs: donor and GCC 16 twins of hello, scalar arithmetic
 in float/double/long double, and printf of int/double/long double; the S2-05
 compare table; the S2-07 integer/soft-float helpers; and `claude-torture`.
 The arithmetic exercises addition, subtraction, multiplication and division
-without fast math or FP contraction. Each of the nine jobs has its own
-expected-output file.
+without fast math or FP contraction. Inexact thirds are stored in volatile
+float, double and long double objects and printed with `%.9g`, `%.17g` and
+`%.21Lg` to expose rounding or precision-control differences in the donor
+comparison. Each of the nine jobs has its own expected-output file.
 
 Hello/scalar/printf expectations currently come from host executions of the
 same sources. **The lead must run each donor twin first and confirm or replace
@@ -193,9 +195,11 @@ summary is `tests/baseline/gcc16-torture-execute.txt`; `compile.tsv` in the
 handoff directory records every source, result, staged filename and option.
 Per-source `.build.log` files retain warnings and link diagnostics there.
 
-`claude-torture` is statically linked by GCC 16 against its own libgcc and the
-retained bootstrap static glibc, referenced in place. Readelf reports no
-interpreter or NEEDED library. It reads `claude-torture.list`, runs each child
+`claude-torture` is linked by GCC 16 with its own libgcc and dynamically
+against the shared sysroot glibc, like hello. It needs no PhiWeather path or
+bootstrap static glibc. Readelf reports interpreter
+`/lib64/ld-linux-k1om.so.2` and NEEDED `libc.so.6`.
+It reads `claude-torture.list`, runs each child
 in a separate owned process group with a two-second wall limit, disables core
 dumps and prints exactly one `PASS`/`FAIL`/`TIMEOUT name` line per child on
 stdout. Failure diagnostics and raw wait status go to stderr before cleanup;
@@ -208,7 +212,7 @@ the merged checkout under Cygwin. The script invokes only `tools/card_run`,
 with all 257 extra files supplied through S2-14's `--file`, a 542-second
 execution limit and a 900-second transport limit for the many sequential
 uploads. Use the configured 128 MiB memory limit from the batch. Driver,
-tests, manifest and runner helper total 9,833,869 bytes including a 64 KiB
+tests, manifest and runner helper total 6,270,785 bytes including a 64 KiB
 watchdog reserve, below the configured 67,108,864-byte staging cap. Children
 inherit the runner's affinity and per-process memory limit.
 
@@ -222,7 +226,14 @@ Host logs in `.work/_state/logs/`: `S2_08_prepare-20261103-132843.log`
 (basic builds/references passed; Cygwin GCC ICE compiling the combined host
 compare fixture), `S2_08_remaining-20261103-132911.log` (adapter reference,
 helper reference, initial driver and 256/256 compile/link PASS), and
-`S2_08_driver_final-20261103-133100.log` (final static driver and host outcome
+`S2_08_driver_final-20261103-133100.log` (earlier static driver and host outcome
 checks PASS). A separate host-driver check initially lacked the Cygwin DLL
 PATH; `S2_08_driver-20261103-133002.log` records that infrastructure failure.
-Passing program builds and the 256-test sweep were not repeated.
+`S2_08_review_fixes-20261103-133411.log` records the scalar donor/GCC 16
+rebuilds, host rounding output, dynamic driver link/readelf check and updated
+staging cap check, all PASS. Host thirds are provisionally `0.333333343`,
+`0.33333333333333331` and `0.333333333333333333342`; donor confirmation is
+still pending. `python tools/prepare_s2_08.py --refresh-affected`, invoked
+through `tools/run.py`, reuses the prior torture compile summary and rebuilds
+only scalar-fp and the driver. Other passing program builds, driver behavior
+checks and the 256-test sweep were not repeated.

@@ -39,6 +39,9 @@ def main():
     donor = [TC / 'cross/bin/k1om-mpss-linux-gcc']
     host = [TC / 'cygwin/bin/gcc']
     flags = ['-O2', '-march=knc', '-ffp-contract=off']
+    # Review changes affect only scalar-fp and the driver's link. Reuse the
+    # already passing programs and torture compile summary in this mode.
+    refresh = '--refresh-affected' in sys.argv
 
     def run(args, check=True):
         args = list(map(str, args))
@@ -66,7 +69,11 @@ int main(void) {
   float a = (f+g)*g-f/g;
   double b = (d-e)*e+d/e;
   long double c = (x+y)*y-x/y;
+  volatile float third_f = g / (g+4.0f);
+  volatile double third_d = e / (e+4.0);
+  volatile long double third_l = y / (y+1.0L);
   printf("scalar %.6f %.6f %.6Lf\\n", (double)a, b, c);
+  printf("thirds %.9g %.17g %.21Lg\\n", (double)third_f, third_d, third_l);
   return a != 6.25f || b != 14.75 || c != -4.4375L;
 }
 ''',
@@ -81,7 +88,8 @@ int main(void) {
         rows = []
         for name, text in sources.items():
             source = OUT / (name + '.c')
-            if '--resume-after-compare-link' not in sys.argv:
+            if ('--resume-after-compare-link' not in sys.argv
+                    and (not refresh or name == 'scalar-fp')):
                 source.write_text(text)
                 for tag, compiler in (('donor-', donor), ('', cc)):
                     run([*compiler, *flags, '-fno-builtin', source,
@@ -100,6 +108,9 @@ int main(void) {
         for name, source, extra in (
                 ('compare', ROOT / 'tests/t1/knc-x87-compare.c', ['-DCOMPARE_MAIN']),
                 ('libgcc', ROOT / 'tests/t2/knc-libgcc.c', ['-fno-builtin'])):
+            if refresh:
+                rows.append((name + '.mic', '[]', '128', name + '.expected.txt'))
+                continue
             if name != 'compare' or '--resume-after-compare-link' not in sys.argv:
                 run([*cc, *flags, *extra, source, '-o', OUT / (name + '.mic')])
             exe = OUT / (name + '-host.exe')
@@ -121,12 +132,12 @@ int main(void) {
             (OUT / (name + '.expected.txt')).write_text(result.stdout)
             exe.unlink()
             rows.append((name + '.mic', '[]', '128', name + '.expected.txt'))
-        # Only static glibc is missing from the shared sysroot. Reference its
-        # retained bootstrap directory in place, without copying or a donor -B.
-        bootstrap = Path('/cygdrive/c/Users/xuzhi/Documents/PhiWeather/.tools/knc-bootstrap')
-        run([*cc, *flags, '-static', ROOT / 'tools/claude-torture.c',
-             '-L' + str(bootstrap / 'sysroot/usr/lib64'), '-Wl,--trace',
+        run([*cc, *flags, ROOT / 'tools/claude-torture.c',
              '-o', OUT / 'claude-torture'])
+        elf = run([TC / 'cross/bin/k1om-mpss-linux-readelf', '-l', '-d',
+                   OUT / 'claude-torture']).stdout
+        if 'INTERP' not in elf or '(NEEDED)' not in elf or 'libc.so.6' not in elf:
+            raise RuntimeError('driver must use the shared sysroot dynamic glibc')
         header = '# S2-10 format; paths relative to batch.txt; memory in MiB.\n'
         header += '# Run donor twins first; host oracles await donor confirmation.\n'
         header += 'program\targuments\tmemoryMB\texpected\n'
@@ -175,8 +186,12 @@ int main(void) {
             binary.chmod(0o700)
         return source.name, state, binary.name, shlex.join(extra)
 
-    with ThreadPoolExecutor(max_workers=8) as pool:
-        results = list(pool.map(build, selected))
+    if refresh:
+        results = [tuple(line.split('\t')) for line in
+                   (OUT / 'compile.tsv').read_text().splitlines()[1:]]
+    else:
+        with ThreadPoolExecutor(max_workers=8) as pool:
+            results = list(pool.map(build, selected))
     counts = Counter(row[1] for row in results)
     linked = [(name, binary) for name, state, binary, _ in results if state == 'linked']
     (OUT / 'compile.tsv').write_text('source\tresult\tprogram\tdg-options\n' + ''.join(
