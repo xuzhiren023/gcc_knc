@@ -145,16 +145,16 @@ outputs, and the compiler commit above; do not fix compiler behavior here.
 
 | Executable | Native result | Boot ID before / after | Card minutes |
 | --- | --- | --- | --- |
-| `hello.mic` | Lead reports exit 0, stdout matches | pending lead records | pending |
-| `m1_affine.mic` | Lead reports exit 0, stdout matches | pending lead records | pending |
-| `scalar-gcc16-caller.mic` | Lead reports exit 0, stdout matches | pending lead records | pending |
-| `scalar-donor-caller.mic` | Lead reports exit 0, stdout matches | pending lead records | pending |
-| `varargs-donor.mic` | Lead reports exit 0, stdout matches | pending lead records | pending |
-| `varargs-gcc16.mic` | Lead reports exit 0, stdout matches | pending lead records | pending |
-| `varargs-gcc16-caller.mic` | Lead reports exit 0, stdout matches | pending lead records | pending |
-| `varargs-donor-caller.mic` | Lead reports exit 0, stdout matches | pending lead records | pending |
-| `secondary-pressure.mic` | Lead reports exit 0, stdout matches | pending lead records | pending |
-| `atomic-counter.mic` | Lead reports exit 127 (missing libatomic); static rebuild awaiting rerun | pending lead records | pending |
+| `hello.mic` | exit 0, stdout matches byte for byte (lead run, job `claude-d9f5ef6c`) | `e9bfb0ab` / same | 0.0237 |
+| `m1_affine.mic` | exit 0, stdout matches byte for byte (lead run, job `claude-855d0925`) | `e9bfb0ab` / same | 0.0242 |
+| `scalar-gcc16-caller.mic` | exit 0, stdout matches byte for byte (lead run, job `claude-ab414606`) | `e9bfb0ab` / same | 0.0237 |
+| `scalar-donor-caller.mic` | exit 0, stdout matches byte for byte (lead run, job `claude-da525b2a`) | `e9bfb0ab` / same | 0.0240 |
+| `varargs-donor.mic` | exit 0, stdout matches byte for byte (lead run, job `claude-feb5be07`) | `e9bfb0ab` / same | 0.0237 |
+| `varargs-gcc16.mic` | exit 0, stdout matches byte for byte (lead run, job `claude-f9e5bc70`) | `e9bfb0ab` / same | 0.0237 |
+| `varargs-gcc16-caller.mic` | exit 0, stdout matches byte for byte (lead run, job `claude-68564c29`) | `e9bfb0ab` / same | 0.0239 |
+| `varargs-donor-caller.mic` | exit 0, stdout matches byte for byte (lead run, job `claude-d6cb3b3d`) | `e9bfb0ab` / same | 0.0234 |
+| `secondary-pressure.mic` | exit 0, stdout matches byte for byte (lead run, job `claude-999a15ee`) | `e9bfb0ab` / same | 0.0237 |
+| `atomic-counter.mic` | exit 0 after static-libatomic rebuild (first run exit 127, libatomic.so.1 missing); stdout matches (job `claude-9ec5937a`) | `e9bfb0ab` / same | 0.0245 |
 
 The lead ticks the other tickets' native lines only after their corresponding
 native comparisons pass.
