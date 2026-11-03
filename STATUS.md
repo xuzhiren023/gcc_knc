@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-03 15:30.
+Updated automatically at every ticket change. Last update: 2026-11-03 15:31.
 
 **Next: GPT-6.1, on S3-01 (Packed modes and IMCI patterns in GCC 16: entry points, audit and line estimate).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
@@ -84,7 +84,7 @@ Current tickets: `[################----]` 38 of 47
 ## Cost
 
 - From the script, engineer: 128 sessions, 243.2M input tokens
-- From the script, lead: 126 sessions, 41.7M input tokens
+- From the script, lead: 127 sessions, 42.8M input tokens
 - Started by hand, Claude: 3 sessions, 401.0M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
