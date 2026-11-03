@@ -188,6 +188,82 @@ class RemoteReview(unittest.TestCase):
         return subprocess.run([shutil.which("sh"), "-c", script],
                               stdout=subprocess.PIPE, stderr=subprocess.PIPE, timeout=timeout)
 
+    def symlink_tmp(self):
+        physical = self.directory / "var/volatile/tmp"
+        physical.mkdir(parents=True)
+        logical = self.directory / "tmp"
+        logical.symlink_to(physical, target_is_directory=True)
+        remote = self.remote.replace("/tmp", str(logical)).replace(
+            "/proc/", str(self.proc) + "/")
+        return logical, physical, remote
+
+    def test_tmp_symlink_guard_owned_identity_and_cleanup(self):
+        logical, physical, remote = self.symlink_tmp()
+        job = "claude-" + "a" * 32
+        run_dir = logical / "claude" / job
+        run_dir.mkdir(parents=True)
+        self.process(42, 1, cwd=str(physical / "claude" / job))
+        script = remote + '\nrun_dir="%s"\nboot_id="%s"\n' % (run_dir, BOOT)
+        # Resolve /tmp once in this shell, even across repeated guards.
+        script += ('cd() { if [ "$*" = "%s" ]; then echo resolve-tmp >&2; fi; '
+                   'command cd "$@"; }\n' % logical)
+        script += ('cd -- "$run_dir" && guard_boot && guard_boot && owned_pid 42\n'
+                   'identity=$?\n[ "$identity" = 0 ] || exit "$identity"\n'
+                   'rm -rf "%s/42"\nsleep() { :; }\ncleanup\n' % self.proc)
+        answer = self.shell(script)
+        self.assertEqual(answer.returncode, 0, answer.stderr)
+        self.assertEqual(answer.stderr.count(b"resolve-tmp"), 1, answer.stderr)
+        self.assertFalse(run_dir.exists())
+        self.assertFalse((physical / "claude").exists())
+
+    def test_tmp_symlink_reaper_removes_old_dirs_preserves_live_and_foreign(self):
+        logical, physical, remote = self.symlink_tmp()
+        parent = logical / "claude"
+        parent.mkdir()
+        stale = [parent / ("claude-" + digit * 32) for digit in "ab"]
+        live = parent / ("claude-" + "c" * 32)
+        foreign = parent / "gpt61-job"
+        malformed = parent / "claude-short"
+        for directory in stale + [live, foreign, malformed]:
+            directory.mkdir()
+            (directory / "output").write_text("keep")
+        link = parent / ("claude-" + "d" * 32)
+        link.symlink_to(foreign, target_is_directory=True)
+        self.process(42, 1, cwd=str(physical / "claude" / live.name))
+        answer = self.shell(remote + '\nrun_dir="%s/claude-%s"\nboot_id="%s"\n'
+                            'cd "%s"\nreap_stale\n' %
+                            (parent, "e" * 32, BOOT, self.directory))
+        self.assertEqual(answer.returncode, 0, answer.stderr)
+        self.assertTrue(all(not directory.exists() for directory in stale))
+        for directory in (live, foreign, malformed):
+            self.assertEqual((directory / "output").read_text(), "keep")
+        self.assertTrue(link.is_symlink())
+
+    def test_directory_and_boot_guards_name_each_failed_check(self):
+        logical, physical, remote = self.symlink_tmp()
+        run_dir = logical / "claude" / ("claude-" + "a" * 32)
+        run_dir.mkdir(parents=True)
+        link = run_dir.parent / ("claude-" + "b" * 32)
+        link.symlink_to(run_dir, target_is_directory=True)
+        cases = (
+            (str(run_dir) + "x", "", "guard_dir", "directory shape"),
+            (str(run_dir)[:-1] + "z", "", "guard_dir", "lowercase hex"),
+            (str(link), "", "guard_dir", "symlink"),
+            (str(run_dir)[:-1] + "c", "", "guard_dir", "directory missing"),
+            (str(run_dir), 'cd "%s"' % physical, "guard_dir", "physical cwd"),
+            (str(run_dir), 'id() { echo -1; }', "guard_dir", "owner"),
+            (str(run_dir), 'boot_id=', "check_boot", "boot ID missing"),
+            (str(run_dir), 'boot_id=changed', "check_boot", "boot ID mismatch"),
+            (str(run_dir), 'cat() { return 1; }', "check_boot", "boot ID unreadable"),
+        )
+        for path, setup, operation, diagnostic in cases:
+            with self.subTest(check=diagnostic):
+                answer = self.shell(remote + '\nrun_dir="%s"\nboot_id="%s"\n'
+                                    'cd "%s"\n%s\n%s\n' %
+                                    (path, BOOT, run_dir, setup, operation))
+                self.assertNotEqual(answer.returncode, 0)
+                self.assertIn(diagnostic.encode(), answer.stderr)
+
     def test_snapshot_has_constant_external_command_count(self):
         # Match the native 240-CPU /proc file, including 23 unused lines/block.
         cpuinfo = "\n\n".join(
