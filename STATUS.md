@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-02 21:48.
+Updated automatically at every ticket change. Last update: 2026-11-02 21:49.
 
 **Next: GPT-6.1, on S1-05 (Integer C assembles with as 2.22 and lints clean).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
@@ -54,7 +54,7 @@ Current tickets: `[################----]` 14 of 17
 ## Cost
 
 - From the script, engineer: 55 sessions, 72.2M input tokens
-- From the script, lead: 55 sessions, 20.0M input tokens
+- From the script, lead: 56 sessions, 20.8M input tokens
 - Started by hand, Claude: 3 sessions, 188.6M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
