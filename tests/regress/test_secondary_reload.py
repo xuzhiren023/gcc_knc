@@ -19,19 +19,30 @@ class SecondaryReload(unittest.TestCase):
 
     def test_pressure_mask_address_and_memory_bridge(self):
         live = '# pressure-live ' + ' '.join('%' + r for r in
-            ('rax rbx rcx rdx rsi rdi rbp r8 r9 r10 r11 r12 r13 r14 r15'.split()))
-        body = ('movq %rdi, %rax\n' + live + '\n'
-                'movl $1, %edx\nkmov %edx, %k1\n'
-                'vbroadcastsd (%rax), %zmm0\n'
-                'vpackstorelpd %zmm0, (%rax){%k1}\n' + live + '\nret\n')
+            ('rax rbx rcx rdx rsi rdi rbp r8 r9 r10 r11 r12 r13 r14'.split()))
+        body = (live + '\n'
+                'movl $1, %r15d\nkmov %r15d, %k1\n'
+                'vbroadcastsd (%rsp), %zmm0\n'
+                'vpackstorelpd %zmm0, (%rsp){%k1}\n' + live + '\nret\n')
         self.assertEqual(pressure_scan(body), [])
-        for old, new in (('kmov %edx, %k1', ''), ('$1', '$3'),
-                         ('(%rax)', '(%r10)'),
-                         ('vbroadcastsd (%rax), %zmm0', 'vmovq %rax, %zmm0'),
-                         ('vpackstorelpd %zmm0, (%rax){%k1}', 'vmovq %zmm0, %rax'),
-                         ('%r15', '%r14')):
+        for old, new in (('kmov %r15d, %k1', ''), ('$1', '$3'),
+                         ('(%rsp)', '(%r10)'),
+                         ('vbroadcastsd (%rsp), %zmm0', 'vmovq %rax, %zmm0'),
+                         ('vpackstorelpd %zmm0, (%rsp){%k1}', 'vmovq %zmm0, %rax'),
+                         ('%r14', '%r13')):
             with self.subTest(mutation=old):
                 self.assertTrue(pressure_scan(body.replace(old, new)))
+
+        # Mask setup using a live register is wrong even if its value is saved
+        # and restored later. Cover subregisters and implicit GPR destinations.
+        for write in ('movl $1, %edx', 'movb $1, %al', 'movb $1, %ah',
+                      'movw $1, %r14w', 'incq %rax', 'popq %rbx',
+                      'xchgq %rax, %r15', 'mulq %r15', 'cqto',
+                      'movq %rdi, %rax'):
+            with self.subTest(live_write=write):
+                errors = pressure_scan(body.replace('movl $1, %r15d',
+                                                    write + '\nmovl $1, %r15d'))
+                self.assertTrue(any('write to live GPR' in e for e in errors), errors)
 
 
 if __name__ == '__main__':

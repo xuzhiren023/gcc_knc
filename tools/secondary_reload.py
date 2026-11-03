@@ -2,7 +2,7 @@
 
 The Fortran dump check is exactly the symptom documented in its header, not
 an assertion that GCC 16 uses the donor's secondary-store mechanism. The C
-probe forces register-bank reloads, with all 15 GPRs live across the moves.
+probe forces register-bank reloads, with 14 GPRs live and one scratch free.
 Native validation is separate: PRESSURE_MAIN prints integer bit results for
 comparison with the host reference, through tools/card_run once available.
 """
@@ -32,13 +32,51 @@ def lost_addresses(dump):
     return failures
 
 
+def gpr(reg):
+    for stem, full in (('a', 'rax'), ('b', 'rbx'), ('c', 'rcx'), ('d', 'rdx')):
+        if reg in (full, 'e' + stem + 'x', stem + 'x', stem + 'l', stem + 'h'):
+            return full
+    for stem in ('si', 'di', 'bp', 'sp'):
+        if reg in ('r' + stem, 'e' + stem, stem, stem + 'l'):
+            return 'r' + stem
+    return re.sub(r'^(r\d+)[dwb]$', r'\1', reg)
+
+
+def gpr_writes(op, args):
+    """Explicit and implicit destinations in the probe's scalar allowlist."""
+    if op.startswith(('cmp', 'test', 'push', 'j')):
+        return set()
+    regs = re.findall(r'%(\w+)', args)
+    dest = re.search(r'(?:^|,)\s*%(\w+)\s*$', args)
+    written = {gpr(dest[1])} if dest else set()
+    if op.startswith('xchg'):
+        written.update(map(gpr, regs))
+    if op in ('cltq', 'cwtl'):
+        written.add('rax')
+    if op in ('cqto', 'cltd'):
+        written.add('rdx')
+    if re.fullmatch(r'(?:i?div|mul)[bwlq]?|imul[bwlq]?', op) and ',' not in args:
+        written.update(('rax', 'rdx'))
+    if op == 'fnstsw' and not args:
+        written.add('rax')
+    if op == 'call':
+        written.update(('rax', 'rcx', 'rdx', 'rsi', 'rdi', 'r8', 'r9', 'r10', 'r11'))
+    return written
+
+
 def pressure_scan(body):
     failures = allowlist(body)
     markers = re.findall(r'# pressure-live([^\n]*)', body)
     expected = {'rax', 'rbx', 'rcx', 'rdx', 'rsi', 'rdi', 'rbp',
-                *('r' + str(i) for i in range(8, 16))}
-    if len(markers) != 2 or any(set(re.findall(r'%(\w+)', m)) != expected for m in markers):
-        failures.append('missing both barriers with all 15 GPRs live')
+                *('r' + str(i) for i in range(8, 15))}
+    if len(markers) != 2 or any(len(re.findall(r'%(\w+)', m)) != 14 or
+                              set(re.findall(r'%(\w+)', m)) != expected for m in markers):
+        failures.append('missing both barriers with 14 GPRs live and r15 free')
+    regions = re.split(r'# pressure-live[^\n]*', body)
+    if len(regions) == 3:
+        for op, args in instructions(regions[1]):
+            for reg in sorted(gpr_writes(op, args) & expected):
+                failures.append('write to live GPR ' + reg + ': ' + op + ' ' + args)
     masks, values = {}, {}
     transfers = 0
     for op, args in instructions(body):
@@ -63,13 +101,11 @@ def pressure_scan(body):
         if not dest:
             continue
         reg = dest[1]
-        canonical = {'eax': 'rax', 'ebx': 'rbx', 'ecx': 'rcx', 'edx': 'rdx',
-                     'esi': 'rsi', 'edi': 'rdi', 'ebp': 'rbp'}.get(reg, re.sub(r'^(r\d+)[dwb]$', r'\1', reg))
+        canonical = gpr(reg)
         if op == 'kmov' and reg.startswith('k'):
             source = re.match(r'%(\w+),', args)
             source = source[1] if source else ''
-            source = {'eax': 'rax', 'ebx': 'rbx', 'ecx': 'rcx', 'edx': 'rdx',
-                      'esi': 'rsi', 'edi': 'rdi'}.get(source, re.sub(r'^(r\d+)[dwb]$', r'\1', source))
+            source = gpr(source)
             masks[reg] = values.get(source)
         elif not reg.startswith(('zmm', 'k', 'st')):
             immediate = re.match(r'\$(\d+),', args)
@@ -109,20 +145,20 @@ def t1(runner):
         return
 
     source = runner.root / 'tests/regress/knc-secondary-pressure.c'
-    for level in ('-O1', '-O2'):
+    for level, number, mode in ((level, number, mode)
+                               for level in ('-O1', '-O2')
+                               for number, mode in enumerate(('si', 'di', 'sf', 'df'), 1)):
         asm = runner.out / 'secondary-pressure.s'
         compiled = runner.command(runner.cc, *runner.cc_flags, level, '-march=knc',
             '-fomit-frame-pointer', '-fno-tree-vectorize', '-ffp-contract=off',
-            '-S', source, '-o', asm, check=False)
+            '-DPRESSURE_MODE=' + str(number), '-S', source, '-o', asm, check=False)
         failures = []
         if compiled.returncode:
             failures.append('compile: ' + compiled.stdout[-2200:])
         else:
             assembly = asm.read_text()
-            for mode in ('si', 'di', 'sf', 'df'):
-                body = runner.function_body(assembly, 'pressure_' + mode)
-                failures.extend(mode + ': ' + f for f in
-                                (pressure_scan(body) if body else ['missing function']))
+            body = runner.function_body(assembly, 'pressure_' + mode)
+            failures.extend(pressure_scan(body) if body else ['missing function'])
             assembled = runner.command(runner.tool('as'), '--march=k1om', asm,
                                        '-o', asm.with_suffix('.o'), check=False)
             if assembled.returncode:
@@ -132,4 +168,4 @@ def t1(runner):
                                       asm, asm.with_suffix('.o'), check=False)
                 if lint.returncode:
                     failures.append('lint: ' + lint.stdout[-1500:])
-        runner.result('t1 secondary mixed pressure ' + level, failures)
+        runner.result('t1 secondary mixed pressure ' + level + ' ' + mode, failures)
