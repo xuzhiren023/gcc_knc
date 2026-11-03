@@ -20,26 +20,28 @@ S3-01, and S3-04 waits for that.
 
 ## Shared i386 line budget
 
-Measured 2026-11-03 at `knc` `80bc88d9f9e`: **251 of 300 used, 49 left** (S1 45, S2 206; S2-06 added
-54). Measure: added plus deleted lines in `gcc/config/i386` and `gcc/common/config/i386` against
-`releases/gcc-16.2.0`, excluding `imci.md`, `linux-k1om.h` and the new KNC-only `i386-knc.*`:
+Measured 2026-11-03 at `knc` `bdcb9b5c10d`: **251 of 300 used, 49 left**. Measure: added plus deleted
+lines in `gcc/config/i386` and `gcc/common/config/i386` against `releases/gcc-16.2.0`, excluding
+`imci.md`, `linux-k1om.h` and the KNC-only `i386-knc.*`:
 
 ```bash
 git -C .work/_shared/gcc diff --numstat releases/gcc-16.2.0 knc -- gcc/config/i386 gcc/common/config/i386
 ```
 
+S3-01 sketched the change and found the original allocations (46) too small: the shared lines are
+standard-name iterator entries, conditions and dispatches in `sse.md`, which GCC allows only one
+definition of. **The owner chose on 2026-11-03 to go past 300** and let M1 compare real costs.
+
 | Ticket | Allocation | Where the lines go |
 |---|---|---|
-| S3-04 | 24 | four `VMOVE` entries, `mov` condition and dispatch, one-line hook calls |
-| S3-05 | 6 | `movmisalign` condition and dispatch |
-| S3-06 | 12 | `VF_BHSD` and `FMAMODEM` entries, add/sub and mul conditions |
-| S3-07 | 4 | the `preferred_simd_mode` call |
-| S3-09 | none | about 20 estimated; runs only with the owner's choice below |
+| S3-04 | 37 | expander-only move iterator, `mov` condition and dispatch, mode-support and constant hooks, ABI guard, object rule |
+| S3-05 | 11 | `movmisalign` operands, condition and dispatch |
+| S3-06 | 35 | `VF_BHSD` FP entries, add/sub/mul conditions and dispatches, `FMAMODEM`, `vec_init` |
+| S3-07 | 8 | `preferred_simd_mode` call, three pressure-cost lines |
+| S3-09 | about 50 | integer add/sub/mul/logic/broadcast; runs only with the owner's choice after S3-07 |
 
-46 of 49. A ticket that would pass its allocation stops and asks on the ticket. S2-07 and S2-09 are
-expected to add none; if they do, the lead re-plans before S3-04. Integer vector arithmetic (S3-09)
-would take M1 to about 315. The owner chooses, when S3-07 is merged: run S3-09 and let M1's
-comparison count it, or move it to Sprint 4.
+91 before S3-09, so about **342**. A ticket that would pass its allocation stops and asks. The M1
+note reports the shared count with the KNC-only files' size beside it.
 
 ## Card
 
