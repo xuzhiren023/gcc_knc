@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-03 18:22.
+Updated automatically at every ticket change. Last update: 2026-11-03 18:23.
 
 **Next: GPT-6.1, on S3-05 (Unaligned packed moves through load and store pairs).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
@@ -88,7 +88,7 @@ Current tickets: `[###############-----]` 40 of 51
 ## Cost
 
 - From the script, engineer: 136 sessions, 280.8M input tokens
-- From the script, lead: 134 sessions, 45.7M input tokens
+- From the script, lead: 135 sessions, 45.9M input tokens
 - Started by hand, Claude: 5 sessions, 429.2M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
