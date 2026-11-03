@@ -83,7 +83,9 @@ class PortabilityTest(unittest.TestCase):
         corpus = self.repo / 'gcc/testsuite/gcc.c-torture/compile'
         corpus.mkdir(parents=True)
         for name in ('same.c', 'different.c'):
-            (corpus / name).write_text('int f(void) { return 1; }\n')
+            (corpus / name).write_text(
+                '/* { dg-additional-options "-std=gnu17 -fpermissive" } */\n'
+                'int f(void) { return 1; }\n')
         compilers = []
         for side in ('a', 'b'):
             script = self.root / (side + '.py')
@@ -91,6 +93,7 @@ class PortabilityTest(unittest.TestCase):
                 'import pathlib, sys\n'
                 'args = sys.argv[1:]\n'
                 'assert "-O2" in args\n'
+                'assert all(x in args for x in ("-w", "-std=gnu17", "-fpermissive"))\n'
                 'source = next(x for x in args if x.endswith(".c"))\n'
                 'text = "assembly\\n"\n'
                 'if "different.c" in source and "-mavx512f" in args:\n'
@@ -108,6 +111,44 @@ class PortabilityTest(unittest.TestCase):
         self.assertIn('-O2 -mavx512f: identical=1 different=1', output.getvalue())
         self.assertIn('DIFFERENT different.c', output.getvalue())
         self.assertIn('-a\n+b\n', output.getvalue())
+        self.assertIn('Default torture options: -w', output.getvalue())
+        self.assertIn('Dialect options same.c: -std=gnu17 -fpermissive', output.getvalue())
+
+    def test_x86_one_sided_and_shared_failures(self):
+        corpus = self.repo / portability.CORPUS
+        corpus.mkdir(parents=True)
+        for name in ('one-sided.c', 'both.c', 'diagnostics.c'):
+            (corpus / name).write_text('int f(void) { return 1; }\n')
+        compilers = []
+        for side in ('a', 'b'):
+            script = self.root / (side + '.py')
+            script.write_text(
+                'import pathlib, sys\n'
+                'args = sys.argv[1:]\n'
+                'name = pathlib.Path(next(x for x in args if x.endswith(".c"))).name\n'
+                'side = ' + repr(side) + '\n'
+                'if name == "both.c":\n'
+                '    print("shared error")\n'
+                '    sys.exit(1)\n'
+                'if name == "diagnostics.c" or side == "b":\n'
+                '    print(side + " error")\n'
+                '    sys.exit(1)\n'
+                'print("a output")\n'
+                'pathlib.Path(args[args.index("-o") + 1]).write_text("assembly\\n")\n')
+            compilers.append([sys.executable, str(script)])
+        with mock.patch.object(portability, 'build_cc1', side_effect=compilers), \
+                mock.patch.object(portability, 'make_is_running', return_value=False), \
+                contextlib.redirect_stdout(io.StringIO()) as output:
+            result = portability.main(['x86', '--repo', str(self.repo), '--shared', str(self.root),
+                                       '--tree', 'base', '--tree', 'knc'])
+        self.assertEqual(result, 1)
+        for flags in ('-O2', '-O2 -mavx512f'):
+            self.assertIn(flags + ': identical=0 different=2 both-failed=1', output.getvalue())
+        self.assertIn('DIFFERENT one-sided.c', output.getvalue())
+        self.assertIn('DIFFERENT diagnostics.c', output.getvalue())
+        self.assertIn('BOTH-FAILED both.c', output.getvalue())
+        for text in ('a output', 'a error', 'b error', 'base', 'knc'):
+            self.assertIn(text, output.getvalue())
 
     def test_x86_refuses_running_make(self):
         with mock.patch.object(portability.subprocess, 'check_output',
