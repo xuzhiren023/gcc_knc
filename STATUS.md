@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-03 13:01.
+Updated automatically at every ticket change. Last update: 2026-11-03 13:04.
 
-**Next: GPT-6.1, on S2-07 (GCC 16 builds its own static libgcc for k1om).** Run `python tools/dispatch.py`, or ask the tech lead to.
+**Next: the tech lead, on S2-14.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[############--------]` 27 of 42
 
@@ -52,7 +52,7 @@ Current tickets: `[############--------]` 27 of 42
 | S2-11 | card_run follows the shared card rules and runs hello on the card | Done | tools/card_run now runs programs on the shared Xeon Phi under the owner's card rules (ledger lines, cores 3... |
 | S2-12 | card_run polls the card gently and reports what it reaped | Done | card_run now checks job status on its existing SSH session with backoff to 5 s and opens output connections... |
 | S2-13 | Card tests pass again, and approve runs them | Done | All card tests in tests/tools pass again under Cygwin Python, and pm.py approve now refuses to merge any br... |
-| S2-14 | card_run stages extra files, so one job can run a batch | In progress | Test-fixture fix, no card_run change: in this test, run both fake shells (rpc's subprocess.run and the fake... |
+| S2-14 | card_run stages extra files, so one job can run a batch | Question for the tech lead | Both approved fixture attempts failed under Cygwin; no card access. cwd=directory plus /tmp->tmp and /proc/... |
 | S3-01 | Packed modes and IMCI patterns in GCC 16: entry points, audit and line estimate | draft |  |
 | S3-02 | One helper for optional tools/check selections | draft |  |
 | S3-03 | Native probe of unaligned pairs and masked aligned forms at page boundaries | draft |  |
@@ -67,6 +67,7 @@ Current tickets: `[############--------]` 27 of 42
 
 ## Recent activity
 
+- 2026-11-03 13:04 **S2-14** engineer ask: Both approved fixture attempts failed under Cygwin; no card access. cwd=directory plus /tmp->tmp and /proc/->proc/: 57/58 pass. ./tmp fallback: foc...
 - 2026-11-03 13:01 **S2-14** lead answer: Test-fixture fix, no card_run change: in this test, run both fake shells (rpc's subprocess.run and the fake-ssh Popen) with cwd=directory, and make...
 - 2026-11-03 13:00 **S2-14** engineer ask: Red ed5900b; implementation a72389a. Two Cygwin card-suite attempts: latest 57/58 pass. Reduced failure: fake stage-create runs mkdir -p /cygdrive/...
 - 2026-11-03 13:00 **S2-14** lead note: For S2-08's torture baseline on the card. The lead runs the card side after merge.
@@ -74,7 +75,6 @@ Current tickets: `[############--------]` 27 of 42
 - 2026-11-03 12:50 **S2-06** lead note: Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`).
 - 2026-11-03 12:50 **S2-04** lead note: Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`).
 - 2026-11-03 12:50 **S2-03** lead note: Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`).
-- 2026-11-03 12:50 **S2-02** lead note: Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`).
 
 ## Cost
 
