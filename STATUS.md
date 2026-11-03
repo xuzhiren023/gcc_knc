@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-03 10:49.
+Updated automatically at every ticket change. Last update: 2026-11-03 10:56.
 
-**Next: GPT-6.1, on S2-11 (card_run follows the shared card rules and runs hello on the card).** Run `python tools/dispatch.py`, or ask the tech lead to.
+**Next: the tech lead, on S2-11.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[################----]` 23 of 28
 
@@ -49,10 +49,11 @@ Current tickets: `[################----]` 23 of 28
 | S2-08 | hello, scalar FP and printf on the card | draft | Owner approved Sprint 2 on 2026-11-03; this ticket stays draft until the card hold ends. |
 | S2-09 | GCC 16 builds gfortran, and the secondary-reload reproducer passes | Not started | Reconfiguring means one full rebuild: use `make -j8` with `CFLAGS=-O2 -g1 CXXFLAGS=-O2 -g1` as `tools/toolc... |
 | S2-10 | First card runs for the queued native checks | Not started | The owner supplied `config/card.local.json` on 2026-11-03 (git-ignored; the `knownHosts` file is read from ... |
-| S2-11 | card_run follows the shared card rules and runs hello on the card | In progress | The failing fake-card tests now pin down every shared-card rule (ledger lines also on failure, cores 30-59 ... |
+| S2-11 | card_run follows the shared card rules and runs hello on the card | Question for the tech lead | 19cf929 is partial GREEN. 18 shared T0 tests passed before final hardening; donor hello built. Native repro... |
 
 ## Recent activity
 
+- 2026-11-03 10:56 **S2-11** engineer ask: 19cf929 is partial GREEN. 18 shared T0 tests passed before final hardening; donor hello built. Native reproducer: python tools/card_run ../_shared/...
 - 2026-11-03 10:49 **S2-11** lead approve-red: The failing fake-card tests now pin down every shared-card rule (ledger lines also on failure, cores 30-59 only, memory limits and waiting, /tmp/cl...
 - 2026-11-03 10:48 **S2-11** engineer red: RED ae87007: tools/run.py --name S2-11-red wrapped Cygwin python3.12.exe unittest discovery of test_card_shared.py. 18 tests, 21 expected assertion...
 - 2026-11-03 10:43 **S2-06** lead approve: Atomics on KNC now compile at every width with 16-byte operations routed to libatomic (no cmpxchg16b, fences or pause, and no false 16-byte CAS or ...
@@ -60,7 +61,6 @@ Current tickets: `[################----]` 23 of 28
 - 2026-11-03 10:41 **S2-06** owner decide: Lead decided under the owner's 2026-11-03 delegation: two more engineer sessions (5 in total) for the one-line getattr guard in tools/check.py from...
 - 2026-11-03 10:41 **S2-06** lead escalate: budget: 3 engineer sessions used; the budget is 3
 - 2026-11-03 10:41 **S2-06** lead changes: 1. tools/check.py:191 and tools/check.py:295 (s2/S2-06): the new --atomics dispatch reads self.args directly, so a Runner built without args (tests...
-- 2026-11-03 10:39 **S2-06** engineer submit: Red 84628d7 reproduced false native TI CAS advertising; GCC fix 0e5eb3cbf21 undefines the macro for KNC. Resumed all-gcc PASS. T1/T2 --compiler gcc...
 
 ## Cost
 
@@ -72,4 +72,4 @@ Current tickets: `[################----]` 23 of 28
 
 ## Disk
 
-The project uses 7.7 GiB of 100 GiB. 305 GiB free on the drive.
+The project uses 7.7 GiB of 100 GiB. 335 GiB free on the drive.
