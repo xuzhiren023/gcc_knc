@@ -132,6 +132,15 @@ class CardRecovery(unittest.TestCase):
         self.assertEqual(result["result_class"], "program", result)
         self.transport.reap_stale.assert_called_once_with(BOOT, timeout=1)
 
+    def test_result_lists_reaped_and_live_stale_directories(self):
+        reaped = ["/tmp/claude/claude-" + "a" * 32]
+        kept = ["/tmp/claude/claude-" + "b" * 32]
+        self.transport.reap_stale = mock.Mock(return_value=dict(reaped=reaped, stale_kept=kept))
+        result = self.invoke()
+        self.assertEqual(result["result_class"], "program", result)
+        self.assertEqual(result.get("reaped"), reaped)
+        self.assertEqual(result.get("stale_kept"), kept)
+
     def test_cpuinfo_read_once_including_waits_and_reconnect(self):
         for reconnect in (False, True):
             with self.subTest(reconnect=reconnect):
@@ -407,6 +416,9 @@ class RemoteReview(unittest.TestCase):
         link = parent / ("claude-" + "c" * 32)
         link.symlink_to(foreign, target_is_directory=True)
         self.process(42, 1, cwd=str(live))
+        self.process(2, 0)
+        for pid in range(100, 400):
+            self.process(pid, 2)
         session = object.__new__(self.runner["SSHSession"])
         session.run_dir = "/tmp/claude/claude-" + "d" * 32
         session.boot_id = BOOT
@@ -427,8 +439,9 @@ class RemoteReview(unittest.TestCase):
                         method(boot, timeout=1)
                     self.assertTrue(stale.exists())
                 else:
-                    method(boot, timeout=1)
+                    report = method(boot, timeout=1)
                     self.assertFalse(stale.exists())
+                    self.assertEqual(report, dict(reaped=[str(stale)], stale_kept=[str(live)]))
                 for directory in (live, foreign, malformed):
                     self.assertEqual((directory / "output").read_text(), "keep")
                 self.assertTrue(link.is_symlink())
