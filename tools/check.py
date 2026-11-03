@@ -268,9 +268,21 @@ class Runner:
             elf = self.out / 'knc-link-defaults.mic'
             # Temporary donor runtime bridge, explicitly required by S1-06.
             donor = self.tc / 'cross/lib/gcc/k1om-mpss-linux/5.1.1'
+            donor_shared = self.tc / 'cross/k1om-mpss-linux/lib64'
+            # GCC 16 normally generates these in libgcc/libatomic builds.
+            # Match libatomic/Makefile.am until E2-05 builds both runtimes.
+            scripts = self.out / 'runtime-specs'
+            scripts.mkdir()
+            for library in ('gcc_s', 'atomic'):
+                (scripts / ('lib' + library + '_asneeded.so')).write_text(
+                    'INPUT ( AS_NEEDED ( -l' + library + ' ) )\n')
             self.say('S1-06 runtime bridge: -B' + str(donor) +
-                     '/ supplies donor crtbegin.o, crtend.o and libgcc until E2-05')
+                     '/ supplies donor crtbegin.o, crtend.o and libgcc; -L' +
+                     str(scripts) + ' supplies test-local asneeded scripts; '
+                     '-L' + str(donor_shared) + ' resolves donor libgcc_s/libatomic; '
+                     'both bridges go away at E2-05')
             linked = self.command(self.cc, *self.cc_flags, '-B' + str(donor) + '/',
+                                  '-L' + str(scripts), '-L' + str(donor_shared),
                                   '-v', '-Wl,--trace', ROOT / 'tests/t2/knc-link-defaults.c',
                                   '-o', elf, check=False)
             trace = linked.stdout
@@ -291,6 +303,13 @@ class Runner:
         else:
             elf, trace = self.t2_affine_link()
         self.t2_abi(elf, trace)
+        if getattr(getattr(self, 'args', None), 'link_defaults', False):
+            dynamic = self.command(self.tool('readelf'), '--dynamic', '--wide', elf)
+            needed = re.findall(r'\(NEEDED\)[^\n]*\[([^\]]+)\]', dynamic)
+            self.say('T2 DT_NEEDED: ' + ', '.join(needed))
+            self.result('t2 integer main needs no libgcc_s or libatomic',
+                        ['unexpected DT_NEEDED ' + name for name in needed
+                         if re.match(r'lib(?:gcc_s|atomic)\.so(?:\.|$)', name)])
 
     def t2_affine_link(self):
         loops_obj = self.off_object or self.out / 'loops-off.o'
