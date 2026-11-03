@@ -132,6 +132,33 @@ class CardRecovery(unittest.TestCase):
         self.assertEqual(result["result_class"], "program", result)
         self.transport.reap_stale.assert_called_once_with(BOOT, timeout=1)
 
+    def test_cpuinfo_read_once_including_waits_and_reconnect(self):
+        for reconnect in (False, True):
+            with self.subTest(reconnect=reconnect):
+                self.transport = SharedTransport()
+                self.transport.ledger = self.ledger
+                self.transport.free_kb = [1_000_000, 4_000_000]
+                requests = []
+                sessions = [self.transport]
+                if reconnect:
+                    fresh, attempts = self.lost_session("same")
+                    sessions.append(fresh)
+                for session in sessions:
+                    original = session.snapshot
+
+                    def snapshot(*, timeout, include_cpuinfo=True, original=original):
+                        requests.append(include_cpuinfo)
+                        return original(timeout=timeout, include_cpuinfo=include_cpuinfo)
+
+                    session.snapshot = snapshot
+                result = self.invoke()
+                self.assertEqual(result["result_class"], "infrastructure" if reconnect else "program", result)
+                self.assertEqual(result["cpus"], [4, 13, 91])
+                self.assertGreaterEqual(len(requests), 4)
+                self.assertEqual(requests, [True] + [False] * (len(requests) - 1))
+                if reconnect:
+                    self.assertEqual(len(attempts), 2)
+
 
 class RemoteReview(unittest.TestCase):
     def setUp(self):
@@ -162,18 +189,30 @@ class RemoteReview(unittest.TestCase):
                               stdout=subprocess.PIPE, stderr=subprocess.PIPE, timeout=timeout)
 
     def test_snapshot_has_constant_external_command_count(self):
+        # Match the native 240-CPU /proc file, including 23 unused lines/block.
+        cpuinfo = "\n\n".join(
+            "processor : %d\ncore id : %d\n" % (cpu, cpu // 4 + 1) +
+            "\n".join("unused%d : ignored" % field for field in range(23))
+            for cpu in range(240)) + "\n\n"
+        (self.proc / "cpuinfo").write_text(cpuinfo)
+        (self.proc / "meminfo").write_text(
+            "MemTotal: 16000000 kB\nMemFree: 4000000 kB\nCached: 2000000 kB\n")
         self.process(42, 1, cwd="/other work")
         for pid in range(100, 400):
             self.process(pid, 2)
         counter = self.directory / "commands"
         wrappers = "\n".join(
             '%s() { printf "%s\\n" >> "%s"; command %s "$@"; }' %
-            (tool, tool, counter, tool) for tool in ("readlink", "cat", "ls", "awk"))
+            (tool, tool, counter, tool)
+            for tool in ("readlink", "cat", "ls", "awk", "read", "printf"))
+        # Count shell builtins too: per-line read/printf caused the native deadline.
+        wrappers = wrappers.replace('printf "', 'command printf "')
         script = self.remote.replace("/proc/", str(self.proc) + "/")
         answer = self.shell(script + "\n" + wrappers + "\nsnapshot\n")
         self.assertEqual(answer.returncode, 0, answer.stderr)
         commands = counter.read_text().splitlines()
-        self.assertLessEqual(len(commands), 3, commands[:12])
+        self.assertLessEqual(len(commands), 1000, commands[:12])
+        self.assertLessEqual(sum(c not in ("read", "printf") for c in commands), 5)
         self.assertNotIn("readlink", commands)
         session = object.__new__(self.runner["SSHSession"])
         session.boot_id = None
@@ -181,6 +220,15 @@ class RemoteReview(unittest.TestCase):
         snapshot = session.snapshot(timeout=1)
         self.assertEqual([p["pid"] for p in snapshot["processes"]], ["42"])
         self.assertEqual(snapshot["processes"][0]["cwd"], "/other work")
+        self.assertEqual(self.runner["cpu_binding"](snapshot["cpuinfo"]),
+                         self.runner["cpu_binding"](cpuinfo))
+        self.assertNotIn("unused", snapshot["cpuinfo"])
+        self.assertEqual(snapshot["meminfo"], "MemFree: 4000000 kB")
+        # Subsequent snapshots must still refresh memory/process/boot data.
+        answer = self.shell(script + "\n" + wrappers + "\nsnapshot skip-cpu\n")
+        self.assertEqual(answer.returncode, 0, answer.stderr)
+        self.assertNotIn(b"CPU\t", answer.stdout)
+        self.assertIn(b"MEM\tMemFree: 4000000 kB", answer.stdout)
 
     def test_remote_failure_names_snapshot_and_captures_stderr(self):
         session = self.runner["SSHSession"]([shutil.which("sh")], "/unused", 1)

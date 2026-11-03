@@ -51,14 +51,15 @@ class SharedTransport:
         self.run_dir = run_dir
         return self
 
-    def snapshot(self, *, timeout):
+    def snapshot(self, *, timeout, include_cpuinfo=True):
         self.events.append(("snapshot",))
         if self.unreachable:
             raise ConnectionError("card unreachable mid-run")
         free = self.free_kb[0]
         if len(self.free_kb) > 1:
             self.free_kb.pop(0)
-        return dict(boot_id=self.boot, processes=self.processes, cpuinfo=self.cpuinfo,
+        return dict(boot_id=self.boot, processes=self.processes,
+                    cpuinfo=self.cpuinfo if include_cpuinfo else "",
                     meminfo="MemTotal: 16000000 kB\nMemFree: %d kB\n" % free,
                     pinning=self.pinning)
 
