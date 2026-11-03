@@ -29,6 +29,10 @@ CONDITIONS = 'e ne a ae b be g ge l le s ns o no p np z nz'.split()
 SCALAR.update('j' + c for c in CONDITIONS)
 SCALAR.update('set' + c for c in CONDITIONS)
 
+# Lead-approved exception: these donor -O0 probes ICE at knc.md:96.
+# Never infer fallback from an arbitrary compilation failure.
+DONOR_O0_FALLBACK = frozenset(('abi_in_ff_a', 'abi_in_ff_b'))
+
 
 def instructions(body):
     for line in body.splitlines():
@@ -119,37 +123,77 @@ def compare(runner, assembly, donor, names=None):
     return failures
 
 
+def struct_probes(runner, source):
+    # Each struct probe occupies one line; retain declarations and ARGS, but
+    # isolate functions so a donor ICE cannot suppress unrelated comparisons.
+    lines = source.read_text().splitlines(keepends=True)
+    pattern = re.compile(r'^(?:void|struct \w+) (abi_\w+)\(.*\) \{.*\}\s*$')
+    probes = [(i, pattern.fullmatch(line)[1]) for i, line in enumerate(lines)
+              if pattern.fullmatch(line)]
+    if len(probes) != len(re.findall(r'\babi_\w+\s*\(', ''.join(lines))):
+        raise RuntimeError('struct probe definitions must each occupy one line')
+    if not DONOR_O0_FALLBACK.issubset(name for _, name in probes):
+        raise RuntimeError('missing explicit donor -O0 fallback probes')
+    function_lines = {i for i, _ in probes}
+    for selected, name in probes:
+        probe = runner.out / (name + '.c')
+        probe.write_text(''.join(line for i, line in enumerate(lines)
+                                 if i not in function_lines or i == selected))
+        yield probe, name
+
+
+def t1_probe(runner, source, level, name=None):
+    label = 't1 scalar ABI ' + (name or source.name) + ' ' + level
+    failures = []
+    texts = []
+    fallback = level == '-O0' and name in DONOR_O0_FALLBACK
+    if fallback:
+        label += ' [donor -O2 fallback; GCC16 -O0]'
+    for compiler, flags, tag in ((runner.tool('gcc'), [], 'donor'),
+                                 (runner.cc, runner.cc_flags, 'gcc16')):
+        asm = runner.out / (source.stem + tag + '.s')
+        compiled = runner.command(compiler, *flags, level, '-march=knc',
+                                  '-ffp-contract=off', '-S', source, '-o', asm, check=False)
+        if fallback and tag == 'donor':
+            if (compiled.returncode == 0 or
+                    'internal compiler error:' not in compiled.stdout or
+                    'config/i386/knc.md:96' not in compiled.stdout):
+                failures.append('expected donor -O0 ICE at knc.md:96 missing: '
+                                + compiled.stdout[-1800:])
+                texts.append(None)
+                continue
+            compiled = runner.command(compiler, *flags, '-O2', '-march=knc',
+                                      '-ffp-contract=off', '-S', source, '-o', asm,
+                                      check=False)
+        if compiled.returncode:
+            failures.append(tag + ' compile: ' + compiled.stdout[-1800:])
+            texts.append(None)
+            continue
+        text = asm.read_text()
+        texts.append(text)
+        failures.extend(tag + ': ' + f for f in allowlist(text))
+        obj = asm.with_suffix('.o')
+        assembled = runner.command(runner.tool('as'), '--march=k1om', asm, '-o', obj, check=False)
+        if assembled.returncode:
+            failures.append(tag + ' assembler: ' + assembled.stdout[-1000:])
+        else:
+            lint = runner.command(sys.executable, runner.root / 'tools/knc_lint',
+                                  asm, obj, check=False)
+            if lint.returncode:
+                failures.append(tag + ' lint: ' + lint.stdout[-1000:])
+    if all(text is not None for text in texts):
+        failures.extend(compare(runner, texts[1], texts[0], [name] if name else None))
+    runner.result(label, failures)
+
+
 def t1(runner):
-    donor = runner.tool('gcc')
     for source in sorted(runner.source_dir.glob('knc-abi-*.c')):
         for level in ('-O0', '-O2', '-Os'):
-            label = 't1 scalar ABI ' + source.name + ' ' + level
-            failures = []
-            texts = []
-            for compiler, flags, tag in ((donor, [], 'donor'),
-                                         (runner.cc, runner.cc_flags, 'gcc16')):
-                asm = runner.out / (source.stem + tag + '.s')
-                compiled = runner.command(compiler, *flags, level, '-march=knc',
-                                          '-ffp-contract=off', '-S', source, '-o', asm, check=False)
-                if compiled.returncode:
-                    failures.append(tag + ' compile: ' + compiled.stdout[-1800:])
-                    texts.append(None)
-                    continue
-                text = asm.read_text()
-                texts.append(text)
-                failures.extend(tag + ': ' + f for f in allowlist(text))
-                obj = asm.with_suffix('.o')
-                assembled = runner.command(runner.tool('as'), '--march=k1om', asm, '-o', obj, check=False)
-                if assembled.returncode:
-                    failures.append(tag + ' assembler: ' + assembled.stdout[-1000:])
-                else:
-                    lint = runner.command(sys.executable, runner.root / 'tools/knc_lint',
-                                          asm, obj, check=False)
-                    if lint.returncode:
-                        failures.append(tag + ' lint: ' + lint.stdout[-1000:])
-            if all(text is not None for text in texts):
-                failures.extend(compare(runner, texts[1], texts[0]))
-            runner.result(label, failures)
+            if source.name == 'knc-abi-structs.c' and level == '-O0':
+                for probe, name in struct_probes(runner, source):
+                    t1_probe(runner, probe, level, name)
+            else:
+                t1_probe(runner, source, level)
     affine(runner)
     # S2-02 owns per-function feature gates and zero-call-used-regs, too.
     for feature in ('sse', 'sse2', 'avx', 'avx512f'):
