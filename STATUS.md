@@ -2,7 +2,7 @@
 
 Updated automatically at every ticket change. Last update: 2026-11-03 13:21.
 
-**Next: the tech lead, on S2-07.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: the tech lead, on S2-14.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[############--------]` 27 of 42
 
@@ -45,7 +45,7 @@ Current tickets: `[############--------]` 27 of 42
 | S2-04 | Scalar transfers through memory and mask scratch | Done | Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`). |
 | S2-05 | x87 compares and zmm spill alignment | Done | gcc16 now has tests proving it picks the IEEE-correct x87 compare for every float, double and long double c... |
 | S2-06 | Atomics without cmpxchg16b, spin hint by delay | Done | Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`). |
-| S2-07 | GCC 16 builds its own static libgcc for k1om | Question for the tech lead | Committed project f351d2d and GCC e682e23a0e7; red 9d734af. Fork libgcc/CRT build, archive/CRT lint, S1-06 ... |
+| S2-07 | GCC 16 builds its own static libgcc for k1om | In progress | No. This lead session cannot use the card either, so do not wait on it. Submit for review now with the nati... |
 | S2-08 | hello, scalar FP and printf on the card | Not started | Rewritten now that the card is available: the engineer prepares, the lead runs (as in S2-10). Set ready by ... |
 | S2-09 | GCC 16 builds gfortran, and the secondary-reload reproducer passes | Not started | Reconfiguring means one full rebuild: use `make -j8` with `CFLAGS=-O2 -g1 CXXFLAGS=-O2 -g1` as `tools/toolc... |
 | S2-10 | First card runs for the queued native checks | Done | Ten programs ran on the shared Xeon Phi with output identical to their references: hello, the m1_affine fix... |
@@ -68,13 +68,13 @@ Current tickets: `[############--------]` 27 of 42
 ## Recent activity
 
 - 2026-11-03 13:21 **S2-14** engineer submit: Clean head ea14df3: Cygwin python3.12 unittest discover tests/tools test_card_*.py via tools/run.py passed 58/58 in 27.775s. Fixture ACL isolation ...
+- 2026-11-03 13:21 **S2-07** lead answer: No. This lead session cannot use the card either, so do not wait on it. Submit for review now with the native item left unchecked and marked 'pendi...
 - 2026-11-03 13:20 **S2-07** engineer ask: Committed project f351d2d and GCC e682e23a0e7; red 9d734af. Fork libgcc/CRT build, archive/CRT lint, S1-06 link and integer/soft-fp helper links PA...
 - 2026-11-03 13:17 **S2-14** lead changes: 1. tests/tools/test_card_backend.py:130: approve's Cygwin rerun fails 57/58: the non-executable extra file 'input ' data' is staged as 700, expecte...
 - 2026-11-03 13:15 **S2-14** engineer submit: Cygwin python3.12 unittest discover tests/tools test_card_*.py via tools/run.py: 58/58 pass in 29.123s. Fixture only; refusal tests unmodified; run...
 - 2026-11-03 13:14 **S2-14** owner decide: Lead, under the owner's 2026-11-03 delegation: 7 sessions and 9M tokens (4 sessions and 3.6M used). Standing answer, so you need not ask again: any...
 - 2026-11-03 13:13 **S2-14** lead escalate: budget: 4 engineer sessions used; the budget is 4
 - 2026-11-03 13:13 **S2-14** lead answer: Yes, fixture only: the fake RPC may cd into the translated job dir (fixture tmp/claude/claude-<job>) before guard_boot calls, with snapshot and sta...
-- 2026-11-03 13:12 **S2-14** engineer ask: Approved fixture timeout=30: Cygwin suite 57/58, 39.121 s. Snapshot completes; stage chmod RPC (guard_boot && chmod) fails with exit 91: guard_dir ...
 
 ## Cost
 
