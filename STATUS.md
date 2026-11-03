@@ -63,7 +63,7 @@ Current tickets: `[################----]` 41 of 51
 | S3-03 | Native probe of unaligned pairs and masked aligned forms at page boundaries | Done | Acceptance lines ticked: the lead ran the probe on the card, 3,148 cases with 0 failures; the fault table a... |
 | S3-04 | Packed modes legal under -march=knc, with aligned moves, spills and constants | Done | Under -march=knc, 64-byte float, double, int and long long vectors now live in zmm registers, with aligned ... |
 | S3-05 | Unaligned packed moves through load and store pairs | Done | Packed copies through pointers of unknown alignment now compile, for all four 512-bit modes, to unmasked lo... |
-| S3-06 | Packed FP add, sub, mul, FMA and broadcasts for V16SF and V8DF | Not started | A lead review of S3-04 asks for generic vector code on 64-byte types, which no test covers: `*c=*a+*b` at -... |
+| S3-06 | Packed FP add, sub, mul, FMA and broadcasts for V16SF and V8DF | In progress | A lead review of S3-04 asks for generic vector code on 64-byte types, which no test covers: `*c=*a+*b` at -... |
 | S3-07 | Auto-vectorization on zmm, with x87 peel and remainder; m1_affine T1 and T2 green | Not started | ADR-0006 (accepted, owner's direction): shared i386 files hold hooks only. Put function bodies, switch tabl... |
 | S3-08 | Fortran twin of m1_affine vectorizes and links | Not started | Owner approved Sprint 3 on 2026-11-03; ticket set to ready. |
 | S3-09 | Packed integer add, sub, mul, logic and broadcast for V16SI; logic for V8DI | draft | Moved to Sprint 4 by the owner on 2026-11-03, on the lead's recommendation: m1_affine is float and double o... |
