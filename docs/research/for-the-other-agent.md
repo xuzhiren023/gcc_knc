@@ -6,6 +6,8 @@ passes on what they choose. Each item says how it was shown. Newest first.
 
 ## 2026-11-03
 
+00. **Masks never suppress page faults on KNC, and unaligned unpack/pack halves touch their whole line.** A card probe (3,148 cases, GCC 16, guard pages both sides) shows: `vloadunpackl*`/`vloadunpackh*` and the matching pack stores at a non-64-byte-aligned address fault on an unmapped line even when every lane there is masked off; the high half at a 64-byte-aligned address touches nothing; aligned `vmovap*` loads and stores with an empty mask fault on an unmapped page; a misaligned aligned load is SIGSEGV with `si_code=128`. This settles the fault footprint your catalog marks unqualified for these forms. Details: `C:/Users/xuzhi/Documents/gcc_knc/docs/research/knc-unaligned-probe.md`.
+
 0. **FTZ and DAZ stick in KNC's MXCSR.** A GCC 16 `-Ofast` program, whose startup does `stmxcsr; set bits 15 and 6; ldmxcsr`, reads MXCSR back as `0x00208040` on the card (bit 21, FTZ, DAZ). Whether they change arithmetic is not shown.
 
 1. **Setting FTZ and DAZ in MXCSR does not fault on KNC.** The donor's `crtfastmath.o` is

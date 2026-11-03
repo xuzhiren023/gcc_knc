@@ -198,3 +198,35 @@ Do not invoke the `.mic` program on the host. Preparation never contacts the car
 
 Successful host logs are recorded on the ticket at submission. Card minutes and
 native results remain empty until the lead actually executes the batch.
+
+## Card results (lead, 2026-11-03)
+
+Run by the lead through `tools/card_run` (job with `--native`, 128 MiB, 0.142 card minutes, boot
+`e9bfb0ab` unchanged): 3,148 cases, 0 data or sentinel failures, exit 0. Fault counts by case:
+
+| Case | Pair (ld+hd) | Low (ld) | High (hd) | Aligned |
+| --- | --- | --- | --- | --- |
+| `inside-start`, `inside-end` (o = 0..63) | no fault, all 64 offsets, all types | | | |
+| `cross-start`, `cross-end` | o = 0 no fault; o = 1..63 SIGSEGV | | | |
+| `mask-start` (guard lanes cleared) | SIGSEGV every case | SIGSEGV every case | no fault | |
+| `mask-end` (guard lanes cleared) | SIGSEGV every case | no fault | SIGSEGV every case | |
+| `high-end` (A = G-64, aligned) | | | no fault | |
+| `aligned-end` (full or empty mask) | | | | no fault |
+| `aligned-guard` (mask 1 or empty) | | | | SIGSEGV, loads and stores |
+| `misaligned` aligned load | | | | SIGSEGV, `si_code=128` |
+
+Answers to ADR-0005 question 1:
+
+1. An unpack/pack half accesses its whole 64-byte line whenever its address is not 64-byte
+   aligned, whatever the mask: clearing every lane that falls in an unmapped page does not stop the
+   fault (`mask-start` for the low half, `mask-end` for the high half).
+2. At a 64-byte-aligned address the high half is a no-op and touches no memory, even when the
+   next page is unmapped (`high-end`, `inside-end` at o = 0).
+3. Masks never suppress a page fault: aligned loads **and stores** with an empty mask fault on an
+   unmapped page (`aligned-guard`). The design above predicted that an empty-mask store would not
+   fault; it does.
+4. A misaligned aligned load faults as SIGSEGV with `si_code=128` (a general-protection fault, not
+   a page fault), so it is distinguishable.
+
+So on KNC a masked vector access is safe only if every 64-byte line it names is mapped; masking
+cannot be used to read or write past the end of an array.

@@ -118,6 +118,10 @@ them unadvertised until E3 adds them with their moves. Today:
 
 1. E3-01: does the `h` half at an aligned address plus 64 touch the next line or page? Do masked
    aligned forms fault on masked-off lanes in an unmapped page?
+   **Answered on the card by S3-03 (2026-11-03, `docs/research/knc-unaligned-probe.md`):** at an
+   aligned address the high half touches nothing; at an unaligned address each half touches its
+   whole line whatever the mask; and masks, even empty ones, never suppress a page fault, for loads
+   or stores. Masked tails must stay within lines known to be mapped.
 2. S3-01: does widening the `VMOVE`, `VF_BHSD` and `FMAMODEM` entries enable any `sse.md` insn
    under KNC? Does a duplicate standard name fail to build as described?
 3. S3-01: is `vpermf32x4 $0` plus the `{aaaa}` swizzle a correct register broadcast for V8DF, given
