@@ -1,18 +1,18 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-03 17:49.
+Updated automatically at every ticket change. Last update: 2026-11-03 18:15.
 
 **Next: GPT-6.1, on S3-05 (Unaligned packed moves through load and store pairs).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
-Current tickets: `[#################---]` 40 of 47
+Current tickets: `[################----]` 40 of 49
 
 ## Milestones
 
 | | Milestone | State | Progress |
 |---|---|---|---|
 | M0 | Foundation | In progress | 17 of 17 tickets |
-| M1 | Mixed native code | In progress | 23 of 30 tickets |
-| M2 | Useful vector target | Not started | Not planned in detail yet |
+| M1 | Mixed native code | In progress | 23 of 31 tickets |
+| M2 | Useful vector target | In progress | 0 of 1 tickets |
 | M3 | Runtimes | Not started | Not planned in detail yet |
 | M4 | Broad optimization | Not started | Not planned in detail yet |
 | M5 | Program corpus | Not started | Not planned in detail yet |
@@ -62,33 +62,35 @@ Current tickets: `[#################---]` 40 of 47
 | S3-02 | One helper for optional tools/check selections | Done | tools/check optional selections now come from one table, several flags given together all run and each repo... |
 | S3-03 | Native probe of unaligned pairs and masked aligned forms at page boundaries | Done | Acceptance lines ticked: the lead ran the probe on the card, 3,148 cases with 0 failures; the fault table a... |
 | S3-04 | Packed modes legal under -march=knc, with aligned moves, spills and constants | Done | Under -march=knc, 64-byte float, double, int and long long vectors now live in zmm registers, with aligned ... |
-| S3-05 | Unaligned packed moves through load and store pairs | In progress | No: distinct UNSPECs would hide the symptom, not the cause. The cause is that *knc_packed_unaligned accepts... |
-| S3-06 | Packed FP add, sub, mul, FMA and broadcasts for V16SF and V8DF | Not started | Allocation raised from 12 to 35 shared lines, from S3-01's estimate (`docs/research/knc-packed-modes.md`, '... |
-| S3-07 | Auto-vectorization on zmm, with x87 peel and remainder; m1_affine T1 and T2 green | Not started | Allocation raised from 4 to 8 shared lines, from S3-01's estimate (`docs/research/knc-packed-modes.md`); th... |
+| S3-05 | Unaligned packed moves through load and store pairs | In progress | ADR-0006 (accepted, owner's direction): shared i386 files hold hooks only. Put function bodies, switch tabl... |
+| S3-06 | Packed FP add, sub, mul, FMA and broadcasts for V16SF and V8DF | Not started | ADR-0006 (accepted, owner's direction): shared i386 files hold hooks only. Put function bodies, switch tabl... |
+| S3-07 | Auto-vectorization on zmm, with x87 peel and remainder; m1_affine T1 and T2 green | Not started | ADR-0006 (accepted, owner's direction): shared i386 files hold hooks only. Put function bodies, switch tabl... |
 | S3-08 | Fortran twin of m1_affine vectorizes and links | Not started | Owner approved Sprint 3 on 2026-11-03; ticket set to ready. |
-| S3-09 | Packed integer add, sub, mul, logic and broadcast for V16SI; logic for V8DI | draft | Owner approved Sprint 3 on 2026-11-03; this ticket stays draft: the owner chooses when S3-07 is merged whet... |
+| S3-09 | Packed integer add, sub, mul, logic and broadcast for V16SI; logic for V8DI | draft | Moved to Sprint 4 by the owner on 2026-11-03, on the lead's recommendation: m1_affine is float and double o... |
 | S3-10 | Card batch for Sprint 3 and m1_affine | Not started | Owner approved Sprint 3 on 2026-11-03; ticket set to ready. |
 | S3-11 | Milestone M1 note: fixture, line counts, ICE classes and backend cost comparison | Not started | Owner approved Sprint 3 on 2026-11-03; ticket set to ready. |
+| S3-12 | tools/portability: forward-port drill and x86_64 unchanged check | In progress | Created under the owner's direction of 2026-11-03 (share i386, but correct and portable to future releases;... |
+| S3-13 | Move KNC code out of shared i386 files into i386-knc | Not started | Created under the owner's direction of 2026-11-03 (ADR-0006). After S3-07, so it moves code that has settle... |
 
 ## Recent activity
 
+- 2026-11-03 18:25 **S3-13** lead note: Created under the owner's direction of 2026-11-03 (ADR-0006). After S3-07, so it moves code that has settled. S3-10's card batch runs after it, so ...
+- 2026-11-03 18:25 **S3-12** lead note: Created under the owner's direction of 2026-11-03 (share i386, but correct and portable to future releases; ADR-0006). Tools lane, so it runs besid...
+- 2026-11-03 18:25 **S3-07** lead note: ADR-0006 (accepted, owner's direction): shared i386 files hold hooks only. Put function bodies, switch tables and prototypes in i386-knc.cc and i38...
+- 2026-11-03 18:25 **S3-06** lead note: ADR-0006 (accepted, owner's direction): shared i386 files hold hooks only. Put function bodies, switch tables and prototypes in i386-knc.cc and i38...
+- 2026-11-03 18:25 **S3-05** lead note: ADR-0006 (accepted, owner's direction): shared i386 files hold hooks only. Put function bodies, switch tables and prototypes in i386-knc.cc and i38...
+- 2026-11-03 18:12 **S3-09** owner decide: Moved to Sprint 4 by the owner on 2026-11-03, on the lead's recommendation: m1_affine is float and double only, so M1 does not need integer vectors...
+- 2026-11-03 18:05 **S3-11** lead note: x86_64 line added. Nothing since S0-06 checks that the shared i386 changes leave x86_64 code alone, and that is the main risk of the subtarget path...
 - 2026-11-03 17:48 **S3-05** lead answer: No: distinct UNSPECs would hide the symptom, not the cause. The cause is that *knc_packed_unaligned accepts memory on both sides (both operands non...
-- 2026-11-03 17:47 **S3-05** engineer ask: Two failed attempts: build condition error fixed; GCC 3ab89ae8964 builds. Vector T1: aligned 80/80, unaligned 28/40; 12 O2 failures. Repro .work/_s...
-- 2026-11-03 17:11 **S3-05** lead approve-red: Red tests approved: 40 host checks (four modes, -O0/-O2, five unknown-alignment copy cases) fail only because unaligned packed copies do not yet us...
-- 2026-11-03 17:10 **S3-05** engineer red: Tests 13cbade. Ran s3-05-unaligned-red once via tools/run.py: check.py t1 --compiler gcc16 --vector-unaligned --worker, exit 1. All 40 probes (4 mo...
-- 2026-11-03 17:07 **S3-04** lead approve: Under -march=knc, 64-byte float, double, int and long long vectors now live in zmm registers, with aligned copies, vpxord zero, 64-byte-aligned poo...
-- 2026-11-03 17:03 **S3-04** engineer submit: GCC 851f2d25060, tests/docs 909488f. Repair build passed; packed O0/O2 80/80 passed with assembly/lint, spills and ABI guards. T0 passed; T1 only b...
-- 2026-11-03 16:16 **S3-04** lead answer: Not a hang. The 15:50 full build is still running: it writes s3_04_full_build-20261103-155024.log and gcc-build/gcc/build/gen*.exe at 16:16. Interr...
-- 2026-11-03 16:14 **S3-04** engineer ask: Two builds stalled before GCC compilation: full after config.status defaults; --resume after support libs. Both interrupted. Repro: python tools/to...
 
 ## Cost
 
 - From the script, engineer: 134 sessions, 272.5M input tokens
 - From the script, lead: 133 sessions, 45.5M input tokens
-- Started by hand, Claude: 5 sessions, 421.5M input tokens
+- Started by hand, Claude: 5 sessions, 425.3M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 7.4 GiB of 100 GiB. 318 GiB free on the drive.
+The project uses 7.1 GiB of 100 GiB. 317 GiB free on the drive.
