@@ -1,17 +1,17 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-03 18:15.
+Updated automatically at every ticket change. Last update: 2026-11-03 18:21.
 
-**Next: GPT-6.1, on S3-05 (Unaligned packed moves through load and store pairs).** Run `python tools/dispatch.py`, or ask the tech lead to.
+**Next: the tech lead, on S3-12.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
-Current tickets: `[################----]` 40 of 49
+Current tickets: `[###############-----]` 40 of 51
 
 ## Milestones
 
 | | Milestone | State | Progress |
 |---|---|---|---|
 | M0 | Foundation | In progress | 17 of 17 tickets |
-| M1 | Mixed native code | In progress | 23 of 31 tickets |
+| M1 | Mixed native code | In progress | 23 of 33 tickets |
 | M2 | Useful vector target | In progress | 0 of 1 tickets |
 | M3 | Runtimes | Not started | Not planned in detail yet |
 | M4 | Broad optimization | Not started | Not planned in detail yet |
@@ -63,34 +63,36 @@ Current tickets: `[################----]` 40 of 49
 | S3-03 | Native probe of unaligned pairs and masked aligned forms at page boundaries | Done | Acceptance lines ticked: the lead ran the probe on the card, 3,148 cases with 0 failures; the fault table a... |
 | S3-04 | Packed modes legal under -march=knc, with aligned moves, spills and constants | Done | Under -march=knc, 64-byte float, double, int and long long vectors now live in zmm registers, with aligned ... |
 | S3-05 | Unaligned packed moves through load and store pairs | In progress | ADR-0006 (accepted, owner's direction): shared i386 files hold hooks only. Put function bodies, switch tabl... |
-| S3-06 | Packed FP add, sub, mul, FMA and broadcasts for V16SF and V8DF | Not started | ADR-0006 (accepted, owner's direction): shared i386 files hold hooks only. Put function bodies, switch tabl... |
+| S3-06 | Packed FP add, sub, mul, FMA and broadcasts for V16SF and V8DF | Not started | A lead review of S3-04 asks for generic vector code on 64-byte types, which no test covers: `*c=*a+*b` at -... |
 | S3-07 | Auto-vectorization on zmm, with x87 peel and remainder; m1_affine T1 and T2 green | Not started | ADR-0006 (accepted, owner's direction): shared i386 files hold hooks only. Put function bodies, switch tabl... |
 | S3-08 | Fortran twin of m1_affine vectorizes and links | Not started | Owner approved Sprint 3 on 2026-11-03; ticket set to ready. |
 | S3-09 | Packed integer add, sub, mul, logic and broadcast for V16SI; logic for V8DI | draft | Moved to Sprint 4 by the owner on 2026-11-03, on the lead's recommendation: m1_affine is float and double o... |
-| S3-10 | Card batch for Sprint 3 and m1_affine | Not started | Owner approved Sprint 3 on 2026-11-03; ticket set to ready. |
+| S3-10 | Card batch for Sprint 3 and m1_affine | Not started | Also add (1) S3-14's TLS and S3-15's complex and rounding cross-checks, built after both merge (objects bui... |
 | S3-11 | Milestone M1 note: fixture, line counts, ICE classes and backend cost comparison | Not started | Owner approved Sprint 3 on 2026-11-03; ticket set to ready. |
-| S3-12 | tools/portability: forward-port drill and x86_64 unchanged check | In progress | Created under the owner's direction of 2026-11-03 (share i386, but correct and portable to future releases;... |
+| S3-12 | tools/portability: forward-port drill and x86_64 unchanged check | Waiting for review | T0: 3 tests passed (planted conflict, disjoint changes, unchanged refs/index/worktree, fake cc1 counts/diff... |
 | S3-13 | Move KNC code out of shared i386 files into i386-knc | Not started | Created under the owner's direction of 2026-11-03 (ADR-0006). After S3-07, so it moves code that has settle... |
+| S3-14 | Native TLS for k1om, and every x86_64-only configure case that misses k1om | Not started | Filed under the owner's delegation (engineering defect found while checking the PhiWeather project's lesson... |
+| S3-15 | ABI gaps: packed vectors through varargs and ms_abi, complex values, rounding mode across calls | Not started | Filed under the owner's delegation. Finding 1 was reproduced by the lead; findings 2-4 come from reading co... |
 
 ## Recent activity
 
+- 2026-11-03 18:45 **S3-15** lead note: Filed under the owner's delegation. Finding 1 was reproduced by the lead; findings 2-4 come from reading code and are not run yet.
+- 2026-11-03 18:45 **S3-14** lead note: Filed under the owner's delegation (engineering defect found while checking the PhiWeather project's lesson about stale TLS attributes). Every obje...
+- 2026-11-03 18:45 **S3-10** lead note: Also add (1) S3-14's TLS and S3-15's complex and rounding cross-checks, built after both merge (objects built before S3-14 use emulated TLS); and (...
+- 2026-11-03 18:45 **S3-06** lead note: A lead review of S3-04 asks for generic vector code on 64-byte types, which no test covers: `*c=*a+*b` at -O0, element read `v[3]` after an asm tha...
 - 2026-11-03 18:25 **S3-13** lead note: Created under the owner's direction of 2026-11-03 (ADR-0006). After S3-07, so it moves code that has settled. S3-10's card batch runs after it, so ...
 - 2026-11-03 18:25 **S3-12** lead note: Created under the owner's direction of 2026-11-03 (share i386, but correct and portable to future releases; ADR-0006). Tools lane, so it runs besid...
 - 2026-11-03 18:25 **S3-07** lead note: ADR-0006 (accepted, owner's direction): shared i386 files hold hooks only. Put function bodies, switch tables and prototypes in i386-knc.cc and i38...
 - 2026-11-03 18:25 **S3-06** lead note: ADR-0006 (accepted, owner's direction): shared i386 files hold hooks only. Put function bodies, switch tables and prototypes in i386-knc.cc and i38...
-- 2026-11-03 18:25 **S3-05** lead note: ADR-0006 (accepted, owner's direction): shared i386 files hold hooks only. Put function bodies, switch tables and prototypes in i386-knc.cc and i38...
-- 2026-11-03 18:12 **S3-09** owner decide: Moved to Sprint 4 by the owner on 2026-11-03, on the lead's recommendation: m1_affine is float and double only, so M1 does not need integer vectors...
-- 2026-11-03 18:05 **S3-11** lead note: x86_64 line added. Nothing since S0-06 checks that the shared i386 changes leave x86_64 code alone, and that is the main risk of the subtarget path...
-- 2026-11-03 17:48 **S3-05** lead answer: No: distinct UNSPECs would hide the symptom, not the cause. The cause is that *knc_packed_unaligned accepts memory on both sides (both operands non...
 
 ## Cost
 
 - From the script, engineer: 134 sessions, 272.5M input tokens
 - From the script, lead: 133 sessions, 45.5M input tokens
-- Started by hand, Claude: 5 sessions, 425.3M input tokens
+- Started by hand, Claude: 5 sessions, 429.2M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 7.1 GiB of 100 GiB. 317 GiB free on the drive.
+The project uses 7.5 GiB of 100 GiB. 316 GiB free on the drive.
