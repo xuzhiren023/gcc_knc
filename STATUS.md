@@ -1,17 +1,17 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-03 17:04.
+Updated automatically at every ticket change. Last update: 2026-11-03 17:07.
 
-**Next: the tech lead, on S3-04.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: GPT-6.1, on S3-05 (Unaligned packed moves through load and store pairs).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
-Current tickets: `[################----]` 39 of 47
+Current tickets: `[#################---]` 40 of 47
 
 ## Milestones
 
 | | Milestone | State | Progress |
 |---|---|---|---|
 | M0 | Foundation | In progress | 17 of 17 tickets |
-| M1 | Mixed native code | In progress | 22 of 30 tickets |
+| M1 | Mixed native code | In progress | 23 of 30 tickets |
 | M2 | Useful vector target | Not started | Not planned in detail yet |
 | M3 | Runtimes | Not started | Not planned in detail yet |
 | M4 | Broad optimization | Not started | Not planned in detail yet |
@@ -61,7 +61,7 @@ Current tickets: `[################----]` 39 of 47
 | S3-01 | Packed modes and IMCI patterns in GCC 16: entry points, audit and line estimate | Done | The packed-mode audit (docs/research/knc-packed-modes.md) is accepted: it maps every pattern and hook the f... |
 | S3-02 | One helper for optional tools/check selections | Done | tools/check optional selections now come from one table, several flags given together all run and each repo... |
 | S3-03 | Native probe of unaligned pairs and masked aligned forms at page boundaries | Done | Acceptance lines ticked: the lead ran the probe on the card, 3,148 cases with 0 failures; the fault table a... |
-| S3-04 | Packed modes legal under -march=knc, with aligned moves, spills and constants | Waiting for review | GCC 851f2d25060, tests/docs 909488f. Repair build passed; packed O0/O2 80/80 passed with assembly/lint, spi... |
+| S3-04 | Packed modes legal under -march=knc, with aligned moves, spills and constants | Done | Under -march=knc, 64-byte float, double, int and long long vectors now live in zmm registers, with aligned ... |
 | S3-05 | Unaligned packed moves through load and store pairs | Not started | Allocation raised from 6 to 11 shared lines, from S3-01's estimate (`docs/research/knc-packed-modes.md`, 'S... |
 | S3-06 | Packed FP add, sub, mul, FMA and broadcasts for V16SF and V8DF | Not started | Allocation raised from 12 to 35 shared lines, from S3-01's estimate (`docs/research/knc-packed-modes.md`, '... |
 | S3-07 | Auto-vectorization on zmm, with x87 peel and remainder; m1_affine T1 and T2 green | Not started | Allocation raised from 4 to 8 shared lines, from S3-01's estimate (`docs/research/knc-packed-modes.md`); th... |
@@ -72,6 +72,7 @@ Current tickets: `[################----]` 39 of 47
 
 ## Recent activity
 
+- 2026-11-03 17:07 **S3-04** lead approve: Under -march=knc, 64-byte float, double, int and long long vectors now live in zmm registers, with aligned copies, vpxord zero, 64-byte-aligned poo...
 - 2026-11-03 17:03 **S3-04** engineer submit: GCC 851f2d25060, tests/docs 909488f. Repair build passed; packed O0/O2 80/80 passed with assembly/lint, spills and ABI guards. T0 passed; T1 only b...
 - 2026-11-03 16:16 **S3-04** lead answer: Not a hang. The 15:50 full build is still running: it writes s3_04_full_build-20261103-155024.log and gcc-build/gcc/build/gen*.exe at 16:16. Interr...
 - 2026-11-03 16:14 **S3-04** engineer ask: Two builds stalled before GCC compilation: full after config.status defaults; --resume after support libs. Both interrupted. Repro: python tools/to...
@@ -79,16 +80,15 @@ Current tickets: `[################----]` 39 of 47
 - 2026-11-03 15:45 **S3-04** engineer red: Tests 24ead3b; first GCC plumbing 105acea2880. Ran s3-04-packed-red once via tools/run.py: check.py t1 --compiler gcc16 --vector --worker, exit 1; ...
 - 2026-11-03 15:40 **S3-07** lead note: Allocation raised from 4 to 8 shared lines, from S3-01's estimate (`docs/research/knc-packed-modes.md`); the owner chose on 2026-11-03 to go past M...
 - 2026-11-03 15:39 **S3-06** lead note: Allocation raised from 12 to 35 shared lines, from S3-01's estimate (`docs/research/knc-packed-modes.md`, 'Shared-i386 estimate'); the owner chose ...
-- 2026-11-03 15:39 **S3-05** lead note: Allocation raised from 6 to 11 shared lines, from S3-01's estimate (`docs/research/knc-packed-modes.md`, 'Shared-i386 estimate'); the owner chose o...
 
 ## Cost
 
 - From the script, engineer: 132 sessions, 262.0M input tokens
 - From the script, lead: 130 sessions, 44.0M input tokens
-- Started by hand, Claude: 5 sessions, 420.7M input tokens
+- Started by hand, Claude: 5 sessions, 421.5M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 7.4 GiB of 100 GiB. 320 GiB free on the drive.
+The project uses 7.4 GiB of 100 GiB. 319 GiB free on the drive.
