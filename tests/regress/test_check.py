@@ -146,6 +146,72 @@ class Runner(unittest.TestCase):
                 self.assertEqual('--inputs' in call.call_args.args[0], tiers == ['t0'])
 
 
+class OptionalSelections(unittest.TestCase):
+    def test_new_table_entry_defaults_without_args_and_dispatches_both_tiers(self):
+        runner = check.Runner.__new__(check.Runner)
+        callbacks = {'t1': Mock(), 't2': Mock()}
+        with patch.dict(check.SELECTIONS, {'future': ('future probe', callbacks)}):
+            for tier in callbacks:
+                self.assertFalse(runner.run_selections(tier))
+                callbacks[tier].assert_not_called()
+            runner.args = SimpleNamespace(future=True)
+            for tier in callbacks:
+                getattr(runner, tier)()
+                callbacks[tier].assert_called_once_with(runner)
+
+    def test_existing_selections_combine_in_each_tier(self):
+        modules = {name: SimpleNamespace(t1=Mock(), t2=Mock(), link=Mock())
+                   for name in ('atomics', 'x87_spill', 'secondary_reload',
+                                'varargs_abi', 'scalar_abi', 'fast_math', 'libgcc')}
+        selected = dict.fromkeys((*modules, 'libgcc_link'), True)
+        runner = check.Runner.__new__(check.Runner)
+        runner.args = SimpleNamespace(**selected)
+        with patch.dict(sys.modules, modules):
+            runner.t1()
+            runner.t2()
+        for name in ('atomics', 'x87_spill', 'secondary_reload', 'varargs_abi', 'scalar_abi'):
+            with self.subTest(tier='t1', selection=name):
+                modules[name].t1.assert_called_once_with(runner)
+        for name in ('fast_math', 'libgcc', 'atomics', 'secondary_reload', 'varargs_abi', 'scalar_abi'):
+            with self.subTest(tier='t2', selection=name):
+                modules[name].t2.assert_called_once_with(runner)
+        modules['libgcc'].link.assert_called_once_with(runner, 'gcc16')
+        modules['x87_spill'].t2.assert_not_called()
+
+    def test_selection_error_is_reported_and_later_selections_still_run(self):
+        runner = check.Runner.__new__(check.Runner)
+        runner.args = SimpleNamespace(broken=True, later=True)
+        runner.lines, runner.failed = [], False
+        later = Mock(side_effect=lambda runner: runner.result('t1 later', []))
+        selections = {
+            'broken': ('broken probe', {'t1': Mock(side_effect=RuntimeError('seed failure'))}),
+            'later': ('later probe', {'t1': later}),
+        }
+        with patch.dict(check.SELECTIONS, selections, clear=True):
+            runner.t1()
+        self.assertTrue(runner.failed)
+        self.assertEqual(runner.lines, ['FAIL t1 broken infrastructure: seed failure', 'PASS t1 later'])
+        later.assert_called_once_with(runner)
+
+    def test_vector_cli_selects_only_vector_sources(self):
+        runner = check.Runner.__new__(check.Runner)
+        runner.run = Mock(return_value=0)
+        with patch.object(check, 'os', SimpleNamespace(name='posix')), \
+                patch.object(check.sys, 'argv', ['tools/check', 't1', '--vector', '--worker']), \
+                patch.object(check, 'Runner', return_value=runner) as constructor:
+            self.assertEqual(check.main(), 0)
+        runner.args = constructor.call_args.args[0]
+        self.assertTrue(runner.args.vector)
+        with tempfile.TemporaryDirectory() as directory:
+            runner.source_dir = Path(directory)
+            for name in ('knc-vec-b.c', 'knc-vec-a.c', 'knc-abi-other.c', 'other.c'):
+                (runner.source_dir / name).touch()
+            runner.t1_sources = Mock()
+            runner.t1()
+            runner.t1_sources.assert_called_once_with([
+                runner.source_dir / 'knc-vec-a.c', runner.source_dir / 'knc-vec-b.c'])
+
+
 class SourceTests(unittest.TestCase):
     """Compile seeded sources with a fake compiler, without a GCC build."""
 
