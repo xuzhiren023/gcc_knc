@@ -1,166 +1,118 @@
-# S0-04 card runner
+﻿# Shared-card runner (S2-11)
 
-Source: `docs/DEVELOPMENT_CYCLE.md`, section 9, and the S0-04 lead answer
-of 2026-11-02 10:39. The spec and RED tests were approved on 2026-11-02.
-Native acceptance remains subject to the owner's card hold.
+`python tools/card_run PROGRAM [ARG ...]` runs a host-built executable on the
+card. The owner rules on ticket S2-11 dated 2026-11-03 supersede S0-04's
+foreign-process refusal and the old external workload lock.
 
-## Entry point and configuration
+## Configuration
 
-`python tools/card_run PROGRAM [ARG ...]` stages a host-built card executable
-and runs it once. Options select the configuration, own lock, external locks,
-baseline daemon names, execution limit, transport limit, and result JSON path.
-All limits must be finite and positive. No automatic retry is permitted.
+The default configuration is the main checkout's gitignored
+`config/card.local.json`, including from `<main>/.work/<ticket>`. It is never
+copied into a worktree. Required settings are `host`, `identity`, `knownHosts`
+and `ledger`; `memoryMB` defaults to 128, `timeout` to 60 seconds and
+`transportTimeout` to 10 seconds. Limits must be finite and positive; memory
+must be an integer from 1 through 7168 MB.
 
-The owner supplies gitignored `config/card.local.json` with `host`, `identity`,
-and `knownHosts`. Commit only an example with placeholders. Never read the
-PhiWeather configuration or put key material in git. Connection arguments are:
+SSH uses the configured identity, strict known-host checking, batch mode,
+`IdentitiesOnly=yes`, `HostKeyAlgorithms=ssh-ed25519`, no user SSH config,
+and a five-second connection timeout. There are no automatic retries.
+No reboot, MPSS, module, sysctl, huge-page or `/etc` changes are made.
 
-```
-C:/Windows/System32/OpenSSH/ssh.exe -F NUL -i <identity>
-  -o IdentitiesOnly=yes -o BatchMode=yes -o StrictHostKeyChecking=yes
-  -o GlobalKnownHostsFile=NUL -o UserKnownHostsFile=<knownHosts>
-  -o HostKeyAlgorithms=ssh-ed25519 -o ConnectTimeout=5 root@<host>
-```
+Options before PROGRAM are `--config`, `--lock`, `--timeout`,
+`--transport-timeout`, and `--receipt` (the existing spelling for the single
+runtime result). `--external-lock` and `--baseline-name` remain parseable for
+compatibility. External lock settings are ignored; baseline names only filter
+which foreign processes are reported, never whether work may run.
 
-Copy `config/card.example.json` to the local file and fill in the owner paths.
-Configure `externalLocks` with every other project's lock for this card and
-`baselineNames` with exact user-space daemon names from an owner-reviewed idle
-snapshot (including sshd). Kernel threads are identified by PID/PPID, never by
-name. The empty allowlist in the example fails closed. Do not allow general
-job/interpreter names such as `sh`. The default own lock is the shared
-`<main>/.work/_state/card.lock`, for main and all `<main>/.work/<ticket>`
-worktrees. Optional `ownLock` must be inside this worktree or be that exact
-shared path; existing locks require owner intervention. CLI options are
-`--config`, `--lock`, repeated `--external-lock` and `--baseline-name`,
-`--timeout`, `--transport-timeout`, and `--receipt`, before PROGRAM.
-The default overwritten result is `tests/out/card-result.json`.
+## Enforcement
 
-The remote card needs a POSIX `sh`, Linux `/proc`, and standard utilities
-`readlink`, `stat`, `id`, `cat`, `base64`, `chmod`, `tail`, `head`, `sleep`,
-`mkdir`, and `rm`. No remote Python or installed runner is required. Inputs
-are base64 chunks over the control session. Program output is read in bounded
-chunks from private files, decoded and written to the corresponding host
-stdout/stderr stream without text conversion. Their interleaving is not kept.
-If transport becomes unavailable, the result reports incomplete cleanup;
-the independent card-side watchdog still enforces the execution limit plus
-`max(5 seconds, 2 * transport_timeout)` of grace, rounded up to whole seconds.
-No immediate stop is claimed.
+- Read the configured shared JSONL ledger before connecting and again at
+  admission. Append complete JSON objects with one append syscall each; never
+  rewrite or truncate the ledger. Malformed or missing ledgers fail closed.
+  A start record precedes staging and includes `agent: "claude"`, job ID,
+  physical cores, logical CPUs, memory MB, start and expected end. Every admitted
+  job appends an end record after cleanup, also on staging/program failure,
+  timeout or card fault. Ledger write errors are infrastructure failures.
+- Hold our local lock (default `<main>/.work/_state/card.lock`) and a mandatory
+  `claude-admission.lock` beside the ledger through final ledger writes.
+  The latter prevents callers with different `--lock` values from racing our
+  admission checks. These locks serialize our invocations; other projects do
+  not take them. Create atomically, refuse on existing/stale locks, and remove
+  only locks this invocation created. No external/shared-card lock is taken.
+- Parse the card's `/proc/cpuinfo` processor/core pairs. Select only logical
+  CPUs belonging to physical cores 30 through 59; never core 60. Pass that
+  explicit CPU list to `taskset -c` at launch. Missing pinning or eligible CPUs
+  refuses execution. Affinity is inherited by the workload's children.
+- Read `/proc/meminfo` before staging. Reserve the declared memory against all
+  active `agent: "claude"` ledger entries; ended jobs release their reservation.
+  Wait while the total exceeds 7168 MB or the reservation would leave less
+  than 1536 MB of `MemFree`. Re-read both ledger and memory after each wait;
+  the configured timeout bounds admission waiting. Expiration refuses without
+  staging the executable. Expected-end estimates never expire reservations.
+- The production memory backend requires an already-mounted cgroup v1 memory
+  controller. It creates only a private `claude-<job-id>` group under that
+  controller, writes `memory.limit_in_bytes`, enables hierarchy within our group,
+  and moves the workload shell into it before exec. The limit covers the
+  workload and descendants. There is no controller mount or global setting
+  change. Missing/unusable enforcement stops launch with a named diagnostic.
+  Its compatibility with the actual card remains unverified (see below).
+- Stage exclusively in `/tmp/claude/claude-<random-id>/`, with executable
+  `claude-program`, control shell name `claude-control`, and watchdog
+  `claude-watchdog`. No ports are allocated. Short-lived system utilities
+  currently retain their system process names; full naming compliance remains
+  pending native tool discovery. Each destructive operation checks the exact
+  directory shape, its owner, physical cwd and original boot ID. Ownership
+  includes the workload's cgroup members, so changing cwd does not evade cleanup.
+- Report other users' processes in `foreign_processes`; leave them alone.
+  Signals target only processes in our exact directory or private resource
+  group, rechecking identity after the boot guard, never by broad name/group.
+  Guarded TERM/KILL cleanup removes our empty resource group and exact staging
+  directory. Stdout/stderr are copied back in bounded chunks before normal
+  cleanup. A separate HUP-ignoring watchdog applies the same guards after the
+  program timeout plus `max(5 seconds, 2 * transportTimeout)` grace.
+- Recheck boot ID before execution, after execution and before any signal or
+  removal. A changed boot or unreachable card mid-run is an infrastructure
+  failure: append `card-fault`, then end; do not signal/remove on an unknown or
+  changed boot, and do not reconnect. Report the fault on the ticket so the lead
+  can escalate. The independent watchdog also refuses destructive operations
+  on another boot.
 
-Host file paths and remote arguments must be passed without shell interpolation.
-The production transport must bound connecting, snapshots, staging, execution,
-signalling, and cleanup. An expired SSH operation is an infrastructure failure;
-an expired program limit is a timeout. Disconnecting SSH alone does not establish
-that the remote program stopped.
+Required utility checks run before creating a remote staging directory. They
+name every missing tool rather than returning an unexplained status 94. The
+current list is `readlink stat id cat base64 chmod tail head sleep mkdir rmdir
+rm`; `taskset` is checked separately as the pinning capability. Replacements
+must be selected from the actual card's tools after the permitted hello probe.
 
-## Locks, process policy, and lifecycle
+## Result and fake seam
 
-1. Exclusively create the configured own lock (shared state by default). If already
-   present, report and refuse, including when stale. Do not remove a lock this
-   invocation did not acquire. Hold an acquired lock through cleanup and release
-   it on all exit paths.
-2. Stat every configured external lock. A present lock means refuse. An
-   unreadable/indeterminate check fails closed. External paths are configuration,
-   not hardcoded PhiWeather paths; never open for writing, remove, or refresh
-   them. No remote access is needed when a local lock prevents the run.
-3. Use one SSH control session for the initial process/boot snapshot, staging,
-   pre-execution snapshot, and execution. Allocate a fresh private directory
-   matching exactly `/var/volatile/tmp/gcc-knc-[0-9a-f]{32}`. All input files,
-   job control files, and runner-owned card processes belong there. Control
-   helpers must also satisfy the ownership rule. The connection may create this
-   empty directory and enter it for its control shell before the first process
-   check; no program inputs are staged until that check passes. Clean up this
-   directory even if the first process check refuses. Do not install system files.
-4. Before staging inputs and again immediately before execution, check all card
-   processes. A process is ours only if its resolved exe or cwd is inside that
-   exact directory (component boundary required). PID 2 and children of PID 2
-   are kernel threads. Every other process must have an exact name in the
-   configured baseline allowlist of user-space system daemons. Missing/unknown
-   identity is foreign. Report offending PIDs/names and refuse. Never signal or
-   otherwise act on a foreign process. A process appearing after staging still
-   prevents execution. The pre-execution check and launch share the SSH session.
-5. Record the initial boot ID. Recheck before execution and after execution,
-   and before any signal or removal. Reboot and unreachable card are
-   infrastructure failures, not program failures. Do not retry. A subsequent
-   invocation chooses a fresh directory and stages inputs again.
-6. On timeout, stop only processes whose exe or cwd is inside this invocation's
-   exact directory. Never kill by name or broad process group. Bounded TERM/KILL
-   escalation may target only those processes while the boot ID still matches.
-   Before launching the program, start a separate HUP-ignoring watchdog shell
-   from the private directory. It sleeps for the integer card-side limit then
-   calls guarded cleanup, even after SSH has gone away, stopping owned processes
-   and removing the private directory. If sleep fails, the watchdog exits without
-   signalling or removal. Owned child processes are covered too. Normal cleanup
-   stops the watchdog along with any other owned processes. Control polls
-   receive the full transport timeout;
-   crossing the host program deadline produces timeout on the next loop check.
-7. Clean up that exact directory on success and failure, but only on the
-   original boot. Validate directory shape and ownership before every destructive
-   operation; the boot check must also be enforced by the remote operation.
-   If boot changed or cannot be read, do not signal or remove anything. Report
-   incomplete cleanup as infrastructure failure. Close the session and release
-   our own local lock even if remote cleanup is impossible.
+The single overwritten result defaults to `tests/out/card-result.json`; it is
+runtime output, never committed. Fields include `result_class`, `exit_code`,
+`program_exit_code`, both boot IDs, `card_minutes`, detail, job ID, staging path,
+memory MB, selected logical CPUs, foreign processes and `overlapping_jobs`.
+Overlaps include jobs already active at admission and jobs starting during ours,
+even when they also end during ours. Card minutes account only for execution;
+there are no performance/timing claims. Classes are `program`, `refused`,
+`timeout`, and `infrastructure`; runner exits are 125, 124, and 126 respectively.
+The result class distinguishes program statuses that collide with those values.
 
-## Results
+`run` accepts program/argv, local and legacy external-lock/baseline arguments,
+timeouts, result path, transport, ledger path, memory MB and an injectable
+monotonic clock. A fake session provides `snapshot`, `stage`, `execute`,
+`signal_owned`, `cleanup` and `close`. Snapshots contain boot ID, processes,
+raw cpuinfo/meminfo and pinning availability. Execute receives the explicit
+logical CPU list, memory MB, execution timeout and watchdog timeout.
+`tests/tools/test_card_shared.py` tests the shared rules without SSH; its shell
+fixture locates `sh` through PATH.
 
-Return and write one small JSON result at the configured output path, overwritten
-on the next invocation. This is runtime output, kept out of git, not a provenance
-artifact. Fields are `result_class`, `exit_code`, `program_exit_code`,
-`boot_id_before`, `boot_id_after`, `card_minutes`, and `detail`. Unknown boot IDs
-are null. Card minutes are monotonic wall time around program execution divided
-by 60, including execution until timeout; staging and lock waits are excluded.
+## Validation status
 
-Classes are `program` (including a nonzero program exit), `refused`, `timeout`,
-and `infrastructure`. Preserve the program's status and stdout/stderr. Export
-three distinct nonzero constants `REFUSED_EXIT`, `TIMEOUT_EXIT`, and `INFRA_EXIT`
-for runner failures. `program_exit_code` is null if no program status was
-obtained. Infrastructure takes precedence if boot changed or cleanup failed.
-A process exit status alone cannot distinguish all 256 program statuses from
-runner errors; `result_class` is authoritative when the numbers overlap.
-The lead approved this status-collision policy before GREEN.
-
-## Fake transport seam for T0
-
-`tools/card_run` exposes the following Python function, also used by its CLI:
-
-```
-run(program, argv, *, lock_path, external_locks, baseline_names,
-    timeout, transport_timeout, receipt_path, transport, monotonic) -> dict
-```
-
-Paths are `pathlib.Path` objects on the host. `monotonic` is a callable defaulting
-to `time.monotonic`; the injected test clock avoids sleeps. The return value
-matches the result JSON. The CLI constructs the production transport; T0 never
-constructs it or needs connection configuration.
-
-`transport.connect(run_dir, timeout=...)` creates the empty control directory,
-enters it, and returns a single session supporting:
-
-- `snapshot(timeout=...)`: dict with `boot_id` and `processes`; each process has
-  `pid`, `ppid`, `name`, `exe`, `cwd` (identity fields may be null).
-- `stage(run_dir, program, timeout=...)`: copies the input into the private dir.
-- `execute(run_dir, argv, timeout=..., card_timeout=...)`: arms the independent
-  watchdog with `card_timeout` before launching; returns the program's integer
-  status; streams output; raises `TimeoutError` only for the program deadline.
-- `signal_owned(run_dir, boot_id, timeout=...)`: stops only owned processes,
-  enforcing the boot guard remotely too.
-- `cleanup(run_dir, boot_id, timeout=...)`: removes only that directory, enforcing
-  the boot guard remotely too.
-- `close()`: releases the control session locally.
-
-Other transport errors raise `OSError`. Operations are bounded by
-`transport_timeout`, except execution, which uses `timeout`. The transport
-must not add retries. Snapshots and destructive operations fail closed.
-
-T0 cases cover existing own/external locks, foreign processes before
-staging and before execution, timeout, unreachable card, reboot during a run,
-nonzero program exit, and cleanup after staging failure. Lead-requested revision
-cases cover shared lock resolution, kernel PID/PPID versus misleading names,
-link loss during execute with a card-side limit, and full-budget control polls
-near the deadline. Assertions inspect
-operation order, boundaries, boot IDs, lock release, result JSON, and card time.
-At RED, missing `tools/card_run` was the expected failure.
-
-After review and GREEN, when the card is free, run donor-built `m1_affine` and
-`hello` through `tools/run.py` and this runner at T3. `m1_affine` must print
-`ACCEPT-PASS`; that is the fixture/runner/guard-page check on actual hardware.
-Do not describe a fake result as native evidence.
+The approved RED is ae87007. The 18 shared-policy T0 cases passed during GREEN
+implementation, before subsequent resource-group cleanup and admission-lock
+hardening. The donor built `tests/tools/card_hello.c` with the shared sysroot.
+The native hello probe was blocked before connecting: the session could not
+read the configured SSH identity and SSH connection permission was denied.
+No card tools were discovered and no native job ran. Required BusyBox
+replacements and their T0 cases, final backend validation, and native acceptance
+remain pending the ticket's access blocker. Old S0-04 fake expectations for
+foreign refusal/external locks and the old staging path are superseded; that
+legacy test module has not yet been migrated.

@@ -2,8 +2,8 @@
   "host": "192.168.1.100",
   "identity": "C:/replace/with/owner/key",
   "knownHosts": "C:/replace/with/owner/known_hosts",
-  "externalLocks": [],
-  "baselineNames": [],
   "timeout": 60.0,
-  "transportTimeout": 10.0
+  "transportTimeout": 10.0,
+  "ledger": "C:/replace/with/shared/card-coordination/jobs.jsonl",
+  "memoryMB": 128
 }

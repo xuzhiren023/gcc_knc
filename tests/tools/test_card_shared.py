@@ -10,6 +10,7 @@ import io
 import json
 from pathlib import Path
 import runpy
+import shutil
 import subprocess
 import tempfile
 import unittest
@@ -350,7 +351,8 @@ class SharedCardRules(unittest.TestCase):
     def test_missing_required_tool_is_named(self):
         # Execute the actual generated tool-check snippet with a fake shell
         # command lookup. All other RPCs are inert; no card connection occurs.
-        sh = "C:/Users/xuzhi/Documents/PhiWeather/.tools/knc-bootstrap/cygwin/bin/sh.exe"
+        sh = shutil.which("sh")
+        self.assertIsNotNone(sh, "POSIX sh must be on PATH")
         scripts = []
 
         class ToolCheckSession:
