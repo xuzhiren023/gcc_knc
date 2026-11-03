@@ -1,6 +1,5 @@
 """S2-11 owner-reported BusyBox replacements; local fake transport only."""
 import io
-import os
 from pathlib import Path
 import runpy
 import shutil

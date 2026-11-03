@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 """Shared-card runner; see docs/card-run.md. Fake transport never uses SSH."""
 import argparse
-import base64
 from datetime import datetime, timedelta, timezone
 import json
 import math
@@ -68,10 +67,15 @@ def active_jobs(lines):
     active = {}
     for line in lines:
         if line.get("event") == "start":
-            active[line["job_id"]] = line
-        elif line.get("event") == "end":
-            active.pop(line["job_id"], None)
+            active[ledger_job_id(line)] = line
+        elif line.get("event") in ("finish", "end"):
+            active.pop(ledger_job_id(line), None)
     return active
+
+
+def ledger_job_id(line):
+    # Read old runner history without rewriting it; all new lines use jobId.
+    return line["jobId"] if "jobId" in line else line["job_id"]
 
 
 def cpu_binding(cpuinfo):
@@ -161,7 +165,7 @@ def run(program, argv, *, lock_path, external_locks, baseline_names, timeout,
             mapping = cpu_binding(snap["cpuinfo"])
             lines = read_ledger(ledger_path)
             active = active_jobs(lines)
-            reserved = sum(int(j.get("memory_mb", 7 * 1024)) for j in active.values()
+            reserved = sum(int(j.get("memoryLimitMiB", j.get("memory_mb", 7 * 1024))) for j in active.values()
                            if j.get("agent") == "claude")
             free = dict(line.split(":", 1) for line in snap["meminfo"].splitlines() if ":" in line)
             free_kb = int(free["MemFree"].split()[0])
@@ -173,9 +177,11 @@ def run(program, argv, *, lock_path, external_locks, baseline_names, timeout,
         now = datetime.now(timezone.utc)
         ledger_offset = len(lines)
         overlaps.update(active)
-        append_ledger(ledger_path, dict(agent="claude", event="start", job_id=job_id,
-                      cores=sorted(set(mapping.values())), cpus=sorted(mapping), memory_mb=memory_mb,
-                      start=now.isoformat(), expected_end=(now + timedelta(seconds=timeout)).isoformat()))
+        ledger_job = dict(agent="claude", jobId=job_id, cores=sorted(set(mapping.values())),
+                          logicalCpus=sorted(mapping), memoryLimitMiB=memory_mb,
+                          startTime=now.isoformat(),
+                          expectedEnd=(now + timedelta(seconds=timeout)).isoformat(), timingValid=False)
+        append_ledger(ledger_path, dict(ledger_job, event="start"))
         recorded = True
         result["cpus"] = sorted(mapping)
         session.stage(run_dir, program, timeout=transport_timeout)
@@ -215,22 +221,30 @@ def run(program, argv, *, lock_path, external_locks, baseline_names, timeout,
                     session.close()
                 except OSError as error:
                     failure("infrastructure", INFRA_EXIT, "session close failed: %s" % error)
+        if card_fault:
+            try:
+                append_ledger(ledger_path, dict(agent="claude", jobId=job_id, event="card-fault",
+                              detail=result["detail"], boot_id_before=result["boot_id_before"],
+                              boot_id_after=result["boot_id_after"], timingValid=False))
+            except OSError as error:
+                failure("infrastructure", INFRA_EXIT, "fault ledger write failed: %s" % error)
         if recorded:
             try:
-                if card_fault:
-                    append_ledger(ledger_path, dict(agent="claude", job_id=job_id, event="card-fault",
-                                  detail=result["detail"], boot_id_before=result["boot_id_before"],
-                                  boot_id_after=result["boot_id_after"]))
                 lines = read_ledger(ledger_path)
-                overlaps.update(line["job_id"] for line in lines[ledger_offset:]
+                overlaps.update(ledger_job_id(line) for line in lines[ledger_offset:]
                                 if line.get("event") == "start")
                 overlaps.discard(job_id)
                 result["overlapping_jobs"] = sorted(overlaps)
-                append_ledger(ledger_path, dict(agent="claude", job_id=job_id, event="end",
-                              end=datetime.now(timezone.utc).isoformat(),
-                              result_class=result["result_class"], exit_code=result["exit_code"]))
             except (OSError, ValueError, KeyError) as error:
                 failure("infrastructure", INFRA_EXIT, "ledger completion failed: %s" % error)
+            try:
+                append_ledger(ledger_path, dict(ledger_job, event="finish",
+                              endTime=datetime.now(timezone.utc).isoformat(),
+                              outcome=("success" if result["result_class"] == "program" and
+                                       result["exit_code"] == 0 else result["result_class"] + "-failure"),
+                              result_class=result["result_class"], exit_code=result["exit_code"]))
+            except OSError as error:
+                failure("infrastructure", INFRA_EXIT, "ledger finish failed: %s" % error)
         if admission_lock is not None:
             try:
                 admission_lock.unlink()
@@ -273,15 +287,16 @@ class SSHTransport:
                    "root@" + host, "exec sh"]
         session = SSHSession(command, run_dir, self.transport_timeout)
         try:
-            session.rpc("check_tools() { for tool in readlink stat id cat base64 chmod tail head sleep mkdir rmdir rm; "
+            session.rpc("check_tools() { for tool in readlink ls id cat od chmod tail head sleep mkdir rm; "
                         "do command -v \"$tool\" >/dev/null || { echo \"missing required card tool: $tool\"; missing=1; }; done; "
                         "if [ \"${missing:-0}\" = 1 ]; then "
-                        "for tool in taskset dd od awk uudecode openssl python perl; do "
-                        "command -v \"$tool\" || :; done; "
-                        "echo MEMORY-CGROUPS; cat /proc/cgroups; return 94; fi; }; check_tools", timeout)
-            session.rpc("umask 077\nrun_dir=%s\nmkdir -p /tmp/claude && mkdir -- \"$run_dir\" && cd -- \"$run_dir\" && "
+                        "return 94; fi; }; check_tools", timeout)
+            session.rpc("umask 077\nrun_dir=%s\n"
                         "printf claude-control > /proc/self/comm" %
                         shlex.quote(run_dir), timeout)
+            session.pin_helper = Path(c.get("pinHelper", str(main_root(ROOT) / ".work/_shared/claude-pin.mic")))
+            if not session.pin_helper.is_file():
+                raise OSError("static donor helper missing: %s; see docs/card-run.md" % session.pin_helper)
             session.rpc((ROOT / "tools/card_run_remote.sh").read_text(encoding="utf8"), timeout)
             return session
         except BaseException:
@@ -292,6 +307,7 @@ class SSHTransport:
 class SSHSession:
     def __init__(self, command, run_dir, transport_timeout):
         self.run_dir, self.transport_timeout = run_dir, transport_timeout
+        self.command = command
         self.process = subprocess.Popen(command, stdin=subprocess.PIPE, stdout=subprocess.PIPE,
                                         stderr=subprocess.PIPE)
         self.lines = queue.Queue()
@@ -383,25 +399,40 @@ class SSHSession:
     def stage(self, run_dir, program, *, timeout):
         self.validate(run_dir)
         deadline = time.monotonic() + timeout
-        self.rpc("guard_dir && : > program.b64", self.remaining(deadline))
-        with open(program, "rb") as source:
-            while True:
-                chunk = source.read(48 * 1024)
-                if not chunk:
-                    break
-                self.rpc("printf '%s' '" + base64.b64encode(chunk).decode("ascii") +
-                         "' >> program.b64", self.remaining(deadline))
-        self.rpc("guard_dir && base64 -d program.b64 > claude-program && chmod 700 claude-program && rm program.b64",
-                 self.remaining(deadline))
+        self.rpc("boot_id=%s\ncheck_boot && mkdir -p /tmp/claude && "
+                 "mkdir -- \"$run_dir\" && cd -- \"$run_dir\" && guard_dir" %
+                 shlex.quote(self.boot_id), self.remaining(deadline))
+        self.send_file("claude-program", Path(program).read_bytes(), self.remaining(deadline))
+        self.send_file("claude-pin", self.pin_helper.read_bytes(), self.remaining(deadline))
         # A separate shell has its own $$, so stop_owned spares the watchdog
         # itself. Ignore HUP before exec; losing SSH must not disarm the timer.
         watchdog = ((ROOT / "tools/card_run_remote.sh").read_text(encoding="utf8") +
-                    '\nrun_dir=$1\nboot_id=$2\nmemory_group=$4\n'
+                    '\nrun_dir=$1\nboot_id=$2\n'
                     'printf claude-watchdog > /proc/self/comm\nguard_boot || exit 92\n'
                     'sleep "$3" || exit 95\ncleanup\n')
-        encoded = base64.b64encode(watchdog.encode("utf8")).decode("ascii")
-        self.rpc("guard_dir && printf '%s' '" + encoded + "' | base64 -d > claude-watchdog.sh",
-                 self.remaining(deadline))
+        self.send_file("claude-watchdog.sh", watchdog.encode("utf8"), self.remaining(deadline))
+        self.rpc("guard_boot && chmod 700 claude-program claude-pin", self.remaining(deadline))
+
+    def send_file(self, name, data, timeout):
+        if name not in ("claude-program", "claude-pin", "claude-watchdog.sh"):
+            raise OSError("unowned staging filename")
+        # A separate, finite SSH stdin carries raw bytes, never shell syntax.
+        script = ((ROOT / "tools/card_run_remote.sh").read_text(encoding="utf8") +
+                  "\numask 077\nrun_dir=%s\nboot_id=%s\n"
+                  "printf claude-upload > /proc/self/comm\n"
+                  "cd -- \"$run_dir\" && guard_boot && cat > %s\n" %
+                  (shlex.quote(self.run_dir), shlex.quote(self.boot_id), name))
+        child = subprocess.Popen(self.command[:-1] + ["sh -c " + shlex.quote(script)],
+                                 stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        try:
+            _, errors = child.communicate(input=data, timeout=timeout)
+        except subprocess.TimeoutExpired:
+            child.kill()
+            child.communicate()
+            raise OSError("SSH upload deadline; no retry")
+        if child.returncode:
+            raise OSError("SSH upload failed (status %s): %s" %
+                          (child.returncode, errors.decode("utf8", "replace")[:500]))
 
     @staticmethod
     def remaining(deadline):
@@ -431,9 +462,9 @@ class SSHSession:
             for index, (name, stream) in enumerate((("stdout", sys.stdout.buffer),
                                                      ("stderr", sys.stderr.buffer))):
                 # Finite chunks keep arbitrary program bytes out of the control protocol.
-                encoded = operation("guard_dir && { tail -c +%d %s | head -c 65536 | base64; }" %
+                encoded = operation("guard_boot && { tail -c +%d %s | head -c 65536 | od -An -v -tx1; }" %
                                     (offsets[index] + 1, name))
-                data = base64.b64decode(encoded)
+                data = bytes.fromhex(encoded.decode("ascii"))
                 stream.write(data)
                 stream.flush()
                 offsets[index] += len(data)

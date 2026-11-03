@@ -9,19 +9,15 @@ guard_dir() {
     case "$suffix" in *[!0-9a-f]*) return 91 ;; esac
     [ ! -L "$run_dir" ] && [ -d "$run_dir" ] &&
         [ "$(pwd -P)" = "$run_dir" ] &&
-        [ "$(stat -c %u "$run_dir")" = "$(id -u)" ]
+        [ "$(LC_ALL=C ls -ldn "$run_dir" | { read -r mode links owner rest; printf '%s' "$owner"; })" = "$(id -u)" ]
 }
-guard_boot() {
-    guard_dir && [ -n "$boot_id" ] &&
+check_boot() {
+    [ -n "$boot_id" ] &&
         [ "$(cat /proc/sys/kernel/random/boot_id)" = "$boot_id" ]
 }
+guard_boot() { guard_dir && check_boot; }
 owned_pid() {
     [ "$1" != "$$" ] || return 1
-    if [ -n "$memory_group" ] && [ -f "$memory_group/tasks" ]; then
-        while read -r member; do
-            [ "$member" != "$1" ] || return 0
-        done < "$memory_group/tasks"
-    fi
     pid_exe=$(readlink "/proc/$1/exe" 2>/dev/null)
     pid_cwd=$(readlink "/proc/$1/cwd" 2>/dev/null)
     case "$pid_exe" in "$run_dir"|"$run_dir"/*) return 0 ;; esac
@@ -29,12 +25,13 @@ owned_pid() {
     return 1
 }
 snapshot() {
-    guard_dir || return 91
     printf 'BOOT\t'
     cat /proc/sys/kernel/random/boot_id || return 92
     while IFS= read -r line; do printf 'CPU\t%s\n' "$line"; done < /proc/cpuinfo
     while IFS= read -r line; do printf 'MEM\t%s\n' "$line"; done < /proc/meminfo
-    if command -v taskset >/dev/null; then printf 'PIN\tyes\n'; else printf 'PIN\tno\n'; fi
+    # Donor-built helper is supplied by the host. Its syscalls must succeed
+    # before exec; no installed affinity utility or memory controller is needed.
+    printf 'PIN\tyes\n'
     for proc in /proc/[0-9]*; do
         proc_pid=${proc##*/}
         proc_exe=$(readlink "$proc/exe" 2>/dev/null)
@@ -71,53 +68,29 @@ stop_owned() {
     return 0
 }
 cleanup() {
+    check_boot || return 92
+    # Admission may have refused before creating any remote directory.
+    [ -e "$run_dir" ] || return 0
     stop_owned && guard_boot || return 92
-    # Remove only this invocation's empty resource group, never a parent/controller.
-    if [ -n "$memory_group" ] && [ -d "$memory_group" ]; then
-        rmdir "$memory_group" || return 96
-    fi
     # No computed parent path, glob, symlink, or directory from another boot.
     rm -rf -- "$run_dir"
 }
 start_job() {
-    guard_boot && [ -f claude-watchdog.sh ] || return 92
+    guard_boot && [ -f claude-watchdog.sh ] && [ -x claude-pin ] || return 92
     job_limit=$1
     job_cpus=$2
     job_memory=$3
     shift 3
-    # Require an existing memory controller: never mount or enable a controller.
-    memory_parent=
-    while read -r dev mount kind options rest; do
-        case ",$options," in
-            *,memory,*) [ "$kind" = cgroup ] && memory_parent=$mount ;;
-        esac
-    done < /proc/mounts
-    if [ -z "$memory_parent" ]; then
-        echo 'resident memory enforcement unavailable: no mounted memory cgroup' >&2
-        return 96
-    fi
-    memory_group=$memory_parent/${run_dir##*/}
-    mkdir "$memory_group" || return 96
-    printf '%s\n' "$((job_memory * 1024 * 1024))" > "$memory_group/memory.limit_in_bytes" || return 96
-    if [ -f "$memory_group/memory.use_hierarchy" ]; then
-        printf '1\n' > "$memory_group/memory.use_hierarchy" || return 96
-    fi
-    # The watchdog inherits this exact owned group path as an argument.
     : > stdout
     : > stderr
     # Both background shells detach their SSH file descriptors and ignore HUP.
     # The watchdog survives a broken control connection and applies the same
     # exact-directory and boot guards as host-requested termination.
-    (trap '' HUP; exec sh ./claude-watchdog.sh "$run_dir" "$boot_id" "$job_limit" "$memory_group") \
+    (trap '' HUP; exec sh ./claude-watchdog.sh "$run_dir" "$boot_id" "$job_limit") \
         < /dev/null > /dev/null 2>&1 &
     (trap '' HUP
-     # A separate shell's $$ is needed to move only the workload into its group.
-     taskset -c "$job_cpus" sh -c '
-         printf claude-launch > /proc/self/comm
-         echo $$ > "$1/tasks" || exit 96
-         shift
-         exec ./claude-program "$@"
-     ' claude-launch "$memory_group" "$@"
+     printf claude-launch > /proc/self/comm
+     ./claude-pin "$job_cpus" "$job_memory" ./claude-program "$@"
      printf '%s\n' "$?" > status) \
         < /dev/null > stdout 2> stderr &
 }

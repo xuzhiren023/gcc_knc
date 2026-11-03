@@ -9,10 +9,12 @@
 
 static int affinity_calls, limit_calls, exec_calls, mode;
 static int fake_affinity(pid_t pid, size_t size, const cpu_set_t *mask) {
+    /* Cygwin's inspection macros take a mutable pointer, unlike glibc's. */
+    cpu_set_t observed = *mask;
     assert(pid == 0 && size == sizeof(*mask));
-    assert(CPU_COUNT(mask) == 3);
-    assert(CPU_ISSET(4, mask) && CPU_ISSET(13, mask) && CPU_ISSET(91, mask));
-    assert(!CPU_ISSET(7, mask)); /* sample core 60's logical CPU */
+    assert(CPU_COUNT(&observed) == 3);
+    assert(CPU_ISSET(4, &observed) && CPU_ISSET(13, &observed) && CPU_ISSET(91, &observed));
+    assert(!CPU_ISSET(7, &observed)); /* sample core 60's logical CPU */
     ++affinity_calls;
     if (mode == 1) { errno = EPERM; return -1; }
     return 0;

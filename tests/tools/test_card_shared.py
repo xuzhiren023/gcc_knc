@@ -1,9 +1,9 @@
 """S2-11 RED: shared-card policy, entirely fake transport, never SSH.
 
 Snapshot adds raw cpuinfo/meminfo and a pinning capability. Execute receives
-cpus (logical CPU IDs) and memory_mb (an enforced resident budget). The CLI
-reads ledger and memoryMB from its config. These are the proposed T0 seams;
-no remote tool replacement is guessed before the permitted hello probe.
+cpus (logical CPU IDs) and memory_mb (an enforced address-space limit). The CLI
+reads ledger and memoryMB from its config. BusyBox replacement tests are in test_card_backend.py, using the
+owner-reported tool availability; none of these tests connects to the card.
 """
 import contextlib
 import io
