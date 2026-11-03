@@ -65,7 +65,9 @@ sessions are planned: S3-03's probe, early, and S3-10's batch, at the end.
 | S3-09 | V16SI add, sub, mul, logic and broadcast; V8DI logic (E3-04, integer part) | standard | S3-07; moved to Sprint 4 |
 | S3-12 | `tools/portability.py`: forward-port drill and x86_64 unchanged check (ADR-0006; added 2026-11-03 on the owner's direction) | standard | none; tools lane |
 | S3-13 | Move KNC code out of shared i386 files into `i386-knc` (ADR-0006) | standard | S3-07 |
-| S3-10 | Native batch for S3: `m1_affine` in all its builds, and the S3 tickets' native lines; lead runs it | standard | S3-07, S3-08, S3-13 |
+| S3-14 | Native TLS for k1om (configure missed k1om; GCC 16 used emulated TLS) and the x86_64-only configure audit; added 2026-11-03 | deep | none |
+| S3-15 | ABI gaps: packed varargs ICE and ms_abi guard, complex values, rounding mode across calls; added 2026-11-03 | standard | none |
+| S3-10 | Native batch for S3: `m1_affine` in all its builds, and the S3 tickets' native lines; lead runs it | standard | S3-07, S3-08, S3-13, S3-14, S3-15 |
 | S3-11 | Milestone M1 note: fixture results, line counts, ICE classes, cost comparison with a separate backend (E3-06) | deep | all above |
 
 The dispatcher runs two lanes, one ticket in progress in each: `--lane gcc` for tickets with
