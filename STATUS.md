@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-03 00:37.
+Updated automatically at every ticket change. Last update: 2026-11-03 00:40.
 
-**Next: GPT-6.1, on S2-02 (Float and double arguments and results in zmm lane 0).** Run `python tools/dispatch.py`, or ask the tech lead to.
+**Next: the tech lead, on S2-02.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[##############------]` 18 of 25
 
@@ -40,7 +40,7 @@ Current tickets: `[##############------]` 18 of 25
 | S1-06 | K1OM link defaults | Done | GCC 16 now targets the K1OM ABI by default: it passes --march=k1om to as and -m elf_k1om to ld, uses the /l... |
 | S1-07 | Milestone M0 evidence note | Done | M0 is settled as adjust: GCC 16.2 builds a k1om cc1 whose assembly the 2.22 assembler accepts, an options-f... |
 | S2-01 | Design for zmm and mask registers under -march=knc | Done | The register design for KNC is settled on paper: all 32 zmm and 8 mask registers become usable under -march... |
-| S2-02 | Float and double arguments and results in zmm lane 0 | In progress | Yes: use the donor -O2 locations as the oracle for GCC16 -O0 wherever the donor -O0 ICEs; do not fix the do... |
+| S2-02 | Float and double arguments and results in zmm lane 0 | Tests waiting for review | 69d714f: explicit abi_in_ff_a/b fallback verifies donor -O0 ICE at knc.md:96, compares donor -O2 with GCC16... |
 | S2-03 | Varargs with the donor's register save area | Not started | Follow docs/adr/0004-knc-registers-and-scalar-abi.md, point 4: 16-byte slots through TI transport, %al test... |
 | S2-04 | Scalar transfers through memory and mask scratch | Not started | Follow docs/adr/0004-knc-registers-and-scalar-abi.md, point 6: an allocated GPR scratch and an HI mask pseu... |
 | S2-05 | x87 compares and zmm spill alignment | Not started | Follow docs/adr/0004-knc-registers-and-scalar-abi.md, point 2: XI spills need 64-byte storage. This ticket ... |
@@ -54,10 +54,10 @@ Current tickets: `[##############------]` 18 of 25
 - 2026-11-03 00:46 **S2-04** lead note: Follow docs/adr/0004-knc-registers-and-scalar-abi.md, point 6: an allocated GPR scratch and an HI mask pseudo, no hard-coded k2, no push/pop of %ra...
 - 2026-11-03 00:46 **S2-03** lead note: Follow docs/adr/0004-knc-registers-and-scalar-abi.md, point 4: 16-byte slots through TI transport, %al tested before any scratch use. This ticket o...
 - 2026-11-03 00:45 **S2-02** lead note: The design is docs/adr/0004-knc-registers-and-scalar-abi.md, from docs/research/knc-register-design.md. Follow it; if the code needs to depart from...
+- 2026-11-03 00:40 **S2-02** engineer red: 69d714f: explicit abi_in_ff_a/b fallback verifies donor -O0 ICE at knc.md:96, compares donor -O2 with GCC16 -O0, and labels results; all others sam...
 - 2026-11-03 00:37 **S2-02** lead answer: Yes: use the donor -O2 locations as the oracle for GCC16 -O0 wherever the donor -O0 ICEs; do not fix the donor (it is a reference, and argument and...
 - 2026-11-03 00:37 **S2-02** engineer ask: Red commit 5681cb8: GCC16 rejects SF/DF results; mixed/overflow and m1_affine disagree with donor locations. Donor -O0 ICEs at knc.md:96 on: struct...
 - 2026-11-03 00:30 **S2-01** lead approve: The register design for KNC is settled on paper: all 32 zmm and 8 mask registers become usable under -march=knc with SSE and AVX-512 kept off, floa...
-- 2026-11-03 00:29 **S2-01** engineer submit: Design note committed; all five acceptance points covered. tools/run.py S2-01-source-review PASS after citation correction: 133 anchors in 12 fork/...
 
 ## Cost
 
