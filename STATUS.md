@@ -49,7 +49,7 @@ Current tickets: `[################----]` 23 of 28
 | S2-08 | hello, scalar FP and printf on the card | draft | Owner approved Sprint 2 on 2026-11-03; this ticket stays draft until the card hold ends. |
 | S2-09 | GCC 16 builds gfortran, and the secondary-reload reproducer passes | Not started | Reconfiguring means one full rebuild: use `make -j8` with `CFLAGS=-O2 -g1 CXXFLAGS=-O2 -g1` as `tools/toolc... |
 | S2-10 | First card runs for the queued native checks | Not started | Owner's decision of 2026-11-03: the interactive lead runs every card job; engineer sessions have no card ac... |
-| S2-11 | card_run follows the shared card rules and runs hello on the card | Changes requested | Lead decided under the owner's 2026-11-03 delegation: 8 engineer sessions in total (4.9M of 12M tokens used... |
+| S2-11 | card_run follows the shared card rules and runs hello on the card | In progress | Lead decided under the owner's 2026-11-03 delegation: 8 engineer sessions in total (4.9M of 12M tokens used... |
 
 ## Recent activity
 
@@ -66,7 +66,7 @@ Current tickets: `[################----]` 23 of 28
 
 - From the script, engineer: 92 sessions, 178.3M input tokens
 - From the script, lead: 91 sessions, 33.2M input tokens
-- Started by hand, Claude: 3 sessions, 250.9M input tokens
+- Started by hand, Claude: 3 sessions, 251.3M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
