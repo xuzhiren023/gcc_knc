@@ -1,17 +1,17 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-03 14:51.
+Updated automatically at every ticket change. Last update: 2026-11-03 14:52.
 
-**Next: the tech lead, on S2-19.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: GPT-6.1, on S2-15 (-ffast-math links on KNC with a KNC crtfastmath).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
-Current tickets: `[##############------]` 34 of 47
+Current tickets: `[##############------]` 35 of 47
 
 ## Milestones
 
 | | Milestone | State | Progress |
 |---|---|---|---|
 | M0 | Foundation | In progress | 17 of 17 tickets |
-| M1 | Mixed native code | In progress | 17 of 30 tickets |
+| M1 | Mixed native code | In progress | 18 of 30 tickets |
 | M2 | Useful vector target | Not started | Not planned in detail yet |
 | M3 | Runtimes | Not started | Not planned in detail yet |
 | M4 | Broad optimization | Not started | Not planned in detail yet |
@@ -57,7 +57,7 @@ Current tickets: `[##############------]` 34 of 47
 | S2-16 | Card batch files are readable by the lead | Done | Card batch programs are now written 0755 and data files 0644, so the lead can read and stage them; Cygwin n... |
 | S2-17 | card_run tolerates ending processes, and stages batch files correctly | Done | card_run now skips processes that end mid-snapshot instead of failing the run, keeps a finished program's r... |
 | S2-18 | The card test driver runs programs in parallel on our 30 cores | Done | claude-torture now runs up to N programs at once (-j N) inside the job's memory budget, with results in lis... |
-| S2-19 | The card snapshot's awk runs under BusyBox | Waiting for review | Red ee895fe rejects snapshot awk program 3 line 19 (name); fix 6e4dd13 adds explicit empty-string concatena... |
+| S2-19 | The card snapshot's awk runs under BusyBox | Done | The card runner's process snapshot no longer trips BusyBox awk, and a T0 test now rejects any card awk line... |
 | S3-01 | Packed modes and IMCI patterns in GCC 16: entry points, audit and line estimate | draft |  |
 | S3-02 | One helper for optional tools/check selections | draft |  |
 | S3-03 | Native probe of unaligned pairs and masked aligned forms at page boundaries | draft |  |
@@ -72,6 +72,7 @@ Current tickets: `[##############------]` 34 of 47
 
 ## Recent activity
 
+- 2026-11-03 14:52 **S2-19** lead approve: The card runner's process snapshot no longer trips BusyBox awk, and a T0 test now rejects any card awk line that BusyBox could misread as a functio...
 - 2026-11-03 14:51 **S2-19** engineer submit: Red ee895fe rejects snapshot awk program 3 line 19 (name); fix 6e4dd13 adds explicit empty-string concatenation. Cygwin T0 passed 31 tests; Cygwin ...
 - 2026-11-03 14:50 **S2-15** lead changes: 1. tools/check.py:295: getattr(self.args, 'fast_math', False) raises AttributeError when Runner has no args, so t0 tests/regress fails 5 tests (log...
 - 2026-11-03 14:50 **S2-15** lead note: Your linux-k1om.h change means a full rebuild. S2-09 measured 3,737 s for a full rebuild with Fortran against S1-06's 1,392 s without, and named a ...
@@ -79,7 +80,6 @@ Current tickets: `[##############------]` 34 of 47
 - 2026-11-03 14:48 **S2-19** lead note: Blocks every card run since S2-17. From now on, every merge that touches the card runner gets a lead `hello` on the card before any batch (CURRENT_...
 - 2026-11-03 14:46 **S2-18** lead approve: claude-torture now runs up to N programs at once (-j N) inside the job's memory budget, with results in list order and every child killed on timeou...
 - 2026-11-03 14:45 **S2-18** engineer submit: Host acceptance passed: N=8 sleep concurrency, list-order output, crash/failure/timeout diagnostics and memory admission; default/parallel checks p...
-- 2026-11-03 14:44 **S2-18** lead answer: Yes: submit with --override 'size: scheduler, ordered output, kill-on-limit cleanup and host fixtures belong together; splitting would leave an unt...
 
 ## Cost
 
