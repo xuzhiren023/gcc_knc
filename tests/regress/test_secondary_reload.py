@@ -40,6 +40,16 @@ class SecondaryReload(unittest.TestCase):
             with self.subTest(mutation=old):
                 self.assertTrue(pressure_scan(body.replace(old, new)))
 
+        pair = body.replace('$1', '$3').replace(
+            'vbroadcastsd (%rsp), %zmm0',
+            'vloadunpacklpd (%rsp), %zmm0{%k1}')
+        self.assertEqual(pressure_scan(pair, live=False, mask_value=3), [])
+        for old, new in (('$3', '$1'), ('kmov %r15d, %k1', ''),
+                         ('%zmm0{%k1}', '%zmm0')):
+            with self.subTest(pair_mutation=old):
+                self.assertTrue(pressure_scan(pair.replace(old, new),
+                                              live=False, mask_value=3))
+
         # Mask setup using a live register is wrong even if its value is saved
         # and restored later. Cover subregisters and implicit GPR destinations.
         for write in ('movl $1, %edx', 'movb $1, %al', 'movb $1, %ah',
