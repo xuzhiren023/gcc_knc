@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-03 11:47.
+Updated automatically at every ticket change. Last update: 2026-11-03 11:51.
 
-**Next: GPT-6.1, on S2-11 (card_run follows the shared card rules and runs hello on the card).** Run `python tools/dispatch.py`, or ask the tech lead to.
+**Next: the tech lead, on S2-11.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[################----]` 23 of 28
 
@@ -49,10 +49,11 @@ Current tickets: `[################----]` 23 of 28
 | S2-08 | hello, scalar FP and printf on the card | draft | Owner approved Sprint 2 on 2026-11-03; this ticket stays draft until the card hold ends. |
 | S2-09 | GCC 16 builds gfortran, and the secondary-reload reproducer passes | Not started | Reconfiguring means one full rebuild: use `make -j8` with `CFLAGS=-O2 -g1 CXXFLAGS=-O2 -g1` as `tools/toolc... |
 | S2-10 | First card runs for the queued native checks | Not started | Owner's decision of 2026-11-03: the interactive lead runs every card job; engineer sessions have no card ac... |
-| S2-11 | card_run follows the shared card rules and runs hello on the card | In progress | Lead, under the owner's 2026-11-03 delegation: allow a sixth round for the cpuinfo snapshot cost found on t... |
+| S2-11 | card_run follows the shared card rules and runs hello on the card | Waiting for review | GREEN d9f7dd6; RED 584bd34. CPU/memory snapshots now use awk; cpuinfo read once across waits/reconnect. T0 ... |
 
 ## Recent activity
 
+- 2026-11-03 11:51 **S2-11** engineer submit: GREEN d9f7dd6; RED 584bd34. CPU/memory snapshots now use awk; cpuinfo read once across waits/reconnect. T0 counts shell builtins and utilities with...
 - 2026-11-03 11:47 **S2-11** owner decide: Lead, under the owner's 2026-11-03 delegation: allow a sixth round for the cpuinfo snapshot cost found on the card.
 - 2026-11-03 11:47 **S2-11** lead escalate: over 2 review rounds: Native run of 5ede60d by the lead at the default 10 s (job claude-e5d2c8fb..., 11 s, receipt in the lead's scratchpad): the f...
 - 2026-11-03 11:47 **S2-11** owner decide: Lead, under the owner's 2026-11-03 delegation: lead's native run follows as review changes.
@@ -60,16 +61,15 @@ Current tickets: `[################----]` 23 of 28
 - 2026-11-03 11:44 **S2-11** engineer submit: GREEN 5ede60d; RED bc5da64. Fixed kernel-thread forks in owned_pid and false faults after successful reconnect. Added dangling-link/300-thread comm...
 - 2026-11-03 11:39 **S2-11** owner decide: Lead, under the owner's 2026-11-03 delegation: allow a fifth round for the two 11:38 findings (kernel-thread forks in owned_pid/stop_owned/reap, an...
 - 2026-11-03 11:38 **S2-11** lead escalate: over 2 review rounds: Review of 24cefc3. The one-pass snapshot, named steps with stderr, the guarded reaper and the no-replay reconnect are sound. ...
-- 2026-11-03 11:34 **S2-11** engineer submit: GREEN 24cefc3/27ef954; RED e1e5cf8/8ef9669. Snapshot command counts, named stderr diagnostics, confirmed faults, one guarded cleanup reconnect and ...
 
 ## Cost
 
 - From the script, engineer: 96 sessions, 183.4M input tokens
 - From the script, lead: 95 sessions, 34.7M input tokens
-- Started by hand, Claude: 3 sessions, 260.1M input tokens
+- Started by hand, Claude: 3 sessions, 260.8M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 7.8 GiB of 100 GiB. 332 GiB free on the drive.
+The project uses 7.8 GiB of 100 GiB. 331 GiB free on the drive.
