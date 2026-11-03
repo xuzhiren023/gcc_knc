@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-03 14:08.
+Updated automatically at every ticket change. Last update: 2026-11-03 14:09.
 
-**Next: the tech lead, on S2-16.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Waiting for you:** S2-16. Run `python tools/pm.py inbox`.
 
 Current tickets: `[#############-------]` 30 of 45
 
@@ -54,7 +54,7 @@ Current tickets: `[#############-------]` 30 of 45
 | S2-13 | Card tests pass again, and approve runs them | Done | All card tests in tests/tools pass again under Cygwin Python, and pm.py approve now refuses to merge any br... |
 | S2-14 | card_run stages extra files, so one job can run a batch | Done | card_run can now stage extra files next to the program with --file (size-capped by maxStageMiB, unsafe or d... |
 | S2-15 | -ffast-math links on KNC with a KNC crtfastmath | Not started | Rewritten after the lead's card run: the donor's FTZ/DAZ write runs on KNC, so the fix provides a matching ... |
-| S2-16 | Card batch files are readable by the lead | Waiting for review | Red failed at 0700; green passed once (e6cb385, 4e85d33). Logs: .work/_state/logs/S2_16_red-20261103-140535... |
+| S2-16 | Card batch files are readable by the lead | **Waiting for you** | lead session ended without a decision (exit 0) |
 | S2-17 | card_run tolerates processes that end during a snapshot | Not started | Recurring on the shared card whenever the other agent's jobs churn. |
 | S3-01 | Packed modes and IMCI patterns in GCC 16: entry points, audit and line estimate | draft |  |
 | S3-02 | One helper for optional tools/check selections | draft |  |
@@ -70,20 +70,20 @@ Current tickets: `[#############-------]` 30 of 45
 
 ## Recent activity
 
-- 2026-11-03 14:12 **S2-15** lead note: Rewritten after the lead's card run: the donor's FTZ/DAZ write runs on KNC, so the fix provides a matching crtfastmath instead of dropping it.
+- 2026-11-03 14:09 **S2-16** lead escalate: lead session ended without a decision (exit 0)
+- 2026-11-03 14:08 **S2-15** lead note: Rewritten after the lead's card run: the donor's FTZ/DAZ write runs on KNC, so the fix provides a matching crtfastmath instead of dropping it.
 - 2026-11-03 14:07 **S2-16** engineer submit: Red failed at 0700; green passed once (e6cb385, 4e85d33). Logs: .work/_state/logs/S2_16_red-20261103-140535.log; S2_16_green-20261103-140604.log; S...
 - 2026-11-03 14:03 **S2-17** lead note: Recurring on the shared card whenever the other agent's jobs churn.
 - 2026-11-03 14:03 **S2-16** lead note: Blocks S2-08's torture run on the card; the other eight S2-08 programs already passed there.
 - 2026-11-03 13:58 **S2-15** lead note: Found while reading PhiWeather's MXCSR note at the owner's request. It runs after S2-09, because S2-09 rebuilds the shared GCC; `linux-k1om.h` is n...
 - 2026-11-03 13:35 **S2-08** lead approve: The S2-08 card batch is ready: hello, scalar FP with inexact rounding checks, printf, the compare table, the libgcc helpers and 256 torture program...
 - 2026-11-03 13:34 **S2-08** engineer submit: a26810c: dynamic shared-sysroot glibc driver, no PhiWeather path/-static/--trace; readelf INTERP and libc.so.6 PASS. Scalar donor/GCC16 twins rebui...
-- 2026-11-03 13:33 **S2-08** lead changes: 1. tools/prepare_s2_08.py:120-124: the static driver links static glibc from an absolute path into the PhiWeather folder. This project must not dep...
 
 ## Cost
 
 - From the script, engineer: 115 sessions, 211.8M input tokens
 - From the script, lead: 114 sessions, 39.1M input tokens
-- Started by hand, Claude: 3 sessions, 345.3M input tokens
+- Started by hand, Claude: 3 sessions, 345.9M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
