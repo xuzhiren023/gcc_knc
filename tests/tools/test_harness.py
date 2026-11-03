@@ -371,6 +371,20 @@ class Dispatcher(Sandbox):
         roots = json.loads(setting[0].split("=", 1)[1])
         self.assertEqual(roots, [storage.state_dir(self.root), storage.shared_area(self.root)])
 
+    def test_engineer_can_append_to_the_card_ledger_named_in_the_local_card_config(self):
+        import dispatch
+        import storage
+        ledger_dir = os.path.join(self.root, "outside", "card-coordination")
+        os.makedirs(os.path.join(self.root, "config"), exist_ok=True)
+        with open(os.path.join(self.root, "config", "card.local.json"), "w", encoding="utf8") as f:
+            json.dump({"host": "h", "ledger": os.path.join(ledger_dir, "jobs.jsonl")}, f)
+        ticket = mock.Mock(fields={"depth": "standard"})
+        board = mock.Mock(root=self.root, policy=POLICY, budget=lambda _t: POLICY["budgets"]["standard"])
+        command = dispatch.engineer_command(board, ticket, self.worktree("A-1"))
+        setting = [arg for arg in command if arg.startswith("sandbox_workspace_write.writable_roots=")]
+        roots = json.loads(setting[0].split("=", 1)[1])
+        self.assertEqual(roots, [storage.state_dir(self.root), storage.shared_area(self.root), ledger_dir])
+
     def test_policy_can_set_engineer_effort_and_service_tier(self):
         import dispatch
         ticket = mock.Mock(fields={"depth": "light"})

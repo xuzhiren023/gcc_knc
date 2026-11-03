@@ -56,7 +56,16 @@ def engineer_command(board, ticket, worktree):
     os.makedirs(storage.shared_area(board.root), exist_ok=True)
     model = board.policy.get("engineer_model")
     # Logs and the shared build area sit beside the worktree, outside what workspace-write allows by itself.
-    writable = "sandbox_workspace_write.writable_roots=" + json.dumps([storage.state_dir(board.root), storage.shared_area(board.root)])
+    roots = [storage.state_dir(board.root), storage.shared_area(board.root)]
+    # The card job ledger is shared with another project's agent, so it lives outside both (owner, 2026-11-03).
+    try:
+        with open(os.path.join(board.root, "config", "card.local.json"), encoding="utf8") as f:
+            ledger = json.load(f).get("ledger")
+    except (OSError, ValueError):
+        ledger = None
+    if ledger:
+        roots.append(os.path.dirname(os.path.abspath(ledger)))
+    writable = "sandbox_workspace_write.writable_roots=" + json.dumps(roots)
     return [codex, "exec"] + (["-m", model] if model else []) + ["--json", "--ephemeral", "-C", worktree, "--sandbox", "workspace-write",
             "--dangerously-bypass-hook-trust", "-c", trust, "-c", writable, "-c", 'approval_policy="never"',
             "-c", 'model_reasoning_effort="%s"' % effort] + (["-c", 'service_tier="%s"' % tier] if tier else []) + [
