@@ -1,17 +1,17 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-03 09:25.
+Updated automatically at every ticket change. Last update: 2026-11-03 09:27.
 
-**Next: the tech lead, on S2-04.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: GPT-6.1, on S2-05 (x87 compares and zmm spill alignment).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
-Current tickets: `[###############-----]` 20 of 26
+Current tickets: `[################----]` 21 of 26
 
 ## Milestones
 
 | | Milestone | State | Progress |
 |---|---|---|---|
 | M0 | Foundation | In progress | 17 of 17 tickets |
-| M1 | Mixed native code | In progress | 3 of 9 tickets |
+| M1 | Mixed native code | In progress | 4 of 9 tickets |
 | M2 | Useful vector target | Not started | Not planned in detail yet |
 | M3 | Runtimes | Not started | Not planned in detail yet |
 | M4 | Broad optimization | Not started | Not planned in detail yet |
@@ -42,7 +42,7 @@ Current tickets: `[###############-----]` 20 of 26
 | S2-01 | Design for zmm and mask registers under -march=knc | Done | The register design for KNC is settled on paper: all 32 zmm and 8 mask registers become usable under -march... |
 | S2-02 | Float and double arguments and results in zmm lane 0 | Done | GCC 16 for KNC now passes float and double arguments and results in zmm lane 0, puts them on the stack afte... |
 | S2-03 | Varargs with the donor's register save area | Done | GCC 16 varargs functions now check %al and save the FP argument registers to the SysV save area at fp_offse... |
-| S2-04 | Scalar transfers through memory and mask scratch | Waiting for review | bd4185f / GCC ec5ace1e3c8: red 5f6d762 exposed u64-to-DF O2 and TF O1/O2 reload ICEs. Fixed SUBREG handling... |
+| S2-04 | Scalar transfers through memory and mask scratch | Done | Scalar values now move between general and vector registers through memory with an allocated mask scratch, ... |
 | S2-05 | x87 compares and zmm spill alignment | Not started | Follow docs/adr/0004-knc-registers-and-scalar-abi.md, point 2: XI spills need 64-byte storage. This ticket ... |
 | S2-06 | Atomics without cmpxchg16b, spin hint by delay | Not started | Owner approved Sprint 2 on 2026-11-03; ticket set to ready. |
 | S2-07 | GCC 16 builds its own static libgcc for k1om | Not started | Owner approved Sprint 2 on 2026-11-03; ticket set to ready. |
@@ -51,6 +51,7 @@ Current tickets: `[###############-----]` 20 of 26
 
 ## Recent activity
 
+- 2026-11-03 09:27 **S2-04** lead approve: Scalar values now move between general and vector registers through memory with an allocated mask scratch, even with 14 general registers live, inc...
 - 2026-11-03 09:24 **S2-04** engineer submit: bd4185f / GCC ec5ace1e3c8: red 5f6d762 exposed u64-to-DF O2 and TF O1/O2 reload ICEs. Fixed SUBREG handling via true_regnum; limited memory excepti...
 - 2026-11-03 09:20 **S2-09** lead note: Reconfiguring means one full rebuild: use `make -j8` with `CFLAGS=-O2 -g1 CXXFLAGS=-O2 -g1` as `tools/toolchain.py` does, and poll quietly. Keep `a...
 - 2026-11-03 09:20 **S2-09** owner decide: Owner chose to add Fortran to the GCC 16 build in Sprint 2 (2026-11-03); S2-04 closes on its C tests and its reproducer item moves here.
@@ -58,7 +59,6 @@ Current tickets: `[###############-----]` 20 of 26
 - 2026-11-03 09:15 **S2-04** lead escalate: over 2 review rounds: The C pressure green is real, but the patch turns off secondary memory for every KNC cross-bank move while the new hook cover...
 - 2026-11-03 09:12 **S2-04** engineer submit: At 4b7175f / GCC de5da75758f ran tools/check t0 t1 t2 --compiler gcc16 once: T0 29 tests and all 8 C pressure cases pass. Overall exit 1: gfortran ...
 - 2026-11-03 09:10 **S2-04** owner decide: Owner raised the limit to 8 engineer sessions on 2026-11-03. Follow the lead's earlier answer: rerun the C checks at your head and submit the C green.
-- 2026-11-03 09:04 **S2-04** engineer escalate: budget: 4 engineer sessions used; the budget is 4
 
 ## Cost
 
@@ -70,4 +70,4 @@ Current tickets: `[###############-----]` 20 of 26
 
 ## Disk
 
-The project uses 9.3 GiB of 100 GiB. 308 GiB free on the drive.
+The project uses 9.3 GiB of 100 GiB. 307 GiB free on the drive.
