@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-03 08:25.
+Updated automatically at every ticket change. Last update: 2026-11-03 08:59.
 
-**Next: GPT-6.1, on S2-04 (Scalar transfers through memory and mask scratch).** Run `python tools/dispatch.py`, or ask the tech lead to.
+**Next: the tech lead, on S2-04.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[################----]` 20 of 25
 
@@ -42,7 +42,7 @@ Current tickets: `[################----]` 20 of 25
 | S2-01 | Design for zmm and mask registers under -march=knc | Done | The register design for KNC is settled on paper: all 32 zmm and 8 mask registers become usable under -march... |
 | S2-02 | Float and double arguments and results in zmm lane 0 | Done | GCC 16 for KNC now passes float and double arguments and results in zmm lane 0, puts them on the stack afte... |
 | S2-03 | Varargs with the donor's register save area | Done | GCC 16 varargs functions now check %al and save the FP argument registers to the SysV save area at fp_offse... |
-| S2-04 | Scalar transfers through memory and mask scratch | In progress | S2-04 red is accepted: the 8 mixed-pressure C cases (SI/DI/SF/DF at -O1/-O2) fail in GCC 16 reload, the don... |
+| S2-04 | Scalar transfers through memory and mask scratch | Question for the tech lead | Green at 4b7175f / GCC de5da75758f: all-gcc passes; all 8 pressure cases pass compile, assembly, lint and a... |
 | S2-05 | x87 compares and zmm spill alignment | Not started | Follow docs/adr/0004-knc-registers-and-scalar-abi.md, point 2: XI spills need 64-byte storage. This ticket ... |
 | S2-06 | Atomics without cmpxchg16b, spin hint by delay | Not started | Owner approved Sprint 2 on 2026-11-03; ticket set to ready. |
 | S2-07 | GCC 16 builds its own static libgcc for k1om | Not started | Owner approved Sprint 2 on 2026-11-03; ticket set to ready. |
@@ -50,6 +50,7 @@ Current tickets: `[################----]` 20 of 25
 
 ## Recent activity
 
+- 2026-11-03 08:59 **S2-04** engineer ask: Green at 4b7175f / GCC de5da75758f: all-gcc passes; all 8 pressure cases pass compile, assembly, lint and address/mask scans. T2 host reference and...
 - 2026-11-03 08:25 **S2-04** lead approve-red: S2-04 red is accepted: the 8 mixed-pressure C cases (SI/DI/SF/DF at -O1/-O2) fail in GCC 16 reload, the donor's 4 lost address setups are detected,...
 - 2026-11-03 08:24 **S2-04** engineer red: Red 93c13d6 exposes preinitialized-r10 and rbp address holes; fix e42a096 accepts only rsp or r15 written inside barriers. Two scanner tests pass. ...
 - 2026-11-03 08:22 **S2-04** lead changes: Red at ea7dd4a is real: all 8 C cases ICE in reload, and the donor shows the 4 lost addresses. One gap in the scanner is left. (1) pressure_scan tr...
@@ -57,7 +58,6 @@ Current tickets: `[################----]` 20 of 25
 - 2026-11-03 08:18 **S2-04** lead changes: Red does not yet prove the right failure. (1) The C probe has no correct green. All 15 GPRs are hard-bound locals that stay live across both asms, ...
 - 2026-11-03 08:16 **S2-04** engineer red: Red 4780b90: 2 scanner mutation tests pass. Donor T1 finds all 4 expected lost-address pairs. GCC16 C pressure ICEs during reload at -O1/-O2 (90 ge...
 - 2026-11-03 08:13 **S2-03** lead approve: GCC 16 varargs functions now check %al and save the FP argument registers to the SysV save area at fp_offset 48 the same way the donor does, and va...
-- 2026-11-03 08:12 **S2-03** engineer submit: Fixed missing Runner.args guards for varargs_abi in T1/T2 and scalar_abi in T1; commit 7920746. Ran python tools/check t0 through its tools/run.py ...
 
 ## Cost
 
@@ -69,4 +69,4 @@ Current tickets: `[################----]` 20 of 25
 
 ## Disk
 
-The project uses 7.7 GiB of 100 GiB. 315 GiB free on the drive.
+The project uses 9.3 GiB of 100 GiB. 312 GiB free on the drive.
