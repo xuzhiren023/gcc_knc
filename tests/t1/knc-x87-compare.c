@@ -4,7 +4,7 @@
    For eventual tools/card_run validation, compile this file with COMPARE_MAIN.
    COMPARE_DRIVER builds only the table driver, to link emitted assembly. */
 #define FORMS(M, T, S) \
-  M(T,S,eq, a == b,0) M(T,S,ne, a != b,0) \
+  M(T,S,eq, a == b,1) M(T,S,ne, a != b,1) \
   M(T,S,lt, a < b,0) M(T,S,le, a <= b,0) \
   M(T,S,gt, a > b,0) M(T,S,ge, a >= b,0) \
   M(T,S,isless,__builtin_isless(a,b),1) \
@@ -59,14 +59,14 @@ static int table_##S(void) \
     for(i=0;i<7;++i) for(j=0;j<7;++j) \
       { \
         unsigned short status; \
-        int got; \
+        int got, invalid_expected = !ops[n].quiet && (i==0 || j==0); \
         __asm__ volatile("fnclex" ::: "memory"); \
         got=ops[n].fn(&values[i],&values[j]); \
         __asm__ volatile("fnstsw %0" : "=a"(status) :: "memory"); \
-        if(got!=expected(n,i,j) || (ops[n].quiet && (status&1))) \
+        if(got!=expected(n,i,j) || (status&1)!=invalid_expected) \
           { \
-            printf("FAIL " #S " %s %u %u got=%d expected=%d invalid=%u\n", \
-              ops[n].name,i,j,got,expected(n,i,j),status&1); \
+            printf("FAIL " #S " %s %u %u got=%d expected=%d invalid=%u expected_invalid=%d\n", \
+              ops[n].name,i,j,got,expected(n,i,j),status&1,invalid_expected); \
             ++failures; \
           } \
       } \

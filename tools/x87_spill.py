@@ -1,8 +1,10 @@
 """S2-05 T1: python tools/check.py t1 --compiler gcc16 --x87-spill.
 
-Compare instruction families with the donor and exercise unchanged emitted
+Check signaling/quiet instruction families and exercise unchanged emitted
 x87/integer instructions using a SysV host driver. This is host T1 validation,
 not native KNC validation. The C fixture also supplies the eventual card table.
+The donor is a missing-compare sanity check and an expected-red invalid-flag
+table: its legacy quiet relational compares must not dictate GCC 16 semantics.
 Simulate XI spill addresses for all four possible 16-byte incoming alignments;
 do not add -mstackrealign or an aligned local that could mask a backend defect.
 """
@@ -14,6 +16,7 @@ from scalar_abi import allowlist, instructions
 
 FORMS = ('eq ne lt le gt ge isless islessequal isgreater isgreaterequal '
          'islessgreater isunordered isordered unlt unle ungt unge').split()
+SIGNALING = ('lt', 'le', 'gt', 'ge', 'unlt', 'unle', 'ungt', 'unge')
 COMPARE = re.compile(r'^(?:fu?com)(?:p{0,2}|p?[sl])$')
 
 
@@ -29,9 +32,12 @@ def compare_scan(body, donor, form):
     reference = [op for op, _ in instructions(donor) if COMPARE.fullmatch(op)]
     if not actual or not reference:
         failures.append('missing x87 compare (actual=%s donor=%s)' % (actual, reference))
-    elif [op.startswith('fu') for op in actual] != [op.startswith('fu') for op in reference]:
-        failures.append('compare family %s; donor %s' % (actual, reference))
-    if form in ('eq', 'ne') or form.startswith('is'):
+    # C Annex F relational operators signal invalid even on quiet NaNs;
+    # negating their boolean result does not change that exception behavior.
+    if form in SIGNALING:
+        if not actual or any(not op.startswith('fcom') for op in actual):
+            failures.append('signaling comparison requires fcom family')
+    else:
         if not actual or any(not op.startswith('fucom') for op in actual):
             failures.append('quiet comparison requires fucom family')
     if not any(op == 'fnstsw' for op, _ in instructions(body)):
@@ -152,7 +158,25 @@ def host_table(runner, asm, source, tag):
         return
     result = runner.command(executable, check=False)
     runner.say('Host x87 table (' + tag + ', not a card result):\n' + result.stdout)
-    runner.result('t1 ' + tag + ' host emitted-code results / quiet-NaN invalid flag',
+    if tag == 'donor':
+        # Require exactly the known legacy defect, not an arbitrary failed run.
+        expected = {(mode, form, str(i), str(j))
+                    for mode in ('sf', 'df', 'xf') for form in SIGNALING
+                    for i in range(7) for j in range(7) if i == 0 or j == 0}
+        observed, unexpected = set(), []
+        for line in result.stdout.splitlines():
+            match = re.fullmatch(r'FAIL (sf|df|xf) (\w+) ([0-6]) ([0-6]) '
+                                 r'got=([01]) expected=([01]) invalid=0 expected_invalid=1', line)
+            if match and match[5] == match[6]:
+                observed.add(match.group(1, 2, 3, 4))
+            elif line not in ('TABLE %s checks=833 failures=104' % mode
+                              for mode in ('sf', 'df', 'xf')):
+                unexpected.append(line)
+        failures = [] if result.returncode == 1 and observed == expected and not unexpected else [
+            'donor did not fail solely for missing signaling invalid flags']
+        runner.result('t1 donor reported expected-red: 312 missing signaling invalid flags', failures)
+        return
+    runner.result('t1 ' + tag + ' host emitted-code IEEE results / invalid flag',
                   [] if result.returncode == 0 else ['table exit ' + str(result.returncode)])
 
 
@@ -179,7 +203,7 @@ def t1(runner):
                 name = 'cmp_' + mode + '_' + form
                 body, donor = (runner.function_body(assemblies[t], name)
                                for t in ('gcc16', 'donor'))
-                runner.result('t1 ' + name + ' donor compare family / status',
+                runner.result('t1 ' + name + ' signaling/quiet family / status (donor presence)',
                     compare_scan(body, donor, form) if body and donor else ['missing function'])
     for high in (16, 31):
         asm = output / ('xi-spill-zmm%d.s' % high)
