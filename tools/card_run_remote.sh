@@ -110,7 +110,7 @@ snapshot() {
                 name = ""; lines = 0
                 while ((getline part < file) > 0) {
                     gsub(/[\t\r]/, "?", part)
-                    name = name (lines++ ? "?" : "") part
+                    name = name "" (lines++ ? "?" : "") part
                 }
                 close(file)
                 file = "/proc/" pid "/status"
