@@ -2,6 +2,7 @@
 import io
 from pathlib import Path
 import runpy
+import shlex
 import shutil
 import subprocess
 import tempfile
@@ -64,20 +65,66 @@ class CardBackend(unittest.TestCase):
         self.assertIn("cat > claude-program", command[-1])
         self.assertNotIn("base64", command[-1])
 
-    def test_base64_output_replaced_with_od_hex_binary_roundtrip(self):
-        data = bytes(range(256)) + b"\x00\xff\n"
-        self.session.rpc.side_effect = [b"", data.hex().encode(), b"", b"0", b"", b""]
+    def test_output_binary_roundtrip_rejects_busybox_head_c_and_od_A(self):
+        directory = Path(self.session.run_dir)
+        directory.mkdir(parents=True)
+        self.addCleanup(shutil.rmtree, directory)
+        data = bytes(range(256)) * 513 + b"\x00\xff\n"
+        errors = b"stderr\x00\xff\n\n"
+        (directory / "expected.stdout").write_bytes(data)
+        (directory / "expected.stderr").write_bytes(errors)
+        boot_file = directory / "boot_id"
+        boot_file.write_text(self.session.boot_id + "\n")
+        # Real local shell transport, with the two native-reported unsupported
+        # options rejected. Raw download SSH commands use this same fake card.
+        busybox = '''
+head() { [ "$1" != -c ] || { echo 'head: invalid option -- c' >&2; return 94; }; command head "$@"; }
+od() { case "$*" in *-A*) echo 'od: invalid option -- A' >&2; return 94;; esac; command od "$@"; }
+'''
+        setup = (self.remote + busybox + '\nrun_dir=%s\nboot_id=%s\ncd -- "$run_dir"\n' %
+                 (shlex.quote(self.session.run_dir), shlex.quote(self.session.boot_id)))
+        setup += ('start_job() { cp expected.stdout stdout; cp expected.stderr stderr; '
+                  ': > claude-pinned; echo 0 > status; };\n')
+
+        def rpc(script, timeout, **kwargs):
+            answer = subprocess.run([shutil.which("sh"), "-c", (setup + script).replace(
+                "/proc/sys/kernel/random/boot_id", str(boot_file))],
+                stdout=subprocess.PIPE, stderr=subprocess.PIPE, timeout=timeout)
+            if answer.returncode:
+                raise OSError(answer.stderr.decode("utf8", "replace"))
+            return answer.stdout.rstrip(b"\n")
+
+        self.session.rpc = rpc
+        self.session.command = ["fake-ssh", "exec sh"]
+        actual_popen = subprocess.Popen
+        downloads = []
+
+        def popen(command, **kwargs):
+            if command[0] != "fake-ssh":
+                return actual_popen(command, **kwargs)
+            script = shlex.split(command[-1])[-1]
+            downloads.append(script)
+            script = script.replace("/proc/sys/kernel/random/boot_id", str(boot_file))
+            return actual_popen([shutil.which("sh"), "-c", busybox + script], **kwargs)
+
         stdout, stderr = io.BytesIO(), io.BytesIO()
-        with mock.patch("sys.stdout", mock.Mock(buffer=stdout)), \
+        status, failure = None, None
+        with mock.patch.object(self.runner["subprocess"], "Popen", side_effect=popen), \
+                mock.patch("sys.stdout", mock.Mock(buffer=stdout)), \
                 mock.patch("sys.stderr", mock.Mock(buffer=stderr)):
-            status = self.session.execute(self.session.run_dir, [], timeout=5, card_timeout=10,
-                                          cpus=[4, 13, 91], memory_mb=128)
-        self.assertEqual(status, 0)
+            try:
+                status = self.session.execute(self.session.run_dir, [], timeout=10, card_timeout=15,
+                                              cpus=[4, 13, 91], memory_mb=128)
+            except OSError as error:
+                failure = str(error)
+        self.assertEqual(status, 0, failure)
         self.assertEqual(stdout.getvalue(), data)
-        self.assertEqual(stderr.getvalue(), b"")
-        scripts = "\n".join(c.args[0] for c in self.session.rpc.call_args_list)
-        self.assertIn("od -An -v -tx1", scripts)
-        self.assertNotIn("base64", scripts)
+        self.assertEqual(stderr.getvalue(), errors)
+        self.assertTrue(downloads, "output must use a separate binary SSH stream")
+        for script in downloads:
+            self.assertIn("guard_boot", script)
+            self.assertNotIn("head -c", script)
+            self.assertNotIn("od -A", script)
 
     def test_helper_launch_replaces_taskset_and_unmounted_cgroups(self):
         self.assertIn('./claude-pin "$job_cpus" "$job_memory"', self.remote)

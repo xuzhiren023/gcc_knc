@@ -197,6 +197,26 @@ class RemoteReview(unittest.TestCase):
             "/proc/", str(self.proc) + "/")
         return logical, physical, remote
 
+    def test_snapshot_physical_run_dir_excludes_our_watchdog_and_program(self):
+        logical, physical, remote = self.symlink_tmp()
+        job = "claude-" + "a" * 32
+        run_dir = logical / "claude" / job
+        physical_dir = physical / "claude" / job
+        # Snapshot must work before staging creates the directory too.
+        self.process(42, 1, cwd=str(physical_dir), exe="/bin/sleep")
+        self.process(43, 1, exe=str(physical_dir / "claude-program"))
+        self.process(44, 1, cwd=str(physical_dir) + "-foreign")
+        self.process(45, 1, exe=str(run_dir / "claude-program"))
+        answer = self.shell(remote + '\nrun_dir="%s"\nsnapshot\n' % run_dir)
+        self.assertEqual(answer.returncode, 0, answer.stderr)
+        session = object.__new__(self.runner["SSHSession"])
+        session.boot_id = None
+        session.rpc = mock.Mock(return_value=answer.stdout.rstrip(b"\n"))
+        snapshot = session.snapshot(timeout=1)
+        foreign = self.runner["foreign_processes"](snapshot, str(run_dir), set())
+        self.assertEqual([p["pid"] for p in foreign], ["44"], foreign)
+        self.assertEqual(snapshot.get("physical_run_dir"), str(physical_dir))
+
     def test_tmp_symlink_guard_owned_identity_and_cleanup(self):
         logical, physical, remote = self.symlink_tmp()
         job = "claude-" + "a" * 32
