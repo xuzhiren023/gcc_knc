@@ -1,5 +1,16 @@
 /* XImode transport does not advertise a packed vector ABI in Sprint 2. */
-#if defined(ABI_VECTOR_PARAMETER) || defined(ABI_VECTOR_RESULT) || defined(ABI_VECTOR_FIELD)
+#if defined(ABI_VECTOR32_PARAMETER)
+typedef int abi_vector32 __attribute__((vector_size(32)));
+int abi_vector32_parameter(abi_vector32 x) { return x[0]; }
+#elif defined(ABI_VECTOR1_PARAMETER) || defined(ABI_VECTOR1_RESULT)
+typedef signed char abi_vector1 __attribute__((vector_size(1)));
+#if defined(ABI_VECTOR1_PARAMETER)
+int abi_vector1_parameter(abi_vector1 x) { return x[0]; }
+#else
+extern abi_vector1 abi_vector1_value;
+abi_vector1 abi_vector1_result(void) { return abi_vector1_value; }
+#endif
+#elif defined(ABI_VECTOR_PARAMETER) || defined(ABI_VECTOR_RESULT) || defined(ABI_VECTOR_FIELD)
 typedef int abi_vector __attribute__((vector_size(64)));
 #if defined(ABI_VECTOR_PARAMETER)
 int abi_vector_parameter(abi_vector x) { return x[0]; }

@@ -205,8 +205,22 @@ def t1_vector_diagnostics(runner):
                                                or 'unsupported vector ABI accepted'])
 
 
+def t1_vector_compatibility(runner):
+    source = runner.source_dir / 'knc-abi-mixed.c'
+    for case in ('VECTOR32_PARAMETER', 'VECTOR1_PARAMETER', 'VECTOR1_RESULT'):
+        for level in ('-O0', '-O2'):
+            compiled = runner.command(
+                runner.cc, *runner.cc_flags, level, '-march=knc',
+                '-DABI_' + case, '-S', source,
+                '-o', runner.out / 'vector.s', check=False)
+            runner.result('t1 KNC preserves ' + case.lower() + ' ' + level,
+                          [] if compiled.returncode == 0 and not compiled.stdout.strip()
+                          else [compiled.stdout[-1800:] or 'compile failed'])
+
+
 def t1(runner):
     t1_vector_diagnostics(runner)
+    t1_vector_compatibility(runner)
     for source in sorted(runner.source_dir.glob('knc-abi-*.c')):
         for level in ('-O0', '-O2', '-Os'):
             if source.name == 'knc-abi-structs.c' and level == '-O0':
