@@ -205,9 +205,10 @@ def t1_vector_diagnostics(runner):
                                                or 'unsupported vector ABI accepted'])
 
 
-def t1_vector_compatibility(runner):
+def t1_vector_compatibility(runner, cases=('VECTOR32_PARAMETER', 'VECTOR1_PARAMETER',
+                                         'VECTOR1_RESULT')):
     source = runner.source_dir / 'knc-abi-mixed.c'
-    for case in ('VECTOR32_PARAMETER', 'VECTOR1_PARAMETER', 'VECTOR1_RESULT'):
+    for case in cases:
         for level in ('-O0', '-O2'):
             asm = runner.out / 'vector.s'
             compiled = runner.command(

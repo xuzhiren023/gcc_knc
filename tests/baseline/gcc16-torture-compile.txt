@@ -9,13 +9,13 @@ FP ABI class requires every compiler error to be the explicit SSE-disabled ABI d
 User inline asm rejected requires every assembler error inside #APP/#NO_APP; source lint must be clean.
 Timeout policy: 60s, then one 600s compiler retry; both exceeded = hang.
 Slow is an additional timing class: retry completed; underlying outcome is counted too.
-Whole-run wall time: 608.398 seconds (10.140 minutes), 8 workers.
+Whole-run wall time: 679.746 seconds (11.329 minutes), 8 workers.
 Files: 2003; measurements: 6009.
 
 level	pass	slow	hang	ICE	compiler error	float/double ABI error	assembler rejection	lint failure	infrastructure failure	user inline asm rejected
-O0	1962	0	0	0	39	0	0	0	0	2
-O2	1963	0	0	0	38	0	0	0	0	2
-O2-g	1963	0	0	0	38	0	0	0	0	2
+O0	1967	0	0	0	34	0	0	0	0	2
+O2	1968	0	0	0	33	0	0	0	0	2
+O2-g	1968	0	0	0	33	0	0	0	0	2
 
 O0 / slow (0)
 
@@ -23,7 +23,7 @@ O0 / hang (0)
 
 O0 / ICE (0)
 
-O0 / compiler error (39)
+O0 / compiler error (34)
 20030305-1.c
 20111209-1.c
 asmgoto-5.c
@@ -42,13 +42,9 @@ pr110386-2.c
 pr28865.c
 pr29201.c
 pr33614.c
-pr33617.c
 pr34856.c
 pr39928-1.c
 pr48767.c
-pr70061.c
-pr70240.c
-pr70355.c
 pr83547.c
 pr86637-2.c
 pr88347.c
@@ -62,7 +58,6 @@ vector-3.c
 vector-5.c
 vector-6.c
 vector-dup-1.c
-vector-shift-1.c
 
 O0 / float/double ABI error (0)
 
@@ -82,7 +77,7 @@ O2 / hang (0)
 
 O2 / ICE (0)
 
-O2 / compiler error (38)
+O2 / compiler error (33)
 20030305-1.c
 20111209-1.c
 dll.c
@@ -100,13 +95,9 @@ pr110386-2.c
 pr28865.c
 pr29201.c
 pr33614.c
-pr33617.c
 pr34856.c
 pr39928-1.c
 pr48767.c
-pr70061.c
-pr70240.c
-pr70355.c
 pr83547.c
 pr86637-2.c
 pr88347.c
@@ -120,7 +111,6 @@ vector-3.c
 vector-5.c
 vector-6.c
 vector-dup-1.c
-vector-shift-1.c
 
 O2 / float/double ABI error (0)
 
@@ -140,7 +130,7 @@ O2-g / hang (0)
 
 O2-g / ICE (0)
 
-O2-g / compiler error (38)
+O2-g / compiler error (33)
 20030305-1.c
 20111209-1.c
 dll.c
@@ -158,13 +148,9 @@ pr110386-2.c
 pr28865.c
 pr29201.c
 pr33614.c
-pr33617.c
 pr34856.c
 pr39928-1.c
 pr48767.c
-pr70061.c
-pr70240.c
-pr70355.c
 pr83547.c
 pr86637-2.c
 pr88347.c
@@ -178,7 +164,6 @@ vector-3.c
 vector-5.c
 vector-6.c
 vector-dup-1.c
-vector-shift-1.c
 
 O2-g / float/double ABI error (0)
 
@@ -191,3 +176,32 @@ O2-g / infrastructure failure (0)
 O2-g / user inline asm rejected (2)
 920520-1.c; reason: every assembler error is inside #APP/#NO_APP
 920521-1.c; reason: every assembler error is inside #APP/#NO_APP
+
+Non-front-end compiler diagnostic audit (all levels unless noted):
+SSE/AVX/MMX options rejected with knc: pr106433.c, pr110386-2.c,
+  pr89235.c, pr97576.c.
+Foreign cpu tuning: pr88347.c (-mtune=603e).
+Invalid SI pointer mode: 20111209-1.c.
+Invalid MIPS register names: mipscop-1.c, mipscop-2.c, mipscop-3.c, mipscop-4.c.
+Impossible asm constraints: asmgoto-5.c (O0 only).
+Graphite unavailable because isl is absent: pr86637-2.c.
+Other compiler-error files have front-end C diagnostics.
+The float/double ABI class is zero; packed vector diagnostics are separate:
+  64-byte vector ABI (pr108892.c); reason: ADR-0004 admits XImode for
+    scalar transport, not packed vector arguments. classify_argument rejects
+    VECTOR_TYPE with XImode before the vector-mode assertion, without an ICE.
+  8- and 16-byte vectors formerly in the float/double ABI class
+    (pr100305.c, pr10153-1.c, pr10153-2.c, pr108237.c, pr33614.c,
+    pr39928-1.c, pr92618.c, pr99647.c, vector-1.c, vector-2.c,
+    vector-3.c, vector-5.c, vector-6.c, vector-dup-1.c); reason:
+    construct_container's TARGET_KNC check rejects packed vector register
+    modes with 'unsupported KNC register ABI mode'; packed vector ABI is E3.
+  pr34856.c; reason: its 16-byte qword vector argument at line 13 reaches
+    construct_container's packed vector register-mode check, independently
+    of classify_argument's XImode guard. The call gives 'unsupported KNC
+    register ABI mode' at O0, O2 and O2-g, without an ICE. Evidence:
+    .work/_shared/torture-compile/{O0,O2,O2-g}/pr34856.c.log and
+    gcc/config/i386/i386.cc:construct_container.
+pr33617.c, pr70061.c, pr70240.c, pr70355.c and vector-shift-1.c pass at
+  every level after narrowing classify_argument's rejection to XImode.
+pr113322-1.c and pr116348.c pass at all levels with selected options skipped.
