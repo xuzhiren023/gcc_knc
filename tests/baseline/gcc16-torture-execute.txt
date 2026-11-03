@@ -1,0 +1,11 @@
+S2-08 first execute subset: GCC 16 -O2 -march=knc
+Selection: first 256 top-level *.c in lexical filename order, before compilation.
+Unselected dg-options/dg-additional-options applied as in S1-05; other dg directives ignored.
+Link flags: -lm, GCC 16 own static libgcc; no donor -B or generated linker scripts.
+Counts: linked=256
+Stage bytes including helper and 64 KiB watchdog reserve: 9833869 / 67108864
+Complete per-source compile/link results: .work/_shared/tmp/S2-08/compile.tsv
+Diagnostics: same directory, <source-stem>.build.log
+Native results: NOT RUN; lead runs run-torture.sh (all --file arguments included).
+
+Nonlinked files:

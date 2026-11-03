@@ -158,3 +158,71 @@ outputs, and the compiler commit above; do not fix compiler behavior here.
 
 The lead ticks the other tickets' native lines only after their corresponding
 native comparisons pass.
+
+## S2-08: GCC 16 own-runtime batch prepared for the lead
+
+Native status: **NOT RUN by this engineer**. This is the host preparation
+handoff requested by S2-08; every card invocation belongs to the interactive
+lead. GCC source/build is the merged `6ea9258d818` (S2-07), with its own
+`gcc-build/gcc/libgcc.a`, `crtbegin.o` and `crtend.o`. There is no donor `-B`
+or test-written `*_asneeded` script in this batch.
+
+The retained handoff is `.work/_shared/tmp/S2-08/batch.txt`, in S2-10's TSV
+format. It lists nine jobs: donor and GCC 16 twins of hello, scalar arithmetic
+in float/double/long double, and printf of int/double/long double; the S2-05
+compare table; the S2-07 integer/soft-float helpers; and `claude-torture`.
+The arithmetic exercises addition, subtraction, multiplication and division
+without fast math or FP contraction. Each of the nine jobs has its own
+expected-output file.
+
+Hello/scalar/printf expectations currently come from host executions of the
+same sources. **The lead must run each donor twin first and confirm or replace
+its expected output with donor stdout before comparing its GCC 16 twin.** No
+donor native output has been invented. The comparison reference uses S2-05's
+host adapter for the emitted x87 functions and the independent integer-rank
+oracle: 833 checks per type, 2499 total, zero failures including invalid flags.
+The helper reference is a host run of S2-07's unchanged fixture: four integer
+lines and one soft-float line, including infinities, NaN and a denormal.
+
+The torture selection is the first 256 top-level `gcc.c-torture/execute/*.c`
+in lexical filename order, `20000112-1.c` through `20031201-1.c`, chosen before
+compilation. All 256 compile and link at `-O2 -march=knc`, with `-lm` and GCC
+16's own libgcc. Unselected `dg-options` and `dg-additional-options` are
+applied as in S1-05; directives with target selectors are ignored. The tracked
+summary is `tests/baseline/gcc16-torture-execute.txt`; `compile.tsv` in the
+handoff directory records every source, result, staged filename and option.
+Per-source `.build.log` files retain warnings and link diagnostics there.
+
+`claude-torture` is statically linked by GCC 16 against its own libgcc and the
+retained bootstrap static glibc, referenced in place. Readelf reports no
+interpreter or NEEDED library. It reads `claude-torture.list`, runs each child
+in a separate owned process group with a two-second wall limit, disables core
+dumps and prints exactly one `PASS`/`FAIL`/`TIMEOUT name` line per child on
+stdout. Failure diagnostics and raw wait status go to stderr before cleanup;
+exit is 1 if any child fails or times out, 125 for driver infrastructure errors.
+The host check exercised all three classifications and preserved failure
+diagnostics. It is a driver check, not native KNC validation.
+
+For the torture row, run `bash .work/_shared/tmp/S2-08/run-torture.sh` from
+the merged checkout under Cygwin. The script invokes only `tools/card_run`,
+with all 257 extra files supplied through S2-14's `--file`, a 542-second
+execution limit and a 900-second transport limit for the many sequential
+uploads. Use the configured 128 MiB memory limit from the batch. Driver,
+tests, manifest and runner helper total 9,833,869 bytes including a 64 KiB
+watchdog reserve, below the configured 67,108,864-byte staging cap. Children
+inherit the runner's affinity and per-process memory limit.
+
+The lead records byte-exact stdout comparisons, exit status, boot IDs and
+card minutes here. For each torture failure, retain its stderr/source and
+classify it as a compiler bug, a test needing a missing runtime, or a test for
+another target. There are currently no native results or native failure
+classifications. Stop on runner refusal or infrastructure failure.
+
+Host logs in `.work/_state/logs/`: `S2_08_prepare-20261103-132843.log`
+(basic builds/references passed; Cygwin GCC ICE compiling the combined host
+compare fixture), `S2_08_remaining-20261103-132911.log` (adapter reference,
+helper reference, initial driver and 256/256 compile/link PASS), and
+`S2_08_driver_final-20261103-133100.log` (final static driver and host outcome
+checks PASS). A separate host-driver check initially lacked the Cygwin DLL
+PATH; `S2_08_driver-20261103-133002.log` records that infrastructure failure.
+Passing program builds and the 256-test sweep were not repeated.
