@@ -1,17 +1,17 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-03 18:27.
+Updated automatically at every ticket change. Last update: 2026-11-03 18:29.
 
-**Next: the tech lead, on S3-12.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: GPT-6.1, on S3-06 (Packed FP add, sub, mul, FMA and broadcasts for V16SF and V8DF).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
-Current tickets: `[################----]` 41 of 51
+Current tickets: `[################----]` 42 of 51
 
 ## Milestones
 
 | | Milestone | State | Progress |
 |---|---|---|---|
 | M0 | Foundation | In progress | 17 of 17 tickets |
-| M1 | Mixed native code | In progress | 24 of 33 tickets |
+| M1 | Mixed native code | In progress | 25 of 33 tickets |
 | M2 | Useful vector target | In progress | 0 of 1 tickets |
 | M3 | Runtimes | Not started | Not planned in detail yet |
 | M4 | Broad optimization | Not started | Not planned in detail yet |
@@ -69,7 +69,7 @@ Current tickets: `[################----]` 41 of 51
 | S3-09 | Packed integer add, sub, mul, logic and broadcast for V16SI; logic for V8DI | draft | Moved to Sprint 4 by the owner on 2026-11-03, on the lead's recommendation: m1_affine is float and double o... |
 | S3-10 | Card batch for Sprint 3 and m1_affine | Not started | Also add (1) S3-14's TLS and S3-15's complex and rounding cross-checks, built after both merge (objects bui... |
 | S3-11 | Milestone M1 note: fixture, line counts, ICE classes and backend cost comparison | Not started | Owner approved Sprint 3 on 2026-11-03; ticket set to ready. |
-| S3-12 | tools/portability: forward-port drill and x86_64 unchanged check | Waiting for review | Review fixes complete in baff875 and 33c28fd. Changed fake-cc1 tests passed (2); make refusal passed in red... |
+| S3-12 | tools/portability: forward-port drill and x86_64 unchanged check | Done | tools/portability.py now checks whether the KNC changes still merge onto newer GCC (master has 2 conflicts,... |
 | S3-13 | Move KNC code out of shared i386 files into i386-knc | Not started | Created under the owner's direction of 2026-11-03 (ADR-0006). After S3-07, so it moves code that has settle... |
 | S3-14 | Native TLS for k1om, and every x86_64-only configure case that misses k1om | Not started | Filed under the owner's delegation (engineering defect found while checking the PhiWeather project's lesson... |
 | S3-15 | ABI gaps: packed vectors through varargs and ms_abi, complex values, rounding mode across calls | Not started | Filed under the owner's delegation. Finding 1 was reproduced by the lead; findings 2-4 come from reading co... |
@@ -80,10 +80,10 @@ Current tickets: `[################----]` 41 of 51
 - 2026-11-03 18:45 **S3-14** lead note: Filed under the owner's delegation (engineering defect found while checking the PhiWeather project's lesson about stale TLS attributes). Every obje...
 - 2026-11-03 18:45 **S3-10** lead note: Also add (1) S3-14's TLS and S3-15's complex and rounding cross-checks, built after both merge (objects built before S3-14 use emulated TLS); and (...
 - 2026-11-03 18:45 **S3-06** lead note: A lead review of S3-04 asks for generic vector code on 64-byte types, which no test covers: `*c=*a+*b` at -O0, element read `v[3]` after an asm tha...
+- 2026-11-03 18:29 **S3-12** lead approve: tools/portability.py now checks whether the KNC changes still merge onto newer GCC (master has 2 conflicts, gcc-16 has none) and can compare x86_64...
 - 2026-11-03 18:27 **S3-12** engineer submit: Review fixes complete in baff875 and 33c28fd. Changed fake-cc1 tests passed (2); make refusal passed in red run. Log: .work/_state/logs/S3_12_x86_r...
 - 2026-11-03 18:27 **S3-05** lead approve: Packed copies through pointers of unknown alignment now compile, for all four 512-bit modes, to unmasked load and store pairs at the address and ad...
 - 2026-11-03 18:26 **S3-12** lead answer: Size override approved; do not split. The fixes in baff875/33c28fd cover all three review points: both sides always run, a one-sided failure counts...
-- 2026-11-03 18:25 **S3-13** lead note: Created under the owner's direction of 2026-11-03 (ADR-0006). After S3-07, so it moves code that has settled. S3-10's card batch runs after it, so ...
 
 ## Cost
 
@@ -95,4 +95,4 @@ Current tickets: `[################----]` 41 of 51
 
 ## Disk
 
-The project uses 7.5 GiB of 100 GiB. 316 GiB free on the drive.
+The project uses 7.5 GiB of 100 GiB. 315 GiB free on the drive.
