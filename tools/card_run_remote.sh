@@ -37,8 +37,13 @@ snapshot() {
     IFS= read -r snapshot_boot < /proc/sys/kernel/random/boot_id || return 92
     printf 'BOOT\t%s\n' "$snapshot_boot"
     {
-    while IFS= read -r line; do printf 'CPU\t%s\n' "$line"; done < /proc/cpuinfo
-    while IFS= read -r line; do printf 'MEM\t%s\n' "$line"; done < /proc/meminfo
+    # Only admission needs the CPU map. Keep block separators for cpu_binding,
+    # without shell read/printf commands for thousands of unused cpuinfo lines.
+    if [ "${1:-}" != skip-cpu ]; then
+        awk '/^processor[ \t]*:|^core id[ \t]*:/ {print "CPU\t" $0}
+             /^$/ {print "CPU\t"}' /proc/cpuinfo
+    fi
+    awk '/^MemFree:/ {print "MEM\t" $0; exit}' /proc/meminfo
     set --
     for proc in /proc/[0-9]*; do
         proc_pid=${proc##*/}

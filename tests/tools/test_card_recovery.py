@@ -229,6 +229,11 @@ class RemoteReview(unittest.TestCase):
         self.assertEqual(answer.returncode, 0, answer.stderr)
         self.assertNotIn(b"CPU\t", answer.stdout)
         self.assertIn(b"MEM\tMemFree: 4000000 kB", answer.stdout)
+        session.rpc.return_value = answer.stdout.rstrip(b"\n")
+        snapshot = session.snapshot(timeout=1, include_cpuinfo=False)
+        session.rpc.assert_called_with("snapshot skip-cpu", 1, step="snapshot")
+        self.assertEqual(snapshot["cpuinfo"], "")
+        self.assertEqual(snapshot["meminfo"], "MemFree: 4000000 kB")
 
     def test_remote_failure_names_snapshot_and_captures_stderr(self):
         session = self.runner["SSHSession"]([shutil.which("sh")], "/unused", 1)

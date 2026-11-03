@@ -53,6 +53,9 @@ which foreign processes are reported, never whether work may run.
   only locks this invocation created. No external/shared-card lock is taken.
 - Parse the card's `/proc/cpuinfo` processor/core pairs. Select only logical
   CPUs belonging to physical cores 30 through 59; never core 60. Pass that
+  mapping through the run, including admission waits and cleanup reconnects.
+  Read cpuinfo once, using one `awk` pass to emit only processor/core fields
+  and block separators; subsequent snapshots skip cpuinfo. Pass the
   explicit CPU list to the static `claude-pin` helper. It calls
   `sched_setaffinity(0, ...)` before executing the program; a failed syscall
   prevents execution and names the failure. No eligible CPUs refuses admission.
@@ -62,7 +65,8 @@ which foreign processes are reported, never whether work may run.
   it if exec fails. A completed launch without that marker is an infrastructure
   failure, with no program exit status; the ledger finish records that outcome.
   A marked program may itself return 125, 126 or 127 without being misclassified.
-- Read `/proc/meminfo` before staging. Reserve the declared memory against all
+- Read `MemFree` from `/proc/meminfo` before staging using one `awk` invocation
+  per snapshot. Reserve the declared memory against all
   active `agent: "claude"` ledger entries; ended jobs release their reservation.
   Wait while the total exceeds 7168 MB or the reservation would leave less
   than 1536 MB of `MemFree`. Re-read both ledger and memory after each wait;
@@ -91,7 +95,8 @@ which foreign processes are reported, never whether work may run.
   One shell pass reads process identities and skips kernel threads by PID/PPid.
   One numeric `ls` reads all user-process executable/cwd links and one `awk`
   joins them to identities. No snapshot forks `readlink` or a subshell per PID;
-  the fake `/proc` test counts external commands with 300 kernel threads.
+  the fake `/proc` test counts utility commands and shell read/printf calls
+  with 300 kernel threads and 240 CPU blocks of 25 lines each.
   Cleanup and stale recovery also skip PID 2 and PPid 2 using shell reads
   before inspecting executable/cwd links. Kernel-thread links can exist as
   dangling symlinks, so their presence alone cannot identify a user process.
@@ -180,8 +185,10 @@ The result class distinguishes program statuses that collide with those values.
 `run` accepts program/argv, local and legacy external-lock/baseline arguments,
 timeouts, result path, transport, ledger path, memory MB and an injectable
 monotonic clock. A fake session provides `snapshot`, `stage`, `execute`,
-`reap_stale`, `signal_owned`, `cleanup` and `close`. Snapshots contain boot ID, processes,
-raw cpuinfo/meminfo, and may report known pinning unavailability for early
+`reap_stale`, `signal_owned`, `cleanup` and `close`. `snapshot` accepts
+`include_cpuinfo` (default true); the runner requests it only for the first
+snapshot, including across a cleanup reconnect. Snapshots contain boot ID,
+processes, filtered cpuinfo/meminfo, and may report known pinning unavailability for early
 refusal. SSH checks enforcement at execution through the helper marker.
 Execute receives the explicit
 logical CPU list, memory MB, execution timeout and watchdog timeout.

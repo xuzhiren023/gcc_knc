@@ -47,7 +47,7 @@ class FakeTransport:
         self.run_dir = run_dir
         return self
 
-    def snapshot(self, *, timeout):
+    def snapshot(self, *, timeout, include_cpuinfo=True):
         self.events.append(("snapshot", timeout))
         if self.link_broken:
             raise ConnectionError("fake SSH link broken")

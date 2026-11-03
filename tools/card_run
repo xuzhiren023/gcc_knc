@@ -110,13 +110,14 @@ def run(program, argv, *, lock_path, external_locks, baseline_names, timeout,
     recorded, card_fault, ledger_offset = False, False, 0
     admission_lock = None
     overlaps = set()
+    cpuinfo = None
 
     def failure(kind, code, detail):
         result.update(result_class=kind, exit_code=code, detail=str(detail))
 
     def snapshot():
-        nonlocal card_fault
-        snap = session.snapshot(timeout=transport_timeout)
+        nonlocal card_fault, cpuinfo
+        snap = session.snapshot(timeout=transport_timeout, include_cpuinfo=cpuinfo is None)
         boot = snap.get("boot_id")
         if not isinstance(boot, str) or not boot.strip():
             raise OSError("unknown boot ID; cannot establish card state")
@@ -126,6 +127,12 @@ def run(program, argv, *, lock_path, external_locks, baseline_names, timeout,
         elif result["boot_id_before"] != boot:
             card_fault = True
             raise OSError("card boot ID changed; no signalling or cleanup permitted")
+        # CPU topology belongs to the established boot. Preserve it through
+        # admission waits and the one cleanup reconnect; memory stays fresh.
+        if cpuinfo is None:
+            cpuinfo = snap["cpuinfo"]
+        else:
+            snap["cpuinfo"] = cpuinfo
         for process in foreign_processes(snap, run_dir, baseline_names):
             if process not in result["foreign_processes"]:
                 result["foreign_processes"].append(process)
@@ -404,9 +411,10 @@ class SSHSession:
         raise OSError("%s: remote operation failed (status %s): %s" %
                       (step, status, b"".join(output).decode("utf8", "replace")[-1000:]))
 
-    def snapshot(self, *, timeout):
+    def snapshot(self, *, timeout, include_cpuinfo=True):
         try:
-            records = self.rpc("snapshot", timeout, step="snapshot").decode("utf8", "strict").splitlines()
+            command = "snapshot" if include_cpuinfo else "snapshot skip-cpu"
+            records = self.rpc(command, timeout, step="snapshot").decode("utf8", "strict").splitlines()
         except UnicodeError as error:
             raise OSError("unknown process identity: %s" % error)
         if not records or not records[0].startswith("BOOT\t"):
