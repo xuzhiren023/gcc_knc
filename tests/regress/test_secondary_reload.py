@@ -20,13 +20,14 @@ class SecondaryReload(unittest.TestCase):
     def test_pressure_mask_address_and_memory_bridge(self):
         live = '# pressure-live ' + ' '.join('%' + r for r in
             ('rax rbx rcx rdx rsi rdi rbp r8 r9 r10 r11 r12 r13 r14'.split()))
-        body = (live + '\n'
+        body = ('leaq 10(%rdi), %r10\n' + live + '\n'
                 'movl $1, %r15d\nkmov %r15d, %k1\n'
                 'vbroadcastsd (%rsp), %zmm0\n'
                 'vpackstorelpd %zmm0, (%rsp){%k1}\n' + live + '\nret\n')
         self.assertEqual(pressure_scan(body), [])
         for old, new in (('kmov %r15d, %k1', ''), ('$1', '$3'),
                          ('(%rsp)', '(%r10)'),
+                         ('(%rsp)', '(%rbp)'),
                          ('vbroadcastsd (%rsp), %zmm0', 'vmovq %rax, %zmm0'),
                          ('vpackstorelpd %zmm0, (%rsp){%k1}', 'vmovq %zmm0, %rax'),
                          ('%r14', '%r13')):
