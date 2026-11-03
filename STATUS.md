@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-03 11:56.
+Updated automatically at every ticket change. Last update: 2026-11-03 11:58.
 
-**Next: the tech lead, on S2-11.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Waiting for you:** S2-11. Run `python tools/pm.py inbox`.
 
 Current tickets: `[################----]` 23 of 28
 
@@ -49,10 +49,11 @@ Current tickets: `[################----]` 23 of 28
 | S2-08 | hello, scalar FP and printf on the card | draft | Owner approved Sprint 2 on 2026-11-03; this ticket stays draft until the card hold ends. |
 | S2-09 | GCC 16 builds gfortran, and the secondary-reload reproducer passes | Not started | Reconfiguring means one full rebuild: use `make -j8` with `CFLAGS=-O2 -g1 CXXFLAGS=-O2 -g1` as `tools/toolc... |
 | S2-10 | First card runs for the queued native checks | Not started | Owner's decision of 2026-11-03: the interactive lead runs every card job; engineer sessions have no card ac... |
-| S2-11 | card_run follows the shared card rules and runs hello on the card | Waiting for review | GREEN a10f43e; RED f3946f6. Physical /tmp resolved once per shell; exact cwd/process guards support symlink... |
+| S2-11 | card_run follows the shared card rules and runs hello on the card | **Waiting for you** | over 2 review rounds: Review of a10f43e: the card-side guard is right (physical /tmp resolved once, exact p... |
 
 ## Recent activity
 
+- 2026-11-03 11:58 **S2-11** lead escalate: over 2 review rounds: Review of a10f43e: the card-side guard is right (physical /tmp resolved once, exact prefix plus claude/claude-<32hex>, owned_...
 - 2026-11-03 11:56 **S2-11** engineer submit: GREEN a10f43e; RED f3946f6. Physical /tmp resolved once per shell; exact cwd/process guards support symlinked /tmp for cleanup and stale recovery. ...
 - 2026-11-03 11:53 **S2-11** owner decide: Lead, under the owner's 2026-11-03 delegation: allow a seventh round for the /tmp symlink guard found on the card.
 - 2026-11-03 11:53 **S2-11** lead escalate: over 2 review rounds: Native run of d9f7dd6 by the lead at 10 s (job claude-53817b80..., 5 s): the snapshot now fits, admission, start/finish ledge...
@@ -60,7 +61,6 @@ Current tickets: `[################----]` 23 of 28
 - 2026-11-03 11:52 **S2-11** lead escalate: Review of d9f7dd6 is clean: the snapshot emits only processor/core id lines from cpuinfo and MemFree from meminfo, each in one awk pass, and cpuinf...
 - 2026-11-03 11:51 **S2-11** engineer submit: GREEN d9f7dd6; RED 584bd34. CPU/memory snapshots now use awk; cpuinfo read once across waits/reconnect. T0 counts shell builtins and utilities with...
 - 2026-11-03 11:47 **S2-11** owner decide: Lead, under the owner's 2026-11-03 delegation: allow a sixth round for the cpuinfo snapshot cost found on the card.
-- 2026-11-03 11:47 **S2-11** lead escalate: over 2 review rounds: Native run of 5ede60d by the lead at the default 10 s (job claude-e5d2c8fb..., 11 s, receipt in the lead's scratchpad): the f...
 
 ## Cost
 
