@@ -50,6 +50,7 @@ class Gcc16(unittest.TestCase):
             configure = next(call for call in command.call_args_list
                              if str(source / 'configure') in map(str, call.args))
             for flag in ('--target=k1om-mpss-linux',
+                         '--enable-languages=c,fortran',
                          '--with-as=' + str(tc / 'cross/bin/k1om-mpss-linux-as'),
                          '--with-ld=' + str(tc / 'cross/bin/k1om-mpss-linux-ld'),
                          '--with-sysroot=' + str(tc / 'sysroot')):
