@@ -152,11 +152,12 @@ it rejects `--native`. No additional test file is required.
 
 ## Build and lead execution
 
-From the checkout, preparation is reproducible through:
+The one-off preparation helper is staged outside git at
+`.work/_shared/tmp/S3-03/prepare_s3_03.py`. From this worktree's root, run:
 
 ```text
-python tools/run.py --name S3-03-t0 --inputs tests/regress/knc-unaligned-probe.c tools/prepare_s3_03.py -- python tools/prepare_s3_03.py --t0-only
-python tools/run.py --name S3-03-build --inputs tests/regress/knc-unaligned-probe.c tools/prepare_s3_03.py -- python tools/prepare_s3_03.py --build-only
+python tools/run.py --name S3-03-t0 --inputs tests/regress/knc-unaligned-probe.c ../_shared/tmp/S3-03/prepare_s3_03.py -- python ../_shared/tmp/S3-03/prepare_s3_03.py --t0-only
+python tools/run.py --name S3-03-build --inputs tests/regress/knc-unaligned-probe.c ../_shared/tmp/S3-03/prepare_s3_03.py -- python ../_shared/tmp/S3-03/prepare_s3_03.py --build-only
 ```
 
 The helper uses shared Cygwin GCC for T0 and the shared GCC 16 `xgcc` for KNC,
