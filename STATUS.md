@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-03 10:14.
+Updated automatically at every ticket change. Last update: 2026-11-03 10:15.
 
-**Next: the tech lead, on S2-06.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: GPT-6.1, on S2-06 (Atomics without cmpxchg16b, spin hint by delay).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
 Current tickets: `[###############-----]` 22 of 28
 
@@ -44,7 +44,7 @@ Current tickets: `[###############-----]` 22 of 28
 | S2-03 | Varargs with the donor's register save area | Done | GCC 16 varargs functions now check %al and save the FP argument registers to the SysV save area at fp_offse... |
 | S2-04 | Scalar transfers through memory and mask scratch | Done | Scalar values now move between general and vector registers through memory with an allocated mask scratch, ... |
 | S2-05 | x87 compares and zmm spill alignment | Done | gcc16 now has tests proving it picks the IEEE-correct x87 compare for every float, double and long double c... |
-| S2-06 | Atomics without cmpxchg16b, spin hint by delay | Question for the tech lead | Build and scoped T1/T2 pass; red 3fc86d7. Logs: .work/_state/logs/S2_06_*.log. Native via tools/card_run ex... |
+| S2-06 | Atomics without cmpxchg16b, spin hint by delay | In progress | No card settings needed from you: the owner has supplied config/card.local.json (git-ignored) and the card ... |
 | S2-07 | GCC 16 builds its own static libgcc for k1om | Not started | Owner approved Sprint 2 on 2026-11-03; ticket set to ready. |
 | S2-08 | hello, scalar FP and printf on the card | draft | Owner approved Sprint 2 on 2026-11-03; this ticket stays draft until the card hold ends. |
 | S2-09 | GCC 16 builds gfortran, and the secondary-reload reproducer passes | Not started | Reconfiguring means one full rebuild: use `make -j8` with `CFLAGS=-O2 -g1 CXXFLAGS=-O2 -g1` as `tools/toolc... |
@@ -53,6 +53,7 @@ Current tickets: `[###############-----]` 22 of 28
 
 ## Recent activity
 
+- 2026-11-03 10:15 **S2-06** lead answer: No card settings needed from you: the owner has supplied config/card.local.json (git-ignored) and the card is in shared mode, so there is no availa...
 - 2026-11-03 10:14 **S2-06** engineer ask: Build and scoped T1/T2 pass; red 3fc86d7. Logs: .work/_state/logs/S2_06_*.log. Native via tools/card_run exits 126: config/card.local.json missing;...
 - 2026-11-03 10:10 **S2-11** lead note: Supersedes the 10:00 to 10:06 lock notes. The owner said card runs need no exclusive window, since the card runs Linux and our tests are small, so ...
 - 2026-11-03 10:06 **S2-11** lead note: Correction to 10:02: if `flock` is missing on the card, nothing on the card can hold this lock by `flock` either, so take it by atomic create alone...
@@ -60,7 +61,6 @@ Current tickets: `[###############-----]` 22 of 28
 - 2026-11-03 10:02 **S2-10** lead note: The owner supplied `config/card.local.json` on 2026-11-03 (git-ignored; the `knownHosts` file is read from PhiWeather's folder, read only). It runs...
 - 2026-11-03 10:00 **S2-11** lead note: Draft until the owner confirms how the WRF side holds this lock (by the file existing, or by `flock` on it); the lead sets it ready with that proto...
 - 2026-11-03 09:40 **S2-10** lead note: Draft until the owner has filled in `config/card.local.json` (host, identity, knownHosts, and the WRF run's lock in `externalLocks`); the lead sets...
-- 2026-11-03 09:38 **S2-05** lead approve: gcc16 now has tests proving it picks the IEEE-correct x87 compare for every float, double and long double comparison (quiet fucom for ==, != and is...
 
 ## Cost
 
