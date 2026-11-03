@@ -106,7 +106,8 @@ def run(program, argv, *, lock_path, external_locks, baseline_names, timeout,
         monotonic=time.monotonic):
     result = dict(result_class="infrastructure", exit_code=INFRA_EXIT,
                   program_exit_code=None, boot_id_before=None, boot_id_after=None,
-                  card_minutes=0.0, detail="", foreign_processes=[], overlapping_jobs=[])
+                  card_minutes=0.0, detail="", foreign_processes=[], overlapping_jobs=[],
+                  reaped=[], stale_kept=[])
     session, acquired, execution_started, execution_finished = None, False, False, False
     job_id = "claude-" + uuid.uuid4().hex
     run_dir = "/tmp/claude/" + job_id
@@ -187,7 +188,7 @@ def run(program, argv, *, lock_path, external_locks, baseline_names, timeout,
             if monotonic() >= deadline:
                 raise Refused("memory admission wait expired; job was not staged")
             time.sleep(min(1.0, deadline - monotonic()))
-        session.reap_stale(result["boot_id_before"], timeout=transport_timeout)
+        result.update(session.reap_stale(result["boot_id_before"], timeout=transport_timeout))
         now = datetime.now(timezone.utc)
         ledger_offset = len(lines)
         overlaps.update(active)
@@ -538,34 +539,42 @@ class SSHSession:
                    shlex.quote(",".join(str(cpu) for cpu in cpus)), memory_mb, command), "start-job")
         offsets = [0, 0]
         status = None
+        poll_delay = 0.5
+        next_output = time.monotonic() + 10.0
         while True:
             if time.monotonic() >= deadline:
                 raise TimeoutError("card program deadline exceeded")
-            for index, (name, stream) in enumerate((("stdout", sys.stdout.buffer),
-                                                     ("stderr", sys.stderr.buffer))):
-                data = self.read_output(name, offsets[index], self.transport_timeout)
-                stream.write(data)
-                stream.flush()
-                offsets[index] += len(data)
-                if status is not None and data:
-                    break
-            else:
+            if status is None:
+                answer = operation("guard_boot && if [ -f status ]; then "
+                                   "if [ -f claude-pinned ]; then cat status; "
+                                   "else echo claude-pinned-missing; fi; "
+                                   "else echo running; fi", "read-status")
+                # A helper failure leaves SSH usable for guarded cleanup.
+                if answer == b"claude-pinned-missing":
+                    raise OSError("claude-pinned missing: helper did not exec program")
+                if answer != b"running":
+                    try:
+                        status = int(answer)
+                    except ValueError:
+                        raise OSError("missing program exit status")
+            # Status uses the existing control session. Only these binary reads
+            # open connections: at most one pair per ten seconds while running.
+            if status is not None or time.monotonic() >= next_output:
+                read_any = False
+                for index, (name, stream) in enumerate((("stdout", sys.stdout.buffer),
+                                                       ("stderr", sys.stderr.buffer))):
+                    data = self.read_output(name, offsets[index], self.transport_timeout)
+                    stream.write(data)
+                    stream.flush()
+                    offsets[index] += len(data)
+                    read_any = read_any or bool(data)
                 if status is not None:
-                    return status
-            answer = operation("guard_boot && if [ -f status ]; then "
-                               "if [ -f claude-pinned ]; then cat status; "
-                               "else echo claude-pinned-missing; fi; "
-                               "else echo running; fi", "read-status")
-            # A helper failure leaves SSH usable for guarded cleanup; it is not
-            # a transport disconnect or evidence of a card fault.
-            if answer == b"claude-pinned-missing":
-                raise OSError("claude-pinned missing: helper did not exec program")
-            if answer != b"running":
-                try:
-                    status = int(answer)
-                except ValueError:
-                    raise OSError("missing program exit status")
-            time.sleep(min(0.05, max(0, deadline - time.monotonic())))
+                    if not read_any:
+                        return status
+                    continue  # Drain completed output without another poll delay.
+                next_output = time.monotonic() + 10.0
+            time.sleep(min(poll_delay, max(0, deadline - time.monotonic())))
+            poll_delay = min(5.0, 2 * poll_delay)
 
     def guarded(self, operation, run_dir, boot_id, timeout):
         self.validate(run_dir)
@@ -579,7 +588,14 @@ class SSHSession:
     def reap_stale(self, boot_id, *, timeout):
         if not boot_id or boot_id != self.boot_id:
             raise OSError("stale cleanup boot guard mismatch")
-        self.rpc("boot_id=%s\nreap_stale" % shlex.quote(boot_id), timeout, step="reap-stale")
+        output = self.rpc("boot_id=%s\nreap_stale" % shlex.quote(boot_id), timeout, step="reap-stale")
+        report = dict(reaped=[], stale_kept=[])
+        fields = {"REAPED": "reaped", "STALE_KEPT": "stale_kept"}
+        for line in output.decode("utf8", "replace").splitlines():
+            tag, separator, path = line.partition("\t")
+            if separator and tag in fields:
+                report[fields[tag]].append(path)
+        return report
 
     def signal_owned(self, run_dir, boot_id, *, timeout):
         self.guarded("stop_owned", run_dir, boot_id, timeout)

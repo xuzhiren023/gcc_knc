@@ -79,6 +79,7 @@ class FakeTransport:
     def reap_stale(self, boot_id, *, timeout):
         self._owned(self.run_dir, boot_id)
         self.events.append(("reap_stale", boot_id))
+        return dict(reaped=[], stale_kept=[])
 
     def execute(self, run_dir, argv, *, timeout, card_timeout=None, cpus=None, memory_mb=None):
         self._owned(run_dir, BOOT)

@@ -127,7 +127,7 @@ class CardRecovery(unittest.TestCase):
         self.assertEqual([line["event"] for line in self.own_lines()], ["start", "finish"])
 
     def test_admission_reaps_stale_dirs_before_staging(self):
-        self.transport.reap_stale = mock.Mock()
+        self.transport.reap_stale = mock.Mock(return_value=dict(reaped=[], stale_kept=[]))
         result = self.invoke()
         self.assertEqual(result["result_class"], "program", result)
         self.transport.reap_stale.assert_called_once_with(BOOT, timeout=1)
