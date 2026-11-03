@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-03 09:32.
+Updated automatically at every ticket change. Last update: 2026-11-03 09:33.
 
-**Next: the tech lead, on S2-05.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: GPT-6.1, on S2-05 (x87 compares and zmm spill alignment).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
 Current tickets: `[################----]` 21 of 26
 
@@ -43,7 +43,7 @@ Current tickets: `[################----]` 21 of 26
 | S2-02 | Float and double arguments and results in zmm lane 0 | Done | GCC 16 for KNC now passes float and double arguments and results in zmm lane 0, puts them on the stack afte... |
 | S2-03 | Varargs with the donor's register save area | Done | GCC 16 varargs functions now check %al and save the FP argument registers to the SysV save area at fp_offse... |
 | S2-04 | Scalar transfers through memory and mask scratch | Done | Scalar values now move between general and vector registers through memory with an allocated mask scratch, ... |
-| S2-05 | x87 compares and zmm spill alignment | Tests waiting for review | 735e52a: T1 red, 24 ordered/negated forms use fcom vs donor fucom; review whether strict family parity is i... |
+| S2-05 | x87 compares and zmm spill alignment | Changes requested | Red fails for the wrong reason. Family parity with the donor is not intended for the signaling forms. C Ann... |
 | S2-06 | Atomics without cmpxchg16b, spin hint by delay | Not started | Owner approved Sprint 2 on 2026-11-03; ticket set to ready. |
 | S2-07 | GCC 16 builds its own static libgcc for k1om | Not started | Owner approved Sprint 2 on 2026-11-03; ticket set to ready. |
 | S2-08 | hello, scalar FP and printf on the card | draft | Owner approved Sprint 2 on 2026-11-03; this ticket stays draft until the card hold ends. |
@@ -51,6 +51,7 @@ Current tickets: `[################----]` 21 of 26
 
 ## Recent activity
 
+- 2026-11-03 09:33 **S2-05** lead changes: Red fails for the wrong reason. Family parity with the donor is not intended for the signaling forms. C Annex F / IEEE 754 make < <= > >= signaling...
 - 2026-11-03 09:32 **S2-05** engineer red: 735e52a: T1 red, 24 ordered/negated forms use fcom vs donor fucom; review whether strict family parity is intended. Quiet scans pass. Both host emi...
 - 2026-11-03 09:27 **S2-04** lead approve: Scalar values now move between general and vector registers through memory with an allocated mask scratch, even with 14 general registers live, inc...
 - 2026-11-03 09:24 **S2-04** engineer submit: bd4185f / GCC ec5ace1e3c8: red 5f6d762 exposed u64-to-DF O2 and TF O1/O2 reload ICEs. Fixed SUBREG handling via true_regnum; limited memory excepti...
@@ -58,7 +59,6 @@ Current tickets: `[################----]` 21 of 26
 - 2026-11-03 09:20 **S2-09** owner decide: Owner chose to add Fortran to the GCC 16 build in Sprint 2 (2026-11-03); S2-04 closes on its C tests and its reproducer item moves here.
 - 2026-11-03 09:16 **S2-04** owner decide: Lead decided under the owner's 2026-11-03 delegation: allow a third review round. The 09:15 findings hold (the lead checked i386.cc at de5da75758f:...
 - 2026-11-03 09:15 **S2-04** lead escalate: over 2 review rounds: The C pressure green is real, but the patch turns off secondary memory for every KNC cross-bank move while the new hook cover...
-- 2026-11-03 09:12 **S2-04** engineer submit: At 4b7175f / GCC de5da75758f ran tools/check t0 t1 t2 --compiler gcc16 once: T0 29 tests and all 8 C pressure cases pass. Overall exit 1: gfortran ...
 
 ## Cost
 
