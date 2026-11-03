@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-03 12:45.
+Updated automatically at every ticket change. Last update: 2026-11-03 12:46.
 
-**Next: GPT-6.1, on S2-13 (Card tests pass again, and approve runs them).** Run `python tools/dispatch.py`, or ask the tech lead to.
+**Next: GPT-6.1, on S2-07 (GCC 16 builds its own static libgcc for k1om).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
 Current tickets: `[#################---]` 26 of 30
 
@@ -25,7 +25,7 @@ Current tickets: `[#################---]` 26 of 30
 | S0-01 | Toolchain manifest and doctor | Done | Reviewed: red commit real; tests fail on the missing-tool cases; doctor rerun OK, required tools present, d... |
 | S0-02 | ISA lint | Done | knc_lint now rejects the listed non-KNC instructions in .s, .o, archives, shared objects and executables, a... |
 | S0-03 | Test runner and red baseline | Done | tools/check now runs t0, t1 and t2 on the donor in about 16 seconds and records the expected baseline, with... |
-| S0-04 | Card runner | Done | The card runner now safely runs one program on the card with a shared lock, refuses if anything foreign is ... |
+| S0-04 | Card runner | Done | Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`). |
 | S0-05 | Donor inventory | Done | The donor inventory now covers the whole tree with port/rewrite/drop decisions, the GCC 16.2 runtime audit ... |
 | S0-06 | GCC 16.2 fork and timing | Done | GCC 16.2 is checked out on branch knc in the shared build area and builds stock x86_64 C+Fortran on Cygwin ... |
 | S0-07 | Benchmark corpus and coverage estimate | Done | We now have a proposed public benchmark corpus (PolyBench, STREAM, NPB, HPCG, zlib, SQLite, with bzip2 and ... |
@@ -40,12 +40,12 @@ Current tickets: `[#################---]` 26 of 30
 | S1-06 | K1OM link defaults | Done | GCC 16 now targets the K1OM ABI by default: it passes --march=k1om to as and -m elf_k1om to ld, uses the /l... |
 | S1-07 | Milestone M0 evidence note | Done | M0 is settled as adjust: GCC 16.2 builds a k1om cc1 whose assembly the 2.22 assembler accepts, an options-f... |
 | S2-01 | Design for zmm and mask registers under -march=knc | Done | The register design for KNC is settled on paper: all 32 zmm and 8 mask registers become usable under -march... |
-| S2-02 | Float and double arguments and results in zmm lane 0 | Done | GCC 16 for KNC now passes float and double arguments and results in zmm lane 0, puts them on the stack afte... |
-| S2-03 | Varargs with the donor's register save area | Done | GCC 16 varargs functions now check %al and save the FP argument registers to the SysV save area at fp_offse... |
-| S2-04 | Scalar transfers through memory and mask scratch | Done | Scalar values now move between general and vector registers through memory with an allocated mask scratch, ... |
+| S2-02 | Float and double arguments and results in zmm lane 0 | Done | Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`). |
+| S2-03 | Varargs with the donor's register save area | Done | Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`). |
+| S2-04 | Scalar transfers through memory and mask scratch | Done | Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`). |
 | S2-05 | x87 compares and zmm spill alignment | Done | gcc16 now has tests proving it picks the IEEE-correct x87 compare for every float, double and long double c... |
-| S2-06 | Atomics without cmpxchg16b, spin hint by delay | Done | Atomics on KNC now compile at every width with 16-byte operations routed to libatomic (no cmpxchg16b, fence... |
-| S2-07 | GCC 16 builds its own static libgcc for k1om | Not started | Owner approved Sprint 2 on 2026-11-03; ticket set to ready. |
+| S2-06 | Atomics without cmpxchg16b, spin hint by delay | Done | Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`). |
+| S2-07 | GCC 16 builds its own static libgcc for k1om | In progress | Owner approved Sprint 2 on 2026-11-03; ticket set to ready. |
 | S2-08 | hello, scalar FP and printf on the card | draft | Owner approved Sprint 2 on 2026-11-03; this ticket stays draft until the card hold ends. |
 | S2-09 | GCC 16 builds gfortran, and the secondary-reload reproducer passes | Not started | Reconfiguring means one full rebuild: use `make -j8` with `CFLAGS=-O2 -g1 CXXFLAGS=-O2 -g1` as `tools/toolc... |
 | S2-10 | First card runs for the queued native checks | Done | Ten programs ran on the shared Xeon Phi with output identical to their references: hello, the m1_affine fix... |
@@ -55,20 +55,20 @@ Current tickets: `[#################---]` 26 of 30
 
 ## Recent activity
 
+- 2026-11-03 12:50 **S2-06** lead note: Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`).
+- 2026-11-03 12:50 **S2-04** lead note: Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`).
+- 2026-11-03 12:50 **S2-03** lead note: Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`).
+- 2026-11-03 12:50 **S2-02** lead note: Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`).
+- 2026-11-03 12:50 **S0-04** lead note: Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`).
 - 2026-11-03 12:45 **S2-13** lead note: The first ticket for the tools lane, which runs beside the gcc lane from 2026-11-03 (`--lane tools`). Do not touch the GCC checkout or build.
 - 2026-11-03 12:45 **S2-10** lead approve: Ten programs ran on the shared Xeon Phi with output identical to their references: hello, the m1_affine fixture, GCC 16 and donor code calling each...
 - 2026-11-03 12:44 **S2-10** owner decide: Lead, under the owner's 2026-11-03 delegation: the relinked counter passed on the card and the results table is filled (01d39c6); approving.
-- 2026-11-03 12:41 **S2-10** lead escalate: S2-10 review: batch is good, 9 of 10 passed on the card. Not approvable yet; both open items need the interactive lead, who alone runs the card. (1...
-- 2026-11-03 12:40 **S2-10** engineer submit: Rebuilt only .work/_shared/tmp/S2-10/atomic-counter.mic with donor libatomic.a and S1-06 bridge; readelf -d confirms no libatomic NEEDED. PASS exit...
-- 2026-11-03 12:38 **S2-10** lead answer: Type is now research. The lead ran the batch through the merged tools/card_run (S2-12) on 2026-11-03: 9 of 10 match byte for byte with exit 0 (hell...
-- 2026-11-03 12:34 **S2-10** owner decide: Lead, under the owner's 2026-11-03 delegation: type set to research, since this ticket prepares a batch and changes no code. Submit as is; the lead...
-- 2026-11-03 12:33 **S2-10** lead escalate: S2-10 only prepares a card batch, which is ready at .work/_shared/tmp/S2-10/batch.txt (docs commit a9952f4). It cannot be submitted because the tic...
 
 ## Cost
 
 - From the script, engineer: 103 sessions, 191.9M input tokens
 - From the script, lead: 102 sessions, 36.8M input tokens
-- Started by hand, Claude: 3 sessions, 303.5M input tokens
+- Started by hand, Claude: 3 sessions, 304.0M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
