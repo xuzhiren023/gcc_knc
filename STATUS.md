@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-02 19:59.
+Updated automatically at every ticket change. Last update: 2026-11-02 20:01.
 
 **Next: GPT-6.1, on S1-04 (-march=knc with no SSE, AVX, MMX, CMOV, FCOMI or MFENCE).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
@@ -35,7 +35,7 @@ Current tickets: `[###############-----]` 13 of 17
 | S1-01 | Tickets can change the GCC fork | Done | Tickets marked gcc: yes now get their own branch in the GCC fork, count its changes in the size budget, sho... |
 | S1-02 | GCC 16.2 builds for k1om-mpss-linux | Done | GCC 16.2 now configures and builds its C compiler for k1om-mpss-linux, using the shared KNC assembler, link... |
 | S1-03 | tools/check runs source-level tests against GCC 16 | Done | tools/check t1 --compiler gcc16 now compiles each tests/t1/*.c test and checks its scan, scan-not, per-func... |
-| S1-04 | -march=knc with no SSE, AVX, MMX, CMOV, FCOMI or MFENCE | Changes requested | 1. tools/check.py:249 regresses t0: tests/regress/test_check.py:211 (test_scan_asm) fails because 'if not f... |
+| S1-04 | -march=knc with no SSE, AVX, MMX, CMOV, FCOMI or MFENCE | In progress | 1. tools/check.py:249 regresses t0: tests/regress/test_check.py:211 (test_scan_asm) fails because 'if not f... |
 | S1-05 | Integer C assembles with as 2.22 and lints clean | Not started | Rebuild GCC with the logged gcc16 step of tools/toolchain.py as ONE blocking foreground shell call with a t... |
 | S1-06 | K1OM link defaults | Not started | Rebuild GCC with the logged gcc16 step of tools/toolchain.py as ONE blocking foreground shell call with a t... |
 | S1-07 | Milestone M0 evidence note | Not started | Rebuild GCC with the logged gcc16 step of tools/toolchain.py as ONE blocking foreground shell call with a t... |
@@ -55,7 +55,7 @@ Current tickets: `[###############-----]` 13 of 17
 
 - From the script, engineer: 51 sessions, 64.7M input tokens
 - From the script, lead: 52 sessions, 19.4M input tokens
-- Started by hand, Claude: 3 sessions, 170.3M input tokens
+- Started by hand, Claude: 3 sessions, 174.8M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
