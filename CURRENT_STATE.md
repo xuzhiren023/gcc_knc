@@ -75,8 +75,8 @@ Last updated: 2026-11-02, at the start of Sprint 1.
 ## Repositories
 
 - This one: `xuzhiren023/gcc_knc`, private per the owner.
-- GCC: `xuzhiren023/gcc_16_knc`, private per the owner, and empty until the owner pushes. S0-06 has set it up as `origin` of `.work/_shared/gcc`, with branch `knc` at the 16.2.0 tag, ready to push.
-- Only the owner pushes.
+- GCC: `xuzhiren023/gcc_16_knc`, private per the owner, `origin` of `.work/_shared/gcc`. Its `knc` branch is at `742806e1e58` (S1-04 merged), pushed by the lead on 2026-11-02 at the owner's explicit request; the owner had pushed up to S1-02 before. Local `knc` now tracks `origin/knc`.
+- Only the owner pushes, or the lead when the owner asks for a specific push.
 
 ## Card
 
