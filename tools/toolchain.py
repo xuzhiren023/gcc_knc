@@ -73,7 +73,7 @@ def gcc16(args):
     ]
     steps = [('configure', ('bash', source / 'configure', *flags))] if not resume else []
     steps.append(('resumed all-gcc' if resume else 'full all-gcc',
-                  ('make', '-j%d' % os.cpu_count(), 'all-gcc',
+                  ('make', '-j8', 'all-gcc',
                    'CFLAGS=-O2 -g1', 'CXXFLAGS=-O2 -g1')))
     for label, argv in steps:
         start = time.monotonic()
