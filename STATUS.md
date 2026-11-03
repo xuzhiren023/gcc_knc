@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-03 11:52.
+Updated automatically at every ticket change. Last update: 2026-11-03 11:53.
 
-**Waiting for you:** S2-11. Run `python tools/pm.py inbox`.
+**Next: the tech lead, on S2-11.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[################----]` 23 of 28
 
@@ -49,10 +49,11 @@ Current tickets: `[################----]` 23 of 28
 | S2-08 | hello, scalar FP and printf on the card | draft | Owner approved Sprint 2 on 2026-11-03; this ticket stays draft until the card hold ends. |
 | S2-09 | GCC 16 builds gfortran, and the secondary-reload reproducer passes | Not started | Reconfiguring means one full rebuild: use `make -j8` with `CFLAGS=-O2 -g1 CXXFLAGS=-O2 -g1` as `tools/toolc... |
 | S2-10 | First card runs for the queued native checks | Not started | Owner's decision of 2026-11-03: the interactive lead runs every card job; engineer sessions have no card ac... |
-| S2-11 | card_run follows the shared card rules and runs hello on the card | **Waiting for you** | Review of d9f7dd6 is clean: the snapshot emits only processor/core id lines from cpuinfo and MemFree from m... |
+| S2-11 | card_run follows the shared card rules and runs hello on the card | Waiting for review | Lead, under the owner's 2026-11-03 delegation: lead's native run follows as review changes. |
 
 ## Recent activity
 
+- 2026-11-03 11:53 **S2-11** owner decide: Lead, under the owner's 2026-11-03 delegation: lead's native run follows as review changes.
 - 2026-11-03 11:52 **S2-11** lead escalate: Review of d9f7dd6 is clean: the snapshot emits only processor/core id lines from cpuinfo and MemFree from meminfo, each in one awk pass, and cpuinf...
 - 2026-11-03 11:51 **S2-11** engineer submit: GREEN d9f7dd6; RED 584bd34. CPU/memory snapshots now use awk; cpuinfo read once across waits/reconnect. T0 counts shell builtins and utilities with...
 - 2026-11-03 11:47 **S2-11** owner decide: Lead, under the owner's 2026-11-03 delegation: allow a sixth round for the cpuinfo snapshot cost found on the card.
@@ -60,13 +61,12 @@ Current tickets: `[################----]` 23 of 28
 - 2026-11-03 11:47 **S2-11** owner decide: Lead, under the owner's 2026-11-03 delegation: lead's native run follows as review changes.
 - 2026-11-03 11:46 **S2-11** lead escalate: Review of 5ede60d is clean: owned_pid skips PID 2 and PPid-2 kernel threads by shell read before any readlink (T0 counts commands with 300 dangling...
 - 2026-11-03 11:44 **S2-11** engineer submit: GREEN 5ede60d; RED bc5da64. Fixed kernel-thread forks in owned_pid and false faults after successful reconnect. Added dangling-link/300-thread comm...
-- 2026-11-03 11:39 **S2-11** owner decide: Lead, under the owner's 2026-11-03 delegation: allow a fifth round for the two 11:38 findings (kernel-thread forks in owned_pid/stop_owned/reap, an...
 
 ## Cost
 
 - From the script, engineer: 97 sessions, 184.3M input tokens
 - From the script, lead: 96 sessions, 35.2M input tokens
-- Started by hand, Claude: 3 sessions, 260.8M input tokens
+- Started by hand, Claude: 3 sessions, 262.7M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
