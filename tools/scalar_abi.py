@@ -280,14 +280,6 @@ def affine(runner):
 
 
 def t2(runner):
-    # Same temporary donor runtime bridge as S1-06, until S2-07 builds libgcc.
-    donor_runtime = runner.tc / 'cross/lib/gcc/k1om-mpss-linux/5.1.1'
-    donor_shared = runner.tc / 'cross/k1om-mpss-linux/lib64'
-    scripts = runner.out / 'scalar-runtime-specs'
-    scripts.mkdir()
-    for library in ('gcc_s', 'atomic'):
-        (scripts / ('lib' + library + '_asneeded.so')).write_text(
-            'INPUT ( AS_NEEDED ( -l' + library + ' ) )\n')
     sources = runner.root / 'tests/t2'
     symbols = re.findall(r'\b(scalar_\w+)\(', (sources / 'knc-scalar-abi.h').read_text())
     for reverse in (False, True):
@@ -306,8 +298,7 @@ def t2(runner):
                 objects.append(obj)
         if not failures:
             elf = runner.out / ('scalar-' + str(int(reverse)) + '.mic')
-            linked = runner.command(runner.cc, *runner.cc_flags, '-B' + str(donor_runtime) + '/',
-                                    '-L' + str(scripts), '-L' + str(donor_shared),
+            linked = runner.command(runner.cc, *runner.cc_flags,
                                     '--sysroot=' + str(runner.sysroot), *objects, '-o', elf,
                                     '-Wl,--trace', check=False)
             if linked.returncode:

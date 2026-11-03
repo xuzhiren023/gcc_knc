@@ -187,12 +187,6 @@ def t1(runner):
 
 def t2(runner):
     sources = runner.root / 'tests/t2'
-    runtime = runner.tc / 'cross/lib/gcc/k1om-mpss-linux/5.1.1'
-    scripts = runner.out / 'varargs-runtime-specs'
-    scripts.mkdir()
-    for library in ('gcc_s', 'atomic'):
-        (scripts / ('lib' + library + '_asneeded.so')).write_text(
-            'INPUT ( AS_NEEDED ( -l' + library + ' ) )\n')
     for donor_caller in (True, False):
         objects, failures = [], []
         for role in ('caller', 'callee'):
@@ -207,8 +201,7 @@ def t2(runner):
             objects.append(obj)
         if not failures:
             elf = runner.out / ('varargs-' + str(int(donor_caller)) + '.mic')
-            linked = runner.command(runner.cc, *runner.cc_flags, '-B' + str(runtime) + '/',
-                '-L' + str(scripts), '-L' + str(runner.tc / 'cross/k1om-mpss-linux/lib64'),
+            linked = runner.command(runner.cc, *runner.cc_flags,
                 '--sysroot=' + str(runner.sysroot), *objects, '-o', elf,
                 '-Wl,--trace', check=False)
             if linked.returncode:

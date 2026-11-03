@@ -292,6 +292,14 @@ class Runner:
                 self.say('ERROR ' + label + ': ' + str(error))
 
     def t2(self):
+        if getattr(getattr(self, 'args', None), 'libgcc_link', False):
+            import libgcc
+            libgcc.link(self, 'gcc16')
+            return
+        if getattr(getattr(self, 'args', None), 'libgcc', False):
+            import libgcc
+            libgcc.t2(self)
+            return
         if getattr(getattr(self, 'args', None), 'atomics', False):
             import atomics
             atomics.t2(self)
@@ -313,8 +321,9 @@ class Runner:
             scalar_abi.t2(self)
         if getattr(getattr(self, 'args', None), 'link_defaults', False):
             elf = self.out / 'knc-link-defaults.mic'
-            runtime = PROJECT / '.work/_shared/gcc-build/k1om-mpss-linux/libgcc'
-            linked = self.command(self.cc, *self.cc_flags, '-B' + str(runtime) + '/',
+            # libgcc's all target installs its results into the GCC build dir.
+            runtime = PROJECT / '.work/_shared/gcc-build/gcc'
+            linked = self.command(self.cc, *self.cc_flags,
                                   '-v', '-Wl,--trace', ROOT / 'tests/t2/knc-link-defaults.c',
                                   '-o', elf, check=False)
             trace = linked.stdout
@@ -447,6 +456,10 @@ def main():
                         help='limit varargs T1 to TAG-ROLE-O0 or TAG-ROLE-O2')
     parser.add_argument('--link-defaults', action='store_true',
                         help='S1-06 T1 ABI macros and T2 integer link with fork-built runtime')
+    parser.add_argument('--libgcc', action='store_true',
+                        help='S2-07 static runtime archive lint and helper links')
+    parser.add_argument('--libgcc-link', action='store_true',
+                        help='S2-07 fork helper link only')
     parser.add_argument('--record', help='small baseline result file')
     parser.add_argument('--worker', action='store_true', help=argparse.SUPPRESS)
     args = parser.parse_args()
