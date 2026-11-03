@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-03 11:53.
+Updated automatically at every ticket change. Last update: 2026-11-03 11:54.
 
 **Next: GPT-6.1, on S2-11 (card_run follows the shared card rules and runs hello on the card).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
@@ -49,7 +49,7 @@ Current tickets: `[################----]` 23 of 28
 | S2-08 | hello, scalar FP and printf on the card | draft | Owner approved Sprint 2 on 2026-11-03; this ticket stays draft until the card hold ends. |
 | S2-09 | GCC 16 builds gfortran, and the secondary-reload reproducer passes | Not started | Reconfiguring means one full rebuild: use `make -j8` with `CFLAGS=-O2 -g1 CXXFLAGS=-O2 -g1` as `tools/toolc... |
 | S2-10 | First card runs for the queued native checks | Not started | Owner's decision of 2026-11-03: the interactive lead runs every card job; engineer sessions have no card ac... |
-| S2-11 | card_run follows the shared card rules and runs hello on the card | Changes requested | Lead, under the owner's 2026-11-03 delegation: allow a seventh round for the /tmp symlink guard found on th... |
+| S2-11 | card_run follows the shared card rules and runs hello on the card | In progress | Lead, under the owner's 2026-11-03 delegation: allow a seventh round for the /tmp symlink guard found on th... |
 
 ## Recent activity
 
@@ -66,7 +66,7 @@ Current tickets: `[################----]` 23 of 28
 
 - From the script, engineer: 97 sessions, 184.3M input tokens
 - From the script, lead: 96 sessions, 35.2M input tokens
-- Started by hand, Claude: 3 sessions, 262.7M input tokens
+- Started by hand, Claude: 3 sessions, 263.0M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
