@@ -212,6 +212,7 @@ class Runner:
         # Compiler regressions only; pm/git/dispatch suites have separate runners.
         for directory, pattern in (('tests/regress', 'test_*.py'),
                                    ('tests/tools', 'test_doctor.py'),
+                                   ('tests/tools', 'test_portability.py'),
                                    ('tests/tools', 'test_knc_lint.py')):
             label = directory + '/' + pattern
             try:
