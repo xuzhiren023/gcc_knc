@@ -7,6 +7,7 @@ gcc16 uses the shared build tree's xgcc driver. T3 is reserved for
 tools/card_run; this runner never executes target programs on the host.
 """
 import argparse
+import importlib
 import json
 import os
 from pathlib import Path
@@ -22,6 +23,36 @@ ROOT = Path(__file__).resolve().parents[1]
 PROJECT = ROOT.parent.parent if ROOT.parent.name == '.work' else ROOT
 FUNCTIONS = ('affine_f32', 'affine_f64', 'recurrence_f32')
 PACKED = re.compile(r'\bv(?:addn?|subr?|mul|div|max|min|sqrt|rcp(?:23)?|rsqrt(?:23)?|fmadd\w*|fmsub\w*|fnmadd\w*|fnmsub\w*)(?:ps|pd)\b.*%zmm\d+\b')
+
+# Each entry supplies its CLI help and handlers for the tiers it selects.
+# Imports stay lazy so T0 and source-only selections need no probe modules.
+SELECTIONS = {
+    'fast_math': ('S2-15 fast-math startup links and MXCSR disassembly', {
+        't2': lambda runner: importlib.import_module('fast_math').t2(runner)}),
+    'libgcc_link': ('S2-07 fork helper link only', {
+        't2': lambda runner: importlib.import_module('libgcc').link(runner, 'gcc16')}),
+    'libgcc': ('S2-07 static runtime archive lint and helper links', {
+        't2': lambda runner: importlib.import_module('libgcc').t2(runner)}),
+    'atomics': ('S2-06 atomic widths, libatomic fallbacks and spin hint', {
+        't1': lambda runner: importlib.import_module('atomics').t1(runner),
+        't2': lambda runner: importlib.import_module('atomics').t2(runner)}),
+    'x87_spill': ('S2-05 x87 forms, donor truth tables and XI spill alignment', {
+        't1': lambda runner: importlib.import_module('x87_spill').t1(runner)}),
+    'secondary_reload': ('S2-04 Fortran address-loss reproducer and mixed GPR/zmm pressure', {
+        't1': lambda runner: importlib.import_module('secondary_reload').t1(runner),
+        't2': lambda runner: importlib.import_module('secondary_reload').t2(runner)}),
+    'varargs_abi': ('S2-03 AL, register save area and varargs cross-links only', {
+        't1': lambda runner: importlib.import_module('varargs_abi').t1(runner),
+        't2': lambda runner: importlib.import_module('varargs_abi').t2(runner)}),
+    'scalar_abi': ('S2-02 donor ABI probes and bidirectional cross-links only', {
+        't1': lambda runner: importlib.import_module('scalar_abi').t1(runner),
+        't2': lambda runner: importlib.import_module('scalar_abi').t2(runner)}),
+    'link_defaults': ('S1-06 T1 ABI macros and T2 integer link with fork-built runtime', {
+        't1': lambda runner: runner.t1_sources([runner.source_dir / 'knc-link-defaults.c']),
+        't2': lambda runner: runner.t2_link_defaults()}),
+    'vector': ('S3 vector code generation probes (knc-vec-*.c)', {
+        't1': lambda runner: runner.t1_sources(sorted(runner.source_dir.glob('knc-vec-*.c')))}),
+}
 
 
 def loop_lines(source):
@@ -187,31 +218,23 @@ class Runner:
             except (OSError, RuntimeError, subprocess.TimeoutExpired) as error:
                 self.result('t0 ' + label, [str(error)])
 
+    def run_selections(self, tier):
+        selected = False
+        args = getattr(self, 'args', None)
+        for name, (help_text, handlers) in SELECTIONS.items():
+            if not getattr(args, name, False) or tier not in handlers:
+                continue
+            selected = True
+            try:
+                handlers[tier](self)
+            except (OSError, RuntimeError, subprocess.TimeoutExpired) as error:
+                self.result(tier + ' ' + name.replace('_', '-') + ' infrastructure', [str(error)])
+        return selected
+
     def t1(self):
-        if getattr(getattr(self, 'args', None), 'atomics', False):
-            import atomics
-            atomics.t1(self)
+        if self.run_selections('t1'):
             return
-        if getattr(getattr(self, 'args', None), 'x87_spill', False):
-            import x87_spill
-            x87_spill.t1(self)
-            return
-        if getattr(getattr(self, 'args', None), 'secondary_reload', False):
-            import secondary_reload
-            secondary_reload.t1(self)
-            return
-        if getattr(getattr(self, 'args', None), 'varargs_abi', False):
-            import varargs_abi
-            varargs_abi.t1(self)
-            return
-        if getattr(getattr(self, 'args', None), 'scalar_abi', False):
-            import scalar_abi
-            scalar_abi.t1(self)
-            return
-        if self.args.link_defaults:
-            self.t1_sources([self.source_dir / 'knc-link-defaults.c'])
-            return
-        if self.args.compiler == 'gcc16':
+        if getattr(getattr(self, 'args', None), 'compiler', None) == 'gcc16':
             import scalar_abi
             scalar_abi.t1(self)
             import secondary_reload
@@ -292,71 +315,45 @@ class Runner:
                 self.say('ERROR ' + label + ': ' + str(error))
 
     def t2(self):
-        if getattr(getattr(self, 'args', None), 'fast_math', False):
-            import fast_math
-            fast_math.t2(self)
+        if self.run_selections('t2'):
             return
-        if getattr(getattr(self, 'args', None), 'libgcc_link', False):
-            import libgcc
-            libgcc.link(self, 'gcc16')
-            return
-        if getattr(getattr(self, 'args', None), 'libgcc', False):
-            import libgcc
-            libgcc.t2(self)
-            return
-        if getattr(getattr(self, 'args', None), 'atomics', False):
-            import atomics
-            atomics.t2(self)
-            return
-        if getattr(getattr(self, 'args', None), 'secondary_reload', False):
-            import secondary_reload
-            secondary_reload.t2(self)
-            return
-        if getattr(getattr(self, 'args', None), 'varargs_abi', False):
-            import varargs_abi
-            varargs_abi.t2(self)
-            return
-        if getattr(getattr(self, 'args', None), 'scalar_abi', False):
+        if getattr(getattr(self, 'args', None), 'compiler', None) == 'gcc16':
             import scalar_abi
             scalar_abi.t2(self)
-            return
-        if getattr(getattr(self, 'args', None), 'compiler', None) == 'gcc16' and not self.args.link_defaults:
-            import scalar_abi
-            scalar_abi.t2(self)
-        if getattr(getattr(self, 'args', None), 'link_defaults', False):
-            elf = self.out / 'knc-link-defaults.mic'
-            # libgcc's all target installs its results into the GCC build dir.
-            runtime = PROJECT / '.work/_shared/gcc-build/gcc'
-            linked = self.command(self.cc, *self.cc_flags,
-                                  '-v', '-Wl,--trace', ROOT / 'tests/t2/knc-link-defaults.c',
-                                  '-o', elf, check=False)
-            trace = linked.stdout
-            self.say(trace)
-            failures = []
-            if not re.search(r'^ [^\n]*\bas(?:\.exe)?\s+[^\n]*--march=k1om(?:\s|$)', trace, re.M):
-                failures.append('verbose assembler command lacks --march=k1om')
-            if not re.search(r'^ [^\n]*\s-m\s+elf_k1om(?:\s|$)', trace, re.M):
-                failures.append('verbose linker command lacks -m elf_k1om')
-            for name in ('crtbegin.o', 'crtend.o', 'libgcc.a'):
-                if str(runtime / name) not in trace:
-                    failures.append('link did not use fork-built ' + name)
-            if str(self.tc / 'cross/lib/gcc') in trace:
-                failures.append('link used donor runtime path')
-            if linked.returncode:
-                failures.append('integer link exited ' + str(linked.returncode))
-            self.result('t2 K1OM driver defaults and fork-built runtime', failures)
-            if linked.returncode:
-                return
-        else:
-            elf, trace = self.t2_affine_link()
+        elf, trace = self.t2_affine_link()
         self.t2_abi(elf, trace)
-        if getattr(getattr(self, 'args', None), 'link_defaults', False):
-            dynamic = self.command(self.tool('readelf'), '--dynamic', '--wide', elf)
-            needed = re.findall(r'\(NEEDED\)[^\n]*\[([^\]]+)\]', dynamic)
-            self.say('T2 DT_NEEDED: ' + ', '.join(needed))
-            self.result('t2 integer main needs no libgcc_s or libatomic',
-                        ['unexpected DT_NEEDED ' + name for name in needed
-                         if re.match(r'lib(?:gcc_s|atomic)\.so(?:\.|$)', name)])
+
+    def t2_link_defaults(self):
+        elf = self.out / 'knc-link-defaults.mic'
+        # libgcc's all target installs its results into the GCC build dir.
+        runtime = PROJECT / '.work/_shared/gcc-build/gcc'
+        linked = self.command(self.cc, *self.cc_flags,
+                              '-v', '-Wl,--trace', ROOT / 'tests/t2/knc-link-defaults.c',
+                              '-o', elf, check=False)
+        trace = linked.stdout
+        self.say(trace)
+        failures = []
+        if not re.search(r'^ [^\n]*\bas(?:\.exe)?\s+[^\n]*--march=k1om(?:\s|$)', trace, re.M):
+            failures.append('verbose assembler command lacks --march=k1om')
+        if not re.search(r'^ [^\n]*\s-m\s+elf_k1om(?:\s|$)', trace, re.M):
+            failures.append('verbose linker command lacks -m elf_k1om')
+        for name in ('crtbegin.o', 'crtend.o', 'libgcc.a'):
+            if str(runtime / name) not in trace:
+                failures.append('link did not use fork-built ' + name)
+        if str(self.tc / 'cross/lib/gcc') in trace:
+            failures.append('link used donor runtime path')
+        if linked.returncode:
+            failures.append('integer link exited ' + str(linked.returncode))
+        self.result('t2 K1OM driver defaults and fork-built runtime', failures)
+        if linked.returncode:
+            return
+        self.t2_abi(elf, trace, link_defaults=True)
+        dynamic = self.command(self.tool('readelf'), '--dynamic', '--wide', elf)
+        needed = re.findall(r'\(NEEDED\)[^\n]*\[([^\]]+)\]', dynamic)
+        self.say('T2 DT_NEEDED: ' + ', '.join(needed))
+        self.result('t2 integer main needs no libgcc_s or libatomic',
+                    ['unexpected DT_NEEDED ' + name for name in needed
+                     if re.match(r'lib(?:gcc_s|atomic)\.so(?:\.|$)', name)])
 
     def t2_affine_link(self):
         loops_obj = self.off_object or self.out / 'loops-off.o'
@@ -369,7 +366,7 @@ class Runner:
                              '-Wl,--trace', '-o', elf)
         return elf, trace
 
-    def t2_abi(self, elf, trace):
+    def t2_abi(self, elf, trace, link_defaults=False):
         for library in ('libc.so.6', 'ld-linux-k1om.so.2'):
             paths = []
             for line in trace.splitlines():
@@ -391,7 +388,7 @@ class Runner:
         # never against host libraries or just a numeric maximum GLIBC version.
         versions = self.command(self.tool('readelf'), '--version-info', '--wide', elf)
         failures = [] if required else ['no versioned symbol requirements found']
-        if getattr(getattr(self, 'args', None), 'link_defaults', False):
+        if link_defaults:
             for symbol in sorted(required):
                 version = symbol.split('@', 1)[1]
                 if version.startswith('GLIBC_'):
@@ -443,29 +440,13 @@ def main():
     parser.add_argument('tiers', nargs='+', choices=('t0', 't1', 't2'))
     parser.add_argument('--compiler', choices=('donor', 'gcc16'), default='donor')
     parser.add_argument('--cc', help='override compiler path')
-    parser.add_argument('--scalar-abi', action='store_true',
-                        help='S2-02 donor ABI probes and bidirectional cross-links only')
-    parser.add_argument('--atomics', action='store_true',
-                        help='S2-06 atomic widths, libatomic fallbacks and spin hint')
-    parser.add_argument('--x87-spill', action='store_true',
-                        help='S2-05 x87 forms, donor truth tables and XI spill alignment')
-    parser.add_argument('--secondary-reload', action='store_true',
-                        help='S2-04 Fortran address-loss reproducer and mixed GPR/zmm pressure')
-    parser.add_argument('--varargs-abi', action='store_true',
-                        help='S2-03 AL, register save area and varargs cross-links only')
+    for name, (help_text, handlers) in SELECTIONS.items():
+        parser.add_argument('--' + name.replace('_', '-'), action='store_true', help=help_text)
     parser.add_argument('--varargs-case', action='append', default=[],
                         choices=[tag + '-' + role + '-' + level
                                  for tag in ('donor', 'gcc16')
                                  for role in ('caller', 'callee') for level in ('O0', 'O2')],
                         help='limit varargs T1 to TAG-ROLE-O0 or TAG-ROLE-O2')
-    parser.add_argument('--link-defaults', action='store_true',
-                        help='S1-06 T1 ABI macros and T2 integer link with fork-built runtime')
-    parser.add_argument('--libgcc', action='store_true',
-                        help='S2-07 static runtime archive lint and helper links')
-    parser.add_argument('--libgcc-link', action='store_true',
-                        help='S2-07 fork helper link only')
-    parser.add_argument('--fast-math', action='store_true',
-                        help='S2-15 fast-math startup links and MXCSR disassembly')
     parser.add_argument('--record', help='small baseline result file')
     parser.add_argument('--worker', action='store_true', help=argparse.SUPPRESS)
     args = parser.parse_args()
