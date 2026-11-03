@@ -1,4 +1,4 @@
-"""S2-04 T1 checks; run tools/check.py t1 --compiler gcc16 --secondary-reload.
+"""S2-04/S2-09 T1 checks; tools/check.py t1 --compiler gcc16 --secondary-reload.
 
 The Fortran dump check is exactly the symptom documented in its header, not
 an assertion that GCC 16 uses the donor's secondary-store mechanism. The C
@@ -149,6 +149,18 @@ def t1(runner):
             for dump in dumps:
                 failures.extend(lost_addresses(dump.read_text()))
             runner.result('t1 secondary Fortran deleted-store address setups', failures)
+            if runner.args.compiler == 'gcc16':
+                assembled = runner.command(runner.tool('as'), '--march=k1om', asm,
+                                           '-o', asm.with_suffix('.o'), check=False)
+                failures = []
+                if assembled.returncode:
+                    failures.append('assembler: ' + assembled.stdout[-1500:])
+                else:
+                    lint = runner.command(sys.executable, runner.root / 'tools/knc_lint',
+                                          asm, asm.with_suffix('.o'), check=False)
+                    if lint.returncode:
+                        failures.append('lint: ' + lint.stdout[-1500:])
+                runner.result('t1 secondary Fortran assembly and knc_lint', failures)
 
     # The donor has different register constraints. It calibrates only the
     # preserved Fortran symptom; the new C reload probes target GCC 16.
