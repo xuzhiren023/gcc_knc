@@ -58,7 +58,7 @@ Current tickets: `[################----]` 38 of 47
 | S2-17 | card_run tolerates ending processes, and stages batch files correctly | Done | card_run now skips processes that end mid-snapshot instead of failing the run, keeps a finished program's r... |
 | S2-18 | The card test driver runs programs in parallel on our 30 cores | Done | Card line ticked: the 256-program torture batch passed 256 of 256 on the card with `-j 30` (`docs/research/... |
 | S2-19 | The card snapshot's awk runs under BusyBox | Done | The card runner's process snapshot no longer trips BusyBox awk, and a T0 test now rejects any card awk line... |
-| S3-01 | Packed modes and IMCI patterns in GCC 16: entry points, audit and line estimate | Changes requested | 1. docs/research/knc-packed-modes.md (every i386.cc citation, e.g. lines 159, 160, 163, 172, 176, 182, 186,... |
+| S3-01 | Packed modes and IMCI patterns in GCC 16: entry points, audit and line estimate | In progress | 1. docs/research/knc-packed-modes.md (every i386.cc citation, e.g. lines 159, 160, 163, 172, 176, 182, 186,... |
 | S3-02 | One helper for optional tools/check selections | Done | tools/check optional selections now come from one table, several flags given together all run and each repo... |
 | S3-03 | Native probe of unaligned pairs and masked aligned forms at page boundaries | Done | Acceptance lines ticked: the lead ran the probe on the card, 3,148 cases with 0 failures; the fault table a... |
 | S3-04 | Packed modes legal under -march=knc, with aligned moves, spills and constants | Not started | Owner approved Sprint 3 on 2026-11-03; ticket set to ready. |
