@@ -348,7 +348,9 @@ def cmd_submit(board, args):
     if soft and not args.override:
         hard += soft
     if hard:
-        raise Refused("submit refused:\n  - " + "\n  - ".join(hard))
+        tail = ("\nBudget items are soft: if the lead has approved the size, resubmit with --override '<reason>'."
+                if soft and not args.override else "")
+        raise Refused("submit refused:\n  - " + "\n  - ".join(hard) + tail)
     if soft:
         note += " | OVER BUDGET (%s): %s" % ("; ".join(soft), args.override)
     ticket.fields["state"] = "review"

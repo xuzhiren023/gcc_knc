@@ -32,6 +32,7 @@ Run: python tools/pm.py show {id}
 {task}
 Read only what you need: the ticket, git log and git diff main...{branch}. Rerun something only if you doubt it.
 For gcc: yes tickets also review git -C .work/_shared/gcc diff knc...{branch} and git -C .work/_shared/gcc log knc..{branch}.
+You cannot edit files or run tools/check, so never promise either. A soft budget (size, test files, test ratio) is passed with submit --override '<reason>'. A ticket field, a protected file or a check you cannot run needs the interactive lead: say so, or escalate.
 Finish with one pm.py command, run as plain `python tools/pm.py ...`: PM_ROLE is already set, and a prefix is refused. On approve, the --note is read by the project manager: say in one plain sentence what now works. Your final message is only the "PM update:" line it prints."""
 
 LEAD_TASKS = {
