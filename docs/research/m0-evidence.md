@@ -9,6 +9,8 @@ environment, but these runs cannot prove that Cygwin alone causes the miss.
 No blocker has been demonstrated to be exclusive to GCC 16 versus 14.4;
 there is no measured basis for a compiler-version bridge.
 
+Owner decision (2026-11-02): M0 is adjust; keep GCC 16.2 as the base and run Sprint 2 on this Windows/Cygwin host; no WSL2 for now.
+
 ## Six requested measurements
 
 Shared source: `.work/_shared/gcc`, branch `knc`, commit `6d879ee3154`;
