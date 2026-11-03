@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-03 15:34.
+Updated automatically at every ticket change. Last update: 2026-11-03 15:40.
 
 **Next: GPT-6.1, on S3-04 (Packed modes legal under -march=knc, with aligned moves, spills and constants).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
@@ -61,10 +61,10 @@ Current tickets: `[################----]` 39 of 47
 | S3-01 | Packed modes and IMCI patterns in GCC 16: entry points, audit and line estimate | Done | The packed-mode audit (docs/research/knc-packed-modes.md) is accepted: it maps every pattern and hook the f... |
 | S3-02 | One helper for optional tools/check selections | Done | tools/check optional selections now come from one table, several flags given together all run and each repo... |
 | S3-03 | Native probe of unaligned pairs and masked aligned forms at page boundaries | Done | Acceptance lines ticked: the lead ran the probe on the card, 3,148 cases with 0 failures; the fault table a... |
-| S3-04 | Packed modes legal under -march=knc, with aligned moves, spills and constants | Not started | Owner approved Sprint 3 on 2026-11-03; ticket set to ready. |
-| S3-05 | Unaligned packed moves through load and store pairs | Not started | Owner approved Sprint 3 on 2026-11-03; ticket set to ready. |
-| S3-06 | Packed FP add, sub, mul, FMA and broadcasts for V16SF and V8DF | Not started | Owner approved Sprint 3 on 2026-11-03; ticket set to ready. |
-| S3-07 | Auto-vectorization on zmm, with x87 peel and remainder; m1_affine T1 and T2 green | Not started | Owner approved Sprint 3 on 2026-11-03; ticket set to ready. |
+| S3-04 | Packed modes legal under -march=knc, with aligned moves, spills and constants | In progress | Allocation raised from 24 to 37 shared lines, from S3-01's estimate (`docs/research/knc-packed-modes.md`, '... |
+| S3-05 | Unaligned packed moves through load and store pairs | Not started | Allocation raised from 6 to 11 shared lines, from S3-01's estimate (`docs/research/knc-packed-modes.md`, 'S... |
+| S3-06 | Packed FP add, sub, mul, FMA and broadcasts for V16SF and V8DF | Not started | Allocation raised from 12 to 35 shared lines, from S3-01's estimate (`docs/research/knc-packed-modes.md`, '... |
+| S3-07 | Auto-vectorization on zmm, with x87 peel and remainder; m1_affine T1 and T2 green | Not started | Allocation raised from 4 to 8 shared lines, from S3-01's estimate (`docs/research/knc-packed-modes.md`); th... |
 | S3-08 | Fortran twin of m1_affine vectorizes and links | Not started | Owner approved Sprint 3 on 2026-11-03; ticket set to ready. |
 | S3-09 | Packed integer add, sub, mul, logic and broadcast for V16SI; logic for V8DI | draft | Owner approved Sprint 3 on 2026-11-03; this ticket stays draft: the owner chooses when S3-07 is merged whet... |
 | S3-10 | Card batch for Sprint 3 and m1_affine | Not started | Owner approved Sprint 3 on 2026-11-03; ticket set to ready. |
@@ -72,20 +72,20 @@ Current tickets: `[################----]` 39 of 47
 
 ## Recent activity
 
+- 2026-11-03 15:40 **S3-07** lead note: Allocation raised from 4 to 8 shared lines, from S3-01's estimate (`docs/research/knc-packed-modes.md`); the owner chose on 2026-11-03 to go past M...
+- 2026-11-03 15:39 **S3-06** lead note: Allocation raised from 12 to 35 shared lines, from S3-01's estimate (`docs/research/knc-packed-modes.md`, 'Shared-i386 estimate'); the owner chose ...
+- 2026-11-03 15:39 **S3-05** lead note: Allocation raised from 6 to 11 shared lines, from S3-01's estimate (`docs/research/knc-packed-modes.md`, 'Shared-i386 estimate'); the owner chose o...
+- 2026-11-03 15:39 **S3-04** lead note: Allocation raised from 24 to 37 shared lines, from S3-01's estimate (`docs/research/knc-packed-modes.md`, 'Shared-i386 estimate'); the owner chose ...
 - 2026-11-03 15:34 **S3-01** lead approve: The packed-mode audit (docs/research/knc-packed-modes.md) is accepted: it maps every pattern and hook the four 512-bit modes need under KNC, with c...
 - 2026-11-03 15:33 **S3-01** engineer submit: Committed 4a2466d: corrected all 45 i386.cc citation groups from git show knc:gcc/config/i386/i386.cc using LF-only numbering; documented the exact...
 - 2026-11-03 15:30 **S3-01** lead changes: 1. docs/research/knc-packed-modes.md (every i386.cc citation, e.g. lines 159, 160, 163, 172, 176, 182, 186, 188, 251, 254): i386.cc line numbers do...
 - 2026-11-03 15:29 **S3-01** engineer submit: Committed 9cc96b7: docs/research/knc-packed-modes.md covers all acceptance items with git-source/manual citations. Three one-line shared as --march...
-- 2026-11-03 15:26 **S3-03** lead note: Acceptance lines ticked: the lead ran the probe on the card, 3,148 cases with 0 failures; the fault table and ADR-0005 question 1 answers are in `d...
-- 2026-11-03 15:24 **S3-03** lead approve: A KNC page-boundary probe for unaligned load/store pairs and masked aligned moves now builds with GCC 16 and passes its host self-test over 3,148 c...
-- 2026-11-03 15:22 **S3-03** engineer submit: Moved the one-off preparation helper to .work/_shared/tmp/S3-03/ and updated documented commands; probe unchanged. Existing T0 PASS: 3148 cases and...
-- 2026-11-03 15:21 **S3-03** lead answer: Yes, submit with --override 'research probe: the ticket requires the probe itself in tests/regress/, so the ratio counts the instrument as test cod...
 
 ## Cost
 
 - From the script, engineer: 129 sessions, 243.7M input tokens
 - From the script, lead: 128 sessions, 43.3M input tokens
-- Started by hand, Claude: 4 sessions, 401.8M input tokens
+- Started by hand, Claude: 4 sessions, 414.6M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
