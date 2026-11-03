@@ -1,0 +1,239 @@
+"""S2-02 host checks. The donor supplies ABI locations, never golden assembly.
+
+Probe functions expose one argument at a time. Compare incoming registers and
+stack slots relative to entry RSP, plus result registers for constant returns.
+Instruction selection inside the function may differ; all instructions must
+still belong to the scalar KNC allowlist. Cross-links are T2, not native proof.
+"""
+import re
+import sys
+
+
+INTEGER = re.compile(r'^(?:mov(?:abs|s[blw]|z[blw])?|lea|push|pop|add|sub|and|or|xor|'
+                     r'cmp|test|neg|not|sal|sar|shl|shr|imul|mul|idiv|div|inc|dec|'
+                     r'xchg|nop)[bwlq]?$')
+SCALAR = set('ret retq leave leaveq call jmp cltq cqto cwtl cltd endbr64 '
+             'fld flds fldl fldt fld1 fldz fldcw fldenv '
+             'fst fsts fstl fstps fstpl fstpt fstp fstcw fnstcw fnstsw '
+             'fadd fadds faddl faddp fsub fsubs fsubl fsubp fsubr fsubrs fsubrl fsubrp '
+             'fmul fmuls fmull fmulp fdiv fdivs fdivl fdivp fdivr fdivrs fdivrl fdivrp '
+             'fild filds fildl fildq fist fistp fistps fistpl fistpq '
+             'fxch fchs fabs fucom fucomp fucompp fcom fcomp fcompp '
+             'fnstenv ffree fwait wait sahf kmov '
+             'vbroadcastss vbroadcastsd vpackstorelps vpackstorehps '
+             'vpbroadcastd vpbroadcastq vpackstoreld vpackstorelq '
+             'vpackstorelpd vpackstorehpd vloadunpacklps vloadunpackhps '
+             'vloadunpacklpd vloadunpackhpd vmovaps vmovapd '
+             'vmovdqa32 vmovdqa64'.split())
+CONDITIONS = 'e ne a ae b be g ge l le s ns o no p np z nz'.split()
+SCALAR.update('j' + c for c in CONDITIONS)
+SCALAR.update('set' + c for c in CONDITIONS)
+
+
+def instructions(body):
+    for line in body.splitlines():
+        line = line.split('#', 1)[0].strip()
+        if not line or line.startswith('.') or line.endswith(':'):
+            continue
+        words = line.split(None, 1)
+        if words[0] in ('rep', 'repz') and len(words) == 2:
+            words = words[1].split(None, 1)
+        yield words[0], words[1] if len(words) == 2 else ''
+
+
+def allowlist(assembly):
+    failures = []
+    for mnemonic, operands in instructions(assembly):
+        if mnemonic not in SCALAR and not INTEGER.fullmatch(mnemonic):
+            failures.append('instruction outside scalar IMCI/x87 allowlist: ' + mnemonic)
+        if re.search(r'%(?:[xy]mm\d+|mm[0-7])\b', operands):
+            failures.append('SSE/AVX register: ' + operands)
+    return sorted(set(failures))
+
+
+def register(name):
+    for family in ('di', 'si', 'dx', 'cx'):
+        if name in (family, 'e' + family, 'r' + family, family + 'l'):
+            return 'r' + family
+    return re.sub(r'^(r[89])[dwb]$', r'\1', name)
+
+
+def locations(body, result=False):
+    incoming, written, outputs, stack = set(), set(), set(), set()
+    x87_depth = 0
+    # Track frame addresses even when the body realigns RSP to 64 bytes.
+    addresses = {'rsp': 0}
+    for mnemonic, operands in instructions(body):
+        if mnemonic in ('fld', 'flds', 'fldl', 'fldt', 'fld1', 'fldz'):
+            x87_depth += 1
+        elif mnemonic in ('fstp', 'fstps', 'fstpl', 'fstpt', 'faddp', 'fsubp', 'fmulp', 'fdivp'):
+            x87_depth -= 1
+        regs = [register(r) for r in re.findall(r'%([a-z0-9]+)', operands)]
+        dest = re.search(r',\s*%([a-z0-9]+)\s*$', operands)
+        dest = register(dest[1]) if dest else None
+        reads = regs[:-1] if dest else regs
+        if mnemonic.startswith(('push', 'cmp', 'test')):
+            reads, dest = regs, None
+        for reg in reads:
+            if re.fullmatch(r'zmm[0-7]|rdi|rsi|rdx|rcx|r8|r9', reg) and reg not in written:
+                incoming.add(reg)
+        if mnemonic != 'leaq':
+            for offset, base in re.findall(r'(-?\d*)\(%(\w+)\)', operands):
+                if addresses.get(base) is not None:
+                    slot = addresses[base] + int(offset or 0)
+                    if slot > 0:
+                        stack.add(slot)
+        if mnemonic.startswith('push') and addresses.get('rsp') is not None:
+            addresses['rsp'] -= 8
+        elif mnemonic in ('addq', 'subq') and dest == 'rsp':
+            amount = re.match(r'\$(-?\d+),', operands)
+            if amount and addresses.get('rsp') is not None:
+                addresses['rsp'] += int(amount[1]) * (1 if mnemonic == 'addq' else -1)
+        elif dest:
+            address = re.match(r'(-?\d*)\(%(\w+)\),', operands)
+            copy = re.match(r'%(\w+),', operands)
+            value = (addresses.get(address[2]) if address and mnemonic == 'leaq' else
+                     addresses.get(copy[1]) if copy and mnemonic == 'movq' else None)
+            addresses[dest] = (value + int(address[1] or 0)
+                               if address and value is not None else value)
+        if dest:
+            written.add(dest)
+            if re.fullmatch(r'zmm[01]', dest):
+                outputs.add(dest)
+    if x87_depth > 0:
+        outputs.add('st0')
+    return (sorted(incoming), sorted(stack), sorted(outputs) if result else [])
+
+
+def compare(runner, assembly, donor, names=None):
+    names = re.findall(r'^(abi_\w+):', donor, re.M) if names is None else names
+    failures = [] if names else ['donor emitted no ABI probe functions']
+    for name in names:
+        actual, reference = (runner.function_body(text, name) for text in (assembly, donor))
+        if actual is None or reference is None:
+            failures.append(name + ': missing function boundary')
+            continue
+        got, want = (locations(body, name.startswith('abi_out_')) for body in (actual, reference))
+        if got != want:
+            failures.append('%s: ABI locations %s; donor %s' % (name, got, want))
+    return failures
+
+
+def t1(runner):
+    donor = runner.tool('gcc')
+    for source in sorted(runner.source_dir.glob('knc-abi-*.c')):
+        for level in ('-O0', '-O2', '-Os'):
+            label = 't1 scalar ABI ' + source.name + ' ' + level
+            failures = []
+            texts = []
+            for compiler, flags, tag in ((donor, [], 'donor'),
+                                         (runner.cc, runner.cc_flags, 'gcc16')):
+                asm = runner.out / (source.stem + tag + '.s')
+                compiled = runner.command(compiler, *flags, level, '-march=knc',
+                                          '-ffp-contract=off', '-S', source, '-o', asm, check=False)
+                if compiled.returncode:
+                    failures.append(tag + ' compile: ' + compiled.stdout[-1800:])
+                    texts.append(None)
+                    continue
+                text = asm.read_text()
+                texts.append(text)
+                failures.extend(tag + ': ' + f for f in allowlist(text))
+                obj = asm.with_suffix('.o')
+                assembled = runner.command(runner.tool('as'), '--march=k1om', asm, '-o', obj, check=False)
+                if assembled.returncode:
+                    failures.append(tag + ' assembler: ' + assembled.stdout[-1000:])
+                else:
+                    lint = runner.command(sys.executable, runner.root / 'tools/knc_lint',
+                                          asm, obj, check=False)
+                    if lint.returncode:
+                        failures.append(tag + ' lint: ' + lint.stdout[-1000:])
+            if all(text is not None for text in texts):
+                failures.extend(compare(runner, texts[1], texts[0]))
+            runner.result(label, failures)
+    affine(runner)
+    # S2-02 owns per-function feature gates and zero-call-used-regs, too.
+    for feature in ('sse', 'sse2', 'avx', 'avx512f'):
+        source = runner.out / 'attribute.c'
+        source.write_text('__attribute__((target("%s"))) int f(void) { return 1; }\n' % feature)
+        compiled = runner.command(runner.cc, *runner.cc_flags, '-march=knc', '-S', source,
+                                  '-o', source.with_suffix('.s'), check=False)
+        rejected = (compiled.returncode != 0 and 'internal compiler error' not in compiled.stdout
+                    and re.search(r'error:.*(?:knc|KNC)', compiled.stdout))
+        runner.result('t1 KNC rejects target attribute ' + feature,
+                      [] if rejected else [compiled.stdout or 'feature attribute accepted'])
+    source = runner.source_dir / 'knc-abi-float.c'
+    asm = runner.out / 'zero.s'
+    compiled = runner.command(runner.cc, *runner.cc_flags, '-O2', '-march=knc',
+                              '-fzero-call-used-regs=all', '-S', source, '-o', asm, check=False)
+    if compiled.returncode:
+        supported_diagnostic = ('internal compiler error' not in compiled.stdout and
+                                re.search(r'error:.*(?:zero-call-used-regs|unsupported)', compiled.stdout))
+        failures = [] if supported_diagnostic else [compiled.stdout[-1800:]]
+    else:
+        failures = allowlist(asm.read_text())
+        obj = asm.with_suffix('.o')
+        assembled = runner.command(runner.tool('as'), '--march=k1om', asm, '-o', obj, check=False)
+        if assembled.returncode:
+            failures.append(assembled.stdout[-1000:])
+    runner.result('t1 KNC zero-call-used-regs legal code or unsupported diagnostic', failures)
+
+
+def affine(runner):
+    # Silent stack/register disagreement must fail even if the fixture compiles.
+    failures, texts = [], []
+    for cc, flags, tag in ((runner.tool('gcc'), [], 'donor'),
+                            (runner.cc, runner.cc_flags, 'gcc16')):
+        asm = runner.out / ('affine-' + tag + '.s')
+        compiled = runner.command(cc, *flags, '-O2', '-ffp-contract=off',
+                                  '--sysroot=' + str(runner.sysroot), '-S', runner.fixture / 'loops.c',
+                                  '-o', asm, check=False)
+        if compiled.returncode:
+            failures.append(tag + ' compile: ' + compiled.stdout[-1800:])
+            texts.append(None)
+        else:
+            texts.append(asm.read_text())
+            failures.extend(tag + ': ' + f for f in allowlist(texts[-1]))
+    if all(text is not None for text in texts):
+        failures.extend(compare(runner, texts[1], texts[0], ['affine_f32', 'affine_f64']))
+    runner.result('t1 m1_affine scalar ABI donor locations', failures)
+
+
+def t2(runner):
+    # Same temporary donor runtime bridge as S1-06, until S2-07 builds libgcc.
+    donor_runtime = runner.tc / 'cross/lib/gcc/k1om-mpss-linux/5.1.1'
+    donor_shared = runner.tc / 'cross/k1om-mpss-linux/lib64'
+    scripts = runner.out / 'scalar-runtime-specs'
+    scripts.mkdir()
+    for library in ('gcc_s', 'atomic'):
+        (scripts / ('lib' + library + '_asneeded.so')).write_text(
+            'INPUT ( AS_NEEDED ( -l' + library + ' ) )\n')
+    sources = runner.root / 'tests/t2'
+    symbols = re.findall(r'\b(scalar_\w+)\(', (sources / 'knc-scalar-abi.h').read_text())
+    for reverse in (False, True):
+        label = 't2 scalar ABI ' + ('donor caller / GCC16 callee' if reverse else 'GCC16 caller / donor callee')
+        objects, failures = [], []
+        for role in ('caller', 'callee'):
+            use_donor = (role == 'caller') == reverse
+            cc, flags = (runner.tool('gcc'), []) if use_donor else (runner.cc, runner.cc_flags)
+            obj = runner.out / (role + '.o')
+            compiled = runner.command(cc, *flags, '-O2', '-ffp-contract=off',
+                                      '--sysroot=' + str(runner.sysroot), '-c',
+                                      sources / ('knc-scalar-abi-' + role + '.c'), '-o', obj, check=False)
+            if compiled.returncode:
+                failures.append(role + ' compile: ' + compiled.stdout[-1800:])
+            else:
+                objects.append(obj)
+        if not failures:
+            elf = runner.out / ('scalar-' + str(int(reverse)) + '.mic')
+            linked = runner.command(runner.cc, *runner.cc_flags, '-B' + str(donor_runtime) + '/',
+                                    '-L' + str(scripts), '-L' + str(donor_shared),
+                                    '--sysroot=' + str(runner.sysroot), *objects, '-o', elf,
+                                    '-Wl,--trace', check=False)
+            if linked.returncode:
+                failures.append('link: ' + linked.stdout[-1800:])
+            else:
+                table = runner.command(runner.tool('nm'), '--defined-only', elf)
+                failures.extend('missing linked symbol ' + name for name in symbols
+                                if not re.search(r'\bT\s+' + name + r'$', table, re.M))
+                runner.t2_abi(elf, linked.stdout)
+        runner.result(label, failures)

@@ -127,6 +127,9 @@ def versioned_symbols(text, undefined):
 
 
 class Runner:
+    function_body = staticmethod(function_body)
+    root = ROOT
+
     def __init__(self, args):
         self.args = args
         manifest = json.loads((ROOT / 'toolchain/manifest.json').read_text())
@@ -185,10 +188,16 @@ class Runner:
                 self.result('t0 ' + label, [str(error)])
 
     def t1(self):
+        if getattr(self.args, 'scalar_abi', False):
+            import scalar_abi
+            scalar_abi.t1(self)
+            return
         if self.args.link_defaults:
             self.t1_sources([self.source_dir / 'knc-link-defaults.c'])
             return
         if self.args.compiler == 'gcc16':
+            import scalar_abi
+            scalar_abi.t1(self)
             self.t1_sources()
         source = (self.fixture / 'loops.c').read_text()
         for mode in ('off', 'fast'):
@@ -206,7 +215,8 @@ class Runner:
                 self.off_object = obj
 
     def t1_sources(self, sources=None):
-        for source in sorted(self.source_dir.glob('*.c') if sources is None else sources):
+        selected = (s for s in self.source_dir.glob('*.c') if not s.name.startswith('knc-abi-'))
+        for source in sorted(selected if sources is None else sources):
             label = 't1 ' + source.name
             try:
                 directives = []
@@ -264,6 +274,13 @@ class Runner:
                 self.say('ERROR ' + label + ': ' + str(error))
 
     def t2(self):
+        if getattr(getattr(self, 'args', None), 'scalar_abi', False):
+            import scalar_abi
+            scalar_abi.t2(self)
+            return
+        if getattr(getattr(self, 'args', None), 'compiler', None) == 'gcc16' and not self.args.link_defaults:
+            import scalar_abi
+            scalar_abi.t2(self)
         if getattr(getattr(self, 'args', None), 'link_defaults', False):
             elf = self.out / 'knc-link-defaults.mic'
             # Temporary donor runtime bridge, explicitly required by S1-06.
@@ -396,6 +413,8 @@ def main():
     parser.add_argument('tiers', nargs='+', choices=('t0', 't1', 't2'))
     parser.add_argument('--compiler', choices=('donor', 'gcc16'), default='donor')
     parser.add_argument('--cc', help='override compiler path')
+    parser.add_argument('--scalar-abi', action='store_true',
+                        help='S2-02 donor ABI probes and bidirectional cross-links only')
     parser.add_argument('--link-defaults', action='store_true',
                         help='S1-06 T1 ABI macros and T2 integer link with donor runtime -B')
     parser.add_argument('--record', help='small baseline result file')
