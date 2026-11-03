@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-03 15:45.
+Updated automatically at every ticket change. Last update: 2026-11-03 15:46.
 
-**Next: the tech lead, on S3-04.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: GPT-6.1, on S3-04 (Packed modes legal under -march=knc, with aligned moves, spills and constants).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
 Current tickets: `[################----]` 39 of 47
 
@@ -61,7 +61,7 @@ Current tickets: `[################----]` 39 of 47
 | S3-01 | Packed modes and IMCI patterns in GCC 16: entry points, audit and line estimate | Done | The packed-mode audit (docs/research/knc-packed-modes.md) is accepted: it maps every pattern and hook the f... |
 | S3-02 | One helper for optional tools/check selections | Done | tools/check optional selections now come from one table, several flags given together all run and each repo... |
 | S3-03 | Native probe of unaligned pairs and masked aligned forms at page boundaries | Done | Acceptance lines ticked: the lead ran the probe on the card, 3,148 cases with 0 failures; the fault table a... |
-| S3-04 | Packed modes legal under -march=knc, with aligned moves, spills and constants | Tests waiting for review | Tests 24ead3b; first GCC plumbing 105acea2880. Ran s3-04-packed-red once via tools/run.py: check.py t1 --co... |
+| S3-04 | Packed modes legal under -march=knc, with aligned moves, spills and constants | In progress | S3-04's red tests are accepted: 80 probes (4 packed modes x -O0/-O2 x 10 cases) fail for the right reasons ... |
 | S3-05 | Unaligned packed moves through load and store pairs | Not started | Allocation raised from 6 to 11 shared lines, from S3-01's estimate (`docs/research/knc-packed-modes.md`, 'S... |
 | S3-06 | Packed FP add, sub, mul, FMA and broadcasts for V16SF and V8DF | Not started | Allocation raised from 12 to 35 shared lines, from S3-01's estimate (`docs/research/knc-packed-modes.md`, '... |
 | S3-07 | Auto-vectorization on zmm, with x87 peel and remainder; m1_affine T1 and T2 green | Not started | Allocation raised from 4 to 8 shared lines, from S3-01's estimate (`docs/research/knc-packed-modes.md`); th... |
@@ -72,6 +72,7 @@ Current tickets: `[################----]` 39 of 47
 
 ## Recent activity
 
+- 2026-11-03 15:46 **S3-04** lead approve-red: S3-04's red tests are accepted: 80 probes (4 packed modes x -O0/-O2 x 10 cases) fail for the right reasons on copies, live-across-call spills, the ...
 - 2026-11-03 15:45 **S3-04** engineer red: Tests 24ead3b; first GCC plumbing 105acea2880. Ran s3-04-packed-red once via tools/run.py: check.py t1 --compiler gcc16 --vector --worker, exit 1; ...
 - 2026-11-03 15:40 **S3-07** lead note: Allocation raised from 4 to 8 shared lines, from S3-01's estimate (`docs/research/knc-packed-modes.md`); the owner chose on 2026-11-03 to go past M...
 - 2026-11-03 15:39 **S3-06** lead note: Allocation raised from 12 to 35 shared lines, from S3-01's estimate (`docs/research/knc-packed-modes.md`, 'Shared-i386 estimate'); the owner chose ...
@@ -79,7 +80,6 @@ Current tickets: `[################----]` 39 of 47
 - 2026-11-03 15:39 **S3-04** lead note: Allocation raised from 24 to 37 shared lines, from S3-01's estimate (`docs/research/knc-packed-modes.md`, 'Shared-i386 estimate'); the owner chose ...
 - 2026-11-03 15:34 **S3-01** lead approve: The packed-mode audit (docs/research/knc-packed-modes.md) is accepted: it maps every pattern and hook the four 512-bit modes need under KNC, with c...
 - 2026-11-03 15:33 **S3-01** engineer submit: Committed 4a2466d: corrected all 45 i386.cc citation groups from git show knc:gcc/config/i386/i386.cc using LF-only numbering; documented the exact...
-- 2026-11-03 15:30 **S3-01** lead changes: 1. docs/research/knc-packed-modes.md (every i386.cc citation, e.g. lines 159, 160, 163, 172, 176, 182, 186, 188, 251, 254): i386.cc line numbers do...
 
 ## Cost
 
@@ -91,4 +91,4 @@ Current tickets: `[################----]` 39 of 47
 
 ## Disk
 
-The project uses 7.4 GiB of 100 GiB. 329 GiB free on the drive.
+The project uses 7.4 GiB of 100 GiB. 328 GiB free on the drive.
