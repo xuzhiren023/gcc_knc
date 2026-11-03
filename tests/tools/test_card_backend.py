@@ -181,11 +181,18 @@ snapshot
             self.assertEqual([p["pid"] for p in snapshot["processes"]], ["42"])
 
     def test_snapshot_does_not_claim_untested_pinning(self):
-        answer = subprocess.run([shutil.which("sh"), "-c", self.remote + "\nsnapshot\n"],
-                                stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        self.assertEqual(answer.returncode, 0, answer.stderr)
-        self.assertNotIn(b"PIN\tyes\n", answer.stdout,
-                         "affinity is established by the staged helper, not snapshot")
+        with tempfile.TemporaryDirectory(dir=ROOT) as name:
+            proc = Path(name) / "proc"
+            (proc / "sys/kernel/random").mkdir(parents=True)
+            (proc / "sys/kernel/random/boot_id").write_text(BOOT + "\n")
+            (proc / "cpuinfo").write_text("processor : 91\ncore id : 30\n")
+            (proc / "meminfo").write_text("MemFree: 4000000 kB\n")
+            script = self.remote.replace("/proc/", str(proc) + "/")
+            answer = subprocess.run([shutil.which("sh"), "-c", script + "\nsnapshot\n"],
+                                    stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            self.assertEqual(answer.returncode, 0, answer.stderr)
+            self.assertNotIn(b"PIN\tyes\n", answer.stdout,
+                             "affinity is established by the staged helper, not snapshot")
 
     def test_cleanup_removes_parent_only_when_empty(self):
         with tempfile.TemporaryDirectory(dir=ROOT) as name:
