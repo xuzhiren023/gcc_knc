@@ -74,9 +74,19 @@ def pressure_scan(body):
         failures.append('missing both barriers with 14 GPRs live and r15 free')
     regions = re.split(r'# pressure-live[^\n]*', body)
     if len(regions) == 3:
+        region_writes = set()
         for op, args in instructions(regions[1]):
-            for reg in sorted(gpr_writes(op, args) & expected):
+            written = gpr_writes(op, args)
+            for reg in sorted(written & expected):
                 failures.append('write to live GPR ' + reg + ': ' + op + ' ' + args)
+            # Preamble values in live GPRs are not transfer addresses. Only
+            # rsp or the free r15, set within these barriers, can address spills.
+            if re.search(r'%zmm\d+', args):
+                for address in re.findall(r'\(([^)]*)\)', args):
+                    for reg in re.findall(r'%(\w+)', address):
+                        if reg != 'rsp' and (reg != 'r15' or reg not in region_writes):
+                            failures.append('invalid pressure transfer address: ' + reg)
+            region_writes.update(written)
     masks, values = {}, {}
     transfers = 0
     for op, args in instructions(body):

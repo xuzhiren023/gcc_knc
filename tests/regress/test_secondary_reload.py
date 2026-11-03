@@ -25,6 +25,12 @@ class SecondaryReload(unittest.TestCase):
                 'vbroadcastsd (%rsp), %zmm0\n'
                 'vpackstorelpd %zmm0, (%rsp){%k1}\n' + live + '\nret\n')
         self.assertEqual(pressure_scan(body), [])
+        r15_body = body.replace('(%rsp)', '(%r15)')
+        r15_before_setup = r15_body.replace('vbroadcastsd (%r15), %zmm0\n', '').replace(
+            'movl $1', 'vbroadcastsd (%r15), %zmm0\nmovl $1')
+        self.assertTrue(pressure_scan('leaq (%rsp), %r15\n' + r15_before_setup))
+        self.assertEqual(pressure_scan(r15_body.replace(
+            'vbroadcastsd', 'leaq (%rsp), %r15\nvbroadcastsd')), [])
         for old, new in (('kmov %r15d, %k1', ''), ('$1', '$3'),
                          ('(%rsp)', '(%r10)'),
                          ('(%rsp)', '(%rbp)'),
