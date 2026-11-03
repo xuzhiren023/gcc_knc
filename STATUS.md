@@ -1,17 +1,17 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-03 13:25.
+Updated automatically at every ticket change. Last update: 2026-11-03 13:26.
 
-**Next: the tech lead, on S2-07.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: GPT-6.1, on S2-08 (hello, scalar FP and printf on the card).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
-Current tickets: `[#############-------]` 28 of 42
+Current tickets: `[#############-------]` 29 of 42
 
 ## Milestones
 
 | | Milestone | State | Progress |
 |---|---|---|---|
 | M0 | Foundation | In progress | 17 of 17 tickets |
-| M1 | Mixed native code | In progress | 11 of 25 tickets |
+| M1 | Mixed native code | In progress | 12 of 25 tickets |
 | M2 | Useful vector target | Not started | Not planned in detail yet |
 | M3 | Runtimes | Not started | Not planned in detail yet |
 | M4 | Broad optimization | Not started | Not planned in detail yet |
@@ -45,7 +45,7 @@ Current tickets: `[#############-------]` 28 of 42
 | S2-04 | Scalar transfers through memory and mask scratch | Done | Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`). |
 | S2-05 | x87 compares and zmm spill alignment | Done | gcc16 now has tests proving it picks the IEEE-correct x87 compare for every float, double and long double c... |
 | S2-06 | Atomics without cmpxchg16b, spin hint by delay | Done | Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`). |
-| S2-07 | GCC 16 builds its own static libgcc for k1om | Waiting for review | Lead, under the owner's 2026-11-03 delegation: native comparison passed (13:23 note). Review item (1): the ... |
+| S2-07 | GCC 16 builds its own static libgcc for k1om | Done | GCC 16 now links KNC programs with its own static libgcc, crtbegin and crtend, with no donor files, and its... |
 | S2-08 | hello, scalar FP and printf on the card | Not started | Rewritten now that the card is available: the engineer prepares, the lead runs (as in S2-10). Set ready by ... |
 | S2-09 | GCC 16 builds gfortran, and the secondary-reload reproducer passes | Not started | Reconfiguring means one full rebuild: use `make -j8` with `CFLAGS=-O2 -g1 CXXFLAGS=-O2 -g1` as `tools/toolc... |
 | S2-10 | First card runs for the queued native checks | Done | Ten programs ran on the shared Xeon Phi with output identical to their references: hello, the m1_affine fix... |
@@ -67,6 +67,7 @@ Current tickets: `[#############-------]` 28 of 42
 
 ## Recent activity
 
+- 2026-11-03 13:26 **S2-07** lead approve: GCC 16 now links KNC programs with its own static libgcc, crtbegin and crtend, with no donor files, and its 128-bit integer and soft-float helpers ...
 - 2026-11-03 13:25 **S2-07** owner decide: Lead, under the owner's 2026-11-03 delegation: native comparison passed (13:23 note). Review item (1): the donor libgcc.a also uses stmxcsr (22 tim...
 - 2026-11-03 13:24 **S2-07** lead escalate: Interactive lead: T2 review of f351d2d/e682e23a0e7 found nothing blocking. Approve waits only on native: in a card session run python tools/libgcc....
 - 2026-11-03 13:23 **S2-07** lead note: Native item done by the interactive lead: donor-libgcc.mic and gcc16-libgcc.mic from .work/_shared/tmp/S2-07 ran on the card through the merged too...
@@ -74,7 +75,6 @@ Current tickets: `[#############-------]` 28 of 42
 - 2026-11-03 13:22 **S2-07** engineer submit: Per lead 13:21 and owner 13:22: existing fork libgcc/CRT build, archive/CRT lint, S1-06 T2 link and integer/soft-fp helper links PASS without donor...
 - 2026-11-03 13:22 **S2-07** owner decide: Lead, under the owner's 2026-11-03 delegation: input budget raised to 20M (1 of 4 sessions and 11.2M used; one GCC build session). Follow the 13:21...
 - 2026-11-03 13:21 **S2-14** engineer submit: Clean head ea14df3: Cygwin python3.12 unittest discover tests/tools test_card_*.py via tools/run.py passed 58/58 in 27.775s. Fixture ACL isolation ...
-- 2026-11-03 13:21 **S2-07** lead escalate: budget: 11168424 input tokens used; the budget is 9000000
 
 ## Cost
 
