@@ -1,17 +1,17 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-03 12:54.
+Updated automatically at every ticket change. Last update: 2026-11-03 13:00.
 
-**Next: GPT-6.1, on S2-07 (GCC 16 builds its own static libgcc for k1om).** Run `python tools/dispatch.py`, or ask the tech lead to.
+**Next: the tech lead, on S2-14.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
-Current tickets: `[#################---]` 27 of 31
+Current tickets: `[############--------]` 27 of 42
 
 ## Milestones
 
 | | Milestone | State | Progress |
 |---|---|---|---|
 | M0 | Foundation | In progress | 17 of 17 tickets |
-| M1 | Mixed native code | In progress | 10 of 14 tickets |
+| M1 | Mixed native code | In progress | 10 of 25 tickets |
 | M2 | Useful vector target | Not started | Not planned in detail yet |
 | M3 | Runtimes | Not started | Not planned in detail yet |
 | M4 | Broad optimization | Not started | Not planned in detail yet |
@@ -52,10 +52,22 @@ Current tickets: `[#################---]` 27 of 31
 | S2-11 | card_run follows the shared card rules and runs hello on the card | Done | tools/card_run now runs programs on the shared Xeon Phi under the owner's card rules (ledger lines, cores 3... |
 | S2-12 | card_run polls the card gently and reports what it reaped | Done | card_run now checks job status on its existing SSH session with backoff to 5 s and opens output connections... |
 | S2-13 | Card tests pass again, and approve runs them | Done | All card tests in tests/tools pass again under Cygwin Python, and pm.py approve now refuses to merge any br... |
-| S2-14 | card_run stages extra files, so one job can run a batch | In progress | For S2-08's torture baseline on the card. The lead runs the card side after merge. |
+| S2-14 | card_run stages extra files, so one job can run a batch | Question for the tech lead | Red ed5900b; implementation a72389a. Two Cygwin card-suite attempts: latest 57/58 pass. Reduced failure: fa... |
+| S3-01 | Packed modes and IMCI patterns in GCC 16: entry points, audit and line estimate | draft |  |
+| S3-02 | One helper for optional tools/check selections | draft |  |
+| S3-03 | Native probe of unaligned pairs and masked aligned forms at page boundaries | draft |  |
+| S3-04 | Packed modes legal under -march=knc, with aligned moves, spills and constants | draft |  |
+| S3-05 | Unaligned packed moves through load and store pairs | draft |  |
+| S3-06 | Packed FP add, sub, mul, FMA and broadcasts for V16SF and V8DF | draft |  |
+| S3-07 | Auto-vectorization on zmm, with x87 peel and remainder; m1_affine T1 and T2 green | draft |  |
+| S3-08 | Fortran twin of m1_affine vectorizes and links | draft |  |
+| S3-09 | Packed integer add, sub, mul, logic and broadcast for V16SI; logic for V8DI | draft |  |
+| S3-10 | Card batch for Sprint 3 and m1_affine | draft |  |
+| S3-11 | Milestone M1 note: fixture, line counts, ICE classes and backend cost comparison | draft |  |
 
 ## Recent activity
 
+- 2026-11-03 13:00 **S2-14** engineer ask: Red ed5900b; implementation a72389a. Two Cygwin card-suite attempts: latest 57/58 pass. Reduced failure: fake stage-create runs mkdir -p /cygdrive/...
 - 2026-11-03 13:00 **S2-14** lead note: For S2-08's torture baseline on the card. The lead runs the card side after merge.
 - 2026-11-03 13:00 **S2-08** lead note: Rewritten now that the card is available: the engineer prepares, the lead runs (as in S2-10). Set ready by the lead; it starts after S2-07 and S2-14.
 - 2026-11-03 12:50 **S2-06** lead note: Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`).
@@ -63,13 +75,12 @@ Current tickets: `[#################---]` 27 of 31
 - 2026-11-03 12:50 **S2-03** lead note: Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`).
 - 2026-11-03 12:50 **S2-02** lead note: Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`).
 - 2026-11-03 12:50 **S0-04** lead note: Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`).
-- 2026-11-03 12:48 **S2-13** lead approve: All card tests in tests/tools pass again under Cygwin Python, and pm.py approve now refuses to merge any branch that touches the card runner, its r...
 
 ## Cost
 
 - From the script, engineer: 104 sessions, 193.0M input tokens
 - From the script, lead: 103 sessions, 37.0M input tokens
-- Started by hand, Claude: 3 sessions, 309.1M input tokens
+- Started by hand, Claude: 3 sessions, 314.4M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
