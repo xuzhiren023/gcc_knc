@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-03 06:33.
+Updated automatically at every ticket change. Last update: 2026-11-03 06:47.
 
-**Next: GPT-6.1, on S2-02 (Float and double arguments and results in zmm lane 0).** Run `python tools/dispatch.py`, or ask the tech lead to.
+**Next: the tech lead, on S2-02.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[##############------]` 18 of 25
 
@@ -40,7 +40,7 @@ Current tickets: `[##############------]` 18 of 25
 | S1-06 | K1OM link defaults | Done | GCC 16 now targets the K1OM ABI by default: it passes --march=k1om to as and -m elf_k1om to ld, uses the /l... |
 | S1-07 | Milestone M0 evidence note | Done | M0 is settled as adjust: GCC 16.2 builds a k1om cc1 whose assembly the 2.22 assembler accepts, an options-f... |
 | S2-01 | Design for zmm and mask registers under -march=knc | Done | The register design for KNC is settled on paper: all 32 zmm and 8 mask registers become usable under -march... |
-| S2-02 | Float and double arguments and results in zmm lane 0 | In progress | Yes, but not for every vector type. Root cause: ADR-0004 point 2 admits XImode to the zmm registers, so an ... |
+| S2-02 | Float and double arguments and results in zmm lane 0 | Waiting for review | Build PASS. All S2-02 scalar T1/T2 checks PASS; broader runner fails packed-vector scans and unbridged runt... |
 | S2-03 | Varargs with the donor's register save area | Not started | Follow docs/adr/0004-knc-registers-and-scalar-abi.md, point 4: 16-byte slots through TI transport, %al test... |
 | S2-04 | Scalar transfers through memory and mask scratch | Not started | Follow docs/adr/0004-knc-registers-and-scalar-abi.md, point 6: an allocated GPR scratch and an HI mask pseu... |
 | S2-05 | x87 compares and zmm spill alignment | Not started | Follow docs/adr/0004-knc-registers-and-scalar-abi.md, point 2: XI spills need 64-byte storage. This ticket ... |
@@ -50,6 +50,7 @@ Current tickets: `[##############------]` 18 of 25
 
 ## Recent activity
 
+- 2026-11-03 06:47 **S2-02** engineer submit: Build PASS. All S2-02 scalar T1/T2 checks PASS; broader runner fails packed-vector scans and unbridged runtime link. 6009 sweep PASS: FP ABI/ICE/as...
 - 2026-11-03 06:33 **S2-02** lead answer: Yes, but not for every vector type. Root cause: ADR-0004 point 2 admits XImode to the zmm registers, so an integer vector_size(64) type now gets TY...
 - 2026-11-03 06:31 **S2-02** engineer ask: Two attempts saved: GCC 03032e73910, tests c0ac52c. Build/T1/T2 PASS. 6009 sweep: FP ABI errors/as/lint=0; pr108892 ICE at all levels. Repro -O0 -m...
 - 2026-11-03 05:45 **S2-02** owner decide: Owner raised the budget to 6 sessions and 40M input tokens on 2026-11-03; continue with the lead's 01:38 fix for the KNC HI move.
@@ -57,7 +58,6 @@ Current tickets: `[##############------]` 18 of 25
 - 2026-11-03 01:38 **S2-02** lead answer: Yes. Root cause: *knc_mask_move's condition tests MASK_REG_P, so it cannot match the pseudo moves LRA creates, and *movhi_internal has no usable ma...
 - 2026-11-03 01:36 **S2-02** engineer ask: Two attempts failed; GCC afbdfdcbc37 and 386441ca3e4 saved. Shared i386: 92 changed lines (137/300 total). Repro: double f(double(*p)(double),doubl...
 - 2026-11-03 00:46 **S2-05** lead note: Follow docs/adr/0004-knc-registers-and-scalar-abi.md, point 2: XI spills need 64-byte storage. This ticket owns the note's spill-alignment and mode...
-- 2026-11-03 00:46 **S2-04** lead note: Follow docs/adr/0004-knc-registers-and-scalar-abi.md, point 6: an allocated GPR scratch and an HI mask pseudo, no hard-coded k2, no push/pop of %ra...
 
 ## Cost
 
@@ -69,4 +69,4 @@ Current tickets: `[##############------]` 18 of 25
 
 ## Disk
 
-The project uses 7.7 GiB of 100 GiB. 316 GiB free on the drive.
+The project uses 7.7 GiB of 100 GiB. 315 GiB free on the drive.
