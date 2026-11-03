@@ -94,14 +94,20 @@ class CardBackend(unittest.TestCase):
             run_dir = directory / self.session.run_dir.lstrip("/")
 
             def translate(script):
+                # Cygwin ancestor workaround: only stage mkdir -p is relative
+                # to the fixture cwd; guards and /proc stay absolute after cd.
+                script = script.replace("mkdir -p /tmp/claude", "mkdir -p tmp/claude")
                 return script.replace("/tmp", str(directory / "tmp")).replace(
                     "/proc/", str(proc) + "/")
 
             def rpc(script, timeout, **kwargs):
                 setup = self.remote + '\nrun_dir=%s\nboot_id=%s\n' % (
                     shlex.quote(self.session.run_dir), shlex.quote(self.session.boot_id))
+                # Same Cygwin-ancestor workaround: mimic the persistent RPC cwd.
+                if script.startswith("guard_boot"):
+                    setup += 'cd -- "$run_dir" || exit 91\n'
                 answer = subprocess.run([shutil.which("sh"), "-c", translate(setup + script)],
-                                        capture_output=True, timeout=timeout)
+                                        cwd=directory, capture_output=True, timeout=timeout)
                 self.assertEqual(answer.returncode, 0, answer.stderr)
                 return answer.stdout.rstrip(b"\n")
 
@@ -111,10 +117,12 @@ class CardBackend(unittest.TestCase):
             def popen(command, **kwargs):
                 if command[0] == "fake-ssh":
                     command = [shutil.which("sh"), "-c", translate(shlex.split(command[-1])[-1])]
+                    kwargs["cwd"] = directory
                 return actual_popen(command, **kwargs)
 
             with mock.patch.object(self.runner["subprocess"], "Popen", side_effect=popen):
-                self.session.snapshot(timeout=5)
+                # Cygwin forks make the fake card-sized /proc walk slow.
+                self.session.snapshot(timeout=30)
                 self.session.stage(self.session.run_dir, program, files=[extra, data], timeout=10)
             for source, mode in ((extra, 0o700), (data, 0o600)):
                 staged = run_dir / source.name
