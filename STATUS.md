@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-03 12:43.
+Updated automatically at every ticket change. Last update: 2026-11-03 12:44.
 
-**Waiting for you:** S2-10. Run `python tools/pm.py inbox`.
+**Next: the tech lead, on S2-10.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[################----]` 25 of 30
 
@@ -48,7 +48,7 @@ Current tickets: `[################----]` 25 of 30
 | S2-07 | GCC 16 builds its own static libgcc for k1om | Not started | Owner approved Sprint 2 on 2026-11-03; ticket set to ready. |
 | S2-08 | hello, scalar FP and printf on the card | draft | Owner approved Sprint 2 on 2026-11-03; this ticket stays draft until the card hold ends. |
 | S2-09 | GCC 16 builds gfortran, and the secondary-reload reproducer passes | Not started | Reconfiguring means one full rebuild: use `make -j8` with `CFLAGS=-O2 -g1 CXXFLAGS=-O2 -g1` as `tools/toolc... |
-| S2-10 | First card runs for the queued native checks | **Waiting for you** | S2-10 review: batch is good, 9 of 10 passed on the card. Not approvable yet; both open items need the inter... |
+| S2-10 | First card runs for the queued native checks | Waiting for review | Lead, under the owner's 2026-11-03 delegation: the relinked counter passed on the card and the results tabl... |
 | S2-11 | card_run follows the shared card rules and runs hello on the card | Done | tools/card_run now runs programs on the shared Xeon Phi under the owner's card rules (ledger lines, cores 3... |
 | S2-12 | card_run polls the card gently and reports what it reaped | Done | card_run now checks job status on its existing SSH session with backoff to 5 s and opens output connections... |
 | S2-13 | Card tests pass again, and approve runs them | In progress | The first ticket for the tools lane, which runs beside the gcc lane from 2026-11-03 (`--lane tools`). Do no... |
@@ -56,22 +56,22 @@ Current tickets: `[################----]` 25 of 30
 ## Recent activity
 
 - 2026-11-03 12:45 **S2-13** lead note: The first ticket for the tools lane, which runs beside the gcc lane from 2026-11-03 (`--lane tools`). Do not touch the GCC checkout or build.
+- 2026-11-03 12:44 **S2-10** owner decide: Lead, under the owner's 2026-11-03 delegation: the relinked counter passed on the card and the results table is filled (01d39c6); approving.
 - 2026-11-03 12:41 **S2-10** lead escalate: S2-10 review: batch is good, 9 of 10 passed on the card. Not approvable yet; both open items need the interactive lead, who alone runs the card. (1...
 - 2026-11-03 12:40 **S2-10** engineer submit: Rebuilt only .work/_shared/tmp/S2-10/atomic-counter.mic with donor libatomic.a and S1-06 bridge; readelf -d confirms no libatomic NEEDED. PASS exit...
 - 2026-11-03 12:38 **S2-10** lead answer: Type is now research. The lead ran the batch through the merged tools/card_run (S2-12) on 2026-11-03: 9 of 10 match byte for byte with exit 0 (hell...
 - 2026-11-03 12:34 **S2-10** owner decide: Lead, under the owner's 2026-11-03 delegation: type set to research, since this ticket prepares a batch and changes no code. Submit as is; the lead...
 - 2026-11-03 12:33 **S2-10** lead escalate: S2-10 only prepares a card batch, which is ready at .work/_shared/tmp/S2-10/batch.txt (docs commit a9952f4). It cannot be submitted because the tic...
 - 2026-11-03 12:32 **S2-10** engineer ask: Reproducer: python tools/pm.py show S2-10 still reports type: code. The 12:32 lead answer says the prepared batch and a9952f4 must remain unchanged...
-- 2026-11-03 12:32 **S2-10** lead answer: No red test is needed: this ticket only prepares a batch for the lead to run, so it is not test-driven work. The [red] check is a hard check keyed ...
 
 ## Cost
 
 - From the script, engineer: 103 sessions, 191.9M input tokens
 - From the script, lead: 102 sessions, 36.8M input tokens
-- Started by hand, Claude: 3 sessions, 300.0M input tokens
+- Started by hand, Claude: 3 sessions, 302.0M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 7.8 GiB of 100 GiB. 332 GiB free on the drive.
+The project uses 7.8 GiB of 100 GiB. 331 GiB free on the drive.
