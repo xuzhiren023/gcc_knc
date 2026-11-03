@@ -292,7 +292,7 @@ class Runner:
                 self.say('ERROR ' + label + ': ' + str(error))
 
     def t2(self):
-        if getattr(self.args, 'fast_math', False):
+        if getattr(getattr(self, 'args', None), 'fast_math', False):
             import fast_math
             fast_math.t2(self)
             return
@@ -321,8 +321,6 @@ class Runner:
             scalar_abi.t2(self)
             return
         if getattr(getattr(self, 'args', None), 'compiler', None) == 'gcc16' and not self.args.link_defaults:
-            import fast_math
-            fast_math.t2(self)
             import scalar_abi
             scalar_abi.t2(self)
         if getattr(getattr(self, 'args', None), 'link_defaults', False):
