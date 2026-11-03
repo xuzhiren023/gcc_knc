@@ -2,7 +2,7 @@
 
 Updated automatically at every ticket change. Last update: 2026-11-03 13:13.
 
-**Next: GPT-6.1, on S2-07 (GCC 16 builds its own static libgcc for k1om).** Run `python tools/dispatch.py`, or ask the tech lead to.
+**Waiting for you:** S2-14. Run `python tools/pm.py inbox`.
 
 Current tickets: `[############--------]` 27 of 42
 
@@ -52,7 +52,7 @@ Current tickets: `[############--------]` 27 of 42
 | S2-11 | card_run follows the shared card rules and runs hello on the card | Done | tools/card_run now runs programs on the shared Xeon Phi under the owner's card rules (ledger lines, cores 3... |
 | S2-12 | card_run polls the card gently and reports what it reaped | Done | card_run now checks job status on its existing SSH session with backoff to 5 s and opens output connections... |
 | S2-13 | Card tests pass again, and approve runs them | Done | All card tests in tests/tools pass again under Cygwin Python, and pm.py approve now refuses to merge any br... |
-| S2-14 | card_run stages extra files, so one job can run a batch | In progress | Yes, fixture only: the fake RPC may cd into the translated job dir (fixture tmp/claude/claude-<job>) before... |
+| S2-14 | card_run stages extra files, so one job can run a batch | **Waiting for you** | budget: 4 engineer sessions used; the budget is 4 |
 | S3-01 | Packed modes and IMCI patterns in GCC 16: entry points, audit and line estimate | draft |  |
 | S3-02 | One helper for optional tools/check selections | draft |  |
 | S3-03 | Native probe of unaligned pairs and masked aligned forms at page boundaries | draft |  |
@@ -67,6 +67,7 @@ Current tickets: `[############--------]` 27 of 42
 
 ## Recent activity
 
+- 2026-11-03 13:13 **S2-14** lead escalate: budget: 4 engineer sessions used; the budget is 4
 - 2026-11-03 13:13 **S2-14** lead answer: Yes, fixture only: the fake RPC may cd into the translated job dir (fixture tmp/claude/claude-<job>) before guard_boot calls, with snapshot and sta...
 - 2026-11-03 13:12 **S2-14** engineer ask: Approved fixture timeout=30: Cygwin suite 57/58, 39.121 s. Snapshot completes; stage chmod RPC (guard_boot && chmod) fails with exit 91: guard_dir ...
 - 2026-11-03 13:11 **S2-14** lead answer: Yes, fixture only: in this test call self.session.snapshot(timeout=30), with a one-line comment that Cygwin forks make the fake card-sized /proc wa...
@@ -74,7 +75,6 @@ Current tickets: `[############--------]` 27 of 42
 - 2026-11-03 13:07 **S2-14** owner decide: Lead, under the owner's 2026-11-03 delegation: input budget raised to 6M as well (the 13:06 decision raised only sessions). Continue per the 13:05 ...
 - 2026-11-03 13:07 **S2-14** engineer escalate: budget: 2612700 input tokens used; the budget is 2000000
 - 2026-11-03 13:06 **S2-14** owner decide: Lead, under the owner's 2026-11-03 delegation: 4 engineer sessions in total (2.6M tokens used). Follow the 13:05 answer: fixture-only change, keep ...
-- 2026-11-03 13:05 **S2-14** lead escalate: budget: 2 engineer sessions used; the budget is 2
 
 ## Cost
 
