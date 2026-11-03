@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-03 13:26.
+Updated automatically at every ticket change. Last update: 2026-11-03 13:32.
 
-**Next: GPT-6.1, on S2-08 (hello, scalar FP and printf on the card).** Run `python tools/dispatch.py`, or ask the tech lead to.
+**Next: the tech lead, on S2-08.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[#############-------]` 29 of 42
 
@@ -46,7 +46,7 @@ Current tickets: `[#############-------]` 29 of 42
 | S2-05 | x87 compares and zmm spill alignment | Done | gcc16 now has tests proving it picks the IEEE-correct x87 compare for every float, double and long double c... |
 | S2-06 | Atomics without cmpxchg16b, spin hint by delay | Done | Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`). |
 | S2-07 | GCC 16 builds its own static libgcc for k1om | Done | GCC 16 now links KNC programs with its own static libgcc, crtbegin and crtend, with no donor files, and its... |
-| S2-08 | hello, scalar FP and printf on the card | In progress | Rewritten now that the card is available: the engineer prepares, the lead runs (as in S2-10). Set ready by ... |
+| S2-08 | hello, scalar FP and printf on the card | Waiting for review | 781c90d: batch ready .work/_shared/tmp/S2-08/batch.txt. GCC16 own libgcc; hello/scalar/printf + donor twins... |
 | S2-09 | GCC 16 builds gfortran, and the secondary-reload reproducer passes | Not started | Reconfiguring means one full rebuild: use `make -j8` with `CFLAGS=-O2 -g1 CXXFLAGS=-O2 -g1` as `tools/toolc... |
 | S2-10 | First card runs for the queued native checks | Done | Ten programs ran on the shared Xeon Phi with output identical to their references: hello, the m1_affine fix... |
 | S2-11 | card_run follows the shared card rules and runs hello on the card | Done | tools/card_run now runs programs on the shared Xeon Phi under the owner's card rules (ledger lines, cores 3... |
@@ -67,6 +67,7 @@ Current tickets: `[#############-------]` 29 of 42
 
 ## Recent activity
 
+- 2026-11-03 13:32 **S2-08** engineer submit: 781c90d: batch ready .work/_shared/tmp/S2-08/batch.txt. GCC16 own libgcc; hello/scalar/printf + donor twins, compare and helper programs, 9 expecte...
 - 2026-11-03 13:26 **S2-07** lead approve: GCC 16 now links KNC programs with its own static libgcc, crtbegin and crtend, with no donor files, and its 128-bit integer and soft-float helpers ...
 - 2026-11-03 13:25 **S2-07** owner decide: Lead, under the owner's 2026-11-03 delegation: native comparison passed (13:23 note). Review item (1): the donor libgcc.a also uses stmxcsr (22 tim...
 - 2026-11-03 13:24 **S2-07** lead escalate: Interactive lead: T2 review of f351d2d/e682e23a0e7 found nothing blocking. Approve waits only on native: in a card session run python tools/libgcc....
@@ -74,13 +75,12 @@ Current tickets: `[#############-------]` 29 of 42
 - 2026-11-03 13:22 **S2-14** lead approve: card_run can now stage extra files next to the program with --file (size-capped by maxStageMiB, unsafe or duplicate names refused before admission)...
 - 2026-11-03 13:22 **S2-07** engineer submit: Per lead 13:21 and owner 13:22: existing fork libgcc/CRT build, archive/CRT lint, S1-06 T2 link and integer/soft-fp helper links PASS without donor...
 - 2026-11-03 13:22 **S2-07** owner decide: Lead, under the owner's 2026-11-03 delegation: input budget raised to 20M (1 of 4 sessions and 11.2M used; one GCC build session). Follow the 13:21...
-- 2026-11-03 13:21 **S2-14** engineer submit: Clean head ea14df3: Cygwin python3.12 unittest discover tests/tools test_card_*.py via tools/run.py passed 58/58 in 27.775s. Fixture ACL isolation ...
 
 ## Cost
 
 - From the script, engineer: 112 sessions, 209.2M input tokens
 - From the script, lead: 111 sessions, 38.6M input tokens
-- Started by hand, Claude: 3 sessions, 327.4M input tokens
+- Started by hand, Claude: 3 sessions, 328.0M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
