@@ -188,6 +188,10 @@ class Runner:
                 self.result('t0 ' + label, [str(error)])
 
     def t1(self):
+        if getattr(getattr(self, 'args', None), 'x87_spill', False):
+            import x87_spill
+            x87_spill.t1(self)
+            return
         if getattr(getattr(self, 'args', None), 'secondary_reload', False):
             import secondary_reload
             secondary_reload.t1(self)
@@ -433,6 +437,8 @@ def main():
     parser.add_argument('--cc', help='override compiler path')
     parser.add_argument('--scalar-abi', action='store_true',
                         help='S2-02 donor ABI probes and bidirectional cross-links only')
+    parser.add_argument('--x87-spill', action='store_true',
+                        help='S2-05 x87 forms, donor truth tables and XI spill alignment')
     parser.add_argument('--secondary-reload', action='store_true',
                         help='S2-04 Fortran address-loss reproducer and mixed GPR/zmm pressure')
     parser.add_argument('--varargs-abi', action='store_true',
