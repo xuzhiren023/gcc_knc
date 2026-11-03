@@ -470,6 +470,75 @@ class Dispatcher(Sandbox):
         self.assertEqual(left, "", "the page is committed")
 
 
+class Lanes(Sandbox):
+    """GCC tickets share one checkout and build; everything else may run beside them (owner, 2026-11-03)."""
+
+    def raw_ticket(self, ident, extra, state="ready", deps=""):
+        text = TICKET.format(id=ident, depth="standard", deps=deps).replace("state: ready", "state: " + state)
+        with open(os.path.join(self.root, "work", "tickets", ident + ".md"), "w", newline="\n") as f:
+            f.write(text.replace("---\n## Outcome", extra + "---\n## Outcome"))
+
+    def board(self):
+        import pm
+        cwd = os.getcwd()
+        os.chdir(self.root)
+        self.addCleanup(os.chdir, cwd)
+        return pm, pm.Board()
+
+    def test_a_tools_ticket_starts_while_a_gcc_ticket_is_in_progress(self):
+        for ident in ("A-1", "A-2"):
+            os.remove(os.path.join(self.root, "work", "tickets", ident + ".md"))
+        self.raw_ticket("G-1", "gcc: yes\n", state="doing")
+        self.raw_ticket("T-1", "")
+        pm, board = self.board()
+        self.assertEqual([(r, t.id) for r, t in [pm.next_action(board, "gcc")]], [("engineer", "G-1")])
+        self.assertEqual([(r, t.id) for r, t in [pm.next_action(board, "tools")]], [("engineer", "T-1")])
+        # Without a lane the board behaves as before: one ticket in progress at a time.
+        self.assertEqual(pm.next_action(board)[1].id, "G-1")
+
+    def test_a_lane_field_puts_a_ticket_that_uses_the_gcc_build_in_the_gcc_lane(self):
+        for ident in ("A-1", "A-2"):
+            os.remove(os.path.join(self.root, "work", "tickets", ident + ".md"))
+        self.raw_ticket("G-1", "gcc: yes\n", state="doing")
+        self.raw_ticket("U-1", "lane: gcc\n")
+        pm, board = self.board()
+        self.assertEqual(pm.lane_of(board.load("U-1")), "gcc")
+        self.assertIsNone(pm.next_action(board, "tools"))
+        self.assertEqual(pm.next_action(board, "gcc")[1].id, "G-1")
+
+    def test_board_changes_wait_for_the_board_lock_held_by_another_process(self):
+        pm, board = self.board()
+        env = dict(os.environ, PM_ROLE="engineer", PM_LOCK_WAIT="1")
+        command = [sys.executable, os.path.join(self.root, "tools", "pm.py"), "start", "A-1"]
+        with pm.board_lock(self.root):
+            with pm.board_lock(self.root):  # re-entrant inside one process
+                pass
+            busy = subprocess.run(command, cwd=self.root, env=env, stdout=subprocess.PIPE,
+                                  stderr=subprocess.STDOUT, universal_newlines=True)
+            self.assertNotEqual(busy.returncode, 0)
+            self.assertIn("board is busy", busy.stdout)
+            self.assertEqual(self.state("A-1"), "ready")
+        done = subprocess.run(command, cwd=self.root, env=env, stdout=subprocess.PIPE,
+                              stderr=subprocess.STDOUT, universal_newlines=True)
+        self.assertEqual(done.returncode, 0, done.stdout)
+        self.assertEqual(self.state("A-1"), "doing")
+
+    def test_a_lane_dispatcher_stops_only_for_owner_tickets_in_its_own_lane(self):
+        for ident in ("A-1", "A-2"):
+            os.remove(os.path.join(self.root, "work", "tickets", ident + ".md"))
+        self.raw_ticket("G-1", "gcc: yes\n", state="owner")
+        self.raw_ticket("T-1", "")
+        self.git("add", "-A")
+        self.git("commit", "-qm", "lanes")
+        env = dict(os.environ, PM_ROLE="engineer")
+        run = lambda lane: subprocess.run(
+            [sys.executable, os.path.join(self.root, "tools", "dispatch.py"), "--dry-run", "--max-sessions", "1",
+             "--lane", lane], cwd=self.root, env=env, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
+            universal_newlines=True)
+        self.assertIn("T-1 ready: engineer session", run("tools").stdout)
+        self.assertNotIn("session", run("gcc").stdout.split("\n")[0])
+
+
 class HandStartedUsage(unittest.TestCase):
     def setUp(self):
         import status
