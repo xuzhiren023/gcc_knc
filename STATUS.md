@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-02 20:54.
+Updated automatically at every ticket change. Last update: 2026-11-02 20:55.
 
-**Next: the tech lead, on S1-05.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Waiting for you:** S1-05. Run `python tools/pm.py inbox`.
 
 Current tickets: `[################----]` 14 of 17
 
@@ -36,12 +36,13 @@ Current tickets: `[################----]` 14 of 17
 | S1-02 | GCC 16.2 builds for k1om-mpss-linux | Done | GCC 16.2 now configures and builds its C compiler for k1om-mpss-linux, using the shared KNC assembler, link... |
 | S1-03 | tools/check runs source-level tests against GCC 16 | Done | tools/check t1 --compiler gcc16 now compiles each tests/t1/*.c test and checks its scan, scan-not, per-func... |
 | S1-04 | -march=knc with no SSE, AVX, MMX, CMOV, FCOMI or MFENCE | Done | GCC 16 now accepts -march=knc (the k1om default): it predefines __KNC__ and no SSE/MMX/AVX macros, rejects ... |
-| S1-05 | Integer C assembles with as 2.22 and lints clean | Question for the tech lead | 31e89e2 commits runner, reduced integer -g case and summary. Existing xgcc: 6009 measurements, 739.348s; IC... |
+| S1-05 | Integer C assembles with as 2.22 and lints clean | **Waiting for you** | Owner: which debugger/version runs on the card (MPSS gdb 7.x, or none)? It sets the k1om default DWARF: GCC... |
 | S1-06 | K1OM link defaults | Not started | Rebuild GCC with the logged gcc16 step of tools/toolchain.py as ONE blocking foreground shell call with a t... |
 | S1-07 | Milestone M0 evidence note | Not started | Rebuild GCC with the logged gcc16 step of tools/toolchain.py as ONE blocking foreground shell call with a t... |
 
 ## Recent activity
 
+- 2026-11-02 20:55 **S1-05** lead escalate: Owner: which debugger/version runs on the card (MPSS gdb 7.x, or none)? It sets the k1om default DWARF: GCC 16 uses DWARF 5 (.file 0, rejected by a...
 - 2026-11-02 20:54 **S1-05** engineer ask: 31e89e2 commits runner, reduced integer -g case and summary. Existing xgcc: 6009 measurements, 739.348s; ICE/as/lint=0. Infra failures: 11-line cor...
 - 2026-11-02 20:04 **S1-04** lead approve: GCC 16 now accepts -march=knc (the k1om default): it predefines __KNC__ and no SSE/MMX/AVX macros, rejects -msse, -msse2, -mavx, -mavx512f and -mmm...
 - 2026-11-02 20:03 **S1-04** engineer submit: 2545639 fixes scan-failure assembly/lint regression. tools/check t0 PASS (26 tests); gcc16 T1: all 12 sources incl smoke PASS; affine scans remain ...
@@ -49,7 +50,6 @@ Current tickets: `[################----]` 14 of 17
 - 2026-11-02 19:57 **S1-04** engineer submit: tools/check t1 --compiler gcc16: all 12 sources incl smoke PASS; affine scans are expected pre-E2 failures. CMOV seed caught cmovge; removed, rebui...
 - 2026-11-02 19:35 **S1-04** lead note: new_test_files is now 11 in the front matter; the 19:23 answer said so, but a review session cannot edit files, so it was not set until now. Submit...
 - 2026-11-02 19:23 **S1-04** lead answer: Yes: new_test_files is now 11 on the ticket, the approved red suite (defaults, two macro tests, five option rejections, three code tests); one file...
-- 2026-11-02 19:23 **S1-04** engineer ask: Submit blocked: 11 new test files; budget 8, although all 11 red tests were approved at 16:00. May the budget be raised for this approved suite? 6a...
 
 ## Cost
 
