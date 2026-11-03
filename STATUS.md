@@ -56,7 +56,7 @@ Current tickets: `[#############-------]` 32 of 46
 | S2-15 | -ffast-math links on KNC with a KNC crtfastmath | Not started | Rewritten after the lead's card run: the donor's FTZ/DAZ write runs on KNC, so the fix provides a matching ... |
 | S2-16 | Card batch files are readable by the lead | Done | Card batch programs are now written 0755 and data files 0644, so the lead can read and stage them; Cygwin n... |
 | S2-17 | card_run tolerates ending processes, and stages batch files correctly | Done | card_run now skips processes that end mid-snapshot instead of failing the run, keeps a finished program's r... |
-| S2-18 | The card test driver runs programs in parallel on our 30 cores | Not started | Part of the owner's card-use rule of 2026-11-03 (CURRENT_STATE.md). Later batches should be the full execut... |
+| S2-18 | The card test driver runs programs in parallel on our 30 cores | In progress | Part of the owner's card-use rule of 2026-11-03 (CURRENT_STATE.md). Later batches should be the full execut... |
 | S3-01 | Packed modes and IMCI patterns in GCC 16: entry points, audit and line estimate | draft |  |
 | S3-02 | One helper for optional tools/check selections | draft |  |
 | S3-03 | Native probe of unaligned pairs and masked aligned forms at page boundaries | draft |  |
