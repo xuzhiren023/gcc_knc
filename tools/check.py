@@ -52,6 +52,8 @@ SELECTIONS = {
         't2': lambda runner: runner.t2_link_defaults()}),
     'vector': ('S3 vector code generation probes (knc-vec-*.c)', {
         't1': lambda runner: importlib.import_module('knc_vector').t1(runner)}),
+    'vector_unaligned': ('S3-05 unaligned packed moves only', {
+        't1': lambda runner: importlib.import_module('knc_vector').t1_unaligned(runner)}),
 }
 
 

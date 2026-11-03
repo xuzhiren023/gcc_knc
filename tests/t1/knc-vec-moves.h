@@ -6,6 +6,50 @@
 #endif
 extern void packed_clobber(void);
 
+#if CASE >= 11 && CASE <= 15
+/* Only element alignment is known, independently for input and output.
+   Keep the vector type local: the ordinary scalar ABI carries the pointers. */
+typedef __typeof__ (((packed){0})[0]) element;
+typedef packed unaligned __attribute__((aligned(__alignof__(element)), may_alias));
+struct __attribute__((packed, aligned(__alignof__(element)))) underaligned
+{
+  element pad;
+  packed value;
+};
+
+#if CASE == 11
+void packed_unknown(const unaligned *input, unaligned *output)
+{
+  *output = *input;
+}
+#elif CASE == 12
+void packed_unknown_load(const unaligned *input, packed *output)
+{
+  *output = *input;
+}
+#elif CASE == 13
+void packed_unknown_store(const packed *input, unaligned *output)
+{
+  *output = *input;
+}
+#elif CASE == 14
+void packed_under_member(const struct underaligned *input,
+                         struct underaligned *output)
+{
+  output->value = input->value;
+}
+#elif CASE == 15
+void packed_unknown_live(const unaligned *input, unaligned *output)
+{
+  packed saved = *input;
+  __asm__ volatile("# packed-live %g0" : "+YJ"(saved));
+  packed_clobber();
+  __asm__ volatile("# packed-reload %g0" : "+YJ"(saved));
+  *output = saved;
+}
+#endif
+#endif
+
 #if CASE == 1
 void packed_copy(const packed *input, packed *output)
 {
