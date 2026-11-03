@@ -5,6 +5,7 @@ import runpy
 import shlex
 import shutil
 import subprocess
+import sys
 import tempfile
 import unittest
 from unittest import mock
@@ -68,6 +69,11 @@ class CardBackend(unittest.TestCase):
     def test_extra_files_raw_upload_modes_and_cleanup_with_card_sized_proc(self):
         with tempfile.TemporaryDirectory(dir=ROOT) as name:
             directory = Path(name)
+            if sys.platform == "cygwin":
+                # Keep inherited Windows ACLs out of this POSIX-mode fixture;
+                # engineer and approve accounts can inherit different grants.
+                subprocess.run([shutil.which("setfacl"), "-b", "-k", str(directory)],
+                               check=True, capture_output=True)
             proc = directory / "proc"
             (directory / "tmp/claude").mkdir(parents=True)
             (proc / "self").mkdir(parents=True)
@@ -89,6 +95,9 @@ class CardBackend(unittest.TestCase):
             data = directory / "input ' data"
             data.write_bytes(b"\x00\xffdata\n")
             data.chmod(0o600)
+            for source, mode in ((extra, 0o700), (data, 0o600)):
+                self.assertEqual(source.stat().st_mode & 0o777, mode,
+                                 "host fixture chmod: %s" % source.name)
             self.session.pin_helper = program
             self.session.command = ["fake-ssh", "exec sh"]
             run_dir = directory / self.session.run_dir.lstrip("/")
