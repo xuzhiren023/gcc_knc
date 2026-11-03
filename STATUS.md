@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-03 18:23.
+Updated automatically at every ticket change. Last update: 2026-11-03 18:24.
 
-**Next: GPT-6.1, on S3-05 (Unaligned packed moves through load and store pairs).** Run `python tools/dispatch.py`, or ask the tech lead to.
+**Next: the tech lead, on S3-05.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[###############-----]` 40 of 51
 
@@ -62,7 +62,7 @@ Current tickets: `[###############-----]` 40 of 51
 | S3-02 | One helper for optional tools/check selections | Done | tools/check optional selections now come from one table, several flags given together all run and each repo... |
 | S3-03 | Native probe of unaligned pairs and masked aligned forms at page boundaries | Done | Acceptance lines ticked: the lead ran the probe on the card, 3,148 cases with 0 failures; the fault table a... |
 | S3-04 | Packed modes legal under -march=knc, with aligned moves, spills and constants | Done | Under -march=knc, 64-byte float, double, int and long long vectors now live in zmm registers, with aligned ... |
-| S3-05 | Unaligned packed moves through load and store pairs | In progress | Yes. The red commit added t1_unaligned to knc_vector.t1 but did not update test_vector_cli_selects_only_vec... |
+| S3-05 | Unaligned packed moves through load and store pairs | Waiting for review | ed24ab6 fixes existing dispatch test. Reran T0 only: PASS (23 regress, 8 doctor, 4 lint). Log: .work/_state... |
 | S3-06 | Packed FP add, sub, mul, FMA and broadcasts for V16SF and V8DF | Not started | A lead review of S3-04 asks for generic vector code on 64-byte types, which no test covers: `*c=*a+*b` at -... |
 | S3-07 | Auto-vectorization on zmm, with x87 peel and remainder; m1_affine T1 and T2 green | Not started | ADR-0006 (accepted, owner's direction): shared i386 files hold hooks only. Put function bodies, switch tabl... |
 | S3-08 | Fortran twin of m1_affine vectorizes and links | Not started | Owner approved Sprint 3 on 2026-11-03; ticket set to ready. |
@@ -89,7 +89,7 @@ Current tickets: `[###############-----]` 40 of 51
 
 - From the script, engineer: 136 sessions, 280.8M input tokens
 - From the script, lead: 135 sessions, 45.9M input tokens
-- Started by hand, Claude: 5 sessions, 429.2M input tokens
+- Started by hand, Claude: 5 sessions, 430.2M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
