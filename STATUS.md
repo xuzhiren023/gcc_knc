@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-03 10:20.
+Updated automatically at every ticket change. Last update: 2026-11-03 10:39.
 
-**Next: GPT-6.1, on S2-06 (Atomics without cmpxchg16b, spin hint by delay).** Run `python tools/dispatch.py`, or ask the tech lead to.
+**Next: the tech lead, on S2-06.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[###############-----]` 22 of 28
 
@@ -44,32 +44,32 @@ Current tickets: `[###############-----]` 22 of 28
 | S2-03 | Varargs with the donor's register save area | Done | GCC 16 varargs functions now check %al and save the FP argument registers to the SysV save area at fp_offse... |
 | S2-04 | Scalar transfers through memory and mask scratch | Done | Scalar values now move between general and vector registers through memory with an allocated mask scratch, ... |
 | S2-05 | x87 compares and zmm spill alignment | Done | gcc16 now has tests proving it picks the IEEE-correct x87 compare for every float, double and long double c... |
-| S2-06 | Atomics without cmpxchg16b, spin hint by delay | In progress | 1. gcc/config/i386/sync.md:425 (gcc fork): enabling atomic_compare_and_swapti for TARGET_KNC sets HAVE_atom... |
+| S2-06 | Atomics without cmpxchg16b, spin hint by delay | Waiting for review | Red 84628d7 reproduced false native TI CAS advertising; GCC fix 0e5eb3cbf21 undefines the macro for KNC. Re... |
 | S2-07 | GCC 16 builds its own static libgcc for k1om | Not started | Owner approved Sprint 2 on 2026-11-03; ticket set to ready. |
 | S2-08 | hello, scalar FP and printf on the card | draft | Owner approved Sprint 2 on 2026-11-03; this ticket stays draft until the card hold ends. |
 | S2-09 | GCC 16 builds gfortran, and the secondary-reload reproducer passes | Not started | Reconfiguring means one full rebuild: use `make -j8` with `CFLAGS=-O2 -g1 CXXFLAGS=-O2 -g1` as `tools/toolc... |
 | S2-10 | First card runs for the queued native checks | Not started | The owner supplied `config/card.local.json` on 2026-11-03 (git-ignored; the `knownHosts` file is read from ... |
-| S2-11 | card_run works on the card's BusyBox and shares the card | Not started | One more item, found by S2-06: `--config` defaults to `ROOT/config/card.local.json`, and `ROOT` is the tick... |
+| S2-11 | card_run follows the shared card rules and runs hello on the card | Not started | Correction to 10:24: the lead made the sandbox change itself, so S2-11's first card run is not blocked by i... |
 
 ## Recent activity
 
+- 2026-11-03 10:39 **S2-06** engineer submit: Red 84628d7 reproduced false native TI CAS advertising; GCC fix 0e5eb3cbf21 undefines the macro for KNC. Resumed all-gcc PASS. T1/T2 --compiler gcc...
+- 2026-11-03 10:35 **S2-11** lead note: Rewritten for the owner's shared-card rules of 2026-11-03; they supersede every earlier note on this ticket. The ledger path waits for the owner (t...
+- 2026-11-03 10:32 **S2-11** lead note: Correction to 10:24: the lead made the sandbox change itself, so S2-11's first card run is not blocked by its own merge. `tools/dispatch.py` now ad...
+- 2026-11-03 10:24 **S2-11** lead note: The owner chose a neutral ledger outside both projects: `C:/Users/xuzhi/Documents/card-coordination/jobs.jsonl` (created empty by the lead with nat...
 - 2026-11-03 10:20 **S2-11** lead note: One more item, found by S2-06: `--config` defaults to `ROOT/config/card.local.json`, and `ROOT` is the ticket worktree, which has no copy of the gi...
 - 2026-11-03 10:19 **S2-06** lead changes: 1. gcc/config/i386/sync.md:425 (gcc fork): enabling atomic_compare_and_swapti for TARGET_KNC sets HAVE_atomic_compare_and_swapti, so c-family/c-cpp...
 - 2026-11-03 10:18 **S2-06** engineer submit: T1/T2 --compiler gcc16 --atomics PASS, including all widths, TI libatomic calls, delay, assembler/lint and counter binary link. Added lock-free che...
 - 2026-11-03 10:16 **S2-06** owner decide: Lead decided under the owner's 2026-11-03 delegation: input budget raised to 40M (one build-heavy session used 18.8M). Follow the 10:15 answer: add...
-- 2026-11-03 10:15 **S2-06** lead escalate: budget: 18797984 input tokens used; the budget is 6000000
-- 2026-11-03 10:15 **S2-06** lead answer: No card settings needed from you: the owner has supplied config/card.local.json (git-ignored) and the card is in shared mode, so there is no availa...
-- 2026-11-03 10:14 **S2-06** engineer ask: Build and scoped T1/T2 pass; red 3fc86d7. Logs: .work/_state/logs/S2_06_*.log. Native via tools/card_run exits 126: config/card.local.json missing;...
-- 2026-11-03 10:10 **S2-11** lead note: Supersedes the 10:00 to 10:06 lock notes. The owner said card runs need no exclusive window, since the card runs Linux and our tests are small, so ...
 
 ## Cost
 
 - From the script, engineer: 85 sessions, 170.0M input tokens
 - From the script, lead: 84 sessions, 31.2M input tokens
-- Started by hand, Claude: 3 sessions, 234.7M input tokens
+- Started by hand, Claude: 3 sessions, 243.3M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 7.7 GiB of 100 GiB. 306 GiB free on the drive.
+The project uses 7.7 GiB of 100 GiB. 305 GiB free on the drive.
