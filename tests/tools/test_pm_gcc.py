@@ -193,3 +193,13 @@ class GccTickets(Sandbox):
         allowed = command[command.index("--allowedTools") + 1]
         for verb in ("log", "diff", "show"):
             self.assertIn("Bash(git -C .work/_shared/gcc " + verb + "*)", allowed)
+
+    def test_review_prompt_says_the_review_cannot_edit_or_run_checks(self):
+        # Reviews three times promised a file edit or a check run that their tools cannot do.
+        board = dispatch.pm.Board.__new__(dispatch.pm.Board)
+        board.policy = {"budgets": {"standard": {"effort": "high"}}}
+        ticket = dispatch.pm.Ticket(board, "A-1", {"state": "blocked", "branch": self.branch}, "")
+        prompt = dispatch.lead_command(board, ticket)[2]
+        self.assertIn("cannot edit files or run tools/check", prompt)
+        self.assertIn("--override", prompt)
+        self.assertIn("escalate", prompt)

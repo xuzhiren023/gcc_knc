@@ -269,7 +269,10 @@ class SubmitChecks(Sandbox):
         lines = "".join("assert %d\n" % i for i in range(200))
         self.commit_file("tests/regress/big.py", lines, "test(A-1): many [red]", self.wt)
         self.commit_file("src/a.py", "x = 1\n", "feat(A-1): x", self.wt)
-        self.assertIn("test lines", self.refused())
+        refusal = self.refused()
+        self.assertIn("test lines", refusal)
+        # Engineers asked instead of overriding because the refusal never named the flag.
+        self.assertIn("--override", refusal)
         done = self.pm("submit", "A-1", "--note", "n", "--override", "generated table", cwd=self.wt)
         self.assertEqual(done.returncode, 0, done.stdout)
         self.assertIn("OVER BUDGET", self.pm("show", "A-1").stdout)
