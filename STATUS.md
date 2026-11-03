@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-03 08:01.
+Updated automatically at every ticket change. Last update: 2026-11-03 08:11.
 
-**Waiting for you:** S2-03. Run `python tools/pm.py inbox`.
+**Next: GPT-6.1, on S2-03 (Varargs with the donor's register save area).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
 Current tickets: `[###############-----]` 19 of 25
 
@@ -41,7 +41,7 @@ Current tickets: `[###############-----]` 19 of 25
 | S1-07 | Milestone M0 evidence note | Done | M0 is settled as adjust: GCC 16.2 builds a k1om cc1 whose assembly the 2.22 assembler accepts, an options-f... |
 | S2-01 | Design for zmm and mask registers under -march=knc | Done | The register design for KNC is settled on paper: all 32 zmm and 8 mask registers become usable under -march... |
 | S2-02 | Float and double arguments and results in zmm lane 0 | Done | GCC 16 for KNC now passes float and double arguments and results in zmm lane 0, puts them on the stack afte... |
-| S2-03 | Varargs with the donor's register save area | **Waiting for you** | budget: 4 engineer sessions used; the budget is 4 |
+| S2-03 | Varargs with the donor's register save area | Changes requested | Owner allowed one more engineer session (5 in total) on 2026-11-03; make the lead's 08:00 tools/check.py gu... |
 | S2-04 | Scalar transfers through memory and mask scratch | Not started | Follow docs/adr/0004-knc-registers-and-scalar-abi.md, point 6: an allocated GPR scratch and an HI mask pseu... |
 | S2-05 | x87 compares and zmm spill alignment | Not started | Follow docs/adr/0004-knc-registers-and-scalar-abi.md, point 2: XI spills need 64-byte storage. This ticket ... |
 | S2-06 | Atomics without cmpxchg16b, spin hint by delay | Not started | Owner approved Sprint 2 on 2026-11-03; ticket set to ready. |
@@ -50,6 +50,7 @@ Current tickets: `[###############-----]` 19 of 25
 
 ## Recent activity
 
+- 2026-11-03 08:11 **S2-03** owner decide: Owner allowed one more engineer session (5 in total) on 2026-11-03; make the lead's 08:00 tools/check.py guard fix, run tools/check t0 and resubmit.
 - 2026-11-03 08:01 **S2-03** lead escalate: budget: 4 engineer sessions used; the budget is 4
 - 2026-11-03 08:00 **S2-03** lead changes: 1. tools/check.py:281 (and :191): getattr(self.args, 'varargs_abi', False) raises AttributeError when Runner has no args, so tools/check t0 fails 5...
 - 2026-11-03 07:59 **S2-03** engineer submit: S2-03 build 5c53d8fa9cd: full unfiltered varargs T1 (8 donor/GCC16 caller/callee O0/O2 cases), S2-02 scalar ABI T1/T2 and torture PASS. Torture: 60...
@@ -57,13 +58,12 @@ Current tickets: `[###############-----]` 19 of 25
 - 2026-11-03 07:44 **S2-03** engineer submit: Build PASS: ../_state/logs/S2_03_build-20261103-072129.log. T1 GCC16 callee O0/O2 and both T2 cross-links/sysroot checks PASS: ../_state/logs/S2_03...
 - 2026-11-03 07:20 **S2-03** lead approve-red: Red proven: the new test shows GCC 16 varargs functions skip the AL check, the FP register saves and fp_offset=48 that the donor does, while AL at ...
 - 2026-11-03 07:19 **S2-03** engineer red: 6ceebb8 [red]. Corrected T1 rerun: donor callers/callees pass at O0/O2, including AL=0/1/8 and overflow stack values; GCC16 callers pass. GCC16 cal...
-- 2026-11-03 07:18 **S2-03** lead answer: Yes. T1 red is the red proof for this ticket. A link cannot see the save-area layout or %al, so passing T2 links before the change is expected and ...
 
 ## Cost
 
 - From the script, engineer: 73 sessions, 136.4M input tokens
 - From the script, lead: 72 sessions, 27.1M input tokens
-- Started by hand, Claude: 3 sessions, 210.3M input tokens
+- Started by hand, Claude: 3 sessions, 211.4M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
