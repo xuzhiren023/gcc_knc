@@ -329,8 +329,11 @@ class MachineCheck(Sandbox):
                          "        self.assertEqual(sys.platform, 'cygwin')\n"
                          "        self.fail('card approval gate ran under Cygwin')\n",
                          "test(A-1): card approval gate [red]", self.wt)
-        self.commit_file(path, "changed\n", "fix(A-1): card change", self.wt)
-        self.assertEqual(self.pm("submit", "A-1", "--note", "n", cwd=self.wt).returncode, 0)
+        with open(os.path.join(self.wt, path), encoding="utf8") as f:
+            original = f.read()
+        self.commit_file(path, original + "\n", "fix(A-1): card change", self.wt)
+        submitted = self.pm("submit", "A-1", "--note", "n", cwd=self.wt)
+        self.assertEqual(submitted.returncode, 0, submitted.stdout)
         done = self.pm("approve", "A-1", role="lead")
         self.assertEqual(done.returncode, 1, done.stdout)
         self.assertIn("card approval gate ran under Cygwin", done.stdout)

@@ -48,6 +48,8 @@ class SharedTransport:
 
     def connect(self, run_dir, *, timeout):
         self.events.append(("connect", run_dir))
+        if self.unreachable:
+            raise ConnectionError("card unreachable on reconnect")
         self.run_dir = run_dir
         return self
 
@@ -318,6 +320,7 @@ class SharedCardRules(unittest.TestCase):
                 self.transport = SharedTransport()
                 self.transport.ledger = self.ledger
                 self.transport.reboot = fault == "reboot"
+                # S2-11 confirms a link fault only if the cleanup reconnect fails.
                 # Break only after admission, when execute is entered.
                 if fault == "link":
                     original = self.transport.execute
@@ -382,6 +385,7 @@ class SharedCardRules(unittest.TestCase):
         self.assertAlmostEqual(result["card_minutes"], 0.2)
 
     def test_missing_required_tool_is_named(self):
+        # S2-11 uses dd for binary output; od is no longer a required tool.
         # Execute the actual generated tool-check snippet with a fake shell
         # command lookup. All other RPCs are inert; no card connection occurs.
         sh = shutil.which("sh")
@@ -395,7 +399,7 @@ class SharedCardRules(unittest.TestCase):
             def rpc(self, script, timeout, **kwargs):
                 scripts.append(script)
                 if "command -v" in script:
-                    fake_lookup = 'command() { [ "$2" != "od" ]; }\n'
+                    fake_lookup = 'command() { [ "$2" != "dd" ]; }\n'
                     answer = subprocess.run([sh, "-c", fake_lookup + script],
                                             stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
                     if answer.returncode:
@@ -409,7 +413,7 @@ class SharedCardRules(unittest.TestCase):
         with mock.patch.dict(self.runner["SSHTransport"].connect.__globals__,
                              SSHSession=ToolCheckSession,
                              RUN_DIR=mock.Mock(fullmatch=mock.Mock(return_value=True))):
-            with self.assertRaisesRegex(OSError, "od"):
+            with self.assertRaisesRegex(OSError, "dd"):
                 self.runner["SSHTransport"](self.config, 1).connect(
                     "/tmp/claude/claude-" + "a" * 32, timeout=1)
         self.assertTrue(any("command -v" in script for script in scripts))
