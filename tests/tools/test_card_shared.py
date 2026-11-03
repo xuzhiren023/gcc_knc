@@ -65,8 +65,9 @@ class SharedTransport:
                     meminfo="MemTotal: 16000000 kB\nMemFree: %d kB\n" % free,
                     pinning=self.pinning)
 
-    def stage(self, run_dir, program, *, timeout):
+    def stage(self, run_dir, program, *, timeout, files=()):
         self.events.append(("stage", run_dir))
+        self.staged_files = list(files)
         if self.stage_failure:
             raise OSError("partial staging failure")
 
@@ -132,13 +133,15 @@ class SharedCardRules(unittest.TestCase):
         self.transport = SharedTransport()
         self.transport.ledger = self.ledger
 
-    def invoke(self, *, default_root=None):
+    def invoke(self, *, default_root=None, files=()):
         if default_root is not None:
             self.config["ownLock"] = str(default_root / "card.lock")
         self.config_path.write_text(json.dumps(self.config), encoding="utf8")
         args = ["card_run", "--receipt", str(self.result_path)]
         if default_root is None:
             args += ["--config", str(self.config_path)]
+        for path in files:
+            args += ["--file", str(path)]
         args += [str(self.program)]
         stdout, stderr = io.StringIO(), io.StringIO()
         actual_run = self.runner["run"]
@@ -165,6 +168,36 @@ class SharedCardRules(unittest.TestCase):
 
     def own_lines(self):
         return [line for line in self.transport.read_ledger() if line.get("agent") == "claude"]
+
+    def test_extra_files_refused_before_connection_or_admission(self):
+        extra = self.directory / "batch.mic"
+        extra.write_bytes(b"batch")
+        other = self.directory / "other"
+        other.mkdir()
+        duplicate = other / extra.name
+        duplicate.write_bytes(b"duplicate basename")
+        reserved = self.directory / "claude-program"
+        reserved.write_bytes(b"must not replace driver")
+        self.config["maxStageMiB"] = 1
+        with self.program.open("wb") as stream:
+            stream.truncate(1024 * 1024)
+        for files in ([extra, duplicate], [self.directory / ".."], [reserved], [extra]):
+            with self.subTest(files=files):
+                result = self.invoke(files=files)
+                self.assertEqual(result.get("result_class"), "refused", self.diagnostic)
+                self.assertEqual(self.transport.events, [])
+                self.assertEqual(self.ledger.read_text(), "")
+        self.program.write_bytes(b"driver")
+        self.transport.stage_overhead = lambda: 1024 * 1024
+        result = self.invoke()
+        self.assertEqual(result.get("result_class"), "refused", self.diagnostic)
+        self.assertEqual(self.transport.events, [])
+        del self.transport.stage_overhead
+        data = self.directory / "input"
+        data.write_bytes(b"data")
+        result = self.invoke(files=[extra, data])
+        self.assertEqual(result.get("result_class"), "program", self.diagnostic)
+        self.assertEqual(self.transport.staged_files, [extra, data])
 
     def test_worktree_default_uses_main_config_without_copy(self):
         main = self.directory / "project"

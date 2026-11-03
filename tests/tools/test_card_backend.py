@@ -5,6 +5,7 @@ import runpy
 import shlex
 import shutil
 import subprocess
+import sys
 import tempfile
 import unittest
 from unittest import mock
@@ -64,6 +65,85 @@ class CardBackend(unittest.TestCase):
         self.assertIn("guard_boot", command[-1])
         self.assertIn("cat > claude-program", command[-1])
         self.assertNotIn("base64", command[-1])
+
+    def test_extra_files_raw_upload_modes_and_cleanup_with_card_sized_proc(self):
+        with tempfile.TemporaryDirectory(dir=ROOT) as name:
+            directory = Path(name)
+            if sys.platform == "cygwin":
+                # Keep inherited Windows ACLs out of this POSIX-mode fixture;
+                # engineer and approve accounts can inherit different grants.
+                subprocess.run([shutil.which("setfacl"), "-b", "-k", str(directory)],
+                               check=True, capture_output=True)
+            proc = directory / "proc"
+            (directory / "tmp/claude").mkdir(parents=True)
+            (proc / "self").mkdir(parents=True)
+            (proc / "sys/kernel/random").mkdir(parents=True)
+            (proc / "sys/kernel/random/boot_id").write_text(self.session.boot_id + "\n")
+            (proc / "cpuinfo").write_text("\n\n".join(
+                "processor : %d\ncore id : %d\n" % (cpu, cpu // 4 + 1) +
+                "\n".join("unused : ignored" for _ in range(23)) for cpu in range(240)))
+            (proc / "meminfo").write_text("MemFree: 4000000 kB\n")
+            for pid in range(100, 400):
+                thread = proc / str(pid)
+                thread.mkdir()
+                (thread / "status").write_text("PPid: 2\n")
+            program = directory / "driver"
+            program.write_bytes(b"driver")
+            extra = directory / "claude-batch.mic"
+            extra.write_bytes(bytes(range(256)))
+            extra.chmod(0o700)
+            data = directory / "input ' data"
+            data.write_bytes(b"\x00\xffdata\n")
+            data.chmod(0o600)
+            for source, mode in ((extra, 0o700), (data, 0o600)):
+                self.assertEqual(source.stat().st_mode & 0o777, mode,
+                                 "host fixture chmod: %s" % source.name)
+            self.session.pin_helper = program
+            self.session.command = ["fake-ssh", "exec sh"]
+            run_dir = directory / self.session.run_dir.lstrip("/")
+
+            def translate(script):
+                # Cygwin ancestor workaround: only stage mkdir -p is relative
+                # to the fixture cwd; guards and /proc stay absolute after cd.
+                script = script.replace("mkdir -p /tmp/claude", "mkdir -p tmp/claude")
+                return script.replace("/tmp", str(directory / "tmp")).replace(
+                    "/proc/", str(proc) + "/")
+
+            def rpc(script, timeout, **kwargs):
+                setup = self.remote + '\nrun_dir=%s\nboot_id=%s\n' % (
+                    shlex.quote(self.session.run_dir), shlex.quote(self.session.boot_id))
+                # Same Cygwin-ancestor workaround: mimic the persistent RPC cwd.
+                if script.startswith("guard_boot"):
+                    setup += 'cd -- "$run_dir" || exit 91\n'
+                answer = subprocess.run([shutil.which("sh"), "-c", translate(setup + script)],
+                                        cwd=directory, capture_output=True, timeout=timeout)
+                self.assertEqual(answer.returncode, 0, answer.stderr)
+                return answer.stdout.rstrip(b"\n")
+
+            self.session.rpc = rpc
+            actual_popen = subprocess.Popen
+
+            def popen(command, **kwargs):
+                if command[0] == "fake-ssh":
+                    command = [shutil.which("sh"), "-c", translate(shlex.split(command[-1])[-1])]
+                    kwargs["cwd"] = directory
+                return actual_popen(command, **kwargs)
+
+            with mock.patch.object(self.runner["subprocess"], "Popen", side_effect=popen):
+                # Cygwin forks make the fake card-sized /proc walk slow.
+                self.session.snapshot(timeout=30)
+                self.session.stage(self.session.run_dir, program, files=[extra, data], timeout=10)
+            for source, mode in ((extra, 0o700), (data, 0o600)):
+                staged = run_dir / source.name
+                self.assertEqual(staged.read_bytes(), source.read_bytes())
+                self.assertEqual(staged.stat().st_mode & 0o777, mode)
+            self.session.cleanup(self.session.run_dir, self.session.boot_id, timeout=5)
+            self.assertFalse(run_dir.exists())
+            with mock.patch.object(self.runner["subprocess"], "Popen") as spawn:
+                for unsafe in ("sub/file", "../escape", "..", "claude-../escape"):
+                    with self.subTest(name=unsafe), self.assertRaises(OSError):
+                        self.session.send_file(unsafe, b"", 1)
+                spawn.assert_not_called()
 
     def test_output_binary_roundtrip_rejects_busybox_head_c_and_od_A(self):
         directory = Path(self.session.run_dir)
@@ -194,6 +274,7 @@ od() { case "$*" in *-A*) echo 'od: invalid option -- A' >&2; return 94;; esac; 
                 with self.subTest(marker=marker, status=status):
                     fixture = directory / ("marked" if marker else "unmarked")
                     fixture.mkdir(exist_ok=True)
+                    (fixture / "unused.mic").write_bytes(b"fake program")
                     session = self.session
                     session.boot_id = BOOT
                     setup = ('guard_boot() { :; }; guard_dir() { :; }; '

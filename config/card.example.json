@@ -5,5 +5,6 @@
   "timeout": 60.0,
   "transportTimeout": 10.0,
   "ledger": "C:/replace/with/shared/card-coordination/jobs.jsonl",
-  "memoryMB": 128
+  "memoryMB": 128,
+  "maxStageMiB": 64
 }
