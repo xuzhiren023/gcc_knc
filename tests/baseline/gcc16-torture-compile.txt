@@ -9,22 +9,21 @@ FP ABI class requires every compiler error to be the explicit SSE-disabled ABI d
 User inline asm rejected requires every assembler error inside #APP/#NO_APP; source lint must be clean.
 Timeout policy: 60s, then one 600s compiler retry; both exceeded = hang.
 Slow is an additional timing class: retry completed; underlying outcome is counted too.
-Whole-run wall time: 679.503 seconds (11.325 minutes), 8 workers.
+Whole-run wall time: 608.398 seconds (10.140 minutes), 8 workers.
 Files: 2003; measurements: 6009.
 
 level	pass	slow	hang	ICE	compiler error	float/double ABI error	assembler rejection	lint failure	infrastructure failure	user inline asm rejected
-O0	1967	0	0	1	33	0	0	0	0	2
-O2	1968	0	0	1	32	0	0	0	0	2
-O2-g	1968	0	0	1	32	0	0	0	0	2
+O0	1962	0	0	0	39	0	0	0	0	2
+O2	1963	0	0	0	38	0	0	0	0	2
+O2-g	1963	0	0	0	38	0	0	0	0	2
 
 O0 / slow (0)
 
 O0 / hang (0)
 
-O0 / ICE (1)
-pr108892.c
+O0 / ICE (0)
 
-O0 / compiler error (33)
+O0 / compiler error (39)
 20030305-1.c
 20111209-1.c
 asmgoto-5.c
@@ -38,13 +37,18 @@ pr10153-1.c
 pr10153-2.c
 pr106433.c
 pr108237.c
+pr108892.c
 pr110386-2.c
 pr28865.c
 pr29201.c
 pr33614.c
+pr33617.c
 pr34856.c
 pr39928-1.c
 pr48767.c
+pr70061.c
+pr70240.c
+pr70355.c
 pr83547.c
 pr86637-2.c
 pr88347.c
@@ -58,6 +62,7 @@ vector-3.c
 vector-5.c
 vector-6.c
 vector-dup-1.c
+vector-shift-1.c
 
 O0 / float/double ABI error (0)
 
@@ -75,10 +80,9 @@ O2 / slow (0)
 
 O2 / hang (0)
 
-O2 / ICE (1)
-pr108892.c
+O2 / ICE (0)
 
-O2 / compiler error (32)
+O2 / compiler error (38)
 20030305-1.c
 20111209-1.c
 dll.c
@@ -91,13 +95,18 @@ pr10153-1.c
 pr10153-2.c
 pr106433.c
 pr108237.c
+pr108892.c
 pr110386-2.c
 pr28865.c
 pr29201.c
 pr33614.c
+pr33617.c
 pr34856.c
 pr39928-1.c
 pr48767.c
+pr70061.c
+pr70240.c
+pr70355.c
 pr83547.c
 pr86637-2.c
 pr88347.c
@@ -111,6 +120,7 @@ vector-3.c
 vector-5.c
 vector-6.c
 vector-dup-1.c
+vector-shift-1.c
 
 O2 / float/double ABI error (0)
 
@@ -128,10 +138,9 @@ O2-g / slow (0)
 
 O2-g / hang (0)
 
-O2-g / ICE (1)
-pr108892.c
+O2-g / ICE (0)
 
-O2-g / compiler error (32)
+O2-g / compiler error (38)
 20030305-1.c
 20111209-1.c
 dll.c
@@ -144,13 +153,18 @@ pr10153-1.c
 pr10153-2.c
 pr106433.c
 pr108237.c
+pr108892.c
 pr110386-2.c
 pr28865.c
 pr29201.c
 pr33614.c
+pr33617.c
 pr34856.c
 pr39928-1.c
 pr48767.c
+pr70061.c
+pr70240.c
+pr70355.c
 pr83547.c
 pr86637-2.c
 pr88347.c
@@ -164,6 +178,7 @@ vector-3.c
 vector-5.c
 vector-6.c
 vector-dup-1.c
+vector-shift-1.c
 
 O2-g / float/double ABI error (0)
 
