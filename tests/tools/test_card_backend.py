@@ -116,7 +116,7 @@ class CardBackend(unittest.TestCase):
                              'printf "%s\\n" > status; %s; };\n' %
                              (status, ': > claude-pinned' if marker else ':'))
 
-                    def rpc(script, timeout):
+                    def rpc(script, timeout, **kwargs):
                         answer = subprocess.run([shutil.which("sh"), "-c", setup + script],
                                                 cwd=fixture, stdout=subprocess.PIPE,
                                                 stderr=subprocess.PIPE, timeout=timeout)

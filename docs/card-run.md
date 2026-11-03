@@ -16,7 +16,9 @@ must be an integer from 1 through 7168 MB.
 
 SSH uses the configured identity, strict known-host checking, batch mode,
 `IdentitiesOnly=yes`, `HostKeyAlgorithms=ssh-ed25519`, no user SSH config,
-and a five-second connection timeout. There are no automatic retries.
+and a five-second connection timeout. Workloads and uploads are never replayed.
+After loss of the control session, the runner reconnects once to check the boot
+ID and perform guarded cleanup only.
 No reboot, MPSS, module, sysctl, huge-page or `/etc` changes are made.
 
 Options before PROGRAM are `--config`, `--lock`, `--timeout`,
@@ -83,28 +85,47 @@ which foreign processes are reported, never whether work may run.
 - Report other users' processes in `foreign_processes`; leave them alone.
   Snapshots exclude the control shell's PID and its direct children by PPid,
   including before staging changes its cwd; foreign names do not grant exclusion.
+  One shell pass reads process identities and skips kernel threads by PID/PPid.
+  One numeric `ls` reads all user-process executable/cwd links and one `awk`
+  joins them to identities. No snapshot forks `readlink` or a subshell per PID;
+  the fake `/proc` test counts external commands with 300 kernel threads.
   Signals target only processes in our exact directory, rechecking identity after the boot guard, never by broad name/group.
   Guarded TERM/KILL cleanup removes our exact staging directory. Stdout/stderr are copied back in bounded chunks before normal
   cleanup. A separate HUP-ignoring watchdog applies the same guards after the
   program timeout plus `max(5 seconds, 2 * transportTimeout)` grace.
   After removing our job directory, `rmdir /tmp/claude` removes the RAM-backed
   parent only when empty, preserving any sibling job directories.
+  Before admission is recorded or files are staged, stale recovery considers
+  only `/tmp/claude/claude-<32 lowercase hex>` directories. The exact path,
+  non-symlink, owner, physical cwd and original boot guards apply. Any live
+  process with its executable or cwd in a candidate keeps it; stale recovery
+  never signals processes. Foreign names and symlinks are left untouched.
 - Recheck boot ID before execution, after execution and before any signal or
-  removal. A changed boot or unreachable card mid-run is an infrastructure
-  failure: append `card-fault`, then finish; do not signal/remove on an unknown or
-  changed boot, and do not reconnect. Report the fault on the ticket so the lead
-  can escalate. The independent watchdog also refuses destructive operations
-  on another boot.
+  removal. A changed boot or a card still unreachable on one reconnect is an
+  infrastructure failure: append `card-fault`, then finish. An ordinary remote
+  command failure or a recovered connection on the same boot records only
+  `infrastructure-failure` in the finish line. Do not signal/remove on an
+  unknown or changed boot. A reconnected shell checks the original boot before
+  entering the exact existing job directory to clean it; it never restages or
+  executes the job. Report confirmed faults on the ticket so the lead can
+  escalate. The watchdog also refuses destructive operations on another boot.
 
 Required utility checks run before creating a remote staging directory. They
 name every missing tool rather than returning an unexplained status 94. The
-list is `readlink ls id cat od chmod tail head sleep mkdir rm rmdir` plus shell
+list is `readlink ls id cat od chmod tail head sleep mkdir rm rmdir awk` plus shell
 builtins. The lead's probe reported `stat` and `base64` missing and `od`
 available. Directory ownership now uses `LC_ALL=C ls -ldn` and `id -u`.
 Program, static helper and watchdog bytes are uploaded on separate, bounded
 SSH stdin streams to guarded `cat` commands, without an encoding tool. Output
 uses `od -An -v -tx1` and host-side hexadecimal decoding, preserving binary
-stdout/stderr. There are no transport retries. Admission happens before remote
+stdout/stderr. Every control operation is labelled (`snapshot`, `stage-create`,
+`stage-chmod`, `start-job`, `read-stdout`, `read-stderr`, `read-status`,
+`stop_owned`, `cleanup`, `reap-stale`, plus connection setup steps). Command
+stderr is merged before the completion marker so nonzero status reports include
+the step name and diagnostics. Deadlines and ended sessions also name the step
+and include captured partial output. Upload failures name the file and include
+stderr. A command's nonzero exit keeps the control protocol usable; a transport
+failure invalidates that session. Admission happens before remote
 mkdir or upload. The second SSH streams recheck the original boot and directory
 owner/cwd; partial uploads remain in our directory for guarded cleanup.
 
@@ -149,7 +170,7 @@ The result class distinguishes program statuses that collide with those values.
 `run` accepts program/argv, local and legacy external-lock/baseline arguments,
 timeouts, result path, transport, ledger path, memory MB and an injectable
 monotonic clock. A fake session provides `snapshot`, `stage`, `execute`,
-`signal_owned`, `cleanup` and `close`. Snapshots contain boot ID, processes,
+`reap_stale`, `signal_owned`, `cleanup` and `close`. Snapshots contain boot ID, processes,
 raw cpuinfo/meminfo, and may report known pinning unavailability for early
 refusal. SSH checks enforcement at execution through the helper marker.
 Execute receives the explicit
@@ -187,3 +208,13 @@ transport fault, the affected classification case passed in
 The updated static donor helper build passed in
 `.work/_state/logs/S2_11_review_pin_build-20261103-112049.log`.
 No card access was attempted; native donor hello remains with the lead.
+
+Native-review RED e1e5cf8 covers snapshot command counts, named failures and
+stderr, same-boot failure classification, one reconnect without job replay, and
+guarded stale cleanup. Eight focused tests produced nine expected assertion
+failures and no errors in `S2_11_native_review_red_fixture-20261103-112835.log`.
+The card-related T0 suite passed all 46 cases in
+`S2_11_native_review_green-20261103-113049.log` under `.work/_state/logs/`.
+The lead's 11:25 run of 61a8a62 established ledger/core mapping/boot reporting
+but did not execute hello; native hello acceptance still requires the lead's
+rerun of this revision. No native result is inferred from these fake tests.

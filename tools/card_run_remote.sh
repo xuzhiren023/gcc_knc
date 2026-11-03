@@ -18,6 +18,8 @@ check_boot() {
 guard_boot() { guard_dir && check_boot; }
 owned_pid() {
     [ "$1" != "$$" ] || return 1
+    # Kernel threads have neither link. Do not fork utilities for them.
+    [ -L "/proc/$1/exe" ] || [ -L "/proc/$1/cwd" ] || return 1
     pid_exe=$(readlink "/proc/$1/exe" 2>/dev/null)
     pid_cwd=$(readlink "/proc/$1/cwd" 2>/dev/null)
     case "$pid_exe" in "$run_dir"|"$run_dir"/*) return 0 ;; esac
@@ -25,10 +27,12 @@ owned_pid() {
     return 1
 }
 snapshot() {
-    printf 'BOOT\t'
-    cat /proc/sys/kernel/random/boot_id || return 92
+    IFS= read -r snapshot_boot < /proc/sys/kernel/random/boot_id || return 92
+    printf 'BOOT\t%s\n' "$snapshot_boot"
+    {
     while IFS= read -r line; do printf 'CPU\t%s\n' "$line"; done < /proc/cpuinfo
     while IFS= read -r line; do printf 'MEM\t%s\n' "$line"; done < /proc/meminfo
+    set --
     for proc in /proc/[0-9]*; do
         proc_pid=${proc##*/}
         [ "$proc_pid" != "$$" ] || continue
@@ -39,13 +43,60 @@ snapshot() {
         # The control shell and its snapshot utilities are ours even before cd.
         # Match identities, never names that a foreign process could also use.
         [ "$proc_ppid" != "$$" ] || continue
-        proc_exe=$(readlink "$proc/exe" 2>/dev/null)
-        proc_cwd=$(readlink "$proc/cwd" 2>/dev/null)
+        [ "$proc_pid" != 2 ] && [ "$proc_ppid" != 2 ] || continue
+        [ -n "$proc_ppid" ] || continue
         proc_name=
         IFS= read -r proc_name < "$proc/comm" 2>/dev/null
         [ -d "$proc" ] || continue
-        printf 'PROC\t%s\t%s\t%s\t%s\t%s\n' "$proc_pid" "$proc_ppid" "$proc_name" "$proc_exe" "$proc_cwd"
+        printf 'IDENT\t%s\t%s\t%s\n' "$proc_pid" "$proc_ppid" "$proc_name"
+        set -- "$@" "$proc/exe" "$proc/cwd"
     done
+    # One ls for all surviving user processes, no readlink/subshell per PID.
+    # A disappearing process may lose either link; keep its identity with blanks.
+    if [ "$#" -gt 0 ]; then LC_ALL=C ls -ldn -- "$@" 2>/dev/null || :; fi
+    } | awk '
+        BEGIN { FS = "\t" }
+        /^CPU\t|^MEM\t/ { print; next }
+        /^IDENT\t/ { ppid[$2] = $3; name[$2] = $4; next }
+        /^l/ && match($0, /\/[0-9]+\/(exe|cwd) -> /) {
+            split(substr($0, RSTART, RLENGTH), link, "/")
+            target = substr($0, RSTART + RLENGTH)
+            if (link[3] == "exe -> ") exe[link[2]] = target
+            else cwd[link[2]] = target
+        }
+        END {
+            for (pid in ppid)
+                printf "PROC\t%s\t%s\t%s\t%s\t%s\n", pid, ppid[pid], name[pid], exe[pid], cwd[pid]
+        }'
+}
+reap_one() {
+    run_dir=$1
+    case "$run_dir" in /tmp/claude/claude-????????????????????????????????) ;; *) return 0 ;; esac
+    suffix=${run_dir##*/claude-}
+    case "$suffix" in *[!0-9a-f]*) return 0 ;; esac
+    [ ! -L "$run_dir" ] && [ -d "$run_dir" ] || return 0
+    cd -- "$run_dir" || return 92
+    guard_dir || return 0
+    check_boot || return 92
+    # Stale recovery never signals: any live user of this exact cwd/exe keeps it.
+    for proc in /proc/[0-9]*; do
+        owned_pid "${proc##*/}" && return 0
+    done
+    guard_boot || return 92
+    rm -rf -- "$run_dir"
+}
+reap_stale() {
+    check_boot || return 92
+    reap_original=$run_dir
+    reap_cwd=$PWD
+    for stale_dir in /tmp/claude/claude-*; do
+        reap_one "$stale_dir"
+        reap_status=$?
+        run_dir=$reap_original
+        cd -- "$reap_cwd" || return 92
+        [ "$reap_status" = 0 ] || return "$reap_status"
+    done
+    rmdir /tmp/claude 2>/dev/null || :
 }
 stop_owned() {
     guard_boot || return 92

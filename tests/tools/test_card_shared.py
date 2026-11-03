@@ -54,7 +54,7 @@ class SharedTransport:
     def snapshot(self, *, timeout):
         self.events.append(("snapshot",))
         if self.unreachable:
-            raise OSError("card unreachable mid-run")
+            raise ConnectionError("card unreachable mid-run")
         free = self.free_kb[0]
         if len(self.free_kb) > 1:
             self.free_kb.pop(0)
@@ -66,6 +66,10 @@ class SharedTransport:
         self.events.append(("stage", run_dir))
         if self.stage_failure:
             raise OSError("partial staging failure")
+
+    def reap_stale(self, boot_id, *, timeout):
+        self._guard(self.run_dir, boot_id)
+        self.events.append(("reap_stale", boot_id))
 
     def execute(self, run_dir, argv, *, timeout, card_timeout, cpus=None, memory_mb=None):
         self.events.append(("execute", run_dir, cpus, memory_mb))
@@ -386,7 +390,7 @@ class SharedCardRules(unittest.TestCase):
             def __init__(self, *args):
                 pass
 
-            def rpc(self, script, timeout):
+            def rpc(self, script, timeout, **kwargs):
                 scripts.append(script)
                 if "command -v" in script:
                     fake_lookup = 'command() { [ "$2" != "od" ]; }\n'

@@ -50,7 +50,7 @@ class FakeTransport:
     def snapshot(self, *, timeout):
         self.events.append(("snapshot", timeout))
         if self.link_broken:
-            raise OSError("fake SSH link broken")
+            raise ConnectionError("fake SSH link broken")
         processes = [DAEMON] + self.processes
         if self.staged:
             processes += self.late_processes
@@ -75,6 +75,10 @@ class FakeTransport:
         self.events.append(("stage", run_dir, Path(program), timeout))
         if self.stage_failure:
             raise OSError("fake partial staging failure")
+
+    def reap_stale(self, boot_id, *, timeout):
+        self._owned(self.run_dir, boot_id)
+        self.events.append(("reap_stale", boot_id))
 
     def execute(self, run_dir, argv, *, timeout, card_timeout=None, cpus=None, memory_mb=None):
         self._owned(run_dir, BOOT)
@@ -152,10 +156,10 @@ class CardRun(unittest.TestCase):
         self.assertEqual(result["boot_id_after"], after)
         self.assertAlmostEqual(result["card_minutes"], seconds / 60.0)
 
-    def assert_released(self):
+    def assert_released(self, connections=1):
         self.assertFalse(self.lock.exists(), "release our acquired local lock")
-        self.assertEqual(self.names().count("connect"), 1, "no connection retries")
-        self.assertEqual(self.names().count("close"), 1)
+        self.assertEqual(self.names().count("connect"), connections)
+        self.assertEqual(self.names().count("close"), connections)
 
     def assert_cleaned(self):
         cleanups = [event for event in self.transport.events if event[0] == "cleanup"]
@@ -257,7 +261,7 @@ class CardRun(unittest.TestCase):
         self.assertTrue(all(call.args[1] == 1.0 for call in session.rpc.call_args_list))
         self.assertIn("start_job 35 ", session.rpc.call_args_list[0].args[0])
 
-    def test_unreachable_is_infrastructure_without_retry(self):
+    def test_unreachable_is_infrastructure_with_one_cleanup_reconnect(self):
         for phase in (True, "execute"):
             with self.subTest(phase=phase):
                 self.transport = FakeTransport()
@@ -266,7 +270,7 @@ class CardRun(unittest.TestCase):
                 self.assertEqual(result["result_class"], "infrastructure")
                 self.assertEqual(result["exit_code"], self.runner["INFRA_EXIT"])
                 self.assertFalse(self.lock.exists())
-                self.assertEqual(self.names().count("connect"), 1)
+                self.assertEqual(self.names().count("connect"), 1 if phase is True else 2)
                 self.assertNotIn("signal_owned", self.names())
                 self.assertNotIn("cleanup", self.names())
                 if phase is True:
@@ -280,7 +284,7 @@ class CardRun(unittest.TestCase):
                     execute = next(e for e in self.transport.events if e[0] == "execute")
                     self.assertEqual(execute[4], 35.0, "watchdog armed before a link can break")
                     self.assertIn("link broken", result["detail"])
-                    self.assert_released()
+                    self.assert_released(connections=2)
 
     def test_reboot_during_run_is_infrastructure_and_forbids_cleanup(self):
         self.transport.reboot = True
