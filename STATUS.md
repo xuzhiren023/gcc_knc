@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-03 12:41.
+Updated automatically at every ticket change. Last update: 2026-11-03 12:43.
 
 **Waiting for you:** S2-10. Run `python tools/pm.py inbox`.
 
@@ -51,7 +51,7 @@ Current tickets: `[################----]` 25 of 30
 | S2-10 | First card runs for the queued native checks | **Waiting for you** | S2-10 review: batch is good, 9 of 10 passed on the card. Not approvable yet; both open items need the inter... |
 | S2-11 | card_run follows the shared card rules and runs hello on the card | Done | tools/card_run now runs programs on the shared Xeon Phi under the owner's card rules (ledger lines, cores 3... |
 | S2-12 | card_run polls the card gently and reports what it reaped | Done | card_run now checks job status on its existing SSH session with backoff to 5 s and opens output connections... |
-| S2-13 | Card tests pass again, and approve runs them | Not started | The first ticket for the tools lane, which runs beside the gcc lane from 2026-11-03 (`--lane tools`). Do no... |
+| S2-13 | Card tests pass again, and approve runs them | In progress | The first ticket for the tools lane, which runs beside the gcc lane from 2026-11-03 (`--lane tools`). Do no... |
 
 ## Recent activity
 
@@ -68,10 +68,10 @@ Current tickets: `[################----]` 25 of 30
 
 - From the script, engineer: 103 sessions, 191.9M input tokens
 - From the script, lead: 102 sessions, 36.8M input tokens
-- Started by hand, Claude: 3 sessions, 299.1M input tokens
+- Started by hand, Claude: 3 sessions, 300.0M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 7.8 GiB of 100 GiB. 333 GiB free on the drive.
+The project uses 7.8 GiB of 100 GiB. 332 GiB free on the drive.
