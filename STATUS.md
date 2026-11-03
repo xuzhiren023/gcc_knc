@@ -69,7 +69,7 @@ Current tickets: `[###############-----]` 40 of 51
 | S3-09 | Packed integer add, sub, mul, logic and broadcast for V16SI; logic for V8DI | draft | Moved to Sprint 4 by the owner on 2026-11-03, on the lead's recommendation: m1_affine is float and double o... |
 | S3-10 | Card batch for Sprint 3 and m1_affine | Not started | Also add (1) S3-14's TLS and S3-15's complex and rounding cross-checks, built after both merge (objects bui... |
 | S3-11 | Milestone M1 note: fixture, line counts, ICE classes and backend cost comparison | Not started | Owner approved Sprint 3 on 2026-11-03; ticket set to ready. |
-| S3-12 | tools/portability: forward-port drill and x86_64 unchanged check | Changes requested | drill is good: it matches the lead's 2 conflicts on master 7eb405c3d11, it is immutable and the tests are t... |
+| S3-12 | tools/portability: forward-port drill and x86_64 unchanged check | In progress | drill is good: it matches the lead's 2 conflicts on master 7eb405c3d11, it is immutable and the tests are t... |
 | S3-13 | Move KNC code out of shared i386 files into i386-knc | Not started | Created under the owner's direction of 2026-11-03 (ADR-0006). After S3-07, so it moves code that has settle... |
 | S3-14 | Native TLS for k1om, and every x86_64-only configure case that misses k1om | Not started | Filed under the owner's delegation (engineering defect found while checking the PhiWeather project's lesson... |
 | S3-15 | ABI gaps: packed vectors through varargs and ms_abi, complex values, rounding mode across calls | Not started | Filed under the owner's delegation. Finding 1 was reproduced by the lead; findings 2-4 come from reading co... |
