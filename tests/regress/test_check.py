@@ -207,9 +207,12 @@ class OptionalSelections(unittest.TestCase):
             for name in ('knc-vec-b.c', 'knc-vec-a.c', 'knc-abi-other.c', 'other.c'):
                 (runner.source_dir / name).touch()
             runner.t1_sources = Mock()
-            runner.t1()
+            import knc_vector
+            with patch.object(knc_vector, 't1_packed') as packed:
+                runner.t1()
             runner.t1_sources.assert_called_once_with([
                 runner.source_dir / 'knc-vec-a.c', runner.source_dir / 'knc-vec-b.c'])
+            packed.assert_called_once_with(runner)
 
 
 class SourceTests(unittest.TestCase):

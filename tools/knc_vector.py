@@ -122,6 +122,10 @@ def t1(runner):
     sources = sorted(runner.source_dir.glob('knc-vec-*.c'))
     fixtures = {runner.source_dir / ('knc-vec-' + mode + '.c') for mode in MODES}
     runner.t1_sources([source for source in sources if source not in fixtures])
+    t1_packed(runner)
+
+
+def t1_packed(runner):
     for mode, move in MODES.items():
         source = runner.source_dir / ('knc-vec-' + mode + '.c')
         for level in ('-O0', '-O2'):
