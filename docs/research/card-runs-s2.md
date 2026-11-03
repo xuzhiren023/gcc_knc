@@ -1,6 +1,12 @@
 # Sprint 2 native checks: S2-10 handoff
 
-Native status: **NOT RUN**. The owner's decision recorded on S2-10 at 11:20
+Native status: **lead reports 9 of 10 passed; counter rerun pending**. The
+lead's 12:38 ticket answer reports byte-exact stdout and exit 0 for the first
+nine programs, with one ledger start/finish pair each, no card fault and an
+unchanged boot ID. The counter exited 127 because the card lacks
+`libatomic.so.1`. Exact boot IDs and card minutes still require the lead's
+result JSON records below; this engineer has not run a native check.
+The owner's decision recorded on S2-10 at 11:20
 on 2026-11-03 assigns every card job to the interactive lead. This engineer
 session prepares the batch only; no connection, card configuration or key is
 read. Boot IDs and card minutes remain pending until the lead records each
@@ -78,6 +84,34 @@ Scalar ABI builds use `-O2 -ffp-contract=off`. Varargs builds use
 and `-march=knc` for the target. The counter uses `-O2 -pthread`. Affine
 uses `-O2 -ftree-vectorize -ffp-contract=off`. No fast-math option is added.
 
+### Counter static-library follow-up (2026-11-03)
+
+Following the lead's 12:38 instruction, rebuilt only `atomic-counter.mic`
+with the same shared GCC 16 compiler and S1-06 donor bridge, adding the donor
+archive `toolchain/cross/k1om-mpss-linux/lib64/libatomic.a` after its sources.
+`prepare.py` now includes that archive for future preparation as well.
+The expected-output file and batch row still apply: exit 0, exact totals
+of 400000, no arguments, 128 MiB. The nine passing programs were not rebuilt
+or rerun, and no host reference was repeated.
+
+The focused recipe is `.work/_shared/tmp/S2-10/relink-atomic.py`. With the
+toolchain PATH above, it was invoked through:
+
+```sh
+../_shared/toolchain/cygwin/bin/python3.12.exe tools/run.py \
+  --name S2-10-static-atomic \
+  --inputs tests/t2/knc-atomic-counter.c tests/t1/knc-atomics.c \
+  tests/t1/knc-spin-hint.c ../_shared/tmp/S2-10/relink-atomic.py -- \
+  ../_shared/toolchain/cygwin/bin/python3.12.exe \
+  ../_shared/tmp/S2-10/relink-atomic.py .
+```
+
+Result: PASS, exit 0. The recipe checks the rebuilt executable with donor
+`readelf -d` and fails if any `NEEDED` entry names libatomic; no such entry
+remains. Log:
+`.work/_state/logs/S2_10_static_atomic-20261103-124014.log`.
+Native execution of this rebuilt counter remains pending with the lead.
+
 Expected stdout includes:
 
 - Hello: `hello from KNC` followed by a newline.
@@ -111,16 +145,16 @@ outputs, and the compiler commit above; do not fix compiler behavior here.
 
 | Executable | Native result | Boot ID before / after | Card minutes |
 | --- | --- | --- | --- |
-| `hello.mic` | NOT RUN | pending | pending |
-| `m1_affine.mic` | NOT RUN | pending | pending |
-| `scalar-gcc16-caller.mic` | NOT RUN | pending | pending |
-| `scalar-donor-caller.mic` | NOT RUN | pending | pending |
-| `varargs-donor.mic` | NOT RUN | pending | pending |
-| `varargs-gcc16.mic` | NOT RUN | pending | pending |
-| `varargs-gcc16-caller.mic` | NOT RUN | pending | pending |
-| `varargs-donor-caller.mic` | NOT RUN | pending | pending |
-| `secondary-pressure.mic` | NOT RUN | pending | pending |
-| `atomic-counter.mic` | NOT RUN | pending | pending |
+| `hello.mic` | Lead reports exit 0, stdout matches | pending lead records | pending |
+| `m1_affine.mic` | Lead reports exit 0, stdout matches | pending lead records | pending |
+| `scalar-gcc16-caller.mic` | Lead reports exit 0, stdout matches | pending lead records | pending |
+| `scalar-donor-caller.mic` | Lead reports exit 0, stdout matches | pending lead records | pending |
+| `varargs-donor.mic` | Lead reports exit 0, stdout matches | pending lead records | pending |
+| `varargs-gcc16.mic` | Lead reports exit 0, stdout matches | pending lead records | pending |
+| `varargs-gcc16-caller.mic` | Lead reports exit 0, stdout matches | pending lead records | pending |
+| `varargs-donor-caller.mic` | Lead reports exit 0, stdout matches | pending lead records | pending |
+| `secondary-pressure.mic` | Lead reports exit 0, stdout matches | pending lead records | pending |
+| `atomic-counter.mic` | Lead reports exit 127 (missing libatomic); static rebuild awaiting rerun | pending lead records | pending |
 
 The lead ticks the other tickets' native lines only after their corresponding
 native comparisons pass.
