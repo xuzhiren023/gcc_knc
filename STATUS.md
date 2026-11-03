@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-03 07:12.
+Updated automatically at every ticket change. Last update: 2026-11-03 07:17.
 
-**Next: GPT-6.1, on S2-03 (Varargs with the donor's register save area).** Run `python tools/dispatch.py`, or ask the tech lead to.
+**Next: the tech lead, on S2-03.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[###############-----]` 19 of 25
 
@@ -41,7 +41,7 @@ Current tickets: `[###############-----]` 19 of 25
 | S1-07 | Milestone M0 evidence note | Done | M0 is settled as adjust: GCC 16.2 builds a k1om cc1 whose assembly the 2.22 assembler accepts, an options-f... |
 | S2-01 | Design for zmm and mask registers under -march=knc | Done | The register design for KNC is settled on paper: all 32 zmm and 8 mask registers become usable under -march... |
 | S2-02 | Float and double arguments and results in zmm lane 0 | Done | GCC 16 for KNC now passes float and double arguments and results in zmm lane 0, puts them on the stack afte... |
-| S2-03 | Varargs with the donor's register save area | In progress | Follow docs/adr/0004-knc-registers-and-scalar-abi.md, point 4: 16-byte slots through TI transport, %al test... |
+| S2-03 | Varargs with the donor's register save area | Question for the tech lead | 6ceebb8 [red]. Reproducer: escaping va_list after va_start omits AL guard, all FP saves and fp_offset=48 on... |
 | S2-04 | Scalar transfers through memory and mask scratch | Not started | Follow docs/adr/0004-knc-registers-and-scalar-abi.md, point 6: an allocated GPR scratch and an HI mask pseu... |
 | S2-05 | x87 compares and zmm spill alignment | Not started | Follow docs/adr/0004-knc-registers-and-scalar-abi.md, point 2: XI spills need 64-byte storage. This ticket ... |
 | S2-06 | Atomics without cmpxchg16b, spin hint by delay | Not started | Owner approved Sprint 2 on 2026-11-03; ticket set to ready. |
@@ -50,6 +50,7 @@ Current tickets: `[###############-----]` 19 of 25
 
 ## Recent activity
 
+- 2026-11-03 07:17 **S2-03** engineer ask: 6ceebb8 [red]. Reproducer: escaping va_list after va_start omits AL guard, all FP saves and fp_offset=48 on GCC16 -O0/-O2; donor passes. Both T2 cr...
 - 2026-11-03 07:12 **S2-02** lead approve: GCC 16 for KNC now passes float and double arguments and results in zmm lane 0, puts them on the stack after eight, and passes double-float and flo...
 - 2026-11-03 07:09 **S2-02** engineer submit: Red 5bbf4ca. Build PASS. Scalar T1/T2 all passed across full run plus focused 32-byte warning fix (final GCC 498234009a3). 6009 sweep on f9ce0e14db...
 - 2026-11-03 06:50 **S2-02** lead changes: 1. gcc/config/i386/i386.cc:2262 (GCC cd59775df0a): the check rejects every VECTOR_TYPE with a non-vector mode, not only the XImode case S2-02 made ...
@@ -57,7 +58,6 @@ Current tickets: `[###############-----]` 19 of 25
 - 2026-11-03 06:33 **S2-02** lead answer: Yes, but not for every vector type. Root cause: ADR-0004 point 2 admits XImode to the zmm registers, so an integer vector_size(64) type now gets TY...
 - 2026-11-03 06:31 **S2-02** engineer ask: Two attempts saved: GCC 03032e73910, tests c0ac52c. Build/T1/T2 PASS. 6009 sweep: FP ABI errors/as/lint=0; pr108892 ICE at all levels. Repro -O0 -m...
 - 2026-11-03 05:45 **S2-02** owner decide: Owner raised the budget to 6 sessions and 40M input tokens on 2026-11-03; continue with the lead's 01:38 fix for the KNC HI move.
-- 2026-11-03 01:38 **S2-02** lead escalate: budget: 19559027 input tokens used; the budget is 12000000
 
 ## Cost
 
