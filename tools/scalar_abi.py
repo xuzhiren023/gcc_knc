@@ -209,13 +209,15 @@ def t1_vector_compatibility(runner):
     source = runner.source_dir / 'knc-abi-mixed.c'
     for case in ('VECTOR32_PARAMETER', 'VECTOR1_PARAMETER', 'VECTOR1_RESULT'):
         for level in ('-O0', '-O2'):
+            asm = runner.out / 'vector.s'
             compiled = runner.command(
                 runner.cc, *runner.cc_flags, level, '-march=knc',
                 '-DABI_' + case, '-S', source,
-                '-o', runner.out / 'vector.s', check=False)
-            runner.result('t1 KNC preserves ' + case.lower() + ' ' + level,
-                          [] if compiled.returncode == 0 and not compiled.stdout.strip()
-                          else [compiled.stdout[-1800:] or 'compile failed'])
+                '-o', asm, check=False)
+            failures = ([compiled.stdout[-1800:] or 'compile failed']
+                        if compiled.returncode or compiled.stdout.strip()
+                        else allowlist(asm.read_text()))
+            runner.result('t1 KNC preserves ' + case.lower() + ' ' + level, failures)
 
 
 def t1(runner):
