@@ -72,6 +72,30 @@ class CardRecovery(unittest.TestCase):
         self.assertFalse(any(e[0] in ("stage", "execute") for e in fresh.events))
         self.assertEqual([line["event"] for line in self.own_lines()], ["start", "finish"])
 
+    def test_deadline_after_reconnect_same_boot_is_not_card_fault(self):
+        for step in ("signal_owned", "cleanup"):
+            with self.subTest(step=step):
+                self.transport = SharedTransport()
+                self.transport.ledger = self.ledger
+                fresh, attempts = self.lost_session("same")
+                original = getattr(fresh, step)
+
+                def deadline(*args, **kwargs):
+                    original(*args, **kwargs)
+                    raise self.runner["TransportError"](step + ": deadline exceeded")
+
+                setattr(fresh, step, deadline)
+                offset = len(self.own_lines())
+                result = self.invoke()
+                self.assertEqual(len(attempts), 2, result)
+                self.assertEqual(result["boot_id_after"], BOOT)
+                self.assertEqual(result["result_class"], "infrastructure")
+                self.assertIn(step + ": deadline exceeded", result["detail"])
+                self.assertIn((step, result["run_dir"]), fresh.events)
+                lines = self.own_lines()[offset:]
+                self.assertEqual([line["event"] for line in lines], ["start", "finish"])
+                self.assertEqual(lines[-1]["outcome"], "infrastructure-failure")
+
     def test_failed_reconnect_or_changed_boot_faults_without_mutation(self):
         for recovery in ("unreachable", "reboot"):
             with self.subTest(recovery=recovery):
@@ -127,13 +151,15 @@ class RemoteReview(unittest.TestCase):
         directory.mkdir()
         (directory / "status").write_text("Name:\tworker\nPPid:\t%d\n" % ppid)
         (directory / "comm").write_text("worker\n")
-        if ppid != 2:
-            (directory / "exe").symlink_to(exe)
-            (directory / "cwd").symlink_to(cwd)
+        # Linux kernel threads still have links visible to lstat/-L, but their
+        # targets cannot be followed. Model that rather than omitting the links.
+        kernel = pid == 2 or ppid == 2
+        (directory / "exe").symlink_to("/missing-kernel-exe" if kernel else exe)
+        (directory / "cwd").symlink_to("/missing-kernel-cwd" if kernel else cwd)
 
-    def shell(self, script):
+    def shell(self, script, timeout=60):
         return subprocess.run([shutil.which("sh"), "-c", script],
-                              stdout=subprocess.PIPE, stderr=subprocess.PIPE, timeout=60)
+                              stdout=subprocess.PIPE, stderr=subprocess.PIPE, timeout=timeout)
 
     def test_snapshot_has_constant_external_command_count(self):
         self.process(42, 1, cwd="/other work")
@@ -165,6 +191,46 @@ class RemoteReview(unittest.TestCase):
         self.assertIn("snapshot", str(raised.exception))
         self.assertIn("snapshot-diagnostic", str(raised.exception))
         self.assertIn("status 1", str(raised.exception))
+
+    def test_cleanup_and_reaper_skip_kernel_threads_without_commands(self):
+        self.process(42, 1)
+        self.process(2, 0)
+        for pid in range(100, 400):
+            self.process(pid, 2)
+        for operation in ("stop_owned", "cleanup", "reap_stale"):
+            with self.subTest(operation=operation):
+                parent = self.directory / "claude"
+                run_dir = parent / ("claude-" + "a" * 32)
+                run_dir.mkdir(parents=True)
+                foreign = parent / "gpt61-job"
+                foreign.mkdir(exist_ok=True)
+                (foreign / "output").write_text("keep")
+                counter = self.directory / "commands"
+                counter.write_text("")
+                wrappers = "\n".join(
+                    '%s() { printf "%s\\n" >> "%s"; command %s "$@"; }' %
+                    (tool, tool, counter, tool)
+                    for tool in ("readlink", "cat", "ls", "awk", "id", "rm", "rmdir"))
+                # No wait or signal is needed with no live owned process.
+                wrappers += '\nsleep() { :; }\nkill() { echo unexpected-signal >&2; return 99; }'
+                script = self.remote.replace("/tmp/claude", str(parent)).replace(
+                    "/proc/", str(self.proc) + "/")
+                try:
+                    answer = self.shell(script + "\n" + wrappers +
+                                        '\nrun_dir="%s"\nboot_id="%s"\ncd -- "$run_dir"\n%s\n' %
+                                        (run_dir, BOOT, operation), timeout=10)
+                except subprocess.TimeoutExpired:
+                    answer = None
+                commands = counter.read_text().splitlines()
+                # Keep the next subcase independent even when stop_owned keeps cwd.
+                if run_dir.exists():
+                    run_dir.rmdir()
+                self.assertLessEqual(len(commands), 24, commands[:12])
+                self.assertLessEqual(commands.count("readlink"), 6)
+                self.assertIsNotNone(answer, "cleanup exceeded deadline despite bounded commands")
+                self.assertEqual(answer.returncode, 0, answer.stderr)
+                self.assertNotIn(b"unexpected-signal", answer.stderr)
+                self.assertEqual((foreign / "output").read_text(), "keep")
 
     def test_remote_deadline_names_snapshot(self):
         session = self.runner["SSHSession"]([shutil.which("sh")], "/unused", 1)
