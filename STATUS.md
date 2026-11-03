@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-03 09:10.
+Updated automatically at every ticket change. Last update: 2026-11-03 09:12.
 
-**Next: GPT-6.1, on S2-04 (Scalar transfers through memory and mask scratch).** Run `python tools/dispatch.py`, or ask the tech lead to.
+**Next: the tech lead, on S2-04.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[###############-----]` 20 of 26
 
@@ -42,7 +42,7 @@ Current tickets: `[###############-----]` 20 of 26
 | S2-01 | Design for zmm and mask registers under -march=knc | Done | The register design for KNC is settled on paper: all 32 zmm and 8 mask registers become usable under -march... |
 | S2-02 | Float and double arguments and results in zmm lane 0 | Done | GCC 16 for KNC now passes float and double arguments and results in zmm lane 0, puts them on the stack afte... |
 | S2-03 | Varargs with the donor's register save area | Done | GCC 16 varargs functions now check %al and save the FP argument registers to the SysV save area at fp_offse... |
-| S2-04 | Scalar transfers through memory and mask scratch | In progress | Owner raised the limit to 8 engineer sessions on 2026-11-03. Follow the lead's earlier answer: rerun the C ... |
+| S2-04 | Scalar transfers through memory and mask scratch | Waiting for review | At 4b7175f / GCC de5da75758f ran tools/check t0 t1 t2 --compiler gcc16 once: T0 29 tests and all 8 C pressu... |
 | S2-05 | x87 compares and zmm spill alignment | Not started | Follow docs/adr/0004-knc-registers-and-scalar-abi.md, point 2: XI spills need 64-byte storage. This ticket ... |
 | S2-06 | Atomics without cmpxchg16b, spin hint by delay | Not started | Owner approved Sprint 2 on 2026-11-03; ticket set to ready. |
 | S2-07 | GCC 16 builds its own static libgcc for k1om | Not started | Owner approved Sprint 2 on 2026-11-03; ticket set to ready. |
@@ -53,21 +53,21 @@ Current tickets: `[###############-----]` 20 of 26
 
 - 2026-11-03 09:20 **S2-09** lead note: Reconfiguring means one full rebuild: use `make -j8` with `CFLAGS=-O2 -g1 CXXFLAGS=-O2 -g1` as `tools/toolchain.py` does, and poll quietly. Keep `a...
 - 2026-11-03 09:20 **S2-09** owner decide: Owner chose to add Fortran to the GCC 16 build in Sprint 2 (2026-11-03); S2-04 closes on its C tests and its reproducer item moves here.
+- 2026-11-03 09:12 **S2-04** engineer submit: At 4b7175f / GCC de5da75758f ran tools/check t0 t1 t2 --compiler gcc16 once: T0 29 tests and all 8 C pressure cases pass. Overall exit 1: gfortran ...
 - 2026-11-03 09:10 **S2-04** owner decide: Owner raised the limit to 8 engineer sessions on 2026-11-03. Follow the lead's earlier answer: rerun the C checks at your head and submit the C green.
 - 2026-11-03 09:04 **S2-04** engineer escalate: budget: 4 engineer sessions used; the budget is 4
 - 2026-11-03 09:04 **S2-04** lead answer: Both settled. (1) gfortran: the owner added S2-09 for it, and acceptance 3 with the reproducer's GCC 16 wiring moved there; keep the reproducer fil...
 - 2026-11-03 09:04 **S2-04** owner decide: Owner chose to add Fortran to the GCC 16 build as S2-09 (2026-11-03). S2-04 closes on its C tests: the reproducer item is moved to S2-09, and the n...
 - 2026-11-03 09:00 **S2-04** lead escalate: Two owner decisions block S2-04's last items; the C green (8 pressure cases, scans, T2 host reference) is ready for review. (1) The shared GCC 16 b...
-- 2026-11-03 08:59 **S2-04** engineer ask: Green at 4b7175f / GCC de5da75758f: all-gcc passes; all 8 pressure cases pass compile, assembly, lint and address/mask scans. T2 host reference and...
 
 ## Cost
 
 - From the script, engineer: 78 sessions, 145.1M input tokens
 - From the script, lead: 77 sessions, 28.4M input tokens
-- Started by hand, Claude: 3 sessions, 216.0M input tokens
+- Started by hand, Claude: 3 sessions, 217.0M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 9.3 GiB of 100 GiB. 311 GiB free on the drive.
+The project uses 9.3 GiB of 100 GiB. 310 GiB free on the drive.
