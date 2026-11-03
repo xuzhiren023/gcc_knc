@@ -86,6 +86,22 @@ class CardRecovery(unittest.TestCase):
                                  ["start", "card-fault", "finish"])
                 self.assertFalse(any(e[0] in ("cleanup", "signal_owned") for e in fresh.events))
 
+    def test_session_lost_during_cleanup_also_reconnects_once(self):
+        fresh, attempts = self.lost_session("same")
+        self.transport.execute = SharedTransport.execute.__get__(self.transport)
+
+        def disconnect(*args, **kwargs):
+            self.transport.unreachable = True
+            raise self.runner["TransportError"]("cleanup: SSH session ended")
+
+        self.transport.cleanup = disconnect
+        result = self.invoke()
+        self.assertEqual(len(attempts), 2, result)
+        self.assertEqual(result["result_class"], "infrastructure")
+        self.assertIn(("cleanup", result["run_dir"]), fresh.events)
+        self.assertFalse(any(e[0] in ("stage", "execute") for e in fresh.events))
+        self.assertEqual([line["event"] for line in self.own_lines()], ["start", "finish"])
+
     def test_admission_reaps_stale_dirs_before_staging(self):
         self.transport.reap_stale = mock.Mock()
         result = self.invoke()
