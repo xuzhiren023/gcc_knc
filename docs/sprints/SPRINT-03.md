@@ -1,6 +1,6 @@
 # Sprint 3: ordinary loops vectorize on `zmm` (Milestone M1)
 
-**Status:** approved by the owner on 2026-11-03, with runs without per-run approval. S3-01 and S3-03 wait for Intel manual 327364; S3-09 waits for the owner's choice after S3-07.
+**Status:** approved by the owner on 2026-11-03, with runs without per-run approval. Intel manual 327364 is in `.work/_shared/` (2026-11-03); S3-09 waits for the owner's choice after S3-07.
 
 **Goal:** GCC 16 auto-vectorizes ordinary FP loops onto `zmm` with IMCI under `-march=knc`, and
 `m1_affine` (`tests/acceptance/m1_affine/`) passes every check in its README: T1 and T2 on the host,
