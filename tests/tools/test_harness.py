@@ -506,6 +506,17 @@ class Lanes(Sandbox):
         self.assertIsNone(pm.next_action(board, "tools"))
         self.assertEqual(pm.next_action(board, "gcc")[1].id, "G-1")
 
+    def test_pm_start_counts_work_in_progress_per_lane(self):
+        for ident in ("A-1", "A-2"):
+            os.remove(os.path.join(self.root, "work", "tickets", ident + ".md"))
+        self.raw_ticket("G-1", "gcc: yes\n", state="doing")
+        self.raw_ticket("T-1", "")
+        self.git("add", "-A")
+        self.git("commit", "-qm", "lanes")
+        done = self.pm("start", "T-1")
+        self.assertEqual(done.returncode, 0, done.stdout)
+        self.assertEqual(self.state("T-1"), "doing")
+
     def test_board_changes_wait_for_the_board_lock_held_by_another_process(self):
         pm, board = self.board()
         env = dict(os.environ, PM_ROLE="engineer", PM_LOCK_WAIT="1")
