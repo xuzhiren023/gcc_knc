@@ -19,6 +19,9 @@ SSH uses the configured identity, strict known-host checking, batch mode,
 and a five-second connection timeout. Workloads and uploads are never replayed.
 After loss of the control session, the runner reconnects once to check the boot
 ID and perform guarded cleanup only.
+This also applies if the connection is lost during signalling or cleanup after
+the final snapshot succeeded. The one recovery attempt repeats only boot
+verification and guarded cleanup; a second connection failure stops recovery.
 No reboot, MPSS, module, sysctl, huge-page or `/etc` changes are made.
 
 Options before PROGRAM are `--config`, `--lock`, `--timeout`,
@@ -218,3 +221,9 @@ The card-related T0 suite passed all 46 cases in
 The lead's 11:25 run of 61a8a62 established ledger/core mapping/boot reporting
 but did not execute hello; native hello acceptance still requires the lead's
 rerun of this revision. No native result is inferred from these fake tests.
+RED 8ef9669 additionally covers a session lost during cleanup after a successful
+final snapshot (`S2_11_cleanup_reconnect_red-20261103-113215.log`, one expected
+assertion failure). After extending the same recovery path to all finalization
+steps, the five affected recovery/classification cases passed in
+`S2_11_cleanup_reconnect_green-20261103-113229.log`; the other passing cases
+were not repeated.

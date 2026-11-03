@@ -213,26 +213,30 @@ def run(program, argv, *, lock_path, external_locks, baseline_names, timeout,
                 # This check runs after success, refusal, timeout, or partial staging.
                 if result["boot_id_before"] is None:
                     raise OSError("initial boot ID unknown; no cleanup permitted")
-                try:
+
+                def finish_remote():
                     snapshot()
+                    if execution_started and (not execution_finished or result["result_class"] == "timeout"):
+                        session.signal_owned(run_dir, result["boot_id_before"], timeout=transport_timeout)
+                    session.cleanup(run_dir, result["boot_id_before"], timeout=transport_timeout)
+
+                try:
+                    finish_remote()
                 except OSError as error:
                     if card_fault:  # Confirmed reboot: never clean another boot.
                         raise
                     failure("infrastructure", INFRA_EXIT,
-                            "%s; final snapshot failed: %s" % (result["detail"], error))
+                            "%s; finalization failed: %s" % (result["detail"], error))
                     # Exactly one reconnect, for state/cleanup only. No replay of
                     # admission, staging, start_job or program execution.
                     session.close()
                     session = None
                     try:
                         session = transport.connect(run_dir, timeout=transport_timeout)
-                        snapshot()
+                        finish_remote()
                     except ConnectionError:
                         card_fault = True
                         raise
-                if execution_started and (not execution_finished or result["result_class"] == "timeout"):
-                    session.signal_owned(run_dir, result["boot_id_before"], timeout=transport_timeout)
-                session.cleanup(run_dir, result["boot_id_before"], timeout=transport_timeout)
             except (OSError, ValueError) as error:
                 failure("infrastructure", INFRA_EXIT, "%s; cleanup incomplete: %s" % (result["detail"], error))
             finally:
