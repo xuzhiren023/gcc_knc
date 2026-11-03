@@ -62,7 +62,7 @@ Current tickets: `[#################---]` 40 of 47
 | S3-02 | One helper for optional tools/check selections | Done | tools/check optional selections now come from one table, several flags given together all run and each repo... |
 | S3-03 | Native probe of unaligned pairs and masked aligned forms at page boundaries | Done | Acceptance lines ticked: the lead ran the probe on the card, 3,148 cases with 0 failures; the fault table a... |
 | S3-04 | Packed modes legal under -march=knc, with aligned moves, spills and constants | Done | Under -march=knc, 64-byte float, double, int and long long vectors now live in zmm registers, with aligned ... |
-| S3-05 | Unaligned packed moves through load and store pairs | Not started | Allocation raised from 6 to 11 shared lines, from S3-01's estimate (`docs/research/knc-packed-modes.md`, 'S... |
+| S3-05 | Unaligned packed moves through load and store pairs | In progress | Allocation raised from 6 to 11 shared lines, from S3-01's estimate (`docs/research/knc-packed-modes.md`, 'S... |
 | S3-06 | Packed FP add, sub, mul, FMA and broadcasts for V16SF and V8DF | Not started | Allocation raised from 12 to 35 shared lines, from S3-01's estimate (`docs/research/knc-packed-modes.md`, '... |
 | S3-07 | Auto-vectorization on zmm, with x87 peel and remainder; m1_affine T1 and T2 green | Not started | Allocation raised from 4 to 8 shared lines, from S3-01's estimate (`docs/research/knc-packed-modes.md`); th... |
 | S3-08 | Fortran twin of m1_affine vectorizes and links | Not started | Owner approved Sprint 3 on 2026-11-03; ticket set to ready. |
