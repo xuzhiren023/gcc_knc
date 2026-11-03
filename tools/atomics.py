@@ -4,6 +4,20 @@ import sys
 
 
 def t1(runner):
+    macros = runner.command(runner.cc, *runner.cc_flags, '-march=knc', '-dM',
+                            '-E', runner.root / 'tests/t1/knc-atomics.c',
+                            check=False)
+    failures = []
+    if macros.returncode:
+        failures.append(macros.stdout[-2200:])
+    else:
+        defined = set(re.findall(r'^#define (\w+)\b', macros.stdout, re.M))
+        for macro in ('__GCC_HAVE_SYNC_COMPARE_AND_SWAP_16', '__CX16__'):
+            if macro in defined:
+                failures.append(macro + ': advertises native 16-byte CAS')
+        if '__GCC_HAVE_SYNC_COMPARE_AND_SWAP_8' not in defined:
+            failures.append('__GCC_HAVE_SYNC_COMPARE_AND_SWAP_8: missing')
+    runner.result('t1 KNC atomic capability macros', failures)
     for name in ('knc-atomics', 'knc-spin-hint'):
         asm = runner.out / (name + '.s')
         flags = ['-mrelax-cmpxchg-loop'] if name == 'knc-spin-hint' else []
