@@ -64,7 +64,10 @@ sessions are planned: S3-03's probe, early, and S3-10's batch, at the end.
 | S3-10 | Native batch for S3: `m1_affine` in all its builds, and the S3 tickets' native lines; lead runs it | standard | S3-07, S3-08 |
 | S3-11 | Milestone M1 note: fixture results, line counts, ICE classes, cost comparison with a separate backend (E3-06) | deep | all above |
 
-S3-01, S3-02 and S3-03 can run in any order; the board runs one ticket at a time.
+The dispatcher runs two lanes, one ticket in progress in each: `--lane gcc` for tickets with
+`gcc: yes` or `lane: gcc`, which share the GCC checkout and build, and `--lane tools` for the rest.
+S3-01 and S3-02 run in the tools lane, so they can overlap with the gcc lane's work. Every ticket
+that builds or compiles with the shared GCC build is in the gcc lane.
 
 ## Sprint exit
 
