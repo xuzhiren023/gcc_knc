@@ -188,7 +188,11 @@ class Runner:
                 self.result('t0 ' + label, [str(error)])
 
     def t1(self):
-        if getattr(self.args, 'scalar_abi', False):
+        if getattr(getattr(self, 'args', None), 'varargs_abi', False):
+            import varargs_abi
+            varargs_abi.t1(self)
+            return
+        if getattr(getattr(self, 'args', None), 'scalar_abi', False):
             import scalar_abi
             scalar_abi.t1(self)
             return
@@ -274,6 +278,10 @@ class Runner:
                 self.say('ERROR ' + label + ': ' + str(error))
 
     def t2(self):
+        if getattr(getattr(self, 'args', None), 'varargs_abi', False):
+            import varargs_abi
+            varargs_abi.t2(self)
+            return
         if getattr(getattr(self, 'args', None), 'scalar_abi', False):
             import scalar_abi
             scalar_abi.t2(self)
@@ -415,6 +423,13 @@ def main():
     parser.add_argument('--cc', help='override compiler path')
     parser.add_argument('--scalar-abi', action='store_true',
                         help='S2-02 donor ABI probes and bidirectional cross-links only')
+    parser.add_argument('--varargs-abi', action='store_true',
+                        help='S2-03 AL, register save area and varargs cross-links only')
+    parser.add_argument('--varargs-case', action='append', default=[],
+                        choices=[tag + '-' + role + '-' + level
+                                 for tag in ('donor', 'gcc16')
+                                 for role in ('caller', 'callee') for level in ('O0', 'O2')],
+                        help='limit varargs T1 to TAG-ROLE-O0 or TAG-ROLE-O2')
     parser.add_argument('--link-defaults', action='store_true',
                         help='S1-06 T1 ABI macros and T2 integer link with donor runtime -B')
     parser.add_argument('--record', help='small baseline result file')
