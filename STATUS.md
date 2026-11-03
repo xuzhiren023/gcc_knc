@@ -2,7 +2,7 @@
 
 Updated automatically at every ticket change. Last update: 2026-11-03 14:53.
 
-**Next: GPT-6.1, on S2-15 (-ffast-math links on KNC with a KNC crtfastmath).** Run `python tools/dispatch.py`, or ask the tech lead to.
+**Next: the tech lead, on S2-15.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[##############------]` 35 of 47
 
@@ -53,7 +53,7 @@ Current tickets: `[##############------]` 35 of 47
 | S2-12 | card_run polls the card gently and reports what it reaped | Done | card_run now checks job status on its existing SSH session with backoff to 5 s and opens output connections... |
 | S2-13 | Card tests pass again, and approve runs them | Done | All card tests in tests/tools pass again under Cygwin Python, and pm.py approve now refuses to merge any br... |
 | S2-14 | card_run stages extra files, so one job can run a batch | Done | card_run can now stage extra files next to the program with --file (size-capped by maxStageMiB, unsafe or d... |
-| S2-15 | -ffast-math links on KNC with a KNC crtfastmath | In progress | 1. tools/check.py:295: getattr(self.args, 'fast_math', False) raises AttributeError when Runner has no args... |
+| S2-15 | -ffast-math links on KNC with a KNC crtfastmath | Waiting for review | Fixed both lead review items in 1f708fb: optional Runner.args is guarded and fast_math.t2 is only called wi... |
 | S2-16 | Card batch files are readable by the lead | Done | Card batch programs are now written 0755 and data files 0644, so the lead can read and stage them; Cygwin n... |
 | S2-17 | card_run tolerates ending processes, and stages batch files correctly | Done | card_run now skips processes that end mid-snapshot instead of failing the run, keeps a finished program's r... |
 | S2-18 | The card test driver runs programs in parallel on our 30 cores | Done | claude-torture now runs up to N programs at once (-j N) inside the job's memory budget, with results in lis... |
@@ -72,6 +72,7 @@ Current tickets: `[##############------]` 35 of 47
 
 ## Recent activity
 
+- 2026-11-03 14:53 **S2-15** engineer submit: Fixed both lead review items in 1f708fb: optional Runner.args is guarded and fast_math.t2 is only called with --fast-math. Ran python tools/check.p...
 - 2026-11-03 14:52 **S2-19** lead approve: The card runner's process snapshot no longer trips BusyBox awk, and a T0 test now rejects any card awk line that BusyBox could misread as a functio...
 - 2026-11-03 14:51 **S2-19** engineer submit: Red ee895fe rejects snapshot awk program 3 line 19 (name); fix 6e4dd13 adds explicit empty-string concatenation. Cygwin T0 passed 31 tests; Cygwin ...
 - 2026-11-03 14:50 **S2-15** lead changes: 1. tools/check.py:295: getattr(self.args, 'fast_math', False) raises AttributeError when Runner has no args, so t0 tests/regress fails 5 tests (log...
@@ -79,7 +80,6 @@ Current tickets: `[##############------]` 35 of 47
 - 2026-11-03 14:49 **S2-15** engineer submit: Red: all four GCC16 fast-math links failed with missing crtfastmath.o (S2_15_red-20261103-144629.log). Built libgcc successfully (S2_15_libgcc-2026...
 - 2026-11-03 14:48 **S2-19** lead note: Blocks every card run since S2-17. From now on, every merge that touches the card runner gets a lead `hello` on the card before any batch (CURRENT_...
 - 2026-11-03 14:46 **S2-18** lead approve: claude-torture now runs up to N programs at once (-j N) inside the job's memory budget, with results in list order and every child killed on timeou...
-- 2026-11-03 14:45 **S2-18** engineer submit: Host acceptance passed: N=8 sleep concurrency, list-order output, crash/failure/timeout diagnostics and memory admission; default/parallel checks p...
 
 ## Cost
 
