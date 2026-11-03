@@ -22,6 +22,23 @@ BUILD = SHARED / 'gcc-build/gcc'
 OUT = SHARED / 'tmp/S2-08'
 
 
+def set_batch_modes():
+    """Keep host artifacts readable across the engineer/lead user boundary."""
+    files = [path for path in OUT.iterdir() if path.is_file()]
+    if sys.platform == 'cygwin' and files:
+        # chmod masks inherited named ACL entries, leaving explicit DENY ACEs.
+        # These shared artifacts need only their owner/group/other mode ACL.
+        subprocess.run([str(TC / 'cygwin/bin/setfacl'), '-b', '--',
+                        *map(str, files)], check=True)
+    counts = Counter()
+    for path in files:
+        mode = 0o755 if path.suffix == '.mic' or path.name == 'claude-torture' else 0o644
+        path.chmod(mode)
+        counts[mode] += 1
+    print('Batch permissions: ' + ', '.join('%04o=%d' % item
+                                           for item in sorted(counts.items())), flush=True)
+
+
 def main():
     if os.name == 'nt':
         env = os.environ.copy()
@@ -35,6 +52,9 @@ def main():
     os.environ['TMPDIR'] = str(SHARED / 'tmp')
     os.environ['LC_ALL'] = 'C'
     OUT.mkdir(exist_ok=True)
+    if '--permissions-only' in sys.argv:
+        set_batch_modes()
+        return 0
     cc = [BUILD / 'xgcc', '-B' + str(BUILD) + '/']
     donor = [TC / 'cross/bin/k1om-mpss-linux-gcc']
     host = [TC / 'cygwin/bin/gcc']
@@ -183,7 +203,7 @@ int main(void) {
         if state != 'linked':
             binary.unlink(missing_ok=True)
         else:
-            binary.chmod(0o700)
+            binary.chmod(0o755)
         return source.name, state, binary.name, shlex.join(extra)
 
     if refresh:
@@ -232,6 +252,7 @@ int main(void) {
                '', 'Nonlinked files:']
     summary.extend(name + ': ' + state for name, state, _, _ in results if state != 'linked')
     (ROOT / 'tests/baseline/gcc16-torture-execute.txt').write_text('\n'.join(summary) + '\n')
+    set_batch_modes()
     print('\n'.join(summary[:9]), flush=True)
     print('READY ' + str(OUT / 'batch.txt'), flush=True)
     return 0
