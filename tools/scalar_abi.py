@@ -189,7 +189,24 @@ def t1_probe(runner, source, level, name=None):
     runner.result(label, failures)
 
 
+def t1_vector_diagnostics(runner):
+    source = runner.source_dir / 'knc-abi-mixed.c'
+    for case in ('parameter', 'result', 'field'):
+        for level in ('-O0', '-O2'):
+            compiled = runner.command(
+                runner.cc, *runner.cc_flags, level, '-march=knc',
+                '-DABI_VECTOR_' + case.upper(), '-S', source,
+                '-o', runner.out / 'vector.s', check=False)
+            rejected = (compiled.returncode != 0
+                        and 'internal compiler error' not in compiled.stdout
+                        and 'error: unsupported KNC register ABI mode' in compiled.stdout)
+            runner.result('t1 KNC rejects 64-byte int vector ABI ' + case + ' ' + level,
+                          [] if rejected else [compiled.stdout[-1800:]
+                                               or 'unsupported vector ABI accepted'])
+
+
 def t1(runner):
+    t1_vector_diagnostics(runner)
     for source in sorted(runner.source_dir.glob('knc-abi-*.c')):
         for level in ('-O0', '-O2', '-Os'):
             if source.name == 'knc-abi-structs.c' and level == '-O0':

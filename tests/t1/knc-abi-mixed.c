@@ -1,3 +1,16 @@
+/* XImode transport does not advertise a packed vector ABI in Sprint 2. */
+#if defined(ABI_VECTOR_PARAMETER) || defined(ABI_VECTOR_RESULT) || defined(ABI_VECTOR_FIELD)
+typedef int abi_vector __attribute__((vector_size(64)));
+#if defined(ABI_VECTOR_PARAMETER)
+int abi_vector_parameter(abi_vector x) { return x[0]; }
+#elif defined(ABI_VECTOR_RESULT)
+extern abi_vector abi_vector_value;
+abi_vector abi_vector_result(void) { return abi_vector_value; }
+#else
+struct abi_vector_record { abi_vector x; };
+int abi_vector_field(struct abi_vector_record x) { return x.x[0]; }
+#endif
+#else
 /* Each probe makes one incoming location observable without conflating args. */
 volatile long abi_sink_i;
 volatile float abi_sink_f;
@@ -9,3 +22,4 @@ void abi_in_mix_j(ARGS) { abi_sink_i = j; }
 void abi_in_mix_d(ARGS) { abi_sink_d = d; }
 void abi_in_mix_k(ARGS) { abi_sink_i = k; }
 void abi_in_mix_g(ARGS) { abi_sink_f = g; }
+#endif
