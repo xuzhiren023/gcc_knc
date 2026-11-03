@@ -69,7 +69,8 @@ class CardBackend(unittest.TestCase):
         with tempfile.TemporaryDirectory(dir=ROOT) as name:
             directory = Path(name)
             proc = directory / "proc"
-            (directory / "tmp").mkdir()
+            (directory / "tmp/claude").mkdir(parents=True)
+            (proc / "self").mkdir(parents=True)
             (proc / "sys/kernel/random").mkdir(parents=True)
             (proc / "sys/kernel/random/boot_id").write_text(self.session.boot_id + "\n")
             (proc / "cpuinfo").write_text("\n\n".join(
@@ -256,6 +257,7 @@ od() { case "$*" in *-A*) echo 'od: invalid option -- A' >&2; return 94;; esac; 
                 with self.subTest(marker=marker, status=status):
                     fixture = directory / ("marked" if marker else "unmarked")
                     fixture.mkdir(exist_ok=True)
+                    (fixture / "unused.mic").write_bytes(b"fake program")
                     session = self.session
                     session.boot_id = BOOT
                     setup = ('guard_boot() { :; }; guard_dir() { :; }; '

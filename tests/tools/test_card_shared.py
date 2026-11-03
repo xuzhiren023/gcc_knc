@@ -65,8 +65,9 @@ class SharedTransport:
                     meminfo="MemTotal: 16000000 kB\nMemFree: %d kB\n" % free,
                     pinning=self.pinning)
 
-    def stage(self, run_dir, program, *, timeout):
+    def stage(self, run_dir, program, *, timeout, files=()):
         self.events.append(("stage", run_dir))
+        self.staged_files = list(files)
         if self.stage_failure:
             raise OSError("partial staging failure")
 
@@ -186,6 +187,17 @@ class SharedCardRules(unittest.TestCase):
                 self.assertEqual(result.get("result_class"), "refused", self.diagnostic)
                 self.assertEqual(self.transport.events, [])
                 self.assertEqual(self.ledger.read_text(), "")
+        self.program.write_bytes(b"driver")
+        self.transport.stage_overhead = lambda: 1024 * 1024
+        result = self.invoke()
+        self.assertEqual(result.get("result_class"), "refused", self.diagnostic)
+        self.assertEqual(self.transport.events, [])
+        del self.transport.stage_overhead
+        data = self.directory / "input"
+        data.write_bytes(b"data")
+        result = self.invoke(files=[extra, data])
+        self.assertEqual(result.get("result_class"), "program", self.diagnostic)
+        self.assertEqual(self.transport.staged_files, [extra, data])
 
     def test_worktree_default_uses_main_config_without_copy(self):
         main = self.directory / "project"

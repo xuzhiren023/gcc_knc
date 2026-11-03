@@ -10,7 +10,10 @@ The default configuration is the main checkout's gitignored
 `config/card.local.json`, including from `<main>/.work/<ticket>`. It is never
 copied into a worktree. Required settings are `host`, `identity`, `knownHosts`
 and `ledger`; `memoryMB` defaults to 128, `timeout` to 60 seconds and
-`transportTimeout` to 10 seconds. `pinHelper` defaults to the main checkout's
+`transportTimeout` to 10 seconds. `maxStageMiB` defaults to 64 and must be a
+positive integer. It caps the total bytes staged: program, extra files, static
+helper and watchdog script. Validation and size refusal happen before connection
+or admission, since the card's filesystem uses RAM. `pinHelper` defaults to the main checkout's
 `.work/_shared/claude-pin.mic` (a donor-built static executable). Limits must be finite and positive; memory
 must be an integer from 1 through 7168 MB.
 
@@ -25,10 +28,22 @@ verification and guarded cleanup; a second connection failure stops recovery.
 No reboot, MPSS, module, sysctl, huge-page or `/etc` changes are made.
 
 Options before PROGRAM are `--config`, `--lock`, `--timeout`,
-`--transport-timeout`, and `--receipt` (the existing spelling for the single
+`--transport-timeout`, repeatable `--file PATH`, and `--receipt` (the existing spelling for the single
 runtime result). `--external-lock` and `--baseline-name` remain parseable for
 compatibility. External lock settings are ignored; baseline names only filter
 which foreign processes are reported, never whether work may run.
+
+Each `--file PATH` stages a regular host file beside `claude-program` under its
+base name, using the same guarded raw SSH stdin stream. Source paths may include
+directories; destination names must be plain names without `/`, `\\`, NUL, `.`
+or `..`. Duplicate base names and runner names (`claude-program`, `claude-pin`,
+`claude-watchdog.sh`, `claude-pinned`, `stdout`, `stderr`, `status`) are refused
+before admission. Executable host files receive mode 700; other files receive
+mode 600. Cleanup removes all extra files with the run directory. For example:
+`python tools/card_run --file batch/test1.mic --file batch/input driver.mic`.
+The driver's children inherit both core pinning and the job's per-process
+address-space limit through `claude-pin`, so these settings apply to every
+program the driver starts. The limit is not aggregate memory for the batch.
 
 ## Enforcement
 
@@ -214,7 +229,8 @@ there are no performance/timing claims. Classes are `program`, `refused`,
 The result class distinguishes program statuses that collide with those values.
 
 `run` accepts program/argv, local and legacy external-lock/baseline arguments,
-timeouts, result path, transport, ledger path, memory MB and an injectable
+timeouts, result path, transport, ledger path, memory MB, optional `files`,
+`max_stage_mib` (default 64) and an injectable
 monotonic clock. A fake session provides `snapshot`, `stage`, `execute`,
 `reap_stale`, `signal_owned`, `cleanup` and `close`. `snapshot` accepts
 `include_cpuinfo` (default true); the runner requests it only for the first
