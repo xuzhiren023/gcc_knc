@@ -328,7 +328,7 @@ def cmd_start(board, args):
     ticket = board.load(args.id)
     require_state(ticket, "ready", "changes", "doing")
     if ticket.state == "ready":
-        action = next_action(board)
+        action = next_action(board, lane_of(ticket))
         if action is None or action[1].id != ticket.id:
             raise Refused("%s cannot start now: its dependencies or the WIP limit prevent it" % ticket.id)
     path = board.worktree(ticket)
