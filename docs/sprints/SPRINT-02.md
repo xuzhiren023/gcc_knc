@@ -29,10 +29,11 @@ The work is in tickets, in `work/tickets/S2-*.md`, in this order:
 | S2-06 | Atomics without `cmpxchg16b`, spin hint by `delay` (E2-04) |
 | S2-07 | GCC 16 builds its own static `libgcc` for `k1om`, removing the donor bridge (E2-05) |
 | S2-08 | `hello`, scalar FP and `printf` on the card, and a first `c-torture/execute` baseline (E2-06); needs the card |
+| S2-09 | GCC 16 builds `gfortran`, and S2-04's Fortran reproducer passes; added by the owner on 2026-11-03 |
 
 ## Sprint exit
 
-- [ ] S2-01 to S2-07 approved and merged, or explicitly returned to the backlog
+- [ ] S2-01 to S2-07 and S2-09 approved and merged, or explicitly returned to the backlog
 - [ ] S2-08 done, or returned to the backlog if the card is still on hold
 - [ ] `CURRENT_STATE.md` updated, and the GCC `knc` branch is ready for the owner to push
 - [ ] Sprint 3 refined from E3
