@@ -202,14 +202,14 @@ class Runner:
             if mode == 'off':
                 self.off_object = obj
 
-    def t1_sources(self):
-        for source in sorted(self.source_dir.glob('*.c')):
+    def t1_sources(self, sources=None):
+        for source in sorted(self.source_dir.glob('*.c') if sources is None else sources):
             label = 't1 ' + source.name
             try:
                 directives = []
                 options = ['-O2']
                 for line in source.read_text().splitlines():
-                    match = re.match(r'^\s*//\s*(options|scan-asm|scan-asm-not|scan-output|error):\s*(.*)$', line)
+                    match = re.match(r'^\s*//\s*(options|scan-asm|scan-asm-not|scan-output|scan-debug-info|error):\s*(.*)$', line)
                     function = re.match(r'^\s*//\s*scan-asm-func\s+(\S+):\s*(.*)$', line)
                     if match:
                         kind, pattern = match.groups()
@@ -239,15 +239,21 @@ class Runner:
                     output_only = bool(directives) and all(
                         kind == 'scan-output' for kind, name, pattern in directives)
                     assembly = '' if output_only else asm.read_text()
+                    debug_info = ''
+                    if any(kind == 'scan-debug-info' for kind, name, pattern in directives):
+                        self.command(self.tool('as'), '--march=k1om', asm, '-o', obj)
+                        debug_info = self.command(self.tool('readelf'), '--debug-dump=info', obj)
                     for kind, name, pattern in directives:
                         body = (compiled.stdout if kind == 'scan-output' else
+                                debug_info if kind == 'scan-debug-info' else
                                 function_body(assembly, name) if name else assembly)
                         found = body is not None and re.search(pattern, body, re.M) is not None
                         if (found if kind == 'scan-asm-not' else not found):
                             failures.append(kind + (' ' + name if name else '') + ': ' + pattern)
                             break
                     if not output_only:
-                        self.command(self.tool('as'), '--march=k1om', asm, '-o', obj)
+                        if not debug_info:
+                            self.command(self.tool('as'), '--march=k1om', asm, '-o', obj)
                         self.command(sys.executable, ROOT / 'tools/knc_lint', asm, obj)
                 self.result(label, failures)
             except (OSError, RuntimeError, subprocess.TimeoutExpired, ValueError, re.error) as error:
