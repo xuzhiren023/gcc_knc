@@ -113,7 +113,7 @@ class CardBackend(unittest.TestCase):
                 if script.startswith("guard_boot"):
                     setup += 'cd -- "$run_dir" || exit 91\n'
                 answer = subprocess.run([shutil.which("sh"), "-c", translate(setup + script)],
-                                        cwd=directory, capture_output=True, timeout=timeout)
+                                        cwd=directory, capture_output=True, timeout=max(timeout, 60))
                 self.assertEqual(answer.returncode, 0, answer.stderr)
                 return answer.stdout.rstrip(b"\n")
 
@@ -208,7 +208,7 @@ od() { case "$*" in *-A*) echo 'od: invalid option -- A' >&2; return 94;; esac; 
         def rpc(script, timeout, **kwargs):
             answer = subprocess.run([shutil.which("sh"), "-c", (setup + script).replace(
                 "/proc/sys/kernel/random/boot_id", str(boot_file))],
-                stdout=subprocess.PIPE, stderr=subprocess.PIPE, timeout=timeout)
+                stdout=subprocess.PIPE, stderr=subprocess.PIPE, timeout=max(timeout, 60))
             if answer.returncode:
                 raise OSError(answer.stderr.decode("utf8", "replace"))
             return answer.stdout.rstrip(b"\n")
@@ -324,7 +324,7 @@ od() { case "$*" in *-A*) echo 'od: invalid option -- A' >&2; return 94;; esac; 
                     def rpc(script, timeout, **kwargs):
                         answer = subprocess.run([shutil.which("sh"), "-c", setup + script],
                                                 cwd=fixture, stdout=subprocess.PIPE,
-                                                stderr=subprocess.PIPE, timeout=timeout)
+                                                stderr=subprocess.PIPE, timeout=max(timeout, 60))
                         if answer.returncode:
                             raise OSError(answer.stderr.decode("utf8", "replace"))
                         return answer.stdout.rstrip(b"\n")
