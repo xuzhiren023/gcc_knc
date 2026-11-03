@@ -5,8 +5,8 @@ One command: python tools/run.py --name S1-05-torture -- python tools/torture_co
 
 The default run writes detailed failures under
 .work/_shared/torture-compile and a small tracked classification summary.
-This deliberately measures the requested flags, without interpreting dg
-directives or changing the language default. compile.exp is a Tcl driver.
+Append each source's dg-options and dg-additional-options in source order.
+Other dg directives, including target selectors and skips, are not interpreted.
 """
 import argparse
 from collections import Counter
@@ -15,6 +15,7 @@ import os
 from pathlib import Path
 import re
 import runpy
+import shlex
 import signal
 import subprocess
 import sys
@@ -70,6 +71,13 @@ def main():
     sources = [args.source.resolve()] if args.source else sorted(CORPUS.rglob('*.c'))
     if not sources:
         raise RuntimeError('empty torture corpus')
+    options = {
+        source: [flag for match in re.finditer(
+            r'\{\s*dg-(?:additional-)?options\s+(?:"([^"\n]*)"|([^\s{}]+))',
+            source.read_text(encoding='utf8', errors='replace'))
+                 for flag in shlex.split(match[1] if match[1] is not None else match[2])]
+        for source in sources
+    }
     levels = args.level or list(LEVELS)
     args.output.mkdir(parents=True, exist_ok=True)
 
@@ -121,7 +129,8 @@ def main():
         kind = 'infrastructure failure'
         try:
             result = invoke([BUILD / 'xgcc', '-B' + str(BUILD) + '/', '-march=knc',
-                             *LEVELS[level], '-S', source, '-o', asm], compiler=True)
+                             *LEVELS[level], *options[source], '-S', source, '-o', asm],
+                            compiler=True)
             if result.returncode:
                 if 'internal compiler error:' in result.stdout:
                     kind = 'ICE'
@@ -173,7 +182,7 @@ def main():
                   if seconds is not None and kind not in ('hang', 'infrastructure failure'))
     lines = ['GCC 16 KNC C torture compile corpus (S1-05)',
              'Scope: ' + (str(args.source) if args.source else 'gcc/testsuite/gcc.c-torture/compile/**/*.c'),
-             'Raw compile corpus; dg options/skips are not applied; compiler language default retained.',
+             'dg-options and dg-additional-options are appended; other dg directives/selectors/skips are not applied.',
              'Flags: -march=knc -S, plus each level below.',
              'Assembler: binutils 2.22, --march=k1om.',
              'Lint: tools/knc_lint source checks and decoded object checks after successful assembly.',
