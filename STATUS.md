@@ -1,17 +1,17 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-03 08:12.
+Updated automatically at every ticket change. Last update: 2026-11-03 08:13.
 
-**Next: the tech lead, on S2-03.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: GPT-6.1, on S2-04 (Scalar transfers through memory and mask scratch).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
-Current tickets: `[###############-----]` 19 of 25
+Current tickets: `[################----]` 20 of 25
 
 ## Milestones
 
 | | Milestone | State | Progress |
 |---|---|---|---|
 | M0 | Foundation | In progress | 17 of 17 tickets |
-| M1 | Mixed native code | In progress | 2 of 8 tickets |
+| M1 | Mixed native code | In progress | 3 of 8 tickets |
 | M2 | Useful vector target | Not started | Not planned in detail yet |
 | M3 | Runtimes | Not started | Not planned in detail yet |
 | M4 | Broad optimization | Not started | Not planned in detail yet |
@@ -41,7 +41,7 @@ Current tickets: `[###############-----]` 19 of 25
 | S1-07 | Milestone M0 evidence note | Done | M0 is settled as adjust: GCC 16.2 builds a k1om cc1 whose assembly the 2.22 assembler accepts, an options-f... |
 | S2-01 | Design for zmm and mask registers under -march=knc | Done | The register design for KNC is settled on paper: all 32 zmm and 8 mask registers become usable under -march... |
 | S2-02 | Float and double arguments and results in zmm lane 0 | Done | GCC 16 for KNC now passes float and double arguments and results in zmm lane 0, puts them on the stack afte... |
-| S2-03 | Varargs with the donor's register save area | Waiting for review | Fixed missing Runner.args guards for varargs_abi in T1/T2 and scalar_abi in T1; commit 7920746. Ran python ... |
+| S2-03 | Varargs with the donor's register save area | Done | GCC 16 varargs functions now check %al and save the FP argument registers to the SysV save area at fp_offse... |
 | S2-04 | Scalar transfers through memory and mask scratch | Not started | Follow docs/adr/0004-knc-registers-and-scalar-abi.md, point 6: an allocated GPR scratch and an HI mask pseu... |
 | S2-05 | x87 compares and zmm spill alignment | Not started | Follow docs/adr/0004-knc-registers-and-scalar-abi.md, point 2: XI spills need 64-byte storage. This ticket ... |
 | S2-06 | Atomics without cmpxchg16b, spin hint by delay | Not started | Owner approved Sprint 2 on 2026-11-03; ticket set to ready. |
@@ -50,6 +50,7 @@ Current tickets: `[###############-----]` 19 of 25
 
 ## Recent activity
 
+- 2026-11-03 08:13 **S2-03** lead approve: GCC 16 varargs functions now check %al and save the FP argument registers to the SysV save area at fp_offset 48 the same way the donor does, and va...
 - 2026-11-03 08:12 **S2-03** engineer submit: Fixed missing Runner.args guards for varargs_abi in T1/T2 and scalar_abi in T1; commit 7920746. Ran python tools/check t0 through its tools/run.py ...
 - 2026-11-03 08:11 **S2-03** owner decide: Owner allowed one more engineer session (5 in total) on 2026-11-03; make the lead's 08:00 tools/check.py guard fix, run tools/check t0 and resubmit.
 - 2026-11-03 08:01 **S2-03** lead escalate: budget: 4 engineer sessions used; the budget is 4
@@ -57,7 +58,6 @@ Current tickets: `[###############-----]` 19 of 25
 - 2026-11-03 07:59 **S2-03** engineer submit: S2-03 build 5c53d8fa9cd: full unfiltered varargs T1 (8 donor/GCC16 caller/callee O0/O2 cases), S2-02 scalar ABI T1/T2 and torture PASS. Torture: 60...
 - 2026-11-03 07:46 **S2-03** lead changes: 1. .work/_shared/gcc/gcc/config/i386/imci.md:12 and i386.cc:4700/4946: the compiler change alters shared S2-02 output (TI knc_store now emits vpack...
 - 2026-11-03 07:44 **S2-03** engineer submit: Build PASS: ../_state/logs/S2_03_build-20261103-072129.log. T1 GCC16 callee O0/O2 and both T2 cross-links/sysroot checks PASS: ../_state/logs/S2_03...
-- 2026-11-03 07:20 **S2-03** lead approve-red: Red proven: the new test shows GCC 16 varargs functions skip the AL check, the FP register saves and fp_offset=48 that the donor does, while AL at ...
 
 ## Cost
 
