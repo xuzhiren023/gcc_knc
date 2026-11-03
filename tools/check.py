@@ -51,7 +51,7 @@ SELECTIONS = {
         't1': lambda runner: runner.t1_sources([runner.source_dir / 'knc-link-defaults.c']),
         't2': lambda runner: runner.t2_link_defaults()}),
     'vector': ('S3 vector code generation probes (knc-vec-*.c)', {
-        't1': lambda runner: runner.t1_sources(sorted(runner.source_dir.glob('knc-vec-*.c')))}),
+        't1': lambda runner: importlib.import_module('knc_vector').t1(runner)}),
 }
 
 
