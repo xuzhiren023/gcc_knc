@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-03 12:46.
+Updated automatically at every ticket change. Last update: 2026-11-03 12:47.
 
-**Next: GPT-6.1, on S2-07 (GCC 16 builds its own static libgcc for k1om).** Run `python tools/dispatch.py`, or ask the tech lead to.
+**Next: the tech lead, on S2-13.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[#################---]` 26 of 30
 
@@ -51,7 +51,7 @@ Current tickets: `[#################---]` 26 of 30
 | S2-10 | First card runs for the queued native checks | Done | Ten programs ran on the shared Xeon Phi with output identical to their references: hello, the m1_affine fix... |
 | S2-11 | card_run follows the shared card rules and runs hello on the card | Done | tools/card_run now runs programs on the shared Xeon Phi under the owner's card rules (ledger lines, cores 3... |
 | S2-12 | card_run polls the card gently and reports what it reaped | Done | card_run now checks job status on its existing SSH session with backoff to 5 s and opens output connections... |
-| S2-13 | Card tests pass again, and approve runs them | In progress | The first ticket for the tools lane, which runs beside the gcc lane from 2026-11-03 (`--lane tools`). Do no... |
+| S2-13 | Card tests pass again, and approve runs them | Waiting for review | Cygwin 3.12/sh: 56 card tests PASS; 5 MachineCheck tests PASS across runs (runner fixture hit size budget, ... |
 
 ## Recent activity
 
@@ -60,15 +60,15 @@ Current tickets: `[#################---]` 26 of 30
 - 2026-11-03 12:50 **S2-03** lead note: Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`).
 - 2026-11-03 12:50 **S2-02** lead note: Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`).
 - 2026-11-03 12:50 **S0-04** lead note: Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`).
+- 2026-11-03 12:47 **S2-13** engineer submit: Cygwin 3.12/sh: 56 card tests PASS; 5 MachineCheck tests PASS across runs (runner fixture hit size budget, fixed and only that test rerun). Red gat...
 - 2026-11-03 12:45 **S2-13** lead note: The first ticket for the tools lane, which runs beside the gcc lane from 2026-11-03 (`--lane tools`). Do not touch the GCC checkout or build.
 - 2026-11-03 12:45 **S2-10** lead approve: Ten programs ran on the shared Xeon Phi with output identical to their references: hello, the m1_affine fixture, GCC 16 and donor code calling each...
-- 2026-11-03 12:44 **S2-10** owner decide: Lead, under the owner's 2026-11-03 delegation: the relinked counter passed on the card and the results table is filled (01d39c6); approving.
 
 ## Cost
 
 - From the script, engineer: 103 sessions, 191.9M input tokens
 - From the script, lead: 102 sessions, 36.8M input tokens
-- Started by hand, Claude: 3 sessions, 304.0M input tokens
+- Started by hand, Claude: 3 sessions, 305.0M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
