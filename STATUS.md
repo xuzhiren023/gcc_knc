@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-03 17:47.
+Updated automatically at every ticket change. Last update: 2026-11-03 17:48.
 
-**Next: the tech lead, on S3-05.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: GPT-6.1, on S3-05 (Unaligned packed moves through load and store pairs).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
 Current tickets: `[#################---]` 40 of 47
 
@@ -62,7 +62,7 @@ Current tickets: `[#################---]` 40 of 47
 | S3-02 | One helper for optional tools/check selections | Done | tools/check optional selections now come from one table, several flags given together all run and each repo... |
 | S3-03 | Native probe of unaligned pairs and masked aligned forms at page boundaries | Done | Acceptance lines ticked: the lead ran the probe on the card, 3,148 cases with 0 failures; the fault table a... |
 | S3-04 | Packed modes legal under -march=knc, with aligned moves, spills and constants | Done | Under -march=knc, 64-byte float, double, int and long long vectors now live in zmm registers, with aligned ... |
-| S3-05 | Unaligned packed moves through load and store pairs | Question for the tech lead | Two failed attempts: build condition error fixed; GCC 3ab89ae8964 builds. Vector T1: aligned 80/80, unalign... |
+| S3-05 | Unaligned packed moves through load and store pairs | In progress | No: distinct UNSPECs would hide the symptom, not the cause. The cause is that *knc_packed_unaligned accepts... |
 | S3-06 | Packed FP add, sub, mul, FMA and broadcasts for V16SF and V8DF | Not started | Allocation raised from 12 to 35 shared lines, from S3-01's estimate (`docs/research/knc-packed-modes.md`, '... |
 | S3-07 | Auto-vectorization on zmm, with x87 peel and remainder; m1_affine T1 and T2 green | Not started | Allocation raised from 4 to 8 shared lines, from S3-01's estimate (`docs/research/knc-packed-modes.md`); th... |
 | S3-08 | Fortran twin of m1_affine vectorizes and links | Not started | Owner approved Sprint 3 on 2026-11-03; ticket set to ready. |
@@ -72,6 +72,7 @@ Current tickets: `[#################---]` 40 of 47
 
 ## Recent activity
 
+- 2026-11-03 17:48 **S3-05** lead answer: No: distinct UNSPECs would hide the symptom, not the cause. The cause is that *knc_packed_unaligned accepts memory on both sides (both operands non...
 - 2026-11-03 17:47 **S3-05** engineer ask: Two failed attempts: build condition error fixed; GCC 3ab89ae8964 builds. Vector T1: aligned 80/80, unaligned 28/40; 12 O2 failures. Repro .work/_s...
 - 2026-11-03 17:11 **S3-05** lead approve-red: Red tests approved: 40 host checks (four modes, -O0/-O2, five unknown-alignment copy cases) fail only because unaligned packed copies do not yet us...
 - 2026-11-03 17:10 **S3-05** engineer red: Tests 13cbade. Ran s3-05-unaligned-red once via tools/run.py: check.py t1 --compiler gcc16 --vector-unaligned --worker, exit 1. All 40 probes (4 mo...
@@ -79,7 +80,6 @@ Current tickets: `[#################---]` 40 of 47
 - 2026-11-03 17:03 **S3-04** engineer submit: GCC 851f2d25060, tests/docs 909488f. Repair build passed; packed O0/O2 80/80 passed with assembly/lint, spills and ABI guards. T0 passed; T1 only b...
 - 2026-11-03 16:16 **S3-04** lead answer: Not a hang. The 15:50 full build is still running: it writes s3_04_full_build-20261103-155024.log and gcc-build/gcc/build/gen*.exe at 16:16. Interr...
 - 2026-11-03 16:14 **S3-04** engineer ask: Two builds stalled before GCC compilation: full after config.status defaults; --resume after support libs. Both interrupted. Repro: python tools/to...
-- 2026-11-03 15:46 **S3-04** lead approve-red: S3-04's red tests are accepted: 80 probes (4 packed modes x -O0/-O2 x 10 cases) fail for the right reasons on copies, live-across-call spills, the ...
 
 ## Cost
 
