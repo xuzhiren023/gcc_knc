@@ -292,6 +292,10 @@ class Runner:
                 self.say('ERROR ' + label + ': ' + str(error))
 
     def t2(self):
+        if getattr(getattr(self, 'args', None), 'fast_math', False):
+            import fast_math
+            fast_math.t2(self)
+            return
         if getattr(getattr(self, 'args', None), 'libgcc_link', False):
             import libgcc
             libgcc.link(self, 'gcc16')
@@ -460,6 +464,8 @@ def main():
                         help='S2-07 static runtime archive lint and helper links')
     parser.add_argument('--libgcc-link', action='store_true',
                         help='S2-07 fork helper link only')
+    parser.add_argument('--fast-math', action='store_true',
+                        help='S2-15 fast-math startup links and MXCSR disassembly')
     parser.add_argument('--record', help='small baseline result file')
     parser.add_argument('--worker', action='store_true', help=argparse.SUPPRESS)
     args = parser.parse_args()
