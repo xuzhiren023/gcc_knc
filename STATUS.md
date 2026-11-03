@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-03 15:12.
+Updated automatically at every ticket change. Last update: 2026-11-03 15:13.
 
-**Next: GPT-6.1, on S3-02 (One helper for optional tools/check selections).** Run `python tools/dispatch.py`, or ask the tech lead to.
+**Next: the tech lead, on S3-03.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[###############-----]` 36 of 47
 
@@ -60,7 +60,7 @@ Current tickets: `[###############-----]` 36 of 47
 | S2-19 | The card snapshot's awk runs under BusyBox | Done | The card runner's process snapshot no longer trips BusyBox awk, and a T0 test now rejects any card awk line... |
 | S3-01 | Packed modes and IMCI patterns in GCC 16: entry points, audit and line estimate | Not started | Intel 327364-001 (Xeon Phi Coprocessor ISA Reference Manual, 7 September 2012, 725 pages) is at `.work/_sha... |
 | S3-02 | One helper for optional tools/check selections | In progress | Owner approved Sprint 3 on 2026-11-03; ticket set to ready. |
-| S3-03 | Native probe of unaligned pairs and masked aligned forms at page boundaries | In progress | Intel 327364-001 (Xeon Phi Coprocessor ISA Reference Manual, 7 September 2012, 725 pages) is at `.work/_sha... |
+| S3-03 | Native probe of unaligned pairs and masked aligned forms at page boundaries | Question for the tech lead | Acceptance blocker: an aligned 64-byte vector cannot span mapped and guard pages. Reduced case: guard G=0x2... |
 | S3-04 | Packed modes legal under -march=knc, with aligned moves, spills and constants | Not started | Owner approved Sprint 3 on 2026-11-03; ticket set to ready. |
 | S3-05 | Unaligned packed moves through load and store pairs | Not started | Owner approved Sprint 3 on 2026-11-03; ticket set to ready. |
 | S3-06 | Packed FP add, sub, mul, FMA and broadcasts for V16SF and V8DF | Not started | Owner approved Sprint 3 on 2026-11-03; ticket set to ready. |
@@ -72,6 +72,7 @@ Current tickets: `[###############-----]` 36 of 47
 
 ## Recent activity
 
+- 2026-11-03 15:13 **S3-03** engineer ask: Acceptance blocker: an aligned 64-byte vector cannot span mapped and guard pages. Reduced case: guard G=0x2000; G-64 is aligned and wholly mapped; ...
 - 2026-11-03 15:12 **S3-03** lead note: Intel 327364-001 (Xeon Phi Coprocessor ISA Reference Manual, 7 September 2012, 725 pages) is at `.work/_shared/intel-327364-001-xeon-phi-isa.pdf`, ...
 - 2026-11-03 15:12 **S3-01** lead note: Intel 327364-001 (Xeon Phi Coprocessor ISA Reference Manual, 7 September 2012, 725 pages) is at `.work/_shared/intel-327364-001-xeon-phi-isa.pdf`, ...
 - 2026-11-03 15:07 **S3-11** owner decide: Owner approved Sprint 3 on 2026-11-03; ticket set to ready.
@@ -79,13 +80,12 @@ Current tickets: `[###############-----]` 36 of 47
 - 2026-11-03 15:07 **S3-09** owner decide: Owner approved Sprint 3 on 2026-11-03; this ticket stays draft: the owner chooses when S3-07 is merged whether it runs in Sprint 3.
 - 2026-11-03 15:07 **S3-08** owner decide: Owner approved Sprint 3 on 2026-11-03; ticket set to ready.
 - 2026-11-03 15:07 **S3-07** owner decide: Owner approved Sprint 3 on 2026-11-03; ticket set to ready.
-- 2026-11-03 15:07 **S3-06** owner decide: Owner approved Sprint 3 on 2026-11-03; ticket set to ready.
 
 ## Cost
 
 - From the script, engineer: 123 sessions, 233.8M input tokens
 - From the script, lead: 122 sessions, 40.7M input tokens
-- Started by hand, Claude: 3 sessions, 392.3M input tokens
+- Started by hand, Claude: 3 sessions, 393.0M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
