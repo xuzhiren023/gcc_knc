@@ -80,9 +80,20 @@ python3 tools/run.py --name S3-11-x86 -- python3 tools/portability.py x86 --tree
 ```
 
 Do not supply `--inputs` here: the GCC refs are external to this worktree and can
-change independently of the tool. Exit status is 0 for identical assembly, 1 for
-differences, and 2 for infrastructure or compile failures. Each option set reports
-identical, different and failed counts; differing files include unified diffs.
+change independently of the tool. Exit status is 0 for identical assembly or
+matching failures, 1 for differences, and 2 for tool/infrastructure errors.
+Both compilers always run for each file. Each option set reports identical,
+different, both-failed and error counts. Both-failed means both compilations
+failed with identical diagnostics and is neutral for the exit status. One-sided
+failures or different failure diagnostics count as different, with both sides'
+diagnostics printed. Successful assembly differences include unified diffs.
+
+The default torture option is `-w` (from `gcc/testsuite/lib/c-torture.exp` and
+`gcc/testsuite/gcc.c-torture/compile/compile.exp`). The tool also preserves the
+unconditional `-std=...`, `-fpermissive` and `-fno-permissive` options in each
+file's `dg-options`/`dg-additional-options` directives, as used by `gcc-dg.exp`.
+It prints the default and each file's dialect options. Other DejaGNU directives
+and target selectors are outside this fixed assembly comparison.
 
 With `S` denoting the absolute Cygwin path to `.work/_shared`, the tool first
 checks `tasklist.exe /FI 'IMAGENAME eq make.exe' /FO CSV /NH`. It resolves both
@@ -95,10 +106,11 @@ git -c core.autocrlf=false -c core.fileMode=false -C "$S/gcc" worktree add --det
 bash ../source/configure --build=x86_64-pc-cygwin --host=x86_64-pc-cygwin --target=x86_64-pc-cygwin --enable-languages=c --disable-bootstrap --disable-multilib --disable-nls --without-isl
 make -j8 all-gcc 'CFLAGS=-O2 -g1' 'CXXFLAGS=-O2 -g1'
 # For every $S/gcc/gcc/testsuite/gcc.c-torture/compile/**/*.c, with both cc1s:
-"$S/portability/x86-a/build/gcc/cc1.exe" -quiet -O2 "$file" -o "$temporary/a.s"
-"$S/portability/x86-b/build/gcc/cc1.exe" -quiet -O2 "$file" -o "$temporary/b.s"
-"$S/portability/x86-a/build/gcc/cc1.exe" -quiet -O2 -mavx512f "$file" -o "$temporary/a.s"
-"$S/portability/x86-b/build/gcc/cc1.exe" -quiet -O2 -mavx512f "$file" -o "$temporary/b.s"
+# dialect_options is the array of that file's unconditional dialect options.
+"$S/portability/x86-a/build/gcc/cc1.exe" -quiet -w -O2 "${dialect_options[@]}" "$file" -o "$temporary/a.s"
+"$S/portability/x86-b/build/gcc/cc1.exe" -quiet -w -O2 "${dialect_options[@]}" "$file" -o "$temporary/b.s"
+"$S/portability/x86-a/build/gcc/cc1.exe" -quiet -w -O2 -mavx512f "${dialect_options[@]}" "$file" -o "$temporary/a.s"
+"$S/portability/x86-b/build/gcc/cc1.exe" -quiet -w -O2 -mavx512f "${dialect_options[@]}" "$file" -o "$temporary/b.s"
 ```
 
 ### upstream/releases/gcc-16
