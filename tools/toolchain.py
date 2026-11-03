@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Shared compiler maintenance (run builds through tools/run.py).
 
-gcc16: replace the stock shared build with the KNC C compiler; do not install it.
+gcc16: build the shared KNC C/Fortran compilers; do not build target libraries.
 rebuild: configure the read-only shared donor, then all-gcc/install-gcc only.
          --install-only resumes installation from the completed shared build.
 sysroot: overlay a card-derived tree, if supplied, and restore development files.
@@ -42,7 +42,7 @@ def command(*args, **kwargs):
 
 
 def gcc16(args):
-    """Replace the shared stock build with the KNC C compiler, without installing."""
+    """Replace the shared build with the KNC C/Fortran compilers (all-gcc only)."""
     source = SHARED / 'gcc'
     build = SHARED / 'gcc-build'
     if not (source / 'configure').is_file():
@@ -65,7 +65,7 @@ def gcc16(args):
         '--with-sysroot=' + str(SYSROOT),
         '--with-as=' + str(TC / 'cross/bin/k1om-mpss-linux-as'),
         '--with-ld=' + str(TC / 'cross/bin/k1om-mpss-linux-ld'),
-        '--enable-languages=c', '--disable-bootstrap', '--disable-multilib',
+        '--enable-languages=c,fortran', '--disable-bootstrap', '--disable-multilib',
         '--disable-nls', '--without-isl',
         '--disable-libssp', '--disable-libquadmath', '--disable-libquadmath-support',
         '--disable-libsanitizer', '--disable-libitm', '--disable-libcilkrts',
