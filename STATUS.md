@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-02 23:55.
+Updated automatically at every ticket change. Last update: 2026-11-03 00:24.
 
-Nothing can move right now.
+**Next: GPT-6.1, on S2-01 (Design for zmm and mask registers under -march=knc).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
 Current tickets: `[#############-------]` 17 of 25
 
@@ -39,34 +39,34 @@ Current tickets: `[#############-------]` 17 of 25
 | S1-05 | Integer C assembles with as 2.22 and lints clean | Done | All 2003 GCC torture compile files now build for KNC at -O0, -O2 and -O2 -g and assemble with the card's ol... |
 | S1-06 | K1OM link defaults | Done | GCC 16 now targets the K1OM ABI by default: it passes --march=k1om to as and -m elf_k1om to ld, uses the /l... |
 | S1-07 | Milestone M0 evidence note | Done | M0 is settled as adjust: GCC 16.2 builds a k1om cc1 whose assembly the 2.22 assembler accepts, an options-f... |
-| S2-01 | Design for zmm and mask registers under -march=knc | draft |  |
-| S2-02 | Float and double arguments and results in zmm lane 0 | draft |  |
-| S2-03 | Varargs with the donor's register save area | draft |  |
-| S2-04 | Scalar transfers through memory and mask scratch | draft |  |
-| S2-05 | x87 compares and zmm spill alignment | draft |  |
-| S2-06 | Atomics without cmpxchg16b, spin hint by delay | draft |  |
-| S2-07 | GCC 16 builds its own static libgcc for k1om | draft |  |
-| S2-08 | hello, scalar FP and printf on the card | draft |  |
+| S2-01 | Design for zmm and mask registers under -march=knc | In progress | Owner approved Sprint 2 on 2026-11-03; ticket set to ready. |
+| S2-02 | Float and double arguments and results in zmm lane 0 | draft | Held as draft until the lead's ADR from S2-01 is in docs/adr/; the lead sets it ready then. |
+| S2-03 | Varargs with the donor's register save area | Not started | Owner approved Sprint 2 on 2026-11-03; ticket set to ready. |
+| S2-04 | Scalar transfers through memory and mask scratch | Not started | Owner approved Sprint 2 on 2026-11-03; ticket set to ready. |
+| S2-05 | x87 compares and zmm spill alignment | Not started | Owner approved Sprint 2 on 2026-11-03; ticket set to ready. |
+| S2-06 | Atomics without cmpxchg16b, spin hint by delay | Not started | Owner approved Sprint 2 on 2026-11-03; ticket set to ready. |
+| S2-07 | GCC 16 builds its own static libgcc for k1om | Not started | Owner approved Sprint 2 on 2026-11-03; ticket set to ready. |
+| S2-08 | hello, scalar FP and printf on the card | draft | Owner approved Sprint 2 on 2026-11-03; this ticket stays draft until the card hold ends. |
 
 ## Recent activity
 
-- 2026-11-02 23:55 **S1-07** lead approve: M0 is settled as adjust: GCC 16.2 builds a k1om cc1 whose assembly the 2.22 assembler accepts, an options-file rebuild plus T1 takes about 82 s, bu...
-- 2026-11-02 23:54 **S1-07** engineer submit: Committed 68979fa: renamed docs/research/m0-evidence.md to docs/research/m0-result.md without content changes, per lead. Existing six runs: builds ...
-- 2026-11-02 23:54 **S1-07** lead answer: The refusal is the lead's mistake: harness/policy.json treats any new file whose name contains 'evidence' as a receipt, and the ticket chose that n...
-- 2026-11-02 23:53 **S1-07** engineer ask: Committed f87e35b adds only the owner decision under the recommendation, as instructed. Reproducer: python tools/pm.py submit S1-07 --note <complet...
-- 2026-11-02 23:52 **S1-07** owner decide: Owner on 2026-11-02: M0 is adjust. Keep GCC 16.2 as the base and run Sprint 2 on this Windows/Cygwin host; no WSL2 for now. Add one line with this ...
-- 2026-11-02 23:41 **S1-07** engineer escalate: 5770eed commits docs/research/m0-evidence.md with all six runs, Sprint 1 blockers and 45 shared-i386 changed lines. Builds pass; T1 exits 1 only on...
-- 2026-11-02 22:59 **S1-06** lead approve: GCC 16 now targets the K1OM ABI by default: it passes --march=k1om to as and -m elf_k1om to ld, uses the /lib64/ld-linux-k1om.so.2 loader and 16-by...
-- 2026-11-02 22:57 **S1-06** engineer submit: Red first and build-command harness red/green recorded. T1 PASS (prior session); T2 PASS now: ELF181, K1OM loader, glibc <=2.21, as/ld flags, only ...
+- 2026-11-03 00:07 **S2-02** lead note: Held as draft until the lead's ADR from S2-01 is in docs/adr/; the lead sets it ready then.
+- 2026-11-03 00:05 **S2-08** owner decide: Owner approved Sprint 2 on 2026-11-03; this ticket stays draft until the card hold ends.
+- 2026-11-03 00:05 **S2-07** owner decide: Owner approved Sprint 2 on 2026-11-03; ticket set to ready.
+- 2026-11-03 00:05 **S2-06** owner decide: Owner approved Sprint 2 on 2026-11-03; ticket set to ready.
+- 2026-11-03 00:05 **S2-05** owner decide: Owner approved Sprint 2 on 2026-11-03; ticket set to ready.
+- 2026-11-03 00:05 **S2-04** owner decide: Owner approved Sprint 2 on 2026-11-03; ticket set to ready.
+- 2026-11-03 00:05 **S2-03** owner decide: Owner approved Sprint 2 on 2026-11-03; ticket set to ready.
+- 2026-11-03 00:05 **S2-02** owner decide: Owner approved Sprint 2 on 2026-11-03; ticket set to ready.
 
 ## Cost
 
 - From the script, engineer: 62 sessions, 86.7M input tokens
 - From the script, lead: 61 sessions, 21.8M input tokens
-- Started by hand, Claude: 3 sessions, 201.3M input tokens
+- Started by hand, Claude: 3 sessions, 204.1M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 7.7 GiB of 100 GiB. 324 GiB free on the drive.
+The project uses 7.7 GiB of 100 GiB. 322 GiB free on the drive.
