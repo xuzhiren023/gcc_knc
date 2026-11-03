@@ -187,18 +187,22 @@ class SharedCardRules(unittest.TestCase):
         self.assertEqual(external.read_text(encoding="utf8"), "other project's lock")
 
     def test_start_precedes_execute_and_end_is_appended(self):
-        seed = '{"agent":"other","job_id":"other-job","event":"end"}\n'
+        seed = '{"agent":"other","jobId":"other-job","event":"finish"}\n'
         self.ledger.write_text(seed, encoding="utf8")
         result = self.invoke()
         lines = self.own_lines()
-        self.assertEqual([line["event"] for line in lines], ["start", "end"])
+        self.assertEqual([line["event"] for line in lines], ["start", "finish"])
         start, end = lines
-        self.assertTrue(start["job_id"].startswith("claude-"))
-        self.assertEqual(end["job_id"], start["job_id"])
+        self.assertTrue(start["jobId"].startswith("claude-"))
+        self.assertEqual(end["jobId"], start["jobId"])
         self.assertEqual(set(start["cores"]), {30, 59})
-        self.assertEqual(start["memory_mb"], 128)
-        self.assertTrue(start["start"])
-        self.assertTrue(start["expected_end"])
+        self.assertEqual(start["memoryLimitMiB"], 128)
+        self.assertTrue(start["startTime"])
+        self.assertTrue(start["expectedEnd"])
+        self.assertEqual(start["logicalCpus"], [4, 13, 91])
+        self.assertFalse(end["timingValid"])
+        self.assertEqual(end["outcome"], "success")
+        self.assertTrue(end["endTime"])
         self.assertIn(start, self.transport.observed_at_execute)
         self.assertNotIn(end, self.transport.observed_at_execute)
         self.assertTrue(self.ledger.read_text(encoding="utf8").startswith(seed))
@@ -215,8 +219,8 @@ class SharedCardRules(unittest.TestCase):
                 before = len(self.own_lines())
                 self.invoke()
                 lines = self.own_lines()[before:]
-                self.assertEqual([line["event"] for line in lines], ["start", "end"])
-                self.assertEqual(lines[0]["job_id"], lines[1]["job_id"])
+                self.assertEqual([line["event"] for line in lines], ["start", "finish"])
+                self.assertEqual(lines[0]["jobId"], lines[1]["jobId"])
                 self.assertEqual(len(self.events("cleanup")), 1)
 
     def test_cpu_ids_come_from_core_ids_never_os_core(self):
@@ -278,16 +282,16 @@ class SharedCardRules(unittest.TestCase):
         self.assertEqual(len(self.events("execute")), 1)
 
     def test_aggregate_reservations_wait_and_reread_ledger(self):
-        active = dict(agent="claude", job_id="claude-existing", event="start",
-                      memory_mb=6600, cores=[31], start="2099-01-01T00:00:00Z",
-                      expected_end="2099-01-01T00:01:00Z")
+        active = dict(agent="claude", jobId="claude-existing", event="start",
+                      memoryLimitMiB=6600, cores=[31], startTime="2099-01-01T00:00:00Z",
+                      expectedEnd="2099-01-01T00:01:00Z")
         self.ledger.write_text(json.dumps(active) + "\n", encoding="utf8")
         self.config["memoryMB"] = 1024
 
         def finish_existing():
             with self.ledger.open("a", encoding="utf8") as stream:
-                stream.write(json.dumps(dict(agent="claude", job_id="claude-existing",
-                                             event="end")) + "\n")
+                stream.write(json.dumps(dict(agent="claude", jobId="claude-existing",
+                                             event="finish")) + "\n")
         self.transport.on_wait = finish_existing
         self.invoke()
         names = [e[0] for e in self.transport.events]
@@ -322,24 +326,47 @@ class SharedCardRules(unittest.TestCase):
                 self.assertEqual(result["exit_code"], self.runner["INFRA_EXIT"])
                 lines = self.own_lines()[before:]
                 self.assertEqual(sum(line["event"] == "card-fault" for line in lines), 1)
-                self.assertEqual(lines[-1]["event"], "end")
+                self.assertEqual(lines[-1]["event"], "finish")
                 self.assertFalse(self.events("cleanup"))
                 self.assertFalse(self.events("signal_owned"))
 
     def test_overlap_includes_jobs_starting_during_execution(self):
-        initial = dict(agent="other", job_id="other-first", event="start")
+        initial = dict(agent="other", jobId="other-first", event="start")
         self.ledger.write_text(json.dumps(initial) + "\n", encoding="utf8")
         original = self.transport.execute
 
         def overlap(*args, **kwargs):
             with self.ledger.open("a", encoding="utf8") as stream:
-                stream.write(json.dumps(dict(agent="other", job_id="other-late", event="start")) + "\n")
-                stream.write(json.dumps(dict(agent="other", job_id="other-late", event="end")) + "\n")
+                stream.write(json.dumps(dict(agent="other", jobId="other-late", event="start")) + "\n")
+                stream.write(json.dumps(dict(agent="other", jobId="other-late", event="finish")) + "\n")
             return original(*args, **kwargs)
         self.transport.execute = overlap
         result = self.invoke()
         self.assertIn("overlapping_jobs", result)
         self.assertEqual(set(result["overlapping_jobs"]), {"other-first", "other-late"})
+
+    def test_gpt61_ledger_schema_tracks_finished_active_and_late_jobs(self):
+        # Real other-agent field names from the owner's 11:02 report.
+        start = dict(agent="gpt61", event="start", jobId="gpt61-complete",
+                     cores=[0, 29], logicalCpus=[0, 116], memoryLimitMiB=512,
+                     startTime="2026-11-03T10:00:00Z", expectedEnd="2026-11-03T10:01:00Z",
+                     timingValid=False)
+        finish = dict(start, event="finish", endTime="2026-11-03T10:01:00Z", outcome="success")
+        active = dict(start, jobId="gpt61-active")
+        seed = "".join(json.dumps(line) + "\n" for line in (start, finish, active))
+        self.ledger.write_text(seed, encoding="utf8")
+        original = self.transport.execute
+
+        def overlap(*args, **kwargs):
+            with self.ledger.open("a", encoding="utf8") as stream:
+                for line in (dict(start, jobId="gpt61-late"), dict(finish, jobId="gpt61-late")):
+                    stream.write(json.dumps(line) + "\n")
+            return original(*args, **kwargs)
+        self.transport.execute = overlap
+        result = self.invoke()
+        self.assertEqual(result["result_class"], "program", result)
+        self.assertEqual(set(result["overlapping_jobs"]), {"gpt61-active", "gpt61-late"})
+        self.assertTrue(self.ledger.read_text(encoding="utf8").startswith(seed))
 
     def test_success_result_has_boot_ids_and_card_minutes(self):
         result = self.invoke()
@@ -362,7 +389,7 @@ class SharedCardRules(unittest.TestCase):
             def rpc(self, script, timeout):
                 scripts.append(script)
                 if "command -v" in script:
-                    fake_lookup = 'command() { [ "$2" != "base64" ]; }\n'
+                    fake_lookup = 'command() { [ "$2" != "od" ]; }\n'
                     answer = subprocess.run([sh, "-c", fake_lookup + script],
                                             stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
                     if answer.returncode:
@@ -376,7 +403,7 @@ class SharedCardRules(unittest.TestCase):
         with mock.patch.dict(self.runner["SSHTransport"].connect.__globals__,
                              SSHSession=ToolCheckSession,
                              RUN_DIR=mock.Mock(fullmatch=mock.Mock(return_value=True))):
-            with self.assertRaisesRegex(OSError, "base64"):
+            with self.assertRaisesRegex(OSError, "od"):
                 self.runner["SSHTransport"](self.config, 1).connect(
                     "/tmp/claude/claude-" + "a" * 32, timeout=1)
         self.assertTrue(any("command -v" in script for script in scripts))
