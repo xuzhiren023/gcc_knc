@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-03 11:18.
+Updated automatically at every ticket change. Last update: 2026-11-03 11:19.
 
 **Next: GPT-6.1, on S2-11 (card_run follows the shared card rules and runs hello on the card).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
@@ -65,7 +65,7 @@ Current tickets: `[################----]` 23 of 28
 ## Cost
 
 - From the script, engineer: 93 sessions, 178.8M input tokens
-- From the script, lead: 91 sessions, 33.2M input tokens
+- From the script, lead: 92 sessions, 33.4M input tokens
 - Started by hand, Claude: 3 sessions, 251.9M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
