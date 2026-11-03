@@ -55,7 +55,7 @@ Current tickets: `[#############-------]` 31 of 46
 | S2-14 | card_run stages extra files, so one job can run a batch | Done | card_run can now stage extra files next to the program with --file (size-capped by maxStageMiB, unsafe or d... |
 | S2-15 | -ffast-math links on KNC with a KNC crtfastmath | Not started | Rewritten after the lead's card run: the donor's FTZ/DAZ write runs on KNC, so the fix provides a matching ... |
 | S2-16 | Card batch files are readable by the lead | Done | Card batch programs are now written 0755 and data files 0644, so the lead can read and stage them; Cygwin n... |
-| S2-17 | card_run tolerates ending processes, and stages batch files correctly | Changes requested | Lead, under the owner's 2026-11-03 delegation: 4 sessions and 7M tokens (1 session and 3.3M used). Fix only... |
+| S2-17 | card_run tolerates ending processes, and stages batch files correctly | In progress | Lead, under the owner's 2026-11-03 delegation: 4 sessions and 7M tokens (1 session and 3.3M used). Fix only... |
 | S2-18 | The card test driver runs programs in parallel on our 30 cores | Not started | Part of the owner's card-use rule of 2026-11-03 (CURRENT_STATE.md). Later batches should be the full execut... |
 | S3-01 | Packed modes and IMCI patterns in GCC 16: entry points, audit and line estimate | draft |  |
 | S3-02 | One helper for optional tools/check selections | draft |  |
@@ -90,4 +90,4 @@ Current tickets: `[#############-------]` 31 of 46
 
 ## Disk
 
-The project uses 6.9 GiB of 100 GiB. 326 GiB free on the drive.
+The project uses 6.9 GiB of 100 GiB. 325 GiB free on the drive.
