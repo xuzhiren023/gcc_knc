@@ -101,11 +101,6 @@ make -j8 all-gcc 'CFLAGS=-O2 -g1' 'CXXFLAGS=-O2 -g1'
 "$S/portability/x86-b/build/gcc/cc1.exe" -quiet -O2 -mavx512f "$file" -o "$temporary/b.s"
 ```
 
-The worktree commands use resolved commits at execution time. Existing clean
-worktrees are reused (checked out to the requested commit if needed); their build
-directories are reconfigured and rebuilt incrementally. Assembly is compared in
-Python and the two temporary assembly files are removed on completion.
-
 ### upstream/releases/gcc-16
 
 Commit: `eafaaddd92e971ab059c6bfa9b8bd93baeb16d19`; date: 2026-11-02T00:20:15Z.
