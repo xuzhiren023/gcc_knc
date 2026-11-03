@@ -143,8 +143,6 @@ def main():
                     kind = 'lint failure' if violations else 'pass'
                 for violation in violations:
                     diagnostic.append('%s:%s:%s: forbidden: %s' % violation)
-            if retried and kind == 'pass':
-                kind = 'slow'
         except CompilerHang as error:
             diagnostic.append('hang: ' + str(error))
             kind = 'hang'
@@ -154,7 +152,7 @@ def main():
         seconds = time.monotonic() - started
         if retried:
             diagnostic.append('elapsed including initial timeout and retry: %.3fs' % seconds)
-        if kind != 'pass':
+        if kind != 'pass' or retried:
             log.write_text('\n'.join(diagnostic), encoding='utf8')
         if kind not in ('assembler rejection', 'lint failure', 'ICE'):
             asm.unlink(missing_ok=True)
@@ -171,17 +169,19 @@ def main():
                 print('measured %d/%d' % (number, len(sources) * len(levels)), flush=True)
     elapsed = time.monotonic() - start
     counts = Counter((level, kind) for level, kind, _, _ in results)
+    counts.update((level, 'slow') for level, kind, _, seconds in results
+                  if seconds is not None and kind not in ('hang', 'infrastructure failure'))
     lines = ['GCC 16 KNC C torture compile corpus (S1-05)',
              'Scope: ' + (str(args.source) if args.source else 'gcc/testsuite/gcc.c-torture/compile/**/*.c'),
              'Raw compile corpus; dg options/skips are not applied; compiler language default retained.',
              'Flags: -march=knc -S, plus each level below.',
              'Assembler: binutils 2.22, --march=k1om.',
              'Lint: tools/knc_lint source checks and decoded object checks after successful assembly.',
-             'Classes are exclusive: compiler failure, then assembler rejection, then lint failure.',
+             'Outcome classes are exclusive: compiler failure, then assembler rejection, then lint failure.',
              'FP ABI class requires every compiler error to be the explicit SSE-disabled ABI diagnostic.',
              'Timeout policy: %.0fs, then one %.0fs compiler retry; both exceeded = hang.' %
              (args.timeout, args.retry_timeout),
-             'Slow = retry completed and assembly/lint passed; other retry outcomes keep their failure class.',
+             'Slow is an additional timing class: retry completed; underlying outcome is counted too.',
              'Whole-run wall time: %.3f seconds (%.3f minutes), %d workers.' %
              (elapsed, elapsed / 60, args.jobs),
              'Files: %d; measurements: %d.' % (len(sources), len(results)), '',
@@ -190,8 +190,11 @@ def main():
         lines.append(level + '\t' + '\t'.join(str(counts[level, kind]) for kind in CLASSES))
     for level in levels:
         for kind in CLASSES[1:]:
-            names = sorted(name + ('\t%.3fs including timeout/retry' % seconds if seconds is not None else '')
-                           for lev, cls, name, seconds in results if lev == level and cls == kind)
+            names = sorted(name + ('\t%.3fs including timeout/retry' % seconds if seconds is not None else '') +
+                           ('; outcome: ' + cls if kind == 'slow' else '')
+                           for lev, cls, name, seconds in results if lev == level and
+                           (cls == kind or (kind == 'slow' and seconds is not None and
+                                            cls not in ('hang', 'infrastructure failure'))))
             lines.extend(['', '%s / %s (%d)' % (level, kind, len(names)), *names])
     args.summary.parent.mkdir(parents=True, exist_ok=True)
     args.summary.write_text('\n'.join(lines) + '\n', encoding='utf8')
