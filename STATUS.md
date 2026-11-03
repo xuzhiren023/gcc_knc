@@ -1,17 +1,17 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-03 14:46.
+Updated automatically at every ticket change. Last update: 2026-11-03 14:48.
 
 **Next: GPT-6.1, on S2-15 (-ffast-math links on KNC with a KNC crtfastmath).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
-Current tickets: `[##############------]` 34 of 46
+Current tickets: `[##############------]` 34 of 47
 
 ## Milestones
 
 | | Milestone | State | Progress |
 |---|---|---|---|
 | M0 | Foundation | In progress | 17 of 17 tickets |
-| M1 | Mixed native code | In progress | 17 of 29 tickets |
+| M1 | Mixed native code | In progress | 17 of 30 tickets |
 | M2 | Useful vector target | Not started | Not planned in detail yet |
 | M3 | Runtimes | Not started | Not planned in detail yet |
 | M4 | Broad optimization | Not started | Not planned in detail yet |
@@ -57,6 +57,7 @@ Current tickets: `[##############------]` 34 of 46
 | S2-16 | Card batch files are readable by the lead | Done | Card batch programs are now written 0755 and data files 0644, so the lead can read and stage them; Cygwin n... |
 | S2-17 | card_run tolerates ending processes, and stages batch files correctly | Done | card_run now skips processes that end mid-snapshot instead of failing the run, keeps a finished program's r... |
 | S2-18 | The card test driver runs programs in parallel on our 30 cores | Done | claude-torture now runs up to N programs at once (-j N) inside the job's memory budget, with results in lis... |
+| S2-19 | The card snapshot's awk runs under BusyBox | In progress | Blocks every card run since S2-17. From now on, every merge that touches the card runner gets a lead `hello... |
 | S3-01 | Packed modes and IMCI patterns in GCC 16: entry points, audit and line estimate | draft |  |
 | S3-02 | One helper for optional tools/check selections | draft |  |
 | S3-03 | Native probe of unaligned pairs and masked aligned forms at page boundaries | draft |  |
@@ -71,6 +72,7 @@ Current tickets: `[##############------]` 34 of 46
 
 ## Recent activity
 
+- 2026-11-03 14:48 **S2-19** lead note: Blocks every card run since S2-17. From now on, every merge that touches the card runner gets a lead `hello` on the card before any batch (CURRENT_...
 - 2026-11-03 14:46 **S2-18** lead approve: claude-torture now runs up to N programs at once (-j N) inside the job's memory budget, with results in list order and every child killed on timeou...
 - 2026-11-03 14:45 **S2-18** engineer submit: Host acceptance passed: N=8 sleep concurrency, list-order output, crash/failure/timeout diagnostics and memory admission; default/parallel checks p...
 - 2026-11-03 14:44 **S2-18** lead answer: Yes: submit with --override 'size: scheduler, ordered output, kill-on-limit cleanup and host fixtures belong together; splitting would leave an unt...
@@ -78,13 +80,12 @@ Current tickets: `[##############------]` 34 of 46
 - 2026-11-03 14:43 **S2-18** engineer ask: Host acceptance passes and docs are complete (commits 0941801, d499bbf), but submit refuses 413 changed lines against the 300-line budget. Changes ...
 - 2026-11-03 14:43 **S2-09** engineer submit: Red 39f5110: C-only flags/missing Fortran. all-gcc provides gfortran/f951; no target libraries built. Full rebuild 3736.542 s (configure 59.526, al...
 - 2026-11-03 14:38 **S2-17** lead approve: card_run now skips processes that end mid-snapshot instead of failing the run, keeps a finished program's result, and stages many batch files with ...
-- 2026-11-03 14:36 **S2-17** engineer submit: Fixed only the three local-shell RPC fixtures in tests/tools/test_card_backend.py to use max(timeout, 60), per 14:31 review; product timeouts uncha...
 
 ## Cost
 
 - From the script, engineer: 120 sessions, 231.2M input tokens
 - From the script, lead: 119 sessions, 40.0M input tokens
-- Started by hand, Claude: 3 sessions, 359.6M input tokens
+- Started by hand, Claude: 3 sessions, 365.7M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
