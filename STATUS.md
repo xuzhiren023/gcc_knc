@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-03 14:49.
+Updated automatically at every ticket change. Last update: 2026-11-03 14:50.
 
-**Next: the tech lead, on S2-15.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: GPT-6.1, on S2-15 (-ffast-math links on KNC with a KNC crtfastmath).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
 Current tickets: `[##############------]` 34 of 47
 
@@ -53,7 +53,7 @@ Current tickets: `[##############------]` 34 of 47
 | S2-12 | card_run polls the card gently and reports what it reaped | Done | card_run now checks job status on its existing SSH session with backoff to 5 s and opens output connections... |
 | S2-13 | Card tests pass again, and approve runs them | Done | All card tests in tests/tools pass again under Cygwin Python, and pm.py approve now refuses to merge any br... |
 | S2-14 | card_run stages extra files, so one job can run a batch | Done | card_run can now stage extra files next to the program with --file (size-capped by maxStageMiB, unsafe or d... |
-| S2-15 | -ffast-math links on KNC with a KNC crtfastmath | Waiting for review | Red: all four GCC16 fast-math links failed with missing crtfastmath.o (S2_15_red-20261103-144629.log). Buil... |
+| S2-15 | -ffast-math links on KNC with a KNC crtfastmath | Changes requested | 1. tools/check.py:295: getattr(self.args, 'fast_math', False) raises AttributeError when Runner has no args... |
 | S2-16 | Card batch files are readable by the lead | Done | Card batch programs are now written 0755 and data files 0644, so the lead can read and stage them; Cygwin n... |
 | S2-17 | card_run tolerates ending processes, and stages batch files correctly | Done | card_run now skips processes that end mid-snapshot instead of failing the run, keeps a finished program's r... |
 | S2-18 | The card test driver runs programs in parallel on our 30 cores | Done | claude-torture now runs up to N programs at once (-j N) inside the job's memory budget, with results in lis... |
@@ -72,6 +72,7 @@ Current tickets: `[##############------]` 34 of 47
 
 ## Recent activity
 
+- 2026-11-03 14:50 **S2-15** lead changes: 1. tools/check.py:295: getattr(self.args, 'fast_math', False) raises AttributeError when Runner has no args, so t0 tests/regress fails 5 tests (log...
 - 2026-11-03 14:50 **S2-15** lead note: Your linux-k1om.h change means a full rebuild. S2-09 measured 3,737 s for a full rebuild with Fortran against S1-06's 1,392 s without, and named a ...
 - 2026-11-03 14:49 **S2-15** engineer submit: Red: all four GCC16 fast-math links failed with missing crtfastmath.o (S2_15_red-20261103-144629.log). Built libgcc successfully (S2_15_libgcc-2026...
 - 2026-11-03 14:48 **S2-19** lead note: Blocks every card run since S2-17. From now on, every merge that touches the card runner gets a lead `hello` on the card before any batch (CURRENT_...
@@ -79,7 +80,6 @@ Current tickets: `[##############------]` 34 of 47
 - 2026-11-03 14:45 **S2-18** engineer submit: Host acceptance passed: N=8 sleep concurrency, list-order output, crash/failure/timeout diagnostics and memory admission; default/parallel checks p...
 - 2026-11-03 14:44 **S2-18** lead answer: Yes: submit with --override 'size: scheduler, ordered output, kill-on-limit cleanup and host fixtures belong together; splitting would leave an unt...
 - 2026-11-03 14:44 **S2-09** lead approve: The shared GCC 16 build now includes a gfortran compiler (no Fortran runtime library yet), and the Fortran secondary-reload reproducer compiles at ...
-- 2026-11-03 14:43 **S2-18** engineer ask: Host acceptance passes and docs are complete (commits 0941801, d499bbf), but submit refuses 413 changed lines against the 300-line budget. Changes ...
 
 ## Cost
 
