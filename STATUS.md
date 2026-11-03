@@ -49,7 +49,7 @@ Current tickets: `[################----]` 23 of 28
 | S2-08 | hello, scalar FP and printf on the card | draft | Owner approved Sprint 2 on 2026-11-03; this ticket stays draft until the card hold ends. |
 | S2-09 | GCC 16 builds gfortran, and the secondary-reload reproducer passes | Not started | Reconfiguring means one full rebuild: use `make -j8` with `CFLAGS=-O2 -g1 CXXFLAGS=-O2 -g1` as `tools/toolc... |
 | S2-10 | First card runs for the queued native checks | Not started | Owner's decision of 2026-11-03: the interactive lead runs every card job; engineer sessions have no card ac... |
-| S2-11 | card_run follows the shared card rules and runs hello on the card | Changes requested | Review of 17b75b4. The ledger schema, core mapping, memory admission, staging without base64 and the config... |
+| S2-11 | card_run follows the shared card rules and runs hello on the card | In progress | Review of 17b75b4. The ledger schema, core mapping, memory admission, staging without base64 and the config... |
 
 ## Recent activity
 
