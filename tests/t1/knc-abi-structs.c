@@ -3,7 +3,8 @@ struct df { double d; float f; };
 struct ff { float a, b; };
 volatile double abi_sink_d;
 volatile float abi_sink_f;
-void abi_in_df_d(struct df x) { abi_sink_d = x.d; }
+/* Observe both eightbytes: either compiler may also materialize unused fields. */
+void abi_in_df_d(struct df x) { abi_sink_d = x.d; abi_sink_f = x.f; }
 void abi_in_df_f(struct df x) { abi_sink_f = x.f; }
 void abi_in_ff_a(struct ff x) { abi_sink_f = x.a; }
 void abi_in_ff_b(struct ff x) { abi_sink_f = x.b; }

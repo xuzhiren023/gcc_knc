@@ -5,5 +5,6 @@
 volatile float abi_sink_f32;
 void abi_in_f32(float x) { abi_sink_f32 = x; }
 float abi_out_f32(void) { return 1.25f; }
-float abi_identity_f32(float x) { return x; }
+/* Keep the donor from reducing this to ret, which exposes no input location. */
+float abi_identity_f32(float x) { volatile float value = x; return value; }
 float abi_body_f32(float x, float y) { return x * y + 1.25f; }
