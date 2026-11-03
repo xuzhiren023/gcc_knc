@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-03 13:20.
+Updated automatically at every ticket change. Last update: 2026-11-03 13:21.
 
 **Next: the tech lead, on S2-07.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
@@ -52,7 +52,7 @@ Current tickets: `[############--------]` 27 of 42
 | S2-11 | card_run follows the shared card rules and runs hello on the card | Done | tools/card_run now runs programs on the shared Xeon Phi under the owner's card rules (ledger lines, cores 3... |
 | S2-12 | card_run polls the card gently and reports what it reaped | Done | card_run now checks job status on its existing SSH session with backoff to 5 s and opens output connections... |
 | S2-13 | Card tests pass again, and approve runs them | Done | All card tests in tests/tools pass again under Cygwin Python, and pm.py approve now refuses to merge any br... |
-| S2-14 | card_run stages extra files, so one job can run a batch | In progress | 1. tests/tools/test_card_backend.py:130: approve's Cygwin rerun fails 57/58: the non-executable extra file ... |
+| S2-14 | card_run stages extra files, so one job can run a batch | Waiting for review | Clean head ea14df3: Cygwin python3.12 unittest discover tests/tools test_card_*.py via tools/run.py passed ... |
 | S3-01 | Packed modes and IMCI patterns in GCC 16: entry points, audit and line estimate | draft |  |
 | S3-02 | One helper for optional tools/check selections | draft |  |
 | S3-03 | Native probe of unaligned pairs and masked aligned forms at page boundaries | draft |  |
@@ -67,6 +67,7 @@ Current tickets: `[############--------]` 27 of 42
 
 ## Recent activity
 
+- 2026-11-03 13:21 **S2-14** engineer submit: Clean head ea14df3: Cygwin python3.12 unittest discover tests/tools test_card_*.py via tools/run.py passed 58/58 in 27.775s. Fixture ACL isolation ...
 - 2026-11-03 13:20 **S2-07** engineer ask: Committed project f351d2d and GCC e682e23a0e7; red 9d734af. Fork libgcc/CRT build, archive/CRT lint, S1-06 link and integer/soft-fp helper links PA...
 - 2026-11-03 13:17 **S2-14** lead changes: 1. tests/tools/test_card_backend.py:130: approve's Cygwin rerun fails 57/58: the non-executable extra file 'input ' data' is staged as 700, expecte...
 - 2026-11-03 13:15 **S2-14** engineer submit: Cygwin python3.12 unittest discover tests/tools test_card_*.py via tools/run.py: 58/58 pass in 29.123s. Fixture only; refusal tests unmodified; run...
@@ -74,7 +75,6 @@ Current tickets: `[############--------]` 27 of 42
 - 2026-11-03 13:13 **S2-14** lead escalate: budget: 4 engineer sessions used; the budget is 4
 - 2026-11-03 13:13 **S2-14** lead answer: Yes, fixture only: the fake RPC may cd into the translated job dir (fixture tmp/claude/claude-<job>) before guard_boot calls, with snapshot and sta...
 - 2026-11-03 13:12 **S2-14** engineer ask: Approved fixture timeout=30: Cygwin suite 57/58, 39.121 s. Snapshot completes; stage chmod RPC (guard_boot && chmod) fails with exit 91: guard_dir ...
-- 2026-11-03 13:11 **S2-14** lead answer: Yes, fixture only: in this test call self.session.snapshot(timeout=30), with a one-line comment that Cygwin forks make the fake card-sized /proc wa...
 
 ## Cost
 
