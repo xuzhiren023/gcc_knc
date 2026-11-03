@@ -1,17 +1,17 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-03 15:18.
+Updated automatically at every ticket change. Last update: 2026-11-03 15:19.
 
-**Next: the tech lead, on S3-02.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: GPT-6.1, on S3-03 (Native probe of unaligned pairs and masked aligned forms at page boundaries).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
-Current tickets: `[###############-----]` 36 of 47
+Current tickets: `[###############-----]` 37 of 47
 
 ## Milestones
 
 | | Milestone | State | Progress |
 |---|---|---|---|
 | M0 | Foundation | In progress | 17 of 17 tickets |
-| M1 | Mixed native code | In progress | 19 of 30 tickets |
+| M1 | Mixed native code | In progress | 20 of 30 tickets |
 | M2 | Useful vector target | Not started | Not planned in detail yet |
 | M3 | Runtimes | Not started | Not planned in detail yet |
 | M4 | Broad optimization | Not started | Not planned in detail yet |
@@ -59,7 +59,7 @@ Current tickets: `[###############-----]` 36 of 47
 | S2-18 | The card test driver runs programs in parallel on our 30 cores | Done | Card line ticked: the 256-program torture batch passed 256 of 256 on the card with `-j 30` (`docs/research/... |
 | S2-19 | The card snapshot's awk runs under BusyBox | Done | The card runner's process snapshot no longer trips BusyBox awk, and a T0 test now rejects any card awk line... |
 | S3-01 | Packed modes and IMCI patterns in GCC 16: entry points, audit and line estimate | Not started | Intel 327364-001 (Xeon Phi Coprocessor ISA Reference Manual, 7 September 2012, 725 pages) is at `.work/_sha... |
-| S3-02 | One helper for optional tools/check selections | Waiting for review | Red f463f56; fix b9c743e: table-driven default-safe T1/T2 selections combine; --vector selects knc-vec-*.c.... |
+| S3-02 | One helper for optional tools/check selections | Done | tools/check optional selections now come from one table, several flags given together all run and each repo... |
 | S3-03 | Native probe of unaligned pairs and masked aligned forms at page boundaries | In progress | Yes, you're right: a 64-byte aligned full vector can't span pages, so that criterion is impossible as writt... |
 | S3-04 | Packed modes legal under -march=knc, with aligned moves, spills and constants | Not started | Owner approved Sprint 3 on 2026-11-03; ticket set to ready. |
 | S3-05 | Unaligned packed moves through load and store pairs | Not started | Owner approved Sprint 3 on 2026-11-03; ticket set to ready. |
@@ -72,6 +72,7 @@ Current tickets: `[###############-----]` 36 of 47
 
 ## Recent activity
 
+- 2026-11-03 15:19 **S3-02** lead approve: tools/check optional selections now come from one table, several flags given together all run and each reports, and a --vector selection is ready f...
 - 2026-11-03 15:18 **S3-02** engineer submit: Red f463f56; fix b9c743e: table-driven default-safe T1/T2 selections combine; --vector selects knc-vec-*.c. tools/check t0 PASS (23+8+4 tests); ful...
 - 2026-11-03 15:14 **S3-03** lead answer: Yes, you're right: a 64-byte aligned full vector can't span pages, so that criterion is impossible as written. Replace it with: (1) aligned vmovaps...
 - 2026-11-03 15:13 **S3-03** engineer ask: Acceptance blocker: an aligned 64-byte vector cannot span mapped and guard pages. Reduced case: guard G=0x2000; G-64 is aligned and wholly mapped; ...
@@ -79,7 +80,6 @@ Current tickets: `[###############-----]` 36 of 47
 - 2026-11-03 15:12 **S3-01** lead note: Intel 327364-001 (Xeon Phi Coprocessor ISA Reference Manual, 7 September 2012, 725 pages) is at `.work/_shared/intel-327364-001-xeon-phi-isa.pdf`, ...
 - 2026-11-03 15:07 **S3-11** owner decide: Owner approved Sprint 3 on 2026-11-03; ticket set to ready.
 - 2026-11-03 15:07 **S3-10** owner decide: Owner approved Sprint 3 on 2026-11-03; ticket set to ready.
-- 2026-11-03 15:07 **S3-09** owner decide: Owner approved Sprint 3 on 2026-11-03; this ticket stays draft: the owner chooses when S3-07 is merged whether it runs in Sprint 3.
 
 ## Cost
 
