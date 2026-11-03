@@ -474,3 +474,24 @@ pr116348.c
 O2-g / lint failure (0)
 
 O2-g / infrastructure failure (0)
+
+Non-front-end compiler diagnostic audit (all levels unless noted):
+SSE/AVX/MMX options rejected with knc: pr106433.c, pr110386-2.c, pr34856.c,
+  pr39928-1.c, pr89235.c, pr97576.c, vector-1.c, vector-2.c, vector-4.c.
+Foreign cpu/architecture: pr88347.c (603e), pr117449.c (armv8.2-a+sha3),
+  pr124280.c (neoverse-v2), pr78748.c (zEC12).
+Unrecognized -G0: attr-retain-1.c, attr-retain-2.c.
+Unrecognized -mthumb/-mfloat-abi=soft: pr82096.c.
+Invalid SI pointer mode: 20111209-1.c.
+Invalid MIPS register names: mipscop-1.c, mipscop-2.c, mipscop-3.c, mipscop-4.c.
+Impossible asm constraints: asmgoto-5.c (O0 only).
+Graphite unavailable because isl is absent: pr86637-2.c.
+Other compiler-error files have front-end C diagnostics.
+
+Assembler rejection causes (not compiler-generated KNC instruction defects):
+920520-1.c: bare operand asm template (%0), all levels.
+920521-1.c: literal invalid asm instructions f and g, all levels.
+pr113322-1.c: source option -march=sapphirerapids overrides -march=knc, all levels.
+pr116348.c: source option -march=znver4 overrides -march=knc, O2 and O2-g.
+The latter two also have source-lint violations, recorded in their assembly logs;
+assembler rejection takes precedence in the exclusive outcome counts above.
