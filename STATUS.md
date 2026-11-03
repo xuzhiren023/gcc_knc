@@ -1,16 +1,16 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-02 22:25.
+Updated automatically at every ticket change. Last update: 2026-11-02 22:26.
 
-**Next: the tech lead, on S1-05.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: GPT-6.1, on S1-06 (K1OM link defaults).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
-Current tickets: `[################----]` 14 of 17
+Current tickets: `[#################---]` 15 of 17
 
 ## Milestones
 
 | | Milestone | State | Progress |
 |---|---|---|---|
-| M0 | Foundation | In progress | 14 of 17 tickets |
+| M0 | Foundation | In progress | 15 of 17 tickets |
 | M1 | Mixed native code | Not started | Not planned in detail yet |
 | M2 | Useful vector target | Not started | Not planned in detail yet |
 | M3 | Runtimes | Not started | Not planned in detail yet |
@@ -36,12 +36,13 @@ Current tickets: `[################----]` 14 of 17
 | S1-02 | GCC 16.2 builds for k1om-mpss-linux | Done | GCC 16.2 now configures and builds its C compiler for k1om-mpss-linux, using the shared KNC assembler, link... |
 | S1-03 | tools/check runs source-level tests against GCC 16 | Done | tools/check t1 --compiler gcc16 now compiles each tests/t1/*.c test and checks its scan, scan-not, per-func... |
 | S1-04 | -march=knc with no SSE, AVX, MMX, CMOV, FCOMI or MFENCE | Done | GCC 16 now accepts -march=knc (the k1om default): it predefines __KNC__ and no SSE/MMX/AVX macros, rejects ... |
-| S1-05 | Integer C assembles with as 2.22 and lints clean | Waiting for review | 75e803f: red/green; 6009 cases/808.426s; ICE/hang/as/lint/infra=0; user asm=2/level. Target diagnostics: pr... |
+| S1-05 | Integer C assembles with as 2.22 and lints clean | Done | All 2003 GCC torture compile files now build for KNC at -O0, -O2 and -O2 -g and assemble with the card's ol... |
 | S1-06 | K1OM link defaults | Not started | The 15:45 note is wrong and replaced: your shell returns after 30 s, so a blocking call cannot work. Start ... |
 | S1-07 | Milestone M0 evidence note | Not started | Rebuild GCC with the logged gcc16 step of tools/toolchain.py as ONE blocking foreground shell call with a t... |
 
 ## Recent activity
 
+- 2026-11-02 22:26 **S1-05** lead approve: All 2003 GCC torture compile files now build for KNC at -O0, -O2 and -O2 -g and assemble with the card's old assembler with no crashes, hangs, asse...
 - 2026-11-02 22:25 **S1-05** engineer submit: 75e803f: red/green; 6009 cases/808.426s; ICE/hang/as/lint/infra=0; user asm=2/level. Target diagnostics: pr106433,pr110386-2,pr89235,pr97576 (SSE f...
 - 2026-11-02 22:20 **S1-06** lead note: The 15:45 note is wrong and replaced: your shell returns after 30 s, so a blocking call cannot work. Start the rebuild in the background and poll i...
 - 2026-11-02 22:03 **S1-05** lead answer: 1. 920520-1/920521-1: yes, a separate class 'user inline asm rejected', no fork change. Admit a file to it only if every as error line falls inside...
@@ -49,7 +50,6 @@ Current tickets: `[################----]` 14 of 17
 - 2026-11-02 21:48 **S1-05** lead changes: 1. tools/torture_compile.py:123 ignores the corpus's own dg-options/dg-additional-options, so 386-387 files per level (19% of the corpus) stop at f...
 - 2026-11-02 21:47 **S1-05** engineer submit: Acceptance met in commits 393c13d / GCC a6f28997967: DWARF 4 red/green; GCC rebuild 2056.884s; full torture sweep 6009 measurements in 584.499s, ze...
 - 2026-11-02 21:46 **S1-05** lead answer: Size is soft and the acceptance itself requires the full file lists, so keep the summary as is and submit with --override 'tests/baseline/gcc16-tor...
-- 2026-11-02 21:46 **S1-05** engineer ask: Acceptance met: DWARF 4 red/green, rebuild 2056.884s, sweep 6009 measurements/584.499s with zero hang/ICE/as/lint/infra. Submit refused: 1743 lines...
 
 ## Cost
 
