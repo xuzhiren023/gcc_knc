@@ -318,6 +318,37 @@ class MachineCheck(Sandbox):
         self.assertEqual(self.state("A-1"), "done")
         self.assertIn("Machine check: tools/check t0 passed", self.pm("show", "A-1").stdout)
 
+    def card_change_blocks_merge(self, path):
+        self.pm("start", "A-1")
+        self.wt = self.worktree("A-1")
+        self.commit_file("tools/check", "raise SystemExit(0)\n", "test(A-1): T0 [red]", self.wt)
+        self.commit_file("tests/tools/test_card_approval.py",
+                         "import sys, unittest\n"
+                         "class CardCheck(unittest.TestCase):\n"
+                         "    def test_gate(self):\n"
+                         "        self.assertEqual(sys.platform, 'cygwin')\n"
+                         "        self.fail('card approval gate ran under Cygwin')\n",
+                         "test(A-1): card approval gate [red]", self.wt)
+        with open(os.path.join(self.wt, path), encoding="utf8") as f:
+            original = f.read()
+        self.commit_file(path, original + "\n", "fix(A-1): card change", self.wt)
+        submitted = self.pm("submit", "A-1", "--note", "n", cwd=self.wt)
+        self.assertEqual(submitted.returncode, 0, submitted.stdout)
+        done = self.pm("approve", "A-1", role="lead")
+        self.assertEqual(done.returncode, 1, done.stdout)
+        self.assertIn("card approval gate ran under Cygwin", done.stdout)
+        self.assertEqual(self.state("A-1"), "review")
+        self.assertTrue(os.path.isdir(self.wt))
+
+    def test_card_runner_change_requires_cygwin_card_tests(self):
+        self.card_change_blocks_merge("tools/card_run")
+
+    def test_card_shell_change_requires_cygwin_card_tests(self):
+        self.card_change_blocks_merge("tools/card_run_remote.sh")
+
+    def test_card_helper_change_requires_cygwin_card_tests(self):
+        self.card_change_blocks_merge("tools/claude-pin.c")
+
 
 class RunWrapper(Sandbox):
     def run_tool(self, *args):

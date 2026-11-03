@@ -414,17 +414,40 @@ def cmd_submit(board, args):
 
 def machine_check(worktree):
     """Run the branch's own T0 before it can merge, so approval never rests on a report alone."""
-    if not os.path.exists(os.path.join(worktree, "tools", "check")):
-        return ""
-    try:
-        done = subprocess.run([sys.executable, os.path.join("tools", "check"), "t0"], cwd=worktree, stdin=subprocess.DEVNULL,
-                              stdout=subprocess.PIPE, stderr=subprocess.STDOUT, universal_newlines=True,
-                              errors="replace", timeout=600)
-    except subprocess.TimeoutExpired:
-        raise Refused("not merged: tools/check t0 ran past 10 minutes. Use pm.py changes.")
-    if done.returncode != 0:
-        raise Refused("not merged: tools/check t0 failed. Use pm.py changes.\n" + done.stdout[-1500:])
-    return " Machine check: tools/check t0 passed."
+    checks = []
+    if os.path.exists(os.path.join(worktree, "tools", "check")):
+        checks.append(("tools/check t0", [sys.executable, os.path.join("tools", "check"), "t0"], None))
+    card_paths = ("tools/card_run", "tools/card_run_remote.sh", "tools/claude-pin.c")
+    if run_git("diff", "--name-only", "main...HEAD", "--", *card_paths, cwd=worktree):
+        env = os.environ.copy()
+        python = sys.executable
+        if sys.platform != "cygwin":
+            try:
+                with open(os.path.join(worktree, "toolchain", "manifest.json"), encoding="utf8") as f:
+                    tc = os.path.join(storage.main_root(worktree), json.load(f)["root"])
+            except (OSError, ValueError, KeyError) as error:
+                raise Refused("not merged: cannot locate Cygwin card test runtime: %s" % error)
+            env["PATH"] = os.pathsep.join(os.path.join(tc, p) for p in ("cross/bin", "cygwin/bin")) + \
+                os.pathsep + env.get("PATH", "")
+            python = os.path.join(tc, "cygwin", "bin", "python3.12.exe")
+        checks.append(("Cygwin tests/tools/test_card_*.py",
+                       [python, "tools/run.py", "--name", "approve-card", "--inputs", "tools", "tests/tools",
+                        "--", "python3.12.exe", "-m", "unittest", "discover", "-s", "tests/tools",
+                        "-p", "test_card_*.py"], env))
+    note = ""
+    for label, command, env in checks:
+        try:
+            done = subprocess.run(command, cwd=worktree, env=env, stdin=subprocess.DEVNULL,
+                                  stdout=subprocess.PIPE, stderr=subprocess.STDOUT, universal_newlines=True,
+                                  errors="replace", timeout=600)
+        except subprocess.TimeoutExpired:
+            raise Refused("not merged: %s ran past 10 minutes. Use pm.py changes." % label)
+        except OSError as error:
+            raise Refused("not merged: %s could not run: %s" % (label, error))
+        if done.returncode != 0:
+            raise Refused("not merged: %s failed. Use pm.py changes.\n%s" % (label, done.stdout[-1500:]))
+        note += " Machine check: %s passed." % label
+    return note
 
 
 def cmd_approve(board, args):

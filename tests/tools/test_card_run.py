@@ -247,8 +247,8 @@ class CardRun(unittest.TestCase):
                          [("execute", self.transport.run_dir, ["argument with spaces"], 30.0, 35)])
         self.assert_cleaned()
 
-        # A control poll started just before the deadline gets its full transport
-        # budget; expiry is then a program timeout, not a broken SSH connection.
+        # S2-12 schedules output from its own initial clock reading, every 10 s.
+        # A late control poll still gets its full transport budget before timeout.
         session = object.__new__(self.runner["SSHSession"])
         session.run_dir = self.transport.run_dir
         session.boot_id = BOOT
@@ -256,7 +256,7 @@ class CardRun(unittest.TestCase):
         session.rpc = mock.Mock(side_effect=[b"", b"running"])
         session.read_output = mock.Mock(return_value=b"")
         with mock.patch.object(self.runner["time"], "monotonic",
-                               side_effect=[0.0, 29.9, 30.0, 30.0]), \
+                               side_effect=[0.0, 0.0, 29.9, 29.9, 29.9, 30.0, 30.0]), \
                 mock.patch.object(self.runner["time"], "sleep"):
             with self.assertRaises(TimeoutError):
                 session.execute(session.run_dir, [], timeout=30.0, card_timeout=35, cpus=[91], memory_mb=128)
