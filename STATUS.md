@@ -1,17 +1,17 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-03 14:13.
+Updated automatically at every ticket change. Last update: 2026-11-03 14:14.
 
-**Next: the tech lead, on S2-16.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: GPT-6.1, on S2-09 (GCC 16 builds gfortran, and the secondary-reload reproducer passes).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
-Current tickets: `[#############-------]` 30 of 45
+Current tickets: `[#############-------]` 31 of 45
 
 ## Milestones
 
 | | Milestone | State | Progress |
 |---|---|---|---|
 | M0 | Foundation | In progress | 17 of 17 tickets |
-| M1 | Mixed native code | In progress | 13 of 28 tickets |
+| M1 | Mixed native code | In progress | 14 of 28 tickets |
 | M2 | Useful vector target | Not started | Not planned in detail yet |
 | M3 | Runtimes | Not started | Not planned in detail yet |
 | M4 | Broad optimization | Not started | Not planned in detail yet |
@@ -54,7 +54,7 @@ Current tickets: `[#############-------]` 30 of 45
 | S2-13 | Card tests pass again, and approve runs them | Done | All card tests in tests/tools pass again under Cygwin Python, and pm.py approve now refuses to merge any br... |
 | S2-14 | card_run stages extra files, so one job can run a batch | Done | card_run can now stage extra files next to the program with --file (size-capped by maxStageMiB, unsafe or d... |
 | S2-15 | -ffast-math links on KNC with a KNC crtfastmath | Not started | Rewritten after the lead's card run: the donor's FTZ/DAZ write runs on KNC, so the fix provides a matching ... |
-| S2-16 | Card batch files are readable by the lead | Waiting for review | Lead, under the owner's 2026-11-03 delegation: the fix works; the lead read all 257 files and staged them o... |
+| S2-16 | Card batch files are readable by the lead | Done | Card batch programs are now written 0755 and data files 0644, so the lead can read and stage them; Cygwin n... |
 | S2-17 | card_run tolerates ending processes, and stages batch files correctly | Not started | Recurring on the shared card whenever the other agent's jobs churn. |
 | S3-01 | Packed modes and IMCI patterns in GCC 16: entry points, audit and line estimate | draft |  |
 | S3-02 | One helper for optional tools/check selections | draft |  |
@@ -70,6 +70,7 @@ Current tickets: `[#############-------]` 30 of 45
 
 ## Recent activity
 
+- 2026-11-03 14:14 **S2-16** lead approve: Card batch programs are now written 0755 and data files 0644, so the lead can read and stage them; Cygwin no longer turns them into deny entries fo...
 - 2026-11-03 14:13 **S2-16** owner decide: Lead, under the owner's 2026-11-03 delegation: the fix works; the lead read all 257 files and staged them on the card (14:10). Approving.
 - 2026-11-03 14:09 **S2-16** lead escalate: lead session ended without a decision (exit 0)
 - 2026-11-03 14:08 **S2-15** lead note: Rewritten after the lead's card run: the donor's FTZ/DAZ write runs on KNC, so the fix provides a matching crtfastmath instead of dropping it.
@@ -77,7 +78,6 @@ Current tickets: `[#############-------]` 30 of 45
 - 2026-11-03 14:03 **S2-17** lead note: Recurring on the shared card whenever the other agent's jobs churn.
 - 2026-11-03 14:03 **S2-16** lead note: Blocks S2-08's torture run on the card; the other eight S2-08 programs already passed there.
 - 2026-11-03 13:58 **S2-15** lead note: Found while reading PhiWeather's MXCSR note at the owner's request. It runs after S2-09, because S2-09 rebuilds the shared GCC; `linux-k1om.h` is n...
-- 2026-11-03 13:35 **S2-08** lead approve: The S2-08 card batch is ready: hello, scalar FP with inexact rounding checks, printf, the compare table, the libgcc helpers and 256 torture program...
 
 ## Cost
 
