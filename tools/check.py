@@ -209,7 +209,7 @@ class Runner:
                 directives = []
                 options = ['-O2']
                 for line in source.read_text().splitlines():
-                    match = re.match(r'^\s*//\s*(options|scan-asm|scan-asm-not|error):\s*(.*)$', line)
+                    match = re.match(r'^\s*//\s*(options|scan-asm|scan-asm-not|scan-output|error):\s*(.*)$', line)
                     function = re.match(r'^\s*//\s*scan-asm-func\s+(\S+):\s*(.*)$', line)
                     if match:
                         kind, pattern = match.groups()
@@ -235,15 +235,20 @@ class Runner:
                     if compiled.returncode:
                         raise RuntimeError('compile exited %d: %s' %
                                            (compiled.returncode, compiled.stdout[-2500:]))
-                    self.command(self.tool('as'), '--march=k1om', asm, '-o', obj)
-                    self.command(sys.executable, ROOT / 'tools/knc_lint', asm, obj)
-                    assembly = asm.read_text()
+                    # --help=target reports defaults without producing assembly.
+                    output_only = bool(directives) and all(
+                        kind == 'scan-output' for kind, name, pattern in directives)
+                    assembly = '' if output_only else asm.read_text()
                     for kind, name, pattern in directives:
-                        body = function_body(assembly, name) if name else assembly
+                        body = (compiled.stdout if kind == 'scan-output' else
+                                function_body(assembly, name) if name else assembly)
                         found = body is not None and re.search(pattern, body, re.M) is not None
                         if (found if kind == 'scan-asm-not' else not found):
                             failures.append(kind + (' ' + name if name else '') + ': ' + pattern)
                             break
+                    if not output_only:
+                        self.command(self.tool('as'), '--march=k1om', asm, '-o', obj)
+                        self.command(sys.executable, ROOT / 'tools/knc_lint', asm, obj)
                 self.result(label, failures)
             except (OSError, RuntimeError, subprocess.TimeoutExpired, ValueError, re.error) as error:
                 self.failed = True
