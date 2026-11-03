@@ -35,6 +35,8 @@ Refined into tickets S1-01 to S1-07; see [SPRINT-01](sprints/SPRINT-01.md).
 
 ## E2 Scalar native (S2)
 
+Drafted as tickets S2-01 to S2-08; see [SPRINT-02](sprints/SPRINT-02.md).
+
 | ID | Story | Acceptance | Depth |
 |---|---|---|---|
 | E2-01 | KNC ABI: SF and DF arguments and returns in `zmm` lane 0, varargs with `%al`, and x87 bodies | ABI fixture cross-linked with donor objects in both directions, including overflow arguments, structs and callbacks; T3 | Deep |
