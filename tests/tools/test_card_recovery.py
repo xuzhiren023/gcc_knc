@@ -342,7 +342,7 @@ class RemoteReview(unittest.TestCase):
                     for tool in ("readlink", "cat", "ls", "awk", "id", "rm", "rmdir"))
                 # No wait or signal is needed with no live owned process.
                 wrappers += '\nsleep() { :; }\nkill() { echo unexpected-signal >&2; return 99; }'
-                script = self.remote.replace("/tmp/claude", str(parent)).replace(
+                script = self.remote.replace("/tmp", str(self.directory)).replace(
                     "/proc/", str(self.proc) + "/")
                 cwd = self.directory if operation == "reap_stale" else run_dir
                 try:
@@ -395,7 +395,7 @@ class RemoteReview(unittest.TestCase):
             with self.subTest(boot=boot):
                 def rpc(script, timeout, **kwargs):
                     script = (self.remote + "\n" + script).replace(
-                        "/tmp/claude", str(parent)).replace("/proc/", str(self.proc) + "/")
+                        "/tmp", str(self.directory)).replace("/proc/", str(self.proc) + "/")
                     answer = self.shell(script)
                     if answer.returncode:
                         raise OSError(answer.stderr.decode())

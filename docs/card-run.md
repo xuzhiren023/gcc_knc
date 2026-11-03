@@ -85,7 +85,16 @@ which foreign processes are reported, never whether work may run.
   `claude-program`, control shell name `claude-control`, and watchdog
   `claude-watchdog`. No ports are allocated. Short-lived system utilities
   retain their system utility names during control, transfer and cleanup. Each
-  destructive operation checks the exact directory shape, its owner, physical cwd and original boot ID. Ownership
+  destructive operation checks the exact directory shape, its owner, physical cwd and original boot ID. The runner
+  resolves `/tmp` with `cd /tmp && pwd -P` once per remote shell, since the
+  card may link it to `/var/volatile/tmp`. The physical cwd must equal that
+  exact resolved prefix plus `/claude/claude-<32 lowercase hex>`; a symlink
+  for the job directory or a redirected `claude` parent cannot pass. Upload,
+  watchdog, reconnect cleanup and stale recovery use the same guard. Each
+  failed directory or boot guard prints the failed check to stderr.
+  Process identity checks use the exact physical job path so a live process
+  under symlinked `/tmp` prevents stale recovery and remains identifiable for
+  guarded cleanup. Ownership
   uses the exact executable/cwd path, never a broad process name. A descendant
   that both execs outside our directory and changes cwd cannot be identified
   by this rule; the helper does not provide cgroup membership tracking.

@@ -1,19 +1,43 @@
 # Shared-card private-session helpers. Loaded on stdin, never installed globally.
 # All helpers and their children inherit the private cwd.
+resolve_tmp() {
+    [ -z "${tmp_physical:-}" ] || return 0
+    tmp_physical=$(cd /tmp && pwd -P) && [ -n "$tmp_physical" ] || {
+        echo 'guard_dir: cannot resolve physical /tmp' >&2; return 91;
+    }
+}
 guard_dir() {
     case "$run_dir" in
         /tmp/claude/claude-????????????????????????????????) ;;
-        *) return 91 ;;
+        *) echo "guard_dir: directory shape: $run_dir" >&2; return 91 ;;
     esac
     suffix=${run_dir##*/claude-}
-    case "$suffix" in *[!0-9a-f]*) return 91 ;; esac
-    [ ! -L "$run_dir" ] && [ -d "$run_dir" ] &&
-        [ "$(pwd -P)" = "$run_dir" ] &&
-        [ "$(LC_ALL=C ls -ldn "$run_dir" | { read -r mode links owner rest; printf '%s' "$owner"; })" = "$(id -u)" ]
+    case "$suffix" in
+        *[!0-9a-f]*) echo "guard_dir: job ID must be lowercase hex: $run_dir" >&2; return 91 ;;
+    esac
+    resolve_tmp || return 91
+    physical_run_dir=${tmp_physical%/}/claude/claude-$suffix
+    [ ! -L "$run_dir" ] || {
+        echo "guard_dir: directory is a symlink: $run_dir" >&2; return 91;
+    }
+    [ -d "$run_dir" ] || {
+        echo "guard_dir: directory missing: $run_dir" >&2; return 91;
+    }
+    [ "$(pwd -P)" = "$physical_run_dir" ] || {
+        echo "guard_dir: physical cwd must equal $physical_run_dir" >&2; return 91;
+    }
+    [ "$(LC_ALL=C ls -ldn "$run_dir" | { read -r mode links owner rest; printf '%s' "$owner"; })" = "$(id -u)" ] || {
+        echo "guard_dir: directory owner mismatch or unreadable: $run_dir" >&2; return 91;
+    }
 }
 check_boot() {
-    [ -n "$boot_id" ] &&
-        [ "$(cat /proc/sys/kernel/random/boot_id)" = "$boot_id" ]
+    [ -n "$boot_id" ] || { echo 'check_boot: boot ID missing' >&2; return 92; }
+    current_boot=$(cat /proc/sys/kernel/random/boot_id) && [ -n "$current_boot" ] || {
+        echo 'check_boot: boot ID unreadable' >&2; return 92;
+    }
+    [ "$current_boot" = "$boot_id" ] || {
+        echo 'check_boot: boot ID mismatch; no signalling or removal permitted' >&2; return 92;
+    }
 }
 guard_boot() { guard_dir && check_boot; }
 owned_pid() {
@@ -29,8 +53,8 @@ owned_pid() {
     [ -L "/proc/$1/exe" ] || [ -L "/proc/$1/cwd" ] || return 1
     pid_exe=$(readlink "/proc/$1/exe" 2>/dev/null)
     pid_cwd=$(readlink "/proc/$1/cwd" 2>/dev/null)
-    case "$pid_exe" in "$run_dir"|"$run_dir"/*) return 0 ;; esac
-    case "$pid_cwd" in "$run_dir"|"$run_dir"/*) return 0 ;; esac
+    case "$pid_exe" in "$physical_run_dir"|"$physical_run_dir"/*) return 0 ;; esac
+    case "$pid_cwd" in "$physical_run_dir"|"$physical_run_dir"/*) return 0 ;; esac
     return 1
 }
 snapshot() {
