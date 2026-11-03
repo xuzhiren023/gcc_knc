@@ -1,17 +1,17 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-03 13:21.
+Updated automatically at every ticket change. Last update: 2026-11-03 13:22.
 
 **Waiting for you:** S2-07. Run `python tools/pm.py inbox`.
 
-Current tickets: `[############--------]` 27 of 42
+Current tickets: `[#############-------]` 28 of 42
 
 ## Milestones
 
 | | Milestone | State | Progress |
 |---|---|---|---|
 | M0 | Foundation | In progress | 17 of 17 tickets |
-| M1 | Mixed native code | In progress | 10 of 25 tickets |
+| M1 | Mixed native code | In progress | 11 of 25 tickets |
 | M2 | Useful vector target | Not started | Not planned in detail yet |
 | M3 | Runtimes | Not started | Not planned in detail yet |
 | M4 | Broad optimization | Not started | Not planned in detail yet |
@@ -52,7 +52,7 @@ Current tickets: `[############--------]` 27 of 42
 | S2-11 | card_run follows the shared card rules and runs hello on the card | Done | tools/card_run now runs programs on the shared Xeon Phi under the owner's card rules (ledger lines, cores 3... |
 | S2-12 | card_run polls the card gently and reports what it reaped | Done | card_run now checks job status on its existing SSH session with backoff to 5 s and opens output connections... |
 | S2-13 | Card tests pass again, and approve runs them | Done | All card tests in tests/tools pass again under Cygwin Python, and pm.py approve now refuses to merge any br... |
-| S2-14 | card_run stages extra files, so one job can run a batch | Waiting for review | Clean head ea14df3: Cygwin python3.12 unittest discover tests/tools test_card_*.py via tools/run.py passed ... |
+| S2-14 | card_run stages extra files, so one job can run a batch | Done | card_run can now stage extra files next to the program with --file (size-capped by maxStageMiB, unsafe or d... |
 | S3-01 | Packed modes and IMCI patterns in GCC 16: entry points, audit and line estimate | draft |  |
 | S3-02 | One helper for optional tools/check selections | draft |  |
 | S3-03 | Native probe of unaligned pairs and masked aligned forms at page boundaries | draft |  |
@@ -67,6 +67,7 @@ Current tickets: `[############--------]` 27 of 42
 
 ## Recent activity
 
+- 2026-11-03 13:22 **S2-14** lead approve: card_run can now stage extra files next to the program with --file (size-capped by maxStageMiB, unsafe or duplicate names refused before admission)...
 - 2026-11-03 13:21 **S2-14** engineer submit: Clean head ea14df3: Cygwin python3.12 unittest discover tests/tools test_card_*.py via tools/run.py passed 58/58 in 27.775s. Fixture ACL isolation ...
 - 2026-11-03 13:21 **S2-07** lead escalate: budget: 11168424 input tokens used; the budget is 9000000
 - 2026-11-03 13:21 **S2-07** lead answer: No. This lead session cannot use the card either, so do not wait on it. Submit for review now with the native item left unchecked and marked 'pendi...
@@ -74,13 +75,12 @@ Current tickets: `[############--------]` 27 of 42
 - 2026-11-03 13:17 **S2-14** lead changes: 1. tests/tools/test_card_backend.py:130: approve's Cygwin rerun fails 57/58: the non-executable extra file 'input ' data' is staged as 700, expecte...
 - 2026-11-03 13:15 **S2-14** engineer submit: Cygwin python3.12 unittest discover tests/tools test_card_*.py via tools/run.py: 58/58 pass in 29.123s. Fixture only; refusal tests unmodified; run...
 - 2026-11-03 13:14 **S2-14** owner decide: Lead, under the owner's 2026-11-03 delegation: 7 sessions and 9M tokens (4 sessions and 3.6M used). Standing answer, so you need not ask again: any...
-- 2026-11-03 13:13 **S2-14** lead escalate: budget: 4 engineer sessions used; the budget is 4
 
 ## Cost
 
 - From the script, engineer: 111 sessions, 209.2M input tokens
 - From the script, lead: 109 sessions, 38.0M input tokens
-- Started by hand, Claude: 3 sessions, 319.2M input tokens
+- Started by hand, Claude: 3 sessions, 320.3M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
