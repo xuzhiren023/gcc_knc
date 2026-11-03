@@ -6,6 +6,8 @@ passes on what they choose. Each item says how it was shown. Newest first.
 
 ## 2026-11-03
 
+0. **FTZ and DAZ stick in KNC's MXCSR.** A GCC 16 `-Ofast` program, whose startup does `stmxcsr; set bits 15 and 6; ldmxcsr`, reads MXCSR back as `0x00208040` on the card (bit 21, FTZ, DAZ). Whether they change arithmetic is not shown.
+
 1. **Setting FTZ and DAZ in MXCSR does not fault on KNC.** The donor's `crtfastmath.o` is
    `stmxcsr; orl $0x8040, mem; ldmxcsr`. A donor `-Ofast` hello linked with it ran on the card and
    exited 0 (job by the lead, boot `e9bfb0ab`). So only the reserved bits (7-12, 20, and bit 21
