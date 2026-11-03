@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-02 21:49.
+Updated automatically at every ticket change. Last update: 2026-11-02 22:02.
 
-**Next: GPT-6.1, on S1-05 (Integer C assembles with as 2.22 and lints clean).** Run `python tools/dispatch.py`, or ask the tech lead to.
+**Next: the tech lead, on S1-05.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[################----]` 14 of 17
 
@@ -36,12 +36,13 @@ Current tickets: `[################----]` 14 of 17
 | S1-02 | GCC 16.2 builds for k1om-mpss-linux | Done | GCC 16.2 now configures and builds its C compiler for k1om-mpss-linux, using the shared KNC assembler, link... |
 | S1-03 | tools/check runs source-level tests against GCC 16 | Done | tools/check t1 --compiler gcc16 now compiles each tests/t1/*.c test and checks its scan, scan-not, per-func... |
 | S1-04 | -march=knc with no SSE, AVX, MMX, CMOV, FCOMI or MFENCE | Done | GCC 16 now accepts -march=knc (the k1om default): it predefines __KNC__ and no SSE/MMX/AVX macros, rejects ... |
-| S1-05 | Integer C assembles with as 2.22 and lints clean | In progress | 1. tools/torture_compile.py:123 ignores the corpus's own dg-options/dg-additional-options, so 386-387 files... |
+| S1-05 | Integer C assembles with as 2.22 and lints clean | Question for the tech lead | 3adf108: options red/green; 6009 cases/618.242s; as=3/4/4, ICE/hang/lint/infra=0. Target diagnostics listed... |
 | S1-06 | K1OM link defaults | Not started | Rebuild GCC with the logged gcc16 step of tools/toolchain.py as ONE blocking foreground shell call with a t... |
 | S1-07 | Milestone M0 evidence note | Not started | Rebuild GCC with the logged gcc16 step of tools/toolchain.py as ONE blocking foreground shell call with a t... |
 
 ## Recent activity
 
+- 2026-11-02 22:02 **S1-05** engineer ask: 3adf108: options red/green; 6009 cases/618.242s; as=3/4/4, ICE/hang/lint/infra=0. Target diagnostics listed in tests/baseline/gcc16-torture-compile...
 - 2026-11-02 21:48 **S1-05** lead changes: 1. tools/torture_compile.py:123 ignores the corpus's own dg-options/dg-additional-options, so 386-387 files per level (19% of the corpus) stop at f...
 - 2026-11-02 21:47 **S1-05** engineer submit: Acceptance met in commits 393c13d / GCC a6f28997967: DWARF 4 red/green; GCC rebuild 2056.884s; full torture sweep 6009 measurements in 584.499s, ze...
 - 2026-11-02 21:46 **S1-05** lead answer: Size is soft and the acceptance itself requires the full file lists, so keep the summary as is and submit with --override 'tests/baseline/gcc16-tor...
@@ -49,7 +50,6 @@ Current tickets: `[################----]` 14 of 17
 - 2026-11-02 21:15 **S1-05** lead note: Owner chose DWARF 4 as the k1om -g default. Set it in linux-k1om.h (DWARF_VERSION_DEFAULT 4), red first with a tests/t1 case that reads the .debug_...
 - 2026-11-02 21:05 **S1-05** lead note: Measured: the donor's -g default is DWARF 4; GCC 16's is DWARF 5, already without .file 0 (configure saw as 2.22), and it assembles, so the choice ...
 - 2026-11-02 20:59 **S1-05** owner decide: Owner on 2026-11-02: DWARF 4 is the default for k1om, matching the donor; continue S1-05 per the lead note at 21:15.
-- 2026-11-02 20:55 **S1-05** lead escalate: Owner: which debugger/version runs on the card (MPSS gdb 7.x, or none)? It sets the k1om default DWARF: GCC 16 uses DWARF 5 (.file 0, rejected by a...
 
 ## Cost
 
