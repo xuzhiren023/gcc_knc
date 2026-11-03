@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-03 13:14.
+Updated automatically at every ticket change. Last update: 2026-11-03 13:15.
 
-**Next: GPT-6.1, on S2-07 (GCC 16 builds its own static libgcc for k1om).** Run `python tools/dispatch.py`, or ask the tech lead to.
+**Next: the tech lead, on S2-14.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[############--------]` 27 of 42
 
@@ -52,7 +52,7 @@ Current tickets: `[############--------]` 27 of 42
 | S2-11 | card_run follows the shared card rules and runs hello on the card | Done | tools/card_run now runs programs on the shared Xeon Phi under the owner's card rules (ledger lines, cores 3... |
 | S2-12 | card_run polls the card gently and reports what it reaped | Done | card_run now checks job status on its existing SSH session with backoff to 5 s and opens output connections... |
 | S2-13 | Card tests pass again, and approve runs them | Done | All card tests in tests/tools pass again under Cygwin Python, and pm.py approve now refuses to merge any br... |
-| S2-14 | card_run stages extra files, so one job can run a batch | In progress | Lead, under the owner's 2026-11-03 delegation: 7 sessions and 9M tokens (4 sessions and 3.6M used). Standin... |
+| S2-14 | card_run stages extra files, so one job can run a batch | Waiting for review | Cygwin python3.12 unittest discover tests/tools test_card_*.py via tools/run.py: 58/58 pass in 29.123s. Fix... |
 | S3-01 | Packed modes and IMCI patterns in GCC 16: entry points, audit and line estimate | draft |  |
 | S3-02 | One helper for optional tools/check selections | draft |  |
 | S3-03 | Native probe of unaligned pairs and masked aligned forms at page boundaries | draft |  |
@@ -67,6 +67,7 @@ Current tickets: `[############--------]` 27 of 42
 
 ## Recent activity
 
+- 2026-11-03 13:15 **S2-14** engineer submit: Cygwin python3.12 unittest discover tests/tools test_card_*.py via tools/run.py: 58/58 pass in 29.123s. Fixture only; refusal tests unmodified; run...
 - 2026-11-03 13:14 **S2-14** owner decide: Lead, under the owner's 2026-11-03 delegation: 7 sessions and 9M tokens (4 sessions and 3.6M used). Standing answer, so you need not ask again: any...
 - 2026-11-03 13:13 **S2-14** lead escalate: budget: 4 engineer sessions used; the budget is 4
 - 2026-11-03 13:13 **S2-14** lead answer: Yes, fixture only: the fake RPC may cd into the translated job dir (fixture tmp/claude/claude-<job>) before guard_boot calls, with snapshot and sta...
@@ -74,16 +75,15 @@ Current tickets: `[############--------]` 27 of 42
 - 2026-11-03 13:11 **S2-14** lead answer: Yes, fixture only: in this test call self.session.snapshot(timeout=30), with a one-line comment that Cygwin forks make the fake card-sized /proc wa...
 - 2026-11-03 13:10 **S2-14** engineer ask: Applied 13:05 fixture-only translation: both fake shells use cwd=directory; only stage mkdir -p is relative, guards and /proc remain absolute. Cygw...
 - 2026-11-03 13:07 **S2-14** owner decide: Lead, under the owner's 2026-11-03 delegation: input budget raised to 6M as well (the 13:06 decision raised only sessions). Continue per the 13:05 ...
-- 2026-11-03 13:07 **S2-14** engineer escalate: budget: 2612700 input tokens used; the budget is 2000000
 
 ## Cost
 
 - From the script, engineer: 108 sessions, 196.6M input tokens
 - From the script, lead: 107 sessions, 37.6M input tokens
-- Started by hand, Claude: 3 sessions, 318.6M input tokens
+- Started by hand, Claude: 3 sessions, 319.2M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 7.2 GiB of 100 GiB. 330 GiB free on the drive.
+The project uses 7.8 GiB of 100 GiB. 329 GiB free on the drive.
