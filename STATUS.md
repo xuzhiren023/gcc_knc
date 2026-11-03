@@ -1,17 +1,17 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-02 23:54.
+Updated automatically at every ticket change. Last update: 2026-11-02 23:55.
 
-**Next: the tech lead, on S1-07.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+Nothing can move right now.
 
-Current tickets: `[##################--]` 16 of 17
+Current tickets: `[#############-------]` 17 of 25
 
 ## Milestones
 
 | | Milestone | State | Progress |
 |---|---|---|---|
-| M0 | Foundation | In progress | 16 of 17 tickets |
-| M1 | Mixed native code | Not started | Not planned in detail yet |
+| M0 | Foundation | In progress | 17 of 17 tickets |
+| M1 | Mixed native code | In progress | 0 of 8 tickets |
 | M2 | Useful vector target | Not started | Not planned in detail yet |
 | M3 | Runtimes | Not started | Not planned in detail yet |
 | M4 | Broad optimization | Not started | Not planned in detail yet |
@@ -38,10 +38,19 @@ Current tickets: `[##################--]` 16 of 17
 | S1-04 | -march=knc with no SSE, AVX, MMX, CMOV, FCOMI or MFENCE | Done | GCC 16 now accepts -march=knc (the k1om default): it predefines __KNC__ and no SSE/MMX/AVX macros, rejects ... |
 | S1-05 | Integer C assembles with as 2.22 and lints clean | Done | All 2003 GCC torture compile files now build for KNC at -O0, -O2 and -O2 -g and assemble with the card's ol... |
 | S1-06 | K1OM link defaults | Done | GCC 16 now targets the K1OM ABI by default: it passes --march=k1om to as and -m elf_k1om to ld, uses the /l... |
-| S1-07 | Milestone M0 evidence note | Waiting for review | Committed 68979fa: renamed docs/research/m0-evidence.md to docs/research/m0-result.md without content chang... |
+| S1-07 | Milestone M0 evidence note | Done | M0 is settled as adjust: GCC 16.2 builds a k1om cc1 whose assembly the 2.22 assembler accepts, an options-f... |
+| S2-01 | Design for zmm and mask registers under -march=knc | draft |  |
+| S2-02 | Float and double arguments and results in zmm lane 0 | draft |  |
+| S2-03 | Varargs with the donor's register save area | draft |  |
+| S2-04 | Scalar transfers through memory and mask scratch | draft |  |
+| S2-05 | x87 compares and zmm spill alignment | draft |  |
+| S2-06 | Atomics without cmpxchg16b, spin hint by delay | draft |  |
+| S2-07 | GCC 16 builds its own static libgcc for k1om | draft |  |
+| S2-08 | hello, scalar FP and printf on the card | draft |  |
 
 ## Recent activity
 
+- 2026-11-02 23:55 **S1-07** lead approve: M0 is settled as adjust: GCC 16.2 builds a k1om cc1 whose assembly the 2.22 assembler accepts, an options-file rebuild plus T1 takes about 82 s, bu...
 - 2026-11-02 23:54 **S1-07** engineer submit: Committed 68979fa: renamed docs/research/m0-evidence.md to docs/research/m0-result.md without content changes, per lead. Existing six runs: builds ...
 - 2026-11-02 23:54 **S1-07** lead answer: The refusal is the lead's mistake: harness/policy.json treats any new file whose name contains 'evidence' as a receipt, and the ticket chose that n...
 - 2026-11-02 23:53 **S1-07** engineer ask: Committed f87e35b adds only the owner decision under the recommendation, as instructed. Reproducer: python tools/pm.py submit S1-07 --note <complet...
@@ -49,13 +58,12 @@ Current tickets: `[##################--]` 16 of 17
 - 2026-11-02 23:41 **S1-07** engineer escalate: 5770eed commits docs/research/m0-evidence.md with all six runs, Sprint 1 blockers and 45 shared-i386 changed lines. Builds pass; T1 exits 1 only on...
 - 2026-11-02 22:59 **S1-06** lead approve: GCC 16 now targets the K1OM ABI by default: it passes --march=k1om to as and -m elf_k1om to ld, uses the /lib64/ld-linux-k1om.so.2 loader and 16-by...
 - 2026-11-02 22:57 **S1-06** engineer submit: Red first and build-command harness red/green recorded. T1 PASS (prior session); T2 PASS now: ELF181, K1OM loader, glibc <=2.21, as/ld flags, only ...
-- 2026-11-02 22:56 **S1-06** lead answer: Do not change the fork's link specs: -lgcc_s_asneeded and -latomic_asneeded are mainstream GCC 16 behavior (gcc.cc:1004 and init_gcc_specs), and th...
 
 ## Cost
 
 - From the script, engineer: 62 sessions, 86.7M input tokens
 - From the script, lead: 60 sessions, 21.5M input tokens
-- Started by hand, Claude: 3 sessions, 200.5M input tokens
+- Started by hand, Claude: 3 sessions, 201.3M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
