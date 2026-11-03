@@ -85,20 +85,17 @@ snapshot() {
         # Match identities, never names that a foreign process could also use.
         [ "$proc_ppid" != "$$" ] || continue
         [ "$proc_pid" != 2 ] && [ "$proc_ppid" != 2 ] || continue
-        [ -n "$proc_ppid" ] || continue
-        proc_name=
-        IFS= read -r proc_name < "$proc/comm" 2>/dev/null
-        [ -d "$proc" ] || continue
-        printf 'IDENT\t%s\t%s\t%s\n' "$proc_pid" "$proc_ppid" "$proc_name"
+        printf 'IDENT\t%s\t%s\n' "$proc_pid" "$proc_ppid"
         set -- "$@" "$proc/exe" "$proc/cwd"
     done
     # One ls for all surviving user processes, no readlink/subshell per PID.
-    # A disappearing process may lose either link; keep its identity with blanks.
-    if [ "$#" -gt 0 ]; then LC_ALL=C ls -ldn -- "$@" 2>/dev/null || :; fi
+    # POSIX -q replaces control bytes (including tabs/newlines) with question
+    # marks before awk sees them. The owned directory prefix is always ASCII.
+    if [ "$#" -gt 0 ]; then LC_ALL=C ls -ldnq -- "$@" 2>/dev/null || :; fi
     } | awk '
         BEGIN { FS = "\t" }
         /^CPU\t|^MEM\t/ { print; next }
-        /^IDENT\t/ { ppid[$2] = $3; name[$2] = $4; next }
+        /^IDENT\t/ { ppid[$2] = $3; next }
         /^l/ && match($0, /\/[0-9]+\/(exe|cwd) -> /) {
             split(substr($0, RSTART, RLENGTH), link, "/")
             target = substr($0, RSTART + RLENGTH)
@@ -106,8 +103,22 @@ snapshot() {
             else cwd[link[2]] = target
         }
         END {
-            for (pid in ppid)
-                printf "PROC\t%s\t%s\t%s\t%s\t%s\n", pid, ppid[pid], name[pid], exe[pid], cwd[pid]
+            for (pid in ppid) {
+                # Read comm directly in this one awk, preserving embedded line
+                # breaks as ?. Never put raw comm bytes into the record stream.
+                file = "/proc/" pid "/comm"
+                name = ""; lines = 0
+                while ((getline part < file) > 0) {
+                    gsub(/[\t\r]/, "?", part)
+                    name = name (lines++ ? "?" : "") part
+                }
+                close(file)
+                file = "/proc/" pid "/status"
+                readable = ((getline part < file) > 0)
+                close(file)
+                tag = readable && lines ? "PROC" : "SKIP"
+                printf "%s\t%s\t%s\t%s\t%s\t%s\n", tag, pid, ppid[pid], name, exe[pid], cwd[pid]
+            }
         }'
 }
 reap_one() {
