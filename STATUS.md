@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-03 11:13.
+Updated automatically at every ticket change. Last update: 2026-11-03 11:15.
 
-**Next: GPT-6.1, on S2-11 (card_run follows the shared card rules and runs hello on the card).** Run `python tools/dispatch.py`, or ask the tech lead to.
+**Next: the tech lead, on S2-11.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[################----]` 23 of 28
 
@@ -49,24 +49,24 @@ Current tickets: `[################----]` 23 of 28
 | S2-08 | hello, scalar FP and printf on the card | draft | Owner approved Sprint 2 on 2026-11-03; this ticket stays draft until the card hold ends. |
 | S2-09 | GCC 16 builds gfortran, and the secondary-reload reproducer passes | Not started | Reconfiguring means one full rebuild: use `make -j8` with `CFLAGS=-O2 -g1 CXXFLAGS=-O2 -g1` as `tools/toolc... |
 | S2-10 | First card runs for the queued native checks | Not started | Owner's decision of 2026-11-03: the interactive lead runs every card job; engineer sessions have no card ac... |
-| S2-11 | card_run follows the shared card rules and runs hello on the card | In progress | Review of 17b75b4. The ledger schema, core mapping, memory admission, staging without base64 and the config... |
+| S2-11 | card_run follows the shared card rules and runs hello on the card | Tests waiting for review | RED db52e6b for the 11:13 review. tools/run.py --name S2-11-review-red wrapped Cygwin unittest: 5 focused T... |
 
 ## Recent activity
 
 - 2026-11-03 11:20 **S2-10** lead note: Owner's decision of 2026-11-03: the interactive lead runs every card job; engineer sessions have no card access. So this ticket's engineer prepares...
+- 2026-11-03 11:15 **S2-11** engineer red: RED db52e6b for the 11:13 review. tools/run.py --name S2-11-review-red wrapped Cygwin unittest: 5 focused T0 tests, 7 expected assertion failures, ...
 - 2026-11-03 11:13 **S2-11** lead changes: Review of 17b75b4. The ledger schema, core mapping, memory admission, staging without base64 and the config path are sound, and the size override i...
 - 2026-11-03 11:11 **S2-11** engineer submit: GREEN 17b75b4, RED 0ec400e. All 34 fake cases passed across .work/_state/logs/S2_11_owner_green-20261103-110731.log and .work/_state/logs/S2_11_own...
 - 2026-11-03 11:11 **S2-11** lead answer: Do not split: the 1304 lines are mostly tests and docs, and the owner added items (1) to (3) mid-ticket, so the size is expected. Submit as is with...
 - 2026-11-03 11:10 **S2-11** engineer ask: GREEN 17b75b4, RED 0ec400e: owner items 1-3 implemented. All 34 fake cases passed across .work/_state/logs/S2_11_owner_green-20261103-110731.log an...
 - 2026-11-03 11:03 **S2-11** lead answer: Answered by the owner's decision above: no card access for this session. Implement items (1) to (3) of that entry red first on the fake transport, ...
 - 2026-11-03 11:02 **S2-11** owner decide: Owner's decision (2026-11-03): the interactive lead (Claude) runs every card job through tools/card_run; engineer sessions never get the card key o...
-- 2026-11-03 10:58 **S2-11** lead escalate: The engineer sandbox cannot reach the card: reading ~/.ssh/xeon_phi_rsa and connecting to 192.168.1.100:22 are both denied (S2_11_hello_probe log; ...
 
 ## Cost
 
 - From the script, engineer: 91 sessions, 177.8M input tokens
 - From the script, lead: 90 sessions, 32.9M input tokens
-- Started by hand, Claude: 3 sessions, 249.8M input tokens
+- Started by hand, Claude: 3 sessions, 250.3M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
