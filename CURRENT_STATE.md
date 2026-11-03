@@ -79,7 +79,7 @@ Last updated: 2026-11-02, at the start of Sprint 1.
 - `ldmxcsr` and `stmxcsr` pass the lint, because Intel manual 327364 is not on this machine. Decide once someone has Appendix B.
 - `f3 2e 90`, a `pause` with a stray prefix in the middle, passes the lint. Hand-written code only.
 - Script reviews cannot run tests, by design. `pm.py approve` now runs the branch's `tools/check t0` itself, once that tool exists on the branch.
-- Script sessions have read 142.1M input tokens for GPT and 27.7M for Claude after 149 sessions. S2-03 needed a fifth session (owner-approved) for a one-line `tools/check.py` guard that T0 caught. S2-02 took 6 engineer sessions and 38.7M of the 40M the owner allowed; one session read 17.8M alone (85 commands, two GCC rebuilds). One S1-02 session that polled a build read 15.5M on its own. Build sessions are the expensive ones: S0-06's read 6.1M and S0-08's 4.8M. From 2026-11-02 engineer sessions run in fast mode, which the catalog describes as "increased usage". Review the balance at the Sprint 0 retro.
+- Script sessions have read 142.9M input tokens for GPT and 28.7M for Claude after 151 sessions. S2-03 needed a fifth session (owner-approved) for a one-line `tools/check.py` guard that T0 caught. S2-02 took 6 engineer sessions and 38.7M of the 40M the owner allowed; one session read 17.8M alone (85 commands, two GCC rebuilds). One S1-02 session that polled a build read 15.5M on its own. Build sessions are the expensive ones: S0-06's read 6.1M and S0-08's 4.8M. From 2026-11-02 engineer sessions run in fast mode, which the catalog describes as "increased usage". Review the balance at the Sprint 0 retro.
 - Submit checks do not see `compiler/gcc`, which is a separate repository. Extend them in Sprint 1.
 
 ## Repositories
