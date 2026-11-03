@@ -2,7 +2,7 @@
 
 Updated automatically at every ticket change. Last update: 2026-11-03 11:16.
 
-**Next: GPT-6.1, on S2-11 (card_run follows the shared card rules and runs hello on the card).** Run `python tools/dispatch.py`, or ask the tech lead to.
+**Waiting for you:** S2-11. Run `python tools/pm.py inbox`.
 
 Current tickets: `[################----]` 23 of 28
 
@@ -49,18 +49,18 @@ Current tickets: `[################----]` 23 of 28
 | S2-08 | hello, scalar FP and printf on the card | draft | Owner approved Sprint 2 on 2026-11-03; this ticket stays draft until the card hold ends. |
 | S2-09 | GCC 16 builds gfortran, and the secondary-reload reproducer passes | Not started | Reconfiguring means one full rebuild: use `make -j8` with `CFLAGS=-O2 -g1 CXXFLAGS=-O2 -g1` as `tools/toolc... |
 | S2-10 | First card runs for the queued native checks | Not started | Owner's decision of 2026-11-03: the interactive lead runs every card job; engineer sessions have no card ac... |
-| S2-11 | card_run follows the shared card rules and runs hello on the card | Changes requested | Red db52e6b is right for findings (1) marker, (2) control-shell snapshot and (3) empty /tmp/claude, but tes... |
+| S2-11 | card_run follows the shared card rules and runs hello on the card | **Waiting for you** | budget: 5 engineer sessions used; the budget is 5 |
 
 ## Recent activity
 
 - 2026-11-03 11:20 **S2-10** lead note: Owner's decision of 2026-11-03: the interactive lead runs every card job; engineer sessions have no card access. So this ticket's engineer prepares...
+- 2026-11-03 11:16 **S2-11** lead escalate: budget: 5 engineer sessions used; the budget is 5
 - 2026-11-03 11:16 **S2-11** lead changes: Red db52e6b is right for findings (1) marker, (2) control-shell snapshot and (3) empty /tmp/claude, but test_snapshot_does_not_claim_untested_pinni...
 - 2026-11-03 11:15 **S2-11** engineer red: RED db52e6b for the 11:13 review. tools/run.py --name S2-11-review-red wrapped Cygwin unittest: 5 focused T0 tests, 7 expected assertion failures, ...
 - 2026-11-03 11:13 **S2-11** lead changes: Review of 17b75b4. The ledger schema, core mapping, memory admission, staging without base64 and the config path are sound, and the size override i...
 - 2026-11-03 11:11 **S2-11** engineer submit: GREEN 17b75b4, RED 0ec400e. All 34 fake cases passed across .work/_state/logs/S2_11_owner_green-20261103-110731.log and .work/_state/logs/S2_11_own...
 - 2026-11-03 11:11 **S2-11** lead answer: Do not split: the 1304 lines are mostly tests and docs, and the owner added items (1) to (3) mid-ticket, so the size is expected. Submit as is with...
 - 2026-11-03 11:10 **S2-11** engineer ask: GREEN 17b75b4, RED 0ec400e: owner items 1-3 implemented. All 34 fake cases passed across .work/_state/logs/S2_11_owner_green-20261103-110731.log an...
-- 2026-11-03 11:03 **S2-11** lead answer: Answered by the owner's decision above: no card access for this session. Implement items (1) to (3) of that entry red first on the fake transport, ...
 
 ## Cost
 
@@ -72,4 +72,4 @@ Current tickets: `[################----]` 23 of 28
 
 ## Disk
 
-The project uses 7.8 GiB of 100 GiB. 333 GiB free on the drive.
+The project uses 7.8 GiB of 100 GiB. 332 GiB free on the drive.
