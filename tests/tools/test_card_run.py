@@ -1,4 +1,4 @@
-"""S0-04 RED contract: seven T0 cases; no SSH, configuration, or card needed."""
+"""S2-11 retained runner safety contract; no SSH, configuration, or card needed."""
 import json
 from pathlib import Path
 import re
@@ -11,7 +11,7 @@ from unittest import mock
 ROOT = Path(__file__).resolve().parents[2]
 BOOT = "00000000-0000-0000-0000-000000000001"
 REBOOT = "00000000-0000-0000-0000-000000000002"
-RUN_DIR = re.compile(r"/var/volatile/tmp/gcc-knc-[0-9a-f]{32}\Z")
+RUN_DIR = re.compile(r"/tmp/claude/claude-[0-9a-f]{32}\Z")
 DAEMON = {"pid": 1, "ppid": 0, "name": "sshd", "exe": "/usr/sbin/sshd", "cwd": "/"}
 FOREIGN = {"pid": 42, "name": "other-job", "exe": "/opt/other/job", "cwd": "/opt/other"}
 UNKNOWN = {"pid": 43, "name": None, "exe": None, "cwd": None}
@@ -47,10 +47,10 @@ class FakeTransport:
         self.run_dir = run_dir
         return self
 
-    def snapshot(self, *, timeout):
+    def snapshot(self, *, timeout, include_cpuinfo=True):
         self.events.append(("snapshot", timeout))
         if self.link_broken:
-            raise OSError("fake SSH link broken")
+            raise ConnectionError("fake SSH link broken")
         processes = [DAEMON] + self.processes
         if self.staged:
             processes += self.late_processes
@@ -64,7 +64,8 @@ class FakeTransport:
                                "cwd": "/opt/other"}]
             # A runner helper is owned by cwd, even though its exe is /bin/sh.
             processes += [{"pid": 80, "name": "sh", "exe": "/bin/sh", "cwd": self.run_dir}]
-        return {"boot_id": self.boot, "processes": processes}
+        return {"boot_id": self.boot, "processes": processes, "pinning": True,
+                "cpuinfo": "processor : 91\ncore id : 30\n", "meminfo": "MemFree: 4000000 kB\n"}
 
     def stage(self, run_dir, program, *, timeout):
         self._owned(run_dir, BOOT)
@@ -75,7 +76,11 @@ class FakeTransport:
         if self.stage_failure:
             raise OSError("fake partial staging failure")
 
-    def execute(self, run_dir, argv, *, timeout, card_timeout=None):
+    def reap_stale(self, boot_id, *, timeout):
+        self._owned(self.run_dir, boot_id)
+        self.events.append(("reap_stale", boot_id))
+
+    def execute(self, run_dir, argv, *, timeout, card_timeout=None, cpus=None, memory_mb=None):
         self._owned(run_dir, BOOT)
         self.events.append(("execute", run_dir, list(argv), timeout, card_timeout))
         self.now += timeout if self.timed_out else 12.0
@@ -123,6 +128,8 @@ class CardRun(unittest.TestCase):
         self.lock = self.directory / "card.lock"
         self.external = self.directory / "foreign.lock"
         self.receipt = self.directory / "result.json"
+        self.ledger = self.directory / "jobs.jsonl"
+        self.ledger.write_text("", encoding="utf8")
         self.transport = FakeTransport()
 
     def run_card(self):
@@ -130,7 +137,7 @@ class CardRun(unittest.TestCase):
             self.program, ["argument with spaces"], lock_path=self.lock,
             external_locks=[self.external], baseline_names={"sshd"},
             timeout=30.0, transport_timeout=1.0, receipt_path=self.receipt,
-            transport=self.transport, monotonic=self.transport.monotonic)
+            transport=self.transport, ledger_path=self.ledger, monotonic=self.transport.monotonic)
         self.assertEqual(json.loads(self.receipt.read_text(encoding="utf8")), result)
         codes = [self.runner[name] for name in ("REFUSED_EXIT", "TIMEOUT_EXIT", "INFRA_EXIT")]
         self.assertEqual(len(set(codes)), 3)
@@ -149,10 +156,10 @@ class CardRun(unittest.TestCase):
         self.assertEqual(result["boot_id_after"], after)
         self.assertAlmostEqual(result["card_minutes"], seconds / 60.0)
 
-    def assert_released(self):
+    def assert_released(self, connections=1):
         self.assertFalse(self.lock.exists(), "release our acquired local lock")
-        self.assertEqual(self.names().count("connect"), 1, "no connection retries")
-        self.assertEqual(self.names().count("close"), 1)
+        self.assertEqual(self.names().count("connect"), connections)
+        self.assertEqual(self.names().count("close"), connections)
 
     def assert_cleaned(self):
         cleanups = [event for event in self.transport.events if event[0] == "cleanup"]
@@ -160,7 +167,7 @@ class CardRun(unittest.TestCase):
         self.assert_released()
 
     def test_lock_present_refuses_without_touching_owner(self):
-        for lock in (self.lock, self.external):
+        for lock in (self.lock,):
             with self.subTest(lock=lock.name):
                 lock.write_text("foreign-or-stale-owner", encoding="utf8")
                 try:
@@ -184,7 +191,7 @@ class CardRun(unittest.TestCase):
             with self.subTest(root=root):
                 self.assertEqual(self.runner["default_lock"](root), expected)
 
-    def test_foreign_or_unknown_process_refuses_before_staging_or_exec(self):
+    def test_foreign_or_unknown_process_is_reported_and_untouched(self):
         cases = ((False, FOREIGN, None), (False, UNKNOWN, None), (True, FOREIGN, None),
                  (False, {"pid": 46, "ppid": 1, "name": "kworker/0:1",
                           "exe": None, "cwd": None}, None),
@@ -200,9 +207,9 @@ class CardRun(unittest.TestCase):
                     else:
                         self.transport.processes = [process]
                 result = self.run_card()
-                self.assert_result(result, "refused", self.runner["REFUSED_EXIT"])
-                self.assertIn(str(process["pid"]), result["detail"])
-                self.assertNotIn("execute", self.names())
+                self.assert_result(result, "program", 0, seconds=12.0, program_status=0)
+                self.assertIn(process["pid"], [p["pid"] for p in result["foreign_processes"]])
+                self.assertIn("execute", self.names())
                 self.assertNotIn("signal_owned", self.names())
                 if late:
                     self.assert_cleaned()
@@ -211,7 +218,7 @@ class CardRun(unittest.TestCase):
                     self.assertIn("snapshot", names[:stage])
                     self.assertIn("snapshot", names[stage + 1:names.index("cleanup")])
                 else:
-                    self.assertNotIn("stage", self.names())
+                    self.assertIn("stage", self.names())
                     self.assert_cleaned()
 
     def test_kernel_threads_are_allowed_by_parent_not_name(self):
@@ -245,16 +252,18 @@ class CardRun(unittest.TestCase):
         session.run_dir = self.transport.run_dir
         session.boot_id = BOOT
         session.transport_timeout = 1.0
-        session.rpc = mock.Mock(side_effect=[b"", b"", b"", b"running"])
+        session.rpc = mock.Mock(side_effect=[b"", b"running"])
+        session.read_output = mock.Mock(return_value=b"")
         with mock.patch.object(self.runner["time"], "monotonic",
                                side_effect=[0.0, 29.9, 30.0, 30.0]), \
                 mock.patch.object(self.runner["time"], "sleep"):
             with self.assertRaises(TimeoutError):
-                session.execute(session.run_dir, [], timeout=30.0, card_timeout=35)
+                session.execute(session.run_dir, [], timeout=30.0, card_timeout=35, cpus=[91], memory_mb=128)
         self.assertTrue(all(call.args[1] == 1.0 for call in session.rpc.call_args_list))
+        self.assertEqual([call.args[2] for call in session.read_output.call_args_list], [1.0, 1.0])
         self.assertIn("start_job 35 ", session.rpc.call_args_list[0].args[0])
 
-    def test_unreachable_is_infrastructure_without_retry(self):
+    def test_unreachable_is_infrastructure_with_one_cleanup_reconnect(self):
         for phase in (True, "execute"):
             with self.subTest(phase=phase):
                 self.transport = FakeTransport()
@@ -263,7 +272,7 @@ class CardRun(unittest.TestCase):
                 self.assertEqual(result["result_class"], "infrastructure")
                 self.assertEqual(result["exit_code"], self.runner["INFRA_EXIT"])
                 self.assertFalse(self.lock.exists())
-                self.assertEqual(self.names().count("connect"), 1)
+                self.assertEqual(self.names().count("connect"), 1 if phase is True else 2)
                 self.assertNotIn("signal_owned", self.names())
                 self.assertNotIn("cleanup", self.names())
                 if phase is True:
@@ -277,7 +286,7 @@ class CardRun(unittest.TestCase):
                     execute = next(e for e in self.transport.events if e[0] == "execute")
                     self.assertEqual(execute[4], 35.0, "watchdog armed before a link can break")
                     self.assertIn("link broken", result["detail"])
-                    self.assert_released()
+                    self.assert_released(connections=2)
 
     def test_reboot_during_run_is_infrastructure_and_forbids_cleanup(self):
         self.transport.reboot = True
