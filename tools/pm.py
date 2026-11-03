@@ -7,12 +7,14 @@ Owner:     decide ID TEXT
 Anyone:    board | status | show ID | inbox | usage | escalate ID TEXT
 """
 import argparse
+import contextlib
 import datetime
 import json
 import os
 import re
 import subprocess
 import sys
+import time
 
 import status
 import storage
@@ -23,6 +25,48 @@ ROLES = {"engineer", "lead", "owner"}
 
 class Refused(Exception):
     pass
+
+
+_lock_depth = 0
+
+
+@contextlib.contextmanager
+def board_lock(root):
+    """One board change at a time, so two dispatcher lanes never race in git. Re-entrant per process."""
+    global _lock_depth
+    if _lock_depth:
+        _lock_depth += 1
+        try:
+            yield
+        finally:
+            _lock_depth -= 1
+        return
+    path = os.path.join(storage.state_dir(root), "board.lock")
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+    # An approve runs tools/check t0 under the lock, so the other lane may wait minutes.
+    deadline = time.monotonic() + float(os.environ.get("PM_LOCK_WAIT", "900"))
+    while True:
+        try:
+            fd = os.open(path, os.O_CREAT | os.O_EXCL | os.O_WRONLY)
+            break
+        except FileExistsError:
+            if time.monotonic() >= deadline:
+                raise Refused("the board is busy: %s is held by another pm or dispatcher process. "
+                              "If none is running, it was left by a crash; remove it." % path)
+            time.sleep(0.2)
+    os.write(fd, str(os.getpid()).encode("ascii"))
+    os.close(fd)
+    _lock_depth = 1
+    try:
+        yield
+    finally:
+        _lock_depth = 0
+        os.remove(path)
+
+
+def lane_of(ticket):
+    """gcc tickets share one GCC checkout and build; a ticket that only uses the build says lane: gcc."""
+    return ticket.fields.get("lane") or ("gcc" if ticket.fields.get("gcc") == "yes" else "tools")
 
 
 def run_git(*args, cwd=None, check=True):
@@ -98,6 +142,10 @@ class Ticket:
         return [d.strip() for d in self.fields.get("deps", "").split(",") if d.strip()]
 
     def save(self, verb, entry=None):
+        with board_lock(self.board.root):
+            self._save(verb, entry)
+
+    def _save(self, verb, entry):
         if entry:
             today = datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
             role = os.environ.get("PM_ROLE", "engineer")
@@ -144,10 +192,13 @@ def limit_text(board, text):
     return " ".join(text.split())
 
 
-def next_action(board):
-    """Who should act next, and on what: (role, ticket) or None. Finish before starting."""
+def next_action(board, lane=None):
+    """Who should act next, and on what: (role, ticket) or None. Finish before starting.
+    With a lane, only that lane's tickets count, and the WIP limit applies per lane."""
     tickets = board.tickets()
     done = {t.id for t in tickets if t.state == "done"}
+    if lane:
+        tickets = [t for t in tickets if lane_of(t) == lane]
     for states, role in ((("review", "red-review", "blocked"), "lead"), (("changes", "doing"), "engineer")):
         for ticket in tickets:
             if ticket.state in states:
@@ -551,7 +602,12 @@ def parser():
 def main(argv=None):
     args = parser().parse_args(argv)
     try:
-        args.func(Board(), args)
+        board = Board()
+        if args.func in (cmd_board, cmd_inbox, cmd_show):
+            args.func(board, args)
+        else:
+            with board_lock(board.root):
+                args.func(board, args)
     except Refused as refusal:
         print("REFUSED: %s" % refusal, file=sys.stderr)
         return 1

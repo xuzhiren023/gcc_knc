@@ -143,9 +143,10 @@ def over_budget(board, ticket):
 def refresh_status(board):
     """The session's last ticket change came before its tokens were recorded, so show them now."""
     try:
-        path = status.write(board, pm.next_action(board))
-        pm.run_git("add", "--", path, cwd=board.root)
-        pm.run_git("commit", "-q", "-m", "pm: status after session", "--", path, cwd=board.root)
+        with pm.board_lock(board.root):
+            path = status.write(board, pm.next_action(board))
+            pm.run_git("add", "--", path, cwd=board.root)
+            pm.run_git("commit", "-q", "-m", "pm: status after session", "--", path, cwd=board.root)
     except Exception as problem:  # The status page must never stop the work.
         print("  Status page not updated: %s" % problem)
 
@@ -231,10 +232,12 @@ def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--max-sessions", type=int, default=4)
     parser.add_argument("--dry-run", action="store_true")
+    # One dispatcher per lane may run at once: gcc tickets share the GCC checkout, tools tickets do not.
+    parser.add_argument("--lane", choices=("gcc", "tools"))
     args = parser.parse_args(argv)
     board = pm.Board()
     for _ in range(args.max_sessions):
-        if any(t.state == "owner" for t in board.tickets()):
+        if any(t.state == "owner" and args.lane in (None, pm.lane_of(t)) for t in board.tickets()):
             break
         level, message = storage.check(board.root, board.policy)
         if level != "ok":
@@ -242,7 +245,7 @@ def main(argv=None):
         if level == "hard":
             print("No session started. See: python tools/storage.py")
             break
-        action = pm.next_action(board)
+        action = pm.next_action(board, args.lane)
         if action is None or not run_session(board, action[1], action[0], args.dry_run):
             break
     pm.cmd_board(board, None)
