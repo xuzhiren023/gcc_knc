@@ -185,6 +185,9 @@ class Runner:
                 self.result('t0 ' + label, [str(error)])
 
     def t1(self):
+        if self.args.link_defaults:
+            self.t1_sources([self.source_dir / 'knc-link-defaults.c'])
+            return
         if self.args.compiler == 'gcc16':
             self.t1_sources()
         source = (self.fixture / 'loops.c').read_text()
@@ -261,6 +264,35 @@ class Runner:
                 self.say('ERROR ' + label + ': ' + str(error))
 
     def t2(self):
+        if getattr(getattr(self, 'args', None), 'link_defaults', False):
+            elf = self.out / 'knc-link-defaults.mic'
+            # Temporary donor runtime bridge, explicitly required by S1-06.
+            donor = self.tc / 'cross/lib/gcc/k1om-mpss-linux/5.1.1'
+            self.say('S1-06 runtime bridge: -B' + str(donor) +
+                     '/ supplies donor crtbegin.o, crtend.o and libgcc until E2-05')
+            linked = self.command(self.cc, *self.cc_flags, '-B' + str(donor) + '/',
+                                  '-v', '-Wl,--trace', ROOT / 'tests/t2/knc-link-defaults.c',
+                                  '-o', elf, check=False)
+            trace = linked.stdout
+            self.say(trace)
+            failures = []
+            if not re.search(r'^ [^\n]*\bas(?:\.exe)?\s+--march=k1om(?:\s|$)', trace, re.M):
+                failures.append('verbose assembler command lacks --march=k1om')
+            if not re.search(r'^ [^\n]*\s-m\s+elf_k1om(?:\s|$)', trace, re.M):
+                failures.append('verbose linker command lacks -m elf_k1om')
+            for name in ('crtbegin.o', 'crtend.o', 'libgcc.a'):
+                if str(donor / name) not in trace:
+                    failures.append('link did not use donor ' + name)
+            if linked.returncode:
+                failures.append('integer link exited ' + str(linked.returncode))
+            self.result('t2 K1OM driver defaults and donor runtime bridge', failures)
+            if linked.returncode:
+                return
+        else:
+            elf, trace = self.t2_affine_link()
+        self.t2_abi(elf, trace)
+
+    def t2_affine_link(self):
         loops_obj = self.off_object or self.out / 'loops-off.o'
         if not self.off_object:
             self.command(self.cc, *self.cc_flags, *self.flags, '-ffp-contract=off', '-c', self.fixture / 'loops.c', '-o', loops_obj)
@@ -269,6 +301,9 @@ class Runner:
         self.command(self.cc, *self.cc_flags, *self.flags, '-ffp-contract=off', '-c', self.fixture / 'driver.c', '-o', driver)
         trace = self.command(self.cc, *self.cc_flags, '--sysroot=' + str(self.sysroot), driver, loops_obj,
                              '-Wl,--trace', '-o', elf)
+        return elf, trace
+
+    def t2_abi(self, elf, trace):
         for library in ('libc.so.6', 'ld-linux-k1om.so.2'):
             paths = []
             for line in trace.splitlines():
@@ -290,6 +325,13 @@ class Runner:
         # never against host libraries or just a numeric maximum GLIBC version.
         versions = self.command(self.tool('readelf'), '--version-info', '--wide', elf)
         failures = [] if required else ['no versioned symbol requirements found']
+        if getattr(getattr(self, 'args', None), 'link_defaults', False):
+            for symbol in sorted(required):
+                version = symbol.split('@', 1)[1]
+                if version.startswith('GLIBC_'):
+                    numbers = version[6:].split('.')
+                    if not all(part.isdigit() for part in numbers) or tuple(map(int, numbers)) > (2, 21):
+                        failures.append('symbol version exceeds glibc 2.21: ' + symbol)
         for library, section in re.findall(r'File:\s+(\S+)(.*?)(?=\n\s*0x[0-9a-f]+:\s+Version:|\Z)', versions, re.S):
             names = set(re.findall(r'Name:\s+(\S+)', section))
             needed = {symbol for symbol in required if symbol.split('@', 1)[1] in names}
@@ -335,6 +377,8 @@ def main():
     parser.add_argument('tiers', nargs='+', choices=('t0', 't1', 't2'))
     parser.add_argument('--compiler', choices=('donor', 'gcc16'), default='donor')
     parser.add_argument('--cc', help='override compiler path')
+    parser.add_argument('--link-defaults', action='store_true',
+                        help='S1-06 T1 ABI macros and T2 integer link with donor runtime -B')
     parser.add_argument('--record', help='small baseline result file')
     parser.add_argument('--worker', action='store_true', help=argparse.SUPPRESS)
     args = parser.parse_args()
