@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-03 11:35.
+Updated automatically at every ticket change. Last update: 2026-11-03 11:38.
 
-**Next: the tech lead, on S2-11.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Waiting for you:** S2-11. Run `python tools/pm.py inbox`.
 
 Current tickets: `[################----]` 23 of 28
 
@@ -49,10 +49,11 @@ Current tickets: `[################----]` 23 of 28
 | S2-08 | hello, scalar FP and printf on the card | draft | Owner approved Sprint 2 on 2026-11-03; this ticket stays draft until the card hold ends. |
 | S2-09 | GCC 16 builds gfortran, and the secondary-reload reproducer passes | Not started | Reconfiguring means one full rebuild: use `make -j8` with `CFLAGS=-O2 -g1 CXXFLAGS=-O2 -g1` as `tools/toolc... |
 | S2-10 | First card runs for the queued native checks | Not started | Owner's decision of 2026-11-03: the interactive lead runs every card job; engineer sessions have no card ac... |
-| S2-11 | card_run follows the shared card rules and runs hello on the card | Waiting for review | GREEN 24cefc3/27ef954; RED e1e5cf8/8ef9669. Snapshot command counts, named stderr diagnostics, confirmed fa... |
+| S2-11 | card_run follows the shared card rules and runs hello on the card | **Waiting for you** | over 2 review rounds: Review of 24cefc3. The one-pass snapshot, named steps with stderr, the guarded reaper... |
 
 ## Recent activity
 
+- 2026-11-03 11:38 **S2-11** lead escalate: over 2 review rounds: Review of 24cefc3. The one-pass snapshot, named steps with stderr, the guarded reaper and the no-replay reconnect are sound. ...
 - 2026-11-03 11:34 **S2-11** engineer submit: GREEN 24cefc3/27ef954; RED e1e5cf8/8ef9669. Snapshot command counts, named stderr diagnostics, confirmed faults, one guarded cleanup reconnect and ...
 - 2026-11-03 11:25 **S2-11** owner decide: Lead, under the owner's 2026-11-03 delegation: allow a fourth round for the native-run findings above.
 - 2026-11-03 11:25 **S2-11** lead escalate: over 2 review rounds: Native run of 61a8a62 by the lead, 2026-11-03 (receipts in the lead's scratchpad; ledger lines for claude-795fee36... in jobs...
@@ -60,7 +61,6 @@ Current tickets: `[################----]` 23 of 28
 - 2026-11-03 11:22 **S2-11** lead escalate: Review of 61a8a62 is clean: claude-pin writes the claude-pinned marker before execv and removes it if exec fails, so a missing marker is an infrast...
 - 2026-11-03 11:21 **S2-11** engineer submit: GREEN 61a8a62 addresses all three 11:13 findings against approved RED db52e6b and cc2afae. Five focused T0 cases passed in .work/_state/logs/S2_11_...
 - 2026-11-03 11:20 **S2-10** lead note: Owner's decision of 2026-11-03: the interactive lead runs every card job; engineer sessions have no card access. So this ticket's engineer prepares...
-- 2026-11-03 11:18 **S2-11** lead approve-red: The corrected pinning test now fails on the constant 'PIN yes' itself, so with db52e6b the red tests pin down all three review findings (helper mar...
 
 ## Cost
 
@@ -72,4 +72,4 @@ Current tickets: `[################----]` 23 of 28
 
 ## Disk
 
-The project uses 7.8 GiB of 100 GiB. 333 GiB free on the drive.
+The project uses 7.8 GiB of 100 GiB. 332 GiB free on the drive.
