@@ -1,17 +1,17 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-03 12:14.
+Updated automatically at every ticket change. Last update: 2026-11-03 12:31.
 
-**Next: GPT-6.1, on S2-10 (First card runs for the queued native checks).** Run `python tools/dispatch.py`, or ask the tech lead to.
+**Next: the tech lead, on S2-10.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
-Current tickets: `[#################---]` 25 of 29
+Current tickets: `[################----]` 25 of 30
 
 ## Milestones
 
 | | Milestone | State | Progress |
 |---|---|---|---|
 | M0 | Foundation | In progress | 17 of 17 tickets |
-| M1 | Mixed native code | In progress | 8 of 12 tickets |
+| M1 | Mixed native code | In progress | 8 of 13 tickets |
 | M2 | Useful vector target | Not started | Not planned in detail yet |
 | M3 | Runtimes | Not started | Not planned in detail yet |
 | M4 | Broad optimization | Not started | Not planned in detail yet |
@@ -48,29 +48,30 @@ Current tickets: `[#################---]` 25 of 29
 | S2-07 | GCC 16 builds its own static libgcc for k1om | Not started | Owner approved Sprint 2 on 2026-11-03; ticket set to ready. |
 | S2-08 | hello, scalar FP and printf on the card | draft | Owner approved Sprint 2 on 2026-11-03; this ticket stays draft until the card hold ends. |
 | S2-09 | GCC 16 builds gfortran, and the secondary-reload reproducer passes | Not started | Reconfiguring means one full rebuild: use `make -j8` with `CFLAGS=-O2 -g1 CXXFLAGS=-O2 -g1` as `tools/toolc... |
-| S2-10 | First card runs for the queued native checks | In progress | Owner's decision of 2026-11-03: the interactive lead runs every card job; engineer sessions have no card ac... |
+| S2-10 | First card runs for the queued native checks | Question for the tech lead | Reproducer: pm.py submit S2-10 refuses no [red] test commit. The 11:20 note assigns build-only handoff; no ... |
 | S2-11 | card_run follows the shared card rules and runs hello on the card | Done | tools/card_run now runs programs on the shared Xeon Phi under the owner's card rules (ledger lines, cores 3... |
 | S2-12 | card_run polls the card gently and reports what it reaped | Done | card_run now checks job status on its existing SSH session with backoff to 5 s and opens output connections... |
+| S2-13 | Card tests pass again, and approve runs them | Not started | The first ticket for the tools lane, which runs beside the gcc lane from 2026-11-03 (`--lane tools`). Do no... |
 
 ## Recent activity
 
+- 2026-11-03 12:45 **S2-13** lead note: The first ticket for the tools lane, which runs beside the gcc lane from 2026-11-03 (`--lane tools`). Do not touch the GCC checkout or build.
+- 2026-11-03 12:31 **S2-10** engineer ask: Reproducer: pm.py submit S2-10 refuses no [red] test commit. The 11:20 note assigns build-only handoff; no compiler/runner code changed. Batch is r...
+- 2026-11-03 12:30 **S2-10** lead note: `lane: gcc`, because this ticket builds programs with the shared GCC build, so it must not run beside a GCC rebuild. It no longer waits for S2-12: ...
 - 2026-11-03 12:15 **S2-12** lead note: The lead (Claude) runs every card job, per the owner's 2026-11-03 decision; this ticket has no card access. Submit after T0; the lead runs the card...
 - 2026-11-03 12:14 **S2-12** lead approve: card_run now checks job status on its existing SSH session with backoff to 5 s and opens output connections at most every 10 s (14 for a quiet one-...
 - 2026-11-03 12:13 **S2-12** engineer submit: T0 via tools/run.py and bootstrap Cygwin Python: 3 focused tests passed (fake 60 s job <=15 output SSH connections; reaped/stale_kept result fields...
 - 2026-11-03 12:09 **S2-11** lead approve: tools/card_run now runs programs on the shared Xeon Phi under the owner's card rules (ledger lines, cores 30-59, memory cap, claude- names, other j...
 - 2026-11-03 12:08 **S2-11** owner decide: Lead, under the owner's 2026-11-03 delegation: the lead's native run passed; approving.
-- 2026-11-03 12:07 **S2-11** lead escalate: Review of 47c9e3b is clean: snapshot prints the physical RUNDIR and our exe/cwd under it is not foreign; output comes back by guarded raw SSH dd bl...
-- 2026-11-03 12:05 **S2-11** engineer submit: GREEN 47c9e3b; RED 6bbd99d. Physical RUNDIR fixes host process ownership; bounded raw SSH dd blocks replace unsupported head/od options. Red: 2 exp...
-- 2026-11-03 12:03 **S2-11** lead note: Native run of a10f43e by the lead at 10 s (job claude-1f35e77f..., 24 s). Confirmed: /tmp on the card resolves to /var/volatile/tmp; stage-create, ...
 
 ## Cost
 
 - From the script, engineer: 100 sessions, 187.7M input tokens
 - From the script, lead: 99 sessions, 36.3M input tokens
-- Started by hand, Claude: 3 sessions, 272.1M input tokens
+- Started by hand, Claude: 3 sessions, 289.9M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 7.8 GiB of 100 GiB. 329 GiB free on the drive.
+The project uses 7.8 GiB of 100 GiB. 331 GiB free on the drive.
