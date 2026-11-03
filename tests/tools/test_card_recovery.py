@@ -302,7 +302,9 @@ class RemoteReview(unittest.TestCase):
         (self.proc / "cpuinfo").write_text(cpuinfo)
         (self.proc / "meminfo").write_text(
             "MemTotal: 16000000 kB\nMemFree: 4000000 kB\nCached: 2000000 kB\n")
-        self.process(42, 1, cwd="/other work")
+        self.process(42, 1, cwd="/other work\twith\ncontrols", exe="/bin/a\tb\nc")
+        (self.proc / "42/comm").write_text("worker\twith\ncontrols\n")
+        self.process(43, 1)
         for pid in range(100, 400):
             self.process(pid, 2)
         counter = self.directory / "commands"
@@ -313,6 +315,10 @@ class RemoteReview(unittest.TestCase):
         # Count shell builtins too: per-line read/printf caused the native deadline.
         wrappers = wrappers.replace('printf "', 'command printf "')
         script = self.remote.replace("/proc/", str(self.proc) + "/")
+        # End a process after enumeration, just before its links are read.
+        script += '\nls() { rm -rf "%s/43"; command ls "$@"; }\n' % self.proc
+        wrappers = wrappers.replace('command ls "$@"',
+                                    'rm -rf "%s/43"; command ls "$@"' % self.proc)
         script += "\nrun_dir=/tmp/claude/claude-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\n"
         answer = self.shell(script + "\n" + wrappers + "\nsnapshot\n")
         self.assertEqual(answer.returncode, 0, answer.stderr)
@@ -325,7 +331,11 @@ class RemoteReview(unittest.TestCase):
         session.rpc = mock.Mock(return_value=answer.stdout.rstrip(b"\n"))
         snapshot = session.snapshot(timeout=1)
         self.assertEqual([p["pid"] for p in snapshot["processes"]], ["42"])
-        self.assertEqual(snapshot["processes"][0]["cwd"], "/other work")
+        process = snapshot["processes"][0]
+        self.assertEqual(process["cwd"], "/other work?with?controls")
+        self.assertEqual(process["exe"], "/bin/a?b?c")
+        self.assertEqual(process["name"], "worker?with?controls")
+        self.assertIn("43", str(snapshot["skipped_processes"]))
         self.assertEqual(self.runner["cpu_binding"](snapshot["cpuinfo"]),
                          self.runner["cpu_binding"](cpuinfo))
         self.assertNotIn("unused", snapshot["cpuinfo"])

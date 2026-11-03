@@ -169,6 +169,28 @@ class SharedCardRules(unittest.TestCase):
     def own_lines(self):
         return [line for line in self.transport.read_ledger() if line.get("agent") == "claude"]
 
+    def test_final_snapshot_race_preserves_program_result_and_notes_skip(self):
+        parser = object.__new__(self.runner["SSHSession"])
+        parser.boot_id = None
+        snapshots = 0
+
+        def snapshot(*, timeout, include_cpuinfo=True):
+            nonlocal snapshots
+            snapshots += 1
+            parser.run_dir = self.transport.run_dir
+            raw = ("BOOT\t%s\nCPU\tprocessor : 91\nCPU\tcore id : 30\n"
+                   "MEM\tMemFree: 4000000 kB\n" % BOOT).encode()
+            if snapshots == 3:  # After execute returned its matched result.
+                raw += b"PROC\t43\t1\tending\nPROC\t42\t1\tforeign\t/bin/sh\t/other\n"
+            parser.rpc = mock.Mock(return_value=raw)
+            return parser.snapshot(timeout=timeout, include_cpuinfo=include_cpuinfo)
+
+        self.transport.snapshot = snapshot
+        result = self.invoke()
+        self.assertEqual((result["result_class"], result["exit_code"]), ("program", 0))
+        self.assertIn("43", str(result["skipped_processes"]))
+        self.assertEqual([p["pid"] for p in result["foreign_processes"]], ["42"])
+
     def test_extra_files_refused_before_connection_or_admission(self):
         extra = self.directory / "batch.mic"
         extra.write_bytes(b"batch")

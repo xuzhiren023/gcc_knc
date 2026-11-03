@@ -140,7 +140,7 @@ def run(program, argv, *, lock_path, external_locks, baseline_names, timeout,
     result = dict(result_class="infrastructure", exit_code=INFRA_EXIT,
                   program_exit_code=None, boot_id_before=None, boot_id_after=None,
                   card_minutes=0.0, detail="", foreign_processes=[], overlapping_jobs=[],
-                  reaped=[], stale_kept=[])
+                  reaped=[], stale_kept=[], skipped_processes=[])
     session, acquired, execution_started, execution_finished = None, False, False, False
     job_id = "claude-" + uuid.uuid4().hex
     run_dir = "/tmp/claude/" + job_id
@@ -174,6 +174,9 @@ def run(program, argv, *, lock_path, external_locks, baseline_names, timeout,
         for process in foreign_processes(snap, run_dir, baseline_names):
             if process not in result["foreign_processes"]:
                 result["foreign_processes"].append(process)
+        for skipped in snap.get("skipped_processes", []):
+            if skipped not in result["skipped_processes"]:
+                result["skipped_processes"].append(skipped)
         return snap
 
     try:
@@ -458,15 +461,17 @@ class SSHSession:
                       (step, status, b"".join(output).decode("utf8", "replace")[-1000:]))
 
     def snapshot(self, *, timeout, include_cpuinfo=True):
-        try:
-            command = "snapshot" if include_cpuinfo else "snapshot skip-cpu"
-            records = self.rpc(command, timeout, step="snapshot").decode("utf8", "strict").splitlines()
-        except UnicodeError as error:
-            raise OSError("unknown process identity: %s" % error)
+        command = "snapshot" if include_cpuinfo else "snapshot skip-cpu"
+        records = []
+        for raw in self.rpc(command, timeout, step="snapshot").rstrip(b"\n").split(b"\n"):
+            try:
+                records.append(raw.decode("utf8", "strict"))
+            except UnicodeError as error:
+                raise OSError("unknown process identity in snapshot: %r" % raw[:200]) from error
         if not records or not records[0].startswith("BOOT\t"):
             raise OSError("malformed process/boot snapshot")
         boot = records[0][5:]
-        processes = []
+        processes, skipped = [], []
         cpuinfo, meminfo = [], []
         physical_run_dir = None
         for line in records[1:]:
@@ -480,34 +485,49 @@ class SSHSession:
             if fields[0] == "MEM":
                 meminfo.append(line[4:])
                 continue
-            if len(fields) != 6 or fields[0] != "PROC" or not fields[1].isdigit():
-                raise OSError("unknown process identity in snapshot")
+            diagnostic = "unknown process identity in snapshot: %r" % line.encode("utf8")[:200]
+            # A partial record may still identify one of our own processes.
+            owned = any(inside(value, directory)
+                        for value in fields[3:]
+                        for directory in (getattr(self, "run_dir", None), physical_run_dir) if directory)
+            complete = (len(fields) == 6 and fields[0] == "PROC"
+                        and fields[1].isdigit() and fields[2].isdigit())
+            if owned and (not complete or not all(fields[3:])):
+                raise Refused(diagnostic)
+            if fields[0] == "SKIP" or (fields[0] == "PROC" and len(fields) < 6):
+                skipped.append(repr(line.encode("utf8")[:200]))
+                continue
+            if not complete:
+                raise OSError(diagnostic)
             processes.append(dict(zip(("pid", "ppid", "name", "exe", "cwd"), fields[1:])))
         if self.boot_id is None:
             self.boot_id = boot
-        return dict(boot_id=boot, processes=processes, physical_run_dir=physical_run_dir,
+        return dict(boot_id=boot, processes=processes, skipped_processes=skipped,
+                    physical_run_dir=physical_run_dir,
                     cpuinfo="\n".join(cpuinfo),
                     meminfo="\n".join(meminfo))
 
     def stage(self, run_dir, program, *, timeout, files=()):
         self.validate(run_dir)
-        deadline = time.monotonic() + timeout
         self.rpc("boot_id=%s\ncheck_boot && mkdir -p /tmp/claude && "
                  "mkdir -- \"$run_dir\" && cd -- \"$run_dir\" && guard_dir" %
-                 shlex.quote(self.boot_id), self.remaining(deadline), step="stage-create")
-        self.send_file("claude-program", Path(program).read_bytes(), self.remaining(deadline))
-        self.send_file("claude-pin", self.pin_helper.read_bytes(), self.remaining(deadline))
+                 shlex.quote(self.boot_id), timeout, step="stage-create")
+        self.send_file("claude-program", Path(program).read_bytes(), timeout)
+        self.send_file("claude-pin", self.pin_helper.read_bytes(), timeout)
         # A separate shell has its own $$, so stop_owned spares the watchdog
         # itself. Ignore HUP before exec; losing SSH must not disarm the timer.
-        self.send_file("claude-watchdog.sh", watchdog_bytes(), self.remaining(deadline))
+        self.send_file("claude-watchdog.sh", watchdog_bytes(), timeout)
         for path in files:
+            # Bound each upload and chmod together, independent of batch size.
+            deadline = time.monotonic() + timeout
             path = Path(path)
             name = staging_name(path.name)
-            self.send_file(name, path.read_bytes(), self.remaining(deadline))
-            mode = "700" if path.stat().st_mode & 0o111 else "600"
+            data = path.read_bytes()
+            self.send_file(name, data, self.remaining(deadline))
+            mode = "700" if data.startswith(b"\x7fELF") else "600"
             self.rpc("guard_boot && chmod %s -- %s" % (mode, shlex.quote(name)),
                      self.remaining(deadline), step="stage-chmod")
-        self.rpc("guard_boot && chmod 700 claude-program claude-pin", self.remaining(deadline),
+        self.rpc("guard_boot && chmod 700 claude-program claude-pin", timeout,
                  step="stage-chmod")
 
     def send_file(self, name, data, timeout):
