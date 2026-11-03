@@ -1,17 +1,17 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-03 12:48.
+Updated automatically at every ticket change. Last update: 2026-11-03 12:54.
 
 **Next: GPT-6.1, on S2-07 (GCC 16 builds its own static libgcc for k1om).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
-Current tickets: `[##################--]` 27 of 30
+Current tickets: `[#################---]` 27 of 31
 
 ## Milestones
 
 | | Milestone | State | Progress |
 |---|---|---|---|
 | M0 | Foundation | In progress | 17 of 17 tickets |
-| M1 | Mixed native code | In progress | 10 of 13 tickets |
+| M1 | Mixed native code | In progress | 10 of 14 tickets |
 | M2 | Useful vector target | Not started | Not planned in detail yet |
 | M3 | Runtimes | Not started | Not planned in detail yet |
 | M4 | Broad optimization | Not started | Not planned in detail yet |
@@ -46,32 +46,33 @@ Current tickets: `[##################--]` 27 of 30
 | S2-05 | x87 compares and zmm spill alignment | Done | gcc16 now has tests proving it picks the IEEE-correct x87 compare for every float, double and long double c... |
 | S2-06 | Atomics without cmpxchg16b, spin hint by delay | Done | Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`). |
 | S2-07 | GCC 16 builds its own static libgcc for k1om | In progress | Owner approved Sprint 2 on 2026-11-03; ticket set to ready. |
-| S2-08 | hello, scalar FP and printf on the card | draft | Owner approved Sprint 2 on 2026-11-03; this ticket stays draft until the card hold ends. |
+| S2-08 | hello, scalar FP and printf on the card | Not started | Rewritten now that the card is available: the engineer prepares, the lead runs (as in S2-10). Set ready by ... |
 | S2-09 | GCC 16 builds gfortran, and the secondary-reload reproducer passes | Not started | Reconfiguring means one full rebuild: use `make -j8` with `CFLAGS=-O2 -g1 CXXFLAGS=-O2 -g1` as `tools/toolc... |
 | S2-10 | First card runs for the queued native checks | Done | Ten programs ran on the shared Xeon Phi with output identical to their references: hello, the m1_affine fix... |
 | S2-11 | card_run follows the shared card rules and runs hello on the card | Done | tools/card_run now runs programs on the shared Xeon Phi under the owner's card rules (ledger lines, cores 3... |
 | S2-12 | card_run polls the card gently and reports what it reaped | Done | card_run now checks job status on its existing SSH session with backoff to 5 s and opens output connections... |
 | S2-13 | Card tests pass again, and approve runs them | Done | All card tests in tests/tools pass again under Cygwin Python, and pm.py approve now refuses to merge any br... |
+| S2-14 | card_run stages extra files, so one job can run a batch | In progress | For S2-08's torture baseline on the card. The lead runs the card side after merge. |
 
 ## Recent activity
 
+- 2026-11-03 13:00 **S2-14** lead note: For S2-08's torture baseline on the card. The lead runs the card side after merge.
+- 2026-11-03 13:00 **S2-08** lead note: Rewritten now that the card is available: the engineer prepares, the lead runs (as in S2-10). Set ready by the lead; it starts after S2-07 and S2-14.
 - 2026-11-03 12:50 **S2-06** lead note: Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`).
 - 2026-11-03 12:50 **S2-04** lead note: Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`).
 - 2026-11-03 12:50 **S2-03** lead note: Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`).
 - 2026-11-03 12:50 **S2-02** lead note: Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`).
 - 2026-11-03 12:50 **S0-04** lead note: Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`).
 - 2026-11-03 12:48 **S2-13** lead approve: All card tests in tests/tools pass again under Cygwin Python, and pm.py approve now refuses to merge any branch that touches the card runner, its r...
-- 2026-11-03 12:47 **S2-13** engineer submit: Cygwin 3.12/sh: 56 card tests PASS; 5 MachineCheck tests PASS across runs (runner fixture hit size budget, fixed and only that test rerun). Red gat...
-- 2026-11-03 12:45 **S2-13** lead note: The first ticket for the tools lane, which runs beside the gcc lane from 2026-11-03 (`--lane tools`). Do not touch the GCC checkout or build.
 
 ## Cost
 
 - From the script, engineer: 104 sessions, 193.0M input tokens
 - From the script, lead: 103 sessions, 37.0M input tokens
-- Started by hand, Claude: 3 sessions, 305.0M input tokens
+- Started by hand, Claude: 3 sessions, 309.1M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 7.8 GiB of 100 GiB. 331 GiB free on the drive.
+The project uses 7.8 GiB of 100 GiB. 328 GiB free on the drive.
