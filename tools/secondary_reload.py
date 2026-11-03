@@ -179,3 +179,48 @@ def t1(runner):
                 if lint.returncode:
                     failures.append('lint: ' + lint.stdout[-1500:])
         runner.result('t1 secondary mixed pressure ' + level + ' ' + mode, failures)
+
+
+def t2(runner):
+    """Link the native probe and measure its host reference; no card execution."""
+    source = runner.root / 'tests/regress/knc-secondary-pressure.c'
+    flags = ['-O2', '-fomit-frame-pointer', '-fno-tree-vectorize',
+             '-ffp-contract=off', '-DPRESSURE_MAIN']
+    out = runner.tc.parent / 'tmp/S2-04'
+    out.mkdir(parents=True, exist_ok=True)
+    host = out / 'secondary-host.exe'
+    compiled = runner.command(runner.tc / 'cygwin/bin/gcc.exe', *flags,
+                              source, '-o', host, check=False)
+    failures = []
+    if compiled.returncode:
+        failures.append('host compile: ' + compiled.stdout[-1800:])
+    else:
+        reference = runner.command(host, check=False)
+        (out / 'host-reference.txt').write_text(reference.stdout)
+        runner.say('secondary host reference:\n' + reference.stdout)
+        if reference.returncode:
+            failures.append('host reference exit ' + str(reference.returncode))
+    runner.result('t2 secondary host reference (not a card result)', failures)
+
+    donor_runtime = runner.tc / 'cross/lib/gcc/k1om-mpss-linux/5.1.1'
+    donor_shared = runner.tc / 'cross/k1om-mpss-linux/lib64'
+    scripts = runner.out / 'secondary-runtime-specs'
+    scripts.mkdir()
+    for library in ('gcc_s', 'atomic'):
+        (scripts / ('lib' + library + '_asneeded.so')).write_text(
+            'INPUT ( AS_NEEDED ( -l' + library + ' ) )\n')
+    elf = out / 'secondary-pressure.mic'
+    linked = runner.command(runner.cc, *runner.cc_flags, *flags, '-march=knc',
+        '-B' + str(donor_runtime) + '/', '-L' + str(scripts),
+        '-L' + str(donor_shared), '--sysroot=' + str(runner.sysroot),
+        source, '-o', elf, '-Wl,--trace', check=False)
+    if linked.returncode:
+        runner.result('t2 secondary mixed pressure link',
+                      ['link: ' + linked.stdout[-1800:]])
+    else:
+        runner.t2_abi(elf, linked.stdout)
+        runner.result('t2 secondary mixed pressure link', [])
+    host.unlink(missing_ok=True)
+    runner.say('Native comparison pending: ' + str(elf)
+               + ' against ' + str(out / 'host-reference.txt')
+               + ' through tools/card_run after the owner releases the card hold.')

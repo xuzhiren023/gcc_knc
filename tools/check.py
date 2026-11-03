@@ -284,6 +284,10 @@ class Runner:
                 self.say('ERROR ' + label + ': ' + str(error))
 
     def t2(self):
+        if getattr(getattr(self, 'args', None), 'secondary_reload', False):
+            import secondary_reload
+            secondary_reload.t2(self)
+            return
         if getattr(getattr(self, 'args', None), 'varargs_abi', False):
             import varargs_abi
             varargs_abi.t2(self)
