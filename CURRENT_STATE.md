@@ -66,6 +66,8 @@ Last updated: 2026-11-03, at the close of Sprint 2 (S2-01 to S2-19 merged).
 
 - **A full GCC rebuild can be silent after `gcc/` configure.** S3-04's full build wrote nothing for about 12 minutes after `gcc/config.status`, then generated `gcc/build/gen*.exe` and compiled normally. Interrupting `tools/run.py` did not stop its Cygwin make; a premature resume started an overlapping make. Check for live `make.exe` processes before resuming. Poll file modification times under `.work/_shared/gcc-build` quietly, and call it a hang only after 20 minutes with no changes. If builds overlapped, let them finish or die, then run one `tools/toolchain.py gcc16 --resume` through `tools/run.py` to repair incomplete output.
 
+- **Restore target runtime files after replacing the GCC build tree.** `tools/toolchain.py gcc16` builds `all-gcc` only and removes the old tree, including `crtbegin.o`, `crtend.o` and `libgcc`. S3-04's first T2 regression therefore failed to link; `tools/toolchain.py libgcc` through `tools/run.py` restored the fork-built runtime, and the failed T2 checks then passed. Do this after a full rebuild before link checks.
+
 ## Open items not on a ticket
 
 - Cygwin tools run outside the Codex sandbox write their own permissions, which a sandboxed engineer cannot replace. `icacls` on `.work/_shared/check/donor/loops-off.o` shows this, and it cost one engineer session on 2026-11-01. Files with inherited permissions are fine, so create shared files outside the sandbox with native tools such as Git for Windows. `.work/_shared/check/donor` is stale and unused. `Copy-Item` from PhiWeather keeps those Cygwin permissions too, which locked the sandbox out of the 4 files the lead seeded for S0-10; `icacls <file> /reset` restored inheritance.
