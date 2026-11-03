@@ -1,17 +1,17 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-03 18:26.
+Updated automatically at every ticket change. Last update: 2026-11-03 18:27.
 
-**Next: the tech lead, on S3-05.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: GPT-6.1, on S3-12 (tools/portability: forward-port drill and x86_64 unchanged check).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
-Current tickets: `[###############-----]` 40 of 51
+Current tickets: `[################----]` 41 of 51
 
 ## Milestones
 
 | | Milestone | State | Progress |
 |---|---|---|---|
 | M0 | Foundation | In progress | 17 of 17 tickets |
-| M1 | Mixed native code | In progress | 23 of 33 tickets |
+| M1 | Mixed native code | In progress | 24 of 33 tickets |
 | M2 | Useful vector target | In progress | 0 of 1 tickets |
 | M3 | Runtimes | Not started | Not planned in detail yet |
 | M4 | Broad optimization | Not started | Not planned in detail yet |
@@ -62,7 +62,7 @@ Current tickets: `[###############-----]` 40 of 51
 | S3-02 | One helper for optional tools/check selections | Done | tools/check optional selections now come from one table, several flags given together all run and each repo... |
 | S3-03 | Native probe of unaligned pairs and masked aligned forms at page boundaries | Done | Acceptance lines ticked: the lead ran the probe on the card, 3,148 cases with 0 failures; the fault table a... |
 | S3-04 | Packed modes legal under -march=knc, with aligned moves, spills and constants | Done | Under -march=knc, 64-byte float, double, int and long long vectors now live in zmm registers, with aligned ... |
-| S3-05 | Unaligned packed moves through load and store pairs | Waiting for review | ed24ab6 fixes existing dispatch test. Reran T0 only: PASS (23 regress, 8 doctor, 4 lint). Log: .work/_state... |
+| S3-05 | Unaligned packed moves through load and store pairs | Done | Packed copies through pointers of unknown alignment now compile, for all four 512-bit modes, to unmasked lo... |
 | S3-06 | Packed FP add, sub, mul, FMA and broadcasts for V16SF and V8DF | Not started | A lead review of S3-04 asks for generic vector code on 64-byte types, which no test covers: `*c=*a+*b` at -... |
 | S3-07 | Auto-vectorization on zmm, with x87 peel and remainder; m1_affine T1 and T2 green | Not started | ADR-0006 (accepted, owner's direction): shared i386 files hold hooks only. Put function bodies, switch tabl... |
 | S3-08 | Fortran twin of m1_affine vectorizes and links | Not started | Owner approved Sprint 3 on 2026-11-03; ticket set to ready. |
@@ -80,10 +80,10 @@ Current tickets: `[###############-----]` 40 of 51
 - 2026-11-03 18:45 **S3-14** lead note: Filed under the owner's delegation (engineering defect found while checking the PhiWeather project's lesson about stale TLS attributes). Every obje...
 - 2026-11-03 18:45 **S3-10** lead note: Also add (1) S3-14's TLS and S3-15's complex and rounding cross-checks, built after both merge (objects built before S3-14 use emulated TLS); and (...
 - 2026-11-03 18:45 **S3-06** lead note: A lead review of S3-04 asks for generic vector code on 64-byte types, which no test covers: `*c=*a+*b` at -O0, element read `v[3]` after an asm tha...
+- 2026-11-03 18:27 **S3-05** lead approve: Packed copies through pointers of unknown alignment now compile, for all four 512-bit modes, to unmasked load and store pairs at the address and ad...
 - 2026-11-03 18:26 **S3-12** lead answer: Size override approved; do not split. The fixes in baff875/33c28fd cover all three review points: both sides always run, a one-sided failure counts...
 - 2026-11-03 18:25 **S3-13** lead note: Created under the owner's direction of 2026-11-03 (ADR-0006). After S3-07, so it moves code that has settled. S3-10's card batch runs after it, so ...
 - 2026-11-03 18:25 **S3-12** engineer ask: Review fixes complete in baff875 and 33c28fd; changed fake-cc1 tests pass (2), make refusal passed in red run. Log: .work/_state/logs/S3_12_x86_rev...
-- 2026-11-03 18:25 **S3-12** lead note: Created under the owner's direction of 2026-11-03 (share i386, but correct and portable to future releases; ADR-0006). Tools lane, so it runs besid...
 
 ## Cost
 
