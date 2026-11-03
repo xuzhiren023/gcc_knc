@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-02 20:04.
+Updated automatically at every ticket change. Last update: 2026-11-02 20:38.
 
 **Next: GPT-6.1, on S1-05 (Integer C assembles with as 2.22 and lints clean).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
@@ -36,7 +36,7 @@ Current tickets: `[################----]` 14 of 17
 | S1-02 | GCC 16.2 builds for k1om-mpss-linux | Done | GCC 16.2 now configures and builds its C compiler for k1om-mpss-linux, using the shared KNC assembler, link... |
 | S1-03 | tools/check runs source-level tests against GCC 16 | Done | tools/check t1 --compiler gcc16 now compiles each tests/t1/*.c test and checks its scan, scan-not, per-func... |
 | S1-04 | -march=knc with no SSE, AVX, MMX, CMOV, FCOMI or MFENCE | Done | GCC 16 now accepts -march=knc (the k1om default): it predefines __KNC__ and no SSE/MMX/AVX macros, rejects ... |
-| S1-05 | Integer C assembles with as 2.22 and lints clean | Not started | Rebuild GCC with the logged gcc16 step of tools/toolchain.py as ONE blocking foreground shell call with a t... |
+| S1-05 | Integer C assembles with as 2.22 and lints clean | In progress | Rebuild GCC with the logged gcc16 step of tools/toolchain.py as ONE blocking foreground shell call with a t... |
 | S1-06 | K1OM link defaults | Not started | Rebuild GCC with the logged gcc16 step of tools/toolchain.py as ONE blocking foreground shell call with a t... |
 | S1-07 | Milestone M0 evidence note | Not started | Rebuild GCC with the logged gcc16 step of tools/toolchain.py as ONE blocking foreground shell call with a t... |
 
@@ -55,10 +55,10 @@ Current tickets: `[################----]` 14 of 17
 
 - From the script, engineer: 52 sessions, 65.0M input tokens
 - From the script, lead: 53 sessions, 19.6M input tokens
-- Started by hand, Claude: 3 sessions, 174.8M input tokens
+- Started by hand, Claude: 3 sessions, 181.0M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 9.3 GiB of 100 GiB. 327 GiB free on the drive.
+The project uses 9.3 GiB of 100 GiB. 326 GiB free on the drive.
