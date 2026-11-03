@@ -90,14 +90,11 @@ class CardBackend(unittest.TestCase):
             program = directory / "driver"
             program.write_bytes(b"driver")
             extra = directory / "claude-batch.mic"
-            extra.write_bytes(bytes(range(256)))
-            extra.chmod(0o700)
+            extra.write_bytes(b"\x7fELF" + bytes(range(256)))
+            extra.chmod(0o600)  # Windows host modes do not identify executables.
             data = directory / "input ' data"
             data.write_bytes(b"\x00\xffdata\n")
-            data.chmod(0o600)
-            for source, mode in ((extra, 0o700), (data, 0o600)):
-                self.assertEqual(source.stat().st_mode & 0o777, mode,
-                                 "host fixture chmod: %s" % source.name)
+            data.chmod(0o700)  # Conversely, data must never inherit execute bits.
             self.session.pin_helper = program
             self.session.command = ["fake-ssh", "exec sh"]
             run_dir = directory / self.session.run_dir.lstrip("/")
@@ -144,6 +141,48 @@ class CardBackend(unittest.TestCase):
                     with self.subTest(name=unsafe), self.assertRaises(OSError):
                         self.session.send_file(unsafe, b"", 1)
                 spawn.assert_not_called()
+
+    def test_each_batch_file_has_its_own_upload_deadline(self):
+        with tempfile.TemporaryDirectory(dir=ROOT) as name:
+            program = Path(name) / "program"
+            program.write_bytes(b"\x7fELF")
+            self.session.pin_helper = program
+            now = 0.0
+            uploaded = []
+
+            def upload(name, data, timeout):
+                nonlocal now
+                self.assertGreaterEqual(timeout, 1, name)
+                now += 1
+                uploaded.append(name)
+
+            self.session.send_file = upload
+            with mock.patch.object(self.runner["time"], "monotonic", lambda: now):
+                self.session.stage(self.session.run_dir, program, timeout=10,
+                                   files=[program] * 257)
+            self.assertEqual(len(uploaded), 260)
+
+    def test_snapshot_refusal_quotes_and_bounds_offending_line(self):
+        line = b"BAD\t\x1b" + b"x" * 250
+        self.session.rpc.return_value = b"BOOT\ttest-boot\n" + line
+        with self.assertRaises(OSError) as raised:
+            self.session.snapshot(timeout=1)
+        self.assertIn(repr(line[:200]), str(raised.exception))
+        self.assertNotIn("x" * 200, str(raised.exception))
+
+    def test_snapshot_skips_short_foreign_records_but_refuses_unreadable_owned(self):
+        prefix = b"BOOT\ttest-boot\n"
+        self.session.rpc.return_value = prefix + (
+            b"PROC\t43\t1\tending\nPROC\t42\t1\tforeign\t/bin/sh\t/outside\n")
+        snapshot = self.session.snapshot(timeout=1)
+        self.assertEqual([p["pid"] for p in snapshot["processes"]], ["42"])
+        self.assertIn("43", str(snapshot["skipped_processes"]))
+        for record in ("PROC\t44\t1\tworker\t" + self.session.run_dir,
+                       "PROC\t44\t1\t\t/bin/sh\t" + self.session.run_dir):
+            with self.subTest(record=record):
+                self.session.rpc.return_value = prefix + record.encode()
+                with self.assertRaises(OSError):
+                    self.session.snapshot(timeout=1)
 
     def test_output_binary_roundtrip_rejects_busybox_head_c_and_od_A(self):
         directory = Path(self.session.run_dir)
