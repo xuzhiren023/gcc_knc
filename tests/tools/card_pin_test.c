@@ -6,6 +6,8 @@
 #include <sys/resource.h>
 #include <unistd.h>
 #include <string.h>
+#include <stdio.h>
+#include <sys/stat.h>
 
 static int affinity_calls, limit_calls, exec_calls, mode;
 static int fake_affinity(pid_t pid, size_t size, const cpu_set_t *mask) {
@@ -29,6 +31,7 @@ static int fake_limit(int resource, const struct rlimit *limit) {
 }
 static int fake_exec(const char *path, char *const argv[]) {
     assert(affinity_calls == 1 && limit_calls == 1);
+    assert(access("claude-pinned", F_OK) == 0);
     assert(strcmp(path, "./claude-program") == 0);
     assert(strcmp(argv[1], "argument with spaces") == 0 && argv[2] == NULL);
     ++exec_calls;
@@ -50,7 +53,15 @@ int main(void) {
         assert(affinity_calls == 1);
         assert(limit_calls == (mode != 1));
         assert(exec_calls == (mode == 0));
+        /* Failed affinity, limit or exec must never claim a program ran. */
+        assert(access("claude-pinned", F_OK) != 0);
     }
+    mode = 3;
+    affinity_calls = limit_calls = exec_calls = 0;
+    assert(mkdir("claude-pinned", 0700) == 0);
+    assert(pin_main(5, args) == 126);
+    assert(affinity_calls == 1 && limit_calls == 1 && exec_calls == 0);
+    assert(rmdir("claude-pinned") == 0);
     char *bad[] = {"", "4,,13", "-1", "9999999", "4x", "4,"};
     for (unsigned i = 0; i < sizeof(bad) / sizeof(*bad); ++i) {
         args[1] = bad[i];
