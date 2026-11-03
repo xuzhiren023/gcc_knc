@@ -6,7 +6,9 @@ import sys
 def t1(runner):
     for name in ('knc-atomics', 'knc-spin-hint'):
         asm = runner.out / (name + '.s')
+        flags = ['-mrelax-cmpxchg-loop'] if name == 'knc-spin-hint' else []
         result = runner.command(runner.cc, *runner.cc_flags, '-O2', '-march=knc',
+                                *flags,
                                 '-S', runner.root / ('tests/t1/' + name + '.c'),
                                 '-o', asm, check=False)
         failures = []
@@ -24,7 +26,7 @@ def t1(runner):
                     if not body or not re.search(r'\b(?:call|jmp)\s+__atomic_\w+_16\b', body):
                         failures.append('sync_' + op + '_16: missing libatomic call')
             else:
-                for function in ('spin_hint', 'spin_wait'):
+                for function in ('spin_hint', 'spin_wait', 'spin_update'):
                     body = runner.function_body(assembly, function)
                     if not body or not re.search(r'^\s*delay\s+%', body, re.M):
                         failures.append(function + ': missing delay')
@@ -53,6 +55,8 @@ def t2(runner):
                             '-B' + str(donor) + '/', '-L' + str(out),
                             '-L' + str(libraries),
                             runner.root / 'tests/t2/knc-atomic-counter.c',
+                            runner.root / 'tests/t1/knc-atomics.c',
+                            runner.root / 'tests/t1/knc-spin-hint.c',
                             '-o', elf, check=False)
     failures = [linked.stdout[-2200:]] if linked.returncode else []
     if not failures:

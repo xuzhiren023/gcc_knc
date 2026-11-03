@@ -5,3 +5,8 @@ void spin_wait(unsigned int *p)
   while (__atomic_load_n(p, __ATOMIC_ACQUIRE) == 0)
     __builtin_ia32_pause();
 }
+/* -mrelax-cmpxchg-loop also inserts the backend's gen_pause hint. */
+unsigned int spin_update(unsigned int *p, unsigned int value)
+{
+  return __atomic_fetch_xor(p, value, __ATOMIC_SEQ_CST);
+}
