@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-03 10:41.
+Updated automatically at every ticket change. Last update: 2026-11-03 10:42.
 
-**Next: GPT-6.1, on S2-06 (Atomics without cmpxchg16b, spin hint by delay).** Run `python tools/dispatch.py`, or ask the tech lead to.
+**Next: the tech lead, on S2-06.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[###############-----]` 22 of 28
 
@@ -44,7 +44,7 @@ Current tickets: `[###############-----]` 22 of 28
 | S2-03 | Varargs with the donor's register save area | Done | GCC 16 varargs functions now check %al and save the FP argument registers to the SysV save area at fp_offse... |
 | S2-04 | Scalar transfers through memory and mask scratch | Done | Scalar values now move between general and vector registers through memory with an allocated mask scratch, ... |
 | S2-05 | x87 compares and zmm spill alignment | Done | gcc16 now has tests proving it picks the IEEE-correct x87 compare for every float, double and long double c... |
-| S2-06 | Atomics without cmpxchg16b, spin hint by delay | In progress | Lead decided under the owner's 2026-11-03 delegation: two more engineer sessions (5 in total) for the one-l... |
+| S2-06 | Atomics without cmpxchg16b, spin hint by delay | Waiting for review | Fixed both atomics dispatch guards with nested getattr in d4424ad; existing red reproduced in check_donor_t... |
 | S2-07 | GCC 16 builds its own static libgcc for k1om | Not started | Owner approved Sprint 2 on 2026-11-03; ticket set to ready. |
 | S2-08 | hello, scalar FP and printf on the card | draft | Owner approved Sprint 2 on 2026-11-03; this ticket stays draft until the card hold ends. |
 | S2-09 | GCC 16 builds gfortran, and the secondary-reload reproducer passes | Not started | Reconfiguring means one full rebuild: use `make -j8` with `CFLAGS=-O2 -g1 CXXFLAGS=-O2 -g1` as `tools/toolc... |
@@ -53,6 +53,7 @@ Current tickets: `[###############-----]` 22 of 28
 
 ## Recent activity
 
+- 2026-11-03 10:42 **S2-06** engineer submit: Fixed both atomics dispatch guards with nested getattr in d4424ad; existing red reproduced in check_donor_t0-20261103-104030.log. Ran python tools/...
 - 2026-11-03 10:41 **S2-06** owner decide: Lead decided under the owner's 2026-11-03 delegation: two more engineer sessions (5 in total) for the one-line getattr guard in tools/check.py from...
 - 2026-11-03 10:41 **S2-06** lead escalate: budget: 3 engineer sessions used; the budget is 3
 - 2026-11-03 10:41 **S2-06** lead changes: 1. tools/check.py:191 and tools/check.py:295 (s2/S2-06): the new --atomics dispatch reads self.args directly, so a Runner built without args (tests...
@@ -60,13 +61,12 @@ Current tickets: `[###############-----]` 22 of 28
 - 2026-11-03 10:35 **S2-11** lead note: Rewritten for the owner's shared-card rules of 2026-11-03; they supersede every earlier note on this ticket. The ledger path waits for the owner (t...
 - 2026-11-03 10:32 **S2-11** lead note: Correction to 10:24: the lead made the sandbox change itself, so S2-11's first card run is not blocked by its own merge. `tools/dispatch.py` now ad...
 - 2026-11-03 10:24 **S2-11** lead note: The owner chose a neutral ledger outside both projects: `C:/Users/xuzhi/Documents/card-coordination/jobs.jsonl` (created empty by the lead with nat...
-- 2026-11-03 10:20 **S2-11** lead note: One more item, found by S2-06: `--config` defaults to `ROOT/config/card.local.json`, and `ROOT` is the ticket worktree, which has no copy of the gi...
 
 ## Cost
 
 - From the script, engineer: 86 sessions, 173.1M input tokens
 - From the script, lead: 85 sessions, 31.5M input tokens
-- Started by hand, Claude: 3 sessions, 244.8M input tokens
+- Started by hand, Claude: 3 sessions, 245.4M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
