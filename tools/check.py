@@ -188,7 +188,7 @@ class Runner:
                 self.result('t0 ' + label, [str(error)])
 
     def t1(self):
-        if getattr(self.args, 'atomics', False):
+        if getattr(getattr(self, 'args', None), 'atomics', False):
             import atomics
             atomics.t1(self)
             return
@@ -292,7 +292,7 @@ class Runner:
                 self.say('ERROR ' + label + ': ' + str(error))
 
     def t2(self):
-        if getattr(self.args, 'atomics', False):
+        if getattr(getattr(self, 'args', None), 'atomics', False):
             import atomics
             atomics.t2(self)
             return
