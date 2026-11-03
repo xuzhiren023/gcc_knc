@@ -1,20 +1,21 @@
 GCC 16 KNC C torture compile corpus (S1-05)
 Scope: gcc/testsuite/gcc.c-torture/compile/**/*.c
-dg-options and dg-additional-options are appended; other dg directives/selectors/skips are not applied.
+dg-options and dg-additional-options without target selectors are appended; selected directives are skipped.
 Flags: -march=knc -S, plus each level below.
 Assembler: binutils 2.22, --march=k1om.
 Lint: tools/knc_lint source checks and decoded object checks after successful assembly.
 Outcome classes are exclusive: compiler failure, then assembler rejection, then lint failure.
 FP ABI class requires every compiler error to be the explicit SSE-disabled ABI diagnostic.
+User inline asm rejected requires every assembler error inside #APP/#NO_APP; source lint must be clean.
 Timeout policy: 60s, then one 600s compiler retry; both exceeded = hang.
 Slow is an additional timing class: retry completed; underlying outcome is counted too.
-Whole-run wall time: 618.242 seconds (10.304 minutes), 8 workers.
+Whole-run wall time: 808.426 seconds (13.474 minutes), 8 workers.
 Files: 2003; measurements: 6009.
 
-level	pass	slow	hang	ICE	compiler error	float/double ABI error	assembler rejection	lint failure	infrastructure failure
-O0	1864	0	0	0	29	107	3	0	0
-O2	1867	0	0	0	28	104	4	0	0
-O2-g	1867	0	0	0	28	104	4	0	0
+level	pass	slow	hang	ICE	compiler error	float/double ABI error	assembler rejection	lint failure	infrastructure failure	user inline asm rejected
+O0	1873	0	0	0	18	110	0	0	0	2
+O2	1877	0	0	0	17	107	0	0	0	2
+O2-g	1877	0	0	0	17	107	0	0	0	2
 
 O0 / slow (0)
 
@@ -22,12 +23,10 @@ O0 / hang (0)
 
 O0 / ICE (0)
 
-O0 / compiler error (29)
+O0 / compiler error (18)
 20030305-1.c
 20111209-1.c
 asmgoto-5.c
-attr-retain-1.c
-attr-retain-2.c
 dll.c
 mipscop-1.c
 mipscop-2.c
@@ -35,25 +34,16 @@ mipscop-3.c
 mipscop-4.c
 pr106433.c
 pr110386-2.c
-pr117449.c
-pr124280.c
 pr28865.c
 pr29201.c
-pr34856.c
-pr39928-1.c
 pr48767.c
-pr78748.c
-pr82096.c
 pr83547.c
 pr86637-2.c
 pr88347.c
 pr89235.c
 pr97576.c
-vector-1.c
-vector-2.c
-vector-4.c
 
-O0 / float/double ABI error (107)
+O0 / float/double ABI error (110)
 20000127-1.c
 20000329-1.c
 20000405-1.c
@@ -137,6 +127,7 @@ pr33614.c
 pr34966.c
 pr35595.c
 pr38123.c
+pr39928-1.c
 pr39928-2.c
 pr42196-1.c
 pr42196-2.c
@@ -157,19 +148,22 @@ pr99787-1.c
 sra-1.c
 ssa-pre-1.c
 udconvert.c
+vector-1.c
+vector-2.c
 vector-3.c
 vector-5.c
 vector-6.c
 vector-dup-1.c
 
-O0 / assembler rejection (3)
-920520-1.c
-920521-1.c
-pr113322-1.c
+O0 / assembler rejection (0)
 
 O0 / lint failure (0)
 
 O0 / infrastructure failure (0)
+
+O0 / user inline asm rejected (2)
+920520-1.c; reason: every assembler error is inside #APP/#NO_APP
+920521-1.c; reason: every assembler error is inside #APP/#NO_APP
 
 O2 / slow (0)
 
@@ -177,11 +171,9 @@ O2 / hang (0)
 
 O2 / ICE (0)
 
-O2 / compiler error (28)
+O2 / compiler error (17)
 20030305-1.c
 20111209-1.c
-attr-retain-1.c
-attr-retain-2.c
 dll.c
 mipscop-1.c
 mipscop-2.c
@@ -189,25 +181,16 @@ mipscop-3.c
 mipscop-4.c
 pr106433.c
 pr110386-2.c
-pr117449.c
-pr124280.c
 pr28865.c
 pr29201.c
-pr34856.c
-pr39928-1.c
 pr48767.c
-pr78748.c
-pr82096.c
 pr83547.c
 pr86637-2.c
 pr88347.c
 pr89235.c
 pr97576.c
-vector-1.c
-vector-2.c
-vector-4.c
 
-O2 / float/double ABI error (104)
+O2 / float/double ABI error (107)
 20000127-1.c
 20000329-1.c
 20000405-1.c
@@ -289,6 +272,7 @@ pr33614.c
 pr34966.c
 pr35595.c
 pr38123.c
+pr39928-1.c
 pr39928-2.c
 pr42196-1.c
 pr42196-2.c
@@ -308,20 +292,22 @@ pr99787-1.c
 sra-1.c
 ssa-pre-1.c
 udconvert.c
+vector-1.c
+vector-2.c
 vector-3.c
 vector-5.c
 vector-6.c
 vector-dup-1.c
 
-O2 / assembler rejection (4)
-920520-1.c
-920521-1.c
-pr113322-1.c
-pr116348.c
+O2 / assembler rejection (0)
 
 O2 / lint failure (0)
 
 O2 / infrastructure failure (0)
+
+O2 / user inline asm rejected (2)
+920520-1.c; reason: every assembler error is inside #APP/#NO_APP
+920521-1.c; reason: every assembler error is inside #APP/#NO_APP
 
 O2-g / slow (0)
 
@@ -329,11 +315,9 @@ O2-g / hang (0)
 
 O2-g / ICE (0)
 
-O2-g / compiler error (28)
+O2-g / compiler error (17)
 20030305-1.c
 20111209-1.c
-attr-retain-1.c
-attr-retain-2.c
 dll.c
 mipscop-1.c
 mipscop-2.c
@@ -341,25 +325,16 @@ mipscop-3.c
 mipscop-4.c
 pr106433.c
 pr110386-2.c
-pr117449.c
-pr124280.c
 pr28865.c
 pr29201.c
-pr34856.c
-pr39928-1.c
 pr48767.c
-pr78748.c
-pr82096.c
 pr83547.c
 pr86637-2.c
 pr88347.c
 pr89235.c
 pr97576.c
-vector-1.c
-vector-2.c
-vector-4.c
 
-O2-g / float/double ABI error (104)
+O2-g / float/double ABI error (107)
 20000127-1.c
 20000329-1.c
 20000405-1.c
@@ -441,6 +416,7 @@ pr33614.c
 pr34966.c
 pr35595.c
 pr38123.c
+pr39928-1.c
 pr39928-2.c
 pr42196-1.c
 pr42196-2.c
@@ -460,38 +436,31 @@ pr99787-1.c
 sra-1.c
 ssa-pre-1.c
 udconvert.c
+vector-1.c
+vector-2.c
 vector-3.c
 vector-5.c
 vector-6.c
 vector-dup-1.c
 
-O2-g / assembler rejection (4)
-920520-1.c
-920521-1.c
-pr113322-1.c
-pr116348.c
+O2-g / assembler rejection (0)
 
 O2-g / lint failure (0)
 
 O2-g / infrastructure failure (0)
 
+O2-g / user inline asm rejected (2)
+920520-1.c; reason: every assembler error is inside #APP/#NO_APP
+920521-1.c; reason: every assembler error is inside #APP/#NO_APP
+
 Non-front-end compiler diagnostic audit (all levels unless noted):
-SSE/AVX/MMX options rejected with knc: pr106433.c, pr110386-2.c, pr34856.c,
-  pr39928-1.c, pr89235.c, pr97576.c, vector-1.c, vector-2.c, vector-4.c.
-Foreign cpu/architecture: pr88347.c (603e), pr117449.c (armv8.2-a+sha3),
-  pr124280.c (neoverse-v2), pr78748.c (zEC12).
-Unrecognized -G0: attr-retain-1.c, attr-retain-2.c.
-Unrecognized -mthumb/-mfloat-abi=soft: pr82096.c.
+SSE/AVX/MMX options rejected with knc: pr106433.c, pr110386-2.c,
+  pr89235.c, pr97576.c.
+Foreign cpu tuning: pr88347.c (-mtune=603e).
 Invalid SI pointer mode: 20111209-1.c.
 Invalid MIPS register names: mipscop-1.c, mipscop-2.c, mipscop-3.c, mipscop-4.c.
 Impossible asm constraints: asmgoto-5.c (O0 only).
 Graphite unavailable because isl is absent: pr86637-2.c.
 Other compiler-error files have front-end C diagnostics.
-
-Assembler rejection causes (not compiler-generated KNC instruction defects):
-920520-1.c: bare operand asm template (%0), all levels.
-920521-1.c: literal invalid asm instructions f and g, all levels.
-pr113322-1.c: source option -march=sapphirerapids overrides -march=knc, all levels.
-pr116348.c: source option -march=znver4 overrides -march=knc, O2 and O2-g.
-The latter two also have source-lint violations, recorded in their assembly logs;
-assembler rejection takes precedence in the exclusive outcome counts above.
+The float/double ABI class separately lists SSE-disabled return diagnostics.
+pr113322-1.c and pr116348.c pass at all levels with selected options skipped.
