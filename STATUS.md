@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-03 10:19.
+Updated automatically at every ticket change. Last update: 2026-11-03 10:20.
 
 **Next: GPT-6.1, on S2-06 (Atomics without cmpxchg16b, spin hint by delay).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
@@ -44,7 +44,7 @@ Current tickets: `[###############-----]` 22 of 28
 | S2-03 | Varargs with the donor's register save area | Done | GCC 16 varargs functions now check %al and save the FP argument registers to the SysV save area at fp_offse... |
 | S2-04 | Scalar transfers through memory and mask scratch | Done | Scalar values now move between general and vector registers through memory with an allocated mask scratch, ... |
 | S2-05 | x87 compares and zmm spill alignment | Done | gcc16 now has tests proving it picks the IEEE-correct x87 compare for every float, double and long double c... |
-| S2-06 | Atomics without cmpxchg16b, spin hint by delay | Changes requested | 1. gcc/config/i386/sync.md:425 (gcc fork): enabling atomic_compare_and_swapti for TARGET_KNC sets HAVE_atom... |
+| S2-06 | Atomics without cmpxchg16b, spin hint by delay | In progress | 1. gcc/config/i386/sync.md:425 (gcc fork): enabling atomic_compare_and_swapti for TARGET_KNC sets HAVE_atom... |
 | S2-07 | GCC 16 builds its own static libgcc for k1om | Not started | Owner approved Sprint 2 on 2026-11-03; ticket set to ready. |
 | S2-08 | hello, scalar FP and printf on the card | draft | Owner approved Sprint 2 on 2026-11-03; this ticket stays draft until the card hold ends. |
 | S2-09 | GCC 16 builds gfortran, and the secondary-reload reproducer passes | Not started | Reconfiguring means one full rebuild: use `make -j8` with `CFLAGS=-O2 -g1 CXXFLAGS=-O2 -g1` as `tools/toolc... |
