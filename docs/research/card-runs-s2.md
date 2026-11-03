@@ -251,7 +251,7 @@ for byte with each expected file after stripping the runner's own result line. B
 | `donor-printf.mic`, `printf.mic` | exit 0, match (`int`, `double`, `long double`) |
 | `compare.mic` | exit 0, match: S2-05's NaN, signed-zero, infinity and ordinary-value table, first run on the card |
 | `libgcc.mic` | exit 0, match (S2-07's helpers, built with GCC 16's own `libgcc`) |
-| `claude-torture` (256 programs) | not run: the lead cannot read the `claude-t-*.mic` files, which `prepare_s2_08.py` wrote 0700 (S2-16) |
+| `claude-torture` (256 programs) | **256 of 256 PASS** (2026-11-03 14:54, after S2-16 to S2-19): one job, `-j 30 --limit-mb 128`, `memoryMB` 3840, about 2 s of card time and 2 min in all, mostly staging 257 files |
 
 Two runs needed a retry because the runner refused on `unknown process identity in snapshot`
 while a `gpt61` job was churning (S2-17); `scalar-fp.mic` had already matched in the first of them.
