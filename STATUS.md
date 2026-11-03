@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-03 18:24.
+Updated automatically at every ticket change. Last update: 2026-11-03 18:25.
 
 **Next: the tech lead, on S3-05.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
@@ -69,7 +69,7 @@ Current tickets: `[###############-----]` 40 of 51
 | S3-09 | Packed integer add, sub, mul, logic and broadcast for V16SI; logic for V8DI | draft | Moved to Sprint 4 by the owner on 2026-11-03, on the lead's recommendation: m1_affine is float and double o... |
 | S3-10 | Card batch for Sprint 3 and m1_affine | Not started | Also add (1) S3-14's TLS and S3-15's complex and rounding cross-checks, built after both merge (objects bui... |
 | S3-11 | Milestone M1 note: fixture, line counts, ICE classes and backend cost comparison | Not started | Owner approved Sprint 3 on 2026-11-03; ticket set to ready. |
-| S3-12 | tools/portability: forward-port drill and x86_64 unchanged check | In progress | drill is good: it matches the lead's 2 conflicts on master 7eb405c3d11, it is immutable and the tests are t... |
+| S3-12 | tools/portability: forward-port drill and x86_64 unchanged check | Question for the tech lead | Review fixes complete in baff875 and 33c28fd; changed fake-cc1 tests pass (2), make refusal passed in red r... |
 | S3-13 | Move KNC code out of shared i386 files into i386-knc | Not started | Created under the owner's direction of 2026-11-03 (ADR-0006). After S3-07, so it moves code that has settle... |
 | S3-14 | Native TLS for k1om, and every x86_64-only configure case that misses k1om | Not started | Filed under the owner's delegation (engineering defect found while checking the PhiWeather project's lesson... |
 | S3-15 | ABI gaps: packed vectors through varargs and ms_abi, complex values, rounding mode across calls | Not started | Filed under the owner's delegation. Finding 1 was reproduced by the lead; findings 2-4 come from reading co... |
@@ -81,9 +81,9 @@ Current tickets: `[###############-----]` 40 of 51
 - 2026-11-03 18:45 **S3-10** lead note: Also add (1) S3-14's TLS and S3-15's complex and rounding cross-checks, built after both merge (objects built before S3-14 use emulated TLS); and (...
 - 2026-11-03 18:45 **S3-06** lead note: A lead review of S3-04 asks for generic vector code on 64-byte types, which no test covers: `*c=*a+*b` at -O0, element read `v[3]` after an asm tha...
 - 2026-11-03 18:25 **S3-13** lead note: Created under the owner's direction of 2026-11-03 (ADR-0006). After S3-07, so it moves code that has settled. S3-10's card batch runs after it, so ...
+- 2026-11-03 18:25 **S3-12** engineer ask: Review fixes complete in baff875 and 33c28fd; changed fake-cc1 tests pass (2), make refusal passed in red run. Log: .work/_state/logs/S3_12_x86_rev...
 - 2026-11-03 18:25 **S3-12** lead note: Created under the owner's direction of 2026-11-03 (share i386, but correct and portable to future releases; ADR-0006). Tools lane, so it runs besid...
 - 2026-11-03 18:25 **S3-07** lead note: ADR-0006 (accepted, owner's direction): shared i386 files hold hooks only. Put function bodies, switch tables and prototypes in i386-knc.cc and i38...
-- 2026-11-03 18:25 **S3-06** lead note: ADR-0006 (accepted, owner's direction): shared i386 files hold hooks only. Put function bodies, switch tables and prototypes in i386-knc.cc and i38...
 
 ## Cost
 
