@@ -237,3 +237,21 @@ still pending. `python tools/prepare_s2_08.py --refresh-affected`, invoked
 through `tools/run.py`, reuses the prior torture compile summary and rebuilds
 only scalar-fp and the driver. Other passing program builds, driver behavior
 checks and the 256-test sweep were not repeated.
+
+## S2-08: lead's card results (2026-11-03)
+
+Run by the lead through the merged `tools/card_run` (with S2-12 and S2-14), stdout compared byte
+for byte with each expected file after stripping the runner's own result line. Boot ID
+`e9bfb0ab` before and after every job; about 0.024 card minutes each; no `card-fault`.
+
+| Program | Result |
+| --- | --- |
+| `donor-hello.mic`, `hello.mic` | exit 0, match |
+| `donor-scalar-fp.mic`, `scalar-fp.mic` | exit 0, match; the inexact thirds print `0.333333343`, `0.33333333333333331`, `0.333333333333333333342` from both compilers |
+| `donor-printf.mic`, `printf.mic` | exit 0, match (`int`, `double`, `long double`) |
+| `compare.mic` | exit 0, match: S2-05's NaN, signed-zero, infinity and ordinary-value table, first run on the card |
+| `libgcc.mic` | exit 0, match (S2-07's helpers, built with GCC 16's own `libgcc`) |
+| `claude-torture` (256 programs) | not run: the lead cannot read the `claude-t-*.mic` files, which `prepare_s2_08.py` wrote 0700 (S2-16) |
+
+Two runs needed a retry because the runner refused on `unknown process identity in snapshot`
+while a `gpt61` job was churning (S2-17); `scalar-fp.mic` had already matched in the first of them.
