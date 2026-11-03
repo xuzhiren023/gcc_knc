@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-03 12:07.
+Updated automatically at every ticket change. Last update: 2026-11-03 12:08.
 
-**Waiting for you:** S2-11. Run `python tools/pm.py inbox`.
+**Next: the tech lead, on S2-11.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[################----]` 23 of 28
 
@@ -49,10 +49,11 @@ Current tickets: `[################----]` 23 of 28
 | S2-08 | hello, scalar FP and printf on the card | draft | Owner approved Sprint 2 on 2026-11-03; this ticket stays draft until the card hold ends. |
 | S2-09 | GCC 16 builds gfortran, and the secondary-reload reproducer passes | Not started | Reconfiguring means one full rebuild: use `make -j8` with `CFLAGS=-O2 -g1 CXXFLAGS=-O2 -g1` as `tools/toolc... |
 | S2-10 | First card runs for the queued native checks | Not started | Owner's decision of 2026-11-03: the interactive lead runs every card job; engineer sessions have no card ac... |
-| S2-11 | card_run follows the shared card rules and runs hello on the card | **Waiting for you** | Review of 47c9e3b is clean: snapshot prints the physical RUNDIR and our exe/cwd under it is not foreign; ou... |
+| S2-11 | card_run follows the shared card rules and runs hello on the card | Waiting for review | Lead, under the owner's 2026-11-03 delegation: the lead's native run passed; approving. |
 
 ## Recent activity
 
+- 2026-11-03 12:08 **S2-11** owner decide: Lead, under the owner's 2026-11-03 delegation: the lead's native run passed; approving.
 - 2026-11-03 12:07 **S2-11** lead escalate: Review of 47c9e3b is clean: snapshot prints the physical RUNDIR and our exe/cwd under it is not foreign; output comes back by guarded raw SSH dd bl...
 - 2026-11-03 12:05 **S2-11** engineer submit: GREEN 47c9e3b; RED 6bbd99d. Physical RUNDIR fixes host process ownership; bounded raw SSH dd blocks replace unsupported head/od options. Red: 2 exp...
 - 2026-11-03 12:03 **S2-11** lead note: Native run of a10f43e by the lead at 10 s (job claude-1f35e77f..., 24 s). Confirmed: /tmp on the card resolves to /var/volatile/tmp; stage-create, ...
@@ -60,13 +61,12 @@ Current tickets: `[################----]` 23 of 28
 - 2026-11-03 11:58 **S2-11** lead escalate: over 2 review rounds: Review of a10f43e: the card-side guard is right (physical /tmp resolved once, exact prefix plus claude/claude-<32hex>, owned_...
 - 2026-11-03 11:56 **S2-11** engineer submit: GREEN a10f43e; RED f3946f6. Physical /tmp resolved once per shell; exact cwd/process guards support symlinked /tmp for cleanup and stale recovery. ...
 - 2026-11-03 11:53 **S2-11** owner decide: Lead, under the owner's 2026-11-03 delegation: allow a seventh round for the /tmp symlink guard found on the card.
-- 2026-11-03 11:53 **S2-11** lead escalate: over 2 review rounds: Native run of d9f7dd6 by the lead at 10 s (job claude-53817b80..., 5 s): the snapshot now fits, admission, start/finish ledge...
 
 ## Cost
 
 - From the script, engineer: 99 sessions, 186.8M input tokens
 - From the script, lead: 98 sessions, 36.2M input tokens
-- Started by hand, Claude: 3 sessions, 266.9M input tokens
+- Started by hand, Claude: 3 sessions, 268.1M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
