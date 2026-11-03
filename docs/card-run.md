@@ -44,6 +44,7 @@ mode 600. Cleanup removes all extra files with the run directory. For example:
 The driver's children inherit both core pinning and the job's per-process
 address-space limit through `claude-pin`, so these settings apply to every
 program the driver starts. The limit is not aggregate memory for the batch.
+Host files the lead must read are never 0700: prepare card programs as 0755 and data files as 0644.
 
 ## Enforcement
 
