@@ -1,17 +1,17 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-03 15:22.
+Updated automatically at every ticket change. Last update: 2026-11-03 15:24.
 
-**Next: the tech lead, on S3-03.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: GPT-6.1, on S3-01 (Packed modes and IMCI patterns in GCC 16: entry points, audit and line estimate).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
-Current tickets: `[###############-----]` 37 of 47
+Current tickets: `[################----]` 38 of 47
 
 ## Milestones
 
 | | Milestone | State | Progress |
 |---|---|---|---|
 | M0 | Foundation | In progress | 17 of 17 tickets |
-| M1 | Mixed native code | In progress | 20 of 30 tickets |
+| M1 | Mixed native code | In progress | 21 of 30 tickets |
 | M2 | Useful vector target | Not started | Not planned in detail yet |
 | M3 | Runtimes | Not started | Not planned in detail yet |
 | M4 | Broad optimization | Not started | Not planned in detail yet |
@@ -60,7 +60,7 @@ Current tickets: `[###############-----]` 37 of 47
 | S2-19 | The card snapshot's awk runs under BusyBox | Done | The card runner's process snapshot no longer trips BusyBox awk, and a T0 test now rejects any card awk line... |
 | S3-01 | Packed modes and IMCI patterns in GCC 16: entry points, audit and line estimate | In progress | Intel 327364-001 (Xeon Phi Coprocessor ISA Reference Manual, 7 September 2012, 725 pages) is at `.work/_sha... |
 | S3-02 | One helper for optional tools/check selections | Done | tools/check optional selections now come from one table, several flags given together all run and each repo... |
-| S3-03 | Native probe of unaligned pairs and masked aligned forms at page boundaries | Waiting for review | Moved the one-off preparation helper to .work/_shared/tmp/S3-03/ and updated documented commands; probe unc... |
+| S3-03 | Native probe of unaligned pairs and masked aligned forms at page boundaries | Done | A KNC page-boundary probe for unaligned load/store pairs and masked aligned moves now builds with GCC 16 an... |
 | S3-04 | Packed modes legal under -march=knc, with aligned moves, spills and constants | Not started | Owner approved Sprint 3 on 2026-11-03; ticket set to ready. |
 | S3-05 | Unaligned packed moves through load and store pairs | Not started | Owner approved Sprint 3 on 2026-11-03; ticket set to ready. |
 | S3-06 | Packed FP add, sub, mul, FMA and broadcasts for V16SF and V8DF | Not started | Owner approved Sprint 3 on 2026-11-03; ticket set to ready. |
@@ -72,6 +72,7 @@ Current tickets: `[###############-----]` 37 of 47
 
 ## Recent activity
 
+- 2026-11-03 15:24 **S3-03** lead approve: A KNC page-boundary probe for unaligned load/store pairs and masked aligned moves now builds with GCC 16 and passes its host self-test over 3,148 c...
 - 2026-11-03 15:22 **S3-03** engineer submit: Moved the one-off preparation helper to .work/_shared/tmp/S3-03/ and updated documented commands; probe unchanged. Existing T0 PASS: 3148 cases and...
 - 2026-11-03 15:21 **S3-03** lead answer: Yes, submit with --override 'research probe: the ticket requires the probe itself in tests/regress/, so the ratio counts the instrument as test cod...
 - 2026-11-03 15:20 **S3-03** engineer ask: Probe and research committed at def877b; batch ready in .work/_shared/tmp/S3-03 (128 MiB). T0 PASS 3148 cases; GCC16 --march=k1om build and assembl...
@@ -79,7 +80,6 @@ Current tickets: `[###############-----]` 37 of 47
 - 2026-11-03 15:18 **S3-02** engineer submit: Red f463f56; fix b9c743e: table-driven default-safe T1/T2 selections combine; --vector selects knc-vec-*.c. tools/check t0 PASS (23+8+4 tests); ful...
 - 2026-11-03 15:14 **S3-03** lead answer: Yes, you're right: a 64-byte aligned full vector can't span pages, so that criterion is impossible as written. Replace it with: (1) aligned vmovaps...
 - 2026-11-03 15:13 **S3-03** engineer ask: Acceptance blocker: an aligned 64-byte vector cannot span mapped and guard pages. Reduced case: guard G=0x2000; G-64 is aligned and wholly mapped; ...
-- 2026-11-03 15:12 **S3-03** lead note: Intel 327364-001 (Xeon Phi Coprocessor ISA Reference Manual, 7 September 2012, 725 pages) is at `.work/_shared/intel-327364-001-xeon-phi-isa.pdf`, ...
 
 ## Cost
 
