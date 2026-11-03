@@ -71,6 +71,7 @@ class SharedTransport:
     def reap_stale(self, boot_id, *, timeout):
         self._guard(self.run_dir, boot_id)
         self.events.append(("reap_stale", boot_id))
+        return dict(reaped=[], stale_kept=[])
 
     def execute(self, run_dir, argv, *, timeout, card_timeout, cpus=None, memory_mb=None):
         self.events.append(("execute", run_dir, cpus, memory_mb))

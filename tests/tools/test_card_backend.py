@@ -128,6 +128,44 @@ od() { case "$*" in *-A*) echo 'od: invalid option -- A' >&2; return 94;; esac; 
 
     def test_helper_launch_replaces_taskset_and_unmounted_cgroups(self):
         self.assertIn('./claude-pin "$job_cpus" "$job_memory"', self.remote)
+
+    def test_sixty_second_job_uses_at_most_fifteen_output_connections(self):
+        self.session.command = ["fake-ssh", "exec sh"]
+        now = 0.0
+        payloads = {"stdout": b"hello\x00\xff\n", "stderr": b"diagnostic\n"}
+
+        def sleep(seconds):
+            nonlocal now
+            now += seconds
+
+        def rpc(script, timeout, *, step):
+            if step == "start-job":
+                return b""
+            self.assertEqual(step, "read-status")
+            return b"0" if now >= 60 else b"running"
+
+        def popen(command, **kwargs):
+            self.assertEqual(command[0], "fake-ssh")
+            script = shlex.split(command[-1])[-1]
+            name = "stdout" if "dd if=stdout " in script else "stderr"
+            data = payloads[name] if now >= 60 else b""
+            child = mock.Mock(returncode=0)
+            child.communicate.return_value = (data, b"")
+            return child
+
+        self.session.rpc = rpc
+        stdout, stderr = io.BytesIO(), io.BytesIO()
+        with mock.patch.object(self.runner["time"], "monotonic", side_effect=lambda: now), \
+                mock.patch.object(self.runner["time"], "sleep", side_effect=sleep), \
+                mock.patch.object(self.runner["subprocess"], "Popen", side_effect=popen) as spawn, \
+                mock.patch("sys.stdout", mock.Mock(buffer=stdout)), \
+                mock.patch("sys.stderr", mock.Mock(buffer=stderr)):
+            status = self.session.execute(self.session.run_dir, [], timeout=70, card_timeout=75,
+                                          cpus=[4, 13, 91], memory_mb=128)
+        self.assertLessEqual(spawn.call_count, 15)
+        self.assertEqual(status, 0)
+        self.assertEqual(stdout.getvalue(), payloads["stdout"])
+        self.assertEqual(stderr.getvalue(), payloads["stderr"])
         self.assertNotIn("taskset", self.remote)
         self.assertNotIn("memory.limit_in_bytes", self.remote)
         self.assertNotIn("/proc/mounts", self.remote)

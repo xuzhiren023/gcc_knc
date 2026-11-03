@@ -150,6 +150,14 @@ uses separate bounded SSH stdout streams running guarded
 `dd if=<stdout-or-stderr> bs=65536 skip=<block-offset> count=<1-or-2>`, with the actual
 filename selected from those two names. An unaligned byte offset reads at most
 two blocks; the host trims the prefix and delivers at most 64 KiB per chunk.
+Status is checked immediately on the existing control session, then after
+delays of 0.5, 1, 2, 4 and at most 5 seconds. While the job runs, stdout and
+stderr each open one bounded download connection no more often than every
+10 seconds; there is no initial download. Once status reports completion,
+both streams are drained without poll delays until an empty pair is read.
+A quiet 60-second job therefore needs at most 14 output connections,
+including the final drain; larger completed output needs additional bounded
+chunks. Execution deadlines still apply throughout polling and draining.
 This avoids one-byte reads on the card. Raw reads preserve
 binary stdout/stderr, trailing newlines and control-marker-like bytes, and
 advance a separate byte offset per stream. Every control operation is labelled (`snapshot`, `stage-create`,
@@ -195,6 +203,10 @@ The single overwritten result defaults to `tests/out/card-result.json`; it is
 runtime output, never committed. Fields include `result_class`, `exit_code`,
 `program_exit_code`, both boot IDs, `card_minutes`, detail, job ID, staging path,
 memory MB, selected logical CPUs, foreign processes and `overlapping_jobs`.
+`reaped` lists stale job paths removed during admission; `stale_kept` lists
+stale candidate paths retained because a live process uses their cwd or
+executable. Both default to empty lists. Foreign names and symlinks are not
+stale candidates and do not appear in either list.
 Overlaps include jobs already active at admission and jobs starting during ours,
 even when they also end during ours. Card minutes account only for execution;
 there are no performance/timing claims. Classes are `program`, `refused`,
@@ -210,6 +222,7 @@ snapshot, including across a cleanup reconnect. Snapshots contain boot ID,
 processes, filtered cpuinfo/meminfo, and `physical_run_dir` when supplied by the
 remote shell. They may report known pinning unavailability for early
 refusal. SSH checks enforcement at execution through the helper marker.
+`reap_stale` returns a mapping containing the `reaped` and `stale_kept` lists.
 Execute receives the explicit
 logical CPU list, memory MB, execution timeout and watchdog timeout.
 `tests/tools/test_card_shared.py` tests the shared rules without SSH; its shell

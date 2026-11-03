@@ -121,10 +121,14 @@ reap_one() {
     check_boot || return 92
     # Stale recovery never signals: any live user of this exact cwd/exe keeps it.
     for proc in /proc/[0-9]*; do
-        owned_pid "${proc##*/}" && return 0
+        if owned_pid "${proc##*/}"; then
+            printf 'STALE_KEPT\t%s\n' "$run_dir"
+            return 0
+        fi
     done
     guard_boot || return 92
-    rm -rf -- "$run_dir"
+    rm -rf -- "$run_dir" || return 92
+    printf 'REAPED\t%s\n' "$run_dir"
 }
 reap_stale() {
     check_boot || return 92
