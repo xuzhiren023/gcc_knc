@@ -78,6 +78,7 @@ Drafted as tickets S2-01 to S2-08; see [SPRINT-02](sprints/SPRINT-02.md).
 | E5-03 | Per-loop reports: vector factor, checks, tail cost, helper calls, spills, and reasons for rejection | Standard |
 | E5-04 | Evaluate source-format scalar in `zmm` against x87 (ADR-0003) | Deep |
 | E5-05 | U/V scheduler v0, tested at production thread density | Standard |
+| E5-07 | Software prefetch v1: `vprefetch0/1/2` and `vprefetche*` patterns in `imci.md`, KNC cache and latency parameters from E5-01, and GCC's `-fprefetch-loop-arrays` on at `-O2`/`-O3` for KNC when E5-01 shows a gain; judged on streaming and stencil kernels in exclusive card windows (owner, 2026-11-03) | Standard |
 | E5-06 | Milestone M2 kernels: short-loop, stencil and small-matrix kernels drawn from the corpus, plus hand-written IMCI references written for this project | Deep |
 
 ## E6 Runtimes (S7–S9, Milestone M3)
@@ -99,6 +100,7 @@ Drafted as tickets S2-01 to S2-08; see [SPRINT-02](sprints/SPRINT-02.md).
 | E7-02 | Accurate `exp`, `log`, `pow` first; relaxed entry points separate; exceptional-lane repair compared | Deep |
 | E7-03 | Rank missed optimizations by corpus-wide profile and carry the top regions through GIMPLE, RTL and assembly | Standard |
 | E7-04 | Scalar and integer code quality for the in-order core: scheduling, inlining, code size, branches without CMOV | Standard |
+| E7-06 | Two-level prefetch like `icc`: L2 far (`vprefetch1`) and L1 near (`vprefetch0`) distances per loop, exclusive prefetch for stores, none for loops that fit in cache; ranked on the corpus against E5-07 (owner, 2026-11-03) | Deep |
 | E7-05 | Milestone M4: corpus comparison against GCC 5.1.1, including held-out programs | Deep |
 
 ## E8 Program corpus and release (M5–M6)
@@ -110,7 +112,6 @@ sysroot content; user manual and support matrix; update procedure.
 
 | Topic | Why parked |
 |---|---|
-| Prefetch policy | After cost model v1; needs T5 crossover data |
 | Small matrix 2-D vectorization | After Milestone M2; applies to fixed-shape kernels only |
 | PGO | After the target works; check threaded profile integrity first |
 | Offline tuning-profile generator | After cost model v1 proves its value |
