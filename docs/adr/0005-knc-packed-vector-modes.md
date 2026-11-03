@@ -1,7 +1,8 @@
 # ADR-0005: KNC packed vector modes
 
-**Status:** Proposed. **Date:** 2026-11-03. **Decider:** Claude. The lead accepts it after S3-01
-confirms the open questions; S3-04 does not start before that. Citations are `file:line` in the
+**Status:** Accepted 2026-11-03, after S3-01 (`docs/research/knc-packed-modes.md`) and S3-03's card
+probe (`docs/research/knc-unaligned-probe.md`). **Decider:** Claude; the owner chose on 2026-11-03
+to go past M1's 300 shared lines (point 8). Citations are `file:line` in the
 GCC fork `.work/_shared/gcc` at `knc` `80bc88d9f9e`, or the donor `.work/_shared/gcc-donor` at
 `93871d7` (prefixed "donor"). Instruction availability was checked by assembling each mnemonic
 with the shared `as --march=k1om` on 2026-11-03.
@@ -49,7 +50,10 @@ them unadvertised until E3 adds them with their moves. Today:
    there. KNC enables it by adding `|| TARGET_KNC` to the four modes' entries in that name's
    iterator and to the expander's condition, plus a first-statement KNC dispatch where the body
    would call SSE-only helpers. This is the `movxi` precedent (`i386.md:2388-2397`) and the
-   `sync.md` one (`sync.md:424-426`). No `sse.md` `define_insn` condition is widened. Every
+   `sync.md` one (`sync.md:424-426`). No `sse.md` `define_insn` condition is widened. S3-01 showed that widening `VMOVE` enables
+   `*vmov<mode>_constm1_pternlog_false_dep` without AVX-512 (`sse.md:1536-1546`) and that `VI` exposes
+   ternary-logic insns and splits (`sse.md:19036-19064`, `19350-19440`), so moves and integer logic
+   use expander-only iterators. Every
    instruction pattern for these modes is a `*knc_` insn in `imci.md` under `TARGET_KNC`, with
    KNC constraints (`YJ`), printing `zmm` with `%g`. A name `sse.md` does not instantiate for these
    modes (FP `vec_duplicate`) goes only in `imci.md`. If widening an iterator entry would enable
@@ -71,12 +75,14 @@ them unadvertised until E3 adds them with their moves. Today:
 
    A pair is `l` at the address and `h` at the address plus 64. Other constants load from a
    64-byte aligned pool entry with `vmovaps`. A broadcast takes its scalar from memory. A scalar
-   in a register goes through S2's lane store first, until S3-01 shows a register-only sequence
-   that is correct for both element sizes.
-4. **Unaligned access and tails.** `movmisalign` uses the pair, on the condition that E3-01 shows
-   a pair wholly inside mapped memory never faults, including when the address is 64-byte
-   aligned and the `h` half at address plus 64 transfers no bytes. If it can fault, there is no
-   `movmisalign`, and M1's flags must change (owner). Peel and remainder iterations are scalar x87
+   in a register is broadcast with `vpermf32x4 $0` and a swizzled `vmovaps`/`vmovapd` (S3-01:
+   327364-001 section 2.2.1, tables 2.2/2.3; checked with the assembler, to be checked on the card
+   in S3-06).
+4. **Unaligned access and tails.** `movmisalign` uses the pair: S3-03 showed on the card that a pair
+   wholly inside mapped memory never faults at any offset, and that the `h` half at a 64-byte
+   aligned address touches nothing. It also showed that masks never suppress a page fault and that
+   an unaligned half touches its whole line whatever its mask, so masked tails (E4-04) must stay
+   inside lines known to be mapped. Peel and remainder iterations are scalar x87
    (E3-05). Partial vectors stay off (`i386-options.cc:3187`), and `ix86_get_mask_mode` is not
    changed in S3 (`i386.cc:26126-26150`). Masked tails are E4-04, designed from E3-01's results.
 5. **Vectorizer.** Under KNC `ix86_preferred_simd_mode` returns the 64-byte mode for SF, DF, SI and
@@ -84,16 +90,19 @@ them unadvertised until E3 adds them with their moves. Today:
    is tried (`i386.cc:26087-26121`). Costs stay the generic tables (`knc` is `PROCESSOR_GENERIC`,
    `common/config/i386/i386-common.cc:2221`) until S6. S3 makes no profitability claim.
 6. **ABI.** Vector-typed arguments, results and struct members stay an error. The guard in
-   `classify_argument` (`i386.cc:2260-2268`) extends from XI to the four modes, so a type whose
-   mode becomes V16SF does not start passing in registers. The vector ABI is its own ADR (E7).
+   `classify_argument` (`i386.cc:2260-2268`) extends from XI to the four modes, and must also run
+   before the large-aggregate return (`i386.cc:2286-2295`), which otherwise skips the fields of a
+   large struct (S3-01), so a type whose mode becomes V16SF does not start passing in registers. The vector ABI is its own ADR (E7).
 7. **Spills.** Packed spills use the 64-byte slots S2-05 proved for XI; `BIGGEST_ALIGNMENT` is
    already 512 for KNC (`i386.h:850-851`).
 8. **Code location and budget.** C++ logic for these hooks goes in a new KNC-only file,
    `gcc/config/i386/i386-knc.cc`, with prototypes in `i386-knc.h` included once from
    `i386-protos.h`. Shared files get one-line calls. The M1 count stays the measure above; the
    KNC-only files' size is reported beside it, so M1's comparison sees the whole cost. Allocations
-   in shared lines: S3-04 24, S3-05 6, S3-06 12, S3-07 4, total 46 of 49. A ticket that would
-   pass its allocation stops and asks. Integer arithmetic (S3-09) has no allocation.
+   in shared lines, from S3-01's sketch: S3-04 37, S3-05 11, S3-06 35, S3-07 8, total 91, taking
+   the measure from 251 to about 342. The owner chose on 2026-11-03 to go past 300 and let M1
+   compare real costs. A ticket that would pass its allocation stops and asks. Integer arithmetic
+   (S3-09, about 50 more) has no allocation.
 
 ## How they stay out of SSE and AVX patterns
 
@@ -110,7 +119,8 @@ them unadvertised until E3 adds them with their moves. Today:
 - Turning on `preferred_simd_mode` changes default `-O2` output, where the very-cheap model
   vectorizes loops whose trip count is a multiple of the vector length (`opts.cc:676-677`). That
   ticket is deep and runs the torture sweep.
-- M1 stays inside 300 only if the allocations hold, and only without vector integer arithmetic.
+- M1's shared-line count will be about 342, over its 300 limit by the owner's choice; M1's
+  comparison weighs that against a separate backend's estimated cost.
 - V8DI is a storage and logic mode in S3. Loops with 64-bit integer add, sub or multiply do not
   vectorize until E4.
 
