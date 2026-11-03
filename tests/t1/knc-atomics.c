@@ -14,6 +14,14 @@ PROBE(2, unsigned short)
 PROBE(4, unsigned int)
 PROBE(8, unsigned long long)
 PROBE(16, unsigned __int128)
+int atomic_always_lock_free_16(void)
+{
+  return __atomic_always_lock_free(16, 0);
+}
+int atomic_is_lock_free_16(void)
+{
+  return __atomic_is_lock_free(16, 0);
+}
 void fences(void)
 {
   __atomic_thread_fence(__ATOMIC_ACQUIRE);

@@ -25,6 +25,19 @@ def t1(runner):
                     body = runner.function_body(assembly, 'sync_' + op + '_16')
                     if not body or not re.search(r'\b(?:call|jmp)\s+__atomic_\w+_16\b', body):
                         failures.append('sync_' + op + '_16: missing libatomic call')
+                for query in ('always', 'is'):
+                    function = 'atomic_' + query + '_lock_free_16'
+                    body = runner.function_body(assembly, function)
+                    # GCC can answer false, or defer the runtime query to
+                    # libatomic. It must never fold the TI libcall into true.
+                    false = re.search(r'\bxorl\s+%eax,\s*%eax\b', body)
+                    runtime = query == 'is' and re.search(
+                        r'\b(?:call|jmp)\s+__atomic_is_lock_free\b', body)
+                    if not body or not (false or runtime):
+                        failures.append(function + ': reports lock-free')
+                    else:
+                        runner.say(function + ': ' +
+                                   ('libatomic runtime query' if runtime else 'false'))
             else:
                 for function in ('spin_hint', 'spin_wait', 'spin_update'):
                     body = runner.function_body(assembly, function)
