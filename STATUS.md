@@ -42,7 +42,7 @@ Current tickets: `[###############-----]` 20 of 26
 | S2-01 | Design for zmm and mask registers under -march=knc | Done | The register design for KNC is settled on paper: all 32 zmm and 8 mask registers become usable under -march... |
 | S2-02 | Float and double arguments and results in zmm lane 0 | Done | GCC 16 for KNC now passes float and double arguments and results in zmm lane 0, puts them on the stack afte... |
 | S2-03 | Varargs with the donor's register save area | Done | GCC 16 varargs functions now check %al and save the FP argument registers to the SysV save area at fp_offse... |
-| S2-04 | Scalar transfers through memory and mask scratch | Changes requested | Lead decided under the owner's 2026-11-03 delegation: allow a third review round. The 09:15 findings hold (... |
+| S2-04 | Scalar transfers through memory and mask scratch | In progress | Lead decided under the owner's 2026-11-03 delegation: allow a third review round. The 09:15 findings hold (... |
 | S2-05 | x87 compares and zmm spill alignment | Not started | Follow docs/adr/0004-knc-registers-and-scalar-abi.md, point 2: XI spills need 64-byte storage. This ticket ... |
 | S2-06 | Atomics without cmpxchg16b, spin hint by delay | Not started | Owner approved Sprint 2 on 2026-11-03; ticket set to ready. |
 | S2-07 | GCC 16 builds its own static libgcc for k1om | Not started | Owner approved Sprint 2 on 2026-11-03; ticket set to ready. |
@@ -64,7 +64,7 @@ Current tickets: `[###############-----]` 20 of 26
 
 - From the script, engineer: 79 sessions, 145.9M input tokens
 - From the script, lead: 78 sessions, 29.4M input tokens
-- Started by hand, Claude: 3 sessions, 218.1M input tokens
+- Started by hand, Claude: 3 sessions, 218.3M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
