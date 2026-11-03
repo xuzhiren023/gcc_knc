@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-03 07:19.
+Updated automatically at every ticket change. Last update: 2026-11-03 07:20.
 
-**Next: the tech lead, on S2-03.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: GPT-6.1, on S2-03 (Varargs with the donor's register save area).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
 Current tickets: `[###############-----]` 19 of 25
 
@@ -41,7 +41,7 @@ Current tickets: `[###############-----]` 19 of 25
 | S1-07 | Milestone M0 evidence note | Done | M0 is settled as adjust: GCC 16.2 builds a k1om cc1 whose assembly the 2.22 assembler accepts, an options-f... |
 | S2-01 | Design for zmm and mask registers under -march=knc | Done | The register design for KNC is settled on paper: all 32 zmm and 8 mask registers become usable under -march... |
 | S2-02 | Float and double arguments and results in zmm lane 0 | Done | GCC 16 for KNC now passes float and double arguments and results in zmm lane 0, puts them on the stack afte... |
-| S2-03 | Varargs with the donor's register save area | Tests waiting for review | 6ceebb8 [red]. Corrected T1 rerun: donor callers/callees pass at O0/O2, including AL=0/1/8 and overflow sta... |
+| S2-03 | Varargs with the donor's register save area | In progress | Red proven: the new test shows GCC 16 varargs functions skip the AL check, the FP register saves and fp_off... |
 | S2-04 | Scalar transfers through memory and mask scratch | Not started | Follow docs/adr/0004-knc-registers-and-scalar-abi.md, point 6: an allocated GPR scratch and an HI mask pseu... |
 | S2-05 | x87 compares and zmm spill alignment | Not started | Follow docs/adr/0004-knc-registers-and-scalar-abi.md, point 2: XI spills need 64-byte storage. This ticket ... |
 | S2-06 | Atomics without cmpxchg16b, spin hint by delay | Not started | Owner approved Sprint 2 on 2026-11-03; ticket set to ready. |
@@ -50,6 +50,7 @@ Current tickets: `[###############-----]` 19 of 25
 
 ## Recent activity
 
+- 2026-11-03 07:20 **S2-03** lead approve-red: Red proven: the new test shows GCC 16 varargs functions skip the AL check, the FP register saves and fp_offset=48 that the donor does, while AL at ...
 - 2026-11-03 07:19 **S2-03** engineer red: 6ceebb8 [red]. Corrected T1 rerun: donor callers/callees pass at O0/O2, including AL=0/1/8 and overflow stack values; GCC16 callers pass. GCC16 cal...
 - 2026-11-03 07:18 **S2-03** lead answer: Yes. T1 red is the red proof for this ticket. A link cannot see the save-area layout or %al, so passing T2 links before the change is expected and ...
 - 2026-11-03 07:17 **S2-03** engineer ask: 6ceebb8 [red]. Reproducer: escaping va_list after va_start omits AL guard, all FP saves and fp_offset=48 on GCC16 -O0/-O2; donor passes. Both T2 cr...
@@ -57,7 +58,6 @@ Current tickets: `[###############-----]` 19 of 25
 - 2026-11-03 07:09 **S2-02** engineer submit: Red 5bbf4ca. Build PASS. Scalar T1/T2 all passed across full run plus focused 32-byte warning fix (final GCC 498234009a3). 6009 sweep on f9ce0e14db...
 - 2026-11-03 06:50 **S2-02** lead changes: 1. gcc/config/i386/i386.cc:2262 (GCC cd59775df0a): the check rejects every VECTOR_TYPE with a non-vector mode, not only the XImode case S2-02 made ...
 - 2026-11-03 06:47 **S2-02** engineer submit: Build PASS. All S2-02 scalar T1/T2 checks PASS; broader runner fails packed-vector scans and unbridged runtime link. 6009 sweep PASS: FP ABI/ICE/as...
-- 2026-11-03 06:33 **S2-02** lead answer: Yes, but not for every vector type. Root cause: ADR-0004 point 2 admits XImode to the zmm registers, so an integer vector_size(64) type now gets TY...
 
 ## Cost
 
