@@ -188,11 +188,11 @@ class Runner:
                 self.result('t0 ' + label, [str(error)])
 
     def t1(self):
-        if getattr(self.args, 'varargs_abi', False):
+        if getattr(getattr(self, 'args', None), 'varargs_abi', False):
             import varargs_abi
             varargs_abi.t1(self)
             return
-        if getattr(self.args, 'scalar_abi', False):
+        if getattr(getattr(self, 'args', None), 'scalar_abi', False):
             import scalar_abi
             scalar_abi.t1(self)
             return
@@ -278,7 +278,7 @@ class Runner:
                 self.say('ERROR ' + label + ': ' + str(error))
 
     def t2(self):
-        if getattr(self.args, 'varargs_abi', False):
+        if getattr(getattr(self, 'args', None), 'varargs_abi', False):
             import varargs_abi
             varargs_abi.t2(self)
             return
