@@ -292,6 +292,14 @@ class Runner:
                 self.say('ERROR ' + label + ': ' + str(error))
 
     def t2(self):
+        if getattr(getattr(self, 'args', None), 'libgcc_link', False):
+            import libgcc
+            libgcc.link(self, 'gcc16')
+            return
+        if getattr(getattr(self, 'args', None), 'libgcc', False):
+            import libgcc
+            libgcc.t2(self)
+            return
         if getattr(getattr(self, 'args', None), 'atomics', False):
             import atomics
             atomics.t2(self)
@@ -313,23 +321,9 @@ class Runner:
             scalar_abi.t2(self)
         if getattr(getattr(self, 'args', None), 'link_defaults', False):
             elf = self.out / 'knc-link-defaults.mic'
-            # Temporary donor runtime bridge, explicitly required by S1-06.
-            donor = self.tc / 'cross/lib/gcc/k1om-mpss-linux/5.1.1'
-            donor_shared = self.tc / 'cross/k1om-mpss-linux/lib64'
-            # GCC 16 normally generates these in libgcc/libatomic builds.
-            # Match libatomic/Makefile.am until E2-05 builds both runtimes.
-            scripts = self.out / 'runtime-specs'
-            scripts.mkdir()
-            for library in ('gcc_s', 'atomic'):
-                (scripts / ('lib' + library + '_asneeded.so')).write_text(
-                    'INPUT ( AS_NEEDED ( -l' + library + ' ) )\n')
-            self.say('S1-06 runtime bridge: -B' + str(donor) +
-                     '/ supplies donor crtbegin.o, crtend.o and libgcc; -L' +
-                     str(scripts) + ' supplies test-local asneeded scripts; '
-                     '-L' + str(donor_shared) + ' resolves donor libgcc_s/libatomic; '
-                     'both bridges go away at E2-05')
-            linked = self.command(self.cc, *self.cc_flags, '-B' + str(donor) + '/',
-                                  '-L' + str(scripts), '-L' + str(donor_shared),
+            # libgcc's all target installs its results into the GCC build dir.
+            runtime = PROJECT / '.work/_shared/gcc-build/gcc'
+            linked = self.command(self.cc, *self.cc_flags,
                                   '-v', '-Wl,--trace', ROOT / 'tests/t2/knc-link-defaults.c',
                                   '-o', elf, check=False)
             trace = linked.stdout
@@ -340,11 +334,13 @@ class Runner:
             if not re.search(r'^ [^\n]*\s-m\s+elf_k1om(?:\s|$)', trace, re.M):
                 failures.append('verbose linker command lacks -m elf_k1om')
             for name in ('crtbegin.o', 'crtend.o', 'libgcc.a'):
-                if str(donor / name) not in trace:
-                    failures.append('link did not use donor ' + name)
+                if str(runtime / name) not in trace:
+                    failures.append('link did not use fork-built ' + name)
+            if str(self.tc / 'cross/lib/gcc') in trace:
+                failures.append('link used donor runtime path')
             if linked.returncode:
                 failures.append('integer link exited ' + str(linked.returncode))
-            self.result('t2 K1OM driver defaults and donor runtime bridge', failures)
+            self.result('t2 K1OM driver defaults and fork-built runtime', failures)
             if linked.returncode:
                 return
         else:
@@ -459,7 +455,11 @@ def main():
                                  for role in ('caller', 'callee') for level in ('O0', 'O2')],
                         help='limit varargs T1 to TAG-ROLE-O0 or TAG-ROLE-O2')
     parser.add_argument('--link-defaults', action='store_true',
-                        help='S1-06 T1 ABI macros and T2 integer link with donor runtime -B')
+                        help='S1-06 T1 ABI macros and T2 integer link with fork-built runtime')
+    parser.add_argument('--libgcc', action='store_true',
+                        help='S2-07 static runtime archive lint and helper links')
+    parser.add_argument('--libgcc-link', action='store_true',
+                        help='S2-07 fork helper link only')
     parser.add_argument('--record', help='small baseline result file')
     parser.add_argument('--worker', action='store_true', help=argparse.SUPPRESS)
     args = parser.parse_args()

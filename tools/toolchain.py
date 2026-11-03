@@ -135,6 +135,21 @@ def rebuild(args):
     command('make', 'install-gcc', 'DESTDIR=' + INSTALL_STAGE, cwd=build)
 
 
+def libgcc(args):
+    """Build the fork's static target runtime in the existing shared tree."""
+    build = SHARED / 'gcc-build'
+    if not (build / 'gcc/xgcc.exe').is_file():
+        raise RuntimeError('missing shared GCC build; build gcc16 first')
+    os.environ['TMPDIR'] = str(SHARED / 'tmp')
+    command('make', '-j8', 'all-target-libgcc', cwd=build)
+
+
+def driver(args):
+    """Rebuild only xgcc after changing driver specs, not code generation."""
+    command('make', '-j8', 'specs', 'CFLAGS=-O2 -g1', 'CXXFLAGS=-O2 -g1',
+            cwd=SHARED / 'gcc-build/gcc')
+
+
 def install_stage(cygpath, env):
     """Resolve and guard the one shared staging tree before copying or deleting."""
     stage = Path(subprocess.check_output(
@@ -273,7 +288,7 @@ def main():
         return result
     os.environ['PATH'] = ':'.join(str(TC / p) for p in ('cross/bin', 'cygwin/bin')) + ':' + os.environ.get('PATH', '')
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('step', choices=('rebuild', 'sysroot', 'verify', 'gcc16'))
+    parser.add_argument('step', choices=('rebuild', 'sysroot', 'verify', 'gcc16', 'libgcc', 'driver'))
     parser.add_argument('--card-root')
     parser.add_argument('--development-files')
     parser.add_argument('--install-only', action='store_true',

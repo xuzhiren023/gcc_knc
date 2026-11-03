@@ -206,17 +206,9 @@ def t2(runner):
             failures.append('host reference exit ' + str(reference.returncode))
     runner.result('t2 secondary host reference (not a card result)', failures)
 
-    donor_runtime = runner.tc / 'cross/lib/gcc/k1om-mpss-linux/5.1.1'
-    donor_shared = runner.tc / 'cross/k1om-mpss-linux/lib64'
-    scripts = runner.out / 'secondary-runtime-specs'
-    scripts.mkdir()
-    for library in ('gcc_s', 'atomic'):
-        (scripts / ('lib' + library + '_asneeded.so')).write_text(
-            'INPUT ( AS_NEEDED ( -l' + library + ' ) )\n')
     elf = out / 'secondary-pressure.mic'
     linked = runner.command(runner.cc, *runner.cc_flags, *flags, '-march=knc',
-        '-B' + str(donor_runtime) + '/', '-L' + str(scripts),
-        '-L' + str(donor_shared), '--sysroot=' + str(runner.sysroot),
+        '--sysroot=' + str(runner.sysroot),
         source, '-o', elf, '-Wl,--trace', check=False)
     if linked.returncode:
         runner.result('t2 secondary mixed pressure link',

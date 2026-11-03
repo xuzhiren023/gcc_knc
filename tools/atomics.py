@@ -72,23 +72,18 @@ def t1(runner):
 def t2(runner):
     out = runner.tc.parent / 'tmp/S2-06'
     out.mkdir(parents=True, exist_ok=True)
-    donor = runner.tc / 'cross/lib/gcc/k1om-mpss-linux/5.1.1'
     libraries = runner.tc / 'cross/k1om-mpss-linux/lib64'
-    for library in ('gcc_s', 'atomic'):
-        (out / ('lib' + library + '_asneeded.so')).write_text(
-            'INPUT ( AS_NEEDED ( -l' + library + ' ) )\n')
     elf = out / 'atomic-counter.mic'
     linked = runner.command(runner.cc, *runner.cc_flags, '-O2', '-pthread',
-                            '-B' + str(donor) + '/', '-L' + str(out),
                             '-L' + str(libraries),
                             runner.root / 'tests/t2/knc-atomic-counter.c',
                             runner.root / 'tests/t1/knc-atomics.c',
                             runner.root / 'tests/t1/knc-spin-hint.c',
-                            '-o', elf, check=False)
+                            '-latomic', '-o', elf, check=False)
     failures = [linked.stdout[-2200:]] if linked.returncode else []
     if not failures:
         lint = runner.command(sys.executable, runner.root / 'tools/knc_lint', elf, check=False)
         if lint.returncode:
             failures.append(lint.stdout[-1600:])
-    runner.result('t2 atomic pthread counter link (donor runtime bridge)', failures)
+    runner.result('t2 atomic pthread counter link (fork libgcc, explicit libatomic)', failures)
     runner.say('Native counter, not yet run: ' + str(elf))
