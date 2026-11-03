@@ -2,7 +2,7 @@
 
 Updated automatically at every ticket change. Last update: 2026-11-03 11:25.
 
-**Next: the tech lead, on S2-11.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Waiting for you:** S2-11. Run `python tools/pm.py inbox`.
 
 Current tickets: `[################----]` 23 of 28
 
@@ -49,10 +49,11 @@ Current tickets: `[################----]` 23 of 28
 | S2-08 | hello, scalar FP and printf on the card | draft | Owner approved Sprint 2 on 2026-11-03; this ticket stays draft until the card hold ends. |
 | S2-09 | GCC 16 builds gfortran, and the secondary-reload reproducer passes | Not started | Reconfiguring means one full rebuild: use `make -j8` with `CFLAGS=-O2 -g1 CXXFLAGS=-O2 -g1` as `tools/toolc... |
 | S2-10 | First card runs for the queued native checks | Not started | Owner's decision of 2026-11-03: the interactive lead runs every card job; engineer sessions have no card ac... |
-| S2-11 | card_run follows the shared card rules and runs hello on the card | Waiting for review | Lead, under the owner's 2026-11-03 delegation: the lead ran the native hello itself; findings follow as rev... |
+| S2-11 | card_run follows the shared card rules and runs hello on the card | **Waiting for you** | over 2 review rounds: Native run of 61a8a62 by the lead, 2026-11-03 (receipts in the lead's scratchpad; led... |
 
 ## Recent activity
 
+- 2026-11-03 11:25 **S2-11** lead escalate: over 2 review rounds: Native run of 61a8a62 by the lead, 2026-11-03 (receipts in the lead's scratchpad; ledger lines for claude-795fee36... in jobs...
 - 2026-11-03 11:25 **S2-11** owner decide: Lead, under the owner's 2026-11-03 delegation: the lead ran the native hello itself; findings follow as review changes.
 - 2026-11-03 11:22 **S2-11** lead escalate: Review of 61a8a62 is clean: claude-pin writes the claude-pinned marker before execv and removes it if exec fails, so a missing marker is an infrast...
 - 2026-11-03 11:21 **S2-11** engineer submit: GREEN 61a8a62 addresses all three 11:13 findings against approved RED db52e6b and cc2afae. Five focused T0 cases passed in .work/_state/logs/S2_11_...
@@ -60,7 +61,6 @@ Current tickets: `[################----]` 23 of 28
 - 2026-11-03 11:18 **S2-11** lead approve-red: The corrected pinning test now fails on the constant 'PIN yes' itself, so with db52e6b the red tests pin down all three review findings (helper mar...
 - 2026-11-03 11:18 **S2-11** engineer red: Corrected RED cc2afae per 11:16 review: fake boot_id, cpuinfo, meminfo and /proc path replacement let test_snapshot_does_not_claim_untested_pinning...
 - 2026-11-03 11:17 **S2-11** owner decide: Lead decided under the owner's 2026-11-03 delegation: 8 engineer sessions in total (4.9M of 12M tokens used). Fix the red test per the 11:16 review...
-- 2026-11-03 11:16 **S2-11** lead escalate: budget: 5 engineer sessions used; the budget is 5
 
 ## Cost
 
