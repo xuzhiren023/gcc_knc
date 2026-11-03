@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-02 22:27.
+Updated automatically at every ticket change. Last update: 2026-11-02 22:55.
 
-**Next: GPT-6.1, on S1-06 (K1OM link defaults).** Run `python tools/dispatch.py`, or ask the tech lead to.
+**Next: the tech lead, on S1-06.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[#################---]` 15 of 17
 
@@ -37,28 +37,28 @@ Current tickets: `[#################---]` 15 of 17
 | S1-03 | tools/check runs source-level tests against GCC 16 | Done | tools/check t1 --compiler gcc16 now compiles each tests/t1/*.c test and checks its scan, scan-not, per-func... |
 | S1-04 | -march=knc with no SSE, AVX, MMX, CMOV, FCOMI or MFENCE | Done | GCC 16 now accepts -march=knc (the k1om default): it predefines __KNC__ and no SSE/MMX/AVX macros, rejects ... |
 | S1-05 | Integer C assembles with as 2.22 and lints clean | Done | All 2003 GCC torture compile files now build for KNC at -O0, -O2 and -O2 -g and assemble with the card's ol... |
-| S1-06 | K1OM link defaults | In progress | The 15:45 note is wrong and replaced: your shell returns after 30 s, so a blocking call cannot work. Start ... |
-| S1-07 | Milestone M0 evidence note | Not started | Rebuild GCC with the logged gcc16 step of tools/toolchain.py as ONE blocking foreground shell call with a t... |
+| S1-06 | K1OM link defaults | Question for the tech lead | Repro: tools/check t2 --compiler gcc16 --link-defaults. Two links fail on absent -lgcc_s_asneeded/-latomic_... |
+| S1-07 | Milestone M0 evidence note | Not started | The 15:45 note is wrong and replaced: your shell returns after 30 s, so start each build in the background ... |
 
 ## Recent activity
 
+- 2026-11-02 22:55 **S1-06** engineer ask: Repro: tools/check t2 --compiler gcc16 --link-defaults. Two links fail on absent -lgcc_s_asneeded/-latomic_asneeded despite donor -B. K1OM as/ld/lo...
+- 2026-11-02 22:35 **S1-07** lead note: The 15:45 note is wrong and replaced: your shell returns after 30 s, so start each build in the background and poll it quietly with write_stdin, do...
 - 2026-11-02 22:26 **S1-05** lead approve: All 2003 GCC torture compile files now build for KNC at -O0, -O2 and -O2 -g and assemble with the card's old assembler with no crashes, hangs, asse...
 - 2026-11-02 22:25 **S1-05** engineer submit: 75e803f: red/green; 6009 cases/808.426s; ICE/hang/as/lint/infra=0; user asm=2/level. Target diagnostics: pr106433,pr110386-2,pr89235,pr97576 (SSE f...
 - 2026-11-02 22:20 **S1-06** lead note: The 15:45 note is wrong and replaced: your shell returns after 30 s, so a blocking call cannot work. Start the rebuild in the background and poll i...
 - 2026-11-02 22:03 **S1-05** lead answer: 1. 920520-1/920521-1: yes, a separate class 'user inline asm rejected', no fork change. Admit a file to it only if every as error line falls inside...
 - 2026-11-02 22:02 **S1-05** engineer ask: 3adf108: options red/green; 6009 cases/618.242s; as=3/4/4, ICE/hang/lint/infra=0. Target diagnostics listed in tests/baseline/gcc16-torture-compile...
 - 2026-11-02 21:48 **S1-05** lead changes: 1. tools/torture_compile.py:123 ignores the corpus's own dg-options/dg-additional-options, so 386-387 files per level (19% of the corpus) stop at f...
-- 2026-11-02 21:47 **S1-05** engineer submit: Acceptance met in commits 393c13d / GCC a6f28997967: DWARF 4 red/green; GCC rebuild 2056.884s; full torture sweep 6009 measurements in 584.499s, ze...
-- 2026-11-02 21:46 **S1-05** lead answer: Size is soft and the acceptance itself requires the full file lists, so keep the summary as is and submit with --override 'tests/baseline/gcc16-tor...
 
 ## Cost
 
 - From the script, engineer: 57 sessions, 76.4M input tokens
 - From the script, lead: 58 sessions, 21.2M input tokens
-- Started by hand, Claude: 3 sessions, 193.2M input tokens
+- Started by hand, Claude: 3 sessions, 194.4M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 9.3 GiB of 100 GiB. 324 GiB free on the drive.
+The project uses 7.7 GiB of 100 GiB. 325 GiB free on the drive.
