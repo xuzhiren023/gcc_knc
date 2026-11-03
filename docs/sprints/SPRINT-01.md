@@ -20,15 +20,22 @@ The work is in tickets, in `work/tickets/S1-*.md`, in this order:
 
 ## Sprint exit
 
-- [ ] All stories approved and merged, or explicitly returned to the backlog
-- [ ] `CURRENT_STATE.md` updated, and the GCC `knc` branch is ready for the owner to push
-- [ ] Milestone M0 review held: go, adjust or stop, decided by the owner
-- [ ] On go, with every M0 requirement met and all tests passing in the lead's own rerun: a local
+- [x] All stories approved and merged, or explicitly returned to the backlog
+- [x] `CURRENT_STATE.md` updated, and the GCC `knc` branch is ready for the owner to push
+- [x] Milestone M0 review held: go, adjust or stop, decided by the owner (adjust, 2026-11-02:
+  GCC 16 stays the base, Sprint 2 on this host; `docs/research/m0-result.md`)
+- [ ] Not applicable, M0 was adjust, not go: on go, with every M0 requirement met and all tests passing in the lead's own rerun: a local
   milestone commit updating `work/milestones.json`, and a local `milestone/M0` tag here and on the
   GCC fork's `knc` branch. Nothing is pushed (owner, 2026-11-02)
-- [ ] Sprint 2 refined from E2
-- [ ] Three-line retro below
+- [x] Sprint 2 refined from E2 (`docs/sprints/SPRINT-02.md`, drafts S2-01 to S2-08)
+- [x] Three-line retro below
 
 ## Retro
 
-*(at close)*
+- Worked: seven tickets in one day; red-first tests and script reviews caught real defects
+  (`check.py` skipping lint, ignored `dg-options`), and GCC 16 needed only 45 shared i386 lines.
+- Cost: hour-long rebuilds polled by GPT, and 36% of the day idle between runs. `-O2 -g1` cut a
+  full rebuild by a third; running without per-run approval removed the idle time.
+- Lead mistakes to avoid: stale build advice copied into tickets, `-j` above AGENTS.md's limit,
+  and a file name the policy treats as a receipt. Check each ticket against AGENTS.md and
+  `harness/policy.json` before it goes ready.
