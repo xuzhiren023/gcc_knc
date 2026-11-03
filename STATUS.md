@@ -1,17 +1,17 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-03 09:38.
+Updated automatically at every ticket change. Last update: 2026-11-03 10:14.
 
-**Next: GPT-6.1, on S2-06 (Atomics without cmpxchg16b, spin hint by delay).** Run `python tools/dispatch.py`, or ask the tech lead to.
+**Next: the tech lead, on S2-06.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
-Current tickets: `[################----]` 22 of 26
+Current tickets: `[###############-----]` 22 of 28
 
 ## Milestones
 
 | | Milestone | State | Progress |
 |---|---|---|---|
 | M0 | Foundation | In progress | 17 of 17 tickets |
-| M1 | Mixed native code | In progress | 5 of 9 tickets |
+| M1 | Mixed native code | In progress | 5 of 11 tickets |
 | M2 | Useful vector target | Not started | Not planned in detail yet |
 | M3 | Runtimes | Not started | Not planned in detail yet |
 | M4 | Broad optimization | Not started | Not planned in detail yet |
@@ -44,30 +44,32 @@ Current tickets: `[################----]` 22 of 26
 | S2-03 | Varargs with the donor's register save area | Done | GCC 16 varargs functions now check %al and save the FP argument registers to the SysV save area at fp_offse... |
 | S2-04 | Scalar transfers through memory and mask scratch | Done | Scalar values now move between general and vector registers through memory with an allocated mask scratch, ... |
 | S2-05 | x87 compares and zmm spill alignment | Done | gcc16 now has tests proving it picks the IEEE-correct x87 compare for every float, double and long double c... |
-| S2-06 | Atomics without cmpxchg16b, spin hint by delay | In progress | Owner approved Sprint 2 on 2026-11-03; ticket set to ready. |
+| S2-06 | Atomics without cmpxchg16b, spin hint by delay | Question for the tech lead | Build and scoped T1/T2 pass; red 3fc86d7. Logs: .work/_state/logs/S2_06_*.log. Native via tools/card_run ex... |
 | S2-07 | GCC 16 builds its own static libgcc for k1om | Not started | Owner approved Sprint 2 on 2026-11-03; ticket set to ready. |
 | S2-08 | hello, scalar FP and printf on the card | draft | Owner approved Sprint 2 on 2026-11-03; this ticket stays draft until the card hold ends. |
 | S2-09 | GCC 16 builds gfortran, and the secondary-reload reproducer passes | Not started | Reconfiguring means one full rebuild: use `make -j8` with `CFLAGS=-O2 -g1 CXXFLAGS=-O2 -g1` as `tools/toolc... |
+| S2-10 | First card runs for the queued native checks | Not started | The owner supplied `config/card.local.json` on 2026-11-03 (git-ignored; the `knownHosts` file is read from ... |
+| S2-11 | card_run works on the card's BusyBox and shares the card | Not started | Supersedes the 10:00 to 10:06 lock notes. The owner said card runs need no exclusive window, since the card... |
 
 ## Recent activity
 
+- 2026-11-03 10:14 **S2-06** engineer ask: Build and scoped T1/T2 pass; red 3fc86d7. Logs: .work/_state/logs/S2_06_*.log. Native via tools/card_run exits 126: config/card.local.json missing;...
+- 2026-11-03 10:10 **S2-11** lead note: Supersedes the 10:00 to 10:06 lock notes. The owner said card runs need no exclusive window, since the card runs Linux and our tests are small, so ...
+- 2026-11-03 10:06 **S2-11** lead note: Correction to 10:02: if `flock` is missing on the card, nothing on the card can hold this lock by `flock` either, so take it by atomic create alone...
+- 2026-11-03 10:02 **S2-11** lead note: The owner has no preference on the protocol, so the runner must be safe under both. Take: create the file atomically only if it is absent (`set -C`...
+- 2026-11-03 10:02 **S2-10** lead note: The owner supplied `config/card.local.json` on 2026-11-03 (git-ignored; the `knownHosts` file is read from PhiWeather's folder, read only). It runs...
+- 2026-11-03 10:00 **S2-11** lead note: Draft until the owner confirms how the WRF side holds this lock (by the file existing, or by `flock` on it); the lead sets it ready with that proto...
+- 2026-11-03 09:40 **S2-10** lead note: Draft until the owner has filled in `config/card.local.json` (host, identity, knownHosts, and the WRF run's lock in `externalLocks`); the lead sets...
 - 2026-11-03 09:38 **S2-05** lead approve: gcc16 now has tests proving it picks the IEEE-correct x87 compare for every float, double and long double comparison (quiet fucom for ==, != and is...
-- 2026-11-03 09:37 **S2-05** engineer submit: Approved tests at ffce091; no GCC edits and shared i386 delta 0. Existing tools/run.py s2-05-t1 check.py t1 --compiler gcc16 --x87-spill --worker P...
-- 2026-11-03 09:36 **S2-05** lead approve-red: S2-05 tests approved: gcc16 picks the right x87 compare for every float, double and long double comparison (fucom for ==, != and is*, signaling fco...
-- 2026-11-03 09:35 **S2-05** engineer red: ffce091 corrects tests per lead. tools/run.py s2-05-t1 wrapping check.py t1 --compiler gcc16 --x87-spill --worker PASS: 51 scans, ISA, 2499 host IE...
-- 2026-11-03 09:33 **S2-05** lead changes: Red fails for the wrong reason. Family parity with the donor is not intended for the signaling forms. C Annex F / IEEE 754 make < <= > >= signaling...
-- 2026-11-03 09:32 **S2-05** engineer red: 735e52a: T1 red, 24 ordered/negated forms use fcom vs donor fucom; review whether strict family parity is intended. Quiet scans pass. Both host emi...
-- 2026-11-03 09:27 **S2-04** lead approve: Scalar values now move between general and vector registers through memory with an allocated mask scratch, even with 14 general registers live, inc...
-- 2026-11-03 09:24 **S2-04** engineer submit: bd4185f / GCC ec5ace1e3c8: red 5f6d762 exposed u64-to-DF O2 and TF O1/O2 reload ICEs. Fixed SUBREG handling via true_regnum; limited memory excepti...
 
 ## Cost
 
 - From the script, engineer: 83 sessions, 150.5M input tokens
 - From the script, lead: 82 sessions, 30.6M input tokens
-- Started by hand, Claude: 3 sessions, 218.7M input tokens
+- Started by hand, Claude: 3 sessions, 232.6M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 9.3 GiB of 100 GiB. 305 GiB free on the drive.
+The project uses 7.7 GiB of 100 GiB. 306 GiB free on the drive.
