@@ -1,6 +1,6 @@
 # Sprint 3: ordinary loops vectorize on `zmm` (Milestone M1)
 
-**Status:** approved by the owner on 2026-11-03, with runs without per-run approval. Intel manual 327364 is in `.work/_shared/` (2026-11-03); S3-09 waits for the owner's choice after S3-07.
+**Status:** approved by the owner on 2026-11-03, with runs without per-run approval. Intel manual 327364 is in `.work/_shared/` (2026-11-03); S3-09 (integer vectors) moved to Sprint 4 by the owner on 2026-11-03.
 
 **Goal:** GCC 16 auto-vectorizes ordinary FP loops onto `zmm` with IMCI under `-march=knc`, and
 `m1_affine` (`tests/acceptance/m1_affine/`) passes every check in its README: T1 and T2 on the host,
@@ -38,7 +38,7 @@ definition of. **The owner chose on 2026-11-03 to go past 300** and let M1 compa
 | S3-05 | 11 | `movmisalign` operands, condition and dispatch |
 | S3-06 | 35 | `VF_BHSD` FP entries, add/sub/mul conditions and dispatches, `FMAMODEM`, `vec_init` |
 | S3-07 | 8 | `preferred_simd_mode` call, three pressure-cost lines |
-| S3-09 | about 50 | integer add/sub/mul/logic/broadcast; runs only with the owner's choice after S3-07 |
+| S3-09 | about 50 | integer add/sub/mul/logic/broadcast; moved to Sprint 4 by the owner (2026-11-03), not in M1's count |
 
 91 before S3-09, so about **342**. A ticket that would pass its allocation stops and asks. The M1
 note reports the shared count with the KNC-only files' size beside it.
@@ -62,8 +62,10 @@ sessions are planned: S3-03's probe, early, and S3-10's batch, at the end.
 | S3-06 | V16SF and V8DF add, sub, mul, FMA, and broadcasts (E3-04, FP part) | standard | S3-04 |
 | S3-07 | Auto-vectorization on, x87 peel and remainder, `m1_affine` T1 and T2 green with GCC 16 (E3-05) | deep | S3-05, S3-06 |
 | S3-08 | Fortran twin of `m1_affine` vectorizes and links | standard | S2-09, S3-07 |
-| S3-09 | V16SI add, sub, mul, logic and broadcast; V8DI logic (E3-04, integer part) | standard | S3-07, owner's choice |
-| S3-10 | Native batch for S3: `m1_affine` in all its builds, and the S3 tickets' native lines; lead runs it | standard | S3-07, S3-08 |
+| S3-09 | V16SI add, sub, mul, logic and broadcast; V8DI logic (E3-04, integer part) | standard | S3-07; moved to Sprint 4 |
+| S3-12 | `tools/portability.py`: forward-port drill and x86_64 unchanged check (ADR-0006; added 2026-11-03 on the owner's direction) | standard | none; tools lane |
+| S3-13 | Move KNC code out of shared i386 files into `i386-knc` (ADR-0006) | standard | S3-07 |
+| S3-10 | Native batch for S3: `m1_affine` in all its builds, and the S3 tickets' native lines; lead runs it | standard | S3-07, S3-08, S3-13 |
 | S3-11 | Milestone M1 note: fixture results, line counts, ICE classes, cost comparison with a separate backend (E3-06) | deep | all above |
 
 The dispatcher runs two lanes, one ticket in progress in each: `--lane gcc` for tickets with
@@ -74,7 +76,7 @@ that builds or compiles with the shared GCC build is in the gcc lane.
 ## Sprint exit
 
 - [ ] S3-01 to S3-08, S3-10 and S3-11 approved and merged, or returned to the backlog with a reason
-- [ ] S3-09 merged, or moved to Sprint 4 by the owner's choice
+- [x] S3-09 merged, or moved to Sprint 4 by the owner's choice (moved, 2026-11-03)
 - [ ] ADR-0005 accepted, with S3-03's answer recorded in it
 - [ ] `m1_affine`: every row of its README green with GCC 16, including the donor-driver run and
   the Fortran twin, from S3-10's card run; the lead ticks the native lines from it
