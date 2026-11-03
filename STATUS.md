@@ -2,7 +2,7 @@
 
 Updated automatically at every ticket change. Last update: 2026-11-03 12:32.
 
-**Next: GPT-6.1, on S2-10 (First card runs for the queued native checks).** Run `python tools/dispatch.py`, or ask the tech lead to.
+**Next: the tech lead, on S2-10.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[################----]` 25 of 30
 
@@ -48,7 +48,7 @@ Current tickets: `[################----]` 25 of 30
 | S2-07 | GCC 16 builds its own static libgcc for k1om | Not started | Owner approved Sprint 2 on 2026-11-03; ticket set to ready. |
 | S2-08 | hello, scalar FP and printf on the card | draft | Owner approved Sprint 2 on 2026-11-03; this ticket stays draft until the card hold ends. |
 | S2-09 | GCC 16 builds gfortran, and the secondary-reload reproducer passes | Not started | Reconfiguring means one full rebuild: use `make -j8` with `CFLAGS=-O2 -g1 CXXFLAGS=-O2 -g1` as `tools/toolc... |
-| S2-10 | First card runs for the queued native checks | In progress | No red test is needed: this ticket only prepares a batch for the lead to run, so it is not test-driven work... |
+| S2-10 | First card runs for the queued native checks | Question for the tech lead | Reproducer: python tools/pm.py show S2-10 still reports type: code. The 12:32 lead answer says the prepared... |
 | S2-11 | card_run follows the shared card rules and runs hello on the card | Done | tools/card_run now runs programs on the shared Xeon Phi under the owner's card rules (ledger lines, cores 3... |
 | S2-12 | card_run polls the card gently and reports what it reaped | Done | card_run now checks job status on its existing SSH session with backoff to 5 s and opens output connections... |
 | S2-13 | Card tests pass again, and approve runs them | Not started | The first ticket for the tools lane, which runs beside the gcc lane from 2026-11-03 (`--lane tools`). Do no... |
@@ -56,13 +56,13 @@ Current tickets: `[################----]` 25 of 30
 ## Recent activity
 
 - 2026-11-03 12:45 **S2-13** lead note: The first ticket for the tools lane, which runs beside the gcc lane from 2026-11-03 (`--lane tools`). Do not touch the GCC checkout or build.
+- 2026-11-03 12:32 **S2-10** engineer ask: Reproducer: python tools/pm.py show S2-10 still reports type: code. The 12:32 lead answer says the prepared batch and a9952f4 must remain unchanged...
 - 2026-11-03 12:32 **S2-10** lead answer: No red test is needed: this ticket only prepares a batch for the lead to run, so it is not test-driven work. The [red] check is a hard check keyed ...
 - 2026-11-03 12:31 **S2-10** engineer ask: Reproducer: pm.py submit S2-10 refuses no [red] test commit. The 11:20 note assigns build-only handoff; no compiler/runner code changed. Batch is r...
 - 2026-11-03 12:30 **S2-10** lead note: `lane: gcc`, because this ticket builds programs with the shared GCC build, so it must not run beside a GCC rebuild. It no longer waits for S2-12: ...
 - 2026-11-03 12:15 **S2-12** lead note: The lead (Claude) runs every card job, per the owner's 2026-11-03 decision; this ticket has no card access. Submit after T0; the lead runs the card...
 - 2026-11-03 12:14 **S2-12** lead approve: card_run now checks job status on its existing SSH session with backoff to 5 s and opens output connections at most every 10 s (14 for a quiet one-...
 - 2026-11-03 12:13 **S2-12** engineer submit: T0 via tools/run.py and bootstrap Cygwin Python: 3 focused tests passed (fake 60 s job <=15 output SSH connections; reaped/stale_kept result fields...
-- 2026-11-03 12:09 **S2-11** lead approve: tools/card_run now runs programs on the shared Xeon Phi under the owner's card rules (ledger lines, cores 30-59, memory cap, claude- names, other j...
 
 ## Cost
 
