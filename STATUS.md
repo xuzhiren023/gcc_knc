@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-03 11:02.
+Updated automatically at every ticket change. Last update: 2026-11-03 11:03.
 
-**Next: the tech lead, on S2-11.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: GPT-6.1, on S2-11 (card_run follows the shared card rules and runs hello on the card).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
 Current tickets: `[################----]` 23 of 28
 
@@ -49,10 +49,11 @@ Current tickets: `[################----]` 23 of 28
 | S2-08 | hello, scalar FP and printf on the card | draft | Owner approved Sprint 2 on 2026-11-03; this ticket stays draft until the card hold ends. |
 | S2-09 | GCC 16 builds gfortran, and the secondary-reload reproducer passes | Not started | Reconfiguring means one full rebuild: use `make -j8` with `CFLAGS=-O2 -g1 CXXFLAGS=-O2 -g1` as `tools/toolc... |
 | S2-10 | First card runs for the queued native checks | Not started | The owner supplied `config/card.local.json` on 2026-11-03 (git-ignored; the `knownHosts` file is read from ... |
-| S2-11 | card_run follows the shared card rules and runs hello on the card | Question for the tech lead | Owner's decision (2026-11-03): the interactive lead (Claude) runs every card job through tools/card_run; en... |
+| S2-11 | card_run follows the shared card rules and runs hello on the card | In progress | Answered by the owner's decision above: no card access for this session. Implement items (1) to (3) of that... |
 
 ## Recent activity
 
+- 2026-11-03 11:03 **S2-11** lead answer: Answered by the owner's decision above: no card access for this session. Implement items (1) to (3) of that entry red first on the fake transport, ...
 - 2026-11-03 11:02 **S2-11** owner decide: Owner's decision (2026-11-03): the interactive lead (Claude) runs every card job through tools/card_run; engineer sessions never get the card key o...
 - 2026-11-03 10:58 **S2-11** lead escalate: The engineer sandbox cannot reach the card: reading ~/.ssh/xeon_phi_rsa and connecting to 192.168.1.100:22 are both denied (S2_11_hello_probe log; ...
 - 2026-11-03 10:56 **S2-11** engineer ask: 19cf929 is partial GREEN. 18 shared T0 tests passed before final hardening; donor hello built. Native reproducer: python tools/card_run ../_shared/...
@@ -60,13 +61,12 @@ Current tickets: `[################----]` 23 of 28
 - 2026-11-03 10:48 **S2-11** engineer red: RED ae87007: tools/run.py --name S2-11-red wrapped Cygwin python3.12.exe unittest discovery of test_card_shared.py. 18 tests, 21 expected assertion...
 - 2026-11-03 10:43 **S2-06** lead approve: Atomics on KNC now compile at every width with 16-byte operations routed to libatomic (no cmpxchg16b, fences or pause, and no false 16-byte CAS or ...
 - 2026-11-03 10:42 **S2-06** engineer submit: Fixed both atomics dispatch guards with nested getattr in d4424ad; existing red reproduced in check_donor_t0-20261103-104030.log. Ran python tools/...
-- 2026-11-03 10:41 **S2-06** owner decide: Lead decided under the owner's 2026-11-03 delegation: two more engineer sessions (5 in total) for the one-line getattr guard in tools/check.py from...
 
 ## Cost
 
 - From the script, engineer: 89 sessions, 175.7M input tokens
 - From the script, lead: 88 sessions, 32.2M input tokens
-- Started by hand, Claude: 3 sessions, 248.5M input tokens
+- Started by hand, Claude: 3 sessions, 248.8M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
