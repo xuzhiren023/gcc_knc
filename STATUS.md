@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-03 14:32.
+Updated automatically at every ticket change. Last update: 2026-11-03 14:33.
 
-**Waiting for you:** S2-17. Run `python tools/pm.py inbox`.
+**Next: GPT-6.1, on S2-09 (GCC 16 builds gfortran, and the secondary-reload reproducer passes).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
 Current tickets: `[#############-------]` 31 of 46
 
@@ -55,7 +55,7 @@ Current tickets: `[#############-------]` 31 of 46
 | S2-14 | card_run stages extra files, so one job can run a batch | Done | card_run can now stage extra files next to the program with --file (size-capped by maxStageMiB, unsafe or d... |
 | S2-15 | -ffast-math links on KNC with a KNC crtfastmath | Not started | Rewritten after the lead's card run: the donor's FTZ/DAZ write runs on KNC, so the fix provides a matching ... |
 | S2-16 | Card batch files are readable by the lead | Done | Card batch programs are now written 0755 and data files 0644, so the lead can read and stage them; Cygwin n... |
-| S2-17 | card_run tolerates ending processes, and stages batch files correctly | **Waiting for you** | budget: 3263609 input tokens used; the budget is 2000000 |
+| S2-17 | card_run tolerates ending processes, and stages batch files correctly | Changes requested | Lead, under the owner's 2026-11-03 delegation: 4 sessions and 7M tokens (1 session and 3.3M used). Fix only... |
 | S2-18 | The card test driver runs programs in parallel on our 30 cores | Not started | Part of the owner's card-use rule of 2026-11-03 (CURRENT_STATE.md). Later batches should be the full execut... |
 | S3-01 | Packed modes and IMCI patterns in GCC 16: entry points, audit and line estimate | draft |  |
 | S3-02 | One helper for optional tools/check selections | draft |  |
@@ -71,6 +71,7 @@ Current tickets: `[#############-------]` 31 of 46
 
 ## Recent activity
 
+- 2026-11-03 14:33 **S2-17** owner decide: Lead, under the owner's 2026-11-03 delegation: 4 sessions and 7M tokens (1 session and 3.3M used). Fix only the fake-transport timeouts per the 14:...
 - 2026-11-03 14:32 **S2-17** lead escalate: budget: 3263609 input tokens used; the budget is 2000000
 - 2026-11-03 14:31 **S2-17** lead changes: 1. tests/tools/test_card_backend.py:209-211: approve-card failed under Cygwin (log .work/_state/logs/approve_card-20261103-142921.log): test_output...
 - 2026-11-03 14:26 **S3-10** lead note: Per the owner's card-use rule of 2026-11-03, run the full `gcc.c-torture/execute` suite (1,692 programs) at `-O2 -march=knc` in one parallel card j...
@@ -78,13 +79,12 @@ Current tickets: `[#############-------]` 31 of 46
 - 2026-11-03 14:26 **S2-17** engineer submit: Red 072737d reproduced acceptance failures; fix 5e8afe6. Cygwin unittest discovery ran 62 tests: 58 methods passed, four affected methods failed fr...
 - 2026-11-03 14:14 **S2-16** lead approve: Card batch programs are now written 0755 and data files 0644, so the lead can read and stage them; Cygwin no longer turns them into deny entries fo...
 - 2026-11-03 14:13 **S2-16** owner decide: Lead, under the owner's 2026-11-03 delegation: the fix works; the lead read all 257 files and staged them on the card (14:10). Approving.
-- 2026-11-03 14:09 **S2-16** lead escalate: lead session ended without a decision (exit 0)
 
 ## Cost
 
 - From the script, engineer: 116 sessions, 215.1M input tokens
 - From the script, lead: 115 sessions, 39.3M input tokens
-- Started by hand, Claude: 3 sessions, 356.9M input tokens
+- Started by hand, Claude: 3 sessions, 358.9M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
