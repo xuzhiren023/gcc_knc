@@ -1,4 +1,4 @@
-"""S3-04 aligned packed probes, selected with tools/check --vector.
+"""S3 packed probes, selected with tools/check --vector.
 
 Each operation is a separate compilation: a failure cannot hide later probes.
 Native value checks belong to S3-10, not this host-only T1 selection.
@@ -123,6 +123,104 @@ def t1(runner):
     fixtures = {runner.source_dir / ('knc-vec-' + mode + '.c') for mode in MODES}
     runner.t1_sources([source for source in sources if source not in fixtures])
     t1_packed(runner)
+    t1_unaligned(runner)
+
+
+UNALIGNED_CASES = ('unknown', 'unknown_load', 'unknown_store', 'under_member',
+                   'unknown_live')
+PAIR_SUFFIX = dict(zip(MODES, ('ps', 'pd', 'd', 'q')))
+PAIRS = frozenset(prefix + half + suffix
+                  for prefix in ('vloadunpack', 'vpackstore')
+                  for half in ('l', 'h') for suffix in PAIR_SUFFIX.values())
+
+
+def scan_unaligned(assembly, case, mode, body):
+    # Keep the S2 allowlist, adding exactly the full-width pair instructions.
+    failures = allowlist('\n'.join(line for line in assembly.splitlines()
+                                   if not re.match(r'\s*(?:' + '|'.join(PAIRS)
+                                                   + r')\b', line)))
+    if re.search(r'%(?:xmm|ymm)\d|\bvmovups\b|\{z\}', assembly):
+        failures.append('forbidden SSE/AVX or zero-mask form')
+    if not body:
+        return failures + ['missing packed_' + case]
+    ops = list(instructions(body))
+    suffix = PAIR_SUFFIX[mode]
+    for direction, needed in (('load', case != 'unknown_store'),
+                              ('store', case != 'unknown_load')):
+        prefix = 'vloadunpack' if direction == 'load' else 'vpackstore'
+        halves = []
+        for half in ('l', 'h'):
+            matches = [args for op, args in ops if op == prefix + half + suffix]
+            if len(matches) != int(needed):
+                failures.append('%s %s: expected %d %s half, got %d' %
+                                (mode, direction, int(needed), half, len(matches)))
+            halves.append(matches)
+        if not needed or any(len(matches) != 1 for matches in halves):
+            continue
+        decoded = []
+        for matches in halves:
+            args = matches[0]
+            pattern = (r'(-?\d*)\(([^)]+)\),\s*(%zmm\d+)' if direction == 'load'
+                       else r'(%zmm\d+),\s*(-?\d*)\(([^)]+)\)')
+            match = re.fullmatch(pattern, args)
+            if not match:
+                failures.append('unexpected pair operands or mask: ' + args)
+                break
+            displacement, base, reg = (match.groups() if direction == 'load'
+                                        else (match[2], match[3], match[1]))
+            if re.search(r'%(?:rsp|rbp)\b', base):
+                failures.append('packed spill/reload must not use a pair: ' + args)
+            decoded.append((int(displacement or 0), base, reg))
+        if len(decoded) == 2:
+            low, high = decoded
+            if high != (low[0] + 64, low[1], low[2]):
+                failures.append(direction + ': high must use low address + 64 and same zmm')
+            if ops.index((prefix + 'l' + suffix, halves[0][0])) > ops.index(
+                    (prefix + 'h' + suffix, halves[1][0])):
+                failures.append(direction + ': high precedes low')
+    expected = {prefix + half + suffix for prefix in ('vloadunpack', 'vpackstore')
+                for half in ('l', 'h')}
+    if any(op in PAIRS and op not in expected for op, args in ops):
+        failures.append('pair uses the wrong element form')
+    if case in ('unknown_load', 'unknown_store'):
+        # The other pointer still has the original vector's known alignment.
+        move = MODES[mode]
+        known = (r'%zmm\d+,\s*-?\d*\(([^)]+)\)' if case == 'unknown_load'
+                 else r'-?\d*\(([^)]+)\),\s*%zmm\d+')
+        accesses = [re.fullmatch(known, args) for op, args in ops if op == move]
+        if not any(match and not re.search(r'%(?:rsp|rbp)\b', match[1])
+                   for match in accesses):
+            failures.append('known-aligned side must use ' + move)
+    if case == 'unknown_live':
+        failures += spill_scan(body, 1)
+    return failures
+
+
+def t1_unaligned(runner):
+    for mode in MODES:
+        source = runner.source_dir / ('knc-vec-' + mode + '.c')
+        for level in ('-O0', '-O2'):
+            for number, case in enumerate(UNALIGNED_CASES, 11):
+                label = 't1 unaligned %s %s %s' % (mode, level, case)
+                asm = runner.out / (mode + '.s')
+                obj = runner.out / (mode + '.o')
+                try:
+                    result = runner.command(runner.cc, *runner.cc_flags, level,
+                                            '-march=knc', '-DCASE=' + str(number),
+                                            '--sysroot=' + str(runner.sysroot),
+                                            '-S', source, '-o', asm, check=False)
+                    if result.returncode:
+                        failures = ['compile exited %d: %s' %
+                                    (result.returncode, result.stdout[-1600:])]
+                    else:
+                        assembly = asm.read_text()
+                        failures = scan_unaligned(assembly, case, mode,
+                            runner.function_body(assembly, 'packed_' + case))
+                        runner.command(runner.tool('as'), '--march=k1om', asm, '-o', obj)
+                        runner.command(sys.executable, runner.root / 'tools/knc_lint', asm, obj)
+                    runner.result(label, failures)
+                except (OSError, RuntimeError, ValueError) as error:
+                    runner.result(label, [str(error)])
 
 
 def t1_packed(runner):
