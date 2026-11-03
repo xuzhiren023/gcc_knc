@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-03 08:00.
+Updated automatically at every ticket change. Last update: 2026-11-03 08:01.
 
 **Next: GPT-6.1, on S2-03 (Varargs with the donor's register save area).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
@@ -62,7 +62,7 @@ Current tickets: `[###############-----]` 19 of 25
 ## Cost
 
 - From the script, engineer: 73 sessions, 136.4M input tokens
-- From the script, lead: 71 sessions, 26.7M input tokens
+- From the script, lead: 72 sessions, 27.1M input tokens
 - Started by hand, Claude: 3 sessions, 210.3M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
