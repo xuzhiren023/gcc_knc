@@ -9,21 +9,22 @@ FP ABI class requires every compiler error to be the explicit SSE-disabled ABI d
 User inline asm rejected requires every assembler error inside #APP/#NO_APP; source lint must be clean.
 Timeout policy: 60s, then one 600s compiler retry; both exceeded = hang.
 Slow is an additional timing class: retry completed; underlying outcome is counted too.
-Whole-run wall time: 808.426 seconds (13.474 minutes), 8 workers.
+Whole-run wall time: 679.503 seconds (11.325 minutes), 8 workers.
 Files: 2003; measurements: 6009.
 
 level	pass	slow	hang	ICE	compiler error	float/double ABI error	assembler rejection	lint failure	infrastructure failure	user inline asm rejected
-O0	1873	0	0	0	18	110	0	0	0	2
-O2	1877	0	0	0	17	107	0	0	0	2
-O2-g	1877	0	0	0	17	107	0	0	0	2
+O0	1967	0	0	1	33	0	0	0	0	2
+O2	1968	0	0	1	32	0	0	0	0	2
+O2-g	1968	0	0	1	32	0	0	0	0	2
 
 O0 / slow (0)
 
 O0 / hang (0)
 
-O0 / ICE (0)
+O0 / ICE (1)
+pr108892.c
 
-O0 / compiler error (18)
+O0 / compiler error (33)
 20030305-1.c
 20111209-1.c
 asmgoto-5.c
@@ -32,128 +33,33 @@ mipscop-1.c
 mipscop-2.c
 mipscop-3.c
 mipscop-4.c
+pr100305.c
+pr10153-1.c
+pr10153-2.c
 pr106433.c
+pr108237.c
 pr110386-2.c
 pr28865.c
 pr29201.c
+pr33614.c
+pr34856.c
+pr39928-1.c
 pr48767.c
 pr83547.c
 pr86637-2.c
 pr88347.c
 pr89235.c
-pr97576.c
-
-O0 / float/double ABI error (110)
-20000127-1.c
-20000329-1.c
-20000405-1.c
-20000718.c
-20001222-1.c
-20011219-2.c
-20020415-1.c
-20020418-1.c
-20020709-1.c
-20020926-1.c
-20020930-1.c
-20030206-1.c
-20030405-2.c
-20030415-1.c
-20030624-1.c
-20030804-1.c
-20030903-1.c
-20030904-1.c
-20030910-1.c
-20031220-2.c
-20040209-1.c
-20040219-1.c
-20040624-1.c
-20040709-1.c
-20040908-1.c
-20050721-1.c
-20060826-1.c
-20071102-1.c
-20090518-1.c
-20101216-1.c
-20110913-1.c
-20140723-1.c
-20161123-1.c
-20170419-1.c
-20191108-1.c
-920409-2.c
-920410-1.c
-920428-2.c
-920617-1.c
-920723-1.c
-920928-2.c
-921206-1.c
-930217-1.c
-930421-1.c
-930513-2.c
-930611-1.c
-940718-1.c
-960704-1.c
-961010-1.c
-961031-1.c
-980506-2.c
-981007-1.c
-981223-1.c
-991202-1.c
-acc1.c
-attr-complex-method-2.c
-combine-hang.c
-complex-2.c
-complex-3.c
-conv.c
-conv_tst.c
-divdf.c
-f1.c
-fdmul.c
-float.c
-flt_const.c
-mdouble.c
-pr100305.c
-pr10153-1.c
-pr10153-2.c
-pr103376.c
-pr108237.c
-pr110266.c
-pr110444-1.c
-pr118501.c
-pr16808.c
-pr23944.c
-pr30132.c
-pr30311.c
-pr33614.c
-pr34966.c
-pr35595.c
-pr38123.c
-pr39928-1.c
-pr39928-2.c
-pr42196-1.c
-pr42196-2.c
-pr42196-3.c
-pr42196-4.c
-pr46832.c
-pr47150.c
-pr48641.c
-pr52555.c
-pr54428.c
-pr54559.c
-pr55921.c
-pr92449.c
 pr92618.c
-pr97243.c
+pr97576.c
 pr99647.c
-pr99787-1.c
-sra-1.c
-ssa-pre-1.c
-udconvert.c
 vector-1.c
 vector-2.c
 vector-3.c
 vector-5.c
 vector-6.c
 vector-dup-1.c
+
+O0 / float/double ABI error (0)
 
 O0 / assembler rejection (0)
 
@@ -169,9 +75,10 @@ O2 / slow (0)
 
 O2 / hang (0)
 
-O2 / ICE (0)
+O2 / ICE (1)
+pr108892.c
 
-O2 / compiler error (17)
+O2 / compiler error (32)
 20030305-1.c
 20111209-1.c
 dll.c
@@ -179,125 +86,33 @@ mipscop-1.c
 mipscop-2.c
 mipscop-3.c
 mipscop-4.c
+pr100305.c
+pr10153-1.c
+pr10153-2.c
 pr106433.c
+pr108237.c
 pr110386-2.c
 pr28865.c
 pr29201.c
+pr33614.c
+pr34856.c
+pr39928-1.c
 pr48767.c
 pr83547.c
 pr86637-2.c
 pr88347.c
 pr89235.c
-pr97576.c
-
-O2 / float/double ABI error (107)
-20000127-1.c
-20000329-1.c
-20000405-1.c
-20000718.c
-20001222-1.c
-20011219-2.c
-20020415-1.c
-20020418-1.c
-20020709-1.c
-20020926-1.c
-20020930-1.c
-20030206-1.c
-20030405-2.c
-20030415-1.c
-20030624-1.c
-20030804-1.c
-20030903-1.c
-20030904-1.c
-20031220-2.c
-20040209-1.c
-20040219-1.c
-20040624-1.c
-20040709-1.c
-20040908-1.c
-20050721-1.c
-20060826-1.c
-20071102-1.c
-20090518-1.c
-20101216-1.c
-20110913-1.c
-20140723-1.c
-20161123-1.c
-20170419-1.c
-20191108-1.c
-920409-2.c
-920410-1.c
-920428-2.c
-920617-1.c
-920723-1.c
-920928-2.c
-921206-1.c
-930217-1.c
-930421-1.c
-930513-2.c
-930611-1.c
-940718-1.c
-960704-1.c
-961010-1.c
-961031-1.c
-980506-2.c
-981223-1.c
-991202-1.c
-acc1.c
-attr-complex-method-2.c
-combine-hang.c
-complex-2.c
-complex-3.c
-conv.c
-conv_tst.c
-divdf.c
-f1.c
-fdmul.c
-float.c
-flt_const.c
-mdouble.c
-pr100305.c
-pr10153-1.c
-pr10153-2.c
-pr103376.c
-pr108237.c
-pr110266.c
-pr110444-1.c
-pr118501.c
-pr16808.c
-pr23944.c
-pr30132.c
-pr30311.c
-pr33614.c
-pr34966.c
-pr35595.c
-pr38123.c
-pr39928-1.c
-pr39928-2.c
-pr42196-1.c
-pr42196-2.c
-pr42196-3.c
-pr42196-4.c
-pr46832.c
-pr47150.c
-pr48641.c
-pr52555.c
-pr54428.c
-pr54559.c
-pr55921.c
 pr92618.c
-pr97243.c
+pr97576.c
 pr99647.c
-pr99787-1.c
-sra-1.c
-ssa-pre-1.c
-udconvert.c
 vector-1.c
 vector-2.c
 vector-3.c
 vector-5.c
 vector-6.c
 vector-dup-1.c
+
+O2 / float/double ABI error (0)
 
 O2 / assembler rejection (0)
 
@@ -313,9 +128,10 @@ O2-g / slow (0)
 
 O2-g / hang (0)
 
-O2-g / ICE (0)
+O2-g / ICE (1)
+pr108892.c
 
-O2-g / compiler error (17)
+O2-g / compiler error (32)
 20030305-1.c
 20111209-1.c
 dll.c
@@ -323,125 +139,33 @@ mipscop-1.c
 mipscop-2.c
 mipscop-3.c
 mipscop-4.c
+pr100305.c
+pr10153-1.c
+pr10153-2.c
 pr106433.c
+pr108237.c
 pr110386-2.c
 pr28865.c
 pr29201.c
+pr33614.c
+pr34856.c
+pr39928-1.c
 pr48767.c
 pr83547.c
 pr86637-2.c
 pr88347.c
 pr89235.c
-pr97576.c
-
-O2-g / float/double ABI error (107)
-20000127-1.c
-20000329-1.c
-20000405-1.c
-20000718.c
-20001222-1.c
-20011219-2.c
-20020415-1.c
-20020418-1.c
-20020709-1.c
-20020926-1.c
-20020930-1.c
-20030206-1.c
-20030405-2.c
-20030415-1.c
-20030624-1.c
-20030804-1.c
-20030903-1.c
-20030904-1.c
-20031220-2.c
-20040209-1.c
-20040219-1.c
-20040624-1.c
-20040709-1.c
-20040908-1.c
-20050721-1.c
-20060826-1.c
-20071102-1.c
-20090518-1.c
-20101216-1.c
-20110913-1.c
-20140723-1.c
-20161123-1.c
-20170419-1.c
-20191108-1.c
-920409-2.c
-920410-1.c
-920428-2.c
-920617-1.c
-920723-1.c
-920928-2.c
-921206-1.c
-930217-1.c
-930421-1.c
-930513-2.c
-930611-1.c
-940718-1.c
-960704-1.c
-961010-1.c
-961031-1.c
-980506-2.c
-981223-1.c
-991202-1.c
-acc1.c
-attr-complex-method-2.c
-combine-hang.c
-complex-2.c
-complex-3.c
-conv.c
-conv_tst.c
-divdf.c
-f1.c
-fdmul.c
-float.c
-flt_const.c
-mdouble.c
-pr100305.c
-pr10153-1.c
-pr10153-2.c
-pr103376.c
-pr108237.c
-pr110266.c
-pr110444-1.c
-pr118501.c
-pr16808.c
-pr23944.c
-pr30132.c
-pr30311.c
-pr33614.c
-pr34966.c
-pr35595.c
-pr38123.c
-pr39928-1.c
-pr39928-2.c
-pr42196-1.c
-pr42196-2.c
-pr42196-3.c
-pr42196-4.c
-pr46832.c
-pr47150.c
-pr48641.c
-pr52555.c
-pr54428.c
-pr54559.c
-pr55921.c
 pr92618.c
-pr97243.c
+pr97576.c
 pr99647.c
-pr99787-1.c
-sra-1.c
-ssa-pre-1.c
-udconvert.c
 vector-1.c
 vector-2.c
 vector-3.c
 vector-5.c
 vector-6.c
 vector-dup-1.c
+
+O2-g / float/double ABI error (0)
 
 O2-g / assembler rejection (0)
 
@@ -452,15 +176,3 @@ O2-g / infrastructure failure (0)
 O2-g / user inline asm rejected (2)
 920520-1.c; reason: every assembler error is inside #APP/#NO_APP
 920521-1.c; reason: every assembler error is inside #APP/#NO_APP
-
-Non-front-end compiler diagnostic audit (all levels unless noted):
-SSE/AVX/MMX options rejected with knc: pr106433.c, pr110386-2.c,
-  pr89235.c, pr97576.c.
-Foreign cpu tuning: pr88347.c (-mtune=603e).
-Invalid SI pointer mode: 20111209-1.c.
-Invalid MIPS register names: mipscop-1.c, mipscop-2.c, mipscop-3.c, mipscop-4.c.
-Impossible asm constraints: asmgoto-5.c (O0 only).
-Graphite unavailable because isl is absent: pr86637-2.c.
-Other compiler-error files have front-end C diagnostics.
-The float/double ABI class separately lists SSE-disabled return diagnostics.
-pr113322-1.c and pr116348.c pass at all levels with selected options skipped.
