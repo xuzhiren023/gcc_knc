@@ -26,6 +26,8 @@ def t2(runner):
         elif str(runtime) not in link.stdout:
             failures.append('link did not use fork crtfastmath.o')
         runner.result('t2 fast-math ' + ' '.join(flags), failures)
+        if flags != ('-Ofast',):
+            elf.unlink(missing_ok=True)
     if not runtime.is_file():
         runner.result('t2 fast-math MXCSR read-modify-write', ['missing ' + str(runtime)])
         return

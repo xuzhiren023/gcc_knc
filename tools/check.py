@@ -292,7 +292,7 @@ class Runner:
                 self.say('ERROR ' + label + ': ' + str(error))
 
     def t2(self):
-        if self.args.fast_math:
+        if getattr(self.args, 'fast_math', False):
             import fast_math
             fast_math.t2(self)
             return
