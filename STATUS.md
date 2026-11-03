@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-03 00:24.
+Updated automatically at every ticket change. Last update: 2026-11-03 00:29.
 
-**Next: GPT-6.1, on S2-01 (Design for zmm and mask registers under -march=knc).** Run `python tools/dispatch.py`, or ask the tech lead to.
+**Next: the tech lead, on S2-01.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[#############-------]` 17 of 25
 
@@ -39,7 +39,7 @@ Current tickets: `[#############-------]` 17 of 25
 | S1-05 | Integer C assembles with as 2.22 and lints clean | Done | All 2003 GCC torture compile files now build for KNC at -O0, -O2 and -O2 -g and assemble with the card's ol... |
 | S1-06 | K1OM link defaults | Done | GCC 16 now targets the K1OM ABI by default: it passes --march=k1om to as and -m elf_k1om to ld, uses the /l... |
 | S1-07 | Milestone M0 evidence note | Done | M0 is settled as adjust: GCC 16.2 builds a k1om cc1 whose assembly the 2.22 assembler accepts, an options-f... |
-| S2-01 | Design for zmm and mask registers under -march=knc | In progress | Owner approved Sprint 2 on 2026-11-03; ticket set to ready. |
+| S2-01 | Design for zmm and mask registers under -march=knc | Waiting for review | Design note committed; all five acceptance points covered. tools/run.py S2-01-source-review PASS after cita... |
 | S2-02 | Float and double arguments and results in zmm lane 0 | draft | Held as draft until the lead's ADR from S2-01 is in docs/adr/; the lead sets it ready then. |
 | S2-03 | Varargs with the donor's register save area | Not started | Owner approved Sprint 2 on 2026-11-03; ticket set to ready. |
 | S2-04 | Scalar transfers through memory and mask scratch | Not started | Owner approved Sprint 2 on 2026-11-03; ticket set to ready. |
@@ -50,6 +50,7 @@ Current tickets: `[#############-------]` 17 of 25
 
 ## Recent activity
 
+- 2026-11-03 00:29 **S2-01** engineer submit: Design note committed; all five acceptance points covered. tools/run.py S2-01-source-review PASS after citation correction: 133 anchors in 12 fork/...
 - 2026-11-03 00:07 **S2-02** lead note: Held as draft until the lead's ADR from S2-01 is in docs/adr/; the lead sets it ready then.
 - 2026-11-03 00:05 **S2-08** owner decide: Owner approved Sprint 2 on 2026-11-03; this ticket stays draft until the card hold ends.
 - 2026-11-03 00:05 **S2-07** owner decide: Owner approved Sprint 2 on 2026-11-03; ticket set to ready.
@@ -57,13 +58,12 @@ Current tickets: `[#############-------]` 17 of 25
 - 2026-11-03 00:05 **S2-05** owner decide: Owner approved Sprint 2 on 2026-11-03; ticket set to ready.
 - 2026-11-03 00:05 **S2-04** owner decide: Owner approved Sprint 2 on 2026-11-03; ticket set to ready.
 - 2026-11-03 00:05 **S2-03** owner decide: Owner approved Sprint 2 on 2026-11-03; ticket set to ready.
-- 2026-11-03 00:05 **S2-02** owner decide: Owner approved Sprint 2 on 2026-11-03; ticket set to ready.
 
 ## Cost
 
 - From the script, engineer: 62 sessions, 86.7M input tokens
 - From the script, lead: 61 sessions, 21.8M input tokens
-- Started by hand, Claude: 3 sessions, 204.1M input tokens
+- Started by hand, Claude: 3 sessions, 204.6M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
