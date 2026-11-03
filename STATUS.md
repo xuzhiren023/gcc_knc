@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-03 14:38.
+Updated automatically at every ticket change. Last update: 2026-11-03 14:43.
 
-**Next: GPT-6.1, on S2-09 (GCC 16 builds gfortran, and the secondary-reload reproducer passes).** Run `python tools/dispatch.py`, or ask the tech lead to.
+**Next: the tech lead, on S2-09.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[#############-------]` 32 of 46
 
@@ -47,7 +47,7 @@ Current tickets: `[#############-------]` 32 of 46
 | S2-06 | Atomics without cmpxchg16b, spin hint by delay | Done | Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`). |
 | S2-07 | GCC 16 builds its own static libgcc for k1om | Done | GCC 16 now links KNC programs with its own static libgcc, crtbegin and crtend, with no donor files, and its... |
 | S2-08 | hello, scalar FP and printf on the card | Done | The S2-08 card batch is ready: hello, scalar FP with inexact rounding checks, printf, the compare table, th... |
-| S2-09 | GCC 16 builds gfortran, and the secondary-reload reproducer passes | In progress | Reconfiguring means one full rebuild: use `make -j8` with `CFLAGS=-O2 -g1 CXXFLAGS=-O2 -g1` as `tools/toolc... |
+| S2-09 | GCC 16 builds gfortran, and the secondary-reload reproducer passes | Waiting for review | Red 39f5110: C-only flags/missing Fortran. all-gcc provides gfortran/f951; no target libraries built. Full ... |
 | S2-10 | First card runs for the queued native checks | Done | Ten programs ran on the shared Xeon Phi with output identical to their references: hello, the m1_affine fix... |
 | S2-11 | card_run follows the shared card rules and runs hello on the card | Done | tools/card_run now runs programs on the shared Xeon Phi under the owner's card rules (ledger lines, cores 3... |
 | S2-12 | card_run polls the card gently and reports what it reaped | Done | card_run now checks job status on its existing SSH session with backoff to 5 s and opens output connections... |
@@ -71,6 +71,7 @@ Current tickets: `[#############-------]` 32 of 46
 
 ## Recent activity
 
+- 2026-11-03 14:43 **S2-09** engineer submit: Red 39f5110: C-only flags/missing Fortran. all-gcc provides gfortran/f951; no target libraries built. Full rebuild 3736.542 s (configure 59.526, al...
 - 2026-11-03 14:38 **S2-17** lead approve: card_run now skips processes that end mid-snapshot instead of failing the run, keeps a finished program's result, and stages many batch files with ...
 - 2026-11-03 14:36 **S2-17** engineer submit: Fixed only the three local-shell RPC fixtures in tests/tools/test_card_backend.py to use max(timeout, 60), per 14:31 review; product timeouts uncha...
 - 2026-11-03 14:33 **S2-17** owner decide: Lead, under the owner's 2026-11-03 delegation: 4 sessions and 7M tokens (1 session and 3.3M used). Fix only the fake-transport timeouts per the 14:...
@@ -78,7 +79,6 @@ Current tickets: `[#############-------]` 32 of 46
 - 2026-11-03 14:31 **S2-17** lead changes: 1. tests/tools/test_card_backend.py:209-211: approve-card failed under Cygwin (log .work/_state/logs/approve_card-20261103-142921.log): test_output...
 - 2026-11-03 14:26 **S3-10** lead note: Per the owner's card-use rule of 2026-11-03, run the full `gcc.c-torture/execute` suite (1,692 programs) at `-O2 -march=knc` in one parallel card j...
 - 2026-11-03 14:26 **S2-18** lead note: Part of the owner's card-use rule of 2026-11-03 (CURRENT_STATE.md). Later batches should be the full execute suite, not a subset.
-- 2026-11-03 14:26 **S2-17** engineer submit: Red 072737d reproduced acceptance failures; fix 5e8afe6. Cygwin unittest discovery ran 62 tests: 58 methods passed, four affected methods failed fr...
 
 ## Cost
 
@@ -90,4 +90,4 @@ Current tickets: `[#############-------]` 32 of 46
 
 ## Disk
 
-The project uses 7.0 GiB of 100 GiB. 326 GiB free on the drive.
+The project uses 7.4 GiB of 100 GiB. 325 GiB free on the drive.
