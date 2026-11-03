@@ -1,17 +1,17 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-03 09:37.
+Updated automatically at every ticket change. Last update: 2026-11-03 09:38.
 
-**Next: the tech lead, on S2-05.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: GPT-6.1, on S2-06 (Atomics without cmpxchg16b, spin hint by delay).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
-Current tickets: `[################----]` 21 of 26
+Current tickets: `[################----]` 22 of 26
 
 ## Milestones
 
 | | Milestone | State | Progress |
 |---|---|---|---|
 | M0 | Foundation | In progress | 17 of 17 tickets |
-| M1 | Mixed native code | In progress | 4 of 9 tickets |
+| M1 | Mixed native code | In progress | 5 of 9 tickets |
 | M2 | Useful vector target | Not started | Not planned in detail yet |
 | M3 | Runtimes | Not started | Not planned in detail yet |
 | M4 | Broad optimization | Not started | Not planned in detail yet |
@@ -43,7 +43,7 @@ Current tickets: `[################----]` 21 of 26
 | S2-02 | Float and double arguments and results in zmm lane 0 | Done | GCC 16 for KNC now passes float and double arguments and results in zmm lane 0, puts them on the stack afte... |
 | S2-03 | Varargs with the donor's register save area | Done | GCC 16 varargs functions now check %al and save the FP argument registers to the SysV save area at fp_offse... |
 | S2-04 | Scalar transfers through memory and mask scratch | Done | Scalar values now move between general and vector registers through memory with an allocated mask scratch, ... |
-| S2-05 | x87 compares and zmm spill alignment | Waiting for review | Approved tests at ffce091; no GCC edits and shared i386 delta 0. Existing tools/run.py s2-05-t1 check.py t1... |
+| S2-05 | x87 compares and zmm spill alignment | Done | gcc16 now has tests proving it picks the IEEE-correct x87 compare for every float, double and long double c... |
 | S2-06 | Atomics without cmpxchg16b, spin hint by delay | Not started | Owner approved Sprint 2 on 2026-11-03; ticket set to ready. |
 | S2-07 | GCC 16 builds its own static libgcc for k1om | Not started | Owner approved Sprint 2 on 2026-11-03; ticket set to ready. |
 | S2-08 | hello, scalar FP and printf on the card | draft | Owner approved Sprint 2 on 2026-11-03; this ticket stays draft until the card hold ends. |
@@ -51,6 +51,7 @@ Current tickets: `[################----]` 21 of 26
 
 ## Recent activity
 
+- 2026-11-03 09:38 **S2-05** lead approve: gcc16 now has tests proving it picks the IEEE-correct x87 compare for every float, double and long double comparison (quiet fucom for ==, != and is...
 - 2026-11-03 09:37 **S2-05** engineer submit: Approved tests at ffce091; no GCC edits and shared i386 delta 0. Existing tools/run.py s2-05-t1 check.py t1 --compiler gcc16 --x87-spill --worker P...
 - 2026-11-03 09:36 **S2-05** lead approve-red: S2-05 tests approved: gcc16 picks the right x87 compare for every float, double and long double comparison (fucom for ==, != and is*, signaling fco...
 - 2026-11-03 09:35 **S2-05** engineer red: ffce091 corrects tests per lead. tools/run.py s2-05-t1 wrapping check.py t1 --compiler gcc16 --x87-spill --worker PASS: 51 scans, ISA, 2499 host IE...
@@ -58,7 +59,6 @@ Current tickets: `[################----]` 21 of 26
 - 2026-11-03 09:32 **S2-05** engineer red: 735e52a: T1 red, 24 ordered/negated forms use fcom vs donor fucom; review whether strict family parity is intended. Quiet scans pass. Both host emi...
 - 2026-11-03 09:27 **S2-04** lead approve: Scalar values now move between general and vector registers through memory with an allocated mask scratch, even with 14 general registers live, inc...
 - 2026-11-03 09:24 **S2-04** engineer submit: bd4185f / GCC ec5ace1e3c8: red 5f6d762 exposed u64-to-DF O2 and TF O1/O2 reload ICEs. Fixed SUBREG handling via true_regnum; limited memory excepti...
-- 2026-11-03 09:20 **S2-09** lead note: Reconfiguring means one full rebuild: use `make -j8` with `CFLAGS=-O2 -g1 CXXFLAGS=-O2 -g1` as `tools/toolchain.py` does, and poll quietly. Keep `a...
 
 ## Cost
 
