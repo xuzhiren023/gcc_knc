@@ -4,15 +4,21 @@ Raw compile corpus; dg options/skips are not applied; compiler language default 
 Flags: -march=knc -S, plus each level below.
 Assembler: binutils 2.22, --march=k1om.
 Lint: tools/knc_lint source checks and decoded object checks after successful assembly.
-Classes are exclusive: compiler failure, then assembler rejection, then lint failure.
+Outcome classes are exclusive: compiler failure, then assembler rejection, then lint failure.
 FP ABI class requires every compiler error to be the explicit SSE-disabled ABI diagnostic.
-Whole-run wall time: 739.348 seconds (12.322 minutes), 8 workers.
+Timeout policy: 60s, then one 600s compiler retry; both exceeded = hang.
+Slow is an additional timing class: retry completed; underlying outcome is counted too.
+Whole-run wall time: 584.499 seconds (9.742 minutes), 8 workers.
 Files: 2003; measurements: 6009.
 
-level	pass	ICE	compiler error	float/double ABI error	assembler rejection	lint failure	infrastructure failure
-O0	1519	0	387	97	0	0	0
-O2	1522	0	385	95	0	0	1
-O2-g	1522	0	385	95	0	0	1
+level	pass	slow	hang	ICE	compiler error	float/double ABI error	assembler rejection	lint failure	infrastructure failure
+O0	1519	0	0	0	387	97	0	0	0
+O2	1522	1	0	0	386	95	0	0	0
+O2-g	1522	0	0	0	386	95	0	0	0
+
+O0 / slow (0)
+
+O0 / hang (0)
 
 O0 / ICE (0)
 
@@ -510,9 +516,14 @@ O0 / lint failure (0)
 
 O0 / infrastructure failure (0)
 
+O2 / slow (1)
+pr110386-2.c	121.119s including timeout/retry; outcome: compiler error
+
+O2 / hang (0)
+
 O2 / ICE (0)
 
-O2 / compiler error (385)
+O2 / compiler error (386)
 20000120-2.c
 20000403-1.c
 20000511-1.c
@@ -791,6 +802,7 @@ pr100241-1.c
 pr100576.c
 pr106101.c
 pr106433.c
+pr110386-2.c	121.119s including timeout/retry
 pr113616.c
 pr115143-2.c
 pr115143-3.c
@@ -1000,12 +1012,15 @@ O2 / assembler rejection (0)
 
 O2 / lint failure (0)
 
-O2 / infrastructure failure (1)
-pr110386-2.c
+O2 / infrastructure failure (0)
+
+O2-g / slow (0)
+
+O2-g / hang (0)
 
 O2-g / ICE (0)
 
-O2-g / compiler error (385)
+O2-g / compiler error (386)
 20000120-2.c
 20000403-1.c
 20000511-1.c
@@ -1284,6 +1299,7 @@ pr100241-1.c
 pr100576.c
 pr106101.c
 pr106433.c
+pr110386-2.c
 pr113616.c
 pr115143-2.c
 pr115143-3.c
@@ -1493,5 +1509,4 @@ O2-g / assembler rejection (0)
 
 O2-g / lint failure (0)
 
-O2-g / infrastructure failure (1)
-pr110386-2.c
+O2-g / infrastructure failure (0)
