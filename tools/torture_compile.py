@@ -5,8 +5,8 @@ One command: python tools/run.py --name S1-05-torture -- python tools/torture_co
 
 The default run writes detailed failures under
 .work/_shared/torture-compile and a small tracked classification summary.
-Append each source's dg-options and dg-additional-options in source order.
-Other dg directives, including target selectors and skips, are not interpreted.
+Append unselected dg-options and dg-additional-options in source order.
+Option directives with a target selector are skipped; other dg directives are ignored.
 """
 import argparse
 from collections import Counter
@@ -29,7 +29,45 @@ BUILD = SHARED / 'gcc-build/gcc'
 CORPUS = SHARED / 'gcc/gcc/testsuite/gcc.c-torture/compile'
 LEVELS = {'O0': ['-O0'], 'O2': ['-O2'], 'O2-g': ['-O2', '-g']}
 CLASSES = ('pass', 'slow', 'hang', 'ICE', 'compiler error', 'float/double ABI error',
-           'assembler rejection', 'lint failure', 'infrastructure failure')
+           'assembler rejection', 'lint failure', 'infrastructure failure',
+           'user inline asm rejected')
+
+
+def user_asm_rejection(asm, diagnostics):
+    """Require every as error location to resolve only to #APP block lines.
+
+    GAS reports logical source locations from GCC's # line markers, so track
+    those as well as physical assembly locations. Ambiguous/unlocated errors
+    remain assembler rejections rather than hiding generated-code failures.
+    """
+    locations = {}
+    inside = False
+    filename, number = str(asm), 1
+    for physical, line in enumerate(asm.read_text().splitlines(), 1):
+        marker = re.fullmatch(r'\s*#\s*(\d+)(?:\s+"([^"]*)")?(?:\s+.*)?', line)
+        if marker:
+            number = int(marker[1])
+            if marker[2] is not None:
+                filename = marker[2]
+            if not number:
+                filename, number = str(asm), physical + 1
+            continue
+        if line.strip() == '#APP':
+            inside = True
+        elif line.strip() == '#NO_APP':
+            inside = False
+        elif line.strip() and not line.lstrip().startswith('#'):
+            for location in ((str(asm), physical), (filename, number)):
+                locations.setdefault(location, set()).add(inside)
+        number += 1
+    errors = [line for line in diagnostics.splitlines() if re.search(r'\bError:', line)]
+    if not errors:
+        return False
+    for error in errors:
+        match = re.match(r'^(.*):(\d+):\s*(?:Fatal )?Error:', error)
+        if not match or locations.get((match[1], int(match[2]))) != {True}:
+            return False
+    return True
 
 
 class CompilerHang(Exception):
@@ -73,8 +111,10 @@ def main():
         raise RuntimeError('empty torture corpus')
     options = {
         source: [flag for match in re.finditer(
-            r'\{\s*dg-(?:additional-)?options\s+(?:"([^"\n]*)"|([^\s{}]+))',
+            r'\{\s*dg-(?:additional-)?options\s+(?:"([^"\n]*)"|([^\s{}]+))'
+            r'(\s*\{\s*target\b)?',
             source.read_text(encoding='utf8', errors='replace'))
+                 if match[3] is None
                  for flag in shlex.split(match[1] if match[1] is not None else match[2])]
         for source in sources
     }
@@ -145,7 +185,10 @@ def main():
                 assembled = invoke([TC / 'cross/bin/k1om-mpss-linux-as',
                                     '--march=k1om', asm, '-o', obj])
                 if assembled.returncode:
-                    kind = 'assembler rejection'
+                    kind = ('user inline asm rejected' if user_asm_rejection(asm, assembled.stdout)
+                            else 'assembler rejection')
+                    if violations:
+                        kind = 'lint failure'
                 else:
                     violations.extend(lint['decoded_violations'](
                         obj, TC / 'cross/bin/k1om-mpss-linux-objdump', env))
@@ -163,7 +206,7 @@ def main():
             diagnostic.append('elapsed including initial timeout and retry: %.3fs' % seconds)
         if kind != 'pass' or retried:
             log.write_text('\n'.join(diagnostic), encoding='utf8')
-        if kind not in ('assembler rejection', 'lint failure', 'ICE'):
+        if kind not in ('assembler rejection', 'user inline asm rejected', 'lint failure', 'ICE'):
             asm.unlink(missing_ok=True)
         if kind != 'lint failure':
             obj.unlink(missing_ok=True)
@@ -182,12 +225,13 @@ def main():
                   if seconds is not None and kind not in ('hang', 'infrastructure failure'))
     lines = ['GCC 16 KNC C torture compile corpus (S1-05)',
              'Scope: ' + (str(args.source) if args.source else 'gcc/testsuite/gcc.c-torture/compile/**/*.c'),
-             'dg-options and dg-additional-options are appended; other dg directives/selectors/skips are not applied.',
+             'dg-options and dg-additional-options without target selectors are appended; selected directives are skipped.',
              'Flags: -march=knc -S, plus each level below.',
              'Assembler: binutils 2.22, --march=k1om.',
              'Lint: tools/knc_lint source checks and decoded object checks after successful assembly.',
              'Outcome classes are exclusive: compiler failure, then assembler rejection, then lint failure.',
              'FP ABI class requires every compiler error to be the explicit SSE-disabled ABI diagnostic.',
+             'User inline asm rejected requires every assembler error inside #APP/#NO_APP; source lint must be clean.',
              'Timeout policy: %.0fs, then one %.0fs compiler retry; both exceeded = hang.' %
              (args.timeout, args.retry_timeout),
              'Slow is an additional timing class: retry completed; underlying outcome is counted too.',
@@ -197,9 +241,12 @@ def main():
              'level\t' + '\t'.join(CLASSES)]
     for level in levels:
         lines.append(level + '\t' + '\t'.join(str(counts[level, kind]) for kind in CLASSES))
+    table_end = len(lines)
     for level in levels:
         for kind in CLASSES[1:]:
             names = sorted(name + ('\t%.3fs including timeout/retry' % seconds if seconds is not None else '') +
+                           ('; reason: every assembler error is inside #APP/#NO_APP' if
+                            kind == 'user inline asm rejected' else '') +
                            ('; outcome: ' + cls if kind == 'slow' else '')
                            for lev, cls, name, seconds in results if lev == level and
                            (cls == kind or (kind == 'slow' and seconds is not None and
@@ -207,7 +254,7 @@ def main():
             lines.extend(['', '%s / %s (%d)' % (level, kind, len(names)), *names])
     args.summary.parent.mkdir(parents=True, exist_ok=True)
     args.summary.write_text('\n'.join(lines) + '\n', encoding='utf8')
-    print('\n'.join(lines[:len(levels) + 14]), flush=True)
+    print('\n'.join(lines[:table_end]), flush=True)
     print('Summary: ' + str(args.summary), flush=True)
     print('Detailed failures: ' + str(args.output), flush=True)
     return int(any(counts[level, kind] for level in levels for kind in
