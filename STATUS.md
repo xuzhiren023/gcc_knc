@@ -1,17 +1,17 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-03 13:34.
+Updated automatically at every ticket change. Last update: 2026-11-03 13:35.
 
-**Next: the tech lead, on S2-08.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: GPT-6.1, on S2-09 (GCC 16 builds gfortran, and the secondary-reload reproducer passes).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
-Current tickets: `[#############-------]` 29 of 42
+Current tickets: `[##############------]` 30 of 42
 
 ## Milestones
 
 | | Milestone | State | Progress |
 |---|---|---|---|
 | M0 | Foundation | In progress | 17 of 17 tickets |
-| M1 | Mixed native code | In progress | 12 of 25 tickets |
+| M1 | Mixed native code | In progress | 13 of 25 tickets |
 | M2 | Useful vector target | Not started | Not planned in detail yet |
 | M3 | Runtimes | Not started | Not planned in detail yet |
 | M4 | Broad optimization | Not started | Not planned in detail yet |
@@ -46,7 +46,7 @@ Current tickets: `[#############-------]` 29 of 42
 | S2-05 | x87 compares and zmm spill alignment | Done | gcc16 now has tests proving it picks the IEEE-correct x87 compare for every float, double and long double c... |
 | S2-06 | Atomics without cmpxchg16b, spin hint by delay | Done | Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`). |
 | S2-07 | GCC 16 builds its own static libgcc for k1om | Done | GCC 16 now links KNC programs with its own static libgcc, crtbegin and crtend, with no donor files, and its... |
-| S2-08 | hello, scalar FP and printf on the card | Waiting for review | a26810c: dynamic shared-sysroot glibc driver, no PhiWeather path/-static/--trace; readelf INTERP and libc.s... |
+| S2-08 | hello, scalar FP and printf on the card | Done | The S2-08 card batch is ready: hello, scalar FP with inexact rounding checks, printf, the compare table, th... |
 | S2-09 | GCC 16 builds gfortran, and the secondary-reload reproducer passes | Not started | Reconfiguring means one full rebuild: use `make -j8` with `CFLAGS=-O2 -g1 CXXFLAGS=-O2 -g1` as `tools/toolc... |
 | S2-10 | First card runs for the queued native checks | Done | Ten programs ran on the shared Xeon Phi with output identical to their references: hello, the m1_affine fix... |
 | S2-11 | card_run follows the shared card rules and runs hello on the card | Done | tools/card_run now runs programs on the shared Xeon Phi under the owner's card rules (ledger lines, cores 3... |
@@ -67,6 +67,7 @@ Current tickets: `[#############-------]` 29 of 42
 
 ## Recent activity
 
+- 2026-11-03 13:35 **S2-08** lead approve: The S2-08 card batch is ready: hello, scalar FP with inexact rounding checks, printf, the compare table, the libgcc helpers and 256 torture program...
 - 2026-11-03 13:34 **S2-08** engineer submit: a26810c: dynamic shared-sysroot glibc driver, no PhiWeather path/-static/--trace; readelf INTERP and libc.so.6 PASS. Scalar donor/GCC16 twins rebui...
 - 2026-11-03 13:33 **S2-08** lead changes: 1. tools/prepare_s2_08.py:120-124: the static driver links static glibc from an absolute path into the PhiWeather folder. This project must not dep...
 - 2026-11-03 13:32 **S2-08** engineer submit: 781c90d: batch ready .work/_shared/tmp/S2-08/batch.txt. GCC16 own libgcc; hello/scalar/printf + donor twins, compare and helper programs, 9 expecte...
@@ -74,7 +75,6 @@ Current tickets: `[#############-------]` 29 of 42
 - 2026-11-03 13:25 **S2-07** owner decide: Lead, under the owner's 2026-11-03 delegation: native comparison passed (13:23 note). Review item (1): the donor libgcc.a also uses stmxcsr (22 tim...
 - 2026-11-03 13:24 **S2-07** lead escalate: Interactive lead: T2 review of f351d2d/e682e23a0e7 found nothing blocking. Approve waits only on native: in a card session run python tools/libgcc....
 - 2026-11-03 13:23 **S2-07** lead note: Native item done by the interactive lead: donor-libgcc.mic and gcc16-libgcc.mic from .work/_shared/tmp/S2-07 ran on the card through the merged too...
-- 2026-11-03 13:22 **S2-14** lead approve: card_run can now stage extra files next to the program with --file (size-capped by maxStageMiB, unsafe or duplicate names refused before admission)...
 
 ## Cost
 
