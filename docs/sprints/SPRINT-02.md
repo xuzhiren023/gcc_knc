@@ -33,12 +33,23 @@ The work is in tickets, in `work/tickets/S2-*.md`, in this order:
 
 ## Sprint exit
 
-- [ ] S2-01 to S2-07 and S2-09 approved and merged, or explicitly returned to the backlog
-- [ ] S2-08 done, or returned to the backlog if the card is still on hold
-- [ ] `CURRENT_STATE.md` updated, and the GCC `knc` branch is ready for the owner to push
-- [ ] Sprint 3 refined from E3
-- [ ] Three-line retro below
+- [x] S2-01 to S2-07 and S2-09 approved and merged, or explicitly returned to the backlog. Also
+  merged: S2-10 to S2-19 (card batches, the card runner under the shared-card rules, parallel
+  card tests, and `-ffast-math`), all added inside the sprint goal under the owner's delegation
+- [x] S2-08 done: the lead ran its batch on the card on 2026-11-03 (8 programs and 256 of 256
+  `gcc.c-torture/execute` programs pass)
+- [x] `CURRENT_STATE.md` updated, and the GCC `knc` branch is ready for the owner to push
+- [x] Sprint 3 refined from E3 (`docs/sprints/SPRINT-03.md`, S3-01 to S3-11, ADR-0005 Proposed)
+- [x] Three-line retro below
 
 ## Retro
 
-*(at close)*
+- **Worked:** owner delegation and two lanes cut the stops; card runs by the lead found no compiler
+  bug in 18 programs and 256 torture tests, while review caught real wrong-code holes before
+  merge (S2-02 vector ABI, S2-04 reload bridges, S2-06 16-byte CAS macro).
+- **Cost:** the card runner took about 8 rounds (S2-11 to S2-19) because no BusyBox exists on the
+  host and every fake passed while the card differed; the full GCC rebuild grew from 23 to about
+  62 minutes with Fortran (not yet measured again); S2 used about 147M GPT input tokens.
+- **Lead mistakes:** raised sessions without tokens (two extra stops), reported 200 shared lines
+  where 251 were used, guessed note times, and guessed that the donor's `crtfastmath` faults
+  before testing it. Check both budgets, measure counts, run `date`, and test before claiming.
