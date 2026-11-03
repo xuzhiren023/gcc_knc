@@ -215,13 +215,15 @@ class RemoteReview(unittest.TestCase):
                 wrappers += '\nsleep() { :; }\nkill() { echo unexpected-signal >&2; return 99; }'
                 script = self.remote.replace("/tmp/claude", str(parent)).replace(
                     "/proc/", str(self.proc) + "/")
+                cwd = self.directory if operation == "reap_stale" else run_dir
                 try:
                     answer = self.shell(script + "\n" + wrappers +
-                                        '\nrun_dir="%s"\nboot_id="%s"\ncd -- "$run_dir"\n%s\n' %
-                                        (run_dir, BOOT, operation), timeout=10)
+                                        '\nrun_dir="%s"\nboot_id="%s"\ncd -- "%s"\n%s\n' %
+                                        (run_dir, BOOT, cwd, operation), timeout=10)
                 except subprocess.TimeoutExpired:
                     answer = None
                 commands = counter.read_text().splitlines()
+                remaining = run_dir.exists()
                 # Keep the next subcase independent even when stop_owned keeps cwd.
                 if run_dir.exists():
                     run_dir.rmdir()
@@ -231,6 +233,7 @@ class RemoteReview(unittest.TestCase):
                 self.assertEqual(answer.returncode, 0, answer.stderr)
                 self.assertNotIn(b"unexpected-signal", answer.stderr)
                 self.assertEqual((foreign / "output").read_text(), "keep")
+                self.assertEqual(remaining, operation == "stop_owned")
 
     def test_remote_deadline_names_snapshot(self):
         session = self.runner["SSHSession"]([shutil.which("sh")], "/unused", 1)

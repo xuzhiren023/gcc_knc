@@ -92,6 +92,11 @@ which foreign processes are reported, never whether work may run.
   One numeric `ls` reads all user-process executable/cwd links and one `awk`
   joins them to identities. No snapshot forks `readlink` or a subshell per PID;
   the fake `/proc` test counts external commands with 300 kernel threads.
+  Cleanup and stale recovery also skip PID 2 and PPid 2 using shell reads
+  before inspecting executable/cwd links. Kernel-thread links can exist as
+  dangling symlinks, so their presence alone cannot identify a user process.
+  Command-count tests cover all cleanup passes and stale recovery with 300
+  such threads.
   Signals target only processes in our exact directory, rechecking identity after the boot guard, never by broad name/group.
   Guarded TERM/KILL cleanup removes our exact staging directory. Stdout/stderr are copied back in bounded chunks before normal
   cleanup. A separate HUP-ignoring watchdog applies the same guards after the
@@ -104,11 +109,13 @@ which foreign processes are reported, never whether work may run.
   process with its executable or cwd in a candidate keeps it; stale recovery
   never signals processes. Foreign names and symlinks are left untouched.
 - Recheck boot ID before execution, after execution and before any signal or
-  removal. A changed boot or a card still unreachable on one reconnect is an
+  removal. A changed boot or a failed connection on the one reconnect is an
   infrastructure failure: append `card-fault`, then finish. An ordinary remote
   command failure or a recovered connection on the same boot records only
   `infrastructure-failure` in the finish line. Do not signal/remove on an
-  unknown or changed boot. A reconnected shell checks the original boot before
+  unknown or changed boot. A deadline during signalling or cleanup after a
+  successful reconnect is infrastructure, without a `card-fault` line.
+  A reconnected shell checks the original boot before
   entering the exact existing job directory to clean it; it never restages or
   executes the job. Report confirmed faults on the ticket so the lead can
   escalate. The watchdog also refuses destructive operations on another boot.

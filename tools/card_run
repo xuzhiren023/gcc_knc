@@ -233,10 +233,13 @@ def run(program, argv, *, lock_path, external_locks, baseline_names, timeout,
                     session = None
                     try:
                         session = transport.connect(run_dir, timeout=transport_timeout)
-                        finish_remote()
                     except ConnectionError:
                         card_fault = True
                         raise
+                    # Only a failed connect establishes unreachability. A later
+                    # deadline on this session is infrastructure; snapshot()
+                    # independently records a confirmed boot-ID change.
+                    finish_remote()
             except (OSError, ValueError) as error:
                 failure("infrastructure", INFRA_EXIT, "%s; cleanup incomplete: %s" % (result["detail"], error))
             finally:

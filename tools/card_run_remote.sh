@@ -18,7 +18,14 @@ check_boot() {
 guard_boot() { guard_dir && check_boot; }
 owned_pid() {
     [ "$1" != "$$" ] || return 1
-    # Kernel threads have neither link. Do not fork utilities for them.
+    # Kernel-thread exe/cwd links exist to lstat but cannot be followed.
+    # Read identity with shell builtins before any readlink/subshell per PID.
+    [ "$1" != 2 ] || return 1
+    pid_ppid=
+    while read -r pid_key pid_value pid_rest; do
+        if [ "$pid_key" = PPid: ]; then pid_ppid=$pid_value; break; fi
+    done < "/proc/$1/status" 2>/dev/null
+    [ -n "$pid_ppid" ] && [ "$pid_ppid" != 2 ] || return 1
     [ -L "/proc/$1/exe" ] || [ -L "/proc/$1/cwd" ] || return 1
     pid_exe=$(readlink "/proc/$1/exe" 2>/dev/null)
     pid_cwd=$(readlink "/proc/$1/cwd" 2>/dev/null)
