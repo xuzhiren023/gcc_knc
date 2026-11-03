@@ -56,7 +56,7 @@ Current tickets: `[#############-------]` 32 of 46
 | S2-15 | -ffast-math links on KNC with a KNC crtfastmath | Not started | Rewritten after the lead's card run: the donor's FTZ/DAZ write runs on KNC, so the fix provides a matching ... |
 | S2-16 | Card batch files are readable by the lead | Done | Card batch programs are now written 0755 and data files 0644, so the lead can read and stage them; Cygwin n... |
 | S2-17 | card_run tolerates ending processes, and stages batch files correctly | Done | card_run now skips processes that end mid-snapshot instead of failing the run, keeps a finished program's r... |
-| S2-18 | The card test driver runs programs in parallel on our 30 cores | In progress | Part of the owner's card-use rule of 2026-11-03 (CURRENT_STATE.md). Later batches should be the full execut... |
+| S2-18 | The card test driver runs programs in parallel on our 30 cores | Question for the tech lead | Host acceptance passes and docs are complete (commits 0941801, d499bbf), but submit refuses 413 changed lin... |
 | S3-01 | Packed modes and IMCI patterns in GCC 16: entry points, audit and line estimate | draft |  |
 | S3-02 | One helper for optional tools/check selections | draft |  |
 | S3-03 | Native probe of unaligned pairs and masked aligned forms at page boundaries | draft |  |
@@ -71,6 +71,7 @@ Current tickets: `[#############-------]` 32 of 46
 
 ## Recent activity
 
+- 2026-11-03 14:43 **S2-18** engineer ask: Host acceptance passes and docs are complete (commits 0941801, d499bbf), but submit refuses 413 changed lines against the 300-line budget. Changes ...
 - 2026-11-03 14:43 **S2-09** engineer submit: Red 39f5110: C-only flags/missing Fortran. all-gcc provides gfortran/f951; no target libraries built. Full rebuild 3736.542 s (configure 59.526, al...
 - 2026-11-03 14:38 **S2-17** lead approve: card_run now skips processes that end mid-snapshot instead of failing the run, keeps a finished program's result, and stages many batch files with ...
 - 2026-11-03 14:36 **S2-17** engineer submit: Fixed only the three local-shell RPC fixtures in tests/tools/test_card_backend.py to use max(timeout, 60), per 14:31 review; product timeouts uncha...
@@ -78,7 +79,6 @@ Current tickets: `[#############-------]` 32 of 46
 - 2026-11-03 14:32 **S2-17** lead escalate: budget: 3263609 input tokens used; the budget is 2000000
 - 2026-11-03 14:31 **S2-17** lead changes: 1. tests/tools/test_card_backend.py:209-211: approve-card failed under Cygwin (log .work/_state/logs/approve_card-20261103-142921.log): test_output...
 - 2026-11-03 14:26 **S3-10** lead note: Per the owner's card-use rule of 2026-11-03, run the full `gcc.c-torture/execute` suite (1,692 programs) at `-O2 -march=knc` in one parallel card j...
-- 2026-11-03 14:26 **S2-18** lead note: Part of the owner's card-use rule of 2026-11-03 (CURRENT_STATE.md). Later batches should be the full execute suite, not a subset.
 
 ## Cost
 
