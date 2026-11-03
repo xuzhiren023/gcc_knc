@@ -246,7 +246,7 @@ class Runner:
                         if (found if kind == 'scan-asm-not' else not found):
                             failures.append(kind + (' ' + name if name else '') + ': ' + pattern)
                             break
-                    if not failures and not output_only:
+                    if not output_only:
                         self.command(self.tool('as'), '--march=k1om', asm, '-o', obj)
                         self.command(sys.executable, ROOT / 'tools/knc_lint', asm, obj)
                 self.result(label, failures)
