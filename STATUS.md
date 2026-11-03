@@ -2,7 +2,7 @@
 
 Updated automatically at every ticket change. Last update: 2026-11-03 15:19.
 
-**Next: GPT-6.1, on S3-03 (Native probe of unaligned pairs and masked aligned forms at page boundaries).** Run `python tools/dispatch.py`, or ask the tech lead to.
+**Next: GPT-6.1, on S3-01 (Packed modes and IMCI patterns in GCC 16: entry points, audit and line estimate).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
 Current tickets: `[###############-----]` 37 of 47
 
@@ -58,7 +58,7 @@ Current tickets: `[###############-----]` 37 of 47
 | S2-17 | card_run tolerates ending processes, and stages batch files correctly | Done | card_run now skips processes that end mid-snapshot instead of failing the run, keeps a finished program's r... |
 | S2-18 | The card test driver runs programs in parallel on our 30 cores | Done | Card line ticked: the 256-program torture batch passed 256 of 256 on the card with `-j 30` (`docs/research/... |
 | S2-19 | The card snapshot's awk runs under BusyBox | Done | The card runner's process snapshot no longer trips BusyBox awk, and a T0 test now rejects any card awk line... |
-| S3-01 | Packed modes and IMCI patterns in GCC 16: entry points, audit and line estimate | Not started | Intel 327364-001 (Xeon Phi Coprocessor ISA Reference Manual, 7 September 2012, 725 pages) is at `.work/_sha... |
+| S3-01 | Packed modes and IMCI patterns in GCC 16: entry points, audit and line estimate | In progress | Intel 327364-001 (Xeon Phi Coprocessor ISA Reference Manual, 7 September 2012, 725 pages) is at `.work/_sha... |
 | S3-02 | One helper for optional tools/check selections | Done | tools/check optional selections now come from one table, several flags given together all run and each repo... |
 | S3-03 | Native probe of unaligned pairs and masked aligned forms at page boundaries | In progress | Yes, you're right: a 64-byte aligned full vector can't span pages, so that criterion is impossible as writt... |
 | S3-04 | Packed modes legal under -march=knc, with aligned moves, spills and constants | Not started | Owner approved Sprint 3 on 2026-11-03; ticket set to ready. |
