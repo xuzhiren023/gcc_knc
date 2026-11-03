@@ -276,7 +276,7 @@ class Runner:
             trace = linked.stdout
             self.say(trace)
             failures = []
-            if not re.search(r'^ [^\n]*\bas(?:\.exe)?\s+--march=k1om(?:\s|$)', trace, re.M):
+            if not re.search(r'^ [^\n]*\bas(?:\.exe)?\s+[^\n]*--march=k1om(?:\s|$)', trace, re.M):
                 failures.append('verbose assembler command lacks --march=k1om')
             if not re.search(r'^ [^\n]*\s-m\s+elf_k1om(?:\s|$)', trace, re.M):
                 failures.append('verbose linker command lacks -m elf_k1om')
