@@ -41,7 +41,7 @@ Current tickets: `[###############-----]` 19 of 25
 | S1-07 | Milestone M0 evidence note | Done | M0 is settled as adjust: GCC 16.2 builds a k1om cc1 whose assembly the 2.22 assembler accepts, an options-f... |
 | S2-01 | Design for zmm and mask registers under -march=knc | Done | The register design for KNC is settled on paper: all 32 zmm and 8 mask registers become usable under -march... |
 | S2-02 | Float and double arguments and results in zmm lane 0 | Done | GCC 16 for KNC now passes float and double arguments and results in zmm lane 0, puts them on the stack afte... |
-| S2-03 | Varargs with the donor's register save area | Not started | Follow docs/adr/0004-knc-registers-and-scalar-abi.md, point 4: 16-byte slots through TI transport, %al test... |
+| S2-03 | Varargs with the donor's register save area | In progress | Follow docs/adr/0004-knc-registers-and-scalar-abi.md, point 4: 16-byte slots through TI transport, %al test... |
 | S2-04 | Scalar transfers through memory and mask scratch | Not started | Follow docs/adr/0004-knc-registers-and-scalar-abi.md, point 6: an allocated GPR scratch and an HI mask pseu... |
 | S2-05 | x87 compares and zmm spill alignment | Not started | Follow docs/adr/0004-knc-registers-and-scalar-abi.md, point 2: XI spills need 64-byte storage. This ticket ... |
 | S2-06 | Atomics without cmpxchg16b, spin hint by delay | Not started | Owner approved Sprint 2 on 2026-11-03; ticket set to ready. |
