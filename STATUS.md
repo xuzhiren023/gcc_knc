@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-03 11:46.
+Updated automatically at every ticket change. Last update: 2026-11-03 11:47.
 
-**Waiting for you:** S2-11. Run `python tools/pm.py inbox`.
+**Next: the tech lead, on S2-11.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[################----]` 23 of 28
 
@@ -49,10 +49,11 @@ Current tickets: `[################----]` 23 of 28
 | S2-08 | hello, scalar FP and printf on the card | draft | Owner approved Sprint 2 on 2026-11-03; this ticket stays draft until the card hold ends. |
 | S2-09 | GCC 16 builds gfortran, and the secondary-reload reproducer passes | Not started | Reconfiguring means one full rebuild: use `make -j8` with `CFLAGS=-O2 -g1 CXXFLAGS=-O2 -g1` as `tools/toolc... |
 | S2-10 | First card runs for the queued native checks | Not started | Owner's decision of 2026-11-03: the interactive lead runs every card job; engineer sessions have no card ac... |
-| S2-11 | card_run follows the shared card rules and runs hello on the card | **Waiting for you** | Review of 5ede60d is clean: owned_pid skips PID 2 and PPid-2 kernel threads by shell read before any readli... |
+| S2-11 | card_run follows the shared card rules and runs hello on the card | Waiting for review | Lead, under the owner's 2026-11-03 delegation: lead's native run follows as review changes. |
 
 ## Recent activity
 
+- 2026-11-03 11:47 **S2-11** owner decide: Lead, under the owner's 2026-11-03 delegation: lead's native run follows as review changes.
 - 2026-11-03 11:46 **S2-11** lead escalate: Review of 5ede60d is clean: owned_pid skips PID 2 and PPid-2 kernel threads by shell read before any readlink (T0 counts commands with 300 dangling...
 - 2026-11-03 11:44 **S2-11** engineer submit: GREEN 5ede60d; RED bc5da64. Fixed kernel-thread forks in owned_pid and false faults after successful reconnect. Added dangling-link/300-thread comm...
 - 2026-11-03 11:39 **S2-11** owner decide: Lead, under the owner's 2026-11-03 delegation: allow a fifth round for the two 11:38 findings (kernel-thread forks in owned_pid/stop_owned/reap, an...
@@ -60,13 +61,12 @@ Current tickets: `[################----]` 23 of 28
 - 2026-11-03 11:34 **S2-11** engineer submit: GREEN 24cefc3/27ef954; RED e1e5cf8/8ef9669. Snapshot command counts, named stderr diagnostics, confirmed faults, one guarded cleanup reconnect and ...
 - 2026-11-03 11:25 **S2-11** owner decide: Lead, under the owner's 2026-11-03 delegation: allow a fourth round for the native-run findings above.
 - 2026-11-03 11:25 **S2-11** lead escalate: over 2 review rounds: Native run of 61a8a62 by the lead, 2026-11-03 (receipts in the lead's scratchpad; ledger lines for claude-795fee36... in jobs...
-- 2026-11-03 11:25 **S2-11** owner decide: Lead, under the owner's 2026-11-03 delegation: the lead ran the native hello itself; findings follow as review changes.
 
 ## Cost
 
 - From the script, engineer: 96 sessions, 183.4M input tokens
 - From the script, lead: 95 sessions, 34.7M input tokens
-- Started by hand, Claude: 3 sessions, 258.2M input tokens
+- Started by hand, Claude: 3 sessions, 259.7M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
