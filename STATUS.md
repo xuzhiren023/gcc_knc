@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-02 20:59.
+Updated automatically at every ticket change. Last update: 2026-11-02 21:46.
 
-**Next: GPT-6.1, on S1-05 (Integer C assembles with as 2.22 and lints clean).** Run `python tools/dispatch.py`, or ask the tech lead to.
+**Next: the tech lead, on S1-05.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[################----]` 14 of 17
 
@@ -36,12 +36,13 @@ Current tickets: `[################----]` 14 of 17
 | S1-02 | GCC 16.2 builds for k1om-mpss-linux | Done | GCC 16.2 now configures and builds its C compiler for k1om-mpss-linux, using the shared KNC assembler, link... |
 | S1-03 | tools/check runs source-level tests against GCC 16 | Done | tools/check t1 --compiler gcc16 now compiles each tests/t1/*.c test and checks its scan, scan-not, per-func... |
 | S1-04 | -march=knc with no SSE, AVX, MMX, CMOV, FCOMI or MFENCE | Done | GCC 16 now accepts -march=knc (the k1om default): it predefines __KNC__ and no SSE/MMX/AVX macros, rejects ... |
-| S1-05 | Integer C assembles with as 2.22 and lints clean | In progress | Owner on 2026-11-02: DWARF 4 is the default for k1om, matching the donor; continue S1-05 per the lead note ... |
+| S1-05 | Integer C assembles with as 2.22 and lints clean | Question for the tech lead | Acceptance met: DWARF 4 red/green, rebuild 2056.884s, sweep 6009 measurements/584.499s with zero hang/ICE/a... |
 | S1-06 | K1OM link defaults | Not started | Rebuild GCC with the logged gcc16 step of tools/toolchain.py as ONE blocking foreground shell call with a t... |
 | S1-07 | Milestone M0 evidence note | Not started | Rebuild GCC with the logged gcc16 step of tools/toolchain.py as ONE blocking foreground shell call with a t... |
 
 ## Recent activity
 
+- 2026-11-02 21:46 **S1-05** engineer ask: Acceptance met: DWARF 4 red/green, rebuild 2056.884s, sweep 6009 measurements/584.499s with zero hang/ICE/as/lint/infra. Submit refused: 1743 lines...
 - 2026-11-02 21:15 **S1-05** lead note: Owner chose DWARF 4 as the k1om -g default. Set it in linux-k1om.h (DWARF_VERSION_DEFAULT 4), red first with a tests/t1 case that reads the .debug_...
 - 2026-11-02 21:05 **S1-05** lead note: Measured: the donor's -g default is DWARF 4; GCC 16's is DWARF 5, already without .file 0 (configure saw as 2.22), and it assembles, so the choice ...
 - 2026-11-02 20:59 **S1-05** owner decide: Owner on 2026-11-02: DWARF 4 is the default for k1om, matching the donor; continue S1-05 per the lead note at 21:15.
@@ -49,16 +50,15 @@ Current tickets: `[################----]` 14 of 17
 - 2026-11-02 20:54 **S1-05** engineer ask: 31e89e2 commits runner, reduced integer -g case and summary. Existing xgcc: 6009 measurements, 739.348s; ICE/as/lint=0. Infra failures: 11-line cor...
 - 2026-11-02 20:04 **S1-04** lead approve: GCC 16 now accepts -march=knc (the k1om default): it predefines __KNC__ and no SSE/MMX/AVX macros, rejects -msse, -msse2, -mavx, -mavx512f and -mmm...
 - 2026-11-02 20:03 **S1-04** engineer submit: 2545639 fixes scan-failure assembly/lint regression. tools/check t0 PASS (26 tests); gcc16 T1: all 12 sources incl smoke PASS; affine scans remain ...
-- 2026-11-02 19:59 **S1-04** lead changes: 1. tools/check.py:249 regresses t0: tests/regress/test_check.py:211 (test_scan_asm) fails because 'if not failures' now skips as --march=k1om and k...
 
 ## Cost
 
 - From the script, engineer: 53 sessions, 67.8M input tokens
 - From the script, lead: 54 sessions, 19.8M input tokens
-- Started by hand, Claude: 3 sessions, 186.9M input tokens
+- Started by hand, Claude: 3 sessions, 188.6M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 9.3 GiB of 100 GiB. 327 GiB free on the drive.
+The project uses 9.3 GiB of 100 GiB. 325 GiB free on the drive.
