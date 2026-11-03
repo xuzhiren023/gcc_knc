@@ -38,7 +38,7 @@ Current tickets: `[##################--]` 16 of 17
 | S1-04 | -march=knc with no SSE, AVX, MMX, CMOV, FCOMI or MFENCE | Done | GCC 16 now accepts -march=knc (the k1om default): it predefines __KNC__ and no SSE/MMX/AVX macros, rejects ... |
 | S1-05 | Integer C assembles with as 2.22 and lints clean | Done | All 2003 GCC torture compile files now build for KNC at -O0, -O2 and -O2 -g and assemble with the card's ol... |
 | S1-06 | K1OM link defaults | Done | GCC 16 now targets the K1OM ABI by default: it passes --march=k1om to as and -m elf_k1om to ld, uses the /l... |
-| S1-07 | Milestone M0 evidence note | Not started | The 15:45 note is wrong and replaced: your shell returns after 30 s, so start each build in the background ... |
+| S1-07 | Milestone M0 evidence note | In progress | The 15:45 note is wrong and replaced: your shell returns after 30 s, so start each build in the background ... |
 
 ## Recent activity
 
