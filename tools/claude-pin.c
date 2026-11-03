@@ -19,6 +19,7 @@ static int parse_number(const char *text, char **end, unsigned long *value) {
 int main(int argc, char **argv) {
     cpu_set_t mask;
     struct rlimit limit;
+    FILE *marker;
     const char *part;
     char *end;
     unsigned long cpu, mib;
@@ -53,7 +54,19 @@ int main(int argc, char **argv) {
         perror("claude-pin: setrlimit RLIMIT_AS");
         return 126;
     }
+    /* Only a successful exec may leave evidence that enforcement succeeded. */
+    marker = fopen("claude-pinned", "w");
+    if (marker == NULL) {
+        perror("claude-pin: claude-pinned");
+        return 126;
+    }
+    if (fclose(marker) != 0) {
+        perror("claude-pin: claude-pinned");
+        unlink("claude-pinned");
+        return 126;
+    }
     execv(argv[3], argv + 3);
     perror("claude-pin: execv");
+    unlink("claude-pinned");
     return 127;
 }

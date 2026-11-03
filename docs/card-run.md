@@ -52,6 +52,11 @@ which foreign processes are reported, never whether work may run.
   `sched_setaffinity(0, ...)` before executing the program; a failed syscall
   prevents execution and names the failure. No eligible CPUs refuses admission.
   Affinity is inherited by the workload's children.
+  Snapshots do not claim pinning succeeded. After affinity and memory limits
+  succeed, the helper creates `claude-pinned` immediately before exec and removes
+  it if exec fails. A completed launch without that marker is an infrastructure
+  failure, with no program exit status; the ledger finish records that outcome.
+  A marked program may itself return 125, 126 or 127 without being misclassified.
 - Read `/proc/meminfo` before staging. Reserve the declared memory against all
   active `agent: "claude"` ledger entries; ended jobs release their reservation.
   Wait while the total exceeds 7168 MB or the reservation would leave less
@@ -76,10 +81,14 @@ which foreign processes are reported, never whether work may run.
   that both execs outside our directory and changes cwd cannot be identified
   by this rule; the helper does not provide cgroup membership tracking.
 - Report other users' processes in `foreign_processes`; leave them alone.
+  Snapshots exclude the control shell's PID and its direct children by PPid,
+  including before staging changes its cwd; foreign names do not grant exclusion.
   Signals target only processes in our exact directory, rechecking identity after the boot guard, never by broad name/group.
   Guarded TERM/KILL cleanup removes our exact staging directory. Stdout/stderr are copied back in bounded chunks before normal
   cleanup. A separate HUP-ignoring watchdog applies the same guards after the
   program timeout plus `max(5 seconds, 2 * transportTimeout)` grace.
+  After removing our job directory, `rmdir /tmp/claude` removes the RAM-backed
+  parent only when empty, preserving any sibling job directories.
 - Recheck boot ID before execution, after execution and before any signal or
   removal. A changed boot or unreachable card mid-run is an infrastructure
   failure: append `card-fault`, then finish; do not signal/remove on an unknown or
@@ -89,7 +98,7 @@ which foreign processes are reported, never whether work may run.
 
 Required utility checks run before creating a remote staging directory. They
 name every missing tool rather than returning an unexplained status 94. The
-list is `readlink ls id cat od chmod tail head sleep mkdir rm` plus shell
+list is `readlink ls id cat od chmod tail head sleep mkdir rm rmdir` plus shell
 builtins. The lead's probe reported `stat` and `base64` missing and `od`
 available. Directory ownership now uses `LC_ALL=C ls -ldn` and `id -u`.
 Program, static helper and watchdog bytes are uploaded on separate, bounded
@@ -141,7 +150,9 @@ The result class distinguishes program statuses that collide with those values.
 timeouts, result path, transport, ledger path, memory MB and an injectable
 monotonic clock. A fake session provides `snapshot`, `stage`, `execute`,
 `signal_owned`, `cleanup` and `close`. Snapshots contain boot ID, processes,
-raw cpuinfo/meminfo and pinning availability. Execute receives the explicit
+raw cpuinfo/meminfo, and may report known pinning unavailability for early
+refusal. SSH checks enforcement at execution through the helper marker.
+Execute receives the explicit
 logical CPU list, memory MB, execution timeout and watchdog timeout.
 `tests/tools/test_card_shared.py` tests the shared rules without SSH; its shell
 fixture locates `sh` through PATH.
@@ -165,3 +176,14 @@ repeating passing cases. Logs: `S2_11_owner_green-20261103-110731.log` and
 `S2_11_owner_green_fixes-20261103-110926.log` in `.work/_state/logs/`.
 The static donor helper build passed with the original bootstrap static libc:
 `.work/_state/logs/S2_11_pin_build-20261103-110845.log`.
+
+Review RED db52e6b and corrected fixture RED cc2afae cover the helper marker,
+snapshot PID exclusions, removal of the constant pinning claim and empty-parent
+cleanup. All five focused T0 cases passed in
+`.work/_state/logs/S2_11_review_green-20261103-112036.log`. After changing the
+missing-marker response to keep SSH usable for cleanup rather than report a
+transport fault, the affected classification case passed in
+`.work/_state/logs/S2_11_review_marker_green-20261103-112110.log`.
+The updated static donor helper build passed in
+`.work/_state/logs/S2_11_review_pin_build-20261103-112049.log`.
+No card access was attempted; native donor hello remains with the lead.

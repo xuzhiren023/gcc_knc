@@ -160,7 +160,9 @@ def run(program, argv, *, lock_path, external_locks, baseline_names, timeout,
         deadline = monotonic() + timeout
         while True:
             snap = snapshot()
-            if not snap.get("pinning"):
+            # Transports may report known unavailability. SSH establishes actual
+            # affinity at execution, via claude-pin and its completion marker.
+            if snap.get("pinning") is False:
                 raise Refused("CPU pinning unavailable; refusing unpinned job")
             mapping = cpu_binding(snap["cpuinfo"])
             lines = read_ledger(ledger_path)
@@ -287,7 +289,7 @@ class SSHTransport:
                    "root@" + host, "exec sh"]
         session = SSHSession(command, run_dir, self.transport_timeout)
         try:
-            session.rpc("check_tools() { for tool in readlink ls id cat od chmod tail head sleep mkdir rm; "
+            session.rpc("check_tools() { for tool in readlink ls id cat od chmod tail head sleep mkdir rm rmdir; "
                         "do command -v \"$tool\" >/dev/null || { echo \"missing required card tool: $tool\"; missing=1; }; done; "
                         "if [ \"${missing:-0}\" = 1 ]; then "
                         "return 94; fi; }; check_tools", timeout)
@@ -376,7 +378,7 @@ class SSHSession:
             raise OSError("malformed process/boot snapshot")
         boot = records[0][5:]
         processes = []
-        cpuinfo, meminfo, pinning = [], [], False
+        cpuinfo, meminfo = [], []
         for line in records[1:]:
             fields = line.split("\t")
             if fields[0] == "CPU":
@@ -385,16 +387,13 @@ class SSHSession:
             if fields[0] == "MEM":
                 meminfo.append(line[4:])
                 continue
-            if fields[0] == "PIN":
-                pinning = fields[1] == "yes"
-                continue
             if len(fields) != 6 or fields[0] != "PROC" or not fields[1].isdigit():
                 raise OSError("unknown process identity in snapshot")
             processes.append(dict(zip(("pid", "ppid", "name", "exe", "cwd"), fields[1:])))
         if self.boot_id is None:
             self.boot_id = boot
         return dict(boot_id=boot, processes=processes, cpuinfo="\n".join(cpuinfo),
-                    meminfo="\n".join(meminfo), pinning=pinning)
+                    meminfo="\n".join(meminfo))
 
     def stage(self, run_dir, program, *, timeout):
         self.validate(run_dir)
@@ -473,7 +472,14 @@ class SSHSession:
             else:
                 if status is not None:
                     return status
-            answer = operation("guard_dir && if [ -f status ]; then cat status; else echo running; fi")
+            answer = operation("guard_boot && if [ -f status ]; then "
+                               "if [ -f claude-pinned ]; then cat status; "
+                               "else echo claude-pinned-missing; fi; "
+                               "else echo running; fi")
+            # A helper failure leaves SSH usable for guarded cleanup; it is not
+            # a transport disconnect or evidence of a card fault.
+            if answer == b"claude-pinned-missing":
+                raise OSError("claude-pinned missing: helper did not exec program")
             if answer != b"running":
                 try:
                     status = int(answer)

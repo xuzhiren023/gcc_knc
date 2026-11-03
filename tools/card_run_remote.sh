@@ -29,19 +29,20 @@ snapshot() {
     cat /proc/sys/kernel/random/boot_id || return 92
     while IFS= read -r line; do printf 'CPU\t%s\n' "$line"; done < /proc/cpuinfo
     while IFS= read -r line; do printf 'MEM\t%s\n' "$line"; done < /proc/meminfo
-    # Donor-built helper is supplied by the host. Its syscalls must succeed
-    # before exec; no installed affinity utility or memory controller is needed.
-    printf 'PIN\tyes\n'
     for proc in /proc/[0-9]*; do
         proc_pid=${proc##*/}
-        proc_exe=$(readlink "$proc/exe" 2>/dev/null)
-        proc_cwd=$(readlink "$proc/cwd" 2>/dev/null)
-        proc_name=
-        IFS= read -r proc_name < "$proc/comm" 2>/dev/null
+        [ "$proc_pid" != "$$" ] || continue
         proc_ppid=
         while read -r proc_key proc_value proc_rest; do
             if [ "$proc_key" = PPid: ]; then proc_ppid=$proc_value; break; fi
         done < "$proc/status" 2>/dev/null
+        # The control shell and its snapshot utilities are ours even before cd.
+        # Match identities, never names that a foreign process could also use.
+        [ "$proc_ppid" != "$$" ] || continue
+        proc_exe=$(readlink "$proc/exe" 2>/dev/null)
+        proc_cwd=$(readlink "$proc/cwd" 2>/dev/null)
+        proc_name=
+        IFS= read -r proc_name < "$proc/comm" 2>/dev/null
         [ -d "$proc" ] || continue
         printf 'PROC\t%s\t%s\t%s\t%s\t%s\n' "$proc_pid" "$proc_ppid" "$proc_name" "$proc_exe" "$proc_cwd"
     done
@@ -73,7 +74,8 @@ cleanup() {
     [ -e "$run_dir" ] || return 0
     stop_owned && guard_boot || return 92
     # No computed parent path, glob, symlink, or directory from another boot.
-    rm -rf -- "$run_dir"
+    rm -rf -- "$run_dir" || return 92
+    rmdir /tmp/claude 2>/dev/null || :
 }
 start_job() {
     guard_boot && [ -f claude-watchdog.sh ] && [ -x claude-pin ] || return 92
