@@ -172,6 +172,8 @@ od() { case "$*" in *-A*) echo 'od: invalid option -- A' >&2; return 94;; esac; 
                         return answer.stdout.rstrip(b"\n")
 
                     session.rpc = rpc
+                    session.read_output = lambda name, offset, timeout: (
+                        fixture / name).read_bytes()[offset:offset + 65536]
                     transport = SharedTransport()
                     transport.ledger = ledger
 
@@ -208,6 +210,7 @@ od() { case "$*" in *-A*) echo 'od: invalid option -- A' >&2; return 94;; esac; 
             script += '''
 readlink() { cat "$1"; }
 fixture_proc=$1
+run_dir=/tmp/claude/claude-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
 for fixture_pid in "$$" 98765 42; do
     mkdir "$fixture_proc/$fixture_pid"
     printf '/bin/sh\\n' > "$fixture_proc/$fixture_pid/exe"
@@ -235,6 +238,7 @@ snapshot
             (proc / "cpuinfo").write_text("processor : 91\ncore id : 30\n")
             (proc / "meminfo").write_text("MemFree: 4000000 kB\n")
             script = self.remote.replace("/proc/", str(proc) + "/")
+            script += "\nrun_dir=/tmp/claude/claude-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\n"
             answer = subprocess.run([shutil.which("sh"), "-c", script + "\nsnapshot\n"],
                                     stdout=subprocess.PIPE, stderr=subprocess.PIPE)
             self.assertEqual(answer.returncode, 0, answer.stderr)

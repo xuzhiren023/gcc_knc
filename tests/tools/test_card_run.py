@@ -252,13 +252,15 @@ class CardRun(unittest.TestCase):
         session.run_dir = self.transport.run_dir
         session.boot_id = BOOT
         session.transport_timeout = 1.0
-        session.rpc = mock.Mock(side_effect=[b"", b"", b"", b"running"])
+        session.rpc = mock.Mock(side_effect=[b"", b"running"])
+        session.read_output = mock.Mock(return_value=b"")
         with mock.patch.object(self.runner["time"], "monotonic",
                                side_effect=[0.0, 29.9, 30.0, 30.0]), \
                 mock.patch.object(self.runner["time"], "sleep"):
             with self.assertRaises(TimeoutError):
                 session.execute(session.run_dir, [], timeout=30.0, card_timeout=35, cpus=[91], memory_mb=128)
         self.assertTrue(all(call.args[1] == 1.0 for call in session.rpc.call_args_list))
+        self.assertEqual([call.args[2] for call in session.read_output.call_args_list], [1.0, 1.0])
         self.assertIn("start_job 35 ", session.rpc.call_args_list[0].args[0])
 
     def test_unreachable_is_infrastructure_with_one_cleanup_reconnect(self):

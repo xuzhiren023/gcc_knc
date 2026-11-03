@@ -6,7 +6,7 @@ resolve_tmp() {
         echo 'guard_dir: cannot resolve physical /tmp' >&2; return 91;
     }
 }
-guard_dir() {
+resolve_run_dir() {
     case "$run_dir" in
         /tmp/claude/claude-????????????????????????????????) ;;
         *) echo "guard_dir: directory shape: $run_dir" >&2; return 91 ;;
@@ -17,6 +17,9 @@ guard_dir() {
     esac
     resolve_tmp || return 91
     physical_run_dir=${tmp_physical%/}/claude/claude-$suffix
+}
+guard_dir() {
+    resolve_run_dir || return 91
     [ ! -L "$run_dir" ] || {
         echo "guard_dir: directory is a symlink: $run_dir" >&2; return 91;
     }
@@ -60,6 +63,8 @@ owned_pid() {
 snapshot() {
     IFS= read -r snapshot_boot < /proc/sys/kernel/random/boot_id || return 92
     printf 'BOOT\t%s\n' "$snapshot_boot"
+    resolve_run_dir || return 91
+    printf 'RUNDIR\t%s\n' "$physical_run_dir"
     {
     # Only admission needs the CPU map. Keep block separators for cpu_binding,
     # without shell read/printf commands for thousands of unused cpuinfo lines.

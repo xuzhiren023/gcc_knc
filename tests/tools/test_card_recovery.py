@@ -304,6 +304,7 @@ class RemoteReview(unittest.TestCase):
         # Count shell builtins too: per-line read/printf caused the native deadline.
         wrappers = wrappers.replace('printf "', 'command printf "')
         script = self.remote.replace("/proc/", str(self.proc) + "/")
+        script += "\nrun_dir=/tmp/claude/claude-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\n"
         answer = self.shell(script + "\n" + wrappers + "\nsnapshot\n")
         self.assertEqual(answer.returncode, 0, answer.stderr)
         commands = counter.read_text().splitlines()

@@ -46,8 +46,12 @@ def default_lock(root):
 
 
 def foreign_processes(snapshot, run_dir, baseline_names):
+    directories = [run_dir]
+    if snapshot.get("physical_run_dir"):
+        directories.append(snapshot["physical_run_dir"])
     return [p for p in snapshot["processes"]
-               if not (inside(p.get("exe"), run_dir) or inside(p.get("cwd"), run_dir))
+               if not any(inside(p.get(field), directory)
+                          for directory in directories for field in ("exe", "cwd"))
                and str(p.get("pid")) != "2" and str(p.get("ppid")) != "2"
                and (not p.get("name") or p["name"] not in baseline_names)]
 
@@ -321,7 +325,7 @@ class SSHTransport:
                    "root@" + host, "exec sh"]
         session = SSHSession(command, run_dir, self.transport_timeout)
         try:
-            session.rpc("check_tools() { for tool in readlink ls id cat od chmod tail head sleep mkdir rm rmdir awk; "
+            session.rpc("check_tools() { for tool in readlink ls id cat dd chmod sleep mkdir rm rmdir awk; "
                         "do command -v \"$tool\" >/dev/null || { echo \"missing required card tool: $tool\"; missing=1; }; done; "
                         "if [ \"${missing:-0}\" = 1 ]; then "
                         "return 94; fi; }; check_tools", timeout, step="check-tools")
@@ -422,8 +426,12 @@ class SSHSession:
         boot = records[0][5:]
         processes = []
         cpuinfo, meminfo = [], []
+        physical_run_dir = None
         for line in records[1:]:
             fields = line.split("\t")
+            if len(fields) == 2 and fields[0] == "RUNDIR":
+                physical_run_dir = fields[1]
+                continue
             if fields[0] == "CPU":
                 cpuinfo.append(line[4:])
                 continue
@@ -435,7 +443,8 @@ class SSHSession:
             processes.append(dict(zip(("pid", "ppid", "name", "exe", "cwd"), fields[1:])))
         if self.boot_id is None:
             self.boot_id = boot
-        return dict(boot_id=boot, processes=processes, cpuinfo="\n".join(cpuinfo),
+        return dict(boot_id=boot, processes=processes, physical_run_dir=physical_run_dir,
+                    cpuinfo="\n".join(cpuinfo),
                     meminfo="\n".join(meminfo))
 
     def stage(self, run_dir, program, *, timeout):
@@ -479,6 +488,34 @@ class SSHSession:
             raise error_type("upload-%s: SSH upload failed (status %s): %s" %
                              (name, child.returncode, errors.decode("utf8", "replace")[-1000:]))
 
+    def read_output(self, name, offset, timeout):
+        if name not in ("stdout", "stderr") or not isinstance(offset, int) or offset < 0:
+            raise OSError("invalid output stream or offset")
+        block, prefix = divmod(offset, 65536)
+        # BusyBox 1.19.4 lacks head -c and od -A. Use a finite raw SSH stream
+        # with the same boot/directory checks as uploads, preserving every byte.
+        script = ((ROOT / "tools/card_run_remote.sh").read_text(encoding="utf8") +
+                  "\nrun_dir=%s\nboot_id=%s\n"
+                  "printf claude-download > /proc/self/comm\n"
+                  "cd -- \"$run_dir\" && guard_boot && dd if=%s bs=65536 skip=%d count=%d\n" %
+                  (shlex.quote(self.run_dir), shlex.quote(self.boot_id), name, block, 1 + bool(prefix)))
+        child = subprocess.Popen(self.command[:-1] + ["sh -c " + shlex.quote(script)],
+                                 stdin=subprocess.DEVNULL, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        try:
+            data, errors = child.communicate(timeout=timeout)
+        except subprocess.TimeoutExpired:
+            child.kill()
+            _, errors = child.communicate()
+            raise TransportError("read-%s: SSH download deadline; %s" %
+                                 (name, errors.decode("utf8", "replace")[-1000:]))
+        if child.returncode:
+            error_type = TransportError if child.returncode == 255 else OSError
+            raise error_type("read-%s: SSH download failed (status %s): %s" %
+                             (name, child.returncode, errors.decode("utf8", "replace")[-1000:]))
+        # An unaligned byte offset needs at most two blocks. Trim the prefix
+        # locally rather than asking the card for slow one-byte reads/skips.
+        return data[prefix:prefix + 65536]
+
     @staticmethod
     def remaining(deadline):
         left = deadline - time.monotonic()
@@ -506,10 +543,7 @@ class SSHSession:
                 raise TimeoutError("card program deadline exceeded")
             for index, (name, stream) in enumerate((("stdout", sys.stdout.buffer),
                                                      ("stderr", sys.stderr.buffer))):
-                # Finite chunks keep arbitrary program bytes out of the control protocol.
-                encoded = operation("guard_boot && { tail -c +%d %s | head -c 65536 | od -An -v -tx1; }" %
-                                    (offsets[index] + 1, name), "read-" + name)
-                data = bytes.fromhex(encoded.decode("ascii"))
+                data = self.read_output(name, offsets[index], self.transport_timeout)
                 stream.write(data)
                 stream.flush()
                 offsets[index] += len(data)

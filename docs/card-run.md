@@ -94,7 +94,11 @@ which foreign processes are reported, never whether work may run.
   failed directory or boot guard prints the failed check to stderr.
   Process identity checks use the exact physical job path so a live process
   under symlinked `/tmp` prevents stale recovery and remains identifiable for
-  guarded cleanup. Ownership
+  guarded cleanup. Each snapshot also emits that physical path in a `RUNDIR`
+  record, including before staging. The host excludes executable/cwd paths
+  inside either the logical or physical job directory from foreign-process
+  reports; matching includes a path boundary, so sibling directories stay
+  foreign. Ownership
   uses the exact executable/cwd path, never a broad process name. A descendant
   that both execs outside our directory and changes cwd cannot be identified
   by this rule; the helper does not provide cgroup membership tracking.
@@ -136,19 +140,25 @@ which foreign processes are reported, never whether work may run.
 
 Required utility checks run before creating a remote staging directory. They
 name every missing tool rather than returning an unexplained status 94. The
-list is `readlink ls id cat od chmod tail head sleep mkdir rm rmdir awk` plus shell
+list is `readlink ls id cat dd chmod sleep mkdir rm rmdir awk` plus shell
 builtins. The lead's probe reported `stat` and `base64` missing and `od`
 available. Directory ownership now uses `LC_ALL=C ls -ldn` and `id -u`.
 Program, static helper and watchdog bytes are uploaded on separate, bounded
-SSH stdin streams to guarded `cat` commands, without an encoding tool. Output
-uses `od -An -v -tx1` and host-side hexadecimal decoding, preserving binary
-stdout/stderr. Every control operation is labelled (`snapshot`, `stage-create`,
+SSH stdin streams to guarded `cat` commands, without an encoding tool. The
+lead's 12:03 run found BusyBox 1.19.4 rejects `head -c` and `od -A`. Output now
+uses separate bounded SSH stdout streams running guarded
+`dd if=<stdout-or-stderr> bs=65536 skip=<block-offset> count=<1-or-2>`, with the actual
+filename selected from those two names. An unaligned byte offset reads at most
+two blocks; the host trims the prefix and delivers at most 64 KiB per chunk.
+This avoids one-byte reads on the card. Raw reads preserve
+binary stdout/stderr, trailing newlines and control-marker-like bytes, and
+advance a separate byte offset per stream. Every control operation is labelled (`snapshot`, `stage-create`,
 `stage-chmod`, `start-job`, `read-stdout`, `read-stderr`, `read-status`,
 `stop_owned`, `cleanup`, `reap-stale`, plus connection setup steps). Command
 stderr is merged before the completion marker so nonzero status reports include
 the step name and diagnostics. Deadlines and ended sessions also name the step
 and include captured partial output. Upload failures name the file and include
-stderr. A command's nonzero exit keeps the control protocol usable; a transport
+stderr; download failures name the stream and include stderr. A command's nonzero exit keeps the control protocol usable; a transport
 failure invalidates that session. Admission happens before remote
 mkdir or upload. The second SSH streams recheck the original boot and directory
 owner/cwd; partial uploads remain in our directory for guarded cleanup.
@@ -197,7 +207,8 @@ monotonic clock. A fake session provides `snapshot`, `stage`, `execute`,
 `reap_stale`, `signal_owned`, `cleanup` and `close`. `snapshot` accepts
 `include_cpuinfo` (default true); the runner requests it only for the first
 snapshot, including across a cleanup reconnect. Snapshots contain boot ID,
-processes, filtered cpuinfo/meminfo, and may report known pinning unavailability for early
+processes, filtered cpuinfo/meminfo, and `physical_run_dir` when supplied by the
+remote shell. They may report known pinning unavailability for early
 refusal. SSH checks enforcement at execution through the helper marker.
 Execute receives the explicit
 logical CPU list, memory MB, execution timeout and watchdog timeout.
@@ -250,3 +261,15 @@ assertion failure). After extending the same recovery path to all finalization
 steps, the five affected recovery/classification cases passed in
 `S2_11_cleanup_reconnect_green-20261103-113229.log`; the other passing cases
 were not repeated.
+
+Eighth-round RED 6bbd99d reproduces physical-path process misclassification and
+the native BusyBox output-option failures. Both cases failed as expected in
+`S2_11_eighth_red-20261103-120214.log`. In
+`S2_11_eighth_green-20261103-120347.log`, eight focused cases passed; the binary
+case exposed slow one-byte `dd` reads and the timeout selector named the wrong
+test class. Block reads with host-side byte trimming fixed the download. The
+binary and corrected timeout cases then passed in
+`S2_11_eighth_green_output-20261103-120439.log`; passing cases were not repeated.
+All logs are under `.work/_state/logs/`. The interactive lead reruns donor hello
+at the default 10-second transport timeout, checks native acceptance, and
+confirms our watchdog/program are absent from foreign-process evidence.
