@@ -64,13 +64,13 @@ def gpr_writes(op, args):
     return written
 
 
-def pressure_scan(body):
+def pressure_scan(body, live=True, mask_value=1):
     failures = allowlist(body)
     markers = re.findall(r'# pressure-live([^\n]*)', body)
     expected = {'rax', 'rbx', 'rcx', 'rdx', 'rsi', 'rdi', 'rbp',
                 *('r' + str(i) for i in range(8, 15))}
-    if len(markers) != 2 or any(len(re.findall(r'%(\w+)', m)) != 14 or
-                              set(re.findall(r'%(\w+)', m)) != expected for m in markers):
+    if live and (len(markers) != 2 or any(len(re.findall(r'%(\w+)', m)) != 14 or
+                              set(re.findall(r'%(\w+)', m)) != expected for m in markers)):
         failures.append('missing both barriers with 14 GPRs live and r15 free')
     regions = re.split(r'# pressure-live[^\n]*', body)
     if len(regions) == 3:
@@ -103,10 +103,11 @@ def pressure_scan(body):
                     for reg in re.findall(r'%(\w+)', address):
                         if reg not in ('rsp', 'rbp') and reg not in values:
                             failures.append('uninitialized transfer address: ' + reg)
-                if op.startswith('vpackstore'):
+                if op.startswith(('vpackstore', 'vloadunpack')):
                     mask = re.search(r'\{%?(k\d+)\}', args)
-                    if not mask or masks.get(mask[1]) != 1:
-                        failures.append('store without reaching mask-one setup: ' + args)
+                    if not mask or masks.get(mask[1]) != mask_value:
+                        failures.append('transfer without reaching mask-%d setup: %s' %
+                                        (mask_value, args))
         dest = re.search(r',\s*%(\w+)\s*$', args)
         if not dest:
             continue
@@ -157,7 +158,8 @@ def t1(runner):
     source = runner.root / 'tests/regress/knc-secondary-pressure.c'
     for level, number, mode in ((level, number, mode)
                                for level in ('-O1', '-O2')
-                               for number, mode in enumerate(('si', 'di', 'sf', 'df'), 1)):
+                               for number, mode in enumerate(('si', 'di', 'sf', 'df',
+                                   'sf_u32', 'u32_sf', 'df_u64', 'u64_df', 'ti', 'tf'), 1)):
         asm = runner.out / 'secondary-pressure.s'
         compiled = runner.command(runner.cc, *runner.cc_flags, level, '-march=knc',
             '-fomit-frame-pointer', '-fno-tree-vectorize', '-ffp-contract=off',
@@ -168,7 +170,9 @@ def t1(runner):
         else:
             assembly = asm.read_text()
             body = runner.function_body(assembly, 'pressure_' + mode)
-            failures.extend(pressure_scan(body) if body else ['missing function'])
+            failures.extend(pressure_scan(body, live=number <= 8,
+                                          mask_value=3 if number > 8 else 1)
+                            if body else ['missing function'])
             assembled = runner.command(runner.tool('as'), '--march=k1om', asm,
                                        '-o', asm.with_suffix('.o'), check=False)
             if assembled.returncode:
