@@ -1,17 +1,17 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-03 13:35.
+Updated automatically at every ticket change. Last update: 2026-11-03 14:04.
 
 **Next: GPT-6.1, on S2-09 (GCC 16 builds gfortran, and the secondary-reload reproducer passes).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
-Current tickets: `[##############------]` 30 of 42
+Current tickets: `[#############-------]` 30 of 45
 
 ## Milestones
 
 | | Milestone | State | Progress |
 |---|---|---|---|
 | M0 | Foundation | In progress | 17 of 17 tickets |
-| M1 | Mixed native code | In progress | 13 of 25 tickets |
+| M1 | Mixed native code | In progress | 13 of 28 tickets |
 | M2 | Useful vector target | Not started | Not planned in detail yet |
 | M3 | Runtimes | Not started | Not planned in detail yet |
 | M4 | Broad optimization | Not started | Not planned in detail yet |
@@ -53,6 +53,9 @@ Current tickets: `[##############------]` 30 of 42
 | S2-12 | card_run polls the card gently and reports what it reaped | Done | card_run now checks job status on its existing SSH session with backoff to 5 s and opens output connections... |
 | S2-13 | Card tests pass again, and approve runs them | Done | All card tests in tests/tools pass again under Cygwin Python, and pm.py approve now refuses to merge any br... |
 | S2-14 | card_run stages extra files, so one job can run a batch | Done | card_run can now stage extra files next to the program with --file (size-capped by maxStageMiB, unsafe or d... |
+| S2-15 | -ffast-math links on KNC without an SSE crtfastmath | Not started | Found while reading PhiWeather's MXCSR note at the owner's request. It runs after S2-09, because S2-09 rebu... |
+| S2-16 | Card batch files are readable by the lead | In progress | Blocks S2-08's torture run on the card; the other eight S2-08 programs already passed there. |
+| S2-17 | card_run tolerates processes that end during a snapshot | Not started | Recurring on the shared card whenever the other agent's jobs churn. |
 | S3-01 | Packed modes and IMCI patterns in GCC 16: entry points, audit and line estimate | draft |  |
 | S3-02 | One helper for optional tools/check selections | draft |  |
 | S3-03 | Native probe of unaligned pairs and masked aligned forms at page boundaries | draft |  |
@@ -67,23 +70,23 @@ Current tickets: `[##############------]` 30 of 42
 
 ## Recent activity
 
+- 2026-11-03 14:03 **S2-17** lead note: Recurring on the shared card whenever the other agent's jobs churn.
+- 2026-11-03 14:03 **S2-16** lead note: Blocks S2-08's torture run on the card; the other eight S2-08 programs already passed there.
+- 2026-11-03 13:58 **S2-15** lead note: Found while reading PhiWeather's MXCSR note at the owner's request. It runs after S2-09, because S2-09 rebuilds the shared GCC; `linux-k1om.h` is n...
 - 2026-11-03 13:35 **S2-08** lead approve: The S2-08 card batch is ready: hello, scalar FP with inexact rounding checks, printf, the compare table, the libgcc helpers and 256 torture program...
 - 2026-11-03 13:34 **S2-08** engineer submit: a26810c: dynamic shared-sysroot glibc driver, no PhiWeather path/-static/--trace; readelf INTERP and libc.so.6 PASS. Scalar donor/GCC16 twins rebui...
 - 2026-11-03 13:33 **S2-08** lead changes: 1. tools/prepare_s2_08.py:120-124: the static driver links static glibc from an absolute path into the PhiWeather folder. This project must not dep...
 - 2026-11-03 13:32 **S2-08** engineer submit: 781c90d: batch ready .work/_shared/tmp/S2-08/batch.txt. GCC16 own libgcc; hello/scalar/printf + donor twins, compare and helper programs, 9 expecte...
 - 2026-11-03 13:26 **S2-07** lead approve: GCC 16 now links KNC programs with its own static libgcc, crtbegin and crtend, with no donor files, and its 128-bit integer and soft-float helpers ...
-- 2026-11-03 13:25 **S2-07** owner decide: Lead, under the owner's 2026-11-03 delegation: native comparison passed (13:23 note). Review item (1): the donor libgcc.a also uses stmxcsr (22 tim...
-- 2026-11-03 13:24 **S2-07** lead escalate: Interactive lead: T2 review of f351d2d/e682e23a0e7 found nothing blocking. Approve waits only on native: in a card session run python tools/libgcc....
-- 2026-11-03 13:23 **S2-07** lead note: Native item done by the interactive lead: donor-libgcc.mic and gcc16-libgcc.mic from .work/_shared/tmp/S2-07 ran on the card through the merged too...
 
 ## Cost
 
 - From the script, engineer: 114 sessions, 211.2M input tokens
 - From the script, lead: 113 sessions, 38.9M input tokens
-- Started by hand, Claude: 3 sessions, 328.0M input tokens
+- Started by hand, Claude: 3 sessions, 340.9M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 7.8 GiB of 100 GiB. 329 GiB free on the drive.
+The project uses 6.7 GiB of 100 GiB. 328 GiB free on the drive.
