@@ -52,7 +52,7 @@ Current tickets: `[############--------]` 27 of 42
 | S2-11 | card_run follows the shared card rules and runs hello on the card | Done | tools/card_run now runs programs on the shared Xeon Phi under the owner's card rules (ledger lines, cores 3... |
 | S2-12 | card_run polls the card gently and reports what it reaped | Done | card_run now checks job status on its existing SSH session with backoff to 5 s and opens output connections... |
 | S2-13 | Card tests pass again, and approve runs them | Done | All card tests in tests/tools pass again under Cygwin Python, and pm.py approve now refuses to merge any br... |
-| S2-14 | card_run stages extra files, so one job can run a batch | Changes requested | 1. tests/tools/test_card_backend.py:130: approve's Cygwin rerun fails 57/58: the non-executable extra file ... |
+| S2-14 | card_run stages extra files, so one job can run a batch | In progress | 1. tests/tools/test_card_backend.py:130: approve's Cygwin rerun fails 57/58: the non-executable extra file ... |
 | S3-01 | Packed modes and IMCI patterns in GCC 16: entry points, audit and line estimate | draft |  |
 | S3-02 | One helper for optional tools/check selections | draft |  |
 | S3-03 | Native probe of unaligned pairs and masked aligned forms at page boundaries | draft |  |
