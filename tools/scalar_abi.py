@@ -25,7 +25,7 @@ SCALAR = set('ret retq leave leaveq call jmp cltq cqto cwtl cltd endbr64 '
              'vpackstorelpd vpackstorehpd vloadunpacklps vloadunpackhps '
              'vloadunpacklpd vloadunpackhpd vmovaps vmovapd '
              'vmovdqa32 vmovdqa64'.split())
-CONDITIONS = 'e ne a ae b be g ge l le s ns o no p np z nz'.split()
+CONDITIONS = 'e ne a ae b be g ge l le s ns o no p np z nz nb'.split()
 SCALAR.update('j' + c for c in CONDITIONS)
 SCALAR.update('set' + c for c in CONDITIONS)
 
