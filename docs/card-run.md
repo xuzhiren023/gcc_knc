@@ -46,6 +46,34 @@ address-space limit through `claude-pin`, so these settings apply to every
 program the driver starts. The limit is not aggregate memory for the batch.
 Host files the lead must read are never 0700: prepare card programs as 0755 and data files as 0644.
 
+### Parallel torture batches (S2-18)
+
+`claude-torture [-j N] [--limit-mb M] LIST` runs at most N programs at once;
+N defaults to 1. Each program has its own two-second deadline and process
+group. PASS/FAIL/TIMEOUT lines and saved diagnostics stay in list order even
+when programs finish out of order. Each child's output is buffered separately
+until its result can be emitted. Crashes and nonzero exits report FAIL.
+
+Choose N up to 30 to use the job's 30 physical cores, or lower it when programs
+need more memory. Set the job configuration's `memoryMB` to at least N times M,
+where M is the per-program address-space limit in MiB. For example, N=30 and
+M=128 require `memoryMB: 3840`; stage the list and all its executables as usual,
+then pass `-j 30 --limit-mb 128 LIST` after the driver executable in the
+`tools/card_run` command. The existing 7168 MiB admission ceiling and free-memory
+reserve still apply. Driver overhead and staged files also need free card RAM.
+
+The driver reads the job budget from the inherited `RLIMIT_AS` set by
+`claude-pin`, checks N times M against it before starting any program, and
+sets each child's own `RLIMIT_AS` to M. No CPU affinity is changed. Without
+`--limit-mb`, parallel runs divide the inherited budget equally among N
+children; serial runs retain their existing inherited limits. Thus
+`-j 30 LIST` with `memoryMB: 3840` also gives each program 128 MiB.
+An unlimited inherited budget refuses parallel execution because it
+cannot establish the declared reservation. Job timeout cleanup still applies
+to all children; driver TERM/HUP/INT also kills and reaps active test groups.
+Native validation belongs to the lead: rerun S2-08's 256-program batch at N=30
+after S2-17, with later batches using the full execute suite.
+
 ## Enforcement
 
 - Read the configured shared JSONL ledger before connecting and again at

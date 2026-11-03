@@ -47,7 +47,7 @@ class TortureDriverTest(unittest.TestCase):
 
     def test_eight_sleepers_finish_in_one_sleep_and_list_order(self):
         names = ['sleep-%d' % i for i in range(8)]
-        result, elapsed = self.run_batch(names, ['-j', '8', '--limit-mb', '64'])
+        result, elapsed = self.run_batch(names, ['-j', '8'])
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertEqual(result.stdout.splitlines(), ['PASS ' + n for n in names])
         self.assertLess(elapsed, 3.5, 'eight sleeps were serialized')
