@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-03 14:14.
+Updated automatically at every ticket change. Last update: 2026-11-03 14:15.
 
 **Next: GPT-6.1, on S2-09 (GCC 16 builds gfortran, and the secondary-reload reproducer passes).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
@@ -55,7 +55,7 @@ Current tickets: `[#############-------]` 31 of 45
 | S2-14 | card_run stages extra files, so one job can run a batch | Done | card_run can now stage extra files next to the program with --file (size-capped by maxStageMiB, unsafe or d... |
 | S2-15 | -ffast-math links on KNC with a KNC crtfastmath | Not started | Rewritten after the lead's card run: the donor's FTZ/DAZ write runs on KNC, so the fix provides a matching ... |
 | S2-16 | Card batch files are readable by the lead | Done | Card batch programs are now written 0755 and data files 0644, so the lead can read and stage them; Cygwin n... |
-| S2-17 | card_run tolerates ending processes, and stages batch files correctly | Not started | Recurring on the shared card whenever the other agent's jobs churn. |
+| S2-17 | card_run tolerates ending processes, and stages batch files correctly | In progress | Recurring on the shared card whenever the other agent's jobs churn. |
 | S3-01 | Packed modes and IMCI patterns in GCC 16: entry points, audit and line estimate | draft |  |
 | S3-02 | One helper for optional tools/check selections | draft |  |
 | S3-03 | Native probe of unaligned pairs and masked aligned forms at page boundaries | draft |  |
@@ -83,7 +83,7 @@ Current tickets: `[#############-------]` 31 of 45
 
 - From the script, engineer: 115 sessions, 211.8M input tokens
 - From the script, lead: 114 sessions, 39.1M input tokens
-- Started by hand, Claude: 3 sessions, 351.0M input tokens
+- Started by hand, Claude: 3 sessions, 351.7M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
