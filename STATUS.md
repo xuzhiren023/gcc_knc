@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-03 22:24.
+Updated automatically at every ticket change. Last update: 2026-11-03 22:26.
 
-**Next: GPT-6.1, on S3-14 (Native TLS for k1om, and every x86_64-only configure case that misses k1om).** Run `python tools/dispatch.py`, or ask the tech lead to.
+**Next: the tech lead, on S3-14.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[#################---]` 51 of 57
 
@@ -71,7 +71,7 @@ Current tickets: `[#################---]` 51 of 57
 | S3-11 | Milestone M1 note: fixture, line counts, ICE classes and backend cost comparison | Not started | Owner approved Sprint 3 on 2026-11-03; ticket set to ready. |
 | S3-12 | tools/portability: forward-port drill and x86_64 unchanged check | Done | tools/portability.py now checks whether the KNC changes still merge onto newer GCC (master has 2 conflicts,... |
 | S3-13 | Move KNC code out of shared i386 files into i386-knc | Done | KNC code now lives in i386-knc.cc/.h behind one-line hooks in the shared i386 files (shared diff 324 lines/... |
-| S3-14 | Native TLS for k1om, and every x86_64-only configure case that misses k1om | In progress | Filed under the owner's delegation (engineering defect found while checking the PhiWeather project's lesson... |
+| S3-14 | Native TLS for k1om, and every x86_64-only configure case that misses k1om | Tests waiting for review | Red commit 3f40227. Ran tools/run.py --name s3-14-native-tls-red --inputs tests/t1/knc-tls.c tools/native_t... |
 | S3-15 | ABI gaps: packed vectors through varargs and ms_abi, complex values, rounding mode across calls | Not started | Filed under the owner's delegation. Finding 1 was reproduced by the lead; findings 2-4 come from reading co... |
 | S3-16 | Nothing writes to Documents/_shared from the main checkout | Done | Torture and x87 probe outputs now stay in the repository's .work/_shared when run from the main checkout, a... |
 | S3-17 | card_run takes each process's parent from the same status read that admits it | Done | card_run no longer refuses jobs when a kernel thread's first status read fails: each process's parent now c... |
@@ -82,6 +82,7 @@ Current tickets: `[#################---]` 51 of 57
 
 ## Recent activity
 
+- 2026-11-03 22:26 **S3-14** engineer red: Red commit 3f40227. Ran tools/run.py --name s3-14-native-tls-red --inputs tests/t1/knc-tls.c tools/native_tls.py tools/check.py -- python tools/che...
 - 2026-11-03 22:24 **S3-21** lead approve: Byte-aligned vector copies (like pr65369) no longer use the KNC load/store pair instructions that need element alignment, so they no longer crash o...
 - 2026-11-03 22:21 **S3-21** engineer submit: Hook rejects is_packed/non-element-multiple misalignment; sub-element MEM_ALIGN uses eight DImode GPR transfers via 64-byte-aligned stack; insns re...
 - 2026-11-03 22:20 **S3-21** owner decide: Lead decided under the owner's 2026-11-03 delegation: budget raised to 5 sessions and 32M input tokens to submit. The lead ran the guard programs o...
@@ -89,7 +90,6 @@ Current tickets: `[#################---]` 51 of 57
 - 2026-11-03 22:17 **S3-21** lead answer: Size: yes, submit with --override 'acceptance requires the T2 card guard probe (145 lines) next to the T1 red tests; no test weakened'. ADR: I cann...
 - 2026-11-03 22:16 **S3-21** engineer ask: Green T1: 8 byte rows + 8 element controls PASS; assembly/lint PASS. Log .work/_state/logs/S3_21_green-20261103-221605.log. Submit hook blocks tick...
 - 2026-11-03 22:14 **S3-21** lead answer: Both yes, with limits. (1) Fix the controls, not the hook: memcpy from a 'const int *' carries no alignment in GCC (folds to a char-aligned ref-all...
-- 2026-11-03 22:13 **S3-21** engineer ask: Build passed; T1 still red. Reproducer .work/_shared/check/S3-21-reduced*: memcpy from const int* loses alignment (A8); hook sees is_packed=true. b...
 
 ## Cost
 
