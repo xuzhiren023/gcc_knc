@@ -1,17 +1,17 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-03 20:45.
+Updated automatically at every ticket change. Last update: 2026-11-03 20:47.
 
-**Next: the tech lead, on S3-18.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: GPT-6.1, on S3-08 (Fortran twin of m1_affine vectorizes and links).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
-Current tickets: `[################----]` 46 of 55
+Current tickets: `[#################---]` 47 of 55
 
 ## Milestones
 
 | | Milestone | State | Progress |
 |---|---|---|---|
 | M0 | Foundation | In progress | 17 of 17 tickets |
-| M1 | Mixed native code | In progress | 29 of 37 tickets |
+| M1 | Mixed native code | In progress | 30 of 37 tickets |
 | M2 | Useful vector target | In progress | 0 of 1 tickets |
 | M3 | Runtimes | Not started | Not planned in detail yet |
 | M4 | Broad optimization | Not started | Not planned in detail yet |
@@ -75,25 +75,25 @@ Current tickets: `[################----]` 46 of 55
 | S3-15 | ABI gaps: packed vectors through varargs and ms_abi, complex values, rounding mode across calls | Not started | Filed under the owner's delegation. Finding 1 was reproduced by the lead; findings 2-4 come from reading co... |
 | S3-16 | Nothing writes to Documents/_shared from the main checkout | Done | Torture and x87 probe outputs now stay in the repository's .work/_shared when run from the main checkout, a... |
 | S3-17 | card_run takes each process's parent from the same status read that admits it | Done | card_run no longer refuses jobs when a kernel thread's first status read fails: each process's parent now c... |
-| S3-18 | card_run keeps every job's receipt, and the ledger finish line says why a job was refused | Waiting for review | Restored --receipt default ROOT/tests/out/card-result.json as requested; retained per-job diagnostics remai... |
+| S3-18 | card_run keeps every job's receipt, and the ledger finish line says why a job was refused | Done | card_run now saves every job's result under .work/_state/card/ (newest 200 kept), and the ledger finish lin... |
 | S3-19 | card_run's snapshot silences the status redirect before it can fail | Not started | Filed under the owner's delegation. This is probably also the unexplained `infrastructure-failure` at 01:31... |
 
 ## Recent activity
 
 - 2026-11-03 20:50 **S3-19** lead note: Filed under the owner's delegation. This is probably also the unexplained `infrastructure-failure` at 01:31:55 UTC that S3-18 was filed for.
+- 2026-11-03 20:47 **S3-18** lead approve: card_run now saves every job's result under .work/_state/card/ (newest 200 kept), and the ledger finish line records why a job was refused or faile...
 - 2026-11-03 20:44 **S3-18** engineer submit: Restored --receipt default ROOT/tests/out/card-result.json as requested; retained per-job diagnostics remain additional. Commit b9394dd. tools/run....
 - 2026-11-03 20:44 **S3-08** lead changes: 1. tools/check.py:392 (also :271, :342): the new unguarded self.args.compiler checks fail on Runner objects built without args, so tools/check t0 f...
 - 2026-11-03 20:42 **S3-08** engineer submit: Red commit 4374b3d: T2 failed for missing driver Fortran call and linked symbol; log .work/_state/logs/S3_08_red-20261103-204026.log. tools/run.py ...
 - 2026-11-03 20:41 **S3-18** owner decide: Lead decided under the owner's 2026-11-03 delegation: budget raised to 3 sessions and 4M input tokens (0.9M used) for the one requested change (res...
 - 2026-11-03 20:41 **S3-18** engineer escalate: budget: 2 engineer sessions used; the budget is 2
 - 2026-11-03 20:40 **S3-18** lead changes: 1. tools/card_run:711 drops the --receipt default (tests/out/card-result.json), which the ticket did not ask for, and docs/card-run.md:246 still do...
-- 2026-11-03 20:40 **S3-18** engineer submit: Renamed tests/tools/test_card_receipts.py to tests/tools/test_card_diagnostics.py as approved by lead; commit 15bb861. Prior tools/run.py card suit...
 
 ## Cost
 
 - From the script, engineer: 154 sessions, 315.3M input tokens
 - From the script, lead: 152 sessions, 50.7M input tokens
-- Started by hand, Claude: 5 sessions, 467.3M input tokens
+- Started by hand, Claude: 5 sessions, 468.4M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
