@@ -475,3 +475,5 @@ Upstream line churn since 16.2 in files changed by KNC:
 | `libgcc/config/i386/knc-sfp-machine.h` | +0 | -0 |
 | `libgcc/config/i386/t-knc` | +0 | -0 |
 
+
+Trunk build finding (S3-11, KNC `eb8fb3e902a9` onto master `b88c2821e219`): `atomic_storeti` in KNC `imci.md:249` collides with upstream `sync.md:410`; this is a logic conflict, not a textual one. Follow-up ticket pending; the lead will integrate the dispatch and retry trunk cc1 and T1/T2.

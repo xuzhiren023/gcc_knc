@@ -168,9 +168,9 @@ Reduced build reproducer: in `portability/trunk/build/gcc`, the failed command w
 `build/gentarget-def.exe ../../source/gcc/common.md
 ../../source/gcc/config/i386/i386.md insn-conditions.md > tmp-target-def.h`
 (source paths in the log are absolute). No full trunk `cc1` or trunk T1/T2 ran.
-AGENTS.md requires a ticket question after two failed attempts; the lead must ticket
-or authorize integration of KNC's libcall dispatch with upstream's expander before
-another trunk attempt.
+The lead's 03:40 answer assigns a follow-up ticket to integrate KNC's libcall dispatch
+with upstream's expander and retry trunk cc1 and T1/T2; ticket pending. No third trunk
+attempt is authorized on S3-11.
 
 ## Measured cost versus estimates
 
@@ -235,7 +235,7 @@ must be measured before preferring either estimate.
 | 2 card batch | Final batch/inexact native results absent; earlier results do not substitute. Not met. |
 | 3 ICE classes | Met in the requested sweep: zero shared SSE/AVX ICEs; other class S3-20 is ticketed and reproduced. |
 | 4 x86 unchanged | Zero assembly differences at both options in the tool's coverage: 1,962 identical pairs each, 41 matching failures without assembly each. |
-| 5 portability | Release clean; four textual resolutions, but trunk generation fails on the atomic-store name collision. No trunk T1/T2. Not met. |
+| 5 portability | Not met: atomic_storeti collision with upstream sync.md, ticket pending. Release clean; four textual resolutions; no trunk cc1 or T1/T2. |
 | 6 ADR form | 202 shared lines/56 hunks; residual blocks need relocation/review. Not met. |
 | 7 cost | Smaller source surface measured; effort estimates overlap. Not proven. |
 
