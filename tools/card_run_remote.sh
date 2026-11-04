@@ -51,7 +51,7 @@ owned_pid() {
     pid_ppid=
     while read -r pid_key pid_value pid_rest; do
         if [ "$pid_key" = PPid: ]; then pid_ppid=$pid_value; break; fi
-    done < "/proc/$1/status" 2>/dev/null
+    done 2>/dev/null < "/proc/$1/status"
     [ -n "$pid_ppid" ] && [ "$pid_ppid" != 2 ] || return 1
     [ -L "/proc/$1/exe" ] || [ -L "/proc/$1/cwd" ] || return 1
     pid_exe=$(readlink "/proc/$1/exe" 2>/dev/null)
@@ -80,7 +80,7 @@ snapshot() {
         proc_ppid=
         while read -r proc_key proc_value proc_rest; do
             if [ "$proc_key" = PPid: ]; then proc_ppid=$proc_value; break; fi
-        done < "$proc/status" 2>/dev/null
+        done 2>/dev/null < "$proc/status"
         # The control shell and its snapshot utilities are ours even before cd.
         # Match identities, never names that a foreign process could also use.
         [ "$proc_ppid" != "$$" ] || continue
@@ -206,10 +206,10 @@ start_job() {
     # The watchdog survives a broken control connection and applies the same
     # exact-directory and boot guards as host-requested termination.
     (trap '' HUP; exec sh ./claude-watchdog.sh "$run_dir" "$boot_id" "$job_limit") \
-        < /dev/null > /dev/null 2>&1 &
+        > /dev/null 2>&1 < /dev/null &
     (trap '' HUP
      printf claude-launch > /proc/self/comm
      ./claude-pin "$job_cpus" "$job_memory" ./claude-program "$@"
      printf '%s\n' "$?" > status) \
-        < /dev/null > stdout 2> stderr &
+        > stdout 2> stderr < /dev/null &
 }
