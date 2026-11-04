@@ -57,6 +57,8 @@ SELECTIONS = {
         't1': lambda runner: importlib.import_module('knc_vector').t1(runner)}),
     'vector_unaligned': ('S3-05 unaligned packed moves only', {
         't1': lambda runner: importlib.import_module('knc_vector').t1_unaligned(runner)}),
+    'vector_byte_aligned': ('S3-21 byte-aligned packed accesses at O2 and O3', {
+        't1': lambda runner: importlib.import_module('knc_vector').t1_byte_aligned(runner)}),
     'vector_fp': ('S3-06 packed FP arithmetic, broadcasts and generic expressions', {
         't1': lambda runner: importlib.import_module('knc_vector').t1_fp(runner)}),
 }
@@ -254,6 +256,8 @@ class Runner:
             import secondary_reload
             secondary_reload.t1(self)
             self.t1_sources()
+            import knc_vector
+            knc_vector.t1_byte_aligned(self)
         source = (self.fixture / 'loops.c').read_text()
         for mode in ('off', 'fast'):
             asm = self.out / ('loops-' + mode + '.s')
@@ -273,7 +277,9 @@ class Runner:
             affine_fortran.t1(self)
 
     def t1_sources(self, sources=None):
-        selected = (s for s in self.source_dir.glob('*.c') if not s.name.startswith('knc-abi-'))
+        selected = (s for s in self.source_dir.glob('*.c')
+                    if not s.name.startswith('knc-abi-')
+                    and s.name != 'knc-vec-byte-aligned.c')
         for source in sorted(selected if sources is None else sources):
             label = 't1 ' + source.name
             try:
