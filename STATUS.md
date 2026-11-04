@@ -1,10 +1,10 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-04 18:14.
+Updated automatically at every ticket change. Last update: 2026-11-04 18:16.
 
-**Next: the tech lead, on S4-12.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: GPT-6.1, on S4-03 (Blends and if-conversion: conditional loops, ?:, fabs, min and max vectorize with masks).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
-Current tickets: `[##################--]` 67 of 73
+Current tickets: `[##################--]` 68 of 73
 
 ## Milestones
 
@@ -12,7 +12,7 @@ Current tickets: `[##################--]` 67 of 73
 |---|---|---|---|
 | M0 | Foundation | In progress | 17 of 17 tickets |
 | M1 | Mixed native code | Done | 43 of 43 tickets |
-| M2 | Useful vector target | In progress | 7 of 13 tickets |
+| M2 | Useful vector target | In progress | 8 of 13 tickets |
 | M3 | Runtimes | Not started | Not planned in detail yet |
 | M4 | Broad optimization | Not started | Not planned in detail yet |
 | M5 | Program corpus | Not started | Not planned in detail yet |
@@ -94,10 +94,11 @@ Current tickets: `[##################--]` 67 of 73
 | S4-09 | LRA folds a misaligned vector load into vaddps/vsubps/vmulps ("m" constraint), which faults on the card | Done | Vectorized float and double add, sub and mul no longer fold a misaligned array load into the instruction, w... |
 | S4-10 | pm.py approve merges a GCC ticket without rewriting files in the shared checkout | Done | Approving a GCC ticket no longer rewrites the merged files in the shared GCC checkout, so the next build is... |
 | S4-11 | gcc_build.py refuses a build tree whose mddeps.mk has lost the .md includes | Done | A shared GCC build tree that has lost its .md dependency list is now rebuilt and checked instead of being c... |
-| S4-12 | card_run stages a whole batch in one upload, so card cores are busy instead of waiting on SSH | Waiting for review | Red a122ec7. --file-list: helper upload + one pack; 300 files = 2 connections (was 303), no per-file chmod.... |
+| S4-12 | card_run stages a whole batch in one upload, so card cores are busy instead of waiting on SSH | Done | card_run can now ship a whole batch of programs in one packed upload, unpacked on the card by a small check... |
 
 ## Recent activity
 
+- 2026-11-04 18:16 **S4-12** lead approve: card_run can now ship a whole batch of programs in one packed upload, unpacked on the card by a small checked helper, instead of two SSH connection...
 - 2026-11-04 18:14 **S4-12** engineer submit: Red a122ec7. --file-list: helper upload + one pack; 300 files = 2 connections (was 303), no per-file chmod. Unpack fail-closed tests pass; donor cl...
 - 2026-11-04 18:14 **S4-12** lead answer: Revert harness/card/run_suite.py on your branch (harness/ is lead-owned and protected); keep the two hunks in your submit note and the lead applies...
 - 2026-11-04 18:13 **S4-12** engineer ask: Submit is hard-refused: protected path harness/card/run_suite.py (--override does not cover it). Ticket fix 2 and your memory addition put it in sc...
@@ -105,13 +106,12 @@ Current tickets: `[##################--]` 67 of 73
 - 2026-11-04 17:44 **S4-02** engineer submit: GCC eab9a5f6dd7 (built). T0 4/4, T1 230/230 (4 new knc-mask files pass), T2 23/23: check_gcc16_t0_t1_t2-20261104-174119.log. Torture O2: 5 of 1962 ...
 - 2026-11-04 15:35 **S4-02** lead approve-red: Red approved: the four T1 files pin each KNC compare predicate into a k register, the operand swap for > and >=, the quiet UNGE staying scalar, and...
 - 2026-11-04 15:31 **S4-02** engineer red: Red f943685: 4 new T1 files (knc-mask-cmp-f32/f64/i32, knc-mask-spill) fail on the current build: the compare loops stay scalar (no vcmpps/vcmppd/v...
-- 2026-11-04 15:25 **S4-11** lead approve: A shared GCC build tree that has lost its .md dependency list is now rebuilt and checked instead of being certified, so edits to imci.md or sse.md ...
 
 ## Cost
 
 - From the script, engineer: 186 sessions, 441.0M input tokens
 - From the script, lead: 184 sessions, 58.7M input tokens
-- Started by hand, Claude: 9 sessions, 694.1M input tokens
+- Started by hand, Claude: 9 sessions, 695.4M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
