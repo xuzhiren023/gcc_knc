@@ -13,8 +13,8 @@
 // scan-asm-func xor_v8di: \A(?![\s\S]*\bvpxorq\b[\s\S]*\bvpxorq\b)[\s\S]*\bvpxorq\s[^\n]*%zmm\d+
 // The float-bits idiom must stay integer logic: KNC has no vandps.
 // scan-asm-func abs_bits_v16sf: \bvpandd\s[^\n]*%zmm\d+
-// scan-asm-func broadcast_v16si: \bvpbroadcastd\s+\(
-// scan-asm-func broadcast_v8di: \bvpbroadcastq\s+\(
+// scan-asm-func broadcast_v16si: \bvpbroadcastd\s+[-\w.]*\(
+// scan-asm-func broadcast_v8di: \bvpbroadcastq\s+[-\w.]*\(
 // scan-asm-not: %(?:xmm|ymm)\d|\bvp(?:add|sub|mull)q\b
 
 typedef int v16si __attribute__ ((vector_size (64)));
