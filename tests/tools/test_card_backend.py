@@ -19,6 +19,12 @@ ROOT = Path(__file__).resolve().parents[2]
 class CardBackend(unittest.TestCase):
     def setUp(self):
         self.runner = runpy.run_path(str(ROOT / "tools/card_run"))
+        temporary = tempfile.TemporaryDirectory(dir=ROOT)
+        self.addCleanup(temporary.cleanup)
+        receipt_patch = mock.patch.dict(self.runner["run"].__globals__,
+                                       RECEIPT_DIR=Path(temporary.name) / "receipts")
+        receipt_patch.start()
+        self.addCleanup(receipt_patch.stop)
         self.remote = (ROOT / "tools/card_run_remote.sh").read_text()
         self.session = object.__new__(self.runner["SSHSession"])
         self.session.run_dir = "/tmp/claude/claude-" + uuid.uuid4().hex
