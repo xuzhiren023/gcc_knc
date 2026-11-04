@@ -145,7 +145,8 @@ def build_cc1(repo, shared, tree, slot):
              '--host=x86_64-pc-cygwin', '--target=x86_64-pc-cygwin',
              '--enable-languages=c', '--disable-bootstrap', '--disable-multilib',
              '--disable-nls', '--without-isl'], build)
-    command(['make', '-j8', 'all-gcc', 'CFLAGS=-O2 -g1', 'CXXFLAGS=-O2 -g1'], build)
+    # Two retained compiler builds leave less memory available for Cygwin DLLs.
+    command(['make', '-j4', 'all-gcc', 'CFLAGS=-O2 -g1', 'CXXFLAGS=-O2 -g1'], build)
     compiler = build / 'gcc/cc1.exe'
     if not compiler.is_file():
         raise RuntimeError('build did not produce ' + str(compiler))

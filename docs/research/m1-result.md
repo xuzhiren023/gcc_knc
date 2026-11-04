@@ -124,10 +124,22 @@ have **not** been built. They look localized; calling all four proven textual co
 would overstate the evidence. The generated file is the same TLS conflict, not a fourth
 independent logic problem.
 
-`tools/portability.py x86 --tree releases/gcc-16.2.0 --tree knc` failed **before either
-build**: `tasklist.exe /FI "IMAGENAME eq make.exe" /FO CSV /NH` returns Access denied (X).
-Neither x86 option set has comparison results. Trunk C-only build/T1/T2 have not run:
-the build-exclusion check is unavailable and conflicts need resolution. Lead action needed.
+The four scratch-tree resolutions preserve KNC behavior: `i386-c.cc` keeps the macro
+hook and upstream's comment spelling (**textual**); `i386.cc` keeps the ABI type guard
+in the public `ix86_pass_by_reference` wrapper, before the cumulative-argument lookup,
+and upstream's extracted helper (**textual relocation**, no guard logic change).
+`configure.ac` and generated `configure` retain upstream's `as_flavor` test while
+adding K1OM to the target alternative (**textual**, same TLS behavior). None required
+redesigning KNC logic. Build/test evidence is reported separately below.
+
+The initial x86 invocation failed before builds because `tasklist.exe` returns Access
+denied (X). The lead-authorized `--skip-make-check` now prints `make check skipped`;
+one tool test went red then passed (K). Before the retry, no build of this ticket was
+running (`Get-Process make` returned none). Stock x86 C-only `cc1` built, but the KNC
+x86 build stopped with Cygwin `unable to load user32.dll, Win32 error 8` (X1), an
+infrastructure resource failure. The retry uses four jobs instead of eight, retains
+the existing objects and separate `portability/x86-{a,b}/build` directories outside
+`gcc-build`, and logs the skipped make check explicitly.
 
 ## Measured cost versus estimates
 
@@ -139,7 +151,7 @@ fork is not the whole project effort: the totals include harness, tools and rese
 S0-06's measured log reports configure 60.112s, full C+Fortran all-gcc 2,725.762s,
 `i386.cc` incremental 168.536s, `i386.md` incremental 264.552s, build 2.304 GiB logical.
 Source: `.work/_state/logs/S0_06_timing-20261102-065354.log`. Those are historical
-measurements, not promised final-head rebuild times; this session built no compiler.
+measurements, not promised final-head rebuild times.
 
 **Estimated separate-backend duplication**, sized from stock GCC 16.2 source, informed by
 [donor inventory](donor-inventory.md): retain the indicated fraction of each source span,
@@ -206,3 +218,6 @@ Logs below are relative to `.work/_state/logs/`; large outputs stay in the share
 - R: `S3_11_xi_reproducer-20261104-011126.log` (both expected ICEs reproduced).
 - D: `S3_11_drill-20261104-010549.log` (PASS, conflict report generated).
 - X: `S3_11_x86-20261104-010533.log` (infrastructure failure).
+- K: `S3_11_skip_make_red-20261104-011946.log` (expected failure),
+  `S3_11_skip_make-20261104-012005.log` (one test PASS).
+- X1: `S3_11_x86-20261104-012011.log` (stock built; KNC build resource failure).
