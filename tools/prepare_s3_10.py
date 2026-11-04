@@ -20,6 +20,11 @@ OPTIONS = re.compile(r'\{\s*dg-(?:additional-)?options\s+(?:"([^"\n]*)"|\{([^{}\
                      r'(\s*\{\s*target\b)?')
 
 
+def card_spelling(text):
+    """Placeholder: rewrite host %La long-double values in the card's glibc spelling."""
+    return text
+
+
 def run(args, check=True):
     args = list(map(str, args))
     print('+ ' + shlex.join(args), flush=True)
@@ -124,7 +129,7 @@ def main():
                 objects.append(obj)
             program = 'claude-abi-O%d-%d.mic' % (opt, reverse)
             run([*cc, *objects, '-lm', '-o', OUT / program])
-            row(program, reference)
+            row(program, card_spelling(reference))
 
     # Default contraction in the loop TU; reference precision in its own TU.
     run([*cc, '-O2', '-ftree-vectorize', '-c', fixture / 'loops.c', '-o', loops])
