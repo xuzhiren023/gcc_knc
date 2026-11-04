@@ -62,6 +62,11 @@ The merged `knc` (`daedd869681`) at `-O2 -march=knc`, vectorization on by defaul
     it, and ADR-0005 point 4 is amended.
 - No runner refusals in six chunks (S3-18 and S3-19 had merged by then).
 
+## m1_affine with the Fortran twin, after S3-08 (2026-11-04 02:45 UTC)
+
+`driver.c -DKNC_WITH_FORTRAN`, `loops.c` and `affine_fortran.f90` (GCC 16 `gfortran`, vectorized),
+at contraction `off` and `fast`: both print `ACCEPT-PASS scalar=3.00 failures=0`.
+
 ## FP state and special values (2026-11-04 01:30 UTC)
 
 `tests/acceptance/s3_vec_card/fp_special.c`, built with S3-07's branch build (`dd28677d065`,

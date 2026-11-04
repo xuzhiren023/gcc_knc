@@ -58,7 +58,9 @@ Last updated: 2026-11-03 evening, mid-Sprint 3 (S3-01 to S3-05 and S3-12 merged;
   - S3-04 and S3-05's packed copies pass 780 checks at `-O0` and `-O2`, and a broken-alignment control segfaults.
   - S3-06's packed add, sub, mul, broadcast and fused FMA pass.
   - The 256-program torture subset rebuilt with the new compiler passes 256 of 256.
-  - Not on the card yet: auto-vectorized loops (S3-07), TLS (S3-14), and complex values and rounding (S3-15).
+  - After S3-07 and S3-08 merged: `m1_affine` with vectorized loops prints `ACCEPT-PASS scalar=3.00 failures=0` in all six builds (contraction off and fast; driver by GCC 16 or the donor; and with the Fortran twin).
+  - The full `gcc.c-torture/execute` suite at `-O2 -march=knc` passes 1,659 of 1,661 on the card. `930529-1` was a harness miss of `-fwrapv`. **`pr65369` is real wrong code:** SLP put a V16SI unaligned pair on a byte-aligned address, and the pairs need element alignment. S3-21 fixes it, and ADR-0005 point 4 is amended. One ICE in the build, `pr85169`: S3-20.
+  - Not on the card yet: TLS (S3-14), and complex values and rounding (S3-15).
 - **FP state on the card (lead, 2026-11-03):** startup MXCSR without fast-math is `0x00200000` (no FTZ or DAZ) and the x87 control word `0x037f`. CPUID leaf 1 reports no SSE or SSE2. Packed add, sub and mul match x87 on signed zeros, infinities, NaN and subnormals, and set the same `fetestexcept` flags (`fp_special.c`, 96 of 96 at -O0 and -O2). x87 in libgcc helpers such as `__powidf2` is intended here (ADR-0003), and the lint already runs on linked executables. One card job after S3-17 ended `infrastructure-failure` for a reason that was not kept; S3-18 keeps receipts.
 - **Rule (owner, 2026-11-03):** card checks run as soon as a code-changing ticket merges, not at sprint end. S3-10 then only adds what is new, built after S3-14 (everything before it uses emulated TLS).
 - **Not yet checked anywhere:** x86_64 assembly unchanged by our shared lines; GCC trunk with our diff building and passing T1 and T2; complex values and the rounding mode across GCC 16/donor calls. All of these are in S3-11 or S3-15.
