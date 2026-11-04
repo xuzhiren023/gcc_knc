@@ -257,3 +257,91 @@ Upstream line churn since 16.2 in files changed by KNC:
 | `libgcc/config/i386/knc-sfp-machine.h` | +0 | -0 |
 | `libgcc/config/i386/t-knc` | +0 | -0 |
 
+## 2026-11-04T02:55:05+00:00
+
+Base: `releases/gcc-16.2.0`; KNC: `c4a350644aabe7f6aea7277b01225744e1a1b458`.
+Local refs only; no fetch, checkout, index update or ref update.
+
+### upstream/master
+
+Commit: `b88c2821e219244d18df873b0bfb344d3dc0b2a7`; date: 2026-11-03T19:41:47+01:00.
+
+Conflicts: 1
+
+#### `gcc/config/i386/i386-c.cc`
+
+```diff
+<<<<<<< upstream/master
+  /* For some of the k6/pentium variants there weren't separate ISA bits to
+=======
+  if (isa_flag & OPTION_MASK_ISA_KNC)
+    arch = ix86_knc_target_macros (parse_in, def_or_undef);
+
+  /* For some of the k6/pentium varients there weren't separate ISA bits to
+>>>>>>> knc
+```
+
+Upstream line churn since 16.2 in files changed by KNC:
+
+| File | Added | Removed |
+| --- | ---: | ---: |
+| `gcc/common/config/i386/i386-common.cc` | +67 | -22 |
+| `gcc/config.gcc` | +93 | -158 |
+| `gcc/config.host` | +10 | -2 |
+| `gcc/config/i386/i386-c.cc` | +10 | -5 |
+| `gcc/config/i386/i386-expand.cc` | +3463 | -508 |
+| `gcc/config/i386/i386-knc.cc` | +0 | -0 |
+| `gcc/config/i386/i386-knc.h` | +0 | -0 |
+| `gcc/config/i386/i386-options.cc` | +142 | -91 |
+| `gcc/config/i386/i386-protos.h` | +21 | -16 |
+| `gcc/config/i386/i386.cc` | +1369 | -459 |
+| `gcc/config/i386/i386.h` | +70 | -48 |
+| `gcc/config/i386/i386.md` | +2401 | -1450 |
+| `gcc/config/i386/i386.opt` | +24 | -6 |
+| `gcc/config/i386/imci.md` | +0 | -0 |
+| `gcc/config/i386/linux-k1om.h` | +0 | -0 |
+| `gcc/config/i386/sse.md` | +2036 | -286 |
+| `gcc/config/i386/sync.md` | +57 | -3 |
+| `gcc/config/i386/t-i386` | +0 | -0 |
+| `gcc/configure` | +1043 | -920 |
+| `gcc/configure.ac` | +367 | -378 |
+| `libgcc/config.host` | +13 | -23 |
+| `libgcc/config/i386/knc-crtfastmath.c` | +0 | -0 |
+| `libgcc/config/i386/knc-sfp-machine.h` | +0 | -0 |
+| `libgcc/config/i386/t-knc` | +0 | -0 |
+
+### upstream/releases/gcc-16
+
+Commit: `4b03dde2e3ad210db469ee763194c0cbec22cf45`; date: 2026-11-03T10:43:47+01:00.
+
+Conflicts: 0
+
+Upstream line churn since 16.2 in files changed by KNC:
+
+| File | Added | Removed |
+| --- | ---: | ---: |
+| `gcc/common/config/i386/i386-common.cc` | +3 | -1 |
+| `gcc/config.gcc` | +0 | -0 |
+| `gcc/config.host` | +0 | -0 |
+| `gcc/config/i386/i386-c.cc` | +0 | -0 |
+| `gcc/config/i386/i386-expand.cc` | +23 | -10 |
+| `gcc/config/i386/i386-knc.cc` | +0 | -0 |
+| `gcc/config/i386/i386-knc.h` | +0 | -0 |
+| `gcc/config/i386/i386-options.cc` | +0 | -0 |
+| `gcc/config/i386/i386-protos.h` | +0 | -0 |
+| `gcc/config/i386/i386.cc` | +35 | -47 |
+| `gcc/config/i386/i386.h` | +0 | -0 |
+| `gcc/config/i386/i386.md` | +73 | -28 |
+| `gcc/config/i386/i386.opt` | +0 | -0 |
+| `gcc/config/i386/imci.md` | +0 | -0 |
+| `gcc/config/i386/linux-k1om.h` | +0 | -0 |
+| `gcc/config/i386/sse.md` | +99 | -54 |
+| `gcc/config/i386/sync.md` | +0 | -0 |
+| `gcc/config/i386/t-i386` | +0 | -0 |
+| `gcc/configure` | +1 | -1 |
+| `gcc/configure.ac` | +1 | -1 |
+| `libgcc/config.host` | +1 | -0 |
+| `libgcc/config/i386/knc-crtfastmath.c` | +0 | -0 |
+| `libgcc/config/i386/knc-sfp-machine.h` | +0 | -0 |
+| `libgcc/config/i386/t-knc` | +0 | -0 |
+
