@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-04 09:50.
+Updated automatically at every ticket change. Last update: 2026-11-04 10:10.
 
 **Next: GPT-6.1, on S3-25 (va_arg of an unsupported KNC type leaves a broken expansion; release builds hide the ICE).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
@@ -11,7 +11,7 @@ Current tickets: `[###################-]` 59 of 61
 | | Milestone | State | Progress |
 |---|---|---|---|
 | M0 | Foundation | In progress | 17 of 17 tickets |
-| M1 | Mixed native code | In progress | 42 of 43 tickets |
+| M1 | Mixed native code | Done | 42 of 43 tickets |
 | M2 | Useful vector target | In progress | 0 of 1 tickets |
 | M3 | Runtimes | Not started | Not planned in detail yet |
 | M4 | Broad optimization | Not started | Not planned in detail yet |
@@ -82,7 +82,7 @@ Current tickets: `[###################-]` 59 of 61
 | S3-22 | The last three KNC blocks in shared i386 code become hooks (ADR-0006 rules 1-4) | Done | The last three KNC blocks in shared i386 code (zero-call-used-regs, the 16-byte CAS macro, the varargs save... |
 | S3-23 | KNC's atomic_storeti survives upstream's new one; trunk builds C-only and runs T1 and T2 | Done | KNC's 128-bit atomic store and exchange now live in i386-knc.cc helpers with unchanged output, and upstream... |
 | S3-24 | Skip GCC builds that are already current (shared tree and the x86 check's stock tree) | Done | GCC builds are now skipped when nothing changed: tools/gcc_build.py --if-stale skips the shared tree's make... |
-| S3-25 | va_arg of an unsupported KNC type leaves a broken expansion; release builds hide the ICE | Not started | Filed for M1 criterion 5 (each trunk difference needs a cause and a ticket). Start it only after the lead's... |
+| S3-25 | va_arg of an unsupported KNC type leaves a broken expansion; release builds hide the ICE | In progress | Filed for M1 criterion 5 (each trunk difference needs a cause and a ticket). Start it only after the lead's... |
 
 ## Recent activity
 
@@ -99,7 +99,7 @@ Current tickets: `[###################-]` 59 of 61
 
 - From the script, engineer: 185 sessions, 428.6M input tokens
 - From the script, lead: 183 sessions, 58.6M input tokens
-- Started by hand, Claude: 8 sessions, 558.4M input tokens
+- Started by hand, Claude: 8 sessions, 572.9M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
