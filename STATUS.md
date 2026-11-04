@@ -1,17 +1,17 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-04 04:02.
+Updated automatically at every ticket change. Last update: 2026-11-04 04:03.
 
-**Next: the tech lead, on S3-20.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: GPT-6.1, on S3-22 (The last three KNC blocks in shared i386 code become hooks (ADR-0006 rules 1-4)).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
-Current tickets: `[##################--]` 55 of 59
+Current tickets: `[##################--]` 56 of 59
 
 ## Milestones
 
 | | Milestone | State | Progress |
 |---|---|---|---|
 | M0 | Foundation | In progress | 17 of 17 tickets |
-| M1 | Mixed native code | In progress | 38 of 41 tickets |
+| M1 | Mixed native code | In progress | 39 of 41 tickets |
 | M2 | Useful vector target | In progress | 0 of 1 tickets |
 | M3 | Runtimes | Not started | Not planned in detail yet |
 | M4 | Broad optimization | Not started | Not planned in detail yet |
@@ -77,13 +77,14 @@ Current tickets: `[##################--]` 55 of 59
 | S3-17 | card_run takes each process's parent from the same status read that admits it | Done | card_run no longer refuses jobs when a kernel thread's first status read fails: each process's parent now c... |
 | S3-18 | card_run keeps every job's receipt, and the ledger finish line says why a job was refused | Done | card_run now saves every job's result under .work/_state/card/ (newest 200 kept), and the ledger finish lin... |
 | S3-19 | card_run's snapshot silences the status redirect before it can fail | Done | A card process that exits mid-snapshot no longer makes card_run refuse the job, and a lint stops the redire... |
-| S3-20 | 64-byte XImode memory-to-memory copy ICEs (gcc.c-torture/execute/pr85169.c) | Waiting for review | Red d3640ed reproduced O0/O1/O2 ICE; all now compile/assemble/lint PASS. GCC: 4bd9010e31f hook, 086fe1c3cc7... |
+| S3-20 | 64-byte XImode memory-to-memory copy ICEs (gcc.c-torture/execute/pr85169.c) | Done | A 64-byte char-vector (XImode) memory-to-memory copy, as in pr85169.c, now compiles at -O0, -O1 and -O2 thr... |
 | S3-21 | Unaligned packed accesses need element alignment; byte-aligned ones must not use load/store pairs | Done | Byte-aligned vector copies (like pr65369) no longer use the KNC load/store pair instructions that need elem... |
 | S3-22 | The last three KNC blocks in shared i386 code become hooks (ADR-0006 rules 1-4) | Not started | Created by the lead from S3-11's audit, as S3-11's 01:18 answer said. |
 | S3-23 | KNC's atomic_storeti survives upstream's new one; trunk builds C-only and runs T1 and T2 | Not started | Created by the lead from S3-11's trunk finding, as S3-11's 03:40 |
 
 ## Recent activity
 
+- 2026-11-04 04:03 **S3-20** lead approve: A 64-byte char-vector (XImode) memory-to-memory copy, as in pr85169.c, now compiles at -O0, -O1 and -O2 through a register instead of crashing the ...
 - 2026-11-04 04:01 **S3-20** engineer submit: Red d3640ed reproduced O0/O1/O2 ICE; all now compile/assemble/lint PASS. GCC: 4bd9010e31f hook, 086fe1c3cc7 XI register transport. Object/full buil...
 - 2026-11-04 03:50 **S3-23** lead note: Created by the lead from S3-11's trunk finding, as S3-11's 03:40
 - 2026-11-04 03:43 **S3-11** lead approve: The M1 evidence note is in: x86_64 assembly is unchanged by our shared i386 lines (1,962 identical files at -O2 and -O2 -mavx512f), the torture swe...
@@ -91,13 +92,12 @@ Current tickets: `[##################--]` 55 of 59
 - 2026-11-04 03:40 **S3-11** lead answer: Yes, and the interactive lead tickets it, so do not wait for it. Treat atomic_storeti as a forward-port finding: upstream master has added its own ...
 - 2026-11-04 03:39 **S3-11** engineer ask: 02a0135: x86 PASS both options: 1962 identical, 0 differences, 41 matching failures each. Trunk failed twice: build-host libcpp prerequisite (fixed...
 - 2026-11-04 03:15 **S3-22** lead note: Created by the lead from S3-11's audit, as S3-11's 01:18 answer said.
-- 2026-11-04 01:32 **S3-10** lead note: Card run done. Every row passes: m1_affine three ways, vector, FP and special-value programs, ABI cross-links (expected files differ only in %La sp...
 
 ## Cost
 
 - From the script, engineer: 178 sessions, 380.4M input tokens
 - From the script, lead: 175 sessions, 57.0M input tokens
-- Started by hand, Claude: 7 sessions, 526.0M input tokens
+- Started by hand, Claude: 7 sessions, 526.9M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
