@@ -41,7 +41,9 @@ void packed_contract(const packed *a, const packed *b, const packed *c, packed *
 void packed_broadcast_memory(const scalar *a, packed *c)
 { scalar x = *a; *c = (packed){PACKED_REPEAT(x)}; }
 #elif CASE == 22
-void packed_broadcast_register(scalar x, packed *c)
+/* Keep x in a pseudo even at -O0; an ordinary parameter is spilled after
+   the asm and would test the memory-broadcast path a second time. */
+void packed_broadcast_register(register scalar x, packed *c)
 {
   __asm__ volatile("# packed-scalar %g0" : "+YJ"(x));
   *c = (packed){PACKED_REPEAT(x)};

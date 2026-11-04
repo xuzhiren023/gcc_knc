@@ -262,7 +262,7 @@ def t1_packed(runner):
                     runner.result(label, [str(error)])
 
 
-def t1_fp(runner):
+def t1_fp(runner, only=None):
     cases = dict(enumerate(('add', 'sub', 'mul', 'contract_off', 'contract_fast',
                            'broadcast_memory', 'broadcast_register', 'divide',
                            'sqrt', 'unaligned_add', 'unaligned_sub', 'unaligned_mul',
@@ -271,6 +271,8 @@ def t1_fp(runner):
     for mode in MODES:
         for level in ('-O0', '-O2'):
             for number, case in cases.items():
+                if only is not None and (mode, level, case) not in only:
+                    continue
                 if mode not in ('v16sf', 'v8df') and number < 30:
                     continue
                 if case.endswith('_fast') and level == '-O0':
