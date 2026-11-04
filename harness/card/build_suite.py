@@ -54,7 +54,7 @@ def build(source):
     prog = "claude-t-" + source.stem + ".mic"
     obj = OUT / (source.stem + ".o")
     try:
-        r = subprocess.run([*cc, "-O2", *arch, "-w", *extra, "-c", str(source), "-o", str(obj)],
+        r = subprocess.run([*cc, "-O2", *arch, "-w", *extra, "-c", source.as_posix(), "-o", str(obj)],
                            env=env, capture_output=True, text=True, timeout=300)
     except subprocess.TimeoutExpired:
         return source.name, prog, "compile timeout", 0

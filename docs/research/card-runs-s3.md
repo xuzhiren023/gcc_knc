@@ -157,3 +157,29 @@ so the expectations are their own control.
 Full execute suite after S3-15 (`eb8fb3e902a`): the build gives the same result for every one of
 the 1,692 sources as after S3-14 (the new guard rejects nothing that compiled before), and on the
 card **1,661 of 1,661 PASS**, six jobs, no retries.
+
+## S3-10 batch (2026-11-04 06:05-06:30 UTC)
+
+Built by S3-10 from merged `knc` `eb8fb3e902a` (S3-15, native TLS) into `.work/_shared/tmp/S3-10/`
+(`batch.txt`); all programs lint clean. Run by the lead, one card job per row, the torture list in
+six jobs at `-j 30`. Receipts and raw output: `.work/_state/card/S3-10/`.
+
+| Row | Card job | Result |
+|---|---|---|
+| `claude-m1` (`m1_affine`, GCC 16 both units, `-ffp-contract=off`) | `claude-c0e96863…` | `ACCEPT-PASS scalar=3.00 failures=0` |
+| `claude-m1-donor` (driver by the donor: ABI cross-check) | `claude-8ccb0f64…` | same |
+| `claude-m1-fortran` (Fortran twin of the loops) | `claude-cf4fb526…` | same |
+| `claude-vec-O0`, `-O2` (S3-04/05 packed copies) | `claude-1751bdce…`, `claude-50579eb4…` | `S3-VEC PASS cases=780 failures=0` |
+| `claude-fp-O0`, `-O2` (S3-06 arithmetic, FMA at `-O2`) | `claude-d41924d5…`, `claude-8c5efcaa…` | `S3-FP PASS` |
+| `claude-special-O0`, `-O2` (signed zeros, ∞, NaN, subnormals, flags) | `claude-5b586e13…`, `claude-cb9cff4c…` | `S3-FPSPECIAL PASS cases=96 failures=0` |
+| `claude-abi-O0-0`, `-O0-1`, `-O2-0`, `-O2-1` (S3-15 complex and rounding, both ways) | `claude-2588b1c9…`, `claude-9a8b3c58…`, `claude-cc92f081…`, `claude-1b508f28…` | `complex ABI PASS` and 4 × `rounding PASS`. The expected files differ only in `%La` spelling of the same long double (host libc `0x1.c00000000000001p+0`, card glibc `0xe.000000000000008p-3`); the program compares the values exactly |
+| `claude-inexact` (affine f32 and f64, contraction on, inexact inputs, offsets 0-15) | `claude-6a72ef8a…` | `S3-INEXACT PASS failures=0`: every element within 1 ULP of a long double reference; 0 elements differ between the x87 peel or remainder and the vector body at every offset |
+| 1,680 `gcc.c-torture/execute` programs, `-O2 -march=knc` | six jobs | **1,680 of 1,680 PASS** |
+
+S3-14's TLS cross-check passed earlier on the same compiler (above). S3-10 links 1,680 of 1,692
+torture sources against the lead harness's 1,661: `harness/card/build_suite.py` passed Windows
+paths to the Cygwin driver, so 19 sources with quoted includes failed to compile there. Fixed in
+the harness (forward-slash paths); those 19 are in the 1,680 above.
+
+**Sprint 3's card batch passes in full.** `pr85169` (S3-20) is the only execute source not
+covered, because it ICEs.
