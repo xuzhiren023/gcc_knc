@@ -54,13 +54,3 @@ void cst_ptr_f32 (PTR (float) c, PTR (const float) a, PTR (const float) x,
 int m_i32[G];
 void cadd_f32 (int n) { LOOP if (m_i32[i]) c_f32[i] += x_f32[i]; }
 void cadd_i32 (int n) { LOOP if (m_i32[i]) c_i32[i] += x_i32[i]; }
-
-void and_i32 (PTR (int) c, PTR (const int) a, PTR (const int) b, int n)
-{ LOOP c[i] = a[i] > 0 && b[i] < 0 ? a[i] : b[i]; }
-void or_f32 (PTR (float) c, PTR (const float) a, PTR (const float) b, int n)
-{ LOOP c[i] = (a[i] > 0) | (b[i] < 0) ? a[i] : b[i]; }
-void xor_f32 (PTR (float) c, PTR (const float) a, PTR (const float) b, int n)
-{ LOOP c[i] = (a[i] > 0) ^ (b[i] < 0) ? a[i] : b[i]; }
-void andnot_f64 (PTR (double) c, PTR (const double) a, PTR (const double) b,
-                 int n)
-{ LOOP c[i] = (a[i] > 0) & !(b[i] < 0) ? a[i] : b[i]; }

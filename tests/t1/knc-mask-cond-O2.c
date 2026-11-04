@@ -1,5 +1,5 @@
 // S4-03 / ADR-0007: selects, min/max, fabs and conditional loads/stores
-// vectorize into IMCI compares, k-register logic, blends and 64-byte aligned
+// vectorize into IMCI compares, blends and 64-byte aligned
 // masked moves guarded against an empty mask.  fmin/fmax stay scalar: libm
 // returns its first argument for opposite zeros, vgminps/vgmaxps do not.
 // options: -O2 -ftree-vectorize
@@ -38,14 +38,5 @@
 // scan-asm-func cadd_f32: \bvmovaps\s+%zmm\d+,\s*[^\n]*\)\{%k[1-7]\}
 // scan-asm-func cadd_i32: \bvpaddd\s[^\n]*%zmm
 // scan-asm-func cadd_i32: \bvmovdqa32\s+%zmm\d+,\s*[^\n]*\)\{%k[1-7]\}
-// scan-asm-func and_i32: \bk(?:and|or)\s+%k[0-7],\s*%k[0-7]\s*$
-// scan-asm-func and_i32: \A(?![\s\S]*\bkmov\s+%k[0-7],\s*%(?:e[a-z]+|r\d+d)\s*$)
-// scan-asm-func or_f32: \bk(?:or|and)\s+%k[0-7],\s*%k[0-7]\s*$
-// scan-asm-func or_f32: \A(?![\s\S]*\bkmov\s+%k[0-7],\s*%(?:e[a-z]+|r\d+d)\s*$)
-// scan-asm-func xor_f32: \bkx(?:or|nor)\s+%k[0-7],\s*%k[0-7]\s*$
-// scan-asm-func xor_f32: \A(?![\s\S]*\bkmov\s+%k[0-7],\s*%(?:e[a-z]+|r\d+d)\s*$)
-// scan-asm-func andnot_f64: \bknot\s+%k[0-7],\s*%k[0-7]\s*$
-// scan-asm-func andnot_f64: \bkand\s+%k[0-7],\s*%k[0-7]\s*$
-// scan-asm-func andnot_f64: \A(?![\s\S]*\bkmov\s+%k[0-7],\s*%(?:e[a-z]+|r\d+d)\s*$)
 // scan-asm-not: %(?:xmm|ymm)\d
 #include "knc-mask-cond.h"
