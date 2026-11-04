@@ -39,7 +39,11 @@ both affine loops vectorized with 64-byte vectors. With `-ffp-contract=off` they
 | fast | GCC 16 | `ACCEPT-PASS scalar=3.00 failures=0` |
 | fast | donor | `ACCEPT-PASS scalar=3.00 failures=0` |
 
-This is rerun on the merged head when S3-07 merges.
+S3-07 merged as `daedd869681`, with no compiler change after `dd28677d065`, so these are the
+merged code's results. After the merge, S2-08's 256 torture programs, rebuilt with vectorization on
+by default, pass 256 of 256. Only 10 of them contain packed zmm code, so that is a regression check,
+not a vector test; the full execute suite follows. Two attempts were refused by the S3-19 race
+before one ran.
 
 ## FP state and special values (2026-11-04 01:30 UTC)
 
