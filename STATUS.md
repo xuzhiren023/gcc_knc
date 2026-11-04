@@ -65,7 +65,7 @@ Current tickets: `[################----]` 46 of 55
 | S3-05 | Unaligned packed moves through load and store pairs | Done | Packed copies through pointers of unknown alignment now compile, for all four 512-bit modes, to unmasked lo... |
 | S3-06 | Packed FP add, sub, mul, FMA and broadcasts for V16SF and V8DF | Done | Under -march=knc, 512-bit float and double vectors now compile to packed add, subtract, multiply, fused mul... |
 | S3-07 | Auto-vectorization on zmm, with x87 peel and remainder; m1_affine T1 and T2 green | Done | With -mknc, GCC 16 now auto-vectorizes simple float and double loops at default -O2 into packed zmm multipl... |
-| S3-08 | Fortran twin of m1_affine vectorizes and links | Changes requested | 1. tools/check.py:392 (also :271, :342): the new unguarded self.args.compiler checks fail on Runner objects... |
+| S3-08 | Fortran twin of m1_affine vectorizes and links | In progress | 1. tools/check.py:392 (also :271, :342): the new unguarded self.args.compiler checks fail on Runner objects... |
 | S3-09 | Packed integer add, sub, mul, logic and broadcast for V16SI; logic for V8DI | draft | Moved to Sprint 4 by the owner on 2026-11-03, on the lead's recommendation: m1_affine is float and double o... |
 | S3-10 | Card batch for Sprint 3 and m1_affine | Not started | Also add (1) S3-14's TLS and S3-15's complex and rounding cross-checks, built after both merge (objects bui... |
 | S3-11 | Milestone M1 note: fixture, line counts, ICE classes and backend cost comparison | Not started | Owner approved Sprint 3 on 2026-11-03; ticket set to ready. |
