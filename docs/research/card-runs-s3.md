@@ -25,6 +25,22 @@ Runner issue: two attempts at the torture job were refused with `unknown process
 snapshot: b'PROC\t242373\t\tkworker/u:7\t\t'` while a `gpt61` job ran. The third attempt passed.
 S3-17 fixes the cause.
 
+## m1_affine, early (2026-11-04 01:50 UTC)
+
+Built with S3-07's branch build (`dd28677d065`, before S3-07 merged): `loops.c` at `-O2
+-ftree-vectorize -march=knc`, and `driver.c` by GCC 16 or by the donor. `-fopt-info-vec` reports
+both affine loops vectorized with 64-byte vectors. With `-ffp-contract=off` they use `vmulp*` and
+`vaddp*`; with `fast`, `vfmadd*`. All four builds lint clean.
+
+| `loops.c` contraction | `driver.c` built by | Card |
+|---|---|---|
+| off | GCC 16 | `ACCEPT-PASS scalar=3.00 failures=0` |
+| off | donor (ABI cross-check) | `ACCEPT-PASS scalar=3.00 failures=0` (first attempt refused by the runner, S3-19) |
+| fast | GCC 16 | `ACCEPT-PASS scalar=3.00 failures=0` |
+| fast | donor | `ACCEPT-PASS scalar=3.00 failures=0` |
+
+This is rerun on the merged head when S3-07 merges.
+
 ## FP state and special values (2026-11-04 01:30 UTC)
 
 `tests/acceptance/s3_vec_card/fp_special.c`, built with S3-07's branch build (`dd28677d065`,
