@@ -24,7 +24,7 @@ FOREIGN = dict(pid=42, ppid=1, name="wrf", exe="/other/wrf", cwd="/other")
 # Deliberately scrambled IDs and multiple logical CPUs per physical core.
 CPUINFO = "\n\n".join(
     "processor : %d\nphysical id : 0\ncore id : %d" % pair
-    for pair in ((7, 60), (91, 30), (2, 29), (13, 59), (4, 30), (88, 0))) + "\n"
+    for pair in ((7, 60), (91, 40), (2, 39), (13, 59), (4, 40), (88, 0))) + "\n"
 
 
 class SharedTransport:
@@ -186,7 +186,7 @@ class SharedCardRules(unittest.TestCase):
             nonlocal snapshots
             snapshots += 1
             parser.run_dir = self.transport.run_dir
-            raw = ("BOOT\t%s\nCPU\tprocessor : 91\nCPU\tcore id : 30\n"
+            raw = ("BOOT\t%s\nCPU\tprocessor : 91\nCPU\tcore id : 40\n"
                    "MEM\tMemFree: 4000000 kB\n" % BOOT).encode()
             if snapshots == 3:  # After execute returned its matched result.
                 raw += b"PROC\t43\t1\tending\nPROC\t42\t1\tforeign\t/bin/sh\t/other\n"
@@ -266,7 +266,7 @@ class SharedCardRules(unittest.TestCase):
         start, end = lines
         self.assertTrue(start["jobId"].startswith("claude-"))
         self.assertEqual(end["jobId"], start["jobId"])
-        self.assertEqual(set(start["cores"]), {30, 59})
+        self.assertEqual(set(start["cores"]), {40, 59})
         self.assertEqual(start["memoryLimitMiB"], 128)
         self.assertTrue(start["startTime"])
         self.assertTrue(start["expectedEnd"])

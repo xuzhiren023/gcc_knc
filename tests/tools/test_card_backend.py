@@ -376,7 +376,7 @@ od() { case "$*" in *-A*) echo 'od: invalid option -- A' >&2; return 94;; esac; 
             proc = Path(name) / "proc"
             (proc / "sys/kernel/random").mkdir(parents=True)
             (proc / "sys/kernel/random/boot_id").write_text(BOOT + "\n")
-            (proc / "cpuinfo").write_text("processor : 91\ncore id : 30\n")
+            (proc / "cpuinfo").write_text("processor : 91\ncore id : 40\n")
             (proc / "meminfo").write_text("MemFree: 4000000 kB\n")
             script = self.remote.replace("/proc/", str(proc) + "/")
             script += '''
@@ -407,7 +407,7 @@ snapshot
             proc = Path(name) / "proc"
             (proc / "sys/kernel/random").mkdir(parents=True)
             (proc / "sys/kernel/random/boot_id").write_text(BOOT + "\n")
-            (proc / "cpuinfo").write_text("processor : 91\ncore id : 30\n")
+            (proc / "cpuinfo").write_text("processor : 91\ncore id : 40\n")
             (proc / "meminfo").write_text("MemFree: 4000000 kB\n")
             script = self.remote.replace("/proc/", str(proc) + "/")
             script += "\nrun_dir=/tmp/claude/claude-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\n"
