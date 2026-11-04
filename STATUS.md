@@ -2,7 +2,7 @@
 
 Updated automatically at every ticket change. Last update: 2026-11-04 12:23.
 
-Nothing can move right now.
+**Next: GPT-6.1, on S4-08 (Small fixes from M1: the varargs V4SF assert checks alignment; S3-10 ABI expected files).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
 Current tickets: `[#################---]` 63 of 71
 
@@ -90,7 +90,7 @@ Current tickets: `[#################---]` 63 of 71
 | S4-05 | Safe masked tails: a masked vector remainder only where every touched line is in the array | draft |  |
 | S4-06 | Batch check after S4-02, S3-09 and S4-03: x86, drill and ICE sweeps at the batch head | draft |  |
 | S4-07 | Final Sprint 4 batch check at the sprint head | draft |  |
-| S4-08 | Small fixes from M1: the varargs V4SF assert checks alignment; S3-10 ABI expected files | draft |  |
+| S4-08 | Small fixes from M1: the varargs V4SF assert checks alignment; S3-10 ABI expected files | In progress |  |
 | S4-09 | LRA folds a misaligned vector load into vaddps/vsubps/vmulps ("m" constraint), which faults on the card | Done | Vectorized float and double add, sub and mul no longer fold a misaligned array load into the instruction, w... |
 | S4-10 | pm.py approve merges a GCC ticket without rewriting files in the shared checkout | Done | Approving a GCC ticket no longer rewrites the merged files in the shared GCC checkout, so the next build is... |
 
@@ -109,7 +109,7 @@ Current tickets: `[#################---]` 63 of 71
 
 - From the script, engineer: 186 sessions, 441.0M input tokens
 - From the script, lead: 184 sessions, 58.7M input tokens
-- Started by hand, Claude: 9 sessions, 615.6M input tokens
+- Started by hand, Claude: 9 sessions, 616.6M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
