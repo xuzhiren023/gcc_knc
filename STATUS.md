@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-04 10:41.
+Updated automatically at every ticket change. Last update: 2026-11-04 10:49.
 
-**Next: GPT-6.1, on S3-25 (va_arg of an unsupported KNC type leaves a broken expansion; release builds hide the ICE).** Run `python tools/dispatch.py`, or ask the tech lead to.
+**Next: the tech lead, on S3-25.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[#################---]` 60 of 70
 
@@ -82,7 +82,7 @@ Current tickets: `[#################---]` 60 of 70
 | S3-22 | The last three KNC blocks in shared i386 code become hooks (ADR-0006 rules 1-4) | Done | The last three KNC blocks in shared i386 code (zero-call-used-regs, the 16-byte CAS macro, the varargs save... |
 | S3-23 | KNC's atomic_storeti survives upstream's new one; trunk builds C-only and runs T1 and T2 | Done | KNC's 128-bit atomic store and exchange now live in i386-knc.cc helpers with unchanged output, and upstream... |
 | S3-24 | Skip GCC builds that are already current (shared tree and the x86 check's stock tree) | Done | GCC builds are now skipped when nothing changed: tools/gcc_build.py --if-stale skips the shared tree's make... |
-| S3-25 | va_arg of an unsupported KNC type leaves a broken expansion; release builds hide the ICE | In progress | Filed for M1 criterion 5 (each trunk difference needs a cause and a ticket). Start it only after the lead's... |
+| S3-25 | va_arg of an unsupported KNC type leaves a broken expansion; release builds hide the ICE | Question for the tech lead | 60-call hook blocks further work. Authorize continuation for green checks? Red 4f8069e: full t0/t1/t2 has o... |
 | S4-01 | Masks on KNC: GCC 16 entry points, IMCI forms, reuse audit and masked-tail design (ADR-0007 input) | Done | The mask design input for Sprint 4 is done: KNC masks are HI for 16-lane and QI for 8-lane vectors, compare... |
 | S4-02 | Vector compares into k masks, mask logic and mask spills for the packed modes | draft |  |
 | S4-03 | Blends and if-conversion: conditional loops, ?:, fabs, min and max vectorize with masks | draft |  |
@@ -95,6 +95,7 @@ Current tickets: `[#################---]` 60 of 70
 
 ## Recent activity
 
+- 2026-11-04 10:49 **S3-25** engineer ask: 60-call hook blocks further work. Authorize continuation for green checks? Red 4f8069e: full t0/t1/t2 has only the 16 expected VAR_GET failures. GC...
 - 2026-11-04 10:41 **S4-01** lead approve: The mask design input for Sprint 4 is done: KNC masks are HI for 16-lane and QI for 8-lane vectors, compares, blends and mask logic are new imci.md...
 - 2026-11-04 10:38 **S4-01** engineer submit: docs/research/knc-masks.md: 6 sections + ADR-0007 inputs, read-only, no build. Masks HI for 16-lane, QI for 8-lane (1-term get_mask_mode hook; ADR-...
 - 2026-11-04 09:55 **S3-24** lead note: Budget raised to 3M input tokens under the owner's 2026-11-03 delegation (2.02M used): only the submit is left. Waiting for the owner's decide.
@@ -102,16 +103,15 @@ Current tickets: `[#################---]` 60 of 70
 - 2026-11-04 09:47 **S3-24** engineer submit: Recorded validation: all 7 new acceptance tests passed; existing tests/tools suite 169/170 passed, and the sole harness test passed separately with...
 - 2026-11-04 09:45 **S3-24** owner decide: Budget raised to 3M input tokens (2.02M used); only the submit is left.
 - 2026-11-04 09:43 **S3-24** lead escalate: budget: 2017420 input tokens used; the budget is 2000000
-- 2026-11-04 09:43 **S3-24** lead answer: Size approved: 320 lines with 7 acceptance tests is fine; submit with --override 'lead approved 320 lines (193 test) on 2026-11-04'. Keep the AGENT...
 
 ## Cost
 
 - From the script, engineer: 185 sessions, 428.6M input tokens
 - From the script, lead: 183 sessions, 58.6M input tokens
-- Started by hand, Claude: 8 sessions, 595.9M input tokens
+- Started by hand, Claude: 8 sessions, 598.4M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 13.0 GiB of 100 GiB. 250 GiB free on the drive.
+The project uses 13.0 GiB of 100 GiB. 251 GiB free on the drive.
