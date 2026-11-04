@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-04 00:30.
+Updated automatically at every ticket change. Last update: 2026-11-04 00:32.
 
-**Next: the tech lead, on S3-15.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: GPT-6.1, on S3-15 (ABI gaps: packed vectors through varargs and ms_abi, complex values, rounding mode across calls).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
 Current tickets: `[##################--]` 52 of 57
 
@@ -72,7 +72,7 @@ Current tickets: `[##################--]` 52 of 57
 | S3-12 | tools/portability: forward-port drill and x86_64 unchanged check | Done | tools/portability.py now checks whether the KNC changes still merge onto newer GCC (master has 2 conflicts,... |
 | S3-13 | Move KNC code out of shared i386 files into i386-knc | Done | KNC code now lives in i386-knc.cc/.h behind one-line hooks in the shared i386 files (shared diff 324 lines/... |
 | S3-14 | Native TLS for k1om, and every x86_64-only configure case that misses k1om | Done | GCC 16 now emits native %fs TLS for k1om, matching the donor's sequences at -O2, -O2 -fPIC and -O0 instead ... |
-| S3-15 | ABI gaps: packed vectors through varargs and ms_abi, complex values, rounding mode across calls | Waiting for review | Red committed; 6/8 shared hook lines, existing KNC guard reused. all-gcc passed (-j4 resume). Full t0/t1/t2... |
+| S3-15 | ABI gaps: packed vectors through varargs and ms_abi, complex values, rounding mode across calls | Changes requested | The GCC hooks, the regress cases and the complex/rounding cross-checks are sound; the 5d24da0 check.py chan... |
 | S3-16 | Nothing writes to Documents/_shared from the main checkout | Done | Torture and x87 probe outputs now stay in the repository's .work/_shared when run from the main checkout, a... |
 | S3-17 | card_run takes each process's parent from the same status read that admits it | Done | card_run no longer refuses jobs when a kernel thread's first status read fails: each process's parent now c... |
 | S3-18 | card_run keeps every job's receipt, and the ledger finish line says why a job was refused | Done | card_run now saves every job's result under .work/_state/card/ (newest 200 kept), and the ledger finish lin... |
@@ -82,6 +82,7 @@ Current tickets: `[##################--]` 52 of 57
 
 ## Recent activity
 
+- 2026-11-04 00:32 **S3-15** lead changes: The GCC hooks, the regress cases and the complex/rounding cross-checks are sound; the 5d24da0 check.py change breaks t0 and has no test of its own....
 - 2026-11-04 00:30 **S3-15** engineer submit: Red committed; 6/8 shared hook lines, existing KNC guard reused. all-gcc passed (-j4 resume). Full t0/t1/t2: t0/t1 passed; 4 libm provider-check fa...
 - 2026-11-03 23:55 **S3-10** lead note: S3-14's TLS cross-check is done. The lead built and ran `tests/acceptance/s3_tls_card/` on the card with the merged compiler: 4 variants pass, and ...
 - 2026-11-03 23:40 **S3-14** lead approve: GCC 16 now emits native %fs TLS for k1om, matching the donor's sequences at -O2, -O2 -fPIC and -O0 instead of emulated __emutls calls; the four-thr...
@@ -89,13 +90,12 @@ Current tickets: `[##################--]` 52 of 57
 - 2026-11-03 23:35 **S3-20** lead note: Sessions raised from 3 to 4 before start, under the owner's delegation of engineering budgets. S3-07, S3-13, S3-18 and S3-21 each stopped at their ...
 - 2026-11-03 23:35 **S3-15** lead note: Sessions raised from 3 to 4 before start, under the owner's delegation of engineering budgets. S3-07, S3-13, S3-18 and S3-21 each stopped at their ...
 - 2026-11-03 23:35 **S3-14** lead changes: The TLS fix is right: the gcc/configure.ac TLS and PIE cases, the test and the HAVE_AS_TLS result are good. One real defect, in the extra picflag c...
-- 2026-11-03 23:33 **S3-14** engineer submit: Fix 0235ff44771; audit e5e7ad6 covers 52 case lines/54 alternatives and regeneration/results. All through tools/run.py: clean GCC C/Fortran rebuild...
 
 ## Cost
 
 - From the script, engineer: 170 sessions, 357.5M input tokens
 - From the script, lead: 168 sessions, 54.7M input tokens
-- Started by hand, Claude: 6 sessions, 507.9M input tokens
+- Started by hand, Claude: 7 sessions, 509.5M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
