@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-04 00:59.
+Updated automatically at every ticket change. Last update: 2026-11-04 01:02.
 
-**Next: GPT-6.1, on S3-10 (Card batch for Sprint 3 and m1_affine).** Run `python tools/dispatch.py`, or ask the tech lead to.
+**Next: the tech lead, on S3-10.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[##################--]` 53 of 57
 
@@ -67,7 +67,7 @@ Current tickets: `[##################--]` 53 of 57
 | S3-07 | Auto-vectorization on zmm, with x87 peel and remainder; m1_affine T1 and T2 green | Done | With -mknc, GCC 16 now auto-vectorizes simple float and double loops at default -O2 into packed zmm multipl... |
 | S3-08 | Fortran twin of m1_affine vectorizes and links | Done | The Fortran twin of the M1 affine kernel now builds with GCC 16 gfortran, vectorizes on zmm (FMA at -ffp-co... |
 | S3-09 | Packed integer add, sub, mul, logic and broadcast for V16SI; logic for V8DI | draft | Moved to Sprint 4 by the owner on 2026-11-03, on the lead's recommendation: m1_affine is float and double o... |
-| S3-10 | Card batch for Sprint 3 and m1_affine | In progress | Yes. Fix the name in row() so it matches what is written, rerun the readiness check only, and do not rebuil... |
+| S3-10 | Card batch for Sprint 3 and m1_affine | Waiting for review | cf553a0 fixes expected filename; no rebuild (merged knc eb8fb3e902a). Readiness only PASS: 15 rows, 1680/16... |
 | S3-11 | Milestone M1 note: fixture, line counts, ICE classes and backend cost comparison | Not started | Owner approved Sprint 3 on 2026-11-03; ticket set to ready. |
 | S3-12 | tools/portability: forward-port drill and x86_64 unchanged check | Done | tools/portability.py now checks whether the KNC changes still merge onto newer GCC (master has 2 conflicts,... |
 | S3-13 | Move KNC code out of shared i386 files into i386-knc | Done | KNC code now lives in i386-knc.cc/.h behind one-line hooks in the shared i386 files (shared diff 324 lines/... |
@@ -82,6 +82,7 @@ Current tickets: `[##################--]` 53 of 57
 
 ## Recent activity
 
+- 2026-11-04 01:02 **S3-10** engineer submit: cf553a0 fixes expected filename; no rebuild (merged knc eb8fb3e902a). Readiness only PASS: 15 rows, 1680/1692 linked, 11 compile errors, 1 ICE. Nat...
 - 2026-11-04 00:59 **S3-10** lead answer: Yes. Fix the name in row() so it matches what is written, rerun the readiness check only, and do not rebuild: the programs are built from merged kn...
 - 2026-11-04 00:58 **S3-10** engineer ask: Two attempts failed: git status timeout, then readiness: missing claude-torture.expected.txt. row() derives that name but writes torture.expected.t...
 - 2026-11-04 00:38 **S3-15** lead approve: Packed vectors passed through varargs or ms_abi now give the KNC ABI error instead of crashing the compiler, and _Complex values and the rounding m...
@@ -89,7 +90,6 @@ Current tickets: `[##################--]` 53 of 57
 - 2026-11-04 00:32 **S3-15** lead changes: The GCC hooks, the regress cases and the complex/rounding cross-checks are sound; the 5d24da0 check.py change breaks t0 and has no test of its own....
 - 2026-11-04 00:30 **S3-15** engineer submit: Red committed; 6/8 shared hook lines, existing KNC guard reused. all-gcc passed (-j4 resume). Full t0/t1/t2: t0/t1 passed; 4 libm provider-check fa...
 - 2026-11-03 23:55 **S3-10** lead note: S3-14's TLS cross-check is done. The lead built and ran `tests/acceptance/s3_tls_card/` on the card with the merged compiler: 4 variants pass, and ...
-- 2026-11-03 23:40 **S3-14** lead approve: GCC 16 now emits native %fs TLS for k1om, matching the donor's sequences at -O2, -O2 -fPIC and -O0 instead of emulated __emutls calls; the four-thr...
 
 ## Cost
 
