@@ -1,17 +1,17 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-04 03:42.
+Updated automatically at every ticket change. Last update: 2026-11-04 03:43.
 
-**Next: the tech lead, on S3-11.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: GPT-6.1, on S3-20 (64-byte XImode memory-to-memory copy ICEs (gcc.c-torture/execute/pr85169.c)).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
-Current tickets: `[##################--]` 54 of 58
+Current tickets: `[##################--]` 55 of 59
 
 ## Milestones
 
 | | Milestone | State | Progress |
 |---|---|---|---|
 | M0 | Foundation | In progress | 17 of 17 tickets |
-| M1 | Mixed native code | In progress | 37 of 40 tickets |
+| M1 | Mixed native code | In progress | 38 of 41 tickets |
 | M2 | Useful vector target | In progress | 0 of 1 tickets |
 | M3 | Runtimes | Not started | Not planned in detail yet |
 | M4 | Broad optimization | Not started | Not planned in detail yet |
@@ -68,7 +68,7 @@ Current tickets: `[##################--]` 54 of 58
 | S3-08 | Fortran twin of m1_affine vectorizes and links | Done | The Fortran twin of the M1 affine kernel now builds with GCC 16 gfortran, vectorizes on zmm (FMA at -ffp-co... |
 | S3-09 | Packed integer add, sub, mul, logic and broadcast for V16SI; logic for V8DI | draft | Moved to Sprint 4 by the owner on 2026-11-03, on the lead's recommendation: m1_affine is float and double o... |
 | S3-10 | Card batch for Sprint 3 and m1_affine | Done | Card run done. Every row passes: m1_affine three ways, vector, FP and special-value programs, ABI cross-lin... |
-| S3-11 | Milestone M1 note: fixture, line counts, ICE classes and backend cost comparison | Waiting for review | 87cefad: atomic_storeti classified as logic conflict with upstream sync.md; follow-up ticket pending, item ... |
+| S3-11 | Milestone M1 note: fixture, line counts, ICE classes and backend cost comparison | Done | The M1 evidence note is in: x86_64 assembly is unchanged by our shared i386 lines (1,962 identical files at... |
 | S3-12 | tools/portability: forward-port drill and x86_64 unchanged check | Done | tools/portability.py now checks whether the KNC changes still merge onto newer GCC (master has 2 conflicts,... |
 | S3-13 | Move KNC code out of shared i386 files into i386-knc | Done | KNC code now lives in i386-knc.cc/.h behind one-line hooks in the shared i386 files (shared diff 324 lines/... |
 | S3-14 | Native TLS for k1om, and every x86_64-only configure case that misses k1om | Done | GCC 16 now emits native %fs TLS for k1om, matching the donor's sequences at -O2, -O2 -fPIC and -O0 instead ... |
@@ -80,23 +80,24 @@ Current tickets: `[##################--]` 54 of 58
 | S3-20 | 64-byte XImode memory-to-memory copy ICEs (gcc.c-torture/execute/pr85169.c) | Not started | Sessions raised from 3 to 4 before start, under the owner's delegation of engineering budgets. S3-07, S3-13... |
 | S3-21 | Unaligned packed accesses need element alignment; byte-aligned ones must not use load/store pairs | Done | Byte-aligned vector copies (like pr65369) no longer use the KNC load/store pair instructions that need elem... |
 | S3-22 | The last three KNC blocks in shared i386 code become hooks (ADR-0006 rules 1-4) | Not started | Created by the lead from S3-11's audit, as S3-11's 01:18 answer said. |
+| S3-23 | KNC's atomic_storeti survives upstream's new one; trunk builds C-only and runs T1 and T2 | Not started | Created by the lead from S3-11's trunk finding, as S3-11's 03:40 |
 
 ## Recent activity
 
+- 2026-11-04 03:50 **S3-23** lead note: Created by the lead from S3-11's trunk finding, as S3-11's 03:40
+- 2026-11-04 03:43 **S3-11** lead approve: The M1 evidence note is in: x86_64 assembly is unchanged by our shared i386 lines (1,962 identical files at -O2 and -O2 -mavx512f), the torture swe...
 - 2026-11-04 03:41 **S3-11** engineer submit: 87cefad: atomic_storeti classified as logic conflict with upstream sync.md; follow-up ticket pending, item 5 not met. No third trunk attempt. Exist...
 - 2026-11-04 03:40 **S3-11** lead answer: Yes, and the interactive lead tickets it, so do not wait for it. Treat atomic_storeti as a forward-port finding: upstream master has added its own ...
 - 2026-11-04 03:39 **S3-11** engineer ask: 02a0135: x86 PASS both options: 1962 identical, 0 differences, 41 matching failures each. Trunk failed twice: build-host libcpp prerequisite (fixed...
 - 2026-11-04 03:15 **S3-22** lead note: Created by the lead from S3-11's audit, as S3-11's 01:18 answer said.
 - 2026-11-04 01:32 **S3-10** lead note: Card run done. Every row passes: m1_affine three ways, vector, FP and special-value programs, ABI cross-links (expected files differ only in %La sp...
 - 2026-11-04 01:18 **S3-11** lead answer: Partly yes; the rest is not yours to wait for. (1) x86 check: change tools/portability.py so a failed tasklist stops with a clear message instead o...
-- 2026-11-04 01:16 **S3-11** engineer ask: dd7509e: fixture/torture PASS; 202 shared lines/56 hunks. Blocker: portability.py x86 -> tasklist.exe Access denied before builds; .work/_state/log...
-- 2026-11-04 01:15 **S3-11** lead note: S3-20 (pr85169 ICE) will merge after this ticket. Measure at the knc head current when you start each measurement, name that head in m1-result.md, ...
 
 ## Cost
 
 - From the script, engineer: 177 sessions, 376.4M input tokens
 - From the script, lead: 174 sessions, 56.6M input tokens
-- Started by hand, Claude: 7 sessions, 523.1M input tokens
+- Started by hand, Claude: 7 sessions, 524.2M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
