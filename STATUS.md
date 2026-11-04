@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-03 20:50.
+Updated automatically at every ticket change. Last update: 2026-11-03 20:51.
 
-**Next: GPT-6.1, on S3-19 (card_run's snapshot silences the status redirect before it can fail).** Run `python tools/dispatch.py`, or ask the tech lead to.
+**Next: GPT-6.1, on S3-13 (Move KNC code out of shared i386 files into i386-knc).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
 Current tickets: `[#################---]` 48 of 56
 
@@ -70,7 +70,7 @@ Current tickets: `[#################---]` 48 of 56
 | S3-10 | Card batch for Sprint 3 and m1_affine | Not started | Also add (1) S3-14's TLS and S3-15's complex and rounding cross-checks, built after both merge (objects bui... |
 | S3-11 | Milestone M1 note: fixture, line counts, ICE classes and backend cost comparison | Not started | Owner approved Sprint 3 on 2026-11-03; ticket set to ready. |
 | S3-12 | tools/portability: forward-port drill and x86_64 unchanged check | Done | tools/portability.py now checks whether the KNC changes still merge onto newer GCC (master has 2 conflicts,... |
-| S3-13 | Move KNC code out of shared i386 files into i386-knc | Not started | Created under the owner's direction of 2026-11-03 (ADR-0006). After S3-07, so it moves code that has settle... |
+| S3-13 | Move KNC code out of shared i386 files into i386-knc | In progress | Created under the owner's direction of 2026-11-03 (ADR-0006). After S3-07, so it moves code that has settle... |
 | S3-14 | Native TLS for k1om, and every x86_64-only configure case that misses k1om | Not started | Filed under the owner's delegation (engineering defect found while checking the PhiWeather project's lesson... |
 | S3-15 | ABI gaps: packed vectors through varargs and ms_abi, complex values, rounding mode across calls | Not started | Filed under the owner's delegation. Finding 1 was reproduced by the lead; findings 2-4 come from reading co... |
 | S3-16 | Nothing writes to Documents/_shared from the main checkout | Done | Torture and x87 probe outputs now stay in the repository's .work/_shared when run from the main checkout, a... |
