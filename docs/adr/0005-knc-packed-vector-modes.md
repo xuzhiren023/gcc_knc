@@ -78,8 +78,13 @@ them unadvertised until E3 adds them with their moves. Today:
    in a register is broadcast with `vpermf32x4 $0` and a swizzled `vmovaps`/`vmovapd` (S3-01:
    327364-001 section 2.2.1, tables 2.2/2.3; checked with the assembler, to be checked on the card
    in S3-06).
-4. **Unaligned access and tails.** `movmisalign` uses the pair: S3-03 showed on the card that a pair
-   wholly inside mapped memory never faults at any offset, and that the `h` half at a 64-byte
+4. **Unaligned access and tails.** `movmisalign` uses the pair, **but only on element-aligned
+   addresses** (amended 2026-11-03). Intel 327364 `VLOADUNPACKLD` (p.361) defines the pair for a
+   stream at an "element-aligned address", that is, loads "only element-wise, not vector-wise,
+   aligned". A byte-aligned V16SI load segfaulted on the card (`pr65369`, S3-21). Byte-aligned packed
+   accesses must not vectorize, and explicit ones take a byte-granular path. S3-03 showed on the
+   card that a pair wholly inside mapped memory never faults at any element offset, and that the
+   `h` half at a 64-byte
    aligned address touches nothing. It also showed that masks never suppress a page fault and that
    an unaligned half touches its whole line whatever its mask, so masked tails (E4-04) must stay
    inside lines known to be mapped. Peel and remainder iterations are scalar x87

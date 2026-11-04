@@ -45,6 +45,23 @@ by default, pass 256 of 256. Only 10 of them contain packed zmm code, so that is
 not a vector test; the full execute suite follows. Two attempts were refused by the S3-19 race
 before one ran.
 
+## Full `gcc.c-torture/execute` suite after S3-07 (2026-11-04 02:30 UTC)
+
+The merged `knc` (`daedd869681`) at `-O2 -march=knc`, vectorization on by default, each file's own
+`dg-options` applied. Built on the laptop; six card jobs of up to 300 programs each, `-j 30`.
+
+- Of 1,692 sources: 1,661 linked; 94 of them contain packed zmm code. There were 30 compile errors:
+  21 for other targets or features, and 5 the expected "unsupported KNC register ABI mode". There
+  was 1 ICE, `pr85169.c` (S3-20).
+- **On the card: 1,659 of 1,661 PASS.**
+  - `930529-1.c` is a harness failure. My script missed its brace-form `dg-options { "-fwrapv" }`,
+    and built with `-fwrapv` it passes.
+  - **`pr65369.c` is wrong code from vectorization.** It segfaults; built with
+    `-fno-tree-vectorize`, `-O0` or the donor, it passes. SLP put a V16SI `vloadunpackld/hd` pair on
+    a byte-aligned address, and the pairs need element alignment (Intel 327364 p.361). S3-21 fixes
+    it, and ADR-0005 point 4 is amended.
+- No runner refusals in six chunks (S3-18 and S3-19 had merged by then).
+
 ## FP state and special values (2026-11-04 01:30 UTC)
 
 `tests/acceptance/s3_vec_card/fp_special.c`, built with S3-07's branch build (`dd28677d065`,

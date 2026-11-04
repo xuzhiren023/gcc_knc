@@ -4,6 +4,18 @@ The owner asked on 2026-11-03 to be told of anything worth sharing with the othe
 (GPT, PhiWeather's WRF-to-IMCI translation). The lead adds items here as they are found; the owner
 passes on what they choose. Each item says how it was shown. Newest first.
 
+## 2026-11-03 (night)
+
+- **KNC's unaligned load and store pairs need element alignment, not just any address.**
+  `vloadunpackl*`/`vloadunpackh*` and `vpackstorel*`/`vpackstoreh*` work on an "element-aligned
+  address" (Intel 327364 `VLOADUNPACKLD`, p.361). A V16SI pair on a byte-aligned address
+  (`input + 1`) segfaulted on the card. Our earlier probe result (masks never suppress faults; a
+  pair inside mapped memory never faults) holds only at whole-element offsets. If your translation
+  turns `memcpy` or `char`-based data into dword or qword pairs, check the alignment first.
+- Our full `gcc.c-torture/execute` run on the card: GCC 16 at `-O2 -march=knc`, with
+  auto-vectorization on, passes 1,659 of 1,661. One failure was our harness missing `-fwrapv`; the
+  other is the alignment case above.
+
 ## 2026-11-03 (evening)
 
 - **A GCC configured for `k1om-*` may silently use emulated TLS.** GCC 16.2's `gcc/configure.ac`
