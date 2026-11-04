@@ -35,6 +35,29 @@ void byte_loop(vector *output, const unsigned char *input)
     __builtin_memcpy(dest + i, input + i * ELEMENT_BYTES, ELEMENT_BYTES);
 }
 
+/* Positive vectorizer controls: the source has element alignment, but its
+   offset within a vector is unknown.  Rejecting all misalignment must fail. */
+void elem_slp(const scalar *block)
+{
+  scalar buf[64 / ELEMENT_BYTES];
+#define PIECE(N) __builtin_memcpy(buf + (N), block + (N), ELEMENT_BYTES)
+  PIECE(0); PIECE(1); PIECE(2); PIECE(3);
+  PIECE(4); PIECE(5); PIECE(6); PIECE(7);
+#if ELEMENT_BYTES == 4
+  PIECE(8); PIECE(9); PIECE(10); PIECE(11);
+  PIECE(12); PIECE(13); PIECE(14); PIECE(15);
+#endif
+#undef PIECE
+  consume(buf);
+}
+
+void elem_loop(vector *output, const scalar *input)
+{
+  scalar *dest = (scalar *) output;
+  for (unsigned i = 0; i < 64 / ELEMENT_BYTES; ++i)
+    __builtin_memcpy(dest + i, input + i, ELEMENT_BYTES);
+}
+
 void byte_load(const byte_vector *input, vector *output)
 {
   vector value = *input;
