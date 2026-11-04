@@ -84,6 +84,26 @@ The tiers are what make TDD workable here: most of the loop runs without the car
 | **T5** | Kernel performance: matched repeats, thermals recorded | Card, **exclusive** | Scheduled | Stories that claim a performance result; milestone reviews |
 | **T6** | Corpus program builds and matched runs | Card, **exclusive** | Owner-approved | Milestones M3, M4 and M5 |
 
+### Per change and per batch (owner, 2026-11-04)
+
+GCC builds are the laptop's real cost, and checks that verify a whole tree prove the same thing
+once per batch as once per ticket. So:
+
+- **Each gcc ticket** keeps its red test, an incremental build, its own T1/T2 checks, and, for a
+  refactor, the KNC before/after assembly compare. After merge the lead runs the ticket's own
+  card check (T3). A ticket skips its baseline build when the shared build already matches the
+  `knc` head (`tools/gcc_build.py --if-stale`, S3-24).
+- **A batch check** runs once after every two or three merged gcc tickets, at sprint end and at
+  each milestone, as one gcc-lane ticket of `type: check` at the batch head: `tools/portability.py
+  x86` (if a shared file changed), the drill, the `-O2 -ftree-vectorize` and `-O3` ICE sweeps, and
+  at a milestone the trunk build with T1 and T2. The lead then runs the full
+  `gcc.c-torture/execute` suite on the card. A batch failure is bisected by rerunning at the
+  batch's ticket merges, newest first.
+- The card runs every target program; the laptop builds the compiler and the test programs. A
+  2026-11-04 sample showed linking and assembling are most of a suite build's laptop time, but a
+  whole suite build is a few minutes, so moving them to the card (native binutils there) is not
+  worth it yet. Revisit if suite builds grow.
+
 ## 5. TDD rules for compiler work
 
 **A code-generation story normally needs two tests:** a T1 test that the intended code is

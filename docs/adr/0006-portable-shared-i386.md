@@ -42,8 +42,9 @@ measured yet.
    widened to cover KNC.
 5. **x86 stays unchanged.** A C-only `x86_64` `cc1` built from our tree and one built from the
    stock release give identical `-O2` and `-O2 -mavx512f` assembly over the torture compile files.
-   This is checked at every milestone (S3-11 for M1), and from Sprint 4 after every ticket that
-   changes a shared file.
+   This is checked at every milestone (S3-11 for M1), and from Sprint 4 once per batch check
+   (`docs/DEVELOPMENT_CYCLE.md` section 4): after every two or three merged gcc tickets that
+   change a shared file, not after each one (owner, 2026-11-04).
 6. **A forward-port drill runs at each sprint end and each milestone.** It applies our diff onto
    the newest upstream `master` and the newest release branch, and records the conflicts per file
    in `docs/research/forward-port.md`. At each milestone it also builds trunk with our diff
