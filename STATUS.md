@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-04 13:22.
+Updated automatically at every ticket change. Last update: 2026-11-04 15:11.
 
-**Next: GPT-6.1, on S3-09 (Packed integer add, sub, mul, logic and broadcast for V16SI; logic for V8DI).** Run `python tools/dispatch.py`, or ask the tech lead to.
+**Next: the tech lead, on S3-09.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[##################--]` 64 of 71
 
@@ -66,7 +66,7 @@ Current tickets: `[##################--]` 64 of 71
 | S3-06 | Packed FP add, sub, mul, FMA and broadcasts for V16SF and V8DF | Done | Under -march=knc, 512-bit float and double vectors now compile to packed add, subtract, multiply, fused mul... |
 | S3-07 | Auto-vectorization on zmm, with x87 peel and remainder; m1_affine T1 and T2 green | Done | With -mknc, GCC 16 now auto-vectorizes simple float and double loops at default -O2 into packed zmm multipl... |
 | S3-08 | Fortran twin of m1_affine vectorizes and links | Done | The Fortran twin of the M1 affine kernel now builds with GCC 16 gfortran, vectorizes on zmm (FMA at -ffp-co... |
-| S3-09 | Packed integer add, sub, mul, logic and broadcast for V16SI; logic for V8DI | In progress | Moved to Sprint 4 by the owner on 2026-11-03, on the lead's recommendation: m1_affine is float and double o... |
+| S3-09 | Packed integer add, sub, mul, logic and broadcast for V16SI; logic for V8DI | Waiting for review | Red bf170fb (all 11 ops + add_int fail); GCC ca005dd. Infra: shared build's mddeps.mk was empty (written 12... |
 | S3-10 | Card batch for Sprint 3 and m1_affine | Done | Card run done. Every row passes: m1_affine three ways, vector, FP and special-value programs, ABI cross-lin... |
 | S3-11 | Milestone M1 note: fixture, line counts, ICE classes and backend cost comparison | Done | The M1 evidence note is in: x86_64 assembly is unchanged by our shared i386 lines (1,962 identical files at... |
 | S3-12 | tools/portability: forward-port drill and x86_64 unchanged check | Done | tools/portability.py now checks whether the KNC changes still merge onto newer GCC (master has 2 conflicts,... |
@@ -96,6 +96,7 @@ Current tickets: `[##################--]` 64 of 71
 
 ## Recent activity
 
+- 2026-11-04 15:11 **S3-09** engineer submit: Red bf170fb (all 11 ops + add_int fail); GCC ca005dd. Infra: shared build's mddeps.mk was empty (written 12:36, not S3-09), so md edits did not reg...
 - 2026-11-04 13:22 **S4-08** lead approve: The varargs save path now asserts a 16-byte aligned slot and is limited to 64-bit KNC, with generated code unchanged, and the S3-10 batch's ABI row...
 - 2026-11-04 13:14 **S4-08** engineer submit: Item2: card_spelling() in prepare_s3_10.py rewrites long-double text to card %La form (text, not value compare); red test tests/tools/test_prepare_...
 - 2026-11-04 12:23 **S4-10** lead approve: Approving a GCC ticket no longer rewrites the merged files in the shared GCC checkout, so the next build is not forced to regenerate and recompile ...
@@ -103,16 +104,15 @@ Current tickets: `[##################--]` 64 of 71
 - 2026-11-04 12:03 **S4-09** lead approve: Vectorized float and double add, sub and mul no longer fold a misaligned array load into the instruction, which used to crash on the card; aligned ...
 - 2026-11-04 12:01 **S4-09** engineer submit: imci.md: *knc_<op><mode>3 op2 YJm->YJBm, *knc_packed_move m->Bm (both sides). Unchanged: FMA forms (YJ only), unaligned load/store (MEM-only, never...
 - 2026-11-04 11:06 **S3-25** lead approve: Rejecting va_arg of an unsupported KNC vector type now ends with its error message and no hidden compiler crash, and the ABI checks fail on any 'co...
-- 2026-11-04 11:05 **S3-25** engineer submit: Green t0/t1/t2 gcc16: 249 PASS, 0 FAIL (t0 4, t1 222, t2 23); 16 VAR_GET rows pass (red had only those 16 failing). Torture assembly after vs befor...
 
 ## Cost
 
 - From the script, engineer: 186 sessions, 441.0M input tokens
 - From the script, lead: 184 sessions, 58.7M input tokens
-- Started by hand, Claude: 9 sessions, 621.9M input tokens
+- Started by hand, Claude: 9 sessions, 629.9M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 12.9 GiB of 100 GiB. 242 GiB free on the drive.
+The project uses 12.7 GiB of 100 GiB. 237 GiB free on the drive.
