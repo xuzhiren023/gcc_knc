@@ -27,6 +27,8 @@ PACKED = re.compile(r'\bv(?:addn?|subr?|mul|div|max|min|sqrt|rcp(?:23)?|rsqrt(?:
 # Each entry supplies its CLI help and handlers for the tiers it selects.
 # Imports stay lazy so T0 and source-only selections need no probe modules.
 SELECTIONS = {
+    'affine_fortran': ('S3-08 Fortran affine acceptance rows (GCC 16)', {
+        't2': lambda runner: importlib.import_module('affine_fortran').t2(runner)}),
     'fast_math': ('S2-15 fast-math startup links and MXCSR disassembly', {
         't2': lambda runner: importlib.import_module('fast_math').t2(runner)}),
     'libgcc_link': ('S2-07 fork helper link only', {
