@@ -39,6 +39,12 @@ Then stop. Your final message is only the `PM update:` line that command prints:
   build takes about 20 minutes. Before it, compile only the files you changed:
   `make -C .work/_shared/gcc-build/gcc i386-knc.o` (and `i386.o` or `i386-expand.o` if you touched
   them). That catches C++ errors in a few minutes. Only then run the full build.
+- `i386-knc.h` reaches nearly all of `cc1` through `i386-protos.h`, so one edit there costs a
+  near-full rebuild (S3-25: 28 minutes for one prototype). An edit to `i386-knc.cc` alone costs
+  about 3 minutes. Make a helper `static` in `i386-knc.cc` when only that file calls it. Add
+  every new prototype a ticket needs in one edit, before the first full build.
+- While a build runs, wait for it once (a long timeout, or the wrapper's own wait). Do not poll
+  it: every check costs a tool call and tokens.
 - Fix every error a failed build reports before rebuilding. Never start a second build while a
   `make.exe` is alive.
 - Build the shared tree through `python tools/run.py --name <name> -- python tools/gcc_build.py
