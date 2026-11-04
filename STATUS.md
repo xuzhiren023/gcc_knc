@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-04 15:31.
+Updated automatically at every ticket change. Last update: 2026-11-04 15:35.
 
-**Next: the tech lead, on S4-02.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: GPT-6.1, on S4-02 (Vector compares into k masks, mask logic and mask spills for the packed modes).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
 Current tickets: `[##################--]` 66 of 72
 
@@ -84,7 +84,7 @@ Current tickets: `[##################--]` 66 of 72
 | S3-24 | Skip GCC builds that are already current (shared tree and the x86 check's stock tree) | Done | GCC builds are now skipped when nothing changed: tools/gcc_build.py --if-stale skips the shared tree's make... |
 | S3-25 | va_arg of an unsupported KNC type leaves a broken expansion; release builds hide the ICE | Done | Rejecting va_arg of an unsupported KNC vector type now ends with its error message and no hidden compiler c... |
 | S4-01 | Masks on KNC: GCC 16 entry points, IMCI forms, reuse audit and masked-tail design (ADR-0007 input) | Done | The mask design input for Sprint 4 is done: KNC masks are HI for 16-lane and QI for 8-lane vectors, compare... |
-| S4-02 | Vector compares into k masks, mask logic and mask spills for the packed modes | Tests waiting for review | Red f943685: 4 new T1 files (knc-mask-cmp-f32/f64/i32, knc-mask-spill) fail on the current build: the compa... |
+| S4-02 | Vector compares into k masks, mask logic and mask spills for the packed modes | In progress | Red approved: the four T1 files pin each KNC compare predicate into a k register, the operand swap for > an... |
 | S4-03 | Blends and if-conversion: conditional loops, ?:, fabs, min and max vectorize with masks | draft |  |
 | S4-04 | V8DI add and sub through the IMCI carry form, so long add loops vectorize | draft |  |
 | S4-05 | Safe masked tails: a masked vector remainder only where every touched line is in the array | draft |  |
@@ -97,6 +97,7 @@ Current tickets: `[##################--]` 66 of 72
 
 ## Recent activity
 
+- 2026-11-04 15:35 **S4-02** lead approve-red: Red approved: the four T1 files pin each KNC compare predicate into a k register, the operand swap for > and >=, the quiet UNGE staying scalar, and...
 - 2026-11-04 15:31 **S4-02** engineer red: Red f943685: 4 new T1 files (knc-mask-cmp-f32/f64/i32, knc-mask-spill) fail on the current build: the compare loops stay scalar (no vcmpps/vcmppd/v...
 - 2026-11-04 15:25 **S4-11** lead approve: A shared GCC build tree that has lost its .md dependency list is now rebuilt and checked instead of being certified, so edits to imci.md or sse.md ...
 - 2026-11-04 15:23 **S4-11** engineer submit: Red 91d2f31 (3 new tests failed), fix 5a4b6b7. gcc_build.py checks gcc/mddeps.mk for MD_INCLUDES with imci.md and sse.md before skipping and after ...
@@ -104,13 +105,12 @@ Current tickets: `[##################--]` 66 of 72
 - 2026-11-04 15:11 **S3-09** engineer submit: Red bf170fb (all 11 ops + add_int fail); GCC ca005dd. Infra: shared build's mddeps.mk was empty (written 12:36, not S3-09), so md edits did not reg...
 - 2026-11-04 13:22 **S4-08** lead approve: The varargs save path now asserts a 16-byte aligned slot and is limited to 64-bit KNC, with generated code unchanged, and the S3-10 batch's ABI row...
 - 2026-11-04 13:14 **S4-08** engineer submit: Item2: card_spelling() in prepare_s3_10.py rewrites long-double text to card %La form (text, not value compare); red test tests/tools/test_prepare_...
-- 2026-11-04 12:23 **S4-10** lead approve: Approving a GCC ticket no longer rewrites the merged files in the shared GCC checkout, so the next build is not forced to regenerate and recompile ...
 
 ## Cost
 
 - From the script, engineer: 186 sessions, 441.0M input tokens
 - From the script, lead: 184 sessions, 58.7M input tokens
-- Started by hand, Claude: 9 sessions, 640.4M input tokens
+- Started by hand, Claude: 9 sessions, 641.5M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
