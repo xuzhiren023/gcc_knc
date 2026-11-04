@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-04 11:06.
+Updated automatically at every ticket change. Last update: 2026-11-04 11:07.
 
-Nothing can move right now.
+**Next: GPT-6.1, on S4-09 (LRA folds a misaligned vector load into vaddps/vsubps/vmulps ("m" constraint), which faults on the card).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
 Current tickets: `[#################---]` 61 of 70
 
@@ -91,7 +91,7 @@ Current tickets: `[#################---]` 61 of 70
 | S4-06 | Batch check after S4-02, S3-09 and S4-03: x86, drill and ICE sweeps at the batch head | draft |  |
 | S4-07 | Final Sprint 4 batch check at the sprint head | draft |  |
 | S4-08 | Small fixes from M1: the varargs V4SF assert checks alignment; S3-10 ABI expected files | draft |  |
-| S4-09 | LRA folds a misaligned vector load into vaddps/vsubps/vmulps ("m" constraint), which faults on the card | draft |  |
+| S4-09 | LRA folds a misaligned vector load into vaddps/vsubps/vmulps ("m" constraint), which faults on the card | In progress |  |
 
 ## Recent activity
 
@@ -108,7 +108,7 @@ Current tickets: `[#################---]` 61 of 70
 
 - From the script, engineer: 186 sessions, 441.0M input tokens
 - From the script, lead: 184 sessions, 58.7M input tokens
-- Started by hand, Claude: 8 sessions, 604.5M input tokens
+- Started by hand, Claude: 8 sessions, 605.0M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
