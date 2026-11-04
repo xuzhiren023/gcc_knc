@@ -54,11 +54,13 @@ group. PASS/FAIL/TIMEOUT lines and saved diagnostics stay in list order even
 when programs finish out of order. Each child's output is buffered separately
 until its result can be emitted. Crashes and nonzero exits report FAIL.
 
-Choose N up to 20 to use the job's 20 physical cores (30 before 2026-11-04), or lower it when programs
+Use 3-4 threads per core for jobs whose layout is not fixed (batches, coverage, smoke, inventory):
+N = 60-80 on our 20 physical cores (owner, 2026-11-04). Aim for at least 3 running threads per
+core summed over all our jobs, within the 7 GB limit. Lower N only when programs
 need more memory. Set the job configuration's `memoryMB` to at least N times M,
-where M is the per-program address-space limit in MiB. For example, N=20 and
-M=128 require `memoryMB: 2560`; stage the list and all its executables as usual,
-then pass `-j 20 --limit-mb 128 LIST` after the driver executable in the
+where M is the per-program address-space limit in MiB. For example, N=60 and
+M=96 require `memoryMB: 5760`; stage the list and all its executables as usual,
+then pass `-j 60 --limit-mb 96 LIST` after the driver executable in the
 `tools/card_run` command. The existing 7168 MiB admission ceiling and free-memory
 reserve still apply. Driver overhead and staged files also need free card RAM.
 
@@ -67,7 +69,7 @@ The driver reads the job budget from the inherited `RLIMIT_AS` set by
 sets each child's own `RLIMIT_AS` to M. No CPU affinity is changed. Without
 `--limit-mb`, parallel runs divide the inherited budget equally among N
 children; serial runs retain their existing inherited limits. Thus
-`-j 20 LIST` with `memoryMB: 2560` also gives each program 128 MiB.
+`-j 60 LIST` with `memoryMB: 5760` also gives each program 96 MiB.
 An unlimited inherited budget refuses parallel execution because it
 cannot establish the declared reservation. Job timeout cleanup still applies
 to all children; driver TERM/HUP/INT also kills and reaps active test groups.
