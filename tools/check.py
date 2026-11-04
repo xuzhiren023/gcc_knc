@@ -427,7 +427,9 @@ class Runner:
                 raise RuntimeError('link trace outside shared sysroot or missing ' + library + ': ' + repr(paths))
             self.say('T2 link trace: ' + '; '.join(paths))
         self.result('t2 ELF machine and interpreter', scan_elf(elf.read_bytes()))
-        required = versioned_symbols(self.command(self.tool('readelf'), '--dyn-syms', '--wide', elf), True)
+        symbols = self.command(self.tool('readelf'), '--dyn-syms', '--wide', elf)
+        required = versioned_symbols(symbols, True)
+        symbol_versions = dict(re.findall(r'\b(\S+@\S+)\s+\((\d+)\)\s*$', symbols, re.M))
         # Resolve version requirements against each named library in the card sysroot,
         # never against host libraries or just a numeric maximum GLIBC version.
         versions = self.command(self.tool('readelf'), '--version-info', '--wide', elf)
@@ -440,8 +442,10 @@ class Runner:
                     if not all(part.isdigit() for part in numbers) or tuple(map(int, numbers)) > (2, 21):
                         failures.append('symbol version exceeds glibc 2.21: ' + symbol)
         for library, section in re.findall(r'File:\s+(\S+)(.*?)(?=\n\s*0x[0-9a-f]+:\s+Version:|\Z)', versions, re.S):
-            names = set(re.findall(r'Name:\s+(\S+)', section))
-            needed = {symbol for symbol in required if symbol.split('@', 1)[1] in names}
+            # libc and libm can both name GLIBC_2.14; the ELF version index
+            # identifies which library must provide each imported symbol.
+            indices = set(re.findall(r'Name:\s+\S+\s+Flags:[^\n]*Version:\s+(\d+)', section))
+            needed = {symbol for symbol in required if symbol_versions.get(symbol) in indices}
             provider = next((self.sysroot / d / library for d in ('lib64', 'usr/lib64')
                              if (self.sysroot / d / library).is_file()), None)
             if provider is None:
