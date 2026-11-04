@@ -1,17 +1,17 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-03 21:40.
+Updated automatically at every ticket change. Last update: 2026-11-03 21:42.
 
-**Next: the tech lead, on S3-13.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: GPT-6.1, on S3-21 (Unaligned packed accesses need element alignment; byte-aligned ones must not use load/store pairs).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
-Current tickets: `[#################---]` 49 of 57
+Current tickets: `[#################---]` 50 of 57
 
 ## Milestones
 
 | | Milestone | State | Progress |
 |---|---|---|---|
 | M0 | Foundation | In progress | 17 of 17 tickets |
-| M1 | Mixed native code | In progress | 32 of 39 tickets |
+| M1 | Mixed native code | In progress | 33 of 39 tickets |
 | M2 | Useful vector target | In progress | 0 of 1 tickets |
 | M3 | Runtimes | Not started | Not planned in detail yet |
 | M4 | Broad optimization | Not started | Not planned in detail yet |
@@ -70,7 +70,7 @@ Current tickets: `[#################---]` 49 of 57
 | S3-10 | Card batch for Sprint 3 and m1_affine | Not started | Also add (1) S3-14's TLS and S3-15's complex and rounding cross-checks, built after both merge (objects bui... |
 | S3-11 | Milestone M1 note: fixture, line counts, ICE classes and backend cost comparison | Not started | Owner approved Sprint 3 on 2026-11-03; ticket set to ready. |
 | S3-12 | tools/portability: forward-port drill and x86_64 unchanged check | Done | tools/portability.py now checks whether the KNC changes still merge onto newer GCC (master has 2 conflicts,... |
-| S3-13 | Move KNC code out of shared i386 files into i386-knc | Waiting for review | Acceptance met. Shared lines/hunks decreased 324/56 -> 192/52. Builds passed; torture assembly identical at... |
+| S3-13 | Move KNC code out of shared i386 files into i386-knc | Done | KNC code now lives in i386-knc.cc/.h behind one-line hooks in the shared i386 files (shared diff 324 lines/... |
 | S3-14 | Native TLS for k1om, and every x86_64-only configure case that misses k1om | Not started | Filed under the owner's delegation (engineering defect found while checking the PhiWeather project's lesson... |
 | S3-15 | ABI gaps: packed vectors through varargs and ms_abi, complex values, rounding mode across calls | Not started | Filed under the owner's delegation. Finding 1 was reproduced by the lead; findings 2-4 come from reading co... |
 | S3-16 | Nothing writes to Documents/_shared from the main checkout | Done | Torture and x87 probe outputs now stay in the repository's .work/_shared when run from the main checkout, a... |
@@ -82,6 +82,7 @@ Current tickets: `[#################---]` 49 of 57
 
 ## Recent activity
 
+- 2026-11-03 21:42 **S3-13** lead approve: KNC code now lives in i386-knc.cc/.h behind one-line hooks in the shared i386 files (shared diff 324 lines/56 hunks down to 192/52), with identical...
 - 2026-11-03 21:40 **S3-13** engineer submit: Acceptance met. Shared lines/hunks decreased 324/56 -> 192/52. Builds passed; torture assembly identical at -O0 and -O2; tools/check t0 t1 t2 --com...
 - 2026-11-03 21:39 **S3-13** lead answer: Yes, submit with --override 'relocation: moved code counts as both deletions and additions; shared lines 324/56 -> 192/52, assembly identical'. The...
 - 2026-11-03 21:38 **S3-13** engineer ask: Acceptance is met, but submit refuses 547 changed lines against the 500-line budget. May I submit with a size override for this relocation? Shared ...
@@ -89,7 +90,6 @@ Current tickets: `[#################---]` 49 of 57
 - 2026-11-03 21:36 **S3-13** lead escalate: budget: 10536184 input tokens used; the budget is 6000000
 - 2026-11-03 21:36 **S3-13** lead answer: Yes. A capture-format mismatch is not a codegen difference. In the after comparison, record a rejected compile the way the baseline did: exit statu...
 - 2026-11-03 21:35 **S3-13** engineer ask: Shared lines/hunks 324/56 -> 192/52; builds pass; tiers identical. First comparison failed on 80 transient dump-path keys; fixed in 3f0ef58. Focuse...
-- 2026-11-03 21:30 **S3-21** lead note: Filed under the owner's delegation. This is a wrong-code bug in merged S3-05/S3-07, so it goes before S3-13's cleanup if the lane allows. M1 cannot...
 
 ## Cost
 
@@ -101,4 +101,4 @@ Current tickets: `[#################---]` 49 of 57
 
 ## Disk
 
-The project uses 8.3 GiB of 100 GiB. 300 GiB free on the drive.
+The project uses 8.3 GiB of 100 GiB. 299 GiB free on the drive.
