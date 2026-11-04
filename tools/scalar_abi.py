@@ -309,20 +309,24 @@ def affine(runner):
 
 def t2(runner):
     sources = runner.root / 'tests/t2'
-    symbols = re.findall(r'\b(scalar_\w+)\(', (sources / 'knc-scalar-abi.h').read_text())
     # Fixed shared paths are the S3-10 native inputs; never execute on the host.
     output = runner.tc.parent / 'scalar-abi'
     output.mkdir(exist_ok=True)
-    for level in ('-O0', '-O2'):
-        for reverse in (False, True):
-            t2_crosscheck(runner, sources, symbols, output, level, reverse)
+    # Keep the existing scalar suite at O2: its ff aggregate has a documented
+    # donor O0 ICE.  Every new complex/rounding test runs at both levels.
+    for stem, levels in (('knc-scalar-abi', ('-O2',)),
+                         ('knc-abi-gaps', ('-O0', '-O2'))):
+        symbols = re.findall(r'\b(scalar_\w+)\(', (sources / (stem + '.h')).read_text())
+        for level in levels:
+            for reverse in (False, True):
+                t2_crosscheck(runner, sources, stem, symbols, output, level, reverse)
 
 
-def t2_crosscheck(runner, sources, symbols, output, level, reverse):
-    label = 't2 scalar/complex/rounding ABI ' + level + ' ' + (
+def t2_crosscheck(runner, sources, stem, symbols, output, level, reverse):
+    label = 't2 ' + stem + ' ' + level + ' ' + (
         'donor caller / GCC16 callee' if reverse else 'GCC16 caller / donor callee')
     objects, failures = [], []
-    elf = output / ('scalar-%s-%d.mic' % (level[1:], int(reverse)))
+    elf = output / ('%s-%s-%d.mic' % (stem[4:], level[1:], int(reverse)))
     elf.unlink(missing_ok=True)
     for role in ('caller', 'callee'):
         use_donor = (role == 'caller') == reverse
@@ -331,7 +335,7 @@ def t2_crosscheck(runner, sources, symbols, output, level, reverse):
         compiled = runner.command(cc, *flags, level, '-ffp-contract=off',
                                   '-frounding-math', '-fexcess-precision=standard',
                                   '--sysroot=' + str(runner.sysroot), '-c',
-                                  sources / ('knc-scalar-abi-' + role + '.c'), '-o', obj, check=False)
+                                  sources / (stem + '-' + role + '.c'), '-o', obj, check=False)
         if compiled.returncode:
             failures.append(role + ' compile: ' + compiled.stdout[-1800:])
         else:
