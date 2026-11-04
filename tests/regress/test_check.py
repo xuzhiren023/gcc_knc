@@ -132,13 +132,14 @@ class Runner(unittest.TestCase):
         runner.say = Mock()
         runner.result = Mock()
         runner.tool = Mock(return_value='readelf')
-        cases = [('/outside', 'GLIBC_2.14', 'GLIBC_2.14', None),
-                 ('/shared/sysroot', 'GLIBC_2.14', 'GLIBC_2.14', []),
-                 ('/shared/sysroot', 'GLIBC_99.0', 'GLIBC_99.0', ['libc.so.6 lacks printf@GLIBC_99.0']),
-                 ('/shared/sysroot', 'GLIBC_99.0', 'GLIBC_2.14', ['unresolved version requirement printf@GLIBC_99.0']),
-                 ('/shared/sysroot', None, 'GLIBC_2.14', ['no versioned symbol requirements found'])]
-        for provider, required, version, failures in cases:
-            with self.subTest(provider=provider, required=required, version=version):
+        cases = [('/outside', 'GLIBC_2.14', 'GLIBC_2.14', 2, None),
+                 ('/shared/sysroot', 'GLIBC_2.14', 'GLIBC_2.14', 2, []),
+                 ('/shared/sysroot', 'GLIBC_99.0', 'GLIBC_99.0', 2, ['libc.so.6 lacks printf@GLIBC_99.0']),
+                 ('/shared/sysroot', 'GLIBC_99.0', 'GLIBC_2.14', 3, ['unresolved version requirement printf@GLIBC_99.0']),
+                 ('/shared/sysroot', None, 'GLIBC_2.14', 2, ['no versioned symbol requirements found'])]
+        for provider, required, version, symbol_index, failures in cases:
+            with self.subTest(provider=provider, required=required, version=version,
+                              symbol_index=symbol_index):
                 trace = '\n'.join('/lib64/%s (%s/lib64/%s)' % (name, provider, name)
                                   for name in ('libc.so.6', 'ld-linux-k1om.so.2'))
                 def command(*args):
@@ -150,8 +151,8 @@ class Runner(unittest.TestCase):
                                 '  0x0010: Name: %s  Flags: none  Version: 2\n' % version)
                     if '--dyn-syms' in args:
                         if args[-1] == runner.out / 'm1_affine.mic':
-                            return ('  1: 0000000000000000 0 FUNC GLOBAL DEFAULT UND printf@%s (2)\n'
-                                    % required) if required else ''
+                            return ('  1: 0000000000000000 0 FUNC GLOBAL DEFAULT UND printf@%s (%d)\n'
+                                    % (required, symbol_index)) if required else ''
                         return '  2: 0000000000010000 0 FUNC GLOBAL DEFAULT 12 printf@@GLIBC_2.14\n'
                     return ''
                 runner.command = Mock(side_effect=command)
@@ -167,6 +168,50 @@ class Runner(unittest.TestCase):
                         runner.result.assert_called_with('t2 symbol versions against card sysroot', failures)
                         self.assertTrue(any('/shared/sysroot/lib64/libc.so.6' in call.args[0]
                                             for call in runner.say.call_args_list))
+
+    def test_version_indices_select_each_symbols_library(self):
+        runner = check.Runner.__new__(check.Runner)
+        runner.sysroot = Path('/shared/sysroot')
+        runner.say = Mock()
+        runner.result = Mock()
+        runner.tool = Mock(return_value='readelf')
+        elf = Path('/shared/check/m1_affine.mic')
+        trace = '\n'.join('/shared/sysroot/lib64/' + name
+                          for name in ('libc.so.6', 'ld-linux-k1om.so.2'))
+        versions = ('Version needs section .gnu.version_r contains 2 entries:\n'
+                    '  000000: Version: 1  File: libc.so.6  Cnt: 1\n'
+                    '  0x0010: Name: GLIBC_2.14  Flags: none  Version: 2\n'
+                    '  0x0020: Version: 1  File: libm.so.6  Cnt: 1\n'
+                    '  0x0030: Name: GLIBC_2.14  Flags: none  Version: 3\n')
+        symbols = ('  1: 0000000000000000 0 FUNC GLOBAL DEFAULT UND printf@GLIBC_2.14 (2)\n'
+                   '  2: 0000000000000000 0 FUNC GLOBAL DEFAULT UND sin@GLIBC_2.14 (3)\n')
+        for missing, failures in (
+                (None, []),
+                ('libc.so.6', ['libc.so.6 lacks printf@GLIBC_2.14']),
+                ('libm.so.6', ['libm.so.6 lacks sin@GLIBC_2.14'])):
+            with self.subTest(missing=missing):
+                def command(*args):
+                    if '--version-info' in args:
+                        return versions
+                    if '--dyn-syms' in args:
+                        if args[-1] == elf:
+                            return symbols
+                        library = args[-1].name
+                        # The other library exports the missing symbol too, so
+                        # a provider-blind union would wrongly accept it.
+                        names = ('sin',) if library == 'libm.so.6' else ('printf',)
+                        if missing:
+                            names = () if library == missing else ('printf', 'sin')
+                        return ''.join('  1: 0000000000010000 0 FUNC GLOBAL DEFAULT 12 '
+                                       + name + '@@GLIBC_2.14\n' for name in names)
+                    return ''
+                runner.command = Mock(side_effect=command)
+                runner.result.reset_mock()
+                with patch.object(Path, 'read_bytes', return_value=b''), \
+                        patch.object(Path, 'is_file', return_value=True), \
+                        patch.object(check, 'scan_elf', return_value=[]):
+                    runner.t2_abi(elf, trace)
+                runner.result.assert_called_with('t2 symbol versions against card sysroot', failures)
 
     def test_only_t0_can_cache_project_inputs(self):
         for tiers in (['t0'], ['t1'], ['t2'], ['t0', 't1', 't2']):
