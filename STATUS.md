@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-04 01:17.
+Updated automatically at every ticket change. Last update: 2026-11-04 01:18.
 
-**Next: the tech lead, on S3-11.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: GPT-6.1, on S3-11 (Milestone M1 note: fixture, line counts, ICE classes and backend cost comparison).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
 Current tickets: `[##################--]` 54 of 57
 
@@ -68,7 +68,7 @@ Current tickets: `[##################--]` 54 of 57
 | S3-08 | Fortran twin of m1_affine vectorizes and links | Done | The Fortran twin of the M1 affine kernel now builds with GCC 16 gfortran, vectorizes on zmm (FMA at -ffp-co... |
 | S3-09 | Packed integer add, sub, mul, logic and broadcast for V16SI; logic for V8DI | draft | Moved to Sprint 4 by the owner on 2026-11-03, on the lead's recommendation: m1_affine is float and double o... |
 | S3-10 | Card batch for Sprint 3 and m1_affine | Done | The Sprint 3 card batch is built from merged knc eb8fb3e902a and ready for the lead to run: m1_affine three... |
-| S3-11 | Milestone M1 note: fixture, line counts, ICE classes and backend cost comparison | Question for the tech lead | dd7509e: fixture/torture PASS; 202 shared lines/56 hunks. Blocker: portability.py x86 -> tasklist.exe Acces... |
+| S3-11 | Milestone M1 note: fixture, line counts, ICE classes and backend cost comparison | In progress | Partly yes; the rest is not yours to wait for. (1) x86 check: change tools/portability.py so a failed taskl... |
 | S3-12 | tools/portability: forward-port drill and x86_64 unchanged check | Done | tools/portability.py now checks whether the KNC changes still merge onto newer GCC (master has 2 conflicts,... |
 | S3-13 | Move KNC code out of shared i386 files into i386-knc | Done | KNC code now lives in i386-knc.cc/.h behind one-line hooks in the shared i386 files (shared diff 324 lines/... |
 | S3-14 | Native TLS for k1om, and every x86_64-only configure case that misses k1om | Done | GCC 16 now emits native %fs TLS for k1om, matching the donor's sequences at -O2, -O2 -fPIC and -O0 instead ... |
@@ -82,6 +82,7 @@ Current tickets: `[##################--]` 54 of 57
 
 ## Recent activity
 
+- 2026-11-04 01:18 **S3-11** lead answer: Partly yes; the rest is not yours to wait for. (1) x86 check: change tools/portability.py so a failed tasklist stops with a clear message instead o...
 - 2026-11-04 01:16 **S3-11** engineer ask: dd7509e: fixture/torture PASS; 202 shared lines/56 hunks. Blocker: portability.py x86 -> tasklist.exe Access denied before builds; .work/_state/log...
 - 2026-11-04 01:15 **S3-11** lead note: S3-20 (pr85169 ICE) will merge after this ticket. Measure at the knc head current when you start each measurement, name that head in m1-result.md, ...
 - 2026-11-04 01:04 **S3-10** lead approve: The Sprint 3 card batch is built from merged knc eb8fb3e902a and ready for the lead to run: m1_affine three ways (GCC 16, donor driver, Fortran), t...
@@ -89,7 +90,6 @@ Current tickets: `[##################--]` 54 of 57
 - 2026-11-04 00:59 **S3-10** lead answer: Yes. Fix the name in row() so it matches what is written, rerun the readiness check only, and do not rebuild: the programs are built from merged kn...
 - 2026-11-04 00:58 **S3-10** engineer ask: Two attempts failed: git status timeout, then readiness: missing claude-torture.expected.txt. row() derives that name but writes torture.expected.t...
 - 2026-11-04 00:38 **S3-15** lead approve: Packed vectors passed through varargs or ms_abi now give the KNC ABI error instead of crashing the compiler, and _Complex values and the rounding m...
-- 2026-11-04 00:36 **S3-15** engineer submit: Lead review addressed at ad5cc11: unresolved fixture uses undeclared index 3; libc/libm share GLIBC_2.14 under distinct indices with disjoint expor...
 
 ## Cost
 
