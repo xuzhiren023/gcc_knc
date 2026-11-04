@@ -104,6 +104,19 @@ snapshot() {
         }
         END {
             for (pid in ppid) {
+                # Admit only with the parent from this same status read. The
+                # earlier shell read may have raced or failed transiently.
+                file = "/proc/" pid "/status"
+                parent = ""
+                while ((getline part < file) > 0) {
+                    if (part ~ /^PPid:[ \t]+[0-9]+[ \t]*$/) {
+                        split(part, status, /[ \t]+/)
+                        parent = status[2]
+                        break
+                    }
+                }
+                close(file)
+                if (pid == 2 || parent == 2) continue
                 # Read comm directly in this one awk, preserving embedded line
                 # breaks as ?. Never put raw comm bytes into the record stream.
                 file = "/proc/" pid "/comm"
@@ -113,11 +126,8 @@ snapshot() {
                     name = name "" (lines++ ? "?" : "") part
                 }
                 close(file)
-                file = "/proc/" pid "/status"
-                readable = ((getline part < file) > 0)
-                close(file)
-                tag = readable && lines ? "PROC" : "SKIP"
-                printf "%s\t%s\t%s\t%s\t%s\t%s\n", tag, pid, ppid[pid], name, exe[pid], cwd[pid]
+                tag = parent != "" && lines ? "PROC" : "SKIP"
+                printf "%s\t%s\t%s\t%s\t%s\t%s\n", tag, pid, parent, name, exe[pid], cwd[pid]
             }
         }'
 }
