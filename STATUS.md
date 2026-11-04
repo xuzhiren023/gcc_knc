@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-04 15:14.
+Updated automatically at every ticket change. Last update: 2026-11-04 15:15.
 
-**Next: GPT-6.1, on S4-11 (gcc_build.py refuses a build tree whose mddeps.mk has lost the .md includes).** Run `python tools/dispatch.py`, or ask the tech lead to.
+**Next: GPT-6.1, on S4-02 (Vector compares into k masks, mask logic and mask spills for the packed modes).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
 Current tickets: `[##################--]` 65 of 72
 
@@ -84,7 +84,7 @@ Current tickets: `[##################--]` 65 of 72
 | S3-24 | Skip GCC builds that are already current (shared tree and the x86 check's stock tree) | Done | GCC builds are now skipped when nothing changed: tools/gcc_build.py --if-stale skips the shared tree's make... |
 | S3-25 | va_arg of an unsupported KNC type leaves a broken expansion; release builds hide the ICE | Done | Rejecting va_arg of an unsupported KNC vector type now ends with its error message and no hidden compiler c... |
 | S4-01 | Masks on KNC: GCC 16 entry points, IMCI forms, reuse audit and masked-tail design (ADR-0007 input) | Done | The mask design input for Sprint 4 is done: KNC masks are HI for 16-lane and QI for 8-lane vectors, compare... |
-| S4-02 | Vector compares into k masks, mask logic and mask spills for the packed modes | draft |  |
+| S4-02 | Vector compares into k masks, mask logic and mask spills for the packed modes | In progress |  |
 | S4-03 | Blends and if-conversion: conditional loops, ?:, fabs, min and max vectorize with masks | draft |  |
 | S4-04 | V8DI add and sub through the IMCI carry form, so long add loops vectorize | draft |  |
 | S4-05 | Safe masked tails: a masked vector remainder only where every touched line is in the array | draft |  |
@@ -110,7 +110,7 @@ Current tickets: `[##################--]` 65 of 72
 
 - From the script, engineer: 186 sessions, 441.0M input tokens
 - From the script, lead: 184 sessions, 58.7M input tokens
-- Started by hand, Claude: 9 sessions, 635.1M input tokens
+- Started by hand, Claude: 9 sessions, 637.2M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
