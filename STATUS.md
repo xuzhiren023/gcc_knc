@@ -1,10 +1,10 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-04 12:14.
+Updated automatically at every ticket change. Last update: 2026-11-04 12:23.
 
-**Next: the tech lead, on S4-10.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+Nothing can move right now.
 
-Current tickets: `[#################---]` 62 of 71
+Current tickets: `[#################---]` 63 of 71
 
 ## Milestones
 
@@ -12,7 +12,7 @@ Current tickets: `[#################---]` 62 of 71
 |---|---|---|---|
 | M0 | Foundation | In progress | 17 of 17 tickets |
 | M1 | Mixed native code | Done | 43 of 43 tickets |
-| M2 | Useful vector target | In progress | 2 of 11 tickets |
+| M2 | Useful vector target | In progress | 3 of 11 tickets |
 | M3 | Runtimes | Not started | Not planned in detail yet |
 | M4 | Broad optimization | Not started | Not planned in detail yet |
 | M5 | Program corpus | Not started | Not planned in detail yet |
@@ -92,10 +92,11 @@ Current tickets: `[#################---]` 62 of 71
 | S4-07 | Final Sprint 4 batch check at the sprint head | draft |  |
 | S4-08 | Small fixes from M1: the varargs V4SF assert checks alignment; S3-10 ABI expected files | draft |  |
 | S4-09 | LRA folds a misaligned vector load into vaddps/vsubps/vmulps ("m" constraint), which faults on the card | Done | Vectorized float and double add, sub and mul no longer fold a misaligned array load into the instruction, w... |
-| S4-10 | pm.py approve merges a GCC ticket without rewriting files in the shared checkout | Waiting for review | Red: new ancestor test failed on mtime (log S4_10_tests-20261104-120806). Fix: commit-tree + update-ref, th... |
+| S4-10 | pm.py approve merges a GCC ticket without rewriting files in the shared checkout | Done | Approving a GCC ticket no longer rewrites the merged files in the shared GCC checkout, so the next build is... |
 
 ## Recent activity
 
+- 2026-11-04 12:23 **S4-10** lead approve: Approving a GCC ticket no longer rewrites the merged files in the shared GCC checkout, so the next build is not forced to regenerate and recompile ...
 - 2026-11-04 12:14 **S4-10** engineer submit: Red: new ancestor test failed on mtime (log S4_10_tests-20261104-120806). Fix: commit-tree + update-ref, then checkout knc; non-ancestor keeps merg...
 - 2026-11-04 12:03 **S4-09** lead approve: Vectorized float and double add, sub and mul no longer fold a misaligned array load into the instruction, which used to crash on the card; aligned ...
 - 2026-11-04 12:01 **S4-09** engineer submit: imci.md: *knc_<op><mode>3 op2 YJm->YJBm, *knc_packed_move m->Bm (both sides). Unchanged: FMA forms (YJ only), unaligned load/store (MEM-only, never...
@@ -103,16 +104,15 @@ Current tickets: `[#################---]` 62 of 71
 - 2026-11-04 11:05 **S3-25** engineer submit: Green t0/t1/t2 gcc16: 249 PASS, 0 FAIL (t0 4, t1 222, t2 23); 16 VAR_GET rows pass (red had only those 16 failing). Torture assembly after vs befor...
 - 2026-11-04 10:53 **S3-25** owner decide: Over budget (12.3M of 2M); fix committed and built. A Claude subagent finishes the green checks and the submit; no more GPT sessions.
 - 2026-11-04 10:50 **S3-25** lead escalate: budget: 12334184 input tokens used; the budget is 2000000
-- 2026-11-04 10:50 **S3-25** lead answer: Yes, continue in a new run, limited to the remaining steps: wait for the running build to finish (do not start another make), then run the green t0...
 
 ## Cost
 
 - From the script, engineer: 186 sessions, 441.0M input tokens
 - From the script, lead: 184 sessions, 58.7M input tokens
-- Started by hand, Claude: 9 sessions, 613.2M input tokens
+- Started by hand, Claude: 9 sessions, 615.6M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 12.9 GiB of 100 GiB. 246 GiB free on the drive.
+The project uses 12.9 GiB of 100 GiB. 245 GiB free on the drive.
