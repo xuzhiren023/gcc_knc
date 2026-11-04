@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-04 11:07.
+Updated automatically at every ticket change. Last update: 2026-11-04 12:01.
 
-**Next: GPT-6.1, on S4-09 (LRA folds a misaligned vector load into vaddps/vsubps/vmulps ("m" constraint), which faults on the card).** Run `python tools/dispatch.py`, or ask the tech lead to.
+**Next: the tech lead, on S4-09.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[#################---]` 61 of 70
 
@@ -91,10 +91,11 @@ Current tickets: `[#################---]` 61 of 70
 | S4-06 | Batch check after S4-02, S3-09 and S4-03: x86, drill and ICE sweeps at the batch head | draft |  |
 | S4-07 | Final Sprint 4 batch check at the sprint head | draft |  |
 | S4-08 | Small fixes from M1: the varargs V4SF assert checks alignment; S3-10 ABI expected files | draft |  |
-| S4-09 | LRA folds a misaligned vector load into vaddps/vsubps/vmulps ("m" constraint), which faults on the card | In progress |  |
+| S4-09 | LRA folds a misaligned vector load into vaddps/vsubps/vmulps ("m" constraint), which faults on the card | Waiting for review | imci.md: *knc_<op><mode>3 op2 YJm->YJBm, *knc_packed_move m->Bm (both sides). Unchanged: FMA forms (YJ only... |
 
 ## Recent activity
 
+- 2026-11-04 12:01 **S4-09** engineer submit: imci.md: *knc_<op><mode>3 op2 YJm->YJBm, *knc_packed_move m->Bm (both sides). Unchanged: FMA forms (YJ only), unaligned load/store (MEM-only, never...
 - 2026-11-04 11:06 **S3-25** lead approve: Rejecting va_arg of an unsupported KNC vector type now ends with its error message and no hidden compiler crash, and the ABI checks fail on any 'co...
 - 2026-11-04 11:05 **S3-25** engineer submit: Green t0/t1/t2 gcc16: 249 PASS, 0 FAIL (t0 4, t1 222, t2 23); 16 VAR_GET rows pass (red had only those 16 failing). Torture assembly after vs befor...
 - 2026-11-04 10:53 **S3-25** owner decide: Over budget (12.3M of 2M); fix committed and built. A Claude subagent finishes the green checks and the submit; no more GPT sessions.
@@ -102,16 +103,15 @@ Current tickets: `[#################---]` 61 of 70
 - 2026-11-04 10:50 **S3-25** lead answer: Yes, continue in a new run, limited to the remaining steps: wait for the running build to finish (do not start another make), then run the green t0...
 - 2026-11-04 10:49 **S3-25** engineer ask: 60-call hook blocks further work. Authorize continuation for green checks? Red 4f8069e: full t0/t1/t2 has only the 16 expected VAR_GET failures. GC...
 - 2026-11-04 10:41 **S4-01** lead approve: The mask design input for Sprint 4 is done: KNC masks are HI for 16-lane and QI for 8-lane vectors, compares, blends and mask logic are new imci.md...
-- 2026-11-04 10:38 **S4-01** engineer submit: docs/research/knc-masks.md: 6 sections + ADR-0007 inputs, read-only, no build. Masks HI for 16-lane, QI for 8-lane (1-term get_mask_mode hook; ADR-...
 
 ## Cost
 
 - From the script, engineer: 186 sessions, 441.0M input tokens
 - From the script, lead: 184 sessions, 58.7M input tokens
-- Started by hand, Claude: 8 sessions, 605.0M input tokens
+- Started by hand, Claude: 9 sessions, 607.2M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 12.9 GiB of 100 GiB. 251 GiB free on the drive.
+The project uses 12.9 GiB of 100 GiB. 247 GiB free on the drive.
