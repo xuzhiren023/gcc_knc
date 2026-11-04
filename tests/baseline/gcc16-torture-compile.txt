@@ -16,7 +16,7 @@ level	pass	slow	hang	ICE	compiler error	float/double ABI error	assembler rejecti
 O0	1967	0	0	0	34	0	0	0	0	2
 O2	1968	0	0	0	33	0	0	0	0	2
 O2-g	1968	0	0	0	33	0	0	0	0	2
-O3	1967	0	0	1	33	0	0	0	0	2
+O3	1968	0	0	0	33	0	0	0	0	2
 
 O0 / slow (0)
 
@@ -186,8 +186,7 @@ O3 / slow (0)
 
 O3 / hang (0)
 
-O3 / ICE (1)
-acc1.c
+O3 / ICE (0)
 
 O3 / compiler error (33)
 20030305-1.c
