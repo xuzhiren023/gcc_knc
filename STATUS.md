@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-03 20:47.
+Updated automatically at every ticket change. Last update: 2026-11-03 20:49.
 
-**Next: GPT-6.1, on S3-08 (Fortran twin of m1_affine vectorizes and links).** Run `python tools/dispatch.py`, or ask the tech lead to.
+**Next: the tech lead, on S3-08.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[#################---]` 47 of 55
 
@@ -65,7 +65,7 @@ Current tickets: `[#################---]` 47 of 55
 | S3-05 | Unaligned packed moves through load and store pairs | Done | Packed copies through pointers of unknown alignment now compile, for all four 512-bit modes, to unmasked lo... |
 | S3-06 | Packed FP add, sub, mul, FMA and broadcasts for V16SF and V8DF | Done | Under -march=knc, 512-bit float and double vectors now compile to packed add, subtract, multiply, fused mul... |
 | S3-07 | Auto-vectorization on zmm, with x87 peel and remainder; m1_affine T1 and T2 green | Done | With -mknc, GCC 16 now auto-vectorizes simple float and double loops at default -O2 into packed zmm multipl... |
-| S3-08 | Fortran twin of m1_affine vectorizes and links | In progress | 1. tools/check.py:392 (also :271, :342): the new unguarded self.args.compiler checks fail on Runner objects... |
+| S3-08 | Fortran twin of m1_affine vectorizes and links | Waiting for review | Fixed all three new compiler checks with the existing guarded getattr form; commit 300c73e. tools/run.py --... |
 | S3-09 | Packed integer add, sub, mul, logic and broadcast for V16SI; logic for V8DI | draft | Moved to Sprint 4 by the owner on 2026-11-03, on the lead's recommendation: m1_affine is float and double o... |
 | S3-10 | Card batch for Sprint 3 and m1_affine | Not started | Also add (1) S3-14's TLS and S3-15's complex and rounding cross-checks, built after both merge (objects bui... |
 | S3-11 | Milestone M1 note: fixture, line counts, ICE classes and backend cost comparison | Not started | Owner approved Sprint 3 on 2026-11-03; ticket set to ready. |
@@ -81,13 +81,13 @@ Current tickets: `[#################---]` 47 of 55
 ## Recent activity
 
 - 2026-11-03 20:50 **S3-19** lead note: Filed under the owner's delegation. This is probably also the unexplained `infrastructure-failure` at 01:31:55 UTC that S3-18 was filed for.
+- 2026-11-03 20:49 **S3-08** engineer submit: Fixed all three new compiler checks with the existing guarded getattr form; commit 300c73e. tools/run.py --name S3-08-review-t0-t1-t2 --inputs tool...
 - 2026-11-03 20:47 **S3-18** lead approve: card_run now saves every job's result under .work/_state/card/ (newest 200 kept), and the ledger finish line records why a job was refused or faile...
 - 2026-11-03 20:44 **S3-18** engineer submit: Restored --receipt default ROOT/tests/out/card-result.json as requested; retained per-job diagnostics remain additional. Commit b9394dd. tools/run....
 - 2026-11-03 20:44 **S3-08** lead changes: 1. tools/check.py:392 (also :271, :342): the new unguarded self.args.compiler checks fail on Runner objects built without args, so tools/check t0 f...
 - 2026-11-03 20:42 **S3-08** engineer submit: Red commit 4374b3d: T2 failed for missing driver Fortran call and linked symbol; log .work/_state/logs/S3_08_red-20261103-204026.log. tools/run.py ...
 - 2026-11-03 20:41 **S3-18** owner decide: Lead decided under the owner's 2026-11-03 delegation: budget raised to 3 sessions and 4M input tokens (0.9M used) for the one requested change (res...
 - 2026-11-03 20:41 **S3-18** engineer escalate: budget: 2 engineer sessions used; the budget is 2
-- 2026-11-03 20:40 **S3-18** lead changes: 1. tools/card_run:711 drops the --receipt default (tests/out/card-result.json), which the ticket did not ask for, and docs/card-run.md:246 still do...
 
 ## Cost
 
