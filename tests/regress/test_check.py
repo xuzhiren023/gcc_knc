@@ -241,13 +241,15 @@ class OptionalSelections(unittest.TestCase):
             import knc_vector
             with patch.object(knc_vector, 't1_packed') as packed, \
                     patch.object(knc_vector, 't1_unaligned') as unaligned, \
-                    patch.object(knc_vector, 't1_fp') as fp:
+                    patch.object(knc_vector, 't1_fp') as fp, \
+                    patch.object(knc_vector, 't1_byte_aligned') as byte_aligned:
                 runner.t1()
             runner.t1_sources.assert_called_once_with([
                 runner.source_dir / 'knc-vec-a.c', runner.source_dir / 'knc-vec-b.c'])
             packed.assert_called_once_with(runner)
             unaligned.assert_called_once_with(runner)
             fp.assert_called_once_with(runner)
+            byte_aligned.assert_called_once_with(runner)
 
 
 class SourceTests(unittest.TestCase):
