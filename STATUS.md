@@ -1,17 +1,17 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-03 22:21.
+Updated automatically at every ticket change. Last update: 2026-11-03 22:24.
 
-**Next: the tech lead, on S3-21.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: GPT-6.1, on S3-14 (Native TLS for k1om, and every x86_64-only configure case that misses k1om).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
-Current tickets: `[#################---]` 50 of 57
+Current tickets: `[#################---]` 51 of 57
 
 ## Milestones
 
 | | Milestone | State | Progress |
 |---|---|---|---|
 | M0 | Foundation | In progress | 17 of 17 tickets |
-| M1 | Mixed native code | In progress | 33 of 39 tickets |
+| M1 | Mixed native code | In progress | 34 of 39 tickets |
 | M2 | Useful vector target | In progress | 0 of 1 tickets |
 | M3 | Runtimes | Not started | Not planned in detail yet |
 | M4 | Broad optimization | Not started | Not planned in detail yet |
@@ -78,10 +78,11 @@ Current tickets: `[#################---]` 50 of 57
 | S3-18 | card_run keeps every job's receipt, and the ledger finish line says why a job was refused | Done | card_run now saves every job's result under .work/_state/card/ (newest 200 kept), and the ledger finish lin... |
 | S3-19 | card_run's snapshot silences the status redirect before it can fail | Done | A card process that exits mid-snapshot no longer makes card_run refuse the job, and a lint stops the redire... |
 | S3-20 | 64-byte XImode memory-to-memory copy ICEs (gcc.c-torture/execute/pr85169.c) | Not started | Filed under the owner's delegation. It goes into M1's ICE classes (S3-11). |
-| S3-21 | Unaligned packed accesses need element alignment; byte-aligned ones must not use load/store pairs | Waiting for review | Hook rejects is_packed/non-element-multiple misalignment; sub-element MEM_ALIGN uses eight DImode GPR trans... |
+| S3-21 | Unaligned packed accesses need element alignment; byte-aligned ones must not use load/store pairs | Done | Byte-aligned vector copies (like pr65369) no longer use the KNC load/store pair instructions that need elem... |
 
 ## Recent activity
 
+- 2026-11-03 22:24 **S3-21** lead approve: Byte-aligned vector copies (like pr65369) no longer use the KNC load/store pair instructions that need element alignment, so they no longer crash o...
 - 2026-11-03 22:21 **S3-21** engineer submit: Hook rejects is_packed/non-element-multiple misalignment; sub-element MEM_ALIGN uses eight DImode GPR transfers via 64-byte-aligned stack; insns re...
 - 2026-11-03 22:20 **S3-21** owner decide: Lead decided under the owner's 2026-11-03 delegation: budget raised to 5 sessions and 32M input tokens to submit. The lead ran the guard programs o...
 - 2026-11-03 22:19 **S3-21** engineer escalate: budget: 4 engineer sessions used; the budget is 4
@@ -89,13 +90,12 @@ Current tickets: `[#################---]` 50 of 57
 - 2026-11-03 22:16 **S3-21** engineer ask: Green T1: 8 byte rows + 8 element controls PASS; assembly/lint PASS. Log .work/_state/logs/S3_21_green-20261103-221605.log. Submit hook blocks tick...
 - 2026-11-03 22:14 **S3-21** lead answer: Both yes, with limits. (1) Fix the controls, not the hook: memcpy from a 'const int *' carries no alignment in GCC (folds to a char-aligned ref-all...
 - 2026-11-03 22:13 **S3-21** engineer ask: Build passed; T1 still red. Reproducer .work/_shared/check/S3-21-reduced*: memcpy from const int* loses alignment (A8); hook sees is_packed=true. b...
-- 2026-11-03 21:50 **S3-21** lead approve-red: S3-21 red is approved: the new tests catch load/store pairs on byte-aligned addresses (pr65369's shape, aligned(1) vector copies, packed members at...
 
 ## Cost
 
 - From the script, engineer: 165 sessions, 336.6M input tokens
 - From the script, lead: 164 sessions, 53.4M input tokens
-- Started by hand, Claude: 5 sessions, 488.8M input tokens
+- Started by hand, Claude: 5 sessions, 489.6M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
