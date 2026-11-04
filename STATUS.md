@@ -2,7 +2,7 @@
 
 Updated automatically at every ticket change. Last update: 2026-11-03 20:36.
 
-**Waiting for you:** S3-07. Run `python tools/pm.py inbox`.
+**Next: GPT-6.1, on S3-07 (Auto-vectorization on zmm, with x87 peel and remainder; m1_affine T1 and T2 green).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
 Current tickets: `[################----]` 45 of 54
 
@@ -64,7 +64,7 @@ Current tickets: `[################----]` 45 of 54
 | S3-04 | Packed modes legal under -march=knc, with aligned moves, spills and constants | Done | Under -march=knc, 64-byte float, double, int and long long vectors now live in zmm registers, with aligned ... |
 | S3-05 | Unaligned packed moves through load and store pairs | Done | Packed copies through pointers of unknown alignment now compile, for all four 512-bit modes, to unmasked lo... |
 | S3-06 | Packed FP add, sub, mul, FMA and broadcasts for V16SF and V8DF | Done | Under -march=knc, 512-bit float and double vectors now compile to packed add, subtract, multiply, fused mul... |
-| S3-07 | Auto-vectorization on zmm, with x87 peel and remainder; m1_affine T1 and T2 green | **Waiting for you** | budget: 5 engineer sessions used; the budget is 5 |
+| S3-07 | Auto-vectorization on zmm, with x87 peel and remainder; m1_affine T1 and T2 green | In progress | Lead decided under the owner's 2026-11-03 delegation: budget raised to 6 sessions and 30M input tokens (14.... |
 | S3-08 | Fortran twin of m1_affine vectorizes and links | Not started | Owner approved Sprint 3 on 2026-11-03; ticket set to ready. |
 | S3-09 | Packed integer add, sub, mul, logic and broadcast for V16SI; logic for V8DI | draft | Moved to Sprint 4 by the owner on 2026-11-03, on the lead's recommendation: m1_affine is float and double o... |
 | S3-10 | Card batch for Sprint 3 and m1_affine | Not started | Also add (1) S3-14's TLS and S3-15's complex and rounding cross-checks, built after both merge (objects bui... |
@@ -80,19 +80,19 @@ Current tickets: `[################----]` 45 of 54
 ## Recent activity
 
 - 2026-11-03 20:40 **S3-18** lead note: Filed under the owner's delegation.
+- 2026-11-03 20:36 **S3-07** owner decide: Lead decided under the owner's 2026-11-03 delegation: budget raised to 6 sessions and 30M input tokens (14.7M used). Every check passes and the siz...
 - 2026-11-03 20:36 **S3-07** lead escalate: budget: 5 engineer sessions used; the budget is 5
 - 2026-11-03 20:36 **S3-07** lead answer: Override approved; do not cut tests. 58 of the 130 lines are the regenerated O3 baseline column, which is data, and the remaining tests (default -O...
 - 2026-11-03 20:35 **S3-07** engineer ask: Submit refused: 130 test lines for 60 code lines. Tests cover requested default-O2 vectors, x87 tails, donor-driver T2, O3 ICE and packed-affine AB...
 - 2026-11-03 20:23 **S3-07** lead answer: 1) Yes. In scalar_abi.affine, stop applying the scalar allowlist to the gcc16 text: ADR-0005 makes packed zmm code the expected -O2 output for loop...
 - 2026-11-03 20:21 **S3-07** engineer ask: Build/T0 pass. Fixture T1 off/fast/x87 tails, default O2 and both T2 drivers pass. Full T1 fails scalar_abi.affine scalar allowlist: may affine use...
 - 2026-11-03 19:42 **S3-07** lead answer: Supported path: python tools/check t0. On Windows it re-runs itself under the toolchain's Cygwin python3.12, which has TemporaryDirectory(ignore_cl...
-- 2026-11-03 19:41 **S3-07** engineer ask: Two runner attempts failed: Windows Python lacks TemporaryDirectory(ignore_cleanup_errors); Cygwin retry cannot import knc_vector with PYTHONPATH=t...
 
 ## Cost
 
 - From the script, engineer: 149 sessions, 312.7M input tokens
 - From the script, lead: 148 sessions, 49.6M input tokens
-- Started by hand, Claude: 5 sessions, 460.0M input tokens
+- Started by hand, Claude: 5 sessions, 461.0M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
