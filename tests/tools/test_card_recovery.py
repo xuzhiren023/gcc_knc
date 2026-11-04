@@ -226,6 +226,60 @@ class RemoteReview(unittest.TestCase):
         self.assertEqual([p["pid"] for p in foreign], ["44"], foreign)
         self.assertEqual(snapshot.get("physical_run_dir"), str(physical_dir))
 
+    def test_snapshot_kernel_parent_comes_from_admitting_status_read(self):
+        self.process(44, 2)
+        (self.proc / "44/comm").write_text("kworker/u:7\n")
+        # A user process can have the same name: only its parent identifies it.
+        self.process(45, 1)
+        (self.proc / "45/comm").write_text("kworker/u:7\n")
+        script = self.remote.replace("/proc/", str(self.proc) + "/")
+        script += '''
+run_dir=/tmp/claude/claude-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+read() {
+    # Fail just the shell's first status read; awk still sees PPid: 2.
+    if [ "${proc_pid:-}" = 44 ] && [ "${2:-}" = proc_key ]; then
+        return 1
+    fi
+    command read "$@"
+}
+snapshot
+'''
+        answer = self.shell(script)
+        self.assertEqual(answer.returncode, 0, answer.stderr)
+        parser = object.__new__(self.runner["SSHSession"])
+        parser.boot_id = None
+        parser.rpc = mock.Mock(return_value=answer.stdout.rstrip(b"\n"))
+        transport = SharedTransport()
+        transport.snapshot = parser.snapshot
+        transport.ledger = self.directory / "jobs.jsonl"
+        transport.ledger.write_text("")
+        program = self.directory / "hello.mic"
+        program.write_bytes(b"fake program; never executed")
+        result = self.runner["run"](
+            program, [], lock_path=self.directory / "card.lock", external_locks=[],
+            baseline_names=set(), timeout=30, transport_timeout=1,
+            receipt_path=self.directory / "result.json", transport=transport,
+            ledger_path=transport.ledger, monotonic=lambda: transport.now)
+        self.assertEqual((result["result_class"], result["exit_code"]),
+                         ("program", 0), result["detail"])
+        self.assertIn("execute", [event[0] for event in transport.events])
+        self.assertEqual([p["pid"] for p in result["foreign_processes"]], ["45"])
+        self.assertNotIn(b"\t44\t", answer.stdout)
+
+    def test_snapshot_skips_unreadable_or_missing_parent_status(self):
+        for pid in (43, 44):
+            directory = self.proc / str(pid)
+            directory.mkdir()
+            (directory / "comm").write_text("worker\n")
+        # Missing status is unreadable even when the test runs as root.
+        (self.proc / "44/status").write_text("Name:\tworker\n")
+        script = self.remote.replace("/proc/", str(self.proc) + "/")
+        answer = self.shell(script +
+                            "\nrun_dir=/tmp/claude/claude-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\nsnapshot\n")
+        self.assertEqual(answer.returncode, 0, answer.stderr)
+        for pid in (43, 44):
+            self.assertIn(("SKIP\t%d\t" % pid).encode(), answer.stdout)
+
     def test_tmp_symlink_guard_owned_identity_and_cleanup(self):
         logical, physical, remote = self.symlink_tmp()
         job = "claude-" + "a" * 32
