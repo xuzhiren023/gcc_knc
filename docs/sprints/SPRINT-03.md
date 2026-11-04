@@ -77,19 +77,24 @@ that builds or compiles with the shared GCC build is in the gcc lane.
 
 ## Sprint exit
 
-- [ ] S3-01 to S3-08, S3-10 and S3-11 approved and merged, or returned to the backlog with a reason
+- [x] S3-01 to S3-08, S3-10 and S3-11 approved and merged (also S3-12 to S3-25, added during the sprint)
 - [x] S3-09 merged, or moved to Sprint 4 by the owner's choice (moved, 2026-11-03)
-- [ ] ADR-0005 accepted, with S3-03's answer recorded in it
-- [ ] `m1_affine`: every row of its README green with GCC 16, including the donor-driver run and
+- [x] ADR-0005 accepted, with S3-03's answer recorded in it
+- [x] `m1_affine`: every row of its README green with GCC 16, including the donor-driver run and
   the Fortran twin, from S3-10's card run; the lead ticks the native lines from it
-- [ ] Shared i386 line count measured at the final `knc` head, with the KNC-only files' size beside it
-- [ ] **M1 cost comparison** (S3-11): the subtarget's real cost so far against a separate backend
+- [x] Shared i386 line count measured at the final `knc` head (184 lines, 53 hunks), with the KNC-only files' size beside it
+- [x] **M1 cost comparison** (S3-11): the subtarget's real cost so far against a separate backend
   estimated from the donor inventory and our own tickets, with any open SSE-assumption ICE class.
   The lead recommends go, adjust or stop; the owner decides
-- [ ] `CURRENT_STATE.md` updated, `work/milestones.json` updated if M1 is accepted, and the GCC
+- [x] `CURRENT_STATE.md` updated, `work/milestones.json` updated if M1 is accepted (M1 go, 2026-11-04, tag `m1`), and the GCC
   `knc` branch ready for the owner to push
 - [ ] Three-line retro below
 
 ## Retro
 
-*(at close)*
+Closed 2026-11-04 by the lead; all of S3's code tickets merged and M1 accepted (S3-09 moved to Sprint 4).
+1. Kept: card runs right after each merge caught real wrong code (pr65369, pr85169). The S4 fixture
+   then found an S3-06 bug (S4-09) that M1's single-load fixture could not, so fixtures need two misaligned inputs.
+2. Cost: per-ticket x86 checks, the drill and needless rebuilds dominated laptop time; batch checks and
+   S3-24's build stamps replace them from Sprint 4.
+3. Budget stops at submit and the 60-call hook halted the lane often; GPT ran out, so Sprint 4 runs on Claude subagents.
