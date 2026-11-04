@@ -53,17 +53,17 @@ def conflict_hunks(text):
 
 def drill(args):
     refs = args.onto or default_refs(args.repo)
-    changed = git(args.repo, 'diff', '--no-renames', '--name-only', '-z', BASE, 'knc').split('\0')
+    changed = git(args.repo, 'diff', '--no-renames', '--name-only', '-z', BASE, args.tree).split('\0')
     changed = [path for path in changed if path]
     lines = ['## ' + datetime.datetime.now(datetime.timezone.utc).isoformat(timespec='seconds'),
-             '', 'Base: `' + BASE + '`; KNC: `' + git(args.repo, 'rev-parse', 'knc') + '`.',
+             '', 'Base: `' + BASE + '`; KNC: `' + git(args.repo, 'rev-parse', args.tree) + '`.',
              'Local refs only; no fetch, checkout, index update or ref update.', '']
     for ref in refs:
         commit = git(args.repo, 'rev-parse', '--verify', ref + '^{commit}')
         date = git(args.repo, 'show', '-s', '--format=%cI', commit)
         result = subprocess.run(['git', '-C', str(args.repo), 'merge-tree', '--write-tree',
                                  '--merge-base=' + BASE, '--name-only', '-z', '--no-messages',
-                                 ref, 'knc'], stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+                                 ref, args.tree], stdout=subprocess.PIPE, stderr=subprocess.PIPE,
                                 text=True, encoding='utf8', errors='replace')
         if result.returncode not in (0, 1):
             raise RuntimeError('merge-tree ' + ref + ': ' + result.stderr.strip())
@@ -81,7 +81,7 @@ def drill(args):
                 # Delete/modify and rename conflicts need not have textual markers.
                 lines += ['Structural conflict; upstream and KNC changes from the base:', '']
                 hunks = [git(args.repo, 'diff', '--no-ext-diff', '--no-color', BASE, side,
-                             '--', path) for side in (ref, 'knc')]
+                             '--', path) for side in (ref, args.tree)]
             for hunk in hunks:
                 lines += ['```diff', hunk, '```', '']
         lines += ['Upstream line churn since 16.2 in files changed by KNC:', '',
@@ -251,6 +251,7 @@ def main(argv=None):
     sub = parser.add_subparsers(dest='action', required=True)
     drill_parser = sub.add_parser('drill')
     drill_parser.add_argument('--onto', action='append')
+    drill_parser.add_argument('--tree', default='knc', help='KNC head to forward-port')
     drill_parser.add_argument('--report', type=Path, default=ROOT / 'docs/research/forward-port.md')
     x86_parser = sub.add_parser('x86')
     x86_parser.add_argument('--tree', action='append', required=True)
