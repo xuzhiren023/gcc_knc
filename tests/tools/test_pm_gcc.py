@@ -155,8 +155,7 @@ class GccTickets(Sandbox):
         self.changes()
         self.submit()
         self.git("checkout", "-q", "knc", cwd=self.gcc)
-        self.commit_file("gcc/other.md", "other
-", "integration", self.gcc)
+        self.commit_file("gcc/other.md", "other\n", "integration", self.gcc)
         self.git("checkout", "-q", self.branch, cwd=self.gcc)
         other = self.output("rev-parse", "knc")
         done = self.pm("approve", "A-1", role="lead")
