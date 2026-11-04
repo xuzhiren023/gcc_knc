@@ -153,3 +153,7 @@ The rounding case adds 2^-53 to ±1, a halfway value, so each mode stores a diff
 also checks that the x87 control word and MXCSR rounding bits are the same before and after the
 call. `fesetround` on the card sets both. A mode lost across the call would print a wrong value,
 so the expectations are their own control.
+
+Full execute suite after S3-15 (`eb8fb3e902a`): the build gives the same result for every one of
+the 1,692 sources as after S3-14 (the new guard rejects nothing that compiled before), and on the
+card **1,661 of 1,661 PASS**, six jobs, no retries.
