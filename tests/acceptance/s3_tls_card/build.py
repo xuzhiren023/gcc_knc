@@ -38,7 +38,7 @@ def run(cmd):
 
 def obj(variant, name, cc, opt, extra=()):
     out = OUT / ("%s-%s.o" % (variant, name))
-    run([*CC[cc], opt, *extra, "-pthread", "-c", str(HERE / (name + ".c")), "-o", str(out)])
+    run([*CC[cc], opt, *extra, "-pthread", "-c", (HERE / (name + ".c")).as_posix(), "-o", str(out)])
     if cc == "gcc16" and "emutls" in run([NM, str(out)]):
         sys.exit("FAILED: %s uses emulated TLS" % out)
     return str(out)
@@ -51,7 +51,8 @@ runs = []
 for v, (main_cc, new_opt, lib_cc, lib_opt) in VARIANTS.items():
     d = ["-DCONTROL_SHARED"] if v == "X" else []
     lib = "libclaude-tls%s.so" % v
-    run([*CC[lib_cc], lib_opt, *d, "-fPIC", "-shared", str(HERE / "tls_lib.c"), "-o", str(OUT / lib)])
+    run([*CC[lib_cc], lib_opt, *d, "-fPIC", "-shared", "-Wl,-soname," + lib, (HERE / "tls_lib.c").as_posix(),
+         "-o", str(OUT / lib)])
     if lib_cc == "gcc16" and "emutls" in run([NM, "-D", str(OUT / lib)]):
         sys.exit("FAILED: %s uses emulated TLS" % lib)
     main_opt = new_opt if main_cc == "gcc16" else "-O2"
