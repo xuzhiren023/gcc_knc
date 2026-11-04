@@ -37,6 +37,16 @@ def git(repo, *args):
                                    encoding='utf8', errors='replace').strip()
 
 
+def mddeps_healthy(build):
+    """True when gcc/mddeps.mk lists the KNC and SSE .md files under MD_INCLUDES."""
+    try:
+        text = (build / 'gcc/mddeps.mk').read_text(encoding='utf8', errors='replace')
+    except OSError:
+        return False
+    return ('MD_INCLUDES' in text and 'config/i386/imci.md' in text
+            and 'config/i386/sse.md' in text)
+
+
 def command(argv, cwd):
     print('+ (cd ' + shlex.quote(str(cwd)) + ' && ' + shlex.join(map(str, argv)) + ')', flush=True)
     subprocess.run(list(map(str, argv)), cwd=cwd, check=True)
@@ -55,15 +65,23 @@ def main(argv=None):
         tree = git(args.repo, 'rev-parse', 'HEAD^{tree}')
         clean = not git(args.repo, 'status', '--porcelain', '--untracked-files=all')
         stamp = read_stamp(stamp_path)
-        if (args.if_stale and clean and stamp.get('clean') is True
+        healthy = mddeps_healthy(args.build)
+        if (args.if_stale and healthy and clean and stamp.get('clean') is True
                 and stamp.get('tree') == tree and stamp.get('make_args') == MAKE_ARGS):
             print('SKIP shared GCC: clean tree ' + tree + ' already built at ' +
                   str(stamp.get('commit')))
             return 0
         # Invalidate before make: failure or interruption must never certify old objects.
         stamp_path.unlink(missing_ok=True)
+        if not healthy:
+            print('mddeps.mk is missing or lost its .md includes; removing s-mddeps to regenerate')
+            (args.build / 'gcc/s-mddeps').unlink(missing_ok=True)
         print('BUILD shared GCC: ' + commit + ' tree=' + tree + ' clean=' + str(clean), flush=True)
         command(['make', *MAKE_ARGS], args.build)
+        if not mddeps_healthy(args.build):
+            print('ERROR: mddeps.mk still lacks config/i386/imci.md or sse.md after the build; '
+                  'not certifying it')
+            return 1
         clean = (clean and git(args.repo, 'rev-parse', 'HEAD') == commit
                  and not git(args.repo, 'status', '--porcelain', '--untracked-files=all'))
         write_stamp(stamp_path, {'commit': commit, 'tree': tree, 'clean': clean,
