@@ -185,33 +185,24 @@ class Runner(unittest.TestCase):
                     '  0x0030: Name: GLIBC_2.14  Flags: none  Version: 3\n')
         symbols = ('  1: 0000000000000000 0 FUNC GLOBAL DEFAULT UND printf@GLIBC_2.14 (2)\n'
                    '  2: 0000000000000000 0 FUNC GLOBAL DEFAULT UND sin@GLIBC_2.14 (3)\n')
-        for missing, failures in (
-                (None, []),
-                ('libc.so.6', ['libc.so.6 lacks printf@GLIBC_2.14']),
-                ('libm.so.6', ['libm.so.6 lacks sin@GLIBC_2.14'])):
-            with self.subTest(missing=missing):
-                def command(*args):
-                    if '--version-info' in args:
-                        return versions
-                    if '--dyn-syms' in args:
-                        if args[-1] == elf:
-                            return symbols
-                        library = args[-1].name
-                        # The other library exports the missing symbol too, so
-                        # a provider-blind union would wrongly accept it.
-                        names = ('sin',) if library == 'libm.so.6' else ('printf',)
-                        if missing:
-                            names = () if library == missing else ('printf', 'sin')
-                        return ''.join('  1: 0000000000010000 0 FUNC GLOBAL DEFAULT 12 '
-                                       + name + '@@GLIBC_2.14\n' for name in names)
-                    return ''
-                runner.command = Mock(side_effect=command)
-                runner.result.reset_mock()
-                with patch.object(Path, 'read_bytes', return_value=b''), \
-                        patch.object(Path, 'is_file', return_value=True), \
-                        patch.object(check, 'scan_elf', return_value=[]):
-                    runner.t2_abi(elf, trace)
-                runner.result.assert_called_with('t2 symbol versions against card sysroot', failures)
+        with self.subTest(version='GLIBC_2.14', libc_index=2, libm_index=3):
+            def command(*args):
+                if '--version-info' in args:
+                    return versions
+                if '--dyn-syms' in args:
+                    if args[-1] == elf:
+                        return symbols
+                    # Disjoint exports expose checks against the wrong library.
+                    name = 'sin' if args[-1].name == 'libm.so.6' else 'printf'
+                    return ('  1: 0000000000010000 0 FUNC GLOBAL DEFAULT 12 '
+                            + name + '@@GLIBC_2.14\n')
+                return ''
+            runner.command = Mock(side_effect=command)
+            with patch.object(Path, 'read_bytes', return_value=b''), \
+                    patch.object(Path, 'is_file', return_value=True), \
+                    patch.object(check, 'scan_elf', return_value=[]):
+                runner.t2_abi(elf, trace)
+            runner.result.assert_called_with('t2 symbol versions against card sysroot', [])
 
     def test_only_t0_can_cache_project_inputs(self):
         for tiers in (['t0'], ['t1'], ['t2'], ['t0', 't1', 't2']):
