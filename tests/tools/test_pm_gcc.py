@@ -137,6 +137,34 @@ class GccTickets(Sandbox):
         self.assertEqual(self.state("A-1"), "done")
         self.assertTrue(os.path.exists(os.path.join(self.root, "tools", "check")))
 
+    def test_approve_does_not_rewrite_files_when_knc_is_an_ancestor(self):
+        self.changes()
+        self.submit()
+        target = os.path.join(self.gcc, "gcc", "imci.md")
+        os.utime(target, (1000000000, 1000000000))
+        tree = self.output("rev-parse", self.branch + "^{tree}")
+        done = self.pm("approve", "A-1", role="lead")
+        self.assertEqual(done.returncode, 0, done.stdout)
+        self.assertEqual(os.stat(target).st_mtime, 1000000000)
+        self.assertEqual(self.output("branch", "--show-current"), "knc")
+        self.assertEqual(self.output("rev-parse", "knc^{tree}"), tree)
+        self.assertEqual(self.output("rev-parse", "knc^2"), self.output("rev-parse", self.branch))
+        self.assertEqual(len(self.output("rev-list", "--parents", "-n1", "knc").split()), 3)
+
+    def test_approve_still_merges_when_knc_is_not_an_ancestor(self):
+        self.changes()
+        self.submit()
+        self.git("checkout", "-q", "knc", cwd=self.gcc)
+        self.commit_file("gcc/other.md", "other\n", "integration", self.gcc)
+        self.git("checkout", "-q", self.branch, cwd=self.gcc)
+        other = self.output("rev-parse", "knc")
+        done = self.pm("approve", "A-1", role="lead")
+        self.assertEqual(done.returncode, 0, done.stdout)
+        self.assertEqual(self.output("rev-parse", "knc^1"), other)
+        self.assertEqual(self.output("rev-parse", "knc^2"), self.output("rev-parse", self.branch))
+        self.assertEqual(self.output("show", "knc:gcc/other.md"), "other")
+        self.assertEqual(self.output("show", "knc:gcc/imci.md"), "ticket")
+
     def test_approve_refuses_moved_gcc_branch(self):
         self.changes()
         self.submit()

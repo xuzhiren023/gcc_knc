@@ -473,9 +473,20 @@ def cmd_approve(board, args):
         main_head = run_git("rev-parse", "HEAD", cwd=board.root)
         knc_head = run_git("rev-parse", "knc", cwd=gcc)
         previous = run_git("branch", "--show-current", cwd=gcc)
+        # When knc is an ancestor the merge tree is the branch tree. Build the commit and move
+        # knc without a merge, so checkout rewrites no file (a rewrite forces a GCC rebuild).
+        ancestor = subprocess.call(["git", "merge-base", "--is-ancestor", "knc", branch], cwd=gcc,
+                                   stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL) == 0
+        fast = False
+        if ancestor:
+            merge = run_git("commit-tree", branch + "^{tree}", "-p", "knc", "-p", branch,
+                            "-m", message, cwd=gcc)
+            run_git("update-ref", "refs/heads/knc", merge, knc_head, cwd=gcc)
+            fast = True
         run_git("checkout", "-q", "knc", cwd=gcc)
         try:
-            run_git("merge", "--no-ff", "-q", "-m", message, branch, cwd=gcc)
+            if not fast:
+                run_git("merge", "--no-ff", "-q", "-m", message, branch, cwd=gcc)
             run_git("merge", "--no-ff", "-q", "-m", message, branch, cwd=board.root)
         except Refused:
             # Both checkouts were clean. Restore both integration tips and clear conflicts.
