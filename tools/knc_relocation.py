@@ -10,6 +10,7 @@ import io
 import os
 from pathlib import Path
 import pickle
+import re
 import subprocess
 import sys
 
@@ -22,6 +23,31 @@ GCC = SHARED / 'gcc'
 BUILD = SHARED / 'gcc-build/gcc'
 OUT = SHARED / 'knc-relocation'
 STATE = OUT / 'before.pickle'
+
+
+def structure():
+    """S3-22: the last shared KNC bodies must be entry hooks (ADR-0006)."""
+    directory = GCC / 'gcc/config/i386'
+    source = (directory / 'i386.cc').read_text()
+    def body(name):
+        start = source.index('\n' + name + ' (')
+        start = source.index('\n{', start)
+        return source[start:source.index('\n}', start) + 2]
+    zero = body('ix86_zero_call_used_regs')
+    hook = ('\n{\n  if (TARGET_KNC)\n'
+            '    return ix86_knc_zero_call_used_regs (need_zeroed_hardregs);')
+    checks = {
+        'zero-call-used-regs entry hook only': zero.startswith(hook)
+            and 'KNC' not in zero[len(hook):],
+        'CAS16 undef outside shared i386-c.cc': not re.search(
+            r'cpp_undef\s*\([^;]*__GCC_HAVE_SYNC_COMPARE_AND_SWAP_16',
+            (directory / 'i386-c.cc').read_text()),
+        'varargs only retains SSE-or-KNC conditions': 'TARGET_KNC' not in
+            body('setup_incoming_varargs_64').replace('TARGET_SSE || TARGET_KNC', ''),
+    }
+    for name, passed in checks.items():
+        print(('PASS ' if passed else 'FAIL ') + name, flush=True)
+    return int(not all(checks.values()))
 
 
 def metrics():
@@ -95,6 +121,8 @@ def capture():
 
 
 def main(action):
+    if action == 'structure':
+        return structure()
     current = metrics()
     print('shared added+removed=%d hunks=%d' % current, flush=True)
     if action == 'before':
