@@ -20,6 +20,28 @@ OPTIONS = re.compile(r'\{\s*dg-(?:additional-)?options\s+(?:"([^"\n]*)"|\{([^{}\
                      r'(\s*\{\s*target\b)?')
 
 
+def card_spelling(text):
+    """Rewrite host %La long-double values (0x1.fffp+e) as card glibc prints them.
+
+    The card prints the 64-bit x87 significand with its explicit integer bit, so the leading
+    hex digit holds the top four bits (0xe.000000000000008p-3), trailing zeros trimmed.
+    Only the values inside long-double=(...) are touched; double fields keep 0x1.xxxp+e.
+    """
+    def value(match):
+        sign, frac, exp = match.group(1), match.group(2), int(match.group(3))
+        bits = 1 + 4 * len(frac)
+        mant = (1 << (4 * len(frac))) | int(frac or '0', 16)
+        mant = mant << (64 - bits) if bits <= 64 else mant >> (bits - 64)  # extra bits are zero
+        digits = '%016x' % mant
+        tail = digits[1:].rstrip('0')
+        return '%s0x%s%s%sp%+d' % (sign, digits[0], '.' if tail else '', tail, exp - 3)
+
+    def fields(match):
+        return 'long-double=(' + re.sub(r'(-?)0x1\.?([0-9a-f]*)p([+-]\d+)', value, match.group(1)) + ')'
+
+    return re.sub(r'long-double=\(([^)]*)\)', fields, text)
+
+
 def run(args, check=True):
     args = list(map(str, args))
     print('+ ' + shlex.join(args), flush=True)
@@ -124,7 +146,7 @@ def main():
                 objects.append(obj)
             program = 'claude-abi-O%d-%d.mic' % (opt, reverse)
             run([*cc, *objects, '-lm', '-o', OUT / program])
-            row(program, reference)
+            row(program, card_spelling(reference))
 
     # Default contraction in the loop TU; reference precision in its own TU.
     run([*cc, '-O2', '-ftree-vectorize', '-c', fixture / 'loops.c', '-o', loops])
