@@ -23,15 +23,17 @@
 // scan-asm-func fmin_f32: \A(?![\s\S]*\bv(?:gmin|cmpp))
 // scan-asm-func fmax_f64: \bcall\s+fmax\b
 // scan-asm-func fmax_f64: \A(?![\s\S]*\bv(?:gmax|cmpp))
+// x[i] is in bounds of a global array, so if-conversion loads it
+// unconditionally (aligned); sel_* covers the masked load.
 // scan-asm-func cst_f32: \bjkzd\s+\S+,\s*%k[0-7]\s*$
-// scan-asm-func cst_f32: \bvmovaps\s+[^\n]*\),\s*%zmm\d+\{%k[1-7]\}
+// scan-asm-func cst_f32: \bvmovaps\s+x_f32\(%\w+\),\s*%zmm\d+\s*$
 // scan-asm-func cst_f32: \bvmovaps\s+%zmm\d+,\s*[^\n]*\)\{%k[1-7]\}
 // scan-asm-func cst_f32: \A(?![\s\S]*\b(?:vloadunpack|vpackstore)\w*\s[^\n]*\{%k)
-// scan-asm-func cst_f64: \bvmovapd\s+[^\n]*\),\s*%zmm\d+\{%k[1-7]\}
+// scan-asm-func cst_f64: \bvmovapd\s+x_f64\(%\w+\),\s*%zmm\d+\s*$
 // scan-asm-func cst_f64: \bvmovapd\s+%zmm\d+,\s*[^\n]*\)\{%k[1-7]\}
 // scan-asm-func cst_f64: \A(?![\s\S]*\b(?:vloadunpack|vpackstore)\w*\s[^\n]*\{%k)
 // scan-asm-func cst_i32: \bjkzd\s+\S+,\s*%k[0-7]\s*$
-// scan-asm-func cst_i32: \bvmovdqa32\s+[^\n]*\),\s*%zmm\d+\{%k[1-7]\}
+// scan-asm-func cst_i32: \bvmovdqa32\s+x_i32\(%\w+\),\s*%zmm\d+\s*$
 // scan-asm-func cst_i32: \bvmovdqa32\s+%zmm\d+,\s*[^\n]*\)\{%k[1-7]\}
 // scan-asm-func cst_ptr_f32: \A(?![\s\S]*\bv(?:cmpps|movaps|blendmps)\b)
 // scan-asm-func cadd_f32: \bvaddps\s[^\n]*\{%k[1-7]\}
