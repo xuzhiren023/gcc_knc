@@ -1,17 +1,17 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-04 09:22.
+Updated automatically at every ticket change. Last update: 2026-11-04 09:32.
 
 **Next: GPT-6.1, on S3-23 (KNC's atomic_storeti survives upstream's new one; trunk builds C-only and runs T1 and T2).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
-Current tickets: `[###################-]` 57 of 59
+Current tickets: `[###################-]` 57 of 60
 
 ## Milestones
 
 | | Milestone | State | Progress |
 |---|---|---|---|
 | M0 | Foundation | In progress | 17 of 17 tickets |
-| M1 | Mixed native code | In progress | 40 of 41 tickets |
+| M1 | Mixed native code | In progress | 40 of 42 tickets |
 | M2 | Useful vector target | In progress | 0 of 1 tickets |
 | M3 | Runtimes | Not started | Not planned in detail yet |
 | M4 | Broad optimization | Not started | Not planned in detail yet |
@@ -81,6 +81,7 @@ Current tickets: `[###################-]` 57 of 59
 | S3-21 | Unaligned packed accesses need element alignment; byte-aligned ones must not use load/store pairs | Done | Byte-aligned vector copies (like pr65369) no longer use the KNC load/store pair instructions that need elem... |
 | S3-22 | The last three KNC blocks in shared i386 code become hooks (ADR-0006 rules 1-4) | Done | The last three KNC blocks in shared i386 code (zero-call-used-regs, the 16-byte CAS macro, the varargs save... |
 | S3-23 | KNC's atomic_storeti survives upstream's new one; trunk builds C-only and runs T1 and T2 | In progress | Yes, continue in the next session. The trunk build is not running: it died at 09:22 with no compiler diagno... |
+| S3-24 | Skip GCC builds that are already current (shared tree and the x86 check's stock tree) | In progress | Filed under the owner's 2026-11-04 direction ("apply your recommended measures"). Tools lane; it must not b... |
 
 ## Recent activity
 
@@ -97,10 +98,10 @@ Current tickets: `[###################-]` 57 of 59
 
 - From the script, engineer: 182 sessions, 423.3M input tokens
 - From the script, lead: 180 sessions, 58.1M input tokens
-- Started by hand, Claude: 8 sessions, 547.0M input tokens
+- Started by hand, Claude: 8 sessions, 551.1M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 12.4 GiB of 100 GiB. 254 GiB free on the drive.
+The project uses 12.6 GiB of 100 GiB. 254 GiB free on the drive.
