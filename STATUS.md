@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-03 19:35.
+Updated automatically at every ticket change. Last update: 2026-11-03 19:36.
 
 **Next: GPT-6.1, on S3-07 (Auto-vectorization on zmm, with x87 peel and remainder; m1_affine T1 and T2 green).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
@@ -90,7 +90,7 @@ Current tickets: `[################----]` 45 of 53
 ## Cost
 
 - From the script, engineer: 146 sessions, 300.2M input tokens
-- From the script, lead: 144 sessions, 48.0M input tokens
+- From the script, lead: 145 sessions, 48.2M input tokens
 - Started by hand, Claude: 5 sessions, 452.2M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
