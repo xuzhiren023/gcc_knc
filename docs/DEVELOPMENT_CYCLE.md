@@ -99,10 +99,8 @@ once per batch as once per ticket. So:
   at a milestone the trunk build with T1 and T2. The lead then runs the full
   `gcc.c-torture/execute` suite on the card. A batch failure is bisected by rerunning at the
   batch's ticket merges, newest first.
-- The card runs every target program; the laptop builds the compiler and the test programs. A
-  2026-11-04 sample showed linking and assembling are most of a suite build's laptop time, but a
-  whole suite build is a few minutes, so moving them to the card (native binutils there) is not
-  worth it yet. Revisit if suite builds grow.
+- The card is for on-card validation and for testing built artifacts only (owner, 2026-11-04).
+  The laptop builds the compiler and the test programs, links included.
 
 ## 5. TDD rules for compiler work
 

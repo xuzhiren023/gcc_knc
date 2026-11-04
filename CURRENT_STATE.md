@@ -127,7 +127,7 @@ Last updated: 2026-11-04 05:40, Sprint 3. Merged: S3-01 to S3-08, S3-10 to S3-21
   - Each gcc ticket keeps its red test, an incremental build and its own checks, and the lead runs the ticket's own card check after merge.
   - x86, the drill, the ICE sweeps and the full card suite run once per batch of 2-3 gcc tickets, at sprint end and at each milestone, as a `type: check` ticket (`docs/DEVELOPMENT_CYCLE.md` section 4; ADR-0006 rule 5 amended).
   - S3-24 (tools lane) skips builds of trees that have not changed.
-  - Card offload of test-program link and assembly was measured on 40 donor programs: link 47% and assembly 18% of the laptop time, but a whole suite build is minutes, so it is not worth native binutils on the card yet.
+  - The card is for on-card validation and testing built artifacts only (owner, 2026-11-04). Builds, links included, stay on the laptop. Measured on 40 donor programs: link is 47% and assembly 18% of a suite build's laptop time, but the whole build is minutes.
   - The M1 final-head runs after S3-23 count as the first batch check.
 - **S3-22 review (Claude subagent, read-only, GCC `43ded4fa4d8`, 2026-11-04): no defect.** The varargs save matches the old path in layout, alias set, alignment and the order of the AL test. No V4SF pseudo can exist on KNC (V4SF is not a supported vector mode and the hard-register check rejects it), so only the varargs save reaches `mov<V4SF>`. Not blocking: the expander's assert (`i386-knc.cc:151`) accepts a store with alignment below 128, which would produce a `vpackstorelq` with mask 3 that can split at a 64-byte boundary. Add `MEM_ALIGN (operands[0]) >= 128` to the assert in Sprint 4. The V4SF condition term also lacks `TARGET_64BIT`.
 
