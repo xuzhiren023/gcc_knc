@@ -204,6 +204,7 @@ def t1_vector_diagnostics(runner):
                 '-o', runner.out / 'vector.s', check=False)
             rejected = (compiled.returncode != 0
                         and 'internal compiler error' not in compiled.stdout
+                        and 'confused by earlier errors' not in compiled.stdout
                         and 'error: unsupported KNC register ABI mode' in compiled.stdout)
             runner.result('t1 KNC rejects 64-byte int vector ABI ' + case + ' ' + level,
                           [] if rejected else [compiled.stdout[-1800:]
@@ -240,6 +241,7 @@ def t1_abi_gaps(runner):
                         '-o', runner.out / 'abi-gap.s', check=False)
                     rejected = (compiled.returncode != 0
                                 and 'internal compiler error' not in compiled.stdout
+                                and 'confused by earlier errors' not in compiled.stdout
                                 and 'error: unsupported KNC register ABI mode' in compiled.stdout)
                     runner.result('t1 packed ABI %s %s %s %s' %
                                   (element, 'record' if record else 'vector', case, level),
@@ -266,6 +268,7 @@ def t1(runner):
         compiled = runner.command(runner.cc, *runner.cc_flags, '-march=knc', '-S', source,
                                   '-o', source.with_suffix('.s'), check=False)
         rejected = (compiled.returncode != 0 and 'internal compiler error' not in compiled.stdout
+                    and 'confused by earlier errors' not in compiled.stdout
                     and re.search(r'error:.*(?:knc|KNC)', compiled.stdout))
         runner.result('t1 KNC rejects target attribute ' + feature,
                       [] if rejected else [compiled.stdout or 'feature attribute accepted'])
@@ -275,6 +278,7 @@ def t1(runner):
                               '-fzero-call-used-regs=all', '-S', source, '-o', asm, check=False)
     if compiled.returncode:
         supported_diagnostic = ('internal compiler error' not in compiled.stdout and
+                                'confused by earlier errors' not in compiled.stdout and
                                 re.search(r'error:.*(?:zero-call-used-regs|unsupported)', compiled.stdout))
         failures = [] if supported_diagnostic else [compiled.stdout[-1800:]]
     else:
