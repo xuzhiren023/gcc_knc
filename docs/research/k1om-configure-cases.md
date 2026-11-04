@@ -10,10 +10,10 @@ including OS-specific alternatives and the already-covered S1-02 case. This
 checkout contains 52 such lines (54 alternatives), rather than the ticket's
 approximate 73. Non-triplet uses are accounted for below.
 
-?Before? and ?after? describe configure dispatch and resulting settings, derived
+"Before" and "after" describe configure dispatch and resulting settings, derived
 from the case bodies. They are not claims that unsupported OS/ISA variants were
 built. Measured configure/build/test results are recorded separately below.
-?Same? means the preceding result is deliberately retained.
+"Same" means the preceding result is deliberately retained.
 
 Reference mechanisms checked in the donor: `gcc/configure.ac` native TLS cases
 at 3042/3086 and PIE copy-relocation case at 4718. These mechanisms still exist in
@@ -101,7 +101,7 @@ backend patterns.
 |---|---|---|---|---|
 | 26 `x86_64-*-cygwin*` | No | Windows targets need no ELF PIC flag; KNC does. | Cygwin target alternative skipped. | Same. |
 | 28 `x86_64-*-mingw*` | No | MinGW targets need no ELF PIC flag; KNC does. | MinGW target alternative skipped. | Same. |
-| 59 `x86_64-*-*` | Yes; changed | KNC uses the same scalar ELF PIC models and supports both spellings; follow the x86 preference consistently. | KNC PICFLAG_FOR_TARGET=-fPIC (generic fallback). | KNC PICFLAG_FOR_TARGET=-fpic; explicit user -fpic/-fPIC overrides retained. Host PICFLAG unchanged. |
+| 59 `x86_64-*-*` | No | On x86-64, -fpic and -fPIC produce the same code. Revert the added KNC alternative: it gains nothing and adds fork surface. | KNC PICFLAG_FOR_TARGET=-fPIC (generic fallback). | Same; explicit user -fpic/-fPIC overrides retained. Host PICFLAG unchanged. |
 
 ## Other occurrences and files without a matching case
 
@@ -123,18 +123,18 @@ backend patterns.
 
 ## Regeneration and measured results
 
-The changed `gcc/configure.ac` is committed with `gcc/configure`. The changed
-`config/picflag.m4` expands in `gcc/configure` and `libiberty/configure`; both
-were regenerated under Cygwin sh with the shared autotools bin first on PATH,
-then the shared Cygwin bin. Reported versions: GNU Autoconf 2.69, GNU M4 1.4.19.
-The generated diffs are exactly five case-line additions in gcc/configure and
-one in libiberty/configure. No generated file was edited by hand.
+The changed `gcc/configure.ac` is committed with `gcc/configure`.
+`config/picflag.m4` expands in `gcc/configure`, `libiberty/configure`,
+`libgcc/configure` and `libada/configure`. The initial PIC flag change did not
+regenerate the latter two; it has been reverted, with `config/picflag.m4` and
+`libiberty/configure` restored to the knc versions.
 
-The first regeneration command completed gcc/configure but the final libiberty
-command had a CRLF script terminator and failed with `autoconf\r: command not
-found`. Normalizing the helper script and running only the remaining libiberty
-regeneration succeeded. Logs: `.work/_state/logs/s3_14_autoconf-20261103-223001.log`
-and `s3_14_autoconf_libiberty-20261103-223013.log`.
+After that revert, `gcc/configure` was regenerated under Cygwin sh with the
+shared autotools bin first on PATH, then the shared Cygwin bin. Reported
+versions: GNU Autoconf 2.69, GNU M4 1.4.19. Its diff against knc contains only
+the four case-line additions implied by `gcc/configure.ac`. No generated file
+was edited by hand. Regeneration log:
+`.work/_state/logs/s3_14_autoconf_correction-20261103-233627.log`.
 
 Before the fix, the shared build's auto-host.h had HAVE_AS_TLS undefined,
 HAVE_LD_PIE_COPYRELOC=0, ENABLE_X86_64_MFENTRY=0; config.log had
@@ -144,8 +144,10 @@ and GCC 16 failing all three native TLS modes.
 The fresh configure reports `checking assembler for thread-local storage
 support... yes`; auto-host.h now defines HAVE_AS_TLS=1. The newly executed PIE
 copy-relocation check reports no (HAVE_LD_PIE_COPYRELOC=0); unsupported capability
-is not assumed. PICFLAG_FOR_TARGET is now -fpic and ENABLE_X86_64_MFENTRY remains
-0.
+is not assumed. That initial configure recorded PICFLAG_FOR_TARGET=-fpic;
+the corrected source retains -fPIC. ENABLE_X86_64_MFENTRY remains 0.
+Per the lead's correction, no full rebuild is needed: PICFLAG_FOR_TARGET only
+affects target libraries we do not build, and libgcc already used its own -fPIC.
 
 The clean C/Fortran rebuild passed via tools/toolchain.py gcc16 (all-gcc;
 53.4 minutes including configuration). Log:
@@ -165,6 +167,12 @@ operations match the donor and no __emutls access remains in these tests.
 Detailed log:
 `.work/_state/logs/check_gcc16_t0_t1_t2-20261103-232642.log`;
 wrapper log: `s3_14_regression-20261103-232641.log` in the same directory.
+
+After the PIC flag revert and configure regeneration, the lead-requested
+`tools/check.py t1 --compiler gcc16` rerun passed once through `tools/run.py`
+in 83.93 seconds. Detailed log:
+`.work/_state/logs/check_gcc16_t1-20261103-233701.log`;
+wrapper log: `s3_14_t1_correction-20261103-233700.log` in the same directory.
 
 The O2 torture compile/assemble/lint sweep ran once over all 2,003 sources:
 1,968 pass, 33 compiler errors, two user inline-asm rejections. There were zero
