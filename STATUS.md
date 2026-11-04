@@ -78,7 +78,7 @@ Current tickets: `[#################---]` 50 of 57
 | S3-18 | card_run keeps every job's receipt, and the ledger finish line says why a job was refused | Done | card_run now saves every job's result under .work/_state/card/ (newest 200 kept), and the ledger finish lin... |
 | S3-19 | card_run's snapshot silences the status redirect before it can fail | Done | A card process that exits mid-snapshot no longer makes card_run refuse the job, and a lint stops the redire... |
 | S3-20 | 64-byte XImode memory-to-memory copy ICEs (gcc.c-torture/execute/pr85169.c) | Not started | Filed under the owner's delegation. It goes into M1's ICE classes (S3-11). |
-| S3-21 | Unaligned packed accesses need element alignment; byte-aligned ones must not use load/store pairs | Changes requested | Red fails for the right reason (log: pairs on byte_slp, aligned(1) copies and packed members 1-3/1-7; byte_... |
+| S3-21 | Unaligned packed accesses need element alignment; byte-aligned ones must not use load/store pairs | In progress | Red fails for the right reason (log: pairs on byte_slp, aligned(1) copies and packed members 1-3/1-7; byte_... |
 
 ## Recent activity
 
