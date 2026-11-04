@@ -121,9 +121,11 @@ def scan(assembly, case, move, body):
 def t1(runner):
     sources = sorted(runner.source_dir.glob('knc-vec-*.c'))
     fixtures = {runner.source_dir / ('knc-vec-' + mode + '.c') for mode in MODES}
+    fixtures.add(runner.source_dir / 'knc-vec-byte-aligned.c')
     runner.t1_sources([source for source in sources if source not in fixtures])
     t1_packed(runner)
     t1_unaligned(runner)
+    t1_byte_aligned(runner)
     t1_fp(runner)
 
 
@@ -222,6 +224,70 @@ def t1_unaligned(runner):
                     runner.result(label, failures)
                 except (OSError, RuntimeError, ValueError) as error:
                     runner.result(label, [str(error)])
+
+
+def t1_byte_aligned(runner):
+    # Intel 327364-001 VLOADUNPACKLD p.361: pairs require element alignment.
+    # --vector includes this probe; overlapping selections must run it once.
+    if getattr(runner, '_knc_byte_aligned_done', False):
+        return
+    runner._knc_byte_aligned_done = True
+    source = runner.source_dir / 'knc-vec-byte-aligned.c'
+    types = {'v16sf': ('float', 4), 'v8df': ('double', 8),
+             'v16si': ('int', 4), 'v8di': ('long long', 8)}
+    for mode, (scalar, size) in types.items():
+        for level in ('-O2', '-O3'):
+            label = 't1 byte-aligned %s %s' % (mode, level)
+            asm, obj = runner.out / (mode + '.s'), runner.out / (mode + '.o')
+            try:
+                compiled = runner.command(runner.cc, *runner.cc_flags, level,
+                    '-march=knc', '-DSCALAR=' + scalar, '-DELEMENT_BYTES=' + str(size),
+                    '--sysroot=' + str(runner.sysroot), '-S', source, '-o', asm,
+                    check=False)
+                failures = []
+                if compiled.returncode:
+                    failures.append('compile exited %d: %s' %
+                                    (compiled.returncode, compiled.stdout[-1600:]))
+                else:
+                    assembly = asm.read_text()
+                    controls = ['elem_slp', 'elem_loop'] if level == '-O3' else ['elem_slp']
+                    control_failures = []
+                    for name in controls:
+                        body = runner.function_body(assembly, name)
+                        if body is None:
+                            control_failures.append(name + ': missing function boundary')
+                            continue
+                        ops = {op for op, args in instructions(body)}
+                        # FP bit copies may vectorize in the integer mode
+                        # of the same width; both forms require element alignment.
+                        suffixes = ('ps', 'd') if size == 4 else ('pd', 'q')
+                        if not any({prefix + half + suffix for half in ('l', 'h')} <= ops
+                                   for prefix in ('vloadunpack', 'vpackstore')
+                                   for suffix in suffixes):
+                            control_failures.append(name + ': missing element-aligned pair')
+                    runner.result(label + ' element-aligned controls', control_failures)
+                    names = ['byte_slp', 'byte_loop', 'byte_load', 'byte_store']
+                    names += [direction + '_member_' + str(offset)
+                              for offset in range(1, size)
+                              for direction in ('load', 'store')]
+                    for name in names:
+                        body = runner.function_body(assembly, name)
+                        if body is None:
+                            failures.append(name + ': missing function boundary')
+                        else:
+                            for op, args in instructions(body):
+                                if op.startswith(('vloadunpack', 'vpackstoreh')):
+                                    failures.append(name + ': pair requires element alignment')
+                                elif op.startswith('vpackstorel'):
+                                    # Intel 327364-001 p.361 permits this masked scalar extract to aligned stack memory.
+                                    if not (re.search(r'\{%k\d+\}', args)
+                                            and re.search(r'\(%(?:rsp|rbp)(?:,|\))', args)):
+                                        failures.append(name + ': pair requires element alignment')
+                    runner.command(runner.tool('as'), '--march=k1om', asm, '-o', obj)
+                    runner.command(sys.executable, runner.root / 'tools/knc_lint', asm, obj)
+                runner.result(label, failures)
+            except (OSError, RuntimeError, ValueError) as error:
+                runner.result(label, [str(error)])
 
 
 def t1_packed(runner):
