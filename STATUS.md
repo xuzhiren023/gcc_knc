@@ -1,10 +1,10 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-04 17:46.
+Updated automatically at every ticket change. Last update: 2026-11-04 17:57.
 
-Nothing can move right now.
+**Next: GPT-6.1, on S4-12 (card_run stages a whole batch in one upload, so card cores are busy instead of waiting on SSH).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
-Current tickets: `[##################--]` 67 of 72
+Current tickets: `[##################--]` 67 of 73
 
 ## Milestones
 
@@ -12,7 +12,7 @@ Current tickets: `[##################--]` 67 of 72
 |---|---|---|---|
 | M0 | Foundation | In progress | 17 of 17 tickets |
 | M1 | Mixed native code | Done | 43 of 43 tickets |
-| M2 | Useful vector target | In progress | 7 of 12 tickets |
+| M2 | Useful vector target | In progress | 7 of 13 tickets |
 | M3 | Runtimes | Not started | Not planned in detail yet |
 | M4 | Broad optimization | Not started | Not planned in detail yet |
 | M5 | Program corpus | Not started | Not planned in detail yet |
@@ -94,6 +94,7 @@ Current tickets: `[##################--]` 67 of 72
 | S4-09 | LRA folds a misaligned vector load into vaddps/vsubps/vmulps ("m" constraint), which faults on the card | Done | Vectorized float and double add, sub and mul no longer fold a misaligned array load into the instruction, w... |
 | S4-10 | pm.py approve merges a GCC ticket without rewriting files in the shared checkout | Done | Approving a GCC ticket no longer rewrites the merged files in the shared GCC checkout, so the next build is... |
 | S4-11 | gcc_build.py refuses a build tree whose mddeps.mk has lost the .md includes | Done | A shared GCC build tree that has lost its .md dependency list is now rebuilt and checked instead of being c... |
+| S4-12 | card_run stages a whole batch in one upload, so card cores are busy instead of waiting on SSH | In progress |  |
 
 ## Recent activity
 
@@ -110,10 +111,10 @@ Current tickets: `[##################--]` 67 of 72
 
 - From the script, engineer: 186 sessions, 441.0M input tokens
 - From the script, lead: 184 sessions, 58.7M input tokens
-- Started by hand, Claude: 9 sessions, 679.6M input tokens
+- Started by hand, Claude: 9 sessions, 685.8M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 12.7 GiB of 100 GiB. 233 GiB free on the drive.
+The project uses 12.7 GiB of 100 GiB. 231 GiB free on the drive.
