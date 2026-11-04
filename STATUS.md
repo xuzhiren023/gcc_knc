@@ -2,7 +2,7 @@
 
 Updated automatically at every ticket change. Last update: 2026-11-04 10:50.
 
-**Next: GPT-6.1, on S3-25 (va_arg of an unsupported KNC type leaves a broken expansion; release builds hide the ICE).** Run `python tools/dispatch.py`, or ask the tech lead to.
+**Waiting for you:** S3-25. Run `python tools/pm.py inbox`.
 
 Current tickets: `[#################---]` 60 of 70
 
@@ -82,7 +82,7 @@ Current tickets: `[#################---]` 60 of 70
 | S3-22 | The last three KNC blocks in shared i386 code become hooks (ADR-0006 rules 1-4) | Done | The last three KNC blocks in shared i386 code (zero-call-used-regs, the 16-byte CAS macro, the varargs save... |
 | S3-23 | KNC's atomic_storeti survives upstream's new one; trunk builds C-only and runs T1 and T2 | Done | KNC's 128-bit atomic store and exchange now live in i386-knc.cc helpers with unchanged output, and upstream... |
 | S3-24 | Skip GCC builds that are already current (shared tree and the x86 check's stock tree) | Done | GCC builds are now skipped when nothing changed: tools/gcc_build.py --if-stale skips the shared tree's make... |
-| S3-25 | va_arg of an unsupported KNC type leaves a broken expansion; release builds hide the ICE | In progress | Yes, continue in a new run, limited to the remaining steps: wait for the running build to finish (do not st... |
+| S3-25 | va_arg of an unsupported KNC type leaves a broken expansion; release builds hide the ICE | **Waiting for you** | budget: 12334184 input tokens used; the budget is 2000000 |
 | S4-01 | Masks on KNC: GCC 16 entry points, IMCI forms, reuse audit and masked-tail design (ADR-0007 input) | Done | The mask design input for Sprint 4 is done: KNC masks are HI for 16-lane and QI for 8-lane vectors, compare... |
 | S4-02 | Vector compares into k masks, mask logic and mask spills for the packed modes | draft |  |
 | S4-03 | Blends and if-conversion: conditional loops, ?:, fabs, min and max vectorize with masks | draft |  |
@@ -95,6 +95,7 @@ Current tickets: `[#################---]` 60 of 70
 
 ## Recent activity
 
+- 2026-11-04 10:50 **S3-25** lead escalate: budget: 12334184 input tokens used; the budget is 2000000
 - 2026-11-04 10:50 **S3-25** lead answer: Yes, continue in a new run, limited to the remaining steps: wait for the running build to finish (do not start another make), then run the green t0...
 - 2026-11-04 10:49 **S3-25** engineer ask: 60-call hook blocks further work. Authorize continuation for green checks? Red 4f8069e: full t0/t1/t2 has only the 16 expected VAR_GET failures. GC...
 - 2026-11-04 10:41 **S4-01** lead approve: The mask design input for Sprint 4 is done: KNC masks are HI for 16-lane and QI for 8-lane vectors, compares, blends and mask logic are new imci.md...
@@ -102,7 +103,6 @@ Current tickets: `[#################---]` 60 of 70
 - 2026-11-04 09:55 **S3-24** lead note: Budget raised to 3M input tokens under the owner's 2026-11-03 delegation (2.02M used): only the submit is left. Waiting for the owner's decide.
 - 2026-11-04 09:50 **S3-24** lead approve: GCC builds are now skipped when nothing changed: tools/gcc_build.py --if-stale skips the shared tree's make on a clean, already-built tree, and the...
 - 2026-11-04 09:47 **S3-24** engineer submit: Recorded validation: all 7 new acceptance tests passed; existing tests/tools suite 169/170 passed, and the sole harness test passed separately with...
-- 2026-11-04 09:45 **S3-24** owner decide: Budget raised to 3M input tokens (2.02M used); only the submit is left.
 
 ## Cost
 
