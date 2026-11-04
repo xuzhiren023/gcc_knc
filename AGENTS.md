@@ -41,6 +41,12 @@ Then stop. Your final message is only the `PM update:` line that command prints:
   them). That catches C++ errors in a few minutes. Only then run the full build.
 - Fix every error a failed build reports before rebuilding. Never start a second build while a
   `make.exe` is alive.
+- Build the shared tree through `python tools/run.py --name <name> -- python tools/gcc_build.py
+  --if-stale`, never with a bare `make` there. It skips the build when the tree is clean and
+  already built, and its stamp is only right if every full build goes through it (S3-24).
+  Single-object compiles (`make ... i386-knc.o`) are fine.
+- x86, the drill, ICE sweeps and the trunk build run in batch-check tickets, not in each ticket,
+  unless your ticket says otherwise (`docs/DEVELOPMENT_CYCLE.md` section 4).
 
 ## Test first
 
