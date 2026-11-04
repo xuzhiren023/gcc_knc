@@ -108,8 +108,15 @@ def drill(args):
 
 
 def make_is_running():
-    text = subprocess.check_output(['tasklist.exe', '/FI', 'IMAGENAME eq make.exe',
-                                    '/FO', 'CSV', '/NH'], text=True)
+    try:
+        text = subprocess.check_output(['tasklist.exe', '/FI', 'IMAGENAME eq make.exe',
+                                        '/FO', 'CSV', '/NH'], text=True,
+                                       stderr=subprocess.STDOUT)
+    except (OSError, subprocess.CalledProcessError) as error:
+        detail = getattr(error, 'output', None) or str(error)
+        raise RuntimeError('cannot check running make.exe with tasklist.exe: ' +
+                           detail.strip() + '; confirm no build is running before using '
+                           '--skip-make-check') from None
     return any(row and row[0].casefold() == 'make.exe' for row in csv.reader(text.splitlines()))
 
 
@@ -159,7 +166,9 @@ def torture_dialect_options(source):
 
 
 def x86(args):
-    if make_is_running():
+    if args.skip_make_check:
+        print('make check skipped', flush=True)
+    elif make_is_running():
         raise RuntimeError('refusing x86 while make.exe is running')
     if len(args.tree) != 2:
         raise RuntimeError('x86 needs exactly two --tree arguments')
@@ -245,6 +254,8 @@ def main(argv=None):
     x86_parser = sub.add_parser('x86')
     x86_parser.add_argument('--tree', action='append', required=True)
     x86_parser.add_argument('--shared', type=Path, default=SHARED)
+    x86_parser.add_argument('--skip-make-check', action='store_true',
+                            help='skip tasklist after independently confirming no build is running')
     for command_parser in (drill_parser, x86_parser):
         command_parser.add_argument('--repo', type=Path, default=SHARED / 'gcc')
     args = parser.parse_args(argv)
