@@ -65,9 +65,10 @@ class SharedTransport:
                     meminfo="MemTotal: 16000000 kB\nMemFree: %d kB\n" % free,
                     pinning=self.pinning)
 
-    def stage(self, run_dir, program, *, timeout, files=()):
+    def stage(self, run_dir, program, *, timeout, files=(), packed=False):
         self.events.append(("stage", run_dir))
         self.staged_files = list(files)
+        self.packed = packed
         if self.stage_failure:
             raise OSError("partial staging failure")
 
@@ -137,7 +138,7 @@ class SharedCardRules(unittest.TestCase):
         self.transport = SharedTransport()
         self.transport.ledger = self.ledger
 
-    def invoke(self, *, default_root=None, files=(), receipt=True):
+    def invoke(self, *, default_root=None, files=(), receipt=True, file_list=None):
         if default_root is not None:
             self.config["ownLock"] = str(default_root / "card.lock")
         self.config_path.write_text(json.dumps(self.config), encoding="utf8")
@@ -148,6 +149,8 @@ class SharedCardRules(unittest.TestCase):
             args += ["--config", str(self.config_path)]
         for path in files:
             args += ["--file", str(path)]
+        if file_list is not None:
+            args += ["--file-list", str(file_list)]
         args += [str(self.program)]
         stdout, stderr = io.StringIO(), io.StringIO()
         actual_run = self.runner["run"]
@@ -228,6 +231,29 @@ class SharedCardRules(unittest.TestCase):
         result = self.invoke(files=[extra, data])
         self.assertEqual(result.get("result_class"), "program", self.diagnostic)
         self.assertEqual(self.transport.staged_files, [extra, data])
+
+    def test_file_list_stages_repo_relative_paths_in_one_pack(self):
+        batch = self.directory / "batch"
+        batch.mkdir()
+        listed = [batch / "t1.mic", batch / "input data"]
+        for path in listed:
+            path.write_bytes(b"x")
+        extra = self.directory / "extra"
+        extra.write_bytes(b"x")
+        file_list = self.directory / "files.list"
+        relative = [path.relative_to(ROOT).as_posix() for path in listed]
+        file_list.write_bytes(("\r\n".join(relative) + "\r\n\n").encode("utf8"))
+        result = self.invoke(files=[extra], file_list=file_list)
+        self.assertEqual(result.get("result_class"), "program", self.diagnostic)
+        self.assertEqual(self.transport.staged_files, [extra] + [ROOT / r for r in relative])
+        self.assertTrue(self.transport.packed)
+        for bad in (relative[0] + "/..", relative[0] + "\n" + relative[0]):
+            with self.subTest(bad=bad):
+                self.transport.events.clear()
+                file_list.write_text(bad + "\n", encoding="utf8")
+                result = self.invoke(file_list=file_list)
+                self.assertEqual(result.get("result_class"), "refused", self.diagnostic)
+                self.assertEqual(self.transport.events, [])
 
     def test_worktree_default_uses_main_config_without_copy(self):
         main = self.directory / "project"
@@ -323,10 +349,19 @@ class SharedCardRules(unittest.TestCase):
         self.assertEqual(self.events("execute")[0][3], 256)
 
     def test_single_job_above_total_memory_budget_refuses(self):
-        self.config["memoryMB"] = 8192
+        self.config["memoryMB"] = 10241
         result = self.invoke()
         self.assertEqual(result["result_class"], "refused")
+        self.assertIn("10240", result["detail"])
         self.assertFalse(self.events("execute"))
+
+    def test_owner_budget_admits_eighty_programs_at_96_mib(self):
+        # Owner, 2026-11-04: our budget is 10240 MiB; the MemFree floor is unchanged.
+        self.config["memoryMB"] = 7680
+        self.transport.free_kb = [7680 * 1024 + 1536 * 1024]
+        result = self.invoke()
+        self.assertEqual(result.get("result_class"), "program", result.get("detail"))
+        self.assertEqual(self.events("execute")[0][3], 7680)
 
     def test_missing_ledger_fails_before_any_card_access(self):
         del self.config["ledger"]
@@ -354,7 +389,7 @@ class SharedCardRules(unittest.TestCase):
 
     def test_aggregate_reservations_wait_and_reread_ledger(self):
         active = dict(agent="claude", jobId="claude-existing", event="start",
-                      memoryLimitMiB=6600, cores=[31], startTime="2099-01-01T00:00:00Z",
+                      memoryLimitMiB=9600, cores=[31], startTime="2099-01-01T00:00:00Z",
                       expectedEnd="2099-01-01T00:01:00Z")
         self.ledger.write_text(json.dumps(active) + "\n", encoding="utf8")
         self.config["memoryMB"] = 1024

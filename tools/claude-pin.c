@@ -39,8 +39,8 @@ int main(int argc, char **argv) {
         if (!*end) break;
         part = end + 1;
     }
-    if (!parse_number(argv[2], &end, &mib) || *end || !mib || mib > 7168) {
-        fputs("claude-pin: memory must be 1..7168 MiB\n", stderr);
+    if (!parse_number(argv[2], &end, &mib) || *end || !mib || mib > 10240) {
+        fputs("claude-pin: memory must be 1..10240 MiB (owner, 2026-11-04)\n", stderr);
         return 125;
     }
     if (sched_setaffinity(0, sizeof(mask), &mask) != 0) {
