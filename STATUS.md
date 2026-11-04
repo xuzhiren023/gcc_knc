@@ -76,7 +76,7 @@ Current tickets: `[#################---]` 47 of 55
 | S3-16 | Nothing writes to Documents/_shared from the main checkout | Done | Torture and x87 probe outputs now stay in the repository's .work/_shared when run from the main checkout, a... |
 | S3-17 | card_run takes each process's parent from the same status read that admits it | Done | card_run no longer refuses jobs when a kernel thread's first status read fails: each process's parent now c... |
 | S3-18 | card_run keeps every job's receipt, and the ledger finish line says why a job was refused | Done | card_run now saves every job's result under .work/_state/card/ (newest 200 kept), and the ledger finish lin... |
-| S3-19 | card_run's snapshot silences the status redirect before it can fail | Not started | Filed under the owner's delegation. This is probably also the unexplained `infrastructure-failure` at 01:31... |
+| S3-19 | card_run's snapshot silences the status redirect before it can fail | In progress | Filed under the owner's delegation. This is probably also the unexplained `infrastructure-failure` at 01:31... |
 
 ## Recent activity
 
