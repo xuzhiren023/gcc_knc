@@ -112,7 +112,15 @@ def main(action):
     # The tier runner also compiles generated scalar/Fortran probes in temporary
     # directories. The requested T1 assembly corpus is its --vector sources.
     def requested(data):
-        return {key: value for key, value in data.items()
+        # The dump destination is transient, just like the -o destination.
+        # Retain the dump option while comparing every assembly byte.
+        def stable(key):
+            if key[0] != 'vector':
+                return key
+            return ('vector', tuple(arg.split('=', 1)[0]
+                                    if arg.startswith('-fdump-rtl-expand=') else arg
+                                    for arg in key[1]))
+        return {stable(key): value for key, value in data.items()
                 if key[0] != 'vector'
                 or any('/tests/t1/knc-vec-' in arg for arg in key[1])}
     before, after = requested(before), requested(after)
