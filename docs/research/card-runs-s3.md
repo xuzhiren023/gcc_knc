@@ -136,3 +136,20 @@ The merged `knc` (`edf7c69d617`, native TLS) at `-O2 -march=knc`, built with
 the build). 1,692 sources, 1,661 linked, 93 with packed zmm code, 30 compile errors as before, and
 1 ICE (`pr85169`, S3-20). **On the card: 1,661 of 1,661 PASS**, in six jobs, with no retries. That
 is the same as the baseline at `10ce7e12b64`, so native TLS caused no regression.
+
+## S3-15: complex values and rounding mode across calls (2026-11-04 05:35 UTC)
+
+The cross-links S3-15's T2 left in `.work/_shared/scalar-abi/`, built at 00:29 local by S3-15's
+branch build (`cc1` of 00:24, from `eb2efcdcf04`). S3-15 merged as `eb8fb3e902a` with no compiler
+change after that, and `cc1` was not rebuilt, so these are the merged compiler's results. All lint
+clean. Suffix `-0` is a GCC 16 caller and donor callee, `-1` the reverse.
+
+| Program | Card | Result |
+|---|---|---|
+| `abi-gaps-O0-0`, `-O0-1`, `-O2-0`, `-O2-1` | `claude-a49bd551…`, `claude-c0c8a9b0…`, `claude-36f63a5c…`, `claude-12a37489…` | `complex ABI PASS` with `_Complex float`, `double` and `long double` exact (long double keeps its 2^-60 tail); `rounding PASS` in all 4 modes |
+| `scalar-abi-O2-0`, `-O2-1` (S2-02's suite, now built with `-frounding-math`) | `claude-c6ef8fff…`, `claude-78afe6b4…` | `S2-02 scalar ABI PASS` |
+
+The rounding case adds 2^-53 to ±1, a halfway value, so each mode stores a different double; it
+also checks that the x87 control word and MXCSR rounding bits are the same before and after the
+call. `fesetround` on the card sets both. A mode lost across the call would print a wrong value,
+so the expectations are their own control.
