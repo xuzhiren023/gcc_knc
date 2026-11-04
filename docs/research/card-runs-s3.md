@@ -62,6 +62,14 @@ The merged `knc` (`daedd869681`) at `-O2 -march=knc`, vectorization on by defaul
     it, and ADR-0005 point 4 is amended.
 - No runner refusals in six chunks (S3-18 and S3-19 had merged by then).
 
+## S3-21 before merge (2026-11-04 03:20 UTC)
+
+S3-21's branch build (`29781633082`):
+
+- The engineer's guard program at `-O2` and `-O3` prints `PASS S3-21 all four modes,
+  source/destination offsets 0-63, sentinels and guards`.
+- `pr65369` rebuilt at `-O2` now exits 0 on the card; before the fix it segfaulted.
+
 ## m1_affine with the Fortran twin, after S3-08 (2026-11-04 02:45 UTC)
 
 `driver.c -DKNC_WITH_FORTRAN`, `loops.c` and `affine_fortran.f90` (GCC 16 `gfortran`, vectorized),
