@@ -52,6 +52,8 @@ SELECTIONS = {
     'scalar_abi': ('S2-02 donor ABI probes and bidirectional cross-links only', {
         't1': lambda runner: importlib.import_module('scalar_abi').t1(runner),
         't2': lambda runner: importlib.import_module('scalar_abi').t2(runner)}),
+    'abi_gaps': ('S3-15 packed varargs and ms_abi diagnostics', {
+        't1': lambda runner: importlib.import_module('scalar_abi').t1_abi_gaps(runner)}),
     'link_defaults': ('S1-06 T1 ABI macros and T2 integer link with fork-built runtime', {
         't1': lambda runner: runner.t1_sources([runner.source_dir / 'knc-link-defaults.c']),
         't2': lambda runner: runner.t2_link_defaults()}),

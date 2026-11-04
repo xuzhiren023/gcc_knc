@@ -9,3 +9,7 @@ double scalar_ten_d(double,double,double,double,double,double,double,double,doub
 struct df scalar_df(struct df);
 struct ff scalar_ff(struct ff);
 double scalar_callback(double (*)(double), double);
+_Complex float scalar_cf(_Complex float);
+_Complex double scalar_cd(_Complex double);
+_Complex long double scalar_cld(_Complex long double);
+int scalar_round(double, double, double *, double *);

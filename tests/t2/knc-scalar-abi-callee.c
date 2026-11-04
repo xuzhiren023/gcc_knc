@@ -1,4 +1,5 @@
 #include "knc-scalar-abi.h"
+#include <fenv.h>
 float scalar_f(float x) { return x + 0.5f; }
 double scalar_d(double x) { return x + 0.25; }
 double scalar_mixed(int i, float f, long j, double d, int k, float g)
@@ -10,3 +11,22 @@ double scalar_ten_d(double a,double b,double c,double d,double e,double f,double
 struct df scalar_df(struct df x) { x.d += 0.25; x.f += 0.5f; return x; }
 struct ff scalar_ff(struct ff x) { x.a += 0.25f; x.b += 0.5f; return x; }
 double scalar_callback(double (*fn)(double), double x) { return fn(x) + 0.5; }
+
+/* Distinct real/imaginary transformations expose swaps and lost components. */
+_Complex float scalar_cf(_Complex float x)
+{ return __builtin_complex(__real__ x + 0.5f, __imag__ x - 0.25f); }
+_Complex double scalar_cd(_Complex double x)
+{ return __builtin_complex(__real__ x + 0.25, __imag__ x - 0.5); }
+_Complex long double scalar_cld(_Complex long double x)
+{ return __builtin_complex(__real__ x + 0.5L, __imag__ x - 0.25L); }
+
+/* Volatile double stores force rounding out of x87's extended precision.
+   Arguments cross the compiler boundary; neither sum can be folded. */
+int scalar_round(double x, double delta, double *positive, double *negative)
+{
+  volatile double p = x + delta;
+  volatile double n = -x - delta;
+  *positive = p;
+  *negative = n;
+  return fegetround();
+}
