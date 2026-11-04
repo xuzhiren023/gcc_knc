@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-03 21:42.
+Updated automatically at every ticket change. Last update: 2026-11-03 21:45.
 
-**Next: GPT-6.1, on S3-21 (Unaligned packed accesses need element alignment; byte-aligned ones must not use load/store pairs).** Run `python tools/dispatch.py`, or ask the tech lead to.
+**Next: the tech lead, on S3-21.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[#################---]` 50 of 57
 
@@ -78,10 +78,11 @@ Current tickets: `[#################---]` 50 of 57
 | S3-18 | card_run keeps every job's receipt, and the ledger finish line says why a job was refused | Done | card_run now saves every job's result under .work/_state/card/ (newest 200 kept), and the ledger finish lin... |
 | S3-19 | card_run's snapshot silences the status redirect before it can fail | Done | A card process that exits mid-snapshot no longer makes card_run refuse the job, and a lint stops the redire... |
 | S3-20 | 64-byte XImode memory-to-memory copy ICEs (gcc.c-torture/execute/pr85169.c) | Not started | Filed under the owner's delegation. It goes into M1's ICE classes (S3-11). |
-| S3-21 | Unaligned packed accesses need element alignment; byte-aligned ones must not use load/store pairs | In progress | Filed under the owner's delegation. This is a wrong-code bug in merged S3-05/S3-07, so it goes before S3-13... |
+| S3-21 | Unaligned packed accesses need element alignment; byte-aligned ones must not use load/store pairs | Tests waiting for review | 6a16909 adds T1 coverage in default gcc16 T1 and --vector-byte-aligned. Ran tools/run.py S3-21-red: check t... |
 
 ## Recent activity
 
+- 2026-11-03 21:45 **S3-21** engineer red: 6a16909 adds T1 coverage in default gcc16 T1 and --vector-byte-aligned. Ran tools/run.py S3-21-red: check t1 --compiler gcc16 --vector-byte-aligned...
 - 2026-11-03 21:42 **S3-13** lead approve: KNC code now lives in i386-knc.cc/.h behind one-line hooks in the shared i386 files (shared diff 324 lines/56 hunks down to 192/52), with identical...
 - 2026-11-03 21:40 **S3-13** engineer submit: Acceptance met. Shared lines/hunks decreased 324/56 -> 192/52. Builds passed; torture assembly identical at -O0 and -O2; tools/check t0 t1 t2 --com...
 - 2026-11-03 21:39 **S3-13** lead answer: Yes, submit with --override 'relocation: moved code counts as both deletions and additions; shared lines 324/56 -> 192/52, assembly identical'. The...
@@ -89,7 +90,6 @@ Current tickets: `[#################---]` 50 of 57
 - 2026-11-03 21:37 **S3-13** owner decide: Lead decided under the owner's 2026-11-03 delegation: budget raised to 4 sessions and 20M input tokens (10.5M used; one full rebuild plus before/af...
 - 2026-11-03 21:36 **S3-13** lead escalate: budget: 10536184 input tokens used; the budget is 6000000
 - 2026-11-03 21:36 **S3-13** lead answer: Yes. A capture-format mismatch is not a codegen difference. In the after comparison, record a rejected compile the way the baseline did: exit statu...
-- 2026-11-03 21:35 **S3-13** engineer ask: Shared lines/hunks 324/56 -> 192/52; builds pass; tiers identical. First comparison failed on 80 transient dump-path keys; fixed in 3f0ef58. Focuse...
 
 ## Cost
 
