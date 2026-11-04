@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-04 03:43.
+Updated automatically at every ticket change. Last update: 2026-11-04 03:45.
 
 **Next: GPT-6.1, on S3-20 (64-byte XImode memory-to-memory copy ICEs (gcc.c-torture/execute/pr85169.c)).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
@@ -77,7 +77,7 @@ Current tickets: `[##################--]` 55 of 59
 | S3-17 | card_run takes each process's parent from the same status read that admits it | Done | card_run no longer refuses jobs when a kernel thread's first status read fails: each process's parent now c... |
 | S3-18 | card_run keeps every job's receipt, and the ledger finish line says why a job was refused | Done | card_run now saves every job's result under .work/_state/card/ (newest 200 kept), and the ledger finish lin... |
 | S3-19 | card_run's snapshot silences the status redirect before it can fail | Done | A card process that exits mid-snapshot no longer makes card_run refuse the job, and a lint stops the redire... |
-| S3-20 | 64-byte XImode memory-to-memory copy ICEs (gcc.c-torture/execute/pr85169.c) | Not started | Sessions raised from 3 to 4 before start, under the owner's delegation of engineering budgets. S3-07, S3-13... |
+| S3-20 | 64-byte XImode memory-to-memory copy ICEs (gcc.c-torture/execute/pr85169.c) | In progress | Sessions raised from 3 to 4 before start, under the owner's delegation of engineering budgets. S3-07, S3-13... |
 | S3-21 | Unaligned packed accesses need element alignment; byte-aligned ones must not use load/store pairs | Done | Byte-aligned vector copies (like pr65369) no longer use the KNC load/store pair instructions that need elem... |
 | S3-22 | The last three KNC blocks in shared i386 code become hooks (ADR-0006 rules 1-4) | Not started | Created by the lead from S3-11's audit, as S3-11's 01:18 answer said. |
 | S3-23 | KNC's atomic_storeti survives upstream's new one; trunk builds C-only and runs T1 and T2 | Not started | Created by the lead from S3-11's trunk finding, as S3-11's 03:40 |
@@ -97,7 +97,7 @@ Current tickets: `[##################--]` 55 of 59
 
 - From the script, engineer: 177 sessions, 376.4M input tokens
 - From the script, lead: 175 sessions, 57.0M input tokens
-- Started by hand, Claude: 7 sessions, 524.2M input tokens
+- Started by hand, Claude: 7 sessions, 525.1M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
