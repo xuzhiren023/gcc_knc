@@ -82,7 +82,12 @@ them unadvertised until E3 adds them with their moves. Today:
    addresses** (amended 2026-11-03). Intel 327364 `VLOADUNPACKLD` (p.361) defines the pair for a
    stream at an "element-aligned address", that is, loads "only element-wise, not vector-wise,
    aligned". A byte-aligned V16SI load segfaulted on the card (`pr65369`, S3-21). Byte-aligned packed
-   accesses must not vectorize, and explicit ones take a byte-granular path. S3-03 showed on the
+   accesses must not vectorize. SLP and loop accesses use the same alignment hook:
+   it accepts only naturally aligned scalar references and element-multiple (or
+   unknown) vector misalignment. Explicit sub-element-aligned packed moves use
+   eight byte-alignment-safe DImode loads/stores through general registers and a
+   64-byte-aligned stack slot, then an aligned vector transfer. The bridge and
+   all transfers remain visible in RTL; element-aligned moves retain the pair. S3-03 showed on the
    card that a pair wholly inside mapped memory never faults at any element offset, and that the
    `h` half at a 64-byte
    aligned address touches nothing. It also showed that masks never suppress a page fault and that
