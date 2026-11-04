@@ -2,7 +2,7 @@
 
 Updated automatically at every ticket change. Last update: 2026-11-03 19:30.
 
-**Next: GPT-6.1, on S3-07 (Auto-vectorization on zmm, with x87 peel and remainder; m1_affine T1 and T2 green).** Run `python tools/dispatch.py`, or ask the tech lead to.
+**Next: the tech lead, on S3-07.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[################----]` 44 of 53
 
@@ -64,7 +64,7 @@ Current tickets: `[################----]` 44 of 53
 | S3-04 | Packed modes legal under -march=knc, with aligned moves, spills and constants | Done | Under -march=knc, 64-byte float, double, int and long long vectors now live in zmm registers, with aligned ... |
 | S3-05 | Unaligned packed moves through load and store pairs | Done | Packed copies through pointers of unknown alignment now compile, for all four 512-bit modes, to unmasked lo... |
 | S3-06 | Packed FP add, sub, mul, FMA and broadcasts for V16SF and V8DF | Done | Under -march=knc, 512-bit float and double vectors now compile to packed add, subtract, multiply, fused mul... |
-| S3-07 | Auto-vectorization on zmm, with x87 peel and remainder; m1_affine T1 and T2 green | In progress | From S3-06's review: the vector_init hook in i386-expand.cc is gated only on TARGET_KNC, not on the packed ... |
+| S3-07 | Auto-vectorization on zmm, with x87 peel and remainder; m1_affine T1 and T2 green | Question for the tech lead | Parent tools/check t1 --compiler gcc16: only affine vectorization scans red; assembly/lint pass. Log .work/... |
 | S3-08 | Fortran twin of m1_affine vectorizes and links | Not started | Owner approved Sprint 3 on 2026-11-03; ticket set to ready. |
 | S3-09 | Packed integer add, sub, mul, logic and broadcast for V16SI; logic for V8DI | draft | Moved to Sprint 4 by the owner on 2026-11-03, on the lead's recommendation: m1_affine is float and double o... |
 | S3-10 | Card batch for Sprint 3 and m1_affine | Not started | Also add (1) S3-14's TLS and S3-15's complex and rounding cross-checks, built after both merge (objects bui... |
@@ -82,10 +82,10 @@ Current tickets: `[################----]` 44 of 53
 - 2026-11-03 19:40 **S3-07** lead note: From S3-06's review: the vector_init hook in i386-expand.cc is gated only on TARGET_KNC, not on the packed mode, and ix86_knc_expand_duplicate trea...
 - 2026-11-03 19:30 **S3-16** lead approve: Torture and x87 probe outputs now stay in the repository's .work/_shared when run from the main checkout, and nothing is written to Documents/_shar...
 - 2026-11-03 19:30 **S3-16** lead note: Filed under the owner's delegation, after the owner asked for the stray folder to be deleted.
+- 2026-11-03 19:30 **S3-07** engineer ask: Parent tools/check t1 --compiler gcc16: only affine vectorization scans red; assembly/lint pass. Log .work/_state/logs/check_gcc16_t1-20261103-1927...
 - 2026-11-03 19:29 **S3-16** engineer submit: Red a411599: fake-main T0 reproduced escaped writes (2 failures, 1 wrong-parent mkdir error); log .work/_state/logs/S3_16_red-20261103-192718.log. ...
 - 2026-11-03 19:25 **S3-06** lead approve: Under -march=knc, 512-bit float and double vectors now compile to packed add, subtract, multiply, fused multiply-add when contraction is on, and br...
 - 2026-11-03 19:25 **S3-06** owner decide: Lead decided under the owner's 2026-11-03 delegation: the merge block was the lead's own untracked tests/acceptance/s3_vec_card/, now committed (93...
-- 2026-11-03 19:22 **S3-06** lead escalate: Review passed and S3-06 is ready to approve, but the merge was refused because the main checkout has an untracked tests/acceptance/s3_vec_card/ dir...
 
 ## Cost
 
