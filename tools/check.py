@@ -54,6 +54,8 @@ SELECTIONS = {
         't1': lambda runner: importlib.import_module('knc_vector').t1(runner)}),
     'vector_unaligned': ('S3-05 unaligned packed moves only', {
         't1': lambda runner: importlib.import_module('knc_vector').t1_unaligned(runner)}),
+    'vector_fp': ('S3-06 packed FP arithmetic, broadcasts and generic expressions', {
+        't1': lambda runner: importlib.import_module('knc_vector').t1_fp(runner)}),
 }
 
 

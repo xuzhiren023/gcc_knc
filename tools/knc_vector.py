@@ -124,6 +124,7 @@ def t1(runner):
     runner.t1_sources([source for source in sources if source not in fixtures])
     t1_packed(runner)
     t1_unaligned(runner)
+    t1_fp(runner)
 
 
 UNALIGNED_CASES = ('unknown', 'unknown_load', 'unknown_store', 'under_member',
@@ -259,3 +260,69 @@ def t1_packed(runner):
                     runner.result(label, failures)
                 except (OSError, RuntimeError, ValueError) as error:
                     runner.result(label, [str(error)])
+
+
+def t1_fp(runner, only=None):
+    cases = dict(enumerate(('add', 'sub', 'mul', 'contract_off', 'contract_fast',
+                           'broadcast_memory', 'broadcast_register', 'divide',
+                           'sqrt', 'unaligned_add', 'unaligned_sub', 'unaligned_mul',
+                           'unaligned_contract_off', 'unaligned_contract_fast'), 16))
+    cases.update({30: 'generic_add', 31: 'element', 32: 'init'})
+    for mode in MODES:
+        for level in ('-O0', '-O2'):
+            for number, case in cases.items():
+                if only is not None and (mode, level, case) not in only:
+                    continue
+                if mode not in ('v16sf', 'v8df') and number < 30:
+                    continue
+                if case.endswith('_fast') and level == '-O0':
+                    continue  # GCC's contraction pass runs with optimization.
+                asm, obj = runner.out / (mode + '.s'), runner.out / (mode + '.o')
+                try:
+                    result = runner.command(runner.cc, *runner.cc_flags, level,
+                        '-march=knc', '-ffp-contract=' + ('fast' if case.endswith('_fast') else 'off'),
+                        '-DCASE=' + str(number), '--sysroot=' + str(runner.sysroot),
+                        '-S', runner.source_dir / ('knc-vec-' + mode + '.c'), '-o', asm,
+                        check=False)
+                    failures = []
+                    if result.returncode:
+                        failures = ['compile exited %d: %s' % (result.returncode, result.stdout[-1600:])]
+                    else:
+                        assembly = asm.read_text()
+                        suffix = 'ps' if mode == 'v16sf' else 'pd'
+                        allowed = PAIRS | {'vpxord', 'vpermf32x4', 'fsqrt'} | {
+                            'v' + op + s for op in ('add', 'sub', 'mul', 'fmadd132',
+                                                   'fmadd213', 'fmadd231') for s in ('ps', 'pd')}
+                        failures += allowlist('\n'.join(line for line in assembly.splitlines()
+                            if not any(re.match(r'\s*' + op + r'\b', line) for op in allowed)))
+                        ops = list(instructions(assembly))
+                        arithmetic = [op for op, args in ops if re.fullmatch(
+                            r'v(?:add|sub|mul|fmadd\d+)(?:ps|pd)', op)]
+                        short = case.removeprefix('unaligned_')
+                        if number < 30 and short in ('add', 'sub', 'mul', 'contract_off', 'contract_fast'):
+                            expected = (['vmul' + suffix, 'vadd' + suffix] if short == 'contract_off'
+                                        else ['v' + short + suffix] if short in ('add', 'sub', 'mul')
+                                        else None)
+                            if expected is not None and sorted(arithmetic) != sorted(expected):
+                                failures.append('expected exactly ' + ', '.join(expected) + ': ' + repr(arithmetic))
+                            if expected is None and (len(arithmetic) != 1 or not re.fullmatch(
+                                    r'vfmadd(?:132|213|231)' + suffix, arithmetic[0])):
+                                failures.append('expected one contracted vfmadd' + suffix)
+                            if case.startswith('unaligned_') and any('(' in args for op, args in ops
+                                    if op in arithmetic):
+                                failures.append('unaligned memory folded into arithmetic')
+                        if 'broadcast_' in case:
+                            mnemonic = 'vbroadcastss' if mode == 'v16sf' else 'vbroadcastsd'
+                            if case == 'broadcast_memory' and not any(op == mnemonic for op, args in ops):
+                                failures.append('missing memory ' + mnemonic)
+                            if case == 'broadcast_register' and not (
+                                    any(op == 'vpermf32x4' for op, args in ops)
+                                    and re.search(r'%zmm\d+\{aaaa\}', assembly)):
+                                failures.append('missing register permute and swizzle broadcast')
+                        if case in ('divide', 'sqrt') and arithmetic:
+                            failures.append('packed arithmetic in scalar divide/sqrt')
+                        runner.command(runner.tool('as'), '--march=k1om', asm, '-o', obj)
+                        runner.command(sys.executable, runner.root / 'tools/knc_lint', asm, obj)
+                    runner.result('t1 fp %s %s %s' % (mode, level, case), failures)
+                except (OSError, RuntimeError, ValueError) as error:
+                    runner.result('t1 fp %s %s %s' % (mode, level, case), [str(error)])

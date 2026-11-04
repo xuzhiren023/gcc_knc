@@ -6,6 +6,78 @@
 #endif
 extern void packed_clobber(void);
 
+/* S3-06: general vector expressions must also compile without optimization. */
+typedef __typeof__ (((packed){0})[0]) scalar;
+#if CASE == 30
+void packed_generic_add(const packed *a, const packed *b, packed *c)
+{ *c = *a + *b; }
+#elif CASE == 31
+scalar packed_element(const packed *a)
+{
+  packed v = *a;
+  __asm__ volatile("# packed-element %g0" : "+YJ"(v));
+  return v[3];
+}
+#elif CASE == 32
+void packed_init(scalar x, packed *c) { *c = (packed){x, x + 1}; }
+#endif
+
+#ifdef PACKED_FP
+#if CASE >= 16 && CASE <= 18
+void packed_arithmetic(const packed *a, const packed *b, packed *c)
+{
+#if CASE == 16
+  *c = *a + *b;
+#elif CASE == 17
+  *c = *a - *b;
+#else
+  *c = *a * *b;
+#endif
+}
+#elif CASE == 19 || CASE == 20
+void packed_contract(const packed *a, const packed *b, const packed *c, packed *d)
+{ *d = *a * *b + *c; }
+#elif CASE == 21
+void packed_broadcast_memory(const scalar *a, packed *c)
+{ scalar x = *a; *c = (packed){PACKED_REPEAT(x)}; }
+#elif CASE == 22
+/* Keep x in a pseudo even at -O0; an ordinary parameter is spilled after
+   the asm and would test the memory-broadcast path a second time. */
+void packed_broadcast_register(register scalar x, packed *c)
+{
+  __asm__ volatile("# packed-scalar %g0" : "+YJ"(x));
+  *c = (packed){PACKED_REPEAT(x)};
+}
+#elif CASE == 23
+void packed_divide(const packed *a, const packed *b, packed *c)
+{ *c = *a / *b; }
+#elif CASE == 24
+void packed_sqrt(const packed *a, packed *c)
+{
+  for (int i = 0; i < sizeof(packed) / sizeof(scalar); ++i)
+    (*c)[i] = PACKED_SQRT((*a)[i]);
+}
+#elif CASE >= 25 && CASE <= 27
+typedef packed unaligned_fp __attribute__((aligned(__alignof__(scalar)), may_alias));
+void packed_unaligned_arithmetic(const unaligned_fp *a, const unaligned_fp *b,
+                                 packed *c)
+{
+#if CASE == 25
+  *c = *a + *b;
+#elif CASE == 26
+  *c = *a - *b;
+#else
+  *c = *a * *b;
+#endif
+}
+#elif CASE == 28 || CASE == 29
+typedef packed unaligned_fp __attribute__((aligned(__alignof__(scalar)), may_alias));
+void packed_unaligned_contract(const unaligned_fp *a, const unaligned_fp *b,
+                                const unaligned_fp *c, packed *d)
+{ *d = *a * *b + *c; }
+#endif
+#endif
+
 #if CASE >= 11 && CASE <= 15
 /* Only element alignment is known, independently for input and output.
    Keep the vector type local: the ordinary scalar ABI carries the pointers. */
