@@ -2,7 +2,7 @@
 
 **Recommend adjust; M1 waits.** Measurements use merged `knc`
 `eb8fb3e902a91e885354edac02f5edb7751100de` (GCC 16.2), 2026-11-04. The lead decides
-against S3-11's seven criteria. Missing x86/trunk evidence cannot count as success.
+against S3-11's seven criteria. The trunk build failure prevents trunk T1/T2 evidence.
 
 ## Measured: fixture and card evidence
 
@@ -24,10 +24,10 @@ Fortran off/fast after S3-08: expected `ACCEPT-PASS`, but no job IDs in those se
 TLS has four successful IDs there; complex/rounding has six, including both scalar ABI
 directions. The last recorded execute batch at this head passed 1,661/1,661.
 
-S3-10's prepared `tmp/S3-10/batch.txt` explicitly says **Native NOT RUN**: 15 rows, including
-the inexact-input affine check and 1,680 linked execute programs out of 1,692 (11 compile
-errors, one ICE). No `.actual.txt` results were present. The lead must run this batch and
-record its IDs; readiness and the earlier 1,661-program run cannot establish its results.
+At the original measurement, S3-10's prepared `tmp/S3-10/batch.txt` said **Native NOT RUN**:
+15 rows, including the inexact-input affine check and 1,680 linked execute programs out of 1,692 (11 compile
+errors, one ICE). No `.actual.txt` results were present. The lead owns this batch and
+its IDs; these rows remain pending here as directed in the ticket's 01:18 answer.
 
 ## Measured: lines and ADR-0006 form
 
@@ -119,10 +119,8 @@ beside our macro hook); `i386.cc` (upstream extracted `ix86_pass_by_reference_ab
 our entry guard and cumulative-argument declaration occupy the old context);
 `configure.ac` and generated `configure` (upstream Solaris assembler detection changed
 next to our k1om TLS case). The ABI entry guard can stay in the public wrapper and the
-TLS target alternative can retain upstream's new `as_flavor` logic, but these resolutions
-have **not** been built. They look localized; calling all four proven textual conflicts
-would overstate the evidence. The generated file is the same TLS conflict, not a fourth
-independent logic problem.
+TLS target alternative can retain upstream's new `as_flavor` logic. The generated file
+is the same TLS conflict, not a fourth independent logic problem.
 
 The four scratch-tree resolutions preserve KNC behavior: `i386-c.cc` keeps the macro
 hook and upstream's comment spelling (**textual**); `i386.cc` keeps the ABI type guard
@@ -139,7 +137,40 @@ running (`Get-Process make` returned none). Stock x86 C-only `cc1` built, but th
 x86 build stopped with Cygwin `unable to load user32.dll, Win32 error 8` (X1), an
 infrastructure resource failure. The retry uses four jobs instead of eight, retains
 the existing objects and separate `portability/x86-{a,b}/build` directories outside
-`gcc-build`, and logs the skipped make check explicitly.
+`gcc-build`, and logs the skipped make check explicitly. The baseline is
+`78d4ac73dd391005b895a6148cd9831e28e1208b`; KNC remains `eb8fb3e902a9` (X2).
+
+| x86 options | Identical assembly | Different | Matching failures | Tool errors |
+| --- | ---: | ---: | ---: | ---: |
+| `-O2` | 1,962 | 0 | 41 | 0 |
+| `-O2 -mavx512f` | 1,962 | 0 | 41 | 0 |
+
+Each set has 2,003 sources. Matching failures are neutral in `portability.py`, not
+assembly passes: direct `cc1` lacks some header search paths, and the fixed comparison
+does not supply all dg-options/target selectors (for example `-fgimple`). Other equal
+diagnostics concern redefinitions, flexible-array initializers and target/language
+restrictions. Every failed source and its matching diagnostics are listed in X2;
+there is no assembly comparison for those sources. Both option sets completed with
+exit 0. No difference needs attribution to build paths or IDs. X2 took 47.3 minutes
+for reconfiguration, incremental compiler builds and both comparisons combined.
+
+Trunk C-only configure succeeded with the four resolutions above, in
+`portability/trunk/build`, targeting `k1om-mpss-linux` with the shared sysroot and
+K1OM assembler/linker. The object-only precheck failed twice before a full build:
+first, `genmatch` lacked build-host `libcpp.a` (Y0); after building `all-build-libcpp`,
+`gentarget-def` rejected **duplicate definition of `atomic_storeti`** (Y1).
+`imci.md:249` defines the KNC libcall expander; upstream `sync.md:410` now defines
+the same name for `TARGET_128BIT_ATOMIC_ENABLED` using SSE. The stock 16.2 `sync.md`
+has no such definition. This is a semantic integration conflict beyond the four
+textual Git conflicts, not a C++ error or a proven structural design clash.
+
+Reduced build reproducer: in `portability/trunk/build/gcc`, the failed command was
+`build/gentarget-def.exe ../../source/gcc/common.md
+../../source/gcc/config/i386/i386.md insn-conditions.md > tmp-target-def.h`
+(source paths in the log are absolute). No full trunk `cc1` or trunk T1/T2 ran.
+AGENTS.md requires a ticket question after two failed attempts; the lead must ticket
+or authorize integration of KNC's libcall dispatch with upstream's expander before
+another trunk attempt.
 
 ## Measured cost versus estimates
 
@@ -187,8 +218,9 @@ baseline. Separate from-start total: **208-337 / 436-706M**. Manual/lead effort 
 from both estimates because comparable role attribution is absent. Ranges overlap:
 criterion 7's strict cost inequality is **not established**; neither is a robust reversal.
 
-Rebase cost: the subtarget has measured 56 shared hunks and four trunk conflict files,
-plus x86/trunk builds every milestone; estimate 1-3 engineer sessions per future rebase
+Rebase cost: the subtarget has measured 56 shared hunks, four trunk conflict files
+and the atomic-store name collision, with x86/trunk builds every milestone;
+estimate 1-3 engineer sessions per future rebase
 if conflicts remain localized. A separate backend avoids most shared i386 merge conflicts,
 but must review upstream fixes to the estimated 7.8-12.4k duplicated lines and adapt GCC
 target APIs; estimate 2-6 sessions per rebase. These ranges price one resolution/review
@@ -202,14 +234,15 @@ must be measured before preferring either estimate.
 | 1 fixture | Host green; final S3-10 native rows pending. Not met. |
 | 2 card batch | Final batch/inexact native results absent; earlier results do not substitute. Not met. |
 | 3 ICE classes | Met in the requested sweep: zero shared SSE/AVX ICEs; other class S3-20 is ticketed and reproduced. |
-| 4 x86 unchanged | Infrastructure blocked before builds. Unmeasured. |
-| 5 portability | Release clean; four trunk conflict files, no trunk build/T1/T2. Not met. |
+| 4 x86 unchanged | Zero assembly differences at both options in the tool's coverage: 1,962 identical pairs each, 41 matching failures without assembly each. |
+| 5 portability | Release clean; four textual resolutions, but trunk generation fails on the atomic-store name collision. No trunk T1/T2. Not met. |
 | 6 ADR form | 202 shared lines/56 hunks; residual blocks need relocation/review. Not met. |
 | 7 cost | Smaller source surface measured; effort estimates overlap. Not proven. |
 
-No structural clash is demonstrated. The lead must resolve/ticket items 4-6, tighten
+No structural clash is demonstrated. The lead must resolve/ticket items 5-6, tighten
 item 7, run S3-10 and decide again after required fixes merge. S3-20 is a listed,
 ticketed non-SSE/AVX class; criterion 3 does not itself require that class to close.
+The lead rechecks lines, drill and x86 after S3-20 merges, before deciding M1.
 
 Logs below are relative to `.work/_state/logs/`; large outputs stay in the shared area:
 
@@ -221,3 +254,9 @@ Logs below are relative to `.work/_state/logs/`; large outputs stay in the share
 - K: `S3_11_skip_make_red-20261104-011946.log` (expected failure),
   `S3_11_skip_make-20261104-012005.log` (one test PASS).
 - X1: `S3_11_x86-20261104-012011.log` (stock built; KNC build resource failure).
+- X2: `S3_11_x86-20261104-025052.log` (PASS, four-job retry; both compiler builds and
+  both comparisons completed; 47.3 min combined).
+- Y0: `S3_11_trunk-20261104-030721.log` (configure 62.201s, support setup 495.744s;
+  missing build-host libcpp in the object precheck; 9.6 min overall).
+- Y1: `S3_11_trunk-20261104-031823.log` (libcpp prerequisite fixed; duplicate
+  `atomic_storeti` during the object precheck; 2.5 min overall, four jobs, `-O2 -g1`).
