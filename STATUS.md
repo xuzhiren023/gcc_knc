@@ -2,7 +2,7 @@
 
 Updated automatically at every ticket change. Last update: 2026-11-03 20:41.
 
-**Waiting for you:** S3-18. Run `python tools/pm.py inbox`.
+**Next: GPT-6.1, on S3-08 (Fortran twin of m1_affine vectorizes and links).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
 Current tickets: `[################----]` 46 of 55
 
@@ -75,25 +75,25 @@ Current tickets: `[################----]` 46 of 55
 | S3-15 | ABI gaps: packed vectors through varargs and ms_abi, complex values, rounding mode across calls | Not started | Filed under the owner's delegation. Finding 1 was reproduced by the lead; findings 2-4 come from reading co... |
 | S3-16 | Nothing writes to Documents/_shared from the main checkout | Done | Torture and x87 probe outputs now stay in the repository's .work/_shared when run from the main checkout, a... |
 | S3-17 | card_run takes each process's parent from the same status read that admits it | Done | card_run no longer refuses jobs when a kernel thread's first status read fails: each process's parent now c... |
-| S3-18 | card_run keeps every job's receipt, and the ledger finish line says why a job was refused | **Waiting for you** | budget: 2 engineer sessions used; the budget is 2 |
+| S3-18 | card_run keeps every job's receipt, and the ledger finish line says why a job was refused | Changes requested | Lead decided under the owner's 2026-11-03 delegation: budget raised to 3 sessions and 4M input tokens (0.9M... |
 | S3-19 | card_run's snapshot silences the status redirect before it can fail | Not started | Filed under the owner's delegation. This is probably also the unexplained `infrastructure-failure` at 01:31... |
 
 ## Recent activity
 
 - 2026-11-03 20:50 **S3-19** lead note: Filed under the owner's delegation. This is probably also the unexplained `infrastructure-failure` at 01:31:55 UTC that S3-18 was filed for.
+- 2026-11-03 20:41 **S3-18** owner decide: Lead decided under the owner's 2026-11-03 delegation: budget raised to 3 sessions and 4M input tokens (0.9M used) for the one requested change (res...
 - 2026-11-03 20:41 **S3-18** engineer escalate: budget: 2 engineer sessions used; the budget is 2
 - 2026-11-03 20:40 **S3-18** lead changes: 1. tools/card_run:711 drops the --receipt default (tests/out/card-result.json), which the ticket did not ask for, and docs/card-run.md:246 still do...
 - 2026-11-03 20:40 **S3-18** engineer submit: Renamed tests/tools/test_card_receipts.py to tests/tools/test_card_diagnostics.py as approved by lead; commit 15bb861. Prior tools/run.py card suit...
 - 2026-11-03 20:40 **S3-18** lead note: Filed under the owner's delegation.
 - 2026-11-03 20:39 **S3-18** lead answer: Yes, rename it to tests/tools/test_card_diagnostics.py and resubmit; the hook stays as is, so keep 'receipt' out of test file names.
 - 2026-11-03 20:38 **S3-18** engineer ask: Submit refuses receipt-style file added: tests/tools/test_card_receipts.py. This is unittest source for the required red-first fake-card tests, not...
-- 2026-11-03 20:38 **S3-07** lead approve: With -mknc, GCC 16 now auto-vectorizes simple float and double loops at default -O2 into packed zmm multiply and add (or vfmadd under -ffp-contract...
 
 ## Cost
 
 - From the script, engineer: 152 sessions, 313.7M input tokens
 - From the script, lead: 151 sessions, 50.4M input tokens
-- Started by hand, Claude: 5 sessions, 464.3M input tokens
+- Started by hand, Claude: 5 sessions, 465.8M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
