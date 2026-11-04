@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-04 15:15.
+Updated automatically at every ticket change. Last update: 2026-11-04 15:23.
 
-**Next: GPT-6.1, on S4-02 (Vector compares into k masks, mask logic and mask spills for the packed modes).** Run `python tools/dispatch.py`, or ask the tech lead to.
+**Next: the tech lead, on S4-11.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[##################--]` 65 of 72
 
@@ -93,10 +93,11 @@ Current tickets: `[##################--]` 65 of 72
 | S4-08 | Small fixes from M1: the varargs V4SF assert checks alignment; S3-10 ABI expected files | Done | The varargs save path now asserts a 16-byte aligned slot and is limited to 64-bit KNC, with generated code ... |
 | S4-09 | LRA folds a misaligned vector load into vaddps/vsubps/vmulps ("m" constraint), which faults on the card | Done | Vectorized float and double add, sub and mul no longer fold a misaligned array load into the instruction, w... |
 | S4-10 | pm.py approve merges a GCC ticket without rewriting files in the shared checkout | Done | Approving a GCC ticket no longer rewrites the merged files in the shared GCC checkout, so the next build is... |
-| S4-11 | gcc_build.py refuses a build tree whose mddeps.mk has lost the .md includes | In progress |  |
+| S4-11 | gcc_build.py refuses a build tree whose mddeps.mk has lost the .md includes | Waiting for review | Red 91d2f31 (3 new tests failed), fix 5a4b6b7. gcc_build.py checks gcc/mddeps.mk for MD_INCLUDES with imci.... |
 
 ## Recent activity
 
+- 2026-11-04 15:23 **S4-11** engineer submit: Red 91d2f31 (3 new tests failed), fix 5a4b6b7. gcc_build.py checks gcc/mddeps.mk for MD_INCLUDES with imci.md and sse.md before skipping and after ...
 - 2026-11-04 15:13 **S3-09** lead approve: 32-bit integer vector add, sub, multiply, and/or/xor and broadcasts now compile to single IMCI instructions, so int loops vectorize on zmm; 64-bit ...
 - 2026-11-04 15:11 **S3-09** engineer submit: Red bf170fb (all 11 ops + add_int fail); GCC ca005dd. Infra: shared build's mddeps.mk was empty (written 12:36, not S3-09), so md edits did not reg...
 - 2026-11-04 13:22 **S4-08** lead approve: The varargs save path now asserts a 16-byte aligned slot and is limited to 64-bit KNC, with generated code unchanged, and the S3-10 batch's ABI row...
@@ -104,13 +105,12 @@ Current tickets: `[##################--]` 65 of 72
 - 2026-11-04 12:23 **S4-10** lead approve: Approving a GCC ticket no longer rewrites the merged files in the shared GCC checkout, so the next build is not forced to regenerate and recompile ...
 - 2026-11-04 12:14 **S4-10** engineer submit: Red: new ancestor test failed on mtime (log S4_10_tests-20261104-120806). Fix: commit-tree + update-ref, then checkout knc; non-ancestor keeps merg...
 - 2026-11-04 12:03 **S4-09** lead approve: Vectorized float and double add, sub and mul no longer fold a misaligned array load into the instruction, which used to crash on the card; aligned ...
-- 2026-11-04 12:01 **S4-09** engineer submit: imci.md: *knc_<op><mode>3 op2 YJm->YJBm, *knc_packed_move m->Bm (both sides). Unchanged: FMA forms (YJ only), unaligned load/store (MEM-only, never...
 
 ## Cost
 
 - From the script, engineer: 186 sessions, 441.0M input tokens
 - From the script, lead: 184 sessions, 58.7M input tokens
-- Started by hand, Claude: 9 sessions, 637.2M input tokens
+- Started by hand, Claude: 9 sessions, 638.8M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
