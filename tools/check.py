@@ -268,7 +268,7 @@ class Runner:
             self.result('t1 ' + mode + ' function scans', scan_t1(asm.read_text(), report, source, mode == 'fast'))
             if mode == 'off':
                 self.off_object = obj
-        if self.args.compiler == 'gcc16':
+        if getattr(getattr(self, 'args', None), 'compiler', None) == 'gcc16':
             import affine_fortran
             affine_fortran.t1(self)
 
@@ -339,7 +339,7 @@ class Runner:
             scalar_abi.t2(self)
         elf, trace = self.t2_affine_link()
         self.t2_abi(elf, trace)
-        if self.args.compiler == 'gcc16':
+        if getattr(getattr(self, 'args', None), 'compiler', None) == 'gcc16':
             import affine_fortran
             affine_fortran.check_link(self, elf, trace)
         if getattr(getattr(self, 'args', None), 'compiler', None) == 'gcc16':
@@ -389,7 +389,7 @@ class Runner:
         driver_cc = [self.tool('gcc')] if donor_driver else [self.cc, *self.cc_flags]
         objects = [loops_obj]
         driver_flags = []
-        if self.args.compiler == 'gcc16':
+        if getattr(getattr(self, 'args', None), 'compiler', None) == 'gcc16':
             import affine_fortran
             objects.append(affine_fortran.compile_object(self))
             driver_flags.append('-DKNC_WITH_FORTRAN')
