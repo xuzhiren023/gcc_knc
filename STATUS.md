@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-03 21:50.
+Updated automatically at every ticket change. Last update: 2026-11-03 22:13.
 
-**Next: GPT-6.1, on S3-21 (Unaligned packed accesses need element alignment; byte-aligned ones must not use load/store pairs).** Run `python tools/dispatch.py`, or ask the tech lead to.
+**Next: the tech lead, on S3-21.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[#################---]` 50 of 57
 
@@ -78,10 +78,11 @@ Current tickets: `[#################---]` 50 of 57
 | S3-18 | card_run keeps every job's receipt, and the ledger finish line says why a job was refused | Done | card_run now saves every job's result under .work/_state/card/ (newest 200 kept), and the ledger finish lin... |
 | S3-19 | card_run's snapshot silences the status redirect before it can fail | Done | A card process that exits mid-snapshot no longer makes card_run refuse the job, and a lint stops the redire... |
 | S3-20 | 64-byte XImode memory-to-memory copy ICEs (gcc.c-torture/execute/pr85169.c) | Not started | Filed under the owner's delegation. It goes into M1's ICE classes (S3-11). |
-| S3-21 | Unaligned packed accesses need element alignment; byte-aligned ones must not use load/store pairs | In progress | S3-21 red is approved: the new tests catch load/store pairs on byte-aligned addresses (pr65369's shape, ali... |
+| S3-21 | Unaligned packed accesses need element alignment; byte-aligned ones must not use load/store pairs | Question for the tech lead | Build passed; T1 still red. Reproducer .work/_shared/check/S3-21-reduced*: memcpy from const int* loses ali... |
 
 ## Recent activity
 
+- 2026-11-03 22:13 **S3-21** engineer ask: Build passed; T1 still red. Reproducer .work/_shared/check/S3-21-reduced*: memcpy from const int* loses alignment (A8); hook sees is_packed=true. b...
 - 2026-11-03 21:50 **S3-21** lead approve-red: S3-21 red is approved: the new tests catch load/store pairs on byte-aligned addresses (pr65369's shape, aligned(1) vector copies, packed members at...
 - 2026-11-03 21:49 **S3-21** engineer red: 18e8c23 adds elem_slp pair checks at O2/O3 and elem_loop at O3 for all modes; FP memcpy accepts same-width integer pairs. Per-runner guard prevents...
 - 2026-11-03 21:46 **S3-21** lead changes: Red fails for the right reason (log: pairs on byte_slp, aligned(1) copies and packed members 1-3/1-7; byte_loop at O3 only), and the S3-05 explicit...
@@ -89,16 +90,15 @@ Current tickets: `[#################---]` 50 of 57
 - 2026-11-03 21:42 **S3-13** lead approve: KNC code now lives in i386-knc.cc/.h behind one-line hooks in the shared i386 files (shared diff 324 lines/56 hunks down to 192/52), with identical...
 - 2026-11-03 21:40 **S3-13** engineer submit: Acceptance met. Shared lines/hunks decreased 324/56 -> 192/52. Builds passed; torture assembly identical at -O0 and -O2; tools/check t0 t1 t2 --com...
 - 2026-11-03 21:39 **S3-13** lead answer: Yes, submit with --override 'relocation: moved code counts as both deletions and additions; shared lines 324/56 -> 192/52, assembly identical'. The...
-- 2026-11-03 21:38 **S3-13** engineer ask: Acceptance is met, but submit refuses 547 changed lines against the 500-line budget. May I submit with a size override for this relocation? Shared ...
 
 ## Cost
 
 - From the script, engineer: 162 sessions, 329.8M input tokens
 - From the script, lead: 162 sessions, 52.9M input tokens
-- Started by hand, Claude: 5 sessions, 481.6M input tokens
+- Started by hand, Claude: 5 sessions, 484.5M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 8.3 GiB of 100 GiB. 299 GiB free on the drive.
+The project uses 7.7 GiB of 100 GiB. 296 GiB free on the drive.
