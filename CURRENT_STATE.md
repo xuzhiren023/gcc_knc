@@ -4,7 +4,7 @@ The handoff between sessions. `STATUS.md` holds tickets, cost and disk, and upda
 file holds what only a person or an agent can know. Replace lines when facts change, and do not
 trust anything here that a quick command can check instead.
 
-Last updated: 2026-11-03 evening, mid-Sprint 3 (S3-01 to S3-05 and S3-12 merged; S3-06 in progress).
+Last updated: 2026-11-03 late, Sprint 3. Merged: S3-01 to S3-08, S3-12, S3-13, S3-16 to S3-19 and S3-21. In progress: S3-14. Left: S3-15, S3-20, then S3-10 and S3-11 (M1). S3-09 is in Sprint 4.
 
 ## Proven, and how
 
