@@ -217,3 +217,9 @@ checks at `-O2 -ftree-vectorize` (`claude-5da7c514…`) and `-O3` (`claude-5f808
 control fails (`claude-7d93916c…`), and the guard control faults on the guard page
 (`claude-cde346e2…`). The execute suite: 1,681 linked, 0 ICE, **1,681 of 1,681 PASS** in six jobs
 (`claude-aeb81556…` to `claude-26812bbb…`).
+
+## Sprint 4: S3-09 merged (lead, 2026-11-04)
+
+GCC `knc` `7836668cc9a`, `cc1` SHA-1 `0c72b4b06626…`. `tests/acceptance/s4_masks` (its integer
+kernels now use `vpaddd`, `vpsubd` and `vpmulld`) passes 1,576,200 checks at
+`-O2 -ftree-vectorize` (`claude-21ae9dba…`) and at `-O3` (`claude-62b73842…`).
