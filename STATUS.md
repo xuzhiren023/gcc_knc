@@ -74,7 +74,7 @@ Current tickets: `[################----]` 44 of 53
 | S3-14 | Native TLS for k1om, and every x86_64-only configure case that misses k1om | Not started | Filed under the owner's delegation (engineering defect found while checking the PhiWeather project's lesson... |
 | S3-15 | ABI gaps: packed vectors through varargs and ms_abi, complex values, rounding mode across calls | Not started | Filed under the owner's delegation. Finding 1 was reproduced by the lead; findings 2-4 come from reading co... |
 | S3-16 | Nothing writes to Documents/_shared from the main checkout | Done | Torture and x87 probe outputs now stay in the repository's .work/_shared when run from the main checkout, a... |
-| S3-17 | card_run takes each process's parent from the same status read that admits it | Not started | Filed under the owner's delegation. The card is blocked for our batch jobs while this happens, so it goes f... |
+| S3-17 | card_run takes each process's parent from the same status read that admits it | In progress | Filed under the owner's delegation. The card is blocked for our batch jobs while this happens, so it goes f... |
 
 ## Recent activity
 
@@ -91,7 +91,7 @@ Current tickets: `[################----]` 44 of 53
 
 - From the script, engineer: 144 sessions, 298.1M input tokens
 - From the script, lead: 142 sessions, 47.6M input tokens
-- Started by hand, Claude: 5 sessions, 451.2M input tokens
+- Started by hand, Claude: 5 sessions, 451.5M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
