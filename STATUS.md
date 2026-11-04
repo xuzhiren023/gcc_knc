@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-04 17:57.
+Updated automatically at every ticket change. Last update: 2026-11-04 18:03.
 
-**Next: GPT-6.1, on S4-12 (card_run stages a whole batch in one upload, so card cores are busy instead of waiting on SSH).** Run `python tools/dispatch.py`, or ask the tech lead to.
+**Next: GPT-6.1, on S4-03 (Blends and if-conversion: conditional loops, ?:, fabs, min and max vectorize with masks).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
 Current tickets: `[##################--]` 67 of 73
 
@@ -85,7 +85,7 @@ Current tickets: `[##################--]` 67 of 73
 | S3-25 | va_arg of an unsupported KNC type leaves a broken expansion; release builds hide the ICE | Done | Rejecting va_arg of an unsupported KNC vector type now ends with its error message and no hidden compiler c... |
 | S4-01 | Masks on KNC: GCC 16 entry points, IMCI forms, reuse audit and masked-tail design (ADR-0007 input) | Done | The mask design input for Sprint 4 is done: KNC masks are HI for 16-lane and QI for 8-lane vectors, compare... |
 | S4-02 | Vector compares into k masks, mask logic and mask spills for the packed modes | Done | Float, double and int vector compares now produce KNC k masks and vectorize with blends (?: and select loop... |
-| S4-03 | Blends and if-conversion: conditional loops, ?:, fabs, min and max vectorize with masks | draft |  |
+| S4-03 | Blends and if-conversion: conditional loops, ?:, fabs, min and max vectorize with masks | In progress |  |
 | S4-04 | V8DI add and sub through the IMCI carry form, so long add loops vectorize | draft |  |
 | S4-05 | Safe masked tails: a masked vector remainder only where every touched line is in the array | draft |  |
 | S4-06 | Batch check after S4-02, S3-09 and S4-03: x86, drill and ICE sweeps at the batch head | draft |  |
@@ -111,10 +111,10 @@ Current tickets: `[##################--]` 67 of 73
 
 - From the script, engineer: 186 sessions, 441.0M input tokens
 - From the script, lead: 184 sessions, 58.7M input tokens
-- Started by hand, Claude: 9 sessions, 685.8M input tokens
+- Started by hand, Claude: 9 sessions, 689.6M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 12.7 GiB of 100 GiB. 231 GiB free on the drive.
+The project uses 12.7 GiB of 100 GiB. 233 GiB free on the drive.
