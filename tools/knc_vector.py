@@ -356,7 +356,8 @@ def t1_fp(runner, only=None):
                     else:
                         assembly = asm.read_text()
                         suffix = 'ps' if mode == 'v16sf' else 'pd'
-                        allowed = PAIRS | {'vpxord', 'vpermf32x4', 'fsqrt'} | {
+                        # S3-09: generic integer expressions use IMCI integer arithmetic.
+                        allowed = PAIRS | {'vpxord', 'vpermf32x4', 'fsqrt', 'vpaddd', 'vpsubd', 'vpmulld'} | {
                             'v' + op + s for op in ('add', 'sub', 'mul', 'fmadd132',
                                                    'fmadd213', 'fmadd231') for s in ('ps', 'pd')}
                         failures += allowlist('\n'.join(line for line in assembly.splitlines()
