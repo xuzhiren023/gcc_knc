@@ -223,3 +223,13 @@ control fails (`claude-7d93916c…`), and the guard control faults on the guard 
 GCC `knc` `7836668cc9a`, `cc1` SHA-1 `0c72b4b06626…`. `tests/acceptance/s4_masks` (its integer
 kernels now use `vpaddd`, `vpsubd` and `vpmulld`) passes 1,576,200 checks at
 `-O2 -ftree-vectorize` (`claude-21ae9dba…`) and at `-O3` (`claude-62b73842…`).
+
+## Sprint 4: S4-02 merged (lead, 2026-11-04)
+
+GCC `knc` `e201456c64b`, `cc1` SHA-1 `b10511dacf36…` (the same before and after the builds). `s4_masks`
+(12 vector compares in its kernels) passes 1,576,200 checks at `-O2 -ftree-vectorize`
+(`claude-43a66c94…`) and at `-O3` (`claude-80b60912…`). Execute suite: 1,681 linked, 0 ICE,
+102 with packed zmm, **1,681 of 1,681 PASS** at `-j 60` (`claude-40988071…` to `claude-603a66ff…`).
+That covers the three scalar functions whose register allocation changed with `*knc_movqi`.
+Earlier, the post-S4-09 suite rerun at `-j 60` with 96 MiB per program also passed 1,681 of 1,681,
+which validated the owner's 3-threads-per-core rule.
