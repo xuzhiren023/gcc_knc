@@ -45,3 +45,37 @@ vectorization, and it says nothing about performance.
 Each of 4 threads writes its own values through one compiler's code and reads them back through
 the other's after a barrier; the main thread writes nothing and must still see the initial
 values. The build refuses any GCC 16 object or library that references `__emutls`.
+
+## `s4_masks/`: compares, masks, blends, conditional stores and tails (Sprint 4)
+
+Build `loops.c` with the compiler under test at `-O2 -ftree-vectorize -fwrapv` and again at
+`-O3 -fwrapv` (no `-ffast-math`). Build `driver.c` at `-O0 -fwrapv`, so the references are never
+vectorized, and link the two with `-lm`. `-fwrapv` makes the integer wraparound rows defined.
+
+The driver checks every kernel at lengths 0-65 and element offsets 0-15 (every fifth offset above
+length 20), with each array flush against a `PROT_NONE` page on one side or the other.
+- **Exact by bits:** compares, selects, conditional stores, `fabs`, the `a < b ? a : b` idioms and
+  integer operations.
+- **Arithmetic:** uses dyadic inputs whose results are exact, so x87 extended precision cannot
+  change a reference.
+- **`fmin`/`fmax`:** any NaN is accepted for a NaN result, and either zero sign for a ±0 pair,
+  because C leaves both open.
+- **Stray writes:** sentinels 256 bytes each side of every output catch a store outside the array.
+
+| Tier | Check | Expected |
+|---|---|---|
+| T3 | Run on the card, each `loops.c` build | Exit 0; last line `S4-MASKS PASS failures=0` (an `INFO checks=` line precedes it) |
+| T3 | `loops.c` with `-DNEGATIVE_CONTROL` (`cmp_lt_f32` uses `<=`) | Exit 1, `S4-MASKS FAIL` |
+| T3 | `loops.c` with `-DGUARD_CONTROL` (`add_f32` reads one past the end) | Prints `S4-MASKS FAULT ... kernel=add_f32`, exit 3 |
+
+A fault in any build prints `S4-MASKS FAULT sig= kernel= n= o= where= addr=` and exits 3;
+`addr=(nil)` is the misaligned-access fault of S3-03, a real address is a guard page.
+
+Which kernels must vectorize, and how, is each ticket's T1 (S4-02 compares, S4-03 selects and
+idioms, S3-09 and S4-04 integers, S4-05 tails). This fixture checks only that whatever code the
+compiler emits is exact and stays inside the arrays.
+
+Before Sprint 4's code (lead, 2026-11-04): host Cygwin gcc at `-O2 -ftree-vectorize` (SSE2)
+passes 1,576,200 checks; the negative control fails, and the guard control dies with SIGSEGV.
+GCC 16 at `knc` `0d3c0152fe3` faults on the card in `add_f32` (n=16, o=1, `addr=(nil)`): LRA
+folds a misaligned load into `vaddps`. That is S4-09, and this fixture is red until it merges.

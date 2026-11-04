@@ -303,6 +303,14 @@ cancels. Rebase cost also favours the subtarget: an estimated 1-3 sessions per r
 2-6. The assumptions are stated: the same cost per ticket on both paths, and S3-11's lowest
 duplication counts. Manual and lead effort is excluded from both sides, as in S3-11.
 
+**Found after acceptance (lead, 2026-11-04, the same day).** The new
+`tests/acceptance/s4_masks` faults on the card in a plain `c[i] = a[i] + b[i]` float loop at
+element offset 1. LRA folds `b`'s misaligned load into `vaddps`, because the `imci.md` pattern's
+constraint is `m` rather than `Bm`. M1's evidence missed it: `m1_affine` loads only one array
+per loop, and few execute tests have two misaligned FP inputs. It is an ordinary pattern fix in
+`imci.md`, not a structural problem, so the go stands. It is ticketed as S4-09, first in Sprint
+4's gcc order.
+
 **Open after M1, none blocking:**
 - **S3-25** (the `va_arg` error path).
 - **S3-22's V4SF assert:** add an alignment check (`CURRENT_STATE.md`).
