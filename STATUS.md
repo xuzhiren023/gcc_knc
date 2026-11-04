@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-04 18:03.
+Updated automatically at every ticket change. Last update: 2026-11-04 18:13.
 
-**Next: GPT-6.1, on S4-03 (Blends and if-conversion: conditional loops, ?:, fabs, min and max vectorize with masks).** Run `python tools/dispatch.py`, or ask the tech lead to.
+**Next: the tech lead, on S4-12.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[##################--]` 67 of 73
 
@@ -94,10 +94,11 @@ Current tickets: `[##################--]` 67 of 73
 | S4-09 | LRA folds a misaligned vector load into vaddps/vsubps/vmulps ("m" constraint), which faults on the card | Done | Vectorized float and double add, sub and mul no longer fold a misaligned array load into the instruction, w... |
 | S4-10 | pm.py approve merges a GCC ticket without rewriting files in the shared checkout | Done | Approving a GCC ticket no longer rewrites the merged files in the shared GCC checkout, so the next build is... |
 | S4-11 | gcc_build.py refuses a build tree whose mddeps.mk has lost the .md includes | Done | A shared GCC build tree that has lost its .md dependency list is now rebuilt and checked instead of being c... |
-| S4-12 | card_run stages a whole batch in one upload, so card cores are busy instead of waiting on SSH | In progress |  |
+| S4-12 | card_run stages a whole batch in one upload, so card cores are busy instead of waiting on SSH | Question for the tech lead | Submit is hard-refused: protected path harness/card/run_suite.py (--override does not cover it). Ticket fix... |
 
 ## Recent activity
 
+- 2026-11-04 18:13 **S4-12** engineer ask: Submit is hard-refused: protected path harness/card/run_suite.py (--override does not cover it). Ticket fix 2 and your memory addition put it in sc...
 - 2026-11-04 17:46 **S4-02** lead approve: Float, double and int vector compares now produce KNC k masks and vectorize with blends (?: and select loops), with C's NaN behaviour, while the qu...
 - 2026-11-04 17:44 **S4-02** engineer submit: GCC eab9a5f6dd7 (built). T0 4/4, T1 230/230 (4 new knc-mask files pass), T2 23/23: check_gcc16_t0_t1_t2-20261104-174119.log. Torture O2: 5 of 1962 ...
 - 2026-11-04 15:35 **S4-02** lead approve-red: Red approved: the four T1 files pin each KNC compare predicate into a k register, the operand swap for > and >=, the quiet UNGE staying scalar, and...
@@ -105,16 +106,15 @@ Current tickets: `[##################--]` 67 of 73
 - 2026-11-04 15:25 **S4-11** lead approve: A shared GCC build tree that has lost its .md dependency list is now rebuilt and checked instead of being certified, so edits to imci.md or sse.md ...
 - 2026-11-04 15:23 **S4-11** engineer submit: Red 91d2f31 (3 new tests failed), fix 5a4b6b7. gcc_build.py checks gcc/mddeps.mk for MD_INCLUDES with imci.md and sse.md before skipping and after ...
 - 2026-11-04 15:13 **S3-09** lead approve: 32-bit integer vector add, sub, multiply, and/or/xor and broadcasts now compile to single IMCI instructions, so int loops vectorize on zmm; 64-bit ...
-- 2026-11-04 15:11 **S3-09** engineer submit: Red bf170fb (all 11 ops + add_int fail); GCC ca005dd. Infra: shared build's mddeps.mk was empty (written 12:36, not S3-09), so md edits did not reg...
 
 ## Cost
 
 - From the script, engineer: 186 sessions, 441.0M input tokens
 - From the script, lead: 184 sessions, 58.7M input tokens
-- Started by hand, Claude: 9 sessions, 689.6M input tokens
+- Started by hand, Claude: 9 sessions, 691.5M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 12.7 GiB of 100 GiB. 233 GiB free on the drive.
+The project uses 12.8 GiB of 100 GiB. 233 GiB free on the drive.
