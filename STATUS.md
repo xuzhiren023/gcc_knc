@@ -1,17 +1,17 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-03 19:34.
+Updated automatically at every ticket change. Last update: 2026-11-03 19:35.
 
 **Next: the tech lead, on S3-07.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
-Current tickets: `[################----]` 44 of 53
+Current tickets: `[################----]` 45 of 53
 
 ## Milestones
 
 | | Milestone | State | Progress |
 |---|---|---|---|
 | M0 | Foundation | In progress | 17 of 17 tickets |
-| M1 | Mixed native code | In progress | 27 of 35 tickets |
+| M1 | Mixed native code | In progress | 28 of 35 tickets |
 | M2 | Useful vector target | In progress | 0 of 1 tickets |
 | M3 | Runtimes | Not started | Not planned in detail yet |
 | M4 | Broad optimization | Not started | Not planned in detail yet |
@@ -74,27 +74,27 @@ Current tickets: `[################----]` 44 of 53
 | S3-14 | Native TLS for k1om, and every x86_64-only configure case that misses k1om | Not started | Filed under the owner's delegation (engineering defect found while checking the PhiWeather project's lesson... |
 | S3-15 | ABI gaps: packed vectors through varargs and ms_abi, complex values, rounding mode across calls | Not started | Filed under the owner's delegation. Finding 1 was reproduced by the lead; findings 2-4 come from reading co... |
 | S3-16 | Nothing writes to Documents/_shared from the main checkout | Done | Torture and x87 probe outputs now stay in the repository's .work/_shared when run from the main checkout, a... |
-| S3-17 | card_run takes each process's parent from the same status read that admits it | Waiting for review | Red 20aeac3 reproduces empty-parent kernel PROC refusal and missing-PPid PROC; fix 834bf9a uses PPid from a... |
+| S3-17 | card_run takes each process's parent from the same status read that admits it | Done | card_run no longer refuses jobs when a kernel thread's first status read fails: each process's parent now c... |
 
 ## Recent activity
 
 - 2026-11-03 19:40 **S3-17** lead note: Filed under the owner's delegation. The card is blocked for our batch jobs while this happens, so it goes first in the tools lane.
 - 2026-11-03 19:40 **S3-07** lead note: From S3-06's review: the vector_init hook in i386-expand.cc is gated only on TARGET_KNC, not on the packed mode, and ix86_knc_expand_duplicate trea...
+- 2026-11-03 19:35 **S3-17** lead approve: card_run no longer refuses jobs when a kernel thread's first status read fails: each process's parent now comes from the same read that admits it, ...
 - 2026-11-03 19:34 **S3-17** engineer submit: Red 20aeac3 reproduces empty-parent kernel PROC refusal and missing-PPid PROC; fix 834bf9a uses PPid from admitting awk status read, drops pid/pare...
 - 2026-11-03 19:34 **S3-07** engineer red: Red commit 663af9f adds tests/t1/knc-vec-autovec.c per lead answer. Ran python tools/check t1 --compiler gcc16 --vector: expected FAIL only for mis...
 - 2026-11-03 19:30 **S3-16** lead approve: Torture and x87 probe outputs now stay in the repository's .work/_shared when run from the main checkout, and nothing is written to Documents/_shar...
 - 2026-11-03 19:30 **S3-16** lead note: Filed under the owner's delegation, after the owner asked for the stray folder to be deleted.
 - 2026-11-03 19:30 **S3-07** lead answer: Do not call tools/run.py yourself: on Windows tools/check re-runs itself under the toolchain's Cygwin python3.12 with cygpath-converted paths, and ...
-- 2026-11-03 19:30 **S3-07** engineer ask: Parent tools/check t1 --compiler gcc16: only affine vectorization scans red; assembly/lint pass. Log .work/_state/logs/check_gcc16_t1-20261103-1927...
 
 ## Cost
 
 - From the script, engineer: 146 sessions, 300.2M input tokens
 - From the script, lead: 143 sessions, 47.9M input tokens
-- Started by hand, Claude: 5 sessions, 451.8M input tokens
+- Started by hand, Claude: 5 sessions, 452.2M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 7.6 GiB of 100 GiB. 308 GiB free on the drive.
+The project uses 7.6 GiB of 100 GiB. 307 GiB free on the drive.
