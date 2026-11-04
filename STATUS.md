@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-03 23:40.
+Updated automatically at every ticket change. Last update: 2026-11-03 23:41.
 
 **Next: GPT-6.1, on S3-15 (ABI gaps: packed vectors through varargs and ms_abi, complex values, rounding mode across calls).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
@@ -72,7 +72,7 @@ Current tickets: `[##################--]` 52 of 57
 | S3-12 | tools/portability: forward-port drill and x86_64 unchanged check | Done | tools/portability.py now checks whether the KNC changes still merge onto newer GCC (master has 2 conflicts,... |
 | S3-13 | Move KNC code out of shared i386 files into i386-knc | Done | KNC code now lives in i386-knc.cc/.h behind one-line hooks in the shared i386 files (shared diff 324 lines/... |
 | S3-14 | Native TLS for k1om, and every x86_64-only configure case that misses k1om | Done | GCC 16 now emits native %fs TLS for k1om, matching the donor's sequences at -O2, -O2 -fPIC and -O0 instead ... |
-| S3-15 | ABI gaps: packed vectors through varargs and ms_abi, complex values, rounding mode across calls | Not started | Sessions raised from 3 to 4 before start, under the owner's delegation of engineering budgets. S3-07, S3-13... |
+| S3-15 | ABI gaps: packed vectors through varargs and ms_abi, complex values, rounding mode across calls | In progress | Sessions raised from 3 to 4 before start, under the owner's delegation of engineering budgets. S3-07, S3-13... |
 | S3-16 | Nothing writes to Documents/_shared from the main checkout | Done | Torture and x87 probe outputs now stay in the repository's .work/_shared when run from the main checkout, a... |
 | S3-17 | card_run takes each process's parent from the same status read that admits it | Done | card_run no longer refuses jobs when a kernel thread's first status read fails: each process's parent now c... |
 | S3-18 | card_run keeps every job's receipt, and the ledger finish line says why a job was refused | Done | card_run now saves every job's result under .work/_state/card/ (newest 200 kept), and the ledger finish lin... |
