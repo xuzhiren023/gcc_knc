@@ -62,6 +62,15 @@ The merged `knc` (`daedd869681`) at `-O2 -march=knc`, vectorization on by defaul
     it, and ADR-0005 point 4 is amended.
 - No runner refusals in six chunks (S3-18 and S3-19 had merged by then).
 
+## Full execute suite after S3-21 (2026-11-04 03:50 UTC)
+
+S3-21's build (`29781633082`), which has the same compiler sources as the merged `knc`
+(`10ce7e12b64`). The suite was rebuilt at `-O2 -march=knc`, with brace-form `dg-options` now
+parsed (so `930529-1` gets `-fwrapv`). 1,661 linked, 93 with packed zmm code (`pr65369` no longer
+vectorizes), and 1 ICE (`pr85169`, S3-20).
+
+**On the card: 1,661 of 1,661 PASS**, in six chunks with no runner refusals.
+
 ## S3-21 before merge (2026-11-04 03:20 UTC)
 
 S3-21's branch build (`29781633082`):
