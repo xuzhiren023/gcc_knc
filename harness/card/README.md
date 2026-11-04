@@ -7,7 +7,7 @@ tooling.
 - `build_suite.py OUTDIR [gcc16|donor] [--list FILE]` builds the `gcc.c-torture/execute` programs on
   the laptop and records which contain packed zmm code. Run it only while no `make.exe` is
   rebuilding `cc1`.
-- `run_suite.py PROGDIR OUTDIR` runs them on the card in chunks of 300 at `-j 80` (4 threads per core, 80 MiB each), retrying a
+- `run_suite.py PROGDIR OUTDIR` runs them on the card as one packed upload per job (`--file-list`, S4-12; split only by `maxStageMiB`) at `-j 80` (4 threads per core, 96 MiB each, 10 GiB budget), retrying a
   chunk refused for infrastructure.
 
 When a ticket that changes generated code merges, run its own card check (the programs are in

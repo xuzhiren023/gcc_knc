@@ -233,3 +233,10 @@ GCC `knc` `e201456c64b`, `cc1` SHA-1 `b10511dacf36…` (the same before and afte
 That covers the three scalar functions whose register allocation changed with `*knc_movqi`.
 Earlier, the post-S4-09 suite rerun at `-j 60` with 96 MiB per program also passed 1,681 of 1,681,
 which validated the owner's 3-threads-per-core rule.
+
+## Sprint 4: S4-12 merged, packed staging (lead, 2026-11-04)
+
+`hello` passes through the new path (`claude-ca84a867…`, pinned to logical CPUs 161-240). The full
+execute suite from S4-02's build runs as **one** job through `--file-list` at `-j 80` with 96 MiB per
+program (7,680 MiB, inside the 10 GiB budget): **1,681 of 1,681 PASS** (`claude-685d1bc9…`). Before,
+it took six jobs of 300 files, with about 600 SSH connections each.
