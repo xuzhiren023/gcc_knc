@@ -43,6 +43,9 @@ Then stop. Your final message is only the `PM update:` line that command prints:
   near-full rebuild (S3-25: 28 minutes for one prototype). An edit to `i386-knc.cc` alone costs
   about 3 minutes. Make a helper `static` in `i386-knc.cc` when only that file calls it. Add
   every new prototype a ticket needs in one edit, before the first full build.
+- Commit the GCC change before the full build. `tools/gcc_build.py` stamps the tree it built,
+  and a build of uncommitted edits is stamped "not clean". That forces the next ticket to rebuild
+  for nothing (S4-09, 2026-11-04).
 - While a build runs, wait for it once (a long timeout, or the wrapper's own wait). Do not poll
   it: every check costs a tool call and tokens.
 - Fix every error a failed build reports before rebuilding. Never start a second build while a
