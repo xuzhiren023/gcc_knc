@@ -7,7 +7,10 @@ import tempfile
 import unittest
 
 ROOT = Path(__file__).resolve().parents[2]
-SHARED = ROOT.parent / '_shared'
+sys.path.insert(0, str(ROOT / 'tools'))
+import storage
+
+SHARED = Path(storage.shared_area(storage.main_root(ROOT)))
 
 
 class TortureOptionsTest(unittest.TestCase):

@@ -3,17 +3,21 @@ import os
 from pathlib import Path
 import resource
 import subprocess
+import sys
 import time
 import unittest
 
 ROOT = Path(__file__).resolve().parents[2]
-OUT = ROOT.parent / '_shared' / 'S2-18-driver'
+sys.path.insert(0, str(ROOT / 'tools'))
+import storage
+
+OUT = Path(storage.shared_area(storage.main_root(ROOT))) / 'S2-18-driver'
 
 
 class TortureDriverTest(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        OUT.mkdir(exist_ok=True)
+        OUT.mkdir(parents=True, exist_ok=True)
         cls.driver = OUT / 'driver.exe'
         fixture = OUT / 'fixture.exe'
         for source, target in [('tools/claude-torture.c', cls.driver),
