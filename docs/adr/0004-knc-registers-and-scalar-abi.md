@@ -3,6 +3,7 @@
 **Status:** Accepted. **Date:** 2026-11-03. **Decider:** Claude. **Source:**
 `docs/research/knc-register-design.md` (S2-01), every claim cited there; the lead checked
 `i386.cc:552-566`, `constraints.md:81-95` and the donor's `i386.c:4569-4578` against it.
+**Amended** 2026-11-04 by ADR-0007 point 1: `k1`-`k7` also hold QImode (8-lane masks).
 
 ## Context
 
