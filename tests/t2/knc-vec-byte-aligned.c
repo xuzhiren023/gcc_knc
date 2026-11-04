@@ -118,17 +118,21 @@ int main(void)
                 for (unsigned i = 0; i < 64; ++i)
                   source[sp + i] = (unsigned char)(37 * i + 13 * m);
                 fn(dest + dp, source + sp);
-                for (size_t i = 0; i < page; ++i)
+                /* A full cache line of sentinels on either side catches
+                   writes by either half of an illegal packed store.  */
+                for (long rel = -64; rel < 128; ++rel)
                   {
-                    unsigned char expected_src = i >= sp && i < sp + 64
-                      ? (unsigned char)(37 * (i - sp) + 13 * m) : 0xa5;
-                    unsigned char expected_dst = i >= dp && i < dp + 64
-                      ? (unsigned char)(37 * (i - dp) + 13 * m) : 0x5a;
-                    if (((volatile unsigned char *)source)[i] != expected_src
-                        || ((volatile unsigned char *)dest)[i] != expected_dst)
+                    long si = (long)sp + rel, di = (long)dp + rel;
+                    unsigned char payload = (unsigned char)(37 * rel + 13 * m);
+                    unsigned char expected_src = rel >= 0 && rel < 64 ? payload : 0xa5;
+                    unsigned char expected_dst = rel >= 0 && rel < 64 ? payload : 0x5a;
+                    if ((si >= 0 && si < (long)page
+                         && ((volatile unsigned char *)source)[si] != expected_src)
+                        || (di >= 0 && di < (long)page
+                            && ((volatile unsigned char *)dest)[di] != expected_dst))
                       {
-                        printf("FAIL %s ends=%u src=%u dst=%u kind=%u byte=%lu\n",
-                               mc->name, ends, so, doff, kind, (unsigned long)i);
+                        printf("FAIL %s ends=%u src=%u dst=%u kind=%u rel=%ld\n",
+                               mc->name, ends, so, doff, kind, rel);
                         return 1;
                       }
                   }
