@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-03 23:41.
+Updated automatically at every ticket change. Last update: 2026-11-04 00:14.
 
 **Next: GPT-6.1, on S3-15 (ABI gaps: packed vectors through varargs and ms_abi, complex values, rounding mode across calls).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
@@ -67,7 +67,7 @@ Current tickets: `[##################--]` 52 of 57
 | S3-07 | Auto-vectorization on zmm, with x87 peel and remainder; m1_affine T1 and T2 green | Done | With -mknc, GCC 16 now auto-vectorizes simple float and double loops at default -O2 into packed zmm multipl... |
 | S3-08 | Fortran twin of m1_affine vectorizes and links | Done | The Fortran twin of the M1 affine kernel now builds with GCC 16 gfortran, vectorizes on zmm (FMA at -ffp-co... |
 | S3-09 | Packed integer add, sub, mul, logic and broadcast for V16SI; logic for V8DI | draft | Moved to Sprint 4 by the owner on 2026-11-03, on the lead's recommendation: m1_affine is float and double o... |
-| S3-10 | Card batch for Sprint 3 and m1_affine | Not started | Also add (1) S3-14's TLS and S3-15's complex and rounding cross-checks, built after both merge (objects bui... |
+| S3-10 | Card batch for Sprint 3 and m1_affine | Not started | S3-14's TLS cross-check is done. The lead built and ran `tests/acceptance/s3_tls_card/` on the card with th... |
 | S3-11 | Milestone M1 note: fixture, line counts, ICE classes and backend cost comparison | Not started | Owner approved Sprint 3 on 2026-11-03; ticket set to ready. |
 | S3-12 | tools/portability: forward-port drill and x86_64 unchanged check | Done | tools/portability.py now checks whether the KNC changes still merge onto newer GCC (master has 2 conflicts,... |
 | S3-13 | Move KNC code out of shared i386 files into i386-knc | Done | KNC code now lives in i386-knc.cc/.h behind one-line hooks in the shared i386 files (shared diff 324 lines/... |
@@ -82,6 +82,7 @@ Current tickets: `[##################--]` 52 of 57
 
 ## Recent activity
 
+- 2026-11-03 23:55 **S3-10** lead note: S3-14's TLS cross-check is done. The lead built and ran `tests/acceptance/s3_tls_card/` on the card with the merged compiler: 4 variants pass, and ...
 - 2026-11-03 23:40 **S3-14** lead approve: GCC 16 now emits native %fs TLS for k1om, matching the donor's sequences at -O2, -O2 -fPIC and -O0 instead of emulated __emutls calls; the four-thr...
 - 2026-11-03 23:38 **S3-14** engineer submit: Fixed lead corrections: GCC 4a9401e27f0 reverts picflag/libiberty and regenerates gcc/configure with Autoconf 2.69/M4 1.4.19; diff vs knc is four c...
 - 2026-11-03 23:35 **S3-20** lead note: Sessions raised from 3 to 4 before start, under the owner's delegation of engineering budgets. S3-07, S3-13, S3-18 and S3-21 each stopped at their ...
@@ -89,16 +90,15 @@ Current tickets: `[##################--]` 52 of 57
 - 2026-11-03 23:35 **S3-14** lead changes: The TLS fix is right: the gcc/configure.ac TLS and PIE cases, the test and the HAVE_AS_TLS result are good. One real defect, in the extra picflag c...
 - 2026-11-03 23:33 **S3-14** engineer submit: Fix 0235ff44771; audit e5e7ad6 covers 52 case lines/54 alternatives and regeneration/results. All through tools/run.py: clean GCC C/Fortran rebuild...
 - 2026-11-03 22:27 **S3-14** lead approve-red: The new TLS test fails on GCC 16 for the right reason: it emits __emutls calls at -O2, -O2 -fPIC and -O0, while the donor's native %fs/@tpoff/@gott...
-- 2026-11-03 22:26 **S3-14** engineer red: Red commit 3f40227. Ran tools/run.py --name s3-14-native-tls-red --inputs tests/t1/knc-tls.c tools/native_tls.py tools/check.py -- python tools/che...
 
 ## Cost
 
-- From the script, engineer: 168 sessions, 353.1M input tokens
+- From the script, engineer: 169 sessions, 353.1M input tokens
 - From the script, lead: 168 sessions, 54.7M input tokens
-- Started by hand, Claude: 6 sessions, 503.1M input tokens
+- Started by hand, Claude: 6 sessions, 507.4M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 7.7 GiB of 100 GiB. 294 GiB free on the drive.
+The project uses 7.7 GiB of 100 GiB. 299 GiB free on the drive.
