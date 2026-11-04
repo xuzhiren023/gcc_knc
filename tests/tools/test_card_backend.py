@@ -176,6 +176,14 @@ class CardBackend(unittest.TestCase):
         self.assertIn(repr(line[:200]), str(raised.exception))
         self.assertNotIn("x" * 200, str(raised.exception))
 
+    def test_shell_diagnostic_is_never_a_process_record(self):
+        for line in (b"sh: line 90: /proc/24267/status: No such file or directory",
+                     b"sh:\t42\t1\tworker\t/bin/sh\t/outside"):
+            with self.subTest(line=line):
+                self.session.rpc.return_value = b"BOOT\ttest-boot\n" + line
+                with self.assertRaisesRegex(OSError, "unknown process identity"):
+                    self.session.snapshot(timeout=1)
+
     def test_snapshot_skips_short_foreign_records_but_refuses_unreadable_owned(self):
         prefix = b"BOOT\ttest-boot\n"
         self.session.rpc.return_value = prefix + (

@@ -284,6 +284,38 @@ snapshot
         for pid in (43, 44):
             self.assertIn(("SKIP\t%d\t" % pid).encode(), answer.stdout)
 
+    def test_disappearing_process_does_not_refuse_job(self):
+        directory = self.proc / "43"
+        directory.mkdir()
+        (directory / "status").write_text("PPid: 1\n")
+        script = self.remote.replace("/proc/", str(self.proc) + "/")
+        # The glob has expanded, but the shell has not opened status yet.
+        marker = '        [ "$proc_pid" != "$$" ] || continue\n'
+        self.assertEqual(script.count(marker), 1)
+        script = script.replace(marker, marker + '        rm -- "$proc/status"\n')
+        answer = self.shell(script +
+                            "\nrun_dir=/tmp/claude/claude-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\nsnapshot\n")
+        self.assertEqual(answer.returncode, 0, answer.stderr)
+        self.assertFalse((directory / "status").exists())
+        parser = object.__new__(self.runner["SSHSession"])
+        parser.boot_id = None
+        # The persistent SSH control stream merges shell stderr into the RPC.
+        parser.rpc = mock.Mock(return_value=answer.stdout + answer.stderr)
+        transport = SharedTransport()
+        transport.snapshot = parser.snapshot
+        transport.ledger = self.directory / "jobs.jsonl"
+        transport.ledger.write_text("")
+        program = self.directory / "hello.mic"
+        program.write_bytes(b"fake program; never executed")
+        result = self.runner["run"](
+            program, [], lock_path=self.directory / "card.lock", external_locks=[],
+            baseline_names=set(), timeout=30, transport_timeout=1,
+            receipt_path=self.directory / "result.json", transport=transport,
+            ledger_path=transport.ledger, monotonic=lambda: transport.now)
+        self.assertEqual((result["result_class"], result["exit_code"]),
+                         ("program", 0), result["detail"])
+        self.assertIn("execute", [event[0] for event in transport.events])
+
     def test_tmp_symlink_guard_owned_identity_and_cleanup(self):
         logical, physical, remote = self.symlink_tmp()
         job = "claude-" + "a" * 32
