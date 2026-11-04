@@ -61,3 +61,8 @@ passes on what they choose. Each item says how it was shown. Newest first.
    statically (our 4-thread counter exited 127 until it was).
 6. **`stmxcsr` runs on KNC** inside `__addtf3`, `__multf3`, `__divtf3`, `__extenddftf2` and
    `__trunctfdf2` (both the donor's and GCC 16's `libgcc`), with results identical between them.
+7. **A GCC built for `k1om-*` silently uses emulated TLS** unless `gcc/configure.ac`'s TLS
+   assembler case includes the k1om triple: `__thread` then compiles to `__emutls_get_address`,
+   and the variable no longer matches one defined by MPSS-built code or system libraries. Check
+   `HAVE_AS_TLS` in `gcc/auto-host.h`. With native TLS, `__thread` shared between new code, MPSS
+   GCC 5.1.1 objects and an MPSS-built `.so` works on the card from 4 threads (2026-11-04).
