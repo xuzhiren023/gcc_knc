@@ -1,17 +1,17 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-03 20:49.
+Updated automatically at every ticket change. Last update: 2026-11-03 20:50.
 
-**Next: the tech lead, on S3-08.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: GPT-6.1, on S3-19 (card_run's snapshot silences the status redirect before it can fail).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
-Current tickets: `[#################---]` 47 of 55
+Current tickets: `[#################---]` 48 of 56
 
 ## Milestones
 
 | | Milestone | State | Progress |
 |---|---|---|---|
 | M0 | Foundation | In progress | 17 of 17 tickets |
-| M1 | Mixed native code | In progress | 30 of 37 tickets |
+| M1 | Mixed native code | In progress | 31 of 38 tickets |
 | M2 | Useful vector target | In progress | 0 of 1 tickets |
 | M3 | Runtimes | Not started | Not planned in detail yet |
 | M4 | Broad optimization | Not started | Not planned in detail yet |
@@ -65,7 +65,7 @@ Current tickets: `[#################---]` 47 of 55
 | S3-05 | Unaligned packed moves through load and store pairs | Done | Packed copies through pointers of unknown alignment now compile, for all four 512-bit modes, to unmasked lo... |
 | S3-06 | Packed FP add, sub, mul, FMA and broadcasts for V16SF and V8DF | Done | Under -march=knc, 512-bit float and double vectors now compile to packed add, subtract, multiply, fused mul... |
 | S3-07 | Auto-vectorization on zmm, with x87 peel and remainder; m1_affine T1 and T2 green | Done | With -mknc, GCC 16 now auto-vectorizes simple float and double loops at default -O2 into packed zmm multipl... |
-| S3-08 | Fortran twin of m1_affine vectorizes and links | Waiting for review | Fixed all three new compiler checks with the existing guarded getattr form; commit 300c73e. tools/run.py --... |
+| S3-08 | Fortran twin of m1_affine vectorizes and links | Done | The Fortran twin of the M1 affine kernel now builds with GCC 16 gfortran, vectorizes on zmm (FMA at -ffp-co... |
 | S3-09 | Packed integer add, sub, mul, logic and broadcast for V16SI; logic for V8DI | draft | Moved to Sprint 4 by the owner on 2026-11-03, on the lead's recommendation: m1_affine is float and double o... |
 | S3-10 | Card batch for Sprint 3 and m1_affine | Not started | Also add (1) S3-14's TLS and S3-15's complex and rounding cross-checks, built after both merge (objects bui... |
 | S3-11 | Milestone M1 note: fixture, line counts, ICE classes and backend cost comparison | Not started | Owner approved Sprint 3 on 2026-11-03; ticket set to ready. |
@@ -77,23 +77,24 @@ Current tickets: `[#################---]` 47 of 55
 | S3-17 | card_run takes each process's parent from the same status read that admits it | Done | card_run no longer refuses jobs when a kernel thread's first status read fails: each process's parent now c... |
 | S3-18 | card_run keeps every job's receipt, and the ledger finish line says why a job was refused | Done | card_run now saves every job's result under .work/_state/card/ (newest 200 kept), and the ledger finish lin... |
 | S3-19 | card_run's snapshot silences the status redirect before it can fail | In progress | Filed under the owner's delegation. This is probably also the unexplained `infrastructure-failure` at 01:31... |
+| S3-20 | 64-byte XImode memory-to-memory copy ICEs (gcc.c-torture/execute/pr85169.c) | Not started | Filed under the owner's delegation. It goes into M1's ICE classes (S3-11). |
 
 ## Recent activity
 
+- 2026-11-03 21:10 **S3-20** lead note: Filed under the owner's delegation. It goes into M1's ICE classes (S3-11).
 - 2026-11-03 20:50 **S3-19** lead note: Filed under the owner's delegation. This is probably also the unexplained `infrastructure-failure` at 01:31:55 UTC that S3-18 was filed for.
+- 2026-11-03 20:50 **S3-08** lead approve: The Fortran twin of the M1 affine kernel now builds with GCC 16 gfortran, vectorizes on zmm (FMA at -ffp-contract=fast), and links into the C drive...
 - 2026-11-03 20:49 **S3-08** engineer submit: Fixed all three new compiler checks with the existing guarded getattr form; commit 300c73e. tools/run.py --name S3-08-review-t0-t1-t2 --inputs tool...
 - 2026-11-03 20:47 **S3-18** lead approve: card_run now saves every job's result under .work/_state/card/ (newest 200 kept), and the ledger finish line records why a job was refused or faile...
 - 2026-11-03 20:44 **S3-18** engineer submit: Restored --receipt default ROOT/tests/out/card-result.json as requested; retained per-job diagnostics remain additional. Commit b9394dd. tools/run....
 - 2026-11-03 20:44 **S3-08** lead changes: 1. tools/check.py:392 (also :271, :342): the new unguarded self.args.compiler checks fail on Runner objects built without args, so tools/check t0 f...
 - 2026-11-03 20:42 **S3-08** engineer submit: Red commit 4374b3d: T2 failed for missing driver Fortran call and linked symbol; log .work/_state/logs/S3_08_red-20261103-204026.log. tools/run.py ...
-- 2026-11-03 20:41 **S3-18** owner decide: Lead decided under the owner's 2026-11-03 delegation: budget raised to 3 sessions and 4M input tokens (0.9M used) for the one requested change (res...
-- 2026-11-03 20:41 **S3-18** engineer escalate: budget: 2 engineer sessions used; the budget is 2
 
 ## Cost
 
 - From the script, engineer: 155 sessions, 316.4M input tokens
 - From the script, lead: 153 sessions, 50.9M input tokens
-- Started by hand, Claude: 5 sessions, 468.8M input tokens
+- Started by hand, Claude: 5 sessions, 471.1M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
