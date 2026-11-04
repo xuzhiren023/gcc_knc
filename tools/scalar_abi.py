@@ -226,9 +226,31 @@ def t1_vector_compatibility(runner, cases=('VECTOR32_PARAMETER', 'VECTOR1_PARAME
             runner.result('t1 KNC preserves ' + case.lower() + ' ' + level, failures)
 
 
+def t1_abi_gaps(runner):
+    source = runner.root / 'tests/regress/knc-abi-gaps.c'
+    for element in ('float', 'double', 'int', 'long long'):
+        for record in (False, True):
+            for case in ('VAR_CALL', 'VAR_GET', 'MS_CALL', 'MS_PARAM',
+                         'MS_RETURN_CALL', 'MS_RETURN_DEF'):
+                for level in ('-O0', '-O2'):
+                    compiled = runner.command(
+                        runner.cc, *runner.cc_flags, level, '-march=knc',
+                        '-DELEMENT=' + element, '-D' + case,
+                        *(['-DRECORD'] if record else []), '-S', source,
+                        '-o', runner.out / 'abi-gap.s', check=False)
+                    rejected = (compiled.returncode != 0
+                                and 'internal compiler error' not in compiled.stdout
+                                and 'error: unsupported KNC register ABI mode' in compiled.stdout)
+                    runner.result('t1 packed ABI %s %s %s %s' %
+                                  (element, 'record' if record else 'vector', case, level),
+                                  [] if rejected else [compiled.stdout[-1800:]
+                                                       or 'unsupported ABI accepted'])
+
+
 def t1(runner):
     t1_vector_diagnostics(runner)
     t1_vector_compatibility(runner)
+    t1_abi_gaps(runner)
     for source in sorted(runner.source_dir.glob('knc-abi-*.c')):
         for level in ('-O0', '-O2', '-Os'):
             if source.name == 'knc-abi-structs.c' and level == '-O0':
@@ -287,31 +309,46 @@ def affine(runner):
 
 def t2(runner):
     sources = runner.root / 'tests/t2'
-    symbols = re.findall(r'\b(scalar_\w+)\(', (sources / 'knc-scalar-abi.h').read_text())
-    for reverse in (False, True):
-        label = 't2 scalar ABI ' + ('donor caller / GCC16 callee' if reverse else 'GCC16 caller / donor callee')
-        objects, failures = [], []
-        for role in ('caller', 'callee'):
-            use_donor = (role == 'caller') == reverse
-            cc, flags = (runner.tool('gcc'), []) if use_donor else (runner.cc, runner.cc_flags)
-            obj = runner.out / (role + '.o')
-            compiled = runner.command(cc, *flags, '-O2', '-ffp-contract=off',
-                                      '--sysroot=' + str(runner.sysroot), '-c',
-                                      sources / ('knc-scalar-abi-' + role + '.c'), '-o', obj, check=False)
-            if compiled.returncode:
-                failures.append(role + ' compile: ' + compiled.stdout[-1800:])
-            else:
-                objects.append(obj)
-        if not failures:
-            elf = runner.out / ('scalar-' + str(int(reverse)) + '.mic')
-            linked = runner.command(runner.cc, *runner.cc_flags,
-                                    '--sysroot=' + str(runner.sysroot), *objects, '-o', elf,
-                                    '-Wl,--trace', check=False)
-            if linked.returncode:
-                failures.append('link: ' + linked.stdout[-1800:])
-            else:
-                table = runner.command(runner.tool('nm'), '--defined-only', elf)
-                failures.extend('missing linked symbol ' + name for name in symbols
-                                if not re.search(r'\bT\s+' + name + r'$', table, re.M))
-                runner.t2_abi(elf, linked.stdout)
-        runner.result(label, failures)
+    # Fixed shared paths are the S3-10 native inputs; never execute on the host.
+    output = runner.tc.parent / 'scalar-abi'
+    output.mkdir(exist_ok=True)
+    # Keep the existing scalar suite at O2: its ff aggregate has a documented
+    # donor O0 ICE.  Every new complex/rounding test runs at both levels.
+    for stem, levels in (('knc-scalar-abi', ('-O2',)),
+                         ('knc-abi-gaps', ('-O0', '-O2'))):
+        symbols = re.findall(r'\b(scalar_\w+)\(', (sources / (stem + '.h')).read_text())
+        for level in levels:
+            for reverse in (False, True):
+                t2_crosscheck(runner, sources, stem, symbols, output, level, reverse)
+
+
+def t2_crosscheck(runner, sources, stem, symbols, output, level, reverse):
+    label = 't2 ' + stem + ' ' + level + ' ' + (
+        'donor caller / GCC16 callee' if reverse else 'GCC16 caller / donor callee')
+    objects, failures = [], []
+    elf = output / ('%s-%s-%d.mic' % (stem[4:], level[1:], int(reverse)))
+    elf.unlink(missing_ok=True)
+    for role in ('caller', 'callee'):
+        use_donor = (role == 'caller') == reverse
+        cc, flags = (runner.tool('gcc'), []) if use_donor else (runner.cc, runner.cc_flags)
+        obj = runner.out / (role + '.o')
+        compiled = runner.command(cc, *flags, level, '-ffp-contract=off',
+                                  '-frounding-math', '-fexcess-precision=standard',
+                                  '--sysroot=' + str(runner.sysroot), '-c',
+                                  sources / (stem + '-' + role + '.c'), '-o', obj, check=False)
+        if compiled.returncode:
+            failures.append(role + ' compile: ' + compiled.stdout[-1800:])
+        else:
+            objects.append(obj)
+    if not failures:
+        linked = runner.command(runner.cc, *runner.cc_flags,
+                                '--sysroot=' + str(runner.sysroot), *objects, '-o', elf,
+                                '-lm', '-Wl,--trace', check=False)
+        if linked.returncode:
+            failures.append('link: ' + linked.stdout[-1800:])
+        else:
+            table = runner.command(runner.tool('nm'), '--defined-only', elf)
+            failures.extend('missing linked symbol ' + name for name in symbols
+                            if not re.search(r'\bT\s+' + name + r'$', table, re.M))
+            runner.t2_abi(elf, linked.stdout)
+    runner.result(label, failures)
