@@ -1,17 +1,17 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-03 20:52.
+Updated automatically at every ticket change. Last update: 2026-11-03 20:53.
 
-**Next: the tech lead, on S3-19.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: GPT-6.1, on S3-13 (Move KNC code out of shared i386 files into i386-knc).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
-Current tickets: `[#################---]` 48 of 56
+Current tickets: `[#################---]` 49 of 56
 
 ## Milestones
 
 | | Milestone | State | Progress |
 |---|---|---|---|
 | M0 | Foundation | In progress | 17 of 17 tickets |
-| M1 | Mixed native code | In progress | 31 of 38 tickets |
+| M1 | Mixed native code | In progress | 32 of 38 tickets |
 | M2 | Useful vector target | In progress | 0 of 1 tickets |
 | M3 | Runtimes | Not started | Not planned in detail yet |
 | M4 | Broad optimization | Not started | Not planned in detail yet |
@@ -76,19 +76,19 @@ Current tickets: `[#################---]` 48 of 56
 | S3-16 | Nothing writes to Documents/_shared from the main checkout | Done | Torture and x87 probe outputs now stay in the repository's .work/_shared when run from the main checkout, a... |
 | S3-17 | card_run takes each process's parent from the same status read that admits it | Done | card_run no longer refuses jobs when a kernel thread's first status read fails: each process's parent now c... |
 | S3-18 | card_run keeps every job's receipt, and the ledger finish line says why a job was refused | Done | card_run now saves every job's result under .work/_state/card/ (newest 200 kept), and the ledger finish lin... |
-| S3-19 | card_run's snapshot silences the status redirect before it can fail | Waiting for review | Red commit faf355a: Cygwin sh reproduced vanished status open diagnostic and fake job infrastructure failur... |
+| S3-19 | card_run's snapshot silences the status redirect before it can fail | Done | A card process that exits mid-snapshot no longer makes card_run refuse the job, and a lint stops the redire... |
 | S3-20 | 64-byte XImode memory-to-memory copy ICEs (gcc.c-torture/execute/pr85169.c) | Not started | Filed under the owner's delegation. It goes into M1's ICE classes (S3-11). |
 
 ## Recent activity
 
 - 2026-11-03 21:10 **S3-20** lead note: Filed under the owner's delegation. It goes into M1's ICE classes (S3-11).
+- 2026-11-03 20:53 **S3-19** lead approve: A card process that exits mid-snapshot no longer makes card_run refuse the job, and a lint stops the redirect-order bug from coming back. Machine c...
 - 2026-11-03 20:52 **S3-19** engineer submit: Red commit faf355a: Cygwin sh reproduced vanished status open diagnostic and fake job infrastructure failure; T0 redirect lint failed as expected. ...
 - 2026-11-03 20:50 **S3-19** lead note: Filed under the owner's delegation. This is probably also the unexplained `infrastructure-failure` at 01:31:55 UTC that S3-18 was filed for.
 - 2026-11-03 20:50 **S3-08** lead approve: The Fortran twin of the M1 affine kernel now builds with GCC 16 gfortran, vectorizes on zmm (FMA at -ffp-contract=fast), and links into the C drive...
 - 2026-11-03 20:49 **S3-08** engineer submit: Fixed all three new compiler checks with the existing guarded getattr form; commit 300c73e. tools/run.py --name S3-08-review-t0-t1-t2 --inputs tool...
 - 2026-11-03 20:47 **S3-18** lead approve: card_run now saves every job's result under .work/_state/card/ (newest 200 kept), and the ledger finish line records why a job was refused or faile...
 - 2026-11-03 20:44 **S3-18** engineer submit: Restored --receipt default ROOT/tests/out/card-result.json as requested; retained per-job diagnostics remain additional. Commit b9394dd. tools/run....
-- 2026-11-03 20:44 **S3-08** lead changes: 1. tools/check.py:392 (also :271, :342): the new unguarded self.args.compiler checks fail on Runner objects built without args, so tools/check t0 f...
 
 ## Cost
 
