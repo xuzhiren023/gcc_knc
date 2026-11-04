@@ -4,7 +4,7 @@ The handoff between sessions. `STATUS.md` holds tickets, cost and disk, and upda
 file holds what only a person or an agent can know. Replace lines when facts change, and do not
 trust anything here that a quick command can check instead.
 
-Last updated: 2026-11-04 10:30, Sprint 3. Merged: S3-01 to S3-08, S3-10 to S3-24. **M1 is accepted (go, lead, 2026-11-04)**; the annotated tag `m1` is on this repo's `fb883f8` and on GCC `knc` `0d3c0152fe3` (empty milestone commit; tree identical to the tested `f4fa4944b8a`). Left in Sprint 3: S3-25 (va_arg error path, gcc lane, ready). S3-09 is in Sprint 4, which the owner has not approved yet.
+Last updated: 2026-11-04 10:30, Sprint 3. Merged: S3-01 to S3-08, S3-10 to S3-24. **M1 is accepted (go, lead, 2026-11-04)**; the annotated tag `m1` is on this repo's `fb883f8` and on GCC `knc` `0d3c0152fe3` (empty milestone commit; tree identical to the tested `f4fa4944b8a`). Left in Sprint 3: S3-25 (va_arg error path, gcc lane, ready). **Sprint 4 approved (owner, 2026-11-04)**: masks, compares, if-conversion, safe masked tails, integer vectors (`docs/sprints/SPRINT-04.md`). GPT usage is tight, so Sprint 4's engineer work runs as Claude subagents that the lead starts; the GPT dispatcher is only finishing S3-25. Gcc tickets stay in draft until the lead starts them, so no new GPT session begins.
 
 ## Proven, and how
 

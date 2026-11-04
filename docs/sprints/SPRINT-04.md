@@ -1,7 +1,15 @@
 # Sprint 4: masks, compares, if-conversion and safe masked tails (Milestone M2, part 1)
 
-**Status:** proposed by the lead on 2026-11-04, after M1 was accepted. Waiting for the owner's
-approval, which also covers runs without per-run approval for this sprint.
+**Status:** approved by the owner on 2026-11-04 ("Approve Sprint 4"), with runs without per-run
+approval. Proposed by the lead the same day, after M1 was accepted.
+
+**Who implements (owner, 2026-11-04: "we are tight on GPT usage, use claude code subagent with
+proper model and level for sprint 4"):** Sprint 4's engineer work runs as Claude Code subagents
+started by the lead, not GPT through `tools/dispatch.py`. Deep compiler tickets and S4-01 use
+Opus at high effort; light tickets use Sonnet at medium. Each subagent works as the engineer under
+`AGENTS.md` (`PM_ROLE=engineer`, `pm.py start/commit/submit`, red first). The lead reviews and
+merges as before, and never reviews its own subagent's work less strictly. Subagent tokens do not
+reach `STATUS.md`; the lead records them per ticket in a note.
 
 **Goal:** loops with conditions vectorize on `zmm` under `-march=knc`. Compares produce `k` masks,
 `if`, `?:`, `fabs`, `min` and `max` become masked operations or blends instead of scalar code, and
