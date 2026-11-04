@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-03 22:20.
+Updated automatically at every ticket change. Last update: 2026-11-03 22:21.
 
-**Next: GPT-6.1, on S3-21 (Unaligned packed accesses need element alignment; byte-aligned ones must not use load/store pairs).** Run `python tools/dispatch.py`, or ask the tech lead to.
+**Next: the tech lead, on S3-21.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[#################---]` 50 of 57
 
@@ -78,10 +78,11 @@ Current tickets: `[#################---]` 50 of 57
 | S3-18 | card_run keeps every job's receipt, and the ledger finish line says why a job was refused | Done | card_run now saves every job's result under .work/_state/card/ (newest 200 kept), and the ledger finish lin... |
 | S3-19 | card_run's snapshot silences the status redirect before it can fail | Done | A card process that exits mid-snapshot no longer makes card_run refuse the job, and a lint stops the redire... |
 | S3-20 | 64-byte XImode memory-to-memory copy ICEs (gcc.c-torture/execute/pr85169.c) | Not started | Filed under the owner's delegation. It goes into M1's ICE classes (S3-11). |
-| S3-21 | Unaligned packed accesses need element alignment; byte-aligned ones must not use load/store pairs | In progress | Lead decided under the owner's 2026-11-03 delegation: budget raised to 5 sessions and 32M input tokens to s... |
+| S3-21 | Unaligned packed accesses need element alignment; byte-aligned ones must not use load/store pairs | Waiting for review | Hook rejects is_packed/non-element-multiple misalignment; sub-element MEM_ALIGN uses eight DImode GPR trans... |
 
 ## Recent activity
 
+- 2026-11-03 22:21 **S3-21** engineer submit: Hook rejects is_packed/non-element-multiple misalignment; sub-element MEM_ALIGN uses eight DImode GPR transfers via 64-byte-aligned stack; insns re...
 - 2026-11-03 22:20 **S3-21** owner decide: Lead decided under the owner's 2026-11-03 delegation: budget raised to 5 sessions and 32M input tokens to submit. The lead ran the guard programs o...
 - 2026-11-03 22:19 **S3-21** engineer escalate: budget: 4 engineer sessions used; the budget is 4
 - 2026-11-03 22:17 **S3-21** lead answer: Size: yes, submit with --override 'acceptance requires the T2 card guard probe (145 lines) next to the T1 red tests; no test weakened'. ADR: I cann...
@@ -89,13 +90,12 @@ Current tickets: `[#################---]` 50 of 57
 - 2026-11-03 22:14 **S3-21** lead answer: Both yes, with limits. (1) Fix the controls, not the hook: memcpy from a 'const int *' carries no alignment in GCC (folds to a char-aligned ref-all...
 - 2026-11-03 22:13 **S3-21** engineer ask: Build passed; T1 still red. Reproducer .work/_shared/check/S3-21-reduced*: memcpy from const int* loses alignment (A8); hook sees is_packed=true. b...
 - 2026-11-03 21:50 **S3-21** lead approve-red: S3-21 red is approved: the new tests catch load/store pairs on byte-aligned addresses (pr65369's shape, aligned(1) vector copies, packed members at...
-- 2026-11-03 21:49 **S3-21** engineer red: 18e8c23 adds elem_slp pair checks at O2/O3 and elem_loop at O3 for all modes; FP memcpy accepts same-width integer pairs. Per-runner guard prevents...
 
 ## Cost
 
 - From the script, engineer: 164 sessions, 336.4M input tokens
 - From the script, lead: 164 sessions, 53.4M input tokens
-- Started by hand, Claude: 5 sessions, 487.9M input tokens
+- Started by hand, Claude: 5 sessions, 488.8M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
