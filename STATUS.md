@@ -1,17 +1,17 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-04 08:06.
+Updated automatically at every ticket change. Last update: 2026-11-04 08:08.
 
-**Next: the tech lead, on S3-22.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: GPT-6.1, on S3-23 (KNC's atomic_storeti survives upstream's new one; trunk builds C-only and runs T1 and T2).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
-Current tickets: `[##################--]` 56 of 59
+Current tickets: `[###################-]` 57 of 59
 
 ## Milestones
 
 | | Milestone | State | Progress |
 |---|---|---|---|
 | M0 | Foundation | In progress | 17 of 17 tickets |
-| M1 | Mixed native code | In progress | 39 of 41 tickets |
+| M1 | Mixed native code | In progress | 40 of 41 tickets |
 | M2 | Useful vector target | In progress | 0 of 1 tickets |
 | M3 | Runtimes | Not started | Not planned in detail yet |
 | M4 | Broad optimization | Not started | Not planned in detail yet |
@@ -79,11 +79,12 @@ Current tickets: `[##################--]` 56 of 59
 | S3-19 | card_run's snapshot silences the status redirect before it can fail | Done | A card process that exits mid-snapshot no longer makes card_run refuse the job, and a lint stops the redire... |
 | S3-20 | 64-byte XImode memory-to-memory copy ICEs (gcc.c-torture/execute/pr85169.c) | Done | Card after merge: pr85169 passes, and the full execute suite passes 1,681 of 1,681 at 73cc9c03798 (docs/res... |
 | S3-21 | Unaligned packed accesses need element alignment; byte-aligned ones must not use load/store pairs | Done | Byte-aligned vector copies (like pr65369) no longer use the KNC load/store pair instructions that need elem... |
-| S3-22 | The last three KNC blocks in shared i386 code become hooks (ADR-0006 rules 1-4) | Waiting for review | GCC 43ded4fa4d8: x86 -O2 and -O2 -mavx512f each 1962 identical, 41 matching failures, 0 differences/errors.... |
+| S3-22 | The last three KNC blocks in shared i386 code become hooks (ADR-0006 rules 1-4) | Done | The last three KNC blocks in shared i386 code (zero-call-used-regs, the 16-byte CAS macro, the varargs save... |
 | S3-23 | KNC's atomic_storeti survives upstream's new one; trunk builds C-only and runs T1 and T2 | Not started | Created by the lead from S3-11's trunk finding, as S3-11's 03:40 |
 
 ## Recent activity
 
+- 2026-11-04 08:08 **S3-22** lead approve: The last three KNC blocks in shared i386 code (zero-call-used-regs, the 16-byte CAS macro, the varargs save) are now one-line hooks into the KNC fi...
 - 2026-11-04 08:05 **S3-22** engineer submit: GCC 43ded4fa4d8: x86 -O2 and -O2 -mavx512f each 1962 identical, 41 matching failures, 0 differences/errors. Log .work/_state/logs/S3_22_x86-2026110...
 - 2026-11-04 07:19 **S3-22** owner decide: Budget raised to 30M input tokens (20.6M used) for one rerun of the x86 check, which failed at 05:21 on a Cygwin out-of-resources error, plus the f...
 - 2026-11-04 05:30 **S3-22** lead note: Budget raised to 30M input tokens under the owner's 2026-11-03 delegation (20.6M used): one rerun of the x86 check, which failed at 05:21 on a Cygw...
@@ -91,7 +92,6 @@ Current tickets: `[##################--]` 56 of 59
 - 2026-11-04 05:22 **S3-22** lead answer: No, it did not survive: S3_22_x86-20261104-043752.log ends at 05:21 with Cygwin 'unable to load user32.dll, Win32 error 8' (out of resources) and m...
 - 2026-11-04 05:21 **S3-22** engineer ask: Committed GCC 43ded4fa4d8 and tools 8783d2c/a164049. Structure, full build, 4216 comparisons (0 differences), unchanged t0/t1/t2+vector outcomes an...
 - 2026-11-04 04:22 **S3-20** lead note: Card after merge: pr85169 passes, and the full execute suite passes 1,681 of 1,681 at 73cc9c03798 (docs/research/card-runs-s3.md). Merged tree iden...
-- 2026-11-04 04:08 **S3-22** lead answer: Use S3-13's path; it is a real red, not a fabricated one. The 'no red step' line meant no new behaviour tests, and I should have worded it that way...
 
 ## Cost
 
