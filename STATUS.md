@@ -1,10 +1,10 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-04 10:38.
+Updated automatically at every ticket change. Last update: 2026-11-04 10:41.
 
-**Next: the tech lead, on S4-01.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: GPT-6.1, on S3-25 (va_arg of an unsupported KNC type leaves a broken expansion; release builds hide the ICE).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
-Current tickets: `[################----]` 59 of 70
+Current tickets: `[#################---]` 60 of 70
 
 ## Milestones
 
@@ -12,7 +12,7 @@ Current tickets: `[################----]` 59 of 70
 |---|---|---|---|
 | M0 | Foundation | In progress | 17 of 17 tickets |
 | M1 | Mixed native code | Done | 42 of 43 tickets |
-| M2 | Useful vector target | In progress | 0 of 10 tickets |
+| M2 | Useful vector target | In progress | 1 of 10 tickets |
 | M3 | Runtimes | Not started | Not planned in detail yet |
 | M4 | Broad optimization | Not started | Not planned in detail yet |
 | M5 | Program corpus | Not started | Not planned in detail yet |
@@ -83,7 +83,7 @@ Current tickets: `[################----]` 59 of 70
 | S3-23 | KNC's atomic_storeti survives upstream's new one; trunk builds C-only and runs T1 and T2 | Done | KNC's 128-bit atomic store and exchange now live in i386-knc.cc helpers with unchanged output, and upstream... |
 | S3-24 | Skip GCC builds that are already current (shared tree and the x86 check's stock tree) | Done | GCC builds are now skipped when nothing changed: tools/gcc_build.py --if-stale skips the shared tree's make... |
 | S3-25 | va_arg of an unsupported KNC type leaves a broken expansion; release builds hide the ICE | In progress | Filed for M1 criterion 5 (each trunk difference needs a cause and a ticket). Start it only after the lead's... |
-| S4-01 | Masks on KNC: GCC 16 entry points, IMCI forms, reuse audit and masked-tail design (ADR-0007 input) | Waiting for review | docs/research/knc-masks.md: 6 sections + ADR-0007 inputs, read-only, no build. Masks HI for 16-lane, QI for... |
+| S4-01 | Masks on KNC: GCC 16 entry points, IMCI forms, reuse audit and masked-tail design (ADR-0007 input) | Done | The mask design input for Sprint 4 is done: KNC masks are HI for 16-lane and QI for 8-lane vectors, compare... |
 | S4-02 | Vector compares into k masks, mask logic and mask spills for the packed modes | draft |  |
 | S4-03 | Blends and if-conversion: conditional loops, ?:, fabs, min and max vectorize with masks | draft |  |
 | S4-04 | V8DI add and sub through the IMCI carry form, so long add loops vectorize | draft |  |
@@ -95,6 +95,7 @@ Current tickets: `[################----]` 59 of 70
 
 ## Recent activity
 
+- 2026-11-04 10:41 **S4-01** lead approve: The mask design input for Sprint 4 is done: KNC masks are HI for 16-lane and QI for 8-lane vectors, compares, blends and mask logic are new imci.md...
 - 2026-11-04 10:38 **S4-01** engineer submit: docs/research/knc-masks.md: 6 sections + ADR-0007 inputs, read-only, no build. Masks HI for 16-lane, QI for 8-lane (1-term get_mask_mode hook; ADR-...
 - 2026-11-04 09:55 **S3-24** lead note: Budget raised to 3M input tokens under the owner's 2026-11-03 delegation (2.02M used): only the submit is left. Waiting for the owner's decide.
 - 2026-11-04 09:50 **S3-24** lead approve: GCC builds are now skipped when nothing changed: tools/gcc_build.py --if-stale skips the shared tree's make on a clean, already-built tree, and the...
@@ -102,16 +103,15 @@ Current tickets: `[################----]` 59 of 70
 - 2026-11-04 09:45 **S3-24** owner decide: Budget raised to 3M input tokens (2.02M used); only the submit is left.
 - 2026-11-04 09:43 **S3-24** lead escalate: budget: 2017420 input tokens used; the budget is 2000000
 - 2026-11-04 09:43 **S3-24** lead answer: Size approved: 320 lines with 7 acceptance tests is fine; submit with --override 'lead approved 320 lines (193 test) on 2026-11-04'. Keep the AGENT...
-- 2026-11-04 09:42 **S3-24** engineer ask: Implementation committed: red 3284902, fix 3b9b566. All 7 new acceptance tests pass. Existing tools suite: 169/170 passed; sole harness test passed...
 
 ## Cost
 
 - From the script, engineer: 185 sessions, 428.6M input tokens
 - From the script, lead: 183 sessions, 58.6M input tokens
-- Started by hand, Claude: 8 sessions, 591.8M input tokens
+- Started by hand, Claude: 8 sessions, 595.9M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 13.0 GiB of 100 GiB. 251 GiB free on the drive.
+The project uses 13.0 GiB of 100 GiB. 250 GiB free on the drive.
