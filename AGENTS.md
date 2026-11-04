@@ -33,6 +33,15 @@ Then stop. Your final message is only the `PM update:` line that command prints:
 - No per-attempt, per-run or dated output folders. Overwrite the previous output, and delete what you no longer need.
 - Large inputs and outputs stay out of git. Ask the lead if something truly must be kept.
 
+## Build cheaply
+
+- A change to any i386 `.md` file regenerates headers that most of `cc1` includes, so the next
+  build takes about 20 minutes. Before it, compile only the files you changed:
+  `make -C .work/_shared/gcc-build/gcc i386-knc.o` (and `i386.o` or `i386-expand.o` if you touched
+  them). That catches C++ errors in a few minutes. Only then run the full build.
+- Fix every error a failed build reports before rebuilding. Never start a second build while a
+  `make.exe` is alive.
+
 ## Test first
 
 Code tickets: a `test(<ID>): ... [red]` commit that fails for the expected reason, then the
