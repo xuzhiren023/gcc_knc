@@ -15,6 +15,8 @@ sys.path.insert(0, str(ROOT / 'tools'))
 import portability
 
 RUN = subprocess.run
+HEALTHY = ('MD_INCLUDES = \\\n\t/src/gcc/config/i386/imci.md \\\n'
+           '\t/src/gcc/config/i386/sse.md\n')
 
 
 class BuildReuseTest(unittest.TestCase):
@@ -118,6 +120,38 @@ class BuildReuseTest(unittest.TestCase):
         (self.build / 'fail-make').unlink()
         self.assertEqual(self.shared('--if-stale')[0], 0)
         self.assertEqual(len(self.recorded()), 3)
+
+    def plant_mddeps(self, text):
+        (self.build / 'gcc').mkdir(exist_ok=True)
+        (self.build / 'gcc/mddeps.mk').write_text(text)
+        (self.build / 'gcc/s-mddeps').touch()
+
+    def test_empty_mddeps_is_not_skipped_and_s_mddeps_is_removed(self):
+        self.assertEqual(self.shared('--if-stale')[0], 0)
+        self.plant_mddeps('')
+        (self.build / 'gcc/mddeps.mk').write_text('')
+        # make would regenerate mddeps.mk only because s-mddeps is gone.
+        code, output = self.shared('--if-stale')
+        self.assertEqual(code, 0)
+        self.assertNotIn('SKIP', output)
+        self.assertFalse((self.build / 'gcc/s-mddeps').exists())
+        self.assertEqual(len(self.recorded()), 2)
+        self.assertIn('SKIP', self.shared('--if-stale')[1])
+
+    def test_missing_include_is_unhealthy(self):
+        self.assertEqual(self.shared('--if-stale')[0], 0)
+        self.plant_mddeps('MD_INCLUDES = \\\n\t/src/gcc/config/i386/sse.md\n')
+        self.assertNotIn('SKIP', self.shared('--if-stale')[1])
+
+    def test_unhealthy_after_build_fails_without_stamp(self):
+        self.assertEqual(self.shared('--if-stale')[0], 0)
+        self.plant_mddeps('')
+        (self.build / 'bad-mddeps').touch()
+        (self.build / 'gcc/mddeps.mk').write_text('')
+        code, output = self.shared('--if-stale')
+        self.assertNotEqual(code, 0)
+        self.assertIn('mddeps', output)
+        self.assertFalse(self.shared_stamp().exists())
 
     def slot(self, tree='HEAD', **kwargs):
         with mock.patch.object(portability, 'command', side_effect=self.command), \
