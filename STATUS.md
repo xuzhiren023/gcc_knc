@@ -2,7 +2,7 @@
 
 Updated automatically at every ticket change. Last update: 2026-11-04 09:42.
 
-**Next: GPT-6.1, on S3-24 (Skip GCC builds that are already current (shared tree and the x86 check's stock tree)).** Run `python tools/dispatch.py`, or ask the tech lead to.
+**Next: the tech lead, on S3-24.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[###################-]` 58 of 60
 
@@ -81,10 +81,11 @@ Current tickets: `[###################-]` 58 of 60
 | S3-21 | Unaligned packed accesses need element alignment; byte-aligned ones must not use load/store pairs | Done | Byte-aligned vector copies (like pr65369) no longer use the KNC load/store pair instructions that need elem... |
 | S3-22 | The last three KNC blocks in shared i386 code become hooks (ADR-0006 rules 1-4) | Done | The last three KNC blocks in shared i386 code (zero-call-used-regs, the 16-byte CAS macro, the varargs save... |
 | S3-23 | KNC's atomic_storeti survives upstream's new one; trunk builds C-only and runs T1 and T2 | Done | KNC's 128-bit atomic store and exchange now live in i386-knc.cc helpers with unchanged output, and upstream... |
-| S3-24 | Skip GCC builds that are already current (shared tree and the x86 check's stock tree) | In progress | Filed under the owner's 2026-11-04 direction ("apply your recommended measures"). Tools lane; it must not b... |
+| S3-24 | Skip GCC builds that are already current (shared tree and the x86 check's stock tree) | Question for the tech lead | Implementation committed: red 3284902, fix 3b9b566. All 7 new acceptance tests pass. Existing tools suite: ... |
 
 ## Recent activity
 
+- 2026-11-04 09:42 **S3-24** engineer ask: Implementation committed: red 3284902, fix 3b9b566. All 7 new acceptance tests pass. Existing tools suite: 169/170 passed; sole harness test passed...
 - 2026-11-04 09:42 **S3-23** lead approve: KNC's 128-bit atomic store and exchange now live in i386-knc.cc helpers with unchanged output, and upstream trunk plus our KNC diff now builds a C-...
 - 2026-11-04 09:39 **S3-23** engineer submit: GCC 2139411dc6c: atomics unchanged; 16.2 T1/T2 245 pass. Trunk b88c2821e219 make -j1 all-gcc PASS (9.9 min). Trunk T1 206 pass/16 fail; T2 23 pass....
 - 2026-11-04 09:22 **S3-23** lead answer: Yes, continue in the next session. The trunk build is not running: it died at 09:22 with no compiler diagnostic. insn-output.o and insn-emit-6.o ex...
@@ -92,13 +93,12 @@ Current tickets: `[###################-]` 58 of 60
 - 2026-11-04 08:08 **S3-22** lead approve: The last three KNC blocks in shared i386 code (zero-call-used-regs, the 16-byte CAS macro, the varargs save) are now one-line hooks into the KNC fi...
 - 2026-11-04 08:05 **S3-22** engineer submit: GCC 43ded4fa4d8: x86 -O2 and -O2 -mavx512f each 1962 identical, 41 matching failures, 0 differences/errors. Log .work/_state/logs/S3_22_x86-2026110...
 - 2026-11-04 07:19 **S3-22** owner decide: Budget raised to 30M input tokens (20.6M used) for one rerun of the x86 check, which failed at 05:21 on a Cygwin out-of-resources error, plus the f...
-- 2026-11-04 05:30 **S3-22** lead note: Budget raised to 30M input tokens under the owner's 2026-11-03 delegation (20.6M used): one rerun of the x86 check, which failed at 05:21 on a Cygw...
 
 ## Cost
 
 - From the script, engineer: 183 sessions, 426.5M input tokens
 - From the script, lead: 181 sessions, 58.3M input tokens
-- Started by hand, Claude: 8 sessions, 552.4M input tokens
+- Started by hand, Claude: 8 sessions, 552.6M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
