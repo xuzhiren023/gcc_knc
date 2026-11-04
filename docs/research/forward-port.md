@@ -477,3 +477,13 @@ Upstream line churn since 16.2 in files changed by KNC:
 
 
 Trunk build finding (S3-11, KNC `eb8fb3e902a9` onto master `b88c2821e219`): `atomic_storeti` in KNC `imci.md:249` collides with upstream `sync.md:410`; this is a logic conflict, not a textual one. Follow-up ticket pending; the lead will integrate the dispatch and retry trunk cc1 and T1/T2.
+
+## S3-23: atomic optab integration
+
+Red baseline: the existing S3-11 trunk tree still fails its target-definition
+generator with `sync.md:410:1: duplicate definition of 'atomic_storeti'`.
+From `portability/trunk/build/gcc`, run
+`build/gentarget-def.exe ../../source/gcc/common.md ../../source/gcc/config/i386/i386.md insn-conditions.md`.
+Exit 1, before any source change; log
+`.work/_state/logs/S3_23_red-20261104-081007.log`. This reuses the existing
+build check; S3-23 adds no tests.
