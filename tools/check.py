@@ -27,6 +27,8 @@ PACKED = re.compile(r'\bv(?:addn?|subr?|mul|div|max|min|sqrt|rcp(?:23)?|rsqrt(?:
 # Each entry supplies its CLI help and handlers for the tiers it selects.
 # Imports stay lazy so T0 and source-only selections need no probe modules.
 SELECTIONS = {
+    'native_tls': ('S3-14 native TLS sequences versus the donor at O2, PIC and O0', {
+        't1': lambda runner: importlib.import_module('native_tls').t1(runner)}),
     'affine_fortran': ('S3-08 Fortran affine acceptance rows (GCC 16)', {
         't1': lambda runner: importlib.import_module('affine_fortran').t1(runner),
         't2': lambda runner: importlib.import_module('affine_fortran').t2(runner)}),
@@ -258,6 +260,8 @@ class Runner:
             self.t1_sources()
             import knc_vector
             knc_vector.t1_byte_aligned(self)
+            import native_tls
+            native_tls.t1(self)
         source = (self.fixture / 'loops.c').read_text()
         for mode in ('off', 'fast'):
             asm = self.out / ('loops-' + mode + '.s')
@@ -279,7 +283,7 @@ class Runner:
     def t1_sources(self, sources=None):
         selected = (s for s in self.source_dir.glob('*.c')
                     if not s.name.startswith('knc-abi-')
-                    and s.name != 'knc-vec-byte-aligned.c')
+                    and s.name not in ('knc-vec-byte-aligned.c', 'knc-tls.c'))
         for source in sorted(selected if sources is None else sources):
             label = 't1 ' + source.name
             try:
