@@ -582,3 +582,65 @@ the shared sysroot, assembler and linker. Build invocations are serialized;
 The trunk object precheck (`i386-knc.o`, `i386.o`, `i386-c.o`) passes,
 including the previously failing target-definition generator; log
 `S3_23_trunk_objects-20261104-084102.log` in `.work/_state/logs/`.
+
+The first full build, `S3_23_trunk_build-20261104-084307.log`, failed
+at four jobs with Cygwin `unable to load user32.dll, Win32 error 8`:
+an infrastructure out-of-memory failure, with no source diagnostic.
+Following the lead's continuation instruction, no make/compiler process
+was running before resuming the same configuration and objects with
+`make -j1 all-gcc CFLAGS='-O2 -g1' CXXFLAGS='-O2 -g1'`. This passed in
+9.9 minutes, including `insn-output.o`, `insn-emit-6.o`, the `cc1.exe`
+link and 7,711,549 C self-test passes. Log:
+`S3_23_trunk_build_serial-20261104-092423.log` in `.work/_state/logs/`.
+
+### Trunk T1/T2 comparison and remaining finding
+
+The existing `portability/trunk/wrappers.py` ran the full
+`check.py t1 t2 --compiler gcc16` selection once. Its first output confirms
+that C uses `portability/trunk/build/gcc/cc1.exe` (GCC 17.0.0,
+20261103 experimental), upstream `b88c2821e219244d18df873b0bfb344d3dc0b2a7`
+with KNC through `2139411dc6c44e3207c5430304e99b231cbeee2b` and the
+store resolution above. Fortran and the target runtime remain the existing
+16.2 build; this is a C-only trunk drill. No target program ran on the card.
+
+| Existing result rows | 16.2 at `2139411dc6c` | Trunk with that KNC diff |
+| --- | ---: | ---: |
+| T1 pass | 222 | 206 |
+| T1 fail | 0 | 16 |
+| T2 pass | 23 | 23 |
+| T2 fail | 0 | 0 |
+
+All 245 row labels and their order match. The only changed results are
+`t1 packed ABI <element> <shape> VAR_GET <level>` for every combination of
+`float`, `double`, `int`, `long long`; `vector`, `record`; and `-O0`, `-O2`.
+They share one cause: an existing ABI rejection error-recovery **logic**
+flaw exposed by the checking configuration, not the atomic optab change.
+The other 206 T1 rows and all 23 T2 rows have identical results.
+
+In both source trees, `ix86_gimplify_va_arg`'s KNC entry guard diagnoses
+`unsupported KNC register ABI mode` and returns `error_mark_node`
+(`i386.cc:5009` on trunk). `expand_ifn_va_arg_1` continues after that error
+and reaches `gcc_assert (gsi_end_p (i))` at `tree-stdarg.cc:1072`;
+each failing backtrace points there. `tree-stdarg.cc` is unchanged between
+these two trees. Both builds enable assertion checking, but their
+`gcc/auto-host.h` has `CHECKING_P=0` for 16.2 and `CHECKING_P=1` for trunk.
+`diagnostics/context.cc:1462-1476` converts an ICE following an earlier
+error to `confused by earlier errors, bailing out` when `CHECKING_P=0`.
+Thus 16.2's no-ICE diagnostic check passes while trunk reports the assertion
+and fails that check. The backtrace's `diagnostic-global-context.cc:787`
+is the ICE reporter, not the original ABI failure. This is an error-path
+integration finding for follow-up; no structural backend redesign is
+demonstrated, and no test was weakened or rerun to hide it.
+
+Compiler-version metadata changes from 16.2.0 to 17.0.0 as expected;
+elapsed time changes from 104.22 to 122.11 seconds. The T1/T2 command exits
+1 because of the 16 failures; the comparison itself passes. Evidence in
+`.work/_state/logs/`:
+
+- `S3_23_trunk_t1_t2-20261104-093427.log` (full run).
+- `S3_23_result_comparison-20261104-093743.log` (245 ordered labels,
+  counts and all 16 changed results).
+
+The saved records are `.work/_shared/tmp/s3-23-gcc16.txt` and
+`.work/_shared/tmp/s3-23-trunk.txt`; these are result comparisons, not
+an assembly-equality claim for the full suites.
