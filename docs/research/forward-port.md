@@ -476,7 +476,7 @@ Upstream line churn since 16.2 in files changed by KNC:
 | `libgcc/config/i386/t-knc` | +0 | -0 |
 
 
-Trunk build finding (S3-11, KNC `eb8fb3e902a9` onto master `b88c2821e219`): `atomic_storeti` in KNC `imci.md:249` collides with upstream `sync.md:410`; this is a logic conflict, not a textual one. Follow-up ticket pending; the lead will integrate the dispatch and retry trunk cc1 and T1/T2.
+Trunk build finding (S3-11, KNC `eb8fb3e902a9` onto master `b88c2821e219`): `atomic_storeti` in KNC `imci.md:249` collides with upstream `sync.md:410`; this is a logic conflict, not a textual one. S3-23 integrates the dispatch below.
 
 ## S3-23: atomic optab integration
 
@@ -487,3 +487,98 @@ From `portability/trunk/build/gcc`, run
 Exit 1, before any source change; log
 `.work/_state/logs/S3_23_red-20261104-081007.log`. This reuses the existing
 build check; S3-23 adds no tests.
+
+### Resolution recipe
+
+On 16.2, keep both `atomic_storeti` and `atomic_exchangeti` in `imci.md`,
+conditioned on `TARGET_KNC`. Each body calls its helper in `i386-knc.cc`
+(`ix86_knc_expand_atomic_store` or `ix86_knc_expand_atomic_exchange`) then
+`DONE`. The helpers retain the original libatomic calls, operands, result move
+and `MEMMODEL_BASE_MASK` filtering. Declare them in `i386-knc.h`.
+
+When rebasing onto upstream `d9e21f7c4d1` or later:
+
+1. Drop only KNC's `atomic_storeti` expander from `imci.md`.
+2. In upstream `sync.md`'s `atomic_storeti` **expander**, change its condition
+   to `TARGET_128BIT_ATOMIC_ENABLED || TARGET_KNC` and add this entry hook
+   before upstream's `enum memmodel model` declaration:
+
+   ```c++
+   if (TARGET_KNC)
+     {
+       ix86_knc_expand_atomic_store (operands);
+       DONE;
+     }
+   ```
+
+The upstream operand numbers still mean memory, value and memory model.
+Its `nonimmediate_operand` value accepts the register supplied by generic
+atomic expansion; the helper passes the TI argument through the ordinary
+libcall machinery. Keep upstream's SSE body and `atomic_storeti_sse`
+condition unchanged. This is an entry dispatch and a condition term under
+ADR-0006 rules 1 and 2; no SSE instruction pattern is widened.
+There is no upstream `atomic_exchangeti` collision on this trunk, so retain
+the KNC exchange expander. Its helper gives a future collision the same
+single-hook resolution.
+
+### Upstream atomic load check
+
+On master `b88c2821e219`, both `atomic_loadti` and `atomic_loadti_sse`
+require `TARGET_128BIT_ATOMIC_ENABLED`, defined in `i386.h` as
+`TARGET_CX16 && TARGET_SSE2 && TARGET_128BIT_ATOMIC`. With `-march=knc`,
+SSE2 is disabled. Adding `-m128bit-atomic` does **not** enable SSE2, so the
+load expander remains unavailable and TI loads retain the libatomic path.
+Explicit SSE options are rejected by `ix86_knc_option_override` after ISA
+dependency expansion.
+
+One nuance in `i386-options.cc`: `-m128bit-atomic` explicitly enables CX16
+later than that KNC option hook, unless `-mno-cx16` was explicit. Thus the
+reason the load expander cannot activate with that flag is **SSE2**, not
+an assertion that CX16 always remains clear. This late CX16 enablement is
+an upstream option interaction to track; S3-23 does not change option
+semantics. Do not widen `atomic_loadti` or either SSE insn condition.
+
+### 16.2 refactor evidence
+
+The before compiler is merged KNC `9b6cbb9f4e1`; the after compiler is
+S3-23 `2139411dc6c`. Both were built in the existing shared `gcc-build`
+with `make -j4 all-gcc CFLAGS='-O2 -g1' CXXFLAGS='-O2 -g1'`, each after
+its object precheck. The refactor changes only `i386-knc.cc`,
+`i386-knc.h` and `imci.md`; there is no shared i386 code change on 16.2.
+
+`tests/t1/knc-atomics.c -march=knc -S` produces byte-identical assembly
+before and after at both `-O0` and `-O2`. The existing
+`check.py t1 t2 --compiler gcc16 --atomics` checks also match: capability
+macros, atomic libcalls, spin hints, assembler/lint and pthread counter
+link all pass. Lock-free queries remain false / a libatomic runtime query.
+The counter was linked, not run natively.
+
+Logs in `.work/_state/logs/`:
+
+- `S3_23_baseline_objects-20261104-081042.log` (pass).
+- `S3_23_baseline_build-20261104-081207.log` (pass, 13.7 minutes).
+- `S3_23_atomics_before-20261104-082611.log` (pass).
+- `S3_23_objects-20261104-082651.log` (pass).
+- `S3_23_build-20261104-082837.log` (pass, 11.7 minutes).
+- `S3_23_atomics_after-20261104-084028.log` (pass, both assembly
+  comparisons and identical `tools/atomics.py` results).
+
+The full existing `check.py t1 t2 --compiler gcc16` run at
+`2139411dc6c` passes (104.22 seconds), log
+`S3_23_gcc16_t1_t2-20261104-084102.log` in the same directory.
+
+### Trunk replay
+
+The existing S3-11 `portability/trunk/source` tree retains its four
+recorded resolutions. The intervening `eb8fb3e902a9..9b6cbb9f4e1` KNC
+diff applies cleanly to it (six files), followed by S3-23's helper
+extraction and the store recipe above. Thus the replay uses upstream
+`b88c2821e219244d18df873b0bfb344d3dc0b2a7` with the KNC diff through
+`2139411dc6c`, rather than leaving the S3-11 snapshot's KNC fixes behind.
+The existing C-only configuration targets `k1om-mpss-linux` and uses
+the shared sysroot, assembler and linker. Build invocations are serialized;
+`Get-Process make` was empty before each new compiler build.
+
+The trunk object precheck (`i386-knc.o`, `i386.o`, `i386-c.o`) passes,
+including the previously failing target-definition generator; log
+`S3_23_trunk_objects-20261104-084102.log` in `.work/_state/logs/`.
