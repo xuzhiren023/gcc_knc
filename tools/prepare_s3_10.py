@@ -64,7 +64,8 @@ def main():
     rows = []
 
     def row(name, expected=None, arguments=(), memory=128):
-        expected_file = name.removesuffix('.mic') + '.expected.txt'
+        expected_file = ('torture' if name == 'claude-torture'
+                         else name.removesuffix('.mic')) + '.expected.txt'
         if expected is not None:
             (OUT / expected_file).write_text(expected)
         rows.append((name, json.dumps(list(arguments)), str(memory), expected_file))
