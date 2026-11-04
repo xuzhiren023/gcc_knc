@@ -28,6 +28,7 @@ PACKED = re.compile(r'\bv(?:addn?|subr?|mul|div|max|min|sqrt|rcp(?:23)?|rsqrt(?:
 # Imports stay lazy so T0 and source-only selections need no probe modules.
 SELECTIONS = {
     'affine_fortran': ('S3-08 Fortran affine acceptance rows (GCC 16)', {
+        't1': lambda runner: importlib.import_module('affine_fortran').t1(runner),
         't2': lambda runner: importlib.import_module('affine_fortran').t2(runner)}),
     'fast_math': ('S2-15 fast-math startup links and MXCSR disassembly', {
         't2': lambda runner: importlib.import_module('fast_math').t2(runner)}),
@@ -267,6 +268,9 @@ class Runner:
             self.result('t1 ' + mode + ' function scans', scan_t1(asm.read_text(), report, source, mode == 'fast'))
             if mode == 'off':
                 self.off_object = obj
+        if self.args.compiler == 'gcc16':
+            import affine_fortran
+            affine_fortran.t1(self)
 
     def t1_sources(self, sources=None):
         selected = (s for s in self.source_dir.glob('*.c') if not s.name.startswith('knc-abi-'))
@@ -335,6 +339,9 @@ class Runner:
             scalar_abi.t2(self)
         elf, trace = self.t2_affine_link()
         self.t2_abi(elf, trace)
+        if self.args.compiler == 'gcc16':
+            import affine_fortran
+            affine_fortran.check_link(self, elf, trace)
         if getattr(getattr(self, 'args', None), 'compiler', None) == 'gcc16':
             self.say('T2 affine ABI cross-check: donor-built driver, GCC 16 loops')
             elf, trace = self.t2_affine_link(donor_driver=True)
@@ -380,8 +387,14 @@ class Runner:
         driver = self.out / 'driver.o'
         elf = self.out / 'm1_affine.mic'
         driver_cc = [self.tool('gcc')] if donor_driver else [self.cc, *self.cc_flags]
-        self.command(*driver_cc, *self.flags, '-ffp-contract=off', '-c', self.fixture / 'driver.c', '-o', driver)
-        trace = self.command(self.cc, *self.cc_flags, '--sysroot=' + str(self.sysroot), driver, loops_obj,
+        objects = [loops_obj]
+        driver_flags = []
+        if self.args.compiler == 'gcc16':
+            import affine_fortran
+            objects.append(affine_fortran.compile_object(self))
+            driver_flags.append('-DKNC_WITH_FORTRAN')
+        self.command(*driver_cc, *self.flags, *driver_flags, '-ffp-contract=off', '-c', self.fixture / 'driver.c', '-o', driver)
+        trace = self.command(self.cc, *self.cc_flags, '--sysroot=' + str(self.sysroot), driver, *objects,
                              '-Wl,--trace', '-o', elf)
         return elf, trace
 
