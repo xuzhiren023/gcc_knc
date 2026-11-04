@@ -183,7 +183,7 @@ class RemoteReview(unittest.TestCase):
         self.proc = self.directory / "proc"
         (self.proc / "sys/kernel/random").mkdir(parents=True)
         (self.proc / "sys/kernel/random/boot_id").write_text(BOOT + "\n")
-        (self.proc / "cpuinfo").write_text("processor : 91\ncore id : 30\n")
+        (self.proc / "cpuinfo").write_text("processor : 91\ncore id : 40\n")
         (self.proc / "meminfo").write_text("MemFree: 4000000 kB\n")
 
     def process(self, pid, ppid, cwd="/outside", exe="/bin/sh"):

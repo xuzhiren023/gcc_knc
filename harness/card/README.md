@@ -1,13 +1,13 @@
 # Card batches (lead only)
 
-The interactive lead runs every card job, under the shared card rules: cores 30-59, at most 7 GB,
+The interactive lead runs every card job, under the shared card rules: cores 40-59 (from 2026-11-04; 30-59 before), at most 7 GB,
 the shared ledger, and `claude-` names. These scripts are the lead's batch harness, not engineer
 tooling.
 
 - `build_suite.py OUTDIR [gcc16|donor] [--list FILE]` builds the `gcc.c-torture/execute` programs on
   the laptop and records which contain packed zmm code. Run it only while no `make.exe` is
   rebuilding `cc1`.
-- `run_suite.py PROGDIR OUTDIR` runs them on the card in chunks of 300 at `-j 30`, retrying a
+- `run_suite.py PROGDIR OUTDIR` runs them on the card in chunks of 300 at `-j 20`, retrying a
   chunk refused for infrastructure.
 
 When a ticket that changes generated code merges, run its own card check (the programs are in

@@ -65,7 +65,7 @@ class FakeTransport:
             # A runner helper is owned by cwd, even though its exe is /bin/sh.
             processes += [{"pid": 80, "name": "sh", "exe": "/bin/sh", "cwd": self.run_dir}]
         return {"boot_id": self.boot, "processes": processes, "pinning": True,
-                "cpuinfo": "processor : 91\ncore id : 30\n", "meminfo": "MemFree: 4000000 kB\n"}
+                "cpuinfo": "processor : 91\ncore id : 40\n", "meminfo": "MemFree: 4000000 kB\n"}
 
     def stage(self, run_dir, program, *, timeout):
         self._owned(run_dir, BOOT)

@@ -60,7 +60,7 @@ cost to M2) is marked "not proven, effort estimates overlap" there; read the met
 - Stop: escalate the case to the owner with `pm.py escalate`.
 
 **Rules that still apply.**
-- Run every card job through `tools/card_run` (the suite scripts use it). Use cores 30-59, 7 GB,
+- Run every card job through `tools/card_run` (the suite scripts use it). Use cores 40-59 (owner, 2026-11-04), 7 GB,
   the ledger, `/tmp/claude` and `claude-` names, and record no timing figures. Never use SSH.
 - Never build test programs while `make.exe` runs. GCC builds belong to engineer sessions.
 - A read-only Claude subagent may review each merged GCC change.

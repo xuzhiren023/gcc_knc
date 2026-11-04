@@ -144,10 +144,10 @@ def cpu_binding(cpuinfo):
         fields = {key.strip(): value.strip() for key, value in fields.items()}
         if "processor" in fields and "core id" in fields:
             core = int(fields["core id"])
-            if 30 <= core <= 59:
+            if 40 <= core <= 59:  # Owner, 2026-11-04: ours are 40-59; GPT has 0-39.
                 mapping[int(fields["processor"])] = core
     if not mapping:
-        raise Refused("no CPUs mapped to physical cores 30-59")
+        raise Refused("no CPUs mapped to physical cores 40-59")
     return mapping
 
 

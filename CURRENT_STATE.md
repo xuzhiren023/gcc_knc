@@ -140,7 +140,7 @@ Last updated: 2026-11-04 05:40, Sprint 3. Merged: S3-01 to S3-08, S3-10 to S3-21
 ## Card
 
 Approved by the owner on 2026-11-01. Since 2026-11-03 the card is shared with the other project's
-agent (`gpt61`), and neither needs it exclusively. Rules: cores 30-59, at most 7 GB, a start and a
+agent (`gpt61`), and neither needs it exclusively. Rules: cores 40-59 (owner, 2026-11-04; was 30-59; GPT has 0-39; core 60 is the OS's), at most 7 GB, a start and a
 finish line per job in `C:/Users/xuzhi/Documents/card-coordination/jobs.jsonl`, files under
 `/tmp/claude/`, `claude-` names, no card-global changes, no timing figures. Only the interactive
 lead runs card jobs, always through `tools/card_run`; batches use `harness/card/` (see its README).

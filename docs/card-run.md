@@ -54,11 +54,11 @@ group. PASS/FAIL/TIMEOUT lines and saved diagnostics stay in list order even
 when programs finish out of order. Each child's output is buffered separately
 until its result can be emitted. Crashes and nonzero exits report FAIL.
 
-Choose N up to 30 to use the job's 30 physical cores, or lower it when programs
+Choose N up to 20 to use the job's 20 physical cores (30 before 2026-11-04), or lower it when programs
 need more memory. Set the job configuration's `memoryMB` to at least N times M,
-where M is the per-program address-space limit in MiB. For example, N=30 and
-M=128 require `memoryMB: 3840`; stage the list and all its executables as usual,
-then pass `-j 30 --limit-mb 128 LIST` after the driver executable in the
+where M is the per-program address-space limit in MiB. For example, N=20 and
+M=128 require `memoryMB: 2560`; stage the list and all its executables as usual,
+then pass `-j 20 --limit-mb 128 LIST` after the driver executable in the
 `tools/card_run` command. The existing 7168 MiB admission ceiling and free-memory
 reserve still apply. Driver overhead and staged files also need free card RAM.
 
@@ -67,7 +67,7 @@ The driver reads the job budget from the inherited `RLIMIT_AS` set by
 sets each child's own `RLIMIT_AS` to M. No CPU affinity is changed. Without
 `--limit-mb`, parallel runs divide the inherited budget equally among N
 children; serial runs retain their existing inherited limits. Thus
-`-j 30 LIST` with `memoryMB: 3840` also gives each program 128 MiB.
+`-j 20 LIST` with `memoryMB: 2560` also gives each program 128 MiB.
 An unlimited inherited budget refuses parallel execution because it
 cannot establish the declared reservation. Job timeout cleanup still applies
 to all children; driver TERM/HUP/INT also kills and reaps active test groups.
@@ -96,7 +96,8 @@ after S2-17, with later batches using the full execute suite.
   not take them. Create atomically, refuse on existing/stale locks, and remove
   only locks this invocation created. No external/shared-card lock is taken.
 - Parse the card's `/proc/cpuinfo` processor/core pairs. Select only logical
-  CPUs belonging to physical cores 30 through 59; never core 60. Pass that
+  CPUs belonging to physical cores 40 through 59 (owner, 2026-11-04; 30 through
+  59 before, and GPT now has 0 through 39); never core 60. Pass that
   mapping through the run, including admission waits and cleanup reconnects.
   Read cpuinfo once, using one `awk` pass to emit only processor/core fields
   and block separators; subsequent snapshots skip cpuinfo. Pass the
