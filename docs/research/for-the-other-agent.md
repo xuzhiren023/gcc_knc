@@ -66,3 +66,8 @@ passes on what they choose. Each item says how it was shown. Newest first.
    and the variable no longer matches one defined by MPSS-built code or system libraries. Check
    `HAVE_AS_TLS` in `gcc/auto-host.h`. With native TLS, `__thread` shared between new code, MPSS
    GCC 5.1.1 objects and an MPSS-built `.so` works on the card from 4 threads (2026-11-04).
+8. **A release-checking GCC hides an ICE that follows an earlier error.** With `CHECKING_P=0`,
+   an assertion after an `error ()` prints "confused by earlier errors, bailing out" instead of
+   "internal compiler error". A test that expects a clean rejection must fail on that text too.
+   Our `va_arg` rejection hid a broken expansion this way until a trunk (checking) build showed
+   it (S3-25, 2026-11-04).

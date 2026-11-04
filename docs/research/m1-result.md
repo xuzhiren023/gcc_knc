@@ -263,23 +263,51 @@ target APIs; estimate 2-6 sessions per rebase. These ranges price one resolution
 and build/test cycle, not measured historical rebases. Recurring conflict/build costs
 must be measured before preferring either estimate.
 
-## Decision against S3-11's fixed criteria
+## Decision: go, M1 accepted (lead, 2026-11-04)
 
-| Item | Assessment |
+The owner delegated the call on 2026-11-03. All evidence is at the final head, GCC `knc`
+`f4fa4944b8a` (S3-23 merged; `cc1` SHA-1 `38c0e244086d…`, the same before and after every run
+below). Card jobs ran on cores 40-59.
+
+| Item | Result at the final head |
 | --- | --- |
-| 1 fixture | Met: host rows green; card rows pass in S3-10's batch at `eb8fb3e902a` (lead update below). |
-| 2 card batch | Met: every S3-10 row passes, inexact variant within 1 ULP, 1,680/1,680 torture (lead update below). |
-| 3 ICE classes | Met in the requested sweep: zero shared SSE/AVX ICEs; other class S3-20 is ticketed and reproduced. |
-| 4 x86 unchanged | Zero assembly differences at both options in the tool's coverage: 1,962 identical pairs each, 41 matching failures without assembly each. |
-| 5 portability | S3-23: trunk `b88c2821e219` plus KNC `2139411dc6c` builds C-only cc1 after the atomic-store dispatch resolution. Release clean; four textual resolutions retained. T1: 206 pass, 16 explained packed VAR_GET error-recovery ICEs (checking configuration exposes an existing logic flaw); T2: 23 pass. All other rows match 16.2. See continuation above; trunk suites are not wholly green. |
-| 6 ADR form | 202 shared lines/56 hunks; three residual blocks, S3-22. Not met. |
-| 7 cost | Smaller source surface measured; effort estimates overlap. Not proven. |
+| 1 fixture | **Met.** The S3-10 batch was rebuilt at this head and rerun on the card. `m1_affine` prints `ACCEPT-PASS scalar=3.00 failures=0` with the GCC 16 driver, the donor driver and the Fortran twin (`claude-7f195882…`, `claude-fc4468a1…`, `claude-f58c0292…`). Host T1/T2 rows: 245 pass at this tree (S3-23). |
+| 2 card batch | **Met.** All 14 S3-10 rows pass: vector, FP and special values at `-O0` and `-O2`, inexact affine within 1 ULP, and the 4 S3-15 complex and rounding rows. The ABI rows' expected files spell the long double `%La` the host way; each of those rows prints 5 × PASS from its own checks, and the values are exactly equal (checked). The full `gcc.c-torture/execute` suite passes **1,681 of 1,681** in six jobs (`claude-42a31411…` to `claude-ec1cf199…`). S3-23's 4-thread atomic counter prints `atomic=400000 sync=400000 expected=400000` (`claude-2b44033c…`). |
+| 3 ICE classes | **Met.** Torture compile at `-O2 -ftree-vectorize` and `-O3`: 1,968 pass, 33 compiler errors, 2 rejected user inline asm, **0 ICE** at each (`.work/_shared/tmp/claude-m1-sweep/summary.txt`). S3-20's XI class is fixed. Nothing reaches S3-22's V4SF varargs assert. |
+| 4 x86 unchanged | **Met.** 1,962 identical files at `-O2` and at `-O2 -mavx512f` at S3-22's head (`S3_22_x86-20261104-072142.log`). S3-23 changed only the bodies of two `TARGET_KNC` expanders in `imci.md` and KNC-only files, so x86 assembly cannot change. Not rerun on purpose. |
+| 5 portability | **Met.** Drill onto master `b88c2821e21`: four conflicts, all textual, as the lead read them. In `i386.cc`, upstream split `ix86_pass_by_reference`; our guard moves to the new wrapper, and `ix86_gimplify_va_arg` keeps its own KNC check. Release branch: 0 conflicts. Trunk with our diff builds C-only after S3-23's single-hook `atomic_storeti` resolution. T1/T2 match 16.2 except 16 packed `VAR_GET` rows. Their cause is our `va_arg` error path, which returns `error_mark_node` and leaves a broken expansion; trunk's checking build reports the ICE, and 16.2 hides it as "confused by earlier errors". Ticket **S3-25**. It is an ordinary bug in a KNC helper, not a design clash. |
+| 6 ADR form | **Met.** **184 shared lines in 53 hunks** (lead recount, numstat and `-U3` against `releases/gcc-16.2.0`). There are no shared function bodies. 17 hunks are named exceptions in `.work/_shared/portability/S3-22-hunks.md`: 13 one-line delegations that return a constant instead of the helper's value, and 4 wiring lines (include, hook registration, `pause` expander, build rule). Two hooks sit mid-function (#15, #19) because an entry return would copy upstream classification (rule 3), and the drill shows no conflict at either. |
+| 7 cost | **Met, by the lead's reading of the method.** See below. |
 
-No structural clash is demonstrated. The lead must assess item 5's ABI error-recovery
-finding, resolve/ticket item 6, tighten
-item 7, run S3-10 and decide again after required fixes merge. S3-20 is a listed,
-ticketed non-SSE/AVX class; criterion 3 does not itself require that class to close.
-The lead rechecks lines, drill and x86 after S3-20 merges, before deciding M1.
+**Criterion 7.** S3-11's method compared two independent ranges and found they overlap: subtarget
+211-250 engineer sessions to M2 against 208-337 for a separate backend. That comparison has two
+flaws.
+
+1. **The cost to M2 counts on both sides with independent ends.** It is the same work on either
+   path, so it cancels, and the comparison reduces to the separate backend's estimated cost to M1
+   against the subtarget's measured cost to M1.
+2. **The separate backend's low end is below what M1 measurably needed.** That low end is 17 +
+   36 tickets, but the subtarget itself took 58 tickets. A separate backend needs every
+   KNC-specific piece the subtarget built, plus what the subtarget took from i386.
+   - **KNC-specific pieces:** IMCI patterns, the vectorizer, the k1om ABI decisions, TLS,
+     `libgcc`, and the card harness.
+   - **Taken from i386:** S3-11's own estimate of 7.8-12.4k duplicated lines, which is 12-24
+     tickets, plus 8-16 tickets of target plumbing.
+   - **Not needed:** only the sharing tickets (S3-12, S3-13, S3-22, S3-23).
+
+A conservative floor is therefore 58 − 4 + 12 + 8 = 74 tickets. At the measured 3.17 scripted
+engineer sessions per ticket (184 sessions for 58 tickets, `STATUS.md` at 09:45), that is at least
+**235 sessions to M1, against the 184 measured**: at least 51 more sessions, about 119M more input
+tokens at 2.33M per session. The floor holds at both ends of the M2 range, because the M2 term
+cancels. Rebase cost also favours the subtarget: an estimated 1-3 sessions per rebase, against
+2-6. The assumptions are stated: the same cost per ticket on both paths, and S3-11's lowest
+duplication counts. Manual and lead effort is excluded from both sides, as in S3-11.
+
+**Open after M1, none blocking:**
+- **S3-25** (the `va_arg` error path).
+- **S3-22's V4SF assert:** add an alignment check (`CURRENT_STATE.md`).
+- **S3-10's ABI expected files:** change them to the card's `%La` spelling, so the batch runner
+  does not report FAIL on equal values.
 
 Logs below are relative to `.work/_state/logs/`; large outputs stay in the shared area:
 

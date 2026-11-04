@@ -191,3 +191,21 @@ was the same before and after the suite build, so S3-22's build did not overlap.
 **0 ICE**, 11 compile errors (the expected `dg-` options and targets), 1,681 linked. On the card in
 six jobs (`claude-caee0087…` to `claude-a60b2c4c…`, receipts in
 `.work/_state/card/claude-suite-s3-20/`): **1,681 of 1,681 PASS**, `pr85169` included.
+
+## M1 final head (lead, 2026-11-04)
+
+GCC `knc` `f4fa4944b8a` (S3-23 merged; tree identical to the tested `2139411dc6c`). `cc1` SHA-1
+`38c0e244086dfd98b977dfa67cd201e46f82d9c9` before and after every build and run below. These are
+the first runs on cores 40-59 (logical CPUs 161-240) after the owner's allocation change.
+
+- Execute suite: 1,692 sources, **0 ICE**, 11 compile errors, 1,681 linked, 98 with packed zmm.
+  Six jobs (`claude-42a31411…` to `claude-ec1cf199…`, receipts in
+  `.work/_state/card/claude-suite-m1/`): **1,681 of 1,681 PASS**.
+- S3-10 batch, rebuilt into `.work/_shared/tmp/claude-s3-10-m1/` from copies of
+  `tools/{prepare,run}_s3_10.py` with only the output directory changed, because the original
+  directory's files belong to the sandbox user. 14 rows, torture excluded (covered above), all
+  program exit 0. The 10 non-ABI rows match their expected files byte for byte, `m1_affine`
+  three ways included. The 4 ABI rows print 5 × PASS each; their expected files differ only in
+  the host's `%La` spelling of equal long double values (checked exactly), as in S3-10's run.
+- S3-23 atomic counter, relinked with the donor's static `libatomic.a`, lint clean:
+  `atomic=400000 sync=400000 expected=400000` (`claude-2b44033c…`).
