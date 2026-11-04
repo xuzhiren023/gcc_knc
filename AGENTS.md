@@ -36,9 +36,10 @@ Then stop. Your final message is only the `PM update:` line that command prints:
 ## Build cheaply
 
 - A change to any i386 `.md` file regenerates headers that most of `cc1` includes, so the next
-  build takes about 20 minutes. Before it, compile only the files you changed:
-  `make -C .work/_shared/gcc-build/gcc i386-knc.o` (and `i386.o` or `i386-expand.o` if you touched
-  them). That catches C++ errors in a few minutes. Only then run the full build.
+  build takes about 20 minutes. Do not run `make` inside `.work/_shared/gcc-build/gcc` (for
+  example `make ... i386-knc.o`). Without the top-level variables it rewrites `mddeps.mk` empty,
+  and every later `.md` edit is then silently not rebuilt (found by S3-09, 2026-11-04). The full
+  build through `tools/gcc_build.py` is incremental, and it is the only build to run.
 - `i386-knc.h` reaches nearly all of `cc1` through `i386-protos.h`, so one edit there costs a
   near-full rebuild (S3-25: 28 minutes for one prototype). An edit to `i386-knc.cc` alone costs
   about 3 minutes. Make a helper `static` in `i386-knc.cc` when only that file calls it. Add
@@ -53,7 +54,6 @@ Then stop. Your final message is only the `PM update:` line that command prints:
 - Build the shared tree through `python tools/run.py --name <name> -- python tools/gcc_build.py
   --if-stale`, never with a bare `make` there. It skips the build when the tree is clean and
   already built, and its stamp is only right if every full build goes through it (S3-24).
-  Single-object compiles (`make ... i386-knc.o`) are fine.
 - x86, the drill, ICE sweeps and the trunk build run in batch-check tickets, not in each ticket,
   unless your ticket says otherwise (`docs/DEVELOPMENT_CYCLE.md` section 4).
 
