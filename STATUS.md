@@ -2,7 +2,7 @@
 
 Updated automatically at every ticket change. Last update: 2026-11-03 21:08.
 
-**Next: the tech lead, on S3-13.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: GPT-6.1, on S3-13 (Move KNC code out of shared i386 files into i386-knc).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
 Current tickets: `[#################---]` 49 of 57
 
@@ -70,7 +70,7 @@ Current tickets: `[#################---]` 49 of 57
 | S3-10 | Card batch for Sprint 3 and m1_affine | Not started | Also add (1) S3-14's TLS and S3-15's complex and rounding cross-checks, built after both merge (objects bui... |
 | S3-11 | Milestone M1 note: fixture, line counts, ICE classes and backend cost comparison | Not started | Owner approved Sprint 3 on 2026-11-03; ticket set to ready. |
 | S3-12 | tools/portability: forward-port drill and x86_64 unchanged check | Done | tools/portability.py now checks whether the KNC changes still merge onto newer GCC (master has 2 conflicts,... |
-| S3-13 | Move KNC code out of shared i386 files into i386-knc | Question for the tech lead | Lead (interactive): no git process was running; the zero-byte .work/_shared/gcc/.git/index.lock from 20:53 ... |
+| S3-13 | Move KNC code out of shared i386 files into i386-knc | In progress | The stale index.lock is gone and git status on s3/S3-13 is clean apart from your uncommitted i386-knc.cc/.h... |
 | S3-14 | Native TLS for k1om, and every x86_64-only configure case that misses k1om | Not started | Filed under the owner's delegation (engineering defect found while checking the PhiWeather project's lesson... |
 | S3-15 | ABI gaps: packed vectors through varargs and ms_abi, complex values, rounding mode across calls | Not started | Filed under the owner's delegation. Finding 1 was reproduced by the lead; findings 2-4 come from reading co... |
 | S3-16 | Nothing writes to Documents/_shared from the main checkout | Done | Torture and x87 probe outputs now stay in the repository's .work/_shared when run from the main checkout, a... |
@@ -84,18 +84,18 @@ Current tickets: `[#################---]` 49 of 57
 
 - 2026-11-03 21:30 **S3-21** lead note: Filed under the owner's delegation. This is a wrong-code bug in merged S3-05/S3-07, so it goes before S3-13's cleanup if the lane allows. M1 cannot...
 - 2026-11-03 21:10 **S3-20** lead note: Filed under the owner's delegation. It goes into M1's ICE classes (S3-11).
+- 2026-11-03 21:08 **S3-13** lead answer: The stale index.lock is gone and git status on s3/S3-13 is clean apart from your uncommitted i386-knc.cc/.h helpers. Resume as planned: commit the ...
 - 2026-11-03 21:08 **S3-13** owner decide: Lead (interactive): no git process was running; the zero-byte .work/_shared/gcc/.git/index.lock from 20:53 is removed, and git status reads cleanly...
 - 2026-11-03 21:04 **S3-13** lead escalate: Needs the interactive lead, not a decision: S3-13 is stuck on a stale zero-byte .work/_shared/gcc/.git/index.lock left by an interrupted git query ...
 - 2026-11-03 21:03 **S3-13** engineer ask: Can you clear protected _shared/gcc/.git/index.lock and resume S3-13? Required pm.py commit --gcc refuses; no git process remains. Zero-byte lock c...
 - 2026-11-03 20:53 **S3-19** lead approve: A card process that exits mid-snapshot no longer makes card_run refuse the job, and a lint stops the redirect-order bug from coming back. Machine c...
 - 2026-11-03 20:52 **S3-19** engineer submit: Red commit faf355a: Cygwin sh reproduced vanished status open diagnostic and fake job infrastructure failure; T0 redirect lint failed as expected. ...
-- 2026-11-03 20:50 **S3-19** lead note: Filed under the owner's delegation. This is probably also the unexplained `infrastructure-failure` at 01:31:55 UTC that S3-18 was filed for.
 
 ## Cost
 
 - From the script, engineer: 157 sessions, 321.6M input tokens
 - From the script, lead: 156 sessions, 51.4M input tokens
-- Started by hand, Claude: 5 sessions, 478.7M input tokens
+- Started by hand, Claude: 5 sessions, 479.1M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
