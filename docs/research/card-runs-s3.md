@@ -209,3 +209,11 @@ the first runs on cores 40-59 (logical CPUs 161-240) after the owner's allocatio
   the host's `%La` spelling of equal long double values (checked exactly), as in S3-10's run.
 - S3-23 atomic counter, relinked with the donor's static `libatomic.a`, lint clean:
   `atomic=400000 sync=400000 expected=400000` (`claude-2b44033c…`).
+
+## Sprint 4: S4-09 merged (lead, 2026-11-04)
+
+GCC `knc` `04cd3cfc307`, `cc1` SHA-1 `760061600d09…`. `tests/acceptance/s4_masks` passes 1,576,200
+checks at `-O2 -ftree-vectorize` (`claude-5da7c514…`) and `-O3` (`claude-5f80806a…`). The negative
+control fails (`claude-7d93916c…`), and the guard control faults on the guard page
+(`claude-cde346e2…`). The execute suite: 1,681 linked, 0 ICE, **1,681 of 1,681 PASS** in six jobs
+(`claude-aeb81556…` to `claude-26812bbb…`).
