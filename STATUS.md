@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-04 04:04.
+Updated automatically at every ticket change. Last update: 2026-11-04 04:05.
 
-**Next: GPT-6.1, on S3-22 (The last three KNC blocks in shared i386 code become hooks (ADR-0006 rules 1-4)).** Run `python tools/dispatch.py`, or ask the tech lead to.
+**Next: the tech lead, on S3-22.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[##################--]` 56 of 59
 
@@ -79,11 +79,12 @@ Current tickets: `[##################--]` 56 of 59
 | S3-19 | card_run's snapshot silences the status redirect before it can fail | Done | A card process that exits mid-snapshot no longer makes card_run refuse the job, and a lint stops the redire... |
 | S3-20 | 64-byte XImode memory-to-memory copy ICEs (gcc.c-torture/execute/pr85169.c) | Done | A 64-byte char-vector (XImode) memory-to-memory copy, as in pr85169.c, now compiles at -O0, -O1 and -O2 thr... |
 | S3-21 | Unaligned packed accesses need element alignment; byte-aligned ones must not use load/store pairs | Done | Byte-aligned vector copies (like pr65369) no longer use the KNC load/store pair instructions that need elem... |
-| S3-22 | The last three KNC blocks in shared i386 code become hooks (ADR-0006 rules 1-4) | In progress | Created by the lead from S3-11's audit, as S3-11's 01:18 answer said. |
+| S3-22 | The last three KNC blocks in shared i386 code become hooks (ADR-0006 rules 1-4) | Question for the tech lead | Preflight blocker: this ticket explicitly says no new tests and no red step, but tools/pm.py submit_problem... |
 | S3-23 | KNC's atomic_storeti survives upstream's new one; trunk builds C-only and runs T1 and T2 | Not started | Created by the lead from S3-11's trunk finding, as S3-11's 03:40 |
 
 ## Recent activity
 
+- 2026-11-04 04:05 **S3-22** engineer ask: Preflight blocker: this ticket explicitly says no new tests and no red step, but tools/pm.py submit_problems unconditionally adds a hard error for ...
 - 2026-11-04 04:03 **S3-20** lead approve: A 64-byte char-vector (XImode) memory-to-memory copy, as in pr85169.c, now compiles at -O0, -O1 and -O2 through a register instead of crashing the ...
 - 2026-11-04 04:01 **S3-20** engineer submit: Red d3640ed reproduced O0/O1/O2 ICE; all now compile/assemble/lint PASS. GCC: 4bd9010e31f hook, 086fe1c3cc7 XI register transport. Object/full buil...
 - 2026-11-04 03:50 **S3-23** lead note: Created by the lead from S3-11's trunk finding, as S3-11's 03:40
@@ -91,13 +92,12 @@ Current tickets: `[##################--]` 56 of 59
 - 2026-11-04 03:41 **S3-11** engineer submit: 87cefad: atomic_storeti classified as logic conflict with upstream sync.md; follow-up ticket pending, item 5 not met. No third trunk attempt. Exist...
 - 2026-11-04 03:40 **S3-11** lead answer: Yes, and the interactive lead tickets it, so do not wait for it. Treat atomic_storeti as a forward-port finding: upstream master has added its own ...
 - 2026-11-04 03:39 **S3-11** engineer ask: 02a0135: x86 PASS both options: 1962 identical, 0 differences, 41 matching failures each. Trunk failed twice: build-host libcpp prerequisite (fixed...
-- 2026-11-04 03:15 **S3-22** lead note: Created by the lead from S3-11's audit, as S3-11's 01:18 answer said.
 
 ## Cost
 
 - From the script, engineer: 178 sessions, 380.4M input tokens
 - From the script, lead: 176 sessions, 57.1M input tokens
-- Started by hand, Claude: 7 sessions, 527.6M input tokens
+- Started by hand, Claude: 7 sessions, 528.2M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
