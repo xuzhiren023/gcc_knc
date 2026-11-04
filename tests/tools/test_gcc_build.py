@@ -48,7 +48,9 @@ class BuildReuseTest(unittest.TestCase):
             'if tool == "configure": pathlib.Path("config.status").touch()\n'
             'if tool == "make":\n'
             '    pathlib.Path("gcc").mkdir(exist_ok=True)\n'
-            '    pathlib.Path("gcc/cc1.exe").touch()\n')
+            '    pathlib.Path("gcc/cc1.exe").touch()\n'
+            '    if not pathlib.Path("bad-mddeps").exists():\n'
+            '        pathlib.Path("gcc/mddeps.mk").write_text(' + repr(HEALTHY) + ')\n')
 
     def git(self, *args):
         return subprocess.check_output(['git', '-C', str(self.repo), *args],
