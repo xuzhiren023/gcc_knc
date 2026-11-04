@@ -14,7 +14,8 @@ and `ledger`; `memoryMB` defaults to 128, `timeout` to 60 seconds and
 positive integer. It caps the total bytes staged: program, extra files, static
 helper and watchdog script. Validation and size refusal happen before connection
 or admission, since the card's filesystem uses RAM. `pinHelper` defaults to the main checkout's
-`.work/_shared/claude-pin.mic` (a donor-built static executable). Limits must be finite and positive; memory
+`.work/_shared/claude-pin.mic` (a donor-built static executable), and `unpackHelper`
+to `.work/_shared/claude-unpack.mic`. Limits must be finite and positive; memory
 must be an integer from 1 through 7168 MB.
 
 SSH uses the configured identity, strict known-host checking, batch mode,
@@ -28,7 +29,7 @@ verification and guarded cleanup; a second connection failure stops recovery.
 No reboot, MPSS, module, sysctl, huge-page or `/etc` changes are made.
 
 Options before PROGRAM are `--config`, `--lock`, `--timeout`,
-`--transport-timeout`, repeatable `--file PATH`, and `--receipt` (the existing spelling for the single
+`--transport-timeout`, repeatable `--file PATH`, `--file-list LIST`, and `--receipt` (the existing spelling for the single
 runtime result). `--external-lock` and `--baseline-name` remain parseable for
 compatibility. External lock settings are ignored; baseline names only filter
 which foreign processes are reported, never whether work may run.
@@ -45,6 +46,22 @@ The driver's children inherit both core pinning and the job's per-process
 address-space limit through `claude-pin`, so these settings apply to every
 program the driver starts. The limit is not aggregate memory for the batch.
 Host files the lead must read are never 0700: prepare card programs as 0755 and data files as 0644.
+
+### One upload per job (S4-12)
+
+`--file-list LIST` names one repo-relative path per line (CRLF and blank lines
+ignored), added after any `--file`. With it, the job opens two upload
+connections whatever the file count: the static `claude-unpack` helper
+(`tools/claude-unpack.c`), then one stream holding `claude-program`, `claude-pin`,
+`claude-watchdog.sh` and every listed file. There is no per-file chmod. The
+stream is `claude-pack 1\n`, then per file `<600|700> <size> <name>\n` and the
+bytes, then `end <count>\n`. The helper runs in the guarded job directory with
+the exact stream length as its argument. It refuses the `staging_name` cases,
+`claude-unpack`, `claude-pinned`, `stdout`, `stderr` and `status`; creates with
+`O_EXCL|O_NOFOLLOW`, so duplicates and planted links fail; requires 700 for ELF
+data and 600 otherwise; and on a short, long or malformed stream removes every
+file it created and exits nonzero. Host checks (names, duplicates, size with
+both helpers counted against `maxStageMiB`) still run before admission.
 
 ### Parallel torture batches (S2-18)
 
@@ -226,6 +243,7 @@ Cygwin shell in this worktree, the donor build commands inside the wrapper are:
 
 ```sh
 k1om-mpss-linux-gcc -O2 -static --sysroot=../_shared/toolchain/sysroot -L/cygdrive/c/Users/xuzhi/Documents/PhiWeather/.tools/knc-bootstrap/sysroot/usr/lib64 tools/claude-pin.c -o ../_shared/claude-pin.mic
+k1om-mpss-linux-gcc -O2 -Wall -Wextra -Werror -static --sysroot=../_shared/toolchain/sysroot -L/cygdrive/c/Users/xuzhi/Documents/PhiWeather/.tools/knc-bootstrap/sysroot/usr/lib64 tools/claude-unpack.c -o ../_shared/claude-unpack.mic
 k1om-mpss-linux-gcc -O2 --sysroot=../_shared/toolchain/sysroot tests/tools/card_hello.c -o ../_shared/claude-hello.mic
 ```
 

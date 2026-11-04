@@ -182,7 +182,8 @@ class PackedStage(PackFixture):
         actual_popen = subprocess.Popen
 
         def popen(command, **kwargs):
-            self.assertEqual(command[0], "fake-ssh")
+            if command[0] != "fake-ssh":  # The local rpc shell, not a card connection.
+                return actual_popen(command, **kwargs)
             uploads.append(command[-1])
             kwargs["cwd"] = directory
             return actual_popen([shutil.which("sh"), "-c", translate(shlex.split(command[-1])[-1])],

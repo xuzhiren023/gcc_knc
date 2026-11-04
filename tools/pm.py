@@ -417,7 +417,8 @@ def machine_check(worktree):
     checks = []
     if os.path.exists(os.path.join(worktree, "tools", "check")):
         checks.append(("tools/check t0", [sys.executable, os.path.join("tools", "check"), "t0"], None))
-    card_paths = ("tools/card_run", "tools/card_run_remote.sh", "tools/claude-pin.c")
+    card_paths = ("tools/card_run", "tools/card_run_remote.sh", "tools/claude-pin.c",
+                  "tools/claude-unpack.c")
     if run_git("diff", "--name-only", "main...HEAD", "--", *card_paths, cwd=worktree):
         env = os.environ.copy()
         python = sys.executable

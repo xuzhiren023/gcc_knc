@@ -20,6 +20,7 @@ import uuid
 ROOT = Path(__file__).resolve().parent.parent
 RUN_DIR = re.compile(r"/tmp/claude/claude-[0-9a-f]{32}\Z")
 REFUSED_EXIT, TIMEOUT_EXIT, INFRA_EXIT = 125, 124, 126
+PACK_MAGIC = b"claude-pack 1\n"
 STAGING_RESERVED = {"claude-program", "claude-pin", "claude-watchdog.sh",
                     "claude-pinned", "stdout", "stderr", "status"}
 
@@ -45,12 +46,14 @@ def watchdog_bytes():
             'sleep "$3" || exit 95\ncleanup\n').encode("utf8")
 
 
-def check_staging(program, files, max_stage_mib, overhead):
+def check_staging(program, files, max_stage_mib, overhead, packed=False):
     if not isinstance(max_stage_mib, int) or isinstance(max_stage_mib, bool) or max_stage_mib <= 0:
         raise Refused("maxStageMiB must be a positive integer")
-    names = set(STAGING_RESERVED)
+    names = set(STAGING_RESERVED) | ({"claude-unpack"} if packed else set())
     for path in files:
         name = staging_name(path.name)
+        if packed and "\n" in name:
+            raise Refused("pack entry names cannot contain a newline: %r" % name)
         if name in names:
             raise Refused("duplicate or reserved staging filename: " + name)
         names.add(name)
@@ -61,6 +64,16 @@ def check_staging(program, files, max_stage_mib, overhead):
         total += path.stat().st_size
     if total > max_stage_mib * 1024 * 1024:
         raise Refused("total staged size exceeds maxStageMiB (%s)" % max_stage_mib)
+
+
+def pack_stream(entries):
+    """One stream for tools/claude-unpack.c: per file "<600|700> <size> <name>\\n", then its bytes."""
+    parts = [PACK_MAGIC]
+    for name, data in entries:
+        mode = b"700" if data.startswith(b"\x7fELF") else b"600"
+        parts += [mode, b" %d " % len(data), staging_name(name).encode("utf8"), b"\n", data]
+    parts.append(b"end %d\n" % len(entries))
+    return b"".join(parts)
 
 
 def inside(path, directory):
@@ -153,7 +166,7 @@ def cpu_binding(cpuinfo):
 
 def run(program, argv, *, lock_path, external_locks, baseline_names, timeout,
         transport_timeout, receipt_path, transport, ledger_path, memory_mb=128,
-        monotonic=time.monotonic, files=(), max_stage_mib=64):
+        monotonic=time.monotonic, files=(), max_stage_mib=64, packed=False):
     result = dict(result_class="infrastructure", exit_code=INFRA_EXIT,
                   program_exit_code=None, boot_id_before=None, boot_id_after=None,
                   card_minutes=0.0, detail="", foreign_processes=[], overlapping_jobs=[],
@@ -202,8 +215,9 @@ def run(program, argv, *, lock_path, external_locks, baseline_names, timeout,
         if not isinstance(memory_mb, int) or not 0 < memory_mb <= 7 * 1024:
             raise Refused("memory limit must be 1..7168 MB (shared 7 GB budget)")
         files = [Path(path) for path in files]
+        overhead = getattr(transport, "stage_overhead", lambda **kwargs: 0)
         check_staging(program, files, max_stage_mib,
-                      getattr(transport, "stage_overhead", lambda: 0)())
+                      overhead(packed=True) if packed else overhead(), packed)
         read_ledger(ledger_path)  # Required before any connection/job.
         lock_path = Path(lock_path).absolute()
         if lock_path.resolve() != default_lock(ROOT):
@@ -256,7 +270,7 @@ def run(program, argv, *, lock_path, external_locks, baseline_names, timeout,
         recorded = True
         result["cpus"] = sorted(mapping)
         session.stage(run_dir, program, timeout=transport_timeout,
-                      **({"files": files} if files else {}))
+                      **({"files": files} if files else {}), **({"packed": True} if packed else {}))
         snapshot()
         started = monotonic()
         execution_started = True
@@ -374,9 +388,12 @@ class SSHTransport:
         self.config = config
         self.transport_timeout = transport_timeout
 
-    def stage_overhead(self):
-        helper = Path(self.config.get("pinHelper", str(main_root(ROOT) / ".work/_shared/claude-pin.mic")))
-        return helper.stat().st_size + len(watchdog_bytes())
+    def helper(self, key, name):
+        return Path(self.config.get(key, str(main_root(ROOT) / ".work/_shared" / name)))
+
+    def stage_overhead(self, packed=False):
+        unpack = self.helper("unpackHelper", "claude-unpack.mic").stat().st_size if packed else 0
+        return self.helper("pinHelper", "claude-pin.mic").stat().st_size + len(watchdog_bytes()) + unpack
 
     def connect(self, run_dir, *, timeout):
         if not RUN_DIR.fullmatch(run_dir):
@@ -400,7 +417,8 @@ class SSHTransport:
             session.rpc("umask 077\nrun_dir=%s\n"
                         "printf claude-control > /proc/self/comm" %
                         shlex.quote(run_dir), timeout, step="initialize-control")
-            session.pin_helper = Path(c.get("pinHelper", str(main_root(ROOT) / ".work/_shared/claude-pin.mic")))
+            session.pin_helper = self.helper("pinHelper", "claude-pin.mic")
+            session.unpack_helper = self.helper("unpackHelper", "claude-unpack.mic")
             if not session.pin_helper.is_file():
                 raise OSError("static donor helper missing: %s; see docs/card-run.md" % session.pin_helper)
             session.rpc((ROOT / "tools/card_run_remote.sh").read_text(encoding="utf8"), timeout,
@@ -530,11 +548,24 @@ class SSHSession:
                     cpuinfo="\n".join(cpuinfo),
                     meminfo="\n".join(meminfo))
 
-    def stage(self, run_dir, program, *, timeout, files=()):
+    def stage(self, run_dir, program, *, timeout, files=(), packed=False):
         self.validate(run_dir)
         self.rpc("boot_id=%s\ncheck_boot && mkdir -p /tmp/claude && "
                  "mkdir -- \"$run_dir\" && cd -- \"$run_dir\" && guard_dir" %
                  shlex.quote(self.boot_id), timeout, step="stage-create")
+        if packed:
+            # S4-12: the helper's own upload, then every other file in one
+            # stream, instead of one connection and one chmod per file.
+            self.send_file("claude-unpack", self.unpack_helper.read_bytes(), timeout)
+            self.rpc("guard_boot && chmod 700 claude-unpack", timeout, step="stage-chmod")
+            stream = pack_stream([("claude-program", Path(program).read_bytes()),
+                                  ("claude-pin", self.pin_helper.read_bytes()),
+                                  ("claude-watchdog.sh", watchdog_bytes())] +
+                                 [(Path(path).name, Path(path).read_bytes()) for path in files])
+            self.upload("upload-pack", "./claude-unpack %d" % len(stream), stream, timeout)
+            self.rpc("guard_boot && chmod 700 claude-program claude-pin", timeout,
+                     step="stage-chmod")
+            return
         self.send_file("claude-program", Path(program).read_bytes(), timeout)
         self.send_file("claude-pin", self.pin_helper.read_bytes(), timeout)
         # A separate shell has its own $$, so stop_owned spares the watchdog
@@ -554,13 +585,15 @@ class SSHSession:
                  step="stage-chmod")
 
     def send_file(self, name, data, timeout):
-        staging_name(name)
+        self.upload("upload-" + name, "cat > " + shlex.quote(staging_name(name)), data, timeout)
+
+    def upload(self, step, command, data, timeout):
         # A separate, finite SSH stdin carries raw bytes, never shell syntax.
         script = ((ROOT / "tools/card_run_remote.sh").read_text(encoding="utf8") +
                   "\numask 077\nrun_dir=%s\nboot_id=%s\n"
                   "printf claude-upload > /proc/self/comm\n"
-                  "cd -- \"$run_dir\" && guard_boot && cat > %s\n" %
-                  (shlex.quote(self.run_dir), shlex.quote(self.boot_id), shlex.quote(name)))
+                  "cd -- \"$run_dir\" && guard_boot && %s\n" %
+                  (shlex.quote(self.run_dir), shlex.quote(self.boot_id), command))
         child = subprocess.Popen(self.command[:-1] + ["sh -c " + shlex.quote(script)],
                                  stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         try:
@@ -568,12 +601,12 @@ class SSHSession:
         except subprocess.TimeoutExpired:
             child.kill()
             _, errors = child.communicate()
-            raise TransportError("upload-%s: SSH upload deadline; %s" %
-                                 (name, errors.decode("utf8", "replace")[-1000:]))
+            raise TransportError("%s: SSH upload deadline; %s" %
+                                 (step, errors.decode("utf8", "replace")[-1000:]))
         if child.returncode:
             error_type = TransportError if child.returncode == 255 else OSError
-            raise error_type("upload-%s: SSH upload failed (status %s): %s" %
-                             (name, child.returncode, errors.decode("utf8", "replace")[-1000:]))
+            raise error_type("%s: SSH upload failed (status %s): %s" %
+                             (step, child.returncode, errors.decode("utf8", "replace")[-1000:]))
 
     def read_output(self, name, offset, timeout):
         if name not in ("stdout", "stderr") or not isinstance(offset, int) or offset < 0:
@@ -710,10 +743,16 @@ def main():
     parser.add_argument("--transport-timeout", type=float)
     parser.add_argument("--receipt", type=Path, default=ROOT / "tests/out/card-result.json")
     parser.add_argument("--file", action="append", type=Path, default=[])
+    parser.add_argument("--file-list", type=Path,
+                        help="one repo-relative path per line; stages everything in one pack upload")
     parser.add_argument("program", type=Path)
     parser.add_argument("args", nargs=argparse.REMAINDER)
     args = parser.parse_args()
     try:
+        files = list(args.file)
+        if args.file_list is not None:
+            lines = args.file_list.read_text(encoding="utf8").split("\n")
+            files += [ROOT / line.rstrip("\r") for line in lines if line.rstrip("\r")]
         config = json.loads(args.config.read_text(encoding="utf8"))
         for key in ("host", "identity", "knownHosts", "ledger"):
             if not isinstance(config[key], str) or not config[key]:
@@ -727,7 +766,8 @@ def main():
                      baseline_names=set(config.get("baselineNames", [])) | set(args.baseline_name),
                      timeout=timeout, transport_timeout=transport_timeout, receipt_path=args.receipt,
                      ledger_path=Path(config["ledger"]), memory_mb=config.get("memoryMB", 128),
-                     files=args.file, max_stage_mib=config.get("maxStageMiB", 64),
+                     files=files, max_stage_mib=config.get("maxStageMiB", 64),
+                     packed=args.file_list is not None,
                      transport=SSHTransport(config, transport_timeout))
         print(json.dumps(result, sort_keys=True))
         return result["exit_code"]
