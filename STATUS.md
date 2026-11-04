@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-04 12:06.
+Updated automatically at every ticket change. Last update: 2026-11-04 12:14.
 
-**Next: GPT-6.1, on S4-10 (pm.py approve merges a GCC ticket without rewriting files in the shared checkout).** Run `python tools/dispatch.py`, or ask the tech lead to.
+**Next: the tech lead, on S4-10.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[#################---]` 62 of 71
 
@@ -92,10 +92,11 @@ Current tickets: `[#################---]` 62 of 71
 | S4-07 | Final Sprint 4 batch check at the sprint head | draft |  |
 | S4-08 | Small fixes from M1: the varargs V4SF assert checks alignment; S3-10 ABI expected files | draft |  |
 | S4-09 | LRA folds a misaligned vector load into vaddps/vsubps/vmulps ("m" constraint), which faults on the card | Done | Vectorized float and double add, sub and mul no longer fold a misaligned array load into the instruction, w... |
-| S4-10 | pm.py approve merges a GCC ticket without rewriting files in the shared checkout | In progress |  |
+| S4-10 | pm.py approve merges a GCC ticket without rewriting files in the shared checkout | Waiting for review | Red: new ancestor test failed on mtime (log S4_10_tests-20261104-120806). Fix: commit-tree + update-ref, th... |
 
 ## Recent activity
 
+- 2026-11-04 12:14 **S4-10** engineer submit: Red: new ancestor test failed on mtime (log S4_10_tests-20261104-120806). Fix: commit-tree + update-ref, then checkout knc; non-ancestor keeps merg...
 - 2026-11-04 12:03 **S4-09** lead approve: Vectorized float and double add, sub and mul no longer fold a misaligned array load into the instruction, which used to crash on the card; aligned ...
 - 2026-11-04 12:01 **S4-09** engineer submit: imci.md: *knc_<op><mode>3 op2 YJm->YJBm, *knc_packed_move m->Bm (both sides). Unchanged: FMA forms (YJ only), unaligned load/store (MEM-only, never...
 - 2026-11-04 11:06 **S3-25** lead approve: Rejecting va_arg of an unsupported KNC vector type now ends with its error message and no hidden compiler crash, and the ABI checks fail on any 'co...
@@ -103,16 +104,15 @@ Current tickets: `[#################---]` 62 of 71
 - 2026-11-04 10:53 **S3-25** owner decide: Over budget (12.3M of 2M); fix committed and built. A Claude subagent finishes the green checks and the submit; no more GPT sessions.
 - 2026-11-04 10:50 **S3-25** lead escalate: budget: 12334184 input tokens used; the budget is 2000000
 - 2026-11-04 10:50 **S3-25** lead answer: Yes, continue in a new run, limited to the remaining steps: wait for the running build to finish (do not start another make), then run the green t0...
-- 2026-11-04 10:49 **S3-25** engineer ask: 60-call hook blocks further work. Authorize continuation for green checks? Red 4f8069e: full t0/t1/t2 has only the 16 expected VAR_GET failures. GC...
 
 ## Cost
 
 - From the script, engineer: 186 sessions, 441.0M input tokens
 - From the script, lead: 184 sessions, 58.7M input tokens
-- Started by hand, Claude: 9 sessions, 612.3M input tokens
+- Started by hand, Claude: 9 sessions, 613.2M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 12.9 GiB of 100 GiB. 247 GiB free on the drive.
+The project uses 12.9 GiB of 100 GiB. 246 GiB free on the drive.
