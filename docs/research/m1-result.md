@@ -15,8 +15,8 @@ Every `m1_affine` row in [the acceptance README](../../tests/acceptance/README.m
 | T1 recurrence stays scalar | PASS | Host, log F, off/fast function scans |
 | T1 fast: packed FMA in both affine loops | PASS | Host, log F |
 | T2 machine 181, K1OM loader, compatible symbol versions | PASS, GCC16 and donor drivers | Host, log F |
-| T3 GCC16 driver | Earlier PASS; final S3-10 batch NOT RUN | Card history below |
-| T3 donor driver | Earlier PASS; final S3-10 batch NOT RUN | Card history below |
+| T3 GCC16 driver | PASS, `ACCEPT-PASS scalar=3.00 failures=0` | Card, `claude-c0e96863…` (S3-10 batch) |
+| T3 donor driver | PASS, same line | Card, `claude-8ccb0f64…` (S3-10 batch) |
 
 Fortran also passes host off/fast assembly, lint, vectorization and runtime-free link (F).
 [Card history](card-runs-s3.md) records C off/fast with both drivers at `dd28677d065`, and
@@ -28,6 +28,8 @@ At the original measurement, S3-10's prepared `tmp/S3-10/batch.txt` said **Nativ
 15 rows, including the inexact-input affine check and 1,680 linked execute programs out of 1,692 (11 compile
 errors, one ICE). No `.actual.txt` results were present. The lead owns this batch and
 its IDs; these rows remain pending here as directed in the ticket's 01:18 answer.
+
+**Lead update, 2026-11-04 03:50.** The lead ran S3-10's batch on the card at `eb8fb3e902a` after this note was measured: every row passes, including `m1_affine` with the GCC 16 driver, the donor driver and the Fortran twin, the inexact-input variant within 1 ULP (`S3-INEXACT PASS failures=0`), and 1,680 of 1,680 torture programs. Job IDs are in [card-runs-s3.md](card-runs-s3.md), section "S3-10 batch". Items 1 and 2 are therefore met at that head.
 
 ## Measured: lines and ADR-0006 form
 
@@ -231,12 +233,12 @@ must be measured before preferring either estimate.
 
 | Item | Assessment |
 | --- | --- |
-| 1 fixture | Host green; final S3-10 native rows pending. Not met. |
-| 2 card batch | Final batch/inexact native results absent; earlier results do not substitute. Not met. |
+| 1 fixture | Met: host rows green; card rows pass in S3-10's batch at `eb8fb3e902a` (lead update below). |
+| 2 card batch | Met: every S3-10 row passes, inexact variant within 1 ULP, 1,680/1,680 torture (lead update below). |
 | 3 ICE classes | Met in the requested sweep: zero shared SSE/AVX ICEs; other class S3-20 is ticketed and reproduced. |
 | 4 x86 unchanged | Zero assembly differences at both options in the tool's coverage: 1,962 identical pairs each, 41 matching failures without assembly each. |
-| 5 portability | Not met: atomic_storeti collision with upstream sync.md, ticket pending. Release clean; four textual resolutions; no trunk cc1 or T1/T2. |
-| 6 ADR form | 202 shared lines/56 hunks; residual blocks need relocation/review. Not met. |
+| 5 portability | Not met: atomic_storeti collision with upstream sync.md, S3-23. Release clean; four textual resolutions; no trunk cc1 or T1/T2. |
+| 6 ADR form | 202 shared lines/56 hunks; three residual blocks, S3-22. Not met. |
 | 7 cost | Smaller source surface measured; effort estimates overlap. Not proven. |
 
 No structural clash is demonstrated. The lead must resolve/ticket items 5-6, tighten
