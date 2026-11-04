@@ -106,7 +106,7 @@ Current tickets: `[#################---]` 60 of 70
 
 ## Cost
 
-- From the script, engineer: 185 sessions, 428.6M input tokens
+- From the script, engineer: 186 sessions, 441.0M input tokens
 - From the script, lead: 183 sessions, 58.6M input tokens
 - Started by hand, Claude: 8 sessions, 598.4M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
@@ -114,4 +114,4 @@ Current tickets: `[#################---]` 60 of 70
 
 ## Disk
 
-The project uses 13.0 GiB of 100 GiB. 251 GiB free on the drive.
+The project uses 13.0 GiB of 100 GiB. 252 GiB free on the drive.
