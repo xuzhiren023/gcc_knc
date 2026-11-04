@@ -121,6 +121,10 @@ class SharedCardRules(unittest.TestCase):
         temporary = tempfile.TemporaryDirectory(dir=ROOT)
         self.addCleanup(temporary.cleanup)
         self.directory = Path(temporary.name)
+        self.receipts = self.directory / ".work/_state/card"
+        receipt_patch = mock.patch.dict(self.runner["run"].__globals__, RECEIPT_DIR=self.receipts)
+        receipt_patch.start()
+        self.addCleanup(receipt_patch.stop)
         self.program = self.directory / "hello.mic"
         self.program.write_bytes(b"fake program; never executed")
         self.ledger = self.directory / "jobs.jsonl"
@@ -133,11 +137,13 @@ class SharedCardRules(unittest.TestCase):
         self.transport = SharedTransport()
         self.transport.ledger = self.ledger
 
-    def invoke(self, *, default_root=None, files=()):
+    def invoke(self, *, default_root=None, files=(), receipt=True):
         if default_root is not None:
             self.config["ownLock"] = str(default_root / "card.lock")
         self.config_path.write_text(json.dumps(self.config), encoding="utf8")
-        args = ["card_run", "--receipt", str(self.result_path)]
+        args = ["card_run"]
+        if receipt:
+            args += ["--receipt", str(self.result_path)]
         if default_root is None:
             args += ["--config", str(self.config_path)]
         for path in files:
@@ -161,6 +167,8 @@ class SharedCardRules(unittest.TestCase):
         self.code = code
         if self.result_path.exists():
             return json.loads(self.result_path.read_text(encoding="utf8"))
+        if stdout.getvalue():
+            return json.loads(stdout.getvalue())
         return {}
 
     def events(self, name):
