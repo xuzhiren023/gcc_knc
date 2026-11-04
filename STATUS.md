@@ -1,17 +1,17 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-03 19:29.
+Updated automatically at every ticket change. Last update: 2026-11-03 19:30.
 
-**Next: the tech lead, on S3-16.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: GPT-6.1, on S3-07 (Auto-vectorization on zmm, with x87 peel and remainder; m1_affine T1 and T2 green).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
-Current tickets: `[################----]` 43 of 53
+Current tickets: `[################----]` 44 of 53
 
 ## Milestones
 
 | | Milestone | State | Progress |
 |---|---|---|---|
 | M0 | Foundation | In progress | 17 of 17 tickets |
-| M1 | Mixed native code | In progress | 26 of 35 tickets |
+| M1 | Mixed native code | In progress | 27 of 35 tickets |
 | M2 | Useful vector target | In progress | 0 of 1 tickets |
 | M3 | Runtimes | Not started | Not planned in detail yet |
 | M4 | Broad optimization | Not started | Not planned in detail yet |
@@ -73,25 +73,25 @@ Current tickets: `[################----]` 43 of 53
 | S3-13 | Move KNC code out of shared i386 files into i386-knc | Not started | Created under the owner's direction of 2026-11-03 (ADR-0006). After S3-07, so it moves code that has settle... |
 | S3-14 | Native TLS for k1om, and every x86_64-only configure case that misses k1om | Not started | Filed under the owner's delegation (engineering defect found while checking the PhiWeather project's lesson... |
 | S3-15 | ABI gaps: packed vectors through varargs and ms_abi, complex values, rounding mode across calls | Not started | Filed under the owner's delegation. Finding 1 was reproduced by the lead; findings 2-4 come from reading co... |
-| S3-16 | Nothing writes to Documents/_shared from the main checkout | Waiting for review | Red a411599: fake-main T0 reproduced escaped writes (2 failures, 1 wrong-parent mkdir error); log .work/_st... |
+| S3-16 | Nothing writes to Documents/_shared from the main checkout | Done | Torture and x87 probe outputs now stay in the repository's .work/_shared when run from the main checkout, a... |
 | S3-17 | card_run takes each process's parent from the same status read that admits it | Not started | Filed under the owner's delegation. The card is blocked for our batch jobs while this happens, so it goes f... |
 
 ## Recent activity
 
 - 2026-11-03 19:40 **S3-17** lead note: Filed under the owner's delegation. The card is blocked for our batch jobs while this happens, so it goes first in the tools lane.
 - 2026-11-03 19:40 **S3-07** lead note: From S3-06's review: the vector_init hook in i386-expand.cc is gated only on TARGET_KNC, not on the packed mode, and ix86_knc_expand_duplicate trea...
+- 2026-11-03 19:30 **S3-16** lead approve: Torture and x87 probe outputs now stay in the repository's .work/_shared when run from the main checkout, and nothing is written to Documents/_shar...
 - 2026-11-03 19:30 **S3-16** lead note: Filed under the owner's delegation, after the owner asked for the stray folder to be deleted.
 - 2026-11-03 19:29 **S3-16** engineer submit: Red a411599: fake-main T0 reproduced escaped writes (2 failures, 1 wrong-parent mkdir error); log .work/_state/logs/S3_16_red-20261103-192718.log. ...
 - 2026-11-03 19:25 **S3-06** lead approve: Under -march=knc, 512-bit float and double vectors now compile to packed add, subtract, multiply, fused multiply-add when contraction is on, and br...
 - 2026-11-03 19:25 **S3-06** owner decide: Lead decided under the owner's 2026-11-03 delegation: the merge block was the lead's own untracked tests/acceptance/s3_vec_card/, now committed (93...
 - 2026-11-03 19:22 **S3-06** lead escalate: Review passed and S3-06 is ready to approve, but the merge was refused because the main checkout has an untracked tests/acceptance/s3_vec_card/ dir...
-- 2026-11-03 19:20 **S3-06** engineer submit: Red e9740a2; GCC 256cb415659; tests 618e21d; shared i386 26/35. Full T0 PASS (23+8+4) with PYTHONPATH=tools: .work/_state/logs/s3_06_t0_final-20261...
 
 ## Cost
 
 - From the script, engineer: 143 sessions, 296.8M input tokens
 - From the script, lead: 141 sessions, 47.4M input tokens
-- Started by hand, Claude: 5 sessions, 450.6M input tokens
+- Started by hand, Claude: 5 sessions, 450.9M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
