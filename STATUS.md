@@ -2,7 +2,7 @@
 
 Updated automatically at every ticket change. Last update: 2026-11-03 20:42.
 
-**Next: GPT-6.1, on S3-08 (Fortran twin of m1_affine vectorizes and links).** Run `python tools/dispatch.py`, or ask the tech lead to.
+**Next: the tech lead, on S3-08.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[################----]` 46 of 55
 
@@ -65,7 +65,7 @@ Current tickets: `[################----]` 46 of 55
 | S3-05 | Unaligned packed moves through load and store pairs | Done | Packed copies through pointers of unknown alignment now compile, for all four 512-bit modes, to unmasked lo... |
 | S3-06 | Packed FP add, sub, mul, FMA and broadcasts for V16SF and V8DF | Done | Under -march=knc, 512-bit float and double vectors now compile to packed add, subtract, multiply, fused mul... |
 | S3-07 | Auto-vectorization on zmm, with x87 peel and remainder; m1_affine T1 and T2 green | Done | With -mknc, GCC 16 now auto-vectorizes simple float and double loops at default -O2 into packed zmm multipl... |
-| S3-08 | Fortran twin of m1_affine vectorizes and links | In progress | Owner approved Sprint 3 on 2026-11-03; ticket set to ready. |
+| S3-08 | Fortran twin of m1_affine vectorizes and links | Waiting for review | Red commit 4374b3d: T2 failed for missing driver Fortran call and linked symbol; log .work/_state/logs/S3_0... |
 | S3-09 | Packed integer add, sub, mul, logic and broadcast for V16SI; logic for V8DI | draft | Moved to Sprint 4 by the owner on 2026-11-03, on the lead's recommendation: m1_affine is float and double o... |
 | S3-10 | Card batch for Sprint 3 and m1_affine | Not started | Also add (1) S3-14's TLS and S3-15's complex and rounding cross-checks, built after both merge (objects bui... |
 | S3-11 | Milestone M1 note: fixture, line counts, ICE classes and backend cost comparison | Not started | Owner approved Sprint 3 on 2026-11-03; ticket set to ready. |
@@ -81,19 +81,19 @@ Current tickets: `[################----]` 46 of 55
 ## Recent activity
 
 - 2026-11-03 20:50 **S3-19** lead note: Filed under the owner's delegation. This is probably also the unexplained `infrastructure-failure` at 01:31:55 UTC that S3-18 was filed for.
+- 2026-11-03 20:42 **S3-08** engineer submit: Red commit 4374b3d: T2 failed for missing driver Fortran call and linked symbol; log .work/_state/logs/S3_08_red-20261103-204026.log. tools/run.py ...
 - 2026-11-03 20:41 **S3-18** owner decide: Lead decided under the owner's 2026-11-03 delegation: budget raised to 3 sessions and 4M input tokens (0.9M used) for the one requested change (res...
 - 2026-11-03 20:41 **S3-18** engineer escalate: budget: 2 engineer sessions used; the budget is 2
 - 2026-11-03 20:40 **S3-18** lead changes: 1. tools/card_run:711 drops the --receipt default (tests/out/card-result.json), which the ticket did not ask for, and docs/card-run.md:246 still do...
 - 2026-11-03 20:40 **S3-18** engineer submit: Renamed tests/tools/test_card_receipts.py to tests/tools/test_card_diagnostics.py as approved by lead; commit 15bb861. Prior tools/run.py card suit...
 - 2026-11-03 20:40 **S3-18** lead note: Filed under the owner's delegation.
 - 2026-11-03 20:39 **S3-18** lead answer: Yes, rename it to tests/tools/test_card_diagnostics.py and resubmit; the hook stays as is, so keep 'receipt' out of test file names.
-- 2026-11-03 20:38 **S3-18** engineer ask: Submit refuses receipt-style file added: tests/tools/test_card_receipts.py. This is unittest source for the required red-first fake-card tests, not...
 
 ## Cost
 
 - From the script, engineer: 152 sessions, 313.7M input tokens
 - From the script, lead: 151 sessions, 50.4M input tokens
-- Started by hand, Claude: 5 sessions, 465.8M input tokens
+- Started by hand, Claude: 5 sessions, 466.9M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
