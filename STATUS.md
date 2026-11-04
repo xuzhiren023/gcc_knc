@@ -71,7 +71,7 @@ Current tickets: `[#################---]` 51 of 57
 | S3-11 | Milestone M1 note: fixture, line counts, ICE classes and backend cost comparison | Not started | Owner approved Sprint 3 on 2026-11-03; ticket set to ready. |
 | S3-12 | tools/portability: forward-port drill and x86_64 unchanged check | Done | tools/portability.py now checks whether the KNC changes still merge onto newer GCC (master has 2 conflicts,... |
 | S3-13 | Move KNC code out of shared i386 files into i386-knc | Done | KNC code now lives in i386-knc.cc/.h behind one-line hooks in the shared i386 files (shared diff 324 lines/... |
-| S3-14 | Native TLS for k1om, and every x86_64-only configure case that misses k1om | Changes requested | The TLS fix is right: the gcc/configure.ac TLS and PIE cases, the test and the HAVE_AS_TLS result are good.... |
+| S3-14 | Native TLS for k1om, and every x86_64-only configure case that misses k1om | In progress | The TLS fix is right: the gcc/configure.ac TLS and PIE cases, the test and the HAVE_AS_TLS result are good.... |
 | S3-15 | ABI gaps: packed vectors through varargs and ms_abi, complex values, rounding mode across calls | Not started | Sessions raised from 3 to 4 before start, under the owner's delegation of engineering budgets. S3-07, S3-13... |
 | S3-16 | Nothing writes to Documents/_shared from the main checkout | Done | Torture and x87 probe outputs now stay in the repository's .work/_shared when run from the main checkout, a... |
 | S3-17 | card_run takes each process's parent from the same status read that admits it | Done | card_run no longer refuses jobs when a kernel thread's first status read fails: each process's parent now c... |
@@ -95,7 +95,7 @@ Current tickets: `[#################---]` 51 of 57
 
 - From the script, engineer: 167 sessions, 352.3M input tokens
 - From the script, lead: 167 sessions, 54.5M input tokens
-- Started by hand, Claude: 6 sessions, 501.9M input tokens
+- Started by hand, Claude: 6 sessions, 502.2M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
