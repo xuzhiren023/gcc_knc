@@ -54,7 +54,12 @@ Last updated: 2026-11-03 evening, mid-Sprint 3 (S3-01 to S3-05 and S3-12 merged;
 
 ## Not proven yet
 
-- **No Sprint 3 compiler change has run on the card.** S3-04 and S3-05 are proven on the host only. The card batch (S3-10) waits for S3-06, S3-07, S3-13, S3-14 and S3-15, and must be built after S3-14, because everything built so far uses emulated TLS.
+- **On the card (lead, 2026-11-03 evening, `docs/research/card-runs-s3.md`):**
+  - S3-04 and S3-05's packed copies pass 780 checks at `-O0` and `-O2`, and a broken-alignment control segfaults.
+  - S3-06's packed add, sub, mul, broadcast and fused FMA pass.
+  - The 256-program torture subset rebuilt with the new compiler passes 256 of 256.
+  - Not on the card yet: auto-vectorized loops (S3-07), TLS (S3-14), and complex values and rounding (S3-15).
+- **Rule (owner, 2026-11-03):** card checks run as soon as a code-changing ticket merges, not at sprint end. S3-10 then only adds what is new, built after S3-14 (everything before it uses emulated TLS).
 - **Not yet checked anywhere:** x86_64 assembly unchanged by our shared lines; GCC trunk with our diff building and passing T1 and T2; complex values and the rounding mode across GCC 16/donor calls. All of these are in S3-11 or S3-15.
 - **GCC 16 links with its own static `libgcc`, `crtbegin` and `crtend` since S2-07**, with no donor files, but `-latomic` still resolves to the donor's `libatomic` until our runtimes (E6), and the card has no `libatomic.so`.
 - **GCC 16 has `gfortran` but no Fortran runtime** (S2-09, merged 2026-11-03): the `0002` reproducer compiles at `-O1 -march=knc` with no lost address setups, and the donor still loses its 4. No `libgfortran` until E6, so Fortran programs do not link to run. The full rebuild with Fortran took 3,737 s against 1,392 s for C only (the engineer named a slow `libcody` Git scan); S2-15's rebuild measures whether that lasts.
