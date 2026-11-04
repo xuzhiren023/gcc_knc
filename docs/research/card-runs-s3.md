@@ -106,3 +106,25 @@ One first `-O0` attempt ended `infrastructure-failure` (exit 126). Its reason wa
 `hello` reruns passed; S3-18 keeps receipts so the next one can be diagnosed.
 
 After S3-17 merged (runner fix): `hello` matched, and the same 256 torture programs passed 256 of 256 while a `gpt61` job overlapped.
+
+## Native TLS after S3-14 (2026-11-04 04:30 UTC)
+
+Built with S3-14's branch build (`cc1` from `0235ff44771`, HAVE_AS_TLS defined). S3-14 merged as
+`edf7c69d617`; the merge differs only in the reverted picflag lines, which do not reach `cc1`, so
+these are the merged compiler's results. Sources and build: `tests/acceptance/s3_tls_card/`. Every
+GCC 16 object and library was checked for `__emutls` before linking (none), and all lint clean.
+
+Each of 4 threads writes its own value to `__thread` variables defined by the donor, by GCC 16 and
+in a shared library, then reads them back through the other compiler's code after a barrier; the
+main thread must still see the initial values.
+
+| Variant | Built how | Card job | Result |
+|---|---|---|---|
+| A | main and `tls_new` by GCC 16 `-O2`; `tls_donor` and the `.so` by the donor | `claude-985a0cc8…` | `S3-TLS PASS checks=59 failures=0` |
+| B | as A, GCC 16 at `-O0` | `claude-e8a82b81…` | same |
+| C | main by the donor; `tls_new` and the `.so` (global- and local-dynamic) by GCC 16 `-O2` | `claude-41ac1b6a…` | same |
+| D | as C, GCC 16 at `-O0` | `claude-80f64600…` | same |
+| X | control: plain globals instead of `__thread` | `claude-ebd13244…` | `S3-TLS FAIL checks=59 failures=46`, exit 1, as it must |
+
+This ticks S3-14's native line: donor-defined used from GCC 16, the reverse, and a donor `.so`,
+each from 4 threads. S3-10 need not rebuild it.
