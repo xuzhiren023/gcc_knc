@@ -1,10 +1,10 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-04 17:44.
+Updated automatically at every ticket change. Last update: 2026-11-04 17:46.
 
-**Next: the tech lead, on S4-02.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+Nothing can move right now.
 
-Current tickets: `[##################--]` 66 of 72
+Current tickets: `[##################--]` 67 of 72
 
 ## Milestones
 
@@ -12,7 +12,7 @@ Current tickets: `[##################--]` 66 of 72
 |---|---|---|---|
 | M0 | Foundation | In progress | 17 of 17 tickets |
 | M1 | Mixed native code | Done | 43 of 43 tickets |
-| M2 | Useful vector target | In progress | 6 of 12 tickets |
+| M2 | Useful vector target | In progress | 7 of 12 tickets |
 | M3 | Runtimes | Not started | Not planned in detail yet |
 | M4 | Broad optimization | Not started | Not planned in detail yet |
 | M5 | Program corpus | Not started | Not planned in detail yet |
@@ -84,7 +84,7 @@ Current tickets: `[##################--]` 66 of 72
 | S3-24 | Skip GCC builds that are already current (shared tree and the x86 check's stock tree) | Done | GCC builds are now skipped when nothing changed: tools/gcc_build.py --if-stale skips the shared tree's make... |
 | S3-25 | va_arg of an unsupported KNC type leaves a broken expansion; release builds hide the ICE | Done | Rejecting va_arg of an unsupported KNC vector type now ends with its error message and no hidden compiler c... |
 | S4-01 | Masks on KNC: GCC 16 entry points, IMCI forms, reuse audit and masked-tail design (ADR-0007 input) | Done | The mask design input for Sprint 4 is done: KNC masks are HI for 16-lane and QI for 8-lane vectors, compare... |
-| S4-02 | Vector compares into k masks, mask logic and mask spills for the packed modes | Waiting for review | GCC eab9a5f6dd7 (built). T0 4/4, T1 230/230 (4 new knc-mask files pass), T2 23/23: check_gcc16_t0_t1_t2-202... |
+| S4-02 | Vector compares into k masks, mask logic and mask spills for the packed modes | Done | Float, double and int vector compares now produce KNC k masks and vectorize with blends (?: and select loop... |
 | S4-03 | Blends and if-conversion: conditional loops, ?:, fabs, min and max vectorize with masks | draft |  |
 | S4-04 | V8DI add and sub through the IMCI carry form, so long add loops vectorize | draft |  |
 | S4-05 | Safe masked tails: a masked vector remainder only where every touched line is in the array | draft |  |
@@ -97,6 +97,7 @@ Current tickets: `[##################--]` 66 of 72
 
 ## Recent activity
 
+- 2026-11-04 17:46 **S4-02** lead approve: Float, double and int vector compares now produce KNC k masks and vectorize with blends (?: and select loops), with C's NaN behaviour, while the qu...
 - 2026-11-04 17:44 **S4-02** engineer submit: GCC eab9a5f6dd7 (built). T0 4/4, T1 230/230 (4 new knc-mask files pass), T2 23/23: check_gcc16_t0_t1_t2-20261104-174119.log. Torture O2: 5 of 1962 ...
 - 2026-11-04 15:35 **S4-02** lead approve-red: Red approved: the four T1 files pin each KNC compare predicate into a k register, the operand swap for > and >=, the quiet UNGE staying scalar, and...
 - 2026-11-04 15:31 **S4-02** engineer red: Red f943685: 4 new T1 files (knc-mask-cmp-f32/f64/i32, knc-mask-spill) fail on the current build: the compare loops stay scalar (no vcmpps/vcmppd/v...
@@ -104,13 +105,12 @@ Current tickets: `[##################--]` 66 of 72
 - 2026-11-04 15:23 **S4-11** engineer submit: Red 91d2f31 (3 new tests failed), fix 5a4b6b7. gcc_build.py checks gcc/mddeps.mk for MD_INCLUDES with imci.md and sse.md before skipping and after ...
 - 2026-11-04 15:13 **S3-09** lead approve: 32-bit integer vector add, sub, multiply, and/or/xor and broadcasts now compile to single IMCI instructions, so int loops vectorize on zmm; 64-bit ...
 - 2026-11-04 15:11 **S3-09** engineer submit: Red bf170fb (all 11 ops + add_int fail); GCC ca005dd. Infra: shared build's mddeps.mk was empty (written 12:36, not S3-09), so md edits did not reg...
-- 2026-11-04 13:22 **S4-08** lead approve: The varargs save path now asserts a 16-byte aligned slot and is limited to 64-bit KNC, with generated code unchanged, and the S3-10 batch's ABI row...
 
 ## Cost
 
 - From the script, engineer: 186 sessions, 441.0M input tokens
 - From the script, lead: 184 sessions, 58.7M input tokens
-- Started by hand, Claude: 9 sessions, 676.6M input tokens
+- Started by hand, Claude: 9 sessions, 679.6M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
