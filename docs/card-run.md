@@ -16,7 +16,7 @@ helper and watchdog script. Validation and size refusal happen before connection
 or admission, since the card's filesystem uses RAM. `pinHelper` defaults to the main checkout's
 `.work/_shared/claude-pin.mic` (a donor-built static executable), and `unpackHelper`
 to `.work/_shared/claude-unpack.mic`. Limits must be finite and positive; memory
-must be an integer from 1 through 7168 MB.
+must be an integer from 1 through 10240 MB (`MEMORY_BUDGET_MIB`, owner 2026-11-04).
 
 SSH uses the configured identity, strict known-host checking, batch mode,
 `IdentitiesOnly=yes`, `HostKeyAlgorithms=ssh-ed25519`, no user SSH config,
@@ -73,12 +73,12 @@ until its result can be emitted. Crashes and nonzero exits report FAIL.
 
 Use 3-4 threads per core for jobs whose layout is not fixed (batches, coverage, smoke, inventory):
 N = 60-80 on our 20 physical cores (owner, 2026-11-04). Aim for at least 3 running threads per
-core summed over all our jobs, within the 7 GB limit. Lower N only when programs
+core summed over all our jobs, within our 10240 MiB budget. Lower N only when programs
 need more memory. Set the job configuration's `memoryMB` to at least N times M,
 where M is the per-program address-space limit in MiB. For example, N=80 and
-M=80 require `memoryMB: 6400`; stage the list and all its executables as usual,
-then pass `-j 80 --limit-mb 80 LIST` after the driver executable in the
-`tools/card_run` command. The existing 7168 MiB admission ceiling and free-memory
+M=96 require `memoryMB: 7680`; stage the list and all its executables as usual,
+then pass `-j 80 --limit-mb 96 LIST` after the driver executable in the
+`tools/card_run` command. The 10240 MiB admission ceiling and free-memory
 reserve still apply. Driver overhead and staged files also need free card RAM.
 
 The driver reads the job budget from the inherited `RLIMIT_AS` set by
@@ -132,7 +132,7 @@ after S2-17, with later batches using the full execute suite.
 - Read `MemFree` from `/proc/meminfo` before staging using one `awk` invocation
   per snapshot. Reserve the declared memory against all
   active `agent: "claude"` ledger entries; ended jobs release their reservation.
-  Wait while the total exceeds 7168 MB or the reservation would leave less
+  Wait while the total exceeds 10240 MB or the reservation would leave less
   than 1536 MB of `MemFree`. Re-read both ledger and memory after each wait;
   the configured timeout bounds admission waiting. Expiration refuses without
   staging the executable. Expected-end estimates never expire reservations.
@@ -143,7 +143,7 @@ after S2-17, with later batches using the full execute suite.
   memory for a single process, and includes mappings and reservations as well
   as resident pages. The limit survives fork/exec, but is per process, not an
   aggregate descendant memory controller. Ledger admission bounds the sum of
-  our declared job limits to 7 GiB; multi-process jobs must account for this
+  our declared job limits to 10240 MiB; multi-process jobs must account for this
   per-process limitation. This is the backend explicitly selected by the owner.
 - Stage exclusively in `/tmp/claude/claude-<random-id>/`, with executable
   `claude-program`, control shell name `claude-control`, and watchdog

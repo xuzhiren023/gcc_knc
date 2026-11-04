@@ -20,6 +20,7 @@ import uuid
 ROOT = Path(__file__).resolve().parent.parent
 RUN_DIR = re.compile(r"/tmp/claude/claude-[0-9a-f]{32}\Z")
 REFUSED_EXIT, TIMEOUT_EXIT, INFRA_EXIT = 125, 124, 126
+MEMORY_BUDGET_MIB = 10240  # Owner, 2026-11-04: the other project rarely uses more than 7 GB.
 PACK_MAGIC = b"claude-pack 1\n"
 STAGING_RESERVED = {"claude-program", "claude-pin", "claude-watchdog.sh",
                     "claude-pinned", "stdout", "stderr", "status"}
@@ -212,8 +213,8 @@ def run(program, argv, *, lock_path, external_locks, baseline_names, timeout,
     try:
         if any(not math.isfinite(n) or n <= 0 for n in (timeout, transport_timeout)):
             raise ValueError("limits must be finite and positive")
-        if not isinstance(memory_mb, int) or not 0 < memory_mb <= 7 * 1024:
-            raise Refused("memory limit must be 1..7168 MB (shared 7 GB budget)")
+        if not isinstance(memory_mb, int) or not 0 < memory_mb <= MEMORY_BUDGET_MIB:
+            raise Refused("memory limit must be 1..%d MB (our card budget)" % MEMORY_BUDGET_MIB)
         files = [Path(path) for path in files]
         overhead = getattr(transport, "stage_overhead", lambda **kwargs: 0)
         check_staging(program, files, max_stage_mib,
@@ -253,7 +254,7 @@ def run(program, argv, *, lock_path, external_locks, baseline_names, timeout,
                            if j.get("agent") == "claude")
             free = dict(line.split(":", 1) for line in snap["meminfo"].splitlines() if ":" in line)
             free_kb = int(free["MemFree"].split()[0])
-            if reserved + memory_mb <= 7 * 1024 and free_kb - memory_mb * 1024 >= 1536 * 1024:
+            if reserved + memory_mb <= MEMORY_BUDGET_MIB and free_kb - memory_mb * 1024 >= 1536 * 1024:
                 break
             if monotonic() >= deadline:
                 raise Refused("memory admission wait expired; job was not staged")

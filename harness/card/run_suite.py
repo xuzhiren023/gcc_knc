@@ -2,7 +2,7 @@
 
 Lead harness; only the interactive lead runs card jobs. Each chunk is one card job using S2-18's
 parallel driver (tools/claude-torture.c, built here with the donor) at -j 80 on our cores 40-59
-(4 threads per core, owner 2026-11-04), 80 MiB per program. S4-12: every chunk is staged in one
+(4 threads per core, owner 2026-11-04), 96 MiB per program. S4-12: every chunk is staged in one
 pack upload through --file-list, so a chunk is bounded only by the config's maxStageMiB; the whole
 execute suite normally fits in one job. A chunk refused for infrastructure is retried up to twice.
 Receipts go to OUTDIR/result<N>.json.
@@ -32,9 +32,10 @@ if not driver.exists():
     subprocess.run([(SHARED / "toolchain/cross/bin/k1om-mpss-linux-gcc.exe").as_posix(), "-O2",
                     str(REPO / "tools/claude-torture.c"), "-o", str(driver)], check=True, env=env)
 
-# card_run takes memoryMB only from its config: 80 programs x 80 MiB = 6400 MiB, under 7 GB.
+# card_run takes memoryMB only from its config: 80 programs x 96 MiB = 7680 MiB, within our
+# 10240 MiB budget (owner, 2026-11-04).
 config = json.loads((REPO / "config/card.local.json").read_text(encoding="utf8"))
-config["memoryMB"] = 6400
+config["memoryMB"] = 7680
 cfg = STATE / "card-j80.json"
 cfg.write_text(json.dumps(config, indent=1), encoding="utf8")
 
@@ -66,7 +67,7 @@ for k, chunk in enumerate(chunks):
     for attempt in range(3):
         cmd = [sys.executable, "tools/card_run", "--config", str(cfg), "--timeout", "900",
                "--transport-timeout", "120", "--receipt", str(OUT / ("result%d.json" % k)),
-               "--file-list", str(files), str(driver), "-j", "80", "--limit-mb", "80", lst.name]
+               "--file-list", str(files), str(driver), "-j", "80", "--limit-mb", "96", lst.name]
         done = subprocess.run(cmd, cwd=REPO, stdout=subprocess.PIPE, stderr=subprocess.PIPE, timeout=3600)
         lines = [l for l in done.stdout.decode("utf8", "replace").splitlines()
                  if l.split(" ")[0] in ("PASS", "FAIL", "TIMEOUT")]
