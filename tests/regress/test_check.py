@@ -9,6 +9,7 @@ from unittest.mock import Mock, patch
 from types import SimpleNamespace
 
 ROOT = Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(ROOT / 'tools'))
 spec = importlib.util.spec_from_file_location('knc_check', ROOT / 'tools/check.py')
 check = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(check)
@@ -61,6 +62,11 @@ class Scans(unittest.TestCase):
         self.assertEqual(self.scan(fast, fast=True), [])
         self.assertTrue(self.scan(fast.replace('vfmadd213pd', 'vmulpd'), fast=True))
         self.assertTrue(self.scan(fast))
+
+    def test_scalar_tails(self):
+        self.assertTrue(self.scan(self.asm.replace('fmuls (%rsi)', 'nop')))
+        self.assertTrue(self.scan(self.asm.replace('faddl (%rdi)', 'nop')))
+        self.assertTrue(self.scan(self.asm.replace('.LT32:', '.LT32:\n vmovaps (%rsi), %zmm0')))
 
     def test_elf_and_versions(self):
         loader = b'/lib64/ld-linux-k1om.so.2\0'
