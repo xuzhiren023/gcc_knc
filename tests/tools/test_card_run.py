@@ -124,6 +124,10 @@ class CardRun(unittest.TestCase):
         temporary = tempfile.TemporaryDirectory(dir=ROOT)
         self.addCleanup(temporary.cleanup)
         self.directory = Path(temporary.name)
+        receipt_patch = mock.patch.dict(self.runner["run"].__globals__,
+                                       RECEIPT_DIR=self.directory / "receipts")
+        receipt_patch.start()
+        self.addCleanup(receipt_patch.stop)
         self.program = self.directory / "hello.mic"
         self.program.write_bytes(b"fake executable; never run on host")
         self.lock = self.directory / "card.lock"

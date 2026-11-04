@@ -74,6 +74,23 @@ def main_root(root):
     return root.parent.parent if root.parent.name == ".work" else root
 
 
+RECEIPT_DIR = main_root(ROOT) / ".work/_state/card"
+
+
+def retain_receipt(result):
+    RECEIPT_DIR.mkdir(parents=True, exist_ok=True)
+    path = RECEIPT_DIR / (result["job_id"] + ".json")
+    path.write_text(json.dumps(result, sort_keys=True) + "\n", encoding="utf8")
+    receipts = []
+    for candidate in RECEIPT_DIR.glob("claude-*.json"):
+        try:
+            receipts.append((candidate.stat().st_mtime_ns, candidate.name, candidate))
+        except FileNotFoundError:
+            continue  # Another runner may have pruned it already.
+    for _, _, candidate in sorted(receipts, reverse=True)[200:]:
+        candidate.unlink(missing_ok=True)
+
+
 def default_lock(root):
     return main_root(root) / ".work/_state/card.lock"
 
@@ -321,7 +338,8 @@ def run(program, argv, *, lock_path, external_locks, baseline_names, timeout,
                               endTime=datetime.now(timezone.utc).isoformat(),
                               outcome=("success" if result["result_class"] == "program" and
                                        result["exit_code"] == 0 else result["result_class"] + "-failure"),
-                              result_class=result["result_class"], exit_code=result["exit_code"]))
+                              result_class=result["result_class"], exit_code=result["exit_code"],
+                              detail=result["detail"][:300]))
             except OSError as error:
                 failure("infrastructure", INFRA_EXIT, "ledger finish failed: %s" % error)
         if admission_lock is not None:
@@ -334,11 +352,16 @@ def run(program, argv, *, lock_path, external_locks, baseline_names, timeout,
                 lock_path.unlink()
             except OSError as error:
                 failure("infrastructure", INFRA_EXIT, "own lock release failed: %s" % error)
-    # One overwritten runtime result, not a committed run history.
+    # An optional caller copy must not prevent retaining the job diagnostic.
+    if receipt_path is not None:
+        try:
+            receipt_path = Path(receipt_path)
+            receipt_path.parent.mkdir(parents=True, exist_ok=True)
+            receipt_path.write_text(json.dumps(result, sort_keys=True) + "\n", encoding="utf8")
+        except OSError as error:
+            failure("infrastructure", INFRA_EXIT, "cannot write result: %s" % error)
     try:
-        receipt_path = Path(receipt_path)
-        receipt_path.parent.mkdir(parents=True, exist_ok=True)
-        receipt_path.write_text(json.dumps(result, sort_keys=True) + "\n", encoding="utf8")
+        retain_receipt(result)
     except OSError as error:
         failure("infrastructure", INFRA_EXIT, "cannot write result: %s" % error)
     return result

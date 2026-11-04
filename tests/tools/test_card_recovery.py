@@ -176,6 +176,10 @@ class RemoteReview(unittest.TestCase):
         temporary = tempfile.TemporaryDirectory(dir=ROOT)
         self.addCleanup(temporary.cleanup)
         self.directory = Path(temporary.name)
+        receipt_patch = mock.patch.dict(self.runner["run"].__globals__,
+                                       RECEIPT_DIR=self.directory / "receipts")
+        receipt_patch.start()
+        self.addCleanup(receipt_patch.stop)
         self.proc = self.directory / "proc"
         (self.proc / "sys/kernel/random").mkdir(parents=True)
         (self.proc / "sys/kernel/random/boot_id").write_text(BOOT + "\n")
