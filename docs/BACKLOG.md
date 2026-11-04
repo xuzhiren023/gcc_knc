@@ -86,8 +86,8 @@ Drafted as tickets S2-01 to S2-08; see [SPRINT-02](sprints/SPRINT-02.md).
 | ID | Story | Depth |
 |---|---|---|
 | E6-01 | Shared libgcc; symbol-version ceiling tied to glibc 2.21 and kernel 2.6.38 | Deep |
-| E6-02 | libgfortran slice: descriptors, allocation, formatted I/O, modules; `real(16)` and libquadmath decision | Deep |
-| E6-03 | libgomp with futex; TLS models; a single OpenMP runtime in the process | Deep |
+| E6-02 | libgfortran slice: descriptors, allocation, formatted I/O, modules; `real(16)` and libquadmath decision. FP control (`config/fpu-387.h`) must manage KNC's MXCSR: CPUID reports no SSE on KNC, so today it skips MXCSR entirely, and the x86 masks it would write (bits 7-12) are reserved and fault. Keep bit 21 and leave 7-12 alone (lead, 2026-11-03 card probe). Never mix with the card's GCC 5 `libgfortran`: its descriptors predate GCC 8 | Deep |
+| E6-03 | libgomp with futex; TLS models (native, after S3-14); a single OpenMP runtime in the process; measure `malloc` arena contention at 60-240 threads in an exclusive card window (the PhiWeather project saw a major slowdown from allocator contention) | Deep |
 | E6-04 | MPI Fortran bindings rebuilt or adapted, and common corpus libraries built; old `.mod` files never reused | Deep |
 | E6-05 | IMCI intrinsics header, only for operations with real demand | Standard |
 | E6-06 | libstdc++: exceptions, RTTI, atomics, threads, with coverage measured by its own testsuite and the corpus. Check GCC 16's default C++ standard against corpus code | Standard |

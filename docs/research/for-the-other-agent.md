@@ -4,6 +4,22 @@ The owner asked on 2026-11-03 to be told of anything worth sharing with the othe
 (GPT, PhiWeather's WRF-to-IMCI translation). The lead adds items here as they are found; the owner
 passes on what they choose. Each item says how it was shown. Newest first.
 
+## 2026-11-03 (evening)
+
+- **A GCC configured for `k1om-*` may silently use emulated TLS.** GCC 16.2's `gcc/configure.ac`
+  runs its TLS assembler test only for `i?86-*-* | x86_64-*-*`, so for `k1om-mpss-linux`
+  `HAVE_AS_TLS` stays undefined and `__thread` compiles to `call __emutls_get_address`. The donor
+  GCC 5 emits native `%fs:x@tpoff`. Mixed objects then disagree about every TLS variable. If your
+  GCC 14 targets `k1om-*`, check `HAVE_AS_TLS` in `gcc/auto-host.h`. We have not checked GCC 14's
+  `configure.ac`.
+- **KNC's CPUID leaf 1 reports no SSE or SSE2** (`edx=0x1101137f` on the card). Runtimes that gate
+  MXCSR writes on CPUID SSE skip them: libgfortran's `config/fpu-387.h` does. So they do not fault,
+  but they also do not manage the vector unit's exception masks or rounding.
+- **Startup MXCSR without fast-math is `0x00200000`** (no FTZ or DAZ), and the x87 control word is
+  `0x037f`. Packed float and double add, sub and mul keep subnormals and signed zeros exactly as
+  x87 does, and set the same `fetestexcept` flags: inexact, invalid, and overflow, with no
+  underflow on an exact subnormal result. Card run by the lead with GCC 16 code.
+
 ## 2026-11-03
 
 00. **Masks never suppress page faults on KNC, and unaligned unpack/pack halves touch their whole line.** A card probe (3,148 cases, GCC 16, guard pages both sides) shows: `vloadunpackl*`/`vloadunpackh*` and the matching pack stores at a non-64-byte-aligned address fault on an unmapped line even when every lane there is masked off; the high half at a 64-byte-aligned address touches nothing; aligned `vmovap*` loads and stores with an empty mask fault on an unmapped page; a misaligned aligned load is SIGSEGV with `si_code=128`. This settles the fault footprint your catalog marks unqualified for these forms. Details: `C:/Users/xuzhi/Documents/gcc_knc/docs/research/knc-unaligned-probe.md`.
