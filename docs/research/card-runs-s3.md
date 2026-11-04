@@ -183,3 +183,11 @@ the harness (forward-slash paths); those 19 are in the 1,680 above.
 
 **Sprint 3's card batch passes in full.** `pr85169` (S3-20) is the only execute source not
 covered, because it ICEs.
+
+## Full suite after S3-20 (`73cc9c03798`, lead, 2026-11-04 04:20)
+
+`cc1` built from S3-20's tested commits (`086fe1c3cc7`, tree identical to the merge); its SHA-1
+was the same before and after the suite build, so S3-22's build did not overlap. 1,692 sources,
+**0 ICE**, 11 compile errors (the expected `dg-` options and targets), 1,681 linked. On the card in
+six jobs (`claude-caee0087…` to `claude-a60b2c4c…`, receipts in
+`.work/_state/card/claude-suite-s3-20/`): **1,681 of 1,681 PASS**, `pr85169` included.
