@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-03 19:17.
+Updated automatically at every ticket change. Last update: 2026-11-03 19:18.
 
-**Next: the tech lead, on S3-06.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: GPT-6.1, on S3-06 (Packed FP add, sub, mul, FMA and broadcasts for V16SF and V8DF).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
 Current tickets: `[################----]` 42 of 52
 
@@ -63,7 +63,7 @@ Current tickets: `[################----]` 42 of 52
 | S3-03 | Native probe of unaligned pairs and masked aligned forms at page boundaries | Done | Acceptance lines ticked: the lead ran the probe on the card, 3,148 cases with 0 failures; the fault table a... |
 | S3-04 | Packed modes legal under -march=knc, with aligned moves, spills and constants | Done | Under -march=knc, 64-byte float, double, int and long long vectors now live in zmm registers, with aligned ... |
 | S3-05 | Unaligned packed moves through load and store pairs | Done | Packed copies through pointers of unknown alignment now compile, for all four 512-bit modes, to unmasked lo... |
-| S3-06 | Packed FP add, sub, mul, FMA and broadcasts for V16SF and V8DF | Question for the tech lead | GCC 256cb415659; tests 618e21d. Two regression attempts failed: full T0 stale FP mock (fixed), focused host... |
+| S3-06 | Packed FP add, sub, mul, FMA and broadcasts for V16SF and V8DF | In progress | Yes. The bare 'import knc_vector' in test_vector_cli_selects_only_vector_sources is already on main and onl... |
 | S3-07 | Auto-vectorization on zmm, with x87 peel and remainder; m1_affine T1 and T2 green | Not started | ADR-0006 (accepted, owner's direction): shared i386 files hold hooks only. Put function bodies, switch tabl... |
 | S3-08 | Fortran twin of m1_affine vectorizes and links | Not started | Owner approved Sprint 3 on 2026-11-03; ticket set to ready. |
 | S3-09 | Packed integer add, sub, mul, logic and broadcast for V16SI; logic for V8DI | draft | Moved to Sprint 4 by the owner on 2026-11-03, on the lead's recommendation: m1_affine is float and double o... |
@@ -78,19 +78,19 @@ Current tickets: `[################----]` 42 of 52
 ## Recent activity
 
 - 2026-11-03 19:30 **S3-16** lead note: Filed under the owner's delegation, after the owner asked for the stray folder to be deleted.
+- 2026-11-03 19:18 **S3-06** lead answer: Yes. The bare 'import knc_vector' in test_vector_cli_selects_only_vector_sources is already on main and only resolves when another suite puts tools...
 - 2026-11-03 19:17 **S3-06** engineer ask: GCC 256cb415659; tests 618e21d. Two regression attempts failed: full T0 stale FP mock (fixed), focused host-Windows unittest cannot import knc_vect...
 - 2026-11-03 19:00 **S3-11** lead note: The owner delegated the M1 call to the lead ("Decide M1 and s3-11"). The go, adjust and stop criteria above are fixed now, before the evidence, so ...
 - 2026-11-03 18:55 **S3-06** lead answer: Yes. In i386 target code ONLY_FIXED_SIZE_MODES is 1, so GET_MODE_NUNITS (machmode.h:766) is already an unsigned integer; use GET_MODE_NUNITS (mode)...
 - 2026-11-03 18:55 **S3-06** engineer ask: Two builds failed. First: early imci include lacked ssescalarmode (fixed). Second: i386-knc.cc:164 GET_MODE_NUNITS(mode).to_constant() fails becaus...
 - 2026-11-03 18:45 **S3-15** lead note: Filed under the owner's delegation. Finding 1 was reproduced by the lead; findings 2-4 come from reading code and are not run yet.
 - 2026-11-03 18:45 **S3-14** lead note: Filed under the owner's delegation (engineering defect found while checking the PhiWeather project's lesson about stale TLS attributes). Every obje...
-- 2026-11-03 18:45 **S3-10** lead note: Also add (1) S3-14's TLS and S3-15's complex and rounding cross-checks, built after both merge (objects built before S3-14 use emulated TLS); and (...
 
 ## Cost
 
 - From the script, engineer: 141 sessions, 295.8M input tokens
 - From the script, lead: 139 sessions, 46.8M input tokens
-- Started by hand, Claude: 5 sessions, 445.0M input tokens
+- Started by hand, Claude: 5 sessions, 445.3M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
