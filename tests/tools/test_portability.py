@@ -159,6 +159,23 @@ class PortabilityTest(unittest.TestCase):
         build.assert_not_called()
         self.assertIn('make.exe', output.getvalue())
 
+    def test_x86_skip_make_check(self):
+        corpus = self.repo / portability.CORPUS
+        corpus.mkdir(parents=True)
+        (corpus / 'probe.c').write_text('int x;\n')
+        with mock.patch.object(portability, 'make_is_running',
+                               side_effect=AssertionError('must skip tasklist')) as check, \
+                mock.patch.object(portability, 'build_cc1', return_value=['cc1']) as build, \
+                mock.patch.object(portability.subprocess, 'run',
+                                  return_value=subprocess.CompletedProcess([], 1, 'same diagnostic')), \
+                contextlib.redirect_stdout(io.StringIO()) as output:
+            self.assertEqual(portability.main([
+                'x86', '--skip-make-check', '--repo', str(self.repo),
+                '--shared', str(self.root), '--tree', 'base', '--tree', 'knc']), 0)
+        check.assert_not_called()
+        self.assertEqual(build.call_count, 2)
+        self.assertIn('make check skipped', output.getvalue())
+
 
 if __name__ == '__main__':
     unittest.main()
