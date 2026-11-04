@@ -2,7 +2,8 @@
 
 **Recommend adjust; M1 waits.** Measurements use merged `knc`
 `eb8fb3e902a91e885354edac02f5edb7751100de` (GCC 16.2), 2026-11-04. The lead decides
-against S3-11's seven criteria. The trunk build failure prevents trunk T1/T2 evidence.
+against S3-11's seven criteria. S3-23 now supplies a successful trunk C-only
+build and T1/T2 evidence, with 16 explained ABI diagnostic failures below.
 
 ## Measured: fixture and card evidence
 
@@ -169,10 +170,43 @@ textual Git conflicts, not a C++ error or a proven structural design clash.
 Reduced build reproducer: in `portability/trunk/build/gcc`, the failed command was
 `build/gentarget-def.exe ../../source/gcc/common.md
 ../../source/gcc/config/i386/i386.md insn-conditions.md > tmp-target-def.h`
-(source paths in the log are absolute). No full trunk `cc1` or trunk T1/T2 ran.
-The lead's 03:40 answer assigns a follow-up ticket to integrate KNC's libcall dispatch
-with upstream's expander and retry trunk cc1 and T1/T2; ticket pending. No third trunk
-attempt is authorized on S3-11.
+(source paths in the log are absolute). No full trunk `cc1` or trunk T1/T2 ran
+in S3-11.
+The lead's 03:40 answer assigned the follow-up now tracked as S3-23 to integrate
+KNC's libcall dispatch with upstream's expander and retry trunk cc1 and T1/T2.
+No third trunk attempt was authorized on S3-11.
+
+S3-23 continuation: the atomic-store entry dispatch in
+[the forward-port recipe](forward-port.md#s3-23-atomic-optab-integration)
+resolves Y1 without widening an SSE insn. Upstream trunk
+`b88c2821e219244d18df873b0bfb344d3dc0b2a7` plus KNC through
+`2139411dc6c44e3207c5430304e99b231cbeee2b` and that resolution builds
+C-only `cc1` for `k1om-mpss-linux`. The four-job build exhausted memory
+(Cygwin user32.dll error 8, no source diagnostic); the lead-authorized
+one-job continuation in the same build directory passed in 9.9 minutes,
+including the C self-tests. This is infrastructure recovery, not another
+source integration conflict.
+
+The full existing T1/T2 selection against trunk took 122.11 seconds and
+exited 1: 206 T1 passes, 16 T1 failures, 23 T2 passes. The 16.2 baseline
+at KNC `2139411dc6c` has 222 T1 and 23 T2 passes (104.22 seconds).
+All 245 ordered row labels match. Every difference is a packed `VAR_GET`
+rejection check: all four element types (`float`, `double`, `int`,
+`long long`), vector/record shapes and `-O0`/`-O2`.
+
+These 16 rows have one explained **logic** cause. The existing KNC
+`ix86_gimplify_va_arg` guard returns `error_mark_node` after its ABI
+diagnostic, and `expand_ifn_va_arg_1` subsequently asserts
+`gsi_end_p (i)` (`tree-stdarg.cc:1072`, unchanged between the trees).
+Trunk's `CHECKING_P=1` exposes the ICE; the 16.2 build has
+`CHECKING_P=0`, under which `diagnostics/context.cc` suppresses an ICE
+after an earlier error. Both builds enable assertions. Thus the release
+test passes its diagnostic/no-ICE condition despite the latent error-path
+flaw. This is a remaining ABI error-recovery finding, not evidence of
+an atomic-store regression or a structural backend clash. All other
+result rows match; no test was changed. The wrapper verifies trunk's C
+`cc1` selection but reuses 16.2 Fortran and target runtime; there was no
+native card execution in this drill.
 
 ## Measured cost versus estimates
 
@@ -237,11 +271,12 @@ must be measured before preferring either estimate.
 | 2 card batch | Met: every S3-10 row passes, inexact variant within 1 ULP, 1,680/1,680 torture (lead update below). |
 | 3 ICE classes | Met in the requested sweep: zero shared SSE/AVX ICEs; other class S3-20 is ticketed and reproduced. |
 | 4 x86 unchanged | Zero assembly differences at both options in the tool's coverage: 1,962 identical pairs each, 41 matching failures without assembly each. |
-| 5 portability | Not met: atomic_storeti collision with upstream sync.md, S3-23. Release clean; four textual resolutions; no trunk cc1 or T1/T2. |
+| 5 portability | S3-23: trunk `b88c2821e219` plus KNC `2139411dc6c` builds C-only cc1 after the atomic-store dispatch resolution. Release clean; four textual resolutions retained. T1: 206 pass, 16 explained packed VAR_GET error-recovery ICEs (checking configuration exposes an existing logic flaw); T2: 23 pass. All other rows match 16.2. See continuation above; trunk suites are not wholly green. |
 | 6 ADR form | 202 shared lines/56 hunks; three residual blocks, S3-22. Not met. |
 | 7 cost | Smaller source surface measured; effort estimates overlap. Not proven. |
 
-No structural clash is demonstrated. The lead must resolve/ticket items 5-6, tighten
+No structural clash is demonstrated. The lead must assess item 5's ABI error-recovery
+finding, resolve/ticket item 6, tighten
 item 7, run S3-10 and decide again after required fixes merge. S3-20 is a listed,
 ticketed non-SSE/AVX class; criterion 3 does not itself require that class to close.
 The lead rechecks lines, drill and x86 after S3-20 merges, before deciding M1.
@@ -262,3 +297,9 @@ Logs below are relative to `.work/_state/logs/`; large outputs stay in the share
   missing build-host libcpp in the object precheck; 9.6 min overall).
 - Y1: `S3_11_trunk-20261104-031823.log` (libcpp prerequisite fixed; duplicate
   `atomic_storeti` during the object precheck; 2.5 min overall, four jobs, `-O2 -g1`).
+- S3-23 build: `S3_23_trunk_build-20261104-084307.log` (four-job memory
+  exhaustion), `S3_23_trunk_build_serial-20261104-092423.log` (PASS, 9.9 min).
+- S3-23 baseline: `S3_23_gcc16_t1_t2-20261104-084102.log` (245 passing rows).
+- S3-23 trunk: `S3_23_trunk_t1_t2-20261104-093427.log` (16 explained T1
+  failures; other 229 rows pass), `S3_23_result_comparison-20261104-093743.log`
+  (PASS, every changed result enumerated).
