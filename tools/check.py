@@ -27,6 +27,8 @@ PACKED = re.compile(r'\bv(?:addn?|subr?|mul|div|max|min|sqrt|rcp(?:23)?|rsqrt(?:
 # Each entry supplies its CLI help and handlers for the tiers it selects.
 # Imports stay lazy so T0 and source-only selections need no probe modules.
 SELECTIONS = {
+    'xi_copy': ('S3-20 XI memory copies and byte element updates at O0, O1 and O2', {
+        't1': lambda runner: runner.t1_sources(runner.source_dir.glob('knc-xi-copy-O*.c'))}),
     'native_tls': ('S3-14 native TLS sequences versus the donor at O2, PIC and O0', {
         't1': lambda runner: importlib.import_module('native_tls').t1(runner)}),
     'affine_fortran': ('S3-08 Fortran affine acceptance rows (GCC 16)', {
