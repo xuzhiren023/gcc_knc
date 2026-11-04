@@ -2,8 +2,9 @@
 
 Probe functions expose one argument at a time. Compare incoming registers and
 stack slots relative to entry RSP, plus result registers for constant returns.
-Instruction selection inside the function may differ; all instructions must
-still belong to the scalar KNC allowlist. Cross-links are T2, not native proof.
+Instruction selection inside the function may differ. Scalar probes and the
+donor fixture use the scalar KNC allowlist; GCC16 affine loops may vectorize.
+Cross-links are T2, not native proof.
 """
 import re
 import sys
@@ -45,14 +46,18 @@ def instructions(body):
         yield words[0], words[1] if len(words) == 2 else ''
 
 
+def forbidden_registers(assembly):
+    return sorted(set('SSE/AVX register: ' + operands
+                      for _, operands in instructions(assembly)
+                      if re.search(r'%(?:[xy]mm\d+|mm[0-7])\b', operands)))
+
+
 def allowlist(assembly):
     failures = []
     for mnemonic, operands in instructions(assembly):
         if mnemonic not in SCALAR and not INTEGER.fullmatch(mnemonic):
             failures.append('instruction outside scalar IMCI/x87 allowlist: ' + mnemonic)
-        if re.search(r'%(?:[xy]mm\d+|mm[0-7])\b', operands):
-            failures.append('SSE/AVX register: ' + operands)
-    return sorted(set(failures))
+    return sorted(set(failures + forbidden_registers(assembly)))
 
 
 def register(name):
@@ -273,10 +278,11 @@ def affine(runner):
             texts.append(None)
         else:
             texts.append(asm.read_text())
-            failures.extend(tag + ': ' + f for f in allowlist(texts[-1]))
+            scan = allowlist if tag == 'donor' else forbidden_registers
+            failures.extend(tag + ': ' + f for f in scan(texts[-1]))
     if all(text is not None for text in texts):
         failures.extend(compare(runner, texts[1], texts[0], ['affine_f32', 'affine_f64']))
-    runner.result('t1 m1_affine scalar ABI donor locations', failures)
+    runner.result('t1 m1_affine ABI donor locations', failures)
 
 
 def t2(runner):
