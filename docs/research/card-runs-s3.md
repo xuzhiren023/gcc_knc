@@ -24,3 +24,5 @@ Card minutes: about 0.18 in total.
 Runner issue: two attempts at the torture job were refused with `unknown process identity in
 snapshot: b'PROC\t242373\t\tkworker/u:7\t\t'` while a `gpt61` job ran. The third attempt passed.
 S3-17 fixes the cause.
+
+After S3-17 merged (runner fix): `hello` matched, and the same 256 torture programs passed 256 of 256 while a `gpt61` job overlapped.
