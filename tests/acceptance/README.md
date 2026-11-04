@@ -28,3 +28,20 @@ Sprint 0 result is a recorded red for the right reason.
 
 The fixture is only a demonstration of M1. It is not evidence of general
 vectorization, and it says nothing about performance.
+
+## `s3_tls_card/`: `__thread` shared between GCC 16 and the donor (S3-14)
+
+`build.py OUTDIR` builds five programs. Run each one on the card with its library staged beside it:
+`tools/card_run --file OUTDIR/libclaude-tlsV.so OUTDIR/claude-tlsV.mic`.
+
+| Variant | Built how | Expected on the card |
+|---|---|---|
+| A | main and `tls_new` by GCC 16 at `-O2`; `tls_donor` and the `.so` by the donor | `S3-TLS PASS checks=59 failures=0` |
+| B | as A, GCC 16 parts at `-O0` | same |
+| C | main by the donor; `tls_new` and the `.so` by GCC 16 at `-O2` (global- and local-dynamic) | same |
+| D | as C, GCC 16 parts at `-O0` | same |
+| X | A with `-DCONTROL_SHARED`: plain globals instead of `__thread` | `S3-TLS FAIL`, exit 1 |
+
+Each of 4 threads writes its own values through one compiler's code and reads them back through
+the other's after a barrier; the main thread writes nothing and must still see the initial
+values. The build refuses any GCC 16 object or library that references `__emutls`.

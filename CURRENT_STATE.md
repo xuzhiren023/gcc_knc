@@ -131,11 +131,12 @@ Last updated: 2026-11-03 late, Sprint 3. Merged: S3-01 to S3-08, S3-12, S3-13, S
 
 ## Card
 
-Approved by the owner on 2026-11-01. Native jobs run only when the card is idle, and only through
-`tools/card_run` once S0-04 has reached that step. Rules are in `docs/DEVELOPMENT_CYCLE.md` section 9.
-
-**On hold since 2026-11-02 10:55:** the owner is using the card for a WRF IMCI optimization
-run. No native job until the owner says it has finished.
+Approved by the owner on 2026-11-01. Since 2026-11-03 the card is shared with the other project's
+agent (`gpt61`), and neither needs it exclusively. Rules: cores 30-59, at most 7 GB, a start and a
+finish line per job in `C:/Users/xuzhi/Documents/card-coordination/jobs.jsonl`, files under
+`/tmp/claude/`, `claude-` names, no card-global changes, no timing figures. Only the interactive
+lead runs card jobs, always through `tools/card_run`; batches use `harness/card/` (see its README).
+Engineer sessions never get the key. The old hold of 2026-11-02 for the owner's WRF run is over.
 
 ## Known limits
 
