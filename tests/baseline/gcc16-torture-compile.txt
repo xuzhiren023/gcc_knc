@@ -16,6 +16,7 @@ level	pass	slow	hang	ICE	compiler error	float/double ABI error	assembler rejecti
 O0	1967	0	0	0	34	0	0	0	0	2
 O2	1968	0	0	0	33	0	0	0	0	2
 O2-g	1968	0	0	0	33	0	0	0	0	2
+O3	1968	0	0	0	33	0	0	0	0	2
 
 O0 / slow (0)
 
@@ -174,6 +175,63 @@ O2-g / lint failure (0)
 O2-g / infrastructure failure (0)
 
 O2-g / user inline asm rejected (2)
+920520-1.c; reason: every assembler error is inside #APP/#NO_APP
+920521-1.c; reason: every assembler error is inside #APP/#NO_APP
+
+O3 extension (S3-07): 2003 measurements. New class: acc1.c ICE in
+vect_create_partial_epilog; reduced reproducer: tests/t1/knc-vec-reduction.c.
+Existing O0/O2/O2-g classifications are unchanged.
+
+O3 / slow (0)
+
+O3 / hang (0)
+
+O3 / ICE (0)
+
+O3 / compiler error (33)
+20030305-1.c
+20111209-1.c
+dll.c
+mipscop-1.c
+mipscop-2.c
+mipscop-3.c
+mipscop-4.c
+pr100305.c
+pr10153-1.c
+pr10153-2.c
+pr106433.c
+pr108237.c
+pr108892.c
+pr110386-2.c
+pr28865.c
+pr29201.c
+pr33614.c
+pr34856.c
+pr39928-1.c
+pr48767.c
+pr83547.c
+pr86637-2.c
+pr88347.c
+pr89235.c
+pr92618.c
+pr97576.c
+pr99647.c
+vector-1.c
+vector-2.c
+vector-3.c
+vector-5.c
+vector-6.c
+vector-dup-1.c
+
+O3 / float/double ABI error (0)
+
+O3 / assembler rejection (0)
+
+O3 / lint failure (0)
+
+O3 / infrastructure failure (0)
+
+O3 / user inline asm rejected (2)
 920520-1.c; reason: every assembler error is inside #APP/#NO_APP
 920521-1.c; reason: every assembler error is inside #APP/#NO_APP
 

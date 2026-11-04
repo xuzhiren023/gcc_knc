@@ -27,7 +27,7 @@ SHARED = PROJECT / '.work/_shared'
 TC = SHARED / 'toolchain'
 BUILD = SHARED / 'gcc-build/gcc'
 CORPUS = SHARED / 'gcc/gcc/testsuite/gcc.c-torture/compile'
-LEVELS = {'O0': ['-O0'], 'O2': ['-O2'], 'O2-g': ['-O2', '-g']}
+LEVELS = {'O0': ['-O0'], 'O2': ['-O2'], 'O2-g': ['-O2', '-g'], 'O3': ['-O3']}
 CLASSES = ('pass', 'slow', 'hang', 'ICE', 'compiler error', 'float/double ABI error',
            'assembler rejection', 'lint failure', 'infrastructure failure',
            'user inline asm rejected')

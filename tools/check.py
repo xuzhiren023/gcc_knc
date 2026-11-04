@@ -110,6 +110,12 @@ def scan_t1(assembly, report, source, fast=False):
         suffix = 'ps' if name.endswith('f32') else 'pd'
         patterns = ([r'vfmadd\w*' + suffix] if fast else ['vmul' + suffix, 'vadd' + suffix])
         candidates = list(loops(body))
+        scalar_loops = [loop for loop in candidates if not PACKED.search(loop)]
+        if not scalar_loops or any('%zmm' in loop for loop in scalar_loops):
+            failures.append(name + ': missing scalar tail or packed access in scalar loop')
+        elif not all(re.search(r'\bfmul\w*\b', loop)
+                     and re.search(r'\bfadd\w*\b', loop) for loop in scalar_loops):
+            failures.append(name + ': peel/remainder arithmetic is not x87')
         if not any(PACKED.search(loop) for loop in candidates):
             failures.append(name + ': no packed `zmm` arithmetic')
         elif not any(all(re.search(r'\b' + p + r'\b[^\n]*%zmm\d+\b', loop)
@@ -327,6 +333,10 @@ class Runner:
             scalar_abi.t2(self)
         elf, trace = self.t2_affine_link()
         self.t2_abi(elf, trace)
+        if getattr(getattr(self, 'args', None), 'compiler', None) == 'gcc16':
+            self.say('T2 affine ABI cross-check: donor-built driver, GCC 16 loops')
+            elf, trace = self.t2_affine_link(donor_driver=True)
+            self.t2_abi(elf, trace)
 
     def t2_link_defaults(self):
         elf = self.out / 'knc-link-defaults.mic'
@@ -360,13 +370,15 @@ class Runner:
                     ['unexpected DT_NEEDED ' + name for name in needed
                      if re.match(r'lib(?:gcc_s|atomic)\.so(?:\.|$)', name)])
 
-    def t2_affine_link(self):
+    def t2_affine_link(self, donor_driver=False):
         loops_obj = self.off_object or self.out / 'loops-off.o'
         if not self.off_object:
             self.command(self.cc, *self.cc_flags, *self.flags, '-ffp-contract=off', '-c', self.fixture / 'loops.c', '-o', loops_obj)
+            self.off_object = loops_obj
         driver = self.out / 'driver.o'
         elf = self.out / 'm1_affine.mic'
-        self.command(self.cc, *self.cc_flags, *self.flags, '-ffp-contract=off', '-c', self.fixture / 'driver.c', '-o', driver)
+        driver_cc = [self.tool('gcc')] if donor_driver else [self.cc, *self.cc_flags]
+        self.command(*driver_cc, *self.flags, '-ffp-contract=off', '-c', self.fixture / 'driver.c', '-o', driver)
         trace = self.command(self.cc, *self.cc_flags, '--sysroot=' + str(self.sysroot), driver, loops_obj,
                              '-Wl,--trace', '-o', elf)
         return elf, trace

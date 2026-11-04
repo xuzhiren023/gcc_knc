@@ -9,6 +9,7 @@ from unittest.mock import Mock, patch
 from types import SimpleNamespace
 
 ROOT = Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(ROOT / 'tools'))
 spec = importlib.util.spec_from_file_location('knc_check', ROOT / 'tools/check.py')
 check = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(check)
@@ -62,6 +63,11 @@ class Scans(unittest.TestCase):
         self.assertTrue(self.scan(fast.replace('vfmadd213pd', 'vmulpd'), fast=True))
         self.assertTrue(self.scan(fast))
 
+    def test_scalar_tails(self):
+        self.assertTrue(self.scan(self.asm.replace('fmuls (%rsi)', 'nop')))
+        self.assertTrue(self.scan(self.asm.replace('faddl (%rdi)', 'nop')))
+        self.assertTrue(self.scan(self.asm.replace('.LT32:', '.LT32:\n vmovaps (%rsi), %zmm0')))
+
     def test_elf_and_versions(self):
         loader = b'/lib64/ld-linux-k1om.so.2\0'
         data = bytearray(120 + len(loader))
@@ -80,6 +86,31 @@ class Scans(unittest.TestCase):
 
 
 class Runner(unittest.TestCase):
+    def test_affine_packed_body_and_forbidden_registers(self):
+        import scalar_abi
+        donor = 'affine_f32:\n fmuls (%rsi)\n ret\n'
+        packed = 'affine_f32:\n vmulps %zmm0, %zmm1, %zmm2\n ret\n'
+        with tempfile.TemporaryDirectory() as directory:
+            runner = SimpleNamespace(out=Path(directory), fixture=Path('/fixture'),
+                                     sysroot=Path('/sysroot'), cc='gcc16', cc_flags=[],
+                                     tool=Mock(return_value='donor'), result=Mock())
+            for gcc_text, donor_text, fails in (
+                    (packed, donor, False),
+                    (packed.replace('%zmm0', '%xmm0'), donor, True),
+                    (packed.replace('%zmm0', '%ymm0'), donor, True),
+                    (packed.replace('%zmm0', '%mm0'), donor, True),
+                    (packed, packed, True)):
+                with self.subTest(gcc=gcc_text, donor=donor_text):
+                    def compile_text(cc, *args, **kwargs):
+                        args[-1].write_text(donor_text if cc == 'donor' else gcc_text)
+                        return SimpleNamespace(returncode=0)
+                    runner.command = compile_text
+                    with patch.object(scalar_abi, 'compare', return_value=[]) as compare:
+                        scalar_abi.affine(runner)
+                    compare.assert_called_once_with(
+                        runner, gcc_text, donor_text, ['affine_f32', 'affine_f64'])
+                    self.assertEqual(bool(runner.result.call_args.args[1]), fails)
+
     def test_runners_use_distinct_temporary_output_directories(self):
         args = SimpleNamespace(compiler='donor', cc=None)
         first, second = check.Runner(args), check.Runner(args)
