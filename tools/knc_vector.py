@@ -258,7 +258,7 @@ def t1_byte_aligned(runner):
                             control_failures.append(name + ': missing function boundary')
                             continue
                         ops = {op for op, args in instructions(body)}
-                        # memcpy may vectorize FP bit copies in the integer mode
+                        # FP bit copies may vectorize in the integer mode
                         # of the same width; both forms require element alignment.
                         suffixes = ('ps', 'd') if size == 4 else ('pd', 'q')
                         if not any({prefix + half + suffix for half in ('l', 'h')} <= ops
@@ -274,8 +274,15 @@ def t1_byte_aligned(runner):
                         body = runner.function_body(assembly, name)
                         if body is None:
                             failures.append(name + ': missing function boundary')
-                        elif re.search(r'\b(?:vloadunpack|vpackstore)\w*\b', body):
-                            failures.append(name + ': pair requires element alignment')
+                        else:
+                            for op, args in instructions(body):
+                                if op.startswith(('vloadunpack', 'vpackstoreh')):
+                                    failures.append(name + ': pair requires element alignment')
+                                elif op.startswith('vpackstorel'):
+                                    # Intel 327364-001 p.361 permits this masked scalar extract to aligned stack memory.
+                                    if not (re.search(r'\{%k\d+\}', args)
+                                            and re.search(r'\(%(?:rsp|rbp)(?:,|\))', args)):
+                                        failures.append(name + ': pair requires element alignment')
                     runner.command(runner.tool('as'), '--march=k1om', asm, '-o', obj)
                     runner.command(sys.executable, runner.root / 'tools/knc_lint', asm, obj)
                 runner.result(label, failures)

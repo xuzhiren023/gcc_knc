@@ -40,7 +40,7 @@ void byte_loop(vector *output, const unsigned char *input)
 void elem_slp(const scalar *block)
 {
   scalar buf[64 / ELEMENT_BYTES];
-#define PIECE(N) __builtin_memcpy(buf + (N), block + (N), ELEMENT_BYTES)
+#define PIECE(N) buf[N] = block[N]
   PIECE(0); PIECE(1); PIECE(2); PIECE(3);
   PIECE(4); PIECE(5); PIECE(6); PIECE(7);
 #if ELEMENT_BYTES == 4
@@ -55,7 +55,7 @@ void elem_loop(vector *output, const scalar *input)
 {
   scalar *dest = (scalar *) output;
   for (unsigned i = 0; i < 64 / ELEMENT_BYTES; ++i)
-    __builtin_memcpy(dest + i, input + i, ELEMENT_BYTES);
+    dest[i] = input[i];
 }
 
 void byte_load(const byte_vector *input, vector *output)
