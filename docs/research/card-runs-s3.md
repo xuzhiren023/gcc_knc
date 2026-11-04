@@ -128,3 +128,11 @@ main thread must still see the initial values.
 
 This ticks S3-14's native line: donor-defined used from GCC 16, the reverse, and a donor `.so`,
 each from 4 threads. S3-10 need not rebuild it.
+
+## Full `gcc.c-torture/execute` suite after S3-14 (2026-11-04 04:45-04:58 UTC)
+
+The merged `knc` (`edf7c69d617`, native TLS) at `-O2 -march=knc`, built with
+`harness/card/build_suite.py` before S3-15's rebuild started (`cc1` unchanged from start to end of
+the build). 1,692 sources, 1,661 linked, 93 with packed zmm code, 30 compile errors as before, and
+1 ICE (`pr85169`, S3-20). **On the card: 1,661 of 1,661 PASS**, in six jobs, with no retries. That
+is the same as the baseline at `10ce7e12b64`, so native TLS caused no regression.
