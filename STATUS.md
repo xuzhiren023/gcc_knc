@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-04 12:23.
+Updated automatically at every ticket change. Last update: 2026-11-04 13:14.
 
-**Next: GPT-6.1, on S4-08 (Small fixes from M1: the varargs V4SF assert checks alignment; S3-10 ABI expected files).** Run `python tools/dispatch.py`, or ask the tech lead to.
+**Next: the tech lead, on S4-08.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[#################---]` 63 of 71
 
@@ -90,12 +90,13 @@ Current tickets: `[#################---]` 63 of 71
 | S4-05 | Safe masked tails: a masked vector remainder only where every touched line is in the array | draft |  |
 | S4-06 | Batch check after S4-02, S3-09 and S4-03: x86, drill and ICE sweeps at the batch head | draft |  |
 | S4-07 | Final Sprint 4 batch check at the sprint head | draft |  |
-| S4-08 | Small fixes from M1: the varargs V4SF assert checks alignment; S3-10 ABI expected files | In progress |  |
+| S4-08 | Small fixes from M1: the varargs V4SF assert checks alignment; S3-10 ABI expected files | Waiting for review | Item2: card_spelling() in prepare_s3_10.py rewrites long-double text to card %La form (text, not value comp... |
 | S4-09 | LRA folds a misaligned vector load into vaddps/vsubps/vmulps ("m" constraint), which faults on the card | Done | Vectorized float and double add, sub and mul no longer fold a misaligned array load into the instruction, w... |
 | S4-10 | pm.py approve merges a GCC ticket without rewriting files in the shared checkout | Done | Approving a GCC ticket no longer rewrites the merged files in the shared GCC checkout, so the next build is... |
 
 ## Recent activity
 
+- 2026-11-04 13:14 **S4-08** engineer submit: Item2: card_spelling() in prepare_s3_10.py rewrites long-double text to card %La form (text, not value compare); red test tests/tools/test_prepare_...
 - 2026-11-04 12:23 **S4-10** lead approve: Approving a GCC ticket no longer rewrites the merged files in the shared GCC checkout, so the next build is not forced to regenerate and recompile ...
 - 2026-11-04 12:14 **S4-10** engineer submit: Red: new ancestor test failed on mtime (log S4_10_tests-20261104-120806). Fix: commit-tree + update-ref, then checkout knc; non-ancestor keeps merg...
 - 2026-11-04 12:03 **S4-09** lead approve: Vectorized float and double add, sub and mul no longer fold a misaligned array load into the instruction, which used to crash on the card; aligned ...
@@ -103,16 +104,15 @@ Current tickets: `[#################---]` 63 of 71
 - 2026-11-04 11:06 **S3-25** lead approve: Rejecting va_arg of an unsupported KNC vector type now ends with its error message and no hidden compiler crash, and the ABI checks fail on any 'co...
 - 2026-11-04 11:05 **S3-25** engineer submit: Green t0/t1/t2 gcc16: 249 PASS, 0 FAIL (t0 4, t1 222, t2 23); 16 VAR_GET rows pass (red had only those 16 failing). Torture assembly after vs befor...
 - 2026-11-04 10:53 **S3-25** owner decide: Over budget (12.3M of 2M); fix committed and built. A Claude subagent finishes the green checks and the submit; no more GPT sessions.
-- 2026-11-04 10:50 **S3-25** lead escalate: budget: 12334184 input tokens used; the budget is 2000000
 
 ## Cost
 
 - From the script, engineer: 186 sessions, 441.0M input tokens
 - From the script, lead: 184 sessions, 58.7M input tokens
-- Started by hand, Claude: 9 sessions, 616.6M input tokens
+- Started by hand, Claude: 9 sessions, 619.4M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 12.9 GiB of 100 GiB. 245 GiB free on the drive.
+The project uses 12.9 GiB of 100 GiB. 242 GiB free on the drive.
