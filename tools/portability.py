@@ -16,11 +16,18 @@ import subprocess
 import sys
 import tempfile
 
+from gcc_build import read_stamp, write_stamp
+
 ROOT = Path(__file__).resolve().parents[1]
 PROJECT = ROOT.parent.parent if ROOT.parent.name == '.work' else ROOT
 SHARED = PROJECT / '.work/_shared'
 BASE = 'releases/gcc-16.2.0'
 CORPUS = 'gcc/testsuite/gcc.c-torture/compile'
+CONFIGURE_ARGS = ['--build=x86_64-pc-cygwin', '--host=x86_64-pc-cygwin',
+                  '--target=x86_64-pc-cygwin', '--enable-languages=c',
+                  '--disable-bootstrap', '--disable-multilib', '--disable-nls', '--without-isl']
+# Two retained compiler builds leave less memory available for Cygwin DLLs.
+MAKE_ARGS = ['-j4', 'all-gcc', 'CFLAGS=-O2 -g1', 'CXXFLAGS=-O2 -g1']
 
 
 def git(repo, *args):
@@ -125,7 +132,7 @@ def command(argv, cwd):
     subprocess.run(list(map(str, argv)), cwd=cwd, check=True)
 
 
-def build_cc1(repo, shared, tree, slot):
+def build_cc1(repo, shared, tree, slot, *, configure_args=None, make_args=None):
     commit = git(repo, 'rev-parse', '--verify', tree + '^{commit}')
     home = shared / 'portability' / ('x86-' + slot)
     source, build = home / 'source', home / 'build'
@@ -140,16 +147,26 @@ def build_cc1(repo, shared, tree, slot):
             command([*git_options, '-C', source, 'checkout', '--detach', commit], shared)
     build.mkdir(exist_ok=True)
     print('Tree ' + tree + ': ' + commit, flush=True)
-    # Reconfigure in place; make reuses all current objects, including on repeat runs.
-    command(['bash', source / 'configure', '--build=x86_64-pc-cygwin',
-             '--host=x86_64-pc-cygwin', '--target=x86_64-pc-cygwin',
-             '--enable-languages=c', '--disable-bootstrap', '--disable-multilib',
-             '--disable-nls', '--without-isl'], build)
-    # Two retained compiler builds leave less memory available for Cygwin DLLs.
-    command(['make', '-j4', 'all-gcc', 'CFLAGS=-O2 -g1', 'CXXFLAGS=-O2 -g1'], build)
+    configure_args = list(CONFIGURE_ARGS if configure_args is None else configure_args)
+    make_args = list(MAKE_ARGS if make_args is None else make_args)
+    stamp_path = build / '.cc1-build-stamp.json'
+    configure_stamp = build / '.cc1-configure-stamp.json'
+    stamp = {'commit': commit, 'configure_args': configure_args, 'make_args': make_args}
     compiler = build / 'gcc/cc1.exe'
+    if read_stamp(stamp_path) == stamp and compiler.is_file():
+        print('SKIP x86-' + slot + ': configure and make current for ' + commit, flush=True)
+        return [str(compiler)]
+    stamp_path.unlink(missing_ok=True)
+    # Keep successful configure state across failed makes and source revisions.
+    configuration = {'configure_args': configure_args}
+    if (read_stamp(configure_stamp) != configuration or not (build / 'config.status').is_file()):
+        configure_stamp.unlink(missing_ok=True)
+        command(['bash', source / 'configure', *configure_args], build)
+        write_stamp(configure_stamp, configuration)
+    command(['make', *make_args], build)
     if not compiler.is_file():
         raise RuntimeError('build did not produce ' + str(compiler))
+    write_stamp(stamp_path, stamp)
     return [str(compiler)]
 
 
