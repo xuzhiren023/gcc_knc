@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-03 23:33.
+Updated automatically at every ticket change. Last update: 2026-11-03 23:35.
 
-**Next: the tech lead, on S3-14.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: GPT-6.1, on S3-14 (Native TLS for k1om, and every x86_64-only configure case that misses k1om).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
 Current tickets: `[#################---]` 51 of 57
 
@@ -71,7 +71,7 @@ Current tickets: `[#################---]` 51 of 57
 | S3-11 | Milestone M1 note: fixture, line counts, ICE classes and backend cost comparison | Not started | Owner approved Sprint 3 on 2026-11-03; ticket set to ready. |
 | S3-12 | tools/portability: forward-port drill and x86_64 unchanged check | Done | tools/portability.py now checks whether the KNC changes still merge onto newer GCC (master has 2 conflicts,... |
 | S3-13 | Move KNC code out of shared i386 files into i386-knc | Done | KNC code now lives in i386-knc.cc/.h behind one-line hooks in the shared i386 files (shared diff 324 lines/... |
-| S3-14 | Native TLS for k1om, and every x86_64-only configure case that misses k1om | Waiting for review | Fix 0235ff44771; audit e5e7ad6 covers 52 case lines/54 alternatives and regeneration/results. All through t... |
+| S3-14 | Native TLS for k1om, and every x86_64-only configure case that misses k1om | Changes requested | The TLS fix is right: the gcc/configure.ac TLS and PIE cases, the test and the HAVE_AS_TLS result are good.... |
 | S3-15 | ABI gaps: packed vectors through varargs and ms_abi, complex values, rounding mode across calls | Not started | Sessions raised from 3 to 4 before start, under the owner's delegation of engineering budgets. S3-07, S3-13... |
 | S3-16 | Nothing writes to Documents/_shared from the main checkout | Done | Torture and x87 probe outputs now stay in the repository's .work/_shared when run from the main checkout, a... |
 | S3-17 | card_run takes each process's parent from the same status read that admits it | Done | card_run no longer refuses jobs when a kernel thread's first status read fails: each process's parent now c... |
@@ -84,18 +84,18 @@ Current tickets: `[#################---]` 51 of 57
 
 - 2026-11-03 23:35 **S3-20** lead note: Sessions raised from 3 to 4 before start, under the owner's delegation of engineering budgets. S3-07, S3-13, S3-18 and S3-21 each stopped at their ...
 - 2026-11-03 23:35 **S3-15** lead note: Sessions raised from 3 to 4 before start, under the owner's delegation of engineering budgets. S3-07, S3-13, S3-18 and S3-21 each stopped at their ...
+- 2026-11-03 23:35 **S3-14** lead changes: The TLS fix is right: the gcc/configure.ac TLS and PIE cases, the test and the HAVE_AS_TLS result are good. One real defect, in the extra picflag c...
 - 2026-11-03 23:33 **S3-14** engineer submit: Fix 0235ff44771; audit e5e7ad6 covers 52 case lines/54 alternatives and regeneration/results. All through tools/run.py: clean GCC C/Fortran rebuild...
 - 2026-11-03 22:27 **S3-14** lead approve-red: The new TLS test fails on GCC 16 for the right reason: it emits __emutls calls at -O2, -O2 -fPIC and -O0, while the donor's native %fs/@tpoff/@gott...
 - 2026-11-03 22:26 **S3-14** engineer red: Red commit 3f40227. Ran tools/run.py --name s3-14-native-tls-red --inputs tests/t1/knc-tls.c tools/native_tls.py tools/check.py -- python tools/che...
 - 2026-11-03 22:24 **S3-21** lead approve: Byte-aligned vector copies (like pr65369) no longer use the KNC load/store pair instructions that need element alignment, so they no longer crash o...
 - 2026-11-03 22:21 **S3-21** engineer submit: Hook rejects is_packed/non-element-multiple misalignment; sub-element MEM_ALIGN uses eight DImode GPR transfers via 64-byte-aligned stack; insns re...
-- 2026-11-03 22:20 **S3-21** owner decide: Lead decided under the owner's 2026-11-03 delegation: budget raised to 5 sessions and 32M input tokens to submit. The lead ran the guard programs o...
 
 ## Cost
 
 - From the script, engineer: 167 sessions, 352.3M input tokens
 - From the script, lead: 166 sessions, 53.8M input tokens
-- Started by hand, Claude: 6 sessions, 500.4M input tokens
+- Started by hand, Claude: 6 sessions, 501.9M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
