@@ -138,3 +138,21 @@ and every zero, negative, infinity and NaN gives the expected special value.
 - `s5_ops` `o2v` and `o3` passed at the same compiler code under S5-10 (above).
 - x86 (lead, `portability-claude`): `-O2` and `-O2 -mavx512f` identical=1962 different=0
   both-failed=41.
+
+## 2026-11-05: S5-11 under review (FP32 vector division)
+
+Built from S5-11's compiler (GCC `fabdf2d706e`), core 59:
+
+- `s5_ops` `o2v`: 779,984 checks, 0 failures (`claude-9c208fd6…`); `o3`: same (`claude-97a295e8…`).
+- `tests/regress/knc-div-sets.c` (S5-03 sets, exact integer residuals, flags per batch;
+  `claude-d51007f0…`, about 10 card minutes):
+
+| Set | Pairs | Bad | Flag mismatches | Flags seen |
+|---|---|---|---|---|
+| (a) modular near-midpoints, RN | 46,513,140 | 0 | 0 | PE |
+| (b) near-one class, RN | 134,217,704 | 0 | 0 | PE |
+| (c) all exponent pairs and subnormals, RN | 4,161,664 | 0 | 0 | PE UE OE |
+| (d) subnormal midpoints, RN | 102,010 | 0 | 0 | PE UE |
+| (e) specials, one pair per call, all modes | 784 | 0 | 0 | IE DZ OE UE PE |
+| (f) 2^30 random, RN | 1,073,741,824 | 0 | 0 | IE DZ OE UE PE |
+| (g) (a), (b), (d) under RD, RU, RZ | 542,498,562 | 0 | 0 | PE UE |
