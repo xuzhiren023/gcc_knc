@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-05 08:45.
+Updated automatically at every ticket change. Last update: 2026-11-05 08:47.
 
 **Next: GPT-6.1, on S5-06 (KNC vec_perm_const: reversed, stride-2 and interleaved loops vectorize with swizzle, vpermf32x4, vpshufd, valignd and vpermd).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
@@ -105,7 +105,7 @@ Current tickets: `[##################--]` 80 of 86
 | S5-06 | KNC vec_perm_const: reversed, stride-2 and interleaved loops vectorize with swizzle, vpermf32x4, vpshufd, valignd and vpermd | In progress | Red approved: reversed, stride-2 and complex loops must use vpermd, masked vpermd and swizzles, and each co... |
 | S5-07 | KNC reductions: vpermf32x4 and swizzle trees for plus, min/max and logic, with no stack accumulator | Not started |  |
 | S5-08 | KNC same-width conversions: int32/uint32 to and from float as single vcvtfxpnt instructions (the ADR-0008 named-insn exception) | Not started |  |
-| S5-09 | Card probe of vrcp23ps, vrsqrt23ps and vgetmant (S5-03 P1a-e), to back the division and square-root proofs | Not started |  |
+| S5-09 | Card probe of vrcp23ps, vrsqrt23ps and vgetmant (S5-03 P1a-e), to back the division and square-root proofs | In progress |  |
 | S5-10 | Correctly rounded FP32 vector square root for V16SF (S5-03 ticket A) | Not started |  |
 | S5-11 | Correctly rounded FP32 vector division for V16SF, with cond_div (S5-03 ticket B) | Not started |  |
 
@@ -124,10 +124,10 @@ Current tickets: `[##################--]` 80 of 86
 
 - From the script, engineer: 186 sessions, 441.0M input tokens
 - From the script, lead: 184 sessions, 58.7M input tokens
-- Started by hand, Claude: 9 sessions, 812.6M input tokens
+- Started by hand, Claude: 9 sessions, 814.3M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 16.3 GiB of 100 GiB. 209 GiB free on the drive.
+The project uses 16.3 GiB of 100 GiB. 208 GiB free on the drive.
