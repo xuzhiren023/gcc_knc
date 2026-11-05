@@ -23,8 +23,9 @@ REBOOT = "00000000-0000-0000-0000-000000000002"
 FOREIGN = dict(pid=42, ppid=1, name="wrf", exe="/other/wrf", cwd="/other")
 # Deliberately scrambled IDs and multiple logical CPUs per physical core.
 CPUINFO = "\n\n".join(
-    "processor : %d\nphysical id : 0\ncore id : %d" % pair
-    for pair in ((7, 60), (91, 40), (2, 39), (13, 59), (4, 40), (88, 0))) + "\n"
+    "processor : %d\nphysical id : 0\ncore id : %d" %
+    ((core * 4 + thread + 17) % 244, core)
+    for core in reversed(range(61)) for thread in (2, 0, 3, 1)) + "\n"
 
 
 class SharedTransport:
@@ -166,7 +167,8 @@ class SharedCardRules(unittest.TestCase):
         def clocked_run(*args, **kwargs):
             kwargs["monotonic"] = lambda: self.transport.now
             return actual_run(*args, **kwargs)
-        replacements = dict(SSHTransport=mock.Mock(return_value=self.transport), run=clocked_run)
+        replacements = dict(SSHTransport=mock.Mock(return_value=self.transport), run=clocked_run,
+                            ROOT=self.directory)
         if default_root is not None:
             replacements["ROOT"] = default_root
         with mock.patch.dict(self.runner["main"].__globals__, replacements), \
@@ -197,8 +199,9 @@ class SharedCardRules(unittest.TestCase):
             nonlocal snapshots
             snapshots += 1
             parser.run_dir = self.transport.run_dir
-            raw = ("BOOT\t%s\nCPU\tprocessor : 91\nCPU\tcore id : 40\n"
-                   "MEM\tMemFree: 4000000 kB\n" % BOOT).encode()
+            raw = ("BOOT\t%s\n" % BOOT +
+                   "".join("CPU\t%s\n" % line for line in CPUINFO.splitlines()) +
+                   "MEM\tMemFree: 4000000 kB\n").encode()
             if snapshots == 3:  # After execute returned its matched result.
                 raw += b"PROC\t43\t1\tending\nPROC\t42\t1\tforeign\t/bin/sh\t/other\n"
             parser.rpc = mock.Mock(return_value=raw)
@@ -300,11 +303,11 @@ class SharedCardRules(unittest.TestCase):
         start, end = lines
         self.assertTrue(start["jobId"].startswith("claude-"))
         self.assertEqual(end["jobId"], start["jobId"])
-        self.assertEqual(set(start["cores"]), {40, 59})
+        self.assertEqual(start["cores"], [59])
         self.assertEqual(start["memoryLimitMiB"], 128)
         self.assertTrue(start["startTime"])
         self.assertTrue(start["expectedEnd"])
-        self.assertEqual(start["logicalCpus"], [4, 13, 91])
+        self.assertEqual(start["logicalCpus"], [9, 10, 11, 12])
         self.assertFalse(end["timingValid"])
         self.assertEqual(end["outcome"], "success")
         self.assertTrue(end["endTime"])
@@ -333,8 +336,8 @@ class SharedCardRules(unittest.TestCase):
         execute = self.events("execute")
         self.assertEqual(len(execute), 1)
         self.assertIsNotNone(execute[0][2], "execution must receive an enforced CPU binding")
-        self.assertEqual(set(execute[0][2]), {91, 13, 4})
-        self.assertNotIn(7, execute[0][2])
+        self.assertEqual(set(execute[0][2]), {9, 10, 11, 12})
+        self.assertTrue(set(execute[0][2]).isdisjoint({13, 14, 15, 16}))
 
     def test_missing_pinning_or_no_eligible_cores_refuses(self):
         for missing in ("pinning", "cores"):
