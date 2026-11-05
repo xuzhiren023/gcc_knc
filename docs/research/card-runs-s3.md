@@ -260,3 +260,16 @@ That last build forces S4-03's element-wise misaligned fallback, which was untes
 is exact and stays inside the arrays. The aligned guard control faults on the guard line after the
 array (`kernel=add_al_f32 n=1 where=2`, real address; `claude-c47aa755…`). Execute suite: 1,681
 linked, 0 ICE, 104 with packed zmm, **1,681 of 1,681 PASS** in one job (`claude-748d87e7…`).
+
+## Sprint 4: S4-05 merged (lead, 2026-11-04)
+
+GCC `knc` `20a310961ac`, `cc1` SHA-1 `65a88218b1ad…` (the same before and after). The aligned kernels now
+end in masked epilogues (31 GPR-to-`k` mask moves at `-O2`). `s4_masks` passes 1,589,070 checks at
+`-O2 -ftree-vectorize` (`claude-41f25ed4…`), `-O3` (`claude-8c3d968c…`), `-fno-trapping-math`
+(`claude-177f1ddc…`) and `-fvect-cost-model=unlimited` (`claude-9dc32942…`). Each aligned array
+ends on a line boundary with a guard page after it, so the empty-mask epilogues at n = 16, 32, 48
+and 64 prove the guards. The aligned guard control faults as designed (`claude-d7b318ca…`). S3-10
+rows rebuilt at this head: `m1_affine` (GCC 16, donor and Fortran drivers), inexact, vector-O2 and
+FP-O2 pass. ABI-O2-0 prints 5 × PASS with equal values; its expected file came from a stale lead
+copy without S4-08's spelling fix, and the copy is now refreshed. Execute suite: **1,681 of 1,681
+PASS** (`claude-11534d89…`).
