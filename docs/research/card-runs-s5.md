@@ -96,3 +96,15 @@ GCC `knc` `bb2dffd3b06`. The integer reductions and the fast-math FP sums now en
 The reductions are exact, including integer wrap-around, and the fast-math FP sums use
 reassociated trees over exact inputs. `s4_masks` still passes 1,589,070 checks at
 `-O2 -ftree-vectorize` (`claude-02ff21ef…`) and `-O3` (`claude-0c3ea928…`).
+
+## 2026-11-05: S5-08 merged (same-width conversions)
+
+GCC `knc` with S5-08: `cvt_i32_f32`, `cvt_u32_f32` and `cvt_f32_i32` now use `vcvtfxpnt*` (3 at
+`-O2 -ftree-vectorize`). `s5_ops` passes:
+- `o2v`: 779,984 checks (`claude-32528ac0…`);
+- `o3`: 779,984 checks (`claude-657ae463…`);
+- `fast`: 602,384 checks (`claude-7c997da8…`).
+
+That includes the round-to-nearest int-to-float checks and float-to-int truncation with negative
+fractions. `s4_masks` still passes 1,589,070 checks at `-O2 -ftree-vectorize` (`claude-34a18310…`)
+and `-O3` (`claude-37ed4a56…`).
