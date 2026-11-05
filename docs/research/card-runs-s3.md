@@ -240,3 +240,12 @@ which validated the owner's 3-threads-per-core rule.
 execute suite from S4-02's build runs as **one** job through `--file-list` at `-j 80` with 96 MiB per
 program (7,680 MiB, inside the 10 GiB budget): **1,681 of 1,681 PASS** (`claude-685d1bc9…`). Before,
 it took six jobs of 300 files, with about 600 SSH connections each.
+
+## Sprint 4: S4-03 merged (lead, 2026-11-04)
+
+GCC `knc` `ae8a033c5f3`, `cc1` SHA-1 `ef3ff3ec0fc6…` (the same before and after). `s4_masks` (56 masked
+operations and 12 compares in its kernels) passes 1,576,200 checks at `-O2 -ftree-vectorize`
+(`claude-a87b9b50…`), at `-O3` (`claude-981cb27c…`) and at `-O2 -ftree-vectorize -fno-trapping-math`
+(`claude-52205208…`). The last build is the only one with a `vcmpnltps`, from S4-03's UNGE-as-nlt
+mapping, so that mapping is exact on real NaNs. Execute suite: 1,681 linked, 0 ICE, 103 with packed
+zmm, **1,681 of 1,681 PASS** in one packed job (`claude-54700e73…`).
