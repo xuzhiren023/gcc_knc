@@ -22,9 +22,9 @@ __attribute__((noinline,noclone)) static void kernel (void)
   for (int i = 0; i < N; i++) cv[i] = av[i] / bv[i];
 }
 
+static uint64_t state = UINT64_C(0x4b4e434449563131);
 static uint32_t random32 (void)
 {
-  static uint64_t state = UINT64_C(0x4b4e434449563131);
   state ^= state >> 12; state ^= state << 25; state ^= state >> 27;
   return (uint32_t)((state * UINT64_C(2685821657736338717)) >> 32);
 }
@@ -180,6 +180,7 @@ static void hard (unsigned sa, unsigned sb)
 static void midpoints (unsigned set)
 {
   int saved = mode;
+  state = UINT64_C(0x4b4e434449563131); /* Same midpoint pairs in every mode. */
   for (int d = 1; d <= 24; ++d) for (int j = 0; j < 4096; ++j) {
     uint32_t q = ((random32 () & 0x7fffff) | 0x800000);
     q = (q >> d << d) | (1u << (d-1));

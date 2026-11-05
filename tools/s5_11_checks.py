@@ -36,9 +36,9 @@ def main():
         suite = unittest.TestSuite()
         for path in sorted((ROOT / 'tests/regress').glob('test_*.py')):
             if path.name != 'test_div_model.py':
-                suite.addTests(unittest.defaultTestLoader.discover(str(path.parent), pattern=path.name))
+                suite.addTests(unittest.TestLoader().discover(str(path.parent), pattern=path.name))
         for name in ('test_doctor.py', 'test_portability.py', 'test_knc_lint.py'):
-            suite.addTests(unittest.defaultTestLoader.discover(str(ROOT / 'tests/tools'), pattern=name, top_level_dir=str(ROOT)))
+            suite.addTests(unittest.TestLoader().discover(str(ROOT / 'tests/tools'), pattern=name))
         return int(not unittest.TextTestRunner(verbosity=1).run(suite).wasSuccessful())
     if action == 'acceptance':
         return acceptance()
