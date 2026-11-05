@@ -1,10 +1,10 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-05 09:20.
+Updated automatically at every ticket change. Last update: 2026-11-05 09:22.
 
-**Next: the tech lead, on S5-09.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: GPT-6.1, on S5-06 (KNC vec_perm_const: reversed, stride-2 and interleaved loops vectorize with swizzle, vpermf32x4, vpshufd, valignd and vpermd).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
-Current tickets: `[#################---]` 80 of 93
+Current tickets: `[#################---]` 81 of 93
 
 ## Milestones
 
@@ -12,7 +12,7 @@ Current tickets: `[#################---]` 80 of 93
 |---|---|---|---|
 | M0 | Foundation | In progress | 17 of 17 tickets |
 | M1 | Mixed native code | Done | 43 of 43 tickets |
-| M2 | Useful vector target | In progress | 20 of 33 tickets |
+| M2 | Useful vector target | In progress | 21 of 33 tickets |
 | M3 | Runtimes | Not started | Not planned in detail yet |
 | M4 | Broad optimization | Not started | Not planned in detail yet |
 | M5 | Program corpus | Not started | Not planned in detail yet |
@@ -105,7 +105,7 @@ Current tickets: `[#################---]` 80 of 93
 | S5-06 | KNC vec_perm_const: reversed, stride-2 and interleaved loops vectorize with swizzle, vpermf32x4, vpshufd, valignd and vpermd | In progress | Red approved: reversed, stride-2 and complex loops must use vpermd, masked vpermd and swizzles, and each co... |
 | S5-07 | KNC reductions: vpermf32x4 and swizzle trees for plus, min/max and logic, with no stack accumulator | Not started |  |
 | S5-08 | KNC same-width conversions: int32/uint32 to and from float as single vcvtfxpnt instructions (the ADR-0008 named-insn exception) | Not started |  |
-| S5-09 | Card probe of vrcp23ps, vrsqrt23ps and vgetmant (S5-03 P1a-e), to back the division and square-root proofs | Waiting for review | Added tests/regress/knc-estimate-probe.c (P1a-e, exact 128-bit integer references, no x87). KNC GCC 16 -O0 ... |
+| S5-09 | Card probe of vrcp23ps, vrsqrt23ps and vgetmant (S5-03 P1a-e), to back the division and square-root proofs | Done | A card probe now measures vrcp23ps and vrsqrt23ps against the error bounds the FP32 division and square-roo... |
 | S5-10 | Correctly rounded FP32 vector square root for V16SF (S5-03 ticket A) | Not started |  |
 | S5-11 | Correctly rounded FP32 vector division for V16SF, with cond_div (S5-03 ticket B) | Not started |  |
 | S5-12 | KNC float/double-width conversions: vcvtps2pd, vcvtpd2ps, vcvtdq2pd, vcvtfxpntpd2dq with vpermf32x4 halves | Not started |  |
@@ -118,6 +118,7 @@ Current tickets: `[#################---]` 80 of 93
 
 ## Recent activity
 
+- 2026-11-05 09:22 **S5-09** lead approve: A card probe now measures vrcp23ps and vrsqrt23ps against the error bounds the FP32 division and square-root proofs assume, with exact integer refe...
 - 2026-11-05 09:20 **S5-09** engineer submit: Added tests/regress/knc-estimate-probe.c (P1a-e, exact 128-bit integer references, no x87). KNC GCC 16 -O0 build with -Wall -Wextra -Wa,--march=k1o...
 - 2026-11-05 08:45 **S5-06** lead approve-red: Red approved: reversed, stride-2 and complex loops must use vpermd, masked vpermd and swizzles, and each constant shuffle recipe is chosen cheapest...
 - 2026-11-05 08:44 **S5-06** engineer red: Red at 2ba76fd: check t1 --compiler gcc16 fails only the new files: knc-perm-loops.c at rev_f32 (no vpermd; loop scalar, 'unsupported SLP instances...
@@ -125,13 +126,12 @@ Current tickets: `[#################---]` 80 of 93
 - 2026-11-05 08:40 **S5-05** lead approve: knc_lint no longer rejects correct vcvtdq2pd, vcvtudq2pd and vcvtps2pd, whose 8-lane register source objdump prints as %ymm; every other %ymm is st...
 - 2026-11-05 08:38 **S5-05** engineer submit: Red commit fb79c37 failed (no decoded kwarg); fix 06a1590: forbidden(decoded=True) from decoded_violations only strips %ymm source of vcvtdq2pd/vcv...
 - 2026-11-05 08:37 **S5-03** engineer submit: docs/research/knc-div-sqrt.md: FP32 sqrt (19 insns) proven by exhaustive exact host model over all reduced args, all allowed vrsqrt23ps estimates, ...
-- 2026-11-05 08:36 **S5-04** lead approve: card_run now shares the card safely with the PhiWeather tuning session: our ledger rows say project gcc-knc, only our own jobs count against our me...
 
 ## Cost
 
 - From the script, engineer: 186 sessions, 441.0M input tokens
 - From the script, lead: 184 sessions, 58.7M input tokens
-- Started by hand, Claude: 9 sessions, 823.2M input tokens
+- Started by hand, Claude: 9 sessions, 824.2M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
