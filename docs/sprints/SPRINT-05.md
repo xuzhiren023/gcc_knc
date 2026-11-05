@@ -73,7 +73,25 @@ Roadmap row S5 in `docs/PROJECT_PLAN.md`; backlog E4-02, E4-03, E4-05, E4-06 and
 | S5-03 | Research: correctly rounded FP32 and FP64 division and square root from `vrcp23ps`/`vrsqrt23ps` and FMA; proof and test plan with MPFR; card time needed | deep | research | |
 | S5-04 | `card_run` shares the card with the PhiWeather tuning session: project tag, own-budget memory count, refusal while a timed job is open, a staging limit, packed S3-10 batch | standard | tools | |
 
-The gcc tickets are written from ADR-0008 once S5-01 to S5-03 are accepted.
+| S5-05 | `knc_lint` accepts the decoded `%ymm` source of `vcvtdq2pd`/`vcvtudq2pd`/`vcvtps2pd` (found by S5-02) | light | tools | |
+| S5-06 | KNC `vec_perm_const`: swizzle, `vpermf32x4`, `vpshufd`, `valignd`, blend, one and two `vpermd` | deep | gcc | |
+| S5-07 | Reductions: `vpermf32x4` and swizzle trees, no stack accumulator | deep | gcc | S5-06 |
+| S5-08 | Same-width int/float conversions; the ADR-0008 named-insn exception | standard | gcc | S5-05 |
+| S5-09 | Card probe of `vrcp23ps`/`vrsqrt23ps`/`vgetmant` (S5-03 P1a-e) | light | research | |
+| S5-10 | Correctly rounded FP32 vector square root | standard | gcc | S5-08 |
+| S5-11 | Correctly rounded FP32 vector division and `cond_div` | deep | gcc | S5-10 |
+
+ADR-0008 was accepted on 2026-11-05 and amended the same day with the card probes. All of its
+probe-dependent points resolved the permissive way (`docs/research/card-runs-s5.md`). Still to
+write, in order, as the gcc lane frees up:
+- float/double-width conversions;
+- 16-lane gather/scatter;
+- 8-lane gather/scatter;
+- FP min/max;
+- byte and word data;
+- two batch checks.
+
+FP64 division and square root stay scalar this sprint (S5-03).
 
 ## Batch check results
 

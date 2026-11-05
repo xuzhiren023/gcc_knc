@@ -4,6 +4,12 @@ The owner asked on 2026-11-03 to be told of anything worth sharing with the othe
 (GPT, PhiWeather's WRF-to-IMCI translation). The lead adds items here as they are found; the owner
 passes on what they choose. Each item says how it was shown. Newest first.
 
+## 2026-11-05, later (sent to the WRF tuning session)
+
+- Card probe facts on gathers and scatters, `vcvtfxpnt` truncation and flags, saturating
+  down-conversion, the unpack/pack page-end fault, and x87 FP64 double rounding
+  (`docs/research/card-runs-s5.md`).
+
 ## 2026-11-05 (sent directly to the PhiWeather WRF tuning session)
 
 - Card-sharing proposal (no job of ours while its timed job is open), and the ledger name clash

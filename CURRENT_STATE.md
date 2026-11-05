@@ -4,7 +4,12 @@ The handoff between sessions. `STATUS.md` holds tickets, cost and disk, and upda
 file holds what only a person or an agent can know. Replace lines when facts change, and do not
 trust anything here that a quick command can check instead.
 
-Last updated: 2026-11-05. **Sprint 4 is closed.** All tickets merged (S3-09, S4-01 to S4-14; GCC `knc` `c759f17f1b9`). At that head: x86 identical (1,962 files), drill all textual, 0 ICE, 314 shared lines in 71 hunks, and on the card `s4_masks` (all six builds, S4-14's split included), the execute suite 1,681/1,681 and all 14 S3-10 rows pass. **Sprint 5 started 2026-11-05** (`docs/sprints/SPRINT-05.md`): research S5-01 to S5-03 and tools S5-04 running as Claude subagents. M1 is accepted and tagged `m1` locally; nothing is pushed. Sprint 4's engineers were Claude subagents (GPT usage ran out).
+Last updated: 2026-11-05, Sprint 5. Sprint 4 is closed (GCC `knc` `c759f17f1b9`; at that head `s4_masks`, the suite and all S3-10 rows pass on the card). **Sprint 5 is running** (`docs/sprints/SPRINT-05.md`):
+- S5-01 to S5-05 are merged: the research, ADR-0008 (amended with the card probes), the ADR-0003 amendment, `card_run` sharing and the lint fix.
+- S5-06 (permutes) is in the gcc lane; S5-09 (estimate probe) is running.
+- The `s5_ops` baseline passes on the card.
+
+M1 is accepted and tagged `m1` locally; nothing is pushed. Engineers are Claude subagents (GPT is on paid credit until about 2026-11-12).
 
 ## Proven, and how
 
@@ -53,8 +58,18 @@ Last updated: 2026-11-05. **Sprint 4 is closed.** All tickets merged (S3-09, S4-
 | Empty `lib` and `usr/lib` fix the donor link failure | Applied to the shared sysroot by S0-03, and the link passes in the lead's rerun | `gcc --sysroot=<sysroot> -print-file-name=crt1.o` |
 | **M1 accepted (go) at GCC `knc` `f4fa4944b8a`**: all 7 fixed S3-11 criteria met. On the card, cores 40-59: execute suite 1,681/1,681, all 14 S3-10 rows, the atomic counter. ICE sweeps `-O2 -ftree-vectorize` and `-O3`: 0 ICE. x86: 0 differences. Drill conflicts all textual; trunk builds, with 16 T1 differences ticketed as S3-25. 184 shared lines in 53 hunks. Cost floor for a separate backend: 235 or more sessions to M1, against 184 measured | `docs/research/m1-result.md` (decision section), `docs/research/card-runs-s3.md` (M1 final head) | `python harness/card/run_suite.py`; `torture_compile.py --level O3` |
 | **Sprint 4 at GCC `knc` `c759f17f1b9`**: vector compares into masks with C NaN semantics, if-converted select and conditional loops, V16SI and V8DI add/sub (carry), masked epilogues for no-peel aligned loops, and S4-14's guarded split for misaligned masked access are exact on the card. `s4_masks` 1,589,070 checks in six builds at lengths 0-65 and offsets 0-15 inside guard pages; execute suite 1,681/1,681; 14 S3-10 rows | `docs/research/card-runs-s3.md` (Sprint 4 head); `docs/sprints/SPRINT-04.md` | Builds in `.work/_shared/tmp/claude-s4-masks`; `python harness/card/run_suite.py` |
+| **Sprint 5 card facts (2026-11-05):**
+- Gathers and scatters do not fault or write on masked-off lanes, complete when resumed after a fault, scale indices at address width, and let the highest lane win on duplicate scatter indices.
+- `vgmax`/`vgmin` match the manual.
+- `vcvtfxpnt` imm 3 truncates and raises IE (NaN, inf, out of range) and PE; imm 4-7 raise SIGILL.
+- Down-converting stores saturate. Converted 16- and 32-byte accesses are safe at a page end, but the unaligned unpack/pack pair is not.
+- The `s5_ops` baseline passes; its negative control fails. | `docs/research/card-runs-s5.md` | `tests/regress/knc-gather-probe.c`, `knc-convert-probe.c` through `tools/card_run` |
 
 ## Not proven yet
+
+- **Scalar x87 FP64 division and square root on the card are double-rounded** (64-bit precision control, then the store), so they are not always correctly rounded (S5-03, from the card's libm and x87 control word; not yet seen in a failing case on the card). `s5_ops` accepts that value from scalar paths.
+- **In-order FP reductions (`dot_f32` at `-O2`)** become a vector multiply plus 16 sequential x87 adds through the stack. That is legal, but probably slower than scalar code. This is a question for the Sprint 6 cost model.
+- **A subagent's leftover background test run held its worktree open,** and `pm.py approve` then failed halfway (S5-04, 2026-11-05). Recovery: stop the processes, `git worktree add` the branch again, and approve again. Briefs now say to leave no background processes.
 
 - **On the card (lead, 2026-11-03 evening, `docs/research/card-runs-s3.md`):**
   - S3-04 and S3-05's packed copies pass 780 checks at `-O0` and `-O2`, and a broken-alignment control segfaults.
