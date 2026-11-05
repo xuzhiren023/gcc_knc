@@ -3,6 +3,13 @@
 #include "ops.h"
 
 #define R __restrict
+/* The driver skips checks that FTZ/DAZ (crtfastmath) or reciprocal
+   approximation legitimately change.  */
+#ifdef __FAST_MATH__
+const int s5_ops_fast_math = 1;
+#else
+const int s5_ops_fast_math = 0;
+#endif
 /* -DNEGATIVE_CONTROL moves every division and square-root result one ulp
    up, so the driver's correct-rounding checks must fail.  */
 #ifdef NEGATIVE_CONTROL

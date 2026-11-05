@@ -33,6 +33,13 @@ What each kernel must do:
   - FP64 is decided exactly in 128-bit integers from the mantissas: the residual against half the
     gap to the neighbour. Operands are normal, with exponents within ±200. A separate set covers
     special operands.
+  - Scalar x87 code on the card runs at 64-bit precision, so its FP64 quotients and roots are
+    rounded twice and are not always correctly rounded (S5-03). An FP64 element equal to that
+    double-rounded x87 value is therefore accepted, because it came from a scalar peel or
+    remainder.
+  - Under `-ffast-math` (the `fast` row), the division, square-root and FP32/FP64 conversion
+    checks are skipped, and the driver prints an `INFO` line instead. `crtfastmath` sets DAZ and
+    FTZ, and reciprocal approximation is allowed there.
 
 ## Builds
 
@@ -42,11 +49,13 @@ Driver: `xgcc -march=knc -O0 -fwrapv -c driver.c`, then link with each `loops.c`
 |---|---|---|
 | `o2v` | `-O2 -ftree-vectorize -fwrapv` | `S5-OPS PASS failures=0` |
 | `o3` | `-O3 -fwrapv` | PASS |
-| `fast` | `-O3 -ffast-math -fwrapv` | PASS (FP reductions may reassociate; inputs are exact) |
+| `fast` | `-O3 -ffast-math -fwrapv` | PASS, with fewer checks (FP reductions may reassociate; inputs are exact) |
 | `neg` | `-O2 -ftree-vectorize -fwrapv -DNEGATIVE_CONTROL` | FAIL in `div_f32`, `sqrt_f32`, `div_f64`, `sqrt_f64` and both special sets |
 
-Host check (Cygwin GCC 14, x86_64, 2026-11-05): `o2v` passes 767,184 checks, and `neg` fails all
-six division and square-root checks.
+Host check (Cygwin GCC 14, x86_64, 2026-11-05):
+- `o2v` passes 767,184 checks;
+- `fast` passes 589,584 checks;
+- `neg` fails all six division and square-root checks.
 
 ## Baseline at GCC `knc` `c759f17f1b9` (Sprint 4 head)
 

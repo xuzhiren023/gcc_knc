@@ -55,4 +55,7 @@ void sqrt_f32 (float *c, const float *a, int n);
 void div_f64 (double *c, const double *a, const double *b, int n);
 void sqrt_f64 (double *c, const double *a, int n);
 
+/* 1 if loops.c was built with -ffast-math.  */
+extern const int s5_ops_fast_math;
+
 #endif

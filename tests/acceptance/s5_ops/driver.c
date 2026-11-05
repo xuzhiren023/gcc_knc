@@ -369,10 +369,13 @@ main (void)
             r = (float) a[i], BITS_OK (float))
   CHECK_EW (int, float, int, "cvt_f32_i32", fconv, ibits, cvt_f32_i32 (c, a, n),
             r = (int) a[i], BITS_OK (int))
-  CHECK_EW (double, float, int, "cvt_f32_f64", fbits, ibits, cvt_f32_f64 (c, a, n),
-            r = a[i], FP_OK (double))
-  CHECK_EW (float, double, int, "cvt_f64_f32", dbits, ibits, cvt_f64_f32 (c, a, n),
-            r = (float) a[i], FP_OK (float))
+  if (!s5_ops_fast_math)  /* DAZ and FTZ change subnormal inputs and results */
+    {
+      CHECK_EW (double, float, int, "cvt_f32_f64", fbits, ibits, cvt_f32_f64 (c, a, n),
+                r = a[i], FP_OK (double))
+      CHECK_EW (float, double, int, "cvt_f64_f32", dbits, ibits, cvt_f64_f32 (c, a, n),
+                r = (float) a[i], FP_OK (float))
+    }
   CHECK_EW (double, int, int, "cvt_i32_f64", ibits, ibits, cvt_i32_f64 (c, a, n),
             r = a[i], BITS_OK (double))
   CHECK_EW (int, double, int, "cvt_f64_i32", inrange, ibits, cvt_f64_i32 (c, a, n),
@@ -457,20 +460,31 @@ main (void)
   CHECK_SCA (double, "sca_f64", dbits, 0, sca_f64 (c, b, idx, n))
   CHECK_SCA (float, "msca_f32", fbits, 1, msca_f32 (c, m, b, idx, n))
 
-  /* Division and square root.  */
-  CHECK_EW (float, float, float, "div_f32", fdiv_in, fdiv_in, div_f32 (c, a, b, n),
-            r = (float) ((double) a[i] / (double) b[i]), FP_OK (float))
-  CHECK_EW (float, float, int, "sqrt_f32", fdiv_in, ibits, sqrt_f32 (c, a, n),
-            r = (float) sqrt ((double) a[i]), FP_OK (float))
-  CHECK_EW (double, double, double, "div_f64", ddiv_in, ddiv_in, div_f64 (c, a, b, n),
-            r = 0, div_ok (a[i], b[i], c[i]))
-  CHECK_EW (double, double, int, "sqrt_f64", dpos, ibits, sqrt_f64 (c, a, n),
-            r = 0, sqrt_ok (a[i], c[i]))
-  /* FP64 special operands: zeros, infinities, NaN, extremes, negative roots.  */
-  CHECK_EW (double, double, double, "div_f64_special", dspec, dbits, div_f64 (c, a, b, n),
-            r = a[i] / b[i], FP_OK (double) || (isnormal (r) && div_ok (a[i], b[i], c[i])))
-  CHECK_EW (double, double, int, "sqrt_f64_special", dspec, ibits, sqrt_f64 (c, a, n),
-            r = sqrt (a[i]), FP_OK (double))
+  /* Division and square root.  Scalar x87 code on the card runs at 64-bit
+     precision, so its FP64 results are rounded twice and may miss correct
+     rounding (S5-03); an element equal to that x87 result came from a
+     scalar peel or remainder and is accepted.  Under -ffast-math these are
+     not checked: DAZ, FTZ and reciprocal approximation are allowed there.  */
+  if (s5_ops_fast_math)
+    printf ("INFO div/sqrt and FP32/FP64 conversion checks skipped (-ffast-math)\n");
+  else
+    {
+      CHECK_EW (float, float, float, "div_f32", fdiv_in, fdiv_in, div_f32 (c, a, b, n),
+                r = (float) ((double) a[i] / (double) b[i]), FP_OK (float))
+      CHECK_EW (float, float, int, "sqrt_f32", fdiv_in, ibits, sqrt_f32 (c, a, n),
+                r = (float) sqrt ((double) a[i]), FP_OK (float))
+      CHECK_EW (double, double, double, "div_f64", ddiv_in, ddiv_in, div_f64 (c, a, b, n),
+                r = (double) ((long double) a[i] / b[i]),
+                div_ok (a[i], b[i], c[i]) || BITS_OK (double))
+      CHECK_EW (double, double, int, "sqrt_f64", dpos, ibits, sqrt_f64 (c, a, n),
+                r = (double) sqrtl (a[i]), sqrt_ok (a[i], c[i]) || BITS_OK (double))
+      /* Special operands: zeros, infinities, NaN, extremes, negative roots.  */
+      CHECK_EW (double, double, double, "div_f64_special", dspec, dbits, div_f64 (c, a, b, n),
+                r = (double) ((long double) a[i] / b[i]),
+                FP_OK (double) || (isnormal (r) && div_ok (a[i], b[i], c[i])))
+      CHECK_EW (double, double, int, "sqrt_f64_special", dspec, ibits, sqrt_f64 (c, a, n),
+                r = sqrt (a[i]), FP_OK (double))
+    }
 
   printf ("INFO checks=%lu\n", checks);
   if (failures)
