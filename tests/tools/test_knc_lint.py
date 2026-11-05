@@ -55,6 +55,34 @@ class Lint(unittest.TestCase):
                     self.assertEqual(result.returncode, 1, result.stdout)
                     self.assertIn(str(obj) + ':seed:0x0: forbidden:', result.stdout)
 
+    def test_decoded_ymm_source_of_convert(self):
+        # K1OM objdump prints the 8-lane source of these as %ymmN (same encoding as %zmmN).
+        import importlib.machinery
+        import importlib.util
+        loader = importlib.machinery.SourceFileLoader('knc_lint_mod', str(ROOT / 'tools/knc_lint'))
+        spec = importlib.util.spec_from_loader('knc_lint_mod', loader)
+        lint = importlib.util.module_from_spec(spec)
+        loader.exec_module(lint)
+        for ok in ('vcvtdq2pd %ymm1,%zmm2', 'vcvtudq2pd %ymm1,%zmm2{%k1}',
+                   'vcvtps2pd %ymm1{dcba},%zmm2', 'vcvtps2pd %ymm3,%zmm2{%k7}'):
+            with self.subTest(decoded=ok):
+                self.assertFalse(lint.forbidden(ok, decoded=True))
+            with self.subTest(text=ok):
+                self.assertTrue(lint.forbidden(ok))
+        for bad in ('vcvtdq2pd %zmm1,%ymm2', 'vcvtps2pd %ymm1,%ymm2',
+                    'vcvtpd2ps %ymm1,%zmm2', 'vaddps %ymm1,%zmm2,%zmm3',
+                    'vcvtdq2pd %zmm1,%zmm2,%ymm3', 'vmovaps %ymm1,%zmm2'):
+            with self.subTest(decoded=bad):
+                self.assertTrue(lint.forbidden(bad, decoded=True))
+
+    def test_convert_ymm_in_source_text_rejected(self):
+        with tempfile.TemporaryDirectory() as temp:
+            source = Path(temp) / 'c.s'
+            source.write_text('.text\nvcvtdq2pd %ymm1, %zmm2\n')
+            result = self.lint(source)
+            self.assertEqual(result.returncode, 1, result.stdout)
+            self.assertIn('line-2', result.stdout)
+
     def test_symbol_names_and_strings(self):
         with tempfile.TemporaryDirectory() as temp:
             source, obj, linked = (Path(temp) / n for n in ('names.s', 'names.o', 'names.elf'))
