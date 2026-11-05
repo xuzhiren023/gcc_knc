@@ -84,3 +84,15 @@ That includes every lane of every shuffle recipe against its selector. `s4_masks
 - A masked-off lane raises no flag: no #Z for `rcp(0)`, and no #I for `rsqrt(-1)` or an sNaN.
 - `vrcp23ps(0x3FFFFFFF)` returns `0x3F000001`, round to nearest. So S5-03's step 15 is not needed
   on this part; the sequence keeps it anyway, because the proof must not rely on that.
+
+## 2026-11-05: S5-07 merged (reductions, the first Codex ticket)
+
+GCC `knc` `bb2dffd3b06`. The integer reductions and the fast-math FP sums now end in a
+`vpermf32x4` and swizzle tree (18 `vpermf32x4` in `s5_ops` at `-O3`). `s5_ops` passes:
+- `o2v`: 779,984 checks (`claude-32c1f857…`);
+- `o3`: 779,984 checks (`claude-5d276890…`);
+- `fast`: 602,384 checks (`claude-d4d47532…`).
+
+The reductions are exact, including integer wrap-around, and the fast-math FP sums use
+reassociated trees over exact inputs. `s4_masks` still passes 1,589,070 checks at
+`-O2 -ftree-vectorize` (`claude-02ff21ef…`) and `-O3` (`claude-0c3ea928…`).
