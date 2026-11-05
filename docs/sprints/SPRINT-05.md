@@ -68,9 +68,9 @@ Roadmap row S5 in `docs/PROJECT_PLAN.md`; backlog E4-02, E4-03, E4-05, E4-06 and
 
 | Ticket | What it delivers | Depth | Lane | Needs |
 |---|---|---|---|---|
-| S5-01 | Research: gather/scatter forms, partial completion and fault footprint, GCC 16 indexed-access entry points, permutes, reductions and the FP ordering contract, FP min/max; card probe | deep | tools | |
-| S5-02 | Research: IMCI int/FP conversions against C semantics, GCC 16 pack/unpack optabs, up/down-converting memory forms, byte and word data design; card probe | deep | tools | |
-| S5-03 | Research: correctly rounded FP32 and FP64 division and square root from `vrcp23ps`/`vrsqrt23ps` and FMA; proof and test plan with MPFR; card time needed | deep | tools | |
+| S5-01 | Research: gather/scatter forms, partial completion and fault footprint, GCC 16 indexed-access entry points, permutes, reductions and the FP ordering contract, FP min/max; card probe | deep | research | |
+| S5-02 | Research: IMCI int/FP conversions against C semantics, GCC 16 pack/unpack optabs, up/down-converting memory forms, byte and word data design; card probe | deep | research | |
+| S5-03 | Research: correctly rounded FP32 and FP64 division and square root from `vrcp23ps`/`vrsqrt23ps` and FMA; proof and test plan with MPFR; card time needed | deep | research | |
 | S5-04 | `card_run` shares the card with the PhiWeather tuning session: project tag, own-budget memory count, refusal while a timed job is open, a staging limit, packed S3-10 batch | standard | tools | |
 
 The gcc tickets are written from ADR-0008 once S5-01 to S5-03 are accepted.
