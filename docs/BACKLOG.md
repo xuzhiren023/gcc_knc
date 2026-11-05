@@ -69,7 +69,7 @@ Drafted as tickets S2-01 to S2-08; see [SPRINT-02](sprints/SPRINT-02.md).
 | E4-06 | Permutes, reductions (with FP ordering contract), min and max semantics | Standard |
 | E4-07 | Memory up/down conversions and swizzle use for byte and word data | Standard |
 
-## E5 Profitability (S6, Milestone M2)
+## E5 Profitability (S6, Milestone M2; designed around the KNC machine model, ADR-0009)
 
 | ID | Story | Depth |
 |---|---|---|
@@ -79,6 +79,8 @@ Drafted as tickets S2-01 to S2-08; see [SPRINT-02](sprints/SPRINT-02.md).
 | E5-04 | Evaluate source-format scalar in `zmm` against x87 (ADR-0003) | Deep |
 | E5-05 | U/V scheduler v0, tested at production thread density | Standard |
 | E5-07 | Software prefetch v1: `vprefetch0/1/2` and `vprefetche*` patterns in `imci.md`, KNC cache and latency parameters from E5-01, and GCC's `-fprefetch-loop-arrays` on at `-O2`/`-O3` for KNC when E5-01 shows a gain; judged on streaming and stencil kernels in exclusive card windows (owner, 2026-11-03) | Standard |
+| E5-08 | Streaming (no-read) stores for write-only output that covers whole lines (`vmovnrap*`/`vmovnrngoap*`), legal only when the whole 64-byte line is written; measured against normal stores (ADR-0009 point 5) | Standard |
+| E5-09 | `-mtune=knc` tables: a KNC `processor_costs` entry, cache and prefetch parameters, unroll and alignment defaults, each chosen by card measurement, plus the published "GCC-KNC flags" page with ICC `-mmic` equivalents (ADR-0009 points 6 and 8) | Standard |
 | E5-06 | Milestone M2 kernels: short-loop, stencil and small-matrix kernels drawn from the corpus, plus hand-written IMCI references written for this project | Deep |
 
 ## E6 Runtimes (S7–S9, Milestone M3)
