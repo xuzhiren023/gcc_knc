@@ -166,9 +166,10 @@ class SharedCardRules(unittest.TestCase):
 
         def clocked_run(*args, **kwargs):
             kwargs["monotonic"] = lambda: self.transport.now
+            if not receipt:
+                kwargs["receipt_path"] = self.result_path
             return actual_run(*args, **kwargs)
-        replacements = dict(SSHTransport=mock.Mock(return_value=self.transport), run=clocked_run,
-                            ROOT=self.directory)
+        replacements = dict(SSHTransport=mock.Mock(return_value=self.transport), run=clocked_run)
         if default_root is not None:
             replacements["ROOT"] = default_root
         with mock.patch.dict(self.runner["main"].__globals__, replacements), \
