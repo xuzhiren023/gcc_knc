@@ -1,10 +1,10 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-05 08:40.
+Updated automatically at every ticket change. Last update: 2026-11-05 08:41.
 
-**Next: the tech lead, on S5-03.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: GPT-6.1, on S5-06 (KNC vec_perm_const: reversed, stride-2 and interleaved loops vectorize with swizzle, vpermf32x4, vpshufd, valignd and vpermd).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
-Current tickets: `[###################-]` 79 of 83
+Current tickets: `[###################-]` 80 of 83
 
 ## Milestones
 
@@ -12,7 +12,7 @@ Current tickets: `[###################-]` 79 of 83
 |---|---|---|---|
 | M0 | Foundation | In progress | 17 of 17 tickets |
 | M1 | Mixed native code | Done | 43 of 43 tickets |
-| M2 | Useful vector target | In progress | 19 of 23 tickets |
+| M2 | Useful vector target | In progress | 20 of 23 tickets |
 | M3 | Runtimes | Not started | Not planned in detail yet |
 | M4 | Broad optimization | Not started | Not planned in detail yet |
 | M5 | Program corpus | Not started | Not planned in detail yet |
@@ -99,7 +99,7 @@ Current tickets: `[###################-]` 79 of 83
 | S4-14 | Misaligned masked access: a guarded aligned split in KNC maskload/maskstore, tested | Done | Misaligned conditional loads and stores now use a guarded split into at most two aligned masked moves plus ... |
 | S5-01 | Gather, scatter, permutes, reductions and FP min/max on KNC: GCC 16 entry points, IMCI forms, fault footprint (ADR-0008 input) | Done | Gather/scatter, permute, reduction and FP min/max design input is in: 16-lane gathers and scatters need no ... |
 | S5-02 | Int and FP conversions, and memory up/down conversions for byte and word data on KNC (ADR-0008 input) | Done | Conversion design input is in: int/float and float/double conversions map to single IMCI instructions with ... |
-| S5-03 | Correctly rounded vector division and square root for V16SF and V8DF: sequences, proof plan, test plan (ADR-0003 point 4 input) | Waiting for review | docs/research/knc-div-sqrt.md: FP32 sqrt (19 insns) proven by exhaustive exact host model over all reduced ... |
+| S5-03 | Correctly rounded vector division and square root for V16SF and V8DF: sequences, proof plan, test plan (ADR-0003 point 4 input) | Done | Correct rounding plan for vector division and square root: FP32 square root is proven exhaustively for any ... |
 | S5-04 | card_run shares the card with the PhiWeather tuning session: project tag, own-budget count, timed-job refusal, staging limit, packed S3-10 batch | Done | card_run now shares the card safely with the PhiWeather tuning session: our ledger rows say project gcc-knc... |
 | S5-05 | knc_lint accepts the decoded %ymm source of vcvtdq2pd, vcvtudq2pd and vcvtps2pd | Done | knc_lint no longer rejects correct vcvtdq2pd, vcvtudq2pd and vcvtps2pd, whose 8-lane register source objdum... |
 | S5-06 | KNC vec_perm_const: reversed, stride-2 and interleaved loops vectorize with swizzle, vpermf32x4, vpshufd, valignd and vpermd | In progress |  |
@@ -108,6 +108,7 @@ Current tickets: `[###################-]` 79 of 83
 
 ## Recent activity
 
+- 2026-11-05 08:41 **S5-03** lead approve: Correct rounding plan for vector division and square root: FP32 square root is proven exhaustively for any estimate the manual allows and FP32 divi...
 - 2026-11-05 08:40 **S5-05** lead approve: knc_lint no longer rejects correct vcvtdq2pd, vcvtudq2pd and vcvtps2pd, whose 8-lane register source objdump prints as %ymm; every other %ymm is st...
 - 2026-11-05 08:38 **S5-05** engineer submit: Red commit fb79c37 failed (no decoded kwarg); fix 06a1590: forbidden(decoded=True) from decoded_violations only strips %ymm source of vcvtdq2pd/vcv...
 - 2026-11-05 08:37 **S5-03** engineer submit: docs/research/knc-div-sqrt.md: FP32 sqrt (19 insns) proven by exhaustive exact host model over all reduced args, all allowed vrsqrt23ps estimates, ...
@@ -115,7 +116,6 @@ Current tickets: `[###################-]` 79 of 83
 - 2026-11-05 08:31 **S5-04** engineer submit: Lead change done: timed-row check now also runs on every memory-admission pass (refuse_if_timed_job_open). New test red at 09338ef (program != refu...
 - 2026-11-05 08:31 **S5-02** lead approve: Conversion design input is in: int/float and float/double conversions map to single IMCI instructions with C semantics for defined inputs, byte and...
 - 2026-11-05 08:30 **S5-01** lead approve: Gather/scatter, permute, reduction and FP min/max design input is in: 16-lane gathers and scatters need no shared change, KNC needs its own permute...
-- 2026-11-05 08:28 **S5-04** lead changes: One gap: the timed-job check runs once, before connect. The memory-admission loop then waits up to --timeout, and the PhiWeather chain may write a ...
 
 ## Cost
 
@@ -127,4 +127,4 @@ Current tickets: `[###################-]` 79 of 83
 
 ## Disk
 
-The project uses 16.3 GiB of 100 GiB. 208 GiB free on the drive.
+The project uses 16.3 GiB of 100 GiB. 209 GiB free on the drive.
