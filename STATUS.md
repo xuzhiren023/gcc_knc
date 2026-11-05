@@ -1,10 +1,10 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-05 12:56.
+Updated automatically at every ticket change. Last update: 2026-11-05 13:19.
 
 **Next: GPT-6.1, on S5-10 (Correctly rounded FP32 vector square root for V16SF (S5-03 ticket A)).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
-Current tickets: `[##################--]` 84 of 93
+Current tickets: `[#################---]` 84 of 94
 
 ## Milestones
 
@@ -12,7 +12,7 @@ Current tickets: `[##################--]` 84 of 93
 |---|---|---|---|
 | M0 | Foundation | In progress | 17 of 17 tickets |
 | M1 | Mixed native code | Done | 43 of 43 tickets |
-| M2 | Useful vector target | In progress | 24 of 33 tickets |
+| M2 | Useful vector target | In progress | 24 of 34 tickets |
 | M3 | Runtimes | Not started | Not planned in detail yet |
 | M4 | Broad optimization | Not started | Not planned in detail yet |
 | M5 | Program corpus | Not started | Not planned in detail yet |
@@ -115,6 +115,7 @@ Current tickets: `[##################--]` 84 of 93
 | S5-16 | KNC byte and word data: V16QI/V16HI transport modes, widening up-converting loads and narrowing down-converting stores | Not started |  |
 | S5-17 | Sprint 5 mid batch check after S5-06, S5-07 and S5-08 | Not started |  |
 | S5-18 | Final Sprint 5 batch check at the sprint head | Not started |  |
+| S5-19 | card_run shares cores with the PhiWeather session - compact per-job core claims from the ledger, and round-robin turns for benchmark jobs | In progress |  |
 
 ## Recent activity
 
@@ -131,10 +132,10 @@ Current tickets: `[##################--]` 84 of 93
 
 - From the script, engineer: 195 sessions, 457.3M input tokens
 - From the script, lead: 184 sessions, 58.7M input tokens
-- Started by hand, Claude: 9 sessions, 915.5M input tokens
+- Started by hand, Claude: 9 sessions, 927.4M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 16.6 GiB of 100 GiB. 200 GiB free on the drive.
+The project uses 16.7 GiB of 100 GiB. 200 GiB free on the drive.
