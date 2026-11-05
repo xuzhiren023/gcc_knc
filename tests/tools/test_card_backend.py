@@ -163,6 +163,7 @@ class CardBackend(unittest.TestCase):
                 uploaded.append(name)
 
             self.session.send_file = upload
+            self.session.stage_timeout = 1e9  # S5-04 limit is tested in test_card_run; this tests per-file deadlines
             with mock.patch.object(self.runner["time"], "monotonic", lambda: now):
                 self.session.stage(self.session.run_dir, program, timeout=10,
                                    files=[program] * 257)
