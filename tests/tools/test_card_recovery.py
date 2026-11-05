@@ -162,7 +162,7 @@ class CardRecovery(unittest.TestCase):
                     session.snapshot = snapshot
                 result = self.invoke()
                 self.assertEqual(result["result_class"], "infrastructure" if reconnect else "program", result)
-                self.assertEqual(result["cpus"], [4, 13, 91])
+                self.assertEqual(result["cpus"], [9, 10, 11, 12])
                 self.assertGreaterEqual(len(requests), 4)
                 self.assertEqual(requests, [True] + [False] * (len(requests) - 1))
                 if reconnect:
@@ -183,7 +183,7 @@ class RemoteReview(unittest.TestCase):
         self.proc = self.directory / "proc"
         (self.proc / "sys/kernel/random").mkdir(parents=True)
         (self.proc / "sys/kernel/random/boot_id").write_text(BOOT + "\n")
-        (self.proc / "cpuinfo").write_text("processor : 91\ncore id : 40\n")
+        (self.proc / "cpuinfo").write_text(shared.CPUINFO)
         (self.proc / "meminfo").write_text("MemFree: 4000000 kB\n")
 
     def process(self, pid, ppid, cwd="/outside", exe="/bin/sh"):
