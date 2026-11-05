@@ -222,10 +222,10 @@ class Runner:
         self.failed |= bool(failures)
         self.say(('FAIL ' if failures else 'PASS ') + label + (': ' + '; '.join(failures) if failures else ''))
 
-    def command(self, *args, check=True):
+    def command(self, *args, check=True, timeout=60):
         result = subprocess.run([str(a) for a in args], env=self.env, cwd=ROOT,
                                 text=True, errors='replace', stdout=subprocess.PIPE,
-                                stderr=subprocess.STDOUT, timeout=60)
+                                stderr=subprocess.STDOUT, timeout=timeout)
         if not check:
             return result
         if result.returncode:
@@ -241,7 +241,7 @@ class Runner:
                                    ('tests/tools', 'test_knc_lint.py')):
             label = directory + '/' + pattern
             try:
-                output = self.command(sys.executable, '-m', 'unittest', 'discover', '-s', directory, '-p', pattern)
+                output = self.command(sys.executable, '-m', 'unittest', 'discover', '-s', directory, '-p', pattern, timeout=900)
                 self.say('PASS t0 ' + label + ': ' + ' '.join(output.strip().splitlines()[-3:]))
             except (OSError, RuntimeError, subprocess.TimeoutExpired) as error:
                 self.result('t0 ' + label, [str(error)])

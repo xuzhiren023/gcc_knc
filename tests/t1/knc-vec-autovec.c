@@ -7,8 +7,8 @@
 // scan-asm-func affine_default_f64: \bvmulpd\b[^\n]*%zmm\d+
 // scan-asm-func affine_default_f64: \bvaddpd\b[^\n]*%zmm\d+
 // scan-asm-not: %(?:xmm|ymm)\d
-// scan-asm-loop-not affine_default_f32: \bv(?:f[mn]|fnm)\w*(?:ps|pd)\b
-// scan-asm-loop-not affine_default_f64: \bv(?:f[mn]|fnm)\w*(?:ps|pd)\b
+// scan-asm-func affine_default_f32: \A(?![\s\S]*\bv(?:f[mn]|fnm)\w*(?:ps|pd)\b)
+// scan-asm-func affine_default_f64: \A(?![\s\S]*\bv(?:f[mn]|fnm)\w*(?:ps|pd)\b)
 
 void
 affine_default_f32(float *restrict y, const float *restrict x, float a, float b)
