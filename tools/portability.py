@@ -132,9 +132,9 @@ def command(argv, cwd):
     subprocess.run(list(map(str, argv)), cwd=cwd, check=True)
 
 
-def build_cc1(repo, shared, tree, slot, *, configure_args=None, make_args=None):
+def build_cc1(repo, shared, tree, slot, *, home=None, configure_args=None, make_args=None):
     commit = git(repo, 'rev-parse', '--verify', tree + '^{commit}')
-    home = shared / 'portability' / ('x86-' + slot)
+    home = (Path(home) if home else shared / 'portability') / ('x86-' + slot)
     source, build = home / 'source', home / 'build'
     home.mkdir(parents=True, exist_ok=True)
     git_options = ['git', '-c', 'core.autocrlf=false', '-c', 'core.fileMode=false']
@@ -193,9 +193,10 @@ def x86(args):
     sources = sorted((args.repo / CORPUS).rglob('*.c'))
     if not sources:
         raise RuntimeError('empty torture compile corpus: ' + str(args.repo / CORPUS))
-    compilers = [build_cc1(args.repo, args.shared, tree, slot)
+    home = args.home.resolve() if args.home else args.shared / 'portability'
+    compilers = [build_cc1(args.repo, args.shared, tree, slot, home=home)
                  for tree, slot in zip(args.tree, ('a', 'b'))]
-    output = args.shared / 'portability'
+    output = home
     output.mkdir(parents=True, exist_ok=True)
     different_total = error_total = 0
     print('Default torture options: -w', flush=True)
@@ -273,6 +274,8 @@ def main(argv=None):
     x86_parser = sub.add_parser('x86')
     x86_parser.add_argument('--tree', action='append', required=True)
     x86_parser.add_argument('--shared', type=Path, default=SHARED)
+    x86_parser.add_argument('--home', type=Path,
+                            help='directory holding x86-a and x86-b (default: SHARED/portability)')
     x86_parser.add_argument('--skip-make-check', action='store_true',
                             help='skip tasklist after independently confirming no build is running')
     for command_parser in (drill_parser, x86_parser):
@@ -294,7 +297,7 @@ if __name__ == '__main__':
             return subprocess.check_output([str(tc / 'cygwin/bin/cygpath.exe'), '-u', str(path)],
                                            env=env, text=True).strip()
         arguments = sys.argv[1:]
-        for flag in ('--repo', '--shared'):
+        for flag in ('--repo', '--shared', '--home'):
             if flag in arguments:
                 index = arguments.index(flag) + 1
                 arguments[index] = posix(arguments[index])
