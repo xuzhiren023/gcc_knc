@@ -2,7 +2,7 @@
 
 Updated automatically at every ticket change. Last update: 2026-11-05 14:00.
 
-**Next: GPT-6.1, on S5-10 (Correctly rounded FP32 vector square root for V16SF (S5-03 ticket A)).** Run `python tools/dispatch.py`, or ask the tech lead to.
+**Next: the tech lead, on S5-10.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[#################---]` 84 of 94
 
@@ -106,7 +106,7 @@ Current tickets: `[#################---]` 84 of 94
 | S5-07 | KNC reductions: vpermf32x4 and swizzle trees for plus, min/max and logic, with no stack accumulator | Done | Integer sum, min/max and logic reductions, and FP sums under -ffast-math, now end in an IMCI vpermf32x4 and... |
 | S5-08 | KNC same-width conversions: int32/uint32 to and from float as single vcvtfxpnt instructions (the ADR-0008 named-insn exception) | Done | Int32/uint32 to float and float to int32/uint32 loops now vectorize as single IMCI vcvtfxpnt instructions w... |
 | S5-09 | Card probe of vrcp23ps, vrsqrt23ps and vgetmant (S5-03 P1a-e), to back the division and square-root proofs | Done | A card probe now measures vrcp23ps and vrsqrt23ps against the error bounds the FP32 division and square-roo... |
-| S5-10 | Correctly rounded FP32 vector square root for V16SF (S5-03 ticket A) | In progress | Allowed: submit with --override 'host E3 model and native exhaustive checker required by the ticket; lead a... |
+| S5-10 | Correctly rounded FP32 vector square root for V16SF (S5-03 ticket A) | Waiting for review | Prior session completed and committed required implementation and checks: T0 including exhaustive host E3, ... |
 | S5-11 | Correctly rounded FP32 vector division for V16SF, with cond_div (S5-03 ticket B) | Not started |  |
 | S5-12 | KNC float/double-width conversions: vcvtps2pd, vcvtpd2ps, vcvtdq2pd, vcvtfxpntpd2dq with vpermf32x4 halves | Not started |  |
 | S5-13 | KNC 16-lane gather and scatter: vgatherdps/vpgatherdd and the scatter forms in a jknzd loop, through the optabs | Not started |  |
@@ -119,6 +119,7 @@ Current tickets: `[#################---]` 84 of 94
 
 ## Recent activity
 
+- 2026-11-05 14:00 **S5-10** engineer submit: Prior session completed and committed required implementation and checks: T0 including exhaustive host E3, T1 errno/noerrno scans, T2, incremental ...
 - 2026-11-05 13:59 **S5-19** lead changes: pm.py approve refuses: the card test discovery hangs past 10 minutes and has errors and failures on this branch, while main passes. Reproduce exact...
 - 2026-11-05 13:59 **S5-10** lead answer: Allowed: submit with --override 'host E3 model and native exhaustive checker required by the ticket; lead allowed'. No split.
 - 2026-11-05 13:54 **S5-10** engineer ask: Submit refuses 704 changed lines vs budget 500. Required E3 model, native exhaustive checker and torture/acceptance runner are implemented. Host ch...
@@ -126,7 +127,6 @@ Current tickets: `[#################---]` 84 of 94
 - 2026-11-05 13:27 **S5-19** lead changes: One deadlock: for --benchmark, core_ready requires 'not active', and active includes live queued rows. If both projects queue a benchmark, our job ...
 - 2026-11-05 13:24 **S5-19** engineer submit: Red-first bad386e failed on missing options, fixed claims and absent queue admission. Added compact descending ledger core claims, explicit layouts...
 - 2026-11-05 12:55 **S5-08** lead approve: Int32/uint32 to float and float to int32/uint32 loops now vectorize as single IMCI vcvtfxpnt instructions with C truncation and IEEE flags, through...
-- 2026-11-05 12:53 **S5-08** engineer submit: GCC 3257a87cd94: wrapped --if-stale build, T0/T1/T2, four README s5_ops builds/lint PASS; both requested loops vectorize. Native pending lead; x86 ...
 
 ## Cost
 
