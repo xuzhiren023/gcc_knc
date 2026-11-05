@@ -433,6 +433,37 @@ class CardRun(unittest.TestCase):
                 self.assertNotIn(result["job_id"], self.runner["active_jobs"](self.ledger_rows()))
                 self.assertEqual(result["result_class"], "program" if release else "refused")
 
+    def test_both_benchmarks_queued_follow_last_timed_finish(self):
+        for last_project in ("PhiWeather", "gcc-knc"):
+            with self.subTest(last_project=last_project):
+                self.ledger.write_text("", encoding="utf8")
+                self.transport = FakeTransport()
+                self.other_start(project=last_project, event="finish", jobId="last-timed")
+                self.queued_other(jobId="their-queue")
+                blocker = self.other_start(jobId="running", timingValid=False, cores=[0])
+
+                def wait(seconds):
+                    self.advance(seconds)
+                    active = self.runner["active_jobs"](self.ledger_rows())
+                    self.assertEqual(sum(row["event"] == "queued" for row in active.values()), 2)
+                    if self.transport.now == 1:
+                        self.other_start(**dict(blocker, event="finish"))
+
+                with mock.patch("time.sleep", wait):
+                    result = self.run_card(benchmark=True)
+                own = [row for row in self.ledger_rows() if row["jobId"] == result["job_id"]]
+                self.assertEqual(own[0]["event"], "queued")
+                if last_project == "PhiWeather":
+                    self.assertEqual(result["result_class"], "program")
+                    self.assertEqual(own[1]["event"], "start")
+                    self.assertEqual(own[1]["cores"], list(range(60)))
+                    self.assertEqual(self.transport.cpus, list(range(240)))
+                else:
+                    self.assertEqual(result["result_class"], "refused")
+                    self.assertIn("their turn", result["detail"])
+                    self.assertEqual(own[1]["event"], "superseded")
+                    self.assertNotIn("stage", self.names())
+
     def test_round_robin_yields_to_other_project(self):
         self.other_start(project="gcc-knc", event="finish")
         self.queued_other()
