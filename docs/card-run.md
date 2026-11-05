@@ -131,11 +131,22 @@ after S2-17, with later batches using the full execute suite.
   A marked program may itself return 125, 126 or 127 without being misclassified.
 - Read `MemFree` from `/proc/meminfo` before staging using one `awk` invocation
   per snapshot. Reserve the declared memory against all
-  active `agent: "claude"` ledger entries; ended jobs release their reservation.
+  active ledger entries of ours (`project: "gcc-knc"`, or no `project` and a
+  `claude-` plus 32 hex digits job ID); other projects' rows do not count.
+  Ended jobs release their reservation.
   Wait while the total exceeds 10240 MB or the reservation would leave less
   than 1536 MB of `MemFree`. Re-read both ledger and memory after each wait;
   the configured timeout bounds admission waiting. Expiration refuses without
   staging the executable. Expected-end estimates never expire reservations.
+- Sharing with timed jobs (S5-04). Our start, finish and fault rows carry
+  `"project": "gcc-knc"`. While any open row that is not ours has
+  `"timingValid": true` (the PhiWeather tuning session's timed runs), card_run
+  refuses before connecting, staging or writing a row, naming the job and its
+  `expectedEnd`; it never retries, so the caller waits and tries again.
+  Staging must finish within `--stage-timeout` (default 120 s); a slower
+  upload is stopped, cleaned up and finished as an infrastructure failure, so
+  our start row never stays open through a slow upload. The S3-10 torture row
+  stages its 1,680 files through `--file-list`, in one pack.
 - The owner-reported card has no taskset, and its cgroup memory controller is
   disabled with no mounted controllers. Nothing is mounted or enabled. Instead,
   `claude-pin` sets both soft and hard `RLIMIT_AS` to the declared MiB before

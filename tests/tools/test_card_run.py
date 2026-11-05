@@ -348,25 +348,25 @@ class CardRun(unittest.TestCase):
         self.assertEqual([row.get("project") for row in rows], ["gcc-knc", "gcc-knc"])
 
     def test_memory_admission_counts_only_our_own_rows(self):
-        # 7168 MiB held by another project must not push a 4096 MiB job over our 10240 MiB budget.
-        self.other_start(timingValid=False)
+        # 9000 MiB held by another project must not push a 2048 MiB job over our 10240 MiB budget.
+        self.other_start(timingValid=False, memoryLimitMiB=9000)
         with mock.patch("time.sleep", lambda seconds: setattr(self.transport, "now",
                                                               self.transport.now + seconds)):
-            result = self.run_card(memory_mb=4096)
+            result = self.run_card(memory_mb=2048)
         self.assert_result(result, "program", 0, seconds=12.0, program_status=0)
-        # Our own rows, tagged or legacy, still count: 7168 + 4096 > 10240.
+        # Our own rows, tagged or legacy, still count: 9000 + 2048 > 10240.
         for ours in (dict(project="gcc-knc", jobId="claude-mentor-1"),
                      dict(project=None, jobId="claude-" + "ab" * 16)):
             with self.subTest(ours=ours):
                 self.ledger.write_text("", encoding="utf8")
-                row = self.other_start(timingValid=False, **ours)
+                row = self.other_start(timingValid=False, memoryLimitMiB=9000, **ours)
                 if row["project"] is None:
                     del row["project"]
                     self.ledger.write_text(json.dumps(row) + "\n", encoding="utf8")
                 self.transport = FakeTransport()
                 with mock.patch("time.sleep", lambda seconds: setattr(self.transport, "now",
                                                                       self.transport.now + seconds)):
-                    result = self.run_card(memory_mb=4096)
+                    result = self.run_card(memory_mb=2048)
                 self.assertEqual(result["result_class"], "refused")
                 self.assertIn("memory admission", result["detail"])
 
