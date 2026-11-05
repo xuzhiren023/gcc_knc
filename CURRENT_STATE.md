@@ -67,6 +67,8 @@ M1 is accepted and tagged `m1` locally; nothing is pushed. Engineers are Claude 
 
 ## Not proven yet
 
+- **Shared build ACLs (2026-11-05).** Cygwin gives files created by `xuzhi` (Claude subagents, the lead) ACLs that deny the `CodexSandboxUsers` group. So Codex's S5-07 build could not rewrite `gcc-build/gcc/s-mddeps`, which S5-06 had written. With the owner's approval, the lead granted `CodexSandboxUsers:(OI)(CI)M` on `.work/_shared/gcc-build` and `.work/_shared/gcc`. Not yet proven: whether files `xuzhi` creates later inherit the grant. If a Codex build hits Permission denied again, rerun the same `icacls ... /grant ... /T`.
+
 - **Scalar x87 FP64 division and square root on the card are double-rounded** (64-bit precision control, then the store), so they are not always correctly rounded (S5-03, from the card's libm and x87 control word; not yet seen in a failing case on the card). `s5_ops` accepts that value from scalar paths.
 - **In-order FP reductions (`dot_f32` at `-O2`)** become a vector multiply plus 16 sequential x87 adds through the stack. That is legal, but probably slower than scalar code. This is a question for the Sprint 6 cost model.
 - **A subagent's leftover background test run held its worktree open,** and `pm.py approve` then failed halfway (S5-04, 2026-11-05). Recovery: stop the processes, `git worktree add` the branch again, and approve again. Briefs now say to leave no background processes.
