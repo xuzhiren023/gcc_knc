@@ -1,10 +1,10 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-04 20:28.
+Updated automatically at every ticket change. Last update: 2026-11-04 20:29.
 
-**Next: the tech lead, on S4-04.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: GPT-6.1, on S4-13 (Rebuild the x86 check's trees under the current user and run the x86 comparison at the knc head).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
-Current tickets: `[##################--]` 70 of 75
+Current tickets: `[##################--]` 71 of 75
 
 ## Milestones
 
@@ -12,7 +12,7 @@ Current tickets: `[##################--]` 70 of 75
 |---|---|---|---|
 | M0 | Foundation | In progress | 17 of 17 tickets |
 | M1 | Mixed native code | Done | 43 of 43 tickets |
-| M2 | Useful vector target | In progress | 10 of 15 tickets |
+| M2 | Useful vector target | In progress | 11 of 15 tickets |
 | M3 | Runtimes | Not started | Not planned in detail yet |
 | M4 | Broad optimization | Not started | Not planned in detail yet |
 | M5 | Program corpus | Not started | Not planned in detail yet |
@@ -86,7 +86,7 @@ Current tickets: `[##################--]` 70 of 75
 | S4-01 | Masks on KNC: GCC 16 entry points, IMCI forms, reuse audit and masked-tail design (ADR-0007 input) | Done | The mask design input for Sprint 4 is done: KNC masks are HI for 16-lane and QI for 8-lane vectors, compare... |
 | S4-02 | Vector compares into k masks, mask logic and mask spills for the packed modes | Done | Float, double and int vector compares now produce KNC k masks and vectorize with blends (?: and select loop... |
 | S4-03 | Blends and if-conversion: conditional loops, ?:, fabs, min and max vectorize with masks | Done | Conditional loops now vectorize on KNC: selects and conditional stores on 64-byte aligned arrays through gu... |
-| S4-04 | V8DI add and sub through the IMCI carry form, so long add loops vectorize | Waiting for review | sse.md add/sub expander: TARGET_KNC entry dispatch to imci.md @knc_plusminus (V16SI vpaddd/vpsubd; V8DI pre... |
+| S4-04 | V8DI add and sub through the IMCI carry form, so long add loops vectorize | Done | 64-bit integer vector add and sub now vectorize through KNC's carry instructions, and the shared add/sub ex... |
 | S4-05 | Masked epilogues for aligned loops: while_ult, the finish_cost term, cond_<op> for FP | draft |  |
 | S4-06 | Batch check after S4-02, S3-09 and S4-03: x86, drill and ICE sweeps at the batch head | Done | Batch check at ae8a033c5f3: no compiler crashes in the -O2 vectorize and -O3 sweeps, 280 shared lines in 68... |
 | S4-07 | Final Sprint 4 batch check at the sprint head | draft |  |
@@ -100,6 +100,7 @@ Current tickets: `[##################--]` 70 of 75
 
 ## Recent activity
 
+- 2026-11-04 20:29 **S4-04** lead approve: 64-bit integer vector add and sub now vectorize through KNC's carry instructions, and the shared add/sub expander hands KNC off at its entry, so up...
 - 2026-11-04 20:28 **S4-04** engineer submit: sse.md add/sub expander: TARGET_KNC entry dispatch to imci.md @knc_plusminus (V16SI vpaddd/vpsubd; V8DI pre-reload split: vmovdqa32{cdab}, vpaddset...
 - 2026-11-04 19:33 **S4-06** lead approve: Batch check at ae8a033c5f3: no compiler crashes in the -O2 vectorize and -O3 sweeps, 280 shared lines in 68 hunks, no conflicts onto the gcc-16 rel...
 - 2026-11-04 19:31 **S4-06** engineer submit: At ae8a033c5f3. 1 x86 NOT RUN, infra: portability/x86-{a,b} trees owned by CodexSandboxOffline; configure cannot chmod config.status (S4_06_x86-202...
@@ -107,13 +108,12 @@ Current tickets: `[##################--]` 70 of 75
 - 2026-11-04 19:15 **S4-03** engineer submit: GCC 5300258a536+b57d497d2d1. T0/T1/T2 259 PASS 0 FAIL (log check_gcc16_t0_t1_t2-20261104-191106). Masked vmov{k} only for 64B-aligned refs behind j...
 - 2026-11-04 18:29 **S4-03** lead approve-red: Red approved: the O2 and O3 scans pin masked selects, aligned conditional stores with a jkzd guard, conditional add, V16SI min/max and fabs, and ke...
 - 2026-11-04 18:28 **S4-03** engineer red: c7f0f0c: knc-mask-cond-O2/O3.c, 31/45 scans fail per file (sel needs maskload: x/y are conditional loads, so it does NOT vectorize today; min/max V...
-- 2026-11-04 18:16 **S4-12** lead approve: card_run can now ship a whole batch of programs in one packed upload, unpacked on the card by a small checked helper, instead of two SSH connection...
 
 ## Cost
 
 - From the script, engineer: 186 sessions, 441.0M input tokens
 - From the script, lead: 184 sessions, 58.7M input tokens
-- Started by hand, Claude: 9 sessions, 732.1M input tokens
+- Started by hand, Claude: 9 sessions, 732.8M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
