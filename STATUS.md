@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-05 14:10.
+Updated automatically at every ticket change. Last update: 2026-11-05 14:13.
 
 **Next: the tech lead, on S5-10.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
@@ -115,10 +115,11 @@ Current tickets: `[#################---]` 84 of 94
 | S5-16 | KNC byte and word data: V16QI/V16HI transport modes, widening up-converting loads and narrowing down-converting stores | Not started |  |
 | S5-17 | Sprint 5 mid batch check after S5-06, S5-07 and S5-08 | Not started |  |
 | S5-18 | Final Sprint 5 batch check at the sprint head | Not started |  |
-| S5-19 | card_run shares cores with the PhiWeather session - compact per-job core claims from the ledger, and round-robin turns for benchmark jobs | Question for the tech lead | Approved receipt_path-only fix applied. Cygwin full discovery PASS: 95 tests, 39.025s. Log: .work/_state/lo... |
+| S5-19 | card_run shares cores with the PhiWeather session - compact per-job core claims from the ledger, and round-robin turns for benchmark jobs | In progress | Done: lead commit d4cebfc removes the tracked tmp*/ fixture directories, and /tmp*/ is excluded in this wor... |
 
 ## Recent activity
 
+- 2026-11-05 14:13 **S5-19** lead answer: Done: lead commit d4cebfc removes the tracked tmp*/ fixture directories, and /tmp*/ is excluded in this worktree, so the two unreadable leftovers c...
 - 2026-11-05 14:10 **S5-19** engineer ask: Approved receipt_path-only fix applied. Cygwin full discovery PASS: 95 tests, 39.025s. Log: .work/_state/logs/S5_19_discovery_green-20261105-140941...
 - 2026-11-05 14:08 **S5-19** lead answer: Yes: remove the ROOT override and redirect only receipt_path in clocked_run when receipt=False, then run the full card discovery once, the way appr...
 - 2026-11-05 14:07 **S5-19** engineer ask: Two repair attempts; stopping per AGENTS.md. Red ae82e9a; partial fix f6b7da5. Cygwin full card discovery: 95 tests, 40.793s, one failure: test_fil...
@@ -126,16 +127,15 @@ Current tickets: `[#################---]` 84 of 94
 - 2026-11-05 13:59 **S5-19** lead changes: pm.py approve refuses: the card test discovery hangs past 10 minutes and has errors and failures on this branch, while main passes. Reproduce exact...
 - 2026-11-05 13:59 **S5-10** lead answer: Allowed: submit with --override 'host E3 model and native exhaustive checker required by the ticket; lead allowed'. No split.
 - 2026-11-05 13:54 **S5-10** engineer ask: Submit refuses 704 changed lines vs budget 500. Required E3 model, native exhaustive checker and torture/acceptance runner are implemented. Host ch...
-- 2026-11-05 13:30 **S5-19** engineer submit: Fixed benchmark deadlock: only open start rows block exclusive core admission; queued rows compete through their_turn. Regression covers both queue...
 
 ## Cost
 
 - From the script, engineer: 201 sessions, 479.3M input tokens
 - From the script, lead: 184 sessions, 58.7M input tokens
-- Started by hand, Claude: 9 sessions, 961.4M input tokens
+- Started by hand, Claude: 9 sessions, 964.9M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 16.7 GiB of 100 GiB. 198 GiB free on the drive.
+The project uses 16.7 GiB of 100 GiB. 196 GiB free on the drive.
