@@ -108,3 +108,20 @@ GCC `knc` with S5-08: `cvt_i32_f32`, `cvt_u32_f32` and `cvt_f32_i32` now use `vc
 That includes the round-to-nearest int-to-float checks and float-to-int truncation with negative
 fractions. `s4_masks` still passes 1,589,070 checks at `-O2 -ftree-vectorize` (`claude-34a18310…`)
 and `-O3` (`claude-37ed4a56…`).
+
+## 2026-11-05: S5-10 under review (FP32 vector sqrt)
+
+`s5_ops` built from S5-10's compiler with `-fno-math-errno`, so `sqrtf` loops vectorize:
+
+- `-O2 -ftree-vectorize`: 779,984 checks, 0 failures.
+- `-O3`: 779,984 checks, 0 failures.
+
+The first 80-thread exhaustive run exited with code 2 in under a second: `pthread_create` failed
+under card_run's default 128 MiB limit (80 default stacks need more). Use a config with
+`memoryMB: 2048` for threaded jobs. card_run also allows only one of our jobs at a time (own lock),
+so our jobs run one after another even when cores are free.
+
+Exhaustive FP32 sqrt check (`sqrt-exhaustive-mt.c`, 80 threads on cores 59-40, MXCSR RN with
+FZ=DAZ=0, `claude-d72bce9f…`): `inputs=4294967296 regular=2139095039 special=2155872257
+bad_regular=0 bad_special=0`. Every positive finite input gives the correctly rounded result,
+and every zero, negative, infinity and NaN gives the expected special value.

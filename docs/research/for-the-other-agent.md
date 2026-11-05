@@ -87,3 +87,6 @@ passes on what they choose. Each item says how it was shown. Newest first.
    "internal compiler error". A test that expects a clean rejection must fail on that text too.
    Our `va_arg` rejection hid a broken expansion this way until a trunk (checking) build showed
    it (S3-25, 2026-11-04).
+9. **card_run's default 128 MiB limit breaks threaded jobs.** 80 threads with default pthread
+   stacks fail in `pthread_create` (exit code 2 in under a second) under that limit. Use a config
+   with `memoryMB` of a GB or more for threaded jobs (2026-11-05, sent to the WRF session).
