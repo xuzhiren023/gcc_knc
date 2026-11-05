@@ -249,3 +249,14 @@ operations and 12 compares in its kernels) passes 1,576,200 checks at `-O2 -ftre
 (`claude-52205208…`). The last build is the only one with a `vcmpnltps`, from S4-03's UNGE-as-nlt
 mapping, so that mapping is exact on real NaNs. Execute suite: 1,681 linked, 0 ICE, 103 with packed
 zmm, **1,681 of 1,681 PASS** in one packed job (`claude-54700e73…`).
+
+## Sprint 4: S4-04 merged (lead, 2026-11-04)
+
+GCC `knc` `0d5b9f4563f`, `cc1` SHA-1 `dd3ada06a18a…` (the same before and after). `s4_masks`, now with
+S4-05's aligned kernels and with `vpaddsetcd`/`vpsubsetbd` carry sequences in `add_i64`/`sub_i64`,
+passes 1,589,070 checks at `-O2 -ftree-vectorize` (`claude-40374bef…`), `-O3` (`claude-486a2498…`),
+`-fno-trapping-math` (`claude-be006d9e…`) and `-fvect-cost-model=unlimited` (`claude-48d96b03…`).
+That last build forces S4-03's element-wise misaligned fallback, which was untested until now; it
+is exact and stays inside the arrays. The aligned guard control faults on the guard line after the
+array (`kernel=add_al_f32 n=1 where=2`, real address; `claude-c47aa755…`). Execute suite: 1,681
+linked, 0 ICE, 104 with packed zmm, **1,681 of 1,681 PASS** in one job (`claude-748d87e7…`).
