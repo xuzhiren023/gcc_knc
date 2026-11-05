@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-05 14:35.
+Updated automatically at every ticket change. Last update: 2026-11-05 14:51.
 
-**Next: GPT-6.1, on S5-17 (Sprint 5 mid batch check after S5-06, S5-07 and S5-08).** Run `python tools/dispatch.py`, or ask the tech lead to.
+**Next: the tech lead, on S5-17.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[##################--]` 86 of 94
 
@@ -113,12 +113,13 @@ Current tickets: `[##################--]` 86 of 94
 | S5-14 | KNC 8-lane gather and scatter for V8DF/V8DI through the builtin hooks, reading the low 8 dwords of a V16SI index | Not started |  |
 | S5-15 | KNC FP min/max: MIN_EXPR/MAX_EXPR and fmin/fmax as vgminps/vgmaxps (pd), with their reductions | Not started |  |
 | S5-16 | KNC byte and word data: V16QI/V16HI transport modes, widening up-converting loads and narrowing down-converting stores | Not started |  |
-| S5-17 | Sprint 5 mid batch check after S5-06, S5-07 and S5-08 | In progress | The lead runs the x86 check (portability-claude is a Claude-owned tree; Codex cannot use it). You: run both... |
+| S5-17 | Sprint 5 mid batch check after S5-06, S5-07 and S5-08 | Waiting for review | knc 9690ac8906a: O2+ftree-vectorize and O3 sweeps PASS; 2003 cases each, each 1968 pass/33 compiler errors/... |
 | S5-18 | Final Sprint 5 batch check at the sprint head | Not started |  |
 | S5-19 | card_run shares cores with the PhiWeather session - compact per-job core claims from the ledger, and round-robin turns for benchmark jobs | Done | card_run now packs each job onto whole cores taken from 59 downward, shares the card with the PhiWeather se... |
 
 ## Recent activity
 
+- 2026-11-05 14:51 **S5-17** engineer submit: knc 9690ac8906a: O2+ftree-vectorize and O3 sweeps PASS; 2003 cases each, each 1968 pass/33 compiler errors/2 rejected user asm, 0 ICE/hang/assemble...
 - 2026-11-05 14:35 **S5-17** lead answer: The lead runs the x86 check (portability-claude is a Claude-owned tree; Codex cannot use it). You: run both ICE sweeps (-O2 -ftree-vectorize and -O...
 - 2026-11-05 14:34 **S5-17** engineer ask: At knc 9690ac8906a, two x86 attempts failed: tasklist Access denied; after ps -l/Get-Process found no make, --skip-make-check hit dubious ownership...
 - 2026-11-05 14:30 **S5-10** lead approve: Vectorized FP32 square root on KNC is now correctly rounded for every one of the 2^32 inputs, checked on the card, and s5_ops still passes at -O2 a...
@@ -126,13 +127,12 @@ Current tickets: `[##################--]` 86 of 94
 - 2026-11-05 14:14 **S5-19** engineer submit: Committed approved receipt_path-only fixture fix as f2fef52. Prior Cygwin full card discovery PASS: 95 tests, 39.025s; no rerun per lead instructio...
 - 2026-11-05 14:13 **S5-19** lead answer: Done: lead commit d4cebfc removes the tracked tmp*/ fixture directories, and /tmp*/ is excluded in this worktree, so the two unreadable leftovers c...
 - 2026-11-05 14:10 **S5-19** engineer ask: Approved receipt_path-only fix applied. Cygwin full discovery PASS: 95 tests, 39.025s. Log: .work/_state/logs/S5_19_discovery_green-20261105-140941...
-- 2026-11-05 14:08 **S5-19** lead answer: Yes: remove the ROOT override and redirect only receipt_path in clocked_run when receipt=False, then run the full card discovery once, the way appr...
 
 ## Cost
 
 - From the script, engineer: 203 sessions, 480.0M input tokens
 - From the script, lead: 184 sessions, 58.7M input tokens
-- Started by hand, Claude: 9 sessions, 974.4M input tokens
+- Started by hand, Claude: 9 sessions, 974.9M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
