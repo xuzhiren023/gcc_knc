@@ -25,6 +25,7 @@ import storage  # noqa: E402
 ENGINEER_PROMPT = """You are an engineer on GCC-KNC, working on ticket {id} only, in this worktree.
 Run: python tools/pm.py show {id}
 Do only what that ticket asks. Rules are in AGENTS.md. Read other documents only if the ticket points to them.
+Work without narration: no plans, progress reports or summaries between steps, only the tool calls the work needs.
 End the session with one pm.py command: submit, red, ask or escalate. Your final message is only the "PM update:" line it prints."""
 
 LEAD_PROMPT = """You are the tech lead on GCC-KNC. Ticket {id} is in state {state}, on branch {branch}.
@@ -54,7 +55,8 @@ def engineer_command(board, ticket, worktree):
     tier = board.policy.get("engineer_service_tier")
     trust ='projects."%s".trust_level="trusted"' % worktree.replace("\\", "\\\\")
     os.makedirs(storage.shared_area(board.root), exist_ok=True)
-    model = board.policy.get("engineer_model")
+    # A ticket's own model field wins, then its depth's budget, then the policy default (owner, 2026-11-05).
+    model = ticket.fields.get("model") or board.budget(ticket).get("model") or board.policy.get("engineer_model")
     # Logs and the shared build area sit beside the worktree, outside what workspace-write allows by itself.
     roots = [storage.state_dir(board.root), storage.shared_area(board.root)]
     # The card job ledger is shared with another project's agent, so it lives outside both (owner, 2026-11-03).

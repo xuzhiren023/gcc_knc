@@ -430,6 +430,17 @@ class Dispatcher(Sandbox):
         self.assertIn('model_reasoning_effort="low"', command)
         self.assertFalse([arg for arg in command if arg.startswith("service_tier=")])
 
+    def test_engineer_model_comes_from_ticket_then_depth_then_policy(self):
+        import dispatch
+        budgets = {depth: {k: v for k, v in b.items() if k != "model"} for depth, b in POLICY["budgets"].items()}
+        budgets["deep"]["model"] = "deep-model"
+        policy = dict(POLICY, engineer_model="default-model", budgets=budgets)
+        board = mock.Mock(root=self.root, policy=policy, budget=lambda t: budgets[t.fields["depth"]])
+        for fields, model in (({"depth": "deep"}, "deep-model"), ({"depth": "light"}, "default-model"),
+                              ({"depth": "deep", "model": "ticket-model"}, "ticket-model")):
+            command = dispatch.engineer_command(board, mock.Mock(fields=fields), self.worktree("A-1"))
+            self.assertEqual(command[command.index("-m") + 1], model)
+
     def test_engineer_git_trusts_the_shared_gcc_checkout(self):
         # The sandbox user does not own the shared checkout, so git refuses it as dubious.
         # Codex drops variables containing KEY, so GIT_CONFIG_KEY_0 cannot carry the setting.
