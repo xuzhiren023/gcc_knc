@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-04 20:29.
+Updated automatically at every ticket change. Last update: 2026-11-04 20:30.
 
-**Next: GPT-6.1, on S4-13 (Rebuild the x86 check's trees under the current user and run the x86 comparison at the knc head).** Run `python tools/dispatch.py`, or ask the tech lead to.
+**Next: GPT-6.1, on S4-05 (Masked epilogues for aligned loops: while_ult, the finish_cost term, cond_<op> for FP).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
 Current tickets: `[##################--]` 71 of 75
 
@@ -87,7 +87,7 @@ Current tickets: `[##################--]` 71 of 75
 | S4-02 | Vector compares into k masks, mask logic and mask spills for the packed modes | Done | Float, double and int vector compares now produce KNC k masks and vectorize with blends (?: and select loop... |
 | S4-03 | Blends and if-conversion: conditional loops, ?:, fabs, min and max vectorize with masks | Done | Conditional loops now vectorize on KNC: selects and conditional stores on 64-byte aligned arrays through gu... |
 | S4-04 | V8DI add and sub through the IMCI carry form, so long add loops vectorize | Done | 64-bit integer vector add and sub now vectorize through KNC's carry instructions, and the shared add/sub ex... |
-| S4-05 | Masked epilogues for aligned loops: while_ult, the finish_cost term, cond_<op> for FP | draft |  |
+| S4-05 | Masked epilogues for aligned loops: while_ult, the finish_cost term, cond_<op> for FP | In progress |  |
 | S4-06 | Batch check after S4-02, S3-09 and S4-03: x86, drill and ICE sweeps at the batch head | Done | Batch check at ae8a033c5f3: no compiler crashes in the -O2 vectorize and -O3 sweeps, 280 shared lines in 68... |
 | S4-07 | Final Sprint 4 batch check at the sprint head | draft |  |
 | S4-08 | Small fixes from M1: the varargs V4SF assert checks alignment; S3-10 ABI expected files | Done | The varargs save path now asserts a 16-byte aligned slot and is limited to 64-bit KNC, with generated code ... |
@@ -113,7 +113,7 @@ Current tickets: `[##################--]` 71 of 75
 
 - From the script, engineer: 186 sessions, 441.0M input tokens
 - From the script, lead: 184 sessions, 58.7M input tokens
-- Started by hand, Claude: 9 sessions, 732.8M input tokens
+- Started by hand, Claude: 9 sessions, 733.5M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
