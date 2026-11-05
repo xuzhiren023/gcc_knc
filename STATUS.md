@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-04 22:51.
+Updated automatically at every ticket change. Last update: 2026-11-04 22:53.
 
-**Next: the tech lead, on S4-14.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: GPT-6.1, on S4-14 (Misaligned masked access: a guarded aligned split in KNC maskload/maskstore, tested).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
 Current tickets: `[###################-]` 73 of 75
 
@@ -96,10 +96,11 @@ Current tickets: `[###################-]` 73 of 75
 | S4-11 | gcc_build.py refuses a build tree whose mddeps.mk has lost the .md includes | Done | A shared GCC build tree that has lost its .md dependency list is now rebuilt and checked instead of being c... |
 | S4-12 | card_run stages a whole batch in one upload, so card cores are busy instead of waiting on SSH | Done | card_run can now ship a whole batch of programs in one packed upload, unpacked on the card by a small check... |
 | S4-13 | Rebuild the x86 check's trees under the current user and run the x86 comparison at the knc head | Done | The x86 check now runs under this user from .work/_shared/portability-claude, and at the S4-04 head x86 ass... |
-| S4-14 | Misaligned masked access: a guarded aligned split in KNC maskload/maskstore, tested | Tests waiting for review | Red f36e582: tests/t1/knc-mask-split.c (-O2 -ftree-vectorize, unlimited cost, peeling 0): cst_f32/f64/i32/i... |
+| S4-14 | Misaligned masked access: a guarded aligned split in KNC maskload/maskstore, tested | In progress | Red approved: with the cost model forced, misaligned conditional loads and stores must become a vpermd rota... |
 
 ## Recent activity
 
+- 2026-11-04 22:53 **S4-14** lead approve-red: Red approved: with the cost model forced, misaligned conditional loads and stores must become a vpermd rotation plus two guarded aligned masked mov...
 - 2026-11-04 22:51 **S4-14** engineer red: Red f36e582: tests/t1/knc-mask-split.c (-O2 -ftree-vectorize, unlimited cost, peeling 0): cst_f32/f64/i32/i64 (conditional load + store, unknown al...
 - 2026-11-04 22:39 **S4-05** lead approve: Aligned loops (no alignment peel) now finish with a guarded masked vector epilogue instead of the x87 remainder, including masked add, mul and FMA,...
 - 2026-11-04 22:37 **S4-05** engineer submit: GCC 5b1920f1f56 (KNC) + 6b298d6b011 (shared). Aligned no-peel loops get masked epilogues: while_ult, cond_mul, cond_fma. Built once. T0 4/0, T1 234...
@@ -107,13 +108,12 @@ Current tickets: `[###################-]` 73 of 75
 - 2026-11-04 22:17 **S4-13** engineer submit: x86 at knc 0d5b9f4 vs releases/gcc-16.2.0 (78d4ac7), --home portability-claude, exit 0, 148 min, make check on. -O2: identical=1962 different=0 bot...
 - 2026-11-04 20:40 **S4-05** lead approve-red: Red approved: O2 and O3 scans require masked epilogues for no-peel aligned loops (GPR mask to k, guarded masked moves with jkzd for 16 lanes and a ...
 - 2026-11-04 20:39 **S4-05** engineer red: Red e422c20: tests/t1/knc-mask-tail-O2.c/-O3.c (+knc-mask-tail.h, loops.c shapes add_al_f32/f64/i32, affine_al_f32/f64, mul_al_f32, cst_al_f32, mis...
-- 2026-11-04 20:29 **S4-04** lead approve: 64-bit integer vector add and sub now vectorize through KNC's carry instructions, and the shared add/sub expander hands KNC off at its entry, so up...
 
 ## Cost
 
 - From the script, engineer: 186 sessions, 441.0M input tokens
 - From the script, lead: 184 sessions, 58.7M input tokens
-- Started by hand, Claude: 9 sessions, 755.6M input tokens
+- Started by hand, Claude: 9 sessions, 757.9M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
