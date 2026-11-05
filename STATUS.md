@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-04 20:30.
+Updated automatically at every ticket change. Last update: 2026-11-04 20:39.
 
-**Next: GPT-6.1, on S4-05 (Masked epilogues for aligned loops: while_ult, the finish_cost term, cond_<op> for FP).** Run `python tools/dispatch.py`, or ask the tech lead to.
+**Next: the tech lead, on S4-05.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[##################--]` 71 of 75
 
@@ -87,7 +87,7 @@ Current tickets: `[##################--]` 71 of 75
 | S4-02 | Vector compares into k masks, mask logic and mask spills for the packed modes | Done | Float, double and int vector compares now produce KNC k masks and vectorize with blends (?: and select loop... |
 | S4-03 | Blends and if-conversion: conditional loops, ?:, fabs, min and max vectorize with masks | Done | Conditional loops now vectorize on KNC: selects and conditional stores on 64-byte aligned arrays through gu... |
 | S4-04 | V8DI add and sub through the IMCI carry form, so long add loops vectorize | Done | 64-bit integer vector add and sub now vectorize through KNC's carry instructions, and the shared add/sub ex... |
-| S4-05 | Masked epilogues for aligned loops: while_ult, the finish_cost term, cond_<op> for FP | In progress |  |
+| S4-05 | Masked epilogues for aligned loops: while_ult, the finish_cost term, cond_<op> for FP | Tests waiting for review | Red e422c20: tests/t1/knc-mask-tail-O2.c/-O3.c (+knc-mask-tail.h, loops.c shapes add_al_f32/f64/i32, affine... |
 | S4-06 | Batch check after S4-02, S3-09 and S4-03: x86, drill and ICE sweeps at the batch head | Done | Batch check at ae8a033c5f3: no compiler crashes in the -O2 vectorize and -O3 sweeps, 280 shared lines in 68... |
 | S4-07 | Final Sprint 4 batch check at the sprint head | draft |  |
 | S4-08 | Small fixes from M1: the varargs V4SF assert checks alignment; S3-10 ABI expected files | Done | The varargs save path now asserts a 16-byte aligned slot and is limited to 64-bit KNC, with generated code ... |
@@ -100,6 +100,7 @@ Current tickets: `[##################--]` 71 of 75
 
 ## Recent activity
 
+- 2026-11-04 20:39 **S4-05** engineer red: Red e422c20: tests/t1/knc-mask-tail-O2.c/-O3.c (+knc-mask-tail.h, loops.c shapes add_al_f32/f64/i32, affine_al_f32/f64, mul_al_f32, cst_al_f32, mis...
 - 2026-11-04 20:29 **S4-04** lead approve: 64-bit integer vector add and sub now vectorize through KNC's carry instructions, and the shared add/sub expander hands KNC off at its entry, so up...
 - 2026-11-04 20:28 **S4-04** engineer submit: sse.md add/sub expander: TARGET_KNC entry dispatch to imci.md @knc_plusminus (V16SI vpaddd/vpsubd; V8DI pre-reload split: vmovdqa32{cdab}, vpaddset...
 - 2026-11-04 19:33 **S4-06** lead approve: Batch check at ae8a033c5f3: no compiler crashes in the -O2 vectorize and -O3 sweeps, 280 shared lines in 68 hunks, no conflicts onto the gcc-16 rel...
@@ -107,16 +108,15 @@ Current tickets: `[##################--]` 71 of 75
 - 2026-11-04 19:17 **S4-03** lead approve: Conditional loops now vectorize on KNC: selects and conditional stores on 64-byte aligned arrays through guarded masked moves, conditional add, int...
 - 2026-11-04 19:15 **S4-03** engineer submit: GCC 5300258a536+b57d497d2d1. T0/T1/T2 259 PASS 0 FAIL (log check_gcc16_t0_t1_t2-20261104-191106). Masked vmov{k} only for 64B-aligned refs behind j...
 - 2026-11-04 18:29 **S4-03** lead approve-red: Red approved: the O2 and O3 scans pin masked selects, aligned conditional stores with a jkzd guard, conditional add, V16SI min/max and fabs, and ke...
-- 2026-11-04 18:28 **S4-03** engineer red: c7f0f0c: knc-mask-cond-O2/O3.c, 31/45 scans fail per file (sel needs maskload: x/y are conditional loads, so it does NOT vectorize today; min/max V...
 
 ## Cost
 
 - From the script, engineer: 186 sessions, 441.0M input tokens
 - From the script, lead: 184 sessions, 58.7M input tokens
-- Started by hand, Claude: 9 sessions, 733.5M input tokens
+- Started by hand, Claude: 9 sessions, 736.5M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 13.9 GiB of 100 GiB. 227 GiB free on the drive.
+The project uses 14.0 GiB of 100 GiB. 226 GiB free on the drive.
