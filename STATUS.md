@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-04 22:29.
+Updated automatically at every ticket change. Last update: 2026-11-04 22:37.
 
-**Next: GPT-6.1, on S4-05 (Masked epilogues for aligned loops: while_ult, the finish_cost term, cond_<op> for FP).** Run `python tools/dispatch.py`, or ask the tech lead to.
+**Next: the tech lead, on S4-05.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[###################-]` 72 of 75
 
@@ -87,7 +87,7 @@ Current tickets: `[###################-]` 72 of 75
 | S4-02 | Vector compares into k masks, mask logic and mask spills for the packed modes | Done | Float, double and int vector compares now produce KNC k masks and vectorize with blends (?: and select loop... |
 | S4-03 | Blends and if-conversion: conditional loops, ?:, fabs, min and max vectorize with masks | Done | Conditional loops now vectorize on KNC: selects and conditional stores on 64-byte aligned arrays through gu... |
 | S4-04 | V8DI add and sub through the IMCI carry form, so long add loops vectorize | Done | 64-bit integer vector add and sub now vectorize through KNC's carry instructions, and the shared add/sub ex... |
-| S4-05 | Masked epilogues for aligned loops: while_ult, the finish_cost term, cond_<op> for FP | In progress | Red approved: O2 and O3 scans require masked epilogues for no-peel aligned loops (GPR mask to k, guarded ma... |
+| S4-05 | Masked epilogues for aligned loops: while_ult, the finish_cost term, cond_<op> for FP | Waiting for review | GCC 5b1920f1f56 (KNC) + 6b298d6b011 (shared). Aligned no-peel loops get masked epilogues: while_ult, cond_m... |
 | S4-06 | Batch check after S4-02, S3-09 and S4-03: x86, drill and ICE sweeps at the batch head | Done | Batch check at ae8a033c5f3: no compiler crashes in the -O2 vectorize and -O3 sweeps, 280 shared lines in 68... |
 | S4-07 | Final Sprint 4 batch check at the sprint head | draft |  |
 | S4-08 | Small fixes from M1: the varargs V4SF assert checks alignment; S3-10 ABI expected files | Done | The varargs save path now asserts a 16-byte aligned slot and is limited to 64-bit KNC, with generated code ... |
@@ -100,6 +100,7 @@ Current tickets: `[###################-]` 72 of 75
 
 ## Recent activity
 
+- 2026-11-04 22:37 **S4-05** engineer submit: GCC 5b1920f1f56 (KNC) + 6b298d6b011 (shared). Aligned no-peel loops get masked epilogues: while_ult, cond_mul, cond_fma. Built once. T0 4/0, T1 234...
 - 2026-11-04 22:29 **S4-13** lead approve: The x86 check now runs under this user from .work/_shared/portability-claude, and at the S4-04 head x86 assembly is identical to stock GCC 16.2 on ...
 - 2026-11-04 22:17 **S4-13** engineer submit: x86 at knc 0d5b9f4 vs releases/gcc-16.2.0 (78d4ac7), --home portability-claude, exit 0, 148 min, make check on. -O2: identical=1962 different=0 bot...
 - 2026-11-04 20:40 **S4-05** lead approve-red: Red approved: O2 and O3 scans require masked epilogues for no-peel aligned loops (GPR mask to k, guarded masked moves with jkzd for 16 lanes and a ...
@@ -107,13 +108,12 @@ Current tickets: `[###################-]` 72 of 75
 - 2026-11-04 20:29 **S4-04** lead approve: 64-bit integer vector add and sub now vectorize through KNC's carry instructions, and the shared add/sub expander hands KNC off at its entry, so up...
 - 2026-11-04 20:28 **S4-04** engineer submit: sse.md add/sub expander: TARGET_KNC entry dispatch to imci.md @knc_plusminus (V16SI vpaddd/vpsubd; V8DI pre-reload split: vmovdqa32{cdab}, vpaddset...
 - 2026-11-04 19:33 **S4-06** lead approve: Batch check at ae8a033c5f3: no compiler crashes in the -O2 vectorize and -O3 sweeps, 280 shared lines in 68 hunks, no conflicts onto the gcc-16 rel...
-- 2026-11-04 19:31 **S4-06** engineer submit: At ae8a033c5f3. 1 x86 NOT RUN, infra: portability/x86-{a,b} trees owned by CodexSandboxOffline; configure cannot chmod config.status (S4_06_x86-202...
 
 ## Cost
 
 - From the script, engineer: 186 sessions, 441.0M input tokens
 - From the script, lead: 184 sessions, 58.7M input tokens
-- Started by hand, Claude: 9 sessions, 749.3M input tokens
+- Started by hand, Claude: 9 sessions, 750.0M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
