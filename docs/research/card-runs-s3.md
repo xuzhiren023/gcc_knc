@@ -289,4 +289,5 @@ faults on the guard line after the array as designed (`kernel=add_al_f32 n=1 whe
 S3-10 rows rebuilt at this head (`claude-s3-10-m1`, compiler `c759f17f1b9`): all 14 match their
 expected files: `m1_affine` with the GCC 16, donor and Fortran drivers (`claude-55d3f4a7…`,
 `claude-0c08605c…`, `claude-f19bea17…`), vector, FP and special values at `-O0` and `-O2`, the four
-ABI cross-links, and inexact (`claude-e5c64f9d…`).
+ABI cross-links, and inexact (`claude-e5c64f9d…`). The batch's own torture row (the suite again, staged
+file by file) also passes (`claude-70ed8763…`).
