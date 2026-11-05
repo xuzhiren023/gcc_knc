@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-05 10:29.
+Updated automatically at every ticket change. Last update: 2026-11-05 10:34.
 
-**Next: the tech lead, on S5-07.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: GPT-6.1, on S5-07 (KNC reductions: vpermf32x4 and swizzle trees for plus, min/max and logic, with no stack accumulator).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
 Current tickets: `[#################---]` 82 of 93
 
@@ -103,7 +103,7 @@ Current tickets: `[#################---]` 82 of 93
 | S5-04 | card_run shares the card with the PhiWeather tuning session: project tag, own-budget count, timed-job refusal, staging limit, packed S3-10 batch | Done | card_run now shares the card safely with the PhiWeather tuning session: our ledger rows say project gcc-knc... |
 | S5-05 | knc_lint accepts the decoded %ymm source of vcvtdq2pd, vcvtudq2pd and vcvtps2pd | Done | knc_lint no longer rejects correct vcvtdq2pd, vcvtudq2pd and vcvtps2pd, whose 8-lane register source objdum... |
 | S5-06 | KNC vec_perm_const: reversed, stride-2 and interleaved loops vectorize with swizzle, vpermf32x4, vpshufd, valignd and vpermd | Done | Reversed, stride-2 and constant-shuffle vector code now uses IMCI permutes (swizzle, vpermf32x4, vpshufd, v... |
-| S5-07 | KNC reductions: vpermf32x4 and swizzle trees for plus, min/max and logic, with no stack accumulator | Question for the tech lead | Build still fails before compilation: echo timestamp > gcc/s-mddeps: Permission denied. ls now reports Code... |
+| S5-07 | KNC reductions: vpermf32x4 and swizzle trees for plus, min/max and logic, with no stack accumulator | In progress | Fixed by the owner: every file in .work/_shared/gcc-build is now owned by CodexSandboxOffline, as in Sprint... |
 | S5-08 | KNC same-width conversions: int32/uint32 to and from float as single vcvtfxpnt instructions (the ADR-0008 named-insn exception) | Not started |  |
 | S5-09 | Card probe of vrcp23ps, vrsqrt23ps and vgetmant (S5-03 P1a-e), to back the division and square-root proofs | Done | A card probe now measures vrcp23ps and vrsqrt23ps against the error bounds the FP32 division and square-roo... |
 | S5-10 | Correctly rounded FP32 vector square root for V16SF (S5-03 ticket A) | Not started |  |
@@ -118,6 +118,7 @@ Current tickets: `[#################---]` 82 of 93
 
 ## Recent activity
 
+- 2026-11-05 10:34 **S5-07** lead answer: Fixed by the owner: every file in .work/_shared/gcc-build is now owned by CodexSandboxOffline, as in Sprints 3 and 4. Rerun tools/gcc_build.py --if...
 - 2026-11-05 10:29 **S5-07** engineer ask: Build still fails before compilation: echo timestamp > gcc/s-mddeps: Permission denied. ls now reports CodexSandboxOffline owner, mode 0644; id mat...
 - 2026-11-05 10:26 **S5-07** lead answer: Fixed by the owner: the explicit CodexSandboxUsers DENY entries are removed from files xuzhi owns in gcc-build and the GCC checkout (s-mddeps now a...
 - 2026-11-05 10:13 **S5-07** engineer ask: Build retry still fails before compilation: echo timestamp > gcc/s-mddeps: Permission denied as CodexSandboxOffline. File is -rwxrw----+ owned by x...
@@ -125,13 +126,12 @@ Current tickets: `[#################---]` 82 of 93
 - 2026-11-05 10:00 **S5-07** engineer ask: Incremental build blocked before compilation: /bin/sh cannot write gcc-build/gcc/s-mddeps (Permission denied). Cygwin runs as CodexSandboxOffline; ...
 - 2026-11-05 09:42 **S5-07** lead approve-red: Red approved: integer and fast-math FP reductions must end in vpermf32x4 plus swizzle trees with no stack accumulator in the loop, and strict FP su...
 - 2026-11-05 09:41 **S5-07** engineer red: Commit 33bb039: T1 scans for integer/FP trees, min/max, logic, loop stack rejection and strict FP controls. Ran tools/run.py --name S5-07-red --inp...
-- 2026-11-05 09:35 **S5-06** lead approve: Reversed, stride-2 and constant-shuffle vector code now uses IMCI permutes (swizzle, vpermf32x4, vpshufd, valignd, blend, one or two vpermd) instea...
 
 ## Cost
 
 - From the script, engineer: 190 sessions, 445.7M input tokens
 - From the script, lead: 184 sessions, 58.7M input tokens
-- Started by hand, Claude: 9 sessions, 846.7M input tokens
+- Started by hand, Claude: 9 sessions, 850.8M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
