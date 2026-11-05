@@ -644,3 +644,193 @@ elapsed time changes from 104.22 to 122.11 seconds. The T1/T2 command exits
 The saved records are `.work/_shared/tmp/s3-23-gcc16.txt` and
 `.work/_shared/tmp/s3-23-trunk.txt`; these are result comparisons, not
 an assembly-equality claim for the full suites.
+## 2026-11-05T00:20:07+00:00
+
+Base: `releases/gcc-16.2.0`; KNC: `ae8a033c5f3a544c092478ff7269f366e828ee81`.
+Local refs only; no fetch, checkout, index update or ref update.
+
+### upstream/master
+
+Commit: `b88c2821e219244d18df873b0bfb344d3dc0b2a7`; date: 2026-11-03T19:41:47+01:00.
+
+Conflicts: 5
+
+#### `gcc/config/i386/i386-c.cc`
+
+```diff
+<<<<<<< upstream/master
+  /* For some of the k6/pentium variants there weren't separate ISA bits to
+=======
+  if (isa_flag & OPTION_MASK_ISA_KNC)
+    arch = ix86_knc_target_macros (parse_in, def_or_undef);
+
+  /* For some of the k6/pentium varients there weren't separate ISA bits to
+>>>>>>> ae8a033c5f3
+```
+
+#### `gcc/config/i386/i386.cc`
+
+```diff
+<<<<<<< upstream/master
+=======
+  if (TARGET_KNC && !ix86_knc_check_abi_type (arg.type, arg.mode))
+    return true;
+  CUMULATIVE_ARGS *cum = get_cumulative_args (cum_v);
+
+>>>>>>> ae8a033c5f3
+```
+
+```diff
+<<<<<<< upstream/master
+=======
+    }
+  if (stmt_cost == -1)
+    stmt_cost = ix86_default_vector_cost (kind, mode);
+  /* ADR-0007 point 7: KNC masked accesses are 64-byte aligned only.  */
+  if (TARGET_KNC && ix86_knc_packed_mode_p (mode)
+      && (kind == unaligned_load || kind == unaligned_store)
+      && stmt_info && gimple_call_internal_p (stmt_info->stmt))
+    stmt_cost *= 1000;
+>>>>>>> ae8a033c5f3
+```
+
+#### `gcc/config/i386/sse.md`
+
+```diff
+<<<<<<< upstream/master
+  [(set (match_operand:VI_AVX2 0 "register_operand")
+	(plusminus:VI_AVX2
+	  (match_operand:VI_AVX2 1 "vector_operand")
+	  (match_operand:VI_AVX2 2 "vector_or_const_vector_operand")))]
+  "TARGET_SSE2"
+{
+  /* Expand vector add/sub 1 as vector sub/add -1.  */
+  if (rtx_equal_p (operands[2], CONST1_RTX (<MODE>mode)))
+    {
+      operands[2] = force_reg (<MODE>mode, CONSTM1_RTX (<MODE>mode));
+      emit_insn (gen_<inv_insn><mode>3 (operands[0], operands[1],
+					operands[2]));
+      DONE;
+    }
+
+  if (CONST_VECTOR_P (operands[2]))
+    operands[2] = force_reg (<MODE>mode, operands[2]);
+
+  ix86_fixup_binary_operands_no_copy (<CODE>, <MODE>mode, operands);
+})
+=======
+  [(set (match_operand:VI_AVX2_KNC 0 "register_operand")
+	(plusminus:VI_AVX2_KNC
+	  (match_operand:VI_AVX2_KNC 1 "vector_operand")
+	  (match_operand:VI_AVX2_KNC 2 "vector_operand")))]
+  "TARGET_SSE2 || ix86_knc_packed_mode_p (<MODE>mode)"
+  "ix86_fixup_binary_operands_no_copy (<CODE>, <MODE>mode, operands);")
+>>>>>>> ae8a033c5f3
+```
+
+#### `gcc/configure`
+
+```diff
+<<<<<<< upstream/master
+  i?86-*-* | x86_64-*-*)
+    if test x$as_flavor = xsolaris; then
+      tls_section_flag=t
+=======
+  i?86-*-* | x86_64-*-* | k1om-*-linux*)
+    case "$target:$gas" in
+      i?86-*-solaris2*:no | x86_64-*-solaris2*:no)
+	tls_section_flag=t
+>>>>>>> ae8a033c5f3
+```
+
+#### `gcc/configure.ac`
+
+```diff
+<<<<<<< upstream/master
+  i?86-*-* | x86_64-*-*)
+    if test x$as_flavor = xsolaris; then
+      tls_section_flag=t
+=======
+  i?86-*-* | x86_64-*-* | k1om-*-linux*)
+    case "$target:$gas" in
+      i?86-*-solaris2*:no | x86_64-*-solaris2*:no)
+	tls_section_flag=t
+>>>>>>> ae8a033c5f3
+```
+
+Upstream line churn since 16.2 in files changed by KNC:
+
+| File | Added | Removed |
+| --- | ---: | ---: |
+| `gcc/common/config/i386/i386-common.cc` | +67 | -22 |
+| `gcc/config.gcc` | +93 | -158 |
+| `gcc/config.host` | +10 | -2 |
+| `gcc/config/i386/i386-c.cc` | +10 | -5 |
+| `gcc/config/i386/i386-expand.cc` | +3463 | -508 |
+| `gcc/config/i386/i386-knc.cc` | +0 | -0 |
+| `gcc/config/i386/i386-knc.h` | +0 | -0 |
+| `gcc/config/i386/i386-options.cc` | +142 | -91 |
+| `gcc/config/i386/i386-protos.h` | +21 | -16 |
+| `gcc/config/i386/i386.cc` | +1369 | -459 |
+| `gcc/config/i386/i386.h` | +70 | -48 |
+| `gcc/config/i386/i386.md` | +2401 | -1450 |
+| `gcc/config/i386/i386.opt` | +24 | -6 |
+| `gcc/config/i386/imci.md` | +0 | -0 |
+| `gcc/config/i386/linux-k1om.h` | +0 | -0 |
+| `gcc/config/i386/sse.md` | +2036 | -286 |
+| `gcc/config/i386/sync.md` | +57 | -3 |
+| `gcc/config/i386/t-i386` | +0 | -0 |
+| `gcc/configure` | +1043 | -920 |
+| `gcc/configure.ac` | +367 | -378 |
+| `libgcc/config.host` | +13 | -23 |
+| `libgcc/config/i386/knc-crtfastmath.c` | +0 | -0 |
+| `libgcc/config/i386/knc-sfp-machine.h` | +0 | -0 |
+| `libgcc/config/i386/t-knc` | +0 | -0 |
+
+### upstream/releases/gcc-16
+
+Commit: `4b03dde2e3ad210db469ee763194c0cbec22cf45`; date: 2026-11-03T10:43:47+01:00.
+
+Conflicts: 0
+
+Upstream line churn since 16.2 in files changed by KNC:
+
+| File | Added | Removed |
+| --- | ---: | ---: |
+| `gcc/common/config/i386/i386-common.cc` | +3 | -1 |
+| `gcc/config.gcc` | +0 | -0 |
+| `gcc/config.host` | +0 | -0 |
+| `gcc/config/i386/i386-c.cc` | +0 | -0 |
+| `gcc/config/i386/i386-expand.cc` | +23 | -10 |
+| `gcc/config/i386/i386-knc.cc` | +0 | -0 |
+| `gcc/config/i386/i386-knc.h` | +0 | -0 |
+| `gcc/config/i386/i386-options.cc` | +0 | -0 |
+| `gcc/config/i386/i386-protos.h` | +0 | -0 |
+| `gcc/config/i386/i386.cc` | +35 | -47 |
+| `gcc/config/i386/i386.h` | +0 | -0 |
+| `gcc/config/i386/i386.md` | +73 | -28 |
+| `gcc/config/i386/i386.opt` | +0 | -0 |
+| `gcc/config/i386/imci.md` | +0 | -0 |
+| `gcc/config/i386/linux-k1om.h` | +0 | -0 |
+| `gcc/config/i386/sse.md` | +99 | -54 |
+| `gcc/config/i386/sync.md` | +0 | -0 |
+| `gcc/config/i386/t-i386` | +0 | -0 |
+| `gcc/configure` | +1 | -1 |
+| `gcc/configure.ac` | +1 | -1 |
+| `libgcc/config.host` | +1 | -0 |
+| `libgcc/config/i386/knc-crtfastmath.c` | +0 | -0 |
+| `libgcc/config/i386/knc-sfp-machine.h` | +0 | -0 |
+| `libgcc/config/i386/t-knc` | +0 | -0 |
+
+### S4-06 classification (KNC `ae8a033c5f3`)
+
+`upstream/releases/gcc-16` (`4b03dde2e3a`): 0 conflicts. `upstream/master`
+(`b88c2821e21`): 5 files, 6 hunks; log `.work/_state/logs/S4_06_drill-20261104-192007.log`.
+
+| File | Kind | Reason |
+| --- | --- | --- |
+| `i386-c.cc` | textual | Upstream fixed the "varients" typo in the comment line right after the KNC macro hook. |
+| `i386.cc` (pass_by_reference) | textual | Upstream split the body into `ix86_pass_by_reference_abi`; the KNC guard moves into the `cum_v` wrapper. Upstream va_arg calls `_abi` directly, but KNC's va_arg entry guard already rejects first. |
+| `i386.cc` (add_stmt_cost, new from S4-03) | textual | Upstream moved the `stmt_cost == -1` default line up into its restructured block; the ADR-0007 point 7 term re-anchors after it. |
+| `sse.md` (plusminus expander, new; S3-09 widening) | logic | Upstream changed operand 2 to `vector_or_const_vector_operand` and added the +1 to -1 rewrite and constant `force_reg`; with `VI_AVX2_KNC` these now run for V16SI/V8DI on KNC and need a KNC check (constant move and inverse op). |
+| `configure`, `configure.ac` | textual | Upstream replaced the Solaris `case "$target:$gas"` body with an `as_flavor` test; keep `k1om-*-linux*` in the label. |
