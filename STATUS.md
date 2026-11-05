@@ -1,10 +1,10 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-04 19:31.
+Updated automatically at every ticket change. Last update: 2026-11-04 19:33.
 
-**Next: the tech lead, on S4-06.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+Nothing can move right now.
 
-Current tickets: `[##################--]` 69 of 73
+Current tickets: `[###################-]` 70 of 73
 
 ## Milestones
 
@@ -12,7 +12,7 @@ Current tickets: `[##################--]` 69 of 73
 |---|---|---|---|
 | M0 | Foundation | In progress | 17 of 17 tickets |
 | M1 | Mixed native code | Done | 43 of 43 tickets |
-| M2 | Useful vector target | In progress | 9 of 13 tickets |
+| M2 | Useful vector target | In progress | 10 of 13 tickets |
 | M3 | Runtimes | Not started | Not planned in detail yet |
 | M4 | Broad optimization | Not started | Not planned in detail yet |
 | M5 | Program corpus | Not started | Not planned in detail yet |
@@ -88,7 +88,7 @@ Current tickets: `[##################--]` 69 of 73
 | S4-03 | Blends and if-conversion: conditional loops, ?:, fabs, min and max vectorize with masks | Done | Conditional loops now vectorize on KNC: selects and conditional stores on 64-byte aligned arrays through gu... |
 | S4-04 | V8DI add and sub through the IMCI carry form, so long add loops vectorize | draft |  |
 | S4-05 | Safe masked tails: a masked vector remainder only where every touched line is in the array | draft |  |
-| S4-06 | Batch check after S4-02, S3-09 and S4-03: x86, drill and ICE sweeps at the batch head | Waiting for review | At ae8a033c5f3. 1 x86 NOT RUN, infra: portability/x86-{a,b} trees owned by CodexSandboxOffline; configure c... |
+| S4-06 | Batch check after S4-02, S3-09 and S4-03: x86, drill and ICE sweeps at the batch head | Done | Batch check at ae8a033c5f3: no compiler crashes in the -O2 vectorize and -O3 sweeps, 280 shared lines in 68... |
 | S4-07 | Final Sprint 4 batch check at the sprint head | draft |  |
 | S4-08 | Small fixes from M1: the varargs V4SF assert checks alignment; S3-10 ABI expected files | Done | The varargs save path now asserts a 16-byte aligned slot and is limited to 64-bit KNC, with generated code ... |
 | S4-09 | LRA folds a misaligned vector load into vaddps/vsubps/vmulps ("m" constraint), which faults on the card | Done | Vectorized float and double add, sub and mul no longer fold a misaligned array load into the instruction, w... |
@@ -98,6 +98,7 @@ Current tickets: `[##################--]` 69 of 73
 
 ## Recent activity
 
+- 2026-11-04 19:33 **S4-06** lead approve: Batch check at ae8a033c5f3: no compiler crashes in the -O2 vectorize and -O3 sweeps, 280 shared lines in 68 hunks, no conflicts onto the gcc-16 rel...
 - 2026-11-04 19:31 **S4-06** engineer submit: At ae8a033c5f3. 1 x86 NOT RUN, infra: portability/x86-{a,b} trees owned by CodexSandboxOffline; configure cannot chmod config.status (S4_06_x86-202...
 - 2026-11-04 19:17 **S4-03** lead approve: Conditional loops now vectorize on KNC: selects and conditional stores on 64-byte aligned arrays through guarded masked moves, conditional add, int...
 - 2026-11-04 19:15 **S4-03** engineer submit: GCC 5300258a536+b57d497d2d1. T0/T1/T2 259 PASS 0 FAIL (log check_gcc16_t0_t1_t2-20261104-191106). Masked vmov{k} only for 64B-aligned refs behind j...
@@ -105,13 +106,12 @@ Current tickets: `[##################--]` 69 of 73
 - 2026-11-04 18:28 **S4-03** engineer red: c7f0f0c: knc-mask-cond-O2/O3.c, 31/45 scans fail per file (sel needs maskload: x/y are conditional loads, so it does NOT vectorize today; min/max V...
 - 2026-11-04 18:16 **S4-12** lead approve: card_run can now ship a whole batch of programs in one packed upload, unpacked on the card by a small checked helper, instead of two SSH connection...
 - 2026-11-04 18:14 **S4-12** engineer submit: Red a122ec7. --file-list: helper upload + one pack; 300 files = 2 connections (was 303), no per-file chmod. Unpack fail-closed tests pass; donor cl...
-- 2026-11-04 18:14 **S4-12** lead answer: Revert harness/card/run_suite.py on your branch (harness/ is lead-owned and protected); keep the two hunks in your submit note and the lead applies...
 
 ## Cost
 
 - From the script, engineer: 186 sessions, 441.0M input tokens
 - From the script, lead: 184 sessions, 58.7M input tokens
-- Started by hand, Claude: 9 sessions, 714.2M input tokens
+- Started by hand, Claude: 9 sessions, 715.6M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
