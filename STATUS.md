@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-05 08:26.
+Updated automatically at every ticket change. Last update: 2026-11-05 08:27.
 
 **Next: the tech lead, on S5-01.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
@@ -100,10 +100,11 @@ Current tickets: `[##################--]` 75 of 79
 | S5-01 | Gather, scatter, permutes, reductions and FP min/max on KNC: GCC 16 entry points, IMCI forms, fault footprint (ADR-0008 input) | Question for the tech lead | Submit refused on size: 1334 changed lines against a budget of 800 (docs/research/knc-gather-reduce.md 771 ... |
 | S5-02 | Int and FP conversions, and memory up/down conversions for byte and word data on KNC (ADR-0008 input) | Question for the tech lead | Submit refused: 986 changed lines against a budget of 800. Committed at 074d04b: docs/research/knc-conversi... |
 | S5-03 | Correctly rounded vector division and square root for V16SF and V8DF: sequences, proof plan, test plan (ADR-0003 point 4 input) | In progress |  |
-| S5-04 | card_run shares the card with the PhiWeather tuning session: project tag, own-budget count, timed-job refusal, staging limit, packed S3-10 batch | In progress |  |
+| S5-04 | card_run shares the card with the PhiWeather tuning session: project tag, own-budget count, timed-job refusal, staging limit, packed S3-10 batch | Waiting for review | tests.tools.test_card_run 16/16 pass (7 new, red first at 53c67e4: 6 failed, s3_10 test errored). card test... |
 
 ## Recent activity
 
+- 2026-11-05 08:27 **S5-04** engineer submit: tests.tools.test_card_run 16/16 pass (7 new, red first at 53c67e4: 6 failed, s3_10 test errored). card tests discover: 79 run, 25 F + 5 E, identica...
 - 2026-11-05 08:26 **S5-02** engineer ask: Submit refused: 986 changed lines against a budget of 800. Committed at 074d04b: docs/research/knc-conversions.md (454 lines, inside the brief's 40...
 - 2026-11-05 08:26 **S5-01** engineer ask: Submit refused on size: 1334 changed lines against a budget of 800 (docs/research/knc-gather-reduce.md 771 + tests/regress/knc-gather-probe.c 563; ...
 - 2026-11-05 01:11 **S4-07** lead approve: Final Sprint 4 check at c759f17f1b9: x86 assembly identical to stock GCC 16.2 on all 1,962 files, every upstream drill conflict textual (none on th...
@@ -111,7 +112,6 @@ Current tickets: `[##################--]` 75 of 79
 - 2026-11-04 23:42 **S4-14** lead approve: Misaligned conditional loads and stores now use a guarded split into at most two aligned masked moves plus a vpermd rotation instead of an element-...
 - 2026-11-04 23:40 **S4-14** engineer submit: GCC 0c5b17b98d7 (imci.md only): misaligned maskload/maskstore is a guarded aligned split (vpermd, 2 GPR-guarded aligned vmov{k}). Built once. T0 4/...
 - 2026-11-04 22:53 **S4-14** lead approve-red: Red approved: with the cost model forced, misaligned conditional loads and stores must become a vpermd rotation plus two guarded aligned masked mov...
-- 2026-11-04 22:51 **S4-14** engineer red: Red f36e582: tests/t1/knc-mask-split.c (-O2 -ftree-vectorize, unlimited cost, peeling 0): cst_f32/f64/i32/i64 (conditional load + store, unknown al...
 
 ## Cost
 
