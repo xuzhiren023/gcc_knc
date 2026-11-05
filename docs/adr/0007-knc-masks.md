@@ -41,7 +41,8 @@ its scalar-mask branch needs `TARGET_AVX512F`.
    swapped. The quiet UNLT, UNLE, UNGT and UNGE are an `ord` compare, a masked `lt`/`le`, then
    `knot`. LTGT is `ord` followed by a masked `neq`. The card must show that a masked-off NaN lane
    raises no invalid flag before anything relies on it; until then those four take the scalar
-   path.
+   path. Under `-fno-trapping-math`, where no flag is observable, UNLT/UNLE/UNGT/UNGE map to
+   `nle`/`nlt` with swaps (S4-03, lead-reviewed 2026-11-04); UNEQ and LTGT stay scalar.
 6. **V8DI.** Add and sub use the 4-instruction carry sequence (`vmovdqa32 t,a{cdab}`,
    `vpaddsetcd t,kc,b{cdab}`, `vpaddd`, `vpadcd r{kodd},kc,zero`; sub uses the borrow forms).
    `addv8di3`/`subv8di3` already exist in `sse.md:16597` over `VI_AVX2`, so S4-04 uses an ADR-0006
