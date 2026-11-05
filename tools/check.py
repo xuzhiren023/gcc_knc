@@ -27,6 +27,8 @@ PACKED = re.compile(r'\bv(?:addn?|subr?|mul|div|max|min|sqrt|rcp(?:23)?|rsqrt(?:
 # Each entry supplies its CLI help and handlers for the tiers it selects.
 # Imports stay lazy so T0 and source-only selections need no probe modules.
 SELECTIONS = {
+    'division': ('S5-11 correctly rounded FP32 division and masked tail', {
+        't1': lambda runner: runner.t1_sources([runner.source_dir / 'knc-div-f32.c'])}),
     'sqrt': ('S5-10 correctly rounded FP32 square root', {
         't1': lambda runner: (runner.t1_sources([runner.source_dir / 'knc-vec-autovec.c']),
                               importlib.import_module('s5_10_checks').t1(runner))}),
