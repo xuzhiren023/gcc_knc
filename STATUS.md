@@ -2,7 +2,7 @@
 
 Updated automatically at every ticket change. Last update: 2026-11-04 22:39.
 
-Nothing can move right now.
+**Next: GPT-6.1, on S4-14 (Misaligned masked access: a guarded aligned split in KNC maskload/maskstore, tested).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
 Current tickets: `[###################-]` 73 of 75
 
@@ -96,7 +96,7 @@ Current tickets: `[###################-]` 73 of 75
 | S4-11 | gcc_build.py refuses a build tree whose mddeps.mk has lost the .md includes | Done | A shared GCC build tree that has lost its .md dependency list is now rebuilt and checked instead of being c... |
 | S4-12 | card_run stages a whole batch in one upload, so card cores are busy instead of waiting on SSH | Done | card_run can now ship a whole batch of programs in one packed upload, unpacked on the card by a small check... |
 | S4-13 | Rebuild the x86 check's trees under the current user and run the x86 comparison at the knc head | Done | The x86 check now runs under this user from .work/_shared/portability-claude, and at the S4-04 head x86 ass... |
-| S4-14 | Misaligned masked access: a guarded aligned split in KNC maskload/maskstore, tested | draft |  |
+| S4-14 | Misaligned masked access: a guarded aligned split in KNC maskload/maskstore, tested | In progress |  |
 
 ## Recent activity
 
@@ -113,7 +113,7 @@ Current tickets: `[###################-]` 73 of 75
 
 - From the script, engineer: 186 sessions, 441.0M input tokens
 - From the script, lead: 184 sessions, 58.7M input tokens
-- Started by hand, Claude: 9 sessions, 751.6M input tokens
+- Started by hand, Claude: 9 sessions, 752.3M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
