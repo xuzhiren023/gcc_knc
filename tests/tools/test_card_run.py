@@ -32,6 +32,7 @@ class FakeTransport:
         self.unreachable = False
         self.link_broken = False
         self.stage_failure = False
+        self.stage_seconds = 0.0
         self.timed_out = False
         self.reboot = False
         self.status = 0
@@ -73,6 +74,7 @@ class FakeTransport:
             raise AssertionError("must not restage/retry")
         self.staged = True
         self.events.append(("stage", run_dir, Path(program), timeout))
+        self.now += self.stage_seconds
         if self.stage_failure:
             raise OSError("fake partial staging failure")
 
@@ -137,12 +139,13 @@ class CardRun(unittest.TestCase):
         self.ledger.write_text("", encoding="utf8")
         self.transport = FakeTransport()
 
-    def run_card(self):
+    def run_card(self, **options):
         result = self.runner["run"](
             self.program, ["argument with spaces"], lock_path=self.lock,
             external_locks=[self.external], baseline_names={"sshd"},
             timeout=30.0, transport_timeout=1.0, receipt_path=self.receipt,
-            transport=self.transport, ledger_path=self.ledger, monotonic=self.transport.monotonic)
+            transport=self.transport, ledger_path=self.ledger, monotonic=self.transport.monotonic,
+            **options)
         self.assertEqual(json.loads(self.receipt.read_text(encoding="utf8")), result)
         codes = [self.runner[name] for name in ("REFUSED_EXIT", "TIMEOUT_EXIT", "INFRA_EXIT")]
         self.assertEqual(len(set(codes)), 3)
@@ -323,6 +326,103 @@ class CardRun(unittest.TestCase):
         self.assertIn("snapshot", self.names()[self.names().index("stage") + 1:
                                                self.names().index("cleanup")])
         self.assert_cleaned()
+
+
+    def ledger_rows(self):
+        return [json.loads(line) for line in self.ledger.read_text(encoding="utf8").splitlines()]
+
+    def other_start(self, **fields):
+        row = dict(agent="claude", project="PhiWeather", jobId="claude-mentor-1", event="start",
+                   cores=list(range(60)), memoryLimitMiB=7168,
+                   startTime="2026-11-05T10:00:00+00:00",
+                   expectedEnd="2026-11-05T12:00:00+00:00", timingValid=True)
+        row.update(fields)
+        with self.ledger.open("a", encoding="utf8") as f:
+            f.write(json.dumps(row) + "\n")
+        return row
+
+    def test_start_and_finish_rows_carry_our_project_tag(self):
+        self.run_card()
+        rows = self.ledger_rows()
+        self.assertEqual([row["event"] for row in rows], ["start", "finish"])
+        self.assertEqual([row.get("project") for row in rows], ["gcc-knc", "gcc-knc"])
+
+    def test_memory_admission_counts_only_our_own_rows(self):
+        # 7168 MiB held by another project must not push a 4096 MiB job over our 10240 MiB budget.
+        self.other_start(timingValid=False)
+        with mock.patch("time.sleep", lambda seconds: setattr(self.transport, "now",
+                                                              self.transport.now + seconds)):
+            result = self.run_card(memory_mb=4096)
+        self.assert_result(result, "program", 0, seconds=12.0, program_status=0)
+        # Our own rows, tagged or legacy, still count: 7168 + 4096 > 10240.
+        for ours in (dict(project="gcc-knc", jobId="claude-mentor-1"),
+                     dict(project=None, jobId="claude-" + "ab" * 16)):
+            with self.subTest(ours=ours):
+                self.ledger.write_text("", encoding="utf8")
+                row = self.other_start(timingValid=False, **ours)
+                if row["project"] is None:
+                    del row["project"]
+                    self.ledger.write_text(json.dumps(row) + "\n", encoding="utf8")
+                self.transport = FakeTransport()
+                with mock.patch("time.sleep", lambda seconds: setattr(self.transport, "now",
+                                                                      self.transport.now + seconds)):
+                    result = self.run_card(memory_mb=4096)
+                self.assertEqual(result["result_class"], "refused")
+                self.assertIn("memory admission", result["detail"])
+
+    def test_open_timed_job_of_another_project_refuses_before_connecting(self):
+        for fields in (dict(), dict(project=None, agent="gpt", jobId="gpt-1")):
+            with self.subTest(fields=fields):
+                self.ledger.write_text("", encoding="utf8")
+                self.transport = FakeTransport()
+                row = self.other_start(**fields)
+                if row["project"] is None:
+                    del row["project"]
+                    self.ledger.write_text(json.dumps(row) + "\n", encoding="utf8")
+                before = self.ledger.read_text(encoding="utf8")
+                result = self.run_card()
+                self.assert_result(result, "refused", self.runner["REFUSED_EXIT"], before=None, after=None)
+                self.assertEqual(self.transport.events, [])
+                self.assertIn(row["jobId"], result["detail"])
+                self.assertIn(row["expectedEnd"], result["detail"])
+                self.assertEqual(self.ledger.read_text(encoding="utf8"), before)
+                self.assertFalse(self.lock.exists())
+                self.assertFalse((self.ledger.parent / "claude-admission.lock").exists())
+
+    def test_untimed_or_ended_jobs_of_another_project_do_not_refuse(self):
+        self.other_start(timingValid=False)
+        self.other_start(jobId="claude-mentor-2")
+        self.other_start(jobId="claude-mentor-2", event="finish")
+        self.assert_result(self.run_card(), "program", 0, seconds=12.0, program_status=0)
+
+    def test_slow_staging_is_an_infrastructure_failure_and_closes_our_row(self):
+        self.transport.stage_seconds = 130.0  # Past the 120 s default.
+        result = self.run_card()
+        self.assert_result(result, "infrastructure", self.runner["INFRA_EXIT"], seconds=0.0)
+        self.assertIn("staging", result["detail"])
+        self.assertNotIn("execute", self.names())
+        self.assert_cleaned()
+        self.assertEqual([row["event"] for row in self.ledger_rows()], ["start", "finish"])
+        self.assertEqual(self.ledger_rows()[-1]["outcome"], "infrastructure-failure")
+
+    def test_stage_timeout_is_a_parameter(self):
+        self.transport.stage_seconds = 130.0
+        self.assert_result(self.run_card(stage_timeout=300.0), "program", 0, seconds=12.0,
+                           program_status=0)
+
+    def test_s3_10_stages_the_torture_row_with_one_file_list(self):
+        script = runpy.run_path(str(ROOT / "tools/run_s3_10.py"))
+        out = self.directory / "S3-10"
+        out.mkdir()
+        (out / "claude-torture.list").write_text("claude-t-a.mic a.c\nclaude-t-b.mic b.c\n", encoding="utf8")
+        listed = script["file_list_for"](out, "claude-torture.list")
+        self.assertEqual(listed.read_text(encoding="utf8").split("\n")[:-1],
+                         [str(out / name) for name in ("claude-torture.list", "claude-t-a.mic", "claude-t-b.mic")])
+        argv = script["card_argv"](out / "card-job.json", out / "claude-torture", ["-j", "30"], listed)
+        self.assertEqual(argv.count("--file-list"), 1)
+        self.assertNotIn("--file", argv)
+        self.assertEqual(argv[argv.index("--file-list") + 1], str(listed))
+        self.assertEqual(argv[-3:], [str(out / "claude-torture"), "-j", "30"])
 
 
 if __name__ == "__main__":
