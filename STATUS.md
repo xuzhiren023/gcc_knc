@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-04 18:29.
+Updated automatically at every ticket change. Last update: 2026-11-04 19:15.
 
-**Next: GPT-6.1, on S4-03 (Blends and if-conversion: conditional loops, ?:, fabs, min and max vectorize with masks).** Run `python tools/dispatch.py`, or ask the tech lead to.
+**Next: the tech lead, on S4-03.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[##################--]` 68 of 73
 
@@ -85,7 +85,7 @@ Current tickets: `[##################--]` 68 of 73
 | S3-25 | va_arg of an unsupported KNC type leaves a broken expansion; release builds hide the ICE | Done | Rejecting va_arg of an unsupported KNC vector type now ends with its error message and no hidden compiler c... |
 | S4-01 | Masks on KNC: GCC 16 entry points, IMCI forms, reuse audit and masked-tail design (ADR-0007 input) | Done | The mask design input for Sprint 4 is done: KNC masks are HI for 16-lane and QI for 8-lane vectors, compare... |
 | S4-02 | Vector compares into k masks, mask logic and mask spills for the packed modes | Done | Float, double and int vector compares now produce KNC k masks and vectorize with blends (?: and select loop... |
-| S4-03 | Blends and if-conversion: conditional loops, ?:, fabs, min and max vectorize with masks | In progress | Red approved: the O2 and O3 scans pin masked selects, aligned conditional stores with a jkzd guard, conditi... |
+| S4-03 | Blends and if-conversion: conditional loops, ?:, fabs, min and max vectorize with masks | Waiting for review | GCC 5300258a536+b57d497d2d1. T0/T1/T2 259 PASS 0 FAIL (log check_gcc16_t0_t1_t2-20261104-191106). Masked vm... |
 | S4-04 | V8DI add and sub through the IMCI carry form, so long add loops vectorize | draft |  |
 | S4-05 | Safe masked tails: a masked vector remainder only where every touched line is in the array | draft |  |
 | S4-06 | Batch check after S4-02, S3-09 and S4-03: x86, drill and ICE sweeps at the batch head | draft |  |
@@ -98,6 +98,7 @@ Current tickets: `[##################--]` 68 of 73
 
 ## Recent activity
 
+- 2026-11-04 19:15 **S4-03** engineer submit: GCC 5300258a536+b57d497d2d1. T0/T1/T2 259 PASS 0 FAIL (log check_gcc16_t0_t1_t2-20261104-191106). Masked vmov{k} only for 64B-aligned refs behind j...
 - 2026-11-04 18:29 **S4-03** lead approve-red: Red approved: the O2 and O3 scans pin masked selects, aligned conditional stores with a jkzd guard, conditional add, V16SI min/max and fabs, and ke...
 - 2026-11-04 18:28 **S4-03** engineer red: c7f0f0c: knc-mask-cond-O2/O3.c, 31/45 scans fail per file (sel needs maskload: x/y are conditional loads, so it does NOT vectorize today; min/max V...
 - 2026-11-04 18:16 **S4-12** lead approve: card_run can now ship a whole batch of programs in one packed upload, unpacked on the card by a small checked helper, instead of two SSH connection...
@@ -105,16 +106,15 @@ Current tickets: `[##################--]` 68 of 73
 - 2026-11-04 18:14 **S4-12** lead answer: Revert harness/card/run_suite.py on your branch (harness/ is lead-owned and protected); keep the two hunks in your submit note and the lead applies...
 - 2026-11-04 18:13 **S4-12** engineer ask: Submit is hard-refused: protected path harness/card/run_suite.py (--override does not cover it). Ticket fix 2 and your memory addition put it in sc...
 - 2026-11-04 17:46 **S4-02** lead approve: Float, double and int vector compares now produce KNC k masks and vectorize with blends (?: and select loops), with C's NaN behaviour, while the qu...
-- 2026-11-04 17:44 **S4-02** engineer submit: GCC eab9a5f6dd7 (built). T0 4/4, T1 230/230 (4 new knc-mask files pass), T2 23/23: check_gcc16_t0_t1_t2-20261104-174119.log. Torture O2: 5 of 1962 ...
 
 ## Cost
 
 - From the script, engineer: 186 sessions, 441.0M input tokens
 - From the script, lead: 184 sessions, 58.7M input tokens
-- Started by hand, Claude: 9 sessions, 702.6M input tokens
+- Started by hand, Claude: 9 sessions, 705.3M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 12.8 GiB of 100 GiB. 233 GiB free on the drive.
+The project uses 12.8 GiB of 100 GiB. 232 GiB free on the drive.
