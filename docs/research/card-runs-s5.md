@@ -125,3 +125,16 @@ Exhaustive FP32 sqrt check (`sqrt-exhaustive-mt.c`, 80 threads on cores 59-40, M
 FZ=DAZ=0, `claude-d72bce9f…`): `inputs=4294967296 regular=2139095039 special=2155872257
 bad_regular=0 bad_special=0`. Every positive finite input gives the correctly rounded result,
 and every zero, negative, infinity and NaN gives the expected special value.
+
+## 2026-11-05: S5-17 mid batch check, at GCC `knc` `9690ac8906a` (after S5-06 to S5-10)
+
+- Full `gcc.c-torture/execute` suite: 1,681 of 1,681 pass (`harness/card/run_suite.py`, now with
+  `--threads 80`; build and receipts in `.work/_shared/tmp/claude-suite-s5-17`).
+- `s4_masks`: 1,589,070 checks, 0 failures at `-O2 -ftree-vectorize` (`claude-96b1e88d…`) and
+  `-O3` (`claude-174af769…`).
+- `s5_ops` `fast` (`-O3 -ffast-math`): 602,384 checks, 0 failures (`claude-5125e9d6…`). Two
+  earlier tries failed with "SSH upload deadline" while the laptop was busy building the suite;
+  the third passed with `--transport-timeout 60 --stage-timeout 300`.
+- `s5_ops` `o2v` and `o3` passed at the same compiler code under S5-10 (above).
+- x86 (lead, `portability-claude`): `-O2` and `-O2 -mavx512f` identical=1962 different=0
+  both-failed=41.
