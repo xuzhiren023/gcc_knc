@@ -141,7 +141,7 @@ after S2-17, with later batches using the full execute suite.
 - Sharing with timed jobs (S5-04). Our start, finish and fault rows carry
   `"project": "gcc-knc"`. While any open row that is not ours has
   `"timingValid": true` (the PhiWeather tuning session's timed runs), card_run
-  refuses before connecting, staging or writing a row, naming the job and its
+  refuses before connecting, staging or writing a row (and again on each admission pass), naming the job and its
   `expectedEnd`; it never retries, so the caller waits and tries again.
   Staging must finish within `--stage-timeout` (default 120 s); a slower
   upload is stopped, cleaned up and finished as an infrastructure failure, so

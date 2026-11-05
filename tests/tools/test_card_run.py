@@ -400,14 +400,12 @@ class CardRun(unittest.TestCase):
                 self.other_start()  # Their chain starts while we wait for memory.
                 with self.ledger.open("a", encoding="utf8") as f:
                     f.write(json.dumps(dict(ours, event="finish")) + "\n")
-        before = self.ledger_rows()
         with mock.patch("time.sleep", sleep):
             result = self.run_card(memory_mb=2048)
         self.assertEqual(result["result_class"], "refused")
         self.assertIn("claude-mentor-1", result["detail"])
         self.assertNotIn("stage", self.names())
-        self.assertEqual([row for row in self.ledger_rows()[len(before):]
-                          if row.get("project") == "gcc-knc"], [])
+        self.assertEqual([row for row in self.ledger_rows() if row["jobId"] == result["job_id"]], [])
 
     def test_untimed_or_ended_jobs_of_another_project_do_not_refuse(self):
         self.other_start(timingValid=False)

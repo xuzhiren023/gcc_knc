@@ -161,6 +161,14 @@ def is_ours(job):
     return bool(OWN_JOB.fullmatch(str(job.get("jobId", job.get("job_id", "")))))
 
 
+def refuse_if_timed_job_open(active):
+    """S5-04: a timed whole-card job of another project or agent is spoiled by any job of ours."""
+    for job in active.values():
+        if not is_ours(job) and job.get("timingValid") is True:
+            raise Refused("timed job %s is open until %s; not staging"
+                          % (ledger_job_id(job), job.get("expectedEnd")))
+
+
 def cpu_binding(cpuinfo):
     mapping = {}
     for block in cpuinfo.strip().split("\n\n"):
@@ -249,11 +257,7 @@ def run(program, argv, *, lock_path, external_locks, baseline_names, timeout,
             raise Refused("our ledger admission lock present: %s" % candidate)
         admission_lock = candidate
         os.close(fd)
-        # S5-04: a timed whole-card job of another project or agent is spoiled by any job of ours.
-        for job in active_jobs(read_ledger(ledger_path)).values():
-            if not is_ours(job) and job.get("timingValid") is True:
-                raise Refused("timed job %s is open until %s; not connecting or staging"
-                              % (ledger_job_id(job), job.get("expectedEnd")))
+        refuse_if_timed_job_open(active_jobs(read_ledger(ledger_path)))
         session = transport.connect(run_dir, timeout=transport_timeout)
         deadline = monotonic() + timeout
         while True:
@@ -265,6 +269,7 @@ def run(program, argv, *, lock_path, external_locks, baseline_names, timeout,
             mapping = cpu_binding(snap["cpuinfo"])
             lines = read_ledger(ledger_path)
             active = active_jobs(lines)
+            refuse_if_timed_job_open(active)  # Their chain may start while we wait for memory.
             reserved = sum(int(j.get("memoryLimitMiB", j.get("memory_mb", 7 * 1024))) for j in active.values()
                            if is_ours(j))
             free = dict(line.split(":", 1) for line in snap["meminfo"].splitlines() if ":" in line)
