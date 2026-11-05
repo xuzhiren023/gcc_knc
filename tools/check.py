@@ -27,6 +27,8 @@ PACKED = re.compile(r'\bv(?:addn?|subr?|mul|div|max|min|sqrt|rcp(?:23)?|rsqrt(?:
 # Each entry supplies its CLI help and handlers for the tiers it selects.
 # Imports stay lazy so T0 and source-only selections need no probe modules.
 SELECTIONS = {
+    'conversions': ('S5-08 same-width signed and unsigned conversions', {
+        't1': lambda runner: runner.t1_sources([runner.source_dir / 'knc-convert-same.c'])}),
     'reductions': ('S5-07 reduction trees and strict FP ordering', {
         't1': lambda runner: runner.t1_sources(runner.source_dir.glob('knc-reduce-*.c'))}),
     'xi_copy': ('S3-20 XI memory copies and byte element updates at O0, O1 and O2', {
