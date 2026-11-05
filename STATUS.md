@@ -1,10 +1,10 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-05 08:32.
+Updated automatically at every ticket change. Last update: 2026-11-05 08:35.
 
 **Next: the tech lead, on S5-04.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
-Current tickets: `[###################-]` 77 of 80
+Current tickets: `[###################-]` 77 of 81
 
 ## Milestones
 
@@ -12,7 +12,7 @@ Current tickets: `[###################-]` 77 of 80
 |---|---|---|---|
 | M0 | Foundation | In progress | 17 of 17 tickets |
 | M1 | Mixed native code | Done | 43 of 43 tickets |
-| M2 | Useful vector target | In progress | 17 of 20 tickets |
+| M2 | Useful vector target | In progress | 17 of 21 tickets |
 | M3 | Runtimes | Not started | Not planned in detail yet |
 | M4 | Broad optimization | Not started | Not planned in detail yet |
 | M5 | Program corpus | Not started | Not planned in detail yet |
@@ -102,6 +102,7 @@ Current tickets: `[###################-]` 77 of 80
 | S5-03 | Correctly rounded vector division and square root for V16SF and V8DF: sequences, proof plan, test plan (ADR-0003 point 4 input) | In progress |  |
 | S5-04 | card_run shares the card with the PhiWeather tuning session: project tag, own-budget count, timed-job refusal, staging limit, packed S3-10 batch | Waiting for review | Lead change done: timed-row check now also runs on every memory-admission pass (refuse_if_timed_job_open). ... |
 | S5-05 | knc_lint accepts the decoded %ymm source of vcvtdq2pd, vcvtudq2pd and vcvtps2pd | In progress |  |
+| S5-06 | KNC vec_perm_const: reversed, stride-2 and interleaved loops vectorize with swizzle, vpermf32x4, vpshufd, valignd and vpermd | In progress |  |
 
 ## Recent activity
 
@@ -118,7 +119,7 @@ Current tickets: `[###################-]` 77 of 80
 
 - From the script, engineer: 186 sessions, 441.0M input tokens
 - From the script, lead: 184 sessions, 58.7M input tokens
-- Started by hand, Claude: 9 sessions, 796.1M input tokens
+- Started by hand, Claude: 9 sessions, 799.9M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
