@@ -67,15 +67,21 @@ length 20), with each array flush against a `PROT_NONE` page on one side or the 
 | T3 | Run on the card, each `loops.c` build | Exit 0; last line `S4-MASKS PASS failures=0` (an `INFO checks=` line precedes it) |
 | T3 | `loops.c` with `-DNEGATIVE_CONTROL` (`cmp_lt_f32` uses `<=`) | Exit 1, `S4-MASKS FAIL` |
 | T3 | `loops.c` with `-DGUARD_CONTROL` (`add_f32` reads one past the end) | Prints `S4-MASKS FAULT ... kernel=add_f32`, exit 3 |
+| T3 | `loops.c` with `-DGUARD_AL_CONTROL` (`add_al_f32` reads one line past `b`) | Prints `S4-MASKS FAULT ... kernel=add_al_f32 ... where=2`, exit 3 |
+| T3 | `loops.c` at `-O2 -ftree-vectorize -fvect-cost-model=unlimited` (S4-05) | As the first row; this forces the misaligned masked paths that the cost model normally avoids |
 
 A fault in any build prints `S4-MASKS FAULT sig= kernel= n= o= where= addr=` and exits 3;
 `addr=(nil)` is the misaligned-access fault of S3-03, a real address is a guard page.
+
+The `*_al_*` kernels (S4-05) promise 64-byte alignment. The driver places each of their arrays so
+the line after the last element is the guard page (`where=2`); a masked tail that names one line too
+many faults there.
 
 Which kernels must vectorize, and how, is each ticket's T1 (S4-02 compares, S4-03 selects and
 idioms, S3-09 and S4-04 integers, S4-05 tails). This fixture checks only that whatever code the
 compiler emits is exact and stays inside the arrays.
 
 Before Sprint 4's code (lead, 2026-11-04): host Cygwin gcc at `-O2 -ftree-vectorize` (SSE2)
-passes 1,576,200 checks; the negative control fails, and the guard control dies with SIGSEGV.
+passes 1,576,200 checks; the negative control fails, and the guard control dies with SIGSEGV. With S4-05's aligned kernels: 1,589,070 checks, and the aligned guard control faults (lead, host).
 GCC 16 at `knc` `0d3c0152fe3` faults on the card in `add_f32` (n=16, o=1, `addr=(nil)`): LRA
 folds a misaligned load into `vaddps`. That is S4-09, and this fixture is red until it merges.

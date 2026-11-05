@@ -39,6 +39,16 @@ S4_SEL_DECL (double, f64)
 S4_SEL_DECL (int, i32)
 S4_SEL_DECL (long, i64)
 
+/* Aligned kernels (S4-05): every pointer is 64-byte aligned, so the
+   vectorizer may use a masked epilogue.  The driver places each array so
+   the line after its last element is a PROT_NONE page.  */
+void add_al_f32 (float *c, const float *a, const float *b, int n);
+void add_al_f64 (double *c, const double *a, const double *b, int n);
+void add_al_i32 (int *c, const int *a, const int *b, int n);
+void affine_al_f32 (float *c, const float *x, float a, float b, int n);
+void affine_al_f64 (double *c, const double *x, double a, double b, int n);
+void cst_al_f32 (float *c, const float *a, const float *x, int n);
+
 void mul_i32 (int *c, const int *a, const int *b, int n);
 void and_i32 (int *c, const int *a, const int *b, int n);
 void or_i32 (int *c, const int *a, const int *b, int n);

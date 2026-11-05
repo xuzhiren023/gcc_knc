@@ -230,6 +230,43 @@ static struct buf A, B, C, X, Y, M;
   CHECK_EW (T, S, XGEN, XGEN, sub, sub_##S (c, a, b, n),                      \
             { r = (T) (a[i] - b[i]); }, OK)
 
+/* Aligned placement (S4-05): the array starts on a 64-byte line and the line
+   after its last element is the PROT_NONE page, so a masked tail that names
+   one line too many faults.  Bytes between the last element and the page end
+   share its line and are sentinel-checked.  */
+static void *
+place_al (struct buf b, int size, int n)
+{
+  int bytes = (n * size + 63) & ~63;
+  unsigned char *p = b.lo + page - bytes;
+  unsigned char *lo = win_lo (b, p), *hi = win_hi (b, p, n * size);
+  memset (lo, 0xA5, hi - lo);
+  return p;
+}
+#define CHECK_AL(T, S, GEN, NAME, CALL, REF, OK)                              \
+  for (int n = 0; n <= MAXN; n++)                                             \
+    {                                                                         \
+      int o = 0, where = 2;                                                   \
+      T *a = place_al (A, sizeof (T), n);                                     \
+      T *b = place_al (B, sizeof (T), n);                                     \
+      T *x = place_al (X, sizeof (T), n);                                     \
+      T *c = place_al (C, sizeof (T), n);                                     \
+      T old[MAXN + 1];                                                        \
+      T ka = GEN (), kb = GEN ();                                             \
+      for (int i = 0; i < n; i++)                                             \
+        { a[i] = GEN (); b[i] = GEN (); x[i] = GEN (); c[i] = old[i] = GEN (); } \
+      SET_CASE (#NAME "_" #S);                                                \
+      CALL;                                                                   \
+      for (int i = 0; i < n; i++, checks++)                                   \
+        {                                                                     \
+          T r; REF;                                                           \
+          if (!(OK)) fail (#NAME "_" #S, n, i, o);                            \
+        }                                                                     \
+      if (!sentinels_ok (C, c, n * sizeof (T)))                               \
+        fail (#NAME "_" #S " wrote outside", n, -1, o);                       \
+      (void) ka; (void) kb;                                                   \
+    }
+
 static float fexact (void) { return (float) exact (); }
 static int ibits (void) { return (int) rnd (); }
 static unsigned ubits (void) { return (unsigned) rnd (); }
@@ -271,6 +308,19 @@ main (void)
             { r = a[i] | b[i]; }, BITS_OK (long))
   CHECK_EW (long, i64, lbits, lbits, xor, xor_i64 (c, a, b, n),
             { r = a[i] ^ b[i]; }, BITS_OK (long))
+
+  CHECK_AL (float, f32, fexact, add_al, add_al_f32 (c, a, b, n),
+            { r = (float) (a[i] + b[i]); }, FP_OK (float))
+  CHECK_AL (double, f64, exact, add_al, add_al_f64 (c, a, b, n),
+            { r = a[i] + b[i]; }, FP_OK (double))
+  CHECK_AL (int, i32, ibits, add_al, add_al_i32 (c, a, b, n),
+            { r = (int) ((unsigned) a[i] + (unsigned) b[i]); }, BITS_OK (int))
+  CHECK_AL (float, f32, fexact, affine_al, affine_al_f32 (c, x, ka, kb, n),
+            { r = (float) (ka * x[i] + kb); }, FP_OK (float))
+  CHECK_AL (double, f64, exact, affine_al, affine_al_f64 (c, x, ka, kb, n),
+            { r = ka * x[i] + kb; }, FP_OK (double))
+  CHECK_AL (float, f32, fbits, cst_al, cst_al_f32 (c, a, x, n),
+            { memcpy (&r, a[i] > 0 ? &x[i] : &old[i], sizeof r); }, BITS_OK (float))
 
   printf ("INFO checks=%lu\n", checks);
   if (failures)

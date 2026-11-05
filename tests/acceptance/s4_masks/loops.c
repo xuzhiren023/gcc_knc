@@ -2,7 +2,8 @@
    -O2 -ftree-vectorize or -O3 (no -ffast-math), separately from driver.c.
    -DNEGATIVE_CONTROL breaks cmp_lt_f32 (uses <=): the driver must FAIL.
    -DGUARD_CONTROL makes add_f32 read one element past the end: the card
-   run must die on the guard page.  */
+   run must die on the guard page.  -DGUARD_AL_CONTROL makes add_al_f32 read one
+   64-byte line past b: it must die on the guard page after the aligned arrays.  */
 #include <math.h>
 #include "masks.h"
 
@@ -77,6 +78,40 @@ void add_f32 (float *restrict c, const float *restrict a,
                 int n)                                                        \
   { LOOP c[i] = a[i] + b[i]; }
 ADD (double, f64) ADD (int, i32) ADD (long, i64)
+
+#define AL(p) __builtin_assume_aligned (p, 64)
+#define ADD_AL(T, S)                                                          \
+  void add_al_##S (T *restrict c, const T *restrict a, const T *restrict b,   \
+                   int n)                                                     \
+  {                                                                           \
+    T *cc = AL (c); const T *aa = AL (a), *bb = AL (b);                       \
+    LOOP cc[i] = aa[i] + bb[i];                                               \
+  }
+#ifdef GUARD_AL_CONTROL
+/* Reads one 64-byte line past b's last element: must die on the guard page.  */
+void add_al_f32 (float *restrict c, const float *restrict a,
+                 const float *restrict b, int n)
+{
+  float *cc = AL (c); const float *aa = AL (a), *bb = AL (b);
+  LOOP cc[i] = aa[i] + bb[i + 16];
+}
+#else
+ADD_AL (float, f32)
+#endif
+ADD_AL (double, f64) ADD_AL (int, i32)
+#define AFFINE_AL(T, S)                                                       \
+  void affine_al_##S (T *restrict c, const T *restrict x, T a, T b, int n)    \
+  {                                                                           \
+    T *cc = AL (c); const T *xx = AL (x);                                     \
+    LOOP cc[i] = a * xx[i] + b;                                               \
+  }
+AFFINE_AL (float, f32) AFFINE_AL (double, f64)
+void cst_al_f32 (float *restrict c, const float *restrict a,
+                 const float *restrict x, int n)
+{
+  float *cc = AL (c); const float *aa = AL (a), *xx = AL (x);
+  LOOP if (aa[i] > 0) cc[i] = xx[i];
+}
 
 #define BIN(T, S, NAME, OP)                                                   \
   void NAME##_##S (T *restrict c, const T *restrict a, const T *restrict b,   \
