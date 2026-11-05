@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-05 09:22.
+Updated automatically at every ticket change. Last update: 2026-11-05 09:32.
 
-**Next: GPT-6.1, on S5-06 (KNC vec_perm_const: reversed, stride-2 and interleaved loops vectorize with swizzle, vpermf32x4, vpshufd, valignd and vpermd).** Run `python tools/dispatch.py`, or ask the tech lead to.
+**Next: the tech lead, on S5-06.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[#################---]` 81 of 93
 
@@ -102,7 +102,7 @@ Current tickets: `[#################---]` 81 of 93
 | S5-03 | Correctly rounded vector division and square root for V16SF and V8DF: sequences, proof plan, test plan (ADR-0003 point 4 input) | Done | Correct rounding plan for vector division and square root: FP32 square root is proven exhaustively for any ... |
 | S5-04 | card_run shares the card with the PhiWeather tuning session: project tag, own-budget count, timed-job refusal, staging limit, packed S3-10 batch | Done | card_run now shares the card safely with the PhiWeather tuning session: our ledger rows say project gcc-knc... |
 | S5-05 | knc_lint accepts the decoded %ymm source of vcvtdq2pd, vcvtudq2pd and vcvtps2pd | Done | knc_lint no longer rejects correct vcvtdq2pd, vcvtudq2pd and vcvtps2pd, whose 8-lane register source objdum... |
-| S5-06 | KNC vec_perm_const: reversed, stride-2 and interleaved loops vectorize with swizzle, vpermf32x4, vpshufd, valignd and vpermd | In progress | Red approved: reversed, stride-2 and complex loops must use vpermd, masked vpermd and swizzles, and each co... |
+| S5-06 | KNC vec_perm_const: reversed, stride-2 and interleaved loops vectorize with swizzle, vpermf32x4, vpshufd, valignd and vpermd | Waiting for review | GCC c009a4e (KNC) + 5faa9bc (shared), built by gcc_build --if-stale. check t0 t1 t2 --compiler gcc16 passes... |
 | S5-07 | KNC reductions: vpermf32x4 and swizzle trees for plus, min/max and logic, with no stack accumulator | Not started |  |
 | S5-08 | KNC same-width conversions: int32/uint32 to and from float as single vcvtfxpnt instructions (the ADR-0008 named-insn exception) | Not started |  |
 | S5-09 | Card probe of vrcp23ps, vrsqrt23ps and vgetmant (S5-03 P1a-e), to back the division and square-root proofs | Done | A card probe now measures vrcp23ps and vrsqrt23ps against the error bounds the FP32 division and square-roo... |
@@ -118,6 +118,7 @@ Current tickets: `[#################---]` 81 of 93
 
 ## Recent activity
 
+- 2026-11-05 09:32 **S5-06** engineer submit: GCC c009a4e (KNC) + 5faa9bc (shared), built by gcc_build --if-stale. check t0 t1 t2 --compiler gcc16 passes (logs check_gcc16_t0_t1_t2-20261105-091...
 - 2026-11-05 09:22 **S5-09** lead approve: A card probe now measures vrcp23ps and vrsqrt23ps against the error bounds the FP32 division and square-root proofs assume, with exact integer refe...
 - 2026-11-05 09:20 **S5-09** engineer submit: Added tests/regress/knc-estimate-probe.c (P1a-e, exact 128-bit integer references, no x87). KNC GCC 16 -O0 build with -Wall -Wextra -Wa,--march=k1o...
 - 2026-11-05 08:45 **S5-06** lead approve-red: Red approved: reversed, stride-2 and complex loops must use vpermd, masked vpermd and swizzles, and each constant shuffle recipe is chosen cheapest...
@@ -125,16 +126,15 @@ Current tickets: `[#################---]` 81 of 93
 - 2026-11-05 08:41 **S5-03** lead approve: Correct rounding plan for vector division and square root: FP32 square root is proven exhaustively for any estimate the manual allows and FP32 divi...
 - 2026-11-05 08:40 **S5-05** lead approve: knc_lint no longer rejects correct vcvtdq2pd, vcvtudq2pd and vcvtps2pd, whose 8-lane register source objdump prints as %ymm; every other %ymm is st...
 - 2026-11-05 08:38 **S5-05** engineer submit: Red commit fb79c37 failed (no decoded kwarg); fix 06a1590: forbidden(decoded=True) from decoded_violations only strips %ymm source of vcvtdq2pd/vcv...
-- 2026-11-05 08:37 **S5-03** engineer submit: docs/research/knc-div-sqrt.md: FP32 sqrt (19 insns) proven by exhaustive exact host model over all reduced args, all allowed vrsqrt23ps estimates, ...
 
 ## Cost
 
 - From the script, engineer: 186 sessions, 441.0M input tokens
 - From the script, lead: 184 sessions, 58.7M input tokens
-- Started by hand, Claude: 9 sessions, 824.2M input tokens
+- Started by hand, Claude: 9 sessions, 825.1M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 16.3 GiB of 100 GiB. 206 GiB free on the drive.
+The project uses 16.3 GiB of 100 GiB. 204 GiB free on the drive.
