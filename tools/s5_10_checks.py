@@ -136,12 +136,43 @@ def acceptance():
     run([*cc, '-O2', '-ftree-vectorize', '-fno-math-errno',
          '-fopt-info-vec-optimized=' + str(native_report), native, '-lm',
          '-o', OUT / 'knc-sqrt-exhaustive.mic'])
-    assert '64 byte vectors' in native_report.read_text(), 'native kernel not vectorized'
+    kernel_line = next(i for i, line in enumerate(native.read_text().splitlines(), 1)
+                       if 'for (int i = 0; i < N;' in line)
+    assert any('knc-sqrt-exhaustive.c:' + str(kernel_line) + ':' in line
+               and '64 byte vectors' in line
+               for line in native_report.read_text().splitlines()), 'native kernel not vectorized'
     print('BUILT exhaustive 2^32 checker; native execution pending lead')
     subprocess.run([sys.executable, str(ROOT / 'tools/knc_lint'),
                     str(OUT / 'knc-sqrt-exhaustive.mic'),
                     *map(str, sorted(dest.glob('*.mic')))], check=True)
     return 0
+
+
+def t1(runner):
+    """Compile both errno policies as translation-unit options, not attributes."""
+    from check import loops
+    source = ROOT / 'tests/t1/knc-vec-autovec.c'
+    for name, flags in [('errno', []), ('noerrno', ['-fno-math-errno'])]:
+        asm = runner.out / ('sqrt-' + name + '.s')
+        obj = runner.out / ('sqrt-' + name + '.o')
+        runner.command(runner.cc, *runner.cc_flags, '-march=knc', '-O2',
+                       '-ftree-vectorize', *flags, '-DS5_SQRT_TEST',
+                       '-S', source, '-o', asm)
+        body = runner.function_body(asm.read_text(), 'sqrt_loop')
+        assert body is not None
+        failures = []
+        if name == 'noerrno':
+            for pattern in (r'\bvrsqrt23ps\b[^\n]*%zmm', r'\bvfmadd\w*ps\b'):
+                if not re.search(pattern, body):
+                    failures.append('missing ' + pattern)
+            bodies = list(loops(body))
+            if not bodies or any(re.search(r'\bfsqrt\b', loop) for loop in bodies):
+                failures.append('scalar fsqrt in loop or no loop')
+        elif not re.search(r'\bfsqrt\b', body) or re.search(r'\bvrsqrt23ps\b', body):
+            failures.append('default math-errno must stay scalar')
+        runner.command(runner.tool('as'), '--march=k1om', asm, '-o', obj)
+        runner.command(sys.executable, ROOT / 'tools/knc_lint', asm, obj)
+        runner.result('t1 sqrt ' + name, failures)
 
 
 if __name__ == '__main__':

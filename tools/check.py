@@ -28,7 +28,8 @@ PACKED = re.compile(r'\bv(?:addn?|subr?|mul|div|max|min|sqrt|rcp(?:23)?|rsqrt(?:
 # Imports stay lazy so T0 and source-only selections need no probe modules.
 SELECTIONS = {
     'sqrt': ('S5-10 correctly rounded FP32 square root', {
-        't1': lambda runner: runner.t1_sources([runner.source_dir / 'knc-vec-autovec.c'])}),
+        't1': lambda runner: (runner.t1_sources([runner.source_dir / 'knc-vec-autovec.c']),
+                              importlib.import_module('s5_10_checks').t1(runner))}),
     'conversions': ('S5-08 same-width signed and unsigned conversions', {
         't1': lambda runner: runner.t1_sources([runner.source_dir / 'knc-convert-same.c'])}),
     'reductions': ('S5-07 reduction trees and strict FP ordering', {
@@ -268,6 +269,8 @@ class Runner:
             import secondary_reload
             secondary_reload.t1(self)
             self.t1_sources()
+            import s5_10_checks
+            s5_10_checks.t1(self)
             import knc_vector
             knc_vector.t1_byte_aligned(self)
             import native_tls
