@@ -27,6 +27,8 @@ PACKED = re.compile(r'\bv(?:addn?|subr?|mul|div|max|min|sqrt|rcp(?:23)?|rsqrt(?:
 # Each entry supplies its CLI help and handlers for the tiers it selects.
 # Imports stay lazy so T0 and source-only selections need no probe modules.
 SELECTIONS = {
+    'reductions': ('S5-07 reduction trees and strict FP ordering', {
+        't1': lambda runner: runner.t1_sources(runner.source_dir.glob('knc-reduce-*.c'))}),
     'xi_copy': ('S3-20 XI memory copies and byte element updates at O0, O1 and O2', {
         't1': lambda runner: runner.t1_sources(runner.source_dir.glob('knc-xi-copy-O*.c'))}),
     'native_tls': ('S3-14 native TLS sequences versus the donor at O2, PIC and O0', {
@@ -295,7 +297,7 @@ class Runner:
                 options = ['-O2']
                 for line in source.read_text().splitlines():
                     match = re.match(r'^\s*//\s*(options|scan-asm|scan-asm-not|scan-output|scan-debug-info|error):\s*(.*)$', line)
-                    function = re.match(r'^\s*//\s*scan-asm-func\s+(\S+):\s*(.*)$', line)
+                    function = re.match(r'^\s*//\s*(scan-asm-func|scan-asm-loop-not)\s+(\S+):\s*(.*)$', line)
                     if match:
                         kind, pattern = match.groups()
                         if kind == 'options':
@@ -303,7 +305,7 @@ class Runner:
                         else:
                             directives.append((kind, None, pattern))
                     elif function:
-                        directives.append(('scan-asm-func', *function.groups()))
+                        directives.append(function.groups())
                 errors = [directive for directive in directives if directive[0] == 'error']
                 asm = self.out / (source.stem + '.s')
                 obj = self.out / (source.stem + '.o')
@@ -332,8 +334,16 @@ class Runner:
                         body = (compiled.stdout if kind == 'scan-output' else
                                 debug_info if kind == 'scan-debug-info' else
                                 function_body(assembly, name) if name else assembly)
-                        found = body is not None and re.search(pattern, body, re.M) is not None
-                        if (found if kind == 'scan-asm-not' else not found):
+                        if kind == 'scan-asm-loop-not':
+                            # Permit scalar-result transport after a reduction,
+                            # but reject stack accumulators in a backward loop.
+                            candidates = list(loops(body)) if body is not None else []
+                            failed = not candidates or any(re.search(pattern, loop, re.M)
+                                                           for loop in candidates)
+                        else:
+                            found = body is not None and re.search(pattern, body, re.M) is not None
+                            failed = found if kind == 'scan-asm-not' else not found
+                        if failed:
                             failures.append(kind + (' ' + name if name else '') + ': ' + pattern)
                             break
                     if not output_only:
