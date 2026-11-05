@@ -9,6 +9,17 @@ effort; standard and light tickets use Sonnet. Each subagent works as the engine
 `AGENTS.md`. The lead reviews and merges as before, and records each subagent's token use on its
 ticket.
 
+**Change (owner, 2026-11-05, at 9% of the weekly Claude usage):**
+- From S5-07 on, engineers are Codex sessions started through `tools/dispatch.py`, at normal speed
+  (no priority tier).
+- The model is chosen per ticket depth in `harness/policy.json`:
+  - deep: `gpt-6-astra`, high effort;
+  - standard: `gpt-6.1-sol`, medium;
+  - light: `gpt-6-luna`, low.
+  - A ticket's `model:` field overrides this.
+- The engineer prompt asks for no narration.
+- S5-06 and S5-09 finish as the Claude subagents they started as.
+
 **Card (owner, 2026-11-05):** we coordinate card time with the PhiWeather "WRF 4.8.0 Xeon Phi
 performance tuning" Claude session. Rules agreed with that session the same day:
 - We never start a job while one of its `"timingValid": true` jobs is open in the shared ledger.
