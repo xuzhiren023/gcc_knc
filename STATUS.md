@@ -1,10 +1,10 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-05 08:28.
+Updated automatically at every ticket change. Last update: 2026-11-05 08:30.
 
-**Next: the tech lead, on S5-01.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: the tech lead, on S5-02.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
-Current tickets: `[##################--]` 75 of 79
+Current tickets: `[###################-]` 76 of 79
 
 ## Milestones
 
@@ -12,7 +12,7 @@ Current tickets: `[##################--]` 75 of 79
 |---|---|---|---|
 | M0 | Foundation | In progress | 17 of 17 tickets |
 | M1 | Mixed native code | Done | 43 of 43 tickets |
-| M2 | Useful vector target | In progress | 15 of 19 tickets |
+| M2 | Useful vector target | In progress | 16 of 19 tickets |
 | M3 | Runtimes | Not started | Not planned in detail yet |
 | M4 | Broad optimization | Not started | Not planned in detail yet |
 | M5 | Program corpus | Not started | Not planned in detail yet |
@@ -97,13 +97,14 @@ Current tickets: `[##################--]` 75 of 79
 | S4-12 | card_run stages a whole batch in one upload, so card cores are busy instead of waiting on SSH | Done | card_run can now ship a whole batch of programs in one packed upload, unpacked on the card by a small check... |
 | S4-13 | Rebuild the x86 check's trees under the current user and run the x86 comparison at the knc head | Done | The x86 check now runs under this user from .work/_shared/portability-claude, and at the S4-04 head x86 ass... |
 | S4-14 | Misaligned masked access: a guarded aligned split in KNC maskload/maskstore, tested | Done | Misaligned conditional loads and stores now use a guarded split into at most two aligned masked moves plus ... |
-| S5-01 | Gather, scatter, permutes, reductions and FP min/max on KNC: GCC 16 entry points, IMCI forms, fault footprint (ADR-0008 input) | Waiting for review | docs/research/knc-gather-reduce.md answers 1-7 with pages and file:line. Today i386-knc.cc:97 blocks all ga... |
+| S5-01 | Gather, scatter, permutes, reductions and FP min/max on KNC: GCC 16 entry points, IMCI forms, fault footprint (ADR-0008 input) | Done | Gather/scatter, permute, reduction and FP min/max design input is in: 16-lane gathers and scatters need no ... |
 | S5-02 | Int and FP conversions, and memory up/down conversions for byte and word data on KNC (ADR-0008 input) | Waiting for review | knc-conversions.md answers 1-6. All ten IMCI conversions cover the C casts; pd2ps/pd2dq zero lanes 8-15. fl... |
 | S5-03 | Correctly rounded vector division and square root for V16SF and V8DF: sequences, proof plan, test plan (ADR-0003 point 4 input) | In progress |  |
 | S5-04 | card_run shares the card with the PhiWeather tuning session: project tag, own-budget count, timed-job refusal, staging limit, packed S3-10 batch | In progress | One gap: the timed-job check runs once, before connect. The memory-admission loop then waits up to --timeou... |
 
 ## Recent activity
 
+- 2026-11-05 08:30 **S5-01** lead approve: Gather/scatter, permute, reduction and FP min/max design input is in: 16-lane gathers and scatters need no shared change, KNC needs its own permute...
 - 2026-11-05 08:28 **S5-04** lead changes: One gap: the timed-job check runs once, before connect. The memory-admission loop then waits up to --timeout, and the PhiWeather chain may write a ...
 - 2026-11-05 08:28 **S5-02** engineer submit: knc-conversions.md answers 1-6. All ten IMCI conversions cover the C casts; pd2ps/pd2dq zero lanes 8-15. floatv16siv16sf2, fix_trunc(uns)v16sfv16si...
 - 2026-11-05 08:27 **S5-04** engineer submit: tests.tools.test_card_run 16/16 pass (7 new, red first at 53c67e4: 6 failed, s3_10 test errored). card tests discover: 79 run, 25 F + 5 E, identica...
@@ -111,13 +112,12 @@ Current tickets: `[##################--]` 75 of 79
 - 2026-11-05 08:27 **S5-01** engineer submit: docs/research/knc-gather-reduce.md answers 1-7 with pages and file:line. Today i386-knc.cc:97 blocks all gathers and KNC has no vec_perm_const; wid...
 - 2026-11-05 08:27 **S5-01** lead answer: Allowed: submit with --override 'research doc 771 + probe 563 lines; lead allowed'. No cuts needed now; review will trim the probe to cases the man...
 - 2026-11-05 08:26 **S5-02** engineer ask: Submit refused: 986 changed lines against a budget of 800. Committed at 074d04b: docs/research/knc-conversions.md (454 lines, inside the brief's 40...
-- 2026-11-05 08:26 **S5-01** engineer ask: Submit refused on size: 1334 changed lines against a budget of 800 (docs/research/knc-gather-reduce.md 771 + tests/regress/knc-gather-probe.c 563; ...
 
 ## Cost
 
 - From the script, engineer: 186 sessions, 441.0M input tokens
 - From the script, lead: 184 sessions, 58.7M input tokens
-- Started by hand, Claude: 9 sessions, 792.4M input tokens
+- Started by hand, Claude: 9 sessions, 794.2M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
