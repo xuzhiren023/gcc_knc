@@ -1,10 +1,10 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-05 01:09.
+Updated automatically at every ticket change. Last update: 2026-11-05 01:11.
 
-**Next: the tech lead, on S4-07.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+All current tickets are done. The tech lead plans the next sprint.
 
-Current tickets: `[###################-]` 74 of 75
+Current tickets: `[####################]` 75 of 75
 
 ## Milestones
 
@@ -12,7 +12,7 @@ Current tickets: `[###################-]` 74 of 75
 |---|---|---|---|
 | M0 | Foundation | In progress | 17 of 17 tickets |
 | M1 | Mixed native code | Done | 43 of 43 tickets |
-| M2 | Useful vector target | In progress | 14 of 15 tickets |
+| M2 | Useful vector target | In progress | 15 of 15 tickets |
 | M3 | Runtimes | Not started | Not planned in detail yet |
 | M4 | Broad optimization | Not started | Not planned in detail yet |
 | M5 | Program corpus | Not started | Not planned in detail yet |
@@ -89,7 +89,7 @@ Current tickets: `[###################-]` 74 of 75
 | S4-04 | V8DI add and sub through the IMCI carry form, so long add loops vectorize | Done | 64-bit integer vector add and sub now vectorize through KNC's carry instructions, and the shared add/sub ex... |
 | S4-05 | Masked epilogues for aligned loops: while_ult, the finish_cost term, cond_<op> for FP | Done | Aligned loops (no alignment peel) now finish with a guarded masked vector epilogue instead of the x87 remai... |
 | S4-06 | Batch check after S4-02, S3-09 and S4-03: x86, drill and ICE sweeps at the batch head | Done | Batch check at ae8a033c5f3: no compiler crashes in the -O2 vectorize and -O3 sweeps, 280 shared lines in 68... |
-| S4-07 | Final Sprint 4 batch check at the sprint head | Waiting for review | At c759f17f1b9. 1 x86 (portability-claude, make check ran, a skipped, b incremental): -O2 and -O2 -mavx512f... |
+| S4-07 | Final Sprint 4 batch check at the sprint head | Done | Final Sprint 4 check at c759f17f1b9: x86 assembly identical to stock GCC 16.2 on all 1,962 files, every ups... |
 | S4-08 | Small fixes from M1: the varargs V4SF assert checks alignment; S3-10 ABI expected files | Done | The varargs save path now asserts a 16-byte aligned slot and is limited to 64-bit KNC, with generated code ... |
 | S4-09 | LRA folds a misaligned vector load into vaddps/vsubps/vmulps ("m" constraint), which faults on the card | Done | Vectorized float and double add, sub and mul no longer fold a misaligned array load into the instruction, w... |
 | S4-10 | pm.py approve merges a GCC ticket without rewriting files in the shared checkout | Done | Approving a GCC ticket no longer rewrites the merged files in the shared GCC checkout, so the next build is... |
@@ -100,6 +100,7 @@ Current tickets: `[###################-]` 74 of 75
 
 ## Recent activity
 
+- 2026-11-05 01:11 **S4-07** lead approve: Final Sprint 4 check at c759f17f1b9: x86 assembly identical to stock GCC 16.2 on all 1,962 files, every upstream drill conflict textual (none on th...
 - 2026-11-05 01:09 **S4-07** engineer submit: At c759f17f1b9. 1 x86 (portability-claude, make check ran, a skipped, b incremental): -O2 and -O2 -mavx512f identical=1962 different=0 both-failed=...
 - 2026-11-04 23:42 **S4-14** lead approve: Misaligned conditional loads and stores now use a guarded split into at most two aligned masked moves plus a vpermd rotation instead of an element-...
 - 2026-11-04 23:40 **S4-14** engineer submit: GCC 0c5b17b98d7 (imci.md only): misaligned maskload/maskstore is a guarded aligned split (vpermd, 2 GPR-guarded aligned vmov{k}). Built once. T0 4/...
@@ -107,16 +108,15 @@ Current tickets: `[###################-]` 74 of 75
 - 2026-11-04 22:51 **S4-14** engineer red: Red f36e582: tests/t1/knc-mask-split.c (-O2 -ftree-vectorize, unlimited cost, peeling 0): cst_f32/f64/i32/i64 (conditional load + store, unknown al...
 - 2026-11-04 22:39 **S4-05** lead approve: Aligned loops (no alignment peel) now finish with a guarded masked vector epilogue instead of the x87 remainder, including masked add, mul and FMA,...
 - 2026-11-04 22:37 **S4-05** engineer submit: GCC 5b1920f1f56 (KNC) + 6b298d6b011 (shared). Aligned no-peel loops get masked epilogues: while_ult, cond_mul, cond_fma. Built once. T0 4/0, T1 234...
-- 2026-11-04 22:29 **S4-13** lead approve: The x86 check now runs under this user from .work/_shared/portability-claude, and at the S4-04 head x86 assembly is identical to stock GCC 16.2 on ...
 
 ## Cost
 
 - From the script, engineer: 186 sessions, 441.0M input tokens
 - From the script, lead: 184 sessions, 58.7M input tokens
-- Started by hand, Claude: 9 sessions, 769.6M input tokens
+- Started by hand, Claude: 9 sessions, 771.2M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 16.2 GiB of 100 GiB. 215 GiB free on the drive.
+The project uses 16.2 GiB of 100 GiB. 214 GiB free on the drive.
