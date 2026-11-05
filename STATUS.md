@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-05 14:00.
+Updated automatically at every ticket change. Last update: 2026-11-05 14:07.
 
 **Next: the tech lead, on S5-10.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
@@ -115,10 +115,11 @@ Current tickets: `[#################---]` 84 of 94
 | S5-16 | KNC byte and word data: V16QI/V16HI transport modes, widening up-converting loads and narrowing down-converting stores | Not started |  |
 | S5-17 | Sprint 5 mid batch check after S5-06, S5-07 and S5-08 | Not started |  |
 | S5-18 | Final Sprint 5 batch check at the sprint head | Not started |  |
-| S5-19 | card_run shares cores with the PhiWeather session - compact per-job core claims from the ledger, and round-robin turns for benchmark jobs | In progress | pm.py approve refuses: the card test discovery hangs past 10 minutes and has errors and failures on this br... |
+| S5-19 | card_run shares cores with the PhiWeather session - compact per-job core claims from the ledger, and round-robin turns for benchmark jobs | Question for the tech lead | Two repair attempts; stopping per AGENTS.md. Red ae82e9a; partial fix f6b7da5. Cygwin full card discovery: ... |
 
 ## Recent activity
 
+- 2026-11-05 14:07 **S5-19** engineer ask: Two repair attempts; stopping per AGENTS.md. Red ae82e9a; partial fix f6b7da5. Cygwin full card discovery: 95 tests, 40.793s, one failure: test_fil...
 - 2026-11-05 14:00 **S5-10** engineer submit: Prior session completed and committed required implementation and checks: T0 including exhaustive host E3, T1 errno/noerrno scans, T2, incremental ...
 - 2026-11-05 13:59 **S5-19** lead changes: pm.py approve refuses: the card test discovery hangs past 10 minutes and has errors and failures on this branch, while main passes. Reproduce exact...
 - 2026-11-05 13:59 **S5-10** lead answer: Allowed: submit with --override 'host E3 model and native exhaustive checker required by the ticket; lead allowed'. No split.
@@ -126,16 +127,15 @@ Current tickets: `[#################---]` 84 of 94
 - 2026-11-05 13:30 **S5-19** engineer submit: Fixed benchmark deadlock: only open start rows block exclusive core admission; queued rows compete through their_turn. Regression covers both queue...
 - 2026-11-05 13:27 **S5-19** lead changes: One deadlock: for --benchmark, core_ready requires 'not active', and active includes live queued rows. If both projects queue a benchmark, our job ...
 - 2026-11-05 13:24 **S5-19** engineer submit: Red-first bad386e failed on missing options, fixed claims and absent queue admission. Added compact descending ledger core claims, explicit layouts...
-- 2026-11-05 12:55 **S5-08** lead approve: Int32/uint32 to float and float to int32/uint32 loops now vectorize as single IMCI vcvtfxpnt instructions with C truncation and IEEE flags, through...
 
 ## Cost
 
 - From the script, engineer: 199 sessions, 477.1M input tokens
 - From the script, lead: 184 sessions, 58.7M input tokens
-- Started by hand, Claude: 9 sessions, 951.8M input tokens
+- Started by hand, Claude: 9 sessions, 958.5M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 16.7 GiB of 100 GiB. 197 GiB free on the drive.
+The project uses 16.7 GiB of 100 GiB. 198 GiB free on the drive.
