@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-05 16:00.
+Updated automatically at every ticket change. Last update: 2026-11-05 16:03.
 
-**Next: GPT-6.1, on S5-11 (Correctly rounded FP32 vector division for V16SF, with cond_div (S5-03 ticket B)).** Run `python tools/dispatch.py`, or ask the tech lead to.
+**Next: the tech lead, on S5-11.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[##################--]` 87 of 94
 
@@ -107,7 +107,7 @@ Current tickets: `[##################--]` 87 of 94
 | S5-08 | KNC same-width conversions: int32/uint32 to and from float as single vcvtfxpnt instructions (the ADR-0008 named-insn exception) | Done | Int32/uint32 to float and float to int32/uint32 loops now vectorize as single IMCI vcvtfxpnt instructions w... |
 | S5-09 | Card probe of vrcp23ps, vrsqrt23ps and vgetmant (S5-03 P1a-e), to back the division and square-root proofs | Done | A card probe now measures vrcp23ps and vrsqrt23ps against the error bounds the FP32 division and square-roo... |
 | S5-10 | Correctly rounded FP32 vector square root for V16SF (S5-03 ticket A) | Done | Vectorized FP32 square root on KNC is now correctly rounded for every one of the 2^32 inputs, checked on th... |
-| S5-11 | Correctly rounded FP32 vector division for V16SF, with cond_div (S5-03 ticket B) | In progress |  |
+| S5-11 | Correctly rounded FP32 vector division for V16SF, with cond_div (S5-03 ticket B) | Tests waiting for review | Committed 034bbbe: T1 scans require FP32 reciprocal/FMA with no loop fdiv, plus aligned variable-count mask... |
 | S5-12 | KNC float/double-width conversions: vcvtps2pd, vcvtpd2ps, vcvtdq2pd, vcvtfxpntpd2dq with vpermf32x4 halves | Not started |  |
 | S5-13 | KNC 16-lane gather and scatter: vgatherdps/vpgatherdd and the scatter forms in a jknzd loop, through the optabs | Not started |  |
 | S5-14 | KNC 8-lane gather and scatter for V8DF/V8DI through the builtin hooks, reading the low 8 dwords of a V16SI index | Not started |  |
@@ -119,6 +119,7 @@ Current tickets: `[##################--]` 87 of 94
 
 ## Recent activity
 
+- 2026-11-05 16:03 **S5-11** engineer red: Committed 034bbbe: T1 scans require FP32 reciprocal/FMA with no loop fdiv, plus aligned variable-count masked division with masked FMA/load/store a...
 - 2026-11-05 15:51 **S5-17** lead approve: At the knc head after S5-06 to S5-10, x86 code is unchanged (1,962 identical files at -O2 and -O2 -mavx512f), the forward-port drill conflicts are ...
 - 2026-11-05 15:50 **S5-17** lead note: x86 check (lead, portability-claude) at knc 9690ac8906a vs releases/gcc-16.2.0: -O2 and -O2 -mavx512f identical=1962 different=0 both-failed=41 err...
 - 2026-11-05 14:51 **S5-17** engineer submit: knc 9690ac8906a: O2+ftree-vectorize and O3 sweeps PASS; 2003 cases each, each 1968 pass/33 compiler errors/2 rejected user asm, 0 ICE/hang/assemble...
@@ -126,7 +127,6 @@ Current tickets: `[##################--]` 87 of 94
 - 2026-11-05 14:34 **S5-17** engineer ask: At knc 9690ac8906a, two x86 attempts failed: tasklist Access denied; after ps -l/Get-Process found no make, --skip-make-check hit dubious ownership...
 - 2026-11-05 14:30 **S5-10** lead approve: Vectorized FP32 square root on KNC is now correctly rounded for every one of the 2^32 inputs, checked on the card, and s5_ops still passes at -O2 a...
 - 2026-11-05 14:17 **S5-19** lead approve: card_run now packs each job onto whole cores taken from 59 downward, shares the card with the PhiWeather session on disjoint cores, and runs benchm...
-- 2026-11-05 14:14 **S5-19** engineer submit: Committed approved receipt_path-only fixture fix as f2fef52. Prior Cygwin full card discovery PASS: 95 tests, 39.025s; no rerun per lead instructio...
 
 ## Cost
 
