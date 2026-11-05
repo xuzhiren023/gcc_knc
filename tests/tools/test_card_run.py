@@ -364,6 +364,7 @@ class CardRun(unittest.TestCase):
                                   ({"threads": 5}, [58, 59]), ({"cores": [3, 17]}, [3, 17])):
             with self.subTest(options=options):
                 self.ledger.write_text("", encoding="utf8")
+                self.transport = FakeTransport()
                 result = self.run_card(**options)
                 self.assertEqual(result["result_class"], "program")
                 start = self.ledger_rows()[0]
