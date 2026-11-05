@@ -25,16 +25,25 @@ in an exclusive window.
     remainder.
   - *(to measure)* the exact pairing rules: which scalar instructions pair, and whether a vector
     instruction with a memory operand pairs.
-- *(to measure, and widely reported, but in neither source)*: one thread cannot issue on two
-  consecutive cycles, so a core needs at least two threads to reach its issue rate. That would
-  make per-thread throughput depend on thread density, which the M2 criterion already asks for.
+- **Confirmed (Klemm slide 11): a core cannot issue from the same thread in adjacent cycles.** The
+  decoder is a fully pipelined 2-cycle unit, so a core needs at least two threads to use all its
+  cycles. Scheduling is "smart" round robin, with 2 prefetched instruction bundles per thread
+  (slide 10).
+- **Scalar: dual-issue on U and V, 1-cycle latency, 64-bit data path** (slide 10).
 
 ## Caches, TLBs and prefetch
 
 - **L1: 32 KB instruction and 32 KB data per core, each 8-way set associative** (330991 p.14).
   Each has its own L1 TLB, plus a shared L2 TLB and a TLB miss handler (diagram).
-- **L2: 512 KB per core** (diagram). The MCA address register has a 4-bit L2 way field (330991
-  p.16), which suggests up to 16 ways *(to confirm)*.
+- **L2: 512 KB per core, 8-way, 64-byte lines, 8 banks, pseudo-LRU, MESI, 11-cycle raw latency,
+  with a streaming hardware prefetcher. There is no L3** (Klemm slides 13-14). This corrects an
+  earlier guess here of up to 16 ways from 330991's 4-bit way field.
+- **L1 data: 8 banks, pseudo-LRU, 1 access per clock (read or write), about 38 concurrent accesses
+  per core.** Access time is given as "1 cycle" on slide 13 and "2 cycle" on slide 14
+  *(to measure)*. There is a **3-cycle address-generation interlock** (slide 13).
+- **Memory: GDDR5, 16 channels of 32 bits at up to 5.5 GT/s, about 275 ns access latency; the ring
+  carries 180 GB/s, and a distributed tag directory reduces snoop traffic** (slide 13). Up to 61
+  cores and 244 threads (slide 9).
 - **Cache line: 64 bytes.** DMA descriptor rings "align the base to a cacheline" with the low 6
   bits zero (330991 p.53).
 - **The hardware prefetcher (HWP) sits at the L2 controller** (diagram), with no L1 hardware
@@ -55,6 +64,26 @@ in an exclusive window.
 ## Memory
 
 - **8 memory controllers (GBOX), each with 2 channels of 32 bits, GDDR** (330991 p.39).
+
+## Vector unit (Klemm, "The Intel Xeon Phi Coprocessor", Intel, LMU seminar 2014-12-11, slide 12)
+
+- 32 zmm registers and 8 mask registers per thread.
+- The ALUs do int32 and float32 operations, float64 arithmetic, and **int64 logic only**, which
+  matches the ISA (no V8DI multiply or compare; S4-04's carry add).
+- They have ternary operations including FMA, and broadcast, swizzle and float16 up-conversion.
+- **Most vector operations: 4-cycle latency, 1-cycle throughput**, which matches the 4-cycle round
+  robin of the integer unit.
+- Consequences:
+  - With four threads, each thread issues every 4th cycle, so a dependent chain never stalls.
+  - With one or two threads, a single accumulator stalls on its own latency. **The scheduler and
+    cost model (E5-02, E5-05) must account for this, for example with several vector accumulators
+    in reductions** (GCC's partial-sum splitting) when fewer than 4 threads run per core.
+  - **The 3-cycle address-generation interlock:** a pointer register updated within 3 cycles of
+    its use as an address stalls, as on the Pentium. Scheduler v0 should move pointer increments
+    away from the accesses that use them.
+- On the same deck's case study (slides 33-37): loop interchange to a long unit-stride inner loop
+  gave about 50% speedup, and an aligned multi-versioned loop (`vector aligned`) about 15% more.
+  This supports versioning for alignment in the cost model.
 
 ## Ring and streaming stores (owner's images, 2026-11-05, from Intel slides)
 
