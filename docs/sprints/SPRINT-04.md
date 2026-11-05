@@ -55,16 +55,40 @@ gets its own card check after merge.
 S3-25 (the `va_arg` error path) finishes in Sprint 3; if it is still open at approval, it carries
 over unchanged.
 
+## Batch check results
+
+- **S4-06** at `ae8a033c5f3` (after S4-02, S3-09 and S4-03): 0 ICE in both sweeps; 280 shared
+  lines in 68 hunks; the release branch had 0 conflicts. Master had one logic conflict (the `sse.md`
+  add/sub expander), which S4-04 fixed with an entry dispatch. x86 could not run on the Codex-owned
+  trees; S4-13 rebuilt them under this user, and at `0d5b9f4` (S4-04) x86 was identical on
+  1,962 files at both levels.
+- **S4-07** at the sprint head `c759f17f1b9`: x86 identical on 1,962 files at `-O2` and
+  `-O2 -mavx512f` (0 different); the release branch has 0 conflicts; master has 5 files and 7 hunks,
+  all textual; 0 ICE at `-O2 -ftree-vectorize` and at `-O3`; **314 shared lines in 71 hunks**
+  (184/53 at M1). KNC-only files: `imci.md` 1,060, `i386-knc.cc` 585, `i386-knc.h` 70,
+  `linux-k1om.h` 72 lines.
+
 ## Sprint exit
 
-- [ ] S4-01 to S4-08 and S3-09 merged, or returned to the backlog with a reason
-- [ ] ADR-0007 accepted
-- [ ] `tests/acceptance/s4_masks` passes on the card at `-O2 -ftree-vectorize` and `-O3`
-- [ ] Final batch check green: x86 identical, every drill conflict textual, 0 ICE in both sweeps,
-  full execute suite all pass on the card
-- [ ] Shared lines and hunks reported at the sprint head, with the KNC-only files beside them
-- [ ] `CURRENT_STATE.md` updated; three-line retro below
+- [x] S4-01 to S4-14 and S3-09 merged (S4-05 split into S4-05 and S4-14; S4-10 to S4-13 added for
+  tooling and infrastructure)
+- [x] ADR-0007 accepted (amended for the `-fno-trapping-math` mapping)
+- [ ] `tests/acceptance/s4_masks` on the card at the sprint head. It passed after every merge
+  through S4-05. After S4-14, seven builds are made and waiting for the owner's card agreement
+- [x] Final batch check, laptop part: x86 identical, every drill conflict textual, 0 ICE (S4-07)
+- [ ] Final batch check, card part: the full execute suite at the sprint head is built (1,681
+  linked, 0 ICE) and waiting for the owner's card agreement. It passed 1,681 of 1,681 after every
+  merge through S4-05
+- [x] Shared lines and hunks reported at the sprint head, with the KNC-only files beside them
+- [x] `CURRENT_STATE.md` updated; retro below
 
 ## Retro
 
-*(at close)*
+Drafted 2026-11-05 by the lead. The sprint closes when the owner allows the card run at the head.
+1. Kept: each merge was proven on the card at once, and the new fixture found real wrong code
+   (S4-09). Batch checks caught a trunk logic conflict that one ticket introduced (S4-06 to S4-04).
+2. Cost: most of the lost time was infrastructure, not compiler work: a 23-minute Cygwin
+   `git status`, `mddeps.mk` emptied by our own advice, rewrites by approve, and x86 trees owned by
+   the old account. All are fixed or guarded now (S4-10, S4-11, S4-13, `checkStat`).
+3. GPT ran out mid-sprint; Claude subagents (Opus for deep work, Sonnet for light) finished the
+   sprint. The red gate plus lead review caught each design risk before a build.
