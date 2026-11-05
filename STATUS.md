@@ -1,10 +1,10 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-05 18:14.
+Updated automatically at every ticket change. Last update: 2026-11-05 18:48.
 
-**Next: the tech lead, on S5-11.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: GPT-6.1, on S5-12 (KNC float/double-width conversions: vcvtps2pd, vcvtpd2ps, vcvtdq2pd, vcvtfxpntpd2dq with vpermf32x4 halves).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
-Current tickets: `[##################--]` 87 of 94
+Current tickets: `[##################--]` 88 of 94
 
 ## Milestones
 
@@ -12,7 +12,7 @@ Current tickets: `[##################--]` 87 of 94
 |---|---|---|---|
 | M0 | Foundation | In progress | 17 of 17 tickets |
 | M1 | Mixed native code | Done | 43 of 43 tickets |
-| M2 | Useful vector target | In progress | 27 of 34 tickets |
+| M2 | Useful vector target | In progress | 28 of 34 tickets |
 | M3 | Runtimes | Not started | Not planned in detail yet |
 | M4 | Broad optimization | Not started | Not planned in detail yet |
 | M5 | Program corpus | Not started | Not planned in detail yet |
@@ -107,7 +107,7 @@ Current tickets: `[##################--]` 87 of 94
 | S5-08 | KNC same-width conversions: int32/uint32 to and from float as single vcvtfxpnt instructions (the ADR-0008 named-insn exception) | Done | Int32/uint32 to float and float to int32/uint32 loops now vectorize as single IMCI vcvtfxpnt instructions w... |
 | S5-09 | Card probe of vrcp23ps, vrsqrt23ps and vgetmant (S5-03 P1a-e), to back the division and square-root proofs | Done | A card probe now measures vrcp23ps and vrsqrt23ps against the error bounds the FP32 division and square-roo... |
 | S5-10 | Correctly rounded FP32 vector square root for V16SF (S5-03 ticket A) | Done | Vectorized FP32 square root on KNC is now correctly rounded for every one of the 2^32 inputs, checked on th... |
-| S5-11 | Correctly rounded FP32 vector division for V16SF, with cond_div (S5-03 ticket B) | Waiting for review | Required implementation and tests committed (project 1fbf169, GCC fabdf2d706e). Prior acceptance runs: host... |
+| S5-11 | Correctly rounded FP32 vector division for V16SF, with cond_div (S5-03 ticket B) | Done | Vectorized FP32 division on KNC is now correctly rounded, with IEEE flags, in all four rounding modes: 1.8 ... |
 | S5-12 | KNC float/double-width conversions: vcvtps2pd, vcvtpd2ps, vcvtdq2pd, vcvtfxpntpd2dq with vpermf32x4 halves | Not started |  |
 | S5-13 | KNC 16-lane gather and scatter: vgatherdps/vpgatherdd and the scatter forms in a jknzd loop, through the optabs | Not started |  |
 | S5-14 | KNC 8-lane gather and scatter for V8DF/V8DI through the builtin hooks, reading the low 8 dwords of a V16SI index | Not started |  |
@@ -119,6 +119,7 @@ Current tickets: `[##################--]` 87 of 94
 
 ## Recent activity
 
+- 2026-11-05 18:48 **S5-11** lead approve: Vectorized FP32 division on KNC is now correctly rounded, with IEEE flags, in all four rounding modes: 1.8 billion hard and random cases on the car...
 - 2026-11-05 18:14 **S5-11** engineer submit: Required implementation and tests committed (project 1fbf169, GCC fabdf2d706e). Prior acceptance runs: host E1/E2/E4 pass; removing step 15 fails 1...
 - 2026-11-05 18:13 **S5-11** lead answer: Allowed: submit with --override 'GCC 327 lines; the rest are the ticket-required host model, native sets and checks; lead allowed'. No split. Do no...
 - 2026-11-05 18:09 **S5-11** engineer ask: All host acceptance checks pass, but submit refuses 1074 changed lines versus budget 800. Required GCC implementation, E1/E2/E4 and native sets are...
@@ -126,16 +127,15 @@ Current tickets: `[##################--]` 87 of 94
 - 2026-11-05 16:03 **S5-11** engineer red: Committed 034bbbe: T1 scans require FP32 reciprocal/FMA with no loop fdiv, plus aligned variable-count masked division with masked FMA/load/store a...
 - 2026-11-05 15:51 **S5-17** lead approve: At the knc head after S5-06 to S5-10, x86 code is unchanged (1,962 identical files at -O2 and -O2 -mavx512f), the forward-port drill conflicts are ...
 - 2026-11-05 15:50 **S5-17** lead note: x86 check (lead, portability-claude) at knc 9690ac8906a vs releases/gcc-16.2.0: -O2 and -O2 -mavx512f identical=1962 different=0 both-failed=41 err...
-- 2026-11-05 14:51 **S5-17** engineer submit: knc 9690ac8906a: O2+ftree-vectorize and O3 sweeps PASS; 2003 cases each, each 1968 pass/33 compiler errors/2 rejected user asm, 0 ICE/hang/assemble...
 
 ## Cost
 
 - From the script, engineer: 207 sessions, 493.6M input tokens
 - From the script, lead: 184 sessions, 58.7M input tokens
-- Started by hand, Claude: 9 sessions, 988.4M input tokens
+- Started by hand, Claude: 9 sessions, 992.9M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 12.0 GiB of 100 GiB. 219 GiB free on the drive.
+The project uses 12.0 GiB of 100 GiB. 217 GiB free on the drive.
