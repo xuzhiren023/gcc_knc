@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-05 13:28.
+Updated automatically at every ticket change. Last update: 2026-11-05 13:30.
 
-**Next: GPT-6.1, on S5-10 (Correctly rounded FP32 vector square root for V16SF (S5-03 ticket A)).** Run `python tools/dispatch.py`, or ask the tech lead to.
+**Next: the tech lead, on S5-19.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[#################---]` 84 of 94
 
@@ -115,10 +115,11 @@ Current tickets: `[#################---]` 84 of 94
 | S5-16 | KNC byte and word data: V16QI/V16HI transport modes, widening up-converting loads and narrowing down-converting stores | Not started |  |
 | S5-17 | Sprint 5 mid batch check after S5-06, S5-07 and S5-08 | Not started |  |
 | S5-18 | Final Sprint 5 batch check at the sprint head | Not started |  |
-| S5-19 | card_run shares cores with the PhiWeather session - compact per-job core claims from the ledger, and round-robin turns for benchmark jobs | In progress | One deadlock: for --benchmark, core_ready requires 'not active', and active includes live queued rows. If b... |
+| S5-19 | card_run shares cores with the PhiWeather session - compact per-job core claims from the ledger, and round-robin turns for benchmark jobs | Waiting for review | Fixed benchmark deadlock: only open start rows block exclusive core admission; queued rows compete through ... |
 
 ## Recent activity
 
+- 2026-11-05 13:30 **S5-19** engineer submit: Fixed benchmark deadlock: only open start rows block exclusive core admission; queued rows compete through their_turn. Regression covers both queue...
 - 2026-11-05 13:27 **S5-19** lead changes: One deadlock: for --benchmark, core_ready requires 'not active', and active includes live queued rows. If both projects queue a benchmark, our job ...
 - 2026-11-05 13:24 **S5-19** engineer submit: Red-first bad386e failed on missing options, fixed claims and absent queue admission. Added compact descending ledger core claims, explicit layouts...
 - 2026-11-05 12:55 **S5-08** lead approve: Int32/uint32 to float and float to int32/uint32 loops now vectorize as single IMCI vcvtfxpnt instructions with C truncation and IEEE flags, through...
@@ -126,7 +127,6 @@ Current tickets: `[#################---]` 84 of 94
 - 2026-11-05 12:00 **S5-08** lead answer: Fixed: the lead deleted the 51 generated files your user could not write (gen* tools and objects, insn-* outputs, tm-preds.h, gtype.state, mddeps.m...
 - 2026-11-05 11:48 **S5-08** engineer ask: Prescribed repair fails: Cygwin chmod u+rw returns Permission denied on 51 owned files (gcc/s-mddeps, mddeps.mk, build/genrecog.exe, etc.). Correct...
 - 2026-11-05 11:45 **S5-08** lead answer: You own s-mddeps, so you can fix its mode yourself. From the Cygwin shell, give yourself write on every file you own in the build tree that lacks i...
-- 2026-11-05 11:44 **S5-08** engineer ask: GCC a5172583247 committed approved conversions. Wrapped gcc_build.py --if-stale failed before compiling: /bin/sh: s-mddeps: Permission denied. Shar...
 
 ## Cost
 
