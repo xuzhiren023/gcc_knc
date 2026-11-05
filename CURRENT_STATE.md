@@ -4,7 +4,7 @@ The handoff between sessions. `STATUS.md` holds tickets, cost and disk, and upda
 file holds what only a person or an agent can know. Replace lines when facts change, and do not
 trust anything here that a quick command can check instead.
 
-Last updated: 2026-11-05, Sprint 4. **All Sprint 4 tickets are merged** (S3-09, S4-01 to S4-14; GCC `knc` `c759f17f1b9`). Final batch check S4-07: x86 identical (1,962 files), drill all textual, 0 ICE, 314 shared lines in 71 hunks. **Open: the card run at the sprint head** (seven `s4_masks` builds and the full suite are built). The card is on hold until the owner agrees. M1 is accepted and tagged `m1` locally; nothing is pushed. Sprint 4's engineers were Claude subagents (GPT usage ran out).
+Last updated: 2026-11-05. **Sprint 4 is closed.** All tickets merged (S3-09, S4-01 to S4-14; GCC `knc` `c759f17f1b9`). At that head: x86 identical (1,962 files), drill all textual, 0 ICE, 314 shared lines in 71 hunks, and on the card `s4_masks` (all six builds, S4-14's split included), the execute suite 1,681/1,681 and all 14 S3-10 rows pass. Sprint 5 needs the owner's approval. M1 is accepted and tagged `m1` locally; nothing is pushed. Sprint 4's engineers were Claude subagents (GPT usage ran out).
 
 ## Proven, and how
 
@@ -52,6 +52,7 @@ Last updated: 2026-11-05, Sprint 4. **All Sprint 4 tickets are merged** (S3-09, 
 | The shared sysroot has five startup files byte-identical to the bootstrap copies, and its libc and loader differ from them | Lead byte comparison on 2026-11-01 | Compare `usr/lib64/crt1.o` and `lib64/libc-2.21.so` against the bootstrap sysroot |
 | Empty `lib` and `usr/lib` fix the donor link failure | Applied to the shared sysroot by S0-03, and the link passes in the lead's rerun | `gcc --sysroot=<sysroot> -print-file-name=crt1.o` |
 | **M1 accepted (go) at GCC `knc` `f4fa4944b8a`**: all 7 fixed S3-11 criteria met. On the card, cores 40-59: execute suite 1,681/1,681, all 14 S3-10 rows, the atomic counter. ICE sweeps `-O2 -ftree-vectorize` and `-O3`: 0 ICE. x86: 0 differences. Drill conflicts all textual; trunk builds, with 16 T1 differences ticketed as S3-25. 184 shared lines in 53 hunks. Cost floor for a separate backend: 235 or more sessions to M1, against 184 measured | `docs/research/m1-result.md` (decision section), `docs/research/card-runs-s3.md` (M1 final head) | `python harness/card/run_suite.py`; `torture_compile.py --level O3` |
+| **Sprint 4 at GCC `knc` `c759f17f1b9`**: vector compares into masks with C NaN semantics, if-converted select and conditional loops, V16SI and V8DI add/sub (carry), masked epilogues for no-peel aligned loops, and S4-14's guarded split for misaligned masked access are exact on the card. `s4_masks` 1,589,070 checks in six builds at lengths 0-65 and offsets 0-15 inside guard pages; execute suite 1,681/1,681; 14 S3-10 rows | `docs/research/card-runs-s3.md` (Sprint 4 head); `docs/sprints/SPRINT-04.md` | Builds in `.work/_shared/tmp/claude-s4-masks`; `python harness/card/run_suite.py` |
 
 ## Not proven yet
 
@@ -155,7 +156,7 @@ Last updated: 2026-11-05, Sprint 4. **All Sprint 4 tickets are merged** (S3-09, 
 ## Card
 
 Approved by the owner on 2026-11-01. Since 2026-11-03 the card is shared with the other project's
-**HOLD (owner, 2026-11-04 ~23:00): run no card job without the owner's agreement; another project is using the card.** Queue card checks and ask first.
+**HOLD (owner, 2026-11-04 ~23:00): run no card job without the owner's agreement; another project is using the card.** Queue card checks and ask first. The owner allowed one run on 2026-11-05 (the Sprint 4 head); the hold otherwise stands.
 agent (`gpt61`), and neither needs it exclusively. Rules: cores 40-59 (owner, 2026-11-04; was 30-59; GPT has 0-39; core 60 is the OS's); 3-4 threads per core for jobs whose layout is not fixed, and at least 3 running threads per core summed over our jobs (owner, 2026-11-04; batches run at `-j 80`, 4 threads per core, 96 MiB each, in one packed upload per job, S4-12); our memory budget is 10 GiB, with the 1.5 GB free floor at admission (owner, 2026-11-04: the other project rarely uses more than 7 GB); at most 7 GB, a start and a
 Nice (lead, 2026-11-04, after the owner asked to move our jobs out of NICE): measured on the card, our jobs and their parents (`claude-program`, `claude-launch`, `claude-control`, `sshd`) all run at nice 0. The only niced processes are kernel threads; the only busy one is `khugepaged` (nice 19, 4,615 ticks), which merges huge pages under memory load. It is card-global, so we leave it alone.
 finish line per job in `C:/Users/xuzhi/Documents/card-coordination/jobs.jsonl`, files under

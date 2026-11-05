@@ -73,18 +73,18 @@ over unchanged.
 - [x] S4-01 to S4-14 and S3-09 merged (S4-05 split into S4-05 and S4-14; S4-10 to S4-13 added for
   tooling and infrastructure)
 - [x] ADR-0007 accepted (amended for the `-fno-trapping-math` mapping)
-- [ ] `tests/acceptance/s4_masks` on the card at the sprint head. It passed after every merge
-  through S4-05. After S4-14, seven builds are made and waiting for the owner's card agreement
+- [x] `tests/acceptance/s4_masks` on the card at the sprint head (2026-11-05): 1,589,070 checks pass
+  in all six data builds, including the three that force S4-14's split; the aligned guard control
+  faults on the guard line as designed
 - [x] Final batch check, laptop part: x86 identical, every drill conflict textual, 0 ICE (S4-07)
-- [ ] Final batch check, card part: the full execute suite at the sprint head is built (1,681
-  linked, 0 ICE) and waiting for the owner's card agreement. It passed 1,681 of 1,681 after every
-  merge through S4-05
+- [x] Final batch check, card part (2026-11-05): the full execute suite passes 1,681 of 1,681 at the
+  sprint head, and all 14 S3-10 rows (`m1_affine` three ways, ABI, FP, inexact) still pass
 - [x] Shared lines and hunks reported at the sprint head, with the KNC-only files beside them
 - [x] `CURRENT_STATE.md` updated; retro below
 
 ## Retro
 
-Drafted 2026-11-05 by the lead. The sprint closes when the owner allows the card run at the head.
+Written 2026-11-05 by the lead. **Sprint 4 is closed** (card run at the head passed, `docs/research/card-runs-s3.md`).
 1. Kept: each merge was proven on the card at once, and the new fixture found real wrong code
    (S4-09). Batch checks caught a trunk logic conflict that one ticket introduced (S4-06 to S4-04).
 2. Cost: most of the lost time was infrastructure, not compiler work: a 23-minute Cygwin
@@ -92,3 +92,6 @@ Drafted 2026-11-05 by the lead. The sprint closes when the owner allows the card
    the old account. All are fixed or guarded now (S4-10, S4-11, S4-13, `checkStat`).
 3. GPT ran out mid-sprint; Claude subagents (Opus for deep work, Sonnet for light) finished the
    sprint. The red gate plus lead review caught each design risk before a build.
+4. Change: the card hold from 2026-11-04 left S4-14 unproven on hardware for a night. `card_run`
+   serializes our jobs (its admission lock lasts the whole job), so the head run took minutes
+   anyway. The S3-10 batch still stages the torture suite file by file; move it to `--file-list`.

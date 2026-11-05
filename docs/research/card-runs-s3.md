@@ -273,3 +273,20 @@ rows rebuilt at this head: `m1_affine` (GCC 16, donor and Fortran drivers), inex
 FP-O2 pass. ABI-O2-0 prints 5 × PASS with equal values; its expected file came from a stale lead
 copy without S4-08's spelling fix, and the copy is now refreshed. Execute suite: **1,681 of 1,681
 PASS** (`claude-11534d89…`).
+
+## Sprint 4 head (lead, 2026-11-05, owner allowed the run)
+
+GCC `knc` `c759f17f1b9` (S4-14's merge, the sprint head), `cc1` SHA-1 `2818504de6f7…`. `s4_masks`
+passes 1,589,070 checks in all six data builds: `-O2 -ftree-vectorize` (`claude-a61fe776…`), `-O3`
+(`claude-15c668c2…`), `-fno-trapping-math` (`claude-1d7adbc4…`), and the three builds that force
+S4-14's guarded split: `-fvect-cost-model=unlimited` (`claude-c6e04c26…`), plus
+`--param vect-max-peeling-for-alignment=0` (`claude-0007e7ff…`) and
+`--param vect-partial-vector-usage=1` (`claude-ab2e0a4d…`). Those three hold 18, 18 and 171 `vpermd`
+rotations, and the `-O2` build holds none, so the split ran on real hardware for the first time: exact
+at every length 0-65 and offset 0-15, inside guard pages on both sides. The aligned guard control
+faults on the guard line after the array as designed (`kernel=add_al_f32 n=1 where=2`,
+`claude-1df30e7a…`). Execute suite: 1,681 linked, 0 ICE, **1,681 of 1,681 PASS** in one packed job.
+S3-10 rows rebuilt at this head (`claude-s3-10-m1`, compiler `c759f17f1b9`): all 14 match their
+expected files: `m1_affine` with the GCC 16, donor and Fortran drivers (`claude-55d3f4a7…`,
+`claude-0c08605c…`, `claude-f19bea17…`), vector, FP and special values at `-O0` and `-O2`, the four
+ABI cross-links, and inexact (`claude-e5c64f9d…`).
