@@ -1,10 +1,10 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-05 12:53.
+Updated automatically at every ticket change. Last update: 2026-11-05 12:55.
 
-**Next: the tech lead, on S5-08.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: GPT-6.1, on S5-10 (Correctly rounded FP32 vector square root for V16SF (S5-03 ticket A)).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
-Current tickets: `[#################---]` 83 of 93
+Current tickets: `[##################--]` 84 of 93
 
 ## Milestones
 
@@ -12,7 +12,7 @@ Current tickets: `[#################---]` 83 of 93
 |---|---|---|---|
 | M0 | Foundation | In progress | 17 of 17 tickets |
 | M1 | Mixed native code | Done | 43 of 43 tickets |
-| M2 | Useful vector target | In progress | 23 of 33 tickets |
+| M2 | Useful vector target | In progress | 24 of 33 tickets |
 | M3 | Runtimes | Not started | Not planned in detail yet |
 | M4 | Broad optimization | Not started | Not planned in detail yet |
 | M5 | Program corpus | Not started | Not planned in detail yet |
@@ -104,7 +104,7 @@ Current tickets: `[#################---]` 83 of 93
 | S5-05 | knc_lint accepts the decoded %ymm source of vcvtdq2pd, vcvtudq2pd and vcvtps2pd | Done | knc_lint no longer rejects correct vcvtdq2pd, vcvtudq2pd and vcvtps2pd, whose 8-lane register source objdum... |
 | S5-06 | KNC vec_perm_const: reversed, stride-2 and interleaved loops vectorize with swizzle, vpermf32x4, vpshufd, valignd and vpermd | Done | Reversed, stride-2 and constant-shuffle vector code now uses IMCI permutes (swizzle, vpermf32x4, vpshufd, v... |
 | S5-07 | KNC reductions: vpermf32x4 and swizzle trees for plus, min/max and logic, with no stack accumulator | Done | Integer sum, min/max and logic reductions, and FP sums under -ffast-math, now end in an IMCI vpermf32x4 and... |
-| S5-08 | KNC same-width conversions: int32/uint32 to and from float as single vcvtfxpnt instructions (the ADR-0008 named-insn exception) | Waiting for review | GCC 3257a87cd94: wrapped --if-stale build, T0/T1/T2, four README s5_ops builds/lint PASS; both requested lo... |
+| S5-08 | KNC same-width conversions: int32/uint32 to and from float as single vcvtfxpnt instructions (the ADR-0008 named-insn exception) | Done | Int32/uint32 to float and float to int32/uint32 loops now vectorize as single IMCI vcvtfxpnt instructions w... |
 | S5-09 | Card probe of vrcp23ps, vrsqrt23ps and vgetmant (S5-03 P1a-e), to back the division and square-root proofs | Done | A card probe now measures vrcp23ps and vrsqrt23ps against the error bounds the FP32 division and square-roo... |
 | S5-10 | Correctly rounded FP32 vector square root for V16SF (S5-03 ticket A) | Not started |  |
 | S5-11 | Correctly rounded FP32 vector division for V16SF, with cond_div (S5-03 ticket B) | Not started |  |
@@ -118,6 +118,7 @@ Current tickets: `[#################---]` 83 of 93
 
 ## Recent activity
 
+- 2026-11-05 12:55 **S5-08** lead approve: Int32/uint32 to float and float to int32/uint32 loops now vectorize as single IMCI vcvtfxpnt instructions with C truncation and IEEE flags, through...
 - 2026-11-05 12:53 **S5-08** engineer submit: GCC 3257a87cd94: wrapped --if-stale build, T0/T1/T2, four README s5_ops builds/lint PASS; both requested loops vectorize. Native pending lead; x86 ...
 - 2026-11-05 12:00 **S5-08** lead answer: Fixed: the lead deleted the 51 generated files your user could not write (gen* tools and objects, insn-* outputs, tm-preds.h, gtype.state, mddeps.m...
 - 2026-11-05 11:48 **S5-08** engineer ask: Prescribed repair fails: Cygwin chmod u+rw returns Permission denied on 51 owned files (gcc/s-mddeps, mddeps.mk, build/genrecog.exe, etc.). Correct...
@@ -125,13 +126,12 @@ Current tickets: `[#################---]` 83 of 93
 - 2026-11-05 11:44 **S5-08** engineer ask: GCC a5172583247 committed approved conversions. Wrapped gcc_build.py --if-stale failed before compiling: /bin/sh: s-mddeps: Permission denied. Shar...
 - 2026-11-05 11:40 **S5-08** lead answer: Yes. ADR-0008 point 5 is amended (commit on main): floatv16siv16sf2 alone may use VF1_KNC, defined in imci.md and identical to VF1 except that V16S...
 - 2026-11-05 11:23 **S5-08** engineer ask: Blocked by condition-only scope: VF1 (sse.md:436-437) ANDs TARGET_AVX512F into floatv16siv16sf2. insn-flags.h:2594 confirms it; read-rtl.cc:635-660...
-- 2026-11-05 11:17 **S5-07** lead approve: Integer sum, min/max and logic reductions, and FP sums under -ffast-math, now end in an IMCI vpermf32x4 and swizzle tree instead of a stack-held ve...
 
 ## Cost
 
 - From the script, engineer: 195 sessions, 457.3M input tokens
 - From the script, lead: 184 sessions, 58.7M input tokens
-- Started by hand, Claude: 9 sessions, 910.0M input tokens
+- Started by hand, Claude: 9 sessions, 913.7M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
