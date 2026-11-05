@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-05 14:30.
+Updated automatically at every ticket change. Last update: 2026-11-05 14:32.
 
-**Next: GPT-6.1, on S5-11 (Correctly rounded FP32 vector division for V16SF, with cond_div (S5-03 ticket B)).** Run `python tools/dispatch.py`, or ask the tech lead to.
+**Next: GPT-6.1, on S5-17 (Sprint 5 mid batch check after S5-06, S5-07 and S5-08).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
 Current tickets: `[##################--]` 86 of 94
 
@@ -113,7 +113,7 @@ Current tickets: `[##################--]` 86 of 94
 | S5-14 | KNC 8-lane gather and scatter for V8DF/V8DI through the builtin hooks, reading the low 8 dwords of a V16SI index | Not started |  |
 | S5-15 | KNC FP min/max: MIN_EXPR/MAX_EXPR and fmin/fmax as vgminps/vgmaxps (pd), with their reductions | Not started |  |
 | S5-16 | KNC byte and word data: V16QI/V16HI transport modes, widening up-converting loads and narrowing down-converting stores | Not started |  |
-| S5-17 | Sprint 5 mid batch check after S5-06, S5-07 and S5-08 | Not started |  |
+| S5-17 | Sprint 5 mid batch check after S5-06, S5-07 and S5-08 | In progress |  |
 | S5-18 | Final Sprint 5 batch check at the sprint head | Not started |  |
 | S5-19 | card_run shares cores with the PhiWeather session - compact per-job core claims from the ledger, and round-robin turns for benchmark jobs | Done | card_run now packs each job onto whole cores taken from 59 downward, shares the card with the PhiWeather se... |
 
@@ -132,7 +132,7 @@ Current tickets: `[##################--]` 86 of 94
 
 - From the script, engineer: 202 sessions, 479.5M input tokens
 - From the script, lead: 184 sessions, 58.7M input tokens
-- Started by hand, Claude: 9 sessions, 971.5M input tokens
+- Started by hand, Claude: 9 sessions, 972.7M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
