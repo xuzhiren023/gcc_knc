@@ -1,10 +1,10 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-04 22:17.
+Updated automatically at every ticket change. Last update: 2026-11-04 22:29.
 
-**Next: the tech lead, on S4-13.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: GPT-6.1, on S4-05 (Masked epilogues for aligned loops: while_ult, the finish_cost term, cond_<op> for FP).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
-Current tickets: `[##################--]` 71 of 75
+Current tickets: `[###################-]` 72 of 75
 
 ## Milestones
 
@@ -12,7 +12,7 @@ Current tickets: `[##################--]` 71 of 75
 |---|---|---|---|
 | M0 | Foundation | In progress | 17 of 17 tickets |
 | M1 | Mixed native code | Done | 43 of 43 tickets |
-| M2 | Useful vector target | In progress | 11 of 15 tickets |
+| M2 | Useful vector target | In progress | 12 of 15 tickets |
 | M3 | Runtimes | Not started | Not planned in detail yet |
 | M4 | Broad optimization | Not started | Not planned in detail yet |
 | M5 | Program corpus | Not started | Not planned in detail yet |
@@ -95,11 +95,12 @@ Current tickets: `[##################--]` 71 of 75
 | S4-10 | pm.py approve merges a GCC ticket without rewriting files in the shared checkout | Done | Approving a GCC ticket no longer rewrites the merged files in the shared GCC checkout, so the next build is... |
 | S4-11 | gcc_build.py refuses a build tree whose mddeps.mk has lost the .md includes | Done | A shared GCC build tree that has lost its .md dependency list is now rebuilt and checked instead of being c... |
 | S4-12 | card_run stages a whole batch in one upload, so card cores are busy instead of waiting on SSH | Done | card_run can now ship a whole batch of programs in one packed upload, unpacked on the card by a small check... |
-| S4-13 | Rebuild the x86 check's trees under the current user and run the x86 comparison at the knc head | Waiting for review | x86 at knc 0d5b9f4 vs releases/gcc-16.2.0 (78d4ac7), --home portability-claude, exit 0, 148 min, make check... |
+| S4-13 | Rebuild the x86 check's trees under the current user and run the x86 comparison at the knc head | Done | The x86 check now runs under this user from .work/_shared/portability-claude, and at the S4-04 head x86 ass... |
 | S4-14 | Misaligned masked access: a guarded aligned split in KNC maskload/maskstore, tested | draft |  |
 
 ## Recent activity
 
+- 2026-11-04 22:29 **S4-13** lead approve: The x86 check now runs under this user from .work/_shared/portability-claude, and at the S4-04 head x86 assembly is identical to stock GCC 16.2 on ...
 - 2026-11-04 22:17 **S4-13** engineer submit: x86 at knc 0d5b9f4 vs releases/gcc-16.2.0 (78d4ac7), --home portability-claude, exit 0, 148 min, make check on. -O2: identical=1962 different=0 bot...
 - 2026-11-04 20:40 **S4-05** lead approve-red: Red approved: O2 and O3 scans require masked epilogues for no-peel aligned loops (GPR mask to k, guarded masked moves with jkzd for 16 lanes and a ...
 - 2026-11-04 20:39 **S4-05** engineer red: Red e422c20: tests/t1/knc-mask-tail-O2.c/-O3.c (+knc-mask-tail.h, loops.c shapes add_al_f32/f64/i32, affine_al_f32/f64, mul_al_f32, cst_al_f32, mis...
@@ -107,13 +108,12 @@ Current tickets: `[##################--]` 71 of 75
 - 2026-11-04 20:28 **S4-04** engineer submit: sse.md add/sub expander: TARGET_KNC entry dispatch to imci.md @knc_plusminus (V16SI vpaddd/vpsubd; V8DI pre-reload split: vmovdqa32{cdab}, vpaddset...
 - 2026-11-04 19:33 **S4-06** lead approve: Batch check at ae8a033c5f3: no compiler crashes in the -O2 vectorize and -O3 sweeps, 280 shared lines in 68 hunks, no conflicts onto the gcc-16 rel...
 - 2026-11-04 19:31 **S4-06** engineer submit: At ae8a033c5f3. 1 x86 NOT RUN, infra: portability/x86-{a,b} trees owned by CodexSandboxOffline; configure cannot chmod config.status (S4_06_x86-202...
-- 2026-11-04 19:17 **S4-03** lead approve: Conditional loops now vectorize on KNC: selects and conditional stores on 64-byte aligned arrays through guarded masked moves, conditional add, int...
 
 ## Cost
 
 - From the script, engineer: 186 sessions, 441.0M input tokens
 - From the script, lead: 184 sessions, 58.7M input tokens
-- Started by hand, Claude: 9 sessions, 746.3M input tokens
+- Started by hand, Claude: 9 sessions, 749.3M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
