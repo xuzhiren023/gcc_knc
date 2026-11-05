@@ -300,12 +300,16 @@ def run(program, argv, *, lock_path, external_locks, baseline_names, timeout,
             last_timed = next((j for j in reversed(lines) if j.get("event") in ("finish", "end")
                                and j.get("timingValid") is True), None)
             their_turn = benchmark and foreign_queue and last_timed is not None and is_ours(last_timed)
-            occupied = {c for j in active.values() for c in j.get("cores", [])}
+            # Benchmark queues express turns, not reservations: only running
+            # jobs must drain before the round-robin winner can start.
+            running = [j for j in active.values() if j.get("event") == "start"]
+            occupied = {c for j in (running if benchmark else active.values())
+                        for c in j.get("cores", [])}
             available = [c for c in range(59, -1, -1) if c not in occupied
                          and sum(value == c for value in topology.values()) == 4]
             selected = list(range(60)) if benchmark else (list(cores) if cores is not None
                                                          else available[:math.ceil(threads / 4)])
-            core_ready = (not active and all(c in available for c in selected) if benchmark else
+            core_ready = (not running and all(c in available for c in selected) if benchmark else
                           not foreign_queue and (cores is not None or len(selected) >= math.ceil(threads / 4))
                           and all(c in available for c in selected))
             reserved = sum(int(j.get("memoryLimitMiB", j.get("memory_mb", 7 * 1024))) for j in active.values()
