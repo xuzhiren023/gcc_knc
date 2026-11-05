@@ -61,7 +61,7 @@ for k, chunk in enumerate(chunks):
     for attempt in range(3):
         cmd = [sys.executable, "tools/card_run", "--config", str(cfg), "--timeout", "900",
                "--transport-timeout", "120", "--receipt", str(OUT / ("result%d.json" % k)),
-               "--file-list", str(stage)]
+               "--file-list", str(stage), "--threads", "80"]  # S5-19: cores 59-40, packed
         cmd += [str(driver), "-j", "80", "--limit-mb", "96", lst.name]
         done = subprocess.run(cmd, cwd=REPO, stdout=subprocess.PIPE, stderr=subprocess.PIPE, timeout=3600)
         lines = [l for l in done.stdout.decode("utf8", "replace").splitlines()
