@@ -56,6 +56,26 @@ in an exclusive window.
 
 - **8 memory controllers (GBOX), each with 2 channels of 32 bits, GDDR** (330991 p.39).
 
+## Ring and streaming stores (owner's images, 2026-11-05, from Intel slides)
+
+- **The cores sit on a bidirectional ring.** Each core and its L2 has a tag directory (TD) stop on
+  the ring, and the GDDR memory controllers sit on the ring between groups of cores. So an L2 miss
+  goes to the TD that owns the line's address, which may be on the far side of the ring. The latency
+  depends on distance *(to measure)*.
+- **Streaming stores.** Intel's silicon data shows bandwidth more than 30% higher with streaming
+  stores than without, at 50 cores (2 address/acknowledge rings, no ECC). Bandwidth keeps rising
+  up to about 50 cores, so a bandwidth-bound loop needs most of the card to saturate memory.
+- On KNC, the streaming store is the no-read-hint store (`vmovnrapd`/`vmovnraps`, and the
+  `vmovnrngoap*` form with relaxed ordering). It writes a whole 64-byte line without first reading
+  it from memory (no RFO).
+  - **For the compiler:** a vectorized loop that overwrites whole aligned lines of an output array
+    that it does not read could emit the NR form instead of `vmovaps`. That is the
+    `-fopt-info`/cost-model work of Sprint 6, or a new backlog item (E5-08, "streaming stores for
+    write-only full-line output, measured"). It is only legal when the whole line is written, so
+    S4-05's masked epilogues and the misaligned split must keep the normal store.
+  - *(to check in the ISA manual)*: the exact mnemonics, alignment rules and memory ordering
+    (whether an `sfence`/`lock` is needed before another thread reads the data).
+
 ## Measurement hooks
 
 - Each thread has two 40-bit performance counters (`PERFCNT0/1`, event selectors `EVSEL0/1`,
