@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-05 10:35.
+Updated automatically at every ticket change. Last update: 2026-11-05 11:14.
 
-**Next: GPT-6.1, on S5-07 (KNC reductions: vpermf32x4 and swizzle trees for plus, min/max and logic, with no stack accumulator).** Run `python tools/dispatch.py`, or ask the tech lead to.
+**Next: the tech lead, on S5-07.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[#################---]` 82 of 93
 
@@ -103,7 +103,7 @@ Current tickets: `[#################---]` 82 of 93
 | S5-04 | card_run shares the card with the PhiWeather tuning session: project tag, own-budget count, timed-job refusal, staging limit, packed S3-10 batch | Done | card_run now shares the card safely with the PhiWeather tuning session: our ledger rows say project gcc-knc... |
 | S5-05 | knc_lint accepts the decoded %ymm source of vcvtdq2pd, vcvtudq2pd and vcvtps2pd | Done | knc_lint no longer rejects correct vcvtdq2pd, vcvtudq2pd and vcvtps2pd, whose 8-lane register source objdum... |
 | S5-06 | KNC vec_perm_const: reversed, stride-2 and interleaved loops vectorize with swizzle, vpermf32x4, vpshufd, valignd and vpermd | Done | Reversed, stride-2 and constant-shuffle vector code now uses IMCI permutes (swizzle, vpermf32x4, vpshufd, v... |
-| S5-07 | KNC reductions: vpermf32x4 and swizzle trees for plus, min/max and logic, with no stack accumulator | In progress | Lead, under the owner's 2026-11-03 budget delegation: sessions raised to 7, because three were lost to the ... |
+| S5-07 | KNC reductions: vpermf32x4 and swizzle trees for plus, min/max and logic, with no stack accumulator | Waiting for review | GCC 3d56ebf9475: incremental build, T0/T1/T2 PASS. s5_ops README variants and s4_masks o2v/o3 build; native... |
 | S5-08 | KNC same-width conversions: int32/uint32 to and from float as single vcvtfxpnt instructions (the ADR-0008 named-insn exception) | Not started |  |
 | S5-09 | Card probe of vrcp23ps, vrsqrt23ps and vgetmant (S5-03 P1a-e), to back the division and square-root proofs | Done | A card probe now measures vrcp23ps and vrsqrt23ps against the error bounds the FP32 division and square-roo... |
 | S5-10 | Correctly rounded FP32 vector square root for V16SF (S5-03 ticket A) | Not started |  |
@@ -118,6 +118,7 @@ Current tickets: `[#################---]` 82 of 93
 
 ## Recent activity
 
+- 2026-11-05 11:14 **S5-07** engineer submit: GCC 3d56ebf9475: incremental build, T0/T1/T2 PASS. s5_ops README variants and s4_masks o2v/o3 build; native exactness pending lead. Torture O0 iden...
 - 2026-11-05 10:35 **S5-07** owner decide: Lead, under the owner's 2026-11-03 budget delegation: sessions raised to 7, because three were lost to the shared-build permission problem (fixed b...
 - 2026-11-05 10:35 **S5-07** engineer escalate: budget: 4 engineer sessions used; the budget is 4
 - 2026-11-05 10:34 **S5-07** lead answer: Fixed by the owner: every file in .work/_shared/gcc-build is now owned by CodexSandboxOffline, as in Sprints 3 and 4. Rerun tools/gcc_build.py --if...
@@ -125,16 +126,15 @@ Current tickets: `[#################---]` 82 of 93
 - 2026-11-05 10:26 **S5-07** lead answer: Fixed by the owner: the explicit CodexSandboxUsers DENY entries are removed from files xuzhi owns in gcc-build and the GCC checkout (s-mddeps now a...
 - 2026-11-05 10:13 **S5-07** engineer ask: Build retry still fails before compilation: echo timestamp > gcc/s-mddeps: Permission denied as CodexSandboxOffline. File is -rwxrw----+ owned by x...
 - 2026-11-05 10:09 **S5-07** lead answer: Fixed: CodexSandboxUsers now has inherited modify rights on .work/_shared/gcc-build and .work/_shared/gcc (owner-approved, 2026-11-05). Files that ...
-- 2026-11-05 10:00 **S5-07** engineer ask: Incremental build blocked before compilation: /bin/sh cannot write gcc-build/gcc/s-mddeps (Permission denied). Cygwin runs as CodexSandboxOffline; ...
 
 ## Cost
 
 - From the script, engineer: 190 sessions, 445.7M input tokens
 - From the script, lead: 184 sessions, 58.7M input tokens
-- Started by hand, Claude: 9 sessions, 853.9M input tokens
+- Started by hand, Claude: 9 sessions, 865.8M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 16.4 GiB of 100 GiB. 204 GiB free on the drive.
+The project uses 16.4 GiB of 100 GiB. 201 GiB free on the drive.
