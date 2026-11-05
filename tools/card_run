@@ -142,11 +142,23 @@ def append_ledger(path, record):
 def active_jobs(lines):
     active = {}
     for line in lines:
-        if line.get("event") == "start":
+        if line.get("event") in ("start", "queued"):
             active[ledger_job_id(line)] = line
-        elif line.get("event") in ("finish", "end"):
+        elif line.get("event") in ("finish", "end", "superseded"):
             active.pop(ledger_job_id(line), None)
-    return active
+    now = datetime.now(timezone.utc)
+    return {key: row for key, row in active.items()
+            if row.get("event") != "queued" or live_queue(row, now)}
+
+
+def live_queue(row, now):
+    if row.get("timingValid") is not True:
+        return False
+    try:
+        age = now - datetime.fromisoformat(row["queuedTime"].replace("Z", "+00:00"))
+        return timedelta(0) <= age < timedelta(hours=3)
+    except (KeyError, TypeError, ValueError):
+        return False
 
 
 def ledger_job_id(line):
@@ -164,7 +176,7 @@ def is_ours(job):
 def refuse_if_timed_job_open(active):
     """S5-04: a timed whole-card job of another project or agent is spoiled by any job of ours."""
     for job in active.values():
-        if not is_ours(job) and job.get("timingValid") is True:
+        if job.get("event") != "queued" and not is_ours(job) and job.get("timingValid") is True:
             raise Refused("timed job %s is open until %s; not staging"
                           % (ledger_job_id(job), job.get("expectedEnd")))
 
@@ -176,16 +188,17 @@ def cpu_binding(cpuinfo):
         fields = {key.strip(): value.strip() for key, value in fields.items()}
         if "processor" in fields and "core id" in fields:
             core = int(fields["core id"])
-            if 40 <= core <= 59:  # Owner, 2026-11-04: ours are 40-59; GPT has 0-39.
+            if 0 <= core <= 59:
                 mapping[int(fields["processor"])] = core
     if not mapping:
-        raise Refused("no CPUs mapped to physical cores 40-59")
+        raise Refused("no CPUs mapped to physical cores 0-59")
     return mapping
 
 
 def run(program, argv, *, lock_path, external_locks, baseline_names, timeout,
         transport_timeout, receipt_path, transport, ledger_path, memory_mb=128,
-        monotonic=time.monotonic, files=(), max_stage_mib=64, packed=False, stage_timeout=STAGE_TIMEOUT):
+        monotonic=time.monotonic, files=(), max_stage_mib=64, packed=False, stage_timeout=STAGE_TIMEOUT,
+        threads=1, cores=None, benchmark=False):
     result = dict(result_class="infrastructure", exit_code=INFRA_EXIT,
                   program_exit_code=None, boot_id_before=None, boot_id_after=None,
                   card_minutes=0.0, detail="", foreign_processes=[], overlapping_jobs=[],
@@ -198,6 +211,7 @@ def run(program, argv, *, lock_path, external_locks, baseline_names, timeout,
     admission_lock = None
     overlaps = set()
     cpuinfo = None
+    queued = False
 
     def failure(kind, code, detail):
         result.update(result_class=kind, exit_code=code, detail=str(detail))
@@ -233,6 +247,14 @@ def run(program, argv, *, lock_path, external_locks, baseline_names, timeout,
             raise ValueError("limits must be finite and positive")
         if not isinstance(memory_mb, int) or not 0 < memory_mb <= MEMORY_BUDGET_MIB:
             raise Refused("memory limit must be 1..%d MB (our card budget)" % MEMORY_BUDGET_MIB)
+        if not isinstance(threads, int) or isinstance(threads, bool) or not 1 <= threads <= 240:
+            raise Refused("threads must be an integer from 1 through 240")
+        if cores is not None:
+            if (not cores or any(not isinstance(c, int) or isinstance(c, bool) or not 0 <= c < 60
+                                 for c in cores) or len(set(cores)) != len(cores)):
+                raise Refused("cores must be a nonempty list of distinct physical cores 0-59")
+            if benchmark:
+                raise Refused("benchmark takes all cores; cannot combine with explicit cores")
         files = [Path(path) for path in files]
         overhead = getattr(transport, "stage_overhead", lambda **kwargs: 0)
         check_staging(program, files, max_stage_mib,
@@ -257,7 +279,8 @@ def run(program, argv, *, lock_path, external_locks, baseline_names, timeout,
             raise Refused("our ledger admission lock present: %s" % candidate)
         admission_lock = candidate
         os.close(fd)
-        refuse_if_timed_job_open(active_jobs(read_ledger(ledger_path)))
+        if not benchmark:
+            refuse_if_timed_job_open(active_jobs(read_ledger(ledger_path)))
         session = transport.connect(run_dir, timeout=transport_timeout)
         deadline = monotonic() + timeout
         while True:
@@ -266,18 +289,43 @@ def run(program, argv, *, lock_path, external_locks, baseline_names, timeout,
             # affinity at execution, via claude-pin and its completion marker.
             if snap.get("pinning") is False:
                 raise Refused("CPU pinning unavailable; refusing unpinned job")
-            mapping = cpu_binding(snap["cpuinfo"])
+            topology = cpu_binding(snap["cpuinfo"])
             lines = read_ledger(ledger_path)
             active = active_jobs(lines)
-            refuse_if_timed_job_open(active)  # Their chain may start while we wait for memory.
+            active.pop(job_id, None)  # Our queue is replaced by our start, never a reservation.
+            if not benchmark:
+                refuse_if_timed_job_open(active)  # Their chain may start while we wait for memory.
+            foreign_queue = any(j.get("event") == "queued" and not is_ours(j)
+                                for j in active.values())
+            last_timed = next((j for j in reversed(lines) if j.get("event") in ("finish", "end")
+                               and j.get("timingValid") is True), None)
+            their_turn = benchmark and foreign_queue and last_timed is not None and is_ours(last_timed)
+            occupied = {c for j in active.values() for c in j.get("cores", [])}
+            available = [c for c in range(59, -1, -1) if c not in occupied
+                         and sum(value == c for value in topology.values()) == 4]
+            selected = list(range(60)) if benchmark else (list(cores) if cores is not None
+                                                         else available[:math.ceil(threads / 4)])
+            core_ready = (not active and all(c in available for c in selected) if benchmark else
+                          not foreign_queue and (cores is not None or len(selected) >= math.ceil(threads / 4))
+                          and all(c in available for c in selected))
             reserved = sum(int(j.get("memoryLimitMiB", j.get("memory_mb", 7 * 1024))) for j in active.values()
-                           if is_ours(j))
+                           if is_ours(j) and j.get("event") != "queued")
             free = dict(line.split(":", 1) for line in snap["meminfo"].splitlines() if ":" in line)
             free_kb = int(free["MemFree"].split()[0])
-            if reserved + memory_mb <= MEMORY_BUDGET_MIB and free_kb - memory_mb * 1024 >= 1536 * 1024:
+            memory_ready = (reserved + memory_mb <= MEMORY_BUDGET_MIB
+                            and free_kb - memory_mb * 1024 >= 1536 * 1024)
+            if core_ready and memory_ready and not their_turn:
+                mapping = {cpu: core for cpu, core in topology.items() if core in selected}
                 break
+            if benchmark and not queued:
+                append_ledger(ledger_path, dict(agent="claude", project=PROJECT, jobId=job_id,
+                              event="queued", timingValid=True, cores=list(range(60)),
+                              queuedTime=datetime.now(timezone.utc).isoformat()))
+                queued = True
             if monotonic() >= deadline:
-                raise Refused("memory admission wait expired; job was not staged")
+                reason = ("their turn" if their_turn else "memory admission" if not memory_ready
+                          else "core admission")
+                raise Refused(reason + " wait expired; job was not staged")
             time.sleep(min(1.0, deadline - monotonic()))
         result.update(session.reap_stale(result["boot_id_before"], timeout=transport_timeout))
         now = datetime.now(timezone.utc)
@@ -286,9 +334,10 @@ def run(program, argv, *, lock_path, external_locks, baseline_names, timeout,
         ledger_job = dict(agent="claude", project=PROJECT, jobId=job_id, cores=sorted(set(mapping.values())),
                           logicalCpus=sorted(mapping), memoryLimitMiB=memory_mb,
                           startTime=now.isoformat(),
-                          expectedEnd=(now + timedelta(seconds=timeout)).isoformat(), timingValid=False)
+                          expectedEnd=(now + timedelta(seconds=timeout)).isoformat(), timingValid=benchmark)
         append_ledger(ledger_path, dict(ledger_job, event="start"))
         recorded = True
+        queued = False  # The start event closes the queued event with the same jobId.
         result["cpus"] = sorted(mapping)
         staging_started = monotonic()
         session.stage(run_dir, program, timeout=transport_timeout,
@@ -380,6 +429,13 @@ def run(program, argv, *, lock_path, external_locks, baseline_names, timeout,
                               detail=result["detail"][:300]))
             except OSError as error:
                 failure("infrastructure", INFRA_EXIT, "ledger finish failed: %s" % error)
+        if queued:
+            try:
+                append_ledger(ledger_path, dict(agent="claude", project=PROJECT, jobId=job_id,
+                              event="superseded", timingValid=True,
+                              endTime=datetime.now(timezone.utc).isoformat(), outcome="cancelled"))
+            except OSError as error:
+                failure("infrastructure", INFRA_EXIT, "queue close failed: %s" % error)
         if admission_lock is not None:
             try:
                 admission_lock.unlink()
@@ -771,6 +827,9 @@ def main():
     parser.add_argument("--external-lock", action="append", type=Path, default=[])
     parser.add_argument("--baseline-name", action="append", default=[])
     parser.add_argument("--timeout", type=float)
+    parser.add_argument("--threads", type=int, default=1, help="worker threads; reserve four logical CPUs per core")
+    parser.add_argument("--cores", help="explicit comma-separated physical core IDs (0-59)")
+    parser.add_argument("--benchmark", action="store_true", help="exclusive whole-card timed or atomic job")
     parser.add_argument("--transport-timeout", type=float)
     parser.add_argument("--stage-timeout", type=float, default=STAGE_TIMEOUT,
                         help="seconds allowed for staging; a slower upload is an infrastructure failure")
@@ -801,6 +860,9 @@ def main():
                      ledger_path=Path(config["ledger"]), memory_mb=config.get("memoryMB", 128),
                      files=files, max_stage_mib=config.get("maxStageMiB", 64),
                      packed=args.file_list is not None, stage_timeout=args.stage_timeout,
+                     threads=args.threads, cores=([int(c) for c in args.cores.split(",")]
+                                                 if args.cores is not None else None),
+                     benchmark=args.benchmark,
                      transport=SSHTransport(config, transport_timeout, args.stage_timeout))
         print(json.dumps(result, sort_keys=True))
         return result["exit_code"]

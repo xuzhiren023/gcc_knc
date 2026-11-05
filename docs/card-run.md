@@ -71,10 +71,10 @@ group. PASS/FAIL/TIMEOUT lines and saved diagnostics stay in list order even
 when programs finish out of order. Each child's output is buffered separately
 until its result can be emitted. Crashes and nonzero exits report FAIL.
 
-Use 3-4 threads per core for jobs whose layout is not fixed (batches, coverage, smoke, inventory):
-N = 60-80 on our 20 physical cores (owner, 2026-11-04). Aim for at least 3 running threads per
-core summed over all our jobs, within our 10240 MiB budget. Lower N only when programs
-need more memory. Set the job configuration's `memoryMB` to at least N times M,
+Pass `--threads N` before PROGRAM for jobs whose layout is not fixed (default 1).
+Admission claims ceil(N/4) free physical cores, from 59 downward, with all four
+logical CPUs per core. `--cores 3,17` selects an explicit layout instead; core 60
+is never used. Set the job configuration's `memoryMB` to at least N times M,
 where M is the per-program address-space limit in MiB. For example, N=80 and
 M=96 require `memoryMB: 7680`; stage the list and all its executables as usual,
 then pass `-j 80 --limit-mb 96 LIST` after the driver executable in the
@@ -114,9 +114,9 @@ after S2-17, with later batches using the full execute suite.
   admission checks. These locks serialize our invocations; other projects do
   not take them. Create atomically, refuse on existing/stale locks, and remove
   only locks this invocation created. No external/shared-card lock is taken.
-- Parse the card's `/proc/cpuinfo` processor/core pairs. Select only logical
-  CPUs belonging to physical cores 40 through 59 (owner, 2026-11-04; 30 through
-  59 before, and GPT now has 0 through 39); never core 60. Pass that
+- Parse the card's `/proc/cpuinfo` processor/core pairs. Claim free physical
+  cores 0 through 59 using every project's open ledger claims, waiting within
+  the admission timeout if too few are free. Pass that
   mapping through the run, including admission waits and cleanup reconnects.
   Read cpuinfo once, using one `awk` pass to emit only processor/core fields
   and block separators; subsequent snapshots skip cpuinfo. Pass the
@@ -138,7 +138,15 @@ after S2-17, with later batches using the full execute suite.
   than 1536 MB of `MemFree`. Re-read both ledger and memory after each wait;
   the configured timeout bounds admission waiting. Expiration refuses without
   staging the executable. Expected-end estimates never expire reservations.
-- Sharing with timed jobs (S5-04). Our start, finish and fault rows carry
+- Sharing with timed jobs (S5-04, S5-19). `--benchmark` requires an empty ledger,
+  claims cores 0-59 and records `timingValid: true`. While waiting it appends a
+  timed `queued` row with `queuedTime`; start or superseded closes that queue.
+  Fresh timed queues (under three hours old) from other projects also hold back
+  ordinary jobs so the ledger can drain. If the last timed finish was ours,
+  another project's fresh queue makes benchmark admission refuse with "their turn"
+  on timeout. Queues close on start, finish (including cancelled), or superseded;
+  legacy queues without timingValid and queuedTime are ignored.
+  Our start, finish and fault rows carry
   `"project": "gcc-knc"`. While any open row that is not ours has
   `"timingValid": true` (the PhiWeather tuning session's timed runs), card_run
   refuses before connecting, staging or writing a row (and again on each admission pass), naming the job and its
