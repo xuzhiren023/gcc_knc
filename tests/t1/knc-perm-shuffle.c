@@ -10,13 +10,13 @@
 // scan-asm-func swz_dacb_i32: \bvmovdqa32\s+%zmm\d+\{dacb\},\s*%zmm\d+
 // scan-asm-func swz_bbbb_f64: \bvmovdqa64\s+%zmm\d+\{bbbb\},\s*%zmm\d+
 // scan-asm-func swz_badc_i64: \bvmovdqa64\s+%zmm\d+\{badc\},\s*%zmm\d+
-// scan-asm-func pf_f32: \bvpermf32x4\s+\$177,\s*%zmm\d+,\s*%zmm\d+
+// scan-asm-func pf_f32: \bvpermf32x4\s+\$114,\s*%zmm\d+,\s*%zmm\d+
 // scan-asm-func pf_f64: \bvpermf32x4\s+\$27,\s*%zmm\d+,\s*%zmm\d+
 // scan-asm-func pshufd_i32: \bvpshufd\s+\$27,\s*%zmm\d+,\s*%zmm\d+
 // scan-asm-func pshufd_f64: \bvpshufd\s+\$68,\s*%zmm\d+,\s*%zmm\d+
 // scan-asm-func align_i32: \bvalignd\s+\$3,\s*%zmm\d+,\s*%zmm\d+,\s*%zmm\d+
 // scan-asm-func align_f64: \bvalignd\s+\$2,\s*%zmm(\d+),\s*%zmm\1,\s*%zmm\d+
-// scan-asm-func blend_f32: \bvblendmps\s+%zmm\d+,\s*%zmm\d+,\s*%zmm\d+\{%k[1-7]\}
+// scan-asm-func blend_f32: \bvblendmps\s+[^\n]*,\s*%zmm\d+,\s*%zmm\d+\{%k[1-7]\}
 // scan-asm-func perm1_f32: \bvpermd\s
 // scan-asm-func perm1_f32: \A(?![\s\S]*\{%k)
 // scan-asm-func perm1_i64: \bvpermd\s
@@ -41,7 +41,7 @@ ONE (swz_cdab_f32, f32, i32, 1, 0, 3, 2, 5, 4, 7, 6, 9, 8, 11, 10, 13, 12, 15, 1
 ONE (swz_dacb_i32, i32, i32, 1, 2, 0, 3, 5, 6, 4, 7, 9, 10, 8, 11, 13, 14, 12, 15)
 ONE (swz_bbbb_f64, f64, i64, 1, 1, 1, 1, 5, 5, 5, 5)
 ONE (swz_badc_i64, i64, i64, 2, 3, 0, 1, 6, 7, 4, 5)
-ONE (pf_f32, f32, i32, 4, 5, 6, 7, 0, 1, 2, 3, 12, 13, 14, 15, 8, 9, 10, 11)
+ONE (pf_f32, f32, i32, 8, 9, 10, 11, 0, 1, 2, 3, 12, 13, 14, 15, 4, 5, 6, 7)
 ONE (pf_f64, f64, i64, 6, 7, 4, 5, 2, 3, 0, 1)
 ONE (pshufd_i32, i32, i32, 3, 2, 1, 0, 7, 6, 5, 4, 11, 10, 9, 8, 15, 14, 13, 12)
 ONE (pshufd_f64, f64, i64, 0, 0, 2, 2, 4, 4, 6, 6)
