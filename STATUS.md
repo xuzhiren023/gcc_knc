@@ -95,7 +95,7 @@ Current tickets: `[##################--]` 70 of 74
 | S4-10 | pm.py approve merges a GCC ticket without rewriting files in the shared checkout | Done | Approving a GCC ticket no longer rewrites the merged files in the shared GCC checkout, so the next build is... |
 | S4-11 | gcc_build.py refuses a build tree whose mddeps.mk has lost the .md includes | Done | A shared GCC build tree that has lost its .md dependency list is now rebuilt and checked instead of being c... |
 | S4-12 | card_run stages a whole batch in one upload, so card cores are busy instead of waiting on SSH | Done | card_run can now ship a whole batch of programs in one packed upload, unpacked on the card by a small check... |
-| S4-13 | Rebuild the x86 check's trees under the current user and run the x86 comparison at the knc head | Not started |  |
+| S4-13 | Rebuild the x86 check's trees under the current user and run the x86 comparison at the knc head | In progress |  |
 
 ## Recent activity
 
@@ -118,4 +118,4 @@ Current tickets: `[##################--]` 70 of 74
 
 ## Disk
 
-The project uses 12.8 GiB of 100 GiB. 228 GiB free on the drive.
+The project uses 12.9 GiB of 100 GiB. 228 GiB free on the drive.
