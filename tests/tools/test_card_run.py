@@ -1,5 +1,6 @@
 """S2-11 retained runner safety contract; no SSH, configuration, or card needed."""
 import json
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 import re
 import runpy
@@ -66,7 +67,9 @@ class FakeTransport:
             # A runner helper is owned by cwd, even though its exe is /bin/sh.
             processes += [{"pid": 80, "name": "sh", "exe": "/bin/sh", "cwd": self.run_dir}]
         return {"boot_id": self.boot, "processes": processes, "pinning": True,
-                "cpuinfo": "processor : 91\ncore id : 40\n", "meminfo": "MemFree: 4000000 kB\n"}
+                "cpuinfo": "\n\n".join("processor : %d\ncore id : %d" % (core * 4 + thread, core)
+                                         for core in range(61) for thread in range(4)),
+                "meminfo": "MemFree: 4000000 kB\n"}
 
     def stage(self, run_dir, program, *, timeout):
         self._owned(run_dir, BOOT)
@@ -86,6 +89,7 @@ class FakeTransport:
     def execute(self, run_dir, argv, *, timeout, card_timeout=None, cpus=None, memory_mb=None):
         self._owned(run_dir, BOOT)
         self.events.append(("execute", run_dir, list(argv), timeout, card_timeout))
+        self.cpus = cpus
         self.now += timeout if self.timed_out else 12.0
         if self.unreachable == "execute":
             self.link_broken = True
@@ -333,7 +337,7 @@ class CardRun(unittest.TestCase):
 
     def other_start(self, **fields):
         row = dict(agent="claude", project="PhiWeather", jobId="claude-mentor-1", event="start",
-                   cores=list(range(60)), memoryLimitMiB=7168,
+                   cores=list(range(40)), memoryLimitMiB=7168,
                    startTime="2026-11-05T10:00:00+00:00",
                    expectedEnd="2026-11-05T12:00:00+00:00", timingValid=True)
         row.update(fields)
@@ -346,6 +350,127 @@ class CardRun(unittest.TestCase):
         rows = self.ledger_rows()
         self.assertEqual([row["event"] for row in rows], ["start", "finish"])
         self.assertEqual([row.get("project") for row in rows], ["gcc-knc", "gcc-knc"])
+
+    def advance(self, seconds):
+        self.transport.now += seconds
+
+    def queued_other(self, **fields):
+        return self.other_start(event="queued", timingValid=fields.pop("timingValid", True), cores=list(range(60)),
+                                queuedTime=(datetime.now(timezone.utc) -
+                                            timedelta(seconds=fields.pop("age", 0))).isoformat(), **fields)
+
+    def test_compact_threads_and_explicit_layout_pin_exact_claim(self):
+        for options, expected in (({}, [59]), ({"threads": 4}, [59]),
+                                  ({"threads": 5}, [58, 59]), ({"cores": [3, 17]}, [3, 17])):
+            with self.subTest(options=options):
+                self.ledger.write_text("", encoding="utf8")
+                result = self.run_card(**options)
+                self.assertEqual(result["result_class"], "program")
+                start = self.ledger_rows()[0]
+                cpus = [core * 4 + thread for core in expected for thread in range(4)]
+                self.assertEqual(start["cores"], expected)
+                self.assertEqual(start["logicalCpus"], cpus)
+                self.assertEqual(self.transport.cpus, cpus)
+
+    def test_core_claims_include_every_project_and_release_on_finish(self):
+        self.other_start(timingValid=False, cores=[59])
+        self.other_start(project="gcc-knc", jobId="ours", timingValid=False, cores=[58])
+        self.other_start(jobId="ended", timingValid=False, cores=[57])
+        self.other_start(jobId="ended", event="finish", timingValid=False)
+        result = self.run_card(threads=8)
+        self.assertEqual(result["result_class"], "program")
+        self.assertEqual(self.ledger_rows()[-2]["cores"], [56, 57])
+
+    def test_core_shortage_waits_and_refuses_without_row(self):
+        self.other_start(timingValid=False, cores=list(range(60)))
+        with mock.patch("time.sleep", self.advance):
+            result = self.run_card()
+        self.assertEqual(result["result_class"], "refused")
+        self.assertEqual(self.transport.now, 30)
+        self.assertEqual(len(self.ledger_rows()), 1)
+        self.assertNotIn("stage", self.names())
+
+    def test_core_wait_reloads_ledger_and_explicit_layout_never_overlaps(self):
+        row = self.other_start(timingValid=False, cores=[59])
+        def release(seconds):
+            self.advance(seconds)
+            self.other_start(**dict(row, event="finish"))
+        with mock.patch("time.sleep", release):
+            result = self.run_card(cores=[59])
+        self.assertEqual(result["result_class"], "program")
+        self.assertEqual(self.transport.now, 13)
+        self.assertEqual(self.ledger_rows()[-2]["cores"], [59])
+
+    def test_benchmark_exclusive_all_cores_and_timed(self):
+        result = self.run_card(benchmark=True)
+        self.assertEqual(result["result_class"], "program")
+        for row in self.ledger_rows():
+            self.assertEqual(row["cores"], list(range(60)))
+            self.assertEqual(row["logicalCpus"], list(range(240)))
+            self.assertIs(row["timingValid"], True)
+
+    def test_benchmark_wait_queues_and_closes_queue_on_start_or_timeout(self):
+        for release in (True, False):
+            with self.subTest(release=release):
+                self.ledger.write_text("", encoding="utf8")
+                self.transport = FakeTransport()
+                row = self.other_start(timingValid=False, cores=[0])
+                def wait(seconds):
+                    self.advance(seconds)
+                    queued = self.ledger_rows()[-1]
+                    self.assertEqual(queued["event"], "queued")
+                    self.assertIs(queued["timingValid"], True)
+                    self.assertIn("queuedTime", queued)
+                    self.assertEqual(queued["cores"], list(range(60)))
+                    if release:
+                        self.other_start(**dict(row, event="finish"))
+                with mock.patch("time.sleep", wait):
+                    result = self.run_card(benchmark=True)
+                own = [r for r in self.ledger_rows() if r["jobId"] == result["job_id"]]
+                self.assertEqual(own[0]["event"], "queued")
+                self.assertEqual(own[1]["event"], "start" if release else "superseded")
+                self.assertNotIn(result["job_id"], self.runner["active_jobs"](self.ledger_rows()))
+                self.assertEqual(result["result_class"], "program" if release else "refused")
+
+    def test_round_robin_yields_to_other_project(self):
+        self.other_start(project="gcc-knc", event="finish")
+        self.queued_other()
+        with mock.patch("time.sleep", self.advance):
+            result = self.run_card(benchmark=True)
+        self.assertEqual(result["result_class"], "refused")
+        self.assertIn("their turn", result["detail"])
+        self.assertNotIn("stage", self.names())
+        self.assertFalse(any(self.runner["is_ours"](r) for r in
+                             self.runner["active_jobs"](self.ledger_rows()).values()))
+
+    def test_fresh_queue_blocks_nonbenchmark_until_closed(self):
+        for closing in (None, "start", "finish", "superseded"):
+            with self.subTest(closing=closing):
+                self.ledger.write_text("", encoding="utf8")
+                self.transport = FakeTransport()
+                self.queued_other()
+                def wait(seconds):
+                    self.advance(seconds)
+                    if closing:
+                        self.other_start(event=closing, timingValid=False, outcome="cancelled", cores=[0])
+                with mock.patch("time.sleep", wait):
+                    result = self.run_card()
+                self.assertEqual(result["result_class"], "program" if closing else "refused")
+                self.assertEqual(self.transport.now, 13 if closing else 30)
+
+    def test_legacy_stale_or_untimed_queues_do_not_block(self):
+        self.other_start(event="queued", jobId="gpt61-legacy", timingValid=False)
+        self.other_start(event="queued", jobId="missing-time", timingValid=True)
+        self.queued_other(jobId="stale", age=10801)
+        self.queued_other(jobId="untimed", timingValid=False)
+        self.assertEqual(self.run_card()["result_class"], "program")
+
+    def test_invalid_layout_refuses_before_connection(self):
+        for options in ({"threads": 0}, {"threads": 241}, {"cores": [60]}, {"cores": []}):
+            with self.subTest(options=options):
+                result = self.run_card(**options)
+                self.assertEqual(result["result_class"], "refused")
+                self.assertEqual(self.transport.events, [])
 
     def test_memory_admission_counts_only_our_own_rows(self):
         # 9000 MiB held by another project must not push a 2048 MiB job over our 10240 MiB budget.
