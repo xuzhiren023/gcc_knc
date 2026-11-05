@@ -49,8 +49,10 @@ Then stop. Your final message is only the `PM update:` line that command prints:
   for nothing (S4-09, 2026-11-04).
 - While a build runs, wait for it once (a long timeout, or the wrapper's own wait). Do not poll
   it: every check costs a tool call and tokens.
-- Fix every error a failed build reports before rebuilding. Never start a second build while a
-  `make.exe` is alive.
+- Fix every error a failed build reports before rebuilding. Never start a second build of the
+  shared tree while a `make` is building in `.work/_shared/gcc-build`. A `make` in another tree
+  (the x86 check's trees under `.work/_shared/portability*`, or the other project's builds) does
+  not block it. Check with the Cygwin toolchain's `ps -l` and each process's working directory.
 - Build the shared tree through `python tools/run.py --name <name> -- python tools/gcc_build.py
   --if-stale`, never with a bare `make` there. It skips the build when the tree is clean and
   already built, and its stamp is only right if every full build goes through it (S3-24).
