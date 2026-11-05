@@ -27,6 +27,8 @@ PACKED = re.compile(r'\bv(?:addn?|subr?|mul|div|max|min|sqrt|rcp(?:23)?|rsqrt(?:
 # Each entry supplies its CLI help and handlers for the tiers it selects.
 # Imports stay lazy so T0 and source-only selections need no probe modules.
 SELECTIONS = {
+    'sqrt': ('S5-10 correctly rounded FP32 square root', {
+        't1': lambda runner: runner.t1_sources([runner.source_dir / 'knc-vec-autovec.c'])}),
     'conversions': ('S5-08 same-width signed and unsigned conversions', {
         't1': lambda runner: runner.t1_sources([runner.source_dir / 'knc-convert-same.c'])}),
     'reductions': ('S5-07 reduction trees and strict FP ordering', {
