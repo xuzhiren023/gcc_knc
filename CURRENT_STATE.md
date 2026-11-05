@@ -4,7 +4,7 @@ The handoff between sessions. `STATUS.md` holds tickets, cost and disk, and upda
 file holds what only a person or an agent can know. Replace lines when facts change, and do not
 trust anything here that a quick command can check instead.
 
-Last updated: 2026-11-05. **Sprint 4 is closed.** All tickets merged (S3-09, S4-01 to S4-14; GCC `knc` `c759f17f1b9`). At that head: x86 identical (1,962 files), drill all textual, 0 ICE, 314 shared lines in 71 hunks, and on the card `s4_masks` (all six builds, S4-14's split included), the execute suite 1,681/1,681 and all 14 S3-10 rows pass. Sprint 5 needs the owner's approval. M1 is accepted and tagged `m1` locally; nothing is pushed. Sprint 4's engineers were Claude subagents (GPT usage ran out).
+Last updated: 2026-11-05. **Sprint 4 is closed.** All tickets merged (S3-09, S4-01 to S4-14; GCC `knc` `c759f17f1b9`). At that head: x86 identical (1,962 files), drill all textual, 0 ICE, 314 shared lines in 71 hunks, and on the card `s4_masks` (all six builds, S4-14's split included), the execute suite 1,681/1,681 and all 14 S3-10 rows pass. **Sprint 5 started 2026-11-05** (`docs/sprints/SPRINT-05.md`): research S5-01 to S5-03 and tools S5-04 running as Claude subagents. M1 is accepted and tagged `m1` locally; nothing is pushed. Sprint 4's engineers were Claude subagents (GPT usage ran out).
 
 ## Proven, and how
 
@@ -156,7 +156,7 @@ Last updated: 2026-11-05. **Sprint 4 is closed.** All tickets merged (S3-09, S4-
 ## Card
 
 Approved by the owner on 2026-11-01. Since 2026-11-03 the card is shared with the other project's
-**HOLD (owner, 2026-11-04 ~23:00): run no card job without the owner's agreement; another project is using the card.** Queue card checks and ask first. The owner allowed one run on 2026-11-05 (the Sprint 4 head); the hold otherwise stands.
+**Card sharing (owner, 2026-11-05, Sprint 5):** coordinate with the PhiWeather "WRF 4.8.0 Xeon Phi performance tuning" Claude session, which replaces the 2026-11-04 hold. Never start a job while one of its `"timingValid": true` rows (`claude-mentor-*`, `"project": "PhiWeather"`, all 60 cores) is open in the shared ledger. It announces its timed blocks; book longer jobs with it first. Both projects write `"agent": "claude"`, so S5-04 tags ours `"project": "gcc-knc"`. Our start row is written before staging, so a slow per-file upload held it open for 13 minutes on 2026-11-05 (S5-04 fixes this).
 agent (`gpt61`), and neither needs it exclusively. Rules: cores 40-59 (owner, 2026-11-04; was 30-59; GPT has 0-39; core 60 is the OS's); 3-4 threads per core for jobs whose layout is not fixed, and at least 3 running threads per core summed over our jobs (owner, 2026-11-04; batches run at `-j 80`, 4 threads per core, 96 MiB each, in one packed upload per job, S4-12); our memory budget is 10 GiB, with the 1.5 GB free floor at admission (owner, 2026-11-04: the other project rarely uses more than 7 GB); at most 7 GB, a start and a
 Nice (lead, 2026-11-04, after the owner asked to move our jobs out of NICE): measured on the card, our jobs and their parents (`claude-program`, `claude-launch`, `claude-control`, `sshd`) all run at nice 0. The only niced processes are kernel threads; the only busy one is `khugepaged` (nice 19, 4,615 ticks), which merges huge pages under memory load. It is card-global, so we leave it alone.
 finish line per job in `C:/Users/xuzhi/Documents/card-coordination/jobs.jsonl`, files under

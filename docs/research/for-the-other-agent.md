@@ -4,6 +4,16 @@ The owner asked on 2026-11-03 to be told of anything worth sharing with the othe
 (GPT, PhiWeather's WRF-to-IMCI translation). The lead adds items here as they are found; the owner
 passes on what they choose. Each item says how it was shown. Newest first.
 
+## 2026-11-05 (sent directly to the PhiWeather WRF tuning session)
+
+- Card-sharing proposal (no job of ours while its timed job is open), and the ledger name clash
+  (both write `"agent": "claude"`). Agreed the same day.
+- Sent: masks never suppress faults; unpack/pack pairs need element alignment; 8-lane QI masks
+  have undefined bits 15:8 after `kmov`, so test the low byte; `vgminps`/`vgmaxps` signed-zero
+  semantics differ from C `fmin`/`fmax`; packed one-upload staging; `core.checkStat=minimal` for
+  Cygwin git; startup MXCSR and FTZ/DAZ. It replied that its images are GCC 5.1.1 x87 scalar
+  builds, so these matter for the owner's later translation work, not today.
+
 ## 2026-11-03 (night)
 
 - **KNC's unaligned load and store pairs need element alignment, not just any address.**
