@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-05 11:45.
+Updated automatically at every ticket change. Last update: 2026-11-05 11:48.
 
-**Next: GPT-6.1, on S5-08 (KNC same-width conversions: int32/uint32 to and from float as single vcvtfxpnt instructions (the ADR-0008 named-insn exception)).** Run `python tools/dispatch.py`, or ask the tech lead to.
+**Next: the tech lead, on S5-08.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[#################---]` 83 of 93
 
@@ -104,7 +104,7 @@ Current tickets: `[#################---]` 83 of 93
 | S5-05 | knc_lint accepts the decoded %ymm source of vcvtdq2pd, vcvtudq2pd and vcvtps2pd | Done | knc_lint no longer rejects correct vcvtdq2pd, vcvtudq2pd and vcvtps2pd, whose 8-lane register source objdum... |
 | S5-06 | KNC vec_perm_const: reversed, stride-2 and interleaved loops vectorize with swizzle, vpermf32x4, vpshufd, valignd and vpermd | Done | Reversed, stride-2 and constant-shuffle vector code now uses IMCI permutes (swizzle, vpermf32x4, vpshufd, v... |
 | S5-07 | KNC reductions: vpermf32x4 and swizzle trees for plus, min/max and logic, with no stack accumulator | Done | Integer sum, min/max and logic reductions, and FP sums under -ffast-math, now end in an IMCI vpermf32x4 and... |
-| S5-08 | KNC same-width conversions: int32/uint32 to and from float as single vcvtfxpnt instructions (the ADR-0008 named-insn exception) | In progress | You own s-mddeps, so you can fix its mode yourself. From the Cygwin shell, give yourself write on every fil... |
+| S5-08 | KNC same-width conversions: int32/uint32 to and from float as single vcvtfxpnt instructions (the ADR-0008 named-insn exception) | Question for the tech lead | Prescribed repair fails: Cygwin chmod u+rw returns Permission denied on 51 owned files (gcc/s-mddeps, mddep... |
 | S5-09 | Card probe of vrcp23ps, vrsqrt23ps and vgetmant (S5-03 P1a-e), to back the division and square-root proofs | Done | A card probe now measures vrcp23ps and vrsqrt23ps against the error bounds the FP32 division and square-roo... |
 | S5-10 | Correctly rounded FP32 vector square root for V16SF (S5-03 ticket A) | Not started |  |
 | S5-11 | Correctly rounded FP32 vector division for V16SF, with cond_div (S5-03 ticket B) | Not started |  |
@@ -118,6 +118,7 @@ Current tickets: `[#################---]` 83 of 93
 
 ## Recent activity
 
+- 2026-11-05 11:48 **S5-08** engineer ask: Prescribed repair fails: Cygwin chmod u+rw returns Permission denied on 51 owned files (gcc/s-mddeps, mddeps.mk, build/genrecog.exe, etc.). Correct...
 - 2026-11-05 11:45 **S5-08** lead answer: You own s-mddeps, so you can fix its mode yourself. From the Cygwin shell, give yourself write on every file you own in the build tree that lacks i...
 - 2026-11-05 11:44 **S5-08** engineer ask: GCC a5172583247 committed approved conversions. Wrapped gcc_build.py --if-stale failed before compiling: /bin/sh: s-mddeps: Permission denied. Shar...
 - 2026-11-05 11:40 **S5-08** lead answer: Yes. ADR-0008 point 5 is amended (commit on main): floatv16siv16sf2 alone may use VF1_KNC, defined in imci.md and identical to VF1 except that V16S...
@@ -125,16 +126,15 @@ Current tickets: `[#################---]` 83 of 93
 - 2026-11-05 11:17 **S5-07** lead approve: Integer sum, min/max and logic reductions, and FP sums under -ffast-math, now end in an IMCI vpermf32x4 and swizzle tree instead of a stack-held ve...
 - 2026-11-05 11:14 **S5-07** engineer submit: GCC 3d56ebf9475: incremental build, T0/T1/T2 PASS. s5_ops README variants and s4_masks o2v/o3 build; native exactness pending lead. Torture O0 iden...
 - 2026-11-05 10:35 **S5-07** owner decide: Lead, under the owner's 2026-11-03 budget delegation: sessions raised to 7, because three were lost to the shared-build permission problem (fixed b...
-- 2026-11-05 10:35 **S5-07** engineer escalate: budget: 4 engineer sessions used; the budget is 4
 
 ## Cost
 
 - From the script, engineer: 193 sessions, 451.5M input tokens
 - From the script, lead: 184 sessions, 58.7M input tokens
-- Started by hand, Claude: 9 sessions, 884.2M input tokens
+- Started by hand, Claude: 9 sessions, 886.0M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 16.5 GiB of 100 GiB. 199 GiB free on the drive.
+The project uses 16.5 GiB of 100 GiB. 198 GiB free on the drive.
