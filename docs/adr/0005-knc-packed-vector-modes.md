@@ -45,7 +45,8 @@ them unadvertised until E3 adds them with their moves. Today:
    one predicate used by `ix86_vector_mode_supported_p` and the KNC branch of
    `ix86_hard_regno_mode_ok`. They live in `zmm0`-`zmm31` only, never in mask or general
    registers. No other vector mode is enabled: no 128- or 256-bit modes, no byte, word, HF, BF or
-   V4TI modes. XI stays transport-only.
+   V4TI modes. XI stays transport-only. *Amended by ADR-0008 point 7 (2026-11-05): V16QI and V16HI
+   become transport-only modes for widening loads and narrowing stores.*
 2. **Entry points.** A standard name that `sse.md` already instantiates for these modes stays
    there. KNC enables it by adding `|| TARGET_KNC` to the four modes' entries in that name's
    iterator and to the expander's condition, plus a first-statement KNC dispatch where the body
@@ -57,7 +58,9 @@ them unadvertised until E3 adds them with their moves. Today:
    instruction pattern for these modes is a `*knc_` insn in `imci.md` under `TARGET_KNC`, with
    KNC constraints (`YJ`), printing `zmm` with `%g`. A name `sse.md` does not instantiate for these
    modes (FP `vec_duplicate`) goes only in `imci.md`. If widening an iterator entry would enable
-   any `sse.md` insn under KNC, that name gets an expander-only iterator instead.
+   any `sse.md` insn under KNC, that name gets an expander-only iterator instead. *Amended by
+   ADR-0008 point 5 (2026-11-05): four named conversion insns may take a mode-tested KNC term
+   under that point's rules.*
 3. **Instruction mapping.**
 
    | Operation | V16SF | V8DF | V16SI | V8DI |
