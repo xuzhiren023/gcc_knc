@@ -56,6 +56,9 @@ Then stop. Your final message is only the `PM update:` line that command prints:
 - Build the shared tree through `python tools/run.py --name <name> -- python tools/gcc_build.py
   --if-stale`, never with a bare `make` there. It skips the build when the tree is clean and
   already built, and its stamp is only right if every full build goes through it (S3-24).
+- Never run `git worktree prune` on the shared GCC repository. The x86 check's worktrees are
+  registered with Cygwin `/cygdrive/...` paths, which Windows git reports as "prunable" although
+  they exist, so pruning breaks them (S4-13, 2026-11-04).
 - x86, the drill, ICE sweeps and the trunk build run in batch-check tickets, not in each ticket,
   unless your ticket says otherwise (`docs/DEVELOPMENT_CYCLE.md` section 4).
 
