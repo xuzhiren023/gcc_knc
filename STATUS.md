@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-05 08:00.
+Updated automatically at every ticket change. Last update: 2026-11-05 08:11.
 
 **Next: GPT-6.1, on S5-01 (Gather, scatter, permutes, reductions and FP min/max on KNC: GCC 16 entry points, IMCI forms, fault footprint (ADR-0008 input)).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
@@ -99,7 +99,7 @@ Current tickets: `[##################--]` 75 of 79
 | S4-14 | Misaligned masked access: a guarded aligned split in KNC maskload/maskstore, tested | Done | Misaligned conditional loads and stores now use a guarded split into at most two aligned masked moves plus ... |
 | S5-01 | Gather, scatter, permutes, reductions and FP min/max on KNC: GCC 16 entry points, IMCI forms, fault footprint (ADR-0008 input) | In progress |  |
 | S5-02 | Int and FP conversions, and memory up/down conversions for byte and word data on KNC (ADR-0008 input) | In progress |  |
-| S5-03 | Correctly rounded vector division and square root for V16SF and V8DF: sequences, proof plan, test plan (ADR-0003 point 4 input) | Not started |  |
+| S5-03 | Correctly rounded vector division and square root for V16SF and V8DF: sequences, proof plan, test plan (ADR-0003 point 4 input) | In progress |  |
 | S5-04 | card_run shares the card with the PhiWeather tuning session: project tag, own-budget count, timed-job refusal, staging limit, packed S3-10 batch | In progress |  |
 
 ## Recent activity
@@ -117,10 +117,10 @@ Current tickets: `[##################--]` 75 of 79
 
 - From the script, engineer: 186 sessions, 441.0M input tokens
 - From the script, lead: 184 sessions, 58.7M input tokens
-- Started by hand, Claude: 9 sessions, 782.3M input tokens
+- Started by hand, Claude: 9 sessions, 790.5M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 16.2 GiB of 100 GiB. 209 GiB free on the drive.
+The project uses 16.2 GiB of 100 GiB. 205 GiB free on the drive.
