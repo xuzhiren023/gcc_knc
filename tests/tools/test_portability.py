@@ -159,6 +159,33 @@ class PortabilityTest(unittest.TestCase):
         build.assert_not_called()
         self.assertIn('make.exe', output.getvalue())
 
+    def test_x86_home_option_places_worktrees_and_builds(self):
+        corpus = self.repo / portability.CORPUS
+        corpus.mkdir(parents=True)
+        (corpus / 'probe.c').write_text('int x;\n')
+        self.commit('corpus')
+        home = self.root / 'elsewhere'
+        calls = []
+
+        def fake_command(argv, cwd):
+            calls.append((list(map(str, argv)), Path(cwd)))
+            if argv[0] == 'make':
+                (Path(cwd) / 'gcc').mkdir(parents=True, exist_ok=True)
+                (Path(cwd) / 'gcc/cc1.exe').write_text('')
+            elif 'worktree' in argv:
+                Path(argv[-2]).mkdir(parents=True)
+
+        with mock.patch.object(portability, 'command', side_effect=fake_command),                 mock.patch.object(portability, 'write_stamp'),                 mock.patch.object(portability.subprocess, 'run',
+                                  return_value=subprocess.CompletedProcess([], 1, 'same')),                 contextlib.redirect_stdout(io.StringIO()):
+            portability.main(['x86', '--skip-make-check', '--repo', str(self.repo),
+                              '--shared', str(self.root), '--home', str(home),
+                              '--tree', 'base', '--tree', 'knc'])
+        makes = [cwd for argv, cwd in calls if argv[0] == 'make']
+        self.assertEqual(makes, [home / 'x86-a/build', home / 'x86-b/build'])
+        self.assertTrue(all(Path(argv[-2]).parent.parent == home
+                            for argv, _ in calls if 'worktree' in argv))
+        self.assertFalse((self.root / 'portability').exists())
+
     def test_x86_skip_make_check(self):
         corpus = self.repo / portability.CORPUS
         corpus.mkdir(parents=True)
