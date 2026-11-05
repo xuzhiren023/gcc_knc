@@ -120,6 +120,11 @@ EXISTING = "claude-" + "0" * 32  # S5-04: legacy rows count as ours by this job 
 
 
 class SharedCardRules(unittest.TestCase):
+    def test_fake_card_has_four_threads_on_every_worker_core(self):
+        topology = self.runner["cpu_binding"](self.transport.cpuinfo)
+        self.assertEqual({core: list(topology.values()).count(core) for core in range(60)},
+                         {core: 4 for core in range(60)})
+
     def setUp(self):
         self.runner = runpy.run_path(str(ROOT / "tools/card_run"))
         temporary = tempfile.TemporaryDirectory(dir=ROOT)
