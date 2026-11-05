@@ -30,16 +30,26 @@ def main():
     os.environ['LC_ALL'] = 'C'
     action = sys.argv[1]
     OUT.mkdir(exist_ok=True)
+    if action == 'model':
+        import unittest
+        sys.path.insert(0, str(ROOT / 'tests/regress'))
+        suite = unittest.TestLoader().loadTestsFromName('test_sqrt_model.DivModel')
+        return int(not unittest.TextTestRunner(verbosity=1).run(suite).wasSuccessful())
     if action == 't0':
         # E1/E2/E4 already ran once in the dedicated model job.
         import unittest
         suite = unittest.TestSuite()
         for path in sorted((ROOT / 'tests/regress').glob('test_*.py')):
-            if path.name != 'test_div_model.py':
-                suite.addTests(unittest.TestLoader().discover(str(path.parent), pattern=path.name))
+            suite.addTests(unittest.TestLoader().discover(str(path.parent), pattern=path.name))
         for name in ('test_doctor.py', 'test_portability.py', 'test_knc_lint.py'):
             suite.addTests(unittest.TestLoader().discover(str(ROOT / 'tests/tools'), pattern=name))
-        return int(not unittest.TextTestRunner(verbosity=1).run(suite).wasSuccessful())
+        def remaining(tests):
+            for test in tests:
+                if isinstance(test, unittest.TestSuite):
+                    yield from remaining(test)
+                elif not test.id().endswith('.DivModel.test_models'):
+                    yield test
+        return int(not unittest.TextTestRunner(verbosity=1).run(unittest.TestSuite(remaining(suite))).wasSuccessful())
     if action == 'acceptance':
         return acceptance()
     if action not in ('before', 'after'):
