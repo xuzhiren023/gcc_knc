@@ -45,18 +45,20 @@ void rev_f64 (double *R c, const double *R a, int n)
 { for (int i = 0; i < n; i++) c[i] = a[n - 1 - i]; }
 void rev_i32 (int *R c, const int *R a, int n)
 { for (int i = 0; i < n; i++) c[i] = a[n - 1 - i]; }
+/* Stride-2 kernels step pointers, not 2*i: under -fwrapv an int 2*i may
+   wrap, which makes the accesses non-affine (S5-06).  */
 void cmul_f32 (float *R c, const float *R a, const float *R b, int n)
 {
-  for (int i = 0; i < n; i++)
+  for (int i = 0; i < n; i++, c += 2, a += 2, b += 2)
     {
-      c[2 * i] = a[2 * i] * b[2 * i] - a[2 * i + 1] * b[2 * i + 1];
-      c[2 * i + 1] = a[2 * i] * b[2 * i + 1] + a[2 * i + 1] * b[2 * i];
+      c[0] = a[0] * b[0] - a[1] * b[1];
+      c[1] = a[0] * b[1] + a[1] * b[0];
     }
 }
 void deint_f32 (float *R re, float *R im, const float *R z, int n)
-{ for (int i = 0; i < n; i++) { re[i] = z[2 * i]; im[i] = z[2 * i + 1]; } }
+{ for (int i = 0; i < n; i++, z += 2) { re[i] = z[0]; im[i] = z[1]; } }
 void inter_f32 (float *R z, const float *R re, const float *R im, int n)
-{ for (int i = 0; i < n; i++) { z[2 * i] = re[i]; z[2 * i + 1] = im[i]; } }
+{ for (int i = 0; i < n; i++, z += 2) { z[0] = re[i]; z[1] = im[i]; } }
 
 int sum_i32 (const int *a, int n)
 { int s = 0; for (int i = 0; i < n; i++) s += a[i]; return s; }
