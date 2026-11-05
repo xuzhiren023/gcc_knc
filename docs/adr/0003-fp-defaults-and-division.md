@@ -20,6 +20,16 @@
    fixups, and the implementation must handle zero, infinity, NaN and subnormals.
    Until a correct sequence is implemented and proven for a mode, division in that mode
    **does not vectorize** and stays on x87.
+   *Amended 2026-11-05 from S5-03 (`docs/research/knc-div-sqrt.md`):*
+   - The vector sequences are correctly rounded in the current MXCSR.RC and raise the IEEE flags
+     as x87 does, except which NaN payload is returned when both operands are NaN; C leaves that
+     open.
+   - They are proven only for FZ = DAZ = 0. Under FTZ or DAZ, for example after `-ffast-math`
+     links `crtfastmath`, subnormals flush.
+   - Scalar x87 FP64 division and square root on the card are rounded twice (64-bit precision
+     control, then the store), so they are not always correctly rounded. Tests must not treat x87
+     FP64 output as the reference.
+   - FP32 is implemented in Sprint 5. FP64 stays scalar until S5-03's two open proof steps close.
 5. **Approximate forms are opt-in only,** behind `-mrecip`-style or `-ffast-math`-style
    options. Each has a documented error bound.
 
