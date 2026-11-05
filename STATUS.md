@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-05 13:59.
+Updated automatically at every ticket change. Last update: 2026-11-05 14:00.
 
 **Next: GPT-6.1, on S5-10 (Correctly rounded FP32 vector square root for V16SF (S5-03 ticket A)).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
@@ -115,7 +115,7 @@ Current tickets: `[#################---]` 84 of 94
 | S5-16 | KNC byte and word data: V16QI/V16HI transport modes, widening up-converting loads and narrowing down-converting stores | Not started |  |
 | S5-17 | Sprint 5 mid batch check after S5-06, S5-07 and S5-08 | Not started |  |
 | S5-18 | Final Sprint 5 batch check at the sprint head | Not started |  |
-| S5-19 | card_run shares cores with the PhiWeather session - compact per-job core claims from the ledger, and round-robin turns for benchmark jobs | Changes requested | pm.py approve refuses: the card test discovery hangs past 10 minutes and has errors and failures on this br... |
+| S5-19 | card_run shares cores with the PhiWeather session - compact per-job core claims from the ledger, and round-robin turns for benchmark jobs | In progress | pm.py approve refuses: the card test discovery hangs past 10 minutes and has errors and failures on this br... |
 
 ## Recent activity
 
@@ -132,7 +132,7 @@ Current tickets: `[#################---]` 84 of 94
 
 - From the script, engineer: 198 sessions, 477.0M input tokens
 - From the script, lead: 184 sessions, 58.7M input tokens
-- Started by hand, Claude: 9 sessions, 950.9M input tokens
+- Started by hand, Claude: 9 sessions, 951.8M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
