@@ -15,6 +15,9 @@ What each kernel must do:
   - Float-to-int inputs stay inside the defined range.
   - `cvt_i64_f64` has no IMCI form and is expected to stay scalar.
 - **Permutes:** bit copies. `cmul_f32` uses dyadic inputs, so every product and sum is exact.
+- **Constant shuffles** (`shuf_*`, S5-06's recipes): `__builtin_shuffle` on 64-byte vectors with
+  the selectors listed in `ops.h`. Every lane is checked against the selector over 64 random bit
+  patterns. Swapping the two operands makes all 16 checks fail (host check).
 - **Reductions:** equal to the in-order reference.
   - FP inputs are dyadic, so the sum is exact in any order. That checks the reduction tree, the
     lane handling and the tails, not the ordering.
@@ -53,7 +56,7 @@ Driver: `xgcc -march=knc -O0 -fwrapv -c driver.c`, then link with each `loops.c`
 | `neg` | `-O2 -ftree-vectorize -fwrapv -DNEGATIVE_CONTROL` | FAIL in `div_f32`, `sqrt_f32`, `div_f64`, `sqrt_f64` and both special sets |
 
 Host check (Cygwin GCC 14, x86_64, 2026-11-05):
-- `o2v` passes 767,184 checks;
+- `o2v` passes 779,984 checks (767,184 before the shuffle checks);
 - `fast` passes 589,584 checks;
 - `neg` fails all six division and square-root checks.
 

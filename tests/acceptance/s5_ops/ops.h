@@ -55,6 +55,16 @@ void sqrt_f32 (float *c, const float *a, int n);
 void div_f64 (double *c, const double *a, const double *b, int n);
 void sqrt_f64 (double *c, const double *a, int n);
 
+/* Constant shuffles (S5-06's recipes): each is r = shuffle (a, b, sel) with
+   the selector listed here, so the driver checks every lane.  */
+typedef float s5_v16sf __attribute__ ((vector_size (64)));
+typedef int s5_v16si __attribute__ ((vector_size (64)));
+typedef double s5_v8df __attribute__ ((vector_size (64)));
+typedef long s5_v8di __attribute__ ((vector_size (64)));
+#define S5_SHUFFLES(X)                                                          X (id_f32, s5_v16sf, s5_v16si, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15)   X (swz_cdab_f32, s5_v16sf, s5_v16si, 1, 0, 3, 2, 5, 4, 7, 6, 9, 8, 11, 10, 13, 12, 15, 14)   X (swz_dacb_i32, s5_v16si, s5_v16si, 1, 2, 0, 3, 5, 6, 4, 7, 9, 10, 8, 11, 13, 14, 12, 15)   X (swz_bbbb_f64, s5_v8df, s5_v8di, 1, 1, 1, 1, 5, 5, 5, 5)                  X (swz_badc_i64, s5_v8di, s5_v8di, 2, 3, 0, 1, 6, 7, 4, 5)                  X (pf_f32, s5_v16sf, s5_v16si, 4, 5, 6, 7, 0, 1, 2, 3, 12, 13, 14, 15, 8, 9, 10, 11)   X (pf_f64, s5_v8df, s5_v8di, 6, 7, 4, 5, 2, 3, 0, 1)                        X (pshufd_i32, s5_v16si, s5_v16si, 3, 2, 1, 0, 7, 6, 5, 4, 11, 10, 9, 8, 15, 14, 13, 12)   X (pshufd_f64, s5_v8df, s5_v8di, 0, 0, 2, 2, 4, 4, 6, 6)                    X (align_i32, s5_v16si, s5_v16si, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18)   X (align_f64, s5_v8df, s5_v8di, 1, 2, 3, 4, 5, 6, 7, 0)                     X (blend_f32, s5_v16sf, s5_v16si, 0, 17, 2, 19, 4, 21, 6, 23, 8, 25, 10, 27, 12, 29, 14, 31)   X (perm1_f32, s5_v16sf, s5_v16si, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0)   X (perm1_i64, s5_v8di, s5_v8di, 3, 0, 7, 2, 5, 1, 6, 4)                     X (perm2_f32, s5_v16sf, s5_v16si, 0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30)   X (perm2_i64, s5_v8di, s5_v8di, 0, 2, 4, 6, 8, 10, 12, 14)
+#define S5_SHUF_DECL(NAME, T, IT, ...) void shuf_##NAME (T *r, const T *a, const T *b);
+S5_SHUFFLES (S5_SHUF_DECL)
+
 /* 1 if loops.c was built with -ffast-math.  */
 extern const int s5_ops_fast_math;
 

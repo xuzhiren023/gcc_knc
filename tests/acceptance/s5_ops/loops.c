@@ -110,3 +110,6 @@ void div_f64 (double *R c, const double *R a, const double *R b, int n)
 { for (int i = 0; i < n; i++) c[i] = UPD (a[i] / b[i]); }
 void sqrt_f64 (double *R c, const double *R a, int n)
 { for (int i = 0; i < n; i++) c[i] = UPD (__builtin_sqrt (a[i])); }
+
+#define S5_SHUF_DEF(NAME, T, IT, ...)                                           void shuf_##NAME (T *r, const T *a, const T *b)                               { *r = __builtin_shuffle (*a, *b, (IT) { __VA_ARGS__ }); }
+S5_SHUFFLES (S5_SHUF_DEF)

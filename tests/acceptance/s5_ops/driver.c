@@ -434,6 +434,10 @@ main (void)
       if (!sentinels_ok (C, z, 8 * n)) fail ("inter_f32 wrote outside", n, -1, o);
     }
 
+  /* Constant shuffles: every lane of r must be lane sel[i] of a:b.  */
+#define S5_SHUF_CHECK(NAME, T, IT, ...)                                         {                                                                               static const int sel[] = { __VA_ARGS__ };                                     enum { N = sizeof sel / sizeof sel[0], E = sizeof (T) / N };                  static T va, vb, vr;                                                          unsigned char *pa = (unsigned char *) &va, *pb = (unsigned char *) &vb;      for (int rep = 0; rep < 64; rep++)                                              {                                                                               for (unsigned k = 0; k < sizeof (T); k++)                                       { pa[k] = (unsigned char) rnd (); pb[k] = (unsigned char) rnd (); }         int n = rep, o = 0, where = 0;                                                SET_CASE ("shuf_" #NAME);                                                     shuf_##NAME (&vr, &va, &vb);                                                  for (int i = 0; i < N; i++, checks++)                                           {                                                                               const unsigned char *src = sel[i] < N ? pa + sel[i] * E                                                             : pb + (sel[i] - N) * E;                if (memcmp ((unsigned char *) &vr + i * E, src, E))                             fail ("shuf_" #NAME, n, i, o);                                            }                                                                         }                                                                         }
+  S5_SHUFFLES (S5_SHUF_CHECK)
+
   /* Reductions.  */
   CHECK_RED (int, "sum_i32", ibits, sum_i32 (a, n), 0, r = (int) ((unsigned) r + (unsigned) a[i]))
   CHECK_RED (long, "sum_i64", lbits, sum_i64 (a, n), 0,
