@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-05 11:23.
+Updated automatically at every ticket change. Last update: 2026-11-05 11:40.
 
-**Next: the tech lead, on S5-08.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: GPT-6.1, on S5-08 (KNC same-width conversions: int32/uint32 to and from float as single vcvtfxpnt instructions (the ADR-0008 named-insn exception)).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
 Current tickets: `[#################---]` 83 of 93
 
@@ -104,7 +104,7 @@ Current tickets: `[#################---]` 83 of 93
 | S5-05 | knc_lint accepts the decoded %ymm source of vcvtdq2pd, vcvtudq2pd and vcvtps2pd | Done | knc_lint no longer rejects correct vcvtdq2pd, vcvtudq2pd and vcvtps2pd, whose 8-lane register source objdum... |
 | S5-06 | KNC vec_perm_const: reversed, stride-2 and interleaved loops vectorize with swizzle, vpermf32x4, vpshufd, valignd and vpermd | Done | Reversed, stride-2 and constant-shuffle vector code now uses IMCI permutes (swizzle, vpermf32x4, vpshufd, v... |
 | S5-07 | KNC reductions: vpermf32x4 and swizzle trees for plus, min/max and logic, with no stack accumulator | Done | Integer sum, min/max and logic reductions, and FP sums under -ffast-math, now end in an IMCI vpermf32x4 and... |
-| S5-08 | KNC same-width conversions: int32/uint32 to and from float as single vcvtfxpnt instructions (the ADR-0008 named-insn exception) | Question for the tech lead | Blocked by condition-only scope: VF1 (sse.md:436-437) ANDs TARGET_AVX512F into floatv16siv16sf2. insn-flags... |
+| S5-08 | KNC same-width conversions: int32/uint32 to and from float as single vcvtfxpnt instructions (the ADR-0008 named-insn exception) | In progress | Yes. ADR-0008 point 5 is amended (commit on main): floatv16siv16sf2 alone may use VF1_KNC, defined in imci.... |
 | S5-09 | Card probe of vrcp23ps, vrsqrt23ps and vgetmant (S5-03 P1a-e), to back the division and square-root proofs | Done | A card probe now measures vrcp23ps and vrsqrt23ps against the error bounds the FP32 division and square-roo... |
 | S5-10 | Correctly rounded FP32 vector square root for V16SF (S5-03 ticket A) | Not started |  |
 | S5-11 | Correctly rounded FP32 vector division for V16SF, with cond_div (S5-03 ticket B) | Not started |  |
@@ -118,6 +118,7 @@ Current tickets: `[#################---]` 83 of 93
 
 ## Recent activity
 
+- 2026-11-05 11:40 **S5-08** lead answer: Yes. ADR-0008 point 5 is amended (commit on main): floatv16siv16sf2 alone may use VF1_KNC, defined in imci.md and identical to VF1 except that V16S...
 - 2026-11-05 11:23 **S5-08** engineer ask: Blocked by condition-only scope: VF1 (sse.md:436-437) ANDs TARGET_AVX512F into floatv16siv16sf2. insn-flags.h:2594 confirms it; read-rtl.cc:635-660...
 - 2026-11-05 11:17 **S5-07** lead approve: Integer sum, min/max and logic reductions, and FP sums under -ffast-math, now end in an IMCI vpermf32x4 and swizzle tree instead of a stack-held ve...
 - 2026-11-05 11:14 **S5-07** engineer submit: GCC 3d56ebf9475: incremental build, T0/T1/T2 PASS. s5_ops README variants and s4_masks o2v/o3 build; native exactness pending lead. Torture O0 iden...
@@ -125,16 +126,15 @@ Current tickets: `[#################---]` 83 of 93
 - 2026-11-05 10:35 **S5-07** engineer escalate: budget: 4 engineer sessions used; the budget is 4
 - 2026-11-05 10:34 **S5-07** lead answer: Fixed by the owner: every file in .work/_shared/gcc-build is now owned by CodexSandboxOffline, as in Sprints 3 and 4. Rerun tools/gcc_build.py --if...
 - 2026-11-05 10:29 **S5-07** engineer ask: Build still fails before compilation: echo timestamp > gcc/s-mddeps: Permission denied. ls now reports CodexSandboxOffline owner, mode 0644; id mat...
-- 2026-11-05 10:26 **S5-07** lead answer: Fixed by the owner: the explicit CodexSandboxUsers DENY entries are removed from files xuzhi owns in gcc-build and the GCC checkout (s-mddeps now a...
 
 ## Cost
 
 - From the script, engineer: 192 sessions, 450.4M input tokens
 - From the script, lead: 184 sessions, 58.7M input tokens
-- Started by hand, Claude: 9 sessions, 872.8M input tokens
+- Started by hand, Claude: 9 sessions, 875.1M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 16.5 GiB of 100 GiB. 201 GiB free on the drive.
+The project uses 16.5 GiB of 100 GiB. 199 GiB free on the drive.
