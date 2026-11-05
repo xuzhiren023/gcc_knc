@@ -155,6 +155,7 @@ Last updated: 2026-11-04 10:30, Sprint 3. Merged: S3-01 to S3-08, S3-10 to S3-24
 ## Card
 
 Approved by the owner on 2026-11-01. Since 2026-11-03 the card is shared with the other project's
+**HOLD (owner, 2026-11-04 ~23:00): run no card job without the owner's agreement; another project is using the card.** Queue card checks and ask first.
 agent (`gpt61`), and neither needs it exclusively. Rules: cores 40-59 (owner, 2026-11-04; was 30-59; GPT has 0-39; core 60 is the OS's); 3-4 threads per core for jobs whose layout is not fixed, and at least 3 running threads per core summed over our jobs (owner, 2026-11-04; batches run at `-j 80`, 4 threads per core, 96 MiB each, in one packed upload per job, S4-12); our memory budget is 10 GiB, with the 1.5 GB free floor at admission (owner, 2026-11-04: the other project rarely uses more than 7 GB); at most 7 GB, a start and a
 Nice (lead, 2026-11-04, after the owner asked to move our jobs out of NICE): measured on the card, our jobs and their parents (`claude-program`, `claude-launch`, `claude-control`, `sshd`) all run at nice 0. The only niced processes are kernel threads; the only busy one is `khugepaged` (nice 19, 4,615 ticks), which merges huge pages under memory load. It is card-global, so we leave it alone.
 finish line per job in `C:/Users/xuzhi/Documents/card-coordination/jobs.jsonl`, files under
