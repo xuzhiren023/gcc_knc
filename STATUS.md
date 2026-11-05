@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-05 13:25.
+Updated automatically at every ticket change. Last update: 2026-11-05 13:27.
 
-**Next: the tech lead, on S5-19.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: GPT-6.1, on S5-10 (Correctly rounded FP32 vector square root for V16SF (S5-03 ticket A)).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
 Current tickets: `[#################---]` 84 of 94
 
@@ -115,10 +115,11 @@ Current tickets: `[#################---]` 84 of 94
 | S5-16 | KNC byte and word data: V16QI/V16HI transport modes, widening up-converting loads and narrowing down-converting stores | Not started |  |
 | S5-17 | Sprint 5 mid batch check after S5-06, S5-07 and S5-08 | Not started |  |
 | S5-18 | Final Sprint 5 batch check at the sprint head | Not started |  |
-| S5-19 | card_run shares cores with the PhiWeather session - compact per-job core claims from the ledger, and round-robin turns for benchmark jobs | Waiting for review | Red-first bad386e failed on missing options, fixed claims and absent queue admission. Added compact descend... |
+| S5-19 | card_run shares cores with the PhiWeather session - compact per-job core claims from the ledger, and round-robin turns for benchmark jobs | Changes requested | One deadlock: for --benchmark, core_ready requires 'not active', and active includes live queued rows. If b... |
 
 ## Recent activity
 
+- 2026-11-05 13:27 **S5-19** lead changes: One deadlock: for --benchmark, core_ready requires 'not active', and active includes live queued rows. If both projects queue a benchmark, our job ...
 - 2026-11-05 13:24 **S5-19** engineer submit: Red-first bad386e failed on missing options, fixed claims and absent queue admission. Added compact descending ledger core claims, explicit layouts...
 - 2026-11-05 12:55 **S5-08** lead approve: Int32/uint32 to float and float to int32/uint32 loops now vectorize as single IMCI vcvtfxpnt instructions with C truncation and IEEE flags, through...
 - 2026-11-05 12:53 **S5-08** engineer submit: GCC 3257a87cd94: wrapped --if-stale build, T0/T1/T2, four README s5_ops builds/lint PASS; both requested loops vectorize. Native pending lead; x86 ...
@@ -126,13 +127,12 @@ Current tickets: `[#################---]` 84 of 94
 - 2026-11-05 11:48 **S5-08** engineer ask: Prescribed repair fails: Cygwin chmod u+rw returns Permission denied on 51 owned files (gcc/s-mddeps, mddeps.mk, build/genrecog.exe, etc.). Correct...
 - 2026-11-05 11:45 **S5-08** lead answer: You own s-mddeps, so you can fix its mode yourself. From the Cygwin shell, give yourself write on every file you own in the build tree that lacks i...
 - 2026-11-05 11:44 **S5-08** engineer ask: GCC a5172583247 committed approved conversions. Wrapped gcc_build.py --if-stale failed before compiling: /bin/sh: s-mddeps: Permission denied. Shar...
-- 2026-11-05 11:40 **S5-08** lead answer: Yes. ADR-0008 point 5 is amended (commit on main): floatv16siv16sf2 alone may use VF1_KNC, defined in imci.md and identical to VF1 except that V16S...
 
 ## Cost
 
 - From the script, engineer: 196 sessions, 458.3M input tokens
 - From the script, lead: 184 sessions, 58.7M input tokens
-- Started by hand, Claude: 9 sessions, 928.3M input tokens
+- Started by hand, Claude: 9 sessions, 932.0M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
