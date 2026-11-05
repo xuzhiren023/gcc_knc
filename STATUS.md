@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-05 13:31.
+Updated automatically at every ticket change. Last update: 2026-11-05 13:54.
 
-**Next: the tech lead, on S5-19.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: the tech lead, on S5-10.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[#################---]` 84 of 94
 
@@ -106,7 +106,7 @@ Current tickets: `[#################---]` 84 of 94
 | S5-07 | KNC reductions: vpermf32x4 and swizzle trees for plus, min/max and logic, with no stack accumulator | Done | Integer sum, min/max and logic reductions, and FP sums under -ffast-math, now end in an IMCI vpermf32x4 and... |
 | S5-08 | KNC same-width conversions: int32/uint32 to and from float as single vcvtfxpnt instructions (the ADR-0008 named-insn exception) | Done | Int32/uint32 to float and float to int32/uint32 loops now vectorize as single IMCI vcvtfxpnt instructions w... |
 | S5-09 | Card probe of vrcp23ps, vrsqrt23ps and vgetmant (S5-03 P1a-e), to back the division and square-root proofs | Done | A card probe now measures vrcp23ps and vrsqrt23ps against the error bounds the FP32 division and square-roo... |
-| S5-10 | Correctly rounded FP32 vector square root for V16SF (S5-03 ticket A) | In progress |  |
+| S5-10 | Correctly rounded FP32 vector square root for V16SF (S5-03 ticket A) | Question for the tech lead | Submit refuses 704 changed lines vs budget 500. Required E3 model, native exhaustive checker and torture/ac... |
 | S5-11 | Correctly rounded FP32 vector division for V16SF, with cond_div (S5-03 ticket B) | Not started |  |
 | S5-12 | KNC float/double-width conversions: vcvtps2pd, vcvtpd2ps, vcvtdq2pd, vcvtfxpntpd2dq with vpermf32x4 halves | Not started |  |
 | S5-13 | KNC 16-lane gather and scatter: vgatherdps/vpgatherdd and the scatter forms in a jknzd loop, through the optabs | Not started |  |
@@ -119,6 +119,7 @@ Current tickets: `[#################---]` 84 of 94
 
 ## Recent activity
 
+- 2026-11-05 13:54 **S5-10** engineer ask: Submit refuses 704 changed lines vs budget 500. Required E3 model, native exhaustive checker and torture/acceptance runner are implemented. Host ch...
 - 2026-11-05 13:30 **S5-19** engineer submit: Fixed benchmark deadlock: only open start rows block exclusive core admission; queued rows compete through their_turn. Regression covers both queue...
 - 2026-11-05 13:27 **S5-19** lead changes: One deadlock: for --benchmark, core_ready requires 'not active', and active includes live queued rows. If both projects queue a benchmark, our job ...
 - 2026-11-05 13:24 **S5-19** engineer submit: Red-first bad386e failed on missing options, fixed claims and absent queue admission. Added compact descending ledger core claims, explicit layouts...
@@ -126,16 +127,15 @@ Current tickets: `[#################---]` 84 of 94
 - 2026-11-05 12:53 **S5-08** engineer submit: GCC 3257a87cd94: wrapped --if-stale build, T0/T1/T2, four README s5_ops builds/lint PASS; both requested loops vectorize. Native pending lead; x86 ...
 - 2026-11-05 12:00 **S5-08** lead answer: Fixed: the lead deleted the 51 generated files your user could not write (gen* tools and objects, insn-* outputs, tm-preds.h, gtype.state, mddeps.m...
 - 2026-11-05 11:48 **S5-08** engineer ask: Prescribed repair fails: Cygwin chmod u+rw returns Permission denied on 51 owned files (gcc/s-mddeps, mddeps.mk, build/genrecog.exe, etc.). Correct...
-- 2026-11-05 11:45 **S5-08** lead answer: You own s-mddeps, so you can fix its mode yourself. From the Cygwin shell, give yourself write on every file you own in the build tree that lacks i...
 
 ## Cost
 
 - From the script, engineer: 197 sessions, 458.8M input tokens
 - From the script, lead: 184 sessions, 58.7M input tokens
-- Started by hand, Claude: 9 sessions, 933.0M input tokens
+- Started by hand, Claude: 9 sessions, 947.1M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 16.7 GiB of 100 GiB. 200 GiB free on the drive.
+The project uses 16.7 GiB of 100 GiB. 198 GiB free on the drive.
