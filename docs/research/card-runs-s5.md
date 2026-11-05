@@ -63,3 +63,24 @@ references on hardware, not new compiler work.
   - **The unaligned `vloadunpackl/hd` and `vpackstorel/hd` `{uint8}` pairs fault at a page end**
     even for a 16-byte stream: the h half touches the next line (`phase=1`). Any compiler use must
     guard the h half, as S4-14 does.
+
+## 2026-11-05: S5-06 merged, S5-09 estimate probe
+
+GCC `knc` `5554500ffb7` (the S5-06 merge), `cc1` `147c34fe5b78…`. All 16 shuffle recipes and the
+reversed and stride-2 kernels are vectorized. `s5_ops` passes:
+- `o2v`: 779,984 checks (`claude-e82e58aa…`);
+- `o3`: 779,984 checks (`claude-21bfeac6…`);
+- `fast`: 602,384 checks (`claude-13b9c1b8…`).
+
+That includes every lane of every shuffle recipe against its selector. `s4_masks` still passes
+1,589,070 checks at `-O2 -ftree-vectorize` (`claude-91bbb9cd…`) and `-O3` (`claude-375c5e45…`).
+
+**S5-09 estimate probe** (`tests/regress/knc-estimate-probe.c`, `claude-6b23d83b…`), all items `ok`:
+- `vrcp23ps`: the maximum error over all 2^23 significands is 0.8991 ulp, under the manual's 0.912.
+- `vrsqrt23ps`: the maximum over all 2^24 values in [1/2,2) is 0.7123 ulp, under 0.775. So the
+  FP32 division and square-root proofs (S5-03) hold for this hardware.
+- `vgetmantps`/`vgetmantpd` normalize subnormal inputs with DAZ=0, as the manual's prose says,
+  not as its pseudocode reads (1,024 and 1,952 cases).
+- A masked-off lane raises no flag: no #Z for `rcp(0)`, and no #I for `rsqrt(-1)` or an sNaN.
+- `vrcp23ps(0x3FFFFFFF)` returns `0x3F000001`, round to nearest. So S5-03's step 15 is not needed
+  on this part; the sequence keeps it anyway, because the proof must not rely on that.
