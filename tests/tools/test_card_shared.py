@@ -116,6 +116,9 @@ class SharedTransport:
             raise OSError("fake wait budget exhausted")
 
 
+EXISTING = "claude-" + "0" * 32  # S5-04: legacy rows count as ours by this job ID shape.
+
+
 class SharedCardRules(unittest.TestCase):
     def setUp(self):
         self.runner = runpy.run_path(str(ROOT / "tools/card_run"))
@@ -388,7 +391,7 @@ class SharedCardRules(unittest.TestCase):
         self.assertEqual(len(self.events("execute")), 1)
 
     def test_aggregate_reservations_wait_and_reread_ledger(self):
-        active = dict(agent="claude", jobId="claude-existing", event="start",
+        active = dict(agent="claude", jobId=EXISTING, event="start",
                       memoryLimitMiB=9600, cores=[31], startTime="2099-01-01T00:00:00Z",
                       expectedEnd="2099-01-01T00:01:00Z")
         self.ledger.write_text(json.dumps(active) + "\n", encoding="utf8")
@@ -396,7 +399,7 @@ class SharedCardRules(unittest.TestCase):
 
         def finish_existing():
             with self.ledger.open("a", encoding="utf8") as stream:
-                stream.write(json.dumps(dict(agent="claude", jobId="claude-existing",
+                stream.write(json.dumps(dict(agent="claude", jobId=EXISTING,
                                              event="finish")) + "\n")
         self.transport.on_wait = finish_existing
         self.invoke()

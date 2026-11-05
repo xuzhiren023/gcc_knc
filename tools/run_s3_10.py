@@ -16,25 +16,33 @@ PROJECT = ROOT.parent.parent if ROOT.parent.name == '.work' else ROOT
 OUT = PROJECT / '.work/_shared/tmp/S3-10'
 
 
+def file_list_for(out, name):
+    """The torture row stages its list and every program in it as one pack (--file-list, S4-12)."""
+    names = [name] + [line.split()[0] for line in (out / name).read_text().splitlines()]
+    packed = out / (name + '.files')
+    packed.write_text(''.join('%s\n' % (out / n) for n in names), encoding='utf8')
+    return packed
+
+
+def card_argv(cfg, program, arguments, file_list=None):
+    argv = [str(ROOT / 'tools/card_run'), '--config', str(cfg), '--timeout', '900', '--transport-timeout', '900']
+    if file_list:
+        argv += ['--file-list', str(file_list)]
+    return argv + [str(program), *arguments]
+
+
 def main():
     lines = (OUT / 'batch.txt').read_text().splitlines()
     rows = list(csv.DictReader((line for line in lines if not line.startswith('#')), delimiter='\t'))
     if sys.argv[1:2] == ['--one']:
-        # Stay in-process for card_run: 1661 --file paths exceed Windows argv.
+        # Stay in-process for card_run; the torture row's files go in one --file-list.
         row = next(r for r in rows if r['program'] == sys.argv[2])
         config = json.loads((PROJECT / 'config/card.local.json').read_text())
         config['memoryMB'] = int(row['memoryMB'])
         cfg = OUT / 'card-job.json'
         cfg.write_text(json.dumps(config), encoding='utf8')
-        files = []
-        if row['program'] == 'claude-torture':
-            files = [OUT / 'claude-torture.list'] + [OUT / line.split()[0] for line in
-                      (OUT / 'claude-torture.list').read_text().splitlines()]
-        sys.argv = [str(ROOT / 'tools/card_run'), '--config', str(cfg),
-                    '--timeout', '900', '--transport-timeout', '900']
-        for path in files:
-            sys.argv.extend(['--file', str(path)])
-        sys.argv.extend([str(OUT / row['program']), *json.loads(row['arguments'])])
+        file_list = file_list_for(OUT, 'claude-torture.list') if row['program'] == 'claude-torture' else None
+        sys.argv = card_argv(cfg, OUT / row['program'], json.loads(row['arguments']), file_list)
         try:
             return runpy.run_path(str(ROOT / 'tools/card_run'))['main']()
         finally:
