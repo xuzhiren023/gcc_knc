@@ -1,10 +1,10 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-05 01:11.
+Updated automatically at every ticket change. Last update: 2026-11-05 07:58.
 
-All current tickets are done. The tech lead plans the next sprint.
+**Next: GPT-6.1, on S5-01 (Gather, scatter, permutes, reductions and FP min/max on KNC: GCC 16 entry points, IMCI forms, fault footprint (ADR-0008 input)).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
-Current tickets: `[####################]` 75 of 75
+Current tickets: `[##################--]` 75 of 79
 
 ## Milestones
 
@@ -12,7 +12,7 @@ Current tickets: `[####################]` 75 of 75
 |---|---|---|---|
 | M0 | Foundation | In progress | 17 of 17 tickets |
 | M1 | Mixed native code | Done | 43 of 43 tickets |
-| M2 | Useful vector target | In progress | 15 of 15 tickets |
+| M2 | Useful vector target | In progress | 15 of 19 tickets |
 | M3 | Runtimes | Not started | Not planned in detail yet |
 | M4 | Broad optimization | Not started | Not planned in detail yet |
 | M5 | Program corpus | Not started | Not planned in detail yet |
@@ -97,6 +97,10 @@ Current tickets: `[####################]` 75 of 75
 | S4-12 | card_run stages a whole batch in one upload, so card cores are busy instead of waiting on SSH | Done | card_run can now ship a whole batch of programs in one packed upload, unpacked on the card by a small check... |
 | S4-13 | Rebuild the x86 check's trees under the current user and run the x86 comparison at the knc head | Done | The x86 check now runs under this user from .work/_shared/portability-claude, and at the S4-04 head x86 ass... |
 | S4-14 | Misaligned masked access: a guarded aligned split in KNC maskload/maskstore, tested | Done | Misaligned conditional loads and stores now use a guarded split into at most two aligned masked moves plus ... |
+| S5-01 | Gather, scatter, permutes, reductions and FP min/max on KNC: GCC 16 entry points, IMCI forms, fault footprint (ADR-0008 input) | In progress |  |
+| S5-02 | Int and FP conversions, and memory up/down conversions for byte and word data on KNC (ADR-0008 input) | Not started |  |
+| S5-03 | Correctly rounded vector division and square root for V16SF and V8DF: sequences, proof plan, test plan (ADR-0003 point 4 input) | Not started |  |
+| S5-04 | card_run shares the card with the PhiWeather tuning session: project tag, own-budget count, timed-job refusal, staging limit, packed S3-10 batch | Not started |  |
 
 ## Recent activity
 
@@ -113,10 +117,10 @@ Current tickets: `[####################]` 75 of 75
 
 - From the script, engineer: 186 sessions, 441.0M input tokens
 - From the script, lead: 184 sessions, 58.7M input tokens
-- Started by hand, Claude: 9 sessions, 771.2M input tokens
+- Started by hand, Claude: 9 sessions, 780.5M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 16.2 GiB of 100 GiB. 214 GiB free on the drive.
+The project uses 16.2 GiB of 100 GiB. 209 GiB free on the drive.
