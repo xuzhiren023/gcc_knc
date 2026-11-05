@@ -92,6 +92,7 @@ Drafted as tickets S2-01 to S2-08; see [SPRINT-02](sprints/SPRINT-02.md).
 | E6-03 | libgomp with futex; TLS models (native, after S3-14); a single OpenMP runtime in the process; measure `malloc` arena contention at 60-240 threads in an exclusive card window (the PhiWeather project saw a major slowdown from allocator contention) | Deep |
 | E6-04 | MPI Fortran bindings rebuilt or adapted, and common corpus libraries built; old `.mod` files never reused | Deep |
 | E6-05 | IMCI intrinsics header, only for operations with real demand | Standard |
+| E6-07 | GCC generic vectors narrower than 512 bits (`vector_size` 8, 16, 32) passed or returned by value: today a clean "unsupported KNC register ABI mode" error (S2-02; 16 of the torture sweep's 33 compile errors). Check what the donor GCC 5 does, then pass them in memory or GPRs as an ABI decision (ADR) and test against donor objects. Only if corpus code needs it | Deep |
 | E6-06 | libstdc++: exceptions, RTTI, atomics, threads, with coverage measured by its own testsuite and the corpus. Check GCC 16's default C++ standard against corpus code | Standard |
 
 ## E7 Math and broad optimization (S10–S12, Milestone M4)
