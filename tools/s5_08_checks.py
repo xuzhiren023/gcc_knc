@@ -128,9 +128,8 @@ def acceptance():
     lines = (source / 'loops.c').read_text().splitlines()
     for name in ('cvt_i32_f32', 'cvt_u32_f32'):
         start = next(i for i, line in enumerate(lines, 1) if line.startswith('void ' + name + ' '))
-        assert any('loops.c:' + str(i) + ':' in report and '64 byte vectors' in row
-                   for i in range(start, start + 5) for row in report.splitlines()
-                   if 'loops.c:' + str(i) + ':' in row), name + ': not vectorized'
+        assert any('loops.c:' + str(start + 1) + ':' in row
+                   and '64 byte vectors' in row for row in report.splitlines()), name + ': not vectorized'
         print('VECTORIZED ' + name)
     subprocess.run([sys.executable, str(ROOT / 'tools/knc_lint'),
                     *map(str, sorted(dest.glob('*.mic')))], check=True)
