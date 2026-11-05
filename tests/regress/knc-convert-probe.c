@@ -154,15 +154,15 @@ static void special_values(void)
   }
 }
 
-/* imm8 bits 1:0 select rn/rd/ru/rz (pp.161-173); bit 2 is undocumented.
-   Each imm 0-7 runs under each MXCSR.RC, so a result that follows RC when
-   bit 2 is set shows bit 2 means "use MXCSR". */
+/* imm8 bits 1:0 select rn/rd/ru/rz (pp.161-173), whatever MXCSR.RC is.
+   Bit 2 is undocumented, and on the card (lead, 2026-11-05, job
+   claude-63aef1fd...) imm 4 raises SIGILL, so only imm 0-3 run. */
 static void rounding(void)
 {
   static const char *const rc_names[] = { "rn", "rd", "ru", "rz" };
   int op, imm, rc, n;
   for (op = PS2DQ; op <= PD2DQ; op += 2)
-    for (imm = 0; imm < 8; ++imm)
+    for (imm = 0; imm < 4; ++imm)
       for (rc = 0; rc < 4; ++rc) {
         unsigned flags;
         memset(&vin, 0, sizeof vin);

@@ -1,10 +1,19 @@
 # ADR-0008: KNC permutes, reductions, conversions, gather/scatter, FP min/max and byte data
 
 **Status:** Accepted 2026-11-05, from S5-01 (`docs/research/knc-gather-reduce.md`) and S5-02
-(`docs/research/knc-conversions.md`). Points 5 and 6 are conditional on the card probes those
-tickets wrote (`tests/regress/knc-gather-probe.c`, `tests/regress/knc-convert-probe.c`). The
-lead amends this ADR with their results before the gather, scatter, fix_trunc and FP min/max
-tickets start.
+(`docs/research/knc-conversions.md`). **Amended 2026-11-05 with the card probes**
+(`docs/research/card-runs-s5.md`). Every probe-conditional clause below resolved the permissive way:
+- masked-off gather and scatter lanes neither fault nor write;
+- indices are scaled at address width;
+- with duplicate scatter indices, the highest lane wins across re-executions;
+- a resumed gather or scatter completes;
+- `vgmax`/`vgmin` match the manual;
+- float-to-int raises IE for finite out-of-range values;
+- down-converting stores saturate.
+
+So gather/scatter (point 6) and FP min/max (point 3) are built as designed. Vector float-to-int
+is enabled under `-ftrapping-math` too (point 4), and narrowing stores keep the AND (point 7).
+`vcvtfxpnt*` immediates above 3 raise SIGILL, so only 0-3 are used.
 **Decider:** Claude (lead), within Sprint 5 as the owner started it on 2026-11-05. Citations are
 in the two research documents, at `knc` `c759f17f1b9`, and refer to printed pages of
 Intel 327364-001.
