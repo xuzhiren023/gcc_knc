@@ -87,6 +87,12 @@ is an in-order fold. It is legal, but costly (the `s5_ops` baseline).
        their own `TARGET_AVX512F`;
      - (d) a T1 scan shows that none of `vcvtdq2ps`, `vcvttps2dq`, `vcvttps2udq` or `vcvtps2pd`
        is emitted with an x86 spelling under KNC.
+   - **Amended 2026-11-05 (S5-08):** where the insn takes the KNC mode from a shared iterator
+     whose entry ANDs in `TARGET_AVX512F` (for example `VF1` on `floatv16siv16sf2`), that insn
+     alone may switch to an iterator copy `<NAME>_KNC`, defined in `imci.md`. The copy is identical
+     to the upstream iterator except that the KNC mode's entry adds `|| TARGET_KNC`. On x86 it is
+     the same iterator. Rules (a)-(d) still apply, and the next batch check's x86 comparison must
+     show identical output.
    - Any further insn needs an ADR amendment.
 6. **Gather and scatter.**
    - **16-lane** (V16SF, V16SI):
