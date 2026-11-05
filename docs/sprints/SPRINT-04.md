@@ -42,6 +42,7 @@ are Sprint 6 and decide M2.
 | S4-03 | Blends and if-conversion: `vcond_mask` to IMCI masked moves and blends, so `if`, `?:`, `fabs`, `min` and `max` loops vectorize; NaN and signed-zero cases exact (E4-01, part 2) | deep | gcc | S4-02 |
 | S4-04 | V8DI add and sub with the IMCI carry form (`vpaddsetcd`/`vpadcd`), so `long` add loops vectorize | standard | gcc | S4-02, S3-09 |
 | S4-05 | Safe masked tails (E4-04): use a masked vector remainder only where the loop's peel makes every touched 64-byte line part of the array; otherwise keep x87. Lengths 0-65, every element offset, arrays flush against a guard page | deep | gcc | S4-03 |
+| S4-14 | Part B of S4-05 (split 2026-11-04 for speed): misaligned masked access through a guarded aligned split, tested at `-fvect-cost-model=unlimited` | deep | gcc | S4-05 |
 | S4-06 | Batch check after S4-02, S3-09 and S4-03 merge: x86 identical, drill, ICE sweeps at `-O2 -ftree-vectorize` and `-O3`; the lead then runs the card suite | standard | gcc | those three |
 | S4-07 | Final batch check at the sprint head, after S4-04 and S4-05 | standard | gcc | all above |
 | S4-09 | **First in the gcc lane.** Wrong code from S3-06: LRA folds a misaligned load into `vaddps`/`vsubps`/`vmulps` (constraint `m` instead of `Bm`), which faults on the card. Found by `s4_masks` on 2026-11-04 | standard | gcc | |
