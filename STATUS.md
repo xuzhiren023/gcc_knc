@@ -100,7 +100,7 @@ Current tickets: `[##################--]` 75 of 79
 | S5-01 | Gather, scatter, permutes, reductions and FP min/max on KNC: GCC 16 entry points, IMCI forms, fault footprint (ADR-0008 input) | Waiting for review | docs/research/knc-gather-reduce.md answers 1-7 with pages and file:line. Today i386-knc.cc:97 blocks all ga... |
 | S5-02 | Int and FP conversions, and memory up/down conversions for byte and word data on KNC (ADR-0008 input) | Waiting for review | knc-conversions.md answers 1-6. All ten IMCI conversions cover the C casts; pd2ps/pd2dq zero lanes 8-15. fl... |
 | S5-03 | Correctly rounded vector division and square root for V16SF and V8DF: sequences, proof plan, test plan (ADR-0003 point 4 input) | In progress |  |
-| S5-04 | card_run shares the card with the PhiWeather tuning session: project tag, own-budget count, timed-job refusal, staging limit, packed S3-10 batch | Changes requested | One gap: the timed-job check runs once, before connect. The memory-admission loop then waits up to --timeou... |
+| S5-04 | card_run shares the card with the PhiWeather tuning session: project tag, own-budget count, timed-job refusal, staging limit, packed S3-10 batch | In progress | One gap: the timed-job check runs once, before connect. The memory-admission loop then waits up to --timeou... |
 
 ## Recent activity
 
@@ -117,7 +117,7 @@ Current tickets: `[##################--]` 75 of 79
 
 - From the script, engineer: 186 sessions, 441.0M input tokens
 - From the script, lead: 184 sessions, 58.7M input tokens
-- Started by hand, Claude: 9 sessions, 792.1M input tokens
+- Started by hand, Claude: 9 sessions, 792.4M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
