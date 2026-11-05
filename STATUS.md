@@ -1,10 +1,10 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-04 19:33.
+Updated automatically at every ticket change. Last update: 2026-11-04 19:34.
 
-Nothing can move right now.
+**Next: GPT-6.1, on S4-04 (V8DI add and sub through the IMCI carry form, so long add loops vectorize).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
-Current tickets: `[###################-]` 70 of 73
+Current tickets: `[##################--]` 70 of 74
 
 ## Milestones
 
@@ -12,7 +12,7 @@ Current tickets: `[###################-]` 70 of 73
 |---|---|---|---|
 | M0 | Foundation | In progress | 17 of 17 tickets |
 | M1 | Mixed native code | Done | 43 of 43 tickets |
-| M2 | Useful vector target | In progress | 10 of 13 tickets |
+| M2 | Useful vector target | In progress | 10 of 14 tickets |
 | M3 | Runtimes | Not started | Not planned in detail yet |
 | M4 | Broad optimization | Not started | Not planned in detail yet |
 | M5 | Program corpus | Not started | Not planned in detail yet |
@@ -86,7 +86,7 @@ Current tickets: `[###################-]` 70 of 73
 | S4-01 | Masks on KNC: GCC 16 entry points, IMCI forms, reuse audit and masked-tail design (ADR-0007 input) | Done | The mask design input for Sprint 4 is done: KNC masks are HI for 16-lane and QI for 8-lane vectors, compare... |
 | S4-02 | Vector compares into k masks, mask logic and mask spills for the packed modes | Done | Float, double and int vector compares now produce KNC k masks and vectorize with blends (?: and select loop... |
 | S4-03 | Blends and if-conversion: conditional loops, ?:, fabs, min and max vectorize with masks | Done | Conditional loops now vectorize on KNC: selects and conditional stores on 64-byte aligned arrays through gu... |
-| S4-04 | V8DI add and sub through the IMCI carry form, so long add loops vectorize | draft |  |
+| S4-04 | V8DI add and sub through the IMCI carry form, so long add loops vectorize | In progress |  |
 | S4-05 | Safe masked tails: a masked vector remainder only where every touched line is in the array | draft |  |
 | S4-06 | Batch check after S4-02, S3-09 and S4-03: x86, drill and ICE sweeps at the batch head | Done | Batch check at ae8a033c5f3: no compiler crashes in the -O2 vectorize and -O3 sweeps, 280 shared lines in 68... |
 | S4-07 | Final Sprint 4 batch check at the sprint head | draft |  |
@@ -95,6 +95,7 @@ Current tickets: `[###################-]` 70 of 73
 | S4-10 | pm.py approve merges a GCC ticket without rewriting files in the shared checkout | Done | Approving a GCC ticket no longer rewrites the merged files in the shared GCC checkout, so the next build is... |
 | S4-11 | gcc_build.py refuses a build tree whose mddeps.mk has lost the .md includes | Done | A shared GCC build tree that has lost its .md dependency list is now rebuilt and checked instead of being c... |
 | S4-12 | card_run stages a whole batch in one upload, so card cores are busy instead of waiting on SSH | Done | card_run can now ship a whole batch of programs in one packed upload, unpacked on the card by a small check... |
+| S4-13 | Rebuild the x86 check's trees under the current user and run the x86 comparison at the knc head | Not started |  |
 
 ## Recent activity
 
@@ -111,7 +112,7 @@ Current tickets: `[###################-]` 70 of 73
 
 - From the script, engineer: 186 sessions, 441.0M input tokens
 - From the script, lead: 184 sessions, 58.7M input tokens
-- Started by hand, Claude: 9 sessions, 715.6M input tokens
+- Started by hand, Claude: 9 sessions, 716.3M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
