@@ -22,6 +22,8 @@ DENIED = {
     'monitor', 'mwait', 'sysenter', 'sysexit',
 }
 REGISTERS = re.compile(r'%(?:[xy]mm\d+|mm[0-7])\b', re.I)
+YMM_SOURCE_OK = {'vcvtdq2pd', 'vcvtudq2pd', 'vcvtps2pd'}
+YMM_SOURCE = re.compile(r'((?:%s))\s+%%ymm\d+(?:\{[^}]*\})*(?=,)' % '|'.join(sorted(YMM_SOURCE_OK)))
 INSTRUCTION = re.compile(r'^\s*([0-9a-f]+):\s+((?:[0-9a-f]{2}\s+)+)(.*?)\s*$', re.I)
 SYMBOL = re.compile(r'^\s*[0-9a-f]+ <(.+)>:$', re.I)
 PREFIXES = {'rep', 'repe', 'repz', 'repne', 'repnz', 'lock', 'data16', 'addr32'}
@@ -31,15 +33,18 @@ def is_prefix(word):
     return word in PREFIXES or word == 'rex' or word.startswith('rex.')
 
 
-def forbidden(instruction, raw=()):
+def forbidden(instruction, raw=(), decoded=False):
     # Objdump annotations describe symbols, not instruction operands.
     text = re.sub(r'<[^>]*>', '', instruction.split('#', 1)[0]).lower()
-    if '(bad)' in text or REGISTERS.search(text):
-        return True
     words = text.replace(';', ' ').split()
     prefixes = []
     while words and is_prefix(words[0]):
         prefixes.append(words.pop(0))
+    if decoded and words and words[0] in YMM_SOURCE_OK:
+        # K1OM objdump prints their 8-lane register source as %ymmN (same encoding as %zmmN).
+        text = YMM_SOURCE.sub(r'\1 src', text, count=1)
+    if '(bad)' in text or REGISTERS.search(text):
+        return True
     mnemonic = words[0] if words else ''
     if mnemonic in DENIED or mnemonic.startswith(('cmov', 'fcmov')):
         return True
@@ -94,7 +99,7 @@ def decoded_violations(path, objdump, env, display=None):
             if label:
                 symbol = label[1]
             match = INSTRUCTION.match(line)
-            if match and forbidden(match[3], match[2].lower().split()):
+            if match and forbidden(match[3], match[2].lower().split(), decoded=True):
                 yield member, symbol, '0x' + match[1], match[3]
         process.stdout.close()
         if process.wait():
