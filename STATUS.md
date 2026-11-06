@@ -1,10 +1,10 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-06 08:12.
+Updated automatically at every ticket change. Last update: 2026-11-06 08:20.
 
 **Next: the tech lead, on S6-01.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
-Current tickets: `[##################--]` 97 of 107
+Current tickets: `[##################--]` 98 of 107
 
 ## Milestones
 
@@ -12,7 +12,7 @@ Current tickets: `[##################--]` 97 of 107
 |---|---|---|---|
 | M0 | Foundation | In progress | 17 of 17 tickets |
 | M1 | Mixed native code | Done | 43 of 43 tickets |
-| M2 | Useful vector target | In progress | 37 of 47 tickets |
+| M2 | Useful vector target | In progress | 38 of 47 tickets |
 | M3 | Runtimes | Not started | Not planned in detail yet |
 | M4 | Broad optimization | Not started | Not planned in detail yet |
 | M5 | Program corpus | Not started | Not planned in detail yet |
@@ -121,7 +121,7 @@ Current tickets: `[##################--]` 97 of 107
 | S6-01 | Measurement method on KNC: clock, pinning, thread density, working sets, repetitions and noise (ADR-0010 input) | Question for the tech lead | 85c0b4d adds numeric clocksource/cpufreq records, CPU MHz/TSC flags, and start/end RAW TSC calibration. GCC... |
 | S6-02 | M2 kernels: affine, stencil, short-loop and small-matrix as GCC-KNC vector, x87 and hand-written IMCI builds, with a timing driver | Not started |  |
 | S6-03 | Machine characterization corpus (E5-01): latency and throughput per instruction class at 1-4 threads per core, cache and memory levels | Not started |  |
-| S6-04 | Per-loop KNC reports (E5-03): vector factor, peel and tail choice, masks, helper calls, spills and rejection reasons | Waiting for review | Submitted by the lead on the engineer's behalf (token budget exhausted after the work was done). Engineer's... |
+| S6-04 | Per-loop KNC reports (E5-03): vector factor, peel and tail choice, masks, helper calls, spills and rejection reasons | Done | With -fopt-info-vec, KNC now reports each costed loop candidate: vector mode and factor, scalar peel, maske... |
 | S6-05 | -mtune=knc costs and vectorizer cost model v1 from the characterization tables (E5-09, E5-02) | Not started |  |
 | S6-06 | KNC scheduler v0 (E5-05): U/V pipes, 4-cycle vector latency, 3-cycle AGI | Not started |  |
 | S6-07 | First gcc.dg/vect baseline for KNC: compile scans on the host, execution on the card | Done | The gcc.dg/vect suite now has a KNC baseline: of 2,001 tests, 1,329 compile (777 linked for the card), 632 ... |
@@ -132,6 +132,7 @@ Current tickets: `[##################--]` 97 of 107
 
 ## Recent activity
 
+- 2026-11-06 08:20 **S6-04** lead approve: With -fopt-info-vec, KNC now reports each costed loop candidate: vector mode and factor, scalar peel, masked or scalar epilogue with the rejection ...
 - 2026-11-06 08:12 **S6-04** engineer submit: Submitted by the lead on the engineer's behalf (token budget exhausted after the work was done). Engineer's last report: build, T0 52, T1/T2 and th...
 - 2026-11-06 08:12 **S6-04** owner decide: Lead, under the owner's delegation: no further engineer session; the work is complete and the lead submits it to save tokens.
 - 2026-11-06 08:11 **S6-04** engineer escalate: budget: 7324487 input tokens used; the budget is 6000000
@@ -139,13 +140,12 @@ Current tickets: `[##################--]` 97 of 107
 - 2026-11-06 08:10 **S6-04** engineer ask: Checks pass: build; T0 52; existing T1/T2; four report scans. Torture 4006 match except verified gcov time stamp. Logs .work/_state/logs/S6_04_*.lo...
 - 2026-11-06 08:06 **S6-07** lead approve: The gcc.dg/vect suite now has a KNC baseline: of 2,001 tests, 1,329 compile (777 linked for the card), 632 are skipped for target selectors, 24 giv...
 - 2026-11-06 07:57 **S6-07** engineer submit: 7e477e9 retains both double-reduc originals, explicitly not reduced, per lead answer. All 16 ICEs listed with reproducers. Prior checks: parser red...
-- 2026-11-06 07:55 **S6-01** engineer ask: 85c0b4d adds numeric clocksource/cpufreq records, CPU MHz/TSC flags, and start/end RAW TSC calibration. GCC16 build + assembly/ELF lint PASS; logs:...
 
 ## Cost
 
 - From the script, engineer: 236 sessions, 567.9M input tokens
 - From the script, lead: 185 sessions, 58.8M input tokens
-- Started by hand, Claude: 9 sessions, 1132.9M input tokens
+- Started by hand, Claude: 9 sessions, 1134.0M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
