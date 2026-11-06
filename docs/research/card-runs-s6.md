@@ -139,3 +139,30 @@ headlines, to be confirmed at 2 and 4 threads before `knc-characterization.md` i
   the `gcc.dg/vect` run baseline is **777 of 777**.
 - S6-11 card checks at GCC `knc` after S6-11: `vect-fmax-3` and `vect-fmin-3` exit 0; `s4_masks`
   `o2v` and `o3` each 1,589,070 checks, 0 failures.
+
+## 2026-11-06: placement test (page-aligned, staggered buffers), 21:18-21:25Z
+
+`.work/_shared/tmp/claude-s6-placement/`: correctness negative (affine_f32 154 failing cases, others
+0) and positive (all 0) as expected. Launches 4 and 5 were refused by the driver (`--launch` accepts
+1-3), so three launches per length:
+
+| Length | Build | Launch 1 | Launch 2 | Launch 3 | Range / median |
+|---|---|---|---|---|---|
+| 1024 | x87 | 0.10398 | 0.10399 | 0.10403 | 0.0% |
+| 1024 | GCC-KNC | 0.00893 | 0.00880 | 0.00898 | 2.0% |
+| 1024 | IMCI | 0.00582 | 0.00597 | 0.00586 | 2.5% |
+| 4096 (L2) | x87 | 0.13752 | 0.13821 | 0.13701 | 0.9% |
+| 4096 (L2) | GCC-KNC | 0.01478 | 0.01383 | 0.01656 | 18.5% |
+| 4096 (L2) | IMCI | 0.01121 | 0.01373 | 0.01192 | 21.1% |
+
+Gain fraction per launch: 0.63, 0.66, 0.63 at 1024; 0.74, 0.99, 0.69 at 4096.
+
+- Fixed virtual placement removed most of the variation at 1024 (IMCI moved 0.0074-0.0097 before,
+  0.0058-0.0060 now) but **not at the L2 working set**.
+- Huge pages are not available to a user program: a card probe (`claude-hugepage/probe.c`, built
+  with the card's GCC 5) shows THP `[always]`, `madvise(MADV_HUGEPAGE)` returning 0, yet
+  `AnonHugePages` stays 0 kB after touching an aligned 64 MiB region; `nr_hugepages` is 0.
+- So each launch gets different physical 4 KiB pages, and the physically indexed 512 KiB L2 sees
+  different set conflicts. This looks like a property of the card for any user program, not
+  measurement noise: within each launch, groups agree within 2%. Not proven: a run with fixed
+  physical pages would prove it, and needs root to reserve huge pages.
