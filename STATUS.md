@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-06 10:51.
+Updated automatically at every ticket change. Last update: 2026-11-06 10:53.
 
-**Waiting for you:** S6-10. Run `python tools/pm.py inbox`.
+**Next: the tech lead, on S6-05.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[##################--]` 102 of 108
 
@@ -127,12 +127,13 @@ Current tickets: `[##################--]` 102 of 108
 | S6-07 | First gcc.dg/vect baseline for KNC: compile scans on the host, execution on the card | Done | The gcc.dg/vect suite now has a KNC baseline: of 2,001 tests, 1,329 compile (777 linked for the card), 632 ... |
 | S6-08 | Sprint 6 mid batch check after S6-04 and S6-05 | Not started |  |
 | S6-09 | ICE in expand_vec_series_expr: KNC lane-index vectors (VEC_SERIES) for V16SI/V8DI and the FP modes | Done | Loops that build lane-index vectors (VEC_SERIES) now compile on KNC instead of crashing the compiler: 6 of ... |
-| S6-10 | Unrecognizable and unconstrained insns: ffsll's scalar conditional move, and constant -1 into a k register | **Waiting for you** | budget: 10308894 input tokens used; the budget is 6000000 |
+| S6-10 | Unrecognizable and unconstrained insns: ffsll's scalar conditional move, and constant -1 into a k register | In progress | Lead, under the owner's delegation: one focused round, input budget 14M. Root cause found by the lead (RTL ... |
 | S6-11 | ICE in expand_fn_using_insn for FP64 fmax/fmin loops (S5-15 follow-up) | Not started |  |
 | S6-12 | card_run --benchmark refuses while another project's processes still run on the card, whatever the ledger says | Not started |  |
 
 ## Recent activity
 
+- 2026-11-06 10:53 **S6-10** owner decide: Lead, under the owner's delegation: one focused round, input budget 14M. Root cause found by the lead (RTL dumps of vect-63.c): the shared peephole...
 - 2026-11-06 10:51 **S6-10** engineer escalate: budget: 10308894 input tokens used; the budget is 6000000
 - 2026-11-06 10:50 **S6-10** lead answer: 1. T2: the lead caused it; my T2 run for S6-09 rewrote .work/_shared/S5-21/short-vector-O2-*.mic as xuzhi. They are deleted now; T2 rebuilds them. ...
 - 2026-11-06 10:46 **S6-10** engineer ask: After two failed attempts: ffsll passes, but vect-63.c with -O2 -ftree-vectorize -march=knc still reaches cprop_hardreg with (set (reg:HI k1) (cons...
@@ -140,16 +141,15 @@ Current tickets: `[##################--]` 102 of 108
 - 2026-11-06 09:35 **S6-02** engineer submit: Submitted by the lead on the engineer's behalf from the main checkout (the worktree's pm.py predates allow_protected). Fixture at 2d9a63d: bitwise ...
 - 2026-11-06 09:34 **S6-02** lead answer: Reviewed 2d9a63d: the references are now fair (4x unroll, FMA, one tail mask, prefetch). The lead submits from the main checkout, whose pm.py has a...
 - 2026-11-06 09:33 **S6-02** engineer ask: 2d9a63d implements all four reference improvements; suite build and both ELF lints PASS. Log: .work/_state/logs/S6_02_suite_build-20261106-093227.l...
-- 2026-11-06 09:28 **S6-02** lead answer: Submit is unblocked: the ticket now has allow_protected: tests/acceptance/m2_kernels/, and the size and ratio are allowed (--override 'M2 fixture r...
 
 ## Cost
 
 - From the script, engineer: 246 sessions, 592.4M input tokens
 - From the script, lead: 185 sessions, 58.8M input tokens
-- Started by hand, Claude: 9 sessions, 1227.6M input tokens
+- Started by hand, Claude: 9 sessions, 1232.5M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 12.9 GiB of 100 GiB. 136 GiB free on the drive.
+The project uses 12.9 GiB of 100 GiB. 148 GiB free on the drive.
