@@ -27,6 +27,8 @@ PACKED = re.compile(r'\bv(?:addn?|subr?|mul|div|max|min|sqrt|rcp(?:23)?|rsqrt(?:
 # Each entry supplies its CLI help and handlers for the tiers it selects.
 # Imports stay lazy so T0 and source-only selections need no probe modules.
 SELECTIONS = {
+    'loop_reports': ('S6-04 KNC per-loop optimization reports', {
+        't1': lambda runner: runner.t1_sources(runner.source_dir.glob('knc-loop-report-*.c'))}),
     'short_vector_abi': ('S5-21 V16HI stack argument and hidden result pointer', {
         't1': lambda runner: importlib.import_module('scalar_abi').t1_short_vector(runner),
         't2': lambda runner: importlib.import_module('scalar_abi').t2_short_vector(runner)}),
