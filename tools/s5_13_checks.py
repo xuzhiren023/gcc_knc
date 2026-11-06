@@ -34,7 +34,9 @@ def acceptance():
     report = (dest / 'o3.vect').read_text()
     lines = (source / 'loops.c').read_text().splitlines()
     failures = []
-    for name in ('gat_f32', 'gat_i32', 'mgat_f32', 'sca_f32', 'msca_f32'):
+    # S5-13's amended acceptance permits mgat_f32/msca_f32 to stay scalar:
+    # their contiguous masked accesses are misaligned (ADR-0007 point 7).
+    for name in ('gat_f32', 'gat_i32', 'sca_f32'):
         start = next(i for i, line in enumerate(lines, 1)
                      if line.startswith('void ' + name + ' '))
         passed = any('loops.c:' + str(start + 1) + ':' in row
