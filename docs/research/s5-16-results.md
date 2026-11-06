@@ -1,8 +1,8 @@
 # S5-16 implementation and outstanding results
 
-Acceptance is **not yet met**. The first implementation's signed-word-to-float
-scan and two torture ICEs are being corrected after the lead approved exact-size
-spills. No program was run on the card.
+Acceptance is **not met**: T1's literal `64 byte vectors` report scan fails for
+narrow-input loops. All seven instruction scans, including signed-word-to-float,
+and both reduced ICE tests now pass. No program was run on the card.
 
 The implementation adds a separate V16QI/V16HI transport predicate, the related
 mode hook, preferred QI/HI modes, ABI rejection, exact-size transport, converting
@@ -46,6 +46,8 @@ Follow-up commits:
 ## Validation
 
 All commands ran through `tools/run.py`. Logs are under `.work/_state/logs/`.
+The original validation below predates the follow-up fixes; passing checks were
+not repeated.
 
 | Check | Result | Log basename |
 |---|---|---|
@@ -57,22 +59,62 @@ All commands ran through `tools/run.py`. Logs are under `.work/_state/logs/`.
 | s5_ops README builds and lint | PASS, four variants; five existing width-conversion kernels checked vectorized | `s5_16_acceptance-20261106-014703.log` |
 | Byte guard build, instruction checks and lint | PASS; execution pending lead | `s5_16_native-20261106-014703.log` |
 
-Torture's changed functions, with fixed `-O0` and `-O2` options:
+Follow-up validation:
 
-- O0 `pr60502.c`, `foo`: reload ICE, maximum 90 generated reload insns.
-  The short existing reproducer uses a V16QI pointer, an all-ones constant,
-  and `*x |= *x ^ m1`.
+| Check | Result | Log basename |
+|---|---|---|
+| Incremental `gcc_build.py --if-stale` | PASS, 21.1 minutes, clean committed GCC | `s5_16_fix_build-20261106-015900.log` |
+| Failed T1 cases | Both reduced ICE tests PASS; all seven positive instruction scans PASS; first report-width scan FAIL | `s5_16_retry_t1-20261106-022017.log` |
+| Torture after fixes | No new ICEs; runner exits 1 only for the required V16HI ABI rejection at O0/O2 | `s5_16_fixed_torture-20261106-022017.log` |
+
+## Report-width acceptance question
+
+The smallest loop already in the positive test is:
+
+```c
+unsigned char u8[1024] __attribute__((aligned(64)));
+int i32[1024] __attribute__((aligned(64)));
+void i32_u8(void) { for (int i = 0; i < 1024; ++i) i32[i] = u8[i]; }
+```
+
+With `-O2 -ftree-vectorize`, it uses one `vmovdqa32 ...{uint8}, %zmm0`, one
+64-byte `vmovdqa32` store, and advances the byte input by 16. The vectorization
+report says `16 byte vectors and unroll factor 16`. The word-input loops report
+32 bytes; the narrowing stores report 64 bytes. These report widths were also
+present in the earlier diagnostic dump, but the old failing `f_s16` instruction
+scan prevented T1 from reaching its report scans.
+
+`tree-vect-stmts.cc:13592,13661-13662` sets the prevailing mode from the first
+scalar type's preferred SIMD mode. The required QI/HI preferences are V16QI and
+V16HI, respectively. `tree-vectorizer.cc:1020-1028` prints that mode's size,
+not the largest vector type used by the loop. The related-mode hook preserves
+sixteen lanes and produces V16SI/V16SF dword results.
+
+May the report scans require 16/32/64 bytes according to the prevailing input
+mode while keeping the sixteen-element, one-conversion zmm instruction checks,
+or is a different prevailing-mode policy required? The existing scans have not
+been changed: AGENTS.md forbids weakening tests, and the ticket explicitly asks
+for 64 bytes.
+
+## Torture comparison
+
+Final changed functions against the pre-ticket baseline, with fixed `-O0` and
+`-O2` options (2003 sources at each level):
+
+- O0 `pr60502.c`, `bar` and `foo`: changed assembly; reload ICE fixed.
 - O0/O2 `pr70240.c`, `foo`: newly rejected V16HI by-value ABI, as required.
 - O2 `pr113089.c`, `intrapred_chroma_plane`: changed assembly.
 - O2 `pr37713.c`, `add_opush`: changed assembly.
 - O2 `pr60502.c`, `bar` and `foo`: changed assembly.
-- O2 `pr82052.c`, `main` with inlined `fn11`: ICE in
-  `ix86_vector_duplicate_value`, reached from `gen_vec_initv16qiqi`.
+- O2 `pr82052.c`, `main` with inlined `fn11`: changed assembly; constructor ICE
+  fixed.
 
 The complete comparison is `.work/_shared/s5-16/torture-after.txt`; retained
 assembly and diagnostics are in its `before/` and `after/` directories.
-The other original failures have identical diagnostics. The post-change run has
-1940 identical O0 assemblies and 1938 identical O2 assemblies.
+All 61 original O0 failures and 60 original O2 failures have identical
+diagnostics. The final run has 1940 identical O0 assemblies and 1938 identical O2
+assemblies. The only changed failure at either level is `pr70240.c`'s
+`unsupported KNC register ABI mode` diagnostic. No new ICE remains.
 
 Card binaries for the lead, built but **not executed**:
 
