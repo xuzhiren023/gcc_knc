@@ -3,6 +3,7 @@
 `python tools/card_run PROGRAM [ARG ...]` runs a host-built executable on the
 card. The owner rules on ticket S2-11 dated 2026-11-03 supersede S0-04's
 foreign-process refusal and the old external workload lock.
+Card jobs are lead-only; Codex sandbox accounts are refused before admission, so leave built binaries for the lead.
 
 ## Configuration
 

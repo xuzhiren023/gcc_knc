@@ -3,6 +3,7 @@
 import argparse
 from collections import deque
 from datetime import datetime, timedelta, timezone
+import getpass
 import json
 import math
 import os
@@ -212,6 +213,7 @@ def run(program, argv, *, lock_path, external_locks, baseline_names, timeout,
     overlaps = set()
     cpuinfo = None
     queued = False
+    refused_sandbox = False
 
     def failure(kind, code, detail):
         result.update(result_class=kind, exit_code=code, detail=str(detail))
@@ -243,6 +245,10 @@ def run(program, argv, *, lock_path, external_locks, baseline_names, timeout,
         return snap
 
     try:
+        username = os.environ.get("USERNAME") or getpass.getuser()
+        if username.startswith("CodexSandbox"):
+            refused_sandbox = True
+            raise Refused("card jobs are lead-only; leave the binaries for the lead")
         if any(not math.isfinite(n) or n <= 0 for n in (timeout, transport_timeout)):
             raise ValueError("limits must be finite and positive")
         if not isinstance(memory_mb, int) or not 0 < memory_mb <= MEMORY_BUDGET_MIB:
@@ -451,17 +457,18 @@ def run(program, argv, *, lock_path, external_locks, baseline_names, timeout,
             except OSError as error:
                 failure("infrastructure", INFRA_EXIT, "own lock release failed: %s" % error)
     # An optional caller copy must not prevent retaining the job diagnostic.
-    if receipt_path is not None:
+    if receipt_path is not None and not refused_sandbox:
         try:
             receipt_path = Path(receipt_path)
             receipt_path.parent.mkdir(parents=True, exist_ok=True)
             receipt_path.write_text(json.dumps(result, sort_keys=True) + "\n", encoding="utf8")
         except OSError as error:
             failure("infrastructure", INFRA_EXIT, "cannot write result: %s" % error)
-    try:
-        retain_receipt(result)
-    except OSError as error:
-        failure("infrastructure", INFRA_EXIT, "cannot write result: %s" % error)
+    if not refused_sandbox:
+        try:
+            retain_receipt(result)
+        except OSError as error:
+            failure("infrastructure", INFRA_EXIT, "cannot write result: %s" % error)
     return result
 
 
