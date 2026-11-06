@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-06 17:22.
+Updated automatically at every ticket change. Last update: 2026-11-06 17:24.
 
-**Next: the tech lead, on S6-05.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: GPT-6.1, on S6-05 (-mtune=knc costs and vectorizer cost model v1 from the characterization tables (E5-09, E5-02)).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
 Current tickets: `[###################-]` 107 of 112
 
@@ -122,7 +122,7 @@ Current tickets: `[###################-]` 107 of 112
 | S6-02 | M2 kernels: affine, stencil, short-loop and small-matrix as GCC-KNC vector, x87 and hand-written IMCI builds, with a timing driver | Done | The M2 yardstick is ready and correct on the card: FP32/FP64 affine, two stencils, a short loop and 8x8/16x... |
 | S6-03 | Machine characterization corpus (E5-01): latency and throughput per instruction class at 1-4 threads per core, cache and memory levels | Done | A KNC characterization corpus of 104 hand-written measurements is ready to run on the card: latency and thr... |
 | S6-04 | Per-loop KNC reports (E5-03): vector factor, peel and tail choice, masks, helper calls, spills and rejection reasons | Done | With -fopt-info-vec, KNC now reports each costed loop candidate: vector mode and factor, scalar peel, maske... |
-| S6-05 | -mtune=knc costs and vectorizer cost model v1 from the characterization tables (E5-09, E5-02) | Question for the tech lead | GCC 7fdd15cf40a; report d27998c docs/research/knc-costs.md. Two T1 attempts failed; accepted cost scans PAS... |
+| S6-05 | -mtune=knc costs and vectorizer cost model v1 from the characterization tables (E5-09, E5-02) | In progress | All three yes, with these limits. 1) Lowering tests: add -fvect-cost-model=unlimited to the options line of... |
 | S6-06 | KNC scheduler v0 (E5-05): U/V pipes, 4-cycle vector latency, 3-cycle AGI | Not started | back in lane gcc. Tables: `docs/research/knc-characterization.md`. The measured |
 | S6-07 | First gcc.dg/vect baseline for KNC: compile scans on the host, execution on the card | Done | The gcc.dg/vect suite now has a KNC baseline: of 2,001 tests, 1,329 compile (777 linked for the card), 632 ... |
 | S6-08 | Sprint 6 mid batch check after S6-04 and S6-05 | Not started |  |
@@ -137,6 +137,7 @@ Current tickets: `[###################-]` 107 of 112
 
 ## Recent activity
 
+- 2026-11-06 17:24 **S6-05** lead answer: All three yes, with these limits. 1) Lowering tests: add -fvect-cost-model=unlimited to the options line of knc-gather16-f32/-i32/-masked, knc-gath...
 - 2026-11-06 17:21 **S6-05** engineer ask: GCC 7fdd15cf40a; report d27998c docs/research/knc-costs.md. Two T1 attempts failed; accepted cost scans PASS. Same out[i]=in[idx[i]] loop must stay...
 - 2026-11-06 17:10 **S6-05** owner decide: Owner, 2026-11-06: yes, +2 engineer sessions (budget now 6 sessions, 17M input tokens). Continue with the lead's 17:07 answer: cost legacy gathers ...
 - 2026-11-06 17:07 **S6-05** engineer escalate: budget: 4 engineer sessions used; the budget is 4
@@ -144,7 +145,6 @@ Current tickets: `[###################-]` 107 of 112
 - 2026-11-06 17:05 **S6-05** engineer ask: GCC 4698d90a9e0; report 43dc8dd docs/research/knc-costs.md. Build, T0 (52), density scans, T2 PASS. T1 fails gather, reduce-int stack, vec-fold-O3;...
 - 2026-11-06 16:28 **S6-05** lead approve-red: The S6-05 red tests are accepted: a scattered-index gather loop must stay scalar, and a runtime-length double reduction must keep one vector accumu...
 - 2026-11-06 16:27 **S6-05** engineer red: 5e98840: runtime-n reduction, SLP enabled; loop scans require 1 accumulator by default, >=2 with proposed --param=knc-threads-per-core=1. Targeted ...
-- 2026-11-06 16:24 **S6-05** lead answer: FP and integer gather rejections count as one decision, not two. Keep the scattered-index gather test as red decision 1 (table point 5: 16 lines co...
 
 ## Cost
 
