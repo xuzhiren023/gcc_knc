@@ -158,6 +158,7 @@ int main(int argc, char **argv) {
   if (argc == 1 || (argc == 2 && !strcmp(argv[1],"--correctness"))) return correctness();
   if (!strcmp(argv[1],"--benchmark")) return benchmark(argc,argv);
   fprintf(stderr,"Use --correctness or --benchmark --kernel NAME --length N "
-          "--density 1|2|3|4 --cores 1|60 --launch 1|2|3 [--short-length 1..64]\n");
+          "--density 1|2|3|4 --cores 1|60 --launch 1..5 [--short-length 1..64] "
+          "[--warmup-seconds 0..60]\n");
   return 2;
 }

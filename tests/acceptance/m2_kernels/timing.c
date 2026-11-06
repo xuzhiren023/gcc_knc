@@ -1,28 +1,43 @@
 /* ADR-0010: RAW wall makespan, pinned first touch, five (3+21) groups.
-   Only the lead may launch this binary in a card_run --benchmark window. */
+   Only the lead may launch this binary in a card_run --benchmark window.
+   Builds are interleaved round by round inside every group (lead, 2026-11-06,
+   docs/research/m2-noise-diagnosis.md): a regime change on the card then hits
+   all three builds alike, and the gain fraction is taken from same-group medians. */
 #define _GNU_SOURCE
 #include "kernels.h"
 #include <errno.h>
 #include <limits.h>
+#include <math.h>
 #include <pthread.h>
 #include <sched.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/resource.h>
 #include <time.h>
 
 static int cores, density, workers, selected, launch, current_build, stopping;
-static unsigned long length, repetitions = 1;
+static unsigned long length, repetitions = 1, warmup_seconds = 10;
 static int topology[61][4], counts[61];
 static const char *working_set = "boundary";
 static cpu_set_t allowed;
 static pthread_barrier_t barrier;
+static uint64_t program_start;
 struct worker {
   struct buffers buffers;
   uint64_t start, end, ticks;
+  struct rusage before, after;
   int cpu, id;
 } __attribute__((aligned(64)));
 static struct worker data[MAX_WORKERS];
+/* Per-batch straggler diagnostics (lead, 2026-11-06): which worker ended last and
+   how long it ran, the median worker time, the wake-up skew, and whether workers
+   were preempted (involuntary context switches and system time, RUSAGE_THREAD). */
+static struct {
+  uint64_t max_ns, median_ns, skew_ns;
+  unsigned long nivcsw, nivcsw_max, stime_us;
+  int max_worker, nivcsw_worker;
+} last;
 static uint64_t now(void) {
   struct timespec ts;
   if (clock_gettime(CLOCK_MONOTONIC_RAW,&ts)) die("CLOCK_MONOTONIC_RAW unavailable");
@@ -113,39 +128,69 @@ static void *worker_main(void *arg) {
     sync_workers();
     if (stopping) break;
     verify_pin(w->cpu);
+    /* Resource reads sit outside the timed window. */
+    if (getrusage(RUSAGE_THREAD,&w->before)) die("getrusage");
     w->start = now();
     uint64_t t0 = ordered_tsc();
     for (unsigned long r = 0; r < repetitions; ++r)
       invoke(selected,current_build,&w->buffers,length);
     w->ticks = ordered_tsc()-t0;
     w->end = now();
+    if (getrusage(RUSAGE_THREAD,&w->after)) die("getrusage");
     verify_pin(w->cpu);
     sync_workers();
   }
   free_buffers(&w->buffers);
   return NULL;
 }
-static uint64_t batch(void) {
-  sync_workers(); sync_workers();
-  uint64_t first = UINT64_MAX, last = 0;
-  for (int w = 0; w < workers; ++w) {
-    if (data[w].start < first) first = data[w].start;
-    if (data[w].end > last) last = data[w].end;
-  }
-  return last-first;
-}
 static int compare(const void *aa, const void *bb) {
   uint64_t a = *(const uint64_t *)aa, b = *(const uint64_t *)bb;
   return (a>b)-(a<b);
 }
+static unsigned long micros(struct timeval a, struct timeval b) {
+  return (unsigned long)((b.tv_sec-a.tv_sec)*1000000L+(b.tv_usec-a.tv_usec));
+}
+static uint64_t batch(void) {
+  sync_workers(); sync_workers();
+  uint64_t first = UINT64_MAX, last_end = 0, last_start = 0, durations[MAX_WORKERS];
+  /* Local accumulators, stored once: conditional updates of the static struct inside this
+     loop make GCC-KNC 16 (gcc-build of 2026-11-06 17:13) put a loop-store-motion flag in mask
+     register k1 and ICE in cprop_hardreg (lead; reproducer .work/_shared/M2-diag/timing-ice.c). */
+  uint64_t max_ns = 0; int max_worker = 0, nivcsw_worker = 0;
+  unsigned long nivcsw = 0, nivcsw_max = 0, stime_us = 0;
+  for (int w = 0; w < workers; ++w) {
+    if (data[w].start < first) first = data[w].start;
+    if (data[w].start > last_start) last_start = data[w].start;
+    if (data[w].end > last_end) last_end = data[w].end;
+    durations[w] = data[w].end-data[w].start;
+    if (durations[w] > max_ns) { max_ns = durations[w]; max_worker = w; }
+    unsigned long n = (unsigned long)(data[w].after.ru_nivcsw-data[w].before.ru_nivcsw);
+    nivcsw += n;
+    if (n > nivcsw_max) { nivcsw_max = n; nivcsw_worker = w; }
+    stime_us += micros(data[w].before.ru_stime,data[w].after.ru_stime);
+  }
+  qsort(durations,workers,sizeof(*durations),compare);
+  last.max_ns = max_ns; last.max_worker = max_worker;
+  last.nivcsw = nivcsw; last.nivcsw_max = nivcsw_max; last.nivcsw_worker = nivcsw_worker;
+  last.stime_us = stime_us;
+  last.median_ns = durations[workers/2];
+  last.skew_ns = last_start-first;
+  return last_end-first;
+}
 static void sample(const char *phase, int group, int index, uint64_t elapsed) {
   printf("sample kernel=%s build=%s length=%lu threads_per_core=%d cores=%d "
          "cycles_per_element=%.9f repetitions=%lu wall_ns=%llu ns_per_element=%.9f "
-         "phase=%s group=%d sample=%d launch=%d working_set=%s short_length=%u\n",
+         "phase=%s group=%d sample=%d launch=%d working_set=%s short_length=%u "
+         "t_ms=%llu max_worker=%d max_ns=%llu median_ns=%llu skew_ns=%llu "
+         "nivcsw=%lu nivcsw_max=%lu nivcsw_worker=%d stime_us=%lu\n",
          kernels[selected].name,build_names[current_build],length,density,cores,
          (double)data[0].ticks/((double)length*repetitions),repetitions,
          (unsigned long long)elapsed,(double)elapsed/((double)length*workers*repetitions),
-         phase,group,index,launch,working_set,short_length);
+         phase,group,index,launch,working_set,short_length,
+         (unsigned long long)((now()-program_start)/1000000ULL),last.max_worker,
+         (unsigned long long)last.max_ns,(unsigned long long)last.median_ns,
+         (unsigned long long)last.skew_ns,last.nivcsw,last.nivcsw_max,last.nivcsw_worker,
+         last.stime_us);
 }
 static unsigned long number(const char *s) {
   char *end; errno = 0;
@@ -160,8 +205,23 @@ static size_t footprint(unsigned long n) {
   size_t np = selected == 6 ? 256 : selected == 5 ? 128 : 16;
   return (nx+n+32+np)*kernels[selected].bytes;
 }
+/* Round r of a group runs every build once; the starting build rotates with the
+   round, and even launches rotate the other way (the old per-launch alternation). */
+static int build_in_round(int round, int k) {
+  int b = launch%2 ? (round+k)%3 : (2-(round+k)%3);
+  return b;
+}
+static double spread_of(double *v, int n) {
+  double s[5]; int m = n;
+  memcpy(s,v,n*sizeof(*v));
+  for (int i = 1; i < m; ++i) for (int j = i; j > 0 && s[j-1] > s[j]; --j) {
+    double t = s[j]; s[j] = s[j-1]; s[j-1] = t;
+  }
+  return (s[m-1]-s[0])/s[m/2];
+}
 int benchmark(int argc, char **argv) {
   selected = -1;
+  program_start = now();
   for (int i = 2; i < argc; i += 2) {
     if (i+1 == argc) die("missing option value");
     const char *key = argv[i], *value = argv[i+1];
@@ -174,11 +234,14 @@ int benchmark(int argc, char **argv) {
     else if (!strcmp(key,"--launch")) launch = number(value);
     else if (!strcmp(key,"--short-length")) short_length = number(value);
     else if (!strcmp(key,"--working-set")) working_set = value;
+    else if (!strcmp(key,"--warmup-seconds")) warmup_seconds = number(value);
     else die("unknown option");
   }
   if (selected < 0 || (cores != 1 && cores != 60) || density < 1 || density > 4
-      || launch < 1 || launch > 5 || short_length < 1 || short_length > 64)
-    die("require kernel, cores 1|60, density 1..4, launch 1..5, short-length 1..64");
+      || launch < 1 || launch > 5 || short_length < 1 || short_length > 64
+      || warmup_seconds > 60)
+    die("require kernel, cores 1|60, density 1..4, launch 1..5, short-length 1..64, "
+        "warmup-seconds 0..60");
   if (strcmp(working_set,"boundary")) {
     static const unsigned l1[] = {0,1024,512,336,256}, l2[] = {0,16384,8192,5456,4096};
     size_t budget = 0;
@@ -194,13 +257,16 @@ int benchmark(int argc, char **argv) {
   /* Every launch must pass the same full correctness gate before timing. */
   int rc = correctness();
   if (rc) return rc;
+  printf("phase name=correctness_done t_ms=%llu\n",
+         (unsigned long long)((now()-program_start)/1000000ULL));
   workers = cores*density;
   policy("start"); read_topology();
   pin(topology[0][0]);
   printf("configuration kernel=%s length=%lu workers=%d bytes_per_worker=%zu "
          "bytes_per_core=%zu clock=CLOCK_MONOTONIC_RAW cycles=worker0_TSC_diagnostic "
-         "density_comparable=%d\n",kernels[selected].name,length,workers,
-         footprint(length),footprint(length)*density,density != 3);
+         "density_comparable=%d warmup_seconds=%lu interleaved=1\n",kernels[selected].name,
+         length,workers,footprint(length),footprint(length)*density,density != 3,
+         warmup_seconds);
   if (pthread_barrier_init(&barrier,NULL,workers+1)) die("barrier init");
   pthread_t threads[MAX_WORKERS];
   /* The card's stack limit is unlimited, so glibc's default thread stack is huge; 240 of them
@@ -212,12 +278,13 @@ int benchmark(int argc, char **argv) {
   pthread_attr_destroy(&attr);
   sync_workers();
   int noisy = density == 3;
-  for (int order = 0; order < 3; ++order) {
-    current_build = launch%2 ? order : 2-order;
-    /* Grow an initial pilot to >=10 ms, then size a batch for 100 ms.
-       Record even pilot/warmup samples, with their own repetition counts. */
+  unsigned long reps[3];
+  uint64_t elapsed;
+  /* Size every build first: grow a pilot to >=10 ms, then size a batch for 100 ms.
+     Record even pilot samples, with their own repetition counts. */
+  for (int b = 0; b < 3; ++b) {
+    current_build = b;
     repetitions = 1;
-    uint64_t elapsed;
     int pilot = 0;
     do {
       elapsed = batch(); sample("pilot",-1,pilot++,elapsed);
@@ -236,31 +303,78 @@ int benchmark(int argc, char **argv) {
       if (elapsed >= 50000000ULL && elapsed <= 200000000ULL) break;
       if (sizing == 9) die("batch sizing did not settle within 50-200 ms");
     }
-    uint64_t medians[5];
-    for (int g = 0; g < 5; ++g) {
-      for (int r = 0; r < 3; ++r) { elapsed = batch(); sample("warmup",g,r,elapsed); }
-      uint64_t samples[21];
-      for (int r = 0; r < 21; ++r) { samples[r] = batch(); sample("timed",g,r,samples[r]); }
-      qsort(samples,21,sizeof(*samples),compare);
-      medians[g] = samples[10];
-      printf("group kernel=%s build=%s group=%d min_ns=%llu median_ns=%llu max_ns=%llu\n",
-             kernels[selected].name,build_names[current_build],g,
-             (unsigned long long)samples[0],(unsigned long long)samples[10],
-             (unsigned long long)samples[20]);
+    reps[b] = repetitions;
+  }
+  /* Global warm-up: the slow regime of the first seconds after the threads start ended
+     6.2-6.9 s into the first build in every large step seen (lead, 2026-11-06). */
+  uint64_t warm_start = now();
+  for (int round = 0; now()-warm_start < warmup_seconds*1000000000ULL; ++round)
+    for (int k = 0; k < 3; ++k) {
+      current_build = build_in_round(round,k); repetitions = reps[current_build];
+      elapsed = batch(); sample("warmup",-1,round,elapsed);
     }
-    qsort(medians,5,sizeof(*medians),compare);
-    double spread = (double)(medians[4]-medians[0])/medians[2];
+  uint64_t medians[3][5];
+  double gf[5], ratio[5], gcc_x87[5];
+  int gf_defined = 1;
+  for (int g = 0; g < 5; ++g) {
+    uint64_t samples[3][21];
+    for (int round = 0; round < 24; ++round)
+      for (int k = 0; k < 3; ++k) {
+        current_build = build_in_round(round,k); repetitions = reps[current_build];
+        if (round < 3) { elapsed = batch(); sample("warmup",g,round,elapsed); }
+        else { elapsed = batch(); sample("timed",g,round-3,elapsed); samples[current_build][round-3] = elapsed; }
+      }
+    double per_element[3];
+    for (int b = 0; b < 3; ++b) {
+      qsort(samples[b],21,sizeof(**samples),compare);
+      medians[b][g] = samples[b][10];
+      per_element[b] = (double)medians[b][g]/((double)workers*length*reps[b]);
+      printf("group kernel=%s build=%s group=%d min_ns=%llu median_ns=%llu max_ns=%llu\n",
+             kernels[selected].name,build_names[b],g,
+             (unsigned long long)samples[b][0],(unsigned long long)samples[b][10],
+             (unsigned long long)samples[b][20]);
+    }
+    /* Same-group pairing: builds 0 gcc, 1 x87, 2 imci (driver.c). */
+    double s_gcc = per_element[1]/per_element[0], s_imci = per_element[1]/per_element[2];
+    gcc_x87[g] = per_element[0]/per_element[1];
+    ratio[g] = per_element[0]/per_element[2];
+    if (s_imci-1 <= 0) gf_defined = 0;
+    gf[g] = (s_gcc-1)/(s_imci-1);
+    printf("pair kernel=%s group=%d gcc_over_x87=%.6f imci_over_x87=%.6f gcc_over_imci=%.6f "
+           "gain_fraction=%.6f\n",kernels[selected].name,g,gcc_x87[g],per_element[2]/per_element[1],
+           ratio[g],gf[g]);
+  }
+  int sized = 1;
+  double figure[3];
+  for (int b = 0; b < 3; ++b) {
+    uint64_t sorted[5];
+    memcpy(sorted,medians[b],sizeof(sorted));
+    qsort(sorted,5,sizeof(*sorted),compare);
+    double spread = (double)(sorted[4]-sorted[0])/sorted[2];
     /* A launch is valid only if its samples are the protocol's ~100 ms batches. */
-    int sized = medians[2] >= 50000000ULL && medians[2] <= 200000000ULL;
-    if (spread >= 0.02 || !sized) noisy = 1;
+    int build_sized = sorted[2] >= 50000000ULL && sorted[2] <= 200000000ULL;
+    sized = sized && build_sized;
+    figure[b] = (double)sorted[2]/((double)workers*length*reps[b]);
     printf("summary kernel=%s build=%s length=%lu threads_per_core=%d cores=%d "
            "repetitions=%lu median_ns=%llu ns_per_element=%.9f group_spread=%.9f "
            "within_launch_ok=%d launch=%d working_set=%s short_length=%u\n",
-           kernels[selected].name,build_names[current_build],length,density,cores,
-           repetitions,(unsigned long long)medians[2],
-           (double)medians[2]/((double)workers*length*repetitions),spread,
-           spread < 0.02 && sized && density != 3,launch,working_set,short_length);
+           kernels[selected].name,build_names[b],length,density,cores,
+           reps[b],(unsigned long long)sorted[2],figure[b],spread,
+           spread < 0.02 && build_sized && density != 3,launch,working_set,short_length);
   }
+  /* The launch figure (ADR-0010 point 6) and the paired validity rule: the quantity M2 decides
+     on, taken from same-group medians, must agree across the five groups within 2%. */
+  double gf_launch = (figure[1]/figure[0]-1)/(figure[1]/figure[2]-1);
+  double gf_spread = spread_of(gf,5), ratio_spread = spread_of(ratio,5), gcc_x87_max = 0;
+  for (int g = 0; g < 5; ++g) if (gcc_x87[g] > gcc_x87_max) gcc_x87_max = gcc_x87[g];
+  double gate = gf_defined ? gf_spread : ratio_spread;
+  int paired_ok = sized && density != 3 && isfinite(gate) && gate < 0.02;
+  if (!paired_ok) noisy = 1;
+  printf("launch kernel=%s length=%lu threads_per_core=%d cores=%d launch=%d working_set=%s "
+         "short_length=%u gain_fraction=%.6f gain_fraction_defined=%d gain_fraction_spread=%.9f "
+         "gcc_over_imci_spread=%.9f gcc_over_x87_max=%.6f sized=%d paired_ok=%d\n",
+         kernels[selected].name,length,density,cores,launch,working_set,short_length,
+         gf_launch,gf_defined,gf_spread,ratio_spread,gcc_x87_max,sized,paired_ok);
   stopping = 1; sync_workers();
   for (int w = 0; w < workers; ++w) if (pthread_join(threads[w],NULL)) die("pthread_join");
   if (pthread_barrier_destroy(&barrier)) die("barrier destroy");

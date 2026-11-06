@@ -112,9 +112,10 @@ m2-kernels.mic --benchmark --kernel affine_f32 --length 17 --density 4 --cores 6
 m2-kernels.mic --benchmark --kernel short --working-set memory --density 2 --cores 1 --launch 3 --short-length 17
 ```
 
-Use three independent launches numbered 1, 2, 3 for each identical configuration.
-Build order is gcc/x87/imci for odd launches and imci/x87/gcc for even launches.
-The driver checks the entire correctness suite before measuring. The lead must
+Use five independent launches numbered 1..5 for each identical configuration
+(ADR-0010 amendment 1). Since 2026-11-06 the three builds are **interleaved**: every
+round of a group runs each build once, the starting build rotates with the round,
+and even launches rotate the other way. The driver checks the entire correctness suite before measuring. The lead must
 still run the separate correctness jobs first. Stage files before the benchmark
 window, retain complete stdout/stderr and job exit status, and coordinate windows
 with PhiWeather through the lead, as required by ADR-0010.
@@ -159,10 +160,19 @@ worker 0**, serialized with CPUID, and is diagnostic. Clocksource and power
 policy are recorded at both endpoints.
 
 A growing pilot estimates repetitions for about 100 ms per batch (minimum one
-sweep). Each build then performs five groups of three warm-up and 21 timed
-batches. Every pilot, warm-up and timed sample is printed. The figure is the
-median of the five group medians. Within-launch spread must be strictly below
-2%; no extra samples are added to rescue a noisy result.
+sweep) for each build, re-sized until a check batch is 50-200 ms. A global warm-up
+of `--warmup-seconds` (default 10, 0..60) interleaved rounds follows: the slow
+regime seen in the first seconds after the threads start ended 6.2-6.9 s into the
+first build in every large step of the 2026-11-06 blocks
+(`docs/research/m2-noise-diagnosis.md`). Then five groups of three warm-up and 21
+timed rounds, each round running every build once. Every pilot, warm-up and timed
+sample is printed. The per-build figure is the median of its five group medians.
+The launch is valid (`paired_ok=1`, exit 0) when every build's batches are sized
+and the gain fraction computed from **same-group** medians agrees across the five
+groups within 2% (when the IMCI denominator is not positive in some group, the
+gcc/imci time ratio is used instead). Per-build group spreads are still printed
+with `within_launch_ok` but no longer decide the exit code. No extra samples are
+added to rescue a noisy result.
 
 ## Output and M2 arithmetic
 
@@ -175,14 +185,25 @@ sample kernel=affine_f32 build=gcc length=N threads_per_core=D cores=C cycles_pe
 `cycles_per_element` is serialized **worker-0 TSC ticks / (N*R)**, not verified
 core cycles and not a cross-core time. It meets the requested diagnostic field;
 M2 calculations use `wall_ns` and `ns_per_element = wall_ns/(N*C*D*R)` only.
+Straggler diagnostics follow on the same line: `t_ms` (RAW time since program
+start), `max_worker`/`max_ns` (the worker with the longest own start-to-end time),
+`median_ns` (median worker time), `skew_ns` (last start minus first start), and
+from `getrusage(RUSAGE_THREAD)` the involuntary context switches summed over
+workers (`nivcsw`), the largest per worker (`nivcsw_max`, `nivcsw_worker`) and the
+summed system time (`stime_us`). Global warm-up samples have `group=-1`. Each group
+also prints a `pair` line (same-group `gcc_over_x87`, `imci_over_x87`,
+`gcc_over_imci`, `gain_fraction`), and the launch ends with a `launch` line
+(`gain_fraction` from the launch figures, `gain_fraction_spread`,
+`gcc_over_imci_spread`, `gcc_over_x87_max` over groups, `sized`, `paired_ok`).
 Placement, policy, configuration, correctness, group min/median/max and summary
 records have distinct prefixes. No example above is measured evidence.
 
 For each build/configuration take the normalized median-of-group-medians from
-its `summary` line in each of three independent launches. Require all three
-`within_launch_ok=1`, density !=3, successful job exits, identical inputs/work,
-and `(max-min)/median < 0.02` across those three normalized launch values. Retain
-all samples even when a gate fails. Only then use their median as T_build:
+its `summary` line in each of five independent launches. Require `paired_ok=1`
+on the `launch` line, density !=3, successful job exits and identical inputs/work;
+M2's two conditions must hold in every launch (ADR-0010 amendment 1), and the
+range across launches is reported. Retain all samples even when a gate fails.
+T_build is the launch figure:
 
 ```text
 speedup_build = T_x87 / T_build

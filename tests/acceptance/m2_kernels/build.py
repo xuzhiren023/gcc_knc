@@ -5,6 +5,7 @@ Invoke through tools/run.py. Outputs overwrite .work/_shared/S6-02.
 import argparse
 import os
 from pathlib import Path
+import shutil
 import subprocess
 import sys
 
@@ -24,6 +25,10 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('mode', choices=('all', 'positive', 'negative'), default='all', nargs='?')
     parser.add_argument('--out', default='S6-02', help='folder under .work/_shared for the outputs')
+    parser.add_argument('--reuse-kernels', default=None, metavar='FOLDER',
+                        help='take kernels-gcc.{s,o} and kernels-x87.{s,o} from this folder under '
+                             '.work/_shared instead of compiling them (when xgcc has changed and '
+                             'only the driver is under test)')
     args = parser.parse_args()
     if os.name == 'nt':
         env = os.environ.copy()
@@ -32,7 +37,9 @@ def main():
             [str(TC / 'cygwin/bin/cygpath.exe'), '-u', str(Path(__file__).resolve())],
             env=env, text=True).strip()
         return subprocess.call([str(TC / 'cygwin/bin/python3.12.exe'), script,
-                                args.mode, '--out', args.out], env=env)
+                                args.mode, '--out', args.out]
+                               + (['--reuse-kernels', args.reuse_kernels] if args.reuse_kernels else []),
+                               env=env)
     os.environ['PATH'] = ':'.join(map(str, (TC / 'cross/bin', TC / 'cygwin/bin'))) + ':' + os.environ['PATH']
     out = SHARED / args.out
     out.mkdir(exist_ok=True)
@@ -53,6 +60,13 @@ def main():
         units.append(('driver-' + variant, 'driver.c',
                       [*oracle, *(['-DNEGATIVE_CONTROL'] if variant == 'negative' else [])]))
     errors = 0
+    if args.reuse_kernels:
+        source_dir = SHARED / args.reuse_kernels
+        for name in ('kernels-gcc', 'kernels-x87'):
+            for suffix in ('.s', '.o'):
+                print('+ copy %s -> %s' % (source_dir / (name + suffix), out / (name + suffix)), flush=True)
+                shutil.copyfile(source_dir / (name + suffix), out / (name + suffix))
+        units = [u for u in units if not u[0].startswith('kernels-')]
     for name, source, extra in units:
         assembly = out / (name + '.s')
         rc = command(*cc, *flags, *extra, '-pthread', '-S', HERE / source, '-o', assembly)
