@@ -84,9 +84,9 @@ from the gate review (`docs/research/m2-gate-review.md`) and the noise diagnosis
 mechanism is pending (`claude-s6-m2diag.sh`).
 
 **Why.** The within-launch 2% rule (point 4) fired in 23 of 86 sized launches on 2026-11-06, in 18
-cases on the build timed first, on a 10-22% step between two performance states that also
-explains the cross-launch range. The discarded launches gave the same M2 verdict as the kept
-ones. Discarding and rerunning launches on that criterion is a selection on an outcome, which the benchmarking
+cases on the build timed first, on a 10-22% step between two performance states that also explains
+the cross-launch range. The discarded launches gave the same M2 verdict as the kept ones. Discarding
+and rerunning launches on that criterion is a selection on an outcome, which the benchmarking
 literature (Hoefler & Belli 2015 rules 5-7; Kalibera & Jones 2013; Abedi & Brecht 2017) replaces
 with full reporting, repetition at the level where variance lives, and confidence intervals around
 the decision statistic. See `docs/research/m2-gate-review.md`.
@@ -117,16 +117,16 @@ the decision statistic. See `docs/research/m2-gate-review.md`.
    in point 7 requires.
 6. Amendment 1's items 1, 2 and 5 stand; its items 3 and 4 are replaced by the above.
 7. **Point 7, tuning evidence** (new):
-   Before and after are two GCC-KNC builds of the same kernel in the
-   same process, on the same buffers, timed in interleaved rounds (one group of each per round,
-   order drawn per round, five rounds or more), in at least three launches so that at least two
-   performance states are seen. The statistic is the per-round ratio T_after / T_before; the
-   figure is the median ratio with a bootstrap percentile 95% interval over all rounds of all
-   launches (Kalibera & Jones' effect-size interval). A change is accepted when the interval excludes 1 and
-   its near end is beyond the ticket's stated minimum effect, at every working set the ticket names.
-   A result whose sign differs between launches is reported as placement-dependent, not accepted.
-   Per Mytkowicz et al., code layout differs between the two binaries; a claimed effect under 2% is
-   additionally checked with the two builds linked in the opposite order.
+   Before and after are two GCC-KNC builds of the same kernel in the same process, on the same
+   buffers, timed in interleaved rounds (one group of each per round, order drawn per round, five
+   rounds or more), in at least three launches so that at least two performance states are seen. The
+   statistic is the per-round ratio T_after / T_before; the figure is the median ratio with a
+   bootstrap percentile 95% interval over all rounds of all launches (Kalibera & Jones' effect-size
+   interval). A change is accepted when the interval excludes 1 and its near end is beyond the
+   ticket's stated minimum effect, at every working set the ticket names. A result whose sign
+   differs between launches is reported as placement-dependent, not accepted. Per Mytkowicz et al.,
+   code layout differs between the two binaries; a claimed effect under 2% is additionally checked
+   with the two builds linked in the opposite order.
 8. **Correction to amendment 1's reason.** The diagnosis finds that the cross-launch L2 range comes
    from straggler workers in a slow regime early in a launch (worker 0's own time moves about 2%),
    not from physical page placement. The page-aligned placement (amendment 1 item 2) stays: it
