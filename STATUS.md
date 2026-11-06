@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-06 02:24.
+Updated automatically at every ticket change. Last update: 2026-11-06 02:27.
 
-**Next: GPT-6.1, on S5-16 (KNC byte and word data: V16QI/V16HI transport modes, widening up-converting loads and narrowing down-converting stores).** Run `python tools/dispatch.py`, or ask the tech lead to.
+**Next: the tech lead, on S5-16.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[###################-]` 93 of 95
 
@@ -112,7 +112,7 @@ Current tickets: `[###################-]` 93 of 95
 | S5-13 | KNC 16-lane gather and scatter: vgatherdps/vpgatherdd and the scatter forms in a jknzd loop, through the optabs | Done | Loops that read or write float or int arrays through a signed int index (a[i] = b[idx[i]], a[idx[i]] = b[i]... |
 | S5-14 | KNC 8-lane gather and scatter for V8DF/V8DI through the builtin hooks, reading the low 8 dwords of a V16SI index | Done | Loops that read or write double or long arrays through an int index now vectorize on KNC as two 8-lane gath... |
 | S5-15 | KNC FP min/max: MIN_EXPR/MAX_EXPR and fmin/fmax as vgminps/vgmaxps (pd), with their reductions | Done | FP min/max loops, fmin/fmax and their reductions now vectorize on KNC as vgmin/vgmax with the C NaN rules, ... |
-| S5-16 | KNC byte and word data: V16QI/V16HI transport modes, widening up-converting loads and narrowing down-converting stores | In progress | Yes: let the report scans accept 16, 32 or 64 byte vectors, and keep every instruction scan (one converting... |
+| S5-16 | KNC byte and word data: V16QI/V16HI transport modes, widening up-converting loads and narrowing down-converting stores | Waiting for review | Acceptance met under lead decisions. Final positive T1 PASS; unchanged instruction scans, approved report w... |
 | S5-17 | Sprint 5 mid batch check after S5-06, S5-07 and S5-08 | Done | x86 check (lead, portability-claude) at knc 9690ac8906a vs releases/gcc-16.2.0: -O2 and -O2 -mavx512f ident... |
 | S5-18 | Final Sprint 5 batch check at the sprint head | Not started |  |
 | S5-19 | card_run shares cores with the PhiWeather session - compact per-job core claims from the ledger, and round-robin turns for benchmark jobs | Done | card_run now packs each job onto whole cores taken from 59 downward, shares the card with the PhiWeather se... |
@@ -120,6 +120,7 @@ Current tickets: `[###################-]` 93 of 95
 
 ## Recent activity
 
+- 2026-11-06 02:27 **S5-16** engineer submit: Acceptance met under lead decisions. Final positive T1 PASS; unchanged instruction scans, approved report widths with comment. Log: .work/_state/lo...
 - 2026-11-06 02:24 **S5-16** lead answer: Yes: let the report scans accept 16, 32 or 64 byte vectors, and keep every instruction scan (one converting zmm access per 16 elements, no xmm/ymm)...
 - 2026-11-06 02:24 **S5-16** engineer ask: Build, f_s16 instruction scan and both reduced ICE tests pass; torture has no new ICEs. T1 now fails literal '64 byte vectors': aligned i32[i]=u8[i...
 - 2026-11-06 01:52 **S5-16** lead answer: Yes: spills use the same exact-size transfer forms as other memory moves (ADR-0008 point 7 amended on main); XI full-register transfers only for re...
@@ -127,13 +128,12 @@ Current tickets: `[###################-]` 93 of 95
 - 2026-11-06 01:15 **S5-16** lead answer: Agreed; ADR-0008 point 7 is amended (commit on main): V16QI home is the low 128 bits with 16-byte transfers, V16HI the low 256 bits with 32-byte tr...
 - 2026-11-06 01:14 **S5-16** engineer ask: Blocked by ADR-0008 point 7: both modes must use low 128 zmm bits. i386-modes.def:85-86 defines V16QI as 16 bytes but V16HI as 32 bytes. Counterexa...
 - 2026-11-06 01:13 **S5-16** lead approve-red: Red approved: T1 scans for one converting vmovdqa32/vmovaps per 16 byte/word elements, vpandd plus an unsigned down-converting store for narrowing ...
-- 2026-11-06 01:12 **S5-16** engineer red: Red commit f0f5332. Ran tools/run.py --name s5-16-red with tools/check.py t1 --compiler gcc16 --byte-word --worker. Expected FAIL: i32_u8 missing c...
 
 ## Cost
 
 - From the script, engineer: 226 sessions, 547.4M input tokens
 - From the script, lead: 184 sessions, 58.7M input tokens
-- Started by hand, Claude: 9 sessions, 1058.6M input tokens
+- Started by hand, Claude: 9 sessions, 1059.1M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
