@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-06 16:23.
+Updated automatically at every ticket change. Last update: 2026-11-06 16:24.
 
-**Next: the tech lead, on S6-05.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: GPT-6.1, on S6-05 (-mtune=knc costs and vectorizer cost model v1 from the characterization tables (E5-09, E5-02)).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
 Current tickets: `[###################-]` 107 of 111
 
@@ -122,7 +122,7 @@ Current tickets: `[###################-]` 107 of 111
 | S6-02 | M2 kernels: affine, stencil, short-loop and small-matrix as GCC-KNC vector, x87 and hand-written IMCI builds, with a timing driver | Done | The M2 yardstick is ready and correct on the card: FP32/FP64 affine, two stencils, a short loop and 8x8/16x... |
 | S6-03 | Machine characterization corpus (E5-01): latency and throughput per instruction class at 1-4 threads per core, cache and memory levels | Done | A KNC characterization corpus of 104 hand-written measurements is ready to run on the card: latency and thr... |
 | S6-04 | Per-loop KNC reports (E5-03): vector factor, peel and tail choice, masks, helper calls, spills and rejection reasons | Done | With -fopt-info-vec, KNC now reports each costed loop candidate: vector mode and factor, scalar peel, maske... |
-| S6-05 | -mtune=knc costs and vectorizer cost model v1 from the characterization tables (E5-09, E5-02) | Question for the tech lead | 6087515 adds --knc-costs. Two attempts: gather-only indexed copy fails no-vgatherdps scan as expected; alig... |
+| S6-05 | -mtune=knc costs and vectorizer cost model v1 from the characterization tables (E5-09, E5-02) | In progress | FP and integer gather rejections count as one decision, not two. Keep the scattered-index gather test as re... |
 | S6-06 | KNC scheduler v0 (E5-05): U/V pipes, 4-cycle vector latency, 3-cycle AGI | Not started | back in lane gcc. Tables: `docs/research/knc-characterization.md`. The measured |
 | S6-07 | First gcc.dg/vect baseline for KNC: compile scans on the host, execution on the card | Done | The gcc.dg/vect suite now has a KNC baseline: of 2,001 tests, 1,329 compile (777 linked for the card), 632 ... |
 | S6-08 | Sprint 6 mid batch check after S6-04 and S6-05 | Not started |  |
@@ -136,6 +136,7 @@ Current tickets: `[###################-]` 107 of 111
 
 ## Recent activity
 
+- 2026-11-06 16:24 **S6-05** lead answer: FP and integer gather rejections count as one decision, not two. Keep the scattered-index gather test as red decision 1 (table point 5: 16 lines co...
 - 2026-11-06 16:23 **S6-05** engineer ask: 6087515 adds --knc-costs. Two attempts: gather-only indexed copy fails no-vgatherdps scan as expected; aligned reductions of 16 unsigned or 8 doubl...
 - 2026-11-06 16:19 **S6-05** lead answer: The characterization tables are in docs/research/knc-characterization.md (main, measured at 1/2/4 threads on one core; a 'For S6-05 and S6-06' sect...
 - 2026-11-06 14:19 **S7-01** lead approve: The shared libgcc plan for KNC is ready: GCC 16's libgcc_s.so.1 can be a drop-in superset of the donor's once 17 missing helpers, six binary128 ali...
@@ -143,7 +144,6 @@ Current tickets: `[###################-]` 107 of 111
 - 2026-11-06 14:12 **S7-01** lead answer: Lead: pm.py now decodes git output as UTF-8 (main 'pm: decode git output as UTF-8'); the lead submits f990744 from the main checkout.
 - 2026-11-06 14:11 **S7-01** engineer ask: Research complete in commit f990744, docs/research/knc-libgcc-shared.md. Submit fails decoding git diff with cp1252; Python UTF-8 mode passes conte...
 - 2026-11-06 14:09 **S7-02** lead approve: The libgfortran plan for KNC is ready: a small MXCSR-safe FP backend, kinds 4/8/10 with kind 16 deferred, a static runtime isolated from the card's...
-- 2026-11-06 14:02 **S7-02** engineer submit: Added docs/research/knc-libgfortran.md in f119698. Static source inspection of knc GCC and sysroot, plus local GCC 5 historical layout references; ...
 
 ## Cost
 
