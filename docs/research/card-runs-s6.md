@@ -69,5 +69,8 @@ does not prove a valid launch.
 
 Fix (`timing.c`, lead): after the pilot, re-size from a check batch until one lands within 50-200 ms
 (at most 10 tries, else the run dies), and a launch is valid only if its median sample is within
-50-200 ms. Built into `.work/_shared/M2-sizing/` (`build.py --out`); launches 2 and 3 of this block
-use the old binary and are discarded. The whole M2 baseline reruns with the new binary.
+50-200 ms. Built into `.work/_shared/M2-sizing/` (`build.py --out`); the block kept
+ran on, so the fixed binary was moved into `.work/_shared/S6-02/` by an atomic rename between jobs
+at 2026-11-06T19:54:06Z: launch 2 from the memory working set onward, and launch 3, use it. Launch 1
+and launch 2's L1 and L2 runs (old binary, kept in `claude-s6-slot5/pre-fix/`) rerun afterwards
+(`claude-s6-slot6.sh`).
