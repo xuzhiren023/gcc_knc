@@ -1,10 +1,10 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-06 00:13.
+Updated automatically at every ticket change. Last update: 2026-11-06 00:14.
 
 **Next: GPT-6.1, on S5-15 (KNC FP min/max: MIN_EXPR/MAX_EXPR and fmin/fmax as vgminps/vgmaxps (pd), with their reductions).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
-Current tickets: `[###################-]` 91 of 94
+Current tickets: `[###################-]` 91 of 95
 
 ## Milestones
 
@@ -12,7 +12,7 @@ Current tickets: `[###################-]` 91 of 94
 |---|---|---|---|
 | M0 | Foundation | In progress | 17 of 17 tickets |
 | M1 | Mixed native code | Done | 43 of 43 tickets |
-| M2 | Useful vector target | In progress | 31 of 34 tickets |
+| M2 | Useful vector target | In progress | 31 of 35 tickets |
 | M3 | Runtimes | Not started | Not planned in detail yet |
 | M4 | Broad optimization | Not started | Not planned in detail yet |
 | M5 | Program corpus | Not started | Not planned in detail yet |
@@ -116,6 +116,7 @@ Current tickets: `[###################-]` 91 of 94
 | S5-17 | Sprint 5 mid batch check after S5-06, S5-07 and S5-08 | Done | x86 check (lead, portability-claude) at knc 9690ac8906a vs releases/gcc-16.2.0: -O2 and -O2 -mavx512f ident... |
 | S5-18 | Final Sprint 5 batch check at the sprint head | Not started |  |
 | S5-19 | card_run shares cores with the PhiWeather session - compact per-job core claims from the ledger, and round-robin turns for benchmark jobs | Done | card_run now packs each job onto whole cores taken from 59 downward, shares the card with the PhiWeather se... |
+| S5-20 | card_run refuses engineer sandbox sessions, so card jobs stay with the lead | In progress |  |
 
 ## Recent activity
 
@@ -132,10 +133,10 @@ Current tickets: `[###################-]` 91 of 94
 
 - From the script, engineer: 219 sessions, 530.0M input tokens
 - From the script, lead: 184 sessions, 58.7M input tokens
-- Started by hand, Claude: 9 sessions, 1027.7M input tokens
+- Started by hand, Claude: 9 sessions, 1030.9M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 12.6 GiB of 100 GiB. 182 GiB free on the drive.
+The project uses 12.6 GiB of 100 GiB. 181 GiB free on the drive.
