@@ -1,8 +1,9 @@
-# S5-16 implementation and outstanding results
+# S5-16 implementation and results
 
-Acceptance is **not met**: T1's literal `64 byte vectors` report scan fails for
-narrow-input loops. All seven instruction scans, including signed-word-to-float,
-and both reduced ICE tests now pass. No program was run on the card.
+Engineer acceptance is **met**, including the lead-approved base-mode report
+widths. All seven instruction and report scans, including signed-word-to-float,
+and both reduced ICE tests pass. No program was run on the card; the lead runs
+the retained guard-page and acceptance binaries after merge.
 
 The implementation adds a separate V16QI/V16HI transport predicate, the related
 mode hook, preferred QI/HI modes, ABI rejection, exact-size transport, converting
@@ -66,8 +67,15 @@ Follow-up validation:
 | Incremental `gcc_build.py --if-stale` | PASS, 21.1 minutes, clean committed GCC | `s5_16_fix_build-20261106-015900.log` |
 | Failed T1 cases | Both reduced ICE tests PASS; all seven positive instruction scans PASS; first report-width scan FAIL | `s5_16_retry_t1-20261106-022017.log` |
 | Torture after fixes | No new ICEs; runner exits 1 only for the required V16HI ABI rejection at O0/O2 | `s5_16_fixed_torture-20261106-022017.log` |
+| Approved report-width scan | PASS, all seven positive instruction and report scans; only the previously failing positive source rerun | `s5_16_report_t1-20261106-022624.log` |
 
-## Report-width acceptance question
+The final retry ran through `tools/run.py --name s5-16-report-t1 --inputs
+tests/t1/knc-convert-byte-positive.c tools/s5_16_checks.py -- python
+tools/s5_16_checks.py retry-t1 positive`, following project commit `89fbb1a`.
+No GCC code changed in this final follow-up, so passing build, torture, other
+T1 cases, T0/T2, and binary build/lint results were not repeated.
+
+## Approved report-width interpretation
 
 The smallest loop already in the positive test is:
 
@@ -90,11 +98,10 @@ V16HI, respectively. `tree-vectorizer.cc:1020-1028` prints that mode's size,
 not the largest vector type used by the loop. The related-mode hook preserves
 sixteen lanes and produces V16SI/V16SF dword results.
 
-May the report scans require 16/32/64 bytes according to the prevailing input
-mode while keeping the sixteen-element, one-conversion zmm instruction checks,
-or is a different prevailing-mode policy required? The existing scans have not
-been changed: AGENTS.md forbids weakening tests, and the ticket explicitly asks
-for 64 bytes.
+The lead approved accepting 16, 32 or 64 bytes in the report scans at 02:24.
+The scans now accept those base-mode widths, with the reason documented directly
+above them. All instruction scans remain unchanged: one converting zmm access
+per sixteen elements, no xmm/ymm, and the narrowing AND remain required.
 
 ## Torture comparison
 
