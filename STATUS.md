@@ -122,7 +122,7 @@ Current tickets: `[##################--]` 101 of 107
 | S6-02 | M2 kernels: affine, stencil, short-loop and small-matrix as GCC-KNC vector, x87 and hand-written IMCI builds, with a timing driver | Question for the tech lead | 0c660a9 completes fixture. GCC 16.2.0, donor 2.22 assembly and ELF lint pass. Log: .work/_state/logs/S6_02_... |
 | S6-03 | Machine characterization corpus (E5-01): latency and throughput per instruction class at 1-4 threads per core, cache and memory levels | Done | A KNC characterization corpus of 104 hand-written measurements is ready to run on the card: latency and thr... |
 | S6-04 | Per-loop KNC reports (E5-03): vector factor, peel and tail choice, masks, helper calls, spills and rejection reasons | Done | With -fopt-info-vec, KNC now reports each costed loop candidate: vector mode and factor, scalar peel, maske... |
-| S6-05 | -mtune=knc costs and vectorizer cost model v1 from the characterization tables (E5-09, E5-02) | In progress |  |
+| S6-05 | -mtune=knc costs and vectorizer cost model v1 from the characterization tables (E5-09, E5-02) | Question for the tech lead | Required S6-03 input is missing: Get-Content docs/research/knc-characterization.md fails with PathNotFound;... |
 | S6-06 | KNC scheduler v0 (E5-05): U/V pipes, 4-cycle vector latency, 3-cycle AGI | Not started |  |
 | S6-07 | First gcc.dg/vect baseline for KNC: compile scans on the host, execution on the card | Done | The gcc.dg/vect suite now has a KNC baseline: of 2,001 tests, 1,329 compile (777 linked for the card), 632 ... |
 | S6-08 | Sprint 6 mid batch check after S6-04 and S6-05 | Not started |  |
@@ -132,6 +132,7 @@ Current tickets: `[##################--]` 101 of 107
 
 ## Recent activity
 
+- 2026-11-06 09:25 **S6-05** engineer ask: Required S6-03 input is missing: Get-Content docs/research/knc-characterization.md fails with PathNotFound; git ls-files '*knc-characterization*' r...
 - 2026-11-06 09:24 **S6-09** lead approve: Loops that build lane-index vectors (VEC_SERIES) now compile on KNC instead of crashing the compiler: 6 of the 7 vect tests that hit this compile, ...
 - 2026-11-06 09:24 **S6-02** engineer ask: 0c660a9 completes fixture. GCC 16.2.0, donor 2.22 assembly and ELF lint pass. Log: .work/_state/logs/S6_02_suite_build-20261106-091711.log. Binarie...
 - 2026-11-06 09:17 **S6-09** engineer submit: Submitted by the lead on the engineer's behalf (token budget exhausted). GCC 89b5040fe28: vec_series for the packed modes in imci.md (+60, no share...
@@ -139,13 +140,12 @@ Current tickets: `[##################--]` 101 of 107
 - 2026-11-06 09:16 **S6-03** lead approve: A KNC characterization corpus of 104 hand-written measurements is ready to run on the card: latency and throughput per instruction class, U/V pairi...
 - 2026-11-06 09:07 **S6-03** engineer submit: Build/lint/host args PASS: .work/_state/logs/S6_03_acceptance-20261106-090406.log. No card run. Lead PowerShell commands (repeat 3 windows): foreac...
 - 2026-11-06 09:06 **S6-03** lead answer: Approved: submit with --override 'measurement corpus required by the ticket: 104 measurements in 5 files, lead allowed'. No split. Name in the subm...
-- 2026-11-06 09:05 **S6-03** engineer ask: 104 requested characterization measurements are implemented in 755 lines / five test files under tests/bench/knc-char (00536ef). GCC16 build, assem...
 
 ## Cost
 
 - From the script, engineer: 243 sessions, 581.5M input tokens
 - From the script, lead: 185 sessions, 58.8M input tokens
-- Started by hand, Claude: 9 sessions, 1174.2M input tokens
+- Started by hand, Claude: 9 sessions, 1177.4M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
