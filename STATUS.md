@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-05 23:33.
+Updated automatically at every ticket change. Last update: 2026-11-05 23:34.
 
-**Next: the tech lead, on S5-15.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: GPT-6.1, on S5-15 (KNC FP min/max: MIN_EXPR/MAX_EXPR and fmin/fmax as vgminps/vgmaxps (pd), with their reductions).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
 Current tickets: `[###################-]` 91 of 94
 
@@ -111,7 +111,7 @@ Current tickets: `[###################-]` 91 of 94
 | S5-12 | KNC float/double-width conversions: vcvtps2pd, vcvtpd2ps, vcvtdq2pd, vcvtfxpntpd2dq with vpermf32x4 halves | Done | Loops that convert between float and double, or between int and double, now vectorize on KNC with full 512-... |
 | S5-13 | KNC 16-lane gather and scatter: vgatherdps/vpgatherdd and the scatter forms in a jknzd loop, through the optabs | Done | Loops that read or write float or int arrays through a signed int index (a[i] = b[idx[i]], a[idx[i]] = b[i]... |
 | S5-14 | KNC 8-lane gather and scatter for V8DF/V8DI through the builtin hooks, reading the low 8 dwords of a V16SI index | Done | Loops that read or write double or long arrays through an int index now vectorize on KNC as two 8-lane gath... |
-| S5-15 | KNC FP min/max: MIN_EXPR/MAX_EXPR and fmin/fmax as vgminps/vgmaxps (pd), with their reductions | Question for the tech lead | Two builds failed: first ssescalarmode before definition (fixed); second genflags: unresolved iterator in *... |
+| S5-15 | KNC FP min/max: MIN_EXPR/MAX_EXPR and fmin/fmax as vgminps/vgmaxps (pd), with their reductions | In progress | Yes: define a local code attribute in imci.md (e.g. knc_maxmin: smax 'max', smin 'min'), not in sse.md, and... |
 | S5-16 | KNC byte and word data: V16QI/V16HI transport modes, widening up-converting loads and narrowing down-converting stores | Not started |  |
 | S5-17 | Sprint 5 mid batch check after S5-06, S5-07 and S5-08 | Done | x86 check (lead, portability-claude) at knc 9690ac8906a vs releases/gcc-16.2.0: -O2 and -O2 -mavx512f ident... |
 | S5-18 | Final Sprint 5 batch check at the sprint head | Not started |  |
@@ -119,6 +119,7 @@ Current tickets: `[###################-]` 91 of 94
 
 ## Recent activity
 
+- 2026-11-05 23:34 **S5-15** lead answer: Yes: define a local code attribute in imci.md (e.g. knc_maxmin: smax 'max', smin 'min'), not in sse.md, and continue.
 - 2026-11-05 23:33 **S5-15** engineer ask: Two builds failed: first ssescalarmode before definition (fixed); second genflags: unresolved iterator in *knc_reduc_<maxmin>v8df_swizzle. Reproduc...
 - 2026-11-05 23:18 **S5-14** lead approve: Loops that read or write double or long arrays through an int index now vectorize on KNC as two 8-lane gathers or scatters per 16 indices, and pass...
 - 2026-11-05 23:08 **S5-14** engineer submit: GCC ab967b42a6e: both one-line ABI hooks share the private gather type/decl predicate. Incremental build and full T1 PASS (four -O3 scans). All REA...
@@ -126,13 +127,12 @@ Current tickets: `[###################-]` 91 of 94
 - 2026-11-05 23:02 **S5-14** engineer ask: May I add a gather-only ix86_function_value hook/prototype (third i386-knc.h edit)? GCC 40a431420db builds; -O3 knc-gather8-f64.c/i64.c still fail ...
 - 2026-11-05 22:27 **S5-14** lead answer: Yes, a second i386-knc.h edit is fine. Constraint: the exemption in ix86_return_in_memory must apply only to the function types of the KNC 8-lane g...
 - 2026-11-05 22:26 **S5-14** engineer ask: May I add a builtin-return ABI hook/prototype, requiring a second i386-knc.h edit despite the ticket's one-edit rule? Repro: knc-gather8-f64.c/i64....
-- 2026-11-05 21:44 **S5-14** lead approve-red: Red approved: T1 scans for two 8-lane gathers/scatters per 16 int indices with one vpermf32x4 0xee feeding the high half. Keep the jknzd retry loop...
 
 ## Cost
 
 - From the script, engineer: 218 sessions, 525.7M input tokens
 - From the script, lead: 184 sessions, 58.7M input tokens
-- Started by hand, Claude: 9 sessions, 1024.9M input tokens
+- Started by hand, Claude: 9 sessions, 1025.6M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
