@@ -114,7 +114,8 @@ M1 is accepted and tagged `m1` locally; nothing is pushed. Engineers are Claude 
   per core best for WRF against ADR-0009's default of 4).
 - ADR-0011 (owner, 2026-11-06): the WRF project's vector math is copied into `contrib/knc-vecmath/`
   (PhiWeather `bfc0977d`, licenses kept) and renamed `__knc_vmath_<name>_<lanes>`; no `_ZGV` names.
-  Not yet compiled or qualified with GCC-KNC (E7-01, E7-02).
+  The expf, logf and powf cores compile with GCC-KNC to IMCI code; a card qualification harness is
+  parked in `tests/acceptance/vecmath_qualify/` (owner: E7 work, not Sprint 6; never run on the card).
 
 - M2 baseline: launch 1 of the first full block was invalid (batches sized from a stalled pilot ran
   4-9 ms instead of 100 ms; two such runs still passed the spread check). `timing.c` now re-sizes

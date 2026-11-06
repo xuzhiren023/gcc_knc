@@ -101,7 +101,7 @@ Drafted as tickets S2-01 to S2-08; see [SPRINT-02](sprints/SPRINT-02.md).
 | ID | Story | Depth |
 |---|---|---|
 | E7-01 | Pick functions from corpus use, starting with common libm calls; vector function ABI and compiler binding (ADR required). Names are settled by ADR-0011 (`__knc_vmath_<name>_<lanes>`, never `_ZGV`); start from the copied sources in `contrib/knc-vecmath/` | Deep |
-| E7-02 | Accurate `exp`, `log`, `pow` first; relaxed entry points separate; exceptional-lane repair compared. Requalify the copied functions as built by GCC-KNC, on the card; the PhiWeather receipts are targets, not evidence (ADR-0011 point 4) | Deep |
+| E7-02 | Accurate `exp`, `log`, `pow` first; relaxed entry points separate; exceptional-lane repair compared. Requalify the copied functions as built by GCC-KNC, on the card; the PhiWeather receipts are targets, not evidence (ADR-0011 point 4). A card harness is ready in `tests/acceptance/vecmath_qualify/` | Deep |
 | E7-03 | Rank missed optimizations by corpus-wide profile and carry the top regions through GIMPLE, RTL and assembly | Standard |
 | E7-04 | Scalar and integer code quality for the in-order core: scheduling, inlining, code size, branches without CMOV | Standard |
 | E7-06 | Two-level prefetch like `icc`: L2 far (`vprefetch1`) and L1 near (`vprefetch0`) distances per loop, exclusive prefetch for stores, none for loops that fit in cache; ranked on the corpus against E5-07 (owner, 2026-11-03) | Deep |
