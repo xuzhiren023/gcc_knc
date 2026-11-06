@@ -1,0 +1,15 @@
+
+;; Function f (f, funcdef_no=0, decl_uid=2548, cgraph_uid=1, symbol_order=0)
+
+void f ()
+{
+  int unused;
+
+  <bb 2> :
+  unused = 3;
+  unused ={v} {CLOBBER(eos)};
+  return;
+
+}
+
+

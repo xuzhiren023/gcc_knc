@@ -1,0 +1,35 @@
+
+;; Function do_div (do_div, funcdef_no=0, decl_uid=2550, cgraph_uid=1, symbol_order=0)
+
+__attribute__((optimize ("-fcx-limited-range")))
+void do_div (complex double * a, complex double * b)
+{
+  double _7;
+  double _8;
+  double _9;
+  double _10;
+  double _11;
+  double _12;
+  double _13;
+  double _14;
+  double _15;
+  double _16;
+
+  <bb 2> [local count: 1073741824]:
+  _7 = REALPART_EXPR <*b_4(D)>;
+  _8 = IMAGPART_EXPR <*b_4(D)>;
+  _9 = _7 * 4.0e+0;
+  _10 = _8 * -5.0e+0;
+  _11 = _9 + _10;
+  _12 = _11 / 4.1e+1;
+  _13 = _8 * 4.0e+0;
+  _14 = _7 * -5.0e+0;
+  _15 = _13 - _14;
+  _16 = _15 / 4.1e+1;
+  REALPART_EXPR <*a_5(D)> = _12;
+  IMAGPART_EXPR <*a_5(D)> = _16;
+  return;
+
+}
+
+
