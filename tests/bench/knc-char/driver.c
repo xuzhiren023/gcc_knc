@@ -212,10 +212,13 @@ int main(int argc, char **argv) {
     topology_read();
     policy(0);
     if (pthread_barrier_init(&barrier, NULL, cores*density+1)) fail("barrier init");
+    /* Explicit small stacks: the card's unlimited stack limit makes glibc's default huge (lead, 2026-11-06). */
+    pthread_attr_t attr;
+    if (pthread_attr_init(&attr) || pthread_attr_setstacksize(&attr, 256 * 1024)) fail("thread attributes");
     for (int i = 0; i < cores*density; ++i) {
         workers[i].id = i; workers[i].cpu = topology[i/density][i%density];
         printf("pin %d %d\n", i, workers[i].cpu);
-        if (pthread_create(&threads[i], NULL, worker_main, &workers[i])) fail("pthread_create");
+        if (pthread_create(&threads[i], &attr, worker_main, &workers[i])) fail("pthread_create");
     }
     for (size_t k = 0; k < NTESTS; ++k) {
         uint64_t medians[GROUPS];

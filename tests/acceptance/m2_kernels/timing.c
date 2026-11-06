@@ -203,8 +203,13 @@ int benchmark(int argc, char **argv) {
          footprint(length),footprint(length)*density,density != 3);
   if (pthread_barrier_init(&barrier,NULL,workers+1)) die("barrier init");
   pthread_t threads[MAX_WORKERS];
+  /* The card's stack limit is unlimited, so glibc's default thread stack is huge; 240 of them
+     exhaust card_run's address-space limit (lead, 2026-11-06). Workers need little stack. */
+  pthread_attr_t attr;
+  if (pthread_attr_init(&attr) || pthread_attr_setstacksize(&attr, 256 * 1024)) die("thread attributes");
   for (int w = 0; w < workers; ++w)
-    if (pthread_create(&threads[w],NULL,worker_main,&data[w])) die("pthread_create");
+    if (pthread_create(&threads[w],&attr,worker_main,&data[w])) die("pthread_create");
+  pthread_attr_destroy(&attr);
   sync_workers();
   int noisy = density == 3;
   for (int order = 0; order < 3; ++order) {
