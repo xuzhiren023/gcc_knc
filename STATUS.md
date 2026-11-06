@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-05 21:03.
+Updated automatically at every ticket change. Last update: 2026-11-05 21:06.
 
-**Next: GPT-6.1, on S5-13 (KNC 16-lane gather and scatter: vgatherdps/vpgatherdd and the scatter forms in a jknzd loop, through the optabs).** Run `python tools/dispatch.py`, or ask the tech lead to.
+**Next: the tech lead, on S5-13.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[##################--]` 89 of 94
 
@@ -109,7 +109,7 @@ Current tickets: `[##################--]` 89 of 94
 | S5-10 | Correctly rounded FP32 vector square root for V16SF (S5-03 ticket A) | Done | Vectorized FP32 square root on KNC is now correctly rounded for every one of the 2^32 inputs, checked on th... |
 | S5-11 | Correctly rounded FP32 vector division for V16SF, with cond_div (S5-03 ticket B) | Done | Vectorized FP32 division on KNC is now correctly rounded, with IEEE flags, in all four rounding modes: 1.8 ... |
 | S5-12 | KNC float/double-width conversions: vcvtps2pd, vcvtpd2ps, vcvtdq2pd, vcvtfxpntpd2dq with vpermf32x4 halves | Done | Loops that convert between float and double, or between int and double, now vectorize on KNC with full 512-... |
-| S5-13 | KNC 16-lane gather and scatter: vgatherdps/vpgatherdd and the scatter forms in a jknzd loop, through the optabs | In progress | Lead, under the owner's delegation: sessions 4 -> 5 for one short round. Fix the masked-gather and masked-s... |
+| S5-13 | KNC 16-lane gather and scatter: vgatherdps/vpgatherdd and the scatter forms in a jknzd loop, through the optabs | Waiting for review | Committed a9a8a58: masked gather/scatter scans exclude read-only jkzd/jknzd branches; line anchoring and a ... |
 | S5-14 | KNC 8-lane gather and scatter for V8DF/V8DI through the builtin hooks, reading the low 8 dwords of a V16SI index | Not started |  |
 | S5-15 | KNC FP min/max: MIN_EXPR/MAX_EXPR and fmin/fmax as vgminps/vgmaxps (pd), with their reductions | Not started |  |
 | S5-16 | KNC byte and word data: V16QI/V16HI transport modes, widening up-converting loads and narrowing down-converting stores | Not started |  |
@@ -119,6 +119,7 @@ Current tickets: `[##################--]` 89 of 94
 
 ## Recent activity
 
+- 2026-11-05 21:06 **S5-13** engineer submit: Committed a9a8a58: masked gather/scatter scans exclude read-only jkzd/jknzd branches; line anchoring and a required mnemonic prevent indentation ba...
 - 2026-11-05 21:03 **S5-13** owner decide: Lead, under the owner's delegation: sessions 4 -> 5 for one short round. Fix the masked-gather and masked-scatter scan regex (jkzd/jknzd lines read...
 - 2026-11-05 21:02 **S5-13** engineer escalate: budget: 4 engineer sessions used; the budget is 4
 - 2026-11-05 21:02 **S5-13** lead answer: No capture needed: the lead compiled it (gcc-build at 917beb990eb). The code is right: vpcmpd $4 -> %k1, kmov %k1,%k2, vgatherdps {%k2} in its jknz...
@@ -126,13 +127,12 @@ Current tickets: `[##################--]` 89 of 94
 - 2026-11-05 20:36 **S5-13** lead answer: 1. Fix the ICE in KNC-only code: in ix86_knc_masked_epilogue_p, test STMT_VINFO_GATHER_SCATTER_P (return false) before reading DR_STEP, which is NU...
 - 2026-11-05 20:34 **S5-13** engineer ask: 561450524cb fixes mask numbering; build/T0/T2 pass. Four gather16 T1 files ICE: integer_zerop(DR_STEP) at i386-knc.cc:121. All README builds succee...
 - 2026-11-05 20:02 **S5-13** lead answer: Yes: renumber so every tied input refers to a lower-numbered operand (a matching constraint must name an earlier operand), for both gather and scat...
-- 2026-11-05 20:01 **S5-13** engineer ask: Two builds failed; stopping per AGENTS.md. First: late VSIB enum, fixed in 4db28d7ad68. Second: genrecog rejects gather input 5 tied to scratch 7: ...
 
 ## Cost
 
 - From the script, engineer: 212 sessions, 510.1M input tokens
 - From the script, lead: 184 sessions, 58.7M input tokens
-- Started by hand, Claude: 9 sessions, 1008.2M input tokens
+- Started by hand, Claude: 9 sessions, 1008.8M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
