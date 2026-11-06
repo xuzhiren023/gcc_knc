@@ -20,6 +20,7 @@ def t1():
 
 def acceptance():
     from s5_13_checks import acceptance as build_acceptance
+    checks.OUT = checks.SHARED / 's5-14'
     # The lead permits mgat_f64 to stay scalar: its masked store is misaligned.
     return build_acceptance(('gat_f64', 'gat_i64', 'sca_f64'))
 
