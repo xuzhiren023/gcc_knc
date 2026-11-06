@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-05 19:49.
+Updated automatically at every ticket change. Last update: 2026-11-05 19:52.
 
-**Next: GPT-6.1, on S5-13 (KNC 16-lane gather and scatter: vgatherdps/vpgatherdd and the scatter forms in a jknzd loop, through the optabs).** Run `python tools/dispatch.py`, or ask the tech lead to.
+**Next: the tech lead, on S5-13.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[##################--]` 89 of 94
 
@@ -109,7 +109,7 @@ Current tickets: `[##################--]` 89 of 94
 | S5-10 | Correctly rounded FP32 vector square root for V16SF (S5-03 ticket A) | Done | Vectorized FP32 square root on KNC is now correctly rounded for every one of the 2^32 inputs, checked on th... |
 | S5-11 | Correctly rounded FP32 vector division for V16SF, with cond_div (S5-03 ticket B) | Done | Vectorized FP32 division on KNC is now correctly rounded, with IEEE flags, in all four rounding modes: 1.8 ... |
 | S5-12 | KNC float/double-width conversions: vcvtps2pd, vcvtpd2ps, vcvtdq2pd, vcvtfxpntpd2dq with vpermf32x4 halves | Done | Loops that convert between float and double, or between int and double, now vectorize on KNC with full 512-... |
-| S5-13 | KNC 16-lane gather and scatter: vgatherdps/vpgatherdd and the scatter forms in a jknzd loop, through the optabs | In progress |  |
+| S5-13 | KNC 16-lane gather and scatter: vgatherdps/vpgatherdd and the scatter forms in a jknzd loop, through the optabs | Tests waiting for review | Red commit 13576f6. Ran through tools/run.py: python tools/check.py t1 --compiler gcc16 --gather-scatter --... |
 | S5-14 | KNC 8-lane gather and scatter for V8DF/V8DI through the builtin hooks, reading the low 8 dwords of a V16SI index | Not started |  |
 | S5-15 | KNC FP min/max: MIN_EXPR/MAX_EXPR and fmin/fmax as vgminps/vgmaxps (pd), with their reductions | Not started |  |
 | S5-16 | KNC byte and word data: V16QI/V16HI transport modes, widening up-converting loads and narrowing down-converting stores | Not started |  |
@@ -119,6 +119,7 @@ Current tickets: `[##################--]` 89 of 94
 
 ## Recent activity
 
+- 2026-11-05 19:52 **S5-13** engineer red: Red commit 13576f6. Ran through tools/run.py: python tools/check.py t1 --compiler gcc16 --gather-scatter --worker. Expected FAIL: float/int gather ...
 - 2026-11-05 19:49 **S5-12** lead approve: Loops that convert between float and double, or between int and double, now vectorize on KNC with full 512-bit halves, and s5_ops passes on the car...
 - 2026-11-05 19:31 **S5-12** engineer submit: All width optabs and zero-high-half insns implemented. Red failed as expected. Incremental GCC build, full T0/T1/T2 (seven width scans), four READM...
 - 2026-11-05 18:48 **S5-11** lead approve: Vectorized FP32 division on KNC is now correctly rounded, with IEEE flags, in all four rounding modes: 1.8 billion hard and random cases on the car...
@@ -126,7 +127,6 @@ Current tickets: `[##################--]` 89 of 94
 - 2026-11-05 18:13 **S5-11** lead answer: Allowed: submit with --override 'GCC 327 lines; the rest are the ticket-required host model, native sets and checks; lead allowed'. No split. Do no...
 - 2026-11-05 18:09 **S5-11** engineer ask: All host acceptance checks pass, but submit refuses 1074 changed lines versus budget 800. Required GCC implementation, E1/E2/E4 and native sets are...
 - 2026-11-05 17:22 **S5-11** lead approve-red: Red approved: T1 scans for vrcp23ps+FMA division with no loop fdiv and a fully masked tail with no x87.
-- 2026-11-05 16:03 **S5-11** engineer red: Committed 034bbbe: T1 scans require FP32 reciprocal/FMA with no loop fdiv, plus aligned variable-count masked division with masked FMA/load/store a...
 
 ## Cost
 
@@ -138,4 +138,4 @@ Current tickets: `[##################--]` 89 of 94
 
 ## Disk
 
-The project uses 12.2 GiB of 100 GiB. 211 GiB free on the drive.
+The project uses 12.2 GiB of 100 GiB. 213 GiB free on the drive.
