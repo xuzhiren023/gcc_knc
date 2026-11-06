@@ -111,3 +111,22 @@ Findings:
 - **Short odd lengths are GCC-KNC's weak spot:** length 17 is slower per element than 16 (0.084 vs
   0.064) while IMCI barely changes (0.040 vs 0.044): the remainder runs scalar where IMCI uses a
   masked tail. A tuning item for S6-05/S6-06 (masked epilogues).
+
+## 2026-11-06: characterization, 1 core x 1 thread (S6-03 binary)
+
+`.work/_shared/tmp/claude-s6-slot5/char-1x1.out`: 104 results, 103 accepted (spread under 2%;
+`vcvtfxpntudq2ps.lat` 2.6%). Units are TSC ticks (about 1232 MHz, core 1238 MHz). Single-thread
+headlines, to be confirmed at 2 and 4 threads before `knc-characterization.md` is written:
+- Vector add, mul, FMA (SP and DP), integer add and logic: latency 4, one per 2 cycles (a single
+  thread issues every other cycle). Permutes and swizzles: latency 6. `vrcp23ps`: latency 6.
+- Pairing: vector + scalar pairs (2.08 per pair), vector + vector does not (4.09).
+- Mask ops and scalar integer ops: latency 2, about 1 per cycle (paired).
+- Memory-operand forms (masked load and store, unpack, convert up and down, spill-reload): latency 12;
+  spill-reload throughput 5.
+- Address generation interlock: about +2 cycles for each cycle the address is computed closer to its
+  use (gap 0 to 4: 3.1, 4.2, 6.2, 8.2, 10.2).
+- Gather: 15 cycles latency with all lanes in one line, about 175-184 with lanes on 16 lines.
+- x87: add and mul latency 3; divide 38-39.
+- Loads: L1 3, L2 24, memory about 357 cycles latency.
+- **Streaming stores are slower than normal stores at one thread**: 27 vs 2.2 ticks (L1-sized),
+  157 vs 38 (memory-sized). E5-08 must check this at 4 threads and 60 cores before using them.
