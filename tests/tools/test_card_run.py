@@ -431,18 +431,32 @@ class CardRun(unittest.TestCase):
             self.assertEqual(row["logicalCpus"], list(range(240)))
             self.assertIs(row["timingValid"], True)
 
-    def test_benchmark_refuses_foreign_workload_before_start(self):
-        self.transport.processes = [{"pid": 77, "name": "wrf.mic", "exe": "/opt/wrf.mic",
-                                     "cwd": "/opt"}]
+    def test_benchmark_refuses_foreign_workload_but_allows_mpss_daemons(self):
+        daemons = [
+            {"pid": 1, "name": "init", "exe": "/sbin/init", "cwd": "/"},
+            {"pid": 2, "name": "sshd", "exe": "/usr/sbin/sshd", "cwd": "/"},
+            {"pid": 3, "name": "udevd", "exe": "/sbin/udevd", "cwd": "/"},
+            {"pid": 4, "name": "getty", "exe": "/sbin/getty", "cwd": "/"},
+            {"pid": 5, "name": "klogd", "exe": "/sbin/klogd", "cwd": "/"},
+            {"pid": 6, "name": "syslogd", "exe": "/sbin/syslogd", "cwd": "/"},
+            {"pid": 7, "name": "portmap", "exe": "/sbin/portmap", "cwd": "/"},
+            {"pid": 8, "name": "coi_daemon", "exe": "/usr/sbin/coi_daemon", "cwd": "/"},
+        ]
+        self.transport.processes = daemons + [
+            {"pid": 77, "name": "wrf.mic", "exe": "/opt/wrf.mic", "cwd": "/opt"},
+            {"pid": 78, "name": "mpiexec.mic", "exe": "/opt/mpiexec.mic", "cwd": "/opt"},
+        ]
         result = self.run_card(benchmark=True)
         self.assertEqual(result["result_class"], "refused")
         self.assertIn("foreign workload running", result["detail"])
         self.assertIn("wrf.mic", result["detail"])
+        self.assertIn("mpiexec.mic", result["detail"])
         self.assertFalse(any(row["event"] == "start" for row in self.ledger_rows()))
         self.assertNotIn("stage", self.names())
 
         self.ledger.write_text("", encoding="utf8")
         self.transport = FakeTransport()
+        self.transport.processes = daemons
         result = self.run_card(benchmark=True)
         self.assertEqual(result["result_class"], "program")
 
