@@ -2,7 +2,7 @@
 
 Updated automatically at every ticket change. Last update: 2026-11-06 08:54.
 
-**Next: GPT-6.1, on S6-02 (M2 kernels: affine, stencil, short-loop and small-matrix as GCC-KNC vector, x87 and hand-written IMCI builds, with a timing driver).** Run `python tools/dispatch.py`, or ask the tech lead to.
+**Next: the tech lead, on S6-02.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[##################--]` 99 of 107
 
@@ -119,7 +119,7 @@ Current tickets: `[##################--]` 99 of 107
 | S5-20 | card_run refuses engineer sandbox sessions, so card jobs stay with the lead | Done | card_run now refuses to run when started from a Codex sandbox account, so only the lead puts jobs on the ca... |
 | S5-21 | 32-byte short vectors pass and return in memory again, as before S5-16 and as the donor does (pr109040 regression) | Done | 32-byte short vectors (such as unsigned short vector_size(32)) are passed on the stack and returned in memo... |
 | S6-01 | Measurement method on KNC: clock, pinning, thread density, working sets, repetitions and noise (ADR-0010 input) | Done | KNC now has a measured timing method: raw-monotonic wall time, fixed sibling pinning for 1-4 threads per co... |
-| S6-02 | M2 kernels: affine, stencil, short-loop and small-matrix as GCC-KNC vector, x87 and hand-written IMCI builds, with a timing driver | In progress |  |
+| S6-02 | M2 kernels: affine, stencil, short-loop and small-matrix as GCC-KNC vector, x87 and hand-written IMCI builds, with a timing driver | Question for the tech lead | S6-02 requires creating tests/acceptance/m2_kernels/, but AGENTS.md says not to change tests/acceptance/ an... |
 | S6-03 | Machine characterization corpus (E5-01): latency and throughput per instruction class at 1-4 threads per core, cache and memory levels | In progress |  |
 | S6-04 | Per-loop KNC reports (E5-03): vector factor, peel and tail choice, masks, helper calls, spills and rejection reasons | Done | With -fopt-info-vec, KNC now reports each costed loop candidate: vector mode and factor, scalar peel, maske... |
 | S6-05 | -mtune=knc costs and vectorizer cost model v1 from the characterization tables (E5-09, E5-02) | Not started |  |
@@ -132,6 +132,7 @@ Current tickets: `[##################--]` 99 of 107
 
 ## Recent activity
 
+- 2026-11-06 08:54 **S6-02** engineer ask: S6-02 requires creating tests/acceptance/m2_kernels/, but AGENTS.md says not to change tests/acceptance/ and to ask if that rule blocks the ticket....
 - 2026-11-06 08:52 **S6-01** lead approve: KNC now has a measured timing method: raw-monotonic wall time, fixed sibling pinning for 1-4 threads per core, per-density L1/L2/memory sizes, and ...
 - 2026-11-06 08:43 **S6-01** engineer submit: cf89686: completed cited one-page protocol and measured answers in docs/research/knc-measurement.md (schema, commands, prior GCC16 build/lint PASS ...
 - 2026-11-06 08:37 **S6-01** lead answer: Card results are in .work/_shared/S6-01/claude-bench/run1.out to run6.out (stdout first, card_run JSON last; jobs claude-1589bc1c…, claude-85d41827...
@@ -139,7 +140,6 @@ Current tickets: `[##################--]` 99 of 107
 - 2026-11-06 08:12 **S6-04** engineer submit: Submitted by the lead on the engineer's behalf (token budget exhausted after the work was done). Engineer's last report: build, T0 52, T1/T2 and th...
 - 2026-11-06 08:12 **S6-04** owner decide: Lead, under the owner's delegation: no further engineer session; the work is complete and the lead submits it to save tokens.
 - 2026-11-06 08:11 **S6-04** engineer escalate: budget: 7324487 input tokens used; the budget is 6000000
-- 2026-11-06 08:11 **S6-04** lead answer: Done: the lead's commit on s5/S6-04 removes the seven tracked dumps (the branch is now 5 files, 34 lines). Leave .work/_shared/S6-04 as it is. Comm...
 
 ## Cost
 
