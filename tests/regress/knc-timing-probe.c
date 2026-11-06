@@ -1,6 +1,7 @@
 /* S6-01 research probe. Numeric record schema: docs/research/knc-measurement.md.
    Run only through the lead's exclusive card_run --benchmark window. */
 #define _GNU_SOURCE
+#include <dirent.h>
 #include <errno.h>
 #include <limits.h>
 #include <pthread.h>
@@ -32,11 +33,12 @@ static void fail(int stage, int error) {
     fflush(stdout);
     exit(1);
 }
-static uint64_t now(void) {
+static uint64_t clock_ns(clockid_t clock) {
     struct timespec t;
-    if (clock_gettime(wall, &t)) fail(1, errno);
+    if (clock_gettime(clock, &t)) fail(1, errno);
     return (uint64_t)t.tv_sec * 1000000000ULL + t.tv_nsec;
 }
+static uint64_t now(void) { return clock_ns(wall); }
 static inline uint64_t tsc(void) {
     unsigned lo, hi;
     __asm__ volatile ("rdtsc" : "=a"(lo), "=d"(hi) : : "memory");
@@ -110,10 +112,59 @@ static void topology_read(void) {
                 }
     }
 }
+/* Encode names and contents as decimal bytes to preserve numbers-only stdout.
+   Missing sysfs interfaces are evidence, not fatal measurement errors. */
+static void policy_record(int phase, const char *path, int error,
+                          const unsigned char *value, size_t size) {
+    printf("10 %d %d %zu %zu", phase, error, strlen(path), size);
+    for (const unsigned char *p = (const unsigned char *)path; *p; ++p)
+        printf(" %u", (unsigned)*p);
+    for (size_t i = 0; i < size; ++i) printf(" %u", (unsigned)value[i]);
+    putchar('\n');
+}
+static void policy_file(int phase, const char *path) {
+    unsigned char value[4096];
+    size_t size = 0;
+    int error = 0;
+    FILE *f = fopen(path, "r");
+    if (!f) error = errno;
+    else {
+        size = fread(value, 1, sizeof(value), f);
+        if (ferror(f)) error = errno ? errno : EIO;
+        else if (size == sizeof(value) && fgetc(f) != EOF) error = EOVERFLOW;
+        if (ferror(f) && !error) error = errno ? errno : EIO;
+        fclose(f);
+    }
+    policy_record(phase, path, error, value, size);
+}
+static void policy(int phase) {
+    const char *base = "/sys/devices/system/cpu/cpu0/cpufreq";
+    DIR *dir;
+    struct dirent *entry;
+    char path[PATH_MAX];
+    policy_file(phase, "/sys/devices/system/clocksource/clocksource0/current_clocksource");
+    policy_file(phase, "/sys/devices/system/clocksource/clocksource0/available_clocksource");
+    dir = opendir(base);
+    if (!dir) { policy_record(phase, base, errno, NULL, 0); return; }
+    for (;;) {
+        errno = 0;
+        entry = readdir(dir);
+        if (!entry) {
+            policy_record(phase, base, errno, NULL, 0);
+            break;
+        }
+        if (strncmp(entry->d_name, "scaling", 7) && !strstr(entry->d_name, "governor"))
+            continue;
+        int n = snprintf(path, sizeof(path), "%s/%s", base, entry->d_name);
+        if (n < 0 || (size_t)n >= sizeof(path)) fail(27, ENAMETOOLONG);
+        policy_file(phase, path);
+    }
+    closedir(dir);
+}
 static void clocks(void) {
     uint64_t delta[CALLS], begin, end, prev, cur, minimum;
     unsigned a, d, max;
-    struct timespec res, pause = {0, 200000000};
+    struct timespec res;
     cpuid(0x80000000U, &max, &d);
     d = 0;
     if (max >= 0x80000007U) cpuid(0x80000007U, &a, &d);
@@ -141,21 +192,34 @@ static void clocks(void) {
                (unsigned long long)(minimum == UINT64_MAX ? 0 : minimum),
                (unsigned long long)delta[CALLS/2], (double)(end - begin)/CALLS);
     }
+}
+static void calibrate(int phase) {
+#ifdef CLOCK_MONOTONIC_RAW
+    struct timespec res, pause = {0, 200000000};
+    if (clock_gettime(CLOCK_MONOTONIC_RAW, &res)) {
+        printf("4 %d -1 -1 %d %d 0 0 0\n", phase, (int)CLOCK_MONOTONIC_RAW, errno);
+        return;
+    }
     for (int mode = 0; mode < 2; ++mode)
         for (int trial = 0; trial < 3; ++trial) {
-            uint64_t w0 = now(), t0 = ordered_tsc(), t1, w1;
+            uint64_t w0 = clock_ns(CLOCK_MONOTONIC_RAW), t0 = ordered_tsc(), t1, w1;
             if (!mode) {
                 struct timespec remain = pause;
                 while (nanosleep(&remain, &remain))
                     if (errno != EINTR) fail(11, errno);
             } else {
-                while (now() - w0 < 200000000ULL) __asm__ volatile ("" ::: "memory");
+                while (clock_ns(CLOCK_MONOTONIC_RAW) - w0 < 200000000ULL)
+                    __asm__ volatile ("" ::: "memory");
             }
-            t1 = ordered_tsc(); w1 = now();
-            printf("4 %d %d %llu %llu %.6f\n", mode, trial,
+            t1 = ordered_tsc(); w1 = clock_ns(CLOCK_MONOTONIC_RAW);
+            printf("4 %d %d %d %d 0 %llu %llu %.6f\n", phase, mode, trial,
+                   (int)CLOCK_MONOTONIC_RAW,
                    (unsigned long long)(w1-w0), (unsigned long long)(t1-t0),
                    1000.0 * (double)(t1-t0)/(double)(w1-w0));
         }
+#else
+    printf("4 %d -1 -1 -1 %d 0 0 0\n", phase, ENOSYS);
+#endif
 }
 static __attribute__((noinline)) void stream(struct worker *w) {
     float *restrict a = w->a, *restrict b = w->b, *restrict c = w->c;
@@ -222,6 +286,7 @@ int main(int argc, char **argv) {
     if (!clock_getres(CLOCK_MONOTONIC_RAW, &res)) wall = CLOCK_MONOTONIC_RAW;
 #endif
     clocks();
+    policy(0); calibrate(0);
     if ((rc = pthread_barrier_init(&barrier, NULL, workers + 1))) fail(18, rc);
     if ((rc = pthread_attr_init(&attr))) fail(19, rc);
     if ((rc = pthread_attr_setstacksize(&attr, 128 * 1024))) fail(20, rc);
@@ -237,7 +302,7 @@ int main(int argc, char **argv) {
     if (!pilot) fail(25, 0);
     batch = (unsigned)((100000000ULL + pilot - 1)/pilot);
     if (!batch) batch = 1;
-    printf("0 1 %d %d %zu %u %d %d %d\n", cores, density, length, batch, GROUPS, REPS, 3);
+    printf("0 2 %d %d %zu %u %d %d %d\n", cores, density, length, batch, GROUPS, REPS, 3);
     for (int i = 0; i < workers; ++i)
         printf("5 %d %d %d %d %d\n", i, i/density, i%density, data[i].cpu, data[i].observed);
     for (int g = 0; g < GROUPS; ++g) {
@@ -266,5 +331,6 @@ int main(int argc, char **argv) {
     }
     printf("9 %lu\n", bad);
     pthread_attr_destroy(&attr); pthread_barrier_destroy(&barrier);
+    calibrate(1); policy(1);
     return bad ? 1 : spread < 2.0 ? 0 : 2;
 }

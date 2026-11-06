@@ -12,7 +12,9 @@ topology discovery but its ticket contains no captured `/proc/cpuinfo` mapping.
    (record 3). Use serialized RDTSC for same-worker ticks, not invariant core
    cycles: Intel 327364-001 p.676, table B.7, reserves CPUID.80000007H, returning
    zero. Actual rate/invariance remain pending CPU MHz/flags (1), CPUID (2),
-   sleep/busy calibration (4), and the unavailable 330991 timer pages.
+   start/end sleep/busy calibration against MONOTONIC_RAW (4), and clocksource /
+   power policy (10). TSC invariance is unproven; 330991 pp.35–37, as cited in
+   `knc-microarch.md`, describe measurement hooks, not an invariant-rate guarantee.
 2. **Placement.** Production means **60 cores, IDs 0–59, four workers per core,
    240 workers**; exclude OS core 60. Also measure densities 1, 2, 3 and 4 over
    N=1 and N=60 cores. Group `/proc/cpuinfo` by `core id`, sort logical IDs, and
@@ -65,10 +67,17 @@ shared sysroot. Assembly inspection shows the stream loop uses x87; this is the
 FP32 storage streaming baseline, not a claim about IMCI performance. No GCC
 checkout changes or GCC rebuild. Both assembly and linked ELF passed `knc_lint`.
 
-Lead-only command (example; not executed by the engineer):
+Lead-only commands from this worktree (not executed by the engineer). Run each
+line as a separately admitted exclusive window; the first three are independent
+production launches, followed by densities 1, 2 and 3:
 
 ```text
 python tools/card_run --benchmark --threads 240 --timeout 300 ../_shared/S6-01/knc-timing-probe.mic 60 4 262144
+python tools/card_run --benchmark --threads 240 --timeout 300 ../_shared/S6-01/knc-timing-probe.mic 60 4 262144
+python tools/card_run --benchmark --threads 240 --timeout 300 ../_shared/S6-01/knc-timing-probe.mic 60 4 262144
+python tools/card_run --benchmark --threads 60 --timeout 300 ../_shared/S6-01/knc-timing-probe.mic 60 1 262144
+python tools/card_run --benchmark --threads 120 --timeout 300 ../_shared/S6-01/knc-timing-probe.mic 60 2 262144
+python tools/card_run --benchmark --threads 180 --timeout 300 ../_shared/S6-01/knc-timing-probe.mic 60 3 262144
 ```
 
 Use a card configuration with **at least 2048 MiB memory budget** for this case
@@ -84,28 +93,45 @@ Whitespace-separated, numbers-only stdout, first column is record type:
 
 | Type | Remaining columns |
 |---|---|
-| 0 | schema=1, cores, density, length/thread, batch, groups=5, reps=21, warmups=3 |
+| 0 | schema=2, cores, density, length/thread, batch, groups=5, reps=21, warmups=3 |
 | 1 | logical CPU, core ID, cpuinfo MHz, constant_tsc flag, nonstop_tsc flag, inherited-allowed flag |
 | 2 | maximum extended CPUID leaf, leaf 80000007 EDX, bit 8 |
 | 3 | kind (0=wall, 1=raw RDTSC, 2=serialized RDTSC), wall clock ID, clock_getres ns (0 for TSC), minimum positive delta, median delta, amortized ns/read |
-| 4 | mode (0=sleep, 1=busy), trial, elapsed ns, TSC ticks, observed TSC MHz |
+| 4 | phase (0=start, 1=end), mode (0=sleep, 1=busy), trial, calibration clock ID, errno (0=success), elapsed ns, TSC ticks, observed TSC MHz |
 | 5 | worker, core, sorted sibling index, requested logical CPU, observed CPU |
 | 6 | group, repetition, elapsed makespan ns, worker-0 serialized TSC ticks |
 | 7 | group, minimum ns, median ns, maximum ns, full spread percent |
 | 8 | minimum group median ns, median of group medians ns, maximum group median ns, spread percent, below-2-percent flag |
 | 9 | incorrect output elements (must be zero) |
+| 10 | phase (0=start, 1=end), errno (0=success), path byte count, value byte count, path bytes then value bytes (each unsigned decimal ASCII, including whitespace) |
 | 99 | failure stage (see source), errno/pthread error or offending value |
 
-Types 1–4 precede type 0. Type 3 deltas are ns for kind 0 and ticks otherwise;
+Types 1–4 and 10 first appear before type 0; end-phase types 4 and 10 follow
+type 9 after workers join. Type 10 captures `current_clocksource` and
+`available_clocksource` under `/sys/devices/system/clocksource/clocksource0/`,
+and every `scaling*` or governor-named file under
+`/sys/devices/system/cpu/cpu0/cpufreq/`. A directory record with empty value
+reports enumeration status; missing/unreadable paths retain their errno.
+Values are preserved verbatim as decimal bytes, so unknown clocksource and
+governor names remain recoverable without violating numbers-only stdout.
+For example, value bytes `116 115 99 10` decode to `tsc` followed by newline.
+Values above 4096 bytes report EOVERFLOW with the captured prefix.
+Type 1 already captures CPU MHz and both requested TSC flags for every CPU.
+Type 3 deltas are ns for kind 0 and ticks otherwise;
 minimum delta is observed read spacing, **not** the intrinsic hardware resolution.
 The amortized cost includes loop overhead. Serialized reads bracket RDTSC with
 CPUID on both sides; the measured interval includes boundary cost. TSC resolution
 in seconds requires a validated measured rate; 1/rate is only nominal tick size.
 Never subtract worker-0 ticks from another core's timestamp or equate them to
-the global makespan. The six rate trials cover one pinned CPU and cannot prove
+the global makespan. Type 4 uses CLOCK_MONOTONIC_RAW explicitly, even if the
+wall timer falls back to MONOTONIC. If RAW is unavailable, mode/trial are -1,
+errno is nonzero and durations/rate are zero (clock ID -1 if not compiled in);
+this is missing calibration evidence, not a zero TSC rate. Six rate trials at
+each of start and end cover the same pinned CPU and cannot prove
 invariance across all power states; if the OS clocksource itself uses TSC, the
-rate calibration is not independent. Obtain clocksource and power-policy
-information with the lead's native results before choosing TSC for comparisons.
+rate calibration is not independent. Compare start/end rates and decode type 10
+with the lead's native results before choosing TSC for comparisons. Neither
+matching rates nor absent flags establishes invariance over untested power states.
 
 The pilot targets 100 ms; inspect actual type-6 durations because first-pass
 cache/startup effects can change subsequent batch times. Check that timer cost
@@ -114,8 +140,9 @@ Do not silently drop a slow sample. Exit 0 requires correct results and <2%
 between-group spread; exit 2 means noise criterion failed, exit 1 means error.
 Even exit 0 does not establish run-to-run stability without independent launches.
 
-Build log: `.work/_state/logs/S6_01_probe_build-20261106-074446.log`.
-Lint log: `.work/_state/logs/S6_01_probe_lint-20261106-074538.log`.
-An earlier lint invocation used the wrong saved-assembly basename and exited 2;
-the corrected invocation above passed. Native output, actual CPU mapping, TSC
+Schema-2 rebuild log: `.work/_state/logs/S6_01_probe_build-20261106-075350.log`.
+Assembly/ELF lint log: `.work/_state/logs/S6_01_probe_lint-20261106-075407.log`.
+Both passed. An initial shell invocation failed before compilation because
+prepending Cygwin to PATH shadowed Windows Python; resolving Python first fixed
+the invocation. Native output, actual CPU mapping, TSC
 rate/cost, and <2% independent-run evidence remain pending the lead's card run.
