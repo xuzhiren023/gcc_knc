@@ -1,10 +1,10 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-06 12:16.
+Updated automatically at every ticket change. Last update: 2026-11-06 12:24.
 
 **Next: the tech lead, on S6-05.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
-Current tickets: `[###################-]` 103 of 108
+Current tickets: `[###################-]` 104 of 108
 
 ## Milestones
 
@@ -12,7 +12,7 @@ Current tickets: `[###################-]` 103 of 108
 |---|---|---|---|
 | M0 | Foundation | In progress | 17 of 17 tickets |
 | M1 | Mixed native code | Done | 43 of 43 tickets |
-| M2 | Useful vector target | In progress | 43 of 48 tickets |
+| M2 | Useful vector target | In progress | 44 of 48 tickets |
 | M3 | Runtimes | Not started | Not planned in detail yet |
 | M4 | Broad optimization | Not started | Not planned in detail yet |
 | M5 | Program corpus | Not started | Not planned in detail yet |
@@ -128,11 +128,12 @@ Current tickets: `[###################-]` 103 of 108
 | S6-08 | Sprint 6 mid batch check after S6-04 and S6-05 | Not started |  |
 | S6-09 | ICE in expand_vec_series_expr: KNC lane-index vectors (VEC_SERIES) for V16SI/V8DI and the FP modes | Done | Loops that build lane-index vectors (VEC_SERIES) now compile on KNC instead of crashing the compiler: 6 of ... |
 | S6-10 | Unrecognizable and unconstrained insns: ffsll's scalar conditional move, and constant -1 into a k register | Done | Constant 0 and -1 loads into mask registers (kxor/kxnor) and 64-bit ffs without CMOV now compile on KNC, fi... |
-| S6-11 | ICE in expand_fn_using_insn for FP64 fmax/fmin loops (S5-15 follow-up) | Waiting for review | Red: both ICEs. Build and reduced/upstream compile+lint PASS. T0/T1/T2: 300 outcomes unchanged vs S6-10. To... |
+| S6-11 | ICE in expand_fn_using_insn for FP64 fmax/fmin loops (S5-15 follow-up) | Done | Scalar and SLP-reduction fmin/fmax on float and double now compile on KNC through vgmin/vgmax with the C Na... |
 | S6-12 | card_run --benchmark refuses while another project's processes still run on the card, whatever the ledger says | Not started |  |
 
 ## Recent activity
 
+- 2026-11-06 12:24 **S6-11** lead approve: Scalar and SLP-reduction fmin/fmax on float and double now compile on KNC through vgmin/vgmax with the C NaN rules, fixing the last two vect tests ...
 - 2026-11-06 12:15 **S6-11** engineer submit: Red: both ICEs. Build and reduced/upstream compile+lint PASS. T0/T1/T2: 300 outcomes unchanged vs S6-10. Torture: 8012 classifications unchanged. i...
 - 2026-11-06 11:33 **S6-10** lead approve: Constant 0 and -1 loads into mask registers (kxor/kxnor) and 64-bit ffs without CMOV now compile on KNC, fixing 8 vect tests that crashed the compi...
 - 2026-11-06 11:23 **S6-10** engineer submit: GCC 7d96f2cef8c: KNC HI/QI KXOR/KXNOR constants; failed guards removed. Build, 8 reduced/upstream compile/lint checks, s4_masks compile/lint, T0/T1...
@@ -140,13 +141,12 @@ Current tickets: `[###################-]` 103 of 108
 - 2026-11-06 10:51 **S6-10** engineer escalate: budget: 10308894 input tokens used; the budget is 6000000
 - 2026-11-06 10:50 **S6-10** lead answer: 1. T2: the lead caused it; my T2 run for S6-09 rewrote .work/_shared/S5-21/short-vector-O2-*.mic as xuzhi. They are deleted now; T2 rebuilds them. ...
 - 2026-11-06 10:46 **S6-10** engineer ask: After two failed attempts: ffsll passes, but vect-63.c with -O2 -ftree-vectorize -march=knc still reaches cprop_hardreg with (set (reg:HI k1) (cons...
-- 2026-11-06 10:31 **S6-02** lead approve: The M2 yardstick is ready and correct on the card: FP32/FP64 affine, two stencils, a short loop and 8x8/16x16 matrix-vector kernels, each as GCC-ve...
 
 ## Cost
 
 - From the script, engineer: 248 sessions, 601.8M input tokens
 - From the script, lead: 185 sessions, 58.8M input tokens
-- Started by hand, Claude: 9 sessions, 1246.2M input tokens
+- Started by hand, Claude: 9 sessions, 1255.0M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
