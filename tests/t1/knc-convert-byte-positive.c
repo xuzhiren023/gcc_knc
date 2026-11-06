@@ -10,13 +10,16 @@
 // scan-asm-func u8_i32: \A(?=[\s\S]*\bvpandd\b[\s\S]*\bvmovdqa32\s+%zmm\d+\{uint8\},\s*[^\n]+)(?!(?:[\s\S]*\{[us]int(?:8|16)\}){2})
 // scan-asm-func s16_i32: \A(?=[\s\S]*\bvpandd\b[\s\S]*\bvmovdqa32\s+%zmm\d+\{uint16\},\s*[^\n]+)(?!(?:[\s\S]*\{[us]int(?:8|16)\}){2})
 // Stable logical line numbers tie each vectorization report to its loop.
-// scan-output: knc-convert-byte-positive\.c:101:\d+: optimized: loop vectorized using 64 byte vectors
-// scan-output: knc-convert-byte-positive\.c:102:\d+: optimized: loop vectorized using 64 byte vectors
-// scan-output: knc-convert-byte-positive\.c:103:\d+: optimized: loop vectorized using 64 byte vectors
-// scan-output: knc-convert-byte-positive\.c:104:\d+: optimized: loop vectorized using 64 byte vectors
-// scan-output: knc-convert-byte-positive\.c:105:\d+: optimized: loop vectorized using 64 byte vectors
-// scan-output: knc-convert-byte-positive\.c:106:\d+: optimized: loop vectorized using 64 byte vectors
-// scan-output: knc-convert-byte-positive\.c:107:\d+: optimized: loop vectorized using 64 byte vectors
+// The report names the base mode (V16QI/V16HI for narrow inputs), not the
+// 64-byte result. Per the S5-16 lead approval, accept all three base widths;
+// the unchanged scans above require one converting zmm access and no xmm/ymm.
+// scan-output: knc-convert-byte-positive\.c:101:\d+: optimized: loop vectorized using (?:16|32|64) byte vectors
+// scan-output: knc-convert-byte-positive\.c:102:\d+: optimized: loop vectorized using (?:16|32|64) byte vectors
+// scan-output: knc-convert-byte-positive\.c:103:\d+: optimized: loop vectorized using (?:16|32|64) byte vectors
+// scan-output: knc-convert-byte-positive\.c:104:\d+: optimized: loop vectorized using (?:16|32|64) byte vectors
+// scan-output: knc-convert-byte-positive\.c:105:\d+: optimized: loop vectorized using (?:16|32|64) byte vectors
+// scan-output: knc-convert-byte-positive\.c:106:\d+: optimized: loop vectorized using (?:16|32|64) byte vectors
+// scan-output: knc-convert-byte-positive\.c:107:\d+: optimized: loop vectorized using (?:16|32|64) byte vectors
 unsigned char u8[1024] __attribute__((aligned(64)));
 signed char s8[1024] __attribute__((aligned(64)));
 unsigned short u16[1024] __attribute__((aligned(64)));

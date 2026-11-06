@@ -8,14 +8,14 @@ import s5_12_checks as checks
 checks.OUT = checks.SHARED / 's5-16'
 
 
-def retry_t1():
-    """Retry the failed positive scan and the two reduced ICE classes."""
+def retry_t1(names):
+    """Retry selected failures without repeating passing cases."""
     from types import SimpleNamespace
     from check import Runner
     runner = Runner(SimpleNamespace(compiler='gcc16', cc=None))
     with runner._output:
         runner.t1_sources(runner.source_dir / ('knc-convert-byte-' + name + '.c')
-                          for name in ('positive', 'reload', 'init'))
+                          for name in names)
     return int(runner.failed)
 
 
@@ -51,7 +51,7 @@ def native():
 if __name__ == '__main__':
     checks.__file__ = __file__
     if os.name != 'nt' and sys.argv[1] == 'retry-t1':
-        sys.exit(retry_t1())
+        sys.exit(retry_t1(sys.argv[2:] or ('positive', 'reload', 'init')))
     if os.name != 'nt' and sys.argv[1] == 'native':
         os.environ['PATH'] = ':'.join(str(checks.TC / p) for p in
                                       ('cross/bin', 'cygwin/bin')) + ':' + os.environ['PATH']
