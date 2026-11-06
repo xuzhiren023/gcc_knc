@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-06 09:28.
+Updated automatically at every ticket change. Last update: 2026-11-06 09:33.
 
-**Next: the tech lead, on S6-05.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: the tech lead, on S6-02.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[##################--]` 101 of 107
 
@@ -119,7 +119,7 @@ Current tickets: `[##################--]` 101 of 107
 | S5-20 | card_run refuses engineer sandbox sessions, so card jobs stay with the lead | Done | card_run now refuses to run when started from a Codex sandbox account, so only the lead puts jobs on the ca... |
 | S5-21 | 32-byte short vectors pass and return in memory again, as before S5-16 and as the donor does (pr109040 regression) | Done | 32-byte short vectors (such as unsigned short vector_size(32)) are passed on the stack and returned in memo... |
 | S6-01 | Measurement method on KNC: clock, pinning, thread density, working sets, repetitions and noise (ADR-0010 input) | Done | KNC now has a measured timing method: raw-monotonic wall time, fixed sibling pinning for 1-4 threads per co... |
-| S6-02 | M2 kernels: affine, stencil, short-loop and small-matrix as GCC-KNC vector, x87 and hand-written IMCI builds, with a timing driver | In progress | Submit is unblocked: the ticket now has allow_protected: tests/acceptance/m2_kernels/, and the size and rat... |
+| S6-02 | M2 kernels: affine, stencil, short-loop and small-matrix as GCC-KNC vector, x87 and hand-written IMCI builds, with a timing driver | Question for the tech lead | 2d9a63d implements all four reference improvements; suite build and both ELF lints PASS. Log: .work/_state/... |
 | S6-03 | Machine characterization corpus (E5-01): latency and throughput per instruction class at 1-4 threads per core, cache and memory levels | Done | A KNC characterization corpus of 104 hand-written measurements is ready to run on the card: latency and thr... |
 | S6-04 | Per-loop KNC reports (E5-03): vector factor, peel and tail choice, masks, helper calls, spills and rejection reasons | Done | With -fopt-info-vec, KNC now reports each costed loop candidate: vector mode and factor, scalar peel, maske... |
 | S6-05 | -mtune=knc costs and vectorizer cost model v1 from the characterization tables (E5-09, E5-02) | Question for the tech lead | Required S6-03 input is missing: Get-Content docs/research/knc-characterization.md fails with PathNotFound;... |
@@ -132,6 +132,7 @@ Current tickets: `[##################--]` 101 of 107
 
 ## Recent activity
 
+- 2026-11-06 09:33 **S6-02** engineer ask: 2d9a63d implements all four reference improvements; suite build and both ELF lints PASS. Log: .work/_state/logs/S6_02_suite_build-20261106-093227.l...
 - 2026-11-06 09:28 **S6-02** lead answer: Submit is unblocked: the ticket now has allow_protected: tests/acceptance/m2_kernels/, and the size and ratio are allowed (--override 'M2 fixture r...
 - 2026-11-06 09:25 **S6-05** engineer ask: Required S6-03 input is missing: Get-Content docs/research/knc-characterization.md fails with PathNotFound; git ls-files '*knc-characterization*' r...
 - 2026-11-06 09:24 **S6-09** lead approve: Loops that build lane-index vectors (VEC_SERIES) now compile on KNC instead of crashing the compiler: 6 of the 7 vect tests that hit this compile, ...
@@ -139,16 +140,15 @@ Current tickets: `[##################--]` 101 of 107
 - 2026-11-06 09:17 **S6-09** engineer submit: Submitted by the lead on the engineer's behalf (token budget exhausted). GCC 89b5040fe28: vec_series for the packed modes in imci.md (+60, no share...
 - 2026-11-06 09:17 **S6-09** owner decide: Lead, under the owner's delegation: no further engineer session; the lead ran the remaining checks and submits.
 - 2026-11-06 09:16 **S6-03** lead approve: A KNC characterization corpus of 104 hand-written measurements is ready to run on the card: latency and throughput per instruction class, U/V pairi...
-- 2026-11-06 09:07 **S6-03** engineer submit: Build/lint/host args PASS: .work/_state/logs/S6_03_acceptance-20261106-090406.log. No card run. Lead PowerShell commands (repeat 3 windows): foreac...
 
 ## Cost
 
 - From the script, engineer: 244 sessions, 581.6M input tokens
 - From the script, lead: 185 sessions, 58.8M input tokens
-- Started by hand, Claude: 9 sessions, 1185.1M input tokens
+- Started by hand, Claude: 9 sessions, 1187.7M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 12.9 GiB of 100 GiB. 160 GiB free on the drive.
+The project uses 12.9 GiB of 100 GiB. 166 GiB free on the drive.
