@@ -1,0 +1,64 @@
+S6-07 first gcc.dg/vect baseline (host compilation only)
+
+2001 top-level C sources; one non-LTO configuration using vect.exp defaults
+and per-test dg options, with -march=knc. Scan directives counted, not judged.
+552 compiled only, 777 linked, 632 skipped, 24 compile errors, 16 ICEs.
+1329 compiled in total; 2656 scan-tree-dump directives counted.
+0 link errors and 0 binary lint failures among the attempted run programs.
+tests/baseline/gcc16-vect.txt contains every source and its classification.
+Unverified effective targets and unimplemented option bundles are explicit
+conservative skips; these are coverage limits, not assertions of missing ISA.
+
+Red: three real-header parser tests failed because vect_suite did not exist.
+Green: all three parser tests passed after implementation.
+The corpus was compiled once. Initial driver linkage with -lrt failed due to
+unresolved librt/libpthread dependencies in the sysroot. The driver was then
+built without unnecessary -lrt and linted; --stage-only completed packaging
+without compiling or linting the 777 test programs again.
+
+Lead card staging (no native execution performed):
+  .work/_shared/S6-07/claude-vect.mic          batch driver, built and linted
+  .work/_shared/S6-07/claude-vect.list         program/source pairs
+  .work/_shared/S6-07/card-files.list          one packed job's staged files
+  .work/_shared/S6-07/claude-t-vect-*.mic      777 built and linted programs
+  .work/_shared/S6-07/README.txt              command from main checkout
+The staging list is relative to the durable main checkout, not this worktree.
+tree-vect.h is adapted for __k1om__ in staging to avoid an SSE2 early exit.
+This adapter preserves test result checks. This is not a native pass claim.
+
+ICEs and reproducers (under tests/regress/s6-07-vect/):
+  pr109011-4.c             pr109011-4.c             extract_insn
+  pr109011-5.c             pr109011-5.c             extract_insn
+  pr114322.c              pr114322.c              expand_vec_series_expr
+  pr53185-2.c             pr53185-2.c             expand_vec_series_expr
+  pr53185.c               pr53185.c               expand_vec_series_expr
+  vect-123.c              vect-123.c              expand_vec_series_expr
+  vect-63.c               vect-63.c               extract_constrain_insn
+  vect-fmax-3.c           vect-fmax-3.c           expand_fn_using_insn
+  vect-fmin-3.c           vect-fmin-3.c           expand_fn_using_insn
+  vect-outer-2b.c          vect-outer-2b.c          extract_constrain_insn
+  vect-outer-2d.c          vect-outer-2d.c          extract_constrain_insn
+  vect-simd-17.c           vect-simd-17.c           expand_vec_series_expr
+  vect-strided-epilogue-1.c vect-strided-epilogue-1.c expand_vec_series_expr
+  vect-strided-store.c     vect-strided-store.c     expand_vec_series_expr
+  vect-double-reduc-3.c    vect-double-reduc-3.c    extract_constrain_insn (original source, not reduced)
+  vect-double-reduc-7.c    vect-double-reduc-7.c    extract_constrain_insn (original source, not reduced)
+
+The two vect-double-reduc cases are original source, not reduced, retained
+unchanged per the lead's 2026-11-06 answer. Both baseline compilations ICE in
+main during cprop_hardreg with a knc_movhi of -1 to k1. Two attempted reductions
+compiled successfully and are not claimed as reproducers. The lead accepted
+the short originals as reproducers and directed that reduction stop.
+The lead will file fixes for the three ICE classes: vec_series, knc_movhi -1
+to a k-register, and fmin/fmax expand_fn. No compiler fix is claimed here.
+
+Reproduce the 14 checked reduced cases through tools/run.py with tools/vect_ice_check.py.
+It uses each original source's options and expects a compiler ICE, not success.
+Per-source original and reduced diagnostics: .work/_shared/S6-07/*.log.
+Wrapper logs in .work/_state/logs/:
+  S6_07_parser_red-20261106-074247.log
+  S6_07_parser-20261106-074513.log
+  S6_07_baseline-20261106-074530.log
+  S6_07_stage-20261106-075058.log
+  S6_07_ice_reductions-20261106-074939.log
+  S6_07_ice_reductions_remaining-20261106-075141.log

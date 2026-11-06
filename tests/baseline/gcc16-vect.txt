@@ -1,0 +1,2019 @@
+KNC GCC 16 gcc.dg/vect/*.c baseline
+Configuration: vect.exp defaults, per-test dg options, -march=knc; no LTO variant.
+Scans counted only; no scan or native execution verdict.
+Unverified effective targets and option bundles conservatively skipped.
+tree-vect.h adapted for __k1om__ to avoid the upstream SSE2 early exit.
+Run executables linted; list and driver staged for one packed card_run job.
+sources: 2001
+compiled (including linked/link failures): 1329
+scan-tree-dump directives: 2656
+compiled: 552
+linked: 777
+skipped: 632
+compile error: 24
+link error: 0
+lint failure: 0
+ICE: 16
+
+source	action	result	compiled	linked	scans	reason/notes
+O-pr46167.c	compile	compiled	1	0	0	
+O1-pr33854.c	compile	compiled	1	0	0	
+O1-pr41008.c	compile	compiled	1	0	0	
+O3-pr36098.c	compile	compiled	1	0	1	
+O3-pr39675-2.c	compile	compiled	1	0	2	
+O3-pr41881.c	compile	compiled	1	0	1	
+O3-pr45971.c	compile	compiled	1	0	0	
+O3-pr46077.c	compile	compiled	1	0	0	
+O3-pr49087.c	compile	compiled	1	0	0	
+O3-pr70130.c	run	linked	1	1	0	dg-require-effective-target: selector [' target powerpc*-*-* '] unmet; dg-additional-options: selector [' target powerpc*-*-* '] unmet
+O3-pr85794.c	compile	compiled	1	0	0	
+O3-pr87546.c	run	linked	1	1	0	
+O3-slp-reduc-10.c	run	linked	1	1	1	
+O3-vect-pr32243.c	compile	compiled	1	0	0	
+O3-vect-pr34223.c	run	linked	1	1	1	
+O3-vect-pr61917.c	compile	compiled	1	0	0	
+Os-vect-95.c	run	linked	1	1	3	
+aligned-section-anchors-nest-1.c	compile	skipped	0	0	0	section_anchors: unsupported on KNC
+aligned-section-anchors-vect-70.c	compile	skipped	0	0	0	section_anchors: unsupported on KNC
+aligned-section-anchors-vect-71.c	compile	skipped	0	0	0	section_anchors: unsupported on KNC
+aligned-section-anchors-vect-72.c	compile	skipped	0	0	0	section_anchors: unsupported on KNC
+bb-slp-1.c	run	linked	1	1	2	
+bb-slp-10.c	run	linked	1	1	2	
+bb-slp-11.c	run	skipped	0	0	1	vect_pack_trunc: capability unverified on KNC
+bb-slp-12.c	run	linked	1	1	1	
+bb-slp-13.c	run	linked	1	1	1	
+bb-slp-14.c	run	linked	1	1	1	
+bb-slp-15.c	run	linked	1	1	1	
+bb-slp-16.c	run	linked	1	1	1	
+bb-slp-17.c	run	linked	1	1	1	
+bb-slp-18.c	run	linked	1	1	1	
+bb-slp-19.c	run	linked	1	1	1	
+bb-slp-2.c	run	linked	1	1	1	
+bb-slp-20.c	run	linked	1	1	3	
+bb-slp-21.c	run	linked	1	1	3	
+bb-slp-22.c	run	linked	1	1	2	
+bb-slp-23.c	run	linked	1	1	1	
+bb-slp-24.c	run	linked	1	1	1	
+bb-slp-25.c	run	linked	1	1	1	
+bb-slp-26.c	run	linked	1	1	1	
+bb-slp-27.c	run	linked	1	1	1	
+bb-slp-28.c	run	linked	1	1	1	
+bb-slp-29.c	run	linked	1	1	1	
+bb-slp-3.c	run	linked	1	1	1	
+bb-slp-30.c	run	linked	1	1	1	
+bb-slp-31.c	compile	compiled	1	0	1	
+bb-slp-32.c	run	linked	1	1	2	
+bb-slp-33.c	run	linked	1	1	1	
+bb-slp-34.c	run	linked	1	1	1	
+bb-slp-35.c	compile	compiled	1	0	1	
+bb-slp-36.c	run	linked	1	1	1	
+bb-slp-37.c	run	linked	1	1	0	
+bb-slp-38.c	run	linked	1	1	1	
+bb-slp-39.c	compile	compiled	1	0	1	
+bb-slp-4.c	run	linked	1	1	1	
+bb-slp-40.c	compile	skipped	0	0	2	vect_char_add: capability unverified on KNC
+bb-slp-41.c	run	linked	1	1	1	
+bb-slp-42.c	run	skipped	0	0	1	vect_perm: capability unverified on KNC
+bb-slp-43.c	compile	compiled	1	0	2	
+bb-slp-44.c	run	linked	1	1	0	
+bb-slp-45.c	run	linked	1	1	1	
+bb-slp-46.c	compile	compiled	1	0	5	
+bb-slp-47.c	compile	compiled	1	0	0	
+bb-slp-48.c	compile	compiled	1	0	2	
+bb-slp-49.c	run	linked	1	1	1	
+bb-slp-5.c	run	linked	1	1	1	
+bb-slp-50.c	compile	compiled	1	0	1	
+bb-slp-51.c	compile	compiled	1	0	1	
+bb-slp-52.c	compile	compiled	1	0	0	
+bb-slp-53.c	compile	compiled	1	0	1	
+bb-slp-54.c	compile	compiled	1	0	1	
+bb-slp-55.c	compile	compiled	1	0	0	
+bb-slp-56.c	compile	compiled	1	0	0	
+bb-slp-57.c	compile	compiled	1	0	3	
+bb-slp-58.c	compile	compiled	1	0	2	
+bb-slp-59.c	compile	compiled	1	0	3	
+bb-slp-6.c	run	linked	1	1	1	
+bb-slp-60.c	compile	compiled	1	0	0	
+bb-slp-61.c	compile	compiled	1	0	0	
+bb-slp-62.c	compile	compiled	1	0	0	
+bb-slp-63.c	compile	compiled	1	0	0	
+bb-slp-64.c	compile	compiled	1	0	0	
+bb-slp-65.c	compile	compiled	1	0	0	dg-additional-options: selector [' target x86_64-*-* i?86-*-* '] unmet
+bb-slp-66.c	compile	compiled	1	0	0	
+bb-slp-67.c	compile	compiled	1	0	1	
+bb-slp-68.c	compile	compiled	1	0	1	dg-additional-options: selector [' target avx '] unmet
+bb-slp-69.c	compile	skipped	0	0	2	vect_condition: capability unverified on KNC
+bb-slp-7.c	run	linked	1	1	1	
+bb-slp-70.c	compile	compile error	0	0	1	dg-additional-options: selector [' target avx512vpopcntdq '] unmet;       |          ^
+bb-slp-71.c	run	linked	1	1	0	
+bb-slp-72.c	run	linked	1	1	0	
+bb-slp-73.c	run	linked	1	1	0	
+bb-slp-74.c	run	linked	1	1	1	
+bb-slp-75.c	compile	compiled	1	0	1	dg-additional-options: selector [' target { x86_64-*-* i?86-*-* } '] unmet
+bb-slp-76.c	compile	compiled	1	0	0	
+bb-slp-77.c	compile	compiled	1	0	1	
+bb-slp-8.c	run	linked	1	1	1	
+bb-slp-8a.c	run	linked	1	1	1	
+bb-slp-8b.c	run	linked	1	1	1	
+bb-slp-9.c	run	linked	1	1	1	
+bb-slp-bool-1.c	run	linked	1	1	0	
+bb-slp-call-1.c	run	linked	1	1	1	
+bb-slp-call-2.c	run	linked	1	1	1	
+bb-slp-call-3.c	run	linked	1	1	0	
+bb-slp-cond-1.c	run	skipped	0	0	3	vect_condition: capability unverified on KNC
+bb-slp-conditional_store_1.c	compile	compiled	1	0	1	dg-additional-options: selector [' target avx2 '] unmet; dg-additional-options: selector [' target aarch64-*-* '] unmet
+bb-slp-div-1.c	compile	compiled	1	0	1	dg-additional-options: selector [' target aarch64_sve '] unmet
+bb-slp-div-2.c	compile	compiled	1	0	1	
+bb-slp-layout-1.c	compile	compiled	1	0	1	
+bb-slp-layout-10.c	compile	compiled	1	0	1	
+bb-slp-layout-11.c	compile	compiled	1	0	2	
+bb-slp-layout-12.c	compile	compiled	1	0	2	
+bb-slp-layout-13.c	compile	compiled	1	0	1	
+bb-slp-layout-14.c	compile	compiled	1	0	1	
+bb-slp-layout-15.c	compile	compiled	1	0	1	
+bb-slp-layout-16.c	compile	compiled	1	0	1	
+bb-slp-layout-17.c	compile	compile error	0	0	0	      |      ^~
+bb-slp-layout-18.c	compile	compile error	0	0	2	/cygdrive/c/Users/xuzhi/Documents/gcc_knc/.work/_shared/gcc/gcc/testsuite/gcc.dg/vect/bb-slp-layout-18.c:8:1: error: unsupported KNC register ABI mode
+bb-slp-layout-19.c	compile	compiled	1	0	1	
+bb-slp-layout-2.c	compile	compiled	1	0	1	
+bb-slp-layout-20.c	compile	compiled	1	0	1	
+bb-slp-layout-21.c	compile	compiled	1	0	0	dg-additional-options: selector [' target x86_64-*-* i?86-*-* '] unmet
+bb-slp-layout-3.c	compile	compiled	1	0	1	
+bb-slp-layout-4.c	compile	compiled	1	0	1	
+bb-slp-layout-5.c	compile	compiled	1	0	1	
+bb-slp-layout-6.c	compile	compiled	1	0	1	
+bb-slp-layout-7.c	compile	compiled	1	0	1	
+bb-slp-layout-8.c	compile	compiled	1	0	1	
+bb-slp-layout-9.c	compile	compiled	1	0	1	
+bb-slp-over-widen-1.c	run	skipped	0	0	4	vect_shift: capability unverified on KNC; vect_pack_trunc: capability unverified on KNC; vect_unpack: capability unverified on KNC
+bb-slp-over-widen-2.c	run	skipped	0	0	4	vect_shift: capability unverified on KNC; vect_pack_trunc: capability unverified on KNC; vect_unpack: capability unverified on KNC
+bb-slp-pattern-1.c	run	linked	1	1	3	dg-additional-options: selector [' target loongarch*-*-* '] unmet
+bb-slp-pattern-2.c	run	skipped	0	0	1	vect_condition: capability unverified on KNC
+bb-slp-phis-1.c	compile	compiled	1	0	0	dg-additional-options: selector [' target x86_64-*-* i?86-*-* '] unmet
+bb-slp-pow-1.c	run	linked	1	1	1	
+bb-slp-pr100778-1.c	compile	compiled	1	0	1	
+bb-slp-pr101207.c	run	linked	1	1	0	
+bb-slp-pr101242.c	compile	compiled	1	0	0	
+bb-slp-pr101615-1.c	run	compile error	0	0	0	      |   ^~~~~~~
+bb-slp-pr101615-2.c	run	linked	1	1	0	
+bb-slp-pr101668.c	run	linked	1	1	0	
+bb-slp-pr101756.c	compile	compile error	0	0	0	/cygdrive/c/Users/xuzhi/Documents/gcc_knc/.work/_shared/gcc/gcc/testsuite/gcc.dg/vect/bb-slp-pr101756.c:17: confused by earlier errors, bailing out
+bb-slp-pr103800.c	compile	compiled	1	0	0	
+bb-slp-pr104240.c	compile	skipped	0	0	1	vect_cond_mixed: capability unverified on KNC
+bb-slp-pr106019.c	compile	compiled	1	0	1	
+bb-slp-pr114249.c	compile	compiled	1	0	0	
+bb-slp-pr114435.c	compile	compiled	1	0	3	
+bb-slp-pr114799.c	compile	compiled	1	0	0	
+bb-slp-pr115777.c	compile	compiled	1	0	1	
+bb-slp-pr119181.c	compile	compiled	1	0	1	
+bb-slp-pr119960-1.c	compile	compiled	1	0	1	
+bb-slp-pr120808.c	compile	compiled	1	0	1	dg-additional-options: selector [' target { x86_64-*-* i?86-*-* } '] unmet
+bb-slp-pr50730.c	compile	compiled	1	0	1	
+bb-slp-pr54400.c	run	compile error	0	0	2	      |       ^~~~~
+bb-slp-pr58135.c	compile	compiled	1	0	1	
+bb-slp-pr65935.c	run	linked	1	1	4	dg-additional-options: selector [' target x86_64-*-* i?86-*-* '] unmet
+bb-slp-pr69907.c	compile	skipped	0	0	1	vect_unpack: capability unverified on KNC
+bb-slp-pr78205.c	compile	compiled	1	0	3	
+bb-slp-pr80705.c	compile	compiled	1	0	2	
+bb-slp-pr81635-1.c	compile	compiled	1	0	1	
+bb-slp-pr81635-2.c	compile	compiled	1	0	1	
+bb-slp-pr81635-3.c	compile	compiled	1	0	1	
+bb-slp-pr81635-4.c	compile	compiled	1	0	1	
+bb-slp-pr90006.c	compile	compiled	1	0	1	dg-additional-options: selector [' target x86_64-*-* i?86-*-* '] unmet
+bb-slp-pr92596.c	compile	compiled	1	0	0	
+bb-slp-pr95271.c	compile	skipped	0	0	0	stdint_types: capability unverified on KNC; dg-additional-options: selector [' target x86_64-*-* i?86-*-* '] unmet
+bb-slp-pr95335.c	compile	compiled	1	0	0	
+bb-slp-pr95839-2.c	compile	compile error	0	0	2	      |          ^
+bb-slp-pr95839-3.c	compile	compiled	1	0	2	
+bb-slp-pr95839-v8.c	compile	skipped	0	0	1	vect64: capability unverified on KNC
+bb-slp-pr95839.c	compile	compile error	0	0	2	      |          ^
+bb-slp-pr95866.c	compile	skipped	0	0	2	vect_shift: capability unverified on KNC
+bb-slp-pr97486.c	compile	compiled	1	0	0	
+bb-slp-pr97496.c	compile	compiled	1	0	0	
+bb-slp-pr97615.c	compile	compiled	1	0	0	
+bb-slp-pr97626.c	compile	compiled	1	0	0	
+bb-slp-pr97633.c	compile	compiled	1	0	0	
+bb-slp-pr97650.c	compile	compiled	1	0	0	
+bb-slp-pr97706.c	compile	compiled	1	0	0	
+bb-slp-pr97709.c	compile	compiled	1	0	0	
+bb-slp-pr97732.c	compile	compiled	1	0	0	
+bb-slp-pr97746.c	compile	compiled	1	0	0	
+bb-slp-pr98137.c	compile	compiled	1	0	1	
+bb-slp-pr98516-1.c	run	linked	1	1	0	
+bb-slp-pr98516-2.c	run	linked	1	1	0	
+bb-slp-pr98544.c	run	linked	1	1	0	
+bb-slp-pr98685.c	compile	compiled	1	0	0	
+bb-slp-pr98854.c	compile	compiled	1	0	1	
+bb-slp-subgroups-1.c	run	linked	1	1	2	
+bb-slp-subgroups-2.c	run	skipped	0	0	3	vect_perm: capability unverified on KNC
+bb-slp-subgroups-3.c	run	skipped	0	0	3	vect_int_mult: capability unverified on KNC
+fast-math-ifcvt-1.c	compile	skipped	0	0	1	vect_condition: capability unverified on KNC
+fast-math-pr35982.c	compile	skipped	0	0	2	vect_intfloat_cvt: capability unverified on KNC
+fast-math-pr43074.c	compile	compiled	1	0	0	
+fast-math-pr44152.c	compile	compiled	1	0	0	
+fast-math-pr55281.c	compile	compiled	1	0	0	
+fast-math-slp-27.c	compile	compiled	1	0	1	
+fast-math-slp-38.c	compile	compiled	1	0	2	
+fast-math-vect-call-1.c	run	linked	1	1	2	
+fast-math-vect-call-2.c	run	linked	1	1	2	
+fast-math-vect-complex-3.c	run	linked	1	1	1	
+fast-math-vect-outer-7.c	compile	compiled	1	0	1	
+fast-math-vect-pow-1.c	compile	compiled	1	0	1	
+fast-math-vect-pow-2.c	compile	compiled	1	0	0	
+fast-math-vect-pr25911.c	compile	compiled	1	0	0	
+fast-math-vect-pr29925.c	run	linked	1	1	1	
+fast-math-vect-reduc-5.c	run	linked	1	1	1	
+fast-math-vect-reduc-7.c	run	linked	1	1	1	
+fast-math-vect-reduc-8.c	compile	compiled	1	0	1	
+fast-math-vect-reduc-9.c	run	linked	1	1	1	
+ggc-pr37574.c	compile	compiled	1	0	0	
+gimplefe-40.c	run	skipped	0	0	0	dg-do: no matching KNC target selector; dg-do: selector [' target { int128 && vect_float } '] unverified; dg-additional-options: selector [' target { powerpc*-*-* && powerpc_altivec_ok } '] unmet
+gimplefe-41.c	run	skipped	0	0	0	dg-do: no matching KNC target selector; dg-do: selector [' target { vect_double && vect_long_long } '] unverified; dg-additional-options: selector [' target x86_64-*-* i?86-*-* '] unmet
+group-no-gaps-1.c	run	linked	1	1	0	
+if-cvt-stores-vect-ifcvt-18.c	run	linked	1	1	1	
+no-fast-math-vect16.c	run	skipped	0	0	2	vect_float_strict: capability unverified on KNC
+no-fre-pre-pr50208.c	compile	compiled	1	0	0	
+no-math-errno-slp-32.c	compile	compiled	1	0	1	
+no-math-errno-vect-pow-1.c	compile	compiled	1	0	1	
+no-scevccp-noreassoc-outer-1.c	run	linked	1	1	1	
+no-scevccp-noreassoc-outer-2.c	run	linked	1	1	1	
+no-scevccp-noreassoc-outer-3.c	run	linked	1	1	1	
+no-scevccp-noreassoc-outer-4.c	run	linked	1	1	1	
+no-scevccp-noreassoc-outer-5.c	run	linked	1	1	1	
+no-scevccp-noreassoc-slp-reduc-7.c	run	linked	1	1	2	
+no-scevccp-outer-1.c	compile	compiled	1	0	1	
+no-scevccp-outer-10.c	run	linked	1	1	1	
+no-scevccp-outer-10a.c	run	linked	1	1	1	
+no-scevccp-outer-10b.c	run	linked	1	1	1	
+no-scevccp-outer-11.c	run	linked	1	1	1	
+no-scevccp-outer-12.c	run	skipped	0	0	1	vect_pack_trunc: capability unverified on KNC
+no-scevccp-outer-13.c	run	linked	1	1	1	
+no-scevccp-outer-14.c	run	linked	1	1	1	
+no-scevccp-outer-15.c	run	linked	1	1	1	
+no-scevccp-outer-16.c	run	linked	1	1	1	
+no-scevccp-outer-17.c	run	linked	1	1	1	
+no-scevccp-outer-18.c	run	linked	1	1	1	
+no-scevccp-outer-19.c	run	linked	1	1	1	
+no-scevccp-outer-2.c	compile	compiled	1	0	1	
+no-scevccp-outer-20.c	run	linked	1	1	1	
+no-scevccp-outer-21.c	run	linked	1	1	1	
+no-scevccp-outer-22.c	run	linked	1	1	1	
+no-scevccp-outer-3.c	run	linked	1	1	1	
+no-scevccp-outer-4.c	run	linked	1	1	1	
+no-scevccp-outer-5.c	run	linked	1	1	1	
+no-scevccp-outer-6-global.c	run	linked	1	1	1	
+no-scevccp-outer-6.c	run	linked	1	1	2	
+no-scevccp-outer-7.c	run	linked	1	1	2	
+no-scevccp-outer-8.c	run	linked	1	1	1	
+no-scevccp-outer-9.c	run	linked	1	1	1	
+no-scevccp-outer-9a.c	run	linked	1	1	1	
+no-scevccp-outer-9b.c	run	linked	1	1	1	
+no-scevccp-pr49199.c	compile	compiled	1	0	0	
+no-scevccp-pr86725-1.c	compile	compiled	1	0	2	
+no-scevccp-pr86725-2.c	compile	compiled	1	0	2	
+no-scevccp-pr86725-3.c	compile	compiled	1	0	2	
+no-scevccp-pr86725-4.c	compile	compiled	1	0	2	
+no-scevccp-pr86725-5.c	compile	compiled	1	0	1	
+no-scevccp-slp-30.c	run	linked	1	1	2	
+no-scevccp-slp-31.c	run	linked	1	1	3	
+no-scevccp-vect-iv-1.c	run	linked	1	1	1	
+no-scevccp-vect-iv-2.c	run	linked	1	1	1	
+no-scevccp-vect-iv-3.c	compile	compiled	1	0	2	
+no-section-anchors-vect-31.c	run	skipped	0	0	3	unimplemented option bundle: bind_pic_locally
+no-section-anchors-vect-34.c	run	skipped	0	0	2	unimplemented option bundle: bind_pic_locally
+no-section-anchors-vect-36.c	run	skipped	0	0	3	unimplemented option bundle: bind_pic_locally
+no-section-anchors-vect-64.c	run	skipped	0	0	3	unimplemented option bundle: bind_pic_locally
+no-section-anchors-vect-65.c	run	skipped	0	0	2	unimplemented option bundle: bind_pic_locally
+no-section-anchors-vect-66.c	run	linked	1	1	4	
+no-section-anchors-vect-68.c	run	skipped	0	0	4	unimplemented option bundle: bind_pic_locally
+no-section-anchors-vect-69.c	run	skipped	0	0	3	unimplemented option bundle: bind_pic_locally
+no-section-anchors-vect-outer-4h.c	run	linked	1	1	1	
+no-trapping-math-1.c	compile	skipped	0	0	0	vect_condition: capability unverified on KNC
+no-trapping-math-2.c	run	linked	1	1	1	
+no-trapping-math-vect-111.c	run	linked	1	1	2	
+no-trapping-math-vect-ifcvt-11.c	run	skipped	0	0	1	vect_condition: capability unverified on KNC
+no-trapping-math-vect-ifcvt-12.c	run	skipped	0	0	1	vect_condition: capability unverified on KNC
+no-trapping-math-vect-ifcvt-13.c	run	skipped	0	0	1	vect_condition: capability unverified on KNC
+no-trapping-math-vect-ifcvt-14.c	run	skipped	0	0	1	vect_condition: capability unverified on KNC
+no-trapping-math-vect-ifcvt-15.c	run	skipped	0	0	1	vect_condition: capability unverified on KNC
+no-tree-dom-vect-bug.c	run	linked	1	1	0	
+no-tree-fre-pr50039.c	compile	compiled	1	0	0	
+no-tree-pre-pr45241.c	compile	compiled	1	0	0	
+no-tree-pre-slp-29.c	run	linked	1	1	2	
+no-vfa-pr29145.c	run	linked	1	1	2	
+no-vfa-vect-101.c	run	linked	1	1	3	
+no-vfa-vect-102.c	run	linked	1	1	3	
+no-vfa-vect-102a.c	run	linked	1	1	3	
+no-vfa-vect-37.c	run	linked	1	1	3	
+no-vfa-vect-43.c	run	linked	1	1	2	
+no-vfa-vect-45.c	run	linked	1	1	1	
+no-vfa-vect-49.c	run	linked	1	1	1	
+no-vfa-vect-51.c	run	linked	1	1	1	
+no-vfa-vect-53.c	run	linked	1	1	1	
+no-vfa-vect-57.c	run	linked	1	1	1	
+no-vfa-vect-61.c	run	linked	1	1	1	
+no-vfa-vect-79.c	run	linked	1	1	3	
+no-vfa-vect-depend-1.c	run	linked	1	1	2	
+no-vfa-vect-depend-2.c	run	linked	1	1	3	
+no-vfa-vect-depend-3.c	run	linked	1	1	2	
+no-vfa-vect-dv-2.c	run	linked	1	1	1	
+nodump-extractlast-1.c	run	linked	1	1	0	
+nodump-extractlast-2.c	run	linked	1	1	0	
+nodump-forwprop-22.c	compile	skipped	0	0	2	vect_perm: capability unverified on KNC
+nodump-pr23073.c	compile	compiled	1	0	0	
+nodump-vect-opt-info-1.c	compile	compiled	1	0	0	
+nodump-vect-opt-info-2.c	compile	compiled	1	0	0	
+pr100756.c	compile	compiled	1	0	1	
+pr101145.c	run	linked	1	1	1	
+pr101145_1.c	run	skipped	0	0	1	vect_char_add: capability unverified on KNC
+pr101145_2.c	run	skipped	0	0	1	vect_char_add: capability unverified on KNC
+pr101145_3.c	run	skipped	0	0	1	vect_long_long: capability unverified on KNC
+pr101145inf.c	run	linked	1	1	0	
+pr101145inf_1.c	run	linked	1	1	0	
+pr101445.c	run	linked	1	1	0	
+pr101505.c	compile	compile error	0	0	0	/cygdrive/c/Users/xuzhi/Documents/gcc_knc/.work/_shared/gcc/gcc/testsuite/gcc.dg/vect/pr101505.c:16: confused by earlier errors, bailing out
+pr102046.c	compile	compiled	1	0	0	dg-additional-options: selector [' target x86_64-*-* i?86-*-* '] unmet
+pr102318.c	compile	compiled	1	0	0	
+pr102832.c	compile	compiled	1	0	0	dg-additional-options: selector [' target aarch64-*-* '] unmet
+pr103116-1.c	run	linked	1	1	1	
+pr103116-2.c	run	linked	1	1	0	dg-additional-options: selector [' target x86_64-*-* i?86-*-* '] unmet
+pr103253.c	compile	skipped	0	0	0	fopenmp: capability unverified on KNC
+pr103494.c	compile	compiled	1	0	0	
+pr103517.c	compile	compiled	1	0	0	dg-additional-options: selector [' target x86_64-*-* i?86-*-* '] unmet
+pr103544.c	compile	compiled	1	0	0	dg-additional-options: selector [' target x86_64-*-* i?86-*-* '] unmet
+pr103581.c	run	linked	1	1	0	dg-additional-options: selector [' target avx2_runtime '] unmet
+pr103744-1.c	compile	compiled	1	0	0	
+pr103744-2.c	compile	compiled	1	0	0	
+pr103761.c	compile	compiled	1	0	0	
+pr103864.c	compile	compiled	1	0	0	
+pr104112-1.c	compile	compiled	1	0	0	dg-additional-options: selector [' target aarch64-*-* '] unmet
+pr104112-2.c	compile	compiled	1	0	0	
+pr104116-ceil-div-2.c	run	skipped	0	0	1	vect_condition: capability unverified on KNC; vect_shift: capability unverified on KNC
+pr104116-ceil-div-pow2.c	run	skipped	0	0	1	vect_condition: capability unverified on KNC; vect_shift: capability unverified on KNC
+pr104116-ceil-div.c	run	skipped	0	0	1	vect_condition: capability unverified on KNC; vect_shift: capability unverified on KNC
+pr104116-ceil-mod-2.c	run	skipped	0	0	1	vect_condition: capability unverified on KNC; vect_shift: capability unverified on KNC
+pr104116-ceil-mod-pow2.c	run	skipped	0	0	1	vect_condition: capability unverified on KNC; vect_shift: capability unverified on KNC
+pr104116-ceil-mod.c	run	skipped	0	0	1	vect_condition: capability unverified on KNC; vect_shift: capability unverified on KNC
+pr104116-ceil-udiv-2.c	run	skipped	0	0	1	vect_condition: capability unverified on KNC; vect_shift: capability unverified on KNC
+pr104116-ceil-udiv-pow2.c	run	skipped	0	0	1	vect_condition: capability unverified on KNC; vect_shift: capability unverified on KNC
+pr104116-ceil-udiv.c	run	skipped	0	0	1	vect_condition: capability unverified on KNC; vect_shift: capability unverified on KNC
+pr104116-ceil-umod-2.c	run	skipped	0	0	1	vect_condition: capability unverified on KNC; vect_shift: capability unverified on KNC
+pr104116-ceil-umod-pow2.c	run	skipped	0	0	1	vect_condition: capability unverified on KNC; vect_shift: capability unverified on KNC
+pr104116-ceil-umod.c	run	skipped	0	0	1	vect_condition: capability unverified on KNC; vect_shift: capability unverified on KNC
+pr104116-floor-div-2.c	run	skipped	0	0	1	vect_condition: capability unverified on KNC; vect_shift: capability unverified on KNC
+pr104116-floor-div-pow2.c	run	skipped	0	0	1	vect_condition: capability unverified on KNC; vect_shift: capability unverified on KNC
+pr104116-floor-div.c	run	skipped	0	0	1	vect_condition: capability unverified on KNC; vect_shift: capability unverified on KNC
+pr104116-floor-mod-2.c	run	skipped	0	0	1	vect_condition: capability unverified on KNC; vect_shift: capability unverified on KNC
+pr104116-floor-mod-pow2.c	run	skipped	0	0	1	vect_condition: capability unverified on KNC; vect_shift: capability unverified on KNC
+pr104116-floor-mod.c	run	skipped	0	0	1	vect_condition: capability unverified on KNC; vect_shift: capability unverified on KNC
+pr104116-round-div-2.c	run	skipped	0	0	1	vect_condition: capability unverified on KNC; vect_shift: capability unverified on KNC
+pr104116-round-div-pow2.c	run	skipped	0	0	1	vect_condition: capability unverified on KNC; vect_shift: capability unverified on KNC
+pr104116-round-div.c	run	skipped	0	0	1	vect_condition: capability unverified on KNC; vect_shift: capability unverified on KNC
+pr104116-round-mod-2.c	run	skipped	0	0	1	vect_condition: capability unverified on KNC; vect_shift: capability unverified on KNC
+pr104116-round-mod-pow2.c	run	skipped	0	0	1	vect_condition: capability unverified on KNC; vect_shift: capability unverified on KNC
+pr104116-round-mod.c	run	skipped	0	0	1	vect_condition: capability unverified on KNC; vect_shift: capability unverified on KNC
+pr104116-round-udiv-2.c	run	skipped	0	0	1	vect_condition: capability unverified on KNC; vect_shift: capability unverified on KNC
+pr104116-round-udiv-pow2.c	run	skipped	0	0	1	vect_condition: capability unverified on KNC; vect_shift: capability unverified on KNC
+pr104116-round-udiv.c	run	skipped	0	0	1	vect_condition: capability unverified on KNC; vect_shift: capability unverified on KNC
+pr104116-round-umod-2.c	run	skipped	0	0	1	vect_condition: capability unverified on KNC; vect_shift: capability unverified on KNC
+pr104116-round-umod-pow2.c	run	skipped	0	0	1	vect_condition: capability unverified on KNC; vect_shift: capability unverified on KNC
+pr104116-round-umod.c	run	skipped	0	0	1	vect_condition: capability unverified on KNC; vect_shift: capability unverified on KNC
+pr104152.c	compile	compiled	1	0	0	dg-additional-options: selector [' target aarch64-*-* '] unmet
+pr104445.c	compile	compiled	1	0	0	dg-additional-options: selector [' target x86_64-*-* i?86-*-* '] unmet
+pr104595.c	compile	skipped	0	0	1	vect_condition: capability unverified on KNC
+pr104782.c	compile	compiled	1	0	0	dg-additional-options: selector [' target aarch64-*-* '] unmet
+pr105219.c	run	linked	1	1	0	dg-additional-options: selector [' target x86_64-*-* i?86-*-* '] unmet; dg-additional-options: selector [' target aarch64*-*-* '] unmet
+pr106081.c	compile	skipped	0	0	2	vect_unpack: capability unverified on KNC; vect_intdouble_cvt: capability unverified on KNC; vect_perm: capability unverified on KNC; dg-additional-options: selector [' target x86_64-*-* i?86-*-* '] unmet
+pr106250.c	compile	compiled	1	0	0	
+pr106914.c	compile	compiled	1	0	0	dg-additional-options: selector [' target x86_64-*-* i?86-*-* '] unmet
+pr107160.c	run	linked	1	1	0	
+pr107212-1.c	run	linked	1	1	0	
+pr107212-2.c	run	linked	1	1	0	
+pr107229-1.c	compile	compiled	1	0	0	
+pr107229-2.c	compile	compiled	1	0	0	
+pr107229-3.c	compile	compiled	1	0	0	
+pr107275.c	compile	compiled	1	0	0	
+pr107302.c	compile	compiled	1	0	0	
+pr107326.c	compile	compiled	1	0	0	
+pr108314.c	compile	compiled	1	0	0	dg-additional-options: selector [' target aarch64-*-* '] unmet
+pr108316.c	compile	compiled	1	0	0	
+pr108608.c	run	linked	1	1	0	
+pr108950.c	compile	skipped	0	0	1	vect_simd_clones: capability unverified on KNC
+pr109011-1.c	compile	compiled	1	0	4	dg-additional-options: selector [' target { { i?86-*-* x86_64-*-* } && avx512cd } '] unmet; dg-additional-options: selector [' target { { i?86-*-* x86_64-*-* } && avx512vpopcntdq } '] unmet; dg-additional-options: selector [' target { powerpc_vsx && { ! has_arch_pwr8 } } '] unmet; dg-additional-options: selector [' target s390_vx '] unmet
+pr109011-2.c	compile	compiled	1	0	3	dg-additional-options: selector [' target { { { { i?86-*-* x86_64-*-* } && avx512cd } && lzcnt } && bmi } '] unmet; dg-additional-options: selector [' target { powerpc_vsx && { ! has_arch_pwr9 } } '] unmet; dg-additional-options: selector [' target s390_vx '] unmet
+pr109011-3.c	compile	compiled	1	0	2	dg-additional-options: selector [' target { { { { i?86-*-* x86_64-*-* } && avx512vpopcntdq } && lzcnt } && bmi } '] unmet; dg-additional-options: selector [' target powerpc_vsx '] unmet
+pr109011-4.c	compile	ICE	0	0	3	dg-additional-options: selector [' target { { { { i?86-*-* x86_64-*-* } && avx512cd } && lzcnt } && bmi } '] unmet; dg-additional-options: selector [' target { powerpc_vsx && { ! has_arch_pwr9 } } '] unmet; dg-additional-options: selector [' target s390_vx '] unmet; See <https://gcc.gnu.org/bugs/> for instructions.
+pr109011-5.c	compile	ICE	0	0	2	dg-additional-options: selector [' target { { { { i?86-*-* x86_64-*-* } && avx512vpopcntdq } && lzcnt } && bmi } '] unmet; dg-additional-options: selector [' target powerpc_vsx '] unmet; See <https://gcc.gnu.org/bugs/> for instructions.
+pr109025.c	compile	compiled	1	0	0	
+pr109473.c	compile	compiled	1	0	0	
+pr109502.c	run	linked	1	1	0	
+pr110142.c	compile	compiled	1	0	1	
+pr110381.c	run	skipped	0	0	0	vect_float_strict: capability unverified on KNC
+pr110838.c	run	linked	1	1	0	
+pr111754.c	compile	compile error	0	0	2	      |          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+pr111764.c	run	linked	1	1	0	
+pr111846.c	compile	compiled	1	0	0	dg-additional-options: selector [' target { x86_64-*-* i?86-*-* } '] unmet
+pr111860-2.c	compile	compiled	1	0	0	
+pr111860-3.c	compile	compiled	1	0	0	
+pr111860.c	compile	compiled	1	0	0	
+pr111882.c	compile	compiled	1	0	1	
+pr111915.c	compile	compiled	1	0	0	
+pr112325.c	compile	skipped	0	0	1	vect_shift: capability unverified on KNC; dg-additional-options: selector [' target x86_64-*-* i?86-*-* '] unmet; dg-additional-options: selector [' target powerpc64*-*-* '] unmet; dg-additional-options: selector [' target loongarch64-*-* '] unmet; dg-additional-options: selector [' target s390*-*-* '] unmet
+pr112505.c	compile	compiled	1	0	0	
+pr112774.c	compile	compiled	1	0	1	
+pr112818.c	compile	compiled	1	0	0	
+pr113002.c	compile	skipped	0	0	0	int128: capability unverified on KNC
+pr113281-1.c	run	linked	1	1	0	
+pr113281-2.c	compile	compiled	1	0	1	
+pr113281-3.c	compile	compiled	1	0	4	
+pr113281-4.c	compile	compiled	1	0	6	
+pr113281-5.c	compile	compiled	1	0	4	
+pr113371.c	compile	compiled	1	0	0	dg-additional-options: selector [' target { x86_64-*-* i?86-*-* } '] unmet
+pr113431.c	run	linked	1	1	1	
+pr113576.c	run	linked	1	1	0	dg-additional-options: selector [' target avx512f '] unmet
+pr113863.c	compile	skipped	0	0	0	unimplemented option bundle: vect_early_break
+pr113902.c	compile	skipped	0	0	0	unimplemented option bundle: vect_early_break
+pr114027.c	run	linked	1	1	0	
+pr114107.c	compile	compiled	1	0	2	
+pr114108.c	compile	compiled	1	0	2	
+pr114231.c	compile	compiled	1	0	0	
+pr114322.c	compile	ICE	0	0	2	See <https://gcc.gnu.org/bugs/> for instructions.
+pr114471.c	compile	compiled	1	0	0	
+pr114485.c	run	linked	1	1	0	
+pr114733.c	run	linked	1	1	0	
+pr114832.c	compile	compiled	1	0	0	
+pr115192.c	run	linked	1	1	0	
+pr115383.c	run	linked	1	1	0	
+pr115385.c	run	linked	1	1	0	dg-additional-options: selector [' target avx2_runtime '] unmet
+pr115395.c	run	linked	1	1	0	dg-additional-options: selector [' target avx2_runtime '] unmet
+pr115537.c	compile	compiled	1	0	0	dg-additional-options: selector [' target aarch64*-*-* '] unmet
+pr115602.c	compile	compiled	1	0	0	
+pr115669.c	run	linked	1	1	0	
+pr115723.c	run	linked	1	1	0	
+pr115753-1.c	compile	skipped	0	0	0	unimplemented option bundle: float16; float16: capability unverified on KNC
+pr115753-2.c	compile	skipped	0	0	0	unimplemented option bundle: float16; float16: capability unverified on KNC
+pr115753-3.c	compile	compiled	1	0	0	
+pr115840.c	compile	compiled	1	0	0	
+pr115841.c	compile	compiled	1	0	0	dg-additional-options: selector [' target avx512vl '] unmet
+pr115843.c	run	linked	1	1	0	dg-additional-options: selector [' target avx512f_runtime '] unmet
+pr115959.c	compile	compiled	1	0	0	
+pr116125.c	run	linked	1	1	0	
+pr116352.c	compile	compiled	1	0	0	
+pr116575.c	compile	compiled	1	0	0	
+pr116628.c	compile	skipped	0	0	1	vect_masked_store: capability unverified on KNC; dg-additional-options: selector [' target aarch64-*-* '] unmet
+pr116791.c	compile	compiled	1	0	0	dg-additional-options: selector [' target avx2 '] unmet
+pr116812.c	compile	compiled	1	0	0	
+pr116985.c	compile	compiled	1	0	0	dg-additional-options: selector [' target { i?86-*-* x86_64-*-* } '] unmet; dg-additional-options: selector [' target aarch64-*-* '] unmet
+pr116997.c	run	linked	1	1	0	
+pr117050.c	compile	compiled	1	0	0	dg-additional-options: selector [' target { x86_64-*-* i?86-*-* } '] unmet
+pr117147.c	compile	compiled	1	0	0	dg-additional-options: selector [' target { x86_64-*-* i?86-*-* } '] unmet
+pr117307.c	compile	compiled	1	0	0	dg-additional-options: selector [' target { x86_64-*-* i?86-*-* } '] unmet
+pr117484-1.c	compile	compiled	1	0	0	
+pr117484-2.c	compile	compiled	1	0	0	
+pr117594.c	run	linked	1	1	0	
+pr117767.c	compile	compiled	1	0	0	
+pr117874.c	compile	compiled	1	0	1	
+pr117888-1.c	compile	skipped	0	0	1	vect_shift: capability unverified on KNC; dg-additional-options: selector [' target x86_64-*-* i?86-*-* '] unmet; dg-additional-options: selector [' target powerpc64*-*-* '] unmet; dg-additional-options: selector [' target loongarch64-*-* '] unmet; dg-additional-options: selector [' target s390*-*-* '] unmet
+pr118140.c	run	skipped	0	0	0	dg-do: no matching KNC target selector; dg-do: selector [' target { aarch64*-*-* || riscv*-*-* } '] unmet
+pr118558.c	run	linked	1	1	0	
+pr118653.c	compile	compiled	1	0	0	
+pr118749.c	run	skipped	0	0	0	unverified selector:  target ia32 ; dg-additional-options: selector [' target ia32 '] unverified
+pr118852.c	run	skipped	0	0	0	unimplemented option bundle: vect_early_break; dg-additional-options: selector [' target { x86_64-*-* i?86-*-* } '] unmet
+pr119057.c	compile	compiled	1	0	0	
+pr119096.c	run	linked	1	1	0	
+pr119145.c	compile	compiled	1	0	0	
+pr119155.c	run	linked	1	1	0	
+pr119399.c	compile	compiled	1	0	1	
+pr119534.c	compile	compiled	1	0	0	dg-additional-options: selector [' target { x86_64-*-* i?86-*-* } '] unmet
+pr119586.c	run	linked	1	1	0	
+pr119640.c	compile	compiled	1	0	0	
+pr119757.c	compile	compiled	1	0	0	
+pr120687-1.c	compile	compiled	1	0	3	
+pr120687-2.c	compile	compiled	1	0	3	
+pr120687-3.c	compile	compiled	1	0	3	
+pr120817.c	run	linked	1	1	0	dg-require-effective-target: selector [' target aarch64*-*-* '] unmet; dg-additional-options: selector [' target aarch64*-*-* '] unmet
+pr120922.c	run	linked	1	1	1	dg-additional-options: selector [' target { riscv_v } '] unmet
+pr121034.c	compile	compiled	1	0	0	
+pr121049.c	run	linked	1	1	0	dg-additional-options: selector [' target avx512f_runtime '] unmet
+pr121059.c	compile	compiled	1	0	0	dg-additional-options: selector [' target avx512f '] unmet
+pr121126.c	run	linked	1	1	0	
+pr121509.c	run	linked	1	1	0	
+pr121638.c	run	linked	1	1	0	
+pr121659.c	compile	compiled	1	0	0	
+pr121686.c	run	linked	1	1	0	
+pr121744-1.c	compile	compiled	1	0	1	dg-additional-options: selector [' target avx2 '] unmet
+pr121754.c	compile	compiled	1	0	0	
+pr121758.c	compile	compiled	1	0	1	
+pr121767.c	compile	compiled	1	0	0	dg-additional-options: selector [' target aarch64-*-* '] unmet
+pr121768.c	compile	compiled	1	0	0	
+pr121830.c	compile	compiled	1	0	0	
+pr121949_1.c	run	linked	1	1	2	
+pr121949_2.c	run	linked	1	1	2	
+pr121949_3.c	run	linked	1	1	2	
+pr122023.c	compile	compiled	1	0	0	
+pr122158.c	compile	compiled	1	0	0	
+pr122419.c	compile	compiled	1	0	0	
+pr122475.c	run	linked	1	1	1	dg-additional-options: selector [' target aarch64*-*-* '] unmet
+pr122680.c	compile	compiled	1	0	0	dg-additional-options: selector [' target avx2 '] unmet
+pr122797.c	run	linked	1	1	0	
+pr122850.c	run	skipped	0	0	0	dg-do: no matching KNC target selector; non-KNC machine options: -march=haswell -m32; dg-do: selector [' target { x86_64-*-* i?86-*-* } '] unmet
+pr122855.c	run	skipped	0	0	0	dg-do: no matching KNC target selector; non-KNC machine options: -march=haswell; dg-do: selector [' target { x86_64-*-* i?86-*-* } '] unmet
+pr122969.c	run	skipped	0	0	1	unimplemented option bundle: vect_early_break; vect_early_break: capability unverified on KNC
+pr123032.c	run	linked	1	1	1	
+pr123038.c	compile	compiled	1	0	0	
+pr123043.c	compile	compiled	1	0	1	dg-additional-options: selector [' target aarch64*-*-* '] unmet; dg-additional-options: selector [' target {  { i?86-*-* x86_64-*-* } && ilp32 } '] unmet
+pr123525.c	compile	compile error	0	0	0	dg-additional-options: selector [' target { x86_64-*-* i?86-*-* } '] unmet; /cygdrive/c/Users/xuzhi/Documents/gcc_knc/.work/_shared/gcc/gcc/testsuite/gcc.dg/vect/pr123525.c:13:15: error: unsupported KNC register ABI mode
+pr123731.c	run	linked	1	1	0	
+pr125646.c	compile	compiled	1	0	0	
+pr16105.c	compile	compiled	1	0	2	
+pr18308.c	compile	compiled	1	0	0	
+pr18400.c	run	linked	1	1	1	
+pr18425.c	compile	skipped	0	0	1	vect_long: capability unverified on KNC
+pr18536.c	run	linked	1	1	1	
+pr20122.c	run	linked	1	1	2	
+pr21591.c	compile	compiled	1	0	1	
+pr21969.c	compile	compiled	1	0	0	
+pr22480.c	compile	skipped	0	0	0	vect_shift: capability unverified on KNC
+pr22506.c	compile	compiled	1	0	0	
+pr23816-1.c	compile	skipped	0	0	0	vect_condition: capability unverified on KNC
+pr23816-2.c	compile	skipped	0	0	0	vect_condition: capability unverified on KNC
+pr23831.c	compile	compiled	1	0	0	
+pr24049.c	compile	compiled	1	0	0	
+pr24059.c	compile	skipped	0	0	0	vect_condition: capability unverified on KNC
+pr24300.c	compile	compiled	1	0	0	
+pr25371.c	compile	compiled	1	0	0	
+pr25413.c	run	linked	1	1	4	
+pr25413a.c	run	linked	1	1	4	
+pr26359.c	compile	compiled	1	0	1	
+pr27151.c	compile	compiled	1	0	0	
+pr28952.c	compile	compiled	1	0	0	
+pr30771.c	compile	compiled	1	0	1	
+pr30784.c	run	linked	1	1	0	
+pr30795.c	compile	compiled	1	0	1	
+pr30843.c	compile	skipped	0	0	1	vect_long: capability unverified on KNC
+pr30858.c	compile	compiled	1	0	2	
+pr31041.c	compile	compiled	1	0	0	
+pr31343.c	compile	compiled	1	0	0	
+pr31699.c	run	linked	1	1	3	
+pr32216.c	compile	skipped	0	0	0	vect_floatint_cvt: capability unverified on KNC
+pr32224.c	compile	compiled	1	0	0	
+pr32230.c	compile	compiled	1	0	0	
+pr32366.c	compile	compiled	1	0	0	
+pr32421.c	compile	compiled	1	0	0	
+pr32824.c	compile	compiled	1	0	1	
+pr33369.c	compile	skipped	0	0	0	vect_shift: capability unverified on KNC
+pr33373.c	compile	compiled	1	0	0	
+pr33373b.c	compile	compiled	1	0	0	
+pr33597.c	compile	compiled	1	0	0	
+pr33707.c	compile	compiled	1	0	1	
+pr33804.c	compile	compiled	1	0	2	
+pr33833.c	compile	compiled	1	0	0	
+pr33846.c	compile	skipped	0	0	0	vect_shift: capability unverified on KNC
+pr33866.c	compile	skipped	0	0	1	vect_long: capability unverified on KNC
+pr33953.c	compile	compiled	1	0	3	
+pr34005.c	compile	compiled	1	0	0	
+pr34195.c	compile	compiled	1	0	1	
+pr34407.c	compile	compiled	1	0	0	
+pr34591.c	compile	compiled	1	0	0	
+pr36228.c	compile	compiled	1	0	1	
+pr36493.c	run	skipped	0	0	1	vect_long: capability unverified on KNC
+pr36630.c	compile	compiled	1	0	1	
+pr37027.c	compile	skipped	0	0	3	vect_perm: capability unverified on KNC
+pr37385.c	compile	compiled	1	0	0	
+pr37474.c	compile	compiled	1	0	0	
+pr37482.c	compile	compiled	1	0	0	
+pr37539.c	run	linked	1	1	1	
+pr37730.c	compile	compiled	1	0	0	
+pr38529.c	compile	compiled	1	0	0	
+pr39529.c	compile	compiled	1	0	0	
+pr40074.c	run	linked	1	1	0	
+pr40238.c	compile	compiled	1	0	0	
+pr40254.c	run	linked	1	1	0	
+pr40542.c	compile	compiled	1	0	1	
+pr41956.c	compile	compiled	1	0	0	
+pr42193.c	compile	skipped	0	0	0	vect_long: capability unverified on KNC
+pr42395.c	compile	compiled	1	0	0	
+pr42604.c	compile	compiled	1	0	0	
+pr42709.c	compile	compiled	1	0	0	
+pr43430-1.c	run	linked	1	1	1	
+pr43430-2.c	compile	compiled	1	0	1	
+pr43432.c	compile	compiled	1	0	1	
+pr43434.c	compile	compiled	1	0	1	
+pr43842.c	compile	compiled	1	0	0	
+pr44507.c	run	linked	1	1	0	
+pr45633.c	compile	compiled	1	0	0	
+pr45752.c	run	skipped	0	0	3	vect_perm: capability unverified on KNC
+pr45847.c	compile	compiled	1	0	0	
+pr45902.c	run	linked	1	1	0	
+pr46009.c	run	linked	1	1	1	
+pr46032.c	compile	skipped	0	0	2	fopenmp: capability unverified on KNC
+pr46049.c	compile	compiled	1	0	0	
+pr46052.c	compile	compiled	1	0	0	
+pr46126.c	compile	compiled	1	0	0	
+pr46663.c	compile	skipped	0	0	0	exceptions: capability unverified on KNC
+pr47001.c	compile	compiled	1	0	0	
+pr47139.c	compile	compiled	1	0	0	
+pr48052.c	compile	skipped	0	0	1	vect_int_mult: capability unverified on KNC
+pr48172.c	run	linked	1	1	0	
+pr48377.c	run	skipped	0	0	0	non_strict_align: capability unverified on KNC
+pr48765.c	run	skipped	0	0	0	dg-do: no matching KNC target selector; non-KNC machine options: -mdejagnu-cpu=power6 -mno-vsx; dg-do: selector [' target { powerpc*-*-* } '] unmet
+pr49038.c	run	linked	1	1	0	
+pr49093.c	compile	compiled	1	0	0	
+pr49318.c	compile	compiled	1	0	0	
+pr49352.c	compile	compiled	1	0	0	
+pr49478.c	compile	compiled	1	0	0	
+pr49610.c	compile	compiled	1	0	0	
+pr49771.c	run	linked	1	1	0	
+pr49926.c	compile	compiled	1	0	0	
+pr50014.c	compile	compiled	1	0	0	
+pr50451.c	compile	compiled	1	0	0	
+pr50635.c	compile	compiled	1	0	0	
+pr50727.c	compile	compiled	1	0	0	
+pr51000.c	compile	compiled	1	0	0	
+pr51015.c	compile	compiled	1	0	0	
+pr51074.c	run	linked	1	1	0	
+pr51301.c	compile	compiled	1	0	0	
+pr51581-1.c	run	linked	1	1	0	
+pr51581-2.c	run	linked	1	1	0	
+pr51581-3.c	run	linked	1	1	0	
+pr51581-4.c	run	linked	1	1	0	
+pr51590.c	compile	compiled	1	0	0	
+pr51799.c	compile	compiled	1	0	0	
+pr52091.c	run	linked	1	1	0	
+pr52252-ld.c	compile	compiled	1	0	1	dg-additional-options: selector [' target { i?86-*-* x86_64-*-* } '] unmet
+pr52252-st.c	compile	compiled	1	0	1	dg-additional-options: selector [' target { i?86-*-* x86_64-*-* } '] unmet
+pr52298.c	run	linked	1	1	0	
+pr52870.c	compile	compiled	1	0	0	
+pr53185-2.c	run	ICE	0	0	0	See <https://gcc.gnu.org/bugs/> for instructions.
+pr53185.c	compile	ICE	0	0	0	See <https://gcc.gnu.org/bugs/> for instructions.
+pr53773.c	compile	compiled	1	0	2	
+pr55857-1.c	compile	compiled	1	0	0	
+pr55857-2.c	compile	compiled	1	0	0	
+pr56541.c	compile	skipped	0	0	1	vect_condition: capability unverified on KNC
+pr56625.c	compile	skipped	0	0	1	vect_int_mult: capability unverified on KNC
+pr56695.c	compile	compiled	1	0	0	
+pr56787.c	compile	compiled	1	0	1	
+pr56826.c	run	linked	1	1	0	
+pr56918.c	run	linked	1	1	0	
+pr56920.c	run	linked	1	1	0	
+pr56933.c	run	linked	1	1	0	
+pr57206.c	compile	compiled	1	0	1	
+pr57558-1.c	compile	compiled	1	0	1	
+pr57558-2.c	compile	compiled	1	0	1	
+pr57705.c	run	linked	1	1	2	
+pr57741-1.c	compile	compiled	1	0	0	
+pr57741-2.c	run	linked	1	1	1	
+pr57741-3.c	run	linked	1	1	1	
+pr58508.c	compile	compiled	1	0	2	
+pr59354.c	run	linked	1	1	1	
+pr59519-1.c	compile	compiled	1	0	0	
+pr59519-2.c	compile	compiled	1	0	0	
+pr59591-1.c	run	linked	1	1	0	
+pr59591-2.c	run	linked	1	1	0	
+pr59594.c	run	linked	1	1	0	
+pr59651.c	run	linked	1	1	0	
+pr59984.c	run	skipped	0	0	4	vect_simd_clones: capability unverified on KNC
+pr60012.c	compile	compiled	1	0	1	
+pr60092-2.c	compile	compiled	1	0	3	
+pr60092.c	compile	compiled	1	0	3	
+pr60196-1.c	run	linked	1	1	0	
+pr60196-2.c	run	linked	1	1	0	
+pr60276.c	run	linked	1	1	0	
+pr60382.c	run	linked	1	1	0	
+pr60482.c	compile	compiled	1	0	1	
+pr60505.c	compile	compiled	1	0	0	
+pr60656.c	run	skipped	0	0	1	vect_long: capability unverified on KNC
+pr60841.c	compile	compiled	1	0	0	
+pr61194.c	run	skipped	0	0	1	vect_cond_mixed: capability unverified on KNC
+pr61634.c	compile	compiled	1	0	0	
+pr61680.c	run	linked	1	1	0	
+pr62021.c	run	skipped	0	0	0	vect_simd_clones: capability unverified on KNC; dg-additional-options: selector [' target avx_runtime '] unmet
+pr62073.c	compile	compiled	1	0	0	
+pr62075.c	compile	compiled	1	0	0	
+pr62171.c	compile	compiled	1	0	2	
+pr63148.c	run	linked	1	1	0	
+pr63189.c	run	linked	1	1	0	
+pr63341-1.c	run	linked	1	1	0	
+pr63341-2.c	run	linked	1	1	0	
+pr63379.c	run	linked	1	1	0	
+pr63530.c	run	compile error	0	0	0	xgcc: error: unrecognized command-line option '--param="max-completely-peeled-insns=400"'; did you mean '--param=max-completely-peeled-insns='?
+pr63605.c	run	linked	1	1	0	
+pr64252.c	run	linked	1	1	0	dg-additional-options: selector [' target avx_runtime '] unmet
+pr64404.c	run	linked	1	1	0	
+pr64421.c	run	skipped	0	0	0	vect_simd_clones: capability unverified on KNC; dg-additional-options: selector [' target avx_runtime '] unmet
+pr64493.c	run	linked	1	1	0	
+pr64495.c	run	linked	1	1	0	
+pr64829.c	compile	compiled	1	0	0	
+pr64844.c	run	linked	1	1	1	
+pr65206.c	compile	compiled	1	0	2	dg-additional-options: selector [' target avx '] unmet
+pr65310.c	compile	compiled	1	0	2	
+pr65494.c	compile	compiled	1	0	1	
+pr65518.c	run	linked	1	1	3	
+pr65930-1.c	run	linked	1	1	1	
+pr65930-2.c	run	linked	1	1	3	
+pr65947-1.c	run	skipped	0	0	3	vect_condition: capability unverified on KNC
+pr65947-10.c	run	skipped	0	0	3	vect_condition: capability unverified on KNC
+pr65947-11.c	run	skipped	0	0	1	vect_condition: capability unverified on KNC
+pr65947-12.c	run	skipped	0	0	4	vect_condition: capability unverified on KNC
+pr65947-13.c	run	skipped	0	0	4	vect_condition: capability unverified on KNC
+pr65947-14.c	run	skipped	0	0	3	vect_condition: capability unverified on KNC
+pr65947-2.c	run	skipped	0	0	3	vect_condition: capability unverified on KNC
+pr65947-3.c	run	skipped	0	0	3	vect_condition: capability unverified on KNC
+pr65947-4.c	run	skipped	0	0	3	vect_condition: capability unverified on KNC
+pr65947-5.c	run	skipped	0	0	5	vect_condition: capability unverified on KNC
+pr65947-6.c	run	skipped	0	0	3	vect_condition: capability unverified on KNC
+pr65947-7.c	run	skipped	0	0	2	vect_condition: capability unverified on KNC
+pr65947-8.c	run	skipped	0	0	3	vect_condition: capability unverified on KNC
+pr65947-9.c	run	skipped	0	0	5	vect_condition: capability unverified on KNC
+pr65951.c	run	linked	1	1	1	
+pr66142.c	compile	compiled	1	0	1	dg-additional-options: selector [' target avx_runtime '] unmet
+pr66251.c	run	skipped	0	0	1	vect_doubleint_cvt: capability unverified on KNC; vect_intdouble_cvt: capability unverified on KNC; vect_pack_trunc: capability unverified on KNC; vect_unpack: capability unverified on KNC; vect_hw_misalign: capability unverified on KNC
+pr66253.c	run	skipped	0	0	1	vect_hw_misalign: capability unverified on KNC
+pr66278.c	compile	compiled	1	0	1	
+pr66623.c	run	linked	1	1	1	
+pr66636.c	run	linked	1	1	0	dg-additional-options: selector [' target avx_runtime '] unmet
+pr66677.c	compile	compiled	1	0	0	dg-additional-options: selector [' target x86_64-*-* i?86-*-* '] unmet
+pr66951.c	compile	compiled	1	0	0	
+pr67790.c	run	skipped	0	0	2	vect_perm: capability unverified on KNC
+pr68305.c	compile	compiled	1	0	0	dg-additional-options: selector [' target { i?86-*-* x86_64-*-* } '] unmet
+pr68339.c	compile	compile error	0	0	0	/cygdrive/c/Users/xuzhi/Documents/gcc_knc/.work/_shared/gcc/gcc/testsuite/gcc.dg/vect/pr68339.c:17: confused by earlier errors, bailing out
+pr68417.c	compile	skipped	0	0	1	vect_condition: capability unverified on KNC
+pr68445.c	compile	compiled	1	0	1	
+pr68482.c	compile	compiled	1	0	1	
+pr68502-1.c	run	linked	1	1	0	
+pr68502-2.c	run	linked	1	1	0	
+pr68577.c	compile	compiled	1	0	0	
+pr68855.c	compile	compiled	1	0	1	
+pr69083.c	compile	compiled	1	0	0	
+pr69652.c	compile	compiled	1	0	0	dg-additional-options: selector [' target { i?86-*-* x86_64-*-* } '] unmet
+pr69783.c	compile	compiled	1	0	1	
+pr69820.c	run	linked	1	1	0	
+pr70021.c	run	linked	1	1	0	
+pr70138-1.c	run	linked	1	1	0	
+pr70138-2.c	run	linked	1	1	0	
+pr70354-1.c	run	linked	1	1	0	
+pr70354-2.c	run	linked	1	1	0	
+pr71259.c	run	linked	1	1	0	dg-additional-options: selector [' target avx_runtime '] unmet
+pr71264.c	compile	compiled	1	0	0	
+pr71407.c	compile	compiled	1	0	0	
+pr71416-1.c	run	linked	1	1	0	
+pr71416-2.c	compile	compiled	1	0	0	
+pr71439.c	run	linked	1	1	0	
+pr71667.c	compile	compiled	1	0	0	
+pr71752.c	compile	compiled	1	0	0	
+pr71818.c	compile	compiled	1	0	0	
+pr71823.c	compile	compiled	1	0	0	dg-additional-options: selector [' target i?86-*-* x86_64-*-* '] unmet
+pr71854.c	compile	compiled	1	0	0	
+pr72866.c	compile	compiled	1	0	0	
+pr77503.c	compile	skipped	0	0	1	vect_condition: capability unverified on KNC; dg-skip-if: need vect_max_reduc support (target unverified)
+pr77724.c	compile	compiled	1	0	0	
+pr78005.c	run	linked	1	1	0	
+pr78558.c	run	linked	1	1	0	
+pr78938.c	compile	compiled	1	0	0	dg-additional-options: selector [' target i?86-*-* x86_64-*-* '] unmet
+pr79347.c	compile	compiled	1	0	1	
+pr79824-1.c	run	linked	1	1	0	
+pr79824-2.c	run	linked	1	1	0	
+pr79887.c	compile	skipped	0	0	0	vect_condition: capability unverified on KNC; dg-additional-options: selector [' target x86_64-*-* i?86-*-* '] unmet
+pr79920.c	run	linked	1	1	2	
+pr80631-1.c	run	linked	1	1	3	
+pr80631-2.c	run	linked	1	1	4	
+pr80815-1.c	run	linked	1	1	0	
+pr80815-2.c	run	linked	1	1	0	
+pr80815-3.c	run	linked	1	1	1	
+pr80928.c	compile	compiled	1	0	2	
+pr81082.c	compile	compiled	1	0	1	
+pr81136.c	compile	compiled	1	0	1	
+pr81196-2.c	compile	skipped	0	0	1	vect_perm: capability unverified on KNC
+pr81196.c	compile	skipped	0	0	1	vect_perm_short: capability unverified on KNC
+pr81410.c	run	skipped	0	0	1	vect_long_long: capability unverified on KNC
+pr81633.c	run	linked	1	1	0	
+pr81740-1.c	run	linked	1	1	0	
+pr81740-2.c	run	skipped	0	0	1	vect_hw_misalign: capability unverified on KNC
+pr81815.c	run	linked	1	1	0	
+pr82108.c	run	linked	1	1	1	
+pr82289.c	compile	compiled	1	0	0	
+pr82436.c	compile	compiled	1	0	0	dg-additional-options: selector [' target { x86_64-*-* i?86-*-* } '] unmet
+pr83202-1.c	compile	compiled	1	0	2	
+pr83338.c	compile	compiled	1	0	0	
+pr83857.c	run	linked	1	1	2	
+pr83867.c	compile	compiled	1	0	0	
+pr83914.c	compile	compiled	1	0	0	
+pr83965-2.c	compile	compiled	1	0	0	
+pr83965.c	compile	compiled	1	0	0	
+pr84201.c	compile	compiled	1	0	1	
+pr84265.c	compile	compiled	1	0	0	
+pr84357.c	compile	compiled	1	0	0	
+pr84419.c	run	linked	1	1	0	
+pr84711.c	compile	compile error	0	0	0	dg-additional-options: selector [' target i?86-*-* x86_64-*-* '] unmet;       |     ^~~
+pr85286.c	compile	compiled	1	0	0	
+pr85586.c	run	linked	1	1	1	
+pr85597.c	compile	compiled	1	0	0	dg-additional-options: selector [' target { x86_64-*-* i?86-*-* } '] unmet
+pr85793.c	compile	skipped	0	0	0	vect_perm: capability unverified on KNC
+pr86749.c	run	linked	1	1	0	
+pr86858.c	compile	compiled	1	0	0	
+pr86871.c	compile	compiled	1	0	0	
+pr86927.c	run	linked	1	1	0	
+pr87288-1.c	run	linked	1	1	1	
+pr87288-2.c	run	linked	1	1	1	
+pr87288-3.c	run	linked	1	1	1	
+pr88497-1.c	run	linked	1	1	1	dg-require-effective-target: selector [' target { powerpc*-*-* } '] unmet; dg-require-effective-target: selector [' target { i?86-*-* x86_64-*-* } '] unmet; dg-additional-options: selector [' target { powerpc*-*-* } '] unmet; dg-additional-options: selector [' target { i?86-*-* x86_64-*-* } '] unmet
+pr88497-2.c	compile	compile error	0	0	1	dg-require-effective-target: selector [' target { powerpc*-*-* } '] unmet; dg-require-effective-target: selector [' target { i?86-*-* x86_64-*-* } '] unmet; dg-additional-options: selector [' target { powerpc*-*-* } '] unmet; dg-additional-options: selector [' target { i?86-*-* x86_64-*-* } '] unmet; /cygdrive/c/Users/xuzhi/Documents/gcc_knc/.work/_shared/gcc/gcc/testsuite/gcc.dg/vect/pr88497-2.c:29:1: error: unsupported KNC register ABI mode
+pr88497-3.c	compile	compile error	0	0	1	dg-require-effective-target: selector [' target { powerpc*-*-* } '] unmet; dg-require-effective-target: selector [' target { i?86-*-* x86_64-*-* } '] unmet; dg-additional-options: selector [' target { powerpc*-*-* } '] unmet; dg-additional-options: selector [' target { i?86-*-* x86_64-*-* } '] unmet; /cygdrive/c/Users/xuzhi/Documents/gcc_knc/.work/_shared/gcc/gcc/testsuite/gcc.dg/vect/pr88497-3.c:29:1: error: unsupported KNC register ABI mode
+pr88497-4.c	compile	compile error	0	0	1	dg-require-effective-target: selector [' target { powerpc*-*-* } '] unmet; dg-require-effective-target: selector [' target { i?86-*-* x86_64-*-* } '] unmet; dg-additional-options: selector [' target { powerpc*-*-* } '] unmet; dg-additional-options: selector [' target { i?86-*-* x86_64-*-* } '] unmet; /cygdrive/c/Users/xuzhi/Documents/gcc_knc/.work/_shared/gcc/gcc/testsuite/gcc.dg/vect/pr88497-4.c:29:1: error: unsupported KNC register ABI mode
+pr88497-5.c	compile	compile error	0	0	1	dg-require-effective-target: selector [' target { powerpc*-*-* } '] unmet; dg-require-effective-target: selector [' target { i?86-*-* x86_64-*-* } '] unmet; dg-additional-options: selector [' target { powerpc*-*-* } '] unmet; dg-additional-options: selector [' target { i?86-*-* x86_64-*-* } '] unmet; /cygdrive/c/Users/xuzhi/Documents/gcc_knc/.work/_shared/gcc/gcc/testsuite/gcc.dg/vect/pr88497-5.c:29:1: error: unsupported KNC register ABI mode
+pr88497-6.c	compile	skipped	0	0	1	avx512f: unsupported on KNC; non-KNC machine options: -mavx512f
+pr88497-7.c	run	skipped	0	0	1	avx512f_runtime: unsupported on KNC; non-KNC machine options: -mavx512f
+pr88598-1.c	run	linked	1	1	1	
+pr88598-2.c	run	linked	1	1	1	
+pr88598-3.c	run	linked	1	1	1	
+pr88598-4.c	run	linked	1	1	0	
+pr88598-5.c	run	linked	1	1	0	
+pr88598-6.c	run	linked	1	1	0	
+pr88903-1.c	run	linked	1	1	0	
+pr88903-2.c	run	linked	1	1	0	
+pr89268.c	compile	skipped	0	0	0	vect_condition: capability unverified on KNC; dg-additional-options: selector [' target x86_64-*-* i?86-*-* '] unmet
+pr89440.c	run	linked	1	1	1	
+pr90018.c	run	linked	1	1	1	
+pr91114.c	compile	compiled	1	0	0	
+pr91293-1.c	run	linked	1	1	0	dg-additional-options: selector [' target { sse4_runtime } '] unmet
+pr91293-2.c	run	linked	1	1	0	dg-additional-options: selector [' target { sse4_runtime } '] unmet
+pr91293-3.c	run	linked	1	1	0	dg-additional-options: selector [' target { sse4_runtime } '] unmet
+pr91403.c	compile	compiled	1	0	0	
+pr91665.c	compile	compiled	1	0	0	
+pr91750.c	compile	compiled	1	0	2	
+pr92205.c	compile	compiled	1	0	1	
+pr92324-1.c	compile	compiled	1	0	0	
+pr92324-2.c	run	linked	1	1	0	
+pr92324-3.c	run	linked	1	1	1	
+pr92324-4.c	run	linked	1	1	1	
+pr92347.c	compile	compiled	1	0	0	dg-additional-options: selector [' target { i?86-*-* x86_64-*-* } '] unmet
+pr92420.c	run	linked	1	1	0	dg-additional-options: selector [' target avx_runtime '] unmet
+pr92429.c	compile	compiled	1	0	0	dg-additional-options: selector [' target { x86_64-*-* i?86-*-* } '] unmet
+pr92554.c	compile	compile error	0	0	0	/cygdrive/c/Users/xuzhi/Documents/gcc_knc/.work/_shared/gcc/gcc/testsuite/gcc.dg/vect/pr92554.c:11: confused by earlier errors, bailing out
+pr92555.c	compile	compiled	1	0	0	
+pr92558.c	run	linked	1	1	1	dg-additional-options: selector [' target avx2_runtime '] unmet
+pr92677.c	compile	compiled	1	0	0	
+pr92710.c	compile	compiled	1	0	0	
+pr92723.c	compile	compiled	1	0	0	
+pr93069.c	run	skipped	0	0	0	dg-do: no matching KNC target selector; dg-do: selector [' target vect_simd_clones '] unverified
+pr93094.c	compile	compiled	1	0	0	dg-additional-options: selector [' target x86_64-*-* i?86-*-* '] unmet
+pr93247-1.c	compile	compiled	1	0	0	dg-additional-options: selector [' target x86_64-*-* i?86-*-* '] unmet
+pr93247-2.c	compile	compiled	1	0	0	dg-additional-options: selector [' target x86_64-*-* i?86-*-* '] unmet
+pr93767.c	run	linked	1	1	0	
+pr93843-1.c	run	linked	1	1	0	
+pr93843-2.c	run	linked	1	1	0	
+pr94443.c	compile	compiled	1	0	0	dg-additional-options: selector [' target { x86_64-*-* i?86-*-* } '] unmet
+pr94606.c	compile	compiled	1	0	0	dg-additional-options: selector [' target aarch64*-*-* '] unmet
+pr94727.c	run	linked	1	1	0	
+pr94994.c	run	linked	1	1	0	
+pr95272.c	compile	compiled	1	0	0	
+pr95495.c	compile	compiled	1	0	1	
+pr95539.c	compile	compile error	0	0	0	      |       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+pr95570.c	compile	compiled	1	0	0	dg-additional-options: selector [' target aarch64*-*-* '] unmet
+pr95856.c	compile	compiled	1	0	0	
+pr95897.c	compile	compiled	1	0	0	
+pr95916.c	compile	compiled	1	0	0	
+pr96698.c	compile	compiled	1	0	1	
+pr96783-1.c	run	linked	1	1	0	
+pr96783-2.c	run	linked	1	1	0	
+pr96854.c	run	linked	1	1	0	
+pr96920.c	compile	compiled	1	0	0	
+pr97081-2.c	run	linked	1	1	0	
+pr97081.c	run	linked	1	1	0	
+pr97085.c	compile	compiled	1	0	0	dg-additional-options: selector [' target aarch64-*-* '] unmet
+pr97139.c	run	linked	1	1	0	
+pr97173.c	compile	compiled	1	0	0	
+pr97236.c	run	linked	1	1	0	
+pr97241.c	compile	compiled	1	0	0	
+pr97428.c	compile	compiled	1	0	4	dg-additional-options: selector [' target riscv*-*-* '] unmet
+pr97457.c	run	linked	1	1	0	
+pr97558-2.c	run	linked	1	1	0	
+pr97558.c	compile	compiled	1	0	0	
+pr97678.c	run	skipped	0	0	1	vect_int_mult: capability unverified on KNC; vect_pack_trunc: capability unverified on KNC; dg-additional-options: selector [' target avx2_runtime '] unmet
+pr97693.c	compile	compiled	1	0	0	
+pr97730.c	run	linked	1	1	0	
+pr97753.c	compile	compiled	1	0	0	
+pr97760.c	run	linked	1	1	0	
+pr97769.c	compile	compiled	1	0	0	
+pr97832-1.c	compile	compiled	1	0	2	
+pr97832-2.c	compile	compiled	1	0	2	
+pr97832-3.c	compile	compiled	1	0	2	
+pr97832-4.c	compile	compiled	1	0	2	
+pr97835.c	compile	compiled	1	0	1	
+pr97838.c	compile	compiled	1	0	0	
+pr97929.c	compile	compiled	1	0	0	
+pr98048.c	compile	compiled	1	0	0	
+pr98069.c	run	linked	1	1	0	
+pr98302.c	run	linked	1	1	0	
+pr98308.c	compile	compiled	1	0	1	dg-additional-options: selector [' target x86_64-*-* i?86-*-* '] unmet
+pr98560-1.c	compile	compiled	1	0	0	dg-additional-options: selector [' target aarch64_sve '] unmet
+pr98560-2.c	compile	compiled	1	0	0	dg-additional-options: selector [' target aarch64_sve '] unmet
+pr98674.c	compile	compiled	1	0	2	dg-additional-options: selector [' target sse2 '] unmet
+pr98848.c	compile	compiled	1	0	1	
+pr99102.c	run	linked	1	1	1	dg-additional-options: selector [' target aarch64_sve256_hw '] unmet
+pr99253.c	run	linked	1	1	0	
+pr99412.c	compile	compiled	1	0	1	
+pr99540.c	compile	compiled	1	0	0	dg-additional-options: selector [' target aarch64*-*-* '] unmet
+pr99856.c	compile	skipped	0	0	1	vect_unpack: capability unverified on KNC; vect_pack_trunc: capability unverified on KNC
+section-anchors-pr27770.c	run	skipped	0	0	0	section_anchors: unsupported on KNC
+section-anchors-vect-69.c	run	skipped	0	0	2	section_anchors: unsupported on KNC
+slp-1.c	run	linked	1	1	2	
+slp-10.c	run	linked	1	1	6	
+slp-11a.c	run	linked	1	1	3	
+slp-11b.c	run	linked	1	1	2	
+slp-11c.c	run	linked	1	1	3	
+slp-12a.c	run	linked	1	1	3	
+slp-12b.c	run	skipped	0	0	4	vect_uintfloat_cvt: capability unverified on KNC
+slp-12c.c	run	linked	1	1	4	
+slp-13-big-array.c	run	linked	1	1	4	
+slp-13.c	run	linked	1	1	4	
+slp-14.c	run	linked	1	1	2	
+slp-15.c	run	linked	1	1	4	
+slp-16.c	run	linked	1	1	2	
+slp-17.c	run	linked	1	1	2	
+slp-18.c	run	skipped	0	0	2	vect_intfloat_cvt: capability unverified on KNC
+slp-19a.c	run	linked	1	1	4	
+slp-19b.c	run	linked	1	1	4	
+slp-19c.c	run	skipped	0	0	4	vect_extract_even_odd: capability unverified on KNC
+slp-2.c	run	linked	1	1	2	
+slp-20.c	run	linked	1	1	2	
+slp-21.c	run	linked	1	1	2	
+slp-22.c	run	linked	1	1	2	
+slp-23.c	run	linked	1	1	4	
+slp-24-big-array.c	run	linked	1	1	2	
+slp-24.c	run	linked	1	1	2	
+slp-25.c	run	skipped	0	0	3	unimplemented option bundle: bind_pic_locally
+slp-26.c	run	linked	1	1	5	
+slp-28.c	run	linked	1	1	2	
+slp-3-big-array.c	run	linked	1	1	2	
+slp-3.c	run	linked	1	1	4	
+slp-33.c	run	linked	1	1	6	
+slp-34-big-array.c	run	linked	1	1	2	
+slp-34.c	run	linked	1	1	2	
+slp-35.c	run	linked	1	1	2	
+slp-36.c	compile	skipped	0	0	0	vect_shift: capability unverified on KNC
+slp-37.c	run	linked	1	1	2	
+slp-38.c	compile	compiled	1	0	1	
+slp-39.c	compile	compiled	1	0	1	
+slp-4-big-array.c	run	linked	1	1	2	
+slp-4.c	run	linked	1	1	2	
+slp-41.c	run	skipped	0	0	1	vect_pack_trunc: capability unverified on KNC; vect_unpack: capability unverified on KNC; vect_hw_misalign: capability unverified on KNC
+slp-42.c	compile	compiled	1	0	2	
+slp-43.c	run	linked	1	1	1	
+slp-44.c	compile	compiled	1	0	1	
+slp-45.c	run	linked	1	1	1	
+slp-46.c	run	linked	1	1	1	
+slp-47.c	run	skipped	0	0	1	vect_perm: capability unverified on KNC
+slp-48.c	run	skipped	0	0	1	vect_perm: capability unverified on KNC
+slp-49.c	run	linked	1	1	2	
+slp-5.c	run	linked	1	1	2	
+slp-50.c	compile	compiled	1	0	0	
+slp-51.c	compile	compiled	1	0	1	
+slp-52.c	compile	compiled	1	0	1	
+slp-53.c	compile	compiled	1	0	2	
+slp-54.c	compile	compiled	1	0	1	
+slp-55.c	compile	skipped	0	0	3	vect_int_mult: capability unverified on KNC
+slp-56.c	run	linked	1	1	1	
+slp-57.c	compile	compiled	1	0	1	
+slp-58.c	compile	compiled	1	0	1	
+slp-6.c	run	linked	1	1	4	
+slp-7.c	run	linked	1	1	4	
+slp-8.c	run	linked	1	1	2	
+slp-9.c	run	linked	1	1	2	
+slp-cond-1.c	run	skipped	0	0	1	vect_condition: capability unverified on KNC
+slp-cond-2-big-array.c	run	skipped	0	0	1	vect_cond_mixed: capability unverified on KNC
+slp-cond-2.c	run	skipped	0	0	1	vect_cond_mixed: capability unverified on KNC
+slp-cond-3.c	run	skipped	0	0	1	vect_condition: capability unverified on KNC
+slp-cond-4.c	run	skipped	0	0	1	vect_condition: capability unverified on KNC
+slp-cond-5.c	run	skipped	0	0	1	vect_condition: capability unverified on KNC
+slp-gap-1.c	compile	compiled	1	0	1	
+slp-mask-store-1.c	run	linked	1	1	1	dg-additional-options: selector [' target avx2 '] unmet
+slp-multitypes-1.c	run	linked	1	1	2	
+slp-multitypes-10.c	run	linked	1	1	2	
+slp-multitypes-11-big-array.c	run	linked	1	1	2	
+slp-multitypes-11.c	run	linked	1	1	3	
+slp-multitypes-12.c	run	linked	1	1	2	
+slp-multitypes-13.c	compile	compiled	1	0	0	
+slp-multitypes-2.c	run	linked	1	1	2	
+slp-multitypes-3.c	run	linked	1	1	2	
+slp-multitypes-4.c	run	linked	1	1	2	
+slp-multitypes-5.c	run	linked	1	1	2	
+slp-multitypes-6.c	run	linked	1	1	2	
+slp-multitypes-7.c	run	linked	1	1	2	
+slp-multitypes-8.c	run	linked	1	1	2	
+slp-multitypes-9.c	run	linked	1	1	2	
+slp-perm-1.c	run	linked	1	1	5	
+slp-perm-10.c	run	linked	1	1	2	
+slp-perm-11.c	run	linked	1	1	1	
+slp-perm-12.c	run	skipped	0	0	1	vect_pack_trunc: capability unverified on KNC; dg-additional-options: selector [' target { i?86-*-* x86_64-*-* } '] unmet
+slp-perm-2.c	run	linked	1	1	4	
+slp-perm-3.c	run	linked	1	1	4	
+slp-perm-4.c	run	skipped	0	0	3	vect_perm: capability unverified on KNC
+slp-perm-5.c	run	linked	1	1	4	
+slp-perm-6.c	run	linked	1	1	5	
+slp-perm-7.c	run	linked	1	1	4	
+slp-perm-8.c	run	linked	1	1	5	
+slp-perm-9.c	run	linked	1	1	4	
+slp-reduc-1.c	run	skipped	0	0	3	vect_perm: capability unverified on KNC
+slp-reduc-10a.c	compile	compiled	1	0	1	
+slp-reduc-10b.c	compile	compiled	1	0	1	
+slp-reduc-10c.c	compile	compiled	1	0	1	
+slp-reduc-10d.c	compile	compiled	1	0	1	
+slp-reduc-10e.c	compile	compiled	1	0	1	
+slp-reduc-11.c	compile	compiled	1	0	2	
+slp-reduc-12.c	compile	skipped	0	0	1	vect_hw_misalign: capability unverified on KNC
+slp-reduc-13.c	compile	compiled	1	0	1	
+slp-reduc-14.c	compile	compiled	1	0	1	
+slp-reduc-2.c	run	skipped	0	0	3	vect_perm: capability unverified on KNC
+slp-reduc-3.c	run	linked	1	1	4	
+slp-reduc-4.c	run	linked	1	1	4	
+slp-reduc-5.c	run	linked	1	1	3	
+slp-reduc-6.c	run	linked	1	1	2	
+slp-reduc-7.c	run	skipped	0	0	3	vect_perm: capability unverified on KNC
+slp-reduc-8.c	run	skipped	0	0	2	vect_perm: capability unverified on KNC
+slp-reduc-9.c	compile	skipped	0	0	3	vect_int_mult: capability unverified on KNC
+slp-reduc-sad-2.c	compile	skipped	0	0	4	vect_usad_char: capability unverified on KNC; dg-additional-options: selector [' target { x86_64-*-* i?86-*-* } '] unmet
+slp-reduc-sad.c	run	skipped	0	0	3	vect_usad_char: capability unverified on KNC
+slp-simd-clone-1.c	run	skipped	0	0	1	vect_simd_clones: capability unverified on KNC
+slp-simd-clone-2.c	run	skipped	0	0	1	vect_simd_clones: capability unverified on KNC; dg-additional-options: selector [' target avx2_runtime '] unmet
+slp-widen-mult-half.c	run	linked	1	1	4	
+slp-widen-mult-s16.c	run	linked	1	1	2	
+slp-widen-mult-u8.c	run	linked	1	1	2	
+trapv-vect-reduc-4.c	compile	compiled	1	0	4	
+unswitch-loops-pr26969.c	compile	compiled	1	0	0	
+vect-1-big-array.c	compile	compiled	1	0	3	
+vect-1.c	compile	compiled	1	0	3	
+vect-10-big-array.c	compile	compiled	1	0	2	
+vect-10.c	compile	compiled	1	0	2	
+vect-100.c	run	linked	1	1	2	
+vect-103.c	run	linked	1	1	2	
+vect-104.c	run	linked	1	1	4	
+vect-105-big-array.c	run	linked	1	1	4	
+vect-105.c	run	linked	1	1	4	
+vect-106.c	run	linked	1	1	2	
+vect-107.c	run	linked	1	1	3	
+vect-108.c	run	skipped	0	0	2	vect_int_mult: capability unverified on KNC
+vect-109.c	run	skipped	0	0	4	unimplemented option bundle: bind_pic_locally; dg-skip-if:  (target unverified)
+vect-11.c	run	skipped	0	0	2	vect_int_mult: capability unverified on KNC
+vect-110.c	run	linked	1	1	2	
+vect-112-big-array.c	run	linked	1	1	2	
+vect-112.c	run	linked	1	1	2	
+vect-113.c	run	linked	1	1	2	
+vect-114.c	run	linked	1	1	3	
+vect-115.c	run	linked	1	1	2	
+vect-116.c	run	linked	1	1	1	
+vect-117.c	run	linked	1	1	3	
+vect-118.c	compile	compiled	1	0	2	
+vect-119.c	compile	compiled	1	0	2	
+vect-11a.c	run	skipped	0	0	2	vect_int_mult: capability unverified on KNC
+vect-12.c	run	linked	1	1	2	
+vect-120.c	compile	skipped	0	0	2	vect_shift: capability unverified on KNC; vect_floatint_cvt: capability unverified on KNC
+vect-121.c	compile	compiled	1	0	2	
+vect-122.c	run	linked	1	1	1	
+vect-123.c	compile	ICE	0	0	2	See <https://gcc.gnu.org/bugs/> for instructions.
+vect-124.c	run	linked	1	1	1	
+vect-125.c	compile	skipped	0	0	1	vect_int_mult: capability unverified on KNC; vect_pack_trunc: capability unverified on KNC; vect_unpack: capability unverified on KNC
+vect-126.c	compile	compiled	1	0	2	
+vect-127.c	compile	compiled	1	0	1	
+vect-13.c	run	skipped	0	0	3	unimplemented option bundle: bind_pic_locally
+vect-14.c	run	linked	1	1	2	
+vect-15-big-array.c	run	linked	1	1	2	
+vect-15.c	run	linked	1	1	2	
+vect-17.c	run	skipped	0	0	3	unimplemented option bundle: bind_pic_locally
+vect-18.c	run	skipped	0	0	3	unimplemented option bundle: bind_pic_locally
+vect-19.c	run	skipped	0	0	3	unimplemented option bundle: bind_pic_locally
+vect-2-big-array.c	run	skipped	0	0	3	unimplemented option bundle: bind_pic_locally
+vect-2.c	run	skipped	0	0	3	unimplemented option bundle: bind_pic_locally
+vect-20.c	run	skipped	0	0	3	unimplemented option bundle: bind_pic_locally
+vect-21.c	run	skipped	0	0	3	unimplemented option bundle: bind_pic_locally
+vect-22.c	run	skipped	0	0	3	unimplemented option bundle: bind_pic_locally
+vect-23.c	run	skipped	0	0	3	vect_condition: capability unverified on KNC
+vect-24.c	run	linked	1	1	3	
+vect-25.c	run	linked	1	1	3	
+vect-26.c	run	linked	1	1	4	
+vect-27.c	run	skipped	0	0	5	unimplemented option bundle: bind_pic_locally
+vect-28.c	run	linked	1	1	3	
+vect-29.c	run	skipped	0	0	5	unimplemented option bundle: bind_pic_locally
+vect-3.c	run	skipped	0	0	3	unimplemented option bundle: bind_pic_locally
+vect-30.c	run	linked	1	1	2	
+vect-31-big-array.c	run	linked	1	1	2	
+vect-31.c	run	linked	1	1	2	
+vect-32-big-array.c	run	linked	1	1	3	
+vect-32-chars.c	compile	compiled	1	0	2	dg-additional-options: selector [' target { i?86-*-* x86_64-*-* } '] unmet
+vect-32.c	run	linked	1	1	3	
+vect-33-big-array.c	compile	compiled	1	0	3	
+vect-33.c	compile	compiled	1	0	5	
+vect-34-big-array.c	run	linked	1	1	2	
+vect-34.c	run	linked	1	1	2	
+vect-35-big-array.c	run	linked	1	1	2	
+vect-35.c	run	linked	1	1	2	
+vect-36-big-array.c	run	linked	1	1	2	
+vect-36.c	run	linked	1	1	2	
+vect-38.c	run	linked	1	1	2	
+vect-4.c	run	skipped	0	0	3	unimplemented option bundle: bind_pic_locally
+vect-40.c	run	skipped	0	0	3	unimplemented option bundle: double_vectors
+vect-42.c	run	skipped	0	0	7	unimplemented option bundle: double_vectors
+vect-44.c	run	linked	1	1	6	
+vect-46.c	run	skipped	0	0	3	unimplemented option bundle: double_vectors
+vect-48.c	run	skipped	0	0	6	unimplemented option bundle: double_vectors
+vect-5.c	run	skipped	0	0	3	unimplemented option bundle: bind_pic_locally
+vect-50.c	run	linked	1	1	6	
+vect-52.c	run	skipped	0	0	6	unimplemented option bundle: double_vectors
+vect-54.c	run	skipped	0	0	4	unimplemented option bundle: double_vectors
+vect-56.c	run	linked	1	1	6	
+vect-58.c	run	linked	1	1	4	
+vect-6-big-array.c	run	linked	1	1	4	
+vect-6.c	run	linked	1	1	4	
+vect-60.c	run	linked	1	1	6	
+vect-62.c	run	linked	1	1	3	
+vect-63.c	run	ICE	0	0	2	See <https://gcc.gnu.org/bugs/> for instructions.
+vect-64.c	run	linked	1	1	2	
+vect-65.c	run	linked	1	1	2	
+vect-66.c	run	linked	1	1	2	
+vect-67.c	run	linked	1	1	3	
+vect-68.c	run	linked	1	1	2	
+vect-7.c	run	skipped	0	0	3	unimplemented option bundle: bind_pic_locally
+vect-70.c	run	linked	1	1	3	
+vect-71.c	run	skipped	0	0	2	vect_hw_misalign: capability unverified on KNC
+vect-72.c	run	skipped	0	0	4	unimplemented option bundle: bind_pic_locally
+vect-73-big-array.c	run	skipped	0	0	3	unimplemented option bundle: bind_pic_locally
+vect-73.c	run	skipped	0	0	3	unimplemented option bundle: bind_pic_locally
+vect-74-big-array.c	run	linked	1	1	5	
+vect-74.c	run	linked	1	1	5	
+vect-75-big-array.c	run	linked	1	1	5	
+vect-75.c	run	linked	1	1	5	
+vect-76-big-array.c	run	linked	1	1	2	
+vect-76.c	run	linked	1	1	2	
+vect-77-alignchecks.c	run	linked	1	1	7	
+vect-77-global.c	run	skipped	0	0	5	unimplemented option bundle: bind_pic_locally
+vect-77.c	run	linked	1	1	2	
+vect-78-alignchecks.c	run	linked	1	1	7	
+vect-78-global.c	run	skipped	0	0	5	unimplemented option bundle: bind_pic_locally
+vect-78.c	run	linked	1	1	2	
+vect-8.c	run	linked	1	1	2	
+vect-80-big-array.c	run	linked	1	1	5	
+vect-80.c	run	linked	1	1	5	
+vect-82.c	run	skipped	0	0	2	dg-skip-if: powerpc/loongarch and integer vectorization only
+vect-82_64.c	run	skipped	0	0	2	powerpc_altivec: unsupported on KNC; dg-do: no matching KNC target selector; non-KNC machine options: -mpowerpc64 -maltivec; dg-do: selector [' target { powerpc*-*-* && lp64 } '] unmet; dg-do: selector [' target { powerpc*-*-* && ilp32 } '] unmet
+vect-83.c	run	skipped	0	0	2	dg-skip-if: powerpc/loongarch and integer vectorization only
+vect-83_64.c	run	skipped	0	0	2	powerpc_altivec: unsupported on KNC; dg-do: no matching KNC target selector; non-KNC machine options: -mpowerpc64 -maltivec; dg-do: selector [' target { powerpc*-*-* && lp64 } '] unmet; dg-do: selector [' target { powerpc*-*-* && ilp32 } '] unmet
+vect-85-big-array.c	run	linked	1	1	2	
+vect-85.c	run	linked	1	1	2	
+vect-86.c	run	skipped	0	0	4	unimplemented option bundle: bind_pic_locally
+vect-87.c	run	linked	1	1	3	
+vect-88.c	run	linked	1	1	3	
+vect-89-big-array.c	run	linked	1	1	4	
+vect-89.c	run	linked	1	1	4	
+vect-9.c	run	linked	1	1	2	
+vect-91.c	compile	compiled	1	0	3	
+vect-92.c	run	linked	1	1	4	
+vect-93.c	run	linked	1	1	5	
+vect-95.c	run	linked	1	1	5	
+vect-96.c	run	skipped	0	0	6	unimplemented option bundle: double_vectors
+vect-97-big-array.c	run	linked	1	1	3	
+vect-97.c	run	linked	1	1	3	
+vect-98-big-array.c	run	linked	1	1	3	
+vect-98.c	run	linked	1	1	3	
+vect-99.c	run	linked	1	1	2	
+vect-aggressive-1.c	run	skipped	0	0	1	vect_condition: capability unverified on KNC; vect_simd_clones: capability unverified on KNC
+vect-alias-check-1.c	compile	compiled	1	0	3	
+vect-alias-check-10.c	run	linked	1	1	2	
+vect-alias-check-11.c	run	linked	1	1	18	
+vect-alias-check-12.c	run	linked	1	1	18	
+vect-alias-check-13.c	compile	compiled	1	0	5	
+vect-alias-check-14.c	run	linked	1	1	5	
+vect-alias-check-15.c	run	linked	1	1	4	
+vect-alias-check-16.c	run	linked	1	1	4	
+vect-alias-check-17.c	compile	skipped	0	0	3	vect_load_lanes: capability unverified on KNC
+vect-alias-check-18.c	run	linked	1	1	3	
+vect-alias-check-19.c	run	linked	1	1	3	
+vect-alias-check-2.c	compile	skipped	0	0	1	vect_int_mult: capability unverified on KNC
+vect-alias-check-20.c	run	linked	1	1	3	
+vect-alias-check-3.c	compile	compiled	1	0	1	
+vect-alias-check-4.c	compile	compiled	1	0	1	
+vect-alias-check-5.c	compile	compiled	1	0	3	
+vect-alias-check-6.c	compile	compiled	1	0	2	
+vect-alias-check-7.c	compile	compiled	1	0	2	
+vect-alias-check-8.c	run	linked	1	1	3	
+vect-alias-check-9.c	run	linked	1	1	3	
+vect-alias-check.c	compile	compiled	1	0	1	
+vect-align-1.c	run	skipped	0	0	3	unimplemented option bundle: bind_pic_locally
+vect-align-2.c	run	linked	1	1	3	
+vect-align-3.c	compile	skipped	0	0	2	unimplemented option bundle: bind_pic_locally
+vect-align-4.c	compile	skipped	0	0	2	unimplemented option bundle: bind_pic_locally
+vect-all-big-array.c	run	skipped	0	0	4	unimplemented option bundle: bind_pic_locally
+vect-all.c	run	skipped	0	0	4	unimplemented option bundle: bind_pic_locally
+vect-avg-1.c	run	linked	1	1	4	
+vect-avg-10.c	run	linked	1	1	1	
+vect-avg-11.c	run	linked	1	1	4	
+vect-avg-12.c	run	linked	1	1	4	
+vect-avg-13.c	run	linked	1	1	4	
+vect-avg-14.c	run	linked	1	1	4	
+vect-avg-15.c	run	linked	1	1	4	
+vect-avg-16.c	run	linked	1	1	4	
+vect-avg-2.c	run	linked	1	1	4	
+vect-avg-3.c	run	linked	1	1	4	
+vect-avg-4.c	run	linked	1	1	4	
+vect-avg-5.c	run	linked	1	1	4	
+vect-avg-6.c	run	linked	1	1	4	
+vect-avg-7.c	run	linked	1	1	4	
+vect-avg-8.c	run	linked	1	1	4	
+vect-avg-9.c	run	linked	1	1	1	
+vect-bic-bitmask-10.c	run	linked	1	1	3	
+vect-bic-bitmask-11.c	run	linked	1	1	3	
+vect-bic-bitmask-12.c	compile	compiled	1	0	3	
+vect-bic-bitmask-2.c	run	linked	1	1	3	
+vect-bic-bitmask-23.c	compile	compile error	0	0	1	      |            ~~~~~~~~~~~~^~~~~~~~
+vect-bic-bitmask-3.c	run	linked	1	1	3	
+vect-bic-bitmask-4.c	run	linked	1	1	3	
+vect-bic-bitmask-5.c	run	linked	1	1	3	
+vect-bic-bitmask-6.c	run	linked	1	1	3	
+vect-bic-bitmask-8.c	run	linked	1	1	3	
+vect-bic-bitmask-9.c	run	linked	1	1	3	
+vect-bitfield-read-1-not.c	run	skipped	0	0	1	vect_shift: capability unverified on KNC; vect_long_long: capability unverified on KNC
+vect-bitfield-read-1.c	run	skipped	0	0	2	vect_shift: capability unverified on KNC
+vect-bitfield-read-2-not.c	run	skipped	0	0	1	vect_shift: capability unverified on KNC; vect_long_long: capability unverified on KNC
+vect-bitfield-read-2.c	run	skipped	0	0	2	vect_shift: capability unverified on KNC; vect_long_long: capability unverified on KNC
+vect-bitfield-read-3.c	run	skipped	0	0	2	vect_shift: capability unverified on KNC
+vect-bitfield-read-4.c	run	skipped	0	0	2	vect_shift: capability unverified on KNC; vect_long_long: capability unverified on KNC
+vect-bitfield-read-5.c	run	skipped	0	0	2	vect_shift: capability unverified on KNC
+vect-bitfield-read-6.c	run	skipped	0	0	2	vect_shift: capability unverified on KNC
+vect-bitfield-read-7.c	run	skipped	0	0	2	vect_shift: capability unverified on KNC
+vect-bitfield-read-8.c	run	skipped	0	0	1	vect_shift: capability unverified on KNC
+vect-bitfield-read-9.c	run	skipped	0	0	1	vect_shift: capability unverified on KNC; vect_long_long: capability unverified on KNC
+vect-bitfield-write-1.c	run	linked	1	1	2	
+vect-bitfield-write-2.c	run	skipped	0	0	2	vect_long_long: capability unverified on KNC
+vect-bitfield-write-3.c	run	skipped	0	0	2	vect_long_long: capability unverified on KNC
+vect-bitfield-write-4.c	run	linked	1	1	2	
+vect-bitfield-write-5.c	run	linked	1	1	2	
+vect-bool-1.c	compile	compiled	1	0	1	
+vect-bool-2.c	compile	compiled	1	0	1	
+vect-bool-3.c	compile	skipped	0	0	1	vect_unpack: capability unverified on KNC
+vect-bool-cmp-2.c	compile	compiled	1	0	1	
+vect-bool-cmp-3.c	compile	compiled	1	0	1	
+vect-bool-cmp-4.c	compile	compiled	1	0	1	
+vect-bool-cmp.c	run	skipped	0	0	1	vect_pack_trunc: capability unverified on KNC; dg-additional-options: selector [' target sse4_runtime '] unmet
+vect-bswap16.c	run	linked	1	1	1	dg-additional-options: selector [' target sse4_runtime '] unmet
+vect-bswap16a.c	run	linked	1	1	1	dg-additional-options: selector [' target sse2_runtime '] unmet
+vect-bswap32.c	run	linked	1	1	1	dg-additional-options: selector [' target sse4_runtime '] unmet
+vect-bswap64.c	run	linked	1	1	1	dg-additional-options: selector [' target sse4_runtime '] unmet
+vect-complex-1.c	run	linked	1	1	2	
+vect-complex-2.c	run	linked	1	1	2	
+vect-complex-4.c	run	linked	1	1	2	
+vect-complex-5.c	run	linked	1	1	1	
+vect-cond-1.c	run	skipped	0	0	1	vect_condition: capability unverified on KNC
+vect-cond-10.c	run	skipped	0	0	1	vect_cond_mixed: capability unverified on KNC
+vect-cond-11.c	run	linked	1	1	1	
+vect-cond-12.c	compile	compiled	1	0	0	
+vect-cond-13.c	run	linked	1	1	1	
+vect-cond-14.c	run	linked	1	1	1	
+vect-cond-2.c	run	skipped	0	0	1	vect_condition: capability unverified on KNC
+vect-cond-3.c	run	skipped	0	0	1	vect_condition: capability unverified on KNC
+vect-cond-4.c	run	skipped	0	0	1	vect_condition: capability unverified on KNC
+vect-cond-5.c	run	skipped	0	0	1	vect_condition: capability unverified on KNC
+vect-cond-6.c	run	skipped	0	0	1	vect_condition: capability unverified on KNC
+vect-cond-7.c	run	linked	1	1	0	
+vect-cond-8.c	run	skipped	0	0	1	vect_cond_mixed: capability unverified on KNC
+vect-cond-9.c	run	skipped	0	0	1	vect_cond_mixed: capability unverified on KNC
+vect-cond-arith-1.c	run	linked	1	1	6	
+vect-cond-arith-2.c	compile	compiled	1	0	2	dg-additional-options: selector [' target { riscv_v } '] unmet
+vect-cond-arith-3.c	run	skipped	0	0	4	scalar_all_fma: capability unverified on KNC
+vect-cond-arith-4.c	run	linked	1	1	5	
+vect-cond-arith-5.c	run	linked	1	1	5	
+vect-cond-arith-6.c	run	linked	1	1	6	
+vect-cond-arith-7.c	run	skipped	0	0	4	scalar_all_fma: capability unverified on KNC
+vect-cond-arith-8.c	compile	compiled	1	0	0	
+vect-cond-reduc-1.c	compile	skipped	0	0	1	vect_condition: capability unverified on KNC
+vect-cond-reduc-2.c	compile	compiled	1	0	1	
+vect-cond-reduc-3.c	run	skipped	0	0	3	vect_cond_mixed: capability unverified on KNC
+vect-cond-reduc-4.c	run	skipped	0	0	3	vect_condition: capability unverified on KNC
+vect-cond-reduc-5.c	run	linked	1	1	1	
+vect-cond-reduc-6.c	compile	compiled	1	0	0	
+vect-cond-reduc-in-order-2-signed-zero.c	run	skipped	0	0	0	unimplemented option bundle: ieee
+vect-conditional_store_1.c	compile	skipped	0	0	2	vect_masked_store: capability unverified on KNC; dg-additional-options: selector [' target avx2 '] unmet; dg-additional-options: selector [' target aarch64-*-* '] unmet
+vect-conditional_store_2.c	compile	skipped	0	0	2	vect_masked_store: capability unverified on KNC; dg-additional-options: selector [' target avx2 '] unmet; dg-additional-options: selector [' target aarch64-*-* '] unmet
+vect-conditional_store_3.c	compile	skipped	0	0	2	vect_masked_store: capability unverified on KNC; dg-additional-options: selector [' target avx2 '] unmet; dg-additional-options: selector [' target aarch64-*-* '] unmet
+vect-conditional_store_4.c	compile	skipped	0	0	2	vect_masked_store: capability unverified on KNC; dg-additional-options: selector [' target avx2 '] unmet; dg-additional-options: selector [' target aarch64-*-* '] unmet
+vect-conditional_store_5.c	compile	skipped	0	0	2	vect_masked_store: capability unverified on KNC; dg-additional-options: selector [' target avx2 '] unmet; dg-additional-options: selector [' target aarch64-*-* '] unmet
+vect-conditional_store_6.c	compile	skipped	0	0	2	vect_masked_store: capability unverified on KNC; dg-additional-options: selector [' target avx2 '] unmet; dg-additional-options: selector [' target aarch64-*-* '] unmet
+vect-cost-model-1.c	compile	compiled	1	0	1	
+vect-cost-model-2.c	compile	compiled	1	0	1	
+vect-cost-model-3.c	compile	compiled	1	0	1	
+vect-cost-model-4.c	compile	compiled	1	0	1	
+vect-cost-model-5.c	compile	compiled	1	0	1	
+vect-cselim-1.c	run	linked	1	1	2	
+vect-cselim-2.c	run	linked	1	1	1	
+vect-ctor-1.c	compile	compiled	1	0	0	dg-additional-options: selector [' target { i?86-*-* x86_64-*-* } '] unmet
+vect-debug-pr41926.c	compile	compiled	1	0	0	
+vect-div-bitmask-1.c	run	linked	1	1	1	
+vect-div-bitmask-2.c	run	linked	1	1	1	
+vect-div-bitmask-3.c	run	linked	1	1	1	dg-additional-options: selector [' target aarch64*-*-* '] unmet
+vect-div-bitmask-4.c	run	compile error	0	0	1	      |          ^
+vect-div-bitmask-5.c	run	linked	1	1	1	
+vect-dotprod-conv-optab.c	compile	skipped	0	0	2	vect_dotprod_hisi: capability unverified on KNC
+vect-double-reduc-1.c	run	skipped	0	0	1	vect_int_mult: capability unverified on KNC
+vect-double-reduc-2.c	run	skipped	0	0	1	vect_int_mult: capability unverified on KNC
+vect-double-reduc-3.c	run	ICE	0	0	1	See <https://gcc.gnu.org/bugs/> for instructions.
+vect-double-reduc-4.c	run	skipped	0	0	1	vect_int_mult: capability unverified on KNC
+vect-double-reduc-5.c	run	skipped	0	0	1	vect_int_mult: capability unverified on KNC
+vect-double-reduc-6-big-array.c	run	skipped	0	0	1	vect_int_mult: capability unverified on KNC
+vect-double-reduc-6.c	run	skipped	0	0	1	vect_int_mult: capability unverified on KNC
+vect-double-reduc-7.c	run	ICE	0	0	1	See <https://gcc.gnu.org/bugs/> for instructions.
+vect-dv-1.c	compile	compiled	1	0	0	
+vect-early-break-run_1.c	run	skipped	0	0	1	unimplemented option bundle: vect_early_break; vect_early_break_hw: capability unverified on KNC
+vect-early-break-run_10.c	run	skipped	0	0	1	unimplemented option bundle: vect_early_break; vect_early_break_hw: capability unverified on KNC
+vect-early-break-run_2.c	run	skipped	0	0	1	unimplemented option bundle: vect_early_break; vect_early_break_hw: capability unverified on KNC
+vect-early-break-run_3.c	run	skipped	0	0	1	unimplemented option bundle: vect_early_break; vect_early_break_hw: capability unverified on KNC
+vect-early-break-run_4.c	run	skipped	0	0	1	unimplemented option bundle: vect_early_break; vect_early_break_hw: capability unverified on KNC
+vect-early-break-run_5.c	run	skipped	0	0	1	unimplemented option bundle: vect_early_break; vect_early_break_hw: capability unverified on KNC
+vect-early-break-run_6.c	run	skipped	0	0	1	unimplemented option bundle: vect_early_break; vect_early_break_hw: capability unverified on KNC
+vect-early-break-run_7.c	run	skipped	0	0	1	unimplemented option bundle: vect_early_break; vect_early_break_hw: capability unverified on KNC
+vect-early-break-run_8.c	run	skipped	0	0	1	unimplemented option bundle: vect_early_break; vect_early_break_hw: capability unverified on KNC
+vect-early-break-run_9.c	run	skipped	0	0	1	unimplemented option bundle: vect_early_break; vect_early_break_hw: capability unverified on KNC
+vect-early-break-template_1.c	run	linked	1	1	0	
+vect-early-break-template_2.c	run	linked	1	1	0	
+vect-early-break_1.c	compile	skipped	0	0	1	unimplemented option bundle: vect_early_break; vect_early_break: capability unverified on KNC
+vect-early-break_10.c	compile	skipped	0	0	1	unimplemented option bundle: vect_early_break; vect_early_break: capability unverified on KNC
+vect-early-break_100-pr113287.c	run	skipped	0	0	1	unimplemented option bundle: vect_early_break; vect_early_break: capability unverified on KNC; vect_long_long: capability unverified on KNC
+vect-early-break_101-pr113178.c	compile	skipped	0	0	0	unimplemented option bundle: vect_early_break; vect_early_break: capability unverified on KNC
+vect-early-break_102-pr113178.c	compile	skipped	0	0	0	unimplemented option bundle: vect_early_break; vect_early_break: capability unverified on KNC
+vect-early-break_103-pr113135.c	compile	skipped	0	0	0	unimplemented option bundle: vect_early_break; vect_early_break: capability unverified on KNC
+vect-early-break_104-pr113373.c	compile	skipped	0	0	0	unimplemented option bundle: vect_early_break; vect_early_break: capability unverified on KNC
+vect-early-break_106-pr113374.c	compile	skipped	0	0	0	unimplemented option bundle: vect_early_break
+vect-early-break_107-pr113364.c	compile	skipped	0	0	0	unimplemented option bundle: vect_early_break; vect_early_break: capability unverified on KNC
+vect-early-break_108-pr113588.c	compile	skipped	0	0	1	unimplemented option bundle: vect_early_break; vect_early_break: capability unverified on KNC
+vect-early-break_109-pr113588.c	run	skipped	0	0	1	unimplemented option bundle: vect_early_break; vect_early_break: capability unverified on KNC
+vect-early-break_11.c	compile	skipped	0	0	1	unimplemented option bundle: vect_early_break; vect_early_break: capability unverified on KNC
+vect-early-break_110-pr113467.c	run	skipped	0	0	1	unimplemented option bundle: vect_early_break; vect_early_break: capability unverified on KNC; vect_long_long: capability unverified on KNC
+vect-early-break_111-pr113731.c	compile	skipped	0	0	1	unimplemented option bundle: vect_early_break; vect_early_break: capability unverified on KNC; vect_long: capability unverified on KNC; dg-additional-options: selector [' target i?86-*-* x86_64-*-* '] unmet
+vect-early-break_112-pr113750.c	compile	skipped	0	0	1	unimplemented option bundle: vect_early_break; vect_early_break: capability unverified on KNC
+vect-early-break_113-pr113750.c	compile	skipped	0	0	1	unimplemented option bundle: vect_early_break; vect_early_break: capability unverified on KNC
+vect-early-break_114-pr113750.c	compile	skipped	0	0	1	unimplemented option bundle: vect_early_break; vect_early_break: capability unverified on KNC
+vect-early-break_115-pr113750.c	compile	skipped	0	0	1	unimplemented option bundle: vect_early_break; vect_early_break: capability unverified on KNC
+vect-early-break_116-pr113750.c	compile	skipped	0	0	1	unimplemented option bundle: vect_early_break; vect_early_break: capability unverified on KNC
+vect-early-break_117-pr113734.c	run	skipped	0	0	1	unimplemented option bundle: vect_early_break; vect_early_break_hw: capability unverified on KNC
+vect-early-break_118-pr114068.c	compile	skipped	0	0	1	unimplemented option bundle: vect_early_break; vect_early_break: capability unverified on KNC
+vect-early-break_119-pr114068.c	compile	skipped	0	0	0	unimplemented option bundle: vect_early_break; vect_early_break: capability unverified on KNC
+vect-early-break_12.c	compile	skipped	0	0	1	unimplemented option bundle: vect_early_break; vect_early_break: capability unverified on KNC
+vect-early-break_120-pr114099.c	compile	skipped	0	0	1	unimplemented option bundle: vect_early_break; vect_early_break: capability unverified on KNC
+vect-early-break_121-pr114081.c	compile	skipped	0	0	1	unimplemented option bundle: vect_early_break; vect_early_break: capability unverified on KNC; dg-additional-options: selector [' target { x86_64-*-* i?86-*-* } '] unmet
+vect-early-break_122-pr114239.c	compile	skipped	0	0	0	unimplemented option bundle: vect_early_break; vect_early_break: capability unverified on KNC
+vect-early-break_123-pr114297.c	compile	skipped	0	0	0	unimplemented option bundle: vect_early_break; vect_early_break: capability unverified on KNC
+vect-early-break_124-pr114403.c	run	skipped	0	0	1	unimplemented option bundle: vect_early_break; vect_early_break_hw: capability unverified on KNC; vect_long_long: capability unverified on KNC; dg-additional-options: selector [' target riscv*-*-* '] unmet
+vect-early-break_125-pr114403.c	run	skipped	0	0	1	unimplemented option bundle: vect_early_break; vect_early_break_hw: capability unverified on KNC; vect_long_long: capability unverified on KNC
+vect-early-break_126.c	compile	skipped	0	0	2	unimplemented option bundle: vect_early_break; vect_early_break: capability unverified on KNC
+vect-early-break_127.c	compile	skipped	0	0	2	unimplemented option bundle: vect_early_break; vect_early_break: capability unverified on KNC
+vect-early-break_128.c	compile	skipped	0	0	3	unimplemented option bundle: vect_early_break; vect_early_break: capability unverified on KNC
+vect-early-break_129-pr117140.c	compile	skipped	0	0	0	unimplemented option bundle: vect_early_break; vect_early_break: capability unverified on KNC
+vect-early-break_13.c	compile	skipped	0	0	1	unimplemented option bundle: vect_early_break; vect_early_break: capability unverified on KNC
+vect-early-break_130-pr117176.c	compile	skipped	0	0	0	unimplemented option bundle: vect_early_break; vect_early_break: capability unverified on KNC
+vect-early-break_130.c	run	skipped	0	0	0	unimplemented option bundle: vect_early_break
+vect-early-break_131-pr118269.c	compile	skipped	0	0	0	unimplemented option bundle: vect_early_break
+vect-early-break_132-pr118464.c	compile	skipped	0	0	0	unimplemented option bundle: vect_early_break; vect_early_break: capability unverified on KNC
+vect-early-break_133_pfa1.c	compile	skipped	0	0	2	unimplemented option bundle: vect_early_break; vect_early_break: capability unverified on KNC
+vect-early-break_133_pfa10.c	compile	skipped	0	0	3	unimplemented option bundle: vect_early_break; vect_early_break: capability unverified on KNC
+vect-early-break_133_pfa11.c	compile	skipped	0	0	1	unimplemented option bundle: vect_early_break; vect_early_break: capability unverified on KNC
+vect-early-break_133_pfa2.c	compile	skipped	0	0	2	unimplemented option bundle: vect_early_break; vect_early_break: capability unverified on KNC
+vect-early-break_133_pfa3.c	compile	skipped	0	0	3	unimplemented option bundle: vect_early_break; vect_early_break: capability unverified on KNC
+vect-early-break_133_pfa4.c	compile	skipped	0	0	3	unimplemented option bundle: vect_early_break; vect_early_break: capability unverified on KNC
+vect-early-break_133_pfa5.c	compile	skipped	0	0	2	unimplemented option bundle: vect_early_break; vect_early_break: capability unverified on KNC
+vect-early-break_133_pfa6.c	compile	skipped	0	0	2	unimplemented option bundle: vect_early_break; vect_early_break: capability unverified on KNC
+vect-early-break_133_pfa7.c	compile	skipped	0	0	1	unimplemented option bundle: vect_early_break; vect_early_break: capability unverified on KNC
+vect-early-break_133_pfa8.c	compile	skipped	0	0	2	unimplemented option bundle: vect_early_break; vect_early_break: capability unverified on KNC
+vect-early-break_133_pfa9.c	compile	skipped	0	0	3	unimplemented option bundle: vect_early_break; vect_early_break: capability unverified on KNC
+vect-early-break_134-pr120089.c	run	skipped	0	0	0	unimplemented option bundle: vect_early_break
+vect-early-break_135-pr120143.c	compile	skipped	0	0	0	unimplemented option bundle: vect_early_break
+vect-early-break_135-pr120211.c	run	skipped	0	0	0	unimplemented option bundle: vect_early_break
+vect-early-break_136-pr120357.c	compile	skipped	0	0	0	unimplemented option bundle: vect_early_break
+vect-early-break_137-pr121190.c	run	skipped	0	0	0	vect_early_break: capability unverified on KNC; dg-additional-options: selector [' target x86_64-*-* i?86-*-* '] unmet
+vect-early-break_138-pr121020.c	run	skipped	0	0	0	vect_early_break: capability unverified on KNC; dg-additional-options: selector [' target x86_64-*-* i?86-*-* '] unmet
+vect-early-break_139.c	run	skipped	0	0	1	unimplemented option bundle: vect_early_break; vect_early_break_hw: capability unverified on KNC
+vect-early-break_14.c	compile	skipped	0	0	1	unimplemented option bundle: vect_early_break; vect_early_break: capability unverified on KNC
+vect-early-break_140-pr122868_1.c	run	skipped	0	0	2	unimplemented option bundle: vect_early_break; vect_sizes_16B_8B: capability unverified on KNC; vect_early_break_hw: capability unverified on KNC
+vect-early-break_140-pr122868_2.c	run	skipped	0	0	2	unimplemented option bundle: vect_early_break; vect_early_break_hw: capability unverified on KNC
+vect-early-break_140-pr122868_3.c	run	skipped	0	0	2	unimplemented option bundle: vect_early_break; vect_sizes_16B_8B: capability unverified on KNC; vect_early_break_hw: capability unverified on KNC
+vect-early-break_140-pr122868_4.c	run	skipped	0	0	2	unimplemented option bundle: vect_early_break; vect_early_break_hw: capability unverified on KNC
+vect-early-break_141-pr123089.c	run	skipped	0	0	1	unimplemented option bundle: vect_early_break; vect_early_break_hw: capability unverified on KNC; dg-require-effective-target: selector [' target { i?86-*-* x86_64-*-* } '] unmet; dg-additional-options: selector [' target { i?86-*-* x86_64-*-* } '] unmet
+vect-early-break_142-pr124034.c	run	skipped	0	0	0	unimplemented option bundle: vect_early_break
+vect-early-break_143-pr124142.c	compile	skipped	0	0	1	unimplemented option bundle: vect_early_break; vect_early_break: capability unverified on KNC
+vect-early-break_15.c	compile	skipped	0	0	1	unimplemented option bundle: vect_early_break; vect_early_break: capability unverified on KNC
+vect-early-break_16.c	compile	skipped	0	0	1	unimplemented option bundle: vect_early_break; vect_early_break: capability unverified on KNC
+vect-early-break_17.c	compile	skipped	0	0	1	unimplemented option bundle: vect_early_break; vect_early_break: capability unverified on KNC
+vect-early-break_18.c	compile	skipped	0	0	2	unimplemented option bundle: vect_early_break; vect_early_break: capability unverified on KNC; dg-additional-options: selector [' target amdgcn*-*-* '] unmet
+vect-early-break_19.c	compile	skipped	0	0	1	unimplemented option bundle: vect_early_break; vect_early_break: capability unverified on KNC
+vect-early-break_2.c	compile	skipped	0	0	2	unimplemented option bundle: vect_early_break; vect_early_break: capability unverified on KNC
+vect-early-break_20.c	compile	skipped	0	0	1	unimplemented option bundle: vect_early_break; vect_early_break: capability unverified on KNC
+vect-early-break_21.c	compile	skipped	0	0	1	unimplemented option bundle: vect_early_break; vect_early_break: capability unverified on KNC
+vect-early-break_22.c	run	skipped	0	0	2	unimplemented option bundle: vect_early_break; vect_perm: capability unverified on KNC; vect_early_break_hw: capability unverified on KNC
+vect-early-break_23.c	run	skipped	0	0	3	unimplemented option bundle: vect_early_break; vect_early_break_hw: capability unverified on KNC
+vect-early-break_24.c	run	skipped	0	0	0	unimplemented option bundle: vect_early_break; vect_early_break_hw: capability unverified on KNC
+vect-early-break_25.c	compile	skipped	0	0	2	unimplemented option bundle: vect_early_break; vect_early_break: capability unverified on KNC
+vect-early-break_26.c	run	skipped	0	0	2	unimplemented option bundle: vect_early_break; vect_early_break_hw: capability unverified on KNC; vect_perm: capability unverified on KNC
+vect-early-break_27.c	compile	skipped	0	0	1	unimplemented option bundle: vect_early_break; vect_early_break: capability unverified on KNC
+vect-early-break_28.c	compile	skipped	0	0	1	unimplemented option bundle: vect_early_break; vect_early_break: capability unverified on KNC
+vect-early-break_29.c	compile	skipped	0	0	1	unimplemented option bundle: vect_early_break; vect_early_break: capability unverified on KNC
+vect-early-break_3.c	compile	skipped	0	0	1	unimplemented option bundle: vect_early_break; vect_early_break: capability unverified on KNC
+vect-early-break_30.c	compile	skipped	0	0	1	unimplemented option bundle: vect_early_break; vect_early_break: capability unverified on KNC
+vect-early-break_31.c	compile	skipped	0	0	2	unimplemented option bundle: vect_early_break; vect_early_break: capability unverified on KNC
+vect-early-break_32.c	compile	skipped	0	0	2	unimplemented option bundle: vect_early_break; vect_early_break: capability unverified on KNC
+vect-early-break_33.c	compile	skipped	0	0	1	unimplemented option bundle: vect_early_break; vect_early_break: capability unverified on KNC
+vect-early-break_34.c	compile	skipped	0	0	1	unimplemented option bundle: vect_early_break; vect_early_break: capability unverified on KNC
+vect-early-break_35.c	compile	skipped	0	0	1	unimplemented option bundle: vect_early_break; vect_early_break: capability unverified on KNC
+vect-early-break_36.c	compile	skipped	0	0	1	unimplemented option bundle: vect_early_break; vect_early_break: capability unverified on KNC
+vect-early-break_37.c	compile	skipped	0	0	1	unimplemented option bundle: vect_early_break; vect_early_break: capability unverified on KNC
+vect-early-break_38.c	compile	skipped	0	0	2	unimplemented option bundle: vect_early_break; vect_early_break: capability unverified on KNC; dg-additional-options: selector [' target amdgcn*-*-* '] unmet
+vect-early-break_39.c	compile	skipped	0	0	2	unimplemented option bundle: vect_early_break; vect_early_break: capability unverified on KNC
+vect-early-break_4.c	compile	skipped	0	0	1	unimplemented option bundle: vect_early_break; vect_early_break: capability unverified on KNC
+vect-early-break_40.c	compile	skipped	0	0	1	unimplemented option bundle: vect_early_break; vect_early_break: capability unverified on KNC
+vect-early-break_41.c	compile	skipped	0	0	1	unimplemented option bundle: vect_early_break; vect_early_break: capability unverified on KNC
+vect-early-break_42.c	compile	skipped	0	0	1	unimplemented option bundle: vect_early_break; vect_early_break: capability unverified on KNC
+vect-early-break_43.c	compile	skipped	0	0	2	unimplemented option bundle: vect_early_break; vect_early_break: capability unverified on KNC
+vect-early-break_44.c	compile	skipped	0	0	2	unimplemented option bundle: vect_early_break; vect_early_break: capability unverified on KNC
+vect-early-break_45.c	compile	skipped	0	0	1	unimplemented option bundle: vect_early_break; vect_early_break: capability unverified on KNC
+vect-early-break_46.c	compile	skipped	0	0	1	unimplemented option bundle: vect_early_break; vect_early_break: capability unverified on KNC
+vect-early-break_47.c	compile	skipped	0	0	1	unimplemented option bundle: vect_early_break; vect_early_break: capability unverified on KNC
+vect-early-break_48.c	compile	skipped	0	0	1	unimplemented option bundle: vect_early_break; vect_early_break: capability unverified on KNC
+vect-early-break_49.c	compile	skipped	0	0	0	unimplemented option bundle: vect_early_break; vect_early_break: capability unverified on KNC
+vect-early-break_5.c	compile	skipped	0	0	1	unimplemented option bundle: vect_early_break; vect_early_break: capability unverified on KNC
+vect-early-break_50.c	compile	skipped	0	0	1	unimplemented option bundle: vect_early_break; vect_early_break: capability unverified on KNC
+vect-early-break_51.c	compile	skipped	0	0	1	unimplemented option bundle: vect_early_break; vect_early_break: capability unverified on KNC
+vect-early-break_52.c	compile	skipped	0	0	1	unimplemented option bundle: vect_early_break; vect_early_break: capability unverified on KNC
+vect-early-break_53.c	compile	skipped	0	0	1	unimplemented option bundle: vect_early_break; vect_early_break: capability unverified on KNC; vect_partial_vectors: capability unverified on KNC
+vect-early-break_54.c	compile	skipped	0	0	1	unimplemented option bundle: vect_early_break; vect_early_break: capability unverified on KNC
+vect-early-break_55.c	compile	skipped	0	0	1	unimplemented option bundle: vect_early_break; vect_early_break: capability unverified on KNC
+vect-early-break_56.c	run	skipped	0	0	1	unimplemented option bundle: vect_early_break; unimplemented option bundle: bind_pic_locally; vect_early_break_hw: capability unverified on KNC; vect_partial_vectors: capability unverified on KNC
+vect-early-break_57.c	compile	skipped	0	0	2	unimplemented option bundle: vect_early_break; vect_early_break: capability unverified on KNC
+vect-early-break_58.c	compile	skipped	0	0	1	unimplemented option bundle: vect_early_break; vect_early_break: capability unverified on KNC
+vect-early-break_59.c	compile	skipped	0	0	1	unimplemented option bundle: vect_early_break; vect_early_break: capability unverified on KNC
+vect-early-break_6.c	compile	skipped	0	0	2	unimplemented option bundle: vect_early_break; vect_early_break: capability unverified on KNC
+vect-early-break_60.c	compile	skipped	0	0	1	unimplemented option bundle: vect_early_break; vect_early_break: capability unverified on KNC
+vect-early-break_61.c	compile	skipped	0	0	1	unimplemented option bundle: vect_early_break; vect_early_break: capability unverified on KNC
+vect-early-break_62.c	compile	skipped	0	0	1	unimplemented option bundle: vect_early_break; vect_early_break: capability unverified on KNC
+vect-early-break_63.c	compile	skipped	0	0	2	unimplemented option bundle: vect_early_break; vect_long: capability unverified on KNC; vect_shift: capability unverified on KNC
+vect-early-break_64.c	compile	skipped	0	0	1	unimplemented option bundle: vect_early_break; vect_early_break: capability unverified on KNC
+vect-early-break_65.c	compile	skipped	0	0	1	unimplemented option bundle: vect_early_break; vect_early_break: capability unverified on KNC
+vect-early-break_66.c	compile	skipped	0	0	0	unimplemented option bundle: vect_early_break; vect_early_break: capability unverified on KNC
+vect-early-break_67.c	compile	skipped	0	0	1	unimplemented option bundle: vect_early_break; vect_early_break: capability unverified on KNC
+vect-early-break_68.c	compile	skipped	0	0	1	unimplemented option bundle: vect_early_break; vect_early_break: capability unverified on KNC
+vect-early-break_69.c	run	skipped	0	0	1	unimplemented option bundle: vect_early_break; vect_early_break_hw: capability unverified on KNC
+vect-early-break_7.c	compile	skipped	0	0	2	unimplemented option bundle: vect_early_break; vect_early_break: capability unverified on KNC
+vect-early-break_70.c	run	skipped	0	0	1	unimplemented option bundle: vect_early_break; vect_early_break_hw: capability unverified on KNC
+vect-early-break_71.c	run	skipped	0	0	1	unimplemented option bundle: vect_early_break; vect_early_break_hw: capability unverified on KNC
+vect-early-break_72.c	run	skipped	0	0	1	unimplemented option bundle: vect_early_break; vect_early_break_hw: capability unverified on KNC
+vect-early-break_73.c	run	skipped	0	0	1	unimplemented option bundle: vect_early_break; vect_early_break_hw: capability unverified on KNC
+vect-early-break_74.c	run	skipped	0	0	1	unimplemented option bundle: vect_early_break; vect_early_break_hw: capability unverified on KNC
+vect-early-break_75.c	run	skipped	0	0	1	unimplemented option bundle: vect_early_break; vect_early_break_hw: capability unverified on KNC
+vect-early-break_76.c	run	skipped	0	0	1	unimplemented option bundle: vect_early_break; vect_early_break_hw: capability unverified on KNC
+vect-early-break_77.c	run	skipped	0	0	1	unimplemented option bundle: vect_early_break; vect_early_break_hw: capability unverified on KNC
+vect-early-break_78.c	run	skipped	0	0	1	unimplemented option bundle: vect_early_break; vect_early_break_hw: capability unverified on KNC
+vect-early-break_79.c	compile	skipped	0	0	1	unimplemented option bundle: vect_early_break; vect_early_break: capability unverified on KNC
+vect-early-break_8.c	compile	skipped	0	0	1	unimplemented option bundle: vect_early_break; vect_early_break: capability unverified on KNC
+vect-early-break_80.c	run	skipped	0	0	1	unimplemented option bundle: vect_early_break; vect_early_break_hw: capability unverified on KNC
+vect-early-break_81.c	compile	skipped	0	0	2	unimplemented option bundle: vect_early_break; vect_early_break: capability unverified on KNC
+vect-early-break_82.c	compile	skipped	0	0	1	unimplemented option bundle: vect_early_break; vect_early_break: capability unverified on KNC
+vect-early-break_83.c	compile	skipped	0	0	1	unimplemented option bundle: vect_early_break; vect_early_break: capability unverified on KNC
+vect-early-break_84.c	run	skipped	0	0	1	unimplemented option bundle: vect_early_break; vect_early_break_hw: capability unverified on KNC
+vect-early-break_85.c	run	skipped	0	0	1	unimplemented option bundle: vect_early_break; vect_early_break_hw: capability unverified on KNC
+vect-early-break_86.c	run	skipped	0	0	1	unimplemented option bundle: vect_early_break; vect_early_break_hw: capability unverified on KNC
+vect-early-break_87.c	run	skipped	0	0	1	unimplemented option bundle: vect_early_break; vect_early_break_hw: capability unverified on KNC
+vect-early-break_88.c	run	skipped	0	0	1	unimplemented option bundle: vect_early_break; vect_early_break_hw: capability unverified on KNC
+vect-early-break_89.c	compile	skipped	0	0	0	unimplemented option bundle: vect_early_break
+vect-early-break_9.c	compile	skipped	0	0	1	unimplemented option bundle: vect_early_break; vect_early_break: capability unverified on KNC
+vect-early-break_90.c	run	skipped	0	0	1	unimplemented option bundle: vect_early_break; vect_early_break_hw: capability unverified on KNC
+vect-early-break_91.c	run	skipped	0	0	1	unimplemented option bundle: vect_early_break; vect_early_break_hw: capability unverified on KNC
+vect-early-break_92.c	run	skipped	0	0	1	unimplemented option bundle: vect_early_break; vect_early_break_hw: capability unverified on KNC
+vect-early-break_93.c	run	skipped	0	0	1	unimplemented option bundle: vect_early_break; vect_early_break_hw: capability unverified on KNC
+vect-early-break_94-pr113144.c	compile	skipped	0	0	1	unimplemented option bundle: vect_early_break; vect_early_break: capability unverified on KNC
+vect-early-break_95-pr113137.c	compile	skipped	0	0	0	unimplemented option bundle: vect_early_break; vect_early_break: capability unverified on KNC
+vect-early-break_96-pr113136.c	compile	skipped	0	0	0	unimplemented option bundle: vect_early_break; vect_early_break: capability unverified on KNC
+vect-early-break_97-pr113172.c	compile	skipped	0	0	0	unimplemented option bundle: vect_early_break; vect_early_break: capability unverified on KNC
+vect-early-break_98-pr113237.c	compile	skipped	0	0	0	unimplemented option bundle: vect_early_break; vect_early_break: capability unverified on KNC
+vect-early-break_99-pr113287.c	run	skipped	0	0	1	unimplemented option bundle: vect_early_break; vect_early_break: capability unverified on KNC; bitint65535: capability unverified on KNC
+vect-epilogues-2.c	compile	compiled	1	0	1	
+vect-epilogues.c	compile	compiled	1	0	2	
+vect-float-extend-1.c	run	linked	1	1	1	
+vect-float-truncate-1.c	run	linked	1	1	1	
+vect-floatint-conversion-1.c	run	linked	1	1	1	
+vect-floatint-conversion-2.c	run	linked	1	1	1	
+vect-fma-1.c	run	skipped	0	0	1	scalar_all_fma: capability unverified on KNC
+vect-fma-2.c	compile	compiled	1	0	1	
+vect-fma-3.c	run	skipped	0	0	1	dg-do: no matching KNC target selector; dg-do: selector [' target { scalar_all_fma || { i?86-*-* x86_64-*-* } } '] unverified; dg-additional-options: selector [' target { i?86-*-* x86_64-*-* } '] unmet
+vect-fmax-1.c	run	linked	1	1	2	
+vect-fmax-2.c	run	linked	1	1	2	
+vect-fmax-3.c	run	ICE	0	0	2	See <https://gcc.gnu.org/bugs/> for instructions.
+vect-fmin-1.c	run	linked	1	1	4	
+vect-fmin-2.c	run	linked	1	1	2	
+vect-fmin-3.c	run	ICE	0	0	2	See <https://gcc.gnu.org/bugs/> for instructions.
+vect-fncall-mask-math.c	run	skipped	0	0	1	dg-do: no matching KNC target selector; dg-do: selector [' target { aarch64*-*-* } '] unmet; dg-additional-options: selector [' target { aarch64*-*-* } '] unmet
+vect-fncall-mask.c	run	skipped	0	0	1	dg-do: no matching KNC target selector; dg-do: selector [' target { aarch64*-*-* } '] unmet; dg-additional-options: selector [' target { aarch64*-*-* } '] unmet
+vect-fold-1.c	compile	compiled	1	0	1	
+vect-gather-1.c	run	linked	1	1	1	
+vect-gather-2.c	compile	compiled	1	0	2	
+vect-gather-3.c	run	linked	1	1	1	
+vect-gather-4.c	compile	compiled	1	0	1	
+vect-gather-5.c	compile	compiled	1	0	2	
+vect-gather-6.c	compile	compiled	1	0	1	
+vect-ifcvt-10.c	compile	compiled	1	0	0	
+vect-ifcvt-11.c	run	skipped	0	0	1	vect_condition: capability unverified on KNC
+vect-ifcvt-16.c	run	skipped	0	0	1	vect_condition: capability unverified on KNC
+vect-ifcvt-17.c	run	skipped	0	0	1	vect_condition: capability unverified on KNC
+vect-ifcvt-18.c	run	skipped	0	0	1	vect_condition: capability unverified on KNC; dg-additional-options: selector [' target i?86-*-* x86_64-*-* '] unmet; dg-additional-options: selector [' target avx_runtime '] unmet
+vect-ifcvt-19.c	compile	compiled	1	0	1	
+vect-ifcvt-2.c	run	skipped	0	0	1	vect_condition: capability unverified on KNC
+vect-ifcvt-20.c	compile	compiled	1	0	2	
+vect-ifcvt-3.c	run	skipped	0	0	1	vect_condition: capability unverified on KNC
+vect-ifcvt-4.c	run	skipped	0	0	1	vect_condition: capability unverified on KNC
+vect-ifcvt-5.c	run	skipped	0	0	1	vect_condition: capability unverified on KNC
+vect-ifcvt-6.c	run	skipped	0	0	1	vect_condition: capability unverified on KNC
+vect-ifcvt-7.c	run	skipped	0	0	1	vect_condition: capability unverified on KNC
+vect-ifcvt-9.c	run	skipped	0	0	1	vect_condition: capability unverified on KNC
+vect-intfloat-conversion-1.c	run	linked	1	1	1	
+vect-intfloat-conversion-2.c	run	linked	1	1	1	
+vect-intfloat-conversion-3.c	run	linked	1	1	1	
+vect-intfloat-conversion-4a.c	run	linked	1	1	1	
+vect-intfloat-conversion-4b.c	run	linked	1	1	1	
+vect-iv-1.c	run	linked	1	1	1	
+vect-iv-10.c	run	linked	1	1	1	
+vect-iv-11.c	run	linked	1	1	1	
+vect-iv-12.c	run	linked	1	1	1	dg-additional-options: selector [' target { x86_64-*-* i?86-*-* } '] unmet
+vect-iv-13.c	run	linked	1	1	1	dg-additional-options: selector [' target { x86_64-*-* i?86-*-* } '] unmet
+vect-iv-14.c	run	linked	1	1	2	dg-additional-options: selector [' target { x86_64-*-* i?86-*-* } '] unmet
+vect-iv-2.c	run	linked	1	1	1	
+vect-iv-3.c	run	linked	1	1	1	
+vect-iv-4.c	run	linked	1	1	1	
+vect-iv-5.c	run	linked	1	1	1	
+vect-iv-6.c	run	skipped	0	0	1	vect_int_mult: capability unverified on KNC
+vect-iv-7.c	run	linked	1	1	1	
+vect-iv-8-big-array.c	run	linked	1	1	1	
+vect-iv-8.c	run	linked	1	1	1	
+vect-iv-8a-big-array.c	run	linked	1	1	1	
+vect-iv-8a.c	run	linked	1	1	1	
+vect-iv-9.c	run	linked	1	1	1	
+vect-ivdep-1.c	compile	compiled	1	0	0	
+vect-ivdep-2.c	compile	compiled	1	0	0	
+vect-licm-hoist-1.c	compile	compiled	1	0	2	
+vect-licm-hoist-2.c	compile	compiled	1	0	1	
+vect-live-1.c	run	linked	1	1	2	
+vect-live-2.c	run	skipped	0	0	2	vect_long: capability unverified on KNC; vect_shift: capability unverified on KNC
+vect-live-3.c	run	linked	1	1	2	
+vect-live-4.c	run	linked	1	1	2	
+vect-live-5.c	run	linked	1	1	2	
+vect-live-6.c	run	linked	1	1	1	
+vect-live-slp-1.c	run	linked	1	1	3	
+vect-live-slp-2.c	run	linked	1	1	3	
+vect-live-slp-3.c	run	skipped	0	0	3	vect_long: capability unverified on KNC
+vect-load-lanes-peeling-1.c	compile	skipped	0	0	2	vect_load_lanes: capability unverified on KNC
+vect-mask-load-1.c	run	linked	1	1	1	dg-additional-options: selector [' target avx_runtime '] unmet
+vect-mask-loadstore-1.c	run	linked	1	1	1	dg-additional-options: selector [' target avx_runtime '] unmet
+vect-mask-store-move-1.c	compile	compiled	1	0	2	dg-additional-options: selector [' target { i?86-*-* x86_64-*-* } '] unmet
+vect-mixed-size-cond-1.c	compile	compiled	1	0	0	
+vect-mod-var.c	run	linked	1	1	1	
+vect-mulhrs-1.c	run	linked	1	1	3	
+vect-mulhrs-2.c	run	linked	1	1	3	
+vect-mulhrs-3.c	run	linked	1	1	3	
+vect-mulhrs-4.c	run	linked	1	1	3	
+vect-mult-const-pattern-1.c	run	skipped	0	0	2	vect_shift: capability unverified on KNC
+vect-mult-const-pattern-2.c	run	linked	1	1	2	
+vect-mult-pattern-1.c	compile	skipped	0	0	2	vect_shift: capability unverified on KNC
+vect-mult-pattern-2.c	compile	skipped	0	0	2	vect_shift: capability unverified on KNC
+vect-multi-peel-gaps.c	run	linked	1	1	1	
+vect-multitypes-1.c	run	skipped	0	0	3	unimplemented option bundle: bind_pic_locally
+vect-multitypes-10.c	run	linked	1	1	1	
+vect-multitypes-11.c	run	linked	1	1	2	
+vect-multitypes-12.c	run	linked	1	1	1	
+vect-multitypes-13.c	run	linked	1	1	1	
+vect-multitypes-14.c	run	linked	1	1	1	
+vect-multitypes-15.c	run	linked	1	1	1	
+vect-multitypes-16.c	run	skipped	0	0	2	vect_long_long: capability unverified on KNC
+vect-multitypes-17.c	run	skipped	0	0	1	vect_long_long: capability unverified on KNC
+vect-multitypes-2.c	run	linked	1	1	1	
+vect-multitypes-3.c	run	skipped	0	0	3	unimplemented option bundle: double_vectors
+vect-multitypes-4.c	run	skipped	0	0	5	unimplemented option bundle: bind_pic_locally
+vect-multitypes-5.c	run	linked	1	1	1	
+vect-multitypes-6.c	run	skipped	0	0	3	vect_char_add: capability unverified on KNC; unimplemented option bundle: double_vectors
+vect-multitypes-7.c	run	linked	1	1	1	
+vect-multitypes-8.c	run	linked	1	1	1	
+vect-multitypes-9.c	run	linked	1	1	1	
+vect-nb-iter-ub-1.c	run	linked	1	1	3	
+vect-nb-iter-ub-2.c	run	linked	1	1	3	
+vect-nb-iter-ub-3.c	run	linked	1	1	2	
+vect-neg-store-1.c	run	linked	1	1	1	
+vect-neg-store-2.c	run	linked	1	1	1	
+vect-neg-zero.c	run	skipped	0	0	0	unimplemented option bundle: ieee
+vect-nest-cycle-1.c	run	linked	1	1	1	
+vect-nest-cycle-2.c	run	linked	1	1	1	
+vect-nest-cycle-3.c	run	linked	1	1	1	
+vect-nop-move.c	run	compile error	0	0	0	      |       ^~~~~~~~~~~~~~
+vect-novect_gcond.c	run	skipped	0	0	1	unimplemented option bundle: vect_early_break; vect_early_break_hw: capability unverified on KNC
+vect-novector-pragma.c	compile	compiled	1	0	1	
+vect-ooo-group-1.c	compile	compiled	1	0	0	
+vect-outer-1-big-array.c	compile	compiled	1	0	2	
+vect-outer-1.c	compile	compiled	1	0	2	
+vect-outer-1a-big-array.c	compile	compiled	1	0	2	
+vect-outer-1a.c	compile	compiled	1	0	2	
+vect-outer-1b-big-array.c	compile	compiled	1	0	2	
+vect-outer-1b.c	compile	compiled	1	0	2	
+vect-outer-2-big-array.c	run	skipped	0	0	1	vect_intfloat_cvt: capability unverified on KNC
+vect-outer-2.c	run	skipped	0	0	1	vect_intfloat_cvt: capability unverified on KNC
+vect-outer-2a-big-array.c	run	skipped	0	0	1	vect_intfloat_cvt: capability unverified on KNC
+vect-outer-2a.c	run	skipped	0	0	1	vect_intfloat_cvt: capability unverified on KNC
+vect-outer-2b.c	run	ICE	0	0	1	See <https://gcc.gnu.org/bugs/> for instructions.
+vect-outer-2c-big-array.c	run	skipped	0	0	1	vect_intfloat_cvt: capability unverified on KNC
+vect-outer-2c.c	run	skipped	0	0	1	vect_intfloat_cvt: capability unverified on KNC
+vect-outer-2d.c	run	ICE	0	0	1	See <https://gcc.gnu.org/bugs/> for instructions.
+vect-outer-3-big-array.c	run	linked	1	1	1	
+vect-outer-3.c	run	linked	1	1	1	
+vect-outer-3a-big-array.c	run	linked	1	1	2	
+vect-outer-3a.c	run	linked	1	1	2	
+vect-outer-3b.c	run	linked	1	1	2	
+vect-outer-3c.c	run	linked	1	1	1	
+vect-outer-4.c	run	linked	1	1	2	
+vect-outer-4a-big-array.c	compile	compiled	1	0	1	
+vect-outer-4a.c	compile	compiled	1	0	1	
+vect-outer-4b-big-array.c	compile	compiled	1	0	1	
+vect-outer-4b.c	compile	compiled	1	0	1	
+vect-outer-4c-big-array.c	compile	compiled	1	0	2	
+vect-outer-4c.c	compile	compiled	1	0	2	
+vect-outer-4d-big-array.c	run	linked	1	1	1	
+vect-outer-4d.c	run	linked	1	1	1	
+vect-outer-4e.c	compile	compiled	1	0	1	
+vect-outer-4f.c	run	linked	1	1	1	
+vect-outer-4g.c	run	linked	1	1	1	
+vect-outer-4i.c	run	linked	1	1	1	
+vect-outer-4j.c	compile	compiled	1	0	1	
+vect-outer-4k.c	run	linked	1	1	1	
+vect-outer-4l.c	run	linked	1	1	1	
+vect-outer-4m-big-array.c	run	linked	1	1	1	
+vect-outer-4m.c	run	linked	1	1	1	
+vect-outer-5.c	run	linked	1	1	3	
+vect-outer-6.c	run	linked	1	1	2	
+vect-outer-call-1.c	compile	compiled	1	0	1	
+vect-outer-fir-big-array.c	run	linked	1	1	1	
+vect-outer-fir-lb-big-array.c	run	linked	1	1	1	
+vect-outer-fir-lb.c	run	linked	1	1	1	
+vect-outer-fir.c	run	linked	1	1	1	
+vect-outer-pr117510.c	compile	compiled	1	0	1	
+vect-outer-pr69720.c	run	linked	1	1	1	
+vect-outer-simd-1.c	run	skipped	0	0	1	vect_simd_clones: capability unverified on KNC
+vect-outer-simd-2.c	run	skipped	0	0	1	vect_simd_clones: capability unverified on KNC
+vect-outer-simd-3.c	run	skipped	0	0	1	vect_simd_clones: capability unverified on KNC
+vect-outer-slp-1.c	compile	compiled	1	0	3	
+vect-outer-slp-2.c	run	skipped	0	0	2	vect_intdouble_cvt: capability unverified on KNC
+vect-outer-slp-3.c	run	skipped	0	0	2	vect_intdouble_cvt: capability unverified on KNC
+vect-over-widen-1-big-array.c	run	skipped	0	0	4	vect_shift: capability unverified on KNC
+vect-over-widen-1.c	run	skipped	0	0	4	vect_shift: capability unverified on KNC
+vect-over-widen-10.c	run	skipped	0	0	7	vect_shift: capability unverified on KNC; vect_pack_trunc: capability unverified on KNC; vect_unpack: capability unverified on KNC
+vect-over-widen-11.c	run	skipped	0	0	7	vect_shift: capability unverified on KNC; vect_pack_trunc: capability unverified on KNC; vect_unpack: capability unverified on KNC
+vect-over-widen-12.c	run	skipped	0	0	7	vect_shift: capability unverified on KNC; vect_pack_trunc: capability unverified on KNC; vect_unpack: capability unverified on KNC
+vect-over-widen-13.c	run	skipped	0	0	6	vect_shift: capability unverified on KNC; vect_pack_trunc: capability unverified on KNC; vect_unpack: capability unverified on KNC
+vect-over-widen-14.c	run	skipped	0	0	6	vect_shift: capability unverified on KNC; vect_pack_trunc: capability unverified on KNC; vect_unpack: capability unverified on KNC
+vect-over-widen-15.c	run	skipped	0	0	6	vect_shift: capability unverified on KNC; vect_pack_trunc: capability unverified on KNC; vect_unpack: capability unverified on KNC
+vect-over-widen-16.c	run	skipped	0	0	6	vect_shift: capability unverified on KNC; vect_pack_trunc: capability unverified on KNC; vect_unpack: capability unverified on KNC
+vect-over-widen-17.c	run	skipped	0	0	4	vect_shift: capability unverified on KNC; vect_pack_trunc: capability unverified on KNC; vect_unpack: capability unverified on KNC
+vect-over-widen-18.c	run	skipped	0	0	6	vect_shift: capability unverified on KNC; vect_pack_trunc: capability unverified on KNC; vect_unpack: capability unverified on KNC
+vect-over-widen-19.c	run	skipped	0	0	2	vect_shift: capability unverified on KNC; vect_pack_trunc: capability unverified on KNC; vect_unpack: capability unverified on KNC
+vect-over-widen-2-big-array.c	run	skipped	0	0	5	vect_shift: capability unverified on KNC
+vect-over-widen-2.c	run	skipped	0	0	5	vect_shift: capability unverified on KNC
+vect-over-widen-20.c	run	skipped	0	0	2	vect_shift: capability unverified on KNC; vect_pack_trunc: capability unverified on KNC; vect_unpack: capability unverified on KNC
+vect-over-widen-21.c	run	skipped	0	0	2	vect_shift: capability unverified on KNC; vect_pack_trunc: capability unverified on KNC; vect_unpack: capability unverified on KNC
+vect-over-widen-22.c	run	skipped	0	0	6	vect_shift: capability unverified on KNC; vect_pack_trunc: capability unverified on KNC; vect_unpack: capability unverified on KNC
+vect-over-widen-23.c	compile	compiled	1	0	3	
+vect-over-widen-3-big-array.c	run	skipped	0	0	3	vect_shift: capability unverified on KNC
+vect-over-widen-3.c	run	skipped	0	0	3	vect_shift: capability unverified on KNC
+vect-over-widen-4-big-array.c	run	skipped	0	0	4	vect_shift: capability unverified on KNC
+vect-over-widen-4.c	run	skipped	0	0	4	vect_shift: capability unverified on KNC
+vect-over-widen-5.c	run	skipped	0	0	6	vect_shift: capability unverified on KNC; vect_pack_trunc: capability unverified on KNC; vect_unpack: capability unverified on KNC
+vect-over-widen-6.c	run	skipped	0	0	6	vect_shift: capability unverified on KNC; vect_pack_trunc: capability unverified on KNC; vect_unpack: capability unverified on KNC
+vect-over-widen-7.c	run	skipped	0	0	6	vect_shift: capability unverified on KNC; vect_pack_trunc: capability unverified on KNC; vect_unpack: capability unverified on KNC
+vect-over-widen-8.c	run	skipped	0	0	6	vect_shift: capability unverified on KNC; vect_pack_trunc: capability unverified on KNC; vect_unpack: capability unverified on KNC
+vect-over-widen-9.c	run	skipped	0	0	7	vect_shift: capability unverified on KNC; vect_pack_trunc: capability unverified on KNC; vect_unpack: capability unverified on KNC
+vect-peel-1-epilogue.c	run	linked	1	1	0	
+vect-peel-1-src.c	run	linked	1	1	0	
+vect-peel-1.c	run	linked	1	1	3	
+vect-peel-2-epilogues.c	run	linked	1	1	0	
+vect-peel-2-src.c	run	linked	1	1	0	
+vect-peel-2.c	run	linked	1	1	3	
+vect-peel-3-epilogue.c	run	skipped	0	0	0	unimplemented option bundle: bind_pic_locally
+vect-peel-3-src.c	run	linked	1	1	0	
+vect-peel-3.c	run	skipped	0	0	3	unimplemented option bundle: bind_pic_locally
+vect-peel-4-epilogue.c	run	skipped	0	0	0	unimplemented option bundle: bind_pic_locally
+vect-peel-4-src.c	run	linked	1	1	0	
+vect-peel-4.c	run	skipped	0	0	3	unimplemented option bundle: bind_pic_locally
+vect-pr111779.c	run	linked	1	1	1	
+vect-pr114375.c	run	linked	1	1	1	dg-additional-options: selector [' target avx2_runtime '] unmet
+vect-pr120927-2.c	run	linked	1	1	0	dg-additional-options: selector [' target avx512f_runtime '] unmet
+vect-pr120927.c	run	linked	1	1	0	dg-additional-options: selector [' target avx512f_runtime '] unmet
+vect-pr122301.c	compile	compiled	1	0	1	
+vect-pr122308.c	compile	compiled	1	0	2	
+vect-pr122370.c	compile	compiled	1	0	0	dg-additional-options: selector [' target { avx512vl && avx512bw } '] unmet
+vect-pr122371.c	compile	compiled	1	0	0	
+vect-pr122406-1.c	compile	compiled	1	0	1	
+vect-pr122406-2.c	compile	compiled	1	0	1	
+vect-pr122793.c	run	linked	1	1	0	dg-additional-options: selector [' target sse4_runtime '] unmet
+vect-pr122844.c	run	linked	1	1	0	
+vect-pr123002.c	run	linked	1	1	0	dg-additional-options: selector [' target avx2 '] unmet
+vect-pr123221.c	compile	compiled	1	0	0	
+vect-pr123316.c	compile	compiled	1	0	0	
+vect-pr12358.c	compile	compiled	1	0	0	
+vect-pr123697.c	compile	compiled	1	0	0	
+vect-pr123755-2.c	compile	compiled	1	0	0	
+vect-pr123755.c	compile	compiled	1	0	0	
+vect-pr123756.c	compile	compiled	1	0	0	
+vect-pr123983.c	run	linked	1	1	0	
+vect-pr124037.c	run	linked	1	1	2	
+vect-pr124677.c	compile	compiled	1	0	0	
+vect-pr124743.c	compile	compiled	1	0	0	
+vect-pr124802.c	run	skipped	0	0	0	avx2_runtime: unsupported on KNC; fma: capability unverified on KNC; dg-skip-if: requires x86 intrinsic header; non-KNC machine options: -mavx2 -mfma
+vect-pr126404.c	compile	compiled	1	0	0	dg-additional-options: selector [' target { x86_64-*-* i?86-*-* } '] unmet
+vect-pr126457.c	compile	compiled	1	0	0	
+vect-pr61247.c	compile	compiled	1	0	1	
+vect-pr69848.c	run	skipped	0	0	1	vect_condition: capability unverified on KNC
+vect-pre-interact.c	compile	compiled	1	0	1	
+vect-prefetch-drop.c	compile	compiled	1	0	1	
+vect-profile-1.c	compile	compiled	1	0	1	
+vect-recip.c	compile	compiled	1	0	0	
+vect-recurr-1.c	run	skipped	0	0	1	vect_perm: capability unverified on KNC
+vect-recurr-2.c	run	skipped	0	0	1	vect_perm: capability unverified on KNC
+vect-recurr-3.c	run	skipped	0	0	1	vect_perm: capability unverified on KNC
+vect-recurr-4.c	run	skipped	0	0	1	vect_perm: capability unverified on KNC
+vect-recurr-5.c	run	skipped	0	0	1	vect_perm: capability unverified on KNC
+vect-recurr-6.c	run	skipped	0	0	1	vect_perm: capability unverified on KNC
+vect-recurr-pr121256-2.c	run	linked	1	1	0	dg-additional-options: selector [' target avx2_runtime '] unmet
+vect-recurr-pr121256.c	run	linked	1	1	0	dg-additional-options: selector [' target avx2_runtime '] unmet
+vect-reduc-1.c	run	linked	1	1	1	
+vect-reduc-10.c	run	linked	1	1	0	
+vect-reduc-11.c	run	linked	1	1	1	
+vect-reduc-1char-big-array.c	run	linked	1	1	1	
+vect-reduc-1char.c	run	linked	1	1	1	
+vect-reduc-1short.c	run	linked	1	1	1	
+vect-reduc-2.c	run	linked	1	1	1	
+vect-reduc-2char-big-array.c	run	linked	1	1	1	
+vect-reduc-2char.c	run	linked	1	1	1	
+vect-reduc-2short.c	run	linked	1	1	1	
+vect-reduc-3.c	run	linked	1	1	1	
+vect-reduc-6.c	run	skipped	0	0	2	vect_float_strict: capability unverified on KNC
+vect-reduc-7.c	run	linked	1	1	0	
+vect-reduc-8.c	run	linked	1	1	0	
+vect-reduc-9.c	run	linked	1	1	0	
+vect-reduc-bool-1.c	run	linked	1	1	1	
+vect-reduc-bool-2.c	run	linked	1	1	1	
+vect-reduc-bool-3.c	run	linked	1	1	1	
+vect-reduc-bool-4.c	run	linked	1	1	1	
+vect-reduc-bool-5.c	run	linked	1	1	1	
+vect-reduc-bool-6.c	run	linked	1	1	1	
+vect-reduc-bool-7.c	run	linked	1	1	1	
+vect-reduc-bool-8.c	run	linked	1	1	1	
+vect-reduc-bool-9.c	compile	compiled	1	0	0	
+vect-reduc-chain-1.c	run	skipped	0	0	2	unimplemented option bundle: arm_v8_2a_dotprod_neon; dg-require-effective-target: selector [' target { aarch64*-*-* || arm*-*-* } '] unmet
+vect-reduc-chain-2.c	run	skipped	0	0	4	unimplemented option bundle: arm_v8_2a_dotprod_neon; dg-require-effective-target: selector [' target { aarch64*-*-* || arm*-*-* } '] unmet
+vect-reduc-chain-3.c	run	linked	1	1	2	
+vect-reduc-chain-4.c	run	linked	1	1	2	
+vect-reduc-chain-5.c	run	linked	1	1	2	
+vect-reduc-chain-dot-slp-1.c	run	skipped	0	0	2	unimplemented option bundle: arm_v8_2a_dotprod_neon; dg-require-effective-target: selector [' target { aarch64*-*-* || arm*-*-* } '] unmet
+vect-reduc-chain-dot-slp-2.c	run	skipped	0	0	2	unimplemented option bundle: arm_v8_2a_dotprod_neon; dg-require-effective-target: selector [' target { aarch64*-*-* || arm*-*-* } '] unmet
+vect-reduc-chain-dot-slp-3.c	run	skipped	0	0	2	unimplemented option bundle: arm_v8_2a_dotprod_neon; dg-require-effective-target: selector [' target { aarch64*-*-* || arm*-*-* } '] unmet
+vect-reduc-chain-dot-slp-4.c	run	skipped	0	0	2	unimplemented option bundle: arm_v8_2a_dotprod_neon; dg-require-effective-target: selector [' target { aarch64*-*-* || arm*-*-* } '] unmet
+vect-reduc-cond-1.c	run	skipped	0	0	1	vect_condition: capability unverified on KNC
+vect-reduc-cond-2.c	run	skipped	0	0	2	vect_condition: capability unverified on KNC
+vect-reduc-cond-3.c	run	linked	1	1	1	
+vect-reduc-cond-add-1.c	run	linked	1	1	0	
+vect-reduc-cond-sub.c	run	linked	1	1	0	
+vect-reduc-dot-1.c	run	linked	1	1	2	
+vect-reduc-dot-10.c	run	skipped	0	0	2	unimplemented option bundle: arm_v8_2a_dotprod_neon; dg-require-effective-target: selector [' target { aarch64*-*-* || arm*-*-* } '] unmet
+vect-reduc-dot-11.c	run	skipped	0	0	2	unimplemented option bundle: arm_v8_2a_dotprod_neon; dg-require-effective-target: selector [' target { aarch64*-*-* || arm*-*-* } '] unmet
+vect-reduc-dot-12.c	run	skipped	0	0	2	unimplemented option bundle: arm_v8_2a_dotprod_neon; dg-require-effective-target: selector [' target { aarch64*-*-* || arm*-*-* } '] unmet
+vect-reduc-dot-13.c	run	skipped	0	0	2	unimplemented option bundle: arm_v8_2a_dotprod_neon; dg-require-effective-target: selector [' target { aarch64*-*-* || arm*-*-* } '] unmet
+vect-reduc-dot-14.c	run	skipped	0	0	2	unimplemented option bundle: arm_v8_2a_dotprod_neon; dg-require-effective-target: selector [' target { aarch64*-*-* || arm*-*-* } '] unmet
+vect-reduc-dot-15.c	run	skipped	0	0	2	unimplemented option bundle: arm_v8_2a_dotprod_neon; dg-require-effective-target: selector [' target { aarch64*-*-* || arm*-*-* } '] unmet
+vect-reduc-dot-16.c	run	skipped	0	0	2	unimplemented option bundle: arm_v8_2a_dotprod_neon; dg-require-effective-target: selector [' target { aarch64*-*-* || arm*-*-* } '] unmet
+vect-reduc-dot-17.c	run	skipped	0	0	2	unimplemented option bundle: arm_v8_2a_dotprod_neon; dg-require-effective-target: selector [' target { aarch64*-*-* || arm*-*-* } '] unmet
+vect-reduc-dot-18.c	run	skipped	0	0	2	unimplemented option bundle: arm_v8_2a_dotprod_neon; dg-require-effective-target: selector [' target { aarch64*-*-* || arm*-*-* } '] unmet
+vect-reduc-dot-19.c	run	skipped	0	0	1	unimplemented option bundle: arm_v8_2a_dotprod_neon; dg-require-effective-target: selector [' target { aarch64*-*-* || arm*-*-* } '] unmet
+vect-reduc-dot-2.c	run	linked	1	1	1	
+vect-reduc-dot-20.c	run	skipped	0	0	1	unimplemented option bundle: arm_v8_2a_dotprod_neon; dg-require-effective-target: selector [' target { aarch64*-*-* || arm*-*-* } '] unmet
+vect-reduc-dot-21.c	run	skipped	0	0	1	unimplemented option bundle: arm_v8_2a_dotprod_neon; dg-require-effective-target: selector [' target { aarch64*-*-* || arm*-*-* } '] unmet
+vect-reduc-dot-22.c	run	skipped	0	0	1	unimplemented option bundle: arm_v8_2a_dotprod_neon; dg-require-effective-target: selector [' target { aarch64*-*-* || arm*-*-* } '] unmet
+vect-reduc-dot-3.c	run	linked	1	1	1	
+vect-reduc-dot-4.c	run	linked	1	1	1	
+vect-reduc-dot-5.c	run	linked	1	1	1	
+vect-reduc-dot-6.c	run	linked	1	1	1	
+vect-reduc-dot-7.c	run	linked	1	1	1	
+vect-reduc-dot-8.c	run	linked	1	1	1	
+vect-reduc-dot-9.c	run	skipped	0	0	2	unimplemented option bundle: arm_v8_2a_dotprod_neon; dg-require-effective-target: selector [' target { aarch64*-*-* || arm*-*-* } '] unmet
+vect-reduc-dot-s16a.c	run	linked	1	1	3	
+vect-reduc-dot-s16b.c	run	linked	1	1	3	
+vect-reduc-dot-s16c.c	run	linked	1	1	1	
+vect-reduc-dot-s8a.c	run	skipped	0	0	4	unimplemented option bundle: arm_v8_2a_dotprod_neon; dg-require-effective-target: selector [' target { aarch64*-*-* || arm*-*-* } '] unmet; dg-additional-options: selector [' target { aarch64*-*-* } '] unmet
+vect-reduc-dot-s8b.c	run	linked	1	1	2	
+vect-reduc-dot-s8c.c	run	linked	1	1	1	
+vect-reduc-dot-slp-1.c	compile	skipped	0	0	2	unimplemented option bundle: arm_v8_2a_dotprod_neon; dg-require-effective-target: selector [' target { aarch64*-*-* || arm*-*-* } '] unmet
+vect-reduc-dot-u16a.c	run	linked	1	1	2	
+vect-reduc-dot-u16b.c	run	linked	1	1	2	
+vect-reduc-dot-u8a.c	run	skipped	0	0	3	unimplemented option bundle: arm_v8_2a_dotprod_neon; dg-require-effective-target: selector [' target { aarch64*-*-* || arm*-*-* } '] unmet; dg-additional-options: selector [' target { aarch64*-*-* } '] unmet
+vect-reduc-dot-u8b.c	run	linked	1	1	3	
+vect-reduc-epilogue-gaps.c	run	linked	1	1	0	
+vect-reduc-fma-1.c	compile	compiled	1	0	1	dg-additional-options: selector [' target { x86_64-*-* i?86-*-* } '] unmet
+vect-reduc-fma-2.c	compile	compiled	1	0	1	dg-additional-options: selector [' target { x86_64-*-* i?86-*-* } '] unmet
+vect-reduc-fma-3.c	compile	compiled	1	0	1	dg-additional-options: selector [' target { x86_64-*-* i?86-*-* } '] unmet
+vect-reduc-in-order-1.c	run	skipped	0	0	1	unimplemented option bundle: ieee
+vect-reduc-in-order-2.c	run	skipped	0	0	2	unimplemented option bundle: ieee
+vect-reduc-in-order-3.c	run	skipped	0	0	2	unimplemented option bundle: ieee
+vect-reduc-in-order-4.c	run	skipped	0	0	1	unimplemented option bundle: ieee
+vect-reduc-mul_1.c	run	skipped	0	0	1	vect_int_mult: capability unverified on KNC; whole_vector_shift: capability unverified on KNC
+vect-reduc-mul_2.c	run	skipped	0	0	1	vect_int_mult: capability unverified on KNC; whole_vector_shift: capability unverified on KNC
+vect-reduc-or_1.c	run	linked	1	1	2	
+vect-reduc-or_2.c	run	linked	1	1	2	
+vect-reduc-pattern-1a.c	run	linked	1	1	3	
+vect-reduc-pattern-1b-big-array.c	run	linked	1	1	3	
+vect-reduc-pattern-1b.c	run	linked	1	1	3	
+vect-reduc-pattern-1c-big-array.c	run	linked	1	1	3	
+vect-reduc-pattern-1c.c	run	linked	1	1	3	
+vect-reduc-pattern-2a.c	run	linked	1	1	3	
+vect-reduc-pattern-2b-big-array.c	run	linked	1	1	3	
+vect-reduc-pattern-2b.c	run	linked	1	1	3	
+vect-reduc-pattern-2c.c	run	linked	1	1	2	
+vect-reduc-pattern-3.c	run	skipped	0	0	1	vect_int_mult: capability unverified on KNC
+vect-reduc-sad-1.c	run	linked	1	1	2	
+vect-reduc-sad-2.c	run	linked	1	1	1	
+vect-reduc-sad-3.c	run	linked	1	1	1	
+vect-reduc-sad-4.c	run	linked	1	1	1	
+vect-reduc-sad-5.c	run	linked	1	1	1	
+vect-reduc-sad-6.c	run	linked	1	1	1	
+vect-reduc-sad-7.c	run	linked	1	1	1	
+vect-reduc-sad-8.c	run	linked	1	1	1	
+vect-reduc-sad-9.c	run	skipped	0	0	2	vect_usad_char: capability unverified on KNC; dg-additional-options: selector [' target { x86_64-*-* i?86-*-* } '] unmet
+vect-reduc-sad.c	run	skipped	0	0	2	vect_usad_char: capability unverified on KNC
+vect-rounding-btrunc.c	compile	skipped	0	0	1	vect_call_btrunc: capability unverified on KNC
+vect-rounding-btruncf.c	compile	skipped	0	0	1	vect_call_btruncf: capability unverified on KNC
+vect-rounding-ceil.c	compile	skipped	0	0	1	vect_call_ceil: capability unverified on KNC
+vect-rounding-ceilf.c	compile	skipped	0	0	1	vect_call_ceilf: capability unverified on KNC
+vect-rounding-floor.c	compile	skipped	0	0	1	vect_call_floor: capability unverified on KNC
+vect-rounding-floorf.c	compile	skipped	0	0	1	vect_call_floorf: capability unverified on KNC
+vect-rounding-lceil.c	compile	skipped	0	0	1	vect_call_lceil: capability unverified on KNC
+vect-rounding-lfloor.c	compile	skipped	0	0	1	vect_call_lfloor: capability unverified on KNC
+vect-rounding-nearbyint.c	compile	skipped	0	0	1	vect_call_nearbyint: capability unverified on KNC
+vect-rounding-nearbyintf.c	compile	skipped	0	0	1	vect_call_nearbyintf: capability unverified on KNC
+vect-rounding-round.c	compile	skipped	0	0	1	vect_call_round: capability unverified on KNC
+vect-rounding-roundf.c	compile	skipped	0	0	1	vect_call_roundf: capability unverified on KNC
+vect-sdiv-pow2-1.c	run	linked	1	1	2	
+vect-sdivmod-1.c	run	linked	1	1	1	
+vect-shift-1.c	run	skipped	0	0	1	vect_shift: capability unverified on KNC
+vect-shift-2-big-array.c	run	skipped	0	0	0	vect_shift: capability unverified on KNC
+vect-shift-2.c	run	skipped	0	0	0	vect_shift: capability unverified on KNC
+vect-shift-3.c	run	skipped	0	0	1	vect_shift: capability unverified on KNC
+vect-shift-4.c	run	skipped	0	0	1	vect_shift_char: capability unverified on KNC
+vect-shift-5.c	compile	skipped	0	0	1	vect_shift: capability unverified on KNC
+vect-shift-6.c	run	skipped	0	0	0	vect_shift: capability unverified on KNC
+vect-shift-7.c	run	skipped	0	0	0	vect_shift: capability unverified on KNC
+vect-simd-1.c	run	linked	1	1	0	dg-additional-options: selector [' target avx_runtime '] unmet
+vect-simd-10.c	run	linked	1	1	1	dg-additional-options: selector [' target avx_runtime '] unmet
+vect-simd-11.c	run	linked	1	1	1	dg-additional-options: selector [' target avx_runtime '] unmet
+vect-simd-12.c	run	linked	1	1	1	dg-additional-options: selector [' target avx_runtime '] unmet
+vect-simd-13.c	run	linked	1	1	1	dg-additional-options: selector [' target avx_runtime '] unmet
+vect-simd-14.c	run	linked	1	1	1	dg-additional-options: selector [' target avx_runtime '] unmet
+vect-simd-15.c	run	linked	1	1	1	dg-additional-options: selector [' target avx_runtime '] unmet
+vect-simd-16.c	run	linked	1	1	1	dg-additional-options: selector [' target avx_runtime '] unmet
+vect-simd-17.c	run	ICE	0	0	1	dg-additional-options: selector [' target avx_runtime '] unmet; See <https://gcc.gnu.org/bugs/> for instructions.
+vect-simd-18.c	run	linked	1	1	1	dg-additional-options: selector [' target avx_runtime '] unmet
+vect-simd-19.c	run	linked	1	1	1	dg-additional-options: selector [' target avx_runtime '] unmet
+vect-simd-2.c	compile	compiled	1	0	2	
+vect-simd-20.c	run	linked	1	1	1	dg-additional-options: selector [' target avx_runtime '] unmet
+vect-simd-3.c	compile	compiled	1	0	1	
+vect-simd-4.c	compile	compiled	1	0	2	
+vect-simd-5.c	compile	compiled	1	0	1	
+vect-simd-6.c	run	linked	1	1	1	
+vect-simd-7.c	run	linked	1	1	0	
+vect-simd-8.c	run	linked	1	1	1	dg-additional-options: selector [' target avx_runtime '] unmet
+vect-simd-9.c	run	linked	1	1	1	dg-additional-options: selector [' target avx_runtime '] unmet
+vect-simd-clone-1.c	run	skipped	0	0	0	vect_simd_clones: capability unverified on KNC; dg-additional-options: selector [' target avx_runtime '] unmet; dg-warning: selector [' target amdgcn*-*-* '] unmet; dg-warning: selector [' target amdgcn*-*-* '] unmet
+vect-simd-clone-10.c	run	skipped	0	0	0	vect_simd_clones: capability unverified on KNC; unimplemented directive: dg-additional-sources; dg-additional-options: selector [' target avx_runtime '] unmet
+vect-simd-clone-10a.c	compile	compiled	1	0	0	
+vect-simd-clone-11.c	run	skipped	0	0	0	vect_simd_clones: capability unverified on KNC; dg-additional-options: selector [' target avx_runtime '] unmet
+vect-simd-clone-12.c	run	skipped	0	0	0	vect_simd_clones: capability unverified on KNC; unimplemented directive: dg-additional-sources; dg-additional-options: selector [' target avx_runtime '] unmet
+vect-simd-clone-12a.c	compile	compiled	1	0	0	
+vect-simd-clone-13.c	run	skipped	0	0	0	vect_simd_clones: capability unverified on KNC; dg-additional-options: selector [' target avx_runtime '] unmet
+vect-simd-clone-14.c	run	skipped	0	0	0	vect_simd_clones: capability unverified on KNC; dg-additional-options: selector [' target avx_runtime '] unmet
+vect-simd-clone-15.c	run	skipped	0	0	0	vect_simd_clones: capability unverified on KNC; dg-additional-options: selector [' target avx_runtime '] unmet
+vect-simd-clone-16.c	run	skipped	0	0	1	vect_simd_clones: capability unverified on KNC; dg-additional-options: selector [' target avx_runtime '] unmet
+vect-simd-clone-16b.c	run	skipped	0	0	2	vect_simd_clones: capability unverified on KNC; dg-additional-options: selector [' target avx_runtime '] unmet
+vect-simd-clone-16c.c	run	skipped	0	0	2	vect_simd_clones: capability unverified on KNC; dg-additional-options: selector [' target avx_runtime '] unmet
+vect-simd-clone-16d.c	run	skipped	0	0	2	vect_simd_clones: capability unverified on KNC; dg-additional-options: selector [' target avx_runtime '] unmet
+vect-simd-clone-16e.c	run	skipped	0	0	2	vect_simd_clones: capability unverified on KNC; dg-additional-options: selector [' target avx_runtime '] unmet
+vect-simd-clone-16f.c	run	skipped	0	0	1	vect_simd_clones: capability unverified on KNC; dg-do-if: selector [' target { sse2_runtime && { ! sse4_runtime } } '] unmet; dg-additional-options: selector [' target sse4 '] unmet; dg-additional-options: selector [' target avx_runtime '] unmet; dg-additional-options: selector [' target { { i?86*-*-* x86_64-*-* } && { ! lp64 } } '] unmet
+vect-simd-clone-17.c	run	skipped	0	0	1	vect_simd_clones: capability unverified on KNC; dg-additional-options: selector [' target avx_runtime '] unmet
+vect-simd-clone-17b.c	run	skipped	0	0	2	vect_simd_clones: capability unverified on KNC; dg-additional-options: selector [' target avx_runtime '] unmet
+vect-simd-clone-17c.c	run	skipped	0	0	2	vect_simd_clones: capability unverified on KNC; dg-additional-options: selector [' target avx_runtime '] unmet
+vect-simd-clone-17d.c	run	skipped	0	0	2	vect_simd_clones: capability unverified on KNC; dg-additional-options: selector [' target avx_runtime '] unmet
+vect-simd-clone-17e.c	run	skipped	0	0	2	vect_simd_clones: capability unverified on KNC; dg-additional-options: selector [' target avx_runtime '] unmet
+vect-simd-clone-17f.c	run	skipped	0	0	1	vect_simd_clones: capability unverified on KNC; dg-do-if: selector [' target { sse2_runtime && { ! sse4_runtime } } '] unmet; dg-additional-options: selector [' target sse4 '] unmet; dg-additional-options: selector [' target avx_runtime '] unmet; dg-additional-options: selector [' target { { i?86*-*-* x86_64-*-* } && { ! lp64 } } '] unmet
+vect-simd-clone-18.c	run	skipped	0	0	1	vect_simd_clones: capability unverified on KNC; dg-additional-options: selector [' target avx_runtime '] unmet
+vect-simd-clone-18b.c	run	skipped	0	0	2	vect_simd_clones: capability unverified on KNC; dg-additional-options: selector [' target avx_runtime '] unmet
+vect-simd-clone-18c.c	run	skipped	0	0	2	vect_simd_clones: capability unverified on KNC; dg-additional-options: selector [' target avx_runtime '] unmet
+vect-simd-clone-18d.c	run	skipped	0	0	2	vect_simd_clones: capability unverified on KNC; dg-additional-options: selector [' target avx_runtime '] unmet
+vect-simd-clone-18e.c	run	skipped	0	0	2	vect_simd_clones: capability unverified on KNC; dg-additional-options: selector [' target avx_runtime '] unmet
+vect-simd-clone-18f.c	run	skipped	0	0	1	vect_simd_clones: capability unverified on KNC; dg-do-if: selector [' target { sse2_runtime && { ! sse4_runtime } } '] unmet; dg-additional-options: selector [' target sse4 '] unmet; dg-additional-options: selector [' target avx_runtime '] unmet; dg-additional-options: selector [' target { { i?86*-*-* x86_64-*-* } && { ! lp64 } } '] unmet
+vect-simd-clone-19.c	compile	skipped	0	0	1	vect_simd_clones: capability unverified on KNC
+vect-simd-clone-2.c	run	skipped	0	0	0	vect_simd_clones: capability unverified on KNC; dg-additional-options: selector [' target avx_runtime '] unmet; dg-warning: selector [' target amdgcn*-*-* '] unmet; dg-warning: selector [' target amdgcn*-*-* '] unmet
+vect-simd-clone-20.c	run	skipped	0	0	2	vect_simd_clones: capability unverified on KNC; dg-do-if: selector [' target { sse2_runtime && { ! sse4_runtime } } '] unmet; dg-additional-options: selector [' target sse4 '] unmet; dg-additional-options: selector [' target avx_runtime '] unmet
+vect-simd-clone-21.c	compile	skipped	0	0	2	vect_simd_clones: capability unverified on KNC
+vect-simd-clone-22.c	run	skipped	0	0	0	vect_simd_clones: capability unverified on KNC; unimplemented option bundle: ieee; fenv_exceptions: capability unverified on KNC; unimplemented directive: dg-additional-sources; dg-additional-options: selector [' target avx512f_runtime '] unmet
+vect-simd-clone-22a.c	compile	compiled	1	0	0	
+vect-simd-clone-23.c	compile	skipped	0	0	0	vect_simd_clones: capability unverified on KNC; dg-additional-options: selector [' target avx512bw '] unmet
+vect-simd-clone-24.c	compile	skipped	0	0	2	vect_simd_clones: capability unverified on KNC; dg-additional-options: selector [' target avx512f '] unmet
+vect-simd-clone-3.c	run	skipped	0	0	0	vect_simd_clones: capability unverified on KNC; dg-additional-options: selector [' target avx_runtime '] unmet; dg-warning: selector [' target amdgcn*-*-* '] unmet
+vect-simd-clone-4.c	run	skipped	0	0	0	vect_simd_clones: capability unverified on KNC; dg-additional-options: selector [' target avx_runtime '] unmet; dg-warning: selector [' target amdgcn*-*-* '] unmet
+vect-simd-clone-5.c	run	skipped	0	0	0	vect_simd_clones: capability unverified on KNC; dg-additional-options: selector [' target avx_runtime '] unmet; dg-warning: selector [' target amdgcn*-*-* '] unmet
+vect-simd-clone-6.c	run	skipped	0	0	0	vect_simd_clones: capability unverified on KNC; dg-additional-options: selector [' target avx_runtime '] unmet
+vect-simd-clone-7.c	run	skipped	0	0	0	vect_simd_clones: capability unverified on KNC; dg-additional-options: selector [' target avx_runtime '] unmet
+vect-simd-clone-8.c	run	skipped	0	0	0	vect_simd_clones: capability unverified on KNC; dg-additional-options: selector [' target avx_runtime '] unmet; dg-warning: selector [' target amdgcn*-*-* '] unmet; dg-warning: selector [' target amdgcn*-*-* '] unmet
+vect-simd-clone-9.c	run	skipped	0	0	0	vect_simd_clones: capability unverified on KNC; dg-additional-options: selector [' target avx_runtime '] unmet
+vect-simd-clone-pr123794.c	compile	skipped	0	0	0	vect_simd_clones: capability unverified on KNC
+vect-simd-pr121130.c	compile	compile error	0	0	0	/cygdrive/c/Users/xuzhi/Documents/gcc_knc/.work/_shared/gcc/gcc/testsuite/gcc.dg/vect/vect-simd-pr121130.c:11: confused by earlier errors, bailing out
+vect-singleton_1.c	compile	compiled	1	0	0	
+vect-strided-a-mult.c	run	linked	1	1	1	
+vect-strided-a-u16-i2.c	run	linked	1	1	1	
+vect-strided-a-u16-i4.c	run	linked	1	1	1	
+vect-strided-a-u16-mult.c	run	linked	1	1	1	
+vect-strided-a-u32-mult.c	run	linked	1	1	1	
+vect-strided-a-u8-i2-gap.c	run	linked	1	1	2	
+vect-strided-a-u8-i8-gap2-big-array.c	run	linked	1	1	1	
+vect-strided-a-u8-i8-gap2.c	run	linked	1	1	1	
+vect-strided-a-u8-i8-gap7-big-array.c	run	linked	1	1	1	
+vect-strided-a-u8-i8-gap7.c	run	linked	1	1	1	
+vect-strided-epilogue-1.c	compile	ICE	0	0	0	See <https://gcc.gnu.org/bugs/> for instructions.
+vect-strided-float.c	run	linked	1	1	2	
+vect-strided-mult-char-ls.c	run	linked	1	1	1	
+vect-strided-mult.c	run	linked	1	1	1	
+vect-strided-same-dr.c	run	linked	1	1	1	
+vect-strided-shift-1.c	run	linked	1	1	1	
+vect-strided-store-a-u8-i2.c	run	linked	1	1	1	
+vect-strided-store-u16-i4.c	run	linked	1	1	2	
+vect-strided-store-u32-i2.c	run	linked	1	1	2	
+vect-strided-store.c	run	ICE	0	0	1	See <https://gcc.gnu.org/bugs/> for instructions.
+vect-strided-u16-i2.c	run	linked	1	1	1	
+vect-strided-u16-i3.c	run	linked	1	1	1	
+vect-strided-u16-i4.c	run	linked	1	1	1	
+vect-strided-u32-i4.c	run	linked	1	1	1	
+vect-strided-u32-i8.c	run	linked	1	1	1	
+vect-strided-u32-mult.c	run	linked	1	1	1	
+vect-strided-u8-i2-gap.c	run	linked	1	1	1	
+vect-strided-u8-i2.c	run	linked	1	1	1	
+vect-strided-u8-i8-gap2-big-array.c	run	linked	1	1	1	
+vect-strided-u8-i8-gap2.c	run	linked	1	1	1	
+vect-strided-u8-i8-gap4-big-array.c	run	linked	1	1	1	
+vect-strided-u8-i8-gap4-unknown.c	run	linked	1	1	1	
+vect-strided-u8-i8-gap4.c	run	linked	1	1	1	
+vect-strided-u8-i8-gap7-big-array.c	run	linked	1	1	1	
+vect-strided-u8-i8-gap7.c	run	linked	1	1	1	
+vect-strided-u8-i8.c	run	linked	1	1	1	
+vect-switch-ifcvt-1.c	run	skipped	0	0	1	vect_condition: capability unverified on KNC
+vect-switch-ifcvt-2.c	compile	compiled	1	0	1	
+vect-switch-ifcvt-3.c	compile	compiled	1	0	0	
+vect-switch-search-line-fast.c	compile	skipped	0	0	2	unimplemented option bundle: vect_early_break; vect_early_break: capability unverified on KNC
+vect-tail-nomask-1.c	run	linked	1	1	2	dg-additional-options: selector [' target avx2_runtime '] unmet
+vect-uncounted-prolog-peel_1.c	compile	skipped	0	0	6	unimplemented option bundle: vect_early_break; vect_early_break: capability unverified on KNC
+vect-uncounted-prolog-peel_2.c	compile	skipped	0	0	3	unimplemented option bundle: vect_early_break; vect_early_break: capability unverified on KNC
+vect-uncounted-prolog-peel_3.c	compile	skipped	0	0	3	unimplemented option bundle: vect_early_break; vect_early_break: capability unverified on KNC
+vect-uncounted-run_1.c	run	skipped	0	0	3	unimplemented option bundle: vect_early_break; vect_early_break_hw: capability unverified on KNC
+vect-uncounted-run_2.c	run	skipped	0	0	1	unimplemented option bundle: vect_early_break; vect_early_break_hw: capability unverified on KNC
+vect-uncounted-run_3.c	run	skipped	0	0	3	unimplemented option bundle: vect_early_break; vect_early_break_hw: capability unverified on KNC
+vect-uncounted-run_4.c	run	skipped	0	0	1	unimplemented option bundle: vect_early_break; vect_early_break_hw: capability unverified on KNC
+vect-uncounted_1.c	compile	skipped	0	0	3	unimplemented option bundle: vect_early_break; vect_early_break: capability unverified on KNC
+vect-uncounted_2.c	compile	skipped	0	0	4	unimplemented option bundle: vect_early_break; vect_early_break: capability unverified on KNC
+vect-uncounted_3.c	compile	skipped	0	0	3	unimplemented option bundle: vect_early_break; vect_early_break: capability unverified on KNC
+vect-uncounted_4.c	compile	skipped	0	0	4	unimplemented option bundle: vect_early_break; vect_early_break: capability unverified on KNC
+vect-uncounted_5.c	compile	skipped	0	0	2	unimplemented option bundle: vect_early_break; vect_early_break: capability unverified on KNC
+vect-uncounted_6.c	compile	skipped	0	0	2	unimplemented option bundle: vect_early_break; vect_early_break: capability unverified on KNC
+vect-uncounted_7.c	compile	skipped	0	0	2	unimplemented option bundle: vect_early_break; vect_early_break: capability unverified on KNC
+vect-version-1.c	compile	skipped	0	0	1	vect_condition: capability unverified on KNC
+vect-version-2.c	compile	skipped	0	0	1	vect_condition: capability unverified on KNC
+vect-vfa-01.c	run	linked	1	1	1	
+vect-vfa-02.c	run	linked	1	1	1	
+vect-vfa-03.c	run	linked	1	1	2	
+vect-vfa-04.c	run	linked	1	1	1	
+vect-vfa-slp.c	run	linked	1	1	1	
+vect-widen-mult-1.c	run	linked	1	1	2	
+vect-widen-mult-2.c	run	linked	1	1	2	
+vect-widen-mult-3.c	run	linked	1	1	2	
+vect-widen-mult-4.c	run	linked	1	1	2	
+vect-widen-mult-const-s16.c	run	linked	1	1	3	
+vect-widen-mult-const-u16.c	run	linked	1	1	3	
+vect-widen-mult-extern-1.c	compile	compiled	1	0	1	
+vect-widen-mult-half-u8.c	run	linked	1	1	3	
+vect-widen-mult-half.c	run	linked	1	1	3	
+vect-widen-mult-s16.c	run	linked	1	1	1	
+vect-widen-mult-s8.c	run	linked	1	1	1	
+vect-widen-mult-sum.c	run	linked	1	1	2	
+vect-widen-mult-u16.c	run	linked	1	1	3	
+vect-widen-mult-u8-s16-s32.c	run	linked	1	1	3	
+vect-widen-mult-u8-u32.c	run	linked	1	1	3	
+vect-widen-mult-u8.c	run	linked	1	1	3	
+vect-widen-shift-s16.c	run	skipped	0	0	2	vect_shift: capability unverified on KNC
+vect-widen-shift-s8.c	run	skipped	0	0	2	vect_shift: capability unverified on KNC
+vect-widen-shift-u16.c	run	skipped	0	0	2	vect_shift: capability unverified on KNC
+vect-widen-shift-u8.c	run	skipped	0	0	2	vect_shift: capability unverified on KNC
+wrapv-vect-7.c	run	skipped	0	0	2	unimplemented option bundle: bind_pic_locally
+wrapv-vect-reduc-2char.c	run	linked	1	1	1	
+wrapv-vect-reduc-2short.c	run	linked	1	1	1	
+wrapv-vect-reduc-dot-s8b.c	run	linked	1	1	4	
+wrapv-vect-reduc-pattern-2c.c	run	linked	1	1	3	
