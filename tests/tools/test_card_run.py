@@ -195,6 +195,27 @@ class CardRun(unittest.TestCase):
                     # Test fixture teardown only; the runner may not remove it.
                     lock.unlink()
 
+    def test_codex_sandbox_user_refuses_before_lock_receipt_or_ledger(self):
+        with mock.patch.dict(self.runner["run"].__globals__["os"].environ,
+                             {"USERNAME": "CodexSandboxOffline"}), \
+             mock.patch.object(self.runner["run"].__globals__["getpass"], "getuser",
+                               return_value="CodexSandboxOffline"):
+            receipts = self.runner["run"].__globals__["RECEIPT_DIR"]
+            result = self.runner["run"](
+                self.program, [], lock_path=self.lock, external_locks=[self.external],
+                baseline_names=set(), timeout=30.0, transport_timeout=1.0,
+                receipt_path=self.receipt, transport=self.transport, ledger_path=self.ledger,
+                monotonic=self.transport.monotonic)
+        self.assertEqual(result["result_class"], "refused")
+        self.assertIn("card jobs are lead-only", result["detail"])
+        self.assertIn("leave the binaries for the lead", result["detail"])
+        self.assertEqual(self.transport.events, [])
+        self.assertFalse(self.lock.exists())
+        self.assertFalse(self.external.exists())
+        self.assertEqual(self.ledger.read_text(encoding="utf8"), "")
+        self.assertFalse(self.receipt.exists())
+        self.assertFalse(receipts.exists())
+
     def test_worktree_roots_share_default_lock(self):
         main = self.directory / "project"
         expected = main / ".work/_state/card.lock"
