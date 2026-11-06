@@ -24,3 +24,17 @@ At GCC `knc` after S6-04, 80 at a time on cores 59-40 (`claude-f7b0e10b…`): **
 `pr121126.c` timed out under the driver's per-program limit. Its loop nest runs about 75 million
 middle-loop iterations per outer iteration, so it is probably slow rather than wrong; it is rerun
 alone with a longer limit at the next free slot.
+
+## 2026-11-06: S6-10 checks, and a lost M2 attempt
+
+At GCC `knc` after S6-10/S6-11, core 59, 18:59-19:13 UTC:
+- S6-10 vect run tests `vect-63`, `vect-outer-2b`, `vect-outer-2d`, `vect-double-reduc-3`,
+  `vect-double-reduc-7`, `vect-simd-17`: all exit 0. `s4_masks` `o2v` and `o3`: 1,589,070 checks
+  each, 0 failures.
+- The M2 baseline jobs (42 `--benchmark` jobs) all exited 2 with `ERROR allocation`: they ran under
+  the 2 GiB `memoryMB` used for S6-01, and 240 workers' default 8 MiB thread stacks alone take about
+  1.9 GiB of address space. Rerun with 6 GiB.
+- The characterization jobs were refused by S6-12's check ("foreign workload running: sh"): the
+  PhiWeather run was starting. Correct behavior.
+- Earlier the same afternoon, two blocks were refused entirely by stale locks left by a force-killed
+  card_run (`CURRENT_STATE.md`).
