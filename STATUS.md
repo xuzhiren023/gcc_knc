@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-06 03:09.
+Updated automatically at every ticket change. Last update: 2026-11-06 03:31.
 
-**Next: GPT-6.1, on S5-21 (32-byte short vectors pass and return in memory again, as before S5-16 and as the donor does (pr109040 regression)).** Run `python tools/dispatch.py`, or ask the tech lead to.
+**Next: the tech lead, on S5-21.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[###################-]` 95 of 96
 
@@ -117,10 +117,11 @@ Current tickets: `[###################-]` 95 of 96
 | S5-18 | Final Sprint 5 batch check at the sprint head | Done | At KNC 656cb9ef096 the forward-port drill applies with only textual conflicts (5 files on upstream master, ... |
 | S5-19 | card_run shares cores with the PhiWeather session - compact per-job core claims from the ledger, and round-robin turns for benchmark jobs | Done | card_run now packs each job onto whole cores taken from 59 downward, shares the card with the PhiWeather se... |
 | S5-20 | card_run refuses engineer sandbox sessions, so card jobs stay with the lead | Done | card_run now refuses to run when started from a Codex sandbox account, so only the lead puts jobs on the ca... |
-| S5-21 | 32-byte short vectors pass and return in memory again, as before S5-16 and as the donor does (pr109040 regression) | In progress | Red approved: T1 reads the V16HI argument from entry rsp+8 like the donor; T2 checks the hidden-pointer ret... |
+| S5-21 | 32-byte short vectors pass and return in memory again, as before S5-16 and as the donor does (pr109040 regression) | Waiting for review | V16HI fixed; V16QI unchanged. Incremental builds pass. T0/T1/T2 pass after targeted push-ICE retries. Tortu... |
 
 ## Recent activity
 
+- 2026-11-06 03:31 **S5-21** engineer submit: V16HI fixed; V16QI unchanged. Incremental builds pass. T0/T1/T2 pass after targeted push-ICE retries. Torture O0/O2 passes 1966/1967 -> 1967/1968 o...
 - 2026-11-06 03:09 **S5-21** lead approve-red: Red approved: T1 reads the V16HI argument from entry rsp+8 like the donor; T2 checks the hidden-pointer return. Both fail on the current compiler a...
 - 2026-11-06 03:08 **S5-21** engineer red: Red commit 0d20124: T1 pr109040 foo checks entry-RSP+8; T2 checks hidden RDI stores and RAX return. GCC16 -O2 fails both with unsupported KNC regis...
 - 2026-11-06 03:01 **S5-18** lead approve: At KNC 656cb9ef096 the forward-port drill applies with only textual conflicts (5 files on upstream master, none on gcc-16) and both ICE sweeps show...
@@ -128,13 +129,12 @@ Current tickets: `[###################-]` 95 of 96
 - 2026-11-06 02:35 **S5-16** lead approve: Byte and word arrays now vectorize on KNC through converting loads and stores (u8/s8/u16/s16 to int and float, int to u8/s16 with modular truncatio...
 - 2026-11-06 02:27 **S5-16** engineer submit: Acceptance met under lead decisions. Final positive T1 PASS; unchanged instruction scans, approved report widths with comment. Log: .work/_state/lo...
 - 2026-11-06 02:24 **S5-16** lead answer: Yes: let the report scans accept 16, 32 or 64 byte vectors, and keep every instruction scan (one converting zmm access per 16 elements, no xmm/ymm)...
-- 2026-11-06 02:24 **S5-16** engineer ask: Build, f_s16 instruction scan and both reduced ICE tests pass; torture has no new ICEs. T1 now fails literal '64 byte vectors': aligned i32[i]=u8[i...
 
 ## Cost
 
 - From the script, engineer: 229 sessions, 550.6M input tokens
 - From the script, lead: 185 sessions, 58.8M input tokens
-- Started by hand, Claude: 9 sessions, 1074.0M input tokens
+- Started by hand, Claude: 9 sessions, 1074.4M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
