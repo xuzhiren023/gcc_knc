@@ -117,7 +117,15 @@ is an in-order fold. It is legal, but costly (the `s5_ops` baseline).
 7. **Byte and word data (amends ADR-0005 point 1).**
    - V16QI and V16HI become supported **transport-only** modes under KNC, through a separate
      predicate, never `ix86_knc_packed_mode_p`. They have no arithmetic, compares or
-     `movmisalign`, and their register home is the low 128 bits of `zmm`, like TI.
+     `movmisalign`. Their register home is the low bytes of `zmm` that hold the whole value:
+     the low 128 bits for V16QI (16 bytes), like TI, and the low 256 bits for V16HI (32 bytes).
+     (Amended by the lead on 2026-11-06, from S5-16's engineer: V16HI is 32 bytes in
+     `i386-modes.def`, so a 128-bit home would lose lanes 8-15.)
+   - Register moves and spills copy the whole `zmm`. Memory transfers move exactly the value's
+     size at its natural alignment (16 bytes for V16QI, 32 for V16HI), with forms that stay inside
+     one 64-byte line: a `vbroadcasti32x4`/`vbroadcasti64x4` load, and a `vpackstorelq` store
+     under a 2- or 4-qword mask. The unaligned unpack/pack pair is never used (it faults at a page
+     end).
    - A KNC `TARGET_VECTORIZE_RELATED_MODE` pairs 16-lane modes.
    - Widening loads and narrowing stores use IMCI up- and down-conversion on 16- or 32-byte
      aligned memory. A narrowing store ANDs first, so C's modular truncation holds whether the
