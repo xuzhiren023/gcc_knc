@@ -177,8 +177,8 @@ int benchmark(int argc, char **argv) {
     else die("unknown option");
   }
   if (selected < 0 || (cores != 1 && cores != 60) || density < 1 || density > 4
-      || launch < 1 || launch > 3 || short_length < 1 || short_length > 64)
-    die("require kernel, cores 1|60, density 1..4, launch 1..3, short-length 1..64");
+      || launch < 1 || launch > 5 || short_length < 1 || short_length > 64)
+    die("require kernel, cores 1|60, density 1..4, launch 1..5, short-length 1..64");
   if (strcmp(working_set,"boundary")) {
     static const unsigned l1[] = {0,1024,512,336,256}, l2[] = {0,16384,8192,5456,4096};
     size_t budget = 0;
