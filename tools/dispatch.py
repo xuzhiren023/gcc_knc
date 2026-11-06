@@ -37,7 +37,9 @@ You cannot edit files or run tools/check, so never promise either. A soft budget
 Finish with one pm.py command, run as plain `python tools/pm.py ...`: PM_ROLE is already set, and a prefix is refused. On approve, the --note is read by the project manager: say in one plain sentence what now works. Your final message is only the "PM update:" line it prints."""
 
 LEAD_TASKS = {
-    "review": "Review per docs/DEVELOPMENT_CYCLE.md section 7, then run pm.py approve, or pm.py changes with numbered findings, each with file:line.",
+    "review": "Review per docs/DEVELOPMENT_CYCLE.md section 7, then run pm.py approve, or pm.py changes with numbered findings, each with file:line. "
+              "If an acceptance line names a step the interactive lead runs (an x86 check by the lead, a card run before approval) "
+              "and the ticket does not yet record its result, do not approve: run pm.py escalate saying which result is missing.",
     "red-review": "Check that the failing tests prove the acceptance criteria and fail for the right reason, then run pm.py approve or pm.py changes.",
     "blocked": "Answer the question with pm.py answer, or send it to the owner with pm.py escalate if it is the owner's decision.",
 }
