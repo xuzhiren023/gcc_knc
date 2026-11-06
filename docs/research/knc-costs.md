@@ -183,3 +183,81 @@ Final shared GCC changes against `b12c3242595`: `i386-common.cc` +1/-1,
 `i386.opt` +4/-0, 1 hunk. Total shared: +49/-3, 9 hunks. KNC-only
 files: `i386-knc.cc` +157/-1, 2 hunks; `i386-knc.h` +4/-0, 1 hunk.
 No project harness or test changes in this follow-up.
+
+## Lead-approved scan corrections, 2026-11-06
+
+Project commit `f3e7257` implements the lead's 17:24 instructions. GCC remains
+at `7fdd15cf40a`; no compiler edits or rebuild were needed in this session.
+The seven gather/scatter lowering tests now request
+`-fvect-cost-model=unlimited`. The folding test disables alignment peeling
+with `--param=vect-max-peeling-for-alignment=0`, with a comment explaining
+the unaligned-input premise. No scan lines changed.
+
+`tools/check.py::loops` now splits basic blocks at labels and after jumps
+and returns. Unconditional jumps and returns end fallthrough; conditional
+and mask branches retain it. For each layout-backward edge, it intersects
+forward reachability from the header with reverse reachability from the
+latch, without crossing the header again. This includes cold blocks on a
+cycle regardless of layout and excludes backward jumps that close no cycle.
+Both mask-branch operand orders are recognized. The same loop bodies feed
+the stack, arithmetic and accumulator scans.
+
+For the saved `.work/_shared/S6-05/knc-reduce-int.s`, `sum_i32` has exactly
+these cycle block sets:
+
+| Header / latch | Blocks | Instructions |
+| --- | --- | --- |
+| `.L6` | `.L6` | Two `vpaddd` operations, pointer update, compare and `jne .L6` |
+| `.L7` | `.L7` | Scalar remainder add, updates, compare and `jg .L7` |
+| `.L35` | `.L35` | Scalar fallback add, updates, compare and `jg .L35` |
+
+The horizontal reduction and stack transfer at `.L32` are outside every
+cycle. The branch from `.L6` falls through to `.L32` only on loop exit;
+the paths from `.L32` go to the remainder `.L7` or return at `.L1`, with
+no path back to `.L6`. `.L42 -> .L4` and the peel exits into `.L5` do not
+close cycles. The inspection log is
+`.work/_state/logs/S6_05_cfg-20261106-172606.log`.
+
+The complete observed T1 decision changes and the nine prior failures are:
+
+| Test / decision | Effect of the costs and resolution |
+| --- | --- |
+| `knc-cost-gather` | Scattered FP32 indexed copy now stays scalar, as required by the measured line-service cost. |
+| `knc-cost-reduce-one-thread` | Density 1 now selects at least two reduction accumulators through the existing x86 unroll path; the default-density companion retains one. |
+| `knc-gather16-f32` | Indexed FP32 copy now stays scalar under normal profitability; unlimited costs restore its gather/retry lowering check. |
+| `knc-gather16-i32` | Indexed integer copy now stays scalar under normal profitability; unlimited costs restore its gather/retry lowering check. |
+| `knc-gather16-masked` | Conditional gather now stays scalar under normal profitability; unlimited costs restore its mask/gather lowering check. |
+| `knc-gather8-f64` | Eight-lane double gather now stays scalar; unlimited costs restore its two-gather lowering check. |
+| `knc-gather8-i64` | Eight-lane integer gather now stays scalar; unlimited costs restore its two-gather lowering check. |
+| `knc-scatter8-f64` | Eight-lane double scatter now stays scalar; unlimited costs restore its two-scatter lowering check. |
+| `knc-scatter8-i64` | Eight-lane integer scatter now stays scalar; unlimited costs restore its two-scatter lowering check. |
+| `knc-reduce-int` | The prior linear-range scanner counted the post-loop bridge at `.L32`; CFG membership fixes the false failure without changing costs or scans. |
+| `knc-vec-fold-O3` | Peeling now chosen for a, b by unpack pair. Alignment permits folding a; disabling peeling restores the test's unaligned-input premise. |
+
+The last nine rows identify the nine failing files from the preceding run;
+the integer-reduction row is a scanner correction, not a new profitability
+decision. The first two rows are the accepted cost-decision checks.
+
+This session changes shared project `tools/check.py` by +51/-4 in one hunk;
+the eight T1 source files change by +9/-8 in eight hunks. Shared GCC totals
+remain +49/-3 in nine hunks, as listed above.
+
+Final validation ran once after these corrections:
+
+```
+python tools/run.py --name S6_05_final_t0_t1_t2 --inputs tools tests toolchain -- python tools/check.py t0 t1 t2 --compiler gcc16 --worker
+```
+
+PASS, exit 0, 542.07 seconds. T0 passed all 52 tests; full T1 and T2 passed.
+All nine previously failing files now pass. `knc-div-f32`,
+`knc-fp-minmax-strict`, `knc-cost-reduce` and
+`knc-cost-reduce-one-thread` retain their passing verdicts with the CFG
+scanner. The scattered-gather profitability check also passes.
+Log: `.work/_state/logs/S6_05_final_t0_t1_t2-20261106-172632.log`.
+
+The final compiler's previously built and linted card binaries remain at
+`.work/_shared/S6-05/m2-kernels.mic` and
+`.work/_shared/S6-05/s5_ops/{o2v,o3,fast,neg}.mic`. This session did not
+execute them on the card. Per the lead's 17:24 instruction, native M2 and
+s5_ops correctness and before/after M2 benchmark windows remain with the
+lead; torture changes and x86 validation remain with the next batch check.
