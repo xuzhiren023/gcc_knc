@@ -58,7 +58,8 @@ def main():
                 ok = result.returncode != 0 and 'internal compiler error' in result.stdout and expected in result.stdout
             else:
                 ok = result.returncode == 0 and not violations
-            print(('PASS ' if ok else 'FAIL ') + stem + ': compile/lint; ' + str(log))
+            print(('PASS ' if ok else 'FAIL ') + stem +
+                  (': expected ICE; ' if red else ': compile/lint; ') + str(log))
             if violations:
                 print(violations[:3])
             failed += not ok
@@ -67,6 +68,28 @@ def main():
                 programs.append(artifact.name)
             else:
                 artifact.unlink(missing_ok=True)
+    if not red:
+        cc += ['-march=knc', '--sysroot=' + str(suite.TC / 'sysroot')]
+        source = suite.ROOT / 'tests/acceptance/s4_masks'
+        driver = out / 'masks-driver.o'
+        subprocess.run([*cc, '-O0', '-fwrapv', '-c', str(source / 'driver.c'),
+                        '-o', str(driver)], env=env, check=True)
+        for name, flags in (('o2v', ['-O2', '-ftree-vectorize']), ('o3', ['-O3'])):
+            obj = out / 'masks-loops.o'
+            artifact = out / ('s4_masks-' + name + '.mic')
+            subprocess.run([*cc, *flags, '-fwrapv', '-c', str(source / 'loops.c'),
+                            '-o', str(obj)], env=env, check=True)
+            subprocess.run([*cc, str(driver), str(obj), '-lm', '-o', str(artifact)],
+                           env=env, check=True)
+            violations = list(lint(artifact, suite.TC, env))
+            failed += bool(violations)
+            print(('FAIL ' if violations else 'PASS ') + artifact.name + ': compile/lint')
+            if violations:
+                print(violations[:3])
+            else:
+                programs.append(artifact.name)
+            obj.unlink()
+        driver.unlink()
     print('Card binaries (not run): ' + ', '.join(programs))
     return int(bool(failed))
 
