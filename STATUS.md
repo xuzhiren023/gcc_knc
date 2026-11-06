@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-06 00:18.
+Updated automatically at every ticket change. Last update: 2026-11-06 00:54.
 
 **Next: the tech lead, on S5-15.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
@@ -116,27 +116,27 @@ Current tickets: `[###################-]` 91 of 95
 | S5-17 | Sprint 5 mid batch check after S5-06, S5-07 and S5-08 | Done | x86 check (lead, portability-claude) at knc 9690ac8906a vs releases/gcc-16.2.0: -O2 and -O2 -mavx512f ident... |
 | S5-18 | Final Sprint 5 batch check at the sprint head | Not started |  |
 | S5-19 | card_run shares cores with the PhiWeather session - compact per-job core claims from the ledger, and round-robin turns for benchmark jobs | Done | card_run now packs each job onto whole cores taken from 59 downward, shares the card with the PhiWeather se... |
-| S5-20 | card_run refuses engineer sandbox sessions, so card jobs stay with the lead | In progress |  |
+| S5-20 | card_run refuses engineer sandbox sessions, so card jobs stay with the lead | In progress | Red accepted by lead check: the new test errors on main's card_run (no getpass import; KeyError), a weaker ... |
 
 ## Recent activity
 
+- 2026-11-06 00:54 **S5-20** lead approve-red: Red accepted by lead check: the new test errors on main's card_run (no getpass import; KeyError), a weaker red than an admission failure, but the r...
+- 2026-11-06 00:22 **S5-20** engineer red: The required failing test commit could not be created: git reset --soft HEAD~1 was denied writing worktree git metadata (.git/worktrees/S5-20/HEAD....
 - 2026-11-06 00:15 **S5-15** engineer submit: GCC 41a1abe5bbb built incrementally; red failed as expected; T0 52 passed; T1/T2 passed except obsolete scans, now fixed bb09b54 and both pass. Log...
 - 2026-11-06 00:13 **S5-15** lead answer: Yes: replace the obsolete 'no vgmin/vgmax in fmin_*/fmax_*' scans in knc-mask-cond with positive scans (ADR-0008 point 3 as amended; the S4 ban pre...
 - 2026-11-06 00:12 **S5-15** engineer ask: GCC 41a1abe5bbb builds; new minmax T1 passes. Existing knc-mask-cond-O2/O3 ban vgmin in fmin_f32. Reproducer: c[i]=__builtin_fminf(a[i],b[i]) now v...
 - 2026-11-05 23:34 **S5-15** lead answer: Yes: define a local code attribute in imci.md (e.g. knc_maxmin: smax 'max', smin 'min'), not in sse.md, and continue.
 - 2026-11-05 23:33 **S5-15** engineer ask: Two builds failed: first ssescalarmode before definition (fixed); second genflags: unresolved iterator in *knc_reduc_<maxmin>v8df_swizzle. Reproduc...
 - 2026-11-05 23:18 **S5-14** lead approve: Loops that read or write double or long arrays through an int index now vectorize on KNC as two 8-lane gathers or scatters per 16 indices, and pass...
-- 2026-11-05 23:08 **S5-14** engineer submit: GCC ab967b42a6e: both one-line ABI hooks share the private gather type/decl predicate. Incremental build and full T1 PASS (four -O3 scans). All REA...
-- 2026-11-05 23:02 **S5-14** lead answer: Yes. Use one helper, e.g. ix86_knc_gather_builtin_type_p (fntype or decl), shared by both hooks, with each i386.cc dispatch one line; zmm0 for exac...
 
 ## Cost
 
-- From the script, engineer: 221 sessions, 531.5M input tokens
+- From the script, engineer: 222 sessions, 532.7M input tokens
 - From the script, lead: 184 sessions, 58.7M input tokens
-- Started by hand, Claude: 9 sessions, 1034.2M input tokens
+- Started by hand, Claude: 9 sessions, 1041.8M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 12.6 GiB of 100 GiB. 171 GiB free on the drive.
+The project uses 12.6 GiB of 100 GiB. 174 GiB free on the drive.
