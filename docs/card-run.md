@@ -144,6 +144,7 @@ after S2-17, with later batches using the full execute suite.
   timed `queued` row with `queuedTime`; start or superseded closes that queue.
   It also refuses when a card process snapshot finds a non-baseline workload,
   checking again after staging immediately before the timed program starts.
+  The MPSS daemon names are built-in to the baseline and merged with configured names.
   Fresh timed queues (under three hours old) from other projects also hold back
   ordinary jobs so the ledger can drain. If the last timed finish was ours,
   another project's fresh queue makes benchmark admission refuse with "their turn"

@@ -114,6 +114,9 @@ def default_lock(root):
 
 
 def foreign_processes(snapshot, run_dir, baseline_names):
+    baseline_names = set(baseline_names) | {
+        "init", "sshd", "udevd", "getty", "klogd", "syslogd", "portmap", "coi_daemon"
+    }
     directories = [run_dir]
     if snapshot.get("physical_run_dir"):
         directories.append(snapshot["physical_run_dir"])
