@@ -41,15 +41,16 @@ def main():
     assembler = TC / 'cross/bin/k1om-mpss-linux-as'
     if command(*cc, '--version') or command(assembler, '--version'):
         return 2
-    flags = ['-O2', '-std=gnu11', '-Wall', '-Wextra', '-Werror', '-ffp-contract=off']
+    flags = ['-O2', '-std=gnu11', '-Wall', '-Wextra', '-Werror', '-ffp-contract=fast']
     scalar = ['-fno-tree-vectorize', '-fno-tree-slp-vectorize']
+    oracle = [*scalar, '-ffp-contract=off']
     variants = ['positive', 'negative'] if args.mode == 'all' else [args.mode]
     units = [('kernels-gcc', 'kernels.c', ['-DBUILD=gcc', '-ftree-vectorize']),
              ('kernels-x87', 'kernels.c', ['-DBUILD=x87', *scalar]),
-             ('timing', 'timing.c', scalar)]
+             ('timing', 'timing.c', oracle)]
     for variant in variants:
         units.append(('driver-' + variant, 'driver.c',
-                      [*scalar, *(['-DNEGATIVE_CONTROL'] if variant == 'negative' else [])]))
+                      [*oracle, *(['-DNEGATIVE_CONTROL'] if variant == 'negative' else [])]))
     errors = 0
     for name, source, extra in units:
         assembly = out / (name + '.s')

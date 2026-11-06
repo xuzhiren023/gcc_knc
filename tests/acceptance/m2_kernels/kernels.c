@@ -1,5 +1,5 @@
 /* Same source, compiled separately with tree vectorization enabled/disabled.
-   No reassociation, contraction, intrinsics or target-specific C extensions. */
+   Contraction is allowed; no reassociation or intrinsics. */
 #include "kernels.h"
 #define CAT_(a,b) a##b
 #define CAT(a,b) CAT_(a,b)

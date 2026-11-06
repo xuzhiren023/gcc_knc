@@ -15,7 +15,7 @@ python tools/run.py --name S6-02-suite-build --inputs tests/acceptance/m2_kernel
 ```
 
 The script uses the shared GCC 16 compiler and sysroot, compiles the C sources
-with `-O2 -march=knc -ffp-contract=off -Wall -Wextra -Werror`, assembles **every**
+with `-O2 -march=knc -ffp-contract=fast -Wall -Wextra -Werror`, assembles **every**
 object with donor binutils 2.22 `--march=k1om`, links with pthreads/librt, and
 runs `tools/knc_lint` on both complete executables. It overwrites outputs in
 `.work/_shared/S6-02/`; it neither rebuilds GCC nor runs a card program.
@@ -39,11 +39,34 @@ excluded density 3. Timing exit 0 does **not** establish cross-launch stability.
 All entry points have separate symbols, restrict-qualified pointer arguments,
 and no scalar FP argument ABI dependency. Array allocations, initial input and
 output pointers, and parameter blocks are 64-byte aligned. The `.s` references
-are hand-written IMCI, with no intrinsics, fused multiply-add or opaque bytes.
+are hand-written IMCI, with no intrinsics or opaque bytes. Affine (including
+short) and matrix multiply-adds use `vfmadd213ps/pd` and `vfmadd231ps`, respectively,
+matching the GCC kernel build's permitted contraction (`-ffp-contract=fast`,
+GCC's default). The independent oracle retains `-ffp-contract=off`.
 `kernels.c` is compiled twice: `BUILD=gcc` enables `-ftree-vectorize`, while
 `BUILD=x87` disables both loop and SLP vectorization. The scalar checker and
 timing code also disable both. The name `gcc` denotes this vector-enabled build;
 it does not assert that GCC successfully vectorizes every loop.
+
+Affine and stencil main loops process four independent vectors per iteration
+to expose four arithmetic chains for one thread (ADR-0009 point 3). Full aligned
+vectors use unmasked aligned moves; the remainder mask is computed once per
+function call, and only the final partial vector uses it. Short calls use
+unpack/pack moves because chunk starts need not be aligned. Stencil neighbor
+loads likewise need unpack moves. The 8x8 matrix uses a constant eight-lane
+store mask for complete outputs (each is half a vector), plus the once-computed
+remainder mask for its final partial output; 16x16 full stores are unmasked.
+
+The affine and 1-D stencil bulk loops prefetch each of four input cache lines
+256 bytes ahead with `vprefetch0` (L1) and 2048 bytes ahead with `vprefetch1`
+(L2). Short calls and matrix input-vector iterations prefetch one line at those
+same distances. The 2-D stencil prefetches the next output row's center/south
+lines at +384/+768 bytes to L1, and row +8 with its north/south neighbors at
++2688/+3072/+3456 bytes to L2, for each of the four column-vector offsets.
+These fixed distances also apply to cache-sized inputs; they are initial
+reference choices, not card-tuned performance claims. Prefetch hints near the
+end can extend past the allocation, but all demand loads stay within the
+initialized padding. No output prefetch or streaming-store assumption is used.
 
 | Kernel | Operation / layout |
 |---|---|
@@ -71,7 +94,9 @@ Inputs are quarter integers in [-15.75,15.75], affine a=2 and b=0.5, and matrix
 coefficients are quarter integers in [-2,2]. Every intermediate and final value
 is exactly representable in FP32 (and FP64): matrix partial sums have at most
 16 terms, each a multiple of 1/16, with absolute sum <=504. No tolerance is
-used. This deliberately establishes identical FP work despite x87 extended
+used. Separate multiply/add and fused multiply-add are bitwise equal for these
+exactly representable inputs and intermediate results. This deliberately
+establishes identical FP results despite contraction and x87 extended
 precision; it is not a claim about arbitrary inexact/exceptional inputs or
 changed FP modes. No fast-math flags are enabled.
 
