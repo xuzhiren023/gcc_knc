@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-06 12:36.
+Updated automatically at every ticket change. Last update: 2026-11-06 12:38.
 
 **Next: the tech lead, on S6-05.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
@@ -129,10 +129,11 @@ Current tickets: `[###################-]` 104 of 108
 | S6-09 | ICE in expand_vec_series_expr: KNC lane-index vectors (VEC_SERIES) for V16SI/V8DI and the FP modes | Done | Loops that build lane-index vectors (VEC_SERIES) now compile on KNC instead of crashing the compiler: 6 of ... |
 | S6-10 | Unrecognizable and unconstrained insns: ffsll's scalar conditional move, and constant -1 into a k register | Done | Constant 0 and -1 loads into mask registers (kxor/kxnor) and 64-bit ffs without CMOV now compile on KNC, fi... |
 | S6-11 | ICE in expand_fn_using_insn for FP64 fmax/fmin loops (S5-15 follow-up) | Done | Scalar and SLP-reduction fmin/fmax on float and double now compile on KNC through vgmin/vgmax with the C Na... |
-| S6-12 | card_run --benchmark refuses while another project's processes still run on the card, whatever the ledger says | In progress | Lead, under the owner's delegation: sessions 2 -> 4 (two were spent on the lead's late finding and a tool p... |
+| S6-12 | card_run --benchmark refuses while another project's processes still run on the card, whatever the ledger says | Question for the tech lead | Required Cygwin discovery command ran: tests.tools.test_card_run passes (30 tests). Full test_card_* discov... |
 
 ## Recent activity
 
+- 2026-11-06 12:38 **S6-12** engineer ask: Required Cygwin discovery command ran: tests.tools.test_card_run passes (30 tests). Full test_card_* discovery ran under the provided Cygwin Python...
 - 2026-11-06 12:36 **S6-12** owner decide: Lead, under the owner's delegation: sessions 2 -> 4 (two were spent on the lead's late finding and a tool path). Finish: run the red, add the built...
 - 2026-11-06 12:36 **S6-12** engineer escalate: budget: 2 engineer sessions used; the budget is 2
 - 2026-11-06 12:35 **S6-12** lead answer: Use the project's own toolchain, not the PhiWeather bootstrap: from the worktree run python tools/run.py --name s6_12_red --inputs tools tests/tool...
@@ -140,13 +141,12 @@ Current tickets: `[###################-]` 104 of 108
 - 2026-11-06 12:24 **S6-11** lead approve: Scalar and SLP-reduction fmin/fmax on float and double now compile on KNC through vgmin/vgmax with the C NaN rules, fixing the last two vect tests ...
 - 2026-11-06 12:15 **S6-11** engineer submit: Red: both ICEs. Build and reduced/upstream compile+lint PASS. T0/T1/T2: 300 outcomes unchanged vs S6-10. Torture: 8012 classifications unchanged. i...
 - 2026-11-06 11:33 **S6-10** lead approve: Constant 0 and -1 loads into mask registers (kxor/kxnor) and 64-bit ffs without CMOV now compile on KNC, fixing 8 vect tests that crashed the compi...
-- 2026-11-06 11:23 **S6-10** engineer submit: GCC 7d96f2cef8c: KNC HI/QI KXOR/KXNOR constants; failed guards removed. Build, 8 reduced/upstream compile/lint checks, s4_masks compile/lint, T0/T1...
 
 ## Cost
 
 - From the script, engineer: 250 sessions, 603.2M input tokens
 - From the script, lead: 185 sessions, 58.8M input tokens
-- Started by hand, Claude: 9 sessions, 1293.1M input tokens
+- Started by hand, Claude: 9 sessions, 1294.0M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
