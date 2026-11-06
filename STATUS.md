@@ -1,10 +1,10 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-06 11:24.
+Updated automatically at every ticket change. Last update: 2026-11-06 11:33.
 
 **Next: the tech lead, on S6-05.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
-Current tickets: `[##################--]` 102 of 108
+Current tickets: `[###################-]` 103 of 108
 
 ## Milestones
 
@@ -12,7 +12,7 @@ Current tickets: `[##################--]` 102 of 108
 |---|---|---|---|
 | M0 | Foundation | In progress | 17 of 17 tickets |
 | M1 | Mixed native code | Done | 43 of 43 tickets |
-| M2 | Useful vector target | In progress | 42 of 48 tickets |
+| M2 | Useful vector target | In progress | 43 of 48 tickets |
 | M3 | Runtimes | Not started | Not planned in detail yet |
 | M4 | Broad optimization | Not started | Not planned in detail yet |
 | M5 | Program corpus | Not started | Not planned in detail yet |
@@ -127,12 +127,13 @@ Current tickets: `[##################--]` 102 of 108
 | S6-07 | First gcc.dg/vect baseline for KNC: compile scans on the host, execution on the card | Done | The gcc.dg/vect suite now has a KNC baseline: of 2,001 tests, 1,329 compile (777 linked for the card), 632 ... |
 | S6-08 | Sprint 6 mid batch check after S6-04 and S6-05 | Not started |  |
 | S6-09 | ICE in expand_vec_series_expr: KNC lane-index vectors (VEC_SERIES) for V16SI/V8DI and the FP modes | Done | Loops that build lane-index vectors (VEC_SERIES) now compile on KNC instead of crashing the compiler: 6 of ... |
-| S6-10 | Unrecognizable and unconstrained insns: ffsll's scalar conditional move, and constant -1 into a k register | Waiting for review | GCC 7d96f2cef8c: KNC HI/QI KXOR/KXNOR constants; failed guards removed. Build, 8 reduced/upstream compile/l... |
+| S6-10 | Unrecognizable and unconstrained insns: ffsll's scalar conditional move, and constant -1 into a k register | Done | Constant 0 and -1 loads into mask registers (kxor/kxnor) and 64-bit ffs without CMOV now compile on KNC, fi... |
 | S6-11 | ICE in expand_fn_using_insn for FP64 fmax/fmin loops (S5-15 follow-up) | Not started |  |
 | S6-12 | card_run --benchmark refuses while another project's processes still run on the card, whatever the ledger says | Not started |  |
 
 ## Recent activity
 
+- 2026-11-06 11:33 **S6-10** lead approve: Constant 0 and -1 loads into mask registers (kxor/kxnor) and 64-bit ffs without CMOV now compile on KNC, fixing 8 vect tests that crashed the compi...
 - 2026-11-06 11:23 **S6-10** engineer submit: GCC 7d96f2cef8c: KNC HI/QI KXOR/KXNOR constants; failed guards removed. Build, 8 reduced/upstream compile/lint checks, s4_masks compile/lint, T0/T1...
 - 2026-11-06 10:53 **S6-10** owner decide: Lead, under the owner's delegation: one focused round, input budget 14M. Root cause found by the lead (RTL dumps of vect-63.c): the shared peephole...
 - 2026-11-06 10:51 **S6-10** engineer escalate: budget: 10308894 input tokens used; the budget is 6000000
@@ -140,16 +141,15 @@ Current tickets: `[##################--]` 102 of 108
 - 2026-11-06 10:46 **S6-10** engineer ask: After two failed attempts: ffsll passes, but vect-63.c with -O2 -ftree-vectorize -march=knc still reaches cprop_hardreg with (set (reg:HI k1) (cons...
 - 2026-11-06 10:31 **S6-02** lead approve: The M2 yardstick is ready and correct on the card: FP32/FP64 affine, two stencils, a short loop and 8x8/16x16 matrix-vector kernels, each as GCC-ve...
 - 2026-11-06 09:35 **S6-02** engineer submit: Submitted by the lead on the engineer's behalf from the main checkout (the worktree's pm.py predates allow_protected). Fixture at 2d9a63d: bitwise ...
-- 2026-11-06 09:34 **S6-02** lead answer: Reviewed 2d9a63d: the references are now fair (4x unroll, FMA, one tail mask, prefetch). The lead submits from the main checkout, whose pm.py has a...
 
 ## Cost
 
 - From the script, engineer: 247 sessions, 596.1M input tokens
 - From the script, lead: 185 sessions, 58.8M input tokens
-- Started by hand, Claude: 9 sessions, 1233.9M input tokens
+- Started by hand, Claude: 9 sessions, 1241.8M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 12.9 GiB of 100 GiB. 155 GiB free on the drive.
+The project uses 12.9 GiB of 100 GiB. 154 GiB free on the drive.
