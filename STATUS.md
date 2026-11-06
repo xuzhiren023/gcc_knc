@@ -1,10 +1,10 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-06 02:36.
+Updated automatically at every ticket change. Last update: 2026-11-06 02:50.
 
-**Next: GPT-6.1, on S5-18 (Final Sprint 5 batch check at the sprint head).** Run `python tools/dispatch.py`, or ask the tech lead to.
+**Next: the tech lead, on S5-18.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
-Current tickets: `[###################-]` 94 of 95
+Current tickets: `[###################-]` 94 of 96
 
 ## Milestones
 
@@ -12,7 +12,7 @@ Current tickets: `[###################-]` 94 of 95
 |---|---|---|---|
 | M0 | Foundation | In progress | 17 of 17 tickets |
 | M1 | Mixed native code | Done | 43 of 43 tickets |
-| M2 | Useful vector target | In progress | 34 of 35 tickets |
+| M2 | Useful vector target | In progress | 34 of 36 tickets |
 | M3 | Runtimes | Not started | Not planned in detail yet |
 | M4 | Broad optimization | Not started | Not planned in detail yet |
 | M5 | Program corpus | Not started | Not planned in detail yet |
@@ -114,12 +114,14 @@ Current tickets: `[###################-]` 94 of 95
 | S5-15 | KNC FP min/max: MIN_EXPR/MAX_EXPR and fmin/fmax as vgminps/vgmaxps (pd), with their reductions | Done | FP min/max loops, fmin/fmax and their reductions now vectorize on KNC as vgmin/vgmax with the C NaN rules, ... |
 | S5-16 | KNC byte and word data: V16QI/V16HI transport modes, widening up-converting loads and narrowing down-converting stores | Done | Byte and word arrays now vectorize on KNC through converting loads and stores (u8/s8/u16/s16 to int and flo... |
 | S5-17 | Sprint 5 mid batch check after S5-06, S5-07 and S5-08 | Done | x86 check (lead, portability-claude) at knc 9690ac8906a vs releases/gcc-16.2.0: -O2 and -O2 -mavx512f ident... |
-| S5-18 | Final Sprint 5 batch check at the sprint head | In progress |  |
+| S5-18 | Final Sprint 5 batch check at the sprint head | Waiting for review | GCC 656cb9ef096; report docs/research/forward-port.md (616f480). Build skipped. Drill: master 5 files/7 tex... |
 | S5-19 | card_run shares cores with the PhiWeather session - compact per-job core claims from the ledger, and round-robin turns for benchmark jobs | Done | card_run now packs each job onto whole cores taken from 59 downward, shares the card with the PhiWeather se... |
 | S5-20 | card_run refuses engineer sandbox sessions, so card jobs stay with the lead | Done | card_run now refuses to run when started from a Codex sandbox account, so only the lead puts jobs on the ca... |
+| S5-21 | 32-byte short vectors pass and return in memory again, as before S5-16 and as the donor does (pr109040 regression) | Not started |  |
 
 ## Recent activity
 
+- 2026-11-06 02:50 **S5-18** engineer submit: GCC 656cb9ef096; report docs/research/forward-port.md (616f480). Build skipped. Drill: master 5 files/7 textual hunks; gcc-16 0. Both sweeps: 0 ICE...
 - 2026-11-06 02:35 **S5-16** lead approve: Byte and word arrays now vectorize on KNC through converting loads and stores (u8/s8/u16/s16 to int and float, int to u8/s16 with modular truncatio...
 - 2026-11-06 02:27 **S5-16** engineer submit: Acceptance met under lead decisions. Final positive T1 PASS; unchanged instruction scans, approved report widths with comment. Log: .work/_state/lo...
 - 2026-11-06 02:24 **S5-16** lead answer: Yes: let the report scans accept 16, 32 or 64 byte vectors, and keep every instruction scan (one converting zmm access per 16 elements, no xmm/ymm)...
@@ -127,13 +129,12 @@ Current tickets: `[###################-]` 94 of 95
 - 2026-11-06 01:52 **S5-16** lead answer: Yes: spills use the same exact-size transfer forms as other memory moves (ADR-0008 point 7 amended on main); XI full-register transfers only for re...
 - 2026-11-06 01:52 **S5-16** engineer ask: Spill rule blocks acceptance: reg:V16HI without wider subregs gets a 32-byte LRA slot (gcc/lra-spills.cc:132-158); V16QI gets 16. A whole-zmm store...
 - 2026-11-06 01:15 **S5-16** lead answer: Agreed; ADR-0008 point 7 is amended (commit on main): V16QI home is the low 128 bits with 16-byte transfers, V16HI the low 256 bits with 32-byte tr...
-- 2026-11-06 01:14 **S5-16** engineer ask: Blocked by ADR-0008 point 7: both modes must use low 128 zmm bits. i386-modes.def:85-86 defines V16QI as 16 bytes but V16HI as 32 bytes. Counterexa...
 
 ## Cost
 
 - From the script, engineer: 227 sessions, 547.8M input tokens
 - From the script, lead: 184 sessions, 58.7M input tokens
-- Started by hand, Claude: 9 sessions, 1063.8M input tokens
+- Started by hand, Claude: 9 sessions, 1069.5M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
