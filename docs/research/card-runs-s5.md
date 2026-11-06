@@ -202,3 +202,11 @@ At GCC `knc` `656cb9ef096` (after S5-16) unless noted; one slot between two PhiW
   cross-links with donor objects, GCC 16 caller (`claude-0b5ed361…`) and donor caller
   (`claude-aceca2eb…`), print exactly the expected 8 lines (six integer arguments, float mix,
   hidden-pointer return, varargs).
+
+## 2026-11-06: S3-10 rows at the Sprint 5 head
+
+At GCC `knc` `ba973dc285b` (after S5-21), core 59, `tools/run_s3_10.py` per row: all 14 rows pass
+(`m1_affine` GCC 16, donor and Fortran; vector, FP and special-value programs at `-O0` and `-O2`;
+the four ABI cross-links; the inexact affine variant). The torture row was not rerun: the full
+execute suite passed 1,680/1,680 in the S5-18 slot, and it needs `--threads` that `run_s3_10.py`
+does not pass yet.

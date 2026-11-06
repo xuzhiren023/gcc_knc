@@ -1,6 +1,6 @@
 # Sprint 5: conversions, gather/scatter, permutes, reductions, correct division and square root (Milestone M2, part 2)
 
-**Status:** started by the owner on 2026-11-05 ("Start! Your! Engine! For sprint 5"). Runs need no
+**Status:** closed 2026-11-06 at GCC `knc` `ba973dc285b`. Started by the owner on 2026-11-05 ("Start! Your! Engine! For sprint 5"). Runs need no
 per-run approval.
 
 **Who implements (owner, 2026-11-05):** Claude Code subagents started by the lead, as in Sprint 4.
@@ -106,14 +106,42 @@ FP64 division and square root stay scalar this sprint (S5-03).
 
 ## Batch check results
 
-(none yet)
+- **S5-17 (mid, `9690ac8906a`):** x86 identical (1,962 files at `-O2` and `-O2 -mavx512f`); drill
+  conflicts textual; 0 ICE in both sweeps (1,968 pass, 33 compiler errors, 2 user asm); execute
+  suite 1,681/1,681; `s4_masks` and `s5_ops` pass.
+- **S5-18 (final):** x86 identical at `656cb9ef096` and again at `ba973dc285b` after S5-21; drill:
+  upstream master 5 files with 7 textual hunks, `releases/gcc-16` none; 0 ICE in both sweeps;
+  shared i386 code 546 lines in 107 hunks, KNC-only `i386-knc.cc` 1,466, `i386-knc.h` 99,
+  `imci.md` 1,860, `linux-k1om.h` 72. Card: execute suite 1,680/1,680 (`pr109040` then failed to
+  compile, fixed by S5-21), `s4_masks`, `s5_ops` at three levels, S5-16's page-end byte loop,
+  S5-21's donor cross-links, and all 14 S3-10 rows at `ba973dc285b`
+  (`docs/research/card-runs-s5.md`).
 
 ## Sprint exit
 
-- [ ] S5-01 to S5-03 accepted; ADR-0008 accepted; ADR-0003 amended for division and square root
-- [ ] Every gcc ticket merged and proven on the card with its acceptance fixture
-- [ ] Final batch check: x86 identical, every drill conflict textual, 0 ICE in both sweeps, shared
+- [x] S5-01 to S5-03 accepted; ADR-0008 accepted; ADR-0003 amended for division and square root
+- [x] Every gcc ticket merged and proven on the card with its acceptance fixture
+- [x] Final batch check: x86 identical, every drill conflict textual, 0 ICE in both sweeps, shared
   lines and hunks reported with the KNC-only files beside them
-- [ ] Card part at the sprint head: the full execute suite, all `s4_masks` and `s5_*` fixtures, and
-  the S3-10 rows
-- [ ] `CURRENT_STATE.md` updated; retro written
+- [x] Card part at the sprint head: the full execute suite, all `s4_masks` and `s5_*` fixtures, and
+  the S3-10 rows (torture row covered by the suite run)
+- [x] `CURRENT_STATE.md` updated; retro written
+
+## Retro
+
+Written 2026-11-06 by the lead. **Sprint 5 is closed** at GCC `knc` `ba973dc285b`.
+1. Kept: every gcc ticket was proven on the card right after merge, and the hard FP work was
+   proven exhaustively or near it: FP32 sqrt over all 2^32 inputs, FP32 division over 1.8 billion
+   hard and random cases in all four rounding modes, flags included. Red-first review caught test
+   bugs (S5-13's mask regex) as well as code bugs.
+2. Design errors were the lead's, and the engineers caught them: ADR-0008 point 7 gave V16HI a
+   128-bit home and whole-register spills, and its "reject the new modes" ABI rule broke
+   `pr109040`, which had worked. Lesson: when a type gains a mode, check what ABI it had before.
+3. Cost: Codex used several million input tokens on standard tickets, and two tickets ran out of
+   budget after finishing; the lead submitted them. Sandbox limits cost rounds: it cannot delete
+   what it creates in a worktree, so stray files got committed twice (now in `.gitignore`).
+4. Process gaps fixed during the sprint: an engineer tried a card job (card is now lead-only, S5-20);
+   the dispatcher's headless lead approved S5-18 before the lead's evidence (its prompt now
+   escalates); a `timeout` on `pm.py approve` left a stale board lock.
+5. Card sharing with the PhiWeather session worked without a clash, through messages and the
+   S5-19 ledger rules, across many timed blocks on both sides.
