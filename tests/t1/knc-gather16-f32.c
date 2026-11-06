@@ -1,7 +1,7 @@
 // S5-13, ADR-0008 point 6; Intel 327364-001 pp.300-302, 598-600.
 // The same non-k0 mask must decorate the access and close its retry loop.
 // Accept numeric local labels and compiler-generated named local labels.
-// options: -O3
+// options: -O3 -fvect-cost-model=unlimited
 // scan-asm-func gather_f32: ^\s*(?P<label>\.L[\w.$]+|[0-9]+):\s*\n\s*vgatherdps\s+[^\n]*\{%k(?P<mask>[1-7])\}\s*\n\s*jknzd\s+(?P=label)b?,\s*%k(?P=mask)\b
 // scan-asm-func scatter_f32: ^\s*(?P<label>\.L[\w.$]+|[0-9]+):\s*\n\s*vscatterdps\s+[^\n]*\{%k(?P<mask>[1-7])\}\s*\n\s*jknzd\s+(?P=label)b?,\s*%k(?P=mask)\b
 float a_f32[1024] __attribute__((aligned(64)));

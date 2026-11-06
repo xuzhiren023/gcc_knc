@@ -115,16 +115,63 @@ def function_body(assembly, name):
 
 
 def loops(body):
+    """Find CFG cycles closed by layout-backward jumps, including cold blocks."""
     lines = [line.split('#', 1)[0] for line in body.splitlines()]
     labels = {}
+    starts = {0, len(lines)}
+    jumps = {}
     for i, line in enumerate(lines):
         label = re.match(r'\s*([\w.$]+):', line)
         if label:
             labels[label[1]] = i
-        # KNC mask branches put a mask register before the target label.
-        branch = re.match(r'\s*j\w+\s+(?:%k[0-7]\s*,\s*)?([\w.$]+)\s*$', line)
-        if branch and branch[1] in labels:
-            yield '\n'.join(lines[labels[branch[1]]:i + 1])
+            starts.add(i)
+        # Accept either operand order for KNC mask branches.
+        branch = re.match(r'\s*(j\w+|ret\w*)\b(.*)', line)
+        if branch:
+            target = re.fullmatch(r'\s*(?:%k[0-7]\s*,\s*)?([\w.$]+)'
+                                  r'(?:\s*,\s*%k[0-7])?\s*',
+                                  branch[2])
+            jumps[i] = (branch[1], target[1] if target else None)
+            starts.add(i + 1)
+
+    boundaries = sorted(starts)
+    blocks = list(zip(boundaries, boundaries[1:]))
+    block_at = {start: b for b, (start, end) in enumerate(blocks)}
+    edges = [set() for block in blocks]
+    backedges = []
+    for b, (start, end) in enumerate(blocks):
+        opcode, target = jumps.get(end - 1, ('', None))
+        if target in labels:
+            header = block_at[labels[target]]
+            edges[b].add(header)
+            if labels[target] < end - 1:
+                backedges.append((b, header))
+        if not opcode.startswith(('jmp', 'ret')) and b + 1 < len(blocks):
+            edges[b].add(b + 1)
+    predecessors = [set() for block in blocks]
+    for b, successors in enumerate(edges):
+        for successor in successors:
+            predecessors[successor].add(b)
+
+    def reachable(seed, graph, header):
+        # Never cross the header again: it closes this cycle.
+        seen = {seed}
+        pending = [seed]
+        while pending:
+            for successor in graph[pending.pop()]:
+                if successor != header and successor not in seen:
+                    seen.add(successor)
+                    pending.append(successor)
+        return seen
+
+    for latch, header in backedges:
+        forward = reachable(header, edges, header)
+        if latch not in forward:
+            continue  # A backward jump alone does not establish a loop.
+        backward = reachable(latch, predecessors, header) if latch != header else set()
+        members = (forward & backward) | {header}
+        yield '\n'.join(line for b in sorted(members)
+                        for line in lines[blocks[b][0]:blocks[b][1]])
 
 
 def scan_t1(assembly, report, source, fast=False):

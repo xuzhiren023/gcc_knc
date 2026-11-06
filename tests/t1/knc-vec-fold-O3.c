@@ -1,4 +1,5 @@
-// options: -O3 -march=knc
+// options: -O3 -march=knc --param=vect-max-peeling-for-alignment=0
+// Disable alignment peeling so unannotated inputs stay unaligned in this test.
 // No misaligned fold: arithmetic stays, and none of it reads memory.
 // scan-asm-func add_f32: \bvaddps\s+%zmm
 // scan-asm-func add_f32: \A(?![\s\S]*\bv(?:add|sub|mul)p[sd]\s[^\n]*\()
