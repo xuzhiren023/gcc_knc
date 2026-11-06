@@ -133,7 +133,10 @@ is an in-order fold. It is legal, but costly (the `s5_ops` baseline).
      aligned memory. A narrowing store ANDs first, so C's modular truncation holds whether the
      hardware saturates or truncates.
    - `char` compares stay scalar. `ix86_get_mask_mode` is unchanged.
-   - The ABI hook rejects the new modes for arguments.
+   - The ABI hook rejects V16QI for arguments and returns, as before (backlog E6-07). V16HI
+     keeps the ABI it had before it became a mode: memory, as the donor does (stack argument,
+     hidden-pointer return). (Amended 2026-11-06: S5-16's rejection of V16HI broke
+     `pr109040.c`, which passed before; fixed by S5-21.)
 
 ## Order
 
