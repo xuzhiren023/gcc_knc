@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-06 18:05.
+Updated automatically at every ticket change. Last update: 2026-11-06 18:12.
 
 **Waiting for you:** S6-05. Run `python tools/pm.py inbox`.
 
@@ -132,12 +132,13 @@ Current tickets: `[##################--]` 107 of 113
 | S6-12 | card_run --benchmark refuses while another project's processes still run on the card, whatever the ledger says | Done | card_run benchmark jobs now refuse to start while another project's programs (such as wrf.mic) are still ru... |
 | S6-13 | M2 driver records card power per build: watts and joules per element next to the timings | Not started |  |
 | S6-14 | ICE in cprop_hardreg - (set (reg:QI k1) (const_int 0)) for a loop-store-motion flag has no *knc_movqi alternative | Not started |  |
-| S6-15 | M2 fixture for ADR-0010 amendment 2 - paired before/after GCC builds in one process, per-round random order, and a decision script | In progress |  |
+| S6-15 | M2 fixture for ADR-0010 amendment 2 - paired before/after GCC builds in one process, per-round random order, and a decision script | Question for the tech lead | Implementation is committed as 03ef1be after red 085614e. Six host tests pass; plain/paired positive and ne... |
 | S7-01 | Shared libgcc for KNC: symbol-version ceiling for the card's glibc 2.21 and kernel 2.6.38, and what GCC 16 adds over the donor's libgcc_s (E6-01 input) | Done | The shared libgcc plan for KNC is ready: GCC 16's libgcc_s.so.1 can be a drop-in superset of the donor's on... |
 | S7-02 | libgfortran slice for KNC: descriptor ABI vs the card's GCC 5 runtime, real(16) and libquadmath, and MXCSR-safe FP control (E6-02 input) | Done | The libgfortran plan for KNC is ready: a small MXCSR-safe FP backend, kinds 4/8/10 with kind 16 deferred, a... |
 
 ## Recent activity
 
+- 2026-11-06 18:12 **S6-15** engineer ask: Implementation is committed as 03ef1be after red 085614e. Six host tests pass; plain/paired positive and negative binaries build and lint; reused g...
 - 2026-11-06 17:38 **S6-05** lead escalate: Code review done, no findings: KNC costs trace to the characterization tables, per-vector gather costing is correct (the count%lanes assert holds, ...
 - 2026-11-06 17:36 **S6-05** engineer submit: f3e7257 fixes nine T1 failures per lead; report 8d1703c docs/research/knc-costs.md lists decisions, CFG blocks and shared hunks. T0 (52), full T1, ...
 - 2026-11-06 17:24 **S6-05** lead answer: All three yes, with these limits. 1) Lowering tests: add -fvect-cost-model=unlimited to the options line of knc-gather16-f32/-i32/-masked, knc-gath...
@@ -145,16 +146,15 @@ Current tickets: `[##################--]` 107 of 113
 - 2026-11-06 17:10 **S6-05** owner decide: Owner, 2026-11-06: yes, +2 engineer sessions (budget now 6 sessions, 17M input tokens). Continue with the lead's 17:07 answer: cost legacy gathers ...
 - 2026-11-06 17:07 **S6-05** engineer escalate: budget: 4 engineer sessions used; the budget is 4
 - 2026-11-06 17:07 **S6-05** lead answer: Yes, vector side only. But key it on the SLP node, not on m_costing_for_scalar alone: in add_stmt_cost, when TARGET_KNC && !m_costing_for_scalar &&...
-- 2026-11-06 17:05 **S6-05** engineer ask: GCC 4698d90a9e0; report 43dc8dd docs/research/knc-costs.md. Build, T0 (52), density scans, T2 PASS. T1 fails gather, reduce-int stack, vec-fold-O3;...
 
 ## Cost
 
 - From the script, engineer: 258 sessions, 625.3M input tokens
 - From the script, lead: 190 sessions, 60.9M input tokens
-- Started by hand, Claude: 10 sessions, 1461.4M input tokens
+- Started by hand, Claude: 10 sessions, 1461.8M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 12.9 GiB of 100 GiB. 160 GiB free on the drive.
+The project uses 12.9 GiB of 100 GiB. 161 GiB free on the drive.
