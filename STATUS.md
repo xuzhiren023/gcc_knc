@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-06 09:16.
+Updated automatically at every ticket change. Last update: 2026-11-06 09:17.
 
-**Waiting for you:** S6-09. Run `python tools/pm.py inbox`.
+**Next: GPT-6.1, on S6-02 (M2 kernels: affine, stencil, short-loop and small-matrix as GCC-KNC vector, x87 and hand-written IMCI builds, with a timing driver).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
 Current tickets: `[##################--]` 100 of 107
 
@@ -126,12 +126,13 @@ Current tickets: `[##################--]` 100 of 107
 | S6-06 | KNC scheduler v0 (E5-05): U/V pipes, 4-cycle vector latency, 3-cycle AGI | Not started |  |
 | S6-07 | First gcc.dg/vect baseline for KNC: compile scans on the host, execution on the card | Done | The gcc.dg/vect suite now has a KNC baseline: of 2,001 tests, 1,329 compile (777 linked for the card), 632 ... |
 | S6-08 | Sprint 6 mid batch check after S6-04 and S6-05 | Not started |  |
-| S6-09 | ICE in expand_vec_series_expr: KNC lane-index vectors (VEC_SERIES) for V16SI/V8DI and the FP modes | **Waiting for you** | budget: 7415416 input tokens used; the budget is 6000000 |
+| S6-09 | ICE in expand_vec_series_expr: KNC lane-index vectors (VEC_SERIES) for V16SI/V8DI and the FP modes | In progress | Lead, under the owner's delegation: no further engineer session; the lead ran the remaining checks and subm... |
 | S6-10 | Unrecognizable and unconstrained insns: ffsll's scalar conditional move, and constant -1 into a k register | Not started |  |
 | S6-11 | ICE in expand_fn_using_insn for FP64 fmax/fmin loops (S5-15 follow-up) | Not started |  |
 
 ## Recent activity
 
+- 2026-11-06 09:17 **S6-09** owner decide: Lead, under the owner's delegation: no further engineer session; the lead ran the remaining checks and submits.
 - 2026-11-06 09:16 **S6-03** lead approve: A KNC characterization corpus of 104 hand-written measurements is ready to run on the card: latency and throughput per instruction class, U/V pairi...
 - 2026-11-06 09:07 **S6-03** engineer submit: Build/lint/host args PASS: .work/_state/logs/S6_03_acceptance-20261106-090406.log. No card run. Lead PowerShell commands (repeat 3 windows): foreac...
 - 2026-11-06 09:06 **S6-03** lead answer: Approved: submit with --override 'measurement corpus required by the ticket: 104 measurements in 5 files, lead allowed'. No split. Name in the subm...
@@ -139,13 +140,12 @@ Current tickets: `[##################--]` 100 of 107
 - 2026-11-06 09:01 **S6-02** lead approve-red: Red approved: the bitwise checker with guards rejects a wrong IMCI affine reference at all 75 nonempty lengths (host stand-in); the native negative...
 - 2026-11-06 09:00 **S6-09** engineer escalate: budget: 7415416 input tokens used; the budget is 6000000
 - 2026-11-06 09:00 **S6-09** lead answer: Do not fix the mask crash here: vect-simd-17 moves to S6-10, which owns the knc_movhi -1 into k1 class (ticket amended). The count of 8 was the lea...
-- 2026-11-06 09:00 **S6-02** engineer red: 70bcf0a adds the red correctness gate. Host checker self-test exits 1 with 75 failing lengths for a C copy stand-in after accepting correct scalar ...
 
 ## Cost
 
 - From the script, engineer: 242 sessions, 578.7M input tokens
 - From the script, lead: 185 sessions, 58.8M input tokens
-- Started by hand, Claude: 9 sessions, 1169.8M input tokens
+- Started by hand, Claude: 9 sessions, 1173.0M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
