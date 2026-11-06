@@ -1,10 +1,10 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-06 17:10.
+Updated automatically at every ticket change. Last update: 2026-11-06 17:21.
 
-**Next: GPT-6.1, on S6-05 (-mtune=knc costs and vectorizer cost model v1 from the characterization tables (E5-09, E5-02)).** Run `python tools/dispatch.py`, or ask the tech lead to.
+**Next: the tech lead, on S6-05.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
-Current tickets: `[###################-]` 107 of 111
+Current tickets: `[###################-]` 107 of 112
 
 ## Milestones
 
@@ -12,7 +12,7 @@ Current tickets: `[###################-]` 107 of 111
 |---|---|---|---|
 | M0 | Foundation | In progress | 17 of 17 tickets |
 | M1 | Mixed native code | Done | 43 of 43 tickets |
-| M2 | Useful vector target | In progress | 45 of 49 tickets |
+| M2 | Useful vector target | In progress | 45 of 50 tickets |
 | M3 | Runtimes | In progress | 2 of 2 tickets |
 | M4 | Broad optimization | Not started | Not planned in detail yet |
 | M5 | Program corpus | Not started | Not planned in detail yet |
@@ -122,7 +122,7 @@ Current tickets: `[###################-]` 107 of 111
 | S6-02 | M2 kernels: affine, stencil, short-loop and small-matrix as GCC-KNC vector, x87 and hand-written IMCI builds, with a timing driver | Done | The M2 yardstick is ready and correct on the card: FP32/FP64 affine, two stencils, a short loop and 8x8/16x... |
 | S6-03 | Machine characterization corpus (E5-01): latency and throughput per instruction class at 1-4 threads per core, cache and memory levels | Done | A KNC characterization corpus of 104 hand-written measurements is ready to run on the card: latency and thr... |
 | S6-04 | Per-loop KNC reports (E5-03): vector factor, peel and tail choice, masks, helper calls, spills and rejection reasons | Done | With -fopt-info-vec, KNC now reports each costed loop candidate: vector mode and factor, scalar peel, maske... |
-| S6-05 | -mtune=knc costs and vectorizer cost model v1 from the characterization tables (E5-09, E5-02) | In progress | Owner, 2026-11-06: yes, +2 engineer sessions (budget now 6 sessions, 17M input tokens). Continue with the l... |
+| S6-05 | -mtune=knc costs and vectorizer cost model v1 from the characterization tables (E5-09, E5-02) | Question for the tech lead | GCC 7fdd15cf40a; report d27998c docs/research/knc-costs.md. Two T1 attempts failed; accepted cost scans PAS... |
 | S6-06 | KNC scheduler v0 (E5-05): U/V pipes, 4-cycle vector latency, 3-cycle AGI | Not started | back in lane gcc. Tables: `docs/research/knc-characterization.md`. The measured |
 | S6-07 | First gcc.dg/vect baseline for KNC: compile scans on the host, execution on the card | Done | The gcc.dg/vect suite now has a KNC baseline: of 2,001 tests, 1,329 compile (777 linked for the card), 632 ... |
 | S6-08 | Sprint 6 mid batch check after S6-04 and S6-05 | Not started |  |
@@ -131,11 +131,13 @@ Current tickets: `[###################-]` 107 of 111
 | S6-11 | ICE in expand_fn_using_insn for FP64 fmax/fmin loops (S5-15 follow-up) | Done | Scalar and SLP-reduction fmin/fmax on float and double now compile on KNC through vgmin/vgmax with the C Na... |
 | S6-12 | card_run --benchmark refuses while another project's processes still run on the card, whatever the ledger says | Done | card_run benchmark jobs now refuse to start while another project's programs (such as wrf.mic) are still ru... |
 | S6-13 | M2 driver records card power per build: watts and joules per element next to the timings | Not started |  |
+| S6-14 | ICE in cprop_hardreg - (set (reg:QI k1) (const_int 0)) for a loop-store-motion flag has no *knc_movqi alternative | Not started |  |
 | S7-01 | Shared libgcc for KNC: symbol-version ceiling for the card's glibc 2.21 and kernel 2.6.38, and what GCC 16 adds over the donor's libgcc_s (E6-01 input) | Done | The shared libgcc plan for KNC is ready: GCC 16's libgcc_s.so.1 can be a drop-in superset of the donor's on... |
 | S7-02 | libgfortran slice for KNC: descriptor ABI vs the card's GCC 5 runtime, real(16) and libquadmath, and MXCSR-safe FP control (E6-02 input) | Done | The libgfortran plan for KNC is ready: a small MXCSR-safe FP backend, kinds 4/8/10 with kind 16 deferred, a... |
 
 ## Recent activity
 
+- 2026-11-06 17:21 **S6-05** engineer ask: GCC 7fdd15cf40a; report d27998c docs/research/knc-costs.md. Two T1 attempts failed; accepted cost scans PASS. Same out[i]=in[idx[i]] loop must stay...
 - 2026-11-06 17:10 **S6-05** owner decide: Owner, 2026-11-06: yes, +2 engineer sessions (budget now 6 sessions, 17M input tokens). Continue with the lead's 17:07 answer: cost legacy gathers ...
 - 2026-11-06 17:07 **S6-05** engineer escalate: budget: 4 engineer sessions used; the budget is 4
 - 2026-11-06 17:07 **S6-05** lead answer: Yes, vector side only. But key it on the SLP node, not on m_costing_for_scalar alone: in add_stmt_cost, when TARGET_KNC && !m_costing_for_scalar &&...
@@ -143,16 +145,15 @@ Current tickets: `[###################-]` 107 of 111
 - 2026-11-06 16:28 **S6-05** lead approve-red: The S6-05 red tests are accepted: a scattered-index gather loop must stay scalar, and a runtime-length double reduction must keep one vector accumu...
 - 2026-11-06 16:27 **S6-05** engineer red: 5e98840: runtime-n reduction, SLP enabled; loop scans require 1 accumulator by default, >=2 with proposed --param=knc-threads-per-core=1. Targeted ...
 - 2026-11-06 16:24 **S6-05** lead answer: FP and integer gather rejections count as one decision, not two. Keep the scattered-index gather test as red decision 1 (table point 5: 16 lines co...
-- 2026-11-06 16:23 **S6-05** engineer ask: 6087515 adds --knc-costs. Two attempts: gather-only indexed copy fails no-vgatherdps scan as expected; aligned reductions of 16 unsigned or 8 doubl...
 
 ## Cost
 
 - From the script, engineer: 256 sessions, 620.0M input tokens
 - From the script, lead: 188 sessions, 59.7M input tokens
-- Started by hand, Claude: 10 sessions, 1440.7M input tokens
+- Started by hand, Claude: 10 sessions, 1448.7M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 12.9 GiB of 100 GiB. 161 GiB free on the drive.
+The project uses 12.9 GiB of 100 GiB. 160 GiB free on the drive.
