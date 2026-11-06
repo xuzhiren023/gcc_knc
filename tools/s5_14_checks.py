@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""S5-14 focused T1 scans; invoke through tools/run.py with action t1."""
+"""S5-14 T1, acceptance builds and torture; invoke through tools/run.py."""
 from types import SimpleNamespace
 import sys
 
@@ -18,8 +18,15 @@ def t1():
     return int(runner.failed)
 
 
+def acceptance():
+    from s5_13_checks import acceptance as build_acceptance
+    # The lead permits mgat_f64 to stay scalar: its masked store is misaligned.
+    return build_acceptance(('gat_f64', 'gat_i64', 'sca_f64'))
+
+
 if __name__ == '__main__':
     # Reuse the Cygwin trampoline and fixed before/after torture options.
     checks.__file__ = __file__
     checks.t1 = t1
+    checks.acceptance = acceptance
     sys.exit(checks.main())

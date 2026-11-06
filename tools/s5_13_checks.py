@@ -8,7 +8,7 @@ import s5_12_checks as checks
 checks.OUT = checks.SHARED / 's5-13'
 
 
-def acceptance():
+def acceptance(names=('gat_f32', 'gat_i32', 'sca_f32')):
     cc = [str(checks.BUILD / 'xgcc'), '-B' + str(checks.BUILD) + '/',
           '-march=knc', '--sysroot=' + str(checks.TC / 'sysroot')]
     source = checks.ROOT / 'tests/acceptance/s5_ops'
@@ -36,7 +36,7 @@ def acceptance():
     failures = []
     # S5-13's amended acceptance permits mgat_f32/msca_f32 to stay scalar:
     # their contiguous masked accesses are misaligned (ADR-0007 point 7).
-    for name in ('gat_f32', 'gat_i32', 'sca_f32'):
+    for name in names:
         start = next(i for i, line in enumerate(lines, 1)
                      if line.startswith('void ' + name + ' '))
         passed = any('loops.c:' + str(start + 1) + ':' in row
