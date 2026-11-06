@@ -2,7 +2,7 @@
 
 Updated automatically at every ticket change. Last update: 2026-11-06 09:00.
 
-**Next: GPT-6.1, on S6-02 (M2 kernels: affine, stencil, short-loop and small-matrix as GCC-KNC vector, x87 and hand-written IMCI builds, with a timing driver).** Run `python tools/dispatch.py`, or ask the tech lead to.
+**Waiting for you:** S6-09. Run `python tools/pm.py inbox`.
 
 Current tickets: `[##################--]` 99 of 107
 
@@ -126,12 +126,13 @@ Current tickets: `[##################--]` 99 of 107
 | S6-06 | KNC scheduler v0 (E5-05): U/V pipes, 4-cycle vector latency, 3-cycle AGI | Not started |  |
 | S6-07 | First gcc.dg/vect baseline for KNC: compile scans on the host, execution on the card | Done | The gcc.dg/vect suite now has a KNC baseline: of 2,001 tests, 1,329 compile (777 linked for the card), 632 ... |
 | S6-08 | Sprint 6 mid batch check after S6-04 and S6-05 | Not started |  |
-| S6-09 | ICE in expand_vec_series_expr: KNC lane-index vectors (VEC_SERIES) for V16SI/V8DI and the FP modes | In progress | Do not fix the mask crash here: vect-simd-17 moves to S6-10, which owns the knc_movhi -1 into k1 class (tic... |
+| S6-09 | ICE in expand_vec_series_expr: KNC lane-index vectors (VEC_SERIES) for V16SI/V8DI and the FP modes | **Waiting for you** | budget: 7415416 input tokens used; the budget is 6000000 |
 | S6-10 | Unrecognizable and unconstrained insns: ffsll's scalar conditional move, and constant -1 into a k register | Not started |  |
 | S6-11 | ICE in expand_fn_using_insn for FP64 fmax/fmin loops (S5-15 follow-up) | Not started |  |
 
 ## Recent activity
 
+- 2026-11-06 09:00 **S6-09** engineer escalate: budget: 7415416 input tokens used; the budget is 6000000
 - 2026-11-06 09:00 **S6-09** lead answer: Do not fix the mask crash here: vect-simd-17 moves to S6-10, which owns the knc_movhi -1 into k1 class (ticket amended). The count of 8 was the lea...
 - 2026-11-06 08:59 **S6-09** engineer ask: Two attempts: initial build failed; corrected clean build passed, green failed. GCC 89b5040fe28 adds vec_series; imci.md +60/-0, 1 hunk; shared 0/0...
 - 2026-11-06 08:55 **S6-02** lead answer: Yes: this ticket is explicitly authorized to create tests/acceptance/m2_kernels/ (new files only; do not change any other acceptance fixture). The ...
@@ -139,13 +140,12 @@ Current tickets: `[##################--]` 99 of 107
 - 2026-11-06 08:52 **S6-01** lead approve: KNC now has a measured timing method: raw-monotonic wall time, fixed sibling pinning for 1-4 threads per core, per-density L1/L2/memory sizes, and ...
 - 2026-11-06 08:43 **S6-01** engineer submit: cf89686: completed cited one-page protocol and measured answers in docs/research/knc-measurement.md (schema, commands, prior GCC16 build/lint PASS ...
 - 2026-11-06 08:37 **S6-01** lead answer: Card results are in .work/_shared/S6-01/claude-bench/run1.out to run6.out (stdout first, card_run JSON last; jobs claude-1589bc1c…, claude-85d41827...
-- 2026-11-06 08:20 **S6-04** lead approve: With -fopt-info-vec, KNC now reports each costed loop candidate: vector mode and factor, scalar peel, masked or scalar epilogue with the rejection ...
 
 ## Cost
 
 - From the script, engineer: 239 sessions, 576.2M input tokens
 - From the script, lead: 185 sessions, 58.8M input tokens
-- Started by hand, Claude: 9 sessions, 1156.7M input tokens
+- Started by hand, Claude: 9 sessions, 1157.3M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
