@@ -266,7 +266,10 @@ def submit_problems(board, ticket, cwd):
     for line in names:
         parts = line.split("\t")
         status, path = parts[0], parts[-1]
-        if any(path.startswith(p) or path == p for p in policy["protected_paths"]):
+        # The lead may open one protected folder to one ticket with allow_protected (comma list of prefixes).
+        allowed = [p.strip() for p in ticket.fields.get("allow_protected", "").split(",") if p.strip()]
+        if (any(path.startswith(p) or path == p for p in policy["protected_paths"])
+                and not any(path.startswith(a) for a in allowed)):
             hard.append("protected path changed: %s (raise it with ask)" % path)
         is_new = status.startswith("A")
         if is_new and re.search(policy["receipt_files"], path):
