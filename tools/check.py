@@ -27,6 +27,8 @@ PACKED = re.compile(r'\bv(?:addn?|subr?|mul|div|max|min|sqrt|rcp(?:23)?|rsqrt(?:
 # Each entry supplies its CLI help and handlers for the tiers it selects.
 # Imports stay lazy so T0 and source-only selections need no probe modules.
 SELECTIONS = {
+    'fp_minmax': ('S5-15 FP min/max and reductions', {
+        't1': lambda runner: runner.t1_sources(runner.source_dir.glob('knc-fp-minmax-*.c'))}),
     'gather_scatter': ('S5-13 signed 16-lane indexed loads and stores', {
         't1': lambda runner: runner.t1_sources(runner.source_dir.glob('knc-gather16-*.c'))}),
     'division': ('S5-11 correctly rounded FP32 division and masked tail', {
