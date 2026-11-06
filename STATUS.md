@@ -2,7 +2,7 @@
 
 Updated automatically at every ticket change. Last update: 2026-11-06 01:01.
 
-**Next: GPT-6.1, on S5-20 (card_run refuses engineer sandbox sessions, so card jobs stay with the lead).** Run `python tools/dispatch.py`, or ask the tech lead to.
+**Waiting for you:** S5-20. Run `python tools/pm.py inbox`.
 
 Current tickets: `[###################-]` 92 of 95
 
@@ -116,10 +116,11 @@ Current tickets: `[###################-]` 92 of 95
 | S5-17 | Sprint 5 mid batch check after S5-06, S5-07 and S5-08 | Done | x86 check (lead, portability-claude) at knc 9690ac8906a vs releases/gcc-16.2.0: -O2 and -O2 -mavx512f ident... |
 | S5-18 | Final Sprint 5 batch check at the sprint head | Not started |  |
 | S5-19 | card_run shares cores with the PhiWeather session - compact per-job core claims from the ledger, and round-robin turns for benchmark jobs | Done | card_run now packs each job onto whole cores taken from 59 downward, shares the card with the PhiWeather se... |
-| S5-20 | card_run refuses engineer sandbox sessions, so card jobs stay with the lead | In progress | Red accepted by lead check: the new test errors on main's card_run (no getpass import; KeyError), a weaker ... |
+| S5-20 | card_run refuses engineer sandbox sessions, so card jobs stay with the lead | **Waiting for you** | budget: 2 engineer sessions used; the budget is 2 |
 
 ## Recent activity
 
+- 2026-11-06 01:01 **S5-20** engineer escalate: budget: 2 engineer sessions used; the budget is 2
 - 2026-11-06 01:01 **S5-15** lead approve: FP min/max loops, fmin/fmax and their reductions now vectorize on KNC as vgmin/vgmax with the C NaN rules, and s4_masks and s5_ops pass on the card...
 - 2026-11-06 00:54 **S5-20** lead approve-red: Red accepted by lead check: the new test errors on main's card_run (no getpass import; KeyError), a weaker red than an admission failure, but the r...
 - 2026-11-06 00:22 **S5-20** engineer red: The required failing test commit could not be created: git reset --soft HEAD~1 was denied writing worktree git metadata (.git/worktrees/S5-20/HEAD....
@@ -127,7 +128,6 @@ Current tickets: `[###################-]` 92 of 95
 - 2026-11-06 00:13 **S5-15** lead answer: Yes: replace the obsolete 'no vgmin/vgmax in fmin_*/fmax_*' scans in knc-mask-cond with positive scans (ADR-0008 point 3 as amended; the S4 ban pre...
 - 2026-11-06 00:12 **S5-15** engineer ask: GCC 41a1abe5bbb builds; new minmax T1 passes. Existing knc-mask-cond-O2/O3 ban vgmin in fmin_f32. Reproducer: c[i]=__builtin_fminf(a[i],b[i]) now v...
 - 2026-11-05 23:34 **S5-15** lead answer: Yes: define a local code attribute in imci.md (e.g. knc_maxmin: smax 'max', smin 'min'), not in sse.md, and continue.
-- 2026-11-05 23:33 **S5-15** engineer ask: Two builds failed: first ssescalarmode before definition (fixed); second genflags: unresolved iterator in *knc_reduc_<maxmin>v8df_swizzle. Reproduc...
 
 ## Cost
 
