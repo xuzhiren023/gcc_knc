@@ -2,7 +2,7 @@
 
 Updated automatically at every ticket change. Last update: 2026-11-05 20:02.
 
-**Next: the tech lead, on S5-13.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: GPT-6.1, on S5-13 (KNC 16-lane gather and scatter: vgatherdps/vpgatherdd and the scatter forms in a jknzd loop, through the optabs).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
 Current tickets: `[##################--]` 89 of 94
 
@@ -109,7 +109,7 @@ Current tickets: `[##################--]` 89 of 94
 | S5-10 | Correctly rounded FP32 vector square root for V16SF (S5-03 ticket A) | Done | Vectorized FP32 square root on KNC is now correctly rounded for every one of the 2^32 inputs, checked on th... |
 | S5-11 | Correctly rounded FP32 vector division for V16SF, with cond_div (S5-03 ticket B) | Done | Vectorized FP32 division on KNC is now correctly rounded, with IEEE flags, in all four rounding modes: 1.8 ... |
 | S5-12 | KNC float/double-width conversions: vcvtps2pd, vcvtpd2ps, vcvtdq2pd, vcvtfxpntpd2dq with vpermf32x4 halves | Done | Loops that convert between float and double, or between int and double, now vectorize on KNC with full 512-... |
-| S5-13 | KNC 16-lane gather and scatter: vgatherdps/vpgatherdd and the scatter forms in a jknzd loop, through the optabs | Question for the tech lead | Two builds failed; stopping per AGENTS.md. First: late VSIB enum, fixed in 4db28d7ad68. Second: genrecog re... |
+| S5-13 | KNC 16-lane gather and scatter: vgatherdps/vpgatherdd and the scatter forms in a jknzd loop, through the optabs | In progress | Yes: renumber so every tied input refers to a lower-numbered operand (a matching constraint must name an ea... |
 | S5-14 | KNC 8-lane gather and scatter for V8DF/V8DI through the builtin hooks, reading the low 8 dwords of a V16SI index | Not started |  |
 | S5-15 | KNC FP min/max: MIN_EXPR/MAX_EXPR and fmin/fmax as vgminps/vgmaxps (pd), with their reductions | Not started |  |
 | S5-16 | KNC byte and word data: V16QI/V16HI transport modes, widening up-converting loads and narrowing down-converting stores | Not started |  |
@@ -119,6 +119,7 @@ Current tickets: `[##################--]` 89 of 94
 
 ## Recent activity
 
+- 2026-11-05 20:02 **S5-13** lead answer: Yes: renumber so every tied input refers to a lower-numbered operand (a matching constraint must name an earlier operand), for both gather and scat...
 - 2026-11-05 20:01 **S5-13** engineer ask: Two builds failed; stopping per AGENTS.md. First: late VSIB enum, fixed in 4db28d7ad68. Second: genrecog rejects gather input 5 tied to scratch 7: ...
 - 2026-11-05 19:53 **S5-13** lead approve-red: Red approved: T1 scans for 16-lane gathers/scatters in a jknzd retry loop on one non-k0 mask, the compare mask for a conditional gather, and no gat...
 - 2026-11-05 19:52 **S5-13** engineer red: Red commit 13576f6. Ran through tools/run.py: python tools/check.py t1 --compiler gcc16 --gather-scatter --worker. Expected FAIL: float/int gather ...
@@ -126,13 +127,12 @@ Current tickets: `[##################--]` 89 of 94
 - 2026-11-05 19:31 **S5-12** engineer submit: All width optabs and zero-high-half insns implemented. Red failed as expected. Incremental GCC build, full T0/T1/T2 (seven width scans), four READM...
 - 2026-11-05 18:48 **S5-11** lead approve: Vectorized FP32 division on KNC is now correctly rounded, with IEEE flags, in all four rounding modes: 1.8 billion hard and random cases on the car...
 - 2026-11-05 18:14 **S5-11** engineer submit: Required implementation and tests committed (project 1fbf169, GCC fabdf2d706e). Prior acceptance runs: host E1/E2/E4 pass; removing step 15 fails 1...
-- 2026-11-05 18:13 **S5-11** lead answer: Allowed: submit with --override 'GCC 327 lines; the rest are the ticket-required host model, native sets and checks; lead allowed'. No split. Do no...
 
 ## Cost
 
 - From the script, engineer: 210 sessions, 503.8M input tokens
 - From the script, lead: 184 sessions, 58.7M input tokens
-- Started by hand, Claude: 9 sessions, 1000.7M input tokens
+- Started by hand, Claude: 9 sessions, 1001.6M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
