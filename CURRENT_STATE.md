@@ -109,7 +109,9 @@ M1 is accepted and tagged `m1` locally; nothing is pushed. Engineers are Claude 
 - Asked the WRF tuning session (owner-approved, 2026-11-06) for its KNC hot-loop, math-function,
   FP, threading, I/O and Fortran-feature findings, to
   `C:\Users\xuzhi\Documents\card-coordination\wrf-hot-loops-for-gcc-knc.md`. Input for new M2+
-  kernels, the vector-math backlog item and S7-02; not requirements.
+  kernels, the vector-math backlog item and S7-02; not requirements. Answered; digest and backlog
+  mapping in `docs/research/wrf-input-2026-11-06.md` (notably: prefetch 2.4x on short rows, 2 threads
+  per core best for WRF against ADR-0009's default of 4).
 
 - M2 baseline: launch 1 of the first full block was invalid (batches sized from a stalled pilot ran
   4-9 ms instead of 100 ms; two such runs still passed the spread check). `timing.c` now re-sizes

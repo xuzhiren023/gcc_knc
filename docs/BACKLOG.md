@@ -63,7 +63,7 @@ Drafted as tickets S2-01 to S2-08; see [SPRINT-02](sprints/SPRINT-02.md).
 |---|---|---|
 | E4-01 | Mask registers, compares, blends, if-conversion | Deep |
 | E4-02 | Gather and scatter loop lowering with `jknzd`; tests prove partial completion handling | Deep |
-| E4-03 | Correctly rounded division and square root (ADR-0003): argument, hard cases, MPFR comparison. Until then, no vectorization of these operations | Deep |
+| E4-03 | Correctly rounded division and square root (ADR-0003): argument, hard cases, MPFR comparison. Until then, no vectorization of these operations. Division by a constant can be exact with a reciprocal and one FMA correction (`q=RN(a*r); e=fma(-c,q,a); q'=fma(e,r,q)`; the WRF work verified it for `/12` and `/60`): prove which constants it holds for (`docs/research/wrf-input-2026-11-06.md`) | Deep |
 | E4-04 | Masked tails, as far as E3-01 allows: scalar vs partial vs full choices across lengths 0–65 | Deep |
 | E4-05 | Int and FP conversions, narrowing and widening within IMCI's 32/64-bit elements | Standard |
 | E4-06 | Permutes, reductions (with FP ordering contract), min and max semantics | Standard |
@@ -80,8 +80,9 @@ Drafted as tickets S2-01 to S2-08; see [SPRINT-02](sprints/SPRINT-02.md).
 | E5-05 | U/V scheduler v0, tested at production thread density | Standard |
 | E5-07 | Software prefetch v1: `vprefetch0/1/2` and `vprefetche*` patterns in `imci.md`, KNC cache and latency parameters from E5-01, and GCC's `-fprefetch-loop-arrays` on at `-O2`/`-O3` for KNC when E5-01 shows a gain; judged on streaming and stencil kernels in exclusive card windows (owner, 2026-11-03) | Standard |
 | E5-08 | Streaming (no-read) stores for write-only output that covers whole lines (`vmovnrap*`/`vmovnrngoap*`), legal only when the whole 64-byte line is written; measured against normal stores (ADR-0009 point 5) | Standard |
+| E5-10 | Inline block move and set (`cpymem`/`setmem`) with IMCI for known and bounded sizes, with line-crossing-safe unaligned halves; measured against the library call (the WRF work saw glibc's word copy at 0.57 GB/s per thread) | Standard |
 | E5-09 | `-mtune=knc` tables: a KNC `processor_costs` entry, cache and prefetch parameters, unroll and alignment defaults, each chosen by card measurement, plus the published "GCC-KNC flags" page with ICC `-mmic` equivalents (ADR-0009 points 6 and 8) | Standard |
-| E5-06 | Milestone M2 kernels: short-loop, stencil and small-matrix kernels drawn from the corpus, plus hand-written IMCI references written for this project | Deep |
+| E5-06 | Milestone M2 kernels: short-loop, stencil and small-matrix kernels drawn from the corpus, plus hand-written IMCI references written for this project. Include a short-row strided kernel shaped like WRF's hot loops (rows of 7-9 elements, j/k/i order, many arrays per point) and report 2 threads per core next to 4 (`docs/research/wrf-input-2026-11-06.md`) | Deep |
 
 ## E6 Runtimes (S7–S9, Milestone M3)
 
