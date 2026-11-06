@@ -170,3 +170,11 @@ Built from S5-11's compiler (GCC `fabdf2d706e`), core 59:
 use `vgatherdps`/`vpgatherdd`/`vscatterdps` in a `jknzd` retry loop; `mgat_f32` and `msca_f32`
 stay scalar by the amended acceptance), core 59: `o2v` 779,984 checks (`claude-19552b23…`),
 `o3` 779,984 (`claude-ac2a8527…`), `fast` 602,384 (`claude-2f13affb…`), all 0 failures.
+
+## 2026-11-06: S5-14 under review (8-lane gather and scatter)
+
+`s5_ops` built from S5-14's compiler (GCC `ab967b42a6e`; `gat_f64`, `gat_i64` and `sca_f64` now
+use two `vgatherdpd`/`vpgatherdq`/`vscatterdpd` per 16 int indices, the high half moved down by
+`vpermf32x4 $0xee`, every 8-lane access with guard-page values in dwords 15:8), core 59: `o2v`
+779,984 checks (`claude-050135f9…`), `o3` 779,984 (`claude-73528700…`), `fast` 602,384
+(`claude-24590e76…`), all 0 failures.
