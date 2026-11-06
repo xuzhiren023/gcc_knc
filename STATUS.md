@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-06 07:40.
+Updated automatically at every ticket change. Last update: 2026-11-06 07:41.
 
 **Next: GPT-6.1, on S6-01 (Measurement method on KNC: clock, pinning, thread density, working sets, repetitions and noise (ADR-0010 input)).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
@@ -124,7 +124,7 @@ Current tickets: `[##################--]` 96 of 104
 | S6-04 | Per-loop KNC reports (E5-03): vector factor, peel and tail choice, masks, helper calls, spills and rejection reasons | Not started |  |
 | S6-05 | -mtune=knc costs and vectorizer cost model v1 from the characterization tables (E5-09, E5-02) | Not started |  |
 | S6-06 | KNC scheduler v0 (E5-05): U/V pipes, 4-cycle vector latency, 3-cycle AGI | Not started |  |
-| S6-07 | First gcc.dg/vect baseline for KNC: compile scans on the host, execution on the card | Not started |  |
+| S6-07 | First gcc.dg/vect baseline for KNC: compile scans on the host, execution on the card | In progress |  |
 | S6-08 | Sprint 6 mid batch check after S6-04 and S6-05 | Not started |  |
 
 ## Recent activity
@@ -142,7 +142,7 @@ Current tickets: `[##################--]` 96 of 104
 
 - From the script, engineer: 230 sessions, 555.8M input tokens
 - From the script, lead: 185 sessions, 58.8M input tokens
-- Started by hand, Claude: 9 sessions, 1109.5M input tokens
+- Started by hand, Claude: 9 sessions, 1110.6M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
