@@ -1,0 +1,278 @@
+{
+  "schemaVersion": 1,
+  "kind": "G5Narrow14BoundedBatchEvidence",
+  "startedUtc": "2026-10-28T03:17:36.392287+00:00",
+  "status": "StoppedAtFirstRequiredFailure",
+  "preparation": {
+    "path": "C:\\Users\\xuzhi\\Documents\\PhiWeather\\artifacts\\test-state\\g5-narrow14\\preparation-v4-01\\preparation.json",
+    "bytes": 373374,
+    "sha256": "37dbd94cf0c0bc1aa68dff24d72fae393e8033440fc5fb589ef704b491c4de4d"
+  },
+  "cardBootId": "994280d1-7cd4-402a-8227-67497468cc59",
+  "cardContacted": true,
+  "processTerminal": true,
+  "symbols": [
+    {
+      "index": 14,
+      "export": "_ZGVeN16v_atanf",
+      "boundedQualificationPassed": false,
+      "result": {
+        "path": "C:\\Users\\xuzhi\\Documents\\PhiWeather\\artifacts\\test-state\\knc-g5-n14v4-atanf-e16\\6ade893d6b824b978ddedbece1fdbddd\\result.json",
+        "bytes": 54552,
+        "sha256": "b1cfe899ffae9952112cae043386c600cf4612c654d154497cfc8c5da3e54744"
+      },
+      "dataset": {
+        "path": "C:\\Users\\xuzhi\\Documents\\PhiWeather\\artifacts\\test-state\\g5-narrow14\\preparation-v4-01\\atanf-e16\\dataset.json",
+        "bytes": 1787,
+        "sha256": "b9e09ff95a45272325d48f342b3fb4bfb9baccfe6830c56ba2ad88c418488540"
+      },
+      "image": {
+        "path": "C:\\Users\\xuzhi\\Documents\\PhiWeather\\artifacts\\test-state\\g5-narrow14\\preparation-v4-01\\image\\g5-batch-candidate.mic",
+        "bytes": 1011045,
+        "sha256": "a4c8dbfcc96e10c37cf691948509ca3641fc7c931a4d8a17f593db87b32152cf"
+      },
+      "startedUtc": "2026-10-28T03:17:36.442333+00:00",
+      "finishedUtc": "2026-10-28T03:18:52.867358+00:00",
+      "nativeWallSeconds": 76.57799999999952,
+      "processTerminal": true,
+      "nativeDirectoryReclaimed": true,
+      "retainedObservation": {
+        "nativeOutput": {
+          "path": "C:\\Users\\xuzhi\\Documents\\PhiWeather\\artifacts\\test-state\\knc-g5-n14v4-atanf-e16\\6ade893d6b824b978ddedbece1fdbddd\\retained\\results\\run\\g5-batch-native.bin",
+          "bytes": 4741808,
+          "sha256": "004014074939d800798e48711c75acc2da471fd3ec5178a4f7f10d43b37a2ead"
+        },
+        "completeValueVectors": 65858,
+        "header": [
+          1328820551,
+          1,
+          14,
+          16,
+          4,
+          72,
+          65858,
+          49152
+        ],
+        "boundaryOutput": {
+          "path": "C:\\Users\\xuzhi\\Documents\\PhiWeather\\artifacts\\test-state\\knc-g5-n14v4-atanf-e16\\6ade893d6b824b978ddedbece1fdbddd\\retained\\results\\run\\boundary.bin",
+          "bytes": 25952256,
+          "sha256": "39f76f57c7d114eeb4a19005feebea6d72d36e630ad3b9cfa70a90c49256d136"
+        },
+        "completeBoundaryRecords": 49152,
+        "firstBoundary": {
+          "kind": 1,
+          "index": 0,
+          "errors": 0,
+          "failed": [],
+          "rawHex": "010000000000000000000000c00100000000200005002000400000004000000050ccce13fd7f000050ccce13fd7f0000e0ac6824df9b5713df9b5713ce8a4602887766554433221111223344556677886996f00fcc33aa5596690ff03cc35aa5e0ac6824df9b5713df9b5713ce8a4602887766554433221111223344556677886996f00fcc33aa5596690ff03cc35aa5010000000f000000ff000000010000000f000000ff000000060200000000000046020000000000004734314e000000004000ffff0000ffffffffffff0000000000000000000000000000ffff4000ffff0000ffffffffffff0000000000000000000000000000ffffc7c7c7c7c7c7c7c7c7c7c7c7c7c7c7c7c7c7c7c7c7c7c7c7c7c7c7c7c7c7c7c7c7c7c7c7c7c7c7c7c7c7c7c7c7c7c7c7c7c7c7c7c7c7c7c7c7c7c7c7c7c7c7c7c7c7c7c7c7c7c7c7c7c7c7c7c7c7c7c7c7c7c7c7c7c7c7c7c7c7c7c7c7c7c7c7c7c7c7c7c7c7c7c7c7c7c7c7c7c7c7c7c7c7c7c7c7c7c7c7c7c7c7c7c7c7c7c7c7c7c7c7c7c7c7c7c7c7c7c7c7c7c7c7c7c7c7c7c7c7c7c700000000c7c7c7c7c7c7c7c7c7c7c7c7c7c7c7c7c7c7c7c7c7c7c7c7c7c7c7c7c7c7c7c7c7c7c7c7c7c7c7c7c7c7c7c7c7c7c7c7c7c7c7c7c7c7c7c7c7c7c7c700000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
+        },
+        "program.exit": "0\n",
+        "program.stderr": "",
+        "program.stdout": "PW_G5_BATCH_CAPTURED symbol=14 vectors=65858 lanes=1053728 controls=49152 errors=0\n",
+        "resources": {
+          "artifact": {
+            "path": "C:\\Users\\xuzhi\\Documents\\PhiWeather\\artifacts\\test-state\\knc-g5-n14v4-atanf-e16\\6ade893d6b824b978ddedbece1fdbddd\\retained\\results\\run\\resource-observations.tsv",
+            "bytes": 666,
+            "sha256": "24b5b7037eef2437393132d30aa8a6744800635f7cf39f69af0b643811e7d9c4"
+          },
+          "observations": 31,
+          "maximumTemperatureC": 58,
+          "minimumFreeKiB": 15119904,
+          "limitsMet": true
+        }
+      },
+      "verdicts": {
+        "status": "RequiredValueStatusAbiOrControlFailure",
+        "vectors": 65858,
+        "lanes": 1053728,
+        "targetPassLanes": 0,
+        "hardCeilingPassLanes": 0,
+        "targetFailLanes": 0,
+        "hardCeilingFailLanes": 0,
+        "targetPendingLanes": 0,
+        "hardCeilingPendingLanes": 0,
+        "profileMismatches": 0,
+        "exceptionVectorMismatches": 65858,
+        "abiVectorMismatches": 0,
+        "RNValueVerdict": "Passed",
+        "specialStatusVerdict": "Failed",
+        "ABIVerdict": "Passed",
+        "legalControlVerdict": "PassedIdentityDomain",
+        "independentIntervals": {
+          "mpfrVersion": "4.2.2",
+          "precisions": [
+            256,
+            384
+          ],
+          "lanes": 1053728,
+          "finiteComparisons": 1053629,
+          "nanComparisons": 99,
+          "infinityComparisons": 0,
+          "signedZeroComparisons": 68,
+          "valueMismatches": 0,
+          "statusMismatches": 65858,
+          "abiMismatches": 0,
+          "endpointMismatches": 0,
+          "worstErrorUlps": 0.49999999097574294,
+          "histogram": {
+            "leHalf": 1053629,
+            "leThreeQuarters": 0,
+            "leOne": 0,
+            "aboveOne": 0
+          },
+          "worst": {
+            "row": 52880,
+            "lane": 14,
+            "x": "000000003ee06db1",
+            "y": "0000000000000000",
+            "actual": "000000003ed38381",
+            "nearest": "000000003ed38381"
+          },
+          "nativeFlagHistogram": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            1,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            11,
+            243,
+            0,
+            65603,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "evaluationCpuSeconds": 63.281
+        },
+        "legalControls": {
+          "cases": 49152,
+          "mismatches": {
+            "control": 0,
+            "stack": 0,
+            "abi": 0,
+            "arguments": 0,
+            "identityReturn": 0
+          },
+          "firstMismatches": [],
+          "passed": true,
+          "scope": "Exact identities only; all legal PC/masks, independent RC, masked dirty status, empty tags at TOP0/5, DAZ/FZ; enabled traps and general other-RC values unqualified"
+        },
+        "targetUlps": 1,
+        "wholeG5Qualified": false,
+        "productionReady": false,
+        "otherRoundingValueAccuracyQualified": false,
+        "errnoQualified": false,
+        "enabledTrapsQualified": false,
+        "fullStatusQualified": false
+      },
+      "failure": {
+        "retentionOrValidationError": "ValueError: Numerical/status/ABI comparison failed or new neighboring intervals pending"
+      }
+    }
+  ],
+  "completedSymbols": 1,
+  "automaticRetries": 0,
+  "newExportCeiling": 3,
+  "nativeWallCeilingSeconds": 3600,
+  "priorBoundedExportCount": 25,
+  "newBoundedExportCount": 0,
+  "productionReady": false,
+  "g3Passed": false,
+  "g5Passed": false,
+  "g6Passed": false,
+  "g9Passed": false,
+  "g10Passed": false,
+  "hypothesis": "Each exact selected wide export satisfies RN <=1 ULP, required special/status and ABI/control contracts",
+  "falsifier": "Any required mismatch or lost ownership/resource/thermal/deadline proof holds dependent dispatch; preserve result, diagnose a concrete repair, no unchanged automatic retries",
+  "commands": [
+    "scripts/Run-KncG5NarrowBatch.py",
+    "execute",
+    "--preparation",
+    "artifacts/test-state/g5-narrow14/preparation-v4-01/preparation.json",
+    "--directory",
+    "artifacts/test-state/g5-narrow14/5b28fcc76e0e4f99ad52f26b1e6e47e2",
+    "--native-boot",
+    "994280d1-7cd4-402a-8227-67497468cc59",
+    "--authorized-selected-export-batch",
+    "--root-compactions",
+    "0"
+  ],
+  "rootCompactionsBeforeNativeLaunch": 0,
+  "batchVersion": 4,
+  "batch": "G5_ATAN3_V4",
+  "frozenSpecification": {
+    "path": "C:\\Users\\xuzhi\\Documents\\PhiWeather\\native\\translation\\G5_NARROW_BATCH_V4.json",
+    "bytes": 1486,
+    "sha256": "a1f8072120e468c1cc875e52c1680a4f009f1b19876edbe3fccf4374836432fd"
+  },
+  "nativeSessionStartedUtc": "2026-10-28T03:17:36.396280+00:00",
+  "finishedUtc": "2026-10-28T03:18:52.974910+00:00",
+  "nativeWallSeconds": 76.57799999999952,
+  "remainingExports": [
+    "_ZGVeN16v_atanf",
+    "_ZGVeN16vv_atan2f",
+    "_ZGVeN8vv_atan2"
+  ],
+  "boundedExportCount": 25,
+  "remainingLimits": [
+    "RN <=1 ULP only for completed exact candidates/domains; other-RC accuracy, errno, enabled traps and complete status remain unqualified",
+    "Legal control preservation is the declared exact-identity domain; full G3/G5/G6/G9/G10 remain open"
+  ],
+  "batchResult": {
+    "path": "C:\\Users\\xuzhi\\Documents\\PhiWeather\\artifacts\\test-state\\g5-narrow14\\5b28fcc76e0e4f99ad52f26b1e6e47e2\\result.json",
+    "bytes": 9956,
+    "sha256": "1c1e2ad5576181a5c40035f752831f329d873afd58e4e57d0d30c2a97bdbad13"
+  }
+}

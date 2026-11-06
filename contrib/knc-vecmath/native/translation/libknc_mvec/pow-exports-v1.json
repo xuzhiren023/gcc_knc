@@ -1,0 +1,56 @@
+{
+  "schemaVersion": "1.0.0",
+  "kind": "AdditionalPowSourceDefinitions",
+  "status": "HostAlgorithmAndSourceWiringCheckedOnly",
+  "g5Passed": false,
+  "targetAbiQualified": false,
+  "targetNumericsQualified": false,
+  "targetMasksQualified": false,
+  "sourceDefinedCountWithPriorThirteen": 16,
+  "remainingDeclarationOnly": 20,
+  "coveredCallSitesWithPriorFamilies": 2261,
+  "exports": [
+    {
+      "symbol": "_ZGVeN8vv_pow",
+      "source": "src/e_pow_export.c",
+      "calls": 291
+    },
+    {
+      "symbol": "_ZGVdN4vv_pow",
+      "source": "src/pow_wrappers.c",
+      "calls": 33
+    },
+    {
+      "symbol": "_ZGVbN2vv_pow",
+      "source": "src/pow_wrappers.c",
+      "calls": 4
+    }
+  ],
+  "sources": {
+    "native/translation/math_algorithms/pow_e8/pow_e8.c": "bb370ec38835965be0b7743bc6913b917f997ddb0e4c94b4d7bbb70f11a42017",
+    "native/translation/math_algorithms/pow_e8/pow_e8.h": "75d815fdcccdb48404752f6fa32545c6bdae8fb1b373acbc521921d1cbc48c7d",
+    "native/translation/libknc_mvec/src/e_pow_export.c": "632cd9c2b4b65b4e77819d8f38a8d338700728f61e91c056dbca67ca971e41e1",
+    "native/translation/libknc_mvec/src/pow_wrappers.c": "5ca6b58e0f621b0ed258dbf0581af6fed6b74d134f2512707db9edf77500d532"
+  },
+  "records": {
+    "artifacts/test-state/host-pow-e8/a84a2698ffb142dfbffb4927cd654812/accuracy.json": "b0426e94a105caff1f4870a735d7d50936e2751b2c791c2cd98c40e260c6053d",
+    "artifacts/test-state/host-pow-e8/51aa2ba8c9e544279d08e0c8dc406ea3/accuracy.json": "5d71ba981d7dea15927311c05e7b6f7ba1d08e46f8baabdab41141d36367ba6c",
+    "artifacts/test-state/host-pow-exports/413b4c4ccbb74334a8c0fd5f71303c91/wiring.json": "cdfdc41811dd069af0892a067009d9620db0fdb5195d80177b9def75ea1263d6"
+  },
+  "requiredConfiguration": {
+    "HAVE_FAST_FMA": 0,
+    "HAVE_FAST_ROUND": 0,
+    "POW_LOG_TABLE_BITS": 7,
+    "POW_LOG_POLY_ORDER": 8,
+    "EXP_TABLE_BITS": 7,
+    "EXP_POLY_ORDER": 5,
+    "EXP_USE_TOINT_NARROW": 0,
+    "fastMath": false
+  },
+  "hostIsa": "baselineSSE2; AVX/AVX2/FMA/AVX512 disabled",
+  "accuracy": {
+    "activeLanesPerVariant": 1312488,
+    "finiteComparisonsPerVariant": 1072628,
+    "maxUlpBound": 0.5068320211096088
+  }
+}

@@ -1,0 +1,63 @@
+{
+  "schemaVersion": "1.0.0",
+  "kind": "AdditionalLog10SourceDefinitions",
+  "status": "HostAlgorithmsAndSourceWiringCheckedOnly",
+  "g5Passed": false,
+  "targetAbiQualified": false,
+  "targetNumericsQualified": false,
+  "targetMasksQualified": false,
+  "sourceDefinedCountWithPriorSixteen": 20,
+  "remainingDeclarationOnly": 16,
+  "coveredCallSitesWithPriorFamilies": 2384,
+  "exports": [
+    {
+      "symbol": "_ZGVeN16v_log10f",
+      "source": "src/e_log10f_export.c",
+      "calls": 20
+    },
+    {
+      "symbol": "_ZGVbN4v_log10f",
+      "source": "src/log10_wrappers.c",
+      "calls": 2
+    },
+    {
+      "symbol": "_ZGVeN8v_log10",
+      "source": "src/e_log10_export.c",
+      "calls": 100
+    },
+    {
+      "symbol": "_ZGVbN2v_log10",
+      "source": "src/log10_wrappers.c",
+      "calls": 1
+    }
+  ],
+  "sources": {
+    "native/translation/math_algorithms/log10_e/e_log10f.c": "bb7c8dfbcf6554b38238620685d2260cad270fed927aa196882f686565799484",
+    "native/translation/math_algorithms/log10_e/e_log10.c": "ad0b9db5cde8df3df540f7f4ee356ff1dd0f1b256aaea01badb8de7ebf849f5a",
+    "native/translation/math_algorithms/log10_e/log10_e.h": "6598aecc0b9e5fb5af191574a64e5f59f4b3fefd2e902d047435ec24ee42f6b4",
+    "native/translation/libknc_mvec/src/e_log10f_export.c": "32279f1deff6ff3eb3afa28b50703006f9055f15886715bf2fc18d20ef1248c4",
+    "native/translation/libknc_mvec/src/e_log10_export.c": "4208b2dcea606d6195b006bdce13b63610589422662caf27857f541b226a5c1e",
+    "native/translation/libknc_mvec/src/log10_wrappers.c": "ba42aac228a79e1329f48d11161ce2ffbbc28b24e8fd9468c3e7c51b0ce447da"
+  },
+  "records": {
+    "artifacts/test-state/host-log10-e/06a76e01d49843928f774a5abad7a759/accuracy.json": "f41b1d49566c3784da014f7fdd84e0b724fbec8b0a712d68a59d513f6282de25",
+    "artifacts/test-state/host-log10-e/6fed1f5b90324d948f1cb83d352a9069/accuracy.json": "46b19b2220afe2bd63206cc156ec30a0d403c7e3128542f5b2c58b9dcfd628fe",
+    "artifacts/test-state/host-log10-exports/c3627925a24343c9bfc979ace37513ae/wiring.json": "3aaec099d95216d82b2e79312c51bae43f687e2163b899af837da33be1d6a942"
+  },
+  "hostIsa": "strict baselineSSE2; AVX/AVX2/FMA/AVX512 disabled",
+  "ulpUnit": "spacing at correctly rounded binary reference, matching HostMathReference",
+  "accuracy": {
+    "log10f": {
+      "activeLanesPerVariant": 1050128,
+      "uniquePositiveFiniteInputs": 1048576,
+      "finiteComparisons": 1048587,
+      "maxUlpBound": 0.818855574549359
+    },
+    "log10": {
+      "activeLanesPerVariant": 1050128,
+      "uniquePositiveFiniteInputs": 1048576,
+      "finiteComparisons": 1048587,
+      "maxUlpBound": 0.5155432490838623
+    }
+  }
+}

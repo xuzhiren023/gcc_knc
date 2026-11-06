@@ -1,0 +1,180 @@
+{
+  "schemaVersion": 1,
+  "kind": "G5DpUnarySinLimitedRnExportConformance",
+  "qualifiedUtc": "2026-10-24T19:32:39.178583+00:00",
+  "export": "_ZGVeN8v_sin",
+  "exportQualified": true,
+  "qualificationScope": "RN/full-active only",
+  "qualifiedExportCount": 9,
+  "totalExportCount": 36,
+  "g5WholeGatePassed": false,
+  "productionReady": false,
+  "vectors": 131633,
+  "lanes": 1053064,
+  "cardBootId": "f98cfa74-28e9-49cd-9e0b-8b93af25135f",
+  "originalResult": {
+    "path": "C:\\Users\\xuzhi\\Documents\\PhiWeather\\artifacts\\test-state\\knc-g5-sin-i64\\6b1b46e8d0af49dbbeae5faffe998d0a\\result.json",
+    "sha256": "2ac3a55db0d8134363dc964b1c46f9a1257e3eebe91fbbee61661d330c500339",
+    "preserved": true
+  },
+  "changedWordCertificate": {
+    "path": "C:\\Users\\xuzhi\\Documents\\PhiWeather\\artifacts\\test-state\\g5-sin-i64-affected-certificate\\32e3fea14b784ebbae003f90cfc98886\\certificate.json",
+    "sha256": "85fe56e85b43cb41009663028ba61d8d3a872934d2e81a046737e356c34714a1"
+  },
+  "nativeResult": {
+    "path": "C:\\Users\\xuzhi\\Documents\\PhiWeather\\artifacts\\test-state\\knc-g5-sin-i64\\6b1b46e8d0af49dbbeae5faffe998d0a\\retained\\results\\run\\g5-sin-i64-native.bin",
+    "bytes": 31591952,
+    "sha256": "7419f57391404c26c4575e91b38a3836c648cf9fa755130ad05872778168ee0d"
+  },
+  "numericalAssessment": {
+    "kind": "LimitedRnUnarySinAssayAssessment",
+    "status": "BoundedRnUnarySinValueSevereStatusAndAbiMatched",
+    "vectors": 131633,
+    "lanes": 1053064,
+    "profileMismatches": 0,
+    "exceptionVectorMismatches": 0,
+    "abiVectorMismatches": 0,
+    "observedDEVectors": 0,
+    "observedUEVectors": 0,
+    "observedPEVectors": 131354,
+    "targetPassLanes": 1053064,
+    "hardCeilingPassLanes": 1053064,
+    "targetPendingLanes": 0,
+    "hardCeilingPendingLanes": 0,
+    "observedFlagHistogram": {
+      "32": 131352,
+      "33": 2,
+      "0": 247,
+      "1": 32
+    },
+    "requiredSevereFlagHistogram": {
+      "0": 131599,
+      "1": 34
+    },
+    "methods": {
+      "retainedCertifiedExactWord": 1050631,
+      "nanClassification": 258,
+      "newIndependentDirectedIntervalCertificate": 2175
+    },
+    "firstMismatches": [],
+    "maximumInheritedTrueErrorUlps": "3852854564751869/5000000000000000",
+    "targetUlps": 1,
+    "hardCeilingUlps": 4,
+    "statusScope": "Exact independent IE; no ZD/OF; UE/PE/DE observed and unqualified",
+    "fullNativeStatusQualified": false,
+    "otherRoundingModesQualified": false,
+    "errnoQualified": false,
+    "trapsQualified": false,
+    "v3ProductionQualified": false,
+    "independentNewIntervalInputsEvaluated": 2175,
+    "hostKernelExecuted": false,
+    "g5Passed": false,
+    "actualExecutionAuthenticatedHere": false,
+    "maximumCertifiedTrueErrorUlps": "6945984679578743/9007199254740992"
+  },
+  "imageAdmission": {
+    "imageSha256": "c72997ccdc7315cfd0533db0fa50522e7230774248059e6acb6c224786606539",
+    "imageBytes": 37811,
+    "machine": 181,
+    "elfType": 2,
+    "actualExportSymbol": "_ZGVeN8v_sin",
+    "runtimeClosure": {
+      "libc.so.6": "7ee7ac7da48c6fac7fea1a8dd75c42d3e1a735c0ff5c71cc7578f85691a5e4fc",
+      "ld-linux-k1om.so.2": "2a60a4698794ca42b43dfd0979771e523dbacaae7c44047ba6c7ed98aa211397"
+    },
+    "staticObjectCount": 8,
+    "readonlyPages": [
+      4214784
+    ],
+    "numericalAndAbiTargetQualified": false,
+    "nativeRelease": false,
+    "g5Passed": false,
+    "export": "_ZGVeN8v_sin",
+    "argc": 2,
+    "argv": [
+      "g5-sin-i64-candidate.mic",
+      "sin-input.bin"
+    ],
+    "corpus": "sin-corpus.bin",
+    "fifo": "sin-input.bin",
+    "output": "g5-sin-i64-native.bin",
+    "vectors": 131633,
+    "lanes": 1053064,
+    "inputBytes": 8424544,
+    "nativeBytes": 31591952,
+    "inputHeader": [
+      1230189895,
+      1,
+      8,
+      8,
+      64,
+      131633,
+      0,
+      0
+    ],
+    "outputHeader": [
+      1314075975,
+      1,
+      8,
+      8,
+      240,
+      131633,
+      0,
+      0
+    ],
+    "completionMarker": "PW_G5_SIN_I64_RAW_CAPTURED variant=0 vectors=131633 lanes=1053064 bytes=31591952 callerProfileRestored=1 canariesIntact=1\n",
+    "datasetSha256": "50b481868d6276b9291f3a6d89554a8678470d35c5e1b1d365d538459fb39cbc",
+    "imageManifest": "C:\\Users\\xuzhi\\Documents\\PhiWeather\\artifacts\\test-state\\g5-sin-i64-local-linked-image\\965ec8ffcc2f45cd84522bae7a612125\\actual-image-bindings-3f74970312c34c8ead084f52896dafd8.json",
+    "datasetManifest": "C:\\Users\\xuzhi\\Documents\\PhiWeather\\artifacts\\test-state\\g5-sin-i64-retained-target-dataset\\dd320b7166744ad7a537dc4733ca6cf4\\dataset.json",
+    "assayScope": "RN/full-active value + exact IE/ZD/OF + ABI; UE/PE/DE observed",
+    "wholeG5Qualified": false
+  },
+  "actualRuntime": {
+    "actualImageSha256": "c72997ccdc7315cfd0533db0fa50522e7230774248059e6acb6c224786606539",
+    "liveExecutableCaptured": true,
+    "actualInputSha256": "4926c9a37b445cef932f6c8cf5be8da0700dc51438d13e800f4fbb3b7a0ab2b9",
+    "actualInputBytes": 8424544,
+    "loadedLibraries": {
+      "ld-linux-k1om.so.2": {
+        "alias": "/lib64/ld-2.21.so",
+        "resolved": "/lib64/ld-2.21.so",
+        "sha256": "2a60a4698794ca42b43dfd0979771e523dbacaae7c44047ba6c7ed98aa211397"
+      },
+      "libc.so.6": {
+        "alias": "/lib64/libc-2.21.so",
+        "resolved": "/lib64/libc-2.21.so",
+        "sha256": "7ee7ac7da48c6fac7fea1a8dd75c42d3e1a735c0ff5c71cc7578f85691a5e4fc"
+      }
+    },
+    "readonlyStaticPagesObserved": [
+      4214784
+    ],
+    "staticObjectCount": 8,
+    "pid": 48779,
+    "maps": "C:\\Users\\xuzhi\\Documents\\PhiWeather\\artifacts\\test-state\\knc-g5-sin-i64\\6b1b46e8d0af49dbbeae5faffe998d0a\\retained\\results\\run\\process.maps",
+    "loaderLog": "C:\\Users\\xuzhi\\Documents\\PhiWeather\\artifacts\\test-state\\knc-g5-sin-i64\\6b1b46e8d0af49dbbeae5faffe998d0a\\retained\\results\\run\\loader-debug.48779",
+    "actualExportSymbol": "_ZGVeN8v_sin",
+    "numericalAndAbiTargetQualified": false,
+    "g5Passed": false
+  },
+  "actualChildOwnership": {
+    "parentPid": 48757,
+    "processGroup": 48757,
+    "sleepingBeforeFeed": true
+  },
+  "lifecycle": {
+    "processTerminal": true,
+    "hostRetentionValidated": true,
+    "nativeDirectoryReclaimed": true,
+    "nativeContractChecked": true
+  },
+  "fullNativeStatusQualified": false,
+  "otherRoundingModesQualified": false,
+  "errnoQualified": false,
+  "trapsQualified": false,
+  "v3ProductionQualified": false,
+  "nanPolicy": "Expected NaN requires observed NaN only; payload/origin ignored",
+  "newNativeExecutions": 0,
+  "independentNewIntervalInputsEvaluated": 2175,
+  "performanceClaim": false
+}

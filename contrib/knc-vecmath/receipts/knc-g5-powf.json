@@ -1,0 +1,218 @@
+{
+  "schemaVersion": 1,
+  "kind": "G5SpBinaryPowfLimitedRnExportConformance",
+  "export": "_ZGVeN16vv_powf",
+  "exportQualified": true,
+  "qualificationScope": "RN/full-active only",
+  "qualifiedExportCount": 5,
+  "totalExportCount": 36,
+  "g5WholeGatePassed": false,
+  "productionReady": false,
+  "qualifiedUtc": "2026-10-24T17:53:54.877382+00:00",
+  "ownerDecision": "D1 2026-10-24: NaN classification only; no new card execution",
+  "originalResult": {
+    "path": "C:\\Users\\xuzhi\\Documents\\PhiWeather\\artifacts\\test-state\\knc-g5-powf\\39a0c9418e594e709a2ee2cbb4b5044c\\result.json",
+    "status": "LimitedRnBinaryPowfAssayHeld",
+    "preserved": true
+  },
+  "vectors": 82176,
+  "lanes": 1314816,
+  "cardBootId": "f98cfa74-28e9-49cd-9e0b-8b93af25135f",
+  "imageAdmission": {
+    "imageSha256": "c2369afe125d398e96b7678c07ffd11d80b48a7c1c1e87884847ef5afdba66b9",
+    "imageBytes": 188830,
+    "machine": 181,
+    "elfType": 2,
+    "actualExportSymbol": "_ZGVeN16vv_powf",
+    "runtimeClosure": {
+      "libc.so.6": "7ee7ac7da48c6fac7fea1a8dd75c42d3e1a735c0ff5c71cc7578f85691a5e4fc",
+      "ld-linux-k1om.so.2": "2a60a4698794ca42b43dfd0979771e523dbacaae7c44047ba6c7ed98aa211397"
+    },
+    "staticObjectCount": 6,
+    "readonlyPages": [
+      4296704,
+      4300800
+    ],
+    "numericalAndAbiTargetQualified": false,
+    "nativeRelease": false,
+    "g5Passed": false,
+    "kind": "G5SpBinaryPowfSinglePositiveConformanceJob",
+    "export": "_ZGVeN16vv_powf",
+    "arity": 2,
+    "vectors": 82176,
+    "lanes": 1314816,
+    "lanesPerVector": 16,
+    "bytesPerLane": 4,
+    "inputRecordBytes": 128,
+    "outputRecordBytes": 240,
+    "inputHeader": [
+      1229993287,
+      2,
+      16,
+      4,
+      128,
+      82176,
+      2,
+      0
+    ],
+    "outputHeader": [
+      1313879367,
+      2,
+      16,
+      4,
+      240,
+      82176,
+      0,
+      2
+    ],
+    "inputBytes": 10518560,
+    "nativeBytes": 19722272,
+    "image": "g5-powf-candidate.mic",
+    "corpus": "powf-corpus.bin",
+    "fifo": "powf-input.bin",
+    "output": "g5-powf-native.bin",
+    "argc": 2,
+    "argv": [
+      "g5-powf-candidate.mic",
+      "powf-input.bin"
+    ],
+    "soleFutureEntrypoint": "scripts/Run-KncCompactBatch.py --conformance",
+    "maintainedLifecycle": "scripts.G5DpTargetJob",
+    "requiredPrivateOverrides": [
+      "validate_spec",
+      "input_header",
+      "output_header",
+      "validate_corpus_header",
+      "validate_input_proof",
+      "host_input_sources",
+      "inspect_inputs"
+    ],
+    "pending": [
+      "actual kernel ISA and linked-image admission",
+      "binary cached-word assessor and independent full status policy",
+      "root integration of private namespace overrides into the maintained lifecycle"
+    ],
+    "completionMarker": "PW_G5_POWF_RAW_CAPTURED variant=0 vectors=82176 lanes=1314816 arity=2 bytes=19722272 callerProfileRestored=1 canariesIntact=1\n",
+    "datasetSha256": "e3fa7b07767919f48da710b223ff79129a51e27ba42516c774f1c20b97a4be46",
+    "imageManifest": "C:\\Users\\xuzhi\\Documents\\PhiWeather\\artifacts\\test-state\\g5-powf-local-linked-image\\c9c863e32a984c24a8659be57f78ca56\\binding-attempts\\7d74e033e3e8432d821b9a17046c5be7\\completion-ehframe-result.json",
+    "datasetManifest": "C:\\Users\\xuzhi\\Documents\\PhiWeather\\artifacts\\test-state\\g5-powf-retained-target-dataset\\d75181a3a2444d8b834235fd9641d7b6\\dataset.json",
+    "assayScope": "RN/full-active value + exact IE/ZD/required OF + ABI; UE/PE/DE observed",
+    "wholeG5Qualified": false
+  },
+  "actualRuntime": {
+    "actualImageSha256": "c2369afe125d398e96b7678c07ffd11d80b48a7c1c1e87884847ef5afdba66b9",
+    "liveExecutableCaptured": true,
+    "actualInputSha256": "293b96c6b84f98ca33d822abb8ec67bf7ef580e21a8d1b34240c8bdda97e5de0",
+    "actualInputBytes": 10518560,
+    "loadedLibraries": {
+      "ld-linux-k1om.so.2": {
+        "alias": "/lib64/ld-2.21.so",
+        "resolved": "/lib64/ld-2.21.so",
+        "sha256": "2a60a4698794ca42b43dfd0979771e523dbacaae7c44047ba6c7ed98aa211397"
+      },
+      "libc.so.6": {
+        "alias": "/lib64/libc-2.21.so",
+        "resolved": "/lib64/libc-2.21.so",
+        "sha256": "7ee7ac7da48c6fac7fea1a8dd75c42d3e1a735c0ff5c71cc7578f85691a5e4fc"
+      }
+    },
+    "readonlyStaticPagesObserved": [
+      4296704,
+      4300800
+    ],
+    "staticObjectCount": 6,
+    "pid": 33657,
+    "maps": "C:\\Users\\xuzhi\\Documents\\PhiWeather\\artifacts\\test-state\\knc-g5-powf\\39a0c9418e594e709a2ee2cbb4b5044c\\retained\\results\\run\\process.maps",
+    "loaderLog": "C:\\Users\\xuzhi\\Documents\\PhiWeather\\artifacts\\test-state\\knc-g5-powf\\39a0c9418e594e709a2ee2cbb4b5044c\\retained\\results\\run\\loader-debug.33657",
+    "actualExportSymbol": "_ZGVeN16vv_powf",
+    "numericalAndAbiTargetQualified": false,
+    "g5Passed": false
+  },
+  "actualChildOwnership": {
+    "parentPid": 33635,
+    "processGroup": 33635,
+    "sleepingBeforeFeed": true
+  },
+  "lifecycle": {
+    "processTerminal": true,
+    "hostRetentionValidated": true,
+    "nativeDirectoryReclaimed": true,
+    "nativeContractChecked": true,
+    "inheritedFromRetainedRun": true
+  },
+  "nativeResult": {
+    "path": "C:\\Users\\xuzhi\\Documents\\PhiWeather\\artifacts\\test-state\\knc-g5-powf\\39a0c9418e594e709a2ee2cbb4b5044c\\retained\\results\\run\\g5-powf-native.bin",
+    "bytes": 19722272
+  },
+  "numericalAssessment": {
+    "kind": "LimitedRnBinaryPowfAssayAssessment",
+    "status": "BoundedRnBinaryPowfValueSevereStatusAndAbiMatched",
+    "vectors": 82176,
+    "lanes": 1314816,
+    "profileMismatches": 0,
+    "exceptionVectorMismatches": 0,
+    "abiVectorMismatches": 0,
+    "observedDEVectors": 4251,
+    "observedUEVectors": 39487,
+    "observedPEVectors": 82062,
+    "targetPassLanes": 1314816,
+    "hardCeilingPassLanes": 1314816,
+    "observedFlagHistogram": {
+      "40": 15261,
+      "32": 25355,
+      "48": 15910,
+      "56": 6165,
+      "50": 900,
+      "34": 904,
+      "42": 748,
+      "58": 369,
+      "59": 1159,
+      "57": 14613,
+      "41": 256,
+      "49": 249,
+      "43": 27,
+      "33": 2,
+      "51": 73,
+      "1": 108,
+      "63": 40,
+      "47": 22,
+      "0": 6,
+      "55": 9
+    },
+    "requiredSevereFlagHistogram": {
+      "8": 22543,
+      "0": 43075,
+      "9": 16055,
+      "1": 432,
+      "13": 62,
+      "5": 9
+    },
+    "methods": {
+      "retainedCertifiedExactWord": 1237139,
+      "nanClassification": 77677
+    },
+    "firstMismatches": [],
+    "maximumInheritedTrueErrorUlps": "0.505089905719066",
+    "targetUlps": 1,
+    "hardCeilingUlps": 4,
+    "statusScope": "Exact independent IE/ZD; required OF only; UE/PE/DE observed and unqualified",
+    "fullNativeStatusQualified": false,
+    "otherRoundingModesQualified": false,
+    "errnoQualified": false,
+    "trapsQualified": false,
+    "v3ProductionQualified": false,
+    "independentNewIntervalInputsEvaluated": 0,
+    "hostKernelExecuted": false,
+    "g5Passed": false,
+    "actualExecutionAuthenticatedHere": false
+  },
+  "nanPolicy": "Expected NaN accepts any observed NaN; sign/quietness/payload/origin ignored",
+  "fullNativeStatusQualified": false,
+  "otherRoundingModesQualified": false,
+  "errnoQualified": false,
+  "trapsQualified": false,
+  "v3ProductionQualified": false,
+  "performanceClaim": false,
+  "newNativeExecutions": 0,
+  "independentNewIntervalInputsEvaluated": 0
+}

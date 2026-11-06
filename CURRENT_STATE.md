@@ -112,6 +112,9 @@ M1 is accepted and tagged `m1` locally; nothing is pushed. Engineers are Claude 
   kernels, the vector-math backlog item and S7-02; not requirements. Answered; digest and backlog
   mapping in `docs/research/wrf-input-2026-11-06.md` (notably: prefetch 2.4x on short rows, 2 threads
   per core best for WRF against ADR-0009's default of 4).
+- ADR-0011 (owner, 2026-11-06): the WRF project's vector math is copied into `contrib/knc-vecmath/`
+  (PhiWeather `bfc0977d`, licenses kept) and renamed `__knc_vmath_<name>_<lanes>`; no `_ZGV` names.
+  Not yet compiled or qualified with GCC-KNC (E7-01, E7-02).
 
 - M2 baseline: launch 1 of the first full block was invalid (batches sized from a stalled pilot ran
   4-9 ms instead of 100 ms; two such runs still passed the spread check). `timing.c` now re-sizes

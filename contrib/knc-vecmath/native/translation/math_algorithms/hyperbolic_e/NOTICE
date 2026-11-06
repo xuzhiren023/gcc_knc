@@ -1,0 +1,11 @@
+This vector implementation adapts the rational coefficients, reduction and
+identities in the official musl v1.2.5 sources retained in upstream/.
+
+Copyright (C) 1993 by Sun Microsystems, Inc. All rights reserved.
+
+Developed at SunPro, a Sun Microsystems, Inc. business.
+Permission to use, copy, modify, and distribute this
+software is freely granted, provided that this notice
+is preserved.
+
+The original file notices and the full musl COPYRIGHT also remain in upstream/.

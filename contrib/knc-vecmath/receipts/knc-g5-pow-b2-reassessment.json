@@ -1,0 +1,463 @@
+{
+  "schemaVersion": 1,
+  "kind": "G5PowB2RetainedOracleReassessment",
+  "startedUtc": "2026-10-28T02:53:47.960716+00:00",
+  "status": "RetainedPowB2BoundedQualificationPassed",
+  "nativeExecuted": false,
+  "mpfrEvaluations": 0,
+  "commands": [
+    "scripts/Run-KncG5NarrowBatch.py",
+    "reassess-pow",
+    "--directory",
+    "artifacts/test-state/g5-narrow14/pow-b2-reassessment-01"
+  ],
+  "hypothesis": "The seven original value failures exhaust the raw sNaN identity branch",
+  "falsifier": "Any other source change, affected result/status failure or unexplained original mismatch",
+  "budget": {
+    "maximumOfflineSeconds": 60,
+    "nativeExecutions": 0
+  },
+  "originalReceiptUnchanged": true,
+  "productionReady": false,
+  "wholeG5Qualified": false,
+  "witnessAssessment": {
+    "path": "C:\\Users\\xuzhi\\Documents\\PhiWeather\\artifacts\\test-state\\g5-narrow14\\oracle-snan-repair-02\\retained-witness-assessment.json",
+    "bytes": 8441,
+    "sha256": "100acb9f9b1eda54f7c5504ae6d419af11623d2c6981ae43e9a99060a3297f6b"
+  },
+  "originalBatchReceipt": {
+    "path": "C:\\Users\\xuzhi\\Documents\\PhiWeather\\artifacts\\native\\knc-g5-narrow14-v2.json",
+    "bytes": 41101,
+    "sha256": "273982b56d0f02cd977dc8ef08b867f2056094aadff956776af27cdd8812fcf5"
+  },
+  "originalExecution": {
+    "path": "C:\\Users\\xuzhi\\Documents\\PhiWeather\\artifacts\\test-state\\knc-g5-n14v2-pow-b2\\d5f26e80f85145e49de573c4c4df96d6\\result.json",
+    "bytes": 47439,
+    "sha256": "0791b8d9a6fcaec34f0e850c649fce8bade77cfa27b02cf58b6f6bbc9061ea17"
+  },
+  "sourceDelta": {
+    "onlyRawSnanIdentityValueBranchChanged": true,
+    "intervalEvaluationAndStatusUnchanged": true
+  },
+  "originalReferenceSource": {
+    "path": "C:\\Users\\xuzhi\\Documents\\PhiWeather\\artifacts\\test-state\\g5-narrow14\\preparation-v2-04\\source-used\\native\\reference\\g5-narrow14\\mpfr_oracle.c",
+    "bytes": 6486,
+    "sha256": "ef97d09279f233e0df69208e53dd3f57d87a7c7551cd8fc65a62119c76b70c03"
+  },
+  "correctedReferenceBuild": {
+    "path": "C:\\Users\\xuzhi\\Documents\\PhiWeather\\artifacts\\test-state\\g5-narrow14\\oracle-snan-repair-02\\build.json",
+    "bytes": 1315,
+    "sha256": "3c9e9ad70ed522c3c557e75a57a2d3a4975d7194dd5dba5d97bbba2d1417147d"
+  },
+  "partition": {
+    "totalLanes": 1312668,
+    "affectedLanes": 7,
+    "unchangedLanes": 1312661,
+    "affected": [
+      {
+        "row": 656131,
+        "lane": 1,
+        "x": "3ff0000000000000",
+        "y": "7ff0123456789abc",
+        "actual": "7ff8123456789abc"
+      },
+      {
+        "row": 656132,
+        "lane": 0,
+        "x": "3ff0000000000000",
+        "y": "fff0123456789abc",
+        "actual": "fff8123456789abc"
+      },
+      {
+        "row": 656222,
+        "lane": 1,
+        "x": "7ff0123456789abc",
+        "y": "0000000000000000",
+        "actual": "7ff8123456789abc"
+      },
+      {
+        "row": 656223,
+        "lane": 0,
+        "x": "7ff0123456789abc",
+        "y": "8000000000000000",
+        "actual": "7ff8123456789abc"
+      },
+      {
+        "row": 656232,
+        "lane": 1,
+        "x": "fff0123456789abc",
+        "y": "0000000000000000",
+        "actual": "fff8123456789abc"
+      },
+      {
+        "row": 656233,
+        "lane": 0,
+        "x": "fff0123456789abc",
+        "y": "8000000000000000",
+        "actual": "fff8123456789abc"
+      },
+      {
+        "row": 656330,
+        "lane": 0,
+        "x": "7ff0000000000001",
+        "y": "8000000000000000",
+        "actual": "7ff8000000000001"
+      }
+    ],
+    "nativeFlagHistogram": [
+      108,
+      9026,
+      0,
+      0,
+      12,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      351310,
+      17132,
+      322,
+      23,
+      0,
+      0,
+      0,
+      0,
+      106374,
+      16903,
+      44,
+      0,
+      0,
+      0,
+      0,
+      0,
+      106383,
+      16719,
+      62,
+      2,
+      0,
+      0,
+      0,
+      0,
+      31884,
+      0,
+      30,
+      0,
+      0,
+      0,
+      0,
+      0
+    ]
+  },
+  "export": "_ZGVbN2vv_pow",
+  "boundedQualificationPassed": true,
+  "priorBoundedExportCount": 15,
+  "boundedExportCount": 16,
+  "assessment": {
+    "status": "NumericalAndAbiSampleMatchedAwaitingExecutionBinding",
+    "vectors": 656334,
+    "lanes": 1312668,
+    "targetPassLanes": 1312668,
+    "hardCeilingPassLanes": 1312668,
+    "targetFailLanes": 0,
+    "hardCeilingFailLanes": 0,
+    "targetPendingLanes": 0,
+    "hardCeilingPendingLanes": 0,
+    "profileMismatches": 0,
+    "exceptionVectorMismatches": 0,
+    "abiVectorMismatches": 0,
+    "RNValueVerdict": "Passed",
+    "specialStatusVerdict": "PassedBoundedIE_ZD_RequiredOF",
+    "ABIVerdict": "Passed",
+    "legalControlVerdict": "PassedIdentityDomain",
+    "independentIntervals": {
+      "mpfrVersion": "4.2.2",
+      "precisions": [
+        256,
+        384
+      ],
+      "lanes": 1312668,
+      "finiteComparisons": 1072763,
+      "nanComparisons": 68851,
+      "infinityComparisons": 171054,
+      "signedZeroComparisons": 167894,
+      "valueMismatches": 0,
+      "statusMismatches": 0,
+      "abiMismatches": 0,
+      "endpointMismatches": 0,
+      "worstErrorUlps": 0.5066233220729456,
+      "histogram": {
+        "leHalf": 1072116,
+        "leThreeQuarters": 647,
+        "leOne": 0,
+        "aboveOne": 0
+      },
+      "worst": {
+        "row": 281557,
+        "lane": 0,
+        "x": "3fefffffffffefb0",
+        "y": "42e8d8a9a185c920",
+        "actual": "36cc2f1395024371",
+        "nearest": "36cc2f1395024370"
+      },
+      "nativeFlagHistogram": [
+        108,
+        9026,
+        0,
+        0,
+        12,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        351310,
+        17132,
+        322,
+        23,
+        0,
+        0,
+        0,
+        0,
+        106374,
+        16903,
+        44,
+        0,
+        0,
+        0,
+        0,
+        0,
+        106383,
+        16719,
+        62,
+        2,
+        0,
+        0,
+        0,
+        0,
+        31884,
+        0,
+        30,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "evaluationCpuSeconds": 70.375,
+      "method": "Exact source delta and exhaustive retained raw-bit partition; unchanged directed intervals inherited"
+    },
+    "legalControls": {
+      "cases": 49152,
+      "mismatches": {
+        "control": 0,
+        "stack": 0,
+        "abi": 0,
+        "arguments": 0,
+        "identityReturn": 0
+      },
+      "firstMismatches": [],
+      "passed": true,
+      "scope": "Exact identities only; all legal PC/masks, independent RC, masked dirty status, empty tags at TOP0/5, DAZ/FZ; enabled traps and general other-RC values unqualified"
+    },
+    "targetUlps": 1,
+    "wholeG5Qualified": false,
+    "productionReady": false,
+    "otherRoundingValueAccuracyQualified": false,
+    "errnoQualified": false,
+    "enabledTrapsQualified": false,
+    "fullStatusQualified": false
+  },
+  "inheritedExecutionEvidence": {
+    "actualRuntime": {
+      "actualImageSha256": "71c6a148ebd0c73fa921c96d44401ea359137e488773e5c41ba66d20f23e6929",
+      "liveExecutableCaptured": true,
+      "actualInputSha256": "a87631169bc15f4e7f1e4f77c73f9578911f52d28027fee17f825e59d97bb8ef",
+      "actualInputBytes": 21002720,
+      "loadedLibraries": {
+        "ld-linux-k1om.so.2": {
+          "alias": "/lib64/ld-2.21.so",
+          "resolved": "/lib64/ld-2.21.so",
+          "sha256": "2a60a4698794ca42b43dfd0979771e523dbacaae7c44047ba6c7ed98aa211397"
+        },
+        "libc.so.6": {
+          "alias": "/lib64/libc-2.21.so",
+          "resolved": "/lib64/libc-2.21.so",
+          "sha256": "7ee7ac7da48c6fac7fea1a8dd75c42d3e1a735c0ff5c71cc7578f85691a5e4fc"
+        }
+      },
+      "readonlyStaticPagesObserved": [
+        4567040,
+        4571136,
+        4575232,
+        4579328,
+        4583424,
+        4587520
+      ],
+      "staticObjectCount": 40,
+      "pid": 10635,
+      "maps": "C:\\Users\\xuzhi\\Documents\\PhiWeather\\artifacts\\test-state\\knc-g5-n14v2-pow-b2\\d5f26e80f85145e49de573c4c4df96d6\\retained\\results\\run\\process.maps",
+      "loaderLog": "C:\\Users\\xuzhi\\Documents\\PhiWeather\\artifacts\\test-state\\knc-g5-n14v2-pow-b2\\d5f26e80f85145e49de573c4c4df96d6\\retained\\results\\run\\loader-debug.10635",
+      "actualExportSymbol": "_ZGVbN2vv_pow",
+      "numericalAndAbiTargetQualified": false,
+      "g5Passed": false
+    },
+    "actualChildOwnership": {
+      "parentPid": 10613,
+      "processGroup": 10613,
+      "sleepingBeforeFeed": true
+    },
+    "supervisorProof": {
+      "WORKER_PID": 10613,
+      "WORKER_PGID": 10613,
+      "WATCHDOG_PID": 10615,
+      "WATCHDOG_PGID": 10615,
+      "CHILD_PID": 10613,
+      "EXIT": 0,
+      "programPid": 10635,
+      "feederPid": 10661
+    },
+    "terminalSnapshot": {
+      "processCount": 1029,
+      "exactOwnedMatches": []
+    },
+    "knownOwnedPids": [
+      10613,
+      10615,
+      10635,
+      10661
+    ]
+  },
+  "authenticatedArtifacts": [
+    {
+      "path": "C:\\Users\\xuzhi\\Documents\\PhiWeather\\artifacts\\native\\knc-g5-narrow14-v2.json",
+      "bytes": 41101,
+      "sha256": "273982b56d0f02cd977dc8ef08b867f2056094aadff956776af27cdd8812fcf5"
+    },
+    {
+      "path": "C:\\Users\\xuzhi\\Documents\\PhiWeather\\artifacts\\test-state\\knc-g5-n14v2-pow-b2\\d5f26e80f85145e49de573c4c4df96d6\\result.json",
+      "bytes": 47439,
+      "sha256": "0791b8d9a6fcaec34f0e850c649fce8bade77cfa27b02cf58b6f6bbc9061ea17"
+    },
+    {
+      "path": "C:\\Users\\xuzhi\\Documents\\PhiWeather\\artifacts\\test-state\\g5-narrow14\\preparation-v2-04\\preparation.json",
+      "bytes": 336953,
+      "sha256": "9b69bcb8e9a81f1ca7c59c02ef1bf0dfe00078d97253ffd90063fc37615e49f8"
+    },
+    {
+      "path": "C:\\Users\\xuzhi\\Documents\\PhiWeather\\artifacts\\test-state\\g5-narrow14\\preparation-v2-04\\image\\g5-batch-candidate.mic",
+      "bytes": 538728,
+      "sha256": "71c6a148ebd0c73fa921c96d44401ea359137e488773e5c41ba66d20f23e6929"
+    },
+    {
+      "path": "C:\\Users\\xuzhi\\Documents\\PhiWeather\\artifacts\\test-state\\g5-narrow14\\preparation-01\\pow-b2\\dataset.json",
+      "bytes": 1449,
+      "sha256": "e58a392bf67db61ced702cbedb3b3361b466820c92b0b5303b46176fd8ecb277"
+    },
+    {
+      "path": "C:\\Users\\xuzhi\\Documents\\PhiWeather\\artifacts\\test-state\\g5-narrow14\\preparation-01\\pow-b2\\batch-corpus.bin",
+      "bytes": 21002720,
+      "sha256": "a87631169bc15f4e7f1e4f77c73f9578911f52d28027fee17f825e59d97bb8ef"
+    },
+    {
+      "path": "C:\\Users\\xuzhi\\Documents\\PhiWeather\\artifacts\\test-state\\knc-g5-n14v2-pow-b2\\d5f26e80f85145e49de573c4c4df96d6\\retained\\results\\run\\g5-batch-native.bin",
+      "bytes": 15752048,
+      "sha256": "7de001bda3c745eb4f6b85fe718d468624aeb973a1059aa36f1ffae6887a7868"
+    },
+    {
+      "path": "C:\\Users\\xuzhi\\Documents\\PhiWeather\\artifacts\\test-state\\knc-g5-n14v2-pow-b2\\d5f26e80f85145e49de573c4c4df96d6\\retained\\results\\run\\boundary.bin",
+      "bytes": 25952256,
+      "sha256": "83b79a261e5cb50ede110fe582e2bea23cae7a5379e4c4f523d80b97d389b134"
+    },
+    {
+      "path": "C:\\Users\\xuzhi\\Documents\\PhiWeather\\artifacts\\test-state\\knc-g5-n14v2-pow-b2\\d5f26e80f85145e49de573c4c4df96d6\\retained\\results\\run\\resource-observations.tsv",
+      "bytes": 3970,
+      "sha256": "ba33354c58833b56f0974d23a1a8958f245988c24eb16c874fbd3cfa75a6c9ec"
+    },
+    {
+      "path": "C:\\Users\\xuzhi\\Documents\\PhiWeather\\artifacts\\test-state\\g5-narrow14\\oracle-snan-repair-02\\build.json",
+      "bytes": 1315,
+      "sha256": "3c9e9ad70ed522c3c557e75a57a2d3a4975d7194dd5dba5d97bbba2d1417147d"
+    },
+    {
+      "path": "C:\\Users\\xuzhi\\Documents\\PhiWeather\\native\\reference\\g5-narrow14\\mpfr_oracle.c",
+      "bytes": 7237,
+      "sha256": "7ec8ee47b076edc2054c5c07f80c4a4d3f2610ab6d7efd8bd1774d0ca9950566"
+    },
+    {
+      "path": "C:\\Users\\xuzhi\\Documents\\PhiWeather\\artifacts\\test-state\\g5-narrow14\\oracle-snan-repair-02\\mpfr-oracle.exe",
+      "bytes": 79545,
+      "sha256": "4b324f58a6f3b277e98410c783d23a3fe82acbe31f91007f2d4afc1201282e97"
+    },
+    {
+      "path": "C:\\Users\\xuzhi\\Documents\\PhiWeather\\artifacts\\test-state\\g5-narrow14\\preparation-12\\image\\mpfr-oracle.exe",
+      "bytes": 79545,
+      "sha256": "b6bff09250d67ce620b45ffc47d811239d54bf294b8b76b062c12afe09b11126"
+    },
+    {
+      "path": "C:\\Users\\xuzhi\\Documents\\PhiWeather\\artifacts\\test-state\\g5-narrow14\\oracle-snan-repair-02\\tests.log",
+      "bytes": 1116,
+      "sha256": "7590f27bb1b84c1754f4cdeafb033600ace4fd06ce9382f9bee34eb253a7f9eb"
+    },
+    {
+      "path": "C:\\Users\\xuzhi\\Documents\\PhiWeather\\native\\translation\\math_algorithms\\pow_e8\\mpfr_reference.c",
+      "bytes": 7526,
+      "sha256": "392851654c5131166bbb2d9e8fc623815b86497874a9927c5631ba5e740d031c"
+    },
+    {
+      "path": "C:\\Users\\xuzhi\\Documents\\PhiWeather\\native\\translation\\math_algorithms\\powf_e16\\mpfr_reference.c",
+      "bytes": 7358,
+      "sha256": "27705010e9ec64f3bf83cc9b6c41d56296b88cdf2049abc629d84116240d5520"
+    }
+  ],
+  "finishedUtc": "2026-10-28T02:53:49.342651+00:00",
+  "result": {
+    "path": "C:\\Users\\xuzhi\\Documents\\PhiWeather\\artifacts\\test-state\\g5-narrow14\\pow-b2-reassessment-01\\result.json",
+    "bytes": 13439,
+    "sha256": "792387badb0adfaad5da20a48b78c050c6acc2bdce4434189f0d3237a741bec7"
+  }
+}

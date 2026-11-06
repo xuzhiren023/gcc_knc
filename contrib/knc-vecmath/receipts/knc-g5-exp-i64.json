@@ -1,0 +1,888 @@
+{
+  "schemaVersion": 1,
+  "kind": "G5ExpI64SingleExportNativeConformance",
+  "export": "_ZGVeN8v_exp",
+  "exportQualified": true,
+  "g5WholeGatePassed": false,
+  "productionReady": false,
+  "vectors": 172160,
+  "lanes": 1377280,
+  "cardBootId": "f98cfa74-28e9-49cd-9e0b-8b93af25135f",
+  "retainedAssessment": true,
+  "result": {
+    "path": "C:\\Users\\xuzhi\\Documents\\PhiWeather\\artifacts\\test-state\\knc-g5-exp-i64\\14d6f43b2fe540ef8e788eb9058c3831\\result.json",
+    "sha256": "b44c367288794481e4c96ed80043f6d69d14444da4f71a9892c8cb1db3517021"
+  },
+  "originalNativeResult": {
+    "path": "C:\\Users\\xuzhi\\Documents\\PhiWeather\\artifacts\\test-state\\knc-g5-exp-i64\\a2786f1cb41a4b488951cf0a784c1200\\result.json",
+    "sha256": "ed6557dc5bc1ab12dc919fff3f6fbcce40cbeedff5e3b646e1243e13fe09f96f"
+  },
+  "originalScientificSourceArtifacts": {
+    "C:\\Users\\xuzhi\\Documents\\PhiWeather\\artifacts\\test-state\\knc-g5-exp-i64\\a2786f1cb41a4b488951cf0a784c1200\\scientific-source\\scripts\\G5ExpI64TargetJob.py": "3356436353cad2472a390236b2f9847ff0266b0a4b56a37db8f7c0680e5b4c25",
+    "C:\\Users\\xuzhi\\Documents\\PhiWeather\\artifacts\\test-state\\knc-g5-exp-i64\\a2786f1cb41a4b488951cf0a784c1200\\scientific-source\\scripts\\G5ExpI64TargetAdmission.py": "4d3476202ec7b4620369354187f1f0e7f95753034e342e0dd4c5567432fe6976",
+    "C:\\Users\\xuzhi\\Documents\\PhiWeather\\artifacts\\test-state\\knc-g5-exp-i64\\a2786f1cb41a4b488951cf0a784c1200\\scientific-source\\scripts\\G5ExpI64TargetReference.py": "c1c35c6b8b6e27a561a2546ab6aaedfaea10b240ada4299e6c72b4cb9416420f",
+    "C:\\Users\\xuzhi\\Documents\\PhiWeather\\artifacts\\test-state\\knc-g5-exp-i64\\a2786f1cb41a4b488951cf0a784c1200\\scientific-source\\scripts\\HostMath64Reference.py": "5db46766042a3d2328e79a7298e22d6b7dadb415727ef88492892c944dec9dd3",
+    "C:\\Users\\xuzhi\\Documents\\PhiWeather\\artifacts\\test-state\\knc-g5-exp-i64\\a2786f1cb41a4b488951cf0a784c1200\\scientific-source\\scripts\\HostExpFullReference.py": "2fe14985470b9e6978716fc7c70a4c81fff1f7bbc56e372f05a757d97d007cb6",
+    "C:\\Users\\xuzhi\\Documents\\PhiWeather\\artifacts\\test-state\\knc-g5-exp-i64\\a2786f1cb41a4b488951cf0a784c1200\\scientific-source\\artifacts\\test-state\\g5-exp-i64-local-linked-image\\97051a0b4f6b45bc8c0235cee5564238\\image-manifest.json": "bd15b070313a3a8674706cc42940a872237333711c556196d2cd9751aa129e1b",
+    "C:\\Users\\xuzhi\\Documents\\PhiWeather\\artifacts\\test-state\\knc-g5-exp-i64\\a2786f1cb41a4b488951cf0a784c1200\\scientific-source\\artifacts\\test-state\\g5-exp-i64-source\\first-source\\dataset.json": "eb609775fb83ddbacd639e509f26a3239563683d7fe902b6c33a2e4733257549"
+  },
+  "assessmentSourceArtifacts": {
+    "C:\\Users\\xuzhi\\Documents\\PhiWeather\\artifacts\\test-state\\knc-g5-exp-i64\\14d6f43b2fe540ef8e788eb9058c3831\\assessment-source\\G5ExpI64TargetJob.py": "4e8bc77bf080f95541546b87a19fc23dd0496ca2af24684de9a8743007eda71e",
+    "C:\\Users\\xuzhi\\Documents\\PhiWeather\\artifacts\\test-state\\knc-g5-exp-i64\\14d6f43b2fe540ef8e788eb9058c3831\\assessment-source\\G5ExpI64TargetAdmission.py": "e5fc57b6f90bb125e5f294cb6246e633bb8d54570dcf080f24dbd6a5690179dd"
+  },
+  "imageAdmission": {
+    "kind": "G5DpExpExactLinkedImageAdmission",
+    "imageSha256": "0b99683b8282fc010fe7fe9b942678ace3e92f4d1a21a86bea0f49b867aa3646",
+    "imageBytes": 76741,
+    "machine": 181,
+    "elfType": 2,
+    "actualExportSymbol": "_ZGVeN8v_exp",
+    "readonlyPages": [
+      4255744,
+      4259840
+    ],
+    "readonlyStaticObjects": [
+      {
+        "sourceName": "pw_exp_tail_0",
+        "sourceLabel": ".LC4",
+        "address": 4256384,
+        "bytes": 64,
+        "alignment": 64,
+        "sha256": "8739e3039150b19315a292bdcff5325dafe5eac358d933b7abc469eb77498565",
+        "instructionReferences": [
+          4201805
+        ]
+      },
+      {
+        "sourceName": "pw_exp_tail_1",
+        "sourceLabel": ".LC7",
+        "address": 4256512,
+        "bytes": 64,
+        "alignment": 64,
+        "sha256": "70c1c80081bb4cb2857b07adf04dbf47b9ab54aaac893a2adcef1bf7cc472853",
+        "instructionReferences": [
+          4202471
+        ]
+      },
+      {
+        "sourceName": "pw_exp_tail_2",
+        "sourceLabel": ".LC10",
+        "address": 4256640,
+        "bytes": 64,
+        "alignment": 64,
+        "sha256": "09d7783e1f562a1016836b16c40da168fc6b63c61a1336145db33d00b9db3602",
+        "instructionReferences": [
+          4204151
+        ]
+      },
+      {
+        "sourceName": "pw_exp_tail_3",
+        "sourceLabel": ".LC13",
+        "address": 4256768,
+        "bytes": 64,
+        "alignment": 64,
+        "sha256": "67fb08abd643c199cf36c46076ac760f327d6e639b015b38043669f68592caa8",
+        "instructionReferences": [
+          4204893
+        ]
+      },
+      {
+        "sourceName": "pw_exp_tail_4",
+        "sourceLabel": ".LC16",
+        "address": 4256896,
+        "bytes": 64,
+        "alignment": 64,
+        "sha256": "93db1f6b2c7e076f6bd40171d9ca7c6b248e463674b999dc0c657d8f7c422027",
+        "instructionReferences": [
+          4205624
+        ]
+      },
+      {
+        "sourceName": "pw_exp_tail_5",
+        "sourceLabel": ".LC19",
+        "address": 4257024,
+        "bytes": 64,
+        "alignment": 64,
+        "sha256": "3086aa19a03d8efdbc55f27377e39994dec86ba63ad221ff00984eade557b529",
+        "instructionReferences": [
+          4209770
+        ]
+      },
+      {
+        "sourceName": "pw_exp_tail_6",
+        "sourceLabel": ".LC22",
+        "address": 4257152,
+        "bytes": 64,
+        "alignment": 64,
+        "sha256": "439b2c746210fc304468d8cf8593785a502c742f99fd4791b5285d66428bf9a8",
+        "instructionReferences": [
+          4210436
+        ]
+      },
+      {
+        "sourceName": "pw_exp_tail_7",
+        "sourceLabel": ".LC24",
+        "address": 4257280,
+        "bytes": 64,
+        "alignment": 64,
+        "sha256": "5db49a93cd64a30fe484867db4de175892f18853c0af89e3451756ce0309de8b",
+        "instructionReferences": [
+          4211335
+        ]
+      },
+      {
+        "sourceName": "pw_exp_tail_8",
+        "sourceLabel": ".LC27",
+        "address": 4257408,
+        "bytes": 64,
+        "alignment": 64,
+        "sha256": "5fd837eac0b4966f3ae97b7e54bf74df36d3e58b79016dde1ca1a8c4103db058",
+        "instructionReferences": [
+          4213074
+        ]
+      },
+      {
+        "sourceName": "pw_exp_tail_9",
+        "sourceLabel": ".LC30",
+        "address": 4257536,
+        "bytes": 64,
+        "alignment": 64,
+        "sha256": "fb524e5df268a7789a594394a809d8a6e25d633718a650bf8bab115235c58396",
+        "instructionReferences": [
+          4215320
+        ]
+      },
+      {
+        "sourceName": "pw_exp_tail_10",
+        "sourceLabel": ".LC33",
+        "address": 4257664,
+        "bytes": 64,
+        "alignment": 64,
+        "sha256": "1406aa92a9c976042b3777b1ade98c8e8472bf230388bde6601b86c4d2a55d67",
+        "instructionReferences": [
+          4215986
+        ]
+      },
+      {
+        "sourceName": "pw_exp_tail_11",
+        "sourceLabel": ".LC36",
+        "address": 4257792,
+        "bytes": 64,
+        "alignment": 64,
+        "sha256": "e7f378412796364564092b1fdecbb9a85f9f74b5e1f256bb1384768336f59c4d",
+        "instructionReferences": [
+          4216880
+        ]
+      },
+      {
+        "sourceName": "pw_exp_tail_12",
+        "sourceLabel": ".LC39",
+        "address": 4257920,
+        "bytes": 64,
+        "alignment": 64,
+        "sha256": "8fdb16b654dd793c361b79d4a982aedaecc37646a828660defedfb688f9c9288",
+        "instructionReferences": [
+          4218619
+        ]
+      },
+      {
+        "sourceName": "pw_exp_tail_13",
+        "sourceLabel": ".LC42",
+        "address": 4258048,
+        "bytes": 64,
+        "alignment": 64,
+        "sha256": "7b4a8f1c5536a6de54e72bbbc9907ac0b44e74907018843bd3381b7dfd0c9733",
+        "instructionReferences": [
+          4219167
+        ]
+      },
+      {
+        "sourceName": "pw_exp_tail_14",
+        "sourceLabel": ".LC45",
+        "address": 4258176,
+        "bytes": 64,
+        "alignment": 64,
+        "sha256": "ac8a636b2ba4ee3a2adc55ee609e0c0e9671f1e0c4138c520b41624ec8d39d7c",
+        "instructionReferences": [
+          4220340
+        ]
+      },
+      {
+        "sourceName": "pw_exp_tail_15",
+        "sourceLabel": ".LC48",
+        "address": 4258304,
+        "bytes": 64,
+        "alignment": 64,
+        "sha256": "04d3d037572d4c61f7d5433a77407cfbceda04e6da30fa81962db84e4456d2fe",
+        "instructionReferences": [
+          4220869
+        ]
+      },
+      {
+        "sourceName": "pw_exp_scale_0",
+        "sourceLabel": ".LC5",
+        "address": 4256448,
+        "bytes": 64,
+        "alignment": 64,
+        "sha256": "4df4a9d8349912a235f5cdffec3a6e11c8d10bf0f9410c160d6dac60b6bc8644",
+        "instructionReferences": [
+          4202138,
+          4234408,
+          4234668,
+          4234840,
+          4235226,
+          4235401,
+          4235787,
+          4235981,
+          4237481,
+          4239561,
+          4241619,
+          4248381,
+          4248516
+        ]
+      },
+      {
+        "sourceName": "pw_exp_scale_1",
+        "sourceLabel": ".LC8",
+        "address": 4256576,
+        "bytes": 64,
+        "alignment": 64,
+        "sha256": "c89e7bdb78bf27783781cf2375bccdf63c06c4375ca54ea08cf8ed9ba115a6ad",
+        "instructionReferences": [
+          4202804
+        ]
+      },
+      {
+        "sourceName": "pw_exp_scale_2",
+        "sourceLabel": ".LC11",
+        "address": 4256704,
+        "bytes": 64,
+        "alignment": 64,
+        "sha256": "8617a55d20b3caae4b0e2becd013afec74a56c4ee9d73da8902f272cabbd79ca",
+        "instructionReferences": [
+          4204560
+        ]
+      },
+      {
+        "sourceName": "pw_exp_scale_3",
+        "sourceLabel": ".LC14",
+        "address": 4256832,
+        "bytes": 64,
+        "alignment": 64,
+        "sha256": "a3056ac370a66b3ecd1db8d369f533336b39aef8505deb02b805cfb804f91d83",
+        "instructionReferences": [
+          4206190
+        ]
+      },
+      {
+        "sourceName": "pw_exp_scale_4",
+        "sourceLabel": ".LC17",
+        "address": 4256960,
+        "bytes": 64,
+        "alignment": 64,
+        "sha256": "a70d37ee890aea611f63abd024a6b56aa96cf98355553a5cf90c32fbc60b7839",
+        "instructionReferences": [
+          4207537
+        ]
+      },
+      {
+        "sourceName": "pw_exp_scale_5",
+        "sourceLabel": ".LC20",
+        "address": 4257088,
+        "bytes": 64,
+        "alignment": 64,
+        "sha256": "8c15ee10d7af9e974e1bafa8640e92ce34d12cd6f357c917da0d98dbeb80ed55",
+        "instructionReferences": [
+          4207883
+        ]
+      },
+      {
+        "sourceName": "pw_exp_scale_6",
+        "sourceLabel": ".LC23",
+        "address": 4257216,
+        "bytes": 64,
+        "alignment": 64,
+        "sha256": "4b25aa2f847b10b1435ce7df1f198d91a2649629a48428c616a5d1b99b4fc8f9",
+        "instructionReferences": [
+          4209426
+        ]
+      },
+      {
+        "sourceName": "pw_exp_scale_7",
+        "sourceLabel": ".LC25",
+        "address": 4257344,
+        "bytes": 64,
+        "alignment": 64,
+        "sha256": "0cffc670c0485c406c4935de6d443625aa2fde8fd18768d5544d606feff62d74",
+        "instructionReferences": [
+          4210103
+        ]
+      },
+      {
+        "sourceName": "pw_exp_scale_8",
+        "sourceLabel": ".LC28",
+        "address": 4257472,
+        "bytes": 64,
+        "alignment": 64,
+        "sha256": "903eef97983d7c2f708750fca59b6c012c7f3afdc86334811fa3519facfa1610",
+        "instructionReferences": [
+          4210965
+        ]
+      },
+      {
+        "sourceName": "pw_exp_scale_9",
+        "sourceLabel": ".LC31",
+        "address": 4257600,
+        "bytes": 64,
+        "alignment": 64,
+        "sha256": "750ea349cdd96971520feaeaad7ae7c11f88120a20bb9799913182d0848b3c53",
+        "instructionReferences": [
+          4213433
+        ]
+      },
+      {
+        "sourceName": "pw_exp_scale_10",
+        "sourceLabel": ".LC34",
+        "address": 4257728,
+        "bytes": 64,
+        "alignment": 64,
+        "sha256": "74dc84ca4684b9fdb0626b44d475803cc13e372e492ab2ac8294375eee2fe32d",
+        "instructionReferences": [
+          4214976
+        ]
+      },
+      {
+        "sourceName": "pw_exp_scale_11",
+        "sourceLabel": ".LC37",
+        "address": 4257856,
+        "bytes": 64,
+        "alignment": 64,
+        "sha256": "5146bfd464518c087a5f0f6806886fe8f99592c29ec2e216b3f0ba1d37fc4d4a",
+        "instructionReferences": [
+          4215653
+        ]
+      },
+      {
+        "sourceName": "pw_exp_scale_12",
+        "sourceLabel": ".LC40",
+        "address": 4257984,
+        "bytes": 64,
+        "alignment": 64,
+        "sha256": "451ab1de52abe76aa5d7e673cb427cfe6feaa181b7f3c0392b7a0a4579f13241",
+        "instructionReferences": [
+          4216528
+        ]
+      },
+      {
+        "sourceName": "pw_exp_scale_13",
+        "sourceLabel": ".LC43",
+        "address": 4258112,
+        "bytes": 64,
+        "alignment": 64,
+        "sha256": "23a235ea9476015269d12d14f72e44f4d32a59e92bb7a04e72012c199ec5e3a3",
+        "instructionReferences": [
+          4220007
+        ]
+      },
+      {
+        "sourceName": "pw_exp_scale_14",
+        "sourceLabel": ".LC46",
+        "address": 4258240,
+        "bytes": 64,
+        "alignment": 64,
+        "sha256": "b9fc56880a73baf2b42871137dce4c06ee28a2455f38889b216a7b5c484fc23e",
+        "instructionReferences": [
+          4221202
+        ]
+      },
+      {
+        "sourceName": "pw_exp_scale_15",
+        "sourceLabel": ".LC49",
+        "address": 4258368,
+        "bytes": 64,
+        "alignment": 64,
+        "sha256": "49624e1a59d3fae1c560015fdf96a2083da0f7e731d70b707e1f0ebbad4328ad",
+        "instructionReferences": [
+          4221743
+        ]
+      },
+      {
+        "sourceName": ".LC50",
+        "sourceLabel": ".LC50",
+        "address": 4258496,
+        "bytes": 32,
+        "alignment": 32,
+        "sha256": "ff1f6ee5d67458cfac950f62e93042e21fcb867e2234dcc8721801231064ad40",
+        "instructionReferences": [
+          4222216
+        ]
+      },
+      {
+        "sourceName": ".LC56",
+        "sourceLabel": ".LC56",
+        "address": 4258528,
+        "bytes": 8,
+        "alignment": 8,
+        "sha256": "1133bf2cfdce975d5027eb4874ddc887c8de87a2c179c23892be0eb5eea6db9d",
+        "instructionReferences": [
+          4228947,
+          4252372
+        ]
+      },
+      {
+        "sourceName": ".LC59",
+        "sourceLabel": ".LC59",
+        "address": 4258536,
+        "bytes": 8,
+        "alignment": 8,
+        "sha256": "e77817b649821c634355a917817c1224a360514b1244fe09e832bac4e8ea4440",
+        "instructionReferences": [
+          4248841
+        ]
+      },
+      {
+        "sourceName": ".LC60",
+        "sourceLabel": ".LC60",
+        "address": 4258544,
+        "bytes": 8,
+        "alignment": 8,
+        "sha256": "0c52f6bb94d3274750db877dc62419e6279cb01d306327df7901e784d2e89536",
+        "instructionReferences": [
+          4236131,
+          4250434
+        ]
+      },
+      {
+        "sourceName": ".LC62",
+        "sourceLabel": ".LC62",
+        "address": 4258552,
+        "bytes": 8,
+        "alignment": 8,
+        "sha256": "02b0498aedd8632a5306bd251a606639a9c504c3b4b5cfc989f43e082f23a745",
+        "instructionReferences": [
+          4241543
+        ]
+      },
+      {
+        "sourceName": ".LC63",
+        "sourceLabel": ".LC63",
+        "address": 4258560,
+        "bytes": 8,
+        "alignment": 8,
+        "sha256": "998e907bfbb34f71c66b6dc6c40fe98ca6d2d5a29755bc5a04824c36082a61d1",
+        "instructionReferences": [
+          4241572
+        ]
+      },
+      {
+        "sourceName": ".LC67",
+        "sourceLabel": ".LC67",
+        "address": 4258432,
+        "bytes": 64,
+        "alignment": 64,
+        "sha256": "c05438411923c1275c6f24411c9c1fc0ab70fe6e7e9178b34a08b1bd89e028bf",
+        "instructionReferences": [
+          4253631
+        ]
+      },
+      {
+        "sourceName": "arm_math_exp_data",
+        "address": 4258576,
+        "bytes": 2224,
+        "alignment": 16,
+        "sha256": "f578d4c98c4370750caecc2d5f517d96806b706dacc52b3d7645827d5c55c11a",
+        "instructionReferences": [
+          4200032,
+          4200076,
+          4204479,
+          4204517,
+          4222071,
+          4222094,
+          4222132,
+          4222173
+        ]
+      }
+    ],
+    "staticObjectCount": 40,
+    "directCalls": [
+      {
+        "caller": "main",
+        "address": 4196416,
+        "bytes": "e8fbfdffff",
+        "target": 4195904,
+        "callee": "plt:fopen"
+      },
+      {
+        "caller": "main",
+        "address": 4196456,
+        "bytes": "e8c3fdffff",
+        "target": 4195888,
+        "callee": "plt:fread"
+      },
+      {
+        "caller": "main",
+        "address": 4196578,
+        "bytes": "e829fdffff",
+        "target": 4195856,
+        "callee": "plt:memcpy"
+      },
+      {
+        "caller": "main",
+        "address": 4196617,
+        "bytes": "e832fdffff",
+        "target": 4195904,
+        "callee": "plt:fopen"
+      },
+      {
+        "caller": "main",
+        "address": 4196660,
+        "bytes": "e8a7fcffff",
+        "target": 4195808,
+        "callee": "plt:fwrite"
+      },
+      {
+        "caller": "main",
+        "address": 4196713,
+        "bytes": "e8f2fcffff",
+        "target": 4195936,
+        "callee": "plt:memset"
+      },
+      {
+        "caller": "main",
+        "address": 4196738,
+        "bytes": "e8d9fcffff",
+        "target": 4195936,
+        "callee": "plt:memset"
+      },
+      {
+        "caller": "main",
+        "address": 4196763,
+        "bytes": "e8c0fcffff",
+        "target": 4195936,
+        "callee": "plt:memset"
+      },
+      {
+        "caller": "main",
+        "address": 4196796,
+        "bytes": "e86ffcffff",
+        "target": 4195888,
+        "callee": "plt:fread"
+      },
+      {
+        "caller": "main",
+        "address": 4196846,
+        "bytes": "e81dfcffff",
+        "target": 4195856,
+        "callee": "plt:memcpy"
+      },
+      {
+        "caller": "main",
+        "address": 4196875,
+        "bytes": "e850fcffff",
+        "target": 4195936,
+        "callee": "plt:memset"
+      },
+      {
+        "caller": "main",
+        "address": 4196904,
+        "bytes": "e833fcffff",
+        "target": 4195936,
+        "callee": "plt:memset"
+      },
+      {
+        "caller": "main",
+        "address": 4196919,
+        "bytes": "e820020000",
+        "target": 4197468,
+        "callee": "pw_g5_exp_i64_get_profile"
+      },
+      {
+        "caller": "main",
+        "address": 4196971,
+        "bytes": "e8f2010000",
+        "target": 4197474,
+        "callee": "pw_g5_exp_i64_call"
+      },
+      {
+        "caller": "main",
+        "address": 4196994,
+        "bytes": "e8d5010000",
+        "target": 4197468,
+        "callee": "pw_g5_exp_i64_get_profile"
+      },
+      {
+        "caller": "main",
+        "address": 4197056,
+        "bytes": "e80bfbffff",
+        "target": 4195792,
+        "callee": "plt:memcmp"
+      },
+      {
+        "caller": "main",
+        "address": 4197079,
+        "bytes": "e8dcfcffff",
+        "target": 4196280,
+        "callee": "canary"
+      },
+      {
+        "caller": "main",
+        "address": 4197102,
+        "bytes": "e8c5fcffff",
+        "target": 4196280,
+        "callee": "canary"
+      },
+      {
+        "caller": "main",
+        "address": 4197121,
+        "bytes": "e8b2fcffff",
+        "target": 4196280,
+        "callee": "canary"
+      },
+      {
+        "caller": "main",
+        "address": 4197144,
+        "bytes": "e89bfcffff",
+        "target": 4196280,
+        "callee": "canary"
+      },
+      {
+        "caller": "main",
+        "address": 4197163,
+        "bytes": "e888fcffff",
+        "target": 4196280,
+        "callee": "canary"
+      },
+      {
+        "caller": "main",
+        "address": 4197188,
+        "bytes": "e86ffcffff",
+        "target": 4196280,
+        "callee": "canary"
+      },
+      {
+        "caller": "main",
+        "address": 4197235,
+        "bytes": "e868faffff",
+        "target": 4195808,
+        "callee": "plt:fwrite"
+      },
+      {
+        "caller": "main",
+        "address": 4197274,
+        "bytes": "e841faffff",
+        "target": 4195808,
+        "callee": "plt:fwrite"
+      },
+      {
+        "caller": "main",
+        "address": 4197319,
+        "bytes": "e8a4faffff",
+        "target": 4195952,
+        "callee": "plt:fgetc"
+      },
+      {
+        "caller": "main",
+        "address": 4197336,
+        "bytes": "e843faffff",
+        "target": 4195872,
+        "callee": "plt:ferror"
+      },
+      {
+        "caller": "main",
+        "address": 4197352,
+        "bytes": "e8d3f9ffff",
+        "target": 4195776,
+        "callee": "plt:fclose"
+      },
+      {
+        "caller": "main",
+        "address": 4197368,
+        "bytes": "e8c3f9ffff",
+        "target": 4195776,
+        "callee": "plt:fclose"
+      },
+      {
+        "caller": "main",
+        "address": 4197440,
+        "bytes": "e8abf9ffff",
+        "target": 4195824,
+        "callee": "plt:printf"
+      },
+      {
+        "caller": "pw_g5_exp_i64_call",
+        "address": 4197805,
+        "bytes": "e8aee10000",
+        "target": 4255584,
+        "callee": "_ZGVeN8v_exp"
+      },
+      {
+        "caller": "knc_mvec_algorithm_exp_register_e8",
+        "address": 4254878,
+        "bytes": "e8ed21ffff",
+        "target": 4198032,
+        "callee": "pw_core_exp"
+      },
+      {
+        "caller": "_ZGVeN8v_exp",
+        "address": 4255759,
+        "bytes": "e87c1effff",
+        "target": 4198032,
+        "callee": "pw_core_exp"
+      }
+    ],
+    "runtimeClosure": {
+      "libc.so.6": "7ee7ac7da48c6fac7fea1a8dd75c42d3e1a735c0ff5c71cc7578f85691a5e4fc",
+      "ld-linux-k1om.so.2": "2a60a4698794ca42b43dfd0979771e523dbacaae7c44047ba6c7ed98aa211397"
+    },
+    "completeFunctions": {
+      "canary": {
+        "address": 4196280,
+        "bytes": 56,
+        "instructions": 19
+      },
+      "main": {
+        "address": 4196336,
+        "bytes": 1129,
+        "instructions": 273
+      },
+      "pw_g5_exp_i64_get_profile": {
+        "address": 4197468,
+        "bytes": 6,
+        "instructions": 3
+      },
+      "pw_g5_exp_i64_call": {
+        "address": 4197474,
+        "bytes": 554,
+        "instructions": 108
+      },
+      "pw_core_exp": {
+        "address": 4198032,
+        "bytes": 55236,
+        "instructions": 10180
+      },
+      "knc_mvec_algorithm_exp_register_e8": {
+        "address": 4253280,
+        "bytes": 2302,
+        "instructions": 440
+      },
+      "_ZGVeN8v_exp": {
+        "address": 4255584,
+        "bytes": 424,
+        "instructions": 87
+      }
+    },
+    "sourceGatherInstructions": 0,
+    "actualImageGatherInstructions": 0,
+    "productionMxcsrInstructions": 0,
+    "explicitObserverMxcsrInstructions": 6,
+    "targetExecuted": false,
+    "genericIsaQualification": false,
+    "imageManifest": "C:\\Users\\xuzhi\\Documents\\PhiWeather\\artifacts\\test-state\\g5-exp-i64-local-linked-image\\97051a0b4f6b45bc8c0235cee5564238\\image-manifest.json",
+    "imageManifestSha256": "bd15b070313a3a8674706cc42940a872237333711c556196d2cd9751aa129e1b",
+    "datasetManifest": "C:\\Users\\xuzhi\\Documents\\PhiWeather\\artifacts\\test-state\\g5-exp-i64-source\\first-source\\dataset.json",
+    "datasetSha256": "eb609775fb83ddbacd639e509f26a3239563683d7fe902b6c33a2e4733257549",
+    "inputBytes": 11018272,
+    "nativeBytes": 41318432,
+    "vectors": 172160,
+    "lanes": 1377280,
+    "argc": 2,
+    "argv": [
+      "g5-exp-i64-candidate.mic",
+      "exp-input.bin"
+    ],
+    "corpus": "exp-corpus.bin",
+    "fifo": "exp-input.bin",
+    "output": "g5-exp-i64-native.bin",
+    "inputHeader": [
+      1229206855,
+      1,
+      8,
+      8,
+      64,
+      172160,
+      0,
+      0
+    ],
+    "outputHeader": [
+      1313092935,
+      1,
+      8,
+      8,
+      240,
+      172160,
+      0,
+      0
+    ],
+    "numericalAndAbiTargetQualified": false,
+    "nativeRelease": false,
+    "g5Passed": false
+  },
+  "actualRuntime": {
+    "actualImageSha256": "0b99683b8282fc010fe7fe9b942678ace3e92f4d1a21a86bea0f49b867aa3646",
+    "liveExecutableCaptured": true,
+    "actualInputSha256": "e5235226de30941236f24654abda62d438c8df804ad9db1bf1564d192d8beaed",
+    "actualInputBytes": 11018272,
+    "loadedLibraries": {
+      "ld-linux-k1om.so.2": {
+        "alias": "/lib64/ld-2.21.so",
+        "resolved": "/lib64/ld-2.21.so",
+        "sha256": "2a60a4698794ca42b43dfd0979771e523dbacaae7c44047ba6c7ed98aa211397"
+      },
+      "libc.so.6": {
+        "alias": "/lib64/libc-2.21.so",
+        "resolved": "/lib64/libc-2.21.so",
+        "sha256": "7ee7ac7da48c6fac7fea1a8dd75c42d3e1a735c0ff5c71cc7578f85691a5e4fc"
+      }
+    },
+    "readonlyStaticPagesObserved": [
+      4255744,
+      4259840
+    ],
+    "staticObjectCount": 40,
+    "pid": 20548,
+    "maps": "C:\\Users\\xuzhi\\Documents\\PhiWeather\\artifacts\\test-state\\knc-g5-exp-i64\\a2786f1cb41a4b488951cf0a784c1200\\retained\\results\\run\\process.maps",
+    "loaderLog": "C:\\Users\\xuzhi\\Documents\\PhiWeather\\artifacts\\test-state\\knc-g5-exp-i64\\a2786f1cb41a4b488951cf0a784c1200\\retained\\results\\run\\loader-debug.20548",
+    "actualExportSymbol": "_ZGVeN8v_exp",
+    "numericalAndAbiTargetQualified": false,
+    "g5Passed": false
+  },
+  "nativeResult": {
+    "path": "C:\\Users\\xuzhi\\Documents\\PhiWeather\\artifacts\\test-state\\knc-g5-exp-i64\\a2786f1cb41a4b488951cf0a784c1200\\retained\\results\\run\\g5-exp-i64-native.bin",
+    "bytes": 41318432,
+    "sha256": "3456da250af4aefc15dc6d4e2c97bf851730ffce9693e0e47f1e104b5fe05668"
+  },
+  "numericalAssessment": {
+    "kind": "G5ExpI64TargetSourceAssessment",
+    "status": "NumericalAndAbiSampleMatchedAwaitingExecutionBinding",
+    "vectors": 172160,
+    "lanes": 1377280,
+    "profileMismatches": 0,
+    "exceptionVectorMismatches": 0,
+    "abiVectorMismatches": 0,
+    "targetPassLanes": 1377280,
+    "hardCeilingPassLanes": 1377280,
+    "roundedReferenceUlpDistance": {
+      "0": 1106649,
+      "1": 46
+    },
+    "methods": {
+      "cachedNearest": 1106649,
+      "specialOrIdentity": 270585,
+      "retainedWordCertificate": 28,
+      "newTargetedInterval": 18
+    },
+    "maximumConservativeTrueErrorUlps": "479435732760164991727024756785777594619715098794894147166712108978557171659979264504733807402862464808200904718384115329938238308539931303759/948568795032094272909893509191171341133987714380927500611236528192824358010355712000000000000000000000000000000000000000000000000000000000000",
+    "targetUlps": 1,
+    "hardCeilingUlps": 4,
+    "independentNewIntervalInputsEvaluated": 18,
+    "pendingExamples": [],
+    "firstMismatches": [],
+    "actualExecutionAuthenticatedHere": false,
+    "hostKernelExecuted": false,
+    "g5Passed": false,
+    "otherRoundingModesQualified": false,
+    "errnoQualified": false,
+    "trapsQualified": false
+  },
+  "performanceClaim": false
+}

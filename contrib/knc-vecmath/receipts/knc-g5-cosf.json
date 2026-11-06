@@ -1,0 +1,173 @@
+{
+  "schemaVersion": 1,
+  "kind": "G5DpUnaryCosfLimitedRnExportConformance",
+  "export": "_ZGVeN16v_cosf",
+  "exportQualified": true,
+  "qualificationScope": "RN/full-active only",
+  "qualifiedExportCount": 10,
+  "totalExportCount": 36,
+  "g5WholeGatePassed": false,
+  "vectors": 65593,
+  "lanes": 1049488,
+  "cardBootId": "f98cfa74-28e9-49cd-9e0b-8b93af25135f",
+  "result": {
+    "path": "C:\\Users\\xuzhi\\Documents\\PhiWeather\\artifacts\\test-state\\knc-g5-cosf\\86847ed203fa428f957ae8b0e94745e1\\result.json",
+    "sha256": "21a034fc013718048e951ac3e48b894e65979489789b353b44e53efa6c64350f"
+  },
+  "numericalAssessment": {
+    "kind": "LimitedRnUnaryCosfAssayAssessment",
+    "status": "BoundedRnUnaryCosfValueSevereStatusAndAbiMatched",
+    "vectors": 65593,
+    "lanes": 1049488,
+    "profileMismatches": 0,
+    "exceptionVectorMismatches": 0,
+    "abiVectorMismatches": 0,
+    "observedDEVectors": 65537,
+    "observedUEVectors": 0,
+    "observedPEVectors": 65566,
+    "targetPassLanes": 1049488,
+    "hardCeilingPassLanes": 1049488,
+    "observedFlagHistogram": {
+      "34": 65536,
+      "35": 1,
+      "32": 28,
+      "0": 11,
+      "33": 1,
+      "1": 16
+    },
+    "requiredSevereFlagHistogram": {
+      "0": 65575,
+      "1": 18
+    },
+    "methods": {
+      "retainedCertifiedExactWord": 1049230,
+      "nanClassification": 258
+    },
+    "firstMismatches": [],
+    "maximumInheritedTrueErrorUlps": "49999960186250003/100000000000000000",
+    "targetUlps": 1,
+    "hardCeilingUlps": 4,
+    "statusScope": "Exact independent IE; no ZD/OF; UE/PE/DE observed and unqualified",
+    "fullNativeStatusQualified": false,
+    "otherRoundingModesQualified": false,
+    "errnoQualified": false,
+    "trapsQualified": false,
+    "v3ProductionQualified": false,
+    "independentNewIntervalInputsEvaluated": 0,
+    "hostKernelExecuted": false,
+    "g5Passed": false,
+    "actualExecutionAuthenticatedHere": false
+  },
+  "imageAdmission": {
+    "imageSha256": "8d1bf969ffd80c12d2f129ad31aec173e331d085ce2ad37d1a1188e48ccd0857",
+    "imageBytes": 34449,
+    "machine": 181,
+    "elfType": 2,
+    "actualExportSymbol": "_ZGVeN16v_cosf",
+    "runtimeClosure": {
+      "libc.so.6": "7ee7ac7da48c6fac7fea1a8dd75c42d3e1a735c0ff5c71cc7578f85691a5e4fc",
+      "ld-linux-k1om.so.2": "2a60a4698794ca42b43dfd0979771e523dbacaae7c44047ba6c7ed98aa211397"
+    },
+    "staticObjectCount": 8,
+    "readonlyPages": [
+      4210688,
+      4214784
+    ],
+    "numericalAndAbiTargetQualified": false,
+    "nativeRelease": false,
+    "g5Passed": false,
+    "export": "_ZGVeN16v_cosf",
+    "argc": 2,
+    "argv": [
+      "g5-cosf-candidate.mic",
+      "cosf-input.bin"
+    ],
+    "corpus": "cosf-corpus.bin",
+    "fifo": "cosf-input.bin",
+    "output": "g5-cosf-native.bin",
+    "vectors": 65593,
+    "lanes": 1049488,
+    "inputBytes": 4197984,
+    "nativeBytes": 15742352,
+    "inputHeader": [
+      1231238471,
+      1,
+      16,
+      4,
+      64,
+      65593,
+      0,
+      0
+    ],
+    "outputHeader": [
+      1315124551,
+      1,
+      16,
+      4,
+      240,
+      65593,
+      0,
+      0
+    ],
+    "completionMarker": "PW_G5_COSF_RAW_CAPTURED variant=0 vectors=65593 lanes=1049488 bytes=15742352 callerProfileRestored=1 canariesIntact=1\n",
+    "datasetSha256": "dadf8555b5e7ca0f42afa33a19b9b5fe472d8063fe3b850d09d04f242b102da8",
+    "imageManifest": "C:\\Users\\xuzhi\\Documents\\PhiWeather\\artifacts\\test-state\\g5-cosf-local-linked-image\\3022f8b806c142418d8b1a31c64ae94b\\actual-image-bindings-c93cc46ba4994ee9b8c407bbc3ed9258.json",
+    "datasetManifest": "C:\\Users\\xuzhi\\Documents\\PhiWeather\\artifacts\\test-state\\g5-cosf-retained-target-dataset\\836d5ebeb12f4a38acc1c331799366d1\\dataset.json",
+    "assayScope": "RN/full-active value + exact IE/ZD/OF + ABI; UE/PE/DE observed",
+    "wholeG5Qualified": false
+  },
+  "actualRuntime": {
+    "actualImageSha256": "8d1bf969ffd80c12d2f129ad31aec173e331d085ce2ad37d1a1188e48ccd0857",
+    "liveExecutableCaptured": true,
+    "actualInputSha256": "f8699c46ddd13a81a120ef7c05394bdaa92cc16f1b0708309320673097ffcbcd",
+    "actualInputBytes": 4197984,
+    "loadedLibraries": {
+      "ld-linux-k1om.so.2": {
+        "alias": "/lib64/ld-2.21.so",
+        "resolved": "/lib64/ld-2.21.so",
+        "sha256": "2a60a4698794ca42b43dfd0979771e523dbacaae7c44047ba6c7ed98aa211397"
+      },
+      "libc.so.6": {
+        "alias": "/lib64/libc-2.21.so",
+        "resolved": "/lib64/libc-2.21.so",
+        "sha256": "7ee7ac7da48c6fac7fea1a8dd75c42d3e1a735c0ff5c71cc7578f85691a5e4fc"
+      }
+    },
+    "readonlyStaticPagesObserved": [
+      4210688,
+      4214784
+    ],
+    "staticObjectCount": 8,
+    "pid": 48907,
+    "maps": "C:\\Users\\xuzhi\\Documents\\PhiWeather\\artifacts\\test-state\\knc-g5-cosf\\86847ed203fa428f957ae8b0e94745e1\\retained\\results\\run\\process.maps",
+    "loaderLog": "C:\\Users\\xuzhi\\Documents\\PhiWeather\\artifacts\\test-state\\knc-g5-cosf\\86847ed203fa428f957ae8b0e94745e1\\retained\\results\\run\\loader-debug.48907",
+    "actualExportSymbol": "_ZGVeN16v_cosf",
+    "numericalAndAbiTargetQualified": false,
+    "g5Passed": false
+  },
+  "actualChildOwnership": {
+    "parentPid": 48885,
+    "processGroup": 48885,
+    "sleepingBeforeFeed": true
+  },
+  "lifecycle": {
+    "processTerminal": true,
+    "hostRetentionValidated": true,
+    "nativeDirectoryReclaimed": true,
+    "nativeContractChecked": true
+  },
+  "nanPolicy": "Expected NaN requires observed NaN only; sign/quietness/payload/origin ignored",
+  "independentNewIntervalInputsEvaluated": 0,
+  "performanceClaim": false,
+  "ueQualified": false,
+  "peQualified": false,
+  "deQualified": false,
+  "fullNativeStatusQualified": false,
+  "otherRoundingModesQualified": false,
+  "errnoQualified": false,
+  "trapsQualified": false,
+  "v3ProductionQualified": false,
+  "wholeG5Qualified": false,
+  "g5Passed": false,
+  "productionReady": false
+}

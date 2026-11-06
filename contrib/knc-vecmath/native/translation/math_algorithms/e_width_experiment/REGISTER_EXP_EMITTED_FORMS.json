@@ -1,0 +1,1592 @@
+{
+  "kind": "RetainedDP8ExpUnknownSourceInventory",
+  "status": "SourceOnlyNotQualified",
+  "compilerExecuted": false,
+  "translationReplayed": false,
+  "cardContacted": false,
+  "nativeQualified": false,
+  "g5Passed": false,
+  "productionReady": false,
+  "unknownSites": 246,
+  "unknownMnemonics": 35,
+  "distinctUnknownLiterals": 211,
+  "alreadyTranslatedCounts": {
+    "catalog-I-integer-control": 609,
+    "narrow-logical": 13,
+    "typed-memory": 30,
+    "broadcast": 67,
+    "typed-register-copy": 4,
+    "full-zmm-double-subtract": 3,
+    "integer-dword-mask": 1,
+    "full-zmm-double-multiply": 3,
+    "full-zmm-double-add": 7,
+    "scalar-bit-transfer": 26,
+    "packed-register-shift": 1,
+    "register-logical-bitwise": 4,
+    "register-block-transfer": 10,
+    "scalar-memory-address": 34,
+    "scalar-register-compare": 9,
+    "word-mask-boolean": 16,
+    "scalar-packed-sub-mul": 1
+  },
+  "unmappedCounts": {
+    "btrq": 8,
+    "vfmadd132pd": 5,
+    "vpandq": 1,
+    "vpsllq": 1,
+    "vporq": 1,
+    "vpandd": 1,
+    "vpsrld": 1,
+    "vpslld": 1,
+    "vpaddd": 1,
+    "vpcmpd": 15,
+    "vpermd": 32,
+    "vfmadd231pd": 3,
+    "vpternlogd": 14,
+    "vpord": 2,
+    "vfmadd213pd": 2,
+    "vpsrlvd": 10,
+    "vpand": 10,
+    "vpaddq": 5,
+    "vpcmpeqd": 20,
+    "vextracti128": 6,
+    "vpmovsxdq": 20,
+    "vptest": 28,
+    "vpmaskmovq": 20,
+    "vextracti64x4": 7,
+    "vextractf64x4": 3,
+    "vmaskmovpd": 6,
+    "vmulpd": 4,
+    "vmovdqa": 2,
+    "vunpckhpd": 2,
+    "cmova": 5,
+    "vextractf64x2": 1,
+    "valignq": 3,
+    "vextractf128": 1,
+    "vaddpd": 3,
+    "vpblendvb": 2
+  },
+  "inputPins": {
+    "artifacts/test-state/g5-exp-register-emission/677ed99fa8a54090815a91bf1b7fd086/result.json": "4be3147884e7d6fe23003f85e4c2e502be04883380c2aa782df7a2d1f9baacfb",
+    "artifacts/test-state/g5-exp-register-emission/677ed99fa8a54090815a91bf1b7fd086/exp-register.knl.s": "374ab37e8ca38bb9d584970ecdeeac1b9ab62febe72ad14f20cf25268a792010",
+    "artifacts/test-state/g5-exp-register-emission/677ed99fa8a54090815a91bf1b7fd086/translation-report.json": "709ec4f1f60a28ec44af662ae9be4d7c8f7a0c2b7317c5cc3d92f1d31ecc9450",
+    "artifacts/test-state/d3-block-transfer-executor/d527c3e8da0e47c096d283fc30414e2b/candidate.manifest.json": "f9d654128bac0a18e7c3da2a498d244a2128891b7746cc7a3ddf85d27d4a6445",
+    "artifacts/test-state/d3-logical-bitwise-executor/eba5871c60a649ebbcec9c4cf724baaf/candidate.manifest.json": "3d161225aad7a6cfb1de6b89d8e83c8fb14eafb6dad221f5e9e126c29112b167"
+  },
+  "inventoryScriptSha256": "4503048e3054868a15465c32ccaf878843e4293dd5d6115e0319cfd09950abfa",
+  "groups": [
+    {
+      "name": "Scalar integer control",
+      "sites": 13,
+      "proposal": "BTR bit63 and CMOVA need exact scalar register/EFLAGS semantics; do not infer support from the broad integer catalog."
+    },
+    {
+      "name": "DP arithmetic memory and unmeasured FMA tuples",
+      "sites": 17,
+      "proposal": "Reuse register DP arithmetic structure and calibrated binary64 rational lanes; qualify exact tuples,8B broadcast or64B stack staging and declared physical scratch effects."
+    },
+    {
+      "name": "Fixed shard selection and mask plumbing",
+      "sites": 70,
+      "proposal": "Reuse fixed aligned-load/permutation, shifts and raw Boolean structures; new K1-K4 zeroing-permute semantics, equality0,TERNLOG254 truth table and32 readonly bindings require exact qualification."
+    },
+    {
+      "name": "Integer predicate lowering",
+      "sites": 93,
+      "proposal": "Reuse shifts/logical/qword carry structures where applicable; add exact vector equality, signed dword-to-qword extension and VTEST flags semantics."
+    },
+    {
+      "name": "Block and lane transfer",
+      "sites": 23,
+      "proposal": "Reuse measured block recipes for new tuples; unpack-high and ALIGNQ need independent exact lane equations. Preserve upper-zero and scratch effects."
+    },
+    {
+      "name": "Masked qword memory and byte blend",
+      "sites": 28,
+      "proposal": "New sign-bit-selected qword memory must prove suppression and complete effects; byte-sign blend is distinct from the measured dword predicate family."
+    },
+    {
+      "name": "Typed register copy",
+      "sites": 2,
+      "proposal": "Reuse measured low256 copy and upper256-zero structure for these two literal register tuples."
+    }
+  ],
+  "witnesses": [
+    {
+      "line": 22,
+      "source": "btrq $63, %rdx",
+      "mnemonic": "btrq",
+      "group": "Scalar integer control"
+    },
+    {
+      "line": 61,
+      "source": "btrq $63, %r14",
+      "mnemonic": "btrq",
+      "group": "Scalar integer control"
+    },
+    {
+      "line": 107,
+      "source": "btrq $63, %r14",
+      "mnemonic": "btrq",
+      "group": "Scalar integer control"
+    },
+    {
+      "line": 135,
+      "source": "btrq $63, %r14",
+      "mnemonic": "btrq",
+      "group": "Scalar integer control"
+    },
+    {
+      "line": 163,
+      "source": "btrq $63, %r14",
+      "mnemonic": "btrq",
+      "group": "Scalar integer control"
+    },
+    {
+      "line": 191,
+      "source": "btrq $63, %r14",
+      "mnemonic": "btrq",
+      "group": "Scalar integer control"
+    },
+    {
+      "line": 219,
+      "source": "btrq $63, %r14",
+      "mnemonic": "btrq",
+      "group": "Scalar integer control"
+    },
+    {
+      "line": 247,
+      "source": "btrq $63, %rdi",
+      "mnemonic": "btrq",
+      "group": "Scalar integer control"
+    },
+    {
+      "line": 263,
+      "source": "vfmadd132pd arm_math_exp_data(%rip){1to8}, %zmm2, %zmm4",
+      "mnemonic": "vfmadd132pd",
+      "group": "DP arithmetic memory and unmeasured FMA tuples"
+    },
+    {
+      "line": 264,
+      "source": "vpandq %zmm4, %zmm3, %zmm6",
+      "mnemonic": "vpandq",
+      "group": "Fixed shard selection and mask plumbing"
+    },
+    {
+      "line": 265,
+      "source": "vpsllq $32, %zmm6, %zmm7",
+      "mnemonic": "vpsllq",
+      "group": "Fixed shard selection and mask plumbing"
+    },
+    {
+      "line": 267,
+      "source": "vporq %zmm6, %zmm7, %zmm8",
+      "mnemonic": "vporq",
+      "group": "Fixed shard selection and mask plumbing"
+    },
+    {
+      "line": 269,
+      "source": "vpandd %zmm8, %zmm11, %zmm9",
+      "mnemonic": "vpandd",
+      "group": "Fixed shard selection and mask plumbing"
+    },
+    {
+      "line": 272,
+      "source": "vpsrld $3, %zmm8, %zmm13",
+      "mnemonic": "vpsrld",
+      "group": "Fixed shard selection and mask plumbing"
+    },
+    {
+      "line": 273,
+      "source": "vpslld $1, %zmm9, %zmm10",
+      "mnemonic": "vpslld",
+      "group": "Fixed shard selection and mask plumbing"
+    },
+    {
+      "line": 276,
+      "source": "vpaddd .LC4(%rip), %zmm10, %zmm12",
+      "mnemonic": "vpaddd",
+      "group": "Fixed shard selection and mask plumbing"
+    },
+    {
+      "line": 277,
+      "source": "vpcmpd $0, %zmm0, %zmm13, %k2",
+      "mnemonic": "vpcmpd",
+      "group": "Fixed shard selection and mask plumbing"
+    },
+    {
+      "line": 278,
+      "source": "vpcmpd $0, %zmm3, %zmm13, %k3",
+      "mnemonic": "vpcmpd",
+      "group": "Fixed shard selection and mask plumbing"
+    },
+    {
+      "line": 280,
+      "source": "vpermd .LC11(%rip), %zmm12, %zmm7{%k3}{z}",
+      "mnemonic": "vpermd",
+      "group": "Fixed shard selection and mask plumbing"
+    },
+    {
+      "line": 281,
+      "source": "vpermd .LC5(%rip), %zmm12, %zmm14{%k1}{z}",
+      "mnemonic": "vpermd",
+      "group": "Fixed shard selection and mask plumbing"
+    },
+    {
+      "line": 282,
+      "source": "vfmadd231pd arm_math_exp_data+8(%rip){1to8}, %zmm5, %zmm1",
+      "mnemonic": "vfmadd231pd",
+      "group": "DP arithmetic memory and unmeasured FMA tuples"
+    },
+    {
+      "line": 284,
+      "source": "vfmadd132pd arm_math_exp_data+16(%rip){1to8}, %zmm1, %zmm5",
+      "mnemonic": "vfmadd132pd",
+      "group": "DP arithmetic memory and unmeasured FMA tuples"
+    },
+    {
+      "line": 286,
+      "source": "vpermd .LC8(%rip), %zmm12, %zmm1{%k2}{z}",
+      "mnemonic": "vpermd",
+      "group": "Fixed shard selection and mask plumbing"
+    },
+    {
+      "line": 287,
+      "source": "vpternlogd $254, %zmm14, %zmm1, %zmm7",
+      "mnemonic": "vpternlogd",
+      "group": "Fixed shard selection and mask plumbing"
+    },
+    {
+      "line": 292,
+      "source": "vpermd .LC6(%rip), %zmm12, %zmm15{%k1}{z}",
+      "mnemonic": "vpermd",
+      "group": "Fixed shard selection and mask plumbing"
+    },
+    {
+      "line": 293,
+      "source": "vpermd .LC9(%rip), %zmm12, %zmm2{%k2}{z}",
+      "mnemonic": "vpermd",
+      "group": "Fixed shard selection and mask plumbing"
+    },
+    {
+      "line": 294,
+      "source": "vpcmpd $0, %zmm6, %zmm13, %k4",
+      "mnemonic": "vpcmpd",
+      "group": "Fixed shard selection and mask plumbing"
+    },
+    {
+      "line": 295,
+      "source": "vpcmpd $0, %zmm14, %zmm13, %k1",
+      "mnemonic": "vpcmpd",
+      "group": "Fixed shard selection and mask plumbing"
+    },
+    {
+      "line": 296,
+      "source": "vpermd .LC12(%rip), %zmm12, %zmm10{%k3}{z}",
+      "mnemonic": "vpermd",
+      "group": "Fixed shard selection and mask plumbing"
+    },
+    {
+      "line": 299,
+      "source": "vpermd .LC14(%rip), %zmm12, %zmm9{%k4}{z}",
+      "mnemonic": "vpermd",
+      "group": "Fixed shard selection and mask plumbing"
+    },
+    {
+      "line": 300,
+      "source": "vpermd .LC15(%rip), %zmm12, %zmm8{%k4}{z}",
+      "mnemonic": "vpermd",
+      "group": "Fixed shard selection and mask plumbing"
+    },
+    {
+      "line": 301,
+      "source": "vpcmpd $0, %zmm1, %zmm13, %k2",
+      "mnemonic": "vpcmpd",
+      "group": "Fixed shard selection and mask plumbing"
+    },
+    {
+      "line": 302,
+      "source": "vpcmpd $0, %zmm3, %zmm13, %k3",
+      "mnemonic": "vpcmpd",
+      "group": "Fixed shard selection and mask plumbing"
+    },
+    {
+      "line": 303,
+      "source": "vpternlogd $254, %zmm15, %zmm2, %zmm10",
+      "mnemonic": "vpternlogd",
+      "group": "Fixed shard selection and mask plumbing"
+    },
+    {
+      "line": 304,
+      "source": "vpermd .LC18(%rip), %zmm12, %zmm0{%k1}{z}",
+      "mnemonic": "vpermd",
+      "group": "Fixed shard selection and mask plumbing"
+    },
+    {
+      "line": 305,
+      "source": "vpermd .LC17(%rip), %zmm12, %zmm15{%k1}{z}",
+      "mnemonic": "vpermd",
+      "group": "Fixed shard selection and mask plumbing"
+    },
+    {
+      "line": 307,
+      "source": "vpermd .LC20(%rip), %zmm12, %zmm2{%k2}{z}",
+      "mnemonic": "vpermd",
+      "group": "Fixed shard selection and mask plumbing"
+    },
+    {
+      "line": 308,
+      "source": "vpternlogd $254, %zmm7, %zmm9, %zmm15",
+      "mnemonic": "vpternlogd",
+      "group": "Fixed shard selection and mask plumbing"
+    },
+    {
+      "line": 309,
+      "source": "vpternlogd $254, %zmm10, %zmm8, %zmm0",
+      "mnemonic": "vpternlogd",
+      "group": "Fixed shard selection and mask plumbing"
+    },
+    {
+      "line": 310,
+      "source": "vpermd .LC21(%rip), %zmm12, %zmm7{%k2}{z}",
+      "mnemonic": "vpermd",
+      "group": "Fixed shard selection and mask plumbing"
+    },
+    {
+      "line": 311,
+      "source": "vpermd .LC23(%rip), %zmm12, %zmm10{%k3}{z}",
+      "mnemonic": "vpermd",
+      "group": "Fixed shard selection and mask plumbing"
+    },
+    {
+      "line": 312,
+      "source": "vpermd .LC24(%rip), %zmm12, %zmm6{%k3}{z}",
+      "mnemonic": "vpermd",
+      "group": "Fixed shard selection and mask plumbing"
+    },
+    {
+      "line": 316,
+      "source": "vpcmpd $0, %zmm8, %zmm13, %k1",
+      "mnemonic": "vpcmpd",
+      "group": "Fixed shard selection and mask plumbing"
+    },
+    {
+      "line": 317,
+      "source": "vpternlogd $254, %zmm15, %zmm2, %zmm10",
+      "mnemonic": "vpternlogd",
+      "group": "Fixed shard selection and mask plumbing"
+    },
+    {
+      "line": 318,
+      "source": "vpternlogd $254, %zmm0, %zmm7, %zmm6",
+      "mnemonic": "vpternlogd",
+      "group": "Fixed shard selection and mask plumbing"
+    },
+    {
+      "line": 319,
+      "source": "vpcmpd $0, %zmm11, %zmm13, %k4",
+      "mnemonic": "vpcmpd",
+      "group": "Fixed shard selection and mask plumbing"
+    },
+    {
+      "line": 324,
+      "source": "vpermd .LC25(%rip), %zmm12, %zmm11{%k4}{z}",
+      "mnemonic": "vpermd",
+      "group": "Fixed shard selection and mask plumbing"
+    },
+    {
+      "line": 325,
+      "source": "vpcmpd $0, %zmm0, %zmm13, %k2",
+      "mnemonic": "vpcmpd",
+      "group": "Fixed shard selection and mask plumbing"
+    },
+    {
+      "line": 326,
+      "source": "vpcmpd $0, %zmm2, %zmm13, %k3",
+      "mnemonic": "vpcmpd",
+      "group": "Fixed shard selection and mask plumbing"
+    },
+    {
+      "line": 327,
+      "source": "vpermd .LC28(%rip), %zmm12, %zmm14{%k1}{z}",
+      "mnemonic": "vpermd",
+      "group": "Fixed shard selection and mask plumbing"
+    },
+    {
+      "line": 332,
+      "source": "vpermd .LC26(%rip), %zmm12, %zmm9{%k4}{z}",
+      "mnemonic": "vpermd",
+      "group": "Fixed shard selection and mask plumbing"
+    },
+    {
+      "line": 333,
+      "source": "vpternlogd $254, %zmm10, %zmm11, %zmm14",
+      "mnemonic": "vpternlogd",
+      "group": "Fixed shard selection and mask plumbing"
+    },
+    {
+      "line": 334,
+      "source": "vpcmpd $0, %zmm3, %zmm13, %k4",
+      "mnemonic": "vpcmpd",
+      "group": "Fixed shard selection and mask plumbing"
+    },
+    {
+      "line": 335,
+      "source": "vpermd .LC29(%rip), %zmm12, %zmm15{%k1}{z}",
+      "mnemonic": "vpermd",
+      "group": "Fixed shard selection and mask plumbing"
+    },
+    {
+      "line": 336,
+      "source": "vpermd .LC31(%rip), %zmm12, %zmm1{%k2}{z}",
+      "mnemonic": "vpermd",
+      "group": "Fixed shard selection and mask plumbing"
+    },
+    {
+      "line": 337,
+      "source": "vpermd .LC34(%rip), %zmm12, %zmm10{%k3}{z}",
+      "mnemonic": "vpermd",
+      "group": "Fixed shard selection and mask plumbing"
+    },
+    {
+      "line": 338,
+      "source": "vpcmpd $0, %zmm8, %zmm13, %k1",
+      "mnemonic": "vpcmpd",
+      "group": "Fixed shard selection and mask plumbing"
+    },
+    {
+      "line": 342,
+      "source": "vpermd .LC32(%rip), %zmm12, %zmm7{%k2}{z}",
+      "mnemonic": "vpermd",
+      "group": "Fixed shard selection and mask plumbing"
+    },
+    {
+      "line": 343,
+      "source": "vpternlogd $254, %zmm6, %zmm9, %zmm15",
+      "mnemonic": "vpternlogd",
+      "group": "Fixed shard selection and mask plumbing"
+    },
+    {
+      "line": 344,
+      "source": "vpternlogd $254, %zmm14, %zmm1, %zmm10",
+      "mnemonic": "vpternlogd",
+      "group": "Fixed shard selection and mask plumbing"
+    },
+    {
+      "line": 345,
+      "source": "vpermd .LC37(%rip), %zmm12, %zmm6{%k4}{z}",
+      "mnemonic": "vpermd",
+      "group": "Fixed shard selection and mask plumbing"
+    },
+    {
+      "line": 346,
+      "source": "vpermd .LC35(%rip), %zmm12, %zmm11{%k3}{z}",
+      "mnemonic": "vpermd",
+      "group": "Fixed shard selection and mask plumbing"
+    },
+    {
+      "line": 347,
+      "source": "vpcmpd $0, %zmm0, %zmm13, %k2",
+      "mnemonic": "vpcmpd",
+      "group": "Fixed shard selection and mask plumbing"
+    },
+    {
+      "line": 348,
+      "source": "vpcmpd $0, %zmm2, %zmm13, %k3",
+      "mnemonic": "vpcmpd",
+      "group": "Fixed shard selection and mask plumbing"
+    },
+    {
+      "line": 349,
+      "source": "vpermd .LC40(%rip), %zmm12, %zmm14{%k1}{z}",
+      "mnemonic": "vpermd",
+      "group": "Fixed shard selection and mask plumbing"
+    },
+    {
+      "line": 351,
+      "source": "vpermd .LC38(%rip), %zmm12, %zmm9{%k4}{z}",
+      "mnemonic": "vpermd",
+      "group": "Fixed shard selection and mask plumbing"
+    },
+    {
+      "line": 352,
+      "source": "vpternlogd $254, %zmm15, %zmm7, %zmm11",
+      "mnemonic": "vpternlogd",
+      "group": "Fixed shard selection and mask plumbing"
+    },
+    {
+      "line": 353,
+      "source": "vpternlogd $254, %zmm10, %zmm6, %zmm14",
+      "mnemonic": "vpternlogd",
+      "group": "Fixed shard selection and mask plumbing"
+    },
+    {
+      "line": 354,
+      "source": "vpermd .LC41(%rip), %zmm12, %zmm15{%k1}{z}",
+      "mnemonic": "vpermd",
+      "group": "Fixed shard selection and mask plumbing"
+    },
+    {
+      "line": 355,
+      "source": "vpcmpd $0, %zmm3, %zmm13, %k4",
+      "mnemonic": "vpcmpd",
+      "group": "Fixed shard selection and mask plumbing"
+    },
+    {
+      "line": 356,
+      "source": "vpermd .LC43(%rip), %zmm12, %zmm1{%k2}{z}",
+      "mnemonic": "vpermd",
+      "group": "Fixed shard selection and mask plumbing"
+    },
+    {
+      "line": 357,
+      "source": "vpermd .LC46(%rip), %zmm12, %zmm10{%k3}{z}",
+      "mnemonic": "vpermd",
+      "group": "Fixed shard selection and mask plumbing"
+    },
+    {
+      "line": 358,
+      "source": "vpternlogd $254, %zmm11, %zmm9, %zmm15",
+      "mnemonic": "vpternlogd",
+      "group": "Fixed shard selection and mask plumbing"
+    },
+    {
+      "line": 359,
+      "source": "vpternlogd $254, %zmm14, %zmm1, %zmm10",
+      "mnemonic": "vpternlogd",
+      "group": "Fixed shard selection and mask plumbing"
+    },
+    {
+      "line": 360,
+      "source": "vpermd .LC44(%rip), %zmm12, %zmm7{%k2}{z}",
+      "mnemonic": "vpermd",
+      "group": "Fixed shard selection and mask plumbing"
+    },
+    {
+      "line": 362,
+      "source": "vpermd .LC49(%rip), %zmm12, %zmm13{%k4}{z}",
+      "mnemonic": "vpermd",
+      "group": "Fixed shard selection and mask plumbing"
+    },
+    {
+      "line": 363,
+      "source": "vpermd .LC47(%rip), %zmm12, %zmm11{%k3}{z}",
+      "mnemonic": "vpermd",
+      "group": "Fixed shard selection and mask plumbing"
+    },
+    {
+      "line": 364,
+      "source": "vpord %zmm13, %zmm10, %zmm6",
+      "mnemonic": "vpord",
+      "group": "Fixed shard selection and mask plumbing"
+    },
+    {
+      "line": 365,
+      "source": "vpternlogd $254, %zmm15, %zmm7, %zmm11",
+      "mnemonic": "vpternlogd",
+      "group": "Fixed shard selection and mask plumbing"
+    },
+    {
+      "line": 370,
+      "source": "vfmadd213pd arm_math_exp_data+24(%rip){1to8}, %zmm5, %zmm0",
+      "mnemonic": "vfmadd213pd",
+      "group": "DP arithmetic memory and unmeasured FMA tuples"
+    },
+    {
+      "line": 371,
+      "source": "vpermd .LC50(%rip), %zmm12, %zmm9{%k4}{z}",
+      "mnemonic": "vpermd",
+      "group": "Fixed shard selection and mask plumbing"
+    },
+    {
+      "line": 373,
+      "source": "vfmadd213pd arm_math_exp_data+40(%rip){1to8}, %zmm5, %zmm7",
+      "mnemonic": "vfmadd213pd",
+      "group": "DP arithmetic memory and unmeasured FMA tuples"
+    },
+    {
+      "line": 377,
+      "source": "vpord %zmm9, %zmm11, %zmm12",
+      "mnemonic": "vpord",
+      "group": "Fixed shard selection and mask plumbing"
+    },
+    {
+      "line": 379,
+      "source": "vpsrlvd %ymm2, %ymm10, %ymm11",
+      "mnemonic": "vpsrlvd",
+      "group": "Integer predicate lowering"
+    },
+    {
+      "line": 380,
+      "source": "vfmadd231pd %zmm14, %zmm0, %zmm15",
+      "mnemonic": "vfmadd231pd",
+      "group": "DP arithmetic memory and unmeasured FMA tuples"
+    },
+    {
+      "line": 384,
+      "source": "vpand %ymm13, %ymm11, %ymm6",
+      "mnemonic": "vpand",
+      "group": "Integer predicate lowering"
+    },
+    {
+      "line": 386,
+      "source": "vpaddq %zmm12, %zmm4, %zmm8",
+      "mnemonic": "vpaddq",
+      "group": "Integer predicate lowering"
+    },
+    {
+      "line": 388,
+      "source": "vpcmpeqd %ymm9, %ymm6, %ymm4",
+      "mnemonic": "vpcmpeqd",
+      "group": "Integer predicate lowering"
+    },
+    {
+      "line": 389,
+      "source": "vpcmpeqd %ymm9, %ymm4, %ymm12",
+      "mnemonic": "vpcmpeqd",
+      "group": "Integer predicate lowering"
+    },
+    {
+      "line": 390,
+      "source": "vextracti128 $0x1, %ymm12, %xmm0",
+      "mnemonic": "vextracti128",
+      "group": "Block and lane transfer"
+    },
+    {
+      "line": 391,
+      "source": "vpmovsxdq %xmm12, %ymm14",
+      "mnemonic": "vpmovsxdq",
+      "group": "Integer predicate lowering"
+    },
+    {
+      "line": 392,
+      "source": "vptest %ymm14, %ymm14",
+      "mnemonic": "vptest",
+      "group": "Integer predicate lowering"
+    },
+    {
+      "line": 393,
+      "source": "vfmadd231pd %zmm7, %zmm1, %zmm15",
+      "mnemonic": "vfmadd231pd",
+      "group": "DP arithmetic memory and unmeasured FMA tuples"
+    },
+    {
+      "line": 394,
+      "source": "vpmovsxdq %xmm0, %ymm1",
+      "mnemonic": "vpmovsxdq",
+      "group": "Integer predicate lowering"
+    },
+    {
+      "line": 399,
+      "source": "vpmaskmovq %ymm5, %ymm14, 64(%rsp)",
+      "mnemonic": "vpmaskmovq",
+      "group": "Masked qword memory and byte blend"
+    },
+    {
+      "line": 401,
+      "source": "vptest %ymm1, %ymm1",
+      "mnemonic": "vptest",
+      "group": "Integer predicate lowering"
+    },
+    {
+      "line": 406,
+      "source": "vpmaskmovq %ymm11, %ymm1, 96(%rsp)",
+      "mnemonic": "vpmaskmovq",
+      "group": "Masked qword memory and byte blend"
+    },
+    {
+      "line": 410,
+      "source": "vfmadd132pd %zmm15, %zmm3, %zmm3",
+      "mnemonic": "vfmadd132pd",
+      "group": "DP arithmetic memory and unmeasured FMA tuples"
+    },
+    {
+      "line": 415,
+      "source": "vpsrlvd %ymm2, %ymm4, %ymm12",
+      "mnemonic": "vpsrlvd",
+      "group": "Integer predicate lowering"
+    },
+    {
+      "line": 420,
+      "source": "vpand %ymm0, %ymm12, %ymm1",
+      "mnemonic": "vpand",
+      "group": "Integer predicate lowering"
+    },
+    {
+      "line": 424,
+      "source": "vpcmpeqd %ymm7, %ymm1, %ymm5",
+      "mnemonic": "vpcmpeqd",
+      "group": "Integer predicate lowering"
+    },
+    {
+      "line": 427,
+      "source": "vpcmpeqd %ymm7, %ymm5, %ymm10",
+      "mnemonic": "vpcmpeqd",
+      "group": "Integer predicate lowering"
+    },
+    {
+      "line": 429,
+      "source": "vpmovsxdq %xmm10, %ymm12",
+      "mnemonic": "vpmovsxdq",
+      "group": "Integer predicate lowering"
+    },
+    {
+      "line": 432,
+      "source": "vextracti64x4 $0x1, %zmm8, %ymm6",
+      "mnemonic": "vextracti64x4",
+      "group": "Block and lane transfer"
+    },
+    {
+      "line": 433,
+      "source": "vpaddq %ymm13, %ymm8, %ymm9",
+      "mnemonic": "vpaddq",
+      "group": "Integer predicate lowering"
+    },
+    {
+      "line": 434,
+      "source": "vextracti128 $0x1, %ymm10, %xmm14",
+      "mnemonic": "vextracti128",
+      "group": "Block and lane transfer"
+    },
+    {
+      "line": 435,
+      "source": "vpaddq %ymm13, %ymm6, %ymm4",
+      "mnemonic": "vpaddq",
+      "group": "Integer predicate lowering"
+    },
+    {
+      "line": 436,
+      "source": "vptest %ymm12, %ymm12",
+      "mnemonic": "vptest",
+      "group": "Integer predicate lowering"
+    },
+    {
+      "line": 437,
+      "source": "vpmovsxdq %xmm14, %ymm0",
+      "mnemonic": "vpmovsxdq",
+      "group": "Integer predicate lowering"
+    },
+    {
+      "line": 439,
+      "source": "vpmaskmovq %ymm9, %ymm12, 192(%rsp)",
+      "mnemonic": "vpmaskmovq",
+      "group": "Masked qword memory and byte blend"
+    },
+    {
+      "line": 441,
+      "source": "vptest %ymm0, %ymm0",
+      "mnemonic": "vptest",
+      "group": "Integer predicate lowering"
+    },
+    {
+      "line": 443,
+      "source": "vpmaskmovq %ymm4, %ymm0, 224(%rsp)",
+      "mnemonic": "vpmaskmovq",
+      "group": "Masked qword memory and byte blend"
+    },
+    {
+      "line": 445,
+      "source": "vptest %ymm12, %ymm12",
+      "mnemonic": "vptest",
+      "group": "Integer predicate lowering"
+    },
+    {
+      "line": 446,
+      "source": "vextractf64x4 $0x1, %zmm15, %ymm7",
+      "mnemonic": "vextractf64x4",
+      "group": "Block and lane transfer"
+    },
+    {
+      "line": 448,
+      "source": "vmaskmovpd %ymm15, %ymm12, 256(%rsp)",
+      "mnemonic": "vmaskmovpd",
+      "group": "Masked qword memory and byte blend"
+    },
+    {
+      "line": 450,
+      "source": "vptest %ymm0, %ymm0",
+      "mnemonic": "vptest",
+      "group": "Integer predicate lowering"
+    },
+    {
+      "line": 452,
+      "source": "vmaskmovpd %ymm7, %ymm0, 288(%rsp)",
+      "mnemonic": "vmaskmovpd",
+      "group": "Masked qword memory and byte blend"
+    },
+    {
+      "line": 454,
+      "source": "vfmadd132pd 256(%rsp), %zmm5, %zmm5",
+      "mnemonic": "vfmadd132pd",
+      "group": "DP arithmetic memory and unmeasured FMA tuples"
+    },
+    {
+      "line": 455,
+      "source": "vmulpd .LC57(%rip){1to8}, %zmm5, %zmm10",
+      "mnemonic": "vmulpd",
+      "group": "DP arithmetic memory and unmeasured FMA tuples"
+    },
+    {
+      "line": 456,
+      "source": "vptest %ymm12, %ymm12",
+      "mnemonic": "vptest",
+      "group": "Integer predicate lowering"
+    },
+    {
+      "line": 457,
+      "source": "vextracti64x4 $0x1, %zmm10, %ymm9",
+      "mnemonic": "vextracti64x4",
+      "group": "Block and lane transfer"
+    },
+    {
+      "line": 458,
+      "source": "vmovdqa %ymm10, %ymm13",
+      "mnemonic": "vmovdqa",
+      "group": "Typed register copy"
+    },
+    {
+      "line": 461,
+      "source": "vptest %ymm0, %ymm0",
+      "mnemonic": "vptest",
+      "group": "Integer predicate lowering"
+    },
+    {
+      "line": 463,
+      "source": "vpmaskmovq %ymm13, %ymm12, (%rsi)",
+      "mnemonic": "vpmaskmovq",
+      "group": "Masked qword memory and byte blend"
+    },
+    {
+      "line": 466,
+      "source": "vpmaskmovq %ymm9, %ymm0, (%r14)",
+      "mnemonic": "vpmaskmovq",
+      "group": "Masked qword memory and byte blend"
+    },
+    {
+      "line": 472,
+      "source": "vpsrlvd %ymm2, %ymm14, %ymm0",
+      "mnemonic": "vpsrlvd",
+      "group": "Integer predicate lowering"
+    },
+    {
+      "line": 478,
+      "source": "vpand %ymm7, %ymm0, %ymm5",
+      "mnemonic": "vpand",
+      "group": "Integer predicate lowering"
+    },
+    {
+      "line": 479,
+      "source": "vpcmpeqd %ymm10, %ymm5, %ymm11",
+      "mnemonic": "vpcmpeqd",
+      "group": "Integer predicate lowering"
+    },
+    {
+      "line": 481,
+      "source": "vpcmpeqd %ymm10, %ymm11, %ymm13",
+      "mnemonic": "vpcmpeqd",
+      "group": "Integer predicate lowering"
+    },
+    {
+      "line": 484,
+      "source": "vpmovsxdq %xmm13, %ymm14",
+      "mnemonic": "vpmovsxdq",
+      "group": "Integer predicate lowering"
+    },
+    {
+      "line": 488,
+      "source": "vpaddq %ymm6, %ymm8, %ymm12",
+      "mnemonic": "vpaddq",
+      "group": "Integer predicate lowering"
+    },
+    {
+      "line": 489,
+      "source": "vextracti128 $0x1, %ymm13, %xmm0",
+      "mnemonic": "vextracti128",
+      "group": "Block and lane transfer"
+    },
+    {
+      "line": 491,
+      "source": "vpmovsxdq %xmm0, %ymm10",
+      "mnemonic": "vpmovsxdq",
+      "group": "Integer predicate lowering"
+    },
+    {
+      "line": 492,
+      "source": "vptest %ymm14, %ymm14",
+      "mnemonic": "vptest",
+      "group": "Integer predicate lowering"
+    },
+    {
+      "line": 494,
+      "source": "vpaddq %ymm6, %ymm8, %ymm4",
+      "mnemonic": "vpaddq",
+      "group": "Integer predicate lowering"
+    },
+    {
+      "line": 496,
+      "source": "vpmaskmovq %ymm12, %ymm14, 128(%rsp)",
+      "mnemonic": "vpmaskmovq",
+      "group": "Masked qword memory and byte blend"
+    },
+    {
+      "line": 498,
+      "source": "vptest %ymm10, %ymm10",
+      "mnemonic": "vptest",
+      "group": "Integer predicate lowering"
+    },
+    {
+      "line": 500,
+      "source": "vptest %ymm14, %ymm14",
+      "mnemonic": "vptest",
+      "group": "Integer predicate lowering"
+    },
+    {
+      "line": 502,
+      "source": "vpmaskmovq %ymm4, %ymm10, 160(%rsp)",
+      "mnemonic": "vpmaskmovq",
+      "group": "Masked qword memory and byte blend"
+    },
+    {
+      "line": 506,
+      "source": "vptest %ymm10, %ymm10",
+      "mnemonic": "vptest",
+      "group": "Integer predicate lowering"
+    },
+    {
+      "line": 507,
+      "source": "vmaskmovpd %ymm7, %ymm14, 192(%rsp)",
+      "mnemonic": "vmaskmovpd",
+      "group": "Masked qword memory and byte blend"
+    },
+    {
+      "line": 510,
+      "source": "vmaskmovpd %ymm15, %ymm10, 224(%rsp)",
+      "mnemonic": "vmaskmovpd",
+      "group": "Masked qword memory and byte blend"
+    },
+    {
+      "line": 514,
+      "source": "vmulpd 192(%rsp), %zmm11, %zmm13",
+      "mnemonic": "vmulpd",
+      "group": "DP arithmetic memory and unmeasured FMA tuples"
+    },
+    {
+      "line": 526,
+      "source": "vunpckhpd %xmm1, %xmm1, %xmm6",
+      "mnemonic": "vunpckhpd",
+      "group": "Block and lane transfer"
+    },
+    {
+      "line": 531,
+      "source": "cmova %r14d, %eax",
+      "mnemonic": "cmova",
+      "group": "Scalar integer control"
+    },
+    {
+      "line": 535,
+      "source": "vextractf64x2 $1, %ymm1, %xmm8",
+      "mnemonic": "vextractf64x2",
+      "group": "Block and lane transfer"
+    },
+    {
+      "line": 540,
+      "source": "cmova %edi, %eax",
+      "mnemonic": "cmova",
+      "group": "Scalar integer control"
+    },
+    {
+      "line": 544,
+      "source": "valignq $3, %zmm1, %zmm1, %zmm0",
+      "mnemonic": "valignq",
+      "group": "Block and lane transfer"
+    },
+    {
+      "line": 549,
+      "source": "cmova %r15d, %eax",
+      "mnemonic": "cmova",
+      "group": "Scalar integer control"
+    },
+    {
+      "line": 558,
+      "source": "cmova %r9d, %eax",
+      "mnemonic": "cmova",
+      "group": "Scalar integer control"
+    },
+    {
+      "line": 562,
+      "source": "valignq $5, %zmm1, %zmm1, %zmm9",
+      "mnemonic": "valignq",
+      "group": "Block and lane transfer"
+    },
+    {
+      "line": 567,
+      "source": "cmova %r14d, %eax",
+      "mnemonic": "cmova",
+      "group": "Scalar integer control"
+    },
+    {
+      "line": 571,
+      "source": "vextractf64x4 $0x1, %zmm1, %ymm6",
+      "mnemonic": "vextractf64x4",
+      "group": "Block and lane transfer"
+    },
+    {
+      "line": 572,
+      "source": "vextractf128 $0x1, %ymm6, %xmm12",
+      "mnemonic": "vextractf128",
+      "group": "Block and lane transfer"
+    },
+    {
+      "line": 583,
+      "source": "vmulpd .LC61(%rip){1to8}, %zmm1, %zmm13",
+      "mnemonic": "vmulpd",
+      "group": "DP arithmetic memory and unmeasured FMA tuples"
+    },
+    {
+      "line": 584,
+      "source": "vptest %ymm14, %ymm14",
+      "mnemonic": "vptest",
+      "group": "Integer predicate lowering"
+    },
+    {
+      "line": 585,
+      "source": "vextracti64x4 $0x1, %zmm13, %ymm9",
+      "mnemonic": "vextracti64x4",
+      "group": "Block and lane transfer"
+    },
+    {
+      "line": 587,
+      "source": "vpmaskmovq %ymm13, %ymm14, (%rsi)",
+      "mnemonic": "vpmaskmovq",
+      "group": "Masked qword memory and byte blend"
+    },
+    {
+      "line": 589,
+      "source": "vptest %ymm10, %ymm10",
+      "mnemonic": "vptest",
+      "group": "Integer predicate lowering"
+    },
+    {
+      "line": 591,
+      "source": "vpmaskmovq %ymm9, %ymm10, 32(%rsi)",
+      "mnemonic": "vpmaskmovq",
+      "group": "Masked qword memory and byte blend"
+    },
+    {
+      "line": 597,
+      "source": "vpsrlvd %ymm2, %ymm6, %ymm12",
+      "mnemonic": "vpsrlvd",
+      "group": "Integer predicate lowering"
+    },
+    {
+      "line": 603,
+      "source": "vaddpd 384(%rsp), %zmm14, %zmm10",
+      "mnemonic": "vaddpd",
+      "group": "DP arithmetic memory and unmeasured FMA tuples"
+    },
+    {
+      "line": 605,
+      "source": "vpcmpeqd %ymm7, %ymm0, %ymm15",
+      "mnemonic": "vpcmpeqd",
+      "group": "Integer predicate lowering"
+    },
+    {
+      "line": 606,
+      "source": "vextracti64x4 $0x1, %zmm10, %ymm1",
+      "mnemonic": "vextracti64x4",
+      "group": "Block and lane transfer"
+    },
+    {
+      "line": 607,
+      "source": "vpcmpeqd %ymm7, %ymm15, %ymm11",
+      "mnemonic": "vpcmpeqd",
+      "group": "Integer predicate lowering"
+    },
+    {
+      "line": 609,
+      "source": "vpmovsxdq %xmm11, %ymm5",
+      "mnemonic": "vpmovsxdq",
+      "group": "Integer predicate lowering"
+    },
+    {
+      "line": 610,
+      "source": "vptest %ymm5, %ymm5",
+      "mnemonic": "vptest",
+      "group": "Integer predicate lowering"
+    },
+    {
+      "line": 611,
+      "source": "vpmovsxdq %xmm9, %ymm14",
+      "mnemonic": "vpmovsxdq",
+      "group": "Integer predicate lowering"
+    },
+    {
+      "line": 613,
+      "source": "vpmaskmovq %ymm10, %ymm5, (%rsi)",
+      "mnemonic": "vpmaskmovq",
+      "group": "Masked qword memory and byte blend"
+    },
+    {
+      "line": 615,
+      "source": "vptest %ymm14, %ymm14",
+      "mnemonic": "vptest",
+      "group": "Integer predicate lowering"
+    },
+    {
+      "line": 617,
+      "source": "vpmaskmovq %ymm1, %ymm14, 32(%rsi)",
+      "mnemonic": "vpmaskmovq",
+      "group": "Masked qword memory and byte blend"
+    },
+    {
+      "line": 623,
+      "source": "vpsrlvd %ymm2, %ymm12, %ymm8",
+      "mnemonic": "vpsrlvd",
+      "group": "Integer predicate lowering"
+    },
+    {
+      "line": 629,
+      "source": "vaddpd 448(%rsp), %zmm10, %zmm6",
+      "mnemonic": "vaddpd",
+      "group": "DP arithmetic memory and unmeasured FMA tuples"
+    },
+    {
+      "line": 630,
+      "source": "vpand %ymm0, %ymm8, %ymm7",
+      "mnemonic": "vpand",
+      "group": "Integer predicate lowering"
+    },
+    {
+      "line": 631,
+      "source": "vpcmpeqd %ymm15, %ymm7, %ymm11",
+      "mnemonic": "vpcmpeqd",
+      "group": "Integer predicate lowering"
+    },
+    {
+      "line": 632,
+      "source": "vextracti64x4 $0x1, %zmm6, %ymm1",
+      "mnemonic": "vextracti64x4",
+      "group": "Block and lane transfer"
+    },
+    {
+      "line": 633,
+      "source": "vpcmpeqd %ymm15, %ymm11, %ymm13",
+      "mnemonic": "vpcmpeqd",
+      "group": "Integer predicate lowering"
+    },
+    {
+      "line": 635,
+      "source": "vpmovsxdq %xmm13, %ymm9",
+      "mnemonic": "vpmovsxdq",
+      "group": "Integer predicate lowering"
+    },
+    {
+      "line": 636,
+      "source": "vptest %ymm9, %ymm9",
+      "mnemonic": "vptest",
+      "group": "Integer predicate lowering"
+    },
+    {
+      "line": 637,
+      "source": "vpmovsxdq %xmm14, %ymm10",
+      "mnemonic": "vpmovsxdq",
+      "group": "Integer predicate lowering"
+    },
+    {
+      "line": 639,
+      "source": "vpmaskmovq %ymm6, %ymm9, (%rsi)",
+      "mnemonic": "vpmaskmovq",
+      "group": "Masked qword memory and byte blend"
+    },
+    {
+      "line": 641,
+      "source": "vptest %ymm10, %ymm10",
+      "mnemonic": "vptest",
+      "group": "Integer predicate lowering"
+    },
+    {
+      "line": 643,
+      "source": "vpmaskmovq %ymm1, %ymm10, 32(%rsi)",
+      "mnemonic": "vpmaskmovq",
+      "group": "Masked qword memory and byte blend"
+    },
+    {
+      "line": 767,
+      "source": "vpsrlvd %ymm2, %ymm7, %ymm15",
+      "mnemonic": "vpsrlvd",
+      "group": "Integer predicate lowering"
+    },
+    {
+      "line": 773,
+      "source": "vpand %ymm13, %ymm15, %ymm5",
+      "mnemonic": "vpand",
+      "group": "Integer predicate lowering"
+    },
+    {
+      "line": 774,
+      "source": "vpcmpeqd %ymm9, %ymm5, %ymm1",
+      "mnemonic": "vpcmpeqd",
+      "group": "Integer predicate lowering"
+    },
+    {
+      "line": 775,
+      "source": "vpcmpeqd %ymm9, %ymm1, %ymm14",
+      "mnemonic": "vpcmpeqd",
+      "group": "Integer predicate lowering"
+    },
+    {
+      "line": 777,
+      "source": "vpmovsxdq %xmm14, %ymm3",
+      "mnemonic": "vpmovsxdq",
+      "group": "Integer predicate lowering"
+    },
+    {
+      "line": 778,
+      "source": "vptest %ymm3, %ymm3",
+      "mnemonic": "vptest",
+      "group": "Integer predicate lowering"
+    },
+    {
+      "line": 779,
+      "source": "vpmovsxdq %xmm8, %ymm4",
+      "mnemonic": "vpmovsxdq",
+      "group": "Integer predicate lowering"
+    },
+    {
+      "line": 780,
+      "source": "vextracti64x4 $0x1, %zmm12, %ymm6",
+      "mnemonic": "vextracti64x4",
+      "group": "Block and lane transfer"
+    },
+    {
+      "line": 782,
+      "source": "vpmaskmovq %ymm12, %ymm3, (%rsi)",
+      "mnemonic": "vpmaskmovq",
+      "group": "Masked qword memory and byte blend"
+    },
+    {
+      "line": 784,
+      "source": "vptest %ymm4, %ymm4",
+      "mnemonic": "vptest",
+      "group": "Integer predicate lowering"
+    },
+    {
+      "line": 786,
+      "source": "vpmaskmovq %ymm6, %ymm4, 32(%rsi)",
+      "mnemonic": "vpmaskmovq",
+      "group": "Masked qword memory and byte blend"
+    },
+    {
+      "line": 792,
+      "source": "vpsrlvd %ymm2, %ymm15, %ymm11",
+      "mnemonic": "vpsrlvd",
+      "group": "Integer predicate lowering"
+    },
+    {
+      "line": 797,
+      "source": "vpand %ymm5, %ymm11, %ymm9",
+      "mnemonic": "vpand",
+      "group": "Integer predicate lowering"
+    },
+    {
+      "line": 798,
+      "source": "vpcmpeqd %ymm14, %ymm9, %ymm1",
+      "mnemonic": "vpcmpeqd",
+      "group": "Integer predicate lowering"
+    },
+    {
+      "line": 799,
+      "source": "vpcmpeqd %ymm14, %ymm1, %ymm10",
+      "mnemonic": "vpcmpeqd",
+      "group": "Integer predicate lowering"
+    },
+    {
+      "line": 800,
+      "source": "vextracti128 $0x1, %ymm10, %xmm3",
+      "mnemonic": "vextracti128",
+      "group": "Block and lane transfer"
+    },
+    {
+      "line": 801,
+      "source": "vpmovsxdq %xmm10, %ymm6",
+      "mnemonic": "vpmovsxdq",
+      "group": "Integer predicate lowering"
+    },
+    {
+      "line": 802,
+      "source": "vptest %ymm6, %ymm6",
+      "mnemonic": "vptest",
+      "group": "Integer predicate lowering"
+    },
+    {
+      "line": 803,
+      "source": "vpmovsxdq %xmm3, %ymm8",
+      "mnemonic": "vpmovsxdq",
+      "group": "Integer predicate lowering"
+    },
+    {
+      "line": 808,
+      "source": "vpmaskmovq %ymm12, %ymm6, (%rsi)",
+      "mnemonic": "vpmaskmovq",
+      "group": "Masked qword memory and byte blend"
+    },
+    {
+      "line": 810,
+      "source": "vptest %ymm8, %ymm8",
+      "mnemonic": "vptest",
+      "group": "Integer predicate lowering"
+    },
+    {
+      "line": 815,
+      "source": "vpmaskmovq %ymm15, %ymm8, 32(%rsi)",
+      "mnemonic": "vpmaskmovq",
+      "group": "Masked qword memory and byte blend"
+    },
+    {
+      "line": 817,
+      "source": "vpsrlvd %ymm2, %ymm0, %ymm2",
+      "mnemonic": "vpsrlvd",
+      "group": "Integer predicate lowering"
+    },
+    {
+      "line": 822,
+      "source": "vpand %ymm11, %ymm2, %ymm13",
+      "mnemonic": "vpand",
+      "group": "Integer predicate lowering"
+    },
+    {
+      "line": 823,
+      "source": "vpcmpeqd %ymm5, %ymm13, %ymm9",
+      "mnemonic": "vpcmpeqd",
+      "group": "Integer predicate lowering"
+    },
+    {
+      "line": 824,
+      "source": "vpcmpeqd %ymm5, %ymm9, %ymm14",
+      "mnemonic": "vpcmpeqd",
+      "group": "Integer predicate lowering"
+    },
+    {
+      "line": 825,
+      "source": "vextracti128 $0x1, %ymm14, %xmm10",
+      "mnemonic": "vextracti128",
+      "group": "Block and lane transfer"
+    },
+    {
+      "line": 826,
+      "source": "vpmovsxdq %xmm14, %ymm1",
+      "mnemonic": "vpmovsxdq",
+      "group": "Integer predicate lowering"
+    },
+    {
+      "line": 827,
+      "source": "vptest %ymm1, %ymm1",
+      "mnemonic": "vptest",
+      "group": "Integer predicate lowering"
+    },
+    {
+      "line": 828,
+      "source": "vpmovsxdq %xmm10, %ymm6",
+      "mnemonic": "vpmovsxdq",
+      "group": "Integer predicate lowering"
+    },
+    {
+      "line": 831,
+      "source": "vpmaskmovq %ymm3, %ymm1, (%rsi)",
+      "mnemonic": "vpmaskmovq",
+      "group": "Masked qword memory and byte blend"
+    },
+    {
+      "line": 833,
+      "source": "vptest %ymm6, %ymm6",
+      "mnemonic": "vptest",
+      "group": "Integer predicate lowering"
+    },
+    {
+      "line": 836,
+      "source": "vpmaskmovq %ymm8, %ymm6, 32(%rsi)",
+      "mnemonic": "vpmaskmovq",
+      "group": "Masked qword memory and byte blend"
+    },
+    {
+      "line": 859,
+      "source": "valignq $7, %zmm1, %zmm1, %zmm0",
+      "mnemonic": "valignq",
+      "group": "Block and lane transfer"
+    },
+    {
+      "line": 875,
+      "source": "vpsrlvd %ymm2, %ymm0, %ymm7",
+      "mnemonic": "vpsrlvd",
+      "group": "Integer predicate lowering"
+    },
+    {
+      "line": 879,
+      "source": "vpand %ymm11, %ymm7, %ymm13",
+      "mnemonic": "vpand",
+      "group": "Integer predicate lowering"
+    },
+    {
+      "line": 881,
+      "source": "vpcmpeqd %ymm5, %ymm13, %ymm9",
+      "mnemonic": "vpcmpeqd",
+      "group": "Integer predicate lowering"
+    },
+    {
+      "line": 882,
+      "source": "vpcmpeqd %ymm5, %ymm9, %ymm3",
+      "mnemonic": "vpcmpeqd",
+      "group": "Integer predicate lowering"
+    },
+    {
+      "line": 883,
+      "source": "vextracti128 $0x1, %ymm3, %xmm1",
+      "mnemonic": "vextracti128",
+      "group": "Block and lane transfer"
+    },
+    {
+      "line": 884,
+      "source": "vaddpd .LC60(%rip){1to8}, %zmm12, %zmm8",
+      "mnemonic": "vaddpd",
+      "group": "DP arithmetic memory and unmeasured FMA tuples"
+    },
+    {
+      "line": 885,
+      "source": "vpmovsxdq %xmm1, %ymm4",
+      "mnemonic": "vpmovsxdq",
+      "group": "Integer predicate lowering"
+    },
+    {
+      "line": 886,
+      "source": "vextractf64x4 $0x1, %zmm8, %ymm12",
+      "mnemonic": "vextractf64x4",
+      "group": "Block and lane transfer"
+    },
+    {
+      "line": 888,
+      "source": "vpmovsxdq %xmm3, %ymm8",
+      "mnemonic": "vpmovsxdq",
+      "group": "Integer predicate lowering"
+    },
+    {
+      "line": 889,
+      "source": "vptest %ymm8, %ymm8",
+      "mnemonic": "vptest",
+      "group": "Integer predicate lowering"
+    },
+    {
+      "line": 891,
+      "source": "vmaskmovpd %ymm6, %ymm8, 256(%rsp)",
+      "mnemonic": "vmaskmovpd",
+      "group": "Masked qword memory and byte blend"
+    },
+    {
+      "line": 893,
+      "source": "vptest %ymm4, %ymm4",
+      "mnemonic": "vptest",
+      "group": "Integer predicate lowering"
+    },
+    {
+      "line": 895,
+      "source": "vmaskmovpd %ymm12, %ymm4, 288(%rsp)",
+      "mnemonic": "vmaskmovpd",
+      "group": "Masked qword memory and byte blend"
+    },
+    {
+      "line": 1064,
+      "source": "vunpckhpd %xmm12, %xmm12, %xmm15",
+      "mnemonic": "vunpckhpd",
+      "group": "Block and lane transfer"
+    },
+    {
+      "line": 1129,
+      "source": "vfmadd132pd 256(%rsp), %zmm11, %zmm11",
+      "mnemonic": "vfmadd132pd",
+      "group": "DP arithmetic memory and unmeasured FMA tuples"
+    },
+    {
+      "line": 1130,
+      "source": "vmulpd .LC57(%rip){1to8}, %zmm11, %zmm3",
+      "mnemonic": "vmulpd",
+      "group": "DP arithmetic memory and unmeasured FMA tuples"
+    },
+    {
+      "line": 1131,
+      "source": "vptest %ymm12, %ymm12",
+      "mnemonic": "vptest",
+      "group": "Integer predicate lowering"
+    },
+    {
+      "line": 1132,
+      "source": "vextracti64x4 $0x1, %zmm3, %ymm9",
+      "mnemonic": "vextracti64x4",
+      "group": "Block and lane transfer"
+    },
+    {
+      "line": 1133,
+      "source": "vmovdqa %ymm3, %ymm13",
+      "mnemonic": "vmovdqa",
+      "group": "Typed register copy"
+    },
+    {
+      "line": 1139,
+      "source": "vptest %ymm14, %ymm14",
+      "mnemonic": "vptest",
+      "group": "Integer predicate lowering"
+    },
+    {
+      "line": 1246,
+      "source": "vpsrlvd .LC51(%rip), %ymm1, %ymm2",
+      "mnemonic": "vpsrlvd",
+      "group": "Integer predicate lowering"
+    },
+    {
+      "line": 1249,
+      "source": "vpcmpeqd %ymm6, %ymm5, %ymm7",
+      "mnemonic": "vpcmpeqd",
+      "group": "Integer predicate lowering"
+    },
+    {
+      "line": 1252,
+      "source": "vpcmpeqd %ymm6, %ymm7, %ymm8",
+      "mnemonic": "vpcmpeqd",
+      "group": "Integer predicate lowering"
+    },
+    {
+      "line": 1254,
+      "source": "vpmovsxdq %xmm8, %ymm9",
+      "mnemonic": "vpmovsxdq",
+      "group": "Integer predicate lowering"
+    },
+    {
+      "line": 1255,
+      "source": "vpmovsxdq %xmm10, %ymm11",
+      "mnemonic": "vpmovsxdq",
+      "group": "Integer predicate lowering"
+    },
+    {
+      "line": 1256,
+      "source": "vpand (%rdi), %ymm9, %ymm12",
+      "mnemonic": "vpand",
+      "group": "Integer predicate lowering"
+    },
+    {
+      "line": 1258,
+      "source": "vpand 32(%rdi), %ymm11, %ymm13",
+      "mnemonic": "vpand",
+      "group": "Integer predicate lowering"
+    },
+    {
+      "line": 1269,
+      "source": "vpblendvb %ymm15, 192(%rsp), %ymm14, %ymm2",
+      "mnemonic": "vpblendvb",
+      "group": "Masked qword memory and byte blend"
+    },
+    {
+      "line": 1271,
+      "source": "vpblendvb %ymm0, 224(%rsp), %ymm1, %ymm3",
+      "mnemonic": "vpblendvb",
+      "group": "Masked qword memory and byte blend"
+    }
+  ]
+}

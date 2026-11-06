@@ -1,0 +1,36 @@
+{
+  "upstream": "official musl libc",
+  "version": "v1.2.5",
+  "sources": [
+    {
+      "path": "__tan.c",
+      "url": "https://git.musl-libc.org/cgit/musl/plain/src/math/__tan.c?h=v1.2.5",
+      "bytes": 3963,
+      "sha256": "e18b65b69fced8dbb2d3ed1a3dc6daea0e9f857f2762f274380bd89a6f89d2c4"
+    },
+    {
+      "path": "tan.c",
+      "url": "https://git.musl-libc.org/cgit/musl/plain/src/math/tan.c?h=v1.2.5",
+      "bytes": 1965,
+      "sha256": "422d411bac962a1077ae394d14e54313012a6faa3476c20b2a66d3fb3f7a923f"
+    },
+    {
+      "path": "tanf.c",
+      "url": "https://git.musl-libc.org/cgit/musl/plain/src/math/tanf.c?h=v1.2.5",
+      "bytes": 1781,
+      "sha256": "38b39aaf03d33341e606b67b3743ee5fa436b7e8338af155994d4b794b366003"
+    },
+    {
+      "path": "__tandf.c",
+      "url": "https://git.musl-libc.org/cgit/musl/plain/src/math/__tandf.c?h=v1.2.5",
+      "bytes": 1869,
+      "sha256": "60455f3cc0ac743f3eaf0017a3a4f0adbab37c0ee30d29397852d22904c40444"
+    },
+    {
+      "path": "COPYRIGHT",
+      "url": "https://git.musl-libc.org/cgit/musl/plain/COPYRIGHT?h=v1.2.5",
+      "bytes": 6204,
+      "sha256": "f9bc4423732350eb0b3f7ed7e91d530298476f8fec0c6c427a1c04ade22655af"
+    }
+  ]
+}

@@ -1,0 +1,60 @@
+{
+  "upstream": "official musl libc",
+  "version": "v1.2.5",
+  "sources": [
+    {
+      "path": "__rem_pio2.c",
+      "url": "https://git.musl-libc.org/cgit/musl/plain/src/math/__rem_pio2.c?h=v1.2.5",
+      "bytes": 4722,
+      "sha256": "938329e0939cd83ee2185a52154b41242f618d4a6df1b08395f344da33d4f1e6"
+    },
+    {
+      "path": "__rem_pio2_large.c",
+      "url": "https://git.musl-libc.org/cgit/musl/plain/src/math/__rem_pio2_large.c?h=v1.2.5",
+      "bytes": 16408,
+      "sha256": "b97f19fb5951c83a0c10506fab35646caefde13bd03100ad2af55ef00af0b9fb"
+    },
+    {
+      "path": "__sin.c",
+      "url": "https://git.musl-libc.org/cgit/musl/plain/src/math/__sin.c?h=v1.2.5",
+      "bytes": 2364,
+      "sha256": "f3a37ef9bcfb8a2f9c809d8c7f1aa2c17c8c3319ad7fb2fe7c0a6284ea8859d2"
+    },
+    {
+      "path": "__cos.c",
+      "url": "https://git.musl-libc.org/cgit/musl/plain/src/math/__cos.c?h=v1.2.5",
+      "bytes": 2884,
+      "sha256": "3f0f774aab60a18d7ef935ffdf121bcda17cbadabff14096c614da22e31a42c1"
+    },
+    {
+      "path": "sin.c",
+      "url": "https://git.musl-libc.org/cgit/musl/plain/src/math/sin.c?h=v1.2.5",
+      "bytes": 2192,
+      "sha256": "24e53a9d85f196f66919cc19247be5480bb607ef38844b1a24bc47c4fe4974ef"
+    },
+    {
+      "path": "cos.c",
+      "url": "https://git.musl-libc.org/cgit/musl/plain/src/math/cos.c?h=v1.2.5",
+      "bytes": 2111,
+      "sha256": "3a74e054057d636fa494bdd76a53a40db5cee618264f6ab31cb0538ba63c6bda"
+    },
+    {
+      "path": "scalbn.c",
+      "url": "https://git.musl-libc.org/cgit/musl/plain/src/math/scalbn.c?h=v1.2.5",
+      "bytes": 576,
+      "sha256": "a2e766283ed30c2b30c71e01dbdabef58faf92cc9aa84a01c1ce1069b6625696"
+    },
+    {
+      "path": "floor.c",
+      "url": "https://git.musl-libc.org/cgit/musl/plain/src/math/floor.c?h=v1.2.5",
+      "bytes": 653,
+      "sha256": "b9ccb9363719a84be218d60c56717f4fb0234e170c305e36ce21c30e1f42f8e1"
+    },
+    {
+      "path": "COPYRIGHT",
+      "url": "https://git.musl-libc.org/cgit/musl/plain/COPYRIGHT?h=v1.2.5",
+      "bytes": 6204,
+      "sha256": "f9bc4423732350eb0b3f7ed7e91d530298476f8fec0c6c427a1c04ade22655af"
+    }
+  ]
+}

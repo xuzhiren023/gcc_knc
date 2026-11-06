@@ -1,0 +1,126 @@
+{
+  "schemaVersion": "1.0.0",
+  "kind": "AdditionalHyperbolicSourceDefinitions",
+  "status": "HostAlgorithmsAndSourceWiringCheckedOnly",
+  "g5Passed": false,
+  "productionReady": false,
+  "targetCompiled": false,
+  "targetAbiQualified": false,
+  "targetNumericsQualified": false,
+  "targetMasksQualified": false,
+  "targetQualifiedCount": 0,
+  "sourceDefinedCountWithPriorThirty": 36,
+  "remainingDeclarationOnly": 0,
+  "coveredCallSitesWithPriorFamilies": 2879,
+  "totalObservedCallSites": 2879,
+  "additionalCallSites": 93,
+  "priorSourceManifest": {
+    "path": "atan-exports-v1.json",
+    "sha256": "c18759fa21212b5afb2451fd2ff006d05546cba616d3f6cc2dbbeca755a4b79a"
+  },
+  "exports": [
+    {
+      "symbol": "_ZGVeN16v_coshf",
+      "source": "src/e_hyperbolic_export.c",
+      "calls": 15
+    },
+    {
+      "symbol": "_ZGVeN16v_sinhf",
+      "source": "src/e_hyperbolic_export.c",
+      "calls": 15
+    },
+    {
+      "symbol": "_ZGVeN16v_tanhf",
+      "source": "src/e_hyperbolic_export.c",
+      "calls": 18
+    },
+    {
+      "symbol": "_ZGVeN8v_cosh",
+      "source": "src/e_hyperbolic_export.c",
+      "calls": 15
+    },
+    {
+      "symbol": "_ZGVeN8v_sinh",
+      "source": "src/e_hyperbolic_export.c",
+      "calls": 15
+    },
+    {
+      "symbol": "_ZGVeN8v_tanh",
+      "source": "src/e_hyperbolic_export.c",
+      "calls": 15
+    }
+  ],
+  "sources": {
+    "native/translation/libknc_mvec/src/e_hyperbolic_export.c": "5eb4faea82ca92923daf592fb07c29366d9a7ebd61033f87960d2997663e3977",
+    "native/translation/math_algorithms/hyperbolic_e/hyperbolic_e.c": "d1f267403a31ae1f0b735429fdad2d7e67add28271e8a69546a1dd1098cd703d",
+    "native/translation/math_algorithms/hyperbolic_e/hyperbolic_e.h": "41f2a2f78844f4011e07d8c4cef60ee5de679119a7a918b7b528c121e3debe3d",
+    "native/translation/math_algorithms/hyperbolic_e/host_assay.c": "2eadcc9f43ef01cdd7a4ca3e37df20ec8599989c0a0effc3e6f8ee233944ee48",
+    "native/translation/math_algorithms/hyperbolic_e/mpfr_reference.c": "5cdf73275fb864985290f5412edded07d6d8c2129e716b34380be9fa1cf9b718",
+    "native/translation/math_algorithms/hyperbolic_e/check_accuracy.py": "0b99750f0a137700903dc34766cde9b614b08a431fa067eb7b5dcef107c9e7fd",
+    "native/translation/math_algorithms/hyperbolic_e/check_exports.py": "129f99a9e507557c9816528446488e18f2fb05960f6080fb7cca31c0fe8ba72e",
+    "native/translation/math_algorithms/hyperbolic_e/export_wiring.c": "2e3c05ac93f3bbed92c77b8759c3d20b30df1e28c1d3fa8712010fb3201f47b8",
+    "native/translation/math_algorithms/hyperbolic_e/NOTICE": "34e1d80cb17043464216f5c769e76bfe1e9c80b845aa5c11e7c05c8fefb03e1d",
+    "native/translation/math_algorithms/hyperbolic_e/upstream/COPYRIGHT": "f9bc4423732350eb0b3f7ed7e91d530298476f8fec0c6c427a1c04ade22655af",
+    "native/translation/math_algorithms/hyperbolic_e/upstream/cosh.c": "5e5ed87e1a80e68734f4c87a4907a55f50a54df58261698aa94d5cb3276a3d43",
+    "native/translation/math_algorithms/hyperbolic_e/upstream/coshf.c": "c834656b0af1d4055167badf60afb062b4d71385a7d5a44769d1039bb9417b7c",
+    "native/translation/math_algorithms/hyperbolic_e/upstream/expm1.c": "c4764166cea03420f2dfc1840a6a7615934192d851b96d5d2dcc321cc1e39460",
+    "native/translation/math_algorithms/hyperbolic_e/upstream/expm1f.c": "a7d4e8f8b41f04d4b977deb59e6bf96067371387062a5987fcc3b4464f54f5e9",
+    "native/translation/math_algorithms/hyperbolic_e/upstream/sinh.c": "ab082814c4b1bbad8ea7dcfde1e36167cd72be5ef0e8b3ef3def0e052dd74261",
+    "native/translation/math_algorithms/hyperbolic_e/upstream/sinhf.c": "2c52f2c26163f8b7a0048465343510a5856d9c8cc954931722e121040fe81024",
+    "native/translation/math_algorithms/hyperbolic_e/upstream/source-lock.json": "bcd32ef934c29a8ace97f8356bfab28ee9191f6838835db645a3637c870386ab",
+    "native/translation/math_algorithms/hyperbolic_e/upstream/tanh.c": "7e290e86729cba6ccc8eb1f7db2452736daf1a2a8ce01b210db5787fee5cb762",
+    "native/translation/math_algorithms/hyperbolic_e/upstream/tanhf.c": "4787b2f6be28bb2ae9721d510b12d2b9aebf96a594f26f25a3dc267f029800df"
+  },
+  "records": {
+    "artifacts/test-state/host-hyperbolic-e/7bb05d01be2540c9aba7f67aee6d9bd7/accuracy.json": "eb1fd475751d89081d16b3107201abcd52a9fb6f591d3f4d13b85e92609509df",
+    "artifacts/test-state/host-hyperbolic-e/2cf60ac1c5cb4d4e89278bf1a11116a5/accuracy.json": "6407f2c93fe52567cfabc6d19c03b0e6e8727822c8340f3de4e934edec1eb5df",
+    "artifacts/test-state/host-hyperbolic-e/a9c8afc6431b42e18fc30d04c164637d/accuracy.json": "22e19eb4247e31ed2ab5a232b2d3dc63f558432eba0831b9f60185ece279c402",
+    "artifacts/test-state/host-hyperbolic-exports/7c053dee887f45d3a4696fde87be05fd/wiring.json": "52e278d6463967b59cab7c435082c5e931107f94286a4715ec41671c7df1bf13"
+  },
+  "hostIsa": "strict baselineSSE2; AVX/AVX2/FMA/AVX512 disabled",
+  "accuracy": {
+    "sinhf-off": {
+      "uniqueFreshFiniteInputs": 1048576,
+      "activeLanesPerVariant": 1058176,
+      "finiteComparisons": 841432,
+      "maxUlpBound": 0.49999887432911877
+    },
+    "sinh-off": {
+      "uniqueFreshFiniteInputs": 1048576,
+      "activeLanesPerVariant": 1057552,
+      "finiteComparisons": 843579,
+      "maxUlpBound": 0.5309405346603406
+    },
+    "coshf-off": {
+      "uniqueFreshFiniteInputs": 1048576,
+      "activeLanesPerVariant": 1058176,
+      "finiteComparisons": 841195,
+      "maxUlpBound": 0.49999781469015786
+    },
+    "cosh-off": {
+      "uniqueFreshFiniteInputs": 1048576,
+      "activeLanesPerVariant": 1057552,
+      "finiteComparisons": 843570,
+      "maxUlpBound": 0.5331714998568603
+    },
+    "tanhf-off": {
+      "uniqueFreshFiniteInputs": 1048576,
+      "activeLanesPerVariant": 1058176,
+      "finiteComparisons": 1057662,
+      "maxUlpBound": 0.49999888257156966
+    },
+    "tanh-off": {
+      "uniqueFreshFiniteInputs": 1048576,
+      "activeLanesPerVariant": 1057552,
+      "finiteComparisons": 1057038,
+      "maxUlpBound": 0.49999898423321115
+    }
+  },
+  "sourceRecipe": "Official pinned musl expm1 rational coefficients and split-ln2; compensated GCC vector evaluation; no scalar math delegation",
+  "remainingTargetObligations": [
+    "pipeline compilation and actual KNC ISA",
+    "measured e/b/d ABI and reserved-mask preservation",
+    "independent target accuracy and special-value effects",
+    "runtime linkage and IP-1 integration"
+  ]
+}

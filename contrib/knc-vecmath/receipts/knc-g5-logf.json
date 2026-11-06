@@ -1,0 +1,511 @@
+{
+  "schemaVersion": 1,
+  "kind": "G5SpLogfSingleExportNativeConformance",
+  "export": "_ZGVeN16v_logf",
+  "exportQualified": true,
+  "g5WholeGatePassed": false,
+  "productionReady": false,
+  "vectors": 81599,
+  "lanes": 1305584,
+  "cardBootId": "f98cfa74-28e9-49cd-9e0b-8b93af25135f",
+  "result": {
+    "path": "C:\\Users\\xuzhi\\Documents\\PhiWeather\\artifacts\\test-state\\knc-g5-logf\\bceb1c737d104cfaa2110a41f3b21d91\\result.json",
+    "sha256": "ec14dee53bd6576d67c66f7397e338970a77f2aac3ced49c6bdf10440c9c9e00"
+  },
+  "imageAdmission": {
+    "kind": "G5SpLogfExactLinkedImageAdmission",
+    "imageSha256": "5a2fe9b58307a32e35b6eae3105f53589d96f083654cffd88607e367720712c0",
+    "imageBytes": 31798,
+    "machine": 181,
+    "elfType": 2,
+    "actualExportSymbol": "_ZGVeN16v_logf",
+    "readonlyPages": [
+      4214784
+    ],
+    "readonlyStaticObjects": [
+      {
+        "sourceName": ".rodata.cst4",
+        "kind": "AnonymousInputSectionSpan",
+        "address": 4215444,
+        "bytes": 8,
+        "alignment": 4,
+        "sha256": "3cb42a9614ee530053e89ba6213290c353695defd30fca055dc5a0905d86f7d9"
+      },
+      {
+        "sourceName": ".rodata",
+        "kind": "AnonymousInputSectionSpan",
+        "address": 4215488,
+        "bytes": 320,
+        "alignment": 64,
+        "sha256": "cffe444b665203be6f8e681d418d676e3a8e185997554cb3166285820306386b"
+      },
+      {
+        "sourceName": ".rodata.cst8",
+        "kind": "AnonymousInputSectionSpan",
+        "address": 4215808,
+        "bytes": 40,
+        "alignment": 8,
+        "sha256": "755ba2720fb7771aee5dc80d80b9929893f349f765ea641051404d9171cd460a"
+      }
+    ],
+    "staticObjectCount": 3,
+    "directCalls": [
+      {
+        "address": 4196432,
+        "bytes": "e8ebfdffff",
+        "target": 4195904,
+        "caller": "main",
+        "callee": "plt:fopen"
+      },
+      {
+        "address": 4196472,
+        "bytes": "e8b3fdffff",
+        "target": 4195888,
+        "caller": "main",
+        "callee": "plt:fread"
+      },
+      {
+        "address": 4196587,
+        "bytes": "e820fdffff",
+        "target": 4195856,
+        "caller": "main",
+        "callee": "plt:memcpy"
+      },
+      {
+        "address": 4196626,
+        "bytes": "e829fdffff",
+        "target": 4195904,
+        "caller": "main",
+        "callee": "plt:fopen"
+      },
+      {
+        "address": 4196669,
+        "bytes": "e89efcffff",
+        "target": 4195808,
+        "caller": "main",
+        "callee": "plt:fwrite"
+      },
+      {
+        "address": 4196722,
+        "bytes": "e8e9fcffff",
+        "target": 4195936,
+        "caller": "main",
+        "callee": "plt:memset"
+      },
+      {
+        "address": 4196747,
+        "bytes": "e8d0fcffff",
+        "target": 4195936,
+        "caller": "main",
+        "callee": "plt:memset"
+      },
+      {
+        "address": 4196772,
+        "bytes": "e8b7fcffff",
+        "target": 4195936,
+        "caller": "main",
+        "callee": "plt:memset"
+      },
+      {
+        "address": 4196805,
+        "bytes": "e866fcffff",
+        "target": 4195888,
+        "caller": "main",
+        "callee": "plt:fread"
+      },
+      {
+        "address": 4196855,
+        "bytes": "e814fcffff",
+        "target": 4195856,
+        "caller": "main",
+        "callee": "plt:memcpy"
+      },
+      {
+        "address": 4196884,
+        "bytes": "e847fcffff",
+        "target": 4195936,
+        "caller": "main",
+        "callee": "plt:memset"
+      },
+      {
+        "address": 4196913,
+        "bytes": "e82afcffff",
+        "target": 4195936,
+        "caller": "main",
+        "callee": "plt:memset"
+      },
+      {
+        "address": 4196928,
+        "bytes": "e81b020000",
+        "target": 4197472,
+        "caller": "main",
+        "callee": "pw_g5_logf_get_profile"
+      },
+      {
+        "address": 4196980,
+        "bytes": "e8ed010000",
+        "target": 4197478,
+        "caller": "main",
+        "callee": "pw_g5_logf_call"
+      },
+      {
+        "address": 4197003,
+        "bytes": "e8d0010000",
+        "target": 4197472,
+        "caller": "main",
+        "callee": "pw_g5_logf_get_profile"
+      },
+      {
+        "address": 4197065,
+        "bytes": "e802fbffff",
+        "target": 4195792,
+        "caller": "main",
+        "callee": "plt:memcmp"
+      },
+      {
+        "address": 4197088,
+        "bytes": "e8e3fcffff",
+        "target": 4196296,
+        "caller": "main",
+        "callee": "canary"
+      },
+      {
+        "address": 4197111,
+        "bytes": "e8ccfcffff",
+        "target": 4196296,
+        "caller": "main",
+        "callee": "canary"
+      },
+      {
+        "address": 4197130,
+        "bytes": "e8b9fcffff",
+        "target": 4196296,
+        "caller": "main",
+        "callee": "canary"
+      },
+      {
+        "address": 4197153,
+        "bytes": "e8a2fcffff",
+        "target": 4196296,
+        "caller": "main",
+        "callee": "canary"
+      },
+      {
+        "address": 4197172,
+        "bytes": "e88ffcffff",
+        "target": 4196296,
+        "caller": "main",
+        "callee": "canary"
+      },
+      {
+        "address": 4197197,
+        "bytes": "e876fcffff",
+        "target": 4196296,
+        "caller": "main",
+        "callee": "canary"
+      },
+      {
+        "address": 4197244,
+        "bytes": "e85ffaffff",
+        "target": 4195808,
+        "caller": "main",
+        "callee": "plt:fwrite"
+      },
+      {
+        "address": 4197283,
+        "bytes": "e838faffff",
+        "target": 4195808,
+        "caller": "main",
+        "callee": "plt:fwrite"
+      },
+      {
+        "address": 4197328,
+        "bytes": "e89bfaffff",
+        "target": 4195952,
+        "caller": "main",
+        "callee": "plt:fgetc"
+      },
+      {
+        "address": 4197345,
+        "bytes": "e83afaffff",
+        "target": 4195872,
+        "caller": "main",
+        "callee": "plt:ferror"
+      },
+      {
+        "address": 4197361,
+        "bytes": "e8caf9ffff",
+        "target": 4195776,
+        "caller": "main",
+        "callee": "plt:fclose"
+      },
+      {
+        "address": 4197377,
+        "bytes": "e8baf9ffff",
+        "target": 4195776,
+        "caller": "main",
+        "callee": "plt:fclose"
+      },
+      {
+        "address": 4197447,
+        "bytes": "e8a4f9ffff",
+        "target": 4195824,
+        "caller": "main",
+        "callee": "plt:printf"
+      },
+      {
+        "address": 4197809,
+        "bytes": "e8ca410000",
+        "target": 4214656,
+        "caller": "pw_g5_logf_call",
+        "callee": "_ZGVeN16v_logf"
+      },
+      {
+        "address": 4213627,
+        "bytes": "e810c3ffff",
+        "target": 4198032,
+        "caller": "pw_apply_logf.constprop.0",
+        "callee": "pw_core_logf"
+      },
+      {
+        "address": 4214839,
+        "bytes": "e8b4f5ffff",
+        "target": 4212208,
+        "caller": "_ZGVeN16v_logf",
+        "callee": "pw_apply_logf.constprop.0"
+      }
+    ],
+    "completeFunctions": {
+      "canary": {
+        "address": 4196296,
+        "bytes": 56,
+        "instructions": 19
+      },
+      "main": {
+        "address": 4196352,
+        "bytes": 1120,
+        "instructions": 271
+      },
+      "pw_g5_logf_get_profile": {
+        "address": 4197472,
+        "bytes": 6,
+        "instructions": 3
+      },
+      "pw_g5_logf_call": {
+        "address": 4197478,
+        "bytes": 554,
+        "instructions": 108
+      },
+      "pw_core_logf": {
+        "address": 4198032,
+        "bytes": 14172,
+        "instructions": 2634
+      },
+      "pw_apply_logf.constprop.0": {
+        "address": 4212208,
+        "bytes": 2395,
+        "instructions": 461
+      },
+      "knc_mvec_algorithm_logf_register_e16": {
+        "address": 4214608,
+        "bytes": 38,
+        "instructions": 7
+      },
+      "_ZGVeN16v_logf": {
+        "address": 4214656,
+        "bytes": 440,
+        "instructions": 91
+      },
+      "_ZGVeN16v_logf.cold": {
+        "address": 4195968,
+        "bytes": 2,
+        "instructions": 1
+      }
+    },
+    "runtimeClosure": {
+      "libc.so.6": "7ee7ac7da48c6fac7fea1a8dd75c42d3e1a735c0ff5c71cc7578f85691a5e4fc",
+      "ld-linux-k1om.so.2": "2a60a4698794ca42b43dfd0979771e523dbacaae7c44047ba6c7ed98aa211397"
+    },
+    "productionMxcsrInstructions": 0,
+    "explicitObserverMxcsrInstructions": 6,
+    "targetExecuted": false,
+    "genericIsaQualification": false,
+    "imageManifest": "C:\\Users\\xuzhi\\Documents\\PhiWeather\\artifacts\\test-state\\g5-logf-local-linked-image\\4e9c4bdcdcaa45f3b61d1592f0a37222\\image-manifest.json",
+    "imageManifestSha256": "f6c811582e6ab9499432ffff840c3950252561f49eaf59a7c7624f7cce263ea2",
+    "datasetManifest": "C:\\Users\\xuzhi\\Documents\\PhiWeather\\artifacts\\test-state\\g5-logf-retained-target-dataset\\07d54414d36f4af18dd33dcdaf003bd5\\dataset.json",
+    "datasetSha256": "7a76d46c7dade3907da07349a73bbc5cb4b15c25566d86ee3cbe977fadc268e2",
+    "export": "_ZGVeN16v_logf",
+    "vectors": 81599,
+    "lanes": 1305584,
+    "inputBytes": 5222368,
+    "nativeBytes": 19583792,
+    "argc": 2,
+    "argv": [
+      "g5-logf-candidate.mic",
+      "logf-input.bin"
+    ],
+    "output": "g5-logf-native.bin",
+    "inputHeader": [
+      1229337927,
+      1,
+      16,
+      4,
+      64,
+      81599,
+      0,
+      0
+    ],
+    "outputHeader": [
+      1313224007,
+      1,
+      16,
+      4,
+      240,
+      81599,
+      0,
+      0
+    ],
+    "observerTag": 1177896753,
+    "completionMarker": "PW_G5_LOGF_RAW_CAPTURED variant=0 vectors=81599 lanes=1305584 bytes=19583792 callerProfileRestored=1 canariesIntact=1\n",
+    "corpus": "logf-corpus.bin",
+    "fifo": "logf-input.bin",
+    "numericalAndAbiTargetQualified": false,
+    "nativeRelease": false,
+    "g5Passed": false
+  },
+  "actualRuntime": {
+    "actualImageSha256": "5a2fe9b58307a32e35b6eae3105f53589d96f083654cffd88607e367720712c0",
+    "liveExecutableCaptured": true,
+    "actualInputSha256": "4056e46b761434226c5de692c5cd6f9f4a8450e63bd55bcbd712dc4f31309e84",
+    "actualInputBytes": 5222368,
+    "loadedLibraries": {
+      "ld-linux-k1om.so.2": {
+        "alias": "/lib64/ld-2.21.so",
+        "resolved": "/lib64/ld-2.21.so",
+        "sha256": "2a60a4698794ca42b43dfd0979771e523dbacaae7c44047ba6c7ed98aa211397"
+      },
+      "libc.so.6": {
+        "alias": "/lib64/libc-2.21.so",
+        "resolved": "/lib64/libc-2.21.so",
+        "sha256": "7ee7ac7da48c6fac7fea1a8dd75c42d3e1a735c0ff5c71cc7578f85691a5e4fc"
+      }
+    },
+    "readonlyStaticPagesObserved": [
+      4214784
+    ],
+    "staticObjectCount": 3,
+    "pid": 29692,
+    "maps": "C:\\Users\\xuzhi\\Documents\\PhiWeather\\artifacts\\test-state\\knc-g5-logf\\bceb1c737d104cfaa2110a41f3b21d91\\retained\\results\\run\\process.maps",
+    "loaderLog": "C:\\Users\\xuzhi\\Documents\\PhiWeather\\artifacts\\test-state\\knc-g5-logf\\bceb1c737d104cfaa2110a41f3b21d91\\retained\\results\\run\\loader-debug.29692",
+    "actualExportSymbol": "_ZGVeN16v_logf",
+    "numericalAndAbiTargetQualified": false,
+    "g5Passed": false
+  },
+  "nativeResult": {
+    "path": "C:\\Users\\xuzhi\\Documents\\PhiWeather\\artifacts\\test-state\\knc-g5-logf\\bceb1c737d104cfaa2110a41f3b21d91\\retained\\results\\run\\g5-logf-native.bin",
+    "bytes": 19583792,
+    "sha256": "b179ee0cf955986c1f8083b8612a788dab33b01a7f9011cc017fbdbcd70985e4"
+  },
+  "numericalAssessment": {
+    "kind": "G5SpLogfTargetSourceAssessment",
+    "status": "NumericalAndAbiSampleMatchedAwaitingExecutionBinding",
+    "vectors": 81599,
+    "lanes": 1305584,
+    "profileMismatches": 0,
+    "exceptionVectorMismatches": 0,
+    "abiVectorMismatches": 0,
+    "observedDenormalVectors": 22580,
+    "observedUnderflowVectors": 0,
+    "observedOverflowVectors": 0,
+    "targetPassLanes": 1305584,
+    "hardCeilingPassLanes": 1305584,
+    "roundedReferenceUlpDistance": {
+      "0": 789725,
+      "1": 3152
+    },
+    "methods": {
+      "cachedNearest": 789725,
+      "specialOrIdentity": 512707,
+      "retainedWordCertificate": 3152
+    },
+    "nativeFlagHistogram": {
+      "33": 58675,
+      "35": 6456,
+      "32": 150,
+      "1": 98,
+      "34": 16087,
+      "38": 2,
+      "39": 3,
+      "4": 32,
+      "3": 32,
+      "0": 64
+    },
+    "requiredFlagHistogram": {
+      "33": 65131,
+      "32": 16237,
+      "1": 130,
+      "36": 2,
+      "37": 3,
+      "4": 32,
+      "0": 64
+    },
+    "maximumConservativeTrueErrorUlps": "14442939551068444118351610626797766348880025639486080199563519024237838677864167311461051819640264279543492962188222265763209989788454354687986393663501/18626451492309570312500000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+    "targetUlps": 1,
+    "hardCeilingUlps": 4,
+    "independentNewIntervalInputsEvaluated": 0,
+    "newIntervalsAutomaticallyEvaluated": false,
+    "pendingExamples": [],
+    "firstMismatches": [],
+    "actualExecutionAuthenticatedHere": false,
+    "hostKernelExecuted": false,
+    "g5Passed": false,
+    "canariesRequireAuthenticatedImageBoundDriver": true,
+    "otherRoundingModesQualified": false,
+    "errnoQualified": false,
+    "trapsQualified": false
+  },
+  "scientificSourceArtifacts": {
+    "C:\\Users\\xuzhi\\Documents\\PhiWeather\\artifacts\\test-state\\knc-g5-logf\\bceb1c737d104cfaa2110a41f3b21d91\\scientific-source\\scripts\\G5DpTargetJob.py": "604c68dbf0c1d26923f50a2fc66619adf0fd9fd878e1b5dba522d3bd026b5000",
+    "C:\\Users\\xuzhi\\Documents\\PhiWeather\\artifacts\\test-state\\knc-g5-logf\\bceb1c737d104cfaa2110a41f3b21d91\\scientific-source\\scripts\\G5LogfTargetAdmission.py": "c2152b20911ee8a76bc2a3ab3b9b29197e3d13e67eb9e4cb96cd87ece5e32814",
+    "C:\\Users\\xuzhi\\Documents\\PhiWeather\\artifacts\\test-state\\knc-g5-logf\\bceb1c737d104cfaa2110a41f3b21d91\\scientific-source\\scripts\\G5LogfTargetReference.py": "dc8b1d5dac05feeb7a69710a4f42bfe8b4f36c7c2fce77753b1bd7850c0250a2",
+    "C:\\Users\\xuzhi\\Documents\\PhiWeather\\artifacts\\test-state\\knc-g5-logf\\bceb1c737d104cfaa2110a41f3b21d91\\scientific-source\\scripts\\KncD3RawBatchRunner.py": "a1b8609ed1b394d857bcdd755aff92cc11dcc1b6c35129499f72789c06b9f1ac",
+    "C:\\Users\\xuzhi\\Documents\\PhiWeather\\artifacts\\test-state\\knc-g5-logf\\bceb1c737d104cfaa2110a41f3b21d91\\scientific-source\\scripts\\Run-KncVmovaps128BoundedBatch.py": "00dcafdd3b14b3fb58115bd9713a20ec5d18b5b000bbd4d93cb2cea7bdefeccd",
+    "C:\\Users\\xuzhi\\Documents\\PhiWeather\\artifacts\\test-state\\knc-g5-logf\\bceb1c737d104cfaa2110a41f3b21d91\\scientific-source\\scripts\\Run-KncManualG1.py": "375ab896499046b8c78db3023150e640cf6a7414cbf56e85afe8ee864e6e6f54",
+    "C:\\Users\\xuzhi\\Documents\\PhiWeather\\artifacts\\test-state\\knc-g5-logf\\bceb1c737d104cfaa2110a41f3b21d91\\scientific-source\\scripts\\G5LogfTargetJob.py": "61db6416cefd39a5275e231455e774a275c7f79b7d1c52be258ae4582d885cd7",
+    "C:\\Users\\xuzhi\\Documents\\PhiWeather\\artifacts\\test-state\\knc-g5-logf\\bceb1c737d104cfaa2110a41f3b21d91\\scientific-source\\scripts\\G5DpTargetRuntime.py": "287fe288102b5c2c85110846374eda74f5ad7acf88d6c7cf31785949de626e06",
+    "C:\\Users\\xuzhi\\Documents\\PhiWeather\\artifacts\\test-state\\knc-g5-logf\\bceb1c737d104cfaa2110a41f3b21d91\\scientific-source\\scripts\\G5ExpI64TargetAdmission.py": "e5fc57b6f90bb125e5f294cb6246e633bb8d54570dcf080f24dbd6a5690179dd",
+    "C:\\Users\\xuzhi\\Documents\\PhiWeather\\artifacts\\test-state\\knc-g5-logf\\bceb1c737d104cfaa2110a41f3b21d91\\scientific-source\\scripts\\G5DpImageBindings.py": "9144a9f0ef5be70ae1673a88959e4ae7dfae55a1be36832d7cc88c8975961eab",
+    "C:\\Users\\xuzhi\\Documents\\PhiWeather\\artifacts\\test-state\\knc-g5-logf\\bceb1c737d104cfaa2110a41f3b21d91\\scientific-source\\scripts\\KncG6X87WholeHelperGuard.py": "eda3f1c104d3e5ec40e13e8088b21f8fe4f9bd57c476289b508a9c51adf0e3c9",
+    "C:\\Users\\xuzhi\\Documents\\PhiWeather\\artifacts\\test-state\\knc-g5-logf\\bceb1c737d104cfaa2110a41f3b21d91\\scientific-source\\scripts\\KncRuntimeErrorObjectAudit.py": "5e84a699fe4abe93271f89e553576f64c2d39c064888fffb595616ebf9b95d80",
+    "C:\\Users\\xuzhi\\Documents\\PhiWeather\\artifacts\\test-state\\knc-g5-logf\\bceb1c737d104cfaa2110a41f3b21d91\\scientific-source\\scripts\\KncD3WidthNativeGuard.py": "db5e0fdff940f1b5e39e2f46c58fad7ed8333815ec2198fa21ab87caaee2cc36",
+    "C:\\Users\\xuzhi\\Documents\\PhiWeather\\artifacts\\test-state\\knc-g5-logf\\bceb1c737d104cfaa2110a41f3b21d91\\scientific-source\\scripts\\KncD3FpConvertNativeGuard.py": "78cc7385154654bbad96307fc3d88a27d13d66712ce561042c412e85125831d5",
+    "C:\\Users\\xuzhi\\Documents\\PhiWeather\\artifacts\\test-state\\knc-g5-logf\\bceb1c737d104cfaa2110a41f3b21d91\\scientific-source\\artifacts\\test-state\\g5-logf-local-linked-image\\4e9c4bdcdcaa45f3b61d1592f0a37222\\image-manifest.json": "f6c811582e6ab9499432ffff840c3950252561f49eaf59a7c7624f7cce263ea2",
+    "C:\\Users\\xuzhi\\Documents\\PhiWeather\\artifacts\\test-state\\knc-g5-logf\\bceb1c737d104cfaa2110a41f3b21d91\\scientific-source\\artifacts\\test-state\\g5-logf-retained-target-dataset\\07d54414d36f4af18dd33dcdaf003bd5\\dataset.json": "7a76d46c7dade3907da07349a73bbc5cb4b15c25566d86ee3cbe977fadc268e2",
+    "C:\\Users\\xuzhi\\Documents\\PhiWeather\\artifacts\\test-state\\knc-g5-logf\\bceb1c737d104cfaa2110a41f3b21d91\\scientific-source\\artifacts\\test-state\\g5-logf-local-linked-image\\4e9c4bdcdcaa45f3b61d1592f0a37222\\scientific-inputs.json": "3e61de6b84328f88e2536c95b718c356013db51332ff52099229c59ecc5284e9",
+    "C:\\Users\\xuzhi\\Documents\\PhiWeather\\artifacts\\test-state\\knc-g5-logf\\bceb1c737d104cfaa2110a41f3b21d91\\scientific-source\\artifacts\\test-state\\g5-logf-local-linked-image\\4e9c4bdcdcaa45f3b61d1592f0a37222\\build_image.py": "3e383749649c82c63737ad9d0d40d188a8e59ee2d862056a97fc32bde8fe822e",
+    "C:\\Users\\xuzhi\\Documents\\PhiWeather\\artifacts\\test-state\\knc-g5-logf\\bceb1c737d104cfaa2110a41f3b21d91\\scientific-source\\artifacts\\test-state\\g5-logf-local-linked-image\\4e9c4bdcdcaa45f3b61d1592f0a37222\\bind_image.py": "2ea20a98e25ff7c3c33ec412040cd3997413bab009e846e875473123a59f9fc4",
+    "C:\\Users\\xuzhi\\Documents\\PhiWeather\\artifacts\\test-state\\knc-g5-logf\\bceb1c737d104cfaa2110a41f3b21d91\\scientific-source\\artifacts\\test-state\\g5-logf-local-linked-image\\4e9c4bdcdcaa45f3b61d1592f0a37222\\sp_source_binding.py": "e5a95476fbd3e114b24cd2fe95226c21a319c6264cb29dc5d319f9b2e3791c57",
+    "C:\\Users\\xuzhi\\Documents\\PhiWeather\\artifacts\\test-state\\knc-g5-logf\\bceb1c737d104cfaa2110a41f3b21d91\\scientific-source\\artifacts\\test-state\\g5-logf-local-linked-image\\4e9c4bdcdcaa45f3b61d1592f0a37222\\qualified-dq-alias-proof-source.txt": "07dc2661e1570b7756b458314b58bcd1a97fa927df39dea8b1f5acbd193b68fd",
+    "C:\\Users\\xuzhi\\Documents\\PhiWeather\\artifacts\\test-state\\knc-g5-logf\\bceb1c737d104cfaa2110a41f3b21d91\\scientific-source\\artifacts\\test-state\\g5-logf-local-linked-image\\4e9c4bdcdcaa45f3b61d1592f0a37222\\qualified-dq-alias-proof-origin.json": "2dd379a32630ae9313feb4586cf2ffb97133db38d20ce8166e702d23a5b9919a",
+    "C:\\Users\\xuzhi\\Documents\\PhiWeather\\artifacts\\test-state\\knc-g5-logf\\bceb1c737d104cfaa2110a41f3b21d91\\scientific-source\\artifacts\\test-state\\g5-logf-local-linked-image\\4e9c4bdcdcaa45f3b61d1592f0a37222\\link.json": "35febe181bbf7ab920916bff42c75026124b470a703970d0706dbbb7e7e51c47",
+    "C:\\Users\\xuzhi\\Documents\\PhiWeather\\artifacts\\test-state\\knc-g5-logf\\bceb1c737d104cfaa2110a41f3b21d91\\scientific-source\\artifacts\\test-state\\g5-logf-local-linked-image\\4e9c4bdcdcaa45f3b61d1592f0a37222\\g5-logf-candidate.mic": "5a2fe9b58307a32e35b6eae3105f53589d96f083654cffd88607e367720712c0",
+    "C:\\Users\\xuzhi\\Documents\\PhiWeather\\artifacts\\test-state\\knc-g5-logf\\bceb1c737d104cfaa2110a41f3b21d91\\scientific-source\\artifacts\\test-state\\g5-logf-local-linked-image\\4e9c4bdcdcaa45f3b61d1592f0a37222\\driver.o": "3c2141d8e536991df51848900386688a0082115bc6b4f1762e083b0393c9ec97",
+    "C:\\Users\\xuzhi\\Documents\\PhiWeather\\artifacts\\test-state\\knc-g5-logf\\bceb1c737d104cfaa2110a41f3b21d91\\scientific-source\\artifacts\\test-state\\g5-logf-local-linked-image\\4e9c4bdcdcaa45f3b61d1592f0a37222\\bridge.o": "5750a3bafc548f428c0e3f9bf70d1cc122db1072280c8f46e1c80f90cce99899",
+    "C:\\Users\\xuzhi\\Documents\\PhiWeather\\artifacts\\test-state\\knc-g5-logf\\bceb1c737d104cfaa2110a41f3b21d91\\scientific-source\\artifacts\\test-state\\g5-logf-local-linked-image\\4e9c4bdcdcaa45f3b61d1592f0a37222\\g5-logf-candidate.map": "0ee7060ce280b8a6b6c9876887bd769e185a2f9a8aead51c24e8723461fcd04b",
+    "C:\\Users\\xuzhi\\Documents\\PhiWeather\\artifacts\\test-state\\knc-g5-logf\\bceb1c737d104cfaa2110a41f3b21d91\\scientific-source\\artifacts\\test-state\\g5-logf-local-linked-image\\4e9c4bdcdcaa45f3b61d1592f0a37222\\disassembly.stdout": "161756884ae48b25ac73dc9f74669656ae5be696ab68e5bd9275ec4ed8bdb09c",
+    "C:\\Users\\xuzhi\\Documents\\PhiWeather\\artifacts\\test-state\\knc-g5-logf\\bceb1c737d104cfaa2110a41f3b21d91\\scientific-source\\artifacts\\test-state\\g5-logf-local-linked-image\\4e9c4bdcdcaa45f3b61d1592f0a37222\\image-bindings.json": "e2c32afb23b6da5983eb1206d7b4b8c98b811d74018d9afa75a6587b7e0f0de7",
+    "C:\\Users\\xuzhi\\Documents\\PhiWeather\\artifacts\\test-state\\knc-g5-logf\\bceb1c737d104cfaa2110a41f3b21d91\\scientific-source\\scripts\\ProjectHostCompiler.py": "78e45923c0b433a5712bd8b05f1d0894bbbcff95bb7d1325fa7bd0650a012b6a",
+    "C:\\Users\\xuzhi\\Documents\\PhiWeather\\artifacts\\test-state\\knc-g5-logf\\bceb1c737d104cfaa2110a41f3b21d91\\scientific-source\\scripts\\Retry-WrfKnlUnit.py": "0baab4fc6fef2f0055f7d7cca5bfbf27feb9714726507c2106ddd0dbb3f6ae35",
+    "C:\\Users\\xuzhi\\Documents\\PhiWeather\\artifacts\\test-state\\knc-g5-logf\\bceb1c737d104cfaa2110a41f3b21d91\\scientific-source\\artifacts\\test-state\\g5-log-i64-local-linked-image\\b2731cdf01f24639a3fa93265b415890\\link.json": "d36a00f467b9a77945786fa66506d0cb0129aebf498eb01cd64f8b0f300f5c9d",
+    "C:\\Users\\xuzhi\\Documents\\PhiWeather\\artifacts\\test-state\\knc-g5-logf\\bceb1c737d104cfaa2110a41f3b21d91\\scientific-source\\native\\reference\\g5-logf\\driver.c": "f0e3ee851aa8222ecbc478f843449a734b889a5f71f039bd1e59edba25d97d5a",
+    "C:\\Users\\xuzhi\\Documents\\PhiWeather\\artifacts\\test-state\\knc-g5-logf\\bceb1c737d104cfaa2110a41f3b21d91\\scientific-source\\native\\reference\\g5-logf\\observer.h": "62da1a5d09809ed69c5c75db2da31629d97732b4379e515eb88bd8691906083a",
+    "C:\\Users\\xuzhi\\Documents\\PhiWeather\\artifacts\\test-state\\knc-g5-logf\\bceb1c737d104cfaa2110a41f3b21d91\\scientific-source\\native\\reference\\g5-logf\\bridge.k1om.s": "c3dbc51ec08cb183554ef39b3a2af482730e006dabe9c321e40044bb3958bbd2",
+    "C:\\Users\\xuzhi\\Documents\\PhiWeather\\artifacts\\test-state\\knc-g5-logf\\bceb1c737d104cfaa2110a41f3b21d91\\scientific-source\\artifacts\\test-state\\g5-register-logf-scalar-events-volatile\\first-emission\\e6ead6c7c93e4147a49249308f910ec5\\logf-scalar-events.o": "ea6ee6dde476d10e1dcb44aafea546686282f926c2d22b65424e2157525e86a6",
+    "C:\\Users\\xuzhi\\Documents\\PhiWeather\\artifacts\\test-state\\knc-g5-logf\\bceb1c737d104cfaa2110a41f3b21d91\\scientific-source\\artifacts\\test-state\\g5-register-logf-scalar-events-volatile\\first-emission\\e6ead6c7c93e4147a49249308f910ec5\\translation.json": "9a3ac292d46caaa3aa6c4a0cb240e3f101848a8079b5250fd772fc803e1db6c4",
+    "C:\\Users\\xuzhi\\Documents\\PhiWeather\\artifacts\\test-state\\knc-g5-logf\\bceb1c737d104cfaa2110a41f3b21d91\\scientific-source\\artifacts\\test-state\\g5-register-logf-scalar-events-volatile\\first-emission\\e6ead6c7c93e4147a49249308f910ec5\\logf-scalar-events.k1om.s": "7c4ebe45eee29190e1745d447277023edbac47b15528fe720a4376aed088c791",
+    "C:\\Users\\xuzhi\\Documents\\PhiWeather\\artifacts\\test-state\\knc-g5-logf\\bceb1c737d104cfaa2110a41f3b21d91\\scientific-source\\artifacts\\test-state\\g5-register-logf-scalar-events-volatile\\first-emission\\e6ead6c7c93e4147a49249308f910ec5\\object-audit-conversion-display-bound.json": "2411d72d0f995737c537eff36a8acb6c7832262e6ca4f30eadae7b4e21003350",
+    "C:\\Users\\xuzhi\\Documents\\PhiWeather\\artifacts\\test-state\\knc-g5-logf\\bceb1c737d104cfaa2110a41f3b21d91\\scientific-source\\artifacts\\test-state\\g5-logf-retained-target-dataset\\07d54414d36f4af18dd33dcdaf003bd5\\materialization.json": "0de95dba13c1015bf6778ae3f16c27de2349f6ca1b7c83f434d4f51b77372bc9",
+    "C:\\Users\\xuzhi\\Documents\\PhiWeather\\artifacts\\test-state\\knc-g5-logf\\bceb1c737d104cfaa2110a41f3b21d91\\scientific-source\\artifacts\\test-state\\g5-logf-retained-target-dataset\\07d54414d36f4af18dd33dcdaf003bd5\\retained-word-certificates.json": "7f79234b1a2904839c2255669bff4bfcdc1824bff7eaf123df49569dbdd22194"
+  },
+  "performanceClaim": false
+}

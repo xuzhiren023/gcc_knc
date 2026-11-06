@@ -1,0 +1,39 @@
+{
+  "project": "Arm optimized-routines",
+  "tag": "v26.01",
+  "tagObject": "ed2fb3fb33eb023a0444e193e5fddc4fa2e0b01e",
+  "commit": "649ccc8411e7c4862965710f25c570d854a1483f",
+  "licenseSelection": "MIT",
+  "files": {
+    "LICENSE": {
+      "url": "https://raw.githubusercontent.com/ARM-software/optimized-routines/649ccc8411e7c4862965710f25c570d854a1483f/LICENSE",
+      "sha256": "650afbf29f214451e02241adc42534e82c9d6ae2b38e2444b92b5a1ffcaf9346",
+      "bytes": 13491
+    },
+    "math/exp.c": {
+      "url": "https://raw.githubusercontent.com/ARM-software/optimized-routines/649ccc8411e7c4862965710f25c570d854a1483f/math/exp.c",
+      "sha256": "219b5f666c84864e80ef5ef33bc5453b4702ea74fc5cbf997c3dfacdcf5738cf",
+      "bytes": 5774
+    },
+    "math/exp_data.c": {
+      "url": "https://raw.githubusercontent.com/ARM-software/optimized-routines/649ccc8411e7c4862965710f25c570d854a1483f/math/exp_data.c",
+      "sha256": "a5e84677e7693c7d22195f86faac5fdc6f92bff7ea2e54c0e7888203a78ffc24",
+      "bytes": 43125
+    },
+    "math/math_config.h": {
+      "url": "https://raw.githubusercontent.com/ARM-software/optimized-routines/649ccc8411e7c4862965710f25c570d854a1483f/math/math_config.h",
+      "sha256": "9a3ee029ba2b58444fafb51427bf0dc390d117f26115cd5a7033a5cc03042881",
+      "bytes": 20268
+    },
+    "math/log.c": {
+      "url": "https://raw.githubusercontent.com/ARM-software/optimized-routines/649ccc8411e7c4862965710f25c570d854a1483f/math/log.c",
+      "sha256": "10e3774a72279c75d3842bc651a9d81e8fe31f9717caac736a603170ed509530",
+      "bytes": 4760
+    },
+    "math/log_data.c": {
+      "url": "https://raw.githubusercontent.com/ARM-software/optimized-routines/649ccc8411e7c4862965710f25c570d854a1483f/math/log_data.c",
+      "sha256": "327cf1819870930486eecb5491c68d5887a712b954e5ec82f3f70bfd9e46fdd3",
+      "bytes": 21332
+    }
+  }
+}

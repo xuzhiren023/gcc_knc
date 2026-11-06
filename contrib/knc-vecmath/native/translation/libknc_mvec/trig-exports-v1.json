@@ -1,0 +1,161 @@
+{
+  "schemaVersion": "1.0.0",
+  "kind": "AdditionalTrigSourceDefinitions",
+  "status": "HostAlgorithmsAndSourceWiringCheckedOnly",
+  "g5Passed": false,
+  "productionReady": false,
+  "targetCompiled": false,
+  "targetAbiQualified": false,
+  "targetNumericsQualified": false,
+  "targetMasksQualified": false,
+  "targetQualifiedCount": 0,
+  "sourceDefinedCountWithPriorTwenty": 25,
+  "remainingDeclarationOnly": 11,
+  "coveredCallSitesWithPriorFamilies": 2709,
+  "totalObservedCallSites": 2879,
+  "exports": [
+    {
+      "symbol": "_ZGVeN16v_sinf",
+      "source": "src/e_cos_sin_export.c",
+      "calls": 67
+    },
+    {
+      "symbol": "_ZGVeN16v_cosf",
+      "source": "src/e_cos_sin_export.c",
+      "calls": 69
+    },
+    {
+      "symbol": "_ZGVeN8v_sin",
+      "source": "src/e_cos_sin_export.c",
+      "calls": 78
+    },
+    {
+      "symbol": "_ZGVeN8v_cos",
+      "source": "src/e_cos_sin_export.c",
+      "calls": 110
+    },
+    {
+      "symbol": "_ZGVbN2v_cos",
+      "source": "src/cos_wrappers.c",
+      "calls": 1
+    }
+  ],
+  "sharedReducerSource": "src/cos_sin_reducer.c",
+  "requiredIncludePaths": [
+    "include",
+    "../math_algorithms/cos_sin_e"
+  ],
+  "sources": {
+    "native/translation/math_algorithms/cos_sin_e/export_wiring.c": "863e1e6cb50b49e19b208033f84fe4045b8c958e393a62fa1b0dc698b2d42c24",
+    "native/translation/math_algorithms/cos_sin_e/cos_sin_e.c": "80e1bcf229099957fa6a71e8bf299e4e69a4fb40eaf5749d53037f3961abb2ac",
+    "native/translation/libknc_mvec/src/e_cos_sin_export.c": "c56aa444d26fa159ca1df0104ac13594043c5c7cb403d47e825b359252cb1140",
+    "native/translation/libknc_mvec/src/cos_sin_reducer.c": "6dc607484b72400f66875069d74c200dd9757f4142b799d8ad923dfae843268a",
+    "native/translation/libknc_mvec/src/cos_wrappers.c": "9c972fd45ead936bfd689a022236253290f1b0f262651bfc0fa35fc02e9c99be",
+    "native/translation/math_algorithms/cos_sin_e/cos_sin_e.h": "8de95713e4fa4d21c35bfe3031f1939e9b5770119c45013de75ad260635f7f7d",
+    "native/translation/math_algorithms/cos_sin_e/reducer.c": "3a8de6109da896a2d1ba450213119ed1ecd66bd115471e8990ce6663bcd33976",
+    "native/translation/math_algorithms/cos_sin_e/libm.h": "431a5f8267be758cce600d67c5c11a4df20ff6ee546d61de52febf07223e885b",
+    "native/translation/libknc_mvec/include/knc_mvec_abi.h": "e9acb084e70bed5350736cd256b52fc64d6cff8620efc14a8276bdc3f1624cbc",
+    "native/translation/libknc_mvec/src/e_export_adapter.h": "ad0b6b6d2cd663efd37128ef97cf8102c2f277664b90f88067813607d5b5977d",
+    "native/translation/math_algorithms/cos_sin_e/check_exports.py": "96eadd3ec9f956987a48a5987e7206a7b1072f3e4e8491ce8660ea2d4ba96b16",
+    "native/translation/math_algorithms/cos_sin_e/upstream/__cos.c": "3f0f774aab60a18d7ef935ffdf121bcda17cbadabff14096c614da22e31a42c1",
+    "native/translation/math_algorithms/cos_sin_e/upstream/__rem_pio2.c": "938329e0939cd83ee2185a52154b41242f618d4a6df1b08395f344da33d4f1e6",
+    "native/translation/math_algorithms/cos_sin_e/upstream/__rem_pio2_large.c": "b97f19fb5951c83a0c10506fab35646caefde13bd03100ad2af55ef00af0b9fb",
+    "native/translation/math_algorithms/cos_sin_e/upstream/__sin.c": "f3a37ef9bcfb8a2f9c809d8c7f1aa2c17c8c3319ad7fb2fe7c0a6284ea8859d2",
+    "native/translation/math_algorithms/cos_sin_e/upstream/COPYRIGHT": "f9bc4423732350eb0b3f7ed7e91d530298476f8fec0c6c427a1c04ade22655af",
+    "native/translation/math_algorithms/cos_sin_e/upstream/cos.c": "3a74e054057d636fa494bdd76a53a40db5cee618264f6ab31cb0538ba63c6bda",
+    "native/translation/math_algorithms/cos_sin_e/upstream/floor.c": "b9ccb9363719a84be218d60c56717f4fb0234e170c305e36ce21c30e1f42f8e1",
+    "native/translation/math_algorithms/cos_sin_e/upstream/scalbn.c": "a2e766283ed30c2b30c71e01dbdabef58faf92cc9aa84a01c1ce1069b6625696",
+    "native/translation/math_algorithms/cos_sin_e/upstream/sin.c": "24e53a9d85f196f66919cc19247be5480bb607ef38844b1a24bc47c4fe4974ef",
+    "native/translation/math_algorithms/cos_sin_e/upstream/source-lock.json": "3e86bb230230cad5513b675fbf81ead2c230b67cac70ddf8a913f61f1c4f80ff"
+  },
+  "records": {
+    "artifacts/test-state/host-cos-sin-e/bc822707ec224c6e9cd79dc711a19106/accuracy.json": "b6279977170033962037b30cb60903f28bfbcbbada754563e95b0c19b194ba58",
+    "artifacts/test-state/host-cos-sin-e/48f04bfa159d40b18524ae282a944e0e/accuracy.json": "63049beabc3586a5ca5e39da259591eeff606318072ef9dabf396127ff22ccd9",
+    "artifacts/test-state/host-trig-exports/785b3790347d476fa90ec39aba023191/wiring.json": "a931a2df3dacb865107f57f1899d5ba69e136ce2460e13abbb124a975b27a662"
+  },
+  "hostIsa": "strict baselineSSE2; AVX/AVX2/FMA/AVX512 disabled",
+  "ulpUnit": "spacing at correctly rounded binary reference, matching HostMathReference",
+  "accuracy": {
+    "sinf": {
+      "activeLanesPerVariant": 1049488,
+      "uniqueRandomFiniteInputs": 1048576,
+      "finiteComparisons": 1049230,
+      "maxUlpBound": 0.4999989419321134
+    },
+    "cosf": {
+      "activeLanesPerVariant": 1049488,
+      "uniqueRandomFiniteInputs": 1048576,
+      "finiteComparisons": 1049230,
+      "maxUlpBound": 0.49999960186250003
+    },
+    "sin": {
+      "activeLanesPerVariant": 1053064,
+      "uniqueRandomFiniteInputs": 1048576,
+      "finiteComparisons": 1052806,
+      "maxUlpBound": 0.7705709129503738
+    },
+    "cos": {
+      "activeLanesPerVariant": 1053064,
+      "uniqueRandomFiniteInputs": 1048576,
+      "finiteComparisons": 1052806,
+      "maxUlpBound": 0.745124648867273
+    }
+  },
+  "remainingSymbols": [
+    {
+      "symbol": "_ZGVeN16v_atanf",
+      "function": "atanf",
+      "calls": 6
+    },
+    {
+      "symbol": "_ZGVeN16v_coshf",
+      "function": "coshf",
+      "calls": 15
+    },
+    {
+      "symbol": "_ZGVeN16v_sinhf",
+      "function": "sinhf",
+      "calls": 15
+    },
+    {
+      "symbol": "_ZGVeN16v_tanf",
+      "function": "tanf",
+      "calls": 19
+    },
+    {
+      "symbol": "_ZGVeN16v_tanhf",
+      "function": "tanhf",
+      "calls": 18
+    },
+    {
+      "symbol": "_ZGVeN16vv_atan2f",
+      "function": "atan2f",
+      "calls": 22
+    },
+    {
+      "symbol": "_ZGVeN8v_cosh",
+      "function": "cosh",
+      "calls": 15
+    },
+    {
+      "symbol": "_ZGVeN8v_sinh",
+      "function": "sinh",
+      "calls": 15
+    },
+    {
+      "symbol": "_ZGVeN8v_tan",
+      "function": "tan",
+      "calls": 15
+    },
+    {
+      "symbol": "_ZGVeN8v_tanh",
+      "function": "tanh",
+      "calls": 15
+    },
+    {
+      "symbol": "_ZGVeN8vv_atan2",
+      "function": "atan2",
+      "calls": 15
+    }
+  ]
+}

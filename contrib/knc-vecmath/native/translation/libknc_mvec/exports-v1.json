@@ -1,0 +1,26 @@
+{
+  "schemaVersion": "1.0.0",
+  "kind": "KncMvecUnqualifiedExportSourceManifest",
+  "status": "SourceDefinitionsOnlyUnqualified",
+  "algorithmEvidence": {
+    "path": "artifacts/test-state/host-e-width/b595df3d71fb4a8cb8b0c7b82f9b746b/experiment.json",
+    "sha256": "03681944dd7d66185a51343b85e6901af7c04b725e22e4c1225de63ae9cc4f25"
+  },
+  "interface": "include/knc_mvec_abi.h",
+  "adapter": "src/e_export_adapter.h",
+  "exports": [
+    {"symbol": "_ZGVeN16v_expf", "source": "src/e_expf_export.c", "operation": "expf", "lanes": 16, "precisionBits": 32},
+    {"symbol": "_ZGVeN16v_logf", "source": "src/e_logf_export.c", "operation": "logf", "lanes": 16, "precisionBits": 32},
+    {"symbol": "_ZGVeN8v_exp", "source": "src/e_exp_export.c", "operation": "exp", "lanes": 8, "precisionBits": 64},
+    {"symbol": "_ZGVeN8v_log", "source": "src/e_log_export.c", "operation": "log", "lanes": 8, "precisionBits": 64}
+  ],
+  "narrowWrapperSource": "src/exp_log_wrappers.c",
+  "narrowWrapperCount": 6,
+  "remainingDeclarationOnlySymbols": 26,
+  "scalarLibmFallback": false,
+  "targetCompiled": false,
+  "targetAbiQualified": false,
+  "targetNumericsQualified": false,
+  "g5Passed": false,
+  "productionReady": false
+}

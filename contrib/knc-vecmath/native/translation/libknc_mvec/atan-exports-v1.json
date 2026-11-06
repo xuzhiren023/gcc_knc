@@ -1,0 +1,125 @@
+{
+  "schemaVersion": "1.0.0",
+  "kind": "AdditionalAtanSourceDefinitions",
+  "status": "HostAlgorithmsAndSourceWiringCheckedOnly",
+  "g5Passed": false,
+  "productionReady": false,
+  "targetCompiled": false,
+  "targetAbiQualified": false,
+  "targetNumericsQualified": false,
+  "targetMasksQualified": false,
+  "targetQualifiedCount": 0,
+  "sourceDefinedCountWithPriorTwentySeven": 30,
+  "remainingDeclarationOnly": 6,
+  "coveredCallSitesWithPriorFamilies": 2786,
+  "totalObservedCallSites": 2879,
+  "priorSourceManifest": {
+    "path": "tan-exports-v1.json",
+    "sha256": "0f14180830bbd74a16534144d4781d1d254e592db94e78be61d73c80e5eb8b6a"
+  },
+  "activeAlgorithmSource": "../math_algorithms/atan_e/atan_e_v2.c",
+  "priorFailedRevision": {
+    "path": "../math_algorithms/atan_e/atan_e.c",
+    "sha256": "f7e71f07695b24c61f2359ae657a60ca5a5c8e8d2879f49a4d3489456107d558",
+    "failure": "DP atan2 strict1ULP; observed1.0078621130864913ULP; preserved unchanged"
+  },
+  "exports": [
+    {
+      "symbol": "_ZGVeN16v_atanf",
+      "source": "src/e_atan_export.c",
+      "calls": 6
+    },
+    {
+      "symbol": "_ZGVeN16vv_atan2f",
+      "source": "src/e_atan_export.c",
+      "calls": 22
+    },
+    {
+      "symbol": "_ZGVeN8vv_atan2",
+      "source": "src/e_atan_export.c",
+      "calls": 15
+    }
+  ],
+  "requiredIncludePaths": [
+    "include",
+    "../math_algorithms/atan_e"
+  ],
+  "sources": {
+    "native/translation/math_algorithms/atan_e/export_wiring.c": "422186cda3245b7cc30635958e17024e6d020b6437e14800943f574c1e2e1125",
+    "native/translation/math_algorithms/atan_e/atan_e_v2.c": "43d6763075bf4c410582d9f55c6a9cbae38399091aae936216fe74d80d21d6c4",
+    "native/translation/libknc_mvec/src/e_atan_export.c": "bc6ed38792e767faf687227feaadc84cb2714c29f08a41a8c3bea94860b9cd06",
+    "native/translation/math_algorithms/atan_e/atan_e.h": "dc2e79ebb4177757c0a707507b39760e7aaebdd71c06b5f1536c5363f1983ddb",
+    "native/translation/libknc_mvec/include/knc_mvec_abi.h": "e9acb084e70bed5350736cd256b52fc64d6cff8620efc14a8276bdc3f1624cbc",
+    "native/translation/libknc_mvec/src/e_export_adapter.h": "ad0b6b6d2cd663efd37128ef97cf8102c2f277664b90f88067813607d5b5977d",
+    "native/translation/math_algorithms/atan_e/check_exports.py": "0c7bd0f03068824bfdc8a1fe39a95c07da211eef23293640db7177bed1db0340",
+    "native/translation/math_algorithms/atan_e/upstream/atan.c": "1cffb67a65456ae0bc5f07a94df04a4f18ebc1ac0bffe3219250c4e0555ee01d",
+    "native/translation/math_algorithms/atan_e/upstream/atan2.c": "a5f94b09b10b4e72bb15d94ae403c9dfd27d7ad881ecd729000004429acfca63",
+    "native/translation/math_algorithms/atan_e/upstream/atan2f.c": "31a61a0a4c7b00db625b708525f24673a83df868a3e363042c9cc9dcf0aaeec8",
+    "native/translation/math_algorithms/atan_e/upstream/atanf.c": "e0533d7b72aabce311a758a1f94fd15e5d4067be73b716cb1f425df5bc9039d6",
+    "native/translation/math_algorithms/atan_e/upstream/COPYRIGHT": "f9bc4423732350eb0b3f7ed7e91d530298476f8fec0c6c427a1c04ade22655af",
+    "native/translation/math_algorithms/atan_e/upstream/source-lock.json": "c5a63ca647d41c1bbd6914280a23658109cf0ea43e5b1b41f421bbd5a222afb1"
+  },
+  "records": {
+    "artifacts/test-state/host-atan-e/d74e20c29d954bc092beb2486bab29d5/accuracy.json": "191cb3c4c6dbf27a8361b6b20f20176a946b79e218fc38f7997cb1a1f707bdce",
+    "artifacts/test-state/host-atan-e/15158e3fc26949118273f136707bff64/accuracy.json": "d27b60319ec549e10e2f04b2b8fdffebc363e5bc4f0d3ff63c0fee0db847fdc4",
+    "artifacts/test-state/host-atan-e/85b19d6b2add4ece9ec66a330ec0df17/accuracy.json": "99fcededb272168215903d25af67f7b2665d541da7b6b8e83c6bfaf57e9f7fe2",
+    "artifacts/test-state/host-atan-exports/7c550d3f7f034461bdf6934699bba286/wiring.json": "751114c37be6a1c94d6453703a1475de6d41bf9e5c9eeacd20341ea7b2a43ad8"
+  },
+  "hostIsa": "strict baselineSSE2; AVX/AVX2/FMA/AVX512 disabled",
+  "ulpUnit": "spacing at correctly rounded binary reference, matching HostMathReference",
+  "accuracy": {
+    "atanf": {
+      "activeLanesPerVariant": 1048832,
+      "uniqueRandomFiniteInputsOrPairs": 1048576,
+      "finiteComparisons": 1048829,
+      "maxUlpBound": 0.49999999097574294,
+      "screenMaxUlpBound": 0.4999894192806507
+    },
+    "atan2f": {
+      "activeLanesPerVariant": 1049072,
+      "uniqueRandomFiniteInputsOrPairs": 1048576,
+      "finiteComparisons": 1048985,
+      "maxUlpBound": 0.49999911656755214,
+      "screenMaxUlpBound": 0.4999994616921789
+    },
+    "atan2": {
+      "activeLanesPerVariant": 1049072,
+      "uniqueRandomFiniteInputsOrPairs": 1048576,
+      "finiteComparisons": 1048985,
+      "maxUlpBound": 0.9180821653690734,
+      "screenMaxUlpBound": 0.770186330046773
+    }
+  },
+  "remainingSymbolsAtThisAdditiveCheckpoint": [
+    {
+      "symbol": "_ZGVeN16v_coshf",
+      "function": "coshf",
+      "calls": 15
+    },
+    {
+      "symbol": "_ZGVeN16v_sinhf",
+      "function": "sinhf",
+      "calls": 15
+    },
+    {
+      "symbol": "_ZGVeN16v_tanhf",
+      "function": "tanhf",
+      "calls": 18
+    },
+    {
+      "symbol": "_ZGVeN8v_cosh",
+      "function": "cosh",
+      "calls": 15
+    },
+    {
+      "symbol": "_ZGVeN8v_sinh",
+      "function": "sinh",
+      "calls": 15
+    },
+    {
+      "symbol": "_ZGVeN8v_tanh",
+      "function": "tanh",
+      "calls": 15
+    }
+  ]
+}

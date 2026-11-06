@@ -1,0 +1,22 @@
+{
+  "project": "Arm optimized-routines",
+  "commit": "649ccc8411e7c4862965710f25c570d854a1483f",
+  "license": "MIT",
+  "files": {
+    "pow.c": {
+      "url": "https://raw.githubusercontent.com/ARM-software/optimized-routines/649ccc8411e7c4862965710f25c570d854a1483f/math/pow.c",
+      "sha256": "c0cea57bed7c0af791600bfd217787158a536ca2611f54a258759de0640422fe",
+      "bytes": 12819
+    },
+    "pow_log_data.c": {
+      "url": "https://raw.githubusercontent.com/ARM-software/optimized-routines/649ccc8411e7c4862965710f25c570d854a1483f/math/pow_log_data.c",
+      "sha256": "d28818bd95355e6854766a3818a6ec0866f7afcef592fe1e836d05d3f465392e",
+      "bytes": 10559
+    }
+  },
+  "requiredRetainedFiles": {
+    "native/upstream/arm-optimized-routines-v26.01-dp/math/exp_data.c": "a5e84677e7693c7d22195f86faac5fdc6f92bff7ea2e54c0e7888203a78ffc24",
+    "native/upstream/arm-optimized-routines-v26.01-dp/math/math_config.h": "9a3ee029ba2b58444fafb51427bf0dc390d117f26115cd5a7033a5cc03042881",
+    "native\\translation\\math_algorithms\\pow_e8\\upstream\\LICENSE": "650afbf29f214451e02241adc42534e82c9d6ae2b38e2444b92b5a1ffcaf9346"
+  }
+}

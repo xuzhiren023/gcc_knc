@@ -1,0 +1,40 @@
+{
+  "project": "Arm optimized-routines",
+  "commit": "649ccc8411e7c4862965710f25c570d854a1483f",
+  "license": "MIT",
+  "files": {
+    "math_log10f.c": {
+      "url": "https://raw.githubusercontent.com/ARM-software/optimized-routines/649ccc8411e7c4862965710f25c570d854a1483f/math/log10f.c",
+      "sha256": "7d646421bddce61db2159020dc52bd1f5cf2d1b5c160fd6e6daea95001b46545",
+      "bytes": 2642
+    },
+    "math_aarch64_v_log10_data.c": {
+      "url": "https://raw.githubusercontent.com/ARM-software/optimized-routines/649ccc8411e7c4862965710f25c570d854a1483f/math/aarch64/v_log10_data.c",
+      "sha256": "e447474095117bc578b298717d0ca728c0d0ab2e8ff13c893b6a15455657d7fb",
+      "bytes": 8227
+    },
+    "musl-v1.2.5-log10.c": {
+      "project": "musl",
+      "tag": "v1.2.5",
+      "url": "https://git.musl-libc.org/cgit/musl/plain/src/math/log10.c?h=v1.2.5",
+      "sha256": "ef9b4b1f0918cf1fcb797f9fa4d4ffe177bfa27f668d74a41d613bfbcd83850a",
+      "bytes": 2968,
+      "license": "Sun permissive notice in retained source"
+    }
+  },
+  "discovery": [
+    {
+      "path": "math/aarch64/v_log10.c",
+      "http": 404
+    }
+  ],
+  "copiedProjectMachinery": {
+    "path": "native/translation/math_algorithms/e_width_experiment/e_logf.c",
+    "sha256": "a79dc9fa88d4bc10706536414fc91a84e8a08e82beeea6d5f06c3fa2a8b75cec",
+    "scope": "integer special/mask handling and the same official Arm logf reduction; SP scaling added before conversion"
+  },
+  "armLicenseSha256": "650afbf29f214451e02241adc42534e82c9d6ae2b38e2444b92b5a1ffcaf9346",
+  "unusedCandidateFiles": [
+    "math_aarch64_v_log10_data.c"
+  ]
+}

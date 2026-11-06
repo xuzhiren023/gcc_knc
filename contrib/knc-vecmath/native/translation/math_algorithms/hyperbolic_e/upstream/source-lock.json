@@ -1,0 +1,60 @@
+{
+  "upstream": "official musl libc",
+  "version": "v1.2.5",
+  "sources": [
+    {
+      "path": "sinh.c",
+      "url": "https://git.musl-libc.org/cgit/musl/plain/src/math/sinh.c?h=v1.2.5",
+      "bytes": 838,
+      "sha256": "ab082814c4b1bbad8ea7dcfde1e36167cd72be5ef0e8b3ef3def0e052dd74261"
+    },
+    {
+      "path": "cosh.c",
+      "url": "https://git.musl-libc.org/cgit/musl/plain/src/math/cosh.c?h=v1.2.5",
+      "bytes": 769,
+      "sha256": "5e5ed87e1a80e68734f4c87a4907a55f50a54df58261698aa94d5cb3276a3d43"
+    },
+    {
+      "path": "tanh.c",
+      "url": "https://git.musl-libc.org/cgit/musl/plain/src/math/tanh.c?h=v1.2.5",
+      "bytes": 996,
+      "sha256": "7e290e86729cba6ccc8eb1f7db2452736daf1a2a8ce01b210db5787fee5cb762"
+    },
+    {
+      "path": "sinhf.c",
+      "url": "https://git.musl-libc.org/cgit/musl/plain/src/math/sinhf.c?h=v1.2.5",
+      "bytes": 489,
+      "sha256": "2c52f2c26163f8b7a0048465343510a5856d9c8cc954931722e121040fe81024"
+    },
+    {
+      "path": "coshf.c",
+      "url": "https://git.musl-libc.org/cgit/musl/plain/src/math/coshf.c?h=v1.2.5",
+      "bytes": 498,
+      "sha256": "c834656b0af1d4055167badf60afb062b4d71385a7d5a44769d1039bb9417b7c"
+    },
+    {
+      "path": "tanhf.c",
+      "url": "https://git.musl-libc.org/cgit/musl/plain/src/math/tanhf.c?h=v1.2.5",
+      "bytes": 653,
+      "sha256": "4787b2f6be28bb2ae9721d510b12d2b9aebf96a594f26f25a3dc267f029800df"
+    },
+    {
+      "path": "expm1.c",
+      "url": "https://git.musl-libc.org/cgit/musl/plain/src/math/expm1.c?h=v1.2.5",
+      "bytes": 6964,
+      "sha256": "c4764166cea03420f2dfc1840a6a7615934192d851b96d5d2dcc321cc1e39460"
+    },
+    {
+      "path": "expm1f.c",
+      "url": "https://git.musl-libc.org/cgit/musl/plain/src/math/expm1f.c?h=v1.2.5",
+      "bytes": 2731,
+      "sha256": "a7d4e8f8b41f04d4b977deb59e6bf96067371387062a5987fcc3b4464f54f5e9"
+    }
+  ],
+  "license": {
+    "path": "COPYRIGHT",
+    "origin": "Official musl v1.2.5 COPYRIGHT (existing pinned project copy)",
+    "bytes": 6204,
+    "sha256": "f9bc4423732350eb0b3f7ed7e91d530298476f8fec0c6c427a1c04ade22655af"
+  }
+}

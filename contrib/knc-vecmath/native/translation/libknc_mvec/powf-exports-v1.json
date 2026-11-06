@@ -1,0 +1,49 @@
+{
+  "schemaVersion": "1.0.0",
+  "kind": "AdditionalPowfSourceDefinitions",
+  "status": "HostAlgorithmAndSourceWiringCheckedOnly",
+  "g5Passed": false,
+  "targetAbiQualified": false,
+  "targetNumericsQualified": false,
+  "targetMasksQualified": false,
+  "sourceDefinedCountWithPriorTen": 13,
+  "remainingDeclarationOnly": 23,
+  "exports": [
+    {
+      "symbol": "_ZGVeN16vv_powf",
+      "source": "src/e_powf_export.c",
+      "calls": 593
+    },
+    {
+      "symbol": "_ZGVdN8vv_powf",
+      "source": "src/powf_wrappers.c",
+      "calls": 7
+    },
+    {
+      "symbol": "_ZGVbN4vv_powf",
+      "source": "src/powf_wrappers.c",
+      "calls": 9
+    }
+  ],
+  "sources": {
+    "native/translation/math_algorithms/powf_e16/powf_e16.c": "1301cb34273cbefcc4fc232e1dfee91c7d352b4eadc4222060aa248922937b85",
+    "native/translation/math_algorithms/powf_e16/powf_e16.h": "23768a74d4b51ed648f06c94f868ee86908f917f908f9f607b869660c2e3d5b3",
+    "native/translation/libknc_mvec/src/e_powf_export.c": "80d81464304a957791fc586c0d759f9da554cfa0084f0042d9337f6312e82a91",
+    "native/translation/libknc_mvec/src/powf_wrappers.c": "3d264c34ff2e2868b37fd8e7f6ac0b74b5351cf1cf196fcdade659ba62ababd2"
+  },
+  "requiredConfiguration": {
+    "HAVE_FAST_FMA": 0,
+    "POWF_SCALE_BITS": 0,
+    "EXP2F_TABLE_BITS": 5,
+    "POWF_LOG2_TABLE_BITS": 4,
+    "fastMath": false
+  },
+  "hostIsa": "baselineSSE2; AVX/AVX2/FMA/AVX512 disabled",
+  "accuracy": {
+    "path": "artifacts/test-state/host-powf-e16/4afa5507f47849ccae051e0bc42816da/accuracy.json",
+    "sha256": "d444937a07e797a7b10abba89a59c22fcca091443e13dee8740e66175ee0a374",
+    "activeLanesPerVariant": 1314816,
+    "finiteComparisonsPerVariant": 1150467,
+    "maxUlpBound": 0.505089905719066
+  }
+}

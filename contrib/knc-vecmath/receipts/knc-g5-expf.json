@@ -1,0 +1,356 @@
+{
+  "schemaVersion": 1,
+  "kind": "KncG5ExpfSingleExportQualification",
+  "status": "G5ExpfExportTargetQualified",
+  "recordedUtc": "2026-10-23T04:36:23.305816+00:00",
+  "export": "_ZGVeN16v_expf",
+  "targetExportQualified": true,
+  "g5QualifiedExportCount": 1,
+  "g5RequiredExportCount": 36,
+  "g5RemainingExportCount": 35,
+  "phase3RegisteredFamilies": 39,
+  "phase3VerifiedFamiliesWithPassingCardLaneTests": 38,
+  "executionAuthenticated": true,
+  "result": {
+    "path": "C:\\Users\\xuzhi\\Documents\\PhiWeather\\artifacts\\test-state\\g5-expf-target-attempts\\75b74152a209473d83428d5c3f2cf3d3\\result.json",
+    "sha256": "4a2504e3999d7ba3ab9bf838d2823b9c5d480801cd559977488215507e8087e2"
+  },
+  "prerequisites": {
+    "preparation": {
+      "path": "C:\\Users\\xuzhi\\Documents\\PhiWeather\\artifacts\\test-state\\g5-expf-target-executor\\392ce8f15e4d4bcdb0e40bc68d5f1160\\preparation.json",
+      "sha256": "a32af665dae9cab342fed9c7314f008da53efcddce59b776e8028235e89beb57"
+    },
+    "release": {
+      "path": "C:\\Users\\xuzhi\\Documents\\PhiWeather\\artifacts\\test-state\\g5-expf-root-release\\b3b4e294e41e49be98902b78b7e20a92\\root-resource-release.json",
+      "sha256": "7d4dedc27f08ca7f5a6f7550b754e63a1519c1016eba761b22bae560489b6c0e"
+    }
+  },
+  "sourceClosure": {
+    "path": "C:\\Users\\xuzhi\\Documents\\PhiWeather\\artifacts\\test-state\\g5-expf-gather-free-image\\6c26aa9aa86e44b49ef150738b495d4f\\source-closure.json",
+    "sha256": "bc32cba56b69f4cf7172c2b9c2fc02609fe4b87fa418de2841fcdf5acdc5871d"
+  },
+  "manifest": {
+    "path": "C:\\Users\\xuzhi\\Documents\\PhiWeather\\native\\reference\\g5-expf\\conformance.v1.json",
+    "sha256": "515981965d86a7f97f0f9441aaad80d5092cc0d0d2b09ebefd6e670bf17d1092"
+  },
+  "linkedImageAdmission": {
+    "kind": "G5ExpfExactLinkedImageAdmission",
+    "imageSha256": "05ec9f35d2a3b3de77fec301a046682041382f4b2ef780d7ff917b7a8dfc27e1",
+    "machine": 181,
+    "elfType": 2,
+    "imageBytes": 35079,
+    "needed": [
+      "libc.so.6",
+      "ld-linux-k1om.so.2"
+    ],
+    "directCalls": [
+      {
+        "address": 4196350,
+        "caller": "main",
+        "callee": "pw_g6_probe_main",
+        "target": 4196364
+      },
+      {
+        "address": 4196911,
+        "caller": "pw_g6_probe_main",
+        "callee": "pw_g5_expf_call",
+        "target": 4197218
+      },
+      {
+        "address": 4197338,
+        "caller": "pw_g5_expf_call",
+        "callee": "_ZGVeN16v_expf",
+        "target": 4208240
+      }
+    ],
+    "staticObjectCount": 8,
+    "staticDataBindings": [
+      {
+        "sourceName": ".LC11",
+        "address": 4209152,
+        "bytes": 64,
+        "alignment": 64,
+        "sha256": "7261fce0fa93430a0b54775a2e12575886b018f5116a0e258564843515b84b63",
+        "readonlyPages": [
+          4206592
+        ],
+        "instructionReferences": [
+          4198908
+        ]
+      },
+      {
+        "sourceName": ".LC12",
+        "address": 4209216,
+        "bytes": 64,
+        "alignment": 64,
+        "sha256": "9f67e263985784682d3eda4728f3d282ee4113ecf33c73e21b98a10613fb3cdb",
+        "readonlyPages": [
+          4206592
+        ],
+        "instructionReferences": [
+          4198924
+        ]
+      },
+      {
+        "sourceName": ".LC13",
+        "address": 4209280,
+        "bytes": 64,
+        "alignment": 64,
+        "sha256": "b808223a2bc4856fb26144ef926f72f80e90b56352c00b5c598649f4b90d57e8",
+        "readonlyPages": [
+          4206592
+        ],
+        "instructionReferences": [
+          4198858
+        ]
+      },
+      {
+        "sourceName": ".LC14",
+        "address": 4209344,
+        "bytes": 64,
+        "alignment": 64,
+        "sha256": "c8dcd8353b4432faf42697b6db8785cccff7fe8cd31989b608a77b73d07ddcc8",
+        "readonlyPages": [
+          4206592
+        ],
+        "instructionReferences": [
+          4198874
+        ]
+      },
+      {
+        "sourceName": "pw_expf_register_b8d1598e12f5c503_extend_selector",
+        "address": 4209536,
+        "bytes": 64,
+        "alignment": 64,
+        "sha256": "c9f5bb1f3cb7cd5e3584ab5ab3bc834beefd8dc96771cb22c832ad108be90c9a",
+        "readonlyPages": [
+          4206592
+        ],
+        "instructionReferences": [
+          4198940,
+          4199044,
+          4199076,
+          4199174
+        ]
+      },
+      {
+        "sourceName": "pw_expf_register_b8d1598e12f5c503_extend_keep",
+        "address": 4209600,
+        "bytes": 64,
+        "alignment": 64,
+        "sha256": "eeaed4f1e83464dc9ce347241abcf3e18d79a91a6ca002412e04816ba994c2d7",
+        "readonlyPages": [
+          4206592
+        ],
+        "instructionReferences": [
+          4198956,
+          4199060,
+          4199092,
+          4199190
+        ]
+      },
+      {
+        "sourceName": ".LC23",
+        "address": 4209408,
+        "bytes": 64,
+        "alignment": 64,
+        "sha256": "5d85718ec594b982c252d0279e5966ffca33a5eaf2a455038d3ab331fde70cea",
+        "readonlyPages": [
+          4206592
+        ],
+        "instructionReferences": [
+          4199766,
+          4204701,
+          4206501
+        ]
+      },
+      {
+        "sourceName": ".LC27",
+        "address": 4209472,
+        "bytes": 64,
+        "alignment": 64,
+        "sha256": "e9512b567a9e967b6e872380418de278fda0606358af1a6720aa0a173a532e8f",
+        "readonlyPages": [
+          4206592
+        ],
+        "instructionReferences": [
+          4203701
+        ]
+      }
+    ],
+    "readonlyPages": [
+      4206592
+    ],
+    "sourceGatherInstructions": 0,
+    "actualImageGatherInstructions": 0,
+    "retiredImageRejected": true,
+    "rawProfile": "KncMxcsrDUE1ReservedZeroFtzDazOff",
+    "rawProfileControl": 2097152,
+    "standingMasks": [
+      1,
+      15,
+      255
+    ],
+    "genericIsaQualification": false,
+    "targetExecuted": false
+  },
+  "actualRuntime": {
+    "actualImageSha256": "05ec9f35d2a3b3de77fec301a046682041382f4b2ef780d7ff917b7a8dfc27e1",
+    "liveExecutableCaptured": true,
+    "actualInputSha256": "8cf1ffb9395798b6e5eb426a0ce65137586267728d331d8ffabe8e0fe4bc4adf",
+    "loadedLibraries": {
+      "ld-linux-k1om.so.2": {
+        "alias": "/lib64/ld-2.21.so",
+        "resolved": "/lib64/ld-2.21.so",
+        "sha256": "2a60a4698794ca42b43dfd0979771e523dbacaae7c44047ba6c7ed98aa211397"
+      },
+      "libc.so.6": {
+        "alias": "/lib64/libc-2.21.so",
+        "resolved": "/lib64/libc-2.21.so",
+        "sha256": "7ee7ac7da48c6fac7fea1a8dd75c42d3e1a735c0ff5c71cc7578f85691a5e4fc"
+      }
+    },
+    "readonlyStaticPagesObserved": [
+      4206592
+    ],
+    "staticObjectCount": 8,
+    "pid": 97516,
+    "maps": "C:\\Users\\xuzhi\\Documents\\PhiWeather\\artifacts\\test-state\\g5-expf-target-attempts\\75b74152a209473d83428d5c3f2cf3d3\\retained\\results\\run\\process.maps",
+    "loaderLog": "C:\\Users\\xuzhi\\Documents\\PhiWeather\\artifacts\\test-state\\g5-expf-target-attempts\\75b74152a209473d83428d5c3f2cf3d3\\retained\\results\\run\\loader-debug.97516",
+    "actualExportSymbol": "_ZGVeN16v_expf"
+  },
+  "actualUserData": {
+    "datasetManifestSha256": "90951b1944c9d95142b61f6be08fc423fe412290b8d9ebc1ab44696c4f881894",
+    "inputBytes": 4908128,
+    "vectors": 76689,
+    "lanes": 1227024,
+    "actualInputSha256": "8cf1ffb9395798b6e5eb426a0ce65137586267728d331d8ffabe8e0fe4bc4adf",
+    "nativeResult": {
+      "path": "C:\\Users\\xuzhi\\Documents\\PhiWeather\\artifacts\\test-state\\g5-expf-target-attempts\\75b74152a209473d83428d5c3f2cf3d3\\retained\\results\\run\\g5-expf-native.bin",
+      "bytes": 7362176,
+      "sha256": "306e01df7b30f47a0d943e8616429caffd97f12cf7e4fd7a2ab3db18355d48b2"
+    }
+  },
+  "numericalAssessment": {
+    "kind": "G5ExpfTargetNumericalSourceAssessment",
+    "status": "NumericalSampleMatchedAwaitingExecutionBinding",
+    "vectors": 76689,
+    "lanes": 1227024,
+    "valueMismatches": 0,
+    "exceptionVectorMismatches": 0,
+    "profileMismatches": 0,
+    "standingMaskMismatches": 0,
+    "roundedReferenceUlpDistance": {
+      "0": 958080,
+      "1": 123
+    },
+    "categories": {
+      "sampledFinite": 958203,
+      "specialOrIdentity": 268821
+    },
+    "independentIntervalLanesEvaluated": 123,
+    "maxCheckedNonidenticalUlpUpperNumerator": "22491812259466688354306677028556405074663559953176956195262288728370841063137929253553609070828414328797817270090150300149066631299346434583112013545029",
+    "maxCheckedNonidenticalUlpUpperDenominator": "44841550858394146269559346665277316200968382140048504696226185084473314645947539247572422027587890625000000000000000000000000000000000000000000000000000",
+    "maxAllowedUlps": 1,
+    "matchedCachedFiniteErrorBoundUlps": "1/2",
+    "firstMismatches": [],
+    "actualExecutionAuthenticatedHere": false,
+    "hostKernelExecuted": false,
+    "g5Passed": false,
+    "errnoQualified": false,
+    "otherRoundingModesQualified": false
+  },
+  "finiteNonidenticalMaximumIntervalBoundUlpsApprox": 0.501584174251554,
+  "boundedCheckerNegativeControlsMatched": true,
+  "nativePhases": [
+    {
+      "phase": "inspect",
+      "exitCode": 0,
+      "proof": {
+        "WORKER_PID": 97466,
+        "WORKER_PGID": 97466,
+        "WATCHDOG_PID": 97468,
+        "WATCHDOG_PGID": 97468,
+        "CHILD_PID": 97466,
+        "EXIT": 0
+      }
+    },
+    {
+      "phase": "run",
+      "exitCode": 0,
+      "proof": {
+        "WORKER_PID": 97500,
+        "WORKER_PGID": 97500,
+        "WATCHDOG_PID": 97502,
+        "WATCHDOG_PGID": 97502,
+        "CHILD_PID": 97500,
+        "EXIT": 0
+      }
+    }
+  ],
+  "gateProofArtifacts": {
+    "C:\\Users\\xuzhi\\Documents\\PhiWeather\\artifacts\\test-state\\g5-expf-target-attempts\\75b74152a209473d83428d5c3f2cf3d3\\retained\\results\\preflight-processes.txt": "595c34f7e47800280fe722b8ed1e7616e6aeb6e41690b314cea4a89d0a2c1f49",
+    "C:\\Users\\xuzhi\\Documents\\PhiWeather\\artifacts\\test-state\\g5-expf-target-attempts\\75b74152a209473d83428d5c3f2cf3d3\\retained\\results\\inspect\\image-disassembly.argv": "c24575d70182db8592d75e2cf75f385a1c2f0b1d7d0495cd7d0e397ceb6375a4",
+    "C:\\Users\\xuzhi\\Documents\\PhiWeather\\artifacts\\test-state\\g5-expf-target-attempts\\75b74152a209473d83428d5c3f2cf3d3\\retained\\results\\inspect\\image-disassembly.exit": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+    "C:\\Users\\xuzhi\\Documents\\PhiWeather\\artifacts\\test-state\\g5-expf-target-attempts\\75b74152a209473d83428d5c3f2cf3d3\\retained\\results\\inspect\\image-disassembly.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "C:\\Users\\xuzhi\\Documents\\PhiWeather\\artifacts\\test-state\\g5-expf-target-attempts\\75b74152a209473d83428d5c3f2cf3d3\\retained\\results\\inspect\\image-disassembly.stdout": "249e9d9a3d6aa4340a327ac661974d170a4a9a724c4bf90d36a901211907ff01",
+    "C:\\Users\\xuzhi\\Documents\\PhiWeather\\artifacts\\test-state\\g5-expf-target-attempts\\75b74152a209473d83428d5c3f2cf3d3\\retained\\results\\inspect\\image-header.argv": "82942249b8adf3abf4c7dd8ec483abfea6c51ec954290ec423c23c66545dafe0",
+    "C:\\Users\\xuzhi\\Documents\\PhiWeather\\artifacts\\test-state\\g5-expf-target-attempts\\75b74152a209473d83428d5c3f2cf3d3\\retained\\results\\inspect\\image-header.exit": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+    "C:\\Users\\xuzhi\\Documents\\PhiWeather\\artifacts\\test-state\\g5-expf-target-attempts\\75b74152a209473d83428d5c3f2cf3d3\\retained\\results\\inspect\\image-header.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "C:\\Users\\xuzhi\\Documents\\PhiWeather\\artifacts\\test-state\\g5-expf-target-attempts\\75b74152a209473d83428d5c3f2cf3d3\\retained\\results\\inspect\\image-header.stdout": "a13d574dd8441ebe8b7932ec0b740c71b14f190a2439e9e2a177043ea675dba1",
+    "C:\\Users\\xuzhi\\Documents\\PhiWeather\\artifacts\\test-state\\g5-expf-target-attempts\\75b74152a209473d83428d5c3f2cf3d3\\retained\\results\\inspect\\image.mic": "05ec9f35d2a3b3de77fec301a046682041382f4b2ef780d7ff917b7a8dfc27e1",
+    "C:\\Users\\xuzhi\\Documents\\PhiWeather\\artifacts\\test-state\\g5-expf-target-attempts\\75b74152a209473d83428d5c3f2cf3d3\\retained\\results\\inspect\\inspect.done": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "C:\\Users\\xuzhi\\Documents\\PhiWeather\\artifacts\\test-state\\g5-expf-target-attempts\\75b74152a209473d83428d5c3f2cf3d3\\retained\\results\\run\\g5-expf-native.bin": "306e01df7b30f47a0d943e8616429caffd97f12cf7e4fd7a2ab3db18355d48b2",
+    "C:\\Users\\xuzhi\\Documents\\PhiWeather\\artifacts\\test-state\\g5-expf-target-attempts\\75b74152a209473d83428d5c3f2cf3d3\\retained\\results\\run\\input-feed.argv": "54671cae8cb309290f1b66dc5a891f92deebc87c711bf32a14d9167c75a3fce5",
+    "C:\\Users\\xuzhi\\Documents\\PhiWeather\\artifacts\\test-state\\g5-expf-target-attempts\\75b74152a209473d83428d5c3f2cf3d3\\retained\\results\\run\\input-feed.exit": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+    "C:\\Users\\xuzhi\\Documents\\PhiWeather\\artifacts\\test-state\\g5-expf-target-attempts\\75b74152a209473d83428d5c3f2cf3d3\\retained\\results\\run\\input-feed.pid": "d585edc4f07f798a959aa5968aa0acf3d002db25d0a0cfbbd347671374cb4e3b",
+    "C:\\Users\\xuzhi\\Documents\\PhiWeather\\artifacts\\test-state\\g5-expf-target-attempts\\75b74152a209473d83428d5c3f2cf3d3\\retained\\results\\run\\input-feed.start-uptime": "8db5629a89894072bd9552196532a87aa547941e7c0a4eb4dfe675255b96f323",
+    "C:\\Users\\xuzhi\\Documents\\PhiWeather\\artifacts\\test-state\\g5-expf-target-attempts\\75b74152a209473d83428d5c3f2cf3d3\\retained\\results\\run\\input-feed.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "C:\\Users\\xuzhi\\Documents\\PhiWeather\\artifacts\\test-state\\g5-expf-target-attempts\\75b74152a209473d83428d5c3f2cf3d3\\retained\\results\\run\\input-hold-capture-complete.uptime": "b2790e2a09de34f44a48e179d232838fae30cd2396f31498432d8fe71e986a82",
+    "C:\\Users\\xuzhi\\Documents\\PhiWeather\\artifacts\\test-state\\g5-expf-target-attempts\\75b74152a209473d83428d5c3f2cf3d3\\retained\\results\\run\\input-hold.kind": "8dc5005dc4880b30b48af0ec720307cfca4afdf830ac4aa8d7b35577a9692b18",
+    "C:\\Users\\xuzhi\\Documents\\PhiWeather\\artifacts\\test-state\\g5-expf-target-attempts\\75b74152a209473d83428d5c3f2cf3d3\\retained\\results\\run\\input-used.bin": "8cf1ffb9395798b6e5eb426a0ce65137586267728d331d8ffabe8e0fe4bc4adf",
+    "C:\\Users\\xuzhi\\Documents\\PhiWeather\\artifacts\\test-state\\g5-expf-target-attempts\\75b74152a209473d83428d5c3f2cf3d3\\retained\\results\\run\\loader-debug.97516": "15e0919cb817248de3ba4b2362c42412c1d3a9ceb98d883caef761beb4986e14",
+    "C:\\Users\\xuzhi\\Documents\\PhiWeather\\artifacts\\test-state\\g5-expf-target-attempts\\75b74152a209473d83428d5c3f2cf3d3\\retained\\results\\run\\mapped-files.list": "f3e37ef00b53362d78379cfc5908c65d3281a72470fad4d3404e1a3513214ecc",
+    "C:\\Users\\xuzhi\\Documents\\PhiWeather\\artifacts\\test-state\\g5-expf-target-attempts\\75b74152a209473d83428d5c3f2cf3d3\\retained\\results\\run\\process.maps": "1cc1bdf7b0593a9d6370f080141d3c4306c31ecf4719f9de3d0bfff7657b094c",
+    "C:\\Users\\xuzhi\\Documents\\PhiWeather\\artifacts\\test-state\\g5-expf-target-attempts\\75b74152a209473d83428d5c3f2cf3d3\\retained\\results\\run\\process.status": "550e83fece4470700a7a0794289db5ce12519340763fe55f25a898e8dff5827f",
+    "C:\\Users\\xuzhi\\Documents\\PhiWeather\\artifacts\\test-state\\g5-expf-target-attempts\\75b74152a209473d83428d5c3f2cf3d3\\retained\\results\\run\\program.argv": "0f575ade48d9ac1990e11ccb9882a074a19f29335be31e6dfc2d26f57cef27a4",
+    "C:\\Users\\xuzhi\\Documents\\PhiWeather\\artifacts\\test-state\\g5-expf-target-attempts\\75b74152a209473d83428d5c3f2cf3d3\\retained\\results\\run\\program.end-uptime": "f5327807d3c758aba8379d27a2396bd0b90b62898b3cd732e3cb57fab8224aef",
+    "C:\\Users\\xuzhi\\Documents\\PhiWeather\\artifacts\\test-state\\g5-expf-target-attempts\\75b74152a209473d83428d5c3f2cf3d3\\retained\\results\\run\\program.environment": "785ff17ee6798d32357a73fdf9261e5f850d016ada1a3aac50b632a92b455844",
+    "C:\\Users\\xuzhi\\Documents\\PhiWeather\\artifacts\\test-state\\g5-expf-target-attempts\\75b74152a209473d83428d5c3f2cf3d3\\retained\\results\\run\\program.exe": "4994e84aa3f8b3aa93faa56ff5a5e7fa58aa7304fc9780a9bff45b3533c67160",
+    "C:\\Users\\xuzhi\\Documents\\PhiWeather\\artifacts\\test-state\\g5-expf-target-attempts\\75b74152a209473d83428d5c3f2cf3d3\\retained\\results\\run\\program.exit": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+    "C:\\Users\\xuzhi\\Documents\\PhiWeather\\artifacts\\test-state\\g5-expf-target-attempts\\75b74152a209473d83428d5c3f2cf3d3\\retained\\results\\run\\program.pid": "e7c1a4934e8af20b79fc0a1dd0c1537fdae962d7626b927e9a7f826cc60e362a",
+    "C:\\Users\\xuzhi\\Documents\\PhiWeather\\artifacts\\test-state\\g5-expf-target-attempts\\75b74152a209473d83428d5c3f2cf3d3\\retained\\results\\run\\program.start-uptime": "d562c1baee9831666bee684ac301bd31673856269dab738a34d586355e579352",
+    "C:\\Users\\xuzhi\\Documents\\PhiWeather\\artifacts\\test-state\\g5-expf-target-attempts\\75b74152a209473d83428d5c3f2cf3d3\\retained\\results\\run\\program.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "C:\\Users\\xuzhi\\Documents\\PhiWeather\\artifacts\\test-state\\g5-expf-target-attempts\\75b74152a209473d83428d5c3f2cf3d3\\retained\\results\\run\\program.stdout": "ec4abef5a77f5ff5c254b7e202b299a6ee40e2f8240350c6fcdbed0e2b8a8375",
+    "C:\\Users\\xuzhi\\Documents\\PhiWeather\\artifacts\\test-state\\g5-expf-target-attempts\\75b74152a209473d83428d5c3f2cf3d3\\retained\\results\\run\\run.done": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "C:\\Users\\xuzhi\\Documents\\PhiWeather\\artifacts\\test-state\\g5-expf-target-attempts\\75b74152a209473d83428d5c3f2cf3d3\\retained\\results\\run\\runtime-executable.mic": "05ec9f35d2a3b3de77fec301a046682041382f4b2ef780d7ff917b7a8dfc27e1",
+    "C:\\Users\\xuzhi\\Documents\\PhiWeather\\artifacts\\test-state\\g5-expf-target-attempts\\75b74152a209473d83428d5c3f2cf3d3\\retained\\results\\run\\runtime-libraries\\0001": "2a60a4698794ca42b43dfd0979771e523dbacaae7c44047ba6c7ed98aa211397",
+    "C:\\Users\\xuzhi\\Documents\\PhiWeather\\artifacts\\test-state\\g5-expf-target-attempts\\75b74152a209473d83428d5c3f2cf3d3\\retained\\results\\run\\runtime-libraries\\0002": "7ee7ac7da48c6fac7fea1a8dd75c42d3e1a735c0ff5c71cc7578f85691a5e4fc",
+    "C:\\Users\\xuzhi\\Documents\\PhiWeather\\artifacts\\test-state\\g5-expf-target-attempts\\75b74152a209473d83428d5c3f2cf3d3\\retained\\results\\run\\runtime-libraries\\manifest.tsv": "89f6ca6e5572d048c498b07878c51cade5a6a225c0940e096d1b907e5c84a10d"
+  },
+  "cardBootId": "3349a234-6e43-4583-b73b-288e878d6089",
+  "ownedProcessesTerminal": true,
+  "hostRetentionValidated": true,
+  "nativeDirectoryReclaimed": true,
+  "scope": {
+    "lanesPerCall": 16,
+    "inputCoverage": "1227024 sampled and special/identity lanes; 76689 full-active vectors including 416 isolation vectors",
+    "rounding": "nearest-even",
+    "ftz": false,
+    "daz": false,
+    "nativeControlProfile": "KncMxcsrDUE1ReservedZeroFtzDazOffNearestEvenOnly",
+    "maxAllowedSampleErrorUlps": 1,
+    "exceptions": "observed native aggregate per-vector flags and special semantics matched independent reference",
+    "errnoQualified": false,
+    "otherRoundingModesQualified": false,
+    "exhaustiveBinary32Proof": false,
+    "maskedExportQualified": false,
+    "forecastOrSpeedupQualified": false
+  },
+  "g3Passed": false,
+  "g5Passed": false,
+  "g6Passed": false,
+  "g10Passed": false,
+  "productionReady": false,
+  "remainingAction": "Continue gather-free exp, then logf and log; full G5 remains open until all required exports and ABI/runtime obligations qualify."
+}
