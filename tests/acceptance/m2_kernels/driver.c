@@ -1,5 +1,6 @@
 /* Correctness gate shared by standalone correctness and every timing launch. */
 #include "kernels.h"
+#include <malloc.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -138,6 +139,9 @@ int correctness(void) {
   return failures ? 1 : 0;
 }
 int main(int argc, char **argv) {
+  /* Workers allocate in their own threads; glibc would give each a 64 MiB arena reservation, and
+     240 of them exceed card_run's address-space limit (lead, 2026-11-06). */
+  mallopt(M_ARENA_MAX, 2);
   if (argc == 1 || (argc == 2 && !strcmp(argv[1],"--correctness"))) return correctness();
   if (!strcmp(argv[1],"--benchmark")) return benchmark(argc,argv);
   fprintf(stderr,"Use --correctness or --benchmark --kernel NAME --length N "
