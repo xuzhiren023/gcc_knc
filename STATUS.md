@@ -1,10 +1,10 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-06 09:08.
+Updated automatically at every ticket change. Last update: 2026-11-06 09:16.
 
 **Waiting for you:** S6-09. Run `python tools/pm.py inbox`.
 
-Current tickets: `[##################--]` 99 of 107
+Current tickets: `[##################--]` 100 of 107
 
 ## Milestones
 
@@ -12,7 +12,7 @@ Current tickets: `[##################--]` 99 of 107
 |---|---|---|---|
 | M0 | Foundation | In progress | 17 of 17 tickets |
 | M1 | Mixed native code | Done | 43 of 43 tickets |
-| M2 | Useful vector target | In progress | 39 of 47 tickets |
+| M2 | Useful vector target | In progress | 40 of 47 tickets |
 | M3 | Runtimes | Not started | Not planned in detail yet |
 | M4 | Broad optimization | Not started | Not planned in detail yet |
 | M5 | Program corpus | Not started | Not planned in detail yet |
@@ -120,7 +120,7 @@ Current tickets: `[##################--]` 99 of 107
 | S5-21 | 32-byte short vectors pass and return in memory again, as before S5-16 and as the donor does (pr109040 regression) | Done | 32-byte short vectors (such as unsigned short vector_size(32)) are passed on the stack and returned in memo... |
 | S6-01 | Measurement method on KNC: clock, pinning, thread density, working sets, repetitions and noise (ADR-0010 input) | Done | KNC now has a measured timing method: raw-monotonic wall time, fixed sibling pinning for 1-4 threads per co... |
 | S6-02 | M2 kernels: affine, stencil, short-loop and small-matrix as GCC-KNC vector, x87 and hand-written IMCI builds, with a timing driver | In progress | Red approved: the bitwise checker with guards rejects a wrong IMCI affine reference at all 75 nonempty leng... |
-| S6-03 | Machine characterization corpus (E5-01): latency and throughput per instruction class at 1-4 threads per core, cache and memory levels | Waiting for review | Build/lint/host args PASS: .work/_state/logs/S6_03_acceptance-20261106-090406.log. No card run. Lead PowerS... |
+| S6-03 | Machine characterization corpus (E5-01): latency and throughput per instruction class at 1-4 threads per core, cache and memory levels | Done | A KNC characterization corpus of 104 hand-written measurements is ready to run on the card: latency and thr... |
 | S6-04 | Per-loop KNC reports (E5-03): vector factor, peel and tail choice, masks, helper calls, spills and rejection reasons | Done | With -fopt-info-vec, KNC now reports each costed loop candidate: vector mode and factor, scalar peel, maske... |
 | S6-05 | -mtune=knc costs and vectorizer cost model v1 from the characterization tables (E5-09, E5-02) | Not started |  |
 | S6-06 | KNC scheduler v0 (E5-05): U/V pipes, 4-cycle vector latency, 3-cycle AGI | Not started |  |
@@ -132,6 +132,7 @@ Current tickets: `[##################--]` 99 of 107
 
 ## Recent activity
 
+- 2026-11-06 09:16 **S6-03** lead approve: A KNC characterization corpus of 104 hand-written measurements is ready to run on the card: latency and throughput per instruction class, U/V pairi...
 - 2026-11-06 09:07 **S6-03** engineer submit: Build/lint/host args PASS: .work/_state/logs/S6_03_acceptance-20261106-090406.log. No card run. Lead PowerShell commands (repeat 3 windows): foreac...
 - 2026-11-06 09:06 **S6-03** lead answer: Approved: submit with --override 'measurement corpus required by the ticket: 104 measurements in 5 files, lead allowed'. No split. Name in the subm...
 - 2026-11-06 09:05 **S6-03** engineer ask: 104 requested characterization measurements are implemented in 755 lines / five test files under tests/bench/knc-char (00536ef). GCC16 build, assem...
@@ -139,13 +140,12 @@ Current tickets: `[##################--]` 99 of 107
 - 2026-11-06 09:00 **S6-09** engineer escalate: budget: 7415416 input tokens used; the budget is 6000000
 - 2026-11-06 09:00 **S6-09** lead answer: Do not fix the mask crash here: vect-simd-17 moves to S6-10, which owns the knc_movhi -1 into k1 class (ticket amended). The count of 8 was the lea...
 - 2026-11-06 09:00 **S6-02** engineer red: 70bcf0a adds the red correctness gate. Host checker self-test exits 1 with 75 failing lengths for a C copy stand-in after accepting correct scalar ...
-- 2026-11-06 08:59 **S6-09** engineer ask: Two attempts: initial build failed; corrected clean build passed, green failed. GCC 89b5040fe28 adds vec_series; imci.md +60/-0, 1 hunk; shared 0/0...
 
 ## Cost
 
 - From the script, engineer: 242 sessions, 578.7M input tokens
 - From the script, lead: 185 sessions, 58.8M input tokens
-- Started by hand, Claude: 9 sessions, 1166.6M input tokens
+- Started by hand, Claude: 9 sessions, 1169.8M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
