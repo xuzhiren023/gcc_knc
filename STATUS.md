@@ -1,10 +1,10 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-06 09:35.
+Updated automatically at every ticket change. Last update: 2026-11-06 10:31.
 
-**Next: the tech lead, on S6-02.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: the tech lead, on S6-05.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
-Current tickets: `[##################--]` 101 of 107
+Current tickets: `[##################--]` 102 of 108
 
 ## Milestones
 
@@ -12,7 +12,7 @@ Current tickets: `[##################--]` 101 of 107
 |---|---|---|---|
 | M0 | Foundation | In progress | 17 of 17 tickets |
 | M1 | Mixed native code | Done | 43 of 43 tickets |
-| M2 | Useful vector target | In progress | 41 of 47 tickets |
+| M2 | Useful vector target | In progress | 42 of 48 tickets |
 | M3 | Runtimes | Not started | Not planned in detail yet |
 | M4 | Broad optimization | Not started | Not planned in detail yet |
 | M5 | Program corpus | Not started | Not planned in detail yet |
@@ -119,7 +119,7 @@ Current tickets: `[##################--]` 101 of 107
 | S5-20 | card_run refuses engineer sandbox sessions, so card jobs stay with the lead | Done | card_run now refuses to run when started from a Codex sandbox account, so only the lead puts jobs on the ca... |
 | S5-21 | 32-byte short vectors pass and return in memory again, as before S5-16 and as the donor does (pr109040 regression) | Done | 32-byte short vectors (such as unsigned short vector_size(32)) are passed on the stack and returned in memo... |
 | S6-01 | Measurement method on KNC: clock, pinning, thread density, working sets, repetitions and noise (ADR-0010 input) | Done | KNC now has a measured timing method: raw-monotonic wall time, fixed sibling pinning for 1-4 threads per co... |
-| S6-02 | M2 kernels: affine, stencil, short-loop and small-matrix as GCC-KNC vector, x87 and hand-written IMCI builds, with a timing driver | Waiting for review | Submitted by the lead on the engineer's behalf from the main checkout (the worktree's pm.py predates allow_... |
+| S6-02 | M2 kernels: affine, stencil, short-loop and small-matrix as GCC-KNC vector, x87 and hand-written IMCI builds, with a timing driver | Done | The M2 yardstick is ready and correct on the card: FP32/FP64 affine, two stencils, a short loop and 8x8/16x... |
 | S6-03 | Machine characterization corpus (E5-01): latency and throughput per instruction class at 1-4 threads per core, cache and memory levels | Done | A KNC characterization corpus of 104 hand-written measurements is ready to run on the card: latency and thr... |
 | S6-04 | Per-loop KNC reports (E5-03): vector factor, peel and tail choice, masks, helper calls, spills and rejection reasons | Done | With -fopt-info-vec, KNC now reports each costed loop candidate: vector mode and factor, scalar peel, maske... |
 | S6-05 | -mtune=knc costs and vectorizer cost model v1 from the characterization tables (E5-09, E5-02) | Question for the tech lead | Required S6-03 input is missing: Get-Content docs/research/knc-characterization.md fails with PathNotFound;... |
@@ -129,9 +129,11 @@ Current tickets: `[##################--]` 101 of 107
 | S6-09 | ICE in expand_vec_series_expr: KNC lane-index vectors (VEC_SERIES) for V16SI/V8DI and the FP modes | Done | Loops that build lane-index vectors (VEC_SERIES) now compile on KNC instead of crashing the compiler: 6 of ... |
 | S6-10 | Unrecognizable and unconstrained insns: ffsll's scalar conditional move, and constant -1 into a k register | In progress |  |
 | S6-11 | ICE in expand_fn_using_insn for FP64 fmax/fmin loops (S5-15 follow-up) | Not started |  |
+| S6-12 | card_run --benchmark refuses while another project's processes still run on the card, whatever the ledger says | Not started |  |
 
 ## Recent activity
 
+- 2026-11-06 10:31 **S6-02** lead approve: The M2 yardstick is ready and correct on the card: FP32/FP64 affine, two stencils, a short loop and 8x8/16x16 matrix-vector kernels, each as GCC-ve...
 - 2026-11-06 09:35 **S6-02** engineer submit: Submitted by the lead on the engineer's behalf from the main checkout (the worktree's pm.py predates allow_protected). Fixture at 2d9a63d: bitwise ...
 - 2026-11-06 09:34 **S6-02** lead answer: Reviewed 2d9a63d: the references are now fair (4x unroll, FMA, one tail mask, prefetch). The lead submits from the main checkout, whose pm.py has a...
 - 2026-11-06 09:33 **S6-02** engineer ask: 2d9a63d implements all four reference improvements; suite build and both ELF lints PASS. Log: .work/_state/logs/S6_02_suite_build-20261106-093227.l...
@@ -139,16 +141,15 @@ Current tickets: `[##################--]` 101 of 107
 - 2026-11-06 09:25 **S6-05** engineer ask: Required S6-03 input is missing: Get-Content docs/research/knc-characterization.md fails with PathNotFound; git ls-files '*knc-characterization*' r...
 - 2026-11-06 09:24 **S6-09** lead approve: Loops that build lane-index vectors (VEC_SERIES) now compile on KNC instead of crashing the compiler: 6 of the 7 vect tests that hit this compile, ...
 - 2026-11-06 09:24 **S6-02** engineer ask: 0c660a9 completes fixture. GCC 16.2.0, donor 2.22 assembly and ELF lint pass. Log: .work/_state/logs/S6_02_suite_build-20261106-091711.log. Binarie...
-- 2026-11-06 09:17 **S6-09** engineer submit: Submitted by the lead on the engineer's behalf (token budget exhausted). GCC 89b5040fe28: vec_series for the packed modes in imci.md (+60, no share...
 
 ## Cost
 
 - From the script, engineer: 245 sessions, 582.1M input tokens
 - From the script, lead: 185 sessions, 58.8M input tokens
-- Started by hand, Claude: 9 sessions, 1190.3M input tokens
+- Started by hand, Claude: 9 sessions, 1218.5M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 12.9 GiB of 100 GiB. 138 GiB free on the drive.
+The project uses 12.9 GiB of 100 GiB. 135 GiB free on the drive.
