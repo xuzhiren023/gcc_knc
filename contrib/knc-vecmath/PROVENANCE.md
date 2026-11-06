@@ -22,6 +22,8 @@ renamed to `__knc_vmath_<name>_<lanes>` (36 names, 66 files; ADR-0011 point 2). 
 `_ZGVeN16v_expf` became `__knc_vmath_expf_16`. Comments that mention `_ZGV` in general, the
 `check_exports.py` scanners (which look for `_ZGV` symbols in PhiWeather's pipeline output), and all
 `.md` and `.json` files are unchanged, so status notes and receipts still use the old names.
+Git stores the files with LF line endings (`.gitattributes`), so file hashes recorded in the receipts
+and `source-lock.json` files match the PhiWeather originals only for files that already used LF.
 
 **Status:** the receipts qualify the functions built by PhiWeather's route (GCC 14 for KNL, then
 translated to k1om), round-to-nearest with all lanes active only; errno, traps, other rounding modes
