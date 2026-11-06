@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-06 08:06.
+Updated automatically at every ticket change. Last update: 2026-11-06 08:10.
 
 **Next: the tech lead, on S6-01.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
@@ -121,7 +121,7 @@ Current tickets: `[##################--]` 97 of 107
 | S6-01 | Measurement method on KNC: clock, pinning, thread density, working sets, repetitions and noise (ADR-0010 input) | Question for the tech lead | 85c0b4d adds numeric clocksource/cpufreq records, CPU MHz/TSC flags, and start/end RAW TSC calibration. GCC... |
 | S6-02 | M2 kernels: affine, stencil, short-loop and small-matrix as GCC-KNC vector, x87 and hand-written IMCI builds, with a timing driver | Not started |  |
 | S6-03 | Machine characterization corpus (E5-01): latency and throughput per instruction class at 1-4 threads per core, cache and memory levels | Not started |  |
-| S6-04 | Per-loop KNC reports (E5-03): vector factor, peel and tail choice, masks, helper calls, spills and rejection reasons | In progress | 1. Yes: a minimal ADR-0006 entry dispatch from ix86_vector_costs (for example in finish_cost) into KNC-only... |
+| S6-04 | Per-loop KNC reports (E5-03): vector factor, peel and tail choice, masks, helper calls, spills and rejection reasons | Question for the tech lead | Checks pass: build; T0 52; existing T1/T2; four report scans. Torture 4006 match except verified gcov time ... |
 | S6-05 | -mtune=knc costs and vectorizer cost model v1 from the characterization tables (E5-09, E5-02) | Not started |  |
 | S6-06 | KNC scheduler v0 (E5-05): U/V pipes, 4-cycle vector latency, 3-cycle AGI | Not started |  |
 | S6-07 | First gcc.dg/vect baseline for KNC: compile scans on the host, execution on the card | Done | The gcc.dg/vect suite now has a KNC baseline: of 2,001 tests, 1,329 compile (777 linked for the card), 632 ... |
@@ -132,6 +132,7 @@ Current tickets: `[##################--]` 97 of 107
 
 ## Recent activity
 
+- 2026-11-06 08:10 **S6-04** engineer ask: Checks pass: build; T0 52; existing T1/T2; four report scans. Torture 4006 match except verified gcov time stamp. Logs .work/_state/logs/S6_04_*.lo...
 - 2026-11-06 08:06 **S6-07** lead approve: The gcc.dg/vect suite now has a KNC baseline: of 2,001 tests, 1,329 compile (777 linked for the card), 632 are skipped for target selectors, 24 giv...
 - 2026-11-06 07:57 **S6-07** engineer submit: 7e477e9 retains both double-reduc originals, explicitly not reduced, per lead answer. All 16 ICEs listed with reproducers. Prior checks: parser red...
 - 2026-11-06 07:55 **S6-01** engineer ask: 85c0b4d adds numeric clocksource/cpufreq records, CPU MHz/TSC flags, and start/end RAW TSC calibration. GCC16 build + assembly/ELF lint PASS; logs:...
@@ -139,13 +140,12 @@ Current tickets: `[##################--]` 97 of 107
 - 2026-11-06 07:53 **S6-07** engineer ask: 42de014 commits baseline: 2001 tests, 777 linked/linted/staged, 16 ICEs; 14 checked reproducers. Two reductions of vect-double-reduc-{3,7} failed: ...
 - 2026-11-06 07:50 **S6-01** lead answer: 330991 is not stored locally; cite it through docs/research/knc-microarch.md (pages already given there) and treat TSC invariance as unproven. Befo...
 - 2026-11-06 07:49 **S6-01** engineer ask: df6d56c adds protocol/probe; GCC 16.2.0 build and assembly/ELF lint PASS. Schema, commands and logs: docs/research/knc-measurement.md. Binary: .wor...
-- 2026-11-06 07:44 **S6-04** lead answer: 1. Yes: a minimal ADR-0006 entry dispatch from ix86_vector_costs (for example in finish_cost) into KNC-only report code, one or two lines, TARGET_K...
 
 ## Cost
 
 - From the script, engineer: 235 sessions, 561.3M input tokens
 - From the script, lead: 185 sessions, 58.8M input tokens
-- Started by hand, Claude: 9 sessions, 1124.3M input tokens
+- Started by hand, Claude: 9 sessions, 1126.6M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
