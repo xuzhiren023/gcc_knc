@@ -372,6 +372,14 @@ def t2_short_vector(runner):
         runner.command(runner.tool('as'), '--march=k1om', asm, '-o', obj)
         runner.command(sys.executable, runner.root / 'tools/knc_lint', asm, obj)
     runner.result('t2 V16HI hidden result pointer', failures)
+    if runner.args.compiler == 'gcc16':
+        output = runner.tc.parent / 'S5-21'
+        output.mkdir(exist_ok=True)
+        for reverse in (False, True):
+            t2_crosscheck(runner, source.parent, 'knc-short-vector',
+                          ['short_vector_six', 'short_vector_float',
+                           'short_vector_return', 'short_vector_varargs'],
+                          output, '-O2', reverse, combined_source=source)
 
 
 def t2(runner):
@@ -390,7 +398,8 @@ def t2(runner):
                 t2_crosscheck(runner, sources, stem, symbols, output, level, reverse)
 
 
-def t2_crosscheck(runner, sources, stem, symbols, output, level, reverse):
+def t2_crosscheck(runner, sources, stem, symbols, output, level, reverse,
+                  combined_source=None):
     label = 't2 ' + stem + ' ' + level + ' ' + (
         'donor caller / GCC16 callee' if reverse else 'GCC16 caller / donor callee')
     objects, failures = [], []
@@ -399,15 +408,24 @@ def t2_crosscheck(runner, sources, stem, symbols, output, level, reverse):
     for role in ('caller', 'callee'):
         use_donor = (role == 'caller') == reverse
         cc, flags = (runner.tool('gcc'), []) if use_donor else (runner.cc, runner.cc_flags)
+        defines = (['-DSHORT_VECTOR_CROSS'] +
+                   (['-DSHORT_VECTOR_CALLER'] if role == 'caller' else [])
+                   if combined_source else [])
         obj = runner.out / (role + '.o')
-        compiled = runner.command(cc, *flags, level, '-ffp-contract=off',
+        compiled = runner.command(cc, *flags, *defines, level, '-ffp-contract=off',
                                   '-frounding-math', '-fexcess-precision=standard',
                                   '--sysroot=' + str(runner.sysroot), '-c',
-                                  sources / (stem + '-' + role + '.c'), '-o', obj, check=False)
+                                  combined_source or sources / (stem + '-' + role + '.c'),
+                                  '-o', obj, check=False)
         if compiled.returncode:
             failures.append(role + ' compile: ' + compiled.stdout[-1800:])
         else:
             objects.append(obj)
+            if combined_source:
+                lint = runner.command(sys.executable, runner.root / 'tools/knc_lint',
+                                      obj, check=False)
+                if lint.returncode:
+                    failures.append(role + ' lint: ' + lint.stdout[-1800:])
     if not failures:
         linked = runner.command(runner.cc, *runner.cc_flags,
                                 '--sysroot=' + str(runner.sysroot), *objects, '-o', elf,
