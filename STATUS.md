@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-06 07:44.
+Updated automatically at every ticket change. Last update: 2026-11-06 07:49.
 
-**Next: GPT-6.1, on S6-01 (Measurement method on KNC: clock, pinning, thread density, working sets, repetitions and noise (ADR-0010 input)).** Run `python tools/dispatch.py`, or ask the tech lead to.
+**Next: the tech lead, on S6-01.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[##################--]` 96 of 104
 
@@ -118,7 +118,7 @@ Current tickets: `[##################--]` 96 of 104
 | S5-19 | card_run shares cores with the PhiWeather session - compact per-job core claims from the ledger, and round-robin turns for benchmark jobs | Done | card_run now packs each job onto whole cores taken from 59 downward, shares the card with the PhiWeather se... |
 | S5-20 | card_run refuses engineer sandbox sessions, so card jobs stay with the lead | Done | card_run now refuses to run when started from a Codex sandbox account, so only the lead puts jobs on the ca... |
 | S5-21 | 32-byte short vectors pass and return in memory again, as before S5-16 and as the donor does (pr109040 regression) | Done | 32-byte short vectors (such as unsigned short vector_size(32)) are passed on the stack and returned in memo... |
-| S6-01 | Measurement method on KNC: clock, pinning, thread density, working sets, repetitions and noise (ADR-0010 input) | In progress |  |
+| S6-01 | Measurement method on KNC: clock, pinning, thread density, working sets, repetitions and noise (ADR-0010 input) | Question for the tech lead | df6d56c adds protocol/probe; GCC 16.2.0 build and assembly/ELF lint PASS. Schema, commands and logs: docs/r... |
 | S6-02 | M2 kernels: affine, stencil, short-loop and small-matrix as GCC-KNC vector, x87 and hand-written IMCI builds, with a timing driver | Not started |  |
 | S6-03 | Machine characterization corpus (E5-01): latency and throughput per instruction class at 1-4 threads per core, cache and memory levels | Not started |  |
 | S6-04 | Per-loop KNC reports (E5-03): vector factor, peel and tail choice, masks, helper calls, spills and rejection reasons | In progress | 1. Yes: a minimal ADR-0006 entry dispatch from ix86_vector_costs (for example in finish_cost) into KNC-only... |
@@ -129,6 +129,7 @@ Current tickets: `[##################--]` 96 of 104
 
 ## Recent activity
 
+- 2026-11-06 07:49 **S6-01** engineer ask: df6d56c adds protocol/probe; GCC 16.2.0 build and assembly/ELF lint PASS. Schema, commands and logs: docs/research/knc-measurement.md. Binary: .wor...
 - 2026-11-06 07:44 **S6-04** lead answer: 1. Yes: a minimal ADR-0006 entry dispatch from ix86_vector_costs (for example in finish_cost) into KNC-only report code, one or two lines, TARGET_K...
 - 2026-11-06 07:44 **S6-04** engineer ask: Red f759c0d: all four T1 report scans fail as expected; log .work/_state/logs/S6_04_red-20261106-074335.log. Scope blocker: i386.cc:26259 always cr...
 - 2026-11-06 04:54 **S5-21** lead approve: 32-byte short vectors (such as unsigned short vector_size(32)) are passed on the stack and returned in memory again, exactly as GCC 5 does, so pr10...
@@ -136,13 +137,12 @@ Current tickets: `[##################--]` 96 of 104
 - 2026-11-06 03:09 **S5-21** lead approve-red: Red approved: T1 reads the V16HI argument from entry rsp+8 like the donor; T2 checks the hidden-pointer return. Both fail on the current compiler a...
 - 2026-11-06 03:08 **S5-21** engineer red: Red commit 0d20124: T1 pr109040 foo checks entry-RSP+8; T2 checks hidden RDI stores and RAX return. GCC16 -O2 fails both with unsupported KNC regis...
 - 2026-11-06 03:01 **S5-18** lead approve: At KNC 656cb9ef096 the forward-port drill applies with only textual conflicts (5 files on upstream master, none on gcc-16) and both ICE sweeps show...
-- 2026-11-06 02:50 **S5-18** engineer submit: GCC 656cb9ef096; report docs/research/forward-port.md (616f480). Build skipped. Drill: master 5 files/7 textual hunks; gcc-16 0. Both sweeps: 0 ICE...
 
 ## Cost
 
 - From the script, engineer: 231 sessions, 556.5M input tokens
 - From the script, lead: 185 sessions, 58.8M input tokens
-- Started by hand, Claude: 9 sessions, 1112.2M input tokens
+- Started by hand, Claude: 9 sessions, 1112.7M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
