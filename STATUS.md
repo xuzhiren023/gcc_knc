@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-06 02:35.
+Updated automatically at every ticket change. Last update: 2026-11-06 02:36.
 
 **Next: GPT-6.1, on S5-18 (Final Sprint 5 batch check at the sprint head).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
@@ -114,7 +114,7 @@ Current tickets: `[###################-]` 94 of 95
 | S5-15 | KNC FP min/max: MIN_EXPR/MAX_EXPR and fmin/fmax as vgminps/vgmaxps (pd), with their reductions | Done | FP min/max loops, fmin/fmax and their reductions now vectorize on KNC as vgmin/vgmax with the C NaN rules, ... |
 | S5-16 | KNC byte and word data: V16QI/V16HI transport modes, widening up-converting loads and narrowing down-converting stores | Done | Byte and word arrays now vectorize on KNC through converting loads and stores (u8/s8/u16/s16 to int and flo... |
 | S5-17 | Sprint 5 mid batch check after S5-06, S5-07 and S5-08 | Done | x86 check (lead, portability-claude) at knc 9690ac8906a vs releases/gcc-16.2.0: -O2 and -O2 -mavx512f ident... |
-| S5-18 | Final Sprint 5 batch check at the sprint head | Not started |  |
+| S5-18 | Final Sprint 5 batch check at the sprint head | In progress |  |
 | S5-19 | card_run shares cores with the PhiWeather session - compact per-job core claims from the ledger, and round-robin turns for benchmark jobs | Done | card_run now packs each job onto whole cores taken from 59 downward, shares the card with the PhiWeather se... |
 | S5-20 | card_run refuses engineer sandbox sessions, so card jobs stay with the lead | Done | card_run now refuses to run when started from a Codex sandbox account, so only the lead puts jobs on the ca... |
 
@@ -133,7 +133,7 @@ Current tickets: `[###################-]` 94 of 95
 
 - From the script, engineer: 227 sessions, 547.8M input tokens
 - From the script, lead: 184 sessions, 58.7M input tokens
-- Started by hand, Claude: 9 sessions, 1062.9M input tokens
+- Started by hand, Claude: 9 sessions, 1063.8M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
