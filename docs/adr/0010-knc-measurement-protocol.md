@@ -76,3 +76,59 @@ variation at length 1024 but not at L2. The card gives user programs no huge pag
 5. Fixed physical placement (reserved huge pages, which needs root on the card) is the owner's call
    and would allow a cross-launch rule again.
 
+## Amendment 2 (2026-11-06): spread is a flag, decisions use confidence bounds
+
+**Status:** Accepted by the owner ("approved recommendation setting"), on the lead's recommendation
+from the gate review (`docs/research/m2-gate-review.md`) and the noise diagnosis
+(`docs/research/m2-noise-diagnosis.md`), both by the lead's subagents. Card confirmation of the
+mechanism is pending (`claude-s6-m2diag.sh`).
+
+**Why.** The within-launch 2% rule (point 4) fired in 23 of 86 sized launches on 2026-11-06, in 18
+cases on the build timed first, on a 10-22% step between two performance states that also
+explains the cross-launch range. The discarded launches gave the same M2 verdict as the kept
+ones. Discarding and rerunning launches on that criterion is a selection on an outcome, which the benchmarking
+literature (Hoefler & Belli 2015 rules 5-7; Kalibera & Jones 2013; Abedi & Brecht 2017) replaces
+with full reporting, repetition at the level where variance lives, and confidence intervals around
+the decision statistic. See `docs/research/m2-gate-review.md`.
+
+**Changes.**
+1. Point 4, validity: a launch is valid when the correctness gate passed before timing, every
+   build's median timed batch is 50-200 ms, every worker's pin check passed, density is not 3,
+   card_run reports no overlapping job and no foreign workload, and the clock policy records are
+   identical at start and end. Nothing else invalidates a launch. Every sample is kept.
+2. Point 4, reporting: for each build the five group medians are printed in chronological order
+   with their spread; a spread of 2% or more is reported as a **regime step** flag with the build,
+   its position in the launch order and the step size. Flags are counted per block and reported
+   with the result. A flagged launch counts like any other.
+3. Point 6, M2 decision, at the L2 working set and production density over five valid launches:
+   (a) the FP32 affine gain fraction is at least 0.5 in every launch; (b) the one-sided 95% lower
+   confidence bound of the mean gain fraction, mean - t(0.95, n-1) * sd / sqrt(n), is at least
+   0.5; (c) T_gcc <= 1.05 * T_x87 at every tested length in every launch. If (a) or (b) fails
+   while the mean is at least 0.5, exactly five more launches are run and the three clauses are
+   applied to all ten; otherwise M2 fails. Launches are never repeated or dropped for spread, and
+   the number of launches is fixed before the block starts.
+4. Point 6, reporting: with each M2 figure, the five (or ten) launch values, their range, the
+   minimum, the lower bound in (b), a bootstrap percentile 95% interval of the median gain
+   fraction, and the regime-step count.
+5. Build order: rotated so that each build is timed first in at least one launch of five (the
+   present alternation never times x87 first). If the driver is changed to interleave builds by
+   group (one group of each build per round, order drawn per round), the gain fraction is also
+   computed per round and the per-round values are reported; this is the design the tuning rule
+   in point 7 requires.
+6. Amendment 1's items 1, 2 and 5 stand; its items 3 and 4 are replaced by the above.
+7. **Point 7, tuning evidence** (new):
+   Before and after are two GCC-KNC builds of the same kernel in the
+   same process, on the same buffers, timed in interleaved rounds (one group of each per round,
+   order drawn per round, five rounds or more), in at least three launches so that at least two
+   performance states are seen. The statistic is the per-round ratio T_after / T_before; the
+   figure is the median ratio with a bootstrap percentile 95% interval over all rounds of all
+   launches (Kalibera & Jones' effect-size interval). A change is accepted when the interval excludes 1 and
+   its near end is beyond the ticket's stated minimum effect, at every working set the ticket names.
+   A result whose sign differs between launches is reported as placement-dependent, not accepted.
+   Per Mytkowicz et al., code layout differs between the two binaries; a claimed effect under 2% is
+   additionally checked with the two builds linked in the opposite order.
+8. **Correction to amendment 1's reason.** The diagnosis finds that the cross-launch L2 range comes
+   from straggler workers in a slow regime early in a launch (worker 0's own time moves about 2%),
+   not from physical page placement. The page-aligned placement (amendment 1 item 2) stays: it
+   removed real variation at length 1024.
+

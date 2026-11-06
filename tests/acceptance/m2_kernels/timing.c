@@ -344,7 +344,7 @@ int benchmark(int argc, char **argv) {
            "gain_fraction=%.6f\n",kernels[selected].name,g,gcc_x87[g],per_element[2]/per_element[1],
            ratio[g],gf[g]);
   }
-  int sized = 1;
+  int sized = 1, regime_steps = 0;
   double figure[3];
   for (int b = 0; b < 3; ++b) {
     uint64_t sorted[5];
@@ -354,27 +354,30 @@ int benchmark(int argc, char **argv) {
     /* A launch is valid only if its samples are the protocol's ~100 ms batches. */
     int build_sized = sorted[2] >= 50000000ULL && sorted[2] <= 200000000ULL;
     sized = sized && build_sized;
+    regime_steps += spread >= 0.02;
     figure[b] = (double)sorted[2]/((double)workers*length*reps[b]);
     printf("summary kernel=%s build=%s length=%lu threads_per_core=%d cores=%d "
            "repetitions=%lu median_ns=%llu ns_per_element=%.9f group_spread=%.9f "
-           "within_launch_ok=%d launch=%d working_set=%s short_length=%u\n",
+           "regime_step=%d launch=%d working_set=%s short_length=%u\n",
            kernels[selected].name,build_names[b],length,density,cores,
            reps[b],(unsigned long long)sorted[2],figure[b],spread,
-           spread < 0.02 && build_sized && density != 3,launch,working_set,short_length);
+           spread >= 0.02,launch,working_set,short_length);
   }
-  /* The launch figure (ADR-0010 point 6) and the paired validity rule: the quantity M2 decides
-     on, taken from same-group medians, must agree across the five groups within 2%. */
+  /* The launch figure (ADR-0010 point 6). Amendment 2: only mechanical checks invalidate a
+     launch; a 2% spread of a build's or the paired gain fraction's group values is a flag. */
   double gf_launch = (figure[1]/figure[0]-1)/(figure[1]/figure[2]-1);
   double gf_spread = spread_of(gf,5), ratio_spread = spread_of(ratio,5), gcc_x87_max = 0;
   for (int g = 0; g < 5; ++g) if (gcc_x87[g] > gcc_x87_max) gcc_x87_max = gcc_x87[g];
   double gate = gf_defined ? gf_spread : ratio_spread;
-  int paired_ok = sized && density != 3 && isfinite(gate) && gate < 0.02;
-  if (!paired_ok) noisy = 1;
+  int paired_step = !isfinite(gate) || gate >= 0.02, valid = sized && density != 3;
+  if (!valid) noisy = 1;
   printf("launch kernel=%s length=%lu threads_per_core=%d cores=%d launch=%d working_set=%s "
          "short_length=%u gain_fraction=%.6f gain_fraction_defined=%d gain_fraction_spread=%.9f "
-         "gcc_over_imci_spread=%.9f gcc_over_x87_max=%.6f sized=%d paired_ok=%d\n",
+         "gcc_over_imci_spread=%.9f gcc_over_x87_max=%.6f sized=%d valid=%d regime_steps=%d "
+         "paired_step=%d\n",
          kernels[selected].name,length,density,cores,launch,working_set,short_length,
-         gf_launch,gf_defined,gf_spread,ratio_spread,gcc_x87_max,sized,paired_ok);
+         gf_launch,gf_defined,gf_spread,ratio_spread,gcc_x87_max,sized,valid,regime_steps,
+         paired_step);
   stopping = 1; sync_workers();
   for (int w = 0; w < workers; ++w) if (pthread_join(threads[w],NULL)) die("pthread_join");
   if (pthread_barrier_destroy(&barrier)) die("barrier destroy");

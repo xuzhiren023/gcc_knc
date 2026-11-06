@@ -167,12 +167,14 @@ first build in every large step of the 2026-11-06 blocks
 (`docs/research/m2-noise-diagnosis.md`). Then five groups of three warm-up and 21
 timed rounds, each round running every build once. Every pilot, warm-up and timed
 sample is printed. The per-build figure is the median of its five group medians.
-The launch is valid (`paired_ok=1`, exit 0) when every build's batches are sized
-and the gain fraction computed from **same-group** medians agrees across the five
-groups within 2% (when the IMCI denominator is not positive in some group, the
-gcc/imci time ratio is used instead). Per-build group spreads are still printed
-with `within_launch_ok` but no longer decide the exit code. No extra samples are
-added to rescue a noisy result.
+Validity is mechanical only (ADR-0010 amendment 2): the launch is valid (`valid=1`,
+exit 0) when every build's batches are 50-200 ms and density is not 3; pinning,
+correctness and card_run's overlap and foreign-workload checks are enforced
+elsewhere. A build whose five group medians spread 2% or more is flagged
+`regime_step=1` on its `summary` line; `regime_steps` on the `launch` line counts
+them, and `paired_step=1` flags a 2% spread of the same-group gain fraction (or of
+gcc/imci when the IMCI denominator is not positive). Flags never invalidate a
+launch. No extra samples are added to rescue a noisy result.
 
 ## Output and M2 arithmetic
 
@@ -194,15 +196,19 @@ summed system time (`stime_us`). Global warm-up samples have `group=-1`. Each gr
 also prints a `pair` line (same-group `gcc_over_x87`, `imci_over_x87`,
 `gcc_over_imci`, `gain_fraction`), and the launch ends with a `launch` line
 (`gain_fraction` from the launch figures, `gain_fraction_spread`,
-`gcc_over_imci_spread`, `gcc_over_x87_max` over groups, `sized`, `paired_ok`).
+`gcc_over_imci_spread`, `gcc_over_x87_max` over groups, `sized`, `valid`,
+`regime_steps`, `paired_step`).
 Placement, policy, configuration, correctness, group min/median/max and summary
 records have distinct prefixes. No example above is measured evidence.
 
 For each build/configuration take the normalized median-of-group-medians from
-its `summary` line in each of five independent launches. Require `paired_ok=1`
-on the `launch` line, density !=3, successful job exits and identical inputs/work;
-M2's two conditions must hold in every launch (ADR-0010 amendment 1), and the
-range across launches is reported. Retain all samples even when a gate fails.
+its `summary` line in each of five independent launches. Require `valid=1` on the
+`launch` line, successful job exits, no overlapping job or foreign workload, and
+identical inputs/work. M2 is decided by ADR-0010 amendment 2: the gain fraction at
+least 0.5 in every launch and its one-sided 95% lower bound at least 0.5, and
+`gcc_over_x87_max` at most 1.05 at every length in every launch; report the
+launch values, range, minimum, bound, bootstrap interval and regime-step count.
+Retain all samples.
 T_build is the launch figure:
 
 ```text
