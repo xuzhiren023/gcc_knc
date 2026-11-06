@@ -25,3 +25,8 @@ __pycache__/
 
 # Owner-supplied card connection settings (S0-04)
 /config/card.local.json
+
+# GCC dump and opt-record files from torture and T1 runs (S6-04 committed some by accident)
+*.c.[0-9][0-9][0-9][rtil].*
+*.opt-record.json.gz
+/tmp*/
