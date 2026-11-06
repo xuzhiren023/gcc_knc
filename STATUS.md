@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-05 18:49.
+Updated automatically at every ticket change. Last update: 2026-11-05 19:31.
 
-**Next: GPT-6.1, on S5-12 (KNC float/double-width conversions: vcvtps2pd, vcvtpd2ps, vcvtdq2pd, vcvtfxpntpd2dq with vpermf32x4 halves).** Run `python tools/dispatch.py`, or ask the tech lead to.
+**Next: the tech lead, on S5-12.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[##################--]` 88 of 94
 
@@ -108,7 +108,7 @@ Current tickets: `[##################--]` 88 of 94
 | S5-09 | Card probe of vrcp23ps, vrsqrt23ps and vgetmant (S5-03 P1a-e), to back the division and square-root proofs | Done | A card probe now measures vrcp23ps and vrsqrt23ps against the error bounds the FP32 division and square-roo... |
 | S5-10 | Correctly rounded FP32 vector square root for V16SF (S5-03 ticket A) | Done | Vectorized FP32 square root on KNC is now correctly rounded for every one of the 2^32 inputs, checked on th... |
 | S5-11 | Correctly rounded FP32 vector division for V16SF, with cond_div (S5-03 ticket B) | Done | Vectorized FP32 division on KNC is now correctly rounded, with IEEE flags, in all four rounding modes: 1.8 ... |
-| S5-12 | KNC float/double-width conversions: vcvtps2pd, vcvtpd2ps, vcvtdq2pd, vcvtfxpntpd2dq with vpermf32x4 halves | In progress |  |
+| S5-12 | KNC float/double-width conversions: vcvtps2pd, vcvtpd2ps, vcvtdq2pd, vcvtfxpntpd2dq with vpermf32x4 halves | Waiting for review | All width optabs and zero-high-half insns implemented. Red failed as expected. Incremental GCC build, full ... |
 | S5-13 | KNC 16-lane gather and scatter: vgatherdps/vpgatherdd and the scatter forms in a jknzd loop, through the optabs | Not started |  |
 | S5-14 | KNC 8-lane gather and scatter for V8DF/V8DI through the builtin hooks, reading the low 8 dwords of a V16SI index | Not started |  |
 | S5-15 | KNC FP min/max: MIN_EXPR/MAX_EXPR and fmin/fmax as vgminps/vgmaxps (pd), with their reductions | Not started |  |
@@ -119,6 +119,7 @@ Current tickets: `[##################--]` 88 of 94
 
 ## Recent activity
 
+- 2026-11-05 19:31 **S5-12** engineer submit: All width optabs and zero-high-half insns implemented. Red failed as expected. Incremental GCC build, full T0/T1/T2 (seven width scans), four READM...
 - 2026-11-05 18:48 **S5-11** lead approve: Vectorized FP32 division on KNC is now correctly rounded, with IEEE flags, in all four rounding modes: 1.8 billion hard and random cases on the car...
 - 2026-11-05 18:14 **S5-11** engineer submit: Required implementation and tests committed (project 1fbf169, GCC fabdf2d706e). Prior acceptance runs: host E1/E2/E4 pass; removing step 15 fails 1...
 - 2026-11-05 18:13 **S5-11** lead answer: Allowed: submit with --override 'GCC 327 lines; the rest are the ticket-required host model, native sets and checks; lead allowed'. No split. Do no...
@@ -126,16 +127,15 @@ Current tickets: `[##################--]` 88 of 94
 - 2026-11-05 17:22 **S5-11** lead approve-red: Red approved: T1 scans for vrcp23ps+FMA division with no loop fdiv and a fully masked tail with no x87.
 - 2026-11-05 16:03 **S5-11** engineer red: Committed 034bbbe: T1 scans require FP32 reciprocal/FMA with no loop fdiv, plus aligned variable-count masked division with masked FMA/load/store a...
 - 2026-11-05 15:51 **S5-17** lead approve: At the knc head after S5-06 to S5-10, x86 code is unchanged (1,962 identical files at -O2 and -O2 -mavx512f), the forward-port drill conflicts are ...
-- 2026-11-05 15:50 **S5-17** lead note: x86 check (lead, portability-claude) at knc 9690ac8906a vs releases/gcc-16.2.0: -O2 and -O2 -mavx512f identical=1962 different=0 both-failed=41 err...
 
 ## Cost
 
 - From the script, engineer: 207 sessions, 493.6M input tokens
 - From the script, lead: 184 sessions, 58.7M input tokens
-- Started by hand, Claude: 9 sessions, 993.9M input tokens
+- Started by hand, Claude: 9 sessions, 994.4M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 12.0 GiB of 100 GiB. 217 GiB free on the drive.
+The project uses 12.2 GiB of 100 GiB. 212 GiB free on the drive.
