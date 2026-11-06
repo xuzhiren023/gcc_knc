@@ -130,3 +130,12 @@ headlines, to be confirmed at 2 and 4 threads before `knc-characterization.md` i
 - Loads: L1 3, L2 24, memory about 357 cycles latency.
 - **Streaming stores are slower than normal stores at one thread**: 27 vs 2.2 ticks (L1-sized),
   157 vs 38 (memory-sized). E5-08 must check this at 4 threads and 60 cores before using them.
+
+## 2026-11-06: end of the slot5 block (21:17Z)
+
+- Characterization at 1, 2 and 4 threads on one core: 312 measurements, 5 over 2% spread. Written up
+  in `docs/research/knc-characterization.md`.
+- `pr121126` alone with a 600 s limit: exit 0. The S6-07 timeout was the driver's per-program limit;
+  the `gcc.dg/vect` run baseline is **777 of 777**.
+- S6-11 card checks at GCC `knc` after S6-11: `vect-fmax-3` and `vect-fmin-3` exit 0; `s4_masks`
+  `o2v` and `o3` each 1,589,070 checks, 0 failures.
