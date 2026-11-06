@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-06 18:13.
+Updated automatically at every ticket change. Last update: 2026-11-06 18:14.
 
 **Waiting for you:** S6-05. Run `python tools/pm.py inbox`.
 
@@ -132,12 +132,13 @@ Current tickets: `[##################--]` 107 of 113
 | S6-12 | card_run --benchmark refuses while another project's processes still run on the card, whatever the ledger says | Done | card_run benchmark jobs now refuse to start while another project's programs (such as wrf.mic) are still ru... |
 | S6-13 | M2 driver records card power per build: watts and joules per element next to the timings | Not started |  |
 | S6-14 | ICE in cprop_hardreg - (set (reg:QI k1) (const_int 0)) for a loop-store-motion flag has no *knc_movqi alternative | Not started |  |
-| S6-15 | M2 fixture for ADR-0010 amendment 2 - paired before/after GCC builds in one process, per-round random order, and a decision script | In progress | Approved as one ticket, no split: the scope is what the ticket asked for, and decide.py belongs in the acce... |
+| S6-15 | M2 fixture for ADR-0010 amendment 2 - paired before/after GCC builds in one process, per-round random order, and a decision script | Waiting for review | Completed in 03ef1be after red 085614e. Six host decide.py tests passed; plain and paired positive and nega... |
 | S7-01 | Shared libgcc for KNC: symbol-version ceiling for the card's glibc 2.21 and kernel 2.6.38, and what GCC 16 adds over the donor's libgcc_s (E6-01 input) | Done | The shared libgcc plan for KNC is ready: GCC 16's libgcc_s.so.1 can be a drop-in superset of the donor's on... |
 | S7-02 | libgfortran slice for KNC: descriptor ABI vs the card's GCC 5 runtime, real(16) and libquadmath, and MXCSR-safe FP control (E6-02 input) | Done | The libgfortran plan for KNC is ready: a small MXCSR-safe FP backend, kinds 4/8/10 with kind 16 deferred, a... |
 
 ## Recent activity
 
+- 2026-11-06 18:14 **S6-15** engineer submit: Completed in 03ef1be after red 085614e. Six host decide.py tests passed; plain and paired positive and negative binaries built and linted; reused M...
 - 2026-11-06 18:13 **S6-15** lead answer: Approved as one ticket, no split: the scope is what the ticket asked for, and decide.py belongs in the acceptance fixture by design, so 'zero code ...
 - 2026-11-06 18:12 **S6-15** engineer ask: Implementation is committed as 03ef1be after red 085614e. Six host tests pass; plain/paired positive and negative binaries build and lint; reused g...
 - 2026-11-06 17:38 **S6-05** lead escalate: Code review done, no findings: KNC costs trace to the characterization tables, per-vector gather costing is correct (the count%lanes assert holds, ...
@@ -145,7 +146,6 @@ Current tickets: `[##################--]` 107 of 113
 - 2026-11-06 17:24 **S6-05** lead answer: All three yes, with these limits. 1) Lowering tests: add -fvect-cost-model=unlimited to the options line of knc-gather16-f32/-i32/-masked, knc-gath...
 - 2026-11-06 17:21 **S6-05** engineer ask: GCC 7fdd15cf40a; report d27998c docs/research/knc-costs.md. Two T1 attempts failed; accepted cost scans PASS. Same out[i]=in[idx[i]] loop must stay...
 - 2026-11-06 17:10 **S6-05** owner decide: Owner, 2026-11-06: yes, +2 engineer sessions (budget now 6 sessions, 17M input tokens). Continue with the lead's 17:07 answer: cost legacy gathers ...
-- 2026-11-06 17:07 **S6-05** engineer escalate: budget: 4 engineer sessions used; the budget is 4
 
 ## Cost
 
