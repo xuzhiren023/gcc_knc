@@ -431,6 +431,21 @@ class CardRun(unittest.TestCase):
             self.assertEqual(row["logicalCpus"], list(range(240)))
             self.assertIs(row["timingValid"], True)
 
+    def test_benchmark_refuses_foreign_workload_before_start(self):
+        self.transport.processes = [{"pid": 77, "name": "wrf.mic", "exe": "/opt/wrf.mic",
+                                     "cwd": "/opt"}]
+        result = self.run_card(benchmark=True)
+        self.assertEqual(result["result_class"], "refused")
+        self.assertIn("foreign workload running", result["detail"])
+        self.assertIn("wrf.mic", result["detail"])
+        self.assertFalse(any(row["event"] == "start" for row in self.ledger_rows()))
+        self.assertNotIn("stage", self.names())
+
+        self.ledger.write_text("", encoding="utf8")
+        self.transport = FakeTransport()
+        result = self.run_card(benchmark=True)
+        self.assertEqual(result["result_class"], "program")
+
     def test_benchmark_wait_queues_and_closes_queue_on_start_or_timeout(self):
         for release in (True, False):
             with self.subTest(release=release):

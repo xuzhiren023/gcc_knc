@@ -244,6 +244,13 @@ def run(program, argv, *, lock_path, external_locks, baseline_names, timeout,
                 result["skipped_processes"].append(skipped)
         return snap
 
+    def refuse_foreign_workload(snap):
+        if benchmark:
+            names = sorted({str(process.get("name") or "unknown")
+                            for process in foreign_processes(snap, run_dir, baseline_names)})
+            if names:
+                raise Refused("foreign workload running: " + ", ".join(names))
+
     try:
         username = os.environ.get("USERNAME") or getpass.getuser()
         if username.startswith("CodexSandbox"):
@@ -291,6 +298,7 @@ def run(program, argv, *, lock_path, external_locks, baseline_names, timeout,
         deadline = monotonic() + timeout
         while True:
             snap = snapshot()
+            refuse_foreign_workload(snap)
             # Transports may report known unavailability. SSH establishes actual
             # affinity at execution, via claude-pin and its completion marker.
             if snap.get("pinning") is False:
@@ -354,7 +362,8 @@ def run(program, argv, *, lock_path, external_locks, baseline_names, timeout,
                       **({"files": files} if files else {}), **({"packed": True} if packed else {}))
         if monotonic() - staging_started > stage_timeout:
             raise OSError("staging took longer than %g s; stopped" % stage_timeout)
-        snapshot()
+        snap = snapshot()
+        refuse_foreign_workload(snap)
         started = monotonic()
         execution_started = True
         try:
