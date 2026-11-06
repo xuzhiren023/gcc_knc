@@ -1,6 +1,6 @@
-"""Build the red-stage card negative control, or run the host checker test.
+"""Compile/lint the M2 suite; execution on the card is lead-only.
 
-Invoke through tools/run.py. Card execution is exclusively lead-run.
+Invoke through tools/run.py. Outputs overwrite .work/_shared/S6-02.
 """
 import argparse
 import os
@@ -17,12 +17,12 @@ TC = SHARED / 'toolchain'
 
 def command(*args):
     print('+ ' + ' '.join(map(str, args)), flush=True)
-    subprocess.run(list(map(str, args)), check=True)
+    return subprocess.call(list(map(str, args)))
 
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('mode', choices=('negative', 'host-negative'))
+    parser.add_argument('mode', choices=('all', 'positive', 'negative'), default='all', nargs='?')
     args = parser.parse_args()
     if os.name == 'nt':
         env = os.environ.copy()
@@ -35,30 +35,44 @@ def main():
     os.environ['PATH'] = ':'.join(map(str, (TC / 'cross/bin', TC / 'cygwin/bin'))) + ':' + os.environ['PATH']
     out = SHARED / 'S6-02'
     out.mkdir(exist_ok=True)
-    flags = ['-O2', '-std=gnu11', '-Wall', '-Wextra', '-Werror',
-             '-fno-tree-vectorize', '-ffp-contract=off']
-    if args.mode == 'host-negative':
-        exe = out / 'checker-host-negative.exe'
-        command(TC / 'cygwin/bin/gcc', *flags, '-DHOST_CHECKER_SELFTEST',
-                HERE / 'driver.c', '-o', exe)
-        # Preserve the failing status: a negative control must not be greenwashed.
-        return subprocess.call([str(exe)])
     build = SHARED / 'gcc-build/gcc'
     cc = [build / 'xgcc', '-B' + str(build) + '/',
           '--sysroot=' + str(TC / 'sysroot'), '-march=knc']
     assembler = TC / 'cross/bin/k1om-mpss-linux-as'
-    command(*cc, '--version')
-    command(assembler, '--version')
-    command(*cc, *flags, '-DNEGATIVE_CONTROL', '-S', HERE / 'driver.c',
-            '-o', out / 'driver-negative.s')
-    for source, obj in ((out / 'driver-negative.s', out / 'driver-negative.o'),
-                        (HERE / 'negative.s', out / 'negative.o')):
-        command(assembler, '--march=k1om', source, '-o', obj)
-    exe = out / 'm2-negative.mic'
-    command(*cc, out / 'driver-negative.o', out / 'negative.o', '-o', exe)
-    command(sys.executable, ROOT / 'tools/knc_lint', exe)
-    print('BUILT and LINTED (not executed on card): ' + str(exe))
-    return 0
+    if command(*cc, '--version') or command(assembler, '--version'):
+        return 2
+    flags = ['-O2', '-std=gnu11', '-Wall', '-Wextra', '-Werror', '-ffp-contract=off']
+    scalar = ['-fno-tree-vectorize', '-fno-tree-slp-vectorize']
+    variants = ['positive', 'negative'] if args.mode == 'all' else [args.mode]
+    units = [('kernels-gcc', 'kernels.c', ['-DBUILD=gcc', '-ftree-vectorize']),
+             ('kernels-x87', 'kernels.c', ['-DBUILD=x87', *scalar]),
+             ('timing', 'timing.c', scalar)]
+    for variant in variants:
+        units.append(('driver-' + variant, 'driver.c',
+                      [*scalar, *(['-DNEGATIVE_CONTROL'] if variant == 'negative' else [])]))
+    errors = 0
+    for name, source, extra in units:
+        assembly = out / (name + '.s')
+        rc = command(*cc, *flags, *extra, '-pthread', '-S', HERE / source, '-o', assembly)
+        errors += bool(rc)
+        if not rc:
+            errors += bool(command(assembler, '--march=k1om', assembly, '-o', out / (name + '.o')))
+    for name in ('imci', 'negative'):
+        errors += bool(command(assembler, '--march=k1om', HERE / (name + '.s'), '-o', out / (name + '.o')))
+    if errors:
+        print('FAIL: %d compile/assembly steps; no binaries linked' % errors)
+        return 1
+    common = [out / (name + '.o') for name in ('kernels-gcc', 'kernels-x87', 'timing', 'imci', 'negative')]
+    for variant in variants:
+        exe = out / ('m2-kernels.mic' if variant == 'positive' else 'm2-negative.mic')
+        rc = command(*cc, out / ('driver-' + variant + '.o'), *common, '-pthread', '-lrt', '-o', exe)
+        errors += bool(rc)
+        if not rc:
+            lint = command(sys.executable, ROOT / 'tools/knc_lint', exe)
+            errors += bool(lint)
+            if not lint:
+                print('BUILT and LINTED (NOT executed on card): ' + str(exe))
+    return 1 if errors else 0
 
 
 if __name__ == '__main__':
