@@ -1,10 +1,10 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-06 07:55.
+Updated automatically at every ticket change. Last update: 2026-11-06 07:57.
 
 **Next: the tech lead, on S6-01.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
-Current tickets: `[##################--]` 96 of 104
+Current tickets: `[#################---]` 96 of 107
 
 ## Milestones
 
@@ -12,7 +12,7 @@ Current tickets: `[##################--]` 96 of 104
 |---|---|---|---|
 | M0 | Foundation | In progress | 17 of 17 tickets |
 | M1 | Mixed native code | Done | 43 of 43 tickets |
-| M2 | Useful vector target | In progress | 36 of 44 tickets |
+| M2 | Useful vector target | In progress | 36 of 47 tickets |
 | M3 | Runtimes | Not started | Not planned in detail yet |
 | M4 | Broad optimization | Not started | Not planned in detail yet |
 | M5 | Program corpus | Not started | Not planned in detail yet |
@@ -124,11 +124,15 @@ Current tickets: `[##################--]` 96 of 104
 | S6-04 | Per-loop KNC reports (E5-03): vector factor, peel and tail choice, masks, helper calls, spills and rejection reasons | In progress | 1. Yes: a minimal ADR-0006 entry dispatch from ix86_vector_costs (for example in finish_cost) into KNC-only... |
 | S6-05 | -mtune=knc costs and vectorizer cost model v1 from the characterization tables (E5-09, E5-02) | Not started |  |
 | S6-06 | KNC scheduler v0 (E5-05): U/V pipes, 4-cycle vector latency, 3-cycle AGI | Not started |  |
-| S6-07 | First gcc.dg/vect baseline for KNC: compile scans on the host, execution on the card | In progress | Track them unreduced: the original vect-double-reduc-3.c and -7.c are short enough to serve as reproducers;... |
+| S6-07 | First gcc.dg/vect baseline for KNC: compile scans on the host, execution on the card | Waiting for review | 7e477e9 retains both double-reduc originals, explicitly not reduced, per lead answer. All 16 ICEs listed wi... |
 | S6-08 | Sprint 6 mid batch check after S6-04 and S6-05 | Not started |  |
+| S6-09 | ICE in expand_vec_series_expr: KNC lane-index vectors (VEC_SERIES) for V16SI/V8DI and the FP modes | Not started |  |
+| S6-10 | Unrecognizable and unconstrained insns: ffsll's scalar conditional move, and constant -1 into a k register | Not started |  |
+| S6-11 | ICE in expand_fn_using_insn for FP64 fmax/fmin loops (S5-15 follow-up) | Not started |  |
 
 ## Recent activity
 
+- 2026-11-06 07:57 **S6-07** engineer submit: 7e477e9 retains both double-reduc originals, explicitly not reduced, per lead answer. All 16 ICEs listed with reproducers. Prior checks: parser red...
 - 2026-11-06 07:55 **S6-01** engineer ask: 85c0b4d adds numeric clocksource/cpufreq records, CPU MHz/TSC flags, and start/end RAW TSC calibration. GCC16 build + assembly/ELF lint PASS; logs:...
 - 2026-11-06 07:54 **S6-07** lead answer: Track them unreduced: the original vect-double-reduc-3.c and -7.c are short enough to serve as reproducers; list them as 'original source, not redu...
 - 2026-11-06 07:53 **S6-07** engineer ask: 42de014 commits baseline: 2001 tests, 777 linked/linted/staged, 16 ICEs; 14 checked reproducers. Two reductions of vect-double-reduc-{3,7} failed: ...
@@ -136,13 +140,12 @@ Current tickets: `[##################--]` 96 of 104
 - 2026-11-06 07:49 **S6-01** engineer ask: df6d56c adds protocol/probe; GCC 16.2.0 build and assembly/ELF lint PASS. Schema, commands and logs: docs/research/knc-measurement.md. Binary: .wor...
 - 2026-11-06 07:44 **S6-04** lead answer: 1. Yes: a minimal ADR-0006 entry dispatch from ix86_vector_costs (for example in finish_cost) into KNC-only report code, one or two lines, TARGET_K...
 - 2026-11-06 07:44 **S6-04** engineer ask: Red f759c0d: all four T1 report scans fail as expected; log .work/_state/logs/S6_04_red-20261106-074335.log. Scope blocker: i386.cc:26259 always cr...
-- 2026-11-06 04:54 **S5-21** lead approve: 32-byte short vectors (such as unsigned short vector_size(32)) are passed on the stack and returned in memory again, exactly as GCC 5 does, so pr10...
 
 ## Cost
 
 - From the script, engineer: 234 sessions, 561.0M input tokens
 - From the script, lead: 185 sessions, 58.8M input tokens
-- Started by hand, Claude: 9 sessions, 1117.6M input tokens
+- Started by hand, Claude: 9 sessions, 1122.6M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
