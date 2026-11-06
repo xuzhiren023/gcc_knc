@@ -1,10 +1,10 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-05 23:09.
+Updated automatically at every ticket change. Last update: 2026-11-05 23:18.
 
-**Next: the tech lead, on S5-14.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: GPT-6.1, on S5-15 (KNC FP min/max: MIN_EXPR/MAX_EXPR and fmin/fmax as vgminps/vgmaxps (pd), with their reductions).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
-Current tickets: `[###################-]` 90 of 94
+Current tickets: `[###################-]` 91 of 94
 
 ## Milestones
 
@@ -12,7 +12,7 @@ Current tickets: `[###################-]` 90 of 94
 |---|---|---|---|
 | M0 | Foundation | In progress | 17 of 17 tickets |
 | M1 | Mixed native code | Done | 43 of 43 tickets |
-| M2 | Useful vector target | In progress | 30 of 34 tickets |
+| M2 | Useful vector target | In progress | 31 of 34 tickets |
 | M3 | Runtimes | Not started | Not planned in detail yet |
 | M4 | Broad optimization | Not started | Not planned in detail yet |
 | M5 | Program corpus | Not started | Not planned in detail yet |
@@ -110,7 +110,7 @@ Current tickets: `[###################-]` 90 of 94
 | S5-11 | Correctly rounded FP32 vector division for V16SF, with cond_div (S5-03 ticket B) | Done | Vectorized FP32 division on KNC is now correctly rounded, with IEEE flags, in all four rounding modes: 1.8 ... |
 | S5-12 | KNC float/double-width conversions: vcvtps2pd, vcvtpd2ps, vcvtdq2pd, vcvtfxpntpd2dq with vpermf32x4 halves | Done | Loops that convert between float and double, or between int and double, now vectorize on KNC with full 512-... |
 | S5-13 | KNC 16-lane gather and scatter: vgatherdps/vpgatherdd and the scatter forms in a jknzd loop, through the optabs | Done | Loops that read or write float or int arrays through a signed int index (a[i] = b[idx[i]], a[idx[i]] = b[i]... |
-| S5-14 | KNC 8-lane gather and scatter for V8DF/V8DI through the builtin hooks, reading the low 8 dwords of a V16SI index | Waiting for review | GCC ab967b42a6e: both one-line ABI hooks share the private gather type/decl predicate. Incremental build an... |
+| S5-14 | KNC 8-lane gather and scatter for V8DF/V8DI through the builtin hooks, reading the low 8 dwords of a V16SI index | Done | Loops that read or write double or long arrays through an int index now vectorize on KNC as two 8-lane gath... |
 | S5-15 | KNC FP min/max: MIN_EXPR/MAX_EXPR and fmin/fmax as vgminps/vgmaxps (pd), with their reductions | Not started |  |
 | S5-16 | KNC byte and word data: V16QI/V16HI transport modes, widening up-converting loads and narrowing down-converting stores | Not started |  |
 | S5-17 | Sprint 5 mid batch check after S5-06, S5-07 and S5-08 | Done | x86 check (lead, portability-claude) at knc 9690ac8906a vs releases/gcc-16.2.0: -O2 and -O2 -mavx512f ident... |
@@ -119,6 +119,7 @@ Current tickets: `[###################-]` 90 of 94
 
 ## Recent activity
 
+- 2026-11-05 23:18 **S5-14** lead approve: Loops that read or write double or long arrays through an int index now vectorize on KNC as two 8-lane gathers or scatters per 16 indices, and pass...
 - 2026-11-05 23:08 **S5-14** engineer submit: GCC ab967b42a6e: both one-line ABI hooks share the private gather type/decl predicate. Incremental build and full T1 PASS (four -O3 scans). All REA...
 - 2026-11-05 23:02 **S5-14** lead answer: Yes. Use one helper, e.g. ix86_knc_gather_builtin_type_p (fntype or decl), shared by both hooks, with each i386.cc dispatch one line; zmm0 for exac...
 - 2026-11-05 23:02 **S5-14** engineer ask: May I add a gather-only ix86_function_value hook/prototype (third i386-knc.h edit)? GCC 40a431420db builds; -O3 knc-gather8-f64.c/i64.c still fail ...
@@ -126,13 +127,12 @@ Current tickets: `[###################-]` 90 of 94
 - 2026-11-05 22:26 **S5-14** engineer ask: May I add a builtin-return ABI hook/prototype, requiring a second i386-knc.h edit despite the ticket's one-edit rule? Repro: knc-gather8-f64.c/i64....
 - 2026-11-05 21:44 **S5-14** lead approve-red: Red approved: T1 scans for two 8-lane gathers/scatters per 16 int indices with one vpermf32x4 0xee feeding the high half. Keep the jknzd retry loop...
 - 2026-11-05 21:43 **S5-14** engineer red: Red commit a71f6cd. Focused -O3 T1: all four double/long gather/scatter scans fail as expected on scalar accesses; compilation, assembly and lint s...
-- 2026-11-05 21:40 **S5-13** lead approve: Loops that read or write float or int arrays through a signed int index (a[i] = b[idx[i]], a[idx[i]] = b[i]) now vectorize on KNC with gather and s...
 
 ## Cost
 
 - From the script, engineer: 217 sessions, 522.6M input tokens
 - From the script, lead: 184 sessions, 58.7M input tokens
-- Started by hand, Claude: 9 sessions, 1020.4M input tokens
+- Started by hand, Claude: 9 sessions, 1023.1M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
