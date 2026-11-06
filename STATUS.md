@@ -1,10 +1,10 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-06 12:41.
+Updated automatically at every ticket change. Last update: 2026-11-06 12:48.
 
 **Next: the tech lead, on S6-05.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
-Current tickets: `[###################-]` 104 of 108
+Current tickets: `[###################-]` 105 of 108
 
 ## Milestones
 
@@ -12,7 +12,7 @@ Current tickets: `[###################-]` 104 of 108
 |---|---|---|---|
 | M0 | Foundation | In progress | 17 of 17 tickets |
 | M1 | Mixed native code | Done | 43 of 43 tickets |
-| M2 | Useful vector target | In progress | 44 of 48 tickets |
+| M2 | Useful vector target | In progress | 45 of 48 tickets |
 | M3 | Runtimes | Not started | Not planned in detail yet |
 | M4 | Broad optimization | Not started | Not planned in detail yet |
 | M5 | Program corpus | Not started | Not planned in detail yet |
@@ -129,10 +129,11 @@ Current tickets: `[###################-]` 104 of 108
 | S6-09 | ICE in expand_vec_series_expr: KNC lane-index vectors (VEC_SERIES) for V16SI/V8DI and the FP modes | Done | Loops that build lane-index vectors (VEC_SERIES) now compile on KNC instead of crashing the compiler: 6 of ... |
 | S6-10 | Unrecognizable and unconstrained insns: ffsll's scalar conditional move, and constant -1 into a k register | Done | Constant 0 and -1 loads into mask registers (kxor/kxnor) and 64-bit ffs without CMOV now compile on KNC, fi... |
 | S6-11 | ICE in expand_fn_using_insn for FP64 fmax/fmin loops (S5-15 follow-up) | Done | Scalar and SLP-reduction fmin/fmax on float and double now compile on KNC through vgmin/vgmax with the C Na... |
-| S6-12 | card_run --benchmark refuses while another project's processes still run on the card, whatever the ledger says | Waiting for review | Submitted by the lead on the engineer's behalf. Red d0cdfc6 (real-snapshot fixture: wrf.mic and mpiexec.mic... |
+| S6-12 | card_run --benchmark refuses while another project's processes still run on the card, whatever the ledger says | Done | card_run benchmark jobs now refuse to start while another project's programs (such as wrf.mic) are still ru... |
 
 ## Recent activity
 
+- 2026-11-06 12:48 **S6-12** lead approve: card_run benchmark jobs now refuse to start while another project's programs (such as wrf.mic) are still running on the card, even if the ledger sa...
 - 2026-11-06 12:41 **S6-12** engineer submit: Submitted by the lead on the engineer's behalf. Red d0cdfc6 (real-snapshot fixture: wrf.mic and mpiexec.mic refuse, daemons only admit; fails on 38...
 - 2026-11-06 12:40 **S6-12** lead answer: Lead reran the full test_card_* discovery in this worktree under the project's Cygwin Python: 97 tests OK in 42 s (test_card_recovery 20 OK alone, ...
 - 2026-11-06 12:38 **S6-12** engineer ask: Required Cygwin discovery command ran: tests.tools.test_card_run passes (30 tests). Full test_card_* discovery ran under the provided Cygwin Python...
@@ -140,13 +141,12 @@ Current tickets: `[###################-]` 104 of 108
 - 2026-11-06 12:36 **S6-12** engineer escalate: budget: 2 engineer sessions used; the budget is 2
 - 2026-11-06 12:35 **S6-12** lead answer: Use the project's own toolchain, not the PhiWeather bootstrap: from the worktree run python tools/run.py --name s6_12_red --inputs tools tests/tool...
 - 2026-11-06 12:35 **S6-12** engineer ask: The required red run is blocked by Windows: the Cygwin python3 executable under PhiWeather/.tools/knc-bootstrap/cygwin/bin is present but PowerShel...
-- 2026-11-06 12:24 **S6-11** lead approve: Scalar and SLP-reduction fmin/fmax on float and double now compile on KNC through vgmin/vgmax with the C NaN rules, fixing the last two vect tests ...
 
 ## Cost
 
 - From the script, engineer: 251 sessions, 603.7M input tokens
 - From the script, lead: 185 sessions, 58.8M input tokens
-- Started by hand, Claude: 9 sessions, 1300.0M input tokens
+- Started by hand, Claude: 9 sessions, 1302.6M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
