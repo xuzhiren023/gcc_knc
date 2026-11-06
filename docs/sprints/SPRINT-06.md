@@ -54,6 +54,9 @@ approximate division of ADR-0003 point 5, two-level prefetch (E7-06), runtimes.
 | S6-06 | KNC scheduler v0 (E5-05): U/V pipes, 4-cycle vector latency, 3-cycle AGI, measured at 4 threads per core | standard | gcc | S6-03 |
 | S6-07 | First `gcc.dg/vect` baseline for KNC: compile scans on the host, execution on the card | standard | tools | |
 | S6-08 | Mid batch check | standard | gcc | S6-04, S6-05 |
+| S6-09 | ICE fix: `expand_vec_series_expr` (8 vect tests) | standard | gcc | S6-07 |
+| S6-10 | ICE fix: `ffsll` conditional move, and constant -1 into a k register (7 vect tests) | standard | gcc | S6-07 |
+| S6-11 | ICE fix: FP64 `fmax`/`fmin` loops in `expand_fn_using_insn` (S5-15 follow-up, 2 vect tests) | standard | gcc | S6-07 |
 
 Later in the sprint, if time remains: streaming stores (E5-08), software prefetch (E5-07), the
 final batch check and the M2 evidence note.
