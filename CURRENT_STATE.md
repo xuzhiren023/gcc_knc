@@ -125,6 +125,12 @@ M1 is accepted and tagged `m1` locally; nothing is pushed. Engineers are Claude 
   Launches 2-3: GF 0.69-0.90 at L2 and the 5%-of-x87 rule holds, but times move up to 20% between
   launches; a page-aligned, staggered placement is under test (`claude-s6-slot6b.sh`) before the
   baseline reruns.
+  Diagnosis (`docs/research/m2-noise-diagnosis.md`, from data, card confirmation pending): invalid
+  launches are one-way steps about 6.5 s into the first build from straggler workers; the same
+  stragglers, not page placement, explain the cross-launch L2 variation, so ADR-0010 amendment 1's
+  stated reason is probably wrong. The driver now interleaves builds per group and gates on the
+  paired gain fraction (needs an ADR amendment); `claude-s6-m2diag.sh` runs after WRF's job. A gate
+  review by a second subagent is pending (`docs/research/m2-gate-review.md`).
 
 - **A force-killed card_run leaves `.work/_state/card.lock` (2026-11-06).** Stopping a hung runner during the PhiWeather overlap left an empty own lock, and the afternoon block's 23 jobs were all refused with "own lock present". card_run never clears its own lock by design. A queued job also leaves `card-coordination/claude-admission.lock` (the shared folder; ours by name). Before any card block after a kill, check that no `card_run` process runs, then remove both files.
 - **The lead's T2 run writes shared binaries Codex then cannot overwrite (2026-11-06).** Running `tools/check.py t2` as `xuzhi` for S6-09 rewrote `.work/_shared/S5-21/short-vector-O2-*.mic`, and S6-10's T2 then failed with permission denied. The lead deleted them. When the lead runs T1/T2 for a Codex ticket, delete any shared outputs it rewrote afterwards, or point the tests at `TMPDIR`.
