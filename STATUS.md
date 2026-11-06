@@ -1,10 +1,10 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-06 14:02.
+Updated automatically at every ticket change. Last update: 2026-11-06 14:09.
 
 **Next: the tech lead, on S6-05.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
-Current tickets: `[###################-]` 105 of 110
+Current tickets: `[###################-]` 106 of 110
 
 ## Milestones
 
@@ -13,7 +13,7 @@ Current tickets: `[###################-]` 105 of 110
 | M0 | Foundation | In progress | 17 of 17 tickets |
 | M1 | Mixed native code | Done | 43 of 43 tickets |
 | M2 | Useful vector target | In progress | 45 of 48 tickets |
-| M3 | Runtimes | In progress | 0 of 2 tickets |
+| M3 | Runtimes | In progress | 1 of 2 tickets |
 | M4 | Broad optimization | Not started | Not planned in detail yet |
 | M5 | Program corpus | Not started | Not planned in detail yet |
 | M6 | Release | Not started | Not planned in detail yet |
@@ -131,10 +131,11 @@ Current tickets: `[###################-]` 105 of 110
 | S6-11 | ICE in expand_fn_using_insn for FP64 fmax/fmin loops (S5-15 follow-up) | Done | Scalar and SLP-reduction fmin/fmax on float and double now compile on KNC through vgmin/vgmax with the C Na... |
 | S6-12 | card_run --benchmark refuses while another project's processes still run on the card, whatever the ledger says | Done | card_run benchmark jobs now refuse to start while another project's programs (such as wrf.mic) are still ru... |
 | S7-01 | Shared libgcc for KNC: symbol-version ceiling for the card's glibc 2.21 and kernel 2.6.38, and what GCC 16 adds over the donor's libgcc_s (E6-01 input) | In progress |  |
-| S7-02 | libgfortran slice for KNC: descriptor ABI vs the card's GCC 5 runtime, real(16) and libquadmath, and MXCSR-safe FP control (E6-02 input) | Waiting for review | Added docs/research/knc-libgfortran.md in f119698. Static source inspection of knc GCC and sysroot, plus lo... |
+| S7-02 | libgfortran slice for KNC: descriptor ABI vs the card's GCC 5 runtime, real(16) and libquadmath, and MXCSR-safe FP control (E6-02 input) | Done | The libgfortran plan for KNC is ready: a small MXCSR-safe FP backend, kinds 4/8/10 with kind 16 deferred, a... |
 
 ## Recent activity
 
+- 2026-11-06 14:09 **S7-02** lead approve: The libgfortran plan for KNC is ready: a small MXCSR-safe FP backend, kinds 4/8/10 with kind 16 deferred, a static runtime isolated from the card's...
 - 2026-11-06 14:02 **S7-02** engineer submit: Added docs/research/knc-libgfortran.md in f119698. Static source inspection of knc GCC and sysroot, plus local GCC 5 historical layout references; ...
 - 2026-11-06 12:48 **S6-12** lead approve: card_run benchmark jobs now refuse to start while another project's programs (such as wrf.mic) are still running on the card, even if the ledger sa...
 - 2026-11-06 12:41 **S6-12** engineer submit: Submitted by the lead on the engineer's behalf. Red d0cdfc6 (real-snapshot fixture: wrf.mic and mpiexec.mic refuse, daemons only admit; fails on 38...
@@ -142,13 +143,12 @@ Current tickets: `[###################-]` 105 of 110
 - 2026-11-06 12:38 **S6-12** engineer ask: Required Cygwin discovery command ran: tests.tools.test_card_run passes (30 tests). Full test_card_* discovery ran under the provided Cygwin Python...
 - 2026-11-06 12:36 **S6-12** owner decide: Lead, under the owner's delegation: sessions 2 -> 4 (two were spent on the lead's late finding and a tool path). Finish: run the red, add the built...
 - 2026-11-06 12:36 **S6-12** engineer escalate: budget: 2 engineer sessions used; the budget is 2
-- 2026-11-06 12:35 **S6-12** lead answer: Use the project's own toolchain, not the PhiWeather bootstrap: from the worktree run python tools/run.py --name s6_12_red --inputs tools tests/tool...
 
 ## Cost
 
 - From the script, engineer: 252 sessions, 605.0M input tokens
 - From the script, lead: 185 sessions, 58.8M input tokens
-- Started by hand, Claude: 9 sessions, 1338.1M input tokens
+- Started by hand, Claude: 9 sessions, 1342.7M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
