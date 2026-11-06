@@ -121,7 +121,7 @@ Current tickets: `[##################--]` 97 of 107
 | S6-01 | Measurement method on KNC: clock, pinning, thread density, working sets, repetitions and noise (ADR-0010 input) | Question for the tech lead | 85c0b4d adds numeric clocksource/cpufreq records, CPU MHz/TSC flags, and start/end RAW TSC calibration. GCC... |
 | S6-02 | M2 kernels: affine, stencil, short-loop and small-matrix as GCC-KNC vector, x87 and hand-written IMCI builds, with a timing driver | Not started |  |
 | S6-03 | Machine characterization corpus (E5-01): latency and throughput per instruction class at 1-4 threads per core, cache and memory levels | Not started |  |
-| S6-04 | Per-loop KNC reports (E5-03): vector factor, peel and tail choice, masks, helper calls, spills and rejection reasons | In progress | Lead, under the owner's delegation: no further engineer session; the work is complete and the lead submits ... |
+| S6-04 | Per-loop KNC reports (E5-03): vector factor, peel and tail choice, masks, helper calls, spills and rejection reasons | Waiting for review | Submitted by the lead on the engineer's behalf (token budget exhausted after the work was done). Engineer's... |
 | S6-05 | -mtune=knc costs and vectorizer cost model v1 from the characterization tables (E5-09, E5-02) | Not started |  |
 | S6-06 | KNC scheduler v0 (E5-05): U/V pipes, 4-cycle vector latency, 3-cycle AGI | Not started |  |
 | S6-07 | First gcc.dg/vect baseline for KNC: compile scans on the host, execution on the card | Done | The gcc.dg/vect suite now has a KNC baseline: of 2,001 tests, 1,329 compile (777 linked for the card), 632 ... |
@@ -132,6 +132,7 @@ Current tickets: `[##################--]` 97 of 107
 
 ## Recent activity
 
+- 2026-11-06 08:12 **S6-04** engineer submit: Submitted by the lead on the engineer's behalf (token budget exhausted after the work was done). Engineer's last report: build, T0 52, T1/T2 and th...
 - 2026-11-06 08:12 **S6-04** owner decide: Lead, under the owner's delegation: no further engineer session; the work is complete and the lead submits it to save tokens.
 - 2026-11-06 08:11 **S6-04** engineer escalate: budget: 7324487 input tokens used; the budget is 6000000
 - 2026-11-06 08:11 **S6-04** lead answer: Done: the lead's commit on s5/S6-04 removes the seven tracked dumps (the branch is now 5 files, 34 lines). Leave .work/_shared/S6-04 as it is. Comm...
@@ -139,7 +140,6 @@ Current tickets: `[##################--]` 97 of 107
 - 2026-11-06 08:06 **S6-07** lead approve: The gcc.dg/vect suite now has a KNC baseline: of 2,001 tests, 1,329 compile (777 linked for the card), 632 are skipped for target selectors, 24 giv...
 - 2026-11-06 07:57 **S6-07** engineer submit: 7e477e9 retains both double-reduc originals, explicitly not reduced, per lead answer. All 16 ICEs listed with reproducers. Prior checks: parser red...
 - 2026-11-06 07:55 **S6-01** engineer ask: 85c0b4d adds numeric clocksource/cpufreq records, CPU MHz/TSC flags, and start/end RAW TSC calibration. GCC16 build + assembly/ELF lint PASS; logs:...
-- 2026-11-06 07:54 **S6-07** lead answer: Track them unreduced: the original vect-double-reduc-3.c and -7.c are short enough to serve as reproducers; list them as 'original source, not redu...
 
 ## Cost
 
