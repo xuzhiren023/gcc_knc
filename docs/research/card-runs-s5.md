@@ -163,3 +163,10 @@ Built from S5-11's compiler (GCC `fabdf2d706e`), core 59:
 `cvt_i32_f64`, `cvt_f64_i32` and `mix_f32_f64` now vectorize), core 59:
 `o2v` 779,984 checks (`claude-7e435c2f…`), `o3` 779,984 (`claude-c620df3d…`), `fast` 602,384
 (`claude-b274292a…`), all 0 failures.
+
+## 2026-11-06: S5-13 under review (16-lane gather and scatter)
+
+`s5_ops` built from S5-13's compiler (GCC `917beb990eb`; `gat_f32`, `gat_i32` and `sca_f32` now
+use `vgatherdps`/`vpgatherdd`/`vscatterdps` in a `jknzd` retry loop; `mgat_f32` and `msca_f32`
+stay scalar by the amended acceptance), core 59: `o2v` 779,984 checks (`claude-19552b23…`),
+`o3` 779,984 (`claude-ac2a8527…`), `fast` 602,384 (`claude-2f13affb…`), all 0 failures.
