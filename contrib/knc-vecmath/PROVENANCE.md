@@ -8,7 +8,7 @@ depend on the PhiWeather tree; this is a copy.
 |---|---|
 | `native/translation/math_algorithms/` | `native/translation/math_algorithms/` (whole folder) |
 | `native/translation/libknc_mvec/` | `native/translation/libknc_mvec/` (whole folder) |
-| `native/upstream/arm-optimized-routines-v26.01/`, `-dp/` | `LICENSE`, `README.phiweather.md`, `upstream.lock.json`, and `-dp/math/math_config.h` only (the only upstream file the sources include) |
+| `native/upstream/arm-optimized-routines-v26.01/`, `-dp/` | `LICENSE`, `README.phiweather.md`, `upstream.lock.json`, and `-dp/math/math_config.h` (the header the sources include) |
 | `native/upstream/arm-optimized-routines-v26.01/math/exp2f_data.c`, `math_config.h` | same path (added 2026-11-06 for the `powf` build; `math_config.h` is identical to the `-dp` copy) |
 | `receipts/knc-g5-*.json` | `artifacts/native/knc-g5-*.json` (qualification receipts) |
 
