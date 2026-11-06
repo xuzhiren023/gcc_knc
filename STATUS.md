@@ -2,7 +2,7 @@
 
 Updated automatically at every ticket change. Last update: 2026-11-05 21:02.
 
-**Next: GPT-6.1, on S5-13 (KNC 16-lane gather and scatter: vgatherdps/vpgatherdd and the scatter forms in a jknzd loop, through the optabs).** Run `python tools/dispatch.py`, or ask the tech lead to.
+**Waiting for you:** S5-13. Run `python tools/pm.py inbox`.
 
 Current tickets: `[##################--]` 89 of 94
 
@@ -109,7 +109,7 @@ Current tickets: `[##################--]` 89 of 94
 | S5-10 | Correctly rounded FP32 vector square root for V16SF (S5-03 ticket A) | Done | Vectorized FP32 square root on KNC is now correctly rounded for every one of the 2^32 inputs, checked on th... |
 | S5-11 | Correctly rounded FP32 vector division for V16SF, with cond_div (S5-03 ticket B) | Done | Vectorized FP32 division on KNC is now correctly rounded, with IEEE flags, in all four rounding modes: 1.8 ... |
 | S5-12 | KNC float/double-width conversions: vcvtps2pd, vcvtpd2ps, vcvtdq2pd, vcvtfxpntpd2dq with vpermf32x4 halves | Done | Loops that convert between float and double, or between int and double, now vectorize on KNC with full 512-... |
-| S5-13 | KNC 16-lane gather and scatter: vgatherdps/vpgatherdd and the scatter forms in a jknzd loop, through the optabs | In progress | No capture needed: the lead compiled it (gcc-build at 917beb990eb). The code is right: vpcmpd $4 -> %k1, km... |
+| S5-13 | KNC 16-lane gather and scatter: vgatherdps/vpgatherdd and the scatter forms in a jknzd loop, through the optabs | **Waiting for you** | budget: 4 engineer sessions used; the budget is 4 |
 | S5-14 | KNC 8-lane gather and scatter for V8DF/V8DI through the builtin hooks, reading the low 8 dwords of a V16SI index | Not started |  |
 | S5-15 | KNC FP min/max: MIN_EXPR/MAX_EXPR and fmin/fmax as vgminps/vgmaxps (pd), with their reductions | Not started |  |
 | S5-16 | KNC byte and word data: V16QI/V16HI transport modes, widening up-converting loads and narrowing down-converting stores | Not started |  |
@@ -119,6 +119,7 @@ Current tickets: `[##################--]` 89 of 94
 
 ## Recent activity
 
+- 2026-11-05 21:02 **S5-13** engineer escalate: budget: 4 engineer sessions used; the budget is 4
 - 2026-11-05 21:02 **S5-13** lead answer: No capture needed: the lead compiled it (gcc-build at 917beb990eb). The code is right: vpcmpd $4 -> %k1, kmov %k1,%k2, vgatherdps {%k2} in its jknz...
 - 2026-11-05 20:44 **S5-13** engineer ask: 917beb990eb fixes ICE; build passes. T1 float/int and negatives pass; masked_gather compare-mask scan fails. Repro: aligned a,idx,m; if(m[i]) a[i]=...
 - 2026-11-05 20:36 **S5-13** lead answer: 1. Fix the ICE in KNC-only code: in ix86_knc_masked_epilogue_p, test STMT_VINFO_GATHER_SCATTER_P (return false) before reading DR_STEP, which is NU...
@@ -126,7 +127,6 @@ Current tickets: `[##################--]` 89 of 94
 - 2026-11-05 20:02 **S5-13** lead answer: Yes: renumber so every tied input refers to a lower-numbered operand (a matching constraint must name an earlier operand), for both gather and scat...
 - 2026-11-05 20:01 **S5-13** engineer ask: Two builds failed; stopping per AGENTS.md. First: late VSIB enum, fixed in 4db28d7ad68. Second: genrecog rejects gather input 5 tied to scratch 7: ...
 - 2026-11-05 19:53 **S5-13** lead approve-red: Red approved: T1 scans for 16-lane gathers/scatters in a jknzd retry loop on one non-k0 mask, the compare mask for a conditional gather, and no gat...
-- 2026-11-05 19:52 **S5-13** engineer red: Red commit 13576f6. Ran through tools/run.py: python tools/check.py t1 --compiler gcc16 --gather-scatter --worker. Expected FAIL: float/int gather ...
 
 ## Cost
 
