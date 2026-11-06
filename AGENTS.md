@@ -90,7 +90,7 @@ milestone criteria. Ask if you think one is wrong. Do not push or merge.
 
 ## Environment
 
-- Compilers run on the host, and programs run on the card. Use the card only through `tools/card_run`. It may be in use by other work, and other projects' folders are read-only.
+- Compilers run on the host, and programs run on the card. Engineers do not start card jobs: leave the built, linted card binaries under `.work/_shared/<ticket>/` and name them in the submit note, and the lead runs them through `tools/card_run` (the lead coordinates card time with the PhiWeather session). Other projects' folders are read-only.
 - Windows 10, 12 threads, about 16 GB of memory. Use `make -j8` at most.
 - Until S0-01 is done, tools are in `C:\Users\xuzhi\Documents\PhiWeather\.tools\knc-bootstrap`. Put its `cross\bin` and `cygwin\bin` on `PATH`, and use that Cygwin's `python3`, `gcc` and `make`.
 - GCC checkouts need `core.autocrlf=false` and `core.fileMode=false`.
