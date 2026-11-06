@@ -38,3 +38,19 @@ At GCC `knc` after S6-10/S6-11, core 59, 18:59-19:13 UTC:
   PhiWeather run was starting. Correct behavior.
 - Earlier the same afternoon, two blocks were refused entirely by stale locks left by a force-killed
   card_run (`CURRENT_STATE.md`).
+
+## 2026-11-06: first M2 measurement (one launch)
+
+FP32 affine, L2 working set (length 4096 per worker), 60 cores x 4 threads, launch 1, ADR-0010
+(`.work/_shared/tmp/claude-s6-m2-test/l2-1.out`), GCC `knc` after S6-11:
+
+| Build | ns per element | Speedup over x87 | Group spread |
+|---|---|---|---|
+| x87 | 0.137514 | 1.00 | 0.41% |
+| GCC-KNC vector | 0.013819 | 9.95 | 0.29% |
+| IMCI reference | 0.011232 | 12.24 | 0.37% |
+
+Gain fraction (ADR-0010 point 6): (9.95 - 1) / (12.24 - 1) = **0.80** (M2 needs 0.5). One launch
+only; the full baseline (three launches, all lengths and working sets) follows. Two fixture fixes
+were needed first: explicit 256 KiB worker stacks and `mallopt(M_ARENA_MAX, 2)` (per-thread malloc
+arenas and default stacks exceeded card_run's address-space limit).
