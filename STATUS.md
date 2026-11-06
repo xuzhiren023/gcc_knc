@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-06 14:11.
+Updated automatically at every ticket change. Last update: 2026-11-06 14:12.
 
 **Next: the tech lead, on S6-05.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
@@ -130,11 +130,12 @@ Current tickets: `[###################-]` 106 of 110
 | S6-10 | Unrecognizable and unconstrained insns: ffsll's scalar conditional move, and constant -1 into a k register | Done | Constant 0 and -1 loads into mask registers (kxor/kxnor) and 64-bit ffs without CMOV now compile on KNC, fi... |
 | S6-11 | ICE in expand_fn_using_insn for FP64 fmax/fmin loops (S5-15 follow-up) | Done | Scalar and SLP-reduction fmin/fmax on float and double now compile on KNC through vgmin/vgmax with the C Na... |
 | S6-12 | card_run --benchmark refuses while another project's processes still run on the card, whatever the ledger says | Done | card_run benchmark jobs now refuse to start while another project's programs (such as wrf.mic) are still ru... |
-| S7-01 | Shared libgcc for KNC: symbol-version ceiling for the card's glibc 2.21 and kernel 2.6.38, and what GCC 16 adds over the donor's libgcc_s (E6-01 input) | Question for the tech lead | Research complete in commit f990744, docs/research/knc-libgcc-shared.md. Submit fails decoding git diff wit... |
+| S7-01 | Shared libgcc for KNC: symbol-version ceiling for the card's glibc 2.21 and kernel 2.6.38, and what GCC 16 adds over the donor's libgcc_s (E6-01 input) | In progress | Lead: pm.py now decodes git output as UTF-8 (main 'pm: decode git output as UTF-8'); the lead submits f9907... |
 | S7-02 | libgfortran slice for KNC: descriptor ABI vs the card's GCC 5 runtime, real(16) and libquadmath, and MXCSR-safe FP control (E6-02 input) | Done | The libgfortran plan for KNC is ready: a small MXCSR-safe FP backend, kinds 4/8/10 with kind 16 deferred, a... |
 
 ## Recent activity
 
+- 2026-11-06 14:12 **S7-01** lead answer: Lead: pm.py now decodes git output as UTF-8 (main 'pm: decode git output as UTF-8'); the lead submits f990744 from the main checkout.
 - 2026-11-06 14:11 **S7-01** engineer ask: Research complete in commit f990744, docs/research/knc-libgcc-shared.md. Submit fails decoding git diff with cp1252; Python UTF-8 mode passes conte...
 - 2026-11-06 14:09 **S7-02** lead approve: The libgfortran plan for KNC is ready: a small MXCSR-safe FP backend, kinds 4/8/10 with kind 16 deferred, a static runtime isolated from the card's...
 - 2026-11-06 14:02 **S7-02** engineer submit: Added docs/research/knc-libgfortran.md in f119698. Static source inspection of knc GCC and sysroot, plus local GCC 5 historical layout references; ...
@@ -142,13 +143,12 @@ Current tickets: `[###################-]` 106 of 110
 - 2026-11-06 12:41 **S6-12** engineer submit: Submitted by the lead on the engineer's behalf. Red d0cdfc6 (real-snapshot fixture: wrf.mic and mpiexec.mic refuse, daemons only admit; fails on 38...
 - 2026-11-06 12:40 **S6-12** lead answer: Lead reran the full test_card_* discovery in this worktree under the project's Cygwin Python: 97 tests OK in 42 s (test_card_recovery 20 OK alone, ...
 - 2026-11-06 12:38 **S6-12** engineer ask: Required Cygwin discovery command ran: tests.tools.test_card_run passes (30 tests). Full test_card_* discovery ran under the provided Cygwin Python...
-- 2026-11-06 12:36 **S6-12** owner decide: Lead, under the owner's delegation: sessions 2 -> 4 (two were spent on the lead's late finding and a tool path). Finish: run the red, add the built...
 
 ## Cost
 
 - From the script, engineer: 253 sessions, 609.9M input tokens
 - From the script, lead: 185 sessions, 58.8M input tokens
-- Started by hand, Claude: 9 sessions, 1344.5M input tokens
+- Started by hand, Claude: 9 sessions, 1350.0M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
