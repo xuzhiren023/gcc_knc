@@ -237,7 +237,7 @@ def main(argv=None):
     parser.add_argument("--max-sessions", type=int, default=4)
     parser.add_argument("--dry-run", action="store_true")
     # One dispatcher per lane may run at once: gcc tickets share the GCC checkout, tools tickets do not.
-    parser.add_argument("--lane", choices=("gcc", "tools"))
+    parser.add_argument("--lane", help="gcc, tools, or any research lane named on tickets")
     args = parser.parse_args(argv)
     board = pm.Board()
     for _ in range(args.max_sessions):
