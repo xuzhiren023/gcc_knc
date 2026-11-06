@@ -1,7 +1,7 @@
 // S4-03 / ADR-0007: selects, min/max, fabs and conditional loads/stores
 // vectorize into IMCI compares, blends and 64-byte aligned
-// masked moves guarded against an empty mask.  fmin/fmax stay scalar: libm
-// returns its first argument for opposite zeros, vgminps/vgmaxps do not.
+// masked moves guarded against an empty mask.  S5-15 / ADR-0008 point 3:
+// fmin/fmax use vgminps/vgmaxpd; either zero sign is permitted.
 // options: -O2 -ftree-vectorize
 // scan-asm-func sel_f32: \bvcmpps\s+\$1,[^\n]*%k[0-7]\s*$
 // scan-asm-func sel_f32: \bvmovaps\s+[^\n]*\),\s*%zmm\d+\{%k[1-7]\}
@@ -19,10 +19,8 @@
 // scan-asm-func max_u32: \bvpmaxud\s[^\n]*%zmm
 // scan-asm-func abs_f32: \bvpandd\s[^\n]*%zmm
 // scan-asm-func abs_f64: \bvpandq\s[^\n]*%zmm
-// scan-asm-func fmin_f32: \bcall\s+fminf\b
-// scan-asm-func fmin_f32: \A(?![\s\S]*\bv(?:gmin|cmpp))
-// scan-asm-func fmax_f64: \bcall\s+fmax\b
-// scan-asm-func fmax_f64: \A(?![\s\S]*\bv(?:gmax|cmpp))
+// scan-asm-func fmin_f32: \bvgminps\s[^\n]*%zmm
+// scan-asm-func fmax_f64: \bvgmaxpd\s[^\n]*%zmm
 // x[i] is in bounds of a global array, so if-conversion loads it
 // unconditionally (aligned); sel_* covers the masked load.
 // scan-asm-func cst_f32: \bjkzd\s+\S+,\s*%k[0-7]\s*$
