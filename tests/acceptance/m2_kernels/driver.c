@@ -6,8 +6,14 @@
 #include <string.h>
 
 unsigned short_length = 17;
-const char *build_names[3] = {"gcc", "x87", "imci"};
-#define ROW(k,i,b) {#k, {m2_##k##_gcc,m2_##k##_x87,m2_##k##_imci},i,b}
+#ifdef WITH_BEFORE
+const char *build_names[BUILD_COUNT] = {"gcc", "x87", "imci", "gcc_before"};
+#define BEFORE_FN(k) ,m2_##k##_gccbefore
+#else
+const char *build_names[BUILD_COUNT] = {"gcc", "x87", "imci"};
+#define BEFORE_FN(k)
+#endif
+#define ROW(k,i,b) {#k, {m2_##k##_gcc,m2_##k##_x87,m2_##k##_imci BEFORE_FN(k)},i,b}
 const struct kernel kernels[7] = {
   ROW(affine_f32,0,4), ROW(affine_f64,1,8), ROW(stencil1,2,4),
   ROW(stencil2,3,4), ROW(short,4,4), ROW(mat8,5,4), ROW(mat16,6,4)
@@ -104,7 +110,7 @@ static int check(int k, unsigned long n, unsigned seed) {
   void *want = aligned((n+32)*size);
   reference(k,&b,want,n);
   int failures = 0;
-  for (int build = 0; build < 3; ++build) {
+  for (int build = 0; build < BUILD_COUNT; ++build) {
     /* Reset output and guards: a missed store must not pass. */
     if (size == 8) for (size_t i = 0; i < b.ny; ++i) ((double *)b.storage)[i] = -12345;
     else for (size_t i = 0; i < b.ny; ++i) ((float *)b.storage)[i] = -12345;
@@ -145,7 +151,7 @@ int correctness(void) {
       for (unsigned i = 0; i < sizeof(lengths)/sizeof(*lengths); ++i)
         bad += check(k,lengths[i],seed);
     }
-    printf("correctness kernel=%s builds=3 failing_cases=%d\n",kernels[k].name,bad);
+    printf("correctness kernel=%s builds=%d failing_cases=%d\n",kernels[k].name,BUILD_COUNT,bad);
     failures += bad;
   }
   short_length = saved;
@@ -158,7 +164,7 @@ int main(int argc, char **argv) {
   if (argc == 1 || (argc == 2 && !strcmp(argv[1],"--correctness"))) return correctness();
   if (!strcmp(argv[1],"--benchmark")) return benchmark(argc,argv);
   fprintf(stderr,"Use --correctness or --benchmark --kernel NAME --length N "
-          "--density 1|2|3|4 --cores 1|60 --launch 1..5 [--short-length 1..64] "
+          "--density 1|2|3|4 --cores 1|60 --launch 1..10 [--short-length 1..64] "
           "[--warmup-seconds 0..60]\n");
   return 2;
 }

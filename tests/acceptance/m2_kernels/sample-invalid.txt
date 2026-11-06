@@ -1,4 +1,10 @@
 correctness kernel=affine_f32 builds=3 failing_cases=0
+correctness kernel=affine_f64 builds=3 failing_cases=0
+correctness kernel=stencil1 builds=3 failing_cases=0
+correctness kernel=stencil2 builds=3 failing_cases=0
+correctness kernel=short builds=3 failing_cases=0
+correctness kernel=mat8 builds=3 failing_cases=0
+correctness kernel=mat16 builds=3 failing_cases=0
 phase name=correctness_done t_ms=3000
 policy phase=start path=clock value=tsc
 configuration kernel=affine_f32 density_comparable=0 builds=3

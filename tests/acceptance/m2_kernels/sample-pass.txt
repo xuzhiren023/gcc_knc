@@ -1,11 +1,17 @@
 correctness kernel=affine_f32 builds=4 failing_cases=0
+correctness kernel=affine_f64 builds=4 failing_cases=0
+correctness kernel=stencil1 builds=4 failing_cases=0
+correctness kernel=stencil2 builds=4 failing_cases=0
+correctness kernel=short builds=4 failing_cases=0
+correctness kernel=mat8 builds=4 failing_cases=0
+correctness kernel=mat16 builds=4 failing_cases=0
 phase name=correctness_done t_ms=3000
 policy phase=start path=clock value=tsc
 configuration kernel=affine_f32 density_comparable=1 builds=4
-summary build=gcc median_ns=100000000 regime_step=1
+summary build=gcc median_ns=100000000 regime_step=0
 summary build=x87 median_ns=100000000 regime_step=0
 summary build=imci median_ns=100000000 regime_step=0
-summary build=gcc_before median_ns=100000000 regime_step=0
+summary build=gcc_before median_ns=100000000 regime_step=1
 round group=0 round=0 gcc_over_gcc_before=0.95 gain_fraction=0.8
 round group=0 round=1 gcc_over_gcc_before=0.95 gain_fraction=0.8
 round group=0 round=2 gcc_over_gcc_before=0.95 gain_fraction=0.8

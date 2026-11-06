@@ -205,12 +205,58 @@ static size_t footprint(unsigned long n) {
   size_t np = selected == 6 ? 256 : selected == 5 ? 128 : 16;
   return (nx+n+32+np)*kernels[selected].bytes;
 }
-/* Round r of a group runs every build once; the starting build rotates with the
-   round, and even launches rotate the other way (the old per-launch alternation). */
-static int build_in_round(int round, int k) {
-  int b = launch%2 ? (round+k)%3 : (2-(round+k)%3);
-  return b;
+/* Balanced seeded shuffles: each build starts once per BUILD_COUNT rounds,
+   with independently shuffled remaining positions in every round. */
+static uint32_t order_state;
+static unsigned order_round;
+static int order[BUILD_COUNT], first_order[BUILD_COUNT], first_position[BUILD_COUNT];
+static uint32_t draw(uint32_t *state) {
+  uint32_t x = *state;
+  x ^= x << 13; x ^= x >> 17; x ^= x << 5;
+  *state = x;
+  return x;
 }
+static void shuffle(int *v) {
+  for (int i = BUILD_COUNT-1; i > 0; --i) {
+    int j = draw(&order_state) % (i+1), tmp = v[i];
+    v[i] = v[j]; v[j] = tmp;
+  }
+}
+static void next_round(void) {
+  if (order_round%BUILD_COUNT == 0) {
+    for (int i = 0; i < BUILD_COUNT; ++i) first_order[i] = i;
+    shuffle(first_order);
+  }
+  for (int i = 0; i < BUILD_COUNT; ++i) order[i] = i;
+  shuffle(order);
+  int first = first_order[order_round++%BUILD_COUNT];
+  for (int i = 0; i < BUILD_COUNT; ++i) if (order[i] == first) {
+    int tmp = order[0]; order[0] = first; order[i] = tmp; break;
+  }
+}
+#ifdef WITH_BEFORE
+static int compare_double(const void *a, const void *b) {
+  double x = *(const double *)a, y = *(const double *)b;
+  return (x>y)-(x<y);
+}
+static double median_double(double *v, int n) {
+  qsort(v,n,sizeof(*v),compare_double);
+  return v[n/2]; /* 105 timed rounds; all bootstrap samples have odd size. */
+}
+static void comparison(double *ratios) {
+  double boot[10000], sample_ratios[105];
+  uint32_t state = 1510;
+  for (int b = 0; b < 10000; ++b) {
+    for (int r = 0; r < 105; ++r) sample_ratios[r] = ratios[draw(&state)%105];
+    boot[b] = median_double(sample_ratios,105);
+  }
+  qsort(boot,10000,sizeof(*boot),compare_double);
+  printf("compare kernel=%s launch=%d rounds=105 gcc_over_gcc_before=%.9f "
+         "ratio_ci95_low=%.9f ratio_ci95_high=%.9f bootstrap_seed=1510 bootstrap_samples=10000\n",
+         kernels[selected].name,launch,median_double(ratios,105),
+         boot[249]+.975*(boot[250]-boot[249]),boot[9749]+.025*(boot[9750]-boot[9749]));
+}
+#endif
 static double spread_of(double *v, int n) {
   double s[5]; int m = n;
   memcpy(s,v,n*sizeof(*v));
@@ -238,9 +284,9 @@ int benchmark(int argc, char **argv) {
     else die("unknown option");
   }
   if (selected < 0 || (cores != 1 && cores != 60) || density < 1 || density > 4
-      || launch < 1 || launch > 5 || short_length < 1 || short_length > 64
+      || launch < 1 || launch > 10 || short_length < 1 || short_length > 64
       || warmup_seconds > 60)
-    die("require kernel, cores 1|60, density 1..4, launch 1..5, short-length 1..64, "
+    die("require kernel, cores 1|60, density 1..4, launch 1..10, short-length 1..64, "
         "warmup-seconds 0..60");
   if (strcmp(working_set,"boundary")) {
     static const unsigned l1[] = {0,1024,512,336,256}, l2[] = {0,16384,8192,5456,4096};
@@ -260,6 +306,9 @@ int benchmark(int argc, char **argv) {
   printf("phase name=correctness_done t_ms=%llu\n",
          (unsigned long long)((now()-program_start)/1000000ULL));
   workers = cores*density;
+  order_state = 0x9e3779b9U ^ (uint32_t)launch;
+  printf("order seed=%u launch=%d algorithm=balanced_xorshift32_fisher_yates builds=%d\n",
+         order_state,launch,BUILD_COUNT);
   policy("start"); read_topology();
   pin(topology[0][0]);
   printf("configuration kernel=%s length=%lu workers=%d bytes_per_worker=%zu "
@@ -278,11 +327,11 @@ int benchmark(int argc, char **argv) {
   pthread_attr_destroy(&attr);
   sync_workers();
   int noisy = density == 3;
-  unsigned long reps[3];
+  unsigned long reps[BUILD_COUNT];
   uint64_t elapsed;
   /* Size every build first: grow a pilot to >=10 ms, then size a batch for 100 ms.
      Record even pilot samples, with their own repetition counts. */
-  for (int b = 0; b < 3; ++b) {
+  for (int b = 0; b < BUILD_COUNT; ++b) {
     current_build = b;
     repetitions = 1;
     int pilot = 0;
@@ -308,24 +357,47 @@ int benchmark(int argc, char **argv) {
   /* Global warm-up: the slow regime of the first seconds after the threads start ended
      6.2-6.9 s into the first build in every large step seen (lead, 2026-11-06). */
   uint64_t warm_start = now();
-  for (int round = 0; now()-warm_start < warmup_seconds*1000000000ULL; ++round)
-    for (int k = 0; k < 3; ++k) {
-      current_build = build_in_round(round,k); repetitions = reps[current_build];
+  for (int round = 0; now()-warm_start < warmup_seconds*1000000000ULL; ++round) {
+    next_round();
+    for (int k = 0; k < BUILD_COUNT; ++k) {
+      current_build = order[k]; repetitions = reps[current_build];
       elapsed = batch(); sample("warmup",-1,round,elapsed);
     }
-  uint64_t medians[3][5];
+  }
+  uint64_t medians[BUILD_COUNT][5];
+#ifdef WITH_BEFORE
+  double before_ratios[105];
+#endif
   double gf[5], ratio[5], gcc_x87[5];
   int gf_defined = 1;
   for (int g = 0; g < 5; ++g) {
-    uint64_t samples[3][21];
-    for (int round = 0; round < 24; ++round)
-      for (int k = 0; k < 3; ++k) {
-        current_build = build_in_round(round,k); repetitions = reps[current_build];
+    uint64_t samples[BUILD_COUNT][21];
+    for (int round = 0; round < 24; ++round) {
+      next_round();
+      if (round == 3) for (int k = 0; k < BUILD_COUNT; ++k) first_position[order[k]] = k;
+      for (int k = 0; k < BUILD_COUNT; ++k) {
+        current_build = order[k]; repetitions = reps[current_build];
         if (round < 3) { elapsed = batch(); sample("warmup",g,round,elapsed); }
         else { elapsed = batch(); sample("timed",g,round-3,elapsed); samples[current_build][round-3] = elapsed; }
       }
-    double per_element[3];
-    for (int b = 0; b < 3; ++b) {
+      if (round >= 3) {
+        double times[BUILD_COUNT];
+        for (int b = 0; b < BUILD_COUNT; ++b)
+          times[b] = (double)samples[b][round-3]/reps[b];
+        double denominator = times[1]/times[2]-1;
+        printf("round kernel=%s launch=%d group=%d round=%d gain_fraction=%.9f "
+               "gain_fraction_defined=%d order=",kernels[selected].name,launch,g,round-3,
+               denominator > 0 ? (times[1]/times[0]-1)/denominator : NAN,denominator > 0);
+        for (int b = 0; b < BUILD_COUNT; ++b) printf("%s%s",b ? "," : "",build_names[order[b]]);
+#ifdef WITH_BEFORE
+        before_ratios[g*21+round-3] = times[0]/times[3];
+        printf(" gcc_over_gcc_before=%.9f",before_ratios[g*21+round-3]);
+#endif
+        printf("\n");
+      }
+    }
+    double per_element[BUILD_COUNT];
+    for (int b = 0; b < BUILD_COUNT; ++b) {
       qsort(samples[b],21,sizeof(**samples),compare);
       medians[b][g] = samples[b][10];
       per_element[b] = (double)medians[b][g]/((double)workers*length*reps[b]);
@@ -345,8 +417,8 @@ int benchmark(int argc, char **argv) {
            ratio[g],gf[g]);
   }
   int sized = 1, regime_steps = 0;
-  double figure[3];
-  for (int b = 0; b < 3; ++b) {
+  double figure[BUILD_COUNT];
+  for (int b = 0; b < BUILD_COUNT; ++b) {
     uint64_t sorted[5];
     memcpy(sorted,medians[b],sizeof(sorted));
     qsort(sorted,5,sizeof(*sorted),compare);
@@ -355,6 +427,11 @@ int benchmark(int argc, char **argv) {
     int build_sized = sorted[2] >= 50000000ULL && sorted[2] <= 200000000ULL;
     sized = sized && build_sized;
     regime_steps += spread >= 0.02;
+    if (spread >= 0.02)
+      printf("regime_step build=%s position=%d position_group=4 spread=%.9f group_medians_ns=%llu,%llu,%llu,%llu,%llu\n",
+             build_names[b],first_position[b],spread,(unsigned long long)medians[b][0],
+             (unsigned long long)medians[b][1],(unsigned long long)medians[b][2],
+             (unsigned long long)medians[b][3],(unsigned long long)medians[b][4]);
     figure[b] = (double)sorted[2]/((double)workers*length*reps[b]);
     printf("summary kernel=%s build=%s length=%lu threads_per_core=%d cores=%d "
            "repetitions=%lu median_ns=%llu ns_per_element=%.9f group_spread=%.9f "
@@ -378,6 +455,9 @@ int benchmark(int argc, char **argv) {
          kernels[selected].name,length,density,cores,launch,working_set,short_length,
          gf_launch,gf_defined,gf_spread,ratio_spread,gcc_x87_max,sized,valid,regime_steps,
          paired_step);
+#ifdef WITH_BEFORE
+  comparison(before_ratios);
+#endif
   stopping = 1; sync_workers();
   for (int w = 0; w < workers; ++w) if (pthread_join(threads[w],NULL)) die("pthread_join");
   if (pthread_barrier_destroy(&barrier)) die("barrier destroy");

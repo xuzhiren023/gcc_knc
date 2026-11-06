@@ -25,6 +25,8 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('mode', choices=('all', 'positive', 'negative'), default='all', nargs='?')
     parser.add_argument('--out', default='S6-02', help='folder under .work/_shared for the outputs')
+    parser.add_argument('--before', metavar='FOLDER', help='link FOLDER/kernels-gcc.o as gcc_before')
+    parser.add_argument('--before-first', action='store_true', help='reverse GCC object link order')
     parser.add_argument('--reuse-kernels', default=None, metavar='FOLDER',
                         help='take kernels-gcc.{s,o} and kernels-x87.{s,o} from this folder under '
                              '.work/_shared instead of compiling them (when xgcc has changed and '
@@ -38,10 +40,14 @@ def main():
             env=env, text=True).strip()
         return subprocess.call([str(TC / 'cygwin/bin/python3.12.exe'), script,
                                 args.mode, '--out', args.out]
-                               + (['--reuse-kernels', args.reuse_kernels] if args.reuse_kernels else []),
+                               + (['--reuse-kernels', args.reuse_kernels] if args.reuse_kernels else [])
+                               + (['--before', args.before] if args.before else [])
+                               + (['--before-first'] if args.before_first else []),
                                env=env)
     os.environ['PATH'] = ':'.join(map(str, (TC / 'cross/bin', TC / 'cygwin/bin'))) + ':' + os.environ['PATH']
     out = SHARED / args.out
+    if args.before and out.resolve() == (SHARED / args.before).resolve():
+        parser.error('--out must differ from --before to preserve the baseline objects')
     out.mkdir(exist_ok=True)
     build = SHARED / 'gcc-build/gcc'
     cc = [build / 'xgcc', '-B' + str(build) + '/',
@@ -50,6 +56,10 @@ def main():
     if command(*cc, '--version') or command(assembler, '--version'):
         return 2
     flags = ['-O2', '-std=gnu11', '-Wall', '-Wextra', '-Werror', '-ffp-contract=fast']
+    if args.before:
+        flags.append('-DWITH_BEFORE')
+    elif args.before_first:
+        parser.error('--before-first requires --before')
     scalar = ['-fno-tree-vectorize', '-fno-tree-slp-vectorize']
     oracle = [*scalar, '-ffp-contract=off']
     variants = ['positive', 'negative'] if args.mode == 'all' else [args.mode]
@@ -65,7 +75,8 @@ def main():
         for name in ('kernels-gcc', 'kernels-x87'):
             for suffix in ('.s', '.o'):
                 print('+ copy %s -> %s' % (source_dir / (name + suffix), out / (name + suffix)), flush=True)
-                shutil.copyfile(source_dir / (name + suffix), out / (name + suffix))
+                if (source_dir / (name + suffix)).resolve() != (out / (name + suffix)).resolve():
+                    shutil.copyfile(source_dir / (name + suffix), out / (name + suffix))
         units = [u for u in units if not u[0].startswith('kernels-')]
     for name, source, extra in units:
         assembly = out / (name + '.s')
@@ -75,10 +86,18 @@ def main():
             errors += bool(command(assembler, '--march=k1om', assembly, '-o', out / (name + '.o')))
     for name in ('imci', 'negative'):
         errors += bool(command(assembler, '--march=k1om', HERE / (name + '.s'), '-o', out / (name + '.o')))
+    if args.before:
+        renames = []
+        for kernel in ('affine_f32', 'affine_f64', 'stencil1', 'stencil2', 'short', 'mat8', 'mat16'):
+            renames.extend(['--redefine-sym', 'm2_%s_gcc=m2_%s_gccbefore' % (kernel, kernel)])
+        errors += bool(command(TC / 'cross/bin/k1om-mpss-linux-objcopy', *renames,
+                               SHARED / args.before / 'kernels-gcc.o', out / 'kernels-gccbefore.o'))
     if errors:
         print('FAIL: %d compile/assembly steps; no binaries linked' % errors)
         return 1
     common = [out / (name + '.o') for name in ('kernels-gcc', 'kernels-x87', 'timing', 'imci', 'negative')]
+    if args.before:
+        common.insert(0 if args.before_first else 1, out / 'kernels-gccbefore.o')
     for variant in variants:
         exe = out / ('m2-kernels.mic' if variant == 'positive' else 'm2-negative.mic')
         rc = command(*cc, out / ('driver-' + variant + '.o'), *common, '-pthread', '-lrt', '-o', exe)

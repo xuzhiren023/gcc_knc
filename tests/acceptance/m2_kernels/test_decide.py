@@ -49,7 +49,7 @@ class Decisions(unittest.TestCase):
         self.assertTrue(report['a'])
         self.assertFalse(report['b'])
         self.assertEqual(report['decision'], 'run-five-more')
-        report = self.run_block([0.50]*9 + [0.70])['m2']
+        report = self.run_block([0.50, 0.50, 0.50, 0.50, 0.70]*2)['m2']
         self.assertEqual(report['decision'], 'fail')
         self.assertEqual(report['sequential_step'], 2)
 
