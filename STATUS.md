@@ -1,10 +1,10 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-06 08:43.
+Updated automatically at every ticket change. Last update: 2026-11-06 08:52.
 
-**Next: the tech lead, on S6-01.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: GPT-6.1, on S6-09 (ICE in expand_vec_series_expr: KNC lane-index vectors (VEC_SERIES) for V16SI/V8DI and the FP modes).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
-Current tickets: `[##################--]` 98 of 107
+Current tickets: `[##################--]` 99 of 107
 
 ## Milestones
 
@@ -12,7 +12,7 @@ Current tickets: `[##################--]` 98 of 107
 |---|---|---|---|
 | M0 | Foundation | In progress | 17 of 17 tickets |
 | M1 | Mixed native code | Done | 43 of 43 tickets |
-| M2 | Useful vector target | In progress | 38 of 47 tickets |
+| M2 | Useful vector target | In progress | 39 of 47 tickets |
 | M3 | Runtimes | Not started | Not planned in detail yet |
 | M4 | Broad optimization | Not started | Not planned in detail yet |
 | M5 | Program corpus | Not started | Not planned in detail yet |
@@ -118,7 +118,7 @@ Current tickets: `[##################--]` 98 of 107
 | S5-19 | card_run shares cores with the PhiWeather session - compact per-job core claims from the ledger, and round-robin turns for benchmark jobs | Done | card_run now packs each job onto whole cores taken from 59 downward, shares the card with the PhiWeather se... |
 | S5-20 | card_run refuses engineer sandbox sessions, so card jobs stay with the lead | Done | card_run now refuses to run when started from a Codex sandbox account, so only the lead puts jobs on the ca... |
 | S5-21 | 32-byte short vectors pass and return in memory again, as before S5-16 and as the donor does (pr109040 regression) | Done | 32-byte short vectors (such as unsigned short vector_size(32)) are passed on the stack and returned in memo... |
-| S6-01 | Measurement method on KNC: clock, pinning, thread density, working sets, repetitions and noise (ADR-0010 input) | Waiting for review | cf89686: completed cited one-page protocol and measured answers in docs/research/knc-measurement.md (schema... |
+| S6-01 | Measurement method on KNC: clock, pinning, thread density, working sets, repetitions and noise (ADR-0010 input) | Done | KNC now has a measured timing method: raw-monotonic wall time, fixed sibling pinning for 1-4 threads per co... |
 | S6-02 | M2 kernels: affine, stencil, short-loop and small-matrix as GCC-KNC vector, x87 and hand-written IMCI builds, with a timing driver | Not started |  |
 | S6-03 | Machine characterization corpus (E5-01): latency and throughput per instruction class at 1-4 threads per core, cache and memory levels | Not started |  |
 | S6-04 | Per-loop KNC reports (E5-03): vector factor, peel and tail choice, masks, helper calls, spills and rejection reasons | Done | With -fopt-info-vec, KNC now reports each costed loop candidate: vector mode and factor, scalar peel, maske... |
@@ -132,6 +132,7 @@ Current tickets: `[##################--]` 98 of 107
 
 ## Recent activity
 
+- 2026-11-06 08:52 **S6-01** lead approve: KNC now has a measured timing method: raw-monotonic wall time, fixed sibling pinning for 1-4 threads per core, per-density L1/L2/memory sizes, and ...
 - 2026-11-06 08:43 **S6-01** engineer submit: cf89686: completed cited one-page protocol and measured answers in docs/research/knc-measurement.md (schema, commands, prior GCC16 build/lint PASS ...
 - 2026-11-06 08:37 **S6-01** lead answer: Card results are in .work/_shared/S6-01/claude-bench/run1.out to run6.out (stdout first, card_run JSON last; jobs claude-1589bc1c…, claude-85d41827...
 - 2026-11-06 08:20 **S6-04** lead approve: With -fopt-info-vec, KNC now reports each costed loop candidate: vector mode and factor, scalar peel, masked or scalar epilogue with the rejection ...
@@ -139,16 +140,15 @@ Current tickets: `[##################--]` 98 of 107
 - 2026-11-06 08:12 **S6-04** owner decide: Lead, under the owner's delegation: no further engineer session; the work is complete and the lead submits it to save tokens.
 - 2026-11-06 08:11 **S6-04** engineer escalate: budget: 7324487 input tokens used; the budget is 6000000
 - 2026-11-06 08:11 **S6-04** lead answer: Done: the lead's commit on s5/S6-04 removes the seven tracked dumps (the branch is now 5 files, 34 lines). Leave .work/_shared/S6-04 as it is. Comm...
-- 2026-11-06 08:10 **S6-04** engineer ask: Checks pass: build; T0 52; existing T1/T2; four report scans. Torture 4006 match except verified gcov time stamp. Logs .work/_state/logs/S6_04_*.lo...
 
 ## Cost
 
 - From the script, engineer: 237 sessions, 568.8M input tokens
 - From the script, lead: 185 sessions, 58.8M input tokens
-- Started by hand, Claude: 9 sessions, 1149.4M input tokens
+- Started by hand, Claude: 9 sessions, 1151.2M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 12.9 GiB of 100 GiB. 166 GiB free on the drive.
+The project uses 12.9 GiB of 100 GiB. 167 GiB free on the drive.
