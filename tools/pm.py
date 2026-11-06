@@ -443,9 +443,10 @@ def machine_check(worktree):
         try:
             done = subprocess.run(command, cwd=worktree, env=env, stdin=subprocess.DEVNULL,
                                   stdout=subprocess.PIPE, stderr=subprocess.STDOUT, universal_newlines=True,
-                                  errors="replace", timeout=600)
+                                  errors="replace", timeout=1200)
         except subprocess.TimeoutExpired:
-            raise Refused("not merged: %s ran past 10 minutes. Use pm.py changes." % label)
+            # T0's tests/regress reached ~600 s by 2026-11-06 (S5-10/S5-11 host models); 20 minutes until it is split.
+            raise Refused("not merged: %s ran past 20 minutes. Use pm.py changes." % label)
         except OSError as error:
             raise Refused("not merged: %s could not run: %s" % (label, error))
         if done.returncode != 0:
