@@ -54,3 +54,20 @@ Gain fraction (ADR-0010 point 6): (9.95 - 1) / (12.24 - 1) = **0.80** (M2 needs 
 only; the full baseline (three launches, all lengths and working sets) follows. Two fixture fixes
 were needed first: explicit 256 KiB worker stacks and `mallopt(M_ARENA_MAX, 2)` (per-thread malloc
 arenas and default stacks exceeded card_run's address-space limit).
+
+## 2026-11-06: the full M2 block, launch 1 is invalid (batch sizing)
+
+`.work/_shared/tmp/claude-s6-slot5/m2-*-1.out`: 10 of 15 runs exited 3. The cause is the fixture, not
+noise on the card (the ledger shows no other project; the only foreign process is card_run's own
+`sleep`). The pilot stopped at the first batch of 10 ms or more; when that batch stalled (usually the
+first build of a launch, cold), the batch was sized from it to 8-79 repetitions, and every timed
+sample then took 4-9 ms instead of 100 ms. At that size the 240-thread barrier dominates: GCC-KNC
+FP32 affine read 230 ns per element at length 15, 0.060 at L2 (against 0.0138 in the first
+measurement). **Two short-batch runs still passed the spread check** (length 4096 GCC: 64
+repetitions, 4.4 ms samples, 0.0697 ns per element, `within_launch_ok=1`), so a spread check alone
+does not prove a valid launch.
+
+Fix (`timing.c`, lead): after the pilot, re-size from a check batch until one lands within 50-200 ms
+(at most 10 tries, else the run dies), and a launch is valid only if its median sample is within
+50-200 ms. Built into `.work/_shared/M2-sizing/` (`build.py --out`); launches 2 and 3 of this block
+use the old binary and are discarded. The whole M2 baseline reruns with the new binary.

@@ -225,9 +225,17 @@ int benchmark(int argc, char **argv) {
       if (repetitions > ULONG_MAX/10) die("pilot overflow");
       repetitions *= 10;
     } while (1);
-    double scaled = (double)repetitions*100000000.0/elapsed;
-    if (scaled >= (double)ULONG_MAX) die("repetition overflow");
-    repetitions = scaled < 1 ? 1 : (unsigned long)(scaled+0.5);
+    /* A stalled pilot batch (cold start, a page-fault burst) sizes batches far too short, and
+       then the barrier dominates every sample (lead, 2026-11-06: 4-9 ms samples in the first
+       M2 block). Re-size from a check batch until one lands within 50-200 ms. */
+    for (int sizing = 0;; ++sizing) {
+      double scaled = (double)repetitions*100000000.0/elapsed;
+      if (scaled >= (double)ULONG_MAX) die("repetition overflow");
+      repetitions = scaled < 1 ? 1 : (unsigned long)(scaled+0.5);
+      elapsed = batch(); sample("pilot",-1,pilot++,elapsed);
+      if (elapsed >= 50000000ULL && elapsed <= 200000000ULL) break;
+      if (sizing == 9) die("batch sizing did not settle within 50-200 ms");
+    }
     uint64_t medians[5];
     for (int g = 0; g < 5; ++g) {
       for (int r = 0; r < 3; ++r) { elapsed = batch(); sample("warmup",g,r,elapsed); }
@@ -242,14 +250,16 @@ int benchmark(int argc, char **argv) {
     }
     qsort(medians,5,sizeof(*medians),compare);
     double spread = (double)(medians[4]-medians[0])/medians[2];
-    if (spread >= 0.02) noisy = 1;
+    /* A launch is valid only if its samples are the protocol's ~100 ms batches. */
+    int sized = medians[2] >= 50000000ULL && medians[2] <= 200000000ULL;
+    if (spread >= 0.02 || !sized) noisy = 1;
     printf("summary kernel=%s build=%s length=%lu threads_per_core=%d cores=%d "
            "repetitions=%lu median_ns=%llu ns_per_element=%.9f group_spread=%.9f "
            "within_launch_ok=%d launch=%d working_set=%s short_length=%u\n",
            kernels[selected].name,build_names[current_build],length,density,cores,
            repetitions,(unsigned long long)medians[2],
            (double)medians[2]/((double)workers*length*repetitions),spread,
-           spread < 0.02 && density != 3,launch,working_set,short_length);
+           spread < 0.02 && sized && density != 3,launch,working_set,short_length);
   }
   stopping = 1; sync_workers();
   for (int w = 0; w < workers; ++w) if (pthread_join(threads[w],NULL)) die("pthread_join");

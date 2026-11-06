@@ -106,6 +106,11 @@ M1 is accepted and tagged `m1` locally; nothing is pushed. Engineers are Claude 
 
 ## Open items not on a ticket
 
+- M2 baseline: launch 1 of the first full block was invalid (batches sized from a stalled pilot ran
+  4-9 ms instead of 100 ms; two such runs still passed the spread check). `timing.c` now re-sizes
+  until a check batch is 50-200 ms and rejects launches whose median sample is outside that range;
+  the full baseline reruns from `.work/_shared/M2-sizing/` (`docs/research/card-runs-s6.md`).
+
 - **A force-killed card_run leaves `.work/_state/card.lock` (2026-11-06).** Stopping a hung runner during the PhiWeather overlap left an empty own lock, and the afternoon block's 23 jobs were all refused with "own lock present". card_run never clears its own lock by design. A queued job also leaves `card-coordination/claude-admission.lock` (the shared folder; ours by name). Before any card block after a kill, check that no `card_run` process runs, then remove both files.
 - **The lead's T2 run writes shared binaries Codex then cannot overwrite (2026-11-06).** Running `tools/check.py t2` as `xuzhi` for S6-09 rewrote `.work/_shared/S5-21/short-vector-O2-*.mic`, and S6-10's T2 then failed with permission denied. The lead deleted them. When the lead runs T1/T2 for a Codex ticket, delete any shared outputs it rewrote afterwards, or point the tests at `TMPDIR`.
 - **T0 reached pm approve's 10-minute limit (2026-11-06).** `tests/regress` alone took 603 s under the Cygwin Python (it was 596 s at S5-21), so S6-02's approve was refused twice although every test passed. Approve now allows 20 minutes per check. Under the Windows Python each regression file runs in 1-2 s because they mostly skip, so the slow test is only visible under Cygwin; the S5-10/S5-11 host models (`test_sqrt_model.py` and the division model) are the likely cost. Split them into a slow tier before T0 grows again.

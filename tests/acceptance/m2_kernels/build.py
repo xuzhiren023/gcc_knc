@@ -23,6 +23,7 @@ def command(*args):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('mode', choices=('all', 'positive', 'negative'), default='all', nargs='?')
+    parser.add_argument('--out', default='S6-02', help='folder under .work/_shared for the outputs')
     args = parser.parse_args()
     if os.name == 'nt':
         env = os.environ.copy()
@@ -31,9 +32,9 @@ def main():
             [str(TC / 'cygwin/bin/cygpath.exe'), '-u', str(Path(__file__).resolve())],
             env=env, text=True).strip()
         return subprocess.call([str(TC / 'cygwin/bin/python3.12.exe'), script,
-                                args.mode], env=env)
+                                args.mode, '--out', args.out], env=env)
     os.environ['PATH'] = ':'.join(map(str, (TC / 'cross/bin', TC / 'cygwin/bin'))) + ':' + os.environ['PATH']
-    out = SHARED / 'S6-02'
+    out = SHARED / args.out
     out.mkdir(exist_ok=True)
     build = SHARED / 'gcc-build/gcc'
     cc = [build / 'xgcc', '-B' + str(build) + '/',
