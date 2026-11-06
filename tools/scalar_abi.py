@@ -421,11 +421,6 @@ def t2_crosscheck(runner, sources, stem, symbols, output, level, reverse,
             failures.append(role + ' compile: ' + compiled.stdout[-1800:])
         else:
             objects.append(obj)
-            if combined_source:
-                lint = runner.command(sys.executable, runner.root / 'tools/knc_lint',
-                                      obj, check=False)
-                if lint.returncode:
-                    failures.append(role + ' lint: ' + lint.stdout[-1800:])
     if not failures:
         linked = runner.command(runner.cc, *runner.cc_flags,
                                 '--sysroot=' + str(runner.sysroot), *objects, '-o', elf,
@@ -433,6 +428,11 @@ def t2_crosscheck(runner, sources, stem, symbols, output, level, reverse,
         if linked.returncode:
             failures.append('link: ' + linked.stdout[-1800:])
         else:
+            if combined_source:
+                lint = runner.command(sys.executable, runner.root / 'tools/knc_lint',
+                                      elf, check=False)
+                if lint.returncode:
+                    failures.append('linked binary lint: ' + lint.stdout[-1800:])
             table = runner.command(runner.tool('nm'), '--defined-only', elf)
             failures.extend('missing linked symbol ' + name for name in symbols
                             if not re.search(r'\bT\s+' + name + r'$', table, re.M))
