@@ -1,10 +1,10 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-06 12:48.
+Updated automatically at every ticket change. Last update: 2026-11-06 13:54.
 
 **Next: the tech lead, on S6-05.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
-Current tickets: `[###################-]` 105 of 108
+Current tickets: `[###################-]` 105 of 110
 
 ## Milestones
 
@@ -13,7 +13,7 @@ Current tickets: `[###################-]` 105 of 108
 | M0 | Foundation | In progress | 17 of 17 tickets |
 | M1 | Mixed native code | Done | 43 of 43 tickets |
 | M2 | Useful vector target | In progress | 45 of 48 tickets |
-| M3 | Runtimes | Not started | Not planned in detail yet |
+| M3 | Runtimes | In progress | 0 of 2 tickets |
 | M4 | Broad optimization | Not started | Not planned in detail yet |
 | M5 | Program corpus | Not started | Not planned in detail yet |
 | M6 | Release | Not started | Not planned in detail yet |
@@ -130,6 +130,8 @@ Current tickets: `[###################-]` 105 of 108
 | S6-10 | Unrecognizable and unconstrained insns: ffsll's scalar conditional move, and constant -1 into a k register | Done | Constant 0 and -1 loads into mask registers (kxor/kxnor) and 64-bit ffs without CMOV now compile on KNC, fi... |
 | S6-11 | ICE in expand_fn_using_insn for FP64 fmax/fmin loops (S5-15 follow-up) | Done | Scalar and SLP-reduction fmin/fmax on float and double now compile on KNC through vgmin/vgmax with the C Na... |
 | S6-12 | card_run --benchmark refuses while another project's processes still run on the card, whatever the ledger says | Done | card_run benchmark jobs now refuse to start while another project's programs (such as wrf.mic) are still ru... |
+| S7-01 | Shared libgcc for KNC: symbol-version ceiling for the card's glibc 2.21 and kernel 2.6.38, and what GCC 16 adds over the donor's libgcc_s (E6-01 input) | In progress |  |
+| S7-02 | libgfortran slice for KNC: descriptor ABI vs the card's GCC 5 runtime, real(16) and libquadmath, and MXCSR-safe FP control (E6-02 input) | Not started |  |
 
 ## Recent activity
 
@@ -146,10 +148,10 @@ Current tickets: `[###################-]` 105 of 108
 
 - From the script, engineer: 251 sessions, 603.7M input tokens
 - From the script, lead: 185 sessions, 58.8M input tokens
-- Started by hand, Claude: 9 sessions, 1302.6M input tokens
+- Started by hand, Claude: 9 sessions, 1320.1M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 12.9 GiB of 100 GiB. 164 GiB free on the drive.
+The project uses 12.9 GiB of 100 GiB. 157 GiB free on the drive.
