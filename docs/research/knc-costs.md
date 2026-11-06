@@ -107,3 +107,79 @@ Project harness `tools/check.py`: +22/-2, 3 hunks including the accepted
 red-test selector and accumulator scanner. Commit `8989b25acde` restores
 LF endings accidentally changed in the preceding shared-code commit;
 the final diff contains no line-ending churn.
+
+## Follow-up diagnosis, 2026-11-06
+
+GCC `5bc3a6af7de` implements the lead's three corrections: vector-side
+legacy gather/scatter records are normalized from lane counts to vector
+counts, zero data-reference steps retain the unknown-index estimate, and
+the late KNC override only handles gather/scatter. The other cost kinds
+retain the x86 lowering adjustments. The incremental build passed.
+
+Full T1 then still failed the gather rejection, integer reduction loop scan
+and unaligned arithmetic scan. Four further decisions changed:
+`knc-gather8-f64.c`, `knc-gather8-i64.c`, `knc-scatter8-f64.c` and
+`knc-scatter8-i64.c` now stay scalar. Both density reduction tests passed.
+The diagnostic compile succeeded using the toolchain PATH trampoline.
+Assembly and vectorizer dumps are under `.work/_shared/S6-05/` with the
+test stems and `.s` / `.vect` suffixes.
+
+The diagnostics explain the remaining issues:
+
+- `knc-cost-gather.c` takes `VMAT_GATHER_SCATTER_IFN`, not the legacy
+  builtin path. The IFN branch in `tree-vect-stmts.cc` also records one
+  scalar access per lane. Its dump still charged 64 for the gather,
+  giving vector-body cost 72 versus scalar-iteration cost 12 and VF 16.
+  GCC `7fdd15cf40a` extends the normalization to that native IFN path;
+  emulated accesses and the scalar baseline remain unchanged.
+- The eight-lane tests take the legacy path. For example, the double
+  gather now costs 236 per eight-lane instruction, with two instructions
+  per vector iteration: total body cost 484 versus scalar cost 12 and
+  VF 16. Rejection follows the scattered-index estimate. Requiring these
+  loops to emit gathers conflicts with the new profitability decision.
+- `sum_i32` has a register accumulator in its actual vector loop `.L6`.
+  The stack transfer follows horizontal reduction at `.L32`, outside
+  that loop. The scanner treats every backward jump as a loop, including
+  `.L42: ... jmp .L4` and the peel exits jumping back to `.L5`; these
+  linear text ranges include the epilogue stack transfer. Changing costs
+  to suppress this layout would conceal a scanner limitation.
+- `add_f32` vectorizes. Alignment peeling aligns `a`, then emits
+  `vaddps 0(%r13,%rdx), %zmm0, %zmm0`; `b` is loaded by an unpack pair.
+  The existing scan assumes unannotated inputs cannot become aligned and
+  requires register arithmetic. The folded operand here is the input
+  aligned by peeling. The positive `b64` cases remain part of the test.
+
+No existing scans were changed or weakened. The remaining scan conflicts
+need the lead's decision before claiming unchanged T1.
+
+Final follow-up validation at GCC `7fdd15cf40a`: incremental build PASS;
+all three accepted cost scans PASS (gather rejected, one default reduction
+accumulator, at least two at density 1). Full T1 still FAILS nine files:
+the six remaining failures from the preceding run, plus
+`knc-gather16-f32.c`, `knc-gather16-i32.c` and `knc-gather16-masked.c`.
+These three now fail their required gather-instruction scans after IFN
+costing is enabled. The unmasked FP32 test has the same indexed-copy loop
+as the accepted gather rejection test. No further tuning or scan edits
+were made after this second failed T1 attempt.
+
+M2 and all four s5_ops binaries were rebuilt and linted successfully with
+this final compiler, overwriting the paths listed above. They have not run
+on the card. T0 and T2 retain the earlier passing results and were not
+rerun in this follow-up. Torture changes and x86 remain for the batch check;
+native correctness and M2 benchmark windows remain pending with the lead.
+
+Follow-up logs under `.work/_state/logs/`:
+
+- `S6_05_build-20261106-171136.log`
+- `S6_05_t1-20261106-171325.log`
+- `S6_05_diagnose-20261106-171548.log`
+- `S6_05_build-20261106-171654.log`
+- `S6_05_t1-20261106-171854.log`
+- `S6_05_m2-20261106-171854.log`
+- `S6_05_s5_ops-20261106-171854.log`
+
+Final shared GCC changes against `b12c3242595`: `i386-common.cc` +1/-1,
+1 hunk; `i386-options.cc` +8/-2, 3 hunks; `i386.cc` +36/-0, 4 hunks;
+`i386.opt` +4/-0, 1 hunk. Total shared: +49/-3, 9 hunks. KNC-only
+files: `i386-knc.cc` +157/-1, 2 hunks; `i386-knc.h` +4/-0, 1 hunk.
+No project harness or test changes in this follow-up.
