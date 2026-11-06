@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-06 07:50.
+Updated automatically at every ticket change. Last update: 2026-11-06 07:53.
 
-**Next: GPT-6.1, on S6-01 (Measurement method on KNC: clock, pinning, thread density, working sets, repetitions and noise (ADR-0010 input)).** Run `python tools/dispatch.py`, or ask the tech lead to.
+**Next: the tech lead, on S6-07.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[##################--]` 96 of 104
 
@@ -124,11 +124,12 @@ Current tickets: `[##################--]` 96 of 104
 | S6-04 | Per-loop KNC reports (E5-03): vector factor, peel and tail choice, masks, helper calls, spills and rejection reasons | In progress | 1. Yes: a minimal ADR-0006 entry dispatch from ix86_vector_costs (for example in finish_cost) into KNC-only... |
 | S6-05 | -mtune=knc costs and vectorizer cost model v1 from the characterization tables (E5-09, E5-02) | Not started |  |
 | S6-06 | KNC scheduler v0 (E5-05): U/V pipes, 4-cycle vector latency, 3-cycle AGI | Not started |  |
-| S6-07 | First gcc.dg/vect baseline for KNC: compile scans on the host, execution on the card | In progress |  |
+| S6-07 | First gcc.dg/vect baseline for KNC: compile scans on the host, execution on the card | Question for the tech lead | 42de014 commits baseline: 2001 tests, 777 linked/linted/staged, 16 ICEs; 14 checked reproducers. Two reduct... |
 | S6-08 | Sprint 6 mid batch check after S6-04 and S6-05 | Not started |  |
 
 ## Recent activity
 
+- 2026-11-06 07:53 **S6-07** engineer ask: 42de014 commits baseline: 2001 tests, 777 linked/linted/staged, 16 ICEs; 14 checked reproducers. Two reductions of vect-double-reduc-{3,7} failed: ...
 - 2026-11-06 07:50 **S6-01** lead answer: 330991 is not stored locally; cite it through docs/research/knc-microarch.md (pages already given there) and treat TSC invariance as unproven. Befo...
 - 2026-11-06 07:49 **S6-01** engineer ask: df6d56c adds protocol/probe; GCC 16.2.0 build and assembly/ELF lint PASS. Schema, commands and logs: docs/research/knc-measurement.md. Binary: .wor...
 - 2026-11-06 07:44 **S6-04** lead answer: 1. Yes: a minimal ADR-0006 entry dispatch from ix86_vector_costs (for example in finish_cost) into KNC-only report code, one or two lines, TARGET_K...
@@ -136,13 +137,12 @@ Current tickets: `[##################--]` 96 of 104
 - 2026-11-06 04:54 **S5-21** lead approve: 32-byte short vectors (such as unsigned short vector_size(32)) are passed on the stack and returned in memory again, exactly as GCC 5 does, so pr10...
 - 2026-11-06 03:31 **S5-21** engineer submit: V16HI fixed; V16QI unchanged. Incremental builds pass. T0/T1/T2 pass after targeted push-ICE retries. Torture O0/O2 passes 1966/1967 -> 1967/1968 o...
 - 2026-11-06 03:09 **S5-21** lead approve-red: Red approved: T1 reads the V16HI argument from entry rsp+8 like the donor; T2 checks the hidden-pointer return. Both fail on the current compiler a...
-- 2026-11-06 03:08 **S5-21** engineer red: Red commit 0d20124: T1 pr109040 foo checks entry-RSP+8; T2 checks hidden RDI stores and RAX return. GCC16 -O2 fails both with unsupported KNC regis...
 
 ## Cost
 
 - From the script, engineer: 232 sessions, 557.9M input tokens
 - From the script, lead: 185 sessions, 58.8M input tokens
-- Started by hand, Claude: 9 sessions, 1114.3M input tokens
+- Started by hand, Claude: 9 sessions, 1114.9M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
