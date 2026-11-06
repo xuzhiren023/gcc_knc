@@ -178,3 +178,11 @@ use two `vgatherdpd`/`vpgatherdq`/`vscatterdpd` per 16 int indices, the high hal
 `vpermf32x4 $0xee`), core 59: `o2v`
 779,984 checks (`claude-050135f9…`), `o3` 779,984 (`claude-73528700…`), `fast` 602,384
 (`claude-24590e76…`), all 0 failures.
+
+## 2026-11-06: S5-15 under review (FP min/max)
+
+Built from S5-15's compiler (GCC `41a1abe5bbb`; `vgmin`/`vgmax` for MIN_EXPR/MAX_EXPR, `fmin`/`fmax`
+and their reductions), core 59: `s4_masks` `o2v` and `o3` 1,589,070 checks each (`claude-b021089b…`,
+`claude-83fc00b3…`), including `fmin_*`/`fmax_*` now vectorized; `s5_ops` `o2v` 779,984
+(`claude-f9c973ff…`), `o3` 779,984 (`claude-09bac8f0…`), `fast` 602,384 (`claude-375bab83…`);
+all 0 failures.
