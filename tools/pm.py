@@ -70,8 +70,9 @@ def lane_of(ticket):
 
 
 def run_git(*args, cwd=None, check=True):
+    # Git emits UTF-8 (notes and diffs may hold non-ASCII text); Windows would decode with its ANSI code page.
     result = subprocess.run(("git",) + args, cwd=cwd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
-                            universal_newlines=True)
+                            universal_newlines=True, encoding="utf-8", errors="replace")
     if check and result.returncode != 0:
         raise Refused("git %s failed:\n%s" % (" ".join(args), result.stdout.strip()[:800]))
     return result.stdout.strip()
