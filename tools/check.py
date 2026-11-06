@@ -27,6 +27,9 @@ PACKED = re.compile(r'\bv(?:addn?|subr?|mul|div|max|min|sqrt|rcp(?:23)?|rsqrt(?:
 # Each entry supplies its CLI help and handlers for the tiers it selects.
 # Imports stay lazy so T0 and source-only selections need no probe modules.
 SELECTIONS = {
+    'short_vector_abi': ('S5-21 V16HI stack argument and hidden result pointer', {
+        't1': lambda runner: importlib.import_module('scalar_abi').t1_short_vector(runner),
+        't2': lambda runner: importlib.import_module('scalar_abi').t2_short_vector(runner)}),
     'byte_word': ('S5-16 byte/word converting loads, stores and alignment', {
         't1': lambda runner: runner.t1_sources(runner.source_dir.glob('knc-convert-byte-*.c'))}),
     'fp_minmax': ('S5-15 FP min/max and reductions', {
@@ -304,7 +307,8 @@ class Runner:
     def t1_sources(self, sources=None):
         selected = (s for s in self.source_dir.glob('*.c')
                     if not s.name.startswith('knc-abi-')
-                    and s.name not in ('knc-vec-byte-aligned.c', 'knc-tls.c'))
+                    and s.name not in ('knc-vec-byte-aligned.c', 'knc-tls.c',
+                                       'knc-short-vector.c'))
         for source in sorted(selected if sources is None else sources):
             label = 't1 ' + source.name
             try:
