@@ -1,10 +1,10 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-06 01:03.
+Updated automatically at every ticket change. Last update: 2026-11-06 01:11.
 
-**Next: the tech lead, on S5-20.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: GPT-6.1, on S5-16 (KNC byte and word data: V16QI/V16HI transport modes, widening up-converting loads and narrowing down-converting stores).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
-Current tickets: `[###################-]` 92 of 95
+Current tickets: `[###################-]` 93 of 95
 
 ## Milestones
 
@@ -12,7 +12,7 @@ Current tickets: `[###################-]` 92 of 95
 |---|---|---|---|
 | M0 | Foundation | In progress | 17 of 17 tickets |
 | M1 | Mixed native code | Done | 43 of 43 tickets |
-| M2 | Useful vector target | In progress | 32 of 35 tickets |
+| M2 | Useful vector target | In progress | 33 of 35 tickets |
 | M3 | Runtimes | Not started | Not planned in detail yet |
 | M4 | Broad optimization | Not started | Not planned in detail yet |
 | M5 | Program corpus | Not started | Not planned in detail yet |
@@ -116,10 +116,11 @@ Current tickets: `[###################-]` 92 of 95
 | S5-17 | Sprint 5 mid batch check after S5-06, S5-07 and S5-08 | Done | x86 check (lead, portability-claude) at knc 9690ac8906a vs releases/gcc-16.2.0: -O2 and -O2 -mavx512f ident... |
 | S5-18 | Final Sprint 5 batch check at the sprint head | Not started |  |
 | S5-19 | card_run shares cores with the PhiWeather session - compact per-job core claims from the ledger, and round-robin turns for benchmark jobs | Done | card_run now packs each job onto whole cores taken from 59 downward, shares the card with the PhiWeather se... |
-| S5-20 | card_run refuses engineer sandbox sessions, so card jobs stay with the lead | Waiting for review | Submitted by the lead on the engineer's behalf (token budget exhausted after the work was done). Lead split... |
+| S5-20 | card_run refuses engineer sandbox sessions, so card jobs stay with the lead | Done | card_run now refuses to run when started from a Codex sandbox account, so only the lead puts jobs on the ca... |
 
 ## Recent activity
 
+- 2026-11-06 01:11 **S5-20** lead approve: card_run now refuses to run when started from a Codex sandbox account, so only the lead puts jobs on the card. Machine check: tools/check t0 passed...
 - 2026-11-06 01:03 **S5-20** engineer submit: Submitted by the lead on the engineer's behalf (token budget exhausted after the work was done). Lead split d0cea08 into red ebe948e (test only; er...
 - 2026-11-06 01:03 **S5-20** owner decide: Lead, under the owner's delegation: no further engineer session; the work at d0cea08 is complete and the lead submits it to save tokens.
 - 2026-11-06 01:02 **S5-20** engineer escalate: budget: 2144560 input tokens used; the budget is 2000000
@@ -127,16 +128,15 @@ Current tickets: `[###################-]` 92 of 95
 - 2026-11-06 01:01 **S5-20** engineer escalate: budget: 2 engineer sessions used; the budget is 2
 - 2026-11-06 01:01 **S5-15** lead approve: FP min/max loops, fmin/fmax and their reductions now vectorize on KNC as vgmin/vgmax with the C NaN rules, and s4_masks and s5_ops pass on the card...
 - 2026-11-06 00:54 **S5-20** lead approve-red: Red accepted by lead check: the new test errors on main's card_run (no getpass import; KeyError), a weaker red than an admission failure, but the r...
-- 2026-11-06 00:22 **S5-20** engineer red: The required failing test commit could not be created: git reset --soft HEAD~1 was denied writing worktree git metadata (.git/worktrees/S5-20/HEAD....
 
 ## Cost
 
 - From the script, engineer: 222 sessions, 532.7M input tokens
 - From the script, lead: 184 sessions, 58.7M input tokens
-- Started by hand, Claude: 9 sessions, 1047.6M input tokens
+- Started by hand, Claude: 9 sessions, 1048.4M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 12.6 GiB of 100 GiB. 174 GiB free on the drive.
+The project uses 12.6 GiB of 100 GiB. 173 GiB free on the drive.
