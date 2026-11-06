@@ -156,3 +156,10 @@ Built from S5-11's compiler (GCC `fabdf2d706e`), core 59:
 | (e) specials, one pair per call, all modes | 784 | 0 | 0 | IE DZ OE UE PE |
 | (f) 2^30 random, RN | 1,073,741,824 | 0 | 0 | IE DZ OE UE PE |
 | (g) (a), (b), (d) under RD, RU, RZ | 542,498,562 | 0 | 0 | PE UE |
+
+## 2026-11-06: S5-12 under review (float/double-width conversions)
+
+`s5_ops` built from S5-12's compiler (GCC `84679230849`; `cvt_f32_f64`, `cvt_f64_f32`,
+`cvt_i32_f64`, `cvt_f64_i32` and `mix_f32_f64` now vectorize), core 59:
+`o2v` 779,984 checks (`claude-7e435c2f…`), `o3` 779,984 (`claude-c620df3d…`), `fast` 602,384
+(`claude-b274292a…`), all 0 failures.
