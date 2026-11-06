@@ -119,7 +119,7 @@ Current tickets: `[##################--]` 99 of 107
 | S5-20 | card_run refuses engineer sandbox sessions, so card jobs stay with the lead | Done | card_run now refuses to run when started from a Codex sandbox account, so only the lead puts jobs on the ca... |
 | S5-21 | 32-byte short vectors pass and return in memory again, as before S5-16 and as the donor does (pr109040 regression) | Done | 32-byte short vectors (such as unsigned short vector_size(32)) are passed on the stack and returned in memo... |
 | S6-01 | Measurement method on KNC: clock, pinning, thread density, working sets, repetitions and noise (ADR-0010 input) | Done | KNC now has a measured timing method: raw-monotonic wall time, fixed sibling pinning for 1-4 threads per co... |
-| S6-02 | M2 kernels: affine, stencil, short-loop and small-matrix as GCC-KNC vector, x87 and hand-written IMCI builds, with a timing driver | Tests waiting for review | 70bcf0a adds the red correctness gate. Host checker self-test exits 1 with 75 failing lengths for a C copy ... |
+| S6-02 | M2 kernels: affine, stencil, short-loop and small-matrix as GCC-KNC vector, x87 and hand-written IMCI builds, with a timing driver | In progress | Red approved: the bitwise checker with guards rejects a wrong IMCI affine reference at all 75 nonempty leng... |
 | S6-03 | Machine characterization corpus (E5-01): latency and throughput per instruction class at 1-4 threads per core, cache and memory levels | In progress |  |
 | S6-04 | Per-loop KNC reports (E5-03): vector factor, peel and tail choice, masks, helper calls, spills and rejection reasons | Done | With -fopt-info-vec, KNC now reports each costed loop candidate: vector mode and factor, scalar peel, maske... |
 | S6-05 | -mtune=knc costs and vectorizer cost model v1 from the characterization tables (E5-09, E5-02) | Not started |  |
@@ -132,6 +132,7 @@ Current tickets: `[##################--]` 99 of 107
 
 ## Recent activity
 
+- 2026-11-06 09:01 **S6-02** lead approve-red: Red approved: the bitwise checker with guards rejects a wrong IMCI affine reference at all 75 nonempty lengths (host stand-in); the native negative...
 - 2026-11-06 09:00 **S6-09** engineer escalate: budget: 7415416 input tokens used; the budget is 6000000
 - 2026-11-06 09:00 **S6-09** lead answer: Do not fix the mask crash here: vect-simd-17 moves to S6-10, which owns the knc_movhi -1 into k1 class (ticket amended). The count of 8 was the lea...
 - 2026-11-06 09:00 **S6-02** engineer red: 70bcf0a adds the red correctness gate. Host checker self-test exits 1 with 75 failing lengths for a C copy stand-in after accepting correct scalar ...
@@ -139,13 +140,12 @@ Current tickets: `[##################--]` 99 of 107
 - 2026-11-06 08:55 **S6-02** lead answer: Yes: this ticket is explicitly authorized to create tests/acceptance/m2_kernels/ (new files only; do not change any other acceptance fixture). The ...
 - 2026-11-06 08:54 **S6-02** engineer ask: S6-02 requires creating tests/acceptance/m2_kernels/, but AGENTS.md says not to change tests/acceptance/ and to ask if that rule blocks the ticket....
 - 2026-11-06 08:52 **S6-01** lead approve: KNC now has a measured timing method: raw-monotonic wall time, fixed sibling pinning for 1-4 threads per core, per-density L1/L2/memory sizes, and ...
-- 2026-11-06 08:43 **S6-01** engineer submit: cf89686: completed cited one-page protocol and measured answers in docs/research/knc-measurement.md (schema, commands, prior GCC16 build/lint PASS ...
 
 ## Cost
 
 - From the script, engineer: 240 sessions, 576.7M input tokens
 - From the script, lead: 185 sessions, 58.8M input tokens
-- Started by hand, Claude: 9 sessions, 1162.3M input tokens
+- Started by hand, Claude: 9 sessions, 1164.1M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
