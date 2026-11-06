@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-06 03:01.
+Updated automatically at every ticket change. Last update: 2026-11-06 03:02.
 
 **Next: GPT-6.1, on S5-21 (32-byte short vectors pass and return in memory again, as before S5-16 and as the donor does (pr109040 regression)).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
@@ -117,7 +117,7 @@ Current tickets: `[###################-]` 95 of 96
 | S5-18 | Final Sprint 5 batch check at the sprint head | Done | At KNC 656cb9ef096 the forward-port drill applies with only textual conflicts (5 files on upstream master, ... |
 | S5-19 | card_run shares cores with the PhiWeather session - compact per-job core claims from the ledger, and round-robin turns for benchmark jobs | Done | card_run now packs each job onto whole cores taken from 59 downward, shares the card with the PhiWeather se... |
 | S5-20 | card_run refuses engineer sandbox sessions, so card jobs stay with the lead | Done | card_run now refuses to run when started from a Codex sandbox account, so only the lead puts jobs on the ca... |
-| S5-21 | 32-byte short vectors pass and return in memory again, as before S5-16 and as the donor does (pr109040 regression) | Not started |  |
+| S5-21 | 32-byte short vectors pass and return in memory again, as before S5-16 and as the donor does (pr109040 regression) | In progress |  |
 
 ## Recent activity
 
@@ -134,10 +134,10 @@ Current tickets: `[###################-]` 95 of 96
 
 - From the script, engineer: 228 sessions, 549.7M input tokens
 - From the script, lead: 185 sessions, 58.8M input tokens
-- Started by hand, Claude: 9 sessions, 1070.8M input tokens
+- Started by hand, Claude: 9 sessions, 1073.1M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 12.7 GiB of 100 GiB. 172 GiB free on the drive.
+The project uses 12.8 GiB of 100 GiB. 172 GiB free on the drive.
