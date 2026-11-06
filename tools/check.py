@@ -364,7 +364,7 @@ class Runner:
                             for loop in loops(body or ''):
                                 accumulators = set()
                                 for line in loop.splitlines():
-                                    add = re.match(r'\s*vaddpd\s+(.+),\s*(%zmm\d+)\s*$', line)
+                                    add = re.match(r'\s*vaddpd\s+(.+),\s*(%zmm\d+)(?:\{%k\d+\})?\s*$', line)
                                     if add and add[2] in re.findall(r'%zmm\d+\b', add[1]):
                                         accumulators.add(add[2])
                                 counts.append(len(accumulators))
