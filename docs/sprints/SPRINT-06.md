@@ -67,7 +67,7 @@ final batch check and the M2 evidence note.
 
 ## Sprint exit
 
-- [ ] ADR-0010 (measurement method) accepted
+- [x] ADR-0010 (measurement method) accepted
 - [ ] The M2 kernels measured at the sprint head against x87 and IMCI references, at L1, L2 and
   memory working sets and 1-4 threads per core
 - [ ] Every gcc ticket merged and proven on the card
