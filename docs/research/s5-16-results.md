@@ -1,8 +1,8 @@
 # S5-16 implementation and outstanding results
 
-Acceptance is **not met**. The implementation builds, but the signed-word-to-float
-scan and two torture cases fail. The lead's whole-zmm spill requirement also
-needs clarification. No program was run on the card.
+Acceptance is **not yet met**. The first implementation's signed-word-to-float
+scan and two torture ICEs are being corrected after the lead approved exact-size
+spills. No program was run on the card.
 
 The implementation adds a separate V16QI/V16HI transport predicate, the related
 mode hook, preferred QI/HI modes, ABI rejection, exact-size transport, converting
@@ -17,18 +17,31 @@ Transport instruction references checked in Intel 327364-001:
   and 15 write 16 and 32 bytes. Natural alignment keeps the value in that line.
 - pp.32-34 and 379-384: memory conversion alignment and VMOVAPS/VMOVDQA32 forms.
 
-## Spill question
+## Spill representation and follow-up fixes
 
 Register moves copy the full zmm. Ordinary pseudo spills currently use the
 exact-size transport operations, preserving all sixteen value lanes.
-This does **not** implement the lead's requirement that spills copy the whole zmm.
+The lead approved these exact-size spills in the ticket answer at 01:52.
 
 The reduced allocator case is a `reg:V16HI` pseudo with no wider subregister
 references. `gcc/lra-spills.cc:132-158` derives its slot from the pseudo mode and
 `biggest_mode`, producing a 32-byte slot; V16QI similarly uses 16 bytes. A 64-byte
-store cannot safely replace that transfer. May ordinary pseudo spills use the
-exact-size transfers, reserving XI for full-register transfers, or is an explicit
-wider spill representation required?
+store cannot safely replace that transfer. XI remains the full-register transfer
+representation.
+
+Follow-up commits:
+
+- Project `e9d6873`: reduced T1 cases for the reload and constructor ICE classes.
+  Both reproduced their expected ICEs before the fixes. The diagnostic wrapper
+  exited zero after collecting results; the two compiler invocations exited 1.
+  Log: `s5_16_reduced_red-20261106-015544.log`.
+- Shared GCC `3cc3a958ba1`: dispatch narrow constructors to KNC initialization,
+  including V16HI in the constructor expander.
+- KNC GCC `e1112842e87`: make register/load/store alternatives share one move
+  pattern so LRA can spill a narrow pseudo without generating endless reloads;
+  build narrow constructors through scalar stores and one exact-size load;
+  recognize `FLOAT (mem:V16QI/V16HI)`, the canonical form produced by
+  `simplify-rtx.cc` from `FLOAT (SIGN_EXTEND mem)`.
 
 ## Validation
 
@@ -68,8 +81,9 @@ Card binaries for the lead, built but **not executed**:
 
 ## Shared i386 changes
 
-The separate shared commit changes five hunks: two in `i386.cc` (supported-mode
-dispatch and related-mode hook) and three in `sse.md` (extension/truncation
-expander guards). Total: six added and four removed lines. KNC implementation
+The separate shared commits change seven hunks: two in `i386.cc` (supported-mode
+dispatch and related-mode hook), four in `sse.md` (extension/truncation and
+constructor expander guards), and one in `i386-expand.cc` (constructor dispatch).
+Total: nine added and six removed lines. KNC implementation
 changes are confined to `i386-knc.cc`, `i386-knc.h` and `imci.md`. No x86 batch
 check was run; the ticket assigns that to the next batch check.

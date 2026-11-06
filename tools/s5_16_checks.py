@@ -8,6 +8,17 @@ import s5_12_checks as checks
 checks.OUT = checks.SHARED / 's5-16'
 
 
+def retry_t1():
+    """Retry the failed positive scan and the two reduced ICE classes."""
+    from types import SimpleNamespace
+    from check import Runner
+    runner = Runner(SimpleNamespace(compiler='gcc16', cc=None))
+    with runner._output:
+        runner.t1_sources(runner.source_dir / ('knc-convert-byte-' + name + '.c')
+                          for name in ('positive', 'reload', 'init'))
+    return int(runner.failed)
+
+
 def native():
     """Build only; card execution belongs to the lead."""
     cc = [str(checks.BUILD / 'xgcc'), '-B' + str(checks.BUILD) + '/',
@@ -39,6 +50,8 @@ def native():
 
 if __name__ == '__main__':
     checks.__file__ = __file__
+    if os.name != 'nt' and sys.argv[1] == 'retry-t1':
+        sys.exit(retry_t1())
     if os.name != 'nt' and sys.argv[1] == 'native':
         os.environ['PATH'] = ':'.join(str(checks.TC / p) for p in
                                       ('cross/bin', 'cygwin/bin')) + ':' + os.environ['PATH']
