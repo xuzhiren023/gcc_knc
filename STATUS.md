@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-05 21:44.
+Updated automatically at every ticket change. Last update: 2026-11-05 22:26.
 
-**Next: GPT-6.1, on S5-14 (KNC 8-lane gather and scatter for V8DF/V8DI through the builtin hooks, reading the low 8 dwords of a V16SI index).** Run `python tools/dispatch.py`, or ask the tech lead to.
+**Next: the tech lead, on S5-14.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[###################-]` 90 of 94
 
@@ -110,7 +110,7 @@ Current tickets: `[###################-]` 90 of 94
 | S5-11 | Correctly rounded FP32 vector division for V16SF, with cond_div (S5-03 ticket B) | Done | Vectorized FP32 division on KNC is now correctly rounded, with IEEE flags, in all four rounding modes: 1.8 ... |
 | S5-12 | KNC float/double-width conversions: vcvtps2pd, vcvtpd2ps, vcvtdq2pd, vcvtfxpntpd2dq with vpermf32x4 halves | Done | Loops that convert between float and double, or between int and double, now vectorize on KNC with full 512-... |
 | S5-13 | KNC 16-lane gather and scatter: vgatherdps/vpgatherdd and the scatter forms in a jknzd loop, through the optabs | Done | Loops that read or write float or int arrays through a signed int index (a[i] = b[idx[i]], a[idx[i]] = b[i]... |
-| S5-14 | KNC 8-lane gather and scatter for V8DF/V8DI through the builtin hooks, reading the low 8 dwords of a V16SI index | In progress | Red approved: T1 scans for two 8-lane gathers/scatters per 16 int indices with one vpermf32x4 0xee feeding ... |
+| S5-14 | KNC 8-lane gather and scatter for V8DF/V8DI through the builtin hooks, reading the low 8 dwords of a V16SI index | Question for the tech lead | May I add a builtin-return ABI hook/prototype, requiring a second i386-knc.h edit despite the ticket's one-... |
 | S5-15 | KNC FP min/max: MIN_EXPR/MAX_EXPR and fmin/fmax as vgminps/vgmaxps (pd), with their reductions | Not started |  |
 | S5-16 | KNC byte and word data: V16QI/V16HI transport modes, widening up-converting loads and narrowing down-converting stores | Not started |  |
 | S5-17 | Sprint 5 mid batch check after S5-06, S5-07 and S5-08 | Done | x86 check (lead, portability-claude) at knc 9690ac8906a vs releases/gcc-16.2.0: -O2 and -O2 -mavx512f ident... |
@@ -119,6 +119,7 @@ Current tickets: `[###################-]` 90 of 94
 
 ## Recent activity
 
+- 2026-11-05 22:26 **S5-14** engineer ask: May I add a builtin-return ABI hook/prototype, requiring a second i386-knc.h edit despite the ticket's one-edit rule? Repro: knc-gather8-f64.c/i64....
 - 2026-11-05 21:44 **S5-14** lead approve-red: Red approved: T1 scans for two 8-lane gathers/scatters per 16 int indices with one vpermf32x4 0xee feeding the high half. Keep the jknzd retry loop...
 - 2026-11-05 21:43 **S5-14** engineer red: Red commit a71f6cd. Focused -O3 T1: all four double/long gather/scatter scans fail as expected on scalar accesses; compilation, assembly and lint s...
 - 2026-11-05 21:40 **S5-13** lead approve: Loops that read or write float or int arrays through a signed int index (a[i] = b[idx[i]], a[idx[i]] = b[i]) now vectorize on KNC with gather and s...
@@ -126,16 +127,15 @@ Current tickets: `[###################-]` 90 of 94
 - 2026-11-05 21:03 **S5-13** owner decide: Lead, under the owner's delegation: sessions 4 -> 5 for one short round. Fix the masked-gather and masked-scatter scan regex (jkzd/jknzd lines read...
 - 2026-11-05 21:02 **S5-13** engineer escalate: budget: 4 engineer sessions used; the budget is 4
 - 2026-11-05 21:02 **S5-13** lead answer: No capture needed: the lead compiled it (gcc-build at 917beb990eb). The code is right: vpcmpd $4 -> %k1, kmov %k1,%k2, vgatherdps {%k2} in its jknz...
-- 2026-11-05 20:44 **S5-13** engineer ask: 917beb990eb fixes ICE; build passes. T1 float/int and negatives pass; masked_gather compare-mask scan fails. Repro: aligned a,idx,m; if(m[i]) a[i]=...
 
 ## Cost
 
 - From the script, engineer: 214 sessions, 511.3M input tokens
 - From the script, lead: 184 sessions, 58.7M input tokens
-- Started by hand, Claude: 9 sessions, 1013.6M input tokens
+- Started by hand, Claude: 9 sessions, 1015.2M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 12.3 GiB of 100 GiB. 206 GiB free on the drive.
+The project uses 12.4 GiB of 100 GiB. 200 GiB free on the drive.
