@@ -186,3 +186,19 @@ and their reductions), core 59: `s4_masks` `o2v` and `o3` 1,589,070 checks each 
 `claude-83fc00b3…`), including `fmin_*`/`fmax_*` now vectorized; `s5_ops` `o2v` 779,984
 (`claude-f9c973ff…`), `o3` 779,984 (`claude-09bac8f0…`), `fast` 602,384 (`claude-375bab83…`);
 all 0 failures.
+
+## 2026-11-06: Sprint 5 final card slot (S5-18), plus S5-16 and S5-21
+
+At GCC `knc` `656cb9ef096` (after S5-16) unless noted; one slot between two PhiWeather runs.
+
+- Full `gcc.c-torture/execute` suite: 1,680 of 1,680 pass (`.work/_shared/tmp/claude-suite-s5-18`).
+  One fewer program built than at S5-17: `pr109040.c` did not compile after S5-16 (see S5-21).
+- `s4_masks` `o2v` and `o3`: 1,589,070 checks each, 0 failures (`claude-aa755879…`, `claude-43d4fbe1…`).
+- `s5_ops` (S5-16 builds) `o2v`/`o3` 779,984, `fast` 602,384, 0 failures (`claude-4d7c7ee6…`,
+  `claude-a47875c2…`, `claude-80eca3ab…`).
+- S5-16 `knc-byte-guard --native`, u8 data ending at a page end, 16/32/64/256 bytes: 0 failures
+  (`claude-f390faf7…`).
+- S5-21 compiler (GCC `d7eb3edec0a`): `pr109040` passes (`claude-22f693a5…`); the V16HI ABI
+  cross-links with donor objects, GCC 16 caller (`claude-0b5ed361…`) and donor caller
+  (`claude-aceca2eb…`), print exactly the expected 8 lines (six integer arguments, float mix,
+  hidden-pointer return, varargs).
