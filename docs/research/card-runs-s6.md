@@ -100,6 +100,11 @@ Findings:
   4 KiB offsets of x, y and the four sibling threads' buffers change with the heap), which changes
   L1/L2 set conflicts. Next: page-aligned buffers with a fixed per-buffer, per-thread stagger, then
   repeat launches to see whether the spread falls under 2% (ADR-0010 amendment if it does).
+  Done in the fixture (`driver.c`: x and y page-aligned, staggered 1 KiB per sibling thread and
+  512 bytes between x and y; built into `.work/_shared/M2-placement/`). `claude-s6-slot6b.sh` runs
+  correctness, then five launches each of lengths 4096 and 1024, after the current block. It replaced
+  `claude-s6-slot6.sh` (the launch-1 reruns on the old placement) before that started any job; the
+  full three-launch baseline reruns on whichever placement proves stable.
 - **The IMCI reference is not a ceiling everywhere:** GCC-KNC beats it 1.3-2x at lengths 255-257 and
   L1. GF above 1 there says the reference has per-call or alignment overhead, not that GCC is
   "better than possible"; M2 judges GF at L2 only.

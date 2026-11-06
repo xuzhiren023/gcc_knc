@@ -18,6 +18,13 @@ static void *aligned(size_t n) {
   if (posix_memalign(&p,64,n)) die("allocation");
   return p;
 }
+/* Page-aligned, so a buffer's cache-set placement is the same in every launch (lead, 2026-11-06:
+   with 64-byte alignment, M2 times moved up to 20% between launches). */
+static void *page_aligned(size_t n) {
+  void *p;
+  if (posix_memalign(&p,4096,n)) die("allocation");
+  return p;
+}
 void allocate_buffers(struct buffers *b, int k, unsigned long n, unsigned seed) {
   size_t nx = n+48, offset = 16;
   int size = kernels[k].bytes;
@@ -25,8 +32,14 @@ void allocate_buffers(struct buffers *b, int k, unsigned long n, unsigned seed) 
   if (k == 3) { nx = ((n+WIDTH-1)/WIDTH+2)*PITCH; offset = PITCH+16; }
   if (k >= 5) { unsigned d = k == 5 ? 8 : 16; nx = ((n+d-1)/d)*16+32; offset = 0; }
   b->nx = nx; b->ny = n+32;
-  b->allocation = aligned(nx*size);
-  b->storage = aligned(b->ny*size);
+  /* A fixed stagger per sibling thread (worker ids run c*density+t) and between x and y keeps the
+     four siblings' and the two arrays' 4 KiB set offsets distinct and identical across launches.
+     Multiples of 64 bytes keep every kernel's alignment. */
+  size_t stagger = (seed%4)*1024;
+  b->raw_x = page_aligned(nx*size+stagger);
+  b->raw_y = page_aligned(b->ny*size+stagger+512);
+  b->allocation = (char *)b->raw_x+stagger;
+  b->storage = (char *)b->raw_y+stagger+512;
   b->x = (char *)b->allocation+offset*size;
   b->y = (char *)b->storage+16*size;
   b->p = aligned(np*size);
@@ -44,7 +57,7 @@ void allocate_buffers(struct buffers *b, int k, unsigned long n, unsigned seed) 
     if (k < 5) { p[0] = 2; p[1] = 0.5f; }
   }
 }
-void free_buffers(struct buffers *b) { free(b->allocation); free(b->storage); free(b->p); }
+void free_buffers(struct buffers *b) { free(b->raw_x); free(b->raw_y); free(b->p); }
 void invoke(int k, int build, struct buffers *b, unsigned long n) {
   kernel_fn fn = kernels[k].fn[build];
 #ifdef NEGATIVE_CONTROL

@@ -24,7 +24,7 @@ struct kernel { const char *name; kernel_fn fn[3]; int kind, bytes; };
 extern const struct kernel kernels[7];
 extern const char *build_names[3];
 extern unsigned short_length;
-struct buffers { void *allocation, *x, *storage, *y, *p; size_t nx, ny; };
+struct buffers { void *allocation, *x, *storage, *y, *p, *raw_x, *raw_y; size_t nx, ny; };
 void allocate_buffers(struct buffers *, int, unsigned long, unsigned);
 void free_buffers(struct buffers *);
 void invoke(int, int, struct buffers *, unsigned long);
