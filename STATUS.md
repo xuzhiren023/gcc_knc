@@ -1,10 +1,10 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-06 00:54.
+Updated automatically at every ticket change. Last update: 2026-11-06 01:01.
 
-**Next: the tech lead, on S5-15.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: GPT-6.1, on S5-20 (card_run refuses engineer sandbox sessions, so card jobs stay with the lead).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
-Current tickets: `[###################-]` 91 of 95
+Current tickets: `[###################-]` 92 of 95
 
 ## Milestones
 
@@ -12,7 +12,7 @@ Current tickets: `[###################-]` 91 of 95
 |---|---|---|---|
 | M0 | Foundation | In progress | 17 of 17 tickets |
 | M1 | Mixed native code | Done | 43 of 43 tickets |
-| M2 | Useful vector target | In progress | 31 of 35 tickets |
+| M2 | Useful vector target | In progress | 32 of 35 tickets |
 | M3 | Runtimes | Not started | Not planned in detail yet |
 | M4 | Broad optimization | Not started | Not planned in detail yet |
 | M5 | Program corpus | Not started | Not planned in detail yet |
@@ -111,7 +111,7 @@ Current tickets: `[###################-]` 91 of 95
 | S5-12 | KNC float/double-width conversions: vcvtps2pd, vcvtpd2ps, vcvtdq2pd, vcvtfxpntpd2dq with vpermf32x4 halves | Done | Loops that convert between float and double, or between int and double, now vectorize on KNC with full 512-... |
 | S5-13 | KNC 16-lane gather and scatter: vgatherdps/vpgatherdd and the scatter forms in a jknzd loop, through the optabs | Done | Loops that read or write float or int arrays through a signed int index (a[i] = b[idx[i]], a[idx[i]] = b[i]... |
 | S5-14 | KNC 8-lane gather and scatter for V8DF/V8DI through the builtin hooks, reading the low 8 dwords of a V16SI index | Done | Loops that read or write double or long arrays through an int index now vectorize on KNC as two 8-lane gath... |
-| S5-15 | KNC FP min/max: MIN_EXPR/MAX_EXPR and fmin/fmax as vgminps/vgmaxps (pd), with their reductions | Waiting for review | GCC 41a1abe5bbb built incrementally; red failed as expected; T0 52 passed; T1/T2 passed except obsolete sca... |
+| S5-15 | KNC FP min/max: MIN_EXPR/MAX_EXPR and fmin/fmax as vgminps/vgmaxps (pd), with their reductions | Done | FP min/max loops, fmin/fmax and their reductions now vectorize on KNC as vgmin/vgmax with the C NaN rules, ... |
 | S5-16 | KNC byte and word data: V16QI/V16HI transport modes, widening up-converting loads and narrowing down-converting stores | Not started |  |
 | S5-17 | Sprint 5 mid batch check after S5-06, S5-07 and S5-08 | Done | x86 check (lead, portability-claude) at knc 9690ac8906a vs releases/gcc-16.2.0: -O2 and -O2 -mavx512f ident... |
 | S5-18 | Final Sprint 5 batch check at the sprint head | Not started |  |
@@ -120,6 +120,7 @@ Current tickets: `[###################-]` 91 of 95
 
 ## Recent activity
 
+- 2026-11-06 01:01 **S5-15** lead approve: FP min/max loops, fmin/fmax and their reductions now vectorize on KNC as vgmin/vgmax with the C NaN rules, and s4_masks and s5_ops pass on the card...
 - 2026-11-06 00:54 **S5-20** lead approve-red: Red accepted by lead check: the new test errors on main's card_run (no getpass import; KeyError), a weaker red than an admission failure, but the r...
 - 2026-11-06 00:22 **S5-20** engineer red: The required failing test commit could not be created: git reset --soft HEAD~1 was denied writing worktree git metadata (.git/worktrees/S5-20/HEAD....
 - 2026-11-06 00:15 **S5-15** engineer submit: GCC 41a1abe5bbb built incrementally; red failed as expected; T0 52 passed; T1/T2 passed except obsolete scans, now fixed bb09b54 and both pass. Log...
@@ -127,13 +128,12 @@ Current tickets: `[###################-]` 91 of 95
 - 2026-11-06 00:12 **S5-15** engineer ask: GCC 41a1abe5bbb builds; new minmax T1 passes. Existing knc-mask-cond-O2/O3 ban vgmin in fmin_f32. Reproducer: c[i]=__builtin_fminf(a[i],b[i]) now v...
 - 2026-11-05 23:34 **S5-15** lead answer: Yes: define a local code attribute in imci.md (e.g. knc_maxmin: smax 'max', smin 'min'), not in sse.md, and continue.
 - 2026-11-05 23:33 **S5-15** engineer ask: Two builds failed: first ssescalarmode before definition (fixed); second genflags: unresolved iterator in *knc_reduc_<maxmin>v8df_swizzle. Reproduc...
-- 2026-11-05 23:18 **S5-14** lead approve: Loops that read or write double or long arrays through an int index now vectorize on KNC as two 8-lane gathers or scatters per 16 indices, and pass...
 
 ## Cost
 
 - From the script, engineer: 222 sessions, 532.7M input tokens
 - From the script, lead: 184 sessions, 58.7M input tokens
-- Started by hand, Claude: 9 sessions, 1041.8M input tokens
+- Started by hand, Claude: 9 sessions, 1042.9M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
