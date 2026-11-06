@@ -2,7 +2,7 @@
 
 Updated automatically at every ticket change. Last update: 2026-11-06 09:17.
 
-**Next: GPT-6.1, on S6-02 (M2 kernels: affine, stencil, short-loop and small-matrix as GCC-KNC vector, x87 and hand-written IMCI builds, with a timing driver).** Run `python tools/dispatch.py`, or ask the tech lead to.
+**Next: the tech lead, on S6-09.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[##################--]` 100 of 107
 
@@ -126,12 +126,13 @@ Current tickets: `[##################--]` 100 of 107
 | S6-06 | KNC scheduler v0 (E5-05): U/V pipes, 4-cycle vector latency, 3-cycle AGI | Not started |  |
 | S6-07 | First gcc.dg/vect baseline for KNC: compile scans on the host, execution on the card | Done | The gcc.dg/vect suite now has a KNC baseline: of 2,001 tests, 1,329 compile (777 linked for the card), 632 ... |
 | S6-08 | Sprint 6 mid batch check after S6-04 and S6-05 | Not started |  |
-| S6-09 | ICE in expand_vec_series_expr: KNC lane-index vectors (VEC_SERIES) for V16SI/V8DI and the FP modes | In progress | Lead, under the owner's delegation: no further engineer session; the lead ran the remaining checks and subm... |
+| S6-09 | ICE in expand_vec_series_expr: KNC lane-index vectors (VEC_SERIES) for V16SI/V8DI and the FP modes | Waiting for review | Submitted by the lead on the engineer's behalf (token budget exhausted). GCC 89b5040fe28: vec_series for th... |
 | S6-10 | Unrecognizable and unconstrained insns: ffsll's scalar conditional move, and constant -1 into a k register | Not started |  |
 | S6-11 | ICE in expand_fn_using_insn for FP64 fmax/fmin loops (S5-15 follow-up) | Not started |  |
 
 ## Recent activity
 
+- 2026-11-06 09:17 **S6-09** engineer submit: Submitted by the lead on the engineer's behalf (token budget exhausted). GCC 89b5040fe28: vec_series for the packed modes in imci.md (+60, no share...
 - 2026-11-06 09:17 **S6-09** owner decide: Lead, under the owner's delegation: no further engineer session; the lead ran the remaining checks and submits.
 - 2026-11-06 09:16 **S6-03** lead approve: A KNC characterization corpus of 104 hand-written measurements is ready to run on the card: latency and throughput per instruction class, U/V pairi...
 - 2026-11-06 09:07 **S6-03** engineer submit: Build/lint/host args PASS: .work/_state/logs/S6_03_acceptance-20261106-090406.log. No card run. Lead PowerShell commands (repeat 3 windows): foreac...
@@ -139,7 +140,6 @@ Current tickets: `[##################--]` 100 of 107
 - 2026-11-06 09:05 **S6-03** engineer ask: 104 requested characterization measurements are implemented in 755 lines / five test files under tests/bench/knc-char (00536ef). GCC16 build, assem...
 - 2026-11-06 09:01 **S6-02** lead approve-red: Red approved: the bitwise checker with guards rejects a wrong IMCI affine reference at all 75 nonempty lengths (host stand-in); the native negative...
 - 2026-11-06 09:00 **S6-09** engineer escalate: budget: 7415416 input tokens used; the budget is 6000000
-- 2026-11-06 09:00 **S6-09** lead answer: Do not fix the mask crash here: vect-simd-17 moves to S6-10, which owns the knc_movhi -1 into k1 class (ticket amended). The count of 8 was the lea...
 
 ## Cost
 
