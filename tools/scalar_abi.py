@@ -250,6 +250,7 @@ def t1_abi_gaps(runner):
 
 
 def t1(runner):
+    t1_short_vector(runner)
     t1_vector_diagnostics(runner)
     t1_vector_compatibility(runner)
     t1_abi_gaps(runner)
@@ -311,7 +312,70 @@ def affine(runner):
     runner.result('t1 m1_affine ABI donor locations', failures)
 
 
+def t1_short_vector(runner):
+    source = runner.source_dir / 'knc-short-vector.c'
+    runner.t1_sources([source])
+    asm = runner.out / (source.stem + '.s')
+    if not asm.exists():
+        return  # t1_sources already reported the compilation failure.
+    body = runner.function_body(asm.read_text(), 'foo')
+    # The donor reserves 96 bytes locally: 104(%rsp) is entry RSP + 8.
+    # Reuse the scalar ABI frame tracker, allowing a different local frame.
+    got = locations(body or '')
+    runner.result('t1 V16HI argument at entry RSP + 8',
+                  [] if body and got == (['rdi'], [8], []) else
+                  ['incoming registers/stack slots %s; expected RDI and stack +8' % (got,)])
+
+
+def t2_short_vector(runner):
+    """The incoming RDI must receive the result and be returned in RAX.
+
+    This probe has no explicit arguments, so a store through incoming RDI
+    cannot be mistaken for a store through an ordinary pointer parameter.
+    Track pointer copies rather than prescribing a scratch register.
+    """
+    source = runner.root / 'tests/t2/knc-short-vector.c'
+    asm = runner.out / 'short-vector-return.s'
+    compiled = runner.command(runner.cc, *runner.cc_flags, '-O2', '-march=knc',
+                              '-S', source, '-o', asm, check=False)
+    failures = []
+    if compiled.returncode:
+        failures.append('compile: ' + compiled.stdout[-1800:])
+    else:
+        assembly = asm.read_text()
+        body = runner.function_body(assembly, 'short_vector_return')
+        aliases, stored, returned = {'rdi'}, False, False
+        for mnemonic, operands in instructions(body or ''):
+            parts = [part.strip() for part in operands.split(',')]
+            if len(parts) == 2:
+                memory = re.fullmatch(r'-?\d*\(%(\w+)\)(?:\{[^}]+\})*', parts[1])
+                if (memory and memory[1] in aliases
+                        and mnemonic.startswith(('mov', 'vmov', 'vpackstore'))):
+                    stored = True
+                dest = re.fullmatch(r'%(\w+)', parts[1])
+                if dest and not mnemonic.startswith(('cmp', 'test')):
+                    copied = mnemonic == 'movq' and parts[0] in {
+                        '%' + name for name in aliases}
+                    aliases.discard(dest[1])
+                    if copied:
+                        aliases.add(dest[1])
+            if mnemonic in ('ret', 'retq'):
+                returned = 'rax' in aliases
+        if not body:
+            failures.append('missing short_vector_return function')
+        if not stored:
+            failures.append('no result store through hidden incoming RDI')
+        if not returned:
+            failures.append('hidden result pointer not returned in RAX')
+        failures.extend(forbidden_registers(assembly))
+        obj = asm.with_suffix('.o')
+        runner.command(runner.tool('as'), '--march=k1om', asm, '-o', obj)
+        runner.command(sys.executable, runner.root / 'tools/knc_lint', asm, obj)
+    runner.result('t2 V16HI hidden result pointer', failures)
+
+
 def t2(runner):
+    t2_short_vector(runner)
     sources = runner.root / 'tests/t2'
     # Fixed shared paths are the S3-10 native inputs; never execute on the host.
     output = runner.tc.parent / 'scalar-abi'
