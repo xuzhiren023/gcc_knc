@@ -320,7 +320,7 @@ class Runner:
                 options = ['-O2']
                 for line in source.read_text().splitlines():
                     match = re.match(r'^\s*//\s*(options|scan-asm|scan-asm-not|scan-output|scan-debug-info|error):\s*(.*)$', line)
-                    function = re.match(r'^\s*//\s*(scan-asm-func|scan-asm-loop-not)\s+(\S+):\s*(.*)$', line)
+                    function = re.match(r'^\s*//\s*(scan-asm-func|scan-asm-loop-not|scan-asm-loop-accumulators)\s+(\S+):\s*(.*)$', line)
                     if match:
                         kind, pattern = match.groups()
                         if kind == 'options':
@@ -357,7 +357,25 @@ class Runner:
                         body = (compiled.stdout if kind == 'scan-output' else
                                 debug_info if kind == 'scan-debug-info' else
                                 function_body(assembly, name) if name else assembly)
-                        if kind == 'scan-asm-loop-not':
+                        if kind == 'scan-asm-loop-accumulators':
+                            # Count distinct self-updating vector sums within
+                            # one backward loop, never the horizontal epilogue.
+                            counts = []
+                            for loop in loops(body or ''):
+                                accumulators = set()
+                                for line in loop.splitlines():
+                                    add = re.match(r'\s*vaddpd\s+(.+),\s*(%zmm\d+)\s*$', line)
+                                    if add and add[2] in re.findall(r'%zmm\d+\b', add[1]):
+                                        accumulators.add(add[2])
+                                counts.append(len(accumulators))
+                            count = max(counts, default=0)
+                            expected = int(pattern.rstrip('+'))
+                            failed = (count < expected if pattern.endswith('+')
+                                      else count != expected)
+                            if failed:
+                                failures.append('vector accumulators: got %d, expected %s'
+                                                % (count, pattern))
+                        elif kind == 'scan-asm-loop-not':
                             # Permit scalar-result transport after a reduction,
                             # but reject stack accumulators in a backward loop.
                             candidates = list(loops(body)) if body is not None else []
