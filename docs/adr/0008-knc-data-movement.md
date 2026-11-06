@@ -121,7 +121,9 @@ is an in-order fold. It is legal, but costly (the `s5_ops` baseline).
      the low 128 bits for V16QI (16 bytes), like TI, and the low 256 bits for V16HI (32 bytes).
      (Amended by the lead on 2026-11-06, from S5-16's engineer: V16HI is 32 bytes in
      `i386-modes.def`, so a 128-bit home would lose lanes 8-15.)
-   - Register moves and spills copy the whole `zmm`. Memory transfers move exactly the value's
+   - Register-to-register moves copy the whole `zmm`. Spills and every other memory transfer
+     move exactly the value's size, because LRA gives these modes 16- and 32-byte slots
+     (`lra-spills.cc`; amended 2026-11-06 from S5-16). Memory transfers move exactly the value's
      size at its natural alignment (16 bytes for V16QI, 32 for V16HI), with forms that stay inside
      one 64-byte line: a `vbroadcasti32x4`/`vbroadcasti64x4` load, and a `vpackstorelq` store
      under a 2- or 4-qword mask. The unaligned unpack/pack pair is never used (it faults at a page
