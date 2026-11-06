@@ -2,7 +2,7 @@
 
 Updated automatically at every ticket change. Last update: 2026-11-06 01:02.
 
-**Next: GPT-6.1, on S5-16 (KNC byte and word data: V16QI/V16HI transport modes, widening up-converting loads and narrowing down-converting stores).** Run `python tools/dispatch.py`, or ask the tech lead to.
+**Waiting for you:** S5-20. Run `python tools/pm.py inbox`.
 
 Current tickets: `[###################-]` 92 of 95
 
@@ -116,10 +116,11 @@ Current tickets: `[###################-]` 92 of 95
 | S5-17 | Sprint 5 mid batch check after S5-06, S5-07 and S5-08 | Done | x86 check (lead, portability-claude) at knc 9690ac8906a vs releases/gcc-16.2.0: -O2 and -O2 -mavx512f ident... |
 | S5-18 | Final Sprint 5 batch check at the sprint head | Not started |  |
 | S5-19 | card_run shares cores with the PhiWeather session - compact per-job core claims from the ledger, and round-robin turns for benchmark jobs | Done | card_run now packs each job onto whole cores taken from 59 downward, shares the card with the PhiWeather se... |
-| S5-20 | card_run refuses engineer sandbox sessions, so card jobs stay with the lead | In progress | Lead, under the owner's delegation: sessions 2 -> 3. The work is done (d0cea08, discovery passed); only sub... |
+| S5-20 | card_run refuses engineer sandbox sessions, so card jobs stay with the lead | **Waiting for you** | budget: 2144560 input tokens used; the budget is 2000000 |
 
 ## Recent activity
 
+- 2026-11-06 01:02 **S5-20** engineer escalate: budget: 2144560 input tokens used; the budget is 2000000
 - 2026-11-06 01:02 **S5-20** owner decide: Lead, under the owner's delegation: sessions 2 -> 3. The work is done (d0cea08, discovery passed); only submit it, citing the passing test_card_run...
 - 2026-11-06 01:01 **S5-20** engineer escalate: budget: 2 engineer sessions used; the budget is 2
 - 2026-11-06 01:01 **S5-15** lead approve: FP min/max loops, fmin/fmax and their reductions now vectorize on KNC as vgmin/vgmax with the C NaN rules, and s4_masks and s5_ops pass on the card...
@@ -127,13 +128,12 @@ Current tickets: `[###################-]` 92 of 95
 - 2026-11-06 00:22 **S5-20** engineer red: The required failing test commit could not be created: git reset --soft HEAD~1 was denied writing worktree git metadata (.git/worktrees/S5-20/HEAD....
 - 2026-11-06 00:15 **S5-15** engineer submit: GCC 41a1abe5bbb built incrementally; red failed as expected; T0 52 passed; T1/T2 passed except obsolete scans, now fixed bb09b54 and both pass. Log...
 - 2026-11-06 00:13 **S5-15** lead answer: Yes: replace the obsolete 'no vgmin/vgmax in fmin_*/fmax_*' scans in knc-mask-cond with positive scans (ADR-0008 point 3 as amended; the S4 ban pre...
-- 2026-11-06 00:12 **S5-15** engineer ask: GCC 41a1abe5bbb builds; new minmax T1 passes. Existing knc-mask-cond-O2/O3 ban vgmin in fmin_f32. Reproducer: c[i]=__builtin_fminf(a[i],b[i]) now v...
 
 ## Cost
 
 - From the script, engineer: 222 sessions, 532.7M input tokens
 - From the script, lead: 184 sessions, 58.7M input tokens
-- Started by hand, Claude: 9 sessions, 1044.5M input tokens
+- Started by hand, Claude: 9 sessions, 1045.3M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
