@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-06 03:02.
+Updated automatically at every ticket change. Last update: 2026-11-06 03:08.
 
-**Next: GPT-6.1, on S5-21 (32-byte short vectors pass and return in memory again, as before S5-16 and as the donor does (pr109040 regression)).** Run `python tools/dispatch.py`, or ask the tech lead to.
+**Next: the tech lead, on S5-21.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[###################-]` 95 of 96
 
@@ -117,10 +117,11 @@ Current tickets: `[###################-]` 95 of 96
 | S5-18 | Final Sprint 5 batch check at the sprint head | Done | At KNC 656cb9ef096 the forward-port drill applies with only textual conflicts (5 files on upstream master, ... |
 | S5-19 | card_run shares cores with the PhiWeather session - compact per-job core claims from the ledger, and round-robin turns for benchmark jobs | Done | card_run now packs each job onto whole cores taken from 59 downward, shares the card with the PhiWeather se... |
 | S5-20 | card_run refuses engineer sandbox sessions, so card jobs stay with the lead | Done | card_run now refuses to run when started from a Codex sandbox account, so only the lead puts jobs on the ca... |
-| S5-21 | 32-byte short vectors pass and return in memory again, as before S5-16 and as the donor does (pr109040 regression) | In progress |  |
+| S5-21 | 32-byte short vectors pass and return in memory again, as before S5-16 and as the donor does (pr109040 regression) | Tests waiting for review | Red commit 0d20124: T1 pr109040 foo checks entry-RSP+8; T2 checks hidden RDI stores and RAX return. GCC16 -... |
 
 ## Recent activity
 
+- 2026-11-06 03:08 **S5-21** engineer red: Red commit 0d20124: T1 pr109040 foo checks entry-RSP+8; T2 checks hidden RDI stores and RAX return. GCC16 -O2 fails both with unsupported KNC regis...
 - 2026-11-06 03:01 **S5-18** lead approve: At KNC 656cb9ef096 the forward-port drill applies with only textual conflicts (5 files on upstream master, none on gcc-16) and both ICE sweeps show...
 - 2026-11-06 02:50 **S5-18** engineer submit: GCC 656cb9ef096; report docs/research/forward-port.md (616f480). Build skipped. Drill: master 5 files/7 textual hunks; gcc-16 0. Both sweeps: 0 ICE...
 - 2026-11-06 02:35 **S5-16** lead approve: Byte and word arrays now vectorize on KNC through converting loads and stores (u8/s8/u16/s16 to int and float, int to u8/s16 with modular truncatio...
@@ -128,7 +129,6 @@ Current tickets: `[###################-]` 95 of 96
 - 2026-11-06 02:24 **S5-16** lead answer: Yes: let the report scans accept 16, 32 or 64 byte vectors, and keep every instruction scan (one converting zmm access per 16 elements, no xmm/ymm)...
 - 2026-11-06 02:24 **S5-16** engineer ask: Build, f_s16 instruction scan and both reduced ICE tests pass; torture has no new ICEs. T1 now fails literal '64 byte vectors': aligned i32[i]=u8[i...
 - 2026-11-06 01:52 **S5-16** lead answer: Yes: spills use the same exact-size transfer forms as other memory moves (ADR-0008 point 7 amended on main); XI full-register transfers only for re...
-- 2026-11-06 01:52 **S5-16** engineer ask: Spill rule blocks acceptance: reg:V16HI without wider subregs gets a 32-byte LRA slot (gcc/lra-spills.cc:132-158); V16QI gets 16. A whole-zmm store...
 
 ## Cost
 
