@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-06 07:41.
+Updated automatically at every ticket change. Last update: 2026-11-06 07:44.
 
-**Next: GPT-6.1, on S6-01 (Measurement method on KNC: clock, pinning, thread density, working sets, repetitions and noise (ADR-0010 input)).** Run `python tools/dispatch.py`, or ask the tech lead to.
+**Next: the tech lead, on S6-04.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[##################--]` 96 of 104
 
@@ -121,7 +121,7 @@ Current tickets: `[##################--]` 96 of 104
 | S6-01 | Measurement method on KNC: clock, pinning, thread density, working sets, repetitions and noise (ADR-0010 input) | In progress |  |
 | S6-02 | M2 kernels: affine, stencil, short-loop and small-matrix as GCC-KNC vector, x87 and hand-written IMCI builds, with a timing driver | Not started |  |
 | S6-03 | Machine characterization corpus (E5-01): latency and throughput per instruction class at 1-4 threads per core, cache and memory levels | Not started |  |
-| S6-04 | Per-loop KNC reports (E5-03): vector factor, peel and tail choice, masks, helper calls, spills and rejection reasons | In progress |  |
+| S6-04 | Per-loop KNC reports (E5-03): vector factor, peel and tail choice, masks, helper calls, spills and rejection reasons | Question for the tech lead | Red f759c0d: all four T1 report scans fail as expected; log .work/_state/logs/S6_04_red-20261106-074335.log... |
 | S6-05 | -mtune=knc costs and vectorizer cost model v1 from the characterization tables (E5-09, E5-02) | Not started |  |
 | S6-06 | KNC scheduler v0 (E5-05): U/V pipes, 4-cycle vector latency, 3-cycle AGI | Not started |  |
 | S6-07 | First gcc.dg/vect baseline for KNC: compile scans on the host, execution on the card | In progress |  |
@@ -129,6 +129,7 @@ Current tickets: `[##################--]` 96 of 104
 
 ## Recent activity
 
+- 2026-11-06 07:44 **S6-04** engineer ask: Red f759c0d: all four T1 report scans fail as expected; log .work/_state/logs/S6_04_red-20261106-074335.log. Scope blocker: i386.cc:26259 always cr...
 - 2026-11-06 04:54 **S5-21** lead approve: 32-byte short vectors (such as unsigned short vector_size(32)) are passed on the stack and returned in memory again, exactly as GCC 5 does, so pr10...
 - 2026-11-06 03:31 **S5-21** engineer submit: V16HI fixed; V16QI unchanged. Incremental builds pass. T0/T1/T2 pass after targeted push-ICE retries. Torture O0/O2 passes 1966/1967 -> 1967/1968 o...
 - 2026-11-06 03:09 **S5-21** lead approve-red: Red approved: T1 reads the V16HI argument from entry rsp+8 like the donor; T2 checks the hidden-pointer return. Both fail on the current compiler a...
@@ -136,7 +137,6 @@ Current tickets: `[##################--]` 96 of 104
 - 2026-11-06 03:01 **S5-18** lead approve: At KNC 656cb9ef096 the forward-port drill applies with only textual conflicts (5 files on upstream master, none on gcc-16) and both ICE sweeps show...
 - 2026-11-06 02:50 **S5-18** engineer submit: GCC 656cb9ef096; report docs/research/forward-port.md (616f480). Build skipped. Drill: master 5 files/7 textual hunks; gcc-16 0. Both sweeps: 0 ICE...
 - 2026-11-06 02:35 **S5-16** lead approve: Byte and word arrays now vectorize on KNC through converting loads and stores (u8/s8/u16/s16 to int and float, int to u8/s16 with modular truncatio...
-- 2026-11-06 02:27 **S5-16** engineer submit: Acceptance met under lead decisions. Final positive T1 PASS; unchanged instruction scans, approved report widths with comment. Log: .work/_state/lo...
 
 ## Cost
 
