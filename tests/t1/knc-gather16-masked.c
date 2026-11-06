@@ -1,10 +1,12 @@
 // S5-13: the conditional gather must use the compare mask, directly or copied
 // with kmov because the gather consumes it and the masked store still needs it.
 // The destination is aligned to permit the existing KNC masked-store lowering.
+// jkzd/jknzd read their final mask operand; only other instructions can overwrite it.
+// Anchor the write check at line start and require a mnemonic after indentation.
 // options: -O3
-// scan-asm-func masked_gather: \bvpcmpd\s+\$4,[^\n]*,\s*%k(?P<cmp>[0-7])\s*\n(?:(?!\s*[^\n]*,\s*%k(?P=cmp)\s*$)[\s\S])*?(?:\bkmov\s+%k(?P=cmp),\s*%k(?P<copy>[1-7])\s*\n[\s\S]*?)?\bvgatherdps\s+[^\n]*\{%k(?(copy)(?P=copy)|(?P=cmp))\}
+// scan-asm-func masked_gather: \bvpcmpd\s+\$4,[^\n]*,\s*%k(?P<cmp>[0-7])\s*\n(?:(?!^[ \t]*(?!jkn?zd\b)\S[^\n]*,\s*%k(?P=cmp)\s*$)[\s\S])*?(?:\bkmov\s+%k(?P=cmp),\s*%k(?P<copy>[1-7])\s*\n[\s\S]*?)?\bvgatherdps\s+[^\n]*\{%k(?(copy)(?P=copy)|(?P=cmp))\}
 // scan-asm-func masked_gather: ^\s*(?P<label>\.L[\w.$]+|[0-9]+):\s*\n\s*vgatherdps\s+[^\n]*\{%k(?P<mask>[1-7])\}\s*\n\s*jknzd\s+(?P=label)b?,\s*%k(?P=mask)\b
-// scan-asm-func masked_scatter: \bvpcmpd\s+\$4,[^\n]*,\s*%k(?P<cmp>[0-7])\s*\n(?:(?!\s*[^\n]*,\s*%k(?P=cmp)\s*$)[\s\S])*?(?:\bkmov\s+%k(?P=cmp),\s*%k(?P<copy>[1-7])\s*\n[\s\S]*?)?\bvscatterdps\s+[^\n]*\{%k(?(copy)(?P=copy)|(?P=cmp))\}
+// scan-asm-func masked_scatter: \bvpcmpd\s+\$4,[^\n]*,\s*%k(?P<cmp>[0-7])\s*\n(?:(?!^[ \t]*(?!jkn?zd\b)\S[^\n]*,\s*%k(?P=cmp)\s*$)[\s\S])*?(?:\bkmov\s+%k(?P=cmp),\s*%k(?P<copy>[1-7])\s*\n[\s\S]*?)?\bvscatterdps\s+[^\n]*\{%k(?(copy)(?P=copy)|(?P=cmp))\}
 // scan-asm-func masked_scatter: ^\s*(?P<label>\.L[\w.$]+|[0-9]+):\s*\n\s*vscatterdps\s+[^\n]*\{%k(?P<mask>[1-7])\}\s*\n\s*jknzd\s+(?P=label)b?,\s*%k(?P=mask)\b
 float a_masked[1024] __attribute__((aligned(64)));
 int idx_masked[1024] __attribute__((aligned(64)));
