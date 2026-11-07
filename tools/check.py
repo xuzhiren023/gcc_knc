@@ -27,6 +27,8 @@ PACKED = re.compile(r'\bv(?:addn?|subr?|mul|div|max|min|sqrt|rcp(?:23)?|rsqrt(?:
 # Each entry supplies its CLI help and handlers for the tiers it selects.
 # Imports stay lazy so T0 and source-only selections need no probe modules.
 SELECTIONS = {
+    'knc_scheduler': ('S6-06 vector/scalar pairing and address separation', {
+        't1': lambda runner: runner.t1_sources([runner.source_dir / 'knc-scheduler.c'])}),
     'knc_costs': ('S6-05 measured KNC vectorizer cost decisions', {
         't1': lambda runner: runner.t1_sources(runner.source_dir.glob('knc-cost-*.c'))}),
     'loop_reports': ('S6-04 KNC per-loop optimization reports', {
