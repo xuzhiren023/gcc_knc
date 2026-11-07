@@ -1,10 +1,10 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-06 23:51.
+Updated automatically at every ticket change. Last update: 2026-11-06 23:58.
 
 **Waiting for you:** S6-13. Run `python tools/pm.py inbox`.
 
-Current tickets: `[###################-]` 108 of 113
+Current tickets: `[###################-]` 109 of 113
 
 ## Milestones
 
@@ -12,7 +12,7 @@ Current tickets: `[###################-]` 108 of 113
 |---|---|---|---|
 | M0 | Foundation | In progress | 17 of 17 tickets |
 | M1 | Mixed native code | Done | 43 of 43 tickets |
-| M2 | Useful vector target | In progress | 46 of 51 tickets |
+| M2 | Useful vector target | In progress | 47 of 51 tickets |
 | M3 | Runtimes | In progress | 2 of 2 tickets |
 | M4 | Broad optimization | Not started | Not planned in detail yet |
 | M5 | Program corpus | Not started | Not planned in detail yet |
@@ -122,7 +122,7 @@ Current tickets: `[###################-]` 108 of 113
 | S6-02 | M2 kernels: affine, stencil, short-loop and small-matrix as GCC-KNC vector, x87 and hand-written IMCI builds, with a timing driver | Done | The M2 yardstick is ready and correct on the card: FP32/FP64 affine, two stencils, a short loop and 8x8/16x... |
 | S6-03 | Machine characterization corpus (E5-01): latency and throughput per instruction class at 1-4 threads per core, cache and memory levels | Done | A KNC characterization corpus of 104 hand-written measurements is ready to run on the card: latency and thr... |
 | S6-04 | Per-loop KNC reports (E5-03): vector factor, peel and tail choice, masks, helper calls, spills and rejection reasons | Done | With -fopt-info-vec, KNC now reports each costed loop candidate: vector mode and factor, scalar peel, maske... |
-| S6-05 | -mtune=knc costs and vectorizer cost model v1 from the characterization tables (E5-09, E5-02) | Waiting for review | Lead, under the owner's delegation for engineering decisions (the escalation only needed the interactive le... |
+| S6-05 | -mtune=knc costs and vectorizer cost model v1 from the characterization tables (E5-09, E5-02) | Done | GCC-KNC now has a KNC cost table from the card measurements: scattered-index gathers stay scalar, reduction... |
 | S6-06 | KNC scheduler v0 (E5-05): U/V pipes, 4-cycle vector latency, 3-cycle AGI | Not started | back in lane gcc. Tables: `docs/research/knc-characterization.md`. The measured |
 | S6-07 | First gcc.dg/vect baseline for KNC: compile scans on the host, execution on the card | Done | The gcc.dg/vect suite now has a KNC baseline: of 2,001 tests, 1,329 compile (777 linked for the card), 632 ... |
 | S6-08 | Sprint 6 mid batch check after S6-04 and S6-05 | Not started |  |
@@ -140,12 +140,12 @@ Current tickets: `[###################-]` 108 of 113
 
 - 2026-11-07  **S6-13** lead note: a third follow-up for this ticket: `decide.py` line 77 treats any
 - 2026-11-07  **S6-13** lead note: two small fixture follow-ups ride with this ticket, since it changes the same
+- 2026-11-06 23:58 **S6-05** lead approve: GCC-KNC now has a KNC cost table from the card measurements: scattered-index gathers stay scalar, reductions use more vector accumulators when fewe...
 - 2026-11-06 23:51 **S6-05** owner decide: Lead, under the owner's delegation for engineering decisions (the escalation only needed the interactive lead's card runs): done 04:41-04:51Z, docs...
 - 2026-11-06 23:45 **S6-13** lead escalate: Round-2 code review found nothing blocking (unpinned sampler when the mask is workers-only, sleep-helper receipt, two-states note and A/A README ar...
 - 2026-11-06 23:44 **S6-13** engineer submit: Red reproduced sampler and sleep-receipt failures. Fixed unpinned sampling and receipt handling; README records confirmed field map. Host parser/jo...
 - 2026-11-06 23:41 **S6-13** lead changes: 1) Sampler: card_run's benchmark set is CPUs 1-240, all workers, so there is no spare CPU; when none is outside the workers, run the sampler unpinn...
 - 2026-11-06 23:40 **S6-13** owner decide: Lead, under the owner's delegation for engineering decisions: card check done 04:38-04:40Z (docs/research/card-runs-s6.md). Correctness and the neg...
-- 2026-11-06 22:41 **S6-05** lead escalate: Round-2 review, no findings: GCC 97f4b6c only raises KNC scalar add cost to 1 (scalar_add.lat), restoring M2-final stencil1/2 IV choice; T0/T1/T2 p...
 
 ## Cost
 
