@@ -1,6 +1,15 @@
-/* No PT_GNU_EH_FRAME: donor crtbeginS/crtendS register and deregister frames. */
+/* No PT_GNU_EH_FRAME: explicitly register/deregister the plugin frame table.
+   Source: libgcc/unwind-dw2-fde.c public __register_frame interface. */
 #include <signal.h>
 #include <unwind.h>
+__asm__(".section .eh_frame,\"a\",@progbits\n"
+        ".hidden plugin_eh_start\nplugin_eh_start:\n.previous");
+extern "C" char plugin_eh_start[];
+extern "C" void __register_frame(void *), __deregister_frame(void *);
+__attribute__((constructor)) static void register_frames()
+{ __register_frame(plugin_eh_start); }
+__attribute__((destructor)) static void deregister_frames()
+{ __deregister_frame(plugin_eh_start); }
 struct Guard { int *p; explicit Guard(int *n):p(n){} ~Guard(){++*p;} };
 extern "C" void plugin_throw(int *n)
 { Guard guard(n); throw 73; }

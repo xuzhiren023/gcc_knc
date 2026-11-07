@@ -58,10 +58,17 @@ def main():
     products.append(target)
     shutil.copyfile(SRC / 'new.expected', OUT / (target.name + '.expected'))
     cxx = [TC / 'cross/bin/k1om-mpss-linux-g++', *donor_flags, *common]
-    # Deliberately omit the EH-frame header on the plugin: libgcc's CRT frame
-    # registration/deregistration path must work across repeated unloads.
+    # This old linker lacks --no-eh-frame-hdr. Remove the driver's positive
+    # option from its link spec rather than passing an unsupported negation.
+    specs = subprocess.check_output([str(cxx[0]), '-dumpspecs'], text=True)
+    link = re.search(r'^\*link:\n(.*?)(?:\n\n|\Z)', specs, re.M | re.S)
+    if not link or '--eh-frame-hdr' not in link[1]:
+        raise RuntimeError('donor link spec lacks the expected EH-frame option')
+    nohdr = OUT / 'no-eh-frame-hdr.specs'
+    nohdr.write_text('*link:\n' + link[1].replace('--eh-frame-hdr','') + '\n\n')
+    # Registration is explicit in plugin.cc and cannot fall back to a header.
     plugin = OUT / 'plugin.so'
-    run([*cxx, '-fPIC', '-shared', '-Wl,--no-eh-frame-hdr', SRC / 'plugin.cc',
+    run([*cxx, '-fPIC', '-shared', '-specs=' + str(nohdr), SRC / 'plugin.cc',
          '-o', plugin])
     products.append(plugin)
     (OUT / 'plugin.so.expected').write_text('Loaded by old-unwind.mic; see old-unwind.mic.expected\n')
@@ -93,9 +100,9 @@ def main():
         if path.name == 'plugin.so':
             if re.search(r'^\s*GNU_EH_FRAME\s', elf, re.M):
                 raise RuntimeError('plugin unexpectedly has an EH frame header')
-            for name in ('__register_frame_info', '__deregister_frame_info'):
-                if not re.search(r'\bUND\s+' + name + r'(?:_bases)?@GCC_', elf):
-                    raise RuntimeError('plugin lacks CRT frame registration: ' + name)
+            for name in ('__register_frame', '__deregister_frame'):
+                if not re.search(r'\bUND\s+' + name + r'@GCC_', elf):
+                    raise RuntimeError('plugin lacks frame registration: ' + name)
     print('PASS S7-05: built and linted; expected output and explicit-path runner staged at ' + str(OUT))
     print('NOT RUN NATIVELY: lead owns S7-06 card execution')
 
