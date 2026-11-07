@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-07 16:40.
+Updated automatically at every ticket change. Last update: 2026-11-07 16:42.
 
-**Next: GPT-6.1, on S7-07 (libgfortran part 1: KNC floating-point backend and capability contract (E6-02)).** Run `python tools/dispatch.py`, or ask the tech lead to.
+**Next: the tech lead, on S7-07.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[###################-]` 117 of 121
 
@@ -139,13 +139,14 @@ Current tickets: `[###################-]` 117 of 121
 | S7-04 | Shared libgcc part 2: shared build and driver integration (E6-01b) | Done | The KNC compiler now builds a shared libgcc_s.so.1 that keeps the donor's ABI, needs nothing newer than gli... |
 | S7-05 | Shared libgcc part 3: compatibility and unwind card payloads (E6-01c) | Done | The old-client and new-client libgcc compatibility and unwind test programs are built, linted and staged wi... |
 | S7-06 | Shared libgcc part 4: lead native acceptance and the install decision (E6-01d) | Done | GCC-KNC's shared libgcc_s passes every compatibility and unwind test on the card (old and new clients, exce... |
-| S7-07 | libgfortran part 1: KNC floating-point backend and capability contract (E6-02) | In progress | Red accepted: host tests of the libgfortran KNC floating-point state logic fail for the right reason (k1om ... |
+| S7-07 | libgfortran part 1: KNC floating-point backend and capability contract (E6-02) | Question for the tech lead | Green is blocked by the 16:40 lead prerequisite: no native flag-map or halting result is recorded in this t... |
 | S7-08 | libgfortran part 2: base runtime build and the descriptor and I/O slice (E6-02) | Not started | Sprint 7 draft; parked in lane lead until the owner starts Sprint 7 and Sprint 6's gcc tickets are merged; ... |
 | S7-09 | libgfortran part 3: runtime isolation and packaging (E6-02) | Not started | owner chose a private directory for GCC-KNC's runtime on the card (S7-06); libgfortran's shared variant goe... |
 | S7-10 | Sprint 7 batch check after S7-05 and S7-08 | Not started | Sprint 7 draft; parked in lane lead until the owner starts Sprint 7 and Sprint 6's gcc tickets are merged; ... |
 
 ## Recent activity
 
+- 2026-11-07 16:42 **S7-07** engineer ask: Green is blocked by the 16:40 lead prerequisite: no native flag-map or halting result is recorded in this ticket. Reduced reproducer is the already...
 - 2026-11-07 16:40 **S7-07** lead approve-red: Red accepted: host tests of the libgfortran KNC floating-point state logic fail for the right reason (k1om falls back to the x87-only backend that ...
 - 2026-11-07 16:36 **S7-07** engineer red: 82fd434: host-built state tests RED: 27 expected failures, plus missing k1om backend selection. Real runtime C/x87, modeled MXCSR; includes nested ...
 - 2026-11-07 16:25 **S7-06** lead approve: GCC-KNC's shared libgcc_s passes every compatibility and unwind test on the card (old and new clients, exceptions across libraries, cancellation, b...
@@ -153,7 +154,6 @@ Current tickets: `[###################-]` 117 of 121
 - 2026-11-07 14:45 **S7-05** lead approve: The old-client and new-client libgcc compatibility and unwind test programs are built, linted and staged with expected outputs in .work/_shared/S7-...
 - 2026-11-07 14:37 **S7-05** engineer submit: Submitted by the lead for the engineer (session budget reached after the 14:36 answer). 85451cd: five payloads with expected outputs and an explici...
 - 2026-11-07 14:37 **S7-05** owner decide: Lead, under the owner's delegation for engineering decisions: no further engineer session; the work is committed (85451cd) and only the submit was ...
-- 2026-11-07 14:36 **S7-05** lead escalate: budget: 3 engineer sessions used; the budget is 3
 
 ## Cost
 
@@ -165,4 +165,4 @@ Current tickets: `[###################-]` 117 of 121
 
 ## Disk
 
-The project uses 13.1 GiB of 100 GiB. 153 GiB free on the drive.
+The project uses 13.1 GiB of 100 GiB. 154 GiB free on the drive.
