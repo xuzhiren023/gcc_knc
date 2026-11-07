@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-07 06:56.
+Updated automatically at every ticket change. Last update: 2026-11-07 07:12.
 
-**Waiting for you:** S6-08. Run `python tools/pm.py inbox`.
+**Next: the tech lead, on S6-08.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[##################--]` 111 of 121
 
@@ -125,7 +125,7 @@ Current tickets: `[##################--]` 111 of 121
 | S6-05 | -mtune=knc costs and vectorizer cost model v1 from the characterization tables (E5-09, E5-02) | Done | GCC-KNC now has a KNC cost table from the card measurements: scattered-index gathers stay scalar, reduction... |
 | S6-06 | KNC scheduler v0 (E5-05): U/V pipes, 4-cycle vector latency, 3-cycle AGI | Done | GCC-KNC now schedules for KNC's two pipes with the measured latencies and threads per core: stencil1 runs 4... |
 | S6-07 | First gcc.dg/vect baseline for KNC: compile scans on the host, execution on the card | Done | The gcc.dg/vect suite now has a KNC baseline: of 2,001 tests, 1,329 compile (777 linked for the card), 632 ... |
-| S6-08 | Sprint 6 mid batch check after S6-04 and S6-05 | **Waiting for you** | S6-08 engineer part is in (drill all textual, both sweeps 0 ICE, lines/hunks reported) but the lead's x86 c... |
+| S6-08 | Sprint 6 mid batch check after S6-04 and S6-05 | Waiting for review | Lead, under the owner's delegation for engineering decisions: the escalation only awaits the interactive le... |
 | S6-09 | ICE in expand_vec_series_expr: KNC lane-index vectors (VEC_SERIES) for V16SI/V8DI and the FP modes | Done | Loops that build lane-index vectors (VEC_SERIES) now compile on KNC instead of crashing the compiler: 6 of ... |
 | S6-10 | Unrecognizable and unconstrained insns: ffsll's scalar conditional move, and constant -1 into a k register | Done | Constant 0 and -1 loads into mask registers (kxor/kxnor) and 64-bit ffs without CMOV now compile on KNC, fi... |
 | S6-11 | ICE in expand_fn_using_insn for FP64 fmax/fmin loops (S5-15 follow-up) | Done | Scalar and SLP-reduction fmin/fmax on float and double now compile on KNC through vgmin/vgmax with the C Na... |
@@ -146,6 +146,7 @@ Current tickets: `[##################--]` 111 of 121
 
 ## Recent activity
 
+- 2026-11-07 07:12 **S6-08** owner decide: Lead, under the owner's delegation for engineering decisions: the escalation only awaits the interactive lead's runs. Card runs pass (recorded abov...
 - 2026-11-07 06:56 **S6-08** lead escalate: S6-08 engineer part is in (drill all textual, both sweeps 0 ICE, lines/hunks reported) but the lead's x86 check (portability-claude) and card runs ...
 - 2026-11-07 06:55 **S6-08** engineer submit: knc 57bec527e002; report ca2a4bc. Drill: master 7 files/10 textual hunks, gcc-16 0; shared i386 644 lines/122 hunks; KNC-only 3981 lines/5 hunks. B...
 - 2026-11-07 06:45 **S6-06** lead approve: GCC-KNC now schedules for KNC's two pipes with the measured latencies and threads per core: stencil1 runs 4-7% faster, mat8 10% slower (owner appro...
@@ -153,16 +154,15 @@ Current tickets: `[##################--]` 111 of 121
 - 2026-11-07 01:17 **S6-06** owner decide: Lead, under the owner's delegation for engineering decisions: no further engineer session. The work is committed (8704b5d, GCC c192fef7e7d) and onl...
 - 2026-11-07 01:17 **S6-06** lead escalate: budget: 14332720 input tokens used; the budget is 6000000
 - 2026-11-07 01:16 **S6-06** lead answer: Yes. Card and x86 runs belong to the lead, not you. Submit as is with the staged artifacts in .work/_shared/S6-06 and the 'NOT RUN' lines stated pl...
-- 2026-11-07 01:15 **S6-06** engineer ask: AGENTS.md forbids engineer card jobs. Lead: run native M2/execute acceptance and batch x86 check? Native/x86 NOT RUN. PASS build, T0(52), T1/T2, re...
 
 ## Cost
 
 - From the script, engineer: 266 sessions, 649.5M input tokens
 - From the script, lead: 198 sessions, 62.6M input tokens
-- Started by hand, Claude: 10 sessions, 1539.3M input tokens
+- Started by hand, Claude: 10 sessions, 1558.2M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 13.0 GiB of 100 GiB. 148 GiB free on the drive.
+The project uses 13.0 GiB of 100 GiB. 147 GiB free on the drive.
