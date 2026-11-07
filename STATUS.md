@@ -1,10 +1,10 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-07 14:14.
+Updated automatically at every ticket change. Last update: 2026-11-07 14:22.
 
-**Next: the tech lead, on S7-04.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: GPT-6.1, on S7-05 (Shared libgcc part 3: compatibility and unwind card payloads (E6-01c)).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
-Current tickets: `[##################--]` 114 of 121
+Current tickets: `[###################-]` 115 of 121
 
 ## Milestones
 
@@ -13,7 +13,7 @@ Current tickets: `[##################--]` 114 of 121
 | M0 | Foundation | In progress | 17 of 17 tickets |
 | M1 | Mixed native code | Done | 43 of 43 tickets |
 | M2 | Useful vector target | Done | 51 of 51 tickets |
-| M3 | Runtimes | In progress | 3 of 10 tickets |
+| M3 | Runtimes | In progress | 4 of 10 tickets |
 | M4 | Broad optimization | Not started | Not planned in detail yet |
 | M5 | Program corpus | Not started | Not planned in detail yet |
 | M6 | Release | Not started | Not planned in detail yet |
@@ -136,7 +136,7 @@ Current tickets: `[##################--]` 114 of 121
 | S7-01 | Shared libgcc for KNC: symbol-version ceiling for the card's glibc 2.21 and kernel 2.6.38, and what GCC 16 adds over the donor's libgcc_s (E6-01 input) | Done | The shared libgcc plan for KNC is ready: GCC 16's libgcc_s.so.1 can be a drop-in superset of the donor's on... |
 | S7-02 | libgfortran slice for KNC: descriptor ABI vs the card's GCC 5 runtime, real(16) and libquadmath, and MXCSR-safe FP control (E6-02 input) | Done | The libgfortran plan for KNC is ready: a small MXCSR-safe FP backend, kinds 4/8/10 with kind 16 deferred, a... |
 | S7-03 | Shared libgcc part 1: donor ABI compatibility objects and symbol map (E6-01a) | Done | GCC-KNC's libgcc now exports everything the card's donor libgcc_s.so.1 does (all 153 symbol and version pai... |
-| S7-04 | Shared libgcc part 2: shared build and driver integration (E6-01b) | Waiting for review | 4d60240 precreates target slibdir and checks private installed paths plus both linker files. Full s7_04_che... |
+| S7-04 | Shared libgcc part 2: shared build and driver integration (E6-01b) | Done | The KNC compiler now builds a shared libgcc_s.so.1 that keeps the donor's ABI, needs nothing newer than gli... |
 | S7-05 | Shared libgcc part 3: compatibility and unwind card payloads (E6-01c) | Not started | Sprint 7 draft; parked in lane lead until the owner starts Sprint 7 and Sprint 6's gcc tickets are merged; ... |
 | S7-06 | Shared libgcc part 4: lead native acceptance and the install decision (E6-01d) | Not started |  |
 | S7-07 | libgfortran part 1: KNC floating-point backend and capability contract (E6-02) | Not started | Sprint 7 draft; parked in lane lead until the owner starts Sprint 7 and Sprint 6's gcc tickets are merged; ... |
@@ -146,6 +146,7 @@ Current tickets: `[##################--]` 114 of 121
 
 ## Recent activity
 
+- 2026-11-07 14:22 **S7-04** lead approve: The KNC compiler now builds a shared libgcc_s.so.1 that keeps the donor's ABI, needs nothing newer than glibc 2.21 and has no text relocations, and...
 - 2026-11-07 14:13 **S7-04** engineer submit: 4d60240 precreates target slibdir and checks private installed paths plus both linker files. Full s7_04_checks.py via tools/run.py: 0/9 failed; DSO...
 - 2026-11-07 14:12 **S7-04** lead answer: Yes. The failing path resolves to .work/_shared/S7-04/install/k1om-mpss-linux/lib64, inside the private prefix, so in tools/s7_04_checks.py also os...
 - 2026-11-07 14:11 **S7-04** engineer ask: e25ce48 precreates approved directories. Build skipped as fresh. Full green: 1/9 fails; DSO audit/lint, six probes and donor integrity pass. Instal...
@@ -153,7 +154,6 @@ Current tickets: `[##################--]` 114 of 121
 - 2026-11-07 14:08 **S7-04** engineer ask: Two green attempts: private install still fails. Build passed (23 min); DSO ABI/lint, six link probes/static helper and donor integrity pass. Log: ...
 - 2026-11-07 13:38 **S7-04** lead approve-red: S7-04's failing tests are accepted: they show that today's compiler cannot link a program or library against a shared libgcc, and they check the sh...
 - 2026-11-07 13:37 **S7-04** engineer red: Red commit c261f4e. Updated audit_errors to report only GLOBAL UND symbols missing from libc/ld while rejecting _dl_find_object at any bind. Synthe...
-- 2026-11-07 13:36 **S7-04** lead changes: Driver probes, GLIBC/_dl_find_object/TEXTREL/superset, private-prefix and donor-integrity detectors are good. One fix before green: audit_errors fl...
 
 ## Cost
 
@@ -165,4 +165,4 @@ Current tickets: `[##################--]` 114 of 121
 
 ## Disk
 
-The project uses 13.1 GiB of 100 GiB. 175 GiB free on the drive.
+The project uses 13.0 GiB of 100 GiB. 175 GiB free on the drive.
