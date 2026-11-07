@@ -40,7 +40,7 @@
       "disk_gib": 20,
       "effort": "high",
       "model": "gpt-6-astra",
-      "claude_model": "opus"
+      "claude_model": "fable"
     }
   },
   "storage": {
