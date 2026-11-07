@@ -60,6 +60,10 @@ def main():
     subprocess.run([*cc, str(ROOT / 'tools/claude-torture.c'), '-o', str(driver)],
                    env=env, check=True)
     assert not list(lint(driver, TC, env)), 'driver lint failure'
+    project = ROOT.parent.parent
+    staged = [driver, out / 'claude-torture.list'] + [out / p for _, p, _ in linked]
+    (out / 'card-files.list').write_text(''.join(
+        os.path.relpath(p, project) + '\n' for p in staged))
     previous = SHARED / 'tmp/suite-S3-14/build.tsv'
     with previous.open() as f:
         baseline = {r['source']: r['result'] for r in csv.DictReader(f, delimiter='\t')}
