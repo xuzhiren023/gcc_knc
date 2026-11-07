@@ -177,8 +177,10 @@ def main():
     print('PASS private install prefix: ' + str(prefix), flush=True)
     OUT.mkdir(exist_ok=True)
     os.environ['TMPDIR'] = str(SHARED / 'tmp')
-    cc = [BUILD / 'gcc/xgcc', '-B' + str(BUILD / 'gcc') + '/',
-          '-B' + str(RUNTIME) + '/']
+    # Prefer the audited runtime itself over libgcc's build-time copyback
+    # into gcc/, while still finding cc1 and the compiler headers there.
+    cc = [BUILD / 'gcc/xgcc', '-B' + str(RUNTIME) + '/',
+          '-B' + str(BUILD / 'gcc') + '/']
     source = ROOT / 'tests/t2/knc-libgcc-link.c'
     cases = (
         ('shared-exe', ['-shared-libgcc'], False, True),
@@ -193,9 +195,14 @@ def main():
     # installation directory that can otherwise retain the configured prefix.
     # The donor snapshot above spans both this install and all link probes.
     if not failed:
+        # Create only private destinations directly.  Cygwin mkdir -p walks
+        # inaccessible Windows ancestors even when this subtree is writable.
+        for directory in (prefix / 'lib/include', prefix / 'lib64'):
+            directory.mkdir(parents=True, exist_ok=True)
         command = ['make', '-C', BUILD, 'install-target-libgcc',
                    'prefix=' + str(prefix), 'exec_prefix=' + str(prefix),
                    'libdir=' + str(prefix / 'lib'),
+                   'libsubdir=' + str(prefix / 'lib'),
                    'slibdir=' + str(prefix / 'lib64'),
                    'shlib_slibdir=' + str(prefix / 'lib64'), 'DESTDIR=']
         code, output = run(command)
