@@ -283,3 +283,10 @@ Execute suite (80 threads, cores 40-59): 1,680 of 1,681 pass. The one failure, `
 is the known harness miss from Sprint 3: the test needs its brace-form `dg-options { "-fwrapv" }`,
 and S6-06's own card builder (`tools/s6_06_card_build.py`) passes no dg-options. Not a compiler
 result; S6-08's batch check uses the full runner.
+
+## S6-08 batch check, card (12:02-12:05Z on 11-07, knc 57bec527e002)
+
+Full `gcc.c-torture/execute` suite (harness `build_suite.py`, each file's dg-options, -O2 -march=knc):
+**1,681 of 1,681 pass**, including `930529-1` with its `-fwrapv` (so S6-06's single failure was the
+harness miss). `s4_masks` o2v and o3: 1,589,070 checks each, 0 failures. `s5_ops` o2v and o3 779,984,
+`fast` 602,384, 0 failures; `neg` fails exactly the six expected div/sqrt sets.
