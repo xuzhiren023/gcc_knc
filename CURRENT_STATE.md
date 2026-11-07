@@ -4,7 +4,7 @@ The handoff between sessions. `STATUS.md` holds tickets, cost and disk, and upda
 file holds what only a person or an agent can know. Replace lines when facts change, and do not
 trust anything here that a quick command can check instead.
 
-Last updated: 2026-11-06, Sprint 6. Sprint 5 is closed (GCC `knc` `ba973dc285b`; at that head the execute suite 1,680/1,680, `s4_masks`, `s5_ops` and all 14 S3-10 rows pass on the card, and x86 is identical). **Sprint 6 is running** (`docs/sprints/SPRINT-06.md`): measure, then tune for Milestone M2.
+Last updated: 2026-11-07, Sprint 7. Sprint 5 is closed (GCC `knc` `ba973dc285b`; at that head the execute suite 1,680/1,680, `s4_masks`, `s5_ops` and all 14 S3-10 rows pass on the card, and x86 is identical). **Sprint 6 is closed and Milestone M2 accepted (2026-11-07, `docs/research/m2-result.md`):** at knc `57bec527e002` the L2 gain fraction is 0.731-0.818 (lower bound 0.733) and the worst GCC/x87 0.627. **Sprint 7 (runtimes) is running** from S7-03.
 - S5-01 to S5-05 are merged: the research, ADR-0008 (amended with the card probes), the ADR-0003 amendment, `card_run` sharing and the lint fix.
 - S5-06 (permutes) is in the gcc lane; S5-09 (estimate probe) is running.
 - The `s5_ops` baseline passes on the card.

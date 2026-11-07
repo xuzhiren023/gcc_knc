@@ -1,6 +1,6 @@
 # Sprint 6: measure, then tune around the KNC core (Milestone M2, part 3)
 
-**Status:** started by the owner on 2026-11-06 ("Can we start sprint 6"). Runs need no per-run
+**Status:** closed 2026-11-07; Milestone M2 accepted (`docs/research/m2-result.md`). Started by the owner on 2026-11-06 ("Can we start sprint 6"). Runs need no per-run
 approval, card jobs and timed benchmark windows included ("Yes, same as S5").
 
 **Who implements (owner, 2026-11-06):** Codex sessions through `tools/dispatch.py`, at normal speed,
@@ -74,3 +74,20 @@ final batch check and the M2 evidence note.
 - [ ] Final batch check: x86 identical, drill conflicts textual, 0 ICE in both sweeps, the full
   execute suite and all `s*_` fixtures on the card
 - [ ] M2 evidence note with the go/no-go recommendation; `CURRENT_STATE.md` updated; retro written
+
+## Retro (2026-11-07)
+
+- **Done:** all 15 tickets (S6-01 to S6-15). M2 passes on the Sprint 6 head: L2 gain fraction
+  0.731-0.818, 95% lower bound 0.733, worst GCC/x87 0.627; x86 identical; execute suite 1,681/1,681.
+- **What cost the most:** measurement, not compilation. A stalled pilot sized 4-9 ms batches, then an
+  early slow regime made a third of launches fail a 2% rule. Fixed by batch re-sizing, interleaved
+  builds and ADR-0010 amendment 2 (two Claude subagents: diagnosis and literature review).
+- **Tuning results were mixed:** S6-05 round 1 traded mat8 +20% for stencils -3-6% through one scalar
+  cost; S6-06 made stencil1 4-7% faster and mat8 10% slower. Paired in-process timing (S6-15) is what
+  made these visible; an A/A run showed a 1.6% code-placement bias.
+- **Process:** Codex tickets overran (S6-05 used 8 sessions; S6-06 14.3M tokens against 6M); the lead
+  submitted twice on an engineer's behalf. `pm.py` now skips a GCC merge when a branch has no commit.
+  A ticket parked on the board still holds the single GCC checkout; release it before dispatching.
+- **Carried to Sprint 8 (proposed):** masked tails, prefetch, small matrices, E5-11, E5-12, checks
+  C1-C10. S6-03's streaming-store figure used the wrong instruction (E5-08).
+

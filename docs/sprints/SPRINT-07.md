@@ -5,7 +5,7 @@ card window"; run authorization and engineers "Yes, same as S6"). Runs need no p
 card jobs and timed benchmark windows included. Engineers: Codex through `tools/dispatch.py`, model by
 ticket depth, as in Sprint 6. The gcc tickets stay parked in `lane: lead` until Sprint 6's gcc
 tickets (S6-06, S6-14, S6-08) are merged, because all gcc tickets share one GCC checkout and build;
-then the lead moves them to `lane: gcc` in order.
+then the lead moves them to `lane: gcc` in order. Sprint 6 closed 2026-11-07; tickets are released one chain at a time while Codex and Claude usage is low (owner, 2026-11-07), starting with S7-03.
 
 **Goal (Milestone M3, part 1):** programs built by GCC-KNC can use a shared `libgcc_s` that is a
 drop-in superset of the donor's on the card's glibc 2.21, and a first Fortran runtime slice
