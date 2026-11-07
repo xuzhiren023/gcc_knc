@@ -1,4 +1,4 @@
-"""Run the scheduler T1 probe, retaining assembly for review."""
+"""Run the scheduler probe or full T1/T2, retaining assembly for review."""
 import os
 from pathlib import Path
 import subprocess
@@ -16,13 +16,18 @@ def main():
                                     ('cross/bin', 'cygwin/bin')) + os.pathsep + env['PATH']
         script = subprocess.check_output(
             [str(TC / 'cygwin/bin/cygpath.exe'), '-u', __file__], text=True).strip()
-        return subprocess.call([str(TC / 'cygwin/bin/python3.12.exe'), script], env=env)
+        return subprocess.call([str(TC / 'cygwin/bin/python3.12.exe'), script,
+                                *sys.argv[1:]], env=env)
     import argparse
     import check
     runner = check.Runner(argparse.Namespace(compiler='gcc16', cc=None))
     runner.out = SHARED / 'S6-06'
     runner.out.mkdir(exist_ok=True)
-    runner.t1_sources([ROOT / 'tests/t1/knc-scheduler.c'])
+    if '--all' in sys.argv:
+        runner.t1()
+        runner.t2()
+    else:
+        runner.t1_sources([ROOT / 'tests/t1/knc-scheduler.c'])
     if runner.failed:
         print((runner.out / 'knc-scheduler.s').read_text())
     return int(runner.failed)
