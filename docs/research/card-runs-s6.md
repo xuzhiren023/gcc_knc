@@ -194,3 +194,25 @@ Binary `.work/_shared/M2-diag` (interleaved builds, amendment-2 flags; kernels f
 779,984 checks, 0 failures; `fast` 602,384 checks (div/sqrt and FP32/FP64 conversions skipped by
 design), 0 failures; `neg` fails exactly the expected sets (div_f32, sqrt_f32, div_f64, sqrt_f64,
 div_f64_special, sqrt_f64_special).
+
+## S6-15 card check and S6-05 point-7 evidence (01:16-01:42Z on 11-07, `claude-s6-paired.sh`)
+
+Both paired binaries pass correctness with `builds=4` (negative 154 failing cases, positive 0).
+All 19 timing launches valid, `regime_steps=0`.
+
+**A/A check (S6-15, both GCC builds are M2-final's, L2 FP32 affine):** `gcc_over_gcc_before` 1.016,
+per-launch interval [1.013, 1.019]. Two identical copies of the same kernel differ by 1.6%, so the
+per-launch interval understates the uncertainty: code placement alone moves a copy by about 2%
+(Mytkowicz et al.), as amendment 2 point 7 anticipated. Effects under about 3% need the
+opposite-link-order check before they are claimed.
+
+**S6-05 against M2-final, L2, three launches each** (ratio = T_S6-05 / T_before; under 1 is faster):
+
+| Kernel | Launch 1 | Launch 2 | Launch 3 | Reading |
+|---|---|---|---|---|
+| affine_f32 | 1.008 | 0.981 | 1.031 | signs differ: no effect (main loop unchanged) |
+| affine_f64 | 0.999 | 0.997 | 0.996 | under the A/A bias: no effect |
+| stencil1 | 1.064 | 1.057 | 1.048 | **5-6% slower**, consistent |
+| stencil2 | 1.029 | 1.029 | 1.029 | **about 3% slower**, consistent, needs the link-order check |
+| mat8 | 0.799 | 0.805 | 0.799 | **20% faster**, consistent |
+| mat16 | 1.000 | 1.017 | 1.002 | no clear effect |
