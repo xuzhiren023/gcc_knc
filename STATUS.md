@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-06 18:15.
+Updated automatically at every ticket change. Last update: 2026-11-06 20:43.
 
-**Waiting for you:** S6-05, S6-15. Run `python tools/pm.py inbox`.
+**Waiting for you:** S6-05. Run `python tools/pm.py inbox`.
 
 Current tickets: `[##################--]` 107 of 113
 
@@ -130,31 +130,31 @@ Current tickets: `[##################--]` 107 of 113
 | S6-10 | Unrecognizable and unconstrained insns: ffsll's scalar conditional move, and constant -1 into a k register | Done | Constant 0 and -1 loads into mask registers (kxor/kxnor) and 64-bit ffs without CMOV now compile on KNC, fi... |
 | S6-11 | ICE in expand_fn_using_insn for FP64 fmax/fmin loops (S5-15 follow-up) | Done | Scalar and SLP-reduction fmin/fmax on float and double now compile on KNC through vgmin/vgmax with the C Na... |
 | S6-12 | card_run --benchmark refuses while another project's processes still run on the card, whatever the ledger says | Done | card_run benchmark jobs now refuse to start while another project's programs (such as wrf.mic) are still ru... |
-| S6-13 | M2 driver records card power per build: watts and joules per element next to the timings | Not started |  |
+| S6-13 | M2 driver records card power per build: watts and joules per element next to the timings | Not started | two small fixture follow-ups ride with this ticket, since it changes the same |
 | S6-14 | ICE in cprop_hardreg - (set (reg:QI k1) (const_int 0)) for a loop-store-motion flag has no *knc_movqi alternative | Not started |  |
-| S6-15 | M2 fixture for ADR-0010 amendment 2 - paired before/after GCC builds in one process, per-round random order, and a decision script | **Waiting for you** | Review of 03ef1be (red 085614e) found nothing blocking. Not approved: acceptance line 3 needs the interacti... |
+| S6-15 | M2 fixture for ADR-0010 amendment 2 - paired before/after GCC builds in one process, per-round random order, and a decision script | Waiting for review | Lead, under the owner's delegation for engineering decisions (the escalation only needed the interactive le... |
 | S7-01 | Shared libgcc for KNC: symbol-version ceiling for the card's glibc 2.21 and kernel 2.6.38, and what GCC 16 adds over the donor's libgcc_s (E6-01 input) | Done | The shared libgcc plan for KNC is ready: GCC 16's libgcc_s.so.1 can be a drop-in superset of the donor's on... |
 | S7-02 | libgfortran slice for KNC: descriptor ABI vs the card's GCC 5 runtime, real(16) and libquadmath, and MXCSR-safe FP control (E6-02 input) | Done | The libgfortran plan for KNC is ready: a small MXCSR-safe FP backend, kinds 4/8/10 with kind 16 deferred, a... |
 
 ## Recent activity
 
+- 2026-11-07  **S6-13** lead note: two small fixture follow-ups ride with this ticket, since it changes the same
+- 2026-11-06 20:43 **S6-15** owner decide: Lead, under the owner's delegation for engineering decisions (the escalation only needed the interactive lead's card run): done 01:16-01:20Z. Paire...
 - 2026-11-06 18:15 **S6-15** lead escalate: Review of 03ef1be (red 085614e) found nothing blocking. Not approved: acceptance line 3 needs the interactive lead to run one m2-kernels launch bui...
 - 2026-11-06 18:14 **S6-15** engineer submit: Completed in 03ef1be after red 085614e. Six host decide.py tests passed; plain and paired positive and negative binaries built and linted; reused M...
 - 2026-11-06 18:13 **S6-15** lead answer: Approved as one ticket, no split: the scope is what the ticket asked for, and decide.py belongs in the acceptance fixture by design, so 'zero code ...
 - 2026-11-06 18:12 **S6-15** engineer ask: Implementation is committed as 03ef1be after red 085614e. Six host tests pass; plain/paired positive and negative binaries build and lint; reused g...
 - 2026-11-06 17:38 **S6-05** lead escalate: Code review done, no findings: KNC costs trace to the characterization tables, per-vector gather costing is correct (the count%lanes assert holds, ...
 - 2026-11-06 17:36 **S6-05** engineer submit: f3e7257 fixes nine T1 failures per lead; report 8d1703c docs/research/knc-costs.md lists decisions, CFG blocks and shared hunks. T0 (52), full T1, ...
-- 2026-11-06 17:24 **S6-05** lead answer: All three yes, with these limits. 1) Lowering tests: add -fvect-cost-model=unlimited to the options line of knc-gather16-f32/-i32/-masked, knc-gath...
-- 2026-11-06 17:21 **S6-05** engineer ask: GCC 7fdd15cf40a; report d27998c docs/research/knc-costs.md. Two T1 attempts failed; accepted cost scans PASS. Same out[i]=in[idx[i]] loop must stay...
 
 ## Cost
 
 - From the script, engineer: 260 sessions, 626.8M input tokens
 - From the script, lead: 192 sessions, 61.4M input tokens
-- Started by hand, Claude: 10 sessions, 1461.8M input tokens
+- Started by hand, Claude: 10 sessions, 1473.7M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 12.9 GiB of 100 GiB. 161 GiB free on the drive.
+The project uses 12.9 GiB of 100 GiB. 157 GiB free on the drive.
