@@ -242,3 +242,11 @@ lines 8-10 three rails with a second and third field (22 W at 1.052 V, 32 W at 1
 1.501 V). **The sampler took no samples** (`samples=0 power=unavailable errno=22` for every build):
 it pins itself to `sampler_cpu`, which was -1 (no CPU outside the workers in card_run's allowed
 set), and `CPU_SET(-1)` makes `sched_setaffinity` fail with EINVAL.
+
+## S6-05 round 2 card checks (04:41-04:51Z on 11-07, GCC 97f4b6c04b7)
+
+Paired binary `S6-05-paired2` correctness: negative 154 failing cases, positive 0 (4 builds).
+`s5_ops` o2v and o3 779,984 checks, `fast` 602,384, 0 failures; `neg` fails exactly the six div/sqrt
+sets. Paired L2 timing, T_S6-05 / T_M2-final: stencil1 1.001, 1.000, 1.000 (code now identical);
+stencil2 1.005, 0.997, 0.973 (signs differ: no consistent effect). The round-1 regressions are gone;
+so is mat8's round-1 gain (its code is identical to M2-final again; backlog E5-11).
