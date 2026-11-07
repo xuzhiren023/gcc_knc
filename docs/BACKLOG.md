@@ -131,6 +131,10 @@ Recommended to the owner as a tuning block in Sprint 8, after Sprint 7's runtime
 Full corpus builds; matched benchmarks; broader suites; packaging without restricted
 sysroot content; user manual and support matrix; update procedure.
 
+| ID | Story | Depth |
+|---|---|---|
+| E8-01 | llama.cpp (KNC fork) as a corpus program (owner, 2026-11-07). Source: the owner's `Project BluePower/llama.cpp-knc`, read-only and not a requirement; GCC-KNC copies a pinned snapshot into its corpus when the work starts, as with ADR-0011. Gates: libstdc++ with threads and atomics (E6-06), libgomp only for ggml's OpenMP mode (E6-03); the whole program built with GCC-KNC (GCC 5 and GCC 16 C++ objects never mixed). Checks: builds without the GCC 5 downgrade patches against a newer upstream; its hand-written IMCI kernels assemble under GCC-KNC (extended-`asm` zmm and mask constraints); generated text and logits match the GCC 5 build; prompt and generation speed versus the GCC 5 build measured by ADR-0010 point 7 (paired, interleaved). A profile shows the time left in non-kernel operators (softmax, SwiGLU, normalization, RoPE), which feeds E7-01/E7-02 (vector `expf`) and E6-05 (intrinsics header, by this program's demand) | Deep |
+
 ## Parked research
 
 | Topic | Why parked |
