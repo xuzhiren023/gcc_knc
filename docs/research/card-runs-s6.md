@@ -264,3 +264,22 @@ Correctness and negative control pass. One L2 FP32 affine launch, 60 x 4, sample
 
 The card draws about the same power whatever the code (as the owner saw on the control panel), so
 energy follows time: GCC-KNC uses **8.7x less energy per element than x87**, IMCI 11.7x less.
+
+## S6-06 card checks (07:55-08:21Z on 11-07, GCC c192fef7e7d)
+
+Paired binary (S6-05 kernels before, S6-06 after): negative 154 failing cases, positive 0. Paired L2
+timing, T_S6-06 / T_S6-05, three launches each, all valid:
+
+| Kernel | Launch 1 | Launch 2 | Launch 3 | Reading |
+|---|---|---|---|---|
+| affine_f32 | 1.001 | 0.999 | 0.997 | no effect |
+| affine_f64 | 0.997 | 1.010 | 0.998 | no effect (signs differ) |
+| stencil1 | 0.958 | 0.943 | 0.928 | **4-7% faster** |
+| stencil2 | 1.023 | 0.965 | 0.951 | signs differ: placement-dependent |
+| mat8 | 1.100 | 1.101 | 1.099 | **10% slower**, consistent |
+| mat16 | 0.988 | 0.986 | 0.994 | about 1% faster, under the A/A bias |
+
+Execute suite (80 threads, cores 40-59): 1,680 of 1,681 pass. The one failure, `930529-1.c` (exit 4),
+is the known harness miss from Sprint 3: the test needs its brace-form `dg-options { "-fwrapv" }`,
+and S6-06's own card builder (`tools/s6_06_card_build.py`) passes no dg-options. Not a compiler
+result; S6-08's batch check uses the full runner.
