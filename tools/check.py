@@ -27,6 +27,8 @@ PACKED = re.compile(r'\bv(?:addn?|subr?|mul|div|max|min|sqrt|rcp(?:23)?|rsqrt(?:
 # Each entry supplies its CLI help and handlers for the tiers it selects.
 # Imports stay lazy so T0 and source-only selections need no probe modules.
 SELECTIONS = {
+    'knc_costs': ('S6-05 measured KNC vectorizer cost decisions', {
+        't1': lambda runner: runner.t1_sources(runner.source_dir.glob('knc-cost-*.c'))}),
     'loop_reports': ('S6-04 KNC per-loop optimization reports', {
         't1': lambda runner: runner.t1_sources(runner.source_dir.glob('knc-loop-report-*.c'))}),
     'short_vector_abi': ('S5-21 V16HI stack argument and hidden result pointer', {
@@ -113,16 +115,63 @@ def function_body(assembly, name):
 
 
 def loops(body):
+    """Find CFG cycles closed by layout-backward jumps, including cold blocks."""
     lines = [line.split('#', 1)[0] for line in body.splitlines()]
     labels = {}
+    starts = {0, len(lines)}
+    jumps = {}
     for i, line in enumerate(lines):
         label = re.match(r'\s*([\w.$]+):', line)
         if label:
             labels[label[1]] = i
-        # KNC mask branches put a mask register before the target label.
-        branch = re.match(r'\s*j\w+\s+(?:%k[0-7]\s*,\s*)?([\w.$]+)\s*$', line)
-        if branch and branch[1] in labels:
-            yield '\n'.join(lines[labels[branch[1]]:i + 1])
+            starts.add(i)
+        # Accept either operand order for KNC mask branches.
+        branch = re.match(r'\s*(j\w+|ret\w*)\b(.*)', line)
+        if branch:
+            target = re.fullmatch(r'\s*(?:%k[0-7]\s*,\s*)?([\w.$]+)'
+                                  r'(?:\s*,\s*%k[0-7])?\s*',
+                                  branch[2])
+            jumps[i] = (branch[1], target[1] if target else None)
+            starts.add(i + 1)
+
+    boundaries = sorted(starts)
+    blocks = list(zip(boundaries, boundaries[1:]))
+    block_at = {start: b for b, (start, end) in enumerate(blocks)}
+    edges = [set() for block in blocks]
+    backedges = []
+    for b, (start, end) in enumerate(blocks):
+        opcode, target = jumps.get(end - 1, ('', None))
+        if target in labels:
+            header = block_at[labels[target]]
+            edges[b].add(header)
+            if labels[target] < end - 1:
+                backedges.append((b, header))
+        if not opcode.startswith(('jmp', 'ret')) and b + 1 < len(blocks):
+            edges[b].add(b + 1)
+    predecessors = [set() for block in blocks]
+    for b, successors in enumerate(edges):
+        for successor in successors:
+            predecessors[successor].add(b)
+
+    def reachable(seed, graph, header):
+        # Never cross the header again: it closes this cycle.
+        seen = {seed}
+        pending = [seed]
+        while pending:
+            for successor in graph[pending.pop()]:
+                if successor != header and successor not in seen:
+                    seen.add(successor)
+                    pending.append(successor)
+        return seen
+
+    for latch, header in backedges:
+        forward = reachable(header, edges, header)
+        if latch not in forward:
+            continue  # A backward jump alone does not establish a loop.
+        backward = reachable(latch, predecessors, header) if latch != header else set()
+        members = (forward & backward) | {header}
+        yield '\n'.join(line for b in sorted(members)
+                        for line in lines[blocks[b][0]:blocks[b][1]])
 
 
 def scan_t1(assembly, report, source, fast=False):
@@ -318,7 +367,7 @@ class Runner:
                 options = ['-O2']
                 for line in source.read_text().splitlines():
                     match = re.match(r'^\s*//\s*(options|scan-asm|scan-asm-not|scan-output|scan-debug-info|error):\s*(.*)$', line)
-                    function = re.match(r'^\s*//\s*(scan-asm-func|scan-asm-loop-not)\s+(\S+):\s*(.*)$', line)
+                    function = re.match(r'^\s*//\s*(scan-asm-func|scan-asm-loop-not|scan-asm-loop-accumulators)\s+(\S+):\s*(.*)$', line)
                     if match:
                         kind, pattern = match.groups()
                         if kind == 'options':
@@ -355,7 +404,25 @@ class Runner:
                         body = (compiled.stdout if kind == 'scan-output' else
                                 debug_info if kind == 'scan-debug-info' else
                                 function_body(assembly, name) if name else assembly)
-                        if kind == 'scan-asm-loop-not':
+                        if kind == 'scan-asm-loop-accumulators':
+                            # Count distinct self-updating vector sums within
+                            # one backward loop, never the horizontal epilogue.
+                            counts = []
+                            for loop in loops(body or ''):
+                                accumulators = set()
+                                for line in loop.splitlines():
+                                    add = re.match(r'\s*vaddpd\s+(.+),\s*(%zmm\d+)(?:\{%k\d+\})?\s*$', line)
+                                    if add and add[2] in re.findall(r'%zmm\d+\b', add[1]):
+                                        accumulators.add(add[2])
+                                counts.append(len(accumulators))
+                            count = max(counts, default=0)
+                            expected = int(pattern.rstrip('+'))
+                            failed = (count < expected if pattern.endswith('+')
+                                      else count != expected)
+                            if failed:
+                                failures.append('vector accumulators: got %d, expected %s'
+                                                % (count, pattern))
+                        elif kind == 'scan-asm-loop-not':
                             # Permit scalar-result transport after a reduction,
                             # but reject stack accumulators in a backward loop.
                             candidates = list(loops(body)) if body is not None else []
