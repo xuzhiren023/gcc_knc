@@ -197,12 +197,22 @@ def main():
     if not failed:
         # Create only private destinations directly.  Cygwin mkdir -p walks
         # inaccessible Windows ancestors even when this subtree is writable.
-        for directory in (prefix / 'lib/include', prefix / 'lib64'):
+        # The top-level make computes libsubdir itself from libdir.
+        directories = (prefix / 'lib', prefix / 'lib64',
+                       prefix / 'lib/gcc/k1om-mpss-linux/16.2.0',
+                       prefix / 'lib/gcc/k1om-mpss-linux/16.2.0/include')
+        for directory in directories:
+            errors = prefix_errors(directory)
+            if not directory.resolve().is_relative_to(prefix):
+                errors.append('install directory escapes private prefix: ' + str(directory))
+            if errors:
+                print('FAIL private install: ' + '; '.join(errors), flush=True)
+                return 1
+        for directory in directories:
             directory.mkdir(parents=True, exist_ok=True)
         command = ['make', '-C', BUILD, 'install-target-libgcc',
                    'prefix=' + str(prefix), 'exec_prefix=' + str(prefix),
                    'libdir=' + str(prefix / 'lib'),
-                   'libsubdir=' + str(prefix / 'lib'),
                    'slibdir=' + str(prefix / 'lib64'),
                    'shlib_slibdir=' + str(prefix / 'lib64'), 'DESTDIR=']
         code, output = run(command)
