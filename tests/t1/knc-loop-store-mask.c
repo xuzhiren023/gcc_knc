@@ -1,5 +1,5 @@
 // options: -O2 -march=knc
-// scan-asm-func batch: \bkxor\s+%k([0-7]),\s*%k\1,\s*%k\1\b
+// scan-asm-func batch: \bkxor\s+%k([0-7]),\s*%k\1\s*$
 // S6-14: reload creates k1:QI=0 for a loop-store-motion flag.
 // S6-10 already handles it; the reported ICE was an unmerged S6-05 WIP.
 // Original reproducer: s6-14/timing-ice.c (retained, not a second test).
