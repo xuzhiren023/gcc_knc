@@ -1,10 +1,10 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-07 16:43.
+Updated automatically at every ticket change. Last update: 2026-11-07 16:50.
 
 **Waiting for you:** S7-07. Run `python tools/pm.py inbox`.
 
-Current tickets: `[###################-]` 117 of 121
+Current tickets: `[###################-]` 117 of 122
 
 ## Milestones
 
@@ -13,7 +13,7 @@ Current tickets: `[###################-]` 117 of 121
 | M0 | Foundation | In progress | 17 of 17 tickets |
 | M1 | Mixed native code | Done | 43 of 43 tickets |
 | M2 | Useful vector target | Done | 51 of 51 tickets |
-| M3 | Runtimes | In progress | 6 of 10 tickets |
+| M3 | Runtimes | In progress | 6 of 11 tickets |
 | M4 | Broad optimization | Not started | Not planned in detail yet |
 | M5 | Program corpus | Not started | Not planned in detail yet |
 | M6 | Release | Not started | Not planned in detail yet |
@@ -143,6 +143,7 @@ Current tickets: `[###################-]` 117 of 121
 | S7-08 | libgfortran part 2: base runtime build and the descriptor and I/O slice (E6-02) | Not started | Sprint 7 draft; parked in lane lead until the owner starts Sprint 7 and Sprint 6's gcc tickets are merged; ... |
 | S7-09 | libgfortran part 3: runtime isolation and packaging (E6-02) | Not started | owner chose a private directory for GCC-KNC's runtime on the card (S7-06); libgfortran's shared variant goe... |
 | S7-10 | Sprint 7 batch check after S7-05 and S7-08 | Not started | Sprint 7 draft; parked in lane lead until the owner starts Sprint 7 and Sprint 6's gcc tickets are merged; ... |
+| S8-01 | Card checks C1-C10 for the Sprint 8 tuning block - microbenchmarks in the knc-char corpus | In progress |  |
 
 ## Recent activity
 
@@ -159,10 +160,10 @@ Current tickets: `[###################-]` 117 of 121
 
 - From the script, engineer: 282 sessions, 672.6M input tokens
 - From the script, lead: 215 sessions, 66.2M input tokens
-- Started by hand, Claude: 10 sessions, 1634.1M input tokens
+- Started by hand, Claude: 10 sessions, 1639.3M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 13.1 GiB of 100 GiB. 154 GiB free on the drive.
+The project uses 13.1 GiB of 100 GiB. 165 GiB free on the drive.
