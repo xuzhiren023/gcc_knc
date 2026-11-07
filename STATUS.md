@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-07 18:23.
+Updated automatically at every ticket change. Last update: 2026-11-07 18:24.
 
 **Waiting for you:** S8-01. Run `python tools/pm.py inbox`.
 
@@ -139,7 +139,7 @@ Current tickets: `[###################-]` 117 of 122
 | S7-04 | Shared libgcc part 2: shared build and driver integration (E6-01b) | Done | The KNC compiler now builds a shared libgcc_s.so.1 that keeps the donor's ABI, needs nothing newer than gli... |
 | S7-05 | Shared libgcc part 3: compatibility and unwind card payloads (E6-01c) | Done | The old-client and new-client libgcc compatibility and unwind test programs are built, linted and staged wi... |
 | S7-06 | Shared libgcc part 4: lead native acceptance and the install decision (E6-01d) | Done | GCC-KNC's shared libgcc_s passes every compatibility and unwind test on the card (old and new clients, exce... |
-| S7-07 | libgfortran part 1: KNC floating-point backend and capability contract (E6-02) | Question for the tech lead | Lead (interactive): state-native.mic ran on the card 23:23Z on 2026-11-07: 'State logic: 0 failures, 0 inst... |
+| S7-07 | libgfortran part 1: KNC floating-point backend and capability contract (E6-02) | In progress | Card result recorded above: 0 failures, exit 0. Submit for approval. |
 | S7-08 | libgfortran part 2: base runtime build and the descriptor and I/O slice (E6-02) | Not started | Sprint 7 draft; parked in lane lead until the owner starts Sprint 7 and Sprint 6's gcc tickets are merged; ... |
 | S7-09 | libgfortran part 3: runtime isolation and packaging (E6-02) | Not started | owner chose a private directory for GCC-KNC's runtime on the card (S7-06); libgfortran's shared variant goe... |
 | S7-10 | Sprint 7 batch check after S7-05 and S7-08 | Not started | Sprint 7 draft; parked in lane lead until the owner starts Sprint 7 and Sprint 6's gcc tickets are merged; ... |
@@ -147,6 +147,7 @@ Current tickets: `[###################-]` 117 of 122
 
 ## Recent activity
 
+- 2026-11-07 18:24 **S7-07** lead answer: Card result recorded above: 0 failures, exit 0. Submit for approval.
 - 2026-11-07 18:23 **S7-07** owner decide: Lead (interactive): state-native.mic ran on the card 23:23Z on 2026-11-07: 'State logic: 0 failures, 0 instrumented MXCSR writes', exit 0 (.work/_s...
 - 2026-11-07 17:59 **S7-07** lead escalate: S7-07 green needs a card run that only the interactive lead can do, with your agreement for a slot clear of the WRF timed runs. The green (GCC 2e6d...
 - 2026-11-07 17:58 **S7-07** engineer ask: Green: GCC 2e6d88948a2; tests 2fac060. Host PASS: 0 failures, 39 instrumented writes, including formatted-input restore. Logs: .work/_state/logs/s7...
@@ -154,16 +155,15 @@ Current tickets: `[###################-]` 117 of 122
 - 2026-11-07 17:53 **S7-07** owner decide: Lead (interactive): the probe ran on the card 22:53Z on 2026-11-07, exit 0; full output .work/_shared/tmp/claude-s7-07/probe.out. Results: (1) Roun...
 - 2026-11-07 17:01 **S8-01** lead escalate: Code review passes (C1-C10 kernels, gates, red 0ed8d09 then green 3f5ccb2), but acceptance line 3 needs the lead's card runs recorded in docs/resea...
 - 2026-11-07 16:59 **S8-01** engineer submit: Acceptance passed: red host check committed as 0ed8d09; implementation committed as 3f5ccb2; build, lint and host check PASS in ../_state/logs/S8_0...
-- 2026-11-07 16:58 **S8-01** lead answer: Yes. The benchmark corpus under tests/bench/knc-char is this ticket's deliverable, so a 0 code-line count is expected and 349 lines is in proportio...
 
 ## Cost
 
 - From the script, engineer: 285 sessions, 674.7M input tokens
 - From the script, lead: 218 sessions, 67.1M input tokens
-- Started by hand, Claude: 10 sessions, 1665.2M input tokens
+- Started by hand, Claude: 10 sessions, 1666.0M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 13.1 GiB of 100 GiB. 132 GiB free on the drive.
+The project uses 13.1 GiB of 100 GiB. 136 GiB free on the drive.
