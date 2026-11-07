@@ -1,5 +1,5 @@
-/* Runtime C logic, actual x87, simulated KNC MXCSR storage.
-   Candidate low-six flag map is provisional until card evidence.
+/* Runtime C logic, actual x87, modeled or native KNC MXCSR storage.
+   Six flag positions proven by the lead card run, 2026-11-07 22:53Z.
    KNC controls are never loaded into the host's hardware MXCSR. */
 #include <stdio.h>
 #include <stdlib.h>
@@ -8,7 +8,19 @@
 #define GFC_FPE_ALL 63
 static struct { int fpe; } options;
 static unsigned int model_mxcsr;
-static int failures, writes;
+static int failures, writes, warnings;
+static unsigned int controls;
+static void estr_write(const char *message) { ++warnings; }
+#ifdef S7_07_NATIVE
+#define main discovery_main
+#include "fp-probe.c"
+#undef main
+static unsigned int read_mx(void) { return mx(); }
+static void write_mx(unsigned int v) { put_mx(v); }
+#else
+static unsigned int read_mx(void) { return model_mxcsr; }
+static void write_mx(unsigned int v) { model_mxcsr = v; }
+#endif
 static void check(int ok, const char *name)
 {
   if (!ok) { printf("FAIL %s\n", name); ++failures; }
@@ -21,7 +33,11 @@ static void model_write(unsigned int value)
         "setter preserves bit 21 and all unsupported controls");
   model_mxcsr = value;
 }
+#ifdef S7_07_NATIVE
+#include "fpu-knc.h"
+#else
 #include "backend.h"
+#endif
 
 /* convert_real is extracted unchanged from read.c. Only the surrounding
    types, conversion wrapper and error callbacks are supplied here. */
@@ -36,7 +52,7 @@ static double gfc_strtod(const char *s, char **end)
 {
   unsigned short cw;
   __asm__ volatile("fnstcw %0" : "=m"(cw));
-  check(((cw >> 10) & 3) == expected_rc && ((model_mxcsr >> 13) & 3) == expected_rc,
+  check(((cw >> 10) & 3) == expected_rc && ((read_mx() >> 13) & 3) == expected_rc,
         "formatted input synchronizes rounding during conversion");
   return strtod(s, end);
 }
@@ -48,7 +64,12 @@ static void next_record(st_parameter_dt *p, int n) {}
 static void reset(void)
 {
   __asm__ volatile("fninit");
+#ifdef S7_07_NATIVE
+  write_mx(read_mx() & ~0x603fu);
+#else
   model_mxcsr = 0x308040; /* bit 20/21, FTZ and DAZ: opaque controls. */
+#endif
+  controls = read_mx() & ~0x603fu;
 }
 
 int main(void)
@@ -64,7 +85,7 @@ int main(void)
       __asm__ volatile("fnstcw %0" : "=m"(before));
       set_fpu_rounding_mode(modes[i]);
       __asm__ volatile("fnstcw %0" : "=m"(cw));
-      check(((cw >> 10) & 3) == i && ((model_mxcsr >> 13) & 3) == i,
+      check(((cw >> 10) & 3) == i && ((read_mx() >> 13) & 3) == i,
             "rounding agrees across x87 and IMCI");
       check((cw & ~0xc00) == (before & ~0xc00), "rounding preserves x87 precision/masks");
       check(get_fpu_rounding_mode() == modes[i], "rounding getter");
@@ -74,64 +95,106 @@ int main(void)
   for (i = 1; i <= 32; i <<= 1)
     {
       reset();
-      if (support_fpu_flag(i))
+      check(support_fpu_flag(i), "all six proven flags must be supported");
         {
-          model_mxcsr |= i;
-          check(get_fpu_except_flags() & i, "candidate vector flag visible in union");
+          write_mx(read_mx() | i);
+          check(get_fpu_except_flags() & i, "proven vector flag visible in union");
           set_fpu_except_flags(0, i);
-          check(!(model_mxcsr & i) && !(get_fpu_except_flags() & i), "flag cleared in both domains");
+          check(!(read_mx() & i) && !(get_fpu_except_flags() & i), "flag cleared in both domains");
           set_fpu_except_flags(i, 0);
-          check(get_fpu_except_flags() & i, "raised x87 flag visible in union");
+          __asm__ volatile("fnstsw %0" : "=am"(cw));
+          check(cw & i, "setter raises x87 sticky flag");
+          write_mx(read_mx() & ~63u);
+          check(get_fpu_except_flags() & i, "x87-only flag visible in union");
           set_fpu_except_flags(0, i);
           check(!(get_fpu_except_flags() & i), "raised flag clear");
         }
       check(!support_fpu_trap(i), "no unproven mixed-domain halting claim");
     }
   reset();
-  model_mxcsr |= 0x4001;
+  write_mx(read_mx() | 0x4001);
   set_fpu_rounding_mode(GFC_FPE_UPWARD);
   get_fpu_state(original);
-  model_mxcsr = (model_mxcsr & ~0x603fu) | 0x2020;
+  write_mx((read_mx() & ~0x603fu) | 0x2020);
   set_fpu_rounding_mode(GFC_FPE_DOWNWARD);
   set_fpu_state(original);
-  check((model_mxcsr & 0x603f) == 0x4001, "save/restore vector rounding and sticky flags");
+  check((read_mx() & 0x603f) == 0x4001, "save/restore vector rounding and sticky flags");
   check(get_fpu_rounding_mode() == GFC_FPE_UPWARD, "save/restore x87 rounding");
   reset();
   set_fpu_except_flags(GFC_FPE_INVALID, 0);
   ieee_procedure_entry(outer);
   check(!get_fpu_except_flags(), "outer entry clears flags");
-  model_mxcsr |= GFC_FPE_OVERFLOW;
+  write_mx(read_mx() | GFC_FPE_OVERFLOW);
   ieee_procedure_entry(inner);
-  check(!get_fpu_except_flags() && !(model_mxcsr & 63), "nested entry clears both domains");
-  model_mxcsr |= GFC_FPE_INEXACT;
+  check(!get_fpu_except_flags() && !(read_mx() & 63), "nested entry clears both domains");
+  write_mx(read_mx() | GFC_FPE_INEXACT);
   ieee_procedure_exit(inner);
   ieee_procedure_exit(outer);
   check((get_fpu_except_flags() & 41) == 41, "nested IEEE procedures merge both domains");
   reset();
+  set_fpu_trap_exceptions(GFC_FPE_ALL, 0);
+  check(warnings == 1 && !get_fpu_trap_exceptions(), "halting enable warns and stays unsupported");
+  __asm__ volatile("fnstcw %0" : "=m"(cw));
+  check((cw & 63) == 63, "unsupported halting does not unmask x87");
   set_fpu_trap_exceptions(0, GFC_FPE_ALL);
-  check(model_mxcsr == 0x308040, "halting disable preserves KNC controls");
+  check(read_mx() == controls, "halting disable preserves KNC controls");
   for (i = 4; i <= 16; i += 2)
     check(!support_fpu_underflow_control(i), "mixed-domain underflow control unsupported");
   set_fpu_underflow_mode(0);
   set_fpu_underflow_mode(1);
-  check(model_mxcsr == 0x308040, "unsupported underflow setters preserve DAZ/FTZ");
+  check(read_mx() == controls, "unsupported underflow setters preserve DAZ/FTZ");
+  check(warnings == 3 && !get_fpu_underflow_mode(), "underflow requests warn without claiming gradual mode");
   for (i = 0; i < 2; ++i)
     {
       unit u = {GFC_FPE_DOWNWARD};
       st_parameter_dt dt = {0, {{&u}}};
       double value;
       reset();
-      model_mxcsr |= 0x4000;
+      write_mx(read_mx() | 0x4000);
       set_fpu_rounding_mode(GFC_FPE_UPWARD);
       expected_rc = 1;
       check(convert_real(&dt, &value, i ? "invalid" : "1.25", 8) == i,
             "formatted input success/error result");
       check(get_fpu_rounding_mode() == GFC_FPE_UPWARD
-            && ((model_mxcsr >> 13) & 3) == 2, "formatted input restores both domains");
+            && ((read_mx() >> 13) & 3) == 2, "formatted input restores both domains");
     }
   check(io_errors == 1, "formatted input invalid-data branch exercised");
+#ifndef S7_07_NATIVE
+  /* Restore a saved foreign word: reserved/opaque fields must never leak. */
+  get_fpu_state(original);
+  ((struct fenv *)original)->__mxcsr ^= 0xffff9fc0u;
+  set_fpu_state(original);
   check(writes > 0, "backend actually manages KNC MXCSR without SSE");
+#else
+  for (i = 0; i < 4; ++i)
+    for (int negative = 0; negative < 2; ++negative)
+      {
+        const unsigned int pos[] = {0x3f800000,0x3f800000,0x3f800001,0x3f800000};
+        const unsigned int neg[] = {0xbf800000,0xbf800001,0xbf800000,0xbf800000};
+        reset();
+        set_fpu_rounding_mode(modes[i]);
+        inputs(negative ? 0xbf800000 : 0x3f800000, negative ? 0xb3800000 : 0x33800000);
+        operation(0, 0);
+        check(result.u[0] == (negative ? neg[i] : pos[i]), "native x87 rounding result");
+        operation(1, 0);
+        for (int lane = 0; lane < 16; ++lane)
+          check(result.u[lane] == (negative ? neg[i] : pos[i]), "native IMCI rounding result");
+        check((read_mx() & ~0x603fu) == controls, "native rounding preserves controls");
+      }
+  for (i = 0; i < 6; ++i)
+    for (int vector = 0; vector < 2; ++vector)
+      {
+        const struct flag_case *c = cases + i;
+        reset();
+        inputs(vector && c->op == 2 ? 0 : c->a, c->b);
+        operation(vector, c->op);
+        check(get_fpu_except_flags() & c->bit, "native arithmetic flag visible");
+        set_fpu_except_flags(0, GFC_FPE_ALL);
+        check(!get_fpu_except_flags(), "native arithmetic flags cleared in both domains");
+        check((read_mx() & ~0x603fu) == controls, "native flag clear preserves controls");
+      }
+#endif
   __asm__ volatile("fninit");
-  printf("Host state logic: %d failures, %d instrumented MXCSR writes; native pending\n", failures, writes);
+  printf("State logic: %d failures, %d instrumented MXCSR writes\n", failures, writes);
   return failures != 0;
 }

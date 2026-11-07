@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
-"""S7-07 red tests and discovery payload; invoke through tools/run.py.
+"""S7-07 backend state tests and card payloads; invoke through tools/run.py.
 
 Host tests execute runtime C with real x87 and instrumented MXCSR storage.
 The fallback fpu-387 has CPUID SSE disabled, reproducing KNC's missing path.
-Candidate flag positions require lead-run probe evidence, not this model.
+Flag positions are established by the lead card run, 2026-11-07 22:53Z.
 """
 import argparse
 import os
@@ -37,6 +37,18 @@ def function(text, name):
         depth += (text[end] == '{') - (text[end] == '}')
         end += 1
     return text[start.start():end]
+
+
+def prepare_callers():
+    constants = (GCC / 'gcc/fortran/libgfortran.h').read_text()
+    (OUT / 'constants.h').write_text('\n'.join(
+        line for line in constants.splitlines() if line.startswith('#define GFC_FPE_')) + '\n')
+    helper = (GCC / 'libgfortran/ieee/ieee_helper.c').read_text()
+    read = (GCC / 'libgfortran/io/read.c').read_text()
+    (OUT / 'callers.h').write_text(
+        'void' + function(helper, 'ieee_procedure_entry') + '\nvoid'
+        + function(helper, 'ieee_procedure_exit') + '\nstatic int'
+        + function(read, 'convert_real') + '\n')
 
 
 def host():
@@ -78,20 +90,31 @@ def host():
         '#define bit_SSE (1u << 25)\n'
         'static int __get_cpuid(unsigned int n, unsigned int *a, unsigned int *b, '
         'unsigned int *c, unsigned int *d) { *a=*b=*c=*d=0; return 1; }\n')
-    constants = (GCC / 'gcc/fortran/libgfortran.h').read_text()
-    (OUT / 'constants.h').write_text('\n'.join(
-        line for line in constants.splitlines() if line.startswith('#define GFC_FPE_')) + '\n')
-    helper = (GCC / 'libgfortran/ieee/ieee_helper.c').read_text()
-    read = (GCC / 'libgfortran/io/read.c').read_text()
-    (OUT / 'callers.h').write_text(
-        'void' + function(helper, 'ieee_procedure_entry') + '\nvoid'
-        + function(helper, 'ieee_procedure_exit') + '\nstatic int'
-        + function(read, 'convert_real') + '\n')
+    prepare_callers()
     binary = OUT / 'state-host.exe'
     run([TC / 'cygwin/bin/gcc', '-O0', '-std=gnu11', '-mfpmath=387',
          '-I' + str(OUT), SRC / 'state-host.c', '-o', binary])
     result = subprocess.run([str(binary)], timeout=30)
     return int(failed or result.returncode != 0)
+
+
+def native():
+    prepare_callers()
+    build = SHARED / 'gcc-build/gcc'
+    binary = OUT / 'state-native.mic'
+    run([build / 'xgcc', '-B' + str(build) + '/', '-march=knc',
+         '--sysroot=' + str(TC / 'sysroot'), '-O0', '-std=gnu11', '-static-libgcc',
+         '-DS7_07_NATIVE', '-I' + str(OUT),
+         '-I' + str(GCC / 'libgfortran/config'), SRC / 'state-host.c', '-o', binary])
+    lint = runpy.run_path(str(ROOT / 'tools/knc_lint'))['lint']
+    violations = list(lint(binary, TC, os.environ.copy()))
+    for row in violations:
+        print(row)
+    if violations:
+        return 1
+    print('PASS build/lint: ' + str(binary) + '; native NOT RUN', flush=True)
+    print('Lead invocation: state-native.mic (no arguments; exit 0 means all assertions passed).')
+    return 0
 
 
 def probes():
@@ -114,7 +137,7 @@ def probes():
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('mode', choices=('host', 'probes'))
+    parser.add_argument('mode', choices=('host', 'probes', 'native'))
     args = parser.parse_args()
     os.environ['PATH'] = os.pathsep.join(str(TC / p) for p in
                                         ('cross/bin', 'cygwin/bin')) + os.pathsep + os.environ['PATH']
@@ -124,7 +147,7 @@ def main():
         return subprocess.call([str(TC / 'cygwin/bin/python3.12.exe'), script, args.mode])
     OUT.mkdir(exist_ok=True)
     os.environ['TMPDIR'] = str(SHARED / 'tmp')
-    return host() if args.mode == 'host' else probes()
+    return {'host': host, 'probes': probes, 'native': native}[args.mode]()
 
 
 if __name__ == '__main__':
