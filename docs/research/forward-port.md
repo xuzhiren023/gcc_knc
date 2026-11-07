@@ -1599,3 +1599,342 @@ Log: `.work/_state/logs/S5_18_sweep-20261106-023923.log`.
 Summary: `.work/_shared/S5-18/sweep/summary.txt`.
 Detailed failure logs are beside that summary, including
 `O2/pr70240.c.log` and `O3/pr70240.c.log`.
+## 2026-11-07T11:47:02+00:00
+
+Base: `releases/gcc-16.2.0`; KNC: `57bec527e002086375881870c44a664542b3bb53`.
+Local refs only; no fetch, checkout, index update or ref update.
+
+### upstream/master
+
+Commit: `b88c2821e219244d18df873b0bfb344d3dc0b2a7`; date: 2026-11-03T19:41:47+01:00.
+
+Conflicts: 7
+
+#### `gcc/config/i386/i386-c.cc`
+
+```diff
+<<<<<<< upstream/master
+  /* For some of the k6/pentium variants there weren't separate ISA bits to
+=======
+  if (isa_flag & OPTION_MASK_ISA_KNC)
+    arch = ix86_knc_target_macros (parse_in, def_or_undef);
+
+  /* For some of the k6/pentium varients there weren't separate ISA bits to
+>>>>>>> knc
+```
+
+#### `gcc/config/i386/i386-options.cc`
+
+```diff
+<<<<<<< upstream/master
+  ix86_tune_cost = processor_cost_table[ix86_tune];
+  /* TODO: ix86_cost should be chosen at instruction or function granularity
+=======
+  ix86_tune_cost = ix86_knc_tune_cost (opts, processor_cost_table[ix86_tune]);
+  /* TODO: ix86_cost should be chosen at instruction or function granuality
+>>>>>>> knc
+```
+
+```diff
+<<<<<<< upstream/master
+  ix86_tune_cost = processor_cost_table[ix86_tune];
+  /* TODO: ix86_cost should be chosen at instruction or function granularity
+=======
+  ix86_tune_cost = ix86_knc_tune_cost (opts, processor_cost_table[ix86_tune]);
+  /* TODO: ix86_cost should be chosen at instruction or function granuality
+>>>>>>> knc
+```
+
+#### `gcc/config/i386/i386.cc`
+
+```diff
+<<<<<<< upstream/master
+=======
+  if (TARGET_KNC && !ix86_knc_check_abi_type (arg.type, arg.mode))
+    return true;
+  CUMULATIVE_ARGS *cum = get_cumulative_args (cum_v);
+
+>>>>>>> knc
+```
+
+```diff
+<<<<<<< upstream/master
+=======
+    }
+  if (stmt_cost == -1)
+    stmt_cost = ix86_default_vector_cost (kind, mode);
+  /* Only gather/scatter needs statement-specific KNC costs here.  Other
+     KNC defaults have already received the x86 lowering adjustments.  */
+  if (TARGET_KNC
+      && (kind == vector_gather_load || kind == vector_scatter_store))
+    {
+      int cost = ix86_knc_stmt_cost (kind, mode, stmt_info);
+      if (cost >= 0)
+        stmt_cost = cost;
+    }
+  /* ADR-0007 point 7: KNC masked accesses are 64-byte aligned only.  */
+  if (TARGET_KNC && ix86_knc_packed_mode_p (mode)
+      && (kind == unaligned_load || kind == unaligned_store)
+      && stmt_info && gimple_call_internal_p (stmt_info->stmt))
+    stmt_cost *= 1000;
+  /* ADR-0008 point 1: a two-input KNC permute is vpermd plus vpermd.  */
+  if (TARGET_KNC && kind == vec_perm
+      && ix86_knc_two_input_perm_p (mode, stmt_info, node))
+    stmt_cost *= 2;
+>>>>>>> knc
+```
+
+#### `gcc/config/i386/i386.opt`
+
+```diff
+<<<<<<< upstream/master
+mavx10v2aux
+Target Mask(ISA2_AVX10V2AUX) Var(ix86_isa_flags2) Save
+Support MMX, SSE, SSE2, SSE3, SSSE3, SSE4.1, SSE4.2, AVX, AVX2,
+AVX10.1 and AVX10V2AUX built-in functions and code generation.
+
+macev1
+Target Mask(ISA2_ACEV1) Var(ix86_isa_flags2) Save
+Support MMX, SSE, SSE2, SSE3, SSSE3, SSE4.1, SSE4.2, AVX, AVX2,
+AVX10.1 and ACEV1 built-in functions and code generation.
+
+mavx10v1aux
+Target Mask(ISA2_AVX10V1AUX) Var(ix86_isa_flags2) Save
+Support MMX, SSE, SSE2, SSE3, SSSE3, SSE4.1, SSE4.2, AVX, AVX2,
+AVX10.1 and AVX10V1AUX built-in functions and code generation.
+=======
+-param=knc-threads-per-core=
+Target Joined UInteger Var(knc_threads_per_core) Init(4) IntegerRange(1, 4) Param Optimization
+Assumed active KNC threads per core for latency hiding (1 to 4, default 4).
+>>>>>>> knc
+```
+
+#### `gcc/config/i386/sse.md`
+
+```diff
+<<<<<<< upstream/master
+  ix86_expand_cond_fma (operands, false, false);
+=======
+  if (TARGET_KNC)
+    {
+      emit_insn (gen_knc_cond_fma (<MODE>mode, operands[0], operands[1],
+				   operands[2], operands[3], operands[4],
+				   operands[5]));
+      DONE;
+    }
+  rtx tmp = gen_reg_rtx (<MODE>mode);
+  emit_insn (gen_fma<mode>4 (tmp,
+			     operands[2],
+			     operands[3],
+			     operands[4]));
+  emit_move_insn (operands[0], gen_rtx_VEC_MERGE (<MODE>mode,
+						  tmp,
+						  operands[5],
+						  operands[1]));
+>>>>>>> knc
+```
+
+```diff
+<<<<<<< upstream/master
+  [(set (match_operand:VI_AVX2 0 "register_operand")
+	(plusminus:VI_AVX2
+	  (match_operand:VI_AVX2 1 "vector_operand")
+	  (match_operand:VI_AVX2 2 "vector_or_const_vector_operand")))]
+  "TARGET_SSE2"
+{
+  /* Expand vector add/sub 1 as vector sub/add -1.  */
+  if (rtx_equal_p (operands[2], CONST1_RTX (<MODE>mode)))
+    {
+      operands[2] = force_reg (<MODE>mode, CONSTM1_RTX (<MODE>mode));
+      emit_insn (gen_<inv_insn><mode>3 (operands[0], operands[1],
+					operands[2]));
+      DONE;
+    }
+
+  if (CONST_VECTOR_P (operands[2]))
+    operands[2] = force_reg (<MODE>mode, operands[2]);
+
+=======
+  [(set (match_operand:VI_AVX2_KNC 0 "register_operand")
+	(plusminus:VI_AVX2_KNC
+	  (match_operand:VI_AVX2_KNC 1 "vector_operand")
+	  (match_operand:VI_AVX2_KNC 2 "vector_operand")))]
+  "TARGET_SSE2 || ix86_knc_packed_mode_p (<MODE>mode)"
+{
+  if (TARGET_KNC)
+    {
+      emit_insn (gen_knc_plusminus (<CODE>, <MODE>mode, operands[0],
+				    operands[1], operands[2]));
+      DONE;
+    }
+>>>>>>> knc
+```
+
+#### `gcc/configure`
+
+```diff
+<<<<<<< upstream/master
+  i?86-*-* | x86_64-*-*)
+    if test x$as_flavor = xsolaris; then
+      tls_section_flag=t
+=======
+  i?86-*-* | x86_64-*-* | k1om-*-linux*)
+    case "$target:$gas" in
+      i?86-*-solaris2*:no | x86_64-*-solaris2*:no)
+	tls_section_flag=t
+>>>>>>> knc
+```
+
+#### `gcc/configure.ac`
+
+```diff
+<<<<<<< upstream/master
+  i?86-*-* | x86_64-*-*)
+    if test x$as_flavor = xsolaris; then
+      tls_section_flag=t
+=======
+  i?86-*-* | x86_64-*-* | k1om-*-linux*)
+    case "$target:$gas" in
+      i?86-*-solaris2*:no | x86_64-*-solaris2*:no)
+	tls_section_flag=t
+>>>>>>> knc
+```
+
+Upstream line churn since 16.2 in files changed by KNC:
+
+| File | Added | Removed |
+| --- | ---: | ---: |
+| `gcc/common/config/i386/i386-common.cc` | +67 | -22 |
+| `gcc/config.gcc` | +93 | -158 |
+| `gcc/config.host` | +10 | -2 |
+| `gcc/config/i386/i386-builtins.cc` | +45 | -5 |
+| `gcc/config/i386/i386-c.cc` | +10 | -5 |
+| `gcc/config/i386/i386-expand.cc` | +3463 | -508 |
+| `gcc/config/i386/i386-knc.cc` | +0 | -0 |
+| `gcc/config/i386/i386-knc.h` | +0 | -0 |
+| `gcc/config/i386/i386-options.cc` | +142 | -91 |
+| `gcc/config/i386/i386-protos.h` | +21 | -16 |
+| `gcc/config/i386/i386.cc` | +1369 | -459 |
+| `gcc/config/i386/i386.h` | +70 | -48 |
+| `gcc/config/i386/i386.md` | +2401 | -1450 |
+| `gcc/config/i386/i386.opt` | +24 | -6 |
+| `gcc/config/i386/imci.md` | +0 | -0 |
+| `gcc/config/i386/knc.md` | +0 | -0 |
+| `gcc/config/i386/linux-k1om.h` | +0 | -0 |
+| `gcc/config/i386/sse.md` | +2036 | -286 |
+| `gcc/config/i386/sync.md` | +57 | -3 |
+| `gcc/config/i386/t-i386` | +0 | -0 |
+| `gcc/config/i386/x86-tune-sched.cc` | +1 | -1 |
+| `gcc/configure` | +1043 | -920 |
+| `gcc/configure.ac` | +367 | -378 |
+| `libgcc/config.host` | +13 | -23 |
+| `libgcc/config/i386/knc-crtfastmath.c` | +0 | -0 |
+| `libgcc/config/i386/knc-sfp-machine.h` | +0 | -0 |
+| `libgcc/config/i386/t-knc` | +0 | -0 |
+
+### upstream/releases/gcc-16
+
+Commit: `4b03dde2e3ad210db469ee763194c0cbec22cf45`; date: 2026-11-03T10:43:47+01:00.
+
+Conflicts: 0
+
+Upstream line churn since 16.2 in files changed by KNC:
+
+| File | Added | Removed |
+| --- | ---: | ---: |
+| `gcc/common/config/i386/i386-common.cc` | +3 | -1 |
+| `gcc/config.gcc` | +0 | -0 |
+| `gcc/config.host` | +0 | -0 |
+| `gcc/config/i386/i386-builtins.cc` | +0 | -0 |
+| `gcc/config/i386/i386-c.cc` | +0 | -0 |
+| `gcc/config/i386/i386-expand.cc` | +23 | -10 |
+| `gcc/config/i386/i386-knc.cc` | +0 | -0 |
+| `gcc/config/i386/i386-knc.h` | +0 | -0 |
+| `gcc/config/i386/i386-options.cc` | +0 | -0 |
+| `gcc/config/i386/i386-protos.h` | +0 | -0 |
+| `gcc/config/i386/i386.cc` | +35 | -47 |
+| `gcc/config/i386/i386.h` | +0 | -0 |
+| `gcc/config/i386/i386.md` | +73 | -28 |
+| `gcc/config/i386/i386.opt` | +0 | -0 |
+| `gcc/config/i386/imci.md` | +0 | -0 |
+| `gcc/config/i386/knc.md` | +0 | -0 |
+| `gcc/config/i386/linux-k1om.h` | +0 | -0 |
+| `gcc/config/i386/sse.md` | +99 | -54 |
+| `gcc/config/i386/sync.md` | +0 | -0 |
+| `gcc/config/i386/t-i386` | +0 | -0 |
+| `gcc/config/i386/x86-tune-sched.cc` | +0 | -0 |
+| `gcc/configure` | +1 | -1 |
+| `gcc/configure.ac` | +1 | -1 |
+| `libgcc/config.host` | +1 | -0 |
+| `libgcc/config/i386/knc-crtfastmath.c` | +0 | -0 |
+| `libgcc/config/i386/knc-sfp-machine.h` | +0 | -0 |
+| `libgcc/config/i386/t-knc` | +0 | -0 |
+
+
+### S6-08 classification and change size (KNC `57bec527e002`)
+
+The drill used local refs only: upstream master `b88c2821e219` has seven
+conflicted files and ten textual hunks; gcc-16 `4b03dde2e3ad` has no conflicts.
+Every conflict has a textual resolution; no structural conflict was found.
+
+| Conflict | Textual resolution |
+| --- | --- |
+| `i386-c.cc` (1 hunk) | Retain the KNC macro hook and upstream's spelling correction. |
+| `i386-options.cc` (2 hunks) | Retain the `ix86_knc_tune_cost` wrapper at both assignments and upstream's comment spelling. |
+| `i386.cc`, pass by reference (1 hunk) | Retain the KNC ABI entry guard in upstream's `cum_v` wrapper; keep upstream's relocated helper and the existing KNC `va_arg` guard. |
+| `i386.cc`, statement cost (1 hunk) | Retain upstream's moved default-cost assignment, then the KNC gather/scatter override and alignment/permute penalties, each with its existing predicate. Preserve upstream's surrounding block structure. |
+| `i386.opt` (1 hunk) | Keep both upstream's new AVX option entries and the independent KNC threads-per-core parameter entry. |
+| `sse.md`, conditional FMA (1 hunk) | Retain the KNC entry dispatch, which finishes expansion, then upstream's `ix86_expand_cond_fma` call for the remaining targets. |
+| `sse.md`, plus/minus (1 hunk) | Retain the KNC iterator, condition and entry dispatch; take upstream's constant-capable operand and rewrite after the dispatch. KNC's binary-operand helper forces constants to registers. |
+| `configure`, `configure.ac` (1 hunk each) | Retain the KNC target label together with upstream's Solaris `as_flavor` test. |
+
+Drill log: `.work/_state/logs/S6_08_drill-20261107-064701.log`.
+
+Change size against `releases/gcc-16.2.0`: additions plus deletions under
+`gcc/config/i386` and `gcc/common/config/i386`, excluding the five KNC-only
+files below. Hunks use Git's default three-line context. The new KNC-only
+scheduler file is excluded from the shared count, just like `imci.md`.
+
+| Scope | Changed lines | Hunks |
+| --- | ---: | ---: |
+| Shared i386 files | 644 | 122 |
+| `i386-knc.cc` (KNC only) | 1733 | 1 |
+| `i386-knc.h` (KNC only) | 104 | 1 |
+| `imci.md` (KNC only) | 1978 | 1 |
+| `knc.md` (KNC only) | 94 | 1 |
+| `linux-k1om.h` (KNC only) | 72 | 1 |
+| KNC-only i386 total | 3981 | 5 |
+
+Outside that i386 measurement scope, KNC-only libgcc files contain 37 lines
+in `knc-crtfastmath.c`, 13 in `knc-sfp-machine.h`, and 17 in `t-knc`.
+
+The shared build wrapper skipped the build: the clean tree
+`ebd0bda6940ccb3e1832d3e0d77d1938310a1ba4` was already built at
+`c192fef7e7d3bd207e90867c767cfd4dec7d4db4` (same tree as the checked head).
+Build log: `.work/_state/logs/S6_08_build-20261107-064642.log`.
+
+The S6-08 ticket assigns x86 identity and card execution to the lead.
+Those results must be recorded on the ticket before approval. No native
+execution result is claimed by this engineer report.
+
+### S6-08 ICE sweeps
+
+At KNC `57bec527e002`, `tools/torture_compile.py` compiled all 2,003 C torture
+compile cases at each requested flag set. Its `LEVELS` table was set in memory
+to `O2: [-O2, -ftree-vectorize]` and `O3: [-O3]`; all directive handling,
+classification, assembly, lint and timeout behavior remained unchanged.
+Four workers completed 4,006 measurements in 447.429 seconds. The wrapper
+returned PASS (exit 0).
+
+| Flags (also `-march=knc`) | Pass | Compiler error | User inline asm rejected | ICE | Hang | Assembler rejection | Lint failure | Infrastructure failure |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| `-O2 -ftree-vectorize` | 1968 | 33 | 2 | 0 | 0 | 0 | 0 | 0 |
+| `-O3` | 1968 | 33 | 2 | 0 | 0 | 0 | 0 | 0 |
+
+Neither level had a slow retry or an FP ABI error. Compiler errors and
+rejected user inline assembly are reported separately from passing cases.
+
+Log: `.work/_state/logs/S6_08_sweep-20261107-064705.log`.
+Summary: `.work/_shared/S6-08/sweep/summary.txt`.
+Detailed failure logs are beside that summary. The small sweep launcher is
+`.work/_shared/S6-08/sweep.py`.
