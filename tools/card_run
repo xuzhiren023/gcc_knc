@@ -256,7 +256,8 @@ def run(program, argv, *, lock_path, external_locks, baseline_names, timeout,
 
     try:
         username = os.environ.get("USERNAME") or getpass.getuser()
-        if username.startswith("CodexSandbox"):
+        # Engineer sessions, Codex or Claude (owner, 2026-11-07), never start card jobs.
+        if username.startswith("CodexSandbox") or os.environ.get("PM_ROLE") == "engineer":
             refused_sandbox = True
             raise Refused("card jobs are lead-only; leave the binaries for the lead")
         if any(not math.isfinite(n) or n <= 0 for n in (timeout, transport_timeout)):

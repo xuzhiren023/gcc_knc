@@ -24,7 +24,7 @@ import storage  # noqa: E402
 
 ENGINEER_PROMPT = """You are an engineer on GCC-KNC, working on ticket {id} only, in this worktree.
 Run: python tools/pm.py show {id}
-Do only what that ticket asks. Rules are in AGENTS.md. Read other documents only if the ticket points to them.
+You are the engineer, not the tech lead: ignore CLAUDE.md's lead role. Do only what that ticket asks. Rules are in AGENTS.md. Read other documents only if the ticket points to them.
 Work without narration: no plans, progress reports or summaries between steps, only the tool calls the work needs.
 End the session with one pm.py command: submit, red, ask or escalate. Your final message is only the "PM update:" line it prints."""
 
@@ -50,7 +50,32 @@ def newest(*patterns):
     return max(found, key=os.path.getmtime) if found else None
 
 
+def claude_binary():
+    # A Microsoft Store install keeps %APPDATA% in its package folder, which only the app sees as %APPDATA%.
+    return newest(r"%LOCALAPPDATA%\Packages\*Claude*\LocalCache\Roaming\Claude\claude-code\*\*\claude.exe",
+                  r"%APPDATA%\Claude\claude-code\*\*\claude.exe") or "claude"
+
+
 def engineer_command(board, ticket, worktree):
+    # Owner, 2026-11-07: engineers are Claude Code sessions from now on; "codex" stays selectable.
+    if board.policy.get("engineer_backend", "codex") == "claude":
+        effort = board.policy.get("engineer_effort") or board.budget(ticket)["effort"]
+        model = ticket.fields.get("model") or board.budget(ticket).get("claude_model") or "opus"
+        os.makedirs(storage.shared_area(board.root), exist_ok=True)
+        dirs = [storage.state_dir(board.root), storage.shared_area(board.root)]
+        try:
+            with open(os.path.join(board.root, "config", "card.local.json"), encoding="utf8") as f:
+                ledger = json.load(f).get("ledger")
+        except (OSError, ValueError):
+            ledger = None
+        if ledger:
+            dirs.append(os.path.dirname(os.path.abspath(ledger)))
+        command = [claude_binary(), "-p", ENGINEER_PROMPT.format(id=ticket.id), "--output-format", "json",
+                   "--no-session-persistence", "--model", model, "--effort", effort,
+                   "--allowedTools", "Read,Edit,Write,Grep,Glob,Bash"]
+        for d in dirs:
+            command += ["--add-dir", d]
+        return command
     codex = newest(r"%LOCALAPPDATA%\OpenAI\Codex\bin\*\codex.exe") or "codex"
     # The policy can fix effort and service tier ("priority" is Codex's fast mode) for every engineer session.
     effort = board.policy.get("engineer_effort") or board.budget(ticket)["effort"]

@@ -1,5 +1,8 @@
 # CLAUDE.md: tech lead role
 
+A session started by `tools/dispatch.py` as an engineer (`PM_ROLE=engineer`) is not the lead: it follows
+`AGENTS.md` and its ticket, and ignores the rest of this file.
+
 GPT (Codex) implements, because it has more usage available. Claude plans, writes tickets,
 reviews, answers and merges to local `main`. The owner decides and pushes. How this works is
 in `docs/COLLABORATION.md`, and `AGENTS.md` holds the engineer rules.
