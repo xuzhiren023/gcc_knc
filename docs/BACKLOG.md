@@ -94,7 +94,8 @@ Recommended to the owner as a tuning block in Sprint 8, after Sprint 7's runtime
   unaligned second half, or peeling/versioning for alignment), so odd short lengths stop falling
   back to x87.
 - Small-matrix kernels (mat8 at about 2% of the IMCI gain, mat16 at about 26%): diagnose with the
-  per-loop reports (S6-04), then fix.
+  per-loop reports (S6-04), then fix. S6-06's scheduler made mat8 a further 10% slower (owner approved S6-06 for
+  now, 2026-11-07; `docs/research/card-runs-s6.md`).
 - E5-11: the per-loop scalar-add cost choice.
 - E5-07: two-level software prefetch (ADR-0009 point 5; WRF measured 2.4x on short rows).
 - E5-12 tune-flag audit if there is room (cheap).
