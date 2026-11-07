@@ -84,7 +84,7 @@ Drafted as tickets S2-01 to S2-08; see [SPRINT-02](sprints/SPRINT-02.md).
 | E5-11 | Per-loop choice where one KNC scalar cost flips loops both ways: S6-05 round 1 (scalar add cost below 1) made mat8 20% faster and stencil1/2 3-6% slower through induction-variable choices; round 2 restored the stencils and lost mat8 (`docs/research/card-runs-s6.md`, `docs/research/knc-costs.md`) Also: reject vectorization with lane use of 25% or less when full unroll plus SLP is possible (Tian et al. Fig. 6.4), after check C6 and the mat8 diagnosis. | Standard |
 | E5-12 | `-mtune=knc` tune-flag audit: `FAST_PREFIX` off (0x66/0x67 prefixes cost 2 decode cycles, SSDG p.16); review partial-register, RMW, inc/dec, memory-operand, macro-fusion and push flags for the in-order core; T1 scans plus one card before/after | Standard |
 | E5-13 | Default 64-byte alignment for static, global and local arrays of 64 bytes or more under `-march=knc`, and for gfortran `ALLOCATE` of vectorizable types (with E6-02); measure on the M2 short-length rows | Standard |
-| E5-09 | `-mtune=knc` tables: a KNC `processor_costs` entry, cache and prefetch parameters, unroll and alignment defaults, each chosen by card measurement, plus the published "GCC-KNC flags" page with ICC `-mmic` equivalents (ADR-0009 points 6 and 8) | Standard |
+| E5-09 | `-mtune=knc` tables: a KNC `processor_costs` entry, cache and prefetch parameters, unroll and alignment defaults, each chosen by card measurement, plus the published "GCC-KNC flags" page with ICC `-mmic` equivalents (ADR-0009 points 6 and 8) Unroll factor from `knc-threads-per-core`, so the 4-cycle vector and 12-cycle memory-operand latencies are covered at that density; unroll-then-schedule plus multiple accumulators is the software pipelining (check C9 at 1 and 2 threads per core, unroll 1/2/4; `docs/research/knc-optimization-sources.md` supplement). | Standard |
 | E5-06 | Milestone M2 kernels: short-loop, stencil and small-matrix kernels drawn from the corpus, plus hand-written IMCI references written for this project. Include a short-row strided kernel shaped like WRF's hot loops (rows of 7-9 elements, j/k/i order, many arrays per point) and report 2 threads per core next to 4 (`docs/research/wrf-input-2026-11-06.md`) | Deep |
 
 ## Proposed for Sprint 8 (lead, 2026-11-07): the M2 weak spots
@@ -120,8 +120,9 @@ Recommended to the owner as a tuning block in Sprint 8, after Sprint 7's runtime
 | E7-01 | Pick functions from corpus use, starting with common libm calls; vector function ABI and compiler binding (ADR required). Names are settled by ADR-0011 (`__knc_vmath_<name>_<lanes>`, never `_ZGV`); start from the copied sources in `contrib/knc-vecmath/` | Deep |
 | E7-02 | Accurate `exp`, `log`, `pow` first; relaxed entry points separate; exceptional-lane repair compared. Requalify the copied functions as built by GCC-KNC, on the card; the PhiWeather receipts are targets, not evidence (ADR-0011 point 4). A card harness is ready in `tests/acceptance/vecmath_qualify/` | Deep |
 | E7-03 | Rank missed optimizations by corpus-wide profile and carry the top regions through GIMPLE, RTL and assembly | Standard |
-| E7-04 | Scalar and integer code quality for the in-order core: scheduling, inlining, code size, branches without CMOV | Standard |
+| E7-04 | Scalar and integer code quality for the in-order core: scheduling, inlining, code size, branches without CMOV Measure the branch-mispredict penalty (check C10) and set `BRANCH_COST` from it; scalar if-conversion through setcc/sbb sequences (no CMOV); evaluate lane-0 `vblendmps` selects for FP with E5-04. | Standard |
 | E7-06 | Two-level prefetch like `icc`: L2 far (`vprefetch1`) and L1 near (`vprefetch0`) distances per loop, exclusive prefetch for stores, none for loops that fit in cache; ranked on the corpus against E5-07 (owner, 2026-11-03) | Deep |
+| E7-08 | Instrumented PGO on the card: libgcov for k1om, `-fprofile-update=atomic`, `.gcda` under `/tmp`; after the E6 runtimes. AutoFDO stays parked until `perf` sampling works on the card | Standard |
 | E7-05 | Milestone M4: corpus comparison against GCC 5.1.1, including held-out programs | Deep |
 
 ## E8 Program corpus and release (M5–M6)
@@ -134,6 +135,7 @@ sysroot content; user manual and support matrix; update procedure.
 | Topic | Why parked |
 |---|---|
 | Small matrix 2-D vectorization | After Milestone M2; applies to fixed-shape kernels only |
-| PGO | After the target works; check threaded profile integrity first |
+| Swing modulo scheduling | Needs an i386 `doloop_end` in shared code (ADR-0006); revisit only if check C9 shows loops still latency-bound at 1-2 threads per core after unrolling and scheduling |
+| AutoFDO | Needs `perf` sampling on the card; instrumented PGO is E7-08 |
 | Offline tuning-profile generator | After cost model v1 proves its value |
 | ICC comparison | Only if a suitable licensed KNC-capable version already exists |

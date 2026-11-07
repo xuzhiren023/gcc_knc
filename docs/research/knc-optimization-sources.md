@@ -310,3 +310,122 @@ miss, so it is not a contradiction worth a card run.
 - ICC's own default prefetch distances for `-mmic` are not stated in any of the six documents; only
   PRACE's tuned 64/32 is.
 - Every [inference] item still needs card evidence before it becomes a default.
+
+## Supplement: the Itanium-to-KNC report (2026-11-07)
+
+The input is the lead's summary of an owner-supplied GPT deep-search report, "Itanium-to-KNC Compiler
+Optimization Integration Report" (scratchpad `itanium-to-knc-report.md`). It is unverified material,
+checked here against the sources above, our ADRs, our measured tables and the GCC 16 tree
+(`.work/_shared/gcc`). The report's Itanium descriptions are outside our scope and are not checked.
+
+### Its KNC and GCC claims
+
+| Claim | Verdict | Source |
+|---|---|---|
+| "8 512-bit vector registers (zmm0-zmm7 in IMCI)" | **Wrong.** There are 32 (`zmm0`-`zmm31`). The report later says 32 itself | SSDG §2.1.9; ADR-0004 |
+| 8 mask registers `k0`-`k7` | Correct | ISA 327364; ADR-0007 |
+| "32 64-bit general registers per thread" | **Wrong.** x86-64 has 16 GPRs, replicated per thread | SSDG §2.1.5 |
+| "IMCI uses VEX-like multibyte prefixes" | **Half right.** Vector instructions use **MVEX** (62h). Only mask and some scalar instructions use the C4/C5 "VEX-like" prefix | ISA §3.1-3.3, p.40 |
+| Two pipes; vectors only on U | Correct | SSDG p.16; `pair.*` rows |
+| "V-pipe handles most scalar"; "some integer ops only on V" | **Wrong as stated.** Scalar integer and mask ops issue on either pipe: two per issue slot, `scalar_add.rt` 1.07 at one thread. The restricted pipe is V ("cannot execute all instruction types"), not U | SSDG p.16; characterization point 2; `knc.md` |
+| One thread reaches at most 50% of issue | Correct | SSDG p.17; characterization point 1 |
+| 16 SP or 8 DP FMA lanes per cycle per core | Correct | Tian §I; characterization |
+| "Hardware prefetching in L1/L2" | **Wrong for L1.** Only L2 has a hardware prefetcher | SSDG p.17; Klemm |
+| "Up to 4 concurrent prefetch streams in L2" | **Wrong.** There are 16 streams; "up to 4" is the requests per detected stream | SSDG p.17 |
+| Memory latency "~100+ cycles" | **Wrong by about 3.5x.** We measure 357-366 cycles; Klemm gives about 275 ns | characterization point 8; ADR-0009 |
+| CMOV for small cases and scalar if-conversion | **Wrong.** KNC has no CMOV and no FCMOV/FCOMI | SSDG §4.2.18.2, §4.2.18.6; ADR-0002 |
+| `prefetchnta` / `prefetch0` | **Wrong mnemonics.** PREFETCH is not supported; KNC has `vprefetchnta`, `vprefetch0/1/2` and `vprefetche*` | SSDG §4.2.12; ISA p.641 |
+| `lfence` | **Wrong.** SFENCE, LFENCE and MFENCE are not supported; ordering uses a LOCK-prefixed instruction or CPUID | SSDG §4.2.18; E2-04 |
+| Vectorizer emits `vblendvpd` and `vpcmpgtps` | **Wrong.** These are SSE4.1/AVX-style names, and `vpcmpgtps` exists nowhere. IMCI uses `vblendmps/pd` with a mask, `vcmpps/pd` with a predicate into a mask, and `vpcmpgtd` for int32 | ISA pp.129, 149, 470; ADR-0007 |
+| Example `vmulpd %zmm2 {k0}, [x], [y]` | **Wrong.** IMCI arithmetic takes at most one memory operand. `k0` cannot be a write mask (it means "no mask"). The example also mixes an SP compare with a DP multiply | ISA §3; ADR-0007 |
+| "Two memory ops cannot pair on U and V" | Unverified. Not measured (our `pair.*` rows cover vector, scalar and mask ops, not load+load) | none |
+| Branch misprediction "~30 cycles" | Unverified. Not measured; `knc-costs.md` keeps generic branch estimates | none |
+| No scalar predication; masks only for vectors | Correct | ISA; ADR-0007 |
+| No rotating registers, register stack or ALAT | Correct | ISA |
+| Files `config/i386/knights.c`, a `.sched` file, `x86/tstops.md`, `ipa-pg` | **Do not exist** in GCC 16 or the donor. The donor's additions are in `i386.c` and `knc.md`, with no scheduler (0 reservations). GCC-KNC's are `i386-knc.cc` and `knc.md` (DFA, S6-06). GCC scheduling models are `define_automaton` in `.md` files; there is no `.sched` type | `.work/_shared/gcc/gcc/config/i386/`; donor `af7cc04` |
+| "Modulo scheduling is not enabled by default on i386, so add it" | **Misleading.** SMS needs a `doloop_end` pattern (`modulo-sched.cc:339-351`, `doloop_register_get`), and i386 defines none. `-fmodulo-sched` therefore does nothing on x86 and KNC today; turning on the flag is not enough | `gcc/modulo-sched.cc`; `doloop_end` is defined for aarch64, rs6000, s390, ia64 and others, but not i386 |
+| PGO "fully applicable" | **Partly.** Instrumented PGO needs no PMU, but it needs libgcov on the card and `.gcda` output from threaded runs, neither tested. AutoFDO needs `perf` sampling, not established for us | BACKLOG Parked (PGO); I-13 |
+
+### Useful ideas, judged against our model
+
+**(a) Swing modulo scheduling: not now. [inference]**
+- **Cost:** SMS needs a `doloop_end` expander for i386. That means a new loop-counter RTL form in
+  shared i386 code (ADR-0006 hook rules), plus SMS's own maintenance risk.
+- **Benefit:** at the production density of 4, our tables show latency hidden. At 2 threads per core
+  (WRF's best), a thread issues every other cycle. A 4-cycle vector chain then needs 2 independent
+  operations, and a 12-cycle memory-operand chain about 6. Unroll by 2, multiple accumulators
+  (ADR-0009 point 3) and the haifa scheduler with `knc.md` supply that for reductions and simple
+  streams.
+- **Where SMS would add something:** long load-compute-store chains without a reduction, at 1-2
+  threads per core.
+- **Plan:** measure first (C9). Adopt only if unroll+schedule leaves a gap.
+
+**(b) Software pipelining vs multiple accumulators.** For reductions, accumulators are software
+pipelining of the recurrence. For other loops, the equivalent is unroll by U, then schedule: GCC's
+unroller plus sched1 interleaving, which also gives modulo variable expansion (the rotating-register
+substitute). The knob that matters is U as a function of density, given the 12-cycle memory-operand
+latency. This is a cost and default choice (E5-09), not a new pass. [inference]
+
+**(c) PGO and AutoFDO.** Instrumented PGO is feasible without hardware counters. It needs libgcov for
+k1om (whether our libgcc build produces it is unverified), `.gcda` written under `/tmp`, and
+`-fprofile-update=atomic` (lock-prefixed RMW exists; no `mfence` needed). AutoFDO waits until `perf`
+sampling works on the card. [inference]
+
+**(d) Itanium practice that maps onto KNC.**
+- **Predication becomes masks:** already E4-01 and ADR-0007.
+- **Scalar if-conversion without CMOV:** GCC's noce path falls back to store-flag (`setcc`, `sbb`,
+  `and`/`or`) sequences, governed by `BRANCH_COST`. Ours is a generic estimate. Measure the
+  misprediction penalty (C10), set it, and check that short diamonds become setcc sequences.
+- **FP selects:** without FCMOV, they stay branches or move to lane 0 of a `zmm` with a masked
+  `vblendmps`. That is a point for E5-04 (source-format scalar in `zmm`).
+- **Control speculation:** the non-faulting memory forms are `vprefetch*` and `clevict*` (ISA p.641,
+  p.624) and masked-off gather lanes (ADR-0008). Hoist a prefetch, not the load, above a guard. The
+  gather tail (I-6) is the speculative-vector-load substitute.
+- **Data speculation (ALAT):** the substitute is runtime alias versioning, which the vectorizer
+  already does.
+
+**(e) Benchmarks.** Its list against our corpus (`corpus-and-coverage.md`):
+
+| Its benchmark | Our corpus or M2 |
+|---|---|
+| STREAM triad | `stream.c` 5.10 (C1, C5) |
+| Sparse update | HPCG (conditional) |
+| DGEMM | PolyBench gemm, plus the M2 small-matrix kernels |
+| 7-point stencil | PolyBench heat-3d / jacobi-2d, plus the M2 stencils |
+| FFT | NPB FT, which does not compile yet |
+| N-body | **Missing.** Tian also uses it, and its `rsqrt`/division makes it a natural judge for E4-03 and E7-02 |
+
+### Proposed backlog text
+
+- **E5-09 addition** (Standard, M2 follow-up): "Unroll factor as a function of
+  `knc-threads-per-core`, covering the 4-cycle vector and 12-cycle memory-operand latencies at that
+  density (C9)."
+- **E7-04 addition** (Standard, M4): "Measure the branch-misprediction penalty (C10). Set
+  `BRANCH_COST` and the KNC branch costs from it. Check that scalar if-conversion uses setcc/sbb
+  sequences (no CMOV). Evaluate `vblendmps` lane-0 FP selects with E5-04."
+- **E7-08** (new, Standard, M4, after E6 runtimes): "Instrumented PGO on the card: libgcov for k1om,
+  `-fprofile-update=atomic`, `.gcda` under `/tmp`; one corpus program before and after
+  `-fprofile-use`. AutoFDO stays parked until `perf` sampling on the card is shown." This replaces
+  the Parked PGO row.
+- **Parked** (new row): "Swing modulo scheduling: needs an i386 `doloop_end` (shared code, ADR-0006).
+  Revisit only if C9 shows loops latency-bound at 1-2 threads per core after unroll and schedule."
+- **E8 corpus addition:** "N-body (SP, with `rsqrt`) once E4-03 lands."
+
+### Card checks
+
+| ID | Question |
+|---|---|
+| C9 | At 1 and 2 threads per core, how far is GCC-KNC from IMCI on the M2 affine and stencil kernels with unroll factors 1, 2, 4? A remaining gap would justify SMS |
+| C10 | Branch-misprediction penalty: random vs predictable branch in a scalar loop, at 1 and 4 threads |
+
+### Verdict
+
+Low value as a source.
+- Most of its KNC facts are wrong or garbled: register counts, CMOV, fences, mnemonics, prefetch
+  streams, memory latency, pipe roles.
+- The GCC files it names do not exist, and its central recommendation (turn on `-fmodulo-sched`)
+  cannot work on i386 without a `doloop_end` pattern.
+- What survives is generic and already planned (masks, prefetch, U/V model, OpenMP), plus three small
+  additions: a density-aware unroll factor, a measured `BRANCH_COST` with CMOV-free if-conversion,
+  and instrumented PGO.
+- Its roadmap should not be used.
