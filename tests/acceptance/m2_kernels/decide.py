@@ -74,9 +74,13 @@ def read(path):
         if (result.get('result_class') != 'program' or result.get('program_exit_code') != 0
                 or result.get('exit_code') != 0):
             reasons.append('card_run or pin checks failed')
-        for field in ('overlapping_jobs', 'foreign_processes'):
-            if result.get(field) != []:
-                reasons.append(field + ' not empty or missing')
+        if result.get('overlapping_jobs') != []:
+            reasons.append('overlapping_jobs not empty or missing')
+        # card_run's S6-12 admission checks foreign work before launch. Its
+        # own sleep helper remains in the recorded process inventory.
+        foreign = result.get('foreign_processes')
+        if not isinstance(foreign, list) or any(p.get('name') != 'sleep' for p in foreign):
+            reasons.append('foreign_processes not empty or missing')
     number(launch, 'gcc_over_x87_max')
     if launch.get('gain_fraction_defined') == '1':
         number(launch, 'gain_fraction')
@@ -143,7 +147,7 @@ def tuning(jobs, invalid, minimum, layout_checked):
     reports = []
     for group, launches in sorted(groups.items()):
         launches.sort(key=lambda j: int(j['launch']['launch']))
-        all_ratios, signs, reasons = [], [], []
+        all_ratios, signs, reasons, notes = [], [], [], []
         for job in launches:
             rounds = job['rows']['round']
             ratios = [number(r, 'gcc_over_gcc_before') for r in rounds]
@@ -165,7 +169,7 @@ def tuning(jobs, invalid, minimum, layout_checked):
         states = (any(r.get('regime_step') == '1' for r in before)
                   or bool(times and (max(times)-min(times))/st.median(times) >= .02))
         if not states:
-            reasons.append('two performance states not established')
+            notes.append('two performance states not established; three launches make both likely')
         if len(launches) < 3:
             reasons.append('need at least three launches')
         median = st.median(all_ratios)
@@ -177,7 +181,7 @@ def tuning(jobs, invalid, minimum, layout_checked):
         elif not invalid and not reasons and ci[1] < 1-minimum:
             decision = 'accept'
         reports.append(dict(configuration=group, median_ratio=median, ratio_ci95=ci,
-                            per_launch_signs=signs, decision=decision, reasons=reasons))
+                            per_launch_signs=signs, decision=decision, reasons=reasons, notes=notes))
     return reports
 
 
