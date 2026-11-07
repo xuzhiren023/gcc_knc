@@ -115,6 +115,8 @@ def main():
         required = dict(expected)
         required.update({name: ('FUNC', 0) for name in ADDITIONS})
         errors = mismatches(required, actual)
+        unexpected = set(actual) - set(required)
+        errors.extend('unintended export ' + name for name in sorted(unexpected))
         print('candidate:', args.candidate)
         print('additional exports:', ' '.join(sorted(set(actual) - set(expected))))
     else:
