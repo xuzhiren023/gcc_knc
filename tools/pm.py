@@ -484,7 +484,10 @@ def cmd_approve(board, args):
         ancestor = subprocess.call(["git", "merge-base", "--is-ancestor", "knc", branch], cwd=gcc,
                                    stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL) == 0
         fast = False
-        if ancestor:
+        # A batch-check or test-only ticket's branch may carry no GCC commit: nothing to merge.
+        if run_git("rev-parse", branch, cwd=gcc) == knc_head:
+            fast = True
+        elif ancestor:
             merge = run_git("commit-tree", branch + "^{tree}", "-p", "knc", "-p", branch,
                             "-m", message, cwd=gcc)
             run_git("update-ref", "refs/heads/knc", merge, knc_head, cwd=gcc)
