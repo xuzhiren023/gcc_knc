@@ -39,7 +39,9 @@ def main():
         dest = OUT / label
         dest.mkdir(exist_ok=True)
         shutil.copyfile(source, dest / 'libgcc_s.so.1')
-    donor_flags = ['-B' + str(TC / 'sysroot/lib64') + '/',
+    # Donor libm.so names /lib64/libm.so.6; ld must resolve it in this sysroot.
+    donor_flags = ['--sysroot=' + str(TC / 'sysroot'),
+                   '-B' + str(TC / 'sysroot/lib64') + '/',
                    '-L' + str(TC / 'sysroot/lib64')]
     donor = [TC / 'cross/bin/k1om-mpss-linux-gcc', *donor_flags]
     new = [BUILD / 'gcc/xgcc', '-B' + str(RUNTIME) + '/',
