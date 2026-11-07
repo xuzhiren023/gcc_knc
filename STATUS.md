@@ -1,10 +1,10 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-07 14:37.
+Updated automatically at every ticket change. Last update: 2026-11-07 14:45.
 
-**Next: the tech lead, on S7-05.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: GPT-6.1, on S7-06 (Shared libgcc part 4: lead native acceptance and the install decision (E6-01d)).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
-Current tickets: `[###################-]` 115 of 121
+Current tickets: `[###################-]` 116 of 121
 
 ## Milestones
 
@@ -13,7 +13,7 @@ Current tickets: `[###################-]` 115 of 121
 | M0 | Foundation | In progress | 17 of 17 tickets |
 | M1 | Mixed native code | Done | 43 of 43 tickets |
 | M2 | Useful vector target | Done | 51 of 51 tickets |
-| M3 | Runtimes | In progress | 4 of 10 tickets |
+| M3 | Runtimes | In progress | 5 of 10 tickets |
 | M4 | Broad optimization | Not started | Not planned in detail yet |
 | M5 | Program corpus | Not started | Not planned in detail yet |
 | M6 | Release | Not started | Not planned in detail yet |
@@ -137,7 +137,7 @@ Current tickets: `[###################-]` 115 of 121
 | S7-02 | libgfortran slice for KNC: descriptor ABI vs the card's GCC 5 runtime, real(16) and libquadmath, and MXCSR-safe FP control (E6-02 input) | Done | The libgfortran plan for KNC is ready: a small MXCSR-safe FP backend, kinds 4/8/10 with kind 16 deferred, a... |
 | S7-03 | Shared libgcc part 1: donor ABI compatibility objects and symbol map (E6-01a) | Done | GCC-KNC's libgcc now exports everything the card's donor libgcc_s.so.1 does (all 153 symbol and version pai... |
 | S7-04 | Shared libgcc part 2: shared build and driver integration (E6-01b) | Done | The KNC compiler now builds a shared libgcc_s.so.1 that keeps the donor's ABI, needs nothing newer than gli... |
-| S7-05 | Shared libgcc part 3: compatibility and unwind card payloads (E6-01c) | Waiting for review | Submitted by the lead for the engineer (session budget reached after the 14:36 answer). 85451cd: five paylo... |
+| S7-05 | Shared libgcc part 3: compatibility and unwind card payloads (E6-01c) | Done | The old-client and new-client libgcc compatibility and unwind test programs are built, linted and staged wi... |
 | S7-06 | Shared libgcc part 4: lead native acceptance and the install decision (E6-01d) | Not started |  |
 | S7-07 | libgfortran part 1: KNC floating-point backend and capability contract (E6-02) | Not started | Sprint 7 draft; parked in lane lead until the owner starts Sprint 7 and Sprint 6's gcc tickets are merged; ... |
 | S7-08 | libgfortran part 2: base runtime build and the descriptor and I/O slice (E6-02) | Not started | Sprint 7 draft; parked in lane lead until the owner starts Sprint 7 and Sprint 6's gcc tickets are merged; ... |
@@ -146,6 +146,7 @@ Current tickets: `[###################-]` 115 of 121
 
 ## Recent activity
 
+- 2026-11-07 14:45 **S7-05** lead approve: The old-client and new-client libgcc compatibility and unwind test programs are built, linted and staged with expected outputs in .work/_shared/S7-...
 - 2026-11-07 14:37 **S7-05** engineer submit: Submitted by the lead for the engineer (session budget reached after the 14:36 answer). 85451cd: five payloads with expected outputs and an explici...
 - 2026-11-07 14:37 **S7-05** owner decide: Lead, under the owner's delegation for engineering decisions: no further engineer session; the work is committed (85451cd) and only the submit was ...
 - 2026-11-07 14:36 **S7-05** lead escalate: budget: 3 engineer sessions used; the budget is 3
@@ -153,13 +154,12 @@ Current tickets: `[###################-]` 115 of 121
 - 2026-11-07 14:35 **S7-05** engineer ask: Build/lint and ELF/import checks PASS after 85451cd restores plugin linker sysroot. All five payloads with expected output and explicit-path runner...
 - 2026-11-07 14:33 **S7-05** lead answer: Likely cause: your private specs file. old-compat.mic links -lm fine with --sysroot and no specs; plugin.so fails only when -specs= replaces *link,...
 - 2026-11-07 14:32 **S7-05** engineer ask: Commit 100e180 adds --sysroot to all donor links. Reproducer: donor g++ --sysroot=<shared>/toolchain/sysroot with existing -B/-L, -shared-libgcc -f...
-- 2026-11-07 14:30 **S7-05** lead answer: Yes. Pass --sysroot=<toolchain>/sysroot explicitly on every donor link (gcc and g++, old-compat too so all donor payloads link the same way), keepi...
 
 ## Cost
 
 - From the script, engineer: 280 sessions, 670.9M input tokens
 - From the script, lead: 212 sessions, 65.6M input tokens
-- Started by hand, Claude: 10 sessions, 1612.7M input tokens
+- Started by hand, Claude: 10 sessions, 1614.8M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
