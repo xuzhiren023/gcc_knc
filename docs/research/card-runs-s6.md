@@ -216,3 +216,19 @@ opposite-link-order check before they are claimed.
 | stencil2 | 1.029 | 1.029 | 1.029 | **about 3% slower**, consistent, needs the link-order check |
 | mat8 | 0.799 | 0.805 | 0.799 | **20% faster**, consistent |
 | mat16 | 1.000 | 1.017 | 1.002 | no clear effect |
+
+## Pre-tuning M2 baseline under amendment 2 (01:51-04:39Z on 11-07, `claude-s6-m2base2.sh`)
+
+Binary `.work/_shared/M2-base2` (S6-15's interleaved fixture on main; kernels from M2-final, GCC
+`knc` after S6-11). Correctness: negative 154 failing cases, positive 0. 150 timing jobs (5 launches
+x 15 configurations x 60 and 1 cores), all exit 0, all `valid=1`; 2 regime-step flags at 60 cores.
+
+`decide.py` (60 cores, production density): **M2 passes all three clauses.** Gain fraction at L2 per
+launch 0.805, 0.737, 0.759, 0.817, 0.809; mean 0.785, minimum 0.737, one-sided 95% lower bound
+0.752, bootstrap interval of the median [0.737, 0.817]; the worst GCC-KNC/x87 time over all lengths
+and launches is 0.625 (length 17). At 1 core the L2 gain fraction is 0.807-0.821 and the worst
+GCC/x87 0.622 (not a decision input; `decide.py` reports 1-core blocks as not production density).
+
+`decide.py` as merged marks every launch invalid because card_run's receipt lists its own `sleep`
+helper under `foreign_processes` (all 150 receipts); the figures above come from a scratch copy that
+ignores that one process. card_run's S6-12 guard admitted every job. Fix rides with S6-13.
