@@ -21,6 +21,6 @@ out = SHARED / 'S6-13'
 out.mkdir(exist_ok=True)
 exe = out / 'test-power.exe'
 subprocess.run([str(BIN / 'gcc'), '-std=gnu11', '-Wall', '-Wextra', '-Werror',
-                '-pthread', str(HERE / 'test_power.c'), str(HERE / 'power.c'), '-lm',
+                '-pthread', str(HERE / 'test_power.c'), '-lm',
                 '-o', str(exe)], check=True)
 sys.exit(subprocess.call([str(exe), str(HERE / 'sample-power.txt')]))

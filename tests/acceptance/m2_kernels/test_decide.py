@@ -35,6 +35,7 @@ class Decisions(unittest.TestCase):
             return json.loads(proc.stdout)
 
     def test_pass(self):
+        # Reduced receipt from tmp/claude-s6-m2-test/l2-1.out: card_run's sleep.
         report = self.run_block([0.8]*5)
         self.assertEqual(report['m2']['decision'], 'pass')
         self.assertEqual(report['m2']['regime_steps'], 5)

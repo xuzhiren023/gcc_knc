@@ -5,6 +5,14 @@
 #include <errno.h>
 #include <math.h>
 #include <string.h>
+/* Exercise the real sampler with a recorded sensor file on the host. */
+static const char *sensor_fixture;
+static FILE *sensor_open(const char *name, const char *mode) {
+  return fopen(strcmp(name,"/sys/class/micras/power") == 0 ? sensor_fixture : name,mode);
+}
+#define fopen sensor_open
+#include "power.c"
+#undef fopen
 static int failures;
 #define CHECK(expr) do { if (!(expr)) { fprintf(stderr,"FAIL: %s\n",#expr); ++failures; } } while (0)
 int main(int argc, char **argv) {
@@ -26,5 +34,20 @@ int main(int argc, char **argv) {
     CHECK(power_parse(f,&watts) == EPROTO);
     fclose(f);
   }
+  sensor_fixture = argv[1];
+  cpu_set_t workers;
+  CPU_ZERO(&workers);
+  for (int cpu = 1; cpu <= 240; ++cpu) CPU_SET(cpu,&workers);
+  power_init(&workers);
+  CHECK(sampler_cpu == -1);
+  CHECK(created == 1);
+  power_begin(0);
+  struct timespec pause = {0,150000000};
+  nanosleep(&pause,NULL);
+  power_end();
+  power_finish();
+  CHECK(setup_error == 0);
+  CHECK(stats[0].samples > 0);
+  CHECK(stats[0].min == 110.0 && stats[0].max == 110.0);
   return failures != 0;
 }
