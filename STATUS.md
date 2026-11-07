@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-07 14:36.
+Updated automatically at every ticket change. Last update: 2026-11-07 14:37.
 
-**Waiting for you:** S7-05. Run `python tools/pm.py inbox`.
+**Next: GPT-6.1, on S7-05 (Shared libgcc part 3: compatibility and unwind card payloads (E6-01c)).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
 Current tickets: `[###################-]` 115 of 121
 
@@ -137,7 +137,7 @@ Current tickets: `[###################-]` 115 of 121
 | S7-02 | libgfortran slice for KNC: descriptor ABI vs the card's GCC 5 runtime, real(16) and libquadmath, and MXCSR-safe FP control (E6-02 input) | Done | The libgfortran plan for KNC is ready: a small MXCSR-safe FP backend, kinds 4/8/10 with kind 16 deferred, a... |
 | S7-03 | Shared libgcc part 1: donor ABI compatibility objects and symbol map (E6-01a) | Done | GCC-KNC's libgcc now exports everything the card's donor libgcc_s.so.1 does (all 153 symbol and version pai... |
 | S7-04 | Shared libgcc part 2: shared build and driver integration (E6-01b) | Done | The KNC compiler now builds a shared libgcc_s.so.1 that keeps the donor's ABI, needs nothing newer than gli... |
-| S7-05 | Shared libgcc part 3: compatibility and unwind card payloads (E6-01c) | **Waiting for you** | budget: 3 engineer sessions used; the budget is 3 |
+| S7-05 | Shared libgcc part 3: compatibility and unwind card payloads (E6-01c) | In progress | Lead, under the owner's delegation for engineering decisions: no further engineer session; the work is comm... |
 | S7-06 | Shared libgcc part 4: lead native acceptance and the install decision (E6-01d) | Not started |  |
 | S7-07 | libgfortran part 1: KNC floating-point backend and capability contract (E6-02) | Not started | Sprint 7 draft; parked in lane lead until the owner starts Sprint 7 and Sprint 6's gcc tickets are merged; ... |
 | S7-08 | libgfortran part 2: base runtime build and the descriptor and I/O slice (E6-02) | Not started | Sprint 7 draft; parked in lane lead until the owner starts Sprint 7 and Sprint 6's gcc tickets are merged; ... |
@@ -146,6 +146,7 @@ Current tickets: `[###################-]` 115 of 121
 
 ## Recent activity
 
+- 2026-11-07 14:37 **S7-05** owner decide: Lead, under the owner's delegation for engineering decisions: no further engineer session; the work is committed (85451cd) and only the submit was ...
 - 2026-11-07 14:36 **S7-05** lead escalate: budget: 3 engineer sessions used; the budget is 3
 - 2026-11-07 14:36 **S7-05** lead answer: Yes, submit with --override 'card payload sources are the deliverable: 4 C/C++ payloads, 3 expected-output files and an explicit-path runner cover ...
 - 2026-11-07 14:35 **S7-05** engineer ask: Build/lint and ELF/import checks PASS after 85451cd restores plugin linker sysroot. All five payloads with expected output and explicit-path runner...
@@ -153,13 +154,12 @@ Current tickets: `[###################-]` 115 of 121
 - 2026-11-07 14:32 **S7-05** engineer ask: Commit 100e180 adds --sysroot to all donor links. Reproducer: donor g++ --sysroot=<shared>/toolchain/sysroot with existing -B/-L, -shared-libgcc -f...
 - 2026-11-07 14:30 **S7-05** lead answer: Yes. Pass --sysroot=<toolchain>/sysroot explicitly on every donor link (gcc and g++, old-compat too so all donor payloads link the same way), keepi...
 - 2026-11-07 14:29 **S7-05** engineer ask: Stopped after two failed build attempts. First: donor ld rejects --no-eh-frame-hdr; fixed using private link specs and explicit frame registration....
-- 2026-11-07 14:22 **S7-04** lead approve: The KNC compiler now builds a shared libgcc_s.so.1 that keeps the donor's ABI, needs nothing newer than glibc 2.21 and has no text relocations, and...
 
 ## Cost
 
 - From the script, engineer: 280 sessions, 670.9M input tokens
 - From the script, lead: 212 sessions, 65.6M input tokens
-- Started by hand, Claude: 10 sessions, 1610.5M input tokens
+- Started by hand, Claude: 10 sessions, 1612.7M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
