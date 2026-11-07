@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-06 22:23.
+Updated automatically at every ticket change. Last update: 2026-11-06 22:24.
 
 **Waiting for you:** S6-13. Run `python tools/pm.py inbox`.
 
@@ -122,7 +122,7 @@ Current tickets: `[###################-]` 108 of 113
 | S6-02 | M2 kernels: affine, stencil, short-loop and small-matrix as GCC-KNC vector, x87 and hand-written IMCI builds, with a timing driver | Done | The M2 yardstick is ready and correct on the card: FP32/FP64 affine, two stencils, a short loop and 8x8/16x... |
 | S6-03 | Machine characterization corpus (E5-01): latency and throughput per instruction class at 1-4 threads per core, cache and memory levels | Done | A KNC characterization corpus of 104 hand-written measurements is ready to run on the card: latency and thr... |
 | S6-04 | Per-loop KNC reports (E5-03): vector factor, peel and tail choice, masks, helper calls, spills and rejection reasons | Done | With -fopt-info-vec, KNC now reports each costed loop candidate: vector mode and factor, scalar peel, maske... |
-| S6-05 | -mtune=knc costs and vectorizer cost model v1 from the characterization tables (E5-09, E5-02) | Waiting for review | Owner, 2026-11-07: +2 engineer sessions (budget 8 sessions, 23M input tokens) to fix the stencil regression... |
+| S6-05 | -mtune=knc costs and vectorizer cost model v1 from the characterization tables (E5-09, E5-02) | Changes requested | Fix the stencil1 (+5-6%) and stencil2 (+3%) regressions before merge, keeping mat8's 20% gain; see the owne... |
 | S6-06 | KNC scheduler v0 (E5-05): U/V pipes, 4-cycle vector latency, 3-cycle AGI | Not started | back in lane gcc. Tables: `docs/research/knc-characterization.md`. The measured |
 | S6-07 | First gcc.dg/vect baseline for KNC: compile scans on the host, execution on the card | Done | The gcc.dg/vect suite now has a KNC baseline: of 2,001 tests, 1,329 compile (777 linked for the card), 632 ... |
 | S6-08 | Sprint 6 mid batch check after S6-04 and S6-05 | Not started |  |
@@ -139,19 +139,19 @@ Current tickets: `[###################-]` 108 of 113
 ## Recent activity
 
 - 2026-11-07  **S6-13** lead note: two small fixture follow-ups ride with this ticket, since it changes the same
+- 2026-11-06 22:24 **S6-05** lead changes: Fix the stencil1 (+5-6%) and stencil2 (+3%) regressions before merge, keeping mat8's 20% gain; see the owner's 2026-11-07 decision note above for t...
 - 2026-11-06 22:23 **S6-05** owner decide: Owner, 2026-11-07: +2 engineer sessions (budget 8 sessions, 23M input tokens) to fix the stencil regressions before merge. Lead's card evidence (AD...
 - 2026-11-06 20:59 **S6-13** lead escalate: S6-13 cannot be approved yet: two lead card results are missing from the ticket. (1) A card rerun of correctness and the negative control from .wor...
 - 2026-11-06 20:58 **S6-13** engineer submit: Host parser/joules test, 7 decide cases, and suite build/lint passed. Logs: .work/_state/logs/S6_13_power_host-20261106-205600.log and .work/_state...
 - 2026-11-06 20:57 **S6-13** lead answer: Approved as is; no consolidation needed. Everything in this ticket is acceptance fixture under tests/acceptance/m2_kernels/, which is what it asked...
 - 2026-11-06 20:56 **S6-13** engineer ask: Implementation committed (15ee47b); host parser/joules, 7 decide cases and suite build/lint pass. Submit gate counts all acceptance fixture impleme...
 - 2026-11-06 20:50 **S6-15** lead approve: The M2 fixture can now time a before and an after GCC build of the same kernels in one process, interleaved round by round, and decide.py applies A...
-- 2026-11-06 20:43 **S6-15** owner decide: Lead, under the owner's delegation for engineering decisions (the escalation only needed the interactive lead's card run): done 01:16-01:20Z. Paire...
 
 ## Cost
 
 - From the script, engineer: 262 sessions, 628.1M input tokens
 - From the script, lead: 194 sessions, 61.8M input tokens
-- Started by hand, Claude: 10 sessions, 1480.7M input tokens
+- Started by hand, Claude: 10 sessions, 1481.2M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
