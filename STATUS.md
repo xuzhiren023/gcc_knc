@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-07 14:30.
+Updated automatically at every ticket change. Last update: 2026-11-07 14:31.
 
 **Next: GPT-6.1, on S7-05 (Shared libgcc part 3: compatibility and unwind card payloads (E6-01c)).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
@@ -158,7 +158,7 @@ Current tickets: `[###################-]` 115 of 121
 ## Cost
 
 - From the script, engineer: 278 sessions, 670.3M input tokens
-- From the script, lead: 209 sessions, 64.9M input tokens
+- From the script, lead: 210 sessions, 65.2M input tokens
 - Started by hand, Claude: 10 sessions, 1610.5M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
