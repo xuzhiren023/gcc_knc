@@ -1,0 +1,5 @@
+PASS cross DSO throw catch both directions
+PASS backtrace across DSO
+PASS signal unwind across trampoline and DSO
+PASS pthread cancellation and two cleanups
+PASS three dlopen dlclose frame registration cycles

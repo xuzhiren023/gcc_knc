@@ -1,0 +1,6 @@
+PASS SF interfaces
+PASS TF interfaces
+PASS six version aliases
+PASS CPU object and initializer
+PASS binary128 four rounding modes
+PASS binary128 exceptions
