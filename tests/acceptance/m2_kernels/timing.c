@@ -5,6 +5,7 @@
    all three builds alike, and the gain fraction is taken from same-group medians. */
 #define _GNU_SOURCE
 #include "kernels.h"
+#include "power.h"
 #include <errno.h>
 #include <limits.h>
 #include <math.h>
@@ -310,6 +311,7 @@ int benchmark(int argc, char **argv) {
   printf("order seed=%u launch=%d algorithm=balanced_xorshift32_fisher_yates builds=%d\n",
          order_state,launch,BUILD_COUNT);
   policy("start"); read_topology();
+  power_init(&allowed);
   pin(topology[0][0]);
   printf("configuration kernel=%s length=%lu workers=%d bytes_per_worker=%zu "
          "bytes_per_core=%zu clock=CLOCK_MONOTONIC_RAW cycles=worker0_TSC_diagnostic "
@@ -378,7 +380,13 @@ int benchmark(int argc, char **argv) {
       for (int k = 0; k < BUILD_COUNT; ++k) {
         current_build = order[k]; repetitions = reps[current_build];
         if (round < 3) { elapsed = batch(); sample("warmup",g,round,elapsed); }
-        else { elapsed = batch(); sample("timed",g,round-3,elapsed); samples[current_build][round-3] = elapsed; }
+        else {
+          power_begin(current_build);
+          elapsed = batch();
+          power_end();
+          sample("timed",g,round-3,elapsed);
+          samples[current_build][round-3] = elapsed;
+        }
       }
       if (round >= 3) {
         double times[BUILD_COUNT];
@@ -416,6 +424,7 @@ int benchmark(int argc, char **argv) {
            "gain_fraction=%.6f\n",kernels[selected].name,g,gcc_x87[g],per_element[2]/per_element[1],
            ratio[g],gf[g]);
   }
+  power_finish();
   int sized = 1, regime_steps = 0;
   double figure[BUILD_COUNT];
   for (int b = 0; b < BUILD_COUNT; ++b) {
@@ -439,6 +448,7 @@ int benchmark(int argc, char **argv) {
            kernels[selected].name,build_names[b],length,density,cores,
            reps[b],(unsigned long long)sorted[2],figure[b],spread,
            spread >= 0.02,launch,working_set,short_length);
+    power_report(b,build_names[b],kernels[selected].name,launch,figure[b]);
   }
   /* The launch figure (ADR-0010 point 6). Amendment 2: only mechanical checks invalidate a
      launch; a 2% spread of a build's or the paired gain fraction's group values is a flag. */

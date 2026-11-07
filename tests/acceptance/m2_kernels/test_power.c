@@ -1,5 +1,6 @@
 /* Recorded sysfs example: Southampton thesis, Appendix C, p.163.
    See README for source and the limits of this fixture (not our card's read). */
+#define _GNU_SOURCE
 #include "power.h"
 #include <errno.h>
 #include <math.h>

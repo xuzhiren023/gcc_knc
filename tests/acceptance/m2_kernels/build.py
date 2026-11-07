@@ -65,7 +65,8 @@ def main():
     variants = ['positive', 'negative'] if args.mode == 'all' else [args.mode]
     units = [('kernels-gcc', 'kernels.c', ['-DBUILD=gcc', '-ftree-vectorize']),
              ('kernels-x87', 'kernels.c', ['-DBUILD=x87', *scalar]),
-             ('timing', 'timing.c', oracle)]
+             ('timing', 'timing.c', oracle),
+             ('power', 'power.c', oracle)]
     for variant in variants:
         units.append(('driver-' + variant, 'driver.c',
                       [*oracle, *(['-DNEGATIVE_CONTROL'] if variant == 'negative' else [])]))
@@ -95,7 +96,7 @@ def main():
     if errors:
         print('FAIL: %d compile/assembly steps; no binaries linked' % errors)
         return 1
-    common = [out / (name + '.o') for name in ('kernels-gcc', 'kernels-x87', 'timing', 'imci', 'negative')]
+    common = [out / (name + '.o') for name in ('kernels-gcc', 'kernels-x87', 'timing', 'power', 'imci', 'negative')]
     if args.before:
         common.insert(0 if args.before_first else 1, out / 'kernels-gccbefore.o')
     for variant in variants:

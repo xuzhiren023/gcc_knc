@@ -178,6 +178,68 @@ launch. No extra samples are added to rescue a noisy result.
 
 ## Output and M2 arithmetic
 
+### Whole-card power (S6-13)
+
+Build this ticket's positive and negative executables into its own directory:
+
+```text
+python tools/run.py --name S6-13-suite-build --inputs tests/acceptance/m2_kernels -- python tests/acceptance/m2_kernels/build.py all --out S6-13
+python tools/run.py --name S6-13-power-host --inputs tests/acceptance/m2_kernels -- python tests/acceptance/m2_kernels/test_power.py
+```
+
+The card-side source is MPSS `/sys/class/micras/power`. Intel's
+[power measurement discussion](https://community.intel.com/t5/Software-Archive/Power-Measurement-of-Xeon-Phi/td-p/939120)
+identifies that path and points to the Software Developer's Guide's Sysfs Nodes
+section (328207 / 488596, section 2.2.8). The ticket's suggested Intel 330991
+field table has not been verified here. The primary research paper
+[Power and Energy Implications of the Number of Threads Used on the Intel Xeon Phi, section IV](https://pureadmin.qub.ac.uk/ws/portalfiles/portal/15384122/power_energy_implications.pdf)
+describes board power in microwatts, two total-power windows and a 50 ms update.
+The parser uses the first line, total power window 0, divided by 1,000,000
+to get watts; it does not sum rail readings or use maximum power or TDP.
+
+`sample-power.txt` transcribes the numeric sysfs example in
+[Runtime Energy Management of Multi-core Processors, Appendix C, p.163](https://eprints.soton.ac.uk/422287/1/Final_Thesis.pdf).
+It is a published format fixture, not a measurement of our card. The host test
+exercises the production C parser and watts-to-joules arithmetic. Our card's
+exact path/format/units remain unconfirmed until the lead's first read: every
+benchmark launch prints `power_source` with that qualification, then the entire
+raw file once as `power_raw line=N value=...`. The lead must check those lines
+against the documented layout before using the converted values.
+
+A separate 256 KiB-stack sampler pins itself to one allowed OS CPU (0, 241,
+242 or 243), checks singleton affinity, and never uses a worker CPU. It samples
+about every 50 ms only during each build's timed batches in the five groups;
+pilots, warm-ups and other builds do not enter that build's statistics. The
+first read waits 50 ms after batch activation, and a read crossing a batch
+boundary is discarded. The hardware averaging window can still include the
+previous interleaved build; these are approximate sensor measurements, not
+isolated kernel energy. The 50-200 ms batch-sizing rule is unchanged.
+
+Each `summary` is followed by one record (including `gcc_before` when linked):
+
+```text
+power kernel=affine_f32 build=gcc launch=1 samples=N mean_watts=W min_watts=W max_watts=W joules_per_element=J
+power kernel=affine_f32 build=x87 launch=1 samples=0 power=unavailable errno=2
+```
+
+These are format examples, not measured results. Mean, min and max use the
+accepted readings across that build's timed groups. Joules per scalar output
+element = mean watts times its summary median ns per element times `1e-9`.
+The summary already divides time by **all workers'** output elements: do not
+multiply energy by the worker count. This is whole-card power, including idle,
+memory, OS activity and sampling overhead, with no idle subtraction. It is an
+energy estimate from mean power and median time, not a time-integrated energy
+counter. Similar watts can give different joules per element when builds run
+at different speeds.
+
+Missing/unreadable files, parse errors (`EPROTO`), no accepted samples
+(`ENODATA`), or sampler setup/affinity failures produce `power=unavailable`
+with the numeric errno. Any read error marks that build unavailable even if
+earlier readings succeeded (`samples` still reports their count). Timing and
+its exit status continue independently. The engineer builds/lints only; the
+lead runs correctness, the negative control, and one benchmark job and retains
+the raw and per-build power records.
+
 Each measurement is one `sample` line with key=value fields:
 
 ```text
@@ -262,7 +324,7 @@ Launch numbers now accept 1..10 for the single sequential extension.
 The lead first runs positive and negative correctness and one paired launch,
 using `.work/_shared/S6-15/paired/m2-{kernels,negative}.mic`. The lead then runs
 at least three independent paired launches at each ticket-named working set,
-with at least two observed performance states. Save complete card_run stdout
+so that both performance states are likely to be observed. Save complete card_run stdout
 to one file per job, including its final JSON (which supplies overlap, foreign
 workload and exit status). For example, after the lead's usual card_run prefix:
 
@@ -277,8 +339,14 @@ and reports median, bootstrap interval, and each launch's median/sign. It accept
 only when the upper interval endpoint is strictly below `1 - min_effect` and
 launch signs agree. Sign flips report `placement-dependent`. A before-build
 regime flag or a >=2% range of its normalized times establishes two states;
-otherwise the report rejects for insufficient state evidence. Invalid jobs
-prevent acceptance and are named with their reasons. An effect below 2% also
+otherwise the report prints a note; absence of two observed states does not
+reject a comparison. Invalid jobs prevent acceptance and are named with their
+reasons. The S6-15 A/A launch measured `gcc_over_gcc_before=1.016` for identical
+kernels, with interval [1.013, 1.019]. Per-launch intervals therefore understate
+the uncertainty: effects under about 3% need the opposite-link-order check
+before being claimed (see `docs/research/card-runs-s6.md`, S6-15 card check).
+The decision tool's existing automatic threshold remains 2%; this documented
+3% evidence rule also applies to effects between 2% and about 3%. An effect below 2% also
 requires repeating the experiment with `build.py --before-first`, which links
 the saved GCC object before the after object. The lead evaluates those outputs
 as a separate block, then uses `decide.py --layout-checked` only when that
