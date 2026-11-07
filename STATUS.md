@@ -2,7 +2,7 @@
 
 Updated automatically at every ticket change. Last update: 2026-11-07 01:16.
 
-**Next: the tech lead, on S6-06.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: GPT-6.1, on S6-06 (KNC scheduler v0 (E5-05): U/V pipes, 4-cycle vector latency, 3-cycle AGI).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
 Current tickets: `[##################--]` 110 of 121
 
@@ -123,7 +123,7 @@ Current tickets: `[##################--]` 110 of 121
 | S6-03 | Machine characterization corpus (E5-01): latency and throughput per instruction class at 1-4 threads per core, cache and memory levels | Done | A KNC characterization corpus of 104 hand-written measurements is ready to run on the card: latency and thr... |
 | S6-04 | Per-loop KNC reports (E5-03): vector factor, peel and tail choice, masks, helper calls, spills and rejection reasons | Done | With -fopt-info-vec, KNC now reports each costed loop candidate: vector mode and factor, scalar peel, maske... |
 | S6-05 | -mtune=knc costs and vectorizer cost model v1 from the characterization tables (E5-09, E5-02) | Done | GCC-KNC now has a KNC cost table from the card measurements: scattered-index gathers stay scalar, reduction... |
-| S6-06 | KNC scheduler v0 (E5-05): U/V pipes, 4-cycle vector latency, 3-cycle AGI | Question for the tech lead | AGENTS.md forbids engineer card jobs. Lead: run native M2/execute acceptance and batch x86 check? Native/x8... |
+| S6-06 | KNC scheduler v0 (E5-05): U/V pipes, 4-cycle vector latency, 3-cycle AGI | In progress | Yes. Card and x86 runs belong to the lead, not you. Submit as is with the staged artifacts in .work/_shared... |
 | S6-07 | First gcc.dg/vect baseline for KNC: compile scans on the host, execution on the card | Done | The gcc.dg/vect suite now has a KNC baseline: of 2,001 tests, 1,329 compile (777 linked for the card), 632 ... |
 | S6-08 | Sprint 6 mid batch check after S6-04 and S6-05 | Not started |  |
 | S6-09 | ICE in expand_vec_series_expr: KNC lane-index vectors (VEC_SERIES) for V16SI/V8DI and the FP modes | Done | Loops that build lane-index vectors (VEC_SERIES) now compile on KNC instead of crashing the compiler: 6 of ... |
@@ -146,6 +146,7 @@ Current tickets: `[##################--]` 110 of 121
 
 ## Recent activity
 
+- 2026-11-07 01:16 **S6-06** lead answer: Yes. Card and x86 runs belong to the lead, not you. Submit as is with the staged artifacts in .work/_shared/S6-06 and the 'NOT RUN' lines stated pl...
 - 2026-11-07 01:15 **S6-06** engineer ask: AGENTS.md forbids engineer card jobs. Lead: run native M2/execute acceptance and batch x86 check? Native/x86 NOT RUN. PASS build, T0(52), T1/T2, re...
 - 2026-11-07 00:06 **S6-13** lead approve: Each M2 timing launch now records the card's power for each build: all three draw about 165-172 W, so GCC-KNC's vector code uses 8.7 times less ene...
 - 2026-11-07  **S7-10** lead note: Sprint 7 draft; parked in lane lead until the owner starts Sprint 7 and Sprint 6's gcc tickets are merged; then lane gcc.
@@ -153,7 +154,6 @@ Current tickets: `[##################--]` 110 of 121
 - 2026-11-07  **S7-08** lead note: Sprint 7 draft; parked in lane lead until the owner starts Sprint 7 and Sprint 6's gcc tickets are merged; then lane gcc.
 - 2026-11-07  **S7-07** lead note: Sprint 7 draft; parked in lane lead until the owner starts Sprint 7 and Sprint 6's gcc tickets are merged; then lane gcc.
 - 2026-11-07  **S7-05** lead note: Sprint 7 draft; parked in lane lead until the owner starts Sprint 7 and Sprint 6's gcc tickets are merged; then lane gcc.
-- 2026-11-07  **S7-04** lead note: Sprint 7 draft; parked in lane lead until the owner starts Sprint 7 and Sprint 6's gcc tickets are merged; then lane gcc.
 
 ## Cost
 
