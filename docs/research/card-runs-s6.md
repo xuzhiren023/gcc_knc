@@ -166,3 +166,24 @@ Gain fraction per launch: 0.63, 0.66, 0.63 at 1024; 0.74, 0.99, 0.69 at 4096.
   different set conflicts. This looks like a property of the card for any user program, not
   measurement noise: within each launch, groups agree within 2%. Not proven: a run with fixed
   physical pages would prove it, and needs root to reserve huge pages.
+
+## 2026-11-06 (01:06-01:14Z on 11-07): M2 diagnostic block, interleaved driver (`claude-s6-m2diag.sh`)
+
+Binary `.work/_shared/M2-diag` (interleaved builds, amendment-2 flags; kernels from M2-final, GCC
+`knc` after S6-11). Correctness: negative 154 failing cases, positive 0. All seven launches valid,
+`regime_steps=0` and `paired_step=0` in every one.
+
+| Job | Gain fraction | Paired GF spread | GCC/x87 worst group |
+|---|---|---|---|
+| A1, L2, no warm-up | 0.750 | 0.63% | 0.111 |
+| A2, length 15, no warm-up | 0.447 | 0.80% | 0.440 |
+| B1-B5, L2, 10 s warm-up | 0.809, 0.799, 0.798, 0.801, 0.824 | 0.29-1.01% | 0.102-0.105 |
+
+- **The interleaved design gives a stable gain fraction:** B1-B5 mean 0.806, sd 0.011, one-sided 95%
+  lower bound 0.796, minimum 0.798. Under amendment 2 the L2 clauses (a) and (b) hold for this
+  pre-tuning compiler; clause (c) needs the full length set in five launches (the baseline block).
+- **The early slow regime did not appear** in these seven launches, so the run did not catch its
+  cause. What the straggler fields do show: a persistent per-worker lag at L2 (max worker 5.5-6.1%
+  above the median worker, mostly workers 120-121, that is core 30, in A1; worker 33 in B1), and
+  about 26 involuntary context switches and 11 ms of system time per batch summed over 240 workers.
+  OS activity versus a per-core hardware effect is still open; it no longer affects M2 decisions.
