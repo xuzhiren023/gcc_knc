@@ -2,7 +2,7 @@
 
 Updated automatically at every ticket change. Last update: 2026-11-07 01:17.
 
-**Waiting for you:** S6-06. Run `python tools/pm.py inbox`.
+**Next: GPT-6.1, on S6-06 (KNC scheduler v0 (E5-05): U/V pipes, 4-cycle vector latency, 3-cycle AGI).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
 Current tickets: `[##################--]` 110 of 121
 
@@ -123,7 +123,7 @@ Current tickets: `[##################--]` 110 of 121
 | S6-03 | Machine characterization corpus (E5-01): latency and throughput per instruction class at 1-4 threads per core, cache and memory levels | Done | A KNC characterization corpus of 104 hand-written measurements is ready to run on the card: latency and thr... |
 | S6-04 | Per-loop KNC reports (E5-03): vector factor, peel and tail choice, masks, helper calls, spills and rejection reasons | Done | With -fopt-info-vec, KNC now reports each costed loop candidate: vector mode and factor, scalar peel, maske... |
 | S6-05 | -mtune=knc costs and vectorizer cost model v1 from the characterization tables (E5-09, E5-02) | Done | GCC-KNC now has a KNC cost table from the card measurements: scattered-index gathers stay scalar, reduction... |
-| S6-06 | KNC scheduler v0 (E5-05): U/V pipes, 4-cycle vector latency, 3-cycle AGI | **Waiting for you** | budget: 14332720 input tokens used; the budget is 6000000 |
+| S6-06 | KNC scheduler v0 (E5-05): U/V pipes, 4-cycle vector latency, 3-cycle AGI | In progress | Lead, under the owner's delegation for engineering decisions: no further engineer session. The work is comm... |
 | S6-07 | First gcc.dg/vect baseline for KNC: compile scans on the host, execution on the card | Done | The gcc.dg/vect suite now has a KNC baseline: of 2,001 tests, 1,329 compile (777 linked for the card), 632 ... |
 | S6-08 | Sprint 6 mid batch check after S6-04 and S6-05 | Not started |  |
 | S6-09 | ICE in expand_vec_series_expr: KNC lane-index vectors (VEC_SERIES) for V16SI/V8DI and the FP modes | Done | Loops that build lane-index vectors (VEC_SERIES) now compile on KNC instead of crashing the compiler: 6 of ... |
@@ -146,6 +146,7 @@ Current tickets: `[##################--]` 110 of 121
 
 ## Recent activity
 
+- 2026-11-07 01:17 **S6-06** owner decide: Lead, under the owner's delegation for engineering decisions: no further engineer session. The work is committed (8704b5d, GCC c192fef7e7d) and onl...
 - 2026-11-07 01:17 **S6-06** lead escalate: budget: 14332720 input tokens used; the budget is 6000000
 - 2026-11-07 01:16 **S6-06** lead answer: Yes. Card and x86 runs belong to the lead, not you. Submit as is with the staged artifacts in .work/_shared/S6-06 and the 'NOT RUN' lines stated pl...
 - 2026-11-07 01:15 **S6-06** engineer ask: AGENTS.md forbids engineer card jobs. Lead: run native M2/execute acceptance and batch x86 check? Native/x86 NOT RUN. PASS build, T0(52), T1/T2, re...
@@ -153,13 +154,12 @@ Current tickets: `[##################--]` 110 of 121
 - 2026-11-07  **S7-10** lead note: Sprint 7 draft; parked in lane lead until the owner starts Sprint 7 and Sprint 6's gcc tickets are merged; then lane gcc.
 - 2026-11-07  **S7-09** lead note: Sprint 7 draft; parked in lane lead until the owner starts Sprint 7 and Sprint 6's gcc tickets are merged; then lane gcc.
 - 2026-11-07  **S7-08** lead note: Sprint 7 draft; parked in lane lead until the owner starts Sprint 7 and Sprint 6's gcc tickets are merged; then lane gcc.
-- 2026-11-07  **S7-07** lead note: Sprint 7 draft; parked in lane lead until the owner starts Sprint 7 and Sprint 6's gcc tickets are merged; then lane gcc.
 
 ## Cost
 
 - From the script, engineer: 265 sessions, 648.1M input tokens
 - From the script, lead: 197 sessions, 62.4M input tokens
-- Started by hand, Claude: 10 sessions, 1510.4M input tokens
+- Started by hand, Claude: 10 sessions, 1513.8M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
