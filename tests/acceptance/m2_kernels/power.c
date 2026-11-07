@@ -108,8 +108,10 @@ static void *sampler(void *unused) {
 }
 void power_init(const cpu_set_t *allowed) {
   static const int os_cpus[] = {0,241,242,243};
+  /* Cygwin's CPU_ISSET takes a non-const mask; keep the caller's untouched. */
+  cpu_set_t available = *allowed;
   for (unsigned i = 0; i < sizeof(os_cpus)/sizeof(*os_cpus); ++i)
-    if (CPU_ISSET(os_cpus[i],allowed)) { sampler_cpu = os_cpus[i]; break; }
+    if (CPU_ISSET(os_cpus[i],&available)) { sampler_cpu = os_cpus[i]; break; }
   raw_dump();
   if (sampler_cpu < 0) setup_error = EINVAL;
   if (!setup_error) {
