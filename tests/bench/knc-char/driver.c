@@ -16,11 +16,13 @@ enum { GROUPS = 5, REPS = 21, WARM = 3 };
 static int density = 4, cores = 1, topology[61][4], counts[61], selected = -1;
 static unsigned long rounds = 1024;
 static int fixed_rounds;
+static const char *family;
 static cpu_set_t allowed;
 static pthread_barrier_t barrier;
 struct worker {
     int id, cpu;
     unsigned char *memory;
+    void *allocation;
     uint64_t begin, end, ticks;
 };
 static struct worker workers[240];
@@ -103,8 +105,18 @@ static uint64_t random_next(uint64_t *state) {
 }
 static void prepare(struct worker *w) {
     memset(w->memory, 0, footprint);
-    if (current->kind == 1) {
-        size_t n = footprint / 64;
+    if (!strncmp(current->name, "c5.", 3) || !strncmp(current->name, "c7.", 3)) {
+        for (size_t i = 0; i < footprint/sizeof(float); ++i)
+            ((float *)w->memory)[i] = .25f;
+    }
+    if (current->kind == 5 || current->kind == 6) {
+        uint64_t state = 7654321 + w->id;
+        for (size_t i = 0; i < footprint; ++i)
+            w->memory[i] = current->kind == 5 ? random_next(&state) & 1 : 1;
+    }
+    if (current->kind == 1 || current->kind == 3) {
+        size_t stride = current->kind == 3 ? 4096 : 64;
+        size_t n = footprint / stride;
         size_t *order = malloc(n * sizeof(*order));
         uint64_t state = 1234567 + w->id;
         if (!order) fail("pointer permutation allocation");
@@ -114,16 +126,43 @@ static void prepare(struct worker *w) {
             order[i] = order[j]; order[j] = t;
         }
         for (size_t i = 0; i < n; ++i)
-            *(void **)(w->memory + 64*order[i]) = w->memory + 64*order[(i+1) % n];
+            *(void **)(w->memory + stride*order[i]) = w->memory + stride*order[(i+1) % n];
         free(order);
+    }
+    /* A one-round native correctness gate precedes the pilot, after pinned first touch. */
+    current->fn(1, w->memory, footprint);
+    if (current->verify_length) {
+        for (int i = 0; i < 48; ++i) {
+            float expected = i >= current->verify_start &&
+                             i < current->verify_start + current->verify_length ? 1.f : 0.f;
+            if (((float *)(w->memory + 512))[i] != expected) fail("tail correctness gate");
+        }
+    }
+    if (!strncmp(current->name, "c1.", 3)) {
+        for (int i = 0; i < 512; ++i)
+            if (((float *)w->memory)[i] != 1.f) fail("store correctness gate");
+    }
+    if (!strncmp(current->name, "c7.", 3)) {
+        for (int i = 0; i < 16; ++i)
+            if (((float *)(w->memory + 2048))[i] != 8.f) fail("reduction correctness gate");
+    }
+    if (!strncmp(current->name, "c5.", 3)) {
+        int row = !strncmp(current->name + 3, "row", 3) ? current->name[6] - '0' : 16;
+        float value = !strncmp(current->name + 3, "stencil", 7) ? .75f :
+                      !strncmp(current->name + 3, "stream", 6) ? 1.25f : 1.75f;
+        for (int line = 0; line < 32; ++line)
+            for (int lane = 0; lane < 16; ++lane)
+                if (((float *)(w->memory + 7*1048576))[16*line + lane] !=
+                    (lane < row ? value : .25f)) fail("prefetch kernel correctness gate");
     }
 }
 static void *worker_main(void *arg) {
     struct worker *w = arg;
     const struct test *last = NULL;
     pin(w->cpu);
-    size_t allocation = 16*1024*1024;
-    if (posix_memalign((void **)&w->memory, 64, allocation)) fail("allocation");
+    size_t allocation = 16*1024*1024 + 4096;
+    if (posix_memalign(&w->allocation, 4096, allocation)) fail("allocation");
+    w->memory = (unsigned char *)w->allocation + (w->id % density)*1024;
     for (;;) {
         wait_all();
         if (stop) break;
@@ -136,7 +175,7 @@ static void *worker_main(void *arg) {
         w->end = now();
         wait_all();
     }
-    free(w->memory);
+    free(w->allocation);
     return NULL;
 }
 static uint64_t sample(void) {
@@ -153,6 +192,7 @@ static int compare(const void *p, const void *q) {
     return (a > b) - (a < b);
 }
 static void policy(int phase) {
+    static char recorded[7][1024];
     static const char *paths[] = {
         "/sys/devices/system/clocksource/clocksource0/current_clocksource",
         "/sys/devices/system/clocksource/clocksource0/available_clocksource",
@@ -165,14 +205,23 @@ static void policy(int phase) {
     for (size_t i = 0; i < sizeof(paths)/sizeof(paths[0]); ++i) {
         char line[1024];
         FILE *f = fopen(paths[i], "r");
-        if (!f) { printf("policy %d %s unavailable %d\n", phase, paths[i], errno); continue; }
-        if (!fgets(line, sizeof(line), f)) strcpy(line, "unreadable\n");
+        if (!f) snprintf(line, sizeof(line), "unavailable %d", errno);
+        else {
+            if (!fgets(line, sizeof(line), f)) strcpy(line, "unreadable\n");
+            fclose(f);
+        }
         line[strcspn(line, "\r\n")] = 0;
         printf("policy %d %s %s\n", phase, paths[i], line);
-        fclose(f);
+        if (!phase) strcpy(recorded[i], line);
+        /* Current frequency is telemetry; source/governor/limits are policy. */
+        else if (i != 6 && strcmp(recorded[i], line)) fail("clock policy changed during launch");
     }
 }
 static size_t budget(const char *name) {
+    for (size_t k = 0; k < NTESTS; ++k)
+        if (!strcmp(name, tests[k].name) && tests[k].core_bytes)
+            return tests[k].core_bytes / density;
+    if (!strncmp(name, "c5.", 3)) return 8*1024*1024;
     size_t size = !strncmp(name, "memory.", 7) ? 16*1024*1024 :
                   !strncmp(name, "l2.", 3) ? 256*1024 : 16*1024;
     size_t per = size / density, result = 2048;
@@ -186,24 +235,33 @@ int main(int argc, char **argv) {
         if (!strcmp(argv[i], "--dry-run")) dry = 1;
         else if (!strcmp(argv[i], "--native")) native = 1;
         else if ((!strcmp(argv[i], "--threads") || !strcmp(argv[i], "--cores") ||
-                  !strcmp(argv[i], "--rounds") || !strcmp(argv[i], "--case")) && i+1 < argc) {
+                  !strcmp(argv[i], "--rounds") || !strcmp(argv[i], "--case") ||
+                  !strcmp(argv[i], "--check")) && i+1 < argc) {
             const char *option = argv[i++], *value = argv[i];
             if (!strcmp(option, "--threads")) density = (int)number(value, 4);
             else if (!strcmp(option, "--cores")) cores = (int)number(value, 60);
             else if (!strcmp(option, "--rounds")) { rounds = number(value, 100000000); fixed_rounds = 1; }
+            else if (!strcmp(option, "--check")) {
+                if (strcmp(value, "c1") && strcmp(value, "c2") && strcmp(value, "c4") &&
+                    strcmp(value, "c5") && strcmp(value, "c6") && strcmp(value, "c7") &&
+                    strcmp(value, "c9") && strcmp(value, "c10")) fail("unknown S8 check");
+                family = value;
+            }
             else {
                 for (size_t k = 0; k < NTESTS; ++k)
                     if (!strcmp(value, tests[k].name)) selected = (int)k;
                 if (selected < 0) fail("unknown measurement name");
             }
-        } else fail("usage: --dry-run|--native [--threads 1..4] [--cores 1..60] [--case NAME] [--rounds N]");
+        } else fail("usage: --dry-run|--native [--threads 1..4] [--cores 1..60] [--check cN] [--case NAME] [--rounds N]");
     }
     if (dry == native) fail("choose exactly one execution mode");
     if (dry) {
         for (size_t k = 0; k < NTESTS; ++k)
-            if (selected < 0 || (size_t)selected == k)
-                printf("DRY %s %d cycles=unmeasured cores=%d bytes=%zu\n", tests[k].name,
-                       density, cores, budget(tests[k].name));
+            if ((selected < 0 || (size_t)selected == k) &&
+                (!family || (!strncmp(tests[k].name, family, strlen(family)) &&
+                             tests[k].name[strlen(family)] == '.')))
+                printf("DRY %s %d cycles=unmeasured cycle_unit=tsc_ticks worker=unmeasured ns_per_unit=unmeasured spread=unmeasured accepted=0 cores=%d bytes=%zu units=unmeasured instructions=%d\n", tests[k].name,
+                       density, cores, budget(tests[k].name), tests[k].instructions);
         return 0;
     }
 #ifdef CHAR_HOST
@@ -224,6 +282,8 @@ int main(int argc, char **argv) {
         uint64_t medians[GROUPS];
         uint64_t tick_groups[240][GROUPS], tick_samples[240][REPS];
         if (selected >= 0 && (size_t)selected != k) continue;
+        if (family && (strncmp(tests[k].name, family, strlen(family)) ||
+                       tests[k].name[strlen(family)] != '.')) continue;
         current = &tests[k]; footprint = budget(current->name);
         if (!fixed_rounds) {
             rounds = 1024;
@@ -231,6 +291,16 @@ int main(int argc, char **argv) {
             double target = (double)rounds * 100000000.0 / (double)(elapsed ? elapsed : 1);
             rounds = target > 100000000 ? 100000000 : target < 1 ? 1 : (unsigned long)target;
         }
+        if (density == 3 && !strncmp(current->name, "c", 1)) fail("S8 excludes density 3");
+        int sized = 0;
+        for (int attempt = 0; attempt < 8; ++attempt) {
+            uint64_t elapsed = sample();
+            if (elapsed >= 50000000 && elapsed <= 200000000) { sized = 1; break; }
+            if (fixed_rounds) break;
+            double target = rounds * 100000000.0 / (elapsed ? elapsed : 1);
+            rounds = target > 100000000 ? 100000000 : target < 1 ? 1 : (unsigned long)target;
+        }
+        if (!sized) fail("batch sizing outside 50-200 ms");
         for (int g = 0; g < GROUPS; ++g) {
             uint64_t times[REPS];
             for (int w = 0; w < WARM; ++w) (void)sample();
@@ -260,9 +330,11 @@ int main(int argc, char **argv) {
             printf("result %s %d cycles=%.6f cycle_unit=tsc_ticks worker=%d ns_per_unit=%.6f spread=%.6f accepted=%d cores=%d bytes=%zu units=%lu instructions=%d\n",
                    current->name, density, (double)tick_groups[i][GROUPS/2]/(32.0*rounds), i,
                    (double)medians[GROUPS/2]/(32.0*rounds), spread,
-                   density != 3 && spread < .02, cores, footprint, 32*rounds, current->instructions);
+                   density != 3 && medians[GROUPS/2] >= 50000000 && medians[GROUPS/2] <= 200000000,
+                   cores, footprint, 32*rounds, current->instructions);
         }
-        if (spread >= .02 || density == 3) unstable = 1;
+        printf("regime_step %s flagged=%d spread=%.6f\n", current->name, spread >= .02, spread);
+        if (density == 3 || medians[GROUPS/2] < 50000000 || medians[GROUPS/2] > 200000000) unstable = 1;
         fflush(stdout);
     }
     stop = 1; wait_all();

@@ -8,7 +8,7 @@ HERE = Path(__file__).resolve().parent
 ROOT = HERE.parents[2]
 SHARED = ROOT.parent / '_shared'
 TC = SHARED / 'toolchain'
-OUT = SHARED / 'S6-03'
+OUT = SHARED / 'S8-01'
 
 
 def run(args):
@@ -44,6 +44,7 @@ def main():
         run(['gcc', '-O2', '-std=gnu11', '-Wall', '-Wextra', '-Werror', '-DCHAR_HOST',
              '-I' + str(OUT), HERE / 'driver.c', '-pthread', '-o', OUT / 'knc-char-host.exe'])
         run([sys.executable, HERE / 'check_args.py', OUT / 'knc-char-host.exe'])
+        run([sys.executable, HERE / 'check_s8.py', OUT / 'knc-char-host.exe'])
     if action not in ('all', 'build', 'lint', 'host'):
         raise ValueError('expected all, build, lint or host')
     return 0
