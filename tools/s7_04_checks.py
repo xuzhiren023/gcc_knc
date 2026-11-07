@@ -199,6 +199,8 @@ def main():
         # inaccessible Windows ancestors even when this subtree is writable.
         # The top-level make computes libsubdir itself from libdir.
         directories = (prefix / 'lib', prefix / 'lib64',
+                       prefix / 'k1om-mpss-linux/lib',
+                       prefix / 'k1om-mpss-linux/lib64',
                        prefix / 'lib/gcc/k1om-mpss-linux/16.2.0',
                        prefix / 'lib/gcc/k1om-mpss-linux/16.2.0/include')
         for directory in directories:
@@ -217,10 +219,17 @@ def main():
                    'shlib_slibdir=' + str(prefix / 'lib64'), 'DESTDIR=']
         code, output = run(command)
         (OUT / 'install.log').write_text(shlex.join(map(str, command)) + '\n' + output)
-        installed = prefix / 'lib64/libgcc_s.so.1'
+        installed = prefix / 'k1om-mpss-linux/lib64/libgcc_s.so.1'
         errors = []
         if code or not installed.is_file():
             errors.append('private libgcc install failed')
+        for name in ('libgcc_s.so', 'libgcc_s_asneeded.so'):
+            if not (installed.parent / name).is_file():
+                errors.append('missing installed ' + name)
+        for path in prefix.rglob('*'):
+            errors.extend(prefix_errors(path))
+            if not path.resolve().is_relative_to(prefix):
+                errors.append('installed path escapes private prefix: ' + str(path))
         print(('FAIL ' if errors else 'PASS ') + 'private install: ' +
               ('; '.join(errors) if errors else str(installed)), flush=True)
         failed += bool(errors)
