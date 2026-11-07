@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-07 08:29.
+Updated automatically at every ticket change. Last update: 2026-11-07 08:30.
 
 **Next: the tech lead, on S6-08.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
@@ -131,7 +131,7 @@ Current tickets: `[##################--]` 111 of 121
 | S6-11 | ICE in expand_fn_using_insn for FP64 fmax/fmin loops (S5-15 follow-up) | Done | Scalar and SLP-reduction fmin/fmax on float and double now compile on KNC through vgmin/vgmax with the C Na... |
 | S6-12 | card_run --benchmark refuses while another project's processes still run on the card, whatever the ledger says | Done | card_run benchmark jobs now refuse to start while another project's programs (such as wrf.mic) are still ru... |
 | S6-13 | M2 driver records card power per build: watts and joules per element next to the timings | Done | Each M2 timing launch now records the card's power for each build: all three draw about 165-172 W, so GCC-K... |
-| S6-14 | ICE in cprop_hardreg - (set (reg:QI k1) (const_int 0)) for a loop-store-motion flag has no *knc_movqi alternative | Question for the tech lead | Lead, under the owner's delegation for engineering decisions: S6-14 is a test-only regression guard (the IC... |
+| S6-14 | ICE in cprop_hardreg - (set (reg:QI k1) (const_int 0)) for a loop-store-motion flag has no *knc_movqi alternative | In progress | Type is now test; the lead submits for you. |
 | S6-15 | M2 fixture for ADR-0010 amendment 2 - paired before/after GCC builds in one process, per-round random order, and a decision script | Done | The M2 fixture can now time a before and an after GCC build of the same kernels in one process, interleaved... |
 | S7-01 | Shared libgcc for KNC: symbol-version ceiling for the card's glibc 2.21 and kernel 2.6.38, and what GCC 16 adds over the donor's libgcc_s (E6-01 input) | Done | The shared libgcc plan for KNC is ready: GCC 16's libgcc_s.so.1 can be a drop-in superset of the donor's on... |
 | S7-02 | libgfortran slice for KNC: descriptor ABI vs the card's GCC 5 runtime, real(16) and libquadmath, and MXCSR-safe FP control (E6-02 input) | Done | The libgfortran plan for KNC is ready: a small MXCSR-safe FP backend, kinds 4/8/10 with kind 16 deferred, a... |
@@ -146,6 +146,7 @@ Current tickets: `[##################--]` 111 of 121
 
 ## Recent activity
 
+- 2026-11-07 08:30 **S6-14** lead answer: Type is now test; the lead submits for you.
 - 2026-11-07 08:29 **S6-14** owner decide: Lead, under the owner's delegation for engineering decisions: S6-14 is a test-only regression guard (the ICE came only from unmerged S6-05 work in ...
 - 2026-11-07 08:29 **S6-14** lead escalate: Needs the interactive lead, not a decision: S6-14 became a test-only regression guard (lead waived red-first because the ICE came only from unmerge...
 - 2026-11-07 08:28 **S6-14** engineer ask: 7148fa9: guard+kxor scan, original kept, no GCC edits. T0/T1/T2 PASS. Logs .work/_state/logs/S6_14_{tiers,card_build}-20261107-081803.log. Built/li...
@@ -153,13 +154,12 @@ Current tickets: `[##################--]` 111 of 121
 - 2026-11-07 08:14 **S6-14** engineer ask: Cannot meet red-first after two fresh-build attempts: pre-S6-05 a81ac500361 and current 57bec527e00 both compile/lint original timing-ice.c at -O2 ...
 - 2026-11-07 07:12 **S6-08** owner decide: Lead, under the owner's delegation for engineering decisions: the escalation only awaits the interactive lead's runs. Card runs pass (recorded abov...
 - 2026-11-07 06:56 **S6-08** lead escalate: S6-08 engineer part is in (drill all textual, both sweeps 0 ICE, lines/hunks reported) but the lead's x86 check (portability-claude) and card runs ...
-- 2026-11-07 06:55 **S6-08** engineer submit: knc 57bec527e002; report ca2a4bc. Drill: master 7 files/10 textual hunks, gcc-16 0; shared i386 644 lines/122 hunks; KNC-only 3981 lines/5 hunks. B...
 
 ## Cost
 
 - From the script, engineer: 268 sessions, 657.5M input tokens
 - From the script, lead: 200 sessions, 62.9M input tokens
-- Started by hand, Claude: 10 sessions, 1573.0M input tokens
+- Started by hand, Claude: 10 sessions, 1573.7M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
