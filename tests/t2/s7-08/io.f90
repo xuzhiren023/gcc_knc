@@ -16,7 +16,7 @@ program io
   read (buf, *) s, m
   call check(s == 1.5e0 .and. m == 2, 'list-directed internal round trip')
   write (buf, '(ES12.4E2)') -1.0d0 / 3.0d0
-  call check(buf(1:12) == '-3.3333E-01 ', 'ES edit descriptor: ' // buf(1:12))
+  call check(buf(1:12) == ' -3.3333E-01', 'ES edit descriptor: ' // buf(1:12))
   write (buf, '(2(I3,","))') 7, -8
   call check(buf(1:8) == '  7, -8,', 'repeated group format')
 
@@ -43,7 +43,7 @@ program io
   read (buf, '(I3)', iostat=ios) n
   call check(ios > 0, 'IOSTAT bad integer field from internal unit')
   write (short, '(I5)', iostat=ios) 12345
-  call check(ios > 0, 'IOSTAT internal record overflow')
+  call check(ios /= 0 .and. is_iostat_eor(ios), 'IOSTAT internal record overflow is end-of-record')
   read (buf, '(F4.1)', iostat=ios) x
   call check(ios > 0, 'IOSTAT bad real field')
   open (newunit=u, file='/nonexistent-s7-08/x.dat', status='old', action='read', iostat=ios)
