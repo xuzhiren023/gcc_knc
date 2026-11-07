@@ -125,7 +125,7 @@ Current tickets: `[##################--]` 111 of 121
 | S6-05 | -mtune=knc costs and vectorizer cost model v1 from the characterization tables (E5-09, E5-02) | Done | GCC-KNC now has a KNC cost table from the card measurements: scattered-index gathers stay scalar, reduction... |
 | S6-06 | KNC scheduler v0 (E5-05): U/V pipes, 4-cycle vector latency, 3-cycle AGI | Done | GCC-KNC now schedules for KNC's two pipes with the measured latencies and threads per core: stencil1 runs 4... |
 | S6-07 | First gcc.dg/vect baseline for KNC: compile scans on the host, execution on the card | Done | The gcc.dg/vect suite now has a KNC baseline: of 2,001 tests, 1,329 compile (777 linked for the card), 632 ... |
-| S6-08 | Sprint 6 mid batch check after S6-04 and S6-05 | Not started |  |
+| S6-08 | Sprint 6 mid batch check after S6-04 and S6-05 | In progress |  |
 | S6-09 | ICE in expand_vec_series_expr: KNC lane-index vectors (VEC_SERIES) for V16SI/V8DI and the FP modes | Done | Loops that build lane-index vectors (VEC_SERIES) now compile on KNC instead of crashing the compiler: 6 of ... |
 | S6-10 | Unrecognizable and unconstrained insns: ffsll's scalar conditional move, and constant -1 into a k register | Done | Constant 0 and -1 loads into mask registers (kxor/kxnor) and 64-bit ffs without CMOV now compile on KNC, fi... |
 | S6-11 | ICE in expand_fn_using_insn for FP64 fmax/fmin loops (S5-15 follow-up) | Done | Scalar and SLP-reduction fmin/fmax on float and double now compile on KNC through vgmin/vgmax with the C Na... |
@@ -159,7 +159,7 @@ Current tickets: `[##################--]` 111 of 121
 
 - From the script, engineer: 265 sessions, 648.1M input tokens
 - From the script, lead: 197 sessions, 62.4M input tokens
-- Started by hand, Claude: 10 sessions, 1534.9M input tokens
+- Started by hand, Claude: 10 sessions, 1536.8M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
