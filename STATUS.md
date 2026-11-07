@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-07 13:32.
+Updated automatically at every ticket change. Last update: 2026-11-07 13:35.
 
-**Next: GPT-6.1, on S7-04 (Shared libgcc part 2: shared build and driver integration (E6-01b)).** Run `python tools/dispatch.py`, or ask the tech lead to.
+**Next: the tech lead, on S7-04.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[##################--]` 114 of 121
 
@@ -136,7 +136,7 @@ Current tickets: `[##################--]` 114 of 121
 | S7-01 | Shared libgcc for KNC: symbol-version ceiling for the card's glibc 2.21 and kernel 2.6.38, and what GCC 16 adds over the donor's libgcc_s (E6-01 input) | Done | The shared libgcc plan for KNC is ready: GCC 16's libgcc_s.so.1 can be a drop-in superset of the donor's on... |
 | S7-02 | libgfortran slice for KNC: descriptor ABI vs the card's GCC 5 runtime, real(16) and libquadmath, and MXCSR-safe FP control (E6-02 input) | Done | The libgfortran plan for KNC is ready: a small MXCSR-safe FP backend, kinds 4/8/10 with kind 16 deferred, a... |
 | S7-03 | Shared libgcc part 1: donor ABI compatibility objects and symbol map (E6-01a) | Done | GCC-KNC's libgcc now exports everything the card's donor libgcc_s.so.1 does (all 153 symbol and version pai... |
-| S7-04 | Shared libgcc part 2: shared build and driver integration (E6-01b) | In progress | No exception: AGENTS.md's no-hashing rule stands, so use a non-hash check. Drop the donor hash. For item 3,... |
+| S7-04 | Shared libgcc part 2: shared build and driver integration (E6-01b) | Tests waiting for review | Red commit 5155321. Expanded s7_04_checks.py run once through tools/run.py: 6/8 fail as expected (DSO not b... |
 | S7-05 | Shared libgcc part 3: compatibility and unwind card payloads (E6-01c) | Not started | Sprint 7 draft; parked in lane lead until the owner starts Sprint 7 and Sprint 6's gcc tickets are merged; ... |
 | S7-06 | Shared libgcc part 4: lead native acceptance and the install decision (E6-01d) | Not started |  |
 | S7-07 | libgfortran part 1: KNC floating-point backend and capability contract (E6-02) | Not started | Sprint 7 draft; parked in lane lead until the owner starts Sprint 7 and Sprint 6's gcc tickets are merged; ... |
@@ -146,6 +146,7 @@ Current tickets: `[##################--]` 114 of 121
 
 ## Recent activity
 
+- 2026-11-07 13:35 **S7-04** engineer red: Red commit 5155321. Expanded s7_04_checks.py run once through tools/run.py: 6/8 fail as expected (DSO not built, five driver failures); static cont...
 - 2026-11-07 13:32 **S7-04** lead answer: No exception: AGENTS.md's no-hashing rule stands, so use a non-hash check. Drop the donor hash. For item 3, tools/s7_04_checks.py must instead (a) ...
 - 2026-11-07 13:31 **S7-04** engineer ask: The 13:30 lead note requires recording the sysroot donor libgcc_s.so.1 hash and failing if it changes, but AGENTS.md explicitly prohibits hashing, ...
 - 2026-11-07 13:30 **S7-04** lead changes: Driver probes are good: shared exe/DSO and the -shared-libgcc -static-libgcc override fail on the KNC guard, defaults fail on static unwinding (mat...
@@ -153,13 +154,12 @@ Current tickets: `[##################--]` 114 of 121
 - 2026-11-07 13:26 **S7-03** lead approve: GCC-KNC's libgcc now exports everything the card's donor libgcc_s.so.1 does (all 153 symbol and version pairs, the six TF aliases and the 16-byte C...
 - 2026-11-07 13:19 **S7-03** owner decide: Lead, under the owner's delegation for engineering decisions: S7-03 changes only libgcc (config.host inside the k1om case and three new KNC libgcc ...
 - 2026-11-07 13:18 **S7-03** lead escalate: Review done, no blocking findings: the fixture checks all 153 donor pairs, the six TF aliases and the 16-byte __cpu_model, and rejects mutations; t...
-- 2026-11-07 13:16 **S7-03** engineer submit: GCC aedc86dd388/959fd99cefd; harness 91092a2. Candidate .work/_shared/S7-03/libgcc_s.so.1: all 153 donor pairs/defaults, six aliases, CPU size 16; ...
 
 ## Cost
 
 - From the script, engineer: 272 sessions, 662.8M input tokens
 - From the script, lead: 204 sessions, 64.0M input tokens
-- Started by hand, Claude: 10 sessions, 1604.0M input tokens
+- Started by hand, Claude: 10 sessions, 1606.1M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
