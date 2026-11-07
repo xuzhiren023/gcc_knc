@@ -8,8 +8,11 @@ The source of measured values is
 `docs/research/knc-characterization.md` (S6-03, 2026-11-06), especially
 points 1–8 and the named `.rt` rows. Each initializer in `i386-knc.cc`
 identifies its source or labels an estimate and its reason. Costs use core
-throughput: one cycle per vector operation, half a cycle per scalar integer
-or mask operation. GCC instruction costs use `COSTS_N_INSNS`; register and
+throughput: one cycle per vector operation and half a cycle per independent
+mask operation. Scalar integer additions use the measured dependent latency
+of one core cycle at four threads: the independent half-cycle throughput
+underprices induction-variable recurrences. GCC instruction costs use
+`COSTS_N_INSNS`; register and
 memory move costs use twice the cycle count.
 
 `--param=knc-threads-per-core=N` accepts 1–4 and defaults to 4. The measured
@@ -261,3 +264,92 @@ The final compiler's previously built and linted card binaries remain at
 execute them on the card. Per the lead's 17:24 instruction, native M2 and
 s5_ops correctness and before/after M2 benchmark windows remain with the
 lead; torture changes and x86 validation remain with the next batch check.
+
+## Stencil regression correction, 2026-11-06 evening
+
+The owner's reopened task follows the lead's paired card measurements:
+stencil1 is 4.8--6.4% slower and stencil2 is 2.9% slower than M2-final;
+mat8 measures about 20% faster. The lead also recorded passing M2 and
+s5_ops correctness for GCC `7fdd15cf40a`. Those results precede this fix.
+
+GCC `97f4b6c04b7` changes only the scalar add entry of the KNC processor
+cost table, from `COSTS_N_INSNS (1) / 2` to `COSTS_N_INSNS (1)`.
+The old entry used independent throughput (`scalar_add.rt`, 0.55 core
+cycles). Induction-variable updates form dependent chains; the measured
+`scalar_add.lat` is 4.19 cycles per thread at four threads, or 1.05 per
+core. One is the rounded cost for these updates. This correction applies
+to scalar adds generally and does not recognize benchmark names, source
+shapes, or trip counts. No vector cost, lowering, test option, or scan
+changes in this follow-up.
+
+`tools/s6_05_stencils.py` compiles the unchanged M2 fixture with its build
+options and saves assembly, `-fdump-tree-vect-details`, and
+`-fdump-tree-ivopts-details` under `.work/_shared/S6-05/`. The saved sets are
+`stencils-before.*` (GCC `7fdd15cf40a`, KNC tuning), `stencils-knc.*`
+(corrected KNC tuning), and `stencils-generic.*` (diagnostic control).
+The generic control retains current KNC statement hooks, so it is **not**
+a historical compiler dump. Its two stencil functions nevertheless
+reproduce M2-final's saved assembly after ignoring local label numbers.
+The before/after KNC dumps directly isolate the add-cost correction.
+
+The vectorizer decisions did not cause these regressions. Before and after
+the fix, each stencil vectorizes one loop with VF 16, no alignment peeling,
+and runtime/static profitability thresholds of 16. Stencil1's vector-body,
+scalar-iteration, and vector-epilogue costs remain 32, 24, and 208;
+stencil2's remain 48, 40, and 336. The changes occur later in IV selection:
+
+| Function | Previous S6-05 decision | Corrected decision and assembly |
+| --- | --- | --- |
+| stencil1 | Vector-loop IV set costs 19; two pointers advance by 64, requiring two adds per iteration. | IV set costs 22; one byte-offset IV advances by 64 and serves both bases. The complete function matches M2-final after label normalization. |
+| stencil2 | Outer-loop IV set costs 31; compare elimination replaces `iv + 64 < n` with equality against a derived bound. This introduces a bound stack slot, an extra row guard, and extra branching. | IV set costs 49; restores the original unsigned comparison against `n`. The vector loop and outer-loop control match M2-final, with no bound spill. |
+| mat8 | Scalar loops; no loop vectorization. | Instructions and alignment directives match the preceding S6-05 function after label normalization. |
+
+Stencil2 retains one extra LEA in scalar-remainder setup compared with
+M2-final: it forms the preceding element's index separately. It is outside
+the vector loop and the full-row path used by the L2 benchmark; the fixed
+vector and outer loops have the original instruction sequences. This is
+the only remaining function-local assembly difference from M2-final after
+normalizing labels.
+
+There is an important limit to the mat8 preservation claim: the **original**
+S6-05 mat8 function also matches M2-final's instructions and alignment
+directives after label normalization. Thus the observed 20% gain cannot
+be attributed to a changed mat8 instruction sequence. Placement remains
+a possible explanation, not a demonstrated cause. This fix preserves its
+instructions but changes preceding code sizes; only the lead's paired
+rerun can establish whether the measured gain survives. No function-specific
+padding or alignment tuning was added.
+
+This follow-up changes shared GCC files by **0 lines / 0 hunks**;
+`i386-knc.cc` changes +3/-1 in one hunk. Total shared GCC changes for the
+ticket remain +49/-3 in nine hunks against `b12c3242595`;
+the KNC-only source total is now +159/-1 in two hunks. The project adds
+the diagnostic helper and updates this report; existing scans and the
+shared scanner are unchanged.
+
+The incremental compiler build passed. M2 and all four s5_ops variants
+were rebuilt and linted at the standard handoff paths:
+`.work/_shared/S6-05/m2-kernels.mic` and
+`.work/_shared/S6-05/s5_ops/{o2v,o3,fast,neg}.mic`.
+They have not been run natively with this correction. Correctness and
+paired performance reruns remain with the lead; torture/x86 remain with
+the batch check.
+
+Logs under `.work/_state/logs/`:
+
+- `S6_05_stencil_diagnose-20261106-222639.log`
+- `S6_05_stencil_build-20261106-222730.log`
+- `S6_05_stencil_fixed-20261106-222920.log`
+- `S6_05_stencil_m2-20261106-222949.log`
+- `S6_05_stencil_s5_ops-20261106-222949.log`
+
+Full T0/T1/T2 ran once after the compiler correction and passed, exit 0,
+560.99 seconds, with no test or scan edits:
+
+```
+python tools/run.py --name S6_05_stencil_t0_t1_t2 -- python tools/check.py t0 t1 t2 --compiler gcc16 --worker
+```
+
+Log: `.work/_state/logs/S6_05_stencil_t0_t1_t2-20261106-222949.log`.
+The accepted gather rejection and both reduction-density checks retain
+their passing verdicts. No additional T1 verdict changes were observed.
