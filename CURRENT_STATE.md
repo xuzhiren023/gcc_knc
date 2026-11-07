@@ -106,6 +106,12 @@ M1 is accepted and tagged `m1` locally; nothing is pushed. Engineers are Claude 
 
 ## Open items not on a ticket
 
+- M2 (2026-11-07): the pre-tuning baseline passes ADR-0010 amendment 2 at 60 cores (L2 gain fraction
+  0.737-0.817, 95% lower bound 0.752; worst GCC/x87 0.625). S6-05 (merged) leaves the M2 kernels'
+  code unchanged except a 5-line stencil2 difference with no measured effect, so the final M2 run
+  waits for S6-06. Power (S6-13): every build draws 164-172 W; GCC-KNC uses 8.7x less energy per
+  element than x87.
+
 - Asked the WRF tuning session (owner-approved, 2026-11-06) for its KNC hot-loop, math-function,
   FP, threading, I/O and Fortran-feature findings, to
   `C:\Users\xuzhi\Documents\card-coordination\wrf-hot-loops-for-gcc-knc.md`. Input for new M2+
