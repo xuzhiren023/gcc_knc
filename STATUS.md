@@ -1,10 +1,10 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-07 08:30.
+Updated automatically at every ticket change. Last update: 2026-11-07 08:31.
 
-**Next: the tech lead, on S6-08.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: the tech lead, on S6-14.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
-Current tickets: `[##################--]` 111 of 121
+Current tickets: `[##################--]` 112 of 121
 
 ## Milestones
 
@@ -12,7 +12,7 @@ Current tickets: `[##################--]` 111 of 121
 |---|---|---|---|
 | M0 | Foundation | In progress | 17 of 17 tickets |
 | M1 | Mixed native code | Done | 43 of 43 tickets |
-| M2 | Useful vector target | In progress | 49 of 51 tickets |
+| M2 | Useful vector target | In progress | 50 of 51 tickets |
 | M3 | Runtimes | In progress | 2 of 10 tickets |
 | M4 | Broad optimization | Not started | Not planned in detail yet |
 | M5 | Program corpus | Not started | Not planned in detail yet |
@@ -125,7 +125,7 @@ Current tickets: `[##################--]` 111 of 121
 | S6-05 | -mtune=knc costs and vectorizer cost model v1 from the characterization tables (E5-09, E5-02) | Done | GCC-KNC now has a KNC cost table from the card measurements: scattered-index gathers stay scalar, reduction... |
 | S6-06 | KNC scheduler v0 (E5-05): U/V pipes, 4-cycle vector latency, 3-cycle AGI | Done | GCC-KNC now schedules for KNC's two pipes with the measured latencies and threads per core: stencil1 runs 4... |
 | S6-07 | First gcc.dg/vect baseline for KNC: compile scans on the host, execution on the card | Done | The gcc.dg/vect suite now has a KNC baseline: of 2,001 tests, 1,329 compile (777 linked for the card), 632 ... |
-| S6-08 | Sprint 6 mid batch check after S6-04 and S6-05 | Waiting for review | all checks recorded; approval waits until S6-14 frees the GCC checkout (approve needs it on knc). |
+| S6-08 | Sprint 6 mid batch check after S6-04 and S6-05 | Done | At the Sprint 6 head (after the cost model and scheduler) every forward-port conflict is textual, both ICE ... |
 | S6-09 | ICE in expand_vec_series_expr: KNC lane-index vectors (VEC_SERIES) for V16SI/V8DI and the FP modes | Done | Loops that build lane-index vectors (VEC_SERIES) now compile on KNC instead of crashing the compiler: 6 of ... |
 | S6-10 | Unrecognizable and unconstrained insns: ffsll's scalar conditional move, and constant -1 into a k register | Done | Constant 0 and -1 loads into mask registers (kxor/kxnor) and 64-bit ffs without CMOV now compile on KNC, fi... |
 | S6-11 | ICE in expand_fn_using_insn for FP64 fmax/fmin loops (S5-15 follow-up) | Done | Scalar and SLP-reduction fmin/fmax on float and double now compile on KNC through vgmin/vgmax with the C Na... |
@@ -146,6 +146,7 @@ Current tickets: `[##################--]` 111 of 121
 
 ## Recent activity
 
+- 2026-11-07 08:31 **S6-08** lead approve: At the Sprint 6 head (after the cost model and scheduler) every forward-port conflict is textual, both ICE sweeps show 0 ICE, x86 output is identic...
 - 2026-11-07 08:30 **S6-14** engineer submit: Submitted by the lead for the engineer. 7148fa9: regression guard (reduced test, no ICE plus kxor scan at -O2 -march=knc; original timing-ice.c kep...
 - 2026-11-07 08:30 **S6-14** lead answer: Type is now test; the lead submits for you.
 - 2026-11-07 08:29 **S6-14** owner decide: Lead, under the owner's delegation for engineering decisions: S6-14 is a test-only regression guard (the ICE came only from unmerged S6-05 work in ...
@@ -153,13 +154,12 @@ Current tickets: `[##################--]` 111 of 121
 - 2026-11-07 08:28 **S6-14** engineer ask: 7148fa9: guard+kxor scan, original kept, no GCC edits. T0/T1/T2 PASS. Logs .work/_state/logs/S6_14_{tiers,card_build}-20261107-081803.log. Built/li...
 - 2026-11-07 08:16 **S6-14** lead answer: Don't look for another revision. The ICE came from an uncommitted S6-05 work-in-progress build that was never merged. Your logs show that a81ac5003...
 - 2026-11-07 08:14 **S6-14** engineer ask: Cannot meet red-first after two fresh-build attempts: pre-S6-05 a81ac500361 and current 57bec527e00 both compile/lint original timing-ice.c at -O2 ...
-- 2026-11-07 07:12 **S6-08** owner decide: Lead, under the owner's delegation for engineering decisions: the escalation only awaits the interactive lead's runs. Card runs pass (recorded abov...
 
 ## Cost
 
 - From the script, engineer: 268 sessions, 657.5M input tokens
 - From the script, lead: 200 sessions, 62.9M input tokens
-- Started by hand, Claude: 10 sessions, 1573.7M input tokens
+- Started by hand, Claude: 10 sessions, 1577.9M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
