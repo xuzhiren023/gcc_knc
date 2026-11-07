@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-07 16:59.
+Updated automatically at every ticket change. Last update: 2026-11-07 17:01.
 
-**Waiting for you:** S7-07. Run `python tools/pm.py inbox`.
+**Waiting for you:** S7-07, S8-01. Run `python tools/pm.py inbox`.
 
 Current tickets: `[###################-]` 117 of 122
 
@@ -143,10 +143,11 @@ Current tickets: `[###################-]` 117 of 122
 | S7-08 | libgfortran part 2: base runtime build and the descriptor and I/O slice (E6-02) | Not started | Sprint 7 draft; parked in lane lead until the owner starts Sprint 7 and Sprint 6's gcc tickets are merged; ... |
 | S7-09 | libgfortran part 3: runtime isolation and packaging (E6-02) | Not started | owner chose a private directory for GCC-KNC's runtime on the card (S7-06); libgfortran's shared variant goe... |
 | S7-10 | Sprint 7 batch check after S7-05 and S7-08 | Not started | Sprint 7 draft; parked in lane lead until the owner starts Sprint 7 and Sprint 6's gcc tickets are merged; ... |
-| S8-01 | Card checks C1-C10 for the Sprint 8 tuning block - microbenchmarks in the knc-char corpus | Waiting for review | Acceptance passed: red host check committed as 0ed8d09; implementation committed as 3f5ccb2; build, lint an... |
+| S8-01 | Card checks C1-C10 for the Sprint 8 tuning block - microbenchmarks in the knc-char corpus | **Waiting for you** | Code review passes (C1-C10 kernels, gates, red 0ed8d09 then green 3f5ccb2), but acceptance line 3 needs the... |
 
 ## Recent activity
 
+- 2026-11-07 17:01 **S8-01** lead escalate: Code review passes (C1-C10 kernels, gates, red 0ed8d09 then green 3f5ccb2), but acceptance line 3 needs the lead's card runs recorded in docs/resea...
 - 2026-11-07 16:59 **S8-01** engineer submit: Acceptance passed: red host check committed as 0ed8d09; implementation committed as 3f5ccb2; build, lint and host check PASS in ../_state/logs/S8_0...
 - 2026-11-07 16:58 **S8-01** lead answer: Yes. The benchmark corpus under tests/bench/knc-char is this ticket's deliverable, so a 0 code-line count is expected and 349 lines is in proportio...
 - 2026-11-07 16:58 **S8-01** engineer ask: Acceptance passes; submit is blocked by the size hook: 349 test lines for 0 code lines. The four requested new files are check_s8.py plus three ben...
@@ -154,7 +155,6 @@ Current tickets: `[###################-]` 117 of 122
 - 2026-11-07 16:42 **S7-07** engineer ask: Green is blocked by the 16:40 lead prerequisite: no native flag-map or halting result is recorded in this ticket. Reduced reproducer is the already...
 - 2026-11-07 16:40 **S7-07** lead approve-red: Red accepted: host tests of the libgfortran KNC floating-point state logic fail for the right reason (k1om falls back to the x87-only backend that ...
 - 2026-11-07 16:36 **S7-07** engineer red: 82fd434: host-built state tests RED: 27 expected failures, plus missing k1om backend selection. Real runtime C/x87, modeled MXCSR; includes nested ...
-- 2026-11-07 16:25 **S7-06** lead approve: GCC-KNC's shared libgcc_s passes every compatibility and unwind test on the card (old and new clients, exceptions across libraries, cancellation, b...
 
 ## Cost
 
