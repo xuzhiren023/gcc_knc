@@ -187,3 +187,10 @@ Binary `.work/_shared/M2-diag` (interleaved builds, amendment-2 flags; kernels f
   above the median worker, mostly workers 120-121, that is core 30, in A1; worker 33 in B1), and
   about 26 involuntary context switches and 11 ms of system time per batch summed over 240 workers.
   OS activity versus a per-core hardware effect is still open; it no longer affects M2 decisions.
+
+## S6-05 card correctness (01:14-01:16Z on 11-07, `claude-s6-05-card.sh`)
+
+`.work/_shared/S6-05` at GCC 7fdd15cf40a: M2 kernels `--correctness` exit 0; `s5_ops` o2v and o3
+779,984 checks, 0 failures; `fast` 602,384 checks (div/sqrt and FP32/FP64 conversions skipped by
+design), 0 failures; `neg` fails exactly the expected sets (div_f32, sqrt_f32, div_f64, sqrt_f64,
+div_f64_special, sqrt_f64_special).
