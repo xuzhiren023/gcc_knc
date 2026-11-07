@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-06 22:41.
+Updated automatically at every ticket change. Last update: 2026-11-06 23:40.
 
-**Waiting for you:** S6-05, S6-13. Run `python tools/pm.py inbox`.
+**Waiting for you:** S6-05. Run `python tools/pm.py inbox`.
 
 Current tickets: `[###################-]` 108 of 113
 
@@ -130,7 +130,7 @@ Current tickets: `[###################-]` 108 of 113
 | S6-10 | Unrecognizable and unconstrained insns: ffsll's scalar conditional move, and constant -1 into a k register | Done | Constant 0 and -1 loads into mask registers (kxor/kxnor) and 64-bit ffs without CMOV now compile on KNC, fi... |
 | S6-11 | ICE in expand_fn_using_insn for FP64 fmax/fmin loops (S5-15 follow-up) | Done | Scalar and SLP-reduction fmin/fmax on float and double now compile on KNC through vgmin/vgmax with the C Na... |
 | S6-12 | card_run --benchmark refuses while another project's processes still run on the card, whatever the ledger says | Done | card_run benchmark jobs now refuse to start while another project's programs (such as wrf.mic) are still ru... |
-| S6-13 | M2 driver records card power per build: watts and joules per element next to the timings | **Waiting for you** | S6-13 cannot be approved yet: two lead card results are missing from the ticket. (1) A card rerun of correc... |
+| S6-13 | M2 driver records card power per build: watts and joules per element next to the timings | Waiting for review | Lead, under the owner's delegation for engineering decisions: card check done 04:38-04:40Z (docs/research/c... |
 | S6-14 | ICE in cprop_hardreg - (set (reg:QI k1) (const_int 0)) for a loop-store-motion flag has no *knc_movqi alternative | Not started |  |
 | S6-15 | M2 fixture for ADR-0010 amendment 2 - paired before/after GCC builds in one process, per-round random order, and a decision script | Done | The M2 fixture can now time a before and an after GCC build of the same kernels in one process, interleaved... |
 | S7-01 | Shared libgcc for KNC: symbol-version ceiling for the card's glibc 2.21 and kernel 2.6.38, and what GCC 16 adds over the donor's libgcc_s (E6-01 input) | Done | The shared libgcc plan for KNC is ready: GCC 16's libgcc_s.so.1 can be a drop-in superset of the donor's on... |
@@ -138,20 +138,20 @@ Current tickets: `[###################-]` 108 of 113
 
 ## Recent activity
 
+- 2026-11-07  **S6-13** lead note: a third follow-up for this ticket: `decide.py` line 77 treats any
 - 2026-11-07  **S6-13** lead note: two small fixture follow-ups ride with this ticket, since it changes the same
+- 2026-11-06 23:40 **S6-13** owner decide: Lead, under the owner's delegation for engineering decisions: card check done 04:38-04:40Z (docs/research/card-runs-s6.md). Correctness and the neg...
 - 2026-11-06 22:41 **S6-05** lead escalate: Round-2 review, no findings: GCC 97f4b6c only raises KNC scalar add cost to 1 (scalar_add.lat), restoring M2-final stencil1/2 IV choice; T0/T1/T2 p...
 - 2026-11-06 22:39 **S6-05** engineer submit: GCC 97f4b6c04b7 fixes scalar-add latency cost: restores stencil1 and stencil2 hot loops/control. Report b6e7561 docs/research/knc-costs.md includes...
 - 2026-11-06 22:24 **S6-05** lead changes: Fix the stencil1 (+5-6%) and stencil2 (+3%) regressions before merge, keeping mat8's 20% gain; see the owner's 2026-11-07 decision note above for t...
 - 2026-11-06 22:23 **S6-05** owner decide: Owner, 2026-11-07: +2 engineer sessions (budget 8 sessions, 23M input tokens) to fix the stencil regressions before merge. Lead's card evidence (AD...
 - 2026-11-06 20:59 **S6-13** lead escalate: S6-13 cannot be approved yet: two lead card results are missing from the ticket. (1) A card rerun of correctness and the negative control from .wor...
-- 2026-11-06 20:58 **S6-13** engineer submit: Host parser/joules test, 7 decide cases, and suite build/lint passed. Logs: .work/_state/logs/S6_13_power_host-20261106-205600.log and .work/_state...
-- 2026-11-06 20:57 **S6-13** lead answer: Approved as is; no consolidation needed. Everything in this ticket is acceptance fixture under tests/acceptance/m2_kernels/, which is what it asked...
 
 ## Cost
 
 - From the script, engineer: 263 sessions, 633.2M input tokens
 - From the script, lead: 195 sessions, 62.1M input tokens
-- Started by hand, Claude: 10 sessions, 1482.2M input tokens
+- Started by hand, Claude: 10 sessions, 1491.4M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
