@@ -3,8 +3,8 @@
 
 Keep the static-only control as well as explicit static override: upstream
 gcc.cc:init_gcc_specs gives static-libgcc priority over shared-libgcc. The
-KNC REAL_LIBGCC_SPEC guard currently rejects that supported combination.
-No runtime is installed, and a donor DSO cannot satisfy these probes.
+KNC REAL_LIBGCC_SPEC guard used to reject that supported combination.
+Install only to a private validation prefix; a donor DSO cannot satisfy the probes.
 The build-tree DSO must satisfy the donor ABI and import contract too.
 """
 import argparse
@@ -162,7 +162,7 @@ def run(command):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--install-prefix', type=Path, default=OUT / 'install',
-                        help='private validation destination; this red gate does not install')
+                        help='private validation destination for the built runtime')
     args = parser.parse_args()
     before = DONOR.stat()
     donor_stamp = (before.st_size, before.st_mtime_ns)
@@ -173,7 +173,8 @@ def main():
     if errors:
         print('FAIL preflight: ' + '; '.join(errors), flush=True)
         return 1
-    print('PASS private install prefix: ' + str(args.install_prefix.resolve()) + '; no install performed', flush=True)
+    prefix = args.install_prefix.resolve()
+    print('PASS private install prefix: ' + str(prefix), flush=True)
     OUT.mkdir(exist_ok=True)
     os.environ['TMPDIR'] = str(SHARED / 'tmp')
     cc = [BUILD / 'gcc/xgcc', '-B' + str(BUILD / 'gcc') + '/',
@@ -188,6 +189,27 @@ def main():
         ('static-override', ['-shared-libgcc', '-static-libgcc'], False, False),
     )
     failed = audit_dso(expected)
+    # Top-level install-target-libgcc has no build dependency.  Override every
+    # installation directory that can otherwise retain the configured prefix.
+    # The donor snapshot above spans both this install and all link probes.
+    if not failed:
+        command = ['make', '-C', BUILD, 'install-target-libgcc',
+                   'prefix=' + str(prefix), 'exec_prefix=' + str(prefix),
+                   'libdir=' + str(prefix / 'lib'),
+                   'slibdir=' + str(prefix / 'lib64'),
+                   'shlib_slibdir=' + str(prefix / 'lib64'), 'DESTDIR=']
+        code, output = run(command)
+        (OUT / 'install.log').write_text(shlex.join(map(str, command)) + '\n' + output)
+        installed = prefix / 'lib64/libgcc_s.so.1'
+        errors = []
+        if code or not installed.is_file():
+            errors.append('private libgcc install failed')
+        print(('FAIL ' if errors else 'PASS ') + 'private install: ' +
+              ('; '.join(errors) if errors else str(installed)), flush=True)
+        failed += bool(errors)
+    else:
+        print('FAIL private install: withheld because build-tree DSO audit failed', flush=True)
+        failed += 1
     for name, flags, dso, dynamic in cases:
         target = OUT / (name + ('.so' if dso else '.mic'))
         target.unlink(missing_ok=True)
@@ -241,7 +263,7 @@ def main():
     print(('FAIL ' if errors else 'PASS ') + 'donor integrity after probes: ' +
           ('; '.join(errors) if errors else 'size, mtime, SONAME and exports unchanged'), flush=True)
     failed += bool(errors)
-    print('S7-04 checks: %d/%d failed; no install or target execution' % (failed, len(cases) + 2))
+    print('S7-04 checks: %d/%d failed; private install only, no target execution' % (failed, len(cases) + 3))
     return int(bool(failed))
 
 

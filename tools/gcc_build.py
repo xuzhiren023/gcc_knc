@@ -15,7 +15,8 @@ import sys
 ROOT = Path(__file__).resolve().parents[1]
 PROJECT = ROOT.parent.parent if ROOT.parent.name == '.work' else ROOT
 SHARED = PROJECT / '.work/_shared'
-MAKE_ARGS = ['-j8', 'all-gcc', 'CFLAGS=-O2 -g1', 'CXXFLAGS=-O2 -g1']
+MAKE_ARGS = ['-j8', 'all-gcc', 'all-target-libgcc',
+             'CFLAGS=-O2 -g1', 'CXXFLAGS=-O2 -g1']
 
 
 def read_stamp(path):
