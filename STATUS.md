@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-07 17:01.
+Updated automatically at every ticket change. Last update: 2026-11-07 17:53.
 
-**Waiting for you:** S7-07, S8-01. Run `python tools/pm.py inbox`.
+**Waiting for you:** S8-01. Run `python tools/pm.py inbox`.
 
 Current tickets: `[###################-]` 117 of 122
 
@@ -139,7 +139,7 @@ Current tickets: `[###################-]` 117 of 122
 | S7-04 | Shared libgcc part 2: shared build and driver integration (E6-01b) | Done | The KNC compiler now builds a shared libgcc_s.so.1 that keeps the donor's ABI, needs nothing newer than gli... |
 | S7-05 | Shared libgcc part 3: compatibility and unwind card payloads (E6-01c) | Done | The old-client and new-client libgcc compatibility and unwind test programs are built, linted and staged wi... |
 | S7-06 | Shared libgcc part 4: lead native acceptance and the install decision (E6-01d) | Done | GCC-KNC's shared libgcc_s passes every compatibility and unwind test on the card (old and new clients, exce... |
-| S7-07 | libgfortran part 1: KNC floating-point backend and capability contract (E6-02) | **Waiting for you** | S7-07 waits on a card run only the interactive lead can do, and the card needs your agreement. The engineer... |
+| S7-07 | libgfortran part 1: KNC floating-point backend and capability contract (E6-02) | Question for the tech lead | Lead (interactive): the probe ran on the card 22:53Z on 2026-11-07, exit 0; full output .work/_shared/tmp/c... |
 | S7-08 | libgfortran part 2: base runtime build and the descriptor and I/O slice (E6-02) | Not started | Sprint 7 draft; parked in lane lead until the owner starts Sprint 7 and Sprint 6's gcc tickets are merged; ... |
 | S7-09 | libgfortran part 3: runtime isolation and packaging (E6-02) | Not started | owner chose a private directory for GCC-KNC's runtime on the card (S7-06); libgfortran's shared variant goe... |
 | S7-10 | Sprint 7 batch check after S7-05 and S7-08 | Not started | Sprint 7 draft; parked in lane lead until the owner starts Sprint 7 and Sprint 6's gcc tickets are merged; ... |
@@ -147,6 +147,7 @@ Current tickets: `[###################-]` 117 of 122
 
 ## Recent activity
 
+- 2026-11-07 17:53 **S7-07** owner decide: Lead (interactive): the probe ran on the card 22:53Z on 2026-11-07, exit 0; full output .work/_shared/tmp/claude-s7-07/probe.out. Results: (1) Roun...
 - 2026-11-07 17:01 **S8-01** lead escalate: Code review passes (C1-C10 kernels, gates, red 0ed8d09 then green 3f5ccb2), but acceptance line 3 needs the lead's card runs recorded in docs/resea...
 - 2026-11-07 16:59 **S8-01** engineer submit: Acceptance passed: red host check committed as 0ed8d09; implementation committed as 3f5ccb2; build, lint and host check PASS in ../_state/logs/S8_0...
 - 2026-11-07 16:58 **S8-01** lead answer: Yes. The benchmark corpus under tests/bench/knc-char is this ticket's deliverable, so a 0 code-line count is expected and 349 lines is in proportio...
@@ -154,16 +155,15 @@ Current tickets: `[###################-]` 117 of 122
 - 2026-11-07 16:43 **S7-07** lead escalate: S7-07 waits on a card run only the interactive lead can do, and the card needs your agreement. The engineer is right to stop: green needs the KNC f...
 - 2026-11-07 16:42 **S7-07** engineer ask: Green is blocked by the 16:40 lead prerequisite: no native flag-map or halting result is recorded in this ticket. Reduced reproducer is the already...
 - 2026-11-07 16:40 **S7-07** lead approve-red: Red accepted: host tests of the libgfortran KNC floating-point state logic fail for the right reason (k1om falls back to the x87-only backend that ...
-- 2026-11-07 16:36 **S7-07** engineer red: 82fd434: host-built state tests RED: 27 expected failures, plus missing k1om backend selection. Real runtime C/x87, modeled MXCSR; includes nested ...
 
 ## Cost
 
 - From the script, engineer: 284 sessions, 673.8M input tokens
 - From the script, lead: 217 sessions, 66.8M input tokens
-- Started by hand, Claude: 10 sessions, 1639.3M input tokens
+- Started by hand, Claude: 10 sessions, 1651.7M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 13.1 GiB of 100 GiB. 165 GiB free on the drive.
+The project uses 13.1 GiB of 100 GiB. 157 GiB free on the drive.
