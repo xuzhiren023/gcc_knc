@@ -40,7 +40,9 @@ figure by 4: the core's cost per operation when all four threads issue.
 8. **Caches and memory.** Load latency: L1 3, L2 24-26, memory about 357-366. Memory load
    throughput per thread: 37 cycles per line at one thread, 78 at four (19.5 per line per core,
    about 4 GB/s per core at one core).
-9. **Streaming stores are slower here.** On one core, streaming stores cost 157-160 cycles per line
+9. **Streaming stores are slower here** (measured with `vmovnraps` only; per the ISA manual the
+   throughput form is the weakly ordered `vmovnrngoaps`, untested: check C1 in
+   `docs/research/knc-optimization-sources.md`). On one core, streaming stores cost 157-160 cycles per line
    at every density, against 38 (one thread) to 80 (four threads, 20 per line per core) for normal
    stores; L1- and L2-sized streaming stores cost 27-36 against 2-25. Do not use them by default;
    E5-08 must measure them at 60 cores, where bandwidth rather than latency may decide.

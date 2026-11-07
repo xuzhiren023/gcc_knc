@@ -64,7 +64,7 @@ Drafted as tickets S2-01 to S2-08; see [SPRINT-02](sprints/SPRINT-02.md).
 | E4-01 | Mask registers, compares, blends, if-conversion | Deep |
 | E4-02 | Gather and scatter loop lowering with `jknzd`; tests prove partial completion handling | Deep |
 | E4-03 | Correctly rounded division and square root (ADR-0003): argument, hard cases, MPFR comparison. Until then, no vectorization of these operations. Division by a constant can be exact with a reciprocal and one FMA correction (`q=RN(a*r); e=fma(-c,q,a); q'=fma(e,r,q)`; the WRF work verified it for `/12` and `/60`): prove which constants it holds for (`docs/research/wrf-input-2026-11-06.md`) | Deep |
-| E4-04 | Masked tails, as far as E3-01 allows: scalar vs partial vs full choices across lengths 0–65 | Deep |
+| E4-04 | Masked tails, as far as E3-01 allows: scalar vs partial vs full choices across lengths 0–65 Tail strategies in order: aligned masked tail; masked vector peel to alignment; gather/scatter tail for unknown alignment (Tian et al. section IV). Whole-loop masking for trip counts below the vector length. Crossovers by check C6 at lengths 1-33. | Deep |
 | E4-05 | Int and FP conversions, narrowing and widening within IMCI's 32/64-bit elements | Standard |
 | E4-06 | Permutes, reductions (with FP ordering contract), min and max semantics | Standard |
 | E4-07 | Memory up/down conversions and swizzle use for byte and word data | Standard |
@@ -78,10 +78,12 @@ Drafted as tickets S2-01 to S2-08; see [SPRINT-02](sprints/SPRINT-02.md).
 | E5-03 | Per-loop reports: vector factor, checks, tail cost, helper calls, spills, and reasons for rejection | Standard |
 | E5-04 | Evaluate source-format scalar in `zmm` against x87 (ADR-0003) | Deep |
 | E5-05 | U/V scheduler v0, tested at production thread density | Standard |
-| E5-07 | Software prefetch v1: `vprefetch0/1/2` and `vprefetche*` patterns in `imci.md`, KNC cache and latency parameters from E5-01, and GCC's `-fprefetch-loop-arrays` on at `-O2`/`-O3` for KNC when E5-01 shows a gain; judged on streaming and stencil kernels in exclusive card windows (owner, 2026-11-03) | Standard |
-| E5-08 | Streaming (no-read) stores for write-only output that covers whole lines (`vmovnrap*`/`vmovnrngoap*`), legal only when the whole 64-byte line is written; measured against normal stores (ADR-0009 point 5) | Standard |
+| E5-07 | Software prefetch v1: `vprefetch0/1/2` and `vprefetche*` patterns in `imci.md`, KNC cache and latency parameters from E5-01, and GCC's `-fprefetch-loop-arrays` on at `-O2`/`-O3` for KNC when E5-01 shows a gain; judged on streaming and stencil kernels in exclusive card windows (owner, 2026-11-03) ADR-0009 amendment 1 point 2: L2 distance > L1 distance; prefetch latency and simultaneous prefetches derived from `knc-threads-per-core`; L2 software prefetch also for unit-stride loops with more streams than 16/(threads per core). Sweep against ICC's 64/32 iterations (check C5, `docs/research/knc-optimization-sources.md`). | Standard |
+| E5-08 | Streaming (no-read) stores for write-only output that covers whole lines (`vmovnrap*`/`vmovnrngoap*`), legal only when the whole 64-byte line is written; measured against normal stores (ADR-0009 point 5) Measure `vmovaps`, `vmovnraps` and `vmovnrngoaps` with a fence on memory-sized write-only output at 1 core and 60x4 (check C1); S6-03's one-core figure used `vmovnraps` only. NGO needs a fence before publication; never masked or converted. | Standard |
 | E5-10 | Inline block move and set (`cpymem`/`setmem`) with IMCI for known and bounded sizes, with line-crossing-safe unaligned halves; measured against the library call (the WRF work saw glibc's word copy at 0.57 GB/s per thread) | Standard |
-| E5-11 | Per-loop choice where one KNC scalar cost flips loops both ways: S6-05 round 1 (scalar add cost below 1) made mat8 20% faster and stencil1/2 3-6% slower through induction-variable choices; round 2 restored the stencils and lost mat8 (`docs/research/card-runs-s6.md`, `docs/research/knc-costs.md`) | Standard |
+| E5-11 | Per-loop choice where one KNC scalar cost flips loops both ways: S6-05 round 1 (scalar add cost below 1) made mat8 20% faster and stencil1/2 3-6% slower through induction-variable choices; round 2 restored the stencils and lost mat8 (`docs/research/card-runs-s6.md`, `docs/research/knc-costs.md`) Also: reject vectorization with lane use of 25% or less when full unroll plus SLP is possible (Tian et al. Fig. 6.4), after check C6 and the mat8 diagnosis. | Standard |
+| E5-12 | `-mtune=knc` tune-flag audit: `FAST_PREFIX` off (0x66/0x67 prefixes cost 2 decode cycles, SSDG p.16); review partial-register, RMW, inc/dec, memory-operand, macro-fusion and push flags for the in-order core; T1 scans plus one card before/after | Standard |
+| E5-13 | Default 64-byte alignment for static, global and local arrays of 64 bytes or more under `-march=knc`, and for gfortran `ALLOCATE` of vectorizable types (with E6-02); measure on the M2 short-length rows | Standard |
 | E5-09 | `-mtune=knc` tables: a KNC `processor_costs` entry, cache and prefetch parameters, unroll and alignment defaults, each chosen by card measurement, plus the published "GCC-KNC flags" page with ICC `-mmic` equivalents (ADR-0009 points 6 and 8) | Standard |
 | E5-06 | Milestone M2 kernels: short-loop, stencil and small-matrix kernels drawn from the corpus, plus hand-written IMCI references written for this project. Include a short-row strided kernel shaped like WRF's hot loops (rows of 7-9 elements, j/k/i order, many arrays per point) and report 2 threads per core next to 4 (`docs/research/wrf-input-2026-11-06.md`) | Deep |
 
@@ -95,6 +97,9 @@ Recommended to the owner as a tuning block in Sprint 8, after Sprint 7's runtime
   per-loop reports (S6-04), then fix.
 - E5-11: the per-loop scalar-add cost choice.
 - E5-07: two-level software prefetch (ADR-0009 point 5; WRF measured 2.4x on short rows).
+- E5-12 tune-flag audit if there is room (cheap).
+- Order (ADR-0009 amendment 1): E4-04 masked tails, E5-07 prefetch, the small-matrix lane-use
+  rejection, E5-11, E5-12. Card checks C1-C7 (`docs/research/knc-optimization-sources.md`) come first.
 
 ## E6 Runtimes (S7–S9, Milestone M3)
 

@@ -83,3 +83,32 @@ slides:
   parameter tables (E5-09). Both measure on the card.
 - Measurements need exclusive card windows, which the owner arranges with the WRF work.
 - Correctness tickets in Sprint 5 are unaffected. Their output is the input to this tuning.
+
+## Amendment 1 (2026-11-07): sources beyond Klemm
+
+**Status:** Accepted by the lead under the owner's delegation for engineering decisions, after the
+owner asked for these documents to be reviewed ("update our optimization approach if they provide
+new insights"). Review by the lead's subagent. Every default below is chosen only after its card
+check in `docs/research/knc-optimization-sources.md` section 4 (C1-C7); point 4's lane-use rule
+waits for C6 and the mat8 diagnosis, point 5 for C7.
+
+`docs/research/knc-optimization-sources.md`
+adds the SSDG, the ISA manual, Tian et al. (ICC's KNC vectorizer) and PRACE. Changes:
+1. Point 5, streaming stores: no-read stores help only on a miss, unmasked and unconverted. The
+   candidate is the weakly ordered `vmovnrngoap*`, which requires a fence before the data is
+   published (at the latest before any call, return or loop exit). Default off until E5-08 shows a
+   gain at 60 cores.
+2. Point 5, prefetch: the L2 hardware prefetcher tracks 16 streams per core within 4 KB pages, and
+   L1 has none. The far (`vprefetch1`) distance must exceed the near (`vprefetch0`) one, because a
+   prefetch that hits L1 is dropped. Prefetch latency and simultaneous prefetches are expressed per
+   thread and derived from the thread density (about 38 outstanding requests per core).
+3. Point 5, alignment: with 4 KB pages the L1 dTLB covers 256 KB, so blocking heuristics use the
+   smaller of L2 and the TLB reach. Statics, globals and Fortran allocations get 64-byte alignment by
+   default.
+4. New point 9, short loops: below the vector length, and for every remainder, the preferred code is
+   masked vector code. Use aligned masked accesses when alignment is known or peeled, and
+   gather/scatter otherwise; never masked unpack/pack without the opt-in safe-padding assumption.
+   Vectorization whose lane use is ≤ 25% is rejected in favour of full unroll and SLP.
+5. Point 3, chains: two independent accumulators are the density-robust default, subject to C7.
+6. Point 6: the `-mtune=knc` tune-flag set is chosen for an in-order U/V core, not inherited from
+   generic x86 (I-10).
