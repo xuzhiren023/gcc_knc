@@ -1,10 +1,10 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-07 13:19.
+Updated automatically at every ticket change. Last update: 2026-11-07 13:26.
 
-**Next: the tech lead, on S7-03.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: GPT-6.1, on S7-04 (Shared libgcc part 2: shared build and driver integration (E6-01b)).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
-Current tickets: `[##################--]` 113 of 121
+Current tickets: `[##################--]` 114 of 121
 
 ## Milestones
 
@@ -13,7 +13,7 @@ Current tickets: `[##################--]` 113 of 121
 | M0 | Foundation | In progress | 17 of 17 tickets |
 | M1 | Mixed native code | Done | 43 of 43 tickets |
 | M2 | Useful vector target | Done | 51 of 51 tickets |
-| M3 | Runtimes | In progress | 2 of 10 tickets |
+| M3 | Runtimes | In progress | 3 of 10 tickets |
 | M4 | Broad optimization | Not started | Not planned in detail yet |
 | M5 | Program corpus | Not started | Not planned in detail yet |
 | M6 | Release | Not started | Not planned in detail yet |
@@ -135,8 +135,8 @@ Current tickets: `[##################--]` 113 of 121
 | S6-15 | M2 fixture for ADR-0010 amendment 2 - paired before/after GCC builds in one process, per-round random order, and a decision script | Done | The M2 fixture can now time a before and an after GCC build of the same kernels in one process, interleaved... |
 | S7-01 | Shared libgcc for KNC: symbol-version ceiling for the card's glibc 2.21 and kernel 2.6.38, and what GCC 16 adds over the donor's libgcc_s (E6-01 input) | Done | The shared libgcc plan for KNC is ready: GCC 16's libgcc_s.so.1 can be a drop-in superset of the donor's on... |
 | S7-02 | libgfortran slice for KNC: descriptor ABI vs the card's GCC 5 runtime, real(16) and libquadmath, and MXCSR-safe FP control (E6-02 input) | Done | The libgfortran plan for KNC is ready: a small MXCSR-safe FP backend, kinds 4/8/10 with kind 16 deferred, a... |
-| S7-03 | Shared libgcc part 1: donor ABI compatibility objects and symbol map (E6-01a) | Waiting for review | Lead, under the owner's delegation for engineering decisions: S7-03 changes only libgcc (config.host inside... |
-| S7-04 | Shared libgcc part 2: shared build and driver integration (E6-01b) | Not started | Sprint 7 draft; parked in lane lead until the owner starts Sprint 7 and Sprint 6's gcc tickets are merged; ... |
+| S7-03 | Shared libgcc part 1: donor ABI compatibility objects and symbol map (E6-01a) | Done | GCC-KNC's libgcc now exports everything the card's donor libgcc_s.so.1 does (all 153 symbol and version pai... |
+| S7-04 | Shared libgcc part 2: shared build and driver integration (E6-01b) | Not started | S7-04 also fixes the stale k1om comment in libgcc/config.host (it still says no CPU dispatch). |
 | S7-05 | Shared libgcc part 3: compatibility and unwind card payloads (E6-01c) | Not started | Sprint 7 draft; parked in lane lead until the owner starts Sprint 7 and Sprint 6's gcc tickets are merged; ... |
 | S7-06 | Shared libgcc part 4: lead native acceptance and the install decision (E6-01d) | Not started |  |
 | S7-07 | libgfortran part 1: KNC floating-point backend and capability contract (E6-02) | Not started | Sprint 7 draft; parked in lane lead until the owner starts Sprint 7 and Sprint 6's gcc tickets are merged; ... |
@@ -146,6 +146,7 @@ Current tickets: `[##################--]` 113 of 121
 
 ## Recent activity
 
+- 2026-11-07 13:26 **S7-03** lead approve: GCC-KNC's libgcc now exports everything the card's donor libgcc_s.so.1 does (all 153 symbol and version pairs, the six TF aliases and the 16-byte C...
 - 2026-11-07 13:19 **S7-03** owner decide: Lead, under the owner's delegation for engineering decisions: S7-03 changes only libgcc (config.host inside the k1om case and three new KNC libgcc ...
 - 2026-11-07 13:18 **S7-03** lead escalate: Review done, no blocking findings: the fixture checks all 153 donor pairs, the six TF aliases and the 16-byte __cpu_model, and rejects mutations; t...
 - 2026-11-07 13:16 **S7-03** engineer submit: GCC aedc86dd388/959fd99cefd; harness 91092a2. Candidate .work/_shared/S7-03/libgcc_s.so.1: all 153 donor pairs/defaults, six aliases, CPU size 16; ...
@@ -153,7 +154,6 @@ Current tickets: `[##################--]` 113 of 121
 - 2026-11-07 13:00 **S7-03** engineer red: Commit d91060d. Ran tools/run.py --name S7-03-red --inputs tools/s7_03_checks.py tests/t2/knc-libgcc-donor.exports -- python tools/s7_03_checks.py:...
 - 2026-11-07 11:29 **S6-14** lead approve: A regression test now guards against the mask-register constant crash seen in an S6-05 work-in-progress build; the merged compiler never had it, an...
 - 2026-11-07 08:31 **S6-08** lead approve: At the Sprint 6 head (after the cost model and scheduler) every forward-port conflict is textual, both ICE sweeps show 0 ICE, x86 output is identic...
-- 2026-11-07 08:30 **S6-14** engineer submit: Submitted by the lead for the engineer. 7148fa9: regression guard (reduced test, no ICE plus kxor scan at -O2 -march=knc; original timing-ice.c kep...
 
 ## Cost
 
