@@ -81,7 +81,7 @@ def audit_errors(output, expected, providers):
         name = fields[7]
         if name.split('@')[0] == '_dl_find_object':
             errors.append('_dl_find_object import')
-        if name not in providers:
+        if fields[4] == 'GLOBAL' and name not in providers:
             errors.append('undefined symbol not supplied by libc/ld: ' + name)
     needed = re.findall(r'\(NEEDED\).*\[(.*?)\]', output)
     errors.extend('unexpected dependency ' + name for name in needed
@@ -102,8 +102,17 @@ def check_detector():
     for version in ('2.22', '2.21.1', '3.0'):
         changed = good.replace('GLIBC_2.21', 'GLIBC_' + version)
         assert any('newer than' in e for e in audit_errors(changed, expected, providers))
-    changed = good + ' 3: 0000000000000000 0 FUNC GLOBAL DEFAULT UND _dl_find_object@GLIBC_2.35 (3)\n'
-    assert '_dl_find_object import' in audit_errors(changed, expected, providers)
+    for bind in ('GLOBAL', 'WEAK'):
+        changed = good + (' 3: 0000000000000000 0 FUNC %s DEFAULT UND '
+                          '_dl_find_object@GLIBC_2.35 (3)\n' % bind)
+        assert '_dl_find_object import' in audit_errors(changed, expected, providers)
+    for name in ('__gmon_start__', 'pthread_once'):
+        changed = good + ' 3: 0000000000000000 0 FUNC WEAK DEFAULT UND %s\n' % name
+        assert not audit_errors(changed, expected, providers)
+    changed = good + ' 3: 0000000000000000 0 FUNC GLOBAL DEFAULT UND __divti3\n'
+    assert 'undefined symbol not supplied by libc/ld: __divti3' in audit_errors(changed, expected, providers)
+    changed = good + ' 0x0000000000000001 (NEEDED) Shared library: [libpthread.so.0]\n'
+    assert 'unexpected dependency libpthread.so.0' in audit_errors(changed, expected, providers)
     for textrel in (' 0x0000000000000016 (TEXTREL) 0x0\n',
                     ' 0x000000000000001e (FLAGS) TEXTREL\n', 'DT_TEXTREL\n'):
         assert 'TEXTREL present' in audit_errors(good + textrel, expected, providers)
@@ -119,7 +128,8 @@ def check_detector():
     assert not prefix_errors(OUT / 'install')
     for prefix in (SYSROOT, SYSROOT / 'lib64', TC, TC / 'private'):
         assert prefix_errors(prefix)
-    print('PASS detectors: GLIBC version, _dl_find_object, TEXTREL, donor superset, '
+    print('PASS detectors: GLIBC version, _dl_find_object at any bind, weak imports, '
+          'unresolved global helpers, extra NEEDED, TEXTREL, donor superset, '
           'private prefix and donor SONAME/export integrity', flush=True)
 
 
