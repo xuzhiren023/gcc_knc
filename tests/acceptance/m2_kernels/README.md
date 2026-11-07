@@ -200,14 +200,19 @@ to get watts; it does not sum rail readings or use maximum power or TDP.
 `sample-power.txt` transcribes the numeric sysfs example in
 [Runtime Energy Management of Multi-core Processors, Appendix C, p.163](https://eprints.soton.ac.uk/422287/1/Final_Thesis.pdf).
 It is a published format fixture, not a measurement of our card. The host test
-exercises the production C parser and watts-to-joules arithmetic. Our card's
-exact path/format/units remain unconfirmed until the lead's first read: every
-benchmark launch prints `power_source` with that qualification, then the entire
-raw file once as `power_raw line=N value=...`. The lead must check those lines
-against the documented layout before using the converted values.
+exercises the production C parser and watts-to-joules arithmetic, plus sampling
+with a worker-only CPU mask. The lead's 2026-11-07 04:38-04:40Z card check
+confirmed this path and first-line units: line 1 was 101 W, total window 0,
+in microwatts. Lines 8-10 contain rail triples (power, current?, voltage);
+the middle field's meaning remains uncertain and no rail fields are parsed.
+Every benchmark launch prints `power_source` with `format=confirmed_on_card`,
+then the entire raw file once as `power_raw line=N value=...`.
 
 A separate 256 KiB-stack sampler pins itself to one allowed OS CPU (0, 241,
-242 or 243), checks singleton affinity, and never uses a worker CPU. It samples
+242 or 243) and checks singleton affinity. When card_run allows only worker
+CPUs 1-240, no OS CPU is available: the sampler inherits the allowed mask and
+runs unpinned, reporting `cpu=unpinned` in `power_source`. It then shares worker
+CPUs as scheduled by the OS; it never attempts to pin to CPU -1. It samples
 about every 50 ms only during each build's timed batches in the five groups;
 pilots, warm-ups and other builds do not enter that build's statistics. The
 first read waits 50 ms after batch activation, and a read crossing a batch

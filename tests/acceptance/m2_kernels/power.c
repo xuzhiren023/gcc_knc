@@ -44,8 +44,10 @@ static unsigned long generation;
 
 static void raw_dump(void) {
   FILE *f = fopen(path,"r");
-  printf("power_source path=%s field=total_window0 units=uW interval_ms=50 cpu=%d "
-         "format=unconfirmed_on_this_card\n",path,sampler_cpu);
+  printf("power_source path=%s field=total_window0 units=uW interval_ms=50 cpu=",path);
+  if (sampler_cpu < 0) printf("unpinned");
+  else printf("%d",sampler_cpu);
+  printf(" format=confirmed_on_card\n");
   if (!f) {
     setup_error = errno;
     printf("power_raw path=%s power=unavailable errno=%d\n",path,setup_error);
@@ -62,11 +64,13 @@ static void raw_dump(void) {
 static void *sampler(void *unused) {
   (void)unused;
   cpu_set_t mask, actual;
-  CPU_ZERO(&mask); CPU_SET(sampler_cpu,&mask);
-  if (sched_setaffinity(0,sizeof(mask),&mask)
-      || sched_getaffinity(0,sizeof(actual),&actual)) setup_error = errno;
-  else if (CPU_COUNT(&actual) != 1 || !CPU_ISSET(sampler_cpu,&actual)
-           || sched_getcpu() != sampler_cpu) setup_error = EINVAL;
+  if (sampler_cpu >= 0) {
+    CPU_ZERO(&mask); CPU_SET(sampler_cpu,&mask);
+    if (sched_setaffinity(0,sizeof(mask),&mask)
+        || sched_getaffinity(0,sizeof(actual),&actual)) setup_error = errno;
+    else if (CPU_COUNT(&actual) != 1 || !CPU_ISSET(sampler_cpu,&actual)
+             || sched_getcpu() != sampler_cpu) setup_error = EINVAL;
+  }
   if (setup_error) return NULL;
   pthread_mutex_lock(&mutex);
   while (!done) {
@@ -113,7 +117,8 @@ void power_init(const cpu_set_t *allowed) {
   for (unsigned i = 0; i < sizeof(os_cpus)/sizeof(*os_cpus); ++i)
     if (CPU_ISSET(os_cpus[i],&available)) { sampler_cpu = os_cpus[i]; break; }
   raw_dump();
-  if (sampler_cpu < 0) setup_error = EINVAL;
+  /* A benchmark mask can contain only workers (1-240). In that case inherit
+     the allowed mask and let the OS schedule us instead of pinning to -1. */
   if (!setup_error) {
     pthread_attr_t attr;
     int rc = pthread_attr_init(&attr);

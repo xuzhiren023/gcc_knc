@@ -74,9 +74,13 @@ def read(path):
         if (result.get('result_class') != 'program' or result.get('program_exit_code') != 0
                 or result.get('exit_code') != 0):
             reasons.append('card_run or pin checks failed')
-        for field in ('overlapping_jobs', 'foreign_processes'):
-            if result.get(field) != []:
-                reasons.append(field + ' not empty or missing')
+        if result.get('overlapping_jobs') != []:
+            reasons.append('overlapping_jobs not empty or missing')
+        # card_run's S6-12 admission checks foreign work before launch. Its
+        # own sleep helper remains in the recorded process inventory.
+        foreign = result.get('foreign_processes')
+        if not isinstance(foreign, list) or any(p.get('name') != 'sleep' for p in foreign):
+            reasons.append('foreign_processes not empty or missing')
     number(launch, 'gcc_over_x87_max')
     if launch.get('gain_fraction_defined') == '1':
         number(launch, 'gain_fraction')
