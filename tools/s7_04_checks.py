@@ -233,6 +233,8 @@ def main():
                     errors.append('wrong runtime selection: NEEDED=' + repr(needed))
                 if not re.search(r'Machine:.*(?:K1OM|181|0xb5)', elf, re.I):
                     errors.append('not ELF K1OM')
+                if not re.search(r'\b(?:GLOBAL|LOCAL)\s+\w+\s+\d+\s+__gcc_bcmp\s*$', elf, re.M):
+                    errors.append('static-only helper definition missing')
                 if dynamic:
                     if not re.search(r'\bUND\s+_Unwind_Backtrace@GCC_3\.3\b', elf):
                         errors.append('unwinder is not imported from versioned shared libgcc')
@@ -251,7 +253,7 @@ def main():
         path = OUT / (name + '.log')
         path.write_text(log)
         print(('FAIL ' if errors else 'PASS ') + name + ': ' +
-              ('; '.join(errors) if errors else 'runtime selection, CRTs and lint') +
+              ('; '.join(errors) if errors else 'runtime selection, static helper, CRTs and lint') +
               '; log=' + str(path), flush=True)
         if code and not target.exists():
             print(output[-1200:], flush=True)
