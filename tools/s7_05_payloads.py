@@ -7,6 +7,7 @@ selected explicitly by the lead. C++ is built by the donor (fork is C/Fortran).
 """
 import os
 from pathlib import Path
+import re
 import shutil
 import subprocess
 import sys
@@ -38,7 +39,9 @@ def main():
         dest = OUT / label
         dest.mkdir(exist_ok=True)
         shutil.copyfile(source, dest / 'libgcc_s.so.1')
-    donor = [TC / 'cross/bin/k1om-mpss-linux-gcc']
+    donor_flags = ['-B' + str(TC / 'sysroot/lib64') + '/',
+                   '-L' + str(TC / 'sysroot/lib64')]
+    donor = [TC / 'cross/bin/k1om-mpss-linux-gcc', *donor_flags]
     new = [BUILD / 'gcc/xgcc', '-B' + str(RUNTIME) + '/',
            '-B' + str(BUILD / 'gcc') + '/']
     common = ['-O1', '-fno-builtin', '-fno-omit-frame-pointer',
@@ -54,13 +57,14 @@ def main():
     run([*new, *common, SRC / 'new.c', '-o', target])
     products.append(target)
     shutil.copyfile(SRC / 'new.expected', OUT / (target.name + '.expected'))
-    cxx = [TC / 'cross/bin/k1om-mpss-linux-g++', *common]
+    cxx = [TC / 'cross/bin/k1om-mpss-linux-g++', *donor_flags, *common]
     # Deliberately omit the EH-frame header on the plugin: libgcc's CRT frame
     # registration/deregistration path must work across repeated unloads.
     plugin = OUT / 'plugin.so'
     run([*cxx, '-fPIC', '-shared', '-Wl,--no-eh-frame-hdr', SRC / 'plugin.cc',
          '-o', plugin])
     products.append(plugin)
+    (OUT / 'plugin.so.expected').write_text('Loaded by old-unwind.mic; see old-unwind.mic.expected\n')
     target = OUT / 'old-unwind.mic'
     run([*cxx, '-rdynamic', SRC / 'unwind.cc', '-pthread', '-ldl', '-o', target])
     products.append(target)
@@ -69,12 +73,29 @@ def main():
     run([sys.executable, ROOT / 'tools/knc_lint', *products])
     for path in products:
         elf = subprocess.check_output([str(TC / 'cross/bin/k1om-mpss-linux-readelf'),
-                                       '-W', '-h', '-d', '-V', '--dyn-syms', str(path)], text=True)
+                                       '-W', '-h', '-l', '-d', '-V', '--dyn-syms', str(path)], text=True)
         (OUT / (path.name + '.elf.txt')).write_text(elf)
         if 'libgcc_s.so.1' not in elf or 'K1OM' not in elf:
             raise RuntimeError('missing K1OM/shared libgcc contract: ' + path.name)
         if '(RPATH)' in elf or '(RUNPATH)' in elf:
             raise RuntimeError('payload has implicit runtime path: ' + path.name)
+        if path.name.endswith('-compat.mic'):
+            for name, version in (('__gttf2','3.0'), ('__lttf2','3.0'),
+                                  ('__netf2','3.0'), ('__divtc3','4.0.0'),
+                                  ('__multc3','4.0.0'), ('__powitf2','4.0.0')):
+                if not re.search(r'\bUND\s+' + name + '@GCC_' + re.escape(version) + r'\b', elf):
+                    raise RuntimeError('missing compatibility import: ' + name)
+        if path.name == 'new-helpers.mic':
+            from s7_03_checks import ADDITIONS
+            for name in ADDITIONS:
+                if name.replace('@@','@') not in elf:
+                    raise RuntimeError('missing new helper import: ' + name)
+        if path.name == 'plugin.so':
+            if re.search(r'^\s*GNU_EH_FRAME\s', elf, re.M):
+                raise RuntimeError('plugin unexpectedly has an EH frame header')
+            for name in ('__register_frame_info', '__deregister_frame_info'):
+                if not re.search(r'\bUND\s+' + name + r'(?:_bases)?@GCC_', elf):
+                    raise RuntimeError('plugin lacks CRT frame registration: ' + name)
     print('PASS S7-05: built and linted; expected output and explicit-path runner staged at ' + str(OUT))
     print('NOT RUN NATIVELY: lead owns S7-06 card execution')
 
