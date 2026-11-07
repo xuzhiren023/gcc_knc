@@ -1,10 +1,10 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-07 00:07.
+Updated automatically at every ticket change. Last update: 2026-11-07 01:15.
 
-**Next: GPT-6.1, on S6-06 (KNC scheduler v0 (E5-05): U/V pipes, 4-cycle vector latency, 3-cycle AGI).** Run `python tools/dispatch.py`, or ask the tech lead to.
+**Next: the tech lead, on S6-06.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
-Current tickets: `[###################-]` 110 of 113
+Current tickets: `[##################--]` 110 of 121
 
 ## Milestones
 
@@ -13,7 +13,7 @@ Current tickets: `[###################-]` 110 of 113
 | M0 | Foundation | In progress | 17 of 17 tickets |
 | M1 | Mixed native code | Done | 43 of 43 tickets |
 | M2 | Useful vector target | In progress | 48 of 51 tickets |
-| M3 | Runtimes | In progress | 2 of 2 tickets |
+| M3 | Runtimes | In progress | 2 of 10 tickets |
 | M4 | Broad optimization | Not started | Not planned in detail yet |
 | M5 | Program corpus | Not started | Not planned in detail yet |
 | M6 | Release | Not started | Not planned in detail yet |
@@ -123,7 +123,7 @@ Current tickets: `[###################-]` 110 of 113
 | S6-03 | Machine characterization corpus (E5-01): latency and throughput per instruction class at 1-4 threads per core, cache and memory levels | Done | A KNC characterization corpus of 104 hand-written measurements is ready to run on the card: latency and thr... |
 | S6-04 | Per-loop KNC reports (E5-03): vector factor, peel and tail choice, masks, helper calls, spills and rejection reasons | Done | With -fopt-info-vec, KNC now reports each costed loop candidate: vector mode and factor, scalar peel, maske... |
 | S6-05 | -mtune=knc costs and vectorizer cost model v1 from the characterization tables (E5-09, E5-02) | Done | GCC-KNC now has a KNC cost table from the card measurements: scattered-index gathers stay scalar, reduction... |
-| S6-06 | KNC scheduler v0 (E5-05): U/V pipes, 4-cycle vector latency, 3-cycle AGI | In progress | back in lane gcc. Tables: `docs/research/knc-characterization.md`. The measured |
+| S6-06 | KNC scheduler v0 (E5-05): U/V pipes, 4-cycle vector latency, 3-cycle AGI | Question for the tech lead | AGENTS.md forbids engineer card jobs. Lead: run native M2/execute acceptance and batch x86 check? Native/x8... |
 | S6-07 | First gcc.dg/vect baseline for KNC: compile scans on the host, execution on the card | Done | The gcc.dg/vect suite now has a KNC baseline: of 2,001 tests, 1,329 compile (777 linked for the card), 632 ... |
 | S6-08 | Sprint 6 mid batch check after S6-04 and S6-05 | Not started |  |
 | S6-09 | ICE in expand_vec_series_expr: KNC lane-index vectors (VEC_SERIES) for V16SI/V8DI and the FP modes | Done | Loops that build lane-index vectors (VEC_SERIES) now compile on KNC instead of crashing the compiler: 6 of ... |
@@ -135,26 +135,34 @@ Current tickets: `[###################-]` 110 of 113
 | S6-15 | M2 fixture for ADR-0010 amendment 2 - paired before/after GCC builds in one process, per-round random order, and a decision script | Done | The M2 fixture can now time a before and an after GCC build of the same kernels in one process, interleaved... |
 | S7-01 | Shared libgcc for KNC: symbol-version ceiling for the card's glibc 2.21 and kernel 2.6.38, and what GCC 16 adds over the donor's libgcc_s (E6-01 input) | Done | The shared libgcc plan for KNC is ready: GCC 16's libgcc_s.so.1 can be a drop-in superset of the donor's on... |
 | S7-02 | libgfortran slice for KNC: descriptor ABI vs the card's GCC 5 runtime, real(16) and libquadmath, and MXCSR-safe FP control (E6-02 input) | Done | The libgfortran plan for KNC is ready: a small MXCSR-safe FP backend, kinds 4/8/10 with kind 16 deferred, a... |
+| S7-03 | Shared libgcc part 1: donor ABI compatibility objects and symbol map (E6-01a) | Not started | Sprint 7 draft; parked in lane lead until the owner starts Sprint 7 and Sprint 6's gcc tickets are merged; ... |
+| S7-04 | Shared libgcc part 2: shared build and driver integration (E6-01b) | Not started | Sprint 7 draft; parked in lane lead until the owner starts Sprint 7 and Sprint 6's gcc tickets are merged; ... |
+| S7-05 | Shared libgcc part 3: compatibility and unwind card payloads (E6-01c) | Not started | Sprint 7 draft; parked in lane lead until the owner starts Sprint 7 and Sprint 6's gcc tickets are merged; ... |
+| S7-06 | Shared libgcc part 4: lead native acceptance and the install decision (E6-01d) | Not started |  |
+| S7-07 | libgfortran part 1: KNC floating-point backend and capability contract (E6-02) | Not started | Sprint 7 draft; parked in lane lead until the owner starts Sprint 7 and Sprint 6's gcc tickets are merged; ... |
+| S7-08 | libgfortran part 2: base runtime build and the descriptor and I/O slice (E6-02) | Not started | Sprint 7 draft; parked in lane lead until the owner starts Sprint 7 and Sprint 6's gcc tickets are merged; ... |
+| S7-09 | libgfortran part 3: runtime isolation and packaging (E6-02) | Not started | Sprint 7 draft; parked in lane lead until the owner starts Sprint 7 and Sprint 6's gcc tickets are merged; ... |
+| S7-10 | Sprint 7 batch check after S7-05 and S7-08 | Not started | Sprint 7 draft; parked in lane lead until the owner starts Sprint 7 and Sprint 6's gcc tickets are merged; ... |
 
 ## Recent activity
 
+- 2026-11-07 01:15 **S6-06** engineer ask: AGENTS.md forbids engineer card jobs. Lead: run native M2/execute acceptance and batch x86 check? Native/x86 NOT RUN. PASS build, T0(52), T1/T2, re...
 - 2026-11-07 00:06 **S6-13** lead approve: Each M2 timing launch now records the card's power for each build: all three draw about 165-172 W, so GCC-KNC's vector code uses 8.7 times less ene...
-- 2026-11-07  **S6-13** lead note: a third follow-up for this ticket: `decide.py` line 77 treats any
-- 2026-11-07  **S6-13** lead note: two small fixture follow-ups ride with this ticket, since it changes the same
-- 2026-11-06 23:59 **S6-13** owner decide: Lead, under the owner's delegation for engineering decisions (the escalation only needed the interactive lead's card run): done 04:51-04:53Z. Corre...
-- 2026-11-06 23:58 **S6-05** lead approve: GCC-KNC now has a KNC cost table from the card measurements: scattered-index gathers stay scalar, reductions use more vector accumulators when fewe...
-- 2026-11-06 23:51 **S6-05** owner decide: Lead, under the owner's delegation for engineering decisions (the escalation only needed the interactive lead's card runs): done 04:41-04:51Z, docs...
-- 2026-11-06 23:45 **S6-13** lead escalate: Round-2 code review found nothing blocking (unpinned sampler when the mask is workers-only, sleep-helper receipt, two-states note and A/A README ar...
-- 2026-11-06 23:44 **S6-13** engineer submit: Red reproduced sampler and sleep-receipt failures. Fixed unpinned sampling and receipt handling; README records confirmed field map. Host parser/jo...
+- 2026-11-07  **S7-10** lead note: Sprint 7 draft; parked in lane lead until the owner starts Sprint 7 and Sprint 6's gcc tickets are merged; then lane gcc.
+- 2026-11-07  **S7-09** lead note: Sprint 7 draft; parked in lane lead until the owner starts Sprint 7 and Sprint 6's gcc tickets are merged; then lane gcc.
+- 2026-11-07  **S7-08** lead note: Sprint 7 draft; parked in lane lead until the owner starts Sprint 7 and Sprint 6's gcc tickets are merged; then lane gcc.
+- 2026-11-07  **S7-07** lead note: Sprint 7 draft; parked in lane lead until the owner starts Sprint 7 and Sprint 6's gcc tickets are merged; then lane gcc.
+- 2026-11-07  **S7-05** lead note: Sprint 7 draft; parked in lane lead until the owner starts Sprint 7 and Sprint 6's gcc tickets are merged; then lane gcc.
+- 2026-11-07  **S7-04** lead note: Sprint 7 draft; parked in lane lead until the owner starts Sprint 7 and Sprint 6's gcc tickets are merged; then lane gcc.
 
 ## Cost
 
 - From the script, engineer: 264 sessions, 633.8M input tokens
 - From the script, lead: 196 sessions, 62.3M input tokens
-- Started by hand, Claude: 10 sessions, 1498.3M input tokens
+- Started by hand, Claude: 10 sessions, 1510.4M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 12.9 GiB of 100 GiB. 157 GiB free on the drive.
+The project uses 13.0 GiB of 100 GiB. 157 GiB free on the drive.
