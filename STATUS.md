@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-06 23:58.
+Updated automatically at every ticket change. Last update: 2026-11-06 23:59.
 
-**Waiting for you:** S6-13. Run `python tools/pm.py inbox`.
+**Next: the tech lead, on S6-13.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[###################-]` 109 of 113
 
@@ -130,7 +130,7 @@ Current tickets: `[###################-]` 109 of 113
 | S6-10 | Unrecognizable and unconstrained insns: ffsll's scalar conditional move, and constant -1 into a k register | Done | Constant 0 and -1 loads into mask registers (kxor/kxnor) and 64-bit ffs without CMOV now compile on KNC, fi... |
 | S6-11 | ICE in expand_fn_using_insn for FP64 fmax/fmin loops (S5-15 follow-up) | Done | Scalar and SLP-reduction fmin/fmax on float and double now compile on KNC through vgmin/vgmax with the C Na... |
 | S6-12 | card_run --benchmark refuses while another project's processes still run on the card, whatever the ledger says | Done | card_run benchmark jobs now refuse to start while another project's programs (such as wrf.mic) are still ru... |
-| S6-13 | M2 driver records card power per build: watts and joules per element next to the timings | **Waiting for you** | Round-2 code review found nothing blocking (unpinned sampler when the mask is workers-only, sleep-helper re... |
+| S6-13 | M2 driver records card power per build: watts and joules per element next to the timings | Waiting for review | Lead, under the owner's delegation for engineering decisions (the escalation only needed the interactive le... |
 | S6-14 | ICE in cprop_hardreg - (set (reg:QI k1) (const_int 0)) for a loop-store-motion flag has no *knc_movqi alternative | Not started |  |
 | S6-15 | M2 fixture for ADR-0010 amendment 2 - paired before/after GCC builds in one process, per-round random order, and a decision script | Done | The M2 fixture can now time a before and an after GCC build of the same kernels in one process, interleaved... |
 | S7-01 | Shared libgcc for KNC: symbol-version ceiling for the card's glibc 2.21 and kernel 2.6.38, and what GCC 16 adds over the donor's libgcc_s (E6-01 input) | Done | The shared libgcc plan for KNC is ready: GCC 16's libgcc_s.so.1 can be a drop-in superset of the donor's on... |
@@ -140,18 +140,18 @@ Current tickets: `[###################-]` 109 of 113
 
 - 2026-11-07  **S6-13** lead note: a third follow-up for this ticket: `decide.py` line 77 treats any
 - 2026-11-07  **S6-13** lead note: two small fixture follow-ups ride with this ticket, since it changes the same
+- 2026-11-06 23:59 **S6-13** owner decide: Lead, under the owner's delegation for engineering decisions (the escalation only needed the interactive lead's card run): done 04:51-04:53Z. Corre...
 - 2026-11-06 23:58 **S6-05** lead approve: GCC-KNC now has a KNC cost table from the card measurements: scattered-index gathers stay scalar, reductions use more vector accumulators when fewe...
 - 2026-11-06 23:51 **S6-05** owner decide: Lead, under the owner's delegation for engineering decisions (the escalation only needed the interactive lead's card runs): done 04:41-04:51Z, docs...
 - 2026-11-06 23:45 **S6-13** lead escalate: Round-2 code review found nothing blocking (unpinned sampler when the mask is workers-only, sleep-helper receipt, two-states note and A/A README ar...
 - 2026-11-06 23:44 **S6-13** engineer submit: Red reproduced sampler and sleep-receipt failures. Fixed unpinned sampling and receipt handling; README records confirmed field map. Host parser/jo...
 - 2026-11-06 23:41 **S6-13** lead changes: 1) Sampler: card_run's benchmark set is CPUs 1-240, all workers, so there is no spare CPU; when none is outside the workers, run the sampler unpinn...
-- 2026-11-06 23:40 **S6-13** owner decide: Lead, under the owner's delegation for engineering decisions: card check done 04:38-04:40Z (docs/research/card-runs-s6.md). Correctness and the neg...
 
 ## Cost
 
 - From the script, engineer: 264 sessions, 633.8M input tokens
 - From the script, lead: 196 sessions, 62.3M input tokens
-- Started by hand, Claude: 10 sessions, 1495.6M input tokens
+- Started by hand, Claude: 10 sessions, 1496.7M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
