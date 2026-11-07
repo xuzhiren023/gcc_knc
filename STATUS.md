@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-07 11:29.
+Updated automatically at every ticket change. Last update: 2026-11-07 12:57.
 
 **Next: GPT-6.1, on S7-03 (Shared libgcc part 1: donor ABI compatibility objects and symbol map (E6-01a)).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
@@ -12,7 +12,7 @@ Current tickets: `[##################--]` 113 of 121
 |---|---|---|---|
 | M0 | Foundation | In progress | 17 of 17 tickets |
 | M1 | Mixed native code | Done | 43 of 43 tickets |
-| M2 | Useful vector target | In progress | 51 of 51 tickets |
+| M2 | Useful vector target | Done | 51 of 51 tickets |
 | M3 | Runtimes | In progress | 2 of 10 tickets |
 | M4 | Broad optimization | Not started | Not planned in detail yet |
 | M5 | Program corpus | Not started | Not planned in detail yet |
@@ -135,7 +135,7 @@ Current tickets: `[##################--]` 113 of 121
 | S6-15 | M2 fixture for ADR-0010 amendment 2 - paired before/after GCC builds in one process, per-round random order, and a decision script | Done | The M2 fixture can now time a before and an after GCC build of the same kernels in one process, interleaved... |
 | S7-01 | Shared libgcc for KNC: symbol-version ceiling for the card's glibc 2.21 and kernel 2.6.38, and what GCC 16 adds over the donor's libgcc_s (E6-01 input) | Done | The shared libgcc plan for KNC is ready: GCC 16's libgcc_s.so.1 can be a drop-in superset of the donor's on... |
 | S7-02 | libgfortran slice for KNC: descriptor ABI vs the card's GCC 5 runtime, real(16) and libquadmath, and MXCSR-safe FP control (E6-02 input) | Done | The libgfortran plan for KNC is ready: a small MXCSR-safe FP backend, kinds 4/8/10 with kind 16 deferred, a... |
-| S7-03 | Shared libgcc part 1: donor ABI compatibility objects and symbol map (E6-01a) | Not started | Sprint 7 draft; parked in lane lead until the owner starts Sprint 7 and Sprint 6's gcc tickets are merged; ... |
+| S7-03 | Shared libgcc part 1: donor ABI compatibility objects and symbol map (E6-01a) | In progress | Sprint 7 draft; parked in lane lead until the owner starts Sprint 7 and Sprint 6's gcc tickets are merged; ... |
 | S7-04 | Shared libgcc part 2: shared build and driver integration (E6-01b) | Not started | Sprint 7 draft; parked in lane lead until the owner starts Sprint 7 and Sprint 6's gcc tickets are merged; ... |
 | S7-05 | Shared libgcc part 3: compatibility and unwind card payloads (E6-01c) | Not started | Sprint 7 draft; parked in lane lead until the owner starts Sprint 7 and Sprint 6's gcc tickets are merged; ... |
 | S7-06 | Shared libgcc part 4: lead native acceptance and the install decision (E6-01d) | Not started |  |
@@ -159,10 +159,10 @@ Current tickets: `[##################--]` 113 of 121
 
 - From the script, engineer: 268 sessions, 657.5M input tokens
 - From the script, lead: 200 sessions, 62.9M input tokens
-- Started by hand, Claude: 10 sessions, 1584.1M input tokens
+- Started by hand, Claude: 10 sessions, 1599.0M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 13.0 GiB of 100 GiB. 157 GiB free on the drive.
+The project uses 13.0 GiB of 100 GiB. 175 GiB free on the drive.
