@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-07 16:50.
+Updated automatically at every ticket change. Last update: 2026-11-07 16:58.
 
 **Waiting for you:** S7-07. Run `python tools/pm.py inbox`.
 
@@ -143,10 +143,11 @@ Current tickets: `[###################-]` 117 of 122
 | S7-08 | libgfortran part 2: base runtime build and the descriptor and I/O slice (E6-02) | Not started | Sprint 7 draft; parked in lane lead until the owner starts Sprint 7 and Sprint 6's gcc tickets are merged; ... |
 | S7-09 | libgfortran part 3: runtime isolation and packaging (E6-02) | Not started | owner chose a private directory for GCC-KNC's runtime on the card (S7-06); libgfortran's shared variant goe... |
 | S7-10 | Sprint 7 batch check after S7-05 and S7-08 | Not started | Sprint 7 draft; parked in lane lead until the owner starts Sprint 7 and Sprint 6's gcc tickets are merged; ... |
-| S8-01 | Card checks C1-C10 for the Sprint 8 tuning block - microbenchmarks in the knc-char corpus | In progress |  |
+| S8-01 | Card checks C1-C10 for the Sprint 8 tuning block - microbenchmarks in the knc-char corpus | Question for the tech lead | Acceptance passes; submit is blocked by the size hook: 349 test lines for 0 code lines. The four requested ... |
 
 ## Recent activity
 
+- 2026-11-07 16:58 **S8-01** engineer ask: Acceptance passes; submit is blocked by the size hook: 349 test lines for 0 code lines. The four requested new files are check_s8.py plus three ben...
 - 2026-11-07 16:43 **S7-07** lead escalate: S7-07 waits on a card run only the interactive lead can do, and the card needs your agreement. The engineer is right to stop: green needs the KNC f...
 - 2026-11-07 16:42 **S7-07** engineer ask: Green is blocked by the 16:40 lead prerequisite: no native flag-map or halting result is recorded in this ticket. Reduced reproducer is the already...
 - 2026-11-07 16:40 **S7-07** lead approve-red: Red accepted: host tests of the libgfortran KNC floating-point state logic fail for the right reason (k1om falls back to the x87-only backend that ...
@@ -154,7 +155,6 @@ Current tickets: `[###################-]` 117 of 122
 - 2026-11-07 16:25 **S7-06** lead approve: GCC-KNC's shared libgcc_s passes every compatibility and unwind test on the card (old and new clients, exceptions across libraries, cancellation, b...
 - 2026-11-07 16:13 **S7-06** engineer submit: Lead ticket: card runs recorded in docs/research/card-runs-s7.md; owner chose a private directory.
 - 2026-11-07 14:45 **S7-05** lead approve: The old-client and new-client libgcc compatibility and unwind test programs are built, linted and staged with expected outputs in .work/_shared/S7-...
-- 2026-11-07 14:37 **S7-05** engineer submit: Submitted by the lead for the engineer (session budget reached after the 14:36 answer). 85451cd: five payloads with expected outputs and an explici...
 
 ## Cost
 
