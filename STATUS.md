@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-07 14:22.
+Updated automatically at every ticket change. Last update: 2026-11-07 14:23.
 
 **Next: GPT-6.1, on S7-05 (Shared libgcc part 3: compatibility and unwind card payloads (E6-01c)).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
@@ -137,7 +137,7 @@ Current tickets: `[###################-]` 115 of 121
 | S7-02 | libgfortran slice for KNC: descriptor ABI vs the card's GCC 5 runtime, real(16) and libquadmath, and MXCSR-safe FP control (E6-02 input) | Done | The libgfortran plan for KNC is ready: a small MXCSR-safe FP backend, kinds 4/8/10 with kind 16 deferred, a... |
 | S7-03 | Shared libgcc part 1: donor ABI compatibility objects and symbol map (E6-01a) | Done | GCC-KNC's libgcc now exports everything the card's donor libgcc_s.so.1 does (all 153 symbol and version pai... |
 | S7-04 | Shared libgcc part 2: shared build and driver integration (E6-01b) | Done | The KNC compiler now builds a shared libgcc_s.so.1 that keeps the donor's ABI, needs nothing newer than gli... |
-| S7-05 | Shared libgcc part 3: compatibility and unwind card payloads (E6-01c) | Not started | Sprint 7 draft; parked in lane lead until the owner starts Sprint 7 and Sprint 6's gcc tickets are merged; ... |
+| S7-05 | Shared libgcc part 3: compatibility and unwind card payloads (E6-01c) | In progress | Sprint 7 draft; parked in lane lead until the owner starts Sprint 7 and Sprint 6's gcc tickets are merged; ... |
 | S7-06 | Shared libgcc part 4: lead native acceptance and the install decision (E6-01d) | Not started |  |
 | S7-07 | libgfortran part 1: KNC floating-point backend and capability contract (E6-02) | Not started | Sprint 7 draft; parked in lane lead until the owner starts Sprint 7 and Sprint 6's gcc tickets are merged; ... |
 | S7-08 | libgfortran part 2: base runtime build and the descriptor and I/O slice (E6-02) | Not started | Sprint 7 draft; parked in lane lead until the owner starts Sprint 7 and Sprint 6's gcc tickets are merged; ... |
@@ -159,10 +159,10 @@ Current tickets: `[###################-]` 115 of 121
 
 - From the script, engineer: 277 sessions, 669.1M input tokens
 - From the script, lead: 209 sessions, 64.9M input tokens
-- Started by hand, Claude: 10 sessions, 1608.3M input tokens
+- Started by hand, Claude: 10 sessions, 1610.5M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 13.0 GiB of 100 GiB. 175 GiB free on the drive.
+The project uses 13.1 GiB of 100 GiB. 175 GiB free on the drive.
