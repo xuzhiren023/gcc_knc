@@ -85,6 +85,17 @@ Drafted as tickets S2-01 to S2-08; see [SPRINT-02](sprints/SPRINT-02.md).
 | E5-09 | `-mtune=knc` tables: a KNC `processor_costs` entry, cache and prefetch parameters, unroll and alignment defaults, each chosen by card measurement, plus the published "GCC-KNC flags" page with ICC `-mmic` equivalents (ADR-0009 points 6 and 8) | Standard |
 | E5-06 | Milestone M2 kernels: short-loop, stencil and small-matrix kernels drawn from the corpus, plus hand-written IMCI references written for this project. Include a short-row strided kernel shaped like WRF's hot loops (rows of 7-9 elements, j/k/i order, many arrays per point) and report 2 threads per core next to 4 (`docs/research/wrf-input-2026-11-06.md`) | Deep |
 
+## Proposed for Sprint 8 (lead, 2026-11-07): the M2 weak spots
+
+Recommended to the owner as a tuning block in Sprint 8, after Sprint 7's runtimes; not yet decided.
+- E4-04 rest: masked tails that never cross into an unmapped page (line-crossing test for the
+  unaligned second half, or peeling/versioning for alignment), so odd short lengths stop falling
+  back to x87.
+- Small-matrix kernels (mat8 at about 2% of the IMCI gain, mat16 at about 26%): diagnose with the
+  per-loop reports (S6-04), then fix.
+- E5-11: the per-loop scalar-add cost choice.
+- E5-07: two-level software prefetch (ADR-0009 point 5; WRF measured 2.4x on short rows).
+
 ## E6 Runtimes (S7–S9, Milestone M3)
 
 | ID | Story | Depth |
