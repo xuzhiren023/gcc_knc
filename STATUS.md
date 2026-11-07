@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-07 14:45.
+Updated automatically at every ticket change. Last update: 2026-11-07 16:12.
 
 **Next: GPT-6.1, on S7-06 (Shared libgcc part 4: lead native acceptance and the install decision (E6-01d)).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
@@ -138,10 +138,10 @@ Current tickets: `[###################-]` 116 of 121
 | S7-03 | Shared libgcc part 1: donor ABI compatibility objects and symbol map (E6-01a) | Done | GCC-KNC's libgcc now exports everything the card's donor libgcc_s.so.1 does (all 153 symbol and version pai... |
 | S7-04 | Shared libgcc part 2: shared build and driver integration (E6-01b) | Done | The KNC compiler now builds a shared libgcc_s.so.1 that keeps the donor's ABI, needs nothing newer than gli... |
 | S7-05 | Shared libgcc part 3: compatibility and unwind card payloads (E6-01c) | Done | The old-client and new-client libgcc compatibility and unwind test programs are built, linted and staged wi... |
-| S7-06 | Shared libgcc part 4: lead native acceptance and the install decision (E6-01d) | Not started |  |
+| S7-06 | Shared libgcc part 4: lead native acceptance and the install decision (E6-01d) | In progress | install GCC-KNC's libgcc_s in a private directory on the card; the donor /lib64/libgcc_s.so.1 stays untouch... |
 | S7-07 | libgfortran part 1: KNC floating-point backend and capability contract (E6-02) | Not started | Sprint 7 draft; parked in lane lead until the owner starts Sprint 7 and Sprint 6's gcc tickets are merged; ... |
 | S7-08 | libgfortran part 2: base runtime build and the descriptor and I/O slice (E6-02) | Not started | Sprint 7 draft; parked in lane lead until the owner starts Sprint 7 and Sprint 6's gcc tickets are merged; ... |
-| S7-09 | libgfortran part 3: runtime isolation and packaging (E6-02) | Not started | Sprint 7 draft; parked in lane lead until the owner starts Sprint 7 and Sprint 6's gcc tickets are merged; ... |
+| S7-09 | libgfortran part 3: runtime isolation and packaging (E6-02) | Not started | owner chose a private directory for GCC-KNC's runtime on the card (S7-06); libgfortran's shared variant goe... |
 | S7-10 | Sprint 7 batch check after S7-05 and S7-08 | Not started | Sprint 7 draft; parked in lane lead until the owner starts Sprint 7 and Sprint 6's gcc tickets are merged; ... |
 
 ## Recent activity
@@ -159,10 +159,10 @@ Current tickets: `[###################-]` 116 of 121
 
 - From the script, engineer: 280 sessions, 670.9M input tokens
 - From the script, lead: 213 sessions, 65.7M input tokens
-- Started by hand, Claude: 10 sessions, 1614.8M input tokens
+- Started by hand, Claude: 10 sessions, 1628.1M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 13.1 GiB of 100 GiB. 175 GiB free on the drive.
+The project uses 13.1 GiB of 100 GiB. 142 GiB free on the drive.
