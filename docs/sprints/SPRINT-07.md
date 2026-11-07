@@ -1,10 +1,11 @@
 # Sprint 7: runtimes, part 1 - shared libgcc and the first libgfortran slice (Milestone M3)
 
-**Status:** DRAFT, planned by the lead on 2026-11-07 at the owner's request ("Can we start working on
-sprint 7 while waiting for card window"). Not started: the tickets are written but stay in
-`lane: lead` (not dispatched) until Sprint 6's gcc tickets (S6-06, S6-14, S6-08) are merged, because
-all gcc tickets share one GCC checkout and build. The owner sets run authorization and who
-implements.
+**Status:** started by the owner on 2026-11-07 ("Can we start working on sprint 7 while waiting for
+card window"; run authorization and engineers "Yes, same as S6"). Runs need no per-run approval,
+card jobs and timed benchmark windows included. Engineers: Codex through `tools/dispatch.py`, model by
+ticket depth, as in Sprint 6. The gcc tickets stay parked in `lane: lead` until Sprint 6's gcc
+tickets (S6-06, S6-14, S6-08) are merged, because all gcc tickets share one GCC checkout and build;
+then the lead moves them to `lane: gcc` in order.
 
 **Goal (Milestone M3, part 1):** programs built by GCC-KNC can use a shared `libgcc_s` that is a
 drop-in superset of the donor's on the card's glibc 2.21, and a first Fortran runtime slice
