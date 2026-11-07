@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-07 18:52.
+Updated automatically at every ticket change. Last update: 2026-11-07 18:54.
 
 **Waiting for you:** S8-01. Run `python tools/pm.py inbox`.
 
@@ -140,13 +140,14 @@ Current tickets: `[###################-]` 118 of 122
 | S7-05 | Shared libgcc part 3: compatibility and unwind card payloads (E6-01c) | Done | The old-client and new-client libgcc compatibility and unwind test programs are built, linted and staged wi... |
 | S7-06 | Shared libgcc part 4: lead native acceptance and the install decision (E6-01d) | Done | GCC-KNC's shared libgcc_s passes every compatibility and unwind test on the card (old and new clients, exce... |
 | S7-07 | libgfortran part 1: KNC floating-point backend and capability contract (E6-02) | Done | libgfortran now has a KNC floating-point backend: it sets and clears the six IEEE flags and the four roundi... |
-| S7-08 | libgfortran part 2: base runtime build and the descriptor and I/O slice (E6-02) | Tests waiting for review | 3ba6cda: six self-checking KNC Fortran programs (tests/t2/s7-08) built by tools/s7_08_checks.py slice with ... |
+| S7-08 | libgfortran part 2: base runtime build and the descriptor and I/O slice (E6-02) | Changes requested | Red reason is right (no k1om libgfortran, link fails) and the slice covers the acceptance list, but io.f90 ... |
 | S7-09 | libgfortran part 3: runtime isolation and packaging (E6-02) | Not started | owner chose a private directory for GCC-KNC's runtime on the card (S7-06); libgfortran's shared variant goe... |
 | S7-10 | Sprint 7 batch check after S7-05 and S7-08 | Not started | Sprint 7 draft; parked in lane lead until the owner starts Sprint 7 and Sprint 6's gcc tickets are merged; ... |
 | S8-01 | Card checks C1-C10 for the Sprint 8 tuning block - microbenchmarks in the knc-char corpus | **Waiting for you** | Code review passes (C1-C10 kernels, gates, red 0ed8d09 then green 3f5ccb2), but acceptance line 3 needs the... |
 
 ## Recent activity
 
+- 2026-11-07 18:54 **S7-08** lead changes: Red reason is right (no k1om libgfortran, link fails) and the slice covers the acceptance list, but io.f90 has two expectations that will fail at g...
 - 2026-11-07 18:51 **S7-08** engineer red: 3ba6cda: six self-checking KNC Fortran programs (tests/t2/s7-08) built by tools/s7_08_checks.py slice with the uninstalled GCC 16 gfortran, static ...
 - 2026-11-07 18:38 **S7-07** lead approve: libgfortran now has a KNC floating-point backend: it sets and clears the six IEEE flags and the four rounding modes in both x87 and IMCI, keeps MXC...
 - 2026-11-07 18:26 **S7-07** engineer submit: Submitted by the lead for the engineer: green at GCC 2e6d88948a2, tests 2fac060, host tests pass; native state-native.mic on the card 0 failures, e...
@@ -154,7 +155,6 @@ Current tickets: `[###################-]` 118 of 122
 - 2026-11-07 18:23 **S7-07** owner decide: Lead (interactive): state-native.mic ran on the card 23:23Z on 2026-11-07: 'State logic: 0 failures, 0 instrumented MXCSR writes', exit 0 (.work/_s...
 - 2026-11-07 17:59 **S7-07** lead escalate: S7-07 green needs a card run that only the interactive lead can do, with your agreement for a slot clear of the WRF timed runs. The green (GCC 2e6d...
 - 2026-11-07 17:58 **S7-07** engineer ask: Green: GCC 2e6d88948a2; tests 2fac060. Host PASS: 0 failures, 39 instrumented writes, including formatted-input restore. Logs: .work/_state/logs/s7...
-- 2026-11-07 17:54 **S7-07** lead answer: Probe results are in the decision note above (flags at the standard MXCSR positions, rounding agrees in all four modes, bit 21 preserved, no IMCI h...
 
 ## Cost
 
@@ -166,4 +166,4 @@ Current tickets: `[###################-]` 118 of 122
 
 ## Disk
 
-The project uses 13.1 GiB of 100 GiB. 160 GiB free on the drive.
+The project uses 13.1 GiB of 100 GiB. 159 GiB free on the drive.
