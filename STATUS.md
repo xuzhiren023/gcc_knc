@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-07 16:27.
+Updated automatically at every ticket change. Last update: 2026-11-07 16:37.
 
-**Next: GPT-6.1, on S7-07 (libgfortran part 1: KNC floating-point backend and capability contract (E6-02)).** Run `python tools/dispatch.py`, or ask the tech lead to.
+**Next: the tech lead, on S7-07.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[###################-]` 117 of 121
 
@@ -139,13 +139,14 @@ Current tickets: `[###################-]` 117 of 121
 | S7-04 | Shared libgcc part 2: shared build and driver integration (E6-01b) | Done | The KNC compiler now builds a shared libgcc_s.so.1 that keeps the donor's ABI, needs nothing newer than gli... |
 | S7-05 | Shared libgcc part 3: compatibility and unwind card payloads (E6-01c) | Done | The old-client and new-client libgcc compatibility and unwind test programs are built, linted and staged wi... |
 | S7-06 | Shared libgcc part 4: lead native acceptance and the install decision (E6-01d) | Done | GCC-KNC's shared libgcc_s passes every compatibility and unwind test on the card (old and new clients, exce... |
-| S7-07 | libgfortran part 1: KNC floating-point backend and capability contract (E6-02) | In progress | Sprint 7 draft; parked in lane lead until the owner starts Sprint 7 and Sprint 6's gcc tickets are merged; ... |
+| S7-07 | libgfortran part 1: KNC floating-point backend and capability contract (E6-02) | Tests waiting for review | 82fd434: host-built state tests RED: 27 expected failures, plus missing k1om backend selection. Real runtim... |
 | S7-08 | libgfortran part 2: base runtime build and the descriptor and I/O slice (E6-02) | Not started | Sprint 7 draft; parked in lane lead until the owner starts Sprint 7 and Sprint 6's gcc tickets are merged; ... |
 | S7-09 | libgfortran part 3: runtime isolation and packaging (E6-02) | Not started | owner chose a private directory for GCC-KNC's runtime on the card (S7-06); libgfortran's shared variant goe... |
 | S7-10 | Sprint 7 batch check after S7-05 and S7-08 | Not started | Sprint 7 draft; parked in lane lead until the owner starts Sprint 7 and Sprint 6's gcc tickets are merged; ... |
 
 ## Recent activity
 
+- 2026-11-07 16:36 **S7-07** engineer red: 82fd434: host-built state tests RED: 27 expected failures, plus missing k1om backend selection. Real runtime C/x87, modeled MXCSR; includes nested ...
 - 2026-11-07 16:25 **S7-06** lead approve: GCC-KNC's shared libgcc_s passes every compatibility and unwind test on the card (old and new clients, exceptions across libraries, cancellation, b...
 - 2026-11-07 16:13 **S7-06** engineer submit: Lead ticket: card runs recorded in docs/research/card-runs-s7.md; owner chose a private directory.
 - 2026-11-07 14:45 **S7-05** lead approve: The old-client and new-client libgcc compatibility and unwind test programs are built, linted and staged with expected outputs in .work/_shared/S7-...
@@ -153,16 +154,15 @@ Current tickets: `[###################-]` 117 of 121
 - 2026-11-07 14:37 **S7-05** owner decide: Lead, under the owner's delegation for engineering decisions: no further engineer session; the work is committed (85451cd) and only the submit was ...
 - 2026-11-07 14:36 **S7-05** lead escalate: budget: 3 engineer sessions used; the budget is 3
 - 2026-11-07 14:36 **S7-05** lead answer: Yes, submit with --override 'card payload sources are the deliverable: 4 C/C++ payloads, 3 expected-output files and an explicit-path runner cover ...
-- 2026-11-07 14:35 **S7-05** engineer ask: Build/lint and ELF/import checks PASS after 85451cd restores plugin linker sysroot. All five payloads with expected output and explicit-path runner...
 
 ## Cost
 
 - From the script, engineer: 280 sessions, 670.9M input tokens
 - From the script, lead: 213 sessions, 65.7M input tokens
-- Started by hand, Claude: 10 sessions, 1632.6M input tokens
+- Started by hand, Claude: 10 sessions, 1633.3M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 13.1 GiB of 100 GiB. 143 GiB free on the drive.
+The project uses 13.1 GiB of 100 GiB. 142 GiB free on the drive.
