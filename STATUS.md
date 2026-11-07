@@ -136,7 +136,7 @@ Current tickets: `[##################--]` 114 of 121
 | S7-01 | Shared libgcc for KNC: symbol-version ceiling for the card's glibc 2.21 and kernel 2.6.38, and what GCC 16 adds over the donor's libgcc_s (E6-01 input) | Done | The shared libgcc plan for KNC is ready: GCC 16's libgcc_s.so.1 can be a drop-in superset of the donor's on... |
 | S7-02 | libgfortran slice for KNC: descriptor ABI vs the card's GCC 5 runtime, real(16) and libquadmath, and MXCSR-safe FP control (E6-02 input) | Done | The libgfortran plan for KNC is ready: a small MXCSR-safe FP backend, kinds 4/8/10 with kind 16 deferred, a... |
 | S7-03 | Shared libgcc part 1: donor ABI compatibility objects and symbol map (E6-01a) | Done | GCC-KNC's libgcc now exports everything the card's donor libgcc_s.so.1 does (all 153 symbol and version pai... |
-| S7-04 | Shared libgcc part 2: shared build and driver integration (E6-01b) | Changes requested | Driver probes, GLIBC/_dl_find_object/TEXTREL/superset, private-prefix and donor-integrity detectors are goo... |
+| S7-04 | Shared libgcc part 2: shared build and driver integration (E6-01b) | In progress | Driver probes, GLIBC/_dl_find_object/TEXTREL/superset, private-prefix and donor-integrity detectors are goo... |
 | S7-05 | Shared libgcc part 3: compatibility and unwind card payloads (E6-01c) | Not started | Sprint 7 draft; parked in lane lead until the owner starts Sprint 7 and Sprint 6's gcc tickets are merged; ... |
 | S7-06 | Shared libgcc part 4: lead native acceptance and the install decision (E6-01d) | Not started |  |
 | S7-07 | libgfortran part 1: KNC floating-point backend and capability contract (E6-02) | Not started | Sprint 7 draft; parked in lane lead until the owner starts Sprint 7 and Sprint 6's gcc tickets are merged; ... |
