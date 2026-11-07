@@ -232,3 +232,13 @@ GCC/x87 0.622 (not a decision input; `decide.py` reports 1-core blocks as not pr
 `decide.py` as merged marks every launch invalid because card_run's receipt lists its own `sleep`
 helper under `foreign_processes` (all 150 receipts); the figures above come from a scratch copy that
 ignores that one process. card_run's S6-12 guard admitted every job. Fix rides with S6-13.
+
+## S6-13 card check (04:38-04:40Z on 11-07)
+
+`.work/_shared/S6-13`: negative 154 failing cases, positive exit 0. The power job ran (exit 0) and
+dumped `/sys/class/micras/power` at launch start, confirming the file and microwatt units: line 1
+101,000,000 (101 W, total window 0), lines 2-3 about 102 W, line 4 204 W, lines 5-7 16, 25, 61 W,
+lines 8-10 three rails with a second and third field (22 W at 1.052 V, 32 W at 1.000 V, 31 W at
+1.501 V). **The sampler took no samples** (`samples=0 power=unavailable errno=22` for every build):
+it pins itself to `sampler_cpu`, which was -1 (no CPU outside the workers in card_run's allowed
+set), and `CPU_SET(-1)` makes `sched_setaffinity` fail with EINVAL.
