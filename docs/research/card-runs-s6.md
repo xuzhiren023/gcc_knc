@@ -250,3 +250,17 @@ Paired binary `S6-05-paired2` correctness: negative 154 failing cases, positive 
 sets. Paired L2 timing, T_S6-05 / T_M2-final: stencil1 1.001, 1.000, 1.000 (code now identical);
 stencil2 1.005, 0.997, 0.973 (signs differ: no consistent effect). The round-1 regressions are gone;
 so is mat8's round-1 gain (its code is identical to M2-final again; backlog E5-11).
+
+## S6-13 round 2: card power per build (04:51-04:53Z on 11-07)
+
+Correctness and negative control pass. One L2 FP32 affine launch, 60 x 4, sampler unpinned at 50 ms,
+105 samples per build (`/sys/class/micras/power` line 1, whole card):
+
+| Build | Mean W (min-max) | ns per element | Energy per element |
+|---|---|---|---|
+| x87 | 171.7 (135-182) | 0.1350 | 23.2 nJ |
+| GCC-KNC | 166.9 (144-182) | 0.0160 | 2.66 nJ |
+| IMCI | 163.8 (132-182) | 0.0121 | 1.99 nJ |
+
+The card draws about the same power whatever the code (as the owner saw on the control panel), so
+energy follows time: GCC-KNC uses **8.7x less energy per element than x87**, IMCI 11.7x less.
