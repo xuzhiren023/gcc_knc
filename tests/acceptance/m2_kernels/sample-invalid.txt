@@ -1,0 +1,16 @@
+correctness kernel=affine_f32 builds=3 failing_cases=0
+correctness kernel=affine_f64 builds=3 failing_cases=0
+correctness kernel=stencil1 builds=3 failing_cases=0
+correctness kernel=stencil2 builds=3 failing_cases=0
+correctness kernel=short builds=3 failing_cases=0
+correctness kernel=mat8 builds=3 failing_cases=0
+correctness kernel=mat16 builds=3 failing_cases=0
+phase name=correctness_done t_ms=3000
+policy phase=start path=clock value=tsc
+configuration kernel=affine_f32 density_comparable=0 builds=3
+summary build=gcc median_ns=100000000 regime_step=0
+summary build=x87 median_ns=100000000 regime_step=0
+summary build=imci median_ns=100000000 regime_step=0
+launch kernel=affine_f32 length=4096 threads_per_core=3 cores=60 launch=1 working_set=L2 short_length=17 gain_fraction=0.8 gain_fraction_defined=1 gcc_over_x87_max=0.2 sized=1 valid=0 regime_steps=0
+policy phase=end path=clock value=tsc
+{"result_class":"program","exit_code":3,"program_exit_code":3,"foreign_processes":[],"overlapping_jobs":[]}

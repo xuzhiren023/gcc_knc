@@ -223,3 +223,95 @@ FP32 affine length, including boundary and working-set rows at 1 and 60 cores.
 Do not pool lengths, short chunk sizes, densities, cores or working-set labels,
 or compare raw batch times when repetitions differ. No M2 pass can be reported
 until the complete required matrix and independent-launch noise gates exist.
+
+## Paired GCC comparison and automated decisions (S6-15)
+
+Build the fixture without recompiling the saved kernels, then build a paired
+fixture. These are host builds and lints; the lead owns all card execution:
+
+```text
+python tools/run.py --name S6-15-build-plain --inputs tests/acceptance/m2_kernels -- python tests/acceptance/m2_kernels/build.py all --out S6-15 --reuse-kernels M2-final
+python tools/run.py --name S6-15-build-paired --inputs tests/acceptance/m2_kernels -- python tests/acceptance/m2_kernels/build.py all --out S6-15/paired --reuse-kernels M2-final --before M2-final
+```
+
+`--before FOLDER` takes `FOLDER/kernels-gcc.o` under `.work/_shared` (an absolute
+folder also works). Cross objcopy renames the seven `m2_<kernel>_gcc` entry
+points to `m2_<kernel>_gccbefore` in a separate output object. It never modifies
+the source object. `gcc_before` is build 3; the same invocation and buffers are
+used for all four builds. Correctness checks all four, resetting outputs and
+guards for each. The negative control still changes only affine_f32 IMCI,
+with the same expected 154 failures; its lines now say `builds=4` when paired.
+Without `--before`, the three original builds remain. For an actual tuning
+comparison, compile the after kernels with the intended GCC, or use
+`--reuse-kernels AFTER_FOLDER`; the commands above compare the baseline to itself
+to validate the fixture. Preserve the before folder before changing GCC.
+
+Every round uses a seeded Fisher-Yates shuffle of the build order. The first
+position is balanced in randomly ordered blocks of three/four rounds, ensuring
+every build runs first repeatedly. `order` prints the launch-derived xorshift32
+seed and algorithm. Each `round` line prints the actual order, gain fraction
+from that round's normalized batches, its denominator-defined flag, and, when
+paired, `gcc_over_gcc_before = T_after/T_before`. Undefined gain fractions print
+`nan` with `gain_fraction_defined=0`. There are 105 timed rounds per launch.
+`compare` reports their median ratio and a percentile 95% bootstrap interval
+(10,000 resamples, seed 1510). `regime_step` includes chronological group medians,
+spread, and the build's position in the first timed round of the named group;
+order varies in later rounds. The existing summary/launch fields remain.
+Launch numbers now accept 1..10 for the single sequential extension.
+
+The lead first runs positive and negative correctness and one paired launch,
+using `.work/_shared/S6-15/paired/m2-{kernels,negative}.mic`. The lead then runs
+at least three independent paired launches at each ticket-named working set,
+with at least two observed performance states. Save complete card_run stdout
+to one file per job, including its final JSON (which supplies overlap, foreign
+workload and exit status). For example, after the lead's usual card_run prefix:
+
+```text
+... --benchmark --threads 240 .work/_shared/S6-15/paired/m2-kernels.mic --benchmark --kernel affine_f32 --working-set L2 --density 4 --cores 60 --launch 1
+python tools/run.py --name S6-15-tuning-decision --inputs tests/acceptance/m2_kernels -- python tests/acceptance/m2_kernels/decide.py --min-effect 0.02 launch1.out launch2.out launch3.out
+```
+
+`--min-effect` is a fractional required time reduction. The JSON tuning report
+groups configurations separately, pools their per-round ratios across launches,
+and reports median, bootstrap interval, and each launch's median/sign. It accepts
+only when the upper interval endpoint is strictly below `1 - min_effect` and
+launch signs agree. Sign flips report `placement-dependent`. A before-build
+regime flag or a >=2% range of its normalized times establishes two states;
+otherwise the report rejects for insufficient state evidence. Invalid jobs
+prevent acceptance and are named with their reasons. An effect below 2% also
+requires repeating the experiment with `build.py --before-first`, which links
+the saved GCC object before the after object. The lead evaluates those outputs
+as a separate block, then uses `decide.py --layout-checked` only when that
+opposite-order result confirms the effect. This flag is an explicit attestation.
+
+For an M2 block, the lead fixes five launches before starting, runs the required
+length/configuration matrix and saves each job separately. Pass every output
+file explicitly to `decide.py` (expand globs in the calling shell). The default
+production density is 4; `--density 1|2|4` selects another declared production
+density. The L2 affine_f32 rows at 60 cores supply clauses (a) and (b), while
+every supplied tested configuration supplies clause (c). Each configuration
+must contain the same launch IDs. The caller must supply the complete required
+matrix; the script cannot infer which lengths a ticket requires. Example:
+
+```text
+python tools/run.py --name S6-15-m2-decision --inputs tests/acceptance/m2_kernels -- python tests/acceptance/m2_kernels/decide.py l2-1.out l2-2.out l2-3.out l2-4.out l2-5.out boundary-1.out boundary-2.out boundary-3.out boundary-4.out boundary-5.out
+```
+
+The M2 JSON includes all launch gain fractions, range, minimum, mean, one-sided
+t lower bound, percentile bootstrap interval of the median, regime-step count,
+and each clause. `run-five-more` means exactly five further launches for every
+configuration, then decide on all ten; this extension is allowed only once,
+when (a)/(b) fail with mean >=0.5 and (c) passes. No regime flag drops a launch.
+`invalid-block` names mechanical failures (including absent card_run JSON,
+changed/missing policy records, density 3, failed correctness/pinning or batch
+sizing), duplicate launches or incomplete cohorts. Fix infrastructure and retain
+the failed outputs; do not select samples by performance. Bootstrap resampling
+is deterministic, 10,000 draws with seed 1510 and linearly interpolated 2.5/97.5
+percentiles. Exit 0 indicates a parsed report, so consumers must read `decision`.
+
+Host-only decision tests use small recorded-format sample fixtures (illustrative
+numbers, not card measurements):
+
+```text
+python tools/run.py --name S6-15-decide --inputs tests/acceptance/m2_kernels -- python tests/acceptance/m2_kernels/test_decide.py
+```
