@@ -70,7 +70,9 @@ def main():
     nohdr.write_text('*link:\n' + link[1].replace('--eh-frame-hdr','') + '\n\n')
     # Registration is explicit in plugin.cc and cannot fall back to a header.
     plugin = OUT / 'plugin.so'
-    run([*cxx, '-fPIC', '-shared', '-specs=' + str(nohdr), SRC / 'plugin.cc',
+    # Replacing *link also removes the driver's injected linker sysroot.
+    run([*cxx, '-fPIC', '-shared', '-specs=' + str(nohdr),
+         '-Wl,--sysroot=' + str(TC / 'sysroot'), SRC / 'plugin.cc',
          '-o', plugin])
     products.append(plugin)
     (OUT / 'plugin.so.expected').write_text('Loaded by old-unwind.mic; see old-unwind.mic.expected\n')
