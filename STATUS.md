@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-07 19:01.
+Updated automatically at every ticket change. Last update: 2026-11-07 19:41.
 
 **Waiting for you:** S8-01. Run `python tools/pm.py inbox`.
 
@@ -140,13 +140,14 @@ Current tickets: `[###################-]` 118 of 122
 | S7-05 | Shared libgcc part 3: compatibility and unwind card payloads (E6-01c) | Done | The old-client and new-client libgcc compatibility and unwind test programs are built, linted and staged wi... |
 | S7-06 | Shared libgcc part 4: lead native acceptance and the install decision (E6-01d) | Done | GCC-KNC's shared libgcc_s passes every compatibility and unwind test on the card (old and new clients, exce... |
 | S7-07 | libgfortran part 1: KNC floating-point backend and capability contract (E6-02) | Done | libgfortran now has a KNC floating-point backend: it sets and clears the six IEEE flags and the four roundi... |
-| S7-08 | libgfortran part 2: base runtime build and the descriptor and I/O slice (E6-02) | In progress | S7-08 red approved: six KNC Fortran slice programs (allocation, descriptors, bounds, formatted and internal... |
+| S7-08 | libgfortran part 2: base runtime build and the descriptor and I/O slice (E6-02) | Waiting for review | Green: GCC 42a9a4d4e6a (libgfortran configure skips AVX/FMA probes for k1om), tests f4f18e7. k1om libgfortr... |
 | S7-09 | libgfortran part 3: runtime isolation and packaging (E6-02) | Not started | owner chose a private directory for GCC-KNC's runtime on the card (S7-06); libgfortran's shared variant goe... |
 | S7-10 | Sprint 7 batch check after S7-05 and S7-08 | Not started | Sprint 7 draft; parked in lane lead until the owner starts Sprint 7 and Sprint 6's gcc tickets are merged; ... |
 | S8-01 | Card checks C1-C10 for the Sprint 8 tuning block - microbenchmarks in the knc-char corpus | **Waiting for you** | Code review passes (C1-C10 kernels, gates, red 0ed8d09 then green 3f5ccb2), but acceptance line 3 needs the... |
 
 ## Recent activity
 
+- 2026-11-07 19:41 **S7-08** engineer submit: Green: GCC 42a9a4d4e6a (libgfortran configure skips AVX/FMA probes for k1om), tests f4f18e7. k1om libgfortran built via gcc_build.py all-target-lib...
 - 2026-11-07 19:00 **S7-08** lead approve-red: S7-08 red approved: six KNC Fortran slice programs (allocation, descriptors, bounds, formatted and internal I/O with IOSTAT/EOR, kind-10, modules, ...
 - 2026-11-07 18:56 **S7-08** engineer red: c84a960: io.f90 fixed per review: ES12.4E2 expectation is right-justified ' -3.3333E-01'; internal write overflow checked with is_iostat_eor(ios). ...
 - 2026-11-07 18:54 **S7-08** lead changes: Red reason is right (no k1om libgfortran, link fails) and the slice covers the acceptance list, but io.f90 has two expectations that will fail at g...
@@ -154,16 +155,15 @@ Current tickets: `[###################-]` 118 of 122
 - 2026-11-07 18:38 **S7-07** lead approve: libgfortran now has a KNC floating-point backend: it sets and clears the six IEEE flags and the four rounding modes in both x87 and IMCI, keeps MXC...
 - 2026-11-07 18:26 **S7-07** engineer submit: Submitted by the lead for the engineer: green at GCC 2e6d88948a2, tests 2fac060, host tests pass; native state-native.mic on the card 0 failures, e...
 - 2026-11-07 18:24 **S7-07** lead answer: Card result recorded above: 0 failures, exit 0. Submit for approval.
-- 2026-11-07 18:23 **S7-07** owner decide: Lead (interactive): state-native.mic ran on the card 23:23Z on 2026-11-07: 'State logic: 0 failures, 0 instrumented MXCSR writes', exit 0 (.work/_s...
 
 ## Cost
 
 - From the script, engineer: 287 sessions, 676.7M input tokens
 - From the script, lead: 220 sessions, 67.6M input tokens
-- Started by hand, Claude: 10 sessions, 1682.3M input tokens
+- Started by hand, Claude: 10 sessions, 1687.2M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 13.1 GiB of 100 GiB. 143 GiB free on the drive.
+The project uses 13.2 GiB of 100 GiB. 136 GiB free on the drive.
