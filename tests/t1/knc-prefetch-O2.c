@@ -29,6 +29,15 @@
 // trip check uses 4 x 2 iterations, not 4 x 32.
 // scan-asm-func column_f32: \bvprefetch1\s+2184\(
 // scan-asm-func column_f32: \bvprefetch0\s+1092\(
+// A loop whose trip count is only known at run time is versioned on it (lead
+// changes 2026-11-08, card: M2 short at length 17 ran one vector iteration
+// with four prefetches and their moves, 1.30x slower).  The prefetched copy
+// runs only when the loop runs at least four L2 distances, 4 x 32 = 128
+// vector iterations: the guard compares the loop's iteration count less one
+// against 127.  The other copy is the loop as it was, without any prefetch:
+// a label, vprefetch-free lines around the vmulps, and a jump back.
+// scan-asm-func stream_f32: \bcmpq\s+\$127,
+// scan-asm-func stream_f32: ^(\.L\d+):\n(?:(?!\s*vprefetch)[^\n]*\n)*?\s+vmulps[^\n]*\n(?:(?!\s*vprefetch)[^\n]*\n)*?\s+j[a-z]+\s+\1$
 #include "knc-prefetch.h"
 
 void
