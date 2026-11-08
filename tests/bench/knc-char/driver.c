@@ -104,6 +104,11 @@ static uint64_t random_next(uint64_t *state) {
     *state ^= *state << 13; *state ^= *state >> 7; *state ^= *state << 17;
     return *state;
 }
+/* C4 puts page i's node on line 5i mod 64, so the cycle covers every page offset
+   (and L1 set) instead of aliasing at offset 0; lines stay L1/L2-resident (S8-12). */
+static size_t node(size_t i) {
+    return current->kind == 3 ? 4096*i + 64*(5*i % 64) : 64*i;
+}
 static void prepare(struct worker *w) {
     memset(w->memory, 0, footprint);
     if (!strncmp(current->name, "c5.", 3) || !strncmp(current->name, "c7.", 3)) {
@@ -116,8 +121,7 @@ static void prepare(struct worker *w) {
             w->memory[i] = current->kind == 5 ? random_next(&state) & 1 : 1;
     }
     if (current->kind == 1 || current->kind == 3) {
-        size_t stride = current->kind == 3 ? 4096 : 64;
-        size_t n = footprint / stride;
+        size_t n = footprint / (current->kind == 3 ? 4096 : 64);
         size_t *order = w->order;
         uint64_t state = 1234567 + w->id;
         for (size_t i = 0; i < n; ++i) order[i] = i;
@@ -126,7 +130,7 @@ static void prepare(struct worker *w) {
             order[i] = order[j]; order[j] = t;
         }
         for (size_t i = 0; i < n; ++i)
-            *(void **)(w->memory + stride*order[i]) = w->memory + stride*order[(i+1) % n];
+            *(void **)(w->memory + node(order[i])) = w->memory + node(order[(i+1) % n]);
     }
     /* A one-round native correctness gate precedes the pilot, after pinned first touch. */
     current->fn(1, w->memory, footprint);
@@ -151,7 +155,7 @@ static void prepare(struct worker *w) {
                       !strncmp(current->name + 3, "stream", 6) ? 1.25f : 1.75f;
         for (int line = 0; line < 32; ++line)
             for (int lane = 0; lane < 16; ++lane)
-                if (((float *)(w->memory + 7*1048576))[16*line + lane] !=
+                if (((float *)(w->memory + 7*C5_PITCH))[16*line + lane] !=
                     (lane < row ? value : .25f)) fail("prefetch kernel correctness gate");
     }
 }
@@ -216,7 +220,7 @@ static size_t budget(const char *name) {
     for (size_t k = 0; k < NTESTS; ++k)
         if (!strcmp(name, tests[k].name) && tests[k].core_bytes)
             return tests[k].core_bytes / density;
-    if (!strncmp(name, "c5.", 3)) return 8*1024*1024;
+    if (!strncmp(name, "c5.", 3)) return 9*1024*1024;
     size_t size = !strncmp(name, "memory.", 7) ? 16*1024*1024 :
                   !strncmp(name, "l2.", 3) ? 256*1024 : 16*1024;
     size_t per = size / density, result = 2048;
@@ -229,11 +233,12 @@ static int chosen(size_t k) {
                         tests[k].name[strlen(family)] == '.'));
 }
 int main(int argc, char **argv) {
-    int dry = 0, native = 0, unstable = 0;
+    int dry = 0, native = 0, layout = 0, unstable = 0;
     pthread_t threads[240];
     for (int i = 1; i < argc; ++i) {
         if (!strcmp(argv[i], "--dry-run")) dry = 1;
         else if (!strcmp(argv[i], "--native")) native = 1;
+        else if (!strcmp(argv[i], "--layout")) layout = 1;
         else if ((!strcmp(argv[i], "--threads") || !strcmp(argv[i], "--cores") ||
                   !strcmp(argv[i], "--rounds") || !strcmp(argv[i], "--case") ||
                   !strcmp(argv[i], "--check")) && i+1 < argc) {
@@ -252,9 +257,40 @@ int main(int argc, char **argv) {
                     if (!strcmp(value, tests[k].name)) selected = (int)k;
                 if (selected < 0) fail("unknown measurement name");
             }
-        } else fail("usage: --dry-run|--native [--threads 1..4] [--cores 1..60] [--check cN] [--case NAME] [--rounds N]");
+        } else fail("usage: --dry-run [--layout]|--native [--threads 1..4] [--cores 1..60] [--check cN] [--case NAME] [--rounds N]");
     }
     if (dry == native) fail("choose exactly one execution mode");
+    if (layout && !dry) fail("--layout needs --dry-run");
+    if (layout) {
+        /* Walk each sibling's C4 pointer cycle as prepare() builds it. */
+        for (size_t k = 0; k < NTESTS; ++k) {
+            if (!chosen(k) || tests[k].kind != 3) continue;
+            current = &tests[k]; footprint = budget(current->name);
+            size_t pages = footprint/4096;
+            for (int i = 0; i < density; ++i) {
+                struct worker *w = &workers[i];
+                unsigned char seen[64] = {0}, *visited = calloc(pages, 1);
+                size_t cycle = 0, offsets = 0;
+                w->id = i;
+                if (posix_memalign(&w->allocation, 4096, footprint + 64*1024) || !visited ||
+                    !(w->order = malloc(pages * sizeof(size_t)))) fail("layout allocation");
+                w->memory = (unsigned char *)w->allocation + i*1024;
+                prepare(w);
+                unsigned char *p = w->memory;
+                do {
+                    size_t page = (size_t)(p - w->memory)/4096, line = (uintptr_t)p % 4096/64;
+                    if (page >= pages || visited[page]++) fail("C4 cycle revisits or leaves its pages");
+                    offsets += !seen[line]++;
+                    ++cycle;
+                    p = *(unsigned char **)p;
+                } while (p != w->memory);
+                printf("layout %s worker=%d pages=%zu cycle=%zu page_offsets=%zu\n",
+                       current->name, i, pages, cycle, offsets);
+                free(visited); free(w->order); free(w->allocation);
+            }
+        }
+        return 0;
+    }
     if (dry) {
         for (size_t k = 0; k < NTESTS; ++k)
             if (chosen(k))

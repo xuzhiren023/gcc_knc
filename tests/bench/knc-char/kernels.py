@@ -139,7 +139,7 @@ for level in ('l1', 'l2', 'memory'):
             + '; bytes/ns derives bandwidth, includes loop/address overhead', kind=2)
 
 
-from s8_memory import register as memory_checks
+from s8_memory import register as memory_checks, C5_PITCH
 from s8_compute import register as compute_checks
 from s8_tails import register as tail_checks
 memory_checks(add)
@@ -173,7 +173,8 @@ def emit(out):
     header += ['{"%s", char_kernel_%d, %d, %d, %d, %d, %d},' %
                (c['name'], i, c['kind'], c['unit'], c['core_bytes'], c['verify_start'], c['verify_length'])
                for i, c in enumerate(CASES)]
-    header += ['};', '#define NTESTS (sizeof(tests)/sizeof(tests[0]))']
+    header += ['};', '#define NTESTS (sizeof(tests)/sizeof(tests[0]))',
+               '#define C5_PITCH %d' % C5_PITCH]
     asm += ['.section .rodata', '.p2align 6', 'ones:', '.rept 16', '.long 0x3f800000', '.endr',
             'double_ones:', '.rept 8', '.quad 0x3ff0000000000000', '.endr',
             'indices:', '.long ' + ','.join(str(i) for i in range(16)),

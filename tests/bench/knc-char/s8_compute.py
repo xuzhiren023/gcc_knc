@@ -22,11 +22,17 @@ def register(add):
     for chain in ('vector', 'memory'):
         for unroll in (1, 2, 4):
             # U expanded iterations, U independent recurrences, 32 updates total.
-            source = '%zmm31' if chain == 'vector' else '(%rsi)'
-            body = '\n'.join(f'vaddps {source}, %zmm{i}, %zmm{i}' for i in range(unroll))
+            if chain == 'vector':
+                body = '\n'.join(f'vaddps %zmm31, %zmm{i}, %zmm{i}' for i in range(unroll))
+            else:
+                # The folded load carries the recurrence: each sum is stored to the
+                # line the next update loads; the register operand is the constant.
+                body = '\n'.join(f'vaddps {64*i}(%rsi), %zmm31, %zmm{i}\n'
+                                 f'vmovaps %zmm{i}, {64*i}(%rsi)' for i in range(unroll))
             add(f'c9.{chain}.u{unroll}', body,
-                f'{unroll} independent recurrences, register (4-cycle) or memory-operand (12-cycle) add',
-                loop_scale=32 // unroll)
+                f'{unroll} independent recurrences, register (4-cycle) add, or folded-load '
+                'add whose result is stored to the line the next update loads',
+                loop_scale=32 // unroll, unit=1 if chain == 'vector' else 2)
     for mode in ('fixed', 'random'):
         body = []
         for i in range(32):
