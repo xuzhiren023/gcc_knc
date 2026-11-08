@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-08 00:36.
+Updated automatically at every ticket change. Last update: 2026-11-08 00:56.
 
 **Waiting for you:** S8-01. Run `python tools/pm.py inbox`.
 
@@ -141,12 +141,13 @@ Current tickets: `[###################-]` 119 of 122
 | S7-06 | Shared libgcc part 4: lead native acceptance and the install decision (E6-01d) | Done | GCC-KNC's shared libgcc_s passes every compatibility and unwind test on the card (old and new clients, exce... |
 | S7-07 | libgfortran part 1: KNC floating-point backend and capability contract (E6-02) | Done | libgfortran now has a KNC floating-point backend: it sets and clears the six IEEE flags and the four roundi... |
 | S7-08 | libgfortran part 2: base runtime build and the descriptor and I/O slice (E6-02) | Done | libgfortran now builds for KNC, and six Fortran programs (allocation, descriptors, bounds, I/O, kind 10, mo... |
-| S7-09 | libgfortran part 3: runtime isolation and packaging (E6-02) | In progress | released to lane gcc. S7-06 settled shared libgcc (private directory on the card), so offer the shared libg... |
+| S7-09 | libgfortran part 3: runtime isolation and packaging (E6-02) | Waiting for review | GCC 9af4eb014e3: k1om libgfortran.spec loads installed libgfortran-knc.ld (ASSERT on a GFORTRAN_10 symbol),... |
 | S7-10 | Sprint 7 batch check after S7-05 and S7-08 | Not started | also waits for S7-09, so the batch runs once at Sprint 7's final GCC head. |
 | S8-01 | Card checks C1-C10 for the Sprint 8 tuning block - microbenchmarks in the knc-char corpus | **Waiting for you** | Code review passes (C1-C10 kernels, gates, red 0ed8d09 then green 3f5ccb2), but acceptance line 3 needs the... |
 
 ## Recent activity
 
+- 2026-11-08 00:56 **S7-09** engineer submit: GCC 9af4eb014e3: k1om libgfortran.spec loads installed libgfortran-knc.ld (ASSERT on a GFORTRAN_10 symbol), so -L to the donor .so.3/.a fails clear...
 - 2026-11-08 00:35 **S7-08** lead approve: libgfortran now builds for KNC, and six Fortran programs (allocation, descriptors, bounds, I/O, kind 10, modules) run correctly on the card. Machin...
 - 2026-11-08 00:27 **S7-08** owner decide: Owner (via lead, 2026-11-08): native rerun 03:49Z passed, all six programs; back to review and approve.
 - 2026-11-08  **S7-10** lead note: also waits for S7-09, so the batch runs once at Sprint 7's final GCC head.
@@ -154,7 +155,6 @@ Current tickets: `[###################-]` 119 of 122
 - 2026-11-07 20:35 **S7-08** lead escalate: Round-2 review clean: bfe3d19 changes only the modules.f90 expectation to REAL128 == 10 with 128-bit storage and precision 18, which matches gfortr...
 - 2026-11-07 20:30 **S7-08** engineer submit: Test was wrong, compiler right: F2008 13.8.2.21 defines REAL128 by 128-bit storage; gfortran trans-types.cc:299 picks the kind with int_size_in_byt...
 - 2026-11-07 20:26 **S7-08** lead changes: modules.mic fails on the card: iso_fortran_env REAL128 is not -1. See the decision note above; decide whether the test or the compiler is wrong, fi...
-- 2026-11-07 20:26 **S7-08** owner decide: Lead (interactive): native run 01:25Z 2026-11-08 (.work/_shared/tmp/claude-s7-08/slice.out): alloc, assumed, bounds, io, kind10 PASS; modules FAIL:...
 
 ## Cost
 
@@ -166,4 +166,4 @@ Current tickets: `[###################-]` 119 of 122
 
 ## Disk
 
-The project uses 13.2 GiB of 100 GiB. 149 GiB free on the drive.
+The project uses 13.8 GiB of 100 GiB. 127 GiB free on the drive.
