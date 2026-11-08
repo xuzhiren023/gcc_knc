@@ -7,8 +7,11 @@
 
 t1 runs only the tail scans (tests/t1/knc-mask-tail-*.c, knc-mask-split.c).
 native builds tests/regress/knc-tail-guard.c into .work/_shared/S8-02 as
-knc-tail-guard.mic and knc-tail-guard-control{1,2,3}.mic, checks the new
-tail forms in the kernel assembly and lints; the lead runs them on the card.
+knc-tail-guard.mic and knc-tail-guard-control{1,2,3}.mic (control 3: the
+aligned length-16 kernel reads one element past its last line, since an
+aligned masked over-read stays inside its own line and cannot reach a
+guard), checks the new tail forms in the kernel assembly and lints; the
+lead runs them on the card.
 acceptance builds the s4_masks and s5_ops fixtures there as well.
 """
 import os

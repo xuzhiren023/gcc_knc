@@ -8,9 +8,14 @@
    .work/_shared/S8-02.  The lead runs them on the card:
    knc-tail-guard.mic prints "S8-02-TAIL PASS failures=0 ..." and exits 0;
    knc-tail-guard-control{1,2,3}.mic (kernels built with -DGUARD_CONTROL=1,
-   2 or 3: the gather tail, the whole-loop gather, the whole-loop aligned
-   mask each read one element past the end) must die on a guard page and
-   exit 3.  Inputs are dyadic values with exact sums, so x87 extended
+   2 or 3: the gather tail and the whole-loop gather each read one element
+   past the end; the aligned length-16 kernel reads one element past its
+   last line) must die on a guard page and exit 3.  Control 3 cannot be an
+   aligned masked over-read: an aligned masked access stays within its own
+   64-byte line, so one element past an aligned array of 5 shares the line
+   with elements 0-4 and never reaches the guard (lead, round 1).  It is
+   the whole-vector access that crosses into the next line, with the array
+   ending at the high guard.  Inputs are dyadic values with exact sums, so x87 extended
    precision in the reference cannot differ from the vector result.
    ADR-0007 point 7; ADR-0009 amendment 1 point 9; C6 in
    docs/research/knc-characterization.md.  */
@@ -35,6 +40,7 @@ void fix_f32_13 (float *restrict, const float *restrict, const float *restrict);
 void fix_f32_20 (float *restrict, const float *restrict, const float *restrict);
 void fix_al_f32_5 (float *restrict, const float *restrict, const float *restrict);
 void fix_al_f32_13 (float *restrict, const float *restrict, const float *restrict);
+void fix_al_f32_16 (float *restrict, const float *restrict, const float *restrict);
 void fix_al_f32_18 (float *restrict, const float *restrict, const float *restrict);
 void fix_f64_5 (double *restrict, const double *restrict, const double *restrict);
 void fix_al_f64_5 (double *restrict, const double *restrict, const double *restrict);
@@ -77,7 +83,8 @@ void small_f32 (float *restrict c, const float *restrict a,
 }
 
 /* Constant lengths: whole-loop masks (5, 13), a full vector plus a masked
-   tail (20, 18).  Controls 2 and 3 read one element past the end of b.  */
+   tail (20, 18), one full aligned vector (16).  Control 2 reads one element
+   past the end of b; control 3 reads one element past the aligned line.  */
 #define FIX(T, S, N, OVER)                                                \
   void fix_##S##_##N (T *restrict c, const T *restrict a,                 \
                       const T *restrict b)                                \
@@ -91,8 +98,8 @@ void small_f32 (float *restrict c, const float *restrict a,
   }
 FIX (float, f32, 5, GUARD_CONTROL == 2) FIX (float, f32, 13, 0)
 FIX (float, f32, 20, 0)
-FIX_AL (float, f32, 5, GUARD_CONTROL == 3) FIX_AL (float, f32, 13, 0)
-FIX_AL (float, f32, 18, 0)
+FIX_AL (float, f32, 5, 0) FIX_AL (float, f32, 13, 0)
+FIX_AL (float, f32, 16, GUARD_CONTROL == 3) FIX_AL (float, f32, 18, 0)
 FIX (double, f64, 5, 0) FIX_AL (double, f64, 5, 0)
 #else
 #define _GNU_SOURCE 1
@@ -276,6 +283,8 @@ main (void)
   SWEEP_AL (float, f32, fix_al_f32_5, 5, 5, fix_al_f32_5 (c, a, b),
             a[i] + b[i]);
   SWEEP_AL (float, f32, fix_al_f32_13, 13, 13, fix_al_f32_13 (c, a, b),
+            a[i] + b[i]);
+  SWEEP_AL (float, f32, fix_al_f32_16, 16, 16, fix_al_f32_16 (c, a, b),
             a[i] + b[i]);
   SWEEP_AL (float, f32, fix_al_f32_18, 18, 18, fix_al_f32_18 (c, a, b),
             a[i] + b[i]);
