@@ -23,7 +23,10 @@ Order (ADR-0009 amendment 1):
    cost (S8-05).
 3. Memory-operand forms (S8-06), `vpmadd231d` (S8-07), tune flags (S8-08), `-O2` defaults (S8-09),
    ring traffic and check C11 (S8-10).
-4. Batch check and paired M2 re-measure (S8-11).
+4. Added 2026-11-08 at the owner's request, for ADR-0009 points the sprint had missed: streaming
+   stores (S8-13, E5-08, now that C1 shows a 60-core gain), default 64-byte alignment and TLB-aware
+   cache parameters (S8-14, E5-13), small-loop unroll and the GCC-KNC flags page (S8-15, E5-09).
+5. Batch check and paired M2 re-measure (S8-11).
 
 **Decided by the lead:** `-ftrapping-math` stays the KNC default (ADR-0003: flags are observable).
 
