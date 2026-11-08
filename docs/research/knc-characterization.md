@@ -440,3 +440,31 @@ Decides (E7-04): an unpredictable branch costs 5 ticks more at 1 thread, about 1
 mispredict if half of the random branches miss; at 4 threads it costs 2.7 cycles per core. Set
 `BRANCH_COST` from about 10 cycles; a branchless sequence pays when it adds under about 5 ticks per
 unpredictable branch.
+
+### C12: card power by rail, 60 cores x 4 threads (S8-17, card 2026-11-08 16:30Z)
+
+One launch, seven 20 s phases in the order idle, x87, fma, stream, fma, x87, idle; the sampler
+reads `/sys/class/micras/power` every 50 ms and drops the first second of each phase (379-380
+samples per phase). The clock stayed at 1,238,094 kHz in every phase (no throttling); the die
+temperature rose from 56 to 72 C. `.work/_shared/tmp/claude-s8-17/c12.out`.
+
+| Phase | Card W | Core rail W | Uncore W | Memory W | Work | Energy |
+|---|---:|---:|---:|---:|---:|---:|
+| idle | 99.2 / 100.6 | 21.1 / 22.0 | 31.8 / 32.0 | 29.3 / 29.2 | - | - |
+| x87 (register chains) | 139.3 / 143.8 | 57.1 / 58.0 | 32.0 | 28.8 / 28.2 | 57.9 GFLOP/s | 2.41-2.48 nJ/flop |
+| fma (register-resident, peak issue) | 161.6 / 163.7 | 74.8 / 75.0 | 32.0 | 28.4 / 28.0 | 2,286 GFLOP/s | 0.071 nJ/flop |
+| stream (memory read-modify-write) | 191.9 | 66.4 | 40.0 | 55.0 | 156.5 GB/s | 1.23 nJ/byte |
+
+(Two figures are the two runs of a phase.) The FMA phase reaches 96% of the single-precision peak
+(60 cores x 16 lanes x 2 flops x 1.238 GHz = 2,377 GFLOP/s).
+
+Answers the owner's question (2026-11-08):
+- About 100 W is fixed: the idle card already draws it, with the core, uncore and memory rails
+  carrying 21, 32 and 29 W.
+- A saturated vector unit adds about 53 W on the core rail over idle, but only about 17 W over
+  x87 code that keeps the same cores busy (core 75 against 57-58 W; card 162-164 against 139-144 W).
+  It does 40x the work, so it needs about 34x less energy per flop.
+- Memory traffic costs the most: streaming lifts the memory rail from 29 to 55 W and the uncore from
+  32 to 40 W, for 192 W on the card. The 160-180 W seen on real kernels is mostly memory and fixed
+  power, not the vector unit.
+- No phase came near the card's 300 W rating; the highest sample was 198 W.

@@ -101,3 +101,8 @@ passes on what they choose. Each item says how it was shown. Newest first.
    thread); beyond it each load costs about 29 ticks more at one thread (11.8-13.7 against 4.1 at
    4 threads). Tiles or per-core working sets over 256 KiB on 4-KiB pages pay this; 2 MB pages
    avoid it (2026-11-08, one launch each).
+12. **Where the card's power goes (S8-17, C12, 60x4).** Idle about 100 W (core 21, uncore 32,
+   memory 29 W). Register-resident x87 about 141 W, saturated IMCI FMA about 163 W (2,286
+   GFLOP/s, 96% of single-precision peak), a memory stream about 192 W (memory rail 55 W, uncore
+   40 W, 156.5 GB/s). Memory traffic, not the vector unit, drives the draw; the clock stayed at
+   1.238 GHz and the die peaked at 72 C, no throttling (2026-11-08, one launch).
