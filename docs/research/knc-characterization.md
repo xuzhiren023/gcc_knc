@@ -241,9 +241,23 @@ L1-resident, so the cost of a prefetch that misses is not measured.
 Every load sits at the same page offset, so all lines of a thread fall in one 8-way L1 set. Loads
 therefore hit L2 (24-26, as `l2.load_lat`), except at 128 KiB and 4 threads, where 8 lines per
 thread fit the set and hit L1 (4.13, as `l1.load_lat`).
-Decides (I-2, E5-07 and blocking): no TLB knee up to 448 KiB per core (112 pages on one thread
-adds 0.07 ticks over 32 pages). Keep the L2 tile at the cache size; the 256 KB TLB-limited tile is
-not supported.
+S8-01's decision here (no TLB knee) was wrong: the layout put every line in one L1 set. **S8-12 rerun
+(2026-11-08, lines at page offset 64*(5i mod 64), every L1 set used; one launch each,
+`.work/_shared/tmp/claude-s8-12/job{1,2}-c4-*.out`):**
+
+| KiB per core | Pages per core | 1 thread | 4 threads |
+|---:|---:|---:|---:|
+| 128 | 32 | 3.01 (0.0%) | 4.13 (0.0%) |
+| 256 | 64 | 3.02 (0.2%) | 4.13 (0.0%) |
+| 384 | 96 | 31.76 (0.0%) | 11.75 (0.2%) |
+| 448 | 112 | 31.79 (0.0%) | 13.68 (0.1%) |
+
+Every line now stays in L1, so the jump is the TLB: up to 64 4-KiB pages per core the loads cost L1
+latency; above it each load misses the 64-entry first-level DTLB and costs about 29 ticks more at one
+thread (31.8 against 3.0; at 4 threads the siblings hide part of it, 11.8-13.7 against 4.1).
+Decides (I-2, E5-07 and blocking): with 4 KiB pages, a tile should touch at most 64 pages per core
+(256 KiB, shared by its threads); larger tiles pay about 29 ticks per first touch of each page beyond that.
+The 256 KB TLB-limited tile is supported; 2 MB pages remove the limit.
 
 ### C5: software prefetch distance sweep (ticks per 64-byte row iteration; rows L1 distance, columns L2 distance, in iterations)
 
@@ -369,6 +383,22 @@ The loop costs about 2 ticks per vector op plus 2 per loop branch, so u2 already
 chain: the folded load is off the recurrence, so this is not the 12-cycle chain the check asked for.
 Decides (E5-09, SMS): unroll 4 is best at 1 and 2 threads per core (25% then 17% gains); no
 latency-bound gap appears, so no case for SMS from C9. A folded load adds no cost (E5-17).
+
+**S8-12 rerun of the memory chain (2026-11-08):** `vaddps 64i(%rsi), %zmm31, %zmmi` then
+`vmovaps %zmmi, 64i(%rsi)`, so the load carries the recurrence through the store (ticks per
+load-add-store link; one launch each, `.work/_shared/tmp/claude-s8-12/job{3,4}-c9-*.out`):
+
+| Chain | 1 thread | 2 threads |
+|---|---:|---:|
+| register, u1 / u2 / u4 | 4.02 / 3.02 / 2.52 | 4.57 / 3.02* / 2.51 |
+| memory, u1 | 11.07 (0.0%) | 13.08 (1.9%) |
+| memory, u2 | 8.56 (0.0%) | 12.03 (1.5%) |
+| memory, u4 | 8.30 (0.0%) | 11.01 (1.7%) |
+
+\* flagged, 14.2% spread. A recurrence through memory costs about 11 ticks per link at one thread,
+almost three times the register chain, and unrolling recovers only a quarter of it (1 thread) or
+less (2 threads). Decides (E5-09, E5-17): keep recurrences in registers (store motion and scalar
+replacement matter more than unroll for such loops); unroll does not fix a memory-carried chain.
 
 ### C10: branch-mispredict cost (ticks per branch)
 

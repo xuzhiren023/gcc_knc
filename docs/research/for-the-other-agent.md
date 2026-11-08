@@ -94,5 +94,10 @@ passes on what they choose. Each item says how it was shown. Newest first.
    glibc 2.21 each thread that calls `malloc` gets its own arena, which reserves 64 MB of address
    space. At 87 threads that is about 5.6 GB, and S8-01's 240-thread job failed with ENOMEM under a
    6 GB limit. Allocate in the main thread before starting workers, or set `M_ARENA_MAX`
-   (`mallopt` or `MALLOC_ARENA_MAX`). Fewer arenas may also mean more lock contention (2026-11-08,
-   lead's diagnosis, not yet confirmed by the S8-01 rerun).
+   (`mallopt` or `MALLOC_ARENA_MAX`). Fewer arenas may also mean more lock contention (2026-11-08;
+   confirmed: after the fix the 240-thread rerun ran cleanly).
+11. **The first-level DTLB holds 64 4-KiB pages per core.** S8-12's card check (C4, one load per
+   page, lines kept in L1): up to 64 pages per core a load costs L1 latency (3 ticks at one
+   thread); beyond it each load costs about 29 ticks more at one thread (11.8-13.7 against 4.1 at
+   4 threads). Tiles or per-core working sets over 256 KiB on 4-KiB pages pay this; 2 MB pages
+   avoid it (2026-11-08, one launch each).
