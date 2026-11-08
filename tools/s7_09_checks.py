@@ -95,9 +95,12 @@ def link(name, extra, binary):
                               for path in modules):
         failures.append(name + ': intrinsic module directory not the prefix finclude: ' + repr(modules))
     maptext = linkmap.read_text(errors='replace')
-    runtime = sorted(set(re.findall(r'(\S*lib(?:gfortran|gcc|gcc_eh|gcc_s)\.(?:a|so[.\d]*))', maptext)))
+    runtime = sorted(set(re.findall(r'(/\S*/lib(?:gfortran|gcc|gcc_eh|gcc_s)\.(?:a|so[.\d]*))', maptext)))
     if not any('libgfortran' in path for path in runtime):
         failures.append(name + ': link map names no libgfortran')
+    guards = re.findall(r'^LOAD (\S*libgfortran-knc\.ld)$', maptext, re.M)
+    if not guards or not all(under_prefix(path) for path in guards):
+        failures.append(name + ': link map does not load the prefix libgfortran-knc.ld: ' + repr(guards))
     failures.extend(name + ': runtime from outside the prefix: ' + path
                     for path in runtime if not under_prefix(path))
     return failures, text, maptext
