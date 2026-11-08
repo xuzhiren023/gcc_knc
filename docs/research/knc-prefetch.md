@@ -1,6 +1,7 @@
 # KNC two-level software prefetch (S8-03, E5-07)
 
-Status: red tests committed 2026-11-08; the green steps below are the plan, not results.
+Status: green 2026-11-08 (GCC s8/S8-03 at d7c493f; T1 scans pass). Card results are the
+lead's: the paired M2 run and s4_masks / s5_ops are staged under `.work/_shared/S8-03/`.
 
 ## Rules the T1 scans encode (`tests/t1/knc-prefetch-*.c`)
 
@@ -26,22 +27,37 @@ Source: `docs/research/knc-characterization.md` C2, C4, C5 and the S8-12 rerun.
 - Written streams use the read-hint forms `vprefetch0/1`, as C5's kernels did for their
   output array. `vprefetche*` is unmeasured and not emitted.
 
-## Green plan
+## What was built (GCC s8/S8-03, 836a0e2..d7c493f)
 
-- `imci.md`: one `(prefetch ...)` insn under `TARGET_KNC`, locality 3/2/1/0 to
+- `imci.md`: `knc_prefetch`, one `(prefetch ...)` insn under `TARGET_KNC`, locality 3/2/1/0 to
   `vprefetch0/1/2/nta` (Intel 327364-001 pp. 641-656); write hint dropped like the SSE path.
-  `knc.md`: prefetches take a scalar slot (C2: `vprefetch0` pairs free with a vector op).
-- `i386.md` `prefetch` expander: `|| TARGET_KNC` in the condition and an early KNC emit
-  (ADR-0006 forms). This also makes `__builtin_prefetch` work on KNC.
-- `tree-ssa-loop-prefetch.cc`: a target hook `TARGET_PREFETCH_DISTANCES (nstreams, &near,
-  &far)` in lines, consulted after reuse pruning; when it answers, `ahead` comes from it and
-  a second prefetch at the far distance is issued with locality 2 (1 for nontemporal). With
-  the hook unset (every other target) the pass is unchanged. `target.def`, `tm.texi.in`,
-  `tm.texi`: one hook entry.
-- `i386.cc`: one hook table entry to `ix86_knc_prefetch_distances` (`i386-knc.cc`).
-- `i386.opt`: the two `-param=knc-prefetch-*-distance=` params, `Param Optimization`.
-- `i386-options.cc`: the existing `-mtune=knc` block calls `ix86_knc_prefetch_params`, which
-  sets `-fprefetch-loop-arrays` at `-O2`+, `min-insn-to-prefetch-ratio` and
-  `prefetch-min-insn-to-mem-ratio` to 1 (an eight-stream loop is two instructions per
-  reference; C2 prices `vprefetch0` at zero and `vprefetch1` at about 2 core cycles), and
-  `simultaneous-prefetches` so eight streams at 16 lines are not refused.
+  `knc.md`: `knc_special` value `prefetch` puts it in a scalar slot (C2).
+- `i386.md` `prefetch` expander: `|| TARGET_KNC` in the condition and an early
+  `gen_knc_prefetch` emit at entry (ADR-0006 forms). `__builtin_prefetch` now works on KNC.
+- `tree-ssa-loop-prefetch.cc`: target hook `TARGET_PREFETCH_DISTANCES (nstreams, &near, &far)`
+  in lines (`target.def`, `tm.texi.in`, `tm.texi`; default `NULL`). When it answers, the
+  pass skips its latency-derived `ahead`, counts the streams after reuse pruning, converts
+  lines to iterations by the loop's largest step (smallest `prefetch_mod`), checks the trip
+  count against the far distance, and issues the far prefetch (locality 2, or 1 when
+  nontemporal) before the near one for every stream. `i386.cc` points the hook at
+  `ix86_knc_prefetch_distances`, which returns false unless `TARGET_KNC`.
+- `i386-knc.cc`: the distance rule above; `-fprefetch-loop-arrays` at `-O2`+ (not `-Os`),
+  `min-insn-to-prefetch-ratio` and `prefetch-min-insn-to-mem-ratio` 1, from the existing
+  `ix86_knc_vectorizer_params` call (no `i386-options.cc` change); `simultaneous_prefetches`
+  1024 in the KNC cost table (the pass's slot count, not a hardware queue: eight streams at
+  16 + 32 lines hold 384 slots). `i386.opt`: the two params.
+- Two generic fixes the scans needed, both inert for x86 at `-O2` (the pass is off there and
+  the torture corpus has no `__builtin_prefetch` in a loop):
+  - The pass groups references whose addresses differ by a constant once expanded through
+    their definitions (`tree-affine`). The vectorizer gives `x[i-1]`, `x[i]` and `x[i+1]`
+    separate pointers, initialized before the loop as `x` plus separately computed offsets
+    (at `-O3` with alignment peeling: prolog count, +1, +2), so the stencil counted four
+    streams, halved its L1 distance and prefetched the same line three times.
+  - `ivopts` treats the pointer of `__builtin_prefetch` as an address use
+    (`USE_PTR_ADDRESS`, as for the masked load/store internal functions). As a generic use
+    the prefetch IV was the cheapest to keep, so the loop pointer was anchored on the far
+    prefetch and the accesses became `-2048(%rcx)`; the assembly was equivalent but the
+    distances were unreadable in it.
+- Stencil scans accept a displacement within 8 bytes of the line: the one prefetched x
+  reference is the leading `x[i+1]`, and the loop pointer may be anchored on any of the
+  three x accesses.
