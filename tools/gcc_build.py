@@ -15,7 +15,7 @@ import sys
 ROOT = Path(__file__).resolve().parents[1]
 PROJECT = ROOT.parent.parent if ROOT.parent.name == '.work' else ROOT
 SHARED = PROJECT / '.work/_shared'
-MAKE_ARGS = ['-j8', 'all-gcc', 'all-target-libgcc',
+MAKE_ARGS = ['-j8', 'all-gcc', 'all-target-libgcc', 'all-target-libgfortran',
              'CFLAGS=-O2 -g1', 'CXXFLAGS=-O2 -g1']
 
 
