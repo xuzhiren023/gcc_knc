@@ -30,6 +30,8 @@ Then stop. Your final message is only the `PM update:` line that command prints:
 
 - Everything in your worktree is deleted when the ticket merges. Keep nothing there that must outlive the ticket.
 - The GCC checkout, toolchain and build trees live once, in the shared build area (`.work/_shared`). Never copy them.
+- There are two GCC trees: `gcc`/`gcc-build` (lane gcc) and `gcc-2`/`gcc-build-2` (lane gcc2; dispatch sets `KNC_GCC_SLOT=2`). Use only your lane's tree and never touch the other one.
+- One build per tree at a time. Both lanes merge into one `knc`, so rebase your branch on `knc` before submit.
 - No per-attempt, per-run or dated output folders. Overwrite the previous output, and delete what you no longer need.
 - Large inputs and outputs stay out of git. Ask the lead if something truly must be kept.
 
