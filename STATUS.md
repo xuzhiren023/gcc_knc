@@ -1,10 +1,10 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-08 00:57.
+Updated automatically at every ticket change. Last update: 2026-11-08 02:41.
 
 **Waiting for you:** S8-01. Run `python tools/pm.py inbox`.
 
-Current tickets: `[###################-]` 119 of 122
+Current tickets: `[###################-]` 120 of 122
 
 ## Milestones
 
@@ -13,7 +13,7 @@ Current tickets: `[###################-]` 119 of 122
 | M0 | Foundation | In progress | 17 of 17 tickets |
 | M1 | Mixed native code | Done | 43 of 43 tickets |
 | M2 | Useful vector target | Done | 51 of 51 tickets |
-| M3 | Runtimes | In progress | 8 of 11 tickets |
+| M3 | Runtimes | In progress | 9 of 11 tickets |
 | M4 | Broad optimization | Not started | Not planned in detail yet |
 | M5 | Program corpus | Not started | Not planned in detail yet |
 | M6 | Release | Not started | Not planned in detail yet |
@@ -141,12 +141,13 @@ Current tickets: `[###################-]` 119 of 122
 | S7-06 | Shared libgcc part 4: lead native acceptance and the install decision (E6-01d) | Done | GCC-KNC's shared libgcc_s passes every compatibility and unwind test on the card (old and new clients, exce... |
 | S7-07 | libgfortran part 1: KNC floating-point backend and capability contract (E6-02) | Done | libgfortran now has a KNC floating-point backend: it sets and clears the six IEEE flags and the four roundi... |
 | S7-08 | libgfortran part 2: base runtime build and the descriptor and I/O slice (E6-02) | Done | libgfortran now builds for KNC, and six Fortran programs (allocation, descriptors, bounds, I/O, kind 10, mo... |
-| S7-09 | libgfortran part 3: runtime isolation and packaging (E6-02) | Waiting for review | GCC 9af4eb014e3: k1om libgfortran.spec loads installed libgfortran-knc.ld (ASSERT on a GFORTRAN_10 symbol),... |
+| S7-09 | libgfortran part 3: runtime isolation and packaging (E6-02) | Done | GCC-KNC's Fortran runtime installs in its private directory, static and shared programs run on the card fro... |
 | S7-10 | Sprint 7 batch check after S7-05 and S7-08 | Not started | also waits for S7-09, so the batch runs once at Sprint 7's final GCC head. |
 | S8-01 | Card checks C1-C10 for the Sprint 8 tuning block - microbenchmarks in the knc-char corpus | **Waiting for you** | Code review passes (C1-C10 kernels, gates, red 0ed8d09 then green 3f5ccb2), but acceptance line 3 needs the... |
 
 ## Recent activity
 
+- 2026-11-08 02:41 **S7-09** lead approve: GCC-KNC's Fortran runtime installs in its private directory, static and shared programs run on the card from it even with the old GCC 5 runtime on ...
 - 2026-11-08 00:56 **S7-09** engineer submit: GCC 9af4eb014e3: k1om libgfortran.spec loads installed libgfortran-knc.ld (ASSERT on a GFORTRAN_10 symbol), so -L to the donor .so.3/.a fails clear...
 - 2026-11-08 00:35 **S7-08** lead approve: libgfortran now builds for KNC, and six Fortran programs (allocation, descriptors, bounds, I/O, kind 10, modules) run correctly on the card. Machin...
 - 2026-11-08 00:27 **S7-08** owner decide: Owner (via lead, 2026-11-08): native rerun 03:49Z passed, all six programs; back to review and approve.
@@ -154,16 +155,15 @@ Current tickets: `[###################-]` 119 of 122
 - 2026-11-08  **S7-09** lead note: released to lane gcc. S7-06 settled shared libgcc (private directory on the card), so offer the shared libgfortran too, in the same private prefix....
 - 2026-11-07 20:35 **S7-08** lead escalate: Round-2 review clean: bfe3d19 changes only the modules.f90 expectation to REAL128 == 10 with 128-bit storage and precision 18, which matches gfortr...
 - 2026-11-07 20:30 **S7-08** engineer submit: Test was wrong, compiler right: F2008 13.8.2.21 defines REAL128 by 128-bit storage; gfortran trans-types.cc:299 picks the kind with int_size_in_byt...
-- 2026-11-07 20:26 **S7-08** lead changes: modules.mic fails on the card: iso_fortran_env REAL128 is not -1. See the decision note above; decide whether the test or the compiler is wrong, fi...
 
 ## Cost
 
 - From the script, engineer: 290 sessions, 684.5M input tokens
 - From the script, lead: 222 sessions, 68.1M input tokens
-- Started by hand, Claude: 10 sessions, 1720.4M input tokens
+- Started by hand, Claude: 10 sessions, 1722.8M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 13.8 GiB of 100 GiB. 126 GiB free on the drive.
+The project uses 13.8 GiB of 100 GiB. 141 GiB free on the drive.
