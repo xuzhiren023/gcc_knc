@@ -30,8 +30,12 @@ limit who needs to talk, and they make the work itself the message.
 |---|---|---|---|
 | Owner | You | Priorities, milestones, anything outward-facing | Only the inbox and milestone reviews |
 | Tech lead | Claude | Specs, reviews, technical answers, merging to local `main` | Tickets in `review`, `red-review` and `blocked` |
-| Engineer | GPT, one fresh session per ticket | How to implement the ticket | Its one ticket |
+| Engineer | Claude Code (Sonnet light, Opus standard, Fable deep; `harness/policy.json`), one fresh session per ticket | How to implement the ticket | Its one ticket |
 | Dispatcher | `tools/dispatch.py`, no model | Nothing; it starts whoever is next | The board |
+
+When a ticket's engineer struggles (repeated timeouts without progress, or a second round of changes
+for the same defect), the lead steps the model up: Sonnet to Opus, Opus or Fable to Codex gpt-6.1-sol
+with `backend: codex` and `model: gpt-6.1-sol` on the ticket (owner, 2026-11-08).
 
 Engineers never see each other. If two tickets interact, the lead sets a dependency or
 splits the work. As subsystems grow (backend, runtimes, tools), each gets a short brief in
