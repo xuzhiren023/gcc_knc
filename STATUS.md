@@ -1,10 +1,10 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-08 16:58.
+Updated automatically at every ticket change. Last update: 2026-11-08 17:07.
 
 **Next: the tech lead, on S8-03.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
-Current tickets: `[################----]` 127 of 150
+Current tickets: `[#################---]` 128 of 150
 
 ## Milestones
 
@@ -160,7 +160,7 @@ Current tickets: `[################----]` 127 of 150
 | S8-15 | Small-loop unroll default and the GCC-KNC flags page (E5-09) | Not started | added at the owner's request (2026-11-08: "add three [tickets] in s8") to cover ADR-0009 points the sprint ... |
 | S8-16 | User story - one bold flag, -mphinix, with a rising-phoenix banner and a progress bar | Not started | owner's user story, written by the lead with the owner's request quoted above. |
 | S8-17 | Card check C12 - power by rail for a saturated vector unit against x87, idle and streaming | Done | Card check C12 is built and ready to run: it measures card power by rail (core, uncore, memory) while the v... |
-| S8-18 | Second GCC tree - a gcc2 lane with its own checkout and build, so two GCC tickets run in parallel | Waiting for review | Resolver + gcc2 lane (env, safe.directory, pm slot), submit refuses branch without knc, approve detaches th... |
+| S8-18 | Second GCC tree - a gcc2 lane with its own checkout and build, so two GCC tickets run in parallel | Done | Tools now support a second GCC tree: a lane gcc2 ticket builds in gcc-2/gcc-build-2 while a gcc ticket uses... |
 | S9-01 | libgomp for KNC: futex, affinity, ring-aware barrier, spin-wait and malloc arenas (E6-03 input) | Done | We now have a build-and-design plan for GCC-KNC's own OpenMP runtime on the card: futex-based waits with de... |
 | S9-02 | libstdc++ for KNC: exceptions, RTTI, atomics, threads, packaging (E6-06 input) | Done | We now know how to build GCC 16's C++ library for the card: no newer glibc or kernel is needed, and built w... |
 | S9-03 | libstdc++ and libatomic build for k1om (E6-06a) | Not started | from S9-02's plan, under the owner's overnight blanket approval. Lead decisions: `--enable-clocale=generic`... |
@@ -175,6 +175,7 @@ Current tickets: `[################----]` 127 of 150
 
 ## Recent activity
 
+- 2026-11-08 17:07 **S8-18** lead approve: Tools now support a second GCC tree: a lane gcc2 ticket builds in gcc-2/gcc-build-2 while a gcc ticket uses the first tree, and submit refuses a br...
 - 2026-11-08 16:58 **S8-18** engineer submit: Resolver + gcc2 lane (env, safe.directory, pm slot), submit refuses branch without knc, approve detaches the other tree holding knc, gcc_build --sl...
 - 2026-11-08 15:50 **S8-03** engineer submit: Round 2 done, GCC 2fb2498: ivopts prefetch address use and affine grouping each gated on targetm.prefetch_distances answering (own condition line)....
 - 2026-11-08 15:04 **S8-03** lead changes: Gate the two generic changes on the two-level hook answering (ADR-0006, own condition line): ivopts BUILT_IN_PREFETCH address use, and affine group...
@@ -182,7 +183,6 @@ Current tickets: `[################----]` 127 of 150
 - 2026-11-08 13:00 **S8-03** lead approve-red: Red approved. The distance rule (L2 32 always; L1 16, halved when distance x streams x threads exceeds L1/4; none for cache-resident loops or under...
 - 2026-11-08 12:59 **S8-03** engineer red: Red at f4ded1a: 4 T1 files + knc-prefetch.h (stream, stencil, 8-stream row, 2 KiB L1-resident loop), tools/s8_03_checks.py t1. All kernels vectoriz...
 - 2026-11-08 12:41 **S8-02** lead approve: Short loops and loop tails on KNC now use masked vector code that never touches an unmapped page: mat8 is 3.4x faster, short loops up to 1.8x and t...
-- 2026-11-08 12:16 **S8-02** engineer submit: Round 3, fallback (c): GCC cb8a2a1 reverts abc984e (S8_02_build5): unknown-alignment masked access is again the unconditional gather/scatter, knc_l...
 
 ## Cost
 
