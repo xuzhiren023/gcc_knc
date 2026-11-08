@@ -35,12 +35,52 @@ def worker_allocations():
     return calls
 
 
+def c5_bases():
+    """Array base displacements in the short-row bodies (S8-12: no 1 MiB aliasing)."""
+    bases = set()
+    for case in CASES:
+        if case['name'].startswith('c5.row') and '.l1_0.l2_0' in case['name']:
+            bases |= {int(d) for d in re.findall(r'vmovaps (\d+)\(%r11\)', case['body'])}
+            bases |= {int(d) for d in re.findall(r'%zmm0, (\d+)\(%r11\)', case['body'])}
+    return sorted(bases)
+
+
+def c9_memory_on_chain(body):
+    """S8-12: each folded load reads the slot its own result is stored to next."""
+    lines = body.splitlines()
+    adds = [l for l in lines if l.startswith('vaddps ')]
+    for add in adds:
+        source, reg, dest = [t.strip() for t in add[len('vaddps '):].split(',')]
+        assert '(' in source and reg != dest, add
+        assert f'vmovaps {dest}, {source}' in lines, 'load off the recurrence: ' + add
+    return len(adds)
+
+
+def c4_layout(binary, density):
+    out = subprocess.check_output([binary, '--dry-run', '--layout', '--check', 'c4',
+                                   '--threads', str(density)], text=True)
+    rows = [dict(t.split('=', 1) for t in line.split()[2:])
+            for line in out.splitlines() if line.startswith('layout ')]
+    assert len(rows) == 4 * density, out
+    for row in rows:
+        pages = int(row['pages'])
+        assert int(row['cycle']) == pages, row
+        assert int(row['page_offsets']) == min(pages, 64), row
+
+
 if __name__ == '__main__':
     calls = worker_allocations()
     assert not calls, 'worker threads allocate: ' + ', '.join(calls)
     names = expected()
     missing = names - {c['name'] for c in CASES}
     assert not missing, 'missing S8 points: ' + ', '.join(sorted(missing))
+    bases = c5_bases()
+    assert len(bases) == 8, bases
+    assert len({b % 1048576 for b in bases}) == 8, 'C5 arrays 1 MiB-aligned apart'
+    assert len({b % 4096 // 64 for b in bases}) == 8, 'C5 arrays share an L1 set'
+    for u in (1, 2, 4):
+        case = next(c for c in CASES if c['name'] == f'c9.memory.u{u}')
+        assert c9_memory_on_chain(case['body']) == u, case['name']
     assert len(sys.argv) == 2, 'supply the CHAR_HOST executable for output checks'
     for density in (1, 2, 4):
         lines = subprocess.check_output([sys.argv[1], '--dry-run', '--threads',
@@ -51,4 +91,6 @@ if __name__ == '__main__':
             assert set(('cycles', 'cycle_unit', 'worker', 'ns_per_unit', 'spread',
                         'accepted', 'cores', 'bytes', 'units', 'instructions')) <= fields.keys(), name
             assert fields['cycles'] == fields['ns_per_unit'] == 'unmeasured', name
+    for density in (1, 4):
+        c4_layout(sys.argv[1], density)
     print(f'PASS S8 catalog and output keys: {len(names)} points, densities 1/2/4; no card execution')
