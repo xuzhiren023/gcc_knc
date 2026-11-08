@@ -29,7 +29,11 @@ program modules
   integer :: failures = 0
 
   call check(real32 == 4 .and. real64 == 8, 'iso_fortran_env kinds 4 and 8')
-  call check(real128 == -1, 'iso_fortran_env real128 is -1 without kind 16')
+  ! F2008 13.8.2.21 defines REAL128 by storage size (128 bits), and gfortran matches on
+  ! int_size_in_bytes (trans-types.cc gfc_get_real_kind_from_width_isofortranenv); on k1om the
+  ! x87 kind 10 occupies 16 bytes, so REAL128 is 10, not -1, even without kind 16.
+  call check(real128 == 10 .and. storage_size(e) == 128 .and. precision(e) == 18, &
+             'iso_fortran_env real128 is kind 10 (128-bit storage, no kind 16)')
   call check(area(box(2.0d0, 3.0d0)) == 6.0d0 .and. calls == 1, 'user module procedure and protected state')
 
   nan = ieee_value(nan, ieee_quiet_nan)
