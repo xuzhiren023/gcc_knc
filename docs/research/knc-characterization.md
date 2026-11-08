@@ -332,6 +332,34 @@ prefetch without L2 prefetch is 1.7-2.3x slower than none. For 8-stream short ro
 prefetch was best at the swept distances (one flagged exception); rerun rows with padded arrays
 before setting the many-stream rule.
 
+**S8-12 rerun with padded arrays (2026-11-08):** the eight arrays are 1 MiB + 4 KiB + 192 B apart, so
+they fall in different L1 and L2 sets. One launch each, `.work/_shared/tmp/claude-s8-12/job{5,6}-c5-*.out`;
+\* marks a flagged point (spread 2% or more). Rows only; stream and stencil reproduce the table above
+within 2-3%, except 32/64 at 4 threads (stream 114.3, stencil 119.8 against 121.0 and 126.7 at 16/32).
+
+| Row kernel, L1 | 2 thr: L2 0 | L2 32 | L2 64 | L2 128 | 4 thr: L2 0 | L2 32 | L2 64 | L2 128 |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|
+| row7, 0 | 460.4 | 313.7 | 319.7 | 379.2 | 2697.9 | 595.9 | 633.9 | 731.6 |
+| row7, 8 | 685.1 | **275.3** | 268.4 | 297.9 | 1390.6 | **589.8** | 606.8 | 989.7* |
+| row7, 16 | 780.2 | 314.6 | 321.9 | 361.3 | 1463.1 | 641.9 | 662.7 | 1173.7 |
+| row7, 32 | 816.9 | 959.8 | 343.9 | 380.0 | 1469.8 | 1635.0 | 677.5 | 1201.4* |
+| row8, 0 | 461.9 | 318.9 | 318.6 | 377.0 | 2698.1 | 609.8 | 637.0 | 727.0 |
+| row8, 8 | 683.5 | **263.8** | 270.8 | 298.4 | 1390.1 | **581.3** | 605.4 | 996.0 |
+| row8, 16 | 780.2 | 316.7 | 324.4 | 361.4 | 1462.9 | 626.1 | 652.2 | 1150.1* |
+| row9, 0 | 461.7 | 316.9 | 318.6 | 373.7 | 2697.1 | 601.8 | 634.0 | 729.4 |
+| row9, 8 | 707.8* | **264.1** | 268.6 | 307.7 | 1391.4 | **576.2** | 600.7 | 988.9* |
+| row9, 16 | 781.6 | 323.0 | 328.4 | 363.5 | 1463.4 | 637.3 | 651.2 | 1208.8 |
+
+(L1 64 rows omitted: every point is 1.3-2.8x slower than L1 8 / L2 32.) Without aliasing, rows are
+3-4x faster than in S8-01's run, and software prefetch now pays: with eight streams the best is L1 8 /
+L2 32 (1.7x over none at 2 threads, 4.6x at 4 threads, where eight streams per thread overflow the
+hardware prefetcher). L2 prefetch alone (L1 0 / L2 32) is within 4-19% of best; L1 prefetch alone is
+1.5-1.7x slower than none at 2 threads.
+Decides (E5-07, S8-03): always issue the L2 prefetch at 32 iterations; L1 distance 16 for one or two
+streams per loop, 8 for many (eight) streams; L2 distance must exceed L1; never L1 prefetch without L2.
+32/64 is within 6% for one or two streams. One launch each; the 4-thread row points repeat within 3%
+across rows 7-9.
+
 ### C6: loop tails for `y = x + 1`, lengths 1-33 (ticks per call)
 
 x87 is linear: 7.05 ticks per element at 1 thread, 16.03 at 4 threads. The other strategies are
