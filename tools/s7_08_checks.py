@@ -29,7 +29,8 @@ ALLOWED_NEEDED = {'libm.so.6', 'libc.so.6', 'libpthread.so.0', 'ld-linux-k1om.so
 
 def driver(extra):
     return [str(BUILD / 'gcc/gfortran'), '-B' + str(BUILD / 'gcc') + '/',
-            '-B' + str(LIBGF) + '/', '-B' + str(LIBGF / '.libs') + '/', '-I' + str(LIBGF),
+            '-B' + str(LIBGF) + '/', '-B' + str(LIBGF / '.libs') + '/',
+            '-fintrinsic-modules-path', str(LIBGF),
             '-march=knc', '--sysroot=' + str(TC / 'sysroot'), '-O1', '-Wall',
             '-static-libgfortran', '-static-libgcc', '-J', str(OUT / 'mod'), *map(str, extra)]
 
