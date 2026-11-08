@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-08 12:42.
+Updated automatically at every ticket change. Last update: 2026-11-08 12:59.
 
-**Next: GPT-6.1, on S8-03 (Two-level software prefetch for KNC loops (E5-07)).** Run `python tools/dispatch.py`, or ask the tech lead to.
+**Next: the tech lead, on S8-03.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[#################---]` 127 of 149
 
@@ -145,7 +145,7 @@ Current tickets: `[#################---]` 127 of 149
 | S7-10 | Sprint 7 batch check after S7-05 and S7-08 | Done | Sprint 7's final compiler matches stock GCC 16.2 on x86 (1,962/1,962 identical at -O2 and -O2 -mavx512f), h... |
 | S8-01 | Card checks C1-C10 for the Sprint 8 tuning block - microbenchmarks in the knc-char corpus | Done | The knc-char corpus now measures the Sprint 8 tuning questions on the card (stores, prefetch, tails, accumu... |
 | S8-02 | Masked loop tails that never touch an unmapped page, chosen by length (E4-04) | Done | Short loops and loop tails on KNC now use masked vector code that never touches an unmapped page: mat8 is 3... |
-| S8-03 | Two-level software prefetch for KNC loops (E5-07) | In progress | S8-12's C5 rerun (padded arrays, knc-characterization.md C5): rows now profit from prefetch. Use L2 distanc... |
+| S8-03 | Two-level software prefetch for KNC loops (E5-07) | Tests waiting for review | Red at f4ded1a: 4 T1 files + knc-prefetch.h (stream, stencil, 8-stream row, 2 KiB L1-resident loop), tools/... |
 | S8-04 | Small-matrix kernels: diagnose mat8 and mat16, reject low lane use (E5-11 part 2) | Not started | written under the owner's overnight blanket approval (2026-11-08). |
 | S8-05 | Per-loop scalar-add cost choice that keeps both mat8 and the stencils (E5-11) | Not started | written under the owner's overnight blanket approval (2026-11-08). |
 | S8-06 | Memory-operand forms for V16SF/V8DF arithmetic and FMA (E5-17) | Not started | written under the owner's overnight blanket approval (2026-11-08). |
@@ -174,6 +174,7 @@ Current tickets: `[#################---]` 127 of 149
 
 ## Recent activity
 
+- 2026-11-08 12:59 **S8-03** engineer red: Red at f4ded1a: 4 T1 files + knc-prefetch.h (stream, stencil, 8-stream row, 2 KiB L1-resident loop), tools/s8_03_checks.py t1. All kernels vectoriz...
 - 2026-11-08 12:41 **S8-02** lead approve: Short loops and loop tails on KNC now use masked vector code that never touches an unmapped page: mat8 is 3.4x faster, short loops up to 1.8x and t...
 - 2026-11-08 12:16 **S8-02** engineer submit: Round 3, fallback (c): GCC cb8a2a1 reverts abc984e (S8_02_build5): unknown-alignment masked access is again the unconditional gather/scatter, knc_l...
 - 2026-11-08 11:31 **S8-02** lead changes: Round 2 on the card (.work/_shared/tmp/claude-s8-02-paired-r2, 3 launches, all valid; fixtures-r2): correctness is clean (guard sweep PASS 96,132 c...
@@ -181,7 +182,6 @@ Current tickets: `[#################---]` 127 of 149
 - 2026-11-08 10:54 **S8-17** engineer submit: Red 9b22080, green dbf2f60. Host check_c12 passes: 7 phases in interleaved order, all card/rail fields match the m2 fixture, 6 malformed sensor fil...
 - 2026-11-08 10:23 **S8-02** engineer submit: Round 2, fix 1 as option (d), target only: GCC 12a514a..abc984e (S8_02_build4). knc_maskmove tests the zero-extended mask at run time against 1 << ...
 - 2026-11-08 09:25 **S8-02** owner decide: Owner 2026-11-08: extend the budget by 2 sessions (now 6) to finish option (d), the run-time active-lane count in knc_maskmove; the lead re-measure...
-- 2026-11-08 09:10 **S8-02** engineer escalate: budget: 4 engineer sessions used; the budget is 4
 
 ## Cost
 
