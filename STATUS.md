@@ -1,10 +1,10 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-08 03:19.
+Updated automatically at every ticket change. Last update: 2026-11-08 03:28.
 
 **Waiting for you:** S8-01. Run `python tools/pm.py inbox`.
 
-Current tickets: `[#################---]` 120 of 135
+Current tickets: `[#################---]` 121 of 135
 
 ## Milestones
 
@@ -13,7 +13,7 @@ Current tickets: `[#################---]` 120 of 135
 | M0 | Foundation | In progress | 17 of 17 tickets |
 | M1 | Mixed native code | Done | 43 of 43 tickets |
 | M2 | Useful vector target | Done | 51 of 51 tickets |
-| M3 | Runtimes | In progress | 9 of 12 tickets |
+| M3 | Runtimes | In progress | 10 of 12 tickets |
 | M4 | Broad optimization | Not started | Not planned in detail yet |
 | M5 | Program corpus | Not started | Not planned in detail yet |
 | M6 | Release | Not started | Not planned in detail yet |
@@ -156,10 +156,11 @@ Current tickets: `[#################---]` 120 of 135
 | S8-11 | Sprint 8 batch check and paired M2 re-measure | Not started | written under the owner's overnight blanket approval (2026-11-08). |
 | S8-12 | Fix three weak S8-01 checks - C4 page offsets, C5 row aliasing, C9 memory chain | Not started | written under the owner's overnight blanket approval; S8-03's short-row acceptance waits for the C5 rerun. |
 | S9-01 | libgomp for KNC: futex, affinity, ring-aware barrier, spin-wait and malloc arenas (E6-03 input) | In progress | Citations spot-checked and correct (configure.tgt:88, x86/futex.h:120-124, imci.md:485-495, bar.h:98, wait.... |
-| S9-02 | libstdc++ for KNC: exceptions, RTTI, atomics, threads, packaging (E6-06 input) | Waiting for review | docs/research/knc-libstdcxx.md answers Q1-5 with file:line evidence and a 3-ticket E6-06 plan. Static only:... |
+| S9-02 | libstdc++ for KNC: exceptions, RTTI, atomics, threads, packaging (E6-06 input) | Done | We now know how to build GCC 16's C++ library for the card: no newer glibc or kernel is needed, and built w... |
 
 ## Recent activity
 
+- 2026-11-08 03:28 **S9-02** lead approve: We now know how to build GCC 16's C++ library for the card: no newer glibc or kernel is needed, and built with the generic C-locale setting it cove...
 - 2026-11-08 03:19 **S9-02** engineer submit: docs/research/knc-libstdcxx.md answers Q1-5 with file:line evidence and a 3-ticket E6-06 plan. Static only: no build, no card. Host runs via run.py...
 - 2026-11-08 03:17 **S9-01** lead changes: Citations spot-checked and correct (configure.tgt:88, x86/futex.h:120-124, imci.md:485-495, bar.h:98, wait.h:48-68, env.c:71-72); sections 1-3 and ...
 - 2026-11-08 03:15 **S9-01** engineer submit: Read-only; nothing built or run on the card. docs/research/knc-libgomp.md (f130494) answers Q1-6 with file:line, each marked proven/inferred/unknow...
@@ -167,7 +168,6 @@ Current tickets: `[#################---]` 120 of 135
 - 2026-11-08 02:52 **S8-01** lead escalate: Code review of the job 19 fix passes (red a21750f, green 51e844a: main now allocates every worker buffer before thread start, about 1 GB for C1 at ...
 - 2026-11-08 02:51 **S8-01** engineer submit: Job 19 fix: workers no longer allocate; main allocates each buffer before thread start, sized to the largest selected budget + 64 KiB (C1 at 60x4: ...
 - 2026-11-08 02:45 **S8-01** lead changes: Job 19 (README line 28, C1 at --cores 60 --threads 4) failed on the card: 'pthread_create (errno=12)' then 'allocation (errno=12)' at thread 87 of ...
-- 2026-11-08 02:45 **S8-01** owner decide: Owner blanket approval 2026-11-08 (lead's recommended option): card jobs 1-18 ran; job 19 (C1 at 60x4) failed with ENOMEM at thread 87 of 240 under...
 
 ## Cost
 
@@ -179,4 +179,4 @@ Current tickets: `[#################---]` 120 of 135
 
 ## Disk
 
-The project uses 13.8 GiB of 100 GiB. 146 GiB free on the drive.
+The project uses 13.8 GiB of 100 GiB. 145 GiB free on the drive.
