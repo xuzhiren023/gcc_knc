@@ -34,9 +34,10 @@
 // with four prefetches and their moves, 1.30x slower).  The prefetched copy
 // runs only when the loop runs at least four L2 distances, 4 x 32 = 128
 // vector iterations: the guard compares the loop's iteration count less one
-// against 127.  The other copy is the loop as it was, without any prefetch:
-// a label, vprefetch-free lines around the vmulps, and a jump back.
-// scan-asm-func stream_f32: \bcmpq\s+\$127,
+// against 127 (niter >= 127, emitted as cmpq $126 and jbe to the plain copy).
+// The other copy is the loop as it was, without any prefetch: a label,
+// vprefetch-free lines around the vmulps, and a jump back.
+// scan-asm-func stream_f32: \bcmpq\s+\$126,[^\n]*\n(?:[^\n]*\n){0,4}\s+jbe\s+\.L\d+$
 // scan-asm-func stream_f32: ^(\.L\d+):\n(?:(?!\s*vprefetch)[^\n]*\n)*?\s+vmulps[^\n]*\n(?:(?!\s*vprefetch)[^\n]*\n)*?\s+j[a-z]+\s+\1$
 #include "knc-prefetch.h"
 

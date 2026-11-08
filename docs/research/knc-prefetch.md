@@ -1,6 +1,6 @@
 # KNC two-level software prefetch (S8-03, E5-07)
 
-Status: green 2026-11-08 (GCC s8/S8-03 at 2fb2498; T1 scans pass). Card results are the
+Status: green 2026-11-08 (GCC s8/S8-03 at 8c18be9; T1 scans pass). Card results are the
 lead's: the paired M2 run and s4_masks / s5_ops are staged under `.work/_shared/S8-03/`.
 
 ## Rules the T1 scans encode (`tests/t1/knc-prefetch-*.c`)
@@ -29,6 +29,14 @@ Source: `docs/research/knc-characterization.md` C2, C4, C5 and the S8-12 rerun.
 - The L1 distance is kept below the L2 distance if a user sets them the other way round.
 - A loop is prefetched only if it runs at least four L2 distances (the pass's trip-count
   ratio, applied to the far distance), so a 2 KiB-per-stream fixed loop gets none.
+- A loop whose trip count is known only at run time is versioned on it (lead changes
+  2026-11-08: on the card, M2 `short` at length 17 ran one vector iteration with four
+  prefetches and their address updates, 1.30-1.33x slower). The prefetched copy runs only
+  when the loop runs at least four L2 distances in iterations (128 vector iterations, 2048
+  floats, for a unit-step loop); the other copy is the loop as S8-02 compiled it, with no
+  prefetch. The guard is one compare and branch before the loop. A loop whose single exit
+  gives no trip count (several exits, or none the niter analysis can express) gets no
+  prefetch, since the guard cannot be built. `tests/t1/knc-prefetch-O2.c` `stream_f32`.
 - Written streams use the read-hint forms `vprefetch0/1`, as C5's kernels did for their
   output array. `vprefetche*` is unmeasured and not emitted.
 
@@ -70,3 +78,11 @@ Source: `docs/research/knc-characterization.md` C2, C4, C5 and the S8-12 rerun.
 - Stencil scans accept a displacement within 8 bytes of the line: the one prefetched x
   reference is the leading `x[i+1]`, and the loop pointer may be anchored on any of the
   three x accesses.
+- Round 3 (lead changes after the card run, 2026-11-08; GCC 8c18be9): the pass's
+  `version_loop_for_prefetch`, run only for the two-level target once every check has
+  passed and before the loop is unrolled or prefetched. `number_of_iterations_exit` on
+  the single exit gives `niter` (one less than the body count); a constant keeps the
+  existing trip check, otherwise `loop_version` on `niter >= 4 x far_ahead - 1`, likely
+  branch to the prefetched original, the copy untouched (KNC has no `storent` pattern, so
+  no store in it was marked nontemporal either). The pass then resets SCEV and asks for
+  a CFG cleanup as after unrolling.
