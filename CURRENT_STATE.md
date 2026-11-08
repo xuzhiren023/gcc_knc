@@ -73,6 +73,8 @@ M1 is accepted and tagged `m1` locally; nothing is pushed. Engineers are Claude 
 
 ## Not proven yet
 
+- tests/tools run from the main checkout on Windows (2026-11-08, after S8-18): 25 failed, 185 passed, 3 errors, every one pre-existing. Card backend and recovery tests need Cygwin; vect_suite, gcc_build and prepare_s3_10 tests assume a .work worktree path; test_torture_driver imports POSIX `resource`. S8-18's own tests pass. A clean Windows baseline needs a tools ticket.
+
 - **S8-01 limits:** every line ran once, not five launches; job 9 (C5 at 2 threads) has two invalid points and bimodal rows; C4 has no TLB knee (all L2 hits), C5 short rows alias, C9's chain stays in L1. S8-12 (merged 2026-11-08) fixed C4, C5 and C9 and rebuilt `.work/_shared/S8-01/knc-char.mic`; the lead reran them on 2026-11-08 (one launch each): C4 shows a 64-page first-level DTLB knee (~29 ticks per miss at one thread), C5 rows prefetch best at L1 8 / L2 32, and C9's memory-carried chain costs ~11 ticks per link.
 
 - **Sprint 5 open (2026-11-06):** 8-lane gather/scatter (S5-14, in progress; the builtin return needs a narrow exemption from the KNC vector-ABI rejection), FP min/max (S5-15), byte/word data (S5-16), final batch check (S5-18). FP64 vector division and sqrt are not implemented (FP32 only). Masked gathers/scatters whose contiguous masked access is misaligned (`mgat_*`, `msca_f32` in `s5_ops`) stay scalar under ADR-0007 point 7. No 512-bit vector argument/return ABI exists yet; 16 of the torture sweep's 33 compile errors are narrower vectors by value (backlog E6-07).
