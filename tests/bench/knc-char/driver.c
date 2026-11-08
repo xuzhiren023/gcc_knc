@@ -232,9 +232,13 @@ static int chosen(size_t k) {
            (!family || (!strncmp(tests[k].name, family, strlen(family)) &&
                         tests[k].name[strlen(family)] == '.'));
 }
+#include "c12.c"
 int main(int argc, char **argv) {
     int dry = 0, native = 0, layout = 0, unstable = 0;
     pthread_t threads[240];
+    /* C12 runs fixed-time power phases, not the timed protocol below (S8-17). */
+    for (int i = 1; i+1 < argc; ++i)
+        if (!strcmp(argv[i], "--check") && !strcmp(argv[i+1], "c12")) return c12_main(argc, argv);
     for (int i = 1; i < argc; ++i) {
         if (!strcmp(argv[i], "--dry-run")) dry = 1;
         else if (!strcmp(argv[i], "--native")) native = 1;
