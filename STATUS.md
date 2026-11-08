@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-08 03:17.
+Updated automatically at every ticket change. Last update: 2026-11-08 03:19.
 
 **Waiting for you:** S8-01. Run `python tools/pm.py inbox`.
 
@@ -156,10 +156,11 @@ Current tickets: `[#################---]` 120 of 135
 | S8-11 | Sprint 8 batch check and paired M2 re-measure | Not started | written under the owner's overnight blanket approval (2026-11-08). |
 | S8-12 | Fix three weak S8-01 checks - C4 page offsets, C5 row aliasing, C9 memory chain | Not started | written under the owner's overnight blanket approval; S8-03's short-row acceptance waits for the C5 rerun. |
 | S9-01 | libgomp for KNC: futex, affinity, ring-aware barrier, spin-wait and malloc arenas (E6-03 input) | In progress | Citations spot-checked and correct (configure.tgt:88, x86/futex.h:120-124, imci.md:485-495, bar.h:98, wait.... |
-| S9-02 | libstdc++ for KNC: exceptions, RTTI, atomics, threads, packaging (E6-06 input) | In progress | written under the owner's overnight blanket approval (2026-11-08). |
+| S9-02 | libstdc++ for KNC: exceptions, RTTI, atomics, threads, packaging (E6-06 input) | Waiting for review | docs/research/knc-libstdcxx.md answers Q1-5 with file:line evidence and a 3-ticket E6-06 plan. Static only:... |
 
 ## Recent activity
 
+- 2026-11-08 03:19 **S9-02** engineer submit: docs/research/knc-libstdcxx.md answers Q1-5 with file:line evidence and a 3-ticket E6-06 plan. Static only: no build, no card. Host runs via run.py...
 - 2026-11-08 03:17 **S9-01** lead changes: Citations spot-checked and correct (configure.tgt:88, x86/futex.h:120-124, imci.md:485-495, bar.h:98, wait.h:48-68, env.c:71-72); sections 1-3 and ...
 - 2026-11-08 03:15 **S9-01** engineer submit: Read-only; nothing built or run on the card. docs/research/knc-libgomp.md (f130494) answers Q1-6 with file:line, each marked proven/inferred/unknow...
 - 2026-11-08 03:08 **S7-10** engineer submit: knc 497bbe8bedf0, build current. Drill: master 8 files/12 hunks all textual (new: libgfortran/configure #line hunks), gcc-16 0. Shared i386 644 lin...
@@ -167,7 +168,6 @@ Current tickets: `[#################---]` 120 of 135
 - 2026-11-08 02:51 **S8-01** engineer submit: Job 19 fix: workers no longer allocate; main allocates each buffer before thread start, sized to the largest selected budget + 64 KiB (C1 at 60x4: ...
 - 2026-11-08 02:45 **S8-01** lead changes: Job 19 (README line 28, C1 at --cores 60 --threads 4) failed on the card: 'pthread_create (errno=12)' then 'allocation (errno=12)' at thread 87 of ...
 - 2026-11-08 02:45 **S8-01** owner decide: Owner blanket approval 2026-11-08 (lead's recommended option): card jobs 1-18 ran; job 19 (C1 at 60x4) failed with ENOMEM at thread 87 of 240 under...
-- 2026-11-08 02:41 **S7-09** lead approve: GCC-KNC's Fortran runtime installs in its private directory, static and shared programs run on the card from it even with the old GCC 5 runtime on ...
 
 ## Cost
 
