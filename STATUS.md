@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-07 20:26.
+Updated automatically at every ticket change. Last update: 2026-11-07 20:27.
 
 **Waiting for you:** S8-01. Run `python tools/pm.py inbox`.
 
@@ -140,7 +140,7 @@ Current tickets: `[###################-]` 118 of 122
 | S7-05 | Shared libgcc part 3: compatibility and unwind card payloads (E6-01c) | Done | The old-client and new-client libgcc compatibility and unwind test programs are built, linted and staged wi... |
 | S7-06 | Shared libgcc part 4: lead native acceptance and the install decision (E6-01d) | Done | GCC-KNC's shared libgcc_s passes every compatibility and unwind test on the card (old and new clients, exce... |
 | S7-07 | libgfortran part 1: KNC floating-point backend and capability contract (E6-02) | Done | libgfortran now has a KNC floating-point backend: it sets and clears the six IEEE flags and the four roundi... |
-| S7-08 | libgfortran part 2: base runtime build and the descriptor and I/O slice (E6-02) | Changes requested | modules.mic fails on the card: iso_fortran_env REAL128 is not -1. See the decision note above; decide wheth... |
+| S7-08 | libgfortran part 2: base runtime build and the descriptor and I/O slice (E6-02) | In progress | modules.mic fails on the card: iso_fortran_env REAL128 is not -1. See the decision note above; decide wheth... |
 | S7-09 | libgfortran part 3: runtime isolation and packaging (E6-02) | Not started | owner chose a private directory for GCC-KNC's runtime on the card (S7-06); libgfortran's shared variant goe... |
 | S7-10 | Sprint 7 batch check after S7-05 and S7-08 | Not started | Sprint 7 draft; parked in lane lead until the owner starts Sprint 7 and Sprint 6's gcc tickets are merged; ... |
 | S8-01 | Card checks C1-C10 for the Sprint 8 tuning block - microbenchmarks in the knc-char corpus | **Waiting for you** | Code review passes (C1-C10 kernels, gates, red 0ed8d09 then green 3f5ccb2), but acceptance line 3 needs the... |
@@ -160,10 +160,10 @@ Current tickets: `[###################-]` 118 of 122
 
 - From the script, engineer: 288 sessions, 678.2M input tokens
 - From the script, lead: 221 sessions, 67.8M input tokens
-- Started by hand, Claude: 10 sessions, 1694.7M input tokens
+- Started by hand, Claude: 10 sessions, 1696.4M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 13.2 GiB of 100 GiB. 140 GiB free on the drive.
+The project uses 13.2 GiB of 100 GiB. 152 GiB free on the drive.
