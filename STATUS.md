@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-08 05:15.
+Updated automatically at every ticket change. Last update: 2026-11-08 05:26.
 
-**Next: GPT-6.1, on S8-02 (Masked loop tails that never touch an unmapped page, chosen by length (E4-04)).** Run `python tools/dispatch.py`, or ask the tech lead to.
+**Next: the tech lead, on S8-02.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[#################---]` 125 of 144
 
@@ -144,7 +144,7 @@ Current tickets: `[#################---]` 125 of 144
 | S7-09 | libgfortran part 3: runtime isolation and packaging (E6-02) | Done | GCC-KNC's Fortran runtime installs in its private directory, static and shared programs run on the card fro... |
 | S7-10 | Sprint 7 batch check after S7-05 and S7-08 | Done | Sprint 7's final compiler matches stock GCC 16.2 on x86 (1,962/1,962 identical at -O2 and -O2 -mavx512f), h... |
 | S8-01 | Card checks C1-C10 for the Sprint 8 tuning block - microbenchmarks in the knc-char corpus | Done | The knc-char corpus now measures the Sprint 8 tuning questions on the card (stores, prefetch, tails, accumu... |
-| S8-02 | Masked loop tails that never touch an unmapped page, chosen by length (E4-04) | In progress | S8-01 C6 (knc-characterization.md): the aligned masked tail beats x87 from n=2; a gather tail beats x87 fro... |
+| S8-02 | Masked loop tails that never touch an unmapped page, chosen by length (E4-04) | Tests waiting for review | Red at 7642729. T1 knc-mask-tail-len.c (runtime + constant 1-33, f32/f64/i32): 59 of 98 scans fail, no gath... |
 | S8-03 | Two-level software prefetch for KNC loops (E5-07) | Not started | S8-01 results (knc-characterization.md, "Sprint 8 tuning checks"): stream and stencil best at L1/L2 = 16/32... |
 | S8-04 | Small-matrix kernels: diagnose mat8 and mat16, reject low lane use (E5-11 part 2) | Not started | written under the owner's overnight blanket approval (2026-11-08). |
 | S8-05 | Per-loop scalar-add cost choice that keeps both mat8 and the stencils (E5-11) | Not started | written under the owner's overnight blanket approval (2026-11-08). |
@@ -169,6 +169,7 @@ Current tickets: `[#################---]` 125 of 144
 
 ## Recent activity
 
+- 2026-11-08 05:26 **S8-02** engineer red: Red at 7642729. T1 knc-mask-tail-len.c (runtime + constant 1-33, f32/f64/i32): 59 of 98 scans fail, no gather/scatter tail, no whole-loop mask. knc...
 - 2026-11-08 05:15 **S8-12** lead approve: The knc-char checks C4, C5 and C9 are fixed and rebuilt: C4 now walks every page offset, C5's eight arrays no longer alias in L1 or L2, and C9's me...
 - 2026-11-08 05:08 **S8-12** engineer submit: Red f0a241e, green e75fec0. C4: page i's node at line 5i mod 64; host --dry-run --layout walks each sibling's cycle (checked: cycle=pages, page off...
 - 2026-11-08 05:03 **S8-01** lead approve: The knc-char corpus now measures the Sprint 8 tuning questions on the card (stores, prefetch, tails, accumulators, unroll, branches): NGO stores ar...
@@ -176,13 +177,12 @@ Current tickets: `[#################---]` 125 of 144
 - 2026-11-08 04:55 **S7-10** lead approve: Sprint 7's final compiler matches stock GCC 16.2 on x86 (1,962/1,962 identical at -O2 and -O2 -mavx512f), has 0 ICE in both sweeps and textual-only...
 - 2026-11-08 03:37 **S9-01** lead approve: We now have a build-and-design plan for GCC-KNC's own OpenMP runtime on the card: futex-based waits with delay instead of pause, physical-core affi...
 - 2026-11-08 03:29 **S9-01** engineer submit: Read-only; nothing built or run. docs/research/knc-libgomp.md (9e4ae16) fixed per review: (1) groups are a pure function of team_id and total, set ...
-- 2026-11-08 03:28 **S9-02** lead approve: We now know how to build GCC 16's C++ library for the card: no newer glibc or kernel is needed, and built with the generic C-locale setting it cove...
 
 ## Cost
 
 - From the script, engineer: 296 sessions, 704.4M input tokens
 - From the script, lead: 225 sessions, 68.7M input tokens
-- Started by hand, Claude: 10 sessions, 1740.6M input tokens
+- Started by hand, Claude: 10 sessions, 1741.1M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
