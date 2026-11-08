@@ -94,7 +94,7 @@ Drafted as tickets S2-01 to S2-08; see [SPRINT-02](sprints/SPRINT-02.md).
 
 ## Proposed for Sprint 8 (lead, 2026-11-07): the M2 weak spots
 
-Recommended to the owner as a tuning block in Sprint 8, after Sprint 7's runtimes; not yet decided.
+Started as Sprint 8 on 2026-11-08 (owner blanket approval; `docs/sprints/SPRINT-08.md`, tickets S8-01 to S8-11).
 - E4-04 rest: masked tails that never cross into an unmapped page (line-crossing test for the
   unaligned second half, or peeling/versioning for alignment), so odd short lengths stop falling
   back to x87.
