@@ -198,7 +198,9 @@ Hierarchy budgets count siblings: total live data is at most 16 KiB/core for
 L1, 256 KiB/core for L2, and 16 MiB/core for memory. Each per-worker allocation
 uses the largest power of two not exceeding that budget divided by density
 (density 3 rounds down). Arrays are 64-byte aligned. These are capacity targets,
-not proven residency. Pointer latency visits a deterministic Fisher-Yates
+not proven residency. The main thread allocates every worker buffer before the
+workers start, sized to the largest selected budget plus 64 KiB; a worker's
+malloc would reserve a 64 MB glibc arena (C1 at 240 threads ran out). Pointer latency visits a deterministic Fisher-Yates
 random permutation of **every 64-byte line** in a single dependent cycle,
 avoiding regular streaming prefetch. Load/store bandwidth visits sequential
 full lines, 2048 bytes/round; calculate aggregate GB/s as

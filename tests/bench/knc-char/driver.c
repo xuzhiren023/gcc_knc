@@ -23,6 +23,7 @@ struct worker {
     int id, cpu;
     unsigned char *memory;
     void *allocation;
+    size_t *order;
     uint64_t begin, end, ticks;
 };
 static struct worker workers[240];
@@ -117,9 +118,8 @@ static void prepare(struct worker *w) {
     if (current->kind == 1 || current->kind == 3) {
         size_t stride = current->kind == 3 ? 4096 : 64;
         size_t n = footprint / stride;
-        size_t *order = malloc(n * sizeof(*order));
+        size_t *order = w->order;
         uint64_t state = 1234567 + w->id;
-        if (!order) fail("pointer permutation allocation");
         for (size_t i = 0; i < n; ++i) order[i] = i;
         for (size_t i = n-1; i > 0; --i) {
             size_t j = random_next(&state) % (i+1), t = order[i];
@@ -127,7 +127,6 @@ static void prepare(struct worker *w) {
         }
         for (size_t i = 0; i < n; ++i)
             *(void **)(w->memory + stride*order[i]) = w->memory + stride*order[(i+1) % n];
-        free(order);
     }
     /* A one-round native correctness gate precedes the pilot, after pinned first touch. */
     current->fn(1, w->memory, footprint);
@@ -160,9 +159,6 @@ static void *worker_main(void *arg) {
     struct worker *w = arg;
     const struct test *last = NULL;
     pin(w->cpu);
-    size_t allocation = 16*1024*1024 + 4096;
-    if (posix_memalign(&w->allocation, 4096, allocation)) fail("allocation");
-    w->memory = (unsigned char *)w->allocation + (w->id % density)*1024;
     for (;;) {
         wait_all();
         if (stop) break;
@@ -175,7 +171,6 @@ static void *worker_main(void *arg) {
         w->end = now();
         wait_all();
     }
-    free(w->allocation);
     return NULL;
 }
 static uint64_t sample(void) {
@@ -228,6 +223,11 @@ static size_t budget(const char *name) {
     while (result*2 <= per) result *= 2;
     return result;
 }
+static int chosen(size_t k) {
+    return (selected < 0 || (size_t)selected == k) &&
+           (!family || (!strncmp(tests[k].name, family, strlen(family)) &&
+                        tests[k].name[strlen(family)] == '.'));
+}
 int main(int argc, char **argv) {
     int dry = 0, native = 0, unstable = 0;
     pthread_t threads[240];
@@ -257,9 +257,7 @@ int main(int argc, char **argv) {
     if (dry == native) fail("choose exactly one execution mode");
     if (dry) {
         for (size_t k = 0; k < NTESTS; ++k)
-            if ((selected < 0 || (size_t)selected == k) &&
-                (!family || (!strncmp(tests[k].name, family, strlen(family)) &&
-                             tests[k].name[strlen(family)] == '.')))
+            if (chosen(k))
                 printf("DRY %s %d cycles=unmeasured cycle_unit=tsc_ticks worker=unmeasured ns_per_unit=unmeasured spread=unmeasured accepted=0 cores=%d bytes=%zu units=unmeasured instructions=%d\n", tests[k].name,
                        density, cores, budget(tests[k].name), tests[k].instructions);
         return 0;
@@ -273,6 +271,22 @@ int main(int argc, char **argv) {
     /* Explicit small stacks: the card's unlimited stack limit makes glibc's default huge (lead, 2026-11-06). */
     pthread_attr_t attr;
     if (pthread_attr_init(&attr) || pthread_attr_setstacksize(&attr, 256 * 1024)) fail("thread attributes");
+    /* Main allocates for workers: a worker's malloc creates a 64 MB arena (job 19 ENOMEM at 240). */
+    size_t largest = 0, lines = 0;
+    for (size_t k = 0; k < NTESTS; ++k)
+        if (chosen(k)) {
+            size_t bytes = budget(tests[k].name);
+            if (bytes > largest) largest = bytes;
+            if ((tests[k].kind == 1 || tests[k].kind == 3) && bytes/64 > lines) lines = bytes/64;
+        }
+    /* Slack covers sibling offsets, prefetch distances and fixed result offsets. */
+    size_t allocation = (largest + 4095)/4096*4096 + 64*1024;
+    for (int i = 0; i < cores*density; ++i) {
+        if (posix_memalign(&workers[i].allocation, 4096, allocation)) fail("allocation");
+        workers[i].memory = (unsigned char *)workers[i].allocation + (i % density)*1024;
+        if (lines && !(workers[i].order = malloc(lines * sizeof(size_t))))
+            fail("pointer permutation allocation");
+    }
     for (int i = 0; i < cores*density; ++i) {
         workers[i].id = i; workers[i].cpu = topology[i/density][i%density];
         printf("pin %d %d\n", i, workers[i].cpu);
@@ -281,9 +295,7 @@ int main(int argc, char **argv) {
     for (size_t k = 0; k < NTESTS; ++k) {
         uint64_t medians[GROUPS];
         uint64_t tick_groups[240][GROUPS], tick_samples[240][REPS];
-        if (selected >= 0 && (size_t)selected != k) continue;
-        if (family && (strncmp(tests[k].name, family, strlen(family)) ||
-                       tests[k].name[strlen(family)] != '.')) continue;
+        if (!chosen(k)) continue;
         current = &tests[k]; footprint = budget(current->name);
         if (!fixed_rounds) {
             rounds = 1024;
@@ -340,6 +352,7 @@ int main(int argc, char **argv) {
     stop = 1; wait_all();
     for (int i = 0; i < cores*density; ++i)
         if (pthread_join(threads[i], NULL)) fail("pthread_join");
+    for (int i = 0; i < cores*density; ++i) { free(workers[i].allocation); free(workers[i].order); }
     if (pthread_barrier_destroy(&barrier)) fail("barrier destroy");
     policy(1);
     return unstable ? 3 : 0;
