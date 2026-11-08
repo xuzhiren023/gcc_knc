@@ -90,3 +90,9 @@ passes on what they choose. Each item says how it was shown. Newest first.
 9. **card_run's default 128 MiB limit breaks threaded jobs.** 80 threads with default pthread
    stacks fail in `pthread_create` (exit code 2 in under a second) under that limit. Use a config
    with `memoryMB` of a GB or more for threaded jobs (2026-11-05, sent to the WRF session).
+10. **glibc per-thread malloc arenas eat address space at high thread counts.** On the card's
+   glibc 2.21 each thread that calls `malloc` gets its own arena, which reserves 64 MB of address
+   space. At 87 threads that is about 5.6 GB, and S8-01's 240-thread job failed with ENOMEM under a
+   6 GB limit. Allocate in the main thread before starting workers, or set `M_ARENA_MAX`
+   (`mallopt` or `MALLOC_ARENA_MAX`). Fewer arenas may also mean more lock contention (2026-11-08,
+   lead's diagnosis, not yet confirmed by the S8-01 rerun).
