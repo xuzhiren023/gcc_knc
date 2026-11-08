@@ -42,26 +42,43 @@ python tools/card_run --benchmark --threads 1 --timeout 120 ../_shared/S8-01/knc
 python tools/card_run --benchmark --threads 4 --timeout 120 ../_shared/S8-01/knc-char.mic --native --cores 1 --threads 4 --check c10
 ```
 
+S8-12 rerun lines for the corrected C4, C5 and C9 kernels (same binary path;
+five launches each, as above). They supersede the earlier C4, C5 and C9
+results:
+
+```text
+python tools/card_run --benchmark --threads 1 --timeout 120 ../_shared/S8-01/knc-char.mic --native --cores 1 --threads 1 --check c4
+python tools/card_run --benchmark --threads 4 --timeout 120 ../_shared/S8-01/knc-char.mic --native --cores 1 --threads 4 --check c4
+python tools/card_run --benchmark --threads 2 --timeout 3600 ../_shared/S8-01/knc-char.mic --native --cores 1 --threads 2 --check c5
+python tools/card_run --benchmark --threads 4 --timeout 3600 ../_shared/S8-01/knc-char.mic --native --cores 1 --threads 4 --check c5
+python tools/card_run --benchmark --threads 1 --timeout 180 ../_shared/S8-01/knc-char.mic --native --cores 1 --threads 1 --check c9
+python tools/card_run --benchmark --threads 2 --timeout 180 ../_shared/S8-01/knc-char.mic --native --cores 1 --threads 2 --check c9
+```
+
+`knc-char-host.exe --dry-run --layout --check c4 --threads N` walks each
+sibling's C4 cycle on the host and prints its pages and distinct page offsets.
+
 Point names and units (each round contains 32 units):
 
 | Check | Point names | Unit and controls |
 |---|---|---|
 | C1 | `c1.store.{normal,nr,ngo}` | 64-byte line; 16 MiB per core divided among siblings, write-only full unmasked lines. All variants include a final `lock addl` drain before timing ends. |
 | C2 | `c2.{vector,prefetch0,prefetch1,vector_prefetch0,vector_prefetch1}` | One instruction or adjacent pair; compare the paired cost with both isolated controls, with eight independent vector chains and hot prefetch targets. |
-| C4 | `c4.pages.{128,256,384,448}` | Dependent load, randomized 4 KiB page cycle; KiB per core divided exactly among siblings, including the non-power-of-two points. |
+| C4 | `c4.pages.{128,256,384,448}` | Dependent load, randomized 4 KiB page cycle, one line per page; page i's line sits at offset 64*(5i mod 64), so the cycle covers every page offset and L1 set and the lines stay cache-resident while each needs its own TLB entry (S8-12; S8-01 put every line at offset 0, one L1 set). KiB per core divided exactly among siblings, including the non-power-of-two points. |
 | C5 | `c5.{stream,stencil,row7,row8,row9}.l1_D.l2_D` | One 64-byte row iteration. Full Cartesian sweep L1={0,8,16,32,64}, L2={0,32,64,128}; 0 disables the hint. Distances count iterations, not bytes. |
 | C6 | `c6.{x87,aligned,peel,gather}.nN` | One complete `y=x+1` invocation of N=1..33 elements. Peel starts one float off alignment and scalar-peels up to alignment; aligned and gather start aligned. Gather only handles a partial final vector, with mask replay. Include the peel alignment difference in interpretation. |
 | C7 | `c7.reduce.a{1,2}` | One 16-lane reduction update, identical 32-vector input and operation counts; two-accumulator finish combines the results. |
-| C9 | `c9.{vector,memory}.u{1,2,4}` | One dependent vector add update; U independent recurrence registers with U instructions per actual loop branch. Round scaling preserves 32 updates per reported round. Memory operands read the same hot line. |
+| C9 | `c9.{vector,memory}.u{1,2,4}` | One dependent vector add update; U independent recurrence registers with U instructions per actual loop branch. Round scaling preserves 32 updates per reported round. Memory variant (S8-12): `vaddps 64i(%rsi), %zmm31, %zmmi` then `vmovaps %zmmi, 64i(%rsi)`, so the folded load carries the recurrence through store forwarding; a unit is one load-add-store link, two instructions. |
 | C10 | `c10.branch.{fixed,random}` | One conditional branch with balanced instruction counts on its two paths (including a common jump); fixed all-taken-direction bits versus precomputed pseudorandom bits, same load/index overhead. RNG is outside timing. Delta per branch is an effective random-branch cost, not a direct hardware miss count. |
 
-C5 uses eight 1 MiB arrays per worker. Stream reads one array and writes an
+C5 uses eight 1 MiB arrays per worker, `C5_PITCH` = 1 MiB + 4 KiB + 192 bytes
+apart (S8-12; S8-01's 1 MiB pitch put all eight in one L1 set). Stream reads one array and writes an
 affine result to the eighth; stencil reads a forward three-point FP32 stencil
 with unaligned load-unpack pairs and a two-element initialized halo; short
 rows sum seven arrays into the eighth with masks for 7, 8 or 9 active elements
 and 64-byte row pitch. Only the arrays used by each kernel are prefetched.
 These fixed memory-sized per-worker arrays deliberately differ from C4's
-fixed per-core capacity experiment. The one-core jobs touch at most 32 MiB.
+fixed per-core capacity experiment. Each worker has 9 MiB; the one-core jobs touch at most 36 MiB.
 
 The extended driver uses pinned first touch with page-aligned allocations and
 a fixed 1 KiB sibling stagger. A native one-round gate checks C1 stores, C5

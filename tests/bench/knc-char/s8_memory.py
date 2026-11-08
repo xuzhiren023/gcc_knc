@@ -1,5 +1,9 @@
 """S8 stores, TLB reach and software-prefetch sweeps."""
 
+# C5 array pitch: 1 MiB plus a page and three lines, so the eight arrays fall in
+# different L1 sets and page colours instead of aliasing (S8-12).
+C5_PITCH = 1048576 + 4096 + 3*64
+
 
 def register(add):
     for name, insn in (('normal', 'vmovaps'), ('nr', 'vmovnraps'), ('ngo', 'vmovnrngoaps')):
@@ -18,13 +22,13 @@ def register(add):
         for l1 in (0, 8, 16, 32, 64):
             for l2 in (0, 32, 64, 128):
                 row = int(kernel[-1]) if kernel.startswith('row') else 16
-                # Eight 1 MiB arrays; only rows use all eight, stream/stencil use two.
+                # Eight 1 MiB arrays C5_PITCH apart; only rows use all eight, stream/stencil use two.
                 setup = f'movl ${(1 << row)-1}, %eax\nkmov %eax, %k1'
                 body = []
                 for iteration in range(32):
                     body.append('leaq (%rsi,%rcx), %r11')
                     for array in (range(8) if row != 16 else (0, 7)):
-                        offset = array * 1048576
+                        offset = array * C5_PITCH
                         for distance, hint in ((l1, 0), (l2, 1)):
                             if distance:
                                 body.append(f'vprefetch{hint} {offset + distance*64}(%r11)')
@@ -32,7 +36,7 @@ def register(add):
                     body += [f'vmovaps 0(%r11), %zmm0{mask}']
                     if row != 16:
                         for array in range(1, 7):
-                            body.append(f'vmovaps {array*1048576}(%r11), %zmm1{mask}')
+                            body.append(f'vmovaps {array*C5_PITCH}(%r11), %zmm1{mask}')
                             body.append('vaddps %zmm1, %zmm0, %zmm0')
                     elif kernel == 'stream':
                         body.append('vaddps %zmm31, %zmm0, %zmm0')
@@ -42,7 +46,7 @@ def register(add):
                             body += [f'vloadunpacklps {offset}(%r11), %zmm1',
                                      f'vloadunpackhps {offset+64}(%r11), %zmm1',
                                      'vaddps %zmm1, %zmm0, %zmm0']
-                    body += [f'vmovaps %zmm0, {7*1048576}(%r11){mask}',
+                    body += [f'vmovaps %zmm0, {7*C5_PITCH}(%r11){mask}',
                              'addq $64, %rcx', 'andq $1048575, %rcx']
                 add(f'c5.{kernel}.l1_{l1}.l2_{l2}', '\n'.join(body),
                     'Stream affine, forward 3-point stencil, or seven-input short rows; zero disables hint',
