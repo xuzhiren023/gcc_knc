@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-08 03:08.
+Updated automatically at every ticket change. Last update: 2026-11-08 03:15.
 
 **Waiting for you:** S8-01. Run `python tools/pm.py inbox`.
 
@@ -155,11 +155,12 @@ Current tickets: `[#################---]` 120 of 135
 | S8-10 | Less ring traffic: 64-byte padding of per-thread data, and card check C11 (E5-16) | Not started | written under the owner's overnight blanket approval (2026-11-08). |
 | S8-11 | Sprint 8 batch check and paired M2 re-measure | Not started | written under the owner's overnight blanket approval (2026-11-08). |
 | S8-12 | Fix three weak S8-01 checks - C4 page offsets, C5 row aliasing, C9 memory chain | Not started | written under the owner's overnight blanket approval; S8-03's short-row acceptance waits for the C5 rerun. |
-| S9-01 | libgomp for KNC: futex, affinity, ring-aware barrier, spin-wait and malloc arenas (E6-03 input) | In progress | written under the owner's overnight blanket approval (2026-11-08). |
+| S9-01 | libgomp for KNC: futex, affinity, ring-aware barrier, spin-wait and malloc arenas (E6-03 input) | Waiting for review | Read-only; nothing built or run on the card. docs/research/knc-libgomp.md (f130494) answers Q1-6 with file:... |
 | S9-02 | libstdc++ for KNC: exceptions, RTTI, atomics, threads, packaging (E6-06 input) | In progress | written under the owner's overnight blanket approval (2026-11-08). |
 
 ## Recent activity
 
+- 2026-11-08 03:15 **S9-01** engineer submit: Read-only; nothing built or run on the card. docs/research/knc-libgomp.md (f130494) answers Q1-6 with file:line, each marked proven/inferred/unknow...
 - 2026-11-08 03:08 **S7-10** engineer submit: knc 497bbe8bedf0, build current. Drill: master 8 files/12 hunks all textual (new: libgfortran/configure #line hunks), gcc-16 0. Shared i386 644 lin...
 - 2026-11-08 02:52 **S8-01** lead escalate: Code review of the job 19 fix passes (red a21750f, green 51e844a: main now allocates every worker buffer before thread start, about 1 GB for C1 at ...
 - 2026-11-08 02:51 **S8-01** engineer submit: Job 19 fix: workers no longer allocate; main allocates each buffer before thread start, sized to the largest selected budget + 64 KiB (C1 at 60x4: ...
@@ -167,16 +168,15 @@ Current tickets: `[#################---]` 120 of 135
 - 2026-11-08 02:45 **S8-01** owner decide: Owner blanket approval 2026-11-08 (lead's recommended option): card jobs 1-18 ran; job 19 (C1 at 60x4) failed with ENOMEM at thread 87 of 240 under...
 - 2026-11-08 02:41 **S7-09** lead approve: GCC-KNC's Fortran runtime installs in its private directory, static and shared programs run on the card from it even with the old GCC 5 runtime on ...
 - 2026-11-08 00:56 **S7-09** engineer submit: GCC 9af4eb014e3: k1om libgfortran.spec loads installed libgfortran-knc.ld (ASSERT on a GFORTRAN_10 symbol), so -L to the donor .so.3/.a fails clear...
-- 2026-11-08 00:35 **S7-08** lead approve: libgfortran now builds for KNC, and six Fortran programs (allocation, descriptors, bounds, I/O, kind 10, modules) run correctly on the card. Machin...
 
 ## Cost
 
 - From the script, engineer: 292 sessions, 686.8M input tokens
 - From the script, lead: 223 sessions, 68.2M input tokens
-- Started by hand, Claude: 10 sessions, 1729.1M input tokens
+- Started by hand, Claude: 10 sessions, 1731.6M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 13.8 GiB of 100 GiB. 145 GiB free on the drive.
+The project uses 13.8 GiB of 100 GiB. 146 GiB free on the drive.
