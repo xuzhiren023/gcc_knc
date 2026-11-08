@@ -1,10 +1,10 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-08 02:45.
+Updated automatically at every ticket change. Last update: 2026-11-08 02:49.
 
 **Next: GPT-6.1, on S7-10 (Sprint 7 batch check after S7-05 and S7-08).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
-Current tickets: `[###################-]` 120 of 122
+Current tickets: `[#################---]` 120 of 134
 
 ## Milestones
 
@@ -13,7 +13,7 @@ Current tickets: `[###################-]` 120 of 122
 | M0 | Foundation | In progress | 17 of 17 tickets |
 | M1 | Mixed native code | Done | 43 of 43 tickets |
 | M2 | Useful vector target | Done | 51 of 51 tickets |
-| M3 | Runtimes | In progress | 9 of 11 tickets |
+| M3 | Runtimes | In progress | 9 of 12 tickets |
 | M4 | Broad optimization | Not started | Not planned in detail yet |
 | M5 | Program corpus | Not started | Not planned in detail yet |
 | M6 | Release | Not started | Not planned in detail yet |
@@ -144,6 +144,18 @@ Current tickets: `[###################-]` 120 of 122
 | S7-09 | libgfortran part 3: runtime isolation and packaging (E6-02) | Done | GCC-KNC's Fortran runtime installs in its private directory, static and shared programs run on the card fro... |
 | S7-10 | Sprint 7 batch check after S7-05 and S7-08 | In progress | also waits for S7-09, so the batch runs once at Sprint 7's final GCC head. |
 | S8-01 | Card checks C1-C10 for the Sprint 8 tuning block - microbenchmarks in the knc-char corpus | Changes requested | Job 19 (README line 28, C1 at --cores 60 --threads 4) failed on the card: 'pthread_create (errno=12)' then ... |
+| S8-02 | Masked loop tails that never touch an unmapped page, chosen by length (E4-04) | Not started | written under the owner's overnight blanket approval (2026-11-08). |
+| S8-03 | Two-level software prefetch for KNC loops (E5-07) | Not started | written under the owner's overnight blanket approval (2026-11-08). |
+| S8-04 | Small-matrix kernels: diagnose mat8 and mat16, reject low lane use (E5-11 part 2) | Not started | written under the owner's overnight blanket approval (2026-11-08). |
+| S8-05 | Per-loop scalar-add cost choice that keeps both mat8 and the stencils (E5-11) | Not started | written under the owner's overnight blanket approval (2026-11-08). |
+| S8-06 | Memory-operand forms for V16SF/V8DF arithmetic and FMA (E5-17) | Not started | written under the owner's overnight blanket approval (2026-11-08). |
+| S8-07 | vpmadd231d for V16SI multiply-add (E5-14) | Not started | written under the owner's overnight blanket approval (2026-11-08). |
+| S8-08 | -mtune=knc tune-flag audit (E5-12) | Not started | written under the owner's overnight blanket approval (2026-11-08). |
+| S8-09 | KNC -O2 defaults: vectorizer cost model, stride versioning, predictive commoning (E5-18) | Not started | written under the owner's overnight blanket approval (2026-11-08). |
+| S8-10 | Less ring traffic: 64-byte padding of per-thread data, and card check C11 (E5-16) | Not started | written under the owner's overnight blanket approval (2026-11-08). |
+| S8-11 | Sprint 8 batch check and paired M2 re-measure | Not started | written under the owner's overnight blanket approval (2026-11-08). |
+| S9-01 | libgomp for KNC: futex, affinity, ring-aware barrier, spin-wait and malloc arenas (E6-03 input) | In progress | written under the owner's overnight blanket approval (2026-11-08). |
+| S9-02 | libstdc++ for KNC: exceptions, RTTI, atomics, threads, packaging (E6-06 input) | Not started | written under the owner's overnight blanket approval (2026-11-08). |
 
 ## Recent activity
 
@@ -153,14 +165,14 @@ Current tickets: `[###################-]` 120 of 122
 - 2026-11-08 00:56 **S7-09** engineer submit: GCC 9af4eb014e3: k1om libgfortran.spec loads installed libgfortran-knc.ld (ASSERT on a GFORTRAN_10 symbol), so -L to the donor .so.3/.a fails clear...
 - 2026-11-08 00:35 **S7-08** lead approve: libgfortran now builds for KNC, and six Fortran programs (allocation, descriptors, bounds, I/O, kind 10, modules) run correctly on the card. Machin...
 - 2026-11-08 00:27 **S7-08** owner decide: Owner (via lead, 2026-11-08): native rerun 03:49Z passed, all six programs; back to review and approve.
-- 2026-11-08  **S7-10** lead note: also waits for S7-09, so the batch runs once at Sprint 7's final GCC head.
-- 2026-11-08  **S7-09** lead note: released to lane gcc. S7-06 settled shared libgcc (private directory on the card), so offer the shared libgfortran too, in the same private prefix....
+- 2026-11-08  **S9-02** lead note: written under the owner's overnight blanket approval (2026-11-08).
+- 2026-11-08  **S9-01** lead note: written under the owner's overnight blanket approval (2026-11-08).
 
 ## Cost
 
 - From the script, engineer: 290 sessions, 684.5M input tokens
 - From the script, lead: 222 sessions, 68.1M input tokens
-- Started by hand, Claude: 10 sessions, 1724.7M input tokens
+- Started by hand, Claude: 10 sessions, 1727.1M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
