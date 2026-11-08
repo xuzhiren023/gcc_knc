@@ -1,5 +1,7 @@
 # Sprint 7: runtimes, part 1 - shared libgcc and the first libgfortran slice (Milestone M3)
 
+**Closed 2026-11-08** at GCC `knc` `497bbe8bedf0`; all ten tickets done (retro below).
+
 **Status:** started by the owner on 2026-11-07 ("Can we start working on sprint 7 while waiting for
 card window"; run authorization and engineers "Yes, same as S6"). Runs need no per-run approval,
 card jobs and timed benchmark windows included. Engineers: Codex through `tools/dispatch.py`, model by
@@ -27,3 +29,19 @@ libstdc++ (E6-06), MPI (E6-04), anything installed over the card's system librar
 **Rules carried from Sprint 6:** shared i386 changes take ADR-0006 forms only; x86 assembly stays
 identical; only the lead runs card jobs; engineers stage binaries under `.work/_shared/<ticket>/`;
 ADR-0010 applies to any timing.
+
+## Retro (2026-11-08)
+
+- **Done:** all 10 tickets (S7-01 to S7-10). The shared `libgcc_s.so.1` is a superset of the donor's
+  ABI and passes every compatibility and unwind test on the card from a private prefix (S7-06). The
+  first libgfortran slice (kinds 4/8/10, descriptors, I/O, modules, KNC FP control) runs on the card,
+  installs privately and ignores the donor's runtime on the library path (S7-07 to S7-09). Batch
+  S7-10: x86 identical, 0 ICE, execute suite 1,681/1,681.
+- **Rework:** S7-04 and S7-08 took two rounds each. S7-08's second round was a real semantics question
+  (REAL128 in `iso_fortran_env`), settled by the storage-size rule, not by editing the test.
+- **Card lessons:** the card has no system `libgfortran.so.3`, so tests that assume one must stage the
+  donor's copy (S7-09). `card_run` flattens staged files; a launcher plus `setup.sh` rebuilds directories.
+- **Process:** engineers moved from Codex to Claude Code via `tools/dispatch.py` on 2026-11-07. Card
+  windows were shared with the PhiWeather session by the announced-block rule with no overlap.
+- **Carried:** M3 continues in Sprint 9 (libstdc++, libgomp) and Sprint 10 after Sprint 8's tuning
+  block. Out of scope still: kind 16 and libquadmath, MPI.
