@@ -1,6 +1,6 @@
 # KNC two-level software prefetch (S8-03, E5-07)
 
-Status: green 2026-11-08 (GCC s8/S8-03 at 440d4a9; T1 scans pass). Card results are the
+Status: green 2026-11-08 (GCC s8/S8-03 at 2fb2498; T1 scans pass). Card results are the
 lead's: the paired M2 run and s4_masks / s5_ops are staged under `.work/_shared/S8-03/`.
 
 ## Rules the T1 scans encode (`tests/t1/knc-prefetch-*.c`)
@@ -32,7 +32,7 @@ Source: `docs/research/knc-characterization.md` C2, C4, C5 and the S8-12 rerun.
 - Written streams use the read-hint forms `vprefetch0/1`, as C5's kernels did for their
   output array. `vprefetche*` is unmeasured and not emitted.
 
-## What was built (GCC s8/S8-03, 836a0e2..440d4a9)
+## What was built (GCC s8/S8-03, 836a0e2..2fb2498)
 
 - `imci.md`: `knc_prefetch`, one `(prefetch ...)` insn under `TARGET_KNC`, locality 3/2/1/0 to
   `vprefetch0/1/2/nta` (Intel 327364-001 pp. 641-656); write hint dropped like the SSE path.
@@ -52,8 +52,11 @@ Source: `docs/research/knc-characterization.md` C2, C4, C5 and the S8-12 rerun.
   `ix86_knc_vectorizer_params` call (no `i386-options.cc` change); `simultaneous_prefetches`
   1024 in the KNC cost table (the pass's slot count, not a hardware queue: eight streams at
   16 + 32 lines hold 384 slots). `i386.opt`: the two params.
-- Two generic fixes the scans needed, both inert for x86 at `-O2` (the pass is off there and
-  the torture corpus has no `__builtin_prefetch` in a loop):
+- Two generic fixes the scans needed. Round 2 (lead, 2026-11-08) gated both on the two-level
+  hook answering (`targetm.prefetch_distances` present and returning true, an own line in each
+  condition; GCC 2fb2498): on every other target `__builtin_prefetch` in `ivopts` and the
+  pass's grouping are exactly upstream's, and the KNC assembly of the T1 files and the M2
+  kernels is byte-identical to 440d4a9.
   - The pass groups references whose addresses differ by a constant once expanded through
     their definitions (`tree-affine`). The vectorizer gives `x[i-1]`, `x[i]` and `x[i+1]`
     separate pointers, initialized before the loop as `x` plus separately computed offsets
