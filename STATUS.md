@@ -155,7 +155,7 @@ Current tickets: `[#################---]` 120 of 134
 | S8-10 | Less ring traffic: 64-byte padding of per-thread data, and card check C11 (E5-16) | Not started | written under the owner's overnight blanket approval (2026-11-08). |
 | S8-11 | Sprint 8 batch check and paired M2 re-measure | Not started | written under the owner's overnight blanket approval (2026-11-08). |
 | S9-01 | libgomp for KNC: futex, affinity, ring-aware barrier, spin-wait and malloc arenas (E6-03 input) | In progress | written under the owner's overnight blanket approval (2026-11-08). |
-| S9-02 | libstdc++ for KNC: exceptions, RTTI, atomics, threads, packaging (E6-06 input) | Not started | written under the owner's overnight blanket approval (2026-11-08). |
+| S9-02 | libstdc++ for KNC: exceptions, RTTI, atomics, threads, packaging (E6-06 input) | In progress | written under the owner's overnight blanket approval (2026-11-08). |
 
 ## Recent activity
 
@@ -172,10 +172,10 @@ Current tickets: `[#################---]` 120 of 134
 
 - From the script, engineer: 290 sessions, 684.5M input tokens
 - From the script, lead: 222 sessions, 68.1M input tokens
-- Started by hand, Claude: 10 sessions, 1727.1M input tokens
+- Started by hand, Claude: 10 sessions, 1727.7M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 13.8 GiB of 100 GiB. 142 GiB free on the drive.
+The project uses 13.8 GiB of 100 GiB. 141 GiB free on the drive.
