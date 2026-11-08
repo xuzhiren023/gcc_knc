@@ -1,6 +1,7 @@
 // S4-05 / ADR-0007 point 7: aligned loops (no peel) end in a masked IMCI
 // epilogue: a GPR mask moved to k, guarded masked moves, cond_<op>, and no
-// x87 remainder.  Unknown alignment keeps the x87 remainder.  The last
+// x87 remainder.  Unknown alignment ends in a gather/scatter epilogue
+// (S8-02, ADR-0009 amendment 1 point 9), never x87.  The last
 // label or jump before each masked memory move is its empty-mask guard
 // (jkzd, or je/jz after a byte test) or the label a jknzd/jne guard
 // branches to; never another jump, ret or the function entry.
@@ -45,7 +46,8 @@
 // scan-asm-func cst_al_f32: \bvmovaps\s+[^\n]*\),\s*%zmm\d+\{%k[1-7]\}
 // scan-asm-func cst_al_f32: \A(?![\s\S]*^(?!\s*jkzd\s|\.L\d+:)(?:\s*(?:j\w+|ret\w*)\b|\.L\w+:)[^\n]*\n(?:(?!(?:\s*(?:j\w+|ret\w*)\b|\.L\w+:))[^\n]*\n)*\s*vmovaps\s[^\n]*\([^\n]*\{%k)
 // scan-asm-func cst_al_f32: \A(?![\s\S]*\bfld)
-// scan-asm-func add_f32: \bflds\s
-// scan-asm-func add_f32: \A(?![\s\S]*\{%k[1-7]\})
+// scan-asm-func add_f32: \bvgatherdps\s+[^\n]*\{%k[1-7]\}
+// scan-asm-func add_f32: \bvscatterdps\s+%zmm\d+,\s*[^\n]*\{%k[1-7]\}
+// scan-asm-func add_f32: \A(?![\s\S]*\bfld)
 // scan-asm-not: %(?:xmm|ymm)\d
 #include "knc-mask-tail.h"
