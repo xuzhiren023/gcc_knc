@@ -94,6 +94,26 @@ def shared_area(root):
     return os.path.join(work_area(root), "_shared")
 
 
+# Two GCC checkouts and build trees, so two GCC tickets can run at once (S8-18). Slot 2 is for lane
+# gcc2 tickets; dispatch sets KNC_GCC_SLOT=2 for them. Everything else in _shared stays shared.
+GCC_SLOTS = {"1": ("gcc", "gcc-build"), "2": ("gcc-2", "gcc-build-2")}
+
+
+def gcc_slot(slot=None):
+    slot = str(slot or os.environ.get("KNC_GCC_SLOT") or "1")
+    if slot not in GCC_SLOTS:
+        raise ValueError("KNC_GCC_SLOT must be 1 or 2, not %r" % slot)
+    return slot
+
+
+def gcc_tree(root, slot=None):
+    return os.path.join(shared_area(root), GCC_SLOTS[gcc_slot(slot)][0])
+
+
+def gcc_build_dir(root, slot=None):
+    return os.path.join(shared_area(root), GCC_SLOTS[gcc_slot(slot)][1])
+
+
 def project_bytes(root):
     return tree_size(root)
 

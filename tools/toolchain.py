@@ -20,9 +20,14 @@ import sys
 import tempfile
 import time
 
+import storage
+
 ROOT = Path(__file__).resolve().parents[1]
 PROJECT = ROOT.parent.parent if ROOT.parent.name == '.work' else ROOT
 SHARED = PROJECT / '.work/_shared'
+# This slot's GCC tree and build, by name inside SHARED (S8-18).
+GCC_TREE = Path(storage.gcc_tree(PROJECT)).name
+GCC_BUILD = Path(storage.gcc_build_dir(PROJECT)).name
 TC = SHARED / 'toolchain'
 SYSROOT = TC / 'sysroot'
 DEVELOPMENT = ('crt1.o', 'crti.o', 'crtn.o', 'libc.so', 'libc_nonshared.a',
@@ -43,11 +48,11 @@ def command(*args, **kwargs):
 
 def gcc16(args):
     """Replace the shared build with the KNC C/Fortran compilers (all-gcc only)."""
-    source = SHARED / 'gcc'
-    build = SHARED / 'gcc-build'
+    source = SHARED / GCC_TREE
+    build = SHARED / GCC_BUILD
     if not (source / 'configure').is_file():
         raise RuntimeError('missing shared GCC source; ask the lead')
-    if build.resolve() != SHARED.resolve() / 'gcc-build' or build.is_symlink():
+    if build.resolve() != SHARED.resolve() / GCC_BUILD or build.is_symlink():
         raise RuntimeError('refusing to clean unexpected build directory: ' + str(build))
     resume = getattr(args, 'resume', False)
     if resume:
@@ -137,7 +142,7 @@ def rebuild(args):
 
 def libgcc(args):
     """Build the fork's static target runtime in the existing shared tree."""
-    build = SHARED / 'gcc-build'
+    build = SHARED / GCC_BUILD
     if not (build / 'gcc/xgcc.exe').is_file():
         raise RuntimeError('missing shared GCC build; build gcc16 first')
     os.environ['TMPDIR'] = str(SHARED / 'tmp')
@@ -147,7 +152,7 @@ def libgcc(args):
 def driver(args):
     """Rebuild only xgcc after changing driver specs, not code generation."""
     command('make', '-j8', 'specs', 'CFLAGS=-O2 -g1', 'CXXFLAGS=-O2 -g1',
-            cwd=SHARED / 'gcc-build/gcc')
+            cwd=SHARED / GCC_BUILD / 'gcc')
 
 
 def install_stage(cygpath, env):

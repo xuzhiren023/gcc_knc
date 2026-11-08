@@ -120,13 +120,21 @@ def session_env(board, ticket, role):
     env = {k: v for k, v in os.environ.items() if not k.startswith("CLAUDE")}
     env.update(PM_ROLE=role, PM_TICKET=ticket.id, PM_DEPTH=ticket.fields.get("depth", "standard"),
                PM_ALLOW_TIERS=ticket.fields.get("allow_tiers", ""), PM_ALLOW_BULK=ticket.fields.get("allow_bulk", ""))
+    # A gcc2 ticket builds in the second GCC tree; nothing else may inherit that slot from this shell.
+    env.pop("KNC_GCC_SLOT", None)
+    slots = ["1"]
+    if pm.gcc_slot(ticket) == "2":
+        env["KNC_GCC_SLOT"] = "2"
+        slots.append("2")
     if role == "engineer":
         # The sandbox user does not own the shared GCC checkout, so git calls it dubious. Command-line
         # scope is trusted for safe.directory; Codex would drop GIT_CONFIG_KEY_0 because it contains KEY.
         # Git for Windows and Cygwin git spell the same path differently, so trust both.
-        gcc = os.path.join(storage.shared_area(board.root), "gcc").replace("\\", "/")
-        cygwin = "/cygdrive/%s%s" % (gcc[0].lower(), gcc[2:])
-        env["GIT_CONFIG_PARAMETERS"] = "'safe.directory'='%s' 'safe.directory'='%s'" % (gcc, cygwin)
+        trusted = []
+        for slot in slots:
+            gcc = storage.gcc_tree(board.root, slot).replace("\\", "/")
+            trusted += [gcc, "/cygdrive/%s%s" % (gcc[0].lower(), gcc[2:])]
+        env["GIT_CONFIG_PARAMETERS"] = " ".join("'safe.directory'='%s'" % path for path in trusted)
     return env
 
 

@@ -19,6 +19,8 @@ import sys
 import tempfile
 import time
 
+import storage
+
 ROOT = Path(__file__).resolve().parents[1]
 PROJECT = ROOT.parent.parent if ROOT.parent.name == '.work' else ROOT
 FUNCTIONS = ('affine_f32', 'affine_f64', 'recurrence_f32')
@@ -272,7 +274,8 @@ class Runner:
         manifest = json.loads((ROOT / 'toolchain/manifest.json').read_text())
         self.tc = PROJECT / manifest['root']
         self.sysroot = self.tc / manifest['sysroot']
-        build = PROJECT / '.work/_shared/gcc-build/gcc'
+        self.gcc_build = Path(storage.gcc_build_dir(PROJECT))
+        build = self.gcc_build / 'gcc'
         self.cc = Path(args.cc) if args.cc else (build / 'xgcc' if args.compiler == 'gcc16' else self.tool('gcc'))
         self.cc_flags = ['-B' + str(build) + '/'] if args.compiler == 'gcc16' else []
         self.env = os.environ.copy()
@@ -478,7 +481,7 @@ class Runner:
     def t2_link_defaults(self):
         elf = self.out / 'knc-link-defaults.mic'
         # libgcc's all target installs its results into the GCC build dir.
-        runtime = PROJECT / '.work/_shared/gcc-build/gcc'
+        runtime = self.gcc_build / 'gcc'
         linked = self.command(self.cc, *self.cc_flags,
                               '-v', '-Wl,--trace', ROOT / 'tests/t2/knc-link-defaults.c',
                               '-o', elf, check=False)

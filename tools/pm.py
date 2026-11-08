@@ -69,6 +69,11 @@ def lane_of(ticket):
     return ticket.fields.get("lane") or ("gcc" if ticket.fields.get("gcc") == "yes" else "tools")
 
 
+def gcc_slot(ticket):
+    """Lane gcc2 works in the second GCC checkout and build (S8-18); every other ticket in the first."""
+    return "2" if lane_of(ticket) == "gcc2" else "1"
+
+
 def run_git(*args, cwd=None, check=True):
     # Git emits UTF-8 (notes and diffs may hold non-ASCII text); Windows would decode with its ANSI code page.
     result = subprocess.run(("git",) + args, cwd=cwd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
@@ -223,25 +228,38 @@ def added_lines(diff):
 
 
 def gcc_current_branch(board, ticket):
-    path = os.path.join(storage.shared_area(board.root), "gcc")
-    if ticket.fields.get("gcc") != "yes" or not os.path.isdir(os.path.join(path, ".git")):
+    path = storage.gcc_tree(board.root, gcc_slot(ticket))
+    if ticket.fields.get("gcc") != "yes" or not os.path.exists(os.path.join(path, ".git")):
         return None
     return run_git("branch", "--show-current", cwd=path)
 
 
 def gcc_checkout(board, ticket, allow_dirty=False):
-    """WIP is one: the shared checkout may belong only to this ticket or knc."""
+    """WIP is one per tree: a GCC checkout may belong only to this ticket, or be idle on knc or detached.
+    The second tree is a git worktree of the first (its .git is a file), so both share knc."""
     if ticket.fields.get("gcc") != "yes":
         return None
-    path = os.path.join(storage.shared_area(board.root), "gcc")
-    if not os.path.isdir(os.path.join(path, ".git")):
+    path = storage.gcc_tree(board.root, gcc_slot(ticket))
+    if not os.path.exists(os.path.join(path, ".git")):
         raise Refused("GCC checkout missing: " + path)
     if not allow_dirty and run_git("status", "--porcelain", cwd=path):
         raise Refused("uncommitted changes in the GCC checkout")
     branch = run_git("branch", "--show-current", cwd=path)
-    if branch not in ("knc", ticket.fields["branch"]):
+    if branch not in ("knc", "", ticket.fields["branch"]):
         raise Refused("GCC checkout is on another branch: " + branch)
     return path
+
+
+def free_knc(gcc):
+    """Detach any other GCC tree that has knc checked out, so knc can move or be checked out here.
+    Detaching changes no file, and a tree left on knc while knc moves would look dirty."""
+    here = os.path.normcase(os.path.realpath(gcc))
+    tree = None
+    for line in run_git("worktree", "list", "--porcelain", cwd=gcc).splitlines():
+        if line.startswith("worktree "):
+            tree = line[len("worktree "):]
+        elif line == "branch refs/heads/knc" and os.path.normcase(os.path.realpath(tree)) != here:
+            run_git("checkout", "-q", "--detach", cwd=tree)
 
 
 def submit_problems(board, ticket, cwd):
@@ -257,6 +275,10 @@ def submit_problems(board, ticket, cwd):
     gcc_diff = "knc..." + ticket.fields["branch"] if gcc else None
     if gcc:
         subjects += run_git("log", "--format=%s", "knc.." + ticket.fields["branch"], cwd=gcc).splitlines()
+        # Two GCC lanes merge into one knc: the branch must already hold its current head.
+        if subprocess.call(["git", "merge-base", "--is-ancestor", "knc", ticket.fields["branch"]], cwd=gcc,
+                           stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL):
+            hard.append("the GCC branch does not contain the current knc head: rebase it on knc first")
     if not subjects:
         hard.append("no commits on this branch")
     if ticket.fields.get("type", "code") == "code" and not any("[red]" in s for s in subjects):
@@ -369,7 +391,7 @@ def cmd_commit(board, args):
         if not run_git("branch", "--list", "knc", cwd=worktree):
             run_git("branch", "knc", "releases/gcc-16.2.0", cwd=worktree)
         branch = ticket.fields["branch"]
-        if run_git("branch", "--show-current", cwd=worktree) == "knc":
+        if run_git("branch", "--show-current", cwd=worktree) in ("knc", ""):
             exists = run_git("branch", "--list", branch, cwd=worktree)
             target = (branch,) if exists else ("-b", branch, "knc")
             run_git("checkout", "-q", *target, cwd=worktree)
@@ -416,11 +438,13 @@ def cmd_submit(board, args):
     print("%s submitted at %s. End this session." % (ticket.id, ticket.fields["head"]))
 
 
-def machine_check(worktree):
-    """Run the branch's own T0 before it can merge, so approval never rests on a report alone."""
+def machine_check(worktree, slot="1"):
+    """Run the branch's own T0 before it can merge, so approval never rests on a report alone.
+    T0 uses the GCC build of the ticket's slot."""
     checks = []
     if os.path.exists(os.path.join(worktree, "tools", "check")):
-        checks.append(("tools/check t0", [sys.executable, os.path.join("tools", "check"), "t0"], None))
+        env = dict(os.environ, KNC_GCC_SLOT=slot)
+        checks.append(("tools/check t0", [sys.executable, os.path.join("tools", "check"), "t0"], env))
     card_paths = ("tools/card_run", "tools/card_run_remote.sh", "tools/claude-pin.c",
                   "tools/claude-unpack.c")
     if run_git("diff", "--name-only", "main...HEAD", "--", *card_paths, cwd=worktree):
@@ -467,7 +491,7 @@ def cmd_approve(board, args):
         return
     branch = ticket.fields["branch"]
     worktree = board.worktree(ticket)
-    note = limit_text(board, args.note or "merged") + machine_check(worktree)
+    note = limit_text(board, args.note or "merged") + machine_check(worktree, gcc_slot(ticket))
     message = "Merge %s: %s" % (ticket.id, ticket.fields.get("title", ""))
     gcc = gcc_checkout(board, ticket)
     if gcc:
@@ -484,6 +508,7 @@ def cmd_approve(board, args):
         ancestor = subprocess.call(["git", "merge-base", "--is-ancestor", "knc", branch], cwd=gcc,
                                    stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL) == 0
         fast = False
+        free_knc(gcc)
         # A batch-check or test-only ticket's branch may carry no GCC commit: nothing to merge.
         if run_git("rev-parse", branch, cwd=gcc) == knc_head:
             fast = True

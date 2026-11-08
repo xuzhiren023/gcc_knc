@@ -21,11 +21,13 @@ import subprocess
 import sys
 import time
 
+import storage
+
 ROOT = Path(__file__).resolve().parents[1]
 PROJECT = ROOT.parent.parent if ROOT.parent.name == '.work' else ROOT
 SHARED = PROJECT / '.work/_shared'
 TC = SHARED / 'toolchain'
-BUILD = SHARED / 'gcc-build/gcc'
+BUILD = Path(storage.gcc_build_dir(PROJECT)) / 'gcc'
 CORPUS = SHARED / 'gcc/gcc/testsuite/gcc.c-torture/compile'
 LEVELS = {'O0': ['-O0'], 'O2': ['-O2'], 'O2-g': ['-O2', '-g'], 'O3': ['-O3']}
 CLASSES = ('pass', 'slow', 'hang', 'ICE', 'compiler error', 'float/double ABI error',
