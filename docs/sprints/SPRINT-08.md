@@ -26,7 +26,7 @@ Order (ADR-0009 amendment 1):
 4. Added 2026-11-08 at the owner's request, for ADR-0009 points the sprint had missed: streaming
    stores (S8-13, E5-08, now that C1 shows a 60-core gain), default 64-byte alignment and TLB-aware
    cache parameters (S8-14, E5-13), small-loop unroll and the GCC-KNC flags page (S8-15, E5-09).
-5. Owner's user story (2026-11-08): one bold flag, `-mphoenix`, bundling the measured best set, with
+5. Owner's user story (2026-11-08): one bold flag, `-mphinix`, bundling the measured best set, with
    a rising-phoenix banner and a progress bar, both shown only on a terminal (S8-16).
 6. Batch check and paired M2 re-measure (S8-11).
 
