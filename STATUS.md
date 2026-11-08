@@ -155,7 +155,7 @@ Current tickets: `[#################---]` 120 of 135
 | S8-10 | Less ring traffic: 64-byte padding of per-thread data, and card check C11 (E5-16) | Not started | written under the owner's overnight blanket approval (2026-11-08). |
 | S8-11 | Sprint 8 batch check and paired M2 re-measure | Not started | written under the owner's overnight blanket approval (2026-11-08). |
 | S8-12 | Fix three weak S8-01 checks - C4 page offsets, C5 row aliasing, C9 memory chain | Not started | written under the owner's overnight blanket approval; S8-03's short-row acceptance waits for the C5 rerun. |
-| S9-01 | libgomp for KNC: futex, affinity, ring-aware barrier, spin-wait and malloc arenas (E6-03 input) | Changes requested | Citations spot-checked and correct (configure.tgt:88, x86/futex.h:120-124, imci.md:485-495, bar.h:98, wait.... |
+| S9-01 | libgomp for KNC: futex, affinity, ring-aware barrier, spin-wait and malloc arenas (E6-03 input) | In progress | Citations spot-checked and correct (configure.tgt:88, x86/futex.h:120-124, imci.md:485-495, bar.h:98, wait.... |
 | S9-02 | libstdc++ for KNC: exceptions, RTTI, atomics, threads, packaging (E6-06 input) | In progress | written under the owner's overnight blanket approval (2026-11-08). |
 
 ## Recent activity
