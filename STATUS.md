@@ -143,7 +143,7 @@ Current tickets: `[#################---]` 120 of 134
 | S7-08 | libgfortran part 2: base runtime build and the descriptor and I/O slice (E6-02) | Done | libgfortran now builds for KNC, and six Fortran programs (allocation, descriptors, bounds, I/O, kind 10, mo... |
 | S7-09 | libgfortran part 3: runtime isolation and packaging (E6-02) | Done | GCC-KNC's Fortran runtime installs in its private directory, static and shared programs run on the card fro... |
 | S7-10 | Sprint 7 batch check after S7-05 and S7-08 | In progress | also waits for S7-09, so the batch runs once at Sprint 7's final GCC head. |
-| S8-01 | Card checks C1-C10 for the Sprint 8 tuning block - microbenchmarks in the knc-char corpus | Changes requested | Job 19 (README line 28, C1 at --cores 60 --threads 4) failed on the card: 'pthread_create (errno=12)' then ... |
+| S8-01 | Card checks C1-C10 for the Sprint 8 tuning block - microbenchmarks in the knc-char corpus | In progress | Job 19 (README line 28, C1 at --cores 60 --threads 4) failed on the card: 'pthread_create (errno=12)' then ... |
 | S8-02 | Masked loop tails that never touch an unmapped page, chosen by length (E4-04) | Not started | written under the owner's overnight blanket approval (2026-11-08). |
 | S8-03 | Two-level software prefetch for KNC loops (E5-07) | Not started | written under the owner's overnight blanket approval (2026-11-08). |
 | S8-04 | Small-matrix kernels: diagnose mat8 and mat16, reject low lane use (E5-11 part 2) | Not started | written under the owner's overnight blanket approval (2026-11-08). |
