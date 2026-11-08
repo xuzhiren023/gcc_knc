@@ -6,6 +6,6 @@
 // scan-asm-func stream_f32: \bvprefetch1\s+4096\(
 // scan-asm-func row8_f32: \bvprefetch0\s+256\(
 // scan-asm-func row8_f32: \bvprefetch1\s+4096\(
-// scan-asm-not: \bvprefetch0\s+(?!(?:256|508|512|516)\()
-// scan-asm-not: \bvprefetch1\s+(?!(?:4092|4096|4100)\()
+// scan-asm-not: \bvprefetch0\s+(?!(?:256|504|508|512|516|520)\()
+// scan-asm-not: \bvprefetch1\s+(?!(?:4088|4092|4096|4100|4104)\()
 #include "knc-prefetch.h"

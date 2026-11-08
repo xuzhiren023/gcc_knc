@@ -2,11 +2,11 @@
 // options: -O3 -ffp-contract=off
 // scan-asm-func stream_f32: \bvprefetch0\s+1024\(
 // scan-asm-func stream_f32: \bvprefetch1\s+2048\(
-// scan-asm-func stencil_f32: \bvprefetch0\s+10(?:20|24|28)\(
-// scan-asm-func stencil_f32: \bvprefetch1\s+20(?:44|48|52)\(
+// scan-asm-func stencil_f32: \bvprefetch0\s+10(?:16|20|24|28|32)\(
+// scan-asm-func stencil_f32: \bvprefetch1\s+20(?:40|44|48|52|56)\(
 // scan-asm-func row8_f32: \bvprefetch0\s+512\(
 // scan-asm-func row8_f32: \bvprefetch1\s+2048\(
-// scan-asm-not: \bvprefetch0\s+(?!(?:512|1020|1024|1028)\()
-// scan-asm-not: \bvprefetch1\s+(?!(?:2044|2048|2052)\()
+// scan-asm-not: \bvprefetch0\s+(?!(?:512|1016|1020|1024|1028|1032)\()
+// scan-asm-not: \bvprefetch1\s+(?!(?:2040|2044|2048|2052|2056)\()
 // scan-asm-loop-not l1_resident_f32: \bvprefetch
 #include "knc-prefetch.h"
