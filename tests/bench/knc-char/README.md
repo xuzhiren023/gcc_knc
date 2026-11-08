@@ -1,5 +1,87 @@
 # S6-03 machine characterization
 
+## S8-01 tuning checks (lead job list, not run by the engineer)
+
+Build the extended corpus with:
+
+```text
+python tools/run.py --name S8-01-acceptance --inputs tests/bench/knc-char -- python tests/bench/knc-char/build.py
+```
+
+The current build writes `knc-char.mic`, `knc-char-host.exe`, `driver.s`,
+`kernels.s` and `kernels.h` to `.work/_shared/S8-01/`. It reads the existing
+compiler without rebuilding or modifying GCC. `check_s8.py` checks all 254 S8
+point names and the output keys on the host, with inert kernels; it first
+failed on the missing catalog. Host output is explicitly unmeasured.
+
+`--check cN` selects a family; `--case NAME` selects a single point. The list
+below covers the required placements. Run each line in five independent
+launches, retain every sample and chronological group, and report launch
+ranges in `docs/research/knc-characterization.md`. Large family selections
+need long exclusive windows; the lead can split them with `--case` using the
+names from `--dry-run --check cN`. No card results are supplied by this ticket.
+The lead coordinates windows with PhiWeather. C3 is optional and omitted.
+
+```text
+python tools/card_run --benchmark --threads 1 --timeout 120 ../_shared/S8-01/knc-char.mic --native --cores 1 --threads 1 --check c1
+python tools/card_run --benchmark --threads 4 --timeout 120 ../_shared/S8-01/knc-char.mic --native --cores 1 --threads 4 --check c1
+python tools/card_run --benchmark --threads 240 --timeout 120 ../_shared/S8-01/knc-char.mic --native --cores 60 --threads 4 --check c1
+python tools/card_run --benchmark --threads 1 --timeout 180 ../_shared/S8-01/knc-char.mic --native --cores 1 --threads 1 --check c2
+python tools/card_run --benchmark --threads 2 --timeout 180 ../_shared/S8-01/knc-char.mic --native --cores 1 --threads 2 --check c2
+python tools/card_run --benchmark --threads 4 --timeout 180 ../_shared/S8-01/knc-char.mic --native --cores 1 --threads 4 --check c2
+python tools/card_run --benchmark --threads 1 --timeout 120 ../_shared/S8-01/knc-char.mic --native --cores 1 --threads 1 --check c4
+python tools/card_run --benchmark --threads 4 --timeout 120 ../_shared/S8-01/knc-char.mic --native --cores 1 --threads 4 --check c4
+python tools/card_run --benchmark --threads 2 --timeout 3600 ../_shared/S8-01/knc-char.mic --native --cores 1 --threads 2 --check c5
+python tools/card_run --benchmark --threads 4 --timeout 3600 ../_shared/S8-01/knc-char.mic --native --cores 1 --threads 4 --check c5
+python tools/card_run --benchmark --threads 1 --timeout 3600 ../_shared/S8-01/knc-char.mic --native --cores 1 --threads 1 --check c6
+python tools/card_run --benchmark --threads 4 --timeout 3600 ../_shared/S8-01/knc-char.mic --native --cores 1 --threads 4 --check c6
+python tools/card_run --benchmark --threads 4 --timeout 120 ../_shared/S8-01/knc-char.mic --native --cores 1 --threads 4 --check c7
+python tools/card_run --benchmark --threads 1 --timeout 180 ../_shared/S8-01/knc-char.mic --native --cores 1 --threads 1 --check c9
+python tools/card_run --benchmark --threads 2 --timeout 180 ../_shared/S8-01/knc-char.mic --native --cores 1 --threads 2 --check c9
+python tools/card_run --benchmark --threads 1 --timeout 120 ../_shared/S8-01/knc-char.mic --native --cores 1 --threads 1 --check c10
+python tools/card_run --benchmark --threads 4 --timeout 120 ../_shared/S8-01/knc-char.mic --native --cores 1 --threads 4 --check c10
+```
+
+Point names and units (each round contains 32 units):
+
+| Check | Point names | Unit and controls |
+|---|---|---|
+| C1 | `c1.store.{normal,nr,ngo}` | 64-byte line; 16 MiB per core divided among siblings, write-only full unmasked lines. All variants include a final `lock addl` drain before timing ends. |
+| C2 | `c2.{vector,prefetch0,prefetch1,vector_prefetch0,vector_prefetch1}` | One instruction or adjacent pair; compare the paired cost with both isolated controls, with eight independent vector chains and hot prefetch targets. |
+| C4 | `c4.pages.{128,256,384,448}` | Dependent load, randomized 4 KiB page cycle; KiB per core divided exactly among siblings, including the non-power-of-two points. |
+| C5 | `c5.{stream,stencil,row7,row8,row9}.l1_D.l2_D` | One 64-byte row iteration. Full Cartesian sweep L1={0,8,16,32,64}, L2={0,32,64,128}; 0 disables the hint. Distances count iterations, not bytes. |
+| C6 | `c6.{x87,aligned,peel,gather}.nN` | One complete `y=x+1` invocation of N=1..33 elements. Peel starts one float off alignment and scalar-peels up to alignment; aligned and gather start aligned. Gather only handles a partial final vector, with mask replay. Include the peel alignment difference in interpretation. |
+| C7 | `c7.reduce.a{1,2}` | One 16-lane reduction update, identical 32-vector input and operation counts; two-accumulator finish combines the results. |
+| C9 | `c9.{vector,memory}.u{1,2,4}` | One dependent vector add update; U independent recurrence registers with U instructions per actual loop branch. Round scaling preserves 32 updates per reported round. Memory operands read the same hot line. |
+| C10 | `c10.branch.{fixed,random}` | One conditional branch with balanced instruction counts on its two paths (including a common jump); fixed all-taken-direction bits versus precomputed pseudorandom bits, same load/index overhead. RNG is outside timing. Delta per branch is an effective random-branch cost, not a direct hardware miss count. |
+
+C5 uses eight 1 MiB arrays per worker. Stream reads one array and writes an
+affine result to the eighth; stencil reads a forward three-point FP32 stencil
+with unaligned load-unpack pairs and a two-element initialized halo; short
+rows sum seven arrays into the eighth with masks for 7, 8 or 9 active elements
+and 64-byte row pitch. Only the arrays used by each kernel are prefetched.
+These fixed memory-sized per-worker arrays deliberately differ from C4's
+fixed per-core capacity experiment. The one-core jobs touch at most 32 MiB.
+
+The extended driver uses pinned first touch with page-aligned allocations and
+a fixed 1 KiB sibling stagger. A native one-round gate checks C1 stores, C5
+outputs, C6 outputs and untouched tail elements, and C7 sums before the pilot.
+Batch sizing is checked and adjusted to 50-200 ms; each result is the median
+of five group medians (3 warm-ups and 21 samples per group). Same-worker TSC
+ticks remain auxiliary; wall makespan is the primary result. Chronological
+`group` lines preserve the unsorted group medians. Under ADR-0010 amendment 2,
+spread >=2% prints `regime_step ... flagged=1` and does not reject a launch.
+`accepted` reflects density and median batch duration; use the process exit
+status too, since end-policy changes fail the launch after result emission.
+Start/end source, governor and policy limits are compared; current frequency
+is recorded as telemetry. No host test establishes native correctness or speed.
+
+## Original S6-03 corpus and historical protocol
+
+The following describes the original corpus. Its S6-03 artifact paths and
+spread-based acceptance text are historical; the S8 build location and
+ADR-0010 amendment-2 behavior above supersede them for the extended binary.
+
 `knc-char.mic` is one driver with small hand-written assembly programs, one
 selectable kernel per measurement below. GCC cannot schedule the timed bodies.
 Source of instruction syntax/semantics: Intel 327364-001 (local shared text),
@@ -116,7 +198,9 @@ Hierarchy budgets count siblings: total live data is at most 16 KiB/core for
 L1, 256 KiB/core for L2, and 16 MiB/core for memory. Each per-worker allocation
 uses the largest power of two not exceeding that budget divided by density
 (density 3 rounds down). Arrays are 64-byte aligned. These are capacity targets,
-not proven residency. Pointer latency visits a deterministic Fisher-Yates
+not proven residency. The main thread allocates every worker buffer before the
+workers start, sized to the largest selected budget plus 64 KiB; a worker's
+malloc would reserve a 64 MB glibc arena (C1 at 240 threads ran out). Pointer latency visits a deterministic Fisher-Yates
 random permutation of **every 64-byte line** in a single dependent cycle,
 avoiding regular streaming prefetch. Load/store bandwidth visits sequential
 full lines, 2048 bytes/round; calculate aggregate GB/s as
