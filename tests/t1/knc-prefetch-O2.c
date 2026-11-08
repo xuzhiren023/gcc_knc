@@ -18,9 +18,23 @@
 // scan-asm-func row8_f32: \bvprefetch0\s+512\(
 // scan-asm-func row8_f32: \bvprefetch1\s+2048\(
 // Never an L1 prefetch without its L2 prefetch: no other distances appear.
-// scan-asm-not: \bvprefetch0\s+(?!(?:512|1016|1020|1024|1028|1032)\()
-// scan-asm-not: \bvprefetch1\s+(?!(?:2040|2044|2048|2052|2056)\()
+// scan-asm-not: \bvprefetch0\s+(?!(?:512|1016|1020|1024|1028|1032|1092)\()
+// scan-asm-not: \bvprefetch1\s+(?!(?:2040|2044|2048|2052|2056|2184)\()
 // scan-asm-not: \bvprefetch(?:2|nta|e[a-z0-9]*)\b
 // A loop that fits in L1 gets no prefetch.
 // scan-asm-loop-not l1_resident_f32: \bvprefetch
+// Distances stay in bytes when the step exceeds a line (lead note, WRF's
+// k loop: 51 trips, 273-float step): L2 32 lines = 2048 bytes is 2 steps
+// (2184 bytes), L1 16 lines = 1024 bytes is 1 step (1092 bytes), and the
+// trip check uses 4 x 2 iterations, not 4 x 32.
+// scan-asm-func column_f32: \bvprefetch1\s+2184\(
+// scan-asm-func column_f32: \bvprefetch0\s+1092\(
 #include "knc-prefetch.h"
+
+void
+column_f32 (float *restrict y, const float *restrict x, float a)
+{
+#pragma GCC novector
+  for (unsigned int k = 0; k < 51; ++k)
+    y[k * 273] = a * x[k * 273];
+}
