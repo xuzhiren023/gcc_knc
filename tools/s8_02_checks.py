@@ -16,7 +16,6 @@ acceptance builds the s4_masks and s5_ops fixtures there as well.
 """
 import os
 from pathlib import Path
-import re
 import subprocess
 import sys
 
@@ -66,22 +65,17 @@ def native():
         (OUT / ('tail-loops%s.i' % tag)).unlink(missing_ok=True)
         asm = OUT / ('tail-loops%s.s' % tag)
         text = asm.read_text()
-        # The forms the ticket delivers; a stale compiler fails here.  The
-        # runtime kernels need both paths: the gather/scatter and the
-        # single-lane moves for a mask within C6's limit (round 1), never a
-        # masked high half.
-        lane = r'\bv(?:loadunpackl|packstorel)\w+\s[^\n]*\{%k'
-        half = r'\bv(?:loadunpackh|packstoreh)\w+\s[^\n]*\{%k'
+        # The forms the ticket delivers; a stale compiler fails here.
         for name, needed, forbidden in [
-                ('add_f32', ('vgatherdps', 'vscatterdps', lane), ('fld', 'vpermd', half)),
-                ('add_f64', ('vgatherdpd', 'vscatterdpd', lane), ('fld', 'vpermd', half)),
+                ('add_f32', ('vgatherdps', 'vscatterdps'), ('fld', 'vpermd')),
+                ('add_f64', ('vgatherdpd', 'vscatterdpd'), ('fld', 'vpermd')),
                 ('add_al_f32', ('vmovaps',), ('fld',)),
                 ('fix_f32_5', ('vgatherdps', 'vscatterdps'), ('fld',)),
                 ('fix_al_f32_5', ('vmovaps',), ('fld',)),
-                ('small_f32', ('vgatherdps', 'vscatterdps', lane), ('fld', half))]:
+                ('small_f32', ('vgatherdps', 'vscatterdps'), ('fld',))]:
             body = function_body(text, name) or ''
-            missing = [n for n in needed if not re.search(n, body)]
-            present = [f for f in forbidden if re.search(f, body)]
+            missing = [n for n in needed if n not in body]
+            present = [f for f in forbidden if f in body]
             if missing or present:
                 raise SystemExit('%s: %s lacks %s or has %s' % (asm.name, name, missing, present))
         run([sys.executable, ROOT / 'tools/knc_lint', asm, binary])
