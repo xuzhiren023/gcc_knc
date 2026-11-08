@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-08 15:05.
+Updated automatically at every ticket change. Last update: 2026-11-08 15:50.
 
-**Next: GPT-6.1, on S8-03 (Two-level software prefetch for KNC loops (E5-07)).** Run `python tools/dispatch.py`, or ask the tech lead to.
+**Next: the tech lead, on S8-03.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[#################---]` 127 of 149
 
@@ -145,7 +145,7 @@ Current tickets: `[#################---]` 127 of 149
 | S7-10 | Sprint 7 batch check after S7-05 and S7-08 | Done | Sprint 7's final compiler matches stock GCC 16.2 on x86 (1,962/1,962 identical at -O2 and -O2 -mavx512f), h... |
 | S8-01 | Card checks C1-C10 for the Sprint 8 tuning block - microbenchmarks in the knc-char corpus | Done | The knc-char corpus now measures the Sprint 8 tuning questions on the card (stores, prefetch, tails, accumu... |
 | S8-02 | Masked loop tails that never touch an unmapped page, chosen by length (E4-04) | Done | round 3 card confirmation (19:04-19:10Z, binaries frozen in .work/_shared/tmp/claude-s8-02-r3, outputs in c... |
-| S8-03 | Two-level software prefetch for KNC loops (E5-07) | In progress | Gate the two generic changes on the two-level hook answering (ADR-0006, own condition line): ivopts BUILT_I... |
+| S8-03 | Two-level software prefetch for KNC loops (E5-07) | Waiting for review | Round 2 done, GCC 2fb2498: ivopts prefetch address use and affine grouping each gated on targetm.prefetch_d... |
 | S8-04 | Small-matrix kernels: diagnose mat8 and mat16, reject low lane use (E5-11 part 2) | Not started | written under the owner's overnight blanket approval (2026-11-08). |
 | S8-05 | Per-loop scalar-add cost choice that keeps both mat8 and the stencils (E5-11) | Not started | written under the owner's overnight blanket approval (2026-11-08). |
 | S8-06 | Memory-operand forms for V16SF/V8DF arithmetic and FMA (E5-17) | Not started | written under the owner's overnight blanket approval (2026-11-08). |
@@ -174,6 +174,7 @@ Current tickets: `[#################---]` 127 of 149
 
 ## Recent activity
 
+- 2026-11-08 15:50 **S8-03** engineer submit: Round 2 done, GCC 2fb2498: ivopts prefetch address use and affine grouping each gated on targetm.prefetch_distances answering (own condition line)....
 - 2026-11-08 15:04 **S8-03** lead changes: Gate the two generic changes on the two-level hook answering (ADR-0006, own condition line): ivopts BUILT_IN_PREFETCH address use, and affine group...
 - 2026-11-08 15:02 **S8-03** engineer submit: Byte-distance rule done. Red 3712b8c (column_f32, 51 trips x 1092 B step: vprefetch1 2184 / vprefetch0 1092; failed on the 4 x 32 trip check). Gree...
 - 2026-11-08 13:00 **S8-03** lead approve-red: Red approved. The distance rule (L2 32 always; L1 16, halved when distance x streams x threads exceeds L1/4; none for cache-resident loops or under...
@@ -181,16 +182,15 @@ Current tickets: `[#################---]` 127 of 149
 - 2026-11-08 12:41 **S8-02** lead approve: Short loops and loop tails on KNC now use masked vector code that never touches an unmapped page: mat8 is 3.4x faster, short loops up to 1.8x and t...
 - 2026-11-08 12:16 **S8-02** engineer submit: Round 3, fallback (c): GCC cb8a2a1 reverts abc984e (S8_02_build5): unknown-alignment masked access is again the unconditional gather/scatter, knc_l...
 - 2026-11-08 11:31 **S8-02** lead changes: Round 2 on the card (.work/_shared/tmp/claude-s8-02-paired-r2, 3 launches, all valid; fixtures-r2): correctness is clean (guard sweep PASS 96,132 c...
-- 2026-11-08 11:03 **S8-17** lead approve: Card check C12 is built and ready to run: it measures card power by rail (core, uncore, memory) while the vector unit runs flat out, against x87, i...
 
 ## Cost
 
 - From the script, engineer: 306 sessions, 723.5M input tokens
 - From the script, lead: 225 sessions, 68.7M input tokens
-- Started by hand, Claude: 10 sessions, 1799.9M input tokens
+- Started by hand, Claude: 10 sessions, 1800.7M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 13.8 GiB of 100 GiB. 159 GiB free on the drive.
+The project uses 13.8 GiB of 100 GiB. 164 GiB free on the drive.
