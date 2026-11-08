@@ -28,6 +28,8 @@ Order (ADR-0009 amendment 1):
    cache parameters (S8-14, E5-13), small-loop unroll and the GCC-KNC flags page (S8-15, E5-09).
 5. Owner's user story (2026-11-08): one bold flag, `-mphinix`, bundling the measured best set, with
    a rising-phoenix banner and a progress bar, both shown only on a terminal (S8-16).
+   Beside the gcc chain, tools lane: card check C12, power by rail for a saturated vector unit against
+   x87, idle and streaming (S8-17, owner's question 2026-11-08).
 6. Batch check and paired M2 re-measure (S8-11).
 
 **Decided by the lead:** `-ftrapping-math` stays the KNC default (ADR-0003: flags are observable).
