@@ -16,6 +16,8 @@ sys.path.insert(0, os.path.join(REPO, "tools"))
 import hook_policy  # noqa: E402
 
 POLICY = hook_policy.load_policy()
+# The Codex engineer path, still selectable per ticket (backend field) or by policy.
+CODEX = dict(POLICY, engineer_backend="codex")
 
 
 def deny(command, env=None):
@@ -394,7 +396,7 @@ class Dispatcher(Sandbox):
         import pm
         import storage
         ticket = mock.Mock(fields={"depth": "standard"})
-        board = mock.Mock(root=self.root, policy=POLICY, budget=lambda _t: POLICY["budgets"]["standard"])
+        board = mock.Mock(root=self.root, policy=CODEX, budget=lambda _t: POLICY["budgets"]["standard"])
         self.assertTrue(pm)
         command = dispatch.engineer_command(board, ticket, self.worktree("A-1"))
         setting = [arg for arg in command if arg.startswith("sandbox_workspace_write.writable_roots=")]
@@ -410,7 +412,7 @@ class Dispatcher(Sandbox):
         with open(os.path.join(self.root, "config", "card.local.json"), "w", encoding="utf8") as f:
             json.dump({"host": "h", "ledger": os.path.join(ledger_dir, "jobs.jsonl")}, f)
         ticket = mock.Mock(fields={"depth": "standard"})
-        board = mock.Mock(root=self.root, policy=POLICY, budget=lambda _t: POLICY["budgets"]["standard"])
+        board = mock.Mock(root=self.root, policy=CODEX, budget=lambda _t: POLICY["budgets"]["standard"])
         command = dispatch.engineer_command(board, ticket, self.worktree("A-1"))
         setting = [arg for arg in command if arg.startswith("sandbox_workspace_write.writable_roots=")]
         roots = json.loads(setting[0].split("=", 1)[1])
@@ -419,7 +421,7 @@ class Dispatcher(Sandbox):
     def test_policy_can_set_engineer_effort_and_service_tier(self):
         import dispatch
         ticket = mock.Mock(fields={"depth": "light"})
-        policy = dict(POLICY, engineer_effort="high", engineer_service_tier="priority")
+        policy = dict(CODEX, engineer_effort="high", engineer_service_tier="priority")
         board = mock.Mock(root=self.root, policy=policy, budget=lambda _t: POLICY["budgets"]["light"])
         command = dispatch.engineer_command(board, ticket, self.worktree("A-1"))
         self.assertIn('model_reasoning_effort="high"', command)
@@ -434,12 +436,23 @@ class Dispatcher(Sandbox):
         import dispatch
         budgets = {depth: {k: v for k, v in b.items() if k != "model"} for depth, b in POLICY["budgets"].items()}
         budgets["deep"]["model"] = "deep-model"
-        policy = dict(POLICY, engineer_model="default-model", budgets=budgets)
+        policy = dict(CODEX, engineer_model="default-model", budgets=budgets)
         board = mock.Mock(root=self.root, policy=policy, budget=lambda t: budgets[t.fields["depth"]])
         for fields, model in (({"depth": "deep"}, "deep-model"), ({"depth": "light"}, "default-model"),
                               ({"depth": "deep", "model": "ticket-model"}, "ticket-model")):
             command = dispatch.engineer_command(board, mock.Mock(fields=fields), self.worktree("A-1"))
             self.assertEqual(command[command.index("-m") + 1], model)
+
+    def test_ticket_backend_overrides_the_policy_backend(self):
+        import dispatch
+        policy = dict(POLICY, engineer_backend="claude")
+        board = mock.Mock(root=self.root, policy=policy, budget=lambda _t: POLICY["budgets"]["deep"])
+        claude = dispatch.engineer_command(board, mock.Mock(id="A-1", fields={"depth": "deep"}), self.worktree("A-1"))
+        self.assertIn("--model", claude)
+        codex = dispatch.engineer_command(board, mock.Mock(id="A-1", fields={"depth": "deep", "backend": "codex",
+                                                                             "model": "gpt-6.1-sol"}), self.worktree("A-1"))
+        self.assertEqual(codex[1], "exec")
+        self.assertEqual(codex[codex.index("-m") + 1], "gpt-6.1-sol")
 
     def test_engineer_git_trusts_the_shared_gcc_checkout(self):
         # The sandbox user does not own the shared checkout, so git refuses it as dubious.

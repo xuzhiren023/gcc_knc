@@ -58,7 +58,8 @@ def claude_binary():
 
 def engineer_command(board, ticket, worktree):
     # Owner, 2026-11-07: engineers are Claude Code sessions from now on; "codex" stays selectable.
-    if board.policy.get("engineer_backend", "codex") == "claude":
+    # A ticket's own backend field wins (owner, 2026-11-08: Codex gpt-6.1 as the fallback for a stuck ticket).
+    if (ticket.fields.get("backend") or board.policy.get("engineer_backend", "codex")) == "claude":
         effort = board.policy.get("engineer_effort") or board.budget(ticket)["effort"]
         model = ticket.fields.get("model") or board.budget(ticket).get("claude_model") or "opus"
         os.makedirs(storage.shared_area(board.root), exist_ok=True)
