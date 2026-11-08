@@ -15,8 +15,14 @@
    64-byte line, so one element past an aligned array of 5 shares the line
    with elements 0-4 and never reaches the guard (lead, round 1).  It is
    the whole-vector access that crosses into the next line, with the array
-   ending at the high guard.  Inputs are dyadic values with exact sums, so x87 extended
-   precision in the reference cannot differ from the vector result.
+   ending at the high guard.  A runtime mask of unknown alignment is chosen
+   at run time (round 1): remainders and short lengths within C6's x87
+   limit (lengths 1-3, 17-19, 33: lanes 0-2 only) move each active lane
+   through a single-lane vloadunpackl/vpackstorel at the element's address,
+   the others (4-15, 20-31) take the gather/scatter, so the sweep at offsets
+   0-63 covers both paths against the guards.  Inputs are dyadic values with
+   exact sums, so x87 extended precision in the reference cannot differ
+   from the vector result.
    ADR-0007 point 7; ADR-0009 amendment 1 point 9; C6 in
    docs/research/knc-characterization.md.  */
 #include <stddef.h>

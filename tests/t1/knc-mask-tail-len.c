@@ -19,6 +19,16 @@
 //   constant 3; a runtime remainder of 2 is masked (fix_al_f32_18).
 // - No scalar peel to alignment (C6: it loses to the gather tail at every
 //   length), at -O2 and -O3 alike.
+// - A runtime mask of unknown alignment is chosen at run time (lead, round
+//   1): when the mask's zero-extended value is below 1 << limit (limit 3 at
+//   the default density, so every active lane is one of lanes 0-2, which
+//   covers every while_ult prefix of 1-3 lanes), each of those lanes moves
+//   through its own single-lane vloadunpackl/vpackstorel at the element's
+//   address, which touches only the line holding that active element;
+//   otherwise the gather or scatter.  The arithmetic stays one masked
+//   vector op.  KNC has no popcnt, so the range test stands in for the
+//   lane count.  Lane 3 is never a scalar move; a masked high half never
+//   appears.  A constant mask folds the branch away.
 // options: -O2 -ftree-vectorize
 // scan-asm-func add_f32: \bkmov\s+%(?:e\w+|r\d+d),\s*%k[1-7]
 // scan-asm-func add_f32: \bvgatherdps\s+[^\n]*\{%k[1-7]\}
@@ -26,12 +36,20 @@
 // scan-asm-func add_f32: \bjknzd\s
 // scan-asm-func add_f32: \bvaddps\s[^\n]*\{%k[1-7]\}
 // scan-asm-func add_f32: \bvloadunpacklps\s
+// scan-asm-func add_f32: \bcmpl\s+\$[78],\s*%e\w+\n\s*j(?:a|nbe|ae|nb)\s
+// scan-asm-func add_f32: \bvloadunpacklps\s+8\([^\n]*\{%k[1-7]\}
+// scan-asm-func add_f32: \bvpackstorelps\s+%zmm\d+,\s*8\([^\n]*\{%k[1-7]\}
+// scan-asm-func add_f32: \A(?![\s\S]*\bvloadunpacklps\s+12\([^\n]*\{%k)
 // scan-asm-func add_f32: \A(?![\s\S]*\bfld)
 // scan-asm-func add_f32: \A(?![\s\S]*\bvpermd\s)
-// scan-asm-func add_f32: \A(?![\s\S]*\bv(?:loadunpack|packstore)\w*\s[^\n]*\{%k)
+// scan-asm-func add_f32: \A(?![\s\S]*\bv(?:loadunpackh|packstoreh)\w*\s[^\n]*\{%k)
 // scan-asm-func add_f64: \bvgatherdpd\s+[^\n]*\{%k[1-7]\}
 // scan-asm-func add_f64: \bvscatterdpd\s+%zmm\d+,\s*[^\n]*\{%k[1-7]\}
 // scan-asm-func add_f64: \bvaddpd\s[^\n]*\{%k[1-7]\}
+// scan-asm-func add_f64: \bcmpl\s+\$[78],\s*%e\w+\n\s*j(?:a|nbe|ae|nb)\s
+// scan-asm-func add_f64: \bvloadunpacklpd\s+16\([^\n]*\{%k[1-7]\}
+// scan-asm-func add_f64: \bvpackstorelpd\s+%zmm\d+,\s*16\([^\n]*\{%k[1-7]\}
+// scan-asm-func add_f64: \A(?![\s\S]*\bv(?:loadunpackh|packstoreh)\w*\s[^\n]*\{%k)
 // scan-asm-func add_f64: \A(?![\s\S]*\bfld)
 // scan-asm-func add_f64: \A(?![\s\S]*\bvpermd\s)
 // scan-asm-func add_i32: \bvpgatherdd\s+[^\n]*\{%k[1-7]\}
@@ -46,7 +64,7 @@
 // scan-asm-func small_f32: \bvgatherdps\s+[^\n]*\{%k[1-7]\}
 // scan-asm-func small_f32: \bvscatterdps\s+%zmm\d+,\s*[^\n]*\{%k[1-7]\}
 // scan-asm-func small_f32: \A(?![\s\S]*\bfld)
-// scan-asm-func small_f32: \A(?![\s\S]*\bvloadunpack)
+// scan-asm-func small_f32: \A(?![\s\S]*\bvloadunpack\w+\s[^\n]*%zmm\d+\s*$)
 // scan-asm-func small_al_f32: \bvmovaps\s+[^\n]*\),\s*%zmm\d+\{%k[1-7]\}
 // scan-asm-func small_al_f32: \bvaddps\s[^\n]*\{%k[1-7]\}
 // scan-asm-func small_al_f32: \bvmovaps\s+%zmm\d+,\s*[^\n]*\)\{%k[1-7]\}
