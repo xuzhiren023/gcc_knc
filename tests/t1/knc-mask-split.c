@@ -1,29 +1,36 @@
-// S4-14 / ADR-0007 point 7: a conditional load or store through a pointer
-// of unknown alignment is a guarded aligned split, not one GPR move per
-// lane.  The two 64-byte lines the vector touches are each one aligned
-// masked move, skipped by a GPR test (je/jz) when its share of the mask is
-// empty, and one vpermd rotates the data.  8-lane masks are never tested
-// with jkzd (bits 15:8 of a QI mask are undefined).
+// S4-14 / ADR-0007 point 7, superseded form by S8-02 / ADR-0009 amendment 1
+// point 9: a conditional load or store through a pointer of unknown
+// alignment is a gather or scatter (lane index iota, scale = element
+// size) under the lane mask, not one GPR move per lane, not a masked
+// unpack/pack pair and no longer the S4-14 split (two aligned masked
+// moves behind GPR tests and a vpermd rotation).  A gather or scatter
+// touches only the lines that hold active elements, which the scalar
+// loop accesses too, so the S4-14 guard-page tests still hold.  The
+// retry loop (jknzd) belongs to the gather/scatter instruction.  8-lane
+// masks are never tested with jkzd (bits 15:8 of a QI mask are undefined);
+// their gathers run with bits 15:8 cleared through a GPR, so the retry
+// loop's jknzd is the only mask branch.
 // options: -O2 -ftree-vectorize -fvect-cost-model=unlimited --param vect-max-peeling-for-alignment=0
-// scan-asm-func cst_f32: \bvpermd\s[\s\S]*\bvpermd\s
-// scan-asm-func cst_f32: \bvmovaps\s+[^\n]*\),\s*%zmm\d+\{%k[1-7]\}[\s\S]*\bvmovaps\s+[^\n]*\),\s*%zmm\d+\{%k[1-7]\}
-// scan-asm-func cst_f32: \bvmovaps\s+%zmm\d+,\s*[^\n]*\)\{%k[1-7]\}[\s\S]*\bvmovaps\s+%zmm\d+,\s*[^\n]*\)\{%k[1-7]\}
-// scan-asm-func cst_f32: \A(?![\s\S]*^(?!\s*j[ez]\s|\.L\d+:)(?:\s*(?:j\w+|ret\w*)\b|\.L\w+:)[^\n]*\n(?:(?!(?:\s*(?:j\w+|ret\w*)\b|\.L\w+:))[^\n]*\n)*\s*vmovaps\s[^\n]*\([^\n]*\{%k)
-// scan-asm-func cst_f32: \A(?![\s\S]*\b(?:vloadunpack|vpackstore)\w*\s[^\n]*\{%k)
-// scan-asm-func cst_f64: \bvpermd\s[\s\S]*\bvpermd\s
-// scan-asm-func cst_f64: \bvmovapd\s+[^\n]*\),\s*%zmm\d+\{%k[1-7]\}[\s\S]*\bvmovapd\s+[^\n]*\),\s*%zmm\d+\{%k[1-7]\}
-// scan-asm-func cst_f64: \bvmovapd\s+%zmm\d+,\s*[^\n]*\)\{%k[1-7]\}[\s\S]*\bvmovapd\s+%zmm\d+,\s*[^\n]*\)\{%k[1-7]\}
-// scan-asm-func cst_f64: \A(?![\s\S]*^(?!\s*j[ez]\s|\.L\d+:)(?:\s*(?:j\w+|ret\w*)\b|\.L\w+:)[^\n]*\n(?:(?!(?:\s*(?:j\w+|ret\w*)\b|\.L\w+:))[^\n]*\n)*\s*vmovapd\s[^\n]*\([^\n]*\{%k)
-// scan-asm-func cst_f64: \A(?![\s\S]*\bjkn?zd)
-// scan-asm-func cst_i32: \bvpermd\s[\s\S]*\bvpermd\s
-// scan-asm-func cst_i32: \bvmovdqa32\s+[^\n]*\),\s*%zmm\d+\{%k[1-7]\}[\s\S]*\bvmovdqa32\s+[^\n]*\),\s*%zmm\d+\{%k[1-7]\}
-// scan-asm-func cst_i32: \bvmovdqa32\s+%zmm\d+,\s*[^\n]*\)\{%k[1-7]\}[\s\S]*\bvmovdqa32\s+%zmm\d+,\s*[^\n]*\)\{%k[1-7]\}
-// scan-asm-func cst_i32: \A(?![\s\S]*^(?!\s*j[ez]\s|\.L\d+:)(?:\s*(?:j\w+|ret\w*)\b|\.L\w+:)[^\n]*\n(?:(?!(?:\s*(?:j\w+|ret\w*)\b|\.L\w+:))[^\n]*\n)*\s*vmovdqa32\s[^\n]*\([^\n]*\{%k)
-// scan-asm-func cst_i64: \bvpermd\s[\s\S]*\bvpermd\s
-// scan-asm-func cst_i64: \bvmovdqa64\s+[^\n]*\),\s*%zmm\d+\{%k[1-7]\}[\s\S]*\bvmovdqa64\s+[^\n]*\),\s*%zmm\d+\{%k[1-7]\}
-// scan-asm-func cst_i64: \bvmovdqa64\s+%zmm\d+,\s*[^\n]*\)\{%k[1-7]\}[\s\S]*\bvmovdqa64\s+%zmm\d+,\s*[^\n]*\)\{%k[1-7]\}
-// scan-asm-func cst_i64: \A(?![\s\S]*^(?!\s*j[ez]\s|\.L\d+:)(?:\s*(?:j\w+|ret\w*)\b|\.L\w+:)[^\n]*\n(?:(?!(?:\s*(?:j\w+|ret\w*)\b|\.L\w+:))[^\n]*\n)*\s*vmovdqa64\s[^\n]*\([^\n]*\{%k)
-// scan-asm-func cst_i64: \A(?![\s\S]*\bjkn?zd)
+// scan-asm-func cst_f32: \bvgatherdps\s+[^\n]*\{%k[1-7]\}
+// scan-asm-func cst_f32: \bvscatterdps\s+%zmm\d+,\s*[^\n]*\{%k[1-7]\}
+// scan-asm-func cst_f32: \bjknzd\s
+// scan-asm-func cst_f32: \A(?![\s\S]*\bvpermd\s)
+// scan-asm-func cst_f32: \A(?![\s\S]*\bv(?:loadunpack|packstore)\w*\s[^\n]*\{%k)
+// scan-asm-func cst_f32: \A(?![\s\S]*\bvmovaps\s+[^\n]*\{%k)
+// scan-asm-func cst_f64: \bvgatherdpd\s+[^\n]*\{%k[1-7]\}
+// scan-asm-func cst_f64: \bvscatterdpd\s+%zmm\d+,\s*[^\n]*\{%k[1-7]\}
+// scan-asm-func cst_f64: \A(?![\s\S]*\bvpermd\s)
+// scan-asm-func cst_f64: \A(?![\s\S]*\bv(?:loadunpack|packstore)\w*\s[^\n]*\{%k)
+// scan-asm-func cst_f64: \A(?![\s\S]*\bjkzd)
+// scan-asm-func cst_i32: \bvpgatherdd\s+[^\n]*\{%k[1-7]\}
+// scan-asm-func cst_i32: \bvpscatterdd\s+%zmm\d+,\s*[^\n]*\{%k[1-7]\}
+// scan-asm-func cst_i32: \A(?![\s\S]*\bvpermd\s)
+// scan-asm-func cst_i32: \A(?![\s\S]*\bv(?:loadunpack|packstore)\w*\s[^\n]*\{%k)
+// scan-asm-func cst_i64: \bvpgatherdq\s+[^\n]*\{%k[1-7]\}
+// scan-asm-func cst_i64: \bvpscatterdq\s+%zmm\d+,\s*[^\n]*\{%k[1-7]\}
+// scan-asm-func cst_i64: \A(?![\s\S]*\bvpermd\s)
+// scan-asm-func cst_i64: \A(?![\s\S]*\bv(?:loadunpack|packstore)\w*\s[^\n]*\{%k)
+// scan-asm-func cst_i64: \A(?![\s\S]*\bjkzd)
 // scan-asm-not: %(?:xmm|ymm)\d
 /* x[i] is a conditional load and c[i] a conditional store; with peeling
    disabled both stay misaligned in the vector loop.  */

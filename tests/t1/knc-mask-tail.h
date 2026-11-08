@@ -42,7 +42,7 @@ void cst_al_f32 (float *restrict c, const float *restrict a,
   LOOP if (aa[i] > 0) cc[i] = xx[i];
 }
 
-/* Unknown alignment: the remainder stays x87.  */
+/* Unknown alignment: the remainder is a gather/scatter tail (S8-02).  */
 void add_f32 (float *restrict c, const float *restrict a,
               const float *restrict b, int n)
 { LOOP c[i] = a[i] + b[i]; }

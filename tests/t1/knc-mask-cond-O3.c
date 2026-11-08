@@ -2,7 +2,7 @@
 // vectorize into IMCI compares, blends and 64-byte aligned
 // masked moves guarded against an empty mask.  S5-15 / ADR-0008 point 3:
 // fmin/fmax use vgminps/vgmaxpd; either zero sign is permitted.
-// options: -O3
+// options: -O3 -fopt-info-vec
 // scan-asm-func sel_f32: \bvcmpps\s+\$1,[^\n]*%k[0-7]\s*$
 // scan-asm-func sel_f32: \bvmovaps\s+[^\n]*\),\s*%zmm\d+\{%k[1-7]\}
 // scan-asm-func sel_f64: \bvcmppd\s+\$1,[^\n]*%k[0-7]\s*$
@@ -33,7 +33,18 @@
 // scan-asm-func cst_i32: \bjkzd\s+\S+,\s*%k[0-7]\s*$
 // scan-asm-func cst_i32: \bvmovdqa32\s+x_i32\(%\w+\),\s*%zmm\d+\s*$
 // scan-asm-func cst_i32: \bvmovdqa32\s+%zmm\d+,\s*[^\n]*\)\{%k[1-7]\}
-// scan-asm-func cst_ptr_f32: \A(?![\s\S]*\bv(?:cmpps|movaps|blendmps)\b)
+// cst_ptr_f32 stores through pointers of unknown alignment: since S8-02
+// (ADR-0009 amendment 1 point 9) its masked accesses are a gather and a
+// scatter under the compare mask, never the S4-14 split or an x87
+// remainder.  At -O3 the generic cost model (kept: ADR-0009 point 5)
+// peels it to alignment with a scalar prologue, so its x87 code is the
+// peel; the opt-info report shows the peel and the masked epilogue.
+// scan-asm-func cst_ptr_f32: \bvcmpps\s+\$1,[^\n]*%k[0-7]\s*$
+// scan-asm-func cst_ptr_f32: \bvgatherdps\s+[^\n]*\{%k[1-7]\}
+// scan-asm-func cst_ptr_f32: \bvscatterdps\s+%zmm\d+,\s*[^\n]*\{%k[1-7]\}
+// scan-asm-func cst_ptr_f32: \A(?![\s\S]*\bvpermd\s)
+// scan-output: knc-mask-cond\.h:52:\d+: optimized:\s+KNC candidate scalar peel: required \(alignment iterations -1, gap peel 0\)
+// scan-output: knc-mask-cond\.h:52:\d+: optimized: epilogue loop vectorized using masked 64 byte vectors
 // scan-asm-func cadd_f32: \bvaddps\s[^\n]*\{%k[1-7]\}
 // scan-asm-func cadd_f32: \bvmovaps\s+%zmm\d+,\s*[^\n]*\)\{%k[1-7]\}
 // scan-asm-func cadd_i32: \bvpaddd\s[^\n]*%zmm
