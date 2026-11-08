@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-08 10:47.
+Updated automatically at every ticket change. Last update: 2026-11-08 10:54.
 
 **Next: the tech lead, on S8-02.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
@@ -159,7 +159,7 @@ Current tickets: `[################----]` 125 of 149
 | S8-14 | Default 64-byte data alignment and TLB-aware cache parameters (E5-13) | Not started | added at the owner's request (2026-11-08: "add three [tickets] in s8") to cover ADR-0009 points the sprint ... |
 | S8-15 | Small-loop unroll default and the GCC-KNC flags page (E5-09) | Not started | added at the owner's request (2026-11-08: "add three [tickets] in s8") to cover ADR-0009 points the sprint ... |
 | S8-16 | User story - one bold flag, -mphinix, with a rising-phoenix banner and a progress bar | Not started | owner's user story, written by the lead with the owner's request quoted above. |
-| S8-17 | Card check C12 - power by rail for a saturated vector unit against x87, idle and streaming | In progress | added at the owner's request ("Yes add the test"). Tools lane, so it runs beside the gcc chain. |
+| S8-17 | Card check C12 - power by rail for a saturated vector unit against x87, idle and streaming | Waiting for review | Red 9b22080, green dbf2f60. Host check_c12 passes: 7 phases in interleaved order, all card/rail fields matc... |
 | S9-01 | libgomp for KNC: futex, affinity, ring-aware barrier, spin-wait and malloc arenas (E6-03 input) | Done | We now have a build-and-design plan for GCC-KNC's own OpenMP runtime on the card: futex-based waits with de... |
 | S9-02 | libstdc++ for KNC: exceptions, RTTI, atomics, threads, packaging (E6-06 input) | Done | We now know how to build GCC 16's C++ library for the card: no newer glibc or kernel is needed, and built w... |
 | S9-03 | libstdc++ and libatomic build for k1om (E6-06a) | Not started | from S9-02's plan, under the owner's overnight blanket approval. Lead decisions: `--enable-clocale=generic`... |
@@ -174,6 +174,7 @@ Current tickets: `[################----]` 125 of 149
 
 ## Recent activity
 
+- 2026-11-08 10:54 **S8-17** engineer submit: Red 9b22080, green dbf2f60. Host check_c12 passes: 7 phases in interleaved order, all card/rail fields match the m2 fixture, 6 malformed sensor fil...
 - 2026-11-08 10:23 **S8-02** engineer submit: Round 2, fix 1 as option (d), target only: GCC 12a514a..abc984e (S8_02_build4). knc_maskmove tests the zero-extended mask at run time against 1 << ...
 - 2026-11-08 09:25 **S8-02** owner decide: Owner 2026-11-08: extend the budget by 2 sessions (now 6) to finish option (d), the run-time active-lane count in knc_maskmove; the lead re-measure...
 - 2026-11-08 09:10 **S8-02** engineer escalate: budget: 4 engineer sessions used; the budget is 4
@@ -181,7 +182,6 @@ Current tickets: `[################----]` 125 of 149
 - 2026-11-08 09:09 **S8-02** engineer ask: Fixes 2 and 3 done at 1244ff3 (GCC ..12a514a; T0/T1 PASS S8_02_t0t1_r2; binaries restaged). Fix 1 needs a middle-end change: for a partial-vector l...
 - 2026-11-08 08:23 **S8-02** lead changes: Paired card run (3 launches, 39 jobs, all valid; .work/_shared/tmp/claude-s8-02-paired, T_S8-02/T_M2-final): mat8 0.29/0.30/0.29 (3.4x faster), sho...
 - 2026-11-08 07:02 **S8-02** engineer submit: Green at bb537b7 (GCC s8/S8-02 497bbe8..d0972d3, build clean). Unaligned masked tails are one gather/scatter; whole-loop masks below VF; x87 only w...
-- 2026-11-08 05:27 **S8-02** lead approve-red: Red approved. Confirmed: ADR-0009 amendment 1 point 9 supersedes ADR-0007 point 7's profitability rule for unknown alignment, so tails and short lo...
 
 ## Cost
 
