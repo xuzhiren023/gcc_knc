@@ -2,7 +2,7 @@
 
 Updated automatically at every ticket change. Last update: 2026-11-08 05:04.
 
-**Next: GPT-6.1, on S8-12 (Fix three weak S8-01 checks - C4 page offsets, C5 row aliasing, C9 memory chain).** Run `python tools/dispatch.py`, or ask the tech lead to.
+**Next: GPT-6.1, on S8-02 (Masked loop tails that never touch an unmapped page, chosen by length (E4-04)).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
 Current tickets: `[#################---]` 124 of 144
 
@@ -144,7 +144,7 @@ Current tickets: `[#################---]` 124 of 144
 | S7-09 | libgfortran part 3: runtime isolation and packaging (E6-02) | Done | GCC-KNC's Fortran runtime installs in its private directory, static and shared programs run on the card fro... |
 | S7-10 | Sprint 7 batch check after S7-05 and S7-08 | Done | Sprint 7's final compiler matches stock GCC 16.2 on x86 (1,962/1,962 identical at -O2 and -O2 -mavx512f), h... |
 | S8-01 | Card checks C1-C10 for the Sprint 8 tuning block - microbenchmarks in the knc-char corpus | Done | The knc-char corpus now measures the Sprint 8 tuning questions on the card (stores, prefetch, tails, accumu... |
-| S8-02 | Masked loop tails that never touch an unmapped page, chosen by length (E4-04) | Not started | S8-01 C6 (knc-characterization.md): the aligned masked tail beats x87 from n=2; a gather tail beats x87 fro... |
+| S8-02 | Masked loop tails that never touch an unmapped page, chosen by length (E4-04) | In progress | S8-01 C6 (knc-characterization.md): the aligned masked tail beats x87 from n=2; a gather tail beats x87 fro... |
 | S8-03 | Two-level software prefetch for KNC loops (E5-07) | Not started | S8-01 results (knc-characterization.md, "Sprint 8 tuning checks"): stream and stencil best at L1/L2 = 16/32... |
 | S8-04 | Small-matrix kernels: diagnose mat8 and mat16, reject low lane use (E5-11 part 2) | Not started | written under the owner's overnight blanket approval (2026-11-08). |
 | S8-05 | Per-loop scalar-add cost choice that keeps both mat8 and the stencils (E5-11) | Not started | written under the owner's overnight blanket approval (2026-11-08). |
@@ -182,7 +182,7 @@ Current tickets: `[#################---]` 124 of 144
 
 - From the script, engineer: 295 sessions, 702.6M input tokens
 - From the script, lead: 225 sessions, 68.7M input tokens
-- Started by hand, Claude: 10 sessions, 1739.7M input tokens
+- Started by hand, Claude: 10 sessions, 1739.9M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
