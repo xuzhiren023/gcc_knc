@@ -7,8 +7,9 @@
 // touches only the lines that hold active elements, which the scalar
 // loop accesses too, so the S4-14 guard-page tests still hold.  The
 // retry loop (jknzd) belongs to the gather/scatter instruction.  8-lane
-// masks are never tested with jkzd (bits 15:8 of a QI mask are undefined),
-// and their gathers run with bits 15:8 cleared through a GPR.
+// masks are never tested with jkzd (bits 15:8 of a QI mask are undefined);
+// their gathers run with bits 15:8 cleared through a GPR, so the retry
+// loop's jknzd is the only mask branch.
 // options: -O2 -ftree-vectorize -fvect-cost-model=unlimited --param vect-max-peeling-for-alignment=0
 // scan-asm-func cst_f32: \bvgatherdps\s+[^\n]*\{%k[1-7]\}
 // scan-asm-func cst_f32: \bvscatterdps\s+%zmm\d+,\s*[^\n]*\{%k[1-7]\}
@@ -20,7 +21,7 @@
 // scan-asm-func cst_f64: \bvscatterdpd\s+%zmm\d+,\s*[^\n]*\{%k[1-7]\}
 // scan-asm-func cst_f64: \A(?![\s\S]*\bvpermd\s)
 // scan-asm-func cst_f64: \A(?![\s\S]*\bv(?:loadunpack|packstore)\w*\s[^\n]*\{%k)
-// scan-asm-func cst_f64: \A(?![\s\S]*\bjkn?zd)
+// scan-asm-func cst_f64: \A(?![\s\S]*\bjkzd)
 // scan-asm-func cst_i32: \bvpgatherdd\s+[^\n]*\{%k[1-7]\}
 // scan-asm-func cst_i32: \bvpscatterdd\s+%zmm\d+,\s*[^\n]*\{%k[1-7]\}
 // scan-asm-func cst_i32: \A(?![\s\S]*\bvpermd\s)
@@ -29,7 +30,7 @@
 // scan-asm-func cst_i64: \bvpscatterdq\s+%zmm\d+,\s*[^\n]*\{%k[1-7]\}
 // scan-asm-func cst_i64: \A(?![\s\S]*\bvpermd\s)
 // scan-asm-func cst_i64: \A(?![\s\S]*\bv(?:loadunpack|packstore)\w*\s[^\n]*\{%k)
-// scan-asm-func cst_i64: \A(?![\s\S]*\bjkn?zd)
+// scan-asm-func cst_i64: \A(?![\s\S]*\bjkzd)
 // scan-asm-not: %(?:xmm|ymm)\d
 /* x[i] is a conditional load and c[i] a conditional store; with peeling
    disabled both stay misaligned in the vector loop.  */

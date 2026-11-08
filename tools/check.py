@@ -191,9 +191,23 @@ def scan_t1(assembly, report, source, fast=False):
             continue
         suffix = 'ps' if name.endswith('f32') else 'pd'
         patterns = ([r'vfmadd\w*' + suffix] if fast else ['vmul' + suffix, 'vadd' + suffix])
-        candidates = list(loops(body))
+        # A gather/scatter retry (jknzd back to the insn's own label) is not
+        # a loop of the function.
+        def retry_only(loop):
+            lines = [line for line in loop.splitlines()
+                     if line.strip() and not re.match(r'\s*[\w.$]+:', line)]
+            return bool(lines) and all(re.search(r'\bv\w*(?:gather|scatter)\w*\b|\bjknzd\b', line)
+                                       for line in lines)
+        candidates = [loop for loop in loops(body) if not retry_only(loop)]
         scalar_loops = [loop for loop in candidates if not PACKED.search(loop)]
-        if not scalar_loops or any('%zmm' in loop for loop in scalar_loops):
+        # S8-02 (ADR-0009 amendment 1 point 9): GCC 16's remainder is a masked
+        # gather/scatter epilogue and no x87 loop remains; the donor keeps the
+        # x87 remainder loop.
+        masked_tail = re.search(r'\bv(?:gather|scatter)d' + suffix + r'\s[^\n]*\{%k[1-7]\}', body)
+        if masked_tail:
+            if scalar_loops:
+                failures.append(name + ': x87 loop remains beside the masked tail')
+        elif not scalar_loops or any('%zmm' in loop for loop in scalar_loops):
             failures.append(name + ': missing scalar tail or packed access in scalar loop')
         elif not all(re.search(r'\bfmul\w*\b', loop)
                      and re.search(r'\bfadd\w*\b', loop) for loop in scalar_loops):

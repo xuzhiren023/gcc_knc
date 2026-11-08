@@ -12,7 +12,13 @@
 //   epilogue mask from while_ult (kmov from a GPR), not an x87 loop.
 // - x87 stays only where C6 shows it wins: a known remainder or trip count
 //   of 1 when aligned (13.2 against 7.1 ticks), of 1 to 3 for the gather
-//   form (gather beats x87 from n = 4 at 4 threads).
+//   form (gather beats x87 from n = 4 at 4 threads).  A constant trip
+//   count of 2 never reaches the vectorizer: cunrolli (generic, before
+//   vectorization at -O2) unrolls it into two scalar statements, so
+//   fix_al_f32_2 is two x87 adds and the aligned masked form starts at a
+//   constant 3; a runtime remainder of 2 is masked (fix_al_f32_18).
+// - No scalar peel to alignment (C6: it loses to the gather tail at every
+//   length), at -O2 and -O3 alike.
 // options: -O2 -ftree-vectorize
 // scan-asm-func add_f32: \bkmov\s+%(?:e\w+|r\d+d),\s*%k[1-7]
 // scan-asm-func add_f32: \bvgatherdps\s+[^\n]*\{%k[1-7]\}
@@ -48,10 +54,13 @@
 // scan-asm-func small_al_f32: \A(?![\s\S]*\bvmovaps\s+[^\n]*\),\s*%zmm\d+\s*$)
 // scan-asm-func fix_al_f32_1: \bflds\s
 // scan-asm-func fix_al_f32_1: \A(?![\s\S]*\{%k[1-7]\})
-// scan-asm-func fix_al_f32_2: \bvmovaps\s+[^\n]*\),\s*%zmm\d+\{%k[1-7]\}
-// scan-asm-func fix_al_f32_2: \bvaddps\s[^\n]*\{%k[1-7]\}
-// scan-asm-func fix_al_f32_2: \bvmovaps\s+%zmm\d+,\s*[^\n]*\)\{%k[1-7]\}
-// scan-asm-func fix_al_f32_2: \A(?![\s\S]*\bfld)
+// scan-asm-func fix_al_f32_2: \bflds\s
+// scan-asm-func fix_al_f32_2: \A(?![\s\S]*\{%k[1-7]\})
+// scan-asm-func fix_al_f32_2: \A(?![\s\S]*\bj\w+\s)
+// scan-asm-func fix_al_f32_3: \bvmovaps\s+[^\n]*\),\s*%zmm\d+\{%k[1-7]\}
+// scan-asm-func fix_al_f32_3: \bvaddps\s[^\n]*\{%k[1-7]\}
+// scan-asm-func fix_al_f32_3: \bvmovaps\s+%zmm\d+,\s*[^\n]*\)\{%k[1-7]\}
+// scan-asm-func fix_al_f32_3: \A(?![\s\S]*\bfld)
 // scan-asm-func fix_al_f32_5: \bvmovaps\s+[^\n]*\),\s*%zmm\d+\{%k[1-7]\}
 // scan-asm-func fix_al_f32_5: \bvmovaps\s+%zmm\d+,\s*[^\n]*\)\{%k[1-7]\}
 // scan-asm-func fix_al_f32_5: \A(?![\s\S]*\bfld)
