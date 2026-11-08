@@ -1,10 +1,10 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-08 02:52.
+Updated automatically at every ticket change. Last update: 2026-11-08 03:08.
 
 **Waiting for you:** S8-01. Run `python tools/pm.py inbox`.
 
-Current tickets: `[#################---]` 120 of 134
+Current tickets: `[#################---]` 120 of 135
 
 ## Milestones
 
@@ -142,10 +142,10 @@ Current tickets: `[#################---]` 120 of 134
 | S7-07 | libgfortran part 1: KNC floating-point backend and capability contract (E6-02) | Done | libgfortran now has a KNC floating-point backend: it sets and clears the six IEEE flags and the four roundi... |
 | S7-08 | libgfortran part 2: base runtime build and the descriptor and I/O slice (E6-02) | Done | libgfortran now builds for KNC, and six Fortran programs (allocation, descriptors, bounds, I/O, kind 10, mo... |
 | S7-09 | libgfortran part 3: runtime isolation and packaging (E6-02) | Done | GCC-KNC's Fortran runtime installs in its private directory, static and shared programs run on the card fro... |
-| S7-10 | Sprint 7 batch check after S7-05 and S7-08 | In progress | also waits for S7-09, so the batch runs once at Sprint 7's final GCC head. |
+| S7-10 | Sprint 7 batch check after S7-05 and S7-08 | Waiting for review | knc 497bbe8bedf0, build current. Drill: master 8 files/12 hunks all textual (new: libgfortran/configure #li... |
 | S8-01 | Card checks C1-C10 for the Sprint 8 tuning block - microbenchmarks in the knc-char corpus | **Waiting for you** | Code review of the job 19 fix passes (red a21750f, green 51e844a: main now allocates every worker buffer be... |
-| S8-02 | Masked loop tails that never touch an unmapped page, chosen by length (E4-04) | Not started | written under the owner's overnight blanket approval (2026-11-08). |
-| S8-03 | Two-level software prefetch for KNC loops (E5-07) | Not started | written under the owner's overnight blanket approval (2026-11-08). |
+| S8-02 | Masked loop tails that never touch an unmapped page, chosen by length (E4-04) | Not started | S8-01 C6 (knc-characterization.md): the aligned masked tail beats x87 from n=2; a gather tail beats x87 fro... |
+| S8-03 | Two-level software prefetch for KNC loops (E5-07) | Not started | S8-01 results (knc-characterization.md, "Sprint 8 tuning checks"): stream and stencil best at L1/L2 = 16/32... |
 | S8-04 | Small-matrix kernels: diagnose mat8 and mat16, reject low lane use (E5-11 part 2) | Not started | written under the owner's overnight blanket approval (2026-11-08). |
 | S8-05 | Per-loop scalar-add cost choice that keeps both mat8 and the stencils (E5-11) | Not started | written under the owner's overnight blanket approval (2026-11-08). |
 | S8-06 | Memory-operand forms for V16SF/V8DF arithmetic and FMA (E5-17) | Not started | written under the owner's overnight blanket approval (2026-11-08). |
@@ -154,11 +154,13 @@ Current tickets: `[#################---]` 120 of 134
 | S8-09 | KNC -O2 defaults: vectorizer cost model, stride versioning, predictive commoning (E5-18) | Not started | written under the owner's overnight blanket approval (2026-11-08). |
 | S8-10 | Less ring traffic: 64-byte padding of per-thread data, and card check C11 (E5-16) | Not started | written under the owner's overnight blanket approval (2026-11-08). |
 | S8-11 | Sprint 8 batch check and paired M2 re-measure | Not started | written under the owner's overnight blanket approval (2026-11-08). |
+| S8-12 | Fix three weak S8-01 checks - C4 page offsets, C5 row aliasing, C9 memory chain | Not started | written under the owner's overnight blanket approval; S8-03's short-row acceptance waits for the C5 rerun. |
 | S9-01 | libgomp for KNC: futex, affinity, ring-aware barrier, spin-wait and malloc arenas (E6-03 input) | In progress | written under the owner's overnight blanket approval (2026-11-08). |
 | S9-02 | libstdc++ for KNC: exceptions, RTTI, atomics, threads, packaging (E6-06 input) | In progress | written under the owner's overnight blanket approval (2026-11-08). |
 
 ## Recent activity
 
+- 2026-11-08 03:08 **S7-10** engineer submit: knc 497bbe8bedf0, build current. Drill: master 8 files/12 hunks all textual (new: libgfortran/configure #line hunks), gcc-16 0. Shared i386 644 lin...
 - 2026-11-08 02:52 **S8-01** lead escalate: Code review of the job 19 fix passes (red a21750f, green 51e844a: main now allocates every worker buffer before thread start, about 1 GB for C1 at ...
 - 2026-11-08 02:51 **S8-01** engineer submit: Job 19 fix: workers no longer allocate; main allocates each buffer before thread start, sized to the largest selected budget + 64 KiB (C1 at 60x4: ...
 - 2026-11-08 02:45 **S8-01** lead changes: Job 19 (README line 28, C1 at --cores 60 --threads 4) failed on the card: 'pthread_create (errno=12)' then 'allocation (errno=12)' at thread 87 of ...
@@ -166,16 +168,15 @@ Current tickets: `[#################---]` 120 of 134
 - 2026-11-08 02:41 **S7-09** lead approve: GCC-KNC's Fortran runtime installs in its private directory, static and shared programs run on the card from it even with the old GCC 5 runtime on ...
 - 2026-11-08 00:56 **S7-09** engineer submit: GCC 9af4eb014e3: k1om libgfortran.spec loads installed libgfortran-knc.ld (ASSERT on a GFORTRAN_10 symbol), so -L to the donor .so.3/.a fails clear...
 - 2026-11-08 00:35 **S7-08** lead approve: libgfortran now builds for KNC, and six Fortran programs (allocation, descriptors, bounds, I/O, kind 10, modules) run correctly on the card. Machin...
-- 2026-11-08 00:27 **S7-08** owner decide: Owner (via lead, 2026-11-08): native rerun 03:49Z passed, all six programs; back to review and approve.
 
 ## Cost
 
 - From the script, engineer: 291 sessions, 685.4M input tokens
 - From the script, lead: 223 sessions, 68.2M input tokens
-- Started by hand, Claude: 10 sessions, 1728.1M input tokens
+- Started by hand, Claude: 10 sessions, 1729.1M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 13.8 GiB of 100 GiB. 141 GiB free on the drive.
+The project uses 13.8 GiB of 100 GiB. 145 GiB free on the drive.
