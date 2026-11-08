@@ -15,6 +15,7 @@ M1 is accepted and tagged `m1` locally; nothing is pushed. Engineers are Claude 
 
 | Claim | Evidence | Rerun with |
 |---|---|---|
+| S8-02 masked tails never touch an unmapped page (knc `836a0e255e5`) | card 2026-11-08 19:04-19:10Z: guard sweep PASS 96,132 checks, controls 1-3 exit 3, s4_masks/s5_ops as expected (neg fails only the six div/sqrt sets); M2 paired: mat8 0.29, short 13 0.55-0.59, remainder 1-3 1.19-1.29 accepted | `bash .work/_shared/tmp/claude-s8-02-r3/run.sh` |
 | The lint rejects the listed instructions and passes legal code | Rerun on `main`; four deliberate breaks to the lint were all caught by its tests | `python -m unittest tests.tools.test_knc_lint` |
 | The harness enforces its limits, and runs engineer sessions on `gpt-6.1-sol` at high effort in Codex fast mode (`service_tier="priority"`, per the owner on 2026-11-02) | 84 tests in temporary repositories passed on `main` on 2026-11-03 (lead rerun, 248 s). The fast-mode test was red first (`ae1d72b`). The Codex model catalog lists `priority`, named Fast, for `gpt-6.1-sol` | `python -m unittest discover -s tests/tools -p "test_*.py"` |
 | Script sessions can write logs and shared builds | Two real Codex sessions, before and after the fix | Read `tools/dispatch.py`, `engineer_command` |
