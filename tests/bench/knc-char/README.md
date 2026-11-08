@@ -1,5 +1,41 @@
 # S6-03 machine characterization
 
+## S8-17 C12: power by rail (lead job, not run by the engineer)
+
+`c12.c`, included by `driver.c`, answers why the card stays at 160-180 W after
+vectorization. Build with
+`python tools/run.py --name S8-17-acceptance --inputs tests/bench/knc-char -- python tests/bench/knc-char/build.py --out S8-17`,
+which stages `knc-char.mic` under `.work/_shared/S8-17/`. One job, about 150 s:
+
+```text
+python tools/card_run --benchmark --threads 240 --timeout 600 ../_shared/S8-17/knc-char.mic --native --cores 60 --threads 4 --check c12
+```
+
+Phases run for `--phase-seconds` (default 20) each, in the order idle, x87,
+fma, stream, fma, x87, idle. Idle workers sleep on the barrier. x87 is seven
+register-resident `fmul`/`fadd` chains per thread (28 flops per iteration).
+fma is eight independent zmm accumulators per thread of `vfmadd231ps`,
+alternating +b and -b products so values stay bounded (32 flops per
+instruction), no memory traffic in the loop. stream is a read-add-write of a
+per-worker buffer of 16 MiB per core divided among siblings (C1 sizing), with
+L1/L2 prefetch 8 and 32 lines ahead; its bytes count reads plus writes.
+
+An unpinned sampler reads `/sys/class/micras/power` every 50 ms after each
+phase's first second: line 1 (whole card) and lines 8-10 (core, uncore and
+memory rails, power and voltage; S6-13's parser and fixture). A malformed file
+fails the launch with exit 2 before any phase. The raw power and temp files are
+printed once at start. One line per phase:
+
+```text
+phase index=I name=NAME seconds=S samples=N {card,core,uncore,memory}_{mean,min,max}_watts=W {core,uncore,memory}_mean_volts=V work=RATE work_unit=gflop_per_s|gbyte_per_s|none joules_per_op=J op=flop|byte|none window_ns=NS ops=OPS freq_khz=CUR temp=TEMP_LINE1 errno=E
+```
+
+`joules_per_op` is whole-card mean watts times the window over the operations.
+`freq_khz` is `scaling_cur_freq` and `temp` the first line of
+`/sys/class/micras/temp` (spaces as commas), both read once at the end of each
+phase. Exit 3 means some phase had no valid sample. The card needs
+`memoryMB >= 2048` (960 MiB of stream buffers at 60 cores).
+
 ## S8-01 tuning checks (lead job list, not run by the engineer)
 
 Build the extended corpus with:
