@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-08 13:00.
+Updated automatically at every ticket change. Last update: 2026-11-08 14:30.
 
 **Next: GPT-6.1, on S8-03 (Two-level software prefetch for KNC loops (E5-07)).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
@@ -144,8 +144,8 @@ Current tickets: `[#################---]` 127 of 149
 | S7-09 | libgfortran part 3: runtime isolation and packaging (E6-02) | Done | GCC-KNC's Fortran runtime installs in its private directory, static and shared programs run on the card fro... |
 | S7-10 | Sprint 7 batch check after S7-05 and S7-08 | Done | Sprint 7's final compiler matches stock GCC 16.2 on x86 (1,962/1,962 identical at -O2 and -O2 -mavx512f), h... |
 | S8-01 | Card checks C1-C10 for the Sprint 8 tuning block - microbenchmarks in the knc-char corpus | Done | The knc-char corpus now measures the Sprint 8 tuning questions on the card (stores, prefetch, tails, accumu... |
-| S8-02 | Masked loop tails that never touch an unmapped page, chosen by length (E4-04) | Done | Short loops and loop tails on KNC now use masked vector code that never touches an unmapped page: mat8 is 3... |
-| S8-03 | Two-level software prefetch for KNC loops (E5-07) | In progress | Red approved. The distance rule (L2 32 always; L1 16, halved when distance x streams x threads exceeds L1/4... |
+| S8-02 | Masked loop tails that never touch an unmapped page, chosen by length (E4-04) | Done | round 3 card confirmation (19:04-19:10Z, binaries frozen in .work/_shared/tmp/claude-s8-02-r3, outputs in c... |
+| S8-03 | Two-level software prefetch for KNC loops (E5-07) | In progress | WRF's prefetch table (PhiWeather artifacts/test-state/claude-mentor-performance-20261105/PREFETCH_RESULTS_F... |
 | S8-04 | Small-matrix kernels: diagnose mat8 and mat16, reject low lane use (E5-11 part 2) | Not started | written under the owner's overnight blanket approval (2026-11-08). |
 | S8-05 | Per-loop scalar-add cost choice that keeps both mat8 and the stencils (E5-11) | Not started | written under the owner's overnight blanket approval (2026-11-08). |
 | S8-06 | Memory-operand forms for V16SF/V8DF arithmetic and FMA (E5-17) | Not started | written under the owner's overnight blanket approval (2026-11-08). |
@@ -185,12 +185,12 @@ Current tickets: `[#################---]` 127 of 149
 
 ## Cost
 
-- From the script, engineer: 304 sessions, 718.8M input tokens
+- From the script, engineer: 305 sessions, 718.8M input tokens
 - From the script, lead: 225 sessions, 68.7M input tokens
-- Started by hand, Claude: 10 sessions, 1789.7M input tokens
+- Started by hand, Claude: 10 sessions, 1793.4M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 13.8 GiB of 100 GiB. 163 GiB free on the drive.
+The project uses 13.8 GiB of 100 GiB. 159 GiB free on the drive.
