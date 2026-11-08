@@ -142,7 +142,7 @@ Current tickets: `[###################-]` 120 of 122
 | S7-07 | libgfortran part 1: KNC floating-point backend and capability contract (E6-02) | Done | libgfortran now has a KNC floating-point backend: it sets and clears the six IEEE flags and the four roundi... |
 | S7-08 | libgfortran part 2: base runtime build and the descriptor and I/O slice (E6-02) | Done | libgfortran now builds for KNC, and six Fortran programs (allocation, descriptors, bounds, I/O, kind 10, mo... |
 | S7-09 | libgfortran part 3: runtime isolation and packaging (E6-02) | Done | GCC-KNC's Fortran runtime installs in its private directory, static and shared programs run on the card fro... |
-| S7-10 | Sprint 7 batch check after S7-05 and S7-08 | Not started | also waits for S7-09, so the batch runs once at Sprint 7's final GCC head. |
+| S7-10 | Sprint 7 batch check after S7-05 and S7-08 | In progress | also waits for S7-09, so the batch runs once at Sprint 7's final GCC head. |
 | S8-01 | Card checks C1-C10 for the Sprint 8 tuning block - microbenchmarks in the knc-char corpus | **Waiting for you** | Code review passes (C1-C10 kernels, gates, red 0ed8d09 then green 3f5ccb2), but acceptance line 3 needs the... |
 
 ## Recent activity
@@ -160,7 +160,7 @@ Current tickets: `[###################-]` 120 of 122
 
 - From the script, engineer: 290 sessions, 684.5M input tokens
 - From the script, lead: 222 sessions, 68.1M input tokens
-- Started by hand, Claude: 10 sessions, 1722.8M input tokens
+- Started by hand, Claude: 10 sessions, 1723.4M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
