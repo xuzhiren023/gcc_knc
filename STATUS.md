@@ -1,10 +1,10 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-08 12:16.
+Updated automatically at every ticket change. Last update: 2026-11-08 12:41.
 
-**Next: the tech lead, on S8-02.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: GPT-6.1, on S8-03 (Two-level software prefetch for KNC loops (E5-07)).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
-Current tickets: `[################----]` 126 of 149
+Current tickets: `[#################---]` 127 of 149
 
 ## Milestones
 
@@ -144,7 +144,7 @@ Current tickets: `[################----]` 126 of 149
 | S7-09 | libgfortran part 3: runtime isolation and packaging (E6-02) | Done | GCC-KNC's Fortran runtime installs in its private directory, static and shared programs run on the card fro... |
 | S7-10 | Sprint 7 batch check after S7-05 and S7-08 | Done | Sprint 7's final compiler matches stock GCC 16.2 on x86 (1,962/1,962 identical at -O2 and -O2 -mavx512f), h... |
 | S8-01 | Card checks C1-C10 for the Sprint 8 tuning block - microbenchmarks in the knc-char corpus | Done | The knc-char corpus now measures the Sprint 8 tuning questions on the card (stores, prefetch, tails, accumu... |
-| S8-02 | Masked loop tails that never touch an unmapped page, chosen by length (E4-04) | Waiting for review | Round 3, fallback (c): GCC cb8a2a1 reverts abc984e (S8_02_build5): unknown-alignment masked access is again... |
+| S8-02 | Masked loop tails that never touch an unmapped page, chosen by length (E4-04) | Done | Short loops and loop tails on KNC now use masked vector code that never touches an unmapped page: mat8 is 3... |
 | S8-03 | Two-level software prefetch for KNC loops (E5-07) | Not started | S8-12's C5 rerun (padded arrays, knc-characterization.md C5): rows now profit from prefetch. Use L2 distanc... |
 | S8-04 | Small-matrix kernels: diagnose mat8 and mat16, reject low lane use (E5-11 part 2) | Not started | written under the owner's overnight blanket approval (2026-11-08). |
 | S8-05 | Per-loop scalar-add cost choice that keeps both mat8 and the stencils (E5-11) | Not started | written under the owner's overnight blanket approval (2026-11-08). |
@@ -174,6 +174,7 @@ Current tickets: `[################----]` 126 of 149
 
 ## Recent activity
 
+- 2026-11-08 12:41 **S8-02** lead approve: Short loops and loop tails on KNC now use masked vector code that never touches an unmapped page: mat8 is 3.4x faster, short loops up to 1.8x and t...
 - 2026-11-08 12:16 **S8-02** engineer submit: Round 3, fallback (c): GCC cb8a2a1 reverts abc984e (S8_02_build5): unknown-alignment masked access is again the unconditional gather/scatter, knc_l...
 - 2026-11-08 11:31 **S8-02** lead changes: Round 2 on the card (.work/_shared/tmp/claude-s8-02-paired-r2, 3 launches, all valid; fixtures-r2): correctness is clean (guard sweep PASS 96,132 c...
 - 2026-11-08 11:03 **S8-17** lead approve: Card check C12 is built and ready to run: it measures card power by rail (core, uncore, memory) while the vector unit runs flat out, against x87, i...
@@ -181,16 +182,15 @@ Current tickets: `[################----]` 126 of 149
 - 2026-11-08 10:23 **S8-02** engineer submit: Round 2, fix 1 as option (d), target only: GCC 12a514a..abc984e (S8_02_build4). knc_maskmove tests the zero-extended mask at run time against 1 << ...
 - 2026-11-08 09:25 **S8-02** owner decide: Owner 2026-11-08: extend the budget by 2 sessions (now 6) to finish option (d), the run-time active-lane count in knc_maskmove; the lead re-measure...
 - 2026-11-08 09:10 **S8-02** engineer escalate: budget: 4 engineer sessions used; the budget is 4
-- 2026-11-08 09:10 **S8-02** lead answer: Not (a): vect_do_peeling is code upstream rewrites, so a guard there breaks ADR-0006 rule 2 (hooks at a function's entry or on their own line in a ...
 
 ## Cost
 
 - From the script, engineer: 303 sessions, 714.0M input tokens
 - From the script, lead: 225 sessions, 68.7M input tokens
-- Started by hand, Claude: 10 sessions, 1784.7M input tokens
+- Started by hand, Claude: 10 sessions, 1787.9M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 13.8 GiB of 100 GiB. 162 GiB free on the drive.
+The project uses 13.8 GiB of 100 GiB. 163 GiB free on the drive.
