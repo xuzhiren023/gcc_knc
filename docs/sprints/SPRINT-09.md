@@ -13,7 +13,7 @@ the private directory beside `libgcc_s` and `libgfortran`, one OpenMP runtime pe
 
 Order:
 1. Research: libgomp (S9-01), libstdc++ (S9-02).
-2. Implementation tickets from their plans (S9-03 onward), libgomp first.
+2. Implementation tickets from their plans: libstdc++ S9-03 to S9-05 (plan landed first), then libgomp from S9-01, all after Sprint 8's gcc chain.
 3. Batch check.
 
 **Out of scope:** MPI bindings (E6-04) and the IMCI intrinsics header (E6-05), Sprint 10;
