@@ -1,10 +1,10 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-08 03:37.
+Updated automatically at every ticket change. Last update: 2026-11-08 04:55.
 
 **Waiting for you:** S8-01. Run `python tools/pm.py inbox`.
 
-Current tickets: `[#################---]` 122 of 138
+Current tickets: `[#################---]` 123 of 144
 
 ## Milestones
 
@@ -13,7 +13,7 @@ Current tickets: `[#################---]` 122 of 138
 | M0 | Foundation | In progress | 17 of 17 tickets |
 | M1 | Mixed native code | Done | 43 of 43 tickets |
 | M2 | Useful vector target | Done | 51 of 51 tickets |
-| M3 | Runtimes | In progress | 11 of 15 tickets |
+| M3 | Runtimes | In progress | 12 of 21 tickets |
 | M4 | Broad optimization | Not started | Not planned in detail yet |
 | M5 | Program corpus | Not started | Not planned in detail yet |
 | M6 | Release | Not started | Not planned in detail yet |
@@ -142,7 +142,7 @@ Current tickets: `[#################---]` 122 of 138
 | S7-07 | libgfortran part 1: KNC floating-point backend and capability contract (E6-02) | Done | libgfortran now has a KNC floating-point backend: it sets and clears the six IEEE flags and the four roundi... |
 | S7-08 | libgfortran part 2: base runtime build and the descriptor and I/O slice (E6-02) | Done | libgfortran now builds for KNC, and six Fortran programs (allocation, descriptors, bounds, I/O, kind 10, mo... |
 | S7-09 | libgfortran part 3: runtime isolation and packaging (E6-02) | Done | GCC-KNC's Fortran runtime installs in its private directory, static and shared programs run on the card fro... |
-| S7-10 | Sprint 7 batch check after S7-05 and S7-08 | Waiting for review | knc 497bbe8bedf0, build current. Drill: master 8 files/12 hunks all textual (new: libgfortran/configure #li... |
+| S7-10 | Sprint 7 batch check after S7-05 and S7-08 | Done | Sprint 7's final compiler matches stock GCC 16.2 on x86 (1,962/1,962 identical at -O2 and -O2 -mavx512f), h... |
 | S8-01 | Card checks C1-C10 for the Sprint 8 tuning block - microbenchmarks in the knc-char corpus | **Waiting for you** | Code review of the job 19 fix passes (red a21750f, green 51e844a: main now allocates every worker buffer be... |
 | S8-02 | Masked loop tails that never touch an unmapped page, chosen by length (E4-04) | Not started | S8-01 C6 (knc-characterization.md): the aligned masked tail beats x87 from n=2; a gather tail beats x87 fro... |
 | S8-03 | Two-level software prefetch for KNC loops (E5-07) | Not started | S8-01 results (knc-characterization.md, "Sprint 8 tuning checks"): stream and stencil best at L1/L2 = 16/32... |
@@ -160,9 +160,16 @@ Current tickets: `[#################---]` 122 of 138
 | S9-03 | libstdc++ and libatomic build for k1om (E6-06a) | Not started | from S9-02's plan, under the owner's overnight blanket approval. Lead decisions: `--enable-clocale=generic`... |
 | S9-04 | libstdc++ packaging into the private prefix and a g++ link guard (E6-06b) | Not started | from S9-02's plan, under the owner's overnight blanket approval. Lead decisions: `--enable-clocale=generic`... |
 | S9-05 | libstdc++ runtime slice on the card (E6-06c) | Not started | from S9-02's plan, under the owner's overnight blanket approval. Lead decisions: `--enable-clocale=generic`... |
+| S9-06 | libgomp for k1om: build, select, package and link guard (E6-03 A) | Not started | from S9-01's plan, under the owner's overnight blanket approval. |
+| S9-07 | libgomp KNC affinity defaults (E6-03 B) | Not started | from S9-01's plan, under the owner's overnight blanket approval. |
+| S9-08 | libgomp spin-wait with delay and the one-core measurement (E6-03 C) | Not started | from S9-01's plan, under the owner's overnight blanket approval. |
+| S9-09 | libgomp hierarchical ring-aware barrier (E6-03 D) | Not started | from S9-01's plan, under the owner's overnight blanket approval. |
+| S9-10 | libgomp padding, static schedule default and malloc guidance (E6-03 E) | Not started | from S9-01's plan, under the owner's overnight blanket approval. |
+| S9-11 | Sprint 9 batch check | Not started | from S9-01's plan, under the owner's overnight blanket approval. |
 
 ## Recent activity
 
+- 2026-11-08 04:55 **S7-10** lead approve: Sprint 7's final compiler matches stock GCC 16.2 on x86 (1,962/1,962 identical at -O2 and -O2 -mavx512f), has 0 ICE in both sweeps and textual-only...
 - 2026-11-08 03:37 **S9-01** lead approve: We now have a build-and-design plan for GCC-KNC's own OpenMP runtime on the card: futex-based waits with delay instead of pause, physical-core affi...
 - 2026-11-08 03:29 **S9-01** engineer submit: Read-only; nothing built or run. docs/research/knc-libgomp.md (9e4ae16) fixed per review: (1) groups are a pure function of team_id and total, set ...
 - 2026-11-08 03:28 **S9-02** lead approve: We now know how to build GCC 16's C++ library for the card: no newer glibc or kernel is needed, and built with the generic C-locale setting it cove...
@@ -170,16 +177,15 @@ Current tickets: `[#################---]` 122 of 138
 - 2026-11-08 03:17 **S9-01** lead changes: Citations spot-checked and correct (configure.tgt:88, x86/futex.h:120-124, imci.md:485-495, bar.h:98, wait.h:48-68, env.c:71-72); sections 1-3 and ...
 - 2026-11-08 03:15 **S9-01** engineer submit: Read-only; nothing built or run on the card. docs/research/knc-libgomp.md (f130494) answers Q1-6 with file:line, each marked proven/inferred/unknow...
 - 2026-11-08 03:08 **S7-10** engineer submit: knc 497bbe8bedf0, build current. Drill: master 8 files/12 hunks all textual (new: libgfortran/configure #line hunks), gcc-16 0. Shared i386 644 lin...
-- 2026-11-08 02:52 **S8-01** lead escalate: Code review of the job 19 fix passes (red a21750f, green 51e844a: main now allocates every worker buffer before thread start, about 1 GB for C1 at ...
 
 ## Cost
 
 - From the script, engineer: 295 sessions, 702.6M input tokens
 - From the script, lead: 225 sessions, 68.7M input tokens
-- Started by hand, Claude: 10 sessions, 1733.6M input tokens
+- Started by hand, Claude: 10 sessions, 1737.9M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 13.8 GiB of 100 GiB. 145 GiB free on the drive.
+The project uses 13.8 GiB of 100 GiB. 137 GiB free on the drive.
