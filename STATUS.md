@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-08 17:30.
+Updated automatically at every ticket change. Last update: 2026-11-08 18:23.
 
 **Next: GPT-6.1, on S8-03 (Two-level software prefetch for KNC loops (E5-07)).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
@@ -148,7 +148,7 @@ Current tickets: `[#################---]` 128 of 150
 | S8-03 | Two-level software prefetch for KNC loops (E5-07) | In progress | Owner 2026-11-08: "Extended by 2 session" (now 6) to add the run-time trip-count guard: the prefetched loop... |
 | S8-04 | Small-matrix kernels: diagnose mat8 and mat16, reject low lane use (E5-11 part 2) | Not started | written under the owner's overnight blanket approval (2026-11-08). |
 | S8-05 | Per-loop scalar-add cost choice that keeps both mat8 and the stencils (E5-11) | Not started | written under the owner's overnight blanket approval (2026-11-08). |
-| S8-06 | Memory-operand forms for V16SF/V8DF arithmetic and FMA (E5-17) | Not started | written under the owner's overnight blanket approval (2026-11-08). |
+| S8-06 | Memory-operand forms for V16SF/V8DF arithmetic and FMA (E5-17) | In progress | written under the owner's overnight blanket approval (2026-11-08). |
 | S8-07 | vpmadd231d for V16SI multiply-add (E5-14) | Not started | written under the owner's overnight blanket approval (2026-11-08). |
 | S8-08 | -mtune=knc tune-flag audit (E5-12) | Not started | code placement swings hot loops by 20 % or more. In S8-03's paired run, m2_mat8_gcc measured 1.21-1.23 agai... |
 | S8-09 | KNC -O2 defaults: vectorizer cost model, stride versioning, predictive commoning (E5-18) | Not started | written under the owner's overnight blanket approval (2026-11-08). |
@@ -188,10 +188,10 @@ Current tickets: `[#################---]` 128 of 150
 
 - From the script, engineer: 308 sessions, 728.5M input tokens
 - From the script, lead: 226 sessions, 68.9M input tokens
-- Started by hand, Claude: 10 sessions, 1816.1M input tokens
+- Started by hand, Claude: 10 sessions, 1820.2M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 14.9 GiB of 100 GiB. 159 GiB free on the drive.
+The project uses 15.7 GiB of 100 GiB. 158 GiB free on the drive.
