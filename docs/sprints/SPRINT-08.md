@@ -30,6 +30,9 @@ Order (ADR-0009 amendment 1):
    a rising-phoenix banner and a progress bar, both shown only on a terminal (S8-16).
    Beside the gcc chain, tools lane: card check C12, power by rail for a saturated vector unit against
    x87, idle and streaming (S8-17, owner's question 2026-11-08).
+   Tools lane: a second GCC tree, lane gcc2 (S8-18, owner 2026-11-08). After it, two GCC lanes:
+   gcc S8-04 > S8-05 > S8-08 > S8-09; gcc2 S8-06 > S8-07 > S8-10 > S8-13 > S8-14; then S8-15 > S8-16 > S8-11.
+   Card: WRF runs one forecast at a time, but only when GCC-KNC has no card work waiting (owner, 2026-11-08).
 6. Batch check and paired M2 re-measure (S8-11).
 
 **Decided by the lead:** `-ftrapping-math` stays the KNC default (ADR-0003: flags are observable).
