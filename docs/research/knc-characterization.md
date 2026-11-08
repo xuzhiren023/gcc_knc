@@ -353,7 +353,7 @@ within 2-3%, except 32/64 at 4 threads (stream 114.3, stencil 119.8 against 121.
 (L1 64 rows omitted: every point is 1.3-2.8x slower than L1 8 / L2 32.) Without aliasing, rows are
 3-4x faster than in S8-01's run, and software prefetch now pays: with eight streams the best is L1 8 /
 L2 32 (1.7x over none at 2 threads, 4.6x at 4 threads, where eight streams per thread overflow the
-hardware prefetcher). L2 prefetch alone (L1 0 / L2 32) is within 4-19% of best; L1 prefetch alone is
+hardware prefetcher). L2 prefetch alone (L1 0 / L2 32) is 1-21% slower than best; L1 prefetch alone is
 1.5-1.7x slower than none at 2 threads.
 Decides (E5-07, S8-03): always issue the L2 prefetch at 32 iterations; L1 distance 16 for one or two
 streams per loop, 8 for many (eight) streams; L2 distance must exceed L1; never L1 prefetch without L2.
