@@ -1,4 +1,6 @@
 """S8-01 host contract: complete point catalog and emitted result fields."""
+from pathlib import Path
+import re
 import subprocess
 import sys
 from kernels import CASES
@@ -20,7 +22,22 @@ def expected():
     return names
 
 
+def worker_allocations():
+    """Worker-side malloc gives each thread a 64 MB arena; job 19 hit ENOMEM at 240 threads."""
+    source = (Path(__file__).parent / 'driver.c').read_text()
+    calls = []
+    for function in ('prepare', 'worker_main'):
+        body = re.search(r'\n[^\n]*\b' + function + r'\([^)]*\) \{\n(.*?)\n\}\n', source, re.S)
+        assert body, 'missing ' + function
+        calls += [function + ': ' + c for c in
+                  re.findall(r'\b(?:malloc|calloc|realloc|posix_memalign|aligned_alloc|free)\b',
+                             body.group(1))]
+    return calls
+
+
 if __name__ == '__main__':
+    calls = worker_allocations()
+    assert not calls, 'worker threads allocate: ' + ', '.join(calls)
     names = expected()
     missing = names - {c['name'] for c in CASES}
     assert not missing, 'missing S8 points: ' + ', '.join(sorted(missing))
