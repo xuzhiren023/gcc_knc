@@ -183,9 +183,10 @@ the group spread; `*` marks a regime-step flag (spread 2% or more, amendment 2).
   of 212 and 233 ms (over 200 ms), so they are **invalid** under amendment 2 point 1. The other C5
   row points at 2 threads are bimodal: samples in one point differ up to 6x (median point 1.9x),
   so treat them as noisy.
-- Jobs 3 and 19 (C1 at 60 cores x 4 threads): exit 2, ENOMEM (`allocation (errno=12)` at worker 98;
-  `pthread_create`, then `allocation`, at worker 87). No data. The engineer is fixing the
-  allocation; **C1's 60-core point is pending**.
+- Jobs 3 and 19 (C1 at 60 cores x 4 threads): exit 2, ENOMEM; glibc 2.21 gave each worker its own
+  64 MB malloc arena. After the fix (main allocates every buffer before the workers start), the lead
+  reran job 19 on 2026-11-08 (job claude-3827228ac5c7, 6 GB config): exit 0, 240 workers, every
+  point accepted, spread 0.4-1.3%, no regime step (.work/_shared/tmp/claude-s8-01/job19r.out).
 - Job 18: `vaddps.lat` at 4 threads gives 4.22 against S6-03's 4.19, so the S8 binary agrees with
   the S6-03 table.
 - Each line ran **once**, not the README's five launches. The cross-launch range is not measured.
@@ -198,9 +199,20 @@ the group spread; `*` marks a regime-step flag (spread 2% or more, amendment 2).
 | `vmovnraps` | 156.41 (0.1%) | 160.14 (0.3%) | 40.0 | 0.5 | 2.0 |
 | `vmovnrngoaps` | 12.43 (0.2%) | 50.00 (0.3%) | 12.5 | 6.3 | 6.3 |
 
-Decides (E5-08): at one core, NGO stores plus the `lock addl` fence beat normal stores 3.1x at
-1 thread and 1.6x at 4 threads; NR stores are 2-4x slower than normal and should never be used. The
-60x4 point is still needed before NGO goes in by default.
+At 60 cores x 4 threads (4 MiB per thread, all workers start each sample on one barrier; ticks per
+line per thread, median of 240 workers with the slowest in brackets; card GB/s from the median, slowest
+worker's figure in brackets):
+
+| Store | Ticks per line, per thread | Card GB/s |
+|---|---:|---:|
+| `vmovaps` | 227.7 (230.9) | 83.5 (82.4) |
+| `vmovnraps` | 166.6 (171.6) | 114.1 (110.8) |
+| `vmovnrngoaps` | 84.1 (93.0) | 226.1 (204.5) |
+
+Decides (E5-08): NGO stores plus the `lock addl` fence beat normal stores 3.1x at 1 thread and 1.6x
+at 4 threads on one core, and 2.7x on the whole card, so NGO is the default for write-only streams.
+NR stores lose 2-4x on one core but beat normal stores 1.4x on the whole card, where the read for
+ownership dominates; NGO still beats NR 2x there, so NR is never chosen. One launch only.
 
 ### C2: does `vprefetch` pair with a vector op (hot targets, ticks per instruction or pair)
 
