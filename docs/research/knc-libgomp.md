@@ -225,22 +225,65 @@ the inline asm is only needed for a variable count. **Design.**
 the `gomp_barrier_t` API and the `BAR_*` flag protocol so `team.c`, `task.c`, `work.c` and
 `single.c` need no change:
 
-- Group = the threads of one core (up to 4). Each group owns one 64-byte line with an arrival
-  counter and a release generation word. A thread finds its group from its place (core places from
-  section 3) or, unbound, from `sched_getcpu ()` (`sysroot/usr/include/bits/sched.h:88`; getcpu is a
-  vsyscall on this kernel, `asm/unistd_64.h:650`) at the first wait; the mapping lives in a per-team
-  array indexed by `team_id` and is rebuilt in `gomp_barrier_reinit`.
+- **Scope: the team barrier only.** `gomp_barrier_init` is called on `team->barrier` once, in
+  `gomp_new_team` with the final `nthreads` (`team.c:190`), and a team is only reused for the same
+  `nthreads` (`get_last_team`, `team.c:175`). `gomp_barrier_reinit` is never applied to a team
+  barrier: its only callers are the pool dock's `gomp_simple_barrier_reinit` (`team.c:482,722,891`
+  through `config/posix/simple-bar.h:48`), which grows the count while old threads are already
+  parked. **Proven** (grep over `libgomp/*.c`). The hierarchical barrier therefore has a fixed
+  member count for its whole life, and the dock keeps the flat `gomp_barrier_t` (a KNC
+  `simple-bar.h` wrapping the flat type, since `simple-bar.h` is the posix one). Making the dock
+  hierarchical is a follow-up decided by measurement 3.
+- **Group membership is a pure function of `team_id` and `total`, computed once by the master.**
+  `gomp_barrier_init (bar, count)` sets `ngroups = min (count, gomp_knc_ncores)` (60 by default,
+  the core count from section 3's place builder, or from the mask) and `gsize = ceil (count /
+  ngroups)`; thread `team_id` belongs to group `team_id / gsize`, and the last group's size is
+  `count - (ngroups - 1) * gsize`. Each group's arrival counter is stored with its size before the
+  team is released, so no counter is ever read before its member count exists. `team_id` is the
+  thread's index in the team and does not change while the team exists (`libgomp.h:412-445`).
+  This matches the bound layouts without a second mapping: with `close` and `T > P`,
+  `s = nthreads / place_partition_len` consecutive `team_id`s share one place (`team.c:697-700,
+  777-781`), and `spread` with `T > P` does the same (`team.c:707-715`), so with section 3's 60
+  core places, threads `4c..4c+3` are the siblings of core `c` at 240 threads and `2c, 2c+1` at
+  120. **Proven** for the assignment order. Unbound threads keep the same deterministic groups:
+  only locality is lost when they migrate, never correctness. `sched_getcpu ()`
+  (`sysroot/usr/include/bits/sched.h:88`; getcpu is a vsyscall on this kernel,
+  `asm/unistd_64.h:650`) is not used for membership; at most it can later choose between two
+  precomputed mappings, and the first ticket does not use it at all.
 - Arrival: decrement the group counter (an L1/L2-local RMW among siblings, no ring traffic); the
-  last sibling decrements the root counter, which sits in its own line and sees at most 60 RMWs
-  instead of 240. A second tree level (fan-in 8: 60 to 8 to 1) is a later option; measure first.
-- Release: the last root arriver bumps the root `generation` (which keeps the `BAR_*` flag bits and
-  the `BAR_INCR` arithmetic of `bar.h:47-54,171-177`), then writes each group's release word: 60
-  line writes by one thread instead of 240 polls of one line. Siblings spin with `delay` on their
-  group word, then `futex_wait` on it. `gomp_team_barrier_wake` and `gomp_team_barrier_cancel`
-  (`bar.c:74-78,203-215`) wake all group words.
-- Tasks and cancellation: when `team->task_count` is nonzero or `BAR_CANCELLED` is set, fall back to
-  the flat protocol on the root word (the existing code path, `bar.c:93-99,112-123,175-192`), so the
-  first ticket does not touch `gomp_barrier_handle_tasks`.
+  sibling that brings it to zero resets it to the group size and decrements the root `awaited`,
+  which sits in its own line and sees at most 60 RMWs instead of 240. The thread that brings the
+  root to zero gets `BAR_WAS_LAST`, exactly as `gomp_barrier_wait_start` does today (`bar.h:98`).
+  `awaited_final` (`bar.h:112-121`) gets the same group treatment with a second per-group counter.
+  A second tree level (fan-in 8: 60 to 8 to 1) is a later option; measure first.
+- **One rule for every thread of a barrier instance: always arrive through the groups, and only
+  the root owns the flags.** The root `generation` word stays the one and only place where
+  `BAR_TASK_PENDING`, `BAR_WAITING_FOR_TASK` and `BAR_CANCELLED` live (`bar.h:47-54,129-169`), so
+  `task.c` works unchanged under `task_lock`. Each group's release word is a *mirror* of the root
+  generation: it is rewritten with the root's current value (flags included) by every operation
+  that changes the root and must wake someone, namely the root release (`bar.c:104-105,168-170`,
+  ours), `gomp_team_barrier_wake` (`bar.c:74-78`, ours) and `gomp_team_barrier_cancel`
+  (`bar.c:203-215`, ours). Every `task.c` writer of the flags that needs a wake already calls
+  `gomp_team_barrier_wake` after it (`task.c:729-734`, `833-839`, `1089-1094`, `1583-1585`,
+  `1620-1622`, `1633`, `1798`, `2116`, `2320`, `2770-2790`); `clear_task_pending` (`task.c:1306`)
+  and `set_waiting_for_tasks` (`task.c:1588`) need no wake today and get none. **Proven** for the
+  call sites. A waiter uses the group word exactly as the flat code uses `bar->generation` for
+  waiting (`do_wait (&group->word, generation)`, `bar.c:114,181`) and reads the root with ACQUIRE
+  for every decision (`bar.c:115-123,182-192`), so the task and cancel loops stay as written: when
+  `TASK_PENDING` is mirrored the waiter wakes, runs `gomp_barrier_handle_tasks`, and loops; when
+  `BAR_CANCELLED` is mirrored the cancel variant returns true. The root releaser writes the new
+  generation into the root first, then into the 60 group words, then futex-wakes each group word:
+  60 line writes by one thread instead of 240 polls of one line. For `gomp_team_barrier_wake (bar,
+  n)` with `n < INT_MAX` (one task to run): mirror into all group words so spinners see it, then
+  `futex_wake (1)` on the group words in order until `n` sleepers have been woken or all groups are
+  tried, bounding the syscalls at 60 in the worst case. Because a thread's expected value is
+  derived from the root generation it read at arrival and the mirror always holds the latest
+  root value, a mirror written before the waiter parks makes `futex_wait` return `EAGAIN` at once,
+  so no wake is lost whichever order arrival, task queueing and release happen in. Siblings spin
+  with `delay` on their group word, then `futex_wait` on it.
+- The plain `gomp_barrier_wait`/`gomp_barrier_wait_last` pair used on `team->barrier` at thread
+  exit and team end (`team.c:112,117,871,988`) goes through the same groups and root; there are no
+  flags on that path, so the mirror is the bare generation.
 
 **What to measure (lead, card; C11 corpus from S8-10 plus one source file).**
 1. One core: a worker loop alone, then with 1, 2 and 3 siblings spinning on a local word with no
@@ -274,17 +317,20 @@ program and other libraries place in TLS. `struct gomp_team.implicit_task[]` is 
 gomp_task` per thread laid out contiguously (`libgomp.h:861`), each written by its own thread
 (`icv`, `kind`, `children_queue`, `libgomp.h:678-780`), unpadded. `ordered_release[]` is a
 pointer array written once (`team.c:102`). `gomp_managed_threads` is a global written at every
-fork (`team.c:289,740,894,980`) and read by every spin iteration of every waiter (`wait.h:52-55`), on a
-line it shares with other `env.c` globals (`env.c:108-109`). Linux `gomp_sem_t`, `gomp_mutex_t`
+fork (`team.c:289,740,894,980`) and loaded once per `do_spin` call, before the spin loop
+(`wait.h:50-55`); the loop itself (`wait.h:56-60`) touches only the waited address. So each waiter
+reads that line once per wait episode, not once per spin iteration: at most 240 reads per barrier
+of a line that was written once at the fork, which is 60 ring transfers per region at the first
+barrier and none afterwards until the next fork. Not worth moving. Linux `gomp_sem_t`, `gomp_mutex_t`
 and `omp_lock_t` are bare `int`s (`config/linux/sem.h:36`, `mutex.h:33`, `omp-lock.h:9`), so
 user locks pad as the user places them. **Proven.**
 
 **Design.** `__thread struct gomp_thread gomp_tls_data __attribute__((aligned (64)))` with the
 struct padded to a multiple of 64 (static assert), `release` on its own line; `struct gomp_task`
 padded to a 64-byte multiple or `implicit_task` allocated as 64-byte strided slots (the `extra`
-size in `team.c:179-184`); `gomp_managed_threads` and `gomp_available_cpus` moved to their own
-line, and the spin loop reading a per-team "throttled" flag instead; the 60 group lines of the
-barrier allocated at 64-byte stride. Sizes change nothing in the ABI: these structures are private
+size in `team.c:179-184`); the 60 group lines of the barrier allocated at 64-byte stride.
+`gomp_managed_threads` and `gomp_available_cpus` stay where they are (see above). Sizes change
+nothing in the ABI: these structures are private
 to `libgomp.so.1` (`libgomp.h` is not installed). **Design.**
 
 **Reductions are a compiler matter.** `lower_reduction_clauses` (`gcc/omp-low.cc:7663-7960`)
@@ -389,18 +435,28 @@ tests red then green. Card checks: measurement 1 (worker alone vs 1-3 spinning s
 vs `delay` 32/128/512) and 3 (fork/join at 60x4 under the three wait policies); the lead sets the
 default from the result and records it in `knc-characterization.md`.
 
-**D. Hierarchical barrier** (deep). `config/linux/knc/bar.h` and `bar.c` per section 4: sibling
-groups, root counter, per-group release words, flat fallback when tasks are pending or the barrier
-is cancelled, same `gomp_barrier_t` API and `BAR_*` protocol. Acceptance: the barrier compiles into
-an x86_64 host unit test (same sources, synthetic group mapping) that runs 240 pthreads through
-100,000 barriers with a generation check, plus the libgomp testsuite's barrier, task, cancel and
-`single`/`ordered` tests cross-compiled and staged (red: the host stress test fails on a
-deliberately broken release); no change outside `config/linux/knc/`. Card checks: measurements 2
-(flat vs two-level at 60x1, 60x2, 60x4), 4 and 5; the staged testsuite subset passes at 60x4; a
-tasks program with 10,000 tasks passes (fallback path).
+**D. Hierarchical barrier** (deep). `config/linux/knc/bar.h`, `bar.c` and `simple-bar.h` per
+section 4: groups fixed by the master in `gomp_barrier_init` from `team_id` and `total`, root
+counter, per-group mirror words refreshed by the root release, `gomp_team_barrier_wake` and
+`gomp_team_barrier_cancel`, the root alone holding the `BAR_*` flags, the dock on the flat type,
+same `gomp_barrier_t` API. Acceptance: the barrier compiles into an x86_64 host unit test (same
+sources, `gomp_knc_ncores` set from the test) that runs 240 pthreads through 100,000 barriers
+with a generation check, in four variants: (a) plain; (b) tasks: with `GOMP_SPINCOUNT=0` so
+waiters park in `futex_wait` on their group words, a late thread queues work through the
+`gomp_team_barrier_set_task_pending` plus `gomp_team_barrier_wake (bar, 1)` sequence while the
+others are parked, and the test checks that a parked thread wakes and that the barrier still
+completes once the queue drains; the same with spinning waiters; (c) cancel: one thread calls
+`gomp_team_barrier_cancel` while others are parked and spinning in `gomp_team_barrier_wait_cancel`,
+and all must return true; (d) wake ordering: the release is forced between a thread's root read
+and its `futex_wait` (a hook in the test build) and no thread hangs. Plus the libgomp testsuite's
+barrier, task, taskwait, cancel and `single`/`ordered` tests cross-compiled and staged (red: the
+host stress test fails on a deliberately broken mirror write); no change outside
+`config/linux/knc/`. Card checks: measurements 2 (flat vs two-level at 60x1, 60x2, 60x4), 4 and 5;
+the staged testsuite subset passes at 60x4 with `OMP_WAIT_POLICY` unset and `passive`; a tasks
+program with 10,000 tasks and one with `cancel parallel` pass at 60x4.
 
 **E. Padding, schedule default and the malloc documentation** (small). Section 5's padding of
-`gomp_tls_data`, `implicit_task`, the spin globals and the group lines; `run_sched_var` default
+`gomp_tls_data`, `implicit_task` and the group lines; `run_sched_var` default
 `GFS_STATIC` for KNC; the manual text and `omp_display_env` hint for `MALLOC_ARENA_MAX` and
 `OMP_STACKSIZE`; a staged reduction microbenchmark (atomic path, lock path, padded partials) and a
 staged malloc microbenchmark. Acceptance: static asserts on sizes and offsets red then green; a
@@ -418,9 +474,13 @@ test. Card checks: measurements 6 and 7; the eight programs from A still pass at
   decides; if `delay` does not help, the fallback is a lower spin count plus earlier `futex_wait`.
 - **sysfs topology may be missing on 2.6.38.** B's `/proc/cpuinfo` fallback covers it; the card
   check in A finds out before B starts.
-- **Tasks and cancellation interact with the barrier generation word.** D keeps the flat path for
-  those cases; the risk is a missed wake when a task is queued between a group release and the
-  root release. The host stress test must include a tasks variant before the card run.
+- **Tasks and cancellation interact with the barrier generation word.** D keeps the flags on the
+  root and mirrors them into the group words at every wake; the residual risk is a `task.c` path
+  that changes the root without calling `gomp_team_barrier_wake` (none found in GCC 16, but a
+  forward port must re-check the list in section 4). The host stress variants (b) to (d) run
+  before the card run.
+- **The dock stays flat in D.** Fork/join still pays 240 polls of one line at the dock release;
+  measurement 3 decides whether a dock follow-up is worth a ticket.
 - **Address space at 240 threads.** Even with our libgomp, a program that mallocs in workers
   reserves 64 MB per thread; the knobs in E are documentation, not enforcement. `card_run` job lines
   for 60x4 should set `MALLOC_ARENA_MAX` and `OMP_STACKSIZE` or raise the memory budget.
