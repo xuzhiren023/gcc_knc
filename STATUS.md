@@ -1,10 +1,10 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-08 10:24.
+Updated automatically at every ticket change. Last update: 2026-11-08 10:47.
 
 **Next: the tech lead, on S8-02.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
-Current tickets: `[################----]` 125 of 148
+Current tickets: `[################----]` 125 of 149
 
 ## Milestones
 
@@ -159,6 +159,7 @@ Current tickets: `[################----]` 125 of 148
 | S8-14 | Default 64-byte data alignment and TLB-aware cache parameters (E5-13) | Not started | added at the owner's request (2026-11-08: "add three [tickets] in s8") to cover ADR-0009 points the sprint ... |
 | S8-15 | Small-loop unroll default and the GCC-KNC flags page (E5-09) | Not started | added at the owner's request (2026-11-08: "add three [tickets] in s8") to cover ADR-0009 points the sprint ... |
 | S8-16 | User story - one bold flag, -mphinix, with a rising-phoenix banner and a progress bar | Not started | owner's user story, written by the lead with the owner's request quoted above. |
+| S8-17 | Card check C12 - power by rail for a saturated vector unit against x87, idle and streaming | In progress | added at the owner's request ("Yes add the test"). Tools lane, so it runs beside the gcc chain. |
 | S9-01 | libgomp for KNC: futex, affinity, ring-aware barrier, spin-wait and malloc arenas (E6-03 input) | Done | We now have a build-and-design plan for GCC-KNC's own OpenMP runtime on the card: futex-based waits with de... |
 | S9-02 | libstdc++ for KNC: exceptions, RTTI, atomics, threads, packaging (E6-06 input) | Done | We now know how to build GCC 16's C++ library for the card: no newer glibc or kernel is needed, and built w... |
 | S9-03 | libstdc++ and libatomic build for k1om (E6-06a) | Not started | from S9-02's plan, under the owner's overnight blanket approval. Lead decisions: `--enable-clocale=generic`... |
@@ -186,10 +187,10 @@ Current tickets: `[################----]` 125 of 148
 
 - From the script, engineer: 301 sessions, 711.6M input tokens
 - From the script, lead: 225 sessions, 68.7M input tokens
-- Started by hand, Claude: 10 sessions, 1771.1M input tokens
+- Started by hand, Claude: 10 sessions, 1777.2M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 13.8 GiB of 100 GiB. 130 GiB free on the drive.
+The project uses 13.8 GiB of 100 GiB. 135 GiB free on the drive.
