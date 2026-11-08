@@ -1,6 +1,6 @@
 # KNC two-level software prefetch (S8-03, E5-07)
 
-Status: green 2026-11-08 (GCC s8/S8-03 at d7c493f; T1 scans pass). Card results are the
+Status: green 2026-11-08 (GCC s8/S8-03 at 440d4a9; T1 scans pass). Card results are the
 lead's: the paired M2 run and s4_masks / s5_ops are staged under `.work/_shared/S8-03/`.
 
 ## Rules the T1 scans encode (`tests/t1/knc-prefetch-*.c`)
@@ -13,7 +13,12 @@ Source: `docs/research/knc-characterization.md` C2, C4, C5 and the S8-12 rerun.
 - Distances are in 64-byte lines of the stream, the unit C5 swept (one line per row
   iteration). For a loop whose iteration moves one line this is C5's iteration count; a
   scalar loop over floats gets 16 x 16 iterations ahead for 16 lines, so a line's prefetch
-  is still issued once (the pass's `prefetch_mod`).
+  is still issued once (the pass's `prefetch_mod`). When the loop's largest step exceeds a
+  line the distance stays in bytes: iterations = ceil(lines x 64 / step), at least 1, so
+  WRF's k loop (51 trips, 1092-byte step; lead note 2026-11-08) gets `vprefetch1` 2 and
+  `vprefetch0` 1 iterations ahead (2184 and 1092 bytes) and a 4 KiB-step loop 1 and 1.
+  The four-distance trip check below uses that iteration count (4 x 2 = 8 for WRF's loop,
+  not 128), so the loop is prefetched. `tests/t1/knc-prefetch-O2.c` `column_f32`.
 - Defaults: `--param=knc-prefetch-l2-distance=32`, `--param=knc-prefetch-l1-distance=16`.
   The L2 distance never changes with density (C5: 32 best at 2 and 4 threads; 64 within 6%).
 - L1 footprint rule: when `L1 distance x prefetched streams x knc-threads-per-core` exceeds
@@ -27,7 +32,7 @@ Source: `docs/research/knc-characterization.md` C2, C4, C5 and the S8-12 rerun.
 - Written streams use the read-hint forms `vprefetch0/1`, as C5's kernels did for their
   output array. `vprefetche*` is unmeasured and not emitted.
 
-## What was built (GCC s8/S8-03, 836a0e2..d7c493f)
+## What was built (GCC s8/S8-03, 836a0e2..440d4a9)
 
 - `imci.md`: `knc_prefetch`, one `(prefetch ...)` insn under `TARGET_KNC`, locality 3/2/1/0 to
   `vprefetch0/1/2/nta` (Intel 327364-001 pp. 641-656); write hint dropped like the SSE path.
@@ -37,9 +42,10 @@ Source: `docs/research/knc-characterization.md` C2, C4, C5 and the S8-12 rerun.
 - `tree-ssa-loop-prefetch.cc`: target hook `TARGET_PREFETCH_DISTANCES (nstreams, &near, &far)`
   in lines (`target.def`, `tm.texi.in`, `tm.texi`; default `NULL`). When it answers, the
   pass skips its latency-derived `ahead`, counts the streams after reuse pruning, converts
-  lines to iterations by the loop's largest step (smallest `prefetch_mod`), checks the trip
-  count against the far distance, and issues the far prefetch (locality 2, or 1 when
-  nontemporal) before the near one for every stream. `i386.cc` points the hook at
+  lines to iterations by the loop's largest step (smallest `prefetch_mod` below a line,
+  ceil(lines x line / step) above one), checks the trip count against the far distance,
+  and issues the far prefetch (locality 2, or 1 when nontemporal) before the near one for
+  every stream. `i386.cc` points the hook at
   `ix86_knc_prefetch_distances`, which returns false unless `TARGET_KNC`.
 - `i386-knc.cc`: the distance rule above; `-fprefetch-loop-arrays` at `-O2`+ (not `-Os`),
   `min-insn-to-prefetch-ratio` and `prefetch-min-insn-to-mem-ratio` 1, from the existing
