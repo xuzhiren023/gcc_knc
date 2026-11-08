@@ -19,10 +19,12 @@ from pathlib import Path
 import subprocess
 import sys
 
+import storage
+
 ROOT = Path(__file__).resolve().parents[1]
 SHARED = ROOT.parent / '_shared'
 TC = SHARED / 'toolchain'
-BUILD = SHARED / 'gcc-build/gcc'
+BUILD = Path(storage.gcc_build_dir(ROOT.parent.parent)) / 'gcc'
 OUT = SHARED / 'S8-02'
 TAIL_SOURCES = ('knc-mask-tail-O2.c', 'knc-mask-tail-O3.c', 'knc-mask-tail-len.c',
                 'knc-mask-split.c')

@@ -15,12 +15,13 @@ import subprocess
 import sys
 
 import check
+import storage
 from portability import torture_dialect_options
 
 ROOT = Path(__file__).resolve().parents[1]
 SHARED = ROOT.parent / '_shared'
-GCC = SHARED / 'gcc'
-BUILD = SHARED / 'gcc-build/gcc'
+GCC = Path(storage.gcc_tree(ROOT.parent.parent))
+BUILD = Path(storage.gcc_build_dir(ROOT.parent.parent)) / 'gcc'
 OUT = SHARED / 'knc-relocation'
 STATE = OUT / 'before.pickle'
 

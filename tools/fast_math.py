@@ -5,7 +5,7 @@ import re
 def t2(runner):
     if runner.args.compiler != 'gcc16':
         raise RuntimeError('fast-math checks require --compiler gcc16')
-    runtime = runner.tc.parent / 'gcc-build/gcc/crtfastmath.o'
+    runtime = runner.gcc_build / 'gcc/crtfastmath.o'
     out = runner.tc.parent / 'tmp/S2-15'
     out.mkdir(parents=True, exist_ok=True)
     options = [('-Ofast',), ('-ffast-math',),

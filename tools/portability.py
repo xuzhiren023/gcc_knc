@@ -17,6 +17,7 @@ import sys
 import tempfile
 
 from gcc_build import read_stamp, write_stamp
+import storage
 
 ROOT = Path(__file__).resolve().parents[1]
 PROJECT = ROOT.parent.parent if ROOT.parent.name == '.work' else ROOT
@@ -279,7 +280,7 @@ def main(argv=None):
     x86_parser.add_argument('--skip-make-check', action='store_true',
                             help='skip tasklist after independently confirming no build is running')
     for command_parser in (drill_parser, x86_parser):
-        command_parser.add_argument('--repo', type=Path, default=SHARED / 'gcc')
+        command_parser.add_argument('--repo', type=Path, default=Path(storage.gcc_tree(PROJECT)))
     args = parser.parse_args(argv)
     try:
         return drill(args) if args.action == 'drill' else x86(args)

@@ -15,7 +15,7 @@ def main():
     if os.name == 'nt':
         script = subprocess.check_output([str(suite.TC / 'cygwin/bin/cygpath.exe'), '-u', str(Path(__file__))], text=True).strip()
         return subprocess.call([str(suite.TC / 'cygwin/bin/python3.12.exe'), script, *requested], env=env)
-    build = suite.SHARED / 'gcc-build/gcc'
+    build = Path(suite.storage.gcc_build_dir(suite.PROJECT)) / 'gcc'
     out = suite.SHARED / 'S6-07'
     failures = 0
     for source in sorted((suite.ROOT / 'tests/regress/s6-07-vect').glob('*.c')):

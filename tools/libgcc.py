@@ -6,7 +6,7 @@ from pathlib import Path
 
 
 def t2(runner):
-    runtime = runner.tc.parent / 'gcc-build/k1om-mpss-linux/libgcc'
+    runtime = runner.gcc_build / 'k1om-mpss-linux/libgcc'
     files = [runtime / name for name in ('libgcc.a', 'crtbegin.o', 'crtend.o')]
     lint = runner.command(sys.executable, runner.root / 'tools/knc_lint',
                           *files, check=False)

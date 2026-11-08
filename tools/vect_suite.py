@@ -20,6 +20,8 @@ import signal
 import subprocess
 import sys
 
+import storage
+
 ROOT = Path(__file__).resolve().parents[1]
 PROJECT = ROOT.parent.parent if ROOT.parent.name == '.work' else ROOT
 SHARED = PROJECT / '.work/_shared'
@@ -226,7 +228,7 @@ def main():
     env['PATH'] = ':'.join(str(TC / p) for p in ('cross/bin', 'cygwin/bin')) + ':' + env.get('PATH', '')
     env['TMPDIR'] = str(SHARED / 'tmp')
     env['LC_ALL'] = 'C'
-    build = SHARED / 'gcc-build/gcc'
+    build = Path(storage.gcc_build_dir(PROJECT)) / 'gcc'
     cc = [str(build / 'xgcc.exe'), '-B' + str(build) + '/']
     lint = runpy.run_path(str(ROOT / 'tools/knc_lint'))['lint']
 

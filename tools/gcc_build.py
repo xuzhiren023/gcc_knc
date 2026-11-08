@@ -1,16 +1,20 @@
 #!/usr/bin/env python3
 """Build the configured shared GCC tree, optionally skipping a current clean tree.
 
-Run through tools/run.py. This does not configure or install GCC.
+Run through tools/run.py. This does not install GCC, and configures only an empty slot 2 build
+(--slot 2 or KNC_GCC_SLOT=2), with slot 1's options.
 Example: python tools/run.py --name gcc-build -- python tools/gcc_build.py --if-stale
 """
 import argparse
 import json
 import os
 from pathlib import Path
+import re
 import shlex
 import subprocess
 import sys
+
+import storage
 
 ROOT = Path(__file__).resolve().parents[1]
 PROJECT = ROOT.parent.parent if ROOT.parent.name == '.work' else ROOT
@@ -48,6 +52,16 @@ def mddeps_healthy(build):
             and 'config/i386/sse.md' in text)
 
 
+def configure_like_slot_one(repo, build):
+    """Configure an empty slot 2 build with the options slot 1's build was configured with (S8-18)."""
+    status = Path(storage.gcc_build_dir(PROJECT, '1')) / 'config.status'
+    match = re.search(r'^ac_cs_config="(.*)"$', status.read_text(encoding='utf8', errors='replace'), re.M)
+    if not match:
+        raise OSError('no configure options in ' + str(status))
+    build.mkdir(parents=True, exist_ok=True)
+    command(['bash', repo / 'configure', *shlex.split(match.group(1))], build)
+
+
 def command(argv, cwd):
     print('+ (cd ' + shlex.quote(str(cwd)) + ' && ' + shlex.join(map(str, argv)) + ')', flush=True)
     subprocess.run(list(map(str, argv)), cwd=cwd, check=True)
@@ -55,17 +69,23 @@ def command(argv, cwd):
 
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--repo', type=Path, default=SHARED / 'gcc')
-    parser.add_argument('--build', type=Path, default=SHARED / 'gcc-build')
+    parser.add_argument('--slot', choices=sorted(storage.GCC_SLOTS),
+                        help='GCC tree and build to use (default: KNC_GCC_SLOT, else 1)')
+    parser.add_argument('--repo', type=Path)
+    parser.add_argument('--build', type=Path)
     parser.add_argument('--if-stale', action='store_true',
                         help='skip make when the last successful build has this clean Git tree')
     args = parser.parse_args(argv)
+    args.repo = args.repo or Path(storage.gcc_tree(PROJECT, args.slot))
+    args.build = args.build or Path(storage.gcc_build_dir(PROJECT, args.slot))
     stamp_path = args.build / '.gcc-build-stamp.json'
     try:
         commit = git(args.repo, 'rev-parse', 'HEAD')
         tree = git(args.repo, 'rev-parse', 'HEAD^{tree}')
         clean = not git(args.repo, 'status', '--porcelain', '--untracked-files=all')
         stamp = read_stamp(stamp_path)
+        if storage.gcc_slot(args.slot) == '2' and not (args.build / 'config.status').is_file():
+            configure_like_slot_one(args.repo, args.build)
         healthy = mddeps_healthy(args.build)
         if (args.if_stale and healthy and clean and stamp.get('clean') is True
                 and stamp.get('tree') == tree and stamp.get('make_args') == MAKE_ARGS):
