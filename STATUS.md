@@ -1,10 +1,10 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-08 03:29.
+Updated automatically at every ticket change. Last update: 2026-11-08 03:37.
 
 **Waiting for you:** S8-01. Run `python tools/pm.py inbox`.
 
-Current tickets: `[#################---]` 121 of 135
+Current tickets: `[#################---]` 122 of 138
 
 ## Milestones
 
@@ -13,7 +13,7 @@ Current tickets: `[#################---]` 121 of 135
 | M0 | Foundation | In progress | 17 of 17 tickets |
 | M1 | Mixed native code | Done | 43 of 43 tickets |
 | M2 | Useful vector target | Done | 51 of 51 tickets |
-| M3 | Runtimes | In progress | 10 of 12 tickets |
+| M3 | Runtimes | In progress | 11 of 15 tickets |
 | M4 | Broad optimization | Not started | Not planned in detail yet |
 | M5 | Program corpus | Not started | Not planned in detail yet |
 | M6 | Release | Not started | Not planned in detail yet |
@@ -155,11 +155,15 @@ Current tickets: `[#################---]` 121 of 135
 | S8-10 | Less ring traffic: 64-byte padding of per-thread data, and card check C11 (E5-16) | Not started | written under the owner's overnight blanket approval (2026-11-08). |
 | S8-11 | Sprint 8 batch check and paired M2 re-measure | Not started | written under the owner's overnight blanket approval (2026-11-08). |
 | S8-12 | Fix three weak S8-01 checks - C4 page offsets, C5 row aliasing, C9 memory chain | Not started | written under the owner's overnight blanket approval; S8-03's short-row acceptance waits for the C5 rerun. |
-| S9-01 | libgomp for KNC: futex, affinity, ring-aware barrier, spin-wait and malloc arenas (E6-03 input) | Waiting for review | Read-only; nothing built or run. docs/research/knc-libgomp.md (9e4ae16) fixed per review: (1) groups are a ... |
+| S9-01 | libgomp for KNC: futex, affinity, ring-aware barrier, spin-wait and malloc arenas (E6-03 input) | Done | We now have a build-and-design plan for GCC-KNC's own OpenMP runtime on the card: futex-based waits with de... |
 | S9-02 | libstdc++ for KNC: exceptions, RTTI, atomics, threads, packaging (E6-06 input) | Done | We now know how to build GCC 16's C++ library for the card: no newer glibc or kernel is needed, and built w... |
+| S9-03 | libstdc++ and libatomic build for k1om (E6-06a) | Not started | from S9-02's plan, under the owner's overnight blanket approval. Lead decisions: `--enable-clocale=generic`... |
+| S9-04 | libstdc++ packaging into the private prefix and a g++ link guard (E6-06b) | Not started | from S9-02's plan, under the owner's overnight blanket approval. Lead decisions: `--enable-clocale=generic`... |
+| S9-05 | libstdc++ runtime slice on the card (E6-06c) | Not started | from S9-02's plan, under the owner's overnight blanket approval. Lead decisions: `--enable-clocale=generic`... |
 
 ## Recent activity
 
+- 2026-11-08 03:37 **S9-01** lead approve: We now have a build-and-design plan for GCC-KNC's own OpenMP runtime on the card: futex-based waits with delay instead of pause, physical-core affi...
 - 2026-11-08 03:29 **S9-01** engineer submit: Read-only; nothing built or run. docs/research/knc-libgomp.md (9e4ae16) fixed per review: (1) groups are a pure function of team_id and total, set ...
 - 2026-11-08 03:28 **S9-02** lead approve: We now know how to build GCC 16's C++ library for the card: no newer glibc or kernel is needed, and built with the generic C-locale setting it cove...
 - 2026-11-08 03:19 **S9-02** engineer submit: docs/research/knc-libstdcxx.md answers Q1-5 with file:line evidence and a 3-ticket E6-06 plan. Static only: no build, no card. Host runs via run.py...
@@ -167,13 +171,12 @@ Current tickets: `[#################---]` 121 of 135
 - 2026-11-08 03:15 **S9-01** engineer submit: Read-only; nothing built or run on the card. docs/research/knc-libgomp.md (f130494) answers Q1-6 with file:line, each marked proven/inferred/unknow...
 - 2026-11-08 03:08 **S7-10** engineer submit: knc 497bbe8bedf0, build current. Drill: master 8 files/12 hunks all textual (new: libgfortran/configure #line hunks), gcc-16 0. Shared i386 644 lin...
 - 2026-11-08 02:52 **S8-01** lead escalate: Code review of the job 19 fix passes (red a21750f, green 51e844a: main now allocates every worker buffer before thread start, about 1 GB for C1 at ...
-- 2026-11-08 02:51 **S8-01** engineer submit: Job 19 fix: workers no longer allocate; main allocates each buffer before thread start, sized to the largest selected budget + 64 KiB (C1 at 60x4: ...
 
 ## Cost
 
 - From the script, engineer: 295 sessions, 702.6M input tokens
 - From the script, lead: 225 sessions, 68.7M input tokens
-- Started by hand, Claude: 10 sessions, 1732.3M input tokens
+- Started by hand, Claude: 10 sessions, 1733.6M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
