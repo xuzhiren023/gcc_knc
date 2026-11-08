@@ -25,6 +25,13 @@ def main():
         return subprocess.call([str(TC / 'cygwin/bin/python3.12.exe'), script, *sys.argv[1:]], env=env)
     os.environ['PATH'] = ':'.join(str(TC / p) for p in ('cross/bin', 'cygwin/bin')) + ':' + os.environ['PATH']
     os.environ['LC_ALL'] = 'C'
+    global OUT
+    args = sys.argv[1:]
+    # --out NAME stages under .work/_shared/NAME (S8-17 C12); default S8-01.
+    if '--out' in args:
+        i = args.index('--out')
+        OUT = SHARED / args[i+1]
+        del args[i:i+2]
     from kernels import emit
     emit(OUT)
     ccdir = SHARED / 'gcc-build/gcc'
@@ -32,7 +39,7 @@ def main():
           '-march=knc', '-O2', '-fno-tree-vectorize', '-ffp-contract=off',
           '-std=gnu11', '-Wall', '-Wextra', '-Werror', '-I' + str(OUT)]
     # Stop after a failed phase; a retry must name only the remaining phase.
-    action = sys.argv[1] if len(sys.argv) > 1 else 'all'
+    action = args[0] if args else 'all'
     if action in ('all', 'build'):
         run([*cc, '-S', HERE / 'driver.c', '-o', OUT / 'driver.s'])
         run([*cc, OUT / 'driver.s', OUT / 'kernels.s', '-pthread', '-lrt', '-o', OUT / 'knc-char.mic'])
@@ -45,6 +52,7 @@ def main():
              '-I' + str(OUT), HERE / 'driver.c', '-pthread', '-o', OUT / 'knc-char-host.exe'])
         run([sys.executable, HERE / 'check_args.py', OUT / 'knc-char-host.exe'])
         run([sys.executable, HERE / 'check_s8.py', OUT / 'knc-char-host.exe'])
+        run([sys.executable, HERE / 'check_c12.py', OUT / 'knc-char-host.exe'])
     if action not in ('all', 'build', 'lint', 'host'):
         raise ValueError('expected all, build, lint or host')
     return 0
