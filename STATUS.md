@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-08 12:41.
+Updated automatically at every ticket change. Last update: 2026-11-08 12:42.
 
 **Next: GPT-6.1, on S8-03 (Two-level software prefetch for KNC loops (E5-07)).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
@@ -145,7 +145,7 @@ Current tickets: `[#################---]` 127 of 149
 | S7-10 | Sprint 7 batch check after S7-05 and S7-08 | Done | Sprint 7's final compiler matches stock GCC 16.2 on x86 (1,962/1,962 identical at -O2 and -O2 -mavx512f), h... |
 | S8-01 | Card checks C1-C10 for the Sprint 8 tuning block - microbenchmarks in the knc-char corpus | Done | The knc-char corpus now measures the Sprint 8 tuning questions on the card (stores, prefetch, tails, accumu... |
 | S8-02 | Masked loop tails that never touch an unmapped page, chosen by length (E4-04) | Done | Short loops and loop tails on KNC now use masked vector code that never touches an unmapped page: mat8 is 3... |
-| S8-03 | Two-level software prefetch for KNC loops (E5-07) | Not started | S8-12's C5 rerun (padded arrays, knc-characterization.md C5): rows now profit from prefetch. Use L2 distanc... |
+| S8-03 | Two-level software prefetch for KNC loops (E5-07) | In progress | S8-12's C5 rerun (padded arrays, knc-characterization.md C5): rows now profit from prefetch. Use L2 distanc... |
 | S8-04 | Small-matrix kernels: diagnose mat8 and mat16, reject low lane use (E5-11 part 2) | Not started | written under the owner's overnight blanket approval (2026-11-08). |
 | S8-05 | Per-loop scalar-add cost choice that keeps both mat8 and the stencils (E5-11) | Not started | written under the owner's overnight blanket approval (2026-11-08). |
 | S8-06 | Memory-operand forms for V16SF/V8DF arithmetic and FMA (E5-17) | Not started | written under the owner's overnight blanket approval (2026-11-08). |
@@ -187,7 +187,7 @@ Current tickets: `[#################---]` 127 of 149
 
 - From the script, engineer: 303 sessions, 714.0M input tokens
 - From the script, lead: 225 sessions, 68.7M input tokens
-- Started by hand, Claude: 10 sessions, 1787.9M input tokens
+- Started by hand, Claude: 10 sessions, 1789.0M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
