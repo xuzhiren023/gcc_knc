@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-08 05:27.
+Updated automatically at every ticket change. Last update: 2026-11-08 06:58.
 
 **Next: GPT-6.1, on S8-02 (Masked loop tails that never touch an unmapped page, chosen by length (E4-04)).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
@@ -180,12 +180,12 @@ Current tickets: `[#################---]` 125 of 144
 
 ## Cost
 
-- From the script, engineer: 297 sessions, 708.4M input tokens
+- From the script, engineer: 298 sessions, 708.4M input tokens
 - From the script, lead: 225 sessions, 68.7M input tokens
-- Started by hand, Claude: 10 sessions, 1742.3M input tokens
+- Started by hand, Claude: 10 sessions, 1744.2M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 13.8 GiB of 100 GiB. 138 GiB free on the drive.
+The project uses 13.8 GiB of 100 GiB. 135 GiB free on the drive.
