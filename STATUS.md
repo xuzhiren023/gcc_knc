@@ -1,10 +1,10 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-08 05:08.
+Updated automatically at every ticket change. Last update: 2026-11-08 05:15.
 
-**Next: the tech lead, on S8-12.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: GPT-6.1, on S8-02 (Masked loop tails that never touch an unmapped page, chosen by length (E4-04)).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
-Current tickets: `[#################---]` 124 of 144
+Current tickets: `[#################---]` 125 of 144
 
 ## Milestones
 
@@ -154,7 +154,7 @@ Current tickets: `[#################---]` 124 of 144
 | S8-09 | KNC -O2 defaults: vectorizer cost model, stride versioning, predictive commoning (E5-18) | Not started | written under the owner's overnight blanket approval (2026-11-08). |
 | S8-10 | Less ring traffic: 64-byte padding of per-thread data, and card check C11 (E5-16) | Not started | written under the owner's overnight blanket approval (2026-11-08). |
 | S8-11 | Sprint 8 batch check and paired M2 re-measure | Not started | written under the owner's overnight blanket approval (2026-11-08). |
-| S8-12 | Fix three weak S8-01 checks - C4 page offsets, C5 row aliasing, C9 memory chain | Waiting for review | Red f0a241e, green e75fec0. C4: page i's node at line 5i mod 64; host --dry-run --layout walks each sibling... |
+| S8-12 | Fix three weak S8-01 checks - C4 page offsets, C5 row aliasing, C9 memory chain | Done | The knc-char checks C4, C5 and C9 are fixed and rebuilt: C4 now walks every page offset, C5's eight arrays ... |
 | S9-01 | libgomp for KNC: futex, affinity, ring-aware barrier, spin-wait and malloc arenas (E6-03 input) | Done | We now have a build-and-design plan for GCC-KNC's own OpenMP runtime on the card: futex-based waits with de... |
 | S9-02 | libstdc++ for KNC: exceptions, RTTI, atomics, threads, packaging (E6-06 input) | Done | We now know how to build GCC 16's C++ library for the card: no newer glibc or kernel is needed, and built w... |
 | S9-03 | libstdc++ and libatomic build for k1om (E6-06a) | Not started | from S9-02's plan, under the owner's overnight blanket approval. Lead decisions: `--enable-clocale=generic`... |
@@ -169,6 +169,7 @@ Current tickets: `[#################---]` 124 of 144
 
 ## Recent activity
 
+- 2026-11-08 05:15 **S8-12** lead approve: The knc-char checks C4, C5 and C9 are fixed and rebuilt: C4 now walks every page offset, C5's eight arrays no longer alias in L1 or L2, and C9's me...
 - 2026-11-08 05:08 **S8-12** engineer submit: Red f0a241e, green e75fec0. C4: page i's node at line 5i mod 64; host --dry-run --layout walks each sibling's cycle (checked: cycle=pages, page off...
 - 2026-11-08 05:03 **S8-01** lead approve: The knc-char corpus now measures the Sprint 8 tuning questions on the card (stores, prefetch, tails, accumulators, unroll, branches): NGO stores ar...
 - 2026-11-08 04:56 **S8-01** owner decide: Owner blanket approval 2026-11-08 (lead's recommended option): the lead's job 19 rerun passed (C1 at 60x4, exit 0, 240 workers accepted); approve.
@@ -176,13 +177,12 @@ Current tickets: `[#################---]` 124 of 144
 - 2026-11-08 03:37 **S9-01** lead approve: We now have a build-and-design plan for GCC-KNC's own OpenMP runtime on the card: futex-based waits with delay instead of pause, physical-core affi...
 - 2026-11-08 03:29 **S9-01** engineer submit: Read-only; nothing built or run. docs/research/knc-libgomp.md (9e4ae16) fixed per review: (1) groups are a pure function of team_id and total, set ...
 - 2026-11-08 03:28 **S9-02** lead approve: We now know how to build GCC 16's C++ library for the card: no newer glibc or kernel is needed, and built with the generic C-locale setting it cove...
-- 2026-11-08 03:19 **S9-02** engineer submit: docs/research/knc-libstdcxx.md answers Q1-5 with file:line evidence and a 3-ticket E6-06 plan. Static only: no build, no card. Host runs via run.py...
 
 ## Cost
 
 - From the script, engineer: 296 sessions, 704.4M input tokens
 - From the script, lead: 225 sessions, 68.7M input tokens
-- Started by hand, Claude: 10 sessions, 1740.2M input tokens
+- Started by hand, Claude: 10 sessions, 1740.6M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
