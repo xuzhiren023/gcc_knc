@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-08 05:04.
+Updated automatically at every ticket change. Last update: 2026-11-08 05:08.
 
-**Next: GPT-6.1, on S8-02 (Masked loop tails that never touch an unmapped page, chosen by length (E4-04)).** Run `python tools/dispatch.py`, or ask the tech lead to.
+**Next: the tech lead, on S8-12.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[#################---]` 124 of 144
 
@@ -154,7 +154,7 @@ Current tickets: `[#################---]` 124 of 144
 | S8-09 | KNC -O2 defaults: vectorizer cost model, stride versioning, predictive commoning (E5-18) | Not started | written under the owner's overnight blanket approval (2026-11-08). |
 | S8-10 | Less ring traffic: 64-byte padding of per-thread data, and card check C11 (E5-16) | Not started | written under the owner's overnight blanket approval (2026-11-08). |
 | S8-11 | Sprint 8 batch check and paired M2 re-measure | Not started | written under the owner's overnight blanket approval (2026-11-08). |
-| S8-12 | Fix three weak S8-01 checks - C4 page offsets, C5 row aliasing, C9 memory chain | In progress | written under the owner's overnight blanket approval; S8-03's short-row acceptance waits for the C5 rerun. |
+| S8-12 | Fix three weak S8-01 checks - C4 page offsets, C5 row aliasing, C9 memory chain | Waiting for review | Red f0a241e, green e75fec0. C4: page i's node at line 5i mod 64; host --dry-run --layout walks each sibling... |
 | S9-01 | libgomp for KNC: futex, affinity, ring-aware barrier, spin-wait and malloc arenas (E6-03 input) | Done | We now have a build-and-design plan for GCC-KNC's own OpenMP runtime on the card: futex-based waits with de... |
 | S9-02 | libstdc++ for KNC: exceptions, RTTI, atomics, threads, packaging (E6-06 input) | Done | We now know how to build GCC 16's C++ library for the card: no newer glibc or kernel is needed, and built w... |
 | S9-03 | libstdc++ and libatomic build for k1om (E6-06a) | Not started | from S9-02's plan, under the owner's overnight blanket approval. Lead decisions: `--enable-clocale=generic`... |
@@ -169,6 +169,7 @@ Current tickets: `[#################---]` 124 of 144
 
 ## Recent activity
 
+- 2026-11-08 05:08 **S8-12** engineer submit: Red f0a241e, green e75fec0. C4: page i's node at line 5i mod 64; host --dry-run --layout walks each sibling's cycle (checked: cycle=pages, page off...
 - 2026-11-08 05:03 **S8-01** lead approve: The knc-char corpus now measures the Sprint 8 tuning questions on the card (stores, prefetch, tails, accumulators, unroll, branches): NGO stores ar...
 - 2026-11-08 04:56 **S8-01** owner decide: Owner blanket approval 2026-11-08 (lead's recommended option): the lead's job 19 rerun passed (C1 at 60x4, exit 0, 240 workers accepted); approve.
 - 2026-11-08 04:55 **S7-10** lead approve: Sprint 7's final compiler matches stock GCC 16.2 on x86 (1,962/1,962 identical at -O2 and -O2 -mavx512f), has 0 ICE in both sweeps and textual-only...
@@ -176,16 +177,15 @@ Current tickets: `[#################---]` 124 of 144
 - 2026-11-08 03:29 **S9-01** engineer submit: Read-only; nothing built or run. docs/research/knc-libgomp.md (9e4ae16) fixed per review: (1) groups are a pure function of team_id and total, set ...
 - 2026-11-08 03:28 **S9-02** lead approve: We now know how to build GCC 16's C++ library for the card: no newer glibc or kernel is needed, and built with the generic C-locale setting it cove...
 - 2026-11-08 03:19 **S9-02** engineer submit: docs/research/knc-libstdcxx.md answers Q1-5 with file:line evidence and a 3-ticket E6-06 plan. Static only: no build, no card. Host runs via run.py...
-- 2026-11-08 03:17 **S9-01** lead changes: Citations spot-checked and correct (configure.tgt:88, x86/futex.h:120-124, imci.md:485-495, bar.h:98, wait.h:48-68, env.c:71-72); sections 1-3 and ...
 
 ## Cost
 
 - From the script, engineer: 295 sessions, 702.6M input tokens
 - From the script, lead: 225 sessions, 68.7M input tokens
-- Started by hand, Claude: 10 sessions, 1739.9M input tokens
+- Started by hand, Claude: 10 sessions, 1740.2M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 13.8 GiB of 100 GiB. 137 GiB free on the drive.
+The project uses 13.8 GiB of 100 GiB. 138 GiB free on the drive.
