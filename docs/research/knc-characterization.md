@@ -167,3 +167,206 @@ figure by 4: the core's cost per operation when all four threads issue.
 | `memory.load_rt` | 37.35 | 47.78 | 77.92 | 19.48 |
 | `memory.store_normal` | 38.28 | 48.93 | 79.83 | 19.96 |
 | `memory.store_stream` | 157.12 | 158.07 | 160.26 | 40.07 |
+
+## Sprint 8 tuning checks (S8-01, card 2026-11-07/08)
+
+Binary `.work/_shared/S8-01/knc-char.mic` (`s8/S8-01` at 3f5ccb2), one core (core 0's siblings) unless
+noted. Raw output: `.work/_shared/tmp/claude-s8-01/job1.out` to `job19.out`; job N is the Nth
+`card_run` line of the README job list, job 18 is an extra `vaddps.lat` check and job 19 reruns job 3.
+Figures are TSC ticks per unit **per thread** (median of five group medians, ADR-0010); `(x%)` is
+the group spread; `*` marks a regime-step flag (spread 2% or more, amendment 2).
+
+**Validity.** Every job: same boot, no overlapping job, no foreign process (only card_run's own
+`sleep`), clock policy identical at start and end.
+- Jobs 1, 2, 4-8, 10-18: exit 0, every point accepted.
+- Job 9 (C5, 2 threads): exit 3. `c5.row8.l1_0.l2_32` and `c5.row9.l1_0.l2_32` have median batches
+  of 212 and 233 ms (over 200 ms), so they are **invalid** under amendment 2 point 1. The other C5
+  row points at 2 threads are bimodal: samples in one point differ up to 6x (median point 1.9x),
+  so treat them as noisy.
+- Jobs 3 and 19 (C1 at 60 cores x 4 threads): exit 2, ENOMEM (`allocation (errno=12)` at worker 98;
+  `pthread_create`, then `allocation`, at worker 87). No data. The engineer is fixing the
+  allocation; **C1's 60-core point is pending**.
+- Job 18: `vaddps.lat` at 4 threads gives 4.22 against S6-03's 4.19, so the S8 binary agrees with
+  the S6-03 table.
+- Each line ran **once**, not the README's five launches. The cross-launch range is not measured.
+
+### C1: write-only memory-sized stores, one core (16 MiB per core, ticks per 64-byte line)
+
+| Store | 1 thread | 4 threads | Per core at 4 | GB/s, 1 thr | GB/s, 4 thr |
+|---|---:|---:|---:|---:|---:|
+| `vmovaps` | 37.94 (0.3%) | 79.58 (0.1%) | 19.9 | 2.1 | 4.0 |
+| `vmovnraps` | 156.41 (0.1%) | 160.14 (0.3%) | 40.0 | 0.5 | 2.0 |
+| `vmovnrngoaps` | 12.43 (0.2%) | 50.00 (0.3%) | 12.5 | 6.3 | 6.3 |
+
+Decides (E5-08): at one core, NGO stores plus the `lock addl` fence beat normal stores 3.1x at
+1 thread and 1.6x at 4 threads; NR stores are 2-4x slower than normal and should never be used. The
+60x4 point is still needed before NGO goes in by default.
+
+### C2: does `vprefetch` pair with a vector op (hot targets, ticks per instruction or pair)
+
+| Unit | 1 thread | 2 threads | 4 threads |
+|---|---:|---:|---:|
+| vector op | 2.08 (0.1%) | 2.07 (0.1%) | 4.19 (0.7%) |
+| `vprefetch0` | 1.07 (0.2%) | 1.09 (0.8%) | 2.13 (0.1%) |
+| `vprefetch1` | 1.92 (1.7%) | 4.52 (0.0%) | 9.01 (0.0%) |
+| vector + `vprefetch0` | 2.08 (0.0%) | 2.20 (0.2%) | 4.13 (0.1%) |
+| vector + `vprefetch1` | 2.09 (0.1%) | 4.52 (0.1%) | 9.02 (0.1%) |
+
+Decides (E5-07 cost model): `vprefetch0` pairs with a vector op and costs nothing extra;
+`vprefetch1` is limited to about one per 2.25 core cycles per core at 2-4 threads, and a vector op
+hides under it. Cost a `vprefetch1` at about 2 core cycles and issue it once per line. Targets were
+L1-resident, so the cost of a prefetch that misses is not measured.
+
+### C4: page-stride dependent loads (one load per 4 KiB page, ticks per load)
+
+| KiB per core | Pages per thread, 1 / 4 thr | 1 thread | 4 threads |
+|---:|---|---:|---:|
+| 128 | 32 / 8 | 24.11 (0.1%) | 4.13 (0.1%) |
+| 256 | 64 / 16 | 24.16 (0.1%) | 25.66 (0.3%) |
+| 384 | 96 / 24 | 24.17 (0.1%) | 25.66 (0.2%) |
+| 448 | 112 / 28 | 24.18 (0.0%) | 25.66 (0.0%) |
+
+Every load sits at the same page offset, so all lines of a thread fall in one 8-way L1 set. Loads
+therefore hit L2 (24-26, as `l2.load_lat`), except at 128 KiB and 4 threads, where 8 lines per
+thread fit the set and hit L1 (4.13, as `l1.load_lat`).
+Decides (I-2, E5-07 and blocking): no TLB knee up to 448 KiB per core (112 pages on one thread
+adds 0.07 ticks over 32 pages). Keep the L2 tile at the cache size; the 256 KB TLB-limited tile is
+not supported.
+
+### C5: software prefetch distance sweep (ticks per 64-byte row iteration; rows L1 distance, columns L2 distance, in iterations)
+
+2 threads per core:
+
+| Kernel, L1 | L2 0 | L2 32 | L2 64 | L2 128 |
+|---|---:|---:|---:|---:|
+| stream, 0 | 97.8 | 85.0 | 83.6 | 86.4 |
+| stream, 8 | 167.2 | 63.2 | 63.1 | 63.3 |
+| stream, 16 | 167.6 | **62.1** | 64.0 | 63.1 |
+| stream, 32 | 167.7 | 207.7 | 62.7 | 64.0 |
+| stream, 64 | 167.9 | 175.0 | 218.0 | 65.2 |
+| stencil, 0 | 100.4 | 84.7 | 88.3 | 88.6 |
+| stencil, 8 | 168.4 | 63.9 | 64.2 | 64.4 |
+| stencil, 16 | 167.8 | **63.3** | 65.4 | 65.1 |
+| stencil, 32 | 168.2 | 217.4 | 65.6 | 66.7 |
+| stencil, 64 | 169.2 | 177.4 | 227.0 | 76.5 |
+| row7, 0 | **601.5*** | 1933.6 | 1426.9 | 1016.3* |
+| row7, 8 | 1205.9* | 1659.5* | 1368.9* | 1065.6* |
+| row7, 16 | 1323.4* | 2448.6 | 2436.7 | 2427.5 |
+| row7, 32 | 2064.2 | 2283.0 | 2175.0 | 2194.5 |
+| row7, 64 | 1482.8 | 2174.9 | 1709.2* | 1550.8 |
+| row8, 0 | 621.2 | invalid | 1395.3 | 1065.8* |
+| row8, 8 | 849.1* | **558.7*** | 1401.3 | 1016.8* |
+| row8, 16 | 1608.3* | 2447.2 | 2453.9 | 2410.8 |
+| row8, 32 | 2063.8 | 2276.6 | 2217.1 | 2180.6 |
+| row8, 64 | 1476.0 | 2222.6 | 1746.0 | 1499.9 |
+| row9, 0 | **617.0** | invalid | 1390.4 | 1034.3 |
+| row9, 8 | 780.7 | 1475.7* | 1531.1* | 967.3* |
+| row9, 16 | 1402.5* | 2454.1 | 2452.5 | 2418.1 |
+| row9, 32 | 2063.6 | 2272.7 | 2182.2 | 2176.8 |
+| row9, 64 | 1568.0* | 2200.4 | 1689.5* | 1502.7 |
+
+4 threads per core:
+
+| Kernel, L1 | L2 0 | L2 32 | L2 64 | L2 128 |
+|---|---:|---:|---:|---:|
+| stream, 0 | 162.2 | 129.7 | 128.1 | 132.1 |
+| stream, 8 | 338.6 | 125.2 | 125.8 | 127.8 |
+| stream, 16 | 339.6 | **123.4** | 125.7 | 126.1 |
+| stream, 32 | 343.9 | 388.6 | 124.4 | 126.3 |
+| stream, 64 | 368.3 | 370.5 | 411.4 | 133.4 |
+| stencil, 0 | 161.4 | 131.6 | 132.1 | 132.8 |
+| stencil, 8 | 338.8 | 127.0 | 128.5 | 129.3 |
+| stencil, 16 | 340.6 | **126.2** | 126.8 | 130.1 |
+| stencil, 32 | 345.7 | 396.3 | 126.9 | 129.5 |
+| stencil, 64 | 367.9 | 374.2 | 420.1 | 137.9 |
+| row7, 0 | **2461.2** | 2902.4 | 2993.4 | 2896.0 |
+| row7, 8 | 2584.2* | 2842.4* | 2765.4* | 2560.8* |
+| row7, 16 | 3183.0* | 3334.0 | 3490.7 | 3406.9* |
+| row7, 32 | 3438.4 | 3573.0 | 3512.4 | 3525.7 |
+| row7, 64 | 3622.2 | 3674.1 | 3609.2 | 3696.8 |
+| row8, 0 | **2457.7** | 2927.0 | 2993.1 | 2906.7 |
+| row8, 8 | 2590.7* | 2811.7* | 2775.6* | 2552.7* |
+| row8, 16 | 3121.6* | 3341.8 | 3453.8* | 3421.1* |
+| row8, 32 | 3437.5 | 3537.8 | 3555.8 | 3539.3 |
+| row8, 64 | 3639.3 | 3670.0 | 3615.5 | 3693.0 |
+| row9, 0 | **2464.0** | 2910.4 | 2990.5 | 2903.0 |
+| row9, 8 | 2591.9 | 2826.4* | 2765.6* | 2632.2* |
+| row9, 16 | 3188.2* | 3367.6 | 3450.8 | 3422.2* |
+| row9, 32 | 3424.9 | 3569.7 | 3523.7 | 3541.2 |
+| row9, 64 | 3593.8 | 3674.9 | 3605.7 | 3694.1 |
+
+Stream and stencil spreads are all under 2%. Row points: 21 flagged at 2 threads (up to 36%, row7
+8/32) and 18 at 4 threads (up to 5.8%).
+Rows cost twice as much per core at 4 threads as at 2 (615 against 305 ticks per row): 8 streams
+per thread overflow the 16-stream hardware prefetcher at 4 threads (I-3). The 8 row arrays are
+1 MiB apart, so a row's 8 lines share one 8-way L1 set; the row results are an aliased worst case.
+Decides (E5-07): for stream and stencil, best L1/L2 = 16/32 at both 2 and 4 threads (about 1.6x
+and 1.3x over no prefetch); ICC's 32/64 is within 4% of best; L2 distance must exceed L1, and L1
+prefetch without L2 prefetch is 1.7-2.3x slower than none. For 8-stream short rows, no software
+prefetch was best at the swept distances (one flagged exception); rerun rows with padded arrays
+before setting the many-stream rule.
+
+### C6: loop tails for `y = x + 1`, lengths 1-33 (ticks per call)
+
+x87 is linear: 7.05 ticks per element at 1 thread, 16.03 at 4 threads. The other strategies are
+constant within 1-15 and 17-31. Peel starts one float off alignment, so it runs 15 scalar
+elements before any vector (the worst case).
+
+| n | x87, 1 thr | aligned | peel | gather | x87, 4 thr | aligned | peel | gather |
+|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| 1 | **7.1** | 13.2 | 7.1 | 19.2 | **16.2** | 24.8 | 16.2 | 49.8 |
+| 2 | 14.2 | **13.2** | 14.2 | 19.2 | 32.2 | **24.7** | 32.2 | 49.7 |
+| 3 | 21.2 | **13.2** | 21.2 | 19.2 | 48.2 | **24.8** | 48.2 | 49.7 |
+| 4 | 28.2 | **13.2** | 28.2 | 19.2 | 64.3 | **24.8** | 64.2 | 49.8 |
+| 5-15 | 35-106 | **13.2** | 35-106 | 19.2 | 80-241 | **24.7** | 80-241 | 49.8 |
+| 16 | 112.8 | **13.2** | 120.8 | **13.2** | 256.6 | **24.7** | 270.7 | **24.6** |
+| 17-31 | 120-219 | **26.3** | 120.8 | 32.3 | 273-497 | **49.3** | 270.8 | 74.7 |
+| 32 | 225.2 | **26.3** | 133.9 | **26.3** | 513.2 | 49.3 | 296.1 | **49.0** |
+| 33 | 232.6 | **39.3** | 133.9 | 45.4 | 529.2 | **73.7** | 296.1 | 99.2 |
+
+All spreads under 2% except `c6.aligned.n6` at 4 threads (2.4%).
+Decides (E4-04, E5-11): an aligned masked tail beats x87 from n = 2 at 1 and 4 threads; a gather
+tail beats x87 from n = 3 at 1 thread and n = 4 at 4 threads, and costs 6 ticks (1 thread) to 25
+ticks (4 threads, 2x) more than an aligned masked vector; a scalar peel to alignment loses to the
+gather tail at every length 1-33. Order: aligned masked tail, then gather tail; scalar only at n = 1.
+A masked vector peel was not measured.
+
+### C7: reduction with 1 or 2 accumulators, 4 threads per core (ticks per 16-lane update)
+
+| Accumulators | 4 threads |
+|---|---:|
+| 1 | 4.13 (0.2%) |
+| 2 | 4.13 (0.0%) |
+
+Decides (I-11, chain choice in `knc-costs.md`): 2 accumulators lose nothing at 4 threads, so 2 can
+be the default at every density. The gain at 2 threads is not measured here.
+
+### C9: unroll 1, 2, 4 on a dependent vector add (ticks per update)
+
+| Chain | 1 thread | 2 threads |
+|---|---:|---:|
+| register, u1 | 4.02 (0.1%) | 4.02 (0.0%) |
+| register, u2 | 3.02 (0.0%) | 3.01 (0.0%) |
+| register, u4 | 2.52 (0.1%) | 2.51 (0.1%) |
+| memory operand, u1 | 4.03 (0.0%) | 4.02 (0.1%) |
+| memory operand, u2 | 3.02 (0.1%) | 3.01 (0.0%) |
+| memory operand, u4 | 2.52 (0.1%) | 2.51 (0.0%) |
+
+The loop costs about 2 ticks per vector op plus 2 per loop branch, so u2 already covers the
+4-cycle latency and u4 only saves branches. The memory-operand chain costs the same as the register
+chain: the folded load is off the recurrence, so this is not the 12-cycle chain the check asked for.
+Decides (E5-09, SMS): unroll 4 is best at 1 and 2 threads per core (25% then 17% gains); no
+latency-bound gap appears, so no case for SMS from C9. A folded load adds no cost (E5-17).
+
+### C10: branch-mispredict cost (ticks per branch)
+
+| Branch | 1 thread | 4 threads |
+|---|---:|---:|
+| fixed direction | 6.22 (0.0%) | 17.02 (0.0%) |
+| pseudorandom | 11.27 (0.0%) | 27.76 (0.1%) |
+| difference | 5.05 | 10.74 (2.7 per core) |
+
+Decides (E7-04): an unpredictable branch costs 5 ticks more at 1 thread, about 10 cycles per
+mispredict if half of the random branches miss; at 4 threads it costs 2.7 cycles per core. Set
+`BRANCH_COST` from about 10 cycles; a branchless sequence pays when it adds under about 5 ticks per
+unpredictable branch.
