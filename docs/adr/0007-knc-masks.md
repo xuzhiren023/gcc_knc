@@ -56,6 +56,8 @@ its scalar-mask branch needs `TARGET_AVX512F`.
    - a prefix-masked pair issues its high half only when the elements reach the next line.
 
    The rule lives in the `maskload`/`maskstore` expanders, so the cost model cannot break it.
+   (2026-11-08: the profitability part below is superseded by ADR-0009 amendment 1 point 9 and S8-01's
+   C6: gather/scatter tails for unknown alignment; the safety rule above stands.)
    Profitability: the KNC term in `finish_cost` asks for a masked epilogue only when every data
    reference is known 64-byte aligned after peeling; otherwise the x87 epilogue stays. Masks come
    from a scalar `while_ult`. `param_vect_partial_vector_usage` stays 0 (no fully masked main
