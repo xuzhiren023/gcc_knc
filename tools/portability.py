@@ -191,9 +191,20 @@ def x86(args):
         raise RuntimeError('refusing x86 while make.exe is running')
     if len(args.tree) != 2:
         raise RuntimeError('x86 needs exactly two --tree arguments')
-    sources = sorted((args.repo / CORPUS).rglob('*.c'))
+    corpus = args.repo / CORPUS
+    if args.source:
+        # Repo-relative globs instead of the torture compile corpus (S8-03:
+        # the gcc.dg builtin-prefetch files at -O3 -fprefetch-loop-arrays).
+        corpus = args.repo
+        sources = sorted({source for pattern in args.source for source in args.repo.glob(pattern)})
+        if not sources:
+            raise RuntimeError('no source matches ' + ' '.join(args.source))
+    else:
+        sources = sorted(corpus.rglob('*.c'))
     if not sources:
-        raise RuntimeError('empty torture compile corpus: ' + str(args.repo / CORPUS))
+        raise RuntimeError('empty torture compile corpus: ' + str(corpus))
+    flag_sets = ([shlex.split(flags) for flags in args.flags] if args.flags
+                 else [['-O2'], ['-O2', '-mavx512f']])
     home = args.home.resolve() if args.home else args.shared / 'portability'
     compilers = [build_cc1(args.repo, args.shared, tree, slot, home=home)
                  for tree, slot in zip(args.tree, ('a', 'b'))]
@@ -204,14 +215,14 @@ def x86(args):
     dialects = {source: torture_dialect_options(source) for source in sources}
     for source, options in dialects.items():
         if options:
-            print('Dialect options ' + source.relative_to(args.repo / CORPUS).as_posix() +
+            print('Dialect options ' + source.relative_to(corpus).as_posix() +
                   ': ' + shlex.join(options), flush=True)
     with tempfile.TemporaryDirectory(dir=output) as temporary:
         assemblies = [Path(temporary) / (slot + '.s') for slot in ('a', 'b')]
-        for flags in (['-O2'], ['-O2', '-mavx512f']):
+        for flags in flag_sets:
             identical = different = both_failed = errors = 0
             for source in sources:
-                name = source.relative_to(args.repo / CORPUS).as_posix()
+                name = source.relative_to(corpus).as_posix()
                 outcomes = []
                 for compiler, assembly in zip(compilers, assemblies):
                     assembly.unlink(missing_ok=True)
@@ -279,6 +290,10 @@ def main(argv=None):
                             help='directory holding x86-a and x86-b (default: SHARED/portability)')
     x86_parser.add_argument('--skip-make-check', action='store_true',
                             help='skip tasklist after independently confirming no build is running')
+    x86_parser.add_argument('--flags', action='append',
+                            help='one flag set per use (default: "-O2" and "-O2 -mavx512f")')
+    x86_parser.add_argument('--source', action='append',
+                            help='repo-relative glob of sources instead of the torture compile corpus')
     for command_parser in (drill_parser, x86_parser):
         command_parser.add_argument('--repo', type=Path, default=Path(storage.gcc_tree(PROJECT)))
     args = parser.parse_args(argv)
