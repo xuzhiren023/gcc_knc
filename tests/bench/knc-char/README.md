@@ -1,5 +1,16 @@
 # S6-03 machine characterization
 
+## S8-07 vpmadd231d row (lead job, not run by the engineer)
+
+`vpmulld`, `vpmadd231d` and the pair `vpmulld_vpaddd` (unit is one dependent
+pair, `instructions=2`), each `.lat` and `.rt`. Built with `build.py --out S8-07`.
+One `--case` per launch, so six lines with `NAME` each of `vpmulld`, `vpmadd231d`,
+`vpmulld_vpaddd` and `MODE` each of `lat`, `rt`:
+
+```text
+python tools/card_run --benchmark --threads 1 --timeout 120 ../_shared/S8-07/knc-char.mic --native --cores 1 --threads 1 --case NAME.MODE
+```
+
 ## S8-17 C12: power by rail (lead job, not run by the engineer)
 
 `c12.c`, included by `driver.c`, answers why the card stays at 160-180 W after

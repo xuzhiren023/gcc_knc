@@ -29,6 +29,8 @@ PACKED = re.compile(r'\bv(?:addn?|subr?|mul|div|max|min|sqrt|rcp(?:23)?|rsqrt(?:
 # Each entry supplies its CLI help and handlers for the tiers it selects.
 # Imports stay lazy so T0 and source-only selections need no probe modules.
 SELECTIONS = {
+    'int_madd': ('S8-07 V16SI multiply-add as vpmadd231d', {
+        't1': lambda runner: runner.t1_sources([runner.source_dir / 'knc-vec-imadd.c'])}),
     'knc_scheduler': ('S6-06 vector/scalar pairing and address separation', {
         't1': lambda runner: runner.t1_sources([runner.source_dir / 'knc-scheduler.c'])}),
     'knc_costs': ('S6-05 measured KNC vectorizer cost decisions', {
