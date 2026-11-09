@@ -15,6 +15,7 @@ M1 is accepted and tagged `m1` locally; nothing is pushed. Engineers are Claude 
 
 | Claim | Evidence | Rerun with |
 |---|---|---|
+| S8-03 two-level prefetch (knc `028f9f3`): L2 2 KiB / L1 1 KiB ahead, in bytes, run-time trip guard | card 2026-11-09 00:25-00:57Z paired against S8-02: L2 affine 0.79-0.89, memory d2 0.96-0.98, short 17 0.87-0.92; short 5/13 1.09-1.13 accepted (S8-08 follow-up); x86 identical at -O2, -O2 -mavx512f and -O3 -fprefetch-loop-arrays | `bash .work/_shared/tmp/claude-s8-03-r3/run.sh` |
 | S8-02 masked tails never touch an unmapped page (knc `836a0e255e5`) | card 2026-11-08 19:04-19:10Z: guard sweep PASS 96,132 checks, controls 1-3 exit 3, s4_masks/s5_ops as expected (neg fails only the six div/sqrt sets); M2 paired: mat8 0.29, short 13 0.55-0.59, remainder 1-3 1.19-1.29 accepted | `bash .work/_shared/tmp/claude-s8-02-r3/run.sh` |
 | The lint rejects the listed instructions and passes legal code | Rerun on `main`; four deliberate breaks to the lint were all caught by its tests | `python -m unittest tests.tools.test_knc_lint` |
 | The harness enforces its limits, and runs engineer sessions on `gpt-6.1-sol` at high effort in Codex fast mode (`service_tier="priority"`, per the owner on 2026-11-02) | 84 tests in temporary repositories passed on `main` on 2026-11-03 (lead rerun, 248 s). The fast-mode test was red first (`ae1d72b`). The Codex model catalog lists `priority`, named Fast, for `gpt-6.1-sol` | `python -m unittest discover -s tests/tools -p "test_*.py"` |
