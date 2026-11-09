@@ -1,10 +1,10 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-09 00:13.
+Updated automatically at every ticket change. Last update: 2026-11-09 01:41.
 
 **Waiting for you:** S8-04. Run `python tools/pm.py inbox`.
 
-Current tickets: `[#################---]` 130 of 150
+Current tickets: `[#################---]` 131 of 150
 
 ## Milestones
 
@@ -149,7 +149,7 @@ Current tickets: `[#################---]` 130 of 150
 | S8-04 | Small-matrix kernels: diagnose mat8 and mat16, reject low lane use (E5-11 part 2) | **Waiting for you** | budget: 4 engineer sessions used; the budget is 4 |
 | S8-05 | Per-loop scalar-add cost choice that keeps both mat8 and the stencils (E5-11) | Not started | written under the owner's overnight blanket approval (2026-11-08). |
 | S8-06 | Memory-operand forms for V16SF/V8DF arithmetic and FMA (E5-17) | Done | KNC vector add, sub, mul and FMA now read aligned memory and {1to16}/{1to8} broadcasts directly instead of ... |
-| S8-07 | vpmadd231d for V16SI multiply-add (E5-14) | Waiting for review | Lead withdraws a scripted escalation: the missing results are the lead's own card runs (knc-char row, imadd... |
+| S8-07 | vpmadd231d for V16SI multiply-add (E5-14) | Done | KNC now emits vpmadd231d for vector integer multiply-add: one instruction at 4 ticks latency instead of vpm... |
 | S8-08 | -mtune=knc tune-flag audit (E5-12) | Not started | also re-measure M2 short at lengths 5 and 13 under the alignment default. S8-03 (prefetch versioning) left ... |
 | S8-09 | KNC -O2 defaults: vectorizer cost model, stride versioning, predictive commoning (E5-18) | Not started | written under the owner's overnight blanket approval (2026-11-08). |
 | S8-10 | Less ring traffic: 64-byte padding of per-thread data, and card check C11 (E5-16) | Not started | written under the owner's overnight blanket approval (2026-11-08). |
@@ -175,23 +175,23 @@ Current tickets: `[#################---]` 130 of 150
 
 ## Recent activity
 
+- 2026-11-09 01:41 **S8-07** lead approve: KNC now emits vpmadd231d for vector integer multiply-add: one instruction at 4 ticks latency instead of vpmulld plus vpaddd at 8 (measured on the c...
 - 2026-11-09 00:13 **S8-07** lead withdraw: Lead withdraws a scripted escalation: the missing results are the lead's own card runs (knc-char row, imadd execute test, s4/s5, M2 paired), not an...
 - 2026-11-09 00:11 **S8-07** lead escalate: Code review clean (imci.md *knc_maddv16si4, TARGET_KNC only; red 2043042 -> green 60bef4e6ee4). Not approved: lead-run results missing from the tic...
 - 2026-11-09 00:10 **S8-07** engineer submit: Red 2043042, green gcc-2 60bef4e6ee4 (imci.md only, TARGET_KNC, no shared i386 lines; x86 identical by construction, not run): int_madd T1 FAIL->PA...
+- 2026-11-09  **S8-07** lead note: card 06:14-06:32Z (.work/_shared/tmp/claude-s8-07-out). knc-char at 1 thread: vpmadd231d lat 4.02, rt 2.07 ticks, equal to vpmulld (4.01/2.07); the...
+- 2026-11-09  **S8-07** lead note: review accepted (imci.md only, all TARGET_KNC, so x86 holds by construction; the test-line overage is the card execute test the ticket asked for). ...
 - 2026-11-08 23:17 **S8-04** lead escalate: budget: 4 engineer sessions used; the budget is 4
 - 2026-11-08 23:16 **S8-06** lead approve: KNC vector add, sub, mul and FMA now read aligned memory and {1to16}/{1to8} broadcasts directly instead of loading into a register first: mat16 is ...
-- 2026-11-08 23:07 **S8-04** lead changes: S8-06 already removes the x87 bridge, better: it folds the broadcast into the FMA ({1to16}), with mat16 at 0.47 as here. Your split adds a separate...
-- 2026-11-08 22:31 **S8-04** engineer submit: Green at GCC 800ef2e on knc 028f9f3 (knc unmoved, S8-06 not merged: no rebase, one split). vec_duplicate insn split in imci.md + i386-knc.cc only, ...
-- 2026-11-08 22:27 **S8-04** lead approve-red: Red approved: at 028f9f3 all six directives fail on the x87 bridge itself (fstps/fstpl to the stack, vbroadcasts from (%rsp), vpermf32x4) in the j ...
 
 ## Cost
 
 - From the script, engineer: 318 sessions, 746.2M input tokens
 - From the script, lead: 228 sessions, 69.5M input tokens
-- Started by hand, Claude: 10 sessions, 1864.1M input tokens
+- Started by hand, Claude: 10 sessions, 1870.8M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 15.7 GiB of 100 GiB. 148 GiB free on the drive.
+The project uses 15.7 GiB of 100 GiB. 147 GiB free on the drive.
