@@ -37,12 +37,14 @@ fma_f32 (float *restrict y, const float *restrict x, const float *restrict p,
     y[i] = p[0] * x[i] + p[1];
 }
 
-/* A matrix column times one scalar per step: the M2 mat16 shape.  */
+/* A matrix column times one scalar per step: the M2 mat16 shape.  The
+   column is not known aligned, so only the scalar can fold.  (With an
+   aligned column either load folds, at the same instruction count.)  */
 void
 bcast_f32 (float *restrict y, const float *restrict a, const float *restrict x,
            int n)
 {
-  y = A (y); a = A (a);
+  y = A (y);
   for (int j = 0; j < n; j++)
     for (int r = 0; r < 16; r++)
       y[r] += a[j * 16 + r] * x[j];
@@ -52,7 +54,7 @@ void
 bcast_f64 (double *restrict y, const double *restrict a,
            const double *restrict x, int n)
 {
-  y = A (y); a = A (a);
+  y = A (y);
   for (int j = 0; j < n; j++)
     for (int r = 0; r < 8; r++)
       y[r] += a[j * 8 + r] * x[j];
