@@ -6,6 +6,7 @@ import shutil
 import subprocess
 import sys
 import tempfile
+import time
 import unittest
 from unittest import mock
 
@@ -451,6 +452,17 @@ class Dispatcher(Sandbox):
             with mock.patch.object(dispatch.subprocess, "run") as run:
                 self.assertFalse(dispatch.run_session(board, ticket, "lead", False))
             run.assert_not_called()
+
+    def test_session_timeout_kills_what_the_session_started(self):
+        import dispatch
+        beat = os.path.join(self.root, "beat")
+        grandchild = "import time\nwhile True:\n    open(%r, 'a').write('.'); time.sleep(0.2)\n" % beat
+        child = "import subprocess, sys, time\nsubprocess.Popen([sys.executable, '-c', %r])\ntime.sleep(60)\n" % grandchild
+        output, code = dispatch.run_session_process([sys.executable, "-c", child], self.root, None, 20)
+        self.assertEqual(code, "timeout")
+        size = os.path.getsize(beat)
+        time.sleep(1.5)
+        self.assertEqual(os.path.getsize(beat), size)
 
     def test_ticket_backend_overrides_the_policy_backend(self):
         import dispatch

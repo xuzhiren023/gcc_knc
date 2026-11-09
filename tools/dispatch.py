@@ -189,6 +189,30 @@ def refresh_status(board):
         print("  Status page not updated: %s" % problem)
 
 
+def run_session_process(command, cwd, env, timeout):
+    """Run one session; return (output, exit code or "timeout"). On timeout kill the whole process
+    tree: a session's builds and checks otherwise run on for hours after it (S8-13, 2026-11-09)."""
+    # codex exec waits for end of input on an inherited stdin.
+    process = subprocess.Popen(command, cwd=cwd, env=env, stdin=subprocess.DEVNULL, stdout=subprocess.PIPE,
+                               stderr=subprocess.STDOUT, universal_newlines=True, encoding="utf8",
+                               errors="replace", start_new_session=sys.platform != "win32")
+    try:
+        output, _ = process.communicate(timeout=timeout)
+        return output, process.returncode
+    except subprocess.TimeoutExpired:
+        if sys.platform == "win32":
+            subprocess.call(["taskkill", "/T", "/F", "/PID", str(process.pid)],
+                            stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        else:
+            os.killpg(process.pid, 9)
+        try:
+            output, _ = process.communicate(timeout=60)
+        except subprocess.TimeoutExpired:
+            process.kill()
+            output = ""
+        return str(output or ""), "timeout"
+
+
 def run_session(board, ticket, role, dry_run):
     if role == "engineer":
         reason = over_budget(board, ticket)
@@ -221,14 +245,7 @@ def run_session(board, ticket, role, dry_run):
     free_before = shutil.disk_usage(board.root).free
     before = (ticket.state, ticket.fields.get("head"))
     try:
-        # codex exec waits for end of input on an inherited stdin.
-        done = subprocess.run(command, cwd=cwd, env=session_env(board, ticket, role), stdin=subprocess.DEVNULL,
-                              stdout=subprocess.PIPE,
-                              stderr=subprocess.STDOUT, universal_newlines=True, encoding="utf8",
-                              errors="replace", timeout=timeout)
-        output, code = done.stdout, done.returncode
-    except subprocess.TimeoutExpired as expired:
-        output, code = str(expired.stdout or ""), "timeout"
+        output, code = run_session_process(command, cwd, session_env(board, ticket, role), timeout)
     except FileNotFoundError:
         print("  Could not find the %s command line, so no session ran and the ticket is unchanged.\n"
               "  Ask a Claude or Codex session to take this ticket instead (see KICKOFF.md)." % role)
