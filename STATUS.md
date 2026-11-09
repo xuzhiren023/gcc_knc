@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-09 13:30.
+Updated automatically at every ticket change. Last update: 2026-11-09 13:34.
 
 **Next: the tech lead, on S8-13.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
@@ -150,7 +150,7 @@ Current tickets: `[#################---]` 134 of 150
 | S8-05 | Re-check the scalar-add cost on mat8 and the stencils after S8-06 (E5-11) | Done | No per-loop add-cost work is needed: with the cheaper add cost mat8 now compiles to the same code as today,... |
 | S8-06 | Memory-operand forms for V16SF/V8DF arithmetic and FMA (E5-17) | Done | KNC vector add, sub, mul and FMA now read aligned memory and {1to16}/{1to8} broadcasts directly instead of ... |
 | S8-07 | vpmadd231d for V16SI multiply-add (E5-14) | Done | KNC now emits vpmadd231d for vector integer multiply-add: one instruction at 4 ticks latency instead of vpm... |
-| S8-08 | -mtune=knc tune-flag audit (E5-12) | In progress | also re-measure M2 short at lengths 5 and 13 under the alignment default. S8-03 (prefetch versioning) left ... |
+| S8-08 | -mtune=knc tune-flag audit (E5-12) | In progress | Two sessions timed out (ended 11:53 and 13:30) with progress: red bd7b00d, FAST_PREFIX off (a47e96e449e, 22... |
 | S8-09 | KNC -O2 defaults: vectorizer cost model, stride versioning, predictive commoning (E5-18) | Not started | written under the owner's overnight blanket approval (2026-11-08). |
 | S8-10 | Less ring traffic: 64-byte padding of per-thread data, and card check C11 (E5-16) | Done | Per-thread arrays and the OpenMP shared block now start on their own 64-byte line, and the C11 card check s... |
 | S8-11 | Sprint 8 batch check and paired M2 re-measure | Not started | add one compiler-prefetch card case, because S8-03's card run has no row kernel (C5's rows are hand-written... |
@@ -175,6 +175,7 @@ Current tickets: `[#################---]` 134 of 150
 
 ## Recent activity
 
+- 2026-11-09 13:34 **S8-08** lead note: Two sessions timed out (ended 11:53 and 13:30) with progress: red bd7b00d, FAST_PREFIX off (a47e96e449e, 223c9dce26d), audit table eb40ad2, A/A ali...
 - 2026-11-09 12:04 **S8-13** lead card: Card 16:20-17:02Z, frozen d74bda170a4 (tmp/claude-s8-13): publish PASS stale=0 twice (120 pairs x 20 rounds); no-fence control also stale=0 (the ca...
 - 2026-11-09 11:12 **S8-13** engineer submit: Green gcc-2 s8/S8-13 d74bda170a4 on knc cba9fe1: KNC storent + fence, shared i386 hooks (sse.md 1 hunk, i386-builtins.cc 1 hunk), loop-prefetch L2-...
 - 2026-11-09 11:00 **S8-13** lead budget: sessions 5 (owner 2026-11-09). Submit only: green d74bda170a4 and its checks are done (10:26 note).
@@ -182,16 +183,15 @@ Current tickets: `[#################---]` 134 of 150
 - 2026-11-09 10:41 **S8-13** lead escalate: budget: 4 engineer sessions used; the budget is 4
 - 2026-11-09 10:36 **S8-13** lead approve-red: Red approved: each NGO function must fence after its last streaming store and before the ret or the publishing flag store, the guard-constant and p...
 - 2026-11-09 10:26 **S8-13** engineer red: Red is the lead's 012e79e (fails at the first NGO scan against knc cba9fe1; negatives hold). Submit refused: red_approved unset after the lead chan...
-- 2026-11-09 10:13 **S8-13** lead note: Two engineer sessions (07:57, 09:51) timed out with nothing committed after 012e79e. The first session started the x86 check at 07:07 (tools/portab...
 
 ## Cost
 
 - From the script, engineer: 328 sessions, 754.2M input tokens
 - From the script, lead: 229 sessions, 69.8M input tokens
-- Started by hand, Claude: 10 sessions, 1915.8M input tokens
+- Started by hand, Claude: 10 sessions, 1917.4M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 15.8 GiB of 100 GiB. 92 GiB free on the drive.
+The project uses 15.8 GiB of 100 GiB. 99 GiB free on the drive.
