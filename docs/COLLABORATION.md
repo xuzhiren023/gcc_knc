@@ -79,6 +79,9 @@ branches, into `main` and `knc`, or neither. Nothing is pushed.
 5. **Tickets stay short:** 80 lines for the brief. Lasting knowledge moves to the code, an ADR or a component brief.
 6. **Two review rounds, then a person.** A third round of requested changes goes to the owner, because something is wrong with the ticket or the design.
 7. **Escalate up, one level at a time.** Engineer asks the lead. The lead answers or escalates to the owner.
+8. **Session budgets: the lead extends.** At a ticket's session budget the lead adds a session and records
+   it on the ticket. Only after two extensions in a row make no progress (no commit, state change or new
+   evidence) does it go to the owner (owner, 2026-11-09).
 
 ## What you see
 
