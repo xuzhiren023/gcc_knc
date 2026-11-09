@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-08 18:23.
+Updated automatically at every ticket change. Last update: 2026-11-08 19:01.
 
 **Next: GPT-6.1, on S8-03 (Two-level software prefetch for KNC loops (E5-07)).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
@@ -186,7 +186,7 @@ Current tickets: `[#################---]` 128 of 150
 
 ## Cost
 
-- From the script, engineer: 308 sessions, 728.5M input tokens
+- From the script, engineer: 309 sessions, 728.5M input tokens
 - From the script, lead: 226 sessions, 68.9M input tokens
 - Started by hand, Claude: 10 sessions, 1820.2M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
@@ -194,4 +194,4 @@ Current tickets: `[#################---]` 128 of 150
 
 ## Disk
 
-The project uses 15.7 GiB of 100 GiB. 158 GiB free on the drive.
+The project uses 15.7 GiB of 100 GiB. 155 GiB free on the drive.
