@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-08 19:53.
+Updated automatically at every ticket change. Last update: 2026-11-08 20:02.
 
-**Next: GPT-6.1, on S8-03 (Two-level software prefetch for KNC loops (E5-07)).** Run `python tools/dispatch.py`, or ask the tech lead to.
+**Next: the tech lead, on S8-03.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[#################---]` 128 of 150
 
@@ -145,12 +145,12 @@ Current tickets: `[#################---]` 128 of 150
 | S7-10 | Sprint 7 batch check after S7-05 and S7-08 | Done | Sprint 7's final compiler matches stock GCC 16.2 on x86 (1,962/1,962 identical at -O2 and -O2 -mavx512f), h... |
 | S8-01 | Card checks C1-C10 for the Sprint 8 tuning block - microbenchmarks in the knc-char corpus | Done | The knc-char corpus now measures the Sprint 8 tuning questions on the card (stores, prefetch, tails, accumu... |
 | S8-02 | Masked loop tails that never touch an unmapped page, chosen by length (E4-04) | Done | round 3 card confirmation (19:04-19:10Z, binaries frozen in .work/_shared/tmp/claude-s8-02-r3, outputs in c... |
-| S8-03 | Two-level software prefetch for KNC loops (E5-07) | In progress | first round-3 card attempt (00:20Z) failed in infrastructure, not the program: two jobs hit "upload-claude-... |
+| S8-03 | Two-level software prefetch for KNC loops (E5-07) | Waiting for review | Round 3 done, GCC 8c18be9: run-time trip counts versioned on niter >= 4 x far distance, prefetched copy lik... |
 | S8-04 | Small-matrix kernels: diagnose mat8 and mat16, reject low lane use (E5-11 part 2) | Not started | written under the owner's overnight blanket approval (2026-11-08). |
 | S8-05 | Per-loop scalar-add cost choice that keeps both mat8 and the stencils (E5-11) | Not started | written under the owner's overnight blanket approval (2026-11-08). |
 | S8-06 | Memory-operand forms for V16SF/V8DF arithmetic and FMA (E5-17) | In progress | written under the owner's overnight blanket approval (2026-11-08). |
 | S8-07 | vpmadd231d for V16SI multiply-add (E5-14) | Not started | written under the owner's overnight blanket approval (2026-11-08). |
-| S8-08 | -mtune=knc tune-flag audit (E5-12) | Not started | code placement swings hot loops by 20 % or more. In S8-03's paired run, m2_mat8_gcc measured 1.21-1.23 agai... |
+| S8-08 | -mtune=knc tune-flag audit (E5-12) | Not started | also re-measure M2 short at lengths 5 and 13 under the alignment default. S8-03 (prefetch versioning) left ... |
 | S8-09 | KNC -O2 defaults: vectorizer cost model, stride versioning, predictive commoning (E5-18) | Not started | written under the owner's overnight blanket approval (2026-11-08). |
 | S8-10 | Less ring traffic: 64-byte padding of per-thread data, and card check C11 (E5-16) | Not started | written under the owner's overnight blanket approval (2026-11-08). |
 | S8-11 | Sprint 8 batch check and paired M2 re-measure | Not started | add one compiler-prefetch card case, because S8-03's card run has no row kernel (C5's rows are hand-written... |
@@ -175,6 +175,7 @@ Current tickets: `[#################---]` 128 of 150
 
 ## Recent activity
 
+- 2026-11-08 20:02 **S8-03** engineer submit: Round 3 done, GCC 8c18be9: run-time trip counts versioned on niter >= 4 x far distance, prefetched copy likely, other copy unchanged (two-level tar...
 - 2026-11-08 17:29 **S8-03** owner decide: Owner 2026-11-08: "Extended by 2 session" (now 6) to add the run-time trip-count guard: the prefetched loop runs only when n >= 4 x far distance, e...
 - 2026-11-08 17:16 **S8-03** lead escalate: budget: 4 engineer sessions used; the budget is 4
 - 2026-11-08 17:15 **S8-03** lead changes: Card: memory/L2 streams gain (L2 affine 9-19%), but M2 short at length 17 is 1.30-1.33x slower: 4 prefetches plus moves in a one-iteration loop. Ve...
@@ -182,16 +183,15 @@ Current tickets: `[#################---]` 128 of 150
 - 2026-11-08 16:58 **S8-18** engineer submit: Resolver + gcc2 lane (env, safe.directory, pm slot), submit refuses branch without knc, approve detaches the other tree holding knc, gcc_build --sl...
 - 2026-11-08 15:50 **S8-03** engineer submit: Round 2 done, GCC 2fb2498: ivopts prefetch address use and affine grouping each gated on targetm.prefetch_distances answering (own condition line)....
 - 2026-11-08 15:04 **S8-03** lead changes: Gate the two generic changes on the two-level hook answering (ADR-0006, own condition line): ivopts BUILT_IN_PREFETCH address use, and affine group...
-- 2026-11-08 15:02 **S8-03** engineer submit: Byte-distance rule done. Red 3712b8c (column_f32, 51 trips x 1092 B step: vprefetch1 2184 / vprefetch0 1092; failed on the 4 x 32 trip check). Gree...
 
 ## Cost
 
 - From the script, engineer: 310 sessions, 728.5M input tokens
 - From the script, lead: 226 sessions, 68.9M input tokens
-- Started by hand, Claude: 10 sessions, 1826.0M input tokens
+- Started by hand, Claude: 10 sessions, 1827.7M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 15.7 GiB of 100 GiB. 150 GiB free on the drive.
+The project uses 15.7 GiB of 100 GiB. 149 GiB free on the drive.
