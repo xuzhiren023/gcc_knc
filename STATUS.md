@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-09 10:07.
+Updated automatically at every ticket change. Last update: 2026-11-09 10:13.
 
 **Next: GPT-6.1, on S8-13 (Streaming stores for write-only loops beyond L2 (E5-08)).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
@@ -155,7 +155,7 @@ Current tickets: `[#################---]` 134 of 150
 | S8-10 | Less ring traffic: 64-byte padding of per-thread data, and card check C11 (E5-16) | Done | Per-thread arrays and the OpenMP shared block now start on their own 64-byte line, and the C11 card check s... |
 | S8-11 | Sprint 8 batch check and paired M2 re-measure | Not started | add one compiler-prefetch card case, because S8-03's card run has no row kernel (C5's rows are hand-written... |
 | S8-12 | Fix three weak S8-01 checks - C4 page offsets, C5 row aliasing, C9 memory chain | Done | The knc-char checks C4, C5 and C9 are fixed and rebuilt: C4 now walks every page offset, C5's eight arrays ... |
-| S8-13 | Streaming stores for write-only loops beyond L2 (E5-08) | In progress | Red is close; four changes before green. (1) Fence placement is not tested: every fence scan matches a lock... |
+| S8-13 | Streaming stores for write-only loops beyond L2 (E5-08) | In progress | Two engineer sessions (07:57, 09:51) timed out with nothing committed after 012e79e. The first session star... |
 | S8-14 | Default 64-byte data alignment and TLB-aware cache parameters (E5-13) | Not started | added at the owner's request (2026-11-08: "add three [tickets] in s8") to cover ADR-0009 points the sprint ... |
 | S8-15 | Small-loop unroll default and the GCC-KNC flags page (E5-09) | Not started | added at the owner's request (2026-11-08: "add three [tickets] in s8") to cover ADR-0009 points the sprint ... |
 | S8-16 | User story - one bold flag, -mphinix, with a rising-phoenix banner and a progress bar | Not started | owner's user story, written by the lead with the owner's request quoted above. |
@@ -175,6 +175,7 @@ Current tickets: `[#################---]` 134 of 150
 
 ## Recent activity
 
+- 2026-11-09 10:13 **S8-13** lead note: Two engineer sessions (07:57, 09:51) timed out with nothing committed after 012e79e. The first session started the x86 check at 07:07 (tools/portab...
 - 2026-11-09 10:07 **S8-05** lead approve: No per-loop add-cost work is needed: with the cheaper add cost mat8 now compiles to the same code as today, so its old 20% gain is gone (S8-06 remo...
 - 2026-11-09 09:45 **S8-05** lead lead-sync: Branch brought up to main for the 1800 s T0 timeout (718f7b1).
 - 2026-11-09 08:48 **S8-05** lead lead-review: Decided without a card run: with the half cost, mat8 and stencil2 compile to the same code as today (only label numbers differ, .work/_shared/S8-05...
@@ -182,16 +183,15 @@ Current tickets: `[#################---]` 134 of 150
 - 2026-11-09 08:18 **S8-04** lead approve: S8-04 closes with its diagnosis and test only: the slow small-matrix loops came from an x87 detour for the broadcast value, which S8-06 already rem...
 - 2026-11-09 08:01 **S8-04** lead lead-close: Closed per the owner (2026-11-09): tests and diagnosis only. Positive scans widened to accept the {1to16}/{1to8} folded broadcast; knc-broadcast-lo...
 - 2026-11-09 07:14 **S8-04** owner decide: Owner 2026-11-09: "Close the s8-04". Lead closes it: merge the diagnosis doc and the tests, widened to accept S8-06's folded {1to16}/{1to8} broadca...
-- 2026-11-09 06:26 **S8-13** lead changes: Red is close; four changes before green. (1) Fence placement is not tested: every fence scan matches a lock addl anywhere in the function, so a fen...
 
 ## Cost
 
 - From the script, engineer: 324 sessions, 753.3M input tokens
 - From the script, lead: 229 sessions, 69.8M input tokens
-- Started by hand, Claude: 10 sessions, 1890.9M input tokens
+- Started by hand, Claude: 10 sessions, 1892.8M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 15.7 GiB of 100 GiB. 97 GiB free on the drive.
+The project uses 15.7 GiB of 100 GiB. 98 GiB free on the drive.
