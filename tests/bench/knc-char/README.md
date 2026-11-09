@@ -11,6 +11,29 @@ One `--case` per launch, so six lines with `NAME` each of `vpmulld`, `vpmadd231d
 python tools/card_run --benchmark --threads 1 --timeout 120 ../_shared/S8-07/knc-char.mic --native --cores 1 --threads 1 --case NAME.MODE
 ```
 
+## S8-10 C11: ring traffic (lead job, not run by the engineer)
+
+`c11.c`, included by driver.c. Build with
+`python tools/run.py --name S8-10-c11 --inputs tests/bench/knc-char -- python tests/bench/knc-char/build.py --out S8-10`
+(stages `knc-char.mic` under `.work/_shared/S8-10/`). One job runs all seven
+points; `--case NAME` selects one. Five launches:
+
+```text
+python tools/card_run --benchmark --threads 240 --timeout 600 ../_shared/S8-10/knc-char.mic --native --cores 60 --threads 4 --check c11
+```
+
+| Point | What |
+|---|---|
+| `c11.l2.local` | dependent loads over a random cycle of 2048 lines (128 KiB) the reader (core 0) just wrote; a 64 KiB evict read first, so the loads hit its L2 |
+| `c11.l2.remote.near`, `.far` | the same chase after core 1 (near) or core `cores/2` (far) wrote the lines: each load is a cache-to-cache transfer over the ring. Far is by logical id, not ring position |
+| `c11.pingpong.shared`, `.padded` | cores 0 and 1 each add 1 to their own counter 2^18 times, 8 bytes apart in one line or 64 bytes apart; value is the slower thread |
+| `c11.barrier.counter`, `.tree` | all 240 workers run 2000 back-to-back barriers: one sense-reversing shared counter, or a combining tree of fan-in 4 (siblings of a core, then groups of four nodes), one node per line; value is worker 0's time per barrier |
+
+Each point prints five `c11_group` lines (l2 points: median of 63 episodes
+after a warm-up) and one `c11 name=... value=... unit=... min= max= spread=`
+line with the median group. Clock policy is checked at start and end as in
+the timed protocol.
+
 ## S8-17 C12: power by rail (lead job, not run by the engineer)
 
 `c12.c`, included by `driver.c`, answers why the card stays at 160-180 W after
