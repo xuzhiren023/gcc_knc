@@ -23,7 +23,10 @@ class Gcc16(unittest.TestCase):
             build = shared / 'gcc-build'
             build.mkdir()
             (build / 'config.status').touch()
+            # Slot 1 names: toolchain resolves them from KNC_GCC_SLOT at import (S8-18).
             with patch.object(toolchain, 'SHARED', shared), \
+                    patch.object(toolchain, 'GCC_TREE', 'gcc'), \
+                    patch.object(toolchain, 'GCC_BUILD', 'gcc-build'), \
                     patch.object(toolchain.os, 'cpu_count', return_value=12), \
                     patch.object(toolchain, 'command') as command, \
                     contextlib.redirect_stdout(io.StringIO()):
@@ -41,7 +44,10 @@ class Gcc16(unittest.TestCase):
             source.mkdir()
             (source / 'configure').touch()
             tc = shared / 'toolchain'
+            # Slot 1 names: toolchain resolves them from KNC_GCC_SLOT at import (S8-18).
             with patch.object(toolchain, 'SHARED', shared), \
+                    patch.object(toolchain, 'GCC_TREE', 'gcc'), \
+                    patch.object(toolchain, 'GCC_BUILD', 'gcc-build'), \
                     patch.object(toolchain, 'TC', tc), \
                     patch.object(toolchain, 'SYSROOT', tc / 'sysroot'), \
                     patch.object(toolchain, 'command') as command, \
