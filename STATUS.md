@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-08 23:18.
+Updated automatically at every ticket change. Last update: 2026-11-09 00:10.
 
 **Waiting for you:** S8-04. Run `python tools/pm.py inbox`.
 
@@ -149,7 +149,7 @@ Current tickets: `[#################---]` 130 of 150
 | S8-04 | Small-matrix kernels: diagnose mat8 and mat16, reject low lane use (E5-11 part 2) | **Waiting for you** | budget: 4 engineer sessions used; the budget is 4 |
 | S8-05 | Per-loop scalar-add cost choice that keeps both mat8 and the stencils (E5-11) | Not started | written under the owner's overnight blanket approval (2026-11-08). |
 | S8-06 | Memory-operand forms for V16SF/V8DF arithmetic and FMA (E5-17) | Done | KNC vector add, sub, mul and FMA now read aligned memory and {1to16}/{1to8} broadcasts directly instead of ... |
-| S8-07 | vpmadd231d for V16SI multiply-add (E5-14) | In progress | written under the owner's overnight blanket approval (2026-11-08). |
+| S8-07 | vpmadd231d for V16SI multiply-add (E5-14) | Waiting for review | Red 2043042, green gcc-2 60bef4e6ee4 (imci.md only, TARGET_KNC, no shared i386 lines; x86 identical by cons... |
 | S8-08 | -mtune=knc tune-flag audit (E5-12) | Not started | also re-measure M2 short at lengths 5 and 13 under the alignment default. S8-03 (prefetch versioning) left ... |
 | S8-09 | KNC -O2 defaults: vectorizer cost model, stride versioning, predictive commoning (E5-18) | Not started | written under the owner's overnight blanket approval (2026-11-08). |
 | S8-10 | Less ring traffic: 64-byte padding of per-thread data, and card check C11 (E5-16) | Not started | written under the owner's overnight blanket approval (2026-11-08). |
@@ -175,6 +175,7 @@ Current tickets: `[#################---]` 130 of 150
 
 ## Recent activity
 
+- 2026-11-09 00:10 **S8-07** engineer submit: Red 2043042, green gcc-2 60bef4e6ee4 (imci.md only, TARGET_KNC, no shared i386 lines; x86 identical by construction, not run): int_madd T1 FAIL->PA...
 - 2026-11-08 23:17 **S8-04** lead escalate: budget: 4 engineer sessions used; the budget is 4
 - 2026-11-08 23:16 **S8-06** lead approve: KNC vector add, sub, mul and FMA now read aligned memory and {1to16}/{1to8} broadcasts directly instead of loading into a register first: mat16 is ...
 - 2026-11-08 23:07 **S8-04** lead changes: S8-06 already removes the x87 bridge, better: it folds the broadcast into the FMA ({1to16}), with mat16 at 0.47 as here. Your split adds a separate...
@@ -182,7 +183,6 @@ Current tickets: `[#################---]` 130 of 150
 - 2026-11-08 22:27 **S8-04** lead approve-red: Red approved: at 028f9f3 all six directives fail on the x87 bridge itself (fstps/fstpl to the stack, vbroadcasts from (%rsp), vpermf32x4) in the j ...
 - 2026-11-08 22:25 **S8-04** engineer red: Lead changes applied (d2273e1): loop scans forbid only the bridge (x87 store to (%rsp), vbroadcasts[sd] from (%rsp), vpermf32x4); positive scan tak...
 - 2026-11-08 22:01 **S8-06** engineer submit: Green 293c29e..5527ff9, rebased clean on knc as 9e831f4..ef0dd1f (imci.md, i386-knc.cc only): fold-fma T1 FAIL->PASS, rest of T0/T1/T2 and torture ...
-- 2026-11-08 20:48 **S8-04** lead changes: Diagnosis accepted (not lane use; x87 broadcast round trip; vec_duplicate split fix). Test cannot go green as written: scan-asm-loop-not checks eve...
 
 ## Cost
 
@@ -194,4 +194,4 @@ Current tickets: `[#################---]` 130 of 150
 
 ## Disk
 
-The project uses 15.7 GiB of 100 GiB. 148 GiB free on the drive.
+The project uses 15.7 GiB of 100 GiB. 147 GiB free on the drive.
