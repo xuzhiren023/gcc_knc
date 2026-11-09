@@ -58,7 +58,7 @@ def acceptance():
 # pair links one kernels-gcc.s twice (gcc and gcc_before, renamed by the M2
 # build.py), so the copies differ only in address; the alignment whose ratios
 # stay within the 1.6% A/A bias removes the swing.  'none' is the -mtune=knc
-# default (functions 16, loops 0:0:8).
+# default before S8-08 set 64 (functions 16, loops 0:0:8).
 ALIGNS = ('none', '16', '32', '64')
 
 
