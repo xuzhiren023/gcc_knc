@@ -1,10 +1,10 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-08 23:07.
+Updated automatically at every ticket change. Last update: 2026-11-08 23:16.
 
-**Next: the tech lead, on S8-06.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: GPT-6.1, on S8-04 (Small-matrix kernels: diagnose mat8 and mat16, reject low lane use (E5-11 part 2)).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
-Current tickets: `[#################---]` 129 of 150
+Current tickets: `[#################---]` 130 of 150
 
 ## Milestones
 
@@ -148,7 +148,7 @@ Current tickets: `[#################---]` 129 of 150
 | S8-03 | Two-level software prefetch for KNC loops (E5-07) | Done | KNC loops now prefetch two levels ahead (L2 2 KiB, L1 1 KiB, in bytes so strided loops work): L2-sized stre... |
 | S8-04 | Small-matrix kernels: diagnose mat8 and mat16, reject low lane use (E5-11 part 2) | Changes requested | S8-06 already removes the x87 bridge, better: it folds the broadcast into the FMA ({1to16}), with mat16 at ... |
 | S8-05 | Per-loop scalar-add cost choice that keeps both mat8 and the stencils (E5-11) | Not started | written under the owner's overnight blanket approval (2026-11-08). |
-| S8-06 | Memory-operand forms for V16SF/V8DF arithmetic and FMA (E5-17) | Waiting for review | card run 03:12-03:39Z on the frozen pre-rebase binaries (5527ff9 on 836a0e2, paired against S8-02; .work/_s... |
+| S8-06 | Memory-operand forms for V16SF/V8DF arithmetic and FMA (E5-17) | Done | KNC vector add, sub, mul and FMA now read aligned memory and {1to16}/{1to8} broadcasts directly instead of ... |
 | S8-07 | vpmadd231d for V16SI multiply-add (E5-14) | Not started | written under the owner's overnight blanket approval (2026-11-08). |
 | S8-08 | -mtune=knc tune-flag audit (E5-12) | Not started | also re-measure M2 short at lengths 5 and 13 under the alignment default. S8-03 (prefetch versioning) left ... |
 | S8-09 | KNC -O2 defaults: vectorizer cost model, stride versioning, predictive commoning (E5-18) | Not started | written under the owner's overnight blanket approval (2026-11-08). |
@@ -175,6 +175,7 @@ Current tickets: `[#################---]` 129 of 150
 
 ## Recent activity
 
+- 2026-11-08 23:16 **S8-06** lead approve: KNC vector add, sub, mul and FMA now read aligned memory and {1to16}/{1to8} broadcasts directly instead of loading into a register first: mat16 is ...
 - 2026-11-08 23:07 **S8-04** lead changes: S8-06 already removes the x87 bridge, better: it folds the broadcast into the FMA ({1to16}), with mat16 at 0.47 as here. Your split adds a separate...
 - 2026-11-08 22:31 **S8-04** engineer submit: Green at GCC 800ef2e on knc 028f9f3 (knc unmoved, S8-06 not merged: no rebase, one split). vec_duplicate insn split in imci.md + i386-knc.cc only, ...
 - 2026-11-08 22:27 **S8-04** lead approve-red: Red approved: at 028f9f3 all six directives fail on the x87 bridge itself (fstps/fstpl to the stack, vbroadcasts from (%rsp), vpermf32x4) in the j ...
@@ -182,13 +183,12 @@ Current tickets: `[#################---]` 129 of 150
 - 2026-11-08 22:01 **S8-06** engineer submit: Green 293c29e..5527ff9, rebased clean on knc as 9e831f4..ef0dd1f (imci.md, i386-knc.cc only): fold-fma T1 FAIL->PASS, rest of T0/T1/T2 and torture ...
 - 2026-11-08 20:48 **S8-04** lead changes: Diagnosis accepted (not lane use; x87 broadcast round trip; vec_duplicate split fix). Test cannot go green as written: scan-asm-loop-not checks eve...
 - 2026-11-08 20:45 **S8-04** engineer red: Cause is not lane use (docs/research/knc-small-matrix.md): mat8 is the whole-loop-masked gather loop since S8-02 (card 0.29x); IMCI uses 8 of 16 la...
-- 2026-11-08 20:12 **S8-03** lead approve: KNC loops now prefetch two levels ahead (L2 2 KiB, L1 1 KiB, in bytes so strided loops work): L2-sized streams are 11-21% faster, memory-sized 2-4%...
 
 ## Cost
 
 - From the script, engineer: 317 sessions, 739.0M input tokens
 - From the script, lead: 227 sessions, 69.3M input tokens
-- Started by hand, Claude: 10 sessions, 1852.7M input tokens
+- Started by hand, Claude: 10 sessions, 1858.9M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
