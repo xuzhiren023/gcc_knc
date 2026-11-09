@@ -34,7 +34,8 @@ def main():
         del args[i:i+2]
     from kernels import emit
     emit(OUT)
-    ccdir = SHARED / 'gcc-build/gcc'
+    # The gcc2 lane (KNC_GCC_SLOT=2) builds with its own tree (S8-10).
+    ccdir = SHARED / ('gcc-build-2' if os.environ.get('KNC_GCC_SLOT') == '2' else 'gcc-build') / 'gcc'
     cc = [ccdir / 'xgcc', '-B' + str(ccdir) + '/', '--sysroot=' + str(TC / 'sysroot'),
           '-march=knc', '-O2', '-fno-tree-vectorize', '-ffp-contract=off',
           '-std=gnu11', '-Wall', '-Wextra', '-Werror', '-I' + str(OUT)]

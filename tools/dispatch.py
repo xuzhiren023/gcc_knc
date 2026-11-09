@@ -197,6 +197,11 @@ def run_session(board, ticket, role, dry_run):
             ticket.fields.update(state="owner", resume=ticket.state)
             ticket.save("escalate", "budget: " + reason)
             return True
+    # A GCC ticket's approval rests on the lead's own card run, so a scripted review could only escalate it
+    # to the owner (S8-07, 2026-11-09). Red reviews stay scripted.
+    if role == "lead" and ticket.state == "review" and pm.lane_of(ticket) in ("gcc", "gcc2"):
+        print("%s review: waits for the interactive lead (card run)" % ticket.id)
+        return False
     print("%s %s: %s session" % (ticket.id, ticket.state, role))
     if dry_run:
         return False

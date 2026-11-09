@@ -1,10 +1,10 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-08 22:20.
+Updated automatically at every ticket change. Last update: 2026-11-09 07:14.
 
-**Next: the tech lead, on S8-06.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: GPT-6.1, on S8-04 (Small-matrix kernels: diagnose mat8 and mat16, reject low lane use (E5-11 part 2)).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
-Current tickets: `[#################---]` 129 of 150
+Current tickets: `[#################---]` 132 of 150
 
 ## Milestones
 
@@ -146,16 +146,16 @@ Current tickets: `[#################---]` 129 of 150
 | S8-01 | Card checks C1-C10 for the Sprint 8 tuning block - microbenchmarks in the knc-char corpus | Done | The knc-char corpus now measures the Sprint 8 tuning questions on the card (stores, prefetch, tails, accumu... |
 | S8-02 | Masked loop tails that never touch an unmapped page, chosen by length (E4-04) | Done | round 3 card confirmation (19:04-19:10Z, binaries frozen in .work/_shared/tmp/claude-s8-02-r3, outputs in c... |
 | S8-03 | Two-level software prefetch for KNC loops (E5-07) | Done | KNC loops now prefetch two levels ahead (L2 2 KiB, L1 1 KiB, in bytes so strided loops work): L2-sized stre... |
-| S8-04 | Small-matrix kernels: diagnose mat8 and mat16, reject low lane use (E5-11 part 2) | In progress | overlap warning. S8-06 (lane gcc2, in review, GCC ef0dd1f) adds `*knc_duplicate_reg<mode>` (define_insn_and... |
+| S8-04 | Small-matrix kernels: diagnose mat8 and mat16, reject low lane use (E5-11 part 2) | Changes requested | Owner 2026-11-09: "Close the s8-04". Lead closes it: merge the diagnosis doc and the tests, widened to acce... |
 | S8-05 | Per-loop scalar-add cost choice that keeps both mat8 and the stencils (E5-11) | Not started | written under the owner's overnight blanket approval (2026-11-08). |
-| S8-06 | Memory-operand forms for V16SF/V8DF arithmetic and FMA (E5-17) | Waiting for review | Green 293c29e..5527ff9, rebased clean on knc as 9e831f4..ef0dd1f (imci.md, i386-knc.cc only): fold-fma T1 F... |
-| S8-07 | vpmadd231d for V16SI multiply-add (E5-14) | Not started | written under the owner's overnight blanket approval (2026-11-08). |
+| S8-06 | Memory-operand forms for V16SF/V8DF arithmetic and FMA (E5-17) | Done | KNC vector add, sub, mul and FMA now read aligned memory and {1to16}/{1to8} broadcasts directly instead of ... |
+| S8-07 | vpmadd231d for V16SI multiply-add (E5-14) | Done | KNC now emits vpmadd231d for vector integer multiply-add: one instruction at 4 ticks latency instead of vpm... |
 | S8-08 | -mtune=knc tune-flag audit (E5-12) | Not started | also re-measure M2 short at lengths 5 and 13 under the alignment default. S8-03 (prefetch versioning) left ... |
 | S8-09 | KNC -O2 defaults: vectorizer cost model, stride versioning, predictive commoning (E5-18) | Not started | written under the owner's overnight blanket approval (2026-11-08). |
-| S8-10 | Less ring traffic: 64-byte padding of per-thread data, and card check C11 (E5-16) | Not started | written under the owner's overnight blanket approval (2026-11-08). |
+| S8-10 | Less ring traffic: 64-byte padding of per-thread data, and card check C11 (E5-16) | Done | Per-thread arrays and the OpenMP shared block now start on their own 64-byte line, and the C11 card check s... |
 | S8-11 | Sprint 8 batch check and paired M2 re-measure | Not started | add one compiler-prefetch card case, because S8-03's card run has no row kernel (C5's rows are hand-written... |
 | S8-12 | Fix three weak S8-01 checks - C4 page offsets, C5 row aliasing, C9 memory chain | Done | The knc-char checks C4, C5 and C9 are fixed and rebuilt: C4 now walks every page offset, C5's eight arrays ... |
-| S8-13 | Streaming stores for write-only loops beyond L2 (E5-08) | Not started | added at the owner's request (2026-11-08: "add three [tickets] in s8") to cover ADR-0009 points the sprint ... |
+| S8-13 | Streaming stores for write-only loops beyond L2 (E5-08) | In progress | Red is close; four changes before green. (1) Fence placement is not tested: every fence scan matches a lock... |
 | S8-14 | Default 64-byte data alignment and TLB-aware cache parameters (E5-13) | Not started | added at the owner's request (2026-11-08: "add three [tickets] in s8") to cover ADR-0009 points the sprint ... |
 | S8-15 | Small-loop unroll default and the GCC-KNC flags page (E5-09) | Not started | added at the owner's request (2026-11-08: "add three [tickets] in s8") to cover ADR-0009 points the sprint ... |
 | S8-16 | User story - one bold flag, -mphinix, with a rising-phoenix banner and a progress bar | Not started | owner's user story, written by the lead with the owner's request quoted above. |
@@ -175,23 +175,23 @@ Current tickets: `[#################---]` 129 of 150
 
 ## Recent activity
 
-- 2026-11-08 22:01 **S8-06** engineer submit: Green 293c29e..5527ff9, rebased clean on knc as 9e831f4..ef0dd1f (imci.md, i386-knc.cc only): fold-fma T1 FAIL->PASS, rest of T0/T1/T2 and torture ...
-- 2026-11-08 20:48 **S8-04** lead changes: Diagnosis accepted (not lane use; x87 broadcast round trip; vec_duplicate split fix). Test cannot go green as written: scan-asm-loop-not checks eve...
-- 2026-11-08 20:45 **S8-04** engineer red: Cause is not lane use (docs/research/knc-small-matrix.md): mat8 is the whole-loop-masked gather loop since S8-02 (card 0.29x); IMCI uses 8 of 16 la...
-- 2026-11-08 20:12 **S8-03** lead approve: KNC loops now prefetch two levels ahead (L2 2 KiB, L1 1 KiB, in bytes so strided loops work): L2-sized streams are 11-21% faster, memory-sized 2-4%...
-- 2026-11-08 20:02 **S8-03** engineer submit: Round 3 done, GCC 8c18be9: run-time trip counts versioned on niter >= 4 x far distance, prefetched copy likely, other copy unchanged (two-level tar...
-- 2026-11-08 17:29 **S8-03** owner decide: Owner 2026-11-08: "Extended by 2 session" (now 6) to add the run-time trip-count guard: the prefetched loop runs only when n >= 4 x far distance, e...
-- 2026-11-08 17:16 **S8-03** lead escalate: budget: 4 engineer sessions used; the budget is 4
-- 2026-11-08 17:15 **S8-03** lead changes: Card: memory/L2 streams gain (L2 affine 9-19%), but M2 short at length 17 is 1.30-1.33x slower: 4 prefetches plus moves in a one-iteration loop. Ve...
+- 2026-11-09 07:14 **S8-04** owner decide: Owner 2026-11-09: "Close the s8-04". Lead closes it: merge the diagnosis doc and the tests, widened to accept S8-06's folded {1to16}/{1to8} broadca...
+- 2026-11-09 06:26 **S8-13** lead changes: Red is close; four changes before green. (1) Fence placement is not tested: every fence scan matches a lock addl anywhere in the function, so a fen...
+- 2026-11-09 06:25 **S8-13** engineer red: Red 34cd86e: check.py t1 t2 --storent (gcc-build-2, knc cba9fe1): knc-storent.c fails at its first scan (no vmovnrngoaps); each negative scan check...
+- 2026-11-09 06:05 **S8-10** lead approve: Per-thread arrays and the OpenMP shared block now start on their own 64-byte line, and the C11 card check shows why: a line from another core costs...
+- 2026-11-09 03:49 **S8-10** engineer submit: Red 1c6323a, C11 295f06a, green gcc-2 f1f71d662b1 (i386-knc.cc +49, .h +3, shared i386.cc +5: two TARGET_KNC hook calls): .omp_data_o gets a 64-byt...
+- 2026-11-09 01:41 **S8-07** lead approve: KNC now emits vpmadd231d for vector integer multiply-add: one instruction at 4 ticks latency instead of vpmulld plus vpaddd at 8 (measured on the c...
+- 2026-11-09 00:13 **S8-07** lead withdraw: Lead withdraws a scripted escalation: the missing results are the lead's own card runs (knc-char row, imadd execute test, s4/s5, M2 paired), not an...
+- 2026-11-09 00:11 **S8-07** lead escalate: Code review clean (imci.md *knc_maddv16si4, TARGET_KNC only; red 2043042 -> green 60bef4e6ee4). Not approved: lead-run results missing from the tic...
 
 ## Cost
 
-- From the script, engineer: 314 sessions, 737.5M input tokens
-- From the script, lead: 227 sessions, 69.3M input tokens
-- Started by hand, Claude: 10 sessions, 1841.8M input tokens
+- From the script, engineer: 321 sessions, 752.4M input tokens
+- From the script, lead: 229 sessions, 69.8M input tokens
+- Started by hand, Claude: 10 sessions, 1877.5M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 15.7 GiB of 100 GiB. 147 GiB free on the drive.
+The project uses 15.7 GiB of 100 GiB. 141 GiB free on the drive.

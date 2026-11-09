@@ -443,6 +443,15 @@ class Dispatcher(Sandbox):
             command = dispatch.engineer_command(board, mock.Mock(fields=fields), self.worktree("A-1"))
             self.assertEqual(command[command.index("-m") + 1], model)
 
+    def test_gcc_review_waits_for_the_interactive_lead(self):
+        import dispatch
+        board = mock.Mock(root=self.root, policy=POLICY)
+        for lane in ("gcc", "gcc2"):
+            ticket = mock.Mock(id="A-1", state="review", fields={"lane": lane, "gcc": "yes"})
+            with mock.patch.object(dispatch.subprocess, "run") as run:
+                self.assertFalse(dispatch.run_session(board, ticket, "lead", False))
+            run.assert_not_called()
+
     def test_ticket_backend_overrides_the_policy_backend(self):
         import dispatch
         policy = dict(POLICY, engineer_backend="claude")

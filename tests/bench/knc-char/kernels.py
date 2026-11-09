@@ -31,7 +31,9 @@ for name, insn, desc in (
     ('vmulps', 'vmulps %zmm31, %zmm{z}, %zmm{z}', 'FP32 vector multiply by one'),
     ('vfmadd213ps', 'vfmadd213ps %zmm31, %zmm31, %zmm{z}', 'FP32 fused multiply-add'),
     ('vpaddd', 'vpaddd %zmm31, %zmm{z}, %zmm{z}', 'Vector integer add'),
-    ('vpxord', 'vpxord %zmm31, %zmm{z}, %zmm{z}', 'Vector integer XOR, distinct operands'),
+    ('vpmulld', 'vpmulld %zmm31, %zmm{z}, %zmm{z}', 'Vector int32 low multiply'),
+    ('vpmadd231d', 'vpmadd231d %zmm31, %zmm31, %zmm{z}', 'Vector int32 multiply-add (S8-07)'),
+    ('vpxord','vpxord %zmm31, %zmm{z}, %zmm{z}', 'Vector integer XOR, distinct operands'),
     ('vpermd', 'vpermd %zmm{z}, %zmm30, %zmm{z}', 'Dword permutation, data dependency'),
     ('vpermf32x4', 'vpermf32x4 $0x1b, %zmm{z}, %zmm{z}', '128-bit block permutation'),
     ('vrcp23ps', 'vrcp23ps %zmm{z}, %zmm{z}', 'FP32 approximate reciprocal of one'),
@@ -42,7 +44,12 @@ for name, insn, desc in (
     ('kxor', 'kxor %k7, %k{k}', 'Mask XOR (six chains in rt)'),
 ):
     arithmetic(name, insn, desc)
-for swizzle in ('cdab', 'badc', 'dacb', 'aaaa', 'bbbb', 'cccc', 'dddd'):
+# S8-07: the two-instruction sequence vpmadd231d replaces; unit is one pair.
+arithmetic('vpmulld_vpaddd', 'vpmulld %zmm31, %zmm{z}, %zmm{z}\nvpaddd %zmm31, %zmm{z}, %zmm{z}',
+           'Vector int32 multiply then dependent add, per pair')
+for case in CASES[-2:]:
+    case['unit'] = 2
+for swizzle in('cdab', 'badc', 'dacb', 'aaaa', 'bbbb', 'cccc', 'dddd'):
     arithmetic('swizzle_' + swizzle,
                'vmovdqa32 %zmm{z}{{' + swizzle + '}}, %zmm{z}',
                '32-bit register swizzle ' + swizzle)
