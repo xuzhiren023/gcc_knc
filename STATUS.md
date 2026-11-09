@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-09 16:12.
+Updated automatically at every ticket change. Last update: 2026-11-09 17:23.
 
-**Next: the tech lead, on S8-13.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: the tech lead, on S8-08.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[#################---]` 134 of 150
 
@@ -150,7 +150,7 @@ Current tickets: `[#################---]` 134 of 150
 | S8-05 | Re-check the scalar-add cost on mat8 and the stencils after S8-06 (E5-11) | Done | No per-loop add-cost work is needed: with the cheaper add cost mat8 now compiles to the same code as today,... |
 | S8-06 | Memory-operand forms for V16SF/V8DF arithmetic and FMA (E5-17) | Done | KNC vector add, sub, mul and FMA now read aligned memory and {1to16}/{1to8} broadcasts directly instead of ... |
 | S8-07 | vpmadd231d for V16SI multiply-add (E5-14) | Done | KNC now emits vpmadd231d for vector integer multiply-add: one instruction at 4 ticks latency instead of vpm... |
-| S8-08 | -mtune=knc tune-flag audit (E5-12) | In progress | sessions 4: lead extension 1 under the owner rule (2026-11-09) for the -falign default. |
+| S8-08 | -mtune=knc tune-flag audit (E5-12) | Waiting for review | -mtune=knc defaults -falign-functions/-falign-loops=64 (gcc abcd19140f4, i386-knc.cc only; user -falign-* w... |
 | S8-09 | KNC -O2 defaults: vectorizer cost model, stride versioning, predictive commoning (E5-18) | Not started | written under the owner's overnight blanket approval (2026-11-08). |
 | S8-10 | Less ring traffic: 64-byte padding of per-thread data, and card check C11 (E5-16) | Done | Per-thread arrays and the OpenMP shared block now start on their own 64-byte line, and the C11 card check s... |
 | S8-11 | Sprint 8 batch check and paired M2 re-measure | Not started | add one compiler-prefetch card case, because S8-03's card run has no row kernel (C5's rows are hand-written... |
@@ -175,6 +175,7 @@ Current tickets: `[#################---]` 134 of 150
 
 ## Recent activity
 
+- 2026-11-09 17:23 **S8-08** engineer submit: -mtune=knc defaults -falign-functions/-falign-loops=64 (gcc abcd19140f4, i386-knc.cc only; user -falign-* wins). Red 0a5c72d, T1 knc-tune-align*.c ...
 - 2026-11-09 16:12 **S8-13** lead note: The engineer x86 check of aeba063f82f (S8_13_x86-20261109-154306) was killed at 16:09 with its timed-out session (dispatch now kills the session tr...
 - 2026-11-09 16:09 **S8-13** lead card: Card 20:22-21:05Z on frozen aeba063f82f (tmp/claude-s8-13b): publish PASS stale=0; s4/s5 PASS; M2 neg 1, pos 0. Paired vs S8-10: L2 stencil1 1.006/...
 - 2026-11-09 16:07 **S8-08** lead budget: sessions 4: lead extension 1 under the owner rule (2026-11-09) for the -falign default.
@@ -182,16 +183,15 @@ Current tickets: `[#################---]` 134 of 150
 - 2026-11-09 15:22 **S8-08** lead review-note: M2 kernels-gcc.s from s8/S8-08 is identical to knc (S8-10/m2), so FAST_PREFIX does not touch M2 and the paired timing is skipped (correctness only)...
 - 2026-11-09 15:10 **S8-13** engineer submit: Extension 1: gcc-2 aeba063f82f (tree-ssa-loop-prefetch.cc). The storent guard on niter gave the L2 copy an upper bound and ivopts dropped its count...
 - 2026-11-09 14:36 **S8-13** lead budget: sessions 6: lead extension 1 under the owner rule (2026-11-09) for the stencil1 L2 change.
-- 2026-11-09 14:35 **S8-13** lead changes: Card: memory affine/stencil1 0.70 and publish stale=0 are good, but stencil1 at L2 is 1.04-1.075 slower and stays 1.027-1.063 with the GCC objects ...
 
 ## Cost
 
 - From the script, engineer: 330 sessions, 754.8M input tokens
 - From the script, lead: 229 sessions, 69.8M input tokens
-- Started by hand, Claude: 10 sessions, 1932.7M input tokens
+- Started by hand, Claude: 11 sessions, 1940.7M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 15.8 GiB of 100 GiB. 90 GiB free on the drive.
+The project uses 16.9 GiB of 100 GiB. 88 GiB free on the drive.
