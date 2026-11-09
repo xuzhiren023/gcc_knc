@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-09 18:53.
+Updated automatically at every ticket change. Last update: 2026-11-09 18:54.
 
 **Next: the tech lead, on S8-08.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
@@ -164,7 +164,7 @@ Current tickets: `[#################---]` 134 of 150
 | S9-01 | libgomp for KNC: futex, affinity, ring-aware barrier, spin-wait and malloc arenas (E6-03 input) | Done | We now have a build-and-design plan for GCC-KNC's own OpenMP runtime on the card: futex-based waits with de... |
 | S9-02 | libstdc++ for KNC: exceptions, RTTI, atomics, threads, packaging (E6-06 input) | Done | We now know how to build GCC 16's C++ library for the card: no newer glibc or kernel is needed, and built w... |
 | S9-03 | libstdc++ and libatomic build for k1om (E6-06a) | Not started | Pre-check: build wiring, static linking, test programs and allowed files are now in the brief (lead pre-che... |
-| S9-04 | libstdc++ packaging into the private prefix and a g++ link guard (E6-06b) | Not started | from S9-02's plan, under the owner's overnight blanket approval. Lead decisions: `--enable-clocale=generic`... |
+| S9-04 | libstdc++ packaging into the private prefix and a g++ link guard (E6-06b) | Not started | Pre-check: build wiring, static linking, test programs and allowed files are now in the brief (lead pre-che... |
 | S9-05 | libstdc++ runtime slice on the card (E6-06c) | Not started | from S9-02's plan, under the owner's overnight blanket approval. Lead decisions: `--enable-clocale=generic`... |
 | S9-06 | libgomp for k1om: build, select, package and link guard (E6-03 A) | Not started | from S9-01's plan, under the owner's overnight blanket approval. |
 | S9-07 | libgomp KNC affinity defaults (E6-03 B) | Not started | from S9-01's plan, under the owner's overnight blanket approval. |
@@ -175,6 +175,7 @@ Current tickets: `[#################---]` 134 of 150
 
 ## Recent activity
 
+- 2026-11-09 18:54 **S9-04** lead amend: Pre-check: build wiring, static linking, test programs and allowed files are now in the brief (lead pre-check section).
 - 2026-11-09 18:53 **S9-03** lead amend: Pre-check: build wiring, static linking, test programs and allowed files are now in the brief (lead pre-check section).
 - 2026-11-09 17:30 **S8-08** lead review-note: abcd19140f4 read: 64 replaces only unset -falign-loops/-functions, -Os and user values win; T1 scans good; M2 code identical to knc except .p2align...
 - 2026-11-09 17:23 **S8-08** engineer submit: -mtune=knc defaults -falign-functions/-falign-loops=64 (gcc abcd19140f4, i386-knc.cc only; user -falign-* wins). Red 0a5c72d, T1 knc-tune-align*.c ...
@@ -182,7 +183,6 @@ Current tickets: `[#################---]` 134 of 150
 - 2026-11-09 16:09 **S8-13** lead card: Card 20:22-21:05Z on frozen aeba063f82f (tmp/claude-s8-13b): publish PASS stale=0; s4/s5 PASS; M2 neg 1, pos 0. Paired vs S8-10: L2 stencil1 1.006/...
 - 2026-11-09 16:07 **S8-08** lead budget: sessions 4: lead extension 1 under the owner rule (2026-11-09) for the -falign default.
 - 2026-11-09 16:06 **S8-08** lead changes: Card 20:22-21:05Z: FAST_PREFIX part is good (s4/s5, M2 correctness pass; M2 code identical to knc). A/A (same code, gcc_before shifted half a line;...
-- 2026-11-09 15:22 **S8-08** lead review-note: M2 kernels-gcc.s from s8/S8-08 is identical to knc (S8-10/m2), so FAST_PREFIX does not touch M2 and the paired timing is skipped (correctness only)...
 
 ## Cost
 
@@ -194,4 +194,4 @@ Current tickets: `[#################---]` 134 of 150
 
 ## Disk
 
-The project uses 18.9 GiB of 100 GiB. 88 GiB free on the drive.
+The project uses 18.9 GiB of 100 GiB. 83 GiB free on the drive.
