@@ -76,6 +76,7 @@ M1 is accepted and tagged `m1` locally; nothing is pushed. Engineers are Claude 
 
 ## Not proven yet
 
+- Card health, 2026-11-09: WRF reports the MPSS management path wedged (a `MicSmc.exe -a mic0` hung at 17:06Z and stays stuck in the driver after a kill). Our `card_run` uses SSH only, but 5 of our uploads missed the 60 s SSH deadline at 16:24-16:40Z under full host load. Before the next card job, run a hello job and treat SSH deadlines as a card or host warning, not noise.
 - tests/tools run from the main checkout on Windows (2026-11-08, after S8-18): 25 failed, 185 passed, 3 errors, every one pre-existing. Card backend and recovery tests need Cygwin; vect_suite, gcc_build and prepare_s3_10 tests assume a .work worktree path; test_torture_driver imports POSIX `resource`. S8-18's own tests pass. A clean Windows baseline needs a tools ticket.
 
 - **S8-01 limits:** every line ran once, not five launches; job 9 (C5 at 2 threads) has two invalid points and bimodal rows; C4 has no TLB knee (all L2 hits), C5 short rows alias, C9's chain stays in L1. S8-12 (merged 2026-11-08) fixed C4, C5 and C9 and rebuilt `.work/_shared/S8-01/knc-char.mic`; the lead reran them on 2026-11-08 (one launch each): C4 shows a 64-page first-level DTLB knee (~29 ticks per miss at one thread), C5 rows prefetch best at L1 8 / L2 32, and C9's memory-carried chain costs ~11 ticks per link.
