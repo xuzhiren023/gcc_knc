@@ -5,8 +5,9 @@
 
 t1 runs tests/t1/knc-storent.c.  t2 compiles tests/t2/knc-storent-publish.c
 at -O2, requires its stream_fill to take the no-read store path (vmovnrngoaps
-and the lock addl fence, so the card run exercises what it claims), links
-the pthread program and lints it.  The binary is staged for the lead under
+and the lock addl fence, so the card run exercises what it claims) and its
+--control writer to stream without a fence, links the pthread program and
+lints it.  The binary is staged for the lead under
 .work/_shared/S8-13/knc-storent-publish.mic; the engineer never runs it.
 """
 import re
@@ -34,14 +35,17 @@ def t2(runner):
     if compiled.returncode:
         failures.append('compile: ' + compiled.stdout[-1600:])
     else:
-        body = function_body(asm.read_text(), 'stream_fill')
-        if body is None:
-            failures.append('stream_fill: missing function boundary')
-        else:
+        text = asm.read_text()
+        for name, fenced in (('stream_fill', True), ('stream_fill_control', False)):
+            body = function_body(text, name)
+            if body is None:
+                failures.append(name + ': missing function boundary')
+                continue
             if not NGO_STORE.search(body):
-                failures.append('stream_fill: no vmovnrngoaps store')
-            if not FENCE.search(body):
-                failures.append('stream_fill: no lock addl $0,(%rsp) fence')
+                failures.append(name + ': no vmovnrngoaps store')
+            if bool(FENCE.search(body)) != fenced:
+                failures.append(name + (': no lock addl $0,(%rsp) fence' if fenced
+                                        else ': has a fence'))
     runner.result('t2 storent publish test takes the NGO path', failures)
     linked = runner.command(runner.cc, *runner.cc_flags, *flags, source, '-o', elf, check=False)
     failures = ['link: ' + linked.stdout[-1600:]] if linked.returncode else []

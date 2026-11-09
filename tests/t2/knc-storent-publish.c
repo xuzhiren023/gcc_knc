@@ -10,13 +10,18 @@
    = 16384 iterations is beyond the 4096 guard), then publishes the round in
    the flag.  The reader spins on the flag, checks every element of y
    bitwise against a * x (x holds small integers, so the products are
-   exact), then acknowledges.  Any stale element is a failure.
+   exact), the last-streamed lines first since those are the ones that can
+   still be in flight, then acknowledges.  Any stale element is a failure.
 
    Build: -O2 -pthread (tools/storent.py t2 stages the binary).  Run on the
    card with --threads 240 (default; pairs = threads/2), --rounds R (20),
    --length N floats per pair (262144).  Prints
    "S8-13-PUBLISH PASS pairs=P rounds=R stale=0" and exits 0, or FAIL and
-   exits 1.  The lead runs it; the engineer only builds it.  */
+   exits 1.  With --control 1 the writer streams through inline-asm
+   vmovnrngoaps with no fence before the flag, to show whether the card
+   makes a missing fence visible: it prints "S8-13-PUBLISH CONTROL ...
+   stale=N" and exits 0 whatever N is.  The lead runs it; the engineer only
+   builds it.  */
 #define _GNU_SOURCE
 #include <pthread.h>
 #include <sched.h>
@@ -32,6 +37,23 @@ stream_fill (float *restrict yy, const float *restrict xx, float a,
   const float *restrict x = __builtin_assume_aligned (xx, 64);
   for (unsigned long i = 0; i < n; ++i)
     y[i] = a * x[i];
+}
+
+/* The control writer: the same NGO stores by hand, and no fence.  */
+typedef float v16sf __attribute__ ((vector_size (64)));
+
+__attribute__ ((noinline)) void
+stream_fill_control (float *restrict yy, const float *restrict xx, float a,
+		     unsigned long n)
+{
+  v16sf *restrict y = __builtin_assume_aligned (yy, 64);
+  const v16sf *restrict x = __builtin_assume_aligned (xx, 64);
+  for (unsigned long i = 0; i < n / 16; ++i)
+    {
+      v16sf v = a * x[i];
+      __asm__ volatile ("vmovnrngoaps %g1, %0" : "=m" (y[i]) : "YJ" (v)
+			: "memory");
+    }
 }
 
 struct pair
@@ -51,6 +73,7 @@ static const float *x;
 static unsigned long length = 262144;
 static unsigned int rounds = 20;
 static int threads = 240;
+static int control;
 static pthread_barrier_t barrier;
 static cpu_set_t allowed;
 
@@ -88,7 +111,10 @@ writer (void *arg)
   pthread_barrier_wait (&barrier);
   for (unsigned int round = 1; round <= rounds; ++round)
     {
-      stream_fill (p->y, x, (float) round, length);
+      if (control)
+	stream_fill_control (p->y, x, (float) round, length);
+      else
+	stream_fill (p->y, x, (float) round, length);
       /* A plain release store: only the compiler's fence after the NGO
 	 loop orders the streamed lines before this flag.  */
       __atomic_store_n (&p->flag, round, __ATOMIC_RELEASE);
@@ -108,7 +134,7 @@ reader (void *arg)
       spin_until (&p->flag, round);
       float a = (float) round;
       unsigned long stale = 0;
-      for (unsigned long i = 0; i < length; ++i)
+      for (unsigned long i = length; i-- > 0;)
 	if (p->y[i] != a * x[i])
 	  ++stale;
       p->stale += stale;
@@ -127,6 +153,8 @@ main (int argc, char **argv)
       rounds = (unsigned int) atoi (argv[i + 1]);
     else if (!strcmp (argv[i], "--length"))
       length = strtoul (argv[i + 1], 0, 10);
+    else if (!strcmp (argv[i], "--control"))
+      control = atoi (argv[i + 1]);
     else
       fail ("argument");
   if (threads < 2 || threads > 240 || rounds < 1 || length < 4096
@@ -185,6 +213,7 @@ main (int argc, char **argv)
     }
   printf ("INFO cpus=%d length=%lu\n", ncpus, length);
   printf ("S8-13-PUBLISH %s pairs=%d rounds=%u stale=%lu\n",
-	  stale ? "FAIL" : "PASS", npairs, rounds, stale);
-  return stale != 0;
+	  control ? "CONTROL" : stale ? "FAIL" : "PASS", npairs, rounds,
+	  stale);
+  return !control && stale != 0;
 }

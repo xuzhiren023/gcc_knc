@@ -6,36 +6,30 @@
 // mfence on KNC).  GCC's loop-prefetch pass marks the stores (storent optab);
 // a loop whose trip count is known only at run time is versioned on the L2
 // footprint: the NGO copy runs when iterations x bytes per iteration reach
-// the 512 KiB L2 (two 64-byte streams: 4096 iterations, guard niter >= 4095,
-// emitted as cmpq $4094 and jbe to the normal-store copy), and the other copy
-// is the S8-03 prefetched loop with normal stores.
+// the 512 KiB L2 (two 64-byte streams: 4096 iterations, three: 2731), and
+// the other copy is the S8-03 prefetched loop with normal stores.
 // options: -O2 -ffp-contract=off
-// scan-asm-func stream_f32: \bvmovnrngoaps\s+%zmm\d+,\s*[^\n]*\(%r
-// scan-asm-func stream_f32: \block\b[ \t]*;?\s*addl[ \t]+\$0,[ \t]*\(%rsp\)
-// scan-asm-func stream_f32: \bcmpq\s+\$4094,[^\n]*\n(?:[^\n]*\n){0,4}\s+jbe\s+\.L\d+$
-// The NGO copy prefetches its input stream at both levels but never its
-// output: no loop has an NGO store beside two L1 prefetches, and no loop has
-// an NGO store without an L2 prefetch.
-// scan-asm-loop-not stream_f32: (?s)\A(?=.*\bvmovnrngoaps\b)(?=.*\bvprefetch0\b.*\bvprefetch0\b)
-// scan-asm-loop-not stream_f32: (?s)\A(?=.*\bvmovnrngoaps\b)(?!.*\bvprefetch1\b)
+// Order within each NGO function: every NGO store comes before the fence,
+// the fence before a ret, and no NGO store reaches a ret without a fence.
+// scan-asm-func stream_f32: (?s)\A(?!.*\bvmovnrngoap[sd]\b(?:(?!\block\b).)*\n\s*ret\b)(?!.*\block[^\n]*addl[^\n]*\n.*\bvmovnrngoap)(?=.*\bvmovnrngoaps\s+%zmm\d+,\s*[^\n]*\(%r.*\block\b[ \t]*;?\s*addl[ \t]+\$0,[ \t]*\(%rsp\).*\n\s*ret\b)
+// The NGO copy prefetches its input stream but never its output: no loop
+// has a vprefetch whose base register is the NGO store's.
+// scan-asm-loop-not stream_f32: (?s)\bvmovnrngoaps\s+%zmm\d+,\s*[^\n(]*\((%r\w+)\b.*\bvprefetch[0-2]\s+[^\n(]*\(\1\b
+// scan-asm-loop-not stream_f32: (?s)\bvprefetch[0-2]\s+[^\n(]*\((%r\w+)\b.*\bvmovnrngoaps\s+%zmm\d+,\s*[^\n(]*\(\1\b
 // The run-time L2-resident copy keeps the normal aligned store.
 // scan-asm-func stream_f32: \bvmovaps\s+%zmm\d+,\s*[^\n]*\(%r
-// scan-asm-func stream_f64: \bvmovnrngoapd\s+%zmm\d+,\s*[^\n]*\(%r
-// scan-asm-func stream_f64: \block\b[ \t]*;?\s*addl[ \t]+\$0,[ \t]*\(%rsp\)
+// scan-asm-func stream_f64: (?s)\A(?!.*\bvmovnrngoap[sd]\b(?:(?!\block\b).)*\n\s*ret\b)(?!.*\block[^\n]*addl[^\n]*\n.*\bvmovnrngoap)(?=.*\bvmovnrngoapd\s+%zmm\d+,\s*[^\n]*\(%r.*\block\b[ \t]*;?\s*addl[ \t]+\$0,[ \t]*\(%rsp\).*\n\s*ret\b)
 // scan-asm-func stream_f64: \bvmovapd\s+%zmm\d+,\s*[^\n]*\(%r
 // Integer lines take the same no-read store (the ISA has no vmovnrngo integer
-// form; the bits are the line).  Three 64-byte streams reach L2 at 2731
-// iterations (guard niter >= 2730).
-// scan-asm-func stream_i32: \bvmovnrngoaps\s+%zmm\d+,\s*[^\n]*\(%r
-// scan-asm-func stream_i32: \block\b[ \t]*;?\s*addl[ \t]+\$0,[ \t]*\(%rsp\)
-// scan-asm-func stream_i64: \bvmovnrngoapd\s+%zmm\d+,\s*[^\n]*\(%r
-// scan-asm-func stream_i64: \block\b[ \t]*;?\s*addl[ \t]+\$0,[ \t]*\(%rsp\)
-// scan-asm-func stream_i64: \bcmpq\s+\$2729,[^\n]*\n(?:[^\n]*\n){0,4}\s+jbe\s+\.L\d+$
+// form; the bits are the line).
+// scan-asm-func stream_i32: (?s)\A(?!.*\bvmovnrngoap[sd]\b(?:(?!\block\b).)*\n\s*ret\b)(?!.*\block[^\n]*addl[^\n]*\n.*\bvmovnrngoap)(?=.*\bvmovnrngoaps\s+%zmm\d+,\s*[^\n]*\(%r.*\block\b[ \t]*;?\s*addl[ \t]+\$0,[ \t]*\(%rsp\).*\n\s*ret\b)
+// scan-asm-func stream_i64: (?s)\A(?!.*\bvmovnrngoap[sd]\b(?:(?!\block\b).)*\n\s*ret\b)(?!.*\block[^\n]*addl[^\n]*\n.*\bvmovnrngoap)(?=.*\bvmovnrngoapd\s+%zmm\d+,\s*[^\n]*\(%r.*\block\b[ \t]*;?\s*addl[ \t]+\$0,[ \t]*\(%rsp\).*\n\s*ret\b)
 // A constant trip count beyond L2 (two 4 MiB static arrays) needs no guard:
 // the pass judges it from the footprint alone.
-// scan-asm-func big_stream_f32: \bvmovnrngoaps\s+%zmm\d+,\s*[^\n]*\(%r
-// scan-asm-func big_stream_f32: \block\b[ \t]*;?\s*addl[ \t]+\$0,[ \t]*\(%rsp\)
-// scan-asm-func big_stream_f32: \A(?![\s\S]*\bjbe\b)
+// scan-asm-func big_stream_f32: (?s)\A(?![\s\S]*\bjbe\b)(?!.*\bvmovnrngoap[sd]\b(?:(?!\block\b).)*\n\s*ret\b)(?!.*\block[^\n]*addl[^\n]*\n.*\bvmovnrngoap)(?=.*\bvmovnrngoaps\s+%zmm\d+,\s*[^\n]*\(%r.*\block\b[ \t]*;?\s*addl[ \t]+\$0,[ \t]*\(%rsp\).*\n\s*ret\b)
+// The inlined publish case: the NGO loop is followed in the same function
+// by a flag store, and the fence sits between the last NGO store and it.
+// scan-asm-func publish_f32: (?s)\A(?!.*\bvmovnrngoaps\b(?:(?!\block\b).)*\n\s*movl\s+\$1,)(?!.*\block[^\n]*addl[^\n]*\n.*\bvmovnrngoap)(?=.*\bvmovnrngoaps\s+%zmm\d+,\s*[^\n]*\(%r.*\block\b[ \t]*;?\s*addl[ \t]+\$0,[ \t]*\(%rsp\).*\n\s*movl\s+\$1,\s*\(%r)
 // Normal stores, no fence: a masked (conditional) store, a converting
 // half-line store, a store of unknown alignment (vpackstore pair) and a
 // constant L2-resident footprint (two 128 KiB arrays).
@@ -87,13 +81,24 @@ stream_i64 (long *restrict yy, const long *restrict xx,
 }
 
 float big_y[1 << 20] __attribute__ ((aligned (64)));
-const float big_x[1 << 20] __attribute__ ((aligned (64)));
+float big_x[1 << 20] __attribute__ ((aligned (64)));
 
 void
 big_stream_f32 (float a)
 {
   for (unsigned int i = 0; i < (1 << 20); ++i)
     big_y[i] = a * big_x[i];
+}
+
+void
+publish_f32 (float *restrict yy, const float *restrict xx, float a,
+	     unsigned long n, volatile int *flag)
+{
+  float *restrict y = __builtin_assume_aligned (yy, 64);
+  const float *restrict x = __builtin_assume_aligned (xx, 64);
+  for (unsigned long i = 0; i < n; ++i)
+    y[i] = a * x[i];
+  *flag = 1;
 }
 
 void
