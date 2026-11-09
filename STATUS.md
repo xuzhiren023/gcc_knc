@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-08 22:32.
+Updated automatically at every ticket change. Last update: 2026-11-08 22:59.
 
 **Next: the tech lead, on S8-04.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
@@ -148,7 +148,7 @@ Current tickets: `[#################---]` 129 of 150
 | S8-03 | Two-level software prefetch for KNC loops (E5-07) | Done | KNC loops now prefetch two levels ahead (L2 2 KiB, L1 1 KiB, in bytes so strided loops work): L2-sized stre... |
 | S8-04 | Small-matrix kernels: diagnose mat8 and mat16, reject low lane use (E5-11 part 2) | Waiting for review | Green at GCC 800ef2e on knc 028f9f3 (knc unmoved, S8-06 not merged: no rebase, one split). vec_duplicate in... |
 | S8-05 | Per-loop scalar-add cost choice that keeps both mat8 and the stencils (E5-11) | Not started | written under the owner's overnight blanket approval (2026-11-08). |
-| S8-06 | Memory-operand forms for V16SF/V8DF arithmetic and FMA (E5-17) | Waiting for review | Green 293c29e..5527ff9, rebased clean on knc as 9e831f4..ef0dd1f (imci.md, i386-knc.cc only): fold-fma T1 F... |
+| S8-06 | Memory-operand forms for V16SF/V8DF arithmetic and FMA (E5-17) | Waiting for review | card run 03:12-03:39Z on the frozen pre-rebase binaries (5527ff9 on 836a0e2, paired against S8-02; .work/_s... |
 | S8-07 | vpmadd231d for V16SI multiply-add (E5-14) | Not started | written under the owner's overnight blanket approval (2026-11-08). |
 | S8-08 | -mtune=knc tune-flag audit (E5-12) | Not started | also re-measure M2 short at lengths 5 and 13 under the alignment default. S8-03 (prefetch versioning) left ... |
 | S8-09 | KNC -O2 defaults: vectorizer cost model, stride versioning, predictive commoning (E5-18) | Not started | written under the owner's overnight blanket approval (2026-11-08). |
@@ -186,12 +186,12 @@ Current tickets: `[#################---]` 129 of 150
 
 ## Cost
 
-- From the script, engineer: 316 sessions, 739.0M input tokens
+- From the script, engineer: 317 sessions, 739.0M input tokens
 - From the script, lead: 227 sessions, 69.3M input tokens
-- Started by hand, Claude: 10 sessions, 1843.5M input tokens
+- Started by hand, Claude: 10 sessions, 1848.9M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 15.7 GiB of 100 GiB. 147 GiB free on the drive.
+The project uses 15.7 GiB of 100 GiB. 149 GiB free on the drive.
