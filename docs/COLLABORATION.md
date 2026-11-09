@@ -30,7 +30,7 @@ limit who needs to talk, and they make the work itself the message.
 |---|---|---|---|
 | Owner | You | Priorities, milestones, anything outward-facing | Only the inbox and milestone reviews |
 | Tech lead | Claude | Specs, reviews, technical answers, merging to local `main` | Tickets in `review`, `red-review` and `blocked` |
-| Engineer | Claude Code (Sonnet light, Opus standard, Fable deep; `harness/policy.json`), one fresh session per ticket | How to implement the ticket | Its one ticket |
+| Engineer | Claude Code (Sonnet light, Opus standard, Fable 5.2 deep, pinned as `claude-fable-5-2`; `harness/policy.json`), one fresh session per ticket | How to implement the ticket | Its one ticket |
 | Dispatcher | `tools/dispatch.py`, no model | Nothing; it starts whoever is next | The board |
 
 When a ticket's engineer struggles (repeated timeouts without progress, or a second round of changes
