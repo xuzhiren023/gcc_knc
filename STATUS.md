@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-09 18:56.
+Updated automatically at every ticket change. Last update: 2026-11-09 18:57.
 
 **Next: the tech lead, on S8-08.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
@@ -166,7 +166,7 @@ Current tickets: `[#################---]` 134 of 150
 | S9-03 | libstdc++ and libatomic build for k1om (E6-06a) | Not started | Pre-check: build wiring, static linking, test programs and allowed files are now in the brief (lead pre-che... |
 | S9-04 | libstdc++ packaging into the private prefix and a g++ link guard (E6-06b) | Not started | Pre-check: build wiring, static linking, test programs and allowed files are now in the brief (lead pre-che... |
 | S9-05 | libstdc++ runtime slice on the card (E6-06c) | Not started | Pre-check: build wiring, static linking, test programs and allowed files are now in the brief (lead pre-che... |
-| S9-06 | libgomp for k1om: build, select, package and link guard (E6-03 A) | Not started | from S9-01's plan, under the owner's overnight blanket approval. |
+| S9-06 | libgomp for k1om: build, select, package and link guard (E6-03 A) | Not started | Pre-check: build wiring, static linking, test programs and allowed files are now in the brief (lead pre-che... |
 | S9-07 | libgomp KNC affinity defaults (E6-03 B) | Not started | from S9-01's plan, under the owner's overnight blanket approval. |
 | S9-08 | libgomp spin-wait with delay and the one-core measurement (E6-03 C) | Not started | from S9-01's plan, under the owner's overnight blanket approval. |
 | S9-09 | libgomp hierarchical ring-aware barrier (E6-03 D) | Not started | from S9-01's plan, under the owner's overnight blanket approval. |
@@ -175,6 +175,7 @@ Current tickets: `[#################---]` 134 of 150
 
 ## Recent activity
 
+- 2026-11-09 18:57 **S9-06** lead amend: Pre-check: build wiring, static linking, test programs and allowed files are now in the brief (lead pre-check section).
 - 2026-11-09 18:56 **S9-05** lead amend: Pre-check: build wiring, static linking, test programs and allowed files are now in the brief (lead pre-check section).
 - 2026-11-09 18:54 **S9-04** lead amend: Pre-check: build wiring, static linking, test programs and allowed files are now in the brief (lead pre-check section).
 - 2026-11-09 18:53 **S9-03** lead amend: Pre-check: build wiring, static linking, test programs and allowed files are now in the brief (lead pre-check section).
@@ -182,13 +183,12 @@ Current tickets: `[#################---]` 134 of 150
 - 2026-11-09 17:23 **S8-08** engineer submit: -mtune=knc defaults -falign-functions/-falign-loops=64 (gcc abcd19140f4, i386-knc.cc only; user -falign-* wins). Red 0a5c72d, T1 knc-tune-align*.c ...
 - 2026-11-09 16:12 **S8-13** lead note: The engineer x86 check of aeba063f82f (S8_13_x86-20261109-154306) was killed at 16:09 with its timed-out session (dispatch now kills the session tr...
 - 2026-11-09 16:09 **S8-13** lead card: Card 20:22-21:05Z on frozen aeba063f82f (tmp/claude-s8-13b): publish PASS stale=0; s4/s5 PASS; M2 neg 1, pos 0. Paired vs S8-10: L2 stencil1 1.006/...
-- 2026-11-09 16:07 **S8-08** lead budget: sessions 4: lead extension 1 under the owner rule (2026-11-09) for the -falign default.
 
 ## Cost
 
 - From the script, engineer: 331 sessions, 755.5M input tokens
 - From the script, lead: 229 sessions, 69.8M input tokens
-- Started by hand, Claude: 11 sessions, 1950.8M input tokens
+- Started by hand, Claude: 11 sessions, 1951.2M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
