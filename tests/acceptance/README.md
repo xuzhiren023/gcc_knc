@@ -85,3 +85,31 @@ Before Sprint 4's code (lead, 2026-11-04): host Cygwin gcc at `-O2 -ftree-vector
 passes 1,576,200 checks; the negative control fails, and the guard control dies with SIGSEGV. With S4-05's aligned kernels: 1,589,070 checks, and the aligned guard control faults (lead, host).
 GCC 16 at `knc` `0d3c0152fe3` faults on the card in `add_f32` (n=16, o=1, `addr=(nil)`): LRA
 folds a misaligned load into `vaddps`. That is S4-09, and this fixture is red until it merges.
+
+## `s9_cxx/`: libstdc++, libsupc++ and libatomic on the card (S9-03 to S9-05, S9-11)
+
+`build.py OUTDIR --cxx G++... --libdir DIR` builds hello (iostream, strings, containers), eh (throw
+through frames, unwinding, rethrow, `exception_ptr`, `bad_alloc`), rtti (`dynamic_cast` down, across
+and to `void*`, `typeid`, `bad_cast`), thread (mutex, condition variable, `thread_local`,
+`call_once`, `async`), atomic16 (16-byte `std::atomic` through libatomic) and tz (C++20 time zones,
+needs `--with-libstdcxx-zoneinfo=static`). hello, eh and rtti are also linked with
+`-static-libstdc++ -static-libgcc` (the k1om sysroot has no static glibc, so nothing links fully
+static). xdso throws and casts across a DSO boundary, built GCC 16/GCC 16, GCC 16 main with a donor
+library, and donor main with a GCC 16 library: the ABI cross-check. Every program is also built
+with `-DBREAK` and must print FAIL. `runs.txt` lists each card job and its expected line.
+
+Without `--cxx` the donor GCC 5.1.1 builds everything but tz: that validates the fixture itself
+(lead, 2026-11-09: all pass on the host, and each BREAK build fails).
+
+## `s9_omp/`: the eight OpenMP programs (S9-06, rerun by S9-10 and S9-11)
+
+`build.py OUTDIR --cc GCC... --fc GFORTRAN... --libdir DIR` builds for (static, dynamic and guided
+schedules, each iteration once, static,1 ownership), reduction (long, double, max, array section),
+critical (critical, named critical, atomic capture), single (single, master, barrier phases,
+ordered), tasks (recursive tasks with taskwait, 10,000 tasks, taskgroup), locks (simple and nested
+locks, `omp_test_lock`, `omp_get_wtime`), and in Fortran do (parallel do, private, reduction) and
+sections (sections, atomic, critical, workshare); each against `libgomp.so.1` and against
+`libgomp.a`. runtime reads `/proc/self/maps`: one libgomp, from the program's own directory, and no
+`libiomp5`. Run every job at 60x1 and 60x4 with `OMP_DISPLAY_ENV=verbose`; the result line does not
+depend on the thread count. `--host` runs the eight on the laptop with Cygwin GCC 14 (lead,
+2026-11-09: all pass at 8 threads, and each BREAK build fails).
