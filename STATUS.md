@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-09 14:35.
+Updated automatically at every ticket change. Last update: 2026-11-09 14:36.
 
 **Next: the tech lead, on S8-08.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
@@ -155,7 +155,7 @@ Current tickets: `[#################---]` 134 of 150
 | S8-10 | Less ring traffic: 64-byte padding of per-thread data, and card check C11 (E5-16) | Done | Per-thread arrays and the OpenMP shared block now start on their own 64-byte line, and the C11 card check s... |
 | S8-11 | Sprint 8 batch check and paired M2 re-measure | Not started | add one compiler-prefetch card case, because S8-03's card run has no row kernel (C5's rows are hand-written... |
 | S8-12 | Fix three weak S8-01 checks - C4 page offsets, C5 row aliasing, C9 memory chain | Done | The knc-char checks C4, C5 and C9 are fixed and rebuilt: C4 now walks every page offset, C5's eight arrays ... |
-| S8-13 | Streaming stores for write-only loops beyond L2 (E5-08) | Changes requested | Card: memory affine/stencil1 0.70 and publish stale=0 are good, but stencil1 at L2 is 1.04-1.075 slower and... |
+| S8-13 | Streaming stores for write-only loops beyond L2 (E5-08) | Changes requested | sessions 6: lead extension 1 under the owner rule (2026-11-09) for the stencil1 L2 change. |
 | S8-14 | Default 64-byte data alignment and TLB-aware cache parameters (E5-13) | Not started | added at the owner's request (2026-11-08: "add three [tickets] in s8") to cover ADR-0009 points the sprint ... |
 | S8-15 | Small-loop unroll default and the GCC-KNC flags page (E5-09) | Not started | added at the owner's request (2026-11-08: "add three [tickets] in s8") to cover ADR-0009 points the sprint ... |
 | S8-16 | User story - one bold flag, -mphinix, with a rising-phoenix banner and a progress bar | Not started | owner's user story, written by the lead with the owner's request quoted above. |
@@ -175,6 +175,7 @@ Current tickets: `[#################---]` 134 of 150
 
 ## Recent activity
 
+- 2026-11-09 14:36 **S8-13** lead budget: sessions 6: lead extension 1 under the owner rule (2026-11-09) for the stencil1 L2 change.
 - 2026-11-09 14:35 **S8-13** lead changes: Card: memory affine/stencil1 0.70 and publish stale=0 are good, but stencil1 at L2 is 1.04-1.075 slower and stays 1.027-1.063 with the GCC objects ...
 - 2026-11-09 13:48 **S8-08** engineer submit: FAST_PREFIX off for -mtune=knc: red bd7b00d, gcc a47e96e449e + 223c9dce26d (shared i386-options.cc: one 2-line ADR-0006 hook). Other flags kept, re...
 - 2026-11-09 13:34 **S8-08** lead note: Two sessions timed out (ended 11:53 and 13:30) with progress: red bd7b00d, FAST_PREFIX off (a47e96e449e, 223c9dce26d), audit table eb40ad2, A/A ali...
@@ -182,16 +183,15 @@ Current tickets: `[#################---]` 134 of 150
 - 2026-11-09 11:12 **S8-13** engineer submit: Green gcc-2 s8/S8-13 d74bda170a4 on knc cba9fe1: KNC storent + fence, shared i386 hooks (sse.md 1 hunk, i386-builtins.cc 1 hunk), loop-prefetch L2-...
 - 2026-11-09 11:00 **S8-13** lead budget: sessions 5 (owner 2026-11-09). Submit only: green d74bda170a4 and its checks are done (10:26 note).
 - 2026-11-09 10:57 **S8-13** owner decide: Owner 2026-11-09: "Yes" to one more session to submit; standing rule from now on: the lead adds sessions automatically until two extra-session atte...
-- 2026-11-09 10:41 **S8-13** lead escalate: budget: 4 engineer sessions used; the budget is 4
 
 ## Cost
 
 - From the script, engineer: 329 sessions, 754.8M input tokens
 - From the script, lead: 229 sessions, 69.8M input tokens
-- Started by hand, Claude: 10 sessions, 1919.9M input tokens
+- Started by hand, Claude: 10 sessions, 1920.3M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 15.8 GiB of 100 GiB. 99 GiB free on the drive.
+The project uses 15.8 GiB of 100 GiB. 103 GiB free on the drive.
