@@ -1,6 +1,6 @@
 # Small-matrix kernels: mat8 and mat16 diagnosis (S8-04, E5-11 part 2)
 
-Compiler: GCC `knc` 028f9f3 (after S8-03). Fixture: `tests/acceptance/m2_kernels/kernels.c`
+Compiler: GCC `knc` 028f9f3 (after S8-03) for the diagnosis, 800ef2e for the result. Fixture: `tests/acceptance/m2_kernels/kernels.c`
 with the `build.py` flags (`-O2 -march=knc -ffp-contract=fast -ftree-vectorize`). Evidence in
 `.work/_shared/S8-04/kernels-diag.{s,vect,optinfo}` (assembly, `-fdump-tree-vect-details`,
 `-fopt-info-vec-all`), produced by `diag.sh` there.
@@ -72,9 +72,39 @@ instructions with no store-to-load round trip, mat8 16 -> 12; V8DF gets `vbroadc
 No shared i386 line; imci.md and i386-knc.cc only. The scalar_to_vec cost entry
 (`CEIL (12, density)`, modelling the bridge) is left as it is in this ticket.
 
-Red scan: `tests/t1/knc-broadcast-load.c` (mat8, mat16 and an FP64 mat8 shape: the
-broadcast must be a `vbroadcasts[sd]` from the pointer and no loop may contain `fld`, `fstp`
-or `vpermf32x4`). Fails at 028f9f3 on the first directive.
+Red scan: `tests/t1/knc-broadcast-load.c` (mat8, mat16 and an FP64 mat8 shape). The positive
+scan wants a `vbroadcasts[sd]` from a non-stack base (any displacement or index); the loop
+scans forbid only the bridge (an x87 store to `(%rsp)`, a `vbroadcasts[sd]` from `(%rsp)`,
+`vpermf32x4`), because mat16's count < 16 remainder (`fldz`, `flds (%rax)`,
+`fstps (%r10,%rsi,4)`) and mat8_f64's `fldl`/`fstpl` remainder are legitimate scalar code that
+the fix keeps. `check.py` stops at the first failing directive, so every directive was scored
+separately (`.work/_shared/S8-04/directives.py`, output in `directives-red.txt` there):
+
+| Directive | knc 028f9f3 | hand-edited .s (bridge replaced by `vbroadcastss (%rdx)`, x87 remainder kept) |
+|---|---|---|
+| scan-asm-func mat8_f32 | FAIL (not found) | PASS |
+| scan-asm-loop-not mat8_f32 | FAIL (2 of 4 loops: `fstps -4(%rsp)`, `vbroadcastss -4(%rsp)`, `vpermf32x4`) | PASS (0 of 4) |
+| scan-asm-func mat16_f32 | FAIL (not found) | PASS |
+| scan-asm-loop-not mat16_f32 | FAIL (2 of 5 loops, same three) | PASS (0 of 5) |
+| scan-asm-func mat8_f64 | FAIL (not found) | PASS |
+| scan-asm-loop-not mat8_f64 | FAIL (2 of 5 loops: `fstpl -8(%rsp)`, `vbroadcastsd -8(%rsp)`, `vpermf32x4`) | PASS (0 of 5) |
+| scan-asm-not xmm/ymm | PASS | PASS |
+
+The two loops with a hit per function are the inner `j` loop and the enclosing row loop that
+contains it.
+
+## Result (GCC `knc` 800ef2e, `kernels-after.s` in `.work/_shared/S8-04`)
+
+| Kernel | Inner `j` loop before | after | Function | Other kernels |
+|---|---|---|---|---|
+| mat16 | 12 instructions, store-to-load round trip | 8: `vloadunpackl/hps`, `vbroadcastss (%rdx)`, `addq`, `addq`, `cmpq`, `vfmadd231ps`, `jne` | 68 -> 62 | same mnemonic counts |
+| mat8 | 16 | 12: the gather pair, `vbroadcastss (%rdx)`, `vblendmps`, masked FMA, loop control | 66 -> 59 | (register names only) |
+
+mat16's x87 remainder for count < 16 is unchanged. The affine, short and stencil kernels keep
+their entry broadcast through x87 and a slot: there the scalar has two uses (the vector
+broadcast and the x87 remainder loop), so combine does not fold the load; the mnemonic counts
+are identical and only register numbers move. The IMCI loop is still 6 instructions: it folds
+the broadcast into the FMA's memory operand and needs no `vloadunpack` pair (below).
 
 ## What remains after the fix (not this ticket)
 
