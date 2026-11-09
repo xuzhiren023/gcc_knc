@@ -29,6 +29,8 @@ PACKED = re.compile(r'\bv(?:addn?|subr?|mul|div|max|min|sqrt|rcp(?:23)?|rsqrt(?:
 # Each entry supplies its CLI help and handlers for the tiers it selects.
 # Imports stay lazy so T0 and source-only selections need no probe modules.
 SELECTIONS = {
+    'tune_prefix': ('S8-08 -mtune=knc avoids 0x66-prefixed forms', {
+        't1': lambda runner: runner.t1_sources([runner.source_dir / 'knc-tune-prefix.c'])}),
     'line_pad': ('S8-10 64-byte lines for OpenMP shared blocks and per-thread arrays', {
         't1': lambda runner: runner.t1_sources(runner.source_dir.glob('knc-pad-*.c'))}),
     'int_madd': ('S8-07 V16SI multiply-add as vpmadd231d', {
