@@ -7,16 +7,19 @@
 // and a store-to-load round trip), where the hand-written IMCI has one.
 // The CONSTRUCTOR repeats the scalar sixteen times, so expand cannot fold
 // the load and the register broadcast must be one combinable vec_duplicate.
-// The positive scans accept any displacement or index on a non-stack base;
+// The positive scans accept the broadcast as one vbroadcastss/sd or folded
+// into the arithmetic as a {1to16}/{1to8} memory operand (S8-06, which
+// closed this ticket's fix, owner 2026-11-09), from any displacement or
+// index on a non-stack base;
 // the loop scans forbid only the bridge (an x87 store to a stack slot, a
 // broadcast from the stack, vpermf32x4), not x87 itself: the remainder for
 // count < 16 is legitimate scalar x87 code and stays.
 // options: -O2 -ftree-vectorize -ffp-contract=fast
-// scan-asm-func mat8_f32: ^[ \t]*vbroadcastss[ \t]+[^,(]*\((?!%rsp)%r\w+[^)]*\), %zmm\d+
+// scan-asm-func mat8_f32: ^[ \t]*(?:vbroadcastss[ \t]+[^,(]*\((?!%rsp)%r\w+[^)]*\), %zmm\d+|v\w+[ \t]+[^,(]*\((?!%rsp)%r\w+[^)]*\)\{1to16\})
 // scan-asm-loop-not mat8_f32: ^[ \t]*(?:fstp?[sl][ \t]+[^\n]*\(%rsp\)|vbroadcasts[sd][ \t]+[^\n]*\(%rsp\)|vpermf32x4\b)
-// scan-asm-func mat16_f32: ^[ \t]*vbroadcastss[ \t]+[^,(]*\((?!%rsp)%r\w+[^)]*\), %zmm\d+
+// scan-asm-func mat16_f32: ^[ \t]*(?:vbroadcastss[ \t]+[^,(]*\((?!%rsp)%r\w+[^)]*\), %zmm\d+|v\w+[ \t]+[^,(]*\((?!%rsp)%r\w+[^)]*\)\{1to16\})
 // scan-asm-loop-not mat16_f32: ^[ \t]*(?:fstp?[sl][ \t]+[^\n]*\(%rsp\)|vbroadcasts[sd][ \t]+[^\n]*\(%rsp\)|vpermf32x4\b)
-// scan-asm-func mat8_f64: ^[ \t]*vbroadcastsd[ \t]+[^,(]*\((?!%rsp)%r\w+[^)]*\), %zmm\d+
+// scan-asm-func mat8_f64: ^[ \t]*(?:vbroadcastsd[ \t]+[^,(]*\((?!%rsp)%r\w+[^)]*\), %zmm\d+|v\w+[ \t]+[^,(]*\((?!%rsp)%r\w+[^)]*\)\{1to8\})
 // scan-asm-loop-not mat8_f64: ^[ \t]*(?:fstp?[sl][ \t]+[^\n]*\(%rsp\)|vbroadcasts[sd][ \t]+[^\n]*\(%rsp\)|vpermf32x4\b)
 // scan-asm-not: %(?:xmm|ymm)\d
 #define R __restrict

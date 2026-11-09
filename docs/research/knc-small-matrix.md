@@ -114,3 +114,14 @@ the broadcast into the FMA's memory operand and needs no `vloadunpack` pair (bel
 - IMCI folds the broadcast into the FMA's memory operand (`{1to16}` swizzle); GCC keeps a
   separate `vbroadcastss`. A later pattern could take `(vec_duplicate (mem))` as an FMA operand.
 - `vblendmps` per iteration from `.COND_ADD`'s else-zero in the whole-loop-masked chain.
+
+## Closed without a compiler change (owner, 2026-11-09)
+
+The diagnosis stands, but S8-06 (knc `a392a27`) removed the x87 bridge first and better: it folds
+the broadcast into the FMA (`vfmadd231ps (%rdx){1to16}`), as the IMCI does, with mat16 at 0.47 on
+the paired card run. This ticket's split, paired against S8-03 on the card (2026-11-08 03:39Z,
+`.work/_shared/tmp/claude-s8-04-paired`), gave mat16 0.470/0.468 and mat8 0.765/0.737, but short
+1.121/1.099 (slower), and adds a separate `vbroadcastss` that S8-06 does not need. The owner
+closed the ticket with the diagnosis and the T1 test only; the positive scans now accept either a
+`vbroadcastss/sd` or a `{1to16}/{1to8}` memory operand on a non-stack base. The split stays on the
+GCC branch `s8/S8-04-split` (`800ef2e`), not merged.
