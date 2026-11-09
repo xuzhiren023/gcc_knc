@@ -441,6 +441,30 @@ mispredict if half of the random branches miss; at 4 threads it costs 2.7 cycles
 `BRANCH_COST` from about 10 cycles; a branchless sequence pays when it adds under about 5 ticks per
 unpredictable branch.
 
+### C11: ring traffic, 60 cores x 4 threads (S8-10, card 2026-11-09 10:53Z)
+
+Three launches, median of five groups each; reader on cpu 1 (core 0), near owner cpu 5 (core 1),
+far owner cpu 121 (core 30). `.work/_shared/tmp/claude-s8-10-out/c11-*.out`.
+
+| Point | Launch 1 | Launch 2 | Launch 3 |
+|---|---:|---:|---:|
+| L2 hit, own line (ns/load) | 21.5 | 44.5 | 21.2 |
+| other core's L2, near (ns/load) | 195.0 | 194.7 | 194.4 |
+| other core's L2, far (ns/load) | 190.6 | 190.9 | 190.6 |
+| two cores, one shared line (ns/increment) | 20.1 | 24.7 | 28.6 |
+| two cores, padded to 64 bytes (ns/increment) | 4.9 | 5.1 | 5.3 |
+| barrier, one shared counter (ns) | 27,397 | 26,810 | 28,410 |
+| barrier, fan-in-4 tree (ns) | 5,722 | 5,521 | 6,469 |
+
+Decides (E5-16, E6-03):
+- A line from another core's L2 costs about 190-195 ns, nine times an own-L2 hit, and the same
+  for a near or a far core: distance on the ring does not matter, the crossing does. (Launch 2's
+  44.5 ns own-L2 hit is likely a page-placement conflict in L2; the other two agree.)
+- False sharing makes a private counter four to six times slower (20-29 against 5 ns per
+  increment). Padding per-thread data to a 64-byte line is worth it, as S8-10 does.
+- At 240 threads a fan-in-4 tree barrier is about 4.7x faster than one shared counter (about 5.5-6.5
+  against 27-28 us). The ring-aware libgomp barrier (S9-09) should be a tree.
+
 ### C12: card power by rail, 60 cores x 4 threads (S8-17, card 2026-11-08 16:30Z)
 
 One launch, seven 20 s phases in the order idle, x87, fma, stream, fma, x87, idle; the sampler
