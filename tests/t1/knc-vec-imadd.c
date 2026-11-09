@@ -7,8 +7,8 @@
 // scan-asm-loop-not madd: \bvpmulld\b
 // scan-asm-func acc: \bvpmadd231d\s[^\n]*%zmm\d+
 // scan-asm-loop-not acc: \bvpmulld\b
-// scan-asm-func index: \bvpmadd231d\s[^\n]*%zmm\d+
-// scan-asm-loop-not index: \bvpmulld\b
+// scan-asm-func index2d: \bvpmadd231d\s[^\n]*%zmm\d+
+// scan-asm-loop-not index2d: \bvpmulld\b
 
 void
 madd (int *restrict x, const int *restrict a, const int *restrict b,
@@ -27,8 +27,8 @@ acc (int *restrict c, const int *restrict a, const int *restrict b, int n)
 
 /* Flat 2-D index math, j * nx + i, with a loop-invariant multiplier.  */
 void
-index (int *restrict x, const int *restrict j, const int *restrict i, int nx,
-       int n)
+index2d (int *restrict x, const int *restrict j, const int *restrict i, int nx,
+         int n)
 {
   for (int k = 0; k < n; k++)
     x[k] = j[k] * nx + i[k];
