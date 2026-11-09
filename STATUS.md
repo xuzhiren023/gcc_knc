@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-09 17:30.
+Updated automatically at every ticket change. Last update: 2026-11-09 18:53.
 
 **Next: the tech lead, on S8-08.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
@@ -163,7 +163,7 @@ Current tickets: `[#################---]` 134 of 150
 | S8-18 | Second GCC tree - a gcc2 lane with its own checkout and build, so two GCC tickets run in parallel | Done | Tools now support a second GCC tree: a lane gcc2 ticket builds in gcc-2/gcc-build-2 while a gcc ticket uses... |
 | S9-01 | libgomp for KNC: futex, affinity, ring-aware barrier, spin-wait and malloc arenas (E6-03 input) | Done | We now have a build-and-design plan for GCC-KNC's own OpenMP runtime on the card: futex-based waits with de... |
 | S9-02 | libstdc++ for KNC: exceptions, RTTI, atomics, threads, packaging (E6-06 input) | Done | We now know how to build GCC 16's C++ library for the card: no newer glibc or kernel is needed, and built w... |
-| S9-03 | libstdc++ and libatomic build for k1om (E6-06a) | Not started | from S9-02's plan, under the owner's overnight blanket approval. Lead decisions: `--enable-clocale=generic`... |
+| S9-03 | libstdc++ and libatomic build for k1om (E6-06a) | Not started | Pre-check: build wiring, static linking, test programs and allowed files are now in the brief (lead pre-che... |
 | S9-04 | libstdc++ packaging into the private prefix and a g++ link guard (E6-06b) | Not started | from S9-02's plan, under the owner's overnight blanket approval. Lead decisions: `--enable-clocale=generic`... |
 | S9-05 | libstdc++ runtime slice on the card (E6-06c) | Not started | from S9-02's plan, under the owner's overnight blanket approval. Lead decisions: `--enable-clocale=generic`... |
 | S9-06 | libgomp for k1om: build, select, package and link guard (E6-03 A) | Not started | from S9-01's plan, under the owner's overnight blanket approval. |
@@ -175,6 +175,7 @@ Current tickets: `[#################---]` 134 of 150
 
 ## Recent activity
 
+- 2026-11-09 18:53 **S9-03** lead amend: Pre-check: build wiring, static linking, test programs and allowed files are now in the brief (lead pre-check section).
 - 2026-11-09 17:30 **S8-08** lead review-note: abcd19140f4 read: 64 replaces only unset -falign-loops/-functions, -Os and user values win; T1 scans good; M2 code identical to knc except .p2align...
 - 2026-11-09 17:23 **S8-08** engineer submit: -mtune=knc defaults -falign-functions/-falign-loops=64 (gcc abcd19140f4, i386-knc.cc only; user -falign-* wins). Red 0a5c72d, T1 knc-tune-align*.c ...
 - 2026-11-09 16:12 **S8-13** lead note: The engineer x86 check of aeba063f82f (S8_13_x86-20261109-154306) was killed at 16:09 with its timed-out session (dispatch now kills the session tr...
@@ -182,16 +183,15 @@ Current tickets: `[#################---]` 134 of 150
 - 2026-11-09 16:07 **S8-08** lead budget: sessions 4: lead extension 1 under the owner rule (2026-11-09) for the -falign default.
 - 2026-11-09 16:06 **S8-08** lead changes: Card 20:22-21:05Z: FAST_PREFIX part is good (s4/s5, M2 correctness pass; M2 code identical to knc). A/A (same code, gcc_before shifted half a line;...
 - 2026-11-09 15:22 **S8-08** lead review-note: M2 kernels-gcc.s from s8/S8-08 is identical to knc (S8-10/m2), so FAST_PREFIX does not touch M2 and the paired timing is skipped (correctness only)...
-- 2026-11-09 15:10 **S8-13** engineer submit: Extension 1: gcc-2 aeba063f82f (tree-ssa-loop-prefetch.cc). The storent guard on niter gave the L2 copy an upper bound and ivopts dropped its count...
 
 ## Cost
 
 - From the script, engineer: 331 sessions, 755.5M input tokens
 - From the script, lead: 229 sessions, 69.8M input tokens
-- Started by hand, Claude: 11 sessions, 1942.7M input tokens
+- Started by hand, Claude: 11 sessions, 1950.4M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 16.9 GiB of 100 GiB. 95 GiB free on the drive.
+The project uses 18.9 GiB of 100 GiB. 88 GiB free on the drive.
