@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-08 22:26.
+Updated automatically at every ticket change. Last update: 2026-11-08 22:27.
 
-**Next: the tech lead, on S8-04.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: the tech lead, on S8-06.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[#################---]` 129 of 150
 
@@ -146,7 +146,7 @@ Current tickets: `[#################---]` 129 of 150
 | S8-01 | Card checks C1-C10 for the Sprint 8 tuning block - microbenchmarks in the knc-char corpus | Done | The knc-char corpus now measures the Sprint 8 tuning questions on the card (stores, prefetch, tails, accumu... |
 | S8-02 | Masked loop tails that never touch an unmapped page, chosen by length (E4-04) | Done | round 3 card confirmation (19:04-19:10Z, binaries frozen in .work/_shared/tmp/claude-s8-02-r3, outputs in c... |
 | S8-03 | Two-level software prefetch for KNC loops (E5-07) | Done | KNC loops now prefetch two levels ahead (L2 2 KiB, L1 1 KiB, in bytes so strided loops work): L2-sized stre... |
-| S8-04 | Small-matrix kernels: diagnose mat8 and mat16, reject low lane use (E5-11 part 2) | Tests waiting for review | Lead changes applied (d2273e1): loop scans forbid only the bridge (x87 store to (%rsp), vbroadcasts[sd] fro... |
+| S8-04 | Small-matrix kernels: diagnose mat8 and mat16, reject low lane use (E5-11 part 2) | In progress | Red approved: at 028f9f3 all six directives fail on the x87 bridge itself (fstps/fstpl to the stack, vbroad... |
 | S8-05 | Per-loop scalar-add cost choice that keeps both mat8 and the stencils (E5-11) | Not started | written under the owner's overnight blanket approval (2026-11-08). |
 | S8-06 | Memory-operand forms for V16SF/V8DF arithmetic and FMA (E5-17) | Waiting for review | Green 293c29e..5527ff9, rebased clean on knc as 9e831f4..ef0dd1f (imci.md, i386-knc.cc only): fold-fma T1 F... |
 | S8-07 | vpmadd231d for V16SI multiply-add (E5-14) | Not started | written under the owner's overnight blanket approval (2026-11-08). |
@@ -175,6 +175,7 @@ Current tickets: `[#################---]` 129 of 150
 
 ## Recent activity
 
+- 2026-11-08 22:27 **S8-04** lead approve-red: Red approved: at 028f9f3 all six directives fail on the x87 bridge itself (fstps/fstpl to the stack, vbroadcasts from (%rsp), vpermf32x4) in the j ...
 - 2026-11-08 22:25 **S8-04** engineer red: Lead changes applied (d2273e1): loop scans forbid only the bridge (x87 store to (%rsp), vbroadcasts[sd] from (%rsp), vpermf32x4); positive scan tak...
 - 2026-11-08 22:01 **S8-06** engineer submit: Green 293c29e..5527ff9, rebased clean on knc as 9e831f4..ef0dd1f (imci.md, i386-knc.cc only): fold-fma T1 FAIL->PASS, rest of T0/T1/T2 and torture ...
 - 2026-11-08 20:48 **S8-04** lead changes: Diagnosis accepted (not lane use; x87 broadcast round trip; vec_duplicate split fix). Test cannot go green as written: scan-asm-loop-not checks eve...
@@ -182,13 +183,12 @@ Current tickets: `[#################---]` 129 of 150
 - 2026-11-08 20:12 **S8-03** lead approve: KNC loops now prefetch two levels ahead (L2 2 KiB, L1 1 KiB, in bytes so strided loops work): L2-sized streams are 11-21% faster, memory-sized 2-4%...
 - 2026-11-08 20:02 **S8-03** engineer submit: Round 3 done, GCC 8c18be9: run-time trip counts versioned on niter >= 4 x far distance, prefetched copy likely, other copy unchanged (two-level tar...
 - 2026-11-08 17:29 **S8-03** owner decide: Owner 2026-11-08: "Extended by 2 session" (now 6) to add the run-time trip-count guard: the prefetched loop runs only when n >= 4 x far distance, e...
-- 2026-11-08 17:16 **S8-03** lead escalate: budget: 4 engineer sessions used; the budget is 4
 
 ## Cost
 
 - From the script, engineer: 315 sessions, 738.4M input tokens
 - From the script, lead: 227 sessions, 69.3M input tokens
-- Started by hand, Claude: 10 sessions, 1841.8M input tokens
+- Started by hand, Claude: 10 sessions, 1842.8M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
