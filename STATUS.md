@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-09 06:25.
+Updated automatically at every ticket change. Last update: 2026-11-09 06:26.
 
 **Waiting for you:** S8-04. Run `python tools/pm.py inbox`.
 
@@ -155,7 +155,7 @@ Current tickets: `[#################---]` 132 of 150
 | S8-10 | Less ring traffic: 64-byte padding of per-thread data, and card check C11 (E5-16) | Done | Per-thread arrays and the OpenMP shared block now start on their own 64-byte line, and the C11 card check s... |
 | S8-11 | Sprint 8 batch check and paired M2 re-measure | Not started | add one compiler-prefetch card case, because S8-03's card run has no row kernel (C5's rows are hand-written... |
 | S8-12 | Fix three weak S8-01 checks - C4 page offsets, C5 row aliasing, C9 memory chain | Done | The knc-char checks C4, C5 and C9 are fixed and rebuilt: C4 now walks every page offset, C5's eight arrays ... |
-| S8-13 | Streaming stores for write-only loops beyond L2 (E5-08) | Tests waiting for review | Red 34cd86e: check.py t1 t2 --storent (gcc-build-2, knc cba9fe1): knc-storent.c fails at its first scan (no... |
+| S8-13 | Streaming stores for write-only loops beyond L2 (E5-08) | Changes requested | Red is close; four changes before green. (1) Fence placement is not tested: every fence scan matches a lock... |
 | S8-14 | Default 64-byte data alignment and TLB-aware cache parameters (E5-13) | Not started | added at the owner's request (2026-11-08: "add three [tickets] in s8") to cover ADR-0009 points the sprint ... |
 | S8-15 | Small-loop unroll default and the GCC-KNC flags page (E5-09) | Not started | added at the owner's request (2026-11-08: "add three [tickets] in s8") to cover ADR-0009 points the sprint ... |
 | S8-16 | User story - one bold flag, -mphinix, with a rising-phoenix banner and a progress bar | Not started | owner's user story, written by the lead with the owner's request quoted above. |
@@ -175,6 +175,7 @@ Current tickets: `[#################---]` 132 of 150
 
 ## Recent activity
 
+- 2026-11-09 06:26 **S8-13** lead changes: Red is close; four changes before green. (1) Fence placement is not tested: every fence scan matches a lock addl anywhere in the function, so a fen...
 - 2026-11-09 06:25 **S8-13** engineer red: Red 34cd86e: check.py t1 t2 --storent (gcc-build-2, knc cba9fe1): knc-storent.c fails at its first scan (no vmovnrngoaps); each negative scan check...
 - 2026-11-09 06:05 **S8-10** lead approve: Per-thread arrays and the OpenMP shared block now start on their own 64-byte line, and the C11 card check shows why: a line from another core costs...
 - 2026-11-09 03:49 **S8-10** engineer submit: Red 1c6323a, C11 295f06a, green gcc-2 f1f71d662b1 (i386-knc.cc +49, .h +3, shared i386.cc +5: two TARGET_KNC hook calls): .omp_data_o gets a 64-byt...
@@ -182,7 +183,6 @@ Current tickets: `[#################---]` 132 of 150
 - 2026-11-09 00:13 **S8-07** lead withdraw: Lead withdraws a scripted escalation: the missing results are the lead's own card runs (knc-char row, imadd execute test, s4/s5, M2 paired), not an...
 - 2026-11-09 00:11 **S8-07** lead escalate: Code review clean (imci.md *knc_maddv16si4, TARGET_KNC only; red 2043042 -> green 60bef4e6ee4). Not approved: lead-run results missing from the tic...
 - 2026-11-09 00:10 **S8-07** engineer submit: Red 2043042, green gcc-2 60bef4e6ee4 (imci.md only, TARGET_KNC, no shared i386 lines; x86 identical by construction, not run): int_madd T1 FAIL->PA...
-- 2026-11-09  **S8-10** lead review: code accepted pending card. Both raises are ABI-safe: TLS only for
 
 ## Cost
 
