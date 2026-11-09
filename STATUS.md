@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-08 20:46.
+Updated automatically at every ticket change. Last update: 2026-11-08 20:48.
 
-**Next: the tech lead, on S8-04.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: GPT-6.1, on S8-04 (Small-matrix kernels: diagnose mat8 and mat16, reject low lane use (E5-11 part 2)).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
 Current tickets: `[#################---]` 129 of 150
 
@@ -146,7 +146,7 @@ Current tickets: `[#################---]` 129 of 150
 | S8-01 | Card checks C1-C10 for the Sprint 8 tuning block - microbenchmarks in the knc-char corpus | Done | The knc-char corpus now measures the Sprint 8 tuning questions on the card (stores, prefetch, tails, accumu... |
 | S8-02 | Masked loop tails that never touch an unmapped page, chosen by length (E4-04) | Done | round 3 card confirmation (19:04-19:10Z, binaries frozen in .work/_shared/tmp/claude-s8-02-r3, outputs in c... |
 | S8-03 | Two-level software prefetch for KNC loops (E5-07) | Done | KNC loops now prefetch two levels ahead (L2 2 KiB, L1 1 KiB, in bytes so strided loops work): L2-sized stre... |
-| S8-04 | Small-matrix kernels: diagnose mat8 and mat16, reject low lane use (E5-11 part 2) | Tests waiting for review | Cause is not lane use (docs/research/knc-small-matrix.md): mat8 is the whole-loop-masked gather loop since ... |
+| S8-04 | Small-matrix kernels: diagnose mat8 and mat16, reject low lane use (E5-11 part 2) | Changes requested | Diagnosis accepted (not lane use; x87 broadcast round trip; vec_duplicate split fix). Test cannot go green ... |
 | S8-05 | Per-loop scalar-add cost choice that keeps both mat8 and the stencils (E5-11) | Not started | written under the owner's overnight blanket approval (2026-11-08). |
 | S8-06 | Memory-operand forms for V16SF/V8DF arithmetic and FMA (E5-17) | In progress | written under the owner's overnight blanket approval (2026-11-08). |
 | S8-07 | vpmadd231d for V16SI multiply-add (E5-14) | Not started | written under the owner's overnight blanket approval (2026-11-08). |
@@ -175,6 +175,7 @@ Current tickets: `[#################---]` 129 of 150
 
 ## Recent activity
 
+- 2026-11-08 20:48 **S8-04** lead changes: Diagnosis accepted (not lane use; x87 broadcast round trip; vec_duplicate split fix). Test cannot go green as written: scan-asm-loop-not checks eve...
 - 2026-11-08 20:45 **S8-04** engineer red: Cause is not lane use (docs/research/knc-small-matrix.md): mat8 is the whole-loop-masked gather loop since S8-02 (card 0.29x); IMCI uses 8 of 16 la...
 - 2026-11-08 20:12 **S8-03** lead approve: KNC loops now prefetch two levels ahead (L2 2 KiB, L1 1 KiB, in bytes so strided loops work): L2-sized streams are 11-21% faster, memory-sized 2-4%...
 - 2026-11-08 20:02 **S8-03** engineer submit: Round 3 done, GCC 8c18be9: run-time trip counts versioned on niter >= 4 x far distance, prefetched copy likely, other copy unchanged (two-level tar...
@@ -182,7 +183,6 @@ Current tickets: `[#################---]` 129 of 150
 - 2026-11-08 17:16 **S8-03** lead escalate: budget: 4 engineer sessions used; the budget is 4
 - 2026-11-08 17:15 **S8-03** lead changes: Card: memory/L2 streams gain (L2 affine 9-19%), but M2 short at length 17 is 1.30-1.33x slower: 4 prefetches plus moves in a one-iteration loop. Ve...
 - 2026-11-08 17:07 **S8-18** lead approve: Tools now support a second GCC tree: a lane gcc2 ticket builds in gcc-2/gcc-build-2 while a gcc ticket uses the first tree, and submit refuses a br...
-- 2026-11-08 16:58 **S8-18** engineer submit: Resolver + gcc2 lane (env, safe.directory, pm slot), submit refuses branch without knc, approve detaches the other tree holding knc, gcc_build --sl...
 
 ## Cost
 
@@ -194,4 +194,4 @@ Current tickets: `[#################---]` 129 of 150
 
 ## Disk
 
-The project uses 15.4 GiB of 100 GiB. 150 GiB free on the drive.
+The project uses 15.7 GiB of 100 GiB. 151 GiB free on the drive.
