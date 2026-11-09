@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-08 23:17.
+Updated automatically at every ticket change. Last update: 2026-11-08 23:18.
 
 **Waiting for you:** S8-04. Run `python tools/pm.py inbox`.
 
@@ -149,7 +149,7 @@ Current tickets: `[#################---]` 130 of 150
 | S8-04 | Small-matrix kernels: diagnose mat8 and mat16, reject low lane use (E5-11 part 2) | **Waiting for you** | budget: 4 engineer sessions used; the budget is 4 |
 | S8-05 | Per-loop scalar-add cost choice that keeps both mat8 and the stencils (E5-11) | Not started | written under the owner's overnight blanket approval (2026-11-08). |
 | S8-06 | Memory-operand forms for V16SF/V8DF arithmetic and FMA (E5-17) | Done | KNC vector add, sub, mul and FMA now read aligned memory and {1to16}/{1to8} broadcasts directly instead of ... |
-| S8-07 | vpmadd231d for V16SI multiply-add (E5-14) | Not started | written under the owner's overnight blanket approval (2026-11-08). |
+| S8-07 | vpmadd231d for V16SI multiply-add (E5-14) | In progress | written under the owner's overnight blanket approval (2026-11-08). |
 | S8-08 | -mtune=knc tune-flag audit (E5-12) | Not started | also re-measure M2 short at lengths 5 and 13 under the alignment default. S8-03 (prefetch versioning) left ... |
 | S8-09 | KNC -O2 defaults: vectorizer cost model, stride versioning, predictive commoning (E5-18) | Not started | written under the owner's overnight blanket approval (2026-11-08). |
 | S8-10 | Less ring traffic: 64-byte padding of per-thread data, and card check C11 (E5-16) | Not started | written under the owner's overnight blanket approval (2026-11-08). |
@@ -188,7 +188,7 @@ Current tickets: `[#################---]` 130 of 150
 
 - From the script, engineer: 317 sessions, 739.0M input tokens
 - From the script, lead: 227 sessions, 69.3M input tokens
-- Started by hand, Claude: 10 sessions, 1859.6M input tokens
+- Started by hand, Claude: 10 sessions, 1861.5M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
