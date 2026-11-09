@@ -327,7 +327,9 @@ class Runner:
                                    ('tests/tools', 'test_knc_lint.py')):
             label = directory + '/' + pattern
             try:
-                output = self.command(sys.executable, '-m', 'unittest', 'discover', '-s', directory, '-p', pattern, timeout=900)
+                # 1800 s: the regress suite takes about 380 s alone and over 900 s while the
+                # other GCC lane builds or runs torture (S8-18, two trees; 2026-11-09).
+                output = self.command(sys.executable, '-m', 'unittest', 'discover', '-s', directory, '-p', pattern, timeout=1800)
                 self.say('PASS t0 ' + label + ': ' + ' '.join(output.strip().splitlines()[-3:]))
             except (OSError, RuntimeError, subprocess.TimeoutExpired) as error:
                 self.result('t0 ' + label, [str(error)])
