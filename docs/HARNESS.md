@@ -47,7 +47,7 @@ Git cannot see any of it, so the limits measure the disk itself:
 |---|---|
 | **Disposable by design** | A ticket's worktree is deleted when it merges, with everything in it. Output only survives by being committed, and files over 1 MiB cannot be committed |
 | **One shared build area** | One GCC checkout, toolchain and build tree in `.work/_shared`, never one per ticket |
-| **Project limit** | Warns at 60 GiB. At 100 GiB, or under 100 GiB free on the drive, no session starts, and running sessions can only delete and hand over |
+| **Project limit** | Warns at 60 GiB. At 100 GiB, or under 30 GiB free on the drive (owner, 2026-11-09), no session starts, and running sessions can only delete and hand over |
 | **Ticket limit** | 2, 10 or 20 GiB per worktree by depth. Going over sends the ticket to you, and blocks submit |
 | **No bulk copies** | Tree copies, archives, clones and downloads are refused unless the ticket allows them |
 | **Commit limits** | 1 MiB per file and 5 MiB per change. `.gitignore` is protected, so it cannot be widened to hide output |
