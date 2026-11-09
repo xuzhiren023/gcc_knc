@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-09 03:12.
+Updated automatically at every ticket change. Last update: 2026-11-09 03:49.
 
 **Waiting for you:** S8-04. Run `python tools/pm.py inbox`.
 
@@ -152,7 +152,7 @@ Current tickets: `[#################---]` 131 of 150
 | S8-07 | vpmadd231d for V16SI multiply-add (E5-14) | Done | KNC now emits vpmadd231d for vector integer multiply-add: one instruction at 4 ticks latency instead of vpm... |
 | S8-08 | -mtune=knc tune-flag audit (E5-12) | Not started | also re-measure M2 short at lengths 5 and 13 under the alignment default. S8-03 (prefetch versioning) left ... |
 | S8-09 | KNC -O2 defaults: vectorizer cost model, stride versioning, predictive commoning (E5-18) | Not started | written under the owner's overnight blanket approval (2026-11-08). |
-| S8-10 | Less ring traffic: 64-byte padding of per-thread data, and card check C11 (E5-16) | In progress | written under the owner's overnight blanket approval (2026-11-08). |
+| S8-10 | Less ring traffic: 64-byte padding of per-thread data, and card check C11 (E5-16) | Waiting for review | Red 1c6323a, C11 295f06a, green gcc-2 f1f71d662b1 (i386-knc.cc +49, .h +3, shared i386.cc +5: two TARGET_KN... |
 | S8-11 | Sprint 8 batch check and paired M2 re-measure | Not started | add one compiler-prefetch card case, because S8-03's card run has no row kernel (C5's rows are hand-written... |
 | S8-12 | Fix three weak S8-01 checks - C4 page offsets, C5 row aliasing, C9 memory chain | Done | The knc-char checks C4, C5 and C9 are fixed and rebuilt: C4 now walks every page offset, C5's eight arrays ... |
 | S8-13 | Streaming stores for write-only loops beyond L2 (E5-08) | Not started | added at the owner's request (2026-11-08: "add three [tickets] in s8") to cover ADR-0009 points the sprint ... |
@@ -175,6 +175,7 @@ Current tickets: `[#################---]` 131 of 150
 
 ## Recent activity
 
+- 2026-11-09 03:49 **S8-10** engineer submit: Red 1c6323a, C11 295f06a, green gcc-2 f1f71d662b1 (i386-knc.cc +49, .h +3, shared i386.cc +5: two TARGET_KNC hook calls): .omp_data_o gets a 64-byt...
 - 2026-11-09 01:41 **S8-07** lead approve: KNC now emits vpmadd231d for vector integer multiply-add: one instruction at 4 ticks latency instead of vpmulld plus vpaddd at 8 (measured on the c...
 - 2026-11-09 00:13 **S8-07** lead withdraw: Lead withdraws a scripted escalation: the missing results are the lead's own card runs (knc-char row, imadd execute test, s4/s5, M2 paired), not an...
 - 2026-11-09 00:11 **S8-07** lead escalate: Code review clean (imci.md *knc_maddv16si4, TARGET_KNC only; red 2043042 -> green 60bef4e6ee4). Not approved: lead-run results missing from the tic...
@@ -182,16 +183,15 @@ Current tickets: `[#################---]` 131 of 150
 - 2026-11-09  **S8-07** lead note: card 06:14-06:32Z (.work/_shared/tmp/claude-s8-07-out). knc-char at 1 thread: vpmadd231d lat 4.02, rt 2.07 ticks, equal to vpmulld (4.01/2.07); the...
 - 2026-11-09  **S8-07** lead note: review accepted (imci.md only, all TARGET_KNC, so x86 holds by construction; the test-line overage is the card execute test the ticket asked for). ...
 - 2026-11-08 23:17 **S8-04** lead escalate: budget: 4 engineer sessions used; the budget is 4
-- 2026-11-08 23:16 **S8-06** lead approve: KNC vector add, sub, mul and FMA now read aligned memory and {1to16}/{1to8} broadcasts directly instead of loading into a register first: mat16 is ...
 
 ## Cost
 
 - From the script, engineer: 319 sessions, 746.2M input tokens
 - From the script, lead: 228 sessions, 69.5M input tokens
-- Started by hand, Claude: 10 sessions, 1872.0M input tokens
+- Started by hand, Claude: 10 sessions, 1872.7M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 15.7 GiB of 100 GiB. 148 GiB free on the drive.
+The project uses 15.7 GiB of 100 GiB. 140 GiB free on the drive.
