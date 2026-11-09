@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-08 23:16.
+Updated automatically at every ticket change. Last update: 2026-11-08 23:17.
 
-**Next: GPT-6.1, on S8-04 (Small-matrix kernels: diagnose mat8 and mat16, reject low lane use (E5-11 part 2)).** Run `python tools/dispatch.py`, or ask the tech lead to.
+**Waiting for you:** S8-04. Run `python tools/pm.py inbox`.
 
 Current tickets: `[#################---]` 130 of 150
 
@@ -146,7 +146,7 @@ Current tickets: `[#################---]` 130 of 150
 | S8-01 | Card checks C1-C10 for the Sprint 8 tuning block - microbenchmarks in the knc-char corpus | Done | The knc-char corpus now measures the Sprint 8 tuning questions on the card (stores, prefetch, tails, accumu... |
 | S8-02 | Masked loop tails that never touch an unmapped page, chosen by length (E4-04) | Done | round 3 card confirmation (19:04-19:10Z, binaries frozen in .work/_shared/tmp/claude-s8-02-r3, outputs in c... |
 | S8-03 | Two-level software prefetch for KNC loops (E5-07) | Done | KNC loops now prefetch two levels ahead (L2 2 KiB, L1 1 KiB, in bytes so strided loops work): L2-sized stre... |
-| S8-04 | Small-matrix kernels: diagnose mat8 and mat16, reject low lane use (E5-11 part 2) | Changes requested | S8-06 already removes the x87 bridge, better: it folds the broadcast into the FMA ({1to16}), with mat16 at ... |
+| S8-04 | Small-matrix kernels: diagnose mat8 and mat16, reject low lane use (E5-11 part 2) | **Waiting for you** | budget: 4 engineer sessions used; the budget is 4 |
 | S8-05 | Per-loop scalar-add cost choice that keeps both mat8 and the stencils (E5-11) | Not started | written under the owner's overnight blanket approval (2026-11-08). |
 | S8-06 | Memory-operand forms for V16SF/V8DF arithmetic and FMA (E5-17) | Done | KNC vector add, sub, mul and FMA now read aligned memory and {1to16}/{1to8} broadcasts directly instead of ... |
 | S8-07 | vpmadd231d for V16SI multiply-add (E5-14) | Not started | written under the owner's overnight blanket approval (2026-11-08). |
@@ -175,6 +175,7 @@ Current tickets: `[#################---]` 130 of 150
 
 ## Recent activity
 
+- 2026-11-08 23:17 **S8-04** lead escalate: budget: 4 engineer sessions used; the budget is 4
 - 2026-11-08 23:16 **S8-06** lead approve: KNC vector add, sub, mul and FMA now read aligned memory and {1to16}/{1to8} broadcasts directly instead of loading into a register first: mat16 is ...
 - 2026-11-08 23:07 **S8-04** lead changes: S8-06 already removes the x87 bridge, better: it folds the broadcast into the FMA ({1to16}), with mat16 at 0.47 as here. Your split adds a separate...
 - 2026-11-08 22:31 **S8-04** engineer submit: Green at GCC 800ef2e on knc 028f9f3 (knc unmoved, S8-06 not merged: no rebase, one split). vec_duplicate insn split in imci.md + i386-knc.cc only, ...
@@ -182,13 +183,12 @@ Current tickets: `[#################---]` 130 of 150
 - 2026-11-08 22:25 **S8-04** engineer red: Lead changes applied (d2273e1): loop scans forbid only the bridge (x87 store to (%rsp), vbroadcasts[sd] from (%rsp), vpermf32x4); positive scan tak...
 - 2026-11-08 22:01 **S8-06** engineer submit: Green 293c29e..5527ff9, rebased clean on knc as 9e831f4..ef0dd1f (imci.md, i386-knc.cc only): fold-fma T1 FAIL->PASS, rest of T0/T1/T2 and torture ...
 - 2026-11-08 20:48 **S8-04** lead changes: Diagnosis accepted (not lane use; x87 broadcast round trip; vec_duplicate split fix). Test cannot go green as written: scan-asm-loop-not checks eve...
-- 2026-11-08 20:45 **S8-04** engineer red: Cause is not lane use (docs/research/knc-small-matrix.md): mat8 is the whole-loop-masked gather loop since S8-02 (card 0.29x); IMCI uses 8 of 16 la...
 
 ## Cost
 
 - From the script, engineer: 317 sessions, 739.0M input tokens
 - From the script, lead: 227 sessions, 69.3M input tokens
-- Started by hand, Claude: 10 sessions, 1858.9M input tokens
+- Started by hand, Claude: 10 sessions, 1859.6M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
