@@ -40,7 +40,7 @@ Source: `docs/research/knc-characterization.md` C2, C4, C5 and the S8-12 rerun.
 - Written streams use the read-hint forms `vprefetch0/1`, as C5's kernels did for their
   output array. `vprefetche*` is unmeasured and not emitted.
 
-## What was built (GCC s8/S8-03, 836a0e2..2fb2498)
+## What was built (GCC s8/S8-03, 836a0e2..8c18be9)
 
 - `imci.md`: `knc_prefetch`, one `(prefetch ...)` insn under `TARGET_KNC`, locality 3/2/1/0 to
   `vprefetch0/1/2/nta` (Intel 327364-001 pp. 641-656); write hint dropped like the SSE path.
@@ -85,4 +85,10 @@ Source: `docs/research/knc-characterization.md` C2, C4, C5 and the S8-12 rerun.
   existing trip check, otherwise `loop_version` on `niter >= 4 x far_ahead - 1`, likely
   branch to the prefetched original, the copy untouched (KNC has no `storent` pattern, so
   no store in it was marked nontemporal either). The pass then resets SCEV and asks for
-  a CFG cleanup as after unrolling.
+  a CFG cleanup as after unrolling. Checks at 8c18be9: T1 scans 4/4 (the stream file's
+  run-time loop guards at `cmpq $126` / `jbe` to the plain copy, which has no `vprefetch`);
+  torture compile unchanged at O0/O2/O2-g/O3 (`.work/_shared/S8-03/torture-after.txt`); x86
+  identical on all 1962 corpus files at `-O2` and `-O2 -mavx512f`, and on the 14 compilable
+  builtin-prefetch files at `-O3 -fprefetch-loop-arrays` (round 3 touches no i386 file; the
+  shared i386 hunks are round 1's `i386.md` expander, `i386.cc` hook line and `i386.opt`
+  params). M2 paired, `s4_masks` and `s5_ops` restaged under `.work/_shared/S8-03/`.
