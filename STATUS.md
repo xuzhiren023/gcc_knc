@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-08 20:49.
+Updated automatically at every ticket change. Last update: 2026-11-08 21:24.
 
 **Next: GPT-6.1, on S8-04 (Small-matrix kernels: diagnose mat8 and mat16, reject low lane use (E5-11 part 2)).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
@@ -186,7 +186,7 @@ Current tickets: `[#################---]` 129 of 150
 
 ## Cost
 
-- From the script, engineer: 312 sessions, 737.5M input tokens
+- From the script, engineer: 313 sessions, 737.5M input tokens
 - From the script, lead: 227 sessions, 69.3M input tokens
 - Started by hand, Claude: 10 sessions, 1836.1M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
@@ -194,4 +194,4 @@ Current tickets: `[#################---]` 129 of 150
 
 ## Disk
 
-The project uses 15.7 GiB of 100 GiB. 152 GiB free on the drive.
+The project uses 15.7 GiB of 100 GiB. 151 GiB free on the drive.
