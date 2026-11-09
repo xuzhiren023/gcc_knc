@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-09 08:18.
+Updated automatically at every ticket change. Last update: 2026-11-09 08:20.
 
-**Next: GPT-6.1, on S8-13 (Streaming stores for write-only loops beyond L2 (E5-08)).** Run `python tools/dispatch.py`, or ask the tech lead to.
+**Next: GPT-6.1, on S8-05 (Re-check the scalar-add cost on mat8 and the stencils after S8-06 (E5-11)).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
 Current tickets: `[#################---]` 133 of 150
 
@@ -147,7 +147,7 @@ Current tickets: `[#################---]` 133 of 150
 | S8-02 | Masked loop tails that never touch an unmapped page, chosen by length (E4-04) | Done | round 3 card confirmation (19:04-19:10Z, binaries frozen in .work/_shared/tmp/claude-s8-02-r3, outputs in c... |
 | S8-03 | Two-level software prefetch for KNC loops (E5-07) | Done | KNC loops now prefetch two levels ahead (L2 2 KiB, L1 1 KiB, in bytes so strided loops work): L2-sized stre... |
 | S8-04 | Small-matrix kernels: diagnose mat8 and mat16, reject low lane use (E5-11 part 2) | Done | S8-04 closes with its diagnosis and test only: the slow small-matrix loops came from an x87 detour for the ... |
-| S8-05 | Re-check the scalar-add cost on mat8 and the stencils after S8-06 (E5-11) | Not started | shrunk to a measurement at the owner's request; budget 1 session. |
+| S8-05 | Re-check the scalar-add cost on mat8 and the stencils after S8-06 (E5-11) | In progress | shrunk to a measurement at the owner's request; budget 1 session. |
 | S8-06 | Memory-operand forms for V16SF/V8DF arithmetic and FMA (E5-17) | Done | KNC vector add, sub, mul and FMA now read aligned memory and {1to16}/{1to8} broadcasts directly instead of ... |
 | S8-07 | vpmadd231d for V16SI multiply-add (E5-14) | Done | KNC now emits vpmadd231d for vector integer multiply-add: one instruction at 4 ticks latency instead of vpm... |
 | S8-08 | -mtune=knc tune-flag audit (E5-12) | Not started | also re-measure M2 short at lengths 5 and 13 under the alignment default. S8-03 (prefetch versioning) left ... |
@@ -188,10 +188,10 @@ Current tickets: `[#################---]` 133 of 150
 
 - From the script, engineer: 322 sessions, 752.4M input tokens
 - From the script, lead: 229 sessions, 69.8M input tokens
-- Started by hand, Claude: 10 sessions, 1883.5M input tokens
+- Started by hand, Claude: 10 sessions, 1884.2M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 15.7 GiB of 100 GiB. 137 GiB free on the drive.
+The project uses 15.7 GiB of 100 GiB. 135 GiB free on the drive.
