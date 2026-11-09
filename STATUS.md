@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-09 01:41.
+Updated automatically at every ticket change. Last update: 2026-11-09 01:42.
 
 **Waiting for you:** S8-04. Run `python tools/pm.py inbox`.
 
@@ -152,7 +152,7 @@ Current tickets: `[#################---]` 131 of 150
 | S8-07 | vpmadd231d for V16SI multiply-add (E5-14) | Done | KNC now emits vpmadd231d for vector integer multiply-add: one instruction at 4 ticks latency instead of vpm... |
 | S8-08 | -mtune=knc tune-flag audit (E5-12) | Not started | also re-measure M2 short at lengths 5 and 13 under the alignment default. S8-03 (prefetch versioning) left ... |
 | S8-09 | KNC -O2 defaults: vectorizer cost model, stride versioning, predictive commoning (E5-18) | Not started | written under the owner's overnight blanket approval (2026-11-08). |
-| S8-10 | Less ring traffic: 64-byte padding of per-thread data, and card check C11 (E5-16) | Not started | written under the owner's overnight blanket approval (2026-11-08). |
+| S8-10 | Less ring traffic: 64-byte padding of per-thread data, and card check C11 (E5-16) | In progress | written under the owner's overnight blanket approval (2026-11-08). |
 | S8-11 | Sprint 8 batch check and paired M2 re-measure | Not started | add one compiler-prefetch card case, because S8-03's card run has no row kernel (C5's rows are hand-written... |
 | S8-12 | Fix three weak S8-01 checks - C4 page offsets, C5 row aliasing, C9 memory chain | Done | The knc-char checks C4, C5 and C9 are fixed and rebuilt: C4 now walks every page offset, C5's eight arrays ... |
 | S8-13 | Streaming stores for write-only loops beyond L2 (E5-08) | Not started | added at the owner's request (2026-11-08: "add three [tickets] in s8") to cover ADR-0009 points the sprint ... |
@@ -188,7 +188,7 @@ Current tickets: `[#################---]` 131 of 150
 
 - From the script, engineer: 318 sessions, 746.2M input tokens
 - From the script, lead: 228 sessions, 69.5M input tokens
-- Started by hand, Claude: 10 sessions, 1870.8M input tokens
+- Started by hand, Claude: 10 sessions, 1872.0M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
