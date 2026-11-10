@@ -2,7 +2,7 @@
 
 Updated automatically at every ticket change. Last update: 2026-11-10 10:33.
 
-**Next: the tech lead, on S9-14.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: GPT-6.1, on S8-16 (User story - one bold flag, -mphinix, with a rising-phoenix banner and a progress bar).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
 Current tickets: `[###################-]` 149 of 154
 
@@ -175,10 +175,11 @@ Current tickets: `[###################-]` 149 of 154
 | S9-11 | Sprint 9 batch check | Not started | deps add S9-14: run correctness and key timings under the 3100/5100/7100 profiles (owner 2026-11-10). |
 | S9-12 | libgomp adapts to the card: malloc arena cap from memory, core count and clock (ADR-0012) | Done | KNC libgomp now reads the card at start-up: the malloc arena cap fits the card's memory and any address-spa... |
 | S9-13 | User story - -mknc-card= picks the card model's tuning, and -mknc-card=native detects it | Not started |  |
-| S9-14 | card_run model profiles - run a job as a 3100, 5100 or 7100 card on our 7120P | Waiting for review | Red 4c4c005, green c63e4b3. tests/regress/test_card_profiles.py 3/3 OK; test_card_shared+test_card_run 54/5... |
+| S9-14 | card_run model profiles - run a job as a 3100, 5100 or 7100 card on our 7120P | Changes requested | 1. tests/tools/card_pin_test.c:72 still expects claude-pin to refuse 10241 MiB, but tools/claude-pin.c:42 n... |
 
 ## Recent activity
 
+- 2026-11-10 10:33 **S9-14** lead changes: 1. tests/tools/card_pin_test.c:72 still expects claude-pin to refuse 10241 MiB, but tools/claude-pin.c:42 now accepts up to 16384, so test_card_bac...
 - 2026-11-10 10:21 **S9-14** engineer submit: Red 4c4c005, green c63e4b3. tests/regress/test_card_profiles.py 3/3 OK; test_card_shared+test_card_run 54/54 OK (PM_ROLE unset; 10240 ceiling test ...
 - 2026-11-10 10:11 **S9-14** lead amend: No core limit in exclusive turns (owner 2026-11-10).
 - 2026-11-10 09:56 **S9-10** lead note: Card 2026-11-10 14:40Z: the eight OpenMP programs pass on the S9-06..S9-10 libgomp at 60 threads (6 GiB) and at 240 threads (MALLOC_ARENA_MAX=64, 1...
@@ -186,7 +187,6 @@ Current tickets: `[###################-]` 149 of 154
 - 2026-11-10 09:56 **S9-07** lead note: Card 2026-11-10 14:45Z, 20-core mask (cores 40-59): 7 of 8 jobs ok; cpu-affinity (GOMP_CPU_AFFINITY=1-237:4, which names CPUs outside the mask) fai...
 - 2026-11-10 09:55 **S8-15** lead note: Card 2026-11-10 14:35Z: correctness passes (s4/s5 PASS, s5 neg 1, M2 negative 1 / positive 0). Timing in progress (d1 launch 1: mat16 0.788, mat8 0...
 - 2026-11-10 09:53 **S9-11** lead amend: deps add S9-14: run correctness and key timings under the 3100/5100/7100 profiles (owner 2026-11-10).
-- 2026-11-10 09:53 **S8-11** lead amend: deps add S9-14: run correctness and key timings under the 3100/5100/7100 profiles (owner 2026-11-10).
 
 ## Cost
 
