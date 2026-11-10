@@ -1,10 +1,10 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-10 09:14.
+Updated automatically at every ticket change. Last update: 2026-11-10 09:16.
 
 **Next: GPT-6.1, on S8-16 (User story - one bold flag, -mphinix, with a rising-phoenix banner and a progress bar).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
-Current tickets: `[###################-]` 148 of 152
+Current tickets: `[###################-]` 148 of 153
 
 ## Milestones
 
@@ -13,7 +13,7 @@ Current tickets: `[###################-]` 148 of 152
 | M0 | Foundation | In progress | 17 of 17 tickets |
 | M1 | Mixed native code | Done | 43 of 43 tickets |
 | M2 | Useful vector target | Done | 51 of 51 tickets |
-| M3 | Runtimes | In progress | 20 of 22 tickets |
+| M3 | Runtimes | In progress | 20 of 23 tickets |
 | M4 | Broad optimization | Not started | Not planned in detail yet |
 | M5 | Program corpus | Not started | Not planned in detail yet |
 | M6 | Release | Not started | Not planned in detail yet |
@@ -172,11 +172,13 @@ Current tickets: `[###################-]` 148 of 152
 | S9-08 | libgomp spin-wait with delay and the one-core measurement (E6-03 C) | Done | KNC libgomp's spin wait can be tuned with GOMP_KNC_DELAY, the default spin count is 3 ms of DELAY periods, ... |
 | S9-09 | libgomp hierarchical ring-aware barrier (E6-03 D) | Done | OpenMP barriers on KNC now synchronise per core first and then across cores (one cache line per core instea... |
 | S9-10 | libgomp padding, static schedule default and malloc guidance (E6-03 E) | Done | KNC libgomp keeps each thread's private data and implicit task on cache lines of their own, schedule(runtim... |
-| S9-11 | Sprint 9 batch check | Not started | deps S9-10 -> S9-12 (ADR-0012 arena default lands before the batch check). |
+| S9-11 | Sprint 9 batch check | Not started | deps add S9-13 (owner story 2026-11-10: -mknc-card). |
 | S9-12 | libgomp adapts to the card: malloc arena cap from memory, core count and clock (ADR-0012) | Not started | Scope: core-count fallback and clock-based spin count read from the card (owner question 2026-11-10 on fitt... |
+| S9-13 | User story - -mknc-card= picks the card model's tuning, and -mknc-card=native detects it | Not started |  |
 
 ## Recent activity
 
+- 2026-11-10 09:16 **S9-11** lead amend: deps add S9-13 (owner story 2026-11-10: -mknc-card).
 - 2026-11-10 09:14 **S9-12** lead amend: Scope: core-count fallback and clock-based spin count read from the card (owner question 2026-11-10 on fitting all KNC models).
 - 2026-11-10 09:13 **S9-10** lead approve: KNC libgomp keeps each thread's private data and implicit task on cache lines of their own, schedule(runtime) defaults to static, and omp_display_e...
 - 2026-11-10 08:59 **S9-10** engineer submit: GCC fb441ea372f..e9ff8ab1556: padded gomp_tls_data/implicit_task with static asserts, KNC run_sched_var default static, MALLOC_ARENA_MAX/OMP_STACKS...
@@ -184,13 +186,12 @@ Current tickets: `[###################-]` 148 of 152
 - 2026-11-10 08:56 **S9-10** engineer ask: Done and ready to submit, but submit refuses 818 changed lines vs 500 budget (repo: 684, all new files: host test 163, measurement programs reducti...
 - 2026-11-10 08:44 **S9-10** owner decide: Owner in chat 2026-11-10 ('yes'): budget raised to 12M input tokens to finish and submit. Follow the 2026-11-10 lead note on MALLOC_ARENA_MAX (ADR-...
 - 2026-11-10 08:44 **S9-10** lead amend: input_tokens budget 6M -> 12M (8.36M used), owner approved in chat 2026-11-10: finishing and submit are left.
-- 2026-11-10 08:27 **S9-10** lead escalate: budget: 8360876 input tokens used; the budget is 6000000
 
 ## Cost
 
 - From the script, engineer: 360 sessions, 793.3M input tokens
 - From the script, lead: 237 sessions, 71.6M input tokens
-- Started by hand, Claude: 11 sessions, 2039.8M input tokens
+- Started by hand, Claude: 11 sessions, 2040.1M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
