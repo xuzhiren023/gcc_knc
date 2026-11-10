@@ -175,11 +175,12 @@ Current tickets: `[###################-]` 151 of 155
 | S9-10 | libgomp padding, static schedule default and malloc guidance (E6-03 E) | Done | Card 2026-11-10 14:40Z: the eight OpenMP programs pass on the S9-06..S9-10 libgomp at 60 threads (6 GiB) an... |
 | S9-11 | Sprint 9 batch check | Not started | From the 2026-11-10 card runs: (1) rerun the S9-09 suite on the final head; (2) make the S9-07 explicit-set... |
 | S9-12 | libgomp adapts to the card: malloc arena cap from memory, core count and clock (ADR-0012) | Done | Measurement 7, 6 GiB RLIMIT_AS, 240 threads, 1 KiB pattern (2026-11-10, partial; job capped at 2 h after 23... |
-| S9-13 | User story - -mknc-card= picks the card model's tuning, and -mknc-card=native detects it | Not started |  |
+| S9-13 | User story - -mknc-card= picks the card model's tuning, and -mknc-card=native detects it | Not started | deps add S8-20: Sprint 8 fix first, and both change KNC tuning in i386-knc.cc. |
 | S9-14 | card_run model profiles - run a job as a 3100, 5100 or 7100 card on our 7120P | Done | card_run --profile 3100/5100/7100/full runs a job as that card would (its compute cores and usable memory),... |
 
 ## Recent activity
 
+- 2026-11-10 12:50 **S9-13** lead amend: deps add S8-20: Sprint 8 fix first, and both change KNC tuning in i386-knc.cc.
 - 2026-11-10 12:50 **S8-11** lead amend: deps add S8-20 (S8-15 loses at 4 threads per core).
 - 2026-11-10 12:49 **S9-14** lead approve: card_run --profile 3100|5100|7100|full runs a job as that card would (its compute cores and usable memory), and in our exclusive turns jobs may use...
 - 2026-11-10 12:49 **S9-11** lead note: From the 2026-11-10 card runs: (1) rerun the S9-09 suite on the final head; (2) make the S9-07 explicit-setting jobs (OMP_PLACES, GOMP_CPU_AFFINITY...
@@ -187,7 +188,6 @@ Current tickets: `[###################-]` 151 of 155
 - 2026-11-10 12:49 **S9-07** lead note: Card 2026-11-10 ~12:15 EST, 30-core mask (cores 0-29, 120 CPUs): the KNC default jobs pass. Two explicit-setting jobs fail on runner expectations w...
 - 2026-11-10 12:49 **S8-15** lead note: Card 2026-11-10 timing (M2 L2 vs knc, launch 1/2): at 1 thread/core mat16 0.787/0.788, stencil1 0.906/0.916, affine_f64 0.936/0.980, affine_f32 0.9...
 - 2026-11-10 12:41 **S8-16** lead approve: -mphinix is one flag for -O3 plus every measured -march=knc default (IEEE kept, any explicit option still wins), with a rising-phoenix banner and a...
-- 2026-11-10 11:57 **S9-12** lead note: Measurement 7, 6 GiB RLIMIT_AS, 240 threads, 1 KiB pattern (2026-11-10, partial; job capped at 2 h after 23 of 96 runs): derived cap (unset) 145.7-...
 
 ## Cost
 
