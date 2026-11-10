@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-10 17:00.
+Updated automatically at every ticket change. Last update: 2026-11-10 17:46.
 
-**Next: GPT-6.1, on S8-21 (The prefetch pass sees masked loads and stores, so rows shorter than a vector are prefetched).** Run `python tools/dispatch.py`, or ask the tech lead to.
+**Next: the tech lead, on S8-21.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[###################-]` 154 of 156
 
@@ -163,7 +163,7 @@ Current tickets: `[###################-]` 154 of 156
 | S8-18 | Second GCC tree - a gcc2 lane with its own checkout and build, so two GCC tickets run in parallel | Done | Tools now support a second GCC tree: a lane gcc2 ticket builds in gcc-2/gcc-build-2 while a gcc ticket uses... |
 | S8-19 | -mtune=knc stops the tight-loop alignment pass (nops on the fallthrough path) | Done | Card 2026-11-10 11:28-12:03Z (frozen .work/_shared/tmp/claude-s8-19, log .work/_shared/tmp/claude-next.log)... |
 | S8-20 | The small-loop unroll costs affine_f64 3-7% at 4 threads per core - make it follow the thread density | Done | The small-loop unroll now follows the thread density: streaming loops (one vector op per store) unroll 2 ti... |
-| S8-21 | The prefetch pass sees masked loads and stores, so rows shorter than a vector are prefetched | In progress |  |
+| S8-21 | The prefetch pass sees masked loads and stores, so rows shorter than a vector are prefetched | Waiting for review | GCC f3c34acd827 (prefetch.cc +25/-3): masked loads/stores now prefetched, never nontemporal. Red 48161f1a -... |
 | S9-01 | libgomp for KNC: futex, affinity, ring-aware barrier, spin-wait and malloc arenas (E6-03 input) | Done | We now have a build-and-design plan for GCC-KNC's own OpenMP runtime on the card: futex-based waits with de... |
 | S9-02 | libstdc++ for KNC: exceptions, RTTI, atomics, threads, packaging (E6-06 input) | Done | We now know how to build GCC 16's C++ library for the card: no newer glibc or kernel is needed, and built w... |
 | S9-03 | libstdc++ and libatomic build for k1om (E6-06a) | Done | Card 2026-11-10 08:40Z (log .work/_shared/tmp/claude-s8-09.log): hello, rtti, thread, atomic16, tz and all ... |
@@ -181,6 +181,7 @@ Current tickets: `[###################-]` 154 of 156
 
 ## Recent activity
 
+- 2026-11-10 17:46 **S8-21** engineer submit: GCC f3c34acd827 (prefetch.cc +25/-3): masked loads/stores now prefetched, never nontemporal. Red 48161f1a -> --prefetch 5/5; 16-float asm identical...
 - 2026-11-10 16:59 **S8-11** lead approve: Sprint 8's final compiler (knc fe7ed380f149) matches stock GCC 16.2 on x86 (1962/0 at -O2 and -O2 -mavx512f, run on the S9-13 tree that contains it...
 - 2026-11-10 16:51 **S9-13** lead approve: -mknc-card=generic|3100|5100|7100|native picks a card model's prefetch distances (3100 and 5100 derived from bandwidth per core, 7100 measured), na...
 - 2026-11-10 16:03 **S8-11** engineer submit: knc fe7ed380f149. Drill textual only (master 12 files/23 hunks; KNC bar.c needs master's barrier API), gcc-16 0. Shared i386 718/132: x86 not run (...
@@ -188,13 +189,12 @@ Current tickets: `[###################-]` 154 of 156
 - 2026-11-10 13:20 **S8-11** lead amend: Lane lead -> gcc2: build and check the Sprint 8 head (knc) in tree 2 while S9-13 uses tree 1. Card parts (execute suite, paired M2, profiles 3100/5...
 - 2026-11-10 13:19 **S8-20** lead approve: The small-loop unroll now follows the thread density: streaming loops (one vector op per store) unroll 2 times at 1-2 threads per core and not at 3...
 - 2026-11-10 13:11 **S8-20** engineer submit: GCC 788255cd1b1: a stream (vector ops <= stores) unrolls 2x at knc-threads-per-core 1-2, 1x at 3-4; others keep 4. Cause with asm in that commit (a...
-- 2026-11-10 12:50 **S9-13** lead amend: deps add S8-20: Sprint 8 fix first, and both change KNC tuning in i386-knc.cc.
 
 ## Cost
 
 - From the script, engineer: 372 sessions, 810.9M input tokens
 - From the script, lead: 239 sessions, 72.0M input tokens
-- Started by hand, Claude: 11 sessions, 2128.1M input tokens
+- Started by hand, Claude: 11 sessions, 2132.9M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
