@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-10 08:09.
+Updated automatically at every ticket change. Last update: 2026-11-10 08:24.
 
-**Next: GPT-6.1, on S8-16 (User story - one bold flag, -mphinix, with a rising-phoenix banner and a progress bar).** Run `python tools/dispatch.py`, or ask the tech lead to.
+**Next: the tech lead, on S9-10.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[###################-]` 147 of 152
 
@@ -171,12 +171,13 @@ Current tickets: `[###################-]` 147 of 152
 | S9-07 | libgomp KNC affinity defaults (E6-03 B) | Done | Card 2026-11-10 12:01Z, whole card (--benchmark, 240 CPUs inherited): all 8 jobs ok (defaults at 60/120/240... |
 | S9-08 | libgomp spin-wait with delay and the one-core measurement (E6-03 C) | Done | KNC libgomp's spin wait can be tuned with GOMP_KNC_DELAY, the default spin count is 3 ms of DELAY periods, ... |
 | S9-09 | libgomp hierarchical ring-aware barrier (E6-03 D) | Done | OpenMP barriers on KNC now synchronise per core first and then across cores (one cache line per core instea... |
-| S9-10 | libgomp padding, static schedule default and malloc guidance (E6-03 E) | In progress | Owner 2026-11-10 changes the malloc part (ADR-0012): libgomp will size the arena cap from the card memory i... |
+| S9-10 | libgomp padding, static schedule default and malloc guidance (E6-03 E) | Question for the tech lead | Blocked: main's tests/acceptance/s9_omp/locks.c (58a2473, line 43) has a literal newline inside the printf ... |
 | S9-11 | Sprint 9 batch check | Not started | deps S9-10 -> S9-12 (ADR-0012 arena default lands before the batch check). |
 | S9-12 | libgomp sizes the malloc arena cap from the card's memory (ADR-0012) | Not started |  |
 
 ## Recent activity
 
+- 2026-11-10 08:24 **S9-10** engineer ask: Blocked: main's tests/acceptance/s9_omp/locks.c (58a2473, line 43) has a literal newline inside the printf string, so build.py fails to compile it ...
 - 2026-11-10 08:09 **S9-10** lead note: Owner 2026-11-10 changes the malloc part (ADR-0012): libgomp will size the arena cap from the card memory in S9-12. In S9-10, the MALLOC_ARENA_MAX ...
 - 2026-11-10 08:07 **S9-11** lead amend: deps S9-10 -> S9-12 (ADR-0012 arena default lands before the batch check).
 - 2026-11-10 07:52 **S9-10** lead note: Card input 2026-11-10 11:40Z: the S9-06 tasks program at 240 threads failed with libgomp Out of memory allocating 247 bytes: glibc per-thread mallo...
@@ -184,16 +185,15 @@ Current tickets: `[###################-]` 147 of 152
 - 2026-11-10 07:41 **S9-09** engineer submit: KNC per-core team barrier: GCC 915a117e6a9 (gcc-2, on knc), built and installed. Host stress 240x100000: red, then 5/5 PASS (logs/s9_09_host-202611...
 - 2026-11-10 07:40 **S9-09** lead answer: Yes, submit with --override: the barrier is one change and the rest is the stress test, card programs and runner the ticket requires. Name the over...
 - 2026-11-10 07:39 **S9-09** engineer ask: Work is complete but submit refuses on size: 1797 changed lines against the 800 budget (GCC 699 incl. license headers; stress test 359; two card pr...
-- 2026-11-10 07:27 **S8-15** lead approve: -O2 -march=knc now unrolls small vector loops (at most 16 insns) up to 4 times, and docs/gcc-knc-flags.md lists the recommended flags, every -march...
 
 ## Cost
 
 - From the script, engineer: 356 sessions, 782.0M input tokens
 - From the script, lead: 235 sessions, 71.3M input tokens
-- Started by hand, Claude: 11 sessions, 2028.4M input tokens
+- Started by hand, Claude: 11 sessions, 2030.4M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 23.2 GiB of 100 GiB. 109 GiB free on the drive.
+The project uses 22.6 GiB of 100 GiB. 110 GiB free on the drive.
