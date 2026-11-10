@@ -193,6 +193,15 @@ def host_mode(args):
 
 
 def build_mode(args):
+    # main's tests/acceptance/s9_omp/locks.c (58a2473) has a literal newline in a printf string; the
+    # lead allowed (2026-11-10 08:26) building from a temporary copy with only that line fixed.
+    sources = WORK / 's9_omp'
+    shutil.rmtree(sources, ignore_errors=True)
+    shutil.copytree(s9.PROGRAMS, sources)
+    locks = (sources / 'locks.c').read_bytes()
+    fixed = locks.replace(b'printf ("omp_get_wtick %g\n", ', b'printf ("omp_get_wtick %g\\n", ')
+    (sources / 'locks.c').write_bytes(fixed)
+    s9.PROGRAMS = sources
     s9.OUT = OUT
     if s9.build_mode():
         print('FAIL build: the S9-06 programs (above)')
@@ -218,6 +227,9 @@ def build_mode(args):
         failures += ['lint %s: %s' % (name, row) for name in (REDUCTION, MALLOC)
                      for row in lint(OUT / name, TC, os.environ.copy())]
     run_sh = (OUT / 'run.sh').read_text().replace('.work/_shared/S9-06/', '.work/_shared/S9-10/')
+    if fixed != locks:
+        run_sh = run_sh.replace('\n', '\n# S9-10: locks built from a copy of tests/acceptance/s9_omp/locks.c with only line 43 '
+                                'fixed to "omp_get_wtick %g\\n" (lead 2026-11-10 08:26).\n', 1)
     (OUT / 'run.sh').write_bytes(run_sh.encode())
     (OUT / 'measure.sh').write_bytes(MEASURE_SH.encode())
     names = sorted(p.name for p in OUT.iterdir() if p.name != 'files.txt')
@@ -228,7 +240,8 @@ def build_mode(args):
         print('FAIL build: %d problems' % len(failures))
         return 1
     print('PASS build: %d files staged in %s (the S9-06 batch, %s, %s); libgomp.so.1 has the KNC hint; '
-          'lint clean; native NOT RUN' % (len(names), OUT, REDUCTION, MALLOC))
+          'lint clean; native NOT RUN%s' % (len(names), OUT, REDUCTION, MALLOC,
+                                            '; locks.c from a copy with the printf newline fixed' if fixed != locks else ''))
     print('Lead card runs: tools/card_run --benchmark --timeout 1800 --file-list .work/_shared/S9-10/files.txt '
           '.work/_shared/S9-10/run.sh 240 (the S9-06 check at 60x4); measure.sh reduction and measure.sh malloc '
           'as whole-card --benchmark jobs.')

@@ -78,7 +78,7 @@ batch (int mode, int threads, long regions)
 	    int id = omp_get_thread_num ();
 	    part[id].v = id + 1 + r % 7;
 #pragma omp barrier
-#pragma omp master
+#pragma omp masked
 	    {
 	      long s = 0;
 	      int i, n = omp_get_num_threads ();
@@ -120,7 +120,7 @@ main (int argc, char **argv)
     }
 
 #pragma omp parallel num_threads(threads)
-#pragma omp master
+#pragma omp masked
   got = omp_get_num_threads ();
   if (got != threads)
     {

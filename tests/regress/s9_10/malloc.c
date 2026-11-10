@@ -78,7 +78,7 @@ main (int argc, char **argv)
 	p[1023] = (char) i;
 	free ((void *) p);
       }
-#pragma omp master
+#pragma omp masked
     got = omp_get_num_threads ();
   }
   t1 = now_s ();
