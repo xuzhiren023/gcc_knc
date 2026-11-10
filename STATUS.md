@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-10 01:55.
+Updated automatically at every ticket change. Last update: 2026-11-10 01:56.
 
-**Next: GPT-6.1, on S9-04 (libstdc++ packaging into the private prefix and a g++ link guard (E6-06b)).** Run `python tools/dispatch.py`, or ask the tech lead to.
+**Next: GPT-6.1, on S8-19 (-mtune=knc stops the tight-loop alignment pass (nops on the fallthrough path)).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
 Current tickets: `[##################--]` 139 of 151
 
@@ -161,7 +161,7 @@ Current tickets: `[##################--]` 139 of 151
 | S8-16 | User story - one bold flag, -mphinix, with a rising-phoenix banner and a progress bar | Not started | Owner 2026-11-09: Sprint 8 runs on without waiting for card timing; the lead approves on code review and ho... |
 | S8-17 | Card check C12 - power by rail for a saturated vector unit against x87, idle and streaming | Done | Card check C12 is built and ready to run: it measures card power by rail (core, uncore, memory) while the v... |
 | S8-18 | Second GCC tree - a gcc2 lane with its own checkout and build, so two GCC tickets run in parallel | Done | Tools now support a second GCC tree: a lane gcc2 ticket builds in gcc-2/gcc-build-2 while a gcc ticket uses... |
-| S8-19 | -mtune=knc stops the tight-loop alignment pass (nops on the fallthrough path) | Not started | written by the lead from the S8-08 card result; S8-15 now waits on it, |
+| S8-19 | -mtune=knc stops the tight-loop alignment pass (nops on the fallthrough path) | In progress | written by the lead from the S8-08 card result; S8-15 now waits on it, |
 | S9-01 | libgomp for KNC: futex, affinity, ring-aware barrier, spin-wait and malloc arenas (E6-03 input) | Done | We now have a build-and-design plan for GCC-KNC's own OpenMP runtime on the card: futex-based waits with de... |
 | S9-02 | libstdc++ for KNC: exceptions, RTTI, atomics, threads, packaging (E6-06 input) | Done | We now know how to build GCC 16's C++ library for the card: no newer glibc or kernel is needed, and built w... |
 | S9-03 | libstdc++ and libatomic build for k1om (E6-06a) | Done | GCC-KNC now builds g++, libstdc++ and libatomic for k1om, with the donor's ABI kept (no donor symbol missin... |
@@ -189,7 +189,7 @@ Current tickets: `[##################--]` 139 of 151
 
 - From the script, engineer: 337 sessions, 758.9M input tokens
 - From the script, lead: 230 sessions, 70.2M input tokens
-- Started by hand, Claude: 11 sessions, 1988.8M input tokens
+- Started by hand, Claude: 11 sessions, 1989.5M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
