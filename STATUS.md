@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-10 09:53.
+Updated automatically at every ticket change. Last update: 2026-11-10 09:55.
 
 **Next: GPT-6.1, on S8-16 (User story - one bold flag, -mphinix, with a rising-phoenix banner and a progress bar).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
@@ -157,7 +157,7 @@ Current tickets: `[###################-]` 149 of 154
 | S8-12 | Fix three weak S8-01 checks - C4 page offsets, C5 row aliasing, C9 memory chain | Done | The knc-char checks C4, C5 and C9 are fixed and rebuilt: C4 now walks every page offset, C5's eight arrays ... |
 | S8-13 | Streaming stores for write-only loops beyond L2 (E5-08) | Done | Loops that write arrays too large for the cache now use streaming stores: about 30% faster beyond L2 on the... |
 | S8-14 | Default 64-byte data alignment and TLB-aware cache parameters (E5-13) | Done | Card 2026-11-10 (deferred timing, frozen 3516ea25905 vs S8-13): s4_masks o2v/o3 pass, guard controls exit 3... |
-| S8-15 | Small-loop unroll default and the GCC-KNC flags page (E5-09) | Done | -O2 -march=knc now unrolls small vector loops (at most 16 insns) up to 4 times, and docs/gcc-knc-flags.md l... |
+| S8-15 | Small-loop unroll default and the GCC-KNC flags page (E5-09) | Done | Card 2026-11-10 14:35Z: correctness passes (s4/s5 PASS, s5 neg 1, M2 negative 1 / positive 0). Timing in pr... |
 | S8-16 | User story - one bold flag, -mphinix, with a rising-phoenix banner and a progress bar | In progress | Owner 2026-11-09: Sprint 8 runs on without waiting for card timing; the lead approves on code review and ho... |
 | S8-17 | Card check C12 - power by rail for a saturated vector unit against x87, idle and streaming | Done | Card check C12 is built and ready to run: it measures card power by rail (core, uncore, memory) while the v... |
 | S8-18 | Second GCC tree - a gcc2 lane with its own checkout and build, so two GCC tickets run in parallel | Done | Tools now support a second GCC tree: a lane gcc2 ticket builds in gcc-2/gcc-build-2 while a gcc ticket uses... |
@@ -179,6 +179,7 @@ Current tickets: `[###################-]` 149 of 154
 
 ## Recent activity
 
+- 2026-11-10 09:55 **S8-15** lead note: Card 2026-11-10 14:35Z: correctness passes (s4/s5 PASS, s5 neg 1, M2 negative 1 / positive 0). Timing in progress (d1 launch 1: mat16 0.788, mat8 0...
 - 2026-11-10 09:53 **S9-11** lead amend: deps add S9-14: run correctness and key timings under the 3100/5100/7100 profiles (owner 2026-11-10).
 - 2026-11-10 09:53 **S8-11** lead amend: deps add S9-14: run correctness and key timings under the 3100/5100/7100 profiles (owner 2026-11-10).
 - 2026-11-10 09:51 **S9-12** lead approve: KNC libgomp now reads the card at start-up: the malloc arena cap fits the card's memory and any address-space limit (a user MALLOC_ARENA_MAX wins),...
@@ -186,13 +187,12 @@ Current tickets: `[###################-]` 149 of 154
 - 2026-11-10 09:38 **S9-12** engineer submit: libgomp on k1om derives MALLOC_ARENA_MAX from MemTotal/CommitLimit/RLIMIT_AS/stack when the user did not set it, reads core count and cpu MHz from ...
 - 2026-11-10 09:36 **S9-12** lead answer: Do not split. The size is from the scope added at 09:14 (core count and clock), about 90 lines moved out of affinity.c, and the measurement 7 runne...
 - 2026-11-10 09:34 **S9-12** engineer ask: Done and verified on host, but submit refuses: 1275 changed lines vs budget 500. Breakdown: GCC 6751b9602fe +543/-96 (knc/card.h 392 new, of which ...
-- 2026-11-10 09:16 **S9-11** lead amend: deps add S9-13 (owner story 2026-11-10: -mknc-card).
 
 ## Cost
 
 - From the script, engineer: 362 sessions, 798.3M input tokens
 - From the script, lead: 238 sessions, 71.7M input tokens
-- Started by hand, Claude: 11 sessions, 2051.0M input tokens
+- Started by hand, Claude: 11 sessions, 2055.4M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
