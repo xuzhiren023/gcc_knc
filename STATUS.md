@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-10 04:11.
+Updated automatically at every ticket change. Last update: 2026-11-10 04:12.
 
 **Next: the tech lead, on S9-05.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
@@ -166,7 +166,7 @@ Current tickets: `[##################--]` 140 of 151
 | S9-02 | libstdc++ for KNC: exceptions, RTTI, atomics, threads, packaging (E6-06 input) | Done | We now know how to build GCC 16's C++ library for the card: no newer glibc or kernel is needed, and built w... |
 | S9-03 | libstdc++ and libatomic build for k1om (E6-06a) | Done | Card 2026-11-10 08:40Z (log .work/_shared/tmp/claude-s8-09.log): hello, rtti, thread, atomic16, tz and all ... |
 | S9-04 | libstdc++ packaging into the private prefix and a g++ link guard (E6-06b) | Done | Card 2026-11-10 08:42Z: both xdso pairs print PASS checks=5 with LD_LIBRARY_PATH=/usr/lib64, and the loader... |
-| S9-05 | libstdc++ runtime slice on the card (E6-06c) | Waiting for review | Rebased on main (eh fixture). run.sh: 60 s watcher per program (RESULT ... exit=timeout), exact match by sh... |
+| S9-05 | libstdc++ runtime slice on the card (E6-06c) | Waiting for review | new_test_files 3 -> 4: random_token.cc was the lead request after the card hang. |
 | S9-06 | libgomp for k1om: build, select, package and link guard (E6-03 A) | Not started | Lane gcc -> gcc2: Sprint 9 runs on tree 2 while tree 1 finishes Sprint 8 (owner 2026-11-09: start Sprint 9 ... |
 | S9-07 | libgomp KNC affinity defaults (E6-03 B) | Not started | Lane gcc -> gcc2: Sprint 9 runs on tree 2 while tree 1 finishes Sprint 8 (owner 2026-11-09: start Sprint 9 ... |
 | S9-08 | libgomp spin-wait with delay and the one-core measurement (E6-03 C) | Not started | Lane gcc -> gcc2: Sprint 9 runs on tree 2 while tree 1 finishes Sprint 8 (owner 2026-11-09: start Sprint 9 ... |
@@ -176,6 +176,7 @@ Current tickets: `[##################--]` 140 of 151
 
 ## Recent activity
 
+- 2026-11-10 04:12 **S9-05** lead amend: new_test_files 3 -> 4: random_token.cc was the lead request after the card hang.
 - 2026-11-10 04:10 **S9-05** engineer submit: Rebased on main (eh fixture). run.sh: 60 s watcher per program (RESULT ... exit=timeout), exact match by sh read loop, no grep -x; watcher checked ...
 - 2026-11-10 04:03 **S9-04** lead note: Card 2026-11-10 08:42Z: both xdso pairs print PASS checks=5 with LD_LIBRARY_PATH=/usr/lib64, and the loader trace shows libstdc++.so.6 and libgcc_s...
 - 2026-11-10 04:03 **S9-03** lead note: Card 2026-11-10 08:40Z (log .work/_shared/tmp/claude-s8-09.log): hello, rtti, thread, atomic16, tz and all six xdso pairs (with donor) match, inclu...
@@ -183,13 +184,12 @@ Current tickets: `[##################--]` 140 of 151
 - 2026-11-10 04:01 **S9-05** lead changes: Card 2026-11-10 08:44-09:00Z (lead copy .work/_shared/tmp/claude-s9-05, run.sh grep patched; log .work/_shared/tmp/claude-s9-05.out). (1) The batch...
 - 2026-11-10 03:42 **S9-05** engineer submit: Batch in .work/_shared/S9-05 for one card job: card_run --timeout 600 --file-list .work/_shared/S9-05/files.txt .work/_shared/S9-05/run.sh, then to...
 - 2026-11-10 03:33 **S9-05** lead note: S9-04 installs the g++ link guard scripts (libstdc++-knc{,-static}.ld) only in the prefix k1om-mpss-linux/lib64, and g++ names one before every -ls...
-- 2026-11-10 03:32 **S9-04** lead approve: g++ for KNC now refuses to link against an older libstdc++ (such as the card's GCC 5 one) with a clear message, and the prefix ships libstdc++.so.6...
 
 ## Cost
 
 - From the script, engineer: 342 sessions, 762.4M input tokens
 - From the script, lead: 230 sessions, 70.2M input tokens
-- Started by hand, Claude: 11 sessions, 1998.7M input tokens
+- Started by hand, Claude: 11 sessions, 1999.2M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
