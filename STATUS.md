@@ -172,13 +172,14 @@ Current tickets: `[###################-]` 149 of 154
 | S9-08 | libgomp spin-wait with delay and the one-core measurement (E6-03 C) | Done | KNC libgomp's spin wait can be tuned with GOMP_KNC_DELAY, the default spin count is 3 ms of DELAY periods, ... |
 | S9-09 | libgomp hierarchical ring-aware barrier (E6-03 D) | Done | OpenMP barriers on KNC now synchronise per core first and then across cores (one cache line per core instea... |
 | S9-10 | libgomp padding, static schedule default and malloc guidance (E6-03 E) | Done | KNC libgomp keeps each thread's private data and implicit task on cache lines of their own, schedule(runtim... |
-| S9-11 | Sprint 9 batch check | Not started | arena constants must be set from measurement 7 before Sprint 9 closes (S9-12 interim 50% MemTotal). |
+| S9-11 | Sprint 9 batch check | Not started | deps add S9-14: run correctness and key timings under the 3100/5100/7100 profiles (owner 2026-11-10). |
 | S9-12 | libgomp adapts to the card: malloc arena cap from memory, core count and clock (ADR-0012) | Done | KNC libgomp now reads the card at start-up: the malloc arena cap fits the card's memory and any address-spa... |
 | S9-13 | User story - -mknc-card= picks the card model's tuning, and -mknc-card=native detects it | Not started |  |
 | S9-14 | card_run model profiles - run a job as a 3100, 5100 or 7100 card on our 7120P | Not started |  |
 
 ## Recent activity
 
+- 2026-11-10 09:53 **S9-11** lead amend: deps add S9-14: run correctness and key timings under the 3100/5100/7100 profiles (owner 2026-11-10).
 - 2026-11-10 09:53 **S8-11** lead amend: deps add S9-14: run correctness and key timings under the 3100/5100/7100 profiles (owner 2026-11-10).
 - 2026-11-10 09:51 **S9-12** lead approve: KNC libgomp now reads the card at start-up: the malloc arena cap fits the card's memory and any address-space limit (a user MALLOC_ARENA_MAX wins),...
 - 2026-11-10 09:40 **S9-11** lead note: arena constants must be set from measurement 7 before Sprint 9 closes (S9-12 interim 50% MemTotal).
@@ -186,7 +187,6 @@ Current tickets: `[###################-]` 149 of 154
 - 2026-11-10 09:36 **S9-12** lead answer: Do not split. The size is from the scope added at 09:14 (core count and clock), about 90 lines moved out of affinity.c, and the measurement 7 runne...
 - 2026-11-10 09:34 **S9-12** engineer ask: Done and verified on host, but submit refuses: 1275 changed lines vs budget 500. Breakdown: GCC 6751b9602fe +543/-96 (knc/card.h 392 new, of which ...
 - 2026-11-10 09:16 **S9-11** lead amend: deps add S9-13 (owner story 2026-11-10: -mknc-card).
-- 2026-11-10 09:14 **S9-12** lead amend: Scope: core-count fallback and clock-based spin count read from the card (owner question 2026-11-10 on fitting all KNC models).
 
 ## Cost
 
