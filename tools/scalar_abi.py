@@ -82,7 +82,8 @@ def locations(body, result=False):
         dest = register(dest[1]) if dest else None
         reads = regs[:-1] if dest else regs
         # The zero idiom defines its destination without reading its old value.
-        if mnemonic.startswith('xor') and regs == [dest, dest]:
+        if (mnemonic.startswith('xor') and regs == [dest, dest]
+                or mnemonic.startswith('vpxor') and regs == [dest, dest, dest]):
             reads = []
         if mnemonic.startswith(('push', 'cmp', 'test')):
             reads, dest = regs, None
