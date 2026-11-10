@@ -1,10 +1,10 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-10 07:12.
+Updated automatically at every ticket change. Last update: 2026-11-10 07:27.
 
-**Next: the tech lead, on S8-15.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: GPT-6.1, on S9-09 (libgomp hierarchical ring-aware barrier (E6-03 D)).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
-Current tickets: `[###################-]` 145 of 151
+Current tickets: `[###################-]` 146 of 151
 
 ## Milestones
 
@@ -157,7 +157,7 @@ Current tickets: `[###################-]` 145 of 151
 | S8-12 | Fix three weak S8-01 checks - C4 page offsets, C5 row aliasing, C9 memory chain | Done | The knc-char checks C4, C5 and C9 are fixed and rebuilt: C4 now walks every page offset, C5's eight arrays ... |
 | S8-13 | Streaming stores for write-only loops beyond L2 (E5-08) | Done | Loops that write arrays too large for the cache now use streaming stores: about 30% faster beyond L2 on the... |
 | S8-14 | Default 64-byte data alignment and TLB-aware cache parameters (E5-13) | Done | Card 2026-11-10 (deferred timing, frozen 3516ea25905 vs S8-13): s4_masks o2v/o3 pass, guard controls exit 3... |
-| S8-15 | Small-loop unroll default and the GCC-KNC flags page (E5-09) | Waiting for review | GCC 7d26134e1f2+482730e75cc (shared i386.cc: 2-line ADR-0006 hook), rebased on knc 5d7514a1e7c (libgomp onl... |
+| S8-15 | Small-loop unroll default and the GCC-KNC flags page (E5-09) | Done | -O2 -march=knc now unrolls small vector loops (at most 16 insns) up to 4 times, and docs/gcc-knc-flags.md l... |
 | S8-16 | User story - one bold flag, -mphinix, with a rising-phoenix banner and a progress bar | Not started | Owner 2026-11-09: Sprint 8 runs on without waiting for card timing; the lead approves on code review and ho... |
 | S8-17 | Card check C12 - power by rail for a saturated vector unit against x87, idle and streaming | Done | Card check C12 is built and ready to run: it measures card power by rail (core, uncore, memory) while the v... |
 | S8-18 | Second GCC tree - a gcc2 lane with its own checkout and build, so two GCC tickets run in parallel | Done | Tools now support a second GCC tree: a lane gcc2 ticket builds in gcc-2/gcc-build-2 while a gcc ticket uses... |
@@ -176,6 +176,7 @@ Current tickets: `[###################-]` 145 of 151
 
 ## Recent activity
 
+- 2026-11-10 07:27 **S8-15** lead approve: -O2 -march=knc now unrolls small vector loops (at most 16 insns) up to 4 times, and docs/gcc-knc-flags.md lists the recommended flags, every -march...
 - 2026-11-10 07:11 **S9-09** lead approve-red: S9-09 red accepted: a 240-thread, 100,000-barrier host stress test of the new per-core KNC team barrier hangs in all five variants (plain, sleeping...
 - 2026-11-10 07:10 **S9-09** engineer red: Red: tools/s9_09_checks.py host (240 threads, 100000 barriers) fails all 5 variants (plain, tasks-park, tasks-spin, cancel, order) with 'no thread ...
 - 2026-11-10 07:05 **S9-07** lead note: Card 2026-11-10 12:01Z, whole card (--benchmark, 240 CPUs inherited): all 8 jobs ok (defaults at 60/120/240 threads, 60 core places, first affinity...
@@ -183,16 +184,15 @@ Current tickets: `[###################-]` 145 of 151
 - 2026-11-10 07:05 **S9-05** lead note: Card 2026-11-10 11:28Z: s9-05 done exit=0. All 56 programs match expected.txt, including the fixed eh programs; random_device token.cc times out (t...
 - 2026-11-10 07:04 **S8-19** lead note: Card 2026-11-10 11:28-12:03Z (frozen .work/_shared/tmp/claude-s8-19, log .work/_shared/tmp/claude-next.log). Correctness: s4/s5 PASS, s5 neg 1, M2 ...
 - 2026-11-10 06:47 **S9-09** lead note: S9-07 did not add gomp_knc_ncores: its knc/affinity.c builds core places (gomp_places_list, one per core of the mask, OS core dropped). Derive the ...
-- 2026-11-10 06:47 **S9-08** lead approve: KNC libgomp's spin wait can be tuned with GOMP_KNC_DELAY, the default spin count is 3 ms of DELAY periods, and omp_display_env shows both; the card...
 
 ## Cost
 
 - From the script, engineer: 354 sessions, 781.1M input tokens
 - From the script, lead: 235 sessions, 71.3M input tokens
-- Started by hand, Claude: 11 sessions, 2018.5M input tokens
+- Started by hand, Claude: 11 sessions, 2019.3M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 22.5 GiB of 100 GiB. 107 GiB free on the drive.
+The project uses 22.5 GiB of 100 GiB. 106 GiB free on the drive.
