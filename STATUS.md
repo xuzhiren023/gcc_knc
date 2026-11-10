@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-09 22:59.
+Updated automatically at every ticket change. Last update: 2026-11-09 23:00.
 
 **Next: the tech lead, on S8-08.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
@@ -156,7 +156,7 @@ Current tickets: `[##################--]` 135 of 150
 | S8-11 | Sprint 8 batch check and paired M2 re-measure | Not started | add one compiler-prefetch card case, because S8-03's card run has no row kernel (C5's rows are hand-written... |
 | S8-12 | Fix three weak S8-01 checks - C4 page offsets, C5 row aliasing, C9 memory chain | Done | The knc-char checks C4, C5 and C9 are fixed and rebuilt: C4 now walks every page offset, C5's eight arrays ... |
 | S8-13 | Streaming stores for write-only loops beyond L2 (E5-08) | Done | Loops that write arrays too large for the cache now use streaming stores: about 30% faster beyond L2 on the... |
-| S8-14 | Default 64-byte data alignment and TLB-aware cache parameters (E5-13) | Waiting for review | Lane gcc2 -> gcc so tree 2 can take S9-03 (owner: start Sprint 9 early). Card binaries are frozen in tmp/cl... |
+| S8-14 | Default 64-byte data alignment and TLB-aware cache parameters (E5-13) | Waiting for review | If the card shows a loss at 256-512 KB, the change is: the S8-13 storent guard reads the real L2 (512 KB) f... |
 | S8-15 | Small-loop unroll default and the GCC-KNC flags page (E5-09) | Not started | added at the owner's request (2026-11-08: "add three [tickets] in s8") to cover ADR-0009 points the sprint ... |
 | S8-16 | User story - one bold flag, -mphinix, with a rising-phoenix banner and a progress bar | Not started | owner's user story, written by the lead with the owner's request quoted above. |
 | S8-17 | Card check C12 - power by rail for a saturated vector unit against x87, idle and streaming | Done | Card check C12 is built and ready to run: it measures card power by rail (core, uncore, memory) while the v... |
@@ -175,6 +175,7 @@ Current tickets: `[##################--]` 135 of 150
 
 ## Recent activity
 
+- 2026-11-09 23:00 **S8-14** lead note: If the card shows a loss at 256-512 KB, the change is: the S8-13 storent guard reads the real L2 (512 KB) from the KNC tuning, not param l2-cache-s...
 - 2026-11-09 22:57 **S8-14** lead note: Lane gcc2 -> gcc so tree 2 can take S9-03 (owner: start Sprint 9 early). Card binaries are frozen in tmp/claude-s8-14; any change round runs on tre...
 - 2026-11-09 22:56 **S9-03** lead note: Owner 2026-11-09 22:45 EST: "start sprint 9 early". Moved to tree 2 (lane gcc2) with deps S8-13 (the knc head it builds on) while tree 1 finishes S...
 - 2026-11-09 22:41 **S8-14** lead note: Lead x86 check of 3516ea25905 (S8_14_lead_x86-20261109-220825.log): -O2 and -O2 -mavx512f identical=1962 different=0 both-failed=41 (missing header...
@@ -182,13 +183,12 @@ Current tickets: `[##################--]` 135 of 150
 - 2026-11-09 22:09 **S8-08** lead note: Lead read 020d107325d and red 43464d3: only the KNC function alignment default remains (loops back to the table 16, as before a4c3a8fd72d); T1 scan...
 - 2026-11-09 22:04 **S8-08** engineer submit: -mtune=knc now defaults only -falign-functions=64, loops generic (gcc 020d107325d on knc 454bead9944, i386-knc.cc only). Red 43464d3, T1 align scan...
 - 2026-11-09 22:00 **S8-14** engineer submit: Green gcc-2 3516ea25905 (i386-knc.cc only): knc defaults to -malign-data=cacheline, local arrays >=64 B 64-aligned, L2 param 256 KB (DTLB reach). R...
-- 2026-11-09 20:31 **S8-08** lead budget: sessions 5: lead extension 2 (progress: the align-64 default was built and measured).
 
 ## Cost
 
 - From the script, engineer: 333 sessions, 755.9M input tokens
 - From the script, lead: 229 sessions, 69.8M input tokens
-- Started by hand, Claude: 11 sessions, 1967.7M input tokens
+- Started by hand, Claude: 11 sessions, 1967.8M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
