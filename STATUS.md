@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-10 00:41.
+Updated automatically at every ticket change. Last update: 2026-11-10 00:53.
 
-**Next: the tech lead, on S9-03.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: the tech lead, on S8-09.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[##################--]` 137 of 150
 
@@ -151,7 +151,7 @@ Current tickets: `[##################--]` 137 of 150
 | S8-06 | Memory-operand forms for V16SF/V8DF arithmetic and FMA (E5-17) | Done | KNC vector add, sub, mul and FMA now read aligned memory and {1to16}/{1to8} broadcasts directly instead of ... |
 | S8-07 | vpmadd231d for V16SI multiply-add (E5-14) | Done | KNC now emits vpmadd231d for vector integer multiply-add: one instruction at 4 ticks latency instead of vpm... |
 | S8-08 | -mtune=knc tune-flag audit (E5-12) | Done | -mtune=knc no longer uses 0x66/0x67 prefixes where a shorter form exists and starts functions on a 64-byte ... |
-| S8-09 | KNC -O2 defaults: vectorizer cost model, stride versioning, predictive commoning (E5-18) | In progress | Owner 2026-11-09: Sprint 8 runs on without waiting for card timing; the lead approves on code review and ho... |
+| S8-09 | KNC -O2 defaults: vectorizer cost model, stride versioning, predictive commoning (E5-18) | Waiting for review | Green gcc 16bc28c465c (i386-knc.cc only): -march=knc -O2 uses -fvect-cost-model=cheap and -fversion-loops-f... |
 | S8-10 | Less ring traffic: 64-byte padding of per-thread data, and card check C11 (E5-16) | Done | Per-thread arrays and the OpenMP shared block now start on their own 64-byte line, and the C11 card check s... |
 | S8-11 | Sprint 8 batch check and paired M2 re-measure | Not started | add one compiler-prefetch card case, because S8-03's card run has no row kernel (C5's rows are hand-written... |
 | S8-12 | Fix three weak S8-01 checks - C4 page offsets, C5 row aliasing, C9 memory chain | Done | The knc-char checks C4, C5 and C9 are fixed and rebuilt: C4 now walks every page offset, C5's eight arrays ... |
@@ -175,6 +175,7 @@ Current tickets: `[##################--]` 137 of 150
 
 ## Recent activity
 
+- 2026-11-10 00:53 **S8-09** engineer submit: Green gcc 16bc28c465c (i386-knc.cc only): -march=knc -O2 uses -fvect-cost-model=cheap and -fversion-loops-for-strides; pcom stays -O3. Corpus -O2 1...
 - 2026-11-10 00:41 **S9-03** engineer submit: Target libraries rebuilt from empty with the rebased compiler (gcc-2 8ad3d5598b4 on knc ff4bf991c62), reinstalled to gcc-knc-16.2.0-2. Regenerated ...
 - 2026-11-10 00:11 **S9-03** lead answer: Yes, resubmit with --override: the 6,166 lines are the generated baseline_symbols.txt the ticket asks for; keep it in the same change. One thing fi...
 - 2026-11-10 00:09 **S9-03** engineer ask: Submit is refused only on size: 6491 changed lines against 800. 6166 of them are the generated baseline_symbols.txt the ticket requires (gcc-2 8ad3...
@@ -182,13 +183,12 @@ Current tickets: `[##################--]` 137 of 150
 - 2026-11-09 23:51 **S8-15** lead note: Owner 2026-11-09: Sprint 8 runs on without waiting for card timing; the lead approves on code review and host checks and times every ticket in one ...
 - 2026-11-09 23:50 **S8-14** lead approve: -march=knc now puts arrays of 64 bytes or more on a 64-byte line and sizes loop blocking to the 256 KB TLB reach; code, host checks and x86 identit...
 - 2026-11-09 23:50 **S8-09** lead note: Owner 2026-11-09: Sprint 8 runs on without waiting for card timing; the lead approves on code review and host checks and times every ticket in one ...
-- 2026-11-09 23:42 **S8-14** lead note: Lead merged knc (with S8-08) into s8/S8-14 (6137ddbf42c, clean) and main into the repo branch (84ac639, clean) to approve with card timing deferred...
 
 ## Cost
 
 - From the script, engineer: 336 sessions, 757.9M input tokens
 - From the script, lead: 230 sessions, 70.2M input tokens
-- Started by hand, Claude: 11 sessions, 1976.9M input tokens
+- Started by hand, Claude: 11 sessions, 1979.0M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
