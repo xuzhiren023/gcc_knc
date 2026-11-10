@@ -63,6 +63,8 @@ Then stop. Your final message is only the `PM update:` line that command prints:
   they exist, so pruning breaks them (S4-13, 2026-11-04).
 - x86, the drill, ICE sweeps and the trunk build run in batch-check tickets, not in each ticket,
   unless your ticket says otherwise (`docs/DEVELOPMENT_CYCLE.md` section 4).
+- Do not start the x86 check yourself, even when your ticket asks for x86 identity: it takes about
+  4 h and dies with your session (S8-13, S8-14). Submit with "x86 not run"; the lead runs it.
 
 ## Test first
 
