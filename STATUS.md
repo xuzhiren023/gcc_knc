@@ -1,10 +1,10 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-09 23:07.
+Updated automatically at every ticket change. Last update: 2026-11-09 23:41.
 
-**Next: the tech lead, on S8-08.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: the tech lead, on S8-14.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
-Current tickets: `[##################--]` 135 of 150
+Current tickets: `[##################--]` 136 of 150
 
 ## Milestones
 
@@ -150,7 +150,7 @@ Current tickets: `[##################--]` 135 of 150
 | S8-05 | Re-check the scalar-add cost on mat8 and the stencils after S8-06 (E5-11) | Done | No per-loop add-cost work is needed: with the cheaper add cost mat8 now compiles to the same code as today,... |
 | S8-06 | Memory-operand forms for V16SF/V8DF arithmetic and FMA (E5-17) | Done | KNC vector add, sub, mul and FMA now read aligned memory and {1to16}/{1to8} broadcasts directly instead of ... |
 | S8-07 | vpmadd231d for V16SI multiply-add (E5-14) | Done | KNC now emits vpmadd231d for vector integer multiply-add: one instruction at 4 ticks latency instead of vpm... |
-| S8-08 | -mtune=knc tune-flag audit (E5-12) | Waiting for review | Lead read 020d107325d and red 43464d3: only the KNC function alignment default remains (loops back to the t... |
+| S8-08 | -mtune=knc tune-flag audit (E5-12) | Done | -mtune=knc no longer uses 0x66/0x67 prefixes where a shorter form exists and starts functions on a 64-byte ... |
 | S8-09 | KNC -O2 defaults: vectorizer cost model, stride versioning, predictive commoning (E5-18) | Not started | written under the owner's overnight blanket approval (2026-11-08). |
 | S8-10 | Less ring traffic: 64-byte padding of per-thread data, and card check C11 (E5-16) | Done | Per-thread arrays and the OpenMP shared block now start on their own 64-byte line, and the C11 card check s... |
 | S8-11 | Sprint 8 batch check and paired M2 re-measure | Not started | add one compiler-prefetch card case, because S8-03's card run has no row kernel (C5's rows are hand-written... |
@@ -175,6 +175,7 @@ Current tickets: `[##################--]` 135 of 150
 
 ## Recent activity
 
+- 2026-11-09 23:41 **S8-08** lead approve: -mtune=knc no longer uses 0x66/0x67 prefixes where a shorter form exists and starts functions on a 64-byte line; code and host checks reviewed, car...
 - 2026-11-09 23:07 **S9-03** lead approve-red: S9-03 red accepted: the host check fails today because the installed compiler has no g++ or libstdc++; at green it builds the lead's static and sha...
 - 2026-11-09 23:06 **S9-03** engineer red: Red at 060ee62: tools/s9_03_checks.py links (run.py s9-03-links) fails with 'no C++ driver at gcc-knc-16.2.0/bin/k1om-mpss-linux-g++' (build is c,f...
 - 2026-11-09 23:00 **S8-14** lead note: If the card shows a loss at 256-512 KB, the change is: the S8-13 storent guard reads the real L2 (512 KB) from the KNC tuning, not param l2-cache-s...
@@ -182,16 +183,15 @@ Current tickets: `[##################--]` 135 of 150
 - 2026-11-09 22:56 **S9-03** lead note: Owner 2026-11-09 22:45 EST: "start sprint 9 early". Moved to tree 2 (lane gcc2) with deps S8-13 (the knc head it builds on) while tree 1 finishes S...
 - 2026-11-09 22:41 **S8-14** lead note: Lead x86 check of 3516ea25905 (S8_14_lead_x86-20261109-220825.log): -O2 and -O2 -mavx512f identical=1962 different=0 both-failed=41 (missing header...
 - 2026-11-09 22:09 **S8-14** lead note: Lead review: the x86 check (S8_14_x86-20261109-215941) died with the session at 22:05 (no compiler error; make killed). Lead reruns -O2 and -O2 -ma...
-- 2026-11-09 22:09 **S8-08** lead note: Lead read 020d107325d and red 43464d3: only the KNC function alignment default remains (loops back to the table 16, as before a4c3a8fd72d); T1 scan...
 
 ## Cost
 
 - From the script, engineer: 334 sessions, 756.8M input tokens
 - From the script, lead: 230 sessions, 70.2M input tokens
-- Started by hand, Claude: 11 sessions, 1968.1M input tokens
+- Started by hand, Claude: 11 sessions, 1971.0M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 18.9 GiB of 100 GiB. 109 GiB free on the drive.
+The project uses 20.1 GiB of 100 GiB. 105 GiB free on the drive.
