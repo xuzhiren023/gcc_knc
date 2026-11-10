@@ -1,10 +1,10 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-10 16:04.
+Updated automatically at every ticket change. Last update: 2026-11-10 16:51.
 
 **Next: the tech lead, on S8-11.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
-Current tickets: `[###################-]` 152 of 155
+Current tickets: `[###################-]` 153 of 156
 
 ## Milestones
 
@@ -13,7 +13,7 @@ Current tickets: `[###################-]` 152 of 155
 | M0 | Foundation | In progress | 17 of 17 tickets |
 | M1 | Mixed native code | Done | 43 of 43 tickets |
 | M2 | Useful vector target | Done | 51 of 51 tickets |
-| M3 | Runtimes | In progress | 22 of 24 tickets |
+| M3 | Runtimes | In progress | 23 of 24 tickets |
 | M4 | Broad optimization | Not started | Not planned in detail yet |
 | M5 | Program corpus | Not started | Not planned in detail yet |
 | M6 | Release | Not started | Not planned in detail yet |
@@ -163,6 +163,7 @@ Current tickets: `[###################-]` 152 of 155
 | S8-18 | Second GCC tree - a gcc2 lane with its own checkout and build, so two GCC tickets run in parallel | Done | Tools now support a second GCC tree: a lane gcc2 ticket builds in gcc-2/gcc-build-2 while a gcc ticket uses... |
 | S8-19 | -mtune=knc stops the tight-loop alignment pass (nops on the fallthrough path) | Done | Card 2026-11-10 11:28-12:03Z (frozen .work/_shared/tmp/claude-s8-19, log .work/_shared/tmp/claude-next.log)... |
 | S8-20 | The small-loop unroll costs affine_f64 3-7% at 4 threads per core - make it follow the thread density | Done | The small-loop unroll now follows the thread density: streaming loops (one vector op per store) unroll 2 ti... |
+| S8-21 | The prefetch pass sees masked loads and stores, so rows shorter than a vector are prefetched | Not started |  |
 | S9-01 | libgomp for KNC: futex, affinity, ring-aware barrier, spin-wait and malloc arenas (E6-03 input) | Done | We now have a build-and-design plan for GCC-KNC's own OpenMP runtime on the card: futex-based waits with de... |
 | S9-02 | libstdc++ for KNC: exceptions, RTTI, atomics, threads, packaging (E6-06 input) | Done | We now know how to build GCC 16's C++ library for the card: no newer glibc or kernel is needed, and built w... |
 | S9-03 | libstdc++ and libatomic build for k1om (E6-06a) | Done | Card 2026-11-10 08:40Z (log .work/_shared/tmp/claude-s8-09.log): hello, rtti, thread, atomic16, tz and all ... |
@@ -175,11 +176,12 @@ Current tickets: `[###################-]` 152 of 155
 | S9-10 | libgomp padding, static schedule default and malloc guidance (E6-03 E) | Done | Card 2026-11-10 14:40Z: the eight OpenMP programs pass on the S9-06..S9-10 libgomp at 60 threads (6 GiB) an... |
 | S9-11 | Sprint 9 batch check | Not started | From the 2026-11-10 card runs: (1) rerun the S9-09 suite on the final head; (2) make the S9-07 explicit-set... |
 | S9-12 | libgomp adapts to the card: malloc arena cap from memory, core count and clock (ADR-0012) | Done | Measurement 7, 6 GiB RLIMIT_AS, 240 threads, 1 KiB pattern (2026-11-10, partial; job capped at 2 h after 23... |
-| S9-13 | User story - -mknc-card= picks the card model's tuning, and -mknc-card=native detects it | Waiting for review | -mknc-card=MODEL/aliases/native in linux-k1om.h self spec + knc_card_spec (card /proc, MPSS /sys/class/mic,... |
+| S9-13 | User story - -mknc-card= picks the card model's tuning, and -mknc-card=native detects it | Done | -mknc-card=generic/3100/5100/7100/native picks a card model's prefetch distances (3100 and 5100 derived fro... |
 | S9-14 | card_run model profiles - run a job as a 3100, 5100 or 7100 card on our 7120P | Done | card_run --profile 3100/5100/7100/full runs a job as that card would (its compute cores and usable memory),... |
 
 ## Recent activity
 
+- 2026-11-10 16:51 **S9-13** lead approve: -mknc-card=generic|3100|5100|7100|native picks a card model's prefetch distances (3100 and 5100 derived from bandwidth per core, 7100 measured), na...
 - 2026-11-10 16:03 **S8-11** engineer submit: knc fe7ed380f149. Drill textual only (master 12 files/23 hunks; KNC bar.c needs master's barrier API), gcc-16 0. Shared i386 718/132: x86 not run (...
 - 2026-11-10 15:14 **S9-13** engineer submit: -mknc-card=MODEL/aliases/native in linux-k1om.h self spec + knc_card_spec (card /proc, MPSS /sys/class/mic, generic+note); -mphinix adds native. Fi...
 - 2026-11-10 13:20 **S8-11** lead amend: Lane lead -> gcc2: build and check the Sprint 8 head (knc) in tree 2 while S9-13 uses tree 1. Card parts (execute suite, paired M2, profiles 3100/5...
@@ -187,16 +189,15 @@ Current tickets: `[###################-]` 152 of 155
 - 2026-11-10 13:11 **S8-20** engineer submit: GCC 788255cd1b1: a stream (vector ops <= stores) unrolls 2x at knc-threads-per-core 1-2, 1x at 3-4; others keep 4. Cause with asm in that commit (a...
 - 2026-11-10 12:50 **S9-13** lead amend: deps add S8-20: Sprint 8 fix first, and both change KNC tuning in i386-knc.cc.
 - 2026-11-10 12:50 **S8-11** lead amend: deps add S8-20 (S8-15 loses at 4 threads per core).
-- 2026-11-10 12:49 **S9-14** lead approve: card_run --profile 3100|5100|7100|full runs a job as that card would (its compute cores and usable memory), and in our exclusive turns jobs may use...
 
 ## Cost
 
 - From the script, engineer: 372 sessions, 810.9M input tokens
 - From the script, lead: 239 sessions, 72.0M input tokens
-- Started by hand, Claude: 11 sessions, 2111.0M input tokens
+- Started by hand, Claude: 11 sessions, 2121.6M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 22.8 GiB of 100 GiB. 112 GiB free on the drive.
+The project uses 22.8 GiB of 100 GiB. 111 GiB free on the drive.
