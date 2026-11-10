@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-09 23:00.
+Updated automatically at every ticket change. Last update: 2026-11-09 23:06.
 
 **Next: the tech lead, on S8-08.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
@@ -163,7 +163,7 @@ Current tickets: `[##################--]` 135 of 150
 | S8-18 | Second GCC tree - a gcc2 lane with its own checkout and build, so two GCC tickets run in parallel | Done | Tools now support a second GCC tree: a lane gcc2 ticket builds in gcc-2/gcc-build-2 while a gcc ticket uses... |
 | S9-01 | libgomp for KNC: futex, affinity, ring-aware barrier, spin-wait and malloc arenas (E6-03 input) | Done | We now have a build-and-design plan for GCC-KNC's own OpenMP runtime on the card: futex-based waits with de... |
 | S9-02 | libstdc++ for KNC: exceptions, RTTI, atomics, threads, packaging (E6-06 input) | Done | We now know how to build GCC 16's C++ library for the card: no newer glibc or kernel is needed, and built w... |
-| S9-03 | libstdc++ and libatomic build for k1om (E6-06a) | In progress | Owner 2026-11-09 22:45 EST: "start sprint 9 early". Moved to tree 2 (lane gcc2) with deps S8-13 (the knc he... |
+| S9-03 | libstdc++ and libatomic build for k1om (E6-06a) | Tests waiting for review | Red at 060ee62: tools/s9_03_checks.py links (run.py s9-03-links) fails with 'no C++ driver at gcc-knc-16.2.... |
 | S9-04 | libstdc++ packaging into the private prefix and a g++ link guard (E6-06b) | Not started | Pre-check: build wiring, static linking, test programs and allowed files are now in the brief (lead pre-che... |
 | S9-05 | libstdc++ runtime slice on the card (E6-06c) | Not started | Pre-check: build wiring, static linking, test programs and allowed files are now in the brief (lead pre-che... |
 | S9-06 | libgomp for k1om: build, select, package and link guard (E6-03 A) | Not started | Pre-check: build wiring, static linking, test programs and allowed files are now in the brief (lead pre-che... |
@@ -175,6 +175,7 @@ Current tickets: `[##################--]` 135 of 150
 
 ## Recent activity
 
+- 2026-11-09 23:06 **S9-03** engineer red: Red at 060ee62: tools/s9_03_checks.py links (run.py s9-03-links) fails with 'no C++ driver at gcc-knc-16.2.0/bin/k1om-mpss-linux-g++' (build is c,f...
 - 2026-11-09 23:00 **S8-14** lead note: If the card shows a loss at 256-512 KB, the change is: the S8-13 storent guard reads the real L2 (512 KB) from the KNC tuning, not param l2-cache-s...
 - 2026-11-09 22:57 **S8-14** lead note: Lane gcc2 -> gcc so tree 2 can take S9-03 (owner: start Sprint 9 early). Card binaries are frozen in tmp/claude-s8-14; any change round runs on tre...
 - 2026-11-09 22:56 **S9-03** lead note: Owner 2026-11-09 22:45 EST: "start sprint 9 early". Moved to tree 2 (lane gcc2) with deps S8-13 (the knc head it builds on) while tree 1 finishes S...
@@ -182,16 +183,15 @@ Current tickets: `[##################--]` 135 of 150
 - 2026-11-09 22:09 **S8-14** lead note: Lead review: the x86 check (S8_14_x86-20261109-215941) died with the session at 22:05 (no compiler error; make killed). Lead reruns -O2 and -O2 -ma...
 - 2026-11-09 22:09 **S8-08** lead note: Lead read 020d107325d and red 43464d3: only the KNC function alignment default remains (loops back to the table 16, as before a4c3a8fd72d); T1 scan...
 - 2026-11-09 22:04 **S8-08** engineer submit: -mtune=knc now defaults only -falign-functions=64, loops generic (gcc 020d107325d on knc 454bead9944, i386-knc.cc only). Red 43464d3, T1 align scan...
-- 2026-11-09 22:00 **S8-14** engineer submit: Green gcc-2 3516ea25905 (i386-knc.cc only): knc defaults to -malign-data=cacheline, local arrays >=64 B 64-aligned, L2 param 256 KB (DTLB reach). R...
 
 ## Cost
 
 - From the script, engineer: 333 sessions, 755.9M input tokens
 - From the script, lead: 229 sessions, 69.8M input tokens
-- Started by hand, Claude: 11 sessions, 1967.8M input tokens
+- Started by hand, Claude: 11 sessions, 1968.1M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 18.9 GiB of 100 GiB. 110 GiB free on the drive.
+The project uses 18.9 GiB of 100 GiB. 109 GiB free on the drive.
