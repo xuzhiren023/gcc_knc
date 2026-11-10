@@ -83,8 +83,11 @@ int main() {
   bool alloc = false;
   try {
     volatile std::size_t huge = ~(std::size_t)0 / 4;
-    char *q = new char[huge];
-    delete[] q;
+    // The pointer escapes: GCC 10+ may delete an unused new/delete pair (C++14 allocation
+    // elision), which GCC 16 does at -O2, and then nothing throws.
+    static char *volatile sink;
+    sink = new char[huge];
+    delete[] sink;
   } catch (const std::bad_alloc &) {
     alloc = true;
   }
