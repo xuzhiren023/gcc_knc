@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-10 07:04.
+Updated automatically at every ticket change. Last update: 2026-11-10 07:05.
 
 **Next: the tech lead, on S8-15.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
@@ -166,7 +166,7 @@ Current tickets: `[###################-]` 145 of 151
 | S9-02 | libstdc++ for KNC: exceptions, RTTI, atomics, threads, packaging (E6-06 input) | Done | We now know how to build GCC 16's C++ library for the card: no newer glibc or kernel is needed, and built w... |
 | S9-03 | libstdc++ and libatomic build for k1om (E6-06a) | Done | Card 2026-11-10 08:40Z (log .work/_shared/tmp/claude-s8-09.log): hello, rtti, thread, atomic16, tz and all ... |
 | S9-04 | libstdc++ packaging into the private prefix and a g++ link guard (E6-06b) | Done | Card 2026-11-10 08:42Z: both xdso pairs print PASS checks=5 with LD_LIBRARY_PATH=/usr/lib64, and the loader... |
-| S9-05 | libstdc++ runtime slice on the card (E6-06c) | Done | A 56-program libstdc++ runtime slice (exceptions, threads, futures, filesystem, random_device, plus the KNC... |
+| S9-05 | libstdc++ runtime slice on the card (E6-06c) | Done | Card 2026-11-10 11:28Z: s9-05 done exit=0. All 56 programs match expected.txt, including the fixed eh progr... |
 | S9-06 | libgomp for k1om: build, select, package and link guard (E6-03 A) | Done | OpenMP (-fopenmp) now links and builds against a KNC libgomp in the private prefix, which spins with DELAY ... |
 | S9-07 | libgomp KNC affinity defaults (E6-03 B) | Done | OpenMP programs on KNC now spread threads one per core over the 60 compute cores by default (OS core left o... |
 | S9-08 | libgomp spin-wait with delay and the one-core measurement (E6-03 C) | Done | KNC libgomp's spin wait can be tuned with GOMP_KNC_DELAY, the default spin count is 3 ms of DELAY periods, ... |
@@ -176,6 +176,7 @@ Current tickets: `[###################-]` 145 of 151
 
 ## Recent activity
 
+- 2026-11-10 07:05 **S9-05** lead note: Card 2026-11-10 11:28Z: s9-05 done exit=0. All 56 programs match expected.txt, including the fixed eh programs; random_device token.cc times out (t...
 - 2026-11-10 07:04 **S8-19** lead note: Card 2026-11-10 11:28-12:03Z (frozen .work/_shared/tmp/claude-s8-19, log .work/_shared/tmp/claude-next.log). Correctness: s4/s5 PASS, s5 neg 1, M2 ...
 - 2026-11-10 06:47 **S9-09** lead note: S9-07 did not add gomp_knc_ncores: its knc/affinity.c builds core places (gomp_places_list, one per core of the mask, OS core dropped). Derive the ...
 - 2026-11-10 06:47 **S9-08** lead approve: KNC libgomp's spin wait can be tuned with GOMP_KNC_DELAY, the default spin count is 3 ms of DELAY periods, and omp_display_env shows both; the card...
@@ -183,7 +184,6 @@ Current tickets: `[###################-]` 145 of 151
 - 2026-11-10 06:35 **S9-08** lead answer: Yes, resubmit with --override 'size is the staged measurement programs and checks the ticket requires; libgomp change is 58 lines'. Keep the stagin...
 - 2026-11-10 06:34 **S9-08** engineer ask: Submit refused: 782 changed lines vs budget 500. Work is done and green (GCC d52140f524a; red e5a468d; s9_08_checks host 11/11, scan PASS; card bat...
 - 2026-11-10 06:32 **S8-15** engineer submit: GCC 7d26134e1f2+482730e75cc (shared i386.cc: 2-line ADR-0006 hook), rebased on knc 5d7514a1e7c (libgomp only), rebuilt. Red 16651e2, green + docs/g...
-- 2026-11-10 06:22 **S9-08** lead note: S9-06 already added config/linux/knc/futex.h (cpu_relax = DELAY gomp_knc_delay), mutex.c (gomp_knc_delay = 32) and spincount.h (default 100000, abo...
 
 ## Cost
 
