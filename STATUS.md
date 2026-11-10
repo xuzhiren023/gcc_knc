@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-10 04:01.
+Updated automatically at every ticket change. Last update: 2026-11-10 04:03.
 
 **Next: GPT-6.1, on S8-19 (-mtune=knc stops the tight-loop alignment pass (nops on the fallthrough path)).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
@@ -151,7 +151,7 @@ Current tickets: `[##################--]` 140 of 151
 | S8-06 | Memory-operand forms for V16SF/V8DF arithmetic and FMA (E5-17) | Done | KNC vector add, sub, mul and FMA now read aligned memory and {1to16}/{1to8} broadcasts directly instead of ... |
 | S8-07 | vpmadd231d for V16SI multiply-add (E5-14) | Done | KNC now emits vpmadd231d for vector integer multiply-add: one instruction at 4 ticks latency instead of vpm... |
 | S8-08 | -mtune=knc tune-flag audit (E5-12) | Done | Card 2026-11-10 05:14-06:02Z (deferred timing, frozen 020d107325d vs S8-10 knc, L2 d4, 2 launches): M2 corr... |
-| S8-09 | KNC -O2 defaults: vectorizer cost model, stride versioning, predictive commoning (E5-18) | Done | -march=knc -O2 now vectorizes loops that need a runtime alias check, a masked epilogue or a runtime stride ... |
+| S8-09 | KNC -O2 defaults: vectorizer cost model, stride versioning, predictive commoning (E5-18) | Done | Card 2026-11-10 08:36-08:40Z (frozen set .work/_shared/tmp/claude-s8-09, log .work/_shared/tmp/claude-s8-09... |
 | S8-10 | Less ring traffic: 64-byte padding of per-thread data, and card check C11 (E5-16) | Done | Per-thread arrays and the OpenMP shared block now start on their own 64-byte line, and the C11 card check s... |
 | S8-11 | Sprint 8 batch check and paired M2 re-measure | Not started | add one compiler-prefetch card case, because S8-03's card run has no row kernel (C5's rows are hand-written... |
 | S8-12 | Fix three weak S8-01 checks - C4 page offsets, C5 row aliasing, C9 memory chain | Done | The knc-char checks C4, C5 and C9 are fixed and rebuilt: C4 now walks every page offset, C5's eight arrays ... |
@@ -176,6 +176,7 @@ Current tickets: `[##################--]` 140 of 151
 
 ## Recent activity
 
+- 2026-11-10 04:03 **S8-09** lead note: Card 2026-11-10 08:36-08:40Z (frozen set .work/_shared/tmp/claude-s8-09, log .work/_shared/tmp/claude-s8-09.log): s4_masks o2/o2v/o3 and s5_ops o2/...
 - 2026-11-10 04:01 **S9-05** lead changes: Card 2026-11-10 08:44-09:00Z (lead copy .work/_shared/tmp/claude-s9-05, run.sh grep patched; log .work/_shared/tmp/claude-s9-05.out). (1) The batch...
 - 2026-11-10 03:42 **S9-05** engineer submit: Batch in .work/_shared/S9-05 for one card job: card_run --timeout 600 --file-list .work/_shared/S9-05/files.txt .work/_shared/S9-05/run.sh, then to...
 - 2026-11-10 03:33 **S9-05** lead note: S9-04 installs the g++ link guard scripts (libstdc++-knc{,-static}.ld) only in the prefix k1om-mpss-linux/lib64, and g++ names one before every -ls...
@@ -183,13 +184,12 @@ Current tickets: `[##################--]` 140 of 151
 - 2026-11-10 03:22 **S9-04** engineer submit: GCC s9/S9-04 5b14957e998: hook LIBSTDCXX_RUNTIME_GUARD{,_STATIC} (linux-k1om.h) in g++spec.cc names -l:libstdc++-knc{,-static}.ld before -lstdc++. ...
 - 2026-11-10 01:55 **S8-09** lead approve: -march=knc -O2 now vectorizes loops that need a runtime alias check, a masked epilogue or a runtime stride (corpus loops vectorized at -O2: 17 -> 6...
 - 2026-11-10 01:44 **S8-09** lead note: Lead review: 16bc28c465c read (one KNC-only hunk; -O2 and up, not -Os; user flags win). Corpus 17 -> 64, M2 asm identical, so the paired timing is ...
-- 2026-11-10 01:06 **S9-10** lead note: Lane gcc -> gcc2: Sprint 9 runs on tree 2 while tree 1 finishes Sprint 8 (owner 2026-11-09: start Sprint 9 early).
 
 ## Cost
 
 - From the script, engineer: 341 sessions, 761.6M input tokens
 - From the script, lead: 230 sessions, 70.2M input tokens
-- Started by hand, Claude: 11 sessions, 1997.9M input tokens
+- Started by hand, Claude: 11 sessions, 1998.1M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
