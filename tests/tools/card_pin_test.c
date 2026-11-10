@@ -63,14 +63,19 @@ int main(void) {
     assert(pin_main(5, args) == 126);
     assert(affinity_calls == 1 && limit_calls == 1 && exec_calls == 0);
     assert(rmdir("claude-pinned") == 0);
-    /* Owner, 2026-11-04: our budget is 10240 MiB, so one job may declare 7680. */
+    /* Owner, 2026-11-10 (S9-14): exclusive turns may use the 7120P's 16 GB,
+       so one job may declare up to 16384 MiB and no more. */
     mode = 0;
     expected_mib = 7680;
     args[2] = "7680";
     affinity_calls = limit_calls = exec_calls = 0;
     assert(pin_main(5, args) == 127 && limit_calls == 1 && exec_calls == 1);
-    args[2] = "10241";
-    affinity_calls = 0;
+    expected_mib = 16384;
+    args[2] = "16384";
+    affinity_calls = limit_calls = exec_calls = 0;
+    assert(pin_main(5, args) == 127 && limit_calls == 1 && exec_calls == 1);
+    args[2] = "16385";
+    affinity_calls = limit_calls = exec_calls = 0;
     assert(pin_main(5, args) == 125 && affinity_calls == 0);
     args[2] = "128";
     char *bad[] = {"", "4,,13", "-1", "9999999", "4x", "4,"};
