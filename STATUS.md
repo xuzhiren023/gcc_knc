@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-10 03:33.
+Updated automatically at every ticket change. Last update: 2026-11-10 03:42.
 
-**Next: GPT-6.1, on S8-19 (-mtune=knc stops the tight-loop alignment pass (nops on the fallthrough path)).** Run `python tools/dispatch.py`, or ask the tech lead to.
+**Next: the tech lead, on S9-05.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[##################--]` 140 of 151
 
@@ -166,7 +166,7 @@ Current tickets: `[##################--]` 140 of 151
 | S9-02 | libstdc++ for KNC: exceptions, RTTI, atomics, threads, packaging (E6-06 input) | Done | We now know how to build GCC 16's C++ library for the card: no newer glibc or kernel is needed, and built w... |
 | S9-03 | libstdc++ and libatomic build for k1om (E6-06a) | Done | GCC-KNC now builds g++, libstdc++ and libatomic for k1om, with the donor's ABI kept (no donor symbol missin... |
 | S9-04 | libstdc++ packaging into the private prefix and a g++ link guard (E6-06b) | Done | g++ for KNC now refuses to link against an older libstdc++ (such as the card's GCC 5 one) with a clear mess... |
-| S9-05 | libstdc++ runtime slice on the card (E6-06c) | In progress | S9-04 installs the g++ link guard scripts (libstdc++-knc{,-static}.ld) only in the prefix k1om-mpss-linux/l... |
+| S9-05 | libstdc++ runtime slice on the card (E6-06c) | Waiting for review | Batch in .work/_shared/S9-05 for one card job: card_run --timeout 600 --file-list .work/_shared/S9-05/files... |
 | S9-06 | libgomp for k1om: build, select, package and link guard (E6-03 A) | Not started | Lane gcc -> gcc2: Sprint 9 runs on tree 2 while tree 1 finishes Sprint 8 (owner 2026-11-09: start Sprint 9 ... |
 | S9-07 | libgomp KNC affinity defaults (E6-03 B) | Not started | Lane gcc -> gcc2: Sprint 9 runs on tree 2 while tree 1 finishes Sprint 8 (owner 2026-11-09: start Sprint 9 ... |
 | S9-08 | libgomp spin-wait with delay and the one-core measurement (E6-03 C) | Not started | Lane gcc -> gcc2: Sprint 9 runs on tree 2 while tree 1 finishes Sprint 8 (owner 2026-11-09: start Sprint 9 ... |
@@ -176,6 +176,7 @@ Current tickets: `[##################--]` 140 of 151
 
 ## Recent activity
 
+- 2026-11-10 03:42 **S9-05** engineer submit: Batch in .work/_shared/S9-05 for one card job: card_run --timeout 600 --file-list .work/_shared/S9-05/files.txt .work/_shared/S9-05/run.sh, then to...
 - 2026-11-10 03:33 **S9-05** lead note: S9-04 installs the g++ link guard scripts (libstdc++-knc{,-static}.ld) only in the prefix k1om-mpss-linux/lib64, and g++ names one before every -ls...
 - 2026-11-10 03:32 **S9-04** lead approve: g++ for KNC now refuses to link against an older libstdc++ (such as the card's GCC 5 one) with a clear message, and the prefix ships libstdc++.so.6...
 - 2026-11-10 03:22 **S9-04** engineer submit: GCC s9/S9-04 5b14957e998: hook LIBSTDCXX_RUNTIME_GUARD{,_STATIC} (linux-k1om.h) in g++spec.cc names -l:libstdc++-knc{,-static}.ld before -lstdc++. ...
@@ -183,16 +184,15 @@ Current tickets: `[##################--]` 140 of 151
 - 2026-11-10 01:44 **S8-09** lead note: Lead review: 16bc28c465c read (one KNC-only hunk; -O2 and up, not -Os; user flags win). Corpus 17 -> 64, M2 asm identical, so the paired timing is ...
 - 2026-11-10 01:06 **S9-10** lead note: Lane gcc -> gcc2: Sprint 9 runs on tree 2 while tree 1 finishes Sprint 8 (owner 2026-11-09: start Sprint 9 early).
 - 2026-11-10 01:06 **S9-09** lead note: Lane gcc -> gcc2: Sprint 9 runs on tree 2 while tree 1 finishes Sprint 8 (owner 2026-11-09: start Sprint 9 early).
-- 2026-11-10 01:06 **S9-08** lead note: Lane gcc -> gcc2: Sprint 9 runs on tree 2 while tree 1 finishes Sprint 8 (owner 2026-11-09: start Sprint 9 early).
 
 ## Cost
 
 - From the script, engineer: 340 sessions, 759.3M input tokens
 - From the script, lead: 230 sessions, 70.2M input tokens
-- Started by hand, Claude: 11 sessions, 1993.0M input tokens
+- Started by hand, Claude: 11 sessions, 1994.1M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 21.3 GiB of 100 GiB. 92 GiB free on the drive.
+The project uses 22.4 GiB of 100 GiB. 89 GiB free on the drive.
