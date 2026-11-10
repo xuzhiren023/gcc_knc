@@ -132,6 +132,15 @@ def host_mode(args):
 
 
 def build_mode(args):
+    # As tools/s9_10_checks.py: main's tests/acceptance/s9_omp/locks.c has a literal newline in a
+    # printf string; built from a temporary copy with only that line fixed (lead, 2026-11-10 08:26).
+    sources = WORK / 's9_omp'
+    shutil.rmtree(sources, ignore_errors=True)
+    shutil.copytree(s9.PROGRAMS, sources)
+    locks = (sources / 'locks.c').read_bytes()
+    fixed = locks.replace(b'printf ("omp_get_wtick %g\n", ', b'printf ("omp_get_wtick %g\\n", ')
+    (sources / 'locks.c').write_bytes(fixed)
+    s9.PROGRAMS = sources
     s9.OUT = OUT
     if s9.build_mode():
         print('FAIL build: the S9-06 programs (above)')

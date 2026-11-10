@@ -12,10 +12,10 @@
    default  no OMP_SCHEDULE, MALLOC_ARENA_MAX, OMP_STACKSIZE or GOMP_STACKSIZE: run-sched-var,
             read as omp_get_schedule (icv.c) and schedule(runtime) (loop.c) read it, is static
             with the default chunk, and the verbose
-            omp_display_env shows OMP_SCHEDULE 'STATIC', MALLOC_ARENA_MAX '' and the KNC hint,
-            which recommends no fixed MALLOC_ARENA_MAX (ADR-0012).
+            omp_display_env shows OMP_SCHEDULE 'STATIC', MALLOC_ARENA_MAX '', the arena cap
+            libgomp derived (ADR-0012; S9-12) and the KNC hint for OMP_STACKSIZE.
    set      OMP_SCHEDULE=dynamic,4 MALLOC_ARENA_MAX=60 OMP_STACKSIZE=2M: OMP_SCHEDULE still
-            overrides, the display shows the values and no hint.  */
+            overrides, the display shows the values, the user's arena cap and no hint.  */
 #include "libgomp.h"
 
 #include <stdio.h>
@@ -40,6 +40,7 @@ gomp_error (const char *fmt, ...)
 
 void gomp_init_num_threads (void) { gomp_global_icv.nthreads_var = 1; }
 void gomp_init_affinity (void) {}
+void gomp_knc_init_ncores (void) {}
 void gomp_init_targets_once (void) {}
 void goacc_runtime_initialize (void) {}
 void goacc_profiling_initialize (void) {}
@@ -138,23 +139,24 @@ main (int argc, char **argv)
 	      "schedule(runtime) without OMP_SCHEDULE is static with the default chunk");
       expect (has_line ("  [host] OMP_SCHEDULE = 'STATIC'"), "display: OMP_SCHEDULE = 'STATIC'");
       expect (has_line ("  [host] MALLOC_ARENA_MAX = ''"), "display: MALLOC_ARENA_MAX = ''");
+      expect (strstr (display, "  [host] KNC malloc arena cap = '") != NULL
+	      && strstr (display, "' (derived: budget ") != NULL,
+	      "display: the arena cap libgomp derived (ADR-0012)");
       const char *start = strstr (display, KNC_HINT);
       char hint[1024] = "";
       if (start)
 	sscanf (start, "%1023[^\n]", hint);
-      /* ADR-0012: no fixed arena count; the default suits the card and a user value wins.  */
-      expect (strstr (hint, "MALLOC_ARENA_MAX") && !strstr (hint, "MALLOC_ARENA_MAX=")
-	      && strstr (hint, "default") && strstr (hint, "you set wins")
-	      && strstr (hint, "OMP_STACKSIZE="),
-	      "display: the KNC hint names MALLOC_ARENA_MAX without a fixed value, its default and that"
-	      " a user value wins, and OMP_STACKSIZE");
+      expect (strstr (hint, "OMP_STACKSIZE=") && strstr (hint, "arena cap"),
+	      "display: the KNC hint names OMP_STACKSIZE and that the arena cap counts the stacks");
     }
   else
     {
       expect (kind == omp_sched_dynamic && chunk == 4, "OMP_SCHEDULE=dynamic,4 overrides the default");
       expect (has_line ("  [host] OMP_SCHEDULE = 'DYNAMIC,4'"), "display: OMP_SCHEDULE = 'DYNAMIC,4'");
       expect (has_line ("  [host] MALLOC_ARENA_MAX = '60'"), "display: MALLOC_ARENA_MAX = '60'");
-      expect (strstr (display, KNC_HINT) == NULL, "display: no KNC hint when both are set");
+      expect (has_line ("  [host] KNC malloc arena cap = '60' (user: MALLOC_ARENA_MAX)"),
+	      "display: the user's arena cap wins");
+      expect (strstr (display, KNC_HINT) == NULL, "display: no KNC hint when OMP_STACKSIZE is set");
     }
   if (failed)
     printf ("--- display ---\n%s---\n", display);
