@@ -67,3 +67,32 @@ division stays scalar x87), and no approximation is used without an opt-in. `-ff
 nearest match to ICC's default; it also links `crtfastmath`, which flushes subnormals. ICC's
 `-no-prec-div` / `-fimf-precision=low` approximate forms are not built yet (ADR-0003 point 5).
 `-ffp-contract` is GCC's default (`fast` in GNU C modes, `off` with `-std=c11`).
+
+## `-mphinix`
+
+One flag for the measured best set ([S8-16](../work/tickets/S8-16.md)): Phi plus phoenix.
+The driver expands it before `cc1` runs, so `-###` shows exactly what it means:
+
+Expansion: `-O3 -march=knc -mtune=knc -fprefetch-loop-arrays -munroll-only-small-loops -malign-data=cacheline`
+
+- `-O3` adds the dynamic vectorizer cost model and predictive commoning to the `-march=knc`
+  defaults above; the other flags are those defaults, written out.
+- Each part yields to an explicit user setting of the same option, given before or after
+  `-mphinix` (`-O2`, `-mtune=`, `-fno-prefetch-loop-arrays`, `-funroll-loops`, `-malign-data=`).
+- IEEE semantics stay: no `-ffast-math` or any part of it.
+- KNC only: with another `-march=` it is an error, and an x86 compiler does not accept it.
+
+On a terminal, `-mphinix` also prints the rising-phoenix banner once, and draws an apt-style
+progress bar, one step per driver job (`[####......] 40%  compiling foo.c (2/5)`). The bar
+sits on the terminal's last line, below a scroll region, so warnings and errors scroll above it
+unchanged, and it is cleared on exit.
+
+| Switch | Effect |
+|---|---|
+| `-mno-phinix-banner` | No banner. |
+| `-mprogress` | The progress bar without `-mphinix`. |
+| `-mno-progress` | No progress bar. |
+
+Neither ever appears when stderr is not a terminal, under `-E` or `-o -`, with `-###`, `-v` or
+`--version`, or under make's `-j` or jobserver (`MAKEFLAGS`). They write only to stderr and never
+change the exit status, the diagnostics or an output file.
