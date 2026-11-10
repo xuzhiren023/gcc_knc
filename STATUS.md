@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-10 02:37.
+Updated automatically at every ticket change. Last update: 2026-11-10 03:22.
 
-**Next: GPT-6.1, on S8-19 (-mtune=knc stops the tight-loop alignment pass (nops on the fallthrough path)).** Run `python tools/dispatch.py`, or ask the tech lead to.
+**Next: the tech lead, on S9-04.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[##################--]` 139 of 151
 
@@ -165,7 +165,7 @@ Current tickets: `[##################--]` 139 of 151
 | S9-01 | libgomp for KNC: futex, affinity, ring-aware barrier, spin-wait and malloc arenas (E6-03 input) | Done | We now have a build-and-design plan for GCC-KNC's own OpenMP runtime on the card: futex-based waits with de... |
 | S9-02 | libstdc++ for KNC: exceptions, RTTI, atomics, threads, packaging (E6-06 input) | Done | We now know how to build GCC 16's C++ library for the card: no newer glibc or kernel is needed, and built w... |
 | S9-03 | libstdc++ and libatomic build for k1om (E6-06a) | Done | GCC-KNC now builds g++, libstdc++ and libatomic for k1om, with the donor's ABI kept (no donor symbol missin... |
-| S9-04 | libstdc++ packaging into the private prefix and a g++ link guard (E6-06b) | In progress | Lane gcc -> gcc2: Sprint 9 runs on tree 2 while tree 1 finishes Sprint 8 (owner 2026-11-09: start Sprint 9 ... |
+| S9-04 | libstdc++ packaging into the private prefix and a g++ link guard (E6-06b) | Waiting for review | GCC s9/S9-04 5b14957e998: hook LIBSTDCXX_RUNTIME_GUARD{,_STATIC} (linux-k1om.h) in g++spec.cc names -l:libs... |
 | S9-05 | libstdc++ runtime slice on the card (E6-06c) | Not started | Lane gcc -> gcc2: Sprint 9 runs on tree 2 while tree 1 finishes Sprint 8 (owner 2026-11-09: start Sprint 9 ... |
 | S9-06 | libgomp for k1om: build, select, package and link guard (E6-03 A) | Not started | Lane gcc -> gcc2: Sprint 9 runs on tree 2 while tree 1 finishes Sprint 8 (owner 2026-11-09: start Sprint 9 ... |
 | S9-07 | libgomp KNC affinity defaults (E6-03 B) | Not started | Lane gcc -> gcc2: Sprint 9 runs on tree 2 while tree 1 finishes Sprint 8 (owner 2026-11-09: start Sprint 9 ... |
@@ -176,6 +176,7 @@ Current tickets: `[##################--]` 139 of 151
 
 ## Recent activity
 
+- 2026-11-10 03:22 **S9-04** engineer submit: GCC s9/S9-04 5b14957e998: hook LIBSTDCXX_RUNTIME_GUARD{,_STATIC} (linux-k1om.h) in g++spec.cc names -l:libstdc++-knc{,-static}.ld before -lstdc++. ...
 - 2026-11-10 01:55 **S8-09** lead approve: -march=knc -O2 now vectorizes loops that need a runtime alias check, a masked epilogue or a runtime stride (corpus loops vectorized at -O2: 17 -> 6...
 - 2026-11-10 01:44 **S8-09** lead note: Lead review: 16bc28c465c read (one KNC-only hunk; -O2 and up, not -Os; user flags win). Corpus 17 -> 64, M2 asm identical, so the paired timing is ...
 - 2026-11-10 01:06 **S9-10** lead note: Lane gcc -> gcc2: Sprint 9 runs on tree 2 while tree 1 finishes Sprint 8 (owner 2026-11-09: start Sprint 9 early).
@@ -183,7 +184,6 @@ Current tickets: `[##################--]` 139 of 151
 - 2026-11-10 01:06 **S9-08** lead note: Lane gcc -> gcc2: Sprint 9 runs on tree 2 while tree 1 finishes Sprint 8 (owner 2026-11-09: start Sprint 9 early).
 - 2026-11-10 01:05 **S9-07** lead note: Lane gcc -> gcc2: Sprint 9 runs on tree 2 while tree 1 finishes Sprint 8 (owner 2026-11-09: start Sprint 9 early).
 - 2026-11-10 01:05 **S9-06** lead note: Lane gcc -> gcc2: Sprint 9 runs on tree 2 while tree 1 finishes Sprint 8 (owner 2026-11-09: start Sprint 9 early).
-- 2026-11-10 01:05 **S9-05** lead note: Lane gcc -> gcc2: Sprint 9 runs on tree 2 while tree 1 finishes Sprint 8 (owner 2026-11-09: start Sprint 9 early).
 
 ## Cost
 
@@ -195,4 +195,4 @@ Current tickets: `[##################--]` 139 of 151
 
 ## Disk
 
-The project uses 21.1 GiB of 100 GiB. 97 GiB free on the drive.
+The project uses 21.3 GiB of 100 GiB. 96 GiB free on the drive.
