@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-10 01:04.
+Updated automatically at every ticket change. Last update: 2026-11-10 01:05.
 
 **Next: the tech lead, on S8-09.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
@@ -165,7 +165,7 @@ Current tickets: `[##################--]` 138 of 151
 | S9-01 | libgomp for KNC: futex, affinity, ring-aware barrier, spin-wait and malloc arenas (E6-03 input) | Done | We now have a build-and-design plan for GCC-KNC's own OpenMP runtime on the card: futex-based waits with de... |
 | S9-02 | libstdc++ for KNC: exceptions, RTTI, atomics, threads, packaging (E6-06 input) | Done | We now know how to build GCC 16's C++ library for the card: no newer glibc or kernel is needed, and built w... |
 | S9-03 | libstdc++ and libatomic build for k1om (E6-06a) | Done | GCC-KNC now builds g++, libstdc++ and libatomic for k1om, with the donor's ABI kept (no donor symbol missin... |
-| S9-04 | libstdc++ packaging into the private prefix and a g++ link guard (E6-06b) | Not started | Pre-check: build wiring, static linking, test programs and allowed files are now in the brief (lead pre-che... |
+| S9-04 | libstdc++ packaging into the private prefix and a g++ link guard (E6-06b) | Not started | Lane gcc -> gcc2: Sprint 9 runs on tree 2 while tree 1 finishes Sprint 8 (owner 2026-11-09: start Sprint 9 ... |
 | S9-05 | libstdc++ runtime slice on the card (E6-06c) | Not started | Pre-check: build wiring, static linking, test programs and allowed files are now in the brief (lead pre-che... |
 | S9-06 | libgomp for k1om: build, select, package and link guard (E6-03 A) | Not started | Pre-check: build wiring, static linking, test programs and allowed files are now in the brief (lead pre-che... |
 | S9-07 | libgomp KNC affinity defaults (E6-03 B) | Not started | Pre-check: build wiring, static linking, test programs and allowed files are now in the brief (lead pre-che... |
@@ -176,6 +176,7 @@ Current tickets: `[##################--]` 138 of 151
 
 ## Recent activity
 
+- 2026-11-10 01:05 **S9-04** lead note: Lane gcc -> gcc2: Sprint 9 runs on tree 2 while tree 1 finishes Sprint 8 (owner 2026-11-09: start Sprint 9 early).
 - 2026-11-10 01:04 **S8-15** lead note: Now also waits on S8-19: the tight-loop alignment pass pads small loops with one-byte nops that run on fallthrough, so unroll timings move with cod...
 - 2026-11-10 01:04 **S8-14** lead note: Card 2026-11-10 (deferred timing, frozen 3516ea25905 vs S8-13): s4_masks o2v/o3 pass, guard controls exit 3 (expected fault), s5_ops pass, neg fail...
 - 2026-11-10 01:04 **S8-08** lead note: Card 2026-11-10 05:14-06:02Z (deferred timing, frozen 020d107325d vs S8-10 knc, L2 d4, 2 launches): M2 correctness pass. mat8 1.105/1.106 slower; o...
@@ -183,13 +184,12 @@ Current tickets: `[##################--]` 138 of 151
 - 2026-11-10 00:53 **S8-09** engineer submit: Green gcc 16bc28c465c (i386-knc.cc only): -march=knc -O2 uses -fvect-cost-model=cheap and -fversion-loops-for-strides; pcom stays -O3. Corpus -O2 1...
 - 2026-11-10 00:41 **S9-03** engineer submit: Target libraries rebuilt from empty with the rebased compiler (gcc-2 8ad3d5598b4 on knc ff4bf991c62), reinstalled to gcc-knc-16.2.0-2. Regenerated ...
 - 2026-11-10 00:11 **S9-03** lead answer: Yes, resubmit with --override: the 6,166 lines are the generated baseline_symbols.txt the ticket asks for; keep it in the same change. One thing fi...
-- 2026-11-10 00:09 **S9-03** engineer ask: Submit is refused only on size: 6491 changed lines against 800. 6166 of them are the generated baseline_symbols.txt the ticket requires (gcc-2 8ad3...
 
 ## Cost
 
 - From the script, engineer: 337 sessions, 758.9M input tokens
 - From the script, lead: 230 sessions, 70.2M input tokens
-- Started by hand, Claude: 11 sessions, 1985.7M input tokens
+- Started by hand, Claude: 11 sessions, 1986.5M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
