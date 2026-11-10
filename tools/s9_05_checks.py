@@ -3,7 +3,7 @@
 
     python tools/s9_05_checks.py build [--prefix DIR]
         builds one flat card batch in .work/_shared/S9-05: the tests/acceptance/s9_cxx programs
-        (build.py), the docs/research/knc-libstdcxx.md section 5.3 testsuite slice and the three
+        (build.py), the docs/research/knc-libstdcxx.md section 5.3 testsuite slice and the four
         tests/regress/s9_05 programs that document known deviations; compile- and link-only slice
         tests are verdicts here. Writes run.sh (the card program), files.txt (its --file-list),
         expected.txt (one RESULT line per program).
@@ -61,24 +61,42 @@ DEVIATION_LINES = {
                 'waits on system_clock (pthread_cond_timedwait, no pthread_cond_clockwait)',
     'f128_from_chars': 'S9-CXX f128 PASS from_chars(_Float128) (not declared in <charconv>) '
                        'reads 1+2^-100 at 64-bit (strtold fallback) precision',
+    'random_token': 'S9-CXX rdtoken PASS random_device tokens that block: /dev/random',
+}
+# Slice tests whose card result is a documented deviation, not exit 0.
+TS_EXPECTED = {
+    # test02 reads random_device("/dev/random"), which blocks on the card (random_token.cc).
+    '26_numerics/random/random_device/cons/token.cc': 'timeout',
 }
 # libstdc++.exp's flags for a test without dg-options (lib/libstdc++.exp v3_target_compile).
 TS_FLAGS = ['-O2', '-D_GNU_SOURCE', '-DLOCALEDIR="."', '-fmessage-length=0', '-pthread']
 RUN_SH = r'''#!/bin/sh
 # Lead-only card program for S9-05 (tools/s9_05_checks.py build). Stage files.txt beside it:
-#   card_run --timeout 600 --file-list .work/_shared/S9-05/files.txt .work/_shared/S9-05/run.sh
+#   card_run --timeout 900 --file-list .work/_shared/S9-05/files.txt .work/_shared/S9-05/run.sh
 # Prints one RESULT line per program; the host compares them with expected.txt
 # (tools/s9_05_checks.py compare). Exit 1 if any RESULT line is not in expected.txt.
+# BusyBox 1.19 sh: no timeout applet and no grep -x, so a watcher kills a program after LIMIT
+# seconds (RESULT ... exit=timeout) and a read loop does the exact match.
 cd -- "$(dirname -- "$0")" || exit 2
+LIMIT=60
 status=0
 for prog in %s; do
-    ./"$prog" > "$prog.out" 2>&1
+    rm -f "$prog.timeout"
+    ./"$prog" > "$prog.out" 2>&1 &
+    pid=$!
+    ( sleep $LIMIT; touch "$prog.timeout"; kill -9 $pid ) > /dev/null 2>&1 &
+    watcher=$!
+    wait $pid
     rc=$?
+    kill $watcher 2> /dev/null
+    [ -e "$prog.timeout" ] && rc=timeout
     line=$(grep '^S9-CXX ' "$prog.out" | tail -n 1)
     result="RESULT $prog exit=$rc ${line:--}"
     echo "$result"
-    case $prog in *hw_concurrency*) sed 's/^/  | /' "$prog.out";; esac
-    if ! grep -qxF "$result" expected.txt; then
+    case $prog in *hw_concurrency*|*random_token*) sed 's/^/  | /' "$prog.out";; esac
+    found=0
+    while IFS= read -r want; do [ "$want" = "$result" ] && found=1; done < expected.txt
+    if [ $found = 0 ]; then
         echo "UNEXPECTED $prog"; sed 's/^/  | /' "$prog.out" | head -n 40; status=1
     fi
 done
@@ -113,7 +131,7 @@ def ts_build(test, gxx, failures):
     if rc:
         failures.append('%s %s: %s' % (what, test, out.strip()[-600:]))
         return None
-    return (name, 'RESULT %s exit=0 -' % name) if what == 'run' else None
+    return (name, 'RESULT %s exit=%s -' % (name, TS_EXPECTED.get(test, 0))) if what == 'run' else None
 
 
 def build_mode(prefix):
@@ -166,7 +184,7 @@ def build_mode(prefix):
     print('PASS build: %d card programs, %d binaries lint clean, %d staged files (%.0f MiB); '
           '%d compile/link-only slice tests built on the host; native NOT RUN'
           % (len(runs), len(binaries), len(staged), mib, len(SLICE) - sum(p.startswith('claude-s9ts') for p, _ in runs)))
-    print('Lead card run: tools/card_run --timeout 600 --file-list .work/_shared/S9-05/files.txt '
+    print('Lead card run: tools/card_run --timeout 900 --file-list .work/_shared/S9-05/files.txt '
           '.work/_shared/S9-05/run.sh > card-out.txt; then tools/s9_05_checks.py compare card-out.txt')
     return 0
 
