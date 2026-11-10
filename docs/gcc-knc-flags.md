@@ -96,3 +96,43 @@ unchanged, and it is cleared on exit.
 Neither ever appears when stderr is not a terminal, under `-E` or `-o -`, with `-###`, `-v` or
 `--version`, or under make's `-j` or jobserver (`MAKEFLAGS`). They write only to stderr and never
 change the exit status, the diagnostics or an output file.
+
+`-mphinix` without `-mknc-card=` also detects the card (`-mknc-card=native`, next section).
+
+## `-mknc-card=`
+
+Every KNC card has the same core (ISA, L1, L2, TLB), so a card model changes tuning, never the
+instruction set ([S9-13](../work/tickets/S9-13.md)). `-mknc-card=MODEL` sets the model's values
+for the parameters that follow the memory system; each yields to an explicit `--param`, given
+before or after it. The driver expands it, so `-###` shows the `--param`s. KNC only: with another
+`-march=` it is an error, and an x86 compiler does not accept it.
+
+| Model | Cards (accepted as names, `-mknc-card=7120` is `7100`) | Cores | Clock | GB/s per core | `knc-prefetch-l2-distance` | `knc-prefetch-l1-distance` |
+|---|---|---|---|---|---|---|
+| `generic` (default) | any | | | | 32 | 16 |
+| `3100` | 3110P, 3115A, 3120A, 3120P | 57 | 1.1 GHz | 4.2 | 23, derived, not measured | 16 |
+| `5100` | 5110P, 5120D | 60 | 1.053 GHz | 5.3 | 29, derived, not measured | 16 |
+| `7100` | 7110P, 7110X, 7120P, 7120X, 7120A, 7120D | 61 | 1.238 GHz | 5.8 | 32, measured on a 7120P ([S8-03](../work/tickets/S8-03.md)) | 16 |
+
+- The model: the L2 prefetch distance (lines) must cover memory latency x bandwidth per core.
+  Latency in ns is about the same on the three (GDDR5 on the same ring), and a stream that waits
+  on memory consumes lines at the bandwidth, not the clock, so the distance scales with bandwidth
+  per core: 32 x 4.2 / 5.8 = 23 and 32 x 5.3 / 5.8 = 29.
+- The L1 distance covers an L2 hit, which costs the same core cycles on every model: 16 for all.
+- `generic` is the longest distance, 32: a distance too short stalls on every line, one too
+  long only keeps a few more lines in the 512 KB L2. So plain `-march=knc` (no `-mknc-card=`)
+  adds no `--param` and gives the same code on every machine.
+- Not card-dependent, so unchanged by the model: `knc-threads-per-core`, the S8-13
+  streaming-store threshold (cache size), the cache parameters, unrolling and vector costs.
+
+`-mknc-card=native` picks the model before `cc1` runs:
+
+- On a card (a native compiler, `cpu family` 11 in `/proc/cpuinfo`): the number of distinct
+  `core id` values, which includes the core MPSS keeps for the OS: 61 is `7100`, 59-60 `5100`,
+  56-57 `3100`. A `MemTotal` in `/proc/meminfo` over 12 GiB is a `7100` (the only 16 GB model)
+  even if a kernel hides the OS core.
+- On a Linux host with MPSS 3.x: each `/sys/class/mic/micN` whose `family` is `x100`, by the
+  first digit after the dash in its `sku` (`C0-7120 P/A/X/D`, `B1PRQ-5110P/5120D`; the names are
+  from mpss-modules `host/linsysfs.c`). One model: that model. Different models: an error that
+  names them and asks for `-mknc-card=MODEL`.
+- Nothing found (a Windows host, a host without MPSS): `generic`, with a one-line note on stderr.
