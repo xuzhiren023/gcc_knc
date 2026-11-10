@@ -1,10 +1,10 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-10 16:51.
+Updated automatically at every ticket change. Last update: 2026-11-10 16:59.
 
-**Next: the tech lead, on S8-11.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: GPT-6.1, on S8-21 (The prefetch pass sees masked loads and stores, so rows shorter than a vector are prefetched).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
-Current tickets: `[###################-]` 153 of 156
+Current tickets: `[###################-]` 154 of 156
 
 ## Milestones
 
@@ -153,7 +153,7 @@ Current tickets: `[###################-]` 153 of 156
 | S8-08 | -mtune=knc tune-flag audit (E5-12) | Done | Card 2026-11-10 05:14-06:02Z (deferred timing, frozen 020d107325d vs S8-10 knc, L2 d4, 2 launches): M2 corr... |
 | S8-09 | KNC -O2 defaults: vectorizer cost model, stride versioning, predictive commoning (E5-18) | Done | Card 2026-11-10 08:36-08:40Z (frozen set .work/_shared/tmp/claude-s8-09, log .work/_shared/tmp/claude-s8-09... |
 | S8-10 | Less ring traffic: 64-byte padding of per-thread data, and card check C11 (E5-16) | Done | Per-thread arrays and the OpenMP shared block now start on their own 64-byte line, and the C11 card check s... |
-| S8-11 | Sprint 8 batch check and paired M2 re-measure | Waiting for review | knc fe7ed380f149. Drill textual only (master 12 files/23 hunks; KNC bar.c needs master's barrier API), gcc-... |
+| S8-11 | Sprint 8 batch check and paired M2 re-measure | Done | Sprint 8's final compiler (knc fe7ed380f149) matches stock GCC 16.2 on x86 (1962/0 at -O2 and -O2 -mavx512f... |
 | S8-12 | Fix three weak S8-01 checks - C4 page offsets, C5 row aliasing, C9 memory chain | Done | The knc-char checks C4, C5 and C9 are fixed and rebuilt: C4 now walks every page offset, C5's eight arrays ... |
 | S8-13 | Streaming stores for write-only loops beyond L2 (E5-08) | Done | Loops that write arrays too large for the cache now use streaming stores: about 30% faster beyond L2 on the... |
 | S8-14 | Default 64-byte data alignment and TLB-aware cache parameters (E5-13) | Done | Card 2026-11-10 (deferred timing, frozen 3516ea25905 vs S8-13): s4_masks o2v/o3 pass, guard controls exit 3... |
@@ -181,6 +181,7 @@ Current tickets: `[###################-]` 153 of 156
 
 ## Recent activity
 
+- 2026-11-10 16:59 **S8-11** lead approve: Sprint 8's final compiler (knc fe7ed380f149) matches stock GCC 16.2 on x86 (1962/0 at -O2 and -O2 -mavx512f, run on the S9-13 tree that contains it...
 - 2026-11-10 16:51 **S9-13** lead approve: -mknc-card=generic|3100|5100|7100|native picks a card model's prefetch distances (3100 and 5100 derived from bandwidth per core, 7100 measured), na...
 - 2026-11-10 16:03 **S8-11** engineer submit: knc fe7ed380f149. Drill textual only (master 12 files/23 hunks; KNC bar.c needs master's barrier API), gcc-16 0. Shared i386 718/132: x86 not run (...
 - 2026-11-10 15:14 **S9-13** engineer submit: -mknc-card=MODEL/aliases/native in linux-k1om.h self spec + knc_card_spec (card /proc, MPSS /sys/class/mic, generic+note); -mphinix adds native. Fi...
@@ -188,13 +189,12 @@ Current tickets: `[###################-]` 153 of 156
 - 2026-11-10 13:19 **S8-20** lead approve: The small-loop unroll now follows the thread density: streaming loops (one vector op per store) unroll 2 times at 1-2 threads per core and not at 3...
 - 2026-11-10 13:11 **S8-20** engineer submit: GCC 788255cd1b1: a stream (vector ops <= stores) unrolls 2x at knc-threads-per-core 1-2, 1x at 3-4; others keep 4. Cause with asm in that commit (a...
 - 2026-11-10 12:50 **S9-13** lead amend: deps add S8-20: Sprint 8 fix first, and both change KNC tuning in i386-knc.cc.
-- 2026-11-10 12:50 **S8-11** lead amend: deps add S8-20 (S8-15 loses at 4 threads per core).
 
 ## Cost
 
 - From the script, engineer: 372 sessions, 810.9M input tokens
 - From the script, lead: 239 sessions, 72.0M input tokens
-- Started by hand, Claude: 11 sessions, 2121.6M input tokens
+- Started by hand, Claude: 11 sessions, 2125.1M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
