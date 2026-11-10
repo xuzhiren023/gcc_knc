@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-10 06:48.
+Updated automatically at every ticket change. Last update: 2026-11-10 07:04.
 
 **Next: the tech lead, on S8-15.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
@@ -161,7 +161,7 @@ Current tickets: `[###################-]` 145 of 151
 | S8-16 | User story - one bold flag, -mphinix, with a rising-phoenix banner and a progress bar | Not started | Owner 2026-11-09: Sprint 8 runs on without waiting for card timing; the lead approves on code review and ho... |
 | S8-17 | Card check C12 - power by rail for a saturated vector unit against x87, idle and streaming | Done | Card check C12 is built and ready to run: it measures card power by rail (core, uncore, memory) while the v... |
 | S8-18 | Second GCC tree - a gcc2 lane with its own checkout and build, so two GCC tickets run in parallel | Done | Tools now support a second GCC tree: a lane gcc2 ticket builds in gcc-2/gcc-build-2 while a gcc ticket uses... |
-| S8-19 | -mtune=knc stops the tight-loop alignment pass (nops on the fallthrough path) | Done | -mtune=knc no longer pads small loops entered by fallthrough with alignment nops (GCC 16's tight-loop pass,... |
+| S8-19 | -mtune=knc stops the tight-loop alignment pass (nops on the fallthrough path) | Done | Card 2026-11-10 11:28-12:03Z (frozen .work/_shared/tmp/claude-s8-19, log .work/_shared/tmp/claude-next.log)... |
 | S9-01 | libgomp for KNC: futex, affinity, ring-aware barrier, spin-wait and malloc arenas (E6-03 input) | Done | We now have a build-and-design plan for GCC-KNC's own OpenMP runtime on the card: futex-based waits with de... |
 | S9-02 | libstdc++ for KNC: exceptions, RTTI, atomics, threads, packaging (E6-06 input) | Done | We now know how to build GCC 16's C++ library for the card: no newer glibc or kernel is needed, and built w... |
 | S9-03 | libstdc++ and libatomic build for k1om (E6-06a) | Done | Card 2026-11-10 08:40Z (log .work/_shared/tmp/claude-s8-09.log): hello, rtti, thread, atomic16, tz and all ... |
@@ -176,6 +176,7 @@ Current tickets: `[###################-]` 145 of 151
 
 ## Recent activity
 
+- 2026-11-10 07:04 **S8-19** lead note: Card 2026-11-10 11:28-12:03Z (frozen .work/_shared/tmp/claude-s8-19, log .work/_shared/tmp/claude-next.log). Correctness: s4/s5 PASS, s5 neg 1, M2 ...
 - 2026-11-10 06:47 **S9-09** lead note: S9-07 did not add gomp_knc_ncores: its knc/affinity.c builds core places (gomp_places_list, one per core of the mask, OS core dropped). Derive the ...
 - 2026-11-10 06:47 **S9-08** lead approve: KNC libgomp's spin wait can be tuned with GOMP_KNC_DELAY, the default spin count is 3 ms of DELAY periods, and omp_display_env shows both; the card...
 - 2026-11-10 06:37 **S9-08** engineer submit: gomp_knc_delay honours GOMP_KNC_DELAY, KNC spin-count default and omp_display_env lines in libgomp (GCC d52140f524a); red e5a468d; host checks 11/1...
@@ -183,16 +184,15 @@ Current tickets: `[###################-]` 145 of 151
 - 2026-11-10 06:34 **S9-08** engineer ask: Submit refused: 782 changed lines vs budget 500. Work is done and green (GCC d52140f524a; red e5a468d; s9_08_checks host 11/11, scan PASS; card bat...
 - 2026-11-10 06:32 **S8-15** engineer submit: GCC 7d26134e1f2+482730e75cc (shared i386.cc: 2-line ADR-0006 hook), rebased on knc 5d7514a1e7c (libgomp only), rebuilt. Red 16651e2, green + docs/g...
 - 2026-11-10 06:22 **S9-08** lead note: S9-06 already added config/linux/knc/futex.h (cpu_relax = DELAY gomp_knc_delay), mutex.c (gomp_knc_delay = 32) and spincount.h (default 100000, abo...
-- 2026-11-10 06:22 **S9-07** lead approve: OpenMP programs on KNC now spread threads one per core over the 60 compute cores by default (OS core left out; OMP_PROC_BIND=false or an explicit p...
 
 ## Cost
 
 - From the script, engineer: 353 sessions, 777.1M input tokens
 - From the script, lead: 234 sessions, 70.9M input tokens
-- Started by hand, Claude: 11 sessions, 2014.4M input tokens
+- Started by hand, Claude: 11 sessions, 2017.7M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 22.5 GiB of 100 GiB. 108 GiB free on the drive.
+The project uses 22.5 GiB of 100 GiB. 107 GiB free on the drive.
