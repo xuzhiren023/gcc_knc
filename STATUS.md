@@ -173,7 +173,7 @@ Current tickets: `[###################-]` 148 of 153
 | S9-09 | libgomp hierarchical ring-aware barrier (E6-03 D) | Done | OpenMP barriers on KNC now synchronise per core first and then across cores (one cache line per core instea... |
 | S9-10 | libgomp padding, static schedule default and malloc guidance (E6-03 E) | Done | KNC libgomp keeps each thread's private data and implicit task on cache lines of their own, schedule(runtim... |
 | S9-11 | Sprint 9 batch check | Not started | deps add S9-13 (owner story 2026-11-10: -mknc-card). |
-| S9-12 | libgomp adapts to the card: malloc arena cap from memory, core count and clock (ADR-0012) | Not started | Scope: core-count fallback and clock-based spin count read from the card (owner question 2026-11-10 on fitt... |
+| S9-12 | libgomp adapts to the card: malloc arena cap from memory, core count and clock (ADR-0012) | In progress | Scope: core-count fallback and clock-based spin count read from the card (owner question 2026-11-10 on fitt... |
 | S9-13 | User story - -mknc-card= picks the card model's tuning, and -mknc-card=native detects it | Not started |  |
 
 ## Recent activity
@@ -191,7 +191,7 @@ Current tickets: `[###################-]` 148 of 153
 
 - From the script, engineer: 360 sessions, 793.3M input tokens
 - From the script, lead: 237 sessions, 71.6M input tokens
-- Started by hand, Claude: 11 sessions, 2040.1M input tokens
+- Started by hand, Claude: 11 sessions, 2041.2M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
