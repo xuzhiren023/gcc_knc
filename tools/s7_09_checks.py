@@ -2,8 +2,9 @@
 """S7-09 libgfortran isolation and packaging; invoke through tools/run.py.
 
     python tools/s7_09_checks.py install    install the shared tree's compilers, libgcc,
-                                            libgfortran, libstdc++ and libatomic into the private
-                                            prefix gcc-knc-<version> (slot 2: gcc-knc-<version>-2)
+                                            libgfortran, libstdc++, libatomic and libgomp into the
+                                            private prefix gcc-knc-<version> (slot 2:
+                                            gcc-knc-<version>-2)
     python tools/s7_09_checks.py links      static and shared card builds with the installed driver;
                                             link map, spec, module directory, SONAME, versions, rpath
     python tools/s7_09_checks.py negative   linking the donor's GCC 5 libgfortran (-L to its
@@ -74,7 +75,8 @@ def install_mode():
     # The prefix is replaced, so every library a build has must be in this list.
     rc, text = capture(['make', '-C', BUILD, 'install-gcc', 'install-target-libgcc',
                         'install-target-libgfortran', 'install-target-libstdc++-v3',
-                        'install-target-libatomic', 'DESTDIR=' + str(stage)], timeout=3600)
+                        'install-target-libatomic', 'install-target-libgomp',
+                        'DESTDIR=' + str(stage)], timeout=3600)
     if rc != 0:
         print('\n'.join(text.splitlines()[-15:]))
         print('FAIL make install exit %d' % rc)
