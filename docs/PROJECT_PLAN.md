@@ -61,8 +61,6 @@ lists where this plan departs from the research report.
 
 ## 5. Roadmap
 
-**Scope (owner, 2026-11-10): GCC-KNC is complete when M4 is met.** M5 and M6 are dropped.
-
 Sprints are goal-based and capped at two weeks. A sprint closes as soon as its goal is
 met, with no waiting for a calendar. Later sprints are deliberately coarse and are
 refined when they come near.
@@ -81,8 +79,8 @@ refined when they come near.
 | | **S9** | The libstdc++ the corpus needs, including exceptions and atomics | **M3** |
 | **M4** Broad optimization | **S10** | Vector math v0 and a documented vector function ABI | |
 | | **S11–12** | Optimization work ranked by corpus-wide profiles, scalar and vector, compared with GCC 5.1.1 | **M4** |
-| ~~M5~~ Program corpus | — | Dropped (owner, 2026-11-10: GCC-KNC completes at M4). Corpus programs M4 needs stay in M4. | |
-| ~~M6~~ Release | — | Dropped (owner, 2026-11-10). | |
+| **M5** Program corpus | **S13–14** | The full corpus built and run, with matched benchmarks, and the corpus widened | |
+| **M6** Release | **S15+** | Packaging, documentation, known-limits list and update procedure | |
 
 M2 to M4 can overlap where dependencies allow. Runtime investigation, for example, can
 start before S6 ends.
