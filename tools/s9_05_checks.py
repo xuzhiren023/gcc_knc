@@ -14,6 +14,7 @@ The compiler is the lane's installed prefix (tools/s7_09_checks.py install); --p
 one (an older prefix without g++ shows the batch is new). Nothing runs natively here.
 """
 import argparse
+import itertools
 import os
 from pathlib import Path
 import re
@@ -173,7 +174,7 @@ def build_mode(prefix):
 def compare_mode(output):
     got = [line for line in output.read_bytes().split(b'\n') if line.startswith(b'RESULT ')]
     want = (OUT / 'expected.txt').read_bytes().split(b'\n')[:-1]
-    for g, w in zip(got + [b'(missing)'] * len(want), want + [b'(none)'] * len(got)):
+    for g, w in itertools.zip_longest(got, want, fillvalue=b'(none)'):
         if g != w:
             print('  got:      %s\n  expected: %s' % (g.decode(errors='replace'), w.decode(errors='replace')))
     if got != want:
