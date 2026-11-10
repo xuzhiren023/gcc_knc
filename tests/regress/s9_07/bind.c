@@ -81,7 +81,9 @@ main (int argc, char **argv)
       procs += CPU_COUNT (&want[places]);
       places += CPU_COUNT (&want[places]) != 0;
     }
-  if (unbound)
+  /* Only the KNC default places change omp_get_num_procs: with a place list from the
+     environment libgomp counts the inherited mask, as on any Linux.  */
+  if (unbound || getenv ("OMP_PLACES") || getenv ("GOMP_CPU_AFFINITY"))
     procs = CPU_COUNT (&inherited);
 
   if (omp_get_num_places () != places)
