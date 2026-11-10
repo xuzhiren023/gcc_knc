@@ -41,6 +41,8 @@ SELECTIONS = {
         't1': lambda runner: runner.t1_sources([runner.source_dir / 'knc-tune-prefix.c'])}),
     'tune_tight_loops': ('S8-19 -mtune=knc drops the unbounded tight-loop alignment', {
         't1': lambda runner: runner.t1_sources(runner.source_dir.glob('knc-tune-tight-loops*.c'))}),
+    'prefetch': ('S8-03/S8-21 -O2 -march=knc loop prefetching, including masked rows', {
+        't1': lambda runner: runner.t1_sources(runner.source_dir.glob('knc-prefetch-*.c'))}),
     'unroll_small': ('S8-15/S8-20 -O2 -march=knc unrolls small vector loops by thread density', {
         't1': lambda runner: runner.t1_sources([runner.source_dir / 'knc-unroll-small.c',
                                                 runner.source_dir / 'knc-unroll-density1.c'])}),
