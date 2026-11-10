@@ -377,7 +377,7 @@ documented or measured KNC reason. `-mdump-tune-features` shows the result. Sour
 | `use_sahf` (on) | inert | `-march=knc` sets `PTA_NO_SAHF`. |
 | `use_cltd`, `use_bt`, `shift1`, `double_with_add`, `promote_himode_imul`, `promote_qimode`, `himode_math`, `qimode_math`, `unroll_strlen`, `misaligned_move_string_pro_epilogues` (on) | unchanged | Generic scalar code shape; no KNC measurement. |
 | `ext_80387_constants`, `always_fancy_math_387` (on) | unchanged | x87 is KNC's scalar FP unit; no measurement against loading constants from memory. |
-| `align_tight_loops` (on) | unchanged | Still lines up loops that fit one cache line; loop alignment is otherwise generic (below). |
+| `align_tight_loops` (on) | **off** (S8-19) | `pass_align_tight_loops` puts `.p2align ceil_log2(size)` with no max-skip before every loop up to `prefetch_block` (64) bytes, for the decoded-icache rules of big cores; KNC has none. Entered by fallthrough, the gap is nops run on every outer trip: m2_mat8 `.L101` got `.p2align 6`, 56 nops per outer trip, 1.105x slower at L2 (lead card 2026-11-10). Loops keep the generic alignment (below). T1 `knc-tune-tight-loops*.c`. |
 | `sse_*`, `avx*`, `inter_unit_*`, `use_gather_*`, `use_scatter_*`, `avoid_*fma*_chains`, `prefer_bcst_from_integer`, `avoid_false_dep_for_bmi` | inert | KNC never sets SSE/AVX/AVX-512F/BMI; IMCI gathers and scatters use their own expanders (`i386-knc.cc`). |
 | every other flag (off in generic) | unchanged | No KNC reason found. |
 

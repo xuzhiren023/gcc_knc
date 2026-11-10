@@ -110,10 +110,9 @@ def align(values=ALIGNS):
             (kernels / 'kernels-gcc.s').read_text(), flags=re.M))
         run([TC / 'cross/bin/k1om-mpss-linux-as', '--march=k1om', shifted / 'kernels-gcc.s',
              '-o', shifted / 'kernels-gcc.o'])
-        folder = 'S8-08/align-' + value
+        folder = OUT.name + '/align-' + value
         run([sys.executable, m2 / 'build.py', '--out', folder,
-             '--reuse-kernels', 'S8-08/align-' + value + '-k',
-             '--before', 'S8-08/align-' + value + '-b'])
+             '--reuse-kernels', folder + '-k', '--before', folder + '-b'])
         print('A/A PAIR ' + folder + '/m2-kernels.mic (' + (' '.join(extra) or 'default')
               + '); card run pending lead', flush=True)
     return 0

@@ -35,6 +35,8 @@ SELECTIONS = {
         't1': lambda runner: runner.t1_sources(runner.source_dir.glob('knc-tune-align*.c'))}),
     'tune_prefix': ('S8-08 -mtune=knc avoids 0x66-prefixed forms', {
         't1': lambda runner: runner.t1_sources([runner.source_dir / 'knc-tune-prefix.c'])}),
+    'tune_tight_loops': ('S8-19 -mtune=knc drops the unbounded tight-loop alignment', {
+        't1': lambda runner: runner.t1_sources(runner.source_dir.glob('knc-tune-tight-loops*.c'))}),
     'storent': ('S8-13 no-read streaming stores for write-only loops beyond L2', {
         't1': lambda runner: importlib.import_module('storent').t1(runner),
         't2': lambda runner: importlib.import_module('storent').t2(runner)}),
