@@ -1,10 +1,10 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-10 09:51.
+Updated automatically at every ticket change. Last update: 2026-11-10 09:53.
 
 **Next: GPT-6.1, on S8-16 (User story - one bold flag, -mphinix, with a rising-phoenix banner and a progress bar).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
-Current tickets: `[###################-]` 149 of 153
+Current tickets: `[###################-]` 149 of 154
 
 ## Milestones
 
@@ -13,7 +13,7 @@ Current tickets: `[###################-]` 149 of 153
 | M0 | Foundation | In progress | 17 of 17 tickets |
 | M1 | Mixed native code | Done | 43 of 43 tickets |
 | M2 | Useful vector target | Done | 51 of 51 tickets |
-| M3 | Runtimes | In progress | 21 of 23 tickets |
+| M3 | Runtimes | In progress | 21 of 24 tickets |
 | M4 | Broad optimization | Not started | Not planned in detail yet |
 | M5 | Program corpus | Not started | Not planned in detail yet |
 | M6 | Release | Not started | Not planned in detail yet |
@@ -153,7 +153,7 @@ Current tickets: `[###################-]` 149 of 153
 | S8-08 | -mtune=knc tune-flag audit (E5-12) | Done | Card 2026-11-10 05:14-06:02Z (deferred timing, frozen 020d107325d vs S8-10 knc, L2 d4, 2 launches): M2 corr... |
 | S8-09 | KNC -O2 defaults: vectorizer cost model, stride versioning, predictive commoning (E5-18) | Done | Card 2026-11-10 08:36-08:40Z (frozen set .work/_shared/tmp/claude-s8-09, log .work/_shared/tmp/claude-s8-09... |
 | S8-10 | Less ring traffic: 64-byte padding of per-thread data, and card check C11 (E5-16) | Done | Per-thread arrays and the OpenMP shared block now start on their own 64-byte line, and the C11 card check s... |
-| S8-11 | Sprint 8 batch check and paired M2 re-measure | Not started | add one compiler-prefetch card case, because S8-03's card run has no row kernel (C5's rows are hand-written... |
+| S8-11 | Sprint 8 batch check and paired M2 re-measure | Not started | deps add S9-14: run correctness and key timings under the 3100/5100/7100 profiles (owner 2026-11-10). |
 | S8-12 | Fix three weak S8-01 checks - C4 page offsets, C5 row aliasing, C9 memory chain | Done | The knc-char checks C4, C5 and C9 are fixed and rebuilt: C4 now walks every page offset, C5's eight arrays ... |
 | S8-13 | Streaming stores for write-only loops beyond L2 (E5-08) | Done | Loops that write arrays too large for the cache now use streaming stores: about 30% faster beyond L2 on the... |
 | S8-14 | Default 64-byte data alignment and TLB-aware cache parameters (E5-13) | Done | Card 2026-11-10 (deferred timing, frozen 3516ea25905 vs S8-13): s4_masks o2v/o3 pass, guard controls exit 3... |
@@ -175,9 +175,11 @@ Current tickets: `[###################-]` 149 of 153
 | S9-11 | Sprint 9 batch check | Not started | arena constants must be set from measurement 7 before Sprint 9 closes (S9-12 interim 50% MemTotal). |
 | S9-12 | libgomp adapts to the card: malloc arena cap from memory, core count and clock (ADR-0012) | Done | KNC libgomp now reads the card at start-up: the malloc arena cap fits the card's memory and any address-spa... |
 | S9-13 | User story - -mknc-card= picks the card model's tuning, and -mknc-card=native detects it | Not started |  |
+| S9-14 | card_run model profiles - run a job as a 3100, 5100 or 7100 card on our 7120P | Not started |  |
 
 ## Recent activity
 
+- 2026-11-10 09:53 **S8-11** lead amend: deps add S9-14: run correctness and key timings under the 3100/5100/7100 profiles (owner 2026-11-10).
 - 2026-11-10 09:51 **S9-12** lead approve: KNC libgomp now reads the card at start-up: the malloc arena cap fits the card's memory and any address-space limit (a user MALLOC_ARENA_MAX wins),...
 - 2026-11-10 09:40 **S9-11** lead note: arena constants must be set from measurement 7 before Sprint 9 closes (S9-12 interim 50% MemTotal).
 - 2026-11-10 09:38 **S9-12** engineer submit: libgomp on k1om derives MALLOC_ARENA_MAX from MemTotal/CommitLimit/RLIMIT_AS/stack when the user did not set it, reads core count and cpu MHz from ...
@@ -185,13 +187,12 @@ Current tickets: `[###################-]` 149 of 153
 - 2026-11-10 09:34 **S9-12** engineer ask: Done and verified on host, but submit refuses: 1275 changed lines vs budget 500. Breakdown: GCC 6751b9602fe +543/-96 (knc/card.h 392 new, of which ...
 - 2026-11-10 09:16 **S9-11** lead amend: deps add S9-13 (owner story 2026-11-10: -mknc-card).
 - 2026-11-10 09:14 **S9-12** lead amend: Scope: core-count fallback and clock-based spin count read from the card (owner question 2026-11-10 on fitting all KNC models).
-- 2026-11-10 09:13 **S9-10** lead approve: KNC libgomp keeps each thread's private data and implicit task on cache lines of their own, schedule(runtime) defaults to static, and omp_display_e...
 
 ## Cost
 
 - From the script, engineer: 362 sessions, 798.3M input tokens
 - From the script, lead: 238 sessions, 71.7M input tokens
-- Started by hand, Claude: 11 sessions, 2047.5M input tokens
+- Started by hand, Claude: 11 sessions, 2051.0M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
