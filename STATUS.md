@@ -1,10 +1,10 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-10 07:41.
+Updated automatically at every ticket change. Last update: 2026-11-10 07:51.
 
-**Next: the tech lead, on S9-09.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: GPT-6.1, on S8-16 (User story - one bold flag, -mphinix, with a rising-phoenix banner and a progress bar).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
-Current tickets: `[###################-]` 146 of 151
+Current tickets: `[###################-]` 147 of 151
 
 ## Milestones
 
@@ -13,7 +13,7 @@ Current tickets: `[###################-]` 146 of 151
 | M0 | Foundation | In progress | 17 of 17 tickets |
 | M1 | Mixed native code | Done | 43 of 43 tickets |
 | M2 | Useful vector target | Done | 51 of 51 tickets |
-| M3 | Runtimes | In progress | 18 of 21 tickets |
+| M3 | Runtimes | In progress | 19 of 21 tickets |
 | M4 | Broad optimization | Not started | Not planned in detail yet |
 | M5 | Program corpus | Not started | Not planned in detail yet |
 | M6 | Release | Not started | Not planned in detail yet |
@@ -170,12 +170,13 @@ Current tickets: `[###################-]` 146 of 151
 | S9-06 | libgomp for k1om: build, select, package and link guard (E6-03 A) | Done | Card 2026-11-10 11:40Z: at 60 and 240 threads every program passes except (1) locks check 4: omp_get_wtick(... |
 | S9-07 | libgomp KNC affinity defaults (E6-03 B) | Done | Card 2026-11-10 12:01Z, whole card (--benchmark, 240 CPUs inherited): all 8 jobs ok (defaults at 60/120/240... |
 | S9-08 | libgomp spin-wait with delay and the one-core measurement (E6-03 C) | Done | KNC libgomp's spin wait can be tuned with GOMP_KNC_DELAY, the default spin count is 3 ms of DELAY periods, ... |
-| S9-09 | libgomp hierarchical ring-aware barrier (E6-03 D) | Waiting for review | KNC per-core team barrier: GCC 915a117e6a9 (gcc-2, on knc), built and installed. Host stress 240x100000: re... |
+| S9-09 | libgomp hierarchical ring-aware barrier (E6-03 D) | Done | OpenMP barriers on KNC now synchronise per core first and then across cores (one cache line per core instea... |
 | S9-10 | libgomp padding, static schedule default and malloc guidance (E6-03 E) | Not started | Lane gcc -> gcc2: Sprint 9 runs on tree 2 while tree 1 finishes Sprint 8 (owner 2026-11-09: start Sprint 9 ... |
 | S9-11 | Sprint 9 batch check | Not started | from S9-01's plan, under the owner's overnight blanket approval. |
 
 ## Recent activity
 
+- 2026-11-10 07:51 **S9-09** lead approve: OpenMP barriers on KNC now synchronise per core first and then across cores (one cache line per core instead of one shared line for all 240 threads...
 - 2026-11-10 07:41 **S9-09** engineer submit: KNC per-core team barrier: GCC 915a117e6a9 (gcc-2, on knc), built and installed. Host stress 240x100000: red, then 5/5 PASS (logs/s9_09_host-202611...
 - 2026-11-10 07:40 **S9-09** lead answer: Yes, submit with --override: the barrier is one change and the rest is the stress test, card programs and runner the ticket requires. Name the over...
 - 2026-11-10 07:39 **S9-09** engineer ask: Work is complete but submit refuses on size: 1797 changed lines against the 800 budget (GCC 699 incl. license headers; stress test 359; two card pr...
@@ -183,13 +184,12 @@ Current tickets: `[###################-]` 146 of 151
 - 2026-11-10 07:11 **S9-09** lead approve-red: S9-09 red accepted: a 240-thread, 100,000-barrier host stress test of the new per-core KNC team barrier hangs in all five variants (plain, sleeping...
 - 2026-11-10 07:10 **S9-09** engineer red: Red: tools/s9_09_checks.py host (240 threads, 100000 barriers) fails all 5 variants (plain, tasks-park, tasks-spin, cancel, order) with 'no thread ...
 - 2026-11-10 07:05 **S9-07** lead note: Card 2026-11-10 12:01Z, whole card (--benchmark, 240 CPUs inherited): all 8 jobs ok (defaults at 60/120/240 threads, 60 core places, first affinity...
-- 2026-11-10 07:05 **S9-06** lead note: Card 2026-11-10 11:40Z: at 60 and 240 threads every program passes except (1) locks check 4: omp_get_wtick() is above 1e-3 on the card (clock_getre...
 
 ## Cost
 
 - From the script, engineer: 356 sessions, 782.0M input tokens
 - From the script, lead: 235 sessions, 71.3M input tokens
-- Started by hand, Claude: 11 sessions, 2022.1M input tokens
+- Started by hand, Claude: 11 sessions, 2023.6M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
