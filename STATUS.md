@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-10 04:03.
+Updated automatically at every ticket change. Last update: 2026-11-10 04:04.
 
 **Next: GPT-6.1, on S8-19 (-mtune=knc stops the tight-loop alignment pass (nops on the fallthrough path)).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
@@ -166,7 +166,7 @@ Current tickets: `[##################--]` 140 of 151
 | S9-02 | libstdc++ for KNC: exceptions, RTTI, atomics, threads, packaging (E6-06 input) | Done | We now know how to build GCC 16's C++ library for the card: no newer glibc or kernel is needed, and built w... |
 | S9-03 | libstdc++ and libatomic build for k1om (E6-06a) | Done | Card 2026-11-10 08:40Z (log .work/_shared/tmp/claude-s8-09.log): hello, rtti, thread, atomic16, tz and all ... |
 | S9-04 | libstdc++ packaging into the private prefix and a g++ link guard (E6-06b) | Done | Card 2026-11-10 08:42Z: both xdso pairs print PASS checks=5 with LD_LIBRARY_PATH=/usr/lib64, and the loader... |
-| S9-05 | libstdc++ runtime slice on the card (E6-06c) | Changes requested | Card 2026-11-10 08:44-09:00Z (lead copy .work/_shared/tmp/claude-s9-05, run.sh grep patched; log .work/_sha... |
+| S9-05 | libstdc++ runtime slice on the card (E6-06c) | In progress | Card 2026-11-10 08:44-09:00Z (lead copy .work/_shared/tmp/claude-s9-05, run.sh grep patched; log .work/_sha... |
 | S9-06 | libgomp for k1om: build, select, package and link guard (E6-03 A) | Not started | Lane gcc -> gcc2: Sprint 9 runs on tree 2 while tree 1 finishes Sprint 8 (owner 2026-11-09: start Sprint 9 ... |
 | S9-07 | libgomp KNC affinity defaults (E6-03 B) | Not started | Lane gcc -> gcc2: Sprint 9 runs on tree 2 while tree 1 finishes Sprint 8 (owner 2026-11-09: start Sprint 9 ... |
 | S9-08 | libgomp spin-wait with delay and the one-core measurement (E6-03 C) | Not started | Lane gcc -> gcc2: Sprint 9 runs on tree 2 while tree 1 finishes Sprint 8 (owner 2026-11-09: start Sprint 9 ... |
@@ -189,10 +189,10 @@ Current tickets: `[##################--]` 140 of 151
 
 - From the script, engineer: 341 sessions, 761.6M input tokens
 - From the script, lead: 230 sessions, 70.2M input tokens
-- Started by hand, Claude: 11 sessions, 1998.1M input tokens
+- Started by hand, Claude: 11 sessions, 1998.7M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 22.4 GiB of 100 GiB. 92 GiB free on the drive.
+The project uses 22.4 GiB of 100 GiB. 100 GiB free on the drive.
