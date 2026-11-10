@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-10 08:44.
+Updated automatically at every ticket change. Last update: 2026-11-10 08:56.
 
-**Next: GPT-6.1, on S8-16 (User story - one bold flag, -mphinix, with a rising-phoenix banner and a progress bar).** Run `python tools/dispatch.py`, or ask the tech lead to.
+**Next: the tech lead, on S9-10.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[###################-]` 147 of 152
 
@@ -171,12 +171,13 @@ Current tickets: `[###################-]` 147 of 152
 | S9-07 | libgomp KNC affinity defaults (E6-03 B) | Done | Card 2026-11-10 12:01Z, whole card (--benchmark, 240 CPUs inherited): all 8 jobs ok (defaults at 60/120/240... |
 | S9-08 | libgomp spin-wait with delay and the one-core measurement (E6-03 C) | Done | KNC libgomp's spin wait can be tuned with GOMP_KNC_DELAY, the default spin count is 3 ms of DELAY periods, ... |
 | S9-09 | libgomp hierarchical ring-aware barrier (E6-03 D) | Done | OpenMP barriers on KNC now synchronise per core first and then across cores (one cache line per core instea... |
-| S9-10 | libgomp padding, static schedule default and malloc guidance (E6-03 E) | In progress | Owner in chat 2026-11-10 ('yes'): budget raised to 12M input tokens to finish and submit. Follow the 2026-1... |
+| S9-10 | libgomp padding, static schedule default and malloc guidance (E6-03 E) | Question for the tech lead | Done and ready to submit, but submit refuses 818 changed lines vs 500 budget (repo: 684, all new files: hos... |
 | S9-11 | Sprint 9 batch check | Not started | deps S9-10 -> S9-12 (ADR-0012 arena default lands before the batch check). |
 | S9-12 | libgomp sizes the malloc arena cap from the card's memory (ADR-0012) | Not started |  |
 
 ## Recent activity
 
+- 2026-11-10 08:56 **S9-10** engineer ask: Done and ready to submit, but submit refuses 818 changed lines vs 500 budget (repo: 684, all new files: host test 163, measurement programs reducti...
 - 2026-11-10 08:44 **S9-10** owner decide: Owner in chat 2026-11-10 ('yes'): budget raised to 12M input tokens to finish and submit. Follow the 2026-11-10 lead note on MALLOC_ARENA_MAX (ADR-...
 - 2026-11-10 08:44 **S9-10** lead amend: input_tokens budget 6M -> 12M (8.36M used), owner approved in chat 2026-11-10: finishing and submit are left.
 - 2026-11-10 08:27 **S9-10** lead escalate: budget: 8360876 input tokens used; the budget is 6000000
@@ -184,13 +185,12 @@ Current tickets: `[###################-]` 147 of 152
 - 2026-11-10 08:24 **S9-10** engineer ask: Blocked: main's tests/acceptance/s9_omp/locks.c (58a2473, line 43) has a literal newline inside the printf string, so build.py fails to compile it ...
 - 2026-11-10 08:09 **S9-10** lead note: Owner 2026-11-10 changes the malloc part (ADR-0012): libgomp will size the arena cap from the card memory in S9-12. In S9-10, the MALLOC_ARENA_MAX ...
 - 2026-11-10 08:07 **S9-11** lead amend: deps S9-10 -> S9-12 (ADR-0012 arena default lands before the batch check).
-- 2026-11-10 07:52 **S9-10** lead note: Card input 2026-11-10 11:40Z: the S9-06 tasks program at 240 threads failed with libgomp Out of memory allocating 247 bytes: glibc per-thread mallo...
 
 ## Cost
 
 - From the script, engineer: 357 sessions, 790.3M input tokens
 - From the script, lead: 236 sessions, 71.4M input tokens
-- Started by hand, Claude: 11 sessions, 2034.3M input tokens
+- Started by hand, Claude: 11 sessions, 2035.3M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
