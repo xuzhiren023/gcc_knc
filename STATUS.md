@@ -170,12 +170,13 @@ Current tickets: `[###################-]` 145 of 151
 | S9-06 | libgomp for k1om: build, select, package and link guard (E6-03 A) | Done | OpenMP (-fopenmp) now links and builds against a KNC libgomp in the private prefix, which spins with DELAY ... |
 | S9-07 | libgomp KNC affinity defaults (E6-03 B) | Done | OpenMP programs on KNC now spread threads one per core over the 60 compute cores by default (OS core left o... |
 | S9-08 | libgomp spin-wait with delay and the one-core measurement (E6-03 C) | Done | KNC libgomp's spin wait can be tuned with GOMP_KNC_DELAY, the default spin count is 3 ms of DELAY periods, ... |
-| S9-09 | libgomp hierarchical ring-aware barrier (E6-03 D) | Not started | Lane gcc -> gcc2: Sprint 9 runs on tree 2 while tree 1 finishes Sprint 8 (owner 2026-11-09: start Sprint 9 ... |
+| S9-09 | libgomp hierarchical ring-aware barrier (E6-03 D) | Not started | S9-07 did not add gomp_knc_ncores: its knc/affinity.c builds core places (gomp_places_list, one per core of... |
 | S9-10 | libgomp padding, static schedule default and malloc guidance (E6-03 E) | Not started | Lane gcc -> gcc2: Sprint 9 runs on tree 2 while tree 1 finishes Sprint 8 (owner 2026-11-09: start Sprint 9 ... |
 | S9-11 | Sprint 9 batch check | Not started | from S9-01's plan, under the owner's overnight blanket approval. |
 
 ## Recent activity
 
+- 2026-11-10 06:47 **S9-09** lead note: S9-07 did not add gomp_knc_ncores: its knc/affinity.c builds core places (gomp_places_list, one per core of the mask, OS core dropped). Derive the ...
 - 2026-11-10 06:47 **S9-08** lead approve: KNC libgomp's spin wait can be tuned with GOMP_KNC_DELAY, the default spin count is 3 ms of DELAY periods, and omp_display_env shows both; the card...
 - 2026-11-10 06:37 **S9-08** engineer submit: gomp_knc_delay honours GOMP_KNC_DELAY, KNC spin-count default and omp_display_env lines in libgomp (GCC d52140f524a); red e5a468d; host checks 11/1...
 - 2026-11-10 06:35 **S9-08** lead answer: Yes, resubmit with --override 'size is the staged measurement programs and checks the ticket requires; libgomp change is 58 lines'. Keep the stagin...
@@ -183,13 +184,12 @@ Current tickets: `[###################-]` 145 of 151
 - 2026-11-10 06:32 **S8-15** engineer submit: GCC 7d26134e1f2+482730e75cc (shared i386.cc: 2-line ADR-0006 hook), rebased on knc 5d7514a1e7c (libgomp only), rebuilt. Red 16651e2, green + docs/g...
 - 2026-11-10 06:22 **S9-08** lead note: S9-06 already added config/linux/knc/futex.h (cpu_relax = DELAY gomp_knc_delay), mutex.c (gomp_knc_delay = 32) and spincount.h (default 100000, abo...
 - 2026-11-10 06:22 **S9-07** lead approve: OpenMP programs on KNC now spread threads one per core over the 60 compute cores by default (OS core left out; OMP_PROC_BIND=false or an explicit p...
-- 2026-11-10 06:13 **S9-07** engineer submit: Green: knc/affinity.c plus a 6-line __k1om__ hook in env.c give core places (sysfs or cpuinfo, inherited mask, OS core dropped), default spread. gc...
 
 ## Cost
 
 - From the script, engineer: 353 sessions, 777.1M input tokens
 - From the script, lead: 234 sessions, 70.9M input tokens
-- Started by hand, Claude: 11 sessions, 2013.6M input tokens
+- Started by hand, Claude: 11 sessions, 2014.1M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
