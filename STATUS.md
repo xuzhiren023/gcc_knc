@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-10 04:51.
+Updated automatically at every ticket change. Last update: 2026-11-10 04:52.
 
-**Next: GPT-6.1, on S9-06 (libgomp for k1om: build, select, package and link guard (E6-03 A)).** Run `python tools/dispatch.py`, or ask the tech lead to.
+**Next: GPT-6.1, on S8-15 (Small-loop unroll default and the GCC-KNC flags page (E5-09)).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
 Current tickets: `[##################--]` 142 of 151
 
@@ -157,7 +157,7 @@ Current tickets: `[##################--]` 142 of 151
 | S8-12 | Fix three weak S8-01 checks - C4 page offsets, C5 row aliasing, C9 memory chain | Done | The knc-char checks C4, C5 and C9 are fixed and rebuilt: C4 now walks every page offset, C5's eight arrays ... |
 | S8-13 | Streaming stores for write-only loops beyond L2 (E5-08) | Done | Loops that write arrays too large for the cache now use streaming stores: about 30% faster beyond L2 on the... |
 | S8-14 | Default 64-byte data alignment and TLB-aware cache parameters (E5-13) | Done | Card 2026-11-10 (deferred timing, frozen 3516ea25905 vs S8-13): s4_masks o2v/o3 pass, guard controls exit 3... |
-| S8-15 | Small-loop unroll default and the GCC-KNC flags page (E5-09) | Not started | Now also waits on S8-19: the tight-loop alignment pass pads small loops with one-byte nops that run on fall... |
+| S8-15 | Small-loop unroll default and the GCC-KNC flags page (E5-09) | In progress | Now also waits on S8-19: the tight-loop alignment pass pads small loops with one-byte nops that run on fall... |
 | S8-16 | User story - one bold flag, -mphinix, with a rising-phoenix banner and a progress bar | Not started | Owner 2026-11-09: Sprint 8 runs on without waiting for card timing; the lead approves on code review and ho... |
 | S8-17 | Card check C12 - power by rail for a saturated vector unit against x87, idle and streaming | Done | Card check C12 is built and ready to run: it measures card power by rail (core, uncore, memory) while the v... |
 | S8-18 | Second GCC tree - a gcc2 lane with its own checkout and build, so two GCC tickets run in parallel | Done | Tools now support a second GCC tree: a lane gcc2 ticket builds in gcc-2/gcc-build-2 while a gcc ticket uses... |
@@ -189,7 +189,7 @@ Current tickets: `[##################--]` 142 of 151
 
 - From the script, engineer: 344 sessions, 764.7M input tokens
 - From the script, lead: 231 sessions, 70.4M input tokens
-- Started by hand, Claude: 11 sessions, 2001.8M input tokens
+- Started by hand, Claude: 11 sessions, 2002.7M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
