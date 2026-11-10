@@ -30,7 +30,7 @@ Each default yields to an explicit user setting.
 | Cache parameters: L1 32 KB, line 64 B, L2 256 KB (the DTLB reach, not the 512 KB cache) | C4; [S8-14](../work/tickets/S8-14.md) |
 | OpenMP shared blocks and per-thread arrays start their own 64-byte line | C11; [S8-10](../work/tickets/S8-10.md) |
 | Vector reduction chains from the thread density: one at the default 4 threads per core, two at 1-3 (`knc-threads-per-core`) | C7; [knc-costs.md](research/knc-costs.md) |
-| Unroll a vector loop of at most 16 insns 4 times at `-O2` (`-munroll-only-small-loops`); larger loops and scalar loops as x86 | C9; [S8-15](../work/tickets/S8-15.md) |
+| Unroll a vector loop of at most 16 insns 4 times at `-O2` (`-munroll-only-small-loops`); a stream (at most one vector op per vector store) 2 times at `knc-threads-per-core` 1-2 and not at 3-4; larger loops and scalar loops as x86 | C9; [S8-15](../work/tickets/S8-15.md), [S8-20](../work/tickets/S8-20.md) |
 
 `-mtune=knc` (tune flags, all listed in [knc-costs.md](research/knc-costs.md)):
 
