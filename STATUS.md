@@ -1,10 +1,10 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-10 01:03.
+Updated automatically at every ticket change. Last update: 2026-11-10 01:04.
 
 **Next: the tech lead, on S8-09.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
-Current tickets: `[##################--]` 138 of 150
+Current tickets: `[##################--]` 138 of 151
 
 ## Milestones
 
@@ -157,10 +157,11 @@ Current tickets: `[##################--]` 138 of 150
 | S8-12 | Fix three weak S8-01 checks - C4 page offsets, C5 row aliasing, C9 memory chain | Done | The knc-char checks C4, C5 and C9 are fixed and rebuilt: C4 now walks every page offset, C5's eight arrays ... |
 | S8-13 | Streaming stores for write-only loops beyond L2 (E5-08) | Done | Loops that write arrays too large for the cache now use streaming stores: about 30% faster beyond L2 on the... |
 | S8-14 | Default 64-byte data alignment and TLB-aware cache parameters (E5-13) | Done | -march=knc now puts arrays of 64 bytes or more on a 64-byte line and sizes loop blocking to the 256 KB TLB ... |
-| S8-15 | Small-loop unroll default and the GCC-KNC flags page (E5-09) | Not started | Owner 2026-11-09: Sprint 8 runs on without waiting for card timing; the lead approves on code review and ho... |
+| S8-15 | Small-loop unroll default and the GCC-KNC flags page (E5-09) | Not started | Now also waits on S8-19: the tight-loop alignment pass pads small loops with one-byte nops that run on fall... |
 | S8-16 | User story - one bold flag, -mphinix, with a rising-phoenix banner and a progress bar | Not started | Owner 2026-11-09: Sprint 8 runs on without waiting for card timing; the lead approves on code review and ho... |
 | S8-17 | Card check C12 - power by rail for a saturated vector unit against x87, idle and streaming | Done | Card check C12 is built and ready to run: it measures card power by rail (core, uncore, memory) while the v... |
 | S8-18 | Second GCC tree - a gcc2 lane with its own checkout and build, so two GCC tickets run in parallel | Done | Tools now support a second GCC tree: a lane gcc2 ticket builds in gcc-2/gcc-build-2 while a gcc ticket uses... |
+| S8-19 | -mtune=knc stops the tight-loop alignment pass (nops on the fallthrough path) | Not started | written by the lead from the S8-08 card result; S8-15 now waits on it, |
 | S9-01 | libgomp for KNC: futex, affinity, ring-aware barrier, spin-wait and malloc arenas (E6-03 input) | Done | We now have a build-and-design plan for GCC-KNC's own OpenMP runtime on the card: futex-based waits with de... |
 | S9-02 | libstdc++ for KNC: exceptions, RTTI, atomics, threads, packaging (E6-06 input) | Done | We now know how to build GCC 16's C++ library for the card: no newer glibc or kernel is needed, and built w... |
 | S9-03 | libstdc++ and libatomic build for k1om (E6-06a) | Done | GCC-KNC now builds g++, libstdc++ and libatomic for k1om, with the donor's ABI kept (no donor symbol missin... |
@@ -175,20 +176,20 @@ Current tickets: `[##################--]` 138 of 150
 
 ## Recent activity
 
+- 2026-11-10 01:04 **S8-15** lead note: Now also waits on S8-19: the tight-loop alignment pass pads small loops with one-byte nops that run on fallthrough, so unroll timings move with cod...
 - 2026-11-10 01:03 **S9-03** lead approve: GCC-KNC now builds g++, libstdc++ and libatomic for k1om, with the donor's ABI kept (no donor symbol missing or resized) and a k1om ABI baseline; t...
 - 2026-11-10 00:53 **S8-09** engineer submit: Green gcc 16bc28c465c (i386-knc.cc only): -march=knc -O2 uses -fvect-cost-model=cheap and -fversion-loops-for-strides; pcom stays -O3. Corpus -O2 1...
 - 2026-11-10 00:41 **S9-03** engineer submit: Target libraries rebuilt from empty with the rebased compiler (gcc-2 8ad3d5598b4 on knc ff4bf991c62), reinstalled to gcc-knc-16.2.0-2. Regenerated ...
 - 2026-11-10 00:11 **S9-03** lead answer: Yes, resubmit with --override: the 6,166 lines are the generated baseline_symbols.txt the ticket asks for; keep it in the same change. One thing fi...
 - 2026-11-10 00:09 **S9-03** engineer ask: Submit is refused only on size: 6491 changed lines against 800. 6166 of them are the generated baseline_symbols.txt the ticket requires (gcc-2 8ad3...
+- 2026-11-10  **S8-19** lead note: written by the lead from the S8-08 card result; S8-15 now waits on it,
 - 2026-11-09 23:51 **S8-16** lead note: Owner 2026-11-09: Sprint 8 runs on without waiting for card timing; the lead approves on code review and host checks and times every ticket in one ...
-- 2026-11-09 23:51 **S8-15** lead note: Owner 2026-11-09: Sprint 8 runs on without waiting for card timing; the lead approves on code review and host checks and times every ticket in one ...
-- 2026-11-09 23:50 **S8-14** lead approve: -march=knc now puts arrays of 64 bytes or more on a 64-byte line and sizes loop blocking to the 256 KB TLB reach; code, host checks and x86 identit...
 
 ## Cost
 
 - From the script, engineer: 337 sessions, 758.9M input tokens
 - From the script, lead: 230 sessions, 70.2M input tokens
-- Started by hand, Claude: 11 sessions, 1985.3M input tokens
+- Started by hand, Claude: 11 sessions, 1985.7M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
