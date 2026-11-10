@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-10 09:56.
+Updated automatically at every ticket change. Last update: 2026-11-10 10:11.
 
 **Next: GPT-6.1, on S8-16 (User story - one bold flag, -mphinix, with a rising-phoenix banner and a progress bar).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
@@ -175,10 +175,11 @@ Current tickets: `[###################-]` 149 of 154
 | S9-11 | Sprint 9 batch check | Not started | deps add S9-14: run correctness and key timings under the 3100/5100/7100 profiles (owner 2026-11-10). |
 | S9-12 | libgomp adapts to the card: malloc arena cap from memory, core count and clock (ADR-0012) | Done | KNC libgomp now reads the card at start-up: the malloc arena cap fits the card's memory and any address-spa... |
 | S9-13 | User story - -mknc-card= picks the card model's tuning, and -mknc-card=native detects it | Not started |  |
-| S9-14 | card_run model profiles - run a job as a 3100, 5100 or 7100 card on our 7120P | Not started |  |
+| S9-14 | card_run model profiles - run a job as a 3100, 5100 or 7100 card on our 7120P | Not started | No core limit in exclusive turns (owner 2026-11-10). |
 
 ## Recent activity
 
+- 2026-11-10 10:11 **S9-14** lead amend: No core limit in exclusive turns (owner 2026-11-10).
 - 2026-11-10 09:56 **S9-10** lead note: Card 2026-11-10 14:40Z: the eight OpenMP programs pass on the S9-06..S9-10 libgomp at 60 threads (6 GiB) and at 240 threads (MALLOC_ARENA_MAX=64, 1...
 - 2026-11-10 09:56 **S9-09** lead note: Card 2026-11-10 14:47Z: every suite program and both 240-thread programs exit 136 (SIGFPE) with no output, on the libgomp staged at S9-09 time; S9-...
 - 2026-11-10 09:56 **S9-07** lead note: Card 2026-11-10 14:45Z, 20-core mask (cores 40-59): 7 of 8 jobs ok; cpu-affinity (GOMP_CPU_AFFINITY=1-237:4, which names CPUs outside the mask) fai...
@@ -186,13 +187,12 @@ Current tickets: `[###################-]` 149 of 154
 - 2026-11-10 09:53 **S9-11** lead amend: deps add S9-14: run correctness and key timings under the 3100/5100/7100 profiles (owner 2026-11-10).
 - 2026-11-10 09:53 **S8-11** lead amend: deps add S9-14: run correctness and key timings under the 3100/5100/7100 profiles (owner 2026-11-10).
 - 2026-11-10 09:51 **S9-12** lead approve: KNC libgomp now reads the card at start-up: the malloc arena cap fits the card's memory and any address-space limit (a user MALLOC_ARENA_MAX wins),...
-- 2026-11-10 09:40 **S9-11** lead note: arena constants must be set from measurement 7 before Sprint 9 closes (S9-12 interim 50% MemTotal).
 
 ## Cost
 
 - From the script, engineer: 362 sessions, 798.3M input tokens
 - From the script, lead: 238 sessions, 71.7M input tokens
-- Started by hand, Claude: 11 sessions, 2055.4M input tokens
+- Started by hand, Claude: 11 sessions, 2057.5M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
