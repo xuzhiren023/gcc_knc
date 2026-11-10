@@ -96,7 +96,8 @@ def t1(runner):
             words = re.findall(r'"([^"]*)"|(\S+)', cc1[0])
             words = [a or b for a, b in words]
             missing = [flag for flag in expanded if flag not in words]
-            if missing or 'phinix' in cc1[0] or 'progress' in cc1[0]:
+            if missing or any(w.startswith(('-mphinix', '-mno-phinix', '-mprogress',
+                                            '-mno-progress')) for w in words):
                 failures.append('-### cc1 line lacks %s or names a phinix switch: %s'
                                 % (missing, cc1[0][-600:]))
         x86 = run('-mphinix', '-march=x86-64', '-S', source, '-o', out / 'phinix-x86.s')
@@ -172,8 +173,8 @@ def t1(runner):
                                    '-c', source, '-o', out / 'phinix-off.o'], None)):
         plain = run(*args, makeflags=makeflags)
         forced = run(*args, force=True, makeflags=makeflags)
-        # -v prints the temporary file names, which differ between runs.
-        strip = (lambda s: re.sub(r'/cc\w{6}\.\w+', '/ccTEMP', s)) if case == '-v' else str
+        # -v and -### print the temporary file names, which differ between runs.
+        strip = (lambda s: re.sub(r'/cc\w{6}\.\w+', '/ccTEMP', s)) if case in ('-v', '-###') else str
         if (forced.returncode != plain.returncode or forced.stdout != plain.stdout
                 or strip(forced.stderr) != strip(plain.stderr)):
             failures.append(case + ': forced terminal changed the run: exit %d vs %d, %r'
