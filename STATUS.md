@@ -1,10 +1,10 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-10 11:58.
+Updated automatically at every ticket change. Last update: 2026-11-10 12:41.
 
-**Next: the tech lead, on S8-16.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: the tech lead, on S9-14.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
-Current tickets: `[###################-]` 149 of 154
+Current tickets: `[###################-]` 150 of 154
 
 ## Milestones
 
@@ -158,7 +158,7 @@ Current tickets: `[###################-]` 149 of 154
 | S8-13 | Streaming stores for write-only loops beyond L2 (E5-08) | Done | Loops that write arrays too large for the cache now use streaming stores: about 30% faster beyond L2 on the... |
 | S8-14 | Default 64-byte data alignment and TLB-aware cache parameters (E5-13) | Done | Card 2026-11-10 (deferred timing, frozen 3516ea25905 vs S8-13): s4_masks o2v/o3 pass, guard controls exit 3... |
 | S8-15 | Small-loop unroll default and the GCC-KNC flags page (E5-09) | Done | Card 2026-11-10 14:35Z: correctness passes (s4/s5 PASS, s5 neg 1, M2 negative 1 / positive 0). Timing in pr... |
-| S8-16 | User story - one bold flag, -mphinix, with a rising-phoenix banner and a progress bar | Waiting for review | -mphinix expands (linux-k1om.h self spec) to -O3 plus measured knc defaults, no fast-math, rejected on x86;... |
+| S8-16 | User story - one bold flag, -mphinix, with a rising-phoenix banner and a progress bar | Done | -mphinix is one flag for -O3 plus every measured -march=knc default (IEEE kept, any explicit option still w... |
 | S8-17 | Card check C12 - power by rail for a saturated vector unit against x87, idle and streaming | Done | Card check C12 is built and ready to run: it measures card power by rail (core, uncore, memory) while the v... |
 | S8-18 | Second GCC tree - a gcc2 lane with its own checkout and build, so two GCC tickets run in parallel | Done | Tools now support a second GCC tree: a lane gcc2 ticket builds in gcc-2/gcc-build-2 while a gcc ticket uses... |
 | S8-19 | -mtune=knc stops the tight-loop alignment pass (nops on the fallthrough path) | Done | Card 2026-11-10 11:28-12:03Z (frozen .work/_shared/tmp/claude-s8-19, log .work/_shared/tmp/claude-next.log)... |
@@ -179,6 +179,7 @@ Current tickets: `[###################-]` 149 of 154
 
 ## Recent activity
 
+- 2026-11-10 12:41 **S8-16** lead approve: -mphinix is one flag for -O3 plus every measured -march=knc default (IEEE kept, any explicit option still wins), with a rising-phoenix banner and a...
 - 2026-11-10 11:57 **S9-12** lead note: Measurement 7, 6 GiB RLIMIT_AS, 240 threads, 1 KiB pattern (2026-11-10, partial; job capped at 2 h after 23 of 96 runs): derived cap (unset) 145.7-...
 - 2026-11-10 11:41 **S9-11** lead note: Set gomp_knc_delay default 32 -> 128 (knc/mutex.c; S9-08 card measurements 2026-11-10: 3 spinning siblings cost 6.8% at 32, 1.1% at 128; fork-join ...
 - 2026-11-10 11:39 **S9-12** lead note: Card 2026-11-10: the S9-06 programs at 240 threads under a 6 GiB RLIMIT_AS with no MALLOC_ARENA_MAX pass (s9-12 done exit=0): the derived cap fits....
@@ -186,16 +187,15 @@ Current tickets: `[###################-]` 149 of 154
 - 2026-11-10 11:08 **S8-16** engineer submit: -mphinix expands (linux-k1om.h self spec) to -O3 plus measured knc defaults, no fast-math, rejected on x86; banner and bar on a terminal only, off ...
 - 2026-11-10 11:07 **S8-16** owner decide: Owner standing rule (2026-11-09, reconfirmed in chat 2026-11-10): the lead adds sessions unless two extensions in a row make no progress. Sessions ...
 - 2026-11-10 11:07 **S8-16** lead amend: sessions budget 3 -> 4 under the owner standing rule (2026-11-09, reconfirmed in chat 2026-11-10): one session timed out; work is done, submit left.
-- 2026-11-10 10:46 **S8-16** engineer escalate: budget: 3 engineer sessions used; the budget is 3
 
 ## Cost
 
 - From the script, engineer: 367 sessions, 803.1M input tokens
 - From the script, lead: 239 sessions, 72.0M input tokens
-- Started by hand, Claude: 11 sessions, 2076.8M input tokens
+- Started by hand, Claude: 11 sessions, 2091.7M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 22.7 GiB of 100 GiB. 121 GiB free on the drive.
+The project uses 22.7 GiB of 100 GiB. 120 GiB free on the drive.
