@@ -76,6 +76,7 @@ M1 is accepted and tagged `m1` locally; nothing is pushed. Engineers are Claude 
 
 ## Not proven yet
 
+- Sprint 9 card fixtures `tests/acceptance/s9_cxx` and `s9_omp` (1c9e7fc) pass on the laptop only (Cygwin GCC 14; each BREAK build fails). The donor-built `s9_cxx` set and a card probe (runtimes on the card, tzdata, sysfs topology) are staged in `.work/_shared/tmp/claude-s9-probe/run.sh` for the next WRF slot, after S8-08's timing. The k1om sysroot has no static glibc, so "static" in Sprint 9 means the runtime library linked in.
 - Card health, 2026-11-09: WRF reports the MPSS management path wedged (a `MicSmc.exe -a mic0` hung at 17:06Z and stays stuck in the driver after a kill). Our `card_run` uses SSH only, but 5 of our uploads missed the 60 s SSH deadline at 16:24-16:40Z under full host load. Before the next card job, run a hello job and treat SSH deadlines as a card or host warning, not noise.
 - tests/tools run from the main checkout on Windows (2026-11-08, after S8-18): 25 failed, 185 passed, 3 errors, every one pre-existing. Card backend and recovery tests need Cygwin; vect_suite, gcc_build and prepare_s3_10 tests assume a .work worktree path; test_torture_driver imports POSIX `resource`. S8-18's own tests pass. A clean Windows baseline needs a tools ticket.
 
