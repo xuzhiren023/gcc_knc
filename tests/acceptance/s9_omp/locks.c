@@ -38,7 +38,11 @@ int main (void)
   CHECK (plain == 500L * nt);
   CHECK (nested_count == 1500L * nt);
   CHECK (test_ok || nt == 1);
-  CHECK (t1 >= t0 && omp_get_wtick () > 0 && omp_get_wtick () < 1e-3);
+  /* The tick is clock_getres (CLOCK_MONOTONIC), the card kernel's timer resolution, which was
+     coarser than 1 ms on the card (2026-11-10); OpenMP only requires it to be positive.  */
+  printf ("omp_get_wtick %g
+", omp_get_wtick ());
+  CHECK (t1 >= t0 && omp_get_wtick () > 0);
   omp_destroy_lock (&lock);
   omp_destroy_nest_lock (&nest);
   return report ("locks", nt);
