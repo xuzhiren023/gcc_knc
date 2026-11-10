@@ -29,6 +29,8 @@ PACKED = re.compile(r'\bv(?:addn?|subr?|mul|div|max|min|sqrt|rcp(?:23)?|rsqrt(?:
 # Each entry supplies its CLI help and handlers for the tiers it selects.
 # Imports stay lazy so T0 and source-only selections need no probe modules.
 SELECTIONS = {
+    'o2_vect': ('S8-09 -march=knc -O2 vectorizer cost model and stride versioning', {
+        't1': lambda runner: runner.t1_sources(runner.source_dir.glob('knc-o2-vect*.c'))}),
     'tune_align': ('S8-08 -mtune=knc aligns functions to 64 bytes', {
         't1': lambda runner: runner.t1_sources(runner.source_dir.glob('knc-tune-align*.c'))}),
     'tune_prefix': ('S8-08 -mtune=knc avoids 0x66-prefixed forms', {
