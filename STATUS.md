@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-10 13:19.
+Updated automatically at every ticket change. Last update: 2026-11-10 13:20.
 
-**Next: GPT-6.1, on S8-11 (Sprint 8 batch check and paired M2 re-measure).** Run `python tools/dispatch.py`, or ask the tech lead to.
+**Next: GPT-6.1, on S9-13 (User story - -mknc-card= picks the card model's tuning, and -mknc-card=native detects it).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
 Current tickets: `[###################-]` 152 of 155
 
@@ -175,7 +175,7 @@ Current tickets: `[###################-]` 152 of 155
 | S9-10 | libgomp padding, static schedule default and malloc guidance (E6-03 E) | Done | Card 2026-11-10 14:40Z: the eight OpenMP programs pass on the S9-06..S9-10 libgomp at 60 threads (6 GiB) an... |
 | S9-11 | Sprint 9 batch check | Not started | From the 2026-11-10 card runs: (1) rerun the S9-09 suite on the final head; (2) make the S9-07 explicit-set... |
 | S9-12 | libgomp adapts to the card: malloc arena cap from memory, core count and clock (ADR-0012) | Done | Measurement 7, 6 GiB RLIMIT_AS, 240 threads, 1 KiB pattern (2026-11-10, partial; job capped at 2 h after 23... |
-| S9-13 | User story - -mknc-card= picks the card model's tuning, and -mknc-card=native detects it | Not started | deps add S8-20: Sprint 8 fix first, and both change KNC tuning in i386-knc.cc. |
+| S9-13 | User story - -mknc-card= picks the card model's tuning, and -mknc-card=native detects it | In progress | deps add S8-20: Sprint 8 fix first, and both change KNC tuning in i386-knc.cc. |
 | S9-14 | card_run model profiles - run a job as a 3100, 5100 or 7100 card on our 7120P | Done | card_run --profile 3100/5100/7100/full runs a job as that card would (its compute cores and usable memory),... |
 
 ## Recent activity
@@ -193,7 +193,7 @@ Current tickets: `[###################-]` 152 of 155
 
 - From the script, engineer: 368 sessions, 807.0M input tokens
 - From the script, lead: 239 sessions, 72.0M input tokens
-- Started by hand, Claude: 11 sessions, 2099.8M input tokens
+- Started by hand, Claude: 11 sessions, 2100.9M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
