@@ -1,10 +1,10 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-10 17:51.
+Updated automatically at every ticket change. Last update: 2026-11-10 17:59.
 
 **Next: the tech lead, on S8-21.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
-Current tickets: `[###################-]` 154 of 159
+Current tickets: `[###################-]` 155 of 159
 
 ## Milestones
 
@@ -13,7 +13,7 @@ Current tickets: `[###################-]` 154 of 159
 | M0 | Foundation | In progress | 17 of 17 tickets |
 | M1 | Mixed native code | Done | 43 of 43 tickets |
 | M2 | Useful vector target | Done | 51 of 51 tickets |
-| M3 | Runtimes | In progress | 23 of 27 tickets |
+| M3 | Runtimes | In progress | 24 of 27 tickets |
 | M4 | Broad optimization | Not started | Not planned in detail yet |
 | M5 | Program corpus | Not started | Not planned in detail yet |
 | M6 | Release | Not started | Not planned in detail yet |
@@ -179,11 +179,12 @@ Current tickets: `[###################-]` 154 of 159
 | S9-13 | User story - -mknc-card= picks the card model's tuning, and -mknc-card=native detects it | Done | -mknc-card=generic/3100/5100/7100/native picks a card model's prefetch distances (3100 and 5100 derived fro... |
 | S9-14 | card_run model profiles - run a job as a 3100, 5100 or 7100 card on our 7120P | Done | card_run --profile 3100/5100/7100/full runs a job as that card would (its compute cores and usable memory),... |
 | S9-15 | libgomp's KNC spin time before sleeping, measured against fork-heavy code | In progress | Lane gcc2 -> gcc: tree 1 is free while S8-21 uses tree 2. |
-| S9-16 | Card probes - unaligned scalar accesses, and the VPU cost of subnormal operands | Waiting for review | Staged and linted, not run on the card: .work/_shared/S9-16/c13.mic (unaligned GPR and x87 scalar ld/st, of... |
+| S9-16 | Card probes - unaligned scalar accesses, and the VPU cost of subnormal operands | Done | Two card probes are built and ready for the lead to run: C13 tests whether unaligned scalar loads and store... |
 | S9-17 | User guidance on the flags page - threads per core, first touch, regions, heap, and ICC differences | Not started |  |
 
 ## Recent activity
 
+- 2026-11-10 17:59 **S9-16** lead approve: Two card probes are built and ready for the lead to run: C13 tests whether unaligned scalar loads and stores fault or slow down on KNC, and C14 mea...
 - 2026-11-10 17:51 **S9-16** engineer submit: Staged and linted, not run on the card: .work/_shared/S9-16/c13.mic (unaligned GPR and x87 scalar ld/st, offsets 0-63 and page crossings; fault, by...
 - 2026-11-10 17:47 **S9-15** lead amend: Lane gcc2 -> gcc: tree 1 is free while S8-21 uses tree 2.
 - 2026-11-10 17:47 **S9-11** lead amend: deps add S9-15..S9-17 (best-practice review, owner 2026-11-10).
@@ -191,16 +192,15 @@ Current tickets: `[###################-]` 154 of 159
 - 2026-11-10 16:59 **S8-11** lead approve: Sprint 8's final compiler (knc fe7ed380f149) matches stock GCC 16.2 on x86 (1962/0 at -O2 and -O2 -mavx512f, run on the S9-13 tree that contains it...
 - 2026-11-10 16:51 **S9-13** lead approve: -mknc-card=generic|3100|5100|7100|native picks a card model's prefetch distances (3100 and 5100 derived from bandwidth per core, 7100 measured), na...
 - 2026-11-10 16:03 **S8-11** engineer submit: knc fe7ed380f149. Drill textual only (master 12 files/23 hunks; KNC bar.c needs master's barrier API), gcc-16 0. Shared i386 718/132: x86 not run (...
-- 2026-11-10 15:14 **S9-13** engineer submit: -mknc-card=MODEL/aliases/native in linux-k1om.h self spec + knc_card_spec (card /proc, MPSS /sys/class/mic, generic+note); -mphinix adds native. Fi...
 
 ## Cost
 
 - From the script, engineer: 373 sessions, 812.6M input tokens
 - From the script, lead: 239 sessions, 72.0M input tokens
-- Started by hand, Claude: 11 sessions, 2135.4M input tokens
+- Started by hand, Claude: 11 sessions, 2136.0M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 22.8 GiB of 100 GiB. 111 GiB free on the drive.
+The project uses 23.1 GiB of 100 GiB. 111 GiB free on the drive.
