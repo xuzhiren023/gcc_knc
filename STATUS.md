@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-10 06:23.
+Updated automatically at every ticket change. Last update: 2026-11-10 06:32.
 
-**Next: GPT-6.1, on S8-15 (Small-loop unroll default and the GCC-KNC flags page (E5-09)).** Run `python tools/dispatch.py`, or ask the tech lead to.
+**Next: the tech lead, on S8-15.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[###################-]` 144 of 151
 
@@ -157,7 +157,7 @@ Current tickets: `[###################-]` 144 of 151
 | S8-12 | Fix three weak S8-01 checks - C4 page offsets, C5 row aliasing, C9 memory chain | Done | The knc-char checks C4, C5 and C9 are fixed and rebuilt: C4 now walks every page offset, C5's eight arrays ... |
 | S8-13 | Streaming stores for write-only loops beyond L2 (E5-08) | Done | Loops that write arrays too large for the cache now use streaming stores: about 30% faster beyond L2 on the... |
 | S8-14 | Default 64-byte data alignment and TLB-aware cache parameters (E5-13) | Done | Card 2026-11-10 (deferred timing, frozen 3516ea25905 vs S8-13): s4_masks o2v/o3 pass, guard controls exit 3... |
-| S8-15 | Small-loop unroll default and the GCC-KNC flags page (E5-09) | In progress | (a). Add -fno-unroll-loops to the dg-options of those 7 T1 tests, with a one-line comment that each test pi... |
+| S8-15 | Small-loop unroll default and the GCC-KNC flags page (E5-09) | Waiting for review | GCC 7d26134e1f2+482730e75cc (shared i386.cc: 2-line ADR-0006 hook), rebased on knc 5d7514a1e7c (libgomp onl... |
 | S8-16 | User story - one bold flag, -mphinix, with a rising-phoenix banner and a progress bar | Not started | Owner 2026-11-09: Sprint 8 runs on without waiting for card timing; the lead approves on code review and ho... |
 | S8-17 | Card check C12 - power by rail for a saturated vector unit against x87, idle and streaming | Done | Card check C12 is built and ready to run: it measures card power by rail (core, uncore, memory) while the v... |
 | S8-18 | Second GCC tree - a gcc2 lane with its own checkout and build, so two GCC tickets run in parallel | Done | Tools now support a second GCC tree: a lane gcc2 ticket builds in gcc-2/gcc-build-2 while a gcc ticket uses... |
@@ -176,6 +176,7 @@ Current tickets: `[###################-]` 144 of 151
 
 ## Recent activity
 
+- 2026-11-10 06:32 **S8-15** engineer submit: GCC 7d26134e1f2+482730e75cc (shared i386.cc: 2-line ADR-0006 hook), rebased on knc 5d7514a1e7c (libgomp only), rebuilt. Red 16651e2, green + docs/g...
 - 2026-11-10 06:22 **S9-08** lead note: S9-06 already added config/linux/knc/futex.h (cpu_relax = DELAY gomp_knc_delay), mutex.c (gomp_knc_delay = 32) and spincount.h (default 100000, abo...
 - 2026-11-10 06:22 **S9-07** lead approve: OpenMP programs on KNC now spread threads one per core over the 60 compute cores by default (OS core left out; OMP_PROC_BIND=false or an explicit p...
 - 2026-11-10 06:13 **S9-07** engineer submit: Green: knc/affinity.c plus a 6-line __k1om__ hook in env.c give core places (sysfs or cpuinfo, inherited mask, OS core dropped), default spread. gc...
@@ -183,16 +184,15 @@ Current tickets: `[###################-]` 144 of 151
 - 2026-11-10 06:10 **S9-07** engineer ask: Work is done but submit is refused on size: 846 changed lines against the 800 budget (red commit you approved is 653; green is knc/affinity.c 187 w...
 - 2026-11-10 06:00 **S9-07** lead approve-red: S9-07 red approved: host tests on synthetic sysfs and cpuinfo-only trees (whole card, 30-core mask, OS core only, explicit OMP_NUM_THREADS) fail 8/...
 - 2026-11-10 05:59 **S9-07** engineer red: Red a5722df: python tools/s9_07_checks.py host fails 8/8 on assertions (log .work/_state/logs/s9_07_host-20261110-055848.log): from sysfs the curre...
-- 2026-11-10 05:46 **S9-06** lead approve: OpenMP (-fopenmp) now links and builds against a KNC libgomp in the private prefix, which spins with DELAY instead of PAUSE and refuses an older li...
 
 ## Cost
 
 - From the script, engineer: 350 sessions, 772.4M input tokens
 - From the script, lead: 233 sessions, 70.8M input tokens
-- Started by hand, Claude: 11 sessions, 2010.6M input tokens
+- Started by hand, Claude: 11 sessions, 2011.0M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 22.5 GiB of 100 GiB. 108 GiB free on the drive.
+The project uses 23.2 GiB of 100 GiB. 107 GiB free on the drive.
