@@ -1,10 +1,10 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-09 23:51.
+Updated automatically at every ticket change. Last update: 2026-11-10 01:07.
 
-**Next: GPT-6.1, on S9-03 (libstdc++ and libatomic build for k1om (E6-06a)).** Run `python tools/dispatch.py`, or ask the tech lead to.
+**Next: the tech lead, on S8-09.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
-Current tickets: `[##################--]` 137 of 150
+Current tickets: `[##################--]` 138 of 151
 
 ## Milestones
 
@@ -13,7 +13,7 @@ Current tickets: `[##################--]` 137 of 150
 | M0 | Foundation | In progress | 17 of 17 tickets |
 | M1 | Mixed native code | Done | 43 of 43 tickets |
 | M2 | Useful vector target | Done | 51 of 51 tickets |
-| M3 | Runtimes | In progress | 12 of 21 tickets |
+| M3 | Runtimes | In progress | 13 of 21 tickets |
 | M4 | Broad optimization | Not started | Not planned in detail yet |
 | M5 | Program corpus | Not started | Not planned in detail yet |
 | M6 | Release | Not started | Not planned in detail yet |
@@ -150,48 +150,49 @@ Current tickets: `[##################--]` 137 of 150
 | S8-05 | Re-check the scalar-add cost on mat8 and the stencils after S8-06 (E5-11) | Done | No per-loop add-cost work is needed: with the cheaper add cost mat8 now compiles to the same code as today,... |
 | S8-06 | Memory-operand forms for V16SF/V8DF arithmetic and FMA (E5-17) | Done | KNC vector add, sub, mul and FMA now read aligned memory and {1to16}/{1to8} broadcasts directly instead of ... |
 | S8-07 | vpmadd231d for V16SI multiply-add (E5-14) | Done | KNC now emits vpmadd231d for vector integer multiply-add: one instruction at 4 ticks latency instead of vpm... |
-| S8-08 | -mtune=knc tune-flag audit (E5-12) | Done | -mtune=knc no longer uses 0x66/0x67 prefixes where a shorter form exists and starts functions on a 64-byte ... |
-| S8-09 | KNC -O2 defaults: vectorizer cost model, stride versioning, predictive commoning (E5-18) | Not started | Owner 2026-11-09: Sprint 8 runs on without waiting for card timing; the lead approves on code review and ho... |
+| S8-08 | -mtune=knc tune-flag audit (E5-12) | Done | Card 2026-11-10 05:14-06:02Z (deferred timing, frozen 020d107325d vs S8-10 knc, L2 d4, 2 launches): M2 corr... |
+| S8-09 | KNC -O2 defaults: vectorizer cost model, stride versioning, predictive commoning (E5-18) | Waiting for review | Green gcc 16bc28c465c (i386-knc.cc only): -march=knc -O2 uses -fvect-cost-model=cheap and -fversion-loops-f... |
 | S8-10 | Less ring traffic: 64-byte padding of per-thread data, and card check C11 (E5-16) | Done | Per-thread arrays and the OpenMP shared block now start on their own 64-byte line, and the C11 card check s... |
 | S8-11 | Sprint 8 batch check and paired M2 re-measure | Not started | add one compiler-prefetch card case, because S8-03's card run has no row kernel (C5's rows are hand-written... |
 | S8-12 | Fix three weak S8-01 checks - C4 page offsets, C5 row aliasing, C9 memory chain | Done | The knc-char checks C4, C5 and C9 are fixed and rebuilt: C4 now walks every page offset, C5's eight arrays ... |
 | S8-13 | Streaming stores for write-only loops beyond L2 (E5-08) | Done | Loops that write arrays too large for the cache now use streaming stores: about 30% faster beyond L2 on the... |
-| S8-14 | Default 64-byte data alignment and TLB-aware cache parameters (E5-13) | Done | -march=knc now puts arrays of 64 bytes or more on a 64-byte line and sizes loop blocking to the 256 KB TLB ... |
-| S8-15 | Small-loop unroll default and the GCC-KNC flags page (E5-09) | Not started | Owner 2026-11-09: Sprint 8 runs on without waiting for card timing; the lead approves on code review and ho... |
+| S8-14 | Default 64-byte data alignment and TLB-aware cache parameters (E5-13) | Done | Card 2026-11-10 (deferred timing, frozen 3516ea25905 vs S8-13): s4_masks o2v/o3 pass, guard controls exit 3... |
+| S8-15 | Small-loop unroll default and the GCC-KNC flags page (E5-09) | Not started | Now also waits on S8-19: the tight-loop alignment pass pads small loops with one-byte nops that run on fall... |
 | S8-16 | User story - one bold flag, -mphinix, with a rising-phoenix banner and a progress bar | Not started | Owner 2026-11-09: Sprint 8 runs on without waiting for card timing; the lead approves on code review and ho... |
 | S8-17 | Card check C12 - power by rail for a saturated vector unit against x87, idle and streaming | Done | Card check C12 is built and ready to run: it measures card power by rail (core, uncore, memory) while the v... |
 | S8-18 | Second GCC tree - a gcc2 lane with its own checkout and build, so two GCC tickets run in parallel | Done | Tools now support a second GCC tree: a lane gcc2 ticket builds in gcc-2/gcc-build-2 while a gcc ticket uses... |
+| S8-19 | -mtune=knc stops the tight-loop alignment pass (nops on the fallthrough path) | Not started | written by the lead from the S8-08 card result; S8-15 now waits on it, |
 | S9-01 | libgomp for KNC: futex, affinity, ring-aware barrier, spin-wait and malloc arenas (E6-03 input) | Done | We now have a build-and-design plan for GCC-KNC's own OpenMP runtime on the card: futex-based waits with de... |
 | S9-02 | libstdc++ for KNC: exceptions, RTTI, atomics, threads, packaging (E6-06 input) | Done | We now know how to build GCC 16's C++ library for the card: no newer glibc or kernel is needed, and built w... |
-| S9-03 | libstdc++ and libatomic build for k1om (E6-06a) | In progress | S9-03 red accepted: the host check fails today because the installed compiler has no g++ or libstdc++; at g... |
-| S9-04 | libstdc++ packaging into the private prefix and a g++ link guard (E6-06b) | Not started | Pre-check: build wiring, static linking, test programs and allowed files are now in the brief (lead pre-che... |
-| S9-05 | libstdc++ runtime slice on the card (E6-06c) | Not started | Pre-check: build wiring, static linking, test programs and allowed files are now in the brief (lead pre-che... |
-| S9-06 | libgomp for k1om: build, select, package and link guard (E6-03 A) | Not started | Pre-check: build wiring, static linking, test programs and allowed files are now in the brief (lead pre-che... |
-| S9-07 | libgomp KNC affinity defaults (E6-03 B) | Not started | Pre-check: build wiring, static linking, test programs and allowed files are now in the brief (lead pre-che... |
-| S9-08 | libgomp spin-wait with delay and the one-core measurement (E6-03 C) | Not started | Pre-check: build wiring, static linking, test programs and allowed files are now in the brief (lead pre-che... |
-| S9-09 | libgomp hierarchical ring-aware barrier (E6-03 D) | Not started | Pre-check: build wiring, static linking, test programs and allowed files are now in the brief (lead pre-che... |
-| S9-10 | libgomp padding, static schedule default and malloc guidance (E6-03 E) | Not started | Pre-check: build wiring, static linking, test programs and allowed files are now in the brief (lead pre-che... |
+| S9-03 | libstdc++ and libatomic build for k1om (E6-06a) | Done | GCC-KNC now builds g++, libstdc++ and libatomic for k1om, with the donor's ABI kept (no donor symbol missin... |
+| S9-04 | libstdc++ packaging into the private prefix and a g++ link guard (E6-06b) | In progress | Lane gcc -> gcc2: Sprint 9 runs on tree 2 while tree 1 finishes Sprint 8 (owner 2026-11-09: start Sprint 9 ... |
+| S9-05 | libstdc++ runtime slice on the card (E6-06c) | Not started | Lane gcc -> gcc2: Sprint 9 runs on tree 2 while tree 1 finishes Sprint 8 (owner 2026-11-09: start Sprint 9 ... |
+| S9-06 | libgomp for k1om: build, select, package and link guard (E6-03 A) | Not started | Lane gcc -> gcc2: Sprint 9 runs on tree 2 while tree 1 finishes Sprint 8 (owner 2026-11-09: start Sprint 9 ... |
+| S9-07 | libgomp KNC affinity defaults (E6-03 B) | Not started | Lane gcc -> gcc2: Sprint 9 runs on tree 2 while tree 1 finishes Sprint 8 (owner 2026-11-09: start Sprint 9 ... |
+| S9-08 | libgomp spin-wait with delay and the one-core measurement (E6-03 C) | Not started | Lane gcc -> gcc2: Sprint 9 runs on tree 2 while tree 1 finishes Sprint 8 (owner 2026-11-09: start Sprint 9 ... |
+| S9-09 | libgomp hierarchical ring-aware barrier (E6-03 D) | Not started | Lane gcc -> gcc2: Sprint 9 runs on tree 2 while tree 1 finishes Sprint 8 (owner 2026-11-09: start Sprint 9 ... |
+| S9-10 | libgomp padding, static schedule default and malloc guidance (E6-03 E) | Not started | Lane gcc -> gcc2: Sprint 9 runs on tree 2 while tree 1 finishes Sprint 8 (owner 2026-11-09: start Sprint 9 ... |
 | S9-11 | Sprint 9 batch check | Not started | from S9-01's plan, under the owner's overnight blanket approval. |
 
 ## Recent activity
 
-- 2026-11-09 23:51 **S8-16** lead note: Owner 2026-11-09: Sprint 8 runs on without waiting for card timing; the lead approves on code review and host checks and times every ticket in one ...
-- 2026-11-09 23:51 **S8-15** lead note: Owner 2026-11-09: Sprint 8 runs on without waiting for card timing; the lead approves on code review and host checks and times every ticket in one ...
-- 2026-11-09 23:50 **S8-14** lead approve: -march=knc now puts arrays of 64 bytes or more on a 64-byte line and sizes loop blocking to the 256 KB TLB reach; code, host checks and x86 identit...
-- 2026-11-09 23:50 **S8-09** lead note: Owner 2026-11-09: Sprint 8 runs on without waiting for card timing; the lead approves on code review and host checks and times every ticket in one ...
-- 2026-11-09 23:42 **S8-14** lead note: Lead merged knc (with S8-08) into s8/S8-14 (6137ddbf42c, clean) and main into the repo branch (84ac639, clean) to approve with card timing deferred...
-- 2026-11-09 23:41 **S8-08** lead approve: -mtune=knc no longer uses 0x66/0x67 prefixes where a shorter form exists and starts functions on a 64-byte line; code and host checks reviewed, car...
-- 2026-11-09 23:07 **S9-03** lead approve-red: S9-03 red accepted: the host check fails today because the installed compiler has no g++ or libstdc++; at green it builds the lead's static and sha...
-- 2026-11-09 23:06 **S9-03** engineer red: Red at 060ee62: tools/s9_03_checks.py links (run.py s9-03-links) fails with 'no C++ driver at gcc-knc-16.2.0/bin/k1om-mpss-linux-g++' (build is c,f...
+- 2026-11-10 01:06 **S9-10** lead note: Lane gcc -> gcc2: Sprint 9 runs on tree 2 while tree 1 finishes Sprint 8 (owner 2026-11-09: start Sprint 9 early).
+- 2026-11-10 01:06 **S9-09** lead note: Lane gcc -> gcc2: Sprint 9 runs on tree 2 while tree 1 finishes Sprint 8 (owner 2026-11-09: start Sprint 9 early).
+- 2026-11-10 01:06 **S9-08** lead note: Lane gcc -> gcc2: Sprint 9 runs on tree 2 while tree 1 finishes Sprint 8 (owner 2026-11-09: start Sprint 9 early).
+- 2026-11-10 01:05 **S9-07** lead note: Lane gcc -> gcc2: Sprint 9 runs on tree 2 while tree 1 finishes Sprint 8 (owner 2026-11-09: start Sprint 9 early).
+- 2026-11-10 01:05 **S9-06** lead note: Lane gcc -> gcc2: Sprint 9 runs on tree 2 while tree 1 finishes Sprint 8 (owner 2026-11-09: start Sprint 9 early).
+- 2026-11-10 01:05 **S9-05** lead note: Lane gcc -> gcc2: Sprint 9 runs on tree 2 while tree 1 finishes Sprint 8 (owner 2026-11-09: start Sprint 9 early).
+- 2026-11-10 01:05 **S9-04** lead note: Lane gcc -> gcc2: Sprint 9 runs on tree 2 while tree 1 finishes Sprint 8 (owner 2026-11-09: start Sprint 9 early).
+- 2026-11-10 01:04 **S8-15** lead note: Now also waits on S8-19: the tight-loop alignment pass pads small loops with one-byte nops that run on fallthrough, so unroll timings move with cod...
 
 ## Cost
 
-- From the script, engineer: 334 sessions, 756.8M input tokens
+- From the script, engineer: 337 sessions, 758.9M input tokens
 - From the script, lead: 230 sessions, 70.2M input tokens
-- Started by hand, Claude: 11 sessions, 1972.5M input tokens
+- Started by hand, Claude: 11 sessions, 1986.7M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 21.0 GiB of 100 GiB. 104 GiB free on the drive.
+The project uses 21.0 GiB of 100 GiB. 101 GiB free on the drive.
