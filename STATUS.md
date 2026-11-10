@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-10 09:39.
+Updated automatically at every ticket change. Last update: 2026-11-10 09:40.
 
 **Next: the tech lead, on S9-12.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
@@ -172,12 +172,13 @@ Current tickets: `[###################-]` 148 of 153
 | S9-08 | libgomp spin-wait with delay and the one-core measurement (E6-03 C) | Done | KNC libgomp's spin wait can be tuned with GOMP_KNC_DELAY, the default spin count is 3 ms of DELAY periods, ... |
 | S9-09 | libgomp hierarchical ring-aware barrier (E6-03 D) | Done | OpenMP barriers on KNC now synchronise per core first and then across cores (one cache line per core instea... |
 | S9-10 | libgomp padding, static schedule default and malloc guidance (E6-03 E) | Done | KNC libgomp keeps each thread's private data and implicit task on cache lines of their own, schedule(runtim... |
-| S9-11 | Sprint 9 batch check | Not started | deps add S9-13 (owner story 2026-11-10: -mknc-card). |
+| S9-11 | Sprint 9 batch check | Not started | arena constants must be set from measurement 7 before Sprint 9 closes (S9-12 interim 50% MemTotal). |
 | S9-12 | libgomp adapts to the card: malloc arena cap from memory, core count and clock (ADR-0012) | Waiting for review | libgomp on k1om derives MALLOC_ARENA_MAX from MemTotal/CommitLimit/RLIMIT_AS/stack when the user did not se... |
 | S9-13 | User story - -mknc-card= picks the card model's tuning, and -mknc-card=native detects it | Not started |  |
 
 ## Recent activity
 
+- 2026-11-10 09:40 **S9-11** lead note: arena constants must be set from measurement 7 before Sprint 9 closes (S9-12 interim 50% MemTotal).
 - 2026-11-10 09:38 **S9-12** engineer submit: libgomp on k1om derives MALLOC_ARENA_MAX from MemTotal/CommitLimit/RLIMIT_AS/stack when the user did not set it, reads core count and cpu MHz from ...
 - 2026-11-10 09:36 **S9-12** lead answer: Do not split. The size is from the scope added at 09:14 (core count and clock), about 90 lines moved out of affinity.c, and the measurement 7 runne...
 - 2026-11-10 09:34 **S9-12** engineer ask: Done and verified on host, but submit refuses: 1275 changed lines vs budget 500. Breakdown: GCC 6751b9602fe +543/-96 (knc/card.h 392 new, of which ...
@@ -185,13 +186,12 @@ Current tickets: `[###################-]` 148 of 153
 - 2026-11-10 09:14 **S9-12** lead amend: Scope: core-count fallback and clock-based spin count read from the card (owner question 2026-11-10 on fitting all KNC models).
 - 2026-11-10 09:13 **S9-10** lead approve: KNC libgomp keeps each thread's private data and implicit task on cache lines of their own, schedule(runtime) defaults to static, and omp_display_e...
 - 2026-11-10 08:59 **S9-10** engineer submit: GCC fb441ea372f..e9ff8ab1556: padded gomp_tls_data/implicit_task with static asserts, KNC run_sched_var default static, MALLOC_ARENA_MAX/OMP_STACKS...
-- 2026-11-10 08:58 **S9-10** lead answer: Yes: resubmit with --override 'size: 684 of 818 lines are new staged files the ticket requires (host test, measurement 6 and 7 programs, runner); G...
 
 ## Cost
 
 - From the script, engineer: 362 sessions, 798.3M input tokens
 - From the script, lead: 238 sessions, 71.7M input tokens
-- Started by hand, Claude: 11 sessions, 2042.3M input tokens
+- Started by hand, Claude: 11 sessions, 2044.1M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
