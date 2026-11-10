@@ -174,7 +174,7 @@ Current tickets: `[###################-]` 155 of 159
 | S9-08 | libgomp spin-wait with delay and the one-core measurement (E6-03 C) | Done | Card 2026-11-10 measurements 1 and 3, three launches (log .work/_shared/tmp/claude-resume.log). One core, w... |
 | S9-09 | libgomp hierarchical ring-aware barrier (E6-03 D) | Done | Card diagnosis 2026-11-10 ~12:10 EST (log .work/_shared/tmp/claude-diag.log): the same 34 suite programs pl... |
 | S9-10 | libgomp padding, static schedule default and malloc guidance (E6-03 E) | Done | Card 2026-11-10 14:40Z: the eight OpenMP programs pass on the S9-06..S9-10 libgomp at 60 threads (6 GiB) an... |
-| S9-11 | Sprint 9 batch check | Not started | deps add S9-15..S9-17 (best-practice review, owner 2026-11-10). |
+| S9-11 | Sprint 9 batch check | Not started | Tool issues found 2026-11-10: tools/s9_08_checks.py host mode broken since S9-12 (card.h needs _GNU_SOURCE ... |
 | S9-12 | libgomp adapts to the card: malloc arena cap from memory, core count and clock (ADR-0012) | Done | Measurement 7, 6 GiB RLIMIT_AS, 240 threads, 1 KiB pattern (2026-11-10, partial; job capped at 2 h after 23... |
 | S9-13 | User story - -mknc-card= picks the card model's tuning, and -mknc-card=native detects it | Done | -mknc-card=generic/3100/5100/7100/native picks a card model's prefetch distances (3100 and 5100 derived fro... |
 | S9-14 | card_run model profiles - run a job as a 3100, 5100 or 7100 card on our 7120P | Done | card_run --profile 3100/5100/7100/full runs a job as that card would (its compute cores and usable memory),... |
@@ -184,6 +184,7 @@ Current tickets: `[###################-]` 155 of 159
 
 ## Recent activity
 
+- 2026-11-10 18:08 **S9-11** lead note: Tool issues found 2026-11-10: tools/s9_08_checks.py host mode broken since S9-12 (card.h needs _GNU_SOURCE before the shim includes stdio.h; S9-15 ...
 - 2026-11-10 18:01 **S9-17** engineer submit: Added 'Writing fast code for KNC' to docs/gcc-knc-flags.md: threads per core, first touch/regions, heap, ICC differences, trademark line; each clai...
 - 2026-11-10 18:00 **S9-15** engineer submit: Red 00e02c6d, green GCC bfa5533618a: card.h gomp_knc_spincount(msec,mhz,delay); default unchanged. s9_15_checks.py host PASS 13/13 (DELAY 128: 2578...
 - 2026-11-10 17:59 **S9-16** lead approve: Two card probes are built and ready for the lead to run: C13 tests whether unaligned scalar loads and stores fault or slow down on KNC, and C14 mea...
@@ -191,7 +192,6 @@ Current tickets: `[###################-]` 155 of 159
 - 2026-11-10 17:47 **S9-15** lead amend: Lane gcc2 -> gcc: tree 1 is free while S8-21 uses tree 2.
 - 2026-11-10 17:47 **S9-11** lead amend: deps add S9-15..S9-17 (best-practice review, owner 2026-11-10).
 - 2026-11-10 17:46 **S8-21** engineer submit: GCC f3c34acd827 (prefetch.cc +25/-3): masked loads/stores now prefetched, never nontemporal. Red 48161f1a -> --prefetch 5/5; 16-float asm identical...
-- 2026-11-10 16:59 **S8-11** lead approve: Sprint 8's final compiler (knc fe7ed380f149) matches stock GCC 16.2 on x86 (1962/0 at -O2 and -O2 -mavx512f, run on the S9-13 tree that contains it...
 
 ## Cost
 
