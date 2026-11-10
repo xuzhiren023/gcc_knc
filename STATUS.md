@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-09 23:54.
+Updated automatically at every ticket change. Last update: 2026-11-10 00:09.
 
-**Next: GPT-6.1, on S8-09 (KNC -O2 defaults: vectorizer cost model, stride versioning, predictive commoning (E5-18)).** Run `python tools/dispatch.py`, or ask the tech lead to.
+**Next: the tech lead, on S9-03.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[##################--]` 137 of 150
 
@@ -163,7 +163,7 @@ Current tickets: `[##################--]` 137 of 150
 | S8-18 | Second GCC tree - a gcc2 lane with its own checkout and build, so two GCC tickets run in parallel | Done | Tools now support a second GCC tree: a lane gcc2 ticket builds in gcc-2/gcc-build-2 while a gcc ticket uses... |
 | S9-01 | libgomp for KNC: futex, affinity, ring-aware barrier, spin-wait and malloc arenas (E6-03 input) | Done | We now have a build-and-design plan for GCC-KNC's own OpenMP runtime on the card: futex-based waits with de... |
 | S9-02 | libstdc++ for KNC: exceptions, RTTI, atomics, threads, packaging (E6-06 input) | Done | We now know how to build GCC 16's C++ library for the card: no newer glibc or kernel is needed, and built w... |
-| S9-03 | libstdc++ and libatomic build for k1om (E6-06a) | In progress | S9-03 red accepted: the host check fails today because the installed compiler has no g++ or libstdc++; at g... |
+| S9-03 | libstdc++ and libatomic build for k1om (E6-06a) | Question for the tech lead | Submit is refused only on size: 6491 changed lines against 800. 6166 of them are the generated baseline_sym... |
 | S9-04 | libstdc++ packaging into the private prefix and a g++ link guard (E6-06b) | Not started | Pre-check: build wiring, static linking, test programs and allowed files are now in the brief (lead pre-che... |
 | S9-05 | libstdc++ runtime slice on the card (E6-06c) | Not started | Pre-check: build wiring, static linking, test programs and allowed files are now in the brief (lead pre-che... |
 | S9-06 | libgomp for k1om: build, select, package and link guard (E6-03 A) | Not started | Pre-check: build wiring, static linking, test programs and allowed files are now in the brief (lead pre-che... |
@@ -175,6 +175,7 @@ Current tickets: `[##################--]` 137 of 150
 
 ## Recent activity
 
+- 2026-11-10 00:09 **S9-03** engineer ask: Submit is refused only on size: 6491 changed lines against 800. 6166 of them are the generated baseline_symbols.txt the ticket requires (gcc-2 8ad3...
 - 2026-11-09 23:51 **S8-16** lead note: Owner 2026-11-09: Sprint 8 runs on without waiting for card timing; the lead approves on code review and host checks and times every ticket in one ...
 - 2026-11-09 23:51 **S8-15** lead note: Owner 2026-11-09: Sprint 8 runs on without waiting for card timing; the lead approves on code review and host checks and times every ticket in one ...
 - 2026-11-09 23:50 **S8-14** lead approve: -march=knc now puts arrays of 64 bytes or more on a 64-byte line and sizes loop blocking to the 256 KB TLB reach; code, host checks and x86 identit...
@@ -182,16 +183,15 @@ Current tickets: `[##################--]` 137 of 150
 - 2026-11-09 23:42 **S8-14** lead note: Lead merged knc (with S8-08) into s8/S8-14 (6137ddbf42c, clean) and main into the repo branch (84ac639, clean) to approve with card timing deferred...
 - 2026-11-09 23:41 **S8-08** lead approve: -mtune=knc no longer uses 0x66/0x67 prefixes where a shorter form exists and starts functions on a 64-byte line; code and host checks reviewed, car...
 - 2026-11-09 23:07 **S9-03** lead approve-red: S9-03 red accepted: the host check fails today because the installed compiler has no g++ or libstdc++; at green it builds the lead's static and sha...
-- 2026-11-09 23:06 **S9-03** engineer red: Red at 060ee62: tools/s9_03_checks.py links (run.py s9-03-links) fails with 'no C++ driver at gcc-knc-16.2.0/bin/k1om-mpss-linux-g++' (build is c,f...
 
 ## Cost
 
 - From the script, engineer: 334 sessions, 756.8M input tokens
 - From the script, lead: 230 sessions, 70.2M input tokens
-- Started by hand, Claude: 11 sessions, 1974.2M input tokens
+- Started by hand, Claude: 11 sessions, 1974.5M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 21.0 GiB of 100 GiB. 104 GiB free on the drive.
+The project uses 21.0 GiB of 100 GiB. 100 GiB free on the drive.
