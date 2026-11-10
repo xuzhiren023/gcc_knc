@@ -1,5 +1,5 @@
-// S5-12, ADR-0008 points 4/5, Intel 327364-001 pp.154-189.
-// options: -O2 -ftree-vectorize -fopt-info-vec-optimized
+// S5-12, ADR-0008 points 4/5, Intel 327364-001 pp.154-189. -fno-unroll-loops pins the convert sequence, not unrolling (S8-15).
+// options: -O2 -ftree-vectorize -fopt-info-vec-optimized -fno-unroll-loops
 // scan-asm-not: %[xy]mm\d+|\b(?:vcvtdq2ps|vcvttps2dq|vcvttps2udq)\b
 // scan-asm-func from_f32: \A(?=(?:[\s\S]*\bvcvtps2pd\b){2})(?!(?:[\s\S]*\bvcvtps2pd\b){3})(?=[\s\S]*\bvpermf32x4\s+\$(?:238|0xee),)(?!(?:[\s\S]*\bvpermf32x4\b){2})
 // scan-asm-func to_f32: \A(?=(?:[\s\S]*\bvcvtpd2ps\b){2})(?!(?:[\s\S]*\bvcvtpd2ps\b){3})(?=[\s\S]*\bvpermf32x4\s+\$(?:68|0x44),[^\n]*%k[1-7])(?!(?:[\s\S]*\bvpermf32x4\b){2})

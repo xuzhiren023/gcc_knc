@@ -1,6 +1,6 @@
 // S5-16, ADR-0008 point 7; Intel 327364-001 pp.379-384.
-// Sixteen source/destination elements per conversion, not byte arithmetic.
-// options: -O2 -ftree-vectorize -fopt-info-vec-optimized
+// Sixteen source/destination elements per conversion, not byte arithmetic. -fno-unroll-loops pins the convert sequence, not unrolling (S8-15).
+// options: -O2 -ftree-vectorize -fopt-info-vec-optimized -fno-unroll-loops
 // scan-asm-not: %[xy]mm\d+|\bv(?:loadunpack|packstore)\w*[^\n]*\{[us]int(?:8|16)\}
 // scan-asm-func i32_u8: \A(?=[\s\S]*\bvmovdqa32\s+[^\n]*\{uint8\}[^\n]*,\s*%zmm\d+)(?!(?:[\s\S]*\{[us]int(?:8|16)\}){2})
 // scan-asm-func i32_s8: \A(?=[\s\S]*\bvmovdqa32\s+[^\n]*\{sint8\}[^\n]*,\s*%zmm\d+)(?!(?:[\s\S]*\{[us]int(?:8|16)\}){2})
