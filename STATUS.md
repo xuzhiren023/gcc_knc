@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-10 06:11.
+Updated automatically at every ticket change. Last update: 2026-11-10 06:12.
 
-**Next: the tech lead, on S9-07.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: GPT-6.1, on S8-15 (Small-loop unroll default and the GCC-KNC flags page (E5-09)).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
 Current tickets: `[##################--]` 143 of 151
 
@@ -168,7 +168,7 @@ Current tickets: `[##################--]` 143 of 151
 | S9-04 | libstdc++ packaging into the private prefix and a g++ link guard (E6-06b) | Done | Card 2026-11-10 08:42Z: both xdso pairs print PASS checks=5 with LD_LIBRARY_PATH=/usr/lib64, and the loader... |
 | S9-05 | libstdc++ runtime slice on the card (E6-06c) | Done | A 56-program libstdc++ runtime slice (exceptions, threads, futures, filesystem, random_device, plus the KNC... |
 | S9-06 | libgomp for k1om: build, select, package and link guard (E6-03 A) | Done | OpenMP (-fopenmp) now links and builds against a KNC libgomp in the private prefix, which spins with DELAY ... |
-| S9-07 | libgomp KNC affinity defaults (E6-03 B) | Question for the tech lead | Work is done but submit is refused on size: 846 changed lines against the 800 budget (red commit you approv... |
+| S9-07 | libgomp KNC affinity defaults (E6-03 B) | In progress | Yes, resubmit with --override: 846 against 800 is the approved red plus a 23-line licence header, no cut ne... |
 | S9-08 | libgomp spin-wait with delay and the one-core measurement (E6-03 C) | Not started | Lane gcc -> gcc2: Sprint 9 runs on tree 2 while tree 1 finishes Sprint 8 (owner 2026-11-09: start Sprint 9 ... |
 | S9-09 | libgomp hierarchical ring-aware barrier (E6-03 D) | Not started | Lane gcc -> gcc2: Sprint 9 runs on tree 2 while tree 1 finishes Sprint 8 (owner 2026-11-09: start Sprint 9 ... |
 | S9-10 | libgomp padding, static schedule default and malloc guidance (E6-03 E) | Not started | Lane gcc -> gcc2: Sprint 9 runs on tree 2 while tree 1 finishes Sprint 8 (owner 2026-11-09: start Sprint 9 ... |
@@ -176,6 +176,7 @@ Current tickets: `[##################--]` 143 of 151
 
 ## Recent activity
 
+- 2026-11-10 06:12 **S9-07** lead answer: Yes, resubmit with --override: 846 against 800 is the approved red plus a 23-line licence header, no cut needed. Name the override reason in the note.
 - 2026-11-10 06:10 **S9-07** engineer ask: Work is done but submit is refused on size: 846 changed lines against the 800 budget (red commit you approved is 653; green is knc/affinity.c 187 w...
 - 2026-11-10 06:00 **S9-07** lead approve-red: S9-07 red approved: host tests on synthetic sysfs and cpuinfo-only trees (whole card, 30-core mask, OS core only, explicit OMP_NUM_THREADS) fail 8/...
 - 2026-11-10 05:59 **S9-07** engineer red: Red a5722df: python tools/s9_07_checks.py host fails 8/8 on assertions (log .work/_state/logs/s9_07_host-20261110-055848.log): from sysfs the curre...
@@ -183,13 +184,12 @@ Current tickets: `[##################--]` 143 of 151
 - 2026-11-10 05:46 **S8-15** lead answer: (a). Add -fno-unroll-loops to the dg-options of those 7 T1 tests, with a one-line comment that each test pins the feature it was written for (gathe...
 - 2026-11-10 05:38 **S8-15** engineer ask: Green (GCC d6346c28b3a + shared hook 97e9f8c6e97): vector loops <=16 insns unroll 4x. Torture classes unchanged. 7 old T1 scans now fail on exact c...
 - 2026-11-10 05:37 **S9-06** engineer submit: Rebased on main; worktree 709e263, gcc-2 s9/S9-06 a7bcf6b5a0e on knc, built clean. s9_06_checks.py build PASS after rebase (26 programs, 30 files s...
-- 2026-11-10 05:31 **S9-06** lead answer: Done on main in 5f57593 (-ldl after -pthread in the s9_omp static link). Rebase and rerun build. libquadmath in LIBS stays (staging skips what the ...
 
 ## Cost
 
 - From the script, engineer: 349 sessions, 772.2M input tokens
 - From the script, lead: 233 sessions, 70.8M input tokens
-- Started by hand, Claude: 11 sessions, 2006.4M input tokens
+- Started by hand, Claude: 11 sessions, 2006.9M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
