@@ -178,7 +178,7 @@ Current tickets: `[###################-]` 154 of 159
 | S9-12 | libgomp adapts to the card: malloc arena cap from memory, core count and clock (ADR-0012) | Done | Measurement 7, 6 GiB RLIMIT_AS, 240 threads, 1 KiB pattern (2026-11-10, partial; job capped at 2 h after 23... |
 | S9-13 | User story - -mknc-card= picks the card model's tuning, and -mknc-card=native detects it | Done | -mknc-card=generic/3100/5100/7100/native picks a card model's prefetch distances (3100 and 5100 derived fro... |
 | S9-14 | card_run model profiles - run a job as a 3100, 5100 or 7100 card on our 7120P | Done | card_run --profile 3100/5100/7100/full runs a job as that card would (its compute cores and usable memory),... |
-| S9-15 | libgomp's KNC spin time before sleeping, measured against fork-heavy code | Not started | Lane gcc2 -> gcc: tree 1 is free while S8-21 uses tree 2. |
+| S9-15 | libgomp's KNC spin time before sleeping, measured against fork-heavy code | In progress | Lane gcc2 -> gcc: tree 1 is free while S8-21 uses tree 2. |
 | S9-16 | Card probes - unaligned scalar accesses, and the VPU cost of subnormal operands | Not started |  |
 | S9-17 | User guidance on the flags page - threads per core, first touch, regions, heap, and ICC differences | Not started |  |
 
@@ -197,7 +197,7 @@ Current tickets: `[###################-]` 154 of 159
 
 - From the script, engineer: 372 sessions, 810.9M input tokens
 - From the script, lead: 239 sessions, 72.0M input tokens
-- Started by hand, Claude: 11 sessions, 2134.1M input tokens
+- Started by hand, Claude: 11 sessions, 2134.8M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
