@@ -138,7 +138,9 @@ Started as Sprint 8 on 2026-11-08 (owner blanket approval; `docs/sprints/SPRINT-
 | E7-08 | Instrumented PGO on the card: libgcov for k1om, `-fprofile-update=atomic`, `.gcda` under `/tmp`; after the E6 runtimes. AutoFDO stays parked until `perf` sampling works on the card | Standard |
 | E7-05 | Milestone M4: corpus comparison against GCC 5.1.1, including held-out programs | Deep |
 
-## E8 Program corpus and release (M5–M6)
+## E8 Program corpus and release (M5–M6): dropped
+
+Owner, 2026-11-10: GCC-KNC is complete at M4; nothing here is scheduled. A corpus program M4 needs (for example E8-01) moves into M4.
 
 Full corpus builds; matched benchmarks; broader suites; packaging without restricted
 sysroot content; user manual and support matrix; update procedure.

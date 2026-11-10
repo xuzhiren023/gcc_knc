@@ -5,6 +5,7 @@ file holds what only a person or an agent can know. Replace lines when facts cha
 trust anything here that a quick command can check instead.
 
 Last updated: 2026-11-08. **Sprint 7 is closed (2026-11-08, GCC `knc` `497bbe8bedf0`):** shared libgcc_s and the first libgfortran slice pass on the card; S7-10 batch check: x86 identical, 0 ICE, execute suite 1,681/1,681. **Sprint 8 (tuning block, S8-02 to S8-12) is running**; S8-01's card checks are merged. Sprint 9 (libstdc++ S9-03 to S9-05, libgomp S9-06 to S9-10) is written and follows Sprint 8's gcc chain. M3 spans s7, s9, s10 (owner's overnight blanket approval). Sprint 5 is closed (GCC `knc` `ba973dc285b`; at that head the execute suite 1,680/1,680, `s4_masks`, `s5_ops` and all 14 S3-10 rows pass on the card, and x86 is identical). **Sprint 6 is closed and Milestone M2 accepted (2026-11-07, `docs/research/m2-result.md`):** at knc `57bec527e002` the L2 gain fraction is 0.731-0.818 (lower bound 0.733) and the worst GCC/x87 0.627.
+- **Scope (owner, 2026-11-10): GCC-KNC is complete at milestone M4** (broad optimization, Sprints 10-12). M5 (program corpus) and M6 (release) are dropped; `docs/PROJECT_PLAN.md` section 5.
 - S5-01 to S5-05 are merged: the research, ADR-0008 (amended with the card probes), the ADR-0003 amendment, `card_run` sharing and the lint fix.
 - S5-06 (permutes) is in the gcc lane; S5-09 (estimate probe) is running.
 - The `s5_ops` baseline passes on the card.
