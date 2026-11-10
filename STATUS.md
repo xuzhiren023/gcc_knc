@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-10 06:22.
+Updated automatically at every ticket change. Last update: 2026-11-10 06:23.
 
 **Next: GPT-6.1, on S8-15 (Small-loop unroll default and the GCC-KNC flags page (E5-09)).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
@@ -169,7 +169,7 @@ Current tickets: `[###################-]` 144 of 151
 | S9-05 | libstdc++ runtime slice on the card (E6-06c) | Done | A 56-program libstdc++ runtime slice (exceptions, threads, futures, filesystem, random_device, plus the KNC... |
 | S9-06 | libgomp for k1om: build, select, package and link guard (E6-03 A) | Done | OpenMP (-fopenmp) now links and builds against a KNC libgomp in the private prefix, which spins with DELAY ... |
 | S9-07 | libgomp KNC affinity defaults (E6-03 B) | Done | OpenMP programs on KNC now spread threads one per core over the 60 compute cores by default (OS core left o... |
-| S9-08 | libgomp spin-wait with delay and the one-core measurement (E6-03 C) | Not started | S9-06 already added config/linux/knc/futex.h (cpu_relax = DELAY gomp_knc_delay), mutex.c (gomp_knc_delay = ... |
+| S9-08 | libgomp spin-wait with delay and the one-core measurement (E6-03 C) | In progress | S9-06 already added config/linux/knc/futex.h (cpu_relax = DELAY gomp_knc_delay), mutex.c (gomp_knc_delay = ... |
 | S9-09 | libgomp hierarchical ring-aware barrier (E6-03 D) | Not started | Lane gcc -> gcc2: Sprint 9 runs on tree 2 while tree 1 finishes Sprint 8 (owner 2026-11-09: start Sprint 9 ... |
 | S9-10 | libgomp padding, static schedule default and malloc guidance (E6-03 E) | Not started | Lane gcc -> gcc2: Sprint 9 runs on tree 2 while tree 1 finishes Sprint 8 (owner 2026-11-09: start Sprint 9 ... |
 | S9-11 | Sprint 9 batch check | Not started | from S9-01's plan, under the owner's overnight blanket approval. |
@@ -189,10 +189,10 @@ Current tickets: `[###################-]` 144 of 151
 
 - From the script, engineer: 350 sessions, 772.4M input tokens
 - From the script, lead: 233 sessions, 70.8M input tokens
-- Started by hand, Claude: 11 sessions, 2009.9M input tokens
+- Started by hand, Claude: 11 sessions, 2010.6M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 22.5 GiB of 100 GiB. 109 GiB free on the drive.
+The project uses 22.5 GiB of 100 GiB. 108 GiB free on the drive.
