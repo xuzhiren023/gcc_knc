@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-10 04:36.
+Updated automatically at every ticket change. Last update: 2026-11-10 04:38.
 
-**Next: the tech lead, on S9-06.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: GPT-6.1, on S8-19 (-mtune=knc stops the tight-loop alignment pass (nops on the fallthrough path)).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
 Current tickets: `[##################--]` 141 of 151
 
@@ -167,7 +167,7 @@ Current tickets: `[##################--]` 141 of 151
 | S9-03 | libstdc++ and libatomic build for k1om (E6-06a) | Done | Card 2026-11-10 08:40Z (log .work/_shared/tmp/claude-s8-09.log): hello, rtti, thread, atomic16, tz and all ... |
 | S9-04 | libstdc++ packaging into the private prefix and a g++ link guard (E6-06b) | Done | Card 2026-11-10 08:42Z: both xdso pairs print PASS checks=5 with LD_LIBRARY_PATH=/usr/lib64, and the loader... |
 | S9-05 | libstdc++ runtime slice on the card (E6-06c) | Done | A 56-program libstdc++ runtime slice (exceptions, threads, futures, filesystem, random_device, plus the KNC... |
-| S9-06 | libgomp for k1om: build, select, package and link guard (E6-03 A) | Tests waiting for review | Red 03be94c: tools/s9_06_checks.py configure/build/guard all FAIL: configure.tgt picks posix for k1om and g... |
+| S9-06 | libgomp for k1om: build, select, package and link guard (E6-03 A) | In progress | S9-06's failing checks are accepted: they show that k1om libgomp is not selected, built, packaged or guarde... |
 | S9-07 | libgomp KNC affinity defaults (E6-03 B) | Not started | Lane gcc -> gcc2: Sprint 9 runs on tree 2 while tree 1 finishes Sprint 8 (owner 2026-11-09: start Sprint 9 ... |
 | S9-08 | libgomp spin-wait with delay and the one-core measurement (E6-03 C) | Not started | Lane gcc -> gcc2: Sprint 9 runs on tree 2 while tree 1 finishes Sprint 8 (owner 2026-11-09: start Sprint 9 ... |
 | S9-09 | libgomp hierarchical ring-aware barrier (E6-03 D) | Not started | Lane gcc -> gcc2: Sprint 9 runs on tree 2 while tree 1 finishes Sprint 8 (owner 2026-11-09: start Sprint 9 ... |
@@ -176,6 +176,7 @@ Current tickets: `[##################--]` 141 of 151
 
 ## Recent activity
 
+- 2026-11-10 04:38 **S9-06** lead approve-red: S9-06's failing checks are accepted: they show that k1om libgomp is not selected, built, packaged or guarded yet, and the card runner for 60 and 24...
 - 2026-11-10 04:36 **S9-06** engineer red: Red 03be94c: tools/s9_06_checks.py configure|build|guard all FAIL: configure.tgt picks posix for k1om and gcc-build-2 has no libgomp; the s9_omp pr...
 - 2026-11-10 04:24 **S9-05** lead approve: A 56-program libstdc++ runtime slice (exceptions, threads, futures, filesystem, random_device, plus the KNC deviations) is built and staged as one ...
 - 2026-11-10 04:12 **S9-05** lead amend: new_test_files 3 -> 4: random_token.cc was the lead request after the card hang.
@@ -183,7 +184,6 @@ Current tickets: `[##################--]` 141 of 151
 - 2026-11-10 04:03 **S9-04** lead note: Card 2026-11-10 08:42Z: both xdso pairs print PASS checks=5 with LD_LIBRARY_PATH=/usr/lib64, and the loader trace shows libstdc++.so.6 and libgcc_s...
 - 2026-11-10 04:03 **S9-03** lead note: Card 2026-11-10 08:40Z (log .work/_shared/tmp/claude-s8-09.log): hello, rtti, thread, atomic16, tz and all six xdso pairs (with donor) match, inclu...
 - 2026-11-10 04:03 **S8-09** lead note: Card 2026-11-10 08:36-08:40Z (frozen set .work/_shared/tmp/claude-s8-09, log .work/_shared/tmp/claude-s8-09.log): s4_masks o2/o2v/o3 and s5_ops o2/...
-- 2026-11-10 04:01 **S9-05** lead changes: Card 2026-11-10 08:44-09:00Z (lead copy .work/_shared/tmp/claude-s9-05, run.sh grep patched; log .work/_shared/tmp/claude-s9-05.out). (1) The batch...
 
 ## Cost
 
