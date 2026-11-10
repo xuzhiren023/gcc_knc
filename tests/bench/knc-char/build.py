@@ -32,8 +32,9 @@ def main():
         i = args.index('--out')
         OUT = SHARED / args[i+1]
         del args[i:i+2]
-    from kernels import emit
-    emit(OUT)
+    if not args or args[0] != 'probes':
+        from kernels import emit
+        emit(OUT)
     # The gcc2 lane (KNC_GCC_SLOT=2) builds with its own tree (S8-10).
     ccdir = SHARED / ('gcc-build-2' if os.environ.get('KNC_GCC_SLOT') == '2' else 'gcc-build') / 'gcc'
     cc = [ccdir / 'xgcc', '-B' + str(ccdir) + '/', '--sysroot=' + str(TC / 'sysroot'),
@@ -41,6 +42,16 @@ def main():
           '-std=gnu11', '-Wall', '-Wextra', '-Werror', '-I' + str(OUT)]
     # Stop after a failed phase; a retry must name only the remaining phase.
     action = args[0] if args else 'all'
+    if action == 'probes':
+        # S9-16 C13/C14: standalone programs staged under .work/_shared/S9-16.
+        out = SHARED / 'S9-16'
+        out.mkdir(parents=True, exist_ok=True)
+        for name in ('c13', 'c14'):
+            run([*cc, '-S', HERE / f'{name}.c', '-o', out / f'{name}.s'])
+            run([*cc, out / f'{name}.s', '-pthread', '-o', out / f'{name}.mic'])
+            run([sys.executable, ROOT / 'tools/knc_lint', out / f'{name}.s', out / f'{name}.mic'])
+        print('PASS C13/C14 card build and lint (not executed)')
+        return 0
     if action in ('all', 'build'):
         run([*cc, '-S', HERE / 'driver.c', '-o', OUT / 'driver.s'])
         run([*cc, OUT / 'driver.s', OUT / 'kernels.s', '-pthread', '-lrt', '-o', OUT / 'knc-char.mic'])
@@ -55,7 +66,7 @@ def main():
         run([sys.executable, HERE / 'check_s8.py', OUT / 'knc-char-host.exe'])
         run([sys.executable, HERE / 'check_c12.py', OUT / 'knc-char-host.exe'])
     if action not in ('all', 'build', 'lint', 'host'):
-        raise ValueError('expected all, build, lint or host')
+        raise ValueError('expected all, build, lint, host or probes')
     return 0
 
 

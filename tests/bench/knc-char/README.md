@@ -1,5 +1,26 @@
 # S6-03 machine characterization
 
+## S9-16 C13 and C14 (lead jobs, not run by the engineer)
+
+`c13.c` and `c14.c` are standalone programs, not part of `knc-char.mic`. Build and lint with
+`python tools/run.py --name s9-16-probes --inputs tests/bench/knc-char -- python tests/bench/knc-char/build.py probes`
+(stages `c13.mic` and `c14.mic` under `.work/_shared/S9-16/`). Three jobs:
+
+```text
+python tools/card_run --benchmark --threads 1 --timeout 300 ../_shared/S9-16/c13.mic
+python tools/card_run --benchmark --threads 1 --timeout 120 ../_shared/S9-16/c14.mic --threads 1
+python tools/card_run --benchmark --threads 4 --timeout 120 ../_shared/S9-16/c14.mic --threads 4
+```
+
+- C13: `ld16/32/64`, `st16/32/64` (general registers), `fld32/64`, `fst32/64` (x87), at byte
+  offsets 0-63 from a 64-byte line and at `page-N` (N bytes before a 4 KiB page boundary). A row
+  is `fault sigN` or `none`, then `ok`/`WRONG` (bytes read or written), ticks per access and the
+  ratio to offset 0. It prints `eflags.ac` first. Exit 1 if any access faults or is wrong.
+- C14: `vaddps`, `vmulps`, `vfmadd231ps` with 0, 1 or 16 subnormal lanes in one operand and
+  normal results, and `mul.subout` whose results stay subnormal; ticks per instruction per thread
+  on core 0's siblings, slowest thread in brackets, ratio to 0 lanes. It prints the MXCSR DAZ and
+  FZ bits first.
+
 ## S8-07 vpmadd231d row (lead job, not run by the engineer)
 
 `vpmulld`, `vpmadd231d` and the pair `vpmulld_vpaddd` (unit is one dependent
