@@ -86,7 +86,7 @@ for name, checks in programs.items():
         if not broken and name != "runtime":
             # libgomp.a linked in; the other runtimes stay shared (the sysroot has no static glibc).
             prog = OUT / (stem + "-static.mic")
-            run([*drv, obj, (args.libdir / "libgomp.a").as_posix(), "-pthread", "-Wl,-rpath,$ORIGIN", "-o", prog])
+            run([*drv, obj, (args.libdir / "libgomp.a").as_posix(), "-pthread", "-ldl", "-Wl,-rpath,$ORIGIN", "-o", prog])
             runs.append("%s %s %s" % (prog.name, ",".join(LIBS[1:]), expect(name, checks, False)))
         obj.unlink()
 if args.host:
