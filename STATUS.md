@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-10 11:07.
+Updated automatically at every ticket change. Last update: 2026-11-10 11:08.
 
-**Next: the tech lead, on S9-14.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: the tech lead, on S8-16.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[###################-]` 149 of 154
 
@@ -158,7 +158,7 @@ Current tickets: `[###################-]` 149 of 154
 | S8-13 | Streaming stores for write-only loops beyond L2 (E5-08) | Done | Loops that write arrays too large for the cache now use streaming stores: about 30% faster beyond L2 on the... |
 | S8-14 | Default 64-byte data alignment and TLB-aware cache parameters (E5-13) | Done | Card 2026-11-10 (deferred timing, frozen 3516ea25905 vs S8-13): s4_masks o2v/o3 pass, guard controls exit 3... |
 | S8-15 | Small-loop unroll default and the GCC-KNC flags page (E5-09) | Done | Card 2026-11-10 14:35Z: correctness passes (s4/s5 PASS, s5 neg 1, M2 negative 1 / positive 0). Timing in pr... |
-| S8-16 | User story - one bold flag, -mphinix, with a rising-phoenix banner and a progress bar | In progress | Owner standing rule (2026-11-09, reconfirmed in chat 2026-11-10): the lead adds sessions unless two extensi... |
+| S8-16 | User story - one bold flag, -mphinix, with a rising-phoenix banner and a progress bar | Waiting for review | -mphinix expands (linux-k1om.h self spec) to -O3 plus measured knc defaults, no fast-math, rejected on x86;... |
 | S8-17 | Card check C12 - power by rail for a saturated vector unit against x87, idle and streaming | Done | Card check C12 is built and ready to run: it measures card power by rail (core, uncore, memory) while the v... |
 | S8-18 | Second GCC tree - a gcc2 lane with its own checkout and build, so two GCC tickets run in parallel | Done | Tools now support a second GCC tree: a lane gcc2 ticket builds in gcc-2/gcc-build-2 while a gcc ticket uses... |
 | S8-19 | -mtune=knc stops the tight-loop alignment pass (nops on the fallthrough path) | Done | Card 2026-11-10 11:28-12:03Z (frozen .work/_shared/tmp/claude-s8-19, log .work/_shared/tmp/claude-next.log)... |
@@ -179,6 +179,7 @@ Current tickets: `[###################-]` 149 of 154
 
 ## Recent activity
 
+- 2026-11-10 11:08 **S8-16** engineer submit: -mphinix expands (linux-k1om.h self spec) to -O3 plus measured knc defaults, no fast-math, rejected on x86; banner and bar on a terminal only, off ...
 - 2026-11-10 11:07 **S8-16** owner decide: Owner standing rule (2026-11-09, reconfirmed in chat 2026-11-10): the lead adds sessions unless two extensions in a row make no progress. Sessions ...
 - 2026-11-10 11:07 **S8-16** lead amend: sessions budget 3 -> 4 under the owner standing rule (2026-11-09, reconfirmed in chat 2026-11-10): one session timed out; work is done, submit left.
 - 2026-11-10 10:46 **S8-16** engineer escalate: budget: 3 engineer sessions used; the budget is 3
@@ -186,13 +187,12 @@ Current tickets: `[###################-]` 149 of 154
 - 2026-11-10 10:45 **S8-16** engineer ask: Submit refused: 705 changed lines vs budget 500. All acceptance met (t1 --phinix PASS, T0/T1/T2 PASS, M2 pair staged at _shared/S8-16/m2paired). Si...
 - 2026-11-10 10:37 **S9-14** engineer submit: Fixed 7b64276: card_pin_test.c accepts 16384 MiB (exec reached, counters reset) and refuses 16385 before affinity; comment updated to owner 2026-11...
 - 2026-11-10 10:33 **S9-14** lead changes: 1. tests/tools/card_pin_test.c:72 still expects claude-pin to refuse 10241 MiB, but tools/claude-pin.c:42 now accepts up to 16384, so test_card_bac...
-- 2026-11-10 10:21 **S9-14** engineer submit: Red 4c4c005, green c63e4b3. tests/regress/test_card_profiles.py 3/3 OK; test_card_shared+test_card_run 54/54 OK (PM_ROLE unset; 10240 ceiling test ...
 
 ## Cost
 
 - From the script, engineer: 366 sessions, 802.6M input tokens
 - From the script, lead: 239 sessions, 72.0M input tokens
-- Started by hand, Claude: 11 sessions, 2064.3M input tokens
+- Started by hand, Claude: 11 sessions, 2066.5M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
