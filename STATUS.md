@@ -166,7 +166,7 @@ Current tickets: `[##################--]` 138 of 151
 | S9-02 | libstdc++ for KNC: exceptions, RTTI, atomics, threads, packaging (E6-06 input) | Done | We now know how to build GCC 16's C++ library for the card: no newer glibc or kernel is needed, and built w... |
 | S9-03 | libstdc++ and libatomic build for k1om (E6-06a) | Done | GCC-KNC now builds g++, libstdc++ and libatomic for k1om, with the donor's ABI kept (no donor symbol missin... |
 | S9-04 | libstdc++ packaging into the private prefix and a g++ link guard (E6-06b) | Not started | Lane gcc -> gcc2: Sprint 9 runs on tree 2 while tree 1 finishes Sprint 8 (owner 2026-11-09: start Sprint 9 ... |
-| S9-05 | libstdc++ runtime slice on the card (E6-06c) | Not started | Pre-check: build wiring, static linking, test programs and allowed files are now in the brief (lead pre-che... |
+| S9-05 | libstdc++ runtime slice on the card (E6-06c) | Not started | Lane gcc -> gcc2: Sprint 9 runs on tree 2 while tree 1 finishes Sprint 8 (owner 2026-11-09: start Sprint 9 ... |
 | S9-06 | libgomp for k1om: build, select, package and link guard (E6-03 A) | Not started | Pre-check: build wiring, static linking, test programs and allowed files are now in the brief (lead pre-che... |
 | S9-07 | libgomp KNC affinity defaults (E6-03 B) | Not started | Pre-check: build wiring, static linking, test programs and allowed files are now in the brief (lead pre-che... |
 | S9-08 | libgomp spin-wait with delay and the one-core measurement (E6-03 C) | Not started | Pre-check: build wiring, static linking, test programs and allowed files are now in the brief (lead pre-che... |
@@ -176,6 +176,7 @@ Current tickets: `[##################--]` 138 of 151
 
 ## Recent activity
 
+- 2026-11-10 01:05 **S9-05** lead note: Lane gcc -> gcc2: Sprint 9 runs on tree 2 while tree 1 finishes Sprint 8 (owner 2026-11-09: start Sprint 9 early).
 - 2026-11-10 01:05 **S9-04** lead note: Lane gcc -> gcc2: Sprint 9 runs on tree 2 while tree 1 finishes Sprint 8 (owner 2026-11-09: start Sprint 9 early).
 - 2026-11-10 01:04 **S8-15** lead note: Now also waits on S8-19: the tight-loop alignment pass pads small loops with one-byte nops that run on fallthrough, so unroll timings move with cod...
 - 2026-11-10 01:04 **S8-14** lead note: Card 2026-11-10 (deferred timing, frozen 3516ea25905 vs S8-13): s4_masks o2v/o3 pass, guard controls exit 3 (expected fault), s5_ops pass, neg fail...
@@ -183,7 +184,6 @@ Current tickets: `[##################--]` 138 of 151
 - 2026-11-10 01:03 **S9-03** lead approve: GCC-KNC now builds g++, libstdc++ and libatomic for k1om, with the donor's ABI kept (no donor symbol missing or resized) and a k1om ABI baseline; t...
 - 2026-11-10 00:53 **S8-09** engineer submit: Green gcc 16bc28c465c (i386-knc.cc only): -march=knc -O2 uses -fvect-cost-model=cheap and -fversion-loops-for-strides; pcom stays -O3. Corpus -O2 1...
 - 2026-11-10 00:41 **S9-03** engineer submit: Target libraries rebuilt from empty with the rebased compiler (gcc-2 8ad3d5598b4 on knc ff4bf991c62), reinstalled to gcc-knc-16.2.0-2. Regenerated ...
-- 2026-11-10 00:11 **S9-03** lead answer: Yes, resubmit with --override: the 6,166 lines are the generated baseline_symbols.txt the ticket asks for; keep it in the same change. One thing fi...
 
 ## Cost
 
