@@ -1,10 +1,10 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-10 12:41.
+Updated automatically at every ticket change. Last update: 2026-11-10 12:49.
 
-**Next: the tech lead, on S9-14.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: GPT-6.1, on S8-11 (Sprint 8 batch check and paired M2 re-measure).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
-Current tickets: `[###################-]` 150 of 154
+Current tickets: `[###################-]` 151 of 154
 
 ## Milestones
 
@@ -13,7 +13,7 @@ Current tickets: `[###################-]` 150 of 154
 | M0 | Foundation | In progress | 17 of 17 tickets |
 | M1 | Mixed native code | Done | 43 of 43 tickets |
 | M2 | Useful vector target | Done | 51 of 51 tickets |
-| M3 | Runtimes | In progress | 21 of 24 tickets |
+| M3 | Runtimes | In progress | 22 of 24 tickets |
 | M4 | Broad optimization | Not started | Not planned in detail yet |
 | M5 | Program corpus | Not started | Not planned in detail yet |
 | M6 | Release | Not started | Not planned in detail yet |
@@ -175,10 +175,11 @@ Current tickets: `[###################-]` 150 of 154
 | S9-11 | Sprint 9 batch check | Not started | Set gomp_knc_delay default 32 -> 128 (knc/mutex.c; S9-08 card measurements 2026-11-10: 3 spinning siblings ... |
 | S9-12 | libgomp adapts to the card: malloc arena cap from memory, core count and clock (ADR-0012) | Done | Measurement 7, 6 GiB RLIMIT_AS, 240 threads, 1 KiB pattern (2026-11-10, partial; job capped at 2 h after 23... |
 | S9-13 | User story - -mknc-card= picks the card model's tuning, and -mknc-card=native detects it | Not started |  |
-| S9-14 | card_run model profiles - run a job as a 3100, 5100 or 7100 card on our 7120P | Waiting for review | Fixed 7b64276: card_pin_test.c accepts 16384 MiB (exec reached, counters reset) and refuses 16385 before af... |
+| S9-14 | card_run model profiles - run a job as a 3100, 5100 or 7100 card on our 7120P | Done | card_run --profile 3100/5100/7100/full runs a job as that card would (its compute cores and usable memory),... |
 
 ## Recent activity
 
+- 2026-11-10 12:49 **S9-14** lead approve: card_run --profile 3100|5100|7100|full runs a job as that card would (its compute cores and usable memory), and in our exclusive turns jobs may use...
 - 2026-11-10 12:41 **S8-16** lead approve: -mphinix is one flag for -O3 plus every measured -march=knc default (IEEE kept, any explicit option still wins), with a rising-phoenix banner and a...
 - 2026-11-10 11:57 **S9-12** lead note: Measurement 7, 6 GiB RLIMIT_AS, 240 threads, 1 KiB pattern (2026-11-10, partial; job capped at 2 h after 23 of 96 runs): derived cap (unset) 145.7-...
 - 2026-11-10 11:41 **S9-11** lead note: Set gomp_knc_delay default 32 -> 128 (knc/mutex.c; S9-08 card measurements 2026-11-10: 3 spinning siblings cost 6.8% at 32, 1.1% at 128; fork-join ...
@@ -186,7 +187,6 @@ Current tickets: `[###################-]` 150 of 154
 - 2026-11-10 11:37 **S9-08** lead note: Card 2026-11-10 measurements 1 and 3, three launches (log .work/_shared/tmp/claude-resume.log). One core, worker time vs alone: no hint with 1/2/3 ...
 - 2026-11-10 11:08 **S8-16** engineer submit: -mphinix expands (linux-k1om.h self spec) to -O3 plus measured knc defaults, no fast-math, rejected on x86; banner and bar on a terminal only, off ...
 - 2026-11-10 11:07 **S8-16** owner decide: Owner standing rule (2026-11-09, reconfirmed in chat 2026-11-10): the lead adds sessions unless two extensions in a row make no progress. Sessions ...
-- 2026-11-10 11:07 **S8-16** lead amend: sessions budget 3 -> 4 under the owner standing rule (2026-11-09, reconfirmed in chat 2026-11-10): one session timed out; work is done, submit left.
 
 ## Cost
 
