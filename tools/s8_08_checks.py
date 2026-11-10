@@ -5,7 +5,8 @@
 
 Builds and lints .work/_shared/S8-08/{s4_masks,s5_ops}/*.mic with the same
 variants as S8-02; the lead runs them on the card.  --align stages M2 A/A
-pairs under .work/_shared/S8-08/align-{none,16,32,64}.
+pairs under .work/_shared/S8-08/align-{none,16,32,64} (--align 64 restages
+one); --m2paired stages S8-08/m2paired, before = the knc S8-10/m2 objects.
 """
 import os
 from pathlib import Path
@@ -58,20 +59,30 @@ def acceptance():
 # pair links one kernels-gcc.s twice (gcc and gcc_before, renamed by the M2
 # build.py), so the copies differ only in address; the alignment whose ratios
 # stay within the 1.6% A/A bias removes the swing.  'none' is the -mtune=knc
-# default before S8-08 set 64 (functions 16, loops 0:0:8).
+# default before S8-08 set 64 (functions 16, loops 0:0:8).  64 is the S8-08
+# default, functions only: -falign-loops=64 has no max-skip and padded inner
+# loops (lead card 2026-11-10, mat8 1.106x).
 ALIGNS = ('none', '16', '32', '64')
 
 
-def align():
+def m2paired():
+    m2 = ROOT / 'tests/acceptance/m2_kernels'
+    run([sys.executable, m2 / 'build.py', '--out', 'S8-08/m2paired', '--before', 'S8-10/m2'])
+    print('M2 PAIR S8-08/m2paired/m2-kernels.mic (before = S8-10/m2 knc); card run pending lead',
+          flush=True)
+    return 0
+
+
+def align(values=ALIGNS):
     m2 = ROOT / 'tests/acceptance/m2_kernels'
     flags = ['-O2', '-std=gnu11', '-Wall', '-Wextra', '-Werror', '-ffp-contract=fast',
              '-DWITH_BEFORE', '-pthread']
     units = [('kernels-gcc', ['-DBUILD=gcc', '-ftree-vectorize']),
              ('kernels-x87', ['-DBUILD=x87', '-fno-tree-vectorize', '-fno-tree-slp-vectorize'])]
-    for value in ALIGNS:
+    for value in values:
         kernels = OUT / ('align-' + value + '-k')
         kernels.mkdir(parents=True, exist_ok=True)
-        extra = ([] if value == 'none' else
+        extra = ([] if value == 'none' else ['-falign-functions=64'] if value == '64' else
                  ['-falign-functions=' + value, '-falign-loops=' + value])
         for name, unit in units:
             run([*cc(), *flags, *extra, *unit, '-S', m2 / 'kernels.c', '-o', kernels / (name + '.s')])
@@ -121,7 +132,9 @@ def main():
     os.environ['PATH'] = ':'.join(str(TC / p) for p in
                                   ('cross/bin', 'cygwin/bin')) + ':' + os.environ['PATH']
     os.environ['LC_ALL'] = 'C'
-    return align() if sys.argv[1:] == ['--align'] else acceptance()
+    if sys.argv[1:2] == ['--align']:
+        return align(sys.argv[2:] or ALIGNS)
+    return m2paired() if sys.argv[1:] == ['--m2paired'] else acceptance()
 
 
 if __name__ == '__main__':
