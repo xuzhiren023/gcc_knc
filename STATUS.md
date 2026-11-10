@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-10 05:46.
+Updated automatically at every ticket change. Last update: 2026-11-10 05:47.
 
 **Next: GPT-6.1, on S8-15 (Small-loop unroll default and the GCC-KNC flags page (E5-09)).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
@@ -168,7 +168,7 @@ Current tickets: `[##################--]` 143 of 151
 | S9-04 | libstdc++ packaging into the private prefix and a g++ link guard (E6-06b) | Done | Card 2026-11-10 08:42Z: both xdso pairs print PASS checks=5 with LD_LIBRARY_PATH=/usr/lib64, and the loader... |
 | S9-05 | libstdc++ runtime slice on the card (E6-06c) | Done | A 56-program libstdc++ runtime slice (exceptions, threads, futures, filesystem, random_device, plus the KNC... |
 | S9-06 | libgomp for k1om: build, select, package and link guard (E6-03 A) | Done | OpenMP (-fopenmp) now links and builds against a KNC libgomp in the private prefix, which spins with DELAY ... |
-| S9-07 | libgomp KNC affinity defaults (E6-03 B) | Not started | Lane gcc -> gcc2: Sprint 9 runs on tree 2 while tree 1 finishes Sprint 8 (owner 2026-11-09: start Sprint 9 ... |
+| S9-07 | libgomp KNC affinity defaults (E6-03 B) | In progress | Lane gcc -> gcc2: Sprint 9 runs on tree 2 while tree 1 finishes Sprint 8 (owner 2026-11-09: start Sprint 9 ... |
 | S9-08 | libgomp spin-wait with delay and the one-core measurement (E6-03 C) | Not started | Lane gcc -> gcc2: Sprint 9 runs on tree 2 while tree 1 finishes Sprint 8 (owner 2026-11-09: start Sprint 9 ... |
 | S9-09 | libgomp hierarchical ring-aware barrier (E6-03 D) | Not started | Lane gcc -> gcc2: Sprint 9 runs on tree 2 while tree 1 finishes Sprint 8 (owner 2026-11-09: start Sprint 9 ... |
 | S9-10 | libgomp padding, static schedule default and malloc guidance (E6-03 E) | Not started | Lane gcc -> gcc2: Sprint 9 runs on tree 2 while tree 1 finishes Sprint 8 (owner 2026-11-09: start Sprint 9 ... |
@@ -189,7 +189,7 @@ Current tickets: `[##################--]` 143 of 151
 
 - From the script, engineer: 347 sessions, 767.9M input tokens
 - From the script, lead: 232 sessions, 70.5M input tokens
-- Started by hand, Claude: 11 sessions, 2005.8M input tokens
+- Started by hand, Claude: 11 sessions, 2006.4M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
