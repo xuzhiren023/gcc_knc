@@ -29,6 +29,8 @@ PACKED = re.compile(r'\bv(?:addn?|subr?|mul|div|max|min|sqrt|rcp(?:23)?|rsqrt(?:
 # Each entry supplies its CLI help and handlers for the tiers it selects.
 # Imports stay lazy so T0 and source-only selections need no probe modules.
 SELECTIONS = {
+    'phinix': ('S8-16 -mphinix expansion, banner and progress bar', {
+        't1': lambda runner: importlib.import_module('phinix').t1(runner)}),
     'o2_vect': ('S8-09 -march=knc -O2 vectorizer cost model and stride versioning', {
         't1': lambda runner: runner.t1_sources(runner.source_dir.glob('knc-o2-vect*.c'))}),
     'tune_align': ('S8-08 -mtune=knc aligns functions to 64 bytes', {
