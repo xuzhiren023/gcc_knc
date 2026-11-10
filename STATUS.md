@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-10 13:20.
+Updated automatically at every ticket change. Last update: 2026-11-10 14:50.
 
 **Next: GPT-6.1, on S8-11 (Sprint 8 batch check and paired M2 re-measure).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
@@ -191,12 +191,12 @@ Current tickets: `[###################-]` 152 of 155
 
 ## Cost
 
-- From the script, engineer: 368 sessions, 807.0M input tokens
+- From the script, engineer: 369 sessions, 807.0M input tokens
 - From the script, lead: 239 sessions, 72.0M input tokens
-- Started by hand, Claude: 11 sessions, 2103.5M input tokens
+- Started by hand, Claude: 11 sessions, 2107.2M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 22.7 GiB of 100 GiB. 120 GiB free on the drive.
+The project uses 22.7 GiB of 100 GiB. 117 GiB free on the drive.
