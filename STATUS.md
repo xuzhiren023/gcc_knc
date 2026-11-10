@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-10 11:41.
+Updated automatically at every ticket change. Last update: 2026-11-10 11:58.
 
 **Next: the tech lead, on S8-16.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
@@ -173,12 +173,13 @@ Current tickets: `[###################-]` 149 of 154
 | S9-09 | libgomp hierarchical ring-aware barrier (E6-03 D) | Done | Card 2026-11-10 14:47Z: every suite program and both 240-thread programs exit 136 (SIGFPE) with no output, ... |
 | S9-10 | libgomp padding, static schedule default and malloc guidance (E6-03 E) | Done | Card 2026-11-10 14:40Z: the eight OpenMP programs pass on the S9-06..S9-10 libgomp at 60 threads (6 GiB) an... |
 | S9-11 | Sprint 9 batch check | Not started | Set gomp_knc_delay default 32 -> 128 (knc/mutex.c; S9-08 card measurements 2026-11-10: 3 spinning siblings ... |
-| S9-12 | libgomp adapts to the card: malloc arena cap from memory, core count and clock (ADR-0012) | Done | Card 2026-11-10: the S9-06 programs at 240 threads under a 6 GiB RLIMIT_AS with no MALLOC_ARENA_MAX pass (s... |
+| S9-12 | libgomp adapts to the card: malloc arena cap from memory, core count and clock (ADR-0012) | Done | Measurement 7, 6 GiB RLIMIT_AS, 240 threads, 1 KiB pattern (2026-11-10, partial; job capped at 2 h after 23... |
 | S9-13 | User story - -mknc-card= picks the card model's tuning, and -mknc-card=native detects it | Not started |  |
 | S9-14 | card_run model profiles - run a job as a 3100, 5100 or 7100 card on our 7120P | Waiting for review | Fixed 7b64276: card_pin_test.c accepts 16384 MiB (exec reached, counters reset) and refuses 16385 before af... |
 
 ## Recent activity
 
+- 2026-11-10 11:57 **S9-12** lead note: Measurement 7, 6 GiB RLIMIT_AS, 240 threads, 1 KiB pattern (2026-11-10, partial; job capped at 2 h after 23 of 96 runs): derived cap (unset) 145.7-...
 - 2026-11-10 11:41 **S9-11** lead note: Set gomp_knc_delay default 32 -> 128 (knc/mutex.c; S9-08 card measurements 2026-11-10: 3 spinning siblings cost 6.8% at 32, 1.1% at 128; fork-join ...
 - 2026-11-10 11:39 **S9-12** lead note: Card 2026-11-10: the S9-06 programs at 240 threads under a 6 GiB RLIMIT_AS with no MALLOC_ARENA_MAX pass (s9-12 done exit=0): the derived cap fits....
 - 2026-11-10 11:37 **S9-08** lead note: Card 2026-11-10 measurements 1 and 3, three launches (log .work/_shared/tmp/claude-resume.log). One core, worker time vs alone: no hint with 1/2/3 ...
@@ -186,16 +187,15 @@ Current tickets: `[###################-]` 149 of 154
 - 2026-11-10 11:07 **S8-16** owner decide: Owner standing rule (2026-11-09, reconfirmed in chat 2026-11-10): the lead adds sessions unless two extensions in a row make no progress. Sessions ...
 - 2026-11-10 11:07 **S8-16** lead amend: sessions budget 3 -> 4 under the owner standing rule (2026-11-09, reconfirmed in chat 2026-11-10): one session timed out; work is done, submit left.
 - 2026-11-10 10:46 **S8-16** engineer escalate: budget: 3 engineer sessions used; the budget is 3
-- 2026-11-10 10:45 **S8-16** lead answer: Yes, resubmit with --override: the banner, bar and flag are one user story and the size is mostly the ASCII art and its tests. List the shared i386...
 
 ## Cost
 
 - From the script, engineer: 367 sessions, 803.1M input tokens
 - From the script, lead: 239 sessions, 72.0M input tokens
-- Started by hand, Claude: 11 sessions, 2071.8M input tokens
+- Started by hand, Claude: 11 sessions, 2076.8M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 22.7 GiB of 100 GiB. 100 GiB free on the drive.
+The project uses 22.7 GiB of 100 GiB. 121 GiB free on the drive.
