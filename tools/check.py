@@ -39,8 +39,9 @@ SELECTIONS = {
         't1': lambda runner: runner.t1_sources([runner.source_dir / 'knc-tune-prefix.c'])}),
     'tune_tight_loops': ('S8-19 -mtune=knc drops the unbounded tight-loop alignment', {
         't1': lambda runner: runner.t1_sources(runner.source_dir.glob('knc-tune-tight-loops*.c'))}),
-    'unroll_small': ('S8-15 -O2 -march=knc unrolls small vector loops 4 times', {
-        't1': lambda runner: runner.t1_sources([runner.source_dir / 'knc-unroll-small.c'])}),
+    'unroll_small': ('S8-15/S8-20 -O2 -march=knc unrolls small vector loops by thread density', {
+        't1': lambda runner: runner.t1_sources([runner.source_dir / 'knc-unroll-small.c',
+                                                runner.source_dir / 'knc-unroll-density1.c'])}),
     'storent': ('S8-13 no-read streaming stores for write-only loops beyond L2', {
         't1': lambda runner: importlib.import_module('storent').t1(runner),
         't2': lambda runner: importlib.import_module('storent').t2(runner)}),
