@@ -1,10 +1,10 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-10 18:15.
+Updated automatically at every ticket change. Last update: 2026-11-10 18:22.
 
 **Next: the tech lead, on S8-21.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
-Current tickets: `[###################-]` 156 of 159
+Current tickets: `[###################-]` 157 of 159
 
 ## Milestones
 
@@ -13,7 +13,7 @@ Current tickets: `[###################-]` 156 of 159
 | M0 | Foundation | In progress | 17 of 17 tickets |
 | M1 | Mixed native code | Done | 43 of 43 tickets |
 | M2 | Useful vector target | Done | 51 of 51 tickets |
-| M3 | Runtimes | In progress | 25 of 27 tickets |
+| M3 | Runtimes | In progress | 26 of 27 tickets |
 | M4 | Broad optimization | Not started | Not planned in detail yet |
 | M5 | Program corpus | Not started | Not planned in detail yet |
 | M6 | Release | Not started | Not planned in detail yet |
@@ -180,10 +180,11 @@ Current tickets: `[###################-]` 156 of 159
 | S9-14 | card_run model profiles - run a job as a 3100, 5100 or 7100 card on our 7120P | Done | card_run --profile 3100/5100/7100/full runs a job as that card would (its compute cores and usable memory),... |
 | S9-15 | libgomp's KNC spin time before sleeping, measured against fork-heavy code | Done | The OpenMP spin-time measurement (3, 30 and 200 ms before sleeping, against fork-heavy code with 1-100 ms g... |
 | S9-16 | Card probes - unaligned scalar accesses, and the VPU cost of subnormal operands | Done | Two card probes are built and ready for the lead to run: C13 tests whether unaligned scalar loads and store... |
-| S9-17 | User guidance on the flags page - threads per core, first touch, regions, heap, and ICC differences | Waiting for review | Added 'Writing fast code for KNC' to docs/gcc-knc-flags.md: threads per core, first touch/regions, heap, IC... |
+| S9-17 | User guidance on the flags page - threads per core, first touch, regions, heap, and ICC differences | Done | The flags page now has a 'Writing fast code for KNC' section: threads per core, first touch and region size... |
 
 ## Recent activity
 
+- 2026-11-10 18:22 **S9-17** lead approve: The flags page now has a 'Writing fast code for KNC' section: threads per core, first touch and region size, heap reuse with glibc's knobs, and how...
 - 2026-11-10 18:15 **S9-15** lead approve: The OpenMP spin-time measurement (3, 30 and 200 ms before sleeping, against fork-heavy code with 1-100 ms gaps) is staged for the card; the default...
 - 2026-11-10 18:08 **S9-11** lead note: Tool issues found 2026-11-10: tools/s9_08_checks.py host mode broken since S9-12 (card.h needs _GNU_SOURCE before the shim includes stdio.h; S9-15 ...
 - 2026-11-10 18:01 **S9-17** engineer submit: Added 'Writing fast code for KNC' to docs/gcc-knc-flags.md: threads per core, first touch/regions, heap, ICC differences, trademark line; each clai...
@@ -191,13 +192,12 @@ Current tickets: `[###################-]` 156 of 159
 - 2026-11-10 17:59 **S9-16** lead approve: Two card probes are built and ready for the lead to run: C13 tests whether unaligned scalar loads and stores fault or slow down on KNC, and C14 mea...
 - 2026-11-10 17:51 **S9-16** engineer submit: Staged and linted, not run on the card: .work/_shared/S9-16/c13.mic (unaligned GPR and x87 scalar ld/st, offsets 0-63 and page crossings; fault, by...
 - 2026-11-10 17:47 **S9-15** lead amend: Lane gcc2 -> gcc: tree 1 is free while S8-21 uses tree 2.
-- 2026-11-10 17:47 **S9-11** lead amend: deps add S9-15..S9-17 (best-practice review, owner 2026-11-10).
 
 ## Cost
 
 - From the script, engineer: 376 sessions, 813.1M input tokens
 - From the script, lead: 240 sessions, 72.1M input tokens
-- Started by hand, Claude: 11 sessions, 2144.2M input tokens
+- Started by hand, Claude: 11 sessions, 2146.8M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
