@@ -492,3 +492,23 @@ Answers the owner's question (2026-11-08):
   32 to 40 W, for 192 W on the card. The 160-180 W seen on real kernels is mostly memory and fixed
   power, not the vector unit.
 - No phase came near the card's 300 W rating; the highest sample was 198 W.
+
+### C13: unaligned scalar accesses (S9-16, not run yet)
+
+Binary `.work/_shared/S9-16/c13.mic` (`tests/bench/knc-char/c13.c`), one thread. 2-, 4- and 8-byte
+general register loads and stores and x87 `fld`/`fst` of float and double, at byte offsets 0-63
+from a 64-byte line and across a 4 KiB page boundary; fault or not, bytes right or not, ticks per
+access against offset 0. The lead adds the numbers after the card run.
+
+| Access | Faults | Wrong | Worst ratio, inside a line | Worst ratio, line crossing | Worst ratio, page crossing |
+|---|---|---|---:|---:|---:|
+
+### C14: VPU cost of subnormal operands (S9-16, not run yet)
+
+Binary `.work/_shared/S9-16/c14.mic` (`tests/bench/knc-char/c14.c`), core 0, 1 and 4 threads.
+Packed single `vaddps`, `vmulps`, `vfmadd231ps` with 0, 1 or 16 subnormal lanes in one operand and
+normal results; `mul.subout` keeps subnormal results. Ticks per instruction per thread; the lead
+adds the numbers after the card run.
+
+| Op | Subnormal lanes | 1 thread | 4 threads | Ratio to 0 lanes, 1 / 4 thr |
+|---|---:|---:|---:|---|
