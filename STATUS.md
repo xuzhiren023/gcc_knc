@@ -1,10 +1,10 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-10 17:46.
+Updated automatically at every ticket change. Last update: 2026-11-10 17:47.
 
 **Next: the tech lead, on S8-21.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
-Current tickets: `[###################-]` 154 of 156
+Current tickets: `[###################-]` 154 of 159
 
 ## Milestones
 
@@ -13,7 +13,7 @@ Current tickets: `[###################-]` 154 of 156
 | M0 | Foundation | In progress | 17 of 17 tickets |
 | M1 | Mixed native code | Done | 43 of 43 tickets |
 | M2 | Useful vector target | Done | 51 of 51 tickets |
-| M3 | Runtimes | In progress | 23 of 24 tickets |
+| M3 | Runtimes | In progress | 23 of 27 tickets |
 | M4 | Broad optimization | Not started | Not planned in detail yet |
 | M5 | Program corpus | Not started | Not planned in detail yet |
 | M6 | Release | Not started | Not planned in detail yet |
@@ -174,13 +174,17 @@ Current tickets: `[###################-]` 154 of 156
 | S9-08 | libgomp spin-wait with delay and the one-core measurement (E6-03 C) | Done | Card 2026-11-10 measurements 1 and 3, three launches (log .work/_shared/tmp/claude-resume.log). One core, w... |
 | S9-09 | libgomp hierarchical ring-aware barrier (E6-03 D) | Done | Card diagnosis 2026-11-10 ~12:10 EST (log .work/_shared/tmp/claude-diag.log): the same 34 suite programs pl... |
 | S9-10 | libgomp padding, static schedule default and malloc guidance (E6-03 E) | Done | Card 2026-11-10 14:40Z: the eight OpenMP programs pass on the S9-06..S9-10 libgomp at 60 threads (6 GiB) an... |
-| S9-11 | Sprint 9 batch check | Not started | From the 2026-11-10 card runs: (1) rerun the S9-09 suite on the final head; (2) make the S9-07 explicit-set... |
+| S9-11 | Sprint 9 batch check | Not started | deps add S9-15..S9-17 (best-practice review, owner 2026-11-10). |
 | S9-12 | libgomp adapts to the card: malloc arena cap from memory, core count and clock (ADR-0012) | Done | Measurement 7, 6 GiB RLIMIT_AS, 240 threads, 1 KiB pattern (2026-11-10, partial; job capped at 2 h after 23... |
 | S9-13 | User story - -mknc-card= picks the card model's tuning, and -mknc-card=native detects it | Done | -mknc-card=generic/3100/5100/7100/native picks a card model's prefetch distances (3100 and 5100 derived fro... |
 | S9-14 | card_run model profiles - run a job as a 3100, 5100 or 7100 card on our 7120P | Done | card_run --profile 3100/5100/7100/full runs a job as that card would (its compute cores and usable memory),... |
+| S9-15 | libgomp's KNC spin time before sleeping, measured against fork-heavy code | Not started |  |
+| S9-16 | Card probes - unaligned scalar accesses, and the VPU cost of subnormal operands | Not started |  |
+| S9-17 | User guidance on the flags page - threads per core, first touch, regions, heap, and ICC differences | Not started |  |
 
 ## Recent activity
 
+- 2026-11-10 17:47 **S9-11** lead amend: deps add S9-15..S9-17 (best-practice review, owner 2026-11-10).
 - 2026-11-10 17:46 **S8-21** engineer submit: GCC f3c34acd827 (prefetch.cc +25/-3): masked loads/stores now prefetched, never nontemporal. Red 48161f1a -> --prefetch 5/5; 16-float asm identical...
 - 2026-11-10 16:59 **S8-11** lead approve: Sprint 8's final compiler (knc fe7ed380f149) matches stock GCC 16.2 on x86 (1962/0 at -O2 and -O2 -mavx512f, run on the S9-13 tree that contains it...
 - 2026-11-10 16:51 **S9-13** lead approve: -mknc-card=generic|3100|5100|7100|native picks a card model's prefetch distances (3100 and 5100 derived from bandwidth per core, 7100 measured), na...
@@ -188,13 +192,12 @@ Current tickets: `[###################-]` 154 of 156
 - 2026-11-10 15:14 **S9-13** engineer submit: -mknc-card=MODEL/aliases/native in linux-k1om.h self spec + knc_card_spec (card /proc, MPSS /sys/class/mic, generic+note); -mphinix adds native. Fi...
 - 2026-11-10 13:20 **S8-11** lead amend: Lane lead -> gcc2: build and check the Sprint 8 head (knc) in tree 2 while S9-13 uses tree 1. Card parts (execute suite, paired M2, profiles 3100/5...
 - 2026-11-10 13:19 **S8-20** lead approve: The small-loop unroll now follows the thread density: streaming loops (one vector op per store) unroll 2 times at 1-2 threads per core and not at 3...
-- 2026-11-10 13:11 **S8-20** engineer submit: GCC 788255cd1b1: a stream (vector ops <= stores) unrolls 2x at knc-threads-per-core 1-2, 1x at 3-4; others keep 4. Cause with asm in that commit (a...
 
 ## Cost
 
 - From the script, engineer: 372 sessions, 810.9M input tokens
 - From the script, lead: 239 sessions, 72.0M input tokens
-- Started by hand, Claude: 11 sessions, 2132.9M input tokens
+- Started by hand, Claude: 11 sessions, 2133.5M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
