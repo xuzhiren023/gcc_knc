@@ -97,5 +97,6 @@ for mtag, mcc, ltag, lcc in pairs:
         run([*mcc, *flags("xdso"), *b, HERE / "xmain.cc", OUT / lib, "-Wl,-rpath,$ORIGIN", "-o", OUT / prog])
         # The newer libstdc++ must be the one loaded when either half is GCC 16.
         runs.append("%s %s,%s %s" % (prog, lib, libs_for(LIBS), expect("xdso", broken)))
-(OUT / "runs.txt").write_text("\n".join(runs) + "\n", encoding="utf8")
+# LF only: the card reads it with a shell, and a CR would end every expected line.
+(OUT / "runs.txt").write_bytes(("\n".join(runs) + "\n").encode("utf8"))
 print("\n".join(runs))

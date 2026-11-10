@@ -91,5 +91,6 @@ for name, checks in programs.items():
         obj.unlink()
 if args.host:
     sys.exit("host check failed: " + " ".join(bad) if bad else 0)
-(OUT / "runs.txt").write_text("\n".join(runs) + "\n", encoding="utf8")
+# LF only: the card reads it with a shell, and a CR would end every expected line.
+(OUT / "runs.txt").write_bytes(("\n".join(runs) + "\n").encode("utf8"))
 print("\n".join(runs))
