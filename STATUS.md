@@ -4,7 +4,7 @@ Updated automatically at every ticket change. Last update: 2026-11-10 12:49.
 
 **Next: GPT-6.1, on S8-11 (Sprint 8 batch check and paired M2 re-measure).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
-Current tickets: `[###################-]` 151 of 154
+Current tickets: `[###################-]` 151 of 155
 
 ## Milestones
 
@@ -157,11 +157,12 @@ Current tickets: `[###################-]` 151 of 154
 | S8-12 | Fix three weak S8-01 checks - C4 page offsets, C5 row aliasing, C9 memory chain | Done | The knc-char checks C4, C5 and C9 are fixed and rebuilt: C4 now walks every page offset, C5's eight arrays ... |
 | S8-13 | Streaming stores for write-only loops beyond L2 (E5-08) | Done | Loops that write arrays too large for the cache now use streaming stores: about 30% faster beyond L2 on the... |
 | S8-14 | Default 64-byte data alignment and TLB-aware cache parameters (E5-13) | Done | Card 2026-11-10 (deferred timing, frozen 3516ea25905 vs S8-13): s4_masks o2v/o3 pass, guard controls exit 3... |
-| S8-15 | Small-loop unroll default and the GCC-KNC flags page (E5-09) | Done | Card 2026-11-10 14:35Z: correctness passes (s4/s5 PASS, s5 neg 1, M2 negative 1 / positive 0). Timing in pr... |
+| S8-15 | Small-loop unroll default and the GCC-KNC flags page (E5-09) | Done | Card 2026-11-10 timing (M2 L2 vs knc, launch 1/2): at 1 thread/core mat16 0.787/0.788, stencil1 0.906/0.916... |
 | S8-16 | User story - one bold flag, -mphinix, with a rising-phoenix banner and a progress bar | Done | -mphinix is one flag for -O3 plus every measured -march=knc default (IEEE kept, any explicit option still w... |
 | S8-17 | Card check C12 - power by rail for a saturated vector unit against x87, idle and streaming | Done | Card check C12 is built and ready to run: it measures card power by rail (core, uncore, memory) while the v... |
 | S8-18 | Second GCC tree - a gcc2 lane with its own checkout and build, so two GCC tickets run in parallel | Done | Tools now support a second GCC tree: a lane gcc2 ticket builds in gcc-2/gcc-build-2 while a gcc ticket uses... |
 | S8-19 | -mtune=knc stops the tight-loop alignment pass (nops on the fallthrough path) | Done | Card 2026-11-10 11:28-12:03Z (frozen .work/_shared/tmp/claude-s8-19, log .work/_shared/tmp/claude-next.log)... |
+| S8-20 | The small-loop unroll costs affine_f64 3-7% at 4 threads per core - make it follow the thread density | Not started |  |
 | S9-01 | libgomp for KNC: futex, affinity, ring-aware barrier, spin-wait and malloc arenas (E6-03 input) | Done | We now have a build-and-design plan for GCC-KNC's own OpenMP runtime on the card: futex-based waits with de... |
 | S9-02 | libstdc++ for KNC: exceptions, RTTI, atomics, threads, packaging (E6-06 input) | Done | We now know how to build GCC 16's C++ library for the card: no newer glibc or kernel is needed, and built w... |
 | S9-03 | libstdc++ and libatomic build for k1om (E6-06a) | Done | Card 2026-11-10 08:40Z (log .work/_shared/tmp/claude-s8-09.log): hello, rtti, thread, atomic16, tz and all ... |
@@ -183,16 +184,16 @@ Current tickets: `[###################-]` 151 of 154
 - 2026-11-10 12:49 **S9-11** lead note: From the 2026-11-10 card runs: (1) rerun the S9-09 suite on the final head; (2) make the S9-07 explicit-setting jobs (OMP_PLACES, GOMP_CPU_AFFINITY...
 - 2026-11-10 12:49 **S9-09** lead note: Card diagnosis 2026-11-10 ~12:10 EST (log .work/_shared/tmp/claude-diag.log): the same 34 suite programs plus tasks and cancel at 240 threads all p...
 - 2026-11-10 12:49 **S9-07** lead note: Card 2026-11-10 ~12:15 EST, 30-core mask (cores 0-29, 120 CPUs): the KNC default jobs pass. Two explicit-setting jobs fail on runner expectations w...
+- 2026-11-10 12:49 **S8-15** lead note: Card 2026-11-10 timing (M2 L2 vs knc, launch 1/2): at 1 thread/core mat16 0.787/0.788, stencil1 0.906/0.916, affine_f64 0.936/0.980, affine_f32 0.9...
 - 2026-11-10 12:41 **S8-16** lead approve: -mphinix is one flag for -O3 plus every measured -march=knc default (IEEE kept, any explicit option still wins), with a rising-phoenix banner and a...
 - 2026-11-10 11:57 **S9-12** lead note: Measurement 7, 6 GiB RLIMIT_AS, 240 threads, 1 KiB pattern (2026-11-10, partial; job capped at 2 h after 23 of 96 runs): derived cap (unset) 145.7-...
 - 2026-11-10 11:41 **S9-11** lead note: Set gomp_knc_delay default 32 -> 128 (knc/mutex.c; S9-08 card measurements 2026-11-10: 3 spinning siblings cost 6.8% at 32, 1.1% at 128; fork-join ...
-- 2026-11-10 11:39 **S9-12** lead note: Card 2026-11-10: the S9-06 programs at 240 threads under a 6 GiB RLIMIT_AS with no MALLOC_ARENA_MAX pass (s9-12 done exit=0): the derived cap fits....
 
 ## Cost
 
 - From the script, engineer: 367 sessions, 803.1M input tokens
 - From the script, lead: 239 sessions, 72.0M input tokens
-- Started by hand, Claude: 11 sessions, 2092.2M input tokens
+- Started by hand, Claude: 11 sessions, 2092.7M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
