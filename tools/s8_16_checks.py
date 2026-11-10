@@ -29,6 +29,7 @@ def main():
                                   ('cross/bin', 'cygwin/bin')) + ':' + os.environ['PATH']
     os.environ['LC_ALL'] = 'C'
     out = s8.SHARED / 'S8-16'
+    out.mkdir(exist_ok=True)
     m2 = s8.ROOT / 'tests/acceptance/m2_kernels'
     s8.run([sys.executable, m2 / 'build.py', '--out', 'S8-16/m2-o2'])
     phinix = out / 'm2-phinix'
