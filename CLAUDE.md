@@ -18,3 +18,4 @@ in `docs/COLLABORATION.md`, and `AGENTS.md` holds the engineer rules.
 - Keep notes short. Send anything that is the owner's decision to the inbox with `pm.py escalate`.
 - Do not use the card directly. Never push.
 - This is a general-purpose compiler project, independent of PhiWeather and PhiChat. Their folders are read-only and are not requirements.
+- Vendor material (Intel documents, ISPC, SVML): follow ADR-0013. Intrinsics work is an inventory ticket first (facts and page references only), then implementation tickets that see only the inventory and the ISA manual. Keep the Intrinsics Guide XML out of git and out of engineers' hands; check new header text for verbatim runs before approving.

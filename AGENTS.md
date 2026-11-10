@@ -82,6 +82,23 @@ result. Report infrastructure failures as infrastructure failures.
 `tests/acceptance/`, `docs/adr/`, `harness/`, `.codex/`, `work/tickets/`, this file, or
 milestone criteria. Ask if you think one is wrong. Do not push or merge.
 
+## Third-party material
+
+ADR-0013 in short. It applies to intrinsics, math and any code that follows a vendor document.
+
+- Take only interface facts from Intel's documents: names, prototypes, constants, mask behaviour,
+  the instruction an intrinsic maps to, and instruction semantics. Write everything in your own
+  words and code.
+- Never paste Intel text, pseudo-code, tables, examples or header text into code, comments,
+  tests, tickets or commit messages.
+- Never open ICC headers (`zmmintrin.h`, `immintrin.h` from ICC), Intel SVML or `libimf`. Never
+  read the Intrinsics Guide XML, and do not read ISPC code unless your ticket says so.
+- Cite a source by reference (ISA manual section and page, ICC guide GUID), never by quotation.
+- Copy third-party code only when your ticket allows it. Keep its licence notice in its own file
+  (ADR-0011, ADR-0013 point 6).
+- Name Intel products only factually ("for the Intel® Xeon Phi™ x100 coprocessor"). Never
+  "official", "certified" or "Intel-approved".
+
 ## Compiler rules
 
 - KNC never sets `TARGET_AVX512F` or any SSE or AVX flag. Vector patterns go in `gcc/config/i386/imci.md`, conditioned on `TARGET_KNC`.
