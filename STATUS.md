@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-10 18:42.
+Updated automatically at every ticket change. Last update: 2026-11-10 18:43.
 
 **Next: GPT-6.1, on S8-22 (-mphinix is slower than -O2 on M2 kernels (mat16 12.9x, short 1.27x, mat8 1.13x) - find and fix).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
@@ -175,7 +175,7 @@ Current tickets: `[###################-]` 158 of 160
 | S9-08 | libgomp spin-wait with delay and the one-core measurement (E6-03 C) | Done | Card 2026-11-10 measurements 1 and 3, three launches (log .work/_shared/tmp/claude-resume.log). One core, w... |
 | S9-09 | libgomp hierarchical ring-aware barrier (E6-03 D) | Done | Card 2026-11-10: measurements 2/4/5: every hier run exits 136 (SIGFPE); flat runs. The measure binaries lin... |
 | S9-10 | libgomp padding, static schedule default and malloc guidance (E6-03 E) | Done | Card 2026-11-10 14:40Z: the eight OpenMP programs pass on the S9-06..S9-10 libgomp at 60 threads (6 GiB) an... |
-| S9-11 | Sprint 9 batch check | Not started | Tool issues found 2026-11-10: tools/s9_08_checks.py host mode broken since S9-12 (card.h needs _GNU_SOURCE ... |
+| S9-11 | Sprint 9 batch check | Not started | From the 21:00Z card run: rebuild S9-09 measure-hier/flat on the final head and rerun measurements 2/4/5 (t... |
 | S9-12 | libgomp adapts to the card: malloc arena cap from memory, core count and clock (ADR-0012) | Done | Measurement 7 cut down, 240 threads x 100000 1 KiB malloc/free, 2 reps (2026-11-10 22:xxZ): full profile (1... |
 | S9-13 | User story - -mknc-card= picks the card model's tuning, and -mknc-card=native detects it | Done | Card 2026-11-10, memory working set, density 4: -mknc-card=7100 vs knc: affine_f32 1.001, stencil1 1.003, m... |
 | S9-14 | card_run model profiles - run a job as a 3100, 5100 or 7100 card on our 7120P | Done | card_run --profile 3100/5100/7100/full runs a job as that card would (its compute cores and usable memory),... |
@@ -185,6 +185,7 @@ Current tickets: `[###################-]` 158 of 160
 
 ## Recent activity
 
+- 2026-11-10 18:43 **S9-11** lead note: From the 21:00Z card run: rebuild S9-09 measure-hier/flat on the final head and rerun measurements 2/4/5 (the S9-09-era builds crash with SIGFPE). ...
 - 2026-11-10 18:42 **S9-13** lead note: Card 2026-11-10, memory working set, density 4: -mknc-card=7100 vs knc: affine_f32 1.001, stencil1 1.003, mat16 1.027; 3100 (L2 distance 23) on the...
 - 2026-11-10 18:42 **S9-12** lead note: Measurement 7 cut down, 240 threads x 100000 1 KiB malloc/free, 2 reps (2026-11-10 22:xxZ): full profile (13 GiB): derived 64.0-67.0 s, 64 arenas 1...
 - 2026-11-10 18:42 **S9-09** lead note: Card 2026-11-10: measurements 2/4/5: every hier run exits 136 (SIGFPE); flat runs. The measure binaries link the S9-09-era libgomp.a statically (sa...
@@ -192,7 +193,6 @@ Current tickets: `[###################-]` 158 of 160
 - 2026-11-10 18:42 **S8-16** lead note: Card 2026-11-10: correctness passes. Timing vs -O2 at density 4: mat16 12.89/12.80 (exit 3 in launch 1), short 1.276/1.260, mat8 1.126/1.127, stenc...
 - 2026-11-10 18:22 **S9-17** lead approve: The flags page now has a 'Writing fast code for KNC' section: threads per core, first touch and region size, heap reuse with glibc's knobs, and how...
 - 2026-11-10 18:22 **S8-21** lead approve: The prefetch pass now sees masked loads and stores, so rows shorter than a vector (WRF 8-float rows) are prefetched (58 vprefetch in the column cas...
-- 2026-11-10 18:15 **S9-15** lead approve: The OpenMP spin-time measurement (3, 30 and 200 ms before sleeping, against fork-heavy code with 1-100 ms gaps) is staged for the card; the default...
 
 ## Cost
 
