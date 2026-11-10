@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-10 17:48.
+Updated automatically at every ticket change. Last update: 2026-11-10 17:51.
 
 **Next: the tech lead, on S8-21.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
@@ -179,11 +179,12 @@ Current tickets: `[###################-]` 154 of 159
 | S9-13 | User story - -mknc-card= picks the card model's tuning, and -mknc-card=native detects it | Done | -mknc-card=generic/3100/5100/7100/native picks a card model's prefetch distances (3100 and 5100 derived fro... |
 | S9-14 | card_run model profiles - run a job as a 3100, 5100 or 7100 card on our 7120P | Done | card_run --profile 3100/5100/7100/full runs a job as that card would (its compute cores and usable memory),... |
 | S9-15 | libgomp's KNC spin time before sleeping, measured against fork-heavy code | In progress | Lane gcc2 -> gcc: tree 1 is free while S8-21 uses tree 2. |
-| S9-16 | Card probes - unaligned scalar accesses, and the VPU cost of subnormal operands | In progress |  |
+| S9-16 | Card probes - unaligned scalar accesses, and the VPU cost of subnormal operands | Waiting for review | Staged and linted, not run on the card: .work/_shared/S9-16/c13.mic (unaligned GPR and x87 scalar ld/st, of... |
 | S9-17 | User guidance on the flags page - threads per core, first touch, regions, heap, and ICC differences | Not started |  |
 
 ## Recent activity
 
+- 2026-11-10 17:51 **S9-16** engineer submit: Staged and linted, not run on the card: .work/_shared/S9-16/c13.mic (unaligned GPR and x87 scalar ld/st, offsets 0-63 and page crossings; fault, by...
 - 2026-11-10 17:47 **S9-15** lead amend: Lane gcc2 -> gcc: tree 1 is free while S8-21 uses tree 2.
 - 2026-11-10 17:47 **S9-11** lead amend: deps add S9-15..S9-17 (best-practice review, owner 2026-11-10).
 - 2026-11-10 17:46 **S8-21** engineer submit: GCC f3c34acd827 (prefetch.cc +25/-3): masked loads/stores now prefetched, never nontemporal. Red 48161f1a -> --prefetch 5/5; 16-float asm identical...
@@ -191,7 +192,6 @@ Current tickets: `[###################-]` 154 of 159
 - 2026-11-10 16:51 **S9-13** lead approve: -mknc-card=generic|3100|5100|7100|native picks a card model's prefetch distances (3100 and 5100 derived from bandwidth per core, 7100 measured), na...
 - 2026-11-10 16:03 **S8-11** engineer submit: knc fe7ed380f149. Drill textual only (master 12 files/23 hunks; KNC bar.c needs master's barrier API), gcc-16 0. Shared i386 718/132: x86 not run (...
 - 2026-11-10 15:14 **S9-13** engineer submit: -mknc-card=MODEL/aliases/native in linux-k1om.h self spec + knc_card_spec (card /proc, MPSS /sys/class/mic, generic+note); -mphinix adds native. Fi...
-- 2026-11-10 13:20 **S8-11** lead amend: Lane lead -> gcc2: build and check the Sprint 8 head (knc) in tree 2 while S9-13 uses tree 1. Card parts (execute suite, paired M2, profiles 3100/5...
 
 ## Cost
 
