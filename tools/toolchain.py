@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Shared compiler maintenance (run builds through tools/run.py).
 
-gcc16: build the shared KNC C/Fortran compilers; do not build target libraries.
+gcc16: build the shared KNC C/C++/Fortran compilers; do not build target libraries.
 rebuild: configure the read-only shared donor, then all-gcc/install-gcc only.
          --install-only resumes installation from the completed shared build.
 sysroot: overlay a card-derived tree, if supplied, and restore development files.
@@ -20,6 +20,7 @@ import sys
 import tempfile
 import time
 
+import gcc_build
 import storage
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -70,7 +71,7 @@ def gcc16(args):
         '--with-sysroot=' + str(SYSROOT),
         '--with-as=' + str(TC / 'cross/bin/k1om-mpss-linux-as'),
         '--with-ld=' + str(TC / 'cross/bin/k1om-mpss-linux-ld'),
-        '--enable-languages=c,fortran', '--disable-bootstrap', '--disable-multilib',
+        *gcc_build.CONFIGURE_FLAGS, '--disable-bootstrap', '--disable-multilib',
         '--disable-nls', '--without-isl',
         '--disable-libssp', '--disable-libquadmath', '--disable-libquadmath-support',
         '--disable-libsanitizer', '--disable-libitm', '--disable-libcilkrts',
