@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-10 06:47.
+Updated automatically at every ticket change. Last update: 2026-11-10 06:48.
 
 **Next: the tech lead, on S8-15.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
@@ -170,7 +170,7 @@ Current tickets: `[###################-]` 145 of 151
 | S9-06 | libgomp for k1om: build, select, package and link guard (E6-03 A) | Done | OpenMP (-fopenmp) now links and builds against a KNC libgomp in the private prefix, which spins with DELAY ... |
 | S9-07 | libgomp KNC affinity defaults (E6-03 B) | Done | OpenMP programs on KNC now spread threads one per core over the 60 compute cores by default (OS core left o... |
 | S9-08 | libgomp spin-wait with delay and the one-core measurement (E6-03 C) | Done | KNC libgomp's spin wait can be tuned with GOMP_KNC_DELAY, the default spin count is 3 ms of DELAY periods, ... |
-| S9-09 | libgomp hierarchical ring-aware barrier (E6-03 D) | Not started | S9-07 did not add gomp_knc_ncores: its knc/affinity.c builds core places (gomp_places_list, one per core of... |
+| S9-09 | libgomp hierarchical ring-aware barrier (E6-03 D) | In progress | S9-07 did not add gomp_knc_ncores: its knc/affinity.c builds core places (gomp_places_list, one per core of... |
 | S9-10 | libgomp padding, static schedule default and malloc guidance (E6-03 E) | Not started | Lane gcc -> gcc2: Sprint 9 runs on tree 2 while tree 1 finishes Sprint 8 (owner 2026-11-09: start Sprint 9 ... |
 | S9-11 | Sprint 9 batch check | Not started | from S9-01's plan, under the owner's overnight blanket approval. |
 
@@ -189,7 +189,7 @@ Current tickets: `[###################-]` 145 of 151
 
 - From the script, engineer: 353 sessions, 777.1M input tokens
 - From the script, lead: 234 sessions, 70.9M input tokens
-- Started by hand, Claude: 11 sessions, 2014.1M input tokens
+- Started by hand, Claude: 11 sessions, 2014.4M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
