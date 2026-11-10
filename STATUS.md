@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-10 15:15.
+Updated automatically at every ticket change. Last update: 2026-11-10 16:03.
 
-**Next: the tech lead, on S9-13.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: the tech lead, on S8-11.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[###################-]` 152 of 155
 
@@ -153,7 +153,7 @@ Current tickets: `[###################-]` 152 of 155
 | S8-08 | -mtune=knc tune-flag audit (E5-12) | Done | Card 2026-11-10 05:14-06:02Z (deferred timing, frozen 020d107325d vs S8-10 knc, L2 d4, 2 launches): M2 corr... |
 | S8-09 | KNC -O2 defaults: vectorizer cost model, stride versioning, predictive commoning (E5-18) | Done | Card 2026-11-10 08:36-08:40Z (frozen set .work/_shared/tmp/claude-s8-09, log .work/_shared/tmp/claude-s8-09... |
 | S8-10 | Less ring traffic: 64-byte padding of per-thread data, and card check C11 (E5-16) | Done | Per-thread arrays and the OpenMP shared block now start on their own 64-byte line, and the C11 card check s... |
-| S8-11 | Sprint 8 batch check and paired M2 re-measure | In progress | Lane lead -> gcc2: build and check the Sprint 8 head (knc) in tree 2 while S9-13 uses tree 1. Card parts (e... |
+| S8-11 | Sprint 8 batch check and paired M2 re-measure | Waiting for review | knc fe7ed380f149. Drill textual only (master 12 files/23 hunks; KNC bar.c needs master's barrier API), gcc-... |
 | S8-12 | Fix three weak S8-01 checks - C4 page offsets, C5 row aliasing, C9 memory chain | Done | The knc-char checks C4, C5 and C9 are fixed and rebuilt: C4 now walks every page offset, C5's eight arrays ... |
 | S8-13 | Streaming stores for write-only loops beyond L2 (E5-08) | Done | Loops that write arrays too large for the cache now use streaming stores: about 30% faster beyond L2 on the... |
 | S8-14 | Default 64-byte data alignment and TLB-aware cache parameters (E5-13) | Done | Card 2026-11-10 (deferred timing, frozen 3516ea25905 vs S8-13): s4_masks o2v/o3 pass, guard controls exit 3... |
@@ -180,6 +180,7 @@ Current tickets: `[###################-]` 152 of 155
 
 ## Recent activity
 
+- 2026-11-10 16:03 **S8-11** engineer submit: knc fe7ed380f149. Drill textual only (master 12 files/23 hunks; KNC bar.c needs master's barrier API), gcc-16 0. Shared i386 718/132: x86 not run (...
 - 2026-11-10 15:14 **S9-13** engineer submit: -mknc-card=MODEL/aliases/native in linux-k1om.h self spec + knc_card_spec (card /proc, MPSS /sys/class/mic, generic+note); -mphinix adds native. Fi...
 - 2026-11-10 13:20 **S8-11** lead amend: Lane lead -> gcc2: build and check the Sprint 8 head (knc) in tree 2 while S9-13 uses tree 1. Card parts (execute suite, paired M2, profiles 3100/5...
 - 2026-11-10 13:19 **S8-20** lead approve: The small-loop unroll now follows the thread density: streaming loops (one vector op per store) unroll 2 times at 1-2 threads per core and not at 3...
@@ -187,16 +188,15 @@ Current tickets: `[###################-]` 152 of 155
 - 2026-11-10 12:50 **S9-13** lead amend: deps add S8-20: Sprint 8 fix first, and both change KNC tuning in i386-knc.cc.
 - 2026-11-10 12:50 **S8-11** lead amend: deps add S8-20 (S8-15 loses at 4 threads per core).
 - 2026-11-10 12:49 **S9-14** lead approve: card_run --profile 3100|5100|7100|full runs a job as that card would (its compute cores and usable memory), and in our exclusive turns jobs may use...
-- 2026-11-10 12:49 **S9-11** lead note: From the 2026-11-10 card runs: (1) rerun the S9-09 suite on the final head; (2) make the S9-07 explicit-setting jobs (OMP_PLACES, GOMP_CPU_AFFINITY...
 
 ## Cost
 
 - From the script, engineer: 371 sessions, 807.3M input tokens
 - From the script, lead: 239 sessions, 72.0M input tokens
-- Started by hand, Claude: 11 sessions, 2107.2M input tokens
+- Started by hand, Claude: 11 sessions, 2111.0M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 22.7 GiB of 100 GiB. 117 GiB free on the drive.
+The project uses 22.8 GiB of 100 GiB. 112 GiB free on the drive.
