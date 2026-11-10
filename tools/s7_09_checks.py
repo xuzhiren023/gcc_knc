@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 """S7-09 libgfortran isolation and packaging; invoke through tools/run.py.
 
-    python tools/s7_09_checks.py install    install the shared tree's compiler, libgcc and
-                                            libgfortran into the private prefix gcc-knc-<version>
+    python tools/s7_09_checks.py install    install the shared tree's compilers, libgcc,
+                                            libgfortran, libstdc++ and libatomic into the private
+                                            prefix gcc-knc-<version> (slot 2: gcc-knc-<version>-2)
     python tools/s7_09_checks.py links      static and shared card builds with the installed driver;
                                             link map, spec, module directory, SONAME, versions, rpath
     python tools/s7_09_checks.py negative   linking the donor's GCC 5 libgfortran (-L to its
@@ -25,12 +26,17 @@ import shutil
 import subprocess
 import sys
 
+import storage
+
 ROOT = Path(__file__).resolve().parents[1]
 SHARED = ROOT.parent / '_shared'
 TC = SHARED / 'toolchain'
-BUILD = SHARED / 'gcc-build'
-VERSION = (SHARED / 'gcc/gcc/BASE-VER').read_text().strip()
-PREFIX = SHARED / ('gcc-knc-' + VERSION)
+# This lane's GCC tree, build and prefix (S8-18); lane gcc's prefix has no suffix.
+SLOT = storage.gcc_slot()
+GCC_TREE, GCC_BUILD = storage.GCC_SLOTS[SLOT]
+BUILD = SHARED / GCC_BUILD
+VERSION = (SHARED / GCC_TREE / 'gcc/BASE-VER').read_text().strip()
+PREFIX = SHARED / ('gcc-knc-' + VERSION + ('' if SLOT == '1' else '-' + SLOT))
 GFORTRAN = PREFIX / 'bin/k1om-mpss-linux-gfortran'
 OUT = SHARED / 'S7-09'
 SRC = ROOT / 'tests/t2/s7-09/runtime.f90'
@@ -65,8 +71,10 @@ def install_mode():
     configured = re.search(r'^prefix = (\S+)$', (BUILD / 'Makefile').read_text(), re.M).group(1)
     stage = OUT / 'stage'
     shutil.rmtree(stage, ignore_errors=True)
+    # The prefix is replaced, so every library a build has must be in this list.
     rc, text = capture(['make', '-C', BUILD, 'install-gcc', 'install-target-libgcc',
-                        'install-target-libgfortran', 'DESTDIR=' + str(stage)], timeout=3600)
+                        'install-target-libgfortran', 'install-target-libstdc++-v3',
+                        'install-target-libatomic', 'DESTDIR=' + str(stage)], timeout=3600)
     if rc != 0:
         print('\n'.join(text.splitlines()[-15:]))
         print('FAIL make install exit %d' % rc)

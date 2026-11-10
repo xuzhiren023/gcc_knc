@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 """Build the configured shared GCC tree, optionally skipping a current clean tree.
 
-Run through tools/run.py. This does not install GCC, and configures only an empty slot 2 build
-(--slot 2 or KNC_GCC_SLOT=2), with slot 1's options.
+Run through tools/run.py. This does not install GCC. It reconfigures a build whose options lack
+CONFIGURE_FLAGS, and configures an empty slot 2 build (--slot 2 or KNC_GCC_SLOT=2) with slot 1's
+other options.
 Example: python tools/run.py --name gcc-build -- python tools/gcc_build.py --if-stale
 """
 import argparse
@@ -20,7 +21,12 @@ ROOT = Path(__file__).resolve().parents[1]
 PROJECT = ROOT.parent.parent if ROOT.parent.name == '.work' else ROOT
 SHARED = PROJECT / '.work/_shared'
 MAKE_ARGS = ['-j8', 'all-gcc', 'all-target-libgcc', 'all-target-libgfortran',
+             'all-target-libstdc++-v3', 'all-target-libatomic',
              'CFLAGS=-O2 -g1', 'CXXFLAGS=-O2 -g1']
+# S9-03: C++ and libstdc++ with the donor's generic C locale model, and tzdata built in because
+# the card sysroot has no zoneinfo (docs/research/knc-libstdcxx.md sections 1.4 and 2.2).
+CONFIGURE_FLAGS = ['--enable-languages=c,c++,fortran,lto', '--enable-clocale=generic',
+                   '--with-libstdcxx-zoneinfo=static']
 
 
 def read_stamp(path):
@@ -52,14 +58,35 @@ def mddeps_healthy(build):
             and 'config/i386/sse.md' in text)
 
 
-def configure_like_slot_one(repo, build):
-    """Configure an empty slot 2 build with the options slot 1's build was configured with (S8-18)."""
-    status = Path(storage.gcc_build_dir(PROJECT, '1')) / 'config.status'
+def configured_options(build):
+    """The configure options recorded in BUILD's config.status, or None if it records none."""
+    status = build / 'config.status'
     match = re.search(r'^ac_cs_config="(.*)"$', status.read_text(encoding='utf8', errors='replace'), re.M)
-    if not match:
-        raise OSError('no configure options in ' + str(status))
+    return shlex.split(match.group(1)) if match else None
+
+
+def configure(repo, build, slot):
+    """Configure BUILD unless its options already carry CONFIGURE_FLAGS; True if it configured.
+
+    An empty slot 2 build takes its other options from slot 1's build (S8-18)."""
+    configured = (build / 'config.status').is_file()
+    if not configured and storage.gcc_slot(slot) != '2':
+        return False
+    source = build if configured else Path(storage.gcc_build_dir(PROJECT, '1'))
+    options = configured_options(source)
+    if options is None:
+        if configured:
+            return False
+        raise OSError('no configure options in ' + str(source / 'config.status'))
+    replaced = {flag.split('=')[0] for flag in CONFIGURE_FLAGS}
+    wanted = [o for o in options if o.split('=')[0] not in replaced] + CONFIGURE_FLAGS
+    if configured and sorted(options) == sorted(wanted):
+        return False
     build.mkdir(parents=True, exist_ok=True)
-    command(['bash', repo / 'configure', *shlex.split(match.group(1))], build)
+    command(['bash', repo / 'configure', *wanted], build)
+    # The top level configures gcc only when gcc/Makefile is missing, and its languages changed.
+    (build / 'gcc/Makefile').unlink(missing_ok=True)
+    return True
 
 
 def command(argv, cwd):
@@ -84,10 +111,9 @@ def main(argv=None):
         tree = git(args.repo, 'rev-parse', 'HEAD^{tree}')
         clean = not git(args.repo, 'status', '--porcelain', '--untracked-files=all')
         stamp = read_stamp(stamp_path)
-        if storage.gcc_slot(args.slot) == '2' and not (args.build / 'config.status').is_file():
-            configure_like_slot_one(args.repo, args.build)
+        reconfigured = configure(args.repo, args.build, args.slot)
         healthy = mddeps_healthy(args.build)
-        if (args.if_stale and healthy and clean and stamp.get('clean') is True
+        if (args.if_stale and not reconfigured and healthy and clean and stamp.get('clean') is True
                 and stamp.get('tree') == tree and stamp.get('make_args') == MAKE_ARGS):
             print('SKIP shared GCC: clean tree ' + tree + ' already built at ' +
                   str(stamp.get('commit')))
