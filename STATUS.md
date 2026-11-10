@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-10 12:49.
+Updated automatically at every ticket change. Last update: 2026-11-10 12:50.
 
-**Next: GPT-6.1, on S8-11 (Sprint 8 batch check and paired M2 re-measure).** Run `python tools/dispatch.py`, or ask the tech lead to.
+**Next: GPT-6.1, on S8-20 (The small-loop unroll costs affine_f64 3-7% at 4 threads per core - make it follow the thread density).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
 Current tickets: `[###################-]` 151 of 155
 
@@ -153,7 +153,7 @@ Current tickets: `[###################-]` 151 of 155
 | S8-08 | -mtune=knc tune-flag audit (E5-12) | Done | Card 2026-11-10 05:14-06:02Z (deferred timing, frozen 020d107325d vs S8-10 knc, L2 d4, 2 launches): M2 corr... |
 | S8-09 | KNC -O2 defaults: vectorizer cost model, stride versioning, predictive commoning (E5-18) | Done | Card 2026-11-10 08:36-08:40Z (frozen set .work/_shared/tmp/claude-s8-09, log .work/_shared/tmp/claude-s8-09... |
 | S8-10 | Less ring traffic: 64-byte padding of per-thread data, and card check C11 (E5-16) | Done | Per-thread arrays and the OpenMP shared block now start on their own 64-byte line, and the C11 card check s... |
-| S8-11 | Sprint 8 batch check and paired M2 re-measure | Not started | deps add S9-14: run correctness and key timings under the 3100/5100/7100 profiles (owner 2026-11-10). |
+| S8-11 | Sprint 8 batch check and paired M2 re-measure | Not started | deps add S8-20 (S8-15 loses at 4 threads per core). |
 | S8-12 | Fix three weak S8-01 checks - C4 page offsets, C5 row aliasing, C9 memory chain | Done | The knc-char checks C4, C5 and C9 are fixed and rebuilt: C4 now walks every page offset, C5's eight arrays ... |
 | S8-13 | Streaming stores for write-only loops beyond L2 (E5-08) | Done | Loops that write arrays too large for the cache now use streaming stores: about 30% faster beyond L2 on the... |
 | S8-14 | Default 64-byte data alignment and TLB-aware cache parameters (E5-13) | Done | Card 2026-11-10 (deferred timing, frozen 3516ea25905 vs S8-13): s4_masks o2v/o3 pass, guard controls exit 3... |
@@ -180,6 +180,7 @@ Current tickets: `[###################-]` 151 of 155
 
 ## Recent activity
 
+- 2026-11-10 12:50 **S8-11** lead amend: deps add S8-20 (S8-15 loses at 4 threads per core).
 - 2026-11-10 12:49 **S9-14** lead approve: card_run --profile 3100|5100|7100|full runs a job as that card would (its compute cores and usable memory), and in our exclusive turns jobs may use...
 - 2026-11-10 12:49 **S9-11** lead note: From the 2026-11-10 card runs: (1) rerun the S9-09 suite on the final head; (2) make the S9-07 explicit-setting jobs (OMP_PLACES, GOMP_CPU_AFFINITY...
 - 2026-11-10 12:49 **S9-09** lead note: Card diagnosis 2026-11-10 ~12:10 EST (log .work/_shared/tmp/claude-diag.log): the same 34 suite programs plus tasks and cancel at 240 threads all p...
@@ -187,7 +188,6 @@ Current tickets: `[###################-]` 151 of 155
 - 2026-11-10 12:49 **S8-15** lead note: Card 2026-11-10 timing (M2 L2 vs knc, launch 1/2): at 1 thread/core mat16 0.787/0.788, stencil1 0.906/0.916, affine_f64 0.936/0.980, affine_f32 0.9...
 - 2026-11-10 12:41 **S8-16** lead approve: -mphinix is one flag for -O3 plus every measured -march=knc default (IEEE kept, any explicit option still wins), with a rising-phoenix banner and a...
 - 2026-11-10 11:57 **S9-12** lead note: Measurement 7, 6 GiB RLIMIT_AS, 240 threads, 1 KiB pattern (2026-11-10, partial; job capped at 2 h after 23 of 96 runs): derived cap (unset) 145.7-...
-- 2026-11-10 11:41 **S9-11** lead note: Set gomp_knc_delay default 32 -> 128 (knc/mutex.c; S9-08 card measurements 2026-11-10: 3 spinning siblings cost 6.8% at 32, 1.1% at 128; fork-join ...
 
 ## Cost
 
