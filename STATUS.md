@@ -1,10 +1,10 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-10 01:55.
+Updated automatically at every ticket change. Last update: 2026-11-10 04:38.
 
-**Next: GPT-6.1, on S9-04 (libstdc++ packaging into the private prefix and a g++ link guard (E6-06b)).** Run `python tools/dispatch.py`, or ask the tech lead to.
+**Next: GPT-6.1, on S8-19 (-mtune=knc stops the tight-loop alignment pass (nops on the fallthrough path)).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
-Current tickets: `[##################--]` 139 of 151
+Current tickets: `[##################--]` 141 of 151
 
 ## Milestones
 
@@ -13,7 +13,7 @@ Current tickets: `[##################--]` 139 of 151
 | M0 | Foundation | In progress | 17 of 17 tickets |
 | M1 | Mixed native code | Done | 43 of 43 tickets |
 | M2 | Useful vector target | Done | 51 of 51 tickets |
-| M3 | Runtimes | In progress | 13 of 21 tickets |
+| M3 | Runtimes | In progress | 15 of 21 tickets |
 | M4 | Broad optimization | Not started | Not planned in detail yet |
 | M5 | Program corpus | Not started | Not planned in detail yet |
 | M6 | Release | Not started | Not planned in detail yet |
@@ -151,7 +151,7 @@ Current tickets: `[##################--]` 139 of 151
 | S8-06 | Memory-operand forms for V16SF/V8DF arithmetic and FMA (E5-17) | Done | KNC vector add, sub, mul and FMA now read aligned memory and {1to16}/{1to8} broadcasts directly instead of ... |
 | S8-07 | vpmadd231d for V16SI multiply-add (E5-14) | Done | KNC now emits vpmadd231d for vector integer multiply-add: one instruction at 4 ticks latency instead of vpm... |
 | S8-08 | -mtune=knc tune-flag audit (E5-12) | Done | Card 2026-11-10 05:14-06:02Z (deferred timing, frozen 020d107325d vs S8-10 knc, L2 d4, 2 launches): M2 corr... |
-| S8-09 | KNC -O2 defaults: vectorizer cost model, stride versioning, predictive commoning (E5-18) | Done | -march=knc -O2 now vectorizes loops that need a runtime alias check, a masked epilogue or a runtime stride ... |
+| S8-09 | KNC -O2 defaults: vectorizer cost model, stride versioning, predictive commoning (E5-18) | Done | Card 2026-11-10 08:36-08:40Z (frozen set .work/_shared/tmp/claude-s8-09, log .work/_shared/tmp/claude-s8-09... |
 | S8-10 | Less ring traffic: 64-byte padding of per-thread data, and card check C11 (E5-16) | Done | Per-thread arrays and the OpenMP shared block now start on their own 64-byte line, and the C11 card check s... |
 | S8-11 | Sprint 8 batch check and paired M2 re-measure | Not started | add one compiler-prefetch card case, because S8-03's card run has no row kernel (C5's rows are hand-written... |
 | S8-12 | Fix three weak S8-01 checks - C4 page offsets, C5 row aliasing, C9 memory chain | Done | The knc-char checks C4, C5 and C9 are fixed and rebuilt: C4 now walks every page offset, C5's eight arrays ... |
@@ -161,13 +161,13 @@ Current tickets: `[##################--]` 139 of 151
 | S8-16 | User story - one bold flag, -mphinix, with a rising-phoenix banner and a progress bar | Not started | Owner 2026-11-09: Sprint 8 runs on without waiting for card timing; the lead approves on code review and ho... |
 | S8-17 | Card check C12 - power by rail for a saturated vector unit against x87, idle and streaming | Done | Card check C12 is built and ready to run: it measures card power by rail (core, uncore, memory) while the v... |
 | S8-18 | Second GCC tree - a gcc2 lane with its own checkout and build, so two GCC tickets run in parallel | Done | Tools now support a second GCC tree: a lane gcc2 ticket builds in gcc-2/gcc-build-2 while a gcc ticket uses... |
-| S8-19 | -mtune=knc stops the tight-loop alignment pass (nops on the fallthrough path) | Not started | written by the lead from the S8-08 card result; S8-15 now waits on it, |
+| S8-19 | -mtune=knc stops the tight-loop alignment pass (nops on the fallthrough path) | In progress | written by the lead from the S8-08 card result; S8-15 now waits on it, |
 | S9-01 | libgomp for KNC: futex, affinity, ring-aware barrier, spin-wait and malloc arenas (E6-03 input) | Done | We now have a build-and-design plan for GCC-KNC's own OpenMP runtime on the card: futex-based waits with de... |
 | S9-02 | libstdc++ for KNC: exceptions, RTTI, atomics, threads, packaging (E6-06 input) | Done | We now know how to build GCC 16's C++ library for the card: no newer glibc or kernel is needed, and built w... |
-| S9-03 | libstdc++ and libatomic build for k1om (E6-06a) | Done | GCC-KNC now builds g++, libstdc++ and libatomic for k1om, with the donor's ABI kept (no donor symbol missin... |
-| S9-04 | libstdc++ packaging into the private prefix and a g++ link guard (E6-06b) | In progress | Lane gcc -> gcc2: Sprint 9 runs on tree 2 while tree 1 finishes Sprint 8 (owner 2026-11-09: start Sprint 9 ... |
-| S9-05 | libstdc++ runtime slice on the card (E6-06c) | Not started | Lane gcc -> gcc2: Sprint 9 runs on tree 2 while tree 1 finishes Sprint 8 (owner 2026-11-09: start Sprint 9 ... |
-| S9-06 | libgomp for k1om: build, select, package and link guard (E6-03 A) | Not started | Lane gcc -> gcc2: Sprint 9 runs on tree 2 while tree 1 finishes Sprint 8 (owner 2026-11-09: start Sprint 9 ... |
+| S9-03 | libstdc++ and libatomic build for k1om (E6-06a) | Done | Card 2026-11-10 08:40Z (log .work/_shared/tmp/claude-s8-09.log): hello, rtti, thread, atomic16, tz and all ... |
+| S9-04 | libstdc++ packaging into the private prefix and a g++ link guard (E6-06b) | Done | Card 2026-11-10 08:42Z: both xdso pairs print PASS checks=5 with LD_LIBRARY_PATH=/usr/lib64, and the loader... |
+| S9-05 | libstdc++ runtime slice on the card (E6-06c) | Done | A 56-program libstdc++ runtime slice (exceptions, threads, futures, filesystem, random_device, plus the KNC... |
+| S9-06 | libgomp for k1om: build, select, package and link guard (E6-03 A) | In progress | S9-06's failing checks are accepted: they show that k1om libgomp is not selected, built, packaged or guarde... |
 | S9-07 | libgomp KNC affinity defaults (E6-03 B) | Not started | Lane gcc -> gcc2: Sprint 9 runs on tree 2 while tree 1 finishes Sprint 8 (owner 2026-11-09: start Sprint 9 ... |
 | S9-08 | libgomp spin-wait with delay and the one-core measurement (E6-03 C) | Not started | Lane gcc -> gcc2: Sprint 9 runs on tree 2 while tree 1 finishes Sprint 8 (owner 2026-11-09: start Sprint 9 ... |
 | S9-09 | libgomp hierarchical ring-aware barrier (E6-03 D) | Not started | Lane gcc -> gcc2: Sprint 9 runs on tree 2 while tree 1 finishes Sprint 8 (owner 2026-11-09: start Sprint 9 ... |
@@ -176,23 +176,23 @@ Current tickets: `[##################--]` 139 of 151
 
 ## Recent activity
 
-- 2026-11-10 01:55 **S8-09** lead approve: -march=knc -O2 now vectorizes loops that need a runtime alias check, a masked epilogue or a runtime stride (corpus loops vectorized at -O2: 17 -> 6...
-- 2026-11-10 01:44 **S8-09** lead note: Lead review: 16bc28c465c read (one KNC-only hunk; -O2 and up, not -Os; user flags win). Corpus 17 -> 64, M2 asm identical, so the paired timing is ...
-- 2026-11-10 01:06 **S9-10** lead note: Lane gcc -> gcc2: Sprint 9 runs on tree 2 while tree 1 finishes Sprint 8 (owner 2026-11-09: start Sprint 9 early).
-- 2026-11-10 01:06 **S9-09** lead note: Lane gcc -> gcc2: Sprint 9 runs on tree 2 while tree 1 finishes Sprint 8 (owner 2026-11-09: start Sprint 9 early).
-- 2026-11-10 01:06 **S9-08** lead note: Lane gcc -> gcc2: Sprint 9 runs on tree 2 while tree 1 finishes Sprint 8 (owner 2026-11-09: start Sprint 9 early).
-- 2026-11-10 01:05 **S9-07** lead note: Lane gcc -> gcc2: Sprint 9 runs on tree 2 while tree 1 finishes Sprint 8 (owner 2026-11-09: start Sprint 9 early).
-- 2026-11-10 01:05 **S9-06** lead note: Lane gcc -> gcc2: Sprint 9 runs on tree 2 while tree 1 finishes Sprint 8 (owner 2026-11-09: start Sprint 9 early).
-- 2026-11-10 01:05 **S9-05** lead note: Lane gcc -> gcc2: Sprint 9 runs on tree 2 while tree 1 finishes Sprint 8 (owner 2026-11-09: start Sprint 9 early).
+- 2026-11-10 04:38 **S9-06** lead approve-red: S9-06's failing checks are accepted: they show that k1om libgomp is not selected, built, packaged or guarded yet, and the card runner for 60 and 24...
+- 2026-11-10 04:36 **S9-06** engineer red: Red 03be94c: tools/s9_06_checks.py configure|build|guard all FAIL: configure.tgt picks posix for k1om and gcc-build-2 has no libgomp; the s9_omp pr...
+- 2026-11-10 04:24 **S9-05** lead approve: A 56-program libstdc++ runtime slice (exceptions, threads, futures, filesystem, random_device, plus the KNC deviations) is built and staged as one ...
+- 2026-11-10 04:12 **S9-05** lead amend: new_test_files 3 -> 4: random_token.cc was the lead request after the card hang.
+- 2026-11-10 04:10 **S9-05** engineer submit: Rebased on main (eh fixture). run.sh: 60 s watcher per program (RESULT ... exit=timeout), exact match by sh read loop, no grep -x; watcher checked ...
+- 2026-11-10 04:03 **S9-04** lead note: Card 2026-11-10 08:42Z: both xdso pairs print PASS checks=5 with LD_LIBRARY_PATH=/usr/lib64, and the loader trace shows libstdc++.so.6 and libgcc_s...
+- 2026-11-10 04:03 **S9-03** lead note: Card 2026-11-10 08:40Z (log .work/_shared/tmp/claude-s8-09.log): hello, rtti, thread, atomic16, tz and all six xdso pairs (with donor) match, inclu...
+- 2026-11-10 04:03 **S8-09** lead note: Card 2026-11-10 08:36-08:40Z (frozen set .work/_shared/tmp/claude-s8-09, log .work/_shared/tmp/claude-s8-09.log): s4_masks o2/o2v/o3 and s5_ops o2/...
 
 ## Cost
 
-- From the script, engineer: 337 sessions, 758.9M input tokens
-- From the script, lead: 230 sessions, 70.2M input tokens
-- Started by hand, Claude: 11 sessions, 1988.8M input tokens
+- From the script, engineer: 343 sessions, 764.3M input tokens
+- From the script, lead: 231 sessions, 70.4M input tokens
+- Started by hand, Claude: 11 sessions, 2000.6M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 21.0 GiB of 100 GiB. 99 GiB free on the drive.
+The project uses 22.4 GiB of 100 GiB. 99 GiB free on the drive.
