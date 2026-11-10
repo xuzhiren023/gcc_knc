@@ -36,6 +36,8 @@ SELECTIONS = {
     'storent': ('S8-13 no-read streaming stores for write-only loops beyond L2', {
         't1': lambda runner: importlib.import_module('storent').t1(runner),
         't2': lambda runner: importlib.import_module('storent').t2(runner)}),
+    'align_data': ('S8-14 64-byte data alignment and KNC cache parameters', {
+        't1': lambda runner: runner.t1_sources(runner.source_dir.glob('knc-align-*.c'))}),
     'line_pad': ('S8-10 64-byte lines for OpenMP shared blocks and per-thread arrays', {
         't1': lambda runner: runner.t1_sources(runner.source_dir.glob('knc-pad-*.c'))}),
     'int_madd': ('S8-07 V16SI multiply-add as vpmadd231d', {
