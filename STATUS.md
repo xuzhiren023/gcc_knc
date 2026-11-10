@@ -165,7 +165,7 @@ Current tickets: `[##################--]` 140 of 151
 | S9-01 | libgomp for KNC: futex, affinity, ring-aware barrier, spin-wait and malloc arenas (E6-03 input) | Done | We now have a build-and-design plan for GCC-KNC's own OpenMP runtime on the card: futex-based waits with de... |
 | S9-02 | libstdc++ for KNC: exceptions, RTTI, atomics, threads, packaging (E6-06 input) | Done | We now know how to build GCC 16's C++ library for the card: no newer glibc or kernel is needed, and built w... |
 | S9-03 | libstdc++ and libatomic build for k1om (E6-06a) | Done | Card 2026-11-10 08:40Z (log .work/_shared/tmp/claude-s8-09.log): hello, rtti, thread, atomic16, tz and all ... |
-| S9-04 | libstdc++ packaging into the private prefix and a g++ link guard (E6-06b) | Done | g++ for KNC now refuses to link against an older libstdc++ (such as the card's GCC 5 one) with a clear mess... |
+| S9-04 | libstdc++ packaging into the private prefix and a g++ link guard (E6-06b) | Done | Card 2026-11-10 08:42Z: both xdso pairs print PASS checks=5 with LD_LIBRARY_PATH=/usr/lib64, and the loader... |
 | S9-05 | libstdc++ runtime slice on the card (E6-06c) | Changes requested | Card 2026-11-10 08:44-09:00Z (lead copy .work/_shared/tmp/claude-s9-05, run.sh grep patched; log .work/_sha... |
 | S9-06 | libgomp for k1om: build, select, package and link guard (E6-03 A) | Not started | Lane gcc -> gcc2: Sprint 9 runs on tree 2 while tree 1 finishes Sprint 8 (owner 2026-11-09: start Sprint 9 ... |
 | S9-07 | libgomp KNC affinity defaults (E6-03 B) | Not started | Lane gcc -> gcc2: Sprint 9 runs on tree 2 while tree 1 finishes Sprint 8 (owner 2026-11-09: start Sprint 9 ... |
@@ -176,6 +176,7 @@ Current tickets: `[##################--]` 140 of 151
 
 ## Recent activity
 
+- 2026-11-10 04:03 **S9-04** lead note: Card 2026-11-10 08:42Z: both xdso pairs print PASS checks=5 with LD_LIBRARY_PATH=/usr/lib64, and the loader trace shows libstdc++.so.6 and libgcc_s...
 - 2026-11-10 04:03 **S9-03** lead note: Card 2026-11-10 08:40Z (log .work/_shared/tmp/claude-s8-09.log): hello, rtti, thread, atomic16, tz and all six xdso pairs (with donor) match, inclu...
 - 2026-11-10 04:03 **S8-09** lead note: Card 2026-11-10 08:36-08:40Z (frozen set .work/_shared/tmp/claude-s8-09, log .work/_shared/tmp/claude-s8-09.log): s4_masks o2/o2v/o3 and s5_ops o2/...
 - 2026-11-10 04:01 **S9-05** lead changes: Card 2026-11-10 08:44-09:00Z (lead copy .work/_shared/tmp/claude-s9-05, run.sh grep patched; log .work/_shared/tmp/claude-s9-05.out). (1) The batch...
@@ -183,7 +184,6 @@ Current tickets: `[##################--]` 140 of 151
 - 2026-11-10 03:33 **S9-05** lead note: S9-04 installs the g++ link guard scripts (libstdc++-knc{,-static}.ld) only in the prefix k1om-mpss-linux/lib64, and g++ names one before every -ls...
 - 2026-11-10 03:32 **S9-04** lead approve: g++ for KNC now refuses to link against an older libstdc++ (such as the card's GCC 5 one) with a clear message, and the prefix ships libstdc++.so.6...
 - 2026-11-10 03:22 **S9-04** engineer submit: GCC s9/S9-04 5b14957e998: hook LIBSTDCXX_RUNTIME_GUARD{,_STATIC} (linux-k1om.h) in g++spec.cc names -l:libstdc++-knc{,-static}.ld before -lstdc++. ...
-- 2026-11-10 01:55 **S8-09** lead approve: -march=knc -O2 now vectorizes loops that need a runtime alias check, a masked epilogue or a runtime stride (corpus loops vectorized at -O2: 17 -> 6...
 
 ## Cost
 
@@ -195,4 +195,4 @@ Current tickets: `[##################--]` 140 of 151
 
 ## Disk
 
-The project uses 22.5 GiB of 100 GiB. 92 GiB free on the drive.
+The project uses 22.4 GiB of 100 GiB. 92 GiB free on the drive.
