@@ -169,13 +169,14 @@ Current tickets: `[###################-]` 144 of 151
 | S9-05 | libstdc++ runtime slice on the card (E6-06c) | Done | A 56-program libstdc++ runtime slice (exceptions, threads, futures, filesystem, random_device, plus the KNC... |
 | S9-06 | libgomp for k1om: build, select, package and link guard (E6-03 A) | Done | OpenMP (-fopenmp) now links and builds against a KNC libgomp in the private prefix, which spins with DELAY ... |
 | S9-07 | libgomp KNC affinity defaults (E6-03 B) | Done | OpenMP programs on KNC now spread threads one per core over the 60 compute cores by default (OS core left o... |
-| S9-08 | libgomp spin-wait with delay and the one-core measurement (E6-03 C) | Not started | Lane gcc -> gcc2: Sprint 9 runs on tree 2 while tree 1 finishes Sprint 8 (owner 2026-11-09: start Sprint 9 ... |
+| S9-08 | libgomp spin-wait with delay and the one-core measurement (E6-03 C) | Not started | S9-06 already added config/linux/knc/futex.h (cpu_relax = DELAY gomp_knc_delay), mutex.c (gomp_knc_delay = ... |
 | S9-09 | libgomp hierarchical ring-aware barrier (E6-03 D) | Not started | Lane gcc -> gcc2: Sprint 9 runs on tree 2 while tree 1 finishes Sprint 8 (owner 2026-11-09: start Sprint 9 ... |
 | S9-10 | libgomp padding, static schedule default and malloc guidance (E6-03 E) | Not started | Lane gcc -> gcc2: Sprint 9 runs on tree 2 while tree 1 finishes Sprint 8 (owner 2026-11-09: start Sprint 9 ... |
 | S9-11 | Sprint 9 batch check | Not started | from S9-01's plan, under the owner's overnight blanket approval. |
 
 ## Recent activity
 
+- 2026-11-10 06:22 **S9-08** lead note: S9-06 already added config/linux/knc/futex.h (cpu_relax = DELAY gomp_knc_delay), mutex.c (gomp_knc_delay = 32) and spincount.h (default 100000, abo...
 - 2026-11-10 06:22 **S9-07** lead approve: OpenMP programs on KNC now spread threads one per core over the 60 compute cores by default (OS core left out; OMP_PROC_BIND=false or an explicit p...
 - 2026-11-10 06:13 **S9-07** engineer submit: Green: knc/affinity.c plus a 6-line __k1om__ hook in env.c give core places (sysfs or cpuinfo, inherited mask, OS core dropped), default spread. gc...
 - 2026-11-10 06:12 **S9-07** lead answer: Yes, resubmit with --override: 846 against 800 is the approved red plus a 23-line licence header, no cut needed. Name the override reason in the note.
@@ -183,13 +184,12 @@ Current tickets: `[###################-]` 144 of 151
 - 2026-11-10 06:00 **S9-07** lead approve-red: S9-07 red approved: host tests on synthetic sysfs and cpuinfo-only trees (whole card, 30-core mask, OS core only, explicit OMP_NUM_THREADS) fail 8/...
 - 2026-11-10 05:59 **S9-07** engineer red: Red a5722df: python tools/s9_07_checks.py host fails 8/8 on assertions (log .work/_state/logs/s9_07_host-20261110-055848.log): from sysfs the curre...
 - 2026-11-10 05:46 **S9-06** lead approve: OpenMP (-fopenmp) now links and builds against a KNC libgomp in the private prefix, which spins with DELAY instead of PAUSE and refuses an older li...
-- 2026-11-10 05:46 **S8-15** lead answer: (a). Add -fno-unroll-loops to the dg-options of those 7 T1 tests, with a one-line comment that each test pins the feature it was written for (gathe...
 
 ## Cost
 
 - From the script, engineer: 350 sessions, 772.4M input tokens
 - From the script, lead: 233 sessions, 70.8M input tokens
-- Started by hand, Claude: 11 sessions, 2009.4M input tokens
+- Started by hand, Claude: 11 sessions, 2009.9M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
