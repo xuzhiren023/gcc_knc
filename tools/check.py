@@ -29,6 +29,10 @@ PACKED = re.compile(r'\bv(?:addn?|subr?|mul|div|max|min|sqrt|rcp(?:23)?|rsqrt(?:
 # Each entry supplies its CLI help and handlers for the tiers it selects.
 # Imports stay lazy so T0 and source-only selections need no probe modules.
 SELECTIONS = {
+    'tune_align': ('S8-08 -mtune=knc aligns functions to 64 bytes', {
+        't1': lambda runner: runner.t1_sources(runner.source_dir.glob('knc-tune-align*.c'))}),
+    'tune_prefix': ('S8-08 -mtune=knc avoids 0x66-prefixed forms', {
+        't1': lambda runner: runner.t1_sources([runner.source_dir / 'knc-tune-prefix.c'])}),
     'storent': ('S8-13 no-read streaming stores for write-only loops beyond L2', {
         't1': lambda runner: importlib.import_module('storent').t1(runner),
         't2': lambda runner: importlib.import_module('storent').t2(runner)}),

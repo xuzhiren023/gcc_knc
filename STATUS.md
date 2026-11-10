@@ -1,10 +1,10 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-09 20:31.
+Updated automatically at every ticket change. Last update: 2026-11-09 23:41.
 
-**Next: GPT-6.1, on S8-08 (-mtune=knc tune-flag audit (E5-12)).** Run `python tools/dispatch.py`, or ask the tech lead to.
+**Next: the tech lead, on S8-14.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
-Current tickets: `[##################--]` 135 of 150
+Current tickets: `[##################--]` 136 of 150
 
 ## Milestones
 
@@ -150,20 +150,20 @@ Current tickets: `[##################--]` 135 of 150
 | S8-05 | Re-check the scalar-add cost on mat8 and the stencils after S8-06 (E5-11) | Done | No per-loop add-cost work is needed: with the cheaper add cost mat8 now compiles to the same code as today,... |
 | S8-06 | Memory-operand forms for V16SF/V8DF arithmetic and FMA (E5-17) | Done | KNC vector add, sub, mul and FMA now read aligned memory and {1to16}/{1to8} broadcasts directly instead of ... |
 | S8-07 | vpmadd231d for V16SI multiply-add (E5-14) | Done | KNC now emits vpmadd231d for vector integer multiply-add: one instruction at 4 ticks latency instead of vpm... |
-| S8-08 | -mtune=knc tune-flag audit (E5-12) | Changes requested | sessions 5: lead extension 2 (progress: the align-64 default was built and measured). |
+| S8-08 | -mtune=knc tune-flag audit (E5-12) | Done | -mtune=knc no longer uses 0x66/0x67 prefixes where a shorter form exists and starts functions on a 64-byte ... |
 | S8-09 | KNC -O2 defaults: vectorizer cost model, stride versioning, predictive commoning (E5-18) | Not started | written under the owner's overnight blanket approval (2026-11-08). |
 | S8-10 | Less ring traffic: 64-byte padding of per-thread data, and card check C11 (E5-16) | Done | Per-thread arrays and the OpenMP shared block now start on their own 64-byte line, and the C11 card check s... |
 | S8-11 | Sprint 8 batch check and paired M2 re-measure | Not started | add one compiler-prefetch card case, because S8-03's card run has no row kernel (C5's rows are hand-written... |
 | S8-12 | Fix three weak S8-01 checks - C4 page offsets, C5 row aliasing, C9 memory chain | Done | The knc-char checks C4, C5 and C9 are fixed and rebuilt: C4 now walks every page offset, C5's eight arrays ... |
 | S8-13 | Streaming stores for write-only loops beyond L2 (E5-08) | Done | Loops that write arrays too large for the cache now use streaming stores: about 30% faster beyond L2 on the... |
-| S8-14 | Default 64-byte data alignment and TLB-aware cache parameters (E5-13) | Not started | added at the owner's request (2026-11-08: "add three [tickets] in s8") to cover ADR-0009 points the sprint ... |
+| S8-14 | Default 64-byte data alignment and TLB-aware cache parameters (E5-13) | Waiting for review | If the card shows a loss at 256-512 KB, the change is: the S8-13 storent guard reads the real L2 (512 KB) f... |
 | S8-15 | Small-loop unroll default and the GCC-KNC flags page (E5-09) | Not started | added at the owner's request (2026-11-08: "add three [tickets] in s8") to cover ADR-0009 points the sprint ... |
 | S8-16 | User story - one bold flag, -mphinix, with a rising-phoenix banner and a progress bar | Not started | owner's user story, written by the lead with the owner's request quoted above. |
 | S8-17 | Card check C12 - power by rail for a saturated vector unit against x87, idle and streaming | Done | Card check C12 is built and ready to run: it measures card power by rail (core, uncore, memory) while the v... |
 | S8-18 | Second GCC tree - a gcc2 lane with its own checkout and build, so two GCC tickets run in parallel | Done | Tools now support a second GCC tree: a lane gcc2 ticket builds in gcc-2/gcc-build-2 while a gcc ticket uses... |
 | S9-01 | libgomp for KNC: futex, affinity, ring-aware barrier, spin-wait and malloc arenas (E6-03 input) | Done | We now have a build-and-design plan for GCC-KNC's own OpenMP runtime on the card: futex-based waits with de... |
 | S9-02 | libstdc++ for KNC: exceptions, RTTI, atomics, threads, packaging (E6-06 input) | Done | We now know how to build GCC 16's C++ library for the card: no newer glibc or kernel is needed, and built w... |
-| S9-03 | libstdc++ and libatomic build for k1om (E6-06a) | Not started | Pre-check: build wiring, static linking, test programs and allowed files are now in the brief (lead pre-che... |
+| S9-03 | libstdc++ and libatomic build for k1om (E6-06a) | In progress | S9-03 red accepted: the host check fails today because the installed compiler has no g++ or libstdc++; at g... |
 | S9-04 | libstdc++ packaging into the private prefix and a g++ link guard (E6-06b) | Not started | Pre-check: build wiring, static linking, test programs and allowed files are now in the brief (lead pre-che... |
 | S9-05 | libstdc++ runtime slice on the card (E6-06c) | Not started | Pre-check: build wiring, static linking, test programs and allowed files are now in the brief (lead pre-che... |
 | S9-06 | libgomp for k1om: build, select, package and link guard (E6-03 A) | Not started | Pre-check: build wiring, static linking, test programs and allowed files are now in the brief (lead pre-che... |
@@ -175,23 +175,23 @@ Current tickets: `[##################--]` 135 of 150
 
 ## Recent activity
 
-- 2026-11-09 20:31 **S8-08** lead budget: sessions 5: lead extension 2 (progress: the align-64 default was built and measured).
-- 2026-11-09 20:30 **S8-08** lead changes: Card 00:55-01:22Z, align-64 vs knc (code identical but .p2align): affine, stencil1 L2-2, short ~1.00; slower: mat8 1.106, mat16 1.173, short5 1.048...
-- 2026-11-09 20:29 **S8-13** lead approve: Loops that write arrays too large for the cache now use streaming stores: about 30% faster beyond L2 on the card, no loss with data in L2, and x86 ...
-- 2026-11-09 19:01 **S9-10** lead amend: Pre-check: build wiring, static linking, test programs and allowed files are now in the brief (lead pre-check section).
-- 2026-11-09 19:00 **S9-09** lead amend: Pre-check: build wiring, static linking, test programs and allowed files are now in the brief (lead pre-check section).
-- 2026-11-09 19:00 **S9-08** lead amend: Pre-check: build wiring, static linking, test programs and allowed files are now in the brief (lead pre-check section).
-- 2026-11-09 18:58 **S9-07** lead amend: Pre-check: build wiring, static linking, test programs and allowed files are now in the brief (lead pre-check section).
-- 2026-11-09 18:57 **S9-06** lead amend: Pre-check: build wiring, static linking, test programs and allowed files are now in the brief (lead pre-check section).
+- 2026-11-09 23:41 **S8-08** lead approve: -mtune=knc no longer uses 0x66/0x67 prefixes where a shorter form exists and starts functions on a 64-byte line; code and host checks reviewed, car...
+- 2026-11-09 23:07 **S9-03** lead approve-red: S9-03 red accepted: the host check fails today because the installed compiler has no g++ or libstdc++; at green it builds the lead's static and sha...
+- 2026-11-09 23:06 **S9-03** engineer red: Red at 060ee62: tools/s9_03_checks.py links (run.py s9-03-links) fails with 'no C++ driver at gcc-knc-16.2.0/bin/k1om-mpss-linux-g++' (build is c,f...
+- 2026-11-09 23:00 **S8-14** lead note: If the card shows a loss at 256-512 KB, the change is: the S8-13 storent guard reads the real L2 (512 KB) from the KNC tuning, not param l2-cache-s...
+- 2026-11-09 22:57 **S8-14** lead note: Lane gcc2 -> gcc so tree 2 can take S9-03 (owner: start Sprint 9 early). Card binaries are frozen in tmp/claude-s8-14; any change round runs on tre...
+- 2026-11-09 22:56 **S9-03** lead note: Owner 2026-11-09 22:45 EST: "start sprint 9 early". Moved to tree 2 (lane gcc2) with deps S8-13 (the knc head it builds on) while tree 1 finishes S...
+- 2026-11-09 22:41 **S8-14** lead note: Lead x86 check of 3516ea25905 (S8_14_lead_x86-20261109-220825.log): -O2 and -O2 -mavx512f identical=1962 different=0 both-failed=41 (missing header...
+- 2026-11-09 22:09 **S8-14** lead note: Lead review: the x86 check (S8_14_x86-20261109-215941) died with the session at 22:05 (no compiler error; make killed). Lead reruns -O2 and -O2 -ma...
 
 ## Cost
 
-- From the script, engineer: 331 sessions, 755.5M input tokens
-- From the script, lead: 229 sessions, 69.8M input tokens
-- Started by hand, Claude: 11 sessions, 1958.4M input tokens
+- From the script, engineer: 334 sessions, 756.8M input tokens
+- From the script, lead: 230 sessions, 70.2M input tokens
+- Started by hand, Claude: 11 sessions, 1971.0M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 18.9 GiB of 100 GiB. 95 GiB free on the drive.
+The project uses 20.1 GiB of 100 GiB. 105 GiB free on the drive.
