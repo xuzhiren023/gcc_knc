@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-09 23:50.
+Updated automatically at every ticket change. Last update: 2026-11-09 23:51.
 
 **Next: GPT-6.1, on S9-03 (libstdc++ and libatomic build for k1om (E6-06a)).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
@@ -157,7 +157,7 @@ Current tickets: `[##################--]` 137 of 150
 | S8-12 | Fix three weak S8-01 checks - C4 page offsets, C5 row aliasing, C9 memory chain | Done | The knc-char checks C4, C5 and C9 are fixed and rebuilt: C4 now walks every page offset, C5's eight arrays ... |
 | S8-13 | Streaming stores for write-only loops beyond L2 (E5-08) | Done | Loops that write arrays too large for the cache now use streaming stores: about 30% faster beyond L2 on the... |
 | S8-14 | Default 64-byte data alignment and TLB-aware cache parameters (E5-13) | Done | -march=knc now puts arrays of 64 bytes or more on a 64-byte line and sizes loop blocking to the 256 KB TLB ... |
-| S8-15 | Small-loop unroll default and the GCC-KNC flags page (E5-09) | Not started | added at the owner's request (2026-11-08: "add three [tickets] in s8") to cover ADR-0009 points the sprint ... |
+| S8-15 | Small-loop unroll default and the GCC-KNC flags page (E5-09) | Not started | Owner 2026-11-09: Sprint 8 runs on without waiting for card timing; the lead approves on code review and ho... |
 | S8-16 | User story - one bold flag, -mphinix, with a rising-phoenix banner and a progress bar | Not started | owner's user story, written by the lead with the owner's request quoted above. |
 | S8-17 | Card check C12 - power by rail for a saturated vector unit against x87, idle and streaming | Done | Card check C12 is built and ready to run: it measures card power by rail (core, uncore, memory) while the v... |
 | S8-18 | Second GCC tree - a gcc2 lane with its own checkout and build, so two GCC tickets run in parallel | Done | Tools now support a second GCC tree: a lane gcc2 ticket builds in gcc-2/gcc-build-2 while a gcc ticket uses... |
@@ -175,6 +175,7 @@ Current tickets: `[##################--]` 137 of 150
 
 ## Recent activity
 
+- 2026-11-09 23:51 **S8-15** lead note: Owner 2026-11-09: Sprint 8 runs on without waiting for card timing; the lead approves on code review and host checks and times every ticket in one ...
 - 2026-11-09 23:50 **S8-14** lead approve: -march=knc now puts arrays of 64 bytes or more on a 64-byte line and sizes loop blocking to the 256 KB TLB reach; code, host checks and x86 identit...
 - 2026-11-09 23:50 **S8-09** lead note: Owner 2026-11-09: Sprint 8 runs on without waiting for card timing; the lead approves on code review and host checks and times every ticket in one ...
 - 2026-11-09 23:42 **S8-14** lead note: Lead merged knc (with S8-08) into s8/S8-14 (6137ddbf42c, clean) and main into the repo branch (84ac639, clean) to approve with card timing deferred...
@@ -182,7 +183,6 @@ Current tickets: `[##################--]` 137 of 150
 - 2026-11-09 23:07 **S9-03** lead approve-red: S9-03 red accepted: the host check fails today because the installed compiler has no g++ or libstdc++; at green it builds the lead's static and sha...
 - 2026-11-09 23:06 **S9-03** engineer red: Red at 060ee62: tools/s9_03_checks.py links (run.py s9-03-links) fails with 'no C++ driver at gcc-knc-16.2.0/bin/k1om-mpss-linux-g++' (build is c,f...
 - 2026-11-09 23:00 **S8-14** lead note: If the card shows a loss at 256-512 KB, the change is: the S8-13 storent guard reads the real L2 (512 KB) from the KNC tuning, not param l2-cache-s...
-- 2026-11-09 22:57 **S8-14** lead note: Lane gcc2 -> gcc so tree 2 can take S9-03 (owner: start Sprint 9 early). Card binaries are frozen in tmp/claude-s8-14; any change round runs on tre...
 
 ## Cost
 
