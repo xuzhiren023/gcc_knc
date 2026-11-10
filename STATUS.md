@@ -1,10 +1,10 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-10 04:42.
+Updated automatically at every ticket change. Last update: 2026-11-10 04:51.
 
-**Next: the tech lead, on S8-19.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: GPT-6.1, on S9-06 (libgomp for k1om: build, select, package and link guard (E6-03 A)).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
-Current tickets: `[##################--]` 141 of 151
+Current tickets: `[##################--]` 142 of 151
 
 ## Milestones
 
@@ -161,7 +161,7 @@ Current tickets: `[##################--]` 141 of 151
 | S8-16 | User story - one bold flag, -mphinix, with a rising-phoenix banner and a progress bar | Not started | Owner 2026-11-09: Sprint 8 runs on without waiting for card timing; the lead approves on code review and ho... |
 | S8-17 | Card check C12 - power by rail for a saturated vector unit against x87, idle and streaming | Done | Card check C12 is built and ready to run: it measures card power by rail (core, uncore, memory) while the v... |
 | S8-18 | Second GCC tree - a gcc2 lane with its own checkout and build, so two GCC tickets run in parallel | Done | Tools now support a second GCC tree: a lane gcc2 ticket builds in gcc-2/gcc-build-2 while a gcc ticket uses... |
-| S8-19 | -mtune=knc stops the tight-loop alignment pass (nops on the fallthrough path) | Waiting for review | GCC 3de77bcaabf (+knc S9-04 merge): -mtune=knc clears X86_TUNE_ALIGN_TIGHT_LOOPS, -mtune-ctrl still wins; k... |
+| S8-19 | -mtune=knc stops the tight-loop alignment pass (nops on the fallthrough path) | Done | -mtune=knc no longer pads small loops entered by fallthrough with alignment nops (GCC 16's tight-loop pass,... |
 | S9-01 | libgomp for KNC: futex, affinity, ring-aware barrier, spin-wait and malloc arenas (E6-03 input) | Done | We now have a build-and-design plan for GCC-KNC's own OpenMP runtime on the card: futex-based waits with de... |
 | S9-02 | libstdc++ for KNC: exceptions, RTTI, atomics, threads, packaging (E6-06 input) | Done | We now know how to build GCC 16's C++ library for the card: no newer glibc or kernel is needed, and built w... |
 | S9-03 | libstdc++ and libatomic build for k1om (E6-06a) | Done | Card 2026-11-10 08:40Z (log .work/_shared/tmp/claude-s8-09.log): hello, rtti, thread, atomic16, tz and all ... |
@@ -176,6 +176,7 @@ Current tickets: `[##################--]` 141 of 151
 
 ## Recent activity
 
+- 2026-11-10 04:51 **S8-19** lead approve: -mtune=knc no longer pads small loops entered by fallthrough with alignment nops (GCC 16's tight-loop pass, the cause of S8-08's 1.105x mat8 loss);...
 - 2026-11-10 04:42 **S8-19** engineer submit: GCC 3de77bcaabf (+knc S9-04 merge): -mtune=knc clears X86_TUNE_ALIGN_TIGHT_LOOPS, -mtune-ctrl still wins; knc-costs.md row. Red fd5d815 now green; ...
 - 2026-11-10 04:38 **S9-06** lead approve-red: S9-06's failing checks are accepted: they show that k1om libgomp is not selected, built, packaged or guarded yet, and the card runner for 60 and 24...
 - 2026-11-10 04:36 **S9-06** engineer red: Red 03be94c: tools/s9_06_checks.py configure|build|guard all FAIL: configure.tgt picks posix for k1om and gcc-build-2 has no libgomp; the s9_omp pr...
@@ -183,13 +184,12 @@ Current tickets: `[##################--]` 141 of 151
 - 2026-11-10 04:12 **S9-05** lead amend: new_test_files 3 -> 4: random_token.cc was the lead request after the card hang.
 - 2026-11-10 04:10 **S9-05** engineer submit: Rebased on main (eh fixture). run.sh: 60 s watcher per program (RESULT ... exit=timeout), exact match by sh read loop, no grep -x; watcher checked ...
 - 2026-11-10 04:03 **S9-04** lead note: Card 2026-11-10 08:42Z: both xdso pairs print PASS checks=5 with LD_LIBRARY_PATH=/usr/lib64, and the loader trace shows libstdc++.so.6 and libgcc_s...
-- 2026-11-10 04:03 **S9-03** lead note: Card 2026-11-10 08:40Z (log .work/_shared/tmp/claude-s8-09.log): hello, rtti, thread, atomic16, tz and all six xdso pairs (with donor) match, inclu...
 
 ## Cost
 
 - From the script, engineer: 344 sessions, 764.7M input tokens
 - From the script, lead: 231 sessions, 70.4M input tokens
-- Started by hand, Claude: 11 sessions, 2000.6M input tokens
+- Started by hand, Claude: 11 sessions, 2001.8M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
