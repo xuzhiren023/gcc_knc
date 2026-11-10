@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-10 18:41.
+Updated automatically at every ticket change. Last update: 2026-11-10 18:42.
 
 **Next: GPT-6.1, on S8-22 (-mphinix is slower than -O2 on M2 kernels (mat16 12.9x, short 1.27x, mat8 1.13x) - find and fix).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
@@ -162,7 +162,7 @@ Current tickets: `[###################-]` 158 of 160
 | S8-17 | Card check C12 - power by rail for a saturated vector unit against x87, idle and streaming | Done | Card check C12 is built and ready to run: it measures card power by rail (core, uncore, memory) while the v... |
 | S8-18 | Second GCC tree - a gcc2 lane with its own checkout and build, so two GCC tickets run in parallel | Done | Tools now support a second GCC tree: a lane gcc2 ticket builds in gcc-2/gcc-build-2 while a gcc ticket uses... |
 | S8-19 | -mtune=knc stops the tight-loop alignment pass (nops on the fallthrough path) | Done | Card 2026-11-10 11:28-12:03Z (frozen .work/_shared/tmp/claude-s8-19, log .work/_shared/tmp/claude-next.log)... |
-| S8-20 | The small-loop unroll costs affine_f64 3-7% at 4 threads per core - make it follow the thread density | Done | The small-loop unroll now follows the thread density: streaming loops (one vector op per store) unroll 2 ti... |
+| S8-20 | The small-loop unroll costs affine_f64 3-7% at 4 threads per core - make it follow the thread density | Done | Card 2026-11-10 21:00-23:00Z vs knc (S8-15 unroll 4), launch 1/2. Density 4: affine_f64 0.931/0.994, affine... |
 | S8-21 | The prefetch pass sees masked loads and stores, so rows shorter than a vector are prefetched | Done | The prefetch pass now sees masked loads and stores, so rows shorter than a vector (WRF 8-float rows) are pr... |
 | S8-22 | -mphinix is slower than -O2 on M2 kernels (mat16 12.9x, short 1.27x, mat8 1.13x) - find and fix | In progress |  |
 | S9-01 | libgomp for KNC: futex, affinity, ring-aware barrier, spin-wait and malloc arenas (E6-03 input) | Done | We now have a build-and-design plan for GCC-KNC's own OpenMP runtime on the card: futex-based waits with de... |
@@ -185,6 +185,7 @@ Current tickets: `[###################-]` 158 of 160
 
 ## Recent activity
 
+- 2026-11-10 18:42 **S8-20** lead note: Card 2026-11-10 21:00-23:00Z vs knc (S8-15 unroll 4), launch 1/2. Density 4: affine_f64 0.931/0.994, affine_f32 0.877/0.984, short 0.977/0.979, oth...
 - 2026-11-10 18:22 **S9-17** lead approve: The flags page now has a 'Writing fast code for KNC' section: threads per core, first touch and region size, heap reuse with glibc's knobs, and how...
 - 2026-11-10 18:22 **S8-21** lead approve: The prefetch pass now sees masked loads and stores, so rows shorter than a vector (WRF 8-float rows) are prefetched (58 vprefetch in the column cas...
 - 2026-11-10 18:15 **S9-15** lead approve: The OpenMP spin-time measurement (3, 30 and 200 ms before sleeping, against fork-heavy code with 1-100 ms gaps) is staged for the card; the default...
@@ -192,7 +193,6 @@ Current tickets: `[###################-]` 158 of 160
 - 2026-11-10 18:01 **S9-17** engineer submit: Added 'Writing fast code for KNC' to docs/gcc-knc-flags.md: threads per core, first touch/regions, heap, ICC differences, trademark line; each clai...
 - 2026-11-10 18:00 **S9-15** engineer submit: Red 00e02c6d, green GCC bfa5533618a: card.h gomp_knc_spincount(msec,mhz,delay); default unchanged. s9_15_checks.py host PASS 13/13 (DELAY 128: 2578...
 - 2026-11-10 17:59 **S9-16** lead approve: Two card probes are built and ready for the lead to run: C13 tests whether unaligned scalar loads and stores fault or slow down on KNC, and C14 mea...
-- 2026-11-10 17:51 **S9-16** engineer submit: Staged and linted, not run on the card: .work/_shared/S9-16/c13.mic (unaligned GPR and x87 scalar ld/st, offsets 0-63 and page crossings; fault, by...
 
 ## Cost
 
