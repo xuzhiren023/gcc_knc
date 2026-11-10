@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-09 19:00.
+Updated automatically at every ticket change. Last update: 2026-11-09 19:01.
 
 **Next: the tech lead, on S8-08.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
@@ -170,11 +170,12 @@ Current tickets: `[#################---]` 134 of 150
 | S9-07 | libgomp KNC affinity defaults (E6-03 B) | Not started | Pre-check: build wiring, static linking, test programs and allowed files are now in the brief (lead pre-che... |
 | S9-08 | libgomp spin-wait with delay and the one-core measurement (E6-03 C) | Not started | Pre-check: build wiring, static linking, test programs and allowed files are now in the brief (lead pre-che... |
 | S9-09 | libgomp hierarchical ring-aware barrier (E6-03 D) | Not started | Pre-check: build wiring, static linking, test programs and allowed files are now in the brief (lead pre-che... |
-| S9-10 | libgomp padding, static schedule default and malloc guidance (E6-03 E) | Not started | from S9-01's plan, under the owner's overnight blanket approval. |
+| S9-10 | libgomp padding, static schedule default and malloc guidance (E6-03 E) | Not started | Pre-check: build wiring, static linking, test programs and allowed files are now in the brief (lead pre-che... |
 | S9-11 | Sprint 9 batch check | Not started | from S9-01's plan, under the owner's overnight blanket approval. |
 
 ## Recent activity
 
+- 2026-11-09 19:01 **S9-10** lead amend: Pre-check: build wiring, static linking, test programs and allowed files are now in the brief (lead pre-check section).
 - 2026-11-09 19:00 **S9-09** lead amend: Pre-check: build wiring, static linking, test programs and allowed files are now in the brief (lead pre-check section).
 - 2026-11-09 19:00 **S9-08** lead amend: Pre-check: build wiring, static linking, test programs and allowed files are now in the brief (lead pre-check section).
 - 2026-11-09 18:58 **S9-07** lead amend: Pre-check: build wiring, static linking, test programs and allowed files are now in the brief (lead pre-check section).
@@ -182,7 +183,6 @@ Current tickets: `[#################---]` 134 of 150
 - 2026-11-09 18:56 **S9-05** lead amend: Pre-check: build wiring, static linking, test programs and allowed files are now in the brief (lead pre-check section).
 - 2026-11-09 18:54 **S9-04** lead amend: Pre-check: build wiring, static linking, test programs and allowed files are now in the brief (lead pre-check section).
 - 2026-11-09 18:53 **S9-03** lead amend: Pre-check: build wiring, static linking, test programs and allowed files are now in the brief (lead pre-check section).
-- 2026-11-09 17:30 **S8-08** lead review-note: abcd19140f4 read: 64 replaces only unset -falign-loops/-functions, -Os and user values win; T1 scans good; M2 code identical to knc except .p2align...
 
 ## Cost
 
@@ -194,4 +194,4 @@ Current tickets: `[#################---]` 134 of 150
 
 ## Disk
 
-The project uses 18.9 GiB of 100 GiB. 88 GiB free on the drive.
+The project uses 18.9 GiB of 100 GiB. 91 GiB free on the drive.
