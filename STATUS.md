@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-10 11:08.
+Updated automatically at every ticket change. Last update: 2026-11-10 11:37.
 
 **Next: the tech lead, on S8-16.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
@@ -169,7 +169,7 @@ Current tickets: `[###################-]` 149 of 154
 | S9-05 | libstdc++ runtime slice on the card (E6-06c) | Done | Card 2026-11-10 11:28Z: s9-05 done exit=0. All 56 programs match expected.txt, including the fixed eh progr... |
 | S9-06 | libgomp for k1om: build, select, package and link guard (E6-03 A) | Done | Card 2026-11-10 11:40Z: at 60 and 240 threads every program passes except (1) locks check 4: omp_get_wtick(... |
 | S9-07 | libgomp KNC affinity defaults (E6-03 B) | Done | Card 2026-11-10 14:45Z, 20-core mask (cores 40-59): 7 of 8 jobs ok; cpu-affinity (GOMP_CPU_AFFINITY=1-237:4... |
-| S9-08 | libgomp spin-wait with delay and the one-core measurement (E6-03 C) | Done | KNC libgomp's spin wait can be tuned with GOMP_KNC_DELAY, the default spin count is 3 ms of DELAY periods, ... |
+| S9-08 | libgomp spin-wait with delay and the one-core measurement (E6-03 C) | Done | Card 2026-11-10 measurements 1 and 3, three launches (log .work/_shared/tmp/claude-resume.log). One core, w... |
 | S9-09 | libgomp hierarchical ring-aware barrier (E6-03 D) | Done | Card 2026-11-10 14:47Z: every suite program and both 240-thread programs exit 136 (SIGFPE) with no output, ... |
 | S9-10 | libgomp padding, static schedule default and malloc guidance (E6-03 E) | Done | Card 2026-11-10 14:40Z: the eight OpenMP programs pass on the S9-06..S9-10 libgomp at 60 threads (6 GiB) an... |
 | S9-11 | Sprint 9 batch check | Not started | deps add S9-14: run correctness and key timings under the 3100/5100/7100 profiles (owner 2026-11-10). |
@@ -179,6 +179,7 @@ Current tickets: `[###################-]` 149 of 154
 
 ## Recent activity
 
+- 2026-11-10 11:37 **S9-08** lead note: Card 2026-11-10 measurements 1 and 3, three launches (log .work/_shared/tmp/claude-resume.log). One core, worker time vs alone: no hint with 1/2/3 ...
 - 2026-11-10 11:08 **S8-16** engineer submit: -mphinix expands (linux-k1om.h self spec) to -O3 plus measured knc defaults, no fast-math, rejected on x86; banner and bar on a terminal only, off ...
 - 2026-11-10 11:07 **S8-16** owner decide: Owner standing rule (2026-11-09, reconfirmed in chat 2026-11-10): the lead adds sessions unless two extensions in a row make no progress. Sessions ...
 - 2026-11-10 11:07 **S8-16** lead amend: sessions budget 3 -> 4 under the owner standing rule (2026-11-09, reconfirmed in chat 2026-11-10): one session timed out; work is done, submit left.
@@ -186,16 +187,15 @@ Current tickets: `[###################-]` 149 of 154
 - 2026-11-10 10:45 **S8-16** lead answer: Yes, resubmit with --override: the banner, bar and flag are one user story and the size is mostly the ASCII art and its tests. List the shared i386...
 - 2026-11-10 10:45 **S8-16** engineer ask: Submit refused: 705 changed lines vs budget 500. All acceptance met (t1 --phinix PASS, T0/T1/T2 PASS, M2 pair staged at _shared/S8-16/m2paired). Si...
 - 2026-11-10 10:37 **S9-14** engineer submit: Fixed 7b64276: card_pin_test.c accepts 16384 MiB (exec reached, counters reset) and refuses 16385 before affinity; comment updated to owner 2026-11...
-- 2026-11-10 10:33 **S9-14** lead changes: 1. tests/tools/card_pin_test.c:72 still expects claude-pin to refuse 10241 MiB, but tools/claude-pin.c:42 now accepts up to 16384, so test_card_bac...
 
 ## Cost
 
 - From the script, engineer: 367 sessions, 803.1M input tokens
 - From the script, lead: 239 sessions, 72.0M input tokens
-- Started by hand, Claude: 11 sessions, 2066.5M input tokens
+- Started by hand, Claude: 11 sessions, 2070.9M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 22.7 GiB of 100 GiB. 122 GiB free on the drive.
+The project uses 22.7 GiB of 100 GiB. 96 GiB free on the drive.
