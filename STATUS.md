@@ -172,7 +172,7 @@ Current tickets: `[###################-]` 151 of 154
 | S9-08 | libgomp spin-wait with delay and the one-core measurement (E6-03 C) | Done | Card 2026-11-10 measurements 1 and 3, three launches (log .work/_shared/tmp/claude-resume.log). One core, w... |
 | S9-09 | libgomp hierarchical ring-aware barrier (E6-03 D) | Done | Card diagnosis 2026-11-10 ~12:10 EST (log .work/_shared/tmp/claude-diag.log): the same 34 suite programs pl... |
 | S9-10 | libgomp padding, static schedule default and malloc guidance (E6-03 E) | Done | Card 2026-11-10 14:40Z: the eight OpenMP programs pass on the S9-06..S9-10 libgomp at 60 threads (6 GiB) an... |
-| S9-11 | Sprint 9 batch check | Not started | Set gomp_knc_delay default 32 -> 128 (knc/mutex.c; S9-08 card measurements 2026-11-10: 3 spinning siblings ... |
+| S9-11 | Sprint 9 batch check | Not started | From the 2026-11-10 card runs: (1) rerun the S9-09 suite on the final head; (2) make the S9-07 explicit-set... |
 | S9-12 | libgomp adapts to the card: malloc arena cap from memory, core count and clock (ADR-0012) | Done | Measurement 7, 6 GiB RLIMIT_AS, 240 threads, 1 KiB pattern (2026-11-10, partial; job capped at 2 h after 23... |
 | S9-13 | User story - -mknc-card= picks the card model's tuning, and -mknc-card=native detects it | Not started |  |
 | S9-14 | card_run model profiles - run a job as a 3100, 5100 or 7100 card on our 7120P | Done | card_run --profile 3100/5100/7100/full runs a job as that card would (its compute cores and usable memory),... |
@@ -180,19 +180,19 @@ Current tickets: `[###################-]` 151 of 154
 ## Recent activity
 
 - 2026-11-10 12:49 **S9-14** lead approve: card_run --profile 3100|5100|7100|full runs a job as that card would (its compute cores and usable memory), and in our exclusive turns jobs may use...
+- 2026-11-10 12:49 **S9-11** lead note: From the 2026-11-10 card runs: (1) rerun the S9-09 suite on the final head; (2) make the S9-07 explicit-setting jobs (OMP_PLACES, GOMP_CPU_AFFINITY...
 - 2026-11-10 12:49 **S9-09** lead note: Card diagnosis 2026-11-10 ~12:10 EST (log .work/_shared/tmp/claude-diag.log): the same 34 suite programs plus tasks and cancel at 240 threads all p...
 - 2026-11-10 12:49 **S9-07** lead note: Card 2026-11-10 ~12:15 EST, 30-core mask (cores 0-29, 120 CPUs): the KNC default jobs pass. Two explicit-setting jobs fail on runner expectations w...
 - 2026-11-10 12:41 **S8-16** lead approve: -mphinix is one flag for -O3 plus every measured -march=knc default (IEEE kept, any explicit option still wins), with a rising-phoenix banner and a...
 - 2026-11-10 11:57 **S9-12** lead note: Measurement 7, 6 GiB RLIMIT_AS, 240 threads, 1 KiB pattern (2026-11-10, partial; job capped at 2 h after 23 of 96 runs): derived cap (unset) 145.7-...
 - 2026-11-10 11:41 **S9-11** lead note: Set gomp_knc_delay default 32 -> 128 (knc/mutex.c; S9-08 card measurements 2026-11-10: 3 spinning siblings cost 6.8% at 32, 1.1% at 128; fork-join ...
 - 2026-11-10 11:39 **S9-12** lead note: Card 2026-11-10: the S9-06 programs at 240 threads under a 6 GiB RLIMIT_AS with no MALLOC_ARENA_MAX pass (s9-12 done exit=0): the derived cap fits....
-- 2026-11-10 11:37 **S9-08** lead note: Card 2026-11-10 measurements 1 and 3, three launches (log .work/_shared/tmp/claude-resume.log). One core, worker time vs alone: no hint with 1/2/3 ...
 
 ## Cost
 
 - From the script, engineer: 367 sessions, 803.1M input tokens
 - From the script, lead: 239 sessions, 72.0M input tokens
-- Started by hand, Claude: 11 sessions, 2091.7M input tokens
+- Started by hand, Claude: 11 sessions, 2092.2M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
