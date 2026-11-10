@@ -137,8 +137,11 @@ main (int argc, char **argv)
 	      "schedule(runtime) without OMP_SCHEDULE is static with the default chunk");
       expect (has_line ("  [host] OMP_SCHEDULE = 'STATIC'"), "display: OMP_SCHEDULE = 'STATIC'");
       expect (has_line ("  [host] MALLOC_ARENA_MAX = ''"), "display: MALLOC_ARENA_MAX = ''");
-      expect (strstr (display, KNC_HINT "MALLOC_ARENA_MAX=60") != NULL
-	      && strstr (display, "OMP_STACKSIZE=") != NULL,
+      const char *start = strstr (display, KNC_HINT);
+      char hint[1024] = "";
+      if (start)
+	sscanf (start, "%1023[^\n]", hint);
+      expect (strstr (hint, "MALLOC_ARENA_MAX=60") && strstr (hint, "OMP_STACKSIZE="),
 	      "display: the KNC hint names MALLOC_ARENA_MAX=60 and OMP_STACKSIZE");
     }
   else
