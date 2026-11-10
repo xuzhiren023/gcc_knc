@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-10 14:51.
+Updated automatically at every ticket change. Last update: 2026-11-10 15:14.
 
-**Next: GPT-6.1, on S8-11 (Sprint 8 batch check and paired M2 re-measure).** Run `python tools/dispatch.py`, or ask the tech lead to.
+**Next: the tech lead, on S9-13.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[###################-]` 152 of 155
 
@@ -175,11 +175,12 @@ Current tickets: `[###################-]` 152 of 155
 | S9-10 | libgomp padding, static schedule default and malloc guidance (E6-03 E) | Done | Card 2026-11-10 14:40Z: the eight OpenMP programs pass on the S9-06..S9-10 libgomp at 60 threads (6 GiB) an... |
 | S9-11 | Sprint 9 batch check | Not started | From the 2026-11-10 card runs: (1) rerun the S9-09 suite on the final head; (2) make the S9-07 explicit-set... |
 | S9-12 | libgomp adapts to the card: malloc arena cap from memory, core count and clock (ADR-0012) | Done | Measurement 7, 6 GiB RLIMIT_AS, 240 threads, 1 KiB pattern (2026-11-10, partial; job capped at 2 h after 23... |
-| S9-13 | User story - -mknc-card= picks the card model's tuning, and -mknc-card=native detects it | In progress | deps add S8-20: Sprint 8 fix first, and both change KNC tuning in i386-knc.cc. |
+| S9-13 | User story - -mknc-card= picks the card model's tuning, and -mknc-card=native detects it | Waiting for review | -mknc-card=MODEL/aliases/native in linux-k1om.h self spec + knc_card_spec (card /proc, MPSS /sys/class/mic,... |
 | S9-14 | card_run model profiles - run a job as a 3100, 5100 or 7100 card on our 7120P | Done | card_run --profile 3100/5100/7100/full runs a job as that card would (its compute cores and usable memory),... |
 
 ## Recent activity
 
+- 2026-11-10 15:14 **S9-13** engineer submit: -mknc-card=MODEL/aliases/native in linux-k1om.h self spec + knc_card_spec (card /proc, MPSS /sys/class/mic, generic+note); -mphinix adds native. Fi...
 - 2026-11-10 13:20 **S8-11** lead amend: Lane lead -> gcc2: build and check the Sprint 8 head (knc) in tree 2 while S9-13 uses tree 1. Card parts (execute suite, paired M2, profiles 3100/5...
 - 2026-11-10 13:19 **S8-20** lead approve: The small-loop unroll now follows the thread density: streaming loops (one vector op per store) unroll 2 times at 1-2 threads per core and not at 3...
 - 2026-11-10 13:11 **S8-20** engineer submit: GCC 788255cd1b1: a stream (vector ops <= stores) unrolls 2x at knc-threads-per-core 1-2, 1x at 3-4; others keep 4. Cause with asm in that commit (a...
@@ -187,7 +188,6 @@ Current tickets: `[###################-]` 152 of 155
 - 2026-11-10 12:50 **S8-11** lead amend: deps add S8-20 (S8-15 loses at 4 threads per core).
 - 2026-11-10 12:49 **S9-14** lead approve: card_run --profile 3100|5100|7100|full runs a job as that card would (its compute cores and usable memory), and in our exclusive turns jobs may use...
 - 2026-11-10 12:49 **S9-11** lead note: From the 2026-11-10 card runs: (1) rerun the S9-09 suite on the final head; (2) make the S9-07 explicit-setting jobs (OMP_PLACES, GOMP_CPU_AFFINITY...
-- 2026-11-10 12:49 **S9-09** lead note: Card diagnosis 2026-11-10 ~12:10 EST (log .work/_shared/tmp/claude-diag.log): the same 34 suite programs plus tasks and cancel at 240 threads all p...
 
 ## Cost
 
