@@ -127,6 +127,7 @@ Started as Sprint 8 on 2026-11-08 (owner blanket approval; `docs/sprints/SPRINT-
 | E6-05b | `imciintrin.h` (from `immintrin.h` under `-march=knc`) plus a `zmmintrin.h` shim: types, constants, the direct one-instruction intrinsics of the first demand set, builtins wired to `imci.md` | Deep |
 | E6-05c | The non-direct ones: unaligned lo/hi load and store pairs, two-result forms (`addsets`), mask-to-integer transfers, 64-bit gathers | Deep |
 | E6-05d | Acceptance: FFTW with `--enable-kcvi` builds, and its test suite passes on the card against the generic build | Standard |
+| E6-05e | Known-answer harness (ADR-0013 point 12): builtin vs inline-asm bit-for-bit on the card, a scalar model per intrinsic, and ISPC 1.8.2's self-checking tests through `knc.h` in `tests/third_party/ispc/` | Standard |
 | E6-07 | GCC generic vectors narrower than 512 bits (`vector_size` 8, 16, 32) passed or returned by value: today a clean "unsupported KNC register ABI mode" error (S2-02; 16 of the torture sweep's 33 compile errors). Check what the donor GCC 5 does, then pass them in memory or GPRs as an ABI decision (ADR) and test against donor objects. Only if corpus code needs it | Deep |
 | E6-06 | libstdc++: exceptions, RTTI, atomics, threads, with coverage measured by its own testsuite and the corpus. Check GCC 16's default C++ standard against corpus code | Standard |
 

@@ -1,8 +1,8 @@
 # ADR-0013: KNC intrinsics are written clean-room from interface facts
 
-**Status:** Accepted 2026-11-10 for the process (owner: "find a way to implement it in our gcc
-without violating any license and intel's own copyright ... update the project guides"). Four
-points marked **owner** below are the lead's defaults until the owner decides.
+**Status:** Accepted 2026-11-10 (owner: "find a way to implement it in our gcc without violating
+any license and intel's own copyright ... update the project guides"). The four points marked
+**owner** were the lead's defaults; the owner accepted them the same day ("Yes").
 **Input:** `docs/research/knc-intrinsics-sources.md`; a lead subagent's source check and
 clean-room guidance (2026-11-10, engineering guidance, not legal advice); backlog E6-05; ADR-0002;
 ADR-0011.
@@ -71,6 +71,18 @@ published specification, under GPL-3.0+ with the GCC Runtime Library Exception.
     from Intel SVML or `libimf`.
 11. **Before any public binary release** (**owner**): a lawyer checks the trademark wording and the
     third-party notices once.
+
+12. **Known answers come from the card, not from Intel examples** (owner question 2026-11-10).
+    - Intel's documentation examples are not test sources. They grant no licence, are not
+      committed, and do not state results; the reference was ICC's output, which we cannot run.
+    - Primary check, per intrinsic: the builtin and the same instruction written as inline
+      assembly (encoded by the MPSS assembler, independent of our patterns) must agree bit for
+      bit on the card, over random inputs and masks.
+    - Second check: a scalar C model written from the ISA manual's definition, compared lane by
+      lane, including NaN, rounding and edge cases.
+    - Corpus: ISPC v1.8.2's self-checking tests through its `knc.h` target (BSD-3) may be used, in
+      `tests/third_party/ispc/` with Intel's notice kept and our changes marked. FFTW's own test
+      suite (GPL) is the end-to-end check for E6-05d.
 
 ## Consequences
 
