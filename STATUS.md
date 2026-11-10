@@ -1,10 +1,10 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-10 18:22.
+Updated automatically at every ticket change. Last update: 2026-11-10 18:41.
 
-**Next: GPT-6.1, on S9-11 (Sprint 9 batch check).** Run `python tools/dispatch.py`, or ask the tech lead to.
+**Next: GPT-6.1, on S8-22 (-mphinix is slower than -O2 on M2 kernels (mat16 12.9x, short 1.27x, mat8 1.13x) - find and fix).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
-Current tickets: `[###################-]` 158 of 159
+Current tickets: `[###################-]` 158 of 160
 
 ## Milestones
 
@@ -164,6 +164,7 @@ Current tickets: `[###################-]` 158 of 159
 | S8-19 | -mtune=knc stops the tight-loop alignment pass (nops on the fallthrough path) | Done | Card 2026-11-10 11:28-12:03Z (frozen .work/_shared/tmp/claude-s8-19, log .work/_shared/tmp/claude-next.log)... |
 | S8-20 | The small-loop unroll costs affine_f64 3-7% at 4 threads per core - make it follow the thread density | Done | The small-loop unroll now follows the thread density: streaming loops (one vector op per store) unroll 2 ti... |
 | S8-21 | The prefetch pass sees masked loads and stores, so rows shorter than a vector are prefetched | Done | The prefetch pass now sees masked loads and stores, so rows shorter than a vector (WRF 8-float rows) are pr... |
+| S8-22 | -mphinix is slower than -O2 on M2 kernels (mat16 12.9x, short 1.27x, mat8 1.13x) - find and fix | In progress |  |
 | S9-01 | libgomp for KNC: futex, affinity, ring-aware barrier, spin-wait and malloc arenas (E6-03 input) | Done | We now have a build-and-design plan for GCC-KNC's own OpenMP runtime on the card: futex-based waits with de... |
 | S9-02 | libstdc++ for KNC: exceptions, RTTI, atomics, threads, packaging (E6-06 input) | Done | We now know how to build GCC 16's C++ library for the card: no newer glibc or kernel is needed, and built w... |
 | S9-03 | libstdc++ and libatomic build for k1om (E6-06a) | Done | Card 2026-11-10 08:40Z (log .work/_shared/tmp/claude-s8-09.log): hello, rtti, thread, atomic16, tz and all ... |
@@ -197,7 +198,7 @@ Current tickets: `[###################-]` 158 of 159
 
 - From the script, engineer: 376 sessions, 813.1M input tokens
 - From the script, lead: 240 sessions, 72.1M input tokens
-- Started by hand, Claude: 11 sessions, 2146.8M input tokens
+- Started by hand, Claude: 11 sessions, 2156.6M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
