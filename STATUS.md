@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-10 07:52.
+Updated automatically at every ticket change. Last update: 2026-11-10 07:53.
 
 **Next: GPT-6.1, on S8-16 (User story - one bold flag, -mphinix, with a rising-phoenix banner and a progress bar).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
@@ -171,7 +171,7 @@ Current tickets: `[###################-]` 147 of 151
 | S9-07 | libgomp KNC affinity defaults (E6-03 B) | Done | Card 2026-11-10 12:01Z, whole card (--benchmark, 240 CPUs inherited): all 8 jobs ok (defaults at 60/120/240... |
 | S9-08 | libgomp spin-wait with delay and the one-core measurement (E6-03 C) | Done | KNC libgomp's spin wait can be tuned with GOMP_KNC_DELAY, the default spin count is 3 ms of DELAY periods, ... |
 | S9-09 | libgomp hierarchical ring-aware barrier (E6-03 D) | Done | OpenMP barriers on KNC now synchronise per core first and then across cores (one cache line per core instea... |
-| S9-10 | libgomp padding, static schedule default and malloc guidance (E6-03 E) | Not started | Card input 2026-11-10 11:40Z: the S9-06 tasks program at 240 threads failed with libgomp Out of memory allo... |
+| S9-10 | libgomp padding, static schedule default and malloc guidance (E6-03 E) | In progress | Card input 2026-11-10 11:40Z: the S9-06 tasks program at 240 threads failed with libgomp Out of memory allo... |
 | S9-11 | Sprint 9 batch check | Not started | from S9-01's plan, under the owner's overnight blanket approval. |
 
 ## Recent activity
@@ -189,10 +189,10 @@ Current tickets: `[###################-]` 147 of 151
 
 - From the script, engineer: 356 sessions, 782.0M input tokens
 - From the script, lead: 235 sessions, 71.3M input tokens
-- Started by hand, Claude: 11 sessions, 2024.7M input tokens
+- Started by hand, Claude: 11 sessions, 2025.6M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 22.5 GiB of 100 GiB. 107 GiB free on the drive.
+The project uses 22.6 GiB of 100 GiB. 107 GiB free on the drive.
