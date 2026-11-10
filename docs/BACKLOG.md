@@ -145,6 +145,7 @@ Started as Sprint 8 on 2026-11-08 (owner blanket approval; `docs/sprints/SPRINT-
 | E7-09 | Prefetch for indirect access: the index stream and the gathered lines, gather prefetch hints and an unrolled gather completion loop, like ICC `-qopt-gather-scatter-unroll` (review item 1; `knc-gather-reduce.md`). Measure on SpMV-type `a[idx[i]]` at 60x4 | Deep |
 | E7-10 | Alignment peeling or versioning at `-O2` for long loops only, as ICC's default `-qopt-dynamic-align` (review item 5); S8-09 kept the cheap model, so measure STREAM-like loops on unaligned malloc arrays first | Standard |
 | E7-11 | Accept ICC's per-loop pragmas (`prefetch`, `noprefetch`, `vector nontemporal`, `vector aligned`) and map them to existing machinery (review item 7) | Standard |
+| E7-12 | At 1-2 threads per core, long streaming loops want unroll 4, not S8-20's 2 (affine 3-7% at density 1, card 2026-11-10); distinguish long streams from one-iteration calls (short) by known or estimated trip count | Standard |
 | E7-05 | Milestone M4: corpus comparison against GCC 5.1.1, including held-out programs | Deep |
 
 ## E8 Program corpus and release (M5–M6)
