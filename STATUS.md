@@ -180,7 +180,7 @@ Current tickets: `[###################-]` 155 of 159
 | S9-14 | card_run model profiles - run a job as a 3100, 5100 or 7100 card on our 7120P | Done | card_run --profile 3100/5100/7100/full runs a job as that card would (its compute cores and usable memory),... |
 | S9-15 | libgomp's KNC spin time before sleeping, measured against fork-heavy code | Waiting for review | Red 00e02c6d, green GCC bfa5533618a: card.h gomp_knc_spincount(msec,mhz,delay); default unchanged. s9_15_ch... |
 | S9-16 | Card probes - unaligned scalar accesses, and the VPU cost of subnormal operands | Done | Two card probes are built and ready for the lead to run: C13 tests whether unaligned scalar loads and store... |
-| S9-17 | User guidance on the flags page - threads per core, first touch, regions, heap, and ICC differences | Not started |  |
+| S9-17 | User guidance on the flags page - threads per core, first touch, regions, heap, and ICC differences | In progress |  |
 
 ## Recent activity
 
