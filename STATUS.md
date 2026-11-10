@@ -1,10 +1,10 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-10 18:08.
+Updated automatically at every ticket change. Last update: 2026-11-10 18:15.
 
 **Next: the tech lead, on S8-21.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
-Current tickets: `[###################-]` 155 of 159
+Current tickets: `[###################-]` 156 of 159
 
 ## Milestones
 
@@ -13,7 +13,7 @@ Current tickets: `[###################-]` 155 of 159
 | M0 | Foundation | In progress | 17 of 17 tickets |
 | M1 | Mixed native code | Done | 43 of 43 tickets |
 | M2 | Useful vector target | Done | 51 of 51 tickets |
-| M3 | Runtimes | In progress | 24 of 27 tickets |
+| M3 | Runtimes | In progress | 25 of 27 tickets |
 | M4 | Broad optimization | Not started | Not planned in detail yet |
 | M5 | Program corpus | Not started | Not planned in detail yet |
 | M6 | Release | Not started | Not planned in detail yet |
@@ -178,12 +178,13 @@ Current tickets: `[###################-]` 155 of 159
 | S9-12 | libgomp adapts to the card: malloc arena cap from memory, core count and clock (ADR-0012) | Done | Measurement 7, 6 GiB RLIMIT_AS, 240 threads, 1 KiB pattern (2026-11-10, partial; job capped at 2 h after 23... |
 | S9-13 | User story - -mknc-card= picks the card model's tuning, and -mknc-card=native detects it | Done | -mknc-card=generic/3100/5100/7100/native picks a card model's prefetch distances (3100 and 5100 derived fro... |
 | S9-14 | card_run model profiles - run a job as a 3100, 5100 or 7100 card on our 7120P | Done | card_run --profile 3100/5100/7100/full runs a job as that card would (its compute cores and usable memory),... |
-| S9-15 | libgomp's KNC spin time before sleeping, measured against fork-heavy code | Waiting for review | Red 00e02c6d, green GCC bfa5533618a: card.h gomp_knc_spincount(msec,mhz,delay); default unchanged. s9_15_ch... |
+| S9-15 | libgomp's KNC spin time before sleeping, measured against fork-heavy code | Done | The OpenMP spin-time measurement (3, 30 and 200 ms before sleeping, against fork-heavy code with 1-100 ms g... |
 | S9-16 | Card probes - unaligned scalar accesses, and the VPU cost of subnormal operands | Done | Two card probes are built and ready for the lead to run: C13 tests whether unaligned scalar loads and store... |
 | S9-17 | User guidance on the flags page - threads per core, first touch, regions, heap, and ICC differences | Waiting for review | Added 'Writing fast code for KNC' to docs/gcc-knc-flags.md: threads per core, first touch/regions, heap, IC... |
 
 ## Recent activity
 
+- 2026-11-10 18:15 **S9-15** lead approve: The OpenMP spin-time measurement (3, 30 and 200 ms before sleeping, against fork-heavy code with 1-100 ms gaps) is staged for the card; the default...
 - 2026-11-10 18:08 **S9-11** lead note: Tool issues found 2026-11-10: tools/s9_08_checks.py host mode broken since S9-12 (card.h needs _GNU_SOURCE before the shim includes stdio.h; S9-15 ...
 - 2026-11-10 18:01 **S9-17** engineer submit: Added 'Writing fast code for KNC' to docs/gcc-knc-flags.md: threads per core, first touch/regions, heap, ICC differences, trademark line; each clai...
 - 2026-11-10 18:00 **S9-15** engineer submit: Red 00e02c6d, green GCC bfa5533618a: card.h gomp_knc_spincount(msec,mhz,delay); default unchanged. s9_15_checks.py host PASS 13/13 (DELAY 128: 2578...
@@ -191,13 +192,12 @@ Current tickets: `[###################-]` 155 of 159
 - 2026-11-10 17:51 **S9-16** engineer submit: Staged and linted, not run on the card: .work/_shared/S9-16/c13.mic (unaligned GPR and x87 scalar ld/st, offsets 0-63 and page crossings; fault, by...
 - 2026-11-10 17:47 **S9-15** lead amend: Lane gcc2 -> gcc: tree 1 is free while S8-21 uses tree 2.
 - 2026-11-10 17:47 **S9-11** lead amend: deps add S9-15..S9-17 (best-practice review, owner 2026-11-10).
-- 2026-11-10 17:46 **S8-21** engineer submit: GCC f3c34acd827 (prefetch.cc +25/-3): masked loads/stores now prefetched, never nontemporal. Red 48161f1a -> --prefetch 5/5; 16-float asm identical...
 
 ## Cost
 
-- From the script, engineer: 375 sessions, 813.0M input tokens
+- From the script, engineer: 376 sessions, 813.1M input tokens
 - From the script, lead: 240 sessions, 72.1M input tokens
-- Started by hand, Claude: 11 sessions, 2142.3M input tokens
+- Started by hand, Claude: 11 sessions, 2144.2M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
