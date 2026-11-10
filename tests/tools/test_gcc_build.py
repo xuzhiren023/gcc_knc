@@ -3,6 +3,7 @@ import contextlib
 import importlib
 import io
 import json
+import os
 from pathlib import Path
 import subprocess
 import sys
@@ -12,6 +13,7 @@ from unittest import mock
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / 'tools'))
+import gcc_build
 import portability
 
 RUN = subprocess.run
@@ -21,6 +23,11 @@ HEALTHY = ('MD_INCLUDES = \\\n\t/src/gcc/config/i386/imci.md \\\n'
 
 class BuildReuseTest(unittest.TestCase):
     def setUp(self):
+        # A gcc2 session's slot would configure the empty fake build from the real slot 1 build.
+        environ = mock.patch.dict(os.environ)
+        environ.start()
+        self.addCleanup(environ.stop)
+        os.environ.pop('KNC_GCC_SLOT', None)
         self.temp = tempfile.TemporaryDirectory()
         self.addCleanup(self.temp.cleanup)
         self.root = Path(self.temp.name)
@@ -92,8 +99,7 @@ class BuildReuseTest(unittest.TestCase):
         self.assertIn('SKIP', self.shared('--if-stale')[1])
         self.git('commit', '--allow-empty', '-qm', 'same tree')
         self.assertIn('SKIP', self.shared('--if-stale')[1])
-        self.assertEqual(self.recorded(), [['make', ['-j8', 'all-gcc',
-                                                    'CFLAGS=-O2 -g1', 'CXXFLAGS=-O2 -g1']]])
+        self.assertEqual(self.recorded(), [['make', gcc_build.MAKE_ARGS]])
 
     def test_shared_changes_dirty_missing_and_unreadable_stamp(self):
         self.assertEqual(self.shared('--if-stale')[0], 0)

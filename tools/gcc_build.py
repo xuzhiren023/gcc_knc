@@ -2,8 +2,8 @@
 """Build the configured shared GCC tree, optionally skipping a current clean tree.
 
 Run through tools/run.py. This does not install GCC. It reconfigures a build whose options lack
-CONFIGURE_FLAGS, and configures an empty slot 2 build (--slot 2 or KNC_GCC_SLOT=2) with slot 1's
-other options.
+CONFIGURE_FLAGS or carry DROPPED_FLAGS, and configures an empty slot 2 build (--slot 2 or
+KNC_GCC_SLOT=2) with slot 1's other options.
 Example: python tools/run.py --name gcc-build -- python tools/gcc_build.py --if-stale
 """
 import argparse
@@ -21,12 +21,16 @@ ROOT = Path(__file__).resolve().parents[1]
 PROJECT = ROOT.parent.parent if ROOT.parent.name == '.work' else ROOT
 SHARED = PROJECT / '.work/_shared'
 MAKE_ARGS = ['-j8', 'all-gcc', 'all-target-libgcc', 'all-target-libgfortran',
-             'all-target-libstdc++-v3', 'all-target-libatomic',
+             'all-target-libstdc++-v3', 'all-target-libatomic', 'all-target-libgomp',
              'CFLAGS=-O2 -g1', 'CXXFLAGS=-O2 -g1']
 # S9-03: C++ and libstdc++ with the donor's generic C locale model, and tzdata built in because
 # the card sysroot has no zoneinfo (docs/research/knc-libstdcxx.md sections 1.4 and 2.2).
+# S9-06: libgomp, with --enable-linux-futex so that a failed futex probe is a configure error and
+# not a silent fall back to the posix runtime (docs/research/knc-libgomp.md, Risks).
 CONFIGURE_FLAGS = ['--enable-languages=c,c++,fortran,lto', '--enable-clocale=generic',
-                   '--with-libstdcxx-zoneinfo=static']
+                   '--with-libstdcxx-zoneinfo=static', '--enable-linux-futex']
+# Options of an older configure that a build must no longer carry.
+DROPPED_FLAGS = ['--disable-libgomp']
 
 
 def read_stamp(path):
@@ -66,7 +70,8 @@ def configured_options(build):
 
 
 def configure(repo, build, slot):
-    """Configure BUILD unless its options already carry CONFIGURE_FLAGS; True if it configured.
+    """Configure BUILD unless its options already carry CONFIGURE_FLAGS and none of
+    DROPPED_FLAGS; True if it configured.
 
     An empty slot 2 build takes its other options from slot 1's build (S8-18)."""
     configured = (build / 'config.status').is_file()
@@ -79,7 +84,8 @@ def configure(repo, build, slot):
             return False
         raise OSError('no configure options in ' + str(source / 'config.status'))
     replaced = {flag.split('=')[0] for flag in CONFIGURE_FLAGS}
-    wanted = [o for o in options if o.split('=')[0] not in replaced] + CONFIGURE_FLAGS
+    wanted = [o for o in options
+              if o.split('=')[0] not in replaced and o not in DROPPED_FLAGS] + CONFIGURE_FLAGS
     if configured and sorted(options) == sorted(wanted):
         return False
     build.mkdir(parents=True, exist_ok=True)

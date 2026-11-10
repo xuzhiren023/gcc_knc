@@ -75,7 +75,7 @@ def gcc16(args):
         '--disable-nls', '--without-isl',
         '--disable-libssp', '--disable-libquadmath', '--disable-libquadmath-support',
         '--disable-libsanitizer', '--disable-libitm', '--disable-libcilkrts',
-        '--disable-libvtv', '--disable-libmpx', '--disable-libgomp',
+        '--disable-libvtv', '--disable-libmpx',
     ]
     steps = [('configure', ('bash', source / 'configure', *flags))] if not resume else []
     steps.append(('resumed all-gcc' if resume else 'full all-gcc',
