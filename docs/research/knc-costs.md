@@ -353,3 +353,54 @@ python tools/run.py --name S6_05_stencil_t0_t1_t2 -- python tools/check.py t0 t1
 Log: `.work/_state/logs/S6_05_stencil_t0_t1_t2-20261106-222949.log`.
 The accepted gather rejection and both reduction-density checks retain
 their passing verdicts. No additional T1 verdict changes were observed.
+
+## `-mtune=knc` tune flags (S8-08, E5-12)
+
+`-mtune=knc` maps to `PROCESSOR_GENERIC` (`i386-common.cc`), so it inherits the generic
+`x86-tune.def` flags. `ix86_knc_tune_features` (`i386-knc.cc`, called from
+`set_ix86_tune_features` before `-mtune-ctrl`, which still wins) changes only flags with a
+documented or measured KNC reason. `-mdump-tune-features` shows the result. Sources: SSDG p.16-22
+(`knc-optimization-sources.md` I-10, I-12), `knc-characterization.md` points 1-8.
+
+| Flag (generic value) | KNC | Reason |
+|---|---|---|
+| `fast_prefix` (on) | **off** | 0x66/0x67 prefixes take 2 decode cycles (SSDG p.16). HImode register ALU, `and`+test and `and $-65536` become SImode forms; 16-bit memory operands, stores and compares keep the prefix (no equivalent unprefixed form). T1 `knc-tune-prefix.c`. |
+| `lcp_stall` (on) | on | Avoids 16-bit immediates with a 0x66 prefix; same direction as the prefix cost. |
+| `schedule` (on) | on | KNC scheduler `knc.md` (S6-06). |
+| `fuse_cmp_and_branch_*`, `fuse_alu_and_branch*` (on) | on, inert | Only read by `x86-tune-sched.cc`, where `ix86_macro_fusion_p` already returns false for `CPU_KNC` (S6-06: KNC pairs, it does not fuse). |
+| `partial_reg_dependency` (on), `partial_reg_stall` (off), `partial_flag_reg_stall` (off), `movx` (on) | unchanged | No partial-register penalty is documented or measured for KNC; zero-extending loads (`movx`) are one op either way. |
+| `read_modify`, `read_modify_write` (on) | unchanged | P5 turns them off for U/V pairing; KNC's pairing of memory-operand integer forms is not measured (characterization measures vector memory operands only). KNC is not P5 (I-10). |
+| `use_incdec` (off) | unchanged | Off avoids the partial-flags write; no KNC measurement either way. |
+| `push_memory`, `use_leave` (on); `single_push`, `double_push`, `single_pop`, `double_pop`, `pad_returns`, `pad_short_function` (off) | unchanged | No KNC measurement; the P5 push/pop pairing rules are not documented for KNC. |
+| `memory_mismatch_stall` (on) | unchanged | Store forwarding of a narrower load is not measured; on is the safe direction. |
+| `avoid_mfence` (on) | on | KNC has no `mfence` (`tests/isa/mfence.s`); the `lock or` fence is required, not a tuning choice. |
+| `use_sahf` (on) | inert | `-march=knc` sets `PTA_NO_SAHF`. |
+| `use_cltd`, `use_bt`, `shift1`, `double_with_add`, `promote_himode_imul`, `promote_qimode`, `himode_math`, `qimode_math`, `unroll_strlen`, `misaligned_move_string_pro_epilogues` (on) | unchanged | Generic scalar code shape; no KNC measurement. |
+| `ext_80387_constants`, `always_fancy_math_387` (on) | unchanged | x87 is KNC's scalar FP unit; no measurement against loading constants from memory. |
+| `align_tight_loops` (on) | unchanged | Still lines up loops that fit one cache line; loop alignment is otherwise generic (below). |
+| `sse_*`, `avx*`, `inter_unit_*`, `use_gather_*`, `use_scatter_*`, `avoid_*fma*_chains`, `prefer_bcst_from_integer`, `avoid_false_dep_for_bmi` | inert | KNC never sets SSE/AVX/AVX-512F/BMI; IMCI gathers and scatters use their own expanders (`i386-knc.cc`). |
+| every other flag (off in generic) | unchanged | No KNC reason found. |
+
+### Code alignment
+
+`-mtune=knc` defaults `-falign-functions=64`; loops, jumps and labels keep the generic
+alignment (loops `.p2align 4,,10` then `3`). The lead's A/A pairs on the card (2026-11-09, L2, 4 threads: one
+`kernels-gcc.s` linked twice, the second copy shifted half a line, a whole line at 64) measure
+the placement swing as the ratio away from 1.00:
+
+| `-falign-*` | mat8 | stencil1 | affine_f32 | short 5 | short 13 |
+|---|---|---|---|---|---|
+| generic (functions 16) | 1.344 | 0.955 | 1.033 | 1.010 | 0.999 |
+| 16 | 1.346 | 1.011 | 1.002 | 1.001 | 1.002 |
+| 32 | 0.764 | 1.005 | 1.004 | 1.074 | 1.051 |
+| 64 | 1.001 | 1.018 | 1.001 | 1.006 | 1.002 |
+
+64 removes the mat8 swing. Loops stay generic: `-falign-loops=64` has no max-skip, so an inner
+loop entered by fallthrough (mat8 `.L101`) ran up to 63 bytes of nops per outer trip. Against
+knc with only `.p2align` changed (lead, card 2026-11-10) the loop-and-function 64 build ran
+mat8 1.106, mat16 1.173, short 5 1.048/1.027, short 13 1.044/1.052 and stencil2 L1 1.064
+slower. `ix86_default_align` reads the per-processor table, so `ix86_knc_vectorizer_params`
+(`i386-knc.cc`, no shared line) replaces its function choice with the `align_func` of the KNC
+cost table. An explicit `-falign-functions=` still wins, and `-Os` or `-fno-align-functions`
+leaves it off; an `optimize` attribute or pragma reruns `ix86_default_align` and gets 16. T1
+`knc-tune-align.c` and `knc-tune-align-user.c`.
