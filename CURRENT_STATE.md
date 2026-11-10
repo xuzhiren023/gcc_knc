@@ -121,6 +121,7 @@ M1 is accepted and tagged `m1` locally; nothing is pushed. Engineers are Claude 
 
 ## Open items not on a ticket
 
+- `pm.py approve` fast path (2026-11-09, S8-14): when the GCC tree of the merge is already on `knc`, `update-ref` moves knc under the checkout and leaves the old files staged, so the next dispatch refuses "uncommitted changes". Tree 1 was fixed by stashing the stale file (`stash 8f7d79192d7`, byte-identical to the committed pre-S8-14 blob 0b43a6c; drop it any time). Fix: in the fast path, when `previous == "knc"`, update the checkout with `git read-tree -m -u` from the old to the new knc.
 - M2 (2026-11-07): the pre-tuning baseline passes ADR-0010 amendment 2 at 60 cores (L2 gain fraction
   0.737-0.817, 95% lower bound 0.752; worst GCC/x87 0.625). S6-05 (merged) leaves the M2 kernels'
   code unchanged except a 5-line stencil2 difference with no measured effect, so the final M2 run
