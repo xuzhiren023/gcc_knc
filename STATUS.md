@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-09 20:31.
+Updated automatically at every ticket change. Last update: 2026-11-09 20:34.
 
 **Next: GPT-6.1, on S8-08 (-mtune=knc tune-flag audit (E5-12)).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
@@ -150,7 +150,7 @@ Current tickets: `[##################--]` 135 of 150
 | S8-05 | Re-check the scalar-add cost on mat8 and the stencils after S8-06 (E5-11) | Done | No per-loop add-cost work is needed: with the cheaper add cost mat8 now compiles to the same code as today,... |
 | S8-06 | Memory-operand forms for V16SF/V8DF arithmetic and FMA (E5-17) | Done | KNC vector add, sub, mul and FMA now read aligned memory and {1to16}/{1to8} broadcasts directly instead of ... |
 | S8-07 | vpmadd231d for V16SI multiply-add (E5-14) | Done | KNC now emits vpmadd231d for vector integer multiply-add: one instruction at 4 ticks latency instead of vpm... |
-| S8-08 | -mtune=knc tune-flag audit (E5-12) | Changes requested | sessions 5: lead extension 2 (progress: the align-64 default was built and measured). |
+| S8-08 | -mtune=knc tune-flag audit (E5-12) | In progress | sessions 5: lead extension 2 (progress: the align-64 default was built and measured). |
 | S8-09 | KNC -O2 defaults: vectorizer cost model, stride versioning, predictive commoning (E5-18) | Not started | written under the owner's overnight blanket approval (2026-11-08). |
 | S8-10 | Less ring traffic: 64-byte padding of per-thread data, and card check C11 (E5-16) | Done | Per-thread arrays and the OpenMP shared block now start on their own 64-byte line, and the C11 card check s... |
 | S8-11 | Sprint 8 batch check and paired M2 re-measure | Not started | add one compiler-prefetch card case, because S8-03's card run has no row kernel (C5's rows are hand-written... |
@@ -188,10 +188,10 @@ Current tickets: `[##################--]` 135 of 150
 
 - From the script, engineer: 331 sessions, 755.5M input tokens
 - From the script, lead: 229 sessions, 69.8M input tokens
-- Started by hand, Claude: 11 sessions, 1958.4M input tokens
+- Started by hand, Claude: 11 sessions, 1960.7M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 18.9 GiB of 100 GiB. 95 GiB free on the drive.
+The project uses 18.9 GiB of 100 GiB. 105 GiB free on the drive.
