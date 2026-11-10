@@ -17,7 +17,18 @@ helper and watchdog script. Validation and size refusal happen before connection
 or admission, since the card's filesystem uses RAM. `pinHelper` defaults to the main checkout's
 `.work/_shared/claude-pin.mic` (a donor-built static executable), and `unpackHelper`
 to `.work/_shared/claude-unpack.mic`. Limits must be finite and positive; memory
-must be an integer from 1 through 10240 MB (`MEMORY_BUDGET_MIB`, owner 2026-11-04).
+must be an integer from 1 through 16384 MB (`CARD_MEMORY_MIB`, the 7120P's memory).
+
+Budgets (S9-14, owner 2026-11-10). In our exclusive turns (no other project's job
+running in the ledger) the memory budget is `MemFree` less 1536 MiB
+(`MEMORY_MARGIN_MIB`) and jobs may use any of cores 0-59. While another project's
+job runs, the 10240 MiB budget (`MEMORY_BUDGET_MIB`) applies and its ledger cores
+(0-39) stay taken. `--profile 3100|5100|7100|full` runs a job as that card would:
+cores 0-55, 0-58 or 0-59 and an `RLIMIT_AS` of 5632 MiB, 7680 MiB, or the budget
+(7100 and full). `--benchmark --profile` keeps the whole card (ledger cores 0-59)
+but pins to the profile's cores. The receipt and ledger rows carry `profile`. A
+profile does not model the clock or memory bandwidth per core (see `--help`).
+The 7100 profile needs the S9-14 `claude-pin.mic`, which accepts up to 16384 MiB.
 
 SSH uses the configured identity, strict known-host checking, batch mode,
 `IdentitiesOnly=yes`, `HostKeyAlgorithms=ssh-ed25519`, no user SSH config,
@@ -79,7 +90,7 @@ is never used. Set the job configuration's `memoryMB` to at least N times M,
 where M is the per-program address-space limit in MiB. For example, N=80 and
 M=96 require `memoryMB: 7680`; stage the list and all its executables as usual,
 then pass `-j 80 --limit-mb 96 LIST` after the driver executable in the
-`tools/card_run` command. The 10240 MiB admission ceiling and free-memory
+`tools/card_run` command. The admission budget (S9-14) and free-memory
 reserve still apply. Driver overhead and staged files also need free card RAM.
 
 The driver reads the job budget from the inherited `RLIMIT_AS` set by
@@ -135,7 +146,7 @@ after S2-17, with later batches using the full execute suite.
   active ledger entries of ours (`project: "gcc-knc"`, or no `project` and a
   `claude-` plus 32 hex digits job ID); other projects' rows do not count.
   Ended jobs release their reservation.
-  Wait while the total exceeds 10240 MB or the reservation would leave less
+  Wait while the total exceeds the budget (S9-14) or the reservation would leave less
   than 1536 MB of `MemFree`. Re-read both ledger and memory after each wait;
   the configured timeout bounds admission waiting. Expiration refuses without
   staging the executable. Expected-end estimates never expire reservations.

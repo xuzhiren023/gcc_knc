@@ -22,6 +22,22 @@ ROOT = Path(__file__).resolve().parent.parent
 RUN_DIR = re.compile(r"/tmp/claude/claude-[0-9a-f]{32}\Z")
 REFUSED_EXIT, TIMEOUT_EXIT, INFRA_EXIT = 125, 124, 126
 MEMORY_BUDGET_MIB = 10240  # Owner, 2026-11-04: the other project rarely uses more than 7 GB.
+# Owner, 2026-11-10: in our exclusive turns the budget is MemFree less this margin; the 10 GiB
+# budget and the other project's cores apply only while one of its jobs runs.
+MEMORY_MARGIN_MIB = 1536
+CARD_MEMORY_MIB = 16384  # 7120P: 16 GB GDDR5, the most any one job can declare.
+# S9-14 (owner 2026-11-10, ADR-0012): run as a smaller card on our 7120P. Compute cores are the
+# card's cores less its OS core (3120: 57, 5110P: 60, 7120: 61, Intel product specifications),
+# so cores 0-55, 0-58 or 0-59 here. Memory is the card's usable memory (the 6 and 8 GB cards
+# less 0.5 GiB for the card OS); None means MemFree less MEMORY_MARGIN_MIB, as for any
+# exclusive job.
+PROFILE_CORES = {"3100": 56, "5100": 59, "7100": 60, "full": 60}
+PROFILE_MEMORY_MIB = {"3100": 5632, "5100": 7680, "7100": None, "full": None}
+PROFILE_HELP = ("run as that card would: its compute cores, and its usable memory as RLIMIT_AS. "
+                "A profile cannot stand in for the clock (1.1, 1.053, 1.238 GHz) or the memory "
+                "bandwidth per core (about 4.2, 5.3, 5.8 GB/s): fewer active cores each get more "
+                "bandwidth, so it is a fair test of correctness, memory size and core count, and "
+                "only a rough test of memory-bound speed")
 PROJECT = "gcc-knc"
 OWN_JOB = re.compile(r"claude-[0-9a-f]{32}\Z")
 STAGE_TIMEOUT = 120.0  # S5-04: no start row of ours stays open through a slow upload.
@@ -202,7 +218,7 @@ def cpu_binding(cpuinfo):
 def run(program, argv, *, lock_path, external_locks, baseline_names, timeout,
         transport_timeout, receipt_path, transport, ledger_path, memory_mb=128,
         monotonic=time.monotonic, files=(), max_stage_mib=64, packed=False, stage_timeout=STAGE_TIMEOUT,
-        threads=1, cores=None, benchmark=False):
+        threads=1, cores=None, benchmark=False, profile=None):
     result = dict(result_class="infrastructure", exit_code=INFRA_EXIT,
                   program_exit_code=None, boot_id_before=None, boot_id_after=None,
                   card_minutes=0.0, detail="", foreign_processes=[], overlapping_jobs=[],
@@ -210,7 +226,7 @@ def run(program, argv, *, lock_path, external_locks, baseline_names, timeout,
     session, acquired, execution_started, execution_finished = None, False, False, False
     job_id = "claude-" + uuid.uuid4().hex
     run_dir = "/tmp/claude/" + job_id
-    result.update(job_id=job_id, run_dir=run_dir, memory_mb=memory_mb)
+    result.update(job_id=job_id, run_dir=run_dir, memory_mb=memory_mb, profile=profile)
     recorded, card_fault, ledger_offset = False, False, 0
     admission_lock = None
     overlaps = set()
@@ -262,8 +278,15 @@ def run(program, argv, *, lock_path, external_locks, baseline_names, timeout,
             raise Refused("card jobs are lead-only; leave the binaries for the lead")
         if any(not math.isfinite(n) or n <= 0 for n in (timeout, transport_timeout)):
             raise ValueError("limits must be finite and positive")
-        if not isinstance(memory_mb, int) or not 0 < memory_mb <= MEMORY_BUDGET_MIB:
-            raise Refused("memory limit must be 1..%d MB (our card budget)" % MEMORY_BUDGET_MIB)
+        if profile is not None:
+            if profile not in PROFILE_CORES:
+                raise Refused("profile must be one of " + ", ".join(PROFILE_CORES))
+            if cores is not None:
+                raise Refused("a profile sets its own cores; cannot combine with explicit cores")
+            memory_mb = PROFILE_MEMORY_MIB[profile]
+        if memory_mb is not None and (not isinstance(memory_mb, int) or isinstance(memory_mb, bool)
+                                      or not 0 < memory_mb <= CARD_MEMORY_MIB):
+            raise Refused("memory limit must be 1..%d MB (the card's memory)" % CARD_MEMORY_MIB)
         if not isinstance(threads, int) or isinstance(threads, bool) or not 1 <= threads <= 240:
             raise Refused("threads must be an integer from 1 through 240")
         if cores is not None:
@@ -321,23 +344,29 @@ def run(program, argv, *, lock_path, external_locks, baseline_names, timeout,
             # Benchmark queues express turns, not reservations: only running
             # jobs must drain before the round-robin winner can start.
             running = [j for j in active.values() if j.get("event") == "start"]
+            shared = any(not is_ours(j) for j in running)
             occupied = {c for j in (running if benchmark else active.values())
                         for c in j.get("cores", [])}
             available = [c for c in range(59, -1, -1) if c not in occupied
                          and sum(value == c for value in topology.values()) == 4]
-            selected = list(range(60)) if benchmark else (list(cores) if cores is not None
-                                                         else available[:math.ceil(threads / 4)])
+            fixed = (list(range(PROFILE_CORES[profile])) if profile is not None
+                     else None if benchmark else cores)
+            selected = (list(fixed) if fixed is not None else list(range(60)) if benchmark
+                        else available[:math.ceil(threads / 4)])
             core_ready = (not running and all(c in available for c in selected) if benchmark else
-                          not foreign_queue and (cores is not None or len(selected) >= math.ceil(threads / 4))
+                          not foreign_queue and (fixed is not None or len(selected) >= math.ceil(threads / 4))
                           and all(c in available for c in selected))
             reserved = sum(int(j.get("memoryLimitMiB", j.get("memory_mb", 7 * 1024))) for j in active.values()
                            if is_ours(j) and j.get("event") != "queued")
             free = dict(line.split(":", 1) for line in snap["meminfo"].splitlines() if ":" in line)
             free_kb = int(free["MemFree"].split()[0])
-            memory_ready = (reserved + memory_mb <= MEMORY_BUDGET_MIB
-                            and free_kb - memory_mb * 1024 >= 1536 * 1024)
+            budget = MEMORY_BUDGET_MIB if shared else free_kb // 1024 - MEMORY_MARGIN_MIB
+            job_memory = memory_mb if memory_mb is not None else min(CARD_MEMORY_MIB, budget - reserved)
+            memory_ready = (job_memory > 0 and reserved + job_memory <= budget
+                            and free_kb - job_memory * 1024 >= MEMORY_MARGIN_MIB * 1024)
             if core_ready and memory_ready and not their_turn:
                 mapping = {cpu: core for cpu, core in topology.items() if core in selected}
+                memory_mb = result["memory_mb"] = job_memory
                 break
             if benchmark and not queued:
                 append_ledger(ledger_path, dict(agent="claude", project=PROJECT, jobId=job_id,
@@ -353,8 +382,10 @@ def run(program, argv, *, lock_path, external_locks, baseline_names, timeout,
         now = datetime.now(timezone.utc)
         ledger_offset = len(lines)
         overlaps.update(active)
-        ledger_job = dict(agent="claude", project=PROJECT, jobId=job_id, cores=sorted(set(mapping.values())),
-                          logicalCpus=sorted(mapping), memoryLimitMiB=memory_mb,
+        # A timed job keeps the whole card to itself even when its profile uses fewer cores.
+        ledger_job = dict(agent="claude", project=PROJECT, jobId=job_id,
+                          cores=list(range(60)) if benchmark else sorted(set(mapping.values())),
+                          logicalCpus=sorted(mapping), memoryLimitMiB=memory_mb, profile=profile,
                           startTime=now.isoformat(),
                           expectedEnd=(now + timedelta(seconds=timeout)).isoformat(), timingValid=benchmark)
         append_ledger(ledger_path, dict(ledger_job, event="start"))
@@ -854,6 +885,7 @@ def main():
     parser.add_argument("--threads", type=int, default=1, help="worker threads; reserve four logical CPUs per core")
     parser.add_argument("--cores", help="explicit comma-separated physical core IDs (0-59)")
     parser.add_argument("--benchmark", action="store_true", help="exclusive whole-card timed or atomic job")
+    parser.add_argument("--profile", choices=sorted(PROFILE_CORES), help=PROFILE_HELP)
     parser.add_argument("--transport-timeout", type=float)
     parser.add_argument("--stage-timeout", type=float, default=STAGE_TIMEOUT,
                         help="seconds allowed for staging; a slower upload is an infrastructure failure")
@@ -886,7 +918,7 @@ def main():
                      packed=args.file_list is not None, stage_timeout=args.stage_timeout,
                      threads=args.threads, cores=([int(c) for c in args.cores.split(",")]
                                                  if args.cores is not None else None),
-                     benchmark=args.benchmark,
+                     benchmark=args.benchmark, profile=args.profile,
                      transport=SSHTransport(config, transport_timeout, args.stage_timeout))
         print(json.dumps(result, sort_keys=True))
         return result["exit_code"]
