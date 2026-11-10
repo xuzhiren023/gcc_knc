@@ -136,3 +136,45 @@ before or after it. The driver expands it, so `-###` shows the `--param`s. KNC o
   from mpss-modules `host/linsysfs.c`). One model: that model. Different models: an error that
   names them and asks for `-mknc-card=MODEL`.
 - Nothing found (a Windows host, a host without MPSS): `generic`, with a one-line note on stderr.
+
+## Writing fast code for KNC
+
+Guidance for programs on the Intel® Xeon Phi™ x100 coprocessor, in our own words. Sources are
+named per claim; none of this is Intel text (ADR-0013).
+
+**Threads per core.**
+- Use 4 per core for compute-bound loops: one thread cannot issue back to back on this in-order
+  core, so the compiler assumes 4 (`knc-threads-per-core`, [best-practice review](research/knc-best-practice-review.md) item 3).
+- Pure streaming code may run faster at 1-2 per core: McCalpin's STREAM loses about 10% at 4
+  (review item 10); our own prefetch and unroll measurements are C5 and S8-15 ([knc-costs.md](research/knc-costs.md)).
+- Tell the compiler what you run: `--param knc-threads-per-core=N` (ICC `-qopt-threads-per-core=N`).
+  At 1-3 it uses two reduction chains and a longer L1 prefetch distance (C7, C5).
+
+**First touch and parallel regions.**
+- Initialize data in the thread that will use it (the same `schedule(static)` loop shape), so
+  pages are first written, and cached, where they are used (PRACE §13.2.2-13.2.8, review item 10).
+- Prefer fewer, larger `parallel` regions over many small ones: each fork and join costs a barrier
+  across up to 240 threads. Use `nowait` on a worksharing loop when the next loop does not read
+  what it wrote. libgomp's static-schedule and spin choices are in S9-08 and S9-10.
+
+**Heap.**
+- Allocate large blocks once and reuse them across time steps. Each `malloc` above glibc's mmap
+  threshold is an `mmap` plus page zeroing, and freeing it is an `munmap` (review item 4).
+- glibc knobs, set in the environment (ICC's `-qopt-malloc-options` did this at link time):
+  `MALLOC_MMAP_THRESHOLD_=<bytes>` (large, for example 1073741824, keeps big blocks on the heap)
+  with `MALLOC_TRIM_THRESHOLD_=<bytes>` (large, so freed memory is not returned each step).
+  Not adopted as a compiler or libgomp default; measure on your program.
+- Arenas and stacks: libgomp sets `MALLOC_ARENA_MAX` from the card's memory unless you set it
+  (ADR-0012, S9-12; WRF runs at 64). Thread stacks reserve address space too: set
+  `OMP_STACKSIZE` for 240 threads ([knc-libgomp.md](research/knc-libgomp.md) section 6).
+
+**Differences from ICC `-mmic` defaults.**
+- ICC flushed subnormals to zero (`-ftz`) and used faster, less accurate divide and
+  transcendentals by default. GCC-KNC keeps IEEE at every `-O` level (ADR-0003): subnormals are
+  kept, divide and square root are correctly rounded.
+- Opt in with `-ffast-math`, which links `crtfastmath` and flushes subnormals, and also
+  reassociates and approximates. There is no separate ICC-style `-no-prec-div` yet (ADR-0003
+  point 5). The VPU cost of subnormal operands is the subject of
+  [S9-16](../work/tickets/S9-16.md); do not assume flushing is needed for speed until it reports.
+
+Intel and Xeon Phi are trademarks of Intel Corporation or its subsidiaries.
