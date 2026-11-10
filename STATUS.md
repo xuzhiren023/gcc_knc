@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-09 20:34.
+Updated automatically at every ticket change. Last update: 2026-11-09 22:00.
 
-**Next: GPT-6.1, on S8-08 (-mtune=knc tune-flag audit (E5-12)).** Run `python tools/dispatch.py`, or ask the tech lead to.
+**Next: the tech lead, on S8-14.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[##################--]` 135 of 150
 
@@ -156,7 +156,7 @@ Current tickets: `[##################--]` 135 of 150
 | S8-11 | Sprint 8 batch check and paired M2 re-measure | Not started | add one compiler-prefetch card case, because S8-03's card run has no row kernel (C5's rows are hand-written... |
 | S8-12 | Fix three weak S8-01 checks - C4 page offsets, C5 row aliasing, C9 memory chain | Done | The knc-char checks C4, C5 and C9 are fixed and rebuilt: C4 now walks every page offset, C5's eight arrays ... |
 | S8-13 | Streaming stores for write-only loops beyond L2 (E5-08) | Done | Loops that write arrays too large for the cache now use streaming stores: about 30% faster beyond L2 on the... |
-| S8-14 | Default 64-byte data alignment and TLB-aware cache parameters (E5-13) | In progress | added at the owner's request (2026-11-08: "add three [tickets] in s8") to cover ADR-0009 points the sprint ... |
+| S8-14 | Default 64-byte data alignment and TLB-aware cache parameters (E5-13) | Waiting for review | Green gcc-2 3516ea25905 (i386-knc.cc only): knc defaults to -malign-data=cacheline, local arrays >=64 B 64-... |
 | S8-15 | Small-loop unroll default and the GCC-KNC flags page (E5-09) | Not started | added at the owner's request (2026-11-08: "add three [tickets] in s8") to cover ADR-0009 points the sprint ... |
 | S8-16 | User story - one bold flag, -mphinix, with a rising-phoenix banner and a progress bar | Not started | owner's user story, written by the lead with the owner's request quoted above. |
 | S8-17 | Card check C12 - power by rail for a saturated vector unit against x87, idle and streaming | Done | Card check C12 is built and ready to run: it measures card power by rail (core, uncore, memory) while the v... |
@@ -175,6 +175,7 @@ Current tickets: `[##################--]` 135 of 150
 
 ## Recent activity
 
+- 2026-11-09 22:00 **S8-14** engineer submit: Green gcc-2 3516ea25905 (i386-knc.cc only): knc defaults to -malign-data=cacheline, local arrays >=64 B 64-aligned, L2 param 256 KB (DTLB reach). R...
 - 2026-11-09 20:31 **S8-08** lead budget: sessions 5: lead extension 2 (progress: the align-64 default was built and measured).
 - 2026-11-09 20:30 **S8-08** lead changes: Card 00:55-01:22Z, align-64 vs knc (code identical but .p2align): affine, stencil1 L2-2, short ~1.00; slower: mat8 1.106, mat16 1.173, short5 1.048...
 - 2026-11-09 20:29 **S8-13** lead approve: Loops that write arrays too large for the cache now use streaming stores: about 30% faster beyond L2 on the card, no loss with data in L2, and x86 ...
@@ -182,7 +183,6 @@ Current tickets: `[##################--]` 135 of 150
 - 2026-11-09 19:00 **S9-09** lead amend: Pre-check: build wiring, static linking, test programs and allowed files are now in the brief (lead pre-check section).
 - 2026-11-09 19:00 **S9-08** lead amend: Pre-check: build wiring, static linking, test programs and allowed files are now in the brief (lead pre-check section).
 - 2026-11-09 18:58 **S9-07** lead amend: Pre-check: build wiring, static linking, test programs and allowed files are now in the brief (lead pre-check section).
-- 2026-11-09 18:57 **S9-06** lead amend: Pre-check: build wiring, static linking, test programs and allowed files are now in the brief (lead pre-check section).
 
 ## Cost
 
