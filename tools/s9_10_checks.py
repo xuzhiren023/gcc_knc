@@ -53,13 +53,13 @@ MEASURE_SH = r'''#!/bin/sh
 #   lock path) and padded partials summed by the master; 10000 regions a batch; the order of
 #   the three is drawn per round, 3 rounds. RATIO lines are per-round median_us(mode)/median_us(padded),
 #   SUMMARY their median over the rounds.
-# malloc: measurement 7 of section 6. claude-s9red-malloc.mic at 60, 120 and 240 threads, each
-#   doing 100000 malloc/free of 1 KiB, with MALLOC_ARENA_MAX unset, 60, 8 and 1, 3 runs each;
-#   one line per run with wall_s, VmPeak, VmHWM and VmRSS. Under card_run's address-space limit
-#   the unset runs at 240 threads may fail (S9-06 tasks at 240: Out of memory): that is data,
-#   and the line says how far it got.
-# Exit 0 when every RESULT line says ok (a malloc run that fails under the limit is reported as
-# LIMIT, not as a failure, when MALLOC_ARENA_MAX is unset).
+# malloc: measurement 7 of section 6 as ADR-0012 point 4 sets it. claude-s9red-malloc.mic at
+#   240 threads, each doing 100000 malloc/free of 1 KiB, with MALLOC_ARENA_MAX unset, 240, 120,
+#   64, 60, 30 and 8, under ulimit -v 6, 8 and 10 GiB (stand-ins for the 3120, 5110P and 7120),
+#   3 runs each; one line per run with wall_s, VmPeak, VmHWM and VmRSS. A limit above the job's
+#   own is SKIP (the job needs 10 GiB of card_run memory for all three). A run that fails under
+#   a limit (S9-06 tasks at 240: Out of memory) is data, reported as LIMIT with how far it got.
+# Exit 0 when no RESULT line says UNEXPECTED (a reduction that fails, or a malloc run that times out).
 # BusyBox 1.19 sh: no timeout applet, so a watcher kills a program after LIMIT seconds.
 cd -- "$(dirname -- "$0")" || exit 2
 status=0
@@ -136,20 +136,27 @@ reduction() {
 malloc() {
     LIMIT=600
     echo "S9-10 malloc start: $(policy)"
-    for threads in 60 120 240; do
-        for arenas in unset 60 8 1; do
+    have=$(ulimit -v)
+    for gib in 6 8 10; do
+        kib=$((gib * 1024 * 1024))
+        if [ "$have" != unlimited ] && [ "$have" -lt $kib ]; then
+            echo "RESULT malloc/limit=${gib}G SKIP: the job's ulimit -v is $have kB; give the job ${gib} GiB"
+            continue
+        fi
+        for arenas in unset 240 120 64 60 30 8; do
             env=-
             [ $arenas = unset ] || env=MALLOC_ARENA_MAX=$arenas
             for rep in 1 2 3; do
-                run $env ./claude-s9red-malloc.mic $threads
+                run $env sh -c "ulimit -v $kib && exec ./claude-s9red-malloc.mic 240"
                 line=$(grep '^S9-10 malloc ' job.out)
+                tag="malloc/limit=${gib}G/arenas=$arenas/$rep"
                 if [ "$rc" = 0 ] && [ -n "$line" ]; then
-                    echo "RESULT malloc/$threads/$arenas/$rep ok: $line"
-                elif [ $arenas = unset ] && [ "$rc" != timeout ]; then
-                    echo "RESULT malloc/$threads/$arenas/$rep LIMIT: exit=$rc ${line:-no result line}"
+                    echo "RESULT $tag ok: $line"
+                elif [ "$rc" != timeout ]; then
+                    echo "RESULT $tag LIMIT: exit=$rc ${line:-no result line}"
                     head -n 5 job.out | sed 's/^/  | /'
                 else
-                    echo "RESULT malloc/$threads/$arenas/$rep UNEXPECTED: exit=$rc"
+                    echo "RESULT $tag UNEXPECTED: exit=$rc"
                     head -n 20 job.out | sed 's/^/  | /'
                     status=1
                 fi

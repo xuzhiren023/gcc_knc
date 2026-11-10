@@ -3,8 +3,8 @@
 
    usage: malloc.mic THREADS [ROUNDS]
 
-   Each thread does ROUNDS (default 100000) malloc, write and free of 1 KiB.  The run.sh caller
-   sets MALLOC_ARENA_MAX (unset, 60, 8, 1).  Prints the wall time (CLOCK_MONOTONIC_RAW) and
+   Each thread does ROUNDS (default 100000) malloc, write and free of 1 KiB.  The caller
+   (measure.sh) sets MALLOC_ARENA_MAX and ulimit -v (ADR-0012 point 4).  Prints the wall time (CLOCK_MONOTONIC_RAW) and
    VmPeak, VmHWM and VmRSS from /proc/self/status.  A malloc that fails is counted, not fatal,
    so a run under an address-space limit reports how far it got; a thread libgomp cannot create
    ends the program in libgomp.  */
