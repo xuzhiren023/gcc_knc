@@ -166,7 +166,7 @@ Current tickets: `[##################--]` 140 of 151
 | S9-02 | libstdc++ for KNC: exceptions, RTTI, atomics, threads, packaging (E6-06 input) | Done | We now know how to build GCC 16's C++ library for the card: no newer glibc or kernel is needed, and built w... |
 | S9-03 | libstdc++ and libatomic build for k1om (E6-06a) | Done | GCC-KNC now builds g++, libstdc++ and libatomic for k1om, with the donor's ABI kept (no donor symbol missin... |
 | S9-04 | libstdc++ packaging into the private prefix and a g++ link guard (E6-06b) | Done | g++ for KNC now refuses to link against an older libstdc++ (such as the card's GCC 5 one) with a clear mess... |
-| S9-05 | libstdc++ runtime slice on the card (E6-06c) | Not started | S9-04 installs the g++ link guard scripts (libstdc++-knc{,-static}.ld) only in the prefix k1om-mpss-linux/l... |
+| S9-05 | libstdc++ runtime slice on the card (E6-06c) | In progress | S9-04 installs the g++ link guard scripts (libstdc++-knc{,-static}.ld) only in the prefix k1om-mpss-linux/l... |
 | S9-06 | libgomp for k1om: build, select, package and link guard (E6-03 A) | Not started | Lane gcc -> gcc2: Sprint 9 runs on tree 2 while tree 1 finishes Sprint 8 (owner 2026-11-09: start Sprint 9 ... |
 | S9-07 | libgomp KNC affinity defaults (E6-03 B) | Not started | Lane gcc -> gcc2: Sprint 9 runs on tree 2 while tree 1 finishes Sprint 8 (owner 2026-11-09: start Sprint 9 ... |
 | S9-08 | libgomp spin-wait with delay and the one-core measurement (E6-03 C) | Not started | Lane gcc -> gcc2: Sprint 9 runs on tree 2 while tree 1 finishes Sprint 8 (owner 2026-11-09: start Sprint 9 ... |
@@ -189,10 +189,10 @@ Current tickets: `[##################--]` 140 of 151
 
 - From the script, engineer: 340 sessions, 759.3M input tokens
 - From the script, lead: 230 sessions, 70.2M input tokens
-- Started by hand, Claude: 11 sessions, 1992.4M input tokens
+- Started by hand, Claude: 11 sessions, 1993.0M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 21.3 GiB of 100 GiB. 94 GiB free on the drive.
+The project uses 21.3 GiB of 100 GiB. 92 GiB free on the drive.
