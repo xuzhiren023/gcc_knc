@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-10 01:56.
+Updated automatically at every ticket change. Last update: 2026-11-10 02:37.
 
 **Next: GPT-6.1, on S8-19 (-mtune=knc stops the tight-loop alignment pass (nops on the fallthrough path)).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
@@ -187,12 +187,12 @@ Current tickets: `[##################--]` 139 of 151
 
 ## Cost
 
-- From the script, engineer: 337 sessions, 758.9M input tokens
+- From the script, engineer: 338 sessions, 758.9M input tokens
 - From the script, lead: 230 sessions, 70.2M input tokens
-- Started by hand, Claude: 11 sessions, 1989.5M input tokens
+- Started by hand, Claude: 11 sessions, 1991.1M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 21.0 GiB of 100 GiB. 99 GiB free on the drive.
+The project uses 21.1 GiB of 100 GiB. 97 GiB free on the drive.
