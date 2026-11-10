@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-10 06:34.
+Updated automatically at every ticket change. Last update: 2026-11-10 06:35.
 
 **Next: the tech lead, on S8-15.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
@@ -169,13 +169,14 @@ Current tickets: `[###################-]` 144 of 151
 | S9-05 | libstdc++ runtime slice on the card (E6-06c) | Done | A 56-program libstdc++ runtime slice (exceptions, threads, futures, filesystem, random_device, plus the KNC... |
 | S9-06 | libgomp for k1om: build, select, package and link guard (E6-03 A) | Done | OpenMP (-fopenmp) now links and builds against a KNC libgomp in the private prefix, which spins with DELAY ... |
 | S9-07 | libgomp KNC affinity defaults (E6-03 B) | Done | OpenMP programs on KNC now spread threads one per core over the 60 compute cores by default (OS core left o... |
-| S9-08 | libgomp spin-wait with delay and the one-core measurement (E6-03 C) | Question for the tech lead | Submit refused: 782 changed lines vs budget 500. Work is done and green (GCC d52140f524a; red e5a468d; s9_0... |
+| S9-08 | libgomp spin-wait with delay and the one-core measurement (E6-03 C) | In progress | Yes, resubmit with --override 'size is the staged measurement programs and checks the ticket requires; libg... |
 | S9-09 | libgomp hierarchical ring-aware barrier (E6-03 D) | Not started | Lane gcc -> gcc2: Sprint 9 runs on tree 2 while tree 1 finishes Sprint 8 (owner 2026-11-09: start Sprint 9 ... |
 | S9-10 | libgomp padding, static schedule default and malloc guidance (E6-03 E) | Not started | Lane gcc -> gcc2: Sprint 9 runs on tree 2 while tree 1 finishes Sprint 8 (owner 2026-11-09: start Sprint 9 ... |
 | S9-11 | Sprint 9 batch check | Not started | from S9-01's plan, under the owner's overnight blanket approval. |
 
 ## Recent activity
 
+- 2026-11-10 06:35 **S9-08** lead answer: Yes, resubmit with --override 'size is the staged measurement programs and checks the ticket requires; libgomp change is 58 lines'. Keep the stagin...
 - 2026-11-10 06:34 **S9-08** engineer ask: Submit refused: 782 changed lines vs budget 500. Work is done and green (GCC d52140f524a; red e5a468d; s9_08_checks host 11/11, scan PASS; card bat...
 - 2026-11-10 06:32 **S8-15** engineer submit: GCC 7d26134e1f2+482730e75cc (shared i386.cc: 2-line ADR-0006 hook), rebased on knc 5d7514a1e7c (libgomp only), rebuilt. Red 16651e2, green + docs/g...
 - 2026-11-10 06:22 **S9-08** lead note: S9-06 already added config/linux/knc/futex.h (cpu_relax = DELAY gomp_knc_delay), mutex.c (gomp_knc_delay = 32) and spincount.h (default 100000, abo...
@@ -183,7 +184,6 @@ Current tickets: `[###################-]` 144 of 151
 - 2026-11-10 06:13 **S9-07** engineer submit: Green: knc/affinity.c plus a 6-line __k1om__ hook in env.c give core places (sysfs or cpuinfo, inherited mask, OS core dropped), default spread. gc...
 - 2026-11-10 06:12 **S9-07** lead answer: Yes, resubmit with --override: 846 against 800 is the approved red plus a 23-line licence header, no cut needed. Name the override reason in the note.
 - 2026-11-10 06:10 **S9-07** engineer ask: Work is done but submit is refused on size: 846 changed lines against the 800 budget (red commit you approved is 653; green is knc/affinity.c 187 w...
-- 2026-11-10 06:00 **S9-07** lead approve-red: S9-07 red approved: host tests on synthetic sysfs and cpuinfo-only trees (whole card, 30-core mask, OS core only, explicit OMP_NUM_THREADS) fail 8/...
 
 ## Cost
 
