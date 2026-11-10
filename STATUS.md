@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-10 09:55.
+Updated automatically at every ticket change. Last update: 2026-11-10 09:56.
 
 **Next: GPT-6.1, on S8-16 (User story - one bold flag, -mphinix, with a rising-phoenix banner and a progress bar).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
@@ -171,7 +171,7 @@ Current tickets: `[###################-]` 149 of 154
 | S9-07 | libgomp KNC affinity defaults (E6-03 B) | Done | Card 2026-11-10 12:01Z, whole card (--benchmark, 240 CPUs inherited): all 8 jobs ok (defaults at 60/120/240... |
 | S9-08 | libgomp spin-wait with delay and the one-core measurement (E6-03 C) | Done | KNC libgomp's spin wait can be tuned with GOMP_KNC_DELAY, the default spin count is 3 ms of DELAY periods, ... |
 | S9-09 | libgomp hierarchical ring-aware barrier (E6-03 D) | Done | OpenMP barriers on KNC now synchronise per core first and then across cores (one cache line per core instea... |
-| S9-10 | libgomp padding, static schedule default and malloc guidance (E6-03 E) | Done | KNC libgomp keeps each thread's private data and implicit task on cache lines of their own, schedule(runtim... |
+| S9-10 | libgomp padding, static schedule default and malloc guidance (E6-03 E) | Done | Card 2026-11-10 14:40Z: the eight OpenMP programs pass on the S9-06..S9-10 libgomp at 60 threads (6 GiB) an... |
 | S9-11 | Sprint 9 batch check | Not started | deps add S9-14: run correctness and key timings under the 3100/5100/7100 profiles (owner 2026-11-10). |
 | S9-12 | libgomp adapts to the card: malloc arena cap from memory, core count and clock (ADR-0012) | Done | KNC libgomp now reads the card at start-up: the malloc arena cap fits the card's memory and any address-spa... |
 | S9-13 | User story - -mknc-card= picks the card model's tuning, and -mknc-card=native detects it | Not started |  |
@@ -179,6 +179,7 @@ Current tickets: `[###################-]` 149 of 154
 
 ## Recent activity
 
+- 2026-11-10 09:56 **S9-10** lead note: Card 2026-11-10 14:40Z: the eight OpenMP programs pass on the S9-06..S9-10 libgomp at 60 threads (6 GiB) and at 240 threads (MALLOC_ARENA_MAX=64, 1...
 - 2026-11-10 09:55 **S8-15** lead note: Card 2026-11-10 14:35Z: correctness passes (s4/s5 PASS, s5 neg 1, M2 negative 1 / positive 0). Timing in progress (d1 launch 1: mat16 0.788, mat8 0...
 - 2026-11-10 09:53 **S9-11** lead amend: deps add S9-14: run correctness and key timings under the 3100/5100/7100 profiles (owner 2026-11-10).
 - 2026-11-10 09:53 **S8-11** lead amend: deps add S9-14: run correctness and key timings under the 3100/5100/7100 profiles (owner 2026-11-10).
@@ -186,7 +187,6 @@ Current tickets: `[###################-]` 149 of 154
 - 2026-11-10 09:40 **S9-11** lead note: arena constants must be set from measurement 7 before Sprint 9 closes (S9-12 interim 50% MemTotal).
 - 2026-11-10 09:38 **S9-12** engineer submit: libgomp on k1om derives MALLOC_ARENA_MAX from MemTotal/CommitLimit/RLIMIT_AS/stack when the user did not set it, reads core count and cpu MHz from ...
 - 2026-11-10 09:36 **S9-12** lead answer: Do not split. The size is from the scope added at 09:14 (core count and clock), about 90 lines moved out of affinity.c, and the measurement 7 runne...
-- 2026-11-10 09:34 **S9-12** engineer ask: Done and verified on host, but submit refuses: 1275 changed lines vs budget 500. Breakdown: GCC 6751b9602fe +543/-96 (knc/card.h 392 new, of which ...
 
 ## Cost
 
