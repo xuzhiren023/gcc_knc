@@ -2,7 +2,7 @@
 
 Updated automatically at every ticket change. Last update: 2026-11-10 07:27.
 
-**Next: GPT-6.1, on S9-09 (libgomp hierarchical ring-aware barrier (E6-03 D)).** Run `python tools/dispatch.py`, or ask the tech lead to.
+**Next: GPT-6.1, on S8-16 (User story - one bold flag, -mphinix, with a rising-phoenix banner and a progress bar).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
 Current tickets: `[###################-]` 146 of 151
 
@@ -158,7 +158,7 @@ Current tickets: `[###################-]` 146 of 151
 | S8-13 | Streaming stores for write-only loops beyond L2 (E5-08) | Done | Loops that write arrays too large for the cache now use streaming stores: about 30% faster beyond L2 on the... |
 | S8-14 | Default 64-byte data alignment and TLB-aware cache parameters (E5-13) | Done | Card 2026-11-10 (deferred timing, frozen 3516ea25905 vs S8-13): s4_masks o2v/o3 pass, guard controls exit 3... |
 | S8-15 | Small-loop unroll default and the GCC-KNC flags page (E5-09) | Done | -O2 -march=knc now unrolls small vector loops (at most 16 insns) up to 4 times, and docs/gcc-knc-flags.md l... |
-| S8-16 | User story - one bold flag, -mphinix, with a rising-phoenix banner and a progress bar | Not started | Owner 2026-11-09: Sprint 8 runs on without waiting for card timing; the lead approves on code review and ho... |
+| S8-16 | User story - one bold flag, -mphinix, with a rising-phoenix banner and a progress bar | In progress | Owner 2026-11-09: Sprint 8 runs on without waiting for card timing; the lead approves on code review and ho... |
 | S8-17 | Card check C12 - power by rail for a saturated vector unit against x87, idle and streaming | Done | Card check C12 is built and ready to run: it measures card power by rail (core, uncore, memory) while the v... |
 | S8-18 | Second GCC tree - a gcc2 lane with its own checkout and build, so two GCC tickets run in parallel | Done | Tools now support a second GCC tree: a lane gcc2 ticket builds in gcc-2/gcc-build-2 while a gcc ticket uses... |
 | S8-19 | -mtune=knc stops the tight-loop alignment pass (nops on the fallthrough path) | Done | Card 2026-11-10 11:28-12:03Z (frozen .work/_shared/tmp/claude-s8-19, log .work/_shared/tmp/claude-next.log)... |
@@ -189,7 +189,7 @@ Current tickets: `[###################-]` 146 of 151
 
 - From the script, engineer: 354 sessions, 781.1M input tokens
 - From the script, lead: 235 sessions, 71.3M input tokens
-- Started by hand, Claude: 11 sessions, 2019.3M input tokens
+- Started by hand, Claude: 11 sessions, 2020.4M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
