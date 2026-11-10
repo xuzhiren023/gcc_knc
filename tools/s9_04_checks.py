@@ -3,7 +3,8 @@
 
     python tools/s9_04_checks.py negative   a g++ link whose -lstdc++ finds the donor's GCC 5
                                             library (-L to its directory), shared or with
-                                            -static-libstdc++, must fail with the guard's message
+                                            -static-libstdc++, must fail with the guard's message;
+                                            the same links without it must succeed
     python tools/s9_04_checks.py package    readelf on the prefix's libstdc++.so.6 and libatomic.so.1
                                             (SONAME, version nodes) and on the s9_cxx cross-DSO pairs
                                             (DT_RPATH $ORIGIN/../lib), staged for the card in
@@ -44,17 +45,23 @@ EXPECT = 'S9-CXX xdso PASS checks=5 failures=0'
 def negative_mode():
     target = OUT / 'old-runtime.mic'
     hello = SRC / 'hello.cc'
-    cases = (
-        ('donor shared libstdc++', []),
-        ('donor static libstdc++', ['-static-libstdc++', '-static-libgcc']),
-    )
+    static = ['-static-libstdc++', '-static-libgcc']
     failed = False
-    for label, extra in cases:
+    for label, extra in (('shared', []), ('static', static)):
+        # The same link without the donor's directory must still succeed: the guard passes ours.
+        target.unlink(missing_ok=True)
+        rc, text = s7.capture([GXX, *FLAGS, *extra, hello, '-o', target])
+        ok = rc == 0 and target.exists()
+        failed |= not ok
+        print(('PASS ' if ok else 'FAIL ') + 'own %s libstdc++: exit %d' % (label, rc), flush=True)
+        if not ok:
+            print(text.strip()[-600:])
         target.unlink(missing_ok=True)
         rc, text = s7.capture([GXX, *FLAGS, *extra, '-L', DONOR_LIB, hello, '-o', target])
         ok = rc != 0 and GUARD in text and not target.exists()
         failed |= not ok
-        print(('PASS ' if ok else 'FAIL ') + label + ': exit %d, expected "%s"' % (rc, GUARD), flush=True)
+        print(('PASS ' if ok else 'FAIL ') + 'donor %s libstdc++: exit %d, expected "%s"'
+              % (label, rc, GUARD), flush=True)
         if not ok:
             print(text.strip()[-600:])
     target.unlink(missing_ok=True)
