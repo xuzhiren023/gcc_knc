@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-09 22:00.
+Updated automatically at every ticket change. Last update: 2026-11-09 22:04.
 
-**Next: the tech lead, on S8-14.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: the tech lead, on S8-08.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[##################--]` 135 of 150
 
@@ -150,7 +150,7 @@ Current tickets: `[##################--]` 135 of 150
 | S8-05 | Re-check the scalar-add cost on mat8 and the stencils after S8-06 (E5-11) | Done | No per-loop add-cost work is needed: with the cheaper add cost mat8 now compiles to the same code as today,... |
 | S8-06 | Memory-operand forms for V16SF/V8DF arithmetic and FMA (E5-17) | Done | KNC vector add, sub, mul and FMA now read aligned memory and {1to16}/{1to8} broadcasts directly instead of ... |
 | S8-07 | vpmadd231d for V16SI multiply-add (E5-14) | Done | KNC now emits vpmadd231d for vector integer multiply-add: one instruction at 4 ticks latency instead of vpm... |
-| S8-08 | -mtune=knc tune-flag audit (E5-12) | In progress | sessions 5: lead extension 2 (progress: the align-64 default was built and measured). |
+| S8-08 | -mtune=knc tune-flag audit (E5-12) | Waiting for review | -mtune=knc now defaults only -falign-functions=64, loops generic (gcc 020d107325d on knc 454bead9944, i386-... |
 | S8-09 | KNC -O2 defaults: vectorizer cost model, stride versioning, predictive commoning (E5-18) | Not started | written under the owner's overnight blanket approval (2026-11-08). |
 | S8-10 | Less ring traffic: 64-byte padding of per-thread data, and card check C11 (E5-16) | Done | Per-thread arrays and the OpenMP shared block now start on their own 64-byte line, and the C11 card check s... |
 | S8-11 | Sprint 8 batch check and paired M2 re-measure | Not started | add one compiler-prefetch card case, because S8-03's card run has no row kernel (C5's rows are hand-written... |
@@ -175,6 +175,7 @@ Current tickets: `[##################--]` 135 of 150
 
 ## Recent activity
 
+- 2026-11-09 22:04 **S8-08** engineer submit: -mtune=knc now defaults only -falign-functions=64, loops generic (gcc 020d107325d on knc 454bead9944, i386-knc.cc only). Red 43464d3, T1 align scan...
 - 2026-11-09 22:00 **S8-14** engineer submit: Green gcc-2 3516ea25905 (i386-knc.cc only): knc defaults to -malign-data=cacheline, local arrays >=64 B 64-aligned, L2 param 256 KB (DTLB reach). R...
 - 2026-11-09 20:31 **S8-08** lead budget: sessions 5: lead extension 2 (progress: the align-64 default was built and measured).
 - 2026-11-09 20:30 **S8-08** lead changes: Card 00:55-01:22Z, align-64 vs knc (code identical but .p2align): affine, stencil1 L2-2, short ~1.00; slower: mat8 1.106, mat16 1.173, short5 1.048...
@@ -182,7 +183,6 @@ Current tickets: `[##################--]` 135 of 150
 - 2026-11-09 19:01 **S9-10** lead amend: Pre-check: build wiring, static linking, test programs and allowed files are now in the brief (lead pre-check section).
 - 2026-11-09 19:00 **S9-09** lead amend: Pre-check: build wiring, static linking, test programs and allowed files are now in the brief (lead pre-check section).
 - 2026-11-09 19:00 **S9-08** lead amend: Pre-check: build wiring, static linking, test programs and allowed files are now in the brief (lead pre-check section).
-- 2026-11-09 18:58 **S9-07** lead amend: Pre-check: build wiring, static linking, test programs and allowed files are now in the brief (lead pre-check section).
 
 ## Cost
 
