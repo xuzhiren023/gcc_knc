@@ -8,7 +8,8 @@
 // footprint: the NGO copy runs when iterations x bytes per iteration reach
 // the 512 KiB L2 (two 64-byte streams: 4096 iterations, three: 2731), and
 // the other copy is the S8-03 prefetched loop with normal stores.
-// options: -O2 -ffp-contract=off
+// -fno-unroll-loops: this test pins the NGO stores and fence, not unrolling (S8-15).
+// options: -O2 -ffp-contract=off -fno-unroll-loops
 // Order within each NGO function: every NGO store comes before the fence,
 // the fence before a ret, and no NGO store reaches a ret without a fence.
 // scan-asm-func stream_f32: (?s)\A(?!.*\bvmovnrngoap[sd]\b(?:(?!\block\b).)*\n\s*ret\b)(?!.*\block[^\n]*addl[^\n]*\n.*\bvmovnrngoap)(?=.*\bvmovnrngoaps\s+%zmm\d+,\s*[^\n]*\(%r.*\block\b[ \t]*;?\s*addl[ \t]+\$0,[ \t]*\(%rsp\).*\n\s*ret\b)
