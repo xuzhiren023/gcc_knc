@@ -1,10 +1,10 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-10 05:38.
+Updated automatically at every ticket change. Last update: 2026-11-10 05:46.
 
 **Next: the tech lead, on S8-15.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
-Current tickets: `[##################--]` 142 of 151
+Current tickets: `[##################--]` 143 of 151
 
 ## Milestones
 
@@ -13,7 +13,7 @@ Current tickets: `[##################--]` 142 of 151
 | M0 | Foundation | In progress | 17 of 17 tickets |
 | M1 | Mixed native code | Done | 43 of 43 tickets |
 | M2 | Useful vector target | Done | 51 of 51 tickets |
-| M3 | Runtimes | In progress | 15 of 21 tickets |
+| M3 | Runtimes | In progress | 16 of 21 tickets |
 | M4 | Broad optimization | Not started | Not planned in detail yet |
 | M5 | Program corpus | Not started | Not planned in detail yet |
 | M6 | Release | Not started | Not planned in detail yet |
@@ -167,7 +167,7 @@ Current tickets: `[##################--]` 142 of 151
 | S9-03 | libstdc++ and libatomic build for k1om (E6-06a) | Done | Card 2026-11-10 08:40Z (log .work/_shared/tmp/claude-s8-09.log): hello, rtti, thread, atomic16, tz and all ... |
 | S9-04 | libstdc++ packaging into the private prefix and a g++ link guard (E6-06b) | Done | Card 2026-11-10 08:42Z: both xdso pairs print PASS checks=5 with LD_LIBRARY_PATH=/usr/lib64, and the loader... |
 | S9-05 | libstdc++ runtime slice on the card (E6-06c) | Done | A 56-program libstdc++ runtime slice (exceptions, threads, futures, filesystem, random_device, plus the KNC... |
-| S9-06 | libgomp for k1om: build, select, package and link guard (E6-03 A) | Waiting for review | Rebased on main; worktree 709e263, gcc-2 s9/S9-06 a7bcf6b5a0e on knc, built clean. s9_06_checks.py build PA... |
+| S9-06 | libgomp for k1om: build, select, package and link guard (E6-03 A) | Done | OpenMP (-fopenmp) now links and builds against a KNC libgomp in the private prefix, which spins with DELAY ... |
 | S9-07 | libgomp KNC affinity defaults (E6-03 B) | Not started | Lane gcc -> gcc2: Sprint 9 runs on tree 2 while tree 1 finishes Sprint 8 (owner 2026-11-09: start Sprint 9 ... |
 | S9-08 | libgomp spin-wait with delay and the one-core measurement (E6-03 C) | Not started | Lane gcc -> gcc2: Sprint 9 runs on tree 2 while tree 1 finishes Sprint 8 (owner 2026-11-09: start Sprint 9 ... |
 | S9-09 | libgomp hierarchical ring-aware barrier (E6-03 D) | Not started | Lane gcc -> gcc2: Sprint 9 runs on tree 2 while tree 1 finishes Sprint 8 (owner 2026-11-09: start Sprint 9 ... |
@@ -176,6 +176,7 @@ Current tickets: `[##################--]` 142 of 151
 
 ## Recent activity
 
+- 2026-11-10 05:46 **S9-06** lead approve: OpenMP (-fopenmp) now links and builds against a KNC libgomp in the private prefix, which spins with DELAY instead of PAUSE and refuses an older li...
 - 2026-11-10 05:38 **S8-15** engineer ask: Green (GCC d6346c28b3a + shared hook 97e9f8c6e97): vector loops <=16 insns unroll 4x. Torture classes unchanged. 7 old T1 scans now fail on exact c...
 - 2026-11-10 05:37 **S9-06** engineer submit: Rebased on main; worktree 709e263, gcc-2 s9/S9-06 a7bcf6b5a0e on knc, built clean. s9_06_checks.py build PASS after rebase (26 programs, 30 files s...
 - 2026-11-10 05:31 **S9-06** lead answer: Done on main in 5f57593 (-ldl after -pthread in the s9_omp static link). Rebase and rerun build. libquadmath in LIBS stays (staging skips what the ...
@@ -183,13 +184,12 @@ Current tickets: `[##################--]` 142 of 151
 - 2026-11-10 04:51 **S8-19** lead approve: -mtune=knc no longer pads small loops entered by fallthrough with alignment nops (GCC 16's tight-loop pass, the cause of S8-08's 1.105x mat8 loss);...
 - 2026-11-10 04:42 **S8-19** engineer submit: GCC 3de77bcaabf (+knc S9-04 merge): -mtune=knc clears X86_TUNE_ALIGN_TIGHT_LOOPS, -mtune-ctrl still wins; knc-costs.md row. Red fd5d815 now green; ...
 - 2026-11-10 04:38 **S9-06** lead approve-red: S9-06's failing checks are accepted: they show that k1om libgomp is not selected, built, packaged or guarded yet, and the card runner for 60 and 24...
-- 2026-11-10 04:36 **S9-06** engineer red: Red 03be94c: tools/s9_06_checks.py configure|build|guard all FAIL: configure.tgt picks posix for k1om and gcc-build-2 has no libgomp; the s9_omp pr...
 
 ## Cost
 
 - From the script, engineer: 347 sessions, 767.9M input tokens
 - From the script, lead: 231 sessions, 70.4M input tokens
-- Started by hand, Claude: 11 sessions, 2004.0M input tokens
+- Started by hand, Claude: 11 sessions, 2005.4M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
