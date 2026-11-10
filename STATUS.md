@@ -2,7 +2,7 @@
 
 Updated automatically at every ticket change. Last update: 2026-11-10 05:46.
 
-**Next: the tech lead, on S8-15.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: GPT-6.1, on S8-15 (Small-loop unroll default and the GCC-KNC flags page (E5-09)).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
 Current tickets: `[##################--]` 143 of 151
 
@@ -157,7 +157,7 @@ Current tickets: `[##################--]` 143 of 151
 | S8-12 | Fix three weak S8-01 checks - C4 page offsets, C5 row aliasing, C9 memory chain | Done | The knc-char checks C4, C5 and C9 are fixed and rebuilt: C4 now walks every page offset, C5's eight arrays ... |
 | S8-13 | Streaming stores for write-only loops beyond L2 (E5-08) | Done | Loops that write arrays too large for the cache now use streaming stores: about 30% faster beyond L2 on the... |
 | S8-14 | Default 64-byte data alignment and TLB-aware cache parameters (E5-13) | Done | Card 2026-11-10 (deferred timing, frozen 3516ea25905 vs S8-13): s4_masks o2v/o3 pass, guard controls exit 3... |
-| S8-15 | Small-loop unroll default and the GCC-KNC flags page (E5-09) | Question for the tech lead | Green (GCC d6346c28b3a + shared hook 97e9f8c6e97): vector loops <=16 insns unroll 4x. Torture classes uncha... |
+| S8-15 | Small-loop unroll default and the GCC-KNC flags page (E5-09) | In progress | (a). Add -fno-unroll-loops to the dg-options of those 7 T1 tests, with a one-line comment that each test pi... |
 | S8-16 | User story - one bold flag, -mphinix, with a rising-phoenix banner and a progress bar | Not started | Owner 2026-11-09: Sprint 8 runs on without waiting for card timing; the lead approves on code review and ho... |
 | S8-17 | Card check C12 - power by rail for a saturated vector unit against x87, idle and streaming | Done | Card check C12 is built and ready to run: it measures card power by rail (core, uncore, memory) while the v... |
 | S8-18 | Second GCC tree - a gcc2 lane with its own checkout and build, so two GCC tickets run in parallel | Done | Tools now support a second GCC tree: a lane gcc2 ticket builds in gcc-2/gcc-build-2 while a gcc ticket uses... |
@@ -177,13 +177,13 @@ Current tickets: `[##################--]` 143 of 151
 ## Recent activity
 
 - 2026-11-10 05:46 **S9-06** lead approve: OpenMP (-fopenmp) now links and builds against a KNC libgomp in the private prefix, which spins with DELAY instead of PAUSE and refuses an older li...
+- 2026-11-10 05:46 **S8-15** lead answer: (a). Add -fno-unroll-loops to the dg-options of those 7 T1 tests, with a one-line comment that each test pins the feature it was written for (gathe...
 - 2026-11-10 05:38 **S8-15** engineer ask: Green (GCC d6346c28b3a + shared hook 97e9f8c6e97): vector loops <=16 insns unroll 4x. Torture classes unchanged. 7 old T1 scans now fail on exact c...
 - 2026-11-10 05:37 **S9-06** engineer submit: Rebased on main; worktree 709e263, gcc-2 s9/S9-06 a7bcf6b5a0e on knc, built clean. s9_06_checks.py build PASS after rebase (26 programs, 30 files s...
 - 2026-11-10 05:31 **S9-06** lead answer: Done on main in 5f57593 (-ldl after -pthread in the s9_omp static link). Rebase and rerun build. libquadmath in LIBS stays (staging skips what the ...
 - 2026-11-10 05:29 **S9-06** engineer ask: tests/acceptance/s9_omp/build.py:89 static link has no -ldl, so every *-static.mic fails on dlopen/dlsym from libgomp.a and 's9_06_checks.py build'...
 - 2026-11-10 04:51 **S8-19** lead approve: -mtune=knc no longer pads small loops entered by fallthrough with alignment nops (GCC 16's tight-loop pass, the cause of S8-08's 1.105x mat8 loss);...
 - 2026-11-10 04:42 **S8-19** engineer submit: GCC 3de77bcaabf (+knc S9-04 merge): -mtune=knc clears X86_TUNE_ALIGN_TIGHT_LOOPS, -mtune-ctrl still wins; knc-costs.md row. Red fd5d815 now green; ...
-- 2026-11-10 04:38 **S9-06** lead approve-red: S9-06's failing checks are accepted: they show that k1om libgomp is not selected, built, packaged or guarded yet, and the card runner for 60 and 24...
 
 ## Cost
 
