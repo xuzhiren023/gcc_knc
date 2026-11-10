@@ -30,7 +30,7 @@ limit who needs to talk, and they make the work itself the message.
 |---|---|---|---|
 | Owner | You | Priorities, milestones, anything outward-facing | Only the inbox and milestone reviews |
 | Tech lead | Claude | Specs, reviews, technical answers, merging to local `main` | Tickets in `review`, `red-review` and `blocked` |
-| Engineer | Claude Code (Sonnet light, Opus standard, Fable deep; `harness/policy.json`), one fresh session per ticket | How to implement the ticket | Its one ticket |
+| Engineer | Claude Code (Sonnet light, Opus standard, Fable 5.2 deep, pinned as `claude-fable-5-2`; `harness/policy.json`), one fresh session per ticket | How to implement the ticket | Its one ticket |
 | Dispatcher | `tools/dispatch.py`, no model | Nothing; it starts whoever is next | The board |
 
 When a ticket's engineer struggles (repeated timeouts without progress, or a second round of changes
@@ -79,6 +79,9 @@ branches, into `main` and `knc`, or neither. Nothing is pushed.
 5. **Tickets stay short:** 80 lines for the brief. Lasting knowledge moves to the code, an ADR or a component brief.
 6. **Two review rounds, then a person.** A third round of requested changes goes to the owner, because something is wrong with the ticket or the design.
 7. **Escalate up, one level at a time.** Engineer asks the lead. The lead answers or escalates to the owner.
+8. **Session budgets: the lead extends.** At a ticket's session budget the lead adds a session and records
+   it on the ticket. Only after two extensions in a row make no progress (no commit, state change or new
+   evidence) does it go to the owner (owner, 2026-11-09).
 
 ## What you see
 
