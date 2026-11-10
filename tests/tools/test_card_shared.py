@@ -361,10 +361,11 @@ class SharedCardRules(unittest.TestCase):
         self.assertEqual(self.events("execute")[0][3], 256)
 
     def test_single_job_above_total_memory_budget_refuses(self):
-        self.config["memoryMB"] = 10241
+        # S9-14 (owner 2026-11-10): exclusive turns may pass 10240 MiB, never the card's 16 GB.
+        self.config["memoryMB"] = 16385
         result = self.invoke()
         self.assertEqual(result["result_class"], "refused")
-        self.assertIn("10240", result["detail"])
+        self.assertIn("16384", result["detail"])
         self.assertFalse(self.events("execute"))
 
     def test_owner_budget_admits_eighty_programs_at_96_mib(self):

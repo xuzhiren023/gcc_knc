@@ -39,8 +39,9 @@ int main(int argc, char **argv) {
         if (!*end) break;
         part = end + 1;
     }
-    if (!parse_number(argv[2], &end, &mib) || *end || !mib || mib > 10240) {
-        fputs("claude-pin: memory must be 1..10240 MiB (owner, 2026-11-04)\n", stderr);
+    if (!parse_number(argv[2], &end, &mib) || *end || !mib || mib > 16384) {
+        /* S9-14 (owner 2026-11-10): exclusive turns may use the 7120P's 16 GB. */
+        fputs("claude-pin: memory must be 1..16384 MiB\n", stderr);
         return 125;
     }
     if (sched_setaffinity(0, sizeof(mask), &mask) != 0) {
