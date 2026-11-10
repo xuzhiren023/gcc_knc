@@ -2298,3 +2298,748 @@ Same counts as S6-08. No slow retry or FP ABI error.
 Log: `.work/_state/logs/S7_10_sweep-20261108-030046.log`.
 Summary: `.work/_shared/S7-10/sweep/summary.txt`, launcher
 `.work/_shared/S7-10/sweep.py`.
+## 2026-11-10T18:21:54+00:00
+
+Base: `releases/gcc-16.2.0`; KNC: `fe7ed380f149f775a6737639ec8a93b1e80d7c97`.
+Local refs only; no fetch, checkout, index update or ref update.
+
+### upstream/master
+
+Commit: `b88c2821e219244d18df873b0bfb344d3dc0b2a7`; date: 2026-11-03T19:41:47+01:00.
+
+Conflicts: 12
+
+#### `gcc/config/i386/i386-c.cc`
+
+```diff
+<<<<<<< upstream/master
+  /* For some of the k6/pentium variants there weren't separate ISA bits to
+=======
+  if (isa_flag & OPTION_MASK_ISA_KNC)
+    arch = ix86_knc_target_macros (parse_in, def_or_undef);
+
+  /* For some of the k6/pentium varients there weren't separate ISA bits to
+>>>>>>> knc
+```
+
+#### `gcc/config/i386/i386-options.cc`
+
+```diff
+<<<<<<< upstream/master
+  ix86_tune_cost = processor_cost_table[ix86_tune];
+  /* TODO: ix86_cost should be chosen at instruction or function granularity
+=======
+  ix86_tune_cost = ix86_knc_tune_cost (opts, processor_cost_table[ix86_tune]);
+  /* TODO: ix86_cost should be chosen at instruction or function granuality
+>>>>>>> knc
+```
+
+```diff
+<<<<<<< upstream/master
+  ix86_tune_cost = processor_cost_table[ix86_tune];
+  /* TODO: ix86_cost should be chosen at instruction or function granularity
+=======
+  ix86_tune_cost = ix86_knc_tune_cost (opts, processor_cost_table[ix86_tune]);
+  /* TODO: ix86_cost should be chosen at instruction or function granuality
+>>>>>>> knc
+```
+
+#### `gcc/config/i386/i386.cc`
+
+```diff
+<<<<<<< upstream/master
+=======
+  if (TARGET_KNC && !ix86_knc_check_abi_type (arg.type, arg.mode))
+    return true;
+  CUMULATIVE_ARGS *cum = get_cumulative_args (cum_v);
+
+>>>>>>> knc
+```
+
+```diff
+<<<<<<< upstream/master
+=======
+    }
+  if (stmt_cost == -1)
+    stmt_cost = ix86_default_vector_cost (kind, mode);
+  /* Only gather/scatter needs statement-specific KNC costs here.  Other
+     KNC defaults have already received the x86 lowering adjustments.  */
+  if (TARGET_KNC
+      && (kind == vector_gather_load || kind == vector_scatter_store))
+    {
+      int cost = ix86_knc_stmt_cost (kind, mode, stmt_info);
+      if (cost >= 0)
+        stmt_cost = cost;
+    }
+  /* ADR-0009 amendment 1 point 9: a KNC masked access of unknown
+     alignment is a gather or scatter.  */
+  if (TARGET_KNC && ix86_knc_packed_mode_p (mode)
+      && (kind == unaligned_load || kind == unaligned_store)
+      && stmt_info && gimple_call_internal_p (stmt_info->stmt))
+    stmt_cost = ix86_knc_stmt_cost (kind, mode, stmt_info);
+  /* ADR-0008 point 1: a two-input KNC permute is vpermd plus vpermd.  */
+  if (TARGET_KNC && kind == vec_perm
+      && ix86_knc_two_input_perm_p (mode, stmt_info, node))
+    stmt_cost *= 2;
+>>>>>>> knc
+```
+
+#### `gcc/config/i386/i386.opt`
+
+```diff
+<<<<<<< upstream/master
+mavx10v2aux
+Target Mask(ISA2_AVX10V2AUX) Var(ix86_isa_flags2) Save
+Support MMX, SSE, SSE2, SSE3, SSSE3, SSE4.1, SSE4.2, AVX, AVX2,
+AVX10.1 and AVX10V2AUX built-in functions and code generation.
+
+macev1
+Target Mask(ISA2_ACEV1) Var(ix86_isa_flags2) Save
+Support MMX, SSE, SSE2, SSE3, SSSE3, SSE4.1, SSE4.2, AVX, AVX2,
+AVX10.1 and ACEV1 built-in functions and code generation.
+
+mavx10v1aux
+Target Mask(ISA2_AVX10V1AUX) Var(ix86_isa_flags2) Save
+Support MMX, SSE, SSE2, SSE3, SSSE3, SSE4.1, SSE4.2, AVX, AVX2,
+AVX10.1 and AVX10V1AUX built-in functions and code generation.
+=======
+-param=knc-threads-per-core=
+Target Joined UInteger Var(knc_threads_per_core) Init(4) IntegerRange(1, 4) Param Optimization
+Assumed active KNC threads per core for latency hiding (1 to 4, default 4).
+
+-param=knc-prefetch-l1-distance=
+Target Joined UInteger Var(knc_prefetch_l1_distance) Init(16) IntegerRange(1, 4096) Param Optimization
+KNC L1 software prefetch distance in cache lines (default 16; halved when distance x streams x threads per core exceeds a quarter of L1; kept below the L2 distance).
+
+-param=knc-prefetch-l2-distance=
+Target Joined UInteger Var(knc_prefetch_l2_distance) Init(32) IntegerRange(1, 4096) Param Optimization
+KNC L2 software prefetch distance in cache lines (default 32).
+
+mphinix
+Target Driver RejectNegative Condition({defined (KNC_DRIVER_OPTIONS)})
+KNC only: -O3 and the measured GCC-KNC defaults in one flag, with a banner and a progress bar on a terminal; IEEE semantics stay.
+
+mphinix-banner
+Target Driver Condition({defined (KNC_DRIVER_OPTIONS)})
+KNC only: print the -mphinix banner on a terminal (default on).
+
+mprogress
+Target Driver Condition({defined (KNC_DRIVER_OPTIONS)})
+KNC only: draw a progress bar, one step per driver job, on a terminal (default with -mphinix).
+>>>>>>> knc
+```
+
+#### `gcc/config/i386/sse.md`
+
+```diff
+<<<<<<< upstream/master
+   (V16SF "TARGET_AVX512F") (V8SF "TARGET_AVX") V4SF
+   (V8DF "TARGET_AVX512F") (V4DF "TARGET_AVX") (V2DF "TARGET_SSE2")
+   (V8DI "TARGET_AVX512F") (V4DI "TARGET_AVX") (V2DI "TARGET_SSE2")
+   (V16SI "TARGET_AVX512F") (V8SI "TARGET_AVX") (V4SI "TARGET_SSE2")
+   (V32HI "TARGET_AVX512F") (V16HI "TARGET_AVX") (V8HI "TARGET_SSE2")
+   (V64QI "TARGET_AVX512F") (V32QI "TARGET_AVX") (V16QI "TARGET_SSE2")])
+=======
+   (V8DI "TARGET_AVX512F || TARGET_KNC") (V4DI "TARGET_AVX") (V2DI "TARGET_SSE2")
+   (V16SF "TARGET_AVX512F || TARGET_KNC") (V8SF "TARGET_AVX") V4SF
+   (V8DF "TARGET_AVX512F || TARGET_KNC") (V4DF "TARGET_AVX") (V2DF "TARGET_SSE2")
+   (V16SI "TARGET_KNC")])
+>>>>>>> knc
+```
+
+```diff
+<<<<<<< upstream/master
+  ix86_expand_cond_fma (operands, false, false);
+=======
+  if (TARGET_KNC)
+    {
+      emit_insn (gen_knc_cond_fma (<MODE>mode, operands[0], operands[1],
+				   operands[2], operands[3], operands[4],
+				   operands[5]));
+      DONE;
+    }
+  rtx tmp = gen_reg_rtx (<MODE>mode);
+  emit_insn (gen_fma<mode>4 (tmp,
+			     operands[2],
+			     operands[3],
+			     operands[4]));
+  emit_move_insn (operands[0], gen_rtx_VEC_MERGE (<MODE>mode,
+						  tmp,
+						  operands[5],
+						  operands[1]));
+>>>>>>> knc
+```
+
+```diff
+<<<<<<< upstream/master
+  [(set (match_operand:VI_AVX2 0 "register_operand")
+	(plusminus:VI_AVX2
+	  (match_operand:VI_AVX2 1 "vector_operand")
+	  (match_operand:VI_AVX2 2 "vector_or_const_vector_operand")))]
+  "TARGET_SSE2"
+{
+  /* Expand vector add/sub 1 as vector sub/add -1.  */
+  if (rtx_equal_p (operands[2], CONST1_RTX (<MODE>mode)))
+    {
+      operands[2] = force_reg (<MODE>mode, CONSTM1_RTX (<MODE>mode));
+      emit_insn (gen_<inv_insn><mode>3 (operands[0], operands[1],
+					operands[2]));
+      DONE;
+    }
+
+  if (CONST_VECTOR_P (operands[2]))
+    operands[2] = force_reg (<MODE>mode, operands[2]);
+
+=======
+  [(set (match_operand:VI_AVX2_KNC 0 "register_operand")
+	(plusminus:VI_AVX2_KNC
+	  (match_operand:VI_AVX2_KNC 1 "vector_operand")
+	  (match_operand:VI_AVX2_KNC 2 "vector_operand")))]
+  "TARGET_SSE2 || ix86_knc_packed_mode_p (<MODE>mode)"
+{
+  if (TARGET_KNC)
+    {
+      emit_insn (gen_knc_plusminus (<CODE>, <MODE>mode, operands[0],
+				    operands[1], operands[2]));
+      DONE;
+    }
+>>>>>>> knc
+```
+
+#### `gcc/configure`
+
+```diff
+<<<<<<< upstream/master
+  i?86-*-* | x86_64-*-*)
+    if test x$as_flavor = xsolaris; then
+      tls_section_flag=t
+=======
+  i?86-*-* | x86_64-*-* | k1om-*-linux*)
+    case "$target:$gas" in
+      i?86-*-solaris2*:no | x86_64-*-solaris2*:no)
+	tls_section_flag=t
+>>>>>>> knc
+```
+
+#### `gcc/configure.ac`
+
+```diff
+<<<<<<< upstream/master
+  i?86-*-* | x86_64-*-*)
+    if test x$as_flavor = xsolaris; then
+      tls_section_flag=t
+=======
+  i?86-*-* | x86_64-*-* | k1om-*-linux*)
+    case "$target:$gas" in
+      i?86-*-solaris2*:no | x86_64-*-solaris2*:no)
+	tls_section_flag=t
+>>>>>>> knc
+```
+
+#### `libgfortran/configure`
+
+```diff
+<<<<<<< upstream/master
+#line 13245 "configure"
+=======
+#line 13250 "configure"
+>>>>>>> knc
+```
+
+```diff
+<<<<<<< upstream/master
+#line 13351 "configure"
+=======
+#line 13356 "configure"
+>>>>>>> knc
+```
+
+#### `libgomp/configure`
+
+```diff
+<<<<<<< upstream/master
+=======
+USE_FORTRAN_FALSE
+USE_FORTRAN_TRUE
+LIBGOMP_RUNTIME_GUARD_FILE
+>>>>>>> knc
+```
+
+```diff
+<<<<<<< upstream/master
+#line 11865 "configure"
+=======
+#line 11862 "configure"
+>>>>>>> knc
+```
+
+```diff
+<<<<<<< upstream/master
+#line 11971 "configure"
+=======
+#line 11968 "configure"
+>>>>>>> knc
+```
+
+#### `libgomp/env.c`
+
+```diff
+<<<<<<< upstream/master
+      fputs ("  [all] GOMP_RUNTIME_USM = '", stderr);
+      switch (gomp_runtime_usm_var)
+	{
+	case GOMP_RUNTIME_USM_DISABLED:
+	  fputs ("DISABLED", stderr);
+	  break;
+	case GOMP_RUNTIME_USM_AUTO:
+	  fputs ("AUTO", stderr);
+	  break;
+	case GOMP_RUNTIME_USM_ENABLED:
+	  fputs ("ENABLED", stderr);
+	  break;
+	}
+      fputs ("'\n", stderr);
+      fprintf (stderr, "  [host] GOMP_BARRIER_TYPE = '%s'\n",
+	       gomp_barrier_request == GOMP_FLAT_BARRIER   ? "flat"
+	       : gomp_barrier_request == GOMP_TREE_BARRIER ? "tree"
+	       : gomp_barrier_request == GOMP_CENTRALIZED_BARRIER
+		 ? "centralized"
+		 : "auto");
+      fprintf (stderr, "  [host] GOMP_FORKJOIN_BARRIER_TYPE = '%s'\n",
+	       gomp_forkjoin_barrier_request == GOMP_FLAT_BARRIER   ? "flat"
+	       : gomp_forkjoin_barrier_request == GOMP_TREE_BARRIER ? "tree"
+	       : gomp_forkjoin_barrier_request == GOMP_CENTRALIZED_BARRIER
+		 ? "centralized"
+		 : "auto");
+=======
+#ifdef __k1om__
+      gomp_knc_display_delay (stderr);
+      gomp_knc_display_malloc (stderr);
+#endif
+>>>>>>> knc
+```
+
+```diff
+<<<<<<< upstream/master
+  parse_barrier_choice ("GOMP_BARRIER_TYPE", &gomp_barrier_request);
+  gomp_forkjoin_barrier_request = gomp_barrier_request;
+  parse_barrier_choice ("GOMP_FORKJOIN_BARRIER_TYPE",
+			&gomp_forkjoin_barrier_request);
+=======
+#ifdef __k1om__
+  gomp_knc_init_arenas ((none != NULL
+			 && gomp_get_icv_flag (none->flags, GOMP_ICV_STACKSIZE))
+			|| (all != NULL
+			    && gomp_get_icv_flag (all->flags,
+						  GOMP_ICV_STACKSIZE)));
+#endif
+>>>>>>> knc
+```
+
+#### `libgomp/libgomp.h`
+
+```diff
+<<<<<<< upstream/master
+#ifdef __AMDGCN__
+/* Parameters needed to kick off new threads on AMD GCN.  They correspond to
+   various fields in gomp_thread.  This struct, and all its contents, should
+   only be modified by gomp_team_start, and stay untouched until the threads
+   of a team reach the final barrier.  */
+
+struct gomp_thread_start_data
+{
+  /* Team the new thread is part of.  */
+  struct gomp_team *team;
+  /* Active nesting level.  */
+  unsigned level, active_level;
+  /* Parent task.  */
+  struct gomp_task *parent_task;
+  /* Previous ICVs.  */
+  struct gomp_task_icv prev_icvs;
+  /* Task group for the new threads implicit task.  */
+  struct gomp_taskgroup *taskgroup;
+};
+=======
+#ifdef __k1om__
+/* KNC: a member that starts a cache line of its own.  */
+#define GOMP_KNC_LINE __attribute__((aligned (64)))
+#else
+#define GOMP_KNC_LINE
+>>>>>>> knc
+```
+
+```diff
+<<<<<<< upstream/master
+#ifdef __AMDGCN__
+  /* Used on AMD GCN to inform threads how to launch in a team.  */
+  struct gomp_thread_start_data thr_start_data;
+#elif LIBGOMP_USE_PTHREADS
+  /* Cache to help initialise each secondary threads `task` when re-using a
+     team very many times.  This allows each secondary thread to perform the
+     re-initialisation instead of having the primary thread need to perform
+     that initialisation.  */
+  struct thread_init {
+    struct gomp_task_icv task_icv_init;
+    struct gomp_task *task_parent_init;
+    struct gomp_taskgroup *task_taskgroup;
+    uintptr_t def_allocator;
+    unsigned int num_teams;
+    unsigned int team_num;
+    void (*fn) (void *data);
+    void *data;
+  } ti;
+  struct prev_place_vars {
+    unsigned int place_partition_off;
+    unsigned int place_partition_len;
+    char bind;
+  } ppv;
+#endif
+  bool reused;
+
+  /* This array contains structures for implicit tasks.  */
+  struct gomp_task implicit_task[];
+=======
+  /* This array contains structures for implicit tasks.  Use
+     gomp_implicit_task to index it.  */
+  struct gomp_task implicit_task[] GOMP_KNC_LINE;
+>>>>>>> knc
+```
+
+#### `libgomp/team.c`
+
+```diff
+<<<<<<< upstream/master
+		     + sizeof (team->implicit_task[0]);
+      size_t team_extra = nthreads * extra;
+      size_t barrier_padding = 0;
+      if (barrier_extra_alloc.size)
+	{
+	  /* `offsetof` in case the structure is padded and `implicit_task` is
+	     not at the end of `sizeof (*team)`.  */
+	  size_t barrier_offset
+	    = offsetof (struct gomp_team, implicit_task) + team_extra;
+	  gomp_assert (barrier_extra_alloc.align
+			 <= __alignof (struct gomp_team),
+		       "barrier extra alignment too large: %lu > %lu",
+		       (unsigned long) barrier_extra_alloc.align,
+		       (unsigned long) __alignof (struct gomp_team));
+	  barrier_padding = ((barrier_offset + barrier_extra_alloc.align - 1)
+			     & ~(barrier_extra_alloc.align - 1))
+			    - barrier_offset;
+	}
+      size_t alloc_extra
+	= team_extra + barrier_padding + barrier_extra_alloc.size;
+=======
+		     + GOMP_IMPLICIT_TASK_STRIDE;
+>>>>>>> knc
+```
+
+```diff
+<<<<<<< upstream/master
+	  nthr->place = place;
+=======
+	  nthr->ts.def_allocator = thr->ts.def_allocator;
+#ifdef HAVE_SYNC_BUILTINS
+	  nthr->ts.single_count = 0;
+#endif
+	  nthr->ts.static_trip = 0;
+	  nthr->num_teams = thr->num_teams;
+	  nthr->team_num = thr->team_num;
+	  nthr->task = gomp_implicit_task (team, i);
+	  nthr->place = place;
+	  gomp_init_task (nthr->task, task, icv);
+	  gomp_implicit_task (team, i)->icv.nthreads_var = nthreads_var;
+	  gomp_implicit_task (team, i)->icv.bind_var = bind_var;
+	  nthr->task->taskgroup = taskgroup;
+	  nthr->fn = fn;
+	  nthr->data = data;
+>>>>>>> knc
+```
+
+```diff
+<<<<<<< upstream/master
+      start_data->team = team;
+      start_data->team_id = i;
+
+      start_data->active_level = thr->ts.active_level;
+=======
+      start_data->fn = fn;
+      start_data->fn_data = data;
+      start_data->ts.team = team;
+      start_data->ts.work_share = &team->work_shares[0];
+      start_data->ts.last_work_share = NULL;
+      start_data->ts.team_id = i;
+      start_data->ts.level = team->prev_ts.level + 1;
+      start_data->ts.active_level = thr->ts.active_level;
+      start_data->ts.def_allocator = thr->ts.def_allocator;
+#ifdef HAVE_SYNC_BUILTINS
+      start_data->ts.single_count = 0;
+#endif
+      start_data->ts.static_trip = 0;
+      start_data->num_teams = thr->num_teams;
+      start_data->team_num = thr->team_num;
+      start_data->task = gomp_implicit_task (team, i);
+      gomp_init_task (start_data->task, task, icv);
+      gomp_implicit_task (team, i)->icv.nthreads_var = nthreads_var;
+      gomp_implicit_task (team, i)->icv.bind_var = bind_var;
+      start_data->task->taskgroup = taskgroup;
+>>>>>>> knc
+```
+
+Upstream line churn since 16.2 in files changed by KNC:
+
+| File | Added | Removed |
+| --- | ---: | ---: |
+| `gcc/common/config/i386/i386-common.cc` | +67 | -22 |
+| `gcc/config.gcc` | +93 | -158 |
+| `gcc/config.host` | +10 | -2 |
+| `gcc/config/i386/i386-builtins.cc` | +45 | -5 |
+| `gcc/config/i386/i386-c.cc` | +10 | -5 |
+| `gcc/config/i386/i386-expand.cc` | +3463 | -508 |
+| `gcc/config/i386/i386-knc.cc` | +0 | -0 |
+| `gcc/config/i386/i386-knc.h` | +0 | -0 |
+| `gcc/config/i386/i386-options.cc` | +142 | -91 |
+| `gcc/config/i386/i386-protos.h` | +21 | -16 |
+| `gcc/config/i386/i386.cc` | +1369 | -459 |
+| `gcc/config/i386/i386.h` | +70 | -48 |
+| `gcc/config/i386/i386.md` | +2401 | -1450 |
+| `gcc/config/i386/i386.opt` | +24 | -6 |
+| `gcc/config/i386/imci.md` | +0 | -0 |
+| `gcc/config/i386/knc-driver.cc` | +0 | -0 |
+| `gcc/config/i386/knc.md` | +0 | -0 |
+| `gcc/config/i386/linux-k1om.h` | +0 | -0 |
+| `gcc/config/i386/sse.md` | +2036 | -286 |
+| `gcc/config/i386/sync.md` | +57 | -3 |
+| `gcc/config/i386/t-i386` | +0 | -0 |
+| `gcc/config/i386/t-knc` | +0 | -0 |
+| `gcc/config/i386/x86-tune-sched.cc` | +1 | -1 |
+| `gcc/configure` | +1043 | -920 |
+| `gcc/configure.ac` | +367 | -378 |
+| `gcc/cp/g++spec.cc` | +1 | -1 |
+| `gcc/doc/tm.texi` | +177 | -69 |
+| `gcc/doc/tm.texi.in` | +55 | -39 |
+| `gcc/gcc.cc` | +160 | -59 |
+| `gcc/target.def` | +160 | -39 |
+| `gcc/tree-ssa-loop-ivopts.cc` | +286 | -97 |
+| `gcc/tree-ssa-loop-prefetch.cc` | +20 | -12 |
+| `libgcc/config.host` | +13 | -23 |
+| `libgcc/config/i386/knc-cpuinfo.c` | +0 | -0 |
+| `libgcc/config/i386/knc-crtfastmath.c` | +0 | -0 |
+| `libgcc/config/i386/knc-sfp-machine.h` | +0 | -0 |
+| `libgcc/config/i386/t-knc` | +0 | -0 |
+| `libgfortran/Makefile.am` | +2 | -1 |
+| `libgfortran/Makefile.in` | +7 | -2 |
+| `libgfortran/config/fpu-knc.h` | +0 | -0 |
+| `libgfortran/config/guard-knc.ld` | +0 | -0 |
+| `libgfortran/configure` | +142 | -16 |
+| `libgfortran/configure.ac` | +14 | -4 |
+| `libgfortran/configure.host` | +0 | -0 |
+| `libgfortran/libgfortran.spec.in` | +0 | -0 |
+| `libgomp/Makefile.am` | +7 | -5 |
+| `libgomp/Makefile.in` | +32 | -25 |
+| `libgomp/config/linux/knc/affinity.c` | +0 | -0 |
+| `libgomp/config/linux/knc/bar.c` | +0 | -0 |
+| `libgomp/config/linux/knc/bar.h` | +0 | -0 |
+| `libgomp/config/linux/knc/card.h` | +0 | -0 |
+| `libgomp/config/linux/knc/futex.h` | +0 | -0 |
+| `libgomp/config/linux/knc/guard.ld` | +0 | -0 |
+| `libgomp/config/linux/knc/mutex.c` | +0 | -0 |
+| `libgomp/config/linux/knc/simple-bar.h` | +0 | -0 |
+| `libgomp/config/linux/knc/spincount.h` | +0 | -0 |
+| `libgomp/configure` | +135 | -271 |
+| `libgomp/configure.ac` | +83 | -27 |
+| `libgomp/configure.tgt` | +19 | -16 |
+| `libgomp/env.c` | +146 | -6 |
+| `libgomp/libgomp.h` | +159 | -11 |
+| `libgomp/libgomp.texi` | +907 | -133 |
+| `libgomp/team.c` | +462 | -101 |
+| `libstdc++-v3/config/abi/post/k1om-linux-gnu/baseline_symbols.txt` | +0 | -0 |
+| `libstdc++-v3/config/abi/post/k1om-linux-gnu/libstdc++-knc-static.ld` | +0 | -0 |
+| `libstdc++-v3/config/abi/post/k1om-linux-gnu/libstdc++-knc.ld` | +0 | -0 |
+| `libstdc++-v3/src/Makefile.am` | +20 | -0 |
+| `libstdc++-v3/src/Makefile.in` | +22 | -1 |
+
+### upstream/releases/gcc-16
+
+Commit: `4b03dde2e3ad210db469ee763194c0cbec22cf45`; date: 2026-11-03T10:43:47+01:00.
+
+Conflicts: 0
+
+Upstream line churn since 16.2 in files changed by KNC:
+
+| File | Added | Removed |
+| --- | ---: | ---: |
+| `gcc/common/config/i386/i386-common.cc` | +3 | -1 |
+| `gcc/config.gcc` | +0 | -0 |
+| `gcc/config.host` | +0 | -0 |
+| `gcc/config/i386/i386-builtins.cc` | +0 | -0 |
+| `gcc/config/i386/i386-c.cc` | +0 | -0 |
+| `gcc/config/i386/i386-expand.cc` | +23 | -10 |
+| `gcc/config/i386/i386-knc.cc` | +0 | -0 |
+| `gcc/config/i386/i386-knc.h` | +0 | -0 |
+| `gcc/config/i386/i386-options.cc` | +0 | -0 |
+| `gcc/config/i386/i386-protos.h` | +0 | -0 |
+| `gcc/config/i386/i386.cc` | +35 | -47 |
+| `gcc/config/i386/i386.h` | +0 | -0 |
+| `gcc/config/i386/i386.md` | +73 | -28 |
+| `gcc/config/i386/i386.opt` | +0 | -0 |
+| `gcc/config/i386/imci.md` | +0 | -0 |
+| `gcc/config/i386/knc-driver.cc` | +0 | -0 |
+| `gcc/config/i386/knc.md` | +0 | -0 |
+| `gcc/config/i386/linux-k1om.h` | +0 | -0 |
+| `gcc/config/i386/sse.md` | +99 | -54 |
+| `gcc/config/i386/sync.md` | +0 | -0 |
+| `gcc/config/i386/t-i386` | +0 | -0 |
+| `gcc/config/i386/t-knc` | +0 | -0 |
+| `gcc/config/i386/x86-tune-sched.cc` | +0 | -0 |
+| `gcc/configure` | +1 | -1 |
+| `gcc/configure.ac` | +1 | -1 |
+| `gcc/cp/g++spec.cc` | +0 | -0 |
+| `gcc/doc/tm.texi` | +0 | -0 |
+| `gcc/doc/tm.texi.in` | +0 | -0 |
+| `gcc/gcc.cc` | +0 | -0 |
+| `gcc/target.def` | +0 | -0 |
+| `gcc/tree-ssa-loop-ivopts.cc` | +8 | -3 |
+| `gcc/tree-ssa-loop-prefetch.cc` | +0 | -0 |
+| `libgcc/config.host` | +1 | -0 |
+| `libgcc/config/i386/knc-cpuinfo.c` | +0 | -0 |
+| `libgcc/config/i386/knc-crtfastmath.c` | +0 | -0 |
+| `libgcc/config/i386/knc-sfp-machine.h` | +0 | -0 |
+| `libgcc/config/i386/t-knc` | +0 | -0 |
+| `libgfortran/Makefile.am` | +0 | -0 |
+| `libgfortran/Makefile.in` | +0 | -0 |
+| `libgfortran/config/fpu-knc.h` | +0 | -0 |
+| `libgfortran/config/guard-knc.ld` | +0 | -0 |
+| `libgfortran/configure` | +0 | -0 |
+| `libgfortran/configure.ac` | +0 | -0 |
+| `libgfortran/configure.host` | +0 | -0 |
+| `libgfortran/libgfortran.spec.in` | +0 | -0 |
+| `libgomp/Makefile.am` | +0 | -0 |
+| `libgomp/Makefile.in` | +0 | -0 |
+| `libgomp/config/linux/knc/affinity.c` | +0 | -0 |
+| `libgomp/config/linux/knc/bar.c` | +0 | -0 |
+| `libgomp/config/linux/knc/bar.h` | +0 | -0 |
+| `libgomp/config/linux/knc/card.h` | +0 | -0 |
+| `libgomp/config/linux/knc/futex.h` | +0 | -0 |
+| `libgomp/config/linux/knc/guard.ld` | +0 | -0 |
+| `libgomp/config/linux/knc/mutex.c` | +0 | -0 |
+| `libgomp/config/linux/knc/simple-bar.h` | +0 | -0 |
+| `libgomp/config/linux/knc/spincount.h` | +0 | -0 |
+| `libgomp/configure` | +0 | -0 |
+| `libgomp/configure.ac` | +0 | -0 |
+| `libgomp/configure.tgt` | +0 | -0 |
+| `libgomp/env.c` | +0 | -0 |
+| `libgomp/libgomp.h` | +0 | -0 |
+| `libgomp/libgomp.texi` | +0 | -0 |
+| `libgomp/team.c` | +0 | -0 |
+| `libstdc++-v3/config/abi/post/k1om-linux-gnu/baseline_symbols.txt` | +0 | -0 |
+| `libstdc++-v3/config/abi/post/k1om-linux-gnu/libstdc++-knc-static.ld` | +0 | -0 |
+| `libstdc++-v3/config/abi/post/k1om-linux-gnu/libstdc++-knc.ld` | +0 | -0 |
+| `libstdc++-v3/src/Makefile.am` | +0 | -0 |
+| `libstdc++-v3/src/Makefile.in` | +0 | -0 |
+
+
+### S8-11 classification and change size (KNC `fe7ed380f149`)
+
+The drill used local refs only: upstream master `b88c2821e219` has twelve
+conflicted files and 23 hunks; gcc-16 `4b03dde2e3ad` has no conflicts. Every
+conflict has a textual resolution. The S7-10 hunks resolve as recorded there
+(`i386.opt` now also carries S8-03's prefetch parameters and S8-16's `-mphinix`
+entries in the same hunk; keep both sides). New since S7-10:
+
+| Conflict | Textual resolution |
+| --- | --- |
+| `sse.md`, `STORENT_MODE` (1 hunk, S8-13) | Take upstream's list (new `V16SI`, `V32HI`, `V64QI` under AVX512F) and add `\|\| TARGET_KNC` to `V8DI`, `V16SF`, `V8DF` and `V16SI`. |
+| `libgomp/configure` (3 hunks) | Generated: two `#line` numbers and the KNC substitution names; regenerate from the merged `configure.ac`. |
+| `libgomp/env.c` (2 hunks) | Keep upstream's `GOMP_RUNTIME_USM` and barrier-type display and parsing, then the `__k1om__` blocks (`gomp_knc_display_*`, `gomp_knc_init_arenas`). |
+| `libgomp/libgomp.h` (2 hunks) | Keep upstream's AMD GCN `gomp_thread_start_data` and the `GOMP_KNC_LINE` macro; keep upstream's new `gomp_team` fields (`ti`, `ppv`, `reused`) and put `GOMP_KNC_LINE` on `implicit_task[]`. |
+| `libgomp/team.c` (3 hunks) | Take upstream's restructured team start (thread-init cache, `start_data` fields) and replace each `&team->implicit_task[i]` with `gomp_implicit_task (team, i)`; in the allocation size use `GOMP_IMPLICIT_TASK_STRIDE` as the per-thread `extra` term before upstream's barrier padding. |
+
+Not a conflict but needed by a forward port: upstream master changes the
+libgomp barrier interface (`gomp_barrier_init` takes a pointer, the wait
+functions take a thread id or increment, new `gomp_barrier_extra_alloc`,
+`gomp_barrier_can_hold`, `gomp_team_barrier_wake_on_increment`), and adds a
+`futex_waitv` tree barrier. KNC's own `libgomp/config/linux/knc/bar.{h,c}`
+(S9-09's per-core group barrier) merges cleanly as a new file but must be
+ported to that interface before libgomp builds on master.
+
+Drill log: `.work/_state/logs/S8_11_drill-20261110-132154.log`.
+
+Change size against `releases/gcc-16.2.0`, measured as in S6-08; the new
+KNC-only `knc-driver.cc` and `t-knc` (S8-16) are counted with the KNC-only files:
+
+| Scope | Changed lines | Hunks |
+| --- | ---: | ---: |
+| Shared i386 files | 718 | 132 |
+| `i386-knc.cc` (KNC only) | 2144 | 1 |
+| `i386-knc.h` (KNC only) | 117 | 1 |
+| `imci.md` (KNC only) | 2158 | 1 |
+| `knc.md` (KNC only) | 97 | 1 |
+| `linux-k1om.h` (KNC only) | 115 | 1 |
+| `knc-driver.cc` (KNC only) | 352 | 1 |
+| `t-knc` (KNC only) | 4 | 1 |
+| KNC-only i386 total | 4987 | 7 |
+
+Shared i386 files changed since S7-10 (644/122: S8-03, S8-13, S8-15, S8-16,
+S8-19 hooks), so the lead's x86 identity check is needed at this head.
+
+Build: tree 2 (`gcc-build-2`) at `fe7ed380f149`, clean.
+Log: `.work/_state/logs/S8_11_build-20261110-133249.log`.
+
+### S8-11 ICE sweeps
+
+| Flags (also `-march=knc`) | Pass | Compiler error | User inline asm rejected | ICE | Hang | Assembler rejection | Lint failure | Infrastructure failure |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| `-O2 -ftree-vectorize` | 1968 | 33 | 2 | 0 | 0 | 0 | 0 | 0 |
+| `-O3` | 1968 | 33 | 2 | 0 | 0 | 0 | 0 | 0 |
+
+Same counts and lists as S7-10 (the summaries differ only in wall time and
+worker count). No slow retry or FP ABI error.
+
+Log: `.work/_state/logs/S8_11_sweep-20261110-140943.log`.
+Summary: `.work/_shared/S8-11/sweep/summary.txt`, launcher
+`.work/_shared/S8-11/sweep.py` (run under the toolchain's Cygwin Python).
+
+### S8-11 T0-T2
+
+`python tools/check t0 t1 t2 --compiler gcc16` on tree 2: exit 0, 328 PASS, no FAIL.
+Log: `.work/_state/logs/check_gcc16_t0_t1_t2-20261110-141753.log`.
+
+### S8-11 compiler-prefetch column case (lead note 2026-11-08)
+
+`tests/bench/prefetch-column/` (29 float arrays, 51 k trips at a 1092-byte step,
+8-float rows, built by `build.py`). Built and linted, not run:
+`.work/_shared/S8-11/prefetch-column/column.mic`
+(log `.work/_state/logs/S8_11_prefetch_build-20261110-140932.log`).
+
+Finding: with `-fprefetch-loop-arrays` the S8 head emits **no** prefetch on this
+shape, so `column_pf` and `column_nopf` are the same code apart from the name, and a
+card pairing would only measure noise. Cause: the vectorizer turns each 8-float
+row into a 16-lane `.MASK_LOAD` (mask of 8 lanes), and
+`gather_memory_references` in `tree-ssa-loop-prefetch.cc` only looks at
+`GIMPLE_ASSIGN`s, so the loop has no memory references to prefetch (the aprefetch
+dump stops after "Processing loop 1:"). The same file with 16-float rows gets 58
+`vprefetch` instructions; scalar code (`-fno-tree-vectorize`) at 8 or 16 floats
+gets none. A row of fewer than 16 floats, as in WRF's 8-float rows, is never
+prefetched by the compiler. Lead's call: run as specified, change the case to
+16-float rows, or open a ticket for masked loads in the prefetch pass.
+
+### S8-11 paired M2 and card staging (lead runs)
+
+Sprint 7's compiler (`497bbe8bedf0`) was rebuilt in tree 2 only for `cc1`
+(target libgomp failed against the Sprint 8 configure, which M2 does not use;
+log `.work/_state/logs/S8_11_build_s7-20261110-145350.log`), its M2 objects
+kept in `.work/_shared/S8-11/m2-s7`, and tree 2 rebuilt clean at `fe7ed380f149`
+(log `.work/_state/logs/S8_11_build-20261110-152151.log`). The paired binary
+links Sprint 7's `kernels-gcc.o` as `gcc_before`; its Sprint 8 `kernels-gcc.s`
+equals the one built before the switch.
+
+| Card job | Binary |
+| --- | --- |
+| Paired M2 (S8 vs S7) | `.work/_shared/S8-11/m2-paired/m2-kernels.mic`, `m2-negative.mic` (log `S8_11_m2_paired-20261110-160138.log`) |
+| M2 at S8 alone | `.work/_shared/S8-11/m2-s8/m2-kernels.mic`, `m2-negative.mic` |
+| Execute suite | `.work/_shared/S8-11/execute/` (1692 sources, 1681 linked, 11 compile errors, 0 ICE; `build.tsv`, log `S8_11_execute_build-20261110-143346.log`) |
+| Prefetch column | `.work/_shared/S8-11/prefetch-column/column.mic` (see finding above) |
+
+Profiles 3100/5100/7100 (S9-14): the same binaries through `card_run --profile`;
+nothing profile-specific is built. x86 identity not run (lead).
