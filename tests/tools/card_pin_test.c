@@ -77,6 +77,10 @@ int main(void) {
     args[2] = "16385";
     affinity_calls = limit_calls = exec_calls = 0;
     assert(pin_main(5, args) == 125 && affinity_calls == 0);
+    /* S9-23: 0 means no limit; setrlimit is skipped but affinity and exec still run. */
+    args[2] = "0";
+    affinity_calls = limit_calls = exec_calls = 0;
+    assert(pin_main(5, args) == 127 && affinity_calls == 1 && limit_calls == 0 && exec_calls == 1);
     args[2] = "128";
     char *bad[] = {"", "4,,13", "-1", "9999999", "4x", "4,"};
     for (unsigned i = 0; i < sizeof(bad) / sizeof(*bad); ++i) {
