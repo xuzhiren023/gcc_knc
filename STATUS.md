@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-11 01:53.
+Updated automatically at every ticket change. Last update: 2026-11-11 01:55.
 
 **Next: the tech lead, on S10-01.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
@@ -193,7 +193,7 @@ Current tickets: `[###################-]` 165 of 173
 | S9-20 | Experiment - how much does instruction scheduling help the in-order core, at 1 and 4 threads per core? | Done | Card 2026-11-11, 1 thread/core, ratio to -O2 default: nosched affine 1.11, mat8 1.05; prepress affine 0.92,... |
 | S9-21 | S9-18 PGO training script - BusyBox od has no -A/-t, so no profile came back | Done | The S9-18 PGO training script now dumps profiles with od -b -v, which BusyBox 1.19 on the card supports, an... |
 | S9-22 | S9-18 PGO rebuild fails with coverage-mismatch on the card profiles - make the two builds identical | Done | The PGO experiment's two builds now use identical compile commands, so profiles collected on the card can b... |
-| S9-23 | card_run - no address-space limit in our exclusive turns (owner - "there is no job memory limit") | Changes requested | pm approve refused: Cygwin tests/tools/test_card_run.py ran past 20 minutes. It hangs in test_core_claims_i... |
+| S9-23 | card_run - no address-space limit in our exclusive turns (owner - "there is no job memory limit") | In progress | pm approve refused: Cygwin tests/tools/test_card_run.py ran past 20 minutes. It hangs in test_core_claims_i... |
 | S9-24 | Sprint 9 settings from the card data, and the harness fixes the batch check needs | In progress |  |
 
 ## Recent activity
@@ -211,10 +211,10 @@ Current tickets: `[###################-]` 165 of 173
 
 - From the script, engineer: 389 sessions, 853.9M input tokens
 - From the script, lead: 246 sessions, 72.9M input tokens
-- Started by hand, Claude: 11 sessions, 2267.2M input tokens
+- Started by hand, Claude: 11 sessions, 2268.1M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 23.2 GiB of 100 GiB. 93 GiB free on the drive.
+The project uses 23.2 GiB of 100 GiB. 91 GiB free on the drive.
