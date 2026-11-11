@@ -40,7 +40,8 @@ def main():
     # The driver retains binary64 SSE evaluation and the same vector ABI.
     driver = out / 'card_rounding.o'
     modes = {'sse': [], 'x87': ['-mfpmath=387'],
-             'x87-fma': ['-mfpmath=387', '-mavx2', '-mfma'],
+             'x87-fma': ['-mfpmath=387', '-mavx2', '-mfma',
+                         '-Wa,-muse-unaligned-vector-move'],
              'x87-standard': ['-mfpmath=387', '-fexcess-precision=standard']}
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--mode', choices=modes)
@@ -51,7 +52,8 @@ def main():
             continue
         # Match the vector ABI/alignment, but keep the MPFR driver on SSE.
         run('gcc', *build.TEST_FLAGS, '-Wno-psabi',
-            *[flag for flag in flags if flag in ('-mavx2', '-mfma')], '-c',
+            *[flag for flag in flags if flag in ('-mavx2', '-mfma',
+                                                '-Wa,-muse-unaligned-vector-move')], '-c',
             ROOT / 'tests/vmath/card_rounding.c', '-o', driver)
         objects = []
         for member in members:
