@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-10 20:12.
+Updated automatically at every ticket change. Last update: 2026-11-10 20:13.
 
 **Next: the tech lead, on S8-22.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
@@ -186,10 +186,11 @@ Current tickets: `[###################-]` 161 of 165
 | S9-18 | Experiment - how much do branch hints and profile-guided optimization gain on KNC? | Done | Card 2026-11-11: the eight instrumented programs ran (TRAIN checksums printed) but BusyBox od rejected -A, ... |
 | S9-19 | Experiment - auto-parallelization on KNC, and whether AutoFDO is possible on the card | Done | Auto-parallelization (GCC splitting loops across threads with no pragmas) works on KNC for the streaming an... |
 | S9-20 | Experiment - how much does instruction scheduling help the in-order core, at 1 and 4 threads per core? | Done | The instruction-scheduling experiment is staged: the M2 kernels and two scalar kernels in five builds (defa... |
-| S9-21 | S9-18 PGO training script - BusyBox od has no -A/-t, so no profile came back | In progress |  |
+| S9-21 | S9-18 PGO training script - BusyBox od has no -A/-t, so no profile came back | Waiting for review | train.sh dumps .gcda with od -b -v (BusyBox 1.19 compatible); use parses octal offsets+bytes; host path (sa... |
 
 ## Recent activity
 
+- 2026-11-10 20:13 **S9-21** engineer submit: train.sh dumps .gcda with od -b -v (BusyBox 1.19 compatible); use parses octal offsets+bytes; host path (same format) PASS; training set restaged, ...
 - 2026-11-10 20:12 **S9-18** lead note: Card 2026-11-11: the eight instrumented programs ran (TRAIN checksums printed) but BusyBox od rejected -A, so no profile came back; fix S9-21, reru...
 - 2026-11-10 20:12 **S9-11** lead note: Defaults to set from the 2026-11-11 card data: gomp_knc_delay 128 (S9-08) and default spin 200 ms (S9-15). Subnormals cost nothing on the VPU (C14)...
 - 2026-11-10 20:11 **S9-16** lead note: Card 2026-11-11: C13 no faults, no wrong values at any offset or page crossing; worst slowdown vs aligned: fst32/fst64 8.0x, ld32/ld64 4.0x, st32 4...
@@ -197,7 +198,6 @@ Current tickets: `[###################-]` 161 of 165
 - 2026-11-10 20:11 **S8-21** lead note: Card 2026-11-11 01:00Z, WRF-shaped column loop (8-float rows), pf over nopf, 7 rounds: density 4 median 0.662 / 0.660 (launch 1/2), density 1 0.809...
 - 2026-11-10 20:09 **S9-20** lead approve: The instruction-scheduling experiment is staged: the M2 kernels and two scalar kernels in five builds (default, no scheduling, pre-RA scheduling, p...
 - 2026-11-10 20:00 **S9-20** engineer submit: Item 1: at -O2 -march=knc sched1 off, sched2 on, knc.md used (sched-verbose dump in docs/research/s9-20-sched.md). M2 + 2 scalar kernels built in 5...
-- 2026-11-10 19:59 **S9-20** lead answer: Yes: resubmit with --override 'runner + spill report need the size'. 714 lines in 3 new files (bench source, tool, doc) is fine for this ticket's s...
 
 ## Cost
 
