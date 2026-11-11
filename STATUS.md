@@ -179,7 +179,7 @@ Current tickets: `[###################-]` 167 of 174
 | S9-06 | libgomp for k1om: build, select, package and link guard (E6-03 A) | Done | Card 2026-11-10 11:40Z: at 60 and 240 threads every program passes except (1) locks check 4: omp_get_wtick(... |
 | S9-07 | libgomp KNC affinity defaults (E6-03 B) | Done | Card 2026-11-10 ~12:15 EST, 30-core mask (cores 0-29, 120 CPUs): the KNC default jobs pass. Two explicit-se... |
 | S9-08 | libgomp spin-wait with delay and the one-core measurement (E6-03 C) | Done | Card 2026-11-10 measurements 1 and 3, three launches (log .work/_shared/tmp/claude-resume.log). One core, w... |
-| S9-09 | libgomp hierarchical ring-aware barrier (E6-03 D) | Done | Card 2026-11-10: measurements 2/4/5: every hier run exits 136 (SIGFPE); flat runs. The measure binaries lin... |
+| S9-09 | libgomp hierarchical ring-aware barrier (E6-03 D) | Done | Card 2026-11-11 08:21Z on the S9-24 libgomp: suite and tasks/cancel pass (the SIGFPE is gone); measurements... |
 | S9-10 | libgomp padding, static schedule default and malloc guidance (E6-03 E) | Done | Card 2026-11-10 14:40Z: the eight OpenMP programs pass on the S9-06..S9-10 libgomp at 60 threads (6 GiB) an... |
 | S9-11 | Sprint 9 batch check | In progress | deps add S9-25 (flat barrier default). Card parts of this check are being run by the lead (2026-11-11 08:21... |
 | S9-12 | libgomp adapts to the card: malloc arena cap from memory, core count and clock (ADR-0012) | Done | Measurement 7 cut down, 240 threads x 100000 1 KiB malloc/free, 2 reps (2026-11-10 22:xxZ): full profile (1... |
@@ -200,13 +200,13 @@ Current tickets: `[###################-]` 167 of 174
 ## Recent activity
 
 - 2026-11-11 03:34 **S9-11** lead amend: deps add S9-25 (flat barrier default). Card parts of this check are being run by the lead (2026-11-11 08:21Z: S9-05, S9-06 60/240, S9-09 suite pass...
+- 2026-11-11 03:34 **S9-09** lead note: Card 2026-11-11 08:21Z on the S9-24 libgomp: suite and tasks/cancel pass (the SIGFPE is gone); measurements hier over flat: barrier 1.52-1.72x slow...
 - 2026-11-11 03:20 **S9-24** lead approve: KNC libgomp now uses the card-measured defaults: DELAY 128 while spinning, 200 ms of spinning before sleeping, and one malloc arena per CPU when no...
 - 2026-11-11 03:11 **S9-24** lead amend: heads set for approve
 - 2026-11-11 03:11 **S9-24** lead note: Lead: both protected paths are sanctioned (m2_kernels/build.py lane fix per Deliver 2; locks.c newline fix of the lead's own 58a2473 bug). Review: ...
 - 2026-11-11 03:09 **S9-24** engineer ask: All done; submit is refused for two protected paths, both sanctioned: tests/acceptance/m2_kernels/build.py (Deliver 2, in aeffad0e) and tests/accep...
 - 2026-11-11 03:05 **S10-02** owner decide: Owner standing rule (2026-11-09, reminded 2026-11-10; blanket approval 2026-11-11): budget raised to 12M input tokens. Answer to the 02:58 ask: (a)...
 - 2026-11-11 03:05 **S10-02** lead amend: input_tokens 6M -> 12M under the owner standing rule (progress: 5 of 6 cores build for KNC, host qualification passes, commit 101529da).
-- 2026-11-11 03:04 **S9-24** lead answer: Confirmed: my commit 58a2473b broke locks.c:43-44 with a literal newline. You may fix it on this branch: one separate commit touching only tests/ac...
 
 ## Cost
 
