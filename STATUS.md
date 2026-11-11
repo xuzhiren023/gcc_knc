@@ -1,10 +1,10 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-11 11:51.
+Updated automatically at every ticket change. Last update: 2026-11-11 12:00.
 
 **Next: the tech lead, on S11-02.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
-Current tickets: `[###################-]` 177 of 180
+Current tickets: `[###################-]` 177 of 181
 
 ## Milestones
 
@@ -13,7 +13,7 @@ Current tickets: `[###################-]` 177 of 180
 | M0 | Foundation | In progress | 17 of 17 tickets |
 | M1 | Mixed native code | Done | 43 of 43 tickets |
 | M2 | Useful vector target | Done | 51 of 51 tickets |
-| M3 | Runtimes | Done | 43 of 44 tickets |
+| M3 | Runtimes | Done | 43 of 45 tickets |
 | M4 | Broad optimization | In progress | 0 of 2 tickets |
 | M5 | Program corpus | Not started | Not planned in detail yet |
 | M6 | Release | Not started | Not planned in detail yet |
@@ -48,6 +48,7 @@ Current tickets: `[###################-]` 177 of 180
 | S10-07 | Vector math v1a - the copied functions (sin, cos, tan, log10, atan, atan2, hyperbolics, bounded groups) in libknc_vmath and the vectorizer hook | Done | The vector math library now also covers sin, cos, tan, log10, atan, atan2, sinh, cosh, tanh and their float... |
 | S10-08 | Vector math v1b - the rest of the libmvec set (acos, asin, cbrt, erf, erfc, exp2, exp10, expm1, log1p, log2, hypot, sincos) | Done | The vector math library now covers the whole set GCC vectorizes with glibc's libmvec: acos, asin, cbrt, erf... |
 | S10-09 | User story - double-precision loops with division and square root vectorize, correctly rounded (V8DF div, cond_div, sqrt) | In progress | S10-09 red accepted: failing scans show that double division (fixed and variable bounds, masked tail) and s... |
+| S10-10 | Card harness fixes from the Sprint 10 card turn - card_qualify binary folder, vmath bench batch sizing | Not started |  |
 | S11-01 | User story - the best way to move data between the host and the card, measured, and how our projects use it | Not started | Owner 2026-11-11 10:45 EST: do not start yet (usage at 95%, wait for tonight's reset). |
 | S11-02 | card_run and run_suite move data by S11-01's recommended method, with fallback | Question for the tech lead |  |
 | S2-01 | Design for zmm and mask registers under -march=knc | Done | The register design for KNC is settled on paper: all 32 zmm and 8 mask registers become usable under -march... |
@@ -216,12 +217,12 @@ Current tickets: `[###################-]` 177 of 180
 
 ## Cost
 
-- From the script, engineer: 410 sessions, 926.1M input tokens
+- From the script, engineer: 411 sessions, 926.1M input tokens
 - From the script, lead: 256 sessions, 76.4M input tokens
-- Started by hand, Claude: 11 sessions, 2410.0M input tokens
+- Started by hand, Claude: 11 sessions, 2412.3M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 23.8 GiB of 100 GiB. 116 GiB free on the drive.
+The project uses 23.9 GiB of 100 GiB. 114 GiB free on the drive.
