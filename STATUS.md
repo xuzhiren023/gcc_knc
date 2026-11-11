@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-11 07:43.
+Updated automatically at every ticket change. Last update: 2026-11-11 07:46.
 
-**Next: the tech lead, on S10-07.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: GPT-6.1, on S10-05 (Sprint 10 batch check).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
 Current tickets: `[###################-]` 174 of 177
 
@@ -45,7 +45,7 @@ Current tickets: `[###################-]` 174 of 177
 | S10-04 | Measure vector math - math kernels and a WRF-shaped physics loop, vector vs scalar libm | Done | The vector-math benchmark (expf, logf, powf, exp, log, pow and a WRF-style theta-e column loop, vector libr... |
 | S10-05 | Sprint 10 batch check | In progress | Lead: this batch check started before S10-07/S10-08 were added. Its host parts (x86, sweeps, drill, execute... |
 | S10-06 | Card qualification - classify powf's 848 special-case mismatches and certify pow under 1 ULP | Done | The powf and pow card failures were traced to the card's own libm (its powl gives NaN for negative x with h... |
-| S10-07 | Vector math v1a - the copied functions (sin, cos, tan, log10, atan, atan2, hyperbolics, bounded groups) in libknc_vmath and the vectorizer hook | Tests waiting for review | Red 287853e2. T1 knc-vmath-v1a.c fails: loops still call scalar sinf. tools/knc_vmath.py --out S10-07 fails... |
+| S10-07 | Vector math v1a - the copied functions (sin, cos, tan, log10, atan, atan2, hyperbolics, bounded groups) in libknc_vmath and the vectorizer hook | In progress | Red approved: T1 fails as loops still call scalar libm; qualify_v1 (MPFR-exact, Annex F, masks, negatives) ... |
 | S10-08 | Vector math v1b - the rest of the libmvec set (acos, asin, cbrt, erf, erfc, exp2, exp10, expm1, log1p, log2, hypot, sincos) | Not started | Upstream supplied: Arm optimized-routines v26.01 (commit 649ccc8411e7c4862965710f25c570d854a1483f, the copi... |
 | S2-01 | Design for zmm and mask registers under -march=knc | Done | The register design for KNC is settled on paper: all 32 zmm and 8 mask registers become usable under -march... |
 | S2-02 | Float and double arguments and results in zmm lane 0 | Done | Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`). |
@@ -202,6 +202,7 @@ Current tickets: `[###################-]` 174 of 177
 
 ## Recent activity
 
+- 2026-11-11 07:46 **S10-07** lead approve-red: Red approved: T1 fails as loops still call scalar libm; qualify_v1 (MPFR-exact, Annex F, masks, negatives) fails only at link. Decisions: (1) hyper...
 - 2026-11-11 07:43 **S10-07** engineer red: Red 287853e2. T1 knc-vmath-v1a.c fails: loops still call scalar sinf. tools/knc_vmath.py --out S10-07 fails only at link, 34 undefined entry points...
 - 2026-11-11 07:21 **S10-05** lead note: Lead: this batch check started before S10-07/S10-08 were added. Its host parts (x86, sweeps, drill, execute) at this head stand; the vector-math ca...
 - 2026-11-11 07:20 **S10-08** lead note: Upstream supplied: Arm optimized-routines v26.01 (commit 649ccc8411e7c4862965710f25c570d854a1483f, the copied tables' release) is checked out read-...
@@ -209,7 +210,6 @@ Current tickets: `[###################-]` 174 of 177
 - 2026-11-11 07:06 **S10-04** lead approve: The vector-math benchmark (expf, logf, powf, exp, log, pow and a WRF-style theta-e column loop, vector library against scalar libm at L2 and memory...
 - 2026-11-11 06:58 **S10-04** engineer submit: Staged, not run: .work/_shared/S10-04/vmath-bench.mic, lint clean (log .work/_state/logs/s10_04_build-20261111-065734.log). vec build calls all six...
 - 2026-11-11 06:52 **S10-03** lead approve: Loops that call expf, logf, powf, exp, log or pow now vectorize under -march=knc and call GCC-KNC's own vector math library, linked automatically, ...
-- 2026-11-11 06:08 **S9-11** lead approve: Sprint 9's final compiler passes the full execute suite on the card (1681/1681), matches stock GCC on x86, has 0 ICE in both sweeps and textual-onl...
 
 ## Cost
 
@@ -221,4 +221,4 @@ Current tickets: `[###################-]` 174 of 177
 
 ## Disk
 
-The project uses 24.3 GiB of 100 GiB. 118 GiB free on the drive.
+The project uses 23.6 GiB of 100 GiB. 118 GiB free on the drive.
