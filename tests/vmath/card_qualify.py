@@ -72,11 +72,11 @@ RECEIPTS = {
 RECEIPTS.update({f + 'f': (0.5000, 'computed in double') for f in (
     'acos', 'asin', 'cbrt', 'erf', 'erfc', 'exp2', 'exp10', 'expm1', 'log1p', 'log2', 'hypot')})
 RECEIPTS.update({
-    'acos': (0.75, 'design bound; polynomial of Arm advsimd/asin.c'),
-    'asin': (0.75, 'design bound; polynomial of Arm advsimd/asin.c'),
+    'acos': (0.75, 'design bound'),
+    'asin': (0.75, 'design bound'),
     'cbrt': (0.51, 'design bound'),
     'erf': (1.05, 'design bound; Arm math/erf.c states 1.01, advsimd/erf.c 2.29'),
-    'erfc': (1.71, 'Arm advsimd/erfc.c'),
+    'erfc': (1.55, 'design bound; Arm advsimd/erfc.c states 1.71'),
     'exp2': (0.75, 'Arm math/exp2.c 0.51; 0.75 for subnormal results'),
     'exp10': (0.75, 'Arm math/exp10.c 0.513; 0.75 for subnormal results'),
     'expm1': (0.80, 'design bound; reduction of Arm math/exp.c'),

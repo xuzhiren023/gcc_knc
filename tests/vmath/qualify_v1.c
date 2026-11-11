@@ -290,9 +290,9 @@ static void pair_input(uint64_t *rng, uint64_t *a, uint64_t *b) {
     if (f->single) { *a = (uint32_t)*a; *b = (uint32_t)*b; }
     return;
   }
-  int span = f->id != HYPOT ? 40 : f->single ? 150 : 1075;
+  int span = f->id != HYPOT ? 40 : f->single ? 150 : 1075, high = f->id != HYPOT ? 16 : 24;
   int e = (int)((r >> 8) % (2*span)) - span;
-  int gap = (r & 3) == 1 ? (int)((r >> 24) % (2*span)) - span - e : (int)((r >> 24) % 25) - 12;
+  int gap = (r & 3) == 1 ? (int)((r >> high) % (2*span)) - span - e : (int)((r >> high) % 25) - 12;
   double x = ldexp(1 + unit(next(rng)),e), y = ldexp(1 + unit(next(rng)),e + gap);
   *a = bits_of(r & 4 ? -y : y); *b = bits_of(r & 8 ? -x : x);
 }
