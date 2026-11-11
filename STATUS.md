@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-11 02:35.
+Updated automatically at every ticket change. Last update: 2026-11-11 02:37.
 
 **Next: GPT-6.1, on S10-01 (512-bit vector arguments and results under -march=knc (ADR-0014 point 1)).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
@@ -40,7 +40,7 @@ Current tickets: `[###################-]` 166 of 173
 | S1-06 | K1OM link defaults | Done | GCC 16 now targets the K1OM ABI by default: it passes --march=k1om to as and -m elf_k1om to ld, uses the /l... |
 | S1-07 | Milestone M0 evidence note | Done | M0 is settled as adjust: GCC 16.2 builds a k1om cc1 whose assembly the 2.22 assembler accepts, an options-f... |
 | S10-01 | 512-bit vector arguments and results under -march=knc (ADR-0014 point 1) | In progress | Red accepted: T1 register and 64-byte stack-slot scans, -O0/-O2 cross-TU card pair (4326 exact checks), and... |
-| S10-02 | libknc_vmath v0 - build and requalify expf, logf, powf, exp, log, pow with GCC-KNC on the card | Not started |  |
+| S10-02 | libknc_vmath v0 - build and requalify expf, logf, powf, exp, log, pow with GCC-KNC on the card | In progress |  |
 | S10-03 | Loops call libknc_vmath - -mveclibabi=knc, by-value entry points, automatic link (ADR-0014 points 2-3) | Not started |  |
 | S10-04 | Measure vector math - math kernels and a WRF-shaped physics loop, vector vs scalar libm | Not started |  |
 | S10-05 | Sprint 10 batch check | Not started |  |
@@ -211,10 +211,10 @@ Current tickets: `[###################-]` 166 of 173
 
 - From the script, engineer: 391 sessions, 858.9M input tokens
 - From the script, lead: 248 sessions, 73.5M input tokens
-- Started by hand, Claude: 11 sessions, 2280.0M input tokens
+- Started by hand, Claude: 11 sessions, 2285.1M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 23.1 GiB of 100 GiB. 92 GiB free on the drive.
+The project uses 23.1 GiB of 100 GiB. 94 GiB free on the drive.
