@@ -2,9 +2,9 @@
 // epilogue: a GPR mask moved to k, guarded masked moves, cond_<op>, and no
 // x87 remainder.  Unknown alignment ends in a gather/scatter epilogue
 // (S8-02, ADR-0009 amendment 1 point 9), never an x87 remainder; at -O3
-// the generic cost model (kept: ADR-0009 point 5) peels add_f32 to
-// alignment with a scalar prologue, so its x87 code is the peel, and the
-// opt-info report shows the peel and the masked epilogue.  The last
+// add_f32 is not peeled to alignment (S8-22: the peel was an x87
+// prologue of up to 15 iterations), and the opt-info report shows no
+// peel and the masked epilogue.  The last
 // label or jump before each masked memory move is its empty-mask guard
 // (jkzd, or je/jz after a byte test) or the label a jknzd/jne guard
 // branches to; never another jump, ret or the function entry.
@@ -51,7 +51,7 @@
 // scan-asm-func cst_al_f32: \A(?![\s\S]*\bfld)
 // scan-asm-func add_f32: \bvgatherdps\s+[^\n]*\{%k[1-7]\}
 // scan-asm-func add_f32: \bvscatterdps\s+%zmm\d+,\s*[^\n]*\{%k[1-7]\}
-// scan-output: knc-mask-tail\.h:48:3: optimized:\s+KNC candidate scalar peel: required \(alignment iterations -1, gap peel 0\)
+// scan-output: knc-mask-tail\.h:48:3: optimized:\s+KNC candidate scalar peel: not required \(alignment iterations 0, gap peel 0\)
 // scan-output: knc-mask-tail\.h:48:3: optimized: epilogue loop vectorized using masked 64 byte vectors
 // scan-asm-not: %(?:xmm|ymm)\d
 #include "knc-mask-tail.h"

@@ -33,6 +33,8 @@ SELECTIONS = {
         't1': lambda runner: importlib.import_module('knc_card').t1(runner)}),
     'phinix': ('S8-16 -mphinix expansion, banner and progress bar', {
         't1': lambda runner: importlib.import_module('phinix').t1(runner)}),
+    'phinix_nest': ('S8-22 -mphinix keeps the -O2 vector forms of a short loop nest and a short call', {
+        't1': lambda runner: runner.t1_sources([runner.source_dir / 'knc-phinix-nest.c'])}),
     'o2_vect': ('S8-09 -march=knc -O2 vectorizer cost model and stride versioning', {
         't1': lambda runner: runner.t1_sources(runner.source_dir.glob('knc-o2-vect*.c'))}),
     'tune_align': ('S8-08 -mtune=knc aligns functions to 64 bytes', {
