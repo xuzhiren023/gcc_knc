@@ -194,7 +194,7 @@ Current tickets: `[###################-]` 165 of 173
 | S9-21 | S9-18 PGO training script - BusyBox od has no -A/-t, so no profile came back | Done | The S9-18 PGO training script now dumps profiles with od -b -v, which BusyBox 1.19 on the card supports, an... |
 | S9-22 | S9-18 PGO rebuild fails with coverage-mismatch on the card profiles - make the two builds identical | Done | The PGO experiment's two builds now use identical compile commands, so profiles collected on the card can b... |
 | S9-23 | card_run - no address-space limit in our exclusive turns (owner - "there is no job memory limit") | Waiting for review | head 84e9f27d: lead updated the S9-14 profile test expectation for 7100/full (no limit). |
-| S9-24 | Sprint 9 settings from the card data, and the harness fixes the batch check needs | Not started |  |
+| S9-24 | Sprint 9 settings from the card data, and the harness fixes the batch check needs | In progress |  |
 
 ## Recent activity
 
@@ -211,10 +211,10 @@ Current tickets: `[###################-]` 165 of 173
 
 - From the script, engineer: 388 sessions, 849.8M input tokens
 - From the script, lead: 246 sessions, 72.9M input tokens
-- Started by hand, Claude: 11 sessions, 2259.7M input tokens
+- Started by hand, Claude: 11 sessions, 2260.5M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 23.1 GiB of 100 GiB. 104 GiB free on the drive.
+The project uses 23.2 GiB of 100 GiB. 104 GiB free on the drive.
