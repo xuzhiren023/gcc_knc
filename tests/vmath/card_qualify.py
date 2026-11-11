@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Qualify libknc_vmath (S10-02, S10-07, ADR-0014 point 4) on the card, or the host build on the host.
+"""Qualify libknc_vmath (S10-02, S10-07, S10-08, ADR-0014 point 4) on the card, or the host build on the host.
 
     python tests/vmath/card_qualify.py --host              host build: negative and compare sets
     python tests/vmath/card_qualify.py [--set S] [--dry-run]   card (lead only), through tools/card_run
@@ -15,7 +15,7 @@ screened error is at most the dump threshold, so their true error is at most tha
 screen error seen on the rechecked lanes outside the special grid (printed as undumped_bound,
 which must stay within the limit too). The grid is checked exactly in full (S10-06).
 
-The v1a functions (S10-07) run tests/vmath/qualify_v1.c. On the host its oracle is MPFR, so the
+The v1a and v1b functions (S10-07, S10-08) run tests/vmath/qualify_v1.c. On the host its oracle is MPFR, so the
 host's max_ulp is exact over every lane. On the card it screens with the long double libm, and the
 host program rechecks the card's "check" lines exactly (--recheck): every lane screened above the
 job's --dump, the special grid, and a sample of one block in 1024 that measures the screen's own
@@ -66,7 +66,27 @@ RECEIPTS = {
     'cosh': (0.5332, 'knc-g5-hyperbolic6-v6.json worstErrorUlps'),
     'tanh': (0.5000, 'knc-g5-hyperbolic6-v6.json worstErrorUlps'),
 }
+# The v1b functions (S10-08) have no receipt. The figure is the error the upstream routine states
+# (Arm optimized-routines v26.01) where its evaluation is kept, else this library's design bound
+# (libknc_vmath/README.md); the floats are computed in double and rounded once.
+RECEIPTS.update({f + 'f': (0.5000, 'computed in double') for f in (
+    'acos', 'asin', 'cbrt', 'erf', 'erfc', 'exp2', 'exp10', 'expm1', 'log1p', 'log2', 'hypot')})
+RECEIPTS.update({
+    'acos': (0.75, 'design bound'),
+    'asin': (0.75, 'design bound'),
+    'cbrt': (0.51, 'design bound'),
+    'erf': (1.05, 'design bound; Arm math/erf.c states 1.01, advsimd/erf.c 2.29'),
+    'erfc': (1.55, 'design bound; Arm advsimd/erfc.c states 1.71'),
+    'exp2': (0.75, 'Arm math/exp2.c 0.51; 0.75 for subnormal results'),
+    'exp10': (0.75, 'Arm math/exp10.c 0.513; 0.75 for subnormal results'),
+    'expm1': (0.80, 'design bound; reduction of Arm math/exp.c'),
+    'log1p': (0.55, 'design bound; evaluation of Arm math/log.c (0.52)'),
+    'log2': (0.55, 'Arm math/log2.c'),
+    'hypot': (0.75, 'design bound: 0.51, 0.75 for subnormal results'),
+})
 LIMIT = 1.0
+# Looser limits, as tests/vmath/qualify_v1.c's table of functions has them.
+LIMITS = {'erf': 1.05, 'erfc': 1.75}
 
 # (job, program, arguments, expected result). powf is not in the compare set: the accepted harness
 # draws its pairs per worker thread, so its inputs depend on the thread count.
@@ -114,6 +134,21 @@ JOBS['compare'] += [('cmp-' + f, 'qualify_v1', [f, '--blocks', '65536', '--dump'
                     for f, dump in V1A]
 JOBS['full'] += [(f, 'qualify_v1', [f, '--blocks', str(1 << 24), '--dump', dump, '--max-dump', '4000000'],
                   'PASS') for f, dump in V1A]
+
+# The v1b functions (S10-08). The floats rarely pass 0.5; the doubles' thresholds keep about 1% of
+# the lanes and leave room for the screen's own error under the function's limit.
+V1B = [(f + 'f', '0.5') for f in ('acos', 'asin', 'cbrt', 'erf', 'erfc', 'exp2', 'exp10', 'expm1',
+                                  'log1p', 'log2', 'hypot')] + [
+    ('acos', '0.7'), ('asin', '0.7'), ('cbrt', '0.6'), ('erf', '0.9'), ('erfc', '1.3'),
+    ('exp2', '0.7'), ('exp10', '0.7'), ('expm1', '0.7'), ('log1p', '0.7'), ('log2', '0.7'),
+    ('hypot', '0.6')]
+JOBS['negative'] += [
+    ('neg-exp2', 'qualify_v1', ['exp2', '--negative', '--blocks', '4096'], 'FAIL'),
+    ('negmask-hypotf', 'qualify_v1', ['hypotf', '--negative-mask', '--blocks', '4096'], 'FAIL')]
+JOBS['compare'] += [('cmp-' + f, 'qualify_v1', [f, '--blocks', '65536', '--dump', dump], 'PASS')
+                    for f, dump in V1B]
+JOBS['full'] += [(f, 'qualify_v1', [f, '--blocks', str(1 << 24), '--dump', dump, '--max-dump', '4000000'],
+                  'PASS') for f, dump in V1B]
 
 CTX = Context(prec=60, Emax=10 ** 8, Emin=-10 ** 8, traps=[])
 DBL_OVERFLOW = (2 - Decimal(2) ** -53) * Decimal(2) ** 1023  # smallest value that rounds to inf
@@ -192,7 +227,8 @@ def assess(job, program, args, expect, text):
         others_ok = fields['mask_errors'] == '0' and \
             int(fields['dumped']) == len(checks) == int(exact['checked'])
         bound = float(fields['dump']) + float(exact['screen_error'])
-        result = 'PASS' if exact['result'] == 'PASS' and bound <= LIMIT and others_ok else 'FAIL'
+        result = 'PASS' if exact['result'] == 'PASS' and bound <= LIMITS.get(function, LIMIT) \
+            and others_ok else 'FAIL'
         fields['max_ulp'] = exact['max_ulp']
         detail = ('exact max_ulp=%s over %d checked lanes, special=%s, screen error<=%s, '
                   'undumped_bound=%.4f, worst: x=%s y=%s out=%s'
@@ -279,7 +315,8 @@ def main():
     if table:
         print('\nfunction  max_ulp   inputs       result  receipt  (limit %.1f ULP)' % LIMIT)
         for function, ulp, inputs, result in table:
-            print('%-9s %-9s %-12s %-7s %.4f  %s' % ((function, ulp, inputs, result) + RECEIPTS[function]))
+            print('%-9s %-9s %-12s %-7s %.4f  %s%s' % ((function, ulp, inputs, result) + RECEIPTS[function] + (
+                ' (limit %.2f ULP)' % LIMITS[function] if function in LIMITS else '',)))
     if not args.dry_run:
         print('ALL AS EXPECTED' if not failures else '%d job(s) NOT as expected' % failures)
     return 1 if failures else 0

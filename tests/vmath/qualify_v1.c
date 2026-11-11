@@ -1,6 +1,9 @@
 /* Qualification of libknc_vmath's v1a functions (S10-07, ADR-0014 point 4): sin, cos, tan, log10,
-   atan2, sinh, cosh and tanh on 16 floats and on 8 doubles, and atanf. It calls what a vectorized
-   loop calls, the by-value entry point __knc_vmath_<name>_<lanes>, and its masked form.
+   atan2, sinh, cosh and tanh on 16 floats and on 8 doubles, and atanf; and of the v1b functions
+   (S10-08): acos, asin, cbrt, erf, erfc, exp2, exp10, expm1, log1p, log2 and hypot on both. It
+   calls what a vectorized loop calls, the by-value entry point __knc_vmath_<name>_<lanes>, and its
+   masked form. The limit is 1 ULP, except where the table of functions gives the looser bound of
+   the upstream routine (erf and erfc on doubles; libknc_vmath/README.md says why).
 
    Special cases come from the C99 Annex F table in annex_f(), never from a libm. The other lanes
    have one of two oracles:
@@ -15,11 +18,12 @@
    set:
    - one argument: --blocks blocks spread evenly over all bit patterns of the type, each of
      consecutive patterns ("sweep"), and as many "dense" blocks: |x| up to the function's range,
-     half uniform and half spread over the 40 binades below it; log10 takes positive x of every
-     exponent, a quarter of them near 1;
-   - atan2: --blocks blocks of random pairs (a quarter raw bit patterns, a quarter independent
-     magnitudes in [2^-40, 2^40), half with magnitudes within 2^12 of each other) and the grid of
-     all pairs of special values.
+     half uniform and half spread over the 40 binades below it; log10 and log2 take positive x of
+     every exponent, a quarter of them near 1; log1p takes x of every exponent above -1, a quarter
+     of them within 2^-63 to 1 of -1;
+   - atan2 and hypot: --blocks blocks of random pairs (a quarter raw bit patterns, a quarter
+     independent magnitudes in [2^-40, 2^40), half with magnitudes within 2^12 of each other;
+     hypot's magnitudes span every exponent instead) and the grid of all pairs of special values.
    One block in 64 also runs masked, with random bits above the lanes' in the mask: an inactive
    lane must return its first argument's bits, an active lane the all-active result. Round to
    nearest only; errno and flags are not checked. */
@@ -40,13 +44,15 @@
 
 typedef __knc_vmath_v16sf vf;
 typedef __knc_vmath_v8df vd;
-enum { SIN, COS, TAN, LOG10, ATAN, ATAN2, SINH, COSH, TANH };
+enum { SIN, COS, TAN, LOG10, ATAN, ATAN2, SINH, COSH, TANH,
+       ACOS, ASIN, CBRT, ERF, ERFC, EXP2, EXP10, EXPM1, LOG1P, LOG2, HYPOT };
 enum { GRID = 1, SAMPLE };
 
 struct function {
   const char *name;
   int id, single;
   double range; /* of the dense inputs */
+  double limit; /* ULP; 0 is 1 */
   vf (*f1)(vf); vf (*f1m)(vf,unsigned); vf (*f2)(vf,vf); vf (*f2m)(vf,vf,unsigned);
   vd (*d1)(vd); vd (*d1m)(vd,unsigned); vd (*d2)(vd,vd); vd (*d2m)(vd,vd,unsigned);
 };
@@ -59,9 +65,19 @@ static const struct function functions[] = {
   D1(sin,SIN,128), D1(cos,COS,128), D1(tan,TAN,128), D1(log10,LOG10,0),
   D1(sinh,SINH,711), D1(cosh,COSH,711), D1(tanh,TANH,22),
   { "atan2",ATAN2,0,0,.d2 = __knc_vmath_atan2_8,.d2m = __knc_vmath_atan2_8_m },
+  F1(acos,ACOS,1), F1(asin,ASIN,1), F1(cbrt,CBRT,8), F1(erf,ERF,4), F1(erfc,ERFC,11),
+  F1(exp2,EXP2,151), F1(exp10,EXP10,46), F1(expm1,EXPM1,89), F1(log1p,LOG1P,0), F1(log2,LOG2,0),
+  { "hypotf",HYPOT,1,0,.f2 = __knc_vmath_hypotf_16,.f2m = __knc_vmath_hypotf_16_m },
+  D1(acos,ACOS,1), D1(asin,ASIN,1), D1(cbrt,CBRT,8), D1(exp2,EXP2,1076), D1(exp10,EXP10,324),
+  D1(expm1,EXPM1,710), D1(log1p,LOG1P,0), D1(log2,LOG2,0),
+  /* Upstream's tables hold erf(r) and erfc(r) rounded to one double (README.md). */
+  { "erf",ERF,0,6,1.05,.d1 = __knc_vmath_erf_8,.d1m = __knc_vmath_erf_8_m },
+  { "erfc",ERFC,0,28,1.75,.d1 = __knc_vmath_erfc_8,.d1m = __knc_vmath_erfc_8_m },
+  { "hypot",HYPOT,0,0,.d2 = __knc_vmath_hypot_8,.d2m = __knc_vmath_hypot_8_m },
 };
 static const struct function *f;
-static int lanes, negative, negative_mask, workers;
+static int lanes, negative, negative_mask, workers, pairs;
+static long double limit = 1;
 #ifdef VMATH_MPFR
 static int screen;
 #else
@@ -104,15 +120,26 @@ static struct special annex_f(double a, double b) {
   const struct special nan = { NOT_A_NUMBER,0 }, compute = { COMPUTE,0 };
 #define exact(v) ((struct special){ EXACT,v })
 #define pi(quarters) ((struct special){ PI_QUARTERS,quarters })
-  if (isnan(a) || (f->id == ATAN2 && isnan(b))) return nan;
+  if (f->id == HYPOT) {
+    if (isinf(a) || isinf(b)) return exact(INFINITY);
+    return isnan(a) || isnan(b) ? nan : a == 0 ? exact(fabs(b)) : b == 0 ? exact(fabs(a)) : compute;
+  }
+  if (isnan(a) || (pairs && isnan(b))) return nan;
   switch (f->id) {
   case SIN: case TAN: return a == 0 ? exact(a) : isinf(a) ? nan : compute;
   case COS: return a == 0 ? exact(1) : isinf(a) ? nan : compute;
-  case LOG10: return a == 0 ? exact(-INFINITY) : a < 0 ? nan : a == 1 ? exact(0) : isinf(a) ? exact(a) : compute;
+  case LOG10: case LOG2: return a == 0 ? exact(-INFINITY) : a < 0 ? nan : a == 1 ? exact(0) : isinf(a) ? exact(a) : compute;
   case ATAN: return a == 0 ? exact(a) : isinf(a) ? pi(copysign(2,a)) : compute;
   case SINH: return a == 0 || isinf(a) ? exact(a) : compute;
   case COSH: return a == 0 ? exact(1) : isinf(a) ? exact(INFINITY) : compute;
-  case TANH: return a == 0 ? exact(a) : isinf(a) ? exact(copysign(1,a)) : compute;
+  case TANH: case ERF: return a == 0 ? exact(a) : isinf(a) ? exact(copysign(1,a)) : compute;
+  case ACOS: return fabs(a) > 1 ? nan : a == 1 ? exact(0) : compute;
+  case ASIN: return fabs(a) > 1 ? nan : a == 0 ? exact(a) : compute;
+  case CBRT: return a == 0 || isinf(a) ? exact(a) : compute;
+  case ERFC: return isinf(a) ? exact(a < 0 ? 2 : 0) : compute;
+  case EXP2: case EXP10: return a == 0 ? exact(1) : isinf(a) ? exact(a < 0 ? 0 : a) : compute;
+  case EXPM1: return a == 0 ? exact(a) : isinf(a) ? exact(a < 0 ? -1 : a) : compute;
+  case LOG1P: return a == 0 ? exact(a) : a == -1 ? exact(-INFINITY) : a < -1 ? nan : isinf(a) ? exact(a) : compute;
   }
   double sign = copysign(1,a);
   if (a == 0) return signbit(b) ? pi(4*sign) : exact(a);
@@ -138,6 +165,17 @@ static long double screen_error(double a, double b, double out, struct special s
   case ATAN2: ref = atan2l(a,b); break;
   case SINH: ref = sinhl(a); break;
   case COSH: ref = coshl(a); break;
+  case ACOS: ref = acosl(a); break;
+  case ASIN: ref = asinl(a); break;
+  case CBRT: ref = cbrtl(a); break;
+  case ERF: ref = erfl(a); break;
+  case ERFC: ref = erfcl(a); break;
+  case EXP2: ref = exp2l(a); break;
+  case EXP10: ref = powl(10,a); break;
+  case EXPM1: ref = expm1l(a); break;
+  case LOG1P: ref = log1pl(a); break;
+  case LOG2: ref = log2l(a); break;
+  case HYPOT: ref = hypotl(a,b); break;
   default: ref = tanhl(a); break;
   }
   double rounded = f->single ? (double)(float)ref : (double)ref;
@@ -163,6 +201,17 @@ static long double exact_error(double a, double b, double out, struct special s)
   case ATAN2: mpfr_atan2(r,x,y,MPFR_RNDN); break;
   case SINH: mpfr_sinh(r,x,MPFR_RNDN); break;
   case COSH: mpfr_cosh(r,x,MPFR_RNDN); break;
+  case ACOS: mpfr_acos(r,x,MPFR_RNDN); break;
+  case ASIN: mpfr_asin(r,x,MPFR_RNDN); break;
+  case CBRT: mpfr_cbrt(r,x,MPFR_RNDN); break;
+  case ERF: mpfr_erf(r,x,MPFR_RNDN); break;
+  case ERFC: mpfr_erfc(r,x,MPFR_RNDN); break;
+  case EXP2: mpfr_exp2(r,x,MPFR_RNDN); break;
+  case EXP10: mpfr_exp10(r,x,MPFR_RNDN); break;
+  case EXPM1: mpfr_expm1(r,x,MPFR_RNDN); break;
+  case LOG1P: mpfr_log1p(r,x,MPFR_RNDN); break;
+  case LOG2: mpfr_log2(r,x,MPFR_RNDN); break;
+  case HYPOT: mpfr_hypot(r,x,y,MPFR_RNDN); break;
   default: mpfr_tanh(r,x,MPFR_RNDN); break;
   }
   double rounded = f->single ? (double)mpfr_get_flt(r,MPFR_RNDN) : mpfr_get_d(r,MPFR_RNDN);
@@ -222,11 +271,15 @@ static double unit(uint64_t r) { return (double)(r >> 11)*0x1p-53; }
 static uint64_t dense_input(uint64_t *rng) {
   uint64_t r = next(rng);
   double u = unit(next(rng)), v;
-  if (f->id != LOG10) {
+  if (f->id != LOG10 && f->id != LOG2 && f->id != LOG1P) {
     v = r & 2 ? u*f->range : ldexp(u*f->range,-(int)((r >> 8) % 40));
     if (r & 1) v = -v;
-  } else if ((r & 3) == 0) v = 1 + (u-0.5)*ldexp(1.0,-(int)(r >> 8 & 31));
-  else v = ldexp(1 + u,(int)((r >> 8) % (f->single ? 277 : 2098)) - (f->single ? 149 : 1074));
+  } else if ((r & 3) == 0) {
+    v = f->id == LOG1P ? ldexp(u,-(int)(r >> 8 & 63)) - 1 : 1 + (u-0.5)*ldexp(1.0,-(int)(r >> 8 & 31));
+  } else {
+    v = ldexp(1 + u,(int)((r >> 8) % (f->single ? 277 : 2098)) - (f->single ? 149 : 1074));
+    if (f->id == LOG1P && (r & 4) && v < 1) v = -v;
+  }
   return bits_of(v);
 }
 
@@ -237,8 +290,9 @@ static void pair_input(uint64_t *rng, uint64_t *a, uint64_t *b) {
     if (f->single) { *a = (uint32_t)*a; *b = (uint32_t)*b; }
     return;
   }
-  int e = (int)((r >> 8) % 80) - 40;
-  int gap = (r & 3) == 1 ? (int)((r >> 16) % 80) - 40 - e : (int)((r >> 16) % 25) - 12;
+  int span = f->id != HYPOT ? 40 : f->single ? 150 : 1075, high = f->id != HYPOT ? 16 : 24;
+  int e = (int)((r >> 8) % (2*span)) - span;
+  int gap = (r & 3) == 1 ? (int)((r >> high) % (2*span)) - span - e : (int)((r >> high) % 25) - 12;
   double x = ldexp(1 + unit(next(rng)),e), y = ldexp(1 + unit(next(rng)),e + gap);
   *a = bits_of(r & 4 ? -y : y); *b = bits_of(r & 8 ? -x : x);
 }
@@ -261,12 +315,12 @@ static void block(struct stats *s, uint64_t *rng, const uint64_t *x, const uint6
   }
 }
 
-/* atan2: block b is random pairs. Others: block b < blocks is a sweep block and block blocks + b
+/* atan2 and hypot: block b is random pairs. Others: block b < blocks is a sweep block and block blocks + b
    the matching dense block. */
 static void run_block(struct stats *s, uint64_t b) {
   uint64_t rng = seed(b), x[16], y[16] = {0};
   for (int l = 0; l < lanes; ++l)
-    if (f->id == ATAN2) pair_input(&rng,&x[l],&y[l]);
+    if (pairs) pair_input(&rng,&x[l],&y[l]);
     else if (b < blocks) x[l] = b*block_stride*(uint64_t)lanes + (uint64_t)l;
     else x[l] = dense_input(&rng);
   block(s,&rng,x,y,0);
@@ -274,7 +328,7 @@ static void run_block(struct stats *s, uint64_t b) {
 
 static void *worker(void *arg) {
   int w = (int)(intptr_t)arg;
-  uint64_t total = f->id == ATAN2 ? blocks : 2*blocks;
+  uint64_t total = pairs ? blocks : 2*blocks;
   extended_precision();
   for (uint64_t b = (uint64_t)w; b < total; b += (uint64_t)workers) run_block(&totals[w],b);
   return NULL;
@@ -290,14 +344,19 @@ static void specials(struct stats *s) {
                              0x1.921fb54442d18p1,0x1.2d97c7f3321d2p1,0x1.921fb54442d18p2,
                              0x1.921fb6p0,0x1.921fb6p1,0x1p63,0x1p64,-0x1p120,0x1p1023,
                              9.0,19.0,20.0,-22.0,88.72283,89.41598629223294,89.5,
-                             710.4758600739439,-710.4758600739439,710.5,711.0};
+                             710.4758600739439,-710.4758600739439,710.5,711.0,
+                             0.25,-0.25,8.0,27.0,-27.0,64.0,5.9921875,-6.0,27.2421875,27.25,28.0,10.0625,
+                             127.5,128.0,-149.5,-150.0,38.53184,-45.0,1023.5,1024.0,-1074.5,-1075.0,
+                             308.25,308.2547155599168,-323.5,-324.0,709.782712893384,-745.2,-37.5,
+                             1e300,1e-300,0x1p-537,0x1p-538,0x1.6a09e667f3bcdp+1023,0x1.6a09e6p+127,
+                             -0x1.fffffffffffffp-1,-0x1.fffffep-1,-0x1.0000000000001p0};
   enum { N = sizeof v/sizeof *v };
   uint64_t rng = 1, x[16], y[16] = {0};
   int n = 0;
   for (int i = 0; i < N; ++i)
-    for (int j = 0; j < (f->id == ATAN2 ? N : 1); ++j) {
+    for (int j = 0; j < (pairs ? N : 1); ++j) {
       x[n] = bits_of(v[i]);
-      if (f->id == ATAN2) y[n] = bits_of(v[j]);
+      if (pairs) y[n] = bits_of(v[j]);
       if (++n == lanes) { block(s,&rng,x,y,GRID); n = 0; }
     }
   if (n) { for (; n < lanes; ++n) { x[n] = x[0]; y[n] = y[0]; } block(s,&rng,x,y,GRID); }
@@ -320,7 +379,7 @@ static int recheck(void) {
     if (screened >= 0 && strcmp(tag,"grid") && fabsl(screened-e) > screen_error) screen_error = fabsl(screened-e);
     if (e > max_ulp) { max_ulp = e; worst[0] = x; worst[1] = y; worst[2] = out; }
   }
-  int pass = max_ulp <= 1.0L && !special_errors;
+  int pass = max_ulp <= limit && !special_errors;
   printf("qualify_v1 function=%s mode=recheck checked=%llu max_ulp=%.6Lf worst_x=0x%016llx worst_y=0x%016llx "
          "worst_out=0x%016llx special_errors=%llu screen_error=%.6Lf result=%s\n",f->name,checked,max_ulp,
          worst[0],worst[1],worst[2],special_errors,screen_error,pass ? "PASS" : "FAIL");
@@ -348,8 +407,10 @@ int main(int argc, char **argv) {
     else { fprintf(stderr,"unknown argument %s\n",argv[i]); return 2; }
   }
   lanes = f->single ? 16 : 8;
+  pairs = f->f2 || f->d2;
+  if (f->limit != 0) limit = f->limit;
   /* The exact oracle dumps only what fails, whatever --dump says. */
-  if (!screen) dump = 1.0L;
+  if (!screen) dump = limit;
   else if (dump < 0) dump = 0.5L;
   uint64_t space = f->single ? 1ULL << 28 : 1ULL << 61; /* blocks of consecutive bit patterns */
   if (!blocks || blocks > space) { fprintf(stderr,"blocks must be 1 to %llu\n",(unsigned long long)space); return 2; }
@@ -384,7 +445,7 @@ int main(int argc, char **argv) {
       all.max_ulp = s->max_ulp; all.worst_x = s->worst_x; all.worst_y = s->worst_y; all.worst_out = s->worst_out;
     }
   }
-  int pass = all.max_ulp <= 1.0L && !all.special_errors && !all.mask_errors && dumped <= max_dump;
+  int pass = all.max_ulp <= limit && !all.special_errors && !all.mask_errors && dumped <= max_dump;
   printf("qualify_v1 function=%s mode=%s negative=%d negative_mask=%d blocks=%llu workers=%d inputs=%llu "
          "max_ulp=%.6Lf worst_x=0x%016llx worst_y=0x%016llx worst_out=0x%016llx ulp_le_0.5=%llu ulp_le_1=%llu "
          "ulp_le_2=%llu ulp_le_4=%llu ulp_gt_4=%llu special_errors=%llu mask_errors=%llu dump=%.3Lf "

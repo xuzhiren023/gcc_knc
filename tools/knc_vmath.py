@@ -42,7 +42,9 @@ LANES = {'expf': 16, 'logf': 16, 'powf': 16, 'exp': 8, 'log': 8, 'pow': 8}
 # Library members: our wrappers around the copied cores, and the Arm data tables they read.
 MEMBERS = sorted(LIB.glob('vmath_*.c')) + [
     ARM_DP / 'exp_data.c', ARM_DP / 'log_data.c', ALGORITHMS / 'pow_e8/upstream/pow_log_data.c',
-    ALGORITHMS / 'powf_e16/upstream/powf_log2_data.c', ARM_SP / 'exp2f_data.c']
+    ALGORITHMS / 'powf_e16/upstream/powf_log2_data.c', ARM_SP / 'exp2f_data.c',
+    # S10-08: the tables of log2, erf and erfc.
+    ARM_SP / 'log2_data.c', ARM_SP / 'aarch64/v_erf_data.c', ARM_SP / 'aarch64/v_erfc_data.c']
 # The cores build as a user would build them: -O2 and GCC's default contraction, no fast-math.
 LIB_FLAGS = ['-std=gnu11', '-O2', '-Wall', '-I' + str(LIB), '-I' + str(ARM_DP),
              '-I' + str(ALGORITHMS / 'e_width_experiment'), '-I' + str(ALGORITHMS / 'pow_e8'),
@@ -54,6 +56,8 @@ LIB_FLAGS = ['-std=gnu11', '-O2', '-Wall', '-I' + str(LIB), '-I' + str(ARM_DP),
 KNC_LIB_FLAGS = ['-fPIC', '-fvisibility=hidden']
 TEST_FLAGS = ['-std=gnu11', '-O2', '-Wall', '-Wextra', '-Werror', '-fno-tree-vectorize',
               '-fno-tree-slp-vectorize', '-ffp-contract=off', '-I' + str(LIB)]
+# S10-08: these members take square roots, which must not call libm's sqrt to set errno.
+NO_ERRNO = ('vmath_asin.c', 'vmath_cbrt.c')
 def command(*args, **kwargs):
     print('+ ' + ' '.join(map(str, args)), flush=True)
     return subprocess.call(list(map(str, args)), **kwargs)
@@ -84,7 +88,8 @@ def build(target):
         return obj
 
     lib_flags = LIB_FLAGS + (KNC_LIB_FLAGS if target == 'knc' else [])
-    objects = [compile_unit(source, lib_flags) for source in MEMBERS]
+    objects = [compile_unit(source, lib_flags + (['-fno-math-errno'] if source.name in NO_ERRNO else []))
+               for source in MEMBERS]
     tests = {'qualify': compile_unit(ROOT / 'tests/acceptance/vecmath_qualify/qualify.c', TEST_FLAGS),
              'qualify_d': compile_unit(ROOT / 'tests/vmath/qualify_d.c', TEST_FLAGS),
              'pow_reference': compile_unit(ROOT / 'tests/vmath/pow_reference.c', TEST_FLAGS),
