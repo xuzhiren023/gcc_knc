@@ -12,8 +12,11 @@ copies; qualify_d is tests/vmath/qualify_d.c.
 import argparse
 import os
 from pathlib import Path
+import re
 import subprocess
 import sys
+
+import storage
 
 ROOT = Path(__file__).resolve().parent.parent
 PROJECT = ROOT.parent.parent if ROOT.parent.name == '.work' else ROOT
@@ -91,6 +94,59 @@ def build(target):
         return 1
     print('BUILT %s: %s %s' % (target, archive, ' '.join(map(str, exes))))
     return 0
+
+
+def prefix():
+    """This lane's installed compiler (tools/s7_09_checks.py install) and its libgcc directory."""
+    slot = storage.gcc_slot()
+    version = (SHARED / storage.GCC_SLOTS[slot][0] / 'gcc/BASE-VER').read_text().strip()
+    root = SHARED / ('gcc-knc-' + version + ('' if slot == '1' else '-' + slot))
+    return root, root / 'lib/gcc/k1om-mpss-linux' / version
+
+
+def t2(runner):
+    """S10-03: tests/t2/knc-vmath-loop.c built with the installed driver and no library flag but
+    -lm, staged for the card. The vector object must call the six entry points, the scalar one
+    none, and the link must take libknc_vmath.a from the prefix by itself."""
+    root, libdir = prefix()
+    driver = root / 'bin/k1om-mpss-linux-gcc'
+    source = ROOT / 'tests/t2/knc-vmath-loop.c'
+    output = SHARED / 'S10-03'
+    output.mkdir(exist_ok=True)
+    elf = output / 'vmath-loop.mic'
+    elf.unlink(missing_ok=True)
+    wanted = {'__knc_vmath_%s_%d' % (f, LANES[f]) for f in FUNCTIONS}
+    objects, failures = [], []
+    for role, flags, calls in (('vector', ['-fno-math-errno', '-DVMATH_VECTOR'], wanted),
+                               ('scalar', [], set())):
+        obj = runner.out / ('vmath-loop-' + role + '.o')
+        compiled = runner.command(driver, '-O2', '-march=knc', *flags,
+                                  '--sysroot=' + str(runner.sysroot), '-c', source, '-o', obj,
+                                  check=False)
+        if compiled.returncode or compiled.stdout.strip():
+            failures.append(role + ' compile: ' + compiled.stdout[-1800:])
+            continue
+        found = set(re.findall(r'\b__knc_vmath_\w+', runner.command(runner.tool('nm'), '-u', obj)))
+        if found != calls:
+            failures.append('%s object calls %s, expected %s'
+                            % (role, sorted(found) or 'no entry point', sorted(calls) or 'none'))
+        objects.append(obj)
+    if not failures:
+        linked = runner.command(driver, '--sysroot=' + str(runner.sysroot), *objects, '-lm',
+                                '-o', elf, '-Wl,--trace', check=False)
+        lint = linked if linked.returncode else runner.command(
+            sys.executable, ROOT / 'tools/knc_lint', elf, check=False)
+        if lint.returncode:
+            failures.append('link or lint: ' + lint.stdout[-1800:])
+            elf.unlink(missing_ok=True)
+        else:
+            archives = set(re.findall(r'^\(?(\S*libknc_vmath\.a)\)?', linked.stdout, re.M))
+            if not archives or any(Path(a).resolve() != (libdir / 'libknc_vmath.a').resolve()
+                                   for a in archives):
+                failures.append('libknc_vmath.a not taken from %s: %s' % (libdir, sorted(archives)))
+            runner.t2_abi(elf, linked.stdout)
+    runner.result('t2 knc-vmath-loop: six loops call libknc_vmath, linked with no library flag',
+                  failures)
 
 
 def main():
