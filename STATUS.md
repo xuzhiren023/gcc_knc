@@ -186,7 +186,7 @@ Current tickets: `[###################-]` 161 of 165
 | S9-18 | Experiment - how much do branch hints and profile-guided optimization gain on KNC? | Done | Card 2026-11-11: the eight instrumented programs ran (TRAIN checksums printed) but BusyBox od rejected -A, ... |
 | S9-19 | Experiment - auto-parallelization on KNC, and whether AutoFDO is possible on the card | Done | Auto-parallelization (GCC splitting loops across threads with no pragmas) works on KNC for the streaming an... |
 | S9-20 | Experiment - how much does instruction scheduling help the in-order core, at 1 and 4 threads per core? | Done | The instruction-scheduling experiment is staged: the M2 kernels and two scalar kernels in five builds (defa... |
-| S9-21 | S9-18 PGO training script - BusyBox od has no -A/-t, so no profile came back | Not started |  |
+| S9-21 | S9-18 PGO training script - BusyBox od has no -A/-t, so no profile came back | In progress |  |
 
 ## Recent activity
 
@@ -203,7 +203,7 @@ Current tickets: `[###################-]` 161 of 165
 
 - From the script, engineer: 382 sessions, 835.4M input tokens
 - From the script, lead: 243 sessions, 72.5M input tokens
-- Started by hand, Claude: 11 sessions, 2190.8M input tokens
+- Started by hand, Claude: 11 sessions, 2192.3M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
