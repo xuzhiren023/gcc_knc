@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-10 21:04.
+Updated automatically at every ticket change. Last update: 2026-11-10 21:05.
 
 **Next: GPT-6.1, on S8-23 (Sprint 8 made the M2 short kernel 5-10% slower than Sprint 7 - bisect and fix).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
@@ -203,7 +203,7 @@ Current tickets: `[###################-]` 163 of 166
 ## Cost
 
 - From the script, engineer: 384 sessions, 836.2M input tokens
-- From the script, lead: 244 sessions, 72.5M input tokens
+- From the script, lead: 245 sessions, 72.7M input tokens
 - Started by hand, Claude: 11 sessions, 2210.2M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
