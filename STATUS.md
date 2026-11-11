@@ -1,10 +1,10 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-10 19:36.
+Updated automatically at every ticket change. Last update: 2026-11-10 19:44.
 
 **Next: the tech lead, on S8-22.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
-Current tickets: `[###################-]` 159 of 162
+Current tickets: `[###################-]` 160 of 162
 
 ## Milestones
 
@@ -13,7 +13,7 @@ Current tickets: `[###################-]` 159 of 162
 | M0 | Foundation | In progress | 17 of 17 tickets |
 | M1 | Mixed native code | Done | 43 of 43 tickets |
 | M2 | Useful vector target | Done | 51 of 51 tickets |
-| M3 | Runtimes | In progress | 27 of 29 tickets |
+| M3 | Runtimes | In progress | 28 of 29 tickets |
 | M4 | Broad optimization | Not started | Not planned in detail yet |
 | M5 | Program corpus | Not started | Not planned in detail yet |
 | M6 | Release | Not started | Not planned in detail yet |
@@ -183,10 +183,11 @@ Current tickets: `[###################-]` 159 of 162
 | S9-16 | Card probes - unaligned scalar accesses, and the VPU cost of subnormal operands | Done | Two card probes are built and ready for the lead to run: C13 tests whether unaligned scalar loads and store... |
 | S9-17 | User guidance on the flags page - threads per core, first touch, regions, heap, and ICC differences | Done | The flags page now has a 'Writing fast code for KNC' section: threads per core, first touch and region size... |
 | S9-18 | Experiment - how much do branch hints and profile-guided optimization gain on KNC? | Done | Four small branchy kernels in five builds (plain -O2, correct and wrong branch hints, PGO, PGO trained on o... |
-| S9-19 | Experiment - auto-parallelization on KNC, and whether AutoFDO is possible on the card | Waiting for review | Staged, lint clean, not run: .work/_shared/S9-19/autopar.sh and probe.sh with their -files.txt. Opt-info (.... |
+| S9-19 | Experiment - auto-parallelization on KNC, and whether AutoFDO is possible on the card | Done | Auto-parallelization (GCC splitting loops across threads with no pragmas) works on KNC for the streaming an... |
 
 ## Recent activity
 
+- 2026-11-10 19:44 **S9-19** lead approve: Auto-parallelization (GCC splitting loops across threads with no pragmas) works on KNC for the streaming and stencil loops but not for a floating-p...
 - 2026-11-10 19:36 **S8-22** engineer submit: Cause (in commits): -O3 cunrolli flattened mat16's inner loop, losing the -O2 outer-loop form; dynamic-model alignment peeling added x87 prologues ...
 - 2026-11-10 19:35 **S9-19** engineer submit: Staged, lint clean, not run: .work/_shared/S9-19/autopar.sh and probe.sh with their -files.txt. Opt-info (.work/_shared/S9-19/optinfo.txt): triad a...
 - 2026-11-10 19:25 **S9-18** lead approve: Four small branchy kernels in five builds (plain -O2, correct and wrong branch hints, PGO, PGO trained on other input) are ready for the card; the ...
@@ -194,13 +195,12 @@ Current tickets: `[###################-]` 159 of 162
 - 2026-11-10 19:17 **S9-18** lead answer: Size fits the scope: four kernels plus the build/card/use/timing driver cannot sensibly fit in 500 lines, and the ticket asked for all of it. Do no...
 - 2026-11-10 19:16 **S9-18** engineer ask: Work is done and committed (7b6b4634), but submit refuses on size: 751 changed lines, budget 500. Split: 4 kernels ~330 lines (tests/bench/pgo), to...
 - 2026-11-10 19:03 **S9-11** lead note: Arena default with no address-space limit: GOMP_KNC_ARENA_MEM_PERCENT=50 gives about 86 arenas on a 16 GB card (half of MemTotal less 240 x 8 MiB s...
-- 2026-11-10 18:43 **S9-11** lead note: From the 21:00Z card run: rebuild S9-09 measure-hier/flat on the final head and rerun measurements 2/4/5 (the S9-09-era builds crash with SIGFPE). ...
 
 ## Cost
 
 - From the script, engineer: 380 sessions, 832.8M input tokens
 - From the script, lead: 241 sessions, 72.2M input tokens
-- Started by hand, Claude: 11 sessions, 2171.6M input tokens
+- Started by hand, Claude: 11 sessions, 2175.8M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
