@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-11 02:02.
+Updated automatically at every ticket change. Last update: 2026-11-11 02:03.
 
 **Next: GPT-6.1, on S10-01 (512-bit vector arguments and results under -march=knc (ADR-0014 point 1)).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
@@ -210,11 +210,11 @@ Current tickets: `[###################-]` 165 of 173
 ## Cost
 
 - From the script, engineer: 390 sessions, 854.3M input tokens
-- From the script, lead: 247 sessions, 73.3M input tokens
+- From the script, lead: 248 sessions, 73.5M input tokens
 - Started by hand, Claude: 11 sessions, 2268.1M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 23.2 GiB of 100 GiB. 89 GiB free on the drive.
+The project uses 23.2 GiB of 100 GiB. 91 GiB free on the drive.
