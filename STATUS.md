@@ -1,10 +1,10 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-11 07:07.
+Updated automatically at every ticket change. Last update: 2026-11-11 07:19.
 
 **Next: GPT-6.1, on S10-05 (Sprint 10 batch check).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
-Current tickets: `[###################-]` 174 of 175
+Current tickets: `[###################-]` 174 of 177
 
 ## Milestones
 
@@ -13,7 +13,7 @@ Current tickets: `[###################-]` 174 of 175
 | M0 | Foundation | In progress | 17 of 17 tickets |
 | M1 | Mixed native code | Done | 43 of 43 tickets |
 | M2 | Useful vector target | Done | 51 of 51 tickets |
-| M3 | Runtimes | Done | 40 of 41 tickets |
+| M3 | Runtimes | Done | 40 of 43 tickets |
 | M4 | Broad optimization | Not started | Not planned in detail yet |
 | M5 | Program corpus | Not started | Not planned in detail yet |
 | M6 | Release | Not started | Not planned in detail yet |
@@ -43,8 +43,10 @@ Current tickets: `[###################-]` 174 of 175
 | S10-02 | libknc_vmath v0 - build and requalify expf, logf, powf, exp, log, pow with GCC-KNC on the card | Done | Card qualification 2026-11-11 09:32-10:37Z (268M inputs each): expf 0.5016, logf 0.8106, exp 0.5079, log 0.... |
 | S10-03 | Loops call libknc_vmath - -mveclibabi=knc, by-value entry points, automatic link (ADR-0014 points 2-3) | Done | Loops that call expf, logf, powf, exp, log or pow now vectorize under -march=knc and call GCC-KNC's own vec... |
 | S10-04 | Measure vector math - math kernels and a WRF-shaped physics loop, vector vs scalar libm | Done | The vector-math benchmark (expf, logf, powf, exp, log, pow and a WRF-style theta-e column loop, vector libr... |
-| S10-05 | Sprint 10 batch check | In progress | deps add S10-06 |
+| S10-05 | Sprint 10 batch check | In progress | deps add S10-07, S10-08 (owner 2026-11-11: complete the vector math set). |
 | S10-06 | Card qualification - classify powf's 848 special-case mismatches and certify pow under 1 ULP | Done | The powf and pow card failures were traced to the card's own libm (its powl gives NaN for negative x with h... |
+| S10-07 | Vector math v1a - the copied functions (sin, cos, tan, log10, atan, atan2, hyperbolics, bounded groups) in libknc_vmath and the vectorizer hook | Not started |  |
+| S10-08 | Vector math v1b - the rest of the libmvec set (acos, asin, cbrt, erf, erfc, exp2, exp10, expm1, log1p, log2, hypot, sincos) | Not started |  |
 | S2-01 | Design for zmm and mask registers under -march=knc | Done | The register design for KNC is settled on paper: all 32 zmm and 8 mask registers become usable under -march... |
 | S2-02 | Float and double arguments and results in zmm lane 0 | Done | Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`). |
 | S2-03 | Varargs with the donor's register save area | Done | Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`). |
@@ -200,6 +202,7 @@ Current tickets: `[###################-]` 174 of 175
 
 ## Recent activity
 
+- 2026-11-11 07:19 **S10-05** lead amend: deps add S10-07, S10-08 (owner 2026-11-11: complete the vector math set).
 - 2026-11-11 07:06 **S10-04** lead approve: The vector-math benchmark (expf, logf, powf, exp, log, pow and a WRF-style theta-e column loop, vector library against scalar libm at L2 and memory...
 - 2026-11-11 06:58 **S10-04** engineer submit: Staged, not run: .work/_shared/S10-04/vmath-bench.mic, lint clean (log .work/_state/logs/s10_04_build-20261111-065734.log). vec build calls all six...
 - 2026-11-11 06:52 **S10-03** lead approve: Loops that call expf, logf, powf, exp, log or pow now vectorize under -march=knc and call GCC-KNC's own vector math library, linked automatically, ...
@@ -207,16 +210,15 @@ Current tickets: `[###################-]` 174 of 175
 - 2026-11-11 05:58 **S9-11** lead note: Card part complete 2026-11-11 10:37Z on the S9-25 libgomp (flat barrier default), no memory limit: S9-06 at 60 and 240 threads pass; S9-09 suite pa...
 - 2026-11-11 05:58 **S10-06** lead approve: The powf and pow card failures were traced to the card's own libm (its powl gives NaN for negative x with huge even y), not to our functions; both ...
 - 2026-11-11 05:58 **S10-03** lead note: Card 2026-11-11: vmath loop program: expf, exp, logf, log, pow agree with scalar libm within 1 ULP on 4099 lanes each including specials; powf diff...
-- 2026-11-11 05:47 **S10-06** engineer submit: Verdict: REFERENCE (card powl NaNs x<0, integer |y|>=2^63). All 8,487,977 powf (not 848) and every pow special lane are that class; ours = Annex F....
 
 ## Cost
 
 - From the script, engineer: 404 sessions, 885.3M input tokens
 - From the script, lead: 254 sessions, 75.0M input tokens
-- Started by hand, Claude: 11 sessions, 2363.4M input tokens
+- Started by hand, Claude: 11 sessions, 2370.9M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 23.6 GiB of 100 GiB. 116 GiB free on the drive.
+The project uses 23.6 GiB of 100 GiB. 118 GiB free on the drive.
