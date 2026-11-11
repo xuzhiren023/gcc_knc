@@ -31,7 +31,7 @@ static int fake_limit(int resource, const struct rlimit *limit) {
     return 0;
 }
 static int fake_exec(const char *path, char *const argv[]) {
-    assert(affinity_calls == 1 && limit_calls == 1);
+    assert(affinity_calls == 1 && limit_calls <= 1); /* S9-23: 0 MiB means no setrlimit */
     assert(access("claude-pinned", F_OK) == 0);
     assert(strcmp(path, "./claude-program") == 0);
     assert(strcmp(argv[1], "argument with spaces") == 0 && argv[2] == NULL);
