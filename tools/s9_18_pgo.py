@@ -14,6 +14,7 @@ Card files go flat into .work/_shared/S9-18/ for card_run --file-list; nothing r
 import os
 from pathlib import Path
 import re
+import shutil
 import subprocess
 import sys
 
@@ -241,8 +242,10 @@ def kernel_compile(t, kernel, variant, flags, cwd):
     """Compile NAME=<kernel>_<variant> as a .o and a .s in CWD (relative names: a profile's .gcda
     is <cwd>/<kernel>_<variant>.gcda for both the instrumented and the -fprofile-use builds)."""
     name = '%s_%s' % (kernel, variant)
-    base = [*t['cc'], *COMMON, *flags, '-DNAME=' + name, '-I', t['obj'].as_posix(),
-            (SRC / (kernel + '.c')).as_posix()]
+    # The profile checksums the source file name as spelled, so compile a copy named '<kernel>.c'
+    # from CWD: the same spelling in every worktree, for either Python, in both builds.
+    shutil.copyfile(SRC / (kernel + '.c'), cwd / (kernel + '.c'))
+    base = [*t['cc'], *COMMON, *flags, '-DNAME=' + name, '-I', t['obj'].as_posix(), kernel + '.c']
     must(*base, '-c', '-o', name + '.o', cwd=cwd)
     if '-fprofile-generate' not in flags:
         must(*base, '-S', '-o', name + '.s', cwd=cwd)
@@ -363,14 +366,19 @@ def report(t, variants=VARIANTS):
 
 
 def host():
-    t = build('host')
+    # Two separate processes from a neutral cwd, as on the card: a build/use mismatch shows here.
+    me = [sys.executable, str(Path(__file__).resolve())]
+    t = setup_target('host')
+    if subprocess.call([*me, 'build-host'], cwd=t['out']):
+        return 1
     out = t['out'] / 'train.out'
     with open(out, 'w') as f:
         rc = subprocess.call([CYG + '/sh.exe', (t['out'] / 'train.sh').as_posix()], env=ENV, stdout=f)
     print('train.sh exit %d' % rc)
     if rc:
         return 1
-    use('host', out)
+    if subprocess.call([*me, 'use-host', str(out)], cwd=t['out']):
+        return 1
     bad = 0
     for k in KERNELS:
         res = subprocess.run([str(t['out'] / (k + '.mic')), '3', '-1', '0.01'], env=ENV, text=True,
@@ -389,6 +397,12 @@ def main():
         return 0
     if len(args) == 2 and args[0] == 'use':
         use('card', args[1])
+        return 0
+    if args == ['build-host']:
+        build('host')
+        return 0
+    if len(args) == 2 and args[0] == 'use-host':
+        use('host', args[1])
         return 0
     if args == ['host']:
         return host()
