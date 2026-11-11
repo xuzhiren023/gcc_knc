@@ -11,6 +11,7 @@ depend on the PhiWeather tree; this is a copy.
 | `native/upstream/arm-optimized-routines-v26.01/`, `-dp/` | `LICENSE`, `README.phiweather.md`, `upstream.lock.json`, and `-dp/math/math_config.h` (the header the sources include) |
 | `native/upstream/arm-optimized-routines-v26.01/math/exp2f_data.c`, `math_config.h` | same path (added 2026-11-06 for the `powf` build; `math_config.h` is identical to the `-dp` copy) |
 | `native/upstream/arm-optimized-routines-v26.01-dp/math/exp_data.c`, `log_data.c` | same path (added 2026-11-11 by S10-02 for `libknc_vmath`'s `exp`, `log` and `pow`; already listed in that folder's `upstream.lock.json` and byte-identical to it) |
+| `native/upstream/arm-optimized-routines-v26.01/math/exp2.c`, `exp10.c`, `log.c`, `log2.c`, `log2_data.c`, `erf.c`, `aarch64/v_erf_data.c`, `aarch64/v_erfc_data.c`, `aarch64/advsimd/erf.c`, `aarch64/advsimd/erfc.c` | Arm optimized-routines v26.01, same paths, from the lead's checkout of commit `649ccc8411e7c4862965710f25c570d854a1483f` (added 2026-11-11 by S10-08: the files `libknc_vmath`'s v1b members follow, and the three tables they link; unchanged but for LF line endings, and not listed in `upstream.lock.json`) |
 | `receipts/knc-g5-*.json` | `artifacts/native/knc-g5-*.json` (qualification receipts) |
 
 The folder layout is kept so the sources' relative `#include` paths still resolve.

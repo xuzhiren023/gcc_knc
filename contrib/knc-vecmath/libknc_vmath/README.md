@@ -32,6 +32,27 @@ ranges, which v0's full-range exp and log cover. `hyperbolic_e.c` is edited: its
 helpers pass pointers, as GCC-KNC has no convention for a struct of two 64-byte vectors by value
 (`hyperbolic_e/NOTICE`).
 
+v1b (S10-08) adds the rest of the set GCC vectorizes with glibc's libmvec, each on 16 floats and on
+8 doubles with a masked entry point: acos, asin, cbrt, erf, erfc, exp2, exp10, expm1, log1p, log2
+and hypot (`hypot`'s masked form returns `x` in a clear lane). These have no copied algorithm.
+The members are written for this library as kernels on 8 doubles in GCC's generic vectors
+(`vmath_v1b.h`), after Arm optimized-routines v26.01 where the table says so; the files they follow
+are kept under `native/upstream/arm-optimized-routines-v26.01/math/`. A 16-float function runs the
+double kernel on its lanes widened to double and rounds once (hypotf: the plain square root of the
+exact squares). They are built without contraction, as their exact products need.
+
+`sincos` has no entry point. GCC turns `sincos(x, &s, &c)`, and a `sin` and `cos` of one argument,
+into `cexpi`, and the vectorizer forms v1a's `__knc_vmath_sin_<lanes>` and `__knc_vmath_cos_<lanes>`
+pair from it; only the scalar epilogue calls `sincos`.
+
+| Member | Functions | Source |
+|---|---|---|
+| `vmath_exp2.c` | exp2, exp10, expm1 | Arm `math/exp2.c`, `exp10.c` (reduction, `__exp_data`, polynomials); expm1 is ours on `exp.c`'s reduction |
+| `vmath_log2.c` | log2, log1p | Arm `math/log2.c` with `log2_data.c`; log1p is ours on `math/log.c`'s evaluation and `__log_data` |
+| `vmath_asin.c` | asin, acos | ours (the polynomial is our own fit; Arm's advsimd one is 0.49 ULP short above 0.5) |
+| `vmath_cbrt.c` | cbrt, hypot | ours |
+| `vmath_erf.c` | erf, erfc | Arm `math/aarch64/advsimd/erf.c`, `erfc.c` with `v_erf_data.c`, `v_erfc_data.c`; erf below 0.5 uses `math/erf.c`'s polynomial |
+
 These are the plain cores, the ones the accepted float harness already used. The receipts' `exp`,
 `log` and `pow` were the `register_i64` rewrites, which avoid gathers for PhiWeather's translation
 route; GCC-KNC needs no such rewrite, and both implement the same Arm algorithm.
@@ -47,7 +68,7 @@ static helpers by value, so it needs S10-01's vector ABI in the compiler.
 Qualification: `python tests/vmath/card_qualify.py` (card, lead only) or `--host`. `expf`, `logf`
 and `powf` run the accepted harness (`tests/acceptance/vecmath_qualify/qualify.c`) linked to these
 cores; `exp`, `log` and `pow` run `tests/vmath/qualify_d.c`, whose x87 screen dumps every lane above
-0.5 ULP for an exact recheck on the host (Python decimal, 60 digits). The v1a functions run
+0.5 ULP for an exact recheck on the host (Python decimal, 60 digits). The v1a and v1b functions run
 `tests/vmath/qualify_v1.c` through the entry points: exact against MPFR on the host, and on the card
 a long double screen whose dumped lanes the host program rechecks exactly; special cases come from
 its C99 Annex F table.
@@ -97,6 +118,39 @@ cos, tan and log10 pass the 1 ULP limit but exceed their receipt's maximum on th
 
 The receipts' input sets differ from ours (about 1.3 million lanes each), so a card maximum a little
 above a receipt's on a larger set is not by itself a regression; above 1 ULP is a failure.
+
+v1b, host result (x86-64 build, MPFR-exact, `card_qualify.py --host --out S10-08`, 2026-11-11: 2^16 sweep
+blocks and 2^16 dense blocks per function, 2^16 pair blocks for hypot; no special-case or mask
+error). The card has not run these. The target is the upstream routine's stated error where its
+evaluation is kept, else our design bound; the limit is 1 ULP except for erf and erfc on doubles.
+
+| Function | Precision | Target (ULP) | Limit (ULP) | Host maximum (ULP) |
+|---|---|---|---|---|
+| the eleven float functions | float, 16 | 0.5000 | 1 | 0.500000 |
+| exp2 | double, 8 | 0.51 (Arm), 0.75 subnormal | 1 | 0.743753 |
+| exp10 | double, 8 | 0.513 (Arm), 0.75 subnormal | 1 | 0.745157 |
+| expm1 | double, 8 | 0.80 | 1 | 0.615419 |
+| log2 | double, 8 | 0.55 (Arm) | 1 | 0.539245 |
+| log1p | double, 8 | 0.55 | 1 | 0.502747 |
+| asin | double, 8 | 0.75 | 1 | 0.630911 |
+| acos | double, 8 | 0.75 | 1 | 0.613561 |
+| cbrt | double, 8 | 0.51 | 1 | 0.499998 |
+| hypot | double, 8 | 0.51, 0.75 subnormal | 1 | 0.749372 |
+| erf | double, 8 | 1.05 | 1.05 | 0.997525 |
+| erfc | double, 8 | 1.55 | 1.75 | 1.467967 |
+
+Looser than 1 ULP, and why it is accepted:
+
+- erfc (double): upstream's table holds erfc(r) rounded to one double, so the result starts half
+  an ULP of the table value off, which is a whole ULP of the result where it lies a binade below,
+  before the final rounding: 1.5 ULP and the correction term's error, which the member keeps small
+  by taking scale d and the difference with their rounding errors (upstream, without that, states
+  1.71 ULP). Doing better needs a second table word for 3488 entries; not done here.
+- erf (double), 1.05: the same one-double table, but erf(r) and the result share a binade from
+  0.5 up, so the bound is 0.5 + 0.5 and the correction term's error. Below 0.5 the table would
+  lose more (upstream's vector erf states 2.29 ULP), so the member uses the scalar routine's
+  polynomial there.
+- A subnormal exp2, exp10 or hypot result is rounded a second time when it is scaled: 0.75 ULP.
 
 Screen limits: the x87 screen's error is shown as `screen error` per job. Cygwin's `powl` is off by
 up to 0.45 double ULP, so on the host the undumped pow lanes are bounded only by 0.95 ULP; glibc's
