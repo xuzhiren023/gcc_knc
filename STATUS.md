@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-11 04:31.
+Updated automatically at every ticket change. Last update: 2026-11-11 04:32.
 
 **Next: the tech lead, on S9-11.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
@@ -195,10 +195,11 @@ Current tickets: `[###################-]` 169 of 174
 | S9-22 | S9-18 PGO rebuild fails with coverage-mismatch on the card profiles - make the two builds identical | Done | The PGO experiment's two builds now use identical compile commands, so profiles collected on the card can b... |
 | S9-23 | card_run - no address-space limit in our exclusive turns (owner - "there is no job memory limit") | Done | In our exclusive card turns, jobs now run with no address-space limit unless a profile (3100, 5100) or the ... |
 | S9-24 | Sprint 9 settings from the card data, and the harness fixes the batch check needs | Done | KNC libgomp now uses the card-measured defaults: DELAY 128 while spinning, 200 ms of spinning before sleepi... |
-| S9-25 | The per-core barrier is slower than the flat one on the card - make flat the default; fix S9-07's runner | In progress |  |
+| S9-25 | The per-core barrier is slower than the flat one on the card - make flat the default; fix S9-07's runner | Waiting for review | Red b96e847b default_barrier.c failed as expected; GCC 269c7c7f15e makes flat the default and keeps per-cor... |
 
 ## Recent activity
 
+- 2026-11-11 04:32 **S9-25** engineer submit: Red b96e847b default_barrier.c failed as expected; GCC 269c7c7f15e makes flat the default and keeps per-core behind -DGOMP_KNC_GROUP_BARRIER. s9_09...
 - 2026-11-11 04:31 **S10-02** lead approve: libknc_vmath v0 builds for KNC with GCC-KNC: expf, logf, powf, exp, log and pow from the copied Arm routines (provenance recorded), all within 1 ul...
 - 2026-11-11 04:23 **S10-02** engineer submit: Split per 04:21 answer: red 2e2cd7b7 (qualifier+runner only; host build fails 'knc_vmath.h: No such file'), green 7303fb8a; qualifier unchanged bet...
 - 2026-11-11 04:21 **S10-02** lead answer: No waiver: the [red] check is hard and the type field needs the interactive lead. Split the one commit honestly instead: git reset --soft main, the...
@@ -206,13 +207,12 @@ Current tickets: `[###################-]` 169 of 174
 - 2026-11-11 03:58 **S10-02** lead note: S10-01 is approved and merged into knc (2026-11-11). If the lane-1 prefix (.work/_shared/gcc-knc-16.2.0) does not yet accept 64-byte vector argumen...
 - 2026-11-11 03:57 **S10-01** lead approve: 64-byte vectors (__m512 and vector_size(64)) can now be passed to and returned from functions under -march=knc, in zmm0-zmm7 and zmm0 (ADR-0014); c...
 - 2026-11-11 03:46 **S9-11** lead note: Card 2026-11-11: execute suite on knc e6b6b55b5dc2: 1681/1681 pass. Card sets from S9-24 (08:21Z): S9-05 all expected, S9-06 60/240 pass with no me...
-- 2026-11-11 03:44 **S9-11** engineer submit: knc e6b6b55b5dc2 (tree = built 84c73d3882d). Drill textual only: master 12 files/23 hunks, same as S8-11 plus S9-13's mknc-card entry in the i386.o...
 
 ## Cost
 
 - From the script, engineer: 398 sessions, 871.7M input tokens
 - From the script, lead: 251 sessions, 73.9M input tokens
-- Started by hand, Claude: 11 sessions, 2322.0M input tokens
+- Started by hand, Claude: 11 sessions, 2322.9M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
