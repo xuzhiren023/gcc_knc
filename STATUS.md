@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-10 19:56.
+Updated automatically at every ticket change. Last update: 2026-11-10 19:58.
 
 **Next: the tech lead, on S8-22.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
@@ -185,10 +185,11 @@ Current tickets: `[###################-]` 160 of 164
 | S9-17 | User guidance on the flags page - threads per core, first touch, regions, heap, and ICC differences | Done | The flags page now has a 'Writing fast code for KNC' section: threads per core, first touch and region size... |
 | S9-18 | Experiment - how much do branch hints and profile-guided optimization gain on KNC? | Done | Four small branchy kernels in five builds (plain -O2, correct and wrong branch hints, PGO, PGO trained on o... |
 | S9-19 | Experiment - auto-parallelization on KNC, and whether AutoFDO is possible on the card | Done | Auto-parallelization (GCC splitting loops across threads with no pragmas) works on KNC for the streaming an... |
-| S9-20 | Experiment - how much does instruction scheduling help the in-order core, at 1 and 4 threads per core? | In progress |  |
+| S9-20 | Experiment - how much does instruction scheduling help the in-order core, at 1 and 4 threads per core? | Question for the tech lead | Work done and committed (c1c8cf5e), but submit refuses: 714 changed lines vs budget 500 (sched.c 391: 2 sca... |
 
 ## Recent activity
 
+- 2026-11-10 19:58 **S9-20** engineer ask: Work done and committed (c1c8cf5e), but submit refuses: 714 changed lines vs budget 500 (sched.c 391: 2 scalar kernels + paired multi-core pinned d...
 - 2026-11-10 19:56 **S8-11** lead note: Card part 2026-11-10 23:39Z: execute suite 1681/1681 pass; M2 negative 1 / positive 0; paired M2 Sprint 8 vs 7 in docs/research/card-runs-s8.md: ma...
 - 2026-11-10 19:44 **S9-19** lead approve: Auto-parallelization (GCC splitting loops across threads with no pragmas) works on KNC for the streaming and stencil loops but not for a floating-p...
 - 2026-11-10 19:36 **S8-22** engineer submit: Cause (in commits): -O3 cunrolli flattened mat16's inner loop, losing the -O2 outer-loop form; dynamic-model alignment peeling added x87 prologues ...
@@ -196,13 +197,12 @@ Current tickets: `[###################-]` 160 of 164
 - 2026-11-10 19:25 **S9-18** lead approve: Four small branchy kernels in five builds (plain -O2, correct and wrong branch hints, PGO, PGO trained on other input) are ready for the card; the ...
 - 2026-11-10 19:18 **S9-18** engineer submit: libgcov: .work/_shared/gcc-knc-16.2.0/lib/gcc/k1om-mpss-linux/16.2.0/libgcov.a. Host: equal checksums, 5 variants x 4 kernels (.work/_state/logs/s9...
 - 2026-11-10 19:17 **S9-18** lead answer: Size fits the scope: four kernels plus the build/card/use/timing driver cannot sensibly fit in 500 lines, and the ticket asked for all of it. Do no...
-- 2026-11-10 19:16 **S9-18** engineer ask: Work is done and committed (7b6b4634), but submit refuses on size: 751 changed lines, budget 500. Split: 4 kernels ~330 lines (tests/bench/pgo), to...
 
 ## Cost
 
 - From the script, engineer: 380 sessions, 832.8M input tokens
 - From the script, lead: 242 sessions, 72.3M input tokens
-- Started by hand, Claude: 11 sessions, 2182.9M input tokens
+- Started by hand, Claude: 11 sessions, 2183.6M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
