@@ -1,10 +1,10 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-11 05:47.
+Updated automatically at every ticket change. Last update: 2026-11-11 05:58.
 
 **Next: the tech lead, on S10-03.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
-Current tickets: `[###################-]` 170 of 175
+Current tickets: `[###################-]` 171 of 175
 
 ## Milestones
 
@@ -13,7 +13,7 @@ Current tickets: `[###################-]` 170 of 175
 | M0 | Foundation | In progress | 17 of 17 tickets |
 | M1 | Mixed native code | Done | 43 of 43 tickets |
 | M2 | Useful vector target | Done | 51 of 51 tickets |
-| M3 | Runtimes | In progress | 36 of 41 tickets |
+| M3 | Runtimes | In progress | 37 of 41 tickets |
 | M4 | Broad optimization | Not started | Not planned in detail yet |
 | M5 | Program corpus | Not started | Not planned in detail yet |
 | M6 | Release | Not started | Not planned in detail yet |
@@ -44,7 +44,7 @@ Current tickets: `[###################-]` 170 of 175
 | S10-03 | Loops call libknc_vmath - -mveclibabi=knc, by-value entry points, automatic link (ADR-0014 points 2-3) | Waiting for review | Green: gcc db7b06406a9 KNC + 25fc35185be shared i386 (10 lines added, 1 changed) + 65cbad181a6 includes; pr... |
 | S10-04 | Measure vector math - math kernels and a WRF-shaped physics loop, vector vs scalar libm | Not started |  |
 | S10-05 | Sprint 10 batch check | Not started | deps add S10-06 |
-| S10-06 | Card qualification - classify powf's 848 special-case mismatches and certify pow under 1 ULP | Waiting for review | Verdict: REFERENCE (card powl NaNs x<0, integer /y/>=2^63). All 8,487,977 powf (not 848) and every pow spec... |
+| S10-06 | Card qualification - classify powf's 848 special-case mismatches and certify pow under 1 ULP | Done | The powf and pow card failures were traced to the card's own libm (its powl gives NaN for negative x with h... |
 | S2-01 | Design for zmm and mask registers under -march=knc | Done | The register design for KNC is settled on paper: all 32 zmm and 8 mask registers become usable under -march... |
 | S2-02 | Float and double arguments and results in zmm lane 0 | Done | Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`). |
 | S2-03 | Varargs with the donor's register save area | Done | Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`). |
@@ -200,6 +200,7 @@ Current tickets: `[###################-]` 170 of 175
 
 ## Recent activity
 
+- 2026-11-11 05:58 **S10-06** lead approve: The powf and pow card failures were traced to the card's own libm (its powl gives NaN for negative x with huge even y), not to our functions; both ...
 - 2026-11-11 05:47 **S10-06** engineer submit: Verdict: REFERENCE (card powl NaNs x<0, integer |y|>=2^63). All 8,487,977 powf (not 848) and every pow special lane are that class; ours = Annex F....
 - 2026-11-11 05:39 **S10-06** lead note: S10-03 reinstalled libknc_vmath as -fPIC with hidden symbols (.work/_shared/S10-02/knc rebuilt): restage the qualification jobs from that build so ...
 - 2026-11-11 05:38 **S10-05** lead amend: deps add S10-06
@@ -207,13 +208,12 @@ Current tickets: `[###################-]` 170 of 175
 - 2026-11-11 05:38 **S10-02** lead note: Card qualification 2026-11-11 09:32-10:37Z (268M inputs each): expf 0.5016, logf 0.8106, exp 0.5079, log 0.5144 ulp PASS; all host-compare jobs sam...
 - 2026-11-11 05:02 **S10-03** lead approve-red: Red accepted: the T1 expf call scan and the -mphinix scan fail for the right reason (no hook yet), the errno guard holds, and the T2 card program c...
 - 2026-11-11 05:01 **S10-03** engineer red: Red ed99b791 adds tests/t1/knc-vmath-phinix.c as asked; nothing else changed. check.py t1 --compiler gcc16 --vmath: knc-vmath-call.c FAIL and knc-v...
-- 2026-11-11 04:59 **S10-03** lead changes: Red is sound: T1 call fails for the right reason (no hook; -march=knc already lifts -O2 to the cheap cost model, i386-knc.cc:1115, so the loop does...
 
 ## Cost
 
 - From the script, engineer: 403 sessions, 883.5M input tokens
 - From the script, lead: 252 sessions, 74.4M input tokens
-- Started by hand, Claude: 11 sessions, 2345.6M input tokens
+- Started by hand, Claude: 11 sessions, 2350.3M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
