@@ -12,7 +12,8 @@
    - the 57-core tree without sysfs topology (from cpuinfo's core id), and with neither (from the
      online CPUs over four);
    - an empty tree: 60 cores and 1100 MHz, the fallbacks;
-   - the spin count: 3 msec at the clock in DELAY periods, 103125 at 1100 MHz and delay 32.  */
+   - the default spin count: 200 msec at the clock in DELAY periods (S9-24), 1718750 at 1100 MHz
+     and delay 128.  */
 #include "card.h"
 
 #include <stdio.h>
@@ -160,10 +161,10 @@ main (int argc, char **argv)
   snprintf (what, sizeof what, "nothing readable: %u MHz (want 1100)", got);
   expect (got == 1100, what);
 
-  expect (gomp_knc_default_spincount (1100, 32) == 103125, "spin count at 1100 MHz, delay 32: 103125");
-  expect (gomp_knc_default_spincount (1238, 32) == 116062, "spin count at 1238 MHz, delay 32: 116062");
-  expect (gomp_knc_default_spincount (1053, 64) == 49359, "spin count at 1053 MHz, delay 64: 49359");
-  expect (gomp_knc_default_spincount (1, 100000) == 1, "spin count never 0");
+  expect (gomp_knc_default_spincount (1100, 128) == 1718750, "spin count at 1100 MHz, delay 128: 1718750");
+  expect (gomp_knc_default_spincount (1238, 128) == 1934375, "spin count at 1238 MHz, delay 128: 1934375");
+  expect (gomp_knc_default_spincount (1053, 64) == 3290625, "spin count at 1053 MHz, delay 64: 3290625");
+  expect (gomp_knc_default_spincount (1, 4294967295u) == 1, "spin count never 0");
 
   printf ("%s S9-12 topology host: %d failed\n", failed ? "FAIL" : "PASS", failed);
   return failed != 0;

@@ -6,8 +6,9 @@
 
    - MemTotal of the three cards (3120 6 GB, 5110P 8 GB, 7120 16 GB; the kernel keeps some back),
      244/240/228 CPUs, 8 MiB stacks (RLIMIT_STACK) and 2 MiB (OMP_STACKSIZE=2M);
-   - with no RLIMIT_AS (a share of MemTotal) and with RLIMIT_AS 6, 8 and 10 GiB (card_run's
-     memoryMB); strict overcommit (CommitLimit); a user MALLOC_ARENA_MAX, which wins;
+   - with no RLIMIT_AS and no strict overcommit (one arena per CPU: reservations then cost no
+     memory; S9-24 from measurement 7), with RLIMIT_AS 6, 8 and 10 GiB (card_run's memoryMB);
+     strict overcommit (CommitLimit); a user MALLOC_ARENA_MAX, which wins;
    - a fixture /proc tree under argv[1] for the meminfo and overcommit readers.
 
    Expected caps are computed here from the rule, written out: the largest N with
@@ -109,9 +110,12 @@ main (int argc, char **argv)
 	in.stack = stacks[s];
 	snprintf (what, sizeof what, "%s, %llu MiB stacks, no RLIMIT_AS", cards[c].name,
 		  stacks[s] >> 20);
-	check (what, &in,
-	       rule (cards[c].mem_total / 100 * GOMP_KNC_ARENA_MEM_PERCENT, in.cpus, in.stack),
-	       GOMP_KNC_BUDGET_MEM_TOTAL);
+	check (what, &in, in.cpus, GOMP_KNC_BUDGET_NONE);
+	in.overcommit = 1;
+	snprintf (what, sizeof what, "%s, %llu MiB stacks, no RLIMIT_AS, overcommit 1",
+		  cards[c].name, stacks[s] >> 20);
+	check (what, &in, in.cpus, GOMP_KNC_BUDGET_NONE);
+	in.overcommit = 0;
 	for (l = 0; l < 3; l++)
 	  {
 	    in.rlimit_as = limits[l];
@@ -192,6 +196,25 @@ main (int argc, char **argv)
 	      "from RLIMIT_AS, 240 CPUs, 8192 KiB stacks)\n", a.cap);
     expect (strcmp (display, want) == 0, "display: derived cap with its budget");
   }
+
+  /* Nothing bounds the reservations: one arena per CPU, and the display says why.  */
+  in.cpus = 169;
+  in.mem_total = cards[2].mem_total;
+  in.overcommit = 0;
+  in.rlimit_as = GOMP_KNC_NO_LIMIT;
+  {
+    FILE *f = tmpfile ();
+    size_t n;
+    gomp_knc_arena_decide (NULL, &in, &a);
+    gomp_knc_display_arena (f, &a);
+    rewind (f);
+    n = fread (display, 1, sizeof display - 1, f);
+    display[n] = '\0';
+    fclose (f);
+  }
+  expect (strcmp (display, "  [host] KNC malloc arena cap = '169' (derived: budget none, "
+		  "169 CPUs, 8192 KiB stacks)\n") == 0,
+	  "display: one arena per CPU when nothing bounds the reservations");
 
   /* The readers, on a fixture /proc tree.  */
   snprintf (root, sizeof root, "%s/proc-7120", argv[1]);
