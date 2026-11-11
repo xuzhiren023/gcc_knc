@@ -49,7 +49,7 @@ pair from it; only the scalar epilogue calls `sincos`.
 |---|---|---|
 | `vmath_exp2.c` | exp2, exp10, expm1 | Arm `math/exp2.c`, `exp10.c` (reduction, `__exp_data`, polynomials); expm1 is ours on `exp.c`'s reduction |
 | `vmath_log2.c` | log2, log1p | Arm `math/log2.c` with `log2_data.c`; log1p is ours on `math/log.c`'s evaluation and `__log_data` |
-| `vmath_asin.c` | asin, acos | ours (the polynomial is our own fit; Arm's advsimd one is 0.49 ULP short above 0.5) |
+| `vmath_asin.c` | asin, acos | ours (the polynomial is our own fit; Arm's advsimd one is 0.49 ULP short above 0.5); `asin_fit.c` regenerates it: host only, MPFR, `-lmpfr -lgmp`, 14 nodes) |
 | `vmath_cbrt.c` | cbrt, hypot | ours |
 | `vmath_erf.c` | erf, erfc | Arm `math/aarch64/advsimd/erf.c`, `erfc.c` with `v_erf_data.c`, `v_erfc_data.c`; erf below 0.5 uses `math/erf.c`'s polynomial |
 
