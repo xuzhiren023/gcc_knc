@@ -44,7 +44,7 @@ Current tickets: `[###################-]` 170 of 175
 | S10-03 | Loops call libknc_vmath - -mveclibabi=knc, by-value entry points, automatic link (ADR-0014 points 2-3) | Waiting for review | Green: gcc db7b06406a9 KNC + 25fc35185be shared i386 (10 lines added, 1 changed) + 65cbad181a6 includes; pr... |
 | S10-04 | Measure vector math - math kernels and a WRF-shaped physics loop, vector vs scalar libm | Not started |  |
 | S10-05 | Sprint 10 batch check | Not started | deps add S10-06 |
-| S10-06 | Card qualification - classify powf's 848 special-case mismatches and certify pow under 1 ULP | In progress |  |
+| S10-06 | Card qualification - classify powf's 848 special-case mismatches and certify pow under 1 ULP | In progress | S10-03 reinstalled libknc_vmath as -fPIC with hidden symbols (.work/_shared/S10-02/knc rebuilt): restage th... |
 | S2-01 | Design for zmm and mask registers under -march=knc | Done | The register design for KNC is settled on paper: all 32 zmm and 8 mask registers become usable under -march... |
 | S2-02 | Float and double arguments and results in zmm lane 0 | Done | Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`). |
 | S2-03 | Varargs with the donor's register save area | Done | Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`). |
@@ -200,6 +200,7 @@ Current tickets: `[###################-]` 170 of 175
 
 ## Recent activity
 
+- 2026-11-11 05:39 **S10-06** lead note: S10-03 reinstalled libknc_vmath as -fPIC with hidden symbols (.work/_shared/S10-02/knc rebuilt): restage the qualification jobs from that build so ...
 - 2026-11-11 05:38 **S10-05** lead amend: deps add S10-06
 - 2026-11-11 05:38 **S10-03** engineer submit: Green: gcc db7b06406a9 KNC + 25fc35185be shared i386 (10 lines added, 1 changed) + 65cbad181a6 includes; project 416d60c1. Build PASS, prefix reins...
 - 2026-11-11 05:38 **S10-02** lead note: Card qualification 2026-11-11 09:32-10:37Z (268M inputs each): expf 0.5016, logf 0.8106, exp 0.5079, log 0.5144 ulp PASS; all host-compare jobs sam...
@@ -207,13 +208,12 @@ Current tickets: `[###################-]` 170 of 175
 - 2026-11-11 05:01 **S10-03** engineer red: Red ed99b791 adds tests/t1/knc-vmath-phinix.c as asked; nothing else changed. check.py t1 --compiler gcc16 --vmath: knc-vmath-call.c FAIL and knc-v...
 - 2026-11-11 04:59 **S10-03** lead changes: Red is sound: T1 call fails for the right reason (no hook; -march=knc already lifts -O2 to the cheap cost model, i386-knc.cc:1115, so the loop does...
 - 2026-11-11 04:57 **S10-03** engineer red: Red 071dc341: check.py t1 t2 --compiler gcc16 --vmath: T1 knc-vmath-call.c FAIL (no call __knc_vmath_expf_16), knc-vmath-errno.c PASS (guard: stays...
-- 2026-11-11 04:42 **S9-25** lead approve: KNC libgomp uses the flat barrier by default again (the per-core one was 1.5-2.5x slower on the card and stays behind a build switch), and the thre...
 
 ## Cost
 
 - From the script, engineer: 402 sessions, 880.2M input tokens
 - From the script, lead: 252 sessions, 74.4M input tokens
-- Started by hand, Claude: 11 sessions, 2341.0M input tokens
+- Started by hand, Claude: 11 sessions, 2343.8M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
