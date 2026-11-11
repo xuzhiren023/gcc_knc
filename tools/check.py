@@ -30,7 +30,8 @@ PACKED = re.compile(r'\bv(?:addn?|subr?|mul|div|max|min|sqrt|rcp(?:23)?|rsqrt(?:
 # Imports stay lazy so T0 and source-only selections need no probe modules.
 SELECTIONS = {
     'vector_abi': ('S10-01 64-byte vector arguments and results in zmm (ADR-0014)', {
-        't1': lambda runner: runner.t1_sources([runner.source_dir / 'knc-vecarg.c']),
+        't1': lambda runner: (runner.t1_sources([runner.source_dir / 'knc-vecarg.c']),
+                              importlib.import_module('scalar_abi').t1_vector_diagnostics(runner)),
         't2': lambda runner: importlib.import_module('scalar_abi').t2_vector(runner)}),
     'knc_card': ('S9-13 -mknc-card=MODEL values and -mknc-card=native detection', {
         't1': lambda runner: importlib.import_module('knc_card').t1(runner)}),

@@ -197,21 +197,25 @@ def t1_probe(runner, source, level, name=None):
 
 def t1_vector_diagnostics(runner):
     # ADR-0014 point 1: a 64-byte vector argument or result is legal; a
-    # by-value field of that type stays an error.
+    # by-value field of that type and any vector argument of a variadic
+    # function, unnamed in a call or named in a definition, stay errors.
     t1_vector_compatibility(runner, ('VECTOR_PARAMETER', 'VECTOR_RESULT'), 'accepts ')
     source = runner.source_dir / 'knc-abi-mixed.c'
-    for level in ('-O0', '-O2'):
-        compiled = runner.command(
-            runner.cc, *runner.cc_flags, level, '-march=knc',
-            '-DABI_VECTOR_FIELD', '-S', source,
-            '-o', runner.out / 'vector.s', check=False)
-        rejected = (compiled.returncode != 0
-                    and 'internal compiler error' not in compiled.stdout
-                    and 'confused by earlier errors' not in compiled.stdout
-                    and 'error: unsupported KNC register ABI mode' in compiled.stdout)
-        runner.result('t1 KNC rejects 64-byte int vector ABI field ' + level,
-                      [] if rejected else [compiled.stdout[-1800:]
-                                           or 'unsupported vector ABI accepted'])
+    for case, what in (('FIELD', 'int vector ABI field'),
+                       ('VARIADIC_CALL', 'float vector unnamed variadic argument'),
+                       ('VARIADIC_NAMED', 'float vector named variadic parameter')):
+        for level in ('-O0', '-O2'):
+            compiled = runner.command(
+                runner.cc, *runner.cc_flags, level, '-march=knc',
+                '-DABI_VECTOR_' + case, '-S', source,
+                '-o', runner.out / 'vector.s', check=False)
+            rejected = (compiled.returncode != 0
+                        and 'internal compiler error' not in compiled.stdout
+                        and 'confused by earlier errors' not in compiled.stdout
+                        and 'error: unsupported KNC register ABI mode' in compiled.stdout)
+            runner.result('t1 KNC rejects 64-byte %s %s' % (what, level),
+                          [] if rejected else [compiled.stdout[-1800:]
+                                               or 'unsupported vector ABI accepted'])
 
 
 def t1_vector_compatibility(runner, cases=('VECTOR32_PARAMETER', 'VECTOR1_PARAMETER',

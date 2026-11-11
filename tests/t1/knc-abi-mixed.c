@@ -21,6 +21,15 @@ abi_vector abi_vector_result(void) { return abi_vector_value; }
 struct abi_vector_record { abi_vector x; };
 int abi_vector_field(struct abi_vector_record x) { return x.x[0]; }
 #endif
+#elif defined(ABI_VECTOR_VARIADIC_CALL) || defined(ABI_VECTOR_VARIADIC_NAMED)
+/* ADR-0014 point 1: no vector argument of a variadic function, named or not. */
+typedef float abi_v16sf __attribute__((vector_size(64)));
+#if defined(ABI_VECTOR_VARIADIC_CALL)
+int abi_variadic(int, ...);
+int abi_vector_variadic_call(abi_v16sf *x) { return abi_variadic(1, *x); }
+#else
+int abi_vector_variadic_named(abi_v16sf x, ...) { return x[0] != 0; }
+#endif
 #else
 /* Each probe makes one incoming location observable without conflating args. */
 volatile long abi_sink_i;
