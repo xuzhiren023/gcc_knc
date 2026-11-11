@@ -106,3 +106,12 @@ passes on what they choose. Each item says how it was shown. Newest first.
    GFLOP/s, 96% of single-precision peak), a memory stream about 192 W (memory rail 55 W, uncore
    40 W, 156.5 GB/s). Memory traffic, not the vector unit, drives the draw; the clock stayed at
    1.238 GHz and the die peaked at 72 C, no throttling (2026-11-08, one launch).
+
+## 2026-11-11: settings shared with PhiWeather's lead on request (owner)
+
+Sent directly: flat barrier wins (per-core 1.5-2.5x slower); DELAY 128 spin hint (siblings 1.01x vs up to 1.80x
+without a hint); 200 ms spin (region entry 0.30 vs 3.75 ms after 10 ms gaps); our libgomp.so.1 should load
+under GCC 5 objects (untested); prefetch L2 32 / L1 16 lines, 8-float rows 34%/20% faster; streaming stores
+beyond 256 KB 15-31%; placement one place per core, OS core excluded; no AutoFDO path (no LBR, no perf); PGO
+19-21% on branchy code; arena cap matters only for one process with many threads; subnormals free;
+unaligned scalar x87 stores 8x slower.
