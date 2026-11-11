@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-10 20:11.
+Updated automatically at every ticket change. Last update: 2026-11-10 20:12.
 
 **Next: the tech lead, on S8-22.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
@@ -183,13 +183,14 @@ Current tickets: `[###################-]` 161 of 165
 | S9-15 | libgomp's KNC spin time before sleeping, measured against fork-heavy code | Done | Card 2026-11-11, gap-join at 240 threads, DELAY 128: region entry after a 1 ms gap 0.30 ms for all; after 1... |
 | S9-16 | Card probes - unaligned scalar accesses, and the VPU cost of subnormal operands | Done | Card 2026-11-11: C13 no faults, no wrong values at any offset or page crossing; worst slowdown vs aligned: ... |
 | S9-17 | User guidance on the flags page - threads per core, first touch, regions, heap, and ICC differences | Done | The flags page now has a 'Writing fast code for KNC' section: threads per core, first touch and region size... |
-| S9-18 | Experiment - how much do branch hints and profile-guided optimization gain on KNC? | Done | Four small branchy kernels in five builds (plain -O2, correct and wrong branch hints, PGO, PGO trained on o... |
+| S9-18 | Experiment - how much do branch hints and profile-guided optimization gain on KNC? | Done | Card 2026-11-11: the eight instrumented programs ran (TRAIN checksums printed) but BusyBox od rejected -A, ... |
 | S9-19 | Experiment - auto-parallelization on KNC, and whether AutoFDO is possible on the card | Done | Auto-parallelization (GCC splitting loops across threads with no pragmas) works on KNC for the streaming an... |
 | S9-20 | Experiment - how much does instruction scheduling help the in-order core, at 1 and 4 threads per core? | Done | The instruction-scheduling experiment is staged: the M2 kernels and two scalar kernels in five builds (defa... |
 | S9-21 | S9-18 PGO training script - BusyBox od has no -A/-t, so no profile came back | Not started |  |
 
 ## Recent activity
 
+- 2026-11-10 20:12 **S9-18** lead note: Card 2026-11-11: the eight instrumented programs ran (TRAIN checksums printed) but BusyBox od rejected -A, so no profile came back; fix S9-21, reru...
 - 2026-11-10 20:11 **S9-16** lead note: Card 2026-11-11: C13 no faults, no wrong values at any offset or page crossing; worst slowdown vs aligned: fst32/fst64 8.0x, ld32/ld64 4.0x, st32 4...
 - 2026-11-10 20:11 **S9-15** lead note: Card 2026-11-11, gap-join at 240 threads, DELAY 128: region entry after a 1 ms gap 0.30 ms for all; after 10 ms: spin3 3.75 ms, spin30 0.30, spin20...
 - 2026-11-10 20:11 **S8-21** lead note: Card 2026-11-11 01:00Z, WRF-shaped column loop (8-float rows), pf over nopf, 7 rounds: density 4 median 0.662 / 0.660 (launch 1/2), density 1 0.809...
@@ -197,7 +198,6 @@ Current tickets: `[###################-]` 161 of 165
 - 2026-11-10 20:00 **S9-20** engineer submit: Item 1: at -O2 -march=knc sched1 off, sched2 on, knc.md used (sched-verbose dump in docs/research/s9-20-sched.md). M2 + 2 scalar kernels built in 5...
 - 2026-11-10 19:59 **S9-20** lead answer: Yes: resubmit with --override 'runner + spill report need the size'. 714 lines in 3 new files (bench source, tool, doc) is fine for this ticket's s...
 - 2026-11-10 19:58 **S9-20** engineer ask: Work done and committed (c1c8cf5e), but submit refuses: 714 changed lines vs budget 500 (sched.c 391: 2 scalar kernels + paired multi-core pinned d...
-- 2026-11-10 19:56 **S8-11** lead note: Card part 2026-11-10 23:39Z: execute suite 1681/1681 pass; M2 negative 1 / positive 0; paired M2 Sprint 8 vs 7 in docs/research/card-runs-s8.md: ma...
 
 ## Cost
 
