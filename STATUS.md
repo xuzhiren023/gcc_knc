@@ -1,10 +1,10 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-10 20:09.
+Updated automatically at every ticket change. Last update: 2026-11-10 20:11.
 
 **Next: the tech lead, on S8-22.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
-Current tickets: `[###################-]` 161 of 164
+Current tickets: `[###################-]` 161 of 165
 
 ## Milestones
 
@@ -13,7 +13,7 @@ Current tickets: `[###################-]` 161 of 164
 | M0 | Foundation | In progress | 17 of 17 tickets |
 | M1 | Mixed native code | Done | 43 of 43 tickets |
 | M2 | Useful vector target | Done | 51 of 51 tickets |
-| M3 | Runtimes | In progress | 29 of 30 tickets |
+| M3 | Runtimes | In progress | 29 of 31 tickets |
 | M4 | Broad optimization | Not started | Not planned in detail yet |
 | M5 | Program corpus | Not started | Not planned in detail yet |
 | M6 | Release | Not started | Not planned in detail yet |
@@ -163,7 +163,7 @@ Current tickets: `[###################-]` 161 of 164
 | S8-18 | Second GCC tree - a gcc2 lane with its own checkout and build, so two GCC tickets run in parallel | Done | Tools now support a second GCC tree: a lane gcc2 ticket builds in gcc-2/gcc-build-2 while a gcc ticket uses... |
 | S8-19 | -mtune=knc stops the tight-loop alignment pass (nops on the fallthrough path) | Done | Card 2026-11-10 11:28-12:03Z (frozen .work/_shared/tmp/claude-s8-19, log .work/_shared/tmp/claude-next.log)... |
 | S8-20 | The small-loop unroll costs affine_f64 3-7% at 4 threads per core - make it follow the thread density | Done | Card 2026-11-10 21:00-23:00Z vs knc (S8-15 unroll 4), launch 1/2. Density 4: affine_f64 0.931/0.994, affine... |
-| S8-21 | The prefetch pass sees masked loads and stores, so rows shorter than a vector are prefetched | Done | The prefetch pass now sees masked loads and stores, so rows shorter than a vector (WRF 8-float rows) are pr... |
+| S8-21 | The prefetch pass sees masked loads and stores, so rows shorter than a vector are prefetched | Done | Card 2026-11-11 01:00Z, WRF-shaped column loop (8-float rows), pf over nopf, 7 rounds: density 4 median 0.6... |
 | S8-22 | -mphinix is slower than -O2 on M2 kernels (mat16 12.9x, short 1.27x, mat8 1.13x) - find and fix | Waiting for review | Cause (in commits): -O3 cunrolli flattened mat16's inner loop, losing the -O2 outer-loop form; dynamic-mode... |
 | S8-23 | Sprint 8 made the M2 short kernel 5-10% slower than Sprint 7 - bisect and fix | Not started |  |
 | S9-01 | libgomp for KNC: futex, affinity, ring-aware barrier, spin-wait and malloc arenas (E6-03 input) | Done | We now have a build-and-design plan for GCC-KNC's own OpenMP runtime on the card: futex-based waits with de... |
@@ -186,9 +186,11 @@ Current tickets: `[###################-]` 161 of 164
 | S9-18 | Experiment - how much do branch hints and profile-guided optimization gain on KNC? | Done | Four small branchy kernels in five builds (plain -O2, correct and wrong branch hints, PGO, PGO trained on o... |
 | S9-19 | Experiment - auto-parallelization on KNC, and whether AutoFDO is possible on the card | Done | Auto-parallelization (GCC splitting loops across threads with no pragmas) works on KNC for the streaming an... |
 | S9-20 | Experiment - how much does instruction scheduling help the in-order core, at 1 and 4 threads per core? | Done | The instruction-scheduling experiment is staged: the M2 kernels and two scalar kernels in five builds (defa... |
+| S9-21 | S9-18 PGO training script - BusyBox od has no -A/-t, so no profile came back | Not started |  |
 
 ## Recent activity
 
+- 2026-11-10 20:11 **S8-21** lead note: Card 2026-11-11 01:00Z, WRF-shaped column loop (8-float rows), pf over nopf, 7 rounds: density 4 median 0.662 / 0.660 (launch 1/2), density 1 0.809...
 - 2026-11-10 20:09 **S9-20** lead approve: The instruction-scheduling experiment is staged: the M2 kernels and two scalar kernels in five builds (default, no scheduling, pre-RA scheduling, p...
 - 2026-11-10 20:00 **S9-20** engineer submit: Item 1: at -O2 -march=knc sched1 off, sched2 on, knc.md used (sched-verbose dump in docs/research/s9-20-sched.md). M2 + 2 scalar kernels built in 5...
 - 2026-11-10 19:59 **S9-20** lead answer: Yes: resubmit with --override 'runner + spill report need the size'. 714 lines in 3 new files (bench source, tool, doc) is fine for this ticket's s...
@@ -196,16 +198,15 @@ Current tickets: `[###################-]` 161 of 164
 - 2026-11-10 19:56 **S8-11** lead note: Card part 2026-11-10 23:39Z: execute suite 1681/1681 pass; M2 negative 1 / positive 0; paired M2 Sprint 8 vs 7 in docs/research/card-runs-s8.md: ma...
 - 2026-11-10 19:44 **S9-19** lead approve: Auto-parallelization (GCC splitting loops across threads with no pragmas) works on KNC for the streaming and stencil loops but not for a floating-p...
 - 2026-11-10 19:36 **S8-22** engineer submit: Cause (in commits): -O3 cunrolli flattened mat16's inner loop, losing the -O2 outer-loop form; dynamic-model alignment peeling added x87 prologues ...
-- 2026-11-10 19:35 **S9-19** engineer submit: Staged, lint clean, not run: .work/_shared/S9-19/autopar.sh and probe.sh with their -files.txt. Opt-info (.work/_shared/S9-19/optinfo.txt): triad a...
 
 ## Cost
 
 - From the script, engineer: 382 sessions, 835.4M input tokens
 - From the script, lead: 243 sessions, 72.5M input tokens
-- Started by hand, Claude: 11 sessions, 2186.5M input tokens
+- Started by hand, Claude: 11 sessions, 2190.8M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 23.0 GiB of 100 GiB. 111 GiB free on the drive.
+The project uses 23.1 GiB of 100 GiB. 111 GiB free on the drive.
