@@ -1,10 +1,10 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-10 19:44.
+Updated automatically at every ticket change. Last update: 2026-11-10 19:52.
 
 **Next: the tech lead, on S8-22.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
-Current tickets: `[###################-]` 160 of 162
+Current tickets: `[###################-]` 160 of 163
 
 ## Milestones
 
@@ -13,7 +13,7 @@ Current tickets: `[###################-]` 160 of 162
 | M0 | Foundation | In progress | 17 of 17 tickets |
 | M1 | Mixed native code | Done | 43 of 43 tickets |
 | M2 | Useful vector target | Done | 51 of 51 tickets |
-| M3 | Runtimes | In progress | 28 of 29 tickets |
+| M3 | Runtimes | In progress | 28 of 30 tickets |
 | M4 | Broad optimization | Not started | Not planned in detail yet |
 | M5 | Program corpus | Not started | Not planned in detail yet |
 | M6 | Release | Not started | Not planned in detail yet |
@@ -184,6 +184,7 @@ Current tickets: `[###################-]` 160 of 162
 | S9-17 | User guidance on the flags page - threads per core, first touch, regions, heap, and ICC differences | Done | The flags page now has a 'Writing fast code for KNC' section: threads per core, first touch and region size... |
 | S9-18 | Experiment - how much do branch hints and profile-guided optimization gain on KNC? | Done | Four small branchy kernels in five builds (plain -O2, correct and wrong branch hints, PGO, PGO trained on o... |
 | S9-19 | Experiment - auto-parallelization on KNC, and whether AutoFDO is possible on the card | Done | Auto-parallelization (GCC splitting loops across threads with no pragmas) works on KNC for the streaming an... |
+| S9-20 | Experiment - how much does instruction scheduling help the in-order core, at 1 and 4 threads per core? | In progress |  |
 
 ## Recent activity
 
@@ -200,7 +201,7 @@ Current tickets: `[###################-]` 160 of 162
 
 - From the script, engineer: 380 sessions, 832.8M input tokens
 - From the script, lead: 242 sessions, 72.3M input tokens
-- Started by hand, Claude: 11 sessions, 2175.8M input tokens
+- Started by hand, Claude: 11 sessions, 2181.5M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
