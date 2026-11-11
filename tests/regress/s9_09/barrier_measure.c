@@ -1,6 +1,6 @@
 /* S9-09 card measurements 2, 4 and 5 of docs/research/knc-libgomp.md section 4, for the team
    barrier.  tools/s9_09_checks.py build links this file twice, with the KNC barrier in per-core
-   groups and with the one-level Linux barrier (-DGOMP_KNC_FLAT_BARRIER); run.sh runs one process
+   groups (-DGOMP_KNC_GROUP_BARRIER) and with the one-level Linux barrier; run.sh runs one process
    per barrier and setting, in an order drawn per round.
 
        barrier_measure barrier THREADS LABEL

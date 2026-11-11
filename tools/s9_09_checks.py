@@ -15,8 +15,9 @@
           environment of its dg- lines (tests.txt);
         - tests/regress/s9_09/tasks_cancel.c (10000 tasks; cancel parallel) with libgomp.so.1;
         - tests/regress/s9_09/barrier_measure.c (measurements 2, 4 and 5) twice, with libgomp
-          linked in: the prefix's libgomp.a, and one built here from the same sources, config.h
-          and flags plus -DGOMP_KNC_FLAT_BARRIER, the one-level Linux barrier;
+          linked in: the prefix's libgomp.a (the one-level Linux barrier, the default), and one
+          built here from the same sources, config.h and flags plus -DGOMP_KNC_GROUP_BARRIER, the
+          per-core groups;
         - the lint, run.sh (the card program) and files.txt (its --file-list).
 
 Nothing runs natively here: the lead runs run.sh on the card.
@@ -203,33 +204,33 @@ def host_mode(args):
     return int(failed != 0)
 
 
-def flat_library(failures):
-    """libgomp.a with the one-level barrier: every C object of the build's libgomp, compiled as its
-    Makefile does (the non-PIC half of LTCOMPILE) plus -DGOMP_KNC_FLAT_BARRIER."""
+def group_library(failures):
+    """libgomp.a with the per-core barrier: every C object of the build's libgomp, compiled as its
+    Makefile does (the non-PIC half of LTCOMPILE) plus -DGOMP_KNC_GROUP_BARRIER."""
     make = (OBJDIR / 'Makefile').read_text()
 
     def var(name):
         return re.search(r'^%s = ((?:.*\\\n)*.*)$' % name, make, re.M).group(1).replace('\\\n', ' ').split()
     search = [LIBGOMP / 'config' / part for part in var('config_path')] + [LIBGOMP, LIBGOMP.parent / 'include']
     flags = ['-DHAVE_CONFIG_H', '-I', OBJDIR, '-I', LIBGOMP, *('-I%s' % d for d in search),
-             *(flag.replace('-Wc,', '') for flag in var('XCFLAGS')), *var('CFLAGS'), '-DGOMP_KNC_FLAT_BARRIER']
-    flat = WORK / 'flat'
-    shutil.rmtree(flat, ignore_errors=True)
-    flat.mkdir(parents=True)
+             *(flag.replace('-Wc,', '') for flag in var('XCFLAGS')), *var('CFLAGS'), GROUP]
+    group = WORK / 'group'
+    shutil.rmtree(group, ignore_errors=True)
+    group.mkdir(parents=True)
     jobs = []
     for name in var('am_libgomp_la_OBJECTS'):
         source = next((d / (name[:-3] + '.c') for d in search if (d / (name[:-3] + '.c')).is_file()), None)
         if name.endswith('.lo') and source:
-            jobs.append([s9.GCC, *flags, '-c', source, '-o', flat / (name[:-3] + '.o')])
+            jobs.append([s9.GCC, *flags, '-c', source, '-o', group / (name[:-3] + '.o')])
     with ThreadPoolExecutor(8) as pool:
         for job, (rc, text) in zip(jobs, pool.map(s7.capture, jobs)):
             if rc:
-                failures.append('flat libgomp: %s: %s' % (job[-3].name, text.strip()[-600:]))
-    archive = flat / 'libgomp.a'
+                failures.append('group libgomp: %s: %s' % (job[-3].name, text.strip()[-600:]))
+    archive = group / 'libgomp.a'
     rc, text = s7.capture([TC / 'cross/bin/k1om-mpss-linux-ar', 'rcs', archive, *(job[-1] for job in jobs)])
     if rc:
-        failures.append('flat libgomp: ar: ' + text.strip()[-300:])
-    print('flat libgomp.a: %d objects with %s' % (len(jobs), ' '.join(map(str, flags[5 + len(search):]))), flush=True)
+        failures.append('group libgomp: ar: ' + text.strip()[-300:])
+    print('group libgomp.a: %d objects with %s' % (len(jobs), ' '.join(map(str, flags[5 + len(search):]))), flush=True)
     return archive
 
 
@@ -252,7 +253,7 @@ def build_mode(args):
     (OUT / 'tests.txt').write_bytes(''.join(row + '\n' for row in rows).encode())
     print('%d libgomp testsuite programs: %s' % (len(rows), ' '.join(SUITE)), flush=True)
 
-    archives = {'hier': s9.LIBDIR / 'libgomp.a', 'flat': flat_library(failures)}
+    archives = {'hier': group_library(failures), 'flat': s9.LIBDIR / 'libgomp.a'}
     links = [([TESTS / 'tasks_cancel.c', '-fopenmp'], OUT / TASKS)]
     links += [([TESTS / 'barrier_measure.c', '-fopenmp', '-c'], WORK / 'barrier_measure.o')]
     links += [([WORK / 'barrier_measure.o', archive, '-pthread', '-ldl'], OUT / (MEASURE % kind))
