@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-11 10:36.
+Updated automatically at every ticket change. Last update: 2026-11-11 11:51.
 
 **Next: the tech lead, on S11-02.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
@@ -43,7 +43,7 @@ Current tickets: `[###################-]` 177 of 180
 | S10-02 | libknc_vmath v0 - build and requalify expf, logf, powf, exp, log, pow with GCC-KNC on the card | Done | Card qualification 2026-11-11 09:32-10:37Z (268M inputs each): expf 0.5016, logf 0.8106, exp 0.5079, log 0.... |
 | S10-03 | Loops call libknc_vmath - -mveclibabi=knc, by-value entry points, automatic link (ADR-0014 points 2-3) | Done | Loops that call expf, logf, powf, exp, log or pow now vectorize under -march=knc and call GCC-KNC's own vec... |
 | S10-04 | Measure vector math - math kernels and a WRF-shaped physics loop, vector vs scalar libm | Done | The vector-math benchmark (expf, logf, powf, exp, log, pow and a WRF-style theta-e column loop, vector libr... |
-| S10-05 | Sprint 10 batch check | Done | The Sprint 10 compiler passes the host batch check: 344 local tests, torture sweeps with no internal compil... |
+| S10-05 | Sprint 10 batch check | Done | Card 2026-11-11 14:16-16:56Z at knc b91ca0b5e67/f81579bb82a: execute suite 1681/1681 PASS. Vector math v0 o... |
 | S10-06 | Card qualification - classify powf's 848 special-case mismatches and certify pow under 1 ULP | Done | The powf and pow card failures were traced to the card's own libm (its powl gives NaN for negative x with h... |
 | S10-07 | Vector math v1a - the copied functions (sin, cos, tan, log10, atan, atan2, hyperbolics, bounded groups) in libknc_vmath and the vectorizer hook | Done | The vector math library now also covers sin, cos, tan, log10, atan, atan2, sinh, cosh, tanh and their float... |
 | S10-08 | Vector math v1b - the rest of the libmvec set (acos, asin, cbrt, erf, erfc, exp2, exp10, expm1, log1p, log2, hypot, sincos) | Done | The vector math library now covers the whole set GCC vectorizes with glibc's libmvec: acos, asin, cbrt, erf... |
@@ -205,6 +205,7 @@ Current tickets: `[###################-]` 177 of 180
 
 ## Recent activity
 
+- 2026-11-11 11:51 **S10-05** lead note: Card 2026-11-11 14:16-16:56Z at knc b91ca0b5e67/f81579bb82a: execute suite 1681/1681 PASS. Vector math v0 on the card (corrected reference): expf 0...
 - 2026-11-11 10:36 **S11-01** lead note: Owner 2026-11-11 10:45 EST: do not start yet (usage at 95%, wait for tonight's reset).
 - 2026-11-11 10:27 **S10-09** lead approve-red: S10-09 red accepted: failing scans show that double division (fixed and variable bounds, masked tail) and square root loops do not yet vectorize un...
 - 2026-11-11 10:25 **S10-09** engineer red: Red fac88ad9: knc-divsqrt-f64.c fails at vrcp23ps in div_f64 (no divv8df3); log check_gcc16_t1-20261111-102408.log. Host model knc-v8df-model.c pas...
@@ -212,16 +213,15 @@ Current tickets: `[###################-]` 177 of 180
 - 2026-11-11 09:33 **S10-08** engineer submit: Green b11167a8, GCC 36edee4f1ad (hook only). T1 --vmath PASS (check_gcc16_t1-20261111-092342.log). Host MPFR qualification ALL AS EXPECTED (vmath_h...
 - 2026-11-11 09:17 **S10-08** owner decide: Owner standing rule (2026-11-09, reminded 2026-11-10; blanket approval 2026-11-11): budget raised to 24M input tokens, first extension; red was app...
 - 2026-11-11 09:16 **S10-08** lead amend: input_tokens 24000000 (deep ticket, red approved at 15.5M)
-- 2026-11-11 09:15 **S10-08** lead escalate: budget: 15506867 input tokens used; the budget is 12000000
 
 ## Cost
 
 - From the script, engineer: 410 sessions, 926.1M input tokens
 - From the script, lead: 256 sessions, 76.4M input tokens
-- Started by hand, Claude: 11 sessions, 2404.1M input tokens
+- Started by hand, Claude: 11 sessions, 2410.0M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 23.7 GiB of 100 GiB. 94 GiB free on the drive.
+The project uses 23.8 GiB of 100 GiB. 116 GiB free on the drive.
