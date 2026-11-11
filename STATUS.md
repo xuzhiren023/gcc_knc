@@ -1,10 +1,10 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-10 19:18.
+Updated automatically at every ticket change. Last update: 2026-11-10 19:25.
 
-**Next: the tech lead, on S9-18.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: GPT-6.1, on S8-22 (-mphinix is slower than -O2 on M2 kernels (mat16 12.9x, short 1.27x, mat8 1.13x) - find and fix).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
-Current tickets: `[###################-]` 158 of 162
+Current tickets: `[###################-]` 159 of 162
 
 ## Milestones
 
@@ -13,7 +13,7 @@ Current tickets: `[###################-]` 158 of 162
 | M0 | Foundation | In progress | 17 of 17 tickets |
 | M1 | Mixed native code | Done | 43 of 43 tickets |
 | M2 | Useful vector target | Done | 51 of 51 tickets |
-| M3 | Runtimes | In progress | 26 of 29 tickets |
+| M3 | Runtimes | In progress | 27 of 29 tickets |
 | M4 | Broad optimization | Not started | Not planned in detail yet |
 | M5 | Program corpus | Not started | Not planned in detail yet |
 | M6 | Release | Not started | Not planned in detail yet |
@@ -182,11 +182,12 @@ Current tickets: `[###################-]` 158 of 162
 | S9-15 | libgomp's KNC spin time before sleeping, measured against fork-heavy code | Done | The OpenMP spin-time measurement (3, 30 and 200 ms before sleeping, against fork-heavy code with 1-100 ms g... |
 | S9-16 | Card probes - unaligned scalar accesses, and the VPU cost of subnormal operands | Done | Two card probes are built and ready for the lead to run: C13 tests whether unaligned scalar loads and store... |
 | S9-17 | User guidance on the flags page - threads per core, first touch, regions, heap, and ICC differences | Done | The flags page now has a 'Writing fast code for KNC' section: threads per core, first touch and region size... |
-| S9-18 | Experiment - how much do branch hints and profile-guided optimization gain on KNC? | Waiting for review | libgcov: .work/_shared/gcc-knc-16.2.0/lib/gcc/k1om-mpss-linux/16.2.0/libgcov.a. Host: equal checksums, 5 va... |
+| S9-18 | Experiment - how much do branch hints and profile-guided optimization gain on KNC? | Done | Four small branchy kernels in five builds (plain -O2, correct and wrong branch hints, PGO, PGO trained on o... |
 | S9-19 | Experiment - auto-parallelization on KNC, and whether AutoFDO is possible on the card | Not started |  |
 
 ## Recent activity
 
+- 2026-11-10 19:25 **S9-18** lead approve: Four small branchy kernels in five builds (plain -O2, correct and wrong branch hints, PGO, PGO trained on other input) are ready for the card; the ...
 - 2026-11-10 19:18 **S9-18** engineer submit: libgcov: .work/_shared/gcc-knc-16.2.0/lib/gcc/k1om-mpss-linux/16.2.0/libgcov.a. Host: equal checksums, 5 variants x 4 kernels (.work/_state/logs/s9...
 - 2026-11-10 19:17 **S9-18** lead answer: Size fits the scope: four kernels plus the build/card/use/timing driver cannot sensibly fit in 500 lines, and the ticket asked for all of it. Do no...
 - 2026-11-10 19:16 **S9-18** engineer ask: Work is done and committed (7b6b4634), but submit refuses on size: 751 changed lines, budget 500. Split: 4 kernels ~330 lines (tests/bench/pgo), to...
@@ -194,13 +195,12 @@ Current tickets: `[###################-]` 158 of 162
 - 2026-11-10 18:43 **S9-11** lead note: From the 21:00Z card run: rebuild S9-09 measure-hier/flat on the final head and rerun measurements 2/4/5 (the S9-09-era builds crash with SIGFPE). ...
 - 2026-11-10 18:42 **S9-13** lead note: Card 2026-11-10, memory working set, density 4: -mknc-card=7100 vs knc: affine_f32 1.001, stencil1 1.003, mat16 1.027; 3100 (L2 distance 23) on the...
 - 2026-11-10 18:42 **S9-12** lead note: Measurement 7 cut down, 240 threads x 100000 1 KiB malloc/free, 2 reps (2026-11-10 22:xxZ): full profile (13 GiB): derived 64.0-67.0 s, 64 arenas 1...
-- 2026-11-10 18:42 **S9-09** lead note: Card 2026-11-10: measurements 2/4/5: every hier run exits 136 (SIGFPE); flat runs. The measure binaries link the S9-09-era libgomp.a statically (sa...
 
 ## Cost
 
 - From the script, engineer: 378 sessions, 816.2M input tokens
 - From the script, lead: 241 sessions, 72.2M input tokens
-- Started by hand, Claude: 11 sessions, 2165.4M input tokens
+- Started by hand, Claude: 11 sessions, 2168.8M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
