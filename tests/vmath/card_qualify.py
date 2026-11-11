@@ -10,7 +10,8 @@ job's output is kept in .work/_shared/S10-02/<host|card>/<job>.txt. qualify_d's 
 recomputed exactly here (Python decimal, 60 digits): that is the high-precision reference, and the
 max_ulp reported for exp, log and pow is the exact maximum over those lanes. The other lanes'
 screened error is at most the dump threshold, so their true error is at most that plus the largest
-screen error seen on the rechecked lanes (printed as undumped_bound).
+screen error seen on the rechecked lanes outside the special grid (printed as undumped_bound,
+which must stay within the limit too). The grid is checked exactly in full (S10-06).
 """
 import argparse
 from decimal import Context, Decimal, localcontext
@@ -53,7 +54,7 @@ JOBS = {
         ('cmp-logf', 'qualify_f', ['logf', '--block-stride', '65536'], 'PASS'),
         ('cmp-exp', 'qualify_d', ['exp', '--blocks', '65536'], 'PASS'),
         ('cmp-log', 'qualify_d', ['log', '--blocks', '65536'], 'PASS'),
-        ('cmp-pow', 'qualify_d', ['pow', '--blocks', '65536'], 'PASS'),
+        ('cmp-pow', 'qualify_d', ['pow', '--blocks', '65536', '--dump', '0.45'], 'PASS'),
     ],
     # expf and logf: every 16th block of the 2^32 inputs (2^28 inputs); stride 1 is exhaustive.
     'full': [
@@ -62,7 +63,10 @@ JOBS = {
         ('powf', 'qualify_f', ['powf', '--pow-count', str(1 << 28)], 'PASS'),
         ('exp', 'qualify_d', ['exp', '--blocks', str(1 << 24)], 'PASS'),
         ('log', 'qualify_d', ['log', '--blocks', str(1 << 24)], 'PASS'),
-        ('pow', 'qualify_d', ['pow', '--blocks', str(1 << 25)], 'PASS'),
+        # pow: every lane screened above 0.45 ULP is checked exactly, which keeps undumped_bound
+        # (0.45 + the screen's error, 0.534 on the card) under 1 ULP (S10-06); about 3.0M lanes.
+        ('pow', 'qualify_d', ['pow', '--blocks', str(1 << 25), '--dump', '0.45', '--max-dump', '4000000'],
+         'PASS'),
     ],
 }
 
@@ -107,14 +111,15 @@ def recheck(function, lines):
     """Exact errors of the dumped lanes: (max, worst line, special, screen error)."""
     worst, worst_line, special, screen = 0.0, '', 0, 0.0
     for line in lines:
-        _, xs, ys, outs, screened = line.split()
+        _, xs, ys, outs, screened, *grid = line.split()
         x, y, out = as_double(int(xs, 16)), as_double(int(ys, 16)), as_double(int(outs, 16))
         value = exact(function, x, y)
         error = None if value is None else ulp_error(value, out)
         if error is None:
-            special += 1  # the screen's exact-match verdict on a special-case lane stands
+            special += float(screened) < 0  # the screen's exact-match verdict on a special-case lane stands
             continue
-        if float(screened) >= 0:
+        # Grid lanes are all checked exactly, so they do not estimate the screen's error.
+        if float(screened) >= 0 and not grid:
             screen = max(screen, abs(float(screened) - error))
         if error > worst:
             worst, worst_line = error, line
@@ -138,11 +143,12 @@ def assess(job, program, args, expect, text):
         worst, line, special, screen = recheck(function, checks)
         others_ok = all(fields[k] == '0' for k in ('status_errors', 'mask_errors')) and \
             int(fields['dumped']) == len(checks)
-        result = 'PASS' if worst <= LIMIT and not special and others_ok else 'FAIL'
+        bound = float(fields['dump']) + screen
+        result = 'PASS' if worst <= LIMIT and bound <= LIMIT and not special and others_ok else 'FAIL'
         fields['max_ulp'] = '%.6f' % max(worst, 0)
         detail = ('exact max_ulp=%.6f over %d checked lanes, special=%d, screen error<=%.4f, '
                   'undumped_bound=%.4f, worst: %s' % (worst, len(checks), special, screen,
-                                                      float(fields['dump']) + screen, line))
+                                                      bound, line))
     return result, detail, fields
 
 
