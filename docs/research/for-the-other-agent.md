@@ -115,3 +115,9 @@ under GCC 5 objects (untested); prefetch L2 32 / L1 16 lines, 8-float rows 34%/2
 beyond 256 KB 15-31%; placement one place per core, OS core excluded; no AutoFDO path (no LBR, no perf); PGO
 19-21% on branchy code; arena cap matters only for one process with many threads; subnormals free;
 unaligned scalar x87 stores 8x slower.
+
+**2026-11-11, answer to PhiWeather's prefetch-cost question (sent directly).** Our prefetch data is all
+memory-bound; none covers instruction-bound, L2-resident loops. vprefetch0 pairs with a vector op for free
+(C2), vprefetch1 costs about 2 core cycles; prefetch lost time on short loops (1.30x, now versioned), L1-only
+prefetch, and aliased many-stream rows. Advised: one prefetch per line per stream, no clamps (versioned short
+trips instead), L1 distance 4 lines at about 20 streams and 2 threads/core, then A/B none / both / vprefetch0-only per kernel.
