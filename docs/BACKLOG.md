@@ -146,6 +146,7 @@ Started as Sprint 8 on 2026-11-08 (owner blanket approval; `docs/sprints/SPRINT-
 | E7-10 | Alignment peeling or versioning at `-O2` for long loops only, as ICC's default `-qopt-dynamic-align` (review item 5); S8-09 kept the cheap model, so measure STREAM-like loops on unaligned malloc arrays first. S8-22 turned alignment peeling off for `-march=knc` because its prologue runs as x87 code (up to 15 iterations) and the cost model ignores that; any peeling here must use a masked vector prologue instead | Standard |
 | E7-11 | Accept ICC's per-loop pragmas (`prefetch`, `noprefetch`, `vector nontemporal`, `vector aligned`) and map them to existing machinery (review item 7) | Standard |
 | E7-12 | At 1-2 threads per core, long streaming loops want unroll 4, not S8-20's 2 (affine 3-7% at density 1, card 2026-11-10); distinguish long streams from one-iteration calls (short) by known or estimated trip count | Standard |
+| E7-13 | Unaligned scalar accesses are safe on KNC but slow (C13, card 2026-11-11: x87 stores 8x, 4- and 8-byte integer loads and stores 4x, x87 loads 2.4x): stop store merging and inline `memcpy`/`memset` from emitting misaligned scalar moves when alignment is unknown, under `-mtune=knc` | Standard |
 | E7-05 | Milestone M4: corpus comparison against GCC 5.1.1, including held-out programs | Deep |
 
 ## E8 Program corpus and release (M5–M6)
