@@ -305,7 +305,7 @@ def t1_packed(runner):
                                             '-fdump-rtl-expand=' + str(dump),
                                             '--sysroot=' + str(runner.sysroot),
                                             '-S', source, '-o', asm, check=False)
-                    if case in ('arg', 'result', 'member', 'large_member'):
+                    if case in ('member', 'large_member'):  # ADR-0014: arg and result are legal
                         failures = [] if result.returncode and re.search(
                             'unsupported KNC register ABI mode', result.stdout) and not re.search(
                                 'internal compiler error|Segmentation fault', result.stdout) else [
