@@ -196,24 +196,30 @@ def t1_probe(runner, source, level, name=None):
 
 
 def t1_vector_diagnostics(runner):
+    # ADR-0014 point 1: a 64-byte vector argument or result is legal; a
+    # by-value field of that type and any vector argument of a variadic
+    # function, unnamed in a call or named in a definition, stay errors.
+    t1_vector_compatibility(runner, ('VECTOR_PARAMETER', 'VECTOR_RESULT'), 'accepts ')
     source = runner.source_dir / 'knc-abi-mixed.c'
-    for case in ('parameter', 'result', 'field'):
+    for case, what in (('FIELD', 'int vector ABI field'),
+                       ('VARIADIC_CALL', 'float vector unnamed variadic argument'),
+                       ('VARIADIC_NAMED', 'float vector named variadic parameter')):
         for level in ('-O0', '-O2'):
             compiled = runner.command(
                 runner.cc, *runner.cc_flags, level, '-march=knc',
-                '-DABI_VECTOR_' + case.upper(), '-S', source,
+                '-DABI_VECTOR_' + case, '-S', source,
                 '-o', runner.out / 'vector.s', check=False)
             rejected = (compiled.returncode != 0
                         and 'internal compiler error' not in compiled.stdout
                         and 'confused by earlier errors' not in compiled.stdout
                         and 'error: unsupported KNC register ABI mode' in compiled.stdout)
-            runner.result('t1 KNC rejects 64-byte int vector ABI ' + case + ' ' + level,
+            runner.result('t1 KNC rejects 64-byte %s %s' % (what, level),
                           [] if rejected else [compiled.stdout[-1800:]
                                                or 'unsupported vector ABI accepted'])
 
 
 def t1_vector_compatibility(runner, cases=('VECTOR32_PARAMETER', 'VECTOR1_PARAMETER',
-                                         'VECTOR1_RESULT')):
+                                         'VECTOR1_RESULT'), verb='preserves '):
     source = runner.source_dir / 'knc-abi-mixed.c'
     for case in cases:
         for level in ('-O0', '-O2'):
@@ -225,7 +231,7 @@ def t1_vector_compatibility(runner, cases=('VECTOR32_PARAMETER', 'VECTOR1_PARAME
             failures = ([compiled.stdout[-1800:] or 'compile failed']
                         if compiled.returncode or compiled.stdout.strip()
                         else allowlist(asm.read_text()))
-            runner.result('t1 KNC preserves ' + case.lower() + ' ' + level, failures)
+            runner.result('t1 KNC ' + verb + case.lower() + ' ' + level, failures)
 
 
 def t1_abi_gaps(runner):
@@ -383,8 +389,43 @@ def t2_short_vector(runner):
                           output, '-O2', reverse, combined_source=source)
 
 
+def t2_vector(runner):
+    """S10-01: caller and callee in separate GCC 16 objects, one of them at
+    -O0, staged for the card. The donor has no register ABI for these types."""
+    sources = runner.root / 'tests/t2'
+    output = runner.tc.parent / 'S10-01'
+    output.mkdir(exist_ok=True)
+    for levels in (('-O0', '-O2'), ('-O2', '-O0')):
+        label = 't2 knc-vecarg caller %s / callee %s' % levels
+        elf = output / ('vecarg-%s-%s.mic' % tuple(level[1:] for level in levels))
+        elf.unlink(missing_ok=True)
+        objects, failures = [], []
+        for role, level in zip(('caller', 'callee'), levels):
+            obj = runner.out / ('vecarg-' + role + '.o')
+            compiled = runner.command(runner.cc, *runner.cc_flags, level, '-march=knc',
+                                      '-ffp-contract=off', '--sysroot=' + str(runner.sysroot),
+                                      '-c', sources / ('knc-vecarg-' + role + '.c'),
+                                      '-o', obj, check=False)
+            if compiled.returncode or compiled.stdout.strip():
+                failures.append(role + ' compile: ' + compiled.stdout[-1800:])
+            objects.append(obj)
+        if not failures:
+            linked = runner.command(runner.cc, *runner.cc_flags,
+                                    '--sysroot=' + str(runner.sysroot), *objects, '-o', elf,
+                                    '-Wl,--trace', check=False)
+            lint = linked if linked.returncode else runner.command(
+                sys.executable, runner.root / 'tools/knc_lint', elf, check=False)
+            if lint.returncode:
+                failures.append('link or lint: ' + lint.stdout[-1800:])
+                elf.unlink(missing_ok=True)
+            else:
+                runner.t2_abi(elf, linked.stdout)
+        runner.result(label, failures)
+
+
 def t2(runner):
     t2_short_vector(runner)
+    t2_vector(runner)
     sources = runner.root / 'tests/t2'
     # Fixed shared paths are the S3-10 native inputs; never execute on the host.
     output = runner.tc.parent / 'scalar-abi'
