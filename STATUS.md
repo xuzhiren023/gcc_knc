@@ -2,7 +2,7 @@
 
 Updated automatically at every ticket change. Last update: 2026-11-11 03:05.
 
-**Waiting for you:** S10-02. Run `python tools/pm.py inbox`.
+**Next: the tech lead, on S10-01.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[###################-]` 166 of 173
 
@@ -40,7 +40,7 @@ Current tickets: `[###################-]` 166 of 173
 | S1-06 | K1OM link defaults | Done | GCC 16 now targets the K1OM ABI by default: it passes --march=k1om to as and -m elf_k1om to ld, uses the /l... |
 | S1-07 | Milestone M0 evidence note | Done | M0 is settled as adjust: GCC 16.2 builds a k1om cc1 whose assembly the 2.22 assembler accepts, an options-f... |
 | S10-01 | 512-bit vector arguments and results under -march=knc (ADR-0014 point 1) | Waiting for review | Green: gcc 6a05e9f54b7 (KNC) + 47e9fa213da (shared i386.cc: 3 guarded calls renamed, 0 added). Build PASS; ... |
-| S10-02 | libknc_vmath v0 - build and requalify expf, logf, powf, exp, log, pow with GCC-KNC on the card | **Waiting for you** | input_tokens 6M -> 12M under the owner standing rule (progress: 5 of 6 cores build for KNC, host qualificat... |
+| S10-02 | libknc_vmath v0 - build and requalify expf, logf, powf, exp, log, pow with GCC-KNC on the card | In progress | Owner standing rule (2026-11-09, reminded 2026-11-10; blanket approval 2026-11-11): budget raised to 12M in... |
 | S10-03 | Loops call libknc_vmath - -mveclibabi=knc, by-value entry points, automatic link (ADR-0014 points 2-3) | Not started |  |
 | S10-04 | Measure vector math - math kernels and a WRF-shaped physics loop, vector vs scalar libm | Not started |  |
 | S10-05 | Sprint 10 batch check | Not started |  |
@@ -198,6 +198,7 @@ Current tickets: `[###################-]` 166 of 173
 
 ## Recent activity
 
+- 2026-11-11 03:05 **S10-02** owner decide: Owner standing rule (2026-11-09, reminded 2026-11-10; blanket approval 2026-11-11): budget raised to 12M input tokens. Answer to the 02:58 ask: (a)...
 - 2026-11-11 03:05 **S10-02** lead amend: input_tokens 6M -> 12M under the owner standing rule (progress: 5 of 6 cores build for KNC, host qualification passes, commit 101529da).
 - 2026-11-11 03:04 **S9-24** lead answer: Confirmed: my commit 58a2473b broke locks.c:43-44 with a literal newline. You may fix it on this branch: one separate commit touching only tests/ac...
 - 2026-11-11 03:03 **S10-02** lead escalate: budget: 7101130 input tokens used; the budget is 6000000
@@ -205,7 +206,6 @@ Current tickets: `[###################-]` 166 of 173
 - 2026-11-11 03:01 **S10-02** lead answer: Neither as asked: S10-01 is still in review, so do not wait on it. Do not edit pow_e8.c to dodge the ABI (copy fidelity, ADR-0011). Submit now with...
 - 2026-11-11 03:01 **S10-01** engineer submit: Green: gcc 6a05e9f54b7 (KNC) + 47e9fa213da (shared i386.cc: 3 guarded calls renamed, 0 added). Build PASS; full t1 t2 gcc16 337 PASS, 0 FAIL (.work...
 - 2026-11-11 02:58 **S10-02** engineer ask: KNC pow blocked: pow_e8.c:24-25 static helpers pass 64-byte vectors by value; built cc1 (2026-11-10 19:14, pre-S10-01) errors 'unsupported KNC regi...
-- 2026-11-11 02:38 **S9-20** lead note: Card 2026-11-11 (no memory limit, S9-23), M2 at 4 threads/core, median ratio to default: nosched 0.995-1.013, pre 0.993-1.005, prepress 0.997-1.005...
 
 ## Cost
 
