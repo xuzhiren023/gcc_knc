@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-11 03:20.
+Updated automatically at every ticket change. Last update: 2026-11-11 03:21.
 
 **Next: the tech lead, on S10-01.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
@@ -181,7 +181,7 @@ Current tickets: `[###################-]` 167 of 173
 | S9-08 | libgomp spin-wait with delay and the one-core measurement (E6-03 C) | Done | Card 2026-11-10 measurements 1 and 3, three launches (log .work/_shared/tmp/claude-resume.log). One core, w... |
 | S9-09 | libgomp hierarchical ring-aware barrier (E6-03 D) | Done | Card 2026-11-10: measurements 2/4/5: every hier run exits 136 (SIGFPE); flat runs. The measure binaries lin... |
 | S9-10 | libgomp padding, static schedule default and malloc guidance (E6-03 E) | Done | Card 2026-11-10 14:40Z: the eight OpenMP programs pass on the S9-06..S9-10 libgomp at 60 threads (6 GiB) an... |
-| S9-11 | Sprint 9 batch check | Not started | deps S9-24 (settings and harness fixes); lane gcc2 after it. Owner 2026-11-11: close Sprint 9 tonight, blan... |
+| S9-11 | Sprint 9 batch check | In progress | deps S9-24 (settings and harness fixes); lane gcc2 after it. Owner 2026-11-11: close Sprint 9 tonight, blan... |
 | S9-12 | libgomp adapts to the card: malloc arena cap from memory, core count and clock (ADR-0012) | Done | Measurement 7 cut down, 240 threads x 100000 1 KiB malloc/free, 2 reps (2026-11-10 22:xxZ): full profile (1... |
 | S9-13 | User story - -mknc-card= picks the card model's tuning, and -mknc-card=native detects it | Done | Card 2026-11-10, memory working set, density 4: -mknc-card=7100 vs knc: affine_f32 1.001, stencil1 1.003, m... |
 | S9-14 | card_run model profiles - run a job as a 3100, 5100 or 7100 card on our 7120P | Done | card_run --profile 3100/5100/7100/full runs a job as that card would (its compute cores and usable memory),... |
@@ -211,10 +211,10 @@ Current tickets: `[###################-]` 167 of 173
 
 - From the script, engineer: 395 sessions, 869.3M input tokens
 - From the script, lead: 250 sessions, 73.8M input tokens
-- Started by hand, Claude: 11 sessions, 2298.1M input tokens
+- Started by hand, Claude: 11 sessions, 2300.7M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 23.2 GiB of 100 GiB. 95 GiB free on the drive.
+The project uses 23.2 GiB of 100 GiB. 96 GiB free on the drive.
