@@ -1,10 +1,10 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-10 19:52.
+Updated automatically at every ticket change. Last update: 2026-11-10 19:56.
 
 **Next: the tech lead, on S8-22.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
-Current tickets: `[###################-]` 160 of 163
+Current tickets: `[###################-]` 160 of 164
 
 ## Milestones
 
@@ -153,7 +153,7 @@ Current tickets: `[###################-]` 160 of 163
 | S8-08 | -mtune=knc tune-flag audit (E5-12) | Done | Card 2026-11-10 05:14-06:02Z (deferred timing, frozen 020d107325d vs S8-10 knc, L2 d4, 2 launches): M2 corr... |
 | S8-09 | KNC -O2 defaults: vectorizer cost model, stride versioning, predictive commoning (E5-18) | Done | Card 2026-11-10 08:36-08:40Z (frozen set .work/_shared/tmp/claude-s8-09, log .work/_shared/tmp/claude-s8-09... |
 | S8-10 | Less ring traffic: 64-byte padding of per-thread data, and card check C11 (E5-16) | Done | Per-thread arrays and the OpenMP shared block now start on their own 64-byte line, and the C11 card check s... |
-| S8-11 | Sprint 8 batch check and paired M2 re-measure | Done | Sprint 8's final compiler (knc fe7ed380f149) matches stock GCC 16.2 on x86 (1962/0 at -O2 and -O2 -mavx512f... |
+| S8-11 | Sprint 8 batch check and paired M2 re-measure | Done | Card part 2026-11-10 23:39Z: execute suite 1681/1681 pass; M2 negative 1 / positive 0; paired M2 Sprint 8 v... |
 | S8-12 | Fix three weak S8-01 checks - C4 page offsets, C5 row aliasing, C9 memory chain | Done | The knc-char checks C4, C5 and C9 are fixed and rebuilt: C4 now walks every page offset, C5's eight arrays ... |
 | S8-13 | Streaming stores for write-only loops beyond L2 (E5-08) | Done | Loops that write arrays too large for the cache now use streaming stores: about 30% faster beyond L2 on the... |
 | S8-14 | Default 64-byte data alignment and TLB-aware cache parameters (E5-13) | Done | Card 2026-11-10 (deferred timing, frozen 3516ea25905 vs S8-13): s4_masks o2v/o3 pass, guard controls exit 3... |
@@ -165,6 +165,7 @@ Current tickets: `[###################-]` 160 of 163
 | S8-20 | The small-loop unroll costs affine_f64 3-7% at 4 threads per core - make it follow the thread density | Done | Card 2026-11-10 21:00-23:00Z vs knc (S8-15 unroll 4), launch 1/2. Density 4: affine_f64 0.931/0.994, affine... |
 | S8-21 | The prefetch pass sees masked loads and stores, so rows shorter than a vector are prefetched | Done | The prefetch pass now sees masked loads and stores, so rows shorter than a vector (WRF 8-float rows) are pr... |
 | S8-22 | -mphinix is slower than -O2 on M2 kernels (mat16 12.9x, short 1.27x, mat8 1.13x) - find and fix | Waiting for review | Cause (in commits): -O3 cunrolli flattened mat16's inner loop, losing the -O2 outer-loop form; dynamic-mode... |
+| S8-23 | Sprint 8 made the M2 short kernel 5-10% slower than Sprint 7 - bisect and fix | Not started |  |
 | S9-01 | libgomp for KNC: futex, affinity, ring-aware barrier, spin-wait and malloc arenas (E6-03 input) | Done | We now have a build-and-design plan for GCC-KNC's own OpenMP runtime on the card: futex-based waits with de... |
 | S9-02 | libstdc++ for KNC: exceptions, RTTI, atomics, threads, packaging (E6-06 input) | Done | We now know how to build GCC 16's C++ library for the card: no newer glibc or kernel is needed, and built w... |
 | S9-03 | libstdc++ and libatomic build for k1om (E6-06a) | Done | Card 2026-11-10 08:40Z (log .work/_shared/tmp/claude-s8-09.log): hello, rtti, thread, atomic16, tz and all ... |
@@ -188,6 +189,7 @@ Current tickets: `[###################-]` 160 of 163
 
 ## Recent activity
 
+- 2026-11-10 19:56 **S8-11** lead note: Card part 2026-11-10 23:39Z: execute suite 1681/1681 pass; M2 negative 1 / positive 0; paired M2 Sprint 8 vs 7 in docs/research/card-runs-s8.md: ma...
 - 2026-11-10 19:44 **S9-19** lead approve: Auto-parallelization (GCC splitting loops across threads with no pragmas) works on KNC for the streaming and stencil loops but not for a floating-p...
 - 2026-11-10 19:36 **S8-22** engineer submit: Cause (in commits): -O3 cunrolli flattened mat16's inner loop, losing the -O2 outer-loop form; dynamic-model alignment peeling added x87 prologues ...
 - 2026-11-10 19:35 **S9-19** engineer submit: Staged, lint clean, not run: .work/_shared/S9-19/autopar.sh and probe.sh with their -files.txt. Opt-info (.work/_shared/S9-19/optinfo.txt): triad a...
@@ -195,13 +197,12 @@ Current tickets: `[###################-]` 160 of 163
 - 2026-11-10 19:18 **S9-18** engineer submit: libgcov: .work/_shared/gcc-knc-16.2.0/lib/gcc/k1om-mpss-linux/16.2.0/libgcov.a. Host: equal checksums, 5 variants x 4 kernels (.work/_state/logs/s9...
 - 2026-11-10 19:17 **S9-18** lead answer: Size fits the scope: four kernels plus the build/card/use/timing driver cannot sensibly fit in 500 lines, and the ticket asked for all of it. Do no...
 - 2026-11-10 19:16 **S9-18** engineer ask: Work is done and committed (7b6b4634), but submit refuses on size: 751 changed lines, budget 500. Split: 4 kernels ~330 lines (tests/bench/pgo), to...
-- 2026-11-10 19:03 **S9-11** lead note: Arena default with no address-space limit: GOMP_KNC_ARENA_MEM_PERCENT=50 gives about 86 arenas on a 16 GB card (half of MemTotal less 240 x 8 MiB s...
 
 ## Cost
 
 - From the script, engineer: 380 sessions, 832.8M input tokens
 - From the script, lead: 242 sessions, 72.3M input tokens
-- Started by hand, Claude: 11 sessions, 2181.5M input tokens
+- Started by hand, Claude: 11 sessions, 2182.9M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
