@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-10 20:58.
+Updated automatically at every ticket change. Last update: 2026-11-10 21:01.
 
-**Next: GPT-6.1, on S8-23 (Sprint 8 made the M2 short kernel 5-10% slower than Sprint 7 - bisect and fix).** Run `python tools/dispatch.py`, or ask the tech lead to.
+**Next: the tech lead, on S9-22.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[###################-]` 163 of 166
 
@@ -187,10 +187,11 @@ Current tickets: `[###################-]` 163 of 166
 | S9-19 | Experiment - auto-parallelization on KNC, and whether AutoFDO is possible on the card | Done | Card 2026-11-11: AutoFDO probe: kernel 2.6.38.8+mpss3.7.1, no perf binary, perf_event_paranoid 1, hw cycles... |
 | S9-20 | Experiment - how much does instruction scheduling help the in-order core, at 1 and 4 threads per core? | Done | Card 2026-11-11, 1 thread/core, ratio to -O2 default: nosched affine 1.11, mat8 1.05; prepress affine 0.92,... |
 | S9-21 | S9-18 PGO training script - BusyBox od has no -A/-t, so no profile came back | Done | The S9-18 PGO training script now dumps profiles with od -b -v, which BusyBox 1.19 on the card supports, an... |
-| S9-22 | S9-18 PGO rebuild fails with coverage-mismatch on the card profiles - make the two builds identical | In progress |  |
+| S9-22 | S9-18 PGO rebuild fails with coverage-mismatch on the card profiles - make the two builds identical | Tests waiting for review | tools-only fix with no unit test; the host run failed before as a single process only in theory. The card l... |
 
 ## Recent activity
 
+- 2026-11-10 21:01 **S9-22** engineer red: tools-only fix with no unit test; the host run failed before as a single process only in theory. The card log is the red evidence (coverage-mismatch)
 - 2026-11-10 20:56 **S9-20** lead note: Card 2026-11-11, 1 thread/core, ratio to -O2 default: nosched affine 1.11, mat8 1.05; prepress affine 0.92, mat16 0.96, mat8 1.04; scalar ichain pr...
 - 2026-11-10 20:56 **S9-19** lead note: Card 2026-11-11: AutoFDO probe: kernel 2.6.38.8+mpss3.7.1, no perf binary, perf_event_paranoid 1, hw cycles/instructions/branches counting ok, cycl...
 - 2026-11-10 20:56 **S8-22** lead note: Card 2026-11-11 01:11Z, -mphinix vs -O2 (launch 1/2): d4 mat16 0.923/0.878, mat8 0.908/0.912, stencil2 0.841/0.939, affine_f32 1.007/1.020, affine_...
@@ -198,7 +199,6 @@ Current tickets: `[###################-]` 163 of 166
 - 2026-11-10 20:22 **S9-21** lead approve: The S9-18 PGO training script now dumps profiles with od -b -v, which BusyBox 1.19 on the card supports, and the host check uses the same format; t...
 - 2026-11-10 20:13 **S9-21** engineer submit: train.sh dumps .gcda with od -b -v (BusyBox 1.19 compatible); use parses octal offsets+bytes; host path (same format) PASS; training set restaged, ...
 - 2026-11-10 20:12 **S9-18** lead note: Card 2026-11-11: the eight instrumented programs ran (TRAIN checksums printed) but BusyBox od rejected -A, so no profile came back; fix S9-21, reru...
-- 2026-11-10 20:12 **S9-11** lead note: Defaults to set from the 2026-11-11 card data: gomp_knc_delay 128 (S9-08) and default spin 200 ms (S9-15). Subnormals cost nothing on the VPU (C14)...
 
 ## Cost
 
