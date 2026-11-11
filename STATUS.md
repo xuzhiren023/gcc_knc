@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-10 20:52.
+Updated automatically at every ticket change. Last update: 2026-11-10 20:53.
 
 **Next: GPT-6.1, on S8-23 (Sprint 8 made the M2 short kernel 5-10% slower than Sprint 7 - bisect and fix).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
@@ -165,7 +165,7 @@ Current tickets: `[###################-]` 163 of 165
 | S8-20 | The small-loop unroll costs affine_f64 3-7% at 4 threads per core - make it follow the thread density | Done | Card 2026-11-10 21:00-23:00Z vs knc (S8-15 unroll 4), launch 1/2. Density 4: affine_f64 0.931/0.994, affine... |
 | S8-21 | The prefetch pass sees masked loads and stores, so rows shorter than a vector are prefetched | Done | Card 2026-11-11 01:00Z, WRF-shaped column loop (8-float rows), pf over nopf, 7 rounds: density 4 median 0.6... |
 | S8-22 | -mphinix is slower than -O2 on M2 kernels (mat16 12.9x, short 1.27x, mat8 1.13x) - find and fix | Done | -march=knc no longer lets -O3 flatten small inner loops before vectorizing or peel for alignment into x87 c... |
-| S8-23 | Sprint 8 made the M2 short kernel 5-10% slower than Sprint 7 - bisect and fix | Not started |  |
+| S8-23 | Sprint 8 made the M2 short kernel 5-10% slower than Sprint 7 - bisect and fix | In progress |  |
 | S9-01 | libgomp for KNC: futex, affinity, ring-aware barrier, spin-wait and malloc arenas (E6-03 input) | Done | We now have a build-and-design plan for GCC-KNC's own OpenMP runtime on the card: futex-based waits with de... |
 | S9-02 | libstdc++ for KNC: exceptions, RTTI, atomics, threads, packaging (E6-06 input) | Done | We now know how to build GCC 16's C++ library for the card: no newer glibc or kernel is needed, and built w... |
 | S9-03 | libstdc++ and libatomic build for k1om (E6-06a) | Done | Card 2026-11-10 08:40Z (log .work/_shared/tmp/claude-s8-09.log): hello, rtti, thread, atomic16, tz and all ... |
@@ -203,7 +203,7 @@ Current tickets: `[###################-]` 163 of 165
 
 - From the script, engineer: 383 sessions, 835.8M input tokens
 - From the script, lead: 244 sessions, 72.5M input tokens
-- Started by hand, Claude: 11 sessions, 2200.4M input tokens
+- Started by hand, Claude: 11 sessions, 2201.9M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
