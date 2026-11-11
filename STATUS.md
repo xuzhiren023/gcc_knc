@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-11 02:03.
+Updated automatically at every ticket change. Last update: 2026-11-11 02:05.
 
-**Next: GPT-6.1, on S10-01 (512-bit vector arguments and results under -march=knc (ADR-0014 point 1)).** Run `python tools/dispatch.py`, or ask the tech lead to.
+**Waiting for you:** S9-23. Run `python tools/pm.py inbox`.
 
 Current tickets: `[###################-]` 165 of 173
 
@@ -193,11 +193,12 @@ Current tickets: `[###################-]` 165 of 173
 | S9-20 | Experiment - how much does instruction scheduling help the in-order core, at 1 and 4 threads per core? | Done | Card 2026-11-11, 1 thread/core, ratio to -O2 default: nosched affine 1.11, mat8 1.05; prepress affine 0.92,... |
 | S9-21 | S9-18 PGO training script - BusyBox od has no -A/-t, so no profile came back | Done | The S9-18 PGO training script now dumps profiles with od -b -v, which BusyBox 1.19 on the card supports, an... |
 | S9-22 | S9-18 PGO rebuild fails with coverage-mismatch on the card profiles - make the two builds identical | Done | The PGO experiment's two builds now use identical compile commands, so profiles collected on the card can b... |
-| S9-23 | card_run - no address-space limit in our exclusive turns (owner - "there is no job memory limit") | In progress | Red approved for round 2: the renamed shared-mode test now expects an undeclared job to keep the 128 MiB de... |
+| S9-23 | card_run - no address-space limit in our exclusive turns (owner - "there is no job memory limit") | **Waiting for you** | budget: 2 engineer sessions used; the budget is 2 |
 | S9-24 | Sprint 9 settings from the card data, and the harness fixes the batch check needs | In progress |  |
 
 ## Recent activity
 
+- 2026-11-11 02:05 **S9-23** lead escalate: budget: 2 engineer sessions used; the budget is 2
 - 2026-11-11 02:02 **S9-23** lead approve-red: Red approved for round 2: the renamed shared-mode test now expects an undeclared job to keep the 128 MiB default, which fails on the previous head ...
 - 2026-11-11 01:59 **S9-23** engineer red: Round 2 fix is a tests+code fix already green; red approved earlier by lead (01:02). Test test_shared_undeclared_keeps_the_128_mib_default now expe...
 - 2026-11-11 01:56 **S10-01** lead changes: Red tests are sound: the T1 register and stack-slot scans, the card values (exact in float, 4326 checked) and both -O0/-O2 cross-TU directions look...
@@ -205,7 +206,6 @@ Current tickets: `[###################-]` 165 of 173
 - 2026-11-11 01:50 **S10-01** engineer red: Red 501d0866: check.py t1 t2 --compiler gcc16 --vector-abi fails 3/3 with 'unsupported KNC register ABI mode' (log .work/_state/logs/check_gcc16_t1...
 - 2026-11-11 01:39 **S9-11** lead amend: deps S9-24 (settings and harness fixes); lane gcc2 after it. Owner 2026-11-11: close Sprint 9 tonight, blanket approval.
 - 2026-11-11 01:10 **S9-23** lead amend: head 84e9f27d: lead updated the S9-14 profile test expectation for 7100/full (no limit).
-- 2026-11-11 01:02 **S9-23** lead note: Lead: the escalation was a lead matter, not an owner decision. Red ran after green, but the new tests fail on the old code (engineer 00:53), which ...
 
 ## Cost
 
@@ -217,4 +217,4 @@ Current tickets: `[###################-]` 165 of 173
 
 ## Disk
 
-The project uses 23.2 GiB of 100 GiB. 91 GiB free on the drive.
+The project uses 23.2 GiB of 100 GiB. 89 GiB free on the drive.
