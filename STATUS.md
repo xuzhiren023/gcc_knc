@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-11 02:00.
+Updated automatically at every ticket change. Last update: 2026-11-11 02:01.
 
 **Next: the tech lead, on S9-23.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
@@ -39,7 +39,7 @@ Current tickets: `[###################-]` 165 of 173
 | S1-05 | Integer C assembles with as 2.22 and lints clean | Done | All 2003 GCC torture compile files now build for KNC at -O0, -O2 and -O2 -g and assemble with the card's ol... |
 | S1-06 | K1OM link defaults | Done | GCC 16 now targets the K1OM ABI by default: it passes --march=k1om to as and -m elf_k1om to ld, uses the /l... |
 | S1-07 | Milestone M0 evidence note | Done | M0 is settled as adjust: GCC 16.2 builds a k1om cc1 whose assembly the 2.22 assembler accepts, an options-f... |
-| S10-01 | 512-bit vector arguments and results under -march=knc (ADR-0014 point 1) | Changes requested | Red tests are sound: the T1 register and stack-slot scans, the card values (exact in float, 4326 checked) a... |
+| S10-01 | 512-bit vector arguments and results under -march=knc (ADR-0014 point 1) | In progress | Red tests are sound: the T1 register and stack-slot scans, the card values (exact in float, 4326 checked) a... |
 | S10-02 | libknc_vmath v0 - build and requalify expf, logf, powf, exp, log, pow with GCC-KNC on the card | Not started |  |
 | S10-03 | Loops call libknc_vmath - -mveclibabi=knc, by-value entry points, automatic link (ADR-0014 points 2-3) | Not started |  |
 | S10-04 | Measure vector math - math kernels and a WRF-shaped physics loop, vector vs scalar libm | Not started |  |
