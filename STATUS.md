@@ -195,7 +195,7 @@ Current tickets: `[###################-]` 168 of 174
 | S9-22 | S9-18 PGO rebuild fails with coverage-mismatch on the card profiles - make the two builds identical | Done | The PGO experiment's two builds now use identical compile commands, so profiles collected on the card can b... |
 | S9-23 | card_run - no address-space limit in our exclusive turns (owner - "there is no job memory limit") | Done | In our exclusive card turns, jobs now run with no address-space limit unless a profile (3100, 5100) or the ... |
 | S9-24 | Sprint 9 settings from the card data, and the harness fixes the batch check needs | Done | KNC libgomp now uses the card-measured defaults: DELAY 128 while spinning, 200 ms of spinning before sleepi... |
-| S9-25 | The per-core barrier is slower than the flat one on the card - make flat the default; fix S9-07's runner | Not started |  |
+| S9-25 | The per-core barrier is slower than the flat one on the card - make flat the default; fix S9-07's runner | In progress |  |
 
 ## Recent activity
 
@@ -212,10 +212,10 @@ Current tickets: `[###################-]` 168 of 174
 
 - From the script, engineer: 396 sessions, 869.9M input tokens
 - From the script, lead: 250 sessions, 73.8M input tokens
-- Started by hand, Claude: 11 sessions, 2316.7M input tokens
+- Started by hand, Claude: 11 sessions, 2317.5M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 23.3 GiB of 100 GiB. 96 GiB free on the drive.
+The project uses 23.4 GiB of 100 GiB. 96 GiB free on the drive.
