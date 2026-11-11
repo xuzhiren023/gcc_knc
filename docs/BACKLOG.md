@@ -130,6 +130,7 @@ Started as Sprint 8 on 2026-11-08 (owner blanket approval; `docs/sprints/SPRINT-
 | E6-05e | Known-answer harness (ADR-0013 point 12): builtin vs inline-asm bit-for-bit on the card, a scalar model per intrinsic, and ISPC 1.8.2's self-checking tests through `knc.h` in `tests/third_party/ispc/` | Standard |
 | E6-07 | GCC generic vectors narrower than 512 bits (`vector_size` 8, 16, 32) passed or returned by value: today a clean "unsupported KNC register ABI mode" error (S2-02; 16 of the torture sweep's 33 compile errors). Check what the donor GCC 5 does, then pass them in memory or GPRs as an ABI decision (ADR) and test against donor objects. Only if corpus code needs it | Deep |
 | E6-08 | Heap reuse guidance and, if measured worthwhile, an opt-in driver setting for glibc's mmap threshold and trim (like ICC `-qopt-malloc-options`; review item 4) | Light |
+| E6-10 | Aggregates containing 64-byte vectors (for example `struct { __m512d h, l; }`) by value under `-march=knc`: today rejected (ADR-0014 point 1 covers plain vectors only); give them the x86-64 memory rule (passed and returned in memory). Found by S10-07, which worked around it in the copied hyperbolic code | Standard |
 | E6-06 | libstdc++: exceptions, RTTI, atomics, threads, with coverage measured by its own testsuite and the corpus. Check GCC 16's default C++ standard against corpus code | Standard |
 
 ## E7 Math and broad optimization (S10–S12, Milestone M4)
