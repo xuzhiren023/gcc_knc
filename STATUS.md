@@ -1,10 +1,10 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-11 05:58.
+Updated automatically at every ticket change. Last update: 2026-11-11 06:08.
 
 **Next: the tech lead, on S10-03.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
-Current tickets: `[###################-]` 171 of 175
+Current tickets: `[###################-]` 172 of 175
 
 ## Milestones
 
@@ -13,7 +13,7 @@ Current tickets: `[###################-]` 171 of 175
 | M0 | Foundation | In progress | 17 of 17 tickets |
 | M1 | Mixed native code | Done | 43 of 43 tickets |
 | M2 | Useful vector target | Done | 51 of 51 tickets |
-| M3 | Runtimes | In progress | 37 of 41 tickets |
+| M3 | Runtimes | In progress | 38 of 41 tickets |
 | M4 | Broad optimization | Not started | Not planned in detail yet |
 | M5 | Program corpus | Not started | Not planned in detail yet |
 | M6 | Release | Not started | Not planned in detail yet |
@@ -182,7 +182,7 @@ Current tickets: `[###################-]` 171 of 175
 | S9-08 | libgomp spin-wait with delay and the one-core measurement (E6-03 C) | Done | Card 2026-11-10 measurements 1 and 3, three launches (log .work/_shared/tmp/claude-resume.log). One core, w... |
 | S9-09 | libgomp hierarchical ring-aware barrier (E6-03 D) | Done | Card 2026-11-11 08:21Z on the S9-24 libgomp: suite and tasks/cancel pass (the SIGFPE is gone); measurements... |
 | S9-10 | libgomp padding, static schedule default and malloc guidance (E6-03 E) | Done | Card 2026-11-10 14:40Z: the eight OpenMP programs pass on the S9-06..S9-10 libgomp at 60 threads (6 GiB) an... |
-| S9-11 | Sprint 9 batch check | Waiting for review | Card part complete 2026-11-11 10:37Z on the S9-25 libgomp (flat barrier default), no memory limit: S9-06 at... |
+| S9-11 | Sprint 9 batch check | Done | Sprint 9's final compiler passes the full execute suite on the card (1681/1681), matches stock GCC on x86, ... |
 | S9-12 | libgomp adapts to the card: malloc arena cap from memory, core count and clock (ADR-0012) | Done | Measurement 7 cut down, 240 threads x 100000 1 KiB malloc/free, 2 reps (2026-11-10 22:xxZ): full profile (1... |
 | S9-13 | User story - -mknc-card= picks the card model's tuning, and -mknc-card=native detects it | Done | Card 2026-11-10, memory working set, density 4: -mknc-card=7100 vs knc: affine_f32 1.001, stencil1 1.003, m... |
 | S9-14 | card_run model profiles - run a job as a 3100, 5100 or 7100 card on our 7120P | Done | card_run --profile 3100/5100/7100/full runs a job as that card would (its compute cores and usable memory),... |
@@ -200,6 +200,7 @@ Current tickets: `[###################-]` 171 of 175
 
 ## Recent activity
 
+- 2026-11-11 06:08 **S9-11** lead approve: Sprint 9's final compiler passes the full execute suite on the card (1681/1681), matches stock GCC on x86, has 0 ICE in both sweeps and textual-onl...
 - 2026-11-11 05:58 **S9-11** lead note: Card part complete 2026-11-11 10:37Z on the S9-25 libgomp (flat barrier default), no memory limit: S9-06 at 60 and 240 threads pass; S9-09 suite pa...
 - 2026-11-11 05:58 **S10-06** lead approve: The powf and pow card failures were traced to the card's own libm (its powl gives NaN for negative x with huge even y), not to our functions; both ...
 - 2026-11-11 05:58 **S10-03** lead note: Card 2026-11-11: vmath loop program: expf, exp, logf, log, pow agree with scalar libm within 1 ULP on 4099 lanes each including specials; powf diff...
@@ -207,13 +208,12 @@ Current tickets: `[###################-]` 171 of 175
 - 2026-11-11 05:39 **S10-06** lead note: S10-03 reinstalled libknc_vmath as -fPIC with hidden symbols (.work/_shared/S10-02/knc rebuilt): restage the qualification jobs from that build so ...
 - 2026-11-11 05:38 **S10-05** lead amend: deps add S10-06
 - 2026-11-11 05:38 **S10-03** engineer submit: Green: gcc db7b06406a9 KNC + 25fc35185be shared i386 (10 lines added, 1 changed) + 65cbad181a6 includes; project 416d60c1. Build PASS, prefix reins...
-- 2026-11-11 05:38 **S10-02** lead note: Card qualification 2026-11-11 09:32-10:37Z (268M inputs each): expf 0.5016, logf 0.8106, exp 0.5079, log 0.5144 ulp PASS; all host-compare jobs sam...
 
 ## Cost
 
 - From the script, engineer: 403 sessions, 883.5M input tokens
 - From the script, lead: 253 sessions, 74.9M input tokens
-- Started by hand, Claude: 11 sessions, 2350.3M input tokens
+- Started by hand, Claude: 11 sessions, 2353.1M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
