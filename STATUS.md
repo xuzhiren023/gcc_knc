@@ -14,7 +14,7 @@ Current tickets: `[###################-]` 177 of 182
 | M1 | Mixed native code | Done | 43 of 43 tickets |
 | M2 | Useful vector target | Done | 51 of 51 tickets |
 | M3 | Runtimes | Done | 43 of 46 tickets |
-| M4 | Broad optimization | In progress | 0 of 2 tickets |
+| M4 | Broad optimization | Not started | 0 of 2 tickets |
 | M5 | Program corpus | Not started | Not planned in detail yet |
 | M6 | Release | Not started | Not planned in detail yet |
 
@@ -51,7 +51,7 @@ Current tickets: `[###################-]` 177 of 182
 | S10-10 | Card harness fixes from the Sprint 10 card turn - card_qualify binary folder, vmath bench batch sizing | Not started | Lead 2026-11-11 14:15 EST: card_qualify now passes --threads 240 (each job ran on one core). pow full on th... |
 | S10-11 | Card-only vector math failures - double sin, cos, tan, atan2 above 1 ULP, and cbrt/cbrtf crash (SIGSEGV) | Not started |  |
 | S11-01 | User story - the best way to move data between the host and the card, measured, and how our projects use it | Not started | Owner 2026-11-11 10:45 EST: do not start yet (usage at 95%, wait for tonight's reset). |
-| S11-02 | card_run and run_suite move data by S11-01's recommended method, with fallback | Question for the tech lead |  |
+| S11-02 | card_run and run_suite move data by S11-01's recommended method, with fallback | Not started | ready; waits on its dep S11-01, the lead writes acceptance before it starts |
 | S2-01 | Design for zmm and mask registers under -march=knc | Done | The register design for KNC is settled on paper: all 32 zmm and 8 mask registers become usable under -march... |
 | S2-02 | Float and double arguments and results in zmm lane 0 | Done | Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`). |
 | S2-03 | Varargs with the donor's register save area | Done | Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`). |
@@ -207,6 +207,7 @@ Current tickets: `[###################-]` 177 of 182
 
 ## Recent activity
 
+- 2026-11-11 15:32 **S11-02** lead amend: ready; waits on its dep S11-01, the lead writes acceptance before it starts
 - 2026-11-11 15:32 **S10-09** lead amend: sessions 8: three of the four were cut off by the Claude usage limit (exit 1, no work lost); engineers are Codex from now (owner 2026-11-11)
 - 2026-11-11 15:31 **S10-09** engineer escalate: budget: 4 engineer sessions used; the budget is 4
 - 2026-11-11 15:28 **S10-07** lead note: Card 2026-11-11 (S10-08 build, 240 threads): full set PASS for sinf 0.499999, cosf 0.499998, tanf 0.499995, log10f 0.8197, atanf 0.499995, atan2f 0...
@@ -214,7 +215,6 @@ Current tickets: `[###################-]` 177 of 182
 - 2026-11-11 11:51 **S10-05** lead note: Card 2026-11-11 14:16-16:56Z at knc b91ca0b5e67/f81579bb82a: execute suite 1681/1681 PASS. Vector math v0 on the card (corrected reference): expf 0...
 - 2026-11-11 10:36 **S11-01** lead note: Owner 2026-11-11 10:45 EST: do not start yet (usage at 95%, wait for tonight's reset).
 - 2026-11-11 10:27 **S10-09** lead approve-red: S10-09 red accepted: failing scans show that double division (fixed and variable bounds, masked tail) and square root loops do not yet vectorize un...
-- 2026-11-11 10:25 **S10-09** engineer red: Red fac88ad9: knc-divsqrt-f64.c fails at vrcp23ps in div_f64 (no divv8df3); log check_gcc16_t1-20261111-102408.log. Host model knc-v8df-model.c pas...
 
 ## Cost
 
