@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-10 22:12.
+Updated automatically at every ticket change. Last update: 2026-11-10 22:14.
 
 **Next: the tech lead, on S8-23.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
@@ -165,7 +165,7 @@ Current tickets: `[###################-]` 164 of 166
 | S8-20 | The small-loop unroll costs affine_f64 3-7% at 4 threads per core - make it follow the thread density | Done | Card 2026-11-10 21:00-23:00Z vs knc (S8-15 unroll 4), launch 1/2. Density 4: affine_f64 0.931/0.994, affine... |
 | S8-21 | The prefetch pass sees masked loads and stores, so rows shorter than a vector are prefetched | Done | Card 2026-11-11 01:00Z, WRF-shaped column loop (8-float rows), pf over nopf, 7 rounds: density 4 median 0.6... |
 | S8-22 | -mphinix is slower than -O2 on M2 kernels (mat16 12.9x, short 1.27x, mat8 1.13x) - find and fix | Done | Card 2026-11-11 01:11Z, -mphinix vs -O2 (launch 1/2): d4 mat16 0.923/0.878, mat8 0.908/0.912, stencil2 0.84... |
-| S8-23 | Sprint 8 made the M2 short kernel 5-10% slower than Sprint 7 - bisect and fix | Waiting for review | S8-02 gather/scatter tail was the cause. GCC s8/S8-23 (3 commits on knc 92a1b1a): while_ult prefix masks us... |
+| S8-23 | Sprint 8 made the M2 short kernel 5-10% slower than Sprint 7 - bisect and fix | Waiting for review | Lead review 2026-11-10: design accepted (the 21:29 lead answer and its conditions). Not approved before its... |
 | S9-01 | libgomp for KNC: futex, affinity, ring-aware barrier, spin-wait and malloc arenas (E6-03 input) | Done | We now have a build-and-design plan for GCC-KNC's own OpenMP runtime on the card: futex-based waits with de... |
 | S9-02 | libstdc++ for KNC: exceptions, RTTI, atomics, threads, packaging (E6-06 input) | Done | We now know how to build GCC 16's C++ library for the card: no newer glibc or kernel is needed, and built w... |
 | S9-03 | libstdc++ and libatomic build for k1om (E6-06a) | Done | Card 2026-11-10 08:40Z (log .work/_shared/tmp/claude-s8-09.log): hello, rtti, thread, atomic16, tz and all ... |
@@ -191,6 +191,7 @@ Current tickets: `[###################-]` 164 of 166
 
 ## Recent activity
 
+- 2026-11-10 22:14 **S8-23** lead note: Lead review 2026-11-10: design accepted (the 21:29 lead answer and its conditions). Not approved before its card check, because it changes S8-02 sa...
 - 2026-11-10 22:12 **S8-23** engineer submit: S8-02 gather/scatter tail was the cause. GCC s8/S8-23 (3 commits on knc 92a1b1a): while_ult prefix masks use a masked unpack/pack pair; other masks...
 - 2026-11-10 21:29 **S8-23** lead answer: Go with (1). The aligned no-op high address keeps the reason for the old rule (the high half must never touch an unmapped line), so I accept it for...
 - 2026-11-10 21:28 **S8-23** engineer ask: Cause is S8-02's gather/scatter tail (remainder 1 at length 17: ~30 insns + gather + scatter vs S7's 7-insn x87 iteration); only vect-partial-vecto...
@@ -198,13 +199,12 @@ Current tickets: `[###################-]` 164 of 166
 - 2026-11-10 21:09 **S9-22** engineer submit: Both builds compile a cwd-relative '<kernel>.c' copy with identical commands (echoed as '+' lines in the log); host runs build and use as separate ...
 - 2026-11-10 21:04 **S9-22** lead approve-red: S9-22 red accepted: the card log's coverage-mismatch on every kernel is the failing evidence; the fix is checked by the host two-process run and a ...
 - 2026-11-10 21:01 **S9-22** engineer red: tools-only fix with no unit test; the host run failed before as a single process only in theory. The card log is the red evidence (coverage-mismatch)
-- 2026-11-10 20:56 **S9-20** lead note: Card 2026-11-11, 1 thread/core, ratio to -O2 default: nosched affine 1.11, mat8 1.05; prepress affine 0.92, mat16 0.96, mat8 1.04; scalar ichain pr...
 
 ## Cost
 
 - From the script, engineer: 387 sessions, 849.7M input tokens
 - From the script, lead: 246 sessions, 72.9M input tokens
-- Started by hand, Claude: 11 sessions, 2219.5M input tokens
+- Started by hand, Claude: 11 sessions, 2222.6M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
