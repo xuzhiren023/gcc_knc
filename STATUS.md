@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-11 02:08.
+Updated automatically at every ticket change. Last update: 2026-11-11 02:25.
 
-**Next: the tech lead, on S9-23.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: the tech lead, on S10-01.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[###################-]` 165 of 173
 
@@ -39,7 +39,7 @@ Current tickets: `[###################-]` 165 of 173
 | S1-05 | Integer C assembles with as 2.22 and lints clean | Done | All 2003 GCC torture compile files now build for KNC at -O0, -O2 and -O2 -g and assemble with the card's ol... |
 | S1-06 | K1OM link defaults | Done | GCC 16 now targets the K1OM ABI by default: it passes --march=k1om to as and -m elf_k1om to ld, uses the /l... |
 | S1-07 | Milestone M0 evidence note | Done | M0 is settled as adjust: GCC 16.2 builds a k1om cc1 whose assembly the 2.22 assembler accepts, an options-f... |
-| S10-01 | 512-bit vector arguments and results under -march=knc (ADR-0014 point 1) | In progress | Red tests are sound: the T1 register and stack-slot scans, the card values (exact in float, 4326 checked) a... |
+| S10-01 | 512-bit vector arguments and results under -march=knc (ADR-0014 point 1) | Tests waiting for review | Guard at aa506820: -DABI_VECTOR_VARIADIC_CALL and _NAMED in knc-abi-mixed.c, checked at -O0/-O2 by t1_vecto... |
 | S10-02 | libknc_vmath v0 - build and requalify expf, logf, powf, exp, log, pow with GCC-KNC on the card | Not started |  |
 | S10-03 | Loops call libknc_vmath - -mveclibabi=knc, by-value entry points, automatic link (ADR-0014 points 2-3) | Not started |  |
 | S10-04 | Measure vector math - math kernels and a WRF-shaped physics loop, vector vs scalar libm | Not started |  |
@@ -198,6 +198,7 @@ Current tickets: `[###################-]` 165 of 173
 
 ## Recent activity
 
+- 2026-11-11 02:25 **S10-01** engineer red: Guard at aa506820: -DABI_VECTOR_VARIADIC_CALL and _NAMED in knc-abi-mixed.c, checked at -O0/-O2 by t1_vector_diagnostics, which --vector-abi now ru...
 - 2026-11-11 02:08 **S9-23** lead note: Lead: fix 276f029d is the requested one (undeclared shared job keeps 128 MiB; exclusive needs only the MemFree margin); moving to review so pm appr...
 - 2026-11-11 02:07 **S9-23** owner decide: Owner standing rule (2026-11-09, reminded 2026-11-10): the lead adds sessions unless two extensions in a row make no progress. Sessions raised to 3...
 - 2026-11-11 02:07 **S9-23** lead amend: sessions 2 -> 3 under the owner standing rule (2026-11-09, reminded 2026-11-10): progress made (head 276f029d).
@@ -205,16 +206,15 @@ Current tickets: `[###################-]` 165 of 173
 - 2026-11-11 02:02 **S9-23** lead approve-red: Red approved for round 2: the renamed shared-mode test now expects an undeclared job to keep the 128 MiB default, which fails on the previous head ...
 - 2026-11-11 01:59 **S9-23** engineer red: Round 2 fix is a tests+code fix already green; red approved earlier by lead (01:02). Test test_shared_undeclared_keeps_the_128_mib_default now expe...
 - 2026-11-11 01:56 **S10-01** lead changes: Red tests are sound: the T1 register and stack-slot scans, the card values (exact in float, 4326 checked) and both -O0/-O2 cross-TU directions look...
-- 2026-11-11 01:53 **S9-23** lead changes: pm approve refused: Cygwin tests/tools/test_card_run.py ran past 20 minutes. It hangs in test_core_claims_include_every_project_and_release_on_fini...
 
 ## Cost
 
 - From the script, engineer: 390 sessions, 854.3M input tokens
 - From the script, lead: 248 sessions, 73.5M input tokens
-- Started by hand, Claude: 11 sessions, 2270.6M input tokens
+- Started by hand, Claude: 11 sessions, 2271.5M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 23.2 GiB of 100 GiB. 89 GiB free on the drive.
+The project uses 23.2 GiB of 100 GiB. 98 GiB free on the drive.
