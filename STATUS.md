@@ -42,7 +42,7 @@ Current tickets: `[###################-]` 173 of 175
 | S10-01 | 512-bit vector arguments and results under -march=knc (ADR-0014 point 1) | Done | 64-byte vectors (__m512 and vector_size(64)) can now be passed to and returned from functions under -march=... |
 | S10-02 | libknc_vmath v0 - build and requalify expf, logf, powf, exp, log, pow with GCC-KNC on the card | Done | Card qualification 2026-11-11 09:32-10:37Z (268M inputs each): expf 0.5016, logf 0.8106, exp 0.5079, log 0.... |
 | S10-03 | Loops call libknc_vmath - -mveclibabi=knc, by-value entry points, automatic link (ADR-0014 points 2-3) | Done | Loops that call expf, logf, powf, exp, log or pow now vectorize under -march=knc and call GCC-KNC's own vec... |
-| S10-04 | Measure vector math - math kernels and a WRF-shaped physics loop, vector vs scalar libm | Not started |  |
+| S10-04 | Measure vector math - math kernels and a WRF-shaped physics loop, vector vs scalar libm | In progress |  |
 | S10-05 | Sprint 10 batch check | Not started | deps add S10-06 |
 | S10-06 | Card qualification - classify powf's 848 special-case mismatches and certify pow under 1 ULP | Done | The powf and pow card failures were traced to the card's own libm (its powl gives NaN for negative x with h... |
 | S2-01 | Design for zmm and mask registers under -march=knc | Done | The register design for KNC is settled on paper: all 32 zmm and 8 mask registers become usable under -march... |
@@ -213,7 +213,7 @@ Current tickets: `[###################-]` 173 of 175
 
 - From the script, engineer: 403 sessions, 883.5M input tokens
 - From the script, lead: 253 sessions, 74.9M input tokens
-- Started by hand, Claude: 11 sessions, 2358.7M input tokens
+- Started by hand, Claude: 11 sessions, 2360.5M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
