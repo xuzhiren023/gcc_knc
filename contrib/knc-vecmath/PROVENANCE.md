@@ -10,6 +10,7 @@ depend on the PhiWeather tree; this is a copy.
 | `native/translation/libknc_mvec/` | `native/translation/libknc_mvec/` (whole folder) |
 | `native/upstream/arm-optimized-routines-v26.01/`, `-dp/` | `LICENSE`, `README.phiweather.md`, `upstream.lock.json`, and `-dp/math/math_config.h` (the header the sources include) |
 | `native/upstream/arm-optimized-routines-v26.01/math/exp2f_data.c`, `math_config.h` | same path (added 2026-11-06 for the `powf` build; `math_config.h` is identical to the `-dp` copy) |
+| `native/upstream/arm-optimized-routines-v26.01-dp/math/exp_data.c`, `log_data.c` | same path (added 2026-11-11 by S10-02 for `libknc_vmath`'s `exp`, `log` and `pow`; already listed in that folder's `upstream.lock.json` and byte-identical to it) |
 | `receipts/knc-g5-*.json` | `artifacts/native/knc-g5-*.json` (qualification receipts) |
 
 The folder layout is kept so the sources' relative `#include` paths still resolve.
