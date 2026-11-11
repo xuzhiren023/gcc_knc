@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-11 02:38.
+Updated automatically at every ticket change. Last update: 2026-11-11 02:58.
 
-**Next: GPT-6.1, on S10-01 (512-bit vector arguments and results under -march=knc (ADR-0014 point 1)).** Run `python tools/dispatch.py`, or ask the tech lead to.
+**Next: the tech lead, on S10-02.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[###################-]` 166 of 173
 
@@ -40,7 +40,7 @@ Current tickets: `[###################-]` 166 of 173
 | S1-06 | K1OM link defaults | Done | GCC 16 now targets the K1OM ABI by default: it passes --march=k1om to as and -m elf_k1om to ld, uses the /l... |
 | S1-07 | Milestone M0 evidence note | Done | M0 is settled as adjust: GCC 16.2 builds a k1om cc1 whose assembly the 2.22 assembler accepts, an options-f... |
 | S10-01 | 512-bit vector arguments and results under -march=knc (ADR-0014 point 1) | In progress | Red accepted: T1 register and 64-byte stack-slot scans, -O0/-O2 cross-TU card pair (4326 exact checks), and... |
-| S10-02 | libknc_vmath v0 - build and requalify expf, logf, powf, exp, log, pow with GCC-KNC on the card | In progress |  |
+| S10-02 | libknc_vmath v0 - build and requalify expf, logf, powf, exp, log, pow with GCC-KNC on the card | Question for the tech lead | KNC pow blocked: pow_e8.c:24-25 static helpers pass 64-byte vectors by value; built cc1 (2026-11-10 19:14, ... |
 | S10-03 | Loops call libknc_vmath - -mveclibabi=knc, by-value entry points, automatic link (ADR-0014 points 2-3) | Not started |  |
 | S10-04 | Measure vector math - math kernels and a WRF-shaped physics loop, vector vs scalar libm | Not started |  |
 | S10-05 | Sprint 10 batch check | Not started |  |
@@ -198,6 +198,7 @@ Current tickets: `[###################-]` 166 of 173
 
 ## Recent activity
 
+- 2026-11-11 02:58 **S10-02** engineer ask: KNC pow blocked: pow_e8.c:24-25 static helpers pass 64-byte vectors by value; built cc1 (2026-11-10 19:14, pre-S10-01) errors 'unsupported KNC regi...
 - 2026-11-11 02:38 **S9-20** lead note: Card 2026-11-11 (no memory limit, S9-23), M2 at 4 threads/core, median ratio to default: nosched 0.995-1.013, pre 0.993-1.005, prepress 0.997-1.005...
 - 2026-11-11 02:35 **S10-01** lead approve-red: Red accepted: T1 register and 64-byte stack-slot scans, -O0/-O2 cross-TU card pair (4326 exact checks), and the variadic guard (unnamed and named v...
 - 2026-11-11 02:34 **S9-23** lead approve: In our exclusive card turns, jobs now run with no address-space limit unless a profile (3100, 5100) or the config asks for one, so 240-thread progr...
@@ -205,16 +206,15 @@ Current tickets: `[###################-]` 166 of 173
 - 2026-11-11 02:25 **S10-01** engineer red: Guard at aa506820: -DABI_VECTOR_VARIADIC_CALL and _NAMED in knc-abi-mixed.c, checked at -O0/-O2 by t1_vector_diagnostics, which --vector-abi now ru...
 - 2026-11-11 02:08 **S9-23** lead note: Lead: fix 276f029d is the requested one (undeclared shared job keeps 128 MiB; exclusive needs only the MemFree margin); moving to review so pm appr...
 - 2026-11-11 02:07 **S9-23** owner decide: Owner standing rule (2026-11-09, reminded 2026-11-10): the lead adds sessions unless two extensions in a row make no progress. Sessions raised to 3...
-- 2026-11-11 02:07 **S9-23** lead amend: sessions 2 -> 3 under the owner standing rule (2026-11-09, reminded 2026-11-10): progress made (head 276f029d).
 
 ## Cost
 
 - From the script, engineer: 391 sessions, 858.9M input tokens
 - From the script, lead: 248 sessions, 73.5M input tokens
-- Started by hand, Claude: 11 sessions, 2287.7M input tokens
+- Started by hand, Claude: 11 sessions, 2288.6M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 23.1 GiB of 100 GiB. 92 GiB free on the drive.
+The project uses 23.2 GiB of 100 GiB. 96 GiB free on the drive.
