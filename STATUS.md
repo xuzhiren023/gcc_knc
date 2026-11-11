@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-11 16:29.
+Updated automatically at every ticket change. Last update: 2026-11-11 16:32.
 
-**Next: GPT-6.1, on S10-09 (User story - double-precision loops with division and square root vectorize, correctly rounded (V8DF div, cond_div, sqrt)).** Run `python tools/dispatch.py`, or ask the tech lead to.
+**Next: the tech lead, on S10-09.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[###################-]` 177 of 182
 
@@ -47,7 +47,7 @@ Current tickets: `[###################-]` 177 of 182
 | S10-06 | Card qualification - classify powf's 848 special-case mismatches and certify pow under 1 ULP | Done | The powf and pow card failures were traced to the card's own libm (its powl gives NaN for negative x with h... |
 | S10-07 | Vector math v1a - the copied functions (sin, cos, tan, log10, atan, atan2, hyperbolics, bounded groups) in libknc_vmath and the vectorizer hook | Done | Card 2026-11-11 (S10-08 build, 240 threads): full set PASS for sinf 0.499999, cosf 0.499998, tanf 0.499995,... |
 | S10-08 | Vector math v1b - the rest of the libmvec set (acos, asin, cbrt, erf, erfc, exp2, exp10, expm1, log1p, log2, hypot, sincos) | Done | The vector math library now covers the whole set GCC vectorizes with glibc's libmvec: acos, asin, cbrt, erf... |
-| S10-09 | User story - double-precision loops with division and square root vectorize, correctly rounded (V8DF div, cond_div, sqrt) | In progress | Owner standing rule: session budget raised to 8 (second extension; the branch has progressed: V8DF div, con... |
+| S10-09 | User story - double-precision loops with division and square root vectorize, correctly rounded (V8DF div, cond_div, sqrt) | Question for the tech lead | Implementation and acceptance checks pass, but submit refuses 2066 changed lines against the 800-line budge... |
 | S10-10 | Card harness fixes from the Sprint 10 card turn - card_qualify binary folder, vmath bench batch sizing | In progress | Lead 2026-11-11 14:15 EST: card_qualify now passes --threads 240 (each job ran on one core). pow full on th... |
 | S10-11 | Card-only vector math failures - double sin, cos, tan, atan2 above 1 ULP, and cbrt/cbrtf crash (SIGSEGV) | In progress |  |
 | S11-01 | User story - the best way to move data between the host and the card, measured, and how our projects use it | Not started | Owner 2026-11-11 10:45 EST: do not start yet (usage at 95%, wait for tonight's reset). |
@@ -207,6 +207,7 @@ Current tickets: `[###################-]` 177 of 182
 
 ## Recent activity
 
+- 2026-11-11 16:32 **S10-09** engineer ask: Implementation and acceptance checks pass, but submit refuses 2066 changed lines against the 800-line budget. May this ticket use --override for th...
 - 2026-11-11 15:32 **S11-02** lead amend: ready; waits on its dep S11-01, the lead writes acceptance before it starts
 - 2026-11-11 15:32 **S10-09** owner decide: Owner standing rule: session budget raised to 8 (second extension; the branch has progressed: V8DF div, cond_div, sqrt, cond_sqrt and costs committ...
 - 2026-11-11 15:32 **S10-09** lead amend: sessions 8: three of the four were cut off by the Claude usage limit (exit 1, no work lost); engineers are Codex from now (owner 2026-11-11)
@@ -214,13 +215,12 @@ Current tickets: `[###################-]` 177 of 182
 - 2026-11-11 15:28 **S10-07** lead note: Card 2026-11-11 (S10-08 build, 240 threads): full set PASS for sinf 0.499999, cosf 0.499998, tanf 0.499995, log10f 0.8197, atanf 0.499995, atan2f 0...
 - 2026-11-11 14:13 **S10-10** lead note: Lead 2026-11-11 14:15 EST: card_qualify now passes --threads 240 (each job ran on one core). pow full on the card: checked lanes max 0.507 ULP but ...
 - 2026-11-11 11:51 **S10-05** lead note: Card 2026-11-11 14:16-16:56Z at knc b91ca0b5e67/f81579bb82a: execute suite 1681/1681 PASS. Vector math v0 on the card (corrected reference): expf 0...
-- 2026-11-11 10:36 **S11-01** lead note: Owner 2026-11-11 10:45 EST: do not start yet (usage at 95%, wait for tonight's reset).
 
 ## Cost
 
 - From the script, engineer: 413 sessions, 926.4M input tokens
 - From the script, lead: 256 sessions, 76.4M input tokens
-- Started by hand, Claude: 11 sessions, 2433.6M input tokens
+- Started by hand, Claude: 11 sessions, 2434.9M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
