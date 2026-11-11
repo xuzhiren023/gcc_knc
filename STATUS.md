@@ -1,10 +1,10 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-11 06:08.
+Updated automatically at every ticket change. Last update: 2026-11-11 06:52.
 
-**Next: the tech lead, on S10-03.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: GPT-6.1, on S10-04 (Measure vector math - math kernels and a WRF-shaped physics loop, vector vs scalar libm).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
-Current tickets: `[###################-]` 172 of 175
+Current tickets: `[###################-]` 173 of 175
 
 ## Milestones
 
@@ -13,7 +13,7 @@ Current tickets: `[###################-]` 172 of 175
 | M0 | Foundation | In progress | 17 of 17 tickets |
 | M1 | Mixed native code | Done | 43 of 43 tickets |
 | M2 | Useful vector target | Done | 51 of 51 tickets |
-| M3 | Runtimes | In progress | 38 of 41 tickets |
+| M3 | Runtimes | Done | 39 of 41 tickets |
 | M4 | Broad optimization | Not started | Not planned in detail yet |
 | M5 | Program corpus | Not started | Not planned in detail yet |
 | M6 | Release | Not started | Not planned in detail yet |
@@ -41,7 +41,7 @@ Current tickets: `[###################-]` 172 of 175
 | S1-07 | Milestone M0 evidence note | Done | M0 is settled as adjust: GCC 16.2 builds a k1om cc1 whose assembly the 2.22 assembler accepts, an options-f... |
 | S10-01 | 512-bit vector arguments and results under -march=knc (ADR-0014 point 1) | Done | 64-byte vectors (__m512 and vector_size(64)) can now be passed to and returned from functions under -march=... |
 | S10-02 | libknc_vmath v0 - build and requalify expf, logf, powf, exp, log, pow with GCC-KNC on the card | Done | Card qualification 2026-11-11 09:32-10:37Z (268M inputs each): expf 0.5016, logf 0.8106, exp 0.5079, log 0.... |
-| S10-03 | Loops call libknc_vmath - -mveclibabi=knc, by-value entry points, automatic link (ADR-0014 points 2-3) | Waiting for review | Card 2026-11-11: vmath loop program: expf, exp, logf, log, pow agree with scalar libm within 1 ULP on 4099 ... |
+| S10-03 | Loops call libknc_vmath - -mveclibabi=knc, by-value entry points, automatic link (ADR-0014 points 2-3) | Done | Loops that call expf, logf, powf, exp, log or pow now vectorize under -march=knc and call GCC-KNC's own vec... |
 | S10-04 | Measure vector math - math kernels and a WRF-shaped physics loop, vector vs scalar libm | Not started |  |
 | S10-05 | Sprint 10 batch check | Not started | deps add S10-06 |
 | S10-06 | Card qualification - classify powf's 848 special-case mismatches and certify pow under 1 ULP | Done | The powf and pow card failures were traced to the card's own libm (its powl gives NaN for negative x with h... |
@@ -200,6 +200,7 @@ Current tickets: `[###################-]` 172 of 175
 
 ## Recent activity
 
+- 2026-11-11 06:52 **S10-03** lead approve: Loops that call expf, logf, powf, exp, log or pow now vectorize under -march=knc and call GCC-KNC's own vector math library, linked automatically, ...
 - 2026-11-11 06:08 **S9-11** lead approve: Sprint 9's final compiler passes the full execute suite on the card (1681/1681), matches stock GCC on x86, has 0 ICE in both sweeps and textual-onl...
 - 2026-11-11 05:58 **S9-11** lead note: Card part complete 2026-11-11 10:37Z on the S9-25 libgomp (flat barrier default), no memory limit: S9-06 at 60 and 240 threads pass; S9-09 suite pa...
 - 2026-11-11 05:58 **S10-06** lead approve: The powf and pow card failures were traced to the card's own libm (its powl gives NaN for negative x with huge even y), not to our functions; both ...
@@ -207,16 +208,15 @@ Current tickets: `[###################-]` 172 of 175
 - 2026-11-11 05:47 **S10-06** engineer submit: Verdict: REFERENCE (card powl NaNs x<0, integer |y|>=2^63). All 8,487,977 powf (not 848) and every pow special lane are that class; ours = Annex F....
 - 2026-11-11 05:39 **S10-06** lead note: S10-03 reinstalled libknc_vmath as -fPIC with hidden symbols (.work/_shared/S10-02/knc rebuilt): restage the qualification jobs from that build so ...
 - 2026-11-11 05:38 **S10-05** lead amend: deps add S10-06
-- 2026-11-11 05:38 **S10-03** engineer submit: Green: gcc db7b06406a9 KNC + 25fc35185be shared i386 (10 lines added, 1 changed) + 65cbad181a6 includes; project 416d60c1. Build PASS, prefix reins...
 
 ## Cost
 
 - From the script, engineer: 403 sessions, 883.5M input tokens
 - From the script, lead: 253 sessions, 74.9M input tokens
-- Started by hand, Claude: 11 sessions, 2353.1M input tokens
+- Started by hand, Claude: 11 sessions, 2358.7M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 23.6 GiB of 100 GiB. 94 GiB free on the drive.
+The project uses 23.6 GiB of 100 GiB. 115 GiB free on the drive.
