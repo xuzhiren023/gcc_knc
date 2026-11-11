@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-11 16:41.
+Updated automatically at every ticket change. Last update: 2026-11-11 16:42.
 
 **Waiting for you:** S10-10. Run `python tools/pm.py inbox`.
 
@@ -49,7 +49,7 @@ Current tickets: `[###################-]` 177 of 182
 | S10-08 | Vector math v1b - the rest of the libmvec set (acos, asin, cbrt, erf, erfc, exp2, exp10, expm1, log1p, log2, hypot, sincos) | Done | The vector math library now covers the whole set GCC vectorizes with glibc's libmvec: acos, asin, cbrt, erf... |
 | S10-09 | User story - double-precision loops with division and square root vectorize, correctly rounded (V8DF div, cond_div, sqrt) | Waiting for review | Lead (owner 2026-11-11 16:55 EST): the lead has no usage until the owner says it reset. If you hit an issue... |
 | S10-10 | Card harness fixes from the Sprint 10 card turn - card_qualify binary folder, vmath bench batch sizing | **Waiting for you** | Lead (owner 2026-11-11 16:55 EST): the lead has no usage until the owner says it reset. If you hit an issue... |
-| S10-11 | Card-only vector math failures - double sin, cos, tan, atan2 above 1 ULP, and cbrt/cbrtf crash (SIGSEGV) | Question for the tech lead | 3703126c adds KNC_LIB_FLAGS to x87 modes and removes assembly generation. Sin .s has FMA; cbrt stack access... |
+| S10-11 | Card-only vector math failures - double sin, cos, tan, atan2 above 1 ULP, and cbrt/cbrtf crash (SIGSEGV) | In progress | No card backtrace now: the lead has no card turn in this session. Don't wait for one. (1) cbrt/cbrtf: stage... |
 | S11-01 | User story - the best way to move data between the host and the card, measured, and how our projects use it | Not started | lane hold: owner 2026-11-11 16:45 EST, no new work until the owner says usage has reset; set lane back to t... |
 | S11-02 | card_run and run_suite move data by S11-01's recommended method, with fallback | Not started | ready; waits on its dep S11-01, the lead writes acceptance before it starts |
 | S2-01 | Design for zmm and mask registers under -march=knc | Done | The register design for KNC is settled on paper: all 32 zmm and 8 mask registers become usable under -march... |
@@ -207,6 +207,7 @@ Current tickets: `[###################-]` 177 of 182
 
 ## Recent activity
 
+- 2026-11-11 16:42 **S10-11** lead answer: No card backtrace now: the lead has no card turn in this session. Don't wait for one. (1) cbrt/cbrtf: stage a minimal card reproducer in .work/_sha...
 - 2026-11-11 16:40 **S10-11** engineer ask: 3703126c adds KNC_LIB_FLAGS to x87 modes and removes assembly generation. Sin .s has FMA; cbrt stack accesses appear aligned, cause unresolved. Two...
 - 2026-11-11 16:40 **S10-11** lead note: Lead (owner 2026-11-11 16:55 EST): the lead has no usage until the owner says it reset. If you hit an issue you cannot settle from the ticket and t...
 - 2026-11-11 16:40 **S10-10** lead note: Lead (owner 2026-11-11 16:55 EST): the lead has no usage until the owner says it reset. If you hit an issue you cannot settle from the ticket and t...
@@ -214,7 +215,6 @@ Current tickets: `[###################-]` 177 of 182
 - 2026-11-11 16:38 **S10-10** engineer escalate: Please resolve worktree git metadata permissions or perform the requested red-test-first rebase. git rebase main fails creating C:/Users/xuzhi/Docu...
 - 2026-11-11 16:37 **S11-01** lead amend: lane hold: owner 2026-11-11 16:45 EST, no new work until the owner says usage has reset; set lane back to tools then
 - 2026-11-11 16:37 **S10-10** engineer ask: I cannot satisfy the required red-test-first history because this worktree's git metadata is outside the writable roots: git rebase main fails crea...
-- 2026-11-11 16:35 **S10-11** lead changes: Good evidence for cos/tan/atan2: host x87 reproduces the card's exact bits, standard excess precision fixes it, so it is a library bug and no T1/T3...
 
 ## Cost
 
