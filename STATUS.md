@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-11 03:57.
+Updated automatically at every ticket change. Last update: 2026-11-11 03:58.
 
 **Next: the tech lead, on S9-11.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
@@ -40,7 +40,7 @@ Current tickets: `[###################-]` 168 of 174
 | S1-06 | K1OM link defaults | Done | GCC 16 now targets the K1OM ABI by default: it passes --march=k1om to as and -m elf_k1om to ld, uses the /l... |
 | S1-07 | Milestone M0 evidence note | Done | M0 is settled as adjust: GCC 16.2 builds a k1om cc1 whose assembly the 2.22 assembler accepts, an options-f... |
 | S10-01 | 512-bit vector arguments and results under -march=knc (ADR-0014 point 1) | Done | 64-byte vectors (__m512 and vector_size(64)) can now be passed to and returned from functions under -march=... |
-| S10-02 | libknc_vmath v0 - build and requalify expf, logf, powf, exp, log, pow with GCC-KNC on the card | In progress | Owner standing rule (2026-11-09, reminded 2026-11-10; blanket approval 2026-11-11): budget raised to 12M in... |
+| S10-02 | libknc_vmath v0 - build and requalify expf, logf, powf, exp, log, pow with GCC-KNC on the card | In progress | S10-01 is approved and merged into knc (2026-11-11). If the lane-1 prefix (.work/_shared/gcc-knc-16.2.0) do... |
 | S10-03 | Loops call libknc_vmath - -mveclibabi=knc, by-value entry points, automatic link (ADR-0014 points 2-3) | Not started |  |
 | S10-04 | Measure vector math - math kernels and a WRF-shaped physics loop, vector vs scalar libm | Not started |  |
 | S10-05 | Sprint 10 batch check | Not started |  |
@@ -199,6 +199,7 @@ Current tickets: `[###################-]` 168 of 174
 
 ## Recent activity
 
+- 2026-11-11 03:58 **S10-02** lead note: S10-01 is approved and merged into knc (2026-11-11). If the lane-1 prefix (.work/_shared/gcc-knc-16.2.0) does not yet accept 64-byte vector argumen...
 - 2026-11-11 03:57 **S10-01** lead approve: 64-byte vectors (__m512 and vector_size(64)) can now be passed to and returned from functions under -march=knc, in zmm0-zmm7 and zmm0 (ADR-0014); c...
 - 2026-11-11 03:46 **S9-11** lead note: Card 2026-11-11: execute suite on knc e6b6b55b5dc2: 1681/1681 pass. Card sets from S9-24 (08:21Z): S9-05 all expected, S9-06 60/240 pass with no me...
 - 2026-11-11 03:44 **S9-11** engineer submit: knc e6b6b55b5dc2 (tree = built 84c73d3882d). Drill textual only: master 12 files/23 hunks, same as S8-11 plus S9-13's mknc-card entry in the i386.o...
@@ -206,13 +207,12 @@ Current tickets: `[###################-]` 168 of 174
 - 2026-11-11 03:34 **S9-09** lead note: Card 2026-11-11 08:21Z on the S9-24 libgomp: suite and tasks/cancel pass (the SIGFPE is gone); measurements hier over flat: barrier 1.52-1.72x slow...
 - 2026-11-11 03:20 **S9-24** lead approve: KNC libgomp now uses the card-measured defaults: DELAY 128 while spinning, 200 ms of spinning before sleeping, and one malloc arena per CPU when no...
 - 2026-11-11 03:11 **S9-24** lead amend: heads set for approve
-- 2026-11-11 03:11 **S9-24** lead note: Lead: both protected paths are sanctioned (m2_kernels/build.py lane fix per Deliver 2; locks.c newline fix of the lead's own 58a2473 bug). Review: ...
 
 ## Cost
 
 - From the script, engineer: 396 sessions, 869.9M input tokens
 - From the script, lead: 250 sessions, 73.8M input tokens
-- Started by hand, Claude: 11 sessions, 2315.8M input tokens
+- Started by hand, Claude: 11 sessions, 2316.7M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
