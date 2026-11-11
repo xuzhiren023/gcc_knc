@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-11 04:42.
+Updated automatically at every ticket change. Last update: 2026-11-11 04:45.
 
 **Next: the tech lead, on S9-11.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
@@ -41,7 +41,7 @@ Current tickets: `[###################-]` 170 of 174
 | S1-07 | Milestone M0 evidence note | Done | M0 is settled as adjust: GCC 16.2 builds a k1om cc1 whose assembly the 2.22 assembler accepts, an options-f... |
 | S10-01 | 512-bit vector arguments and results under -march=knc (ADR-0014 point 1) | Done | 64-byte vectors (__m512 and vector_size(64)) can now be passed to and returned from functions under -march=... |
 | S10-02 | libknc_vmath v0 - build and requalify expf, logf, powf, exp, log, pow with GCC-KNC on the card | Done | libknc_vmath v0 builds for KNC with GCC-KNC: expf, logf, powf, exp, log and pow from the copied Arm routine... |
-| S10-03 | Loops call libknc_vmath - -mveclibabi=knc, by-value entry points, automatic link (ADR-0014 points 2-3) | Not started |  |
+| S10-03 | Loops call libknc_vmath - -mveclibabi=knc, by-value entry points, automatic link (ADR-0014 points 2-3) | In progress |  |
 | S10-04 | Measure vector math - math kernels and a WRF-shaped physics loop, vector vs scalar libm | Not started |  |
 | S10-05 | Sprint 10 batch check | Not started |  |
 | S2-01 | Design for zmm and mask registers under -march=knc | Done | The register design for KNC is settled on paper: all 32 zmm and 8 mask registers become usable under -march... |
@@ -212,7 +212,7 @@ Current tickets: `[###################-]` 170 of 174
 
 - From the script, engineer: 399 sessions, 875.3M input tokens
 - From the script, lead: 251 sessions, 73.9M input tokens
-- Started by hand, Claude: 11 sessions, 2331.9M input tokens
+- Started by hand, Claude: 11 sessions, 2334.7M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
