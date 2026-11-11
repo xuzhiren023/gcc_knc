@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-11 08:20.
+Updated automatically at every ticket change. Last update: 2026-11-11 09:09.
 
-**Next: GPT-6.1, on S10-08 (Vector math v1b - the rest of the libmvec set (acos, asin, cbrt, erf, erfc, exp2, exp10, expm1, log1p, log2, hypot, sincos)).** Run `python tools/dispatch.py`, or ask the tech lead to.
+**Next: the tech lead, on S10-08.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[###################-]` 176 of 177
 
@@ -46,7 +46,7 @@ Current tickets: `[###################-]` 176 of 177
 | S10-05 | Sprint 10 batch check | Done | The Sprint 10 compiler passes the host batch check: 344 local tests, torture sweeps with no internal compil... |
 | S10-06 | Card qualification - classify powf's 848 special-case mismatches and certify pow under 1 ULP | Done | The powf and pow card failures were traced to the card's own libm (its powl gives NaN for negative x with h... |
 | S10-07 | Vector math v1a - the copied functions (sin, cos, tan, log10, atan, atan2, hyperbolics, bounded groups) in libknc_vmath and the vectorizer hook | Done | The vector math library now also covers sin, cos, tan, log10, atan, atan2, sinh, cosh, tanh and their float... |
-| S10-08 | Vector math v1b - the rest of the libmvec set (acos, asin, cbrt, erf, erfc, exp2, exp10, expm1, log1p, log2, hypot, sincos) | In progress | Upstream supplied: Arm optimized-routines v26.01 (commit 649ccc8411e7c4862965710f25c570d854a1483f, the copi... |
+| S10-08 | Vector math v1b - the rest of the libmvec set (acos, asin, cbrt, erf, erfc, exp2, exp10, expm1, log1p, log2, hypot, sincos) | Tests waiting for review | Red 7ec8c967. T1 knc-vmath-v1b.c fails: loops call scalar acosf etc. (check_gcc16_t1-20261111-084113.log); ... |
 | S2-01 | Design for zmm and mask registers under -march=knc | Done | The register design for KNC is settled on paper: all 32 zmm and 8 mask registers become usable under -march... |
 | S2-02 | Float and double arguments and results in zmm lane 0 | Done | Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`). |
 | S2-03 | Varargs with the donor's register save area | Done | Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`). |
@@ -202,6 +202,7 @@ Current tickets: `[###################-]` 176 of 177
 
 ## Recent activity
 
+- 2026-11-11 09:09 **S10-08** engineer red: Red 7ec8c967. T1 knc-vmath-v1b.c fails: loops call scalar acosf etc. (check_gcc16_t1-20261111-084113.log); its sincos scans are green already: GCC ...
 - 2026-11-11 08:20 **S10-05** lead approve: The Sprint 10 compiler passes the host batch check: 344 local tests, torture sweeps with no internal compiler errors, the forward-port drill onto u...
 - 2026-11-11 08:10 **S10-05** engineer submit: Results at knc 1900ea2784e; knc then moved to b91ca0b5e67 (S10-07), GCC branch fast-forwarded, not rebuilt (lead 07:21: host parts stand). Drill te...
 - 2026-11-11 08:09 **S10-07** lead approve: The vector math library now also covers sin, cos, tan, log10, atan, atan2, sinh, cosh, tanh and their float forms (17 more entry points, within 1 U...
@@ -209,16 +210,15 @@ Current tickets: `[###################-]` 176 of 177
 - 2026-11-11 07:46 **S10-07** lead approve-red: Red approved: T1 fails as loops still call scalar libm; qualify_v1 (MPFR-exact, Annex F, masks, negatives) fails only at link. Decisions: (1) hyper...
 - 2026-11-11 07:43 **S10-07** engineer red: Red 287853e2. T1 knc-vmath-v1a.c fails: loops still call scalar sinf. tools/knc_vmath.py --out S10-07 fails only at link, 34 undefined entry points...
 - 2026-11-11 07:21 **S10-05** lead note: Lead: this batch check started before S10-07/S10-08 were added. Its host parts (x86, sweeps, drill, execute) at this head stand; the vector-math ca...
-- 2026-11-11 07:20 **S10-08** lead note: Upstream supplied: Arm optimized-routines v26.01 (commit 649ccc8411e7c4862965710f25c570d854a1483f, the copied tables' release) is checked out read-...
 
 ## Cost
 
 - From the script, engineer: 407 sessions, 899.1M input tokens
 - From the script, lead: 255 sessions, 76.1M input tokens
-- Started by hand, Claude: 11 sessions, 2388.2M input tokens
+- Started by hand, Claude: 11 sessions, 2389.8M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 23.6 GiB of 100 GiB. 118 GiB free on the drive.
+The project uses 23.6 GiB of 100 GiB. 110 GiB free on the drive.
