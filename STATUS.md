@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-11 07:06.
+Updated automatically at every ticket change. Last update: 2026-11-11 07:07.
 
 **Next: GPT-6.1, on S10-05 (Sprint 10 batch check).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
@@ -43,7 +43,7 @@ Current tickets: `[###################-]` 174 of 175
 | S10-02 | libknc_vmath v0 - build and requalify expf, logf, powf, exp, log, pow with GCC-KNC on the card | Done | Card qualification 2026-11-11 09:32-10:37Z (268M inputs each): expf 0.5016, logf 0.8106, exp 0.5079, log 0.... |
 | S10-03 | Loops call libknc_vmath - -mveclibabi=knc, by-value entry points, automatic link (ADR-0014 points 2-3) | Done | Loops that call expf, logf, powf, exp, log or pow now vectorize under -march=knc and call GCC-KNC's own vec... |
 | S10-04 | Measure vector math - math kernels and a WRF-shaped physics loop, vector vs scalar libm | Done | The vector-math benchmark (expf, logf, powf, exp, log, pow and a WRF-style theta-e column loop, vector libr... |
-| S10-05 | Sprint 10 batch check | Not started | deps add S10-06 |
+| S10-05 | Sprint 10 batch check | In progress | deps add S10-06 |
 | S10-06 | Card qualification - classify powf's 848 special-case mismatches and certify pow under 1 ULP | Done | The powf and pow card failures were traced to the card's own libm (its powl gives NaN for negative x with h... |
 | S2-01 | Design for zmm and mask registers under -march=knc | Done | The register design for KNC is settled on paper: all 32 zmm and 8 mask registers become usable under -march... |
 | S2-02 | Float and double arguments and results in zmm lane 0 | Done | Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`). |
@@ -213,7 +213,7 @@ Current tickets: `[###################-]` 174 of 175
 
 - From the script, engineer: 404 sessions, 885.3M input tokens
 - From the script, lead: 254 sessions, 75.0M input tokens
-- Started by hand, Claude: 11 sessions, 2360.5M input tokens
+- Started by hand, Claude: 11 sessions, 2363.4M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
