@@ -82,6 +82,14 @@ Expansion: `-O3 -march=knc -mtune=knc -fprefetch-loop-arrays -munroll-only-small
 - IEEE semantics stay: no `-ffast-math` or any part of it.
 - KNC only: with another `-march=` it is an error, and an x86 compiler does not accept it.
 
+What "best" means (owner, 2026-11-10): the one flag most people should use for speed on ordinary
+programs, so they need not combine flags themselves. It is not "every optimization on", and it need not
+beat `-O2` on every kernel. The bar is the best median across a set of ordinary programs, with no
+program more than 5% slower than `-O2 -march=knc` unless the cause is known. Its contents are chosen by
+that measurement on the M4 corpus (backlog E7-14); if `-O2` plus chosen extras beats `-O3`, the
+expansion changes to that. Until then it is `-O3` plus the KNC defaults, with S8-22's fix for the two
+`-O3` transforms that put x87 code on KNC hot paths.
+
 On a terminal, `-mphinix` also prints the rising-phoenix banner once, and draws an apt-style
 progress bar, one step per driver job (`[####......] 40%  compiling foo.c (2/5)`). The bar
 sits on the terminal's last line, below a scroll region, so warnings and errors scroll above it

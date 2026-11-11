@@ -147,6 +147,7 @@ Started as Sprint 8 on 2026-11-08 (owner blanket approval; `docs/sprints/SPRINT-
 | E7-11 | Accept ICC's per-loop pragmas (`prefetch`, `noprefetch`, `vector nontemporal`, `vector aligned`) and map them to existing machinery (review item 7) | Standard |
 | E7-12 | At 1-2 threads per core, long streaming loops want unroll 4, not S8-20's 2 (affine 3-7% at density 1, card 2026-11-10); distinguish long streams from one-iteration calls (short) by known or estimated trip count | Standard |
 | E7-13 | Unaligned scalar accesses are safe on KNC but slow (C13, card 2026-11-11: x87 stores 8x, 4- and 8-byte integer loads and stores 4x, x87 loads 2.4x): stop store merging and inline `memcpy`/`memset` from emitting misaligned scalar moves when alignment is unknown, under `-mtune=knc` | Standard |
+| E7-14 | Choose `-mphinix` contents by measurement on the M4 corpus: the best median over ordinary programs, no program more than 5% slower than `-O2` without a known cause (owner 2026-11-10); `-O3`-based or `-O2` plus chosen extras, whichever wins | Standard |
 | E7-05 | Milestone M4: corpus comparison against GCC 5.1.1, including held-out programs | Deep |
 
 ## E8 Program corpus and release (M5–M6)
