@@ -6,9 +6,11 @@
    next to this file.  Each case sets or clears GOMP_KNC_DELAY and runs what env.c runs at
    startup on k1om: gomp_knc_init_delay, then, with neither GOMP_SPINCOUNT nor
    OMP_WAIT_POLICY, do_adjust_default_spincount.  Expected: a positive 32-bit decimal count is
-   taken; anything else is reported once and the default delay of 32 is kept; the default spin
-   count is 3 msec at 1.1 GHz in delay periods, 3300000 / delay, at least 1; the verbose
-   omp_display_env line shows the delay in use.  */
+   taken; anything else is reported once and the default delay of 128 is kept (S9-24, from S9-08's
+   card data); the default spin count is 200 msec in delay periods at the clock this machine's
+   /proc/cpuinfo gives (S9-24, from S9-15's), 200000 * MHz / delay, at least 1; the verbose
+   omp_display_env line shows the delay in use.  The exact counts at the cards' clocks are
+   tests/regress/s9_12/topology_host.c's.  */
 #include "spincount.h"
 
 #include <stdarg.h>
@@ -16,7 +18,7 @@
 #include <string.h>
 
 /* As config/linux/knc/mutex.c.  */
-unsigned int gomp_knc_delay = 32;
+unsigned int gomp_knc_delay = GOMP_KNC_DELAY_DEFAULT;
 unsigned long long gomp_spin_count_var;
 
 static int errors;
@@ -37,35 +39,39 @@ static const struct test_case
 {
   const char *value;		/* GOMP_KNC_DELAY, or NULL when it is not set.  */
   unsigned int delay;		/* Expected gomp_knc_delay.  */
-  unsigned long long spin;	/* Expected default gomp_spin_count_var.  */
   int errors;			/* Expected reports.  */
 } cases[] =
 {
-  { NULL, 32, 103125, 0 },
-  { "128", 128, 25781, 0 },
-  { " 512 ", 512, 6445, 0 },
-  { "1", 1, 3300000, 0 },
-  { "4294967295", 4294967295u, 1, 0 },
-  { "", 32, 103125, 1 },
-  { "0", 32, 103125, 1 },
-  { "-32", 32, 103125, 1 },
-  { "32x", 32, 103125, 1 },
-  { "abc", 32, 103125, 1 },
-  { "4294967296", 32, 103125, 1 }
+  { NULL, 128, 0 },
+  { "32", 32, 0 },
+  { " 512 ", 512, 0 },
+  { "1", 1, 0 },
+  { "4294967295", 4294967295u, 0 },
+  { "", 128, 1 },
+  { "0", 128, 1 },
+  { "-32", 128, 1 },
+  { "32x", 128, 1 },
+  { "abc", 128, 1 },
+  { "4294967296", 128, 1 }
 };
 
 int
 main (void)
 {
   int failed = 0;
+  unsigned int mhz = gomp_knc_read_mhz ("");
+  printf ("clock %u MHz\n", mhz);
   for (size_t i = 0; i < sizeof cases / sizeof cases[0]; i++)
     {
       const struct test_case *c = &cases[i];
+      unsigned long long spin = 200000ULL * mhz / c->delay;
+      if (spin == 0)
+	spin = 1;
       if (c->value)
 	setenv ("GOMP_KNC_DELAY", c->value, 1);
       else
 	unsetenv ("GOMP_KNC_DELAY");
-      gomp_knc_delay = 32;
+      gomp_knc_delay = GOMP_KNC_DELAY_DEFAULT;
       gomp_spin_count_var = 300000;
       errors = 0;
 
@@ -84,12 +90,12 @@ main (void)
 	  fclose (f);
 	}
 
-      bool ok = (gomp_knc_delay == c->delay && gomp_spin_count_var == c->spin
+      bool ok = (gomp_knc_delay == c->delay && gomp_spin_count_var == spin
 		 && errors == c->errors && strcmp (got, want) == 0);
       printf ("%s GOMP_KNC_DELAY=%s%s%s: delay %u (want %u), spin count %llu (want %llu), "
 	      "%d reports (want %d), display \"%.*s\"\n",
 	      ok ? "ok  " : "FAIL", c->value ? "'" : "", c->value ? c->value : "unset",
-	      c->value ? "'" : "", gomp_knc_delay, c->delay, gomp_spin_count_var, c->spin,
+	      c->value ? "'" : "", gomp_knc_delay, c->delay, gomp_spin_count_var, spin,
 	      errors, c->errors, (int) strcspn (got, "\n"), got);
       failed += !ok;
     }

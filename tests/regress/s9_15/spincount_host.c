@@ -3,8 +3,8 @@
    7120's 1238 MHz.  tools/s9_15_checks.py host compiles this against the lane's card.h; the card
    runner (tools/s9_15_checks.py build) sets GOMP_SPINCOUNT from the same function.
 
-   Expected: msec * 1000 * mhz / delay cycles, rounded down, at least 1; the 3 msec default of
-   gomp_knc_default_spincount is the same arithmetic.  */
+   Expected: msec * 1000 * mhz / delay cycles, rounded down, at least 1; the default of
+   gomp_knc_default_spincount is the same arithmetic for 200 msec (S9-24).  */
 #include "card.h"
 
 static const struct test_case
@@ -41,10 +41,10 @@ main (void)
   for (unsigned int mhz = 1100; mhz <= 1238; mhz += 138)
     for (unsigned int delay = 32; delay <= 128; delay *= 4)
       {
-	unsigned long long want = gomp_knc_spincount (3, mhz, delay);
+	unsigned long long want = gomp_knc_spincount (200, mhz, delay);
 	unsigned long long got = gomp_knc_default_spincount (mhz, delay);
 	bool ok = got == want;
-	printf ("%s default at %u MHz, DELAY %u: %llu (want the 3 msec count %llu)\n",
+	printf ("%s default at %u MHz, DELAY %u: %llu (want the 200 msec count %llu)\n",
 		ok ? "ok  " : "FAIL", mhz, delay, got, want);
 	failed += !ok;
 	n++;
