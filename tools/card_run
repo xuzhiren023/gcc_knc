@@ -362,14 +362,17 @@ def run(program, argv, *, lock_path, external_locks, baseline_names, timeout,
             free = dict(line.split(":", 1) for line in snap["meminfo"].splitlines() if ":" in line)
             free_kb = int(free["MemFree"].split()[0])
             budget = MEMORY_BUDGET_MIB if shared else free_kb // 1024 - MEMORY_MARGIN_MIB
-            job_memory = declared_mb if declared_mb is not None else min(CARD_MEMORY_MIB, budget - reserved)
-            memory_ready = (job_memory > 0 and reserved + job_memory <= budget
+            unlimited = declared_mb is None and not shared
+            job_memory = (declared_mb if declared_mb is not None else
+                          128 if shared else 0)
+            memory_ready = (budget > 0 if unlimited else
+                            job_memory > 0 and reserved + job_memory <= budget
                             and free_kb - job_memory * 1024 >= MEMORY_MARGIN_MIB * 1024)
             if core_ready and memory_ready and not their_turn:
                 mapping = {cpu: core for cpu, core in topology.items() if core in selected}
                 # S9-23 (owner 2026-11-10): an exclusive job with no declared limit gets no
                 # RLIMIT_AS; the admission check above still ran on MemFree and the margin.
-                memory_mb = result["memory_mb"] = (job_memory if declared_mb is not None or shared else None)
+                memory_mb = result["memory_mb"] = (None if unlimited else job_memory)
                 break
             if benchmark and not queued:
                 append_ledger(ledger_path, dict(agent="claude", project=PROJECT, jobId=job_id,

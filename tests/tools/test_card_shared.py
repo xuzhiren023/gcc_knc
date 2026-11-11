@@ -400,7 +400,7 @@ class SharedCardRules(unittest.TestCase):
         self.invoke()
         self.assertIn("wait", [e[0] for e in self.transport.events])
 
-    def test_shared_default_keeps_the_ten_gib_cap(self):
+    def test_shared_undeclared_keeps_the_128_mib_default(self):
         del self.config["memoryMB"]
         self.ledger.write_text(json.dumps(dict(agent="codex", project="other", jobId="other-1", event="start",
                       memoryLimitMiB=512, cores=[31], startTime="2099-01-01T00:00:00Z",
@@ -408,7 +408,7 @@ class SharedCardRules(unittest.TestCase):
         self.transport.free_kb = [16 * 1024 * 1024]
         result = self.invoke()
         self.assertEqual(result.get("result_class"), "program", result.get("detail"))
-        self.assertEqual(self.events("execute")[0][3], 10240)
+        self.assertEqual(self.events("execute")[0][3], 128)
 
     def test_profiles_3100_and_5100_keep_their_limits_and_full_has_none(self):
         for profile, limit in (("3100", 5632), ("5100", 7680), ("full", None)):
