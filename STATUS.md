@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-11 01:00.
+Updated automatically at every ticket change. Last update: 2026-11-11 01:02.
 
-**Waiting for you:** S9-23. Run `python tools/pm.py inbox`.
+**Next: the tech lead, on S9-23.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[###################-]` 165 of 167
 
@@ -188,10 +188,11 @@ Current tickets: `[###################-]` 165 of 167
 | S9-20 | Experiment - how much does instruction scheduling help the in-order core, at 1 and 4 threads per core? | Done | Card 2026-11-11, 1 thread/core, ratio to -O2 default: nosched affine 1.11, mat8 1.05; prepress affine 0.92,... |
 | S9-21 | S9-18 PGO training script - BusyBox od has no -A/-t, so no profile came back | Done | The S9-18 PGO training script now dumps profiles with od -b -v, which BusyBox 1.19 on the card supports, an... |
 | S9-22 | S9-18 PGO rebuild fails with coverage-mismatch on the card profiles - make the two builds identical | Done | The PGO experiment's two builds now use identical compile commands, so profiles collected on the card can b... |
-| S9-23 | card_run - no address-space limit in our exclusive turns (owner - "there is no job memory limit") | **Waiting for you** | S9-23 is in red-review but green code is already committed on s9/S9-23 (I ran red late, after coding). Appr... |
+| S9-23 | card_run - no address-space limit in our exclusive turns (owner - "there is no job memory limit") | Waiting for review | Lead: the escalation was a lead matter, not an owner decision. Red ran after green, but the new tests fail ... |
 
 ## Recent activity
 
+- 2026-11-11 01:02 **S9-23** lead note: Lead: the escalation was a lead matter, not an owner decision. Red ran after green, but the new tests fail on the old code (engineer 00:53), which ...
 - 2026-11-11 00:53 **S9-23** engineer escalate: S9-23 is in red-review but green code is already committed on s9/S9-23 (I ran red late, after coding). Approve red, then the ticket can be submitte...
 - 2026-11-11 00:53 **S9-23** engineer red: tests fail on old code: exclusive default still limited to 128/budget, null memoryLimitMiB, full profile limited
 - 2026-11-11 00:37 **S9-18** lead note: Card 2026-11-11 04:43Z, three launches, single thread, ratio to -O2 (mean of rounds): skewed hint 0.962, wrong 1.007, PGO 0.809, PGO on the other m...
@@ -199,13 +200,12 @@ Current tickets: `[###################-]` 165 of 167
 - 2026-11-10 22:14 **S8-23** lead note: Lead review 2026-11-10: design accepted (the 21:29 lead answer and its conditions). Not approved before its card check, because it changes S8-02 sa...
 - 2026-11-10 22:12 **S8-23** engineer submit: S8-02 gather/scatter tail was the cause. GCC s8/S8-23 (3 commits on knc 92a1b1a): while_ult prefix masks use a masked unpack/pack pair; other masks...
 - 2026-11-10 21:29 **S8-23** lead answer: Go with (1). The aligned no-op high address keeps the reason for the old rule (the high half must never touch an unmapped line), so I accept it for...
-- 2026-11-10 21:28 **S8-23** engineer ask: Cause is S8-02's gather/scatter tail (remainder 1 at length 17: ~30 insns + gather + scatter vs S7's 7-insn x87 iteration); only vect-partial-vecto...
 
 ## Cost
 
 - From the script, engineer: 388 sessions, 849.8M input tokens
 - From the script, lead: 246 sessions, 72.9M input tokens
-- Started by hand, Claude: 11 sessions, 2236.8M input tokens
+- Started by hand, Claude: 11 sessions, 2244.1M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
