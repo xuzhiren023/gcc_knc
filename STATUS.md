@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-11 02:37.
+Updated automatically at every ticket change. Last update: 2026-11-11 02:38.
 
 **Next: GPT-6.1, on S10-01 (512-bit vector arguments and results under -march=knc (ADR-0014 point 1)).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
@@ -190,7 +190,7 @@ Current tickets: `[###################-]` 166 of 173
 | S9-17 | User guidance on the flags page - threads per core, first touch, regions, heap, and ICC differences | Done | The flags page now has a 'Writing fast code for KNC' section: threads per core, first touch and region size... |
 | S9-18 | Experiment - how much do branch hints and profile-guided optimization gain on KNC? | Done | Card 2026-11-11 04:43Z, three launches, single thread, ratio to -O2 (mean of rounds): skewed hint 0.962, wr... |
 | S9-19 | Experiment - auto-parallelization on KNC, and whether AutoFDO is possible on the card | Done | Card 2026-11-11: AutoFDO probe: kernel 2.6.38.8+mpss3.7.1, no perf binary, perf_event_paranoid 1, hw cycles... |
-| S9-20 | Experiment - how much does instruction scheduling help the in-order core, at 1 and 4 threads per core? | Done | Card 2026-11-11, 1 thread/core, ratio to -O2 default: nosched affine 1.11, mat8 1.05; prepress affine 0.92,... |
+| S9-20 | Experiment - how much does instruction scheduling help the in-order core, at 1 and 4 threads per core? | Done | Card 2026-11-11 (no memory limit, S9-23), M2 at 4 threads/core, median ratio to default: nosched 0.995-1.01... |
 | S9-21 | S9-18 PGO training script - BusyBox od has no -A/-t, so no profile came back | Done | The S9-18 PGO training script now dumps profiles with od -b -v, which BusyBox 1.19 on the card supports, an... |
 | S9-22 | S9-18 PGO rebuild fails with coverage-mismatch on the card profiles - make the two builds identical | Done | The PGO experiment's two builds now use identical compile commands, so profiles collected on the card can b... |
 | S9-23 | card_run - no address-space limit in our exclusive turns (owner - "there is no job memory limit") | Done | In our exclusive card turns, jobs now run with no address-space limit unless a profile (3100, 5100) or the ... |
@@ -198,6 +198,7 @@ Current tickets: `[###################-]` 166 of 173
 
 ## Recent activity
 
+- 2026-11-11 02:38 **S9-20** lead note: Card 2026-11-11 (no memory limit, S9-23), M2 at 4 threads/core, median ratio to default: nosched 0.995-1.013, pre 0.993-1.005, prepress 0.997-1.005...
 - 2026-11-11 02:35 **S10-01** lead approve-red: Red accepted: T1 register and 64-byte stack-slot scans, -O0/-O2 cross-TU card pair (4326 exact checks), and the variadic guard (unnamed and named v...
 - 2026-11-11 02:34 **S9-23** lead approve: In our exclusive card turns, jobs now run with no address-space limit unless a profile (3100, 5100) or the config asks for one, so 240-thread progr...
 - 2026-11-11 02:26 **S9-23** lead amend: head 1d09ead5: lead fixed the pin test fake exec for the unlimited case.
@@ -205,16 +206,15 @@ Current tickets: `[###################-]` 166 of 173
 - 2026-11-11 02:08 **S9-23** lead note: Lead: fix 276f029d is the requested one (undeclared shared job keeps 128 MiB; exclusive needs only the MemFree margin); moving to review so pm appr...
 - 2026-11-11 02:07 **S9-23** owner decide: Owner standing rule (2026-11-09, reminded 2026-11-10): the lead adds sessions unless two extensions in a row make no progress. Sessions raised to 3...
 - 2026-11-11 02:07 **S9-23** lead amend: sessions 2 -> 3 under the owner standing rule (2026-11-09, reminded 2026-11-10): progress made (head 276f029d).
-- 2026-11-11 02:05 **S9-23** lead escalate: budget: 2 engineer sessions used; the budget is 2
 
 ## Cost
 
 - From the script, engineer: 391 sessions, 858.9M input tokens
 - From the script, lead: 248 sessions, 73.5M input tokens
-- Started by hand, Claude: 11 sessions, 2285.1M input tokens
+- Started by hand, Claude: 11 sessions, 2287.7M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 23.1 GiB of 100 GiB. 94 GiB free on the drive.
+The project uses 23.1 GiB of 100 GiB. 92 GiB free on the drive.
