@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-11 04:20.
+Updated automatically at every ticket change. Last update: 2026-11-11 04:21.
 
-**Next: the tech lead, on S10-02.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: the tech lead, on S9-11.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[###################-]` 168 of 174
 
@@ -40,7 +40,7 @@ Current tickets: `[###################-]` 168 of 174
 | S1-06 | K1OM link defaults | Done | GCC 16 now targets the K1OM ABI by default: it passes --march=k1om to as and -m elf_k1om to ld, uses the /l... |
 | S1-07 | Milestone M0 evidence note | Done | M0 is settled as adjust: GCC 16.2 builds a k1om cc1 whose assembly the 2.22 assembler accepts, an options-f... |
 | S10-01 | 512-bit vector arguments and results under -march=knc (ADR-0014 point 1) | Done | 64-byte vectors (__m512 and vector_size(64)) can now be passed to and returned from functions under -march=... |
-| S10-02 | libknc_vmath v0 - build and requalify expf, logf, powf, exp, log, pow with GCC-KNC on the card | Question for the tech lead | Work done, submit refuses: 'no [red] test commit' (size overridden: 1652 of 2303 lines are copied Arm table... |
+| S10-02 | libknc_vmath v0 - build and requalify expf, logf, powf, exp, log, pow with GCC-KNC on the card | In progress | No waiver: the [red] check is hard and the type field needs the interactive lead. Split the one commit hone... |
 | S10-03 | Loops call libknc_vmath - -mveclibabi=knc, by-value entry points, automatic link (ADR-0014 points 2-3) | Not started |  |
 | S10-04 | Measure vector math - math kernels and a WRF-shaped physics loop, vector vs scalar libm | Not started |  |
 | S10-05 | Sprint 10 batch check | Not started |  |
@@ -199,6 +199,7 @@ Current tickets: `[###################-]` 168 of 174
 
 ## Recent activity
 
+- 2026-11-11 04:21 **S10-02** lead answer: No waiver: the [red] check is hard and the type field needs the interactive lead. Split the one commit honestly instead: git reset --soft main, the...
 - 2026-11-11 04:19 **S10-02** engineer ask: Work done, submit refuses: 'no [red] test commit' (size overridden: 1652 of 2303 lines are copied Arm tables). Rebased on main; tree rebuilt with S...
 - 2026-11-11 03:58 **S10-02** lead note: S10-01 is approved and merged into knc (2026-11-11). If the lane-1 prefix (.work/_shared/gcc-knc-16.2.0) does not yet accept 64-byte vector argumen...
 - 2026-11-11 03:57 **S10-01** lead approve: 64-byte vectors (__m512 and vector_size(64)) can now be passed to and returned from functions under -march=knc, in zmm0-zmm7 and zmm0 (ADR-0014); c...
@@ -206,7 +207,6 @@ Current tickets: `[###################-]` 168 of 174
 - 2026-11-11 03:44 **S9-11** engineer submit: knc e6b6b55b5dc2 (tree = built 84c73d3882d). Drill textual only: master 12 files/23 hunks, same as S8-11 plus S9-13's mknc-card entry in the i386.o...
 - 2026-11-11 03:34 **S9-11** lead amend: deps add S9-25 (flat barrier default). Card parts of this check are being run by the lead (2026-11-11 08:21Z: S9-05, S9-06 60/240, S9-09 suite pass...
 - 2026-11-11 03:34 **S9-09** lead note: Card 2026-11-11 08:21Z on the S9-24 libgomp: suite and tasks/cancel pass (the SIGFPE is gone); measurements hier over flat: barrier 1.52-1.72x slow...
-- 2026-11-11 03:20 **S9-24** lead approve: KNC libgomp now uses the card-measured defaults: DELAY 128 while spinning, 200 ms of spinning before sleeping, and one malloc arena per CPU when no...
 
 ## Cost
 
@@ -218,4 +218,4 @@ Current tickets: `[###################-]` 168 of 174
 
 ## Disk
 
-The project uses 23.3 GiB of 100 GiB. 95 GiB free on the drive.
+The project uses 23.4 GiB of 100 GiB. 95 GiB free on the drive.
