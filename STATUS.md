@@ -1,10 +1,10 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-11 04:23.
+Updated automatically at every ticket change. Last update: 2026-11-11 04:31.
 
-**Next: the tech lead, on S10-02.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: the tech lead, on S9-11.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
-Current tickets: `[###################-]` 168 of 174
+Current tickets: `[###################-]` 169 of 174
 
 ## Milestones
 
@@ -13,7 +13,7 @@ Current tickets: `[###################-]` 168 of 174
 | M0 | Foundation | In progress | 17 of 17 tickets |
 | M1 | Mixed native code | Done | 43 of 43 tickets |
 | M2 | Useful vector target | Done | 51 of 51 tickets |
-| M3 | Runtimes | In progress | 34 of 40 tickets |
+| M3 | Runtimes | In progress | 35 of 40 tickets |
 | M4 | Broad optimization | Not started | Not planned in detail yet |
 | M5 | Program corpus | Not started | Not planned in detail yet |
 | M6 | Release | Not started | Not planned in detail yet |
@@ -40,7 +40,7 @@ Current tickets: `[###################-]` 168 of 174
 | S1-06 | K1OM link defaults | Done | GCC 16 now targets the K1OM ABI by default: it passes --march=k1om to as and -m elf_k1om to ld, uses the /l... |
 | S1-07 | Milestone M0 evidence note | Done | M0 is settled as adjust: GCC 16.2 builds a k1om cc1 whose assembly the 2.22 assembler accepts, an options-f... |
 | S10-01 | 512-bit vector arguments and results under -march=knc (ADR-0014 point 1) | Done | 64-byte vectors (__m512 and vector_size(64)) can now be passed to and returned from functions under -march=... |
-| S10-02 | libknc_vmath v0 - build and requalify expf, logf, powf, exp, log, pow with GCC-KNC on the card | Waiting for review | Split per 04:21 answer: red 2e2cd7b7 (qualifier+runner only; host build fails 'knc_vmath.h: No such file'),... |
+| S10-02 | libknc_vmath v0 - build and requalify expf, logf, powf, exp, log, pow with GCC-KNC on the card | Done | libknc_vmath v0 builds for KNC with GCC-KNC: expf, logf, powf, exp, log and pow from the copied Arm routine... |
 | S10-03 | Loops call libknc_vmath - -mveclibabi=knc, by-value entry points, automatic link (ADR-0014 points 2-3) | Not started |  |
 | S10-04 | Measure vector math - math kernels and a WRF-shaped physics loop, vector vs scalar libm | Not started |  |
 | S10-05 | Sprint 10 batch check | Not started |  |
@@ -199,6 +199,7 @@ Current tickets: `[###################-]` 168 of 174
 
 ## Recent activity
 
+- 2026-11-11 04:31 **S10-02** lead approve: libknc_vmath v0 builds for KNC with GCC-KNC: expf, logf, powf, exp, log and pow from the copied Arm routines (provenance recorded), all within 1 ul...
 - 2026-11-11 04:23 **S10-02** engineer submit: Split per 04:21 answer: red 2e2cd7b7 (qualifier+runner only; host build fails 'knc_vmath.h: No such file'), green 7303fb8a; qualifier unchanged bet...
 - 2026-11-11 04:21 **S10-02** lead answer: No waiver: the [red] check is hard and the type field needs the interactive lead. Split the one commit honestly instead: git reset --soft main, the...
 - 2026-11-11 04:19 **S10-02** engineer ask: Work done, submit refuses: 'no [red] test commit' (size overridden: 1652 of 2303 lines are copied Arm tables). Rebased on main; tree rebuilt with S...
@@ -206,16 +207,15 @@ Current tickets: `[###################-]` 168 of 174
 - 2026-11-11 03:57 **S10-01** lead approve: 64-byte vectors (__m512 and vector_size(64)) can now be passed to and returned from functions under -march=knc, in zmm0-zmm7 and zmm0 (ADR-0014); c...
 - 2026-11-11 03:46 **S9-11** lead note: Card 2026-11-11: execute suite on knc e6b6b55b5dc2: 1681/1681 pass. Card sets from S9-24 (08:21Z): S9-05 all expected, S9-06 60/240 pass with no me...
 - 2026-11-11 03:44 **S9-11** engineer submit: knc e6b6b55b5dc2 (tree = built 84c73d3882d). Drill textual only: master 12 files/23 hunks, same as S8-11 plus S9-13's mknc-card entry in the i386.o...
-- 2026-11-11 03:34 **S9-11** lead amend: deps add S9-25 (flat barrier default). Card parts of this check are being run by the lead (2026-11-11 08:21Z: S9-05, S9-06 60/240, S9-09 suite pass...
 
 ## Cost
 
 - From the script, engineer: 398 sessions, 871.7M input tokens
 - From the script, lead: 251 sessions, 73.9M input tokens
-- Started by hand, Claude: 11 sessions, 2319.3M input tokens
+- Started by hand, Claude: 11 sessions, 2322.0M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 23.4 GiB of 100 GiB. 95 GiB free on the drive.
+The project uses 23.3 GiB of 100 GiB. 93 GiB free on the drive.
