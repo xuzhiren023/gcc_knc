@@ -1,10 +1,10 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-11 04:32.
+Updated automatically at every ticket change. Last update: 2026-11-11 04:42.
 
 **Next: the tech lead, on S9-11.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
-Current tickets: `[###################-]` 169 of 174
+Current tickets: `[###################-]` 170 of 174
 
 ## Milestones
 
@@ -13,7 +13,7 @@ Current tickets: `[###################-]` 169 of 174
 | M0 | Foundation | In progress | 17 of 17 tickets |
 | M1 | Mixed native code | Done | 43 of 43 tickets |
 | M2 | Useful vector target | Done | 51 of 51 tickets |
-| M3 | Runtimes | In progress | 35 of 40 tickets |
+| M3 | Runtimes | In progress | 36 of 40 tickets |
 | M4 | Broad optimization | Not started | Not planned in detail yet |
 | M5 | Program corpus | Not started | Not planned in detail yet |
 | M6 | Release | Not started | Not planned in detail yet |
@@ -195,10 +195,11 @@ Current tickets: `[###################-]` 169 of 174
 | S9-22 | S9-18 PGO rebuild fails with coverage-mismatch on the card profiles - make the two builds identical | Done | The PGO experiment's two builds now use identical compile commands, so profiles collected on the card can b... |
 | S9-23 | card_run - no address-space limit in our exclusive turns (owner - "there is no job memory limit") | Done | In our exclusive card turns, jobs now run with no address-space limit unless a profile (3100, 5100) or the ... |
 | S9-24 | Sprint 9 settings from the card data, and the harness fixes the batch check needs | Done | KNC libgomp now uses the card-measured defaults: DELAY 128 while spinning, 200 ms of spinning before sleepi... |
-| S9-25 | The per-core barrier is slower than the flat one on the card - make flat the default; fix S9-07's runner | Waiting for review | Red b96e847b default_barrier.c failed as expected; GCC 269c7c7f15e makes flat the default and keeps per-cor... |
+| S9-25 | The per-core barrier is slower than the flat one on the card - make flat the default; fix S9-07's runner | Done | KNC libgomp uses the flat barrier by default again (the per-core one was 1.5-2.5x slower on the card and st... |
 
 ## Recent activity
 
+- 2026-11-11 04:42 **S9-25** lead approve: KNC libgomp uses the flat barrier by default again (the per-core one was 1.5-2.5x slower on the card and stays behind a build switch), and the thre...
 - 2026-11-11 04:32 **S9-25** engineer submit: Red b96e847b default_barrier.c failed as expected; GCC 269c7c7f15e makes flat the default and keeps per-core behind -DGOMP_KNC_GROUP_BARRIER. s9_09...
 - 2026-11-11 04:31 **S10-02** lead approve: libknc_vmath v0 builds for KNC with GCC-KNC: expf, logf, powf, exp, log and pow from the copied Arm routines (provenance recorded), all within 1 ul...
 - 2026-11-11 04:23 **S10-02** engineer submit: Split per 04:21 answer: red 2e2cd7b7 (qualifier+runner only; host build fails 'knc_vmath.h: No such file'), green 7303fb8a; qualifier unchanged bet...
@@ -206,16 +207,15 @@ Current tickets: `[###################-]` 169 of 174
 - 2026-11-11 04:19 **S10-02** engineer ask: Work done, submit refuses: 'no [red] test commit' (size overridden: 1652 of 2303 lines are copied Arm tables). Rebased on main; tree rebuilt with S...
 - 2026-11-11 03:58 **S10-02** lead note: S10-01 is approved and merged into knc (2026-11-11). If the lane-1 prefix (.work/_shared/gcc-knc-16.2.0) does not yet accept 64-byte vector argumen...
 - 2026-11-11 03:57 **S10-01** lead approve: 64-byte vectors (__m512 and vector_size(64)) can now be passed to and returned from functions under -march=knc, in zmm0-zmm7 and zmm0 (ADR-0014); c...
-- 2026-11-11 03:46 **S9-11** lead note: Card 2026-11-11: execute suite on knc e6b6b55b5dc2: 1681/1681 pass. Card sets from S9-24 (08:21Z): S9-05 all expected, S9-06 60/240 pass with no me...
 
 ## Cost
 
 - From the script, engineer: 399 sessions, 875.3M input tokens
 - From the script, lead: 251 sessions, 73.9M input tokens
-- Started by hand, Claude: 11 sessions, 2324.7M input tokens
+- Started by hand, Claude: 11 sessions, 2331.9M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 23.3 GiB of 100 GiB. 93 GiB free on the drive.
+The project uses 23.4 GiB of 100 GiB. 94 GiB free on the drive.
