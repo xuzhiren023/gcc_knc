@@ -2,8 +2,10 @@
 """S9-09 libgomp KNC team barrier; invoke through tools/run.py.
 
     python tools/s9_09_checks.py host [--barriers N]
-        compiles tests/regress/s9_09/barrier_stress.c with the Cygwin GCC against the lane's
-        libgomp/config/linux/knc/bar.h, bar.c and simple-bar.h and runs its variants: 240 threads,
+        preprocesses tests/regress/s9_09/default_barrier.c against the lane's libgomp/config/linux/knc
+        (the default build has the one-level barrier, -DGOMP_KNC_GROUP_BARRIER the per-core one), then
+        compiles tests/regress/s9_09/barrier_stress.c with the Cygwin GCC against bar.h, bar.c and
+        simple-bar.h with -DGOMP_KNC_GROUP_BARRIER and runs its variants: 240 threads,
         100000 barriers each, 60 groups (the cancel variant 36 cores, so that the last group is
         smaller than the others).
     python tools/s9_09_checks.py build
@@ -13,8 +15,9 @@
           environment of its dg- lines (tests.txt);
         - tests/regress/s9_09/tasks_cancel.c (10000 tasks; cancel parallel) with libgomp.so.1;
         - tests/regress/s9_09/barrier_measure.c (measurements 2, 4 and 5) twice, with libgomp
-          linked in: the prefix's libgomp.a, and one built here from the same sources, config.h
-          and flags plus -DGOMP_KNC_FLAT_BARRIER, the one-level Linux barrier;
+          linked in: the prefix's libgomp.a (the one-level Linux barrier, the default), and one
+          built here from the same sources, config.h and flags plus -DGOMP_KNC_GROUP_BARRIER, the
+          per-core groups;
         - the lint, run.sh (the card program) and files.txt (its --file-list).
 
 Nothing runs natively here: the lead runs run.sh on the card.
@@ -40,6 +43,9 @@ OBJDIR = s7.BUILD / 'k1om-mpss-linux/libgomp'
 WORK = s7.SHARED / 'tmp/s9-09'
 OUT = s7.SHARED / 'S9-09'
 # (mode, gomp_knc_ncores)
+# The libgomp build-time switch to the per-core barrier; without it the KNC libgomp has the one-level
+# Linux barrier (S9-25).
+GROUP = '-DGOMP_KNC_GROUP_BARRIER'
 VARIANTS = (('plain', 60), ('tasks-park', 60), ('tasks-spin', 60), ('cancel', 36), ('order', 60))
 # libgomp/testsuite: the barrier, cancel, single, ordered and task tests of libgomp.c, the ones there
 # that use taskwait, and the taskwait tests of libgomp.c-c++-common.
@@ -174,49 +180,57 @@ def host_mode(args):
     WORK.mkdir(parents=True)
     test = WORK / 'barrier_stress.exe'
     includes = [LIBGOMP / 'config' / part for part in s9.CONFIG_PATH.split()]
-    rc, text = s7.capture(['gcc', '-std=gnu11', '-O2', '-Wall', '-pthread', *('-I%s' % d for d in includes),
+    failed = 0
+    for switch in ([], [GROUP]):
+        rc, text = s7.capture(['gcc', '-E', '-o', os.devnull, *switch, *('-I%s' % d for d in includes),
+                               '-I%s' % LIBGOMP, TESTS / 'default_barrier.c'])
+        kind = 'grouped (%s)' % GROUP if switch else 'default'
+        print('%s %s barrier' % ('FAIL' if rc else 'PASS', kind), flush=True)
+        if rc:
+            print('\n'.join(text.splitlines()[-5:]))
+        failed += rc != 0
+    rc, text = s7.capture(['gcc', '-std=gnu11', '-O2', '-Wall', '-pthread', GROUP, *('-I%s' % d for d in includes),
                            TESTS / 'barrier_stress.c', '-o', test])
     if rc or text.strip():
         print('\n'.join(text.splitlines()[-15:]))
     if rc:
         print('FAIL host: barrier_stress.c does not build against %s' % LIBGOMP)
         return 1
-    failed = 0
     for mode, ncores in VARIANTS:
         rc, text = s7.capture([test, mode, args.barriers, ncores], timeout=7200)
         print(text.strip() or 'FAIL %s: no output, exit %s' % (mode, rc), flush=True)
         failed += rc != 0
-    print('%s host: %d of %d variants failed' % ('FAIL' if failed else 'PASS', failed, len(VARIANTS)))
+    print('%s host: %d of %d checks failed' % ('FAIL' if failed else 'PASS', failed, 2 + len(VARIANTS)))
     return int(failed != 0)
 
 
-def flat_library(failures):
-    """libgomp.a with the one-level barrier: every C object of the build's libgomp, compiled as its
-    Makefile does (the non-PIC half of LTCOMPILE) plus -DGOMP_KNC_FLAT_BARRIER."""
+def group_library(failures):
+    """libgomp.a with the per-core barrier: every C object of the build's libgomp, compiled as its
+    Makefile does (the non-PIC half of LTCOMPILE) plus -DGOMP_KNC_GROUP_BARRIER."""
     make = (OBJDIR / 'Makefile').read_text()
 
     def var(name):
         return re.search(r'^%s = ((?:.*\\\n)*.*)$' % name, make, re.M).group(1).replace('\\\n', ' ').split()
     search = [LIBGOMP / 'config' / part for part in var('config_path')] + [LIBGOMP, LIBGOMP.parent / 'include']
     flags = ['-DHAVE_CONFIG_H', '-I', OBJDIR, '-I', LIBGOMP, *('-I%s' % d for d in search),
-             *(flag.replace('-Wc,', '') for flag in var('XCFLAGS')), *var('CFLAGS'), '-DGOMP_KNC_FLAT_BARRIER']
-    flat = WORK / 'flat'
-    shutil.rmtree(flat, ignore_errors=True)
-    flat.mkdir(parents=True)
+             *(flag.replace('-Wc,', '') for flag in var('XCFLAGS')), *var('CFLAGS'), GROUP]
+    group = WORK / 'group'
+    shutil.rmtree(group, ignore_errors=True)
+    group.mkdir(parents=True)
     jobs = []
     for name in var('am_libgomp_la_OBJECTS'):
         source = next((d / (name[:-3] + '.c') for d in search if (d / (name[:-3] + '.c')).is_file()), None)
         if name.endswith('.lo') and source:
-            jobs.append([s9.GCC, *flags, '-c', source, '-o', flat / (name[:-3] + '.o')])
+            jobs.append([s9.GCC, *flags, '-c', source, '-o', group / (name[:-3] + '.o')])
     with ThreadPoolExecutor(8) as pool:
         for job, (rc, text) in zip(jobs, pool.map(s7.capture, jobs)):
             if rc:
-                failures.append('flat libgomp: %s: %s' % (job[-3].name, text.strip()[-600:]))
-    archive = flat / 'libgomp.a'
+                failures.append('group libgomp: %s: %s' % (job[-3].name, text.strip()[-600:]))
+    archive = group / 'libgomp.a'
     rc, text = s7.capture([TC / 'cross/bin/k1om-mpss-linux-ar', 'rcs', archive, *(job[-1] for job in jobs)])
     if rc:
-        failures.append('flat libgomp: ar: ' + text.strip()[-300:])
-    print('flat libgomp.a: %d objects with %s' % (len(jobs), ' '.join(map(str, flags[5 + len(search):]))), flush=True)
+        failures.append('group libgomp: ar: ' + text.strip()[-300:])
+    print('group libgomp.a: %d objects with %s' % (len(jobs), ' '.join(map(str, flags[5 + len(search):]))), flush=True)
     return archive
 
 
@@ -239,7 +253,7 @@ def build_mode(args):
     (OUT / 'tests.txt').write_bytes(''.join(row + '\n' for row in rows).encode())
     print('%d libgomp testsuite programs: %s' % (len(rows), ' '.join(SUITE)), flush=True)
 
-    archives = {'hier': s9.LIBDIR / 'libgomp.a', 'flat': flat_library(failures)}
+    archives = {'hier': group_library(failures), 'flat': s9.LIBDIR / 'libgomp.a'}
     links = [([TESTS / 'tasks_cancel.c', '-fopenmp'], OUT / TASKS)]
     links += [([TESTS / 'barrier_measure.c', '-fopenmp', '-c'], WORK / 'barrier_measure.o')]
     links += [([WORK / 'barrier_measure.o', archive, '-pthread', '-ldl'], OUT / (MEASURE % kind))

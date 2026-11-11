@@ -47,8 +47,8 @@ RUN_SH = r'''#!/bin/sh
 # then the opt-out, then the explicit settings of docs/research/knc-libgomp.md section 3, which
 # must behave as before. The explicit strings are derived from the mask this script inherited, so
 # that they name no CPU outside it: one place per compute core with its CPUs in the mask
-# (OMP_PLACES; {1:4}:60:4 on the whole card), and the first CPU 4c+1 of each core that has it in
-# the mask (GOMP_CPU_AFFINITY; 1-237:4 on the whole card).
+# (OMP_PLACES; {1,2,3,4},...,{237,238,239,240} on the whole card), and the first CPU 4c+1 of each
+# core that has it in the mask (GOMP_CPU_AFFINITY; 1,5,...,237 on the whole card).
 # BusyBox 1.19 sh: no timeout applet, so a watcher kills a program after LIMIT seconds.
 cd -- "$(dirname -- "$0")" || exit 2
 LIMIT=300
@@ -91,22 +91,32 @@ job() {
 }
 
 # derive WIDTH: the first WIDTH CPUs of each compute core c (CPUs 4c+1..4c+4) that are in the
-# mask, as a place list "{1,2,3,4},{5,...}" for 4 and a CPU list "1,5,..." for 1.
+# mask, as a place list "{1,2,3,4},{5,...}" for 4 and a CPU list "1,5,..." for 1. BusyBox 1.19
+# awk reads a name followed by "(" as a function call, so no concatenation here starts with "(".
 mask=$(awk '/^Cpus_allowed_list:/ { print $2 }' /proc/$$/status)
 derive() {
     echo "$mask" | awk -F, -v width=$1 '
         { for (i = 1; i <= NF; i++) { n = split($i, r, "-"); for (c = r[1] + 0; c <= r[n] + 0; c++) m[c] = 1 } }
-        END { s = ""
+        END { s = ""; ssep = ""
               for (core = 0; core < 60; core++) {
-                  p = ""
-                  for (k = 1; k <= width; k++) if ((4 * core + k) in m) p = p (p == "" ? "" : ",") (4 * core + k)
-                  if (p != "") s = s (s == "" ? "" : ",") (width == 1 ? p : "{" p "}")
+                  p = ""; psep = ""
+                  for (k = 1; k <= width; k++) {
+                      cpu = 4 * core + k
+                      if (cpu in m) { p = p psep cpu; psep = "," }
+                  }
+                  if (p == "") continue
+                  if (width != 1) p = "{" p "}"
+                  s = s ssep p; ssep = ","
               }
               print s }'
 }
 places=$(derive 4)
 affinity=$(derive 1)
 echo "S9-07 mask $mask: OMP_PLACES=$places GOMP_CPU_AFFINITY=$affinity"
+if [ -z "$places" ] || [ -z "$affinity" ]; then
+    echo "RESULT derive UNEXPECTED: no explicit setting derived from mask $mask"
+    status=1
+fi
 
 job default-1-per-core cores 1 spread
 job default-2-per-core cores 2 spread
