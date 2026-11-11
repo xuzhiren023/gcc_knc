@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-11 16:39.
+Updated automatically at every ticket change. Last update: 2026-11-11 16:40.
 
 **Waiting for you:** S10-10. Run `python tools/pm.py inbox`.
 
@@ -48,7 +48,7 @@ Current tickets: `[###################-]` 177 of 182
 | S10-07 | Vector math v1a - the copied functions (sin, cos, tan, log10, atan, atan2, hyperbolics, bounded groups) in libknc_vmath and the vectorizer hook | Done | Card 2026-11-11 (S10-08 build, 240 threads): full set PASS for sinf 0.499999, cosf 0.499998, tanf 0.499995,... |
 | S10-08 | Vector math v1b - the rest of the libmvec set (acos, asin, cbrt, erf, erfc, exp2, exp10, expm1, log1p, log2, hypot, sincos) | Done | The vector math library now covers the whole set GCC vectorizes with glibc's libmvec: acos, asin, cbrt, erf... |
 | S10-09 | User story - double-precision loops with division and square root vectorize, correctly rounded (V8DF div, cond_div, sqrt) | Waiting for review | Lead (owner 2026-11-11 16:55 EST): the lead has no usage until the owner says it reset. If you hit an issue... |
-| S10-10 | Card harness fixes from the Sprint 10 card turn - card_qualify binary folder, vmath bench batch sizing | **Waiting for you** | Please resolve worktree git metadata permissions or perform the requested red-test-first rebase. git rebase... |
+| S10-10 | Card harness fixes from the Sprint 10 card turn - card_qualify binary folder, vmath bench batch sizing | **Waiting for you** | Lead (owner 2026-11-11 16:55 EST): the lead has no usage until the owner says it reset. If you hit an issue... |
 | S10-11 | Card-only vector math failures - double sin, cos, tan, atan2 above 1 ULP, and cbrt/cbrtf crash (SIGSEGV) | In progress | Good evidence for cos/tan/atan2: host x87 reproduces the card's exact bits, standard excess precision fixes... |
 | S11-01 | User story - the best way to move data between the host and the card, measured, and how our projects use it | Not started | lane hold: owner 2026-11-11 16:45 EST, no new work until the owner says usage has reset; set lane back to t... |
 | S11-02 | card_run and run_suite move data by S11-01's recommended method, with fallback | Not started | ready; waits on its dep S11-01, the lead writes acceptance before it starts |
@@ -207,6 +207,7 @@ Current tickets: `[###################-]` 177 of 182
 
 ## Recent activity
 
+- 2026-11-11 16:40 **S10-10** lead note: Lead (owner 2026-11-11 16:55 EST): the lead has no usage until the owner says it reset. If you hit an issue you cannot settle from the ticket and t...
 - 2026-11-11 16:39 **S10-09** lead note: Lead (owner 2026-11-11 16:55 EST): the lead has no usage until the owner says it reset. If you hit an issue you cannot settle from the ticket and t...
 - 2026-11-11 16:38 **S10-10** engineer escalate: Please resolve worktree git metadata permissions or perform the requested red-test-first rebase. git rebase main fails creating C:/Users/xuzhi/Docu...
 - 2026-11-11 16:37 **S11-01** lead amend: lane hold: owner 2026-11-11 16:45 EST, no new work until the owner says usage has reset; set lane back to tools then
@@ -214,7 +215,6 @@ Current tickets: `[###################-]` 177 of 182
 - 2026-11-11 16:35 **S10-11** lead changes: Good evidence for cos/tan/atan2: host x87 reproduces the card's exact bits, standard excess precision fixes it, so it is a library bug and no T1/T3...
 - 2026-11-11 16:35 **S10-10** lead answer: Use your one new test file, e.g. tests/vmath/test_s10_10_harness.py (not under tests/acceptance). It must cover: (a) card_qualify --dry-run --out o...
 - 2026-11-11 16:34 **S10-10** engineer ask: Ticket is a light code ticket with one new test file budget, but acceptance gives no named failing test or harness; changes implement the harness a...
-- 2026-11-11 16:34 **S10-09** engineer submit: Prior acceptance checks PASS; no passing tests rerun. T0/T1/T2/model: .work/_state/logs/check_gcc16_t0_t1_t2-20261111-115647.log. Acceptance and vm...
 
 ## Cost
 
