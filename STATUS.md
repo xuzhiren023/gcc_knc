@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-11 09:15.
+Updated automatically at every ticket change. Last update: 2026-11-11 09:16.
 
 **Waiting for you:** S10-08. Run `python tools/pm.py inbox`.
 
@@ -46,7 +46,7 @@ Current tickets: `[###################-]` 176 of 177
 | S10-05 | Sprint 10 batch check | Done | The Sprint 10 compiler passes the host batch check: 344 local tests, torture sweeps with no internal compil... |
 | S10-06 | Card qualification - classify powf's 848 special-case mismatches and certify pow under 1 ULP | Done | The powf and pow card failures were traced to the card's own libm (its powl gives NaN for negative x with h... |
 | S10-07 | Vector math v1a - the copied functions (sin, cos, tan, log10, atan, atan2, hyperbolics, bounded groups) in libknc_vmath and the vectorizer hook | Done | The vector math library now also covers sin, cos, tan, log10, atan, atan2, sinh, cosh, tanh and their float... |
-| S10-08 | Vector math v1b - the rest of the libmvec set (acos, asin, cbrt, erf, erfc, exp2, exp10, expm1, log1p, log2, hypot, sincos) | **Waiting for you** | budget: 15506867 input tokens used; the budget is 12000000 |
+| S10-08 | Vector math v1b - the rest of the libmvec set (acos, asin, cbrt, erf, erfc, exp2, exp10, expm1, log1p, log2, hypot, sincos) | **Waiting for you** | input_tokens 24000000 (deep ticket, red approved at 15.5M) |
 | S2-01 | Design for zmm and mask registers under -march=knc | Done | The register design for KNC is settled on paper: all 32 zmm and 8 mask registers become usable under -march... |
 | S2-02 | Float and double arguments and results in zmm lane 0 | Done | Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`). |
 | S2-03 | Varargs with the donor's register save area | Done | Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`). |
@@ -202,6 +202,7 @@ Current tickets: `[###################-]` 176 of 177
 
 ## Recent activity
 
+- 2026-11-11 09:16 **S10-08** lead amend: input_tokens 24000000 (deep ticket, red approved at 15.5M)
 - 2026-11-11 09:15 **S10-08** lead escalate: budget: 15506867 input tokens used; the budget is 12000000
 - 2026-11-11 09:14 **S10-08** lead approve-red: S10-08 red accepted: failing scans now show that loops of the 11 remaining libmvec functions (float and double) still call scalar libm, and the hos...
 - 2026-11-11 09:09 **S10-08** engineer red: Red 7ec8c967. T1 knc-vmath-v1b.c fails: loops call scalar acosf etc. (check_gcc16_t1-20261111-084113.log); its sincos scans are green already: GCC ...
@@ -209,13 +210,12 @@ Current tickets: `[###################-]` 176 of 177
 - 2026-11-11 08:10 **S10-05** engineer submit: Results at knc 1900ea2784e; knc then moved to b91ca0b5e67 (S10-07), GCC branch fast-forwarded, not rebuilt (lead 07:21: host parts stand). Drill te...
 - 2026-11-11 08:09 **S10-07** lead approve: The vector math library now also covers sin, cos, tan, log10, atan, atan2, sinh, cosh, tanh and their float forms (17 more entry points, within 1 U...
 - 2026-11-11 07:58 **S10-07** engineer submit: GCC 9a33551fe47, repo a7b4aa57. T1 green (305 PASS, check_gcc16_t1-20261111-075246.log). Host MPFR qualify: 17 functions PASS at 1.0 ULP, max 0.877...
-- 2026-11-11 07:46 **S10-07** lead approve-red: Red approved: T1 fails as loops still call scalar libm; qualify_v1 (MPFR-exact, Annex F, masks, negatives) fails only at link. Decisions: (1) hyper...
 
 ## Cost
 
 - From the script, engineer: 408 sessions, 914.6M input tokens
 - From the script, lead: 256 sessions, 76.4M input tokens
-- Started by hand, Claude: 11 sessions, 2389.8M input tokens
+- Started by hand, Claude: 11 sessions, 2390.7M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
