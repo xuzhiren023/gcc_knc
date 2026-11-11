@@ -216,7 +216,7 @@ def cpu_binding(cpuinfo):
 
 
 def run(program, argv, *, lock_path, external_locks, baseline_names, timeout,
-        transport_timeout, receipt_path, transport, ledger_path, memory_mb=128,
+        transport_timeout, receipt_path, transport, ledger_path, memory_mb=None,
         monotonic=time.monotonic, files=(), max_stage_mib=64, packed=False, stage_timeout=STAGE_TIMEOUT,
         threads=1, cores=None, benchmark=False, profile=None):
     result = dict(result_class="infrastructure", exit_code=INFRA_EXIT,
@@ -323,6 +323,7 @@ def run(program, argv, *, lock_path, external_locks, baseline_names, timeout,
             refuse_if_timed_job_open(active_jobs(read_ledger(ledger_path)))
         session = transport.connect(run_dir, timeout=transport_timeout)
         deadline = monotonic() + timeout
+        declared_mb = memory_mb
         while True:
             snap = snapshot()
             refuse_foreign_workload(snap)
@@ -356,17 +357,19 @@ def run(program, argv, *, lock_path, external_locks, baseline_names, timeout,
             core_ready = (not running and all(c in available for c in selected) if benchmark else
                           not foreign_queue and (fixed is not None or len(selected) >= math.ceil(threads / 4))
                           and all(c in available for c in selected))
-            reserved = sum(int(j.get("memoryLimitMiB", j.get("memory_mb", 7 * 1024))) for j in active.values()
-                           if is_ours(j) and j.get("event") != "queued")
+            reserved = sum(int(j.get("memoryLimitMiB", j.get("memory_mb", 7 * 1024)) or 0)
+                           for j in active.values() if is_ours(j) and j.get("event") != "queued")
             free = dict(line.split(":", 1) for line in snap["meminfo"].splitlines() if ":" in line)
             free_kb = int(free["MemFree"].split()[0])
             budget = MEMORY_BUDGET_MIB if shared else free_kb // 1024 - MEMORY_MARGIN_MIB
-            job_memory = memory_mb if memory_mb is not None else min(CARD_MEMORY_MIB, budget - reserved)
+            job_memory = declared_mb if declared_mb is not None else min(CARD_MEMORY_MIB, budget - reserved)
             memory_ready = (job_memory > 0 and reserved + job_memory <= budget
                             and free_kb - job_memory * 1024 >= MEMORY_MARGIN_MIB * 1024)
             if core_ready and memory_ready and not their_turn:
                 mapping = {cpu: core for cpu, core in topology.items() if core in selected}
-                memory_mb = result["memory_mb"] = job_memory
+                # S9-23 (owner 2026-11-10): an exclusive job with no declared limit gets no
+                # RLIMIT_AS; the admission check above still ran on MemFree and the margin.
+                memory_mb = result["memory_mb"] = (job_memory if declared_mb is not None or shared else None)
                 break
             if benchmark and not queued:
                 append_ledger(ledger_path, dict(agent="claude", project=PROJECT, jobId=job_id,
@@ -797,7 +800,7 @@ class SSHSession:
         command = " ".join(shlex.quote(str(arg)) for arg in argv)
         operation("boot_id=%s\nstart_job %s %s %s %s" %
                   (shlex.quote(self.boot_id), shlex.quote(str(card_timeout)),
-                   shlex.quote(",".join(str(cpu) for cpu in cpus)), memory_mb, command), "start-job")
+                   shlex.quote(",".join(str(cpu) for cpu in cpus)), memory_mb or 0, command), "start-job")
         offsets = [0, 0]
         status = None
         poll_delay = 0.5
@@ -913,7 +916,7 @@ def main():
                      external_locks=[Path(p) for p in config.get("externalLocks", [])] + args.external_lock,
                      baseline_names=set(config.get("baselineNames", [])) | set(args.baseline_name),
                      timeout=timeout, transport_timeout=transport_timeout, receipt_path=args.receipt,
-                     ledger_path=Path(config["ledger"]), memory_mb=config.get("memoryMB", 128),
+                     ledger_path=Path(config["ledger"]), memory_mb=config.get("memoryMB"),
                      files=files, max_stage_mib=config.get("maxStageMiB", 64),
                      packed=args.file_list is not None, stage_timeout=args.stage_timeout,
                      threads=args.threads, cores=([int(c) for c in args.cores.split(",")]

@@ -39,9 +39,9 @@ int main(int argc, char **argv) {
         if (!*end) break;
         part = end + 1;
     }
-    if (!parse_number(argv[2], &end, &mib) || *end || !mib || mib > 16384) {
+    if (!parse_number(argv[2], &end, &mib) || *end || mib > 16384) {
         /* S9-14 (owner 2026-11-10): exclusive turns may use the 7120P's 16 GB. */
-        fputs("claude-pin: memory must be 1..16384 MiB\n", stderr);
+        fputs("claude-pin: memory must be 0 (no limit) or 1..16384 MiB\n", stderr);
         return 125;
     }
     if (sched_setaffinity(0, sizeof(mask), &mask) != 0) {
@@ -51,7 +51,8 @@ int main(int argc, char **argv) {
     /* RLIMIT_AS bounds virtual address space, stricter than resident memory
        for a single process. The hard limit and affinity survive exec/fork. */
     limit.rlim_cur = limit.rlim_max = (rlim_t)mib * 1024 * 1024;
-    if (setrlimit(RLIMIT_AS, &limit) != 0) {
+    /* S9-23: 0 means no limit (an exclusive turn); skip setrlimit. */
+    if (mib && setrlimit(RLIMIT_AS, &limit) != 0) {
         perror("claude-pin: setrlimit RLIMIT_AS");
         return 126;
     }
