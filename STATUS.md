@@ -44,7 +44,7 @@ Current tickets: `[###################-]` 170 of 175
 | S10-03 | Loops call libknc_vmath - -mveclibabi=knc, by-value entry points, automatic link (ADR-0014 points 2-3) | Waiting for review | Green: gcc db7b06406a9 KNC + 25fc35185be shared i386 (10 lines added, 1 changed) + 65cbad181a6 includes; pr... |
 | S10-04 | Measure vector math - math kernels and a WRF-shaped physics loop, vector vs scalar libm | Not started |  |
 | S10-05 | Sprint 10 batch check | Not started | deps add S10-06 |
-| S10-06 | Card qualification - classify powf's 848 special-case mismatches and certify pow under 1 ULP | Not started |  |
+| S10-06 | Card qualification - classify powf's 848 special-case mismatches and certify pow under 1 ULP | In progress |  |
 | S2-01 | Design for zmm and mask registers under -march=knc | Done | The register design for KNC is settled on paper: all 32 zmm and 8 mask registers become usable under -march... |
 | S2-02 | Float and double arguments and results in zmm lane 0 | Done | Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`). |
 | S2-03 | Varargs with the donor's register save area | Done | Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`). |
