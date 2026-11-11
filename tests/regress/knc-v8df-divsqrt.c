@@ -364,12 +364,12 @@ static double cv[N] __attribute__ ((aligned (64)));
 static uint64_t ax[N], bx[N];
 static unsigned used;
 static int mode;
-enum { NSET = 14 };
+enum { NSET = 15 };
 static const char *const name[NSET] =
   { "div-midpoint", "div-markstein", "div-exponent", "div-tiny-midpoint",
     "div-special", "div-random", "div-modes", "div-masked", "sqrt-midpoint",
     "sqrt-double", "sqrt-exponent", "sqrt-special", "sqrt-random",
-    "sqrt-modes" };
+    "sqrt-modes", "sqrt-masked" };
 static uint64_t count[NSET], bad[NSET], flagbad[NSET];
 static unsigned flags_seen[NSET];
 
@@ -392,6 +392,14 @@ __attribute__ ((noinline, noclone)) static void
 sqrt_kernel (void)
 {
   for (int i = 0; i < N; i++) cv[i] = __builtin_sqrt (av[i]);
+}
+
+__attribute__ ((noinline, noclone)) static void
+sqrt_kernel_n (double *restrict c, const double *restrict a, int n)
+{
+  c = __builtin_assume_aligned (c, 64);
+  a = __builtin_assume_aligned (a, 64);
+  for (int i = 0; i < n; i++) c[i] = __builtin_sqrt (a[i]);
 }
 
 static void
@@ -437,13 +445,14 @@ flush_div (unsigned set, int residual, int masked)
   check (set, 0, residual);
 }
 static void
-flush_sqrt (unsigned set, int residual)
+flush_sqrt (unsigned set, int residual, int masked)
 {
   if (!used) return;
-  for (unsigned i = used; i < N; ++i) ax[i] = ONE;
+  /* An unmasked lane of sqrt (-1) would raise invalid.  */
+  for (unsigned i = used; i < N; ++i) ax[i] = masked ? SIGN | ONE : ONE;
   memcpy (av, ax, sizeof av);
   feclearexcept (FE_ALL_EXCEPT);
-  sqrt_kernel ();
+  if (masked) sqrt_kernel_n (cv, av, used); else sqrt_kernel ();
   check (set, 1, residual);
 }
 static void
@@ -456,7 +465,7 @@ static void
 one (unsigned set, uint64_t x)
 {
   ax[used++] = x;
-  if (used == N) flush_sqrt (set, 0);
+  if (used == N) flush_sqrt (set, 0, 0);
 }
 
 int
@@ -474,9 +483,9 @@ main (void)
       div_sweep (pair, mode == RN ? 2 : 6, mode == RN ? 3 : 61, 1024);
       flush_div (mode == RN ? 2 : 6, 0, 0);
       sqrt_hard (one, mode == RN ? 8 : 13, mode == RN ? 9 : 13, 1L << 20);
-      flush_sqrt (mode == RN ? 9 : 13, 0);
+      flush_sqrt (mode == RN ? 9 : 13, 0, 0);
       sqrt_sweep (one, mode == RN ? 10 : 13, 1 << 16);
-      flush_sqrt (mode == RN ? 10 : 13, 0);
+      flush_sqrt (mode == RN ? 10 : 13, 0, 0);
       /* One active element per call isolates the exception flags.  */
       for (unsigned i = 0; i < NSPECIAL; ++i)
 	{
@@ -488,7 +497,10 @@ main (void)
 		{ ax[used] = ONE; bx[used] = ONE; }
 	      pair (7, special[i], special[j]); flush_div (7, 0, 1);
 	    }
-	  one (11, special[i]); flush_sqrt (11, 0);
+	  one (11, special[i]); flush_sqrt (11, 0, 0);
+	  /* The same argument in the last active lane of the masked loop.  */
+	  for (used = 0; used < 1 + i % 6; ++used) ax[used] = ONE;
+	  one (14, special[i]); flush_sqrt (14, 0, 1);
 	}
     }
   mode = RN; fesetround (FE_TONEAREST);
@@ -503,7 +515,7 @@ main (void)
   for (uint64_t i = 0; i < (UINT64_C (1) << 28); ++i)
     {
       ax[used++] = mk (0, (int) (rnd64 () % 2098) - 1074, rsig ());
-      if (used == N) flush_sqrt (12, 1);
+      if (used == N) flush_sqrt (12, 1, 0);
     }
   int failed = 0;
   for (int s = 0; s < NSET; ++s)
