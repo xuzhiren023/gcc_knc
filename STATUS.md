@@ -1,10 +1,10 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-11 01:10.
+Updated automatically at every ticket change. Last update: 2026-11-11 01:39.
 
 **Next: the tech lead, on S9-23.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
-Current tickets: `[###################-]` 165 of 167
+Current tickets: `[###################-]` 165 of 173
 
 ## Milestones
 
@@ -13,7 +13,7 @@ Current tickets: `[###################-]` 165 of 167
 | M0 | Foundation | In progress | 17 of 17 tickets |
 | M1 | Mixed native code | Done | 43 of 43 tickets |
 | M2 | Useful vector target | Done | 51 of 51 tickets |
-| M3 | Runtimes | In progress | 31 of 33 tickets |
+| M3 | Runtimes | In progress | 31 of 39 tickets |
 | M4 | Broad optimization | Not started | Not planned in detail yet |
 | M5 | Program corpus | Not started | Not planned in detail yet |
 | M6 | Release | Not started | Not planned in detail yet |
@@ -39,6 +39,11 @@ Current tickets: `[###################-]` 165 of 167
 | S1-05 | Integer C assembles with as 2.22 and lints clean | Done | All 2003 GCC torture compile files now build for KNC at -O0, -O2 and -O2 -g and assemble with the card's ol... |
 | S1-06 | K1OM link defaults | Done | GCC 16 now targets the K1OM ABI by default: it passes --march=k1om to as and -m elf_k1om to ld, uses the /l... |
 | S1-07 | Milestone M0 evidence note | Done | M0 is settled as adjust: GCC 16.2 builds a k1om cc1 whose assembly the 2.22 assembler accepts, an options-f... |
+| S10-01 | 512-bit vector arguments and results under -march=knc (ADR-0014 point 1) | Not started |  |
+| S10-02 | libknc_vmath v0 - build and requalify expf, logf, powf, exp, log, pow with GCC-KNC on the card | Not started |  |
+| S10-03 | Loops call libknc_vmath - -mveclibabi=knc, by-value entry points, automatic link (ADR-0014 points 2-3) | Not started |  |
+| S10-04 | Measure vector math - math kernels and a WRF-shaped physics loop, vector vs scalar libm | Not started |  |
+| S10-05 | Sprint 10 batch check | Not started |  |
 | S2-01 | Design for zmm and mask registers under -march=knc | Done | The register design for KNC is settled on paper: all 32 zmm and 8 mask registers become usable under -march... |
 | S2-02 | Float and double arguments and results in zmm lane 0 | Done | Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`). |
 | S2-03 | Varargs with the donor's register save area | Done | Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`). |
@@ -176,7 +181,7 @@ Current tickets: `[###################-]` 165 of 167
 | S9-08 | libgomp spin-wait with delay and the one-core measurement (E6-03 C) | Done | Card 2026-11-10 measurements 1 and 3, three launches (log .work/_shared/tmp/claude-resume.log). One core, w... |
 | S9-09 | libgomp hierarchical ring-aware barrier (E6-03 D) | Done | Card 2026-11-10: measurements 2/4/5: every hier run exits 136 (SIGFPE); flat runs. The measure binaries lin... |
 | S9-10 | libgomp padding, static schedule default and malloc guidance (E6-03 E) | Done | Card 2026-11-10 14:40Z: the eight OpenMP programs pass on the S9-06..S9-10 libgomp at 60 threads (6 GiB) an... |
-| S9-11 | Sprint 9 batch check | Not started | Defaults to set from the 2026-11-11 card data: gomp_knc_delay 128 (S9-08) and default spin 200 ms (S9-15). ... |
+| S9-11 | Sprint 9 batch check | Not started | deps S9-24 (settings and harness fixes); lane gcc2 after it. Owner 2026-11-11: close Sprint 9 tonight, blan... |
 | S9-12 | libgomp adapts to the card: malloc arena cap from memory, core count and clock (ADR-0012) | Done | Measurement 7 cut down, 240 threads x 100000 1 KiB malloc/free, 2 reps (2026-11-10 22:xxZ): full profile (1... |
 | S9-13 | User story - -mknc-card= picks the card model's tuning, and -mknc-card=native detects it | Done | Card 2026-11-10, memory working set, density 4: -mknc-card=7100 vs knc: affine_f32 1.001, stencil1 1.003, m... |
 | S9-14 | card_run model profiles - run a job as a 3100, 5100 or 7100 card on our 7120P | Done | card_run --profile 3100/5100/7100/full runs a job as that card would (its compute cores and usable memory),... |
@@ -189,9 +194,11 @@ Current tickets: `[###################-]` 165 of 167
 | S9-21 | S9-18 PGO training script - BusyBox od has no -A/-t, so no profile came back | Done | The S9-18 PGO training script now dumps profiles with od -b -v, which BusyBox 1.19 on the card supports, an... |
 | S9-22 | S9-18 PGO rebuild fails with coverage-mismatch on the card profiles - make the two builds identical | Done | The PGO experiment's two builds now use identical compile commands, so profiles collected on the card can b... |
 | S9-23 | card_run - no address-space limit in our exclusive turns (owner - "there is no job memory limit") | Waiting for review | head 84e9f27d: lead updated the S9-14 profile test expectation for 7100/full (no limit). |
+| S9-24 | Sprint 9 settings from the card data, and the harness fixes the batch check needs | Not started |  |
 
 ## Recent activity
 
+- 2026-11-11 01:39 **S9-11** lead amend: deps S9-24 (settings and harness fixes); lane gcc2 after it. Owner 2026-11-11: close Sprint 9 tonight, blanket approval.
 - 2026-11-11 01:10 **S9-23** lead amend: head 84e9f27d: lead updated the S9-14 profile test expectation for 7100/full (no limit).
 - 2026-11-11 01:02 **S9-23** lead note: Lead: the escalation was a lead matter, not an owner decision. Red ran after green, but the new tests fail on the old code (engineer 00:53), which ...
 - 2026-11-11 00:53 **S9-23** engineer escalate: S9-23 is in red-review but green code is already committed on s9/S9-23 (I ran red late, after coding). Approve red, then the ticket can be submitte...
@@ -199,16 +206,15 @@ Current tickets: `[###################-]` 165 of 167
 - 2026-11-11 00:37 **S9-18** lead note: Card 2026-11-11 04:43Z, three launches, single thread, ratio to -O2 (mean of rounds): skewed hint 0.962, wrong 1.007, PGO 0.809, PGO on the other m...
 - 2026-11-11 00:36 **S8-23** lead close: Card 2026-11-11 04:43Z: safety holds (guard sweep 96132 checks, 0 failures; controls exit 3; M2 correctness passes), but the masked unpack/pack tai...
 - 2026-11-10 22:14 **S8-23** lead note: Lead review 2026-11-10: design accepted (the 21:29 lead answer and its conditions). Not approved before its card check, because it changes S8-02 sa...
-- 2026-11-10 22:12 **S8-23** engineer submit: S8-02 gather/scatter tail was the cause. GCC s8/S8-23 (3 commits on knc 92a1b1a): while_ult prefix masks use a masked unpack/pack pair; other masks...
 
 ## Cost
 
 - From the script, engineer: 388 sessions, 849.8M input tokens
 - From the script, lead: 246 sessions, 72.9M input tokens
-- Started by hand, Claude: 11 sessions, 2248.1M input tokens
+- Started by hand, Claude: 11 sessions, 2259.7M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 23.1 GiB of 100 GiB. 105 GiB free on the drive.
+The project uses 23.1 GiB of 100 GiB. 104 GiB free on the drive.
