@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-11 06:52.
+Updated automatically at every ticket change. Last update: 2026-11-11 06:58.
 
-**Next: GPT-6.1, on S10-04 (Measure vector math - math kernels and a WRF-shaped physics loop, vector vs scalar libm).** Run `python tools/dispatch.py`, or ask the tech lead to.
+**Next: the tech lead, on S10-04.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[###################-]` 173 of 175
 
@@ -42,7 +42,7 @@ Current tickets: `[###################-]` 173 of 175
 | S10-01 | 512-bit vector arguments and results under -march=knc (ADR-0014 point 1) | Done | 64-byte vectors (__m512 and vector_size(64)) can now be passed to and returned from functions under -march=... |
 | S10-02 | libknc_vmath v0 - build and requalify expf, logf, powf, exp, log, pow with GCC-KNC on the card | Done | Card qualification 2026-11-11 09:32-10:37Z (268M inputs each): expf 0.5016, logf 0.8106, exp 0.5079, log 0.... |
 | S10-03 | Loops call libknc_vmath - -mveclibabi=knc, by-value entry points, automatic link (ADR-0014 points 2-3) | Done | Loops that call expf, logf, powf, exp, log or pow now vectorize under -march=knc and call GCC-KNC's own vec... |
-| S10-04 | Measure vector math - math kernels and a WRF-shaped physics loop, vector vs scalar libm | In progress |  |
+| S10-04 | Measure vector math - math kernels and a WRF-shaped physics loop, vector vs scalar libm | Waiting for review | Staged, not run: .work/_shared/S10-04/vmath-bench.mic, lint clean (log .work/_state/logs/s10_04_build-20261... |
 | S10-05 | Sprint 10 batch check | Not started | deps add S10-06 |
 | S10-06 | Card qualification - classify powf's 848 special-case mismatches and certify pow under 1 ULP | Done | The powf and pow card failures were traced to the card's own libm (its powl gives NaN for negative x with h... |
 | S2-01 | Design for zmm and mask registers under -march=knc | Done | The register design for KNC is settled on paper: all 32 zmm and 8 mask registers become usable under -march... |
@@ -200,6 +200,7 @@ Current tickets: `[###################-]` 173 of 175
 
 ## Recent activity
 
+- 2026-11-11 06:58 **S10-04** engineer submit: Staged, not run: .work/_shared/S10-04/vmath-bench.mic, lint clean (log .work/_state/logs/s10_04_build-20261111-065734.log). vec build calls all six...
 - 2026-11-11 06:52 **S10-03** lead approve: Loops that call expf, logf, powf, exp, log or pow now vectorize under -march=knc and call GCC-KNC's own vector math library, linked automatically, ...
 - 2026-11-11 06:08 **S9-11** lead approve: Sprint 9's final compiler passes the full execute suite on the card (1681/1681), matches stock GCC on x86, has 0 ICE in both sweeps and textual-onl...
 - 2026-11-11 05:58 **S9-11** lead note: Card part complete 2026-11-11 10:37Z on the S9-25 libgomp (flat barrier default), no memory limit: S9-06 at 60 and 240 threads pass; S9-09 suite pa...
@@ -207,7 +208,6 @@ Current tickets: `[###################-]` 173 of 175
 - 2026-11-11 05:58 **S10-03** lead note: Card 2026-11-11: vmath loop program: expf, exp, logf, log, pow agree with scalar libm within 1 ULP on 4099 lanes each including specials; powf diff...
 - 2026-11-11 05:47 **S10-06** engineer submit: Verdict: REFERENCE (card powl NaNs x<0, integer |y|>=2^63). All 8,487,977 powf (not 848) and every pow special lane are that class; ours = Annex F....
 - 2026-11-11 05:39 **S10-06** lead note: S10-03 reinstalled libknc_vmath as -fPIC with hidden symbols (.work/_shared/S10-02/knc rebuilt): restage the qualification jobs from that build so ...
-- 2026-11-11 05:38 **S10-05** lead amend: deps add S10-06
 
 ## Cost
 
