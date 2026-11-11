@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-10 19:35.
+Updated automatically at every ticket change. Last update: 2026-11-10 19:36.
 
-**Next: the tech lead, on S9-19.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: the tech lead, on S8-22.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[###################-]` 159 of 162
 
@@ -164,7 +164,7 @@ Current tickets: `[###################-]` 159 of 162
 | S8-19 | -mtune=knc stops the tight-loop alignment pass (nops on the fallthrough path) | Done | Card 2026-11-10 11:28-12:03Z (frozen .work/_shared/tmp/claude-s8-19, log .work/_shared/tmp/claude-next.log)... |
 | S8-20 | The small-loop unroll costs affine_f64 3-7% at 4 threads per core - make it follow the thread density | Done | Card 2026-11-10 21:00-23:00Z vs knc (S8-15 unroll 4), launch 1/2. Density 4: affine_f64 0.931/0.994, affine... |
 | S8-21 | The prefetch pass sees masked loads and stores, so rows shorter than a vector are prefetched | Done | The prefetch pass now sees masked loads and stores, so rows shorter than a vector (WRF 8-float rows) are pr... |
-| S8-22 | -mphinix is slower than -O2 on M2 kernels (mat16 12.9x, short 1.27x, mat8 1.13x) - find and fix | In progress |  |
+| S8-22 | -mphinix is slower than -O2 on M2 kernels (mat16 12.9x, short 1.27x, mat8 1.13x) - find and fix | Waiting for review | Cause (in commits): -O3 cunrolli flattened mat16's inner loop, losing the -O2 outer-loop form; dynamic-mode... |
 | S9-01 | libgomp for KNC: futex, affinity, ring-aware barrier, spin-wait and malloc arenas (E6-03 input) | Done | We now have a build-and-design plan for GCC-KNC's own OpenMP runtime on the card: futex-based waits with de... |
 | S9-02 | libstdc++ for KNC: exceptions, RTTI, atomics, threads, packaging (E6-06 input) | Done | We now know how to build GCC 16's C++ library for the card: no newer glibc or kernel is needed, and built w... |
 | S9-03 | libstdc++ and libatomic build for k1om (E6-06a) | Done | Card 2026-11-10 08:40Z (log .work/_shared/tmp/claude-s8-09.log): hello, rtti, thread, atomic16, tz and all ... |
@@ -187,6 +187,7 @@ Current tickets: `[###################-]` 159 of 162
 
 ## Recent activity
 
+- 2026-11-10 19:36 **S8-22** engineer submit: Cause (in commits): -O3 cunrolli flattened mat16's inner loop, losing the -O2 outer-loop form; dynamic-model alignment peeling added x87 prologues ...
 - 2026-11-10 19:35 **S9-19** engineer submit: Staged, lint clean, not run: .work/_shared/S9-19/autopar.sh and probe.sh with their -files.txt. Opt-info (.work/_shared/S9-19/optinfo.txt): triad a...
 - 2026-11-10 19:25 **S9-18** lead approve: Four small branchy kernels in five builds (plain -O2, correct and wrong branch hints, PGO, PGO trained on other input) are ready for the card; the ...
 - 2026-11-10 19:18 **S9-18** engineer submit: libgcov: .work/_shared/gcc-knc-16.2.0/lib/gcc/k1om-mpss-linux/16.2.0/libgcov.a. Host: equal checksums, 5 variants x 4 kernels (.work/_state/logs/s9...
@@ -194,7 +195,6 @@ Current tickets: `[###################-]` 159 of 162
 - 2026-11-10 19:16 **S9-18** engineer ask: Work is done and committed (7b6b4634), but submit refuses on size: 751 changed lines, budget 500. Split: 4 kernels ~330 lines (tests/bench/pgo), to...
 - 2026-11-10 19:03 **S9-11** lead note: Arena default with no address-space limit: GOMP_KNC_ARENA_MEM_PERCENT=50 gives about 86 arenas on a 16 GB card (half of MemTotal less 240 x 8 MiB s...
 - 2026-11-10 18:43 **S9-11** lead note: From the 21:00Z card run: rebuild S9-09 measure-hier/flat on the final head and rerun measurements 2/4/5 (the S9-09-era builds crash with SIGFPE). ...
-- 2026-11-10 18:42 **S9-13** lead note: Card 2026-11-10, memory working set, density 4: -mknc-card=7100 vs knc: affine_f32 1.001, stencil1 1.003, mat16 1.027; 3100 (L2 distance 23) on the...
 
 ## Cost
 
