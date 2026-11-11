@@ -114,5 +114,5 @@
   "removal": "(?:^|[;&|(]\\s*|-Command\\s+[\"']?)(rm|del|rmdir|Remove-Item)\\b",
   "wrappers": "tools[/\\\\](run|card_run)(\\.py)?\\b",
   "exempt": "tools[/\\\\]pm\\.py|git\\s+(add|commit|status|diff|log|show)\\b",
-  "engineer_backend": "claude"
+  "engineer_backend": "codex"
 }
