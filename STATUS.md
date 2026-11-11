@@ -1,10 +1,10 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-11 14:13.
+Updated automatically at every ticket change. Last update: 2026-11-11 15:28.
 
 **Next: the tech lead, on S11-02.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
-Current tickets: `[###################-]` 177 of 181
+Current tickets: `[###################-]` 177 of 182
 
 ## Milestones
 
@@ -13,7 +13,7 @@ Current tickets: `[###################-]` 177 of 181
 | M0 | Foundation | In progress | 17 of 17 tickets |
 | M1 | Mixed native code | Done | 43 of 43 tickets |
 | M2 | Useful vector target | Done | 51 of 51 tickets |
-| M3 | Runtimes | Done | 43 of 45 tickets |
+| M3 | Runtimes | Done | 43 of 46 tickets |
 | M4 | Broad optimization | In progress | 0 of 2 tickets |
 | M5 | Program corpus | Not started | Not planned in detail yet |
 | M6 | Release | Not started | Not planned in detail yet |
@@ -45,10 +45,11 @@ Current tickets: `[###################-]` 177 of 181
 | S10-04 | Measure vector math - math kernels and a WRF-shaped physics loop, vector vs scalar libm | Done | The vector-math benchmark (expf, logf, powf, exp, log, pow and a WRF-style theta-e column loop, vector libr... |
 | S10-05 | Sprint 10 batch check | Done | Card 2026-11-11 14:16-16:56Z at knc b91ca0b5e67/f81579bb82a: execute suite 1681/1681 PASS. Vector math v0 o... |
 | S10-06 | Card qualification - classify powf's 848 special-case mismatches and certify pow under 1 ULP | Done | The powf and pow card failures were traced to the card's own libm (its powl gives NaN for negative x with h... |
-| S10-07 | Vector math v1a - the copied functions (sin, cos, tan, log10, atan, atan2, hyperbolics, bounded groups) in libknc_vmath and the vectorizer hook | Done | The vector math library now also covers sin, cos, tan, log10, atan, atan2, sinh, cosh, tanh and their float... |
+| S10-07 | Vector math v1a - the copied functions (sin, cos, tan, log10, atan, atan2, hyperbolics, bounded groups) in libknc_vmath and the vectorizer hook | Done | Card 2026-11-11 (S10-08 build, 240 threads): full set PASS for sinf 0.499999, cosf 0.499998, tanf 0.499995,... |
 | S10-08 | Vector math v1b - the rest of the libmvec set (acos, asin, cbrt, erf, erfc, exp2, exp10, expm1, log1p, log2, hypot, sincos) | Done | The vector math library now covers the whole set GCC vectorizes with glibc's libmvec: acos, asin, cbrt, erf... |
 | S10-09 | User story - double-precision loops with division and square root vectorize, correctly rounded (V8DF div, cond_div, sqrt) | In progress | S10-09 red accepted: failing scans show that double division (fixed and variable bounds, masked tail) and s... |
 | S10-10 | Card harness fixes from the Sprint 10 card turn - card_qualify binary folder, vmath bench batch sizing | Not started | Lead 2026-11-11 14:15 EST: card_qualify now passes --threads 240 (each job ran on one core). pow full on th... |
+| S10-11 | Card-only vector math failures - double sin, cos, tan, atan2 above 1 ULP, and cbrt/cbrtf crash (SIGSEGV) | Not started |  |
 | S11-01 | User story - the best way to move data between the host and the card, measured, and how our projects use it | Not started | Owner 2026-11-11 10:45 EST: do not start yet (usage at 95%, wait for tonight's reset). |
 | S11-02 | card_run and run_suite move data by S11-01's recommended method, with fallback | Question for the tech lead |  |
 | S2-01 | Design for zmm and mask registers under -march=knc | Done | The register design for KNC is settled on paper: all 32 zmm and 8 mask registers become usable under -march... |
@@ -206,6 +207,7 @@ Current tickets: `[###################-]` 177 of 181
 
 ## Recent activity
 
+- 2026-11-11 15:28 **S10-07** lead note: Card 2026-11-11 (S10-08 build, 240 threads): full set PASS for sinf 0.499999, cosf 0.499998, tanf 0.499995, log10f 0.8197, atanf 0.499995, atan2f 0...
 - 2026-11-11 14:13 **S10-10** lead note: Lead 2026-11-11 14:15 EST: card_qualify now passes --threads 240 (each job ran on one core). pow full on the card: checked lanes max 0.507 ULP but ...
 - 2026-11-11 11:51 **S10-05** lead note: Card 2026-11-11 14:16-16:56Z at knc b91ca0b5e67/f81579bb82a: execute suite 1681/1681 PASS. Vector math v0 on the card (corrected reference): expf 0...
 - 2026-11-11 10:36 **S11-01** lead note: Owner 2026-11-11 10:45 EST: do not start yet (usage at 95%, wait for tonight's reset).
@@ -213,16 +215,15 @@ Current tickets: `[###################-]` 177 of 181
 - 2026-11-11 10:25 **S10-09** engineer red: Red fac88ad9: knc-divsqrt-f64.c fails at vrcp23ps in div_f64 (no divv8df3); log check_gcc16_t1-20261111-102408.log. Host model knc-v8df-model.c pas...
 - 2026-11-11 09:43 **S10-08** lead approve: The vector math library now covers the whole set GCC vectorizes with glibc's libmvec: acos, asin, cbrt, erf, erfc, exp2, exp10, expm1, log1p, log2 ...
 - 2026-11-11 09:33 **S10-08** engineer submit: Green b11167a8, GCC 36edee4f1ad (hook only). T1 --vmath PASS (check_gcc16_t1-20261111-092342.log). Host MPFR qualification ALL AS EXPECTED (vmath_h...
-- 2026-11-11 09:17 **S10-08** owner decide: Owner standing rule (2026-11-09, reminded 2026-11-10; blanket approval 2026-11-11): budget raised to 24M input tokens, first extension; red was app...
 
 ## Cost
 
 - From the script, engineer: 413 sessions, 926.4M input tokens
 - From the script, lead: 256 sessions, 76.4M input tokens
-- Started by hand, Claude: 11 sessions, 2421.5M input tokens
+- Started by hand, Claude: 11 sessions, 2428.7M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 24.1 GiB of 100 GiB. 110 GiB free on the drive.
+The project uses 24.4 GiB of 100 GiB. 110 GiB free on the drive.
