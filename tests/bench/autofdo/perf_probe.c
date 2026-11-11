@@ -27,17 +27,9 @@ static void busy(void)
 static void probe(const char *name, uint32_t type, uint64_t config, uint64_t period,
                   uint64_t sample_type, int exclude_kernel)
 {
-    struct perf_event_attr a;
-    memset(&a, 0, sizeof a);
-    a.size = sizeof a;
-    a.type = type;
-    a.config = config;
-    a.sample_period = period;
-    a.sample_type = sample_type;
-    a.disabled = 1;
-    a.exclude_kernel = exclude_kernel;
-    a.exclude_hv = 1;
-    a.wakeup_events = 1;
+    struct perf_event_attr a = { .size = sizeof a, .type = type, .config = config,
+                                 .sample_period = period, .sample_type = sample_type, .disabled = 1,
+                                 .exclude_kernel = exclude_kernel, .exclude_hv = 1, .wakeup_events = 1 };
     int fd = syscall(__NR_perf_event_open, &a, 0, -1, -1, 0);
     if (fd < 0) {
         printf("EVENT %s open=FAIL errno=%d (%s)\n", name, errno, strerror(errno));

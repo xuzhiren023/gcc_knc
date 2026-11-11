@@ -1,11 +1,9 @@
 /* S9-19: three loop shapes with no OpenMP in the plain variants, for -ftree-parallelize-loops=N.
-   Built by tools/s9_19_autopar.py once per variant with -DV=<name>:
+   Built by tools/s9_19_auto.py once per variant with -DV=<name>:
      -DOMP=0  plain loops; the variant's parallelism comes only from -ftree-parallelize-loops=N
      -DOMP=T  the same loops with "#pragma omp parallel for num_threads(T)" (built with -fopenmp)
    and once with -DDRIVER for main().  Data are small integers so every sum is exact in any order,
    and every variant must give the serial checksum bit for bit. */
-#include <stddef.h>
-
 #define NX 4096 /* stencil grid NX x NX */
 #define CAT2(a, b) a##_##b
 #define CAT(a, b) CAT2(a, b)
@@ -19,11 +17,6 @@
 #define PAR
 #define PAR_SUM
 #endif
-
-void CAT(triad, V)(double *restrict a, const double *restrict b, const double *restrict c,
-                   double q, long n);
-void CAT(stencil, V)(double (*restrict out)[NX], const double (*restrict in)[NX]);
-double CAT(reduce, V)(const double *restrict a, const double *restrict b, long n);
 
 /* Streaming triad: one store and two loads per element. */
 void CAT(triad, V)(double *restrict a, const double *restrict b, const double *restrict c,
@@ -54,23 +47,19 @@ double CAT(reduce, V)(const double *restrict a, const double *restrict b, long n
 }
 
 #else /* DRIVER */
-/* prog [ROUNDS [SECONDS [N]]]: for each kernel, ROUNDS rounds; each round runs every variant once,
-   in a shuffled order, as one untimed warm-up call and then a batch sized to about SECONDS for
-   that variant (pilot before round 0). RATIO is ms/call(variant) / ms/call(par1) in the same round.
-   N is the triad and reduction length. */
+/* prog [ROUNDS [SECONDS [N]]]: per kernel and round, every variant once in a shuffled order: an
+   untimed checked call, then a batch of about SECONDS. N is the triad and reduction length. */
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 #include <time.h>
 #ifndef CLOCK_MONOTONIC_RAW
 #define CLOCK_MONOTONIC_RAW CLOCK_MONOTONIC
 #endif
 
 #define VARIANTS(X) X(par1) X(par60) X(par120) X(par240) X(omp60) X(omp120) X(omp240)
-#define DECL(v)                                                                              \
-    void triad_##v(double *restrict, const double *restrict, const double *restrict, double, \
-                   long);                                                                    \
-    void stencil_##v(double (*restrict)[NX], const double (*restrict)[NX]);                  \
+#define DECL(v)                                                                                 \
+    void triad_##v(double *restrict, const double *restrict, const double *restrict, double, long); \
+    void stencil_##v(double (*restrict)[NX], const double (*restrict)[NX]);                     \
     double reduce_##v(const double *restrict, const double *restrict, long);
 VARIANTS(DECL)
 
@@ -78,22 +67,11 @@ static double *A, *B, *C, (*G)[NX], (*H)[NX];
 static long N;
 
 /* One call of a kernel; with CHECK, also its checksum (a serial sum, kept out of timed batches). */
-#define CALLS(v)                                                     \
-    static double t_##v(int check)                                   \
-    {                                                                \
-        triad_##v(A, B, C, 3.0, N);                                  \
-        return check ? sum(A, N) : 0;                                \
-    }                                                                \
-    static double s_##v(int check)                                   \
-    {                                                                \
-        stencil_##v(H, (const double (*)[NX])G);                     \
-        return check ? sum(&H[0][0], (long)NX * NX) : 0;             \
-    }                                                                \
-    static double r_##v(int check)                                   \
-    {                                                                \
-        (void)check;                                                 \
-        return reduce_##v(A, B, N);                                  \
-    }
+#define CALLS(v)                                                                             \
+    static double t_##v(int check) { triad_##v(A, B, C, 3.0, N); return check ? sum(A, N) : 0; } \
+    static double s_##v(int check)                                                           \
+    { stencil_##v(H, (const double (*)[NX])G); return check ? sum(*H, (long)NX * NX) : 0; }   \
+    static double r_##v(int check) { (void)check; return reduce_##v(A, B, N); }
 
 static double sum(const double *x, long n)
 {
@@ -104,12 +82,10 @@ static double sum(const double *x, long n)
 }
 VARIANTS(CALLS)
 
-typedef double (*call_fn)(int);
-#define ROW(k, v) { #v, k##_##v },
-#define ROWS_T(v) ROW(t, v)
-#define ROWS_S(v) ROW(s, v)
-#define ROWS_R(v) ROW(r, v)
-static const struct { const char *name; call_fn fn; } T[][7] = {
+#define ROWS_T(v) { #v, t_##v },
+#define ROWS_S(v) { #v, s_##v },
+#define ROWS_R(v) { #v, r_##v },
+static const struct { const char *name; double (*fn)(int); } T[][7] = {
     { VARIANTS(ROWS_T) }, { VARIANTS(ROWS_S) }, { VARIANTS(ROWS_R) } };
 static const char *const KERNEL[] = { "triad", "stencil", "reduce" };
 #define NV 7
@@ -142,10 +118,8 @@ int main(int argc, char **argv)
         return 2;
     A = malloc(sizeof *A * N), B = malloc(sizeof *B * N), C = malloc(sizeof *C * N);
     G = malloc(sizeof *G * NX), H = malloc(sizeof *H * NX);
-    if (!A || !B || !C || !G || !H) {
-        printf("RESULT FAIL: out of memory\n");
-        return 2;
-    }
+    if (!A || !B || !C || !G || !H)
+        return printf("RESULT FAIL: out of memory\n"), 2;
     for (long i = 0; i < N; i++)
         A[i] = i % 7, B[i] = i % 5 - 2.0, C[i] = i % 3;
     for (long i = 0; i < NX; i++)
