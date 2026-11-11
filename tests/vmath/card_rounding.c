@@ -1,11 +1,73 @@
 /* S10-11: card qualification's worst lanes, checked against MPFR at 256 bits.
    Keep this driver on SSE so only the library's scalar evaluation changes. */
+#define _GNU_SOURCE
 #include <math.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <string.h>
-#include <mpfr.h>
 #include "knc_vmath.h"
+#ifdef KNC_CBRT_DIAGNOSTIC
+#include <signal.h>
+#include <unistd.h>
+#include <ucontext.h>
+
+/* Async-signal-safe output, including when the failing path exhausts its stack. */
+static void hexline(const char *label, size_t length, uintptr_t value)
+{
+  char digits[19] = "0x0000000000000000\n";
+  for (int i = 17; i >= 2; --i) {
+    digits[i] = "0123456789abcdef"[value & 15]; value >>= 4;
+  }
+  (void)write(2, label, length);
+  (void)write(2, digits, sizeof digits);
+}
+
+static void fault(int sig, siginfo_t *info, void *context)
+{
+  ucontext_t *uc = context;
+  hexline("si_addr=", 8, (uintptr_t)info->si_addr);
+  hexline("RIP=", 4, (uintptr_t)uc->uc_mcontext.gregs[REG_RIP]);
+  hexline("RSP=", 4, (uintptr_t)uc->uc_mcontext.gregs[REG_RSP]);
+  _exit(128 + sig);
+}
+
+int main(int argc, char **argv)
+{
+  static char signal_stack[65536];
+  stack_t stack = { .ss_sp = signal_stack, .ss_size = sizeof signal_stack };
+  struct sigaction action = { .sa_sigaction = fault,
+                             .sa_flags = SA_SIGINFO | SA_ONSTACK };
+  sigemptyset(&action.sa_mask);
+  if (sigaltstack(&stack, NULL) || sigaction(SIGSEGV, &action, NULL)) return 2;
+  if (argc != 2 || (strcmp(argv[1], "cbrt") && strcmp(argv[1], "cbrtf"))) return 2;
+  /* qualify_v1 compare sweep block zero: lane i has raw bits i. */
+  if (!strcmp(argv[1], "cbrtf")) {
+    __knc_vmath_v16sf x, y;
+    for (uint32_t i = 0; i < 16; ++i) {
+      float lane; memcpy(&lane, &i, sizeof i); x[i] = lane;
+    }
+    (void)write(2, "calling cbrtf\n", 14);
+    y = __knc_vmath_cbrtf_16(x);
+    for (int i = 0; i < 16; ++i) {
+      uint32_t bits; float lane = y[i];
+      memcpy(&bits, &lane, sizeof bits); hexline("out=", 4, bits);
+    }
+  } else {
+    __knc_vmath_v8df x, y;
+    for (uint64_t i = 0; i < 8; ++i) {
+      double lane; memcpy(&lane, &i, sizeof i); x[i] = lane;
+    }
+    (void)write(2, "calling cbrt\n", 13);
+    y = __knc_vmath_cbrt_8(x);
+    for (int i = 0; i < 8; ++i) {
+      uint64_t bits; double lane = y[i];
+      memcpy(&bits, &lane, sizeof bits); hexline("out=", 4, bits);
+    }
+  }
+  return 0;
+}
+#else
+#include <mpfr.h>
 
 int main(void)
 {
@@ -53,3 +115,4 @@ int main(void)
   mpfr_clears(a, b, exact, error, (mpfr_ptr)0);
   return failed;
 }
+#endif
