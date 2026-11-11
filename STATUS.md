@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-10 19:16.
+Updated automatically at every ticket change. Last update: 2026-11-10 19:17.
 
-**Next: the tech lead, on S9-18.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: GPT-6.1, on S8-22 (-mphinix is slower than -O2 on M2 kernels (mat16 12.9x, short 1.27x, mat8 1.13x) - find and fix).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
 Current tickets: `[###################-]` 158 of 162
 
@@ -182,11 +182,12 @@ Current tickets: `[###################-]` 158 of 162
 | S9-15 | libgomp's KNC spin time before sleeping, measured against fork-heavy code | Done | The OpenMP spin-time measurement (3, 30 and 200 ms before sleeping, against fork-heavy code with 1-100 ms g... |
 | S9-16 | Card probes - unaligned scalar accesses, and the VPU cost of subnormal operands | Done | Two card probes are built and ready for the lead to run: C13 tests whether unaligned scalar loads and store... |
 | S9-17 | User guidance on the flags page - threads per core, first touch, regions, heap, and ICC differences | Done | The flags page now has a 'Writing fast code for KNC' section: threads per core, first touch and region size... |
-| S9-18 | Experiment - how much do branch hints and profile-guided optimization gain on KNC? | Question for the tech lead | Work is done and committed (7b6b4634), but submit refuses on size: 751 changed lines, budget 500. Split: 4 ... |
+| S9-18 | Experiment - how much do branch hints and profile-guided optimization gain on KNC? | In progress | Size fits the scope: four kernels plus the build/card/use/timing driver cannot sensibly fit in 500 lines, a... |
 | S9-19 | Experiment - auto-parallelization on KNC, and whether AutoFDO is possible on the card | Not started |  |
 
 ## Recent activity
 
+- 2026-11-10 19:17 **S9-18** lead answer: Size fits the scope: four kernels plus the build/card/use/timing driver cannot sensibly fit in 500 lines, and the ticket asked for all of it. Do no...
 - 2026-11-10 19:16 **S9-18** engineer ask: Work is done and committed (7b6b4634), but submit refuses on size: 751 changed lines, budget 500. Split: 4 kernels ~330 lines (tests/bench/pgo), to...
 - 2026-11-10 19:03 **S9-11** lead note: Arena default with no address-space limit: GOMP_KNC_ARENA_MEM_PERCENT=50 gives about 86 arenas on a 16 GB card (half of MemTotal less 240 x 8 MiB s...
 - 2026-11-10 18:43 **S9-11** lead note: From the 21:00Z card run: rebuild S9-09 measure-hier/flat on the final head and rerun measurements 2/4/5 (the S9-09-era builds crash with SIGFPE). ...
@@ -194,7 +195,6 @@ Current tickets: `[###################-]` 158 of 162
 - 2026-11-10 18:42 **S9-12** lead note: Measurement 7 cut down, 240 threads x 100000 1 KiB malloc/free, 2 reps (2026-11-10 22:xxZ): full profile (13 GiB): derived 64.0-67.0 s, 64 arenas 1...
 - 2026-11-10 18:42 **S9-09** lead note: Card 2026-11-10: measurements 2/4/5: every hier run exits 136 (SIGFPE); flat runs. The measure binaries link the S9-09-era libgomp.a statically (sa...
 - 2026-11-10 18:42 **S8-20** lead note: Card 2026-11-10 21:00-23:00Z vs knc (S8-15 unroll 4), launch 1/2. Density 4: affine_f64 0.931/0.994, affine_f32 0.877/0.984, short 0.977/0.979, oth...
-- 2026-11-10 18:42 **S8-16** lead note: Card 2026-11-10: correctness passes. Timing vs -O2 at density 4: mat16 12.89/12.80 (exit 3 in launch 1), short 1.276/1.260, mat8 1.126/1.127, stenc...
 
 ## Cost
 
