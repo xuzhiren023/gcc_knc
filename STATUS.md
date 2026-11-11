@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-10 19:26.
+Updated automatically at every ticket change. Last update: 2026-11-10 19:35.
 
-**Next: GPT-6.1, on S8-22 (-mphinix is slower than -O2 on M2 kernels (mat16 12.9x, short 1.27x, mat8 1.13x) - find and fix).** Run `python tools/dispatch.py`, or ask the tech lead to.
+**Next: the tech lead, on S9-19.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[###################-]` 159 of 162
 
@@ -183,10 +183,11 @@ Current tickets: `[###################-]` 159 of 162
 | S9-16 | Card probes - unaligned scalar accesses, and the VPU cost of subnormal operands | Done | Two card probes are built and ready for the lead to run: C13 tests whether unaligned scalar loads and store... |
 | S9-17 | User guidance on the flags page - threads per core, first touch, regions, heap, and ICC differences | Done | The flags page now has a 'Writing fast code for KNC' section: threads per core, first touch and region size... |
 | S9-18 | Experiment - how much do branch hints and profile-guided optimization gain on KNC? | Done | Four small branchy kernels in five builds (plain -O2, correct and wrong branch hints, PGO, PGO trained on o... |
-| S9-19 | Experiment - auto-parallelization on KNC, and whether AutoFDO is possible on the card | In progress |  |
+| S9-19 | Experiment - auto-parallelization on KNC, and whether AutoFDO is possible on the card | Waiting for review | Staged, lint clean, not run: .work/_shared/S9-19/autopar.sh and probe.sh with their -files.txt. Opt-info (.... |
 
 ## Recent activity
 
+- 2026-11-10 19:35 **S9-19** engineer submit: Staged, lint clean, not run: .work/_shared/S9-19/autopar.sh and probe.sh with their -files.txt. Opt-info (.work/_shared/S9-19/optinfo.txt): triad a...
 - 2026-11-10 19:25 **S9-18** lead approve: Four small branchy kernels in five builds (plain -O2, correct and wrong branch hints, PGO, PGO trained on other input) are ready for the card; the ...
 - 2026-11-10 19:18 **S9-18** engineer submit: libgcov: .work/_shared/gcc-knc-16.2.0/lib/gcc/k1om-mpss-linux/16.2.0/libgcov.a. Host: equal checksums, 5 variants x 4 kernels (.work/_state/logs/s9...
 - 2026-11-10 19:17 **S9-18** lead answer: Size fits the scope: four kernels plus the build/card/use/timing driver cannot sensibly fit in 500 lines, and the ticket asked for all of it. Do no...
@@ -194,13 +195,12 @@ Current tickets: `[###################-]` 159 of 162
 - 2026-11-10 19:03 **S9-11** lead note: Arena default with no address-space limit: GOMP_KNC_ARENA_MEM_PERCENT=50 gives about 86 arenas on a 16 GB card (half of MemTotal less 240 x 8 MiB s...
 - 2026-11-10 18:43 **S9-11** lead note: From the 21:00Z card run: rebuild S9-09 measure-hier/flat on the final head and rerun measurements 2/4/5 (the S9-09-era builds crash with SIGFPE). ...
 - 2026-11-10 18:42 **S9-13** lead note: Card 2026-11-10, memory working set, density 4: -mknc-card=7100 vs knc: affine_f32 1.001, stencil1 1.003, mat16 1.027; 3100 (L2 distance 23) on the...
-- 2026-11-10 18:42 **S9-12** lead note: Measurement 7 cut down, 240 threads x 100000 1 KiB malloc/free, 2 reps (2026-11-10 22:xxZ): full profile (13 GiB): derived 64.0-67.0 s, 64 arenas 1...
 
 ## Cost
 
 - From the script, engineer: 378 sessions, 816.2M input tokens
 - From the script, lead: 241 sessions, 72.2M input tokens
-- Started by hand, Claude: 11 sessions, 2170.9M input tokens
+- Started by hand, Claude: 11 sessions, 2171.6M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
