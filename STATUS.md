@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-11 03:44.
+Updated automatically at every ticket change. Last update: 2026-11-11 03:46.
 
 **Next: the tech lead, on S10-01.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
@@ -181,7 +181,7 @@ Current tickets: `[###################-]` 167 of 174
 | S9-08 | libgomp spin-wait with delay and the one-core measurement (E6-03 C) | Done | Card 2026-11-10 measurements 1 and 3, three launches (log .work/_shared/tmp/claude-resume.log). One core, w... |
 | S9-09 | libgomp hierarchical ring-aware barrier (E6-03 D) | Done | Card 2026-11-11 08:21Z on the S9-24 libgomp: suite and tasks/cancel pass (the SIGFPE is gone); measurements... |
 | S9-10 | libgomp padding, static schedule default and malloc guidance (E6-03 E) | Done | Card 2026-11-10 14:40Z: the eight OpenMP programs pass on the S9-06..S9-10 libgomp at 60 threads (6 GiB) an... |
-| S9-11 | Sprint 9 batch check | Waiting for review | knc e6b6b55b5dc2 (tree = built 84c73d3882d). Drill textual only: master 12 files/23 hunks, same as S8-11 pl... |
+| S9-11 | Sprint 9 batch check | Waiting for review | Card 2026-11-11: execute suite on knc e6b6b55b5dc2: 1681/1681 pass. Card sets from S9-24 (08:21Z): S9-05 al... |
 | S9-12 | libgomp adapts to the card: malloc arena cap from memory, core count and clock (ADR-0012) | Done | Measurement 7 cut down, 240 threads x 100000 1 KiB malloc/free, 2 reps (2026-11-10 22:xxZ): full profile (1... |
 | S9-13 | User story - -mknc-card= picks the card model's tuning, and -mknc-card=native detects it | Done | Card 2026-11-10, memory working set, density 4: -mknc-card=7100 vs knc: affine_f32 1.001, stencil1 1.003, m... |
 | S9-14 | card_run model profiles - run a job as a 3100, 5100 or 7100 card on our 7120P | Done | card_run --profile 3100/5100/7100/full runs a job as that card would (its compute cores and usable memory),... |
@@ -199,6 +199,7 @@ Current tickets: `[###################-]` 167 of 174
 
 ## Recent activity
 
+- 2026-11-11 03:46 **S9-11** lead note: Card 2026-11-11: execute suite on knc e6b6b55b5dc2: 1681/1681 pass. Card sets from S9-24 (08:21Z): S9-05 all expected, S9-06 60/240 pass with no me...
 - 2026-11-11 03:44 **S9-11** engineer submit: knc e6b6b55b5dc2 (tree = built 84c73d3882d). Drill textual only: master 12 files/23 hunks, same as S8-11 plus S9-13's mknc-card entry in the i386.o...
 - 2026-11-11 03:34 **S9-11** lead amend: deps add S9-25 (flat barrier default). Card parts of this check are being run by the lead (2026-11-11 08:21Z: S9-05, S9-06 60/240, S9-09 suite pass...
 - 2026-11-11 03:34 **S9-09** lead note: Card 2026-11-11 08:21Z on the S9-24 libgomp: suite and tasks/cancel pass (the SIGFPE is gone); measurements hier over flat: barrier 1.52-1.72x slow...
@@ -206,16 +207,15 @@ Current tickets: `[###################-]` 167 of 174
 - 2026-11-11 03:11 **S9-24** lead amend: heads set for approve
 - 2026-11-11 03:11 **S9-24** lead note: Lead: both protected paths are sanctioned (m2_kernels/build.py lane fix per Deliver 2; locks.c newline fix of the lead's own 58a2473 bug). Review: ...
 - 2026-11-11 03:09 **S9-24** engineer ask: All done; submit is refused for two protected paths, both sanctioned: tests/acceptance/m2_kernels/build.py (Deliver 2, in aeffad0e) and tests/accep...
-- 2026-11-11 03:05 **S10-02** owner decide: Owner standing rule (2026-11-09, reminded 2026-11-10; blanket approval 2026-11-11): budget raised to 12M input tokens. Answer to the 02:58 ask: (a)...
 
 ## Cost
 
 - From the script, engineer: 396 sessions, 869.9M input tokens
 - From the script, lead: 250 sessions, 73.8M input tokens
-- Started by hand, Claude: 11 sessions, 2306.0M input tokens
+- Started by hand, Claude: 11 sessions, 2311.3M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 23.3 GiB of 100 GiB. 96 GiB free on the drive.
+The project uses 23.4 GiB of 100 GiB. 96 GiB free on the drive.
