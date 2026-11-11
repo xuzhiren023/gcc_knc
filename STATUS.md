@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-11 05:01.
+Updated automatically at every ticket change. Last update: 2026-11-11 05:02.
 
-**Next: the tech lead, on S10-03.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: the tech lead, on S9-11.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[###################-]` 170 of 174
 
@@ -41,7 +41,7 @@ Current tickets: `[###################-]` 170 of 174
 | S1-07 | Milestone M0 evidence note | Done | M0 is settled as adjust: GCC 16.2 builds a k1om cc1 whose assembly the 2.22 assembler accepts, an options-f... |
 | S10-01 | 512-bit vector arguments and results under -march=knc (ADR-0014 point 1) | Done | 64-byte vectors (__m512 and vector_size(64)) can now be passed to and returned from functions under -march=... |
 | S10-02 | libknc_vmath v0 - build and requalify expf, logf, powf, exp, log, pow with GCC-KNC on the card | Done | libknc_vmath v0 builds for KNC with GCC-KNC: expf, logf, powf, exp, log and pow from the copied Arm routine... |
-| S10-03 | Loops call libknc_vmath - -mveclibabi=knc, by-value entry points, automatic link (ADR-0014 points 2-3) | Tests waiting for review | Red ed99b791 adds tests/t1/knc-vmath-phinix.c as asked; nothing else changed. check.py t1 --compiler gcc16 ... |
+| S10-03 | Loops call libknc_vmath - -mveclibabi=knc, by-value entry points, automatic link (ADR-0014 points 2-3) | In progress | Red accepted: the T1 expf call scan and the -mphinix scan fail for the right reason (no hook yet), the errn... |
 | S10-04 | Measure vector math - math kernels and a WRF-shaped physics loop, vector vs scalar libm | Not started |  |
 | S10-05 | Sprint 10 batch check | Not started |  |
 | S2-01 | Design for zmm and mask registers under -march=knc | Done | The register design for KNC is settled on paper: all 32 zmm and 8 mask registers become usable under -march... |
@@ -199,6 +199,7 @@ Current tickets: `[###################-]` 170 of 174
 
 ## Recent activity
 
+- 2026-11-11 05:02 **S10-03** lead approve-red: Red accepted: the T1 expf call scan and the -mphinix scan fail for the right reason (no hook yet), the errno guard holds, and the T2 card program c...
 - 2026-11-11 05:01 **S10-03** engineer red: Red ed99b791 adds tests/t1/knc-vmath-phinix.c as asked; nothing else changed. check.py t1 --compiler gcc16 --vmath: knc-vmath-call.c FAIL and knc-v...
 - 2026-11-11 04:59 **S10-03** lead changes: Red is sound: T1 call fails for the right reason (no hook; -march=knc already lifts -O2 to the cheap cost model, i386-knc.cc:1115, so the loop does...
 - 2026-11-11 04:57 **S10-03** engineer red: Red 071dc341: check.py t1 t2 --compiler gcc16 --vmath: T1 knc-vmath-call.c FAIL (no call __knc_vmath_expf_16), knc-vmath-errno.c PASS (guard: stays...
@@ -206,13 +207,12 @@ Current tickets: `[###################-]` 170 of 174
 - 2026-11-11 04:32 **S9-25** engineer submit: Red b96e847b default_barrier.c failed as expected; GCC 269c7c7f15e makes flat the default and keeps per-core behind -DGOMP_KNC_GROUP_BARRIER. s9_09...
 - 2026-11-11 04:31 **S10-02** lead approve: libknc_vmath v0 builds for KNC with GCC-KNC: expf, logf, powf, exp, log and pow from the copied Arm routines (provenance recorded), all within 1 ul...
 - 2026-11-11 04:23 **S10-02** engineer submit: Split per 04:21 answer: red 2e2cd7b7 (qualifier+runner only; host build fails 'knc_vmath.h: No such file'), green 7303fb8a; qualifier unchanged bet...
-- 2026-11-11 04:21 **S10-02** lead answer: No waiver: the [red] check is hard and the type field needs the interactive lead. Split the one commit honestly instead: git reset --soft main, the...
 
 ## Cost
 
 - From the script, engineer: 401 sessions, 879.1M input tokens
 - From the script, lead: 252 sessions, 74.4M input tokens
-- Started by hand, Claude: 11 sessions, 2334.7M input tokens
+- Started by hand, Claude: 11 sessions, 2336.5M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
