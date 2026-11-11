@@ -1,10 +1,10 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-10 19:03.
+Updated automatically at every ticket change. Last update: 2026-11-10 19:07.
 
 **Next: GPT-6.1, on S8-22 (-mphinix is slower than -O2 on M2 kernels (mat16 12.9x, short 1.27x, mat8 1.13x) - find and fix).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
-Current tickets: `[###################-]` 158 of 160
+Current tickets: `[###################-]` 158 of 161
 
 ## Milestones
 
@@ -13,7 +13,7 @@ Current tickets: `[###################-]` 158 of 160
 | M0 | Foundation | In progress | 17 of 17 tickets |
 | M1 | Mixed native code | Done | 43 of 43 tickets |
 | M2 | Useful vector target | Done | 51 of 51 tickets |
-| M3 | Runtimes | In progress | 26 of 27 tickets |
+| M3 | Runtimes | In progress | 26 of 28 tickets |
 | M4 | Broad optimization | Not started | Not planned in detail yet |
 | M5 | Program corpus | Not started | Not planned in detail yet |
 | M6 | Release | Not started | Not planned in detail yet |
@@ -182,6 +182,7 @@ Current tickets: `[###################-]` 158 of 160
 | S9-15 | libgomp's KNC spin time before sleeping, measured against fork-heavy code | Done | The OpenMP spin-time measurement (3, 30 and 200 ms before sleeping, against fork-heavy code with 1-100 ms g... |
 | S9-16 | Card probes - unaligned scalar accesses, and the VPU cost of subnormal operands | Done | Two card probes are built and ready for the lead to run: C13 tests whether unaligned scalar loads and store... |
 | S9-17 | User guidance on the flags page - threads per core, first touch, regions, heap, and ICC differences | Done | The flags page now has a 'Writing fast code for KNC' section: threads per core, first touch and region size... |
+| S9-18 | Experiment - how much do branch hints and profile-guided optimization gain on KNC? | In progress |  |
 
 ## Recent activity
 
@@ -198,7 +199,7 @@ Current tickets: `[###################-]` 158 of 160
 
 - From the script, engineer: 376 sessions, 813.1M input tokens
 - From the script, lead: 240 sessions, 72.1M input tokens
-- Started by hand, Claude: 11 sessions, 2160.0M input tokens
+- Started by hand, Claude: 11 sessions, 2164.0M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
