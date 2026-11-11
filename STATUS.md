@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-11 01:55.
+Updated automatically at every ticket change. Last update: 2026-11-11 01:57.
 
-**Next: the tech lead, on S10-01.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: GPT-6.1, on S10-01 (512-bit vector arguments and results under -march=knc (ADR-0014 point 1)).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
 Current tickets: `[###################-]` 165 of 173
 
@@ -39,7 +39,7 @@ Current tickets: `[###################-]` 165 of 173
 | S1-05 | Integer C assembles with as 2.22 and lints clean | Done | All 2003 GCC torture compile files now build for KNC at -O0, -O2 and -O2 -g and assemble with the card's ol... |
 | S1-06 | K1OM link defaults | Done | GCC 16 now targets the K1OM ABI by default: it passes --march=k1om to as and -m elf_k1om to ld, uses the /l... |
 | S1-07 | Milestone M0 evidence note | Done | M0 is settled as adjust: GCC 16.2 builds a k1om cc1 whose assembly the 2.22 assembler accepts, an options-f... |
-| S10-01 | 512-bit vector arguments and results under -march=knc (ADR-0014 point 1) | Tests waiting for review | Red 501d0866: check.py t1 t2 --compiler gcc16 --vector-abi fails 3/3 with 'unsupported KNC register ABI mod... |
+| S10-01 | 512-bit vector arguments and results under -march=knc (ADR-0014 point 1) | Changes requested | Red tests are sound: the T1 register and stack-slot scans, the card values (exact in float, 4326 checked) a... |
 | S10-02 | libknc_vmath v0 - build and requalify expf, logf, powf, exp, log, pow with GCC-KNC on the card | Not started |  |
 | S10-03 | Loops call libknc_vmath - -mveclibabi=knc, by-value entry points, automatic link (ADR-0014 points 2-3) | Not started |  |
 | S10-04 | Measure vector math - math kernels and a WRF-shaped physics loop, vector vs scalar libm | Not started |  |
@@ -198,6 +198,7 @@ Current tickets: `[###################-]` 165 of 173
 
 ## Recent activity
 
+- 2026-11-11 01:56 **S10-01** lead changes: Red tests are sound: the T1 register and stack-slot scans, the card values (exact in float, 4326 checked) and both -O0/-O2 cross-TU directions look...
 - 2026-11-11 01:53 **S9-23** lead changes: pm approve refused: Cygwin tests/tools/test_card_run.py ran past 20 minutes. It hangs in test_core_claims_include_every_project_and_release_on_fini...
 - 2026-11-11 01:50 **S10-01** engineer red: Red 501d0866: check.py t1 t2 --compiler gcc16 --vector-abi fails 3/3 with 'unsupported KNC register ABI mode' (log .work/_state/logs/check_gcc16_t1...
 - 2026-11-11 01:39 **S9-11** lead amend: deps S9-24 (settings and harness fixes); lane gcc2 after it. Owner 2026-11-11: close Sprint 9 tonight, blanket approval.
@@ -205,7 +206,6 @@ Current tickets: `[###################-]` 165 of 173
 - 2026-11-11 01:02 **S9-23** lead note: Lead: the escalation was a lead matter, not an owner decision. Red ran after green, but the new tests fail on the old code (engineer 00:53), which ...
 - 2026-11-11 00:53 **S9-23** engineer escalate: S9-23 is in red-review but green code is already committed on s9/S9-23 (I ran red late, after coding). Approve red, then the ticket can be submitte...
 - 2026-11-11 00:53 **S9-23** engineer red: tests fail on old code: exclusive default still limited to 128/budget, null memoryLimitMiB, full profile limited
-- 2026-11-11 00:37 **S9-18** lead note: Card 2026-11-11 04:43Z, three launches, single thread, ratio to -O2 (mean of rounds): skewed hint 0.962, wrong 1.007, PGO 0.809, PGO on the other m...
 
 ## Cost
 
@@ -217,4 +217,4 @@ Current tickets: `[###################-]` 165 of 173
 
 ## Disk
 
-The project uses 23.2 GiB of 100 GiB. 91 GiB free on the drive.
+The project uses 23.2 GiB of 100 GiB. 89 GiB free on the drive.
