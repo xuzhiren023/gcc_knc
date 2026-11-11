@@ -148,3 +148,5 @@ them unadvertised until E3 adds them with their moves. Today:
    with a rule for the high bits.
 5. S6: the generic tables price x87 scalar statements with SSE costs (`i386.cc:25714-25730`), so
    S3's vectorization decisions are not tuned.
+
+*Amended 2026-11-11 by ADR-0014:* point 6 no longer forbids 64-byte vector arguments and results under `-march=knc`; they pass in `zmm0`-`zmm7` and return in `zmm0` (S10-01). Vector arguments to variadic functions stay an error.
