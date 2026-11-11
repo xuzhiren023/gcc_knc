@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-11 02:07.
+Updated automatically at every ticket change. Last update: 2026-11-11 02:08.
 
-**Next: GPT-6.1, on S10-01 (512-bit vector arguments and results under -march=knc (ADR-0014 point 1)).** Run `python tools/dispatch.py`, or ask the tech lead to.
+**Next: the tech lead, on S9-23.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[###################-]` 165 of 173
 
@@ -193,11 +193,12 @@ Current tickets: `[###################-]` 165 of 173
 | S9-20 | Experiment - how much does instruction scheduling help the in-order core, at 1 and 4 threads per core? | Done | Card 2026-11-11, 1 thread/core, ratio to -O2 default: nosched affine 1.11, mat8 1.05; prepress affine 0.92,... |
 | S9-21 | S9-18 PGO training script - BusyBox od has no -A/-t, so no profile came back | Done | The S9-18 PGO training script now dumps profiles with od -b -v, which BusyBox 1.19 on the card supports, an... |
 | S9-22 | S9-18 PGO rebuild fails with coverage-mismatch on the card profiles - make the two builds identical | Done | The PGO experiment's two builds now use identical compile commands, so profiles collected on the card can b... |
-| S9-23 | card_run - no address-space limit in our exclusive turns (owner - "there is no job memory limit") | In progress | Owner standing rule (2026-11-09, reminded 2026-11-10): the lead adds sessions unless two extensions in a ro... |
+| S9-23 | card_run - no address-space limit in our exclusive turns (owner - "there is no job memory limit") | Waiting for review | Lead: fix 276f029d is the requested one (undeclared shared job keeps 128 MiB; exclusive needs only the MemF... |
 | S9-24 | Sprint 9 settings from the card data, and the harness fixes the batch check needs | In progress |  |
 
 ## Recent activity
 
+- 2026-11-11 02:08 **S9-23** lead note: Lead: fix 276f029d is the requested one (undeclared shared job keeps 128 MiB; exclusive needs only the MemFree margin); moving to review so pm appr...
 - 2026-11-11 02:07 **S9-23** owner decide: Owner standing rule (2026-11-09, reminded 2026-11-10): the lead adds sessions unless two extensions in a row make no progress. Sessions raised to 3...
 - 2026-11-11 02:07 **S9-23** lead amend: sessions 2 -> 3 under the owner standing rule (2026-11-09, reminded 2026-11-10): progress made (head 276f029d).
 - 2026-11-11 02:05 **S9-23** lead escalate: budget: 2 engineer sessions used; the budget is 2
@@ -205,13 +206,12 @@ Current tickets: `[###################-]` 165 of 173
 - 2026-11-11 01:59 **S9-23** engineer red: Round 2 fix is a tests+code fix already green; red approved earlier by lead (01:02). Test test_shared_undeclared_keeps_the_128_mib_default now expe...
 - 2026-11-11 01:56 **S10-01** lead changes: Red tests are sound: the T1 register and stack-slot scans, the card values (exact in float, 4326 checked) and both -O0/-O2 cross-TU directions look...
 - 2026-11-11 01:53 **S9-23** lead changes: pm approve refused: Cygwin tests/tools/test_card_run.py ran past 20 minutes. It hangs in test_core_claims_include_every_project_and_release_on_fini...
-- 2026-11-11 01:50 **S10-01** engineer red: Red 501d0866: check.py t1 t2 --compiler gcc16 --vector-abi fails 3/3 with 'unsupported KNC register ABI mode' (log .work/_state/logs/check_gcc16_t1...
 
 ## Cost
 
 - From the script, engineer: 390 sessions, 854.3M input tokens
 - From the script, lead: 248 sessions, 73.5M input tokens
-- Started by hand, Claude: 11 sessions, 2269.8M input tokens
+- Started by hand, Claude: 11 sessions, 2270.6M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
