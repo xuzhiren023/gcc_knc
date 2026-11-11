@@ -1,10 +1,10 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-11 03:21.
+Updated automatically at every ticket change. Last update: 2026-11-11 03:34.
 
 **Next: the tech lead, on S10-01.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
-Current tickets: `[###################-]` 167 of 173
+Current tickets: `[###################-]` 167 of 174
 
 ## Milestones
 
@@ -13,7 +13,7 @@ Current tickets: `[###################-]` 167 of 173
 | M0 | Foundation | In progress | 17 of 17 tickets |
 | M1 | Mixed native code | Done | 43 of 43 tickets |
 | M2 | Useful vector target | Done | 51 of 51 tickets |
-| M3 | Runtimes | In progress | 33 of 39 tickets |
+| M3 | Runtimes | In progress | 33 of 40 tickets |
 | M4 | Broad optimization | Not started | Not planned in detail yet |
 | M5 | Program corpus | Not started | Not planned in detail yet |
 | M6 | Release | Not started | Not planned in detail yet |
@@ -181,7 +181,7 @@ Current tickets: `[###################-]` 167 of 173
 | S9-08 | libgomp spin-wait with delay and the one-core measurement (E6-03 C) | Done | Card 2026-11-10 measurements 1 and 3, three launches (log .work/_shared/tmp/claude-resume.log). One core, w... |
 | S9-09 | libgomp hierarchical ring-aware barrier (E6-03 D) | Done | Card 2026-11-10: measurements 2/4/5: every hier run exits 136 (SIGFPE); flat runs. The measure binaries lin... |
 | S9-10 | libgomp padding, static schedule default and malloc guidance (E6-03 E) | Done | Card 2026-11-10 14:40Z: the eight OpenMP programs pass on the S9-06..S9-10 libgomp at 60 threads (6 GiB) an... |
-| S9-11 | Sprint 9 batch check | In progress | deps S9-24 (settings and harness fixes); lane gcc2 after it. Owner 2026-11-11: close Sprint 9 tonight, blan... |
+| S9-11 | Sprint 9 batch check | In progress | deps add S9-25 (flat barrier default). Card parts of this check are being run by the lead (2026-11-11 08:21... |
 | S9-12 | libgomp adapts to the card: malloc arena cap from memory, core count and clock (ADR-0012) | Done | Measurement 7 cut down, 240 threads x 100000 1 KiB malloc/free, 2 reps (2026-11-10 22:xxZ): full profile (1... |
 | S9-13 | User story - -mknc-card= picks the card model's tuning, and -mknc-card=native detects it | Done | Card 2026-11-10, memory working set, density 4: -mknc-card=7100 vs knc: affine_f32 1.001, stencil1 1.003, m... |
 | S9-14 | card_run model profiles - run a job as a 3100, 5100 or 7100 card on our 7120P | Done | card_run --profile 3100/5100/7100/full runs a job as that card would (its compute cores and usable memory),... |
@@ -195,9 +195,11 @@ Current tickets: `[###################-]` 167 of 173
 | S9-22 | S9-18 PGO rebuild fails with coverage-mismatch on the card profiles - make the two builds identical | Done | The PGO experiment's two builds now use identical compile commands, so profiles collected on the card can b... |
 | S9-23 | card_run - no address-space limit in our exclusive turns (owner - "there is no job memory limit") | Done | In our exclusive card turns, jobs now run with no address-space limit unless a profile (3100, 5100) or the ... |
 | S9-24 | Sprint 9 settings from the card data, and the harness fixes the batch check needs | Done | KNC libgomp now uses the card-measured defaults: DELAY 128 while spinning, 200 ms of spinning before sleepi... |
+| S9-25 | The per-core barrier is slower than the flat one on the card - make flat the default; fix S9-07's runner | Not started |  |
 
 ## Recent activity
 
+- 2026-11-11 03:34 **S9-11** lead amend: deps add S9-25 (flat barrier default). Card parts of this check are being run by the lead (2026-11-11 08:21Z: S9-05, S9-06 60/240, S9-09 suite pass...
 - 2026-11-11 03:20 **S9-24** lead approve: KNC libgomp now uses the card-measured defaults: DELAY 128 while spinning, 200 ms of spinning before sleeping, and one malloc arena per CPU when no...
 - 2026-11-11 03:11 **S9-24** lead amend: heads set for approve
 - 2026-11-11 03:11 **S9-24** lead note: Lead: both protected paths are sanctioned (m2_kernels/build.py lane fix per Deliver 2; locks.c newline fix of the lead's own 58a2473 bug). Review: ...
@@ -205,16 +207,15 @@ Current tickets: `[###################-]` 167 of 173
 - 2026-11-11 03:05 **S10-02** owner decide: Owner standing rule (2026-11-09, reminded 2026-11-10; blanket approval 2026-11-11): budget raised to 12M input tokens. Answer to the 02:58 ask: (a)...
 - 2026-11-11 03:05 **S10-02** lead amend: input_tokens 6M -> 12M under the owner standing rule (progress: 5 of 6 cores build for KNC, host qualification passes, commit 101529da).
 - 2026-11-11 03:04 **S9-24** lead answer: Confirmed: my commit 58a2473b broke locks.c:43-44 with a literal newline. You may fix it on this branch: one separate commit touching only tests/ac...
-- 2026-11-11 03:03 **S10-02** lead escalate: budget: 7101130 input tokens used; the budget is 6000000
 
 ## Cost
 
 - From the script, engineer: 395 sessions, 869.3M input tokens
 - From the script, lead: 250 sessions, 73.8M input tokens
-- Started by hand, Claude: 11 sessions, 2300.7M input tokens
+- Started by hand, Claude: 11 sessions, 2305.1M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 23.2 GiB of 100 GiB. 96 GiB free on the drive.
+The project uses 23.3 GiB of 100 GiB. 96 GiB free on the drive.
