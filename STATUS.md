@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-10 20:53.
+Updated automatically at every ticket change. Last update: 2026-11-10 20:56.
 
 **Next: GPT-6.1, on S8-23 (Sprint 8 made the M2 short kernel 5-10% slower than Sprint 7 - bisect and fix).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
@@ -164,7 +164,7 @@ Current tickets: `[###################-]` 163 of 165
 | S8-19 | -mtune=knc stops the tight-loop alignment pass (nops on the fallthrough path) | Done | Card 2026-11-10 11:28-12:03Z (frozen .work/_shared/tmp/claude-s8-19, log .work/_shared/tmp/claude-next.log)... |
 | S8-20 | The small-loop unroll costs affine_f64 3-7% at 4 threads per core - make it follow the thread density | Done | Card 2026-11-10 21:00-23:00Z vs knc (S8-15 unroll 4), launch 1/2. Density 4: affine_f64 0.931/0.994, affine... |
 | S8-21 | The prefetch pass sees masked loads and stores, so rows shorter than a vector are prefetched | Done | Card 2026-11-11 01:00Z, WRF-shaped column loop (8-float rows), pf over nopf, 7 rounds: density 4 median 0.6... |
-| S8-22 | -mphinix is slower than -O2 on M2 kernels (mat16 12.9x, short 1.27x, mat8 1.13x) - find and fix | Done | -march=knc no longer lets -O3 flatten small inner loops before vectorizing or peel for alignment into x87 c... |
+| S8-22 | -mphinix is slower than -O2 on M2 kernels (mat16 12.9x, short 1.27x, mat8 1.13x) - find and fix | Done | Card 2026-11-11 01:11Z, -mphinix vs -O2 (launch 1/2): d4 mat16 0.923/0.878, mat8 0.908/0.912, stencil2 0.84... |
 | S8-23 | Sprint 8 made the M2 short kernel 5-10% slower than Sprint 7 - bisect and fix | In progress |  |
 | S9-01 | libgomp for KNC: futex, affinity, ring-aware barrier, spin-wait and malloc arenas (E6-03 input) | Done | We now have a build-and-design plan for GCC-KNC's own OpenMP runtime on the card: futex-based waits with de... |
 | S9-02 | libstdc++ for KNC: exceptions, RTTI, atomics, threads, packaging (E6-06 input) | Done | We now know how to build GCC 16's C++ library for the card: no newer glibc or kernel is needed, and built w... |
@@ -190,6 +190,7 @@ Current tickets: `[###################-]` 163 of 165
 
 ## Recent activity
 
+- 2026-11-10 20:56 **S8-22** lead note: Card 2026-11-11 01:11Z, -mphinix vs -O2 (launch 1/2): d4 mat16 0.923/0.878, mat8 0.908/0.912, stencil2 0.841/0.939, affine_f32 1.007/1.020, affine_...
 - 2026-11-10 20:52 **S8-22** lead approve: -march=knc no longer lets -O3 flatten small inner loops before vectorizing or peel for alignment into x87 code, the two causes of -mphinix's mat16 ...
 - 2026-11-10 20:22 **S9-21** lead approve: The S9-18 PGO training script now dumps profiles with od -b -v, which BusyBox 1.19 on the card supports, and the host check uses the same format; t...
 - 2026-11-10 20:13 **S9-21** engineer submit: train.sh dumps .gcda with od -b -v (BusyBox 1.19 compatible); use parses octal offsets+bytes; host path (same format) PASS; training set restaged, ...
@@ -197,13 +198,12 @@ Current tickets: `[###################-]` 163 of 165
 - 2026-11-10 20:12 **S9-11** lead note: Defaults to set from the 2026-11-11 card data: gomp_knc_delay 128 (S9-08) and default spin 200 ms (S9-15). Subnormals cost nothing on the VPU (C14)...
 - 2026-11-10 20:11 **S9-16** lead note: Card 2026-11-11: C13 no faults, no wrong values at any offset or page crossing; worst slowdown vs aligned: fst32/fst64 8.0x, ld32/ld64 4.0x, st32 4...
 - 2026-11-10 20:11 **S9-15** lead note: Card 2026-11-11, gap-join at 240 threads, DELAY 128: region entry after a 1 ms gap 0.30 ms for all; after 10 ms: spin3 3.75 ms, spin30 0.30, spin20...
-- 2026-11-10 20:11 **S8-21** lead note: Card 2026-11-11 01:00Z, WRF-shaped column loop (8-float rows), pf over nopf, 7 rounds: density 4 median 0.662 / 0.660 (launch 1/2), density 1 0.809...
 
 ## Cost
 
 - From the script, engineer: 383 sessions, 835.8M input tokens
 - From the script, lead: 244 sessions, 72.5M input tokens
-- Started by hand, Claude: 11 sessions, 2201.9M input tokens
+- Started by hand, Claude: 11 sessions, 2204.9M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
