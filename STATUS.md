@@ -2,7 +2,7 @@
 
 Updated automatically at every ticket change. Last update: 2026-11-11 00:53.
 
-**Next: the tech lead, on S9-23.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Waiting for you:** S9-23. Run `python tools/pm.py inbox`.
 
 Current tickets: `[###################-]` 165 of 167
 
@@ -188,10 +188,11 @@ Current tickets: `[###################-]` 165 of 167
 | S9-20 | Experiment - how much does instruction scheduling help the in-order core, at 1 and 4 threads per core? | Done | Card 2026-11-11, 1 thread/core, ratio to -O2 default: nosched affine 1.11, mat8 1.05; prepress affine 0.92,... |
 | S9-21 | S9-18 PGO training script - BusyBox od has no -A/-t, so no profile came back | Done | The S9-18 PGO training script now dumps profiles with od -b -v, which BusyBox 1.19 on the card supports, an... |
 | S9-22 | S9-18 PGO rebuild fails with coverage-mismatch on the card profiles - make the two builds identical | Done | The PGO experiment's two builds now use identical compile commands, so profiles collected on the card can b... |
-| S9-23 | card_run - no address-space limit in our exclusive turns (owner - "there is no job memory limit") | Tests waiting for review | tests fail on old code: exclusive default still limited to 128/budget, null memoryLimitMiB, full profile li... |
+| S9-23 | card_run - no address-space limit in our exclusive turns (owner - "there is no job memory limit") | **Waiting for you** | S9-23 is in red-review but green code is already committed on s9/S9-23 (I ran red late, after coding). Appr... |
 
 ## Recent activity
 
+- 2026-11-11 00:53 **S9-23** engineer escalate: S9-23 is in red-review but green code is already committed on s9/S9-23 (I ran red late, after coding). Approve red, then the ticket can be submitte...
 - 2026-11-11 00:53 **S9-23** engineer red: tests fail on old code: exclusive default still limited to 128/budget, null memoryLimitMiB, full profile limited
 - 2026-11-11 00:37 **S9-18** lead note: Card 2026-11-11 04:43Z, three launches, single thread, ratio to -O2 (mean of rounds): skewed hint 0.962, wrong 1.007, PGO 0.809, PGO on the other m...
 - 2026-11-11 00:36 **S8-23** lead close: Card 2026-11-11 04:43Z: safety holds (guard sweep 96132 checks, 0 failures; controls exit 3; M2 correctness passes), but the masked unpack/pack tai...
@@ -199,7 +200,6 @@ Current tickets: `[###################-]` 165 of 167
 - 2026-11-10 22:12 **S8-23** engineer submit: S8-02 gather/scatter tail was the cause. GCC s8/S8-23 (3 commits on knc 92a1b1a): while_ult prefix masks use a masked unpack/pack pair; other masks...
 - 2026-11-10 21:29 **S8-23** lead answer: Go with (1). The aligned no-op high address keeps the reason for the old rule (the high half must never touch an unmapped line), so I accept it for...
 - 2026-11-10 21:28 **S8-23** engineer ask: Cause is S8-02's gather/scatter tail (remainder 1 at length 17: ~30 insns + gather + scatter vs S7's 7-insn x87 iteration); only vect-partial-vecto...
-- 2026-11-10 21:22 **S9-22** lead approve: The PGO experiment's two builds now use identical compile commands, so profiles collected on the card can be used; the training run and timing go i...
 
 ## Cost
 
