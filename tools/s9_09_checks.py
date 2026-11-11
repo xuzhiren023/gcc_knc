@@ -2,8 +2,10 @@
 """S9-09 libgomp KNC team barrier; invoke through tools/run.py.
 
     python tools/s9_09_checks.py host [--barriers N]
-        compiles tests/regress/s9_09/barrier_stress.c with the Cygwin GCC against the lane's
-        libgomp/config/linux/knc/bar.h, bar.c and simple-bar.h and runs its variants: 240 threads,
+        preprocesses tests/regress/s9_09/default_barrier.c against the lane's libgomp/config/linux/knc
+        (the default build has the one-level barrier, -DGOMP_KNC_GROUP_BARRIER the per-core one), then
+        compiles tests/regress/s9_09/barrier_stress.c with the Cygwin GCC against bar.h, bar.c and
+        simple-bar.h with -DGOMP_KNC_GROUP_BARRIER and runs its variants: 240 threads,
         100000 barriers each, 60 groups (the cancel variant 36 cores, so that the last group is
         smaller than the others).
     python tools/s9_09_checks.py build
@@ -40,6 +42,9 @@ OBJDIR = s7.BUILD / 'k1om-mpss-linux/libgomp'
 WORK = s7.SHARED / 'tmp/s9-09'
 OUT = s7.SHARED / 'S9-09'
 # (mode, gomp_knc_ncores)
+# The libgomp build-time switch to the per-core barrier; without it the KNC libgomp has the one-level
+# Linux barrier (S9-25).
+GROUP = '-DGOMP_KNC_GROUP_BARRIER'
 VARIANTS = (('plain', 60), ('tasks-park', 60), ('tasks-spin', 60), ('cancel', 36), ('order', 60))
 # libgomp/testsuite: the barrier, cancel, single, ordered and task tests of libgomp.c, the ones there
 # that use taskwait, and the taskwait tests of libgomp.c-c++-common.
@@ -174,19 +179,27 @@ def host_mode(args):
     WORK.mkdir(parents=True)
     test = WORK / 'barrier_stress.exe'
     includes = [LIBGOMP / 'config' / part for part in s9.CONFIG_PATH.split()]
-    rc, text = s7.capture(['gcc', '-std=gnu11', '-O2', '-Wall', '-pthread', *('-I%s' % d for d in includes),
+    failed = 0
+    for switch in ([], [GROUP]):
+        rc, text = s7.capture(['gcc', '-E', '-o', os.devnull, *switch, *('-I%s' % d for d in includes),
+                               '-I%s' % LIBGOMP, TESTS / 'default_barrier.c'])
+        kind = 'grouped (%s)' % GROUP if switch else 'default'
+        print('%s %s barrier' % ('FAIL' if rc else 'PASS', kind), flush=True)
+        if rc:
+            print('\n'.join(text.splitlines()[-5:]))
+        failed += rc != 0
+    rc, text = s7.capture(['gcc', '-std=gnu11', '-O2', '-Wall', '-pthread', GROUP, *('-I%s' % d for d in includes),
                            TESTS / 'barrier_stress.c', '-o', test])
     if rc or text.strip():
         print('\n'.join(text.splitlines()[-15:]))
     if rc:
         print('FAIL host: barrier_stress.c does not build against %s' % LIBGOMP)
         return 1
-    failed = 0
     for mode, ncores in VARIANTS:
         rc, text = s7.capture([test, mode, args.barriers, ncores], timeout=7200)
         print(text.strip() or 'FAIL %s: no output, exit %s' % (mode, rc), flush=True)
         failed += rc != 0
-    print('%s host: %d of %d variants failed' % ('FAIL' if failed else 'PASS', failed, len(VARIANTS)))
+    print('%s host: %d of %d checks failed' % ('FAIL' if failed else 'PASS', failed, 2 + len(VARIANTS)))
     return int(failed != 0)
 
 
