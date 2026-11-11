@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-11 01:51.
+Updated automatically at every ticket change. Last update: 2026-11-11 01:53.
 
 **Next: the tech lead, on S10-01.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
@@ -193,11 +193,12 @@ Current tickets: `[###################-]` 165 of 173
 | S9-20 | Experiment - how much does instruction scheduling help the in-order core, at 1 and 4 threads per core? | Done | Card 2026-11-11, 1 thread/core, ratio to -O2 default: nosched affine 1.11, mat8 1.05; prepress affine 0.92,... |
 | S9-21 | S9-18 PGO training script - BusyBox od has no -A/-t, so no profile came back | Done | The S9-18 PGO training script now dumps profiles with od -b -v, which BusyBox 1.19 on the card supports, an... |
 | S9-22 | S9-18 PGO rebuild fails with coverage-mismatch on the card profiles - make the two builds identical | Done | The PGO experiment's two builds now use identical compile commands, so profiles collected on the card can b... |
-| S9-23 | card_run - no address-space limit in our exclusive turns (owner - "there is no job memory limit") | Waiting for review | head 84e9f27d: lead updated the S9-14 profile test expectation for 7100/full (no limit). |
+| S9-23 | card_run - no address-space limit in our exclusive turns (owner - "there is no job memory limit") | Changes requested | pm approve refused: Cygwin tests/tools/test_card_run.py ran past 20 minutes. It hangs in test_core_claims_i... |
 | S9-24 | Sprint 9 settings from the card data, and the harness fixes the batch check needs | In progress |  |
 
 ## Recent activity
 
+- 2026-11-11 01:53 **S9-23** lead changes: pm approve refused: Cygwin tests/tools/test_card_run.py ran past 20 minutes. It hangs in test_core_claims_include_every_project_and_release_on_fini...
 - 2026-11-11 01:50 **S10-01** engineer red: Red 501d0866: check.py t1 t2 --compiler gcc16 --vector-abi fails 3/3 with 'unsupported KNC register ABI mode' (log .work/_state/logs/check_gcc16_t1...
 - 2026-11-11 01:39 **S9-11** lead amend: deps S9-24 (settings and harness fixes); lane gcc2 after it. Owner 2026-11-11: close Sprint 9 tonight, blanket approval.
 - 2026-11-11 01:10 **S9-23** lead amend: head 84e9f27d: lead updated the S9-14 profile test expectation for 7100/full (no limit).
@@ -205,16 +206,15 @@ Current tickets: `[###################-]` 165 of 173
 - 2026-11-11 00:53 **S9-23** engineer escalate: S9-23 is in red-review but green code is already committed on s9/S9-23 (I ran red late, after coding). Approve red, then the ticket can be submitte...
 - 2026-11-11 00:53 **S9-23** engineer red: tests fail on old code: exclusive default still limited to 128/budget, null memoryLimitMiB, full profile limited
 - 2026-11-11 00:37 **S9-18** lead note: Card 2026-11-11 04:43Z, three launches, single thread, ratio to -O2 (mean of rounds): skewed hint 0.962, wrong 1.007, PGO 0.809, PGO on the other m...
-- 2026-11-11 00:36 **S8-23** lead close: Card 2026-11-11 04:43Z: safety holds (guard sweep 96132 checks, 0 failures; controls exit 3; M2 correctness passes), but the masked unpack/pack tai...
 
 ## Cost
 
 - From the script, engineer: 389 sessions, 853.9M input tokens
 - From the script, lead: 246 sessions, 72.9M input tokens
-- Started by hand, Claude: 11 sessions, 2265.5M input tokens
+- Started by hand, Claude: 11 sessions, 2267.2M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 23.2 GiB of 100 GiB. 97 GiB free on the drive.
+The project uses 23.2 GiB of 100 GiB. 93 GiB free on the drive.
