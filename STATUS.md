@@ -1,10 +1,10 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-11 05:02.
+Updated automatically at every ticket change. Last update: 2026-11-11 05:38.
 
 **Next: the tech lead, on S9-11.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
-Current tickets: `[###################-]` 170 of 174
+Current tickets: `[###################-]` 170 of 175
 
 ## Milestones
 
@@ -13,7 +13,7 @@ Current tickets: `[###################-]` 170 of 174
 | M0 | Foundation | In progress | 17 of 17 tickets |
 | M1 | Mixed native code | Done | 43 of 43 tickets |
 | M2 | Useful vector target | Done | 51 of 51 tickets |
-| M3 | Runtimes | In progress | 36 of 40 tickets |
+| M3 | Runtimes | In progress | 36 of 41 tickets |
 | M4 | Broad optimization | Not started | Not planned in detail yet |
 | M5 | Program corpus | Not started | Not planned in detail yet |
 | M6 | Release | Not started | Not planned in detail yet |
@@ -40,10 +40,11 @@ Current tickets: `[###################-]` 170 of 174
 | S1-06 | K1OM link defaults | Done | GCC 16 now targets the K1OM ABI by default: it passes --march=k1om to as and -m elf_k1om to ld, uses the /l... |
 | S1-07 | Milestone M0 evidence note | Done | M0 is settled as adjust: GCC 16.2 builds a k1om cc1 whose assembly the 2.22 assembler accepts, an options-f... |
 | S10-01 | 512-bit vector arguments and results under -march=knc (ADR-0014 point 1) | Done | 64-byte vectors (__m512 and vector_size(64)) can now be passed to and returned from functions under -march=... |
-| S10-02 | libknc_vmath v0 - build and requalify expf, logf, powf, exp, log, pow with GCC-KNC on the card | Done | libknc_vmath v0 builds for KNC with GCC-KNC: expf, logf, powf, exp, log and pow from the copied Arm routine... |
+| S10-02 | libknc_vmath v0 - build and requalify expf, logf, powf, exp, log, pow with GCC-KNC on the card | Done | Card qualification 2026-11-11 09:32-10:37Z (268M inputs each): expf 0.5016, logf 0.8106, exp 0.5079, log 0.... |
 | S10-03 | Loops call libknc_vmath - -mveclibabi=knc, by-value entry points, automatic link (ADR-0014 points 2-3) | In progress | Red accepted: the T1 expf call scan and the -mphinix scan fail for the right reason (no hook yet), the errn... |
 | S10-04 | Measure vector math - math kernels and a WRF-shaped physics loop, vector vs scalar libm | Not started |  |
 | S10-05 | Sprint 10 batch check | Not started |  |
+| S10-06 | Card qualification - classify powf's 848 special-case mismatches and certify pow under 1 ULP | Not started |  |
 | S2-01 | Design for zmm and mask registers under -march=knc | Done | The register design for KNC is settled on paper: all 32 zmm and 8 mask registers become usable under -march... |
 | S2-02 | Float and double arguments and results in zmm lane 0 | Done | Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`). |
 | S2-03 | Varargs with the donor's register save area | Done | Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`). |
@@ -199,6 +200,7 @@ Current tickets: `[###################-]` 170 of 174
 
 ## Recent activity
 
+- 2026-11-11 05:38 **S10-02** lead note: Card qualification 2026-11-11 09:32-10:37Z (268M inputs each): expf 0.5016, logf 0.8106, exp 0.5079, log 0.5144 ulp PASS; all host-compare jobs sam...
 - 2026-11-11 05:02 **S10-03** lead approve-red: Red accepted: the T1 expf call scan and the -mphinix scan fail for the right reason (no hook yet), the errno guard holds, and the T2 card program c...
 - 2026-11-11 05:01 **S10-03** engineer red: Red ed99b791 adds tests/t1/knc-vmath-phinix.c as asked; nothing else changed. check.py t1 --compiler gcc16 --vmath: knc-vmath-call.c FAIL and knc-v...
 - 2026-11-11 04:59 **S10-03** lead changes: Red is sound: T1 call fails for the right reason (no hook; -march=knc already lifts -O2 to the cheap cost model, i386-knc.cc:1115, so the loop does...
@@ -206,16 +208,15 @@ Current tickets: `[###################-]` 170 of 174
 - 2026-11-11 04:42 **S9-25** lead approve: KNC libgomp uses the flat barrier by default again (the per-core one was 1.5-2.5x slower on the card and stays behind a build switch), and the thre...
 - 2026-11-11 04:32 **S9-25** engineer submit: Red b96e847b default_barrier.c failed as expected; GCC 269c7c7f15e makes flat the default and keeps per-core behind -DGOMP_KNC_GROUP_BARRIER. s9_09...
 - 2026-11-11 04:31 **S10-02** lead approve: libknc_vmath v0 builds for KNC with GCC-KNC: expf, logf, powf, exp, log and pow from the copied Arm routines (provenance recorded), all within 1 ul...
-- 2026-11-11 04:23 **S10-02** engineer submit: Split per 04:21 answer: red 2e2cd7b7 (qualifier+runner only; host build fails 'knc_vmath.h: No such file'), green 7303fb8a; qualifier unchanged bet...
 
 ## Cost
 
 - From the script, engineer: 401 sessions, 879.1M input tokens
 - From the script, lead: 252 sessions, 74.4M input tokens
-- Started by hand, Claude: 11 sessions, 2336.5M input tokens
+- Started by hand, Claude: 11 sessions, 2340.1M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 23.4 GiB of 100 GiB. 94 GiB free on the drive.
+The project uses 23.6 GiB of 100 GiB. 94 GiB free on the drive.
