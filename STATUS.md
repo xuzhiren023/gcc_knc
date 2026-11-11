@@ -1,10 +1,10 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-11 10:27.
+Updated automatically at every ticket change. Last update: 2026-11-11 10:36.
 
-**Next: GPT-6.1, on S10-09 (User story - double-precision loops with division and square root vectorize, correctly rounded (V8DF div, cond_div, sqrt)).** Run `python tools/dispatch.py`, or ask the tech lead to.
+**Next: the tech lead, on S11-02.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
-Current tickets: `[###################-]` 177 of 178
+Current tickets: `[###################-]` 177 of 180
 
 ## Milestones
 
@@ -14,7 +14,7 @@ Current tickets: `[###################-]` 177 of 178
 | M1 | Mixed native code | Done | 43 of 43 tickets |
 | M2 | Useful vector target | Done | 51 of 51 tickets |
 | M3 | Runtimes | Done | 43 of 44 tickets |
-| M4 | Broad optimization | Not started | Not planned in detail yet |
+| M4 | Broad optimization | In progress | 0 of 2 tickets |
 | M5 | Program corpus | Not started | Not planned in detail yet |
 | M6 | Release | Not started | Not planned in detail yet |
 
@@ -48,6 +48,8 @@ Current tickets: `[###################-]` 177 of 178
 | S10-07 | Vector math v1a - the copied functions (sin, cos, tan, log10, atan, atan2, hyperbolics, bounded groups) in libknc_vmath and the vectorizer hook | Done | The vector math library now also covers sin, cos, tan, log10, atan, atan2, sinh, cosh, tanh and their float... |
 | S10-08 | Vector math v1b - the rest of the libmvec set (acos, asin, cbrt, erf, erfc, exp2, exp10, expm1, log1p, log2, hypot, sincos) | Done | The vector math library now covers the whole set GCC vectorizes with glibc's libmvec: acos, asin, cbrt, erf... |
 | S10-09 | User story - double-precision loops with division and square root vectorize, correctly rounded (V8DF div, cond_div, sqrt) | In progress | S10-09 red accepted: failing scans show that double division (fixed and variable bounds, masked tail) and s... |
+| S11-01 | User story - the best way to move data between the host and the card, measured, and how our projects use it | Not started | Owner 2026-11-11 10:45 EST: do not start yet (usage at 95%, wait for tonight's reset). |
+| S11-02 | card_run and run_suite move data by S11-01's recommended method, with fallback | Question for the tech lead |  |
 | S2-01 | Design for zmm and mask registers under -march=knc | Done | The register design for KNC is settled on paper: all 32 zmm and 8 mask registers become usable under -march... |
 | S2-02 | Float and double arguments and results in zmm lane 0 | Done | Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`). |
 | S2-03 | Varargs with the donor's register save area | Done | Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`). |
@@ -203,6 +205,7 @@ Current tickets: `[###################-]` 177 of 178
 
 ## Recent activity
 
+- 2026-11-11 10:36 **S11-01** lead note: Owner 2026-11-11 10:45 EST: do not start yet (usage at 95%, wait for tonight's reset).
 - 2026-11-11 10:27 **S10-09** lead approve-red: S10-09 red accepted: failing scans show that double division (fixed and variable bounds, masked tail) and square root loops do not yet vectorize un...
 - 2026-11-11 10:25 **S10-09** engineer red: Red fac88ad9: knc-divsqrt-f64.c fails at vrcp23ps in div_f64 (no divv8df3); log check_gcc16_t1-20261111-102408.log. Host model knc-v8df-model.c pas...
 - 2026-11-11 09:43 **S10-08** lead approve: The vector math library now covers the whole set GCC vectorizes with glibc's libmvec: acos, asin, cbrt, erf, erfc, exp2, exp10, expm1, log1p, log2 ...
@@ -210,16 +213,15 @@ Current tickets: `[###################-]` 177 of 178
 - 2026-11-11 09:17 **S10-08** owner decide: Owner standing rule (2026-11-09, reminded 2026-11-10; blanket approval 2026-11-11): budget raised to 24M input tokens, first extension; red was app...
 - 2026-11-11 09:16 **S10-08** lead amend: input_tokens 24000000 (deep ticket, red approved at 15.5M)
 - 2026-11-11 09:15 **S10-08** lead escalate: budget: 15506867 input tokens used; the budget is 12000000
-- 2026-11-11 09:14 **S10-08** lead approve-red: S10-08 red accepted: failing scans now show that loops of the 11 remaining libmvec functions (float and double) still call scalar libm, and the hos...
 
 ## Cost
 
 - From the script, engineer: 410 sessions, 926.1M input tokens
 - From the script, lead: 256 sessions, 76.4M input tokens
-- Started by hand, Claude: 11 sessions, 2401.4M input tokens
+- Started by hand, Claude: 11 sessions, 2404.1M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 23.7 GiB of 100 GiB. 98 GiB free on the drive.
+The project uses 23.7 GiB of 100 GiB. 94 GiB free on the drive.
