@@ -258,7 +258,7 @@ def run_job(target, job, program, args, timeout):
     if target == 'host':
         text = run_host(program, args)
     else:
-        cmd = [sys.executable, str(ROOT / 'tools/card_run'), '--timeout', str(timeout),
+        cmd = [sys.executable, str(ROOT / 'tools/card_run'), '--threads', '240', '--timeout', str(timeout),
                str(OUT / target / (program + '.mic'))] + args
         text = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
                               universal_newlines=True).stdout
