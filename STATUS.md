@@ -2,9 +2,9 @@
 
 Updated automatically at every ticket change. Last update: 2026-11-11 00:37.
 
-**Next: GPT-6.1, on S9-11 (Sprint 9 batch check).** Run `python tools/dispatch.py`, or ask the tech lead to.
+**Next: GPT-6.1, on S9-23 (card_run - no address-space limit in our exclusive turns (owner - "there is no job memory limit")).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
-Current tickets: `[###################-]` 165 of 166
+Current tickets: `[###################-]` 165 of 167
 
 ## Milestones
 
@@ -13,7 +13,7 @@ Current tickets: `[###################-]` 165 of 166
 | M0 | Foundation | In progress | 17 of 17 tickets |
 | M1 | Mixed native code | Done | 43 of 43 tickets |
 | M2 | Useful vector target | Done | 51 of 51 tickets |
-| M3 | Runtimes | In progress | 31 of 32 tickets |
+| M3 | Runtimes | In progress | 31 of 33 tickets |
 | M4 | Broad optimization | Not started | Not planned in detail yet |
 | M5 | Program corpus | Not started | Not planned in detail yet |
 | M6 | Release | Not started | Not planned in detail yet |
@@ -188,6 +188,7 @@ Current tickets: `[###################-]` 165 of 166
 | S9-20 | Experiment - how much does instruction scheduling help the in-order core, at 1 and 4 threads per core? | Done | Card 2026-11-11, 1 thread/core, ratio to -O2 default: nosched affine 1.11, mat8 1.05; prepress affine 0.92,... |
 | S9-21 | S9-18 PGO training script - BusyBox od has no -A/-t, so no profile came back | Done | The S9-18 PGO training script now dumps profiles with od -b -v, which BusyBox 1.19 on the card supports, an... |
 | S9-22 | S9-18 PGO rebuild fails with coverage-mismatch on the card profiles - make the two builds identical | Done | The PGO experiment's two builds now use identical compile commands, so profiles collected on the card can b... |
+| S9-23 | card_run - no address-space limit in our exclusive turns (owner - "there is no job memory limit") | In progress |  |
 
 ## Recent activity
 
@@ -204,7 +205,7 @@ Current tickets: `[###################-]` 165 of 166
 
 - From the script, engineer: 387 sessions, 849.7M input tokens
 - From the script, lead: 246 sessions, 72.9M input tokens
-- Started by hand, Claude: 11 sessions, 2233.6M input tokens
+- Started by hand, Claude: 11 sessions, 2235.2M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
