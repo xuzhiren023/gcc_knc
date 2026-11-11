@@ -121,3 +121,10 @@ memory-bound; none covers instruction-bound, L2-resident loops. vprefetch0 pairs
 (C2), vprefetch1 costs about 2 core cycles; prefetch lost time on short loops (1.30x, now versioned), L1-only
 prefetch, and aliased many-stream rows. Advised: one prefetch per line per stream, no clamps (versioned short
 trips instead), L1 distance 4 lines at about 20 streams and 2 threads/core, then A/B none / both / vprefetch0-only per kernel.
+
+**2026-11-11 16:45 EST, for PhiWeather's next session (their session was offline after the host reboot).**
+2 MB pages are now available on the card, on demand: the owner set `nr_overcommit_hugepages` = 4096 (up to
+8 GB, allocated only when asked, freed on exit; nothing reserved) and mounted hugetlbfs at `/mnt/huge`; MPSS
+also mounts one at `/var/volatile/tmp/COI2MB`. Only code using `MAP_HUGETLB` or those mounts gets them; THP is
+unchanged (`always`, never used). Lost at the next card reboot. Owner's instruction to both projects: start no
+new work until the owner says usage has been reset.
