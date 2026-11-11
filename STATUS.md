@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-10 19:25.
+Updated automatically at every ticket change. Last update: 2026-11-10 19:26.
 
 **Next: GPT-6.1, on S8-22 (-mphinix is slower than -O2 on M2 kernels (mat16 12.9x, short 1.27x, mat8 1.13x) - find and fix).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
@@ -183,7 +183,7 @@ Current tickets: `[###################-]` 159 of 162
 | S9-16 | Card probes - unaligned scalar accesses, and the VPU cost of subnormal operands | Done | Two card probes are built and ready for the lead to run: C13 tests whether unaligned scalar loads and store... |
 | S9-17 | User guidance on the flags page - threads per core, first touch, regions, heap, and ICC differences | Done | The flags page now has a 'Writing fast code for KNC' section: threads per core, first touch and region size... |
 | S9-18 | Experiment - how much do branch hints and profile-guided optimization gain on KNC? | Done | Four small branchy kernels in five builds (plain -O2, correct and wrong branch hints, PGO, PGO trained on o... |
-| S9-19 | Experiment - auto-parallelization on KNC, and whether AutoFDO is possible on the card | Not started |  |
+| S9-19 | Experiment - auto-parallelization on KNC, and whether AutoFDO is possible on the card | In progress |  |
 
 ## Recent activity
 
@@ -200,7 +200,7 @@ Current tickets: `[###################-]` 159 of 162
 
 - From the script, engineer: 378 sessions, 816.2M input tokens
 - From the script, lead: 241 sessions, 72.2M input tokens
-- Started by hand, Claude: 11 sessions, 2168.8M input tokens
+- Started by hand, Claude: 11 sessions, 2170.9M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
