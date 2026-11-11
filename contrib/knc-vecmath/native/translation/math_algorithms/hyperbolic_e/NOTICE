@@ -9,3 +9,10 @@ software is freely granted, provided that this notice
 is preserved.
 
 The original file notices and the full musl COPYRIGHT also remain in upstream/.
+
+GCC-KNC change (S10-07, 2026-11-11): in hyperbolic_e.c the double-double
+helpers (number, norm, add, neg, sub, mul, divide, scale, reduced_exp) take
+their operands and return their result through pointers instead of passing
+struct {dv h,l} by value, because GCC-KNC has no calling convention for an
+aggregate with a 64-byte vector member (ADR-0014 point 1). The operations and
+their order are unchanged. The other files in this directory are as copied.

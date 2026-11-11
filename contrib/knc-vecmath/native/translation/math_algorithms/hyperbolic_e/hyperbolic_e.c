@@ -15,38 +15,42 @@ typedef uint64_t uv __attribute__((vector_size(64)));
 typedef struct {dv h,l;} dd;
 #define INLINE static inline __attribute__((always_inline))
 INLINE dv splat(double a){return(dv){0}+a;}
-INLINE dd number(double a){return(dd){splat(a),(dv){0}};}
-INLINE dd norm(dv h,dv l){dv s=h+l;return(dd){s,l-(s-h)};}
-INLINE dd add(dd a,dd b){dv s=a.h+b.h,v=s-a.h,e=(a.h-(s-v))+(b.h-v)+a.l+b.l;return norm(s,e);}
-INLINE dd neg(dd a){return(dd){-a.h,-a.l};}
-INLINE dd sub(dd a,dd b){return add(a,neg(b));}
-INLINE dd mul(dd a,dd b){
-  dv p=a.h*b.h,ca=0x1.0000002p27*a.h,cb=0x1.0000002p27*b.h;
-  dv ah=ca-(ca-a.h),al=a.h-ah,bh=cb-(cb-b.h),bl=b.h-bh;
-  dv e=((ah*bh-p)+ah*bl+al*bh)+al*bl+a.h*b.l+a.l*b.h+a.l*b.l;
-  return norm(p,e);
+/* GCC-KNC (S10-07, see NOTICE): a dd travels by pointer, not by value. Each
+ * helper reads its operands, then writes *o, which may be an operand, and
+ * returns o so that calls nest as before; NEW is a fresh temporary. */
+#define NEW (&(dd){{0},{0}})
+INLINE const dd *number(dd *o,double a){*o=(dd){splat(a),(dv){0}};return o;}
+INLINE const dd *norm(dd *o,dv h,dv l){dv s=h+l;*o=(dd){s,l-(s-h)};return o;}
+INLINE const dd *add(dd *o,const dd *a,const dd *b){dv s=a->h+b->h,v=s-a->h,e=(a->h-(s-v))+(b->h-v)+a->l+b->l;return norm(o,s,e);}
+INLINE const dd *neg(dd *o,const dd *a){*o=(dd){-a->h,-a->l};return o;}
+INLINE const dd *sub(dd *o,const dd *a,const dd *b){return add(o,a,neg(NEW,b));}
+INLINE const dd *mul(dd *o,const dd *a,const dd *b){
+  dv p=a->h*b->h,ca=0x1.0000002p27*a->h,cb=0x1.0000002p27*b->h;
+  dv ah=ca-(ca-a->h),al=a->h-ah,bh=cb-(cb-b->h),bl=b->h-bh;
+  dv e=((ah*bh-p)+ah*bl+al*bh)+al*bl+a->h*b->l+a->l*b->h+a->l*b->l;
+  return norm(o,p,e);
 }
-INLINE dd divide(dd a,dd b){
-  dv q=a.h/b.h;dd first={q,(dv){0}},r=sub(a,mul(b,first));
-  dv q2=(r.h+r.l)/b.h;dd result=add(first,(dd){q2,(dv){0}});
-  r=sub(a,mul(b,result));return add(result,(dd){(r.h+r.l)/b.h,(dv){0}});
+INLINE const dd *divide(dd *o,const dd *a,const dd *b){
+  dv q=a->h/b->h;dd first={q,(dv){0}},r,result;sub(&r,a,mul(NEW,b,&first));
+  dv q2=(r.h+r.l)/b->h;add(&result,&first,&(dd){q2,(dv){0}});
+  sub(&r,a,mul(NEW,b,&result));return add(o,&result,&(dd){(r.h+r.l)/b->h,(dv){0}});
 }
-INLINE dd scale(dd a,dv power){return(dd){a.h*power,a.l*power};}
+INLINE const dd *scale(dd *o,const dd *a,dv power){*o=(dd){a->h*power,a->l*power};return o;}
 INLINE dv frombits(uv b){dv v;memcpy(&v,&b,64);return v;}
 INLINE uv tobits(dv v){uv b;memcpy(&b,&v,64);return b;}
 
 /* Same scaled Q1..Q5 bit patterns as the pinned official expm1.c. */
-INLINE dd reduced_exp(dd r){
-  dd half=mul(r,number(.5)),z=mul(r,half);
-  dd p=number(-0x1.afdb76e09c32dp-23);
-  p=add(number(0x1.0cfca86e65239p-18),mul(z,p));
-  p=add(number(-0x1.4ce199eaadbb7p-14),mul(z,p));
-  p=add(number(0x1.a01a019fe5585p-10),mul(z,p));
-  p=add(number(-0x1.11111111110f4p-5),mul(z,p));
-  dd r1=add(number(1),mul(z,p)),t=sub(number(3),mul(r1,half));
+INLINE const dd *reduced_exp(dd *o,const dd *r){
+  dd half,z,p,r1,t,e;mul(&half,r,number(NEW,.5));mul(&z,r,&half);
+  number(&p,-0x1.afdb76e09c32dp-23);
+  add(&p,number(NEW,0x1.0cfca86e65239p-18),mul(NEW,&z,&p));
+  add(&p,number(NEW,-0x1.4ce199eaadbb7p-14),mul(NEW,&z,&p));
+  add(&p,number(NEW,0x1.a01a019fe5585p-10),mul(NEW,&z,&p));
+  add(&p,number(NEW,-0x1.11111111110f4p-5),mul(NEW,&z,&p));
+  add(&r1,number(NEW,1),mul(NEW,&z,&p));sub(&t,number(NEW,3),mul(NEW,&r1,&half));
   /* Multiply the zero numerator first, avoiding unused1/3 on neutral lanes. */
-  dd e=divide(mul(z,sub(r1,t)),sub(number(6),mul(r,t)));
-  return add(number(1),add(r,sub(z,mul(r,e))));
+  divide(&e,mul(NEW,&z,sub(NEW,&r1,&t)),sub(NEW,number(NEW,6),mul(NEW,r,&t)));
+  return add(o,number(NEW,1),add(NEW,r,sub(NEW,&z,mul(NEW,r,&e))));
 }
 
 static __attribute__((noinline)) void core(unsigned operation,const double input[8],double output[8]){
@@ -60,21 +64,22 @@ static __attribute__((noinline)) void core(unsigned operation,const double input
     small_scale_bits[i]=input[i]<20?(uint64_t)(k+1023)<<52:UINT64_C(0x3ff0000000000000);
   }
   dv k;memcpy(&k,kd,64);
-  dd r=sub(sub((dd){x,(dv){0}},mul((dd){k,(dv){0}},number(0x1.62e42fee00000p-1))),
-      mul((dd){k,(dv){0}},number(0x1.a39ef35793c76p-33)));
-  dd er=reduced_exp(r);
+  dd r,er,ex,t,sh,ch;
+  sub(&r,sub(NEW,&(dd){x,(dv){0}},mul(NEW,&(dd){k,(dv){0}},number(NEW,0x1.62e42fee00000p-1))),
+      mul(NEW,&(dd){k,(dv){0}},number(NEW,0x1.a39ef35793c76p-33)));
+  reduced_exp(&er,&r);
   /* Only finite small arguments participate in reciprocal/cancellation paths. */
   for(unsigned i=0;i<8;i++)if(input[i]>=20){er.h[i]=1;er.l[i]=0;}
-  dd ex=scale(er,frombits(small_scale_bits)),t=sub(ex,number(1));
-  dd sh=mul(number(.5),add(t,divide(t,add(t,number(1)))));
-  dd ch=add(number(1),divide(mul(t,t),mul(number(2),add(t,number(1)))));
-  dd answer=operation==0?sh:operation==1?ch:divide(sh,ch);
-  dv value=answer.h+answer.l;
+  scale(&ex,&er,frombits(small_scale_bits));sub(&t,&ex,number(NEW,1));
+  mul(&sh,number(NEW,.5),add(NEW,&t,divide(NEW,&t,add(NEW,&t,number(NEW,1)))));
+  add(&ch,number(NEW,1),divide(NEW,mul(NEW,&t,&t),mul(NEW,number(NEW,2),add(NEW,&t,number(NEW,1)))));
+  const dd *answer=operation==0?&sh:operation==1?&ch:divide(NEW,&sh,&ch);
+  dv value=answer->h+answer->l;
   unsigned large=0;for(unsigned i=0;i<8;i++)if(input[i]>=20)large|=1u<<i;
   if(large&&operation!=2){
     /* Recompute only sanitized large lanes; no overflowing DD intermediates. */
     dd large_r=r;for(unsigned i=0;i<8;i++)if(!(large&(1u<<i))){large_r.h[i]=0;large_r.l[i]=0;}
-    dd y=reduced_exp(large_r);dv half=(y.h+y.l)*frombits(half_scale_bits);
+    dd y;reduced_exp(&y,&large_r);dv half=(y.h+y.l)*frombits(half_scale_bits);
     for(unsigned i=0;i<8;i++)if(twice&(1u<<i))half[i]*=2;
     for(unsigned i=0;i<8;i++)if(large&(1u<<i))value[i]=half[i];
   }
