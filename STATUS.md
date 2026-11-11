@@ -1,10 +1,10 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-11 03:11.
+Updated automatically at every ticket change. Last update: 2026-11-11 03:20.
 
 **Next: the tech lead, on S10-01.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
-Current tickets: `[###################-]` 166 of 173
+Current tickets: `[###################-]` 167 of 173
 
 ## Milestones
 
@@ -13,7 +13,7 @@ Current tickets: `[###################-]` 166 of 173
 | M0 | Foundation | In progress | 17 of 17 tickets |
 | M1 | Mixed native code | Done | 43 of 43 tickets |
 | M2 | Useful vector target | Done | 51 of 51 tickets |
-| M3 | Runtimes | In progress | 32 of 39 tickets |
+| M3 | Runtimes | In progress | 33 of 39 tickets |
 | M4 | Broad optimization | Not started | Not planned in detail yet |
 | M5 | Program corpus | Not started | Not planned in detail yet |
 | M6 | Release | Not started | Not planned in detail yet |
@@ -194,10 +194,11 @@ Current tickets: `[###################-]` 166 of 173
 | S9-21 | S9-18 PGO training script - BusyBox od has no -A/-t, so no profile came back | Done | The S9-18 PGO training script now dumps profiles with od -b -v, which BusyBox 1.19 on the card supports, an... |
 | S9-22 | S9-18 PGO rebuild fails with coverage-mismatch on the card profiles - make the two builds identical | Done | The PGO experiment's two builds now use identical compile commands, so profiles collected on the card can b... |
 | S9-23 | card_run - no address-space limit in our exclusive turns (owner - "there is no job memory limit") | Done | In our exclusive card turns, jobs now run with no address-space limit unless a profile (3100, 5100) or the ... |
-| S9-24 | Sprint 9 settings from the card data, and the harness fixes the batch check needs | Waiting for review | heads set for approve |
+| S9-24 | Sprint 9 settings from the card data, and the harness fixes the batch check needs | Done | KNC libgomp now uses the card-measured defaults: DELAY 128 while spinning, 200 ms of spinning before sleepi... |
 
 ## Recent activity
 
+- 2026-11-11 03:20 **S9-24** lead approve: KNC libgomp now uses the card-measured defaults: DELAY 128 while spinning, 200 ms of spinning before sleeping, and one malloc arena per CPU when no...
 - 2026-11-11 03:11 **S9-24** lead amend: heads set for approve
 - 2026-11-11 03:11 **S9-24** lead note: Lead: both protected paths are sanctioned (m2_kernels/build.py lane fix per Deliver 2; locks.c newline fix of the lead's own 58a2473 bug). Review: ...
 - 2026-11-11 03:09 **S9-24** engineer ask: All done; submit is refused for two protected paths, both sanctioned: tests/acceptance/m2_kernels/build.py (Deliver 2, in aeffad0e) and tests/accep...
@@ -205,16 +206,15 @@ Current tickets: `[###################-]` 166 of 173
 - 2026-11-11 03:05 **S10-02** lead amend: input_tokens 6M -> 12M under the owner standing rule (progress: 5 of 6 cores build for KNC, host qualification passes, commit 101529da).
 - 2026-11-11 03:04 **S9-24** lead answer: Confirmed: my commit 58a2473b broke locks.c:43-44 with a literal newline. You may fix it on this branch: one separate commit touching only tests/ac...
 - 2026-11-11 03:03 **S10-02** lead escalate: budget: 7101130 input tokens used; the budget is 6000000
-- 2026-11-11 03:02 **S9-24** engineer ask: Everything is done except staging S9-06. Red f663b63e then green; gcc-2 35b5470c5c3 plus fixes 2507dfda717 and 84c73d3882d (flat bar.h); t0/t1/t2 g...
 
 ## Cost
 
 - From the script, engineer: 395 sessions, 869.3M input tokens
 - From the script, lead: 250 sessions, 73.8M input tokens
-- Started by hand, Claude: 11 sessions, 2297.2M input tokens
+- Started by hand, Claude: 11 sessions, 2298.1M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 23.2 GiB of 100 GiB. 96 GiB free on the drive.
+The project uses 23.2 GiB of 100 GiB. 95 GiB free on the drive.
