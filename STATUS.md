@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-11 00:36.
+Updated automatically at every ticket change. Last update: 2026-11-11 00:37.
 
 **Next: GPT-6.1, on S9-11 (Sprint 9 batch check).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
@@ -183,7 +183,7 @@ Current tickets: `[###################-]` 165 of 166
 | S9-15 | libgomp's KNC spin time before sleeping, measured against fork-heavy code | Done | Card 2026-11-11, gap-join at 240 threads, DELAY 128: region entry after a 1 ms gap 0.30 ms for all; after 1... |
 | S9-16 | Card probes - unaligned scalar accesses, and the VPU cost of subnormal operands | Done | Card 2026-11-11: C13 no faults, no wrong values at any offset or page crossing; worst slowdown vs aligned: ... |
 | S9-17 | User guidance on the flags page - threads per core, first touch, regions, heap, and ICC differences | Done | The flags page now has a 'Writing fast code for KNC' section: threads per core, first touch and region size... |
-| S9-18 | Experiment - how much do branch hints and profile-guided optimization gain on KNC? | Done | Card 2026-11-11: the eight instrumented programs ran (TRAIN checksums printed) but BusyBox od rejected -A, ... |
+| S9-18 | Experiment - how much do branch hints and profile-guided optimization gain on KNC? | Done | Card 2026-11-11 04:43Z, three launches, single thread, ratio to -O2 (mean of rounds): skewed hint 0.962, wr... |
 | S9-19 | Experiment - auto-parallelization on KNC, and whether AutoFDO is possible on the card | Done | Card 2026-11-11: AutoFDO probe: kernel 2.6.38.8+mpss3.7.1, no perf binary, perf_event_paranoid 1, hw cycles... |
 | S9-20 | Experiment - how much does instruction scheduling help the in-order core, at 1 and 4 threads per core? | Done | Card 2026-11-11, 1 thread/core, ratio to -O2 default: nosched affine 1.11, mat8 1.05; prepress affine 0.92,... |
 | S9-21 | S9-18 PGO training script - BusyBox od has no -A/-t, so no profile came back | Done | The S9-18 PGO training script now dumps profiles with od -b -v, which BusyBox 1.19 on the card supports, an... |
@@ -191,6 +191,7 @@ Current tickets: `[###################-]` 165 of 166
 
 ## Recent activity
 
+- 2026-11-11 00:37 **S9-18** lead note: Card 2026-11-11 04:43Z, three launches, single thread, ratio to -O2 (mean of rounds): skewed hint 0.962, wrong 1.007, PGO 0.809, PGO on the other m...
 - 2026-11-11 00:36 **S8-23** lead close: Card 2026-11-11 04:43Z: safety holds (guard sweep 96132 checks, 0 failures; controls exit 3; M2 correctness passes), but the masked unpack/pack tai...
 - 2026-11-10 22:14 **S8-23** lead note: Lead review 2026-11-10: design accepted (the 21:29 lead answer and its conditions). Not approved before its card check, because it changes S8-02 sa...
 - 2026-11-10 22:12 **S8-23** engineer submit: S8-02 gather/scatter tail was the cause. GCC s8/S8-23 (3 commits on knc 92a1b1a): while_ult prefix masks use a masked unpack/pack pair; other masks...
@@ -198,7 +199,6 @@ Current tickets: `[###################-]` 165 of 166
 - 2026-11-10 21:28 **S8-23** engineer ask: Cause is S8-02's gather/scatter tail (remainder 1 at length 17: ~30 insns + gather + scatter vs S7's 7-insn x87 iteration); only vect-partial-vecto...
 - 2026-11-10 21:22 **S9-22** lead approve: The PGO experiment's two builds now use identical compile commands, so profiles collected on the card can be used; the training run and timing go i...
 - 2026-11-10 21:09 **S9-22** engineer submit: Both builds compile a cwd-relative '<kernel>.c' copy with identical commands (echoed as '+' lines in the log); host runs build and use as separate ...
-- 2026-11-10 21:04 **S9-22** lead approve-red: S9-22 red accepted: the card log's coverage-mismatch on every kernel is the failing evidence; the fix is checked by the host two-process run and a ...
 
 ## Cost
 
