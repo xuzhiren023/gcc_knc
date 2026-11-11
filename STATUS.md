@@ -1,10 +1,10 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-10 20:56.
+Updated automatically at every ticket change. Last update: 2026-11-10 20:58.
 
 **Next: GPT-6.1, on S8-23 (Sprint 8 made the M2 short kernel 5-10% slower than Sprint 7 - bisect and fix).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
-Current tickets: `[###################-]` 163 of 165
+Current tickets: `[###################-]` 163 of 166
 
 ## Milestones
 
@@ -13,7 +13,7 @@ Current tickets: `[###################-]` 163 of 165
 | M0 | Foundation | In progress | 17 of 17 tickets |
 | M1 | Mixed native code | Done | 43 of 43 tickets |
 | M2 | Useful vector target | Done | 51 of 51 tickets |
-| M3 | Runtimes | In progress | 30 of 31 tickets |
+| M3 | Runtimes | In progress | 30 of 32 tickets |
 | M4 | Broad optimization | Not started | Not planned in detail yet |
 | M5 | Program corpus | Not started | Not planned in detail yet |
 | M6 | Release | Not started | Not planned in detail yet |
@@ -187,6 +187,7 @@ Current tickets: `[###################-]` 163 of 165
 | S9-19 | Experiment - auto-parallelization on KNC, and whether AutoFDO is possible on the card | Done | Card 2026-11-11: AutoFDO probe: kernel 2.6.38.8+mpss3.7.1, no perf binary, perf_event_paranoid 1, hw cycles... |
 | S9-20 | Experiment - how much does instruction scheduling help the in-order core, at 1 and 4 threads per core? | Done | Card 2026-11-11, 1 thread/core, ratio to -O2 default: nosched affine 1.11, mat8 1.05; prepress affine 0.92,... |
 | S9-21 | S9-18 PGO training script - BusyBox od has no -A/-t, so no profile came back | Done | The S9-18 PGO training script now dumps profiles with od -b -v, which BusyBox 1.19 on the card supports, an... |
+| S9-22 | S9-18 PGO rebuild fails with coverage-mismatch on the card profiles - make the two builds identical | In progress |  |
 
 ## Recent activity
 
@@ -203,10 +204,10 @@ Current tickets: `[###################-]` 163 of 165
 
 - From the script, engineer: 383 sessions, 835.8M input tokens
 - From the script, lead: 244 sessions, 72.5M input tokens
-- Started by hand, Claude: 11 sessions, 2204.9M input tokens
+- Started by hand, Claude: 11 sessions, 2210.2M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 23.1 GiB of 100 GiB. 111 GiB free on the drive.
+The project uses 23.1 GiB of 100 GiB. 110 GiB free on the drive.
