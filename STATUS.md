@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-11 02:34.
+Updated automatically at every ticket change. Last update: 2026-11-11 02:35.
 
-**Next: the tech lead, on S10-01.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: GPT-6.1, on S10-01 (512-bit vector arguments and results under -march=knc (ADR-0014 point 1)).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
 Current tickets: `[###################-]` 166 of 173
 
@@ -39,7 +39,7 @@ Current tickets: `[###################-]` 166 of 173
 | S1-05 | Integer C assembles with as 2.22 and lints clean | Done | All 2003 GCC torture compile files now build for KNC at -O0, -O2 and -O2 -g and assemble with the card's ol... |
 | S1-06 | K1OM link defaults | Done | GCC 16 now targets the K1OM ABI by default: it passes --march=k1om to as and -m elf_k1om to ld, uses the /l... |
 | S1-07 | Milestone M0 evidence note | Done | M0 is settled as adjust: GCC 16.2 builds a k1om cc1 whose assembly the 2.22 assembler accepts, an options-f... |
-| S10-01 | 512-bit vector arguments and results under -march=knc (ADR-0014 point 1) | Tests waiting for review | Guard at aa506820: -DABI_VECTOR_VARIADIC_CALL and _NAMED in knc-abi-mixed.c, checked at -O0/-O2 by t1_vecto... |
+| S10-01 | 512-bit vector arguments and results under -march=knc (ADR-0014 point 1) | In progress | Red accepted: T1 register and 64-byte stack-slot scans, -O0/-O2 cross-TU card pair (4326 exact checks), and... |
 | S10-02 | libknc_vmath v0 - build and requalify expf, logf, powf, exp, log, pow with GCC-KNC on the card | Not started |  |
 | S10-03 | Loops call libknc_vmath - -mveclibabi=knc, by-value entry points, automatic link (ADR-0014 points 2-3) | Not started |  |
 | S10-04 | Measure vector math - math kernels and a WRF-shaped physics loop, vector vs scalar libm | Not started |  |
@@ -198,6 +198,7 @@ Current tickets: `[###################-]` 166 of 173
 
 ## Recent activity
 
+- 2026-11-11 02:35 **S10-01** lead approve-red: Red accepted: T1 register and 64-byte stack-slot scans, -O0/-O2 cross-TU card pair (4326 exact checks), and the variadic guard (unnamed and named v...
 - 2026-11-11 02:34 **S9-23** lead approve: In our exclusive card turns, jobs now run with no address-space limit unless a profile (3100, 5100) or the config asks for one, so 240-thread progr...
 - 2026-11-11 02:26 **S9-23** lead amend: head 1d09ead5: lead fixed the pin test fake exec for the unlimited case.
 - 2026-11-11 02:25 **S10-01** engineer red: Guard at aa506820: -DABI_VECTOR_VARIADIC_CALL and _NAMED in knc-abi-mixed.c, checked at -O0/-O2 by t1_vector_diagnostics, which --vector-abi now ru...
@@ -205,7 +206,6 @@ Current tickets: `[###################-]` 166 of 173
 - 2026-11-11 02:07 **S9-23** owner decide: Owner standing rule (2026-11-09, reminded 2026-11-10): the lead adds sessions unless two extensions in a row make no progress. Sessions raised to 3...
 - 2026-11-11 02:07 **S9-23** lead amend: sessions 2 -> 3 under the owner standing rule (2026-11-09, reminded 2026-11-10): progress made (head 276f029d).
 - 2026-11-11 02:05 **S9-23** lead escalate: budget: 2 engineer sessions used; the budget is 2
-- 2026-11-11 02:02 **S9-23** lead approve-red: Red approved for round 2: the renamed shared-mode test now expects an undeclared job to keep the 128 MiB default, which fails on the previous head ...
 
 ## Cost
 
@@ -217,4 +217,4 @@ Current tickets: `[###################-]` 166 of 173
 
 ## Disk
 
-The project uses 23.1 GiB of 100 GiB. 95 GiB free on the drive.
+The project uses 23.1 GiB of 100 GiB. 92 GiB free on the drive.
