@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-11 09:14.
+Updated automatically at every ticket change. Last update: 2026-11-11 09:15.
 
 **Next: GPT-6.1, on S10-08 (Vector math v1b - the rest of the libmvec set (acos, asin, cbrt, erf, erfc, exp2, exp10, expm1, log1p, log2, hypot, sincos)).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
@@ -214,7 +214,7 @@ Current tickets: `[###################-]` 176 of 177
 ## Cost
 
 - From the script, engineer: 408 sessions, 914.6M input tokens
-- From the script, lead: 255 sessions, 76.1M input tokens
+- From the script, lead: 256 sessions, 76.4M input tokens
 - Started by hand, Claude: 11 sessions, 2389.8M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
