@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-11 04:45.
+Updated automatically at every ticket change. Last update: 2026-11-11 04:57.
 
-**Next: the tech lead, on S9-11.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: the tech lead, on S10-03.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[###################-]` 170 of 174
 
@@ -41,7 +41,7 @@ Current tickets: `[###################-]` 170 of 174
 | S1-07 | Milestone M0 evidence note | Done | M0 is settled as adjust: GCC 16.2 builds a k1om cc1 whose assembly the 2.22 assembler accepts, an options-f... |
 | S10-01 | 512-bit vector arguments and results under -march=knc (ADR-0014 point 1) | Done | 64-byte vectors (__m512 and vector_size(64)) can now be passed to and returned from functions under -march=... |
 | S10-02 | libknc_vmath v0 - build and requalify expf, logf, powf, exp, log, pow with GCC-KNC on the card | Done | libknc_vmath v0 builds for KNC with GCC-KNC: expf, logf, powf, exp, log and pow from the copied Arm routine... |
-| S10-03 | Loops call libknc_vmath - -mveclibabi=knc, by-value entry points, automatic link (ADR-0014 points 2-3) | In progress |  |
+| S10-03 | Loops call libknc_vmath - -mveclibabi=knc, by-value entry points, automatic link (ADR-0014 points 2-3) | Tests waiting for review | Red 071dc341: check.py t1 t2 --compiler gcc16 --vmath: T1 knc-vmath-call.c FAIL (no call __knc_vmath_expf_1... |
 | S10-04 | Measure vector math - math kernels and a WRF-shaped physics loop, vector vs scalar libm | Not started |  |
 | S10-05 | Sprint 10 batch check | Not started |  |
 | S2-01 | Design for zmm and mask registers under -march=knc | Done | The register design for KNC is settled on paper: all 32 zmm and 8 mask registers become usable under -march... |
@@ -199,6 +199,7 @@ Current tickets: `[###################-]` 170 of 174
 
 ## Recent activity
 
+- 2026-11-11 04:57 **S10-03** engineer red: Red 071dc341: check.py t1 t2 --compiler gcc16 --vmath: T1 knc-vmath-call.c FAIL (no call __knc_vmath_expf_16), knc-vmath-errno.c PASS (guard: stays...
 - 2026-11-11 04:42 **S9-25** lead approve: KNC libgomp uses the flat barrier by default again (the per-core one was 1.5-2.5x slower on the card and stays behind a build switch), and the thre...
 - 2026-11-11 04:32 **S9-25** engineer submit: Red b96e847b default_barrier.c failed as expected; GCC 269c7c7f15e makes flat the default and keeps per-core behind -DGOMP_KNC_GROUP_BARRIER. s9_09...
 - 2026-11-11 04:31 **S10-02** lead approve: libknc_vmath v0 builds for KNC with GCC-KNC: expf, logf, powf, exp, log and pow from the copied Arm routines (provenance recorded), all within 1 ul...
@@ -206,7 +207,6 @@ Current tickets: `[###################-]` 170 of 174
 - 2026-11-11 04:21 **S10-02** lead answer: No waiver: the [red] check is hard and the type field needs the interactive lead. Split the one commit honestly instead: git reset --soft main, the...
 - 2026-11-11 04:19 **S10-02** engineer ask: Work done, submit refuses: 'no [red] test commit' (size overridden: 1652 of 2303 lines are copied Arm tables). Rebased on main; tree rebuilt with S...
 - 2026-11-11 03:58 **S10-02** lead note: S10-01 is approved and merged into knc (2026-11-11). If the lane-1 prefix (.work/_shared/gcc-knc-16.2.0) does not yet accept 64-byte vector argumen...
-- 2026-11-11 03:57 **S10-01** lead approve: 64-byte vectors (__m512 and vector_size(64)) can now be passed to and returned from functions under -march=knc, in zmm0-zmm7 and zmm0 (ADR-0014); c...
 
 ## Cost
 
