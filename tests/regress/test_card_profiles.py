@@ -70,7 +70,8 @@ class CardProfiles(unittest.TestCase):
 
     def test_each_profile_gives_its_cores_and_limit(self):
         for profile, cores, limit in (("3100", range(56), 5632), ("5100", range(59), 7680),
-                                      ("7100", range(60), 14089), ("full", range(60), 14089)):
+                                      ("7100", range(60), None), ("full", range(60), None)):
+            # S9-23 (owner 2026-11-10): 7100 and full get no RLIMIT_AS in an exclusive turn.
             with self.subTest(profile=profile):
                 self.transport.events.clear()
                 result = self.run_card(profile=profile)
