@@ -7,7 +7,8 @@ KNC outputs go to .work/_shared/S10-02/knc (libknc_vmath.a, qualify_f.mic, quali
 outputs (Cygwin GCC, x86-64, the same sources and flags) to .work/_shared/S10-02/host. Card runs
 are the lead's: tests/vmath/card_qualify.py (which also runs the host programs). qualify_f is the accepted harness
 (tests/acceptance/vecmath_qualify/qualify.c) linked to the library's cores instead of its own
-copies; qualify_d is tests/vmath/qualify_d.c.
+copies; qualify_d is tests/vmath/qualify_d.c. Both take pow's special cases from
+tests/vmath/pow_reference.c, not the libm.
 """
 import argparse
 import os
@@ -69,7 +70,8 @@ def build(target):
 
     objects = [compile_unit(source, LIB_FLAGS) for source in MEMBERS]
     tests = {'qualify': compile_unit(ROOT / 'tests/acceptance/vecmath_qualify/qualify.c', TEST_FLAGS),
-             'qualify_d': compile_unit(ROOT / 'tests/vmath/qualify_d.c', TEST_FLAGS)}
+             'qualify_d': compile_unit(ROOT / 'tests/vmath/qualify_d.c', TEST_FLAGS),
+             'pow_reference': compile_unit(ROOT / 'tests/vmath/pow_reference.c', TEST_FLAGS)}
     if errors:
         print('FAIL %s: %d compile steps' % (target, errors))
         return 1
@@ -83,9 +85,11 @@ def build(target):
     for f in ('expf', 'logf', 'powf'):
         alias += ['-Wl,-u,__knc_vmath_core_%s_16' % f,
                   '-Wl,--defsym,phi_host_%s_e16=__knc_vmath_core_%s_16' % (f, f)]
+    # Both oracles' powl goes through the C99 Annex F table in pow_reference.c (S10-06).
+    oracle = [tests['pow_reference'], '-Wl,--wrap=powl']
     exes = [out / ('qualify_f' + suffix), out / ('qualify_d' + suffix)]
-    if (command(*cc, tests['qualify'], *alias, archive, '-pthread', '-lm', '-o', exes[0]) or
-            command(*cc, tests['qualify_d'], archive, '-pthread', '-lm', '-o', exes[1])):
+    if (command(*cc, tests['qualify'], *oracle, *alias, archive, '-pthread', '-lm', '-o', exes[0]) or
+            command(*cc, tests['qualify_d'], *oracle, archive, '-pthread', '-lm', '-o', exes[1])):
         return 1
     if target == 'knc' and command(sys.executable, ROOT / 'tools/knc_lint', *objects, *exes):
         return 1

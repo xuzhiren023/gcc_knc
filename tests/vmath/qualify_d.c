@@ -3,7 +3,10 @@
    expl/logl/powl (64-bit significand) only screen: powl's own error reaches about 0.4 double ULP
    where |y log x| is large. Every lane whose screened error exceeds --dump (default 0.5) prints a
    "check" line, and tests/vmath/card_qualify.py recomputes those lanes exactly on the host; the
-   summary line's max_ulp and histogram are the screen's. The inputs depend
+   summary line's max_ulp and histogram are the screen's. Every lane of the special grid is
+   dumped, marked "grid", and checked exactly: powl is far off on some of its pairs (x = 1 +- 1 ulp,
+   y = 2^53: millions of ULPs on the card), so the screen's error is only estimated on the other
+   lanes. pow's special cases come from tests/vmath/pow_reference.c, not the libm. The inputs depend
    only on the block number, so any worker count, and a host build, sees the same set:
    - exp, log: every block-stride-th block of 8 consecutive bit patterns of the whole 2^64 space
      ("sweep" blocks), and as many blocks of x uniform in the function's interesting range
@@ -29,6 +32,7 @@ enum { EXP, LOG, POW };
 static int function, negative, negative_mask, workers;
 static uint64_t blocks = 1ULL << 22, block_stride; /* 0: spread the sweep over all 2^64 */
 static long double dump = 0.5L;
+static int grid; /* set while the special grid runs (main thread, before the workers) */
 static uint64_t max_dump = 2000000, dumped;
 
 struct stats {
@@ -72,10 +76,10 @@ static long double ulp_error(double out, long double ref) {
 static void record(struct stats *s, uint64_t x, uint64_t y, uint64_t out) {
   long double ref = reference(as_double(x),as_double(y)), e = ulp_error(as_double(out),ref);
   s->inputs++;
-  if (e < 0 || e > dump) {
+  if (e < 0 || e > dump || grid) {
     if (__atomic_fetch_add(&dumped,1,__ATOMIC_RELAXED) < max_dump)
-      printf("check 0x%016llx 0x%016llx 0x%016llx %.6Lf\n",(unsigned long long)x,(unsigned long long)y,
-             (unsigned long long)out,e < 0 ? -1.0L : e);
+      printf("check 0x%016llx 0x%016llx 0x%016llx %.6Lf%s\n",(unsigned long long)x,(unsigned long long)y,
+             (unsigned long long)out,e < 0 ? -1.0L : e,grid ? " grid" : "");
   }
   if (e < 0) { s->special_errors++; s->hist[5]++; e = 1e9L; }
   else s->hist[e <= 0.5L ? 0 : e <= 1 ? 1 : e <= 2 ? 2 : e <= 4 ? 3 : 4]++;
@@ -158,6 +162,7 @@ static void specials(struct stats *s) {
   enum { N = sizeof v/sizeof *v };
   uint64_t rng = 1, x[8], y[8] = {0};
   int n = 0;
+  grid = 1;
   if (function != POW) {
     for (int i = 0; i < N; ++i) { x[n] = as_bits(v[i]); if (++n == 8) { block(s,&rng,x,y); n = 0; } }
   } else {
@@ -168,6 +173,7 @@ static void specials(struct stats *s) {
       }
   }
   if (n) { for (; n < 8; ++n) { x[n] = x[0]; y[n] = y[0]; } block(s,&rng,x,y); }
+  grid = 0;
 }
 
 int main(int argc, char **argv) {
@@ -191,6 +197,8 @@ int main(int argc, char **argv) {
   if (block_stride > (1ULL << 61)/blocks) {
     fprintf(stderr,"blocks*stride*8 must be within 2^64\n"); return 2;
   }
+  struct stats all = {0};
+  specials(&all);
   cpu_set_t set;
   if (sched_getaffinity(0,sizeof set,&set)) { perror("sched_getaffinity"); return 2; }
   workers = CPU_COUNT(&set);
@@ -201,8 +209,6 @@ int main(int argc, char **argv) {
   for (int w = 0; w < workers; ++w)
     if (pthread_create(&threads[w],&attr,worker,(void *)(intptr_t)w)) { perror("pthread_create"); return 2; }
   for (int w = 0; w < workers; ++w) pthread_join(threads[w],NULL);
-  struct stats all = {0};
-  specials(&all);
   for (int w = 0; w < workers; ++w) {
     struct stats *s = &totals[w];
     all.inputs += s->inputs; all.status_errors += s->status_errors;
