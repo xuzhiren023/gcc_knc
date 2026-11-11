@@ -4,10 +4,12 @@
 Run through tools/run.py. SSE is the existing host control; x87 uses the
 library build's existing flags. The standard-excess-precision control tests
 whether honoring C assignments/casts repairs the compensated arithmetic.
-Also compile the affected members with lane 2's installed GCC-KNC prefix
-for assembly evidence. No shared GCC build or installed archive is modified.
+The FMA mode also enables hardware vector contraction, as on KNC. All card
+emulation modes include KNC_LIB_FLAGS, so fixes there reach this regression.
+No shared GCC build or installed archive is modified.
 """
 import os
+import argparse
 from pathlib import Path
 import subprocess
 import sys
@@ -24,7 +26,7 @@ def main():
         script = subprocess.check_output(
             [str(TC / 'cygwin/bin/cygpath.exe'), '-u', str(Path(__file__).resolve())],
             env=env, text=True).strip()
-        return subprocess.call([str(TC / 'cygwin/bin/python3.12.exe'), script], env=env)
+        return subprocess.call([str(TC / 'cygwin/bin/python3.12.exe'), script, *sys.argv[1:]], env=env)
     sys.path.insert(0, str(ROOT / 'tools'))
     import knc_vmath as build
     os.environ['PATH'] = ':'.join(map(str, (TC / 'cross/bin', TC / 'cygwin/bin'))) + ':' + os.environ['PATH']
@@ -37,28 +39,33 @@ def main():
 
     # The driver retains binary64 SSE evaluation and the same vector ABI.
     driver = out / 'card_rounding.o'
-    run('gcc', *build.TEST_FLAGS, '-Wno-psabi', '-c',
-        ROOT / 'tests/vmath/card_rounding.c', '-o', driver)
+    modes = {'sse': [], 'x87': ['-mfpmath=387'],
+             'x87-fma': ['-mfpmath=387', '-mavx2', '-mfma'],
+             'x87-standard': ['-mfpmath=387', '-fexcess-precision=standard']}
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--mode', choices=modes)
+    args = parser.parse_args()
     failed = False
-    for name, flags in [('sse', []), ('x87', ['-mfpmath=387']),
-                        ('x87-standard', ['-mfpmath=387', '-fexcess-precision=standard'])]:
+    for name, flags in modes.items():
+        if args.mode and name != args.mode:
+            continue
+        # Match the vector ABI/alignment, but keep the MPFR driver on SSE.
+        run('gcc', *build.TEST_FLAGS, '-Wno-psabi',
+            *[flag for flag in flags if flag in ('-mavx2', '-mfma')], '-c',
+            ROOT / 'tests/vmath/card_rounding.c', '-o', driver)
         objects = []
         for member in members:
             obj = out / (member + '.o')
-            run('gcc', *build.LIB_FLAGS, '-Wno-psabi', *flags, '-c',
+            run('gcc', *build.LIB_FLAGS, *([] if name == 'sse' else build.KNC_LIB_FLAGS),
+                '-Wno-psabi', *flags, '-c',
                 build.LIB / (member + '.c'), '-o', obj)
             objects.append(obj)
         exe = out / 'card_rounding.exe'
         run('gcc', driver, *objects, '-lmpfr', '-lgmp', '-lm', '-o', exe)
         print('MODE ' + name, flush=True)
-        failed |= subprocess.call([str(exe)]) != 0
-    prefix = SHARED / 'gcc-knc-16.2.0-2/bin/k1om-mpss-linux-gcc'
-    for member in members + ['vmath_cbrt']:
-        run(prefix, '-march=knc', '--sysroot=' + str(TC / 'sysroot'),
-            *build.LIB_FLAGS, *build.KNC_LIB_FLAGS,
-            *(['-fno-math-errno'] if member == 'vmath_cbrt' else []),
-            '-S', build.LIB / (member + '.c'), '-o', out / (member + '.s'))
-    print('GCC-KNC lane 2 assembly: ' + str(out), flush=True)
+        rc = subprocess.call([str(exe)])
+        print('EXIT %s: %d' % (name, rc), flush=True)
+        failed |= rc != 0
     return int(failed)
 
 
