@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-11 01:40.
+Updated automatically at every ticket change. Last update: 2026-11-11 01:50.
 
-**Next: the tech lead, on S9-23.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: the tech lead, on S10-01.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[###################-]` 165 of 173
 
@@ -39,7 +39,7 @@ Current tickets: `[###################-]` 165 of 173
 | S1-05 | Integer C assembles with as 2.22 and lints clean | Done | All 2003 GCC torture compile files now build for KNC at -O0, -O2 and -O2 -g and assemble with the card's ol... |
 | S1-06 | K1OM link defaults | Done | GCC 16 now targets the K1OM ABI by default: it passes --march=k1om to as and -m elf_k1om to ld, uses the /l... |
 | S1-07 | Milestone M0 evidence note | Done | M0 is settled as adjust: GCC 16.2 builds a k1om cc1 whose assembly the 2.22 assembler accepts, an options-f... |
-| S10-01 | 512-bit vector arguments and results under -march=knc (ADR-0014 point 1) | In progress |  |
+| S10-01 | 512-bit vector arguments and results under -march=knc (ADR-0014 point 1) | Tests waiting for review | Red 501d0866: check.py t1 t2 --compiler gcc16 --vector-abi fails 3/3 with 'unsupported KNC register ABI mod... |
 | S10-02 | libknc_vmath v0 - build and requalify expf, logf, powf, exp, log, pow with GCC-KNC on the card | Not started |  |
 | S10-03 | Loops call libknc_vmath - -mveclibabi=knc, by-value entry points, automatic link (ADR-0014 points 2-3) | Not started |  |
 | S10-04 | Measure vector math - math kernels and a WRF-shaped physics loop, vector vs scalar libm | Not started |  |
@@ -198,6 +198,7 @@ Current tickets: `[###################-]` 165 of 173
 
 ## Recent activity
 
+- 2026-11-11 01:50 **S10-01** engineer red: Red 501d0866: check.py t1 t2 --compiler gcc16 --vector-abi fails 3/3 with 'unsupported KNC register ABI mode' (log .work/_state/logs/check_gcc16_t1...
 - 2026-11-11 01:39 **S9-11** lead amend: deps S9-24 (settings and harness fixes); lane gcc2 after it. Owner 2026-11-11: close Sprint 9 tonight, blanket approval.
 - 2026-11-11 01:10 **S9-23** lead amend: head 84e9f27d: lead updated the S9-14 profile test expectation for 7100/full (no limit).
 - 2026-11-11 01:02 **S9-23** lead note: Lead: the escalation was a lead matter, not an owner decision. Red ran after green, but the new tests fail on the old code (engineer 00:53), which ...
@@ -205,16 +206,15 @@ Current tickets: `[###################-]` 165 of 173
 - 2026-11-11 00:53 **S9-23** engineer red: tests fail on old code: exclusive default still limited to 128/budget, null memoryLimitMiB, full profile limited
 - 2026-11-11 00:37 **S9-18** lead note: Card 2026-11-11 04:43Z, three launches, single thread, ratio to -O2 (mean of rounds): skewed hint 0.962, wrong 1.007, PGO 0.809, PGO on the other m...
 - 2026-11-11 00:36 **S8-23** lead close: Card 2026-11-11 04:43Z: safety holds (guard sweep 96132 checks, 0 failures; controls exit 3; M2 correctness passes), but the masked unpack/pack tai...
-- 2026-11-10 22:14 **S8-23** lead note: Lead review 2026-11-10: design accepted (the 21:29 lead answer and its conditions). Not approved before its card check, because it changes S8-02 sa...
 
 ## Cost
 
 - From the script, engineer: 388 sessions, 849.8M input tokens
 - From the script, lead: 246 sessions, 72.9M input tokens
-- Started by hand, Claude: 11 sessions, 2262.2M input tokens
+- Started by hand, Claude: 11 sessions, 2265.5M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 23.2 GiB of 100 GiB. 104 GiB free on the drive.
+The project uses 23.2 GiB of 100 GiB. 98 GiB free on the drive.
