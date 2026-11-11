@@ -1,10 +1,10 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-11 02:26.
+Updated automatically at every ticket change. Last update: 2026-11-11 02:34.
 
 **Next: the tech lead, on S10-01.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
-Current tickets: `[###################-]` 165 of 173
+Current tickets: `[###################-]` 166 of 173
 
 ## Milestones
 
@@ -13,7 +13,7 @@ Current tickets: `[###################-]` 165 of 173
 | M0 | Foundation | In progress | 17 of 17 tickets |
 | M1 | Mixed native code | Done | 43 of 43 tickets |
 | M2 | Useful vector target | Done | 51 of 51 tickets |
-| M3 | Runtimes | In progress | 31 of 39 tickets |
+| M3 | Runtimes | In progress | 32 of 39 tickets |
 | M4 | Broad optimization | Not started | Not planned in detail yet |
 | M5 | Program corpus | Not started | Not planned in detail yet |
 | M6 | Release | Not started | Not planned in detail yet |
@@ -193,11 +193,12 @@ Current tickets: `[###################-]` 165 of 173
 | S9-20 | Experiment - how much does instruction scheduling help the in-order core, at 1 and 4 threads per core? | Done | Card 2026-11-11, 1 thread/core, ratio to -O2 default: nosched affine 1.11, mat8 1.05; prepress affine 0.92,... |
 | S9-21 | S9-18 PGO training script - BusyBox od has no -A/-t, so no profile came back | Done | The S9-18 PGO training script now dumps profiles with od -b -v, which BusyBox 1.19 on the card supports, an... |
 | S9-22 | S9-18 PGO rebuild fails with coverage-mismatch on the card profiles - make the two builds identical | Done | The PGO experiment's two builds now use identical compile commands, so profiles collected on the card can b... |
-| S9-23 | card_run - no address-space limit in our exclusive turns (owner - "there is no job memory limit") | Waiting for review | head 1d09ead5: lead fixed the pin test fake exec for the unlimited case. |
+| S9-23 | card_run - no address-space limit in our exclusive turns (owner - "there is no job memory limit") | Done | In our exclusive card turns, jobs now run with no address-space limit unless a profile (3100, 5100) or the ... |
 | S9-24 | Sprint 9 settings from the card data, and the harness fixes the batch check needs | In progress |  |
 
 ## Recent activity
 
+- 2026-11-11 02:34 **S9-23** lead approve: In our exclusive card turns, jobs now run with no address-space limit unless a profile (3100, 5100) or the config asks for one, so 240-thread progr...
 - 2026-11-11 02:26 **S9-23** lead amend: head 1d09ead5: lead fixed the pin test fake exec for the unlimited case.
 - 2026-11-11 02:25 **S10-01** engineer red: Guard at aa506820: -DABI_VECTOR_VARIADIC_CALL and _NAMED in knc-abi-mixed.c, checked at -O0/-O2 by t1_vector_diagnostics, which --vector-abi now ru...
 - 2026-11-11 02:08 **S9-23** lead note: Lead: fix 276f029d is the requested one (undeclared shared job keeps 128 MiB; exclusive needs only the MemFree margin); moving to review so pm appr...
@@ -205,16 +206,15 @@ Current tickets: `[###################-]` 165 of 173
 - 2026-11-11 02:07 **S9-23** lead amend: sessions 2 -> 3 under the owner standing rule (2026-11-09, reminded 2026-11-10): progress made (head 276f029d).
 - 2026-11-11 02:05 **S9-23** lead escalate: budget: 2 engineer sessions used; the budget is 2
 - 2026-11-11 02:02 **S9-23** lead approve-red: Red approved for round 2: the renamed shared-mode test now expects an undeclared job to keep the 128 MiB default, which fails on the previous head ...
-- 2026-11-11 01:59 **S9-23** engineer red: Round 2 fix is a tests+code fix already green; red approved earlier by lead (01:02). Test test_shared_undeclared_keeps_the_128_mib_default now expe...
 
 ## Cost
 
 - From the script, engineer: 391 sessions, 858.9M input tokens
 - From the script, lead: 248 sessions, 73.5M input tokens
-- Started by hand, Claude: 11 sessions, 2278.3M input tokens
+- Started by hand, Claude: 11 sessions, 2280.0M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 23.2 GiB of 100 GiB. 98 GiB free on the drive.
+The project uses 23.1 GiB of 100 GiB. 95 GiB free on the drive.
