@@ -49,7 +49,12 @@ def main():
     if args.before and out.resolve() == (SHARED / args.before).resolve():
         parser.error('--out must differ from --before to preserve the baseline objects')
     out.mkdir(exist_ok=True)
-    build = SHARED / 'gcc-build/gcc'
+    # The lane's GCC build (tools/storage.py GCC_SLOTS): gcc-build, or gcc-build-2 when
+    # KNC_GCC_SLOT=2.
+    slot = os.environ.get('KNC_GCC_SLOT') or '1'
+    if slot not in ('1', '2'):
+        parser.error('KNC_GCC_SLOT must be 1 or 2, not %r' % slot)
+    build = SHARED / ('gcc-build' if slot == '1' else 'gcc-build-' + slot) / 'gcc'
     cc = [build / 'xgcc', '-B' + str(build) + '/',
           '--sysroot=' + str(TC / 'sysroot'), '-march=knc']
     assembler = TC / 'cross/bin/k1om-mpss-linux-as'

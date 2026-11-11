@@ -4,6 +4,11 @@
 #ifndef S9_08_LIBGOMP_H
 #define S9_08_LIBGOMP_H 1
 
+/* card.h, which spincount.h includes after this file, needs the GNU extensions of
+   <sched.h>; they must be on before the first system header.  */
+#ifndef _GNU_SOURCE
+#define _GNU_SOURCE 1
+#endif
 #include <stdbool.h>
 #include <stdio.h>
 
