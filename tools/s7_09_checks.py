@@ -85,7 +85,8 @@ def install_mode():
     shutil.move(str(stage) + configured, str(PREFIX))
     shutil.rmtree(stage)
     print('PASS installed into ' + str(PREFIX))
-    return 0
+    # The prefix was replaced: build libknc_vmath with this compiler and put it back (S10-03).
+    return subprocess.call([sys.executable, str(ROOT / 'tools/knc_vmath.py'), '--install'])
 
 
 def link(name, extra, binary):

@@ -2,6 +2,9 @@
 """Build libknc_vmath v0 (ADR-0014 point 3) and its qualification programs, for KNC and the host.
 
     python tools/knc_vmath.py            build both, lint the KNC outputs
+    python tools/knc_vmath.py --install  then copy the KNC archive beside libgcc.a in this lane's
+                                         build tree (for xgcc -B) and installed prefix, where the
+                                         KNC link spec finds it (S10-03, ADR-0014 point 3)
 
 KNC outputs go to .work/_shared/S10-02/knc (libknc_vmath.a, qualify_f.mic, qualify_d.mic), host
 outputs (Cygwin GCC, x86-64, the same sources and flags) to .work/_shared/S10-02/host. Card runs
@@ -13,8 +16,12 @@ tests/vmath/pow_reference.c, not the libm.
 import argparse
 import os
 from pathlib import Path
+import re
+import shutil
 import subprocess
 import sys
+
+import storage
 
 ROOT = Path(__file__).resolve().parent.parent
 PROJECT = ROOT.parent.parent if ROOT.parent.name == '.work' else ROOT
@@ -37,6 +44,8 @@ LIB_FLAGS = ['-std=gnu11', '-O2', '-Wall', '-I' + str(LIB), '-I' + str(ARM_DP),
              '-I' + str(ALGORITHMS / 'e_width_experiment'), '-I' + str(ALGORITHMS / 'pow_e8'),
              '-I' + str(ALGORITHMS / 'powf_e16')]
 # The harness and its x87 oracle neither vectorize nor contract.
+# KNC members also link into shared libraries and, as in libgcc.a, export nothing from them.
+KNC_LIB_FLAGS = ['-fPIC', '-fvisibility=hidden']
 TEST_FLAGS = ['-std=gnu11', '-O2', '-Wall', '-Wextra', '-Werror', '-fno-tree-vectorize',
               '-fno-tree-slp-vectorize', '-ffp-contract=off', '-I' + str(LIB)]
 def command(*args, **kwargs):
@@ -48,7 +57,7 @@ def build(target):
     out = OUT / target
     out.mkdir(parents=True, exist_ok=True)
     if target == 'knc':
-        gcc = SHARED / 'gcc-build/gcc'
+        gcc = gcc_build()
         cc = [gcc / 'xgcc', '-B' + str(gcc) + '/', '--sysroot=' + str(TC / 'sysroot'), '-march=knc']
         ar = TC / 'cross/bin/k1om-mpss-linux-ar'
         assembler = [TC / 'cross/bin/k1om-mpss-linux-as', '--march=k1om']
@@ -68,7 +77,8 @@ def build(target):
         errors += bool(rc)
         return obj
 
-    objects = [compile_unit(source, LIB_FLAGS) for source in MEMBERS]
+    lib_flags = LIB_FLAGS + (KNC_LIB_FLAGS if target == 'knc' else [])
+    objects = [compile_unit(source, lib_flags) for source in MEMBERS]
     tests = {'qualify': compile_unit(ROOT / 'tests/acceptance/vecmath_qualify/qualify.c', TEST_FLAGS),
              'qualify_d': compile_unit(ROOT / 'tests/vmath/qualify_d.c', TEST_FLAGS),
              'pow_reference': compile_unit(ROOT / 'tests/vmath/pow_reference.c', TEST_FLAGS)}
@@ -97,9 +107,80 @@ def build(target):
     return 0
 
 
+def gcc_build():
+    return SHARED / storage.GCC_SLOTS[storage.gcc_slot()][1] / 'gcc'
+
+
+def install():
+    archive = OUT / 'knc/libknc_vmath.a'
+    root, libdir = prefix()
+    for directory in (gcc_build(), libdir):
+        if not directory.is_dir():
+            print('SKIP install: no ' + str(directory))
+            continue
+        shutil.copyfile(archive, directory / archive.name)
+        print('INSTALLED ' + str(directory / archive.name))
+    return 0
+
+
+def prefix():
+    """This lane's installed compiler (tools/s7_09_checks.py install) and its libgcc directory."""
+    slot = storage.gcc_slot()
+    version = (SHARED / storage.GCC_SLOTS[slot][0] / 'gcc/BASE-VER').read_text().strip()
+    root = SHARED / ('gcc-knc-' + version + ('' if slot == '1' else '-' + slot))
+    return root, root / 'lib/gcc/k1om-mpss-linux' / version
+
+
+def t2(runner):
+    """S10-03: tests/t2/knc-vmath-loop.c built with the installed driver and no library flag but
+    -lm, staged for the card. The vector object must call the six entry points, the scalar one
+    none, and the link must take libknc_vmath.a from the prefix by itself."""
+    root, libdir = prefix()
+    driver = root / 'bin/k1om-mpss-linux-gcc'
+    source = ROOT / 'tests/t2/knc-vmath-loop.c'
+    output = SHARED / 'S10-03'
+    output.mkdir(exist_ok=True)
+    elf = output / 'vmath-loop.mic'
+    elf.unlink(missing_ok=True)
+    wanted = {'__knc_vmath_%s_%d' % (f, LANES[f]) for f in FUNCTIONS}
+    objects, failures = [], []
+    for role, flags, calls in (('vector', ['-fno-math-errno', '-DVMATH_VECTOR'], wanted),
+                               ('scalar', [], set())):
+        obj = runner.out / ('vmath-loop-' + role + '.o')
+        compiled = runner.command(driver, '-O2', '-march=knc', *flags,
+                                  '--sysroot=' + str(runner.sysroot), '-c', source, '-o', obj,
+                                  check=False)
+        if compiled.returncode or compiled.stdout.strip():
+            failures.append(role + ' compile: ' + compiled.stdout[-1800:])
+            continue
+        found = set(re.findall(r'\b__knc_vmath_\w+', runner.command(runner.tool('nm'), '-u', obj)))
+        if found != calls:
+            failures.append('%s object calls %s, expected %s'
+                            % (role, sorted(found) or 'no entry point', sorted(calls) or 'none'))
+        objects.append(obj)
+    if not failures:
+        linked = runner.command(driver, '--sysroot=' + str(runner.sysroot), *objects, '-lm',
+                                '-o', elf, '-Wl,--trace', check=False)
+        lint = linked if linked.returncode else runner.command(
+            sys.executable, ROOT / 'tools/knc_lint', elf, check=False)
+        if lint.returncode:
+            failures.append('link or lint: ' + lint.stdout[-1800:])
+            elf.unlink(missing_ok=True)
+        else:
+            archives = set(re.findall(r'^\(?(\S*libknc_vmath\.a)\)?', linked.stdout, re.M))
+            if not archives or any(Path(a).resolve() != (libdir / 'libknc_vmath.a').resolve()
+                                   for a in archives):
+                failures.append('libknc_vmath.a not taken from %s: %s' % (libdir, sorted(archives)))
+            runner.t2_abi(elf, linked.stdout)
+    runner.result('t2 knc-vmath-loop: six loops call libknc_vmath, linked with no library flag',
+                  failures)
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    parser.parse_args()
+    parser.add_argument('--install', action='store_true',
+                        help='copy the KNC archive into the build tree and the installed prefix')
+    args = parser.parse_args()
     if os.name == 'nt':
         env = os.environ.copy()
         env['PATH'] = str(TC / 'cygwin/bin') + os.pathsep + env.get('PATH', '')
@@ -108,7 +189,7 @@ def main():
         return subprocess.call([str(TC / 'cygwin/bin/python3.12.exe'), script] + sys.argv[1:], env=env)
     os.environ['PATH'] = ':'.join(map(str, (TC / 'cross/bin', TC / 'cygwin/bin'))) + ':' + os.environ['PATH']
     host = build('host')
-    return build('knc') or host
+    return build('knc') or host or (install() if args.install else 0)
 
 
 if __name__ == '__main__':
