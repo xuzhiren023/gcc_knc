@@ -2,7 +2,7 @@
 
 Updated automatically at every ticket change. Last update: 2026-11-11 05:38.
 
-**Next: the tech lead, on S9-11.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: the tech lead, on S10-03.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[###################-]` 170 of 175
 
@@ -41,7 +41,7 @@ Current tickets: `[###################-]` 170 of 175
 | S1-07 | Milestone M0 evidence note | Done | M0 is settled as adjust: GCC 16.2 builds a k1om cc1 whose assembly the 2.22 assembler accepts, an options-f... |
 | S10-01 | 512-bit vector arguments and results under -march=knc (ADR-0014 point 1) | Done | 64-byte vectors (__m512 and vector_size(64)) can now be passed to and returned from functions under -march=... |
 | S10-02 | libknc_vmath v0 - build and requalify expf, logf, powf, exp, log, pow with GCC-KNC on the card | Done | Card qualification 2026-11-11 09:32-10:37Z (268M inputs each): expf 0.5016, logf 0.8106, exp 0.5079, log 0.... |
-| S10-03 | Loops call libknc_vmath - -mveclibabi=knc, by-value entry points, automatic link (ADR-0014 points 2-3) | In progress | Red accepted: the T1 expf call scan and the -mphinix scan fail for the right reason (no hook yet), the errn... |
+| S10-03 | Loops call libknc_vmath - -mveclibabi=knc, by-value entry points, automatic link (ADR-0014 points 2-3) | Waiting for review | Green: gcc db7b06406a9 KNC + 25fc35185be shared i386 (10 lines added, 1 changed) + 65cbad181a6 includes; pr... |
 | S10-04 | Measure vector math - math kernels and a WRF-shaped physics loop, vector vs scalar libm | Not started |  |
 | S10-05 | Sprint 10 batch check | Not started | deps add S10-06 |
 | S10-06 | Card qualification - classify powf's 848 special-case mismatches and certify pow under 1 ULP | Not started |  |
@@ -201,13 +201,13 @@ Current tickets: `[###################-]` 170 of 175
 ## Recent activity
 
 - 2026-11-11 05:38 **S10-05** lead amend: deps add S10-06
+- 2026-11-11 05:38 **S10-03** engineer submit: Green: gcc db7b06406a9 KNC + 25fc35185be shared i386 (10 lines added, 1 changed) + 65cbad181a6 includes; project 416d60c1. Build PASS, prefix reins...
 - 2026-11-11 05:38 **S10-02** lead note: Card qualification 2026-11-11 09:32-10:37Z (268M inputs each): expf 0.5016, logf 0.8106, exp 0.5079, log 0.5144 ulp PASS; all host-compare jobs sam...
 - 2026-11-11 05:02 **S10-03** lead approve-red: Red accepted: the T1 expf call scan and the -mphinix scan fail for the right reason (no hook yet), the errno guard holds, and the T2 card program c...
 - 2026-11-11 05:01 **S10-03** engineer red: Red ed99b791 adds tests/t1/knc-vmath-phinix.c as asked; nothing else changed. check.py t1 --compiler gcc16 --vmath: knc-vmath-call.c FAIL and knc-v...
 - 2026-11-11 04:59 **S10-03** lead changes: Red is sound: T1 call fails for the right reason (no hook; -march=knc already lifts -O2 to the cheap cost model, i386-knc.cc:1115, so the loop does...
 - 2026-11-11 04:57 **S10-03** engineer red: Red 071dc341: check.py t1 t2 --compiler gcc16 --vmath: T1 knc-vmath-call.c FAIL (no call __knc_vmath_expf_16), knc-vmath-errno.c PASS (guard: stays...
 - 2026-11-11 04:42 **S9-25** lead approve: KNC libgomp uses the flat barrier by default again (the per-core one was 1.5-2.5x slower on the card and stays behind a build switch), and the thre...
-- 2026-11-11 04:32 **S9-25** engineer submit: Red b96e847b default_barrier.c failed as expected; GCC 269c7c7f15e makes flat the default and keeps per-core behind -DGOMP_KNC_GROUP_BARRIER. s9_09...
 
 ## Cost
 
