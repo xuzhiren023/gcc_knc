@@ -10,7 +10,7 @@ Card jobs are lead-only; Codex sandbox accounts are refused before admission, so
 The default configuration is the main checkout's gitignored
 `config/card.local.json`, including from `<main>/.work/<ticket>`. It is never
 copied into a worktree. Required settings are `host`, `identity`, `knownHosts`
-and `ledger`; `memoryMB` defaults to 128, `timeout` to 60 seconds and
+and `ledger`; `memoryMB` defaults to none (S9-23), `timeout` to 60 seconds and
 `transportTimeout` to 10 seconds. `maxStageMiB` defaults to 64 and must be a
 positive integer. It caps the total bytes staged: program, extra files, static
 helper and watchdog script. Validation and size refusal happen before connection
@@ -25,7 +25,9 @@ running in the ledger) the memory budget is `MemFree` less 1536 MiB
 job runs, the 10240 MiB budget (`MEMORY_BUDGET_MIB`) applies and its ledger cores
 (0-39) stay taken. `--profile 3100|5100|7100|full` runs a job as that card would:
 cores 0-55, 0-58 or 0-59 and an `RLIMIT_AS` of 5632 MiB, 7680 MiB, or the budget
-(7100 and full). `--benchmark --profile` keeps the whole card (ledger cores 0-59)
+(7100 and full). S9-23 (owner 2026-11-10): an exclusive job with no declared `memoryMB` and no
+3100/5100 profile gets no `RLIMIT_AS` (`claude-pin` memory 0; receipt and ledger `memoryLimitMiB`
+null); the MemFree admission check still runs, and shared mode keeps the 10240 MiB cap. `--benchmark --profile` keeps the whole card (ledger cores 0-59)
 but pins to the profile's cores. The receipt and ledger rows carry `profile`. A
 profile does not model the clock or memory bandwidth per core (see `--help`).
 The 7100 profile needs the S9-14 `claude-pin.mic`, which accepts up to 16384 MiB.

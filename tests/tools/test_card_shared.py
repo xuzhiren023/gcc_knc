@@ -147,7 +147,7 @@ class SharedCardRules(unittest.TestCase):
         self.transport = SharedTransport()
         self.transport.ledger = self.ledger
 
-    def invoke(self, *, default_root=None, files=(), receipt=True, file_list=None):
+    def invoke(self, *, default_root=None, files=(), receipt=True, file_list=None, profile=None):
         if default_root is not None:
             self.config["ownLock"] = str(default_root / "card.lock")
         self.config_path.write_text(json.dumps(self.config), encoding="utf8")
@@ -160,6 +160,8 @@ class SharedCardRules(unittest.TestCase):
             args += ["--file", str(path)]
         if file_list is not None:
             args += ["--file-list", str(file_list)]
+        if profile is not None:
+            args += ["--profile", profile]
         args += [str(self.program)]
         stdout, stderr = io.StringIO(), io.StringIO()
         actual_run = self.runner["run"]
@@ -383,14 +385,41 @@ class SharedCardRules(unittest.TestCase):
         self.assertFalse(self.transport.events)
         self.assertIn("ledger", (self.diagnostic + result.get("detail", "")).lower())
 
-    def test_default_memory_budget_is_small_and_positive(self):
+    def test_exclusive_default_has_no_address_space_limit(self):
+        # S9-23 (owner 2026-11-10): no declared limit and nobody else running means none.
         del self.config["memoryMB"]
+        result = self.invoke()
+        self.assertIsNone(self.events("execute")[0][3])
+        self.assertIsNone(result["memory_mb"])
+        starts = [j for j in self.own_lines() if j["event"] == "start"]
+        self.assertIsNone(starts[0]["memoryLimitMiB"])
+
+    def test_unlimited_job_still_needs_free_memory(self):
+        del self.config["memoryMB"]
+        self.transport.free_kb = [1_000_000, 4_000_000]
         self.invoke()
-        self.assertEqual(len(self.events("execute")), 1)
-        limit = self.events("execute")[0][3]
-        self.assertIsInstance(limit, (int, float))
-        self.assertGreater(limit, 0)
-        self.assertLessEqual(limit, 256)
+        self.assertIn("wait", [e[0] for e in self.transport.events])
+
+    def test_shared_undeclared_keeps_the_128_mib_default(self):
+        del self.config["memoryMB"]
+        self.ledger.write_text(json.dumps(dict(agent="codex", project="other", jobId="other-1", event="start",
+                      memoryLimitMiB=512, cores=[31], startTime="2099-01-01T00:00:00Z",
+                      expectedEnd="2099-01-01T01:00:00Z", timingValid=False)) + "\n", encoding="utf8")
+        self.transport.free_kb = [16 * 1024 * 1024]
+        result = self.invoke()
+        self.assertEqual(result.get("result_class"), "program", result.get("detail"))
+        self.assertEqual(self.events("execute")[0][3], 128)
+
+    def test_profiles_3100_and_5100_keep_their_limits_and_full_has_none(self):
+        for profile, limit in (("3100", 5632), ("5100", 7680), ("full", None)):
+            with self.subTest(profile=profile):
+                self.ledger.write_text("", encoding="utf8")
+                self.transport = SharedTransport()
+                self.transport.ledger = self.ledger
+                self.transport.free_kb = [16 * 1024 * 1024]
+                result = self.invoke(profile=profile)
+                self.assertEqual(result.get("result_class"), "program", result.get("detail"))
+                self.assertEqual(self.events("execute")[0][3], limit)
 
     def test_low_free_memory_waits_before_staging(self):
         self.transport.free_kb = [1_000_000, 4_000_000]
