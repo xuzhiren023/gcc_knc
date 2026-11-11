@@ -243,6 +243,8 @@ M1 is accepted and tagged `m1` locally; nothing is pushed. Engineers are Claude 
 
 ## Card
 
+- **Card OS state set by the owner, 2026-11-11 after the host reboot (lost at the next card reboot):** governor `performance` (already), THP `always` but never used (AnonHugePages 0), 15.5 GB RAM, no swap. Owner enabled on-demand 2 MB pages: `nr_overcommit_hugepages` 4096 (up to 8 GB, nothing reserved until asked), hugetlbfs at `/mnt/huge`; MPSS already mounts one at `/var/volatile/tmp/COI2MB`. Only code using MAP_HUGETLB or those mounts is affected. A 2 MB page timing trial is still to write; tell PhiWeather they exist.
+
 Approved by the owner on 2026-11-01. Since 2026-11-03 the card is shared with the other project's
 **Card sharing (owner, 2026-11-05, Sprint 5; agreed with the PhiWeather WRF tuning session):**
 - Non-benchmark jobs of both projects may run together, on disjoint cores listed in open ledger rows. Each job takes ceil(threads/4) cores and fills all 4 threads of each core before the next; we take cores from 59 downward, they take from 0 upward.
