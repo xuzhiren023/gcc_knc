@@ -4,6 +4,7 @@
 Uses the dispatched lane's installed prefix. Does not run anything on the card.
 The cbrt diagnostic deliberately retains the failing build's library flags.
 """
+import argparse
 import difflib
 import os
 from pathlib import Path
@@ -26,7 +27,10 @@ def main():
         script = subprocess.check_output(
             [str(build.TC / 'cygwin/bin/cygpath.exe'), '-u', str(Path(__file__).resolve())],
             env=env, text=True).strip()
-        return subprocess.call([str(build.TC / 'cygwin/bin/python3.12.exe'), script], env=env)
+        return subprocess.call([str(build.TC / 'cygwin/bin/python3.12.exe'), script, *sys.argv[1:]], env=env)
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--stage-only', action='store_true', help='reuse completed assembly evidence')
+    args = parser.parse_args()
     os.environ['PATH'] = ':'.join(map(str, (build.TC / 'cross/bin', build.TC / 'cygwin/bin'))) + ':' + os.environ['PATH']
     out = build.SHARED / 'S10-11'
     card = out / 'card'
@@ -35,7 +39,7 @@ def main():
     cc = [prefix / 'bin/k1om-mpss-linux-gcc', '--sysroot=' + str(build.TC / 'sysroot'), '-march=knc']
     cross = build.TC / 'cross/bin'
     old_flags = ['-fPIC', '-fvisibility=hidden']
-    for member in ('vmath_sincos', 'vmath_reducer', 'vmath_tan', 'vmath_atan'):
+    for member in (() if args.stage_only else ('vmath_sincos', 'vmath_reducer', 'vmath_tan', 'vmath_atan')):
         source = build.LIB / (member + '.c')
         before, after = out / (member + '.before.s'), out / (member + '.s')
         for asm, flags in ((before, old_flags), (after, build.KNC_LIB_FLAGS)):

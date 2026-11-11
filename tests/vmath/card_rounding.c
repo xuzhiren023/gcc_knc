@@ -14,12 +14,12 @@
 /* Async-signal-safe output, including when the failing path exhausts its stack. */
 static void hexline(const char *label, size_t length, uintptr_t value)
 {
-  char digits[19] = "0x0000000000000000\n";
+  char digits[] = "0x0000000000000000\n";
   for (int i = 17; i >= 2; --i) {
     digits[i] = "0123456789abcdef"[value & 15]; value >>= 4;
   }
   (void)write(2, label, length);
-  (void)write(2, digits, sizeof digits);
+  (void)write(2, digits, sizeof digits - 1);
 }
 
 static void fault(int sig, siginfo_t *info, void *context)
