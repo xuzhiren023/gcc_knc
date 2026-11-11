@@ -36,14 +36,14 @@
 // cst_ptr_f32 stores through pointers of unknown alignment: since S8-02
 // (ADR-0009 amendment 1 point 9) its masked accesses are a gather and a
 // scatter under the compare mask, never the S4-14 split or an x87
-// remainder.  At -O3 the generic cost model (kept: ADR-0009 point 5)
-// peels it to alignment with a scalar prologue, so its x87 code is the
-// peel; the opt-info report shows the peel and the masked epilogue.
+// remainder.  At -O3 it is not peeled to alignment (S8-22: the peel was
+// an x87 prologue of up to 15 iterations); the opt-info report shows no
+// peel and the masked epilogue.
 // scan-asm-func cst_ptr_f32: \bvcmpps\s+\$1,[^\n]*%k[0-7]\s*$
 // scan-asm-func cst_ptr_f32: \bvgatherdps\s+[^\n]*\{%k[1-7]\}
 // scan-asm-func cst_ptr_f32: \bvscatterdps\s+%zmm\d+,\s*[^\n]*\{%k[1-7]\}
 // scan-asm-func cst_ptr_f32: \A(?![\s\S]*\bvpermd\s)
-// scan-output: knc-mask-cond\.h:52:\d+: optimized:\s+KNC candidate scalar peel: required \(alignment iterations -1, gap peel 0\)
+// scan-output: knc-mask-cond\.h:52:\d+: optimized:\s+KNC candidate scalar peel: not required \(alignment iterations 0, gap peel 0\)
 // scan-output: knc-mask-cond\.h:52:\d+: optimized: epilogue loop vectorized using masked 64 byte vectors
 // scan-asm-func cadd_f32: \bvaddps\s[^\n]*\{%k[1-7]\}
 // scan-asm-func cadd_f32: \bvmovaps\s+%zmm\d+,\s*[^\n]*\)\{%k[1-7]\}

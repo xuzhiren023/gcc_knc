@@ -9,7 +9,7 @@ are in [work/tickets](../work/tickets/).
 | Flag | Why |
 |---|---|
 | `-O2 -march=knc` | The defaults below; `-march=knc` also sets `-mtune=knc`. |
-| `-O3` | Adds the dynamic vectorizer cost model (alignment peeling and versioning) and predictive commoning. |
+| `-O3` | Adds the dynamic vectorizer cost model (alignment versioning) and predictive commoning. |
 | `-fopenmp` | 4 threads per core is the tuned case (ADR-0009 point 2). |
 | `--param knc-threads-per-core=N` | Running 1-3 threads per core: more reduction chains (C7, [knc-costs.md](research/knc-costs.md)) and a longer L1 prefetch distance (C5). |
 | `-ffast-math` | Only to match ICC's default FP model; see the last table. |
@@ -26,6 +26,7 @@ Each default yields to an explicit user setting.
 | `-fprefetch-loop-arrays` at `-O2` and above: `vprefetch1` 32 lines ahead (`knc-prefetch-l2-distance`), `vprefetch0` 16 (`knc-prefetch-l1-distance`, halved for many streams) | C2, C5; [S8-03](../work/tickets/S8-03.md), [S8-12](../work/tickets/S8-12.md) |
 | No-read streaming stores for write-only loops larger than L2, with a fence after the loop | C1; [S8-13](../work/tickets/S8-13.md) |
 | `-O2` vectorizes with the cheap cost model and `-fversion-loops-for-strides` | [S8-09](../work/tickets/S8-09.md) (corpus loops vectorized at `-O2`: 17 to 64) |
+| At `-O3`, no alignment peeling (`vect-max-peeling-for-alignment=0`) and no code growth from complete unrolling before the vectorizer (`cunrolli-grow-size=0`): both put x87 code on the hot path (a peel of up to 15 x87 iterations; a flattened inner loop loses the outer-loop vector form) | [S8-22](../work/tickets/S8-22.md) (M2 at `-mphinix`: mat16 12.9x, short 1.27x slower than `-O2`) |
 | `-malign-data=cacheline`; local arrays of 64 bytes or more start a line | [S8-14](../work/tickets/S8-14.md) |
 | Cache parameters: L1 32 KB, line 64 B, L2 256 KB (the DTLB reach, not the 512 KB cache) | C4; [S8-14](../work/tickets/S8-14.md) |
 | OpenMP shared blocks and per-thread arrays start their own 64-byte line | C11; [S8-10](../work/tickets/S8-10.md) |
