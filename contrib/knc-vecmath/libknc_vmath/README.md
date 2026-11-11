@@ -2,8 +2,9 @@
 
 GCC-KNC's vector math library (ADR-0014 point 3, S10-02): the copied algorithms (ADR-0011) for
 `expf`, `logf`, `powf` (16 lanes) and `exp`, `log`, `pow` (8 lanes), as pointer-form cores
-`__knc_vmath_core_<name>_<lanes>` (`knc_vmath.h`). The by-value entry points
-`__knc_vmath_<name>_<lanes>` come with S10-03.
+`__knc_vmath_core_<name>_<lanes>` behind the by-value entry points `__knc_vmath_<name>_<lanes>`
+(`knc_vmath.h`, S10-03). Loops compiled with `-mveclibabi=knc` (the `-march=knc` default) call the
+entry points, and the KNC driver names the installed `libknc_vmath.a` in every link.
 
 | Member | Copied source |
 |---|---|
@@ -17,7 +18,10 @@ These are the plain cores, the ones the accepted float harness already used. The
 route; GCC-KNC needs no such rewrite, and both implement the same Arm algorithm.
 
 Build: `python tools/knc_vmath.py` (KNC into `.work/_shared/S10-02/knc`, host into `.../host`).
-`-O2`, GCC's default contraction, no fast-math. `pow_e8.c` passes 64-byte vectors between its
+`-O2`, GCC's default contraction, no fast-math; the KNC members are `-fPIC` with hidden symbols,
+as in `libgcc.a`, so the archive also links into shared libraries. `--install` copies the KNC
+archive beside `libgcc.a` in this lane's build tree and installed prefix
+(`tools/s7_09_checks.py install` does it after replacing the prefix). `pow_e8.c` passes 64-byte vectors between its
 static helpers by value, so it needs S10-01's vector ABI in the compiler.
 
 Qualification: `python tests/vmath/card_qualify.py` (card, lead only) or `--host`. `expf`, `logf`

@@ -2,8 +2,11 @@
 
    Each core reads LANES input words (bit patterns of float or double), computes the active lanes
    (bit i of ACTIVE), copies the inactive lanes from MERGE, and writes OUT. It returns nonzero only
-   for an ACTIVE bit above LANES. Round to nearest, IEEE special values; errno is never set. The
-   by-value entry points __knc_vmath_<name>_<lanes> wrap these cores (S10-03). */
+   for an ACTIVE bit above LANES. Round to nearest, IEEE special values; errno is never set.
+
+   The by-value entry points __knc_vmath_<name>_<lanes> compute every lane through these cores.
+   Loops compiled with -mveclibabi=knc (the -march=knc default) call them; their 64-byte vector
+   arguments and results travel in zmm (ADR-0014 points 1-2). */
 #ifndef KNC_VMATH_H
 #define KNC_VMATH_H
 #include <stdint.h>
@@ -24,4 +27,14 @@ int __knc_vmath_core_log_8(const uint64_t in[8], unsigned active, const uint64_t
                            uint64_t out[8]);
 int __knc_vmath_core_pow_8(const uint64_t x[8], const uint64_t y[8], unsigned active,
                            const uint64_t merge[8], uint64_t out[8]);
+
+typedef float __knc_vmath_v16sf __attribute__((vector_size(64)));
+typedef double __knc_vmath_v8df __attribute__((vector_size(64)));
+
+__knc_vmath_v16sf __knc_vmath_expf_16(__knc_vmath_v16sf x);
+__knc_vmath_v16sf __knc_vmath_logf_16(__knc_vmath_v16sf x);
+__knc_vmath_v16sf __knc_vmath_powf_16(__knc_vmath_v16sf x, __knc_vmath_v16sf y);
+__knc_vmath_v8df __knc_vmath_exp_8(__knc_vmath_v8df x);
+__knc_vmath_v8df __knc_vmath_log_8(__knc_vmath_v8df x);
+__knc_vmath_v8df __knc_vmath_pow_8(__knc_vmath_v8df x, __knc_vmath_v8df y);
 #endif

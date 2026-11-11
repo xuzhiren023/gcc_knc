@@ -12,6 +12,7 @@ are in [work/tickets](../work/tickets/).
 | `-O3` | Adds the dynamic vectorizer cost model (alignment versioning) and predictive commoning. |
 | `-fopenmp` | 4 threads per core is the tuned case (ADR-0009 point 2). |
 | `--param knc-threads-per-core=N` | Running 1-3 threads per core: more reduction chains (C7, [knc-costs.md](research/knc-costs.md)) and a longer L1 prefetch distance (C5). |
+| `-fno-math-errno` | Loops of `expf`, `logf`, `powf`, `exp`, `log`, `pow` become vector calls (next table). Results stay IEEE; only `errno` is no longer set. Fortran has it by default, `-mphinix` adds it. |
 | `-ffast-math` | Only to match ICC's default FP model; see the last table. |
 
 Do not pass SSE, AVX or MMX options: `-march=knc` rejects them (ADR-0002).
@@ -32,6 +33,7 @@ Each default yields to an explicit user setting.
 | OpenMP shared blocks and per-thread arrays start their own 64-byte line | C11; [S8-10](../work/tickets/S8-10.md) |
 | Vector reduction chains from the thread density: one at the default 4 threads per core, two at 1-3 (`knc-threads-per-core`) | C7; [knc-costs.md](research/knc-costs.md) |
 | Unroll a vector loop of at most 16 insns 4 times at `-O2` (`-munroll-only-small-loops`); a stream (at most one vector op per vector store) 2 times at `knc-threads-per-core` 1-2 and not at 3-4; larger loops and scalar loops as x86 | C9; [S8-15](../work/tickets/S8-15.md), [S8-20](../work/tickets/S8-20.md) |
+| `-mveclibabi=knc`: a vectorized loop calls `libknc_vmath` for `expf`, `logf`, `powf` (16 lanes) and `exp`, `log`, `pow` (8 lanes), as `__knc_vmath_<name>_<lanes>`. Within 1 ULP, round to nearest, IEEE special values, no fast-math flag needed. Only where GCC may vectorize the call: with `-fno-math-errno` (with `-fmath-errno`, the C and C++ default, the loop stays scalar) and not with `-frounding-math`. The driver names `libknc_vmath.a` in every link, after `-lm`, and only the functions used are linked; with `-nostdlib` or `-nodefaultlibs`, name it yourself. Another `-mveclibabi=` turns it off | ADR-0014; [S10-02](../work/tickets/S10-02.md), [S10-03](../work/tickets/S10-03.md) |
 
 `-mtune=knc` (tune flags, all listed in [knc-costs.md](research/knc-costs.md)):
 
@@ -74,13 +76,16 @@ nearest match to ICC's default; it also links `crtfastmath`, which flushes subno
 One flag for the measured best set ([S8-16](../work/tickets/S8-16.md)): Phi plus phoenix.
 The driver expands it before `cc1` runs, so `-###` shows exactly what it means:
 
-Expansion: `-O3 -march=knc -mtune=knc -fprefetch-loop-arrays -munroll-only-small-loops -malign-data=cacheline`
+Expansion: `-O3 -march=knc -mtune=knc -fprefetch-loop-arrays -munroll-only-small-loops -malign-data=cacheline -fno-math-errno`
 
 - `-O3` adds the dynamic vectorizer cost model and predictive commoning to the `-march=knc`
-  defaults above; the other flags are those defaults, written out.
+  defaults above; the next three flags are those defaults, written out.
+- `-fno-math-errno` lets loops call the vector math library (`-mveclibabi=knc` above). Math
+  functions then do not set `errno`; their results are unchanged.
 - Each part yields to an explicit user setting of the same option, given before or after
-  `-mphinix` (`-O2`, `-mtune=`, `-fno-prefetch-loop-arrays`, `-funroll-loops`, `-malign-data=`).
-- IEEE semantics stay: no `-ffast-math` or any part of it.
+  `-mphinix` (`-O2`, `-mtune=`, `-fno-prefetch-loop-arrays`, `-funroll-loops`, `-malign-data=`,
+  `-fmath-errno`).
+- IEEE semantics stay: no `-ffast-math`, and no part of it but `-fno-math-errno`.
 - KNC only: with another `-march=` it is an error, and an x86 compiler does not accept it.
 
 What "best" means (owner, 2026-11-10): the one flag most people should use for speed on ordinary
