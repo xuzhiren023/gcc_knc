@@ -1,10 +1,10 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-12 09:26.
+Updated automatically at every ticket change. Last update: 2026-11-12 09:27.
 
 **Next: GPT-6.1, on S11-02 (card_run and run_suite move data by S11-01's recommended method, with fallback).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
-Current tickets: `[###################-]` 182 of 184
+Current tickets: `[###################-]` 182 of 185
 
 ## Milestones
 
@@ -14,7 +14,7 @@ Current tickets: `[###################-]` 182 of 184
 | M1 | Mixed native code | Done | 43 of 43 tickets |
 | M2 | Useful vector target | Done | 51 of 51 tickets |
 | M3 | Runtimes | Done | 47 of 48 tickets |
-| M4 | Broad optimization | In progress | 1 of 2 tickets |
+| M4 | Broad optimization | In progress | 1 of 3 tickets |
 | M5 | Program corpus | Not started | Not planned in detail yet |
 | M6 | Release | Not started | Not planned in detail yet |
 
@@ -53,7 +53,8 @@ Current tickets: `[###################-]` 182 of 184
 | S10-12 | cbrt and cbrtf crash (SIGSEGV) in qualify_v1 on the card - root cause and fix | Done | The cbrt and cbrtf qualification jobs no longer crash on the card and pass (worst 0.4996 and 0.4991 ULP): t... |
 | S10-13 | User story - code that calls cbrtl under -march=knc gets a safe replacement and a compile-time warning (MPSS libm cbrtl faults) | lead | Waits for S10-12's approval; then the lead moves it to lane gcc (tree 1) to build. |
 | S11-01 | User story - the best way to move data between the host and the card, measured, and how our projects use it | Done | We now have a sourced inventory of every host-card transfer path that works without changing MPSS (SSH, tar... |
-| S11-02 | card_run and run_suite move data by S11-01's recommended method, with fallback | Not started | ready; waits on its dep S11-01, the lead writes acceptance before it starts |
+| S11-02 | card_run and run_suite move data by S11-01's recommended method, with fallback | In progress | ready; waits on its dep S11-01, the lead writes acceptance before it starts |
+| S11-03 | S11-01 transfer tool rejects the card's physical /tmp path, so the native study never starts | Not started |  |
 | S2-01 | Design for zmm and mask registers under -march=knc | Done | The register design for KNC is settled on paper: all 32 zmm and 8 mask registers become usable under -march... |
 | S2-02 | Float and double arguments and results in zmm lane 0 | Done | Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`). |
 | S2-03 | Varargs with the donor's register save area | Done | Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`). |
@@ -222,7 +223,7 @@ Current tickets: `[###################-]` 182 of 184
 
 - From the script, engineer: 434 sessions, 950.9M input tokens
 - From the script, lead: 274 sessions, 80.4M input tokens
-- Started by hand, Claude: 11 sessions, 2497.8M input tokens
+- Started by hand, Claude: 11 sessions, 2500.2M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
