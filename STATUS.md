@@ -2,7 +2,7 @@
 
 Updated automatically at every ticket change. Last update: 2026-11-12 09:28.
 
-**Next: the tech lead, on S11-02.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Waiting for you:** S11-02. Run `python tools/pm.py inbox`.
 
 Current tickets: `[###################-]` 182 of 185
 
@@ -53,7 +53,7 @@ Current tickets: `[###################-]` 182 of 185
 | S10-12 | cbrt and cbrtf crash (SIGSEGV) in qualify_v1 on the card - root cause and fix | Done | The cbrt and cbrtf qualification jobs no longer crash on the card and pass (worst 0.4996 and 0.4991 ULP): t... |
 | S10-13 | User story - code that calls cbrtl under -march=knc gets a safe replacement and a compile-time warning (MPSS libm cbrtl faults) | In progress | Lane is now gcc: build in tree 1 (.work/_shared/gcc, build dir .work/_shared/gcc-build, owned by the Codex ... |
 | S11-01 | User story - the best way to move data between the host and the card, measured, and how our projects use it | Done | We now have a sourced inventory of every host-card transfer path that works without changing MPSS (SSH, tar... |
-| S11-02 | card_run and run_suite move data by S11-01's recommended method, with fallback | Question for the tech lead | Ticket still contains a placeholder and says the lead must write acceptance from S11-01 before work starts.... |
+| S11-02 | card_run and run_suite move data by S11-01's recommended method, with fallback | **Waiting for you** | The ticket changed from doing to blocked during this session, with an existing engineer question requesting... |
 | S11-03 | S11-01 transfer tool rejects the card's physical /tmp path, so the native study never starts | Not started |  |
 | S2-01 | Design for zmm and mask registers under -march=knc | Done | The register design for KNC is settled on paper: all 32 zmm and 8 mask registers become usable under -march... |
 | S2-02 | Float and double arguments and results in zmm lane 0 | Done | Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`). |
@@ -210,6 +210,7 @@ Current tickets: `[###################-]` 182 of 185
 
 ## Recent activity
 
+- 2026-11-12 09:28 **S11-02** engineer escalate: The ticket changed from doing to blocked during this session, with an existing engineer question requesting finalized acceptance, the S11-01 recomm...
 - 2026-11-12 09:28 **S11-02** engineer ask: Ticket still contains a placeholder and says the lead must write acceptance from S11-01 before work starts. It does not identify the recommended bu...
 - 2026-11-12 09:28 **S10-13** lead answer: Lane is now gcc: build in tree 1 (.work/_shared/gcc, build dir .work/_shared/gcc-build, owned by the Codex sandbox). Your GCC commit 157940608ed on...
 - 2026-11-12 09:27 **S10-13** lead resume: S10-12 approved; tree 1 is free.
@@ -217,13 +218,12 @@ Current tickets: `[###################-]` 182 of 185
 - 2026-11-12 09:16 **S10-12** engineer submit: Submitted by the lead for the engineer: red 1ff46888 (host model of the MPSS cbrtl negative table offset), fix 7ae4d224 (qualifier keeps cbrtl's ar...
 - 2026-11-12 09:15 **S10-12** lead answer: Card PASS; the lead submits for the engineer.
 - 2026-11-12 09:15 **S10-12** lead note: Card 2026-11-12 14:05-14:15Z (boot da3144f1), fixed qualifier .work/_shared/S10-12/knc/qualify_v1.mic, 240 threads: cmp-cbrt PASS exact max_ulp 0.4...
-- 2026-11-12 09:14 **S10-12** lead resume: Card PASS for cbrt and cbrtf (09:15 note).
 
 ## Cost
 
 - From the script, engineer: 435 sessions, 951.0M input tokens
 - From the script, lead: 274 sessions, 80.4M input tokens
-- Started by hand, Claude: 11 sessions, 2501.2M input tokens
+- Started by hand, Claude: 11 sessions, 2501.9M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
