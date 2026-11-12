@@ -1,19 +1,97 @@
 """Pure host-side M4 scoring and report routing; see proposed ADR-0015.
 
 Input pairs are (old_seconds, new_seconds), already validated by the runner.
+Model rows carry pairs and primary build metadata matched to a pilot-frozen spec.
 The runner owns launch order, equal work, correctness, environment validation,
 and sealed-directory ACLs. This module neither runs programs nor grants ACLs.
 """
 
+from dataclasses import asdict, dataclass
 import json
 import math
 from pathlib import Path
 import random
 from statistics import median
+from types import MappingProxyType
 
 from corpus import PROGRAMS
 
 MODELS = ("7120", "3100", "5100")
+SQLITE_LEVELS = ("-O3", "-O2", "-O1", "-O0")
+OPENMP_PANEL_LABEL = "the donor toolchain has no OpenMP runtime"
+HPCG_SOURCE_FIX = "default(none): add n to shared list; both compilers"
+
+
+@dataclass(frozen=True)
+class PrimarySpec:
+    build_mode: str = "serial"
+    workers: int = 1
+    donor_flags: tuple = ("-O2",)
+    new_flags: tuple = ("-O2", "-march=knc")
+    source_fix: str = "unchanged"
+    donor_diagnostic: str = ""
+
+
+def freeze_primary_spec(sqlite_pilot):
+    """Freeze before timing using assembly outcomes, never measured speedups.
+
+    Require all four ordinary donor optimization levels; each outcome records
+    assembled (bool) and diagnostic (str). Failed assembly diagnostics, including
+    the donor kmov error, are retained in SQLite's label. The runner keeps the
+    original pilot logs and the same frozen spec across every model and block.
+    """
+    if set(sqlite_pilot) != set(SQLITE_LEVELS):
+        raise ValueError("SQLite pilot requires -O3/-O2/-O1/-O0 assembly outcomes")
+    selected = None
+    diagnostics = []
+    for level in SQLITE_LEVELS:
+        outcome = sqlite_pilot[level]
+        assembled = outcome.get("assembled")
+        diagnostic = outcome.get("diagnostic")
+        if type(assembled) is not bool or not isinstance(diagnostic, str):
+            raise ValueError("invalid SQLite pilot outcome")
+        if assembled:
+            if selected is None:
+                selected = level
+        else:
+            if not diagnostic.strip():
+                raise ValueError("failed SQLite assembly requires its diagnostic")
+            diagnostics.append(level + ": " + diagnostic)
+    if selected is None:
+        raise ValueError("SQLite donor has no assembling optimization level")
+    specs = {name: PrimarySpec(source_fix=HPCG_SOURCE_FIX if name == "HPCG"
+                              else "unchanged") for name in PROGRAMS}
+    specs["SQLite"] = PrimarySpec(donor_flags=(selected,),
+                                  donor_diagnostic="\n".join(diagnostics))
+    return MappingProxyType(specs)
+
+
+def _primary_metadata(name, row, spec):
+    # Validate the supplied freeze as well as the row. No arbitrary primary
+    # modes or flag tracks become legal by changing the caller's mapping.
+    expected = PrimarySpec(source_fix=HPCG_SOURCE_FIX if name == "HPCG" else "unchanged")
+    if name == "SQLite":
+        if (not isinstance(spec, PrimarySpec) or len(spec.donor_flags) != 1
+                or spec.donor_flags[0] not in SQLITE_LEVELS
+                or not isinstance(spec.donor_diagnostic, str)):
+            raise ValueError("invalid SQLite primary specification")
+        expected = PrimarySpec(donor_flags=spec.donor_flags,
+                               donor_diagnostic=spec.donor_diagnostic)
+    if spec != expected or not isinstance(row, dict):
+        raise ValueError("invalid primary specification or row")
+    metadata = row.get("primary")
+    if not isinstance(metadata, dict):
+        raise ValueError("primary row requires build metadata")
+    metadata = dict(metadata)
+    # JSON transports tuples as lists.
+    for field in ("donor_flags", "new_flags"):
+        flags = metadata.get(field)
+        if not isinstance(flags, (tuple, list)):
+            raise ValueError("primary flags must be argument lists")
+        metadata[field] = tuple(flags)
+    if metadata != asdict(spec):
+        raise ValueError("primary build metadata differs from frozen specification")
+    return metadata
 
 
 def sealed_root(root):
@@ -94,7 +172,7 @@ def score_program(pairs, *, seed=1514, draws=10000):
     return _program_result(ratios, programs[0])
 
 
-def score_model(rows, *, known_causes=None, seed=1514, draws=10000):
+def score_model(rows, *, primary_spec, known_causes=None, seed=1514, draws=10000):
     """Score all 17 primary programs; causes must already be lead-reviewed.
 
     Nondefault seed/draws are for host diagnostics, not an ADR-0015 gate.
@@ -102,10 +180,14 @@ def score_model(rows, *, known_causes=None, seed=1514, draws=10000):
     """
     if set(rows) != set(PROGRAMS):
         raise ValueError("a model requires exactly the frozen 17 programs")
+    if set(primary_spec) != set(PROGRAMS):
+        raise ValueError("primary specification requires exactly 17 programs")
+    metadata = {name: _primary_metadata(name, rows[name], primary_spec[name])
+                for name in PROGRAMS}
     known_causes = known_causes or {}
     if not set(known_causes).issubset(PROGRAMS):
         raise ValueError("unknown program in regression review")
-    ratios = [_ratios(rows[name]) for name in PROGRAMS]
+    ratios = [_ratios(rows[name].get("pairs", [])) for name in PROGRAMS]
     if len({len(values) for values in ratios}) != 1:
         raise ValueError("extension must include every program")
     boot_programs, boot_corpus = _bootstrap(ratios, seed, draws)
@@ -116,6 +198,7 @@ def score_model(rows, *, known_causes=None, seed=1514, draws=10000):
         cause = known_causes.get(name, "")
         if not isinstance(cause, str):
             raise ValueError("known causes must be reviewed reference strings")
+        result["primary"] = metadata[name]
         result["known_cause"] = cause
         status = result["regression"]
         reviewed &= (status == "clear" or
@@ -140,12 +223,13 @@ def score_model(rows, *, known_causes=None, seed=1514, draws=10000):
     }
 
 
-def score_models(rows, *, known_causes=None, seed=1514, draws=10000):
+def score_models(rows, *, primary_spec, known_causes=None, seed=1514, draws=10000):
     """All three models must independently pass the primary-track gate."""
     if set(rows) != set(MODELS):
         raise ValueError("expected full 7120 and both 3100/5100 profiles")
     known_causes = known_causes or {}
-    models = {name: score_model(rows[name], known_causes=known_causes.get(name),
+    models = {name: score_model(rows[name], primary_spec=primary_spec,
+                                known_causes=known_causes.get(name),
                                 seed=seed, draws=draws) for name in MODELS}
     if len({model["pairs"] for model in models.values()}) != 1:
         raise ValueError("extension must include every model")

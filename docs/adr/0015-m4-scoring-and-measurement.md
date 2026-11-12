@@ -6,14 +6,19 @@
 ## Authority and scope
 
 The owner's decisions in [Sprint 11, goal 1](../sprints/SPRINT-11.md) control
-the comparison, resources, corpus, models and retry policy. The numbered findings
+the comparison, resources, corpus, models and retry policy, as amended by the
+owner's **2026-11-12 17:00 EST** decision recorded on S11-14: serial versus serial
+primary, the SQLite donor assembly exception, and the HPCG shared-list fix.
+That later decision supersedes the earlier OpenMP primary and HPCG blocker rules.
+The numbered findings
 below refer to the [S11-S13 scope review](../reviews/2026-11-12-s11-s13-scope-review.md).
 This ADR adapts [ADR-0010](0010-knc-measurement-protocol.md) to separate executables;
 it does not replace its kernel experiment rules. No native result is asserted here.
 
 ## Frozen comparison and eligibility
 
-1. Strict matched `-O2` GCC-KNC versus `-O2` GCC 5.1.1 decides M4. Source,
+1. Strict matched `-O2` GCC-KNC versus `-O2` GCC 5.1.1 decides M4, with the
+   owner's explicit SQLite donor exception below. Source,
    completed work, input, FP semantics and resources match. Each compiler uses its
    own compatible runtime; do not mix objects across incompatible ABIs. Publish
    `-O3`, `-mphinix` and PGO alongside with explicit compiler/flag/runtime labels.
@@ -21,6 +26,16 @@ it does not replace its kernel experiment rules. No native result is asserted he
    primary track. PGO training inputs are separate from evaluation inputs and
    exclude held-out programs. A PGO competitiveness claim needs donor PGO too.
    Side tracks never replace a failed primary result. (Owner; findings 1, 6, 7.)
+   **SQLite exception:** GCC-KNC remains at `-O2`; the donor uses its highest
+   ordinary optimization level that assembles. The pilot records assembly
+   outcomes at `-O3`, `-O2`, `-O1`, `-O0`, choosing the first success in that
+   descending order without consulting timings. If none assembles, the row
+   blocks the gate. Freeze that level before timing, use it on all three models,
+   and label the SQLite primary row with the actual donor level. Retain the
+   donor's `kmov` operand-size assembler error and failed-level diagnostics in
+   the pilot record and row label. This is an explicit exception to matched
+   `-O2`, not an unlabelled matched-flags claim; every corpus headline must
+   disclose it. (Owner decision 2026-11-12 17:00 EST; findings 1, 2.)
 2. Exactly 17 program units receive one vote each: gemm, atax, cholesky, ludcmp,
    jacobi-2d, heat-3d, adi, durbin, STREAM, NPB CG, EP, MG, IS, HPCG, zlib,
    SQLite and bzip2. Operations, input variants, launches, flag sets and densities
@@ -31,25 +46,54 @@ it does not replace its kernel experiment rules. No native result is asserted he
    The scorer imports the canonical identifiers from `tools/corpus.py`: PolyBench
    identifiers have the `PB-` prefix; STREAM, NPB-CG/EP/MG/IS, HPCG and SQLite
    retain the harness's capitalization. No independent alias list defines votes.
-3. HPCG is mandatory unless unchanged source truly cannot build. The pilot
-   reproduces and classifies failure under both actual toolchains. Before tuning,
-   the owner decides any authorized compatibility fix or other eligibility change;
-   until that decision the gate is blocked. Do not remove OpenMP, suppress errors,
-   edit source without authorization or substitute an easier program. An owner
-   change must explicitly amend the frozen corpus and score contract, retaining
-   the blocked row and changed-scope label. (Owner; finding 8.)
+3. HPCG remains a mandatory vote. The owner authorizes exactly one source
+   compatibility change: add the missing variable `n` to the OpenMP
+   `default(none)` shared list in a one-line fix, applied identically for both
+   compilers. Document this as the **only corpus source change**, preserving its
+   patch and source revision in the build record. Apply it for the serial
+   primary and OpenMP panel builds; record the same source-fix label for both
+   compilers. A remaining build or validity failure blocks the gate rather than
+   removing HPCG. (Owner decision 2026-11-12 17:00 EST resolves finding 8.)
 4. Every benchmark and A/B comparison runs on the full 7120 and through
    `card_run --profile 3100` and `card_run --profile 5100`. Score each model
    independently; M4 passes only if all three pass. A claimed tuning gain must
    hold on all three. Every result states: profiles model cores and memory,
    not clock or per-core bandwidth; these are resource-profile results on a
    7120, not native 3120/5110 measurements. (Owner; findings 8, 9.)
-5. OpenMP primary uses all benchmark hardware threads of the card/profile
-   (240 on the full 7120), with verified topology and affinity. One and two
-   threads per core are separate side panels. Serial programs use one pinned
-   worker. No hindsight-best density per compiler, no parallel copies of a
-   serial program counted as acceleration, and no harness rewrite to add
-   algorithm parallelism. (Owner; findings 1, 2.)
+5. All 17 primary programs use **serial builds against serial builds**, without
+   `-fopenmp`, with one pinned worker for each compiler. In particular this
+   covers STREAM, NPB CG/EP/MG/IS and HPCG, the six OpenMP-capable programs.
+   GCC-KNC's OpenMP builds form a separate panel labelled **"the donor toolchain
+   has no OpenMP runtime"**. That panel uses all benchmark hardware threads of
+   the card/profile (240 on the full 7120), plus one and two threads per core
+   as separate side panels, with verified topology and affinity. These panels
+   never enter the 17-vote median or substitute for serial primary data.
+   No hindsight-best density, parallel copies of a serial program counted as
+   acceleration, or harness rewrite to add algorithm parallelism.
+   (Owner decision 2026-11-12 17:00 EST amends findings 1, 2.)
+
+The host scorer's `freeze_primary_spec(sqlite_pilot)` consumes the pilot's four
+SQLite donor assembly outcomes (`assembled` boolean and `diagnostic` string).
+It returns immutable per-program specifications with `build_mode="serial"`,
+`workers=1`, donor/new flag labels, and a source-fix label. The primary compiler
+flag labels are `("-O2",)` for the donor, except SQLite's selected level, and
+`("-O2", "-march=knc")` for GCC-KNC. No extra optimization, OpenMP or PGO flags
+are permitted in those labels. Include paths, library linkage and fixed workload
+defines remain in the separately frozen complete build-command record; these
+labels do not replace that record. HPCG's source-fix label is
+`default(none): add n to shared list; both compilers`; all other source labels
+are `unchanged`. SQLite's donor diagnostic label retains failed pilot levels.
+
+Each model maps the 17 canonical names to rows with `pairs` and `primary`
+metadata matching these specification fields. Pass the same frozen specification
+to `score_models(..., primary_spec=spec)` for all models and both sampling blocks;
+`score_model` rejects missing metadata, mismatched modes, workers, flags or source
+labels, and extra panel rows. Results retain the primary metadata beside each
+score. The harness publishes the OpenMP panel separately, using
+`OPENMP_PANEL_LABEL`; there is no donor OpenMP speedup claim. Freeze and archive
+the pilot/spec before timing: the pure scorer cannot attest assembly or verify
+that the runner actually used the declared build commands. (Findings 1, 2, 8;
+owner decision 2026-11-12 17:00 EST.)
 
 ## Timed boundaries and fixed work
 
@@ -94,7 +138,7 @@ separately, never replace the latency score with per-operation kernel time.
 HPCG validity/performance output and PolyBench/STREAM kernel timers are diagnostic,
 not substitute scores. Record HPCG actual iterations/work and require equal work;
 an adaptive duration setting that changes completed work between compilers cannot
-supply a score. Failure to obtain equal work with valid unchanged code is a blocker.
+supply a score. Failure to obtain equal work with valid code with only the authorized HPCG source fix is a blocker.
 (Findings 1, 2, 8.)
 
 The neutral feasibility pilot selects and records exact source versions, primary
@@ -114,12 +158,14 @@ The first pass is a buildability/correctness/duration pilot, not the final gate.
 It cannot contribute timing samples to the gate. Freeze compiler/runtime heads,
 flags, runner, inputs, checks and schedule before the final gate. (Findings 1, 2.)
 
-Use **six independent paired launches per program per model per panel**, exceeding
+Use **six independent paired launches per program per model per A/B panel**, exceeding
 the five-pair minimum while allowing exact balance. A is GCC 5.1.1; B is GCC-KNC.
 Pair orders are AB, BA, AB, BA, AB, BA, in that order. Each member is a separate
 process with identical inputs and resources; pair members are adjacent. Iterate
 models in 7120/3100/5100 order and programs in the table's order within each round;
-complete all primary rounds before side panels. Preserve chronological timestamps,
+complete all primary rounds before side panels. GCC-KNC-only OpenMP panels have
+six independent launches at each density, without a fictitious donor pair, and
+report raw latency separately. Preserve chronological timestamps,
 pair IDs, start order, raw times and every attempt. (Finding 2.)
 
 There is exactly one predeclared extension of **six additional pairs for every
