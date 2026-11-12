@@ -1,10 +1,10 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-12 15:29.
+Updated automatically at every ticket change. Last update: 2026-11-12 15:54.
 
 **Waiting for you:** S11-02. Run `python tools/pm.py inbox`.
 
-Current tickets: `[###################-]` 189 of 193
+Current tickets: `[###################-]` 189 of 194
 
 ## Milestones
 
@@ -14,7 +14,7 @@ Current tickets: `[###################-]` 189 of 193
 | M1 | Mixed native code | Done | 43 of 43 tickets |
 | M2 | Useful vector target | Done | 51 of 51 tickets |
 | M3 | Runtimes | Done | 48 of 48 tickets |
-| M4 | Broad optimization | In progress | 7 of 11 tickets |
+| M4 | Broad optimization | In progress | 7 of 12 tickets |
 | M5 | Program corpus | Not started | Not planned in detail yet |
 | M6 | Release | Not started | Not planned in detail yet |
 
@@ -61,8 +61,9 @@ Current tickets: `[###################-]` 189 of 193
 | S11-07 | S11-01 transfer tool - the card's listener gives up before card_run relays its announcement | Done | The transfer study's card listener now waits long enough for card_run to relay its address to the host; che... |
 | S11-08 | -Wknc-unsafe-cbrtl cannot be used in #pragma GCC diagnostic ("valid for  but not for C") | Done | The cbrtl warning can now be silenced around one deliberate call with #pragma GCC diagnostic in C and C++; ... |
 | S11-09 | Memory bandwidth for LLM decode - a weight-streaming GEMV workload, pushed toward 264-299 GB/s of weight bytes | lead | Needs interactive lead: card run in our exclusive turn. Reviewed 33de9541: IMCI sint8/float16 load conversi... |
-| S11-10 | S11-01 transfer runner - choose repetitions, sizes and load states per run, so slow methods fit a card turn | In progress | Owner standing rule (feedback 2026-11-09/10: the lead raises budgets itself): input budget raised to 6M, fi... |
+| S11-10 | S11-01 transfer runner - choose repetitions, sizes and load states per run, so slow methods fit a card turn | Waiting for review | Options and plan tested: red 4c6c5b74 against missing plan; green tools/run.py s11_10_options_green, log C:... |
 | S11-11 | M4 corpus run harness - every corpus program built by GCC 5.1.1 and GCC-KNC, run on the card with frozen inputs and a correctness check, in one command | In progress |  |
+| S11-13 | Senior compiler review of the Sprint 11-13 scope (Milestone M4) against our research, with recommended plan changes | In progress |  |
 | S2-01 | Design for zmm and mask registers under -march=knc | Done | The register design for KNC is settled on paper: all 32 zmm and 8 mask registers become usable under -march... |
 | S2-02 | Float and double arguments and results in zmm lane 0 | Done | Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`). |
 | S2-03 | Varargs with the donor's register save area | Done | Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`). |
@@ -218,6 +219,7 @@ Current tickets: `[###################-]` 189 of 193
 
 ## Recent activity
 
+- 2026-11-12 15:30 **S11-10** engineer submit: Options and plan tested: red 4c6c5b74 against missing plan; green tools/run.py s11_10_options_green, log C:\Users\xuzhi\Documents\gcc_knc\.work\_st...
 - 2026-11-12 15:25 **S11-10** lead note: Two more runner bugs from the card turn, fix them here too: (1) the runner closes card-control.log (finally: card_log.close()) while card_run may s...
 - 2026-11-12 15:24 **S11-10** owner decide: Owner standing rule (feedback 2026-11-09/10: the lead raises budgets itself): input budget raised to 6M, first extension. Options plumbing is done;...
 - 2026-11-12 15:24 **S11-10** engineer escalate: budget: 3216728 input tokens used; the budget is 2000000
@@ -225,16 +227,15 @@ Current tickets: `[###################-]` 189 of 193
 - 2026-11-12 14:52 **S11-10** engineer ask: After two real test attempts, runner options/plumbing and temporary output build are implemented, but the new plan/row test remains failing because...
 - 2026-11-12 14:44 **S11-10** lead answer: Not a code fault: ld could not overwrite .work/_shared/S11-01/transfer-host.exe because a running transfer process holds it open (Device or resourc...
 - 2026-11-12 14:43 **S11-10** engineer ask: The required test command via tools/run.py failed during setUpClass: host transfer_bench.exe link returned 1; wrapper log C:\\Users\\xuzhi\\Documen...
-- 2026-11-12 14:28 **S11-09** lead defer: Needs interactive lead: card run in our exclusive turn. Reviewed 33de9541: IMCI sint8/float16 load conversion, 16/32-byte alignment for 4096/11008 ...
 
 ## Cost
 
-- From the script, engineer: 456 sessions, 978.6M input tokens
+- From the script, engineer: 458 sessions, 982.3M input tokens
 - From the script, lead: 290 sessions, 83.7M input tokens
-- Started by hand, Claude: 11 sessions, 2639.7M input tokens
+- Started by hand, Claude: 12 sessions, 2657.0M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 24.6 GiB of 100 GiB. 82 GiB free on the drive.
+The project uses 24.6 GiB of 100 GiB. 83 GiB free on the drive.
