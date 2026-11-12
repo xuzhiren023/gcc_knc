@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-12 00:26.
+Updated automatically at every ticket change. Last update: 2026-11-12 00:27.
 
 **Waiting for you:** S10-10. Run `python tools/pm.py inbox`.
 
@@ -49,7 +49,7 @@ Current tickets: `[###################-]` 177 of 182
 | S10-08 | Vector math v1b - the rest of the libmvec set (acos, asin, cbrt, erf, erfc, exp2, exp10, expm1, log1p, log2, hypot, sincos) | Done | The vector math library now covers the whole set GCC vectorizes with glibc's libmvec: acos, asin, cbrt, erf... |
 | S10-09 | User story - double-precision loops with division and square root vectorize, correctly rounded (V8DF div, cond_div, sqrt) | Waiting for review | Lead (owner 2026-11-11 16:55 EST): the lead has no usage until the owner says it reset. If you hit an issue... |
 | S10-10 | Card harness fixes from the Sprint 10 card turn - card_qualify binary folder, vmath bench batch sizing | **Waiting for you** | Engineer sandbox cannot write the worktree git metadata (.git/worktrees/S10-10/index.lock: Permission denie... |
-| S10-11 | Card-only vector math failures - double sin, cos, tan, atan2 above 1 ULP, and cbrt/cbrtf crash (SIGSEGV) | Question for the tech lead | 97b7abf7 complete; submit refuses: receipt-style file added: tools/s10_11_evidence.py. This existing script... |
+| S10-11 | Card-only vector math failures - double sin, cos, tan, atan2 above 1 ULP, and cbrt/cbrtf crash (SIGSEGV) | In progress | My 16:35 note asked for a 'separate evidence script', so the conflict is my doing. Don't rename around the ... |
 | S11-01 | User story - the best way to move data between the host and the card, measured, and how our projects use it | Not started | lane tools: owner 2026-11-12, usage reset, move on (Codex engineers) |
 | S11-02 | card_run and run_suite move data by S11-01's recommended method, with fallback | Not started | ready; waits on its dep S11-01, the lead writes acceptance before it starts |
 | S2-01 | Design for zmm and mask registers under -march=knc | Done | The register design for KNC is settled on paper: all 32 zmm and 8 mask registers become usable under -march... |
@@ -207,6 +207,7 @@ Current tickets: `[###################-]` 177 of 182
 
 ## Recent activity
 
+- 2026-11-12 00:27 **S10-11** lead answer: My 16:35 note asked for a 'separate evidence script', so the conflict is my doing. Don't rename around the check. A one-off script tied to this tic...
 - 2026-11-12 00:25 **S10-11** engineer ask: 97b7abf7 complete; submit refuses: receipt-style file added: tools/s10_11_evidence.py. This existing script implements your requested assembly evid...
 - 2026-11-12 00:24 **S10-10** lead escalate: Engineer sandbox cannot write the worktree git metadata (.git/worktrees/S10-10/index.lock: Permission denied), so pm.py commit fails; the red test ...
 - 2026-11-12 00:16 **S10-10** engineer ask: Required red-first test and fix are ready, but pm.py commit failed because git add -A cannot create the worktree index.lock (Permission denied). Pl...
@@ -214,7 +215,6 @@ Current tickets: `[###################-]` 177 of 182
 - 2026-11-12 00:11 **S10-10** owner decide: Owner standing rule: input budget raised to 6M (the fix exists; the remaining work is the red test and applying the patch).
 - 2026-11-12 00:10 **S10-11** lead amend: sessions 8
 - 2026-11-12 00:10 **S10-11** lead escalate: budget: 4 engineer sessions used; the budget is 4
-- 2026-11-12 00:10 **S10-10** lead amend: input_tokens 6M
 
 ## Cost
 
