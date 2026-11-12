@@ -1,64 +1,80 @@
 # Sprint 11: measure (Milestone M4, part 1)
 
-**Status:** started 2026-11-12; rewritten the same day as a roadmap (owner: "we didn't have a clear road map").
-What M4 is for: `docs/M4-DEFINITION.md`. Scoring: ADR-0015 (accepted). Engineers: Codex; the lead builds GCC and runs
-every card job.
+**In plain words:** We will finish with trustworthy starting measurements and a short list of improvements.
+We measure first so the next sprint tackles costs that matter to complete programs. This sprint is done
+when both compilers produce correct results, we can explain where the development programs spend time,
+and the proposed improvements fit the available time. Three programs remain reserved for the final check.
 
-**Sprint goal:** at the end of Sprint 11 we know, honestly and reproducibly, how GCC-KNC compares with GCC 5.1.1 on
-every corpus program, and where each program spends the time we could remove. Sprint 12 then picks its work from
-that evidence instead of from a list of ideas.
+**Status:** started 2026-11-12; adjusted by S11-19. Scope: [M4 definition](../M4-DEFINITION.md).
+**Goal:** a valid experiment and an honest baseline and profile of all 14 development programs, sufficient to select
+at most three S12 themes. The three held-out programs expose only readiness and correctness status until choices freeze.
+**Why now:** kernel wins and the compile survey do not establish whole-program donor gains. Measure first so S12
+removes demonstrated costs ([first review], Evidence boundary and findings 1-3, 8).
 
-**Why this comes first:** M4 is decided on whole programs. Until now the corpus was only compile-surveyed (Sprint 0),
-and our evidence is kernel speedups that cannot be multiplied into a program speedup (S11-13 review). Optimizing
-before measuring would mean choosing work by guess.
+**Binding decisions:** [ADR-0015] fixes the serial comparison, SQLite's disclosed donor exception and HPCG's identical fix.
+Comparisons cover full 7120 and both resource profiles; gains must hold on all three. Profiles model cores and memory,
+not clock or per-core bandwidth. Optional modes are separate panels and never replace primary votes.
 
-Owner decisions that bind this sprint (2026-11-12): strict serial `-O2` vs `-O2` decides M4; 17 programs, one vote
-each, no exclusions after results; every benchmark on the 7120 and under `card_run --profile 3100` and `--profile
-5100`, and a gain counts only if it holds on all three (profiles model cores and memory, not clock or per-core
-bandwidth); the six OpenMP programs vote serial vs serial, GCC-KNC's OpenMP a labelled panel; SQLite at the donor's
-highest level that assembles; HPCG one documented `default(none)` fix for both; a held-out-triggered retry is an
-exposed-set confirmation; a miss after the one retry means release with documented limits.
+## Theme A - make both sides trustworthy
 
-## Theme A - a valid experiment (M4 critical path)
+**What and why now:** finish S11-11's harness with S11-14's contract and S11-18's integration before collecting
+evidence used to choose optimizations. Staged binaries and host tests are not native readiness.
 
-| Ticket | Delivers | State |
-|---|---|---|
-| S11-14 | Scoring contract ADR-0015 and scorer: strict serial `-O2`, 17 programs, 3 models, paired launches, 95% bound, 5% rule, sealing | done |
-| S11-11 | Corpus harness v1: 17 programs built by both compilers, frozen inputs, staged card runs | done |
-| S11-18 | Harness v2: card profiles, runtime-prefix record, held-out sealing, stronger correctness checks, donor-failure rule | doing |
+- Freeze sources, equal work and inputs sized for the smallest profile, checks, SQLite level and the HPCG fix.
+- Verify each compiler's installed and linked C, C++, Fortran and math runtimes and loader environment on card; never mix
+  incompatible objects or runtimes. The donor's absent OpenMP runtime remains a labelled panel limitation.
+- Lead verifies access controls before any held-out build, check or run; diagnostics and full-corpus scores stay sealed.
+- Exercise independent correctness checks and corrupted-result controls; retain failed or blocked rows.
 
-**Exit:** the pilot pass runs every program on the card under both compilers and all three models, with every
-correctness check passing or a failure recorded with its cause.
+**Exit:** all 17 programs have native readiness status for both compilers and all settings, with equal valid work
+and passing checks before timings are usable. A primary blocker blocks this exit; recording it is not completion
+([ADR-0015], Frozen comparison, Timed boundaries, Correctness, Held-out access).
 
-## Theme B - the first baseline and profile (M4 critical path)
+## Theme B - explain the baseline and choose affordable work
 
-| Ticket | Delivers | State |
-|---|---|---|
-| S11-15 | Pilot timings of both compilers, and a profile of each development program: hot functions and loops, x87/vector bridges, spills, code size, OpenMP wait; a removable-time ranking | after A |
-| S11-17 | PGO feasibility on one complete development program (S9-18's path) | after A |
+**What and why now:** S11-15 delivers pilot-quality donor comparisons and hot-cost profiles for all 14 development
+programs, using A's verified runner and C's relevant hazard results. First pilot existing cycle or timer IP sampling
+on one development program, checking symbol attribution and overhead; if unavailable, use bounded compiler
+instrumentation in diagnostic builds without corpus source edits. Record uncertainty; diagnostic times never replace primary
+latency. No AutoFDO recorder project: [S9-19] section 2 leaves sampling availability unproven. An inadequate method
+is a profiling blocker, not permission to infer time shares from assembly. Rank removable serial time from hot
+functions and loops, vectorization, transfers between x87 and vector code, spills, code size, setup and runtime costs. OpenMP wait stays
+in its separate panel.
+**Exit:** `docs/research/m4-baseline.md` has 14 development rows across all settings, uncertainty and causes, the profiler
+decision and at most three general mechanisms with expected benefit, cost and controls. No held-out timings or
+17-vote aggregate appears there ([S11-15], Scope; [first review], findings 3, 5, 8).
 
-**Exit:** `docs/research/m4-baseline.md` with per-program speedups (pilot quality, not the gate), the removable-time
-ranking, and the three Sprint 12 themes it implies.
+## Theme C - close hazards before trusting results
 
-## Theme C - no hidden correctness hazard in the score
+**What and why now:** run S11-16's bounded long-double libm probe alongside A; a fault can invalidate the baseline
+or its oracle. Guard against or fix reproduced hazards before affected measurements; record untested coverage. S11-08's
+completed `cbrtl` repair belongs here. S11-12 qualifies the final integrated head after repairs.
+**Exit:** no known relevant fault remains unguarded; native ABI, runtime and prefix checks, lead-run x86 identity and
+the sprint-end forward-port drill have recorded results. Failures remain blockers, not "green"
+([first review], findings 7, 9; [ADR-0006], Decision 5-7).
 
-| Ticket | Delivers | State |
-|---|---|---|
-| S11-16 | Long-double libm audit: does any other MPSS entry point fault like `cbrtl`? | probe staged |
-| S11-12 | Batch check at the sprint's final head: native suite, x86 identity, forward-port drill, runtime prefix consistency | last |
+## Side track - bounded feasibility and owner priorities
 
-**Exit:** no known libm fault unguarded, and the batch green.
+**What and why now:** S11-17 checks the existing PGO training and use path on one complete development program with separate
+training and evaluation inputs so S12 can decide whether to reuse it. Success or a documented blocker is its exit;
+it does not delay the serial baseline. S11-13 and this review supply planning evidence, not extra experiments.
+S11-02 qualifies DMA integration and SSH fallback; S11-05, S11-06 and S11-09 finish bandwidth and GEMV analyses for later work.
+Their exits are their own correctness and results reports, not an M4 bandwidth target. Staging may use the working
+fallback; research enters S12 only through M4's admission rule ([first review], findings 3, 6).
 
-## Side track - owner priorities that run beside M4 (not M4 exit criteria)
+## Capacity and handoff
 
-| Work | Status | Remaining |
-|---|---|---|
-| Host-card transport (S11-01, -03, -04, -07, -10 done) | DMA at the link limit: 1.67 GB/s card to host, 1.46 GB/s host to card (Gen2 x4) | S11-02: card_run and run_suite use DMA, SSH fallback |
-| Memory bandwidth and GEMV for LLM decode (S11-05, -06 done; S11-09) | read 189 GB/s; GEMV fp32 125 GB/s, int8 70 G weights/s | S11-09 analysis; sweep 3 analysis; findings become S12 candidates only through the M4 rule |
-| S11-08 (`cbrtl` pragma), S11-13 (scope review) | done | none |
+**Cap:** two weeks from 2026-11-12. The lead owns builds and card jobs and records pilot-derived hours and exclusive
+windows for readiness and hazard checks, B profiling, final batch, optional PGO and research before booking. S11-18's staged
+468-launch estimate is 4-7 hours, not a validated baseline duration ([S11-18], 17:12 note). Protect primary
+readiness, baseline and final batch; run the hazard probe before affected measurements. The owner still needs to
+allocate corpus versus side-work hours; defer side work rather than borrow protected windows. At the cap, report
+unmet exits and a smaller justified S12 scope; never infer missing evidence or promise a pass.
+**Out of scope:** performance implementations (S12), new profiling infrastructure, hardware or MPSS changes, intrinsics, autotune.
 
-**Card time, in priority order:** Theme A/B pilot and baseline runs, then S11-16's probe, then S11-02, then research
-sweeps.
-
-**Out of scope:** any optimization change (Sprint 12), hardware or MPSS configuration changes, intrinsics, autotune.
-**Cap:** two weeks from 2026-11-12.
+[ADR-0015]: ../adr/0015-m4-scoring-and-measurement.md
+[ADR-0006]: ../adr/0006-portable-shared-i386.md
+[first review]: ../reviews/2026-11-12-s11-s13-scope-review.md
+[S9-19]: ../research/s9-19-auto.md
+[S11-15]: ../../work/tickets/S11-15.md
+[S11-18]: ../../work/tickets/S11-18.md
