@@ -69,7 +69,7 @@ Current tickets: `[###################-]` 193 of 201
 | S11-15 | First development-corpus baseline and profile, GCC 5.1.1 vs GCC-KNC at -O2 (E7-03 part 1) | draft |  |
 | S11-16 | Long-double libm hazard audit - do other MPSS long double entry points fault like cbrtl? (E7-21, bounded) | lead | Needs a card run by the interactive lead (card turn per shared-card rules): python tools/card_run --threads... |
 | S11-17 | PGO feasibility on one complete development program (reuse of S9-18's train/use path) | draft |  |
-| S11-18 | M4 corpus harness v2 - card profiles, prefix record, held-out sealing, stronger checks, and the donor-failure rule | In progress | Size approved: 943 lines covers six spec items, and 278 of them are the approved test file and 218 a README... |
+| S11-18 | M4 corpus harness v2 - card profiles, prefix record, held-out sealing, stronger checks, and the donor-failure rule | Waiting for review | e2667d67: 5 host tests pass; 40 builds linted, 7 expected donor failures; SQLite O3. Logs: .work/_state/log... |
 | S11-19 | Second senior review - the M4 definition and the Sprint 11-13 roadmap, adjusted | In progress |  |
 | S2-01 | Design for zmm and mask registers under -march=knc | Done | The register design for KNC is settled on paper: all 32 zmm and 8 mask registers become usable under -march... |
 | S2-02 | Float and double arguments and results in zmm lane 0 | Done | Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`). |
@@ -226,6 +226,7 @@ Current tickets: `[###################-]` 193 of 201
 
 ## Recent activity
 
+- 2026-11-12 17:16 **S11-18** engineer submit: e2667d67: 5 host tests pass; 40 builds linted, 7 expected donor failures; SQLite O3. Logs: .work/_state/logs/S11_18_green_cygwin-20261112-165852.lo...
 - 2026-11-12 17:15 **S11-09** lead answer: Approved: the test/code ratio is a path artefact (the benchmark itself, membw.c and sweep.sh, lives under tests/bench/membw, so it counts as test l...
 - 2026-11-12 17:15 **S11-09** lead note: Card GEMV sweep 2026-11-12 21:41-21:57Z (boot da3144f1, benchmark mode, 240 CPUs granted, 55 cases): raw output .work/_shared/tmp/claude-next28/mem...
 - 2026-11-12 17:14 **S11-09** engineer ask: Analysis committed at 9c1880f2. Native log .work/_shared/tmp/claude-next28/membw-gemv.out has 55/55 valid cases. Submit blocks on 413 test lines ve...
@@ -233,7 +234,6 @@ Current tickets: `[###################-]` 193 of 201
 - 2026-11-12 17:12 **S11-18** engineer ask: Submission blocked: pm.py submit reports 943 changed lines against the 800-line budget. Please approve this size or specify a scope split. Implemen...
 - 2026-11-12 17:06 **S11-09** lead answer: Card results are in the 17:15 lead note; raw output path there. Write the analysis and candidate stories as the note says; leave uncommitted and as...
 - 2026-11-12 17:06 **S11-09** lead resume: GEMV sweep result on the ticket (17:15 note).
-- 2026-11-12 17:05 **S11-14** lead approve: M4's scoring contract is frozen in ADR-0015 with a tested scorer: strict serial -O2 versus -O2 over 17 programs on the 7120 and the 3100/5100 profi...
 
 ## Cost
 
