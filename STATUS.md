@@ -1,10 +1,10 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-12 10:54.
+Updated automatically at every ticket change. Last update: 2026-11-12 10:55.
 
 **Waiting for you:** S11-02. Run `python tools/pm.py inbox`.
 
-Current tickets: `[###################-]` 183 of 186
+Current tickets: `[###################-]` 183 of 187
 
 ## Milestones
 
@@ -14,7 +14,7 @@ Current tickets: `[###################-]` 183 of 186
 | M1 | Mixed native code | Done | 43 of 43 tickets |
 | M2 | Useful vector target | Done | 51 of 51 tickets |
 | M3 | Runtimes | Done | 47 of 48 tickets |
-| M4 | Broad optimization | In progress | 2 of 4 tickets |
+| M4 | Broad optimization | In progress | 2 of 5 tickets |
 | M5 | Program corpus | Not started | Not planned in detail yet |
 | M6 | Release | Not started | Not planned in detail yet |
 
@@ -56,6 +56,7 @@ Current tickets: `[###################-]` 183 of 186
 | S11-02 | card_run and run_suite move data by S11-01's recommended method, with fallback | **Waiting for you** | Started by mistake: the ticket was 'ready' as a placeholder and became startable when S11-01 closed. The en... |
 | S11-03 | S11-01 transfer tool rejects the card's physical /tmp path, so the native study never starts | Done | The transfer study's tool now accepts the card's real /tmp location (/var/volatile/tmp), so its card run ca... |
 | S11-04 | S11-01 transfer tool - the host opens every connection, because Windows Firewall blocks inbound TCP from the card | Question for the tech lead | Implemented and committed red adf57742 and fix aafd029d. Regression red on S11-03; loopback green both dire... |
+| S11-05 | Research - raise KNC's real memory bandwidth from about 175 GB/s toward 75-85% of peak, with a measured plan | In progress |  |
 | S2-01 | Design for zmm and mask registers under -march=knc | Done | The register design for KNC is settled on paper: all 32 zmm and 8 mask registers become usable under -march... |
 | S2-02 | Float and double arguments and results in zmm lane 0 | Done | Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`). |
 | S2-03 | Varargs with the donor's register save area | Done | Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`). |
@@ -224,7 +225,7 @@ Current tickets: `[###################-]` 183 of 186
 
 - From the script, engineer: 443 sessions, 957.2M input tokens
 - From the script, lead: 278 sessions, 81.0M input tokens
-- Started by hand, Claude: 11 sessions, 2539.7M input tokens
+- Started by hand, Claude: 11 sessions, 2541.0M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
