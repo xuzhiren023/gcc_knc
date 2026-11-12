@@ -1,10 +1,10 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-12 03:27.
+Updated automatically at every ticket change. Last update: 2026-11-12 04:17.
 
 **Waiting for you:** S10-10, S10-12. Run `python tools/pm.py inbox`.
 
-Current tickets: `[###################-]` 178 of 183
+Current tickets: `[###################-]` 179 of 183
 
 ## Milestones
 
@@ -13,7 +13,7 @@ Current tickets: `[###################-]` 178 of 183
 | M0 | Foundation | In progress | 17 of 17 tickets |
 | M1 | Mixed native code | Done | 43 of 43 tickets |
 | M2 | Useful vector target | Done | 51 of 51 tickets |
-| M3 | Runtimes | Done | 44 of 47 tickets |
+| M3 | Runtimes | Done | 45 of 47 tickets |
 | M4 | Broad optimization | Not started | 0 of 2 tickets |
 | M5 | Program corpus | Not started | Not planned in detail yet |
 | M6 | Release | Not started | Not planned in detail yet |
@@ -49,7 +49,7 @@ Current tickets: `[###################-]` 178 of 183
 | S10-08 | Vector math v1b - the rest of the libmvec set (acos, asin, cbrt, erf, erfc, exp2, exp10, expm1, log1p, log2, hypot, sincos) | Done | The vector math library now covers the whole set GCC vectorizes with glibc's libmvec: acos, asin, cbrt, erf... |
 | S10-09 | User story - double-precision loops with division and square root vectorize, correctly rounded (V8DF div, cond_div, sqrt) | Done | Double-precision loops with division or square root now vectorize under -march=knc and give the correctly r... |
 | S10-10 | Card harness fixes from the Sprint 10 card turn - card_qualify binary folder, vmath bench batch sizing | **Waiting for you** | Owner choice: Codex engineers cannot write the main .git, so pm.py commit fails in their worktrees. (a) All... |
-| S10-11 | Card-only vector math failures - double sin, cos, tan, atan2 above 1 ULP, and cbrt/cbrtf crash (SIGSEGV) | Waiting for review | Review: the narrowed fix reads right (only the compensated steps lose FMA: sincos 15->9, tan 18->11, atan 2... |
+| S10-11 | Card-only vector math failures - double sin, cos, tan, atan2 above 1 ULP, and cbrt/cbrtf crash (SIGSEGV) | Done | Double sin, cos, tan and atan2 from the KNC vector math library are now within 1 ULP on the card (0.76 to 0... |
 | S10-12 | cbrt and cbrtf crash (SIGSEGV) in qualify_v1 on the card - root cause and fix | **Waiting for you** | Needs the interactive lead's card turn, not an owner decision. Reviewed caabcc0c: the reproducer in .work/_... |
 | S11-01 | User story - the best way to move data between the host and the card, measured, and how our projects use it | Not started | lane tools: owner 2026-11-12, usage reset, move on (Codex engineers) |
 | S11-02 | card_run and run_suite move data by S11-01's recommended method, with fallback | Not started | ready; waits on its dep S11-01, the lead writes acceptance before it starts |
@@ -208,23 +208,23 @@ Current tickets: `[###################-]` 178 of 183
 
 ## Recent activity
 
+- 2026-11-12 04:17 **S10-11** lead approve: Double sin, cos, tan and atan2 from the KNC vector math library are now within 1 ULP on the card (0.76 to 0.88 ULP, same as the host): FMA is turne...
+- 2026-11-12 04:12 **S10-11** lead note: Card 2026-11-12 08:54-09:10Z (boot da3144f1), narrowed build: compare set 42 PASS, double sin 0.761, cos 0.787, tan 0.826, atan2 0.877 ULP; only cb...
 - 2026-11-12 03:55 **S10-12** lead amend: lane gcc: tree 1 is idle and gcc2 waits on the S10-11 review
 - 2026-11-12 03:45 **S10-11** lead note: Review: the narrowed fix reads right (only the compensated steps lose FMA: sincos 15->9, tan 18->11, atan 20->12; -fexcess-precision=standard stays...
 - 2026-11-12 03:30 **S10-10** lead note: Owner choice: Codex engineers cannot write the main .git, so pm.py commit fails in their worktrees. (a) Allow it: add the repo's .git to the Codex ...
 - 2026-11-12 03:27 **S10-12** lead escalate: Needs the interactive lead's card turn, not an owner decision. Reviewed caabcc0c: the reproducer in .work/_shared/S10-12/card/ is fine (unchanged S...
 - 2026-11-12 03:23 **S10-12** engineer ask: Diagnostic committed caabcc0c and staged with nm/objdump maps; build/lint PASS. Log: .work/_state/logs/S10_12_stage-20261112-032233.log. Native/hos...
 - 2026-11-12 01:20 **S10-09** lead approve: Double-precision loops with division or square root now vectorize under -march=knc and give the correctly rounded IEEE result in every rounding mod...
-- 2026-11-12 00:31 **S10-11** engineer submit: 8d8f3c5f staging/lint PASS. FMA before/global-off/narrowed: sincos 15/0/9, reducer 0/0/0, tan 18/0/11, atan 20/0/12. Log: .work/_state/logs/S10_11_...
-- 2026-11-12 00:29 **S10-11** lead note: Lead card 2026-11-12 (boot da3144f1), S10-11 build: compare set fixed for double sin 0.761, cos 0.767, tan 0.826, atan2 0.877 ULP (match host); all...
 
 ## Cost
 
 - From the script, engineer: 425 sessions, 940.2M input tokens
 - From the script, lead: 265 sessions, 78.4M input tokens
-- Started by hand, Claude: 11 sessions, 2464.1M input tokens
+- Started by hand, Claude: 11 sessions, 2466.9M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 24.5 GiB of 100 GiB. 66 GiB free on the drive.
+The project uses 24.4 GiB of 100 GiB. 100 GiB free on the drive.
