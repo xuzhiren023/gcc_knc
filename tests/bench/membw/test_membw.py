@@ -3,6 +3,7 @@ import json
 import os
 from pathlib import Path
 import subprocess
+import shlex
 import sys
 import unittest
 
@@ -39,6 +40,14 @@ class MemoryBandwidth(unittest.TestCase):
             self.assertLessEqual(row['median_GBs'], row['max_GBs'])
             self.assertEqual(row['threads'], row['allowed_cpus'])
             self.assertEqual(len(set(row['cpus'])), row['threads'])
+            self.assertEqual(len(row['timings']), 5)
+            rates = []
+            for sample in row['timings']:
+                self.assertGreater(sample['seconds'], 0)
+                self.assertGreaterEqual(sample['wall_seconds'], sample['seconds'])
+                self.assertGreaterEqual(sample['start_skew_seconds'], 0)
+                rates.append(row['logical_bytes'] / sample['seconds'] / 1e9)
+            self.assertAlmostEqual(sorted(rates)[2], row['median_GBs'], places=5)
         return rows
 
     def test_all_kernels_and_controls(self):
@@ -47,18 +56,82 @@ class MemoryBandwidth(unittest.TestCase):
                       '--pf0', '8', '--pf1', '32', '--prefetch', 'exclusive',
                       '--fence', 'chunk', '--evict', 'both', '--offset-lines', '3',
                       '--padding-lines', '5', '--chunk-lines', '17',
-                      '--schedule', 'cyclic', '--unroll', '4', '--split', '1')
+                      '--schedule', 'cyclic', '--unroll', '4', '--split', '1',
+                      '--read-chains', '4')
         self.run_case('--store', 'nr', '--placement', 'reverse', '--prefetch', 'l2',
-                      '--fence', 'line', '--unroll', '8', '--chunk-lines', '31')
+                      '--fence', 'line', '--unroll', '8', '--chunk-lines', '31',
+                      '--pass-fence', 'final', '--read-chains', '1')
 
     def test_invalid_configuration(self):
         for options in [('--repeats', '4'), ('--unroll', '0'), ('--mib', '0'),
                         ('--store', 'bogus'), ('--threads', '99999'),
-                        ('--fence', 'none'), ('--offset-lines', '-1')]:
+                        ('--fence', 'none'), ('--offset-lines', '-1'),
+                        ('--pass-fence', 'none'), ('--read-chains', '2')]:
             result = subprocess.run([str(self.binary), *options],
                                     stdout=subprocess.PIPE, stderr=subprocess.PIPE,
                                     timeout=10)
             self.assertNotEqual(result.returncode, 0, options)
+
+    def test_second_sweep_budget_and_calibration(self):
+        result = subprocess.run(['sh', str(HERE / 'sweep.sh'), 'second-plan'],
+                                check=True, text=True, stdout=subprocess.PIPE)
+        cases = result.stdout.splitlines()
+        self.assertEqual(len(cases), 58)
+        self.assertLess(len(cases) * 90 + 120, 90 * 60)
+        configs = []
+        for i, case in enumerate(cases, 1):
+            words = shlex.split(case)
+            self.assertEqual(words[:2], ['CASE', str(i)])
+            configs.append(dict(zip(words[2::2], words[3::2])))
+        self.assertEqual([c['--workload'] for c in configs[:3]], ['triad'] * 3)
+        for i in range(0, 18, 3):
+            self.assertEqual([(c['--mib'], c['--passes']) for c in configs[i:i+3]],
+                             [('256', '8'), ('2048', '8'), ('2048', '32')])
+        for c in configs[18:]:
+            self.assertEqual((c['--mib'], c['--passes']), ('2048', '32'))
+            self.assertNotEqual(c['--workload'], 'all')
+
+    def test_third_sweep_budget_and_controls(self):
+        result = subprocess.run(['sh', str(HERE / 'sweep.sh'), 'third-plan'],
+                                check=True, text=True, stdout=subprocess.PIPE)
+        cases = result.stdout.splitlines()
+        self.assertEqual(len(cases), 58)
+        self.assertLess(len(cases) * 90 + 120, 90 * 60)
+        configs = []
+        for i, case in enumerate(cases, 1):
+            words = shlex.split(case)
+            self.assertEqual(words[:2], ['CASE', str(i)])
+            c = dict(zip(words[2::2], words[3::2]))
+            configs.append(c)
+            self.assertEqual((c['--mib'], c['--passes'], c['--repeats']),
+                             ('2048', '32', '5'))
+            self.assertEqual(c['--placement'], 'spread')
+            self.assertNotEqual(c['--workload'], 'all')
+        self.assertEqual([c['--workload'] for c in configs[:6]],
+                         ['triad', 'read', 'write', 'copy', 'rmw', 'stencil'])
+        self.assertEqual(configs[:6], configs[-6:])
+        self.assertEqual((configs[0]['--threads'], configs[0]['--pf0'],
+                          configs[0]['--pf1']), ('60', '8', '64'))
+        for start, workload in zip(range(6, 26, 4),
+                                   ['read', 'copy', 'triad', 'rmw', 'stencil']):
+            group = configs[start:start+4]
+            self.assertEqual([c['--workload'] for c in group], [workload] * 4)
+            self.assertEqual([(c['--threads'], c['--pf0'], c['--pf1']) for c in group],
+                             [('60', '16', '128'), ('60', '32', '256'),
+                              ('120', '16', '128'), ('120', '32', '256')])
+        reference = configs[26]
+        self.assertEqual(reference, configs[51])
+        self.assertEqual(reference['--threads'], '120')
+        for c, keys in zip(configs[27:38],
+                           [{'--prefetch'}, {'--pf0', '--pf1'}, {'--pf0', '--pf1'},
+                            {'--pages'}, {'--schedule'}, {'--chunk-lines'},
+                            {'--evict'}, {'--prefetch'}, {'--store'}, {'--store'},
+                            {'--offset-lines'}]):
+            changed = {k for k in reference.keys() | c.keys()
+                       if reference.get(k) != c.get(k)}
+            self.assertEqual(changed, keys)
+        self.assertEqual([c['--evict'] for c in configs[46:51]],
+                         ['none', 'l2', 'none', 'l2', 'both'])
 
 
 if __name__ == '__main__':

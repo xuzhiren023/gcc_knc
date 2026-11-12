@@ -28,6 +28,8 @@ These commands are from a worktree under `.work`, hence `../_shared`:
 python tools/card_run --benchmark --threads 240 --timeout 120 --file ../_shared/S11-05/membw.mic ../_shared/S11-05/sweep.sh probe
 python tools/card_run --benchmark --threads 240 --timeout 6600 --file ../_shared/S11-05/membw.mic ../_shared/S11-05/sweep.sh first
 python tools/card_run --benchmark --threads 240 --timeout 600 --file ../_shared/S11-05/membw.mic ../_shared/S11-05/sweep.sh confirm --threads 60 --pages huge --pf0 8 --pf1 64 --offset-lines 62
+python tools/card_run --benchmark --threads 240 --timeout 5340 --file ../_shared/S11-05/membw.mic ../_shared/S11-05/sweep.sh second
+python tools/card_run --benchmark --threads 240 --timeout 5340 --file ../_shared/S11-05/membw.mic ../_shared/S11-05/sweep.sh third
 ```
 
 The confirmation configuration is an example: replace it with the winning
@@ -65,6 +67,8 @@ Every option takes a value; last occurrence wins.
 | `--unroll` | 1/2/4/8; 4 | Explicit source expansion; operation/store/prefetch/fence/eviction modes dispatched outside the line loop |
 | `--split` | 0/1; 0 | Split triad within each chunk using output as a temporary; other classes unchanged |
 | `--first-touch` | parallel/serial; parallel | Workers or worker zero initialize arrays outside timing |
+| `--pass-fence` | each/final; each | Completion per pass, or only after the last pass; RMW and split triad always retain per-pass completion; chunk/line fences still apply |
+| `--read-chains` | 0/1/4; 0 | Original read kernel, private single accumulator, or four independent accumulators; private paths group four lines regardless of `--unroll` |
 | `--probe` | 1 | Standalone perf syscall capability probe; no memory benchmark |
 
 On Linux, huge allocation checks the filesystem type and faults one byte per
@@ -101,14 +105,22 @@ reports five implementation streams (20 bytes) rather than three. Do not call
 either logical result a memory-controller measurement.
 
 Five or more synchronized samples include all passes, completion fences and the
-last finishing worker. Initialization and full validation are outside the timed
-region. A final barrier prevents validation overlapping the next sample.
+last finishing worker. S11-06 measures the envelope from the earliest worker
+start to the latest worker completion, after the completion fence and before the
+ending barrier. It includes worker start skew, chunk dispatch and loop overhead.
+Initialization and full validation are outside that envelope. The old worker-zero
+wall interval is retained in each sample's `timings.wall_seconds` for comparison;
+it includes both timed barriers and may include other workers starting validation
+before worker zero obtains its timestamp. `timings.seconds` is the envelope used
+for bandwidth; `start_skew_seconds` is latest minus earliest worker start. Raw
+samples remain in acquisition order; min/median/max rates are sorted separately.
+A final barrier prevents validation overlapping the next sample.
 Output is JSON Lines with median/min/max decimal GB/s and the selected CPU list.
 `sweep.sh` adds `CASE` command lines and `METADATA` blocks. Filter JSON result
 records when analyzing; keep surrounding case/config records to retain context.
 These are STREAM-style byte counts, not a submission to the official STREAM list.
 
-## Native inner-loop instruction budget
+## S11-05 native inner-loop instruction budget
 
 Counted from the staged k1om binary's disassembly after the review fixes, with
 the default `--unroll 4 --prefetch shared --pf0 16 --pf1 32 --store ngo
@@ -141,8 +153,9 @@ With both prefetch distances nonzero, a separate bulk loop omits bounds checks;
 the tail checks each hint, preserving the in-array rule. Disabling either
 distance uses the checked path. Short chunks, tails, split triad, fences and
 eviction variants have different costs. Compare those results using their own
-paths rather than assigning these default counts to them. The per-pass fence,
-chunk dispatch and thread synchronization remain inside the measured interval.
+paths rather than assigning these default counts to them. The completion fences
+and chunk dispatch remain inside the measured interval. S11-06 reports barrier
+overhead separately, as described above.
 
 ## First-pass budget and interpretation
 
@@ -168,3 +181,112 @@ to retest a proposed winner against the actual best base before accepting it.
 The initial sweep does not claim a full Cartesian search. Compare medians and
 ranges, retain regressions, and reject comparisons contaminated by fallback,
 thermal drift, a changed affinity mask or overlapping jobs.
+
+## S11-06 second sweep: calibration before tuning
+
+Run the `second` command above only through the lead's card allocation. It runs
+58 single-workload invocations, each bounded by the existing 90-second alarm:
+87 minutes maximum summed process time, plus a two-minute metadata/launch reserve.
+The outer 5340-second timeout caps the job at 89 minutes; an incomplete or timed
+out case is a failure, never a valid slow sample. No hardware setting changes.
+Every invocation uses five fully initialized and validated samples. Long cases
+use 2048 MiB per array (about 6 GiB total), 32 passes, spread placement and NGO
+stores unless the CASE line overrides them. Allocation fallback remains visible.
+
+`sh tests/bench/membw/sweep.sh second-plan` prints the exact 58 CASE commands
+without touching a binary or reading card metadata. Duplicate options are
+intentional: the final value wins. The host test checks expansion and the budget.
+
+| Cases | Purpose |
+|---|---|
+| 1-3 | STREAM-equivalent triad: 60 threads, huge, NGO, prefetch 8/64; 256 MiB x 8, 2048 MiB x 8, 2048 MiB x 32 |
+| 4-18 | Same three-size/pass calibration for read, write, copy, RMW and stencil, in that order |
+| 19-24 | Long triad/read/write/copy/RMW/stencil with only the final completion fence |
+| 25-42 | Per class read/write/copy/triad/RMW/stencil: 120 threads at 8/64, 120 at 32/128, 60 at 32/128 |
+| 43-44 | Read: private single accumulator and four independent accumulators |
+| 45-47 | Write: 240 threads NGO, 60 NR, 60 normal with exclusive prefetch |
+| 48 | Copy: cyclic 1024-line chunks and L2 eviction |
+| 49-50 | Triad: offset 62 plus unroll 8; split with 1024-line chunks |
+| 51 | RMW: both evictions plus cyclic 1024-line chunks |
+| 52 | Stencil: 128-line chunks and L1 eviction |
+| 53-58 | Closing long references, fresh mappings, same order as cases 19-24 |
+
+The per-class references retain promising first-sweep configurations: read uses
+small pages and prefetch 16/32; write uses huge pages and 8/32; RMW uses huge,
+16/32 and both evictions; copy/triad/stencil use huge and 8/64. Case 43/44 keep
+the same read reference configuration. Private reductions preserve full modulo
+2^32 validation; neither result is accepted on instruction counts alone.
+
+Final-only fencing retains publication after all passes. Each worker owns its
+written lines; stencil reads immutable input. RMW consumes its own prior output,
+and split triad reuses streamed output as a normal-store temporary, so both
+always retain per-pass completion even when `final` is requested. Case 23 is
+therefore a repeated RMW control. No worker consumes another worker's streamed
+output during the timed loop. The experiment measures intermediate completion
+cost only where output is not reused, and never omits final NGO completion.
+
+Compare the triad size/pass ladder (cases 1-3) using both
+envelope and old wall rates. At 175 GB/s the longest triad sample should last
+about 1.18 seconds, versus 37 ms for the shortest. Require at least 175 GB/s
+completed triad before describing calibration as reproduced. If it falls short,
+report the measured gap, timing/skew fraction, actual pages and reference drift;
+prioritize that diagnosis over promoting small tuning gains. Do not adjust counts
+or remove completion to match STREAM. This is an equivalent useful-byte kernel,
+not the official STREAM implementation or a matched compiler/system experiment.
+
+For each sample calculate `logical_bytes / wall_seconds / 1e9` and compare with
+the envelope rate. Report `(wall_seconds-seconds)/wall_seconds` and
+`start_skew_seconds/seconds`; no guessed overhead subtraction. Compare 2048 x 8
+against 2048 x 32 to test duration at fixed footprint, and 256 x 8 against
+2048 x 8 to expose size/cache/page effects. Only longer native runs can tell which
+first-sweep observations survive. Keep differences below 10% provisional; wider
+overlapping ranges or closing-reference drift require paired repeats even above
+10%. The predicted-vs-target table and current evidence are in the research note.
+
+## S11-06 third sweep: close the long-sample gap
+
+Sweep 2's measured baseline and per-class results are in the research note's
+final section. The benchmark binary is unchanged from the validated sweep-2
+build; only the runner needs restaging. Run `third` with the exact lead command
+above. `sh tests/bench/membw/sweep.sh third-plan` prints all commands without
+reading metadata, touching the binary or executing a card case. The host test
+checks case count, long samples, paired controls and identical closing references.
+
+Every case uses 2048 MiB per array, 32 passes, five samples and spread placement.
+Defaults remain NGO, block scheduling, 4096-line chunks, unroll four, both
+prefetch levels, no output eviction and per-pass completion. Class references:
+triad 60/huge/8/64, read 120/small/8/64, write 60/huge/8/32,
+copy and stencil 60/huge/32/128, RMW 60/huge/16/32 with both evictions.
+Distances in write's configuration do not issue prefetch with NGO stores.
+Requested huge pages must be verified from each config record as before.
+
+| Cases | Exact variation from the class reference |
+|---|---|
+| 1-6 | Calibration/references: triad, read, write, copy, RMW, stencil |
+| 7-10, 11-14, 15-18, 19-22, 23-26 | Read, copy, triad, RMW, stencil respectively: 60 at 16/128; 60 at 32/256; 120 at 16/128; 120 at 32/256 |
+| 27 | Triad 120 threads, 8/64: repeat the collapse reference |
+| 28-30 | Triad 120: no prefetch; far-only 0/128; near-only 16/0 |
+| 31-33 | Triad 120: small pages; cyclic scheduling at 4096; block chunks 65536 |
+| 34-38 | Triad 120: L2 eviction; far T2 hint; NR stores; normal stores; offset 62 |
+| 39-42 | Write 60 unroll 8; 60 chunk 65536; 240 unroll 8; 240 chunk 65536 |
+| 43-46 | Write 120 unroll 8; 60 L2 eviction; 60 chunk fences; 60 cyclic chunks 1024 |
+| 47-51 | RMW at 16/32: 60 no eviction; 60 L2; 120 no eviction; 120 L2; 120 both |
+| 52 | Repeat case 27's triad 120-thread collapse reference |
+| 53-58 | Repeat cases 1-6 exactly, with fresh allocations |
+
+All 58 process alarms include initialization and validation: `58 * 90 = 5220`
+seconds (87 minutes), plus a 120-second metadata/launch reserve. The 5340-second
+outer timeout enforces an 89-minute cap; a timeout or validation failure is
+incomplete, not accepted performance. The prior sweep took about 20 minutes,
+but that observation does not replace the conservative bound.
+
+Read/density comparisons use matched distances; RMW eviction comparisons hold
+16/32 fixed. Compare each triad diagnostic to 27/52 and the 60-thread 1/53
+references. Single-level prefetch changes both hints and checked-loop overhead;
+NR/normal tests retain shared input prefetch and change only store kind. Write
+unroll/chunk changes are separate, except the explicitly combined cyclic-1024
+candidate. Interpret gains below 10% as provisional and check min/max, overhead,
+skew, closing drift and actual pages before selecting a candidate. Sweep 3 does
+not reproduce the small combined offset/unroll winner or split triad; it spends
+those cases on identifying the large class-specific loss. No native gain is
+claimed until the lead returns raw output.
