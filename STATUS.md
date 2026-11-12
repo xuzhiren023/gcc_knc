@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-12 00:27.
+Updated automatically at every ticket change. Last update: 2026-11-12 00:29.
 
 **Waiting for you:** S10-10. Run `python tools/pm.py inbox`.
 
@@ -47,7 +47,7 @@ Current tickets: `[###################-]` 177 of 182
 | S10-06 | Card qualification - classify powf's 848 special-case mismatches and certify pow under 1 ULP | Done | The powf and pow card failures were traced to the card's own libm (its powl gives NaN for negative x with h... |
 | S10-07 | Vector math v1a - the copied functions (sin, cos, tan, log10, atan, atan2, hyperbolics, bounded groups) in libknc_vmath and the vectorizer hook | Done | Card 2026-11-11 (S10-08 build, 240 threads): full set PASS for sinf 0.499999, cosf 0.499998, tanf 0.499995,... |
 | S10-08 | Vector math v1b - the rest of the libmvec set (acos, asin, cbrt, erf, erfc, exp2, exp10, expm1, log1p, log2, hypot, sincos) | Done | The vector math library now covers the whole set GCC vectorizes with glibc's libmvec: acos, asin, cbrt, erf... |
-| S10-09 | User story - double-precision loops with division and square root vectorize, correctly rounded (V8DF div, cond_div, sqrt) | Waiting for review | Lead (owner 2026-11-11 16:55 EST): the lead has no usage until the owner says it reset. If you hit an issue... |
+| S10-09 | User story - double-precision loops with division and square root vectorize, correctly rounded (V8DF div, cond_div, sqrt) | Waiting for review | Card 2026-11-12 05:09-05:19Z (boot da3144f1): knc-v8df-divsqrt.mic all 15 sets bad=0 flagbad=0: div midpoin... |
 | S10-10 | Card harness fixes from the Sprint 10 card turn - card_qualify binary folder, vmath bench batch sizing | **Waiting for you** | Engineer sandbox cannot write the worktree git metadata (.git/worktrees/S10-10/index.lock: Permission denie... |
 | S10-11 | Card-only vector math failures - double sin, cos, tan, atan2 above 1 ULP, and cbrt/cbrtf crash (SIGSEGV) | In progress | My 16:35 note asked for a 'separate evidence script', so the conflict is my doing. Don't rename around the ... |
 | S11-01 | User story - the best way to move data between the host and the card, measured, and how our projects use it | Not started | lane tools: owner 2026-11-12, usage reset, move on (Codex engineers) |
@@ -207,6 +207,7 @@ Current tickets: `[###################-]` 177 of 182
 
 ## Recent activity
 
+- 2026-11-12 00:29 **S10-09** lead note: Card 2026-11-12 05:09-05:19Z (boot da3144f1): knc-v8df-divsqrt.mic all 15 sets bad=0 flagbad=0: div midpoint 1.45M, Markstein 2.10M, exponent 1.54M...
 - 2026-11-12 00:27 **S10-11** lead answer: My 16:35 note asked for a 'separate evidence script', so the conflict is my doing. Don't rename around the check. A one-off script tied to this tic...
 - 2026-11-12 00:25 **S10-11** engineer ask: 97b7abf7 complete; submit refuses: receipt-style file added: tools/s10_11_evidence.py. This existing script implements your requested assembly evid...
 - 2026-11-12 00:24 **S10-10** lead escalate: Engineer sandbox cannot write the worktree git metadata (.git/worktrees/S10-10/index.lock: Permission denied), so pm.py commit fails; the red test ...
@@ -214,13 +215,12 @@ Current tickets: `[###################-]` 177 of 182
 - 2026-11-12 00:11 **S10-11** owner decide: Owner standing rule: session budget raised to 8 (red approved, fix committed, progressing). Continue with the lead's 00:09 answer; the cbrt card ou...
 - 2026-11-12 00:11 **S10-10** owner decide: Owner standing rule: input budget raised to 6M (the fix exists; the remaining work is the red test and applying the patch).
 - 2026-11-12 00:10 **S10-11** lead amend: sessions 8
-- 2026-11-12 00:10 **S10-11** lead escalate: budget: 4 engineer sessions used; the budget is 4
 
 ## Cost
 
 - From the script, engineer: 423 sessions, 939.1M input tokens
 - From the script, lead: 264 sessions, 78.1M input tokens
-- Started by hand, Claude: 11 sessions, 2451.7M input tokens
+- Started by hand, Claude: 11 sessions, 2453.1M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
