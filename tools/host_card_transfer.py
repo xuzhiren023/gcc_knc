@@ -33,6 +33,7 @@ ENV = dict(os.environ, PATH=os.pathsep.join(map(str, (TC / 'cross/bin', TC / 'cy
            + os.pathsep + os.environ['PATH'])
 SIZES = (4096, 1048576, 67108864, 1073741824)
 METHODS = ('pipe', 'scp', 'tar', 'tcp', 'scif-msg', 'scif-write', 'scif-read', 'scif-vwrite', 'scif-mmap')
+LEASE_DIRECTORY = re.compile(r'(?:/tmp|/var/volatile/tmp)/claude/claude-[a-f0-9]{32}\Z')
 
 
 def command(argv):
@@ -343,7 +344,7 @@ def run_native(args):
                     raise RuntimeError('invalid lease greeting')
                 line.extend(part)
             lease = json.loads(line)
-            if lease.get('nonce') != nonce or not re.fullmatch(r'/tmp/claude/claude-[a-f0-9]+', lease.get('directory', '')):
+            if lease.get('nonce') != nonce or not isinstance(lease.get('directory'), str) or not LEASE_DIRECTORY.fullmatch(lease['directory']):
                 raise RuntimeError('lease identity mismatch')
             if not re.fullmatch(r'\d+(,\d+){239}', lease.get('cpus', '')):
                 raise RuntimeError('lease must own 240 CPUs')
