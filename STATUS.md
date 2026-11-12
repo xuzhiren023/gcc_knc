@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-12 07:17.
+Updated automatically at every ticket change. Last update: 2026-11-12 07:19.
 
-**Waiting for you:** S10-10, S10-12. Run `python tools/pm.py inbox`.
+**Waiting for you:** S10-12. Run `python tools/pm.py inbox`.
 
 Current tickets: `[###################-]` 179 of 183
 
@@ -48,7 +48,7 @@ Current tickets: `[###################-]` 179 of 183
 | S10-07 | Vector math v1a - the copied functions (sin, cos, tan, log10, atan, atan2, hyperbolics, bounded groups) in libknc_vmath and the vectorizer hook | Done | Card 2026-11-11 (S10-08 build, 240 threads): full set PASS for sinf 0.499999, cosf 0.499998, tanf 0.499995,... |
 | S10-08 | Vector math v1b - the rest of the libmvec set (acos, asin, cbrt, erf, erfc, exp2, exp10, expm1, log1p, log2, hypot, sincos) | Done | The vector math library now covers the whole set GCC vectorizes with glibc's libmvec: acos, asin, cbrt, erf... |
 | S10-09 | User story - double-precision loops with division and square root vectorize, correctly rounded (V8DF div, cond_div, sqrt) | Done | Double-precision loops with division or square root now vectorize under -march=knc and give the correctly r... |
-| S10-10 | Card harness fixes from the Sprint 10 card turn - card_qualify binary folder, vmath bench batch sizing | **Waiting for you** | Needs the interactive lead (owner's 07:00 option b): engineer's work is uncommitted in the S10-10 worktree ... |
+| S10-10 | Card harness fixes from the Sprint 10 card turn - card_qualify binary folder, vmath bench batch sizing | Question for the tech lead | Owner 2026-11-12 07:00 EST ('you commit their work by hand'): the lead committed the engineer's work (9762b... |
 | S10-11 | Card-only vector math failures - double sin, cos, tan, atan2 above 1 ULP, and cbrt/cbrtf crash (SIGSEGV) | Done | Double sin, cos, tan and atan2 from the KNC vector math library are now within 1 ULP on the card (0.76 to 0... |
 | S10-12 | cbrt and cbrtf crash (SIGSEGV) in qualify_v1 on the card - root cause and fix | **Waiting for you** | Needs the interactive lead's card turn, not an owner decision. Reviewed 7ae4d224: the harness now passes MP... |
 | S11-01 | User story - the best way to move data between the host and the card, measured, and how our projects use it | Not started | lane tools: owner 2026-11-12, usage reset, move on (Codex engineers) |
@@ -208,6 +208,7 @@ Current tickets: `[###################-]` 179 of 183
 
 ## Recent activity
 
+- 2026-11-12 07:19 **S10-10** owner decide: Owner 2026-11-12 07:00 EST ('you commit their work by hand'): the lead committed the engineer's work (9762b24d [red], 3b528a54 fix) and carries it ...
 - 2026-11-12 07:17 **S10-12** lead escalate: Needs the interactive lead's card turn, not an owner decision. Reviewed 7ae4d224: the harness now passes MPSS cbrtl only arguments in [1,8) and res...
 - 2026-11-12 07:16 **S10-12** engineer ask: 7ae4d224 fixes the documented MPSS cbrtl fault by normalizing to [1,8). Regression PASS: 4750 cases, <=0.01 ULP vs MPFR. Host compare PASS: cbrt 0....
 - 2026-11-12 07:13 **S10-12** lead approve-red: S10-12 red accepted: the cbrt/cbrtf card crash is traced to the MPSS libm cbrtl that qualify_v1 uses as its reference, which reads its table at a w...
@@ -215,13 +216,12 @@ Current tickets: `[###################-]` 179 of 183
 - 2026-11-12 07:11 **S10-10** lead escalate: Needs the interactive lead (owner's 07:00 option b): engineer's work is uncommitted in the S10-10 worktree and its host test passes (python -m unit...
 - 2026-11-12 07:06 **S10-10** engineer ask: Host harness changes are ready; test command passed with CC=C:\\Users\\xuzhi\\Documents\\gcc_knc\\.work\\_shared\\toolchain\\cygwin\\bin\\gcc.exe a...
 - 2026-11-12 07:04 **S10-10** lead answer: Go ahead per the owner's 07:00 decision and the lead's 03:30 note. The worktree already has the test (shared path and kernels.c link fixed by the l...
-- 2026-11-12 07:03 **S10-12** lead answer: Card output is in the 04:15 lead note above: the vector call returns; SIGSEGV (SEGV_MAPERR) is in the oracle-and-dump phase, cbrt block 1 and cbrtf...
 
 ## Cost
 
 - From the script, engineer: 428 sessions, 943.3M input tokens
 - From the script, lead: 268 sessions, 79.0M input tokens
-- Started by hand, Claude: 11 sessions, 2470.0M input tokens
+- Started by hand, Claude: 11 sessions, 2471.8M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
