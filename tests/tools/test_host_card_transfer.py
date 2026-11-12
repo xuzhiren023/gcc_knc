@@ -21,7 +21,7 @@ class TransferIntegrity(unittest.TestCase):
         known = subprocess.run([exe, 'selftest'], env=transfer.ENV, capture_output=True, text=True)
         self.assertEqual(known.returncode, 0, known.stderr)
         self.assertIn('abc: match', known.stdout)
-        for method in ('tcp', 'fake-write', 'fake-read', 'fake-vwrite', 'fake-mmap'):
+        for method in ('pipe', 'tcp', 'fake-write', 'fake-read', 'fake-vwrite', 'fake-mmap'):
             for direction in ('up', 'down'):
                 with self.subTest(method=method, direction=direction):
                     rows = transfer.loopback(method, direction, 1048705)
