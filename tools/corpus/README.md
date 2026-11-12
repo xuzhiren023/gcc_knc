@@ -78,6 +78,15 @@ Array names, order and lengths must agree. Every finite element must satisfy
 fails. The host corruption control permutes values while preserving all five
 old reductions and must fail. Clean and within-tolerance controls pass.
 
+Upstream reference tolerances are unchanged: STREAM's double validation uses
+1e-13 relative average error; NPB CG uses 1e-10, EP and MG use 1e-8, and IS uses
+exact integer verification. HPCG TestCG uses 1e-12 convergence tolerance and
+TestSymmetry allows scaled departures up to 1 (normalized by DBL_EPSILON and
+the vector/matrix norms). The upstream report must declare validity; all its
+other validity conditions still apply. Sources: stream.c, NPB CG/cg.f90,
+EP/verify.f90, MG/mg.f90, and HPCG TestCG.cpp/TestSymmetry.cpp. SQLite and
+compression use exact comparisons, with no numeric tolerance.
+
 Compression input is the frozen unsigned 32-bit LCG seed 11, multiplier 1664525,
 increment 1013904223, using the fixed block pattern and literal in corpus.py.
 After timing, the launcher runs the other compiler's decoder in an isolated

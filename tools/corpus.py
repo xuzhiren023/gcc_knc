@@ -534,10 +534,10 @@ def write_lead_script(stage_dir):
     project = ROOT.parent.parent if ROOT.parent.name == '.work' else ROOT
     quote = lambda path: "'" + windows_path(path).replace("'", "''") + "'"
     (stage_dir / 'lead.ps1').write_text(
-        "# Windows Python is required by card_run. Prefer the merged checkout.\n" +
-        "# Baseline estimate: 4-7 hoursutes; native calibration is pending.\n" +
-        '$corpusEntry = ' + quote(project / 'tools/corpus.py') + '\n' +
-        'if (!(Test-Path -LiteralPath $corpusEntry)) { $corpusEntry = ' + quote(Path(__file__).resolve()) + ' }\n' +
+        "# Windows Python is required by card_run. Use this ticket until merged.\n" +
+        "# Baseline: 468 launches across full/3100/5100, estimated 4-7 hours.\n" +
+        '$corpusEntry = ' + quote(Path(__file__).resolve()) + '\n' +
+        'if (!(Test-Path -LiteralPath $corpusEntry)) { $corpusEntry = ' + quote(project / 'tools/corpus.py') + ' }\n' +
         '& (Get-Command python.exe).Source $corpusEntry lead --stage ' + quote(stage_dir) + '\nexit $LASTEXITCODE\n')
     shutil.copyfile(SUPPORT / 'README.md', stage_dir / 'README.md')
 
@@ -582,16 +582,21 @@ def output_result(job, stdout, stderr, returncode):
 def card_call(stage_dir, files, mode, density, stdout, stderr, profile='full'):
     # Called only by the explicit lead subcommand, never by stage or collect.
     threads = {'full': 240, '3100': 224, '5100': 236}[profile]
+    # card_run requires a transport record; keep only its transient working file.
+    transport_record = stdout.parent / 'card-result.json'
     command = [sys.executable, str(ROOT / 'tools/card_run'), '--benchmark', '--threads', str(threads),
                '--timeout', '600' if mode == 'HPCG' else '120',
-               '--receipt', str(stdout.with_suffix('.card.json'))]
+               '--receipt', str(transport_record)]
     if profile != 'full':
         command += ['--profile', profile]
     for file in files:
         command += ['--file', str(file)]
     command += [str(stage_dir / 'launch'), density, mode]
-    with stdout.open('w') as out, stderr.open('w') as err:
-        return subprocess.run(command, stdout=out, stderr=err).returncode
+    try:
+        with stdout.open('w') as out, stderr.open('w') as err:
+            return subprocess.run(command, stdout=out, stderr=err).returncode
+    finally:
+        transport_record.unlink(missing_ok=True)
 
 
 def lead(args):
