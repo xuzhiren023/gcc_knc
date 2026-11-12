@@ -553,6 +553,11 @@ class SSHTransport:
         self.transfers = []
         self.collect_names, self.collect_dir = collect, collect_dir
         self.dma_latch = main_root(ROOT) / ".work/_state/card-dma-active.lock"
+        self.helper_free = transfer == "ssh" or not all(
+            self.helper(key, name).is_file() for key, name in
+            (("transferHelper", "claude-transfer.mic"), ("transferHost", "claude-transfer.exe")))
+        if self.helper_free and (transfer == "dma" or collect):
+            raise Refused("DMA/--collect requires both transfer helpers and --transfer auto or dma")
 
     def helper(self, key, name):
         return Path(self.config.get(key, str(main_root(ROOT) / ".work/_shared" / name)))
@@ -560,7 +565,7 @@ class SSHTransport:
     def stage_overhead(self, packed=False):
         unpack = self.helper("unpackHelper", "claude-unpack.mic").stat().st_size if packed else 0
         return (self.helper("pinHelper", "claude-pin.mic").stat().st_size + len(watchdog_bytes()) + unpack
-                + self.helper("transferHelper", "claude-transfer.mic").stat().st_size)
+                + (0 if self.helper_free else self.helper("transferHelper", "claude-transfer.mic").stat().st_size))
 
     def connect(self, run_dir, *, timeout):
         if not RUN_DIR.fullmatch(run_dir):
@@ -592,6 +597,7 @@ class SSHTransport:
             session.cygwin_bin = self.helper("cygwinBin", "toolchain/cygwin/bin")
             session.dma_enabled = c.get("dmaEnabled", True)
             session.transfer_method, session.threshold_bytes = self.transfer, self.threshold_bytes
+            session.helper_free = self.helper_free
             session.transfers, session.dma_latch = self.transfers, self.dma_latch
             session.transfer_stop = False
             if not session.pin_helper.is_file():
@@ -733,19 +739,27 @@ class SSHSession:
         self.rpc("boot_id=%s\ncheck_boot && mkdir -p /tmp/claude && "
                  "mkdir -- \"$run_dir\" && cd -- \"$run_dir\" && guard_dir" %
                  shlex.quote(self.boot_id), step_limit(), step="stage-create")
-        self.bootstrap_helper(step_limit())
+        if not self.helper_free:
+            self.bootstrap_helper(step_limit())
         if packed:
             # S4-12: the helper's own upload, then every other file in one
             # stream, instead of one connection and one chmod per file.
             self.send_file("claude-unpack", self.unpack_helper.read_bytes(), step_limit())
             self.rpc("guard_boot && chmod 700 claude-unpack", step_limit(), step="stage-chmod")
-            stream = pack_stream([("claude-program", Path(program).read_bytes()),
+            entries = ([("claude-program", Path(program).read_bytes()),
                                   ("claude-pin", self.pin_helper.read_bytes()),
                                   ("claude-watchdog.sh", watchdog_bytes())] +
                                  [(Path(path).name, Path(path).read_bytes()) for path in files])
-            self.send_file("claude-pack", stream, step_limit())
-            self.rpc("guard_boot && ./claude-unpack %d < claude-pack && rm -- claude-pack" % len(stream),
-                     step_limit(), step="unpack-verified-pack")
+            stream = pack_stream(entries)
+            if self.helper_free:
+                started = time.monotonic()
+                self.upload("upload-pack", "./claude-unpack %d" % len(stream), stream, step_limit())
+                for name, data in entries:
+                    self.finish_ssh(name, len(data), started, step_limit(), "shared pack wall time")
+            else:
+                self.send_file("claude-pack", stream, step_limit())
+                self.rpc("guard_boot && ./claude-unpack %d < claude-pack && rm -- claude-pack" % len(stream),
+                         step_limit(), step="unpack-verified-pack")
             self.rpc("guard_boot && chmod 700 claude-program claude-pin", step_limit(),
                      step="stage-chmod")
             return
@@ -769,6 +783,10 @@ class SSHSession:
                  step="stage-chmod")
 
     def send_file(self, name, data, timeout):
+        if self.helper_free:
+            started = time.monotonic()
+            self.upload("upload-" + name, "cat > " + shlex.quote(staging_name(name)), data, timeout)
+            return self.finish_ssh(name, len(data), started, self.remaining(started + timeout))
         # Generated controls and the suite pack share the file transport.
         # Temporary host bytes are bounded by the existing maxStageMiB check.
         with tempfile.NamedTemporaryFile(prefix="claude-input-", dir=self.host_helper.parent,
@@ -781,8 +799,24 @@ class SSHSession:
             path.unlink()
 
     def send_path(self, name, source, timeout):
+        if self.helper_free:
+            return self.send_file(name, source.read_bytes(), timeout)
         destination = staging_name(name)
         self.transfer_file(source, destination, source.stat().st_size, "up", timeout)
+
+    def finish_ssh(self, name, size, started, timeout, scope="file wall time"):
+        count = self.rpc("guard_boot && wc -c < " + shlex.quote(staging_name(name)),
+                         timeout, step="upload-length")
+        if int(count) != size:
+            self.transfer_stop = True
+            raise OSError("SSH upload length mismatch: " + name)
+        seconds = time.monotonic() - started
+        self.transfers.append(dict(method="ssh", bytes=size, seconds=seconds,
+                                   mib_per_second=size / 1048576 / seconds if seconds else 0,
+                                   digest_match=None, digest_note="not checked: no helper",
+                                   fallback=(dict(method="dma", reason="dma unavailable: helper missing")
+                                             if self.transfer_method == "auto" else None),
+                                   direction="up", destination=name, timing_scope=scope))
 
     def transfer_file(self, source, destination, size, direction, timeout):
         try:

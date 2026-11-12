@@ -16,6 +16,8 @@ import importlib.util
 from pathlib import Path, PurePosixPath
 import sys
 import unittest
+from unittest.mock import Mock, patch
+import runpy
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "tools"))
@@ -73,6 +75,30 @@ class FakeEndpoint:
 
 
 class TransferPolicy(unittest.TestCase):
+    def test_helper_free_ssh(self):
+        runner = runpy.run_path(str(ROOT / "tools/card_run"))
+        for method, present in (("ssh", False), ("ssh", True), ("auto", False)):
+            with patch.object(Path, "is_file", return_value=present):
+                transport = runner["SSHTransport"]({}, 10, transfer=method)
+            with patch.object(Path, "stat", return_value=Mock(st_size=123)) as stat:
+                overhead = transport.stage_overhead()
+            self.assertEqual((transport.helper_free, stat.call_count, overhead),
+                             (True, 1, 123 + len(runner["watchdog_bytes"]())))
+            session = object.__new__(runner["SSHSession"])
+            session.helper_free, session.transfer_method, session.transfers = True, method, []
+            session.upload, session.rpc = Mock(), Mock(return_value="3")
+            session.send_file("claude-payload", b"abc", 10)
+            self.assertEqual(session.upload.call_args.args[:3],
+                             ("upload-claude-payload", "cat > claude-payload", b"abc"))
+            row = session.transfers[0]
+            self.assertEqual((row["method"], row["bytes"], row["digest_match"]), ("ssh", 3, None))
+            self.assertEqual(row["fallback"], dict(method="dma", reason="dma unavailable: helper missing")
+                             if method == "auto" else None)
+        with patch.object(Path, "is_file", return_value=False):
+            for options in (dict(transfer="dma"), dict(collect=["claude-payload"])):
+                with self.assertRaises(runner["Refused"]):
+                    runner["SSHTransport"]({}, 10, **options)
+
     def setUp(self):
         self.assertIsNotNone(
             SPEC, "S11-02: tools/card_dma.py shared transfer policy is not implemented")

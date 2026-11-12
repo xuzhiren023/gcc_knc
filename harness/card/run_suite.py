@@ -51,7 +51,12 @@ rel = os.path.relpath(P, REPO)
 # The stage also carries the driver, claude-pin and claude-unpack; keep 64 KiB for the list.
 limit = config.get("maxStageMiB", 64) * 1024 * 1024 - 64 * 1024 - driver.stat().st_size - sum(
     (SHARED / name).stat().st_size for name in ("claude-pin.mic", "claude-unpack.mic"))
-limit -= Path(config.get("transferHelper", str(SHARED / "claude-transfer.mic"))).stat().st_size
+helpers = [Path(config.get(key, str(SHARED / name))) for key, name in
+           (("transferHelper", "claude-transfer.mic"), ("transferHost", "claude-transfer.exe"))]
+if args.transfer != "ssh" and all(path.is_file() for path in helpers):
+    limit -= helpers[0].stat().st_size
+elif args.transfer == "dma":
+    raise SystemExit("DMA requires both transfer helpers")
 chunks, size = [[]], 0
 for e in entries:
     n = (P / e.split()[0]).stat().st_size
