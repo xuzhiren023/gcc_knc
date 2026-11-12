@@ -91,6 +91,48 @@ class MemoryBandwidth(unittest.TestCase):
             self.assertEqual((c['--mib'], c['--passes']), ('2048', '32'))
             self.assertNotEqual(c['--workload'], 'all')
 
+    def test_third_sweep_budget_and_controls(self):
+        result = subprocess.run(['sh', str(HERE / 'sweep.sh'), 'third-plan'],
+                                check=True, text=True, stdout=subprocess.PIPE)
+        cases = result.stdout.splitlines()
+        self.assertEqual(len(cases), 58)
+        self.assertLess(len(cases) * 90 + 120, 90 * 60)
+        configs = []
+        for i, case in enumerate(cases, 1):
+            words = shlex.split(case)
+            self.assertEqual(words[:2], ['CASE', str(i)])
+            c = dict(zip(words[2::2], words[3::2]))
+            configs.append(c)
+            self.assertEqual((c['--mib'], c['--passes'], c['--repeats']),
+                             ('2048', '32', '5'))
+            self.assertEqual(c['--placement'], 'spread')
+            self.assertNotEqual(c['--workload'], 'all')
+        self.assertEqual([c['--workload'] for c in configs[:6]],
+                         ['triad', 'read', 'write', 'copy', 'rmw', 'stencil'])
+        self.assertEqual(configs[:6], configs[-6:])
+        self.assertEqual((configs[0]['--threads'], configs[0]['--pf0'],
+                          configs[0]['--pf1']), ('60', '8', '64'))
+        for start, workload in zip(range(6, 26, 4),
+                                   ['read', 'copy', 'triad', 'rmw', 'stencil']):
+            group = configs[start:start+4]
+            self.assertEqual([c['--workload'] for c in group], [workload] * 4)
+            self.assertEqual([(c['--threads'], c['--pf0'], c['--pf1']) for c in group],
+                             [('60', '16', '128'), ('60', '32', '256'),
+                              ('120', '16', '128'), ('120', '32', '256')])
+        reference = configs[26]
+        self.assertEqual(reference, configs[51])
+        self.assertEqual(reference['--threads'], '120')
+        for c, keys in zip(configs[27:38],
+                           [{'--prefetch'}, {'--pf0', '--pf1'}, {'--pf0', '--pf1'},
+                            {'--pages'}, {'--schedule'}, {'--chunk-lines'},
+                            {'--evict'}, {'--prefetch'}, {'--store'}, {'--store'},
+                            {'--offset-lines'}]):
+            changed = {k for k in reference.keys() | c.keys()
+                       if reference.get(k) != c.get(k)}
+            self.assertEqual(changed, keys)
+        self.assertEqual([c['--evict'] for c in configs[46:51]],
+                         ['none', 'l2', 'none', 'l2', 'both'])
+
 
 if __name__ == '__main__':
     if os.name == 'nt':

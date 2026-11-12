@@ -314,7 +314,7 @@ results from that binary, not new native results or corrected long-run baselines
 
 | Class | Best case | Min / median / max GB/s | Median sample ms | Interpretation |
 |---|---:|---|---:|---|
-| read | 4 | 73.48 / 107.73 / 115.86 | 19.93 | 60 spread, small pages; a memory-dependent reduction also limits this kernel |
+| read | 4 | 73.48 / 107.73 / 115.86 | 19.93 | 60 spread, small pages; reduction overhead is a hypothesis tested in sweep 2 below |
 | write | 33 | 102.92 / 124.83 / 126.30 | 17.20 | Huge/60 with chunk fences; case 10's 8/32 is effectively tied, not evidence that extra fences help |
 | copy | 11 | 117.89 / 137.76 / 143.37 | 31.18 | Huge/60, prefetch 8/64 is a candidate; large within-case variation |
 | triad | 16 | 143.54 / 143.70 / 144.17 | 44.83 | Offset 62 is tied with 8/64 case 11 at 143.5; no established offset gain |
@@ -367,7 +367,7 @@ hardware bandwidth ceiling. The earlier write comparison must use C1's **204.5**
 slowest-worker completed rate, not its 226.1 median-worker aggregate. The present
 124.8 is 39.0% below that completed comparator; their workloads/timing differ.
 
-**What is answered, and what needs the card.** The audit establishes the timed
+**At sweep-2 staging (superseded by the results below).** The audit establishes the timed
 boundaries, absence of per-pass barriers, short sample durations, and read-loop
 overhead. It cannot establish the numerical timing penalty or which density,
 page, prefetch and eviction observations survive longer native runs. The corrected
@@ -414,5 +414,147 @@ GCC-KNC prefix build/instruction-lint logs are
 `.work/_state/logs/S11_06_host-20261112-121926.log` and
 `.work/_state/logs/S11_06_k1om-20261112-121926.log`.
 The rebuilt binary and runner are staged in `.work/_shared/S11-05/`.
-Native correctness/performance and the corrected baseline await the lead; no
-card job, GCC rebuild or x86 batch check was run by this engineer.
+At that staging point, native correctness/performance and the corrected baseline
+awaited the lead. No card job, GCC rebuild or x86 batch check was run by this engineer.
+
+## S11-06: sweep-2 results, corrected baseline and sweep 3
+
+Evidence: `.work/_shared/tmp/claude-next23/membw-second.out`, lead-run
+2026-11-12 18:32-18:52Z, boot da3144f1, benchmark mode with 240 CPUs granted.
+All 58 native result records validate all five samples; 48 configurations used
+actual huge pages and ten used small pages, with no huge-page fallback. These
+are observed card results, superseding the pending baseline above. The timing
+fix and optional private reductions are in 18a2713c; this follow-up changes the
+runner and analysis, not the measured kernels or byte counts.
+
+### Calibration and measured overhead
+
+Each row holds its configuration fixed while increasing footprint and passes.
+All use 60 spread threads, NGO and per-pass completion. Read uses small pages
+and 16/32 prefetch; write huge and 8/32; RMW huge, 16/32 and both evictions;
+the other classes huge and 8/64. Rates are median decimal GB/s.
+
+| Class / cases | 256 MiB x 8 | 2048 MiB x 8 | 2048 MiB x 32: corrected baseline | Median wall-time penalty, short -> long | Long start skew / envelope |
+|---|---:|---:|---:|---:|---:|
+| triad / 1-3 | 153.12 | 163.85 | 163.70 | 13.68% -> 0.70% | 0.17% |
+| read / 4-6 | 136.25 | 146.33 | 147.24 | 30.67% -> 1.58% | 0.50% |
+| write / 7-9 | 144.15 | 167.32 | 169.23 | 51.14% -> 1.79% | 0.51% |
+| copy / 10-12 | 152.83 | 160.89 | 161.65 | 28.62% -> 0.86% | 0.24% |
+| RMW / 13-15 | 166.50 | 177.93 | 179.11 | 23.91% -> 0.81% | 0.26% |
+| stencil, logical / 16-18 | 293.16 | 316.36 | 323.10 | 30.01% -> 0.80% | 0.28% |
+
+The penalty is the median of `(wall_seconds-seconds)/wall_seconds`, not a
+subtracted estimate. Long baseline sample envelopes last 0.406-1.259 seconds;
+their `(max-min)/median` rate spreads are 0.43-0.83%. Closing references 53-58
+change those medians by -0.68% to +0.39%, so the earlier large write drift does
+not persist. This stability statement concerns the six baselines, not every
+tuning case: read case 27 spans 2.79%, and triad case 35 spans 5.79%.
+
+The corrected envelope rate rises 5.77-17.39% from short to long, or equivalently
+the short rate is 5.46-14.82% below the long rate. Most recovery occurs when
+increasing footprint at eight passes; increasing passes at fixed 2048 MiB adds
+-0.09% to +2.13%. Thus size, startup amortization and cache/page effects remain
+confounded in the first step; it would be incorrect to attribute all recovery
+to sample duration alone. The separate wall/envelope comparison demonstrates
+substantial old timing overhead directly. It cannot retroactively correct the
+first sweep's samples, which did not record both clocks.
+
+There is no per-pass barrier. Final-only completion (19-24) changes the matched
+long envelope medians by less than 0.6%; RMW retains per-pass completion and is
+a repeat control. Fences are therefore not the dominant measured loss in these
+settings. Start skew stays included in the envelope. Private read chains one
+and four give 148.857 and 148.864 GB/s (43/44), only about 1.1% above the
+147.24 reference: neither the memory accumulator nor the dependency chain is
+shown to be the limiting factor at 60 threads and 16/32. This corrects the
+first-sweep hypothesis rather than assuming fewer instructions imply more GB/s.
+
+**STREAM calibration still misses 175 GB/s.** Plain long triad is 163.70,
+6.46% below that criterion; its old-wall median is 162.58. Timing overhead and
+0.17% start skew cannot account for the remaining gap. The best combined
+offset/unroll case reaches 168.23, still 3.87% below 175. These are equivalent
+logical operations, not a matched reproduction of Intel's compiler/system [5].
+
+### Which tuning observations survive
+
+- Read reaches 186.14 at 120 threads, small pages, 8/64 (25). At matched
+  32/128 it is 183.37 with 60 threads and 185.21 with 120 (27/26): the 1.0%
+  difference does not establish a density win. The large increase over 147.24
+  demonstrates a useful prefetch/density combination, not a density-only gain.
+- Write NGO is nearly flat at 60/120/240 threads: 169.23, 167.74 and 165.86
+  (9/28/45). NR 28.65 and normal plus exclusive prefetch 51.49 (46/47) lose
+  strongly under the tested settings. In `hints()`/`lines()`, NGO write emits
+  no prefetch, so the earlier attribution to write distances 8/32 was spurious.
+  The best 169.74 remains 17.0% below C1's completed-worker 204.5 comparator;
+  dispatch/issue, allocation and completion-method differences remain open.
+- Copy's 60-thread 32/128 result is 163.90 (33), versus 158.83 at 120 with
+  those distances (32). Cyclic 1024 plus L2 eviction gives 147.42 (48), a
+  combined change that does not isolate either lever. No sub-10% gain is accepted.
+- Triad collapses to 74.71/76.91 at 120 threads with 8/64 and 32/128 (34/35),
+  versus 163.70/166.33 at 60 (3/36). Its roughly 0.35% wall penalty and
+  0.11-0.19% skew at 120 rule out barrier/start timing as an explanation of
+  the roughly halved throughput. This class-specific effect needs controls for
+  two input streams, prefetch pressure, output stores and address scheduling;
+  the data do not identify which resource is responsible. Offset 62 plus
+  unroll eight gives 168.23 (49), a provisional 2.8% combination gain. Split
+  triad gives 83.56 useful GB/s (50), with five implementation streams rather
+  than three; splitting at 1024 lines is rejected for this configuration only.
+- RMW's both-eviction reference is stable at 179.11-179.39 (15/23/57).
+  Deeper 32/128 at 60 threads drops to 157.28 (39); 120-thread 8/64 gives
+  171.36 (37). Cyclic 1024 with both evictions gives 170.37 (51). Sweep 2
+  lacks a matched no-eviction control, so it confirms the candidate's rate,
+  not the first sweep's claimed eviction gain independently of other changes.
+- Stencil reaches 326.22 logical GB/s (42); 120 threads at 32/128 give
+  316.66 (41). The logical target is exceeded, but input reuse prevents
+  claiming 92.7% physical channel utilization. Long-run page-size and
+  compact/reverse comparisons were not repeated, so neither is established.
+
+### Gap and staged next experiment
+
+No measured hardware ceiling has been isolated. Using the best read and write
+endpoints in the earlier traffic model predicts only
+`3/(2/186.14 + 1/169.74) = 180.34 GB/s` for triad. This is an illustrative
+mixed-traffic model using different configurations, not a bound. It shows why
+closing a small mixed-stream gap alone would not demonstrate 264 GB/s: the
+endpoints also need improvement. Even applying the historical ECC ratio [5]
+to 168.23 gives about 182.49, not the target; no ECC change was performed.
+
+The forecast below is deliberately the measured winner carried forward (the
+null forecast), not an assumed gain from an untested lever. The required
+improvement remains explicit; fill the last column from sweep 3's raw output.
+
+| Class | Sweep-2 winner / case, GB/s | Forecast GB/s | Target GB/s | Gain required to lower / upper target | Sweep-3 result |
+|---|---:|---:|---:|---:|---|
+| read | 186.14 / 25 | 186.14 | 264-299.2 | 41.8% / 60.7% | pending |
+| write | 169.74 / 55 | 169.74 | 264-299.2 | 55.5% / 76.3% | pending |
+| copy | 163.90 / 33 | 163.90 | 264-299.2 | 61.1% / 82.6% | pending |
+| triad | 168.23 / 49 | 168.23 | 264-299.2 | 56.9% / 77.9% | pending |
+| RMW | 179.39 / 23 | 179.39 | 264-299.2 | 47.2% / 66.8% | pending |
+| stencil, logical | 326.22 / 42 | 326.22 logical | 264-299.2 logical | already exceeded; DRAM unknown | pending |
+
+`sweep.sh third` stages 58 cases at **2048 MiB x 32 passes**, five samples each.
+Calibration/reference cases come first; then matched 60/120-thread 16/128 and
+32/256 tests per reading class, isolated controls for the 120-thread triad
+collapse, write dispatch/unroll/density tests, and matched RMW eviction controls.
+The collapse reference and all six opening configurations are repeated at the
+end with fresh mappings. Exact commands and numbered cases are in the README;
+`third-plan` prints the expansion. The 90-second process alarms sum to 87
+minutes; a two-minute reserve and 5340-second outer timeout cap the job at 89.
+
+Interpret single-level prefetch controls with care: disabling one distance also
+selects the bounds-checked loop, so a loss alone does not establish that both
+cache-level hints are necessary. A recovery at 120 threads identifies a useful
+configuration, then needs a paired confirmation before attributing a mechanism.
+The same caution applies to offsets without known physical page colors.
+If deeper prefetch and the isolated controls plateau, the missing discriminant
+is actual channel traffic/latency and the documented GBOX interface described
+above, followed by an owner-approved ECC crossover if warranted. Present rates
+are measured limits of these kernels/configurations, not proof that software
+cannot reach the target. No clock, ECC, MPSS or system configuration change is
+part of sweep 3, and its native results await the lead.
+
+Validation: all four host tests pass, including third-sweep expansion, controls
+and budget; log `.work/_state/logs/S11_06_third_host-20261112-135711.log`.
+The new runner is restaged at `.work/_shared/S11-05/sweep.sh`, alongside the
+unchanged `membw.mic` used in sweep 2. The existing GCC-KNC build/lint evidence
+above remains applicable because `membw.c` and the build flags were not changed;
+no repeat compiler build or native execution was needed for this runner update.

@@ -29,6 +29,7 @@ python tools/card_run --benchmark --threads 240 --timeout 120 --file ../_shared/
 python tools/card_run --benchmark --threads 240 --timeout 6600 --file ../_shared/S11-05/membw.mic ../_shared/S11-05/sweep.sh first
 python tools/card_run --benchmark --threads 240 --timeout 600 --file ../_shared/S11-05/membw.mic ../_shared/S11-05/sweep.sh confirm --threads 60 --pages huge --pf0 8 --pf1 64 --offset-lines 62
 python tools/card_run --benchmark --threads 240 --timeout 5340 --file ../_shared/S11-05/membw.mic ../_shared/S11-05/sweep.sh second
+python tools/card_run --benchmark --threads 240 --timeout 5340 --file ../_shared/S11-05/membw.mic ../_shared/S11-05/sweep.sh third
 ```
 
 The confirmation configuration is an example: replace it with the winning
@@ -241,3 +242,51 @@ against 2048 x 32 to test duration at fixed footprint, and 256 x 8 against
 first-sweep observations survive. Keep differences below 10% provisional; wider
 overlapping ranges or closing-reference drift require paired repeats even above
 10%. The predicted-vs-target table and current evidence are in the research note.
+
+## S11-06 third sweep: close the long-sample gap
+
+Sweep 2's measured baseline and per-class results are in the research note's
+final section. The benchmark binary is unchanged from the validated sweep-2
+build; only the runner needs restaging. Run `third` with the exact lead command
+above. `sh tests/bench/membw/sweep.sh third-plan` prints all commands without
+reading metadata, touching the binary or executing a card case. The host test
+checks case count, long samples, paired controls and identical closing references.
+
+Every case uses 2048 MiB per array, 32 passes, five samples and spread placement.
+Defaults remain NGO, block scheduling, 4096-line chunks, unroll four, both
+prefetch levels, no output eviction and per-pass completion. Class references:
+triad 60/huge/8/64, read 120/small/8/64, write 60/huge/8/32,
+copy and stencil 60/huge/32/128, RMW 60/huge/16/32 with both evictions.
+Distances in write's configuration do not issue prefetch with NGO stores.
+Requested huge pages must be verified from each config record as before.
+
+| Cases | Exact variation from the class reference |
+|---|---|
+| 1-6 | Calibration/references: triad, read, write, copy, RMW, stencil |
+| 7-10, 11-14, 15-18, 19-22, 23-26 | Read, copy, triad, RMW, stencil respectively: 60 at 16/128; 60 at 32/256; 120 at 16/128; 120 at 32/256 |
+| 27 | Triad 120 threads, 8/64: repeat the collapse reference |
+| 28-30 | Triad 120: no prefetch; far-only 0/128; near-only 16/0 |
+| 31-33 | Triad 120: small pages; cyclic scheduling at 4096; block chunks 65536 |
+| 34-38 | Triad 120: L2 eviction; far T2 hint; NR stores; normal stores; offset 62 |
+| 39-42 | Write 60 unroll 8; 60 chunk 65536; 240 unroll 8; 240 chunk 65536 |
+| 43-46 | Write 120 unroll 8; 60 L2 eviction; 60 chunk fences; 60 cyclic chunks 1024 |
+| 47-51 | RMW at 16/32: 60 no eviction; 60 L2; 120 no eviction; 120 L2; 120 both |
+| 52 | Repeat case 27's triad 120-thread collapse reference |
+| 53-58 | Repeat cases 1-6 exactly, with fresh allocations |
+
+All 58 process alarms include initialization and validation: `58 * 90 = 5220`
+seconds (87 minutes), plus a 120-second metadata/launch reserve. The 5340-second
+outer timeout enforces an 89-minute cap; a timeout or validation failure is
+incomplete, not accepted performance. The prior sweep took about 20 minutes,
+but that observation does not replace the conservative bound.
+
+Read/density comparisons use matched distances; RMW eviction comparisons hold
+16/32 fixed. Compare each triad diagnostic to 27/52 and the 60-thread 1/53
+references. Single-level prefetch changes both hints and checked-loop overhead;
+NR/normal tests retain shared input prefetch and change only store kind. Write
+unroll/chunk changes are separate, except the explicitly combined cyclic-1024
+candidate. Interpret gains below 10% as provisional and check min/max, overhead,
+skew, closing drift and actual pages before selecting a candidate. Sweep 3 does
+not reproduce the small combined offset/unroll winner or split triad; it spends
+those cases on identifying the large class-specific loss. No native gain is
+claimed until the lead returns raw output.
