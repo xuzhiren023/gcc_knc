@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-12 17:12.
+Updated automatically at every ticket change. Last update: 2026-11-12 17:13.
 
 **Waiting for you:** S11-02. Run `python tools/pm.py inbox`.
 
@@ -70,7 +70,7 @@ Current tickets: `[###################-]` 193 of 201
 | S11-16 | Long-double libm hazard audit - do other MPSS long double entry points fault like cbrtl? (E7-21, bounded) | lead | Needs a card run by the interactive lead (card turn per shared-card rules): python tools/card_run --threads... |
 | S11-17 | PGO feasibility on one complete development program (reuse of S9-18's train/use path) | draft |  |
 | S11-18 | M4 corpus harness v2 - card profiles, prefix record, held-out sealing, stronger checks, and the donor-failure rule | Question for the tech lead | Submission blocked: pm.py submit reports 943 changed lines against the 800-line budget. Please approve this... |
-| S11-19 | Second senior review - the M4 definition and the Sprint 11-13 roadmap, adjusted | Not started |  |
+| S11-19 | Second senior review - the M4 definition and the Sprint 11-13 roadmap, adjusted | In progress |  |
 | S2-01 | Design for zmm and mask registers under -march=knc | Done | The register design for KNC is settled on paper: all 32 zmm and 8 mask registers become usable under -march... |
 | S2-02 | Float and double arguments and results in zmm lane 0 | Done | Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`). |
 | S2-03 | Varargs with the donor's register save area | Done | Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`). |
