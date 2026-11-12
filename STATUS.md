@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-12 07:10.
+Updated automatically at every ticket change. Last update: 2026-11-12 07:11.
 
 **Next: the tech lead, on S10-10.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
@@ -50,7 +50,7 @@ Current tickets: `[###################-]` 179 of 183
 | S10-09 | User story - double-precision loops with division and square root vectorize, correctly rounded (V8DF div, cond_div, sqrt) | Done | Double-precision loops with division or square root now vectorize under -march=knc and give the correctly r... |
 | S10-10 | Card harness fixes from the Sprint 10 card turn - card_qualify binary folder, vmath bench batch sizing | Question for the tech lead | Host harness changes are ready; test command passed with CC=C:\\Users\\xuzhi\\Documents\\gcc_knc\\.work\\_s... |
 | S10-11 | Card-only vector math failures - double sin, cos, tan, atan2 above 1 ULP, and cbrt/cbrtf crash (SIGSEGV) | Done | Double sin, cos, tan and atan2 from the KNC vector math library are now within 1 ULP on the card (0.76 to 0... |
-| S10-12 | cbrt and cbrtf crash (SIGSEGV) in qualify_v1 on the card - root cause and fix | In progress | Card output is in the 04:15 lead note above: the vector call returns; SIGSEGV (SEGV_MAPERR) is in the oracl... |
+| S10-12 | cbrt and cbrtf crash (SIGSEGV) in qualify_v1 on the card - root cause and fix | Tests waiting for review | 1ff46888: expected host regression FAIL at 1e-5 (frexp exponent -16). Log: .work/_state/logs/S10_12_screen_... |
 | S11-01 | User story - the best way to move data between the host and the card, measured, and how our projects use it | Not started | lane tools: owner 2026-11-12, usage reset, move on (Codex engineers) |
 | S11-02 | card_run and run_suite move data by S11-01's recommended method, with fallback | Not started | ready; waits on its dep S11-01, the lead writes acceptance before it starts |
 | S2-01 | Design for zmm and mask registers under -march=knc | Done | The register design for KNC is settled on paper: all 32 zmm and 8 mask registers become usable under -march... |
@@ -208,6 +208,7 @@ Current tickets: `[###################-]` 179 of 183
 
 ## Recent activity
 
+- 2026-11-12 07:11 **S10-12** engineer red: 1ff46888: expected host regression FAIL at 1e-5 (frexp exponent -16). Log: .work/_state/logs/S10_12_screen_red-20261112-070726.log. Cause: MPSS lib...
 - 2026-11-12 07:06 **S10-10** engineer ask: Host harness changes are ready; test command passed with CC=C:\\Users\\xuzhi\\Documents\\gcc_knc\\.work\\_shared\\toolchain\\cygwin\\bin\\gcc.exe a...
 - 2026-11-12 07:04 **S10-10** lead answer: Go ahead per the owner's 07:00 decision and the lead's 03:30 note. The worktree already has the test (shared path and kernels.c link fixed by the l...
 - 2026-11-12 07:03 **S10-12** lead answer: Card output is in the 04:15 lead note above: the vector call returns; SIGSEGV (SEGV_MAPERR) is in the oracle-and-dump phase, cbrt block 1 and cbrtf...
@@ -215,7 +216,6 @@ Current tickets: `[###################-]` 179 of 183
 - 2026-11-12 07:02 **S10-12** owner decide: Owner 2026-11-12 07:00 EST ('You run the command on s10-12'): release; the lead's card fault output (04:15 note) is on the ticket; continue to root...
 - 2026-11-12 04:17 **S10-11** lead approve: Double sin, cos, tan and atan2 from the KNC vector math library are now within 1 ULP on the card (0.76 to 0.88 ULP, same as the host): FMA is turne...
 - 2026-11-12 04:15 **S10-12** lead note: Card 2026-11-12 08:55Z (boot da3144f1), the 03:23 reproducer, 1 thread. cbrt: block 0 passes its oracle-and-dump; last trace 'trace block=1 class=s...
-- 2026-11-12 04:12 **S10-11** lead note: Card 2026-11-12 08:54-09:10Z (boot da3144f1), narrowed build: compare set 42 PASS, double sin 0.761, cos 0.787, tan 0.826, atan2 0.877 ULP; only cb...
 
 ## Cost
 
