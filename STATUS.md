@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-12 16:41.
+Updated automatically at every ticket change. Last update: 2026-11-12 16:42.
 
 **Waiting for you:** S11-02. Run `python tools/pm.py inbox`.
 
@@ -65,7 +65,7 @@ Current tickets: `[###################-]` 192 of 200
 | S11-11 | M4 corpus run harness - every corpus program built by GCC 5.1.1 and GCC-KNC, run on the card with frozen inputs and a correctness check, in one command | Done | The M4 corpus harness builds 17 programs with GCC 5.1.1 and GCC-KNC and stages checked card runs; GCC-KNC b... |
 | S11-12 | Sprint 11 batch check - full native suite, x86 identity, forward-port drill, ICE sweeps, runtime prefix consistency | draft |  |
 | S11-13 | Senior compiler review of the Sprint 11-13 scope (Milestone M4) against our research, with recommended plan changes | Done | A senior compiler review of the Sprint 11-13 plan is in: M4 is plausible but needs a frozen scoring and mea... |
-| S11-14 | M4 scoring contract and measurement protocol, frozen before any tuning | Question for the tech lead | Implemented f6def2b6; red e6516f26 failed because m4_score was absent. Proposed ADR-0015 and scorer complet... |
+| S11-14 | M4 scoring contract and measurement protocol, frozen before any tuning | lead | Interactive lead: (1) set allow_protected: docs/adr/0015-m4-scoring-and-measurement.md; (2) rebase s11/S11-... |
 | S11-15 | First development-corpus baseline and profile, GCC 5.1.1 vs GCC-KNC at -O2 (E7-03 part 1) | draft |  |
 | S11-16 | Long-double libm hazard audit - do other MPSS long double entry points fault like cbrtl? (E7-21, bounded) | lead | Needs a card run by the interactive lead (card turn per shared-card rules): python tools/card_run --threads... |
 | S11-17 | PGO feasibility on one complete development program (reuse of S9-18's train/use path) | draft |  |
@@ -225,6 +225,7 @@ Current tickets: `[###################-]` 192 of 200
 
 ## Recent activity
 
+- 2026-11-12 16:42 **S11-14** lead defer: Interactive lead: (1) set allow_protected: docs/adr/0015-m4-scoring-and-measurement.md; (2) rebase s11/S11-14 (red e6516f26, green f6def2b6) onto m...
 - 2026-11-12 16:41 **S11-14** engineer ask: Implemented f6def2b6; red e6516f26 failed because m4_score was absent. Proposed ADR-0015 and scorer complete; 8 host tests pass. Logs: .work/_state...
 - 2026-11-12 16:40 **S11-16** lead defer: Needs a card run by the interactive lead (card turn per shared-card rules): python tools/card_run --threads 240 --timeout 1800 .work/_shared/S11-16...
 - 2026-11-12 16:40 **S11-11** lead note: Re-specified after the senior scope review (docs/reviews/2026-11-12-s11-s13-scope-review.md) and the owner's decisions (docs/sprints/SPRINT-11.md g...
@@ -232,7 +233,6 @@ Current tickets: `[###################-]` 192 of 200
 - 2026-11-12 16:37 **S11-11** lead approve: The M4 corpus harness builds 17 programs with GCC 5.1.1 and GCC-KNC and stages checked card runs; GCC-KNC builds 16 of 17 (HPCG fails on an OpenMP ...
 - 2026-11-12 16:25 **S11-11** engineer submit: 36148f7b: prior 13 host tests passed; 26/34 builds linted/staged. Eight failures: donor -O2 STREAM, NPB-CG, NPB-EP, NPB-MG: missing libgomp.spec; H...
 - 2026-11-12 16:24 **S11-11** lead answer: Size approved: 1200 lines is fair for five suites, C drivers and README, and both approve-red points (checksum mismatch -> fail, 1-per-core from ca...
-- 2026-11-12 16:22 **S11-11** engineer ask: Submit refused: 1200 changed lines exceed the 800-line budget. Please approve this size or split scope; I did not use an unapproved override. Commi...
 
 ## Cost
 
