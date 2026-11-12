@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-12 07:27.
+Updated automatically at every ticket change. Last update: 2026-11-12 07:29.
 
 **Waiting for you:** S10-12. Run `python tools/pm.py inbox`.
 
@@ -14,7 +14,7 @@ Current tickets: `[###################-]` 180 of 183
 | M1 | Mixed native code | Done | 43 of 43 tickets |
 | M2 | Useful vector target | Done | 51 of 51 tickets |
 | M3 | Runtimes | Done | 46 of 47 tickets |
-| M4 | Broad optimization | Not started | 0 of 2 tickets |
+| M4 | Broad optimization | In progress | 0 of 2 tickets |
 | M5 | Program corpus | Not started | Not planned in detail yet |
 | M6 | Release | Not started | Not planned in detail yet |
 
@@ -50,8 +50,8 @@ Current tickets: `[###################-]` 180 of 183
 | S10-09 | User story - double-precision loops with division and square root vectorize, correctly rounded (V8DF div, cond_div, sqrt) | Done | Double-precision loops with division or square root now vectorize under -march=knc and give the correctly r... |
 | S10-10 | Card harness fixes from the Sprint 10 card turn - card_qualify binary folder, vmath bench batch sizing | Done | card_qualify now runs the card binaries from knc/ and stops before any card job when one is missing, and th... |
 | S10-11 | Card-only vector math failures - double sin, cos, tan, atan2 above 1 ULP, and cbrt/cbrtf crash (SIGSEGV) | Done | Double sin, cos, tan and atan2 from the KNC vector math library are now within 1 ULP on the card (0.76 to 0... |
-| S10-12 | cbrt and cbrtf crash (SIGSEGV) in qualify_v1 on the card - root cause and fix | **Waiting for you** | Needs the interactive lead's card turn, not an owner decision. Reviewed 7ae4d224: the harness now passes MP... |
-| S11-01 | User story - the best way to move data between the host and the card, measured, and how our projects use it | Not started | lane tools: owner 2026-11-12, usage reset, move on (Codex engineers) |
+| S10-12 | cbrt and cbrtf crash (SIGSEGV) in qualify_v1 on the card - root cause and fix | **Waiting for you** | Review of 1ff46888/7ae4d224: cause accepted (MPSS libm s_cbrtl.S:178, cbrtl+0xea, zero-extends a negative t... |
+| S11-01 | User story - the best way to move data between the host and the card, measured, and how our projects use it | In progress | lane tools: owner 2026-11-12, usage reset, move on (Codex engineers) |
 | S11-02 | card_run and run_suite move data by S11-01's recommended method, with fallback | Not started | ready; waits on its dep S11-01, the lead writes acceptance before it starts |
 | S2-01 | Design for zmm and mask registers under -march=knc | Done | The register design for KNC is settled on paper: all 32 zmm and 8 mask registers become usable under -march... |
 | S2-02 | Float and double arguments and results in zmm lane 0 | Done | Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`). |
@@ -208,6 +208,7 @@ Current tickets: `[###################-]` 180 of 183
 
 ## Recent activity
 
+- 2026-11-12 07:35 **S10-12** lead note: Review of 1ff46888/7ae4d224: cause accepted (MPSS libm s_cbrtl.S:178, cbrtl+0xea, zero-extends a negative table offset; first fault at the grid inp...
 - 2026-11-12 07:27 **S10-10** lead approve: card_qualify now runs the card binaries from knc/ and stops before any card job when one is missing, and the vector-math benchmark stops with an er...
 - 2026-11-12 07:19 **S10-10** engineer submit: Submitted by the lead for the engineer (owner 07:00: lead commits by hand). 9762b24d [red] fails on main; 3b528a54 fix: python -m pytest tests/vmat...
 - 2026-11-12 07:19 **S10-10** lead answer: Committed by the lead per the owner's 07:00 decision: 9762b24d test [red] (fails on main: knc/ paths, and the host build of driver.c), 3b528a54 fix...
@@ -215,13 +216,12 @@ Current tickets: `[###################-]` 180 of 183
 - 2026-11-12 07:17 **S10-12** lead escalate: Needs the interactive lead's card turn, not an owner decision. Reviewed 7ae4d224: the harness now passes MPSS cbrtl only arguments in [1,8) and res...
 - 2026-11-12 07:16 **S10-12** engineer ask: 7ae4d224 fixes the documented MPSS cbrtl fault by normalizing to [1,8). Regression PASS: 4750 cases, <=0.01 ULP vs MPFR. Host compare PASS: cbrt 0....
 - 2026-11-12 07:13 **S10-12** lead approve-red: S10-12 red accepted: the cbrt/cbrtf card crash is traced to the MPSS libm cbrtl that qualify_v1 uses as its reference, which reads its table at a w...
-- 2026-11-12 07:11 **S10-12** engineer red: 1ff46888: expected host regression FAIL at 1e-5 (frexp exponent -16). Log: .work/_state/logs/S10_12_screen_red-20261112-070726.log. Cause: MPSS lib...
 
 ## Cost
 
 - From the script, engineer: 428 sessions, 943.3M input tokens
 - From the script, lead: 268 sessions, 79.0M input tokens
-- Started by hand, Claude: 11 sessions, 2472.6M input tokens
+- Started by hand, Claude: 11 sessions, 2475.6M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
