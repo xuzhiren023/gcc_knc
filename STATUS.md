@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-12 09:14.
+Updated automatically at every ticket change. Last update: 2026-11-12 09:15.
 
-**Next: the tech lead, on S10-12.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: GPT-6.1, on S10-12 (cbrt and cbrtf crash (SIGSEGV) in qualify_v1 on the card - root cause and fix).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
 Current tickets: `[###################-]` 181 of 184
 
@@ -50,7 +50,7 @@ Current tickets: `[###################-]` 181 of 184
 | S10-09 | User story - double-precision loops with division and square root vectorize, correctly rounded (V8DF div, cond_div, sqrt) | Done | Double-precision loops with division or square root now vectorize under -march=knc and give the correctly r... |
 | S10-10 | Card harness fixes from the Sprint 10 card turn - card_qualify binary folder, vmath bench batch sizing | Done | card_qualify now runs the card binaries from knc/ and stops before any card job when one is missing, and th... |
 | S10-11 | Card-only vector math failures - double sin, cos, tan, atan2 above 1 ULP, and cbrt/cbrtf crash (SIGSEGV) | Done | Double sin, cos, tan and atan2 from the KNC vector math library are now within 1 ULP on the card (0.76 to 0... |
-| S10-12 | cbrt and cbrtf crash (SIGSEGV) in qualify_v1 on the card - root cause and fix | Question for the tech lead | Card PASS for cbrt and cbrtf (09:15 note). |
+| S10-12 | cbrt and cbrtf crash (SIGSEGV) in qualify_v1 on the card - root cause and fix | In progress | Card PASS; the lead submits for the engineer. |
 | S10-13 | User story - code that calls cbrtl under -march=knc gets a safe replacement and a compile-time warning (MPSS libm cbrtl faults) | lead | Waits for S10-12's approval; then the lead moves it to lane gcc (tree 1) to build. |
 | S11-01 | User story - the best way to move data between the host and the card, measured, and how our projects use it | Done | We now have a sourced inventory of every host-card transfer path that works without changing MPSS (SSH, tar... |
 | S11-02 | card_run and run_suite move data by S11-01's recommended method, with fallback | Not started | ready; waits on its dep S11-01, the lead writes acceptance before it starts |
@@ -209,6 +209,7 @@ Current tickets: `[###################-]` 181 of 184
 
 ## Recent activity
 
+- 2026-11-12 09:15 **S10-12** lead answer: Card PASS; the lead submits for the engineer.
 - 2026-11-12 09:15 **S10-12** lead note: Card 2026-11-12 14:05-14:15Z (boot da3144f1), fixed qualifier .work/_shared/S10-12/knc/qualify_v1.mic, 240 threads: cmp-cbrt PASS exact max_ulp 0.4...
 - 2026-11-12 09:14 **S10-12** lead resume: Card PASS for cbrt and cbrtf (09:15 note).
 - 2026-11-12 08:38 **S11-01** lead approve: We now have a sourced inventory of every host-card transfer path that works without changing MPSS (SSH, tar, raw TCP, SCIF messages and DMA, COI), ...
@@ -216,7 +217,6 @@ Current tickets: `[###################-]` 181 of 184
 - 2026-11-12 08:27 **S11-01** engineer submit: Submitted by the lead for the engineer after rebasing (engineer sandbox cannot write .git). Engineer 07:57: loopback/FIPS/corruption tests and K1OM...
 - 2026-11-12 08:27 **S11-01** lead answer: Rebased by the lead; the lead submits for the engineer.
 - 2026-11-12 08:26 **S11-01** lead resume: Lead rebased s11/S11-01 onto main (81ceac2a red, 95625ad5 green over 48c83946); submits for the engineer.
-- 2026-11-12 08:25 **S11-01** lead defer: Interactive lead: the engineer's sandbox cannot write .git/worktrees/S11-01, so rebase s11/S11-01 (81ceac2a red, 95625ad5 green, base 40f1ab64) ont...
 
 ## Cost
 
