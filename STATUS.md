@@ -1,10 +1,10 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-12 16:27.
+Updated automatically at every ticket change. Last update: 2026-11-12 16:37.
 
 **Waiting for you:** S11-02. Run `python tools/pm.py inbox`.
 
-Current tickets: `[###################-]` 191 of 199
+Current tickets: `[###################-]` 192 of 199
 
 ## Milestones
 
@@ -14,7 +14,7 @@ Current tickets: `[###################-]` 191 of 199
 | M1 | Mixed native code | Done | 43 of 43 tickets |
 | M2 | Useful vector target | Done | 51 of 51 tickets |
 | M3 | Runtimes | Done | 48 of 48 tickets |
-| M4 | Broad optimization | In progress | 9 of 17 tickets |
+| M4 | Broad optimization | In progress | 10 of 17 tickets |
 | M5 | Program corpus | Not started | Not planned in detail yet |
 | M6 | Release | Not started | Not planned in detail yet |
 
@@ -62,7 +62,7 @@ Current tickets: `[###################-]` 191 of 199
 | S11-08 | -Wknc-unsafe-cbrtl cannot be used in #pragma GCC diagnostic ("valid for  but not for C") | Done | The cbrtl warning can now be silenced around one deliberate call with #pragma GCC diagnostic in C and C++; ... |
 | S11-09 | Memory bandwidth for LLM decode - a weight-streaming GEMV workload, pushed toward 264-299 GB/s of weight bytes | lead | Needs interactive lead: card run in our exclusive turn. Reviewed 33de9541: IMCI sint8/float16 load conversi... |
 | S11-10 | S11-01 transfer runner - choose repetitions, sizes and load states per run, so slow methods fit a card turn | Done | The transfer runner now takes --repeats, --sizes, --loads and --concurrency so a slow method fits a card tu... |
-| S11-11 | M4 corpus run harness - every corpus program built by GCC 5.1.1 and GCC-KNC, run on the card with frozen inputs and a correctness check, in one command | Waiting for review | Re-specified after the senior scope review (docs/reviews/2026-11-12-s11-s13-scope-review.md) and the owner'... |
+| S11-11 | M4 corpus run harness - every corpus program built by GCC 5.1.1 and GCC-KNC, run on the card with frozen inputs and a correctness check, in one command | Done | The M4 corpus harness builds 17 programs with GCC 5.1.1 and GCC-KNC and stages checked card runs; GCC-KNC b... |
 | S11-12 | Sprint 11 batch check - full native suite, x86 identity, forward-port drill, ICE sweeps, runtime prefix consistency | draft |  |
 | S11-13 | Senior compiler review of the Sprint 11-13 scope (Milestone M4) against our research, with recommended plan changes | Done | A senior compiler review of the Sprint 11-13 plan is in: M4 is plausible but needs a frozen scoring and mea... |
 | S11-14 | M4 scoring contract and measurement protocol, frozen before any tuning | In progress |  |
@@ -225,19 +225,19 @@ Current tickets: `[###################-]` 191 of 199
 ## Recent activity
 
 - 2026-11-12 16:40 **S11-11** lead note: Re-specified after the senior scope review (docs/reviews/2026-11-12-s11-s13-scope-review.md) and the owner's decisions (docs/sprints/SPRINT-11.md g...
+- 2026-11-12 16:37 **S11-11** lead approve: The M4 corpus harness builds 17 programs with GCC 5.1.1 and GCC-KNC and stages checked card runs; GCC-KNC builds 16 of 17 (HPCG fails on an OpenMP ...
 - 2026-11-12 16:25 **S11-11** engineer submit: 36148f7b: prior 13 host tests passed; 26/34 builds linted/staged. Eight failures: donor -O2 STREAM, NPB-CG, NPB-EP, NPB-MG: missing libgomp.spec; H...
 - 2026-11-12 16:24 **S11-11** lead answer: Size approved: 1200 lines is fair for five suites, C drivers and README, and both approve-red points (checksum mismatch -> fail, 1-per-core from ca...
 - 2026-11-12 16:22 **S11-11** engineer ask: Submit refused: 1200 changed lines exceed the 800-line budget. Please approve this size or split scope; I did not use an unapproved override. Commi...
 - 2026-11-12 16:21 **S11-13** lead approve: A senior compiler review of the Sprint 11-13 plan is in: M4 is plausible but needs a frozen scoring and measurement contract first, profiling moved...
 - 2026-11-12 16:12 **S11-13** engineer submit: Submitted by the lead for the engineer (pm.py commit hung): review at docs/reviews/2026-11-12-s11-s13-scope-review.md, five questions, 17 program e...
 - 2026-11-12 16:12 **S11-13** lead answer: Committed by the lead; the lead submits for the engineer.
-- 2026-11-12 16:11 **S11-13** engineer ask: Review complete at docs/reviews/2026-11-12-s11-s13-scope-review.md: all five questions, 17 program estimates, nine ranked findings, revised outline...
 
 ## Cost
 
 - From the script, engineer: 464 sessions, 992.6M input tokens
 - From the script, lead: 296 sessions, 85.0M input tokens
-- Started by hand, Claude: 12 sessions, 2679.8M input tokens
+- Started by hand, Claude: 12 sessions, 2680.5M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
