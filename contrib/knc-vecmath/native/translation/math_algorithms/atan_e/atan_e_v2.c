@@ -19,6 +19,20 @@ typedef double dv __attribute__((vector_size(64)));
 typedef float fv __attribute__((vector_size(64)));
 static uint64_t dbits(double x){uint64_t b;memcpy(&b,&x,8);return b;}
 static double dvalue(uint64_t b){double x;memcpy(&x,&b,8);return x;}
+/* S10-11: preserve the low parts at the reconstruction and Dekker boundaries.
+ * No inlining across the option boundary; the polynomial still contracts. */
+#pragma GCC push_options
+#pragma GCC optimize ("fp-contract=off")
+static __attribute__((noinline)) void compensated_tails(dv x,dv s1,dv s2,dv corr,dv l,dv *direct,dv *reduced) {
+  const dv poly=x*(s1+s2);
+  *direct=corr-poly;*reduced=corr-(poly-l-x);
+}
+static __attribute__((noinline)) dv compensated_division(dv ny,dv nx,dv rq,dv rh,dv xh) {
+  const dv rl=rq-rh,xl=nx-xh,product=rq*nx;
+  const dv product_tail=((rh*xh-product)+rh*xl+rl*xh)+rl*xl;
+  return ((ny-product)-product_tail)/nx;
+}
+#pragma GCC pop_options
 static const double hi[]={4.63647609000806093515e-01,7.85398163397448278999e-01,9.82793723247329054082e-01,1.57079632679489655800e+00};
 static const double lo[]={2.26987774529616870924e-17,3.06161699786838301793e-17,1.39033110312309984516e-17,6.12323399573676603587e-17};
 static const double aT[]={3.33333333333329318027e-01,-1.99999999998764832476e-01,1.42857142725034663711e-01,-1.11111104054623557880e-01,9.09088713343650656196e-02,-7.69187620504482999495e-02,6.66107313738753120669e-02,-5.83357013379057348645e-02,4.97687799461593236017e-02,-3.65315727442169155270e-02,1.62858201153657823623e-02};
@@ -28,7 +42,8 @@ static __attribute__((noinline)) void atan_core(const double input[8],const doub
     na[i]=id[i]==0?2:id[i]==3?0:1;nb[i]=id[i]==0||id[i]==1||id[i]==3?-1:id[i]==2?-1.5:0;da[i]=id[i]==0||id[i]==1||id[i]==3?1:id[i]==2?1.5:0;db[i]=id[i]==0?2:id[i]==3?0:1;h[i]=id[i]<0?0:hi[id[i]];l[i]=id[i]<0?0:lo[id[i]];}
   x=(na*x+nb)/(da*x+db);const dv z=x*x,w=z*z;
   const dv s1=z*(aT[0]+w*(aT[2]+w*(aT[4]+w*(aT[6]+w*(aT[8]+w*aT[10]))))),s2=w*(aT[1]+w*(aT[3]+w*(aT[5]+w*(aT[7]+w*aT[9]))));
-  dv corr;memcpy(&corr,correction,64);const dv poly=x*(s1+s2),direct_tail=corr-poly,reduced_tail=corr-(poly-l-x);
+  dv corr,direct_tail,reduced_tail;memcpy(&corr,correction,64);
+  compensated_tails(x,s1,s2,corr,l,&direct_tail,&reduced_tail);
   for(unsigned i=0;i<8;++i){if(tiny[i]){output[i]=input[i];low[i]=correction[i];continue;}if(large[i]){output[i]=dvalue(dbits(hi[3])^sign[i]);low[i]=dvalue(dbits(lo[3])^sign[i]);continue;}double head=id[i]<0?x[i]:h[i],tail=id[i]<0?direct_tail[i]:reduced_tail[i];double sum=head+tail,residual=(head-sum)+tail;output[i]=dvalue(dbits(sum)^sign[i]);low[i]=dvalue(dbits(residual)^sign[i]);}
 }
 static __attribute__((noinline)) void atan2_core(const double y[8],const double x[8],double output[8]) {
@@ -47,8 +62,7 @@ static __attribute__((noinline)) void atan2_core(const double y[8],const double 
   dv ny,nx,rq;
   for(unsigned i=0;i<8;++i){ny[i]=0;nx[i]=1;rq[i]=0;uint64_t yb=dbits(numerator[i]),xb=dbits(denominator[i]);if(!yb)continue;int ey=(int)(yb>>52),ex=(int)(xb>>52);uint64_t yf=yb&UINT64_C(0xfffffffffffff),xf=xb&UINT64_C(0xfffffffffffff);if(!ey){int shift=__builtin_clzll(yf)-11;yf=(yf<<shift)&UINT64_C(0xfffffffffffff);ey=1-shift;}if(!ex){int shift=__builtin_clzll(xf)-11;xf=(xf<<shift)&UINT64_C(0xfffffffffffff);ex=1-shift;}int gap=ey-ex;if(gap>=-64&&gap<=64){ny[i]=dvalue(((uint64_t)(1023+gap)<<52)|yf);nx[i]=dvalue((UINT64_C(1023)<<52)|xf);rq[i]=quotient[i];}}
   uint64_t rb[8],xb[8];memcpy(rb,&rq,64);memcpy(xb,&nx,64);dv rh,xh;for(unsigned i=0;i<8;++i){rh[i]=dvalue(rb[i]&UINT64_C(0xfffffffff8000000));xh[i]=dvalue(xb[i]&UINT64_C(0xfffffffff8000000));}
-  const dv rl=rq-rh,xl=nx-xh,product=rq*nx,product_tail=((rh*xh-product)+rh*xl+rl*xh)+rl*xl;
-  const dv division_tail=((ny-product)-product_tail)/nx,angle_correction=division_tail/(1+rq*rq);memcpy(correction,&angle_correction,64);
+  const dv division_tail=compensated_division(ny,nx,rq,rh,xh),angle_correction=division_tail/(1+rq*rq);memcpy(correction,&angle_correction,64);
   atan_core(ratio,correction,angle,angle_low);
   dv z,qz,ql;memcpy(&z,angle,64);for(unsigned i=0;i<8;++i){qz[i]=negative&(1u<<i)?z[i]:0;ql[i]=negative&(1u<<i)?angle_low[i]:pi_lo;}
   const dv sum=pi-qz,error=(pi-sum)-qz,adjusted=sum+(error+pi_lo-ql);
