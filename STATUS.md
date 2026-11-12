@@ -2,7 +2,7 @@
 
 Updated automatically at every ticket change. Last update: 2026-11-12 15:24.
 
-**Waiting for you:** S11-02, S11-10. Run `python tools/pm.py inbox`.
+**Waiting for you:** S11-02. Run `python tools/pm.py inbox`.
 
 Current tickets: `[###################-]` 189 of 192
 
@@ -61,7 +61,7 @@ Current tickets: `[###################-]` 189 of 192
 | S11-07 | S11-01 transfer tool - the card's listener gives up before card_run relays its announcement | Done | The transfer study's card listener now waits long enough for card_run to relay its address to the host; che... |
 | S11-08 | -Wknc-unsafe-cbrtl cannot be used in #pragma GCC diagnostic ("valid for  but not for C") | Done | The cbrtl warning can now be silenced around one deliberate call with #pragma GCC diagnostic in C and C++; ... |
 | S11-09 | Memory bandwidth for LLM decode - a weight-streaming GEMV workload, pushed toward 264-299 GB/s of weight bytes | lead | Needs interactive lead: card run in our exclusive turn. Reviewed 33de9541: IMCI sint8/float16 load conversi... |
-| S11-10 | S11-01 transfer runner - choose repetitions, sizes and load states per run, so slow methods fit a card turn | **Waiting for you** | budget: 3216728 input tokens used; the budget is 2000000 |
+| S11-10 | S11-01 transfer runner - choose repetitions, sizes and load states per run, so slow methods fit a card turn | In progress | Owner standing rule (feedback 2026-11-09/10: the lead raises budgets itself): input budget raised to 6M, fi... |
 | S2-01 | Design for zmm and mask registers under -march=knc | Done | The register design for KNC is settled on paper: all 32 zmm and 8 mask registers become usable under -march... |
 | S2-02 | Float and double arguments and results in zmm lane 0 | Done | Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`). |
 | S2-03 | Varargs with the donor's register save area | Done | Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`). |
@@ -218,19 +218,19 @@ Current tickets: `[###################-]` 189 of 192
 ## Recent activity
 
 - 2026-11-12 15:25 **S11-10** lead note: Two more runner bugs from the card turn, fix them here too: (1) the runner closes card-control.log (finally: card_log.close()) while card_run may s...
+- 2026-11-12 15:24 **S11-10** owner decide: Owner standing rule (feedback 2026-11-09/10: the lead raises budgets itself): input budget raised to 6M, first extension. Options plumbing is done;...
 - 2026-11-12 15:24 **S11-10** engineer escalate: budget: 3216728 input tokens used; the budget is 2000000
 - 2026-11-12 14:53 **S11-10** lead answer: Option plumbing reviewed and correct; the lead is already using it on the card. Change the test approach: remove the _exchange/_record/_test_mode h...
 - 2026-11-12 14:52 **S11-10** engineer ask: After two real test attempts, runner options/plumbing and temporary output build are implemented, but the new plan/row test remains failing because...
 - 2026-11-12 14:44 **S11-10** lead answer: Not a code fault: ld could not overwrite .work/_shared/S11-01/transfer-host.exe because a running transfer process holds it open (Device or resourc...
 - 2026-11-12 14:43 **S11-10** engineer ask: The required test command via tools/run.py failed during setUpClass: host transfer_bench.exe link returned 1; wrapper log C:\\Users\\xuzhi\\Documen...
 - 2026-11-12 14:28 **S11-09** lead defer: Needs interactive lead: card run in our exclusive turn. Reviewed 33de9541: IMCI sint8/float16 load conversion, 16/32-byte alignment for 4096/11008 ...
-- 2026-11-12 14:27 **S11-09** engineer ask: At 33de9541, all 6 host tests and GCC-KNC build/lint pass; GEMV binary/sweep staged in .work/_shared/S11-05. Ticket prohibits engineer card jobs. P...
 
 ## Cost
 
 - From the script, engineer: 456 sessions, 978.6M input tokens
 - From the script, lead: 290 sessions, 83.7M input tokens
-- Started by hand, Claude: 11 sessions, 2631.7M input tokens
+- Started by hand, Claude: 11 sessions, 2632.9M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
