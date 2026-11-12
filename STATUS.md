@@ -54,7 +54,7 @@ Current tickets: `[###################-]` 182 of 185
 | S10-13 | User story - code that calls cbrtl under -march=knc gets a safe replacement and a compile-time warning (MPSS libm cbrtl faults) | lead | Needs the interactive lead: tree 1 build outputs .work/_shared/gcc-build/gcc/pass-instances.def and gcc/s-o... |
 | S11-01 | User story - the best way to move data between the host and the card, measured, and how our projects use it | Done | We now have a sourced inventory of every host-card transfer path that works without changing MPSS (SSH, tar... |
 | S11-02 | card_run and run_suite move data by S11-01's recommended method, with fallback | **Waiting for you** | Started by mistake: the ticket was 'ready' as a placeholder and became startable when S11-01 closed. The en... |
-| S11-03 | S11-01 transfer tool rejects the card's physical /tmp path, so the native study never starts | In progress |  |
+| S11-03 | S11-01 transfer tool rejects the card's physical /tmp path, so the native study never starts | Question for the tech lead | Checked-in host_card_transfer.py and transfer_bench.c match the worktree baseline. The baseline regex alrea... |
 | S2-01 | Design for zmm and mask registers under -march=knc | Done | The register design for KNC is settled on paper: all 32 zmm and 8 mask registers become usable under -march... |
 | S2-02 | Float and double arguments and results in zmm lane 0 | Done | Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`). |
 | S2-03 | Varargs with the donor's register save area | Done | Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`). |
@@ -211,19 +211,19 @@ Current tickets: `[###################-]` 182 of 185
 ## Recent activity
 
 - 2026-11-12 09:40 **S11-02** lead note: Started by mistake: the ticket was 'ready' as a placeholder and became startable when S11-01 closed. The engineer was right to stop; nothing was ch...
+- 2026-11-12 09:32 **S11-03** engineer ask: Checked-in host_card_transfer.py and transfer_bench.c match the worktree baseline. The baseline regex already accepts /tmp/...; the ticket's requir...
 - 2026-11-12 09:32 **S10-13** lead defer: Needs the interactive lead: tree 1 build outputs .work/_shared/gcc-build/gcc/pass-instances.def and gcc/s-options are owned by xuzhi and not writab...
 - 2026-11-12 09:30 **S10-13** engineer ask: Tree 1 also fails Permission denied on gcc/pass-instances.def and gcc/s-options (owner xuzhi; directory CodexSandboxOffline). Reproducer: Cygwin py...
 - 2026-11-12 09:28 **S11-02** engineer escalate: The ticket changed from doing to blocked during this session, with an existing engineer question requesting finalized acceptance, the S11-01 recomm...
 - 2026-11-12 09:28 **S11-02** engineer ask: Ticket still contains a placeholder and says the lead must write acceptance from S11-01 before work starts. It does not identify the recommended bu...
 - 2026-11-12 09:28 **S10-13** lead answer: Lane is now gcc: build in tree 1 (.work/_shared/gcc, build dir .work/_shared/gcc-build, owned by the Codex sandbox). Your GCC commit 157940608ed on...
 - 2026-11-12 09:27 **S10-13** lead resume: S10-12 approved; tree 1 is free.
-- 2026-11-12 09:26 **S10-12** lead approve: The cbrt and cbrtf qualification jobs no longer crash on the card and pass (worst 0.4996 and 0.4991 ULP): the crash was in the card's MPSS libm cbr...
 
 ## Cost
 
 - From the script, engineer: 437 sessions, 951.7M input tokens
 - From the script, lead: 275 sessions, 80.6M input tokens
-- Started by hand, Claude: 11 sessions, 2504.0M input tokens
+- Started by hand, Claude: 11 sessions, 2504.3M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
