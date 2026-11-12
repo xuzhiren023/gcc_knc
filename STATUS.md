@@ -1,10 +1,10 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-12 00:31.
+Updated automatically at every ticket change. Last update: 2026-11-12 01:20.
 
 **Waiting for you:** S10-10. Run `python tools/pm.py inbox`.
 
-Current tickets: `[###################-]` 177 of 182
+Current tickets: `[###################-]` 178 of 182
 
 ## Milestones
 
@@ -13,7 +13,7 @@ Current tickets: `[###################-]` 177 of 182
 | M0 | Foundation | In progress | 17 of 17 tickets |
 | M1 | Mixed native code | Done | 43 of 43 tickets |
 | M2 | Useful vector target | Done | 51 of 51 tickets |
-| M3 | Runtimes | Done | 43 of 46 tickets |
+| M3 | Runtimes | Done | 44 of 46 tickets |
 | M4 | Broad optimization | Not started | 0 of 2 tickets |
 | M5 | Program corpus | Not started | Not planned in detail yet |
 | M6 | Release | Not started | Not planned in detail yet |
@@ -47,7 +47,7 @@ Current tickets: `[###################-]` 177 of 182
 | S10-06 | Card qualification - classify powf's 848 special-case mismatches and certify pow under 1 ULP | Done | The powf and pow card failures were traced to the card's own libm (its powl gives NaN for negative x with h... |
 | S10-07 | Vector math v1a - the copied functions (sin, cos, tan, log10, atan, atan2, hyperbolics, bounded groups) in libknc_vmath and the vectorizer hook | Done | Card 2026-11-11 (S10-08 build, 240 threads): full set PASS for sinf 0.499999, cosf 0.499998, tanf 0.499995,... |
 | S10-08 | Vector math v1b - the rest of the libmvec set (acos, asin, cbrt, erf, erfc, exp2, exp10, expm1, log1p, log2, hypot, sincos) | Done | The vector math library now covers the whole set GCC vectorizes with glibc's libmvec: acos, asin, cbrt, erf... |
-| S10-09 | User story - double-precision loops with division and square root vectorize, correctly rounded (V8DF div, cond_div, sqrt) | Waiting for review | Card 2026-11-12 05:09-05:19Z (boot da3144f1): knc-v8df-divsqrt.mic all 15 sets bad=0 flagbad=0: div midpoin... |
+| S10-09 | User story - double-precision loops with division and square root vectorize, correctly rounded (V8DF div, cond_div, sqrt) | Done | Double-precision loops with division or square root now vectorize under -march=knc and give the correctly r... |
 | S10-10 | Card harness fixes from the Sprint 10 card turn - card_qualify binary folder, vmath bench batch sizing | **Waiting for you** | Engineer sandbox cannot write the worktree git metadata (.git/worktrees/S10-10/index.lock: Permission denie... |
 | S10-11 | Card-only vector math failures - double sin, cos, tan, atan2 above 1 ULP, and cbrt/cbrtf crash (SIGSEGV) | Waiting for review | 8d8f3c5f staging/lint PASS. FMA before/global-off/narrowed: sincos 15/0/9, reducer 0/0/0, tan 18/0/11, atan... |
 | S11-01 | User story - the best way to move data between the host and the card, measured, and how our projects use it | Not started | lane tools: owner 2026-11-12, usage reset, move on (Codex engineers) |
@@ -207,6 +207,7 @@ Current tickets: `[###################-]` 177 of 182
 
 ## Recent activity
 
+- 2026-11-12 01:20 **S10-09** lead approve: Double-precision loops with division or square root now vectorize under -march=knc and give the correctly rounded IEEE result in every rounding mod...
 - 2026-11-12 00:31 **S10-11** engineer submit: 8d8f3c5f staging/lint PASS. FMA before/global-off/narrowed: sincos 15/0/9, reducer 0/0/0, tan 18/0/11, atan 20/0/12. Log: .work/_state/logs/S10_11_...
 - 2026-11-12 00:29 **S10-11** lead note: Lead card 2026-11-12 (boot da3144f1), S10-11 build: compare set fixed for double sin 0.761, cos 0.767, tan 0.826, atan2 0.877 ULP (match host); all...
 - 2026-11-12 00:29 **S10-09** lead note: Card 2026-11-12 05:09-05:19Z (boot da3144f1): knc-v8df-divsqrt.mic all 15 sets bad=0 flagbad=0: div midpoint 1.45M, Markstein 2.10M, exponent 1.54M...
@@ -214,16 +215,15 @@ Current tickets: `[###################-]` 177 of 182
 - 2026-11-12 00:25 **S10-11** engineer ask: 97b7abf7 complete; submit refuses: receipt-style file added: tools/s10_11_evidence.py. This existing script implements your requested assembly evid...
 - 2026-11-12 00:24 **S10-10** lead escalate: Engineer sandbox cannot write the worktree git metadata (.git/worktrees/S10-10/index.lock: Permission denied), so pm.py commit fails; the red test ...
 - 2026-11-12 00:16 **S10-10** engineer ask: Required red-first test and fix are ready, but pm.py commit failed because git add -A cannot create the worktree index.lock (Permission denied). Pl...
-- 2026-11-12 00:11 **S10-11** owner decide: Owner standing rule: session budget raised to 8 (red approved, fix committed, progressing). Continue with the lead's 00:09 answer; the cbrt card ou...
 
 ## Cost
 
 - From the script, engineer: 424 sessions, 939.6M input tokens
 - From the script, lead: 264 sessions, 78.1M input tokens
-- Started by hand, Claude: 11 sessions, 2453.9M input tokens
+- Started by hand, Claude: 11 sessions, 2455.0M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 24.4 GiB of 100 GiB. 109 GiB free on the drive.
+The project uses 24.4 GiB of 100 GiB. 106 GiB free on the drive.
