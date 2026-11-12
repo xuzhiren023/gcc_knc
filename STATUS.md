@@ -1,10 +1,10 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-12 17:06.
+Updated automatically at every ticket change. Last update: 2026-11-12 17:12.
 
 **Waiting for you:** S11-02. Run `python tools/pm.py inbox`.
 
-Current tickets: `[###################-]` 193 of 200
+Current tickets: `[###################-]` 193 of 201
 
 ## Milestones
 
@@ -14,7 +14,7 @@ Current tickets: `[###################-]` 193 of 200
 | M1 | Mixed native code | Done | 43 of 43 tickets |
 | M2 | Useful vector target | Done | 51 of 51 tickets |
 | M3 | Runtimes | Done | 48 of 48 tickets |
-| M4 | Broad optimization | In progress | 11 of 18 tickets |
+| M4 | Broad optimization | In progress | 11 of 19 tickets |
 | M5 | Program corpus | Not started | Not planned in detail yet |
 | M6 | Release | Not started | Not planned in detail yet |
 
@@ -69,7 +69,8 @@ Current tickets: `[###################-]` 193 of 200
 | S11-15 | First development-corpus baseline and profile, GCC 5.1.1 vs GCC-KNC at -O2 (E7-03 part 1) | draft |  |
 | S11-16 | Long-double libm hazard audit - do other MPSS long double entry points fault like cbrtl? (E7-21, bounded) | lead | Needs a card run by the interactive lead (card turn per shared-card rules): python tools/card_run --threads... |
 | S11-17 | PGO feasibility on one complete development program (reuse of S9-18's train/use path) | draft |  |
-| S11-18 | M4 corpus harness v2 - card profiles, prefix record, held-out sealing, stronger checks, and the donor-failure rule | In progress | S11-18 red approved: host tests now pin the owner's serial-vs-serial voting with a GCC-KNC-only labelled Op... |
+| S11-18 | M4 corpus harness v2 - card profiles, prefix record, held-out sealing, stronger checks, and the donor-failure rule | Question for the tech lead | Submission blocked: pm.py submit reports 943 changed lines against the 800-line budget. Please approve this... |
+| S11-19 | Second senior review - the M4 definition and the Sprint 11-13 roadmap, adjusted | Not started |  |
 | S2-01 | Design for zmm and mask registers under -march=knc | Done | The register design for KNC is settled on paper: all 32 zmm and 8 mask registers become usable under -march... |
 | S2-02 | Float and double arguments and results in zmm lane 0 | Done | Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`). |
 | S2-03 | Varargs with the donor's register save area | Done | Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`). |
@@ -226,22 +227,22 @@ Current tickets: `[###################-]` 193 of 200
 ## Recent activity
 
 - 2026-11-12 17:15 **S11-09** lead note: Card GEMV sweep 2026-11-12 21:41-21:57Z (boot da3144f1, benchmark mode, 240 CPUs granted, 55 cases): raw output .work/_shared/tmp/claude-next28/mem...
+- 2026-11-12 17:12 **S11-18** engineer ask: Submission blocked: pm.py submit reports 943 changed lines against the 800-line budget. Please approve this size or specify a scope split. Implemen...
 - 2026-11-12 17:06 **S11-09** lead answer: Card results are in the 17:15 lead note; raw output path there. Write the analysis and candidate stories as the note says; leave uncommitted and as...
 - 2026-11-12 17:06 **S11-09** lead resume: GEMV sweep result on the ticket (17:15 note).
 - 2026-11-12 17:05 **S11-14** lead approve: M4's scoring contract is frozen in ADR-0015 with a tested scorer: strict serial -O2 versus -O2 over 17 programs on the 7120 and the 3100/5100 profi...
 - 2026-11-12 17:00 **S11-18** lead note: Owner 2026-11-12 17:00 EST ("Serial vs serial primary", accepting the lead's recommendation): (1) the six OpenMP programs (STREAM, NPB CG/EP/MG/IS,...
 - 2026-11-12 17:00 **S11-14** lead note: Owner 2026-11-12 17:00 EST ("Serial vs serial primary", accepting the lead's recommendation): (1) the six OpenMP programs (STREAM, NPB CG/EP/MG/IS,...
 - 2026-11-12 16:53 **S11-18** lead approve-red: S11-18 red approved: host tests now pin the owner's serial-vs-serial voting with a GCC-KNC-only labelled OpenMP panel across 7120/3100/5100, held-o...
-- 2026-11-12 16:53 **S11-14** engineer submit: 1248919a after red 0f7940b6: ADR proposed; all 17 serial primary, labelled OpenMP panels excluded, SQLite pilot-frozen donor level and kmov record,...
 
 ## Cost
 
 - From the script, engineer: 470 sessions, 1000.8M input tokens
 - From the script, lead: 301 sessions, 86.4M input tokens
-- Started by hand, Claude: 12 sessions, 2703.9M input tokens
+- Started by hand, Claude: 12 sessions, 2707.6M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 24.8 GiB of 100 GiB. 82 GiB free on the drive.
+The project uses 25.2 GiB of 100 GiB. 82 GiB free on the drive.
