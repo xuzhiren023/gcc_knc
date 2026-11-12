@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-12 16:11.
+Updated automatically at every ticket change. Last update: 2026-11-12 16:12.
 
 **Waiting for you:** S11-02. Run `python tools/pm.py inbox`.
 
@@ -63,7 +63,7 @@ Current tickets: `[###################-]` 190 of 194
 | S11-09 | Memory bandwidth for LLM decode - a weight-streaming GEMV workload, pushed toward 264-299 GB/s of weight bytes | lead | Needs interactive lead: card run in our exclusive turn. Reviewed 33de9541: IMCI sint8/float16 load conversi... |
 | S11-10 | S11-01 transfer runner - choose repetitions, sizes and load states per run, so slow methods fit a card turn | Done | The transfer runner now takes --repeats, --sizes, --loads and --concurrency so a slow method fits a card tu... |
 | S11-11 | M4 corpus run harness - every corpus program built by GCC 5.1.1 and GCC-KNC, run on the card with frozen inputs and a correctness check, in one command | In progress | The corpus harness now has a failing host contract that pins the S0-07 program set (held-out adi, durbin an... |
-| S11-13 | Senior compiler review of the Sprint 11-13 scope (Milestone M4) against our research, with recommended plan changes | Question for the tech lead | Review complete at docs/reviews/2026-11-12-s11-s13-scope-review.md: all five questions, 17 program estimate... |
+| S11-13 | Senior compiler review of the Sprint 11-13 scope (Milestone M4) against our research, with recommended plan changes | In progress | Committed by the lead; the lead submits for the engineer. |
 | S2-01 | Design for zmm and mask registers under -march=knc | Done | The register design for KNC is settled on paper: all 32 zmm and 8 mask registers become usable under -march... |
 | S2-02 | Float and double arguments and results in zmm lane 0 | Done | Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`). |
 | S2-03 | Varargs with the donor's register save area | Done | Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`). |
@@ -219,6 +219,7 @@ Current tickets: `[###################-]` 190 of 194
 
 ## Recent activity
 
+- 2026-11-12 16:12 **S11-13** lead answer: Committed by the lead; the lead submits for the engineer.
 - 2026-11-12 16:11 **S11-13** engineer ask: Review complete at docs/reviews/2026-11-12-s11-s13-scope-review.md: all five questions, 17 program estimates, nine ranked findings, revised outline...
 - 2026-11-12 16:11 **S11-10** lead approve: The transfer runner now takes --repeats, --sizes, --loads and --concurrency so a slow method fits a card turn, keeps card-control.log open until ca...
 - 2026-11-12 16:00 **S11-10** engineer submit: Test passed: tools/run.py s11_10_review_fixes; log C:\Users\xuzhi\Documents\gcc_knc\.work\_state\logs\s11_10_review_fixes-20261112-155732.log. No c...
@@ -226,13 +227,12 @@ Current tickets: `[###################-]` 190 of 194
 - 2026-11-12 15:58 **S11-10** engineer ask: Review fixes applied and tests pass. S11-01 transfer-host.exe is still locked; restage failed with Device/resource busy and PermissionError. The ti...
 - 2026-11-12 15:57 **S11-11** lead approve-red: The corpus harness now has a failing host contract that pins the S0-07 program set (held-out adi, durbin and bzip2 split off by program name), pair...
 - 2026-11-12 15:56 **S11-11** engineer red: Red contract committed at 4f4a34f3. Ran python tools/run.py --name S11-11-host-red --inputs tests/tools/test_corpus.py tools/corpus.py -- python -m...
-- 2026-11-12 15:55 **S11-10** owner decide: Owner standing rule (feedback 2026-11-09/10): session budget raised to 5. The ticket progressed (submitted at 15:30, three review findings at 15:54...
 
 ## Cost
 
 - From the script, engineer: 462 sessions, 987.8M input tokens
 - From the script, lead: 294 sessions, 84.6M input tokens
-- Started by hand, Claude: 12 sessions, 2665.5M input tokens
+- Started by hand, Claude: 12 sessions, 2668.1M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
