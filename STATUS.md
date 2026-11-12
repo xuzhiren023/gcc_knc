@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-12 16:45.
+Updated automatically at every ticket change. Last update: 2026-11-12 16:46.
 
 **Waiting for you:** S11-02. Run `python tools/pm.py inbox`.
 
@@ -65,11 +65,11 @@ Current tickets: `[###################-]` 192 of 200
 | S11-11 | M4 corpus run harness - every corpus program built by GCC 5.1.1 and GCC-KNC, run on the card with frozen inputs and a correctness check, in one command | Done | The M4 corpus harness builds 17 programs with GCC 5.1.1 and GCC-KNC and stages checked card runs; GCC-KNC b... |
 | S11-12 | Sprint 11 batch check - full native suite, x86 identity, forward-port drill, ICE sweeps, runtime prefix consistency | draft |  |
 | S11-13 | Senior compiler review of the Sprint 11-13 scope (Milestone M4) against our research, with recommended plan changes | Done | A senior compiler review of the Sprint 11-13 plan is in: M4 is plausible but needs a frozen scoring and mea... |
-| S11-14 | M4 scoring contract and measurement protocol, frozen before any tuning | In progress | Rebased by the lead; ADR-0015 is allowed (allow_protected). Fix before submit: tools/m4_score.py SEALED_ROO... |
+| S11-14 | M4 scoring contract and measurement protocol, frozen before any tuning | In progress | Owner 2026-11-12 17:00 EST ("Serial vs serial primary", accepting the lead's recommendation): (1) the six O... |
 | S11-15 | First development-corpus baseline and profile, GCC 5.1.1 vs GCC-KNC at -O2 (E7-03 part 1) | draft |  |
 | S11-16 | Long-double libm hazard audit - do other MPSS long double entry points fault like cbrtl? (E7-21, bounded) | lead | Needs a card run by the interactive lead (card turn per shared-card rules): python tools/card_run --threads... |
 | S11-17 | PGO feasibility on one complete development program (reuse of S9-18's train/use path) | draft |  |
-| S11-18 | M4 corpus harness v2 - card profiles, prefix record, held-out sealing, stronger checks, and the donor-failure rule | Tests waiting for review | Red commit 71155a3f: one new host test file, five tests. tools/run.py --name S11-18-red ran once: 11 expect... |
+| S11-18 | M4 corpus harness v2 - card profiles, prefix record, held-out sealing, stronger checks, and the donor-failure rule | Tests waiting for review | Owner 2026-11-12 17:00 EST ("Serial vs serial primary", accepting the lead's recommendation): (1) the six O... |
 | S2-01 | Design for zmm and mask registers under -march=knc | Done | The register design for KNC is settled on paper: all 32 zmm and 8 mask registers become usable under -march... |
 | S2-02 | Float and double arguments and results in zmm lane 0 | Done | Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`). |
 | S2-03 | Varargs with the donor's register save area | Done | Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`). |
@@ -225,20 +225,20 @@ Current tickets: `[###################-]` 192 of 200
 
 ## Recent activity
 
+- 2026-11-12 17:00 **S11-18** lead note: Owner 2026-11-12 17:00 EST ("Serial vs serial primary", accepting the lead's recommendation): (1) the six OpenMP programs (STREAM, NPB CG/EP/MG/IS,...
+- 2026-11-12 17:00 **S11-14** lead note: Owner 2026-11-12 17:00 EST ("Serial vs serial primary", accepting the lead's recommendation): (1) the six OpenMP programs (STREAM, NPB CG/EP/MG/IS,...
 - 2026-11-12 16:45 **S11-18** engineer red: Red commit 71155a3f: one new host test file, five tests. tools/run.py --name S11-18-red ran once: 11 expected assertion failures, no errors. Covers...
 - 2026-11-12 16:43 **S11-14** lead answer: Rebased by the lead; ADR-0015 is allowed (allow_protected). Fix before submit: tools/m4_score.py SEALED_ROOT = parents[2]/_shared/m4-sealed is righ...
 - 2026-11-12 16:43 **S11-14** lead resume: Lead set allow_protected for ADR-0015 and rebased onto main (cae042e1 red, de2b7b9f green).
 - 2026-11-12 16:42 **S11-14** lead defer: Interactive lead: (1) set allow_protected: docs/adr/0015-m4-scoring-and-measurement.md; (2) rebase s11/S11-14 (red e6516f26, green f6def2b6) onto m...
 - 2026-11-12 16:41 **S11-14** engineer ask: Implemented f6def2b6; red e6516f26 failed because m4_score was absent. Proposed ADR-0015 and scorer complete; 8 host tests pass. Logs: .work/_state...
 - 2026-11-12 16:40 **S11-16** lead defer: Needs a card run by the interactive lead (card turn per shared-card rules): python tools/card_run --threads 240 --timeout 1800 .work/_shared/S11-16...
-- 2026-11-12 16:40 **S11-11** lead note: Re-specified after the senior scope review (docs/reviews/2026-11-12-s11-s13-scope-review.md) and the owner's decisions (docs/sprints/SPRINT-11.md g...
-- 2026-11-12 16:39 **S11-16** engineer ask: b7338e18: probe built with GCC-KNC prefix, lint PASS; host enumeration/isolation/format PASS after red commit c2d26ca0. Logs: .work/_state/logs/s11...
 
 ## Cost
 
-- From the script, engineer: 466 sessions, 998.3M input tokens
+- From the script, engineer: 467 sessions, 998.9M input tokens
 - From the script, lead: 298 sessions, 85.4M input tokens
-- Started by hand, Claude: 12 sessions, 2691.9M input tokens
+- Started by hand, Claude: 12 sessions, 2693.4M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
