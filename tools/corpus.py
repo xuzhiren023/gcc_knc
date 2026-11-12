@@ -647,10 +647,13 @@ def lead(args):
                     ready = bool(peers)
                     if ready:
                         peer = folder / 'peer.tar'
+                        def peer_mode(member):
+                            member.mode = 0o755 if member.name == 'workload' else 0o644
+                            return member
                         with tarfile.open(peer, 'w') as archive:
                             for file in peers[0]['files']:
                                 if not file.endswith('.json'):
-                                    archive.add(windows_path(file), arcname=Path(file).name)
+                                    archive.add(windows_path(file), arcname=Path(file).name, filter=peer_mode)
                         files.append(str(peer))
                 elif job['program'] == 'SQLite':
                     files.append(str(stage_dir / 'input.sql'))
