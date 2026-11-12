@@ -59,7 +59,7 @@ Current tickets: `[###################-]` 187 of 190
 | S11-05 | Research - raise KNC's real memory bandwidth from about 175 GB/s toward 75-85% of peak, with a measured plan | Done | The memory-bandwidth research plan and a validated multithreaded KNC bandwidth benchmark are ready, with a ... |
 | S11-06 | Memory bandwidth - read the first card sweep, find why our numbers sit below STREAM's, and stage sweep 2 toward 264-299 GB/s | lead | Interactive lead: (1) review and commit by hand the uncommitted work in .work/S11-06 (red b57eca55; pm comm... |
 | S11-07 | S11-01 transfer tool - the card's listener gives up before card_run relays its announcement | Done | The transfer study's card listener now waits long enough for card_run to relay its address to the host; che... |
-| S11-08 | -Wknc-unsafe-cbrtl cannot be used in #pragma GCC diagnostic ("valid for  but not for C") | In progress |  |
+| S11-08 | -Wknc-unsafe-cbrtl cannot be used in #pragma GCC diagnostic ("valid for  but not for C") | Question for the tech lead | Worktree does not contain GCC source: expected gcc/config/i386/i386.opt and GCC testsuite, but this worktre... |
 | S2-01 | Design for zmm and mask registers under -march=knc | Done | The register design for KNC is settled on paper: all 32 zmm and 8 mask registers become usable under -march... |
 | S2-02 | Float and double arguments and results in zmm lane 0 | Done | Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`). |
 | S2-03 | Varargs with the donor's register save area | Done | Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`). |
@@ -215,6 +215,7 @@ Current tickets: `[###################-]` 187 of 190
 
 ## Recent activity
 
+- 2026-11-12 12:30 **S11-08** engineer ask: Worktree does not contain GCC source: expected gcc/config/i386/i386.opt and GCC testsuite, but this worktree only has config/, tests/, toolchain/, ...
 - 2026-11-12 12:25 **S11-06** lead defer: Interactive lead: (1) review and commit by hand the uncommitted work in .work/S11-06 (red b57eca55; pm commit stalled): membw fixes, sweep.sh secon...
 - 2026-11-12 12:24 **S11-06** engineer ask: Please commit pending changes (pm commit stalled; interrupted; red b57eca55), then run: python tools/card_run --benchmark --threads 240 --timeout 5...
 - 2026-11-12 12:23 **S11-07** lead approve: The transfer study's card listener now waits long enough for card_run to relay its address to the host; checked on the host, card run next. Machine...
@@ -222,13 +223,12 @@ Current tickets: `[###################-]` 187 of 190
 - 2026-11-12 12:14 **S11-07** lead answer: Split by the lead; the lead submits for the engineer.
 - 2026-11-12 12:14 **S11-07** lead resume: Lead split af43d01f into 59d54628 [red] and 160ec58a fix.
 - 2026-11-12 12:13 **S11-07** lead defer: Engineer committed red test and fix together (af43d01f); submit needs a test(...)[red] commit. Interactive lead: split af43d01f into test[red] (tes...
-- 2026-11-12 12:12 **S11-07** engineer ask: Submit is blocked because there is no test(...)[red] commit. The red test was run and failed as expected (card wait 90s vs required 60s host deadli...
 
 ## Cost
 
 - From the script, engineer: 449 sessions, 971.1M input tokens
 - From the script, lead: 285 sessions, 82.8M input tokens
-- Started by hand, Claude: 11 sessions, 2574.8M input tokens
+- Started by hand, Claude: 11 sessions, 2575.4M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
