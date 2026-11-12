@@ -128,3 +128,7 @@ trips instead), L1 distance 4 lines at about 20 streams and 2 threads/core, then
 also mounts one at `/var/volatile/tmp/COI2MB`. Only code using `MAP_HUGETLB` or those mounts gets them; THP is
 unchanged (`always`, never used). Lost at the next card reboot. Owner's instruction to both projects: start no
 new work until the owner says usage has been reset.
+
+MPSS libm `cbrtl` (long double cube root) segfaults on the card for many arguments, for example `cbrtl(1e-5)`:
+`s_cbrtl.S:178` zero-extends a negative table offset and reads 4 GiB past the table (found by GCC-KNC S10-12,
+2026-11-12). Double `cbrt` and `cbrtf` are not affected as far as we know. Avoid `cbrtl` on the card.
