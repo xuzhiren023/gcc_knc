@@ -95,17 +95,18 @@ class TransferIntegrity(unittest.TestCase):
         args = type('Args', (), dict(repeats=3, sizes=(1048576, 4096),
             loads=('busy240',), concurrency=(1, 2), methods=('pipe', 'scp', 'tar')))()
         trials = list(transfer.plan(args))
-        self.assertEqual(len(trials), 8)
+        self.assertEqual(len(trials), 16)
         self.assertEqual(trials[:4], [
             (1, 'busy240', 'pipe', 1048576, 'up', 3),
             (1, 'busy240', 'pipe', 1048576, 'down', 3),
             (1, 'busy240', 'pipe', 4096, 'up', 3),
             (1, 'busy240', 'pipe', 4096, 'down', 3)])
-        self.assertEqual({trial[0] for trial in trials[4:]}, {2})
-        self.assertEqual({trial[2] for trial in trials[4:]}, {'pipe'})
+        self.assertEqual({trial[0] for trial in trials[12:]}, {2})
+        self.assertEqual({trial[2] for trial in trials[12:]}, {'pipe'})
         self.assertEqual({trial[1] for trial in trials}, {'busy240'})
         self.assertEqual({trial[3] for trial in trials}, {1048576, 4096})
         self.assertEqual({trial[5] for trial in trials}, {3})
+        self.assertEqual({trial[4] for trial in trials}, {'up', 'down'})
 
     def test_run_options_parse(self):
         with mock.patch.object(sys, 'argv', ['host_card_transfer.py', 'run', '--config', 'c',
