@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-12 17:19.
+Updated automatically at every ticket change. Last update: 2026-11-12 17:20.
 
 **Waiting for you:** S11-02. Run `python tools/pm.py inbox`.
 
@@ -60,7 +60,7 @@ Current tickets: `[###################-]` 193 of 201
 | S11-06 | Memory bandwidth - read the first card sweep, find why our numbers sit below STREAM's, and stage sweep 2 toward 264-299 GB/s | Done | The memory-bandwidth benchmark now times only the worker passes and has a corrected long-sample baseline on... |
 | S11-07 | S11-01 transfer tool - the card's listener gives up before card_run relays its announcement | Done | The transfer study's card listener now waits long enough for card_run to relay its address to the host; che... |
 | S11-08 | -Wknc-unsafe-cbrtl cannot be used in #pragma GCC diagnostic ("valid for  but not for C") | Done | The cbrtl warning can now be silenced around one deliberate call with #pragma GCC diagnostic in C and C++; ... |
-| S11-09 | Memory bandwidth for LLM decode - a weight-streaming GEMV workload, pushed toward 264-299 GB/s of weight bytes | In progress | S11-09 is gcc: no, so there is no knc rebase: the knc ref is the GCC tree's branch (.work/_shared/gcc), not... |
+| S11-09 | Memory bandwidth for LLM decode - a weight-streaming GEMV workload, pushed toward 264-299 GB/s of weight bytes | Waiting for review | Submitted by the lead for the engineer after rebasing onto main (sandbox cannot rebase). Analysis 5ed0012f:... |
 | S11-10 | S11-01 transfer runner - choose repetitions, sizes and load states per run, so slow methods fit a card turn | Done | The transfer runner now takes --repeats, --sizes, --loads and --concurrency so a slow method fits a card tu... |
 | S11-11 | M4 corpus run harness - every corpus program built by GCC 5.1.1 and GCC-KNC, run on the card with frozen inputs and a correctness check, in one command | Done | The M4 corpus harness builds 17 programs with GCC 5.1.1 and GCC-KNC and stages checked card runs; GCC-KNC b... |
 | S11-12 | Sprint 11 batch check - full native suite, x86 identity, forward-port drill, ICE sweeps, runtime prefix consistency | draft |  |
@@ -226,6 +226,7 @@ Current tickets: `[###################-]` 193 of 201
 
 ## Recent activity
 
+- 2026-11-12 17:20 **S11-09** engineer submit: Submitted by the lead for the engineer after rebasing onto main (sandbox cannot rebase). Analysis 5ed0012f: GEMV fp32 125.3, fp16 87.3, int8 70.0 G...
 - 2026-11-12 17:19 **S11-18** lead changes: Profiles, sealing, serial-vs-serial voting, the HPCG staged fix, the SQLite fallback and the runtime-prefix record are right, and the tests are pro...
 - 2026-11-12 17:19 **S11-09** lead answer: S11-09 is gcc: no, so there is no knc rebase: the knc ref is the GCC tree's branch (.work/_shared/gcc), not this repo's. Rebase on main instead: gi...
 - 2026-11-12 17:17 **S11-09** engineer ask: Ready to submit 9c1880f2 with the approved test/code override; no changes or repeat tests in this continuation. AGENTS.md requires rebasing on knc ...
@@ -233,13 +234,12 @@ Current tickets: `[###################-]` 193 of 201
 - 2026-11-12 17:15 **S11-09** lead answer: Approved: the test/code ratio is a path artefact (the benchmark itself, membw.c and sweep.sh, lives under tests/bench/membw, so it counts as test l...
 - 2026-11-12 17:15 **S11-09** lead note: Card GEMV sweep 2026-11-12 21:41-21:57Z (boot da3144f1, benchmark mode, 240 CPUs granted, 55 cases): raw output .work/_shared/tmp/claude-next28/mem...
 - 2026-11-12 17:14 **S11-09** engineer ask: Analysis committed at 9c1880f2. Native log .work/_shared/tmp/claude-next28/membw-gemv.out has 55/55 valid cases. Submit blocks on 413 test lines ve...
-- 2026-11-12 17:13 **S11-18** lead answer: Size approved: 943 lines covers six spec items, and 278 of them are the approved test file and 218 a README rewrite, so no split. Run pm.py submit ...
 
 ## Cost
 
 - From the script, engineer: 474 sessions, 1006.1M input tokens
 - From the script, lead: 305 sessions, 87.6M input tokens
-- Started by hand, Claude: 12 sessions, 2713.4M input tokens
+- Started by hand, Claude: 12 sessions, 2716.4M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
