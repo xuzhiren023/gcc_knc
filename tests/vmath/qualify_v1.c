@@ -155,6 +155,20 @@ static struct special annex_f(double a, double b) {
 #undef pi
 }
 
+/* MPSS libm's s_cbrtl.S:178 zero-extends a negative table offset through ecx
+   (cbrtl+0xea, fldt (%rdx,%rcx,1)), addressing 4 GiB beyond the table. Keep
+   its argument in [1,8), then undo the exact power-of-two scaling. */
+static long double screen_cbrt(long double a) {
+  if (!isfinite(a) || a == 0) return a;
+  int exponent;
+  long double mantissa = 2 * frexpl(fabsl(a), &exponent);
+  --exponent;
+  int remainder = exponent % 3;
+  if (remainder < 0) remainder += 3;
+  long double root = cbrtl(ldexpl(mantissa, remainder));
+  return copysignl(ldexpl(root, (exponent - remainder) / 3), a);
+}
+
 /* Both oracles: the error of out in ULPs of the reference, or -1 where the reference overflows or
    out is not finite, and only the correctly rounded value will do. */
 static long double screen_error(double a, double b, double out, struct special s) {
@@ -171,7 +185,7 @@ static long double screen_error(double a, double b, double out, struct special s
   case COSH: ref = coshl(a); break;
   case ACOS: ref = acosl(a); break;
   case ASIN: ref = asinl(a); break;
-  case CBRT: ref = cbrtl(a); break;
+  case CBRT: ref = screen_cbrt(a); break;
   case ERF: ref = erfl(a); break;
   case ERFC: ref = erfcl(a); break;
   case EXP2: ref = exp2l(a); break;
