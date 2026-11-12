@@ -2,7 +2,7 @@
 """The project board. Tickets in work/tickets/ are the only channel between agents.
 
 Engineer:  start ID | commit ID -m M | red ID --note N | submit ID --note N [--override WHY] | ask ID TEXT
-Lead:      approve ID [--note N] | changes ID TEXT | answer ID TEXT
+Lead:      approve ID [--note N] | changes ID TEXT | answer ID TEXT | defer ID TEXT | resume ID TEXT
 Owner:     decide ID TEXT
 Anyone:    board | status | show ID | inbox | usage | escalate ID TEXT
 """
@@ -342,8 +342,10 @@ def submit_problems(board, ticket, cwd):
                     % (test_added, code_added))
 
     hash_rx = re.compile(policy["hash_in_diff"], re.I)
+    # A ticket whose deliverable hashes payloads names those paths in hash_ok, set by the lead (S11-01).
+    hash_ok = re.compile(ticket.fields["hash_ok"]) if ticket.fields.get("hash_ok") else None
     for path, text in added_lines(run_git("diff", "-U0", base + "...HEAD", cwd=cwd)):
-        if hash_rx.search(text):
+        if hash_rx.search(text) and not (hash_ok and hash_ok.search(path)):
             hard.append("hashing added in %s: %s" % (path, text.strip()[:80]))
             break
     return hard, soft
@@ -580,6 +582,27 @@ def cmd_escalate(board, args):
     print(ticket.id + ": sent to the owner")
 
 
+def cmd_defer(board, args):
+    """A scripted lead hands a ticket to the interactive lead (card run, hand commit, harness change), not to
+    the owner, whose inbox is for the owner's decisions (2026-11-12: S10-12 and S11-01 landed there twice)."""
+    require_role("lead")
+    ticket = board.load(args.id)
+    if ticket.state in ("done", "owner", "lead"):
+        raise Refused("%s is already %s" % (ticket.id, ticket.state))
+    ticket.fields.update(state="lead", resume=ticket.state)
+    ticket.save("defer", limit_text(board, args.text))
+    print(ticket.id + ": waits for the interactive lead")
+
+
+def cmd_resume(board, args):
+    require_role("lead")
+    ticket = board.load(args.id)
+    require_state(ticket, "lead")
+    ticket.fields["state"] = ticket.fields.pop("resume", "doing")
+    ticket.save("resume", args.text)
+    print("%s: back to %s" % (ticket.id, ticket.state))
+
+
 def cmd_decide(board, args):
     require_role("owner")
     ticket = board.load(args.id)
@@ -599,6 +622,9 @@ def cmd_board(board, _args):
     waiting = [t.id for t in tickets if t.state == "owner"]
     if waiting:
         print("Waiting for the owner: " + ", ".join(waiting))
+    lead = [t.id for t in tickets if t.state == "lead"]
+    if lead:
+        print("Waiting for the interactive lead: " + ", ".join(lead))
 
 
 def cmd_status(board, _args):
@@ -662,7 +688,8 @@ def parser():
     add("submit", cmd_submit, ident, ("--note", {"required": True}), ("--override", {}))
     add("approve", cmd_approve, ident, ("--note", {}))
     for name, func in (("changes", cmd_changes), ("ask", cmd_ask), ("answer", cmd_answer),
-                       ("escalate", cmd_escalate), ("decide", cmd_decide)):
+                       ("escalate", cmd_escalate), ("decide", cmd_decide),
+                       ("defer", cmd_defer), ("resume", cmd_resume)):
         add(name, func, ident, ("text", {}))
     return top
 

@@ -33,15 +33,15 @@ Run: python tools/pm.py show {id}
 {task}
 Read only what you need: the ticket, git log and git diff main...{branch}. Rerun something only if you doubt it.
 For gcc: yes tickets also review git -C .work/_shared/gcc diff knc...{branch} and git -C .work/_shared/gcc log knc..{branch}.
-You cannot edit files or run tools/check, so never promise either. A soft budget (size, test files, test ratio) is passed with submit --override '<reason>'. A ticket field, a protected file or a check you cannot run needs the interactive lead: say so, or escalate.
+You cannot edit files or run tools/check, so never promise either. A soft budget (size, test files, test ratio) is passed with submit --override '<reason>'. A card run, a commit by hand, a ticket field, a harness or policy change, a protected file or a check you cannot run needs the interactive lead: run pm.py defer saying exactly what is needed. pm.py escalate goes to the owner, only for the owner's decisions (sprint scope, milestones, card time, pushing).
 Finish with one pm.py command, run as plain `python tools/pm.py ...`: PM_ROLE is already set, and a prefix is refused. On approve, the --note is read by the project manager: say in one plain sentence what now works. Your final message is only the "PM update:" line it prints."""
 
 LEAD_TASKS = {
     "review": "Review per docs/DEVELOPMENT_CYCLE.md section 7, then run pm.py approve, or pm.py changes with numbered findings, each with file:line. "
               "If an acceptance line names a step the interactive lead runs (an x86 check by the lead, a card run before approval) "
-              "and the ticket does not yet record its result, do not approve: run pm.py escalate saying which result is missing.",
+              "and the ticket does not yet record its result, do not approve: run pm.py defer saying which result is missing.",
     "red-review": "Check that the failing tests prove the acceptance criteria and fail for the right reason, then run pm.py approve or pm.py changes.",
-    "blocked": "Answer the question with pm.py answer, or send it to the owner with pm.py escalate if it is the owner's decision.",
+    "blocked": "Answer the question with pm.py answer; run pm.py defer if only the interactive lead can settle it, or pm.py escalate if it is the owner's decision.",
 }
 
 
@@ -297,7 +297,7 @@ def main(argv=None):
     args = parser.parse_args(argv)
     board = pm.Board()
     for _ in range(args.max_sessions):
-        if any(t.state == "owner" and args.lane in (None, pm.lane_of(t)) for t in board.tickets()):
+        if any(t.state in ("owner", "lead") and args.lane in (None, pm.lane_of(t)) for t in board.tickets()):
             break
         level, message = storage.check(board.root, board.policy)
         if level != "ok":

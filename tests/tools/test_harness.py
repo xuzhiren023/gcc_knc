@@ -212,6 +212,32 @@ class Flow(Sandbox):
         self.assertEqual(self.pm("decide", "A-1", "yes", role="owner").returncode, 0)
         self.assertEqual(self.state("A-1"), "doing")
 
+    def test_defer_waits_for_the_interactive_lead_not_the_owner(self):
+        self.pm("start", "A-1")
+        self.assertIn("belongs to", self.pm("defer", "A-1", "card run").stdout)
+        self.assertEqual(self.pm("defer", "A-1", "card run", role="lead").returncode, 0)
+        self.assertEqual(self.state("A-1"), "lead")
+        board = self.pm("board").stdout
+        self.assertIn("Waiting for the interactive lead: A-1", board)
+        self.assertNotIn("Waiting for the owner", board)
+        self.assertIn("Nothing needs the owner", self.pm("inbox").stdout)
+        self.assertEqual(self.pm("resume", "A-1", "card PASS", role="lead").returncode, 0)
+        self.assertEqual(self.state("A-1"), "doing")
+
+    def test_hash_ok_exempts_only_the_named_paths(self):
+        self.pm("start", "A-1")
+        wt = self.worktree("A-1")
+        self.commit_file("tests/regress/t.py", "assert False\n", "test(A-1): x [red]", wt)
+        self.commit_file("tools/xfer.py", "import hashlib\n", "feat(A-1): x", wt)
+        self.assertIn("hashing added in tools/xfer.py", self.pm("submit", "A-1", "--note", "n", cwd=wt).stdout)
+        path = os.path.join(self.root, "work", "tickets", "A-1.md")
+        with open(path, encoding="utf8") as f:
+            text = f.read()
+        with open(path, "w", newline="\n") as f:
+            f.write(text.replace("deps:", "hash_ok: ^tools/xfer\\.py$\ndeps:", 1))
+        self.git("commit", "-qam", "hash_ok")
+        self.assertEqual(self.pm("submit", "A-1", "--note", "n", cwd=wt).returncode, 0)
+
     def test_dependencies_and_wip_limit_hold(self):
         self.assertIn("cannot start", self.pm("start", "A-2").stdout)
 
