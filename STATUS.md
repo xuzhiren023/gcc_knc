@@ -54,7 +54,7 @@ Current tickets: `[###################-]` 182 of 185
 | S10-13 | User story - code that calls cbrtl under -march=knc gets a safe replacement and a compile-time warning (MPSS libm cbrtl faults) | In progress | Tree 1 is built at GCC 157940608ed by the lead (gcc_build.py exit 0; log S10_13_lead_build-20261112-093315.... |
 | S11-01 | User story - the best way to move data between the host and the card, measured, and how our projects use it | Done | We now have a sourced inventory of every host-card transfer path that works without changing MPSS (SSH, tar... |
 | S11-02 | card_run and run_suite move data by S11-01's recommended method, with fallback | **Waiting for you** | Started by mistake: the ticket was 'ready' as a placeholder and became startable when S11-01 closed. The en... |
-| S11-03 | S11-01 transfer tool rejects the card's physical /tmp path, so the native study never starts | Question for the tech lead | Lead reviewed and committed 151a98bd [red] and fcb157ec. |
+| S11-03 | S11-01 transfer tool rejects the card's physical /tmp path, so the native study never starts | In progress | Committed by the lead; the lead submits for the engineer. |
 | S2-01 | Design for zmm and mask registers under -march=knc | Done | The register design for KNC is settled on paper: all 32 zmm and 8 mask registers become usable under -march... |
 | S2-02 | Float and double arguments and results in zmm lane 0 | Done | Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`). |
 | S2-03 | Varargs with the donor's register save area | Done | Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`). |
@@ -210,6 +210,7 @@ Current tickets: `[###################-]` 182 of 185
 
 ## Recent activity
 
+- 2026-11-12 10:31 **S11-03** lead answer: Committed by the lead; the lead submits for the engineer.
 - 2026-11-12 10:31 **S11-03** lead resume: Lead reviewed and committed 151a98bd [red] and fcb157ec.
 - 2026-11-12 10:30 **S10-13** lead answer: Tree 1 is built at GCC 157940608ed by the lead (gcc_build.py exit 0; log S10_13_lead_build-20261112-093315.log). Do not build (AGENTS.md, owner 202...
 - 2026-11-12 10:30 **S10-13** lead resume: Lead built tree 1 at 157940608ed (log S10_13_lead_build-20261112-093315.log, exit 0).
@@ -217,7 +218,6 @@ Current tickets: `[###################-]` 182 of 185
 - 2026-11-12 09:50 **S11-03** engineer ask: Host suite PASS: .work/_state/logs/S11_03_host-20261112-094922.log. Card lease fix uses realpath(/tmp), exact /claude/claude-<32 lowercase hex> val...
 - 2026-11-12 09:46 **S11-03** owner decide: Owner standing rule (feedback 2026-11-09/10: the lead raises session budgets itself): sessions raised to 5, first extension. The host fix exists un...
 - 2026-11-12 09:45 **S11-03** engineer escalate: budget: 3 engineer sessions used; the budget is 3
-- 2026-11-12 09:45 **S10-13** lead note: Interactive lead is building tree 1 at GCC 157940608ed (python tools/gcc_build.py, log S10_13_lead_build-*). Cause of the EACCES: earlier interacti...
 
 ## Cost
 
