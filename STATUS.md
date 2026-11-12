@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-12 15:59.
+Updated automatically at every ticket change. Last update: 2026-11-12 16:00.
 
 **Waiting for you:** S11-02. Run `python tools/pm.py inbox`.
 
@@ -61,7 +61,7 @@ Current tickets: `[###################-]` 189 of 194
 | S11-07 | S11-01 transfer tool - the card's listener gives up before card_run relays its announcement | Done | The transfer study's card listener now waits long enough for card_run to relay its address to the host; che... |
 | S11-08 | -Wknc-unsafe-cbrtl cannot be used in #pragma GCC diagnostic ("valid for  but not for C") | Done | The cbrtl warning can now be silenced around one deliberate call with #pragma GCC diagnostic in C and C++; ... |
 | S11-09 | Memory bandwidth for LLM decode - a weight-streaming GEMV workload, pushed toward 264-299 GB/s of weight bytes | lead | Needs interactive lead: card run in our exclusive turn. Reviewed 33de9541: IMCI sint8/float16 load conversi... |
-| S11-10 | S11-01 transfer runner - choose repetitions, sizes and load states per run, so slow methods fit a card turn | In progress | Yes: commit (pm.py commit) and submit source and tests only, without the exe. transfer_bench.c changed, so ... |
+| S11-10 | S11-01 transfer runner - choose repetitions, sizes and load states per run, so slow methods fit a card turn | Waiting for review | Test passed: tools/run.py s11_10_review_fixes; log C:\Users\xuzhi\Documents\gcc_knc\.work\_state\logs\s11_1... |
 | S11-11 | M4 corpus run harness - every corpus program built by GCC 5.1.1 and GCC-KNC, run on the card with frozen inputs and a correctness check, in one command | In progress | The corpus harness now has a failing host contract that pins the S0-07 program set (held-out adi, durbin an... |
 | S11-13 | Senior compiler review of the Sprint 11-13 scope (Milestone M4) against our research, with recommended plan changes | In progress |  |
 | S2-01 | Design for zmm and mask registers under -march=knc | Done | The register design for KNC is settled on paper: all 32 zmm and 8 mask registers become usable under -march... |
@@ -219,6 +219,7 @@ Current tickets: `[###################-]` 189 of 194
 
 ## Recent activity
 
+- 2026-11-12 16:00 **S11-10** engineer submit: Test passed: tools/run.py s11_10_review_fixes; log C:\Users\xuzhi\Documents\gcc_knc\.work\_state\logs\s11_10_review_fixes-20261112-155732.log. No c...
 - 2026-11-12 15:59 **S11-10** lead answer: Yes: commit (pm.py commit) and submit source and tests only, without the exe. transfer_bench.c changed, so the staged transfer-host.exe is now stal...
 - 2026-11-12 15:58 **S11-10** engineer ask: Review fixes applied and tests pass. S11-01 transfer-host.exe is still locked; restage failed with Device/resource busy and PermissionError. The ti...
 - 2026-11-12 15:57 **S11-11** lead approve-red: The corpus harness now has a failing host contract that pins the S0-07 program set (held-out adi, durbin and bzip2 split off by program name), pair...
@@ -226,13 +227,12 @@ Current tickets: `[###################-]` 189 of 194
 - 2026-11-12 15:55 **S11-10** owner decide: Owner standing rule (feedback 2026-11-09/10): session budget raised to 5. The ticket progressed (submitted at 15:30, three review findings at 15:54...
 - 2026-11-12 15:55 **S11-10** engineer escalate: budget: 3 engineer sessions used; the budget is 3
 - 2026-11-12 15:54 **S11-10** lead changes: 1. tests/tools/test_host_card_transfer.py:21 builds into a temp dir, but test_loopback_and_integrity (line 28) still runs transfer.OUT/'transfer-ho...
-- 2026-11-12 15:30 **S11-10** engineer submit: Options and plan tested: red 4c6c5b74 against missing plan; green tools/run.py s11_10_options_green, log C:\Users\xuzhi\Documents\gcc_knc\.work\_st...
 
 ## Cost
 
 - From the script, engineer: 460 sessions, 983.1M input tokens
 - From the script, lead: 293 sessions, 84.1M input tokens
-- Started by hand, Claude: 12 sessions, 2663.5M input tokens
+- Started by hand, Claude: 12 sessions, 2665.5M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
