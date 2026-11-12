@@ -75,12 +75,14 @@ refined when they come near.
 | | **S5** | Conversions, gather/scatter, permutes, reductions, and correct division and square root | |
 | | **S6** | Machine characterization, cost model v1, scheduler v0, per-loop reports, first GCC vect testsuite baseline | **M2** |
 | **M3** Runtimes | **S7** | Shared libgcc and a libgfortran slice | |
-| | **S8** | libgomp, TLS, and MPI Fortran bindings | |
-| | **S9** | The libstdc++ the corpus needs, including exceptions and atomics | **M3** |
-| **M4** Broad optimization | **S10** | Vector math v0 and a documented vector function ABI | |
-| | **S11–12** | Optimization work ranked by corpus-wide profiles, scalar and vector, compared with GCC 5.1.1 | **M4** |
-| **M5** Program corpus | **S13–14** | The full corpus built and run, with matched benchmarks, and the corpus widened | |
-| **M6** Release | **S15+** | Packaging, documentation, known-limits list and update procedure | |
+| | **S8** | Tuning block: the M2 weak spots (short lengths, prefetch, mat8/mat16, code-shape wins) | |
+| | **S9** | libgomp and libstdc++ on the card (exceptions, RTTI, threads, atomics) | **M3** (accepted 2026-11-11) |
+| | **S10** | 512-bit vector ABI, libknc_vmath v0/v1a/v1b and loops calling it, correctly rounded V8DF div/sqrt, card-only vmath fixes, safe `cbrtl` | |
+| **M4** Broad optimization | **S11–13** | Host-card transfer best practice; optimization ranked by corpus-wide profiles, scalar and vector (scheduling, prefetch, alignment, PGO, `-mphinix`), compared with GCC 5.1.1 | **M4** |
+| **M5** Program corpus | **S14–15** | The full corpus built and run, with matched benchmarks, and the corpus widened (llama.cpp, WRF) | |
+| **M6** Release | **S16** | Packaging, documentation, known-limits list and update procedure | |
+
+Updated 2026-11-12 to match `work/milestones.json`: Sprint 8 became a tuning block, the runtimes ran through Sprint 10, and later sprints moved by one.
 
 M2 to M4 can overlap where dependencies allow. Runtime investigation, for example, can
 start before S6 ends.
