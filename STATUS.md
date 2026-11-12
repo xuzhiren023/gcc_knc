@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-12 11:24.
+Updated automatically at every ticket change. Last update: 2026-11-12 11:25.
 
 **Waiting for you:** S11-02. Run `python tools/pm.py inbox`.
 
@@ -56,7 +56,7 @@ Current tickets: `[###################-]` 184 of 187
 | S11-02 | card_run and run_suite move data by S11-01's recommended method, with fallback | **Waiting for you** | Started by mistake: the ticket was 'ready' as a placeholder and became startable when S11-01 closed. The en... |
 | S11-03 | S11-01 transfer tool rejects the card's physical /tmp path, so the native study never starts | Done | The transfer study's tool now accepts the card's real /tmp location (/var/volatile/tmp), so its card run ca... |
 | S11-04 | S11-01 transfer tool - the host opens every connection, because Windows Firewall blocks inbound TCP from the card | Done | The transfer study's host side now opens every connection to the card, so Windows Firewall no longer blocks... |
-| S11-05 | Research - raise KNC's real memory bandwidth from about 175 GB/s toward 75-85% of peak, with a measured plan | Changes requested | The research doc is accepted as written. The benchmark needs two fixes before it is worth card time. |
+| S11-05 | Research - raise KNC's real memory bandwidth from about 175 GB/s toward 75-85% of peak, with a measured plan | In progress | The research doc is accepted as written. The benchmark needs two fixes before it is worth card time. |
 | S2-01 | Design for zmm and mask registers under -march=knc | Done | The register design for KNC is settled on paper: all 32 zmm and 8 mask registers become usable under -march... |
 | S2-02 | Float and double arguments and results in zmm lane 0 | Done | Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`). |
 | S2-03 | Varargs with the donor's register save area | Done | Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`). |
@@ -231,4 +231,4 @@ Current tickets: `[###################-]` 184 of 187
 
 ## Disk
 
-The project uses 24.6 GiB of 100 GiB. 93 GiB free on the drive.
+The project uses 24.6 GiB of 100 GiB. 92 GiB free on the drive.
