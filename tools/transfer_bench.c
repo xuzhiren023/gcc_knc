@@ -13,6 +13,7 @@
 #include <sys/socket.h>
 #include <sys/types.h>
 #include <sys/resource.h>
+#include <sys/stat.h>
 #include <sys/wait.h>
 #include <arpa/inet.h>
 #include <netinet/tcp.h>
@@ -291,6 +292,135 @@ static int trial(int host,const char *method,const char *direction,uint64_t size
   return 0;
 }
 
+/* Production files use the same bounded allocation and receiver-pull handshake
+   as the S11-01 trial. The card listens; Windows only connects out. Neither
+   endpoint publishes a pathname: the guarded Python policy does that after
+   comparing both reports. Interface source: MPSS 3.7 scif.h RMA contracts. */
+static void file_io(int fd,void *data,size_t size,int writing)
+{
+  unsigned char *p=data;
+  while(size) {
+    ssize_t n=writing?write(fd,p,size):read(fd,p,size);
+    if(n<0 && errno==EINTR && !cancelled)continue;
+    if(n<=0)die("integrity: short file IO");
+    p+=n;size-=(size_t)n;
+  }
+}
+static int file_digest(const char *path)
+{
+  unsigned char buf[65536],digest[32];char hex[65];sha256 hash;uint64_t size=0;
+  int fd=open(path,O_RDONLY|O_NOFOLLOW);struct stat st;
+  if(fd<0 || fstat(fd,&st) || !S_ISREG(st.st_mode))die("digest regular file");
+  sha_init(&hash);
+  for(;;) {
+    ssize_t n=read(fd,buf,sizeof(buf));
+    if(n<0 && errno==EINTR)continue;
+    if(n<0)die("digest read");
+    if(!n)break;
+    sha_add(&hash,buf,(size_t)n);size+=(uint64_t)n;
+  }
+  if(close(fd))die("digest close");
+  sha_end(&hash,digest);sha_hex(digest,hex);
+  printf("{\"bytes\":%"PRIu64",\"sha256\":\"%s\"}\n",size,hex);return 0;
+}
+static int transfer_file(int host,const char *method,const char *address,unsigned port,
+                         const char *nonce,uint64_t size,const char *direction,const char *path)
+{
+  int sender=(!strcmp(direction,"up"))==host,dma=!strcmp(method,"scif-read");
+  int fd=open(path,sender?(O_RDONLY|O_NOFOLLOW):(O_WRONLY|O_CREAT|O_EXCL|O_NOFOLLOW),0600);
+  struct stat st;
+  if(fd<0 || fstat(fd,&st) || !S_ISREG(st.st_mode))die("regular transfer file");
+  if(sender && (uint64_t)st.st_size!=size)die("integrity: source length");
+  double started=now(WALL_CLOCK),elapsed=0;
+  /* Reverse the benchmark's server role for production: the card listens. */
+  connect_transport(method,address,port,!host);
+  char auth[32];
+  if(host){exact((void*)nonce,32,1);token('N',0);}
+  else {exact(auth,32,0);if(memcmp(auth,nonce,32))die("nonce mismatch");token('N',1);}
+  uint64_t agreed=size,peer_offset=0;
+  if(host){exact(&agreed,8,1);token('L',0);}
+  else {exact(&agreed,8,0);if(agreed!=size)die("integrity: declared length");token('L',1);}
+  window_size=size<64*1024*1024?(size_t)size:64*1024*1024;
+  if(!window_size)window_size=4096;
+  window_size=(window_size+4095)&~(size_t)4095;
+#ifdef __CYGWIN__
+  window=VirtualAlloc(NULL,window_size,MEM_RESERVE|MEM_COMMIT,PAGE_READWRITE);
+  if(!window)die("VirtualAlloc");
+#else
+  if(posix_memalign(&window,4096,window_size))die("aligned allocation");
+#endif
+  if(dma) {
+    local_offset=sc.reg(ep,window,window_size,0,sender?1:2,0);
+    if(local_offset<0)die("register");
+    registered=1;
+    uint64_t mine=(uint64_t)local_offset;
+    if(host){exact(&mine,8,1);exact(&peer_offset,8,0);}
+    else{exact(&peer_offset,8,0);exact(&mine,8,1);}
+    if(peer_offset>(UINT64_C(1)<<62)-window_size || (peer_offset&4095))die("remote offset range");
+  }
+  sha256 hash;unsigned char digest[32],peer_digest[32];char hex[65];sha_init(&hash);
+  for(uint64_t off=0;off<size;) {
+    size_t n=size-off>window_size?window_size:(size_t)(size-off);
+    if(sender) {
+      file_io(fd,window,n,0);sha_add(&hash,window,n);
+      if(dma && (n&63))memset((unsigned char*)window+n,0,64-(n&63));
+      token('S',1);token('R',0);
+    } else {token('S',0);token('R',1);}
+    double t=now(WALL_CLOCK);
+    if(dma) {
+      if(!sender) {
+        /* RMA tails are cache-line aligned inside the page-rounded window;
+           only the exact file bytes enter the digest and destination file. */
+        size_t dma_bytes=(n+63)&~(size_t)63;
+        if(sc.read(ep,local_offset,dma_bytes,(int64_t)peer_offset,4))die("synchronous read");
+        token('D',1);
+      } else token('D',0);
+    } else exact(window,n,sender);
+    token('A',!sender);
+    elapsed+=now(WALL_CLOCK)-t;
+    if(!sender){sha_add(&hash,window,n);file_io(fd,window,n,1);}
+    off+=n;
+  }
+  if(sender) {
+    unsigned char extra;ssize_t n=read(fd,&extra,1);
+    if(n!=0 || fstat(fd,&st) || (uint64_t)st.st_size!=size)die("integrity: source length changed");
+  } else if(fstat(fd,&st) || (uint64_t)st.st_size!=size)die("integrity: destination length");
+  if(close(fd))die("file close");
+  sha_end(&hash,digest);sha_hex(digest,hex);
+  if(host){exact(digest,32,1);exact(peer_digest,32,0);}
+  else{exact(peer_digest,32,0);exact(digest,32,1);}
+  if(memcmp(digest,peer_digest,32))die("integrity: digest mismatch");
+  /* Each endpoint confirms it compared the digests before either unregisters. */
+  if(host){token('V',1);token('V',0);}else{token('V',0);token('V',1);}
+  if(registered) {
+    if(sc.unreg(ep,local_offset,window_size))die("unregister; cleanup uncertain");
+    registered=0;
+  }
+  if(host){token('Q',1);token('Q',0);token('Z',1);}
+  else{token('Q',0);token('Q',1);token('Z',0);}
+  if(opened) {
+    /* The client waits for the server's orderly close, as in S11-01. */
+    if(host) {
+      double deadline=now(WALL_CLOCK)+120;char c;
+      for(;;) {
+        int r=sc.recv(ep,&c,1,0);
+#ifdef __CYGWIN__
+        if(r<0)errno=*native_errno();
+#endif
+        if(r<0 && errno!=EAGAIN && errno!=EWOULDBLOCK)break;
+        if(r>0 || now(WALL_CLOCK)>deadline)die("close handshake");
+        usleep(1000);
+      }
+    }
+    if(sc.close(ep))die("close; cleanup uncertain");
+    opened=0;
+  }
+  fprintf(stderr,"{\"file_complete\":true,\"bytes\":%"PRIu64",\"sha256\":\"%s\","
+          "\"digest_match\":true,\"cleanup_confirmed\":true,\"seconds\":%.9f,\"wall_seconds\":%.9f}\n",
+          size,hex,elapsed,now(WALL_CLOCK)-started);
+  return 0;
+}
+
 static int file_payload(int generate,const char *path,uint64_t size,unsigned seed)
 {
   unsigned char *data=malloc(1048576),digest[32];char hex[65];sha256 hash;
@@ -387,6 +517,18 @@ static int lease(const char *address,unsigned port,const char *nonce)
 int main(int argc,char **argv)
 {
   signal(SIGPIPE,SIG_IGN);signal(SIGINT,stop);signal(SIGTERM,stop);atexit(cleanup);
+  /* Availability probe deliberately opens no endpoint and registers no pages. */
+  if(argc==2 && !strcmp(argv[1],"scif-probe")){scif_load();return 0;}
+  if(argc==3 && !strcmp(argv[1],"digest"))return file_digest(argv[2]);
+  if(argc==10 && !strcmp(argv[1],"file")) {
+    int host=!strcmp(argv[2],"host");
+    if(!host && strcmp(argv[2],"card"))die("file role");
+    if(strcmp(argv[3],"pipe") && strcmp(argv[3],"scif-read"))die("file method");
+    if(strlen(argv[6])!=32 || strspn(argv[6],"0123456789abcdef")!=32)die("nonce");
+    if(strcmp(argv[8],"up") && strcmp(argv[8],"down"))die("direction");
+    return transfer_file(host,argv[3],argv[4],(unsigned)number(argv[5],65535),argv[6],
+                         number(argv[7],INT64_MAX),argv[8],argv[9]);
+  }
 #ifdef __CYGWIN__
   /* Native scp -S invokes this executable as its SSH client. The runner supplies
      a guarded, validated prefix, keeping the remote scp process measurable. */

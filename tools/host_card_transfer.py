@@ -40,12 +40,15 @@ def command(argv):
     subprocess.run([v.as_posix() if isinstance(v, Path) else str(v) for v in argv], env=ENV, check=True)
 
 
-def build(host_only=False, card_only=False):
-    OUT.mkdir(parents=True, exist_ok=True)
+def build(host_only=False, card_only=False, production=False):
+    out = SHARED / 'S11-02' if production else OUT
+    host_name = 'claude-transfer.exe' if production else 'transfer-host.exe'
+    card_name = 'claude-transfer.mic' if production else 'transfer-card.mic'
+    out.mkdir(parents=True, exist_ok=True)
     flags = ['-O2', '-std=gnu11', '-Wall', '-Wextra', '-pthread']
     if not card_only:
         command([TC / 'cygwin/bin/gcc.exe', *flags, HERE / 'transfer_bench.c',
-                 '-o', OUT / 'transfer-host.exe'])
+                 '-o', out / host_name])
     if host_only:
         return
     import storage
@@ -55,12 +58,86 @@ def build(host_only=False, card_only=False):
     command([prefix / 'bin/k1om-mpss-linux-gcc.exe',
              '--sysroot=' + (TC / 'sysroot').as_posix(), *flags, '-march=knc',
              '-fno-tree-vectorize', HERE / 'transfer_bench.c', '-ldl',
-             '-o', OUT / 'transfer-card.mic'])
-    command([sys.executable, HERE / 'knc_lint', OUT / 'transfer-card.mic'])
+             '-o', out / card_name])
+    command([sys.executable, HERE / 'knc_lint', out / card_name])
+    if production:
+        command([TC / 'cygwin/bin/chmod.exe', '755', out / card_name])
+        stage_production_validation(out)
+        print('STAGED (no card execution): ' + str(out))
+        return
     for name in ('host_card_transfer.py', 'transfer-card.sh'):
         shutil.copyfile(HERE / name, OUT / name)
     command([TC / 'cygwin/bin/chmod.exe', '755', OUT / 'transfer-card.mic', OUT / 'transfer-card.sh'])
     print('STAGED (no card execution): ' + str(OUT))
+
+
+def stage_production_validation(out):
+    """Leave commands for the lead; building never connects to the card."""
+    (out / 'claude-check.sh').write_text('#!/bin/sh\ntest -f claude-payload\n', encoding='ascii')
+    (out / 'validate.ps1').write_text(r'''# Lead only, on an idle card. Run after merging or pass -Repo for this worktree.
+# Example: powershell -File .work/_shared/S11-02/validate.ps1 -Suite <built-suite>
+# No automatic retry after any nonzero exit. Do not clear DMA stop markers
+# without inspecting both endpoints and the host boot/bugcheck state.
+param([Parameter(Mandatory=$true)][string]$Suite,
+      [string]$Repo = "PROJECT_ROOT")
+$ErrorActionPreference = 'Stop'
+Set-Location -LiteralPath $Repo
+$project = $Repo
+if ((Split-Path -Leaf (Split-Path -Parent $Repo)) -eq '.work') { $project = Split-Path -Parent (Split-Path -Parent $Repo) }
+$stage = Join-Path $project '.work/_shared/S11-02'
+$env:PATH = (Join-Path $project '.work/_shared/toolchain/cygwin/bin') + ';' + $env:PATH
+$config = Get-Content -Raw -LiteralPath (Join-Path $project 'config/card.local.json') | ConvertFrom-Json
+$config | Add-Member -Force NoteProperty maxStageMiB 1100
+$config | Add-Member -Force NoteProperty memoryMB 2048
+$cfg = Join-Path $stage 'validation-config.json'
+$config | ConvertTo-Json | Set-Content -Encoding Ascii -LiteralPath $cfg
+$payload = Join-Path $stage 'claude-payload'
+& (Join-Path $stage 'claude-transfer.exe') generate $payload.Replace('\','/') 1073741824 0 -
+if ($LASTEXITCODE -ne 0) { throw 'payload generation failed' }
+$measurements = @()
+foreach ($repeat in 1..3) {
+  foreach ($method in 'dma','ssh') {
+    $receipt = Join-Path $stage ("pair-{0}-{1}.json" -f $repeat,$method)
+    python tools/card_run --config $cfg --benchmark --threads 1 --timeout 1800 `
+      --stage-timeout 1200 --transport-timeout 1200 --transfer $method --file $payload `
+      --collect claude-payload --collect-dir $stage/collected --receipt $receipt $stage/claude-check.sh
+    if ($LASTEXITCODE -ne 0) { throw "STOP: $method pair $repeat; inspect $receipt and cleanup state" }
+    $rows = (Get-Content -Raw -LiteralPath $receipt | ConvertFrom-Json).transfers |
+      Where-Object { $_.bytes -eq 1073741824 }
+    if (@($rows).Count -ne 2 -or @($rows | Where-Object { !$_.digest_match -or $_.method -ne $method }).Count) {
+      throw 'missing paired digest/length evidence'
+    }
+    if ($rows[0].source_sha256 -ne $rows[1].source_sha256) { throw 'round-trip digest mismatch' }
+    foreach ($row in $rows) {
+      $measurements += [PSCustomObject]@{ repeat=$repeat; method=$method; direction=$row.direction;
+        seconds=$row.seconds; wall_seconds=$row.wall_seconds; MiB_s=$row.mib_per_second }
+    }
+  }
+}
+# Show both actual file wall time and payload-only DMA timing; do not conflate them.
+$measurements | Format-Table
+foreach ($repeat in 1..3) {
+  foreach ($direction in 'up','down') {
+    $dma = $measurements | Where-Object { $_.repeat -eq $repeat -and $_.direction -eq $direction -and $_.method -eq 'dma' }
+    $ssh = $measurements | Where-Object { $_.repeat -eq $repeat -and $_.direction -eq $direction -and $_.method -eq 'ssh' }
+    Write-Output ("pair {0} {1}: payload speedup {2:N2}x; file wall speedup {3:N2}x" -f $repeat,$direction,($ssh.seconds/$dma.seconds),($ssh.wall_seconds/$dma.wall_seconds))
+  }
+}
+$config | Add-Member -Force NoteProperty dmaEnabled $false
+$config | ConvertTo-Json | Set-Content -Encoding Ascii -LiteralPath $cfg
+python tools/card_run --config $cfg --benchmark --timeout 1800 --stage-timeout 1200 `
+  --transport-timeout 1200 --transfer auto --file $payload --collect claude-payload `
+  --collect-dir $stage/collected --receipt $stage/unavailable.json $stage/claude-check.sh
+if ($LASTEXITCODE -ne 0) { throw 'forced unavailable run failed' }
+$fallbacks = (Get-Content -Raw -LiteralPath $stage/unavailable.json | ConvertFrom-Json).transfers |
+  Where-Object { $_.bytes -eq 1073741824 }
+if (@($fallbacks).Count -ne 2 -or @($fallbacks | Where-Object { $_.method -ne 'ssh' -or !$_.fallback.reason -or !$_.digest_match }).Count) {
+  throw 'missing fallback reason or digest match'
+}
+python harness/card/run_suite.py $Suite $stage/suite-output --transfer dma
+if ($LASTEXITCODE -ne 0) { throw 'suite upload failed; no retry' }
+Write-Output 'Lead review required: every digest, paired speedups (>=50x both directions), suite receipt and cleanup.'
+'''.replace('PROJECT_ROOT', PROJECT.as_posix()), encoding='utf8')
 
 
 def start_endpoint(role, method, address, port, nonce, size, repeats, direction, cpus='-', corrupt=False, **kwargs):
@@ -414,6 +491,7 @@ def main():
     b = sub.add_parser('build')
     b.add_argument('--host-only', action='store_true')
     b.add_argument('--card-only', action='store_true')
+    b.add_argument('--production', action='store_true', help='build S11-02 file helpers and stage lead validation commands')
     n = sub.add_parser('run')
     n.add_argument('--project', type=Path, default=PROJECT)
     n.add_argument('--config', type=Path, required=True)
@@ -426,7 +504,7 @@ def main():
     n.add_argument('--mac')
     args = parser.parse_args()
     if args.action == 'build':
-        build(args.host_only, args.card_only)
+        build(args.host_only, args.card_only, args.production)
     else:
         run_native(args)
 
