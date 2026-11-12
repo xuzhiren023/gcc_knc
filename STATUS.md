@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-12 17:45.
+Updated automatically at every ticket change. Last update: 2026-11-12 17:54.
 
-**Waiting for you:** S11-02. Run `python tools/pm.py inbox`.
+**Next: the tech lead, on S11-02.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[###################-]` 195 of 201
 
@@ -53,7 +53,7 @@ Current tickets: `[###################-]` 195 of 201
 | S10-12 | cbrt and cbrtf crash (SIGSEGV) in qualify_v1 on the card - root cause and fix | Done | The cbrt and cbrtf qualification jobs no longer crash on the card and pass (worst 0.4996 and 0.4991 ULP): t... |
 | S10-13 | User story - code that calls cbrtl under -march=knc gets a safe replacement and a compile-time warning (MPSS libm cbrtl faults) | Done | Under -march=knc, calls to cbrtl (and std::cbrt on long double) now go to GCC-KNC's own safe cube root with... |
 | S11-01 | User story - the best way to move data between the host and the card, measured, and how our projects use it | Done | We now have a sourced inventory of every host-card transfer path that works without changing MPSS (SSH, tar... |
-| S11-02 | card_run and run_suite move data by S11-01's recommended method, with fallback | **Waiting for you** | Started by mistake: the ticket was 'ready' as a placeholder and became startable when S11-01 closed. The en... |
+| S11-02 | card_run and run_suite move bulk data by SCIF DMA at the PCIe link limit, with the SSH stream as fallback | Question for the tech lead | Owner 2026-11-12 17:50 EST: "s11-02 approved by me". Acceptance written by the lead from the measured DMA r... |
 | S11-03 | S11-01 transfer tool rejects the card's physical /tmp path, so the native study never starts | Done | The transfer study's tool now accepts the card's real /tmp location (/var/volatile/tmp), so its card run ca... |
 | S11-04 | S11-01 transfer tool - the host opens every connection, because Windows Firewall blocks inbound TCP from the card | Done | The transfer study's host side now opens every connection to the card, so Windows Firewall no longer blocks... |
 | S11-05 | Research - raise KNC's real memory bandwidth from about 175 GB/s toward 75-85% of peak, with a measured plan | Done | The memory-bandwidth research plan and a validated multithreaded KNC bandwidth benchmark are ready, with a ... |
@@ -226,6 +226,7 @@ Current tickets: `[###################-]` 195 of 201
 
 ## Recent activity
 
+- 2026-11-12 17:54 **S11-02** owner decide: Owner 2026-11-12 17:50 EST: "s11-02 approved by me". Acceptance written by the lead from the measured DMA results.
 - 2026-11-12 17:45 **S11-19** engineer submit: Addressed both 17:32 review fixes: plain-language introductions on M4 and S11-S13, prose slash-pairs written out, ASCII review byline, and evidence...
 - 2026-11-12 17:45 **S11-16** lead approve: The card's MPSS long double libm was probed on the card: of 12 entry points only cbrtl faults, and S10-13 already guards it, so the M4 correctness ...
 - 2026-11-12 17:35 **S11-18** lead answer: Both, split by cost: (1) Implement ADR-0015's timed boundary and record format now: launch-to-exit wall time on the card's monotonic clock as the r...
@@ -233,16 +234,15 @@ Current tickets: `[###################-]` 195 of 201
 - 2026-11-12 17:34 **S11-18** engineer ask: 3da5a9ce fixes timed output and peer corruption control. Seven host tests pass; 20 builds plus launcher restaged/linted. Logs: .work/_state/logs/S1...
 - 2026-11-12 17:34 **S11-16** engineer submit: Native results recorded in docs/research/mpss-libm-long-double.md at 9dc764db. Lead card run with 240 threads: only known cbrtl SIGSEGV; all 11 con...
 - 2026-11-12 17:33 **S11-16** lead answer: Size approved: 580 lines are mostly the research note (263) and the probe source (219); a split adds nothing. Submit with: python tools/pm.py submi...
-- 2026-11-12 17:32 **S11-19** lead changes: Substance is right and matches ADR-0015 (six pairs, 612 launches, 1.25x lower bound, SQLite exception, one retry, 14+3 split); the inclusion rule a...
 
 ## Cost
 
 - From the script, engineer: 479 sessions, 1013.7M input tokens
 - From the script, lead: 307 sessions, 88.1M input tokens
-- Started by hand, Claude: 12 sessions, 2722.7M input tokens
+- Started by hand, Claude: 12 sessions, 2726.6M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 25.2 GiB of 100 GiB. 80 GiB free on the drive.
+The project uses 25.2 GiB of 100 GiB. 79 GiB free on the drive.
