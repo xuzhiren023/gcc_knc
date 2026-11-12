@@ -39,6 +39,14 @@ class MemoryBandwidth(unittest.TestCase):
             self.assertLessEqual(row['median_GBs'], row['max_GBs'])
             self.assertEqual(row['threads'], row['allowed_cpus'])
             self.assertEqual(len(set(row['cpus'])), row['threads'])
+            self.assertEqual(len(row['timings']), 5)
+            rates = []
+            for sample in row['timings']:
+                self.assertGreater(sample['seconds'], 0)
+                self.assertGreaterEqual(sample['wall_seconds'], sample['seconds'])
+                self.assertGreaterEqual(sample['start_skew_seconds'], 0)
+                rates.append(row['logical_bytes'] / sample['seconds'] / 1e9)
+            self.assertAlmostEqual(sorted(rates)[2], row['median_GBs'], places=5)
         return rows
 
     def test_all_kernels_and_controls(self):
@@ -49,12 +57,14 @@ class MemoryBandwidth(unittest.TestCase):
                       '--padding-lines', '5', '--chunk-lines', '17',
                       '--schedule', 'cyclic', '--unroll', '4', '--split', '1')
         self.run_case('--store', 'nr', '--placement', 'reverse', '--prefetch', 'l2',
-                      '--fence', 'line', '--unroll', '8', '--chunk-lines', '31')
+                      '--fence', 'line', '--unroll', '8', '--chunk-lines', '31',
+                      '--pass-fence', 'final')
 
     def test_invalid_configuration(self):
         for options in [('--repeats', '4'), ('--unroll', '0'), ('--mib', '0'),
                         ('--store', 'bogus'), ('--threads', '99999'),
-                        ('--fence', 'none'), ('--offset-lines', '-1')]:
+                        ('--fence', 'none'), ('--offset-lines', '-1'),
+                        ('--pass-fence', 'none')]:
             result = subprocess.run([str(self.binary), *options],
                                     stdout=subprocess.PIPE, stderr=subprocess.PIPE,
                                     timeout=10)
