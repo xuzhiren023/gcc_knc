@@ -42,12 +42,13 @@ def command(argv):
     subprocess.run([v.as_posix() if isinstance(v, Path) else str(v) for v in argv], env=ENV, check=True)
 
 
-def build(host_only=False, card_only=False):
-    OUT.mkdir(parents=True, exist_ok=True)
+def build(host_only=False, card_only=False, output_dir=None):
+    output_dir = OUT if output_dir is None else Path(output_dir)
+    output_dir.mkdir(parents=True, exist_ok=True)
     flags = ['-O2', '-std=gnu11', '-Wall', '-Wextra', '-pthread']
     if not card_only:
         command([TC / 'cygwin/bin/gcc.exe', *flags, HERE / 'transfer_bench.c',
-                 '-o', OUT / 'transfer-host.exe'])
+                 '-o', output_dir / 'transfer-host.exe'])
     if host_only:
         return
     import storage
@@ -93,6 +94,8 @@ def lease_ready(proc, log, nonce):
     """Drain card_run output continuously, retaining its diagnostics after startup."""
     announcements = queue.Queue()
 
+    drained = threading.Event()
+
     def drain():
         try:
             for line in iter(proc.stdout.readline, b''):
@@ -105,7 +108,7 @@ def lease_ready(proc, log, nonce):
                 if isinstance(row, dict) and row.get('ready') is True:
                     announcements.put(row)
         finally:
-            log.close()
+            drained.set()
             announcements.put(None)
 
     threading.Thread(target=drain, daemon=True).start()
@@ -116,6 +119,7 @@ def lease_ready(proc, log, nonce):
         raise RuntimeError('lease startup deadline: no card listener announcement; see card-control.log')
     if not row or row.get('nonce') != nonce or type(row.get('port')) is not int or not 0 < row['port'] <= 65535:
         raise RuntimeError('invalid card lease listener announcement; see card-control.log')
+    proc._card_log_drained = drained
     return row
 
 
@@ -248,7 +252,7 @@ def cygpath(path):
     return '/cygdrive/' + path.drive[0].lower() + path.as_posix()[2:]
 
 
-def native_files(config, lease, method, size, direction, check_event, compression=False, cipher=None, mac=None):
+def native_files(config, lease, method, size, direction, check_event, repeats=20, compression=False, cipher=None, mac=None):
     """Actual legacy SCP or tar-over-SSH, with file IO and process startup timed."""
     exe = str(OUT / 'transfer-host.exe')
     local = OUT / 'payload.bin'
@@ -264,7 +268,7 @@ def native_files(config, lease, method, size, direction, check_event, compressio
 
     source = payload('generate', direction == 'down')
     result = []
-    for rep in range(20):
+    for rep in range(repeats):
         check_event()
         env = dict(ENV)
         if method == 'scp':
@@ -323,6 +327,18 @@ def native_files(config, lease, method, size, direction, check_event, compressio
     return result
 
 
+def plan(args):
+    """Yield the selected trial groups in the order the runner executes them."""
+    for concurrency in args.concurrency:
+        for load in args.loads:
+            for method in args.methods:
+                if concurrency == 2 and method in ('scp', 'tar'):
+                    continue
+                for size in args.sizes:
+                    for direction in ('up', 'down'):
+                        yield concurrency, load, method, size, direction, args.repeats
+
+
 def run_native(args):
     if not args.lead_exclusive_turn:
         raise RuntimeError('lead must invoke --lead-exclusive-turn during the coordinated exclusive turn')
@@ -371,7 +387,8 @@ def run_native(args):
             if current != baseline:
                 raise RuntimeError('new bugcheck or changed host boot; stop before next trial')
 
-        record(dict(event='started', **baseline))
+        record(dict(event='started', repeats=args.repeats, sizes=args.sizes,
+                    loads=args.loads, concurrency=args.concurrency, methods=args.methods, **baseline))
         try:
             card = subprocess.Popen([sys.executable, str(args.project / 'tools/card_run'),
                                      '--config', str(args.config), '--benchmark', '--threads', '240',
@@ -408,32 +425,28 @@ def run_native(args):
             probe_result = subprocess.run(ssh_args(config) + [probe], capture_output=True, timeout=30)
             record(dict(event='inventory', stdout=probe_result.stdout.decode(errors='replace'),
                         stderr=probe_result.stderr.decode(errors='replace'), returncode=probe_result.returncode))
-            # Serial small-to-large in both load states before any concurrent DMA.
-            for concurrency in (1, 2):
-                for load in ('idle', 'busy240'):
+            active_load = None
+            for concurrency, load, method, size, direction, repeats in plan(args):
+                if load != active_load:
                     exchange(b'I' if load == 'idle' else b'B')
-                    for method in args.methods:
-                        if concurrency == 2 and method in ('scp', 'tar'):
-                            continue
-                        for size in SIZES:
-                            for direction in ('up', 'down'):
-                                check_event()
-                                if method in ('scp', 'tar'):
-                                    for row in native_files(config, lease, method, size, direction, check_event,
-                                                            args.compression, args.cipher, args.mac):
-                                        row.update(load=load, concurrency=1, stream=0)
-                                        record(row)
-                                    continue
-                                # Workers already in flight finish; no new group after any error.
-                                with concurrent.futures.ThreadPoolExecutor(max_workers=concurrency) as pool:
-                                    trials = [pool.submit(native_trial, config, lease, args.host_address,
-                                                          method, size, direction, 20, args.compression,
-                                                          args.cipher, args.mac) for _ in range(concurrency)]
-                                    for index, future in enumerate(trials):
-                                        for row in future.result():
-                                            row.update(load=load, concurrency=concurrency, stream=index)
-                                            record(row)
-                                check_event()
+                    active_load = load
+                check_event()
+                if method in ('scp', 'tar'):
+                    for row in native_files(config, lease, method, size, direction, check_event,
+                                            repeats, args.compression, args.cipher, args.mac):
+                        row.update(load=load, concurrency=1, stream=0, repeats=repeats)
+                        record(row)
+                    continue
+                # Workers already in flight finish; no new group after any error.
+                with concurrent.futures.ThreadPoolExecutor(max_workers=concurrency) as pool:
+                    trials = [pool.submit(native_trial, config, lease, args.host_address,
+                                          method, size, direction, repeats, args.compression,
+                                          args.cipher, args.mac) for _ in range(concurrency)]
+                    for index, future in enumerate(trials):
+                        for row in future.result():
+                            row.update(load=load, concurrency=concurrency, stream=index, repeats=repeats)
+                            record(row)
+                check_event()
             heartbeat_stop.set()
             heartbeat_thread.join(timeout=125)
             exchange(b'Q')
@@ -455,6 +468,11 @@ def run_native(args):
             # Once started, the drain owns the log through card_run cleanup.
             if card is None:
                 card_log.close()
+            else:
+                drained = getattr(card, '_card_log_drained', None)
+                if drained:
+                    drained.wait(timeout=190)
+                card_log.close()
 
 
 def main():
@@ -470,10 +488,19 @@ def main():
     n.add_argument('--lead-exclusive-turn', action='store_true')
     n.add_argument('--acknowledge-prior-incomplete', action='store_true')
     n.add_argument('--methods', nargs='+', choices=METHODS, default=METHODS)
+    n.add_argument('--repeats', type=int, default=20)
+    n.add_argument('--sizes', nargs='+', choices=('4K', '1M', '64M', '1G'), default=('4K', '1M', '64M', '1G'))
+    n.add_argument('--loads', nargs='+', choices=('idle', 'busy240'), default=('idle', 'busy240'))
+    n.add_argument('--concurrency', nargs='+', type=int, choices=(1, 2), default=(1, 2))
     n.add_argument('--compression', action='store_true')
     n.add_argument('--cipher')
     n.add_argument('--mac')
     args = parser.parse_args()
+    if args.action == 'run':
+        if args.repeats < 1:
+            parser.error('--repeats must be positive')
+        size_values = dict(zip(('4K', '1M', '64M', '1G'), SIZES))
+        args.sizes = tuple(size_values[value] for value in args.sizes)
     if args.action == 'build':
         build(args.host_only, args.card_only)
     else:
