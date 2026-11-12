@@ -1,10 +1,10 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-12 18:33.
+Updated automatically at every ticket change. Last update: 2026-11-12 18:35.
 
-Nothing can move right now.
+**Next: GPT-6.1, on S11-20 (Research - which compiler optimizations benefit the widest range of real code on KNC, from professional to amateur, and does our corpus cover it?).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
-Current tickets: `[###################-]` 197 of 201
+Current tickets: `[###################-]` 197 of 202
 
 ## Milestones
 
@@ -14,7 +14,7 @@ Current tickets: `[###################-]` 197 of 201
 | M1 | Mixed native code | Done | 43 of 43 tickets |
 | M2 | Useful vector target | Done | 51 of 51 tickets |
 | M3 | Runtimes | Done | 48 of 48 tickets |
-| M4 | Broad optimization | In progress | 15 of 19 tickets |
+| M4 | Broad optimization | In progress | 15 of 20 tickets |
 | M5 | Program corpus | Not started | Not planned in detail yet |
 | M6 | Release | Not started | Not planned in detail yet |
 
@@ -71,6 +71,7 @@ Current tickets: `[###################-]` 197 of 201
 | S11-17 | PGO feasibility on one complete development program (reuse of S9-18's train/use path) | lead | Needs the interactive lead's card run: from the S11-17 worktree at 1d096574, run python tools/run.py --name... |
 | S11-18 | M4 corpus harness v2 - card profiles, prefix record, held-out sealing, stronger checks, and the donor-failure rule | Done | The M4 corpus harness now stages all 17 programs for the 7120 and the 3100/5100 profiles with serial voting... |
 | S11-19 | Second senior review - the M4 definition and the Sprint 11-13 roadmap, adjusted | Done | The M4 definition and the Sprint 11-13 roadmap are rewritten as measure, improve, decide, each sprint with ... |
+| S11-20 | Research - which compiler optimizations benefit the widest range of real code on KNC, from professional to amateur, and does our corpus cover it? | In progress |  |
 | S2-01 | Design for zmm and mask registers under -march=knc | Done | The register design for KNC is settled on paper: all 32 zmm and 8 mask registers become usable under -march... |
 | S2-02 | Float and double arguments and results in zmm lane 0 | Done | Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`). |
 | S2-03 | Varargs with the donor's register save area | Done | Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`). |
@@ -239,7 +240,7 @@ Current tickets: `[###################-]` 197 of 201
 
 - From the script, engineer: 486 sessions, 1025.0M input tokens
 - From the script, lead: 314 sessions, 89.7M input tokens
-- Started by hand, Claude: 12 sessions, 2759.4M input tokens
+- Started by hand, Claude: 12 sessions, 2766.7M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
