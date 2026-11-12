@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-12 07:49.
+Updated automatically at every ticket change. Last update: 2026-11-12 07:51.
 
 **Waiting for you:** S10-12. Run `python tools/pm.py inbox`.
 
@@ -51,7 +51,7 @@ Current tickets: `[###################-]` 180 of 184
 | S10-10 | Card harness fixes from the Sprint 10 card turn - card_qualify binary folder, vmath bench batch sizing | Done | card_qualify now runs the card binaries from knc/ and stops before any card job when one is missing, and th... |
 | S10-11 | Card-only vector math failures - double sin, cos, tan, atan2 above 1 ULP, and cbrt/cbrtf crash (SIGSEGV) | Done | Double sin, cos, tan and atan2 from the KNC vector math library are now within 1 ULP on the card (0.76 to 0... |
 | S10-12 | cbrt and cbrtf crash (SIGSEGV) in qualify_v1 on the card - root cause and fix | **Waiting for you** | Review of 1ff46888/7ae4d224: cause accepted (MPSS libm s_cbrtl.S:178, cbrtl+0xea, zero-extends a negative t... |
-| S10-13 | User story - code that calls cbrtl under -march=knc gets a safe replacement and a compile-time warning (MPSS libm cbrtl faults) | Tests waiting for review | Red commit f9a101aa. Ran S10-13-red once via tools/run.py: check.py t1 --compiler gcc16 --cbrtl --worker, g... |
+| S10-13 | User story - code that calls cbrtl under -march=knc gets a safe replacement and a compile-time warning (MPSS libm cbrtl faults) | In progress | Red tests for S10-13 approved: they fail today because KNC code still calls the card's faulting cbrtl with ... |
 | S11-01 | User story - the best way to move data between the host and the card, measured, and how our projects use it | In progress | Yes. The AGENTS.md rule is about process provenance (receipts, hash manifests of our own files), which git ... |
 | S11-02 | card_run and run_suite move data by S11-01's recommended method, with fallback | Not started | ready; waits on its dep S11-01, the lead writes acceptance before it starts |
 | S2-01 | Design for zmm and mask registers under -march=knc | Done | The register design for KNC is settled on paper: all 32 zmm and 8 mask registers become usable under -march... |
@@ -209,6 +209,7 @@ Current tickets: `[###################-]` 180 of 184
 
 ## Recent activity
 
+- 2026-11-12 07:51 **S10-13** lead approve-red: Red tests for S10-13 approved: they fail today because KNC code still calls the card's faulting cbrtl with no warning, and they pass for x86. For t...
 - 2026-11-12 07:49 **S10-13** engineer red: Red commit f9a101aa. Ran S10-13-red once via tools/run.py: check.py t1 --compiler gcc16 --cbrtl --worker, gcc2. Expected failures: KNC calls cbrtl,...
 - 2026-11-12 07:35 **S10-12** lead note: Review of 1ff46888/7ae4d224: cause accepted (MPSS libm s_cbrtl.S:178, cbrtl+0xea, zero-extends a negative table offset; first fault at the grid inp...
 - 2026-11-12 07:31 **S11-01** lead answer: Yes. The AGENTS.md rule is about process provenance (receipts, hash manifests of our own files), which git already covers. The SHA-256 in deliverab...
@@ -216,7 +217,6 @@ Current tickets: `[###################-]` 180 of 184
 - 2026-11-12 07:27 **S10-10** lead approve: card_qualify now runs the card binaries from knc/ and stops before any card job when one is missing, and the vector-math benchmark stops with an er...
 - 2026-11-12 07:19 **S10-10** engineer submit: Submitted by the lead for the engineer (owner 07:00: lead commits by hand). 9762b24d [red] fails on main; 3b528a54 fix: python -m pytest tests/vmat...
 - 2026-11-12 07:19 **S10-10** lead answer: Committed by the lead per the owner's 07:00 decision: 9762b24d test [red] (fails on main: knc/ paths, and the host build of driver.c), 3b528a54 fix...
-- 2026-11-12 07:19 **S10-10** owner decide: Owner 2026-11-12 07:00 EST ('you commit their work by hand'): the lead committed the engineer's work (9762b24d [red], 3b528a54 fix) and carries it ...
 
 ## Cost
 
