@@ -36,6 +36,21 @@ class TransferIntegrity(unittest.TestCase):
         with self.assertRaisesRegex(RuntimeError, 'mismatch'):
             transfer.loopback('tcp', 'up', 4096, corrupt=True)
 
+    def test_lease_directory_shapes(self):
+        valid = ('/tmp/claude/claude-' + 'a' * 32,
+                 '/var/volatile/tmp/claude/claude-' + '0f' * 16)
+        invalid = ('/tmp/claude/claude-' + 'a' * 31,
+                   '/tmp/claude/claude-' + 'A' * 32,
+                   '/tmp/other/claude-' + 'a' * 32,
+                   '/tmp/claude/claude-' + 'a' * 32 + '"',
+                   '/var/volatile/other/claude/claude-' + 'a' * 32)
+        for directory in valid:
+            with self.subTest(directory=directory):
+                self.assertTrue(transfer.LEASE_DIRECTORY.fullmatch(directory))
+        for directory in invalid:
+            with self.subTest(directory=directory):
+                self.assertIsNone(transfer.LEASE_DIRECTORY.fullmatch(directory))
+
 
 if __name__ == '__main__':
     unittest.main()
