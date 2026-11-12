@@ -65,7 +65,7 @@ Current tickets: `[###################-]` 192 of 200
 | S11-11 | M4 corpus run harness - every corpus program built by GCC 5.1.1 and GCC-KNC, run on the card with frozen inputs and a correctness check, in one command | Done | The M4 corpus harness builds 17 programs with GCC 5.1.1 and GCC-KNC and stages checked card runs; GCC-KNC b... |
 | S11-12 | Sprint 11 batch check - full native suite, x86 identity, forward-port drill, ICE sweeps, runtime prefix consistency | draft |  |
 | S11-13 | Senior compiler review of the Sprint 11-13 scope (Milestone M4) against our research, with recommended plan changes | Done | A senior compiler review of the Sprint 11-13 plan is in: M4 is plausible but needs a frozen scoring and mea... |
-| S11-14 | M4 scoring contract and measurement protocol, frozen before any tuning | Changes requested | The scoring math, 17 canonical votes, sealed-root fix (red f1c136b3 then green 593e1230) and the rest of AD... |
+| S11-14 | M4 scoring contract and measurement protocol, frozen before any tuning | In progress | The scoring math, 17 canonical votes, sealed-root fix (red f1c136b3 then green 593e1230) and the rest of AD... |
 | S11-15 | First development-corpus baseline and profile, GCC 5.1.1 vs GCC-KNC at -O2 (E7-03 part 1) | draft |  |
 | S11-16 | Long-double libm hazard audit - do other MPSS long double entry points fault like cbrtl? (E7-21, bounded) | lead | Needs a card run by the interactive lead (card turn per shared-card rules): python tools/card_run --threads... |
 | S11-17 | PGO feasibility on one complete development program (reuse of S9-18's train/use path) | draft |  |
