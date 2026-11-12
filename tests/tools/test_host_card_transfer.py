@@ -1,10 +1,12 @@
 """S11-01 acceptance: host loopback, real corruption rejection, FIPS abc vector."""
 import json
+import ast
 import os
 from pathlib import Path
 import subprocess
 import sys
 import unittest
+from unittest import mock
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / 'tools'))
@@ -24,7 +26,18 @@ class TransferIntegrity(unittest.TestCase):
         for method in ('pipe', 'tcp', 'fake-write', 'fake-read', 'fake-vwrite', 'fake-mmap'):
             for direction in ('up', 'down'):
                 with self.subTest(method=method, direction=direction):
-                    rows = transfer.loopback(method, direction, 1048705)
+                    original = transfer.start_endpoint
+
+                    def outbound_only(role, method, address, port, *args, **kwargs):
+                        if method != 'pipe':
+                            self.assertEqual(port == 0, role == 'card',
+                                             'only the card may bind an ephemeral TCP port')
+                        return original(role, method, address, port, *args, **kwargs)
+
+                    with mock.patch.object(transfer, 'start_endpoint', side_effect=outbound_only), \
+                            mock.patch('socket.socket.listen', side_effect=AssertionError('host listener')), \
+                            mock.patch('socket.socket.bind', side_effect=AssertionError('host bind')):
+                        rows = transfer.loopback(method, direction, 1048705)
                     self.assertEqual(len(rows), 2)
                     for row in rows:
                         self.assertEqual(row['integrity'], 'match')
@@ -35,6 +48,13 @@ class TransferIntegrity(unittest.TestCase):
                         self.assertGreaterEqual(row['card_cpu_seconds'], 0)
         with self.assertRaisesRegex(RuntimeError, 'mismatch'):
             transfer.loopback('tcp', 'up', 4096, corrupt=True)
+
+    def test_runner_has_no_host_listener(self):
+        tree = ast.parse(Path(transfer.__file__).read_text())
+        forbidden = [node.func.attr for node in ast.walk(tree)
+                     if isinstance(node, ast.Call) and isinstance(node.func, ast.Attribute)
+                     and node.func.attr in ('bind', 'listen', 'accept')]
+        self.assertEqual(forbidden, [], 'runner must only connect to card listeners')
 
     def test_lease_directory_shapes(self):
         valid = ('/tmp/claude/claude-' + 'a' * 32,
