@@ -1,10 +1,10 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-12 17:54.
+Updated automatically at every ticket change. Last update: 2026-11-12 17:55.
 
-**Next: the tech lead, on S11-19.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: GPT-6.1, on S11-02 (card_run and run_suite move bulk data by SCIF DMA at the PCIe link limit, with the SSH stream as fallback).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
-Current tickets: `[###################-]` 195 of 201
+Current tickets: `[###################-]` 196 of 201
 
 ## Milestones
 
@@ -14,7 +14,7 @@ Current tickets: `[###################-]` 195 of 201
 | M1 | Mixed native code | Done | 43 of 43 tickets |
 | M2 | Useful vector target | Done | 51 of 51 tickets |
 | M3 | Runtimes | Done | 48 of 48 tickets |
-| M4 | Broad optimization | In progress | 13 of 19 tickets |
+| M4 | Broad optimization | In progress | 14 of 19 tickets |
 | M5 | Program corpus | Not started | Not planned in detail yet |
 | M6 | Release | Not started | Not planned in detail yet |
 
@@ -70,7 +70,7 @@ Current tickets: `[###################-]` 195 of 201
 | S11-16 | Long-double libm hazard audit - do other MPSS long double entry points fault like cbrtl? (E7-21, bounded) | Done | The card's MPSS long double libm was probed on the card: of 12 entry points only cbrtl faults, and S10-13 a... |
 | S11-17 | PGO feasibility on one complete development program (reuse of S9-18's train/use path) | draft |  |
 | S11-18 | M4 corpus harness v2 - card profiles, prefix record, held-out sealing, stronger checks, and the donor-failure rule | In progress | Both, split by cost: (1) Implement ADR-0015's timed boundary and record format now: launch-to-exit wall tim... |
-| S11-19 | Second senior review - the M4 definition and the Sprint 11-13 roadmap, adjusted | Waiting for review | Addressed both 17:32 review fixes: plain-language introductions on M4 and S11-S13, prose slash-pairs writte... |
+| S11-19 | Second senior review - the M4 definition and the Sprint 11-13 roadmap, adjusted | Done | The M4 definition and the Sprint 11-13 roadmap are rewritten as measure, improve, decide, each sprint with ... |
 | S2-01 | Design for zmm and mask registers under -march=knc | Done | The register design for KNC is settled on paper: all 32 zmm and 8 mask registers become usable under -march... |
 | S2-02 | Float and double arguments and results in zmm lane 0 | Done | Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`). |
 | S2-03 | Varargs with the donor's register save area | Done | Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`). |
@@ -226,6 +226,7 @@ Current tickets: `[###################-]` 195 of 201
 
 ## Recent activity
 
+- 2026-11-12 17:55 **S11-19** lead approve: The M4 definition and the Sprint 11-13 roadmap are rewritten as measure, improve, decide, each sprint with a plain-language goal, reason and comple...
 - 2026-11-12 17:54 **S11-02** lead answer: Acceptance is written (top of the ticket): DMA by receiver-pull scif_readfrom for files of 1 MiB or more, SSH stream for small files and fallback, ...
 - 2026-11-12 17:54 **S11-02** owner decide: Owner 2026-11-12 17:50 EST: "s11-02 approved by me". Acceptance written by the lead from the measured DMA results.
 - 2026-11-12 17:45 **S11-19** engineer submit: Addressed both 17:32 review fixes: plain-language introductions on M4 and S11-S13, prose slash-pairs written out, ASCII review byline, and evidence...
@@ -233,7 +234,6 @@ Current tickets: `[###################-]` 195 of 201
 - 2026-11-12 17:35 **S11-18** lead answer: Both, split by cost: (1) Implement ADR-0015's timed boundary and record format now: launch-to-exit wall time on the card's monotonic clock as the r...
 - 2026-11-12 17:35 **S11-16** lead note: Card 2026-11-12 22:22:59-22:23:16Z (boot da3144f1), 240 threads: python tools/card_run --threads 240 --timeout 1800 .work/_shared/S11-16/long-doubl...
 - 2026-11-12 17:34 **S11-18** engineer ask: 3da5a9ce fixes timed output and peer corruption control. Seven host tests pass; 20 builds plus launcher restaged/linted. Logs: .work/_state/logs/S1...
-- 2026-11-12 17:34 **S11-16** engineer submit: Native results recorded in docs/research/mpss-libm-long-double.md at 9dc764db. Lead card run with 240 threads: only known cbrtl SIGSEGV; all 11 con...
 
 ## Cost
 
