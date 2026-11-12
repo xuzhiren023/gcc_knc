@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-12 09:29.
+Updated automatically at every ticket change. Last update: 2026-11-12 09:30.
 
 **Waiting for you:** S11-02. Run `python tools/pm.py inbox`.
 
@@ -51,7 +51,7 @@ Current tickets: `[###################-]` 182 of 185
 | S10-10 | Card harness fixes from the Sprint 10 card turn - card_qualify binary folder, vmath bench batch sizing | Done | card_qualify now runs the card binaries from knc/ and stops before any card job when one is missing, and th... |
 | S10-11 | Card-only vector math failures - double sin, cos, tan, atan2 above 1 ULP, and cbrt/cbrtf crash (SIGSEGV) | Done | Double sin, cos, tan and atan2 from the KNC vector math library are now within 1 ULP on the card (0.76 to 0... |
 | S10-12 | cbrt and cbrtf crash (SIGSEGV) in qualify_v1 on the card - root cause and fix | Done | The cbrt and cbrtf qualification jobs no longer crash on the card and pass (worst 0.4996 and 0.4991 ULP): t... |
-| S10-13 | User story - code that calls cbrtl under -march=knc gets a safe replacement and a compile-time warning (MPSS libm cbrtl faults) | In progress | Lane is now gcc: build in tree 1 (.work/_shared/gcc, build dir .work/_shared/gcc-build, owned by the Codex ... |
+| S10-13 | User story - code that calls cbrtl under -march=knc gets a safe replacement and a compile-time warning (MPSS libm cbrtl faults) | Question for the tech lead | Tree 1 also fails Permission denied on gcc/pass-instances.def and gcc/s-options (owner xuzhi; directory Cod... |
 | S11-01 | User story - the best way to move data between the host and the card, measured, and how our projects use it | Done | We now have a sourced inventory of every host-card transfer path that works without changing MPSS (SSH, tar... |
 | S11-02 | card_run and run_suite move data by S11-01's recommended method, with fallback | **Waiting for you** | Started by mistake: the ticket was 'ready' as a placeholder and became startable when S11-01 closed. The en... |
 | S11-03 | S11-01 transfer tool rejects the card's physical /tmp path, so the native study never starts | In progress |  |
@@ -211,13 +211,13 @@ Current tickets: `[###################-]` 182 of 185
 ## Recent activity
 
 - 2026-11-12 09:40 **S11-02** lead note: Started by mistake: the ticket was 'ready' as a placeholder and became startable when S11-01 closed. The engineer was right to stop; nothing was ch...
+- 2026-11-12 09:30 **S10-13** engineer ask: Tree 1 also fails Permission denied on gcc/pass-instances.def and gcc/s-options (owner xuzhi; directory CodexSandboxOffline). Reproducer: Cygwin py...
 - 2026-11-12 09:28 **S11-02** engineer escalate: The ticket changed from doing to blocked during this session, with an existing engineer question requesting finalized acceptance, the S11-01 recomm...
 - 2026-11-12 09:28 **S11-02** engineer ask: Ticket still contains a placeholder and says the lead must write acceptance from S11-01 before work starts. It does not identify the recommended bu...
 - 2026-11-12 09:28 **S10-13** lead answer: Lane is now gcc: build in tree 1 (.work/_shared/gcc, build dir .work/_shared/gcc-build, owned by the Codex sandbox). Your GCC commit 157940608ed on...
 - 2026-11-12 09:27 **S10-13** lead resume: S10-12 approved; tree 1 is free.
 - 2026-11-12 09:26 **S10-12** lead approve: The cbrt and cbrtf qualification jobs no longer crash on the card and pass (worst 0.4996 and 0.4991 ULP): the crash was in the card's MPSS libm cbr...
 - 2026-11-12 09:16 **S10-12** engineer submit: Submitted by the lead for the engineer: red 1ff46888 (host model of the MPSS cbrtl negative table offset), fix 7ae4d224 (qualifier keeps cbrtl's ar...
-- 2026-11-12 09:15 **S10-12** lead answer: Card PASS; the lead submits for the engineer.
 
 ## Cost
 
