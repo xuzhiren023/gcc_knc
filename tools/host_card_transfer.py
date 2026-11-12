@@ -75,7 +75,6 @@ def stage_production_validation(out):
     """Leave commands for the lead; building never connects to the card."""
     (out / 'claude-check.sh').write_text('#!/bin/sh\ntest -f claude-payload\n', encoding='ascii')
     (out / 'validate.ps1').write_text(r'''# Lead only, on an idle card. Run after merging or pass -Repo for this worktree.
-# Example: powershell -File .work/_shared/S11-02/validate.ps1 -Suite <built-suite>
 # No automatic retry after any nonzero exit. Do not clear DMA stop markers
 # without inspecting both endpoints and the host boot/bugcheck state.
 param([Parameter(Mandatory=$true)][string]$Suite,
@@ -85,6 +84,7 @@ Set-Location -LiteralPath $Repo
 $project = $Repo
 if ((Split-Path -Leaf (Split-Path -Parent $Repo)) -eq '.work') { $project = Split-Path -Parent (Split-Path -Parent $Repo) }
 $stage = Join-Path $project '.work/_shared/S11-02'
+Copy-Item -LiteralPath "$stage/claude-transfer.mic", "$stage/claude-transfer.exe" -Destination (Join-Path $project '.work/_shared')
 $env:PATH = (Join-Path $project '.work/_shared/toolchain/cygwin/bin') + ';' + $env:PATH
 $config = Get-Content -Raw -LiteralPath (Join-Path $project 'config/card.local.json') | ConvertFrom-Json
 $config | Add-Member -Force NoteProperty maxStageMiB 1100

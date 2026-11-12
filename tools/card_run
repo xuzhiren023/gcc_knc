@@ -560,7 +560,7 @@ class SSHTransport:
     def stage_overhead(self, packed=False):
         unpack = self.helper("unpackHelper", "claude-unpack.mic").stat().st_size if packed else 0
         return (self.helper("pinHelper", "claude-pin.mic").stat().st_size + len(watchdog_bytes()) + unpack
-                + self.helper("transferHelper", "S11-02/claude-transfer.mic").stat().st_size)
+                + self.helper("transferHelper", "claude-transfer.mic").stat().st_size)
 
     def connect(self, run_dir, *, timeout):
         if not RUN_DIR.fullmatch(run_dir):
@@ -587,8 +587,8 @@ class SSHTransport:
             session.stage_timeout = self.stage_timeout
             session.pin_helper = self.helper("pinHelper", "claude-pin.mic")
             session.unpack_helper = self.helper("unpackHelper", "claude-unpack.mic")
-            session.card_helper = self.helper("transferHelper", "S11-02/claude-transfer.mic")
-            session.host_helper = self.helper("transferHost", "S11-02/claude-transfer.exe")
+            session.card_helper = self.helper("transferHelper", "claude-transfer.mic")
+            session.host_helper = self.helper("transferHost", "claude-transfer.exe")
             session.cygwin_bin = self.helper("cygwinBin", "toolchain/cygwin/bin")
             session.dma_enabled = c.get("dmaEnabled", True)
             session.transfer_method, session.threshold_bytes = self.transfer, self.threshold_bytes
