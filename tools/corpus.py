@@ -1,18 +1,19 @@
 #!/usr/bin/env python3
 """Frozen M4 corpus: stage on host, lead launches on card, collect on host.
 
-See corpus/README.md. No source patches, compiler builds, or implicit card jobs.
+See corpus/README.md. Only the ticket-authorized staged HPCG fix is applied.
+No compiler builds or implicit card jobs.
 """
 import argparse
 from collections import defaultdict, deque
-import itertools
 import json
+import itertools
+import statistics
 import math
 import os
 from pathlib import Path
 import re
 import shutil
-import statistics
 import subprocess
 import sys
 import tarfile
@@ -34,6 +35,7 @@ PB = {
     'durbin': dict(N=8192),
 }
 OPENMP = ('STREAM', 'NPB-CG', 'NPB-EP', 'NPB-MG', 'NPB-IS', 'HPCG')
+OPENMP_PANEL = 'the donor toolchain has no OpenMP runtime'
 PROGRAMS = tuple('PB-' + name for name in PB) + OPENMP + ('zlib', 'SQLite', 'bzip2')
 INPUTS = {'PB-' + name: 'polybench-4.2.1-double-' + '-'.join('%s=%s' % x for x in dims.items())
           for name, dims in PB.items()}
@@ -66,28 +68,54 @@ def flag_sets(extra_flags=None):
 def make_plan(repetitions=3, extra_flags=None, *, core_count=None):
     if not isinstance(core_count, int) or isinstance(core_count, bool) or core_count < 1:
         raise ValueError('core_count must come from the card affinity probe')
-    if repetitions < 3:
-        raise ValueError('at least three repetitions are required')
+    if not isinstance(repetitions, int) or isinstance(repetitions, bool) or repetitions < 3:
+        raise ValueError('at least three pairs are required')
     variants = flag_sets(extra_flags)
     plan = []
-    for program in PROGRAMS:
-        for threads in sorted({core_count, 240}) if program in OPENMP else [1]:
-            for run in range(repetitions):
-                # Alternate first compiler, including additional flag pairs.
+    # ADR-0015: complete primary rounds before any side panel.
+    for side_panel in (False, True):
+      for run in range(repetitions):
+       for profile, cores in [('full', core_count), ('3100', 56), ('5100', 59)]:
+        for program in PROGRAMS:
+            panels = [(1, 'serial', 'primary')]
+            if side_panel:
+                panels = ([(t, 'openmp', OPENMP_PANEL) for t in (cores, cores * 2, cores * 4)]
+                          if program in OPENMP else [])
+            for threads, variant, panel in panels:
                 for index in range(max(map(len, variants.values()))):
                     order = (DONOR, KNC) if run % 2 == 0 else (KNC, DONOR)
-                    for compiler in order:
+                    if side_panel:
+                        order = (KNC,)
+                    for start_order, compiler in enumerate(order):
                         if index < len(variants[compiler]):
                             plan.append(dict(program=program, compiler=compiler,
-                                             flags=variants[compiler][index], run=run,
-                                             threads=threads, input=INPUTS[program],
-                                             held_out=program in HELD_OUT))
+                                flags=variants[compiler][index], run=run,
+                                threads=threads, input=INPUTS[program],
+                                profile=profile, variant=variant, panel=panel,
+                                pair_id=None if side_panel else '%s/%s/%d/%d' % (profile, program, index, run),
+                                start_order=start_order, launch_order=len(plan),
+                                held_out=program in HELD_OUT))
     return plan
 
 
 def identity(row):
     return (row['program'], row['compiler'], tuple(row['flags']), row['run'],
-            row['threads'], row['input'])
+            row['threads'], row['input'], row.get('profile', 'full'), row.get('variant', 'serial'))
+
+
+def arrays_match(left, right):
+    if not isinstance(left, list) or not isinstance(right, list) or not left or len(left) != len(right):
+        return False
+    for a, b in zip(left, right):
+        x, y = a.get('values'), b.get('values')
+        if a.get('array') != b.get('array') or not isinstance(x, list) or not isinstance(y, list) or not x or len(x) != len(y):
+            return False
+        for u, v in zip(x, y):
+            if (not isinstance(u, (int, float)) or not isinstance(v, (int, float))
+                    or not math.isfinite(u) or not math.isfinite(v)
+                    or not math.isclose(u, v, rel_tol=RTOL, abs_tol=ATOL)):
+                return False
+    return True
 
 
 def parse_results(text):
@@ -110,6 +138,7 @@ def parse_results(text):
     return rows
 
 
+# Legacy v1 analysis API; v2 collection emits no scores.
 def checksum_matches(left, right):
     """Compare numeric live-out reductions; no file hashes or provenance data."""
     if not isinstance(left, list) or not isinstance(right, list) or not left or len(left) != len(right):
@@ -237,10 +266,17 @@ def stage_runtimes(binary, compiler, directory, log):
     readelf = SHARED / 'toolchain/cross/bin/k1om-mpss-linux-readelf'
     queue, seen, files = [binary], set(), []
     system = {'libc.so.6', 'libm.so.6', 'libpthread.so.0', 'libdl.so.2', 'librt.so.1', 'ld-linux-k1om.so.2'}
+    dependencies, installed = {}, []
+    def revision(path):
+        result = subprocess.run([str(readelf), '-p', '.comment', str(path)],
+                                capture_output=True, text=True)
+        return result.stdout.strip() or 'revision unavailable in installed ELF'
     while queue:
         current = queue.pop()
         output = subprocess.check_output([str(readelf), '-d', str(current)], text=True)
-        for name in re.findall(r'\(NEEDED\).*\[(.*?)\]', output):
+        needed = re.findall(r'\(NEEDED\).*\[(.*?)\]', output)
+        dependencies[current.name] = needed
+        for name in needed:
             if name in system or name in seen:
                 continue
             seen.add(name)
@@ -253,11 +289,22 @@ def stage_runtimes(binary, compiler, directory, log):
             target = directory / name
             shutil.copyfile(path, target)
             files.append(target)
+            installed.append(dict(name=name, selected_path=str(path.resolve()),
+                                  revision=revision(path)))
             queue.append(target)
+    record = directory / 'runtime-prefix.json'
+    write_json(record, dict(compiler=compiler, prefix=str(compiler_prefix(compiler)),
+                           compiler_revision=subprocess.check_output(
+                               [str(compiler_path(compiler)), '--version'], text=True).strip(),
+                           binary_revision=revision(binary), needed=dependencies,
+                           installed_libraries=installed,
+                           system_runtime_names=sorted(system & set(sum(dependencies.values(), []))),
+                           system_runtime_revision='card supplied; captured by launcher at execution'))
+    files.append(record)
     return files
 
 
-def build_program(program, compiler, flags, source, out, log, setparams):
+def build_program(program, compiler, flags, source, out, log, setparams, variant='openmp'):
     cc = compiler_path(compiler)
     common = list(flags)
     sources, extra, language = [], [], 'gcc'
@@ -299,6 +346,14 @@ def build_program(program, compiler, flags, source, out, log, setparams):
     elif program == 'HPCG':
         hpcg = source / 'hpcg-3.1/src'
         sources = sorted(hpcg.glob('*.cpp'))
+        original = hpcg / 'ComputeResidual.cpp'
+        fixed = out / original.name
+        content = original.read_text()
+        before = 'shared(local_residual, v1v, v2v)'
+        if content.count(before) != 1:
+            raise RuntimeError('HPCG source does not match authorized one-line fix')
+        fixed.write_text(content.replace(before, 'shared(local_residual, v1v, v2v, n)'))
+        sources = [fixed if p == original else p for p in sources]
         extra, language = ['-fopenmp', '-DHPCG_NO_MPI', '-I' + str(hpcg)], 'g++'
     elif program == 'zlib':
         lib = source / 'zlib-1.3.1'
@@ -314,6 +369,10 @@ def build_program(program, compiler, flags, source, out, log, setparams):
         lib = source / 'sqlite-amalgamation-3460100'
         sources = [lib / 'sqlite3.c', SUPPORT / 'sqlite.c']
         extra = ['-I' + str(lib), '-lpthread', '-ldl']
+    if variant == 'serial':
+        extra = [f for f in extra if f != '-fopenmp']
+        if program == 'HPCG':
+            extra.append('-DHPCG_NO_OPENMP')
     binary = out / 'workload'
     execute([compiler_path(compiler, language), *common, *extra, *sources, *link_paths(), '-lm', '-o', binary], out, log)
     execute([sys.executable, ROOT / 'tools/knc_lint', binary], out, log)
@@ -330,6 +389,82 @@ def windows_path(value):
     return match[1].upper() + ':/' + match[2] if match else value
 
 
+def sealed_dir(stage_dir):
+    destination = SHARED / 'm4-sealed' / stage_dir.name
+    destination.mkdir(parents=True, exist_ok=True)
+    return destination
+
+
+def write_partition(stage_dir, name, rows):
+    private = sealed_dir(stage_dir)
+    for directory, held in ((stage_dir, False), (private, True)):
+        selected = [r for r in rows if (r['program'] in HELD_OUT) == held]
+        if name.endswith('.jsonl'):
+            (directory / name).write_text(''.join(json.dumps(r, allow_nan=False) + '\n' for r in selected))
+        else:
+            write_json(directory / name, selected)
+
+
+def read_partition(stage_dir, name):
+    result = []
+    for directory in (stage_dir, sealed_dir(stage_dir)):
+        path = directory / name
+        if path.exists():
+            result.extend(parse_results(path.read_text()) if name.endswith('.jsonl')
+                          else json.loads(path.read_text()))
+    return result
+
+
+def stage_build(program, compiler, flags, variant, flag_index, source, stage_dir, reason=None):
+    held = program in HELD_OUT
+    base = sealed_dir(stage_dir) if held else stage_dir
+    # Build diagnostics for held-out programs never enter the public build tree.
+    build_base = base / 'build' if held else SHARED / 'corpus-build/v2'
+    build_variant = variant
+    if variant == 'optimization-fallback':
+        build_variant += next(f for f in flags if re.fullmatch(r'-O[0-3]', f))
+    out = build_base / compiler / str(flag_index) / build_variant / program
+    out.mkdir(parents=True, exist_ok=True)
+    for old in out.iterdir():
+        if old.is_file():
+            old.unlink()
+    actual_flags = list(flags) + (['-fopenmp'] if program in OPENMP and variant == 'openmp' else [])
+    record = dict(program=program, compiler=compiler, flags=actual_flags,
+                  requested_flags=list(flags), variant=variant,
+                  panel=OPENMP_PANEL if variant == 'openmp' else 'primary',
+                  held_out=held, log=str(out / 'build.log'), source_changes=[])
+    if reason:
+        record['fallback_reason'] = reason
+    if program == 'HPCG':
+        record['source_changes'] = [dict(file='hpcg-3.1/src/ComputeResidual.cpp',
+            reason='Owner S11-18: add n to default(none) shared list in staged copy only')]
+    with (out / 'build.log').open('w') as log:
+        try:
+            files = build_program(program, compiler, flags, source, out, log,
+                                  stage_dir / 'setparams', variant)
+            dest = base / compiler / str(flag_index) / build_variant / program
+            dest.mkdir(parents=True, exist_ok=True)
+            for old in dest.iterdir():
+                if old.is_file():
+                    old.unlink()
+            staged = []
+            for file in files:
+                shutil.copyfile(file, dest / file.name)
+                staged.append(str(dest / file.name))
+            record.update(check='pass', files=staged)
+        except (OSError, RuntimeError, subprocess.SubprocessError) as exc:
+            log.write(str(exc) + '\n')
+            log.flush()
+            with (out / 'build.log').open(errors='replace') as diagnostics:
+                diagnostic = list(deque(diagnostics, maxlen=30))
+            reasons = [s.strip() for s in diagnostic if re.search(
+                r'error:|undefined reference|cannot find|runtime unavailable|forbidden', s, re.I)]
+            record.update(check='error', cause=str(exc) + ': ' + ' | '.join(reasons[-3:])[:1000], files=[])
+    print('%s: %s' % (program, record['check']) if held else
+          '%s %s %s %s: %s' % (compiler, program, variant, actual_flags, record['check']), flush=True)
+    return record
+
+
 def stage(args):
     if os.name == 'nt':
         raise RuntimeError('stage with the shared Cygwin Python (see README)')
@@ -337,12 +472,12 @@ def stage(args):
     extract_packages(source)
     stage_dir = args.stage.resolve()
     stage_dir.mkdir(parents=True, exist_ok=True)
-    settings = dict(extra_flags=args.extra_flags, repetitions=args.repetitions)
+    settings = dict(extra_flags=args.extra_flags, repetitions=args.repetitions or 3)
     if args.only:
         previous = json.loads((stage_dir / 'settings.json').read_text())
         if settings != previous:
             raise ValueError('selective staging must preserve the existing flag sets and repetitions')
-        records = [r for r in json.loads((stage_dir / 'builds.json').read_text()) if r['program'] not in args.only]
+        records = [r for r in read_partition(stage_dir, 'builds.json') if r['program'] not in args.only]
     else:
         records = []
     # Inputs are staged once and shared by every compiler and flag set.
@@ -358,52 +493,46 @@ def stage(args):
         # Reference input, retained verbatim in the package; no source edits.
         shutil.copyfile(source / 'hpcg-3.1/bin/hpcg.dat', stage_dir / 'hpcg.dat')
         with (stage_dir / 'support.log').open('w') as log:
-            execute([compiler_path(DONOR), '-O2', SUPPORT / 'launch.c', *link_paths(), '-lrt', '-pthread', '-o', stage_dir / 'launch'], stage_dir, log)
-            execute([sys.executable, ROOT / 'tools/knc_lint', stage_dir / 'launch'], stage_dir, log)
             execute(['gcc', source / 'NPB3.4.2/NPB3.4-OMP/sys/setparams.c', '-o', stage_dir / 'setparams'], stage_dir, log)
-    for compiler, variants in flag_sets(args.extra_flags).items():
-        for variant, flags in enumerate(variants):
+    # Selective restaging must also refresh the launcher protocol.
+    with (stage_dir / 'support.log').open('a') as log:
+        execute([compiler_path(DONOR), '-O2', SUPPORT / 'launch.c', *link_paths(), '-lrt', '-pthread', '-o', stage_dir / 'launch'], stage_dir, log)
+        execute([sys.executable, ROOT / 'tools/knc_lint', stage_dir / 'launch'], stage_dir, log)
+    for compiler, flag_variants in flag_sets(args.extra_flags).items():
+        for flag_index, flags in enumerate(flag_variants):
             for program in PROGRAMS:
                 if args.only and program not in args.only:
                     continue
-                out = SHARED / 'corpus-build' / compiler / str(variant) / program
-                out.mkdir(parents=True, exist_ok=True)
-                # Clear stale artifacts in this fixed, harness-owned build folder.
-                for old in out.iterdir():
-                    if old.is_file():
-                        old.unlink()
-                record = dict(program=program, compiler=compiler, flags=flags,
-                              held_out=program in HELD_OUT, log=str(out / 'build.log'))
-                with (out / 'build.log').open('w') as log:
-                    try:
-                        files = build_program(program, compiler, flags, source, out, log, stage_dir / 'setparams')
-                        dest = stage_dir / compiler / str(variant) / program
-                        dest.mkdir(parents=True, exist_ok=True)
-                        for old in dest.iterdir():
-                            if old.is_file():
-                                old.unlink()
-                        staged = []
-                        for file in files:
-                            shutil.copyfile(file, dest / file.name)
-                            staged.append(str(dest / file.name))
-                        record.update(check='pass', files=staged)
-                    except (OSError, RuntimeError, subprocess.SubprocessError) as exc:
-                        log.write(str(exc) + '\n')
-                        log.flush()
-                        with (out / 'build.log').open(errors='replace') as diagnostics:
-                            diagnostic = [s.strip() for s in deque(diagnostics, maxlen=30)]
-                        reasons = [s for s in diagnostic if re.search(r'error:|undefined reference|cannot find|runtime unavailable|forbidden', s, re.I)]
-                        record.update(check='error', cause=str(exc) + ': ' + ' | '.join(reasons[-3:])[:1000], files=[])
-                records.append(record)
-                print('%s %s %s: %s' % (compiler, program, flags, record['check']), flush=True)
-    write_json(stage_dir / 'builds.json', records)
+                variants = ['openmp', 'serial'] if program in OPENMP else ['serial']
+                for variant in variants:
+                    record = stage_build(program, compiler, flags, variant, flag_index,
+                                         source, stage_dir,
+                                         OPENMP_PANEL if program in OPENMP and variant == 'serial' else None)
+                    records.append(record)
+                    if program == 'SQLite' and compiler == DONOR and record['check'] == 'error':
+                        # Try descending optimization levels; retain every failed attempt.
+                        for level in ('-O3', '-O2', '-O1', '-O0'):
+                            fallback_flags = [f for f in flags if not re.fullmatch(r'-O(?:[0-3sgz]|fast)', f)] + [level]
+                            if fallback_flags == flags or set(fallback_flags) == set(flags):
+                                continue
+                            fallback = stage_build(program, compiler, fallback_flags,
+                                'optimization-fallback', flag_index, source, stage_dir, record['cause'])
+                            fallback['requested_flags'] = flags
+                            records.append(fallback)
+                            if fallback['check'] == 'pass':
+                                break
+                            fallback['variant'] = 'failed-optimization-attempt'
+    write_partition(stage_dir, 'builds.json', records)
+    write_json(stage_dir / 'held-out-status.json', [dict(program=p, check=(
+        'ready' if all(r['check'] == 'pass' for r in records if r['program'] == p) else 'fail'))
+        for p in HELD_OUT if any(r['program'] == p for r in records)])
     write_json(stage_dir / 'settings.json', settings)
     # Runtime dependencies are staged per compiler, all input and runtime files
     # are transferred by card_run; the lead invokes this script explicitly.
     write_lead_script(stage_dir)
     (stage_dir / 'lead.sh').unlink(missing_ok=True)
     print('Staged lead script:', stage_dir / 'lead.ps1')
-    print('Baseline estimate: 70-110 min including staging; no native timing calibration yet.')
+    print('Baseline estimate: 4-7 hours including staging; no native timing calibration yet.')
     print('Build failures:', sum(r['check'] != 'pass' for r in records), 'of', len(records))
 
 
@@ -411,31 +540,46 @@ def write_lead_script(stage_dir):
     project = ROOT.parent.parent if ROOT.parent.name == '.work' else ROOT
     quote = lambda path: "'" + windows_path(path).replace("'", "''") + "'"
     (stage_dir / 'lead.ps1').write_text(
-        "# Windows Python is required by card_run. Prefer the merged checkout.\n" +
-        "# Baseline estimate: 70-110 minutes; native calibration is pending.\n" +
-        '$corpusEntry = ' + quote(project / 'tools/corpus.py') + '\n' +
-        'if (!(Test-Path -LiteralPath $corpusEntry)) { $corpusEntry = ' + quote(Path(__file__).resolve()) + ' }\n' +
-        '& (Get-Command python.exe).Source $corpusEntry lead --stage ' + quote(stage_dir) + '\nexit $LASTEXITCODE\n')
+        "# Windows Python is required by card_run. Use this ticket until merged.\n" +
+        "# Pilot: 468 launches across full/3100/5100, initially estimated 4-7 hours; NPB may extend this.\n" +
+        "param([int]$Pairs = 3, [int]$TimeoutSeconds = 3600)\n" +
+        '$corpusEntry = ' + quote(Path(__file__).resolve()) + '\n' +
+        'if (!(Test-Path -LiteralPath $corpusEntry)) { $corpusEntry = ' + quote(project / 'tools/corpus.py') + ' }\n' +
+        '& (Get-Command python.exe).Source $corpusEntry lead --stage ' + quote(stage_dir) + ' --pairs $Pairs --timeout $TimeoutSeconds\nexit $LASTEXITCODE\n')
     shutil.copyfile(SUPPORT / 'README.md', stage_dir / 'README.md')
 
 
 def output_result(job, stdout, stderr, returncode):
     row = dict(job, check='error', time_seconds=None)
     try:
-        if returncode:
-            raise ValueError('card_run exit %d' % returncode)
         meta = [json.loads(line[len('CORPUS_META '):]) for line in stdout.splitlines() if line.startswith('CORPUS_META ')]
         times = [float(line.split()[1]) for line in stdout.splitlines() if line.startswith('CORPUS_TIME ')]
         if len(meta) != 1 or meta[0]['threads'] != job['threads'] or len(times) != 1 or not math.isfinite(times[0]) or times[0] <= 0:
             raise ValueError('missing or mismatched native timing/affinity metadata')
-        row.update(time_seconds=times[0], affinity=meta[0])
+        clocks = [json.loads(line[len('CORPUS_CLOCK '):]) for line in stdout.splitlines()
+                  if line.startswith('CORPUS_CLOCK ')]
+        if len(clocks) != 1:
+            raise ValueError('missing launch-to-exit clock record')
+        timing = clocks[0]
+        if (timing.get('clock') != 'CLOCK_MONOTONIC_RAW' or timing.get('boundary') != 'launch-to-exit'
+                or any(type(timing.get(k)) is not int for k in ('start_ns', 'end_ns', 'utc_start_ns'))
+                or timing['end_ns'] <= timing['start_ns'] or timing['utc_start_ns'] <= 0
+                or not math.isclose((timing['end_ns'] - timing['start_ns']) / 1e9,
+                                    times[0], rel_tol=1e-9, abs_tol=1e-9)):
+            raise ValueError('invalid launch-to-exit clock record')
+        row.update(time_seconds=times[0], affinity=meta[0], timing=timing,
+                   secondary_timing_output=[line for line in (stdout + '\n' + stderr).splitlines()
+                       if re.search(r'Time in seconds|(?:time|Time|seconds|Seconds).*[:=]|Avg time|Min time|Max time', line)],
+                   system_runtime=[line for line in stdout.splitlines() if line.startswith('CORPUS_RUNTIME ')])
+        if returncode:
+            raise ValueError('card_run exit %d' % returncode)
         text = stdout + '\n' + stderr
         program = job['program']
         if program.startswith('PB-'):
             checks = [json.loads(line[len('CORPUS_ARRAY '):]) for line in stdout.splitlines() if line.startswith('CORPUS_ARRAY ')]
-            if not checksum_matches(checks, checks):
-                raise ValueError('missing or nonfinite PolyBench checksums')
-            row['checksum'] = checks
+            if not arrays_match(checks, checks):
+                raise ValueError('missing or nonfinite complete PolyBench output')
+            row['arrays'] = checks
         elif program.startswith('NPB-'):
             if not re.search(r'Verification\s*=\s*SUCCESSFUL', text, re.I) or re.search(r'UNSUCCESSFUL|VERIFICATION FAILED', text, re.I):
                 raise ValueError('NPB verification failed or absent')
@@ -447,21 +591,32 @@ def output_result(job, stdout, stderr, returncode):
                 raise ValueError('HPCG validity report failed or absent')
         elif 'CORPUS_CHECK pass' not in stdout:
             raise ValueError('correctness check failed or absent')
+        if program in ('zlib', 'bzip2') and ('CORPUS_CROSS pass' not in stdout or 'CORPUS_CONTROL rejected' not in stdout):
+            raise ValueError('missing cross-compiler decoding or corruption rejection')
         row['check'] = 'pass'
     except (ValueError, KeyError, TypeError) as exc:
         row.update(check='fail' if row['time_seconds'] is not None else 'error', cause=str(exc))
     return row
 
 
-def card_call(stage_dir, files, mode, density, stdout, stderr):
+def card_call(stage_dir, files, mode, density, stdout, stderr, profile='full', timeout=3600):
     # Called only by the explicit lead subcommand, never by stage or collect.
-    command = [sys.executable, str(ROOT / 'tools/card_run'), '--benchmark', '--threads', '240',
-               '--timeout', '180' if mode == 'HPCG' else '45']
+    threads = {'full': 240, '3100': 224, '5100': 236}[profile]
+    # card_run requires a transport record; keep only its transient working file.
+    transport_record = stdout.parent / 'card-result.json'
+    command = [sys.executable, str(ROOT / 'tools/card_run'), '--benchmark', '--threads', str(threads),
+               '--timeout', str(timeout),
+               '--receipt', str(transport_record)]
+    if profile != 'full':
+        command += ['--profile', profile]
     for file in files:
         command += ['--file', str(file)]
     command += [str(stage_dir / 'launch'), density, mode]
-    with stdout.open('w') as out, stderr.open('w') as err:
-        return subprocess.run(command, stdout=out, stderr=err).returncode
+    try:
+        with stdout.open('w') as out, stderr.open('w') as err:
+            return subprocess.run(command, stdout=out, stderr=err).returncode
+    finally:
+        transport_record.unlink(missing_ok=True)
 
 
 def lead(args):
@@ -469,7 +624,9 @@ def lead(args):
         raise RuntimeError('lead requires Windows Python for card_run and its Windows OpenSSH paths')
     stage_dir = args.stage.resolve()
     settings = json.loads((stage_dir / 'settings.json').read_text())
-    builds = json.loads((stage_dir / 'builds.json').read_text())
+    if args.repetitions is not None:
+        settings['repetitions'] = args.repetitions
+    builds = read_partition(stage_dir, 'builds.json')
     capture = stage_dir / 'capture'
     capture.mkdir(exist_ok=True)
     out, err = capture / 'probe.stdout', capture / 'probe.stderr'
@@ -477,30 +634,69 @@ def lead(args):
     if rc:
         raise RuntimeError('card affinity probe failed; see ' + str(err))
     metadata = [json.loads(s[len('CORPUS_META '):]) for s in out.read_text().splitlines() if s.startswith('CORPUS_META ')]
-    if len(metadata) != 1:
-        raise RuntimeError('missing card topology probe')
+    if len(metadata) != 1 or metadata[0]['granted_cpus'] != metadata[0]['cores'] * 4:
+        raise RuntimeError('missing or incomplete card topology probe')
     plan = make_plan(**settings, core_count=metadata[0]['cores'])
-    write_json(stage_dir / 'plan.json', plan)
-    index = {(r['program'], r['compiler'], tuple(r['flags'])): r for r in builds}
-    # Fixed flat output files, overwritten on the next full pass.
-    with (stage_dir / 'raw-results.jsonl').open('w') as results:
-        for number, job in enumerate(plan):
-            build = index[(job['program'], job['compiler'], tuple(job['flags']))]
+    selected = []
+    for job in plan:
+        matches = [b for b in builds if b['program'] == job['program'] and
+                   b['compiler'] == job['compiler'] and b['requested_flags'] == job['flags'] and
+                   b['variant'] == job['variant']]
+        if job['program'] == 'SQLite' and job['compiler'] == DONOR:
+            fallback = [b for b in builds if b['program'] == 'SQLite' and b['compiler'] == DONOR and
+                        b['requested_flags'] == job['flags'] and b['variant'] == 'optimization-fallback' and b['check'] == 'pass']
+            matches = fallback or matches
+        if len(matches) != 1:
+            raise RuntimeError('missing or ambiguous staged build: ' + job['program'])
+        build = matches[0]
+        job.update(flags=build['flags'], variant=build['variant'], panel=build['panel'])
+        if 'fallback_reason' in build:
+            job['fallback_reason'] = build['fallback_reason']
+        selected.append(build)
+    write_partition(stage_dir, 'plan.json', plan)
+    private = sealed_dir(stage_dir)
+    (private / 'capture').mkdir(exist_ok=True)
+    # Keep the two streams separate from their first byte, even on interruption.
+    with (stage_dir / 'raw-results.jsonl').open('w') as public, (private / 'raw-results.jsonl').open('w') as sealed:
+        for number, (job, build) in enumerate(zip(plan, selected)):
+            job['timeout_seconds'] = args.timeout
+            held = job['program'] in HELD_OUT
+            folder = private / 'capture' if held else capture
+            out, err = folder / ('%03d.stdout' % number), folder / ('%03d.stderr' % number)
             if build['check'] != 'pass':
                 row = dict(job, check='error', time_seconds=None, cause='build: ' + build['cause'], log=build['log'])
             else:
-                files = [windows_path(file) for file in build['files']]
+                files = [windows_path(file) for file in build['files'] if not file.endswith('.json')]
+                ready = True
                 if job['program'] in ('zlib', 'bzip2'):
                     files.append(str(stage_dir / 'input.bin'))
+                    peers = [b for b in builds if b['program'] == job['program'] and
+                             b['compiler'] != job['compiler'] and b['check'] == 'pass']
+                    ready = bool(peers)
+                    if ready:
+                        peer = folder / 'peer.tar'
+                        def peer_mode(member):
+                            member.mode = 0o755 if member.name == 'workload' else 0o644
+                            return member
+                        with tarfile.open(peer, 'w') as archive:
+                            for file in peers[0]['files']:
+                                if not file.endswith('.json'):
+                                    archive.add(windows_path(file), arcname=Path(file).name, filter=peer_mode)
+                        files.append(str(peer))
                 elif job['program'] == 'SQLite':
                     files.append(str(stage_dir / 'input.sql'))
                 elif job['program'] == 'HPCG':
                     files.append(str(stage_dir / 'hpcg.dat'))
-                density = 'serial' if job['program'] not in OPENMP else 'full' if job['threads'] == 240 else 'one'
-                out, err = capture / ('%03d.stdout' % number), capture / ('%03d.stderr' % number)
-                rc = card_call(stage_dir, files, job['program'], density, out, err)
-                row = output_result(job, out.read_text(errors='replace'), err.read_text(errors='replace'), rc)
-                row.update(stdout=str(out), stderr=str(err))
+                cores = {'full': metadata[0]['cores'], '3100': 56, '5100': 59}[job['profile']]
+                density = 'serial' if job['threads'] == 1 else 'full' if job['threads'] == 4 * cores else 'two' if job['threads'] == 2 * cores else 'one'
+                if ready:
+                    rc = card_call(stage_dir, files, job['program'], density, out, err, job['profile'], args.timeout)
+                    row = output_result(job, out.read_text(errors='replace'), err.read_text(errors='replace'), rc)
+                    row.update(stdout=str(out), stderr=str(err))
+                    row['runtime_prefix'] = next((windows_path(f) for f in build['files'] if f.endswith('runtime-prefix.json')), None)
+                else:
+                    row = dict(job, check='error', time_seconds=None, cause='other compiler decoder build unavailable')
+            results = sealed if held else public
             results.write(json.dumps(row, allow_nan=False) + '\n')
             results.flush()
     collect(args)
@@ -508,44 +704,61 @@ def lead(args):
 
 def collect(args):
     stage_dir = args.stage.resolve()
-    plan = json.loads((stage_dir / 'plan.json').read_text())
-    rows = parse_results((stage_dir / 'raw-results.jsonl').read_text())
-    # Explicitly mark each mismatching candidate as failed in the final JSONL.
+    plan = read_partition(stage_dir, 'plan.json')
+    rows = read_partition(stage_dir, 'raw-results.jsonl')
+    # Migrate imported v1 files immediately; never trust a held_out label.
+    write_partition(stage_dir, 'plan.json', plan)
+    write_partition(stage_dir, 'raw-results.jsonl', rows)
     donors = defaultdict(list)
+    def pair(row):
+        return (row['program'], row['run'], row['threads'], row['input'],
+                row.get('profile', 'full'), row.get('variant', 'serial'))
     for row in rows:
         if row['compiler'] == DONOR and row['program'].startswith('PB-'):
-            donors[(row['program'], row['run'], row['threads'], row['input'])].append(row)
+            donors[pair(row)].append(row)
     for row in rows:
-        if row['compiler'] == KNC and row['program'].startswith('PB-') and row['check'] == 'pass':
-            paired = donors[(row['program'], row['run'], row['threads'], row['input'])]
-            if not paired or any(d['check'] != 'pass' or not checksum_matches(d.get('checksum'), row.get('checksum')) for d in paired):
-                row.update(check='fail', cause='PolyBench cross-compiler checksum mismatch or missing reference')
-    (stage_dir / 'results.jsonl').write_text(''.join(json.dumps(row, allow_nan=False) + '\n' for row in rows))
-    report = summarize(plan, rows)
-    write_json(stage_dir / 'summary.json', report)
-    lines = []
-    for partition, median in [('development', 'median_speedup'), ('held_out', 'held_out_median_speedup')]:
-        lines += [partition, 'program | threads | donor flags | candidate flags | speedup', '--- | ---: | --- | --- | ---:']
-        for row in report[partition]:
-            lines.append('%s | %s | %s | %s | %s' % (row['program'], row['threads'], ' '.join(row['donor_flags']),
-                         ' '.join(row['candidate_flags']), 'FAILED' if row['speedup'] is None else '%.4fx' % row['speedup']))
-        lines.append('Median: ' + str(report[median]))
-    lines += ['Failures:', *[json.dumps(row) for row in report['failures']]]
-    (stage_dir / 'summary.md').write_text('\n'.join(lines) + '\n')
-    print('Collected %d launches; %d failures; see %s' % (len(rows), len(report['failures']), stage_dir / 'summary.md'))
+        if row['program'].startswith('PB-') and row['check'] == 'pass':
+            if not arrays_match(row.get('arrays'), row.get('arrays')):
+                row.update(check='fail', cause='missing or invalid complete PolyBench output')
+            elif row['compiler'] == KNC:
+                paired = donors[pair(row)]
+                if not paired or any(d['check'] != 'pass' or not arrays_match(d.get('arrays'), row['arrays']) for d in paired):
+                    row.update(check='fail', cause='PolyBench elementwise mismatch or missing reference')
+    write_partition(stage_dir, 'results.jsonl', rows)
+    observed = defaultdict(list)
+    for row in rows:
+        observed[identity(row)].append(row)
+    states = []
+    for program in sorted({p['program'] for p in plan}):
+        jobs = [p for p in plan if p['program'] == program]
+        good = all(len(observed[identity(p)]) == 1 and
+                   observed[identity(p)][0]['check'] == 'pass' for p in jobs)
+        expected = {identity(p) for p in jobs}
+        good = good and all(identity(r) in expected for r in rows if r['program'] == program)
+        states.append(dict(program=program, check='pass' if good else 'fail'))
+    # Scoring belongs to S11-14 / ADR-0015, not this harness.
+    write_json(stage_dir / 'status.json', states)
+    for old in ('summary.json', 'summary.md'):
+        (stage_dir / old).unlink(missing_ok=True)
+    for state in states:
+        print('%s: %s' % (state['program'], state['check']))
 
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('action', choices=('stage', 'lead', 'collect'))
-    parser.add_argument('--stage', type=Path, default=SHARED / 'S11-11')
+    parser.add_argument('--stage', type=Path, default=SHARED / 'S11-18')
     parser.add_argument('--extra-flags', type=json.loads, default={})
-    parser.add_argument('--repetitions', type=int, default=3)
+    parser.add_argument('--pairs', '--repetitions', dest='repetitions', type=int,
+                        help='paired launches: pilot default 3; ADR-0015 gate 6 (lead overrides staged count)')
+    parser.add_argument('--timeout', type=int, default=3600, help='per-launch seconds, including serial NPB pilot')
     parser.add_argument('--only', nargs='+', choices=PROGRAMS,
                         help='stage only these programs, retaining previous build records and inputs')
     args = parser.parse_args()
-    if args.repetitions < 3:
+    if args.repetitions is not None and args.repetitions < 3:
         parser.error('at least three repetitions')
+    if args.timeout < 1:
+        parser.error('timeout must be positive')
     globals()[args.action](args)
 
 
