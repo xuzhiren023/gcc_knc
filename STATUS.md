@@ -1,10 +1,10 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-12 07:31.
+Updated automatically at every ticket change. Last update: 2026-11-12 07:45.
 
 **Waiting for you:** S10-12. Run `python tools/pm.py inbox`.
 
-Current tickets: `[###################-]` 180 of 183
+Current tickets: `[###################-]` 180 of 184
 
 ## Milestones
 
@@ -13,7 +13,7 @@ Current tickets: `[###################-]` 180 of 183
 | M0 | Foundation | In progress | 17 of 17 tickets |
 | M1 | Mixed native code | Done | 43 of 43 tickets |
 | M2 | Useful vector target | Done | 51 of 51 tickets |
-| M3 | Runtimes | Done | 46 of 47 tickets |
+| M3 | Runtimes | Done | 46 of 48 tickets |
 | M4 | Broad optimization | In progress | 0 of 2 tickets |
 | M5 | Program corpus | Not started | Not planned in detail yet |
 | M6 | Release | Not started | Not planned in detail yet |
@@ -51,6 +51,7 @@ Current tickets: `[###################-]` 180 of 183
 | S10-10 | Card harness fixes from the Sprint 10 card turn - card_qualify binary folder, vmath bench batch sizing | Done | card_qualify now runs the card binaries from knc/ and stops before any card job when one is missing, and th... |
 | S10-11 | Card-only vector math failures - double sin, cos, tan, atan2 above 1 ULP, and cbrt/cbrtf crash (SIGSEGV) | Done | Double sin, cos, tan and atan2 from the KNC vector math library are now within 1 ULP on the card (0.76 to 0... |
 | S10-12 | cbrt and cbrtf crash (SIGSEGV) in qualify_v1 on the card - root cause and fix | **Waiting for you** | Review of 1ff46888/7ae4d224: cause accepted (MPSS libm s_cbrtl.S:178, cbrtl+0xea, zero-extends a negative t... |
+| S10-13 | User story - code that calls cbrtl under -march=knc gets a safe replacement and a compile-time warning (MPSS libm cbrtl faults) | In progress |  |
 | S11-01 | User story - the best way to move data between the host and the card, measured, and how our projects use it | In progress | Yes. The AGENTS.md rule is about process provenance (receipts, hash manifests of our own files), which git ... |
 | S11-02 | card_run and run_suite move data by S11-01's recommended method, with fallback | Not started | ready; waits on its dep S11-01, the lead writes acceptance before it starts |
 | S2-01 | Design for zmm and mask registers under -march=knc | Done | The register design for KNC is settled on paper: all 32 zmm and 8 mask registers become usable under -march... |
@@ -221,10 +222,10 @@ Current tickets: `[###################-]` 180 of 183
 
 - From the script, engineer: 429 sessions, 943.4M input tokens
 - From the script, lead: 269 sessions, 79.2M input tokens
-- Started by hand, Claude: 11 sessions, 2475.8M input tokens
+- Started by hand, Claude: 11 sessions, 2477.4M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 24.4 GiB of 100 GiB. 99 GiB free on the drive.
+The project uses 24.5 GiB of 100 GiB. 99 GiB free on the drive.
