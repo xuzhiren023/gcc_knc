@@ -17,6 +17,7 @@ import os
 from pathlib import Path
 import re
 import signal
+import struct
 import subprocess
 import sys
 import tempfile
@@ -88,6 +89,33 @@ class CorpusV2(unittest.TestCase):
                         self.assertEqual(len(launches), 15)
                     else:
                         self.assertEqual(len(launches), 6)
+
+    def test_gate_pairs_and_raw_clock_record(self):
+        plan = corpus.make_plan(repetitions=6, core_count=60)
+        self.assertEqual(len(plan), 936)
+        primary = [r for r in plan if r['panel'] == 'primary']
+        self.assertEqual(plan[:len(primary)], primary)
+        for run in range(6):
+            block = primary[run * 102:(run + 1) * 102]
+            self.assertEqual([r['profile'] for r in block[::34]], ['full', '3100', '5100'])
+            for a, b in zip(block[::2], block[1::2]):
+                self.assertEqual((a['compiler'], b['compiler']),
+                                 (corpus.DONOR, corpus.KNC) if run % 2 == 0 else (corpus.KNC, corpus.DONOR))
+                self.assertIsNotNone(a.get('pair_id'))
+                self.assertEqual(a.get('pair_id'), b.get('pair_id'))
+                self.assertEqual((a.get('start_order'), b.get('start_order')), (0, 1))
+        stdout = ('CORPUS_META {"threads":1}\nCORPUS_TIME 2.5\n'
+                  'CORPUS_CLOCK {"clock":"CLOCK_MONOTONIC_RAW","boundary":"launch-to-exit",'
+                  '"start_ns":1000000000,"end_ns":3500000000,"utc_start_ns":123456789}\n'
+                  'Time in seconds = 0.75\nVerification = SUCCESSFUL\n')
+        row = corpus.output_result(dict(program='NPB-CG', threads=1), stdout, '', 0)
+        self.assertEqual(row['check'], 'pass')
+        self.assertEqual(row['time_seconds'], 2.5)
+        self.assertEqual(row.get('timing', {}).get('boundary'), 'launch-to-exit')
+        self.assertIn('Time in seconds = 0.75', row.get('secondary_timing_output', []))
+        old = corpus.output_result(dict(program='NPB-CG', threads=1),
+                                   '\n'.join(s for s in stdout.splitlines() if not s.startswith('CORPUS_CLOCK ')), '', 0)
+        self.assertNotEqual(old['check'], 'pass', 'legacy partial timing must not be scored')
 
     def test_profiles_are_distinct_launch_identities_even_for_serial(self):
         plan, _ = observations('zlib')
@@ -297,7 +325,7 @@ class ReviewRuntime(unittest.TestCase):
             after = output.read()
         return os.WIFSTOPPED(status), before, after, packed_before
 
-    def test_polybench_pauses_before_complete_output(self):
+    def test_polybench_materializes_complete_binary_output_before_exit(self):
         with tempfile.TemporaryDirectory() as temporary:
             directory = Path(temporary)
             fixture = directory / 'dump.c'
@@ -316,13 +344,49 @@ int main(void) {
             subprocess.run(['gcc', '-I' + str(corpus.SUPPORT), str(fixture),
                             str(corpus.SUPPORT / 'polybench_capture.c'), '-o', str(binary)],
                            check=True, capture_output=True)
-            stopped, before, after, _ = self.paused_run(binary, directory)
-            self.assertTrue(stopped, 'complete output must wait for the timing boundary')
-            self.assertEqual(before, '')
-            arrays = [json.loads(line.removeprefix('CORPUS_ARRAY '))
-                      for line in after.splitlines()]
-            self.assertEqual(arrays, [dict(array='A', values=[1.2345678901234567]),
-                                      dict(array='B', values=[-2.0])])
+            stopped, _, after, _ = self.paused_run(binary, directory)
+            self.assertFalse(stopped, 'ADR-0015 requires exit, without a stop boundary')
+            self.assertEqual(after, '', 'format and transfer only after child exit')
+            artifact = directory / 'arrays.bin'
+            self.assertTrue(artifact.exists(), 'complete output must be materialized on card')
+            if artifact.exists():
+                arrays = []
+                with artifact.open('rb') as data:
+                    while name := data.read(80):
+                        count, = struct.unpack('=Q', data.read(8))
+                        values = struct.unpack('=' + 'd' * count, data.read(8 * count))
+                        arrays.append(dict(array=name.rstrip(b'\0').decode(), values=list(values)))
+                self.assertEqual(arrays, [dict(array='A', values=[1.2345678901234567]),
+                                          dict(array='B', values=[-2.0])])
+
+    def test_supervisor_waits_for_exit_and_defers_transfer(self):
+        header = corpus.SUPPORT / 'timing.h'
+        self.assertTrue(header.exists(), 'shared launch-to-exit supervisor is required')
+        if not header.exists():
+            return
+        with tempfile.TemporaryDirectory() as temporary:
+            directory = Path(temporary)
+            (directory / 'workload').write_text('#!/bin/sh\necho child-output\necho child-error >&2\nsleep 0.2\nexit 7\n')
+            (directory / 'workload').chmod(0o755)
+            fixture = directory / 'timer.c'
+            fixture.write_text('#include "timing.h"\nint main(void) { int status; '
+                               'if (corpus_timed_workload(&status)) return 2; '
+                               'return WIFEXITED(status) ? WEXITSTATUS(status) : 3; }\n')
+            binary = directory / 'timer'
+            # Cygwin's host clock is a stand-in; the card build uses RAW unconditionally.
+            subprocess.run(['gcc', '-DCLOCK_MONOTONIC_RAW=CLOCK_MONOTONIC',
+                            '-I' + str(corpus.SUPPORT), str(fixture), '-o', str(binary)],
+                           check=True, capture_output=True)
+            result = subprocess.run([str(binary)], cwd=directory, capture_output=True, text=True)
+            self.assertEqual(result.returncode, 7)
+            self.assertLess(result.stdout.index('CORPUS_TIME '), result.stdout.index('child-output'))
+            self.assertIn('child-error', result.stderr)
+            timing = json.loads(next(line[len('CORPUS_CLOCK '):] for line in result.stdout.splitlines()
+                                     if line.startswith('CORPUS_CLOCK ')))
+            self.assertEqual(timing['clock'], 'CLOCK_MONOTONIC_RAW')
+            self.assertEqual(timing['boundary'], 'launch-to-exit')
+            self.assertGreaterEqual((timing['end_ns'] - timing['start_ns']) / 1e9, 0.2)
+            self.assertGreater(timing['utc_start_ns'], 0)
 
     def test_peer_control_uses_corrupted_stream_and_rejects_clean_control(self):
         sources = corpus.SHARED / 'corpus-build/sources'
@@ -340,8 +404,10 @@ int main(void) {
                 (directory / 'input.bin').write_bytes(b'A' * (8 * 1024 * 1024))
                 stopped, _, output, packed_before = self.paused_run(binary, directory)
                 with self.subTest(boundary=name):
-                    self.assertTrue(stopped, 'packed.bin write must follow the timing boundary')
-                    self.assertFalse(packed_before)
+                    self.assertFalse(stopped, 'materialization belongs inside launch-to-exit')
+                    self.assertTrue(packed_before)
+                    self.assertEqual((directory / 'restored.bin').read_bytes(),
+                                     (directory / 'input.bin').read_bytes())
                     self.assertNotIn('CORPUS_CONTROL', output)
                 packed = (directory / 'packed.bin').read_bytes()
                 clean = subprocess.run([str(binary), 'decode'], cwd=directory,
