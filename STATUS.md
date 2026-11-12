@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-12 12:36.
+Updated automatically at every ticket change. Last update: 2026-11-12 12:37.
 
 **Waiting for you:** S11-02. Run `python tools/pm.py inbox`.
 
@@ -59,7 +59,7 @@ Current tickets: `[###################-]` 187 of 190
 | S11-05 | Research - raise KNC's real memory bandwidth from about 175 GB/s toward 75-85% of peak, with a measured plan | Done | The memory-bandwidth research plan and a validated multithreaded KNC bandwidth benchmark are ready, with a ... |
 | S11-06 | Memory bandwidth - read the first card sweep, find why our numbers sit below STREAM's, and stage sweep 2 toward 264-299 GB/s | lead | Interactive lead: (1) review and commit by hand the uncommitted work in .work/S11-06 (red b57eca55; pm comm... |
 | S11-07 | S11-01 transfer tool - the card's listener gives up before card_run relays its announcement | Done | The transfer study's card listener now waits long enough for card_run to relay its address to the host; che... |
-| S11-08 | -Wknc-unsafe-cbrtl cannot be used in #pragma GCC diagnostic ("valid for  but not for C") | In progress | 1. afb24158583 mixes the fix (i386.opt Target->Common) into the [red] commit. Make the red commit test file... |
+| S11-08 | -Wknc-unsafe-cbrtl cannot be used in #pragma GCC diagnostic ("valid for  but not for C") | Question for the tech lead | GCC build needed at ca9243bbb4f |
 | S2-01 | Design for zmm and mask registers under -march=knc | Done | The register design for KNC is settled on paper: all 32 zmm and 8 mask registers become usable under -march... |
 | S2-02 | Float and double arguments and results in zmm lane 0 | Done | Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`). |
 | S2-03 | Varargs with the donor's register save area | Done | Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`). |
@@ -215,6 +215,7 @@ Current tickets: `[###################-]` 187 of 190
 
 ## Recent activity
 
+- 2026-11-12 12:37 **S11-08** engineer ask: GCC build needed at ca9243bbb4f
 - 2026-11-12 12:36 **S11-08** lead changes: 1. afb24158583 mixes the fix (i386.opt Target->Common) into the [red] commit. Make the red commit test files only; the i386.opt change is the fix c...
 - 2026-11-12 12:35 **S11-08** engineer red: T1 C and C++ pragma regressions committed as afb24158583; not run because the shared GCC build is owner-managed.
 - 2026-11-12 12:31 **S11-08** lead answer: GCC source is the separate repo .work/_shared/gcc (from the project root; branch base knc). Work there: git -C .work/_shared/gcc checkout -b s11/S1...
@@ -222,7 +223,6 @@ Current tickets: `[###################-]` 187 of 190
 - 2026-11-12 12:25 **S11-06** lead defer: Interactive lead: (1) review and commit by hand the uncommitted work in .work/S11-06 (red b57eca55; pm commit stalled): membw fixes, sweep.sh secon...
 - 2026-11-12 12:24 **S11-06** engineer ask: Please commit pending changes (pm commit stalled; interrupted; red b57eca55), then run: python tools/card_run --benchmark --threads 240 --timeout 5...
 - 2026-11-12 12:23 **S11-07** lead approve: The transfer study's card listener now waits long enough for card_run to relay its address to the host; checked on the host, card run next. Machine...
-- 2026-11-12 12:15 **S11-07** engineer submit: Submitted by the lead for the engineer: red 59d54628 (card wait 10 s < host 60 s + relay 10 s), fix 160ec58a (card lease listener 90 s; SSH-started...
 
 ## Cost
 
