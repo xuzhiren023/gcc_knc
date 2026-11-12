@@ -1,34 +1,64 @@
 # Sprint 12: remove measured whole-program costs (Milestone M4, part 2)
 
-**Status:** planned 2026-11-12, revised from the senior scope review (S11-13). Tickets are written from Sprint 11's
-baseline and profile (S11-15); the profiles choose the themes, not this list.
+**Status:** planned; adjusted by S11-19, 2026-11-12. Scope: [M4 definition](../M4-DEFINITION.md).
+**Goal:** deliver bounded, general compiler improvements with measured development-program benefit and an integrated
+candidate ready for qualification. This sprint does not promise that the unseen 17-vote gate will pass.
+**Why now:** S11 supplies a valid donor baseline, profiles, runtime readiness and affordable candidates. Turn those
+observations into code before S13 freezes choices ([first review], findings 3-7 and Proposed revised sprint outline).
 
-**Goal:** the development corpus runs measurably faster under GCC-KNC than GCC 5.1.1 at strict `-O2`, from at most
-three implementation themes chosen by removable wall time and coverage, each proven by a shape test and a paired
-whole-program A/B on the 7120 and under the 3100 and 5100 profiles (a gain must hold on all three), with no development program more than 5% slower without a known cause.
+## Theme A - select at most three implementation themes and prove each change
 
-Order:
-1. **Complete E7-03:** profiles of every development program, the removable-time ranking, and the three themes.
-2. **Up to three themes**, each split into bounded stories with their own proof. Likely candidates, in the review's
-   provisional order (replace with the measured ranking):
-   - scalar addressing, alignment, branches, calls and code size (E7-13, focused E7-04);
-   - loop locality and scalar replacement (legal interchange, blocking, invariant hoisting, predictive commoning)
-     where existing GCC passes suffice;
-   - scheduling with register pressure (E7-15 split: x87 reservation/stack pressure; vector scheduling at 1-2
-     threads per core), and density-aware unroll (E7-12) after it;
-   - class-specific prefetch (E7-06), causally confirmed first: a matched baseline, density and page-mode controls,
-     a compiler-generated corpus loop, and no-regression cache-resident cases. NGO store choice and eviction are
-     separate changes; no blanket eviction or automatic thread downsizing;
-   - scalar FP in zmm (diagnosis/prototype only), sparse prefetch (E7-09), alignment for long loops (E7-10), short
-     tails (E7-19) only if the profiles show them.
-3. **PGO on development programs (E7-08 reuse):** qualify the existing atomic-profile train/use workflow on complete
-   programs with separate training and evaluation inputs; a donor PGO build if PGO competitiveness is claimed; never
-   train on held-out programs. Reported as its own track.
-4. **`-mphinix` screen (E7-14):** a bounded development-only `-O2`/`-O3`/current `-mphinix` screen early, contents
-   frozen at the end of the sprint; strict and `errno`-relaxed results kept apart.
-5. **OpenMP runtime (E6-09)** only for proven runtime loss, after separating barrier cost from late arrival, imbalance
-   and fork/join.
-6. Batch check: development-corpus regression scan at the integrated head; x86 and portability for every shared change.
+**Achieve / why this sprint:** finish missing E7-03 development profiling before selecting affected work; rank by
+removable strict-serial wall time, coverage, risk and build/card cost. Use only the 14 development programs;
+held-out timings/profiles/diagnostics remain sealed. Fewer than three themes is acceptable.
 
-**Out of scope:** software pipelining, Graphite, LTO, intrinsics (E6-05), autotune (E7-18), new library or loop-pass
-projects without a measured blocker. **Cap:** two weeks from the first implementation ticket.
+- Candidates: scalar addressing/branches/calls/code size (focused E7-04/13); legal locality/scalar replacement
+  using existing passes; scheduling with pressure (split E7-15), then unroll (E7-12); class-specific prefetch/stores
+  (E7-06). Sparse access, scalar FP regions, alignment and tails enter only if hot.
+- Before coding, name the general code property, mechanism, removable time, affected programs, two unaffected
+  controls and bounded experiments. Preserve strict FP order and visible spill/call/transfer costs.
+- Prefetch/stores need matched page/resource controls, a compiler-generated corpus loop and cache-resident/reuse
+  controls. NGO stores and eviction are separate changes; no blanket eviction or automatic team downsizing.
+
+**Exit:** each accepted change has correctness and shape evidence plus paired before/after GCC-KNC whole-program
+benefit on affected programs and no-regression evidence on two unaffected controls, across all three settings. Report uncertainty
+and failures. Keep donor comparisons separate: beating the donor does not prove this change helped. The integrated
+development scan retains regressions and requires a known cause for confirmed slowdowns above 5%; unresolved
+evidence cannot support an improvement claim ([first review], findings 4-5; [ADR-0015]).
+
+## Theme B - qualify optional modes before choices freeze
+
+**Achieve / why this sprint:** use S11-17's feasibility result to reuse E7-08's atomic PGO train/use path on complete
+development programs. Separate training/evaluation, report profile mismatches and build donor PGO for any PGO
+competitiveness claim. A feasibility blocker limits this track instead of creating a new infrastructure project.
+Run E7-14's bounded `-O2`/`-O3`/current `-mphinix` screen early; fix candidate count and budget first. Strict
+`-O2` changes pass A; optional errno/FP behavior stays labelled. OpenMP E6-09 work requires measured runtime loss,
+separating barrier cost, late arrival, imbalance and fork/join. It earns no serial credit, cannot create a fourth
+implementation theme and cannot consume reserved qualification windows.
+**Exit:** modes, frozen flags/semantics and results or explicit blockers are recorded by sprint end, without held-out
+training/selection. Disclose the donor's absent OpenMP runtime; never substitute mixed runtimes
+([first review], findings 6-7; [ADR-0015], Frozen comparison and eligibility).
+
+## Theme C - integrate and hand S13 a qualified candidate
+
+**Achieve / why this sprint:** run the development-corpus regression scan at the integrated head; isolated A/B wins
+can interact. Finish known correctness repairs before candidate freeze. Book the lead's native ABI/runtime batch,
+x86 identity and sprint-end forward-port drill; shared changes get targeted non-KNC coverage in that batch.
+**Exit:** compiler/library/runner revisions, flags, development comparisons, regression causes and batch results
+are ready for S13, with unresolved failures marked as blockers. Supply final-gate duration estimates and booked
+windows; an older batch or staged script does not qualify this head ([first review], finding 9; [ADR-0006], Decision 5-7).
+
+## Capacity and boundary
+
+**Cap:** two weeks from the first implementation ticket. The lead budgets rebuilds, installs, reviews and A/B
+runs in all settings before committing to themes, reserves the integrated batch and sets an optional-work cutoff.
+Defer over-budget or unsupported themes; retain the measured candidate and state its limitations.
+Profiles model cores/memory on a 7120, not clock/per-core bandwidth or native 3120/5110 performance.
+Donor headlines remain strict serial `-O2` with the disclosed SQLite donor assembly exception; only the identical
+authorized HPCG fix changes corpus source. Optional panels never replace primary results.
+**Out of scope:** new large passes, software pipelining, Graphite, LTO and new library projects without a measured
+blocker and bounded admission; intrinsics, autotune, WRF, llama.cpp, corpus expansion and held-out tuning.
+
+[first review]: ../reviews/2026-11-12-s11-s13-scope-review.md
+[ADR-0015]: ../adr/0015-m4-scoring-and-measurement.md
+[ADR-0006]: ../adr/0006-portable-shared-i386.md

@@ -1,54 +1,72 @@
 # Milestone M4: what "broad optimization" means for GCC-KNC
 
-**Status:** lead draft 2026-11-12, for the senior review (S11-19) and then the owner. Scoring rules are already
-frozen in ADR-0015; this page says what the milestone is for and what work belongs in it.
+**Status:** adjusted by S11-19, 2026-11-12. [ADR-0015] is the accepted scoring authority.
+This page defines engineering scope without changing that contract.
 
 ## The question M4 answers
 
-M0-M3 proved that GCC-KNC is a **correct and complete** toolchain for the card: native scalar code and ABI (M1),
-vector code generation whose kernels can beat x87 and approach hand IMCI (M2), and the C, C++, Fortran and OpenMP
-runtimes (M3). None of that shows that an ordinary program, compiled unchanged, runs faster than with the compiler
-users have today (GCC 5.1.1 from MPSS).
+M1-M3 established scalar/ABI, vector and language/runtime capabilities. M4 asks whether those capabilities
+deliver useful whole-program speedups over MPSS GCC 5.1.1. Kernel gains alone cannot answer that question
+([first review], Evidence boundary and findings 1, 8).
 
-**M4 asks: do our gains reach whole programs, broadly?** "Broad" has three meanings, and all three must hold:
-1. **Across programs, not kernels.** The unit of success is a whole, unmodified program from a fixed public corpus
-   (17 programs: dense and sparse numeric, stencil, integer, compression, database; C, C++, Fortran), timed launch to
-   exit. A faster kernel counts only through the programs it speeds up.
-2. **Across kinds of code, not only vector loops.** The corpus is mostly not long vectorizable loops. A broad
-   optimizer improves scalar integer and branchy code, address arithmetic, x87 floating point, calls and code
-   size, memory traffic, and runtime overhead, as well as vectorization.
-3. **Across the KNC family and without regressions.** Gains must hold on the 7120 and under the 3100 and 5100
-   profiles, and no program may get more than 5% slower without a known cause. Correctness, IEEE semantics and
-   the ABI are never traded for speed (ADR-0003, ADR-0014); no fast-math by default.
+**Broad optimization means general compiler improvements evaluated across a fixed mix of programs:**
 
-**Pass rule (ADR-0015):** the median of the 17 per-program speedups, strict serial `-O2` GCC-KNC over GCC 5.1.1, has
-a one-sided 95% lower bound of at least 1.25x on each model, with the regression rule above. `-O3`, `-mphinix`, PGO
-and OpenMP are published beside it, labelled.
+1. **Whole programs:** 17 votes spanning numeric, stencil, sparse, integer, compression and database work,
+   timed from launch to exit. Sources stay unchanged except the authorized, identical HPCG shared-list fix.
+2. **Different costs:** consider scalar/control flow, addressing, FP, calls, code size, memory, runtime setup
+   and vectors. Profiles choose the work; M4 does not require a new feature in every category.
+3. **Transferable improvements:** select by code properties and costs, never benchmark names, fixed dimensions
+   or source rewrites. Preserve correctness, strict FP and ABI; account for spills, calls and transfers.
+
+This is a bounded milestone, not proof of broad production performance: eight votes are PolyBench. Publish
+family diagnostics alongside the unchanged program median; MPI and LLM decode need later evidence
+([first review], findings 5, 7, 8).
+
+**Pass rule:** strict serial `-O2` GCC-KNC versus GCC 5.1.1, **with the SQLite donor assembly exception**:
+the donor uses its highest assembling level, frozen before timing; every headline discloses it.
+On each of full 7120, `--profile 3100` and `--profile 5100`, the median of all 17 program speedups needs a
+one-sided 95% lower bound of at least 1.25x. Correctness must pass; a confirmed slowdown above 5% needs a
+lead-reviewed known cause. Missing/invalid data or unresolved regression intervals prevent a pass.
+Profiles model cores/memory, not clock or per-core bandwidth: these are 7120 resource-profile results,
+not native 3120/5110 measurements. `-O3`, `-mphinix`, PGO and GCC-KNC-only OpenMP remain labelled panels.
 
 ## What work belongs in M4
 
-The rule for every M4 ticket: **it is chosen because a whole-program profile shows removable time, and it is accepted
-because a paired whole-program A/B shows that time removed** (on the affected programs, with two unaffected controls,
-on all three models). Work that cannot show that is not M4 work, however interesting.
+Classify each proposed ticket before accepting it:
 
-| Belongs in M4 | Does not belong in M4 (where it goes) |
-|---|---|
-| Measuring the baseline: the corpus harness, the scoring contract, profiles (S11) | Single-kernel peak tuning without a corpus program behind it (research) |
-| Removing profiled costs: scalar code quality, loop locality, scheduling with register pressure, prefetch and store choice, unrolling, alignment, calls and code size (S12) | New large passes (software pipelining, Graphite, LTO) without a measured blocker (later) |
-| Choosing defaults by measurement: `-O2` behaviour, `-mphinix` contents, PGO workflow (S12-S13) | Application-specific tuning or source changes (never) |
-| Correctness hazards that would invalidate the score: libm faults, runtime-prefix drift (S11) | Intrinsics, autotune, WRF and llama.cpp builds (M5) |
-| Qualification: final batch, x86 identity, the decision (S13) | Hardware changes (owner) |
+- **Enable or qualify the experiment:** identify the readiness, correctness, measurement or portability obligation
+  it closes. Acceptance proves that obligation; a harness, oracle or ABI repair need not demonstrate speedup.
+- **Improve primary performance:** name a hot cost in the 14 development programs, a general mechanism,
+  expected removable whole-program time and a bounded implementation/measurement budget. Require correctness
+  and code-shape evidence, paired before/after GCC-KNC benefit on affected programs, and no-regression evidence on two controls,
+  across all three settings. Keep donor-relative competitiveness separate from the causal effect of a change.
+- **Qualify an optional mode:** name the panel, its proof and budget. It cannot rescue the serial score or displace
+  required qualification. Held-out diagnostics never select ordinary tuning.
 
-## Work that runs beside M4 (owner priorities, not M4 criteria)
+| Work | Admission and exit evidence | Boundary |
+|---|---|---|
+| Harness, donor/runtime setup, profiles (S11) | Frozen equal work, independent checks, sealed held-out data, usable profiles | Infrastructure enables tuning; no speedup required |
+| Scalar, locality, scheduling/pressure, prefetch/stores, unroll, calls/code size (S12) | Profile-selected general remedy; correct shape and paired whole-program benefit with controls | At most three implementation themes; no kernel-only justification |
+| Strict defaults (S12) | Same proof as a primary performance change | No implicit fast-math, FTZ or reassociation |
+| PGO, `-mphinix`, OpenMP (S11 feasibility, S12 qualification) | Labelled semantics/resources and measured panel results; separate PGO training/evaluation | No primary credit; donor PGO required for PGO competitiveness |
+| Libm/ABI/prefix hazards and batches (S11-S13) | Reproducer or contract obligation, correctness/portability evidence at the relevant head | Bounded repairs, not a replacement library/runtime project |
+| Final measurement and decision (S13) | Complete ADR-0015 gate, regression causes and owner decision | One repair retry; no changed denominator or threshold |
 
-- **Host-card transport at the PCIe link limit** (S11-01 ... S11-10, S11-02): infrastructure for every later project;
-  DMA concluded at 1.67 GB/s card to host and 1.46 host to card on this Gen2 x4 link. It does not change the M4
-  score (transfers are outside the timed region) and is not on M4's critical path.
-- **Memory bandwidth and GEMV for LLM decode** (S11-05, -06, -09): research for the next project. Findings enter M4
-  only as S12 tickets that pass the M4 rule above.
+New large passes, Graphite, software pipelining, LTO or new library coverage are not committed M4 projects.
+A measured blocker permits bounded investigation, not automatic admission of a large implementation; the lead
+must fit it within the themes and sprint cap. Intrinsics, autotune, WRF, llama.cpp and corpus widening stay in M5.
+These rules follow [first review], findings 3-9; [ADR-0006] governs shared-backend qualification.
 
-## How the sprints map onto it
+## Work beside M4 and sprint handoffs
 
-- **S11 - measure:** make the experiment valid and get the first honest baseline and profile.
-- **S12 - improve:** remove the largest profiled costs, at most three themes, plus defaults and PGO.
-- **S13 - decide:** freeze, qualify, run the gate, one bounded retry, owner decision.
+Transport rollout and bandwidth/GEMV research retain separate outcomes and card windows. Working staging is
+required, but DMA rollout or a bandwidth target is not: transfers are outside primary timing. Research enters M4
+only through the admission rules ([ADR-0015], Timed boundaries; [first review], finding 3).
+
+- **S11 - measure:** valid experiment, sealed held-out readiness, development baseline/profiles and budgeted shortlist.
+- **S12 - improve:** at most three measured themes, integrated regression evidence and frozen optional modes.
+- **S13 - decide:** final-head qualification, complete gate, at most one repair retry and owner decision.
+
+[ADR-0015]: adr/0015-m4-scoring-and-measurement.md
+[ADR-0006]: adr/0006-portable-shared-i386.md
+[first review]: reviews/2026-11-12-s11-s13-scope-review.md
