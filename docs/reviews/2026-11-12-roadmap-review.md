@@ -1,6 +1,6 @@
 # Second roadmap review: M4 and Sprints 11-13
 
-2026-11-12 ? S11-19 ? Senior GCC back-end review ? Documents adjusted directly
+2026-11-12 - S11-19 - Senior GCC back-end review - Documents adjusted directly
 
 **Verdict:** measure / improve / decide is coherent once handoffs distinguish native readiness, development tuning
 and final qualification. The edits preserve owner scoring decisions; they neither predict a pass nor assert native
@@ -20,6 +20,17 @@ results. Only the definition, three sprint pages and this change log were change
 | S12, A | Make the candidate list at most three profile-selected themes, with controls and causal comparisons. Preserve strict semantics, separate prefetch/store causes, allow fewer themes instead of speculative quota filling. | [R], findings 4-5, Proposed revised sprint outline; [A], Frozen comparison |
 | S12, B/C | Freeze optional modes before S13; optional OpenMP has no serial credit and stays within the theme/budget cap. Add integrated regressions and a qualified candidate handoff. | [R], findings 6-7, 9; [A], Frozen comparison; [D], Decision 5-7 |
 | S13, A-C | Use the accepted six-pair schedule, distinct extension/repair rules, lower bound and resolved regression review. Requalify repaired heads; label exposed-set confirmation and distinguish release with limits from an M4 pass. | [A], Launch schedule, Arithmetic and decision, Held-out access; [D], Decision 5-7; [R], findings 8-9 |
+
+## Readability revision after lead review
+
+- Added three- or four-sentence **In plain words** introductions to the definition and each sprint: the outcome,
+  its place in the sequence, and the completion check, without ticket identifiers or scoring shorthand.
+  Evidence: S11-19 item 4 and the lead's 17:32 review; [R], Proposed revised sprint outline.
+- Wrote prose slash-pairs out as words, explained generated-code checks and the consequence of seeing reserved
+  programs, and shortened S11's repeated scoring detail by referring to [A]. The detailed exits remain binding.
+  Evidence: S11-19 lead review, fix 1; [A], Frozen comparison and Held-out access.
+- Replaced the damaged byline separators with ASCII hyphens. Evidence: S11-19 lead review, fix 2.
+  These are readability corrections; the accepted scope, scoring policy and open capacity decision are unchanged.
 
 ## Decisions still needed, through the lead
 
