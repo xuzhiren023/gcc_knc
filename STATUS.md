@@ -70,7 +70,7 @@ Current tickets: `[###################-]` 194 of 201
 | S11-16 | Long-double libm hazard audit - do other MPSS long double entry points fault like cbrtl? (E7-21, bounded) | Question for the tech lead | Native results recorded and committed as 9dc764db: only known cbrtl fault, 11 controls OK, errors=0; log .w... |
 | S11-17 | PGO feasibility on one complete development program (reuse of S9-18's train/use path) | draft |  |
 | S11-18 | M4 corpus harness v2 - card profiles, prefix record, held-out sealing, stronger checks, and the donor-failure rule | In progress | Profiles, sealing, serial-vs-serial voting, the HPCG staged fix, the SQLite fallback and the runtime-prefix... |
-| S11-19 | Second senior review - the M4 definition and the Sprint 11-13 roadmap, adjusted | Changes requested | Substance is right and matches ADR-0015 (six pairs, 612 launches, 1.25x lower bound, SQLite exception, one ... |
+| S11-19 | Second senior review - the M4 definition and the Sprint 11-13 roadmap, adjusted | In progress | Substance is right and matches ADR-0015 (six pairs, 612 launches, 1.25x lower bound, SQLite exception, one ... |
 | S2-01 | Design for zmm and mask registers under -march=knc | Done | The register design for KNC is settled on paper: all 32 zmm and 8 mask registers become usable under -march... |
 | S2-02 | Float and double arguments and results in zmm lane 0 | Done | Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`). |
 | S2-03 | Varargs with the donor's register save area | Done | Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`). |
@@ -239,7 +239,7 @@ Current tickets: `[###################-]` 194 of 201
 
 - From the script, engineer: 476 sessions, 1009.1M input tokens
 - From the script, lead: 306 sessions, 87.9M input tokens
-- Started by hand, Claude: 11 sessions, 2711.2M input tokens
+- Started by hand, Claude: 11 sessions, 2711.9M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
