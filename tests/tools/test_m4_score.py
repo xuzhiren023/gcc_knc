@@ -12,9 +12,9 @@ import m4_score
 
 
 PROGRAMS = (
-    "gemm", "atax", "cholesky", "ludcmp", "jacobi-2d", "heat-3d",
-    "adi", "durbin", "stream", "npb-cg", "npb-ep", "npb-mg", "npb-is",
-    "hpcg", "zlib", "sqlite", "bzip2",
+    "PB-gemm", "PB-atax", "PB-cholesky", "PB-ludcmp", "PB-jacobi-2d", "PB-heat-3d",
+    "PB-adi", "PB-durbin", "STREAM", "NPB-CG", "NPB-EP", "NPB-MG", "NPB-IS",
+    "HPCG", "zlib", "SQLite", "bzip2",
 )
 MODELS = ("7120", "3100", "5100")
 
@@ -33,13 +33,14 @@ class M4ScoreContract(unittest.TestCase):
         self.assertAlmostEqual(result["time_ratio"], 1 / 3)
 
     def test_one_program_one_vote_and_no_missing_rows(self):
+        self.assertEqual(m4_score.PROGRAMS, PROGRAMS)
         rows = corpus(1)
         for name in PROGRAMS[:9]:
             rows[name] = [(2, 1)] * 6
         result = m4_score.score_model(rows)
         self.assertEqual(result["median_speedup"], 2)
         self.assertTrue(result["pass"])
-        del rows["hpcg"]
+        del rows["HPCG"]
         with self.assertRaises(ValueError):
             m4_score.score_model(rows)
 
@@ -104,6 +105,16 @@ class M4ScoreContract(unittest.TestCase):
                 m4_score.score_program([(bad, 1)] * 6)
         with self.assertRaises(ValueError):
             m4_score.score_program([(1, 1)] * 4)
+
+    def test_sealed_root_in_main_checkout_and_ticket_worktree(self):
+        project = Path(__file__).resolve().parents[2]
+        if project.parent.name == ".work":
+            project = project.parent.parent
+        expected = project / ".work" / "_shared" / "m4-sealed"
+        for root in (project, project / ".work" / "S11-14"):
+            with self.subTest(root=root):
+                self.assertEqual(m4_score.sealed_root(root), expected)
+        self.assertEqual(m4_score.SEALED_ROOT, expected)
 
     def test_held_out_details_only_go_to_sealed_output(self):
         # The runner/lead provisions the real directory with access controls.
