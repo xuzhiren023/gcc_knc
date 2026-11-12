@@ -2,7 +2,7 @@
 
 Updated automatically at every ticket change. Last update: 2026-11-12 17:55.
 
-**Next: GPT-6.1, on S11-02 (card_run and run_suite move bulk data by SCIF DMA at the PCIe link limit, with the SSH stream as fallback).** Run `python tools/dispatch.py`, or ask the tech lead to.
+**Next: the tech lead, on S11-18.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[###################-]` 196 of 201
 
@@ -69,7 +69,7 @@ Current tickets: `[###################-]` 196 of 201
 | S11-15 | First development-corpus baseline and profile, GCC 5.1.1 vs GCC-KNC at -O2 (E7-03 part 1) | draft |  |
 | S11-16 | Long-double libm hazard audit - do other MPSS long double entry points fault like cbrtl? (E7-21, bounded) | Done | The card's MPSS long double libm was probed on the card: of 12 entry points only cbrtl faults, and S10-13 a... |
 | S11-17 | PGO feasibility on one complete development program (reuse of S9-18's train/use path) | draft |  |
-| S11-18 | M4 corpus harness v2 - card profiles, prefix record, held-out sealing, stronger checks, and the donor-failure rule | In progress | Both, split by cost: (1) Implement ADR-0015's timed boundary and record format now: launch-to-exit wall tim... |
+| S11-18 | M4 corpus harness v2 - card profiles, prefix record, held-out sealing, stronger checks, and the donor-failure rule | Waiting for review | 3684eca9: ADR-0015 RAW launch-to-exit; --pairs 3/6. 9 host tests pass; launcher+20 builds linted. Logs: .wo... |
 | S11-19 | Second senior review - the M4 definition and the Sprint 11-13 roadmap, adjusted | Done | The M4 definition and the Sprint 11-13 roadmap are rewritten as measure, improve, decide, each sprint with ... |
 | S2-01 | Design for zmm and mask registers under -march=knc | Done | The register design for KNC is settled on paper: all 32 zmm and 8 mask registers become usable under -march... |
 | S2-02 | Float and double arguments and results in zmm lane 0 | Done | Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`). |
@@ -227,19 +227,19 @@ Current tickets: `[###################-]` 196 of 201
 ## Recent activity
 
 - 2026-11-12 17:55 **S11-19** lead approve: The M4 definition and the Sprint 11-13 roadmap are rewritten as measure, improve, decide, each sprint with a plain-language goal, reason and comple...
+- 2026-11-12 17:55 **S11-18** engineer submit: 3684eca9: ADR-0015 RAW launch-to-exit; --pairs 3/6. 9 host tests pass; launcher+20 builds linted. Logs: .work/_state/logs/S11_18_adr_{green-2026111...
 - 2026-11-12 17:54 **S11-02** lead answer: Acceptance is written (top of the ticket): DMA by receiver-pull scif_readfrom for files of 1 MiB or more, SSH stream for small files and fallback, ...
 - 2026-11-12 17:54 **S11-02** owner decide: Owner 2026-11-12 17:50 EST: "s11-02 approved by me". Acceptance written by the lead from the measured DMA results.
 - 2026-11-12 17:45 **S11-19** engineer submit: Addressed both 17:32 review fixes: plain-language introductions on M4 and S11-S13, prose slash-pairs written out, ASCII review byline, and evidence...
 - 2026-11-12 17:45 **S11-16** lead approve: The card's MPSS long double libm was probed on the card: of 12 entry points only cbrtl faults, and S10-13 already guards it, so the M4 correctness ...
 - 2026-11-12 17:35 **S11-18** lead answer: Both, split by cost: (1) Implement ADR-0015's timed boundary and record format now: launch-to-exit wall time on the card's monotonic clock as the r...
 - 2026-11-12 17:35 **S11-16** lead note: Card 2026-11-12 22:22:59-22:23:16Z (boot da3144f1), 240 threads: python tools/card_run --threads 240 --timeout 1800 .work/_shared/S11-16/long-doubl...
-- 2026-11-12 17:34 **S11-18** engineer ask: 3da5a9ce fixes timed output and peer corruption control. Seven host tests pass; 20 builds plus launcher restaged/linted. Logs: .work/_state/logs/S1...
 
 ## Cost
 
 - From the script, engineer: 479 sessions, 1013.7M input tokens
 - From the script, lead: 307 sessions, 88.1M input tokens
-- Started by hand, Claude: 12 sessions, 2727.4M input tokens
+- Started by hand, Claude: 12 sessions, 2730.6M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
