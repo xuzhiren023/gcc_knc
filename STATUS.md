@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-12 12:13.
+Updated automatically at every ticket change. Last update: 2026-11-12 12:14.
 
 **Waiting for you:** S11-02. Run `python tools/pm.py inbox`.
 
@@ -58,7 +58,7 @@ Current tickets: `[###################-]` 186 of 189
 | S11-04 | S11-01 transfer tool - the host opens every connection, because Windows Firewall blocks inbound TCP from the card | Done | The transfer study's host side now opens every connection to the card, so Windows Firewall no longer blocks... |
 | S11-05 | Research - raise KNC's real memory bandwidth from about 175 GB/s toward 75-85% of peak, with a measured plan | Done | The memory-bandwidth research plan and a validated multithreaded KNC bandwidth benchmark are ready, with a ... |
 | S11-06 | Memory bandwidth - read the first card sweep, find why our numbers sit below STREAM's, and stage sweep 2 toward 264-299 GB/s | In progress |  |
-| S11-07 | S11-01 transfer tool - the card's listener gives up before card_run relays its announcement | lead | Engineer committed red test and fix together (af43d01f); submit needs a test(...)[red] commit. Interactive ... |
+| S11-07 | S11-01 transfer tool - the card's listener gives up before card_run relays its announcement | Question for the tech lead | Lead split af43d01f into 59d54628 [red] and 160ec58a fix. |
 | S2-01 | Design for zmm and mask registers under -march=knc | Done | The register design for KNC is settled on paper: all 32 zmm and 8 mask registers become usable under -march... |
 | S2-02 | Float and double arguments and results in zmm lane 0 | Done | Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`). |
 | S2-03 | Varargs with the donor's register save area | Done | Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`). |
@@ -214,6 +214,7 @@ Current tickets: `[###################-]` 186 of 189
 
 ## Recent activity
 
+- 2026-11-12 12:14 **S11-07** lead resume: Lead split af43d01f into 59d54628 [red] and 160ec58a fix.
 - 2026-11-12 12:13 **S11-07** lead defer: Engineer committed red test and fix together (af43d01f); submit needs a test(...)[red] commit. Interactive lead: split af43d01f into test[red] (tes...
 - 2026-11-12 12:12 **S11-07** engineer ask: Submit is blocked because there is no test(...)[red] commit. The red test was run and failed as expected (card wait 90s vs required 60s host deadli...
 - 2026-11-12 12:10 **S10-13** lead note: x86 check at GCC 157940608ed: -O2 and -O2 -mavx512f identical 1962, different 0, both-failed 41 (Cygwin headers), errors 0.
@@ -221,16 +222,15 @@ Current tickets: `[###################-]` 186 of 189
 - 2026-11-12 12:00 **S10-13** lead note: Card 2026-11-12 16:55Z (boot da3144f1), 240 threads: __knc_cbrtl over 16,974,074 inputs (four shards) bit-identical to the host's results, 0 failur...
 - 2026-11-12 11:52 **S11-05** lead approve: The memory-bandwidth research plan and a validated multithreaded KNC bandwidth benchmark are ready, with a 38-case first sweep (about an hour) stag...
 - 2026-11-12 11:40 **S11-05** engineer submit: Review fixed at 05c623e4: snapshotted inputs, exact asm operands, modes outside loops; default write/triad counts 14/53 instructions per four lines...
-- 2026-11-12 11:24 **S11-05** lead changes: The research doc is accepted as written. The benchmark needs two fixes before it is worth card time.
 
 ## Cost
 
 - From the script, engineer: 448 sessions, 967.4M input tokens
 - From the script, lead: 284 sessions, 82.6M input tokens
-- Started by hand, Claude: 11 sessions, 2561.3M input tokens
+- Started by hand, Claude: 11 sessions, 2563.8M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 24.6 GiB of 100 GiB. 88 GiB free on the drive.
+The project uses 24.6 GiB of 100 GiB. 89 GiB free on the drive.
