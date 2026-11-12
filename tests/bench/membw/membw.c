@@ -202,6 +202,7 @@ INLINE void lines(size_t lo, size_t hi, int op, int sk, int pf, int lf, int ev,
     }
     lines_loop(end,hi,op,sk,pf,lf,ev,1,sum,k);
 }
+#if NATIVE
 #define VARIANT(OP,SK,PF,LF,EV) \
 static __attribute__((noinline)) void kernel_##OP##_##SK##_##PF##_##LF##_##EV( \
     size_t lo, size_t hi, Uvec *sum, const Kernel *options) { \
@@ -231,10 +232,25 @@ static const KernelFn kernels[] = { OPERATIONS(ENTRY) };
 #undef PREFETCHES
 #undef FENCES
 #undef EVICTIONS
+#else
+/* Host emulation checks the same helpers. Duplicating hundreds of scalar
+   sixteen-lane loops wastes host compiler time without testing IMCI code. */
+static void host_kernel(size_t lo, size_t hi, int op, int sk, int pf, int lf,
+                        int ev, Uvec *sum, const Kernel *k) {
+    if (op==TRIAD && k->split) {
+        lines(lo,hi,SPLIT_START,0,pf,0,0,sum,k);
+        lines(lo,hi,SPLIT_END,sk,0,lf,ev,sum,k);
+    } else lines(lo,hi,op,sk,pf,lf,ev,sum,k);
+}
+#endif
 static void kernel(size_t lo, size_t hi, int op, Uvec *sum) {
     const Kernel k={a,b,c,cfg.lines,cfg.pf0,cfg.pf1,cfg.unroll,cfg.split};
     const int store_kind=cfg.store, pf=cfg.prefetch, fm=cfg.fence, ev=cfg.evict;
+#if NATIVE
     kernels[((((op*3+store_kind)*4+pf)*2+(fm==2))*4+ev)](lo,hi,sum,&k);
+#else
+    host_kernel(lo,hi,op,store_kind,pf,fm==2,ev,sum,&k);
+#endif
     if (fm==1) fence();
 }
 static float init_a(size_t k) { return (float)(1 + (k % 251)); }
