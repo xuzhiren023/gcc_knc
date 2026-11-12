@@ -25,7 +25,7 @@ class TransferIntegrity(unittest.TestCase):
         cls.host_build.cleanup()
 
     def test_loopback_and_integrity(self):
-        exe = str(transfer.OUT / 'transfer-host.exe')
+        exe = str(Path(self.host_build.name) / 'transfer-host.exe')
         known = subprocess.run([exe, 'selftest'], env=transfer.ENV, capture_output=True, text=True)
         self.assertEqual(known.returncode, 0, known.stderr)
         self.assertIn('abc: match', known.stdout)

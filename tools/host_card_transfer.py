@@ -471,7 +471,7 @@ def run_native(args):
             else:
                 drained = getattr(card, '_card_log_drained', None)
                 if drained:
-                    drained.wait()
+                    drained.wait(timeout=190)
                 card_log.close()
 
 
