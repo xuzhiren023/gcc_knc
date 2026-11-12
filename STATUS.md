@@ -69,7 +69,7 @@ Current tickets: `[###################-]` 194 of 201
 | S11-15 | First development-corpus baseline and profile, GCC 5.1.1 vs GCC-KNC at -O2 (E7-03 part 1) | draft |  |
 | S11-16 | Long-double libm hazard audit - do other MPSS long double entry points fault like cbrtl? (E7-21, bounded) | In progress | Size approved: 580 lines are mostly the research note (263) and the probe source (219); a split adds nothin... |
 | S11-17 | PGO feasibility on one complete development program (reuse of S9-18's train/use path) | draft |  |
-| S11-18 | M4 corpus harness v2 - card profiles, prefix record, held-out sealing, stronger checks, and the donor-failure rule | In progress | Profiles, sealing, serial-vs-serial voting, the HPCG staged fix, the SQLite fallback and the runtime-prefix... |
+| S11-18 | M4 corpus harness v2 - card profiles, prefix record, held-out sealing, stronger checks, and the donor-failure rule | Question for the tech lead | 3da5a9ce fixes timed output and peer corruption control. Seven host tests pass; 20 builds plus launcher res... |
 | S11-19 | Second senior review - the M4 definition and the Sprint 11-13 roadmap, adjusted | In progress | Substance is right and matches ADR-0015 (six pairs, 612 launches, 1.25x lower bound, SQLite exception, one ... |
 | S2-01 | Design for zmm and mask registers under -march=knc | Done | The register design for KNC is settled on paper: all 32 zmm and 8 mask registers become usable under -march... |
 | S2-02 | Float and double arguments and results in zmm lane 0 | Done | Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`). |
@@ -227,13 +227,13 @@ Current tickets: `[###################-]` 194 of 201
 ## Recent activity
 
 - 2026-11-12 17:35 **S11-16** lead note: Card 2026-11-12 22:22:59-22:23:16Z (boot da3144f1), 240 threads: python tools/card_run --threads 240 --timeout 1800 .work/_shared/S11-16/long-doubl...
+- 2026-11-12 17:34 **S11-18** engineer ask: 3da5a9ce fixes timed output and peer corruption control. Seven host tests pass; 20 builds plus launcher restaged/linted. Logs: .work/_state/logs/S1...
 - 2026-11-12 17:33 **S11-16** lead answer: Size approved: 580 lines are mostly the research note (263) and the probe source (219); a split adds nothing. Submit with: python tools/pm.py submi...
 - 2026-11-12 17:32 **S11-19** lead changes: Substance is right and matches ADR-0015 (six pairs, 612 launches, 1.25x lower bound, SQLite exception, one retry, 14+3 split); the inclusion rule a...
 - 2026-11-12 17:32 **S11-16** engineer ask: Native results recorded and committed as 9dc764db: only known cbrtl fault, 11 controls OK, errors=0; log .work/_shared/tmp/claude-next29/probe.out....
 - 2026-11-12 17:31 **S11-16** lead answer: Finish the note with the card result (17:35) and submit; if pm.py commit fails, leave uncommitted and ask.
 - 2026-11-12 17:30 **S11-19** engineer submit: Adjusted M4 definition and S11-S13 roadmaps; evidence/change log in docs/reviews/2026-11-12-roadmap-review.md. Clarified admission, sealed baseline...
 - 2026-11-12 17:30 **S11-16** lead resume: Card result in the 17:35 note.
-- 2026-11-12 17:30 **S11-09** lead approve: Weight-streaming GEMV for LLM decode is measured on the card: int8 weights reach 70 billion weights/s (2.2x fp32), and the gap to plain read bandwi...
 
 ## Cost
 
