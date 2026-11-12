@@ -1,10 +1,10 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-12 16:53.
+Updated automatically at every ticket change. Last update: 2026-11-12 17:05.
 
 **Waiting for you:** S11-02. Run `python tools/pm.py inbox`.
 
-Current tickets: `[###################-]` 192 of 200
+Current tickets: `[###################-]` 193 of 200
 
 ## Milestones
 
@@ -14,7 +14,7 @@ Current tickets: `[###################-]` 192 of 200
 | M1 | Mixed native code | Done | 43 of 43 tickets |
 | M2 | Useful vector target | Done | 51 of 51 tickets |
 | M3 | Runtimes | Done | 48 of 48 tickets |
-| M4 | Broad optimization | In progress | 10 of 18 tickets |
+| M4 | Broad optimization | In progress | 11 of 18 tickets |
 | M5 | Program corpus | Not started | Not planned in detail yet |
 | M6 | Release | Not started | Not planned in detail yet |
 
@@ -65,7 +65,7 @@ Current tickets: `[###################-]` 192 of 200
 | S11-11 | M4 corpus run harness - every corpus program built by GCC 5.1.1 and GCC-KNC, run on the card with frozen inputs and a correctness check, in one command | Done | The M4 corpus harness builds 17 programs with GCC 5.1.1 and GCC-KNC and stages checked card runs; GCC-KNC b... |
 | S11-12 | Sprint 11 batch check - full native suite, x86 identity, forward-port drill, ICE sweeps, runtime prefix consistency | draft |  |
 | S11-13 | Senior compiler review of the Sprint 11-13 scope (Milestone M4) against our research, with recommended plan changes | Done | A senior compiler review of the Sprint 11-13 plan is in: M4 is plausible but needs a frozen scoring and mea... |
-| S11-14 | M4 scoring contract and measurement protocol, frozen before any tuning | Waiting for review | 1248919a after red 0f7940b6: ADR proposed; all 17 serial primary, labelled OpenMP panels excluded, SQLite p... |
+| S11-14 | M4 scoring contract and measurement protocol, frozen before any tuning | Done | M4's scoring contract is frozen in ADR-0015 with a tested scorer: strict serial -O2 versus -O2 over 17 prog... |
 | S11-15 | First development-corpus baseline and profile, GCC 5.1.1 vs GCC-KNC at -O2 (E7-03 part 1) | draft |  |
 | S11-16 | Long-double libm hazard audit - do other MPSS long double entry points fault like cbrtl? (E7-21, bounded) | lead | Needs a card run by the interactive lead (card turn per shared-card rules): python tools/card_run --threads... |
 | S11-17 | PGO feasibility on one complete development program (reuse of S9-18's train/use path) | draft |  |
@@ -225,6 +225,7 @@ Current tickets: `[###################-]` 192 of 200
 
 ## Recent activity
 
+- 2026-11-12 17:05 **S11-14** lead approve: M4's scoring contract is frozen in ADR-0015 with a tested scorer: strict serial -O2 versus -O2 over 17 programs on the 7120 and the 3100/5100 profi...
 - 2026-11-12 17:00 **S11-18** lead note: Owner 2026-11-12 17:00 EST ("Serial vs serial primary", accepting the lead's recommendation): (1) the six OpenMP programs (STREAM, NPB CG/EP/MG/IS,...
 - 2026-11-12 17:00 **S11-14** lead note: Owner 2026-11-12 17:00 EST ("Serial vs serial primary", accepting the lead's recommendation): (1) the six OpenMP programs (STREAM, NPB CG/EP/MG/IS,...
 - 2026-11-12 16:53 **S11-18** lead approve-red: S11-18 red approved: host tests now pin the owner's serial-vs-serial voting with a GCC-KNC-only labelled OpenMP panel across 7120/3100/5100, held-o...
@@ -232,16 +233,15 @@ Current tickets: `[###################-]` 192 of 200
 - 2026-11-12 16:51 **S11-18** engineer red: Red 51a1f2cf: serial primary for both compilers; KNC-only labelled OpenMP densities; variant identities; staged-only identical HPCG n fix and sole-...
 - 2026-11-12 16:47 **S11-18** lead changes: Red is mostly good: the corruption control (2,1,3 vs 1,3,2 has equal count, sum, abs, squares and weighted sum) is right, sealing goes by program n...
 - 2026-11-12 16:47 **S11-14** lead changes: The scoring math, 17 canonical votes, sealed-root fix (red f1c136b3 then green 593e1230) and the rest of ADR-0015 are sound. The owner's 2026-11-12...
-- 2026-11-12 16:46 **S11-14** engineer submit: Fixed review requests in 593e1230 after red f1c136b3: sealed output resolves under project .work/_shared/m4-sealed from both checkout layouts; scor...
 
 ## Cost
 
 - From the script, engineer: 470 sessions, 1000.8M input tokens
 - From the script, lead: 301 sessions, 86.4M input tokens
-- Started by hand, Claude: 12 sessions, 2693.4M input tokens
+- Started by hand, Claude: 12 sessions, 2701.1M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 24.8 GiB of 100 GiB. 83 GiB free on the drive.
+The project uses 24.8 GiB of 100 GiB. 82 GiB free on the drive.
