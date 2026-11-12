@@ -29,6 +29,8 @@ PACKED = re.compile(r'\bv(?:addn?|subr?|mul|div|max|min|sqrt|rcp(?:23)?|rsqrt(?:
 # Each entry supplies its CLI help and handlers for the tiers it selects.
 # Imports stay lazy so T0 and source-only selections need no probe modules.
 SELECTIONS = {
+    'cbrtl': ('S10-13 safe scalar cbrtl calls and KNC diagnostics', {
+        't1': lambda runner: importlib.import_module('s10_13_checks').t1(runner)}),
     'divsqrt_f64': ('S10-09 correctly rounded FP64 division and square root', {
         't1': lambda runner: runner.t1_sources([runner.source_dir / 'knc-divsqrt-f64.c',
                                                 runner.source_dir / 'knc-sqrt-f64-errno.c'])}),
@@ -396,6 +398,8 @@ class Runner:
             knc_vector.t1_byte_aligned(self)
             import native_tls
             native_tls.t1(self)
+            import s10_13_checks
+            s10_13_checks.t1(self)
         source = (self.fixture / 'loops.c').read_text()
         for mode in ('off', 'fast'):
             asm = self.out / ('loops-' + mode + '.s')
