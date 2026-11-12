@@ -132,3 +132,11 @@ new work until the owner says usage has been reset.
 MPSS libm `cbrtl` (long double cube root) segfaults on the card for many arguments, for example `cbrtl(1e-5)`:
 `s_cbrtl.S:178` zero-extends a negative table offset and reads 4 GiB past the table (found by GCC-KNC S10-12,
 2026-11-12). Double `cbrt` and `cbrtf` are not affected as far as we know. Avoid `cbrtl` on the card.
+
+Host-card DMA, measured 2026-11-12 (GCC-KNC S11-01, idle card, SHA-256 checked, no bugcheck): the card's link is PCIe
+Gen2 x4 (about 1.6-1.7 GB/s data per direction). Card to host: host-initiated `scif_readfrom` 1.67 GB/s (link limit).
+Host to card: card-initiated `scif_readfrom` 1.35 GB/s, `scif_writeto` 1.0 GB/s. SCIF messages (0.1-0.2 MiB/s,
+disconnect at 64 MiB) and `scif_mmap` (2.5-9 MiB/s) are not for bulk data. Raw TCP 174/320 MiB/s, SSH 11/17 MiB/s; the
+host firewall blocks inbound TCP from the card. Safe practice: reusable 64 MiB registered windows, synchronous RMA,
+explicit completion before reuse or unregister, in-memory SHA-256, bugcheck check between groups, no force-kill or
+auto-retry of DMA. Sent to the WRF lead 2026-11-12 15:45 EST.
