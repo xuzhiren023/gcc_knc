@@ -376,4 +376,9 @@ The outer timeout caps the job at 89 minutes. A timeout is incomplete evidence.
 
 Every memory/prefetch/unroll setting has an earlier matched plain-read control.
 Requested huge pages must be verified from `page_bytes`, and CPU lists checked
-against topology. This is a screen, not a Cartesian search or a native result.
+against topology. This is a screen, not a Cartesian search.
+
+The lead completed all 55 cases with valid outputs on 2026-11-12. Raw results:
+`.work/_shared/tmp/claude-next28/membw-gemv.out`. See the S11-09 section of
+`docs/research/knc-memory-bandwidth.md` for measured format winners, instruction
+counts, configuration corrections and candidate compiler/runtime work.

@@ -561,153 +561,257 @@ no repeat compiler build or native execution was needed for this runner update.
 
 ## S11-09: GEMV weight bandwidth for decode
 
-The new workload consumes a row-major weight matrix with fp32, signed int8 plus
-a per-row fp32 scale, or fp16 weights, and a resident fp32 vector. Column counts
-are 4096 and 11008. Weight payload is at least 2 GiB in the staged sweep; rows
-round upward to meet that size. Each pass computes one dot product per row.
-The exact controls, accounting, validation and lead command are in
-`tests/bench/membw/README.md`. This section describes an experiment awaiting the
-lead's exclusive card turn; **there are no native GEMV measurements yet**.
+The validated native screen reaches **125.30 GB/s fp32, 87.25 GB/s fp16 and
+70.04 GB/s int8 weight bytes**. In decode work these are **31.33, 43.63 and
+70.04 billion weights/s**, respectively. Packed weights improve work/s despite
+lower byte rates. None reaches the 264-299.2 GB/s weight-byte target. The next
+compiler work should reduce scalar address/prefetch control and accumulator
+copies; the runtime choice must be format-specific. More threads, more row
+streams and smaller vector windows do not improve every format.
 
-The starting observation is sweep 2, case 25: 186.143664 weight-like read GB/s,
-range 185.489341-186.701635, at 120 spread threads, small pages, 8/64 prefetch,
-2048 MiB and 32 passes. Its raw output is
-`.work/_shared/tmp/claude-next23/membw-second.out`. Cases 26/27 show that density
-alone is not the explanation: 32/128 gives 185.208162 at 120 threads and
-183.373272 at 60. These are read measurements, not GEMV measurements. The
-staged GEMV sweep opens with the read configuration and repeats it at the end.
+The workload consumes a row-major matrix with fp32, signed int8 plus a per-row
+fp32 scale, or fp16 weights, and a shared fp32 vector. Each pass computes one
+dot product per row. The controls, accounting, validation and exact lead
+command are in `tests/bench/membw/README.md`.
 
-### Conversion and computational cost
+### Native evidence and calibration
 
-The ISA provides load-time expansion of signed bytes and binary16 to fp32 via
-`vmovaps` [9, section 2.2.2, pp. 30-33; VMOVAPS, pp. 379-382]. The kernel uses
-these conversion forms with precise 16-byte/32-byte memory operands. It does
-not unpack weights to a temporary fp32 matrix. Each converted group feeds an
-explicit fp32 FMA. The scalar reference uses independently generated expected
-weight values and checks every output and input, with exactly representable
-finite data. No fast-math change or arbitrary-model accuracy claim follows.
+Evidence is the lead's 2026-11-12 21:41-21:57Z run, boot
+`da3144f1-552e-4305-bd17-84a3835da020`, in
+`.work/_shared/tmp/claude-next28/membw-gemv.out`. All **55 result records are
+valid**, each with five samples; the job and program exit codes are zero, and
+the runner reports no overlapping jobs. The run took 15.72 card minutes within
+the 89-minute outer cap. Every case uses 2048 MiB (GEMV rounds upward to whole
+rows), 32 passes, and spread placement within 240 granted CPUs on 60 cores.
+Validation checks every output against the scalar reference and verifies
+immutable inputs outside timing. This establishes correctness for the generated
+exact finite inputs, not arbitrary-model accuracy or special-value behavior.
 
-At four interleaved rows, the source-level minimum per weight cache line is:
+Sweep 2's corrected read reference was 186.143664 GB/s, range
+185.489341-186.701635, at 120 threads, small pages and prefetch 8/64
+(`.work/_shared/tmp/claude-next23/membw-second.out`, case 25). The new read
+opening/closing pair is 183.502622/185.563886 GB/s at those same settings.
+The fastest new read median is **189.061677 GB/s, case 8, actual 2 MiB pages**,
+range 187.893589-190.170735. The raw config and CASE records correct two details
+in the ticket's lead summary: read case 8 uses huge pages, and int8 case 18
+uses **240 threads**, not 120. All three GEMV winners use actual 4096-byte pages.
 
-| Format | Weights / 64 bytes | Converted weight loads | FMAs | Shared vector loads, amortized | Near + far hints |
-|---|---:|---:|---:|---:|---:|
-| fp32 | 16 | 1 | 1 | 0.25 | 2 |
-| fp16 | 32 | 2 | 2 | 0.5 | 2 |
-| int8 | 64 | 4 | 4 | 1 | 2 |
+| Workload | Case | Columns / window | Threads | Min / median / max weight GB/s | Gweights/s | Effective GFLOP/s | Median envelope ms | Start-skew range ms |
+|---|---:|---|---:|---|---:|---:|---:|---|
+| fp32 | 14 | 11008 / 1024 | 120 | 112.38 / 125.30 / 128.08 | 31.33 | 62.65 | 548.43 | 2.23-3.85 |
+| fp16 | 46 | 11008 / full | 120 | 85.89 / 87.25 / 88.26 | 43.63 | 87.25 | 787.60 | 2.43-3.39 |
+| int8 + row scale | 18 | 4096 / 1024 | 240 | 69.15 / 70.04 / 70.71 | 70.04 | 140.08 | 981.17 | 3.90-5.01 |
 
-These are algorithmic counts, not measured native instructions or cycles.
-Branches, addresses, hint bounds, scalar reductions, row scales and output
-updates add cost. In particular, the explicit horizontal reduction stores a
-vector to the stack and sums its lanes; the scalar partial output is updated
-once per column block. These costs remain inside timing. Packed weights reduce
-model traffic but require more converted vectors and FMAs per weight byte;
-therefore better decode work/s can coexist with lower weight GB/s. The table
-does not establish a conversion-throughput ceiling or a spill-free loop.
+All winners use four row streams, unroll four and shared `vprefetch0/1` at
+8/64 weight lines. Timing is earliest worker start to latest completed worker,
+including start skew and completion fences. The plain-read controls matched on
+threads/pages/prefetch/unroll are case 1 for fp32/fp16 and case 4 for int8;
+GEMV attains 68.3%, 47.5% and 37.7% of their respective read byte rates.
+Read allocates three arrays whereas GEMV allocates the weight matrix plus small
+metadata/vector/output regions; these controls do not fix physical page mapping.
 
-Column windows trade vector reuse against extra reductions, scalar scale reads
-and partial-output transfers. A 4096-column vector occupies 16 KiB; 11008
-columns occupy 44032 bytes. The 256/1024-column windows use 1/4 KiB of vector
-data while traversing the row tile. These are working-set calculations, not
-proof of cache residency under sibling and weight-stream pressure. The
-11008/full-window control tests whether the extra blocking work pays for itself.
+Closing references 52-55 versus opening 1/10/15/20 change read by +1.12%, fp32
+by +2.79%, int8 by +5.19%, and fp16 by -0.24%. The largest winner spread is
+fp32 case 14: (max-min)/median = 12.5%. Treat these as best medians in a screen,
+not independently confirmed optima. In particular, modest int8 changes must
+survive the observed reference drift before becoming defaults. Start skew is
+small compared with these long envelopes; it does not explain the GEMV/read gap.
+No PMU measurements isolate conversion stalls, cache misses or instruction issue.
 
-Prefetch advances in physical weight bytes and issues once per cache line.
-For int8, a 4096-column row is only 64 lines: far distance 64 must be allowed
-to cross a row boundary. Bounds checks stop at the matrix allocation. Distance
-32/256, far-only 0/128 and near-only 8/0 have matched read controls. Interleaved
-rows can overlap hint coverage and blocked traversal changes when prefetched
-rows are consumed. A loss tests that combination; it does not reject software
-prefetch or quantization as a whole.
+### Prediction versus target
 
-### Predictions, target and measured-best slots
+Retain the pre-run prediction as an **optimistic equal-byte-rate scenario**:
+186.14 GB/s for each format, transferring sweep 2's read rate without charging
+GEMV overhead. The measurements are 32.7%, 53.1% and 62.4% below that scenario
+for fp32, fp16 and int8. It was neither a lower bound nor a measured ceiling.
 
-The provisional prediction is an **optimistic equal-byte-rate scenario** using
-the measured read rate, with no allowance for GEMV's extra work. It is neither
-a lower bound nor an asserted GEMV ceiling. Replace each pending slot with the
-best validated native configuration and its range, actual pages, CPU placement,
-timing/skew and closing-reference drift.
+| Format | Predicted scenario weight GB/s (effective GFLOP/s) | Measured best weight GB/s | Target weight GB/s (effective GFLOP/s) | Gain needed from measured best to lower / upper target |
+|---|---:|---:|---|---:|
+| fp32 | 186.14 (93.07) | 125.30 | 264-299.2 (132-149.6) | 110.7% / 138.8% |
+| fp16 | 186.14 (186.14) | 87.25 | 264-299.2 (264-299.2) | 202.6% / 242.9% |
+| int8 + row scale | 186.14 (372.29) | 70.04 | 264-299.2 (528-598.4) | 276.9% / 327.2% |
 
-| Format | Scenario weight GB/s | Implied effective GFLOP/s | Target weight GB/s | Target effective GFLOP/s | Gain over scenario to lower / upper target | Measured GEMV best |
-|---|---:|---:|---:|---:|---:|---|
-| fp32 | 186.14 | 93.07 | 264-299.2 | 132-149.6 | 41.8% / 60.7% | pending lead run |
-| fp16 | 186.14 | 186.14 | 264-299.2 | 264-299.2 | 41.8% / 60.7% | pending lead run |
-| int8 + row scale | 186.14 | 372.29 | 264-299.2 | 528-598.4 | 41.8% / 60.7% | pending lead run |
+Effective FLOPs are two per weight. Weight GB/s excludes vector loads, scale
+reads, partial-output traffic, reduction stack transfers, RFO and ECC; it is
+not measured channel utilization. For P billion streamed parameters, the
+illustrative weight-only rate is Gweights/s divided by P tokens/s. Thus the
+best int8 kernel consumes 2.24 times as many weights/s as the best fp32 kernel,
+and fp16 1.39 times, across the configurations/shapes in the table. These are
+not matched-model speedups: quantization accuracy, metadata format, attention,
+other operators and synchronization still require end-to-end measurement.
 
-Effective FLOPs are `2 * rows * columns * passes`. Weight GB/s excludes vector,
-scale and output traffic, and cannot be called measured memory-channel
-utilization. For a model whose streamed weights occupy W decimal GB, an
-illustrative weight-only token bound is `B/W` tokens/s; attention, activations,
-other operators and synchronization consume additional time. No end-to-end
-llama.cpp throughput is predicted from a standalone GEMV result.
+Even recovery to the matched read controls would require +46.4% fp32, +110.3%
+fp16 and +165.0% int8. Reaching 264-299.2 then also requires memory-delivery
+improvements beyond the measured read cases. Neither step is established here;
+there is no conclusion that the requested target cannot be reached.
 
-### Sweep and decisions after the card run
+### Executed instruction cost and accumulator chains
 
-The 55-case `sweep.sh gemv` uses five long samples per case. Cases 1-9 calibrate
-plain read at every memory/prefetch/unroll setting used later. Cases 10-24 screen
-all formats at 1/2/3/4 threads per core and both shapes. Cases 25-51 screen one
-versus eight row streams, full versus small windows at 11008 columns, near/far
-coverage, huge pages and unroll. Cases 52-55 repeat read and format references.
-The default four streams and 1024-column window provide intermediate controls.
-The conservative budget is 55 process alarms of 90 seconds plus 120 seconds
-for metadata/launch, totaling 84.5 minutes; `card_run --timeout 5340` caps 89.
-Alarms include validation and initialization; any timeout is incomplete data.
+IMCI `vmovaps` expands signed bytes and binary16 to fp32 on the load path
+[9, section 2.2.2, pp. 30-33; VMOVAPS, pp. 379-382]. The kernels use precise
+16-byte/32-byte operands and feed explicit fp32 FMAs, without a dequantized
+matrix buffer. There is no separate AVX/F16C conversion instruction here.
+Conversion latency/throughput itself was not measured independently.
 
-Compare GEMV/read ratios at matched thread count, pages, distances and unroll.
-If read and GEMV improve together, pursue memory delivery and coverage. If
-read remains stable while packed GEMV loses weight GB/s, inspect conversion,
-FMA, scalar reduction and address/loop issue costs. Compare effective GFLOP/s
-as well as bytes before rejecting a format. If row interleaving helps without
-extra byte traffic, inspect shared vector-load amortization and dependency
-latency; if it hurts, inspect register pressure and overlapping hints. These
-are proposed discriminating tests, not diagnoses made without card evidence.
-All levers remain open pending measured results; no mechanism is rejected here.
+The staged binary's disassembly is `.work/_shared/S11-05/membw-gemv.dis`.
+Followed paths for `gemv_0_4`, `gemv_1_4`, `gemv_2_4` use four rows, unroll
+four, shared prefetch 8/64, aligned column starts, and interior matrix addresses
+where both hints are in bounds. One iteration covers 64 columns in each of
+four rows (256 weights). Counts include executed branches and padding NOPs;
+they exclude entry, column tails, horizontal reductions and output updates.
+They are static path counts, not measured retired instructions or cycles.
 
-Owner-only options remain those identified above: historical same-model ECC
-off/on triad gain 8.47% [5, p. 5], with unknown GEMV gain; restoring a throttled
-clock has at most the frequency-ratio illustration for issue-bound work, with
-no measured positive gain if already stable; MPSS/page policy changes have
-unknown gain and require a separate matched experiment. The runner changes
-none of ECC, clocks, MPSS or `/etc`. Existing hugetlbfs allocation/fallback is
-measured as-is. The available evidence does not warrant an MPSS change or a
-claim that the target cannot be reached.
+| Format / symbol | Weight lines / iteration | Weight loads | Shared vector loads | FMAs | Register copies | Near + far hints | Scalar/control/NOP | Total instructions | Instructions / weight line |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| fp32 / `gemv_0_4` | 16 | 16 | 4 | 16 | 20 | 32 | 279 | 367 | 22.94 |
+| fp16 / `gemv_2_4` | 8 | 16 | 4 | 16 | 20 | 16 | 200 | 272 | 34.00 |
+| int8 / `gemv_1_4` | 4 | 16 | 4 | 16 | 20 | 8 | 135 | 199 | 49.75 |
 
-### Candidate backlog after measurements
+The back edges are `0x53fe14 -> 0x53f710`, `0x556184 -> 0x5559d0`, and
+`0x54ab61 -> 0x54ab64`, respectively. The last is a jump to a loop header laid
+out after its body. Runtime hint-mode/distance tests, bounds comparisons,
+address formation and unroll selection remain inside these loops. Scalar
+stack operands hold addresses/bounds; the inspected inner paths keep vector
+accumulators in registers, but execute 20 register-to-register vector moves
+per iteration. This provides a concrete optimization target beyond FMA count.
+The earlier read audit counted 7.75 instructions/line for its original bulk
+path; that is context from the earlier binary, not a fresh read disassembly.
 
-- **GEMV vectorizer shape:** recognize row-major reductions and model several
-  independent rows sharing a vector load. Cost narrowing loads, FMA chains,
-  horizontal reductions, register pressure and cleanup explicitly. Preserve
-  normal language FP semantics; reassociation requires the appropriate contract.
-- **Packed-weight load lowering:** expose signed-byte/half load expansion with
-  accurate memory widths and costs, retaining the per-row scale operation.
-  Validate arbitrary finite values and special-value behavior separately before
-  treating this finite-data bandwidth kernel as a general numerical primitive.
-- **Prefetch defaults:** select near/far distances in weight bytes, accounting
-  for row-stream count, blocking and shared core resources. Promote defaults
-  only after paired native confirmation across both shapes and formats.
-- **Runtime and libgomp placement:** compare 60/120/180/240 granted workers with
-  spread sibling order. Use the measured format-specific density, preserve
-  `sched_getaffinity`, and expose explicit placement/first-touch controls. A
-  pthread result motivates an OpenMP comparison; it does not establish libgomp
-  behavior or justify a global density default.
-- **llama.cpp-style integration:** add KNC dispatch and aligned packed-weight
-  kernels, row/block quantization metadata and tail handling; preserve model
-  rounding/scale conventions, avoid dequantization buffers, and report every
-  extra transfer. Reuse a persistent worker team, partition whole rows, tune
-  vector windows, then measure whole-token latency including non-GEMV work.
-  Actual model accuracy and latency must be checked before choosing a format.
+Per physical weight line the kernels need 1/2/4 load expansions and 1/2/4
+FMAs for fp32/fp16/int8, plus 0.25/0.5/1 shared vector loads. Four independent
+row sums hide some dependency latency, but unrolling columns continues the
+same four accumulator chains. More unroll does not create more independent
+sums. Packed formats execute more arithmetic, conversion and copies per byte;
+int8 additionally scales each partial row sum. Consequently lower packed-weight
+GB/s is compatible with greater useful work/s and does not by itself measure
+the conversion unit's limit.
 
-### Staging evidence and remaining measurement
+Horizontal reduction is another visible cost: a vector store to the stack,
+then 16 x87 scalar additions (eight iterations of two `fadds` plus loop control),
+followed by a scalar output update, per row per column window. At 4096 columns,
+window 1024 performs four such reductions per row; at 11008 it performs eleven,
+window 256 performs 43, and full-row performs one. Int8 reads/applies its scale
+per window. A vector-register reduction and fewer partial updates are specific
+candidates, subject to the required FP ordering contract.
 
-Implementation commit `b0dd4243` follows failing contract commit `737e8ed5`.
-All six host tests pass, including nine GEMV format/control combinations and
-the 55-case calibration/budget contract. The host runner now names Cygwin's
-`.exe` explicitly: an older extensionless executable had shadowed the new
-binary during the first implementation test. The corrected final test log is
+### What the lever measurements support
+
+The following medians are weight GB/s. Density cases retain 4096 columns,
+window 1024, four streams, unroll four, small pages and prefetch 8/64.
+
+| Threads (siblings/core) | Read, cases 2/1/3/4 | fp32, cases 11/10/12/13 | fp16, cases 21/20/22/23 | int8, cases 16/15/17/18 |
+|---|---:|---:|---:|---:|
+| 60 (1) | 175.33 | 82.47 | 56.57 | 38.82 |
+| 120 (2) | 183.50 | 98.55 | 72.63 | 53.58 |
+| 180 (3) | 186.06 | 99.85 | 64.94 | 58.03 |
+| 240 (4) | 185.59 | 90.93 | 66.28 | 70.04 |
+
+Int8 improves 30.7% from two to four siblings while read improves only 1.1%:
+this is evidence for hiding kernel latency/issue gaps, not a comparable rise
+in available DRAM bandwidth. Three siblings barely improve fp32, within the
+opening/closing drift; three/four lose for fp16 and four lose for fp32.
+Retain 120 as the starting density for fp32/fp16 and 240 for int8, without
+extrapolating the 4096-column density ladder to every shape or optimized kernel.
+
+| Lever (120 threads unless stated) | fp32 | fp16 | int8 | Interpretation |
+|---|---|---|---|---|
+| Row streams 1 / 4 / 8, 4096 columns | 103.10 / 98.55 / 86.24 (25/10/26) | 65.67 / 72.63 / 72.65 (43/20/44) | 43.37 / 53.58 / 51.74 (34/15/35) | Four beats one for packed formats; eight supplies no established win. More streams remain a candidate only with reduced address/copy cost and register-pressure checks. |
+| Window 256 / 1024 / full, 11008 columns | 99.12 / 125.30 / 117.24 (27/14/28) | 65.85 / 77.53 / 87.25 (45/24/46) | 39.73 / 53.13 / 58.49 (36/19/37) | Smaller vector footprint loses to added reductions/traversal. Full-row gains 12.5% fp16 and 10.1% int8 over 1024; fp32's 1024 winner has broad variation. |
+| Hints 8/64 / 32/256, 4096 columns | 98.55 / 76.97 (10/29) | 72.63 / 60.87 (20/47) | 53.58 / 47.99 (15/38) | Deeper hints lose while matched read rises 183.50 to 186.27 (1/5); distance is kernel-dependent. |
+| Far-only 0/128 / near-only 8/0 | 89.37 / 86.90 (30/31) | 77.23 / 78.41 (48/49) | 54.39 / 58.75 (39/40) | Read falls to 148.52 / 92.37 (6/7); packed kernels can benefit from less hint/control work, although int8 drift weakens small gains. |
+| Small / actual huge pages | 98.55 / 96.71 (10/32) | 72.63 / 73.60 (20/50) | 53.58 / 55.09 (15/41) | Read improves to 189.06 (8), but no large GEMV gain. Small packed-format gains need paired confirmation. |
+| Unroll 4 / 8 | 98.55 / 96.37 (10/33) | 72.63 / 72.07 (20/51) | 53.58 / 54.79 (15/42) | No robust gain over drift; the same accumulator chains remain. |
+
+The 4096-column vector is 16 KiB and the 11008-column vector is 43 KiB;
+windows 256/1024 reduce the active vector segment to 1/4 KiB. A smaller
+working set is not proof of better L1 residency once sibling and weight traffic
+are included. The full-row packed wins show that saving reduction and traversal
+work can outweigh the intended vector-cache benefit. The fp32 shape comparison
+also changes row stride, rows per tile and traversal locality, so its large
+11008-column gain cannot be assigned solely to fewer reductions per weight.
+
+Hints issue once per physical weight line, with distances in weight bytes.
+A 4096-column int8 row spans 64 lines: far distance 64 reaches the next row.
+Interleaving and column blocking change the time until those lines are used,
+and can overlap coverage. The near-only packed wins and deeper-hint losses
+support testing lower hint overhead/less premature coverage; they do not prove
+which cache or queue caused the loss. The far-only comparison also changes
+far distance from 64 to 128, so it is not a pure removal-of-near-hint test.
+
+Together, the disassembly and divergent read/GEMV responses support **kernel
+instruction issue, dependent accumulation and conversion work per weight byte**
+as the leading explanation for the gap. They do not exclude cache delivery or
+prefetch effects, nor establish a hardware conversion-throughput ceiling.
+Fp32 carries the heaviest hint/control burden per group; fp16 adds two expanded
+vectors per line and benefits from fewer reductions; int8 adds four and row
+scaling, and responds strongly to four siblings. This is more actionable than
+attributing every format to a single DRAM plateau.
+
+### Candidate compiler/runtime backlog and next experiment
+
+- **Specialize GEMV bulk control:** dispatch hint mode, nonzero distances and
+  unroll outside the inner loop; use advancing row pointers and a bounds-safe
+  bulk region plus a checked tail. The 367/272/199-instruction paths provide
+  the baseline. Preserve exact operand widths and allocation bounds; measure
+  code size and scalar spills as well as instructions and weight throughput.
+- **GEMV vectorizer and register allocation:** represent multiple row reductions
+  sharing one vector load; cost load expansion, FMA dependencies, accumulator
+  copies, horizontal reduction and cleanup. Investigate the 20 copies per
+  iteration before simply doubling streams. Test independent partial sums
+  within a row only with the appropriate reassociation contract; ordinary FP
+  semantics must remain unchanged. Compare against the native four-stream
+  baseline, since eight already failed to improve this implementation.
+- **Packed loads and reduction lowering:** keep signed-byte/half expansion in
+  registers and make its width/conversion cost visible. Replace stack/x87
+  reduction only when a legal vector reduction is available, and amortize row
+  scale/partial stores over longer windows. Validate general finite values,
+  exceptional values and model-specific scaling separately from this exact
+  synthetic validation. No GCC build or compiler patch is part of this ticket.
+- **Prefetch policy:** use bytes per row stream and consume time, not one
+  distance for every format. Start from 8/64 for fp32; test near-only packed
+  kernels paired with full-row windows. Do not promote 32/256, huge pages or
+  unroll eight on the basis of their plain-read behavior.
+- **Runtime/libgomp placement:** preserve the granted affinity mask, spread
+  across cores before adding siblings, and expose format/shape-specific team
+  sizes. Compare persistent OpenMP teams at 120 for fp32/fp16 and 240 for int8
+  against this pthread baseline, including first touch and scheduling overhead.
+  Pthread results do not establish libgomp's current placement behavior.
+- **llama.cpp-style integration:** provide KNC dispatch, aligned packed loads,
+  row/block-scale metadata handling and tails, without dequantization buffers.
+  Real block-quantized formats can require extra unpack, zero-point and scale
+  operations absent here. Partition whole rows over a persistent team, tune
+  vector windows and density per layer, preserve rounding conventions, and
+  measure model accuracy plus complete token latency. Weights/s is the kernel
+  comparison metric; metadata and all extra transfers remain visible.
+
+A concrete next native experiment is the interaction of **full-row accumulation
+and near-only hints for packed weights**, at 120 and 240 threads and both
+column counts, with matching read controls and paired opening/closing GEMV
+references. The individual gains above motivate this combination; their gains
+must not be multiplied into a prediction. No additional sweep is staged in
+this analysis-only continuation: first keep the completed 55-case screen as
+the baseline, and put bulk-control/reduction changes in a separate code ticket
+before spending another card turn on their comparison.
+
+Owner-only options remain unchanged: historical same-model ECC off/on triad
+gain 8.47% [5, p. 5], with unknown GEMV gain; restoring a throttled clock has
+at most the restored/current-frequency illustration for issue-bound work,
+with no demonstrated gain if already stable; MPSS and page-policy changes
+have unknown gain and require matched experiments. No ECC, clock, MPSS or
+`/etc` setting was changed. Existing hugetlbfs was measured as allocated.
+
+### Acceptance evidence
+
+Implementation `b0dd4243` follows failing contract commit `737e8ed5`; staging
+and host evidence were recorded in `33de9541`. All six host tests passed,
+including nine GEMV format/control combinations and the 55-case calibration/
+budget contract. The corrected host runner names Cygwin's `.exe` explicitly;
+an older extensionless binary had shadowed it during the initial test. Log:
 `.work/_state/logs/S11_09_host_final-20261112-142447.log`.
 
-The existing GCC-KNC prefix rebuilt the benchmark, lint passed, and the binary
-and sweep were restaged at `.work/_shared/S11-05/{membw.mic,sweep.sh}`. Log:
-`.work/_state/logs/S11_09_k1om_final-20261112-142447.log`. GCC itself was not
-built. No engineer card job or x86 check ran. Native output validation, best
-per-format rates and measured bottleneck conclusions remain pending the lead's
-`sweep.sh gemv` run; the table above deliberately retains pending entries.
+The benchmark was rebuilt with the existing GCC-KNC prefix, linted and staged
+as `.work/_shared/S11-05/{membw.mic,sweep.sh}`. Build/lint log:
+`.work/_state/logs/S11_09_k1om_final-20261112-142447.log`. The lead's raw native
+log above supplies all 55 validated results. This continuation changes analysis
+only, so passing host tests and the build were not repeated. GCC itself was
+not built; x86 was not run; the engineer launched no card job.
