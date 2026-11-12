@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-12 10:49.
+Updated automatically at every ticket change. Last update: 2026-11-12 10:53.
 
 **Waiting for you:** S11-02. Run `python tools/pm.py inbox`.
 
@@ -55,7 +55,7 @@ Current tickets: `[###################-]` 183 of 186
 | S11-01 | User story - the best way to move data between the host and the card, measured, and how our projects use it | Done | We now have a sourced inventory of every host-card transfer path that works without changing MPSS (SSH, tar... |
 | S11-02 | card_run and run_suite move data by S11-01's recommended method, with fallback | **Waiting for you** | Started by mistake: the ticket was 'ready' as a placeholder and became startable when S11-01 closed. The en... |
 | S11-03 | S11-01 transfer tool rejects the card's physical /tmp path, so the native study never starts | Done | The transfer study's tool now accepts the card's real /tmp location (/var/volatile/tmp), so its card run ca... |
-| S11-04 | S11-01 transfer tool - the host opens every connection, because Windows Firewall blocks inbound TCP from the card | In progress |  |
+| S11-04 | S11-01 transfer tool - the host opens every connection, because Windows Firewall blocks inbound TCP from the card | Question for the tech lead | Implemented and committed red adf57742 and fix aafd029d. Regression red on S11-03; loopback green both dire... |
 | S2-01 | Design for zmm and mask registers under -march=knc | Done | The register design for KNC is settled on paper: all 32 zmm and 8 mask registers become usable under -march... |
 | S2-02 | Float and double arguments and results in zmm lane 0 | Done | Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`). |
 | S2-03 | Varargs with the donor's register save area | Done | Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`). |
@@ -211,6 +211,7 @@ Current tickets: `[###################-]` 183 of 186
 
 ## Recent activity
 
+- 2026-11-12 10:53 **S11-04** engineer ask: Implemented and committed red adf57742 and fix aafd029d. Regression red on S11-03; loopback green both directions including fake transport, 3 tests...
 - 2026-11-12 10:42 **S11-03** lead approve: The transfer study's tool now accepts the card's real /tmp location (/var/volatile/tmp), so its card run can start; checked on the host, card run n...
 - 2026-11-12 10:42 **S10-13** engineer submit: T1 PASS: .work/_state/logs/S10_13_green-20261112-103135.log. Stage/link/lint PASS; all five exact card_run commands: .work/_state/logs/S10_13_stage...
 - 2026-11-12 10:31 **S11-03** engineer submit: Submitted by the lead for the engineer. Red 151a98bd (main has no LEASE_DIRECTORY; the old regex rejected /var/volatile/tmp), fix fcb157ec: host ch...
@@ -218,7 +219,6 @@ Current tickets: `[###################-]` 183 of 186
 - 2026-11-12 10:31 **S11-03** lead resume: Lead reviewed and committed 151a98bd [red] and fcb157ec.
 - 2026-11-12 10:30 **S10-13** lead answer: Tree 1 is built at GCC 157940608ed by the lead (gcc_build.py exit 0; log S10_13_lead_build-20261112-093315.log). Do not build (AGENTS.md, owner 202...
 - 2026-11-12 10:30 **S10-13** lead resume: Lead built tree 1 at 157940608ed (log S10_13_lead_build-20261112-093315.log, exit 0).
-- 2026-11-12 10:29 **S11-03** lead defer: Engineer finished uncommitted in .work/S11-03: host regex accepts /tmp and /var/volatile/tmp roots, lease() uses realpath(/tmp) + exact 32-hex tail...
 
 ## Cost
 
@@ -230,4 +230,4 @@ Current tickets: `[###################-]` 183 of 186
 
 ## Disk
 
-The project uses 24.6 GiB of 100 GiB. 100 GiB free on the drive.
+The project uses 24.6 GiB of 100 GiB. 99 GiB free on the drive.
