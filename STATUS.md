@@ -2,7 +2,7 @@
 
 Updated automatically at every ticket change. Last update: 2026-11-12 07:03.
 
-**Waiting for you:** S10-10. Run `python tools/pm.py inbox`.
+**Next: the tech lead, on S10-10.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[###################-]` 179 of 183
 
@@ -48,7 +48,7 @@ Current tickets: `[###################-]` 179 of 183
 | S10-07 | Vector math v1a - the copied functions (sin, cos, tan, log10, atan, atan2, hyperbolics, bounded groups) in libknc_vmath and the vectorizer hook | Done | Card 2026-11-11 (S10-08 build, 240 threads): full set PASS for sinf 0.499999, cosf 0.499998, tanf 0.499995,... |
 | S10-08 | Vector math v1b - the rest of the libmvec set (acos, asin, cbrt, erf, erfc, exp2, exp10, expm1, log1p, log2, hypot, sincos) | Done | The vector math library now covers the whole set GCC vectorizes with glibc's libmvec: acos, asin, cbrt, erf... |
 | S10-09 | User story - double-precision loops with division and square root vectorize, correctly rounded (V8DF div, cond_div, sqrt) | Done | Double-precision loops with division or square root now vectorize under -march=knc and give the correctly r... |
-| S10-10 | Card harness fixes from the Sprint 10 card turn - card_qualify binary folder, vmath bench batch sizing | **Waiting for you** | Owner choice: Codex engineers cannot write the main .git, so pm.py commit fails in their worktrees. (a) All... |
+| S10-10 | Card harness fixes from the Sprint 10 card turn - card_qualify binary folder, vmath bench batch sizing | Question for the tech lead | Owner 2026-11-12 07:00 EST ('you commit their work by hand'): option (b). The engineer does not run pm.py c... |
 | S10-11 | Card-only vector math failures - double sin, cos, tan, atan2 above 1 ULP, and cbrt/cbrtf crash (SIGSEGV) | Done | Double sin, cos, tan and atan2 from the KNC vector math library are now within 1 ULP on the card (0.76 to 0... |
 | S10-12 | cbrt and cbrtf crash (SIGSEGV) in qualify_v1 on the card - root cause and fix | In progress | Card output is in the 04:15 lead note above: the vector call returns; SIGSEGV (SEGV_MAPERR) is in the oracl... |
 | S11-01 | User story - the best way to move data between the host and the card, measured, and how our projects use it | Not started | lane tools: owner 2026-11-12, usage reset, move on (Codex engineers) |
@@ -209,13 +209,13 @@ Current tickets: `[###################-]` 179 of 183
 ## Recent activity
 
 - 2026-11-12 07:03 **S10-12** lead answer: Card output is in the 04:15 lead note above: the vector call returns; SIGSEGV (SEGV_MAPERR) is in the oracle-and-dump phase, cbrt block 1 and cbrtf...
+- 2026-11-12 07:03 **S10-10** owner decide: Owner 2026-11-12 07:00 EST ('you commit their work by hand'): option (b). The engineer does not run pm.py commit: it edits the worktree, leaves cha...
 - 2026-11-12 07:02 **S10-12** owner decide: Owner 2026-11-12 07:00 EST ('You run the command on s10-12'): release; the lead's card fault output (04:15 note) is on the ticket; continue to root...
 - 2026-11-12 04:17 **S10-11** lead approve: Double sin, cos, tan and atan2 from the KNC vector math library are now within 1 ULP on the card (0.76 to 0.88 ULP, same as the host): FMA is turne...
 - 2026-11-12 04:15 **S10-12** lead note: Card 2026-11-12 08:55Z (boot da3144f1), the 03:23 reproducer, 1 thread. cbrt: block 0 passes its oracle-and-dump; last trace 'trace block=1 class=s...
 - 2026-11-12 04:12 **S10-11** lead note: Card 2026-11-12 08:54-09:10Z (boot da3144f1), narrowed build: compare set 42 PASS, double sin 0.761, cos 0.787, tan 0.826, atan2 0.877 ULP; only cb...
 - 2026-11-12 03:55 **S10-12** lead amend: lane gcc: tree 1 is idle and gcc2 waits on the S10-11 review
 - 2026-11-12 03:45 **S10-11** lead note: Review: the narrowed fix reads right (only the compensated steps lose FMA: sincos 15->9, tan 18->11, atan 20->12; -fexcess-precision=standard stays...
-- 2026-11-12 03:30 **S10-10** lead note: Owner choice: Codex engineers cannot write the main .git, so pm.py commit fails in their worktrees. (a) Allow it: add the repo's .git to the Codex ...
 
 ## Cost
 
