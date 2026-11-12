@@ -1,6 +1,6 @@
 """S11-11 host contract; no compilers, source extraction, or card jobs.
 
-The future tools/corpus.py exposes make_plan(repetitions=3, extra_flags=None),
+tools/corpus.py exposes make_plan(repetitions=3, extra_flags=None, core_count=...),
 parse_results(JSONL_text), and summarize(plan, results). Plans are ordered lists
 of launch dictionaries. extra_flags maps compiler names to additional flag sets,
 each represented by a list of arguments; the baseline pair remains present.
@@ -16,7 +16,9 @@ Program identity, not a supplied held_out label, controls the partition.
 import json
 from pathlib import Path
 import sys
+import tempfile
 import unittest
+from unittest.mock import patch
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[2] / 'tools'))
 import corpus
@@ -41,12 +43,15 @@ def fixture(program, donor_times=(10, 20, 30), knc_times=(5, 10, 15), threads=1)
                        held_out=program in HELD_OUT)
             plan.append(job)
             results.append(dict(job, time_seconds=seconds, check='pass'))
+            if program.startswith('PB-'):
+                results[-1]['checksum'] = [dict(array='A', count=2, sum=3.,
+                                                abs=3., squares=5., weighted=8.)]
     return plan, results
 
 
 class CorpusPlan(unittest.TestCase):
     def test_complete_baseline_and_interleaved_repetitions(self):
-        plan = corpus.make_plan(repetitions=3)
+        plan = corpus.make_plan(repetitions=3, core_count=60)
         self.assertEqual({row['program'] for row in plan}, SERIAL | OPENMP)
         groups = {}
         for row in plan:
@@ -73,9 +78,9 @@ class CorpusPlan(unittest.TestCase):
             self.assertEqual({row['compiler'] for row in rows[::2]}, {DONOR, CANDIDATE})
 
     def test_extra_flags_preserve_baseline_and_frozen_inputs(self):
-        baseline = corpus.make_plan(repetitions=3)
+        baseline = corpus.make_plan(repetitions=3, core_count=60)
         extended = corpus.make_plan(repetitions=3, extra_flags={
-            DONOR: [['-O3']], CANDIDATE: [['-O3', '-mphinix']]})
+            DONOR: [['-O3']], CANDIDATE: [['-O3', '-mphinix']]}, core_count=60)
         for row in baseline:
             self.assertIn(row, extended)
         for compiler, option in ((DONOR, '-O3'), (CANDIDATE, '-mphinix')):
@@ -85,6 +90,12 @@ class CorpusPlan(unittest.TestCase):
         frozen = {(row['program'], row['threads']): row['input'] for row in baseline}
         for row in extended:
             self.assertEqual(row['input'], frozen[row['program'], row['threads']])
+
+    def test_card_core_count_is_required_and_controls_density(self):
+        with self.assertRaises(ValueError):
+            corpus.make_plan()
+        plan = corpus.make_plan(core_count=59)
+        self.assertEqual({r['threads'] for r in plan if r['program'] == 'STREAM'}, {59, 240})
 
 
 class CorpusResults(unittest.TestCase):
@@ -178,6 +189,83 @@ class CorpusResults(unittest.TestCase):
         self.assertEqual([row['program'] for row in report['held_out']], ['bzip2'])
         self.assertIsNone(report['median_speedup'])
         self.assertIsNone(report['held_out_median_speedup'])
+
+    def test_polybench_tolerance_and_missing_output_fail_closed(self):
+        for value, passes in ((3. + 1e-9, True), (3.01, False), (float('nan'), False)):
+            plan, rows = fixture('PB-gemm')
+            rows[1]['checksum'][0]['sum'] = value
+            report = corpus.summarize(plan, rows)
+            self.assertEqual(report['development'][0]['speedup'] is not None, passes)
+            self.assertEqual(bool(report['failures']), not passes)
+        plan, rows = fixture('PB-gemm')
+        del rows[1]['checksum']
+        self.assertIsNone(corpus.summarize(plan, rows)['median_speedup'])
+
+    def test_native_output_checks_and_affinity_metadata(self):
+        checks = {
+            'NPB-CG': 'Verification = SUCCESSFUL',
+            'STREAM': 'Solution Validates: avg error less than 1e-13',
+            'HPCG': 'HPCG result is VALID with a GFLOP/s rating of=1',
+            'zlib': 'CORPUS_CHECK pass',
+            'bzip2': 'CORPUS_CHECK pass',
+            'SQLite': 'CORPUS_CHECK pass',
+        }
+        meta = 'CORPUS_META {"cores":59,"threads":59}\nCORPUS_TIME 1.25\n'
+        for program, good in checks.items():
+            plan, _ = fixture(program, threads=59)
+            self.assertEqual(corpus.output_result(plan[0], meta + good, '', 0)['check'], 'pass')
+            self.assertNotEqual(corpus.output_result(plan[0], meta, '', 0)['check'], 'pass')
+            self.assertNotEqual(corpus.output_result(plan[0], meta + good, '', 1)['check'], 'pass')
+            self.assertNotEqual(corpus.output_result(plan[0], meta.replace('"threads":59', '"threads":60') + good, '', 0)['check'], 'pass')
+        plan, rows = fixture('PB-gemm', threads=59)
+        good = meta + 'CORPUS_ARRAY ' + json.dumps(rows[0]['checksum'][0])
+        self.assertEqual(corpus.output_result(plan[0], good, '', 0)['checksum'], rows[0]['checksum'])
+        self.assertNotEqual(corpus.output_result(plan[0], meta, '', 0)['check'], 'pass')
+
+    def test_lead_collects_fake_launches_and_marks_checksum_mismatch(self):
+        # Exercise host orchestration without SSH, compilers or card execution.
+        with tempfile.TemporaryDirectory() as temporary:
+            stage = Path(temporary)
+            settings = dict(extra_flags={}, repetitions=3)
+            corpus.write_json(stage / 'settings.json', settings)
+            builds = []
+            for compiler, variants in corpus.flag_sets().items():
+                for program in corpus.PROGRAMS:
+                    builds.append(dict(program=program, compiler=compiler, flags=variants[0],
+                                       check='pass' if program == 'PB-gemm' else 'error',
+                                       files=['/cygdrive/c/fixture/' + compiler + '/workload'],
+                                       cause='fixture unavailable compiler', log='fixture.log'))
+            corpus.write_json(stage / 'builds.json', builds)
+
+            def fake_call(directory, files, mode, density, stdout, stderr):
+                if mode == 'probe':
+                    text = 'CORPUS_META {"cores":59,"threads":240}\n'
+                else:
+                    self.assertEqual(mode, 'PB-gemm')
+                    self.assertEqual(density, 'serial')
+                    self.assertTrue(files[0].startswith('C:/fixture/'))
+                    checksum = dict(array='C', count=2, sum=3., abs=3., squares=5., weighted=8.)
+                    if 'gcc-knc' in files[0]:
+                        checksum['sum'] = 9.
+                    text = ('CORPUS_META {"cores":59,"threads":1}\nCORPUS_TIME 1.0\n'
+                            'CORPUS_ARRAY ' + json.dumps(checksum) + '\n')
+                stdout.write_text(text)
+                stderr.write_text('')
+                return 0
+
+            args = type('Args', (), {'stage': stage})()
+            with patch.object(corpus, 'card_call', side_effect=fake_call), patch('builtins.print'):
+                # The acceptance suite runs with Windows Python like the lead.
+                corpus.lead(args)
+            results = corpus.parse_results((stage / 'results.jsonl').read_text())
+            self.assertEqual(len(results), 138)
+            candidate = [r for r in results if r['program'] == 'PB-gemm' and r['compiler'] == CANDIDATE]
+            self.assertEqual(len(candidate), 3)
+            self.assertTrue(all(r['check'] == 'fail' and 'checksum' in r['cause'] for r in candidate))
+            self.assertEqual({r['threads'] for r in results if r['program'] == 'STREAM'}, {59, 240})
+            summary = json.loads((stage / 'summary.json').read_text())
+            self.assertIsNone(summary['median_speedup'])
+            self.assertEqual({r['program'] for r in summary['held_out']}, HELD_OUT)
 
 
 if __name__ == '__main__':

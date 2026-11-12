@@ -1,0 +1,9 @@
+BEGIN;
+CREATE TABLE samples(id INTEGER PRIMARY KEY, v INTEGER NOT NULL);
+WITH RECURSIVE seq(i) AS (VALUES(1) UNION ALL SELECT i+1 FROM seq WHERE i<100000)
+INSERT INTO samples SELECT i, (i*17+11)%1009 FROM seq;
+CREATE INDEX sample_values ON samples(v);
+UPDATE samples SET v=v+3 WHERE id%7=0;
+DELETE FROM samples WHERE id%13=0;
+COMMIT;
+SELECT count(*), sum(id), sum(v) FROM samples;
