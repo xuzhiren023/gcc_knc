@@ -67,7 +67,7 @@ Current tickets: `[###################-]` 194 of 201
 | S11-13 | Senior compiler review of the Sprint 11-13 scope (Milestone M4) against our research, with recommended plan changes | Done | A senior compiler review of the Sprint 11-13 plan is in: M4 is plausible but needs a frozen scoring and mea... |
 | S11-14 | M4 scoring contract and measurement protocol, frozen before any tuning | Done | M4's scoring contract is frozen in ADR-0015 with a tested scorer: strict serial -O2 versus -O2 over 17 prog... |
 | S11-15 | First development-corpus baseline and profile, GCC 5.1.1 vs GCC-KNC at -O2 (E7-03 part 1) | draft |  |
-| S11-16 | Long-double libm hazard audit - do other MPSS long double entry points fault like cbrtl? (E7-21, bounded) | Question for the tech lead | Native results recorded and committed as 9dc764db: only known cbrtl fault, 11 controls OK, errors=0; log .w... |
+| S11-16 | Long-double libm hazard audit - do other MPSS long double entry points fault like cbrtl? (E7-21, bounded) | In progress | Size approved: 580 lines are mostly the research note (263) and the probe source (219); a split adds nothin... |
 | S11-17 | PGO feasibility on one complete development program (reuse of S9-18's train/use path) | draft |  |
 | S11-18 | M4 corpus harness v2 - card profiles, prefix record, held-out sealing, stronger checks, and the donor-failure rule | In progress | Profiles, sealing, serial-vs-serial voting, the HPCG staged fix, the SQLite fallback and the runtime-prefix... |
 | S11-19 | Second senior review - the M4 definition and the Sprint 11-13 roadmap, adjusted | In progress | Substance is right and matches ADR-0015 (six pairs, 612 launches, 1.25x lower bound, SQLite exception, one ... |
@@ -227,19 +227,19 @@ Current tickets: `[###################-]` 194 of 201
 ## Recent activity
 
 - 2026-11-12 17:35 **S11-16** lead note: Card 2026-11-12 22:22:59-22:23:16Z (boot da3144f1), 240 threads: python tools/card_run --threads 240 --timeout 1800 .work/_shared/S11-16/long-doubl...
+- 2026-11-12 17:33 **S11-16** lead answer: Size approved: 580 lines are mostly the research note (263) and the probe source (219); a split adds nothing. Submit with: python tools/pm.py submi...
 - 2026-11-12 17:32 **S11-19** lead changes: Substance is right and matches ADR-0015 (six pairs, 612 launches, 1.25x lower bound, SQLite exception, one retry, 14+3 split); the inclusion rule a...
 - 2026-11-12 17:32 **S11-16** engineer ask: Native results recorded and committed as 9dc764db: only known cbrtl fault, 11 controls OK, errors=0; log .work/_shared/tmp/claude-next29/probe.out....
 - 2026-11-12 17:31 **S11-16** lead answer: Finish the note with the card result (17:35) and submit; if pm.py commit fails, leave uncommitted and ask.
 - 2026-11-12 17:30 **S11-19** engineer submit: Adjusted M4 definition and S11-S13 roadmaps; evidence/change log in docs/reviews/2026-11-12-roadmap-review.md. Clarified admission, sealed baseline...
 - 2026-11-12 17:30 **S11-16** lead resume: Card result in the 17:35 note.
 - 2026-11-12 17:30 **S11-09** lead approve: Weight-streaming GEMV for LLM decode is measured on the card: int8 weights reach 70 billion weights/s (2.2x fp32), and the gap to plain read bandwi...
-- 2026-11-12 17:20 **S11-09** engineer submit: Submitted by the lead for the engineer after rebasing onto main (sandbox cannot rebase). Analysis 5ed0012f: GEMV fp32 125.3, fp16 87.3, int8 70.0 G...
 
 ## Cost
 
 - From the script, engineer: 476 sessions, 1009.1M input tokens
 - From the script, lead: 306 sessions, 87.9M input tokens
-- Started by hand, Claude: 11 sessions, 2711.9M input tokens
+- Started by hand, Claude: 11 sessions, 2715.0M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
