@@ -1,10 +1,10 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-12 11:01.
+Updated automatically at every ticket change. Last update: 2026-11-12 11:14.
 
 **Waiting for you:** S11-02. Run `python tools/pm.py inbox`.
 
-Current tickets: `[###################-]` 183 of 187
+Current tickets: `[###################-]` 184 of 187
 
 ## Milestones
 
@@ -14,7 +14,7 @@ Current tickets: `[###################-]` 183 of 187
 | M1 | Mixed native code | Done | 43 of 43 tickets |
 | M2 | Useful vector target | Done | 51 of 51 tickets |
 | M3 | Runtimes | Done | 47 of 48 tickets |
-| M4 | Broad optimization | In progress | 2 of 5 tickets |
+| M4 | Broad optimization | In progress | 3 of 5 tickets |
 | M5 | Program corpus | Not started | Not planned in detail yet |
 | M6 | Release | Not started | Not planned in detail yet |
 
@@ -55,7 +55,7 @@ Current tickets: `[###################-]` 183 of 187
 | S11-01 | User story - the best way to move data between the host and the card, measured, and how our projects use it | Done | We now have a sourced inventory of every host-card transfer path that works without changing MPSS (SSH, tar... |
 | S11-02 | card_run and run_suite move data by S11-01's recommended method, with fallback | **Waiting for you** | Started by mistake: the ticket was 'ready' as a placeholder and became startable when S11-01 closed. The en... |
 | S11-03 | S11-01 transfer tool rejects the card's physical /tmp path, so the native study never starts | Done | The transfer study's tool now accepts the card's real /tmp location (/var/volatile/tmp), so its card run ca... |
-| S11-04 | S11-01 transfer tool - the host opens every connection, because Windows Firewall blocks inbound TCP from the card | Waiting for review | Submitted by the lead for the engineer: red adf57742 (host listener rejected, card-first loopback), fix aaf... |
+| S11-04 | S11-01 transfer tool - the host opens every connection, because Windows Firewall blocks inbound TCP from the card | Done | The transfer study's host side now opens every connection to the card, so Windows Firewall no longer blocks... |
 | S11-05 | Research - raise KNC's real memory bandwidth from about 175 GB/s toward 75-85% of peak, with a measured plan | In progress |  |
 | S2-01 | Design for zmm and mask registers under -march=knc | Done | The register design for KNC is settled on paper: all 32 zmm and 8 mask registers become usable under -march... |
 | S2-02 | Float and double arguments and results in zmm lane 0 | Done | Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`). |
@@ -212,6 +212,7 @@ Current tickets: `[###################-]` 183 of 187
 
 ## Recent activity
 
+- 2026-11-12 11:14 **S11-04** lead approve: The transfer study's host side now opens every connection to the card, so Windows Firewall no longer blocks it; checked on the host, card run next....
 - 2026-11-12 11:01 **S11-04** engineer submit: Submitted by the lead for the engineer: red adf57742 (host listener rejected, card-first loopback), fix aafd029d (card listens for lease and tcp, h...
 - 2026-11-12 10:59 **S11-04** lead answer: Skip the rebase. For gcc: no tickets submit only diffs against merge-base main, and main is ahead only by pm commits that touch none of your files,...
 - 2026-11-12 10:57 **S11-04** engineer ask: Required git rebase main is blocked by sandbox: error: could not create temporary C:/Users/xuzhi/Documents/gcc_knc/.git/worktrees/S11-04/rebase-mer...
@@ -219,16 +220,15 @@ Current tickets: `[###################-]` 183 of 187
 - 2026-11-12 10:53 **S11-04** engineer ask: Implemented and committed red adf57742 and fix aafd029d. Regression red on S11-03; loopback green both directions including fake transport, 3 tests...
 - 2026-11-12 10:42 **S11-03** lead approve: The transfer study's tool now accepts the card's real /tmp location (/var/volatile/tmp), so its card run can start; checked on the host, card run n...
 - 2026-11-12 10:42 **S10-13** engineer submit: T1 PASS: .work/_state/logs/S10_13_green-20261112-103135.log. Stage/link/lint PASS; all five exact card_run commands: .work/_state/logs/S10_13_stage...
-- 2026-11-12 10:31 **S11-03** engineer submit: Submitted by the lead for the engineer. Red 151a98bd (main has no LEASE_DIRECTORY; the old regex rejected /var/volatile/tmp), fix fcb157ec: host ch...
 
 ## Cost
 
 - From the script, engineer: 444 sessions, 957.5M input tokens
 - From the script, lead: 280 sessions, 81.4M input tokens
-- Started by hand, Claude: 11 sessions, 2545.8M input tokens
+- Started by hand, Claude: 11 sessions, 2546.2M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 24.6 GiB of 100 GiB. 94 GiB free on the drive.
+The project uses 24.6 GiB of 100 GiB. 93 GiB free on the drive.
