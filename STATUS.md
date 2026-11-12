@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-12 09:46.
+Updated automatically at every ticket change. Last update: 2026-11-12 10:29.
 
 **Waiting for you:** S11-02. Run `python tools/pm.py inbox`.
 
@@ -54,7 +54,7 @@ Current tickets: `[###################-]` 182 of 185
 | S10-13 | User story - code that calls cbrtl under -march=knc gets a safe replacement and a compile-time warning (MPSS libm cbrtl faults) | lead | Interactive lead is building tree 1 at GCC 157940608ed (python tools/gcc_build.py, log S10_13_lead_build-*)... |
 | S11-01 | User story - the best way to move data between the host and the card, measured, and how our projects use it | Done | We now have a sourced inventory of every host-card transfer path that works without changing MPSS (SSH, tar... |
 | S11-02 | card_run and run_suite move data by S11-01's recommended method, with fallback | **Waiting for you** | Started by mistake: the ticket was 'ready' as a placeholder and became startable when S11-01 closed. The en... |
-| S11-03 | S11-01 transfer tool rejects the card's physical /tmp path, so the native study never starts | In progress | Owner standing rule (feedback 2026-11-09/10: the lead raises session budgets itself): sessions raised to 5,... |
+| S11-03 | S11-01 transfer tool rejects the card's physical /tmp path, so the native study never starts | lead | Engineer finished uncommitted in .work/S11-03: host regex accepts /tmp and /var/volatile/tmp roots, lease()... |
 | S2-01 | Design for zmm and mask registers under -march=knc | Done | The register design for KNC is settled on paper: all 32 zmm and 8 mask registers become usable under -march... |
 | S2-02 | Float and double arguments and results in zmm lane 0 | Done | Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`). |
 | S2-03 | Varargs with the donor's register save area | Done | Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`). |
@@ -210,23 +210,23 @@ Current tickets: `[###################-]` 182 of 185
 
 ## Recent activity
 
+- 2026-11-12 10:29 **S11-03** lead defer: Engineer finished uncommitted in .work/S11-03: host regex accepts /tmp and /var/volatile/tmp roots, lease() uses realpath(/tmp) + exact 32-hex tail...
+- 2026-11-12 09:50 **S11-03** engineer ask: Host suite PASS: .work/_state/logs/S11_03_host-20261112-094922.log. Card lease fix uses realpath(/tmp), exact /claude/claude-<32 lowercase hex> val...
 - 2026-11-12 09:46 **S11-03** owner decide: Owner standing rule (feedback 2026-11-09/10: the lead raises session budgets itself): sessions raised to 5, first extension. The host fix exists un...
 - 2026-11-12 09:45 **S11-03** engineer escalate: budget: 3 engineer sessions used; the budget is 3
 - 2026-11-12 09:45 **S10-13** lead note: Interactive lead is building tree 1 at GCC 157940608ed (python tools/gcc_build.py, log S10_13_lead_build-*). Cause of the EACCES: earlier interacti...
 - 2026-11-12 09:43 **S11-03** lead answer: The card fix is not made yet: transfer_bench.c line 357 still checks strncmp(cwd,"/tmp/claude/claude-",19), so the helper you restaged will fail ex...
 - 2026-11-12 09:41 **S11-03** engineer ask: Host lease shape test passes (log .work/_state/logs/S11_03_host_red-20261112-094048.log). Card fix requires realpath /tmp plus exact cwd suffix val...
 - 2026-11-12 09:40 **S11-02** lead note: Started by mistake: the ticket was 'ready' as a placeholder and became startable when S11-01 closed. The engineer was right to stop; nothing was ch...
-- 2026-11-12 09:39 **S11-03** lead answer: hash_ok already covers tools/transfer_bench.c: the ticket's pattern matches 'tools/transfer_bench.c' (lead checked with re.search). hash_ok only ex...
-- 2026-11-12 09:37 **S11-03** engineer ask: Host regression passes; card helper rebuilt/linted and restaged in .work/_shared/S11-01; no card job run. The required card-side fix cannot be made...
 
 ## Cost
 
-- From the script, engineer: 440 sessions, 953.4M input tokens
+- From the script, engineer: 441 sessions, 954.2M input tokens
 - From the script, lead: 277 sessions, 81.0M input tokens
-- Started by hand, Claude: 11 sessions, 2510.8M input tokens
+- Started by hand, Claude: 11 sessions, 2515.5M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 24.6 GiB of 100 GiB. 96 GiB free on the drive.
+The project uses 24.6 GiB of 100 GiB. 100 GiB free on the drive.
