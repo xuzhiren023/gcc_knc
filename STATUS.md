@@ -48,7 +48,7 @@ Current tickets: `[###################-]` 177 of 182
 | S10-07 | Vector math v1a - the copied functions (sin, cos, tan, log10, atan, atan2, hyperbolics, bounded groups) in libknc_vmath and the vectorizer hook | Done | Card 2026-11-11 (S10-08 build, 240 threads): full set PASS for sinf 0.499999, cosf 0.499998, tanf 0.499995,... |
 | S10-08 | Vector math v1b - the rest of the libmvec set (acos, asin, cbrt, erf, erfc, exp2, exp10, expm1, log1p, log2, hypot, sincos) | Done | The vector math library now covers the whole set GCC vectorizes with glibc's libmvec: acos, asin, cbrt, erf... |
 | S10-09 | User story - double-precision loops with division and square root vectorize, correctly rounded (V8DF div, cond_div, sqrt) | Waiting for review | Lead (owner 2026-11-11 16:55 EST): the lead has no usage until the owner says it reset. If you hit an issue... |
-| S10-10 | Card harness fixes from the Sprint 10 card turn - card_qualify binary folder, vmath bench batch sizing | **Waiting for you** | budget: 2712316 input tokens used; the budget is 2000000 |
+| S10-10 | Card harness fixes from the Sprint 10 card turn - card_qualify binary folder, vmath bench batch sizing | **Waiting for you** | input_tokens 6M |
 | S10-11 | Card-only vector math failures - double sin, cos, tan, atan2 above 1 ULP, and cbrt/cbrtf crash (SIGSEGV) | **Waiting for you** | budget: 4 engineer sessions used; the budget is 4 |
 | S11-01 | User story - the best way to move data between the host and the card, measured, and how our projects use it | Not started | lane tools: owner 2026-11-12, usage reset, move on (Codex engineers) |
 | S11-02 | card_run and run_suite move data by S11-01's recommended method, with fallback | Not started | ready; waits on its dep S11-01, the lead writes acceptance before it starts |
@@ -208,19 +208,19 @@ Current tickets: `[###################-]` 177 of 182
 ## Recent activity
 
 - 2026-11-12 00:10 **S10-11** lead escalate: budget: 4 engineer sessions used; the budget is 4
+- 2026-11-12 00:10 **S10-10** lead amend: input_tokens 6M
 - 2026-11-12 00:09 **S10-11** lead answer: (1) Yes, narrow it. Keep -fexcess-precision=standard in KNC_LIB_FLAGS for all members: KNC scalar code is x87, so it is a correctness flag, not a s...
 - 2026-11-12 00:07 **S10-11** engineer ask: Global contraction-off exceeds the demonstrated four-member need; vmath_v1b.h already disables it for cbrt. Removed FMA sites: sincos/tan/atan 15/1...
 - 2026-11-12 00:07 **S10-10** engineer escalate: budget: 2712316 input tokens used; the budget is 2000000
 - 2026-11-12 00:07 **S10-10** owner decide: Owner standing rule: session budget raised to 4 (first extension; the fix exists as .work/_shared/S10-10/fix-3ff91fd2.patch). Commit the test [red]...
 - 2026-11-12 00:06 **S10-10** lead amend: sessions 4
 - 2026-11-12 00:06 **S10-10** engineer escalate: budget: 2 engineer sessions used; the budget is 2
-- 2026-11-12 00:04 **S10-10** lead answer: See the decide above: worktree rewound to main, fix saved as .work/_shared/S10-10/fix-3ff91fd2.patch; commit the test [red] first, then apply the p...
 
 ## Cost
 
 - From the script, engineer: 421 sessions, 933.7M input tokens
 - From the script, lead: 262 sessions, 77.8M input tokens
-- Started by hand, Claude: 11 sessions, 2449.8M input tokens
+- Started by hand, Claude: 11 sessions, 2450.9M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
