@@ -17,7 +17,9 @@ class MemoryBandwidth(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         OUT.mkdir(exist_ok=True)
-        cls.binary = OUT / 'membw-host'
+        # Cygwin appends .exe at link time; an older extensionless executable
+        # can otherwise shadow the just-built program during subprocess exec.
+        cls.binary = OUT / ('membw-host.exe' if sys.platform == 'cygwin' else 'membw-host')
         subprocess.run(['gcc', '-O2', '-std=gnu11', '-Wall', '-Wextra',
                         '-Werror', '-pthread', str(HERE / 'membw.c'),
                         '-o', str(cls.binary)], check=True)
@@ -74,17 +76,19 @@ class MemoryBandwidth(unittest.TestCase):
 
     def test_gemv_formats_shapes_and_accounting(self):
         # Each run checks every row against the benchmark's scalar reference.
-        # Uneven partitions and partial row groups exercise the cleanup paths.
+        # Partial row groups and cyclic worker partitions exercise cleanup.
         for fmt, width in [('fp32', 4), ('int8', 1), ('fp16', 2)]:
-            for columns, streams, block, unroll in [(4096, 1, 0, 1),
-                                                    (11008, 8, 256, 8)]:
+            for columns, streams, block, unroll, threads in [(4096, 1, 0, 1, 1),
+                                                            (11008, 8, 256, 8, 1),
+                                                            (4096, 2, 1024, 2, 0)]:
                 with self.subTest(format=fmt, columns=columns):
                     result = subprocess.run(
                         [str(self.binary), '--workload', 'gemv', '--format', fmt,
                          '--columns', str(columns), '--row-streams', str(streams),
                          '--column-block', str(block), '--unroll', str(unroll),
                          '--mib', '1', '--passes', '2', '--repeats', '5',
-                         '--threads', '1', '--pf0', '8', '--pf1', '64'],
+                         '--threads', str(threads), '--schedule', 'cyclic',
+                         '--chunk-lines', '5000', '--pf0', '8', '--pf1', '64'],
                         text=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
                         timeout=45)
                     self.assertEqual(result.returncode, 0, result.stderr)
