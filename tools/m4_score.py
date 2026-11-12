@@ -11,14 +11,18 @@ from pathlib import Path
 import random
 from statistics import median
 
+from corpus import PROGRAMS
 
-PROGRAMS = (
-    "gemm", "atax", "cholesky", "ludcmp", "jacobi-2d", "heat-3d",
-    "adi", "durbin", "stream", "npb-cg", "npb-ep", "npb-mg", "npb-is",
-    "hpcg", "zlib", "sqlite", "bzip2",
-)
 MODELS = ("7120", "3100", "5100")
-SEALED_ROOT = Path(__file__).resolve().parents[2] / "_shared" / "m4-sealed"
+
+
+def sealed_root(root):
+    """Locate lead-only output from a main checkout or .work/<ticket> root."""
+    project = root.parent.parent if root.parent.name == ".work" else root
+    return project / ".work" / "_shared" / "m4-sealed"
+
+
+SEALED_ROOT = sealed_root(Path(__file__).resolve().parents[1])
 
 
 def regression_status(lower, upper):

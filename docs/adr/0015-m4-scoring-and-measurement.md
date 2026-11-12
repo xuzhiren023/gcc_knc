@@ -28,6 +28,9 @@ it does not replace its kernel experiment rules. No native result is asserted he
    row. Missing or invalid primary data prevents a complete M4 pass; never take
    the median of only successful programs. No exclusions after results.
    (Owner; findings 1, 8.)
+   The scorer imports the canonical identifiers from `tools/corpus.py`: PolyBench
+   identifiers have the `PB-` prefix; STREAM, NPB-CG/EP/MG/IS, HPCG and SQLite
+   retain the harness's capitalization. No independent alias list defines votes.
 3. HPCG is mandatory unless unchanged source truly cannot build. The pilot
    reproduces and classifies failure under both actual toolchains. Before tuning,
    the owner decides any authorized compatibility fix or other eligibility change;
