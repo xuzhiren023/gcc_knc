@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-12 15:56.
+Updated automatically at every ticket change. Last update: 2026-11-12 15:57.
 
 **Waiting for you:** S11-02. Run `python tools/pm.py inbox`.
 
@@ -62,7 +62,7 @@ Current tickets: `[###################-]` 189 of 194
 | S11-08 | -Wknc-unsafe-cbrtl cannot be used in #pragma GCC diagnostic ("valid for  but not for C") | Done | The cbrtl warning can now be silenced around one deliberate call with #pragma GCC diagnostic in C and C++; ... |
 | S11-09 | Memory bandwidth for LLM decode - a weight-streaming GEMV workload, pushed toward 264-299 GB/s of weight bytes | lead | Needs interactive lead: card run in our exclusive turn. Reviewed 33de9541: IMCI sint8/float16 load conversi... |
 | S11-10 | S11-01 transfer runner - choose repetitions, sizes and load states per run, so slow methods fit a card turn | In progress | Owner standing rule (feedback 2026-11-09/10): session budget raised to 5. The ticket progressed (submitted ... |
-| S11-11 | M4 corpus run harness - every corpus program built by GCC 5.1.1 and GCC-KNC, run on the card with frozen inputs and a correctness check, in one command | Tests waiting for review | Red contract committed at 4f4a34f3. Ran python tools/run.py --name S11-11-host-red --inputs tests/tools/tes... |
+| S11-11 | M4 corpus run harness - every corpus program built by GCC 5.1.1 and GCC-KNC, run on the card with frozen inputs and a correctness check, in one command | In progress | The corpus harness now has a failing host contract that pins the S0-07 program set (held-out adi, durbin an... |
 | S11-13 | Senior compiler review of the Sprint 11-13 scope (Milestone M4) against our research, with recommended plan changes | In progress |  |
 | S2-01 | Design for zmm and mask registers under -march=knc | Done | The register design for KNC is settled on paper: all 32 zmm and 8 mask registers become usable under -march... |
 | S2-02 | Float and double arguments and results in zmm lane 0 | Done | Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`). |
@@ -219,6 +219,7 @@ Current tickets: `[###################-]` 189 of 194
 
 ## Recent activity
 
+- 2026-11-12 15:57 **S11-11** lead approve-red: The corpus harness now has a failing host contract that pins the S0-07 program set (held-out adi, durbin and bzip2 split off by program name), pair...
 - 2026-11-12 15:56 **S11-11** engineer red: Red contract committed at 4f4a34f3. Ran python tools/run.py --name S11-11-host-red --inputs tests/tools/test_corpus.py tools/corpus.py -- python -m...
 - 2026-11-12 15:55 **S11-10** owner decide: Owner standing rule (feedback 2026-11-09/10): session budget raised to 5. The ticket progressed (submitted at 15:30, three review findings at 15:54...
 - 2026-11-12 15:55 **S11-10** engineer escalate: budget: 3 engineer sessions used; the budget is 3
@@ -226,7 +227,6 @@ Current tickets: `[###################-]` 189 of 194
 - 2026-11-12 15:30 **S11-10** engineer submit: Options and plan tested: red 4c6c5b74 against missing plan; green tools/run.py s11_10_options_green, log C:\Users\xuzhi\Documents\gcc_knc\.work\_st...
 - 2026-11-12 15:25 **S11-10** lead note: Two more runner bugs from the card turn, fix them here too: (1) the runner closes card-control.log (finally: card_log.close()) while card_run may s...
 - 2026-11-12 15:24 **S11-10** owner decide: Owner standing rule (feedback 2026-11-09/10: the lead raises budgets itself): input budget raised to 6M, first extension. Options plumbing is done;...
-- 2026-11-12 15:24 **S11-10** engineer escalate: budget: 3216728 input tokens used; the budget is 2000000
 
 ## Cost
 
