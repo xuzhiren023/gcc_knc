@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-12 00:06.
+Updated automatically at every ticket change. Last update: 2026-11-12 00:07.
 
-**Waiting for you:** S10-10. Run `python tools/pm.py inbox`.
+**Next: the tech lead, on S10-09.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[###################-]` 177 of 182
 
@@ -48,7 +48,7 @@ Current tickets: `[###################-]` 177 of 182
 | S10-07 | Vector math v1a - the copied functions (sin, cos, tan, log10, atan, atan2, hyperbolics, bounded groups) in libknc_vmath and the vectorizer hook | Done | Card 2026-11-11 (S10-08 build, 240 threads): full set PASS for sinf 0.499999, cosf 0.499998, tanf 0.499995,... |
 | S10-08 | Vector math v1b - the rest of the libmvec set (acos, asin, cbrt, erf, erfc, exp2, exp10, expm1, log1p, log2, hypot, sincos) | Done | The vector math library now covers the whole set GCC vectorizes with glibc's libmvec: acos, asin, cbrt, erf... |
 | S10-09 | User story - double-precision loops with division and square root vectorize, correctly rounded (V8DF div, cond_div, sqrt) | Waiting for review | Lead (owner 2026-11-11 16:55 EST): the lead has no usage until the owner says it reset. If you hit an issue... |
-| S10-10 | Card harness fixes from the Sprint 10 card turn - card_qualify binary folder, vmath bench batch sizing | **Waiting for you** | sessions 4 |
+| S10-10 | Card harness fixes from the Sprint 10 card turn - card_qualify binary folder, vmath bench batch sizing | In progress | Owner standing rule: session budget raised to 4 (first extension; the fix exists as .work/_shared/S10-10/fi... |
 | S10-11 | Card-only vector math failures - double sin, cos, tan, atan2 above 1 ULP, and cbrt/cbrtf crash (SIGSEGV) | In progress | The host now reproduces the card's double sin, cos, tan and atan2 failures bit for bit (x87 plus FMA contra... |
 | S11-01 | User story - the best way to move data between the host and the card, measured, and how our projects use it | Not started | lane tools: owner 2026-11-12, usage reset, move on (Codex engineers) |
 | S11-02 | card_run and run_suite move data by S11-01's recommended method, with fallback | Not started | ready; waits on its dep S11-01, the lead writes acceptance before it starts |
@@ -207,6 +207,7 @@ Current tickets: `[###################-]` 177 of 182
 
 ## Recent activity
 
+- 2026-11-12 00:07 **S10-10** owner decide: Owner standing rule: session budget raised to 4 (first extension; the fix exists as .work/_shared/S10-10/fix-3ff91fd2.patch). Commit the test [red]...
 - 2026-11-12 00:06 **S10-10** lead amend: sessions 4
 - 2026-11-12 00:06 **S10-10** engineer escalate: budget: 2 engineer sessions used; the budget is 2
 - 2026-11-12 00:04 **S10-10** lead answer: See the decide above: worktree rewound to main, fix saved as .work/_shared/S10-10/fix-3ff91fd2.patch; commit the test [red] first, then apply the p...
@@ -214,7 +215,6 @@ Current tickets: `[###################-]` 177 of 182
 - 2026-11-12 00:03 **S11-01** lead amend: lane tools: owner 2026-11-12, usage reset, move on (Codex engineers)
 - 2026-11-11 16:50 **S10-11** lead approve-red: The host now reproduces the card's double sin, cos, tan and atan2 failures bit for bit (x87 plus FMA contraction breaks the library's compensated s...
 - 2026-11-11 16:48 **S10-11** engineer red: Red 6cb6aa11 reproduces all four card outputs exactly using host x87+FMA. Fix fe1e143a passes all host regression modes and six targeted compare jo...
-- 2026-11-11 16:42 **S10-11** lead answer: No card backtrace now: the lead has no card turn in this session. Don't wait for one. (1) cbrt/cbrtf: stage a minimal card reproducer in .work/_sha...
 
 ## Cost
 
