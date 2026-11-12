@@ -1,10 +1,11 @@
 # MPSS long-double libm hazard audit (S11-16)
 
-Native results are pending the lead's run. The disassembly identifies **cbrtl**
+The lead's native run found **only cbrtl** faulting among the 12 probed functions;
+the other 11 completed the corpus without a crash. The disassembly identifies **cbrtl**
 as the one direct match for the negative 32-bit table-offset pattern in the
 reviewed long-double code. This is a bounded crash audit, not an accuracy or
 memory-safety proof. The ticket supplies the earlier cbrtl fault and S10-13 guard;
-no additional native fault is claimed here.
+no additional native fault was observed in this sweep.
 
 ## Library and method
 
@@ -101,10 +102,39 @@ GCC-KNC prefix cross build and `knc_lint`: **PASS**,
 `s11_16_stage-20261112-163821.log`. All logs are under `.work/_state/logs/`.
 The build uses `.work/_shared/gcc-knc-16.2.0/bin/k1om-mpss-linux-gcc`
 with `-march=knc`, the card sysroot and dynamic libm lookup.
-Native run: **not run**. Lead to append the card log path and each function's
-`RESULT`. The known cbrtl guard is S10-13. Any newly faulting function needs its
-own guard ticket, with the exact `FAULT` record and library instruction address;
-absence of that run is not evidence that the other functions are safe.
+Native run: **completed by the lead**, 2026-11-12 22:22:59–22:23:16 UTC,
+with 240 workers and boot ID `da3144f1-552e-4305-bd17-84a3835da020`.
+Log: `.work/_shared/tmp/claude-next29/probe.out`; command as above.
+
+| Function | Native result | Completed calls |
+| --- | --- | --- |
+| `cbrtl` | SIGSEGV (signal 11) | Child exited on fault |
+| `powl` | OK | 1,050,528 |
+| `scalbl` | OK | 1,050,528 |
+| `lgammal` | OK | 262,632 |
+| `lgammal_r` | OK | 262,632 |
+| `gammal` | OK | 262,632 |
+| `tgammal` | OK | 262,632 |
+| `sinl` | OK | 262,632 |
+| `cosl` | OK | 262,632 |
+| `tanl` | OK | 262,632 |
+| `sincosl` | OK | 262,632 |
+| `cexpl` | OK | 525,264 |
+
+The log contains two concurrent cbrtl fault reports for the same smallest
+positive subnormal, with distinct significand selectors:
+
+```
+FAULT cbrtl signal=11 input=0000:0000000000000001 exponent=-16445 sign=0 mantissa=2 variant=0
+FAULT cbrtl signal=11 input=0000:0000000000000001 exponent=-16445 sign=0 mantissa=3 variant=0
+```
+
+The parent continued through all functions and reported
+`SUMMARY functions=12 faults=1 errors=0`. Card exit 1 represents the observed
+cbrtl fault, not an infrastructure failure. This confirms the known cbrtl
+hazard; S10-13 already provides its guard, so no new guard ticket is needed.
+The controls' OK results establish only that this finite corpus did not crash;
+they do not establish numerical accuracy or safety for other inputs.
 
 ## Exported long-double entry points
 
