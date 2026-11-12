@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-12 12:23.
+Updated automatically at every ticket change. Last update: 2026-11-12 12:24.
 
 **Waiting for you:** S11-02. Run `python tools/pm.py inbox`.
 
@@ -57,7 +57,7 @@ Current tickets: `[###################-]` 187 of 189
 | S11-03 | S11-01 transfer tool rejects the card's physical /tmp path, so the native study never starts | Done | The transfer study's tool now accepts the card's real /tmp location (/var/volatile/tmp), so its card run ca... |
 | S11-04 | S11-01 transfer tool - the host opens every connection, because Windows Firewall blocks inbound TCP from the card | Done | The transfer study's host side now opens every connection to the card, so Windows Firewall no longer blocks... |
 | S11-05 | Research - raise KNC's real memory bandwidth from about 175 GB/s toward 75-85% of peak, with a measured plan | Done | The memory-bandwidth research plan and a validated multithreaded KNC bandwidth benchmark are ready, with a ... |
-| S11-06 | Memory bandwidth - read the first card sweep, find why our numbers sit below STREAM's, and stage sweep 2 toward 264-299 GB/s | In progress |  |
+| S11-06 | Memory bandwidth - read the first card sweep, find why our numbers sit below STREAM's, and stage sweep 2 toward 264-299 GB/s | Question for the tech lead | Please commit pending changes (pm commit stalled; interrupted; red b57eca55), then run: python tools/card_r... |
 | S11-07 | S11-01 transfer tool - the card's listener gives up before card_run relays its announcement | Done | The transfer study's card listener now waits long enough for card_run to relay its address to the host; che... |
 | S2-01 | Design for zmm and mask registers under -march=knc | Done | The register design for KNC is settled on paper: all 32 zmm and 8 mask registers become usable under -march... |
 | S2-02 | Float and double arguments and results in zmm lane 0 | Done | Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`). |
@@ -214,6 +214,7 @@ Current tickets: `[###################-]` 187 of 189
 
 ## Recent activity
 
+- 2026-11-12 12:24 **S11-06** engineer ask: Please commit pending changes (pm commit stalled; interrupted; red b57eca55), then run: python tools/card_run --benchmark --threads 240 --timeout 5...
 - 2026-11-12 12:23 **S11-07** lead approve: The transfer study's card listener now waits long enough for card_run to relay its address to the host; checked on the host, card run next. Machine...
 - 2026-11-12 12:15 **S11-07** engineer submit: Submitted by the lead for the engineer: red 59d54628 (card wait 10 s < host 60 s + relay 10 s), fix 160ec58a (card lease listener 90 s; SSH-started...
 - 2026-11-12 12:14 **S11-07** lead answer: Split by the lead; the lead submits for the engineer.
@@ -221,7 +222,6 @@ Current tickets: `[###################-]` 187 of 189
 - 2026-11-12 12:13 **S11-07** lead defer: Engineer committed red test and fix together (af43d01f); submit needs a test(...)[red] commit. Interactive lead: split af43d01f into test[red] (tes...
 - 2026-11-12 12:12 **S11-07** engineer ask: Submit is blocked because there is no test(...)[red] commit. The red test was run and failed as expected (card wait 90s vs required 60s host deadli...
 - 2026-11-12 12:10 **S10-13** lead note: x86 check at GCC 157940608ed: -O2 and -O2 -mavx512f identical 1962, different 0, both-failed 41 (Cygwin headers), errors 0.
-- 2026-11-12 12:07 **S10-13** lead approve: Under -march=knc, calls to cbrtl (and std::cbrt on long double) now go to GCC-KNC's own safe cube root with a compile-time warning, instead of the ...
 
 ## Cost
 
