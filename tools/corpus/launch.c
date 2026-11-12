@@ -11,6 +11,7 @@
 #include <sys/wait.h>
 #include <time.h>
 #include <unistd.h>
+#include <gnu/libc-version.h>
 
 static int topology(int cpu, const char *field)
 {
@@ -52,7 +53,7 @@ static void reports(void)
 int main(int argc, char **argv)
 {
   cpu_set_t granted, selected;
-  int cores[CPU_SETSIZE], packages[CPU_SETSIZE], ncores = 0, ncpus = 0;
+  int cores[CPU_SETSIZE], packages[CPU_SETSIZE], percore[CPU_SETSIZE] = {0}, ncores = 0, ncpus = 0;
   int cpu, i, count = 0, status;
   char affinity[CPU_SETSIZE * 6], threads[32];
   size_t used = 0;
@@ -75,13 +76,17 @@ int main(int argc, char **argv)
     }
     if ((!strcmp(argv[1], "serial") && !count) ||
         (!strcmp(argv[1], "one") && first) ||
-        ((!strcmp(argv[1], "full") || !strcmp(argv[1], "probe")) && count < 240)) {
+        (!strcmp(argv[1], "two") && percore[i] < 2) ||
+        !strcmp(argv[1], "full") || !strcmp(argv[1], "probe")) {
       CPU_SET(cpu, &selected);
       used += snprintf(affinity + used, sizeof affinity - used, "%s%d", count ? " " : "", cpu);
       ++count;
     }
+    ++percore[i];
   }
-  if (!ncores || !count || ((!strcmp(argv[1], "full") || !strcmp(argv[1], "probe")) && count != 240)) {
+  if (!ncores || !count || ncpus != 4 * ncores ||
+      (!strcmp(argv[1], "one") && count != ncores) ||
+      (!strcmp(argv[1], "two") && count != 2 * ncores)) {
     fprintf(stderr, "Insufficient affinity: %d cores, %d CPUs\n", ncores, ncpus);
     return 2;
   }
@@ -89,6 +94,7 @@ int main(int argc, char **argv)
          ncores, ncpus, count, affinity);
   fflush(stdout);
   if (!strcmp(argv[1], "probe")) return 0;
+  printf("CORPUS_RUNTIME glibc %s\n", gnu_get_libc_version());
   if (sched_setaffinity(0, sizeof selected, &selected)) return 2;
   snprintf(threads, sizeof threads, "%d", count);
   setenv("OMP_NUM_THREADS", threads, 1);
@@ -98,6 +104,8 @@ int main(int argc, char **argv)
   unsetenv("OMP_PLACES");
   setenv("GOMP_CPU_AFFINITY", affinity, 1);
   setenv("LD_LIBRARY_PATH", ".", 1);
+  if ((!strcmp(argv[2], "zlib") || !strcmp(argv[2], "bzip2")) &&
+      system("mkdir -p peer && tar -xf peer.tar -C peer")) return 2;
   if (clock_gettime(CLOCK_MONOTONIC, &start)) return 2;
   child = fork();
   if (child < 0) return 2;
@@ -110,5 +118,17 @@ int main(int argc, char **argv)
   if (clock_gettime(CLOCK_MONOTONIC, &end)) return 2;
   printf("\nCORPUS_TIME %.9f\n", end.tv_sec - start.tv_sec + (end.tv_nsec - start.tv_nsec) * 1e-9);
   if (!strcmp(argv[2], "HPCG")) reports();
+  if ((!strcmp(argv[2], "zlib") || !strcmp(argv[2], "bzip2")) &&
+      WIFEXITED(status) && WEXITSTATUS(status) == 0) {
+    fflush(stdout);
+    child = fork();
+    if (child < 0) return 2;
+    if (!child) {
+      setenv("LD_LIBRARY_PATH", "peer", 1);
+      execl("./peer/workload", "workload", "decode", (char *)0);
+      _exit(127);
+    }
+    while (waitpid(child, &status, 0) < 0) if (errno != EINTR) return 2;
+  }
   return WIFEXITED(status) ? WEXITSTATUS(status) : 128 + WTERMSIG(status);
 }
