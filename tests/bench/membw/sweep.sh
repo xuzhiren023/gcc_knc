@@ -4,7 +4,7 @@ set -eu
 phase=${1:-first}
 binary=./membw.mic
 plan=0
-case "$phase" in second-plan|third-plan) plan=1;; esac
+case "$phase" in second-plan|third-plan|gemv-plan) plan=1;; esac
 if [ "$plan" = 0 ]; then chmod u+x "$binary"; fi
 case_no=0
 snapshot() {
@@ -51,8 +51,44 @@ third_case() {
     esac
     second_case "$workload" "$@"
 }
+gemv_case() {
+    workload=$1
+    shift
+    run --workload "$workload" --mib 2048 --passes 32 --threads 120 \
+        --placement spread --pages small --pf0 8 --pf1 64 --prefetch shared \
+        --unroll 4 --columns 4096 --row-streams 4 --column-block 1024 "$@"
+}
 if [ "$plan" = 0 ]; then snapshot; fi
 case "$phase" in
+    gemv|gemv-plan)
+        # 1-9: plain-read calibration for every memory/prefetch configuration.
+        for t in 120 60 180 240; do gemv_case read --threads "$t"; done
+        gemv_case read --pf0 32 --pf1 256
+        gemv_case read --pf0 0 --pf1 128
+        gemv_case read --pf0 8 --pf1 0
+        gemv_case read --pages huge
+        gemv_case read --unroll 8
+        # 10-24: independent density ladders, then the larger vector shape.
+        for f in fp32 int8 fp16; do
+            for t in 120 60 180 240; do gemv_case gemv --format "$f" --threads "$t"; done
+            gemv_case gemv --format "$f" --columns 11008
+        done
+        # 25-51: row streams, vector windows, coverage, pages and unroll.
+        for f in fp32 int8 fp16; do
+            gemv_case gemv --format "$f" --row-streams 1
+            gemv_case gemv --format "$f" --row-streams 8
+            gemv_case gemv --format "$f" --columns 11008 --column-block 256
+            gemv_case gemv --format "$f" --columns 11008 --column-block 0
+            gemv_case gemv --format "$f" --pf0 32 --pf1 256
+            gemv_case gemv --format "$f" --pf0 0 --pf1 128
+            gemv_case gemv --format "$f" --pf0 8 --pf1 0
+            gemv_case gemv --format "$f" --pages huge
+            gemv_case gemv --format "$f" --unroll 8
+        done
+        # 52-55: fresh allocations of the opening read and format references.
+        gemv_case read
+        for f in fp32 int8 fp16; do gemv_case gemv --format "$f"; done
+        ;;
     third|third-plan)
         # 1-6: long calibration/references, including the read density winner.
         for w in triad read write copy rmw stencil; do third_case "$w"; done
@@ -180,6 +216,6 @@ case "$phase" in
         run "$@"
         run --threads 60 --pages huge
         ;;
-    *) echo "expected probe, first, second, second-plan, third, third-plan, or confirm" >&2; exit 2;;
+    *) echo "expected probe, first, second, second-plan, third, third-plan, gemv, gemv-plan, or confirm" >&2; exit 2;;
 esac
 if [ "$plan" = 0 ]; then snapshot; fi

@@ -290,3 +290,95 @@ skew, closing drift and actual pages before selecting a candidate. Sweep 3 does
 not reproduce the small combined offset/unroll winner or split triad; it spends
 those cases on identifying the large class-specific loss. No native gain is
 claimed until the lead returns raw output.
+
+## S11-09: weight-streaming GEMV
+
+`--workload gemv --format fp32|int8|fp16` selects a separate workload;
+`all` retains the six original streaming classes. `--columns 4096|11008`
+selects the row length. `--mib` is the weight payload budget, rounded **up**
+to whole rows, so `--mib 2048` always streams at least 2 GiB. The mapping
+also holds the shared immutable fp32 input vector, per-row scale storage and
+one fp32 output per row. It does not allocate the three STREAM arrays.
+
+The workers, affinity, placement, page allocation/fallback, first touch,
+sample envelope and completion fences are shared with the existing harness.
+Block/cyclic scheduling operates on whole rows; `--chunk-lines` is rounded up
+to a whole-row tile with at least `--row-streams` rows. `--row-streams 1|2|4|8`
+(default 4) interleaves that many
+rows, reusing each vector load across their independent accumulators. A partial
+group uses single-row cleanup. `--column-block 0|N` (default 1024, positive N
+must be a multiple of 16) traverses that vector window across the row tile
+before the next window; zero means the full row. Smaller windows aim to retain
+the vector in L1, including the 43 KiB vector at 11008 columns. `--unroll`
+controls 1/2/4/8 groups of 16 columns per loop iteration.
+
+Weights expand directly to registers using IMCI `vmovaps` with signed-byte or
+half conversion, then explicit fp32 fused multiply-adds. The int8 scale is a
+per-row fp32 power of two, applied after each partial reduction. The generator
+includes both signs, zero, all signed-byte values and fractional normal half
+values. Products and sums are exact for these inputs, permitting exact scalar
+reference comparison across reduction orders. This is a finite-value bandwidth
+validation, not a NaN/subnormal or arbitrary-model numerical qualification.
+Every sample checks all outputs and immutable weights, scales and vector.
+Initialization and the scalar reference run on the same selected workers,
+outside timing. Host execution emulates conversion and vector arithmetic.
+
+Near/far prefetch distances remain **weight cache lines per row stream**.
+Hints issue once per 64 weight bytes, not once per converted vector, and may
+cross into later rows but never leave the weight allocation. This matters for
+int8: a 4096-column row is only 64 lines, so stopping hints at row boundaries
+would disable the default far hint. Blocking can make those future lines less
+immediately useful; compare full-row and blocked traversal. `shared` uses
+`vprefetch0/1`; `l2` selects `vprefetch2` for the far hint. `exclusive` remains
+shared for immutable weights. `store`, `evict`, `split`, `offset-lines`,
+`padding-lines`, extra line/chunk fences and `read-chains` affect only the
+original classes. GEMV uses ordinary scalar output stores and pass fences.
+
+GEMV `logical_bytes` counts only `rows * columns * weight_width * passes`.
+`median_GFLOPs` counts two operations per weight and equals
+`median_GBs * 2 / weight_width`; conversion/scaling/reduction overhead is timed
+but not counted as extra useful FLOPs. `scale_bytes` is the int8 scale footprint,
+not timed DRAM traffic. Column blocking writes partial sums and reads them back:
+`output_bytes_per_pass = rows * 4 * (2 * column_blocks - 1)` reports these logical
+transfers. Scale reads occur per row per column block. Vector loads, scalar
+horizontal-reduction stack transfers, RFO, ECC and cache reuse are excluded from
+weight GB/s; this is never labelled measured GDDR controller bandwidth.
+
+Build/test through the existing scripts:
+
+```text
+python tools/run.py --name S11-09-host --inputs tests/bench/membw -- python tests/bench/membw/test_membw.py
+python tools/run.py --name S11-09-k1om --inputs tests/bench/membw tools/knc_lint -- python tests/bench/membw/build.py
+```
+
+The host test extends the existing file with format/shape validation, byte/FLOP
+accounting and sweep expansion checks. It launches no card job. The lead runs:
+
+```text
+python tools/card_run --benchmark --threads 240 --timeout 5340 --file ../_shared/S11-05/membw.mic ../_shared/S11-05/sweep.sh gemv
+```
+
+`sh tests/bench/membw/sweep.sh gemv-plan` prints all 55 exact CASE commands,
+without touching the binary or card metadata. Every case uses 2048 MiB of
+weights (or read input), 32 passes, five samples and spread placement. Defaults
+are 120 threads, small pages, 8/64 prefetch, four row streams, 1024-column blocks
+and unroll four. The process alarms include initialization and validation:
+`55 * 90 + 120 = 5070 seconds` (84.5 minutes including launch/metadata reserve).
+The outer timeout caps the job at 89 minutes. A timeout is incomplete evidence.
+
+| Cases | Purpose |
+|---|---|
+| 1-4 | Plain read at 120, 60, 180, 240 threads (2, 1, 3, 4 siblings/core on the granted 60 cores) |
+| 5-9 | Read controls: 32/256, far-only 0/128, near-only 8/0, huge pages, unroll eight |
+| 10-24 | Per format fp32/int8/fp16: same four densities, then 11008 columns at 120 threads |
+| 25-51 | Per format: streams one/eight; 11008 columns with window 256/full; deeper, far-only and near-only hints; huge pages; unroll eight |
+| 52-55 | Repeat opening read and each format's 120-thread/4096-column reference |
+
+Every memory/prefetch/unroll setting has an earlier matched plain-read control.
+Requested huge pages must be verified from `page_bytes`, and CPU lists checked
+against topology. This is a screen, not a Cartesian search.
+
+The lead completed all 55 cases with valid outputs on 2026-11-12. Raw results:
+`.work/_shared/tmp/claude-next28/membw-gemv.out`. See the S11-09 section of
+`docs/research/knc-memory-bandwidth.md` for measured format winners, instruction
+counts, configuration corrections and candidate compiler/runtime work.
