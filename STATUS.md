@@ -59,7 +59,7 @@ Current tickets: `[###################-]` 187 of 190
 | S11-05 | Research - raise KNC's real memory bandwidth from about 175 GB/s toward 75-85% of peak, with a measured plan | Done | The memory-bandwidth research plan and a validated multithreaded KNC bandwidth benchmark are ready, with a ... |
 | S11-06 | Memory bandwidth - read the first card sweep, find why our numbers sit below STREAM's, and stage sweep 2 toward 264-299 GB/s | lead | Interactive lead: (1) review and commit by hand the uncommitted work in .work/S11-06 (red b57eca55; pm comm... |
 | S11-07 | S11-01 transfer tool - the card's listener gives up before card_run relays its announcement | Done | The transfer study's card listener now waits long enough for card_run to relay its address to the host; che... |
-| S11-08 | -Wknc-unsafe-cbrtl cannot be used in #pragma GCC diagnostic ("valid for  but not for C") | In progress | Red/green and x86 done by the lead; the lead submits for the engineer. |
+| S11-08 | -Wknc-unsafe-cbrtl cannot be used in #pragma GCC diagnostic ("valid for  but not for C") | Waiting for review | Submitted by the lead for the engineer: red fd1ccb4e240 (C and C++ pragma tests; pragma rejected and silenc... |
 | S2-01 | Design for zmm and mask registers under -march=knc | Done | The register design for KNC is settled on paper: all 32 zmm and 8 mask registers become usable under -march... |
 | S2-02 | Float and double arguments and results in zmm lane 0 | Done | Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`). |
 | S2-03 | Varargs with the donor's register save area | Done | Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`). |
@@ -215,6 +215,7 @@ Current tickets: `[###################-]` 187 of 190
 
 ## Recent activity
 
+- 2026-11-12 13:16 **S11-08** engineer submit: Submitted by the lead for the engineer: red fd1ccb4e240 (C and C++ pragma tests; pragma rejected and silenced call warns on the S10-13 compiler), f...
 - 2026-11-12 13:16 **S11-08** lead answer: Red/green and x86 done by the lead; the lead submits for the engineer.
 - 2026-11-12 13:15 **S11-08** lead resume: Lead red/green and x86 done.
 - 2026-11-12 13:05 **S11-08** lead note: x86 check at ca9243bbb4f: -O2 and -O2 -mavx512f identical 1962, different 0, both-failed 41, errors 0.
@@ -222,7 +223,6 @@ Current tickets: `[###################-]` 187 of 190
 - 2026-11-12 12:38 **S11-08** lead defer: Interactive lead: build GCC at ca9243bbb4f in .work/_shared/gcc (s11/S11-08), run the T1 pragma tests red at the parent (test-only) commit and gree...
 - 2026-11-12 12:37 **S11-08** engineer ask: GCC build needed at ca9243bbb4f
 - 2026-11-12 12:36 **S11-08** lead changes: 1. afb24158583 mixes the fix (i386.opt Target->Common) into the [red] commit. Make the red commit test files only; the i386.opt change is the fix c...
-- 2026-11-12 12:35 **S11-08** engineer red: T1 C and C++ pragma regressions committed as afb24158583; not run because the shared GCC build is owner-managed.
 
 ## Cost
 
