@@ -13,8 +13,11 @@ These fields describe proposed v2 interfaces for red review.
 from contextlib import redirect_stdout, redirect_stderr
 import io
 import json
+import os
 from pathlib import Path
 import re
+import signal
+import subprocess
 import sys
 import tempfile
 from types import SimpleNamespace
@@ -272,6 +275,95 @@ class CorpusV2(unittest.TestCase):
             self.assertIn('-O1', fallback[0]['flags'])
             self.assertNotIn('-O2', fallback[0]['flags'])
             self.assertTrue(fallback[0].get('fallback_reason'))
+
+
+class ReviewRuntime(unittest.TestCase):
+    """Host builds of harness code only; no card correctness claim."""
+
+    def paused_run(self, binary, directory):
+        with (directory / 'stdout').open('w+') as output:
+            child = subprocess.Popen([str(binary)], cwd=directory, stdout=output,
+                                     env=dict(os.environ, CORPUS_TIMED='1'))
+            _, status = os.waitpid(child.pid, os.WUNTRACED)
+            output.seek(0)
+            before = output.read()
+            packed_before = (directory / 'packed.bin').exists()
+            if os.WIFSTOPPED(status):
+                os.kill(child.pid, signal.SIGCONT)
+                self.assertEqual(child.wait(timeout=30), 0)
+            else:
+                child.returncode = os.waitstatus_to_exitcode(status)
+            output.seek(0)
+            after = output.read()
+        return os.WIFSTOPPED(status), before, after, packed_before
+
+    def test_polybench_pauses_before_complete_output(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            directory = Path(temporary)
+            fixture = directory / 'dump.c'
+            fixture.write_text('''#include "polybench_capture.h"
+int main(void) {
+  fprintf(stderr, "begin dump: %s", "A");
+  fprintf(stderr, "%0.2lf ", 1.2345678901234567);
+  fprintf(stderr, "\\nend   dump: %s\\n", "A");
+  fprintf(stderr, "begin dump: %s", "B");
+  fprintf(stderr, "%0.2lf ", -2.0);
+  fprintf(stderr, "\\nend   dump: %s\\n", "B");
+  return 0;
+}
+''')
+            binary = directory / 'dump'
+            subprocess.run(['gcc', '-I' + str(corpus.SUPPORT), str(fixture),
+                            str(corpus.SUPPORT / 'polybench_capture.c'), '-o', str(binary)],
+                           check=True, capture_output=True)
+            stopped, before, after, _ = self.paused_run(binary, directory)
+            self.assertTrue(stopped, 'complete output must wait for the timing boundary')
+            self.assertEqual(before, '')
+            arrays = [json.loads(line.removeprefix('CORPUS_ARRAY '))
+                      for line in after.splitlines()]
+            self.assertEqual(arrays, [dict(array='A', values=[1.2345678901234567]),
+                                      dict(array='B', values=[-2.0])])
+
+    def test_peer_control_uses_corrupted_stream_and_rejects_clean_control(self):
+        sources = corpus.SHARED / 'corpus-build/sources'
+        for name, package, units, defines in (
+                ('zlib', 'zlib-1.3.1', 'adler32 crc32 deflate infback inffast inflate inftrees trees zutil compress uncompr', ['-DCORPUS_ZLIB']),
+                ('bzip2', 'bzip2-1.0.8', 'blocksort huffman crctable randtable compress decompress bzlib', [])):
+            with self.subTest(codec=name), tempfile.TemporaryDirectory() as temporary:
+                directory = Path(temporary)
+                library = sources / package
+                binary = directory / 'workload'
+                subprocess.run(['gcc', '-O2', '-I' + str(library), *defines,
+                                *(str(library / (unit + '.c')) for unit in units.split()),
+                                str(corpus.SUPPORT / 'roundtrip.c'), '-o', str(binary)],
+                               check=True, capture_output=True)
+                (directory / 'input.bin').write_bytes(b'A' * (8 * 1024 * 1024))
+                stopped, _, output, packed_before = self.paused_run(binary, directory)
+                with self.subTest(boundary=name):
+                    self.assertTrue(stopped, 'packed.bin write must follow the timing boundary')
+                    self.assertFalse(packed_before)
+                    self.assertNotIn('CORPUS_CONTROL', output)
+                packed = (directory / 'packed.bin').read_bytes()
+                clean = subprocess.run([str(binary), 'decode'], cwd=directory,
+                                       capture_output=True, text=True)
+                self.assertEqual(clean.returncode, 0)
+                self.assertIn('CORPUS_CROSS pass', clean.stdout)
+                for corrupt in (False, True):
+                    control = bytearray(packed)
+                    if corrupt:
+                        control[0] ^= 1
+                    (directory / 'corrupt.bin').write_bytes(control)
+                    result = subprocess.run([str(binary), 'control'], cwd=directory,
+                                            capture_output=True, text=True)
+                    with self.subTest(codec=name, corrupt=corrupt):
+                        self.assertEqual(result.returncode, 0 if corrupt else 1)
+                        self.assertEqual('CORPUS_CONTROL rejected' in result.stdout, corrupt)
+                (directory / 'corrupt.bin').unlink()
+                missing = subprocess.run([str(binary), 'control'], cwd=directory,
+                                         capture_output=True, text=True)
+                self.assertEqual(missing.returncode, 2)
+                self.assertNotIn('CORPUS_CONTROL rejected', missing.stdout)
+                self.assertEqual((directory / 'packed.bin').read_bytes(), packed)
 
 
 if __name__ == '__main__':
