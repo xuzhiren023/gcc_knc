@@ -69,7 +69,7 @@ Current tickets: `[###################-]` 193 of 201
 | S11-15 | First development-corpus baseline and profile, GCC 5.1.1 vs GCC-KNC at -O2 (E7-03 part 1) | draft |  |
 | S11-16 | Long-double libm hazard audit - do other MPSS long double entry points fault like cbrtl? (E7-21, bounded) | lead | Needs a card run by the interactive lead (card turn per shared-card rules): python tools/card_run --threads... |
 | S11-17 | PGO feasibility on one complete development program (reuse of S9-18's train/use path) | draft |  |
-| S11-18 | M4 corpus harness v2 - card profiles, prefix record, held-out sealing, stronger checks, and the donor-failure rule | Changes requested | Profiles, sealing, serial-vs-serial voting, the HPCG staged fix, the SQLite fallback and the runtime-prefix... |
+| S11-18 | M4 corpus harness v2 - card profiles, prefix record, held-out sealing, stronger checks, and the donor-failure rule | In progress | Profiles, sealing, serial-vs-serial voting, the HPCG staged fix, the SQLite fallback and the runtime-prefix... |
 | S11-19 | Second senior review - the M4 definition and the Sprint 11-13 roadmap, adjusted | In progress |  |
 | S2-01 | Design for zmm and mask registers under -march=knc | Done | The register design for KNC is settled on paper: all 32 zmm and 8 mask registers become usable under -march... |
 | S2-02 | Float and double arguments and results in zmm lane 0 | Done | Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`). |
