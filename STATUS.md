@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-12 12:09.
+Updated automatically at every ticket change. Last update: 2026-11-12 12:10.
 
 **Waiting for you:** S11-02. Run `python tools/pm.py inbox`.
 
@@ -58,7 +58,7 @@ Current tickets: `[###################-]` 186 of 189
 | S11-04 | S11-01 transfer tool - the host opens every connection, because Windows Firewall blocks inbound TCP from the card | Done | The transfer study's host side now opens every connection to the card, so Windows Firewall no longer blocks... |
 | S11-05 | Research - raise KNC's real memory bandwidth from about 175 GB/s toward 75-85% of peak, with a measured plan | Done | The memory-bandwidth research plan and a validated multithreaded KNC bandwidth benchmark are ready, with a ... |
 | S11-06 | Memory bandwidth - read the first card sweep, find why our numbers sit below STREAM's, and stage sweep 2 toward 264-299 GB/s | In progress |  |
-| S11-07 | S11-01 transfer tool - the card's listener gives up before card_run relays its announcement | Not started |  |
+| S11-07 | S11-01 transfer tool - the card's listener gives up before card_run relays its announcement | In progress |  |
 | S2-01 | Design for zmm and mask registers under -march=knc | Done | The register design for KNC is settled on paper: all 32 zmm and 8 mask registers become usable under -march... |
 | S2-02 | Float and double arguments and results in zmm lane 0 | Done | Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`). |
 | S2-03 | Varargs with the donor's register save area | Done | Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`). |
@@ -227,10 +227,10 @@ Current tickets: `[###################-]` 186 of 189
 
 - From the script, engineer: 447 sessions, 966.5M input tokens
 - From the script, lead: 283 sessions, 82.4M input tokens
-- Started by hand, Claude: 11 sessions, 2560.9M input tokens
+- Started by hand, Claude: 11 sessions, 2561.3M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 24.6 GiB of 100 GiB. 89 GiB free on the drive.
+The project uses 24.6 GiB of 100 GiB. 88 GiB free on the drive.
