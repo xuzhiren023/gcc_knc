@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-12 13:28.
+Updated automatically at every ticket change. Last update: 2026-11-12 13:53.
 
 **Waiting for you:** S11-02. Run `python tools/pm.py inbox`.
 
@@ -57,7 +57,7 @@ Current tickets: `[###################-]` 188 of 190
 | S11-03 | S11-01 transfer tool rejects the card's physical /tmp path, so the native study never starts | Done | The transfer study's tool now accepts the card's real /tmp location (/var/volatile/tmp), so its card run ca... |
 | S11-04 | S11-01 transfer tool - the host opens every connection, because Windows Firewall blocks inbound TCP from the card | Done | The transfer study's host side now opens every connection to the card, so Windows Firewall no longer blocks... |
 | S11-05 | Research - raise KNC's real memory bandwidth from about 175 GB/s toward 75-85% of peak, with a measured plan | Done | The memory-bandwidth research plan and a validated multithreaded KNC bandwidth benchmark are ready, with a ... |
-| S11-06 | Memory bandwidth - read the first card sweep, find why our numbers sit below STREAM's, and stage sweep 2 toward 264-299 GB/s | lead | Interactive lead: (1) review and commit by hand the uncommitted work in .work/S11-06 (red b57eca55; pm comm... |
+| S11-06 | Memory bandwidth - read the first card sweep, find why our numbers sit below STREAM's, and stage sweep 2 toward 264-299 GB/s | Question for the tech lead | Sweep 2 result on the ticket (14:00 note). |
 | S11-07 | S11-01 transfer tool - the card's listener gives up before card_run relays its announcement | Done | The transfer study's card listener now waits long enough for card_run to relay its address to the host; che... |
 | S11-08 | -Wknc-unsafe-cbrtl cannot be used in #pragma GCC diagnostic ("valid for  but not for C") | Done | The cbrtl warning can now be silenced around one deliberate call with #pragma GCC diagnostic in C and C++; ... |
 | S2-01 | Design for zmm and mask registers under -march=knc | Done | The register design for KNC is settled on paper: all 32 zmm and 8 mask registers become usable under -march... |
@@ -215,20 +215,20 @@ Current tickets: `[###################-]` 188 of 190
 
 ## Recent activity
 
+- 2026-11-12 14:00 **S11-06** lead note: Lead committed the engineer's work (b57eca55 [red], 18a2713c fix). Card sweep 2, 2026-11-12 18:32-18:52Z (boot da3144f1), benchmark mode, 240 CPUs ...
+- 2026-11-12 13:53 **S11-06** lead resume: Sweep 2 result on the ticket (14:00 note).
 - 2026-11-12 13:28 **S11-08** lead approve: The cbrtl warning can now be silenced around one deliberate call with #pragma GCC diagnostic in C and C++; x86 unchanged. Machine check: tools/chec...
 - 2026-11-12 13:16 **S11-08** engineer submit: Submitted by the lead for the engineer: red fd1ccb4e240 (C and C++ pragma tests; pragma rejected and silenced call warns on the S10-13 compiler), f...
 - 2026-11-12 13:16 **S11-08** lead answer: Red/green and x86 done by the lead; the lead submits for the engineer.
 - 2026-11-12 13:15 **S11-08** lead resume: Lead red/green and x86 done.
 - 2026-11-12 13:05 **S11-08** lead note: x86 check at ca9243bbb4f: -O2 and -O2 -mavx512f identical 1962, different 0, both-failed 41, errors 0.
 - 2026-11-12 12:55 **S11-08** lead note: Lead built tree 1 at ca9243bbb4f (log S11_08_lead_build-20261112-123959.log). Red at fd1ccb4e240's code (the previous build): the pragma is rejecte...
-- 2026-11-12 12:38 **S11-08** lead defer: Interactive lead: build GCC at ca9243bbb4f in .work/_shared/gcc (s11/S11-08), run the T1 pragma tests red at the parent (test-only) commit and gree...
-- 2026-11-12 12:37 **S11-08** engineer ask: GCC build needed at ca9243bbb4f
 
 ## Cost
 
 - From the script, engineer: 452 sessions, 972.1M input tokens
 - From the script, lead: 287 sessions, 83.1M input tokens
-- Started by hand, Claude: 11 sessions, 2588.0M input tokens
+- Started by hand, Claude: 11 sessions, 2592.9M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
