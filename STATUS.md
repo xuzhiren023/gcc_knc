@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-12 18:05.
+Updated automatically at every ticket change. Last update: 2026-11-12 18:06.
 
 **Next: the tech lead, on S11-02.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
@@ -66,7 +66,7 @@ Current tickets: `[###################-]` 197 of 201
 | S11-12 | Sprint 11 batch check - full native suite, x86 identity, forward-port drill, ICE sweeps, runtime prefix consistency | draft |  |
 | S11-13 | Senior compiler review of the Sprint 11-13 scope (Milestone M4) against our research, with recommended plan changes | Done | A senior compiler review of the Sprint 11-13 plan is in: M4 is plausible but needs a frozen scoring and mea... |
 | S11-14 | M4 scoring contract and measurement protocol, frozen before any tuning | Done | M4's scoring contract is frozen in ADR-0015 with a tested scorer: strict serial -O2 versus -O2 over 17 prog... |
-| S11-15 | First development-corpus baseline and profile, GCC 5.1.1 vs GCC-KNC at -O2 (E7-03 part 1) | Not started | Ready. S11-18 (harness v2) is merged and staged at .work/_shared/S11-18/ (lead.ps1: 468 launches, 7120/3100... |
+| S11-15 | First development-corpus baseline and profile, GCC 5.1.1 vs GCC-KNC at -O2 (E7-03 part 1) | In progress | Ready. S11-18 (harness v2) is merged and staged at .work/_shared/S11-18/ (lead.ps1: 468 launches, 7120/3100... |
 | S11-16 | Long-double libm hazard audit - do other MPSS long double entry points fault like cbrtl? (E7-21, bounded) | Done | The card's MPSS long double libm was probed on the card: of 12 entry points only cbrtl faults, and S10-13 a... |
 | S11-17 | PGO feasibility on one complete development program (reuse of S9-18's train/use path) | Not started | Ready (S11-18 merged; corpus builds staged in .work/_shared/S11-18/). Lane pgo. Build the training and use ... |
 | S11-18 | M4 corpus harness v2 - card profiles, prefix record, held-out sealing, stronger checks, and the donor-failure rule | Done | The M4 corpus harness now stages all 17 programs for the 7120 and the 3100/5100 profiles with serial voting... |
@@ -239,7 +239,7 @@ Current tickets: `[###################-]` 197 of 201
 
 - From the script, engineer: 481 sessions, 1019.3M input tokens
 - From the script, lead: 308 sessions, 88.3M input tokens
-- Started by hand, Claude: 12 sessions, 2737.8M input tokens
+- Started by hand, Claude: 12 sessions, 2738.6M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
