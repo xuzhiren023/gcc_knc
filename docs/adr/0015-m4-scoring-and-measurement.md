@@ -1,6 +1,6 @@
 # ADR-0015: M4 scoring and whole-program measurement
 
-**Status:** Proposed. The lead accepts this contract before tuning starts.
+**Status:** Accepted 2026-11-12 by the lead, with the owner's decisions of 2026-11-12 (S11-13 review answers; donor-failure rule "Serial vs serial primary"). Changing a rule after any M4 result is seen requires a new owner decision, recorded here.
 **Ticket:** S11-14; S11-11 implements the runner and its correctness checks.
 
 ## Authority and scope
