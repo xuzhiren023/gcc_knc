@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-12 09:27.
+Updated automatically at every ticket change. Last update: 2026-11-12 09:28.
 
-**Next: the tech lead, on S10-13.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: GPT-6.1, on S10-13 (User story - code that calls cbrtl under -march=knc gets a safe replacement and a compile-time warning (MPSS libm cbrtl faults)).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
 Current tickets: `[###################-]` 182 of 185
 
@@ -51,7 +51,7 @@ Current tickets: `[###################-]` 182 of 185
 | S10-10 | Card harness fixes from the Sprint 10 card turn - card_qualify binary folder, vmath bench batch sizing | Done | card_qualify now runs the card binaries from knc/ and stops before any card job when one is missing, and th... |
 | S10-11 | Card-only vector math failures - double sin, cos, tan, atan2 above 1 ULP, and cbrt/cbrtf crash (SIGSEGV) | Done | Double sin, cos, tan and atan2 from the KNC vector math library are now within 1 ULP on the card (0.76 to 0... |
 | S10-12 | cbrt and cbrtf crash (SIGSEGV) in qualify_v1 on the card - root cause and fix | Done | The cbrt and cbrtf qualification jobs no longer crash on the card and pass (worst 0.4996 and 0.4991 ULP): t... |
-| S10-13 | User story - code that calls cbrtl under -march=knc gets a safe replacement and a compile-time warning (MPSS libm cbrtl faults) | Question for the tech lead | S10-12 approved; tree 1 is free. |
+| S10-13 | User story - code that calls cbrtl under -march=knc gets a safe replacement and a compile-time warning (MPSS libm cbrtl faults) | In progress | Lane is now gcc: build in tree 1 (.work/_shared/gcc, build dir .work/_shared/gcc-build, owned by the Codex ... |
 | S11-01 | User story - the best way to move data between the host and the card, measured, and how our projects use it | Done | We now have a sourced inventory of every host-card transfer path that works without changing MPSS (SSH, tar... |
 | S11-02 | card_run and run_suite move data by S11-01's recommended method, with fallback | In progress | ready; waits on its dep S11-01, the lead writes acceptance before it starts |
 | S11-03 | S11-01 transfer tool rejects the card's physical /tmp path, so the native study never starts | Not started |  |
@@ -210,6 +210,7 @@ Current tickets: `[###################-]` 182 of 185
 
 ## Recent activity
 
+- 2026-11-12 09:28 **S10-13** lead answer: Lane is now gcc: build in tree 1 (.work/_shared/gcc, build dir .work/_shared/gcc-build, owned by the Codex sandbox). Your GCC commit 157940608ed on...
 - 2026-11-12 09:27 **S10-13** lead resume: S10-12 approved; tree 1 is free.
 - 2026-11-12 09:26 **S10-12** lead approve: The cbrt and cbrtf qualification jobs no longer crash on the card and pass (worst 0.4996 and 0.4991 ULP): the crash was in the card's MPSS libm cbr...
 - 2026-11-12 09:16 **S10-12** engineer submit: Submitted by the lead for the engineer: red 1ff46888 (host model of the MPSS cbrtl negative table offset), fix 7ae4d224 (qualifier keeps cbrtl's ar...
@@ -217,7 +218,6 @@ Current tickets: `[###################-]` 182 of 185
 - 2026-11-12 09:15 **S10-12** lead note: Card 2026-11-12 14:05-14:15Z (boot da3144f1), fixed qualifier .work/_shared/S10-12/knc/qualify_v1.mic, 240 threads: cmp-cbrt PASS exact max_ulp 0.4...
 - 2026-11-12 09:14 **S10-12** lead resume: Card PASS for cbrt and cbrtf (09:15 note).
 - 2026-11-12 08:38 **S11-01** lead approve: We now have a sourced inventory of every host-card transfer path that works without changing MPSS (SSH, tar, raw TCP, SCIF messages and DMA, COI), ...
-- 2026-11-12 08:35 **S10-13** lead note: Interactive lead: tree 2's build folder .work/_shared/gcc-build-2 was created outside the Codex sandbox (owner xuzhi, Cygwin deny entries for other...
 
 ## Cost
 
