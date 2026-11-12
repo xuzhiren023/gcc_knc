@@ -2,7 +2,7 @@
 
 Updated automatically at every ticket change. Last update: 2026-11-12 07:11.
 
-**Next: the tech lead, on S10-10.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Waiting for you:** S10-10. Run `python tools/pm.py inbox`.
 
 Current tickets: `[###################-]` 179 of 183
 
@@ -48,7 +48,7 @@ Current tickets: `[###################-]` 179 of 183
 | S10-07 | Vector math v1a - the copied functions (sin, cos, tan, log10, atan, atan2, hyperbolics, bounded groups) in libknc_vmath and the vectorizer hook | Done | Card 2026-11-11 (S10-08 build, 240 threads): full set PASS for sinf 0.499999, cosf 0.499998, tanf 0.499995,... |
 | S10-08 | Vector math v1b - the rest of the libmvec set (acos, asin, cbrt, erf, erfc, exp2, exp10, expm1, log1p, log2, hypot, sincos) | Done | The vector math library now covers the whole set GCC vectorizes with glibc's libmvec: acos, asin, cbrt, erf... |
 | S10-09 | User story - double-precision loops with division and square root vectorize, correctly rounded (V8DF div, cond_div, sqrt) | Done | Double-precision loops with division or square root now vectorize under -march=knc and give the correctly r... |
-| S10-10 | Card harness fixes from the Sprint 10 card turn - card_qualify binary folder, vmath bench batch sizing | Question for the tech lead | Host harness changes are ready; test command passed with CC=C:\\Users\\xuzhi\\Documents\\gcc_knc\\.work\\_s... |
+| S10-10 | Card harness fixes from the Sprint 10 card turn - card_qualify binary folder, vmath bench batch sizing | **Waiting for you** | Needs the interactive lead (owner's 07:00 option b): engineer's work is uncommitted in the S10-10 worktree ... |
 | S10-11 | Card-only vector math failures - double sin, cos, tan, atan2 above 1 ULP, and cbrt/cbrtf crash (SIGSEGV) | Done | Double sin, cos, tan and atan2 from the KNC vector math library are now within 1 ULP on the card (0.76 to 0... |
 | S10-12 | cbrt and cbrtf crash (SIGSEGV) in qualify_v1 on the card - root cause and fix | Tests waiting for review | 1ff46888: expected host regression FAIL at 1e-5 (frexp exponent -16). Log: .work/_state/logs/S10_12_screen_... |
 | S11-01 | User story - the best way to move data between the host and the card, measured, and how our projects use it | Not started | lane tools: owner 2026-11-12, usage reset, move on (Codex engineers) |
@@ -209,13 +209,13 @@ Current tickets: `[###################-]` 179 of 183
 ## Recent activity
 
 - 2026-11-12 07:11 **S10-12** engineer red: 1ff46888: expected host regression FAIL at 1e-5 (frexp exponent -16). Log: .work/_state/logs/S10_12_screen_red-20261112-070726.log. Cause: MPSS lib...
+- 2026-11-12 07:11 **S10-10** lead escalate: Needs the interactive lead (owner's 07:00 option b): engineer's work is uncommitted in the S10-10 worktree and its host test passes (python -m unit...
 - 2026-11-12 07:06 **S10-10** engineer ask: Host harness changes are ready; test command passed with CC=C:\\Users\\xuzhi\\Documents\\gcc_knc\\.work\\_shared\\toolchain\\cygwin\\bin\\gcc.exe a...
 - 2026-11-12 07:04 **S10-10** lead answer: Go ahead per the owner's 07:00 decision and the lead's 03:30 note. The worktree already has the test (shared path and kernels.c link fixed by the l...
 - 2026-11-12 07:03 **S10-12** lead answer: Card output is in the 04:15 lead note above: the vector call returns; SIGSEGV (SEGV_MAPERR) is in the oracle-and-dump phase, cbrt block 1 and cbrtf...
 - 2026-11-12 07:03 **S10-10** owner decide: Owner 2026-11-12 07:00 EST ('you commit their work by hand'): option (b). The engineer does not run pm.py commit: it edits the worktree, leaves cha...
 - 2026-11-12 07:02 **S10-12** owner decide: Owner 2026-11-12 07:00 EST ('You run the command on s10-12'): release; the lead's card fault output (04:15 note) is on the ticket; continue to root...
 - 2026-11-12 04:17 **S10-11** lead approve: Double sin, cos, tan and atan2 from the KNC vector math library are now within 1 ULP on the card (0.76 to 0.88 ULP, same as the host): FMA is turne...
-- 2026-11-12 04:15 **S10-12** lead note: Card 2026-11-12 08:55Z (boot da3144f1), the 03:23 reproducer, 1 thread. cbrt: block 0 passes its oracle-and-dump; last trace 'trace block=1 class=s...
 
 ## Cost
 
