@@ -11,11 +11,16 @@ candidate ready for qualification. This sprint does not promise that the unseen 
 **Why now:** S11 supplies a valid donor baseline, profiles, runtime readiness and affordable candidates. Turn those
 observations into code before S13 freezes choices ([first review], findings 3-7 and Proposed revised sprint outline).
 
-## Theme A - select at most three implementation themes and prove each change
+## Theme A - select up to five broad implementation themes in one round, and prove each change
 
 **What and why this sprint:** finish missing E7-03 development profiling before selecting affected work; rank by
 removable strict-serial wall time, coverage, risk and build and card cost. Use only the 14 development programs;
-held-out timings, profiles and diagnostics remain sealed. Fewer than three themes is acceptable.
+held-out timings, profiles and diagnostics remain sealed. Owner 2026-11-12: one improvement round only (no repeated
+rounds); three themes is the target, up to five if three cannot cover the corpus broadly; fewer is acceptable.
+**Breadth is the selection rule:** prefer the themes whose benefit reaches the widest range of code styles, from
+tuned professional code to naive amateur code (plain nested loops, pointer arithmetic without `restrict`, arrays of
+structs, calls inside loops, globals, `double` everywhere, unhelpful loop order), using S11-20's coverage study and
+the development profiles; a theme that helps one program style a lot ranks below one that helps many styles.
 
 - Candidates: scalar addressing, branches, calls and code size (focused E7-04 and E7-13); legal locality and scalar replacement
   using existing passes; scheduling with pressure (split E7-15), then unroll (E7-12); class-specific prefetch and stores

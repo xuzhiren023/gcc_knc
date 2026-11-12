@@ -7,7 +7,7 @@ and the proposed improvements fit the available time. Three programs remain rese
 
 **Status:** started 2026-11-12; adjusted by S11-19. Scope: [M4 definition](../M4-DEFINITION.md).
 **Goal:** a valid experiment and an honest baseline and profile of all 14 development programs, sufficient to select
-at most three S12 themes. The three held-out programs expose only readiness and correctness status until choices freeze.
+three to at most five broad S12 themes. The three held-out programs expose only readiness and correctness status until choices freeze.
 **Why now:** kernel wins and the compile survey do not establish whole-program donor gains. Measure first so S12
 removes demonstrated costs ([first review], Evidence boundary and findings 1-3, 8).
 
@@ -41,7 +41,7 @@ is a profiling blocker, not permission to infer time shares from assembly. Rank 
 functions and loops, vectorization, transfers between x87 and vector code, spills, code size, setup and runtime costs. OpenMP wait stays
 in its separate panel.
 **Exit:** `docs/research/m4-baseline.md` has 14 development rows across all settings, uncertainty and causes, the profiler
-decision and at most three general mechanisms with expected benefit, cost and controls. No held-out timings or
+decision and three to at most five general mechanisms with expected benefit, cost, controls and code-style coverage (S11-20). No held-out timings or
 17-vote aggregate appears there ([S11-15], Scope; [first review], findings 3, 5, 8).
 
 ## Theme C - close hazards before trusting results
