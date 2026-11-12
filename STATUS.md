@@ -1,10 +1,10 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-12 11:53.
+Updated automatically at every ticket change. Last update: 2026-11-12 12:07.
 
 **Waiting for you:** S11-02. Run `python tools/pm.py inbox`.
 
-Current tickets: `[###################-]` 185 of 187
+Current tickets: `[###################-]` 186 of 187
 
 ## Milestones
 
@@ -13,7 +13,7 @@ Current tickets: `[###################-]` 185 of 187
 | M0 | Foundation | In progress | 17 of 17 tickets |
 | M1 | Mixed native code | Done | 43 of 43 tickets |
 | M2 | Useful vector target | Done | 51 of 51 tickets |
-| M3 | Runtimes | Done | 47 of 48 tickets |
+| M3 | Runtimes | Done | 48 of 48 tickets |
 | M4 | Broad optimization | In progress | 4 of 5 tickets |
 | M5 | Program corpus | Not started | Not planned in detail yet |
 | M6 | Release | Not started | Not planned in detail yet |
@@ -51,7 +51,7 @@ Current tickets: `[###################-]` 185 of 187
 | S10-10 | Card harness fixes from the Sprint 10 card turn - card_qualify binary folder, vmath bench batch sizing | Done | card_qualify now runs the card binaries from knc/ and stops before any card job when one is missing, and th... |
 | S10-11 | Card-only vector math failures - double sin, cos, tan, atan2 above 1 ULP, and cbrt/cbrtf crash (SIGSEGV) | Done | Double sin, cos, tan and atan2 from the KNC vector math library are now within 1 ULP on the card (0.76 to 0... |
 | S10-12 | cbrt and cbrtf crash (SIGSEGV) in qualify_v1 on the card - root cause and fix | Done | The cbrt and cbrtf qualification jobs no longer crash on the card and pass (worst 0.4996 and 0.4991 ULP): t... |
-| S10-13 | User story - code that calls cbrtl under -march=knc gets a safe replacement and a compile-time warning (MPSS libm cbrtl faults) | Waiting for review | T1 PASS: .work/_state/logs/S10_13_green-20261112-103135.log. Stage/link/lint PASS; all five exact card_run ... |
+| S10-13 | User story - code that calls cbrtl under -march=knc gets a safe replacement and a compile-time warning (MPSS libm cbrtl faults) | Done | Under -march=knc, calls to cbrtl (and std::cbrt on long double) now go to GCC-KNC's own safe cube root with... |
 | S11-01 | User story - the best way to move data between the host and the card, measured, and how our projects use it | Done | We now have a sourced inventory of every host-card transfer path that works without changing MPSS (SSH, tar... |
 | S11-02 | card_run and run_suite move data by S11-01's recommended method, with fallback | **Waiting for you** | Started by mistake: the ticket was 'ready' as a placeholder and became startable when S11-01 closed. The en... |
 | S11-03 | S11-01 transfer tool rejects the card's physical /tmp path, so the native study never starts | Done | The transfer study's tool now accepts the card's real /tmp location (/var/volatile/tmp), so its card run ca... |
@@ -212,23 +212,23 @@ Current tickets: `[###################-]` 185 of 187
 
 ## Recent activity
 
+- 2026-11-12 12:10 **S10-13** lead note: x86 check at GCC 157940608ed: -O2 and -O2 -mavx512f identical 1962, different 0, both-failed 41 (Cygwin headers), errors 0.
+- 2026-11-12 12:07 **S10-13** lead approve: Under -march=knc, calls to cbrtl (and std::cbrt on long double) now go to GCC-KNC's own safe cube root with a compile-time warning, instead of the ...
+- 2026-11-12 12:00 **S10-13** lead note: Card 2026-11-12 16:55Z (boot da3144f1), 240 threads: __knc_cbrtl over 16,974,074 inputs (four shards) bit-identical to the host's results, 0 failur...
 - 2026-11-12 11:52 **S11-05** lead approve: The memory-bandwidth research plan and a validated multithreaded KNC bandwidth benchmark are ready, with a 38-case first sweep (about an hour) stag...
 - 2026-11-12 11:40 **S11-05** engineer submit: Review fixed at 05c623e4: snapshotted inputs, exact asm operands, modes outside loops; default write/triad counts 14/53 instructions per four lines...
 - 2026-11-12 11:24 **S11-05** lead changes: The research doc is accepted as written. The benchmark needs two fixes before it is worth card time.
 - 2026-11-12 11:21 **S11-05** engineer submit: Resubmitting 66d2b067 with lead-approved research budget override. Existing host correctness passed (2 tests), k1om build/lint passed, sweep shell ...
 - 2026-11-12 11:19 **S11-05** lead answer: Approved as one ticket, no split. Every file is a deliverable the ticket asks for (research doc, benchmark C source, build, sweep runner, README, h...
-- 2026-11-12 11:17 **S11-05** engineer ask: Submit at 66d2b067 is blocked by budgets: 1067 changed lines versus 800, five files under tests versus two, and 761 test lines versus 306 code line...
-- 2026-11-12 11:14 **S11-04** lead approve: The transfer study's host side now opens every connection to the card, so Windows Firewall no longer blocks it; checked on the host, card run next....
-- 2026-11-12 11:01 **S11-04** engineer submit: Submitted by the lead for the engineer: red adf57742 (host listener rejected, card-first loopback), fix aafd029d (card listens for lease and tcp, h...
 
 ## Cost
 
 - From the script, engineer: 447 sessions, 966.5M input tokens
 - From the script, lead: 283 sessions, 82.4M input tokens
-- Started by hand, Claude: 11 sessions, 2548.0M input tokens
+- Started by hand, Claude: 11 sessions, 2557.1M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 24.6 GiB of 100 GiB. 88 GiB free on the drive.
+The project uses 24.6 GiB of 100 GiB. 89 GiB free on the drive.
