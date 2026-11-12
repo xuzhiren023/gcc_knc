@@ -86,6 +86,10 @@ enum { screen = 1 };
 static uint64_t blocks = 1ULL << 16, block_stride, max_dump = 2000000, dumped;
 static long double dump = -1;
 
+#ifdef VMATH_CRASH_TRACE
+#include "qualify_crash.h"
+#endif
+
 struct stats {
   uint64_t inputs, special_errors, mask_errors, hist[6];
   long double max_ulp;
@@ -249,6 +253,9 @@ static void record(struct stats *s, uint64_t x, uint64_t y, uint64_t out, int ta
 }
 
 static void call(const uint64_t *x, const uint64_t *y, int masked, unsigned mask, uint64_t *out) {
+#ifdef VMATH_CRASH_TRACE
+  crash_trace_call(x,y,masked,mask);
+#endif
   if (f->single) {
     union { vf v; uint32_t w[16]; } a, b, r;
     for (int l = 0; l < 16; ++l) { a.w[l] = (uint32_t)x[l]; b.w[l] = (uint32_t)y[l]; }
@@ -298,9 +305,16 @@ static void pair_input(uint64_t *rng, uint64_t *a, uint64_t *b) {
 }
 
 static void block(struct stats *s, uint64_t *rng, const uint64_t *x, const uint64_t *y, int tag) {
+#ifdef VMATH_CRASH_TRACE
+  if (tag == GRID) { crash_class = "special-grid"; crash_block = crash_grid++; }
+#endif
   uint64_t out[16], masked[16], r = next(rng);
   if (!tag && (r >> 6 & 1023) == 0) tag = SAMPLE;
   call(x,y,0,0,out);
+#ifdef VMATH_CRASH_TRACE
+  fprintf(stderr,"trace block=%llu class=%s phase=oracle-and-dump\n",
+          (unsigned long long)crash_block,crash_class);
+#endif
   if (negative) out[3] ^= 1;
   for (int l = 0; l < lanes; ++l) record(s,x[l],y[l],out[l],tag);
   if ((r & 63) == 0) {
@@ -318,6 +332,10 @@ static void block(struct stats *s, uint64_t *rng, const uint64_t *x, const uint6
 /* atan2 and hypot: block b is random pairs. Others: block b < blocks is a sweep block and block blocks + b
    the matching dense block. */
 static void run_block(struct stats *s, uint64_t b) {
+#ifdef VMATH_CRASH_TRACE
+  crash_block = b;
+  crash_class = pairs ? "pairs" : b < blocks ? "sweep" : "dense";
+#endif
   uint64_t rng = seed(b), x[16], y[16] = {0};
   for (int l = 0; l < lanes; ++l)
     if (pairs) pair_input(&rng,&x[l],&y[l]);
@@ -327,6 +345,9 @@ static void run_block(struct stats *s, uint64_t b) {
 }
 
 static void *worker(void *arg) {
+#ifdef VMATH_CRASH_TRACE
+  crash_stack(1);
+#endif
   int w = (int)(intptr_t)arg;
   uint64_t total = pairs ? blocks : 2*blocks;
   extended_precision();
@@ -388,6 +409,9 @@ static int recheck(void) {
 #endif
 
 int main(int argc, char **argv) {
+#ifdef VMATH_CRASH_TRACE
+  crash_init();
+#endif
   int rechecking = 0;
   for (unsigned i = 0; argc > 1 && i < sizeof functions/sizeof *functions; ++i)
     if (!strcmp(argv[1],functions[i].name)) f = &functions[i];
@@ -426,6 +450,9 @@ int main(int argc, char **argv) {
   if (sched_getaffinity(0,sizeof set,&set)) { perror("sched_getaffinity"); return 2; }
   workers = CPU_COUNT(&set);
   if (workers > 256) workers = 256;
+#ifdef VMATH_CRASH_TRACE
+  workers = 1; /* S10-12: crash diagnosis, preserving the pthread call path. */
+#endif
 #ifdef VMATH_MPFR
   if (!mpfr_buildopt_tls_p()) workers = 1;
 #endif
