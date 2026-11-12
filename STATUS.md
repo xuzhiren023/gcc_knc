@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-12 11:18.
+Updated automatically at every ticket change. Last update: 2026-11-12 11:19.
 
 **Waiting for you:** S11-02. Run `python tools/pm.py inbox`.
 
@@ -56,7 +56,7 @@ Current tickets: `[###################-]` 184 of 187
 | S11-02 | card_run and run_suite move data by S11-01's recommended method, with fallback | **Waiting for you** | Started by mistake: the ticket was 'ready' as a placeholder and became startable when S11-01 closed. The en... |
 | S11-03 | S11-01 transfer tool rejects the card's physical /tmp path, so the native study never starts | Done | The transfer study's tool now accepts the card's real /tmp location (/var/volatile/tmp), so its card run ca... |
 | S11-04 | S11-01 transfer tool - the host opens every connection, because Windows Firewall blocks inbound TCP from the card | Done | The transfer study's host side now opens every connection to the card, so Windows Firewall no longer blocks... |
-| S11-05 | Research - raise KNC's real memory bandwidth from about 175 GB/s toward 75-85% of peak, with a measured plan | Question for the tech lead | Submit at 66d2b067 is blocked by budgets: 1067 changed lines versus 800, five files under tests versus two,... |
+| S11-05 | Research - raise KNC's real memory bandwidth from about 175 GB/s toward 75-85% of peak, with a measured plan | In progress | Approved as one ticket, no split. Every file is a deliverable the ticket asks for (research doc, benchmark ... |
 | S2-01 | Design for zmm and mask registers under -march=knc | Done | The register design for KNC is settled on paper: all 32 zmm and 8 mask registers become usable under -march... |
 | S2-02 | Float and double arguments and results in zmm lane 0 | Done | Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`). |
 | S2-03 | Varargs with the donor's register save area | Done | Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`). |
@@ -212,6 +212,7 @@ Current tickets: `[###################-]` 184 of 187
 
 ## Recent activity
 
+- 2026-11-12 11:19 **S11-05** lead answer: Approved as one ticket, no split. Every file is a deliverable the ticket asks for (research doc, benchmark C source, build, sweep runner, README, h...
 - 2026-11-12 11:17 **S11-05** engineer ask: Submit at 66d2b067 is blocked by budgets: 1067 changed lines versus 800, five files under tests versus two, and 761 test lines versus 306 code line...
 - 2026-11-12 11:14 **S11-04** lead approve: The transfer study's host side now opens every connection to the card, so Windows Firewall no longer blocks it; checked on the host, card run next....
 - 2026-11-12 11:01 **S11-04** engineer submit: Submitted by the lead for the engineer: red adf57742 (host listener rejected, card-first loopback), fix aafd029d (card listens for lease and tcp, h...
@@ -219,7 +220,6 @@ Current tickets: `[###################-]` 184 of 187
 - 2026-11-12 10:57 **S11-04** engineer ask: Required git rebase main is blocked by sandbox: error: could not create temporary C:/Users/xuzhi/Documents/gcc_knc/.git/worktrees/S11-04/rebase-mer...
 - 2026-11-12 10:55 **S11-04** lead answer: Yes. gcc: no tickets rebase on main (knc exists only in the GCC tree). Run git rebase main on s11/S11-04; main is ahead only by pm commits that tou...
 - 2026-11-12 10:53 **S11-04** engineer ask: Implemented and committed red adf57742 and fix aafd029d. Regression red on S11-03; loopback green both directions including fake transport, 3 tests...
-- 2026-11-12 10:42 **S11-03** lead approve: The transfer study's tool now accepts the card's real /tmp location (/var/volatile/tmp), so its card run can start; checked on the host, card run n...
 
 ## Cost
 
