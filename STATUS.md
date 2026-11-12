@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-12 12:31.
+Updated automatically at every ticket change. Last update: 2026-11-12 12:32.
 
 **Waiting for you:** S11-02. Run `python tools/pm.py inbox`.
 
@@ -227,7 +227,7 @@ Current tickets: `[###################-]` 187 of 190
 ## Cost
 
 - From the script, engineer: 450 sessions, 971.2M input tokens
-- From the script, lead: 285 sessions, 82.8M input tokens
+- From the script, lead: 286 sessions, 83.0M input tokens
 - Started by hand, Claude: 11 sessions, 2575.4M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
