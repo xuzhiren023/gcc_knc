@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-12 08:17.
+Updated automatically at every ticket change. Last update: 2026-11-12 08:18.
 
-**Next: the tech lead, on S10-12.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: the tech lead, on S10-13.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[###################-]` 180 of 184
 
@@ -50,7 +50,7 @@ Current tickets: `[###################-]` 180 of 184
 | S10-09 | User story - double-precision loops with division and square root vectorize, correctly rounded (V8DF div, cond_div, sqrt) | Done | Double-precision loops with division or square root now vectorize under -march=knc and give the correctly r... |
 | S10-10 | Card harness fixes from the Sprint 10 card turn - card_qualify binary folder, vmath bench batch sizing | Done | card_qualify now runs the card binaries from knc/ and stops before any card job when one is missing, and th... |
 | S10-11 | Card-only vector math failures - double sin, cos, tan, atan2 above 1 ULP, and cbrt/cbrtf crash (SIGSEGV) | Done | Double sin, cos, tan and atan2 from the KNC vector math library are now within 1 ULP on the card (0.76 to 0... |
-| S10-12 | cbrt and cbrtf crash (SIGSEGV) in qualify_v1 on the card - root cause and fix | Question for the tech lead | Owner 2026-11-12 08:40 EST ('Approve both', answering the lead's request to release the inbox tickets): rel... |
+| S10-12 | cbrt and cbrtf crash (SIGSEGV) in qualify_v1 on the card - root cause and fix | lead | Waits for the lead's card run of cbrt/cbrtf compare in WRF's slot (~09:15 EST). |
 | S10-13 | User story - code that calls cbrtl under -march=knc gets a safe replacement and a compile-time warning (MPSS libm cbrtl faults) | Question for the tech lead | Owner 2026-11-12 08:40 EST ('Approve both', answering the lead's request to release the inbox tickets): rel... |
 | S11-01 | User story - the best way to move data between the host and the card, measured, and how our projects use it | Question for the tech lead | Owner 2026-11-12 08:40 EST ('Approve both', answering the lead's request to release the inbox tickets): rel... |
 | S11-02 | card_run and run_suite move data by S11-01's recommended method, with fallback | Not started | ready; waits on its dep S11-01, the lead writes acceptance before it starts |
@@ -211,18 +211,18 @@ Current tickets: `[###################-]` 180 of 184
 
 - 2026-11-12 08:35 **S10-13** lead note: Interactive lead: tree 2's build folder .work/_shared/gcc-build-2 was created outside the Codex sandbox (owner xuzhi, Cygwin deny entries for other...
 - 2026-11-12 08:25 **S11-01** lead note: Interactive lead: (1) payload SHA-256 is part of the deliverable, so the ticket now carries hash_ok for the transfer tool, bench, SHA-256 header, c...
+- 2026-11-12 08:18 **S10-12** lead defer: Waits for the lead's card run of cbrt/cbrtf compare in WRF's slot (~09:15 EST).
 - 2026-11-12 08:17 **S11-01** owner decide: Owner 2026-11-12 08:40 EST ('Approve both', answering the lead's request to release the inbox tickets): released; follow the lead's latest note.
 - 2026-11-12 08:17 **S10-13** owner decide: Owner 2026-11-12 08:40 EST ('Approve both', answering the lead's request to release the inbox tickets): released; follow the lead's latest note.
 - 2026-11-12 08:16 **S10-12** owner decide: Owner 2026-11-12 08:40 EST ('Approve both', answering the lead's request to release the inbox tickets): released; follow the lead's latest note.
 - 2026-11-12 08:05 **S10-13** lead escalate: Needs the interactive lead, not an owner decision: the lane gcc2 engineer sandbox cannot write .work/_shared/gcc-build-2/gcc (Permission denied; se...
 - 2026-11-12 08:03 **S10-13** engineer ask: Build blocked: Cygwin bash -c 'cd ../_shared/gcc-build-2/gcc && : > tmp-optionlist' fails Permission denied, reproducing full-build failure. Please...
-- 2026-11-12 08:01 **S11-01** lead escalate: For the interactive lead, not an owner decision. (1) hash_in_diff in harness/policy.json is a hard submit check and blocks the payload SHA-256 I au...
 
 ## Cost
 
 - From the script, engineer: 432 sessions, 950.3M input tokens
 - From the script, lead: 272 sessions, 80.0M input tokens
-- Started by hand, Claude: 11 sessions, 2485.0M input tokens
+- Started by hand, Claude: 11 sessions, 2485.3M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
