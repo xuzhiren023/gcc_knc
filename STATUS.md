@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-12 09:15.
+Updated automatically at every ticket change. Last update: 2026-11-12 09:16.
 
-**Next: GPT-6.1, on S10-12 (cbrt and cbrtf crash (SIGSEGV) in qualify_v1 on the card - root cause and fix).** Run `python tools/dispatch.py`, or ask the tech lead to.
+**Next: the tech lead, on S10-12.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[###################-]` 181 of 184
 
@@ -50,7 +50,7 @@ Current tickets: `[###################-]` 181 of 184
 | S10-09 | User story - double-precision loops with division and square root vectorize, correctly rounded (V8DF div, cond_div, sqrt) | Done | Double-precision loops with division or square root now vectorize under -march=knc and give the correctly r... |
 | S10-10 | Card harness fixes from the Sprint 10 card turn - card_qualify binary folder, vmath bench batch sizing | Done | card_qualify now runs the card binaries from knc/ and stops before any card job when one is missing, and th... |
 | S10-11 | Card-only vector math failures - double sin, cos, tan, atan2 above 1 ULP, and cbrt/cbrtf crash (SIGSEGV) | Done | Double sin, cos, tan and atan2 from the KNC vector math library are now within 1 ULP on the card (0.76 to 0... |
-| S10-12 | cbrt and cbrtf crash (SIGSEGV) in qualify_v1 on the card - root cause and fix | In progress | Card PASS; the lead submits for the engineer. |
+| S10-12 | cbrt and cbrtf crash (SIGSEGV) in qualify_v1 on the card - root cause and fix | Waiting for review | Submitted by the lead for the engineer: red 1ff46888 (host model of the MPSS cbrtl negative table offset), ... |
 | S10-13 | User story - code that calls cbrtl under -march=knc gets a safe replacement and a compile-time warning (MPSS libm cbrtl faults) | lead | Waits for S10-12's approval; then the lead moves it to lane gcc (tree 1) to build. |
 | S11-01 | User story - the best way to move data between the host and the card, measured, and how our projects use it | Done | We now have a sourced inventory of every host-card transfer path that works without changing MPSS (SSH, tar... |
 | S11-02 | card_run and run_suite move data by S11-01's recommended method, with fallback | Not started | ready; waits on its dep S11-01, the lead writes acceptance before it starts |
@@ -209,6 +209,7 @@ Current tickets: `[###################-]` 181 of 184
 
 ## Recent activity
 
+- 2026-11-12 09:16 **S10-12** engineer submit: Submitted by the lead for the engineer: red 1ff46888 (host model of the MPSS cbrtl negative table offset), fix 7ae4d224 (qualifier keeps cbrtl's ar...
 - 2026-11-12 09:15 **S10-12** lead answer: Card PASS; the lead submits for the engineer.
 - 2026-11-12 09:15 **S10-12** lead note: Card 2026-11-12 14:05-14:15Z (boot da3144f1), fixed qualifier .work/_shared/S10-12/knc/qualify_v1.mic, 240 threads: cmp-cbrt PASS exact max_ulp 0.4...
 - 2026-11-12 09:14 **S10-12** lead resume: Card PASS for cbrt and cbrtf (09:15 note).
@@ -216,13 +217,12 @@ Current tickets: `[###################-]` 181 of 184
 - 2026-11-12 08:35 **S10-13** lead note: Interactive lead: tree 2's build folder .work/_shared/gcc-build-2 was created outside the Codex sandbox (owner xuzhi, Cygwin deny entries for other...
 - 2026-11-12 08:27 **S11-01** engineer submit: Submitted by the lead for the engineer after rebasing (engineer sandbox cannot write .git). Engineer 07:57: loopback/FIPS/corruption tests and K1OM...
 - 2026-11-12 08:27 **S11-01** lead answer: Rebased by the lead; the lead submits for the engineer.
-- 2026-11-12 08:26 **S11-01** lead resume: Lead rebased s11/S11-01 onto main (81ceac2a red, 95625ad5 green over 48c83946); submits for the engineer.
 
 ## Cost
 
 - From the script, engineer: 434 sessions, 950.9M input tokens
 - From the script, lead: 274 sessions, 80.4M input tokens
-- Started by hand, Claude: 11 sessions, 2497.2M input tokens
+- Started by hand, Claude: 11 sessions, 2497.5M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
