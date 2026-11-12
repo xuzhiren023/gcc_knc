@@ -29,6 +29,9 @@ PACKED = re.compile(r'\bv(?:addn?|subr?|mul|div|max|min|sqrt|rcp(?:23)?|rsqrt(?:
 # Each entry supplies its CLI help and handlers for the tiers it selects.
 # Imports stay lazy so T0 and source-only selections need no probe modules.
 SELECTIONS = {
+    'divsqrt_f64': ('S10-09 correctly rounded FP64 division and square root', {
+        't1': lambda runner: runner.t1_sources([runner.source_dir / 'knc-divsqrt-f64.c',
+                                                runner.source_dir / 'knc-sqrt-f64-errno.c'])}),
     'vmath': ('S10-03 loops call libknc_vmath (-mveclibabi=knc) and link it with no flag (ADR-0014)', {
         't1': lambda runner: runner.t1_sources(runner.source_dir.glob('knc-vmath-*.c')),
         't2': lambda runner: importlib.import_module('knc_vmath').t2(runner)}),
