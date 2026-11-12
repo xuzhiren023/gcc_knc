@@ -146,7 +146,8 @@ static int tcp(const char *address,unsigned port,int server,const char *lease_no
     fprintf(announcement,"{\"ready\":true,\"port\":%u,\"node\":0,\"nonce\":\"%s\"}\n",
             ntohs(a.sin_port),lease_nonce?lease_nonce:"");fflush(announcement);
     struct pollfd wait={s,POLLIN,0};
-    if(poll(&wait,1,10000)!=1)die("card TCP listener unreachable: no host connection within 10 seconds");
+    /* card_run relays every 10 s; exceed the host's 60 s announcement wait plus the relay interval. */
+    if(poll(&wait,1,90000)!=1)die("card TCP listener unreachable: no host connection within 90 seconds");
     int t=accept(s,NULL,NULL);close(s);s=t;if(s<0)die("accept");
   } else {
     int flags=fcntl(s,F_GETFL,0);if(flags<0||fcntl(s,F_SETFL,flags|O_NONBLOCK))die("connect flags");
@@ -178,6 +179,7 @@ static void connect_transport(const char *method,const char *address,unsigned po
       int bound=sc.bind(ep,0);if(bound<0||sc.listen(ep,1))die("scif listen");
       if(sc.nodes(nodes,32,&self)<0)die("node enumeration");
       fprintf(stderr,"{\"ready\":true,\"port\":%d,\"node\":%u}\n",bound,self);fflush(stderr);
+      /* SSH starts this endpoint directly, so exceed the host's 20 s announcement wait. */
       if(sc.accept(ep,&peer,&accepted,1))die("scif accept");
       sc.close(ep);ep=accepted;
       fprintf(stderr,"SCIF peer node=%u port=%u\n",peer.node,peer.port);

@@ -110,6 +110,7 @@ def lease_ready(proc, log, nonce):
 
     threading.Thread(target=drain, daemon=True).start()
     try:
+        # The card listener waits 90 s, exceeding this deadline plus card_run's 10 s relay interval.
         row = announcements.get(timeout=60)
     except queue.Empty:
         raise RuntimeError('lease startup deadline: no card listener announcement; see card-control.log')

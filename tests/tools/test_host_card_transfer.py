@@ -56,6 +56,20 @@ class TransferIntegrity(unittest.TestCase):
                      and node.func.attr in ('bind', 'listen', 'accept')]
         self.assertEqual(forbidden, [], 'runner must only connect to card listeners')
 
+    def test_card_listener_deadlines_cover_host_relay_deadlines(self):
+        bench = (ROOT / 'tools/transfer_bench.c').read_text()
+        runner = Path(transfer.__file__).read_text()
+        relay = 10  # card_run's next_output poll interval, in seconds.
+        card_wait = int(__import__('re').search(r'card TCP listener unreachable: no host connection within (\d+) seconds', bench).group(1))
+        host_announcement = int(__import__('re').search(r'announcements\.get\(timeout=(\d+)\)', runner).group(1))
+        self.assertGreater(card_wait, host_announcement + relay)
+        self.assertIn(f'{relay} s relay interval', runner)
+
+        # SCIF endpoint startup runs over SSH, without card_run's output relay.
+        ssh_announcement = int(__import__('re').search(r'lines\.get\(timeout=(\d+)\)', runner).group(1))
+        accept_note = bench.split('/* SSH starts this endpoint directly', 1)[1].split('*/', 1)[0]
+        self.assertIn(str(ssh_announcement), accept_note)
+
     def test_lease_directory_shapes(self):
         valid = ('/tmp/claude/claude-' + 'a' * 32,
                  '/var/volatile/tmp/claude/claude-' + '0f' * 16)
