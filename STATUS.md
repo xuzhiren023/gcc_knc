@@ -1,10 +1,10 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-12 16:01.
+Updated automatically at every ticket change. Last update: 2026-11-12 16:11.
 
 **Waiting for you:** S11-02. Run `python tools/pm.py inbox`.
 
-Current tickets: `[###################-]` 189 of 194
+Current tickets: `[###################-]` 190 of 194
 
 ## Milestones
 
@@ -14,7 +14,7 @@ Current tickets: `[###################-]` 189 of 194
 | M1 | Mixed native code | Done | 43 of 43 tickets |
 | M2 | Useful vector target | Done | 51 of 51 tickets |
 | M3 | Runtimes | Done | 48 of 48 tickets |
-| M4 | Broad optimization | In progress | 7 of 12 tickets |
+| M4 | Broad optimization | In progress | 8 of 12 tickets |
 | M5 | Program corpus | Not started | Not planned in detail yet |
 | M6 | Release | Not started | Not planned in detail yet |
 
@@ -61,7 +61,7 @@ Current tickets: `[###################-]` 189 of 194
 | S11-07 | S11-01 transfer tool - the card's listener gives up before card_run relays its announcement | Done | The transfer study's card listener now waits long enough for card_run to relay its address to the host; che... |
 | S11-08 | -Wknc-unsafe-cbrtl cannot be used in #pragma GCC diagnostic ("valid for  but not for C") | Done | The cbrtl warning can now be silenced around one deliberate call with #pragma GCC diagnostic in C and C++; ... |
 | S11-09 | Memory bandwidth for LLM decode - a weight-streaming GEMV workload, pushed toward 264-299 GB/s of weight bytes | lead | Needs interactive lead: card run in our exclusive turn. Reviewed 33de9541: IMCI sint8/float16 load conversi... |
-| S11-10 | S11-01 transfer runner - choose repetitions, sizes and load states per run, so slow methods fit a card turn | Waiting for review | Test passed: tools/run.py s11_10_review_fixes; log C:\Users\xuzhi\Documents\gcc_knc\.work\_state\logs\s11_1... |
+| S11-10 | S11-01 transfer runner - choose repetitions, sizes and load states per run, so slow methods fit a card turn | Done | The transfer runner now takes --repeats, --sizes, --loads and --concurrency so a slow method fits a card tu... |
 | S11-11 | M4 corpus run harness - every corpus program built by GCC 5.1.1 and GCC-KNC, run on the card with frozen inputs and a correctness check, in one command | In progress | The corpus harness now has a failing host contract that pins the S0-07 program set (held-out adi, durbin an... |
 | S11-13 | Senior compiler review of the Sprint 11-13 scope (Milestone M4) against our research, with recommended plan changes | In progress |  |
 | S2-01 | Design for zmm and mask registers under -march=knc | Done | The register design for KNC is settled on paper: all 32 zmm and 8 mask registers become usable under -march... |
@@ -219,6 +219,7 @@ Current tickets: `[###################-]` 189 of 194
 
 ## Recent activity
 
+- 2026-11-12 16:11 **S11-10** lead approve: The transfer runner now takes --repeats, --sizes, --loads and --concurrency so a slow method fits a card turn, keeps card-control.log open until ca...
 - 2026-11-12 16:00 **S11-10** engineer submit: Test passed: tools/run.py s11_10_review_fixes; log C:\Users\xuzhi\Documents\gcc_knc\.work\_state\logs\s11_10_review_fixes-20261112-155732.log. No c...
 - 2026-11-12 15:59 **S11-10** lead answer: Yes: commit (pm.py commit) and submit source and tests only, without the exe. transfer_bench.c changed, so the staged transfer-host.exe is now stal...
 - 2026-11-12 15:58 **S11-10** engineer ask: Review fixes applied and tests pass. S11-01 transfer-host.exe is still locked; restage failed with Device/resource busy and PermissionError. The ti...
@@ -226,7 +227,6 @@ Current tickets: `[###################-]` 189 of 194
 - 2026-11-12 15:56 **S11-11** engineer red: Red contract committed at 4f4a34f3. Ran python tools/run.py --name S11-11-host-red --inputs tests/tools/test_corpus.py tools/corpus.py -- python -m...
 - 2026-11-12 15:55 **S11-10** owner decide: Owner standing rule (feedback 2026-11-09/10): session budget raised to 5. The ticket progressed (submitted at 15:30, three review findings at 15:54...
 - 2026-11-12 15:55 **S11-10** engineer escalate: budget: 3 engineer sessions used; the budget is 3
-- 2026-11-12 15:54 **S11-10** lead changes: 1. tests/tools/test_host_card_transfer.py:21 builds into a temp dir, but test_loopback_and_integrity (line 28) still runs transfer.OUT/'transfer-ho...
 
 ## Cost
 
@@ -238,4 +238,4 @@ Current tickets: `[###################-]` 189 of 194
 
 ## Disk
 
-The project uses 24.6 GiB of 100 GiB. 83 GiB free on the drive.
+The project uses 24.8 GiB of 100 GiB. 83 GiB free on the drive.
