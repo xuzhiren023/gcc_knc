@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-12 07:16.
+Updated automatically at every ticket change. Last update: 2026-11-12 07:17.
 
-**Waiting for you:** S10-10. Run `python tools/pm.py inbox`.
+**Waiting for you:** S10-10, S10-12. Run `python tools/pm.py inbox`.
 
 Current tickets: `[###################-]` 179 of 183
 
@@ -50,7 +50,7 @@ Current tickets: `[###################-]` 179 of 183
 | S10-09 | User story - double-precision loops with division and square root vectorize, correctly rounded (V8DF div, cond_div, sqrt) | Done | Double-precision loops with division or square root now vectorize under -march=knc and give the correctly r... |
 | S10-10 | Card harness fixes from the Sprint 10 card turn - card_qualify binary folder, vmath bench batch sizing | **Waiting for you** | Needs the interactive lead (owner's 07:00 option b): engineer's work is uncommitted in the S10-10 worktree ... |
 | S10-11 | Card-only vector math failures - double sin, cos, tan, atan2 above 1 ULP, and cbrt/cbrtf crash (SIGSEGV) | Done | Double sin, cos, tan and atan2 from the KNC vector math library are now within 1 ULP on the card (0.76 to 0... |
-| S10-12 | cbrt and cbrtf crash (SIGSEGV) in qualify_v1 on the card - root cause and fix | Question for the tech lead | 7ae4d224 fixes the documented MPSS cbrtl fault by normalizing to [1,8). Regression PASS: 4750 cases, <=0.01... |
+| S10-12 | cbrt and cbrtf crash (SIGSEGV) in qualify_v1 on the card - root cause and fix | **Waiting for you** | Needs the interactive lead's card turn, not an owner decision. Reviewed 7ae4d224: the harness now passes MP... |
 | S11-01 | User story - the best way to move data between the host and the card, measured, and how our projects use it | Not started | lane tools: owner 2026-11-12, usage reset, move on (Codex engineers) |
 | S11-02 | card_run and run_suite move data by S11-01's recommended method, with fallback | Not started | ready; waits on its dep S11-01, the lead writes acceptance before it starts |
 | S2-01 | Design for zmm and mask registers under -march=knc | Done | The register design for KNC is settled on paper: all 32 zmm and 8 mask registers become usable under -march... |
@@ -208,6 +208,7 @@ Current tickets: `[###################-]` 179 of 183
 
 ## Recent activity
 
+- 2026-11-12 07:17 **S10-12** lead escalate: Needs the interactive lead's card turn, not an owner decision. Reviewed 7ae4d224: the harness now passes MPSS cbrtl only arguments in [1,8) and res...
 - 2026-11-12 07:16 **S10-12** engineer ask: 7ae4d224 fixes the documented MPSS cbrtl fault by normalizing to [1,8). Regression PASS: 4750 cases, <=0.01 ULP vs MPFR. Host compare PASS: cbrt 0....
 - 2026-11-12 07:13 **S10-12** lead approve-red: S10-12 red accepted: the cbrt/cbrtf card crash is traced to the MPSS libm cbrtl that qualify_v1 uses as its reference, which reads its table at a w...
 - 2026-11-12 07:11 **S10-12** engineer red: 1ff46888: expected host regression FAIL at 1e-5 (frexp exponent -16). Log: .work/_state/logs/S10_12_screen_red-20261112-070726.log. Cause: MPSS lib...
@@ -215,7 +216,6 @@ Current tickets: `[###################-]` 179 of 183
 - 2026-11-12 07:06 **S10-10** engineer ask: Host harness changes are ready; test command passed with CC=C:\\Users\\xuzhi\\Documents\\gcc_knc\\.work\\_shared\\toolchain\\cygwin\\bin\\gcc.exe a...
 - 2026-11-12 07:04 **S10-10** lead answer: Go ahead per the owner's 07:00 decision and the lead's 03:30 note. The worktree already has the test (shared path and kernels.c link fixed by the l...
 - 2026-11-12 07:03 **S10-12** lead answer: Card output is in the 04:15 lead note above: the vector call returns; SIGSEGV (SEGV_MAPERR) is in the oracle-and-dump phase, cbrt block 1 and cbrtf...
-- 2026-11-12 07:03 **S10-10** owner decide: Owner 2026-11-12 07:00 EST ('you commit their work by hand'): option (b). The engineer does not run pm.py commit: it edits the worktree, leaves cha...
 
 ## Cost
 
