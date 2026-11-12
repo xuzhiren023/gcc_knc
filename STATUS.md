@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-12 00:08.
+Updated automatically at every ticket change. Last update: 2026-11-12 00:09.
 
 **Waiting for you:** S10-10. Run `python tools/pm.py inbox`.
 
@@ -49,7 +49,7 @@ Current tickets: `[###################-]` 177 of 182
 | S10-08 | Vector math v1b - the rest of the libmvec set (acos, asin, cbrt, erf, erfc, exp2, exp10, expm1, log1p, log2, hypot, sincos) | Done | The vector math library now covers the whole set GCC vectorizes with glibc's libmvec: acos, asin, cbrt, erf... |
 | S10-09 | User story - double-precision loops with division and square root vectorize, correctly rounded (V8DF div, cond_div, sqrt) | Waiting for review | Lead (owner 2026-11-11 16:55 EST): the lead has no usage until the owner says it reset. If you hit an issue... |
 | S10-10 | Card harness fixes from the Sprint 10 card turn - card_qualify binary folder, vmath bench batch sizing | **Waiting for you** | budget: 2712316 input tokens used; the budget is 2000000 |
-| S10-11 | Card-only vector math failures - double sin, cos, tan, atan2 above 1 ULP, and cbrt/cbrtf crash (SIGSEGV) | Question for the tech lead | Global contraction-off exceeds the demonstrated four-member need; vmath_v1b.h already disables it for cbrt.... |
+| S10-11 | Card-only vector math failures - double sin, cos, tan, atan2 above 1 ULP, and cbrt/cbrtf crash (SIGSEGV) | In progress | (1) Yes, narrow it. Keep -fexcess-precision=standard in KNC_LIB_FLAGS for all members: KNC scalar code is x... |
 | S11-01 | User story - the best way to move data between the host and the card, measured, and how our projects use it | Not started | lane tools: owner 2026-11-12, usage reset, move on (Codex engineers) |
 | S11-02 | card_run and run_suite move data by S11-01's recommended method, with fallback | Not started | ready; waits on its dep S11-01, the lead writes acceptance before it starts |
 | S2-01 | Design for zmm and mask registers under -march=knc | Done | The register design for KNC is settled on paper: all 32 zmm and 8 mask registers become usable under -march... |
@@ -207,6 +207,7 @@ Current tickets: `[###################-]` 177 of 182
 
 ## Recent activity
 
+- 2026-11-12 00:09 **S10-11** lead answer: (1) Yes, narrow it. Keep -fexcess-precision=standard in KNC_LIB_FLAGS for all members: KNC scalar code is x87, so it is a correctness flag, not a s...
 - 2026-11-12 00:07 **S10-11** engineer ask: Global contraction-off exceeds the demonstrated four-member need; vmath_v1b.h already disables it for cbrt. Removed FMA sites: sincos/tan/atan 15/1...
 - 2026-11-12 00:07 **S10-10** engineer escalate: budget: 2712316 input tokens used; the budget is 2000000
 - 2026-11-12 00:07 **S10-10** owner decide: Owner standing rule: session budget raised to 4 (first extension; the fix exists as .work/_shared/S10-10/fix-3ff91fd2.patch). Commit the test [red]...
@@ -214,13 +215,12 @@ Current tickets: `[###################-]` 177 of 182
 - 2026-11-12 00:06 **S10-10** engineer escalate: budget: 2 engineer sessions used; the budget is 2
 - 2026-11-12 00:04 **S10-10** lead answer: See the decide above: worktree rewound to main, fix saved as .work/_shared/S10-10/fix-3ff91fd2.patch; commit the test [red] first, then apply the p...
 - 2026-11-12 00:04 **S10-10** owner decide: Lead (usage reset 2026-11-12): the worktree is rewound to main and your fix is saved as .work/_shared/S10-10/fix-3ff91fd2.patch (also branch s10/S1...
-- 2026-11-12 00:03 **S11-01** lead amend: lane tools: owner 2026-11-12, usage reset, move on (Codex engineers)
 
 ## Cost
 
 - From the script, engineer: 421 sessions, 933.7M input tokens
 - From the script, lead: 261 sessions, 77.6M input tokens
-- Started by hand, Claude: 11 sessions, 2447.3M input tokens
+- Started by hand, Claude: 11 sessions, 2449.1M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
