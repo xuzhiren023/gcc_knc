@@ -112,6 +112,7 @@ ADR-0013 in short. It applies to intrinsics, math and any code that follows a ve
 ## Environment
 
 - Compilers run on the host, and programs run on the card. Engineers do not start card jobs: leave the built, linted card binaries under `.work/_shared/<ticket>/` and name them in the submit note, and the lead runs them through `tools/card_run` (the lead coordinates card time with the PhiWeather session). Other projects' folders are read-only.
+- A native check program that runs longer than about a minute splits its work across every CPU it is given (`sched_getaffinity`, one worker per CPU), so the lead can run it with `card_run --threads 240`; say in the submit note how to run it. A single-threaded native check is only for crash diagnosis or single-core timing.
 - Windows 10, 12 threads, about 16 GB of memory. Use `make -j8` at most.
 - Until S0-01 is done, tools are in `C:\Users\xuzhi\Documents\PhiWeather\.tools\knc-bootstrap`. Put its `cross\bin` and `cygwin\bin` on `PATH`, and use that Cygwin's `python3`, `gcc` and `make`.
 - GCC checkouts need `core.autocrlf=false` and `core.fileMode=false`.
