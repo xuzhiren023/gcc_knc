@@ -21,6 +21,18 @@ int phi_trig_rem_pio2(double,double *);
 static uint64_t dbits(double x){uint64_t b;memcpy(&b,&x,8);return b;}
 static double dvalue(uint64_t b){double x;memcpy(&x,&b,8);return x;}
 
+/* S10-11: round the reduced-tail reconstruction separately from the polynomial.
+ * Keep this boundary out of line so inlining cannot restore caller contraction. */
+#pragma GCC push_options
+#pragma GCC optimize ("fp-contract=off")
+static __attribute__((noinline)) void compensated_sincos(dv x,dv y,dv z,dv sr,dv cr,dv *s,dv *c) {
+  const dv v=z*x;
+  *s=x-((z*(.5*y-v*sr)-y)-v*(-1.66666666666666324348e-01));
+  const dv hz=.5*z,cw=1-hz;
+  *c=cw+(((1-cw)-hz)+(z*cr-x*y));
+}
+#pragma GCC pop_options
+
 /* All actual polynomial arithmetic is GCC-vector arithmetic. Per-lane range
  * reduction supplies high/low parts and quadrant, never a trig result. */
 static __attribute__((noinline)) void finite_core(const double input[8],double output[8],int cosine) {
@@ -37,11 +49,9 @@ static __attribute__((noinline)) void finite_core(const double input[8],double o
   const dv z=x*x,w=z*z;
   const dv sr=8.33333333332248946124e-03+z*(-1.98412698298579493134e-04+z*2.75573137070700676789e-06)
        +z*w*(-2.50507602534068634195e-08+z*1.58969099521155010221e-10);
-  const dv v=z*x;
-  const dv s=x-((z*(.5*y-v*sr)-y)-v*(-1.66666666666666324348e-01));
   const dv cr=z*(4.16666666666666019037e-02+z*(-1.38888888888741095749e-03+z*2.48015872894767294178e-05))
        +w*w*(-2.75573143513906633035e-07+z*(2.08757232129817482790e-09+z*(-1.13596475577881948265e-11)));
-  const dv hz=.5*z,cw=1-hz,c=cw+(((1-cw)-hz)+(z*cr-x*y));
+  dv s,c;compensated_sincos(x,y,z,sr,cr,&s,&c);
   for(unsigned i=0;i<8;++i) {
     if(small[i]){output[i]=cosine?1:input[i];continue;}
     unsigned q=(quadrant[i]+(unsigned)cosine)&3;

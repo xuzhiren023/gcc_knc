@@ -22,6 +22,18 @@ static uint64_t dbits(double x){uint64_t b;memcpy(&b,&x,8);return b;}
 static double dvalue(uint64_t b){double x;memcpy(&x,&b,8);return x;}
 static uv tobits(dv x){uv b;memcpy(&b,&x,64);return b;}
 static dv frombits(uv b){dv x;memcpy(&x,&b,64);return x;}
+/* S10-11: the reduced tail and split reciprocal require separate rounding.
+ * Out-of-line boundaries preserve these options when the caller uses FMA. */
+#pragma GCC push_options
+#pragma GCC optimize ("fp-contract=off")
+static __attribute__((noinline)) dv compensated_tail(dv x,dv y,dv z,dv r,dv v) {
+  const dv cube=z*x;
+  return y+z*(cube*(r+v)+y)+cube*3.33333333333334091986e-01;
+}
+static __attribute__((noinline)) dv compensated_reciprocal(dv a,dv a0,dv w0,dv tail) {
+  return a0+a*(1+a0*w0+a0*tail);
+}
+#pragma GCC pop_options
 static const double T[]={3.33333333333334091986e-01,1.33333333333201242699e-01,5.39682539762260521377e-02,2.18694882948595424599e-02,8.86323982359930005737e-03,3.59207910759131235356e-03,1.45620945432529025516e-03,5.88041240820264096874e-04,2.46463134818469906812e-04,7.81794442939557092300e-05,7.14072491382608190305e-05,-1.85586374855275456654e-05,2.59073051863633712884e-05};
 static __attribute__((noinline)) void finite_core(const double input[8],double output[8]) {
   const double pio4=7.85398163397448278999e-01,pio4lo=3.06161699786838301793e-17;
@@ -41,14 +53,14 @@ static __attribute__((noinline)) void finite_core(const double input[8],double o
   x=frombits((tobits(x)&~bm)|(tobits(transformed)&bm));y=frombits(tobits(y)&~bm);
   const dv z=x*x,w2=z*z;
   dv r=T[1]+w2*(T[3]+w2*(T[5]+w2*(T[7]+w2*(T[9]+w2*T[11]))));
-  const dv v=z*(T[2]+w2*(T[4]+w2*(T[6]+w2*(T[8]+w2*(T[10]+w2*T[12]))))),cube=z*x;
-  r=y+z*(cube*(r+v)+y)+cube*T[0];const dv w=x+r;
+  const dv v=z*(T[2]+w2*(T[4]+w2*(T[6]+w2*(T[8]+w2*(T[10]+w2*T[12])))));
+  r=compensated_tail(x,y,z,r,v);const dv w=x+r;
   const dv transformed_result=s-2*(x+(r-w*w/(w+s)));
   const dv w0=frombits(tobits(w)&UINT64_C(0xffffffff00000000));
   const dv tail=r-(w0-x);dv denominator;
   for(unsigned i=0;i<8;++i)denominator[i]=odd[i]&&!big[i]?w[i]:1;
   const dv a=-1/denominator,a0=frombits(tobits(a)&UINT64_C(0xffffffff00000000));
-  const dv reciprocal=a0+a*(1+a0*w0+a0*tail);
+  const dv reciprocal=compensated_reciprocal(a,a0,w0,tail);
   for(unsigned i=0;i<8;++i) {
     if(small[i]){output[i]=input[i];continue;}
     output[i]=big[i]?dvalue(dbits(transformed_result[i])^sign[i]):odd[i]?reciprocal[i]:w[i];

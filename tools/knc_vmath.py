@@ -53,10 +53,10 @@ LIB_FLAGS = ['-std=gnu11', '-O2', '-Wall', '-I' + str(LIB), '-I' + str(ARM_DP),
              '-I' + str(ALGORITHMS / 'cos_sin_e/native_x87')]
 # The harness and its x87 oracle neither vectorize nor contract.
 # KNC members also link into shared libraries and, as in libgcc.a, export nothing from them.
-# Compensated steps require rounded double assignments and separate products/sums.
+# Compensated steps require rounded double assignments on the scalar x87 path.
 # S10-11: x87+FMA reproduces the card's sin/cos/tan/atan2 failures exactly.
-KNC_LIB_FLAGS = ['-fPIC', '-fvisibility=hidden', '-fexcess-precision=standard',
-                 '-ffp-contract=off']
+# Their compensated helpers control contraction locally; polynomials keep FMA.
+KNC_LIB_FLAGS = ['-fPIC', '-fvisibility=hidden', '-fexcess-precision=standard']
 TEST_FLAGS = ['-std=gnu11', '-O2', '-Wall', '-Wextra', '-Werror', '-fno-tree-vectorize',
               '-fno-tree-slp-vectorize', '-ffp-contract=off', '-I' + str(LIB)]
 # S10-08: these members take square roots, which must not call libm's sqrt to set errno.
