@@ -3,7 +3,7 @@
 set -eu
 phase=${1:-first}
 binary=./membw.mic
-chmod u+x "$binary"
+if [ "$phase" != second-plan ]; then chmod u+x "$binary"; fi
 case_no=0
 snapshot() {
     echo "METADATA $(date -u)"
@@ -21,11 +21,56 @@ snapshot() {
 }
 run() {
     case_no=$((case_no+1))
-    echo "CASE $case_no $*"
+    echo "CASE $case_no --mib 256 --passes 8 --repeats 5 $*"
+    if [ "$phase" = second-plan ]; then return; fi
     "$binary" --mib 256 --passes 8 --repeats 5 "$@"
 }
-snapshot
+second_case() {
+    workload=$1
+    shift
+    # Preserve separate first-sweep candidates, without accepting small offsets
+    # or fence differences that lie inside the observed variation.
+    case "$workload" in
+        read) set -- --pages small --pf0 16 --pf1 32 "$@";;
+        write) set -- --pf0 8 --pf1 32 "$@";;
+        rmw) set -- --pf0 16 --pf1 32 --evict both "$@";;
+    esac
+    run --threads 60 --placement spread --pages huge --store ngo \
+        --pf0 8 --pf1 64 --mib 2048 --passes 32 --workload "$workload" "$@"
+}
+if [ "$phase" != second-plan ]; then snapshot; fi
 case "$phase" in
+    second|second-plan)
+        # 1-18: triad calibration first; separate size from sample duration.
+        for w in triad read write copy rmw stencil; do
+            second_case "$w" --mib 256 --passes 8
+            second_case "$w" --passes 8
+            second_case "$w"
+        done
+        # 19-24: keep the final completion fence, remove intermediate fences.
+        for w in triad read write copy rmw stencil; do
+            second_case "$w" --pass-fence final
+        done
+        # 25-42: density x coordinated prefetch, with long samples.
+        for w in read write copy triad rmw stencil; do
+            second_case "$w" --threads 120 --pf0 8 --pf1 64
+            second_case "$w" --threads 120 --pf0 32 --pf1 128
+            second_case "$w" --threads 60 --pf0 32 --pf1 128
+        done
+        # 43-52: instruction issue, store density and combined class winners.
+        second_case read --read-chains 1
+        second_case read --read-chains 4
+        second_case write --threads 240
+        second_case write --store nr
+        second_case write --store normal --prefetch exclusive
+        second_case copy --schedule cyclic --chunk-lines 1024 --evict l2
+        second_case triad --offset-lines 62 --unroll 8
+        second_case triad --split 1 --chunk-lines 1024
+        second_case rmw --schedule cyclic --chunk-lines 1024
+        second_case stencil --chunk-lines 128 --evict l1
+        # 53-58: new allocations, closing long references for every class.
+        for w in triad read write copy rmw stencil; do second_case "$w"; done
+        ;;
     probe)
         # Expose the actual registered PMUs/aliases rather than assuming Xeon
         # server event encodings work on KNC. Nothing is installed or enabled.
@@ -80,6 +125,6 @@ case "$phase" in
         run "$@"
         run --threads 60 --pages huge
         ;;
-    *) echo "expected probe, first, or confirm" >&2; exit 2;;
+    *) echo "expected probe, first, second, second-plan, or confirm" >&2; exit 2;;
 esac
-snapshot
+if [ "$phase" != second-plan ]; then snapshot; fi

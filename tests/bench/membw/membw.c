@@ -37,8 +37,9 @@ static struct {
     size_t lines, chunk, offset, padding;
     int threads, repeats, passes, placement, pf0, pf1, prefetch;
     int store, fence, evict, huge, cyclic, unroll, split, workload, serial_touch;
+    int pass_fence, read_chains;
 } cfg = {4194304, 4096, 0, 0, 0, 5, 8, 1, 16, 32, 1,
-         2, 0, 0, 0, 0, 4, 0, -1, 0};
+         2, 0, 0, 0, 0, 4, 0, -1, 0, 0, 0};
 static float *a, *b, *c;
 static pthread_barrier_t barrier;
 static int allowed, cpus[CPU_SETSIZE], actual_huge, current_workload;
@@ -48,6 +49,7 @@ static void *mapping;
 typedef struct __attribute__((aligned(64))) {
     int id, cpu, valid;
     Uvec sum;
+    double started[101], finished[101];
 } Worker;
 static Worker workers[CPU_SETSIZE];
 
@@ -127,7 +129,7 @@ INLINE void prefetch(const float *p, int level, int exclusive) {
 typedef struct {
     float *a, *b, *c;
     size_t lines;
-    int pf0, pf1, unroll, split;
+    int pf0, pf1, unroll, split, read_chains;
 } Kernel;
 INLINE void hints(size_t i, int op, int sk, int pf, int checked, const Kernel *k) {
     if (!pf) return;
@@ -177,6 +179,33 @@ INLINE void line(size_t i, int op, int sk, int pf, int lf, int ev, int checked,
 INLINE void lines_loop(size_t lo, size_t hi, int op, int sk, int pf, int lf, int ev,
                        int checked, Uvec *sum, const Kernel *k) {
     size_t i=lo;
+    /* Private reductions cannot alias the input memory operands. Keep the old
+       path selectable so the lead can measure the change on identical data. */
+    if (op==READ && k->read_chains) {
+        Uvec s0=*sum, s1={0}, s2={0}, s3={0};
+        if (k->read_chains==4) {
+            for (;i+4<=hi;i+=4) {
+                line(i,op,sk,pf,lf,ev,checked,&s0,k);
+                line(i+1,op,sk,pf,lf,ev,checked,&s1,k);
+                line(i+2,op,sk,pf,lf,ev,checked,&s2,k);
+                line(i+3,op,sk,pf,lf,ev,checked,&s3,k);
+            }
+        } else {
+            for (;i+4<=hi;i+=4) {
+                line(i,op,sk,pf,lf,ev,checked,&s0,k);
+                line(i+1,op,sk,pf,lf,ev,checked,&s0,k);
+                line(i+2,op,sk,pf,lf,ev,checked,&s0,k);
+                line(i+3,op,sk,pf,lf,ev,checked,&s0,k);
+            }
+        }
+        for (;i<hi;i++) line(i,op,sk,pf,lf,ev,checked,&s0,k);
+#if NATIVE
+        *sum=s0+s1+s2+s3;
+#else
+        for(int j=0;j<16;j++) sum->v[j]=s0.v[j]+s1.v[j]+s2.v[j]+s3.v[j];
+#endif
+        return;
+    }
     const size_t unroll=k->unroll;
     for (; i+unroll<=hi; i+=unroll) {
         ONE(0); if (unroll>=2) { ONE(1); }
@@ -244,7 +273,7 @@ static void host_kernel(size_t lo, size_t hi, int op, int sk, int pf, int lf,
 }
 #endif
 static void kernel(size_t lo, size_t hi, int op, Uvec *sum) {
-    const Kernel k={a,b,c,cfg.lines,cfg.pf0,cfg.pf1,cfg.unroll,cfg.split};
+    const Kernel k={a,b,c,cfg.lines,cfg.pf0,cfg.pf1,cfg.unroll,cfg.split,cfg.read_chains};
     const int store_kind=cfg.store, pf=cfg.prefetch, fm=cfg.fence, ev=cfg.evict;
 #if NATIVE
     kernels[((((op*3+store_kind)*4+pf)*2+(fm==2))*4+ev)](lo,hi,sum,&k);
@@ -295,6 +324,10 @@ static void *worker(void *arg) {
     cpu_set_t set; CPU_ZERO(&set); CPU_SET(w->cpu,&set);
     int err=pthread_setaffinity_np(pthread_self(),sizeof(set),&set);
     if(err) { errno=err; die("pthread_setaffinity_np"); }
+    /* RMW reads prior streamed output; split triad reuses its output as a
+       normal-store temporary. Keep completion before either next pass. */
+    const int per_pass=!cfg.pass_fence || current_workload==RMW
+        || (current_workload==TRIAD && cfg.split);
     for (int r=0;r<cfg.repeats;r++) {
         memset(&w->sum,0,64); w->valid=1;
         if (!cfg.serial_touch) ranges(w,0);
@@ -302,7 +335,13 @@ static void *worker(void *arg) {
         pthread_barrier_wait(&barrier);
         if(w->id==0) start_time=now();
         pthread_barrier_wait(&barrier);
-        for(int pass=0;pass<cfg.passes;pass++) { ranges(w,1); fence(); }
+        w->started[r]=now();
+        for(int pass=0;pass<cfg.passes;pass++) {
+            ranges(w,1);
+            if(per_pass) fence();
+        }
+        if(!per_pass) fence();
+        w->finished[r]=now();
         pthread_barrier_wait(&barrier);
         if(w->id==0) elapsed[r]=now()-start_time;
         ranges(w,2);
@@ -349,10 +388,13 @@ static void parse(int argc,char **argv) {
         else if(!strcmp(k,"--unroll")) cfg.unroll=number(v,8);
         else if(!strcmp(k,"--split")) cfg.split=number(v,1);
         else if(!strcmp(k,"--first-touch")) cfg.serial_touch=choice(v,"parallel,serial");
+        else if(!strcmp(k,"--pass-fence")) cfg.pass_fence=choice(v,"each,final");
+        else if(!strcmp(k,"--read-chains")) cfg.read_chains=number(v,4);
         else die("unknown option");
     }
     if(!cfg.lines || !cfg.chunk || !cfg.passes || cfg.repeats<5 || !(cfg.repeats&1)
-       || (cfg.unroll!=1 && cfg.unroll!=2 && cfg.unroll!=4 && cfg.unroll!=8)) die("invalid size/repeats/unroll");
+       || (cfg.unroll!=1 && cfg.unroll!=2 && cfg.unroll!=4 && cfg.unroll!=8)
+       || (cfg.read_chains!=0 && cfg.read_chains!=1 && cfg.read_chains!=4)) die("invalid size/repeats/unroll/chains");
 }
 static int topology(int cpu) {
     char path[160]; int id=-1;
@@ -476,10 +518,25 @@ int main(int argc,char **argv) {
         for(int t=0;t<cfg.threads;t++) if(pthread_join(threads[t],NULL)) die("pthread_join");
         const int streams[]={1,1,2,3,2,4};
         double bytes=(double)cfg.lines*64*cfg.passes*streams[op], rates[101];
-        for(int r=0;r<cfg.repeats;r++) { if(elapsed[r]<=0) die("invalid timer"); rates[r]=bytes/elapsed[r]/1e9; }
+        double seconds[101], skew[101];
+        for(int r=0;r<cfg.repeats;r++) {
+            double first=workers[0].started[r], last_start=first, last=workers[0].finished[r];
+            for(int t=1;t<cfg.threads;t++) {
+                if(workers[t].started[r]<first) first=workers[t].started[r];
+                if(workers[t].started[r]>last_start) last_start=workers[t].started[r];
+                if(workers[t].finished[r]>last) last=workers[t].finished[r];
+            }
+            seconds[r]=last-first; skew[r]=last_start-first;
+            if(seconds[r]<=0 || elapsed[r]<seconds[r]) die("invalid timer");
+            rates[r]=bytes/seconds[r]/1e9;
+        }
         qsort(rates,cfg.repeats,sizeof(double),cmp);
         printf("{\"kind\":\"result\",\"workload\":\"%s\",\"valid\":true,\"samples\":%d,\"threads\":%d,\"allowed_cpus\":%d,\"min_GBs\":%.6f,\"median_GBs\":%.6f,\"max_GBs\":%.6f,\"logical_bytes\":%.0f,\"implementation_streams\":%d,\"cpus\":[",names[op],cfg.repeats,cfg.threads,allowed,rates[0],rates[cfg.repeats/2],rates[cfg.repeats-1],bytes,op==TRIAD&&cfg.split?5:streams[op]);
         for(int t=0;t<cfg.threads;t++) printf("%s%d",t?",":"",cpus[t]);
+        printf("],\"timings\":[");
+        for(int r=0;r<cfg.repeats;r++)
+            printf("%s{\"seconds\":%.12f,\"wall_seconds\":%.12f,\"start_skew_seconds\":%.12f}",
+                   r?",":"",seconds[r],elapsed[r],skew[r]);
         puts("]}"); fflush(stdout);
     }
     pthread_barrier_destroy(&barrier); munmap(mapping,map_bytes);

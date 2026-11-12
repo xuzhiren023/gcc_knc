@@ -3,6 +3,7 @@ import json
 import os
 from pathlib import Path
 import subprocess
+import shlex
 import sys
 import unittest
 
@@ -55,20 +56,40 @@ class MemoryBandwidth(unittest.TestCase):
                       '--pf0', '8', '--pf1', '32', '--prefetch', 'exclusive',
                       '--fence', 'chunk', '--evict', 'both', '--offset-lines', '3',
                       '--padding-lines', '5', '--chunk-lines', '17',
-                      '--schedule', 'cyclic', '--unroll', '4', '--split', '1')
+                      '--schedule', 'cyclic', '--unroll', '4', '--split', '1',
+                      '--read-chains', '4')
         self.run_case('--store', 'nr', '--placement', 'reverse', '--prefetch', 'l2',
                       '--fence', 'line', '--unroll', '8', '--chunk-lines', '31',
-                      '--pass-fence', 'final')
+                      '--pass-fence', 'final', '--read-chains', '1')
 
     def test_invalid_configuration(self):
         for options in [('--repeats', '4'), ('--unroll', '0'), ('--mib', '0'),
                         ('--store', 'bogus'), ('--threads', '99999'),
                         ('--fence', 'none'), ('--offset-lines', '-1'),
-                        ('--pass-fence', 'none')]:
+                        ('--pass-fence', 'none'), ('--read-chains', '2')]:
             result = subprocess.run([str(self.binary), *options],
                                     stdout=subprocess.PIPE, stderr=subprocess.PIPE,
                                     timeout=10)
             self.assertNotEqual(result.returncode, 0, options)
+
+    def test_second_sweep_budget_and_calibration(self):
+        result = subprocess.run(['sh', str(HERE / 'sweep.sh'), 'second-plan'],
+                                check=True, text=True, stdout=subprocess.PIPE)
+        cases = result.stdout.splitlines()
+        self.assertEqual(len(cases), 58)
+        self.assertLess(len(cases) * 90 + 120, 90 * 60)
+        configs = []
+        for i, case in enumerate(cases, 1):
+            words = shlex.split(case)
+            self.assertEqual(words[:2], ['CASE', str(i)])
+            configs.append(dict(zip(words[2::2], words[3::2])))
+        self.assertEqual([c['--workload'] for c in configs[:3]], ['triad'] * 3)
+        for i in range(0, 18, 3):
+            self.assertEqual([(c['--mib'], c['--passes']) for c in configs[i:i+3]],
+                             [('256', '8'), ('2048', '8'), ('2048', '32')])
+        for c in configs[18:]:
+            self.assertEqual((c['--mib'], c['--passes']), ('2048', '32'))
+            self.assertNotEqual(c['--workload'], 'all')
 
 
 if __name__ == '__main__':

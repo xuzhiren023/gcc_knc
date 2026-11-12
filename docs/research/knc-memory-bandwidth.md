@@ -304,3 +304,115 @@ controls, then decide the ECC and counter follow-ups using the measured gap.
 11. [Linux transparent huge-page documentation](https://docs.kernel.org/admin-guide/mm/transhuge.html), introduction and application behavior.
 12. [Intel MPSS User's Guide, April 2017](https://manualzz.com/doc/48993479/intel%C2%AE-manycore-platform-software-stack--intel%C2%AE-mpss-), section 9.3.6, p. 128. Later MPSS edition; local 3.7 behavior comes from CURRENT_STATE, not extrapolation from this guide.
 13. [Intel resource index: PMU 327357-001](https://community.intel.com/t5/Software-Archive/RESOURCES-including-downloads/m-p/816579/thread-id/5984?attachment-id=57653). Attachment unavailable when checked; no unverified raw event numbers used.
+
+## S11-06: first-sweep audit and staged long-sample calibration
+
+Evidence is the lead's 2026-11-12 16:56-17:05Z run, boot da3144f1,
+`.work/_shared/tmp/claude-next22/membw-first.out`: 38 cases, 218 valid class
+records, actual small and huge allocations. The following are completed wall-time
+results from that binary, not new native results or corrected long-run baselines.
+
+| Class | Best case | Min / median / max GB/s | Median sample ms | Interpretation |
+|---|---:|---|---:|---|
+| read | 4 | 73.48 / 107.73 / 115.86 | 19.93 | 60 spread, small pages; a memory-dependent reduction also limits this kernel |
+| write | 33 | 102.92 / 124.83 / 126.30 | 17.20 | Huge/60 with chunk fences; case 10's 8/32 is effectively tied, not evidence that extra fences help |
+| copy | 11 | 117.89 / 137.76 / 143.37 | 31.18 | Huge/60, prefetch 8/64 is a candidate; large within-case variation |
+| triad | 16 | 143.54 / 143.70 / 144.17 | 44.83 | Offset 62 is tied with 8/64 case 11 at 143.5; no established offset gain |
+| RMW | 32 | 127.40 / 151.02 / 155.68 | 28.44 | Both evictions; L2-only 149.3 is tied; base case 6 is 99.3 |
+| stencil | 11 | 246.62 / 265.69 / 280.28 | 32.33 | Logical reuse-inclusive throughput reaches the lower target; channel throughput is unknown |
+
+Durations are inferred from the reported bytes/rate, not separately recorded
+timestamps. At small pages, 60/120/240 spread threads give read
+107.7/70.1/58.5 and triad 138.0/82.2/96.7 GB/s (cases 4/5/3).
+The density effect is substantial but not yet established for long samples.
+Sixty compact or reverse threads occupy only 15 physical cores on the supplied
+CPU numbering, versus 60 cores for spread: this comparison confounds sibling
+density and core count; it is not proof of a ring-direction effect.
+Huge-page triad 135.4 versus small-page 138.0 does not establish a page win.
+Closing case 38 versus identical case 6 changes write 101.7 to 124.2 (+22%),
+read 88.5 to 92.1, triad 135.4 to 137.0 and RMW 99.3 to 103.5.
+Write drift alone prevents accepting its small single-case improvements.
+
+**Timing and instruction evidence.** `worker()` has one fence after each pass
+and no per-pass barrier. Allocation, thread creation, initialization and ordinary
+validation work are outside the intended interval. However, the old start time
+precedes a barrier, and its stop time follows another barrier: faster workers
+can begin validation before worker zero records that stop time. Thus it measures
+more than completed streaming, with a potentially variable final scheduling delay.
+The S11-06 binary reports earliest-start/latest-completed-worker envelope timing
+and preserves the old wall interval and worker start skew for every sample.
+It retains final completion in both fence modes and per-pass completion for RMW
+and split triad, which reuse streamed output. README gives the exact overhead
+ratios and matched-size/pass comparisons; no overhead is guessed or subtracted.
+
+The original `kernel_READ_2_1_0_0` unroll-four bulk back edge was
+0x414dbd -> 0x414ca0, taking 0x414d34 -> 0x414db0. It executes 31 instructions
+per four lines: eight prefetches, four input loads, four integer adds, three
+accumulator stores and twelve scalar/control instructions. One add reloads the
+accumulator from memory each group; all four adds share a dependency chain.
+This is 7.75 instructions per useful 64-byte line plus extra L1 accumulator
+traffic, not a pure demand-load benchmark. New selectable private single/four
+accumulators isolate that cost while retaining the original algorithm as control
+and validating every line with the same modulo-2^32 result. Chunk dispatch and
+all executed instructions remain timed. Counts are not cycle or bandwidth claims.
+The private-four bulk path in the rebuilt binary executes 21 instructions per
+four lines (eight prefetches, four loads, four independent adds, five control),
+with no accumulator memory traffic inside that loop. The generated disassembly
+is staged as `.work/_shared/S11-05/membw-read.dis`; addresses can change on build.
+
+The triad's prior count is 13.25 instructions/line (README), including four
+prefetches and two adds per line. Its completed best is 18.8% below Intel's
+177 GB/s ECC-on comparator [5]; neither this gap nor the read reduction proves a
+hardware bandwidth ceiling. The earlier write comparison must use C1's **204.5**
+slowest-worker completed rate, not its 226.1 median-worker aggregate. The present
+124.8 is 39.0% below that completed comparator; their workloads/timing differ.
+
+**What is answered, and what needs the card.** The audit establishes the timed
+boundaries, absence of per-pass barriers, short sample durations, and read-loop
+overhead. It cannot establish the numerical timing penalty or which density,
+page, prefetch and eviction observations survive longer native runs. The corrected
+baseline is **pending**; no host result supplies it. Sweep 2 begins with triad
+256 MiB x 8, 2048 MiB x 8, then 2048 MiB x 32, all 60 spread/huge/NGO/8/64.
+The last should last about 1.18 seconds at 175 GB/s. If it remains below 175,
+report that gap first, together with wall/envelope timing, skew, pages and drift.
+Repeat the same size/pass calibration separately for the other five classes.
+
+`sweep.sh second` stages 58 single-class cases, 87 minutes of summed 90-second
+process bounds plus two minutes reserve, with an 89-minute outer timeout. It then
+pairs 60/120 density with 8/64 and 32/128 prefetch, tests completed final-only
+fences, private read reductions, 240-thread writes, store alternatives, and class
+combinations of eviction/chunking/splitting/offset/unroll. Closing references use
+new mappings for every class. Exact lead commands and numbered cases are in
+`tests/bench/membw/README.md`; `second-plan` prints all commands without execution.
+
+| Class | Short-run anchor GB/s | Provisional software scenario GB/s | Target GB/s | Gain to lower target from anchor | Long baseline / winner |
+|---|---:|---:|---:|---:|---|
+| read | 107.73 | 107.7-140.0 | 264-299.2 | 145.1% | pending / pending |
+| write | 124.83 | 124.8-162.3 | 264-299.2 | 111.5% | pending / pending |
+| copy | 137.76 | 137.8-179.1 | 264-299.2 | 91.6% | pending / pending |
+| triad | 143.70 | 143.7-186.8; calibration must reach 175+ | 264-299.2 | 83.7% | pending / pending |
+| RMW | 151.02 | 151.0-196.3 | 264-299.2 | 74.8% | pending / pending |
+| stencil | 265.69 logical | 265.7-345.4 logical | 264-299.2 logical; channels separate | lower logical target reached | pending / pending |
+
+These scenarios reuse the earlier explicitly conditional 1.3x prefetch opportunity
+from [8], not a measured gain or an upper bound. Replace them with long baseline
+and winner results; timing correction may change the anchor itself. No software
+lever is yet shown to reach the physical target, and no measured hardware limit
+has been isolated for any class. Current limits are the above short completed
+kernel rates under those specific settings. The staged duration/fence/read-chain
+experiments test benchmark limits; density/prefetch tests test latency hiding;
+store/eviction/chunk tests test mixed-traffic costs. If those plateau, the next
+discriminating evidence is channel traffic using the verified PMU route described
+above, or an owner-approved ECC on/off/on comparison [5]. Do not prescribe ECC-off
+as sufficient: even transferring 192/177 to today's best triad gives only 155.9
+GB/s. Neither ECC, clocks, MPSS nor system configuration was changed here.
+
+Host validation passed all three tests (kernel/control correctness, invalid
+options, and second-sweep expansion/budget). The expected initial failure was
+missing timing diagnostics, committed as b57eca55. Final host and native
+GCC-KNC prefix build/instruction-lint logs are
+`.work/_state/logs/S11_06_host-20261112-121926.log` and
+`.work/_state/logs/S11_06_k1om-20261112-121926.log`.
+The rebuilt binary and runner are staged in `.work/_shared/S11-05/`.
+Native correctness/performance and the corrected baseline await the lead; no
+card job, GCC rebuild or x86 batch check was run by this engineer.
