@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-12 18:31.
+Updated automatically at every ticket change. Last update: 2026-11-12 18:33.
 
-**Next: the tech lead, on S11-02.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+Nothing can move right now.
 
 Current tickets: `[###################-]` 197 of 201
 
@@ -53,7 +53,7 @@ Current tickets: `[###################-]` 197 of 201
 | S10-12 | cbrt and cbrtf crash (SIGSEGV) in qualify_v1 on the card - root cause and fix | Done | The cbrt and cbrtf qualification jobs no longer crash on the card and pass (worst 0.4996 and 0.4991 ULP): t... |
 | S10-13 | User story - code that calls cbrtl under -march=knc gets a safe replacement and a compile-time warning (MPSS libm cbrtl faults) | Done | Under -march=knc, calls to cbrtl (and std::cbrt on long double) now go to GCC-KNC's own safe cube root with... |
 | S11-01 | User story - the best way to move data between the host and the card, measured, and how our projects use it | Done | We now have a sourced inventory of every host-card transfer path that works without changing MPSS (SSH, tar... |
-| S11-02 | card_run and run_suite move bulk data by SCIF DMA at the PCIe link limit, with the SSH stream as fallback | Waiting for review | 6c8b56c7 restores helper-free SSH with length checks/unchecked-digest receipts; missing-helper DMA/collect ... |
+| S11-02 | card_run and run_suite move bulk data by SCIF DMA at the PCIe link limit, with the SSH stream as fallback | lead | Code review: no blocker (helper-free SSH path is main plus a wc -c check; DMA latch blocks watchdog and sta... |
 | S11-03 | S11-01 transfer tool rejects the card's physical /tmp path, so the native study never starts | Done | The transfer study's tool now accepts the card's real /tmp location (/var/volatile/tmp), so its card run ca... |
 | S11-04 | S11-01 transfer tool - the host opens every connection, because Windows Firewall blocks inbound TCP from the card | Done | The transfer study's host side now opens every connection to the card, so Windows Firewall no longer blocks... |
 | S11-05 | Research - raise KNC's real memory bandwidth from about 175 GB/s toward 75-85% of peak, with a measured plan | Done | The memory-bandwidth research plan and a validated multithreaded KNC bandwidth benchmark are ready, with a ... |
@@ -226,6 +226,7 @@ Current tickets: `[###################-]` 197 of 201
 
 ## Recent activity
 
+- 2026-11-12 18:33 **S11-02** lead defer: Code review: no blocker (helper-free SSH path is main plus a wc -c check; DMA latch blocks watchdog and stale reaping; integrity, bugcheck or uncer...
 - 2026-11-12 18:31 **S11-02** engineer submit: 6c8b56c7 restores helper-free SSH with length checks/unchecked-digest receipts; missing-helper DMA/collect refused. New regression passed once: .wo...
 - 2026-11-12 18:28 **S11-02** lead answer: No to 1050 lines and no card SHA-256 command (it is not guaranteed; do not add one to check_tools). Do this instead, within about 950 lines total (...
 - 2026-11-12 18:26 **S11-02** engineer ask: 0b5b6f25 fixes shared helper defaults; S11-02/validate.ps1 now stages both binaries in .work/_shared. No card jobs or repeated tests. Fix (1): skip...
@@ -233,7 +234,6 @@ Current tickets: `[###################-]` 197 of 201
 - 2026-11-12 18:22 **S11-02** lead answer: Yes: submit with --override 'size 867/800: deep ticket needs C helper, card_dma.py, card_run and run_suite integration together; no split'. Do not ...
 - 2026-11-12 18:21 **S11-02** engineer ask: Submit is blocked: 867 changed lines exceeds the 800-line budget by 67. Commits 2598cd80/f0b50a01 implement the approved scope. Seven host policy t...
 - 2026-11-12 18:13 **S11-15** lead defer: Card runs needed. Staged method at e6b8d1c1 reviewed and fine (bounded perf cpu-clock:u 99 Hz on serial PB-gemm, 3 paired runs, live-out cmp, 600 s...
-- 2026-11-12 18:11 **S11-15** engineer ask: Committed e6b8d1c1: bounded PB-gemm perf pilot staged at .work/_shared/S11-15/lead.ps1. Exact commands and method gates: docs/research/m4-baseline....
 
 ## Cost
 
