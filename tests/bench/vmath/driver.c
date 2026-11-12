@@ -198,6 +198,16 @@ command (int k, int b, int n, long reps, int fill_only)
 static void
 read_topology (void)
 {
+#ifdef S10_10_HOST_TEST
+  for (int c = 0; c < cores; ++c)
+    for (int t = 0; t < density; ++t)
+      {
+        int w = c * density + t;
+        cpus[w] = sched_getcpu ();
+        siblings[w] = t;
+        printf ("placement worker=%d core=%d cpu=%d\n", w, c, cpus[w]);
+      }
+#else
   static int sibling[61][4], count[61];
   FILE *f = fopen ("/proc/cpuinfo", "r");
   char line[512];
@@ -222,6 +232,7 @@ read_topology (void)
           printf ("placement worker=%d core=%d cpu=%d\n", c * density + t, c, sibling[c][t]);
         }
     }
+#endif
 }
 
 static void
@@ -322,17 +333,34 @@ median (double *v, int count)
 static long
 size_batch (int k, int b, int n)
 {
+  /* Calibrate with a fixed small number of calls so a slow build does not need
+     multiple long probes. Scale from the observed per-call time, then measure
+     again until the requested interval is reached. */
   long reps = 1;
-  for (int tries = 0; tries < 8; tries++)
+  double t = command (k, b, n, reps, 0);
+  long calibration_reps = 1;
+  if (t < 0.05 || t > 0.2)
     {
-      double t = command (k, b, n, reps, 0);
-      if (t >= 0.05 && t <= 0.2)
-        break;
       double scale = 0.1 / (t > 1e-6 ? t : 1e-6);
-      reps = (long) (reps * scale + 0.5);
+      calibration_reps = (long) (scale + 0.5);
+      reps = calibration_reps;
       if (reps < 1)
         reps = 1;
     }
+  for (int tries = 0; tries < 8; tries++)
+    {
+      t = command (k, b, n, reps, 0);
+      if (t >= 0.05 && t <= 0.2)
+        return reps;
+      double scale = 0.1 / (t > 1e-6 ? t : 1e-6);
+      calibration_reps = (long) (reps * scale + 0.5);
+      reps = calibration_reps;
+      if (reps < 1)
+        reps = 1;
+    }
+  t = command (k, b, n, reps, 0);
+  if (t < 0.05 || t > 0.2)
+    die ("batch calibration did not reach 50-200 ms");
   return reps;
 }
 
