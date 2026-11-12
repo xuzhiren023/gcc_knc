@@ -351,10 +351,15 @@ static void *burn(void *arg)
 static int lease(const char *address,unsigned port,const char *nonce)
 {
   cpu_set_t set;pthread_t threads[CPU_SETSIZE];unsigned n=0;int cpu;
-  char cpus[4096]="",cwd[4096],line[9000];size_t used=0;
+  char cpus[4096]="",cwd[4096],root[4096],line[9000];size_t used=0;
   if(sched_getaffinity(0,sizeof(set),&set)||!getcwd(cwd,sizeof(cwd)))die("lease affinity/cwd");
-  /* The current guarded card_run directory has a simple ASCII name. */
-  if(strncmp(cwd,"/tmp/claude/claude-",19)||strchr(cwd,'"'))die("not a card_run directory");
+  if(!realpath("/tmp",root))die("realpath /tmp");
+  size_t root_len=strlen(root);
+  const char *suffix=cwd+root_len;
+  if(strncmp(cwd,root,root_len)||strncmp(suffix,"/claude/claude-",15)
+     ||strlen(suffix+15)!=32)die("not a card_run directory");
+  for(const char *p=suffix+15;*p;p++)
+    if(!((*p>='0'&&*p<='9')||(*p>='a'&&*p<='f')))die("not a card_run directory");
   for(cpu=0;cpu<CPU_SETSIZE;cpu++)if(CPU_ISSET(cpu,&set)) {
     used+=(size_t)snprintf(cpus+used,sizeof(cpus)-used,"%s%d",n?",":"",cpu);
     if(pthread_create(&threads[n++],NULL,burn,(void*)(intptr_t)cpu))die("busy worker");
