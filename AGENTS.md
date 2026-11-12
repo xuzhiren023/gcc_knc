@@ -55,6 +55,10 @@ Then stop. Your final message is only the `PM update:` line that command prints:
   shared tree while a `make` is building in `.work/_shared/gcc-build`. A `make` in another tree
   (the x86 check's trees under `.work/_shared/portability*`, or the other project's builds) does
   not block it. Check with the Cygwin toolchain's `ps -l` and each process's working directory.
+- Codex engineers do not build GCC (owner 2026-11-12: the sandbox cannot overwrite outputs in
+  `.work/_shared/gcc-build*`). Commit the GCC change, then `pm.py ask` with "GCC build needed at
+  <commit>"; the lead builds and answers, and you continue with tests and staging. Claude engineers
+  build as below.
 - Build the shared tree through `python tools/run.py --name <name> -- python tools/gcc_build.py
   --if-stale`, never with a bare `make` there. It skips the build when the tree is clean and
   already built, and its stamp is only right if every full build goes through it (S3-24).
