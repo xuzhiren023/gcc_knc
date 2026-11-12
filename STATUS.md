@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-12 16:39.
+Updated automatically at every ticket change. Last update: 2026-11-12 16:40.
 
 **Waiting for you:** S11-02. Run `python tools/pm.py inbox`.
 
@@ -67,7 +67,7 @@ Current tickets: `[###################-]` 192 of 200
 | S11-13 | Senior compiler review of the Sprint 11-13 scope (Milestone M4) against our research, with recommended plan changes | Done | A senior compiler review of the Sprint 11-13 plan is in: M4 is plausible but needs a frozen scoring and mea... |
 | S11-14 | M4 scoring contract and measurement protocol, frozen before any tuning | In progress |  |
 | S11-15 | First development-corpus baseline and profile, GCC 5.1.1 vs GCC-KNC at -O2 (E7-03 part 1) | draft |  |
-| S11-16 | Long-double libm hazard audit - do other MPSS long double entry points fault like cbrtl? (E7-21, bounded) | Question for the tech lead | b7338e18: probe built with GCC-KNC prefix, lint PASS; host enumeration/isolation/format PASS after red comm... |
+| S11-16 | Long-double libm hazard audit - do other MPSS long double entry points fault like cbrtl? (E7-21, bounded) | lead | Needs a card run by the interactive lead (card turn per shared-card rules): python tools/card_run --threads... |
 | S11-17 | PGO feasibility on one complete development program (reuse of S9-18's train/use path) | draft |  |
 | S11-18 | M4 corpus harness v2 - card profiles, prefix record, held-out sealing, stronger checks, and the donor-failure rule | Not started |  |
 | S2-01 | Design for zmm and mask registers under -march=knc | Done | The register design for KNC is settled on paper: all 32 zmm and 8 mask registers become usable under -march... |
@@ -225,6 +225,7 @@ Current tickets: `[###################-]` 192 of 200
 
 ## Recent activity
 
+- 2026-11-12 16:40 **S11-16** lead defer: Needs a card run by the interactive lead (card turn per shared-card rules): python tools/card_run --threads 240 --timeout 1800 .work/_shared/S11-16...
 - 2026-11-12 16:40 **S11-11** lead note: Re-specified after the senior scope review (docs/reviews/2026-11-12-s11-s13-scope-review.md) and the owner's decisions (docs/sprints/SPRINT-11.md g...
 - 2026-11-12 16:39 **S11-16** engineer ask: b7338e18: probe built with GCC-KNC prefix, lint PASS; host enumeration/isolation/format PASS after red commit c2d26ca0. Logs: .work/_state/logs/s11...
 - 2026-11-12 16:37 **S11-11** lead approve: The M4 corpus harness builds 17 programs with GCC 5.1.1 and GCC-KNC and stages checked card runs; GCC-KNC builds 16 of 17 (HPCG fails on an OpenMP ...
@@ -232,13 +233,12 @@ Current tickets: `[###################-]` 192 of 200
 - 2026-11-12 16:24 **S11-11** lead answer: Size approved: 1200 lines is fair for five suites, C drivers and README, and both approve-red points (checksum mismatch -> fail, 1-per-core from ca...
 - 2026-11-12 16:22 **S11-11** engineer ask: Submit refused: 1200 changed lines exceed the 800-line budget. Please approve this size or split scope; I did not use an unapproved override. Commi...
 - 2026-11-12 16:21 **S11-13** lead approve: A senior compiler review of the Sprint 11-13 plan is in: M4 is plausible but needs a frozen scoring and measurement contract first, profiling moved...
-- 2026-11-12 16:12 **S11-13** engineer submit: Submitted by the lead for the engineer (pm.py commit hung): review at docs/reviews/2026-11-12-s11-s13-scope-review.md, five questions, 17 program e...
 
 ## Cost
 
 - From the script, engineer: 465 sessions, 996.1M input tokens
 - From the script, lead: 296 sessions, 85.0M input tokens
-- Started by hand, Claude: 12 sessions, 2681.9M input tokens
+- Started by hand, Claude: 12 sessions, 2682.6M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
