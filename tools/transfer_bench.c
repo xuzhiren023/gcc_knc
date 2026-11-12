@@ -163,7 +163,8 @@ static void connect_transport(const char *method,const char *address,unsigned po
       if(sc.nodes(nodes,32,&self)<0)die("node enumeration");
       fprintf(stderr,"{\"ready\":true,\"port\":%d,\"node\":%u}\n",bound,self);fflush(stderr);
       if(sc.accept(ep,&peer,&accepted,1))die("scif accept");
-      sc.close(ep);ep=accepted;
+      if(sc.close(ep))die("listener close; cleanup uncertain");
+      ep=accepted;
       fprintf(stderr,"SCIF peer node=%u port=%u\n",peer.node,peer.port);
     } else {
       node_port target={(uint16_t)number(address,65535),(uint16_t)port};
