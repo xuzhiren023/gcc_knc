@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-12 18:35.
+Updated automatically at every ticket change. Last update: 2026-11-12 18:47.
 
-**Next: GPT-6.1, on S11-20 (Research - which compiler optimizations benefit the widest range of real code on KNC, from professional to amateur, and does our corpus cover it?).** Run `python tools/dispatch.py`, or ask the tech lead to.
+**Next: the tech lead, on S11-20.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[###################-]` 197 of 202
 
@@ -71,7 +71,7 @@ Current tickets: `[###################-]` 197 of 202
 | S11-17 | PGO feasibility on one complete development program (reuse of S9-18's train/use path) | lead | Needs the interactive lead's card run: from the S11-17 worktree at 1d096574, run python tools/run.py --name... |
 | S11-18 | M4 corpus harness v2 - card profiles, prefix record, held-out sealing, stronger checks, and the donor-failure rule | Done | The M4 corpus harness now stages all 17 programs for the 7120 and the 3100/5100 profiles with serial voting... |
 | S11-19 | Second senior review - the M4 definition and the Sprint 11-13 roadmap, adjusted | Done | The M4 definition and the Sprint 11-13 roadmap are rewritten as measure, improve, decide, each sprint with ... |
-| S11-20 | Research - which compiler optimizations benefit the widest range of real code on KNC, from professional to amateur, and does our corpus cover it? | In progress |  |
+| S11-20 | Research - which compiler optimizations benefit the widest range of real code on KNC, from professional to amateur, and does our corpus cover it? | Waiting for review | Delivered docs/research/code-style-coverage.md (296 lines): four questions, primary sources, licences/versi... |
 | S2-01 | Design for zmm and mask registers under -march=knc | Done | The register design for KNC is settled on paper: all 32 zmm and 8 mask registers become usable under -march... |
 | S2-02 | Float and double arguments and results in zmm lane 0 | Done | Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`). |
 | S2-03 | Varargs with the donor's register save area | Done | Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`). |
@@ -227,6 +227,7 @@ Current tickets: `[###################-]` 197 of 202
 
 ## Recent activity
 
+- 2026-11-12 18:47 **S11-20** engineer submit: Delivered docs/research/code-style-coverage.md (296 lines): four questions, primary sources, licences/versions, breadth-first rubric and provisiona...
 - 2026-11-12 18:33 **S11-02** lead defer: Code review: no blocker (helper-free SSH path is main plus a wc -c check; DMA latch blocks watchdog and stale reaping; integrity, bugcheck or uncer...
 - 2026-11-12 18:31 **S11-02** engineer submit: 6c8b56c7 restores helper-free SSH with length checks/unchecked-digest receipts; missing-helper DMA/collect refused. New regression passed once: .wo...
 - 2026-11-12 18:28 **S11-02** lead answer: No to 1050 lines and no card SHA-256 command (it is not guaranteed; do not add one to check_tools). Do this instead, within about 950 lines total (...
@@ -234,7 +235,6 @@ Current tickets: `[###################-]` 197 of 202
 - 2026-11-12 18:25 **S11-02** lead amend: Owner 2026-11-12: the card check no longer includes SSH timing runs. Acceptance item 2 now asks only that DMA works near the link limit (at least 1...
 - 2026-11-12 18:22 **S11-02** lead answer: Yes: submit with --override 'size 867/800: deep ticket needs C helper, card_dma.py, card_run and run_suite integration together; no split'. Do not ...
 - 2026-11-12 18:21 **S11-02** engineer ask: Submit is blocked: 867 changed lines exceeds the 800-line budget by 67. Commits 2598cd80/f0b50a01 implement the approved scope. Seven host policy t...
-- 2026-11-12 18:13 **S11-15** lead defer: Card runs needed. Staged method at e6b8d1c1 reviewed and fine (bounded perf cpu-clock:u 99 Hz on serial PB-gemm, 3 paired runs, live-out cmp, 600 s...
 
 ## Cost
 
@@ -246,4 +246,4 @@ Current tickets: `[###################-]` 197 of 202
 
 ## Disk
 
-The project uses 25.2 GiB of 100 GiB. 76 GiB free on the drive.
+The project uses 25.2 GiB of 100 GiB. 75 GiB free on the drive.
