@@ -51,7 +51,7 @@ Current tickets: `[###################-]` 182 of 185
 | S10-10 | Card harness fixes from the Sprint 10 card turn - card_qualify binary folder, vmath bench batch sizing | Done | card_qualify now runs the card binaries from knc/ and stops before any card job when one is missing, and th... |
 | S10-11 | Card-only vector math failures - double sin, cos, tan, atan2 above 1 ULP, and cbrt/cbrtf crash (SIGSEGV) | Done | Double sin, cos, tan and atan2 from the KNC vector math library are now within 1 ULP on the card (0.76 to 0... |
 | S10-12 | cbrt and cbrtf crash (SIGSEGV) in qualify_v1 on the card - root cause and fix | Done | The cbrt and cbrtf qualification jobs no longer crash on the card and pass (worst 0.4996 and 0.4991 ULP): t... |
-| S10-13 | User story - code that calls cbrtl under -march=knc gets a safe replacement and a compile-time warning (MPSS libm cbrtl faults) | Question for the tech lead | Lead built tree 1 at 157940608ed (log S10_13_lead_build-20261112-093315.log, exit 0). |
+| S10-13 | User story - code that calls cbrtl under -march=knc gets a safe replacement and a compile-time warning (MPSS libm cbrtl faults) | In progress | Tree 1 is built at GCC 157940608ed by the lead (gcc_build.py exit 0; log S10_13_lead_build-20261112-093315.... |
 | S11-01 | User story - the best way to move data between the host and the card, measured, and how our projects use it | Done | We now have a sourced inventory of every host-card transfer path that works without changing MPSS (SSH, tar... |
 | S11-02 | card_run and run_suite move data by S11-01's recommended method, with fallback | **Waiting for you** | Started by mistake: the ticket was 'ready' as a placeholder and became startable when S11-01 closed. The en... |
 | S11-03 | S11-01 transfer tool rejects the card's physical /tmp path, so the native study never starts | lead | Engineer finished uncommitted in .work/S11-03: host regex accepts /tmp and /var/volatile/tmp roots, lease()... |
@@ -210,6 +210,7 @@ Current tickets: `[###################-]` 182 of 185
 
 ## Recent activity
 
+- 2026-11-12 10:30 **S10-13** lead answer: Tree 1 is built at GCC 157940608ed by the lead (gcc_build.py exit 0; log S10_13_lead_build-20261112-093315.log). Do not build (AGENTS.md, owner 202...
 - 2026-11-12 10:30 **S10-13** lead resume: Lead built tree 1 at 157940608ed (log S10_13_lead_build-20261112-093315.log, exit 0).
 - 2026-11-12 10:29 **S11-03** lead defer: Engineer finished uncommitted in .work/S11-03: host regex accepts /tmp and /var/volatile/tmp roots, lease() uses realpath(/tmp) + exact 32-hex tail...
 - 2026-11-12 09:50 **S11-03** engineer ask: Host suite PASS: .work/_state/logs/S11_03_host-20261112-094922.log. Card lease fix uses realpath(/tmp), exact /claude/claude-<32 lowercase hex> val...
@@ -217,7 +218,6 @@ Current tickets: `[###################-]` 182 of 185
 - 2026-11-12 09:45 **S11-03** engineer escalate: budget: 3 engineer sessions used; the budget is 3
 - 2026-11-12 09:45 **S10-13** lead note: Interactive lead is building tree 1 at GCC 157940608ed (python tools/gcc_build.py, log S10_13_lead_build-*). Cause of the EACCES: earlier interacti...
 - 2026-11-12 09:43 **S11-03** lead answer: The card fix is not made yet: transfer_bench.c line 357 still checks strncmp(cwd,"/tmp/claude/claude-",19), so the helper you restaged will fail ex...
-- 2026-11-12 09:41 **S11-03** engineer ask: Host lease shape test passes (log .work/_state/logs/S11_03_host_red-20261112-094048.log). Card fix requires realpath /tmp plus exact cwd suffix val...
 
 ## Cost
 
