@@ -695,3 +695,19 @@ claim that the target cannot be reached.
   extra transfer. Reuse a persistent worker team, partition whole rows, tune
   vector windows, then measure whole-token latency including non-GEMV work.
   Actual model accuracy and latency must be checked before choosing a format.
+
+### Staging evidence and remaining measurement
+
+Implementation commit `b0dd4243` follows failing contract commit `737e8ed5`.
+All six host tests pass, including nine GEMV format/control combinations and
+the 55-case calibration/budget contract. The host runner now names Cygwin's
+`.exe` explicitly: an older extensionless executable had shadowed the new
+binary during the first implementation test. The corrected final test log is
+`.work/_state/logs/S11_09_host_final-20261112-142447.log`.
+
+The existing GCC-KNC prefix rebuilt the benchmark, lint passed, and the binary
+and sweep were restaged at `.work/_shared/S11-05/{membw.mic,sweep.sh}`. Log:
+`.work/_state/logs/S11_09_k1om_final-20261112-142447.log`. GCC itself was not
+built. No engineer card job or x86 check ran. Native output validation, best
+per-format rates and measured bottleneck conclusions remain pending the lead's
+`sweep.sh gemv` run; the table above deliberately retains pending entries.
