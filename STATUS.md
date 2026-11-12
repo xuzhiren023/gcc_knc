@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-12 08:25.
+Updated automatically at every ticket change. Last update: 2026-11-12 08:26.
 
-Nothing can move right now.
+**Next: the tech lead, on S11-01.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[###################-]` 180 of 184
 
@@ -52,7 +52,7 @@ Current tickets: `[###################-]` 180 of 184
 | S10-11 | Card-only vector math failures - double sin, cos, tan, atan2 above 1 ULP, and cbrt/cbrtf crash (SIGSEGV) | Done | Double sin, cos, tan and atan2 from the KNC vector math library are now within 1 ULP on the card (0.76 to 0... |
 | S10-12 | cbrt and cbrtf crash (SIGSEGV) in qualify_v1 on the card - root cause and fix | lead | Waits for the lead's card run of cbrt/cbrtf compare in WRF's slot (~09:15 EST). |
 | S10-13 | User story - code that calls cbrtl under -march=knc gets a safe replacement and a compile-time warning (MPSS libm cbrtl faults) | lead | Waits for S10-12's approval; then the lead moves it to lane gcc (tree 1) to build. |
-| S11-01 | User story - the best way to move data between the host and the card, measured, and how our projects use it | lead | Interactive lead: the engineer's sandbox cannot write .git/worktrees/S11-01, so rebase s11/S11-01 (81ceac2a... |
+| S11-01 | User story - the best way to move data between the host and the card, measured, and how our projects use it | Question for the tech lead | Lead rebased s11/S11-01 onto main (81ceac2a red, 95625ad5 green over 48c83946); submits for the engineer. |
 | S11-02 | card_run and run_suite move data by S11-01's recommended method, with fallback | Not started | ready; waits on its dep S11-01, the lead writes acceptance before it starts |
 | S2-01 | Design for zmm and mask registers under -march=knc | Done | The register design for KNC is settled on paper: all 32 zmm and 8 mask registers become usable under -march... |
 | S2-02 | Float and double arguments and results in zmm lane 0 | Done | Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`). |
@@ -210,19 +210,19 @@ Current tickets: `[###################-]` 180 of 184
 ## Recent activity
 
 - 2026-11-12 08:35 **S10-13** lead note: Interactive lead: tree 2's build folder .work/_shared/gcc-build-2 was created outside the Codex sandbox (owner xuzhi, Cygwin deny entries for other...
+- 2026-11-12 08:26 **S11-01** lead resume: Lead rebased s11/S11-01 onto main (81ceac2a red, 95625ad5 green over 48c83946); submits for the engineer.
 - 2026-11-12 08:25 **S11-01** lead defer: Interactive lead: the engineer's sandbox cannot write .git/worktrees/S11-01, so rebase s11/S11-01 (81ceac2a red, 95625ad5 green, base 40f1ab64) ont...
 - 2026-11-12 08:25 **S11-01** lead note: Interactive lead: (1) payload SHA-256 is part of the deliverable, so the ticket now carries hash_ok for the transfer tool, bench, SHA-256 header, c...
 - 2026-11-12 08:23 **S11-01** engineer ask: Required git rebase main is blocked: could not create temporary C:/Users/xuzhi/Documents/gcc_knc/.git/worktrees/S11-01/rebase-merge: Permission den...
 - 2026-11-12 08:21 **S11-01** lead answer: Your branch forks from main before 48c83946, so the worktree's tools/pm.py has no hash_ok support; the ticket field is right. Rebase s11/S11-01 ont...
 - 2026-11-12 08:20 **S11-01** engineer ask: Unchanged submit with --override 'lead approved size: research doc plus the measurement tool the ticket asks for' still fails: hashing added in tes...
 - 2026-11-12 08:18 **S11-01** lead answer: Per the lead's 08:25 note: hash_ok now covers the transfer files, and the size is approved. Resubmit with --override 'lead approved size: research ...
-- 2026-11-12 08:18 **S10-13** lead defer: Waits for S10-12's approval; then the lead moves it to lane gcc (tree 1) to build.
 
 ## Cost
 
 - From the script, engineer: 434 sessions, 950.9M input tokens
 - From the script, lead: 274 sessions, 80.4M input tokens
-- Started by hand, Claude: 11 sessions, 2487.4M input tokens
+- Started by hand, Claude: 11 sessions, 2488.0M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
