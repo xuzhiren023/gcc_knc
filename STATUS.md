@@ -1,10 +1,10 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-12 15:24.
+Updated automatically at every ticket change. Last update: 2026-11-12 15:29.
 
 **Waiting for you:** S11-02. Run `python tools/pm.py inbox`.
 
-Current tickets: `[###################-]` 189 of 192
+Current tickets: `[###################-]` 189 of 193
 
 ## Milestones
 
@@ -14,7 +14,7 @@ Current tickets: `[###################-]` 189 of 192
 | M1 | Mixed native code | Done | 43 of 43 tickets |
 | M2 | Useful vector target | Done | 51 of 51 tickets |
 | M3 | Runtimes | Done | 48 of 48 tickets |
-| M4 | Broad optimization | In progress | 7 of 10 tickets |
+| M4 | Broad optimization | In progress | 7 of 11 tickets |
 | M5 | Program corpus | Not started | Not planned in detail yet |
 | M6 | Release | Not started | Not planned in detail yet |
 
@@ -62,6 +62,7 @@ Current tickets: `[###################-]` 189 of 192
 | S11-08 | -Wknc-unsafe-cbrtl cannot be used in #pragma GCC diagnostic ("valid for  but not for C") | Done | The cbrtl warning can now be silenced around one deliberate call with #pragma GCC diagnostic in C and C++; ... |
 | S11-09 | Memory bandwidth for LLM decode - a weight-streaming GEMV workload, pushed toward 264-299 GB/s of weight bytes | lead | Needs interactive lead: card run in our exclusive turn. Reviewed 33de9541: IMCI sint8/float16 load conversi... |
 | S11-10 | S11-01 transfer runner - choose repetitions, sizes and load states per run, so slow methods fit a card turn | In progress | Owner standing rule (feedback 2026-11-09/10: the lead raises budgets itself): input budget raised to 6M, fi... |
+| S11-11 | M4 corpus run harness - every corpus program built by GCC 5.1.1 and GCC-KNC, run on the card with frozen inputs and a correctness check, in one command | In progress |  |
 | S2-01 | Design for zmm and mask registers under -march=knc | Done | The register design for KNC is settled on paper: all 32 zmm and 8 mask registers become usable under -march... |
 | S2-02 | Float and double arguments and results in zmm lane 0 | Done | Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`). |
 | S2-03 | Varargs with the donor's register save area | Done | Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`). |
@@ -230,7 +231,7 @@ Current tickets: `[###################-]` 189 of 192
 
 - From the script, engineer: 456 sessions, 978.6M input tokens
 - From the script, lead: 290 sessions, 83.7M input tokens
-- Started by hand, Claude: 11 sessions, 2632.9M input tokens
+- Started by hand, Claude: 11 sessions, 2639.7M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
