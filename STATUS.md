@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-12 16:21.
+Updated automatically at every ticket change. Last update: 2026-11-12 16:22.
 
 **Waiting for you:** S11-02. Run `python tools/pm.py inbox`.
 
@@ -62,7 +62,7 @@ Current tickets: `[###################-]` 191 of 194
 | S11-08 | -Wknc-unsafe-cbrtl cannot be used in #pragma GCC diagnostic ("valid for  but not for C") | Done | The cbrtl warning can now be silenced around one deliberate call with #pragma GCC diagnostic in C and C++; ... |
 | S11-09 | Memory bandwidth for LLM decode - a weight-streaming GEMV workload, pushed toward 264-299 GB/s of weight bytes | lead | Needs interactive lead: card run in our exclusive turn. Reviewed 33de9541: IMCI sint8/float16 load conversi... |
 | S11-10 | S11-01 transfer runner - choose repetitions, sizes and load states per run, so slow methods fit a card turn | Done | The transfer runner now takes --repeats, --sizes, --loads and --concurrency so a slow method fits a card tu... |
-| S11-11 | M4 corpus run harness - every corpus program built by GCC 5.1.1 and GCC-KNC, run on the card with frozen inputs and a correctness check, in one command | In progress | The corpus harness now has a failing host contract that pins the S0-07 program set (held-out adi, durbin an... |
+| S11-11 | M4 corpus run harness - every corpus program built by GCC 5.1.1 and GCC-KNC, run on the card with frozen inputs and a correctness check, in one command | Question for the tech lead | Submit refused: 1200 changed lines exceed the 800-line budget. Please approve this size or split scope; I d... |
 | S11-13 | Senior compiler review of the Sprint 11-13 scope (Milestone M4) against our research, with recommended plan changes | Done | A senior compiler review of the Sprint 11-13 plan is in: M4 is plausible but needs a frozen scoring and mea... |
 | S2-01 | Design for zmm and mask registers under -march=knc | Done | The register design for KNC is settled on paper: all 32 zmm and 8 mask registers become usable under -march... |
 | S2-02 | Float and double arguments and results in zmm lane 0 | Done | Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`). |
@@ -219,6 +219,7 @@ Current tickets: `[###################-]` 191 of 194
 
 ## Recent activity
 
+- 2026-11-12 16:22 **S11-11** engineer ask: Submit refused: 1200 changed lines exceed the 800-line budget. Please approve this size or split scope; I did not use an unapproved override. Commi...
 - 2026-11-12 16:21 **S11-13** lead approve: A senior compiler review of the Sprint 11-13 plan is in: M4 is plausible but needs a frozen scoring and measurement contract first, profiling moved...
 - 2026-11-12 16:12 **S11-13** engineer submit: Submitted by the lead for the engineer (pm.py commit hung): review at docs/reviews/2026-11-12-s11-s13-scope-review.md, five questions, 17 program e...
 - 2026-11-12 16:12 **S11-13** lead answer: Committed by the lead; the lead submits for the engineer.
@@ -226,13 +227,12 @@ Current tickets: `[###################-]` 191 of 194
 - 2026-11-12 16:11 **S11-10** lead approve: The transfer runner now takes --repeats, --sizes, --loads and --concurrency so a slow method fits a card turn, keeps card-control.log open until ca...
 - 2026-11-12 16:00 **S11-10** engineer submit: Test passed: tools/run.py s11_10_review_fixes; log C:\Users\xuzhi\Documents\gcc_knc\.work\_state\logs\s11_10_review_fixes-20261112-155732.log. No c...
 - 2026-11-12 15:59 **S11-10** lead answer: Yes: commit (pm.py commit) and submit source and tests only, without the exe. transfer_bench.c changed, so the staged transfer-host.exe is now stal...
-- 2026-11-12 15:58 **S11-10** engineer ask: Review fixes applied and tests pass. S11-01 transfer-host.exe is still locked; restage failed with Device/resource busy and PermissionError. The ti...
 
 ## Cost
 
 - From the script, engineer: 462 sessions, 987.8M input tokens
 - From the script, lead: 295 sessions, 84.8M input tokens
-- Started by hand, Claude: 12 sessions, 2668.8M input tokens
+- Started by hand, Claude: 12 sessions, 2669.5M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
