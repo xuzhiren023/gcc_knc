@@ -1,5 +1,6 @@
 """S11-14: executable contract for the proposed M4 scoring policy."""
 
+from dataclasses import asdict
 import json
 from pathlib import Path
 import sys
@@ -19,12 +20,87 @@ PROGRAMS = (
 MODELS = ("7120", "3100", "5100")
 
 
+def primary_spec():
+    # Synthetic pilot evidence; this is not a claim about donor build results.
+    return m4_score.freeze_primary_spec({
+        "-O3": {"assembled": False, "diagnostic": "kmov operand-size mismatch"},
+        "-O2": {"assembled": False, "diagnostic": "kmov operand-size mismatch"},
+        "-O1": {"assembled": True, "diagnostic": ""},
+        "-O0": {"assembled": True, "diagnostic": ""},
+    })
+
+
 def corpus(speedup):
     # Six independent pairs allow exactly balanced AB/BA launch order.
-    return {name: [(speedup, 1.0)] * 6 for name in PROGRAMS}
+    return {name: {"pairs": [(speedup, 1.0)] * 6,
+                   "primary": asdict(primary_spec()[name])} for name in PROGRAMS}
+
+
+def score_model(rows, **kwargs):
+    return m4_score.score_model(rows, primary_spec=primary_spec(), **kwargs)
+
+
+def score_models(rows, **kwargs):
+    return m4_score.score_models(rows, primary_spec=primary_spec(), **kwargs)
 
 
 class M4ScoreContract(unittest.TestCase):
+    def test_primary_spec_freezes_owner_exceptions_and_rejects_mismatches(self):
+        specs = primary_spec()
+        self.assertEqual(set(specs), set(PROGRAMS))
+        for spec in specs.values():
+            self.assertEqual(spec.build_mode, "serial")
+            self.assertEqual(spec.workers, 1)
+            self.assertEqual(spec.new_flags, ("-O2", "-march=knc"))
+        self.assertEqual(specs["SQLite"].donor_flags, ("-O1",))
+        self.assertIn("kmov", specs["SQLite"].donor_diagnostic)
+        self.assertEqual(specs["HPCG"].source_fix, "default(none): add n to shared list; both compilers")
+        self.assertEqual(specs["STREAM"].donor_flags, ("-O2",))
+        with self.assertRaises(TypeError):
+            specs["SQLite"] = specs["STREAM"]
+        for name, field, value in (
+            ("STREAM", "build_mode", "openmp"),
+            ("STREAM", "workers", 240),
+            ("NPB-CG", "donor_flags", ("-O2", "-fopenmp")),
+            ("NPB-MG", "new_flags", ("-O2", "-march=knc", "-fopenmp")),
+            ("zlib", "new_flags", ("-O3", "-march=knc")),
+            ("SQLite", "donor_flags", ("-O2",)),
+            ("SQLite", "donor_diagnostic", ""),
+            ("HPCG", "source_fix", "unchanged"),
+        ):
+            with self.subTest(program=name, field=field):
+                rows = corpus(2)
+                rows[name]["primary"][field] = value
+                with self.assertRaises(ValueError):
+                    score_model(rows)
+        rows = corpus(2)
+        del rows["STREAM"]["primary"]
+        with self.assertRaises(ValueError):
+            score_model(rows)
+        result = score_model(corpus(2))
+        self.assertEqual(result["programs"]["SQLite"]["primary"], asdict(specs["SQLite"]))
+
+    def test_sqlite_level_is_highest_assembling_pilot_level(self):
+        pilot = {level: {"assembled": False, "diagnostic": "kmov operand-size mismatch"}
+                 for level in ("-O3", "-O2", "-O1", "-O0")}
+        with self.assertRaises(ValueError):
+            m4_score.freeze_primary_spec(pilot)
+        for level in ("-O0", "-O1", "-O2", "-O3"):
+            pilot[level] = {"assembled": True, "diagnostic": ""}
+            self.assertEqual(m4_score.freeze_primary_spec(pilot)["SQLite"].donor_flags, (level,))
+        del pilot["-O3"]
+        with self.assertRaises(ValueError):
+            m4_score.freeze_primary_spec(pilot)
+
+    def test_openmp_panel_cannot_enter_primary_median(self):
+        rows = corpus(1)
+        self.assertEqual(score_model(rows)["median_speedup"], 1)
+        for name in ("STREAM", "NPB-CG", "NPB-EP", "NPB-MG", "NPB-IS", "HPCG"):
+            rows[name + ":openmp"] = {"pairs": [(100, 1)] * 6,
+                                      "label": "the donor toolchain has no OpenMP runtime"}
+        with self.assertRaises(ValueError):
+            score_model(rows)
+
     def test_pair_ratios_precede_program_median(self):
         pairs = [(10, 5), (100, 100), (9, 3), (6, 2), (30, 10), (12, 4)]
         result = m4_score.score_program(pairs)
@@ -36,13 +112,13 @@ class M4ScoreContract(unittest.TestCase):
         self.assertEqual(m4_score.PROGRAMS, PROGRAMS)
         rows = corpus(1)
         for name in PROGRAMS[:9]:
-            rows[name] = [(2, 1)] * 6
-        result = m4_score.score_model(rows)
+            rows[name]["pairs"] = [(2, 1)] * 6
+        result = score_model(rows)
         self.assertEqual(result["median_speedup"], 2)
         self.assertTrue(result["pass"])
         del rows["HPCG"]
         with self.assertRaises(ValueError):
-            m4_score.score_model(rows)
+            score_model(rows)
 
     def test_fixed_seed_bootstrap_bounds(self):
         # Nonconstant pairs: the percentile endpoints are 1 and 2;
@@ -51,10 +127,13 @@ class M4ScoreContract(unittest.TestCase):
         result = m4_score.score_program(pairs, seed=1514, draws=10000)
         self.assertEqual(result["speedup"], 1.5)
         self.assertEqual(result["speedup_ci95"], [1, 2])
-        model = m4_score.score_model(corpus(1.25), seed=1514, draws=10000)
+        model = score_model(corpus(1.25), seed=1514, draws=10000)
         self.assertEqual(model["lower95"], 1.25)
         self.assertTrue(model["pass"])
-        noisy = m4_score.score_model({name: pairs for name in PROGRAMS},
+        noisy_rows = corpus(1)
+        for row in noisy_rows.values():
+            row["pairs"] = pairs
+        noisy = score_model(noisy_rows,
                                      seed=1514, draws=10000)
         self.assertEqual(noisy["median_speedup"], 1.5)
         self.assertEqual(noisy["lower95"], 1)
@@ -72,32 +151,33 @@ class M4ScoreContract(unittest.TestCase):
 
     def test_regression_review_is_required_even_when_median_passes(self):
         rows = corpus(2)
-        rows["zlib"] = [(1, 1.1)] * 6
-        self.assertFalse(m4_score.score_model(rows)["pass"])
-        result = m4_score.score_model(
+        rows["zlib"]["pairs"] = [(1, 1.1)] * 6
+        self.assertFalse(score_model(rows)["pass"])
+        result = score_model(
             rows, known_causes={"zlib": "lead-reviewed cause: diagnostic ticket reference"}
         )
         self.assertTrue(result["pass"])
         self.assertEqual(result["programs"]["zlib"]["regression"], "regression")
-        rows["zlib"] = [(1, 1)] * 3 + [(1, 1.1)] * 3
-        self.assertFalse(m4_score.score_model(
+        rows["zlib"]["pairs"] = [(1, 1)] * 3 + [(1, 1.1)] * 3
+        self.assertFalse(score_model(
             rows, known_causes={"zlib": "a cause cannot resolve an interval"}
         )["pass"])
 
     def test_every_model_must_pass(self):
         rows = {model: corpus(1.25) for model in MODELS}
-        self.assertTrue(m4_score.score_models(rows)["pass"])
+        self.assertTrue(score_models(rows)["pass"])
         rows["5100"] = corpus(1.24)
-        result = m4_score.score_models(rows)
+        result = score_models(rows)
         self.assertFalse(result["pass"])
         self.assertFalse(result["models"]["5100"]["pass"])
-        extended = {name: pairs * 2 for name, pairs in rows["5100"].items()}
+        extended = {name: {**row, "pairs": row["pairs"] * 2}
+                    for name, row in rows["5100"].items()}
         rows["5100"] = extended
         with self.assertRaises(ValueError):
-            m4_score.score_models(rows)
+            score_models(rows)
         del rows["5100"]
         with self.assertRaises(ValueError):
-            m4_score.score_models(rows)
+            score_models(rows)
 
     def test_invalid_or_insufficient_times_cannot_be_scored(self):
         for bad in (0, -1, float("nan"), float("inf")):
