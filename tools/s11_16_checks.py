@@ -22,7 +22,22 @@ def main():
     out.mkdir(exist_ok=True)
     if sys.argv[1] == 'host':
         return subprocess.call([sys.executable, str(root / 'tests/tools/test_s11_16_probe.py')])
-    raise ValueError('expected host')
+    if sys.argv[1] == 'stage':
+        prefix = shared / 'gcc-knc-16.2.0'
+        binary = out / 'long-double-probe.mic'
+        subprocess.run([str(prefix / 'bin/k1om-mpss-linux-gcc'),
+                        '--sysroot=' + str(tc / 'sysroot'), '-O2', '-std=gnu11',
+                        '-march=knc', '-Wall', '-Wextra', '-Werror',
+                        '-static-libgcc', '-pthread',
+                        str(root / 'tools/s11_16_long_double.c'), '-ldl',
+                        '-o', str(binary)], check=True)
+        subprocess.run([sys.executable, str(root / 'tools/knc_lint'),
+                        str(binary)], check=True)
+        print('Staged; native results pending lead card run:')
+        print('python tools/card_run --threads 240 --timeout 1800 '
+              '.work/_shared/S11-16/long-double-probe.mic')
+        return 0
+    raise ValueError('expected host or stage')
 
 
 if __name__ == '__main__':
