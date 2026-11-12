@@ -63,7 +63,7 @@ Current tickets: `[###################-]` 190 of 194
 | S11-09 | Memory bandwidth for LLM decode - a weight-streaming GEMV workload, pushed toward 264-299 GB/s of weight bytes | lead | Needs interactive lead: card run in our exclusive turn. Reviewed 33de9541: IMCI sint8/float16 load conversi... |
 | S11-10 | S11-01 transfer runner - choose repetitions, sizes and load states per run, so slow methods fit a card turn | Done | The transfer runner now takes --repeats, --sizes, --loads and --concurrency so a slow method fits a card tu... |
 | S11-11 | M4 corpus run harness - every corpus program built by GCC 5.1.1 and GCC-KNC, run on the card with frozen inputs and a correctness check, in one command | In progress | The corpus harness now has a failing host contract that pins the S0-07 program set (held-out adi, durbin an... |
-| S11-13 | Senior compiler review of the Sprint 11-13 scope (Milestone M4) against our research, with recommended plan changes | In progress | Committed by the lead; the lead submits for the engineer. |
+| S11-13 | Senior compiler review of the Sprint 11-13 scope (Milestone M4) against our research, with recommended plan changes | Waiting for review | Submitted by the lead for the engineer (pm.py commit hung): review at docs/reviews/2026-11-12-s11-s13-scope... |
 | S2-01 | Design for zmm and mask registers under -march=knc | Done | The register design for KNC is settled on paper: all 32 zmm and 8 mask registers become usable under -march... |
 | S2-02 | Float and double arguments and results in zmm lane 0 | Done | Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`). |
 | S2-03 | Varargs with the donor's register save area | Done | Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`). |
@@ -219,6 +219,7 @@ Current tickets: `[###################-]` 190 of 194
 
 ## Recent activity
 
+- 2026-11-12 16:12 **S11-13** engineer submit: Submitted by the lead for the engineer (pm.py commit hung): review at docs/reviews/2026-11-12-s11-s13-scope-review.md, five questions, 17 program e...
 - 2026-11-12 16:12 **S11-13** lead answer: Committed by the lead; the lead submits for the engineer.
 - 2026-11-12 16:11 **S11-13** engineer ask: Review complete at docs/reviews/2026-11-12-s11-s13-scope-review.md: all five questions, 17 program estimates, nine ranked findings, revised outline...
 - 2026-11-12 16:11 **S11-10** lead approve: The transfer runner now takes --repeats, --sizes, --loads and --concurrency so a slow method fits a card turn, keeps card-control.log open until ca...
@@ -226,7 +227,6 @@ Current tickets: `[###################-]` 190 of 194
 - 2026-11-12 15:59 **S11-10** lead answer: Yes: commit (pm.py commit) and submit source and tests only, without the exe. transfer_bench.c changed, so the staged transfer-host.exe is now stal...
 - 2026-11-12 15:58 **S11-10** engineer ask: Review fixes applied and tests pass. S11-01 transfer-host.exe is still locked; restage failed with Device/resource busy and PermissionError. The ti...
 - 2026-11-12 15:57 **S11-11** lead approve-red: The corpus harness now has a failing host contract that pins the S0-07 program set (held-out adi, durbin and bzip2 split off by program name), pair...
-- 2026-11-12 15:56 **S11-11** engineer red: Red contract committed at 4f4a34f3. Ran python tools/run.py --name S11-11-host-red --inputs tests/tools/test_corpus.py tools/corpus.py -- python -m...
 
 ## Cost
 
