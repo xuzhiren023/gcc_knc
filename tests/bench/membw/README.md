@@ -34,6 +34,9 @@ The confirmation configuration is an example: replace it with the winning
 combination, separately by workload if winners differ. `probe` is read-only and
 prints PMU availability and metadata. It must not be mistaken for a timing run.
 Each native invocation has a 90-second alarm including initialization/validation;
+it covers all requested workloads together. The two serial first-touch cases
+run triad only (five initializations each, rather than thirty across six classes).
+They retain 256 MiB per array, eight timed passes and the 90-second process bound.
 the runner stops on failure, timeout, or invalid output. `card_run` supplies the
 exclusive window and outer timeout. The sweep chmods only its staged binary.
 
@@ -59,7 +62,7 @@ Every option takes a value; last occurrence wins.
 | `--padding-lines` | 0..32768; 0 | Extra gap after each array's halo; distinguish base displacement from logical length |
 | `--chunk-lines` | 1..1048576; 4096 | Chunk/block size; stencil retains contiguous traversal within chunks |
 | `--schedule` | block/cyclic; block | Contiguous worker partitions, or round-robin chunks |
-| `--unroll` | 1/2/4/8; 4 | Explicit source expansion; fixed operation/store dispatch outside chunk |
+| `--unroll` | 1/2/4/8; 4 | Explicit source expansion; operation/store/prefetch/fence/eviction modes dispatched outside the line loop |
 | `--split` | 0/1; 0 | Split triad within each chunk using output as a temporary; other classes unchanged |
 | `--first-touch` | parallel/serial; parallel | Workers or worker zero initialize arrays outside timing |
 | `--probe` | 1 | Standalone perf syscall capability probe; no memory benchmark |
@@ -105,6 +108,42 @@ Output is JSON Lines with median/min/max decimal GB/s and the selected CPU list.
 records when analyzing; keep surrounding case/config records to retain context.
 These are STREAM-style byte counts, not a submission to the official STREAM list.
 
+## Native inner-loop instruction budget
+
+Counted from the staged k1om binary's disassembly after the review fixes, with
+the default `--unroll 4 --prefetch shared --pf0 16 --pf1 32 --store ngo
+--fence end --evict none --split 0`. Counts follow the executed steady-state
+path, including branches and loop control, excluding entry/exit and array tails.
+`../_shared/S11-05/membw.dis` contains the two inspected functions.
+
+| Workload / symbol | Executed instructions per four lines | Per line | Logical bytes per four lines |
+|---|---:|---:|---:|
+| write / `kernel_WRITE_2_1_0_0` | 14: 4 stores + 10 scalar/control | 3.5 | 256 |
+| triad / `kernel_TRIAD_2_1_0_0` | 53: 16 prefetches + 8 loads + 8 adds + 4 stores + 17 scalar/control | 13.25 | 768 |
+
+For this binary, the write back edge is `0x426c06 -> 0x426bd0`; all 14
+instructions on that path execute at unroll four. The triad back edge is
+`0x48e8ee -> 0x48e6d0`: follow through `0x48e7cf`, whose taken branch skips
+the unroll-eight body to `0x48e8d0`. That path executes 53 instructions.
+Addresses can change on rebuild; the symbols and branch paths identify the
+loops. These are static instruction counts, not measured cycles or bandwidth.
+
+Configuration and array pointers are snapshotted at chunk entry. The generated
+variants select operation, store, prefetch mode, line fence and eviction before
+the line loop. Load/store/prefetch/eviction assembly names its exact 64-byte
+memory operand; only the completion fence has a full memory clobber. The write
+constant is loaded into a vector register before the loop, with no scalar
+construction or stack traffic per line. The triad loop has one stack-resident
+end-bound comparison per four lines, but no global configuration/pointer loads,
+vector spills, or per-line mode tests. Unroll selection costs remain included.
+
+With both prefetch distances nonzero, a separate bulk loop omits bounds checks;
+the tail checks each hint, preserving the in-array rule. Disabling either
+distance uses the checked path. Short chunks, tails, split triad, fences and
+eviction variants have different costs. Compare those results using their own
+paths rather than assigning these default counts to them. The per-pass fence,
+chunk dispatch and thread synchronization remain inside the measured interval.
+
 ## First-pass budget and interpretation
 
 | Step | Cases | Conservative bound, 90 seconds/case |
@@ -112,7 +151,7 @@ These are STREAM-style byte counts, not a submission to the official STREAM list
 | Store kind, density, pages | 8 | 12 min |
 | Prefetch | 6 | 9 min |
 | Relative offsets and placement | 7 | 10.5 min |
-| Splitting, chunking, first touch | 6 | 9 min |
+| Splitting/chunking (all classes), first touch (triad only) | 4 + 2 | 6 + 3 min |
 | Unroll, eviction, fences, far hint | 7 | 10.5 min |
 | Core scaling and closing reference | 4 | 6 min |
 | Total first sweep | 38 | 57 min |

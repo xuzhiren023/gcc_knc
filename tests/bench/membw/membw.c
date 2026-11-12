@@ -64,10 +64,10 @@ INLINE void fence(void) {
 INLINE Vec load(const float *p) {
     Vec v;
 #if NATIVE
-    __asm__ volatile("vmovaps (%1),%g0" : "=YJ"(v) : "r"(p) : "memory");
+    __asm__ volatile("vmovaps %1,%g0" : "=YJ"(v) : "m"(*(const Vec *)p));
 #else
     memcpy(&v, p, 64);
-    __asm__ volatile("" : : "m"(v) : "memory");
+    __asm__ volatile("" : "+m"(v));
 #endif
     return v;
 }
@@ -80,9 +80,13 @@ INLINE Vec add(Vec x, Vec y) {
 #endif
 }
 INLINE Vec constant(float f) {
+#if NATIVE
+    return (Vec){f,f,f,f,f,f,f,f,f,f,f,f,f,f,f,f};
+#else
     Vec v;
     for (int j=0;j<16;j++) ((float *)&v)[j] = f;
     return v;
+#endif
 }
 INLINE void accumulate(Uvec *sum, Vec x) {
     Uvec u;
@@ -95,100 +99,143 @@ INLINE void accumulate(Uvec *sum, Vec x) {
 }
 INLINE void store(float *p, Vec v, int kind) {
 #if NATIVE
-    if (kind == 2) __asm__ volatile("vmovnrngoaps %g1,(%0)" : : "r"(p), "YJ"(v) : "memory");
-    else if (kind == 1) __asm__ volatile("vmovnraps %g1,(%0)" : : "r"(p), "YJ"(v) : "memory");
-    else __asm__ volatile("vmovaps %g1,(%0)" : : "r"(p), "YJ"(v) : "memory");
+    if (kind == 2) __asm__ volatile("vmovnrngoaps %g1,%0" : "=m"(*(Vec *)p) : "YJ"(v));
+    else if (kind == 1) __asm__ volatile("vmovnraps %g1,%0" : "=m"(*(Vec *)p) : "YJ"(v));
+    else __asm__ volatile("vmovaps %g1,%0" : "=m"(*(Vec *)p) : "YJ"(v));
 #else
     (void)kind;
     memcpy(p, &v, 64);
-    __asm__ volatile("" : : "m"(*(float (*)[16])p) : "memory");
+    __asm__ volatile("" : "+m"(*(float (*)[16])p));
 #endif
 }
 INLINE void prefetch(const float *p, int level, int exclusive) {
 #if NATIVE
     if (exclusive) {
-        if (level==0) __asm__ volatile("vprefetche0 (%0)" : : "r"(p));
-        else if (level==1) __asm__ volatile("vprefetche1 (%0)" : : "r"(p));
-        else __asm__ volatile("vprefetche2 (%0)" : : "r"(p));
+        if (level==0) __asm__ volatile("vprefetche0 %0" : : "m"(*(const Vec *)p));
+        else if (level==1) __asm__ volatile("vprefetche1 %0" : : "m"(*(const Vec *)p));
+        else __asm__ volatile("vprefetche2 %0" : : "m"(*(const Vec *)p));
     } else {
-        if (level==0) __asm__ volatile("vprefetch0 (%0)" : : "r"(p));
-        else if (level==1) __asm__ volatile("vprefetch1 (%0)" : : "r"(p));
-        else __asm__ volatile("vprefetch2 (%0)" : : "r"(p));
+        if (level==0) __asm__ volatile("vprefetch0 %0" : : "m"(*(const Vec *)p));
+        else if (level==1) __asm__ volatile("vprefetch1 %0" : : "m"(*(const Vec *)p));
+        else __asm__ volatile("vprefetch2 %0" : : "m"(*(const Vec *)p));
     }
 #else
     (void)p; (void)level; (void)exclusive;
 #endif
 }
-INLINE void hints(size_t i, int op) {
-    if (!cfg.prefetch) return;
+/* A private snapshot: no configuration or global-pointer reads in line loops. */
+typedef struct {
+    float *a, *b, *c;
+    size_t lines;
+    int pf0, pf1, unroll, split;
+} Kernel;
+INLINE void hints(size_t i, int op, int sk, int pf, int checked, const Kernel *k) {
+    if (!pf) return;
     for (int level=0;level<2;level++) {
-        size_t distance = level ? cfg.pf1 : cfg.pf0;
-        if (!distance || i + distance >= cfg.lines) continue;
-        size_t k = (i + distance)*16;
-        int hint = cfg.prefetch == 3 && level ? 2 : level;
-        if (op != WRITE) prefetch(a+k, hint, op==RMW && cfg.prefetch==2);
-        if (op==TRIAD) prefetch(b+k, hint, 0);
-        if (op!=READ && op!=RMW && cfg.store==0 && cfg.prefetch==2)
-            prefetch(c+k, hint, 1);
+        size_t distance = level ? k->pf1 : k->pf0;
+        if (checked && (!distance || i + distance >= k->lines)) continue;
+        size_t j = (i + distance)*16;
+        int hint = pf == 3 && level ? 2 : level;
+        if (op != WRITE) prefetch(k->a+j, hint, op==RMW && pf==2);
+        if (op==TRIAD) prefetch(k->b+j, hint, 0);
+        if (op!=READ && op!=RMW && sk==0 && pf==2)
+            prefetch(k->c+j, hint, 1);
     }
 }
-INLINE void evict(float *p) {
+INLINE void evict(float *p, int mode) {
 #if NATIVE
-    if (cfg.evict & 1) __asm__ volatile("clevict0 (%0)" : : "r"(p) : "memory");
-    if (cfg.evict & 2) __asm__ volatile("clevict1 (%0)" : : "r"(p) : "memory");
+    if (mode & 1) __asm__ volatile("clevict0 %0" : "+m"(*(Vec *)p));
+    if (mode & 2) __asm__ volatile("clevict1 %0" : "+m"(*(Vec *)p));
 #else
-    (void)p;
+    (void)p; (void)mode;
 #endif
 }
-INLINE void line(size_t i, int op, int sk, Uvec *sum) {
-    size_t k = i*16;
+enum { SPLIT_START=6, SPLIT_END };
+INLINE void line(size_t i, int op, int sk, int pf, int lf, int ev, int checked,
+                 Uvec *sum, const Kernel *k) {
+    size_t j = i*16;
     Vec v;
-    hints(i, op);
-    if (op==READ) { accumulate(sum, load(a+k)); return; }
+    hints(i, op==SPLIT_START ? TRIAD : op, sk, pf, checked, k);
+    if (op==READ) { accumulate(sum, load(k->a+j)); return; }
     if (op==WRITE) v = constant(7);
-    else if (op==COPY) v = load(a+k);
-    else if (op==TRIAD) { Vec y = load(b+k); v = add(load(a+k), add(y,y)); }
-    else if (op==RMW) v = add(load(a+k),constant(1));
-    else v = add(add(load(a+k-16),load(a+k)),load(a+k+16));
-    float *out = (op==RMW ? a : c) + k;
+    else if (op==COPY) v = load(k->a+j);
+    else if (op==TRIAD) { Vec y = load(k->b+j); v = add(load(k->a+j), add(y,y)); }
+    else if (op==RMW) v = add(load(k->a+j),constant(1));
+    else if (op==SPLIT_START) { Vec y=load(k->b+j); v=add(y,y); }
+    else if (op==SPLIT_END) v=add(load(k->a+j),load(k->c+j));
+    else v = add(add(load(k->a+j-16),load(k->a+j)),load(k->a+j+16));
+    float *out = (op==RMW ? k->a : k->c) + j;
     store(out,v,sk);
-    if (cfg.fence==2) fence();
-    evict(out);
+    if (lf) fence();
+    evict(out,ev);
 }
 
-/* Dispatch outside each chunk; each generated loop has a fixed operation/store.
-   Explicit expansion makes --unroll control independent of compiler heuristics. */
-#define ONE(J) line(i+(J),OP,SK,sum)
-#define LOOP(OP_, SK_) do { enum {OP=OP_, SK=SK_}; \
-    size_t i=lo; \
-    for (; i+(size_t)cfg.unroll<=hi; i+=cfg.unroll) { \
-        ONE(0); if (cfg.unroll>=2) { ONE(1); } \
-        if (cfg.unroll>=4) { ONE(2); ONE(3); } \
-        if (cfg.unroll==8) { ONE(4); ONE(5); ONE(6); ONE(7); } \
-    } \
-    for (;i<hi;i++) { ONE(0); } \
-} while(0)
-#define CHOOSE(OP) do { if(cfg.store==0) {LOOP(OP,0);} \
-    else if(cfg.store==1) {LOOP(OP,1);} else {LOOP(OP,2);} } while(0)
-static void kernel(size_t lo, size_t hi, int op, Uvec *sum) {
-    /* Split triad uses the output as a cache-resident intermediate. The extra
-       read/write is not hidden in the report's implementation byte count. */
-    if (op==TRIAD && cfg.split) {
-        for (size_t i=lo;i<hi;i++) { hints(i,op); Vec y=load(b+i*16); store(c+i*16,add(y,y),0); }
-        for (size_t i=lo;i<hi;i++) {
-            store(c+i*16,add(load(a+i*16),load(c+i*16)),cfg.store);
-            if (cfg.fence==2) fence();
-            evict(c+i*16);
-        }
-    } else switch(op) {
-        case READ: LOOP(READ,0); break;
-        case WRITE: CHOOSE(WRITE); break;
-        case COPY: CHOOSE(COPY); break;
-        case TRIAD: CHOOSE(TRIAD); break;
-        case RMW: CHOOSE(RMW); break;
-        case STENCIL: CHOOSE(STENCIL); break;
+/* Constant modes are selected once per chunk, never once per line. Keep named
+   variants in the disassembly so the instruction budget can be inspected.
+   Bound checks live in the array tail; unroll grouping remains runtime. */
+#define ONE(J) line(i+(J),op,sk,pf,lf,ev,checked,sum,k)
+INLINE void lines_loop(size_t lo, size_t hi, int op, int sk, int pf, int lf, int ev,
+                       int checked, Uvec *sum, const Kernel *k) {
+    size_t i=lo;
+    const size_t unroll=k->unroll;
+    for (; i+unroll<=hi; i+=unroll) {
+        ONE(0); if (unroll>=2) { ONE(1); }
+        if (unroll>=4) { ONE(2); ONE(3); }
+        if (unroll==8) { ONE(4); ONE(5); ONE(6); ONE(7); }
     }
-    if (cfg.fence==1) fence();
+    for (;i<hi;i++) { ONE(0); }
+}
+#undef ONE
+INLINE void lines(size_t lo, size_t hi, int op, int sk, int pf, int lf, int ev,
+                  Uvec *sum, const Kernel *k) {
+    if (!pf || (op==WRITE && !(sk==0 && pf==2))) {
+        lines_loop(lo,hi,op,sk,pf,lf,ev,0,sum,k);
+        return;
+    }
+    size_t end=lo;
+    if (k->pf0 && k->pf1) {
+        size_t distance=k->pf0>k->pf1 ? k->pf0 : k->pf1;
+        end=k->lines>distance ? k->lines-distance : 0;
+        if (end>hi) end=hi;
+        if (end<lo) end=lo;
+        lines_loop(lo,end,op,sk,pf,lf,ev,0,sum,k);
+    }
+    lines_loop(end,hi,op,sk,pf,lf,ev,1,sum,k);
+}
+#define VARIANT(OP,SK,PF,LF,EV) \
+static __attribute__((noinline)) void kernel_##OP##_##SK##_##PF##_##LF##_##EV( \
+    size_t lo, size_t hi, Uvec *sum, const Kernel *options) { \
+    const Kernel k=*options; \
+    if (OP==TRIAD && k.split) { \
+        lines(lo,hi,SPLIT_START,0,PF,0,0,sum,&k); \
+        lines(lo,hi,SPLIT_END,SK,0,LF,EV,sum,&k); \
+    } else lines(lo,hi,OP,SK,PF,LF,EV,sum,&k); \
+}
+#define EVICTIONS(M,OP,SK,PF,LF) \
+    M(OP,SK,PF,LF,0) M(OP,SK,PF,LF,1) M(OP,SK,PF,LF,2) M(OP,SK,PF,LF,3)
+#define FENCES(M,OP,SK,PF) EVICTIONS(M,OP,SK,PF,0) EVICTIONS(M,OP,SK,PF,1)
+#define PREFETCHES(M,OP,SK) \
+    FENCES(M,OP,SK,0) FENCES(M,OP,SK,1) FENCES(M,OP,SK,2) FENCES(M,OP,SK,3)
+#define STORES(M,OP) PREFETCHES(M,OP,0) PREFETCHES(M,OP,1) PREFETCHES(M,OP,2)
+#define OPERATIONS(M) \
+    STORES(M,READ) STORES(M,WRITE) STORES(M,COPY) \
+    STORES(M,TRIAD) STORES(M,RMW) STORES(M,STENCIL)
+OPERATIONS(VARIANT)
+#define ENTRY(OP,SK,PF,LF,EV) kernel_##OP##_##SK##_##PF##_##LF##_##EV,
+typedef void (*KernelFn)(size_t, size_t, Uvec *, const Kernel *);
+static const KernelFn kernels[] = { OPERATIONS(ENTRY) };
+#undef ENTRY
+#undef VARIANT
+#undef OPERATIONS
+#undef STORES
+#undef PREFETCHES
+#undef FENCES
+#undef EVICTIONS
+static void kernel(size_t lo, size_t hi, int op, Uvec *sum) {
+    const Kernel k={a,b,c,cfg.lines,cfg.pf0,cfg.pf1,cfg.unroll,cfg.split};
+    const int store_kind=cfg.store, pf=cfg.prefetch, fm=cfg.fence, ev=cfg.evict;
+    kernels[((((op*3+store_kind)*4+pf)*2+(fm==2))*4+ev)](lo,hi,sum,&k);
+    if (fm==1) fence();
 }
 static float init_a(size_t k) { return (float)(1 + (k % 251)); }
 static float init_b(size_t k) { return (float)(1 + (k % 127)); }
@@ -397,7 +444,7 @@ int main(int argc,char **argv) {
         puts("GBOX channel utilization/read-write mix requires registered GBOX PMUs, event encodings, transfer units and permission; see sweep probe PMU inventory. No core-miss proxy is reported as channel traffic.");
         return 0;
     }
-    alarm(90); /* Each sweep case has a hard bound, including validation. */
+    alarm(90); /* Whole invocation, including allocation and every workload. */
     parse(argc,argv); affinity(); allocate();
     printf("{\"kind\":\"config\",\"native\":%s,\"page_bytes\":%d,\"requested_huge\":%s,\"mapping_bytes\":%zu,\"counting\":\"decimal GB/s; logical reads+writes, excludes RFO and ECC; stencil counts 3 reads+1 write\"}\n",NATIVE?"true":"false",actual_huge?2097152:4096,cfg.huge?"true":"false",map_bytes);
     pthread_t threads[CPU_SETSIZE];

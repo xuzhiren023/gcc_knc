@@ -60,8 +60,8 @@ case "$phase" in
             run --threads 60 --pages huge --chunk-lines "$chunk" --split 1
             run --threads 60 --pages huge --chunk-lines "$chunk" --schedule cyclic
         done
-        run --threads 60 --pages huge --first-touch serial
-        run --threads 60 --pages small --first-touch serial
+        run --threads 60 --pages huge --first-touch serial --workload triad
+        run --threads 60 --pages small --first-touch serial --workload triad
         # 5: instruction overhead, eviction, fence and far hint (7).
         for u in 1 8; do run --threads 60 --pages huge --unroll "$u"; done
         for ev in l1 l2 both; do run --threads 60 --pages huge --evict "$ev"; done
