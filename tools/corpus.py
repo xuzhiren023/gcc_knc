@@ -68,29 +68,33 @@ def flag_sets(extra_flags=None):
 def make_plan(repetitions=3, extra_flags=None, *, core_count=None):
     if not isinstance(core_count, int) or isinstance(core_count, bool) or core_count < 1:
         raise ValueError('core_count must come from the card affinity probe')
-    if repetitions < 3:
-        raise ValueError('at least three repetitions are required')
+    if not isinstance(repetitions, int) or isinstance(repetitions, bool) or repetitions < 3:
+        raise ValueError('at least three pairs are required')
     variants = flag_sets(extra_flags)
     plan = []
-    for profile, cores in [('full', core_count), ('3100', 56), ('5100', 59)]:
-      for program in PROGRAMS:
-        panels = [(1, 'serial', 'primary')]
-        if program in OPENMP:
-            panels += [(t, 'openmp', OPENMP_PANEL) for t in (cores, cores * 2, cores * 4)]
-        for threads, variant, panel in panels:
-            for run in range(repetitions):
-                # Alternate first compiler, including additional flag pairs.
+    # ADR-0015: complete primary rounds before any side panel.
+    for side_panel in (False, True):
+      for run in range(repetitions):
+       for profile, cores in [('full', core_count), ('3100', 56), ('5100', 59)]:
+        for program in PROGRAMS:
+            panels = [(1, 'serial', 'primary')]
+            if side_panel:
+                panels = ([(t, 'openmp', OPENMP_PANEL) for t in (cores, cores * 2, cores * 4)]
+                          if program in OPENMP else [])
+            for threads, variant, panel in panels:
                 for index in range(max(map(len, variants.values()))):
                     order = (DONOR, KNC) if run % 2 == 0 else (KNC, DONOR)
-                    for compiler in order:
-                        if variant == 'openmp' and compiler == DONOR:
-                            continue
+                    if side_panel:
+                        order = (KNC,)
+                    for start_order, compiler in enumerate(order):
                         if index < len(variants[compiler]):
                             plan.append(dict(program=program, compiler=compiler,
-                                             flags=variants[compiler][index], run=run,
-                                             threads=threads, input=INPUTS[program],
-                                             profile=profile, variant=variant, panel=panel,
-                                             held_out=program in HELD_OUT))
+                                flags=variants[compiler][index], run=run,
+                                threads=threads, input=INPUTS[program],
+                                profile=profile, variant=variant, panel=panel,
+                                pair_id=None if side_panel else '%s/%s/%d/%d' % (profile, program, index, run),
+                                start_order=start_order, launch_order=len(plan),
+                                held_out=program in HELD_OUT))
     return plan
 
 
@@ -468,7 +472,7 @@ def stage(args):
     extract_packages(source)
     stage_dir = args.stage.resolve()
     stage_dir.mkdir(parents=True, exist_ok=True)
-    settings = dict(extra_flags=args.extra_flags, repetitions=args.repetitions)
+    settings = dict(extra_flags=args.extra_flags, repetitions=args.repetitions or 3)
     if args.only:
         previous = json.loads((stage_dir / 'settings.json').read_text())
         if settings != previous:
@@ -537,24 +541,38 @@ def write_lead_script(stage_dir):
     quote = lambda path: "'" + windows_path(path).replace("'", "''") + "'"
     (stage_dir / 'lead.ps1').write_text(
         "# Windows Python is required by card_run. Use this ticket until merged.\n" +
-        "# Baseline: 468 launches across full/3100/5100, estimated 4-7 hours.\n" +
+        "# Pilot: 468 launches across full/3100/5100, initially estimated 4-7 hours; NPB may extend this.\n" +
+        "param([int]$Pairs = 3, [int]$TimeoutSeconds = 3600)\n" +
         '$corpusEntry = ' + quote(Path(__file__).resolve()) + '\n' +
         'if (!(Test-Path -LiteralPath $corpusEntry)) { $corpusEntry = ' + quote(project / 'tools/corpus.py') + ' }\n' +
-        '& (Get-Command python.exe).Source $corpusEntry lead --stage ' + quote(stage_dir) + '\nexit $LASTEXITCODE\n')
+        '& (Get-Command python.exe).Source $corpusEntry lead --stage ' + quote(stage_dir) + ' --pairs $Pairs --timeout $TimeoutSeconds\nexit $LASTEXITCODE\n')
     shutil.copyfile(SUPPORT / 'README.md', stage_dir / 'README.md')
 
 
 def output_result(job, stdout, stderr, returncode):
     row = dict(job, check='error', time_seconds=None)
     try:
-        if returncode:
-            raise ValueError('card_run exit %d' % returncode)
         meta = [json.loads(line[len('CORPUS_META '):]) for line in stdout.splitlines() if line.startswith('CORPUS_META ')]
         times = [float(line.split()[1]) for line in stdout.splitlines() if line.startswith('CORPUS_TIME ')]
         if len(meta) != 1 or meta[0]['threads'] != job['threads'] or len(times) != 1 or not math.isfinite(times[0]) or times[0] <= 0:
             raise ValueError('missing or mismatched native timing/affinity metadata')
-        row.update(time_seconds=times[0], affinity=meta[0],
+        clocks = [json.loads(line[len('CORPUS_CLOCK '):]) for line in stdout.splitlines()
+                  if line.startswith('CORPUS_CLOCK ')]
+        if len(clocks) != 1:
+            raise ValueError('missing launch-to-exit clock record')
+        timing = clocks[0]
+        if (timing.get('clock') != 'CLOCK_MONOTONIC_RAW' or timing.get('boundary') != 'launch-to-exit'
+                or any(type(timing.get(k)) is not int for k in ('start_ns', 'end_ns', 'utc_start_ns'))
+                or timing['end_ns'] <= timing['start_ns'] or timing['utc_start_ns'] <= 0
+                or not math.isclose((timing['end_ns'] - timing['start_ns']) / 1e9,
+                                    times[0], rel_tol=1e-9, abs_tol=1e-9)):
+            raise ValueError('invalid launch-to-exit clock record')
+        row.update(time_seconds=times[0], affinity=meta[0], timing=timing,
+                   secondary_timing_output=[line for line in (stdout + '\n' + stderr).splitlines()
+                       if re.search(r'Time in seconds|(?:time|Time|seconds|Seconds).*[:=]|Avg time|Min time|Max time', line)],
                    system_runtime=[line for line in stdout.splitlines() if line.startswith('CORPUS_RUNTIME ')])
+        if returncode:
+            raise ValueError('card_run exit %d' % returncode)
         text = stdout + '\n' + stderr
         program = job['program']
         if program.startswith('PB-'):
@@ -581,13 +599,13 @@ def output_result(job, stdout, stderr, returncode):
     return row
 
 
-def card_call(stage_dir, files, mode, density, stdout, stderr, profile='full'):
+def card_call(stage_dir, files, mode, density, stdout, stderr, profile='full', timeout=3600):
     # Called only by the explicit lead subcommand, never by stage or collect.
     threads = {'full': 240, '3100': 224, '5100': 236}[profile]
     # card_run requires a transport record; keep only its transient working file.
     transport_record = stdout.parent / 'card-result.json'
     command = [sys.executable, str(ROOT / 'tools/card_run'), '--benchmark', '--threads', str(threads),
-               '--timeout', '600' if mode == 'HPCG' else '120',
+               '--timeout', str(timeout),
                '--receipt', str(transport_record)]
     if profile != 'full':
         command += ['--profile', profile]
@@ -606,6 +624,8 @@ def lead(args):
         raise RuntimeError('lead requires Windows Python for card_run and its Windows OpenSSH paths')
     stage_dir = args.stage.resolve()
     settings = json.loads((stage_dir / 'settings.json').read_text())
+    if args.repetitions is not None:
+        settings['repetitions'] = args.repetitions
     builds = read_partition(stage_dir, 'builds.json')
     capture = stage_dir / 'capture'
     capture.mkdir(exist_ok=True)
@@ -639,6 +659,7 @@ def lead(args):
     # Keep the two streams separate from their first byte, even on interruption.
     with (stage_dir / 'raw-results.jsonl').open('w') as public, (private / 'raw-results.jsonl').open('w') as sealed:
         for number, (job, build) in enumerate(zip(plan, selected)):
+            job['timeout_seconds'] = args.timeout
             held = job['program'] in HELD_OUT
             folder = private / 'capture' if held else capture
             out, err = folder / ('%03d.stdout' % number), folder / ('%03d.stderr' % number)
@@ -669,7 +690,7 @@ def lead(args):
                 cores = {'full': metadata[0]['cores'], '3100': 56, '5100': 59}[job['profile']]
                 density = 'serial' if job['threads'] == 1 else 'full' if job['threads'] == 4 * cores else 'two' if job['threads'] == 2 * cores else 'one'
                 if ready:
-                    rc = card_call(stage_dir, files, job['program'], density, out, err, job['profile'])
+                    rc = card_call(stage_dir, files, job['program'], density, out, err, job['profile'], args.timeout)
                     row = output_result(job, out.read_text(errors='replace'), err.read_text(errors='replace'), rc)
                     row.update(stdout=str(out), stderr=str(err))
                     row['runtime_prefix'] = next((windows_path(f) for f in build['files'] if f.endswith('runtime-prefix.json')), None)
@@ -728,12 +749,16 @@ def main():
     parser.add_argument('action', choices=('stage', 'lead', 'collect'))
     parser.add_argument('--stage', type=Path, default=SHARED / 'S11-18')
     parser.add_argument('--extra-flags', type=json.loads, default={})
-    parser.add_argument('--repetitions', type=int, default=3)
+    parser.add_argument('--pairs', '--repetitions', dest='repetitions', type=int,
+                        help='paired launches: pilot default 3; ADR-0015 gate 6 (lead overrides staged count)')
+    parser.add_argument('--timeout', type=int, default=3600, help='per-launch seconds, including serial NPB pilot')
     parser.add_argument('--only', nargs='+', choices=PROGRAMS,
                         help='stage only these programs, retaining previous build records and inputs')
     args = parser.parse_args()
-    if args.repetitions < 3:
+    if args.repetitions is not None and args.repetitions < 3:
         parser.error('at least three repetitions')
+    if args.timeout < 1:
+        parser.error('timeout must be positive')
     globals()[args.action](args)
 
 

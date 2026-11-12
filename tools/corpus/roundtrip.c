@@ -2,7 +2,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <signal.h>
 #ifdef CORPUS_ZLIB
 #include <zlib.h>
 #else
@@ -48,11 +47,10 @@ int main(int argc, char **argv)
   }
 #endif
   if (good && !decode) {
-    /* End timing after the local round trip, before persistence and checks
-       by the other compiler. The launcher resumes us after CORPUS_TIME. */
-    if (getenv("CORPUS_TIMED")) raise(SIGSTOP);
     f = fopen("packed.bin", "wb");
     if (!f || fwrite(packed, 1, packed_size, f) != packed_size || fclose(f)) return 2;
+    f = fopen("restored.bin", "wb");
+    if (!f || fwrite(output, 1, size, f) != size || fclose(f)) return 2;
   }
   free(input); free(packed); free(output);
   if (control) {

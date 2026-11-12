@@ -41,14 +41,20 @@ recursive DT_NEEDED graph. Missing revision strings are explicitly unavailable,
 never inferred from the current source checkout. Card-supplied glibc's version
 is captured at execution. Each compiler's driver selects its own runtimes.
 
-Three repetitions alternate the first compiler in each primary pair. Profile,
-variant, actual flags, program, input, run and threads distinguish launches.
-The baseline has 468 timed launches plus the probe. Plan 4-7 hours including
-transfer and checks, pending native calibration. The conservative timeout
-ceiling is about 22 hours (120 seconds per launch, 600 for HPCG). Extra flags
-increase these budgets; timed-out work remains failed.
-Serial NPB EP/CG/MG class A may exceed the 120-second limit on one KNC core;
-the lead should calibrate those limits on the first native pass.
+The pilot defaults to three pairs; `lead --pairs 6` selects ADR-0015's gate
+count without rebuilding. `--repetitions` remains an alias. The staged script
+accepts `-Pairs 6`; its default is three. Orders alternate AB, BA, AB (A is the
+donor), with adjacent members. Complete primary rounds traverse full/3100/5100
+and the program order above before the OpenMP panels. Those panels contain only
+GCC-KNC launches, with no fictitious donor pair. Records include pair_id,
+start_order, launch_order, profile, variant, actual flags, input and run.
+The pilot's baseline has 468 timed launches plus the probe; six pairs yield 936.
+The original 4-7 hour estimate is provisional: serial NPB EP/CG/MG class A can
+exceed 120 seconds on one KNC core. The pilot now allows 3600 seconds per launch,
+configurable with `lead --timeout` or the script's `-TimeoutSeconds`. Record the
+measured duration; the lead uses neutral feasibility, never speedup, to freeze
+the gate's class. Timed-out attempts remain failures. Extra flags and long serial
+runs extend the estimate; no native calibration has run.
 
 PB-adi, PB-durbin and bzip2 are sealed by program name, ignoring caller labels.
 Their builds, logs, plans, runtime records, captures, card transport records and
@@ -101,23 +107,64 @@ do not. A clean control stream must be accepted by the decoder and therefore
 fail the negative control. Cross-decoding and the corruption control must both pass.
 The other compiler's first successful flag set supplies the reference decoder.
 
-CLOCK_MONOTONIC measures initialization, computation and the local check,
-excluding transfer and the additional cross-decoding check. Before the first
-PolyBench array is formatted, the dump interceptor raises SIGSTOP. The launcher
-waits with WUNTRACED, records and flushes CORPUS_TIME, then sends SIGCONT and
-waits for successful completion of the complete dump. Later arrays do not stop
-again. Compression stops in the same way after its local round trip and before
-writing packed.bin. Thus all complete-array formatting, stdout/SSH transfer,
-packed-file writes, cross-decoding and corruption checks occur after timing.
-The stop/wakeup boundary adds a small scheduling cost, but no per-element output
-cost; workload initialization remains measured. Missing boundaries or failed
-output completion fail the launch. Other workloads retain whole-child timing.
+ADR-0015's raw score is launch-to-exit wall latency on CLOCK_MONOTONIC_RAW.
+The resident launcher timestamps immediately before fork and immediately after
+waitpid reaps the child. Startup, input reads, allocation, initialization, work,
+local built-in checks, required output materialization, cleanup and exit all count.
+There is no SIGSTOP boundary and no subtraction of built-in validation costs.
+The child writes stdout/stderr to local files. PolyBench's interceptor writes
+array names, counts and every raw double to arrays.bin. Compression writes both
+packed.bin and restored.bin before exit. After CORPUS_TIME is recorded, the
+supervisor transfers text and formats arrays as CORPUS_ARRAY lines. Cross-decoding
+and corruption checks follow timing. Thus output is complete without timing
+per-double decimal conversion or SSH transfer. No corpus source changes are needed.
+
+Each row's time_seconds is the raw wall latency, with timing carrying the clock,
+boundary, monotonic start/end nanoseconds, UTC start nanoseconds and clocksource.
+Missing, inconsistent or legacy partial clock records fail. A child failure retains
+its measured duration when timing metadata exists. Recognizable package-internal
+timer lines are retained verbatim in secondary_timing_output, also preserved in
+the original capture; they never replace time_seconds. No program timer is enabled
+or synthesized where the package does not emit one.
 This is not an official HPCG submission or published STREAM rating.
 
 Each launch produces one raw JSON line, including build and transport failures.
 `collect` writes checked results.jsonl and public status.json. Missing, duplicate
-or incorrect launches fail. Scoring belongs to S11-14 / ADR-0015 once available;
+or incorrect launches fail. Scoring belongs to S11-14 / ADR-0015;
 v2 collection emits no scores. The old summary helper remains a legacy API only.
+
+Independent references before the gate (follow-up owned by the lead, per the
+17:35 S11-18 answer; these are proposed checks, not implemented native passes):
+
+| Program | Independent reference to freeze and validate |
+| --- | --- |
+| PB-gemm | Independently initialized matrices and high-precision direct matrix multiplication; every C element |
+| PB-atax | Independent dense A*x and transpose(A)*temporary; every y element |
+| PB-cholesky | High-precision scalar Cholesky; compare the live-out array and reconstruction residual |
+| PB-ludcmp | High-precision independent LU and triangular solves; complete live-outs and solve residual |
+| PB-jacobi-2d | Scalar reference with independent ping-pong grids, exact frozen boundaries and step count |
+| PB-heat-3d | Scalar three-dimensional stencil reference with independent initialization and boundaries |
+| PB-adi | Independent directional tridiagonal solves and boundary updates for every frozen step |
+| PB-durbin | High-precision independent recurrence from the declared input; every live-out element |
+| STREAM | Analytic recurrence for each array element after the exact warm-up and iteration count, replacing average-only validation |
+| NPB-CG | NPB 3.4.2 class A packaged zeta reference and verification |
+| NPB-EP | NPB 3.4.2 class A packaged Gaussian-sum references and verification |
+| NPB-MG | NPB 3.4.2 class A packaged residual-norm reference and verification |
+| NPB-IS | NPB 3.4.2 class A rank references and full integer verification |
+| HPCG | HPCG 3.1 full TestCG/TestSymmetry and validity conditions; record actual iterations and require equal work |
+| zlib | Original bytes as exact oracle; both peer decoding and an independent host zlib decoder |
+| SQLite | Independent integer computation of every ordered query result, row count and transaction effect |
+| bzip2 | Original bytes as exact oracle; peer decoding and independent host bzip2 decoder, all artifacts sealed |
+
+The independent PolyBench and STREAM checks must use ADR-0015's frozen
+`abs(actual-reference) <= 1e-8 + 1e-6*abs(reference)` with finiteness checked
+first. The current pilot's stricter donor-comparison tolerance above is retained;
+donor agreement alone is not independent-reference readiness. Packaged NPB/HPCG
+tolerances stay unchanged and integer/byte results are exact. The follow-up must
+exercise corruption through each checker family. HPCG's duration-driven work is
+pilot-only until equal completed work can be established; six pairs alone do not
+make this harness gate-ready. The lead must also freeze environment/inputs and
+verify held-out ACLs before any gate run. Pilot timings cannot become gate samples.
 
 Host acceptance (fixtures and host builds of harness C code; use shared Cygwin
 Python and gcc, with the staged codec sources available):
