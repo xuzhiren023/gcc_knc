@@ -25,10 +25,20 @@ def main():
         script = subprocess.check_output(
             [str(v.TC / 'cygwin/bin/cygpath.exe'), '-u', str(Path(__file__).resolve())],
             env=env, text=True).strip()
-        return subprocess.call([str(v.TC / 'cygwin/bin/python3.12.exe'), script], env=env)
+        return subprocess.call([str(v.TC / 'cygwin/bin/python3.12.exe'), script, *sys.argv[1:]], env=env)
     os.environ['PATH'] = ':'.join(map(str, (v.TC / 'cross/bin', v.TC / 'cygwin/bin'))) + ':' + os.environ['PATH']
     out = v.SHARED / 'S10-12/card'
     out.mkdir(parents=True, exist_ok=True)
+    if sys.argv[1:] == ['--regression']:
+        host = v.SHARED / 'S10-12/host'
+        host.mkdir(parents=True, exist_ok=True)
+        exe = host / 'cbrt_screen.exe'
+        run('gcc', *v.TEST_FLAGS, '-DVMATH_MPFR', '-Wno-psabi',
+            v.ROOT / 'tests/vmath/cbrt_screen.c',
+            v.SHARED / 'S10-11/host/libknc_vmath.a',
+            '-pthread', '-lmpfr', '-lgmp', '-lm', '-o', exe)
+        run(exe)
+        return 0
     archive = v.SHARED / 'S10-11/knc/libknc_vmath.a'
     if not archive.is_file():
         raise SystemExit('Missing crash baseline: ' + str(archive))
