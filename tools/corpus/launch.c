@@ -1,9 +1,10 @@
-/* Harness only: time the whole child process and bind the granted CPUs.
+/* Harness only: time the child up to its output boundary and bind granted CPUs.
    Never starts a remote job; card_run supplies this process's affinity. */
 #define _GNU_SOURCE
 #include <dirent.h>
 #include <errno.h>
 #include <sched.h>
+#include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -50,16 +51,37 @@ static void reports(void)
   closedir(d);
 }
 
+/* A separate copy leaves the normal cross-decoding input intact. */
+static int corrupt_stream(void)
+{
+  FILE *input = fopen("packed.bin", "rb"), *output;
+  unsigned char buffer[4096];
+  size_t got;
+  int first = 1, failed;
+  if (!input) return 2;
+  output = fopen("corrupt.bin", "wb");
+  if (!output) { fclose(input); return 2; }
+  while ((got = fread(buffer, 1, sizeof buffer, input))) {
+    if (first) { buffer[0] ^= 1; first = 0; }
+    if (fwrite(buffer, 1, got, output) != got) break;
+  }
+  failed = first || ferror(input) || ferror(output);
+  if (fclose(input)) failed = 1;
+  if (fclose(output)) failed = 1;
+  return failed ? 2 : 0;
+}
+
 int main(int argc, char **argv)
 {
   cpu_set_t granted, selected;
   int cores[CPU_SETSIZE], packages[CPU_SETSIZE], percore[CPU_SETSIZE] = {0}, ncores = 0, ncpus = 0;
-  int cpu, i, count = 0, status;
+  int cpu, i, count = 0, status, deferred;
   char affinity[CPU_SETSIZE * 6], threads[32];
   size_t used = 0;
   struct timespec start, end;
   pid_t child;
   if (argc != 3 || sched_getaffinity(0, sizeof granted, &granted)) return 2;
+  deferred = !strncmp(argv[2], "PB-", 3) || !strcmp(argv[2], "zlib") || !strcmp(argv[2], "bzip2");
   CPU_ZERO(&selected);
   for (cpu = 0; cpu < CPU_SETSIZE; ++cpu) {
     int core, package, first;
@@ -106,29 +128,50 @@ int main(int argc, char **argv)
   setenv("LD_LIBRARY_PATH", ".", 1);
   if ((!strcmp(argv[2], "zlib") || !strcmp(argv[2], "bzip2")) &&
       system("mkdir -p peer && tar -xf peer.tar -C peer")) return 2;
+  fflush(stdout);
   if (clock_gettime(CLOCK_MONOTONIC, &start)) return 2;
   child = fork();
   if (child < 0) return 2;
   if (!child) {
+    if (deferred) setenv("CORPUS_TIMED", "1", 1);
+    else unsetenv("CORPUS_TIMED");
     execl("./workload", "workload", (char *)0);
     perror("exec workload");
     _exit(127);
   }
-  while (waitpid(child, &status, 0) < 0) if (errno != EINTR) return 2;
+  while (waitpid(child, &status, WUNTRACED) < 0) if (errno != EINTR) return 2;
   if (clock_gettime(CLOCK_MONOTONIC, &end)) return 2;
   printf("\nCORPUS_TIME %.9f\n", end.tv_sec - start.tv_sec + (end.tv_nsec - start.tv_nsec) * 1e-9);
+  fflush(stdout);
+  if (WIFSTOPPED(status)) {
+    if (!deferred || WSTOPSIG(status) != SIGSTOP) {
+      kill(child, SIGKILL);
+      while (waitpid(child, &status, 0) < 0) if (errno != EINTR) return 2;
+      return 2;
+    }
+    if (kill(child, SIGCONT)) return 2;
+    while (waitpid(child, &status, 0) < 0) if (errno != EINTR) return 2;
+  } else if (deferred) {
+    fprintf(stderr, "Missing workload timing boundary\n");
+    return 2;
+  }
   if (!strcmp(argv[2], "HPCG")) reports();
   if ((!strcmp(argv[2], "zlib") || !strcmp(argv[2], "bzip2")) &&
       WIFEXITED(status) && WEXITSTATUS(status) == 0) {
-    fflush(stdout);
-    child = fork();
-    if (child < 0) return 2;
-    if (!child) {
-      setenv("LD_LIBRARY_PATH", "peer", 1);
-      execl("./peer/workload", "workload", "decode", (char *)0);
-      _exit(127);
+    for (i = 0; i < 2; ++i) {
+      if (i && corrupt_stream()) return 2;
+      fflush(stdout);
+      child = fork();
+      if (child < 0) return 2;
+      if (!child) {
+        setenv("LD_LIBRARY_PATH", "peer", 1);
+        unsetenv("CORPUS_TIMED");
+        execl("./peer/workload", "workload", i ? "control" : "decode", (char *)0);
+        _exit(127);
+      }
+      while (waitpid(child, &status, 0) < 0) if (errno != EINTR) return 2;
+      if (!WIFEXITED(status) || WEXITSTATUS(status)) break;
     }
-    while (waitpid(child, &status, 0) < 0) if (errno != EINTR) return 2;
   }
   return WIFEXITED(status) ? WEXITSTATUS(status) : 128 + WTERMSIG(status);
 }

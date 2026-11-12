@@ -1,4 +1,4 @@
-"""S11-18 red contract: host fixtures only; no compiler or card execution.
+"""S11-18 contract: host fixtures and harness C builds; no card execution.
 
 V2 launch identities include profile ('full', '3100', '5100') and variant.
 Serial OpenMP-program builds vote in panel='primary'; variant='openmp'

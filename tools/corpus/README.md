@@ -47,6 +47,8 @@ The baseline has 468 timed launches plus the probe. Plan 4-7 hours including
 transfer and checks, pending native calibration. The conservative timeout
 ceiling is about 22 hours (120 seconds per launch, 600 for HPCG). Extra flags
 increase these budgets; timed-out work remains failed.
+Serial NPB EP/CG/MG class A may exceed the 120-second limit on one KNC core;
+the lead should calibrate those limits on the first native pass.
 
 PB-adi, PB-durbin and bzip2 are sealed by program name, ignoring caller labels.
 Their builds, logs, plans, runtime records, captures, card transport records and
@@ -72,7 +74,8 @@ Frozen workloads and checks:
 | zlib, bzip2 | fixed 8 MiB input, levels 6 and 9 | full round trip and other compiler decoding |
 | SQLite | input.sql, 100,000 rows | independent integer reference for all query outputs |
 
-PolyBench emits every unrounded live-out double with 17 significant digits.
+PolyBench emits every unrounded live-out double with 17 significant digits,
+after the timing boundary described below.
 Array names, order and lengths must agree. Every finite element must satisfy
 `abs(a-b) <= max(1e-10, 1e-8*max(abs(a),abs(b)))`; missing or nonfinite output
 fails. The host corruption control permutes values while preserving all five
@@ -91,13 +94,24 @@ Compression input is the frozen unsigned 32-bit LCG seed 11, multiplier 1664525,
 increment 1013904223, using the fixed block pattern and literal in corpus.py.
 After timing, the launcher runs the other compiler's decoder in an isolated
 runtime directory on the actual compressed output. Both decoders compare every
-byte with the original. An intentionally flipped restored byte must be rejected
-by the same comparison. Cross-decoding and the corruption control must both pass.
+byte with the original. The launcher then copies packed.bin to corrupt.bin,
+flipping its first byte, and invokes that same peer decoder in control mode.
+Only a decoder error or a full-output mismatch counts as rejection; file errors
+do not. A clean control stream must be accepted by the decoder and therefore
+fail the negative control. Cross-decoding and the corruption control must both pass.
 The other compiler's first successful flag set supplies the reference decoder.
 
 CLOCK_MONOTONIC measures initialization, computation and the local check,
-excluding transfer and the additional cross-decoding check. PolyBench complete
-output capture is included symmetrically, so timings include validation I/O.
+excluding transfer and the additional cross-decoding check. Before the first
+PolyBench array is formatted, the dump interceptor raises SIGSTOP. The launcher
+waits with WUNTRACED, records and flushes CORPUS_TIME, then sends SIGCONT and
+waits for successful completion of the complete dump. Later arrays do not stop
+again. Compression stops in the same way after its local round trip and before
+writing packed.bin. Thus all complete-array formatting, stdout/SSH transfer,
+packed-file writes, cross-decoding and corruption checks occur after timing.
+The stop/wakeup boundary adds a small scheduling cost, but no per-element output
+cost; workload initialization remains measured. Missing boundaries or failed
+output completion fail the launch. Other workloads retain whole-child timing.
 This is not an official HPCG submission or published STREAM rating.
 
 Each launch produces one raw JSON line, including build and transport failures.
@@ -105,7 +119,8 @@ Each launch produces one raw JSON line, including build and transport failures.
 or incorrect launches fail. Scoring belongs to S11-14 / ADR-0015 once available;
 v2 collection emits no scores. The old summary helper remains a legacy API only.
 
-Approved host acceptance (fixtures only; use Python 3.9 or later):
+Host acceptance (fixtures and host builds of harness C code; use shared Cygwin
+Python and gcc, with the staged codec sources available):
 
 ```
 python tools/run.py --name S11-18-green --inputs tests/tools/test_corpus_v2.py tools/corpus.py tools/corpus -- ../_shared/toolchain/cygwin/bin/python3.12.exe -m unittest discover -s tests/tools -p test_corpus_v2.py

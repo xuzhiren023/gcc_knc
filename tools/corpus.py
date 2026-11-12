@@ -489,9 +489,11 @@ def stage(args):
         # Reference input, retained verbatim in the package; no source edits.
         shutil.copyfile(source / 'hpcg-3.1/bin/hpcg.dat', stage_dir / 'hpcg.dat')
         with (stage_dir / 'support.log').open('w') as log:
-            execute([compiler_path(DONOR), '-O2', SUPPORT / 'launch.c', *link_paths(), '-lrt', '-pthread', '-o', stage_dir / 'launch'], stage_dir, log)
-            execute([sys.executable, ROOT / 'tools/knc_lint', stage_dir / 'launch'], stage_dir, log)
             execute(['gcc', source / 'NPB3.4.2/NPB3.4-OMP/sys/setparams.c', '-o', stage_dir / 'setparams'], stage_dir, log)
+    # Selective restaging must also refresh the launcher protocol.
+    with (stage_dir / 'support.log').open('a') as log:
+        execute([compiler_path(DONOR), '-O2', SUPPORT / 'launch.c', *link_paths(), '-lrt', '-pthread', '-o', stage_dir / 'launch'], stage_dir, log)
+        execute([sys.executable, ROOT / 'tools/knc_lint', stage_dir / 'launch'], stage_dir, log)
     for compiler, flag_variants in flag_sets(args.extra_flags).items():
         for flag_index, flags in enumerate(flag_variants):
             for program in PROGRAMS:

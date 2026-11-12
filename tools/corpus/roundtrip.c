@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <signal.h>
 #ifdef CORPUS_ZLIB
 #include <zlib.h>
 #else
@@ -15,12 +16,13 @@ int main(int argc, char **argv)
   FILE *f = fopen("input.bin", "rb");
   int good = 0;
   unsigned int packed_size = 0;
-  int decode = argc == 2 && !strcmp(argv[1], "decode");
+  int control = argc == 2 && !strcmp(argv[1], "control");
+  int decode = control || (argc == 2 && !strcmp(argv[1], "decode"));
   if (!input || !packed || !output || !f) return 2;
   if (fread(input, 1, size, f) != size || fgetc(f) != EOF) return 2;
   fclose(f);
   if (decode) {
-    f = fopen("packed.bin", "rb");
+    f = fopen(control ? "corrupt.bin" : "packed.bin", "rb");
     if (!f) return 2;
     packed_size = fread(packed, 1, size * 2 + 4096, f);
     if (!feof(f) || ferror(f)) return 2;
@@ -46,15 +48,17 @@ int main(int argc, char **argv)
   }
 #endif
   if (good && !decode) {
+    /* End timing after the local round trip, before persistence and checks
+       by the other compiler. The launcher resumes us after CORPUS_TIME. */
+    if (getenv("CORPUS_TIMED")) raise(SIGSTOP);
     f = fopen("packed.bin", "wb");
     if (!f || fwrite(packed, 1, packed_size, f) != packed_size || fclose(f)) return 2;
   }
-  if (good) {
-    output[size / 2] ^= 1;
-    if (!memcmp(input, output, size)) return 1;
-    puts("CORPUS_CONTROL rejected");
-  }
   free(input); free(packed); free(output);
+  if (control) {
+    puts(good ? "CORPUS_CONTROL accepted" : "CORPUS_CONTROL rejected");
+    return good ? 1 : 0;
+  }
   puts(decode ? (good ? "CORPUS_CROSS pass" : "CORPUS_CROSS fail") :
                (good ? "CORPUS_CHECK pass" : "CORPUS_CHECK fail"));
   return good ? 0 : 1;
