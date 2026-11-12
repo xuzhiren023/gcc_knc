@@ -258,8 +258,13 @@ def run_job(target, job, program, args, timeout):
     if target == 'host':
         text = run_host(program, args)
     else:
+        binary = OUT / 'knc' / (program + '.mic')
+        if binary.is_symlink():
+            binary = binary.resolve(strict=True)
+        if not binary.is_file():
+            raise FileNotFoundError('card binary is missing or not a regular file: %s' % binary)
         cmd = [sys.executable, str(ROOT / 'tools/card_run'), '--threads', '240', '--timeout', str(timeout),
-               str(OUT / target / (program + '.mic'))] + args
+               str(binary)] + args
         text = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
                               universal_newlines=True).stdout
     (OUT / target / (job + '.txt')).write_text(text)
@@ -290,6 +295,19 @@ def main():
                         help='with --host: run qualify_v1 as the card does, screen then recheck')
     args = parser.parse_args()
     OUT = SHARED / args.out
+    if not args.host:
+        missing = []
+        for name in sorted({program for jobs in JOBS.values() for _, program, _, _ in jobs}):
+            binary = OUT / 'knc' / (name + '.mic')
+            try:
+                resolved = binary.resolve(strict=True) if binary.is_symlink() else binary
+            except OSError:
+                resolved = binary
+            if not resolved.is_file():
+                missing.append(str(binary))
+        if missing:
+            print('card binaries missing or not regular files: ' + ', '.join(missing), file=sys.stderr)
+            return 2
     target = 'host' if args.host else 'card'
     sets = ['negative', 'compare'] if args.host else (['negative', 'compare', 'full'] if args.set == 'all' else [args.set])
     (OUT / target).mkdir(parents=True, exist_ok=True)
@@ -301,7 +319,8 @@ def main():
             if args.screen and target == 'host' and program == 'qualify_v1':
                 jargs = jargs + ['--screen']
             if args.dry_run:
-                print('%s: %s %s' % (job, program, ' '.join(jargs)))
+                binary = OUT / 'knc' / (program + '.mic')
+                print('%s: %s %s %s' % (job, binary, program, ' '.join(jargs)))
                 continue
             text = run_job(target, job, program, jargs, args.timeout)
             result, detail, fields = assess(job, program, jargs, expect, text)
