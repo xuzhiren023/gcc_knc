@@ -2,7 +2,7 @@
 
 Updated automatically at every ticket change. Last update: 2026-11-12 18:05.
 
-**Next: GPT-6.1, on S11-02 (card_run and run_suite move bulk data by SCIF DMA at the PCIe link limit, with the SSH stream as fallback).** Run `python tools/dispatch.py`, or ask the tech lead to.
+**Next: the tech lead, on S11-02.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[###################-]` 197 of 201
 
@@ -53,7 +53,7 @@ Current tickets: `[###################-]` 197 of 201
 | S10-12 | cbrt and cbrtf crash (SIGSEGV) in qualify_v1 on the card - root cause and fix | Done | The cbrt and cbrtf qualification jobs no longer crash on the card and pass (worst 0.4996 and 0.4991 ULP): t... |
 | S10-13 | User story - code that calls cbrtl under -march=knc gets a safe replacement and a compile-time warning (MPSS libm cbrtl faults) | Done | Under -march=knc, calls to cbrtl (and std::cbrt on long double) now go to GCC-KNC's own safe cube root with... |
 | S11-01 | User story - the best way to move data between the host and the card, measured, and how our projects use it | Done | We now have a sourced inventory of every host-card transfer path that works without changing MPSS (SSH, tar... |
-| S11-02 | card_run and run_suite move bulk data by SCIF DMA at the PCIe link limit, with the SSH stream as fallback | In progress | Acceptance is written (top of the ticket): DMA by receiver-pull scif_readfrom for files of 1 MiB or more, S... |
+| S11-02 | card_run and run_suite move bulk data by SCIF DMA at the PCIe link limit, with the SSH stream as fallback | Tests waiting for review | Red commit f8d553f8. tools/run.py --name s11-02-dma-red ran tests/tools/test_card_dma.py once: 7 expected f... |
 | S11-03 | S11-01 transfer tool rejects the card's physical /tmp path, so the native study never starts | Done | The transfer study's tool now accepts the card's real /tmp location (/var/volatile/tmp), so its card run ca... |
 | S11-04 | S11-01 transfer tool - the host opens every connection, because Windows Firewall blocks inbound TCP from the card | Done | The transfer study's host side now opens every connection to the card, so Windows Firewall no longer blocks... |
 | S11-05 | Research - raise KNC's real memory bandwidth from about 175 GB/s toward 75-85% of peak, with a measured plan | Done | The memory-bandwidth research plan and a validated multithreaded KNC bandwidth benchmark are ready, with a ... |
@@ -66,9 +66,9 @@ Current tickets: `[###################-]` 197 of 201
 | S11-12 | Sprint 11 batch check - full native suite, x86 identity, forward-port drill, ICE sweeps, runtime prefix consistency | draft |  |
 | S11-13 | Senior compiler review of the Sprint 11-13 scope (Milestone M4) against our research, with recommended plan changes | Done | A senior compiler review of the Sprint 11-13 plan is in: M4 is plausible but needs a frozen scoring and mea... |
 | S11-14 | M4 scoring contract and measurement protocol, frozen before any tuning | Done | M4's scoring contract is frozen in ADR-0015 with a tested scorer: strict serial -O2 versus -O2 over 17 prog... |
-| S11-15 | First development-corpus baseline and profile, GCC 5.1.1 vs GCC-KNC at -O2 (E7-03 part 1) | draft |  |
+| S11-15 | First development-corpus baseline and profile, GCC 5.1.1 vs GCC-KNC at -O2 (E7-03 part 1) | Not started | Ready. S11-18 (harness v2) is merged and staged at .work/_shared/S11-18/ (lead.ps1: 468 launches, 7120/3100... |
 | S11-16 | Long-double libm hazard audit - do other MPSS long double entry points fault like cbrtl? (E7-21, bounded) | Done | The card's MPSS long double libm was probed on the card: of 12 entry points only cbrtl faults, and S10-13 a... |
-| S11-17 | PGO feasibility on one complete development program (reuse of S9-18's train/use path) | draft |  |
+| S11-17 | PGO feasibility on one complete development program (reuse of S9-18's train/use path) | Not started | Ready (S11-18 merged; corpus builds staged in .work/_shared/S11-18/). Lane pgo. Build the training and use ... |
 | S11-18 | M4 corpus harness v2 - card profiles, prefix record, held-out sealing, stronger checks, and the donor-failure rule | Done | The M4 corpus harness now stages all 17 programs for the 7120 and the 3100/5100 profiles with serial voting... |
 | S11-19 | Second senior review - the M4 definition and the Sprint 11-13 roadmap, adjusted | Done | The M4 definition and the Sprint 11-13 roadmap are rewritten as measure, improve, decide, each sprint with ... |
 | S2-01 | Design for zmm and mask registers under -march=knc | Done | The register design for KNC is settled on paper: all 32 zmm and 8 mask registers become usable under -march... |
@@ -226,20 +226,20 @@ Current tickets: `[###################-]` 197 of 201
 
 ## Recent activity
 
+- 2026-11-12 18:10 **S11-17** lead note: Ready (S11-18 merged; corpus builds staged in .work/_shared/S11-18/). Lane pgo. Build the training and use variants for one development program (zl...
+- 2026-11-12 18:10 **S11-15** lead note: Ready. S11-18 (harness v2) is merged and staged at .work/_shared/S11-18/ (lead.ps1: 468 launches, 7120/3100/5100, pilot pairs 3). The lead runs the...
 - 2026-11-12 18:05 **S11-18** lead approve: The M4 corpus harness now stages all 17 programs for the 7120 and the 3100/5100 profiles with serial voting builds, launch-to-exit timing, complete...
+- 2026-11-12 18:05 **S11-02** engineer red: Red commit f8d553f8. tools/run.py --name s11-02-dma-red ran tests/tools/test_card_dma.py once: 7 expected failures, missing tools/card_dma.py. Fake...
 - 2026-11-12 17:55 **S11-19** lead approve: The M4 definition and the Sprint 11-13 roadmap are rewritten as measure, improve, decide, each sprint with a plain-language goal, reason and comple...
 - 2026-11-12 17:55 **S11-18** engineer submit: 3684eca9: ADR-0015 RAW launch-to-exit; --pairs 3/6. 9 host tests pass; launcher+20 builds linted. Logs: .work/_state/logs/S11_18_adr_{green-2026111...
 - 2026-11-12 17:54 **S11-02** lead answer: Acceptance is written (top of the ticket): DMA by receiver-pull scif_readfrom for files of 1 MiB or more, SSH stream for small files and fallback, ...
 - 2026-11-12 17:54 **S11-02** owner decide: Owner 2026-11-12 17:50 EST: "s11-02 approved by me". Acceptance written by the lead from the measured DMA results.
-- 2026-11-12 17:45 **S11-19** engineer submit: Addressed both 17:32 review fixes: plain-language introductions on M4 and S11-S13, prose slash-pairs written out, ASCII review byline, and evidence...
-- 2026-11-12 17:45 **S11-16** lead approve: The card's MPSS long double libm was probed on the card: of 12 entry points only cbrtl faults, and S10-13 already guards it, so the M4 correctness ...
-- 2026-11-12 17:35 **S11-18** lead answer: Both, split by cost: (1) Implement ADR-0015's timed boundary and record format now: launch-to-exit wall time on the card's monotonic clock as the r...
 
 ## Cost
 
 - From the script, engineer: 480 sessions, 1017.8M input tokens
 - From the script, lead: 308 sessions, 88.3M input tokens
-- Started by hand, Claude: 12 sessions, 2734.6M input tokens
+- Started by hand, Claude: 12 sessions, 2735.4M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
