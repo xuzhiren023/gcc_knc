@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-12 08:06.
+Updated automatically at every ticket change. Last update: 2026-11-12 08:16.
 
-**Waiting for you:** S10-12, S10-13, S11-01. Run `python tools/pm.py inbox`.
+**Waiting for you:** S10-13, S11-01. Run `python tools/pm.py inbox`.
 
 Current tickets: `[###################-]` 180 of 184
 
@@ -50,9 +50,9 @@ Current tickets: `[###################-]` 180 of 184
 | S10-09 | User story - double-precision loops with division and square root vectorize, correctly rounded (V8DF div, cond_div, sqrt) | Done | Double-precision loops with division or square root now vectorize under -march=knc and give the correctly r... |
 | S10-10 | Card harness fixes from the Sprint 10 card turn - card_qualify binary folder, vmath bench batch sizing | Done | card_qualify now runs the card binaries from knc/ and stops before any card job when one is missing, and th... |
 | S10-11 | Card-only vector math failures - double sin, cos, tan, atan2 above 1 ULP, and cbrt/cbrtf crash (SIGSEGV) | Done | Double sin, cos, tan and atan2 from the KNC vector math library are now within 1 ULP on the card (0.76 to 0... |
-| S10-12 | cbrt and cbrtf crash (SIGSEGV) in qualify_v1 on the card - root cause and fix | **Waiting for you** | Review of 1ff46888/7ae4d224: cause accepted (MPSS libm s_cbrtl.S:178, cbrtl+0xea, zero-extends a negative t... |
-| S10-13 | User story - code that calls cbrtl under -march=knc gets a safe replacement and a compile-time warning (MPSS libm cbrtl faults) | **Waiting for you** | Needs the interactive lead, not an owner decision: the lane gcc2 engineer sandbox cannot write .work/_share... |
-| S11-01 | User story - the best way to move data between the host and the card, measured, and how our projects use it | **Waiting for you** | For the interactive lead, not an owner decision. (1) hash_in_diff in harness/policy.json is a hard submit c... |
+| S10-12 | cbrt and cbrtf crash (SIGSEGV) in qualify_v1 on the card - root cause and fix | Question for the tech lead | Owner 2026-11-12 08:40 EST ('Approve both', answering the lead's request to release the inbox tickets): rel... |
+| S10-13 | User story - code that calls cbrtl under -march=knc gets a safe replacement and a compile-time warning (MPSS libm cbrtl faults) | **Waiting for you** | Interactive lead: tree 2's build folder .work/_shared/gcc-build-2 was created outside the Codex sandbox (ow... |
+| S11-01 | User story - the best way to move data between the host and the card, measured, and how our projects use it | **Waiting for you** | Interactive lead: (1) payload SHA-256 is part of the deliverable, so the ticket now carries hash_ok for the... |
 | S11-02 | card_run and run_suite move data by S11-01's recommended method, with fallback | Not started | ready; waits on its dep S11-01, the lead writes acceptance before it starts |
 | S2-01 | Design for zmm and mask registers under -march=knc | Done | The register design for KNC is settled on paper: all 32 zmm and 8 mask registers become usable under -march... |
 | S2-02 | Float and double arguments and results in zmm lane 0 | Done | Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`). |
@@ -209,20 +209,20 @@ Current tickets: `[###################-]` 180 of 184
 
 ## Recent activity
 
+- 2026-11-12 08:35 **S10-13** lead note: Interactive lead: tree 2's build folder .work/_shared/gcc-build-2 was created outside the Codex sandbox (owner xuzhi, Cygwin deny entries for other...
+- 2026-11-12 08:25 **S11-01** lead note: Interactive lead: (1) payload SHA-256 is part of the deliverable, so the ticket now carries hash_ok for the transfer tool, bench, SHA-256 header, c...
+- 2026-11-12 08:16 **S10-12** owner decide: Owner 2026-11-12 08:40 EST ('Approve both', answering the lead's request to release the inbox tickets): released; follow the lead's latest note.
 - 2026-11-12 08:05 **S10-13** lead escalate: Needs the interactive lead, not an owner decision: the lane gcc2 engineer sandbox cannot write .work/_shared/gcc-build-2/gcc (Permission denied; se...
 - 2026-11-12 08:03 **S10-13** engineer ask: Build blocked: Cygwin bash -c 'cd ../_shared/gcc-build-2/gcc && : > tmp-optionlist' fails Permission denied, reproducing full-build failure. Please...
 - 2026-11-12 08:01 **S11-01** lead escalate: For the interactive lead, not an owner decision. (1) hash_in_diff in harness/policy.json is a hard submit check and blocks the payload SHA-256 I au...
 - 2026-11-12 07:57 **S11-01** engineer ask: Committed 3620386b; study and tools staged in .work/_shared/S11-01. Final loopback/FIPS/corruption and K1OM build/lint PASS; no card job. Logs: .wo...
 - 2026-11-12 07:51 **S10-13** lead approve-red: Red tests for S10-13 approved: they fail today because KNC code still calls the card's faulting cbrtl with no warning, and they pass for x86. For t...
-- 2026-11-12 07:49 **S10-13** engineer red: Red commit f9a101aa. Ran S10-13-red once via tools/run.py: check.py t1 --compiler gcc16 --cbrtl --worker, gcc2. Expected failures: KNC calls cbrtl,...
-- 2026-11-12 07:35 **S10-12** lead note: Review of 1ff46888/7ae4d224: cause accepted (MPSS libm s_cbrtl.S:178, cbrtl+0xea, zero-extends a negative table offset; first fault at the grid inp...
-- 2026-11-12 07:31 **S11-01** lead answer: Yes. The AGENTS.md rule is about process provenance (receipts, hash manifests of our own files), which git already covers. The SHA-256 in deliverab...
 
 ## Cost
 
 - From the script, engineer: 432 sessions, 950.3M input tokens
 - From the script, lead: 272 sessions, 80.0M input tokens
-- Started by hand, Claude: 11 sessions, 2482.2M input tokens
+- Started by hand, Claude: 11 sessions, 2485.0M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
