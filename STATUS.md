@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-12 17:05.
+Updated automatically at every ticket change. Last update: 2026-11-12 17:06.
 
 **Waiting for you:** S11-02. Run `python tools/pm.py inbox`.
 
@@ -60,7 +60,7 @@ Current tickets: `[###################-]` 193 of 200
 | S11-06 | Memory bandwidth - read the first card sweep, find why our numbers sit below STREAM's, and stage sweep 2 toward 264-299 GB/s | Done | The memory-bandwidth benchmark now times only the worker passes and has a corrected long-sample baseline on... |
 | S11-07 | S11-01 transfer tool - the card's listener gives up before card_run relays its announcement | Done | The transfer study's card listener now waits long enough for card_run to relay its address to the host; che... |
 | S11-08 | -Wknc-unsafe-cbrtl cannot be used in #pragma GCC diagnostic ("valid for  but not for C") | Done | The cbrtl warning can now be silenced around one deliberate call with #pragma GCC diagnostic in C and C++; ... |
-| S11-09 | Memory bandwidth for LLM decode - a weight-streaming GEMV workload, pushed toward 264-299 GB/s of weight bytes | lead | Needs interactive lead: card run in our exclusive turn. Reviewed 33de9541: IMCI sint8/float16 load conversi... |
+| S11-09 | Memory bandwidth for LLM decode - a weight-streaming GEMV workload, pushed toward 264-299 GB/s of weight bytes | Question for the tech lead | GEMV sweep result on the ticket (17:15 note). |
 | S11-10 | S11-01 transfer runner - choose repetitions, sizes and load states per run, so slow methods fit a card turn | Done | The transfer runner now takes --repeats, --sizes, --loads and --concurrency so a slow method fits a card tu... |
 | S11-11 | M4 corpus run harness - every corpus program built by GCC 5.1.1 and GCC-KNC, run on the card with frozen inputs and a correctness check, in one command | Done | The M4 corpus harness builds 17 programs with GCC 5.1.1 and GCC-KNC and stages checked card runs; GCC-KNC b... |
 | S11-12 | Sprint 11 batch check - full native suite, x86 identity, forward-port drill, ICE sweeps, runtime prefix consistency | draft |  |
@@ -225,23 +225,23 @@ Current tickets: `[###################-]` 193 of 200
 
 ## Recent activity
 
+- 2026-11-12 17:15 **S11-09** lead note: Card GEMV sweep 2026-11-12 21:41-21:57Z (boot da3144f1, benchmark mode, 240 CPUs granted, 55 cases): raw output .work/_shared/tmp/claude-next28/mem...
+- 2026-11-12 17:06 **S11-09** lead resume: GEMV sweep result on the ticket (17:15 note).
 - 2026-11-12 17:05 **S11-14** lead approve: M4's scoring contract is frozen in ADR-0015 with a tested scorer: strict serial -O2 versus -O2 over 17 programs on the 7120 and the 3100/5100 profi...
 - 2026-11-12 17:00 **S11-18** lead note: Owner 2026-11-12 17:00 EST ("Serial vs serial primary", accepting the lead's recommendation): (1) the six OpenMP programs (STREAM, NPB CG/EP/MG/IS,...
 - 2026-11-12 17:00 **S11-14** lead note: Owner 2026-11-12 17:00 EST ("Serial vs serial primary", accepting the lead's recommendation): (1) the six OpenMP programs (STREAM, NPB CG/EP/MG/IS,...
 - 2026-11-12 16:53 **S11-18** lead approve-red: S11-18 red approved: host tests now pin the owner's serial-vs-serial voting with a GCC-KNC-only labelled OpenMP panel across 7120/3100/5100, held-o...
 - 2026-11-12 16:53 **S11-14** engineer submit: 1248919a after red 0f7940b6: ADR proposed; all 17 serial primary, labelled OpenMP panels excluded, SQLite pilot-frozen donor level and kmov record,...
 - 2026-11-12 16:51 **S11-18** engineer red: Red 51a1f2cf: serial primary for both compilers; KNC-only labelled OpenMP densities; variant identities; staged-only identical HPCG n fix and sole-...
-- 2026-11-12 16:47 **S11-18** lead changes: Red is mostly good: the corruption control (2,1,3 vs 1,3,2 has equal count, sum, abs, squares and weighted sum) is right, sealing goes by program n...
-- 2026-11-12 16:47 **S11-14** lead changes: The scoring math, 17 canonical votes, sealed-root fix (red f1c136b3 then green 593e1230) and the rest of ADR-0015 are sound. The owner's 2026-11-12...
 
 ## Cost
 
 - From the script, engineer: 470 sessions, 1000.8M input tokens
 - From the script, lead: 301 sessions, 86.4M input tokens
-- Started by hand, Claude: 12 sessions, 2701.1M input tokens
+- Started by hand, Claude: 12 sessions, 2703.9M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 24.8 GiB of 100 GiB. 82 GiB free on the drive.
+The project uses 24.8 GiB of 100 GiB. 83 GiB free on the drive.
