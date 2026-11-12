@@ -1,10 +1,10 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-12 17:35.
+Updated automatically at every ticket change. Last update: 2026-11-12 17:45.
 
 **Waiting for you:** S11-02. Run `python tools/pm.py inbox`.
 
-Current tickets: `[###################-]` 194 of 201
+Current tickets: `[###################-]` 195 of 201
 
 ## Milestones
 
@@ -14,7 +14,7 @@ Current tickets: `[###################-]` 194 of 201
 | M1 | Mixed native code | Done | 43 of 43 tickets |
 | M2 | Useful vector target | Done | 51 of 51 tickets |
 | M3 | Runtimes | Done | 48 of 48 tickets |
-| M4 | Broad optimization | In progress | 12 of 19 tickets |
+| M4 | Broad optimization | In progress | 13 of 19 tickets |
 | M5 | Program corpus | Not started | Not planned in detail yet |
 | M6 | Release | Not started | Not planned in detail yet |
 
@@ -67,7 +67,7 @@ Current tickets: `[###################-]` 194 of 201
 | S11-13 | Senior compiler review of the Sprint 11-13 scope (Milestone M4) against our research, with recommended plan changes | Done | A senior compiler review of the Sprint 11-13 plan is in: M4 is plausible but needs a frozen scoring and mea... |
 | S11-14 | M4 scoring contract and measurement protocol, frozen before any tuning | Done | M4's scoring contract is frozen in ADR-0015 with a tested scorer: strict serial -O2 versus -O2 over 17 prog... |
 | S11-15 | First development-corpus baseline and profile, GCC 5.1.1 vs GCC-KNC at -O2 (E7-03 part 1) | draft |  |
-| S11-16 | Long-double libm hazard audit - do other MPSS long double entry points fault like cbrtl? (E7-21, bounded) | Waiting for review | Native results recorded in docs/research/mpss-libm-long-double.md at 9dc764db. Lead card run with 240 threa... |
+| S11-16 | Long-double libm hazard audit - do other MPSS long double entry points fault like cbrtl? (E7-21, bounded) | Done | The card's MPSS long double libm was probed on the card: of 12 entry points only cbrtl faults, and S10-13 a... |
 | S11-17 | PGO feasibility on one complete development program (reuse of S9-18's train/use path) | draft |  |
 | S11-18 | M4 corpus harness v2 - card profiles, prefix record, held-out sealing, stronger checks, and the donor-failure rule | In progress | Both, split by cost: (1) Implement ADR-0015's timed boundary and record format now: launch-to-exit wall tim... |
 | S11-19 | Second senior review - the M4 definition and the Sprint 11-13 roadmap, adjusted | In progress | Substance is right and matches ADR-0015 (six pairs, 612 launches, 1.25x lower bound, SQLite exception, one ... |
@@ -226,6 +226,7 @@ Current tickets: `[###################-]` 194 of 201
 
 ## Recent activity
 
+- 2026-11-12 17:45 **S11-16** lead approve: The card's MPSS long double libm was probed on the card: of 12 entry points only cbrtl faults, and S10-13 already guards it, so the M4 correctness ...
 - 2026-11-12 17:35 **S11-18** lead answer: Both, split by cost: (1) Implement ADR-0015's timed boundary and record format now: launch-to-exit wall time on the card's monotonic clock as the r...
 - 2026-11-12 17:35 **S11-16** lead note: Card 2026-11-12 22:22:59-22:23:16Z (boot da3144f1), 240 threads: python tools/card_run --threads 240 --timeout 1800 .work/_shared/S11-16/long-doubl...
 - 2026-11-12 17:34 **S11-18** engineer ask: 3da5a9ce fixes timed output and peer corruption control. Seven host tests pass; 20 builds plus launcher restaged/linted. Logs: .work/_state/logs/S1...
@@ -233,16 +234,15 @@ Current tickets: `[###################-]` 194 of 201
 - 2026-11-12 17:33 **S11-16** lead answer: Size approved: 580 lines are mostly the research note (263) and the probe source (219); a split adds nothing. Submit with: python tools/pm.py submi...
 - 2026-11-12 17:32 **S11-19** lead changes: Substance is right and matches ADR-0015 (six pairs, 612 launches, 1.25x lower bound, SQLite exception, one retry, 14+3 split); the inclusion rule a...
 - 2026-11-12 17:32 **S11-16** engineer ask: Native results recorded and committed as 9dc764db: only known cbrtl fault, 11 controls OK, errors=0; log .work/_shared/tmp/claude-next29/probe.out....
-- 2026-11-12 17:31 **S11-16** lead answer: Finish the note with the card result (17:35) and submit; if pm.py commit fails, leave uncommitted and ask.
 
 ## Cost
 
 - From the script, engineer: 478 sessions, 1011.6M input tokens
 - From the script, lead: 307 sessions, 88.1M input tokens
-- Started by hand, Claude: 11 sessions, 2716.5M input tokens
+- Started by hand, Claude: 12 sessions, 2719.6M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 25.2 GiB of 100 GiB. 82 GiB free on the drive.
+The project uses 25.2 GiB of 100 GiB. 80 GiB free on the drive.
