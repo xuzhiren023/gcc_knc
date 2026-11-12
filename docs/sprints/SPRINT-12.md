@@ -1,30 +1,34 @@
-# Sprint 12: optimization ranked by corpus profiles, and the bandwidth winners in the compiler (Milestone M4, part 2)
+# Sprint 12: remove measured whole-program costs (Milestone M4, part 2)
 
-**Status:** planned 2026-11-12. Tickets are written when Sprint 11's corpus harness and bandwidth sweeps land;
-the order below is by expected benefit across the corpus, and the profiles may reorder it.
+**Status:** planned 2026-11-12, revised from the senior scope review (S11-13). Tickets are written from Sprint 11's
+baseline and profile (S11-15); the profiles choose the themes, not this list.
 
-**Goal:** the corpus programs run faster under GCC-KNC than under GCC 5.1.1 for reasons we can name, with the top
-corpus-wide hot spots carried through GIMPLE, RTL and assembly, and the memory-bandwidth winners from Sprint 11
-applied by the compiler and runtimes by default where they help.
+**Goal:** the development corpus runs measurably faster under GCC-KNC than GCC 5.1.1 at strict `-O2`, from at most
+three implementation themes chosen by removable wall time and coverage, each proven by a shape test and a paired
+whole-program A/B on the 7120 and under the 3100 and 5100 profiles (a gain must hold on all three), with no development program more than 5% slower without a known cause.
 
 Order:
-1. **Corpus profiles (E7-03).** Card time per program under both compilers, hot functions and loops per program,
-   and a ranked list of missed optimizations across the corpus (held-out programs excluded from every decision).
-2. **Bandwidth winners in the compiler (from S11-05/06/09).** Software prefetch distances per loop class (L2 far /
-   L1 near, E7-06), NGO streaming stores and eviction for write and read-modify-write streams, the GEMV loop shape
-   for weight streaming (several independent row streams, vector kept in L1), and thread-density guidance; each
-   a ticket with a T1 shape test and a card A/B on the bandwidth benchmark and on the corpus program it helps.
-3. **Scalar and integer code quality for the in-order core (E7-04, E7-15, E7-13).** Scheduling where it helps
-   (vector loops) and not where it hurts (x87), inlining and branch shape, no unaligned scalar stores.
-4. **Loop-level items the profiles confirm:** unroll for long streams at low thread density (E7-12), a cheaper short
-   remainder (E7-19), indirect-access prefetch (E7-09), alignment peeling for long loops (E7-10).
-5. **Runtime:** retune the per-core OpenMP barrier (E6-09) if the corpus's OpenMP programs show barrier time.
-6. Batch check.
+1. **Complete E7-03:** profiles of every development program, the removable-time ranking, and the three themes.
+2. **Up to three themes**, each split into bounded stories with their own proof. Likely candidates, in the review's
+   provisional order (replace with the measured ranking):
+   - scalar addressing, alignment, branches, calls and code size (E7-13, focused E7-04);
+   - loop locality and scalar replacement (legal interchange, blocking, invariant hoisting, predictive commoning)
+     where existing GCC passes suffice;
+   - scheduling with register pressure (E7-15 split: x87 reservation/stack pressure; vector scheduling at 1-2
+     threads per core), and density-aware unroll (E7-12) after it;
+   - class-specific prefetch (E7-06), causally confirmed first: a matched baseline, density and page-mode controls,
+     a compiler-generated corpus loop, and no-regression cache-resident cases. NGO store choice and eviction are
+     separate changes; no blanket eviction or automatic thread downsizing;
+   - scalar FP in zmm (diagnosis/prototype only), sparse prefetch (E7-09), alignment for long loops (E7-10), short
+     tails (E7-19) only if the profiles show them.
+3. **PGO on development programs (E7-08 reuse):** qualify the existing atomic-profile train/use workflow on complete
+   programs with separate training and evaluation inputs; a donor PGO build if PGO competitiveness is claimed; never
+   train on held-out programs. Reported as its own track.
+4. **`-mphinix` screen (E7-14):** a bounded development-only `-O2`/`-O3`/current `-mphinix` screen early, contents
+   frozen at the end of the sprint; strict and `errno`-relaxed results kept apart.
+5. **OpenMP runtime (E6-09)** only for proven runtime loss, after separating barrier cost from late arrival, imbalance
+   and fork/join.
+6. Batch check: development-corpus regression scan at the integrated head; x86 and portability for every shared change.
 
-Every optimization ticket: a red T1/T3 test for the shape, a paired card A/B (ADR-0010) on the programs it targets
-and on two it should not change, and no program more than 5% slower without a known cause.
-
-**Out of scope:** `-mphinix` final contents and PGO (Sprint 13); IMCI intrinsics (E6-05) unless a corpus program
-needs them.
-
-**Cap:** two weeks from the first implementation ticket.
+**Out of scope:** software pipelining, Graphite, LTO, intrinsics (E6-05), autotune (E7-18), new library or loop-pass
+projects without a measured blocker. **Cap:** two weeks from the first implementation ticket.
