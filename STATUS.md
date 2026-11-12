@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-12 17:17.
+Updated automatically at every ticket change. Last update: 2026-11-12 17:19.
 
 **Waiting for you:** S11-02. Run `python tools/pm.py inbox`.
 
@@ -60,7 +60,7 @@ Current tickets: `[###################-]` 193 of 201
 | S11-06 | Memory bandwidth - read the first card sweep, find why our numbers sit below STREAM's, and stage sweep 2 toward 264-299 GB/s | Done | The memory-bandwidth benchmark now times only the worker passes and has a corrected long-sample baseline on... |
 | S11-07 | S11-01 transfer tool - the card's listener gives up before card_run relays its announcement | Done | The transfer study's card listener now waits long enough for card_run to relay its address to the host; che... |
 | S11-08 | -Wknc-unsafe-cbrtl cannot be used in #pragma GCC diagnostic ("valid for  but not for C") | Done | The cbrtl warning can now be silenced around one deliberate call with #pragma GCC diagnostic in C and C++; ... |
-| S11-09 | Memory bandwidth for LLM decode - a weight-streaming GEMV workload, pushed toward 264-299 GB/s of weight bytes | Question for the tech lead | Ready to submit 9c1880f2 with the approved test/code override; no changes or repeat tests in this continuat... |
+| S11-09 | Memory bandwidth for LLM decode - a weight-streaming GEMV workload, pushed toward 264-299 GB/s of weight bytes | In progress | S11-09 is gcc: no, so there is no knc rebase: the knc ref is the GCC tree's branch (.work/_shared/gcc), not... |
 | S11-10 | S11-01 transfer runner - choose repetitions, sizes and load states per run, so slow methods fit a card turn | Done | The transfer runner now takes --repeats, --sizes, --loads and --concurrency so a slow method fits a card tu... |
 | S11-11 | M4 corpus run harness - every corpus program built by GCC 5.1.1 and GCC-KNC, run on the card with frozen inputs and a correctness check, in one command | Done | The M4 corpus harness builds 17 programs with GCC 5.1.1 and GCC-KNC and stages checked card runs; GCC-KNC b... |
 | S11-12 | Sprint 11 batch check - full native suite, x86 identity, forward-port drill, ICE sweeps, runtime prefix consistency | draft |  |
@@ -226,6 +226,7 @@ Current tickets: `[###################-]` 193 of 201
 
 ## Recent activity
 
+- 2026-11-12 17:19 **S11-09** lead answer: S11-09 is gcc: no, so there is no knc rebase: the knc ref is the GCC tree's branch (.work/_shared/gcc), not this repo's. Rebase on main instead: gi...
 - 2026-11-12 17:17 **S11-09** engineer ask: Ready to submit 9c1880f2 with the approved test/code override; no changes or repeat tests in this continuation. AGENTS.md requires rebasing on knc ...
 - 2026-11-12 17:16 **S11-18** engineer submit: e2667d67: 5 host tests pass; 40 builds linted, 7 expected donor failures; SQLite O3. Logs: .work/_state/logs/S11_18_green_cygwin-20261112-165852.lo...
 - 2026-11-12 17:15 **S11-09** lead answer: Approved: the test/code ratio is a path artefact (the benchmark itself, membw.c and sweep.sh, lives under tests/bench/membw, so it counts as test l...
@@ -233,7 +234,6 @@ Current tickets: `[###################-]` 193 of 201
 - 2026-11-12 17:14 **S11-09** engineer ask: Analysis committed at 9c1880f2. Native log .work/_shared/tmp/claude-next28/membw-gemv.out has 55/55 valid cases. Submit blocks on 413 test lines ve...
 - 2026-11-12 17:13 **S11-18** lead answer: Size approved: 943 lines covers six spec items, and 278 of them are the approved test file and 218 a README rewrite, so no split. Run pm.py submit ...
 - 2026-11-12 17:12 **S11-18** engineer ask: Submission blocked: pm.py submit reports 943 changed lines against the 800-line budget. Please approve this size or specify a scope split. Implemen...
-- 2026-11-12 17:06 **S11-09** lead answer: Card results are in the 17:15 lead note; raw output path there. Write the analysis and candidate stories as the note says; leave uncommitted and as...
 
 ## Cost
 
