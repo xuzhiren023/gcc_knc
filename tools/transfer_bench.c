@@ -236,7 +236,7 @@ static int trial(int host,const char *method,const char *direction,uint64_t size
   }
   for(rep=0;rep<reps;rep++) {
     sha256 hash;unsigned char digest[32],peer_digest[32];char hex[65];
-    uint64_t off;double elapsed=0,cpu=0,hash_seconds=0,started=now(WALL_CLOCK);
+    uint64_t off;double elapsed=0,cpu=0,hash_seconds=0,started=now(WALL_CLOCK),transfer_started=0;
     sha_init(&hash);
     for(off=0;off<size;) {
       size_t n=size-off>window_size?window_size:(size_t)(size-off);
@@ -245,6 +245,7 @@ static int trial(int host,const char *method,const char *direction,uint64_t size
         token('S',1);token('R',0);
       } else {memset(window,0xa5,n);token('S',0);token('R',1);}
       double ct=now(CLOCK_PROCESS_CPUTIME_ID),t=now(WALL_CLOCK);
+      if(!off)transfer_started=t;
       if(!dma)exact(window,n,sender);
       else if(read_mode || map_mode) {
         if(!sender) {
@@ -265,7 +266,7 @@ static int trial(int host,const char *method,const char *direction,uint64_t size
       }
       /* Receiver completion is acknowledged before either hashes/reuses pages. */
       token('A',!sender);
-      elapsed+=now(WALL_CLOCK)-t;cpu+=now(CLOCK_PROCESS_CPUTIME_ID)-ct;
+      elapsed=now(WALL_CLOCK)-transfer_started;cpu+=now(CLOCK_PROCESS_CPUTIME_ID)-ct;
       if(!sender) {
         if(corrupt && !off)((unsigned char*)window)[0]^=1;
         double ht=now(WALL_CLOCK);sha_add(&hash,window,n);hash_seconds+=now(WALL_CLOCK)-ht;

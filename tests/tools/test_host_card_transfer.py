@@ -5,6 +5,7 @@ import os
 from pathlib import Path
 import subprocess
 import sys
+import tempfile
 import unittest
 from unittest import mock
 
@@ -16,7 +17,12 @@ import host_card_transfer as transfer
 class TransferIntegrity(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        transfer.build(host_only=True)
+        cls.host_build = tempfile.TemporaryDirectory(prefix='s11-01-host-test-')
+        transfer.build(host_only=True, output_dir=cls.host_build.name)
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.host_build.cleanup()
 
     def test_loopback_and_integrity(self):
         exe = str(transfer.OUT / 'transfer-host.exe')
@@ -84,6 +90,32 @@ class TransferIntegrity(unittest.TestCase):
         for directory in invalid:
             with self.subTest(directory=directory):
                 self.assertIsNone(transfer.LEASE_DIRECTORY.fullmatch(directory))
+
+    def test_run_options_select_trial_plan(self):
+        args = type('Args', (), dict(repeats=3, sizes=(1048576, 4096),
+            loads=('busy240',), concurrency=(1, 2), methods=('pipe', 'scp', 'tar')))()
+        trials = list(transfer.plan(args))
+        self.assertEqual(len(trials), 8)
+        self.assertEqual(trials[:4], [
+            (1, 'busy240', 'pipe', 1048576, 'up', 3),
+            (1, 'busy240', 'pipe', 1048576, 'down', 3),
+            (1, 'busy240', 'pipe', 4096, 'up', 3),
+            (1, 'busy240', 'pipe', 4096, 'down', 3)])
+        self.assertEqual({trial[0] for trial in trials[4:]}, {2})
+        self.assertEqual({trial[2] for trial in trials[4:]}, {'pipe'})
+        self.assertEqual({trial[1] for trial in trials}, {'busy240'})
+        self.assertEqual({trial[3] for trial in trials}, {1048576, 4096})
+        self.assertEqual({trial[5] for trial in trials}, {3})
+
+    def test_run_options_parse(self):
+        with mock.patch.object(sys, 'argv', ['host_card_transfer.py', 'run', '--config', 'c',
+                '--host-address', '127.0.0.1', '--repeats', '3', '--sizes', '1M', '4K',
+                '--loads', 'busy240', '--concurrency', '2', '--methods', 'pipe', 'scp']):
+            with mock.patch.object(transfer, 'run_native') as run_native:
+                transfer.main()
+        args = run_native.call_args.args[0]
+        self.assertEqual((args.repeats, args.sizes, args.loads, args.concurrency),
+                         (3, (1048576, 4096), ['busy240'], [2]))
 
 
 if __name__ == '__main__':
