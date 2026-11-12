@@ -61,7 +61,7 @@ Current tickets: `[###################-]` 189 of 194
 | S11-07 | S11-01 transfer tool - the card's listener gives up before card_run relays its announcement | Done | The transfer study's card listener now waits long enough for card_run to relay its address to the host; che... |
 | S11-08 | -Wknc-unsafe-cbrtl cannot be used in #pragma GCC diagnostic ("valid for  but not for C") | Done | The cbrtl warning can now be silenced around one deliberate call with #pragma GCC diagnostic in C and C++; ... |
 | S11-09 | Memory bandwidth for LLM decode - a weight-streaming GEMV workload, pushed toward 264-299 GB/s of weight bytes | lead | Needs interactive lead: card run in our exclusive turn. Reviewed 33de9541: IMCI sint8/float16 load conversi... |
-| S11-10 | S11-01 transfer runner - choose repetitions, sizes and load states per run, so slow methods fit a card turn | Waiting for review | Options and plan tested: red 4c6c5b74 against missing plan; green tools/run.py s11_10_options_green, log C:... |
+| S11-10 | S11-01 transfer runner - choose repetitions, sizes and load states per run, so slow methods fit a card turn | Changes requested | 1. tests/tools/test_host_card_transfer.py:21 builds into a temp dir, but test_loopback_and_integrity (line ... |
 | S11-11 | M4 corpus run harness - every corpus program built by GCC 5.1.1 and GCC-KNC, run on the card with frozen inputs and a correctness check, in one command | In progress |  |
 | S11-13 | Senior compiler review of the Sprint 11-13 scope (Milestone M4) against our research, with recommended plan changes | In progress |  |
 | S2-01 | Design for zmm and mask registers under -march=knc | Done | The register design for KNC is settled on paper: all 32 zmm and 8 mask registers become usable under -march... |
@@ -219,6 +219,7 @@ Current tickets: `[###################-]` 189 of 194
 
 ## Recent activity
 
+- 2026-11-12 15:54 **S11-10** lead changes: 1. tests/tools/test_host_card_transfer.py:21 builds into a temp dir, but test_loopback_and_integrity (line 28) still runs transfer.OUT/'transfer-ho...
 - 2026-11-12 15:30 **S11-10** engineer submit: Options and plan tested: red 4c6c5b74 against missing plan; green tools/run.py s11_10_options_green, log C:\Users\xuzhi\Documents\gcc_knc\.work\_st...
 - 2026-11-12 15:25 **S11-10** lead note: Two more runner bugs from the card turn, fix them here too: (1) the runner closes card-control.log (finally: card_log.close()) while card_run may s...
 - 2026-11-12 15:24 **S11-10** owner decide: Owner standing rule (feedback 2026-11-09/10: the lead raises budgets itself): input budget raised to 6M, first extension. Options plumbing is done;...
@@ -226,13 +227,12 @@ Current tickets: `[###################-]` 189 of 194
 - 2026-11-12 14:53 **S11-10** lead answer: Option plumbing reviewed and correct; the lead is already using it on the card. Change the test approach: remove the _exchange/_record/_test_mode h...
 - 2026-11-12 14:52 **S11-10** engineer ask: After two real test attempts, runner options/plumbing and temporary output build are implemented, but the new plan/row test remains failing because...
 - 2026-11-12 14:44 **S11-10** lead answer: Not a code fault: ld could not overwrite .work/_shared/S11-01/transfer-host.exe because a running transfer process holds it open (Device or resourc...
-- 2026-11-12 14:43 **S11-10** engineer ask: The required test command via tools/run.py failed during setUpClass: host transfer_bench.exe link returned 1; wrapper log C:\\Users\\xuzhi\\Documen...
 
 ## Cost
 
 - From the script, engineer: 458 sessions, 982.3M input tokens
 - From the script, lead: 290 sessions, 83.7M input tokens
-- Started by hand, Claude: 12 sessions, 2658.3M input tokens
+- Started by hand, Claude: 12 sessions, 2658.9M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
