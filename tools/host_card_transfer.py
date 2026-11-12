@@ -10,6 +10,7 @@ import json
 import os
 from pathlib import Path
 import re
+import queue
 import secrets
 import shlex
 import shutil
@@ -73,14 +74,48 @@ def start_endpoint(role, method, address, port, nonce, size, repeats, direction,
 
 
 def ready(proc):
-    line = proc.stderr.readline()
+    lines = queue.Queue()
+    threading.Thread(target=lambda: lines.put(proc.stderr.readline()), daemon=True).start()
+    try:
+        line = lines.get(timeout=20)
+    except queue.Empty:
+        raise RuntimeError('card endpoint startup deadline: no listener announcement within 20 seconds')
     try:
         row = json.loads(line)
-        if row.get('ready') is not True:
+        if not isinstance(row, dict) or row.get('ready') is not True:
             raise ValueError('not ready')
         return row
     except (ValueError, TypeError):
         raise RuntimeError('endpoint startup failed: ' + line.decode(errors='replace'))
+
+
+def lease_ready(proc, log, nonce):
+    """Drain card_run output continuously, retaining its diagnostics after startup."""
+    announcements = queue.Queue()
+
+    def drain():
+        try:
+            for line in iter(proc.stdout.readline, b''):
+                log.write(line)
+                log.flush()
+                try:
+                    row = json.loads(line)
+                except (ValueError, TypeError):
+                    continue
+                if isinstance(row, dict) and row.get('ready') is True:
+                    announcements.put(row)
+        finally:
+            log.close()
+            announcements.put(None)
+
+    threading.Thread(target=drain, daemon=True).start()
+    try:
+        row = announcements.get(timeout=60)
+    except queue.Empty:
+        raise RuntimeError('lease startup deadline: no card listener announcement; see card-control.log')
+    if not row or row.get('nonce') != nonce or type(row.get('port')) is not int or not 0 < row['port'] <= 65535:
+        raise RuntimeError('invalid card lease listener announcement; see card-control.log')
+    return row
 
 
 def rows_from(output, code):
@@ -99,15 +134,20 @@ def rows_from(output, code):
 
 def loopback(method, direction, size, corrupt=False):
     nonce = secrets.token_hex(16)
-    host = start_endpoint('host', method, '127.0.0.1', 0, nonce, size, 2, direction,
-                          stdin=subprocess.PIPE, stdout=subprocess.PIPE if method == 'pipe' else subprocess.DEVNULL)
-    peer = None
+    host = peer = None
     try:
-        greeting = {'port': 0} if method == 'pipe' else ready(host)
-        peer = start_endpoint('card', method, '127.0.0.1', greeting['port'], nonce,
-                              size, 2, direction, corrupt=corrupt,
-                              stdin=host.stdout if method == 'pipe' else subprocess.DEVNULL,
-                              stdout=host.stdin if method == 'pipe' else subprocess.DEVNULL)
+        if method != 'pipe':
+            peer = start_endpoint('card', method, '127.0.0.1', 0, nonce, size, 2,
+                                  direction, corrupt=corrupt, stdout=subprocess.DEVNULL)
+            greeting = ready(peer)
+        else:
+            greeting = {'port': 0}
+        host = start_endpoint('host', method, '127.0.0.1', greeting['port'], nonce, size, 2, direction,
+                              stdin=subprocess.PIPE, stdout=subprocess.PIPE if method == 'pipe' else subprocess.DEVNULL)
+        if method == 'pipe':
+            peer = start_endpoint('card', method, '127.0.0.1', 0, nonce,
+                                  size, 2, direction, corrupt=corrupt,
+                                  stdin=host.stdout, stdout=host.stdin)
         if host.stdout:
             host.stdout.close()
             host.stdout = None
@@ -160,13 +200,15 @@ def ssh_args(config, compression=False, cipher=None, mac=None):
 def native_trial(config, lease, address, method, size, direction, repeats=20,
                  compression=False, cipher=None, mac=None):
     nonce = secrets.token_hex(16)
-    host = start_endpoint('host', method, address, 0, nonce, size, repeats, direction,
-                          stdin=subprocess.PIPE, stdout=subprocess.PIPE if method == 'pipe' else subprocess.DEVNULL)
+    host = None
     remote = None
     try:
-        info = {'port': 0, 'node': 0} if method == 'pipe' else ready(host)
+        if method != 'tcp':
+            host = start_endpoint('host', method, address, 0, nonce, size, repeats, direction,
+                                  stdin=subprocess.PIPE, stdout=subprocess.PIPE if method == 'pipe' else subprocess.DEVNULL)
+        info = {'port': 0, 'node': 0} if method in ('pipe', 'tcp') else ready(host)
         args = ['./transfer-card.mic', 'card', method,
-                str(info['node']) if method.startswith('scif-') else address,
+                str(info['node']) if method.startswith('scif-') else '0.0.0.0',
                 str(info['port']), nonce, str(size), str(repeats), direction, lease['cpus']]
         directory = shlex.quote(lease['directory'])
         remote_command = ('cd ' + directory + ' && test -f claude-pinned && exec ' + shlex.join(args))
@@ -174,6 +216,10 @@ def native_trial(config, lease, address, method, size, direction, repeats=20,
                                   stdin=host.stdout if method == 'pipe' else subprocess.DEVNULL,
                                   stdout=host.stdin if method == 'pipe' else subprocess.DEVNULL,
                                   stderr=subprocess.PIPE)
+        if method == 'tcp':
+            info = ready(remote)
+            host = start_endpoint('host', method, config['host'], info['port'], nonce, size,
+                                  repeats, direction, stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL)
         if host.stdout:
             host.stdout.close()
             host.stdout = None
@@ -290,10 +336,6 @@ def run_native(args):
             raise RuntimeError('prior run incomplete: inspect bugcheck/dump and endpoint cleanup before --acknowledge-prior-incomplete')
     baseline = event_log()
     nonce = secrets.token_hex(16)
-    listener = socket.socket()
-    listener.bind((args.host_address, 0))
-    listener.listen(1)
-    listener.settimeout(180)
     card_log = (OUT / 'card-control.log').open('wb')
     card = None
     control = None
@@ -333,9 +375,13 @@ def run_native(args):
             card = subprocess.Popen([sys.executable, str(args.project / 'tools/card_run'),
                                      '--config', str(args.config), '--benchmark', '--threads', '240',
                                      '--timeout', '43200', '--file', str(OUT / 'transfer-card.mic'),
-                                     str(OUT / 'transfer-card.sh'), args.host_address,
-                                     str(listener.getsockname()[1]), nonce], stdout=card_log, stderr=subprocess.STDOUT)
-            control, _ = listener.accept()
+                                     str(OUT / 'transfer-card.sh'), '0.0.0.0', '0', nonce],
+                                    stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+            announcement = lease_ready(card, card_log, nonce)
+            try:
+                control = socket.create_connection((config['host'], announcement['port']), timeout=5)
+            except OSError as error:
+                raise RuntimeError('card lease listener unreachable (5 second connect deadline): ' + str(error)) from error
             control.settimeout(120)
             line = bytearray()
             while not line.endswith(b'\n'):
@@ -405,8 +451,9 @@ def run_native(args):
             if control:
                 control.shutdown(socket.SHUT_RDWR)
                 control.close()
-            listener.close()
-            card_log.close()
+            # Once started, the drain owns the log through card_run cleanup.
+            if card is None:
+                card_log.close()
 
 
 def main():

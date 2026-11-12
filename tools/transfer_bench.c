@@ -10,6 +10,7 @@
 #include <signal.h>
 #include <time.h>
 #include <fcntl.h>
+#include <poll.h>
 #include <sys/socket.h>
 #include <sys/types.h>
 #include <sys/resource.h>
@@ -132,7 +133,7 @@ static void token(char expected,int sending)
 { char x=expected;exact(&x,1,sending);if(x!=expected){cancelled=1;die("protocol token");} }
 static uint64_t number(const char *s,uint64_t max)
 { char *end;errno=0;unsigned long long n=strtoull(s,&end,10);if(errno||!*s||*end||n>max)die("argument range");return n; }
-static int tcp(const char *address,unsigned port,int server)
+static int tcp(const char *address,unsigned port,int server,const char *lease_nonce)
 {
   struct sockaddr_in a;int s=socket(AF_INET,SOCK_STREAM,0),one=1;
   if(s<0)die("socket");
@@ -141,9 +142,25 @@ static int tcp(const char *address,unsigned port,int server)
   if(server) {
     socklen_t n=sizeof(a);
     if(bind(s,(struct sockaddr*)&a,sizeof(a))||listen(s,1)||getsockname(s,(struct sockaddr*)&a,&n))die("listen");
-    fprintf(stderr,"{\"ready\":true,\"port\":%u,\"node\":0}\n",ntohs(a.sin_port));fflush(stderr);
+    FILE *announcement=lease_nonce?stdout:stderr;
+    fprintf(announcement,"{\"ready\":true,\"port\":%u,\"node\":0,\"nonce\":\"%s\"}\n",
+            ntohs(a.sin_port),lease_nonce?lease_nonce:"");fflush(announcement);
+    struct pollfd wait={s,POLLIN,0};
+    if(poll(&wait,1,10000)!=1)die("card TCP listener unreachable: no host connection within 10 seconds");
     int t=accept(s,NULL,NULL);close(s);s=t;if(s<0)die("accept");
-  } else if(connect(s,(struct sockaddr*)&a,sizeof(a)))die("connect");
+  } else {
+    int flags=fcntl(s,F_GETFL,0);if(flags<0||fcntl(s,F_SETFL,flags|O_NONBLOCK))die("connect flags");
+    if(connect(s,(struct sockaddr*)&a,sizeof(a))) {
+      if(errno!=EINPROGRESS)die("card TCP listener unreachable: connect failed");
+      struct pollfd wait={s,POLLOUT,0};int error=0;socklen_t n=sizeof(error);
+      if(poll(&wait,1,5000)!=1)die("card TCP listener unreachable: connect deadline (5 seconds)");
+      if(getsockopt(s,SOL_SOCKET,SO_ERROR,&error,&n)||error) {
+        if(error)errno=error;
+        die("card TCP listener unreachable: connect failed");
+      }
+    }
+    if(fcntl(s,F_SETFL,flags))die("connect flags restore");
+  }
   struct timeval timeout={120,0};
   setsockopt(s,SOL_SOCKET,SO_RCVTIMEO,&timeout,sizeof(timeout));
   setsockopt(s,SOL_SOCKET,SO_SNDTIMEO,&timeout,sizeof(timeout));
@@ -168,7 +185,7 @@ static void connect_transport(const char *method,const char *address,unsigned po
       node_port target={(uint16_t)number(address,65535),(uint16_t)port};
       if(sc.connect(ep,&target)<0)die("scif connect");
     }
-  } else if(strcmp(method,"pipe")) fdin=fdout=tcp(address,port,host);
+  } else if(strcmp(method,"pipe")) fdin=fdout=tcp(address,port,!host,NULL);
 }
 static void affinity(const char *list)
 {
@@ -365,7 +382,7 @@ static int lease(const char *address,unsigned port,const char *nonce)
     if(pthread_create(&threads[n++],NULL,burn,(void*)(intptr_t)cpu))die("busy worker");
   }
   if(n!=240)die("exclusive 240 CPU lease required");
-  fdin=fdout=tcp(address,port,0);
+  fdin=fdout=tcp(address,port,1,nonce);
   int len=snprintf(line,sizeof(line),"{\"nonce\":\"%s\",\"directory\":\"%s\",\"cpus\":\"%s\"}\n",nonce,cwd,cpus);
   exact(line,(size_t)len,1);
   for(;;){
