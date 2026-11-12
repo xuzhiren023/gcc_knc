@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-12 14:13.
+Updated automatically at every ticket change. Last update: 2026-11-12 14:27.
 
 **Waiting for you:** S11-02. Run `python tools/pm.py inbox`.
 
@@ -60,7 +60,7 @@ Current tickets: `[###################-]` 189 of 191
 | S11-06 | Memory bandwidth - read the first card sweep, find why our numbers sit below STREAM's, and stage sweep 2 toward 264-299 GB/s | Done | The memory-bandwidth benchmark now times only the worker passes and has a corrected long-sample baseline on... |
 | S11-07 | S11-01 transfer tool - the card's listener gives up before card_run relays its announcement | Done | The transfer study's card listener now waits long enough for card_run to relay its address to the host; che... |
 | S11-08 | -Wknc-unsafe-cbrtl cannot be used in #pragma GCC diagnostic ("valid for  but not for C") | Done | The cbrtl warning can now be silenced around one deliberate call with #pragma GCC diagnostic in C and C++; ... |
-| S11-09 | Memory bandwidth for LLM decode - a weight-streaming GEMV workload, pushed toward 264-299 GB/s of weight bytes | In progress |  |
+| S11-09 | Memory bandwidth for LLM decode - a weight-streaming GEMV workload, pushed toward 264-299 GB/s of weight bytes | Question for the tech lead | At 33de9541, all 6 host tests and GCC-KNC build/lint pass; GEMV binary/sweep staged in .work/_shared/S11-05... |
 | S2-01 | Design for zmm and mask registers under -march=knc | Done | The register design for KNC is settled on paper: all 32 zmm and 8 mask registers become usable under -march... |
 | S2-02 | Float and double arguments and results in zmm lane 0 | Done | Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`). |
 | S2-03 | Varargs with the donor's register save area | Done | Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`). |
@@ -216,6 +216,7 @@ Current tickets: `[###################-]` 189 of 191
 
 ## Recent activity
 
+- 2026-11-12 14:27 **S11-09** engineer ask: At 33de9541, all 6 host tests and GCC-KNC build/lint pass; GEMV binary/sweep staged in .work/_shared/S11-05. Ticket prohibits engineer card jobs. P...
 - 2026-11-12 14:11 **S11-06** lead approve: The memory-bandwidth benchmark now times only the worker passes and has a corrected long-sample baseline on the card (read 186, RMW 179, write 170,...
 - 2026-11-12 14:00 **S11-06** engineer submit: Commit 163f7d45: sweep-2 analysis, corrected baselines and target table complete. Four host tests PASS; log .work/_state/logs/S11_06_third_host-202...
 - 2026-11-12 14:00 **S11-06** lead note: Lead committed the engineer's work (b57eca55 [red], 18a2713c fix). Card sweep 2, 2026-11-12 18:32-18:52Z (boot da3144f1), benchmark mode, 240 CPUs ...
@@ -223,13 +224,12 @@ Current tickets: `[###################-]` 189 of 191
 - 2026-11-12 13:53 **S11-06** lead resume: Sweep 2 result on the ticket (14:00 note).
 - 2026-11-12 13:28 **S11-08** lead approve: The cbrtl warning can now be silenced around one deliberate call with #pragma GCC diagnostic in C and C++; x86 unchanged. Machine check: tools/chec...
 - 2026-11-12 13:16 **S11-08** engineer submit: Submitted by the lead for the engineer: red fd1ccb4e240 (C and C++ pragma tests; pragma rejected and silenced call warns on the S10-13 compiler), f...
-- 2026-11-12 13:16 **S11-08** lead answer: Red/green and x86 done by the lead; the lead submits for the engineer.
 
 ## Cost
 
 - From the script, engineer: 453 sessions, 972.9M input tokens
 - From the script, lead: 288 sessions, 83.2M input tokens
-- Started by hand, Claude: 11 sessions, 2598.4M input tokens
+- Started by hand, Claude: 11 sessions, 2599.5M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
