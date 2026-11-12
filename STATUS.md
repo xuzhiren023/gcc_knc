@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-12 00:29.
+Updated automatically at every ticket change. Last update: 2026-11-12 00:31.
 
 **Waiting for you:** S10-10. Run `python tools/pm.py inbox`.
 
@@ -49,7 +49,7 @@ Current tickets: `[###################-]` 177 of 182
 | S10-08 | Vector math v1b - the rest of the libmvec set (acos, asin, cbrt, erf, erfc, exp2, exp10, expm1, log1p, log2, hypot, sincos) | Done | The vector math library now covers the whole set GCC vectorizes with glibc's libmvec: acos, asin, cbrt, erf... |
 | S10-09 | User story - double-precision loops with division and square root vectorize, correctly rounded (V8DF div, cond_div, sqrt) | Waiting for review | Card 2026-11-12 05:09-05:19Z (boot da3144f1): knc-v8df-divsqrt.mic all 15 sets bad=0 flagbad=0: div midpoin... |
 | S10-10 | Card harness fixes from the Sprint 10 card turn - card_qualify binary folder, vmath bench batch sizing | **Waiting for you** | Engineer sandbox cannot write the worktree git metadata (.git/worktrees/S10-10/index.lock: Permission denie... |
-| S10-11 | Card-only vector math failures - double sin, cos, tan, atan2 above 1 ULP, and cbrt/cbrtf crash (SIGSEGV) | In progress | Lead card 2026-11-12 (boot da3144f1), S10-11 build: compare set fixed for double sin 0.761, cos 0.767, tan ... |
+| S10-11 | Card-only vector math failures - double sin, cos, tan, atan2 above 1 ULP, and cbrt/cbrtf crash (SIGSEGV) | Waiting for review | 8d8f3c5f staging/lint PASS. FMA before/global-off/narrowed: sincos 15/0/9, reducer 0/0/0, tan 18/0/11, atan... |
 | S11-01 | User story - the best way to move data between the host and the card, measured, and how our projects use it | Not started | lane tools: owner 2026-11-12, usage reset, move on (Codex engineers) |
 | S11-02 | card_run and run_suite move data by S11-01's recommended method, with fallback | Not started | ready; waits on its dep S11-01, the lead writes acceptance before it starts |
 | S2-01 | Design for zmm and mask registers under -march=knc | Done | The register design for KNC is settled on paper: all 32 zmm and 8 mask registers become usable under -march... |
@@ -207,6 +207,7 @@ Current tickets: `[###################-]` 177 of 182
 
 ## Recent activity
 
+- 2026-11-12 00:31 **S10-11** engineer submit: 8d8f3c5f staging/lint PASS. FMA before/global-off/narrowed: sincos 15/0/9, reducer 0/0/0, tan 18/0/11, atan 20/0/12. Log: .work/_state/logs/S10_11_...
 - 2026-11-12 00:29 **S10-11** lead note: Lead card 2026-11-12 (boot da3144f1), S10-11 build: compare set fixed for double sin 0.761, cos 0.767, tan 0.826, atan2 0.877 ULP (match host); all...
 - 2026-11-12 00:29 **S10-09** lead note: Card 2026-11-12 05:09-05:19Z (boot da3144f1): knc-v8df-divsqrt.mic all 15 sets bad=0 flagbad=0: div midpoint 1.45M, Markstein 2.10M, exponent 1.54M...
 - 2026-11-12 00:27 **S10-11** lead answer: My 16:35 note asked for a 'separate evidence script', so the conflict is my doing. Don't rename around the check. A one-off script tied to this tic...
@@ -214,13 +215,12 @@ Current tickets: `[###################-]` 177 of 182
 - 2026-11-12 00:24 **S10-10** lead escalate: Engineer sandbox cannot write the worktree git metadata (.git/worktrees/S10-10/index.lock: Permission denied), so pm.py commit fails; the red test ...
 - 2026-11-12 00:16 **S10-10** engineer ask: Required red-first test and fix are ready, but pm.py commit failed because git add -A cannot create the worktree index.lock (Permission denied). Pl...
 - 2026-11-12 00:11 **S10-11** owner decide: Owner standing rule: session budget raised to 8 (red approved, fix committed, progressing). Continue with the lead's 00:09 answer; the cbrt card ou...
-- 2026-11-12 00:11 **S10-10** owner decide: Owner standing rule: input budget raised to 6M (the fix exists; the remaining work is the red test and applying the patch).
 
 ## Cost
 
 - From the script, engineer: 423 sessions, 939.1M input tokens
 - From the script, lead: 264 sessions, 78.1M input tokens
-- Started by hand, Claude: 11 sessions, 2453.1M input tokens
+- Started by hand, Claude: 11 sessions, 2453.9M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
