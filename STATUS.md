@@ -1,10 +1,10 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-12 10:42.
+Updated automatically at every ticket change. Last update: 2026-11-12 10:43.
 
 **Waiting for you:** S11-02. Run `python tools/pm.py inbox`.
 
-Current tickets: `[###################-]` 182 of 185
+Current tickets: `[###################-]` 183 of 185
 
 ## Milestones
 
@@ -14,7 +14,7 @@ Current tickets: `[###################-]` 182 of 185
 | M1 | Mixed native code | Done | 43 of 43 tickets |
 | M2 | Useful vector target | Done | 51 of 51 tickets |
 | M3 | Runtimes | Done | 47 of 48 tickets |
-| M4 | Broad optimization | In progress | 1 of 3 tickets |
+| M4 | Broad optimization | In progress | 2 of 3 tickets |
 | M5 | Program corpus | Not started | Not planned in detail yet |
 | M6 | Release | Not started | Not planned in detail yet |
 
@@ -54,7 +54,7 @@ Current tickets: `[###################-]` 182 of 185
 | S10-13 | User story - code that calls cbrtl under -march=knc gets a safe replacement and a compile-time warning (MPSS libm cbrtl faults) | Waiting for review | T1 PASS: .work/_state/logs/S10_13_green-20261112-103135.log. Stage/link/lint PASS; all five exact card_run ... |
 | S11-01 | User story - the best way to move data between the host and the card, measured, and how our projects use it | Done | We now have a sourced inventory of every host-card transfer path that works without changing MPSS (SSH, tar... |
 | S11-02 | card_run and run_suite move data by S11-01's recommended method, with fallback | **Waiting for you** | Started by mistake: the ticket was 'ready' as a placeholder and became startable when S11-01 closed. The en... |
-| S11-03 | S11-01 transfer tool rejects the card's physical /tmp path, so the native study never starts | Waiting for review | Submitted by the lead for the engineer. Red 151a98bd (main has no LEASE_DIRECTORY; the old regex rejected /... |
+| S11-03 | S11-01 transfer tool rejects the card's physical /tmp path, so the native study never starts | Done | The transfer study's tool now accepts the card's real /tmp location (/var/volatile/tmp), so its card run ca... |
 | S2-01 | Design for zmm and mask registers under -march=knc | Done | The register design for KNC is settled on paper: all 32 zmm and 8 mask registers become usable under -march... |
 | S2-02 | Float and double arguments and results in zmm lane 0 | Done | Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`). |
 | S2-03 | Varargs with the donor's register save area | Done | Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`). |
@@ -210,6 +210,7 @@ Current tickets: `[###################-]` 182 of 185
 
 ## Recent activity
 
+- 2026-11-12 10:42 **S11-03** lead approve: The transfer study's tool now accepts the card's real /tmp location (/var/volatile/tmp), so its card run can start; checked on the host, card run n...
 - 2026-11-12 10:42 **S10-13** engineer submit: T1 PASS: .work/_state/logs/S10_13_green-20261112-103135.log. Stage/link/lint PASS; all five exact card_run commands: .work/_state/logs/S10_13_stage...
 - 2026-11-12 10:31 **S11-03** engineer submit: Submitted by the lead for the engineer. Red 151a98bd (main has no LEASE_DIRECTORY; the old regex rejected /var/volatile/tmp), fix fcb157ec: host ch...
 - 2026-11-12 10:31 **S11-03** lead answer: Committed by the lead; the lead submits for the engineer.
@@ -217,13 +218,12 @@ Current tickets: `[###################-]` 182 of 185
 - 2026-11-12 10:30 **S10-13** lead answer: Tree 1 is built at GCC 157940608ed by the lead (gcc_build.py exit 0; log S10_13_lead_build-20261112-093315.log). Do not build (AGENTS.md, owner 202...
 - 2026-11-12 10:30 **S10-13** lead resume: Lead built tree 1 at 157940608ed (log S10_13_lead_build-20261112-093315.log, exit 0).
 - 2026-11-12 10:29 **S11-03** lead defer: Engineer finished uncommitted in .work/S11-03: host regex accepts /tmp and /var/volatile/tmp roots, lease() uses realpath(/tmp) + exact 32-hex tail...
-- 2026-11-12 09:50 **S11-03** engineer ask: Host suite PASS: .work/_state/logs/S11_03_host-20261112-094922.log. Card lease fix uses realpath(/tmp), exact /claude/claude-<32 lowercase hex> val...
 
 ## Cost
 
 - From the script, engineer: 441 sessions, 954.2M input tokens
 - From the script, lead: 278 sessions, 81.0M input tokens
-- Started by hand, Claude: 11 sessions, 2519.3M input tokens
+- Started by hand, Claude: 11 sessions, 2519.7M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
