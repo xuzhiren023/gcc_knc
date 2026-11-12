@@ -193,14 +193,21 @@ limits, not a changed denominator or threshold. (Owner; findings 1, 8.)
 
 Before timing, S11-11 must freeze and exercise independent correctness oracles:
 complete outputs or deterministic references/residuals, not only array sums or
-agreement with the donor. Every numerical oracle records its exact absolute,
-relative or ULP limits and comparison formula in the frozen run configuration;
-missing limits block readiness. NaN is rejected unless explicitly expected at
-that exact output position by the reference; infinity must match expected sign
-and position. No NaN comparison may pass by falling through a subtraction test.
-No tolerance may be relaxed after observing a failure. (Finding 2.)
+agreement with the donor. For all eight PolyBench programs compare every output
+component with an independent reference using
+`abs(actual-reference) <= 1e-8 + 1e-6*abs(reference)`. STREAM compares every
+array component with its independently computed expected value using the same
+formula. Store enough digits to preserve the source floating-point value; no
+rounded display or aggregate sum is an oracle. All primary floating outputs must
+be finite: NaN or either infinity fails even when the donor agrees. Check
+finiteness before arithmetic comparisons. These tolerances are frozen here;
+an inadequate reference/check blocks readiness and requires an explicit contract
+amendment before tuning, never a tolerance relaxation after a failure. (Finding 2.)
 
-Retain NPB verification and HPCG's full validity conditions. Compression must
+Retain NPB 3.4.2 verification with its packaged class-specific reference/tolerance
+and HPCG 3.1's full validity conditions and packaged tolerances; record the exact
+selected class/reference and checker revision in the frozen configuration.
+Neither built-in check is replaced with donor agreement. Compression must
 round-trip byte for byte and be cross-decoded with the other compiler's build
 where feasible; a feasibility exception requires a recorded technical reason.
 SQLite checks complete expected results, ordering where required, counts and

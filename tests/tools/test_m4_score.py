@@ -53,6 +53,12 @@ class M4ScoreContract(unittest.TestCase):
         model = m4_score.score_model(corpus(1.25), seed=1514, draws=10000)
         self.assertEqual(model["lower95"], 1.25)
         self.assertTrue(model["pass"])
+        noisy = m4_score.score_model({name: pairs for name in PROGRAMS},
+                                     seed=1514, draws=10000)
+        self.assertEqual(noisy["median_speedup"], 1.5)
+        self.assertEqual(noisy["lower95"], 1)
+        self.assertTrue(noisy["inconclusive"])
+        self.assertFalse(noisy["pass"])
 
     def test_regression_is_strictly_more_than_five_percent(self):
         self.assertEqual(m4_score.regression_status(1.05, 1.05), "clear")
@@ -72,6 +78,10 @@ class M4ScoreContract(unittest.TestCase):
         )
         self.assertTrue(result["pass"])
         self.assertEqual(result["programs"]["zlib"]["regression"], "regression")
+        rows["zlib"] = [(1, 1)] * 3 + [(1, 1.1)] * 3
+        self.assertFalse(m4_score.score_model(
+            rows, known_causes={"zlib": "a cause cannot resolve an interval"}
+        )["pass"])
 
     def test_every_model_must_pass(self):
         rows = {model: corpus(1.25) for model in MODELS}
@@ -80,6 +90,10 @@ class M4ScoreContract(unittest.TestCase):
         result = m4_score.score_models(rows)
         self.assertFalse(result["pass"])
         self.assertFalse(result["models"]["5100"]["pass"])
+        extended = {name: pairs * 2 for name, pairs in rows["5100"].items()}
+        rows["5100"] = extended
+        with self.assertRaises(ValueError):
+            m4_score.score_models(rows)
         del rows["5100"]
         with self.assertRaises(ValueError):
             m4_score.score_models(rows)
@@ -111,6 +125,9 @@ class M4ScoreContract(unittest.TestCase):
                                               ready=True, passed=False)
                 self.assertEqual(public, {"ready": True, "pass": False})
                 self.assertEqual(json.loads(destination.read_text()), report)
+                with self.assertRaises(ValueError):
+                    m4_score.write_report({"held_out": True}, root / "public.json",
+                                          held_out=False, ready=True, passed=True)
 
 
 if __name__ == "__main__":
