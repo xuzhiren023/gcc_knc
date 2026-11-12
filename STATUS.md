@@ -224,11 +224,11 @@ Current tickets: `[###################-]` 184 of 187
 ## Cost
 
 - From the script, engineer: 446 sessions, 963.6M input tokens
-- From the script, lead: 281 sessions, 81.5M input tokens
+- From the script, lead: 282 sessions, 82.3M input tokens
 - Started by hand, Claude: 11 sessions, 2548.0M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 24.6 GiB of 100 GiB. 92 GiB free on the drive.
+The project uses 24.6 GiB of 100 GiB. 93 GiB free on the drive.
