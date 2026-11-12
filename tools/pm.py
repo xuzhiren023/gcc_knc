@@ -50,6 +50,13 @@ def board_lock(root):
             fd = os.open(path, os.O_CREAT | os.O_EXCL | os.O_WRONLY)
             break
         except FileExistsError:
+            # A sandboxed session killed mid-command leaves its lock behind (three times on 2026-11-12).
+            if _lock_holder_gone(path):
+                try:
+                    os.remove(path)
+                except OSError:
+                    pass
+                continue
             if time.monotonic() >= deadline:
                 raise Refused("the board is busy: %s is held by another pm or dispatcher process. "
                               "If none is running, it was left by a crash; remove it." % path)
@@ -62,6 +69,32 @@ def board_lock(root):
     finally:
         _lock_depth = 0
         os.remove(path)
+
+
+def _lock_holder_gone(path):
+    """True only when the lock names a process that certainly no longer exists; any doubt keeps the lock."""
+    try:
+        with open(path, encoding="ascii") as f:
+            pid = int(f.read().strip())
+    except (OSError, ValueError):
+        return False  # being written, or unreadable: wait as before
+    if os.name != "nt":
+        try:
+            os.kill(pid, 0)
+        except ProcessLookupError:
+            return True
+        except OSError:
+            return False
+        return False
+    import ctypes
+    kernel32 = ctypes.WinDLL("kernel32", use_last_error=True)
+    handle = kernel32.OpenProcess(0x1000, False, pid)  # PROCESS_QUERY_LIMITED_INFORMATION
+    if handle:
+        code = ctypes.c_ulong()
+        alive = kernel32.GetExitCodeProcess(handle, ctypes.byref(code)) == 0 or code.value == 259  # STILL_ACTIVE
+        kernel32.CloseHandle(handle)
+        return not alive
+    return ctypes.get_last_error() == 87  # ERROR_INVALID_PARAMETER: no such process; access denied means alive
 
 
 def lane_of(ticket):
