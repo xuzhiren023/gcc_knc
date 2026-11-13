@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-13 15:45.
+Updated automatically at every ticket change. Last update: 2026-11-13 15:47.
 
-**Next: the tech lead, on S11-27.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: GPT-6.1, on S11-15 (First development-corpus baseline and profile, GCC 5.1.1 vs GCC-KNC at -O2 (E7-03 part 1)).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
 Current tickets: `[###################-]` 205 of 213
 
@@ -78,7 +78,7 @@ Current tickets: `[###################-]` 205 of 213
 | S11-24 | WRF OpenMP (smpar) build with GCC-KNC at -mphinix, for PhiWeather's benchmark - replaces the serial trial build | Done | WRF v4.8.0 now builds as an OpenMP card binary at -mphinix with GCC-KNC (wrf.exe and real.exe linked, needi... |
 | S11-25 | ICE in do_store_flag (expr.cc) on WRF's surface layer (SFCLAY1D) at -O2 -march=knc | Done | The last WRF file that crashed GCC-KNC (surface layer, SFCLAY1D) now compiles: vector 'ordered and not equa... |
 | S11-26 | WRF OpenMP build at -mphinix with no per-file workarounds (S11-23 and S11-25 fixed), restaged for PhiWeather | draft | Owner 2026-11-13: the S11-24 WRF build is removed. Deleted: |
-| S11-27 | Wrong code - NPB-MG (class A, serial) built by GCC-KNC at -O2 -march=knc fails NPB verification on the card | Question for the tech lead | Lead built GCC at 0297f57d723 and ran checks at 15:45 EST: results in the answer. |
+| S11-27 | Wrong code - NPB-MG (class A, serial) built by GCC-KNC at -O2 -march=knc fails NPB verification on the card | In progress | Lead results at 0297f57d723, 2026-11-13 15:45 EST: |
 | S11-28 | HPCG run that fits every card model - fixed work instead of fixed duration, grid sized to the 3100's memory | lead | After S11-29 merges (still ready): run .work/_shared/S11-28/lead-pilot.ps1 at 242936bf+ (30 exclusive timed... |
 | S11-29 | card_run profiles limit memory in use, not address space, so a 3100 or 5100 run fails only where the real card would | Not started |  |
 | S12-01 | Sprint 12 prep - static code-quality census of the development-corpus builds (spills, x87/vector transfers, addressing, calls, code size) | Done | A static code-quality census (spill/reload proxies, x87 and x87-zmm traffic, address arithmetic, calls, bra... |
@@ -238,23 +238,23 @@ Current tickets: `[###################-]` 205 of 213
 
 ## Recent activity
 
+- 2026-11-13 15:50 **S11-27** lead note: Reduced cases at 0297f57d723 on the card (reduce-card-new.log): stencil-O2, novec and noreuse all PASS (old: O2 and noreuse FAIL 142). MG S/A rerun...
+- 2026-11-13 15:47 **S11-27** lead answer: Lead results at 0297f57d723, 2026-11-13 15:45 EST:
 - 2026-11-13 15:45 **S11-27** lead resume: Lead built GCC at 0297f57d723 and ran checks at 15:45 EST: results in the answer.
 - 2026-11-13 15:33 **S11-17** lead defer: Needs the interactive lead's card runs at ce3d9920, exclusive turn. Fix looks right: peer workload was 0660 (execl 127); now USTAR with 0755, and s...
 - 2026-11-13 15:32 **S11-27** lead defer: GCC build needed (interactive lead) at gcc 0297f57d723, lane gcc. Fix direction accepted: LRA now spills the bridge slots, so the elimination offse...
 - 2026-11-13 15:30 **S11-17** engineer ask: Fix ce3d9920: peer workload was 0660 (execl returned 127); now 0755 in USTAR. Two host tests pass; actual launch/archive/ELF/input checks pass. Log...
 - 2026-11-13 15:28 **S11-27** engineer ask: GCC build needed at 0297f57d723 (lane gcc). LRA owns bridge spill slots via memory-only constraints. T1 integrated: expected red O2/noreuse, PASS n...
 - 2026-11-13 15:22 **S11-17** lead answer: The evaluation pilot (bf894ae5) cannot run as staged. Fix both problems and restage; the lead reruns pilot then confirm.
-- 2026-11-13 15:22 **S11-17** lead resume: Lead ran the evaluation pilot at 15:22 EST: harness failures, results in the answer.
-- 2026-11-13 15:19 **S11-27** lead approve-red: The NPB-MG wrong answer is traced to a reload bug: on vectorized stencil loops, KNC's x87-to-vector scratch slot is addressed 48 bytes too high and...
 
 ## Cost
 
 - From the script, engineer: 535 sessions, 1096.2M input tokens
 - From the script, lead: 351 sessions, 98.3M input tokens
-- Started by hand, Claude: 12 sessions, 2967.5M input tokens
+- Started by hand, Claude: 12 sessions, 2970.1M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 26.6 GiB of 100 GiB. 216 GiB free on the drive.
+The project uses 27.6 GiB of 100 GiB. 217 GiB free on the drive.
