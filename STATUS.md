@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-12 23:57.
+Updated automatically at every ticket change. Last update: 2026-11-12 23:58.
 
-**Next: the tech lead, on S11-23.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: the tech lead, on S11-21.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[###################-]` 201 of 207
 
@@ -72,7 +72,7 @@ Current tickets: `[###################-]` 201 of 207
 | S11-18 | M4 corpus harness v2 - card profiles, prefix record, held-out sealing, stronger checks, and the donor-failure rule | Done | The M4 corpus harness now stages all 17 programs for the 7120 and the 3100/5100 profiles with serial voting... |
 | S11-19 | Second senior review - the M4 definition and the Sprint 11-13 roadmap, adjusted | Done | The M4 definition and the Sprint 11-13 roadmap are rewritten as measure, improve, decide, each sprint with ... |
 | S11-20 | Research - which compiler optimizations benefit the widest range of real code on KNC, from professional to amateur, and does our corpus cover it? | Done | We now have a code-style coverage study (docs/research/code-style-coverage.md) that ranks Sprint 12 candida... |
-| S11-21 | Exploratory WRF build with GCC-KNC (learn-only, host-side) - how far does an unmodified WRF get, and what breaks? | In progress | Owner standing rule (feedback 2026-11-09/10): session budget raised to 17, third extension, granted because... |
+| S11-21 | Exploratory WRF build with GCC-KNC (learn-only, host-side) - how far does an unmodified WRF get, and what breaks? | Question for the tech lead | 52c4ea06 completes the requested report from retained results; no new build/test. Submit refused: 932 chang... |
 | S11-22 | Review PhiWeather's first instrumented-PGO attempt on WRF (GCC 5.1.1, k1om) - method, near-zero gain, tolerance gate | Done | PhiWeather's first WRF PGO attempt is reviewed for their lead: the collection and use pipeline is credible,... |
 | S11-23 | ICE in WRF's RRTM radiation (rtrn) at -O2 -march=knc - unrecognizable insn after reload, and sub-512-bit SLP vectors under KNC | Question for the tech lead | GCC build needed at 64c033d1255. RTL: complex-5 SF insns 24/29 change from *movsf_internal to *knc_copysf i... |
 | S12-01 | Sprint 12 prep - static code-quality census of the development-corpus builds (spills, x87/vector transfers, addressing, calls, code size) | Done | A static code-quality census (spill/reload proxies, x87 and x87-zmm traffic, address arithmetic, calls, bra... |
@@ -232,6 +232,7 @@ Current tickets: `[###################-]` 201 of 207
 
 ## Recent activity
 
+- 2026-11-12 23:58 **S11-21** engineer ask: 52c4ea06 completes the requested report from retained results; no new build/test. Submit refused: 932 changed lines exceeds the 800-line budget. Ma...
 - 2026-11-12 23:56 **S11-23** engineer ask: GCC build needed at 64c033d1255. RTL: complex-5 SF insns 24/29 change from *movsf_internal to *knc_copysf in LRA, losing immediate stores; va-arg-2...
 - 2026-11-12 23:55 **S11-23** lead note: Lead built 5c4f29faa51 (log S11_23_lead_build3-20261112-232944.log). WRF rtrn reproducer compiles (rc 0). Torture diff against the installed prefix...
 - 2026-11-12 23:54 **S11-21** owner decide: Owner standing rule (feedback 2026-11-09/10): session budget raised to 17, third extension, granted because the last extension made the decisive pr...
@@ -239,7 +240,6 @@ Current tickets: `[###################-]` 201 of 207
 - 2026-11-12 23:42 **S11-23** lead answer: Fix 3 built; see the 23:55 note: WRF compiles, but 5 FP torture files still differ in float constant stores (struct/complex and varargs cases your ...
 - 2026-11-12 23:40 **S11-23** lead resume: Fix 3 build and checks in the 23:55 note.
 - 2026-11-12 23:40 **S11-23** lead note: Lead built 3bfe7d827fa (log .work/_state/logs/S11_23_lead_build2-20261112-230849.log). The WRF rtrn reproducer now compiles (rc 0): ICE and LRA cyc...
-- 2026-11-12 23:32 **S11-23** lead defer: Interactive lead: build GCC at 5c4f29faa51; run check.py t1 --compiler gcc16 --rrtm and --rrtm-constants, the 165-file FP torture asm diff vs knc t...
 
 ## Cost
 
@@ -251,4 +251,4 @@ Current tickets: `[###################-]` 201 of 207
 
 ## Disk
 
-The project uses 26.5 GiB of 100 GiB. 67 GiB free on the drive.
+The project uses 26.5 GiB of 100 GiB. 64 GiB free on the drive.
