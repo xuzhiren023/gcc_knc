@@ -40,14 +40,14 @@ def stage(args):
         raise ValueError('expected donor serial and KNC serial/OpenMP builds')
     shutil.copyfile(old / 'launch', dest / 'launch')
     corpus.write_json(dest / 'builds.json', records)
-    input_file(dest, 104)  # Diagnostic candidate, not a frozen grid choice.
+    input_file(dest, 104)  # Lead's frozen grid choice, 2026-11-13.
     (dest / 'arena.flag').write_text('diagnostic only\n')
     shutil.copyfile(corpus.SUPPORT / 'hpcg_round.md', dest / 'README.md')
     for action in ('memory', 'pilot'):
         command = "& (Get-Command python.exe).Source $entry %s-lead --stage '%s'" % (action, corpus.windows_path(dest))
         header = ''
         if action == 'pilot':
-            header = 'param([Parameter(Mandatory=$true)][ValidateSet(80,88,96,104)][int]$Grid)\n'
+            header = 'param([ValidateSet(104)][int]$Grid = 104)\n'
             command += ' --grid $Grid'
         entry = corpus.windows_path(corpus.ROOT / 'tools/hpcg_round.py')
         fallback = corpus.windows_path(corpus.ROOT.parent.parent / 'tools/hpcg_round.py')
@@ -120,8 +120,8 @@ def memory_lead(args):
 
 def pilot_lead(args):
     stage = args.stage
-    if args.grid is None:
-        raise ValueError('--grid requires the lead-reviewed memory choice; no default')
+    if args.grid != 104:
+        raise ValueError('pilot requires the frozen 104-cubed grid')
     input_file(stage, args.grid)
     capture = stage / 'pilot'
     capture.mkdir(exist_ok=True)
@@ -135,7 +135,7 @@ def pilot_lead(args):
                 job = dict(program='HPCG', compiler=compiler, variant=variant,
                            flags=['-O2'] + (['-march=knc'] if compiler == corpus.KNC else []),
                            run=run, threads=threads, profile=profile,
-                           input='HPCG-3.1-%dx%dx%d-rt0' % (args.grid, args.grid, args.grid),
+                           input=corpus.INPUTS['HPCG'],
                            panel='primary' if variant == 'serial' else corpus.OPENMP_PANEL)
                 out, err = capture / ('%02d.stdout' % len(rows)), capture / ('%02d.stderr' % len(rows))
                 rc = corpus.card_call(stage, files_for(stage, compiler, variant), 'HPCG', density,
@@ -153,7 +153,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('action', choices=('stage', 'memory-lead', 'pilot-lead'))
     parser.add_argument('--stage', type=Path, default=STAGE)
-    parser.add_argument('--grid', type=int, choices=(80, 88, 96, 104))
+    parser.add_argument('--grid', type=int, choices=(104,), default=104)
     parser.add_argument('--timeout', type=int, default=900)
     args = parser.parse_args()
     if args.action.endswith('-lead') and os.name != 'nt':

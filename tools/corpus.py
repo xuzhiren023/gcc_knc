@@ -41,7 +41,7 @@ INPUTS = {'PB-' + name: 'polybench-4.2.1-double-' + '-'.join('%s=%s' % x for x i
           for name, dims in PB.items()}
 INPUTS.update({p: 'NPB-3.4.2-class-A' for p in OPENMP if p.startswith('NPB-')})
 INPUTS.update(STREAM='STREAM-5.10-3x16777216-double-20-iterations',
-              HPCG='HPCG-3.1-reference-104x104x104-60s',
+              HPCG='HPCG-3.1-104x104x104-rt0',
               zlib='lcg-seed-11-8MiB-level6', bzip2='lcg-seed-11-8MiB-level9',
               SQLite='sqlite-3.46.1-recursive-100000-v1')
 RTOL, ATOL = 1e-8, 1e-10
@@ -490,10 +490,12 @@ def stage(args):
             data.append((state >> 24) if i % 4096 < 1024 else text[i % len(text)])
         (stage_dir / 'input.bin').write_bytes(data)
         shutil.copyfile(SUPPORT / 'input.sql', stage_dir / 'input.sql')
-        # Reference input, retained verbatim in the package; no source edits.
-        shutil.copyfile(source / 'hpcg-3.1/bin/hpcg.dat', stage_dir / 'hpcg.dat')
         with (stage_dir / 'support.log').open('w') as log:
             execute(['gcc', source / 'NPB3.4.2/NPB3.4-OMP/sys/setparams.c', '-o', stage_dir / 'setparams'], stage_dir, log)
+    if not args.only or 'HPCG' in args.only:
+        # S11-28 lead choice: identical grid and exactly one CG set on all models.
+        (stage_dir / 'hpcg.dat').write_text(
+            'HPCG fixed work\nS11-28: one benchmark CG set\n104 104 104\n0\n')
     # Selective restaging must also refresh the launcher protocol.
     with (stage_dir / 'support.log').open('a') as log:
         execute([compiler_path(DONOR), '-O2', SUPPORT / 'launch.c', *link_paths(), '-lrt', '-pthread', '-o', stage_dir / 'launch'], stage_dir, log)
