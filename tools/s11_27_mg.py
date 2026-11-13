@@ -8,11 +8,13 @@ import shutil
 import subprocess
 import sys
 
+import storage
+
 ROOT = Path(__file__).resolve().parents[1]
 SHARED = ROOT.parent / '_shared'
 OUT = SHARED / 'S11-27'
 TC = SHARED / 'toolchain'
-BUILD = SHARED / 'gcc-build-2/gcc'
+BUILD = Path(storage.gcc_build_dir(ROOT.parent.parent)) / 'gcc'
 PREFIX = SHARED / 'gcc-knc-16.2.0'
 SOURCE = SHARED / 'corpus-build/sources/NPB3.4.2/NPB3.4-OMP'
 NAMES = ('mg_data', 'mg', 'print_results', 'randi8', 'timers', 'wtime')
@@ -68,14 +70,14 @@ def build():
     OUT.mkdir(exist_ok=True)
     os.environ['PATH'] = ':'.join([str(TC / 'cross/bin'), str(TC / 'cygwin/bin'),
                                  os.environ.get('PATH', '')])
-    stamp = json.loads((SHARED / 'gcc-build-2/.gcc-build-stamp.json').read_text())
-    source_tree = SHARED / 'gcc-2'
+    stamp = json.loads((BUILD.parent / '.gcc-build-stamp.json').read_text())
+    source_tree = Path(storage.gcc_tree(ROOT.parent.parent))
     git = ['git', '-c', 'safe.directory=' + str(source_tree), '-C', source_tree]
     # A merge commit may differ while the built source tree remains identical.
-    run(*git, 'diff', '--exit-code', stamp['commit'], 'knc')
+    run(*git, 'diff', '--exit-code', stamp['commit'], 'HEAD')
     if not stamp['clean']:
-        raise RuntimeError('slot-2 build is stamped unclean; lead build required')
-    print('Slot-2 built commit:', stamp['commit'], 'same source tree as knc')
+        raise RuntimeError('selected build is stamped unclean; lead build required')
+    print('Built commit:', stamp['commit'], 'same source tree as selected lane HEAD')
     config = OUT / 'config'
     config.mkdir(exist_ok=True)
     (config / 'make.def').write_text('F77 = gfortran\nFLINK = gfortran\n'
