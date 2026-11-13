@@ -147,6 +147,11 @@ M1 is accepted and tagged `m1` locally; nothing is pushed. Engineers are Claude 
 - **Restore target runtime files after replacing the GCC build tree.** `tools/toolchain.py gcc16` builds `all-gcc` only and removes the old tree, including `crtbegin.o`, `crtend.o` and `libgcc`. S3-04's first T2 regression therefore failed to link; `tools/toolchain.py libgcc` through `tools/run.py` restored the fork-built runtime, and the failed T2 checks then passed. Do this after a full rebuild before link checks.
 
 ## Open items not on a ticket
+- 2026-11-13 16:10 EST (lead): S11-27 at 0297f57d723.
+  - On the card: MG S and A verify (A-O2 14.2 s vs GCC 5.1.1 33.8 s), and the reduced cases pass.
+  - T0 and T2 pass. T1 regresses: 4 ICEs in knc-secondary-pressure ti/tf at -O1/-O2, LRA 'maximum number of generated reload insns' (a bridge-pseudo reload cycle). Back to the engineer.
+  - Lead mistakes, both cleaned up: the first torture diff script broke on Windows glob backslashes; the x86 check with a relative --shared made a stray releases/gcc-16.2.0 worktree inside .work/_shared/gcc/.work, now removed and pruned, and git status in the GCC tree is clean.
+  - S11-17 first pilot: full profile 5 pairs, PGO/base median 0.996 (spread 1.2%), so no gain on zlib. It stopped at 3100 pair 1 on an SSH upload deadline under heavy host load. Rerun at 16:10.
 - 2026-11-13 15:55 EST (lead): S11-02 DMA validation FAILED safely, with PhiWeather's OK.
   - The first 1 GiB dma upload gave 'ERROR remote offset range' from the card helper, then 'SCIF endpoint cleanup unresolved' (status 92). Receipt .work/_shared/S11-02/pair-1-dma.json.
   - No host bugcheck; card boot unchanged; no leftover card process (ps, 15:52 EST).
