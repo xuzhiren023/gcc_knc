@@ -1,9 +1,11 @@
-"""Stage one existing-perf pilot; never run a card job or rebuild the corpus."""
+"""Stage one SIGPROF pilot; never run a card job or rebuild the corpus."""
 import json
 import os
 from pathlib import Path
 import shutil
 import subprocess
+import sys
+import re
 
 ROOT = Path(__file__).resolve().parents[1]
 SHARED = ROOT.parent / '_shared' if ROOT.parent.name == '.work' else ROOT / '.work/_shared'
@@ -39,6 +41,25 @@ def main():
     env = dict(os.environ)
     cyg = SHARED / 'toolchain/cygwin/bin'
     env['PATH'] = str(cyg) + os.pathsep + env['PATH']
+    # Only this diagnostic DSO is new; the corpus binary and launcher stay frozen.
+    cc = SHARED / 'gcc-knc-16.2.0/bin/k1om-mpss-linux-gcc.exe'
+    library = OUT / 'profile-sigprof.so'
+    sysroot = SHARED / 'toolchain/sysroot'
+    subprocess.run([str(cc), '-O2', '-march=knc', '-fPIC', '-shared',
+                    '-Wall', '-Wextra', '-Werror',
+                    str(ROOT / 'tools/corpus/profile-sigprof.c'), '-lrt',
+                    '-Wl,-rpath-link,' + str(sysroot / 'lib64'),
+                    '-Wl,-rpath-link,' + str(sysroot / 'usr/lib64'),
+                    '-o', str(library)], env=env, check=True)
+    subprocess.run([sys.executable, str(ROOT / 'tools/knc_lint'), str(library)],
+                   env=env, check=True)
+    readelf = SHARED / 'toolchain/cross/bin/k1om-mpss-linux-readelf.exe'
+    dependencies = subprocess.check_output([str(readelf), '-d', str(library)],
+                                           env=env, text=True)
+    needed = re.findall(r'\(NEEDED\).*\[(.*?)\]', dependencies)
+    if set(needed) - {'libc.so.6', 'librt.so.1'}:
+        raise RuntimeError('unexpected sampler runtime: ' + str(needed))
+    staged.append(library)
     # One syntax check and symbol inspection; S11-18 already linted these binaries.
     subprocess.run([str(cyg / 'bash.exe'), '-n', str(OUT / 'profile-pilot.sh')],
                    env=env, check=True)
@@ -55,16 +76,15 @@ def main():
     (OUT / 'files.txt').write_text(''.join(str(p) + '\n' for p in staged if p.name != 'profile-pilot.sh'))
     quote = lambda p: "'" + str(p).replace("'", "''") + "'"
     project = ROOT.parent.parent if ROOT.parent.name == '.work' else ROOT
-    lead = """param([ValidateSet('cpu-clock:u','cycles:u')][string]$Event = 'cpu-clock:u')
-$ErrorActionPreference = 'Stop'
+    lead = """$ErrorActionPreference = 'Stop'
 """
     lead += '$entry = ' + quote(ROOT / 'tools/card_run') + '\n'
     lead += 'if (!(Test-Path -LiteralPath $entry)) { $entry = ' + quote(project / 'tools/card_run') + ' }\n'
     lead += '& (Get-Command python.exe).Source $entry --benchmark --threads 240 --timeout 600 --file-list '
-    lead += quote(OUT / 'files.txt') + ' ' + quote(OUT / 'profile-pilot.sh') + ' $Event\nexit $LASTEXITCODE\n'
+    lead += quote(OUT / 'files.txt') + ' ' + quote(OUT / 'profile-pilot.sh') + '\nexit $LASTEXITCODE\n'
     (OUT / 'lead.ps1').write_text(lead)
     print('STAGED PB-gemm strict -O2, unchanged S11-18 binary and launcher; existing lint reused')
-    print('PASS shell syntax; executable symbols and disassembly saved under ' + str(OUT))
+    print('PASS sampler build/lint/dependencies, shell syntax; symbols/disassembly under ' + str(OUT))
     print('NOT RUN: card sampling, attribution, overhead, primary correctness and baseline')
 
 
