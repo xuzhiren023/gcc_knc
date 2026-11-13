@@ -18,6 +18,8 @@ import sys
 import unittest
 from unittest.mock import Mock, patch
 import runpy
+import subprocess
+import tempfile
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "tools"))
@@ -75,6 +77,83 @@ class FakeEndpoint:
 
 
 class TransferPolicy(unittest.TestCase):
+    def test_native_window_offsets(self):
+        # The policy fake never executes registration or the C transfer loop.
+        # Compile that actual loop with fake SCIF/file IO: no endpoint, card,
+        # gigabyte file, or digest throughput measurement is involved.
+        import host_card_transfer as build
+        source = (ROOT / "tools/transfer_bench.c").read_text()
+        start = source.index("static int transfer_file(")
+        end = source.index("static int file_payload(", start)
+        function = source[start:end].replace("read(fd,", "read_file_fake(fd,")
+        function = function.replace("close(fd)", "close_file_fake(fd)")
+        mocks = r'''
+#include <assert.h>
+static uint64_t total, moved, peer, base;
+static unsigned calls, registrations, releases;
+static int sending;
+static int *errno_fake(void) {return &errno;}
+static int64_t reg_fake(endpoint e,void *p,size_t n,int64_t o,int prot,int flags) {
+  assert(!o && !flags && n==67108864 && prot==(sending?1:2));
+  registrations++;return (int64_t)base;
+}
+static int read_fake(endpoint e,int64_t local,size_t n,int64_t remote,int flags) {
+  size_t expected=total-moved>67108864?67108864:(size_t)(total-moved);
+  assert((uint64_t)local==base && (uint64_t)remote==peer && flags==4);
+  assert(n==((expected+63)&~(size_t)63) && n<=window_size);calls++;return 0;
+}
+static int unreg_fake(endpoint e,int64_t offset,size_t n) {
+  assert((uint64_t)offset==base && n==window_size && moved==total);releases++;return 0;
+}
+static int close_fake(endpoint e) {return 0;}
+static int recv_fake(endpoint e,void *p,int n,int flags) {errno=ECONNRESET;return -1;}
+static int stat_fake(int fd,struct stat *s) {s->st_mode=S_IFREG;s->st_size=total;return 0;}
+static void exact_fake(void *p,size_t n,int send) {
+  static unsigned char digest[32];
+  if(n==8 && !send)memcpy(p,&peer,8);
+  if(n==32) {if(send)memcpy(digest,p,32);else memcpy(p,digest,32);}
+}
+#define open(...) 7
+#define close_file_fake(...) 0
+#define read_file_fake(...) 0
+#define fstat stat_fake
+#define connect_transport(...) (opened=1)
+#define exact exact_fake
+#define token(...) ((void)0)
+#define file_io(fd,p,n,w) (moved+=(n))
+#define sha_add(...) ((void)0)
+'''
+        main = r'''
+int main(int argc,char **argv) {
+  total=strtoull(argv[1],0,0);peer=strtoull(argv[2],0,0);
+  base=(UINT64_C(1)<<62)+4096;sending=atoi(argv[3]);
+  sc.reg=reg_fake;sc.read=read_fake;sc.unreg=unreg_fake;
+  sc.close=close_fake;sc.recv=recv_fake;
+  native_errno=errno_fake;
+  transfer_file(1,"scif-read","0",0,"01234567890123456789012345678901",
+                total,sending?"up":"down","unused");
+  assert(registrations==1 && releases==1 && moved==total);
+  assert(calls==(sending?0:(total+67108863)/67108864));return 0;
+}
+'''
+        with tempfile.TemporaryDirectory(dir=build.SHARED, prefix="offset-test-") as temp:
+            path = Path(temp) / "offset.c"
+            path.write_text(source[:start] + mocks + function + main)
+            exe = path.with_suffix(".exe")
+            subprocess.run([str(build.TC / "cygwin/bin/gcc.exe"), "-O0", "-std=gnu11",
+                            "-I" + str(ROOT / "tools"), str(path), "-o", str(exe)],
+                           env=build.ENV, check=True, capture_output=True)
+            for size in (1073741824, 1073741841):
+                for peer in (4096, (1 << 62) + 4096, (1 << 63) - 67108864):
+                    for sender in (0, 1):
+                        result = subprocess.run([str(exe), str(size), str(peer), str(sender)],
+                                                env=build.ENV, capture_output=True, text=True)
+                        self.assertEqual(result.returncode, 0, (size, peer, sender, result.stderr))
+            for peer in (4097, (1 << 63) - 4096, 1 << 63):
+                result = subprocess.run([str(exe), "1073741824", str(peer), "0"],
+                                        env=build.ENV, capture_output=True, text=True)
+                self.assertNotEqual(result.returncode, 0)
+
     def test_helper_free_ssh(self):
         runner = runpy.run_path(str(ROOT / "tools/card_run"))
         for method, present in (("ssh", False), ("ssh", True), ("auto", False)):
