@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-13 01:34.
+Updated automatically at every ticket change. Last update: 2026-11-13 01:35.
 
-**Waiting for you:** S11-23. Run `python tools/pm.py inbox`.
+**Next: GPT-6.1, on S11-23 (ICE in WRF's RRTM radiation (rtrn) at -O2 -march=knc - unrecognizable insn after reload, and sub-512-bit SLP vectors under KNC).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
 Current tickets: `[###################-]` 202 of 209
 
@@ -74,7 +74,7 @@ Current tickets: `[###################-]` 202 of 209
 | S11-20 | Research - which compiler optimizations benefit the widest range of real code on KNC, from professional to amateur, and does our corpus cover it? | Done | We now have a code-style coverage study (docs/research/code-style-coverage.md) that ranks Sprint 12 candida... |
 | S11-21 | Exploratory WRF build with GCC-KNC (learn-only, host-side) - how far does an unmodified WRF get, and what breaks? | Done | WRF v4.8.0 builds with GCC-KNC (serial em_real, -O2 -march=knc, netCDF built with GCC-KNC, GCC 16 runtimes ... |
 | S11-22 | Review PhiWeather's first instrumented-PGO attempt on WRF (GCC 5.1.1, k1om) - method, near-zero gain, tolerance gate | Done | PhiWeather's first WRF PGO attempt is reviewed for their lead: the collection and use pipeline is credible,... |
-| S11-23 | ICE in WRF's RRTM radiation (rtrn) at -O2 -march=knc - unrecognizable insn after reload, and sub-512-bit SLP vectors under KNC | **Waiting for you** | budget: 6 engineer sessions used; the budget is 6 |
+| S11-23 | ICE in WRF's RRTM radiation (rtrn) at -O2 -march=knc - unrecognizable insn after reload, and sub-512-bit SLP vectors under KNC | In progress | Owner standing rule (feedback 2026-11-09/10): session budget raised to 8, first extension; progress: fix 4 ... |
 | S11-24 | WRF OpenMP (smpar) build with GCC-KNC at -mphinix, for PhiWeather's benchmark - replaces the serial trial build | In progress | The KFCPS and advance_uv -O3 ICEs (postreload extract_constrain_insn) are the S11-23 bug: both repros ICE o... |
 | S11-25 | ICE in do_store_flag (expr.cc) on WRF's surface layer (SFCLAY1D) at -O2 -march=knc | In progress |  |
 | S12-01 | Sprint 12 prep - static code-quality census of the development-corpus builds (spills, x87/vector transfers, addressing, calls, code size) | Done | A static code-quality census (spill/reload proxies, x87 and x87-zmm traffic, address arithmetic, calls, bra... |
@@ -235,22 +235,22 @@ Current tickets: `[###################-]` 202 of 209
 ## Recent activity
 
 - 2026-11-13 01:40 **S11-24** lead note: The KFCPS and advance_uv -O3 ICEs (postreload extract_constrain_insn) are the S11-23 bug: both repros ICE on the installed knc compiler and compile...
+- 2026-11-13 01:35 **S11-23** owner decide: Owner standing rule (feedback 2026-11-09/10): session budget raised to 8, first extension; progress: fix 4 (64c033d1255) fixes the WRF rtrn ICE and...
 - 2026-11-13 01:33 **S11-23** engineer escalate: budget: 6 engineer sessions used; the budget is 6
 - 2026-11-13 01:30 **S11-23** lead answer: Fix 4 is good; only the new test needs work. Lead results at 64c033d1255: WRF rtrn compiles; the -O3 WRF reproducers from S11-24 (repro/kfcps.f90 a...
 - 2026-11-13 01:29 **S11-23** lead resume: Fix 4 (64c033d1255) built and checked; see the 01:35 answer.
 - 2026-11-13 00:33 **S11-24** lead answer: Yes, per the S11-21 rule. Take the narrowest flag that compiles: first try per-file -O2 (keeping -mphinix -mknc-card=7120 and the rest) on kfcps.f9...
 - 2026-11-13 00:31 **S11-24** engineer ask: Two failures: smpar -mphinix build (15.4 min), then KFCPS with SLP disabled; both postreload extract_constrain_insn ICEs. Reduced repro: .work/_sha...
 - 2026-11-13 00:22 **S11-21** lead approve: WRF v4.8.0 builds with GCC-KNC (serial em_real, -O2 -march=knc, netCDF built with GCC-KNC, GCC 16 runtimes static): wrf.exe and real.exe are card b...
-- 2026-11-13 00:15 **S11-24** lead note: S11-21's final report found two GCC-KNC ICEs, both worked around per file at -O1 (not -fno-tree-slp-vectorize): phys/module_ra_rrtm (RTRN, S11-23) ...
 
 ## Cost
 
 - From the script, engineer: 517 sessions, 1065.8M input tokens
 - From the script, lead: 336 sessions, 94.6M input tokens
-- Started by hand, Claude: 12 sessions, 2906.4M input tokens
+- Started by hand, Claude: 12 sessions, 2907.0M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 27.2 GiB of 100 GiB. 55 GiB free on the drive.
+The project uses 27.2 GiB of 100 GiB. 59 GiB free on the drive.
