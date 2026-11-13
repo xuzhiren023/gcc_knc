@@ -74,7 +74,7 @@ class CensusTest(unittest.TestCase):
 
     def test_primary_selection_excludes_optional_panels(self):
         rows = [dict(program='STREAM', compiler='gcc-knc', check='pass',
-                     panel='primary', requested_flags=['-O2'], variant='serial',
+                     panel='primary', requested_flags=['-O2', '-march=knc'], variant='serial',
                      held_out=False, files=['workload'])]
         self.assertEqual(census.select_builds(rows, require_complete=False), rows)
         with self.assertRaises(ValueError):
