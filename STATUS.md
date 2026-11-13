@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-13 15:53.
+Updated automatically at every ticket change. Last update: 2026-11-13 15:54.
 
-**Waiting for you:** S11-02. Run `python tools/pm.py inbox`.
+**Next: the tech lead, on S11-27.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[###################-]` 205 of 213
 
@@ -53,7 +53,7 @@ Current tickets: `[###################-]` 205 of 213
 | S10-12 | cbrt and cbrtf crash (SIGSEGV) in qualify_v1 on the card - root cause and fix | Done | The cbrt and cbrtf qualification jobs no longer crash on the card and pass (worst 0.4996 and 0.4991 ULP): t... |
 | S10-13 | User story - code that calls cbrtl under -march=knc gets a safe replacement and a compile-time warning (MPSS libm cbrtl faults) | Done | Under -march=knc, calls to cbrtl (and std::cbrt on long double) now go to GCC-KNC's own safe cube root with... |
 | S11-01 | User story - the best way to move data between the host and the card, measured, and how our projects use it | Done | We now have a sourced inventory of every host-card transfer path that works without changing MPSS (SSH, tar... |
-| S11-02 | card_run and run_suite move bulk data by SCIF DMA at the PCIe link limit, with the SSH stream as fallback | **Waiting for you** | budget: 6 engineer sessions used; the budget is 6 |
+| S11-02 | card_run and run_suite move bulk data by SCIF DMA at the PCIe link limit, with the SSH stream as fallback | Changes requested | Budget raised by the lead under the owner's standing rule (2026-11-09/10: the lead extends session and toke... |
 | S11-03 | S11-01 transfer tool rejects the card's physical /tmp path, so the native study never starts | Done | The transfer study's tool now accepts the card's real /tmp location (/var/volatile/tmp), so its card run ca... |
 | S11-04 | S11-01 transfer tool - the host opens every connection, because Windows Firewall blocks inbound TCP from the card | Done | The transfer study's host side now opens every connection to the card, so Windows Firewall no longer blocks... |
 | S11-05 | Research - raise KNC's real memory bandwidth from about 175 GB/s toward 75-85% of peak, with a measured plan | Done | The memory-bandwidth research plan and a validated multithreaded KNC bandwidth benchmark are ready, with a ... |
@@ -238,6 +238,7 @@ Current tickets: `[###################-]` 205 of 213
 
 ## Recent activity
 
+- 2026-11-13 15:54 **S11-02** owner decide: Budget raised by the lead under the owner's standing rule (2026-11-09/10: the lead extends session and token budgets itself; ask only after two ext...
 - 2026-11-13 15:52 **S11-02** engineer escalate: budget: 6 engineer sessions used; the budget is 6
 - 2026-11-13 15:51 **S11-27** engineer ask: Card round ready at be59bbe2: run python .work/_shared/S11-27/verify-card.py; post verification/L2 per CASE. S-O2,A-O2,S-noslp,A-default,A-novec re...
 - 2026-11-13 15:50 **S11-27** lead note: Reduced cases at 0297f57d723 on the card (reduce-card-new.log): stencil-O2, novec and noreuse all PASS (old: O2 and noreuse FAIL 142). MG S/A rerun...
@@ -245,16 +246,15 @@ Current tickets: `[###################-]` 205 of 213
 - 2026-11-13 15:50 **S11-02** lead resume: Lead ran validate.ps1 at 15:48 EST: DMA failed on the first 1 GiB upload.
 - 2026-11-13 15:47 **S11-27** lead answer: Lead results at 0297f57d723, 2026-11-13 15:45 EST:
 - 2026-11-13 15:45 **S11-27** lead resume: Lead built GCC at 0297f57d723 and ran checks at 15:45 EST: results in the answer.
-- 2026-11-13 15:33 **S11-17** lead defer: Needs the interactive lead's card runs at ce3d9920, exclusive turn. Fix looks right: peer workload was 0660 (execl 127); now USTAR with 0755, and s...
 
 ## Cost
 
 - From the script, engineer: 536 sessions, 1097.0M input tokens
 - From the script, lead: 351 sessions, 98.3M input tokens
-- Started by hand, Claude: 12 sessions, 2974.7M input tokens
+- Started by hand, Claude: 12 sessions, 2975.7M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 27.6 GiB of 100 GiB. 214 GiB free on the drive.
+The project uses 27.6 GiB of 100 GiB. 213 GiB free on the drive.
