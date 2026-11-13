@@ -1,10 +1,10 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-13 00:04.
+Updated automatically at every ticket change. Last update: 2026-11-13 00:06.
 
 **Next: the tech lead, on S11-21.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
-Current tickets: `[###################-]` 201 of 207
+Current tickets: `[###################-]` 201 of 208
 
 ## Milestones
 
@@ -14,7 +14,7 @@ Current tickets: `[###################-]` 201 of 207
 | M1 | Mixed native code | Done | 43 of 43 tickets |
 | M2 | Useful vector target | Done | 51 of 51 tickets |
 | M3 | Runtimes | Done | 48 of 48 tickets |
-| M4 | Broad optimization | In progress | 19 of 25 tickets |
+| M4 | Broad optimization | In progress | 19 of 26 tickets |
 | M5 | Program corpus | Not started | Not planned in detail yet |
 | M6 | Release | Not started | Not planned in detail yet |
 
@@ -75,6 +75,7 @@ Current tickets: `[###################-]` 201 of 207
 | S11-21 | Exploratory WRF build with GCC-KNC (learn-only, host-side) - how far does an unmodified WRF get, and what breaks? | Waiting for review | 52c4ea06: report complete; no new build/test. Retained wrf.exe/real.exe linked K1OM, readelf: only libc/lib... |
 | S11-22 | Review PhiWeather's first instrumented-PGO attempt on WRF (GCC 5.1.1, k1om) - method, near-zero gain, tolerance gate | Done | PhiWeather's first WRF PGO attempt is reviewed for their lead: the collection and use pipeline is credible,... |
 | S11-23 | ICE in WRF's RRTM radiation (rtrn) at -O2 -march=knc - unrecognizable insn after reload, and sub-512-bit SLP vectors under KNC | lead | Interactive lead: build GCC at 64c033d1255; run check.py t1 --compiler gcc16 --rrtm and --rrtm-constants, t... |
+| S11-24 | WRF OpenMP (smpar) build with GCC-KNC at -mphinix, for PhiWeather's benchmark - replaces the serial trial build | In progress |  |
 | S12-01 | Sprint 12 prep - static code-quality census of the development-corpus builds (spills, x87/vector transfers, addressing, calls, code size) | Done | A static code-quality census (spill/reload proxies, x87 and x87-zmm traffic, address arithmetic, calls, bra... |
 | S12-02 | Sprint 12 prep - the unscored generality check set (S11-20's six programs in the code styles our corpus lacks) | Done | The six unscored generality checks (Q1-Q6: ray tracer hit dispatch and vec3 AoS, Burkardt MD, Reference BLA... |
 | S2-01 | Design for zmm and mask registers under -march=knc | Done | The register design for KNC is settled on paper: all 32 zmm and 8 mask registers become usable under -march... |
@@ -245,10 +246,10 @@ Current tickets: `[###################-]` 201 of 207
 
 - From the script, engineer: 516 sessions, 1061.2M input tokens
 - From the script, lead: 335 sessions, 94.4M input tokens
-- Started by hand, Claude: 12 sessions, 2893.4M input tokens
+- Started by hand, Claude: 12 sessions, 2896.3M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 26.9 GiB of 100 GiB. 63 GiB free on the drive.
+The project uses 27.0 GiB of 100 GiB. 63 GiB free on the drive.
