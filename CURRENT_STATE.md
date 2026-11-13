@@ -147,6 +147,11 @@ M1 is accepted and tagged `m1` locally; nothing is pushed. Engineers are Claude 
 - **Restore target runtime files after replacing the GCC build tree.** `tools/toolchain.py gcc16` builds `all-gcc` only and removes the old tree, including `crtbegin.o`, `crtend.o` and `libgcc`. S3-04's first T2 regression therefore failed to link; `tools/toolchain.py libgcc` through `tools/run.py` restored the fork-built runtime, and the failed T2 checks then passed. Do this after a full rebuild before link checks.
 
 ## Open items not on a ticket
+- 2026-11-13 15:45 EST (lead): S12-02 genset card run, stopped by the lead after 44 of 108 launches.
+  - Every launch failed the oracle check, GCC 5.1.1 included, with plausible-looking output (Q1). That makes it a harness bug in genset's matches()/payload, not the compilers.
+  - Q4 built by GCC-KNC segfaults (card_run exit 139) on all three profiles. That could be a real GCC-KNC bug and needs a reproducer.
+  - The later launches would only have repeated these. I stopped only the parent script, so the in-flight card_run finished and released its locks cleanly.
+  - Results: .work/_shared/S12-02/results.jsonl. Needs a follow-up ticket for the harness fix and the Q4 crash.
 - 2026-11-13 15:15 EST (lead): Two harness problems found in the S11-17 evaluation.
   1. Any staged lead .ps1 with $ErrorActionPreference='Stop' aborts on a native program's stderr. Here it was BusyBox tar's 'skipping header x' pax warning from card_run's upload, a PS 5.1 NativeCommandError. I set S11-17's staged lead.ps1 to 'Continue'; the original is lead.ps1.orig, and exit codes are still checked.
   2. That abort left .work/_state/card.lock behind with no card_run process alive, and the next card_run refused with 'own lock present'. I removed it by hand after checking no python/ssh card job was running.
