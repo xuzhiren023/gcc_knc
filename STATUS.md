@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-13 14:58.
+Updated automatically at every ticket change. Last update: 2026-11-13 14:59.
 
-**Next: the tech lead, on S11-15.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: GPT-6.1, on S11-27 (Wrong code - NPB-MG (class A, serial) built by GCC-KNC at -O2 -march=knc fails NPB verification on the card).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
 Current tickets: `[###################-]` 205 of 212
 
@@ -66,7 +66,7 @@ Current tickets: `[###################-]` 205 of 212
 | S11-12 | Sprint 11 batch check - full native suite, x86 identity, forward-port drill, ICE sweeps, runtime prefix consistency | draft |  |
 | S11-13 | Senior compiler review of the Sprint 11-13 scope (Milestone M4) against our research, with recommended plan changes | Done | A senior compiler review of the Sprint 11-13 plan is in: M4 is plausible but needs a frozen scoring and mea... |
 | S11-14 | M4 scoring contract and measurement protocol, frozen before any tuning | Done | M4's scoring contract is frozen in ADR-0015 with a tested scorer: strict serial -O2 versus -O2 over 17 prog... |
-| S11-15 | First development-corpus baseline and profile, GCC 5.1.1 vs GCC-KNC at -O2 (E7-03 part 1) | Question for the tech lead | Committed df72e0a6. Please run from main: python tools/run.py --name S11-15-profile-sigprof -- powershell -... |
+| S11-15 | First development-corpus baseline and profile, GCC 5.1.1 vs GCC-KNC at -O2 (E7-03 part 1) | lead | Card run needed. Staged SIGPROF pilot at df72e0a6 reviewed and fine (LD_PRELOAD ITIMER_PROF 10 ms sampler o... |
 | S11-16 | Long-double libm hazard audit - do other MPSS long double entry points fault like cbrtl? (E7-21, bounded) | Done | The card's MPSS long double libm was probed on the card: of 12 entry points only cbrtl faults, and S10-13 a... |
 | S11-17 | PGO feasibility on one complete development program (reuse of S9-18's train/use path) | lead | Needs the interactive lead's card runs at bf894ae5, in an exclusive turn, from the S11-17 worktree: the pil... |
 | S11-18 | M4 corpus harness v2 - card profiles, prefix record, held-out sealing, stronger checks, and the donor-failure rule | Done | The M4 corpus harness now stages all 17 programs for the 7120 and the 3100/5100 profiles with serial voting... |
@@ -237,6 +237,7 @@ Current tickets: `[###################-]` 205 of 212
 
 ## Recent activity
 
+- 2026-11-13 14:59 **S11-15** lead defer: Card run needed. Staged SIGPROF pilot at df72e0a6 reviewed and fine (LD_PRELOAD ITIMER_PROF 10 ms sampler on unchanged serial PB-gemm, 3 pairs x 2 ...
 - 2026-11-13 14:58 **S11-27** lead answer: Card round at 498a154b, 2026-11-13 15:00 EST; log .work/_shared/S11-27/card.log; card_run exit 124 because the total budget ran out at 9 min.
 - 2026-11-13 14:58 **S11-27** lead resume: Lead ran card.py at 15:00 EST: results posted in the answer.
 - 2026-11-13 14:57 **S11-15** engineer ask: Committed df72e0a6. Please run from main: python tools/run.py --name S11-15-profile-sigprof -- powershell -NoProfile -File .work\_shared\S11-15\lea...
@@ -244,13 +245,12 @@ Current tickets: `[###################-]` 205 of 212
 - 2026-11-13 14:52 **S11-17** engineer ask: Lead card evaluation needed at bf894ae5; engineer card jobs forbidden. All 12 profiles imported; profile-use compiled/linted with fatal missing/mis...
 - 2026-11-13 14:49 **S11-15** lead answer: Card 2026-11-13 14:47 EST: .work/_shared/S11-15/lead.ps1 exited 3 in 0.3 min with 'PROFILE_BLOCKED no existing perf executable'. The card has no pe...
 - 2026-11-13 14:48 **S11-17** lead answer: Training ran on the card 2026-11-13 14:47 EST: exit 0, 0.4 min, stderr empty. Output in .work/_shared/S11-17/train.stdout (146 KB). It is UTF-16LE ...
-- 2026-11-13 14:48 **S11-17** lead resume: Lead ran the training at 14:47 EST: train exit 0, 0.4 min.
 
 ## Cost
 
 - From the script, engineer: 530 sessions, 1087.4M input tokens
 - From the script, lead: 345 sessions, 96.8M input tokens
-- Started by hand, Claude: 12 sessions, 2946.2M input tokens
+- Started by hand, Claude: 12 sessions, 2946.7M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
