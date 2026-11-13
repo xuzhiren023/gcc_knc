@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-13 16:53.
+Updated automatically at every ticket change. Last update: 2026-11-13 16:54.
 
-**Next: the tech lead, on S11-17.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: GPT-6.1, on S11-02 (card_run and run_suite move bulk data by SCIF DMA at the PCIe link limit, with the SSH stream as fallback).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
 Current tickets: `[###################-]` 205 of 213
 
@@ -68,7 +68,7 @@ Current tickets: `[###################-]` 205 of 213
 | S11-14 | M4 scoring contract and measurement protocol, frozen before any tuning | Done | M4's scoring contract is frozen in ADR-0015 with a tested scorer: strict serial -O2 versus -O2 over 17 prog... |
 | S11-15 | First development-corpus baseline and profile, GCC 5.1.1 vs GCC-KNC at -O2 (E7-03 part 1) | In progress | SIGPROF pilot ran 2026-11-13 15:20 EST: PASS, exit 0, 0.9 min, 843 log lines with PROFILE_PC samples. Log: ... |
 | S11-16 | Long-double libm hazard audit - do other MPSS long double entry points fault like cbrtl? (E7-21, bounded) | Done | The card's MPSS long double libm was probed on the card: of 12 entry points only cbrtl faults, and S10-13 a... |
-| S11-17 | PGO feasibility on one complete development program (reuse of S9-18's train/use path) | Question for the tech lead | Lead finished the zlib evaluation at 16:55 EST. |
+| S11-17 | PGO feasibility on one complete development program (reuse of S9-18's train/use path) | In progress | zlib evaluation done at ce3d9920, 2026-11-13. Every launch passed CORPUS_CHECK. Host was loaded (PhiWeather... |
 | S11-18 | M4 corpus harness v2 - card profiles, prefix record, held-out sealing, stronger checks, and the donor-failure rule | Done | The M4 corpus harness now stages all 17 programs for the 7120 and the 3100/5100 profiles with serial voting... |
 | S11-19 | Second senior review - the M4 definition and the Sprint 11-13 roadmap, adjusted | Done | The M4 definition and the Sprint 11-13 roadmap are rewritten as measure, improve, decide, each sprint with ... |
 | S11-20 | Research - which compiler optimizations benefit the widest range of real code on KNC, from professional to amateur, and does our corpus cover it? | Done | We now have a code-style coverage study (docs/research/code-style-coverage.md) that ranks Sprint 12 candida... |
@@ -238,6 +238,7 @@ Current tickets: `[###################-]` 205 of 213
 
 ## Recent activity
 
+- 2026-11-13 16:54 **S11-17** lead answer: zlib evaluation done at ce3d9920, 2026-11-13. Every launch passed CORPUS_CHECK. Host was loaded (PhiWeather downloads and WPS, lead builds); timing...
 - 2026-11-13 16:53 **S11-27** lead answer: Do not use t1-fix2: the lead's check created it and its ACL is not yours, and the lead does not change ACLs. Write the dumps to a directory you cre...
 - 2026-11-13 16:53 **S11-17** lead resume: Lead finished the zlib evaluation at 16:55 EST.
 - 2026-11-13 16:52 **S11-27** engineer ask: Cannot regenerate requested dumps: lane-gcc b56d5090c86 compiling knc-secondary-pressure.c at O2/march=knc, PRESSURE_MODE=9, fdump-rtl-reload fails...
@@ -245,7 +246,6 @@ Current tickets: `[###################-]` 205 of 213
 - 2026-11-13 16:47 **S11-27** lead answer: Built b56d5090c86 (PASS, 13.0 min). Targeted T1 on the new build:
 - 2026-11-13 16:46 **S11-27** lead resume: Lead built b56d5090c86 and ran targeted T1: TI/TF ICE persists.
 - 2026-11-13 16:45 **S11-02** lead note: Legacy latch released per validate.ps1 recovery steps:
-- 2026-11-13 16:43 **S11-02** lead changes: Card validation 2 at 3953ab96, 2026-11-13 16:40-16:42 EST, with PhiWeather's OK. The legacy latch was released first per the recovery steps (see th...
 
 ## Cost
 
@@ -257,4 +257,4 @@ Current tickets: `[###################-]` 205 of 213
 
 ## Disk
 
-The project uses 27.5 GiB of 100 GiB. 205 GiB free on the drive.
+The project uses 27.5 GiB of 100 GiB. 204 GiB free on the drive.
