@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-13 02:05.
+Updated automatically at every ticket change. Last update: 2026-11-13 02:09.
 
 **Next: GPT-6.1, on S11-24 (WRF OpenMP (smpar) build with GCC-KNC at -mphinix, for PhiWeather's benchmark - replaces the serial trial build).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
@@ -75,7 +75,7 @@ Current tickets: `[###################-]` 203 of 209
 | S11-21 | Exploratory WRF build with GCC-KNC (learn-only, host-side) - how far does an unmodified WRF get, and what breaks? | Done | WRF v4.8.0 builds with GCC-KNC (serial em_real, -O2 -march=knc, netCDF built with GCC-KNC, GCC 16 runtimes ... |
 | S11-22 | Review PhiWeather's first instrumented-PGO attempt on WRF (GCC 5.1.1, k1om) - method, near-zero gain, tolerance gate | Done | PhiWeather's first WRF PGO attempt is reviewed for their lead: the collection and use pipeline is credible,... |
 | S11-23 | ICE in WRF's RRTM radiation (rtrn) at -O2 -march=knc - unrecognizable insn after reload, and sub-512-bit SLP vectors under KNC | Done | WRF's RRTM radiation and the -O3 OpenMP WRF files that crashed GCC-KNC after reload (rtrn, kfcps, advance_u... |
-| S11-24 | WRF OpenMP (smpar) build with GCC-KNC at -mphinix, for PhiWeather's benchmark - replaces the serial trial build | Changes requested | Build, staging, readelf (models need only libm/libdl/libgomp/libpthread/libc), lint and vector notes are ac... |
+| S11-24 | WRF OpenMP (smpar) build with GCC-KNC at -mphinix, for PhiWeather's benchmark - replaces the serial trial build | In progress | Build, staging, readelf (models need only libm/libdl/libgomp/libpthread/libc), lint and vector notes are ac... |
 | S11-25 | ICE in do_store_flag (expr.cc) on WRF's surface layer (SFCLAY1D) at -O2 -march=knc | In progress | Not building e5dd129d6a6 yet: one FP-semantics change first. GCC treats LTGT as a signaling compare (rtlana... |
 | S12-01 | Sprint 12 prep - static code-quality census of the development-corpus builds (spills, x87/vector transfers, addressing, calls, code size) | Done | A static code-quality census (spill/reload proxies, x87 and x87-zmm traffic, address arithmetic, calls, bra... |
 | S12-02 | Sprint 12 prep - the unscored generality check set (S11-20's six programs in the code styles our corpus lacks) | Done | The six unscored generality checks (Q1-Q6: ray tracer hit dispatch and vec3 AoS, Burkardt MD, Reference BLA... |
