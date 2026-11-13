@@ -33,3 +33,8 @@ def check_source(runner, relative, fortran=False):
 def t1(runner):
     check_source(runner, 'gfortran.dg/knc-rrtm-reload.f90', fortran=True)
     check_source(runner, 'gcc.target/i386/knc-slp-width.c')
+    t1_constants(runner)
+
+
+def t1_constants(runner):
+    runner.t1_sources([runner.source_dir / 'knc-fp-constant-store.c'])
