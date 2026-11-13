@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-13 02:04.
+Updated automatically at every ticket change. Last update: 2026-11-13 02:05.
 
 **Next: GPT-6.1, on S11-24 (WRF OpenMP (smpar) build with GCC-KNC at -mphinix, for PhiWeather's benchmark - replaces the serial trial build).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
@@ -246,11 +246,11 @@ Current tickets: `[###################-]` 203 of 209
 ## Cost
 
 - From the script, engineer: 521 sessions, 1080.0M input tokens
-- From the script, lead: 338 sessions, 95.1M input tokens
+- From the script, lead: 339 sessions, 95.6M input tokens
 - Started by hand, Claude: 12 sessions, 2909.7M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 27.6 GiB of 100 GiB. 56 GiB free on the drive.
+The project uses 27.6 GiB of 100 GiB. 52 GiB free on the drive.
