@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-13 02:01.
+Updated automatically at every ticket change. Last update: 2026-11-13 02:02.
 
-**Next: the tech lead, on S11-25.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: the tech lead, on S11-24.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[###################-]` 203 of 209
 
@@ -75,7 +75,7 @@ Current tickets: `[###################-]` 203 of 209
 | S11-21 | Exploratory WRF build with GCC-KNC (learn-only, host-side) - how far does an unmodified WRF get, and what breaks? | Done | WRF v4.8.0 builds with GCC-KNC (serial em_real, -O2 -march=knc, netCDF built with GCC-KNC, GCC 16 runtimes ... |
 | S11-22 | Review PhiWeather's first instrumented-PGO attempt on WRF (GCC 5.1.1, k1om) - method, near-zero gain, tolerance gate | Done | PhiWeather's first WRF PGO attempt is reviewed for their lead: the collection and use pipeline is credible,... |
 | S11-23 | ICE in WRF's RRTM radiation (rtrn) at -O2 -march=knc - unrecognizable insn after reload, and sub-512-bit SLP vectors under KNC | Done | WRF's RRTM radiation and the -O3 OpenMP WRF files that crashed GCC-KNC after reload (rtrn, kfcps, advance_u... |
-| S11-24 | WRF OpenMP (smpar) build with GCC-KNC at -mphinix, for PhiWeather's benchmark - replaces the serial trial build | In progress | The KFCPS and advance_uv -O3 ICEs (postreload extract_constrain_insn) are the S11-23 bug: both repros ICE o... |
+| S11-24 | WRF OpenMP (smpar) build with GCC-KNC at -mphinix, for PhiWeather's benchmark - replaces the serial trial build | Waiting for review | OpenMP em_real linked at -mphinix -mknc-card=7120; staged wrf.exe, real.exe, private shared libgomp.so.1 an... |
 | S11-25 | ICE in do_store_flag (expr.cc) on WRF's surface layer (SFCLAY1D) at -O2 -march=knc | Question for the tech lead | GCC build needed at e5dd129d6a6 (tree 2). WRF dump:4752 _632 = vect__550.537_1327 <> zero is V16SF LTGT -> ... |
 | S12-01 | Sprint 12 prep - static code-quality census of the development-corpus builds (spills, x87/vector transfers, addressing, calls, code size) | Done | A static code-quality census (spill/reload proxies, x87 and x87-zmm traffic, address arithmetic, calls, bra... |
 | S12-02 | Sprint 12 prep - the unscored generality check set (S11-20's six programs in the code styles our corpus lacks) | Done | The six unscored generality checks (Q1-Q6: ray tracer hit dispatch and vec3 AoS, Burkardt MD, Reference BLA... |
@@ -234,6 +234,7 @@ Current tickets: `[###################-]` 203 of 209
 
 ## Recent activity
 
+- 2026-11-13 02:02 **S11-24** engineer submit: OpenMP em_real linked at -mphinix -mknc-card=7120; staged wrf.exe, real.exe, private shared libgomp.so.1 and RUN-NOTES.md in .work/_shared/wrf-tria...
 - 2026-11-13 02:01 **S11-23** lead approve: WRF's RRTM radiation and the -O3 OpenMP WRF files that crashed GCC-KNC after reload (rtrn, kfcps, advance_uv) now compile: scalar float copies betw...
 - 2026-11-13 01:51 **S11-25** engineer ask: GCC build needed at e5dd129d6a6 (tree 2). WRF dump:4752 _632 = vect__550.537_1327 <> zero is V16SF LTGT -> HI mask. Late folding introduces LTGT; k...
 - 2026-11-13 01:47 **S11-23** engineer submit: Test fdfc79f1 reduces complex-5/va-arg-26: baseline passes; archived regression asm rejected. Full T1: 327 PASS, 0 FAIL; log .work/_state/logs/S11_...
@@ -241,13 +242,12 @@ Current tickets: `[###################-]` 203 of 209
 - 2026-11-13 01:41 **S11-25** engineer red: Red GCC commit c5f932efe90: gfortran.dg/knc-ltgt-mask.f90 ICEs on tree 2 at -O2 -march=knc, do_store_flag expr.cc:13879. S11-25-red-fortran exit 1;...
 - 2026-11-13 01:40 **S11-24** lead note: The KFCPS and advance_uv -O3 ICEs (postreload extract_constrain_insn) are the S11-23 bug: both repros ICE on the installed knc compiler and compile...
 - 2026-11-13 01:35 **S11-23** owner decide: Owner standing rule (feedback 2026-11-09/10): session budget raised to 8, first extension; progress: fix 4 (64c033d1255) fixes the WRF rtrn ICE and...
-- 2026-11-13 01:33 **S11-23** engineer escalate: budget: 6 engineer sessions used; the budget is 6
 
 ## Cost
 
 - From the script, engineer: 520 sessions, 1069.7M input tokens
 - From the script, lead: 337 sessions, 94.8M input tokens
-- Started by hand, Claude: 12 sessions, 2908.3M input tokens
+- Started by hand, Claude: 12 sessions, 2909.1M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
