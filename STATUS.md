@@ -2,7 +2,7 @@
 
 Updated automatically at every ticket change. Last update: 2026-11-13 15:04.
 
-**Next: the tech lead, on S11-27.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+Nothing can move right now.
 
 Current tickets: `[###################-]` 205 of 212
 
@@ -78,7 +78,7 @@ Current tickets: `[###################-]` 205 of 212
 | S11-24 | WRF OpenMP (smpar) build with GCC-KNC at -mphinix, for PhiWeather's benchmark - replaces the serial trial build | Done | WRF v4.8.0 now builds as an OpenMP card binary at -mphinix with GCC-KNC (wrf.exe and real.exe linked, needi... |
 | S11-25 | ICE in do_store_flag (expr.cc) on WRF's surface layer (SFCLAY1D) at -O2 -march=knc | Done | The last WRF file that crashed GCC-KNC (surface layer, SFCLAY1D) now compiles: vector 'ordered and not equa... |
 | S11-26 | WRF OpenMP build at -mphinix with no per-file workarounds (S11-23 and S11-25 fixed), restaged for PhiWeather | draft | Owner 2026-11-13: the S11-24 WRF build is removed. Deleted: |
-| S11-27 | Wrong code - NPB-MG (class A, serial) built by GCC-KNC at -O2 -march=knc fails NPB verification on the card | Question for the tech lead | Card round needed at ebc62958: run python .work/_shared/S11-27/narrow-card.py. Which CASEs verify, with wha... |
+| S11-27 | Wrong code - NPB-MG (class A, serial) built by GCC-KNC at -O2 -march=knc fails NPB verification on the card | lead | Card round needed (interactive lead): run python C:/Users/xuzhi/Documents/gcc_knc/.work/_shared/S11-27/narr... |
 | S11-28 | HPCG run that fits every card model - fixed work instead of fixed duration, grid sized to the 3100's memory | lead | Needs the interactive lead: one card round, run .work/_shared/S11-28/lead-memory.ps1 at ede7b91c (11 correc... |
 | S12-01 | Sprint 12 prep - static code-quality census of the development-corpus builds (spills, x87/vector transfers, addressing, calls, code size) | Done | A static code-quality census (spill/reload proxies, x87 and x87-zmm traffic, address arithmetic, calls, bra... |
 | S12-02 | Sprint 12 prep - the unscored generality check set (S11-20's six programs in the code styles our corpus lacks) | Done | The six unscored generality checks (Q1-Q6: ray tracer hit dispatch and vec3 AoS, Burkardt MD, Reference BLA... |
@@ -237,6 +237,7 @@ Current tickets: `[###################-]` 205 of 212
 
 ## Recent activity
 
+- 2026-11-13 15:04 **S11-27** lead defer: Card round needed (interactive lead): run python C:/Users/xuzhi/Documents/gcc_knc/.work/_shared/S11-27/narrow-card.py at ebc62958 (one card_run --t...
 - 2026-11-13 15:03 **S11-27** engineer ask: Card round needed at ebc62958: run python .work/_shared/S11-27/narrow-card.py. Which CASEs verify, with what L2 norms? 43 linted class-S cases: O2,...
 - 2026-11-13 14:59 **S11-15** lead defer: Card run needed. Staged SIGPROF pilot at df72e0a6 reviewed and fine (LD_PRELOAD ITIMER_PROF 10 ms sampler on unchanged serial PB-gemm, 3 pairs x 2 ...
 - 2026-11-13 14:58 **S11-27** lead answer: Card round at 498a154b, 2026-11-13 15:00 EST; log .work/_shared/S11-27/card.log; card_run exit 124 because the total budget ran out at 9 min.
@@ -244,7 +245,6 @@ Current tickets: `[###################-]` 205 of 212
 - 2026-11-13 14:57 **S11-15** engineer ask: Committed df72e0a6. Please run from main: python tools/run.py --name S11-15-profile-sigprof -- powershell -NoProfile -File .work\_shared\S11-15\lea...
 - 2026-11-13 14:53 **S11-17** lead defer: Needs the interactive lead's card runs at bf894ae5, in an exclusive turn, from the S11-17 worktree: the pilot then confirm commands in docs/researc...
 - 2026-11-13 14:52 **S11-17** engineer ask: Lead card evaluation needed at bf894ae5; engineer card jobs forbidden. All 12 profiles imported; profile-use compiled/linted with fatal missing/mis...
-- 2026-11-13 14:49 **S11-15** lead answer: Card 2026-11-13 14:47 EST: .work/_shared/S11-15/lead.ps1 exited 3 in 0.3 min with 'PROFILE_BLOCKED no existing perf executable'. The card has no pe...
 
 ## Cost
 
