@@ -132,12 +132,11 @@ def build():
     # Keep one original failing loop while exposing reload's new stack slots.
     base = mg.OUT / 'S/O2'
     asm = directory / 'mg.s'
-    if not asm.exists():
-        print(mg.run(*mg.compiler('gfortran'), '-O2', '-march=knc',
-                     '-I' + str(base), '-I' + str(mg.SOURCE / 'common'),
-                     '-fdbg-cnt=vect_loop:16-16', '-fdump-rtl-expand',
-                     '-fdump-rtl-ira', '-fdump-rtl-reload',
-                     '-S', mg.SOURCE / 'MG/mg.f90', '-o', asm, cwd=directory))
+    print(mg.run(*mg.compiler('gfortran'), '-O2', '-march=knc',
+                 '-I' + str(base), '-I' + str(mg.SOURCE / 'common'),
+                 '-fdbg-cnt=vect_loop:16-16', '-fdump-rtl-expand',
+                 '-fdump-rtl-ira', '-fdump-rtl-reload',
+                 '-S', mg.SOURCE / 'MG/mg.f90', '-o', asm, cwd=directory))
 
     runner = (mg.ROOT / 'tools/s11_27_parallel.c').read_text()
     runner = runner.replace('/* CASES */', ',\n'.join('"' + n + '"' for n in cases))
