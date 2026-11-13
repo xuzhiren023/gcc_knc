@@ -61,23 +61,28 @@ python tools/run.py --name S11-21-netcdf-c-make --inputs ../_shared/wrf-trial/tr
 
 ## Stage reached and blockers
 
-**Stage 2: netCDF-C and netCDF-Fortran compiled and installed; the required
-Fortran/C dependency link test failed.** The installed static archives are
+**Stage 2 complete: both dependency libraries are built and installed, and
+`nf_create`/`nf90_create` now link. Stage 3 is blocked by the project hook
+rejecting WRF source-export preparation.** The installed static archives are
 `install/lib/libnetcdf.a` (1,770,676 bytes) and `libnetcdff.a` (1,561,006 bytes).
-Both use GCC-KNC 16.2.0 at `-O2 -march=knc`. Fortran needed the minimal
-classic-path patch described below. Installed `netcdf.mod` and
-`netcdf_nf_data.mod` match the fresh build outputs, whose configure and compile
-logs identify GCC 16.2.0. Their compressed headers report module format 16;
-the format number alone is not a compiler-version check.
+Both use GCC-KNC 16.2.0 at `-O2 -march=knc`. Fortran needed the classic-path
+patch below. Installed module verification passed in the preceding session
+and was not repeated.
 
-The small link-only program calls both `nf_create` and `nf90_create` (and
-closes both files). It failed because the selected shared `libstdc++.so`
-requires versioned GCC arithmetic/unwind symbols while the command requests
-static GCC/Fortran runtimes. This is currently a runtime-link configuration
-blocker, not an observed code-generation defect. No test executable linked;
-WRF and MPI remain unbuilt, with nothing staged for the card. There was no
-observed GCC-KNC ICE or wrong assembler output, so no compiler reproducer
-is applicable. The failed link input is retained for diagnosis.
+Following the lead's 20:21 answer, removing `-lstdc++` resolved the link without
+other link-line changes. No archive member pulled into this probe required
+C++ runtime symbols; other optional netCDF APIs were not tested.
+`netcdf-link.exe` is retained under the trial root and was not run.
+`readelf -d` confirmed no NEEDED entry for `libgfortran.so.5`, `libstdc++.so.6`,
+or `libgcc_s.so.1`.
+
+All trial links must use static GCC 16 runtimes: `-static-libgcc` and
+`-static-libgfortran`, plus `-static-libstdc++` if C++ is actually required.
+The card has MPSS GCC 5 runtimes. Apply this rule in WRF's
+`configure.wrf` `LDFLAGS_LOCAL` when configuration is reached.
+WRF and MPI remain unbuilt, with no WRF binary staged for the card. No
+GCC-KNC ICE or wrong assembler output was observed; no compiler reproducer
+is applicable.
 
 The lead authorized retaining the contaminated `build-netcdf-c` as stale and
 using `build-netcdf-c-nomsys`. Every configure and make runs through
@@ -135,7 +140,7 @@ without deleting anything, changing sources, or recompiling C. It is also
 selected for netCDF-Fortran installation. All commands use `trial-env.sh`
 and `tools/run.py`.
 
-### Classic Fortran patch and current link blocker
+### Classic Fortran patch and earlier link blocker
 
 The earlier unpatched Fortran build failed before installation. The lead's
 2026-11-12 19:59 answer authorized patching copied 4.6.1 sources, retaining the
@@ -163,7 +168,7 @@ existing relative `MKDIR_P` helper and needed no new top-level directory.
 | --- | --- | --- |
 | `nf_nc_noparallel.F90:33,49,64`: undefined `NC_ENOPAR`. | Upstream dependency classic-path guard bug. | Its definition was inside `USE_NETCDF4`, although the nonparallel stubs are built without that macro. Moving that one definition outside the guard resolved compilation. |
 | Libtool rejects a missing `gcc-install/.../lib64/libstdc++.la`. | Relocated toolchain metadata / dependency link configuration. | Two stale absolute entries in this trial's `install/lib/libnetcdf.la` `dependency_libs` were normalized to `-lstdc++`. The script records the adjustment. No toolchain file was edited. Fortran make/install then passed. |
-| Tiny netCDF link selects shared `libstdc++.so` and fails on versioned GCC runtime references. | Runtime-link configuration; not established as a GCC-KNC backend defect. | `netcdf-link.sh` uses `-static-libgcc -static-libgfortran` but plain `-lstdc++`. Undefined symbols include quad conversions/comparisons, 128-bit integer division, and unwind functions. The candidate next change is to select `libstdc++.a` explicitly, keeping the same link test. This has **not** been tried. |
+| Tiny netCDF link selects shared `libstdc++.so` and fails on versioned GCC runtime references. | Runtime-link configuration; not established as a GCC-KNC backend defect. | `netcdf-link.sh` uses `-static-libgcc -static-libgfortran` but plain `-lstdc++`. Undefined symbols include quad conversions/comparisons, 128-bit integer division, and unwind functions. Resolved in the current continuation by removing unnecessary `-lstdc++` as directed by the lead. Static C++ selection was not needed. |
 
 All 19 unresolved references in the link log are:
 `__extendxftf2`, `__udivti3`, `_Unwind_Resume`, `_Unwind_Resume_or_Rethrow`,
@@ -176,8 +181,8 @@ and `_Unwind_GetDataRelBase`. Their required GCC symbol versions are in the log.
 The installed modules were checked once: compressed header inspection,
 comparison with the build outputs, and the build's GCC 16.2.0 identification.
 `netcdf.mod` is 17,591 bytes and `netcdf_nf_data.mod` is 8,076 bytes. The link
-program uses both modules and reached the linker; neither API link nor native
-behavior is claimed to pass. The shared `netcdf-link.f90` is a link probe,
+program uses both modules. The API link now passes; native behavior remains
+untested. The shared `netcdf-link.f90` is a link probe,
 not a repository test or a card job.
 
 Commands for this continuation (all through `tools/run.py` and `trial-env.sh`):
@@ -194,13 +199,47 @@ Reduced failing link, from the trial root under `trial-env.sh`:
 k1om-mpss-linux-gfortran -O2 -march=knc -Iinstall/include netcdf-link.f90 -Linstall/lib -static-libgcc -static-libgfortran -lnetcdff -lnetcdf -lstdc++ -lm -ldl -o netcdf-link.exe
 ```
 
-This continuation had two failed attempts (first p1 make, then the link test),
-with a successful incremental make/install between them. Under AGENTS.md,
-stop and ask the lead before another attempt. Proposed next action: use
-`-Wl,-Bstatic -lstdc++ -Wl,-Bdynamic` in the same link test, then proceed to
-pristine WRF 4.8.0 serial/no-nesting `em_real` only if it links. Static C++
-selection is an untested hypothesis, not a promised fix. No GCC build is needed
-for that proposed link-only experiment.
+The preceding continuation stopped after two failed attempts. The lead then
+directed removing `-lstdc++` first. That passed on this continuation's only
+build/test invocation (including the requested dynamic-dependency check):
+
+```text
+python tools/run.py --name S11-21-netcdf-link-no-cxx --inputs ../_shared/wrf-trial/netcdf-link.sh ../_shared/wrf-trial/netcdf-link.f90 -- C:/Users/xuzhi/Documents/PhiWeather/.tools/knc-bootstrap/cygwin/bin/bash.exe ../_shared/wrf-trial/trial-env.sh bash ../_shared/wrf-trial/netcdf-link.sh
+```
+
+### Current blocker: WRF source preparation
+
+Read-only inspection identifies upstream tag `v4.8.0` at
+`06d4240ae989cc3e50af412bb472df3d9048783c` in
+`C:/Users/xuzhi/Documents/PhiWeather/native/upstream/WRF`. Its seven physics
+submodules are `GFL`, `MYNN-EDMF`, `MYNN-SFC`, `TEMPO`, `fire_behavior`,
+`noahmp`, and `physics_mmm`; local object repositories exist under
+`.git/modules/phys`. A pristine export must include their pinned gitlinks.
+
+The planned script would export that tag and pinned physics submodules into
+`wrf-trial/src/`, preserve licences, and record origins in `PROVENANCE.md`.
+The project PreToolUse hook rejected the command to write the script before
+it ran, with this reason:
+
+> Copying trees and downloading are how this project would run out of space.
+> Reuse the shared build area, or ask the lead to allow it on this ticket.
+
+Classification: **host/project execution policy**, not a compiler defect.
+The destination was already the ticket-authorized shared area. No script,
+export, extraction, configure, or WRF build resulted. AGENTS.md prohibits
+bypassing a hook refusal. The lead must provide the source export or an
+approved preparation path; no alternate copying method was attempted.
+
+Read-only comparison identifies pending cross-configuration issues, not
+observed compile failures: upstream `configure:700-717` executes host
+`gfortran` to choose compatibility flags; PhiWeather instead queries the
+selected compiler's `-dumpversion`. WRF already specifies
+`-fallow-argument-mismatch -fallow-invalid-boz` for GCC newer than 9.
+Upstream `configure:617-628` executes fseek probes and `configure:1036-1037`
+executes an RPC probe; cross configuration must avoid target execution.
+PhiWeather's RPC adaptation uses a `rpc_type_cross` make target. The serial
+KNC entry needs GCC 16 flags, host `CC_TOOLS`, static runtime flags, and
+`NETCDF_classic=1`. No WRF compatibility patch has been applied.
 
 ### Time, disk and logs
 
@@ -217,7 +256,7 @@ make/install took **0.6 minute**; the failed link probe took under 0.1 minute.
 Configure and make times are combined where the wrapper ran both. No WRF
 compilation timing is available.
 
-After this continuation, the trial contains **79,439,526 logical file bytes**
+Before this continuation, the trial contained **79,439,526 logical file bytes**
 (79.4 MB decimal, 75.8 MiB) in 4,619 file entries. This includes archives,
 stale trees retained at the lead's direction, patched sources, installed
 libraries/modules and the link input. The `os.walk`/`lstat` measurement does
@@ -240,6 +279,14 @@ Logs under `.work/_state/logs/`:
 - `S11_21_netcdf_fortran_p1_resume-20261112-201201.log`: corrected incremental make and install passed (0.6 minute).
 - `S11_21_netcdf_link-20261112-201304.log`: GCC/module checks passed; link failed (undefined references at lines 5-23). No execution.
 
+Current continuation: link plus dynamic-dependency check took less than
+**0.1 minute** (wrapper: 0.0 minute); WRF compilation has not started.
+Current logical disk usage before this documentation append is **84,286,462 bytes**
+(using lstat for Cygwin links), below 25 GB. The initial stat-based accounting
+could not follow a stale Cygwin HDF4 link; no build was involved.
+Log: `.work/_state/logs/S11_21_netcdf_link_no_cxx-20261112-202434.log`.
+The source-preparation refusal is in the tool response, not a build log.
+
 ## Vectorization
 
 No WRF loop compilation result is available: stage 4 was not reached. No
@@ -259,12 +306,13 @@ engineering effort, not measured build times.
 1. **Reproducible source/configuration baseline (0.5–1 day):** export a pristine
    WRF 4.8.0 revision from the read-only source repository, preserve its licence,
    and isolate only the necessary cross configuration from PhiWeather's local
-   changes. Establish host tools versus target tools and classic netCDF options.
+   changes. First obtain a lead-approved export path; include all seven pinned
+   physics submodules and replace host/target execution configure probes. Establish host tools versus target tools and classic netCDF options.
 2. **GCC 16 dependency stack (1–2 days, after this trial):** retain the
    corrected environment and successful relative-directory installation of
    netCDF-C, retain the now-built classic Fortran compatibility patch and fresh GCC 16
-   modules, resolve the static/shared C++/GCC runtime link selection, then verify
-   target-runtime links;
+   modules, and retain the passed no-C++ API link and static GCC/Fortran runtime
+   rule;
    classify strictness versus cross-probe failures without executing target
    probes on the host. Any compiler defect gets a separate reduced case and
    lead-built compiler fix before this work resumes.
