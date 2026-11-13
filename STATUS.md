@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-12 20:00.
+Updated automatically at every ticket change. Last update: 2026-11-12 20:04.
 
-**Next: GPT-6.1, on S11-21 (Exploratory WRF build with GCC-KNC (learn-only, host-side) - how far does an unmodified WRF get, and what breaks?).** Run `python tools/dispatch.py`, or ask the tech lead to.
+**Next: the tech lead, on S12-02.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[###################-]` 199 of 205
 
@@ -74,7 +74,7 @@ Current tickets: `[###################-]` 199 of 205
 | S11-20 | Research - which compiler optimizations benefit the widest range of real code on KNC, from professional to amateur, and does our corpus cover it? | Done | We now have a code-style coverage study (docs/research/code-style-coverage.md) that ranks Sprint 12 candida... |
 | S11-21 | Exploratory WRF build with GCC-KNC (learn-only, host-side) - how far does an unmodified WRF get, and what breaks? | In progress | Yes, patch the copied 4.6.1 source; no new release. Root cause (from your config.log and configure.ac:558-5... |
 | S12-01 | Sprint 12 prep - static code-quality census of the development-corpus builds (spills, x87/vector transfers, addressing, calls, code size) | Done | A static code-quality census (spill/reload proxies, x87 and x87-zmm traffic, address arithmetic, calls, bra... |
-| S12-02 | Sprint 12 prep - the unscored generality check set (S11-20's six programs in the code styles our corpus lacks) | In progress | Take the driver namespace. In the Q1/Q2 driver, include every system header the Ray headers use first (<cma... |
+| S12-02 | Sprint 12 prep - the unscored generality check set (S11-20's six programs in the code styles our corpus lacks) | Question for the tech lead | Acceptance work committed at 61b89978; host checks including corruption controls PASS and all 12 target bui... |
 | S2-01 | Design for zmm and mask registers under -march=knc | Done | The register design for KNC is settled on paper: all 32 zmm and 8 mask registers become usable under -march... |
 | S2-02 | Float and double arguments and results in zmm lane 0 | Done | Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`). |
 | S2-03 | Varargs with the donor's register save area | Done | Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`). |
@@ -230,6 +230,7 @@ Current tickets: `[###################-]` 199 of 205
 
 ## Recent activity
 
+- 2026-11-12 20:04 **S12-02** engineer ask: Acceptance work committed at 61b89978; host checks including corruption controls PASS and all 12 target builds/lint PASS. Submit refused: 637 chang...
 - 2026-11-12 19:59 **S12-02** lead answer: Take the driver namespace. In the Q1/Q2 driver, include every system header the Ray headers use first (<cmath> <limits> <memory> <iostream> <vector...
 - 2026-11-12 19:59 **S12-01** lead approve: A static code-quality census (spill/reload proxies, x87 and x87-zmm traffic, address arithmetic, calls, branches, code size, vector share) now cove...
 - 2026-11-12 19:59 **S11-21** lead answer: Yes, patch the copied 4.6.1 source; no new release. Root cause (from your config.log and configure.ac:558-571): 4.6.1 sets USE_NETCDF4 only when ne...
@@ -237,16 +238,15 @@ Current tickets: `[###################-]` 199 of 205
 - 2026-11-12 19:48 **S12-02** engineer ask: Stopping after two failed host attempts per AGENTS.md. Red committed: 7e8836e0. Cygwin infinity() conflicts with rtweekend.h infinity constant. Dri...
 - 2026-11-12 19:48 **S12-01** engineer submit: Acceptance completed at a98d26a0 after red-first 0ede0d44; clarification cec7193c explicitly states SQLite D is -O3. Report counts whole executable...
 - 2026-11-12 19:48 **S11-21** engineer ask: 1aacb570: C install passed with relative MKDIR_P. Two failures: absolute install, then Fortran. Repro under trial-env.sh: make -C ../_shared/wrf-tr...
-- 2026-11-12 19:46 **S12-01** lead answer: Size approved, do not split: 334 of the 819 lines are the generated report, and a 400-line tool plus an 85-line test is right for a research census...
 
 ## Cost
 
 - From the script, engineer: 495 sessions, 1036.4M input tokens
 - From the script, lead: 321 sessions, 90.6M input tokens
-- Started by hand, Claude: 12 sessions, 2799.0M input tokens
+- Started by hand, Claude: 12 sessions, 2802.4M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 25.4 GiB of 100 GiB. 72 GiB free on the drive.
+The project uses 25.6 GiB of 100 GiB. 72 GiB free on the drive.
