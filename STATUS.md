@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-13 15:22.
+Updated automatically at every ticket change. Last update: 2026-11-13 15:28.
 
-**Next: GPT-6.1, on S11-15 (First development-corpus baseline and profile, GCC 5.1.1 vs GCC-KNC at -O2 (E7-03 part 1)).** Run `python tools/dispatch.py`, or ask the tech lead to.
+**Next: the tech lead, on S11-27.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[###################-]` 205 of 213
 
@@ -78,7 +78,7 @@ Current tickets: `[###################-]` 205 of 213
 | S11-24 | WRF OpenMP (smpar) build with GCC-KNC at -mphinix, for PhiWeather's benchmark - replaces the serial trial build | Done | WRF v4.8.0 now builds as an OpenMP card binary at -mphinix with GCC-KNC (wrf.exe and real.exe linked, needi... |
 | S11-25 | ICE in do_store_flag (expr.cc) on WRF's surface layer (SFCLAY1D) at -O2 -march=knc | Done | The last WRF file that crashed GCC-KNC (surface layer, SFCLAY1D) now compiles: vector 'ordered and not equa... |
 | S11-26 | WRF OpenMP build at -mphinix with no per-file workarounds (S11-23 and S11-25 fixed), restaged for PhiWeather | draft | Owner 2026-11-13: the S11-24 WRF build is removed. Deleted: |
-| S11-27 | Wrong code - NPB-MG (class A, serial) built by GCC-KNC at -O2 -march=knc fails NPB verification on the card | In progress | The NPB-MG wrong answer is traced to a reload bug: on vectorized stencil loops, KNC's x87-to-vector scratch... |
+| S11-27 | Wrong code - NPB-MG (class A, serial) built by GCC-KNC at -O2 -march=knc fails NPB verification on the card | Question for the tech lead | GCC build needed at 0297f57d723 (lane gcc). LRA owns bridge spill slots via memory-only constraints. T1 int... |
 | S11-28 | HPCG run that fits every card model - fixed work instead of fixed duration, grid sized to the 3100's memory | lead | After S11-29 merges (still ready): run .work/_shared/S11-28/lead-pilot.ps1 at 242936bf+ (30 exclusive timed... |
 | S11-29 | card_run profiles limit memory in use, not address space, so a 3100 or 5100 run fails only where the real card would | Not started |  |
 | S12-01 | Sprint 12 prep - static code-quality census of the development-corpus builds (spills, x87/vector transfers, addressing, calls, code size) | Done | A static code-quality census (spill/reload proxies, x87 and x87-zmm traffic, address arithmetic, calls, bra... |
@@ -238,6 +238,7 @@ Current tickets: `[###################-]` 205 of 213
 
 ## Recent activity
 
+- 2026-11-13 15:28 **S11-27** engineer ask: GCC build needed at 0297f57d723 (lane gcc). LRA owns bridge spill slots via memory-only constraints. T1 integrated: expected red O2/noreuse, PASS n...
 - 2026-11-13 15:22 **S11-17** lead answer: The evaluation pilot (bf894ae5) cannot run as staged. Fix both problems and restage; the lead reruns pilot then confirm.
 - 2026-11-13 15:22 **S11-17** lead resume: Lead ran the evaluation pilot at 15:22 EST: harness failures, results in the answer.
 - 2026-11-13 15:19 **S11-27** lead approve-red: The NPB-MG wrong answer is traced to a reload bug: on vectorized stencil loops, KNC's x87-to-vector scratch slot is addressed 48 bytes too high and...
@@ -245,16 +246,15 @@ Current tickets: `[###################-]` 205 of 213
 - 2026-11-13 15:14 **S11-28** lead defer: After S11-29 merges (still ready): run .work/_shared/S11-28/lead-pilot.ps1 at 242936bf+ (30 exclusive timed launches, 4-7 h; owner OK if longer tha...
 - 2026-11-13 15:12 **S11-28** engineer ask: Lead pilot needed at 242936bf after S11-29: run .work/_shared/S11-28/lead-pilot.ps1 (104 cubed, rt=0; 30 exclusive launches, 4-7 hours). Return cap...
 - 2026-11-13 15:10 **S11-15** lead answer: SIGPROF pilot ran 2026-11-13 15:20 EST: PASS, exit 0, 0.9 min, 843 log lines with PROFILE_PC samples. Log: .work/_state/logs/S11_15_profile_sigprof...
-- 2026-11-13 15:10 **S11-15** lead resume: Lead ran the SIGPROF pilot at 15:20 EST: PASS.
 
 ## Cost
 
 - From the script, engineer: 533 sessions, 1091.2M input tokens
 - From the script, lead: 349 sessions, 97.8M input tokens
-- Started by hand, Claude: 12 sessions, 2959.1M input tokens
+- Started by hand, Claude: 12 sessions, 2959.4M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 26.6 GiB of 100 GiB. 239 GiB free on the drive.
+The project uses 26.6 GiB of 100 GiB. 233 GiB free on the drive.
