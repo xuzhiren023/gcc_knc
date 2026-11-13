@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-12 22:09.
+Updated automatically at every ticket change. Last update: 2026-11-12 22:11.
 
-**Next: GPT-6.1, on S11-21 (Exploratory WRF build with GCC-KNC (learn-only, host-side) - how far does an unmodified WRF get, and what breaks?).** Run `python tools/dispatch.py`, or ask the tech lead to.
+**Next: the tech lead, on S11-21.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[###################-]` 201 of 207
 
@@ -72,7 +72,7 @@ Current tickets: `[###################-]` 201 of 207
 | S11-18 | M4 corpus harness v2 - card profiles, prefix record, held-out sealing, stronger checks, and the donor-failure rule | Done | The M4 corpus harness now stages all 17 programs for the 7120 and the 3100/5100 profiles with serial voting... |
 | S11-19 | Second senior review - the M4 definition and the Sprint 11-13 roadmap, adjusted | Done | The M4 definition and the Sprint 11-13 roadmap are rewritten as measure, improve, decide, each sprint with ... |
 | S11-20 | Research - which compiler optimizations benefit the widest range of real code on KNC, from professional to amateur, and does our corpus cover it? | Done | We now have a code-style coverage study (docs/research/code-style-coverage.md) that ranks Sprint 12 candida... |
-| S11-21 | Exploratory WRF build with GCC-KNC (learn-only, host-side) - how far does an unmodified WRF get, and what breaks? | In progress | Good find. The rtrn ICE is now a GCC ticket (S11-23, lane gcc, with your reproducer and the narrow 16-byte/... |
+| S11-21 | Exploratory WRF build with GCC-KNC (learn-only, host-side) - how far does an unmodified WRF get, and what breaks? | Waiting for review | f9aa2c64: research complete at GCC-KNC postreload ICE in WRF RTRN; isolated reproducer also fails. Report: ... |
 | S11-22 | Review PhiWeather's first instrumented-PGO attempt on WRF (GCC 5.1.1, k1om) - method, near-zero gain, tolerance gate | Done | PhiWeather's first WRF PGO attempt is reviewed for their lead: the collection and use pipeline is credible,... |
 | S11-23 | ICE in WRF's RRTM radiation (rtrn) at -O2 -march=knc - unrecognizable insn after reload, and sub-512-bit SLP vectors under KNC | In progress |  |
 | S12-01 | Sprint 12 prep - static code-quality census of the development-corpus builds (spills, x87/vector transfers, addressing, calls, code size) | Done | A static code-quality census (spill/reload proxies, x87 and x87-zmm traffic, address arithmetic, calls, bra... |
@@ -232,6 +232,7 @@ Current tickets: `[###################-]` 201 of 207
 
 ## Recent activity
 
+- 2026-11-12 22:11 **S11-21** engineer submit: f9aa2c64: research complete at GCC-KNC postreload ICE in WRF RTRN; isolated reproducer also fails. Report: docs/research/wrf-trial.md. Repro/licenc...
 - 2026-11-12 22:10 **S11-21** lead note: Good find. The rtrn ICE is now a GCC ticket (S11-23, lane gcc, with your reproducer and the narrow 16-byte/2-byte SLP vectors you logged). For this...
 - 2026-11-12 22:02 **S11-22** lead approve: PhiWeather's first WRF PGO attempt is reviewed for their lead: the collection and use pipeline is credible, the early 0.4% from one pair is unresol...
 - 2026-11-12 21:49 **S11-22** engineer submit: Review complete and committed as f17912b5 in docs/reviews/2026-11-12-phiweather-pgo-review.md: verdict, four answers with citations, detectability,...
@@ -239,7 +240,6 @@ Current tickets: `[###################-]` 201 of 207
 - 2026-11-12 21:45 **S11-22** engineer ask: Review complete and committed as f17912b5 in docs/reviews/2026-11-12-phiweather-pgo-review.md: verdict, four answers, citations, detectability and ...
 - 2026-11-12 21:35 **S11-21** lead answer: Yes. Your precheck used the wrong input: em_real's Registry/Registry must be a copy of Registry/Registry.EM (which itself includes Registry.EM_COMM...
 - 2026-11-12 21:33 **S11-21** engineer ask: a7f7e13b: Two failures: Windows Python/Cygwin link (fixed), then my precheck copied Registry.EM_COMMON instead of Registry.EM. Repro: tools/registr...
-- 2026-11-12 21:09 **S11-21** owner decide: Owner standing rule (feedback 2026-11-09/10): session budget raised to 14, second extension; progress since the first: WRF v4.8.0 exported, configu...
 
 ## Cost
 
@@ -251,4 +251,4 @@ Current tickets: `[###################-]` 201 of 207
 
 ## Disk
 
-The project uses 26.2 GiB of 100 GiB. 63 GiB free on the drive.
+The project uses 26.2 GiB of 100 GiB. 60 GiB free on the drive.
