@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-12 20:36.
+Updated automatically at every ticket change. Last update: 2026-11-12 20:37.
 
-**Next: the tech lead, on S11-21.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+Nothing can move right now.
 
 Current tickets: `[###################-]` 200 of 205
 
@@ -72,7 +72,7 @@ Current tickets: `[###################-]` 200 of 205
 | S11-18 | M4 corpus harness v2 - card profiles, prefix record, held-out sealing, stronger checks, and the donor-failure rule | Done | The M4 corpus harness now stages all 17 programs for the 7120 and the 3100/5100 profiles with serial voting... |
 | S11-19 | Second senior review - the M4 definition and the Sprint 11-13 roadmap, adjusted | Done | The M4 definition and the Sprint 11-13 roadmap are rewritten as measure, improve, decide, each sprint with ... |
 | S11-20 | Research - which compiler optimizations benefit the widest range of real code on KNC, from professional to amateur, and does our corpus cover it? | Done | We now have a code-style coverage study (docs/research/code-style-coverage.md) that ranks Sprint 12 candida... |
-| S11-21 | Exploratory WRF build with GCC-KNC (learn-only, host-side) - how far does an unmodified WRF get, and what breaks? | Question for the tech lead | 8111c156: supplied WRF-4.8.0 export contains only phys/ with seven submodule directories (645 files, 167825... |
+| S11-21 | Exploratory WRF build with GCC-KNC (learn-only, host-side) - how far does an unmodified WRF get, and what breaks? | lead | Engineer is right (checked): .work/_shared/wrf-trial/src/WRF-4.8.0 holds only phys/, the main v4.8.0 git ar... |
 | S12-01 | Sprint 12 prep - static code-quality census of the development-corpus builds (spills, x87/vector transfers, addressing, calls, code size) | Done | A static code-quality census (spill/reload proxies, x87 and x87-zmm traffic, address arithmetic, calls, bra... |
 | S12-02 | Sprint 12 prep - the unscored generality check set (S11-20's six programs in the code styles our corpus lacks) | Done | The six unscored generality checks (Q1-Q6: ray tracer hit dispatch and vec3 AoS, Burkardt MD, Reference BLA... |
 | S2-01 | Design for zmm and mask registers under -march=knc | Done | The register design for KNC is settled on paper: all 32 zmm and 8 mask registers become usable under -march... |
@@ -230,6 +230,7 @@ Current tickets: `[###################-]` 200 of 205
 
 ## Recent activity
 
+- 2026-11-12 20:37 **S11-21** lead defer: Engineer is right (checked): .work/_shared/wrf-trial/src/WRF-4.8.0 holds only phys/, the main v4.8.0 git archive never landed (the 20:31 resume was...
 - 2026-11-12 20:35 **S11-21** engineer ask: 8111c156: supplied WRF-4.8.0 export contains only phys/ with seven submodule directories (645 files, 167825584 bytes); root configure is absent. Re...
 - 2026-11-12 20:32 **S11-21** lead answer: WRF v4.8.0 (06d4240a) and the 7 physics submodules at their v4.8.0 gitlinks are exported to .work/_shared/wrf-trial/src/WRF-4.8.0 (162 MB; provenan...
 - 2026-11-12 20:31 **S11-21** lead resume: Lead exported WRF v4.8.0 and its 7 pinned physics submodules to .work/_shared/wrf-trial/src/WRF-4.8.0 (see PROVENANCE-WRF.md).
@@ -237,7 +238,6 @@ Current tickets: `[###################-]` 200 of 205
 - 2026-11-12 20:29 **S11-21** engineer ask: 258abd41: netCDF API link passed without -lstdc++; readelf confirms no dynamic GCC16 runtimes. Log: .work/_state/logs/S11_21_netcdf_link_no_cxx-202...
 - 2026-11-12 20:23 **S11-21** owner decide: Owner standing rule (feedback 2026-11-09/10): session budget raised to 10, first extension. Progress: netCDF-C and netCDF-Fortran (GCC 16) built an...
 - 2026-11-12 20:22 **S11-21** lead escalate: budget: 6 engineer sessions used; the budget is 6
-- 2026-11-12 20:21 **S11-21** lead answer: Yes, with one change. Root cause: -static-libgcc plus the shared GCC 16 libstdc++.so, whose DT_NEEDED libgcc_s.so.1 the linker never resolves; it i...
 
 ## Cost
 
@@ -249,4 +249,4 @@ Current tickets: `[###################-]` 200 of 205
 
 ## Disk
 
-The project uses 25.8 GiB of 100 GiB. 70 GiB free on the drive.
+The project uses 25.8 GiB of 100 GiB. 71 GiB free on the drive.
