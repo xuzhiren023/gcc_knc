@@ -29,6 +29,8 @@ PACKED = re.compile(r'\bv(?:addn?|subr?|mul|div|max|min|sqrt|rcp(?:23)?|rsqrt(?:
 # Each entry supplies its CLI help and handlers for the tiers it selects.
 # Imports stay lazy so T0 and source-only selections need no probe modules.
 SELECTIONS = {
+    'stencil_reload': ('S11-27 Fortran stencil reload scratch bounds', {
+        't1': lambda runner: importlib.import_module('s11_27_reduce').t1(runner)}),
     'rrtm_constants': ('S11-23 immediate floating constant stores', {
         't1': lambda runner: importlib.import_module('s11_23_checks').t1_constants(runner)}),
     'rrtm': ('S11-23 Fortran reload regression and scalar SLP fallback', {

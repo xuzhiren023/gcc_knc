@@ -9,38 +9,64 @@ import sys
 import s11_27_mg as mg
 
 
-def check():
+def scan(asm, vector=True):
     """Check scratch stores against the two live 40-double local arrays.
 
     Discover array bases from the scalar producer's indexed stores, rather
     than baking in register numbers or frame displacements. A changed code
     shape is an explicit failure requiring review, never a vacuous pass.
     """
+    if 'stencil_:\n' not in asm:
+        return ['missing stencil body; review scanner']
+    body = asm.split('stencil_:\n', 1)[1].split('.size\tstencil_', 1)[0]
+    bases = {}
+    for offset, frame, reg in re.findall(
+            r'leaq\s+(-?\d+)\(%(rbp|rsp)\), %(\w+)', body):
+        if re.search(r'fstpl\s+\(%' + reg + r',%\w+,8\)', body):
+            bases[reg] = (frame, int(offset))
+    if len(bases) != 2 or (vector and not re.search(r'\bvaddpd\b', body)):
+        return ['unrecognized producer/vector loop; review scanner']
+    overlaps = []
+    for offset, frame in re.findall(r'fstpl\s+(-?\d+)\(%(rbp|rsp)\)', body):
+        off = int(offset)
+        for array_frame, base in bases.values():
+            if frame == array_frame and base <= off < base + 40 * 8:
+                overlaps.append((off, base, (off - base) // 8 + 1))
+    if overlaps:
+        return ['broadcast scratch overwrites live local array: ' + str(overlaps)]
+    return []
+
+
+def check():
     failed = False
     for name in ('O2', 'novec', 'noreuse'):
-        asm = (mg.OUT / 'reduce' / (name + '.s')).read_text()
-        body = asm.split('stencil_:\n', 1)[1].split('.size\tstencil_', 1)[0]
-        bases = {}
-        for offset, frame, reg in re.findall(
-                r'leaq\s+(-?\d+)\(%(rbp|rsp)\), %(\w+)', body):
-            if re.search(r'fstpl\s+\(%' + reg + r',%\w+,8\)', body):
-                bases[reg] = (frame, int(offset))
-        if len(bases) != 2 or (name != 'novec' and not re.search(r'\bvaddpd\b', body)):
-            print('FAIL', name, 'unrecognized producer/vector loop; review scanner')
-            failed = True
-            continue
-        overlaps = []
-        for offset, frame in re.findall(r'fstpl\s+(-?\d+)\(%(rbp|rsp)\)', body):
-            off = int(offset)
-            for array_frame, base in bases.values():
-                if frame == array_frame and base <= off < base + 40 * 8:
-                    overlaps.append((off, base, (off - base) // 8 + 1))
-        if overlaps:
-            print('FAIL', name, 'broadcast scratch overwrites live local array:', overlaps)
-            failed = True
-        else:
-            print('PASS', name, 'scalar scratch does not overlap local stencil arrays')
+        errors = scan((mg.OUT / 'reduce' / (name + '.s')).read_text(),
+                      vector=name != 'novec')
+        print('FAIL' if errors else 'PASS', name,
+              '; '.join(errors) if errors else 'scalar scratch does not overlap local stencil arrays')
+        failed |= bool(errors)
     return int(failed)
+
+
+def t1(runner):
+    """Compile fresh assembly with the selected T1 compiler, then scan and lint."""
+    source = runner.root / 'tests/regress/knc-stencil-reload.F90'
+    compiler = runner.cc.with_name('gfortran')
+    for name, flags in [('O2', []), ('novec', ['-fno-tree-vectorize']),
+                        ('noreuse', ['-fstack-reuse=none'])]:
+        asm = runner.out / ('stencil-' + name + '.s')
+        obj = asm.with_suffix('.o')
+        label = 't1 stencil reload ' + name
+        try:
+            runner.command(compiler, *runner.cc_flags, '-O2', '-march=knc',
+                           *flags, '--sysroot=' + str(runner.sysroot),
+                           '-S', source, '-o', asm)
+            errors = scan(asm.read_text(), vector=name != 'novec')
+            runner.command(runner.tool('as'), '--march=k1om', asm, '-o', obj)
+            runner.command(sys.executable, runner.root / 'tools/knc_lint', asm, obj)
+            runner.result(label + ' scratch bounds, assembly and knc_lint', errors)
+        except RuntimeError as error:
+            runner.result(label, [str(error)])
 
 
 def build():
