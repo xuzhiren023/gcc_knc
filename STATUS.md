@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-13 16:18.
+Updated automatically at every ticket change. Last update: 2026-11-13 16:19.
 
 **Next: the tech lead, on S11-02.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
@@ -78,7 +78,7 @@ Current tickets: `[###################-]` 205 of 213
 | S11-24 | WRF OpenMP (smpar) build with GCC-KNC at -mphinix, for PhiWeather's benchmark - replaces the serial trial build | Done | WRF v4.8.0 now builds as an OpenMP card binary at -mphinix with GCC-KNC (wrf.exe and real.exe linked, needi... |
 | S11-25 | ICE in do_store_flag (expr.cc) on WRF's surface layer (SFCLAY1D) at -O2 -march=knc | Done | The last WRF file that crashed GCC-KNC (surface layer, SFCLAY1D) now compiles: vector 'ordered and not equa... |
 | S11-26 | WRF OpenMP build at -mphinix with no per-file workarounds (S11-23 and S11-25 fixed), restaged for PhiWeather | draft | Owner 2026-11-13: the S11-24 WRF build is removed. Deleted: |
-| S11-27 | Wrong code - NPB-MG (class A, serial) built by GCC-KNC at -O2 -march=knc fails NPB verification on the card | Question for the tech lead | GCC build needed at b56d5090c86 (lane gcc). Bridge pseudos start in NO_REGS via LRA API; spill allocation/e... |
+| S11-27 | Wrong code - NPB-MG (class A, serial) built by GCC-KNC at -O2 -march=knc fails NPB verification on the card | lead | GCC build needed (interactive lead) at gcc b56d5090c86, lane gcc (project 4724284e): NO_REGS LRA bridge pse... |
 | S11-28 | HPCG run that fits every card model - fixed work instead of fixed duration, grid sized to the 3100's memory | lead | After S11-29 merges (still ready): run .work/_shared/S11-28/lead-pilot.ps1 at 242936bf+ (30 exclusive timed... |
 | S11-29 | card_run profiles limit memory in use, not address space, so a 3100 or 5100 run fails only where the real card would | Not started | Dependency on S11-02 removed, so the HPCG chain (S11-29, then S11-28) does not wait on the DMA debugging. B... |
 | S12-01 | Sprint 12 prep - static code-quality census of the development-corpus builds (spills, x87/vector transfers, addressing, calls, code size) | Done | A static code-quality census (spill/reload proxies, x87 and x87-zmm traffic, address arithmetic, calls, bra... |
@@ -238,6 +238,7 @@ Current tickets: `[###################-]` 205 of 213
 
 ## Recent activity
 
+- 2026-11-13 16:19 **S11-27** lead defer: GCC build needed (interactive lead) at gcc b56d5090c86, lane gcc (project 4724284e): NO_REGS LRA bridge pseudos. Then: T1 secondary-reload and sten...
 - 2026-11-13 16:17 **S11-02** engineer ask: 3953ab96 fixes driver-assigned offsets above 2^62; the old fake bypassed C. New C window/tail and cleanup-evidence tests pass. Error cleanup requir...
 - 2026-11-13 16:15 **S11-27** engineer ask: GCC build needed at b56d5090c86 (lane gcc). Bridge pseudos start in NO_REGS via LRA API; spill allocation/elimination retained. Red T1: four TI/TF ...
 - 2026-11-13 16:08 **S11-29** lead note: Dependency on S11-02 removed, so the HPCG chain (S11-29, then S11-28) does not wait on the DMA debugging. Base on main. Whichever of S11-02 and S11...
@@ -245,7 +246,6 @@ Current tickets: `[###################-]` 205 of 213
 - 2026-11-13 16:05 **S11-27** lead resume: Lead ran T0/T1/T2 at 0297f57d723: T1 regression, details in the answer.
 - 2026-11-13 16:00 **S11-27** lead note: MG at 0297f57d723 on the card (verify-card.log, parallel, card_run exit 0): S-O2, S-noslp SUCCESSFUL L2 0.5307707005735E-04; A-O2 (14.16 s), A-defa...
 - 2026-11-13 15:55 **S11-27** lead defer: Card round needed (interactive lead): run python C:/Users/xuzhi/Documents/gcc_knc/.work/_shared/S11-27/verify-card.py at be59bbe2 (one card_run --t...
-- 2026-11-13 15:54 **S11-02** owner decide: Budget raised by the lead under the owner's standing rule (2026-11-09/10: the lead extends session and token budgets itself; ask only after two ext...
 
 ## Cost
 
