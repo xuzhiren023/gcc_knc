@@ -280,3 +280,5 @@ Engineer sessions never get the key. The old hold of 2026-11-02 for the owner's 
 
 - Upstream binutils has no K1OM support, so LTO is out of scope.
 - Sysroot redistribution review is open, so no release package may contain it.
+
+- 2026-11-13 01:40 (lead): S11-23 fix 4 (64c033d1255, imci.md only) fixes the WRF rtrn ICE and also the two -O3 WRF ICEs S11-24 hit (kfcps, advance_uv: same postreload extract_constrain_insn); FP torture asm identical to the knc compiler, full T1 326 pass, x86 identical=1962. Only its new constant-store test needs rewriting (red on the baseline too). S11-25 (sfclay do_store_flag) is a separate bug, dispatched on gcc2.
