@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-12 22:33.
+Updated automatically at every ticket change. Last update: 2026-11-12 22:39.
 
-**Next: GPT-6.1, on S11-21 (Exploratory WRF build with GCC-KNC (learn-only, host-side) - how far does an unmodified WRF get, and what breaks?).** Run `python tools/dispatch.py`, or ask the tech lead to.
+**Next: the tech lead, on S11-23.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[###################-]` 201 of 207
 
@@ -74,7 +74,7 @@ Current tickets: `[###################-]` 201 of 207
 | S11-20 | Research - which compiler optimizations benefit the widest range of real code on KNC, from professional to amateur, and does our corpus cover it? | Done | We now have a code-style coverage study (docs/research/code-style-coverage.md) that ranks Sprint 12 candida... |
 | S11-21 | Exploratory WRF build with GCC-KNC (learn-only, host-side) - how far does an unmodified WRF get, and what breaks? | In progress | Good stop and a real find (now S11-23). One change before approval, per my 22:10 note: continue past the rt... |
 | S11-22 | Review PhiWeather's first instrumented-PGO attempt on WRF (GCC 5.1.1, k1om) - method, near-zero gain, tolerance gate | Done | PhiWeather's first WRF PGO attempt is reviewed for their lead: the collection and use pipeline is credible,... |
-| S11-23 | ICE in WRF's RRTM radiation (rtrn) at -O2 -march=knc - unrecognizable insn after reload, and sub-512-bit SLP vectors under KNC | In progress | S11-23 red approved: a reduced WRF RTRN Fortran test reproduces the KNC postreload ICE (SF register copy ma... |
+| S11-23 | ICE in WRF's RRTM radiation (rtrn) at -O2 -march=knc - unrecognizable insn after reload, and sub-512-bit SLP vectors under KNC | Question for the tech lead | GCC build needed at 32ea02589db. SF xmm10<-xmm0 cached *movsf_internal: hard-only KNC copy rejects pseudos;... |
 | S12-01 | Sprint 12 prep - static code-quality census of the development-corpus builds (spills, x87/vector transfers, addressing, calls, code size) | Done | A static code-quality census (spill/reload proxies, x87 and x87-zmm traffic, address arithmetic, calls, bra... |
 | S12-02 | Sprint 12 prep - the unscored generality check set (S11-20's six programs in the code styles our corpus lacks) | Done | The six unscored generality checks (Q1-Q6: ray tracer hit dispatch and vec3 AoS, Burkardt MD, Reference BLA... |
 | S2-01 | Design for zmm and mask registers under -march=knc | Done | The register design for KNC is settled on paper: all 32 zmm and 8 mask registers become usable under -march... |
@@ -232,6 +232,7 @@ Current tickets: `[###################-]` 201 of 207
 
 ## Recent activity
 
+- 2026-11-12 22:39 **S11-23** engineer ask: GCC build needed at 32ea02589db. SF xmm10<-xmm0 cached *movsf_internal: hard-only KNC copy rejects pseudos; LRA cost-2 fast path skips constraints....
 - 2026-11-12 22:31 **S11-23** lead approve-red: S11-23 red approved: a reduced WRF RTRN Fortran test reproduces the KNC postreload ICE (SF register copy matched as *movsf_internal with SSE-only c...
 - 2026-11-12 22:27 **S11-23** engineer red: GCC 60705fedb97 adds two failing tests; WRF notice retained. Reduced RTRN ICEs in postreload extract_constrain_insn: insn 1310, SF xmm10 <- xmm0, c...
 - 2026-11-12 22:13 **S11-21** lead changes: Good stop and a real find (now S11-23). One change before approval, per my 22:10 note: continue past the rtrn ICE so the report shows the rest of t...
@@ -239,7 +240,6 @@ Current tickets: `[###################-]` 201 of 207
 - 2026-11-12 22:10 **S11-21** lead note: Good find. The rtrn ICE is now a GCC ticket (S11-23, lane gcc, with your reproducer and the narrow 16-byte/2-byte SLP vectors you logged). For this...
 - 2026-11-12 22:02 **S11-22** lead approve: PhiWeather's first WRF PGO attempt is reviewed for their lead: the collection and use pipeline is credible, the early 0.4% from one pair is unresol...
 - 2026-11-12 21:49 **S11-22** engineer submit: Review complete and committed as f17912b5 in docs/reviews/2026-11-12-phiweather-pgo-review.md: verdict, four answers with citations, detectability,...
-- 2026-11-12 21:47 **S11-22** lead answer: No rebase needed. pm.py submit only checks the merge-base with main, not whether the branch holds main's head (that check applies only to gcc: yes ...
 
 ## Cost
 
@@ -251,4 +251,4 @@ Current tickets: `[###################-]` 201 of 207
 
 ## Disk
 
-The project uses 26.2 GiB of 100 GiB. 61 GiB free on the drive.
+The project uses 26.2 GiB of 100 GiB. 67 GiB free on the drive.
