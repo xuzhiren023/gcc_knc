@@ -147,6 +147,10 @@ M1 is accepted and tagged `m1` locally; nothing is pushed. Engineers are Claude 
 - **Restore target runtime files after replacing the GCC build tree.** `tools/toolchain.py gcc16` builds `all-gcc` only and removes the old tree, including `crtbegin.o`, `crtend.o` and `libgcc`. S3-04's first T2 regression therefore failed to link; `tools/toolchain.py libgcc` through `tools/run.py` restored the fork-built runtime, and the failed T2 checks then passed. Do this after a full rebuild before link checks.
 
 ## Open items not on a ticket
+- 2026-11-13 14:30 EST (lead), M4 pilot at launch 446/468: 376 pass, 17 fail. New findings:
+  1. HPCG time is not a speed measure. hpcg.dat asks for 60 s of benchmark time, so wall time is fixed by design, and this morning's 0.99 'speedup' was meaningless. Compare its GFLOP/s rating instead. Serial: GCC-KNC 0.0850 vs GCC 5.1.1 0.0864, so GCC-KNC is 1.7% slower. OpenMP: 0.12 at 60, 120 and 240 threads, only 1.4x serial; the reference HPCG's SYMGS is serial. S11-14's contract must score HPCG by rating or drop it from timing; README already flags HPCG's duration-driven work as pilot-only.
+  2. HPCG OpenMP aborts with std::bad_alloc (exit 134, 2.3 s) at 2 and 4 threads per core under the 3100 and 5100 profiles (5632 MB job memory). Full-card runs and 1 thread per core pass. Memory grows with thread count, likely OMP stack or per-thread buffers. Either a real 6/8 GB card limit or a harness setting; check before M4.
+  3. NPB-MG built by GCC-KNC with -fopenmp verifies at every thread count and profile; only the serial build is wrong (S11-27 clue).
 - 2026-11-13 10:50 EST (owner): PGO must be one flag. The user never runs the instrumented build or the profile run by hand; GCC does the counted build, runs the training, and does the rebuild by itself. The user supplies only the training command. Lead plan: a Sprint 12 work item once S11-17 shows a real gain on zlib. Design points:
   - The driver records each compile command and replays them with -fprofile-use at link time, so Makefile projects work too, much as LTO recompiles at link.
   - The training run goes through card_run from the host; on PhiNix it is a local run.
