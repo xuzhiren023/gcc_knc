@@ -61,6 +61,11 @@ python tools/run.py --name S11-21-netcdf-c-make --inputs ../_shared/wrf-trial/tr
 
 ## Stage reached and blockers
 
+**Latest resume: export line endings corrected, WRF cleaned and reconfigured;
+the standalone Registry precheck was stopped after an engineer-selected wrong
+input caused a warning loop. No new em_real build ran. See the resume section
+below for the reduced cause and pending correction.**
+
 **Stage 2 complete: both dependency libraries are built and installed, and
 `nf_create`/`nf90_create` now link. The lead completed the WRF export.
 Stage 3 now has a complete serial, no-nesting GCC-KNC configuration, with
@@ -493,6 +498,73 @@ was deliberately interrupted. Logical trial disk use after termination:
 **556,344,525 bytes in 11,071 files** (556.3 MB decimal), below 25 GB. No WRF
 executable or native run was staged. Stale outputs await lead-directed cleanup.
 
+## Resume after the lead's 21:07 answer
+
+`repair-wrf-export.py` normalizes copied nonbinary text in place, skipping
+symlinks and files containing NUL bytes; in-place writes retain mode bits.
+The first invocation used Windows Python and stopped at the Cygwin link
+`external/io_grib1/wgrib.exe` (WinError 1920), after partial normalization.
+The corrected invocation used the trial environment's Cygwin `python3` and
+completed the remaining 4,083 text files. Its byte check reported zero
+remaining CRLF in inspected text. This is an export correction, not a WRF
+source compatibility patch. PhiWeather's tree was never modified.
+
+`src/patches/wrf-4.8.0-export-runtime.patch` records two changes in the copy:
+the six `phys/Makefile` Git update commands become checks for the seven
+already exported submodule directories, retaining all upstream symlink setup;
+the trial architecture's `SFC`, `SCC`, and `CCOMP` carry static GCC runtime
+driver flags. This extends the existing `LDFLAGS_LOCAL` rule to probes and
+auxiliary links. No Git network operation or safe.directory relaxation was
+used. These are cross-build changes, not compiler fixes.
+
+Through `tools/run.py`, `wrf-clean-configure.sh` ran the authorized `./clean
+-a`, regenerated serial/no-nesting configuration and rebuilt the host
+Registry utility. The configuration reports `_RPC_TYPES_H=1`,
+`CFLAGS_LOCAL` with `-DRPC_TYPES=1`, and all four Fortran 2003/2008 linked
+probe executables present. The driver settings printed with the static
+runtime flags. The pending `check-wrf-links.py` checks every target ELF
+executable's dynamic dependencies and every `libwrfio_int.a` member's
+architecture; it has **not run**, since no new model/auxiliary build followed.
+The physics Makefile patch likewise has not yet been exercised by em_real.
+
+The second failed attempt was an **engineer precheck/input error**, not a
+GCC-KNC defect: the helper copied `Registry.EM_COMMON` to `Registry/Registry`
+instead of using the complete `Registry.EM`. `compile:188-190` selects
+`Registry.EM`; that file includes `registry.dimspec` and
+`registry.em_shared_collection`, which in turn includes `Registry.EM_COMMON`
+and the other collections. The incomplete input produced dimension warnings
+and an endless missing-`moist` warning. In `tools/gen_scalar_indices.c:237`,
+the missing-array branch continues before advancing the scalar token. No
+Registry source change is proposed: the trial supplied the wrong input.
+
+Reduced failing invocation (do not run without a timeout): after copying
+`Registry.EM_COMMON` to `Registry/Registry`, invoke
+`tools/registry -DEM_CORE=1 -DNMM_CORE=0 -DDA_CORE=0 -DWRFPLUS=0 Registry/Registry`
+from the WRF root. The helper is now corrected to copy `Registry.EM` and use
+`timeout 60s`, **untested**. The existing generated `Registry/Registry` and
+partial `inc/` outputs still come from the failed precheck and must be
+regenerated before em_real; no complete Registry success is claimed.
+
+The trial Registry process was terminated and Cygwin `ps -l` showed no
+remaining trial build process. Wrapper result: exit 143, **7.9 minutes**,
+log `.work/_state/logs/S11_21_wrf_clean_configure-20261112-212045.log`.
+The warning flood grew that log to 2,128,154,019 bytes; after termination it
+was compacted in place to retain its first 64 KiB and last 4 KiB with an
+explicit omission marker (69,760 bytes retained). The runner had already
+read the original and reported 50,670,014 lines. No logs were treated as
+passed. There was no new target compile error, ICE, wrong assembly, WRF
+executable, card run, or vectorization result in this resume.
+
+Trial disk use before the final documentation append was **539,473,711
+logical bytes in 10,364 files** (539.5 MB decimal), below 25 GB. The separate
+state log's temporary 2.13 GB warning flood is disclosed above and removed.
+
+The two failed preparation/precheck attempts trigger the repository's
+request-for-direction rule. Next proposed step: run only the corrected,
+bounded Registry precheck (do not repeat the passed clean/configure), then
+the prepared em_real build and link/archive checks. If ccpp_kind_types
+ordering fails, the lead has already authorized one serial physics retry.
+
 ## Vectorization
 
 The interrupted second attempt emitted `-fopt-info-vec` output while WRF's
@@ -524,13 +596,13 @@ Do not substitute synthetic kernel results for whole WRF loop reports.
 These are proposed work packages, not dispatched tickets. Estimates are
 engineering effort, not measured build times.
 
-Latest ordering correction: package 1 starts with the supplied export,
-normalizes copied Registry text to LF, fixes exported-source submodule
-checks, and regenerates in a clean build state to discard stale host
-objects. Retain the architecture terminator and RPC preprocessing patches;
-validate Registry generation first. Package 3 must propagate static-runtime
-flags to auxiliary links and investigate the `ccpp_kind_types` parallel
-dependency before another full attempt. The estimates below are unchanged.
+Latest ordering correction: export-wide text normalization, source cleanup,
+reconfiguration, static runtime propagation and exported-source submodule
+patching are implemented. Package 1 must validate Registry generation with
+the complete `Registry.EM` input before package 3 runs em_real. Package 3
+must verify the patched auxiliary runtime links and investigate the
+`ccpp_kind_types` parallel dependency if it recurs. The estimates below
+are unchanged.
 
 1. **Reproducible source/configuration baseline (0.5–1 day):** export a pristine
    WRF 4.8.0 revision from the read-only source repository, preserve its licence,
