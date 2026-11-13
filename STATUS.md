@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-12 19:35.
+Updated automatically at every ticket change. Last update: 2026-11-12 19:38.
 
 **Next: GPT-6.1, on S11-21 (Exploratory WRF build with GCC-KNC (learn-only, host-side) - how far does an unmodified WRF get, and what breaks?).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
@@ -241,9 +241,9 @@ Current tickets: `[###################-]` 198 of 205
 
 ## Cost
 
-- From the script, engineer: 489 sessions, 1030.2M input tokens
+- From the script, engineer: 490 sessions, 1031.6M input tokens
 - From the script, lead: 317 sessions, 90.1M input tokens
-- Started by hand, Claude: 12 sessions, 2789.7M input tokens
+- Started by hand, Claude: 12 sessions, 2791.4M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
