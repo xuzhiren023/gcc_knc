@@ -61,17 +61,23 @@ python tools/run.py --name S11-21-netcdf-c-make --inputs ../_shared/wrf-trial/tr
 
 ## Stage reached and blockers
 
-**Stage 2: netCDF-C compiled and installed successfully; netCDF-Fortran compilation failed.** The clean
-build produced `build-netcdf-c-nomsys/liblib/.libs/libnetcdf.a` (1,770,676 bytes)
-with GCC-KNC 16.2.0, `-O2 -march=knc`, and no source patch. `make -j8` completed;
-the first `make install` failed while creating the include directory. The
-relative-directory installation described below succeeded. This was a
-host filesystem/tool interaction, not a compiler diagnostic. netCDF-Fortran
-configured with GCC 16 and the installed C library, then failed on the classic
-Fortran source path. No Fortran library or complete module set was installed. WRF and MPI
-remain unbuilt; no executable is staged for the card.
-There was no observed GCC-KNC ICE or wrong assembler output, so no compiler
-reproducer is applicable.
+**Stage 2: netCDF-C and netCDF-Fortran compiled and installed; the required
+Fortran/C dependency link test failed.** The installed static archives are
+`install/lib/libnetcdf.a` (1,770,676 bytes) and `libnetcdff.a` (1,561,006 bytes).
+Both use GCC-KNC 16.2.0 at `-O2 -march=knc`. Fortran needed the minimal
+classic-path patch described below. Installed `netcdf.mod` and
+`netcdf_nf_data.mod` match the fresh build outputs, whose configure and compile
+logs identify GCC 16.2.0. Their compressed headers report module format 16;
+the format number alone is not a compiler-version check.
+
+The small link-only program calls both `nf_create` and `nf90_create` (and
+closes both files). It failed because the selected shared `libstdc++.so`
+requires versioned GCC arithmetic/unwind symbols while the command requests
+static GCC/Fortran runtimes. This is currently a runtime-link configuration
+blocker, not an observed code-generation defect. No test executable linked;
+WRF and MPI remain unbuilt, with nothing staged for the card. There was no
+observed GCC-KNC ICE or wrong assembler output, so no compiler reproducer
+is applicable. The failed link input is retained for diagnosis.
 
 The lead authorized retaining the contaminated `build-netcdf-c` as stale and
 using `build-netcdf-c-nomsys`. Every configure and make runs through
@@ -129,26 +135,72 @@ without deleting anything, changing sources, or recompiling C. It is also
 selected for netCDF-Fortran installation. All commands use `trial-env.sh`
 and `tools/run.py`.
 
-The next wrapped command ran `netcdf-fortran.sh`. Configure succeeded and
-automatically added `-fallow-argument-mismatch` to the GCC 16 Fortran flags;
-the compile errors above are not argument-mismatch diagnostics. `make -j8`
-failed before installation. No dependency patch was applied. Two failed
-wrapped attempts in this resume (absolute C install, then Fortran build)
-require a ticket question before another attempt under AGENTS.md.
+### Classic Fortran patch and current link blocker
 
-Reduced build targets for the lead (extracted from the failure; not rerun):
+The earlier unpatched Fortran build failed before installation. The lead's
+2026-11-12 19:59 answer authorized patching copied 4.6.1 sources, retaining the
+no-HDF5 C library and old build tree. A read-only byte comparison of every
+regular member of the pristine archive against PhiWeather's extracted
+`scientific-sources/netcdf-fortran-4.6.1` found no differing or missing members;
+there were no subset files to adopt.
 
-```sh
-# Under trial-env.sh, from the worktree:
-make -C ../_shared/wrf-trial/build-netcdf-fortran/fortran netcdf.lo module_netcdf_nf_data.lo
+`src/patches/netcdf-fortran-4.6.1-classic.patch` now contains only these changes:
+
+- Replace the three nonexistent subset includes in `fortran/netcdf.F90` with
+  the distributed `netcdf_expanded.F90` and `netcdf_eightbyte.F90`.
+- Move the two quantization constant definitions outside `USE_NETCDF4`.
+- Move `NC_ENOPAR` outside the same guard; the nonparallel stubs use it even
+  when netCDF-4 is disabled.
+
+`netcdf-fortran.sh` applies the patch to a fresh archive extraction under
+`src/netcdf-fortran-p1/` and configures `build-netcdf-fortran-p1/`. It omits
+the two unrecognized inherited configure options. The first p1 make exposed
+`NC_ENOPAR` and libtool metadata errors; after correcting both, an incremental
+make and install passed without repeating configure. Installation used the
+existing relative `MKDIR_P` helper and needed no new top-level directory.
+
+| New finding | Classification | Evidence and disposition |
+| --- | --- | --- |
+| `nf_nc_noparallel.F90:33,49,64`: undefined `NC_ENOPAR`. | Upstream dependency classic-path guard bug. | Its definition was inside `USE_NETCDF4`, although the nonparallel stubs are built without that macro. Moving that one definition outside the guard resolved compilation. |
+| Libtool rejects a missing `gcc-install/.../lib64/libstdc++.la`. | Relocated toolchain metadata / dependency link configuration. | Two stale absolute entries in this trial's `install/lib/libnetcdf.la` `dependency_libs` were normalized to `-lstdc++`. The script records the adjustment. No toolchain file was edited. Fortran make/install then passed. |
+| Tiny netCDF link selects shared `libstdc++.so` and fails on versioned GCC runtime references. | Runtime-link configuration; not established as a GCC-KNC backend defect. | `netcdf-link.sh` uses `-static-libgcc -static-libgfortran` but plain `-lstdc++`. Undefined symbols include quad conversions/comparisons, 128-bit integer division, and unwind functions. The candidate next change is to select `libstdc++.a` explicitly, keeping the same link test. This has **not** been tried. |
+
+All 19 unresolved references in the link log are:
+`__extendxftf2`, `__udivti3`, `_Unwind_Resume`, `_Unwind_Resume_or_Rethrow`,
+`_Unwind_DeleteException`, `_Unwind_GetRegionStart`, `__getf2`, `__eqtf2`,
+`__unordtf2`, `_Unwind_SetGR`, `_Unwind_GetIPInfo`, `_Unwind_SetIP`,
+`_Unwind_RaiseException`, `__letf2`, `__trunctfxf2`,
+`_Unwind_GetLanguageSpecificData`, `__udivmodti4`, `_Unwind_GetTextRelBase`,
+and `_Unwind_GetDataRelBase`. Their required GCC symbol versions are in the log.
+
+The installed modules were checked once: compressed header inspection,
+comparison with the build outputs, and the build's GCC 16.2.0 identification.
+`netcdf.mod` is 17,591 bytes and `netcdf_nf_data.mod` is 8,076 bytes. The link
+program uses both modules and reached the linker; neither API link nor native
+behavior is claimed to pass. The shared `netcdf-link.f90` is a link probe,
+not a repository test or a card job.
+
+Commands for this continuation (all through `tools/run.py` and `trial-env.sh`):
+
+```text
+S11-21-netcdf-fortran-p1: bash netcdf-fortran.sh
+S11-21-netcdf-fortran-p1-resume: bash netcdf-fortran.sh build-only
+S11-21-netcdf-link: bash netcdf-link.sh
 ```
 
-The specific next decision is whether to patch the copied classic Fortran
-path to use the distributed expanded/eight-byte sources and make its
-quantization constants available consistently, or select a corrected
-netCDF-Fortran source baseline. The proposed patch is not implemented or
-tested; its exact replacement includes need source inspection before editing.
-The analogous PhiWeather source directory also lacks the subset include files.
+Reduced failing link, from the trial root under `trial-env.sh`:
+
+```sh
+k1om-mpss-linux-gfortran -O2 -march=knc -Iinstall/include netcdf-link.f90 -Linstall/lib -static-libgcc -static-libgfortran -lnetcdff -lnetcdf -lstdc++ -lm -ldl -o netcdf-link.exe
+```
+
+This continuation had two failed attempts (first p1 make, then the link test),
+with a successful incremental make/install between them. Under AGENTS.md,
+stop and ask the lead before another attempt. Proposed next action: use
+`-Wl,-Bstatic -lstdc++ -Wl,-Bdynamic` in the same link test, then proceed to
+pristine WRF 4.8.0 serial/no-nesting `em_real` only if it links. Static C++
+selection is an untested hypothesis, not a promised fix. No GCC build is needed
+for that proposed link-only experiment.
 
 ### Time, disk and logs
 
@@ -160,13 +212,17 @@ compilation plus failed install took **0.8 minutes**. No WRF compilation time
 is available. The successful C install took **0.1 minute**; Fortran configure
 and partial compilation took **1.9 minutes** together. Make was capped at 8 jobs.
 
-After the Fortran failure, the trial contains **65,435,787 logical file bytes**
-(65.4 MB decimal, 62.4 MiB) in 4,229 file entries, including both C build trees,
-the installed C library, archives, and partial Fortran build. This measurement
-uses `os.walk` and `lstat` without following Cygwin reparse files; allocated disk
-blocks were not measured. It is well below the 25 GB budget. A first size walk
-that followed links failed on a Cygwin link in the stale build; it made no
-changes. Stale files remain for lead cleanup as directed.
+The p1 configure/partial make took **2.7 minutes**. The successful incremental
+make/install took **0.6 minute**; the failed link probe took under 0.1 minute.
+Configure and make times are combined where the wrapper ran both. No WRF
+compilation timing is available.
+
+After this continuation, the trial contains **79,439,526 logical file bytes**
+(79.4 MB decimal, 75.8 MiB) in 4,619 file entries. This includes archives,
+stale trees retained at the lead's direction, patched sources, installed
+libraries/modules and the link input. The `os.walk`/`lstat` measurement does
+not follow Cygwin reparse files; allocated disk blocks were not measured.
+The trial remains below its 25 GB budget. Nothing was deleted.
 
 Logs under `.work/_state/logs/`:
 
@@ -179,6 +235,10 @@ Logs under `.work/_state/logs/`:
 - `S11_21_netcdf_c_install-20261112-194235.log`: install-only retry after destination precreation failed at absolute mkdir (less than 0.1 minute).
 - `S11_21_netcdf_c_install_relative-20261112-194327.log`: relative-directory installation passed (0.1 minute).
 - `S11_21_netcdf_fortran-20261112-194351.log`: configure passed; classic Fortran compilation failed (1.9 minutes). Missing-include diagnostic at line 307; undefined constants at lines 313-322.
+
+- `S11_21_netcdf_fortran_p1-20261112-200815.log`: patch applied and configure passed; make failed on `NC_ENOPAR` (lines 327-341) and stale C++ libtool metadata (lines 347-358).
+- `S11_21_netcdf_fortran_p1_resume-20261112-201201.log`: corrected incremental make and install passed (0.6 minute).
+- `S11_21_netcdf_link-20261112-201304.log`: GCC/module checks passed; link failed (undefined references at lines 5-23). No execution.
 
 ## Vectorization
 
@@ -202,8 +262,8 @@ engineering effort, not measured build times.
    changes. Establish host tools versus target tools and classic netCDF options.
 2. **GCC 16 dependency stack (1–2 days, after this trial):** retain the
    corrected environment and successful relative-directory installation of
-   netCDF-C, resolve the classic Fortran missing includes and quantization
-   guards (or select a corrected dependency release), then build fresh modules and
+   netCDF-C, retain the now-built classic Fortran compatibility patch and fresh GCC 16
+   modules, resolve the static/shared C++/GCC runtime link selection, then verify
    target-runtime links;
    classify strictness versus cross-probe failures without executing target
    probes on the host. Any compiler defect gets a separate reduced case and
