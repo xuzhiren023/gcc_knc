@@ -587,8 +587,7 @@ def output_result(job, stdout, stderr, returncode):
             if 'Solution Validates:' not in text or 'Failed Validation' in text:
                 raise ValueError('STREAM verification failed or absent')
         elif program == 'HPCG':
-            if 'HPCG result is VALID' not in text or 'INVALID' in text or 'Result=FAILED' in text:
-                raise ValueError('HPCG validity report failed or absent')
+            row['hpcg_work'] = hpcg_work(text)
         elif 'CORPUS_CHECK pass' not in stdout:
             raise ValueError('correctness check failed or absent')
         if program in ('zlib', 'bzip2') and ('CORPUS_CROSS pass' not in stdout or 'CORPUS_CONTROL rejected' not in stdout):
@@ -597,6 +596,42 @@ def output_result(job, stdout, stderr, returncode):
     except (ValueError, KeyError, TypeError) as exc:
         row.update(check='fail' if row['time_seconds'] is not None else 'error', cause=str(exc))
     return row
+
+
+def hpcg_work(text):
+    """Read HPCG 3.1's text report; derive sets from both reported totals.
+
+    ReportResults.cpp emits totals = iterations per set * numberOfCgSets,
+    rather than a separate set-count field. YAML is also transferred by the
+    launcher; only the unambiguous text-report fields below are consumed.
+    """
+    if 'HPCG result is VALID' not in text or 'INVALID' in text or 'Result=FAILED' in text:
+        raise ValueError('HPCG validity report failed or absent')
+    for section in ('Spectral Convergence Tests', 'Iteration Count Information',
+                    'Reproducibility Information'):
+        if text.splitlines().count(section + '::Result=PASSED') != 1:
+            raise ValueError('HPCG required test failed or absent: ' + section)
+    if len(re.findall(r'^Departure from Symmetry .*::Result=PASSED$', text, re.M)) != 1:
+        raise ValueError('HPCG symmetry test failed or absent')
+    work = {}
+    for key, label in [('reference_per_set', 'Reference CG iterations per set'),
+                       ('optimized_per_set', 'Optimized CG iterations per set'),
+                       ('reference_total', 'Total number of reference iterations'),
+                       ('optimized_total', 'Total number of optimized iterations')]:
+        values = re.findall(r'^Iteration Count Information::' + label + r'=(\d+)$', text, re.M)
+        if len(values) != 1 or int(values[0]) <= 0:
+            raise ValueError('HPCG missing or invalid iteration count: ' + label)
+        work[key] = int(values[0])
+    counts = []
+    for kind in ('reference', 'optimized'):
+        total, per_set = work[kind + '_total'], work[kind + '_per_set']
+        if total % per_set:
+            raise ValueError('HPCG inconsistent iteration totals')
+        counts.append(total // per_set)
+    if counts[0] != counts[1]:
+        raise ValueError('HPCG inconsistent set counts')
+    work['sets'] = counts[0]
+    return work
 
 
 def card_call(stage_dir, files, mode, density, stdout, stderr, profile='full', timeout=3600):
@@ -716,7 +751,17 @@ def collect(args):
     for row in rows:
         if row['compiler'] == DONOR and row['program'].startswith('PB-'):
             donors[pair(row)].append(row)
+        if row['compiler'] == DONOR and row['program'] == 'HPCG':
+            donors[pair(row)].append(row)
     for row in rows:
+        if row['program'] == 'HPCG' and row['check'] == 'pass':
+            work = row.get('hpcg_work')
+            if not work or work.get('sets') != 1:
+                row.update(check='fail', cause='HPCG requires exactly one reported CG set')
+            elif row.get('variant', 'serial') == 'serial' and row['compiler'] == KNC:
+                paired = donors[pair(row)]
+                if len(paired) != 1 or paired[0]['check'] != 'pass' or paired[0].get('hpcg_work') != work:
+                    row.update(check='fail', cause='HPCG unequal work or missing reference')
         if row['program'].startswith('PB-') and row['check'] == 'pass':
             if not arrays_match(row.get('arrays'), row.get('arrays')):
                 row.update(check='fail', cause='missing or invalid complete PolyBench output')
