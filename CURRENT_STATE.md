@@ -147,6 +147,12 @@ M1 is accepted and tagged `m1` locally; nothing is pushed. Engineers are Claude 
 - **Restore target runtime files after replacing the GCC build tree.** `tools/toolchain.py gcc16` builds `all-gcc` only and removes the old tree, including `crtbegin.o`, `crtend.o` and `libgcc`. S3-04's first T2 regression therefore failed to link; `tools/toolchain.py libgcc` through `tools/run.py` restored the fork-built runtime, and the failed T2 checks then passed. Do this after a full rebuild before link checks.
 
 ## Open items not on a ticket
+- 2026-11-13 15:55 EST (lead): S11-02 DMA validation FAILED safely, with PhiWeather's OK.
+  - The first 1 GiB dma upload gave 'ERROR remote offset range' from the card helper, then 'SCIF endpoint cleanup unresolved' (status 92). Receipt .work/_shared/S11-02/pair-1-dma.json.
+  - No host bugcheck; card boot unchanged; no leftover card process (ps, 15:52 EST).
+  - .work/_state/card-dma-active.lock is left for the engineer. Only the S11-02 branch's card_run reads it; main card_run has no DMA code.
+  - Changes requested on S11-02: the offset bug, resolvable cleanup, and validate.ps1's PATH and 'Stop' bugs, which the lead fixed in the staged copy.
+  - S11-27 at 0297f57d723: reduced cases PASS on the card (old compiler: FAIL), green T1 PASS. MG S/A waits for the engineer's rebuild, because NPB3.4.2 sources have a DENY read ACE for xuzhi owned by CodexSandboxOffline, and the lead does not change sandbox ACLs.
 - 2026-11-13 15:45 EST (lead): S12-02 genset card run, stopped by the lead after 44 of 108 launches.
   - Every launch failed the oracle check, GCC 5.1.1 included, with plausible-looking output (Q1). That makes it a harness bug in genset's matches()/payload, not the compilers.
   - Q4 built by GCC-KNC segfaults (card_run exit 139) on all three profiles. That could be a real GCC-KNC bug and needs a reproducer.
