@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-13 03:31.
+Updated automatically at every ticket change. Last update: 2026-11-13 03:33.
 
-**Next: the tech lead, on S11-25.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: GPT-6.1, on S11-25 (ICE in do_store_flag (expr.cc) on WRF's surface layer (SFCLAY1D) at -O2 -march=knc).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
 Current tickets: `[###################-]` 204 of 209
 
@@ -76,7 +76,7 @@ Current tickets: `[###################-]` 204 of 209
 | S11-22 | Review PhiWeather's first instrumented-PGO attempt on WRF (GCC 5.1.1, k1om) - method, near-zero gain, tolerance gate | Done | PhiWeather's first WRF PGO attempt is reviewed for their lead: the collection and use pipeline is credible,... |
 | S11-23 | ICE in WRF's RRTM radiation (rtrn) at -O2 -march=knc - unrecognizable insn after reload, and sub-512-bit SLP vectors under KNC | Done | WRF's RRTM radiation and the -O3 OpenMP WRF files that crashed GCC-KNC after reload (rtrn, kfcps, advance_u... |
 | S11-24 | WRF OpenMP (smpar) build with GCC-KNC at -mphinix, for PhiWeather's benchmark - replaces the serial trial build | Done | WRF v4.8.0 now builds as an OpenMP card binary at -mphinix with GCC-KNC (wrf.exe and real.exe linked, needi... |
-| S11-25 | ICE in do_store_flag (expr.cc) on WRF's surface layer (SFCLAY1D) at -O2 -march=knc | Question for the tech lead | Lead rebased and rebuilt; see the answer. |
+| S11-25 | ICE in do_store_flag (expr.cc) on WRF's surface layer (SFCLAY1D) at -O2 -march=knc | In progress | Lead rebased s11/S11-25 onto knc (HEAD 58d2d07db42, includes S11-23) and rebuilt tree 2 there. All green on... |
 | S12-01 | Sprint 12 prep - static code-quality census of the development-corpus builds (spills, x87/vector transfers, addressing, calls, code size) | Done | A static code-quality census (spill/reload proxies, x87 and x87-zmm traffic, address arithmetic, calls, bra... |
 | S12-02 | Sprint 12 prep - the unscored generality check set (S11-20's six programs in the code styles our corpus lacks) | Done | The six unscored generality checks (Q1-Q6: ray tracer hit dispatch and vec3 AoS, Burkardt MD, Reference BLA... |
 | S2-01 | Design for zmm and mask registers under -march=knc | Done | The register design for KNC is settled on paper: all 32 zmm and 8 mask registers become usable under -march... |
@@ -234,6 +234,7 @@ Current tickets: `[###################-]` 204 of 209
 
 ## Recent activity
 
+- 2026-11-13 03:33 **S11-25** lead answer: Lead rebased s11/S11-25 onto knc (HEAD 58d2d07db42, includes S11-23) and rebuilt tree 2 there. All green on the combined tree: sfclay1d.f90 and rtr...
 - 2026-11-13 03:31 **S11-25** lead resume: Lead rebased and rebuilt; see the answer.
 - 2026-11-13 03:16 **S11-25** lead defer: Test-only c3a4ef89365 is correct (plain scan for vcmpps $1, keeps the $4/$7 forbids; no rebuild needed). Needs the interactive lead: rebase gcc bra...
 - 2026-11-13 03:13 **S11-25** engineer ask: Test-only commit c3a4ef89365 uses plain scan-assembler for immediate 1; keeps forbids for 4/7. Loop-copy count is optimizer-dependent. Whitespace P...
@@ -241,7 +242,6 @@ Current tickets: `[###################-]` 204 of 209
 - 2026-11-13 03:10 **S11-25** lead resume: Built tree 2 at 3cd892904ec and checked; see the next answer.
 - 2026-11-13 02:47 **S11-24** lead approve: WRF v4.8.0 now builds as an OpenMP card binary at -mphinix with GCC-KNC (wrf.exe and real.exe linked, needing only the card's libc, libm, libdl, li...
 - 2026-11-13 02:31 **S11-24** engineer submit: Checked rebased branch diff against main: only docs/research/wrf-trial.md changes, retaining the 119-line report and corrected S11-23/S11-25 workar...
-- 2026-11-13 02:25 **S11-24** lead answer: Done: the lead rebased s11/S11-24 onto main (HEAD c8810be1); docs/research/wrf-trial.md is your 119-line version as the whole file and is the only ...
 
 ## Cost
 
