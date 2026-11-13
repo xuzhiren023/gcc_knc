@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-13 15:14.
+Updated automatically at every ticket change. Last update: 2026-11-13 15:18.
 
-**Next: GPT-6.1, on S11-15 (First development-corpus baseline and profile, GCC 5.1.1 vs GCC-KNC at -O2 (E7-03 part 1)).** Run `python tools/dispatch.py`, or ask the tech lead to.
+**Next: the tech lead, on S11-27.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[###################-]` 205 of 213
 
@@ -78,7 +78,7 @@ Current tickets: `[###################-]` 205 of 213
 | S11-24 | WRF OpenMP (smpar) build with GCC-KNC at -mphinix, for PhiWeather's benchmark - replaces the serial trial build | Done | WRF v4.8.0 now builds as an OpenMP card binary at -mphinix with GCC-KNC (wrf.exe and real.exe linked, needi... |
 | S11-25 | ICE in do_store_flag (expr.cc) on WRF's surface layer (SFCLAY1D) at -O2 -march=knc | Done | The last WRF file that crashed GCC-KNC (surface layer, SFCLAY1D) now compiles: vector 'ordered and not equa... |
 | S11-26 | WRF OpenMP build at -mphinix with no per-file workarounds (S11-23 and S11-25 fixed), restaged for PhiWeather | draft | Owner 2026-11-13: the S11-24 WRF build is removed. Deleted: |
-| S11-27 | Wrong code - NPB-MG (class A, serial) built by GCC-KNC at -O2 -march=knc fails NPB verification on the card | In progress | Narrowing round at ebc62958, 2026-11-13 15:15 EST: card_run exit 0, all 43 class-S cases ran, log .work/_sh... |
+| S11-27 | Wrong code - NPB-MG (class A, serial) built by GCC-KNC at -O2 -march=knc fails NPB verification on the card | Tests waiting for review | Red at 9e76de00: stencil asm check FAIL O2/noreuse, PASS novec. LRA bridge scratch overwrites six live arra... |
 | S11-28 | HPCG run that fits every card model - fixed work instead of fixed duration, grid sized to the 3100's memory | lead | After S11-29 merges (still ready): run .work/_shared/S11-28/lead-pilot.ps1 at 242936bf+ (30 exclusive timed... |
 | S11-29 | card_run profiles limit memory in use, not address space, so a 3100 or 5100 run fails only where the real card would | Not started |  |
 | S12-01 | Sprint 12 prep - static code-quality census of the development-corpus builds (spills, x87/vector transfers, addressing, calls, code size) | Done | A static code-quality census (spill/reload proxies, x87 and x87-zmm traffic, address arithmetic, calls, bra... |
@@ -238,6 +238,7 @@ Current tickets: `[###################-]` 205 of 213
 
 ## Recent activity
 
+- 2026-11-13 15:18 **S11-27** engineer red: Red at 9e76de00: stencil asm check FAIL O2/noreuse, PASS novec. LRA bridge scratch overwrites six live array elements: missing -48 frame-to-rbp off...
 - 2026-11-13 15:14 **S11-28** lead defer: After S11-29 merges (still ready): run .work/_shared/S11-28/lead-pilot.ps1 at 242936bf+ (30 exclusive timed launches, 4-7 h; owner OK if longer tha...
 - 2026-11-13 15:12 **S11-28** engineer ask: Lead pilot needed at 242936bf after S11-29: run .work/_shared/S11-28/lead-pilot.ps1 (104 cubed, rt=0; 30 exclusive launches, 4-7 hours). Return cap...
 - 2026-11-13 15:10 **S11-15** lead answer: SIGPROF pilot ran 2026-11-13 15:20 EST: PASS, exit 0, 0.9 min, 843 log lines with PROFILE_PC samples. Log: .work/_state/logs/S11_15_profile_sigprof...
@@ -245,7 +246,6 @@ Current tickets: `[###################-]` 205 of 213
 - 2026-11-13 15:09 **S11-28** lead answer: Memory round ran 2026-11-13 15:00-15:10 EST: 10.5 min, memory-results.json, log .work/_state/logs/S11_28_memory-20261113-145740.log. Exit 124 means...
 - 2026-11-13 15:09 **S11-28** lead resume: Lead ran lead-memory.ps1 at 15:10 EST: results in the answer.
 - 2026-11-13 15:09 **S11-27** lead answer: Narrowing round at ebc62958, 2026-11-13 15:15 EST: card_run exit 0, all 43 class-S cases ran, log .work/_shared/S11-27/narrow-card.log.
-- 2026-11-13 15:09 **S11-27** lead resume: Lead ran narrow-card.py at 15:15 EST: results in the answer.
 
 ## Cost
 
@@ -257,4 +257,4 @@ Current tickets: `[###################-]` 205 of 213
 
 ## Disk
 
-The project uses 26.6 GiB of 100 GiB. 243 GiB free on the drive.
+The project uses 26.6 GiB of 100 GiB. 244 GiB free on the drive.
