@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-12 23:07.
+Updated automatically at every ticket change. Last update: 2026-11-12 23:19.
 
-**Next: GPT-6.1, on S11-21 (Exploratory WRF build with GCC-KNC (learn-only, host-side) - how far does an unmodified WRF get, and what breaks?).** Run `python tools/dispatch.py`, or ask the tech lead to.
+**Next: the tech lead, on S11-23.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[###################-]` 201 of 207
 
@@ -74,7 +74,7 @@ Current tickets: `[###################-]` 201 of 207
 | S11-20 | Research - which compiler optimizations benefit the widest range of real code on KNC, from professional to amateur, and does our corpus cover it? | Done | We now have a code-style coverage study (docs/research/code-style-coverage.md) that ranks Sprint 12 candida... |
 | S11-21 | Exploratory WRF build with GCC-KNC (learn-only, host-side) - how far does an unmodified WRF get, and what breaks? | In progress | Good stop and a real find (now S11-23). One change before approval, per my 22:10 note: continue past the rt... |
 | S11-22 | Review PhiWeather's first instrumented-PGO attempt on WRF (GCC 5.1.1, k1om) - method, near-zero gain, tolerance gate | Done | PhiWeather's first WRF PGO attempt is reviewed for their lead: the collection and use pipeline is credible,... |
-| S11-23 | ICE in WRF's RRTM radiation (rtrn) at -O2 -march=knc - unrecognizable insn after reload, and sub-512-bit SLP vectors under KNC | lead | Interactive lead: build GCC at 3bfe7d827fa, then run tools/check.py t1 --compiler gcc16 --rrtm, the WRF rtr... |
+| S11-23 | ICE in WRF's RRTM radiation (rtrn) at -O2 -march=knc - unrecognizable insn after reload, and sub-512-bit SLP vectors under KNC | Question for the tech lead | Build and checks in the 23:40 note. |
 | S12-01 | Sprint 12 prep - static code-quality census of the development-corpus builds (spills, x87/vector transfers, addressing, calls, code size) | Done | A static code-quality census (spill/reload proxies, x87 and x87-zmm traffic, address arithmetic, calls, bra... |
 | S12-02 | Sprint 12 prep - the unscored generality check set (S11-20's six programs in the code styles our corpus lacks) | Done | The six unscored generality checks (Q1-Q6: ray tracer hit dispatch and vec3 AoS, Burkardt MD, Reference BLA... |
 | S2-01 | Design for zmm and mask registers under -march=knc | Done | The register design for KNC is settled on paper: all 32 zmm and 8 mask registers become usable under -march... |
@@ -232,23 +232,23 @@ Current tickets: `[###################-]` 201 of 207
 
 ## Recent activity
 
+- 2026-11-12 23:40 **S11-23** lead note: Lead built 3bfe7d827fa (log .work/_state/logs/S11_23_lead_build2-20261112-230849.log). The WRF rtrn reproducer now compiles (rc 0): ICE and LRA cyc...
+- 2026-11-12 23:19 **S11-23** lead resume: Build and checks in the 23:40 note.
 - 2026-11-12 23:06 **S11-23** lead defer: Interactive lead: build GCC at 3bfe7d827fa, then run tools/check.py t1 --compiler gcc16 --rrtm, the WRF rtrn.f90 repro at -O2 -march=knc (must comp...
 - 2026-11-12 23:05 **S11-23** lead note: Lead built tree 1 at 32ea02589db (log .work/_state/logs/S11_23_lead_build-20261112-224357.log, exit 0). Result: the WRF reproducer (.work/_shared/w...
 - 2026-11-12 23:01 **S11-23** engineer ask: GCC build needed at 3bfe7d827fa. SF insn 1242 (*knc_copysf): spilled r1104 cycles x87/zmm reloads because memory alternatives are absent. Added x87...
 - 2026-11-12 22:42 **S11-23** lead answer: Keep the integer fallback; no generic vectorizer hook change (ADR-0006: no shared-code risk for a correct, scalar result). The 'N byte vectors' mes...
 - 2026-11-12 22:39 **S11-23** engineer ask: GCC build needed at 32ea02589db. SF xmm10<-xmm0 cached *movsf_internal: hard-only KNC copy rejects pseudos; LRA cost-2 fast path skips constraints....
 - 2026-11-12 22:31 **S11-23** lead approve-red: S11-23 red approved: a reduced WRF RTRN Fortran test reproduces the KNC postreload ICE (SF register copy matched as *movsf_internal with SSE-only c...
-- 2026-11-12 22:27 **S11-23** engineer red: GCC 60705fedb97 adds two failing tests; WRF notice retained. Reduced RTRN ICEs in postreload extract_constrain_insn: insn 1310, SF xmm10 <- xmm0, c...
-- 2026-11-12 22:13 **S11-21** lead changes: Good stop and a real find (now S11-23). One change before approval, per my 22:10 note: continue past the rtrn ICE so the report shows the rest of t...
 
 ## Cost
 
 - From the script, engineer: 511 sessions, 1056.4M input tokens
 - From the script, lead: 332 sessions, 93.7M input tokens
-- Started by hand, Claude: 12 sessions, 2858.1M input tokens
+- Started by hand, Claude: 12 sessions, 2865.0M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 26.3 GiB of 100 GiB. 64 GiB free on the drive.
+The project uses 26.3 GiB of 100 GiB. 54 GiB free on the drive.
