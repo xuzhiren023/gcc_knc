@@ -41,7 +41,7 @@ in-order core). The pgo/pgox columns of the `use` REPORT show `.text.hot`/`.text
 splitting, `.cold` parts and whether `calls` gained direct calls; read the card ratios against
 them.
 
-## S11-17: complete development zlib program (card training pending)
+## S11-17: complete development zlib program (evaluation pending)
 
 `tools/s11_17_pgo.py` reuses the S11-18 zlib 1.3.1 source list,
 `roundtrip.c`, `-O2 -march=knc`, includes, defines and linker search paths.
@@ -50,7 +50,8 @@ and passed binary lint. They are staged as
 `.work/_shared/S11-17/{base,train}/workload`. No GCC compiler build was needed.
 The host stage passed once; log:
 `.work/_state/logs/S11_17_stage-20261112-180819.log`.
-No program has run natively for this ticket yet.
+The lead ran the instrumented program on the card on 2026-11-13 at 14:47 EST:
+exit 0, `CORPUS_CHECK pass`, empty stderr (ticket's lead report).
 
 Training uses a separate 8 MiB input: LCG seed 29, half of each 4096-byte
 block pseudorandom and half a training literal. Evaluation uses the unchanged
@@ -70,17 +71,59 @@ Lead sequence, from this worktree (all execution through `tools/run.py`):
    executable path so GCC profile lookup names match. The importer requires all
    twelve translation-unit profiles and clean training output. Missing profiles
    and coverage mismatches are errors, never silently accepted fallbacks.
-3. Once the use build passes lint, the lead runs
-   `python tools/run.py --name S11-17-eval -- powershell -NoProfile -File ../_shared/S11-17/lead.ps1 -Evaluate`.
-   It stages three adjacent base/PGO pairs per full 7120, 3100 and 5100 profile,
-   alternating AB/BA/AB, with one pinned worker. The unchanged S11-18 launcher
+3. The use build has passed lint. The lead runs
+   `python tools/run.py --name S11-17-pilot -- powershell -NoProfile -File ../_shared/S11-17/lead.ps1 -Evaluate -Phase pilot`.
+   This runs five adjacent base/PGO pairs per full 7120, 3100 and 5100 profile.
+   Review the pilot for correctness and timing variation, then run
+   `python tools/run.py --name S11-17-confirm -- powershell -NoProfile -File ../_shared/S11-17/lead.ps1 -Evaluate -Phase confirm`
+   for ten confirmatory pairs per profile. Pairs alternate base/PGO then PGO/base
+   (C T T C), with one pinned worker. The unchanged S11-18 launcher
    measures CLOCK_MONOTONIC_RAW launch-to-exit latency, then checks donor decoding
-   and corruption rejection. Each launch retains its stdout/stderr in S11-17.
+   and corruption rejection. Each launch retains its stdout/stderr in S11-17 as
+   `<phase>-<profile>-<pair>-<variant>.stdout` and `.stderr` (zero-based pairs).
 
-What remains unproven: real profile generation/return, the profile-use build,
-profile diagnostic counts and native correctness/timing on all three profiles.
-The use build cannot be produced honestly before the lead supplies training data.
-Do not interpret instrumented compilation or lint as an end-to-end PGO result.
+The host use step passed on 2026-11-13. PowerShell captured training stdout as
+UTF-16LE; the importer now decodes the BOM before parsing the octal records.
+All 12 expected `.gcda` files were returned and imported, with zero missing
+profiles and zero coverage mismatch diagnostics. The use build makes both
+diagnostics fatal and preserves the generate build's output path. The resulting
+`.work/_shared/S11-17/pgo/workload` compiled and passed binary lint.
+Log: `.work/_state/logs/S11_17_use-20261113-145120.log`.
+
+`-fdump-ipa-profile-details` also shows measured edge counts read by the use
+build, rather than merely successful profile lookup. Dumps remain under
+`.work/_shared/S11-17/build/`. The tool rejects a use build with no positive counts.
+
+| Translation unit | Edges read | Positive edges | Maximum count |
+|---|---:|---:|---:|
+| adler32 | 22 | 7 | 965686 |
+| compress | 13 | 9 | 1 |
+| crc32 | 34 | 0 | 0 |
+| deflate | 496 | 111 | 8355585 |
+| infback | 139 | 0 | 0 |
+| inffast | 35 | 13 | 4192718 |
+| inflate | 358 | 81 | 74938 |
+| inftrees | 34 | 25 | 84772 |
+| roundtrip | 50 | 22 | 1 |
+| trees | 154 | 114 | 2098495 |
+| uncompr | 18 | 10 | 1 |
+| zutil | 6 | 2 | 6 |
+
+The crc32 and infback files are present with zero measured edges; they are not
+missing profiles. Native correctness of the use binary and paired evaluation
+timings remain pending on all three profiles. No speedup is claimed.
+
+### Lessons from PhiWeather
+
+The lead's 2026-11-13 ticket note reports that PhiWeather's WRF-only GCC 5.1.1
+pipeline worked after preserving the `-o` path, but its 0.78% gain was below its
+noise bar and its tolerance gate failed by one cell. That result does not settle
+GCC-KNC 16 PGO on zlib. Preserve generate/use names, require complete matching
+profiles and positive use counts, and evaluate correctness before accepting
+timings. Because each zlib run is about 1.25 seconds, the staged protocol uses
+five pilot pairs and ten confirmatory pairs per profile, as requested by the lead.
+Keep pilot and confirmatory results separate; report paired PGO/base ratios and
+variation for each hardware profile before deciding whether PGO pays.
 
 Sprint 12 plan: first finish this train/use/evaluation cycle and record every
 missing/mismatched profile and per-profile paired time ratio. Freeze a separate

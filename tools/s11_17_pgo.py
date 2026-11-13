@@ -5,6 +5,7 @@ The use step requires the lead's real card profile; missing profiles are fatal.
 """
 import argparse
 from pathlib import Path
+import re
 import shutil
 import sys
 import tarfile
@@ -78,8 +79,12 @@ done
         archive.add(peer / 'workload', arcname='workload')
         for runtime in peer.glob('*.so*'):
             archive.add(runtime, arcname=runtime.name)
+    stage_lead()
+
+
+def stage_lead():
     write(OUT / 'lead.ps1', r'''# Lead only. Run from this ticket worktree, through tools/run.py.
-param([switch]$Evaluate)
+param([switch]$Evaluate, [ValidateSet('pilot', 'confirm')][string]$Phase = 'pilot')
 $ErrorActionPreference = 'Stop'
 $stage = [IO.Path]::GetFullPath("$PSScriptRoot")
 if (!$Evaluate) {
@@ -89,7 +94,8 @@ if (!$Evaluate) {
 }
 if (!(Test-Path "$stage/pgo/workload")) { throw 'Run the host use step with train.stdout first' }
 foreach ($profile in @('full', '3100', '5100')) {
-    for ($pair = 0; $pair -lt 3; $pair++) {
+    $pairs = if ($Phase -eq 'pilot') { 5 } else { 10 }
+    for ($pair = 0; $pair -lt $pairs; $pair++) {
         $order = if ($pair % 2) { @('pgo', 'base') } else { @('base', 'pgo') }
         foreach ($variant in $order) {
             $args = @('--benchmark', '--threads', '1', '--timeout', '600')
@@ -97,7 +103,7 @@ foreach ($profile in @('full', '3100', '5100')) {
             foreach ($file in @("$stage/$variant/workload", "$stage/input.bin", "$stage/peer.tar")) {
                 $args += @('--file', $file)
             }
-            python tools/card_run @args "$stage/launch" serial zlib > "$stage/$profile-$pair-$variant.stdout" 2> "$stage/$profile-$pair-$variant.stderr"
+            python tools/card_run @args "$stage/launch" serial zlib > "$stage/$Phase-$profile-$pair-$variant.stdout" 2> "$stage/$Phase-$profile-$pair-$variant.stderr"
             if ($LASTEXITCODE) { throw "Evaluation failed: $profile $pair $variant" }
         }
     }
@@ -107,7 +113,8 @@ foreach ($profile in @('full', '3100', '5100')) {
 
 
 def use(capture):
-    text = Path(capture).read_text(errors='replace')
+    raw = Path(capture).read_bytes()
+    text = raw.decode('utf-16' if raw.startswith((b'\xff\xfe', b'\xfe\xff')) else 'utf-8-sig')
     if 'CORPUS_CHECK pass' not in text or 'libgcov profiling error' in text:
         raise ValueError('training did not pass cleanly; inspect card capture')
     profiles = parse_gcda(text)
@@ -119,7 +126,24 @@ def use(capture):
             raise ValueError('invalid profile: ' + name)
         (BUILD / name).write_bytes(data)
     print('Imported %d card profiles' % len(profiles), flush=True)
-    build('pgo', ['-fprofile-use', '-Werror=missing-profile', '-Werror=coverage-mismatch'])
+    for dump in BUILD.glob('*.profile'):
+        dump.unlink()
+    build('pgo', ['-fprofile-use', '-Werror=missing-profile', '-Werror=coverage-mismatch',
+                  '-fdump-ipa-profile-details'])
+    dumps = list(BUILD.glob('*.profile'))
+    if len(dumps) != len(EXPECTED):
+        raise ValueError('expected twelve profile-use dumps, got %d' % len(dumps))
+    positive = 0
+    for dump in sorted(dumps):
+        counts = [int(n) for n in re.findall(r'Read edge from \d+ to \d+, count:\s*(\d+)',
+                                            dump.read_text())]
+        nonzero = sum(n > 0 for n in counts)
+        positive += nonzero
+        print('%s: read_edges=%d positive_edges=%d max_count=%d' %
+              (dump.name, len(counts), nonzero, max(counts, default=0)), flush=True)
+    if not positive:
+        raise ValueError('profile-use build has no positive measured edge counts')
+    stage_lead()
 
 
 if __name__ == '__main__':
