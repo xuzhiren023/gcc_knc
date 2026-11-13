@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-13 17:41.
+Updated automatically at every ticket change. Last update: 2026-11-13 17:48.
 
-**Next: the tech lead, on S11-27.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: the tech lead, on S11-02.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[###################-]` 205 of 213
 
@@ -53,7 +53,7 @@ Current tickets: `[###################-]` 205 of 213
 | S10-12 | cbrt and cbrtf crash (SIGSEGV) in qualify_v1 on the card - root cause and fix | Done | The cbrt and cbrtf qualification jobs no longer crash on the card and pass (worst 0.4996 and 0.4991 ULP): t... |
 | S10-13 | User story - code that calls cbrtl under -march=knc gets a safe replacement and a compile-time warning (MPSS libm cbrtl faults) | Done | Under -march=knc, calls to cbrtl (and std::cbrt on long double) now go to GCC-KNC's own safe cube root with... |
 | S11-01 | User story - the best way to move data between the host and the card, measured, and how our projects use it | Done | We now have a sourced inventory of every host-card transfer path that works without changing MPSS (SSH, tar... |
-| S11-02 | card_run and run_suite move bulk data by SCIF DMA at the PCIe link limit, with the SSH stream as fallback | In progress | Budget raised by the lead under the owner's standing rule: sessions 9 -> 12, the second extension. Since th... |
+| S11-02 | card_run and run_suite move bulk data by SCIF DMA at the PCIe link limit, with the SSH stream as fallback | Waiting for review | 45e732b9 removes production transfer hashes; keeps exact lengths/completion and private publication. Mode b... |
 | S11-03 | S11-01 transfer tool rejects the card's physical /tmp path, so the native study never starts | Done | The transfer study's tool now accepts the card's real /tmp location (/var/volatile/tmp), so its card run ca... |
 | S11-04 | S11-01 transfer tool - the host opens every connection, because Windows Firewall blocks inbound TCP from the card | Done | The transfer study's host side now opens every connection to the card, so Windows Firewall no longer blocks... |
 | S11-05 | Research - raise KNC's real memory bandwidth from about 175 GB/s toward 75-85% of peak, with a measured plan | Done | The memory-bandwidth research plan and a validated multithreaded KNC bandwidth benchmark are ready, with a ... |
@@ -239,22 +239,22 @@ Current tickets: `[###################-]` 205 of 213
 ## Recent activity
 
 - 2026-11-13 18:05 **S11-27** lead note: e0bc456a11e built (PASS, 29.8 min).
+- 2026-11-13 17:48 **S11-02** engineer submit: 45e732b9 removes production transfer hashes; keeps exact lengths/completion and private publication. Mode before rename; LF script. Old fake modele...
 - 2026-11-13 17:41 **S11-02** owner decide: Budget raised by the lead under the owner's standing rule: sessions 9 -> 12, the second extension. Since the first, the card showed 1 GiB DMA at 1....
 - 2026-11-13 17:39 **S11-02** lead escalate: budget: 9 engineer sessions used; the budget is 9
 - 2026-11-13 17:37 **S11-02** lead answer: Yes to your fix: set the mode before rename, write claude-check.sh with LF, no transfer hashing, exact length plus publish-after-complete, whole-fi...
 - 2026-11-13 17:31 **S11-02** engineer ask: Pre-tool hook blocked the first test edit: removing existing hashlib digest expressions was rejected as 'Hashing is not part of this project proces...
 - 2026-11-13 17:10 **S11-02** lead amend: Owner 2026-11-13: "No validation needed between local transfer." This replaces item 2 of the 16:47 changes; do not build a parallel hash.
 - 2026-11-13 17:08 **S11-17** lead defer: Needs the interactive lead's card run at 82be2cbc, from the S11-17 worktree: python tools/run.py --name S11-17-controls-train -- powershell -NoProf...
-- 2026-11-13 17:03 **S11-17** engineer ask: Lead card training needed at 82be2cbc; engineers cannot run card jobs. Zlib per-pair results recorded. Ten atomic control binaries compiled/linted;...
 
 ## Cost
 
 - From the script, engineer: 543 sessions, 1106.8M input tokens
 - From the script, lead: 358 sessions, 100.5M input tokens
-- Started by hand, Claude: 12 sessions, 3026.2M input tokens
+- Started by hand, Claude: 12 sessions, 3027.1M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 27.6 GiB of 100 GiB. 197 GiB free on the drive.
+The project uses 27.6 GiB of 100 GiB. 196 GiB free on the drive.
