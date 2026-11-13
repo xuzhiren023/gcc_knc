@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-12 20:37.
+Updated automatically at every ticket change. Last update: 2026-11-12 20:41.
 
-Nothing can move right now.
+**Next: the tech lead, on S11-21.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[###################-]` 200 of 205
 
@@ -72,7 +72,7 @@ Current tickets: `[###################-]` 200 of 205
 | S11-18 | M4 corpus harness v2 - card profiles, prefix record, held-out sealing, stronger checks, and the donor-failure rule | Done | The M4 corpus harness now stages all 17 programs for the 7120 and the 3100/5100 profiles with serial voting... |
 | S11-19 | Second senior review - the M4 definition and the Sprint 11-13 roadmap, adjusted | Done | The M4 definition and the Sprint 11-13 roadmap are rewritten as measure, improve, decide, each sprint with ... |
 | S11-20 | Research - which compiler optimizations benefit the widest range of real code on KNC, from professional to amateur, and does our corpus cover it? | Done | We now have a code-style coverage study (docs/research/code-style-coverage.md) that ranks Sprint 12 candida... |
-| S11-21 | Exploratory WRF build with GCC-KNC (learn-only, host-side) - how far does an unmodified WRF get, and what breaks? | lead | Engineer is right (checked): .work/_shared/wrf-trial/src/WRF-4.8.0 holds only phys/, the main v4.8.0 git ar... |
+| S11-21 | Exploratory WRF build with GCC-KNC (learn-only, host-side) - how far does an unmodified WRF get, and what breaks? | Question for the tech lead | Lead re-exported the WRF main tree (partial-clone archive was empty); see PROVENANCE-WRF.md correction. |
 | S12-01 | Sprint 12 prep - static code-quality census of the development-corpus builds (spills, x87/vector transfers, addressing, calls, code size) | Done | A static code-quality census (spill/reload proxies, x87 and x87-zmm traffic, address arithmetic, calls, bra... |
 | S12-02 | Sprint 12 prep - the unscored generality check set (S11-20's six programs in the code styles our corpus lacks) | Done | The six unscored generality checks (Q1-Q6: ray tracer hit dispatch and vec3 AoS, Burkardt MD, Reference BLA... |
 | S2-01 | Design for zmm and mask registers under -march=knc | Done | The register design for KNC is settled on paper: all 32 zmm and 8 mask registers become usable under -march... |
@@ -230,6 +230,7 @@ Current tickets: `[###################-]` 200 of 205
 
 ## Recent activity
 
+- 2026-11-12 20:41 **S11-21** lead resume: Lead re-exported the WRF main tree (partial-clone archive was empty); see PROVENANCE-WRF.md correction.
 - 2026-11-12 20:37 **S11-21** lead defer: Engineer is right (checked): .work/_shared/wrf-trial/src/WRF-4.8.0 holds only phys/, the main v4.8.0 git archive never landed (the 20:31 resume was...
 - 2026-11-12 20:35 **S11-21** engineer ask: 8111c156: supplied WRF-4.8.0 export contains only phys/ with seven submodule directories (645 files, 167825584 bytes); root configure is absent. Re...
 - 2026-11-12 20:32 **S11-21** lead answer: WRF v4.8.0 (06d4240a) and the 7 physics submodules at their v4.8.0 gitlinks are exported to .work/_shared/wrf-trial/src/WRF-4.8.0 (162 MB; provenan...
@@ -237,16 +238,15 @@ Current tickets: `[###################-]` 200 of 205
 - 2026-11-12 20:30 **S11-21** lead defer: Lead must export WRF sources by hand (hook refused the engineer's script; no bypass was tried). From PhiWeather/native/upstream/WRF (read-only): gi...
 - 2026-11-12 20:29 **S11-21** engineer ask: 258abd41: netCDF API link passed without -lstdc++; readelf confirms no dynamic GCC16 runtimes. Log: .work/_state/logs/S11_21_netcdf_link_no_cxx-202...
 - 2026-11-12 20:23 **S11-21** owner decide: Owner standing rule (feedback 2026-11-09/10): session budget raised to 10, first extension. Progress: netCDF-C and netCDF-Fortran (GCC 16) built an...
-- 2026-11-12 20:22 **S11-21** lead escalate: budget: 6 engineer sessions used; the budget is 6
 
 ## Cost
 
 - From the script, engineer: 500 sessions, 1041.3M input tokens
 - From the script, lead: 326 sessions, 91.9M input tokens
-- Started by hand, Claude: 12 sessions, 2819.6M input tokens
+- Started by hand, Claude: 12 sessions, 2825.8M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 25.8 GiB of 100 GiB. 71 GiB free on the drive.
+The project uses 26.0 GiB of 100 GiB. 70 GiB free on the drive.
