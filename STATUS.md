@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-13 16:06.
+Updated automatically at every ticket change. Last update: 2026-11-13 16:07.
 
 **Next: GPT-6.1, on S11-02 (card_run and run_suite move bulk data by SCIF DMA at the PCIe link limit, with the SSH stream as fallback).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
@@ -53,7 +53,7 @@ Current tickets: `[###################-]` 205 of 213
 | S10-12 | cbrt and cbrtf crash (SIGSEGV) in qualify_v1 on the card - root cause and fix | Done | The cbrt and cbrtf qualification jobs no longer crash on the card and pass (worst 0.4996 and 0.4991 ULP): t... |
 | S10-13 | User story - code that calls cbrtl under -march=knc gets a safe replacement and a compile-time warning (MPSS libm cbrtl faults) | Done | Under -march=knc, calls to cbrtl (and std::cbrt on long double) now go to GCC-KNC's own safe cube root with... |
 | S11-01 | User story - the best way to move data between the host and the card, measured, and how our projects use it | Done | We now have a sourced inventory of every host-card transfer path that works without changing MPSS (SSH, tar... |
-| S11-02 | card_run and run_suite move bulk data by SCIF DMA at the PCIe link limit, with the SSH stream as fallback | Changes requested | Budget raised by the lead under the owner's standing rule (2026-11-09/10: the lead extends session and toke... |
+| S11-02 | card_run and run_suite move bulk data by SCIF DMA at the PCIe link limit, with the SSH stream as fallback | In progress | Budget raised by the lead under the owner's standing rule (2026-11-09/10: the lead extends session and toke... |
 | S11-03 | S11-01 transfer tool rejects the card's physical /tmp path, so the native study never starts | Done | The transfer study's tool now accepts the card's real /tmp location (/var/volatile/tmp), so its card run ca... |
 | S11-04 | S11-01 transfer tool - the host opens every connection, because Windows Firewall blocks inbound TCP from the card | Done | The transfer study's host side now opens every connection to the card, so Windows Firewall no longer blocks... |
 | S11-05 | Research - raise KNC's real memory bandwidth from about 175 GB/s toward 75-85% of peak, with a measured plan | Done | The memory-bandwidth research plan and a validated multithreaded KNC bandwidth benchmark are ready, with a ... |
@@ -80,7 +80,7 @@ Current tickets: `[###################-]` 205 of 213
 | S11-26 | WRF OpenMP build at -mphinix with no per-file workarounds (S11-23 and S11-25 fixed), restaged for PhiWeather | draft | Owner 2026-11-13: the S11-24 WRF build is removed. Deleted: |
 | S11-27 | Wrong code - NPB-MG (class A, serial) built by GCC-KNC at -O2 -march=knc fails NPB verification on the card | In progress | Not done yet: T1 regression at 0297f57d723. T0 PASS (12.2 min), T2 PASS. T1 FAILs 4 cases, 322 PASS: 'secon... |
 | S11-28 | HPCG run that fits every card model - fixed work instead of fixed duration, grid sized to the 3100's memory | lead | After S11-29 merges (still ready): run .work/_shared/S11-28/lead-pilot.ps1 at 242936bf+ (30 exclusive timed... |
-| S11-29 | card_run profiles limit memory in use, not address space, so a 3100 or 5100 run fails only where the real card would | Not started |  |
+| S11-29 | card_run profiles limit memory in use, not address space, so a 3100 or 5100 run fails only where the real card would | Not started | Dependency on S11-02 removed, so the HPCG chain (S11-29, then S11-28) does not wait on the DMA debugging. B... |
 | S12-01 | Sprint 12 prep - static code-quality census of the development-corpus builds (spills, x87/vector transfers, addressing, calls, code size) | Done | A static code-quality census (spill/reload proxies, x87 and x87-zmm traffic, address arithmetic, calls, bra... |
 | S12-02 | Sprint 12 prep - the unscored generality check set (S11-20's six programs in the code styles our corpus lacks) | Done | The six unscored generality checks (Q1-Q6: ray tracer hit dispatch and vec3 AoS, Burkardt MD, Reference BLA... |
 | S2-01 | Design for zmm and mask registers under -march=knc | Done | The register design for KNC is settled on paper: all 32 zmm and 8 mask registers become usable under -march... |
@@ -238,6 +238,7 @@ Current tickets: `[###################-]` 205 of 213
 
 ## Recent activity
 
+- 2026-11-13 16:08 **S11-29** lead note: Dependency on S11-02 removed, so the HPCG chain (S11-29, then S11-28) does not wait on the DMA debugging. Base on main. Whichever of S11-02 and S11...
 - 2026-11-13 16:06 **S11-27** lead answer: Not done yet: T1 regression at 0297f57d723. T0 PASS (12.2 min), T2 PASS. T1 FAILs 4 cases, 322 PASS: 'secondary mixed pressure' -O1/-O2 for ti and ...
 - 2026-11-13 16:05 **S11-27** lead resume: Lead ran T0/T1/T2 at 0297f57d723: T1 regression, details in the answer.
 - 2026-11-13 16:00 **S11-27** lead note: MG at 0297f57d723 on the card (verify-card.log, parallel, card_run exit 0): S-O2, S-noslp SUCCESSFUL L2 0.5307707005735E-04; A-O2 (14.16 s), A-defa...
@@ -245,16 +246,15 @@ Current tickets: `[###################-]` 205 of 213
 - 2026-11-13 15:54 **S11-02** owner decide: Budget raised by the lead under the owner's standing rule (2026-11-09/10: the lead extends session and token budgets itself; ask only after two ext...
 - 2026-11-13 15:52 **S11-02** engineer escalate: budget: 6 engineer sessions used; the budget is 6
 - 2026-11-13 15:51 **S11-27** engineer ask: Card round ready at be59bbe2: run python .work/_shared/S11-27/verify-card.py; post verification/L2 per CASE. S-O2,A-O2,S-noslp,A-default,A-novec re...
-- 2026-11-13 15:50 **S11-27** lead note: Reduced cases at 0297f57d723 on the card (reduce-card-new.log): stencil-O2, novec and noreuse all PASS (old: O2 and noreuse FAIL 142). MG S/A rerun...
 
 ## Cost
 
 - From the script, engineer: 536 sessions, 1097.0M input tokens
 - From the script, lead: 352 sessions, 98.5M input tokens
-- Started by hand, Claude: 12 sessions, 2989.6M input tokens
+- Started by hand, Claude: 12 sessions, 2991.5M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 27.5 GiB of 100 GiB. 216 GiB free on the drive.
+The project uses 27.5 GiB of 100 GiB. 210 GiB free on the drive.
