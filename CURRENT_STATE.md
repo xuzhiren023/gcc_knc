@@ -147,6 +147,10 @@ M1 is accepted and tagged `m1` locally; nothing is pushed. Engineers are Claude 
 - **Restore target runtime files after replacing the GCC build tree.** `tools/toolchain.py gcc16` builds `all-gcc` only and removes the old tree, including `crtbegin.o`, `crtend.o` and `libgcc`. S3-04's first T2 regression therefore failed to link; `tools/toolchain.py libgcc` through `tools/run.py` restored the fork-built runtime, and the failed T2 checks then passed. Do this after a full rebuild before link checks.
 
 ## Open items not on a ticket
+- 2026-11-13 16:55 EST (lead): Card turn ended; card handed back to PhiWeather ('done'), with no locks and the ledger closed. Results:
+  - S11-17 zlib PGO, 30 pilot and 60 confirm launches, all correct: PGO/base +0.7-0.9% (confirm medians full 1.0084, 3100 1.0069, 5100 1.0094). Positive-control set next.
+  - S11-02 DMA rerun at 3953ab96: offset bug fixed, 1 GiB up at 1347.7 MiB/s payload with digests matching and no bugcheck. It failed on two things: DMA-published files lose the exec bit ('helper did not exec program'), and the 1 GiB wall time is 93.6 s, dominated by digest and I/O, probably single-core card SHA-256. Changes requested, with a wall-clock target of at least 0.5 GB/s. Legacy latch released after the documented checks.
+  - S11-27 second fix b56d5090c86: stencil T1 green, secondary-reload TI/TF still ICEs (reload cycle). Back to the engineer. MG card check next turn.
 - 2026-11-13 16:10 EST (lead): S11-27 at 0297f57d723.
   - On the card: MG S and A verify (A-O2 14.2 s vs GCC 5.1.1 33.8 s), and the reduced cases pass.
   - T0 and T2 pass. T1 regresses: 4 ICEs in knc-secondary-pressure ti/tf at -O1/-O2, LRA 'maximum number of generated reload insns' (a bridge-pseudo reload cycle). Back to the engineer.
