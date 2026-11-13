@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-13 04:03.
+Updated automatically at every ticket change. Last update: 2026-11-13 04:05.
 
-**Next: the tech lead, on S11-27.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+Nothing can move right now.
 
 Current tickets: `[###################-]` 205 of 211
 
@@ -78,7 +78,7 @@ Current tickets: `[###################-]` 205 of 211
 | S11-24 | WRF OpenMP (smpar) build with GCC-KNC at -mphinix, for PhiWeather's benchmark - replaces the serial trial build | Done | WRF v4.8.0 now builds as an OpenMP card binary at -mphinix with GCC-KNC (wrf.exe and real.exe linked, needi... |
 | S11-25 | ICE in do_store_flag (expr.cc) on WRF's surface layer (SFCLAY1D) at -O2 -march=knc | Done | The last WRF file that crashed GCC-KNC (surface layer, SFCLAY1D) now compiles: vector 'ordered and not equa... |
 | S11-26 | WRF OpenMP build at -mphinix with no per-file workarounds (S11-23 and S11-25 fixed), restaged for PhiWeather | draft |  |
-| S11-27 | Wrong code - NPB-MG (class A, serial) built by GCC-KNC at -O2 -march=knc fails NPB verification on the card | Question for the tech lead | Card round needed at 498a154b: run python .work/_shared/S11-27/card.py; which CASEs verify? 24 linted seria... |
+| S11-27 | Wrong code - NPB-MG (class A, serial) built by GCC-KNC at -O2 -march=knc fails NPB verification on the card | lead | Card round needed (interactive lead): run python C:/Users/xuzhi/Documents/gcc_knc/.work/_shared/S11-27/card... |
 | S12-01 | Sprint 12 prep - static code-quality census of the development-corpus builds (spills, x87/vector transfers, addressing, calls, code size) | Done | A static code-quality census (spill/reload proxies, x87 and x87-zmm traffic, address arithmetic, calls, bra... |
 | S12-02 | Sprint 12 prep - the unscored generality check set (S11-20's six programs in the code styles our corpus lacks) | Done | The six unscored generality checks (Q1-Q6: ray tracer hit dispatch and vec3 AoS, Burkardt MD, Reference BLA... |
 | S2-01 | Design for zmm and mask registers under -march=knc | Done | The register design for KNC is settled on paper: all 32 zmm and 8 mask registers become usable under -march... |
@@ -236,6 +236,7 @@ Current tickets: `[###################-]` 205 of 211
 
 ## Recent activity
 
+- 2026-11-13 04:05 **S11-27** lead defer: Card round needed (interactive lead): run python C:/Users/xuzhi/Documents/gcc_knc/.work/_shared/S11-27/card.py at 498a154b (one card_run, --threads...
 - 2026-11-13 04:02 **S11-27** engineer ask: Card round needed at 498a154b: run python .work/_shared/S11-27/card.py; which CASEs verify? 24 linted serial S/A binaries: O0/O1/O2/no-vectorize/no...
 - 2026-11-13 03:46 **S11-25** lead approve: The last WRF file that crashed GCC-KNC (surface layer, SFCLAY1D) now compiles: vector 'ordered and not equal' float comparisons are expanded as two...
 - 2026-11-13 03:34 **S11-25** engineer submit: Lead rebased onto knc and rebuilt tree 2 at 58d2d07db42. Lead results: sfclay1d/rtrn -O2 -march=knc and kfcps/advance_uv -mphinix -mknc-card=7120 c...
@@ -243,7 +244,6 @@ Current tickets: `[###################-]` 205 of 211
 - 2026-11-13 03:31 **S11-25** lead resume: Lead rebased and rebuilt; see the answer.
 - 2026-11-13 03:16 **S11-25** lead defer: Test-only c3a4ef89365 is correct (plain scan for vcmpps $1, keeps the $4/$7 forbids; no rebuild needed). Needs the interactive lead: rebase gcc bra...
 - 2026-11-13 03:13 **S11-25** engineer ask: Test-only commit c3a4ef89365 uses plain scan-assembler for immediate 1; keeps forbids for 4/7. Loop-copy count is optimizer-dependent. Whitespace P...
-- 2026-11-13 03:11 **S11-25** lead answer: Fix is good; one test edit, then rebase and submit. Lead results at 3cd892904ec (tree 2): sfclay1d.f90 compiles at -O2 -march=knc and at -mphinix -...
 
 ## Cost
 
