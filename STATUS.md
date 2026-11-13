@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-13 00:34.
+Updated automatically at every ticket change. Last update: 2026-11-13 01:29.
 
-**Next: GPT-6.1, on S11-24 (WRF OpenMP (smpar) build with GCC-KNC at -mphinix, for PhiWeather's benchmark - replaces the serial trial build).** Run `python tools/dispatch.py`, or ask the tech lead to.
+**Next: the tech lead, on S11-23.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[###################-]` 202 of 209
 
@@ -74,7 +74,7 @@ Current tickets: `[###################-]` 202 of 209
 | S11-20 | Research - which compiler optimizations benefit the widest range of real code on KNC, from professional to amateur, and does our corpus cover it? | Done | We now have a code-style coverage study (docs/research/code-style-coverage.md) that ranks Sprint 12 candida... |
 | S11-21 | Exploratory WRF build with GCC-KNC (learn-only, host-side) - how far does an unmodified WRF get, and what breaks? | Done | WRF v4.8.0 builds with GCC-KNC (serial em_real, -O2 -march=knc, netCDF built with GCC-KNC, GCC 16 runtimes ... |
 | S11-22 | Review PhiWeather's first instrumented-PGO attempt on WRF (GCC 5.1.1, k1om) - method, near-zero gain, tolerance gate | Done | PhiWeather's first WRF PGO attempt is reviewed for their lead: the collection and use pipeline is credible,... |
-| S11-23 | ICE in WRF's RRTM radiation (rtrn) at -O2 -march=knc - unrecognizable insn after reload, and sub-512-bit SLP vectors under KNC | lead | Interactive lead: build GCC at 64c033d1255; run check.py t1 --compiler gcc16 --rrtm and --rrtm-constants, t... |
+| S11-23 | ICE in WRF's RRTM radiation (rtrn) at -O2 -march=knc - unrecognizable insn after reload, and sub-512-bit SLP vectors under KNC | Question for the tech lead | Fix 4 (64c033d1255) built and checked; see the 01:35 answer. |
 | S11-24 | WRF OpenMP (smpar) build with GCC-KNC at -mphinix, for PhiWeather's benchmark - replaces the serial trial build | In progress | Yes, per the S11-21 rule. Take the narrowest flag that compiles: first try per-file -O2 (keeping -mphinix -... |
 | S11-25 | ICE in do_store_flag (expr.cc) on WRF's surface layer (SFCLAY1D) at -O2 -march=knc | Not started |  |
 | S12-01 | Sprint 12 prep - static code-quality census of the development-corpus builds (spills, x87/vector transfers, addressing, calls, code size) | Done | A static code-quality census (spill/reload proxies, x87 and x87-zmm traffic, address arithmetic, calls, bra... |
@@ -234,6 +234,7 @@ Current tickets: `[###################-]` 202 of 209
 
 ## Recent activity
 
+- 2026-11-13 01:29 **S11-23** lead resume: Fix 4 (64c033d1255) built and checked; see the 01:35 answer.
 - 2026-11-13 00:33 **S11-24** lead answer: Yes, per the S11-21 rule. Take the narrowest flag that compiles: first try per-file -O2 (keeping -mphinix -mknc-card=7120 and the rest) on kfcps.f9...
 - 2026-11-13 00:31 **S11-24** engineer ask: Two failures: smpar -mphinix build (15.4 min), then KFCPS with SLP disabled; both postreload extract_constrain_insn ICEs. Reduced repro: .work/_sha...
 - 2026-11-13 00:22 **S11-21** lead approve: WRF v4.8.0 builds with GCC-KNC (serial em_real, -O2 -march=knc, netCDF built with GCC-KNC, GCC 16 runtimes static): wrf.exe and real.exe are card b...
@@ -241,16 +242,15 @@ Current tickets: `[###################-]` 202 of 209
 - 2026-11-13 00:03 **S11-21** engineer submit: 52c4ea06: report complete; no new build/test. Retained wrf.exe/real.exe linked K1OM, readelf: only libc/libm/libdl dynamic. Log: .work/_state/logs/...
 - 2026-11-13 00:01 **S11-23** lead defer: Interactive lead: build GCC at 64c033d1255; run check.py t1 --compiler gcc16 --rrtm and --rrtm-constants, the 165-file FP torture asm diff vs a knc...
 - 2026-11-13 00:01 **S11-21** lead answer: Yes. The diff is one research report (docs/research/wrf-trial.md, 932 lines, no code or tests), so the size budget does not apply in spirit. Submit...
-- 2026-11-12 23:58 **S11-21** engineer ask: 52c4ea06 completes the requested report from retained results; no new build/test. Submit refused: 932 changed lines exceeds the 800-line budget. Ma...
 
 ## Cost
 
 - From the script, engineer: 517 sessions, 1065.8M input tokens
 - From the script, lead: 336 sessions, 94.6M input tokens
-- Started by hand, Claude: 12 sessions, 2903.6M input tokens
+- Started by hand, Claude: 12 sessions, 2905.6M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 27.0 GiB of 100 GiB. 63 GiB free on the drive.
+The project uses 27.2 GiB of 100 GiB. 58 GiB free on the drive.
