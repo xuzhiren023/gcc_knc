@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-13 14:36.
+Updated automatically at every ticket change. Last update: 2026-11-13 14:43.
 
-**Next: GPT-6.1, on S11-28 (HPCG run that fits every card model - fixed work instead of fixed duration, grid sized to the 3100's memory).** Run `python tools/dispatch.py`, or ask the tech lead to.
+**Next: the tech lead, on S11-28.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[###################-]` 205 of 212
 
@@ -79,7 +79,7 @@ Current tickets: `[###################-]` 205 of 212
 | S11-25 | ICE in do_store_flag (expr.cc) on WRF's surface layer (SFCLAY1D) at -O2 -march=knc | Done | The last WRF file that crashed GCC-KNC (surface layer, SFCLAY1D) now compiles: vector 'ordered and not equa... |
 | S11-26 | WRF OpenMP build at -mphinix with no per-file workarounds (S11-23 and S11-25 fixed), restaged for PhiWeather | draft | Owner 2026-11-13: the S11-24 WRF build is removed. Deleted: |
 | S11-27 | Wrong code - NPB-MG (class A, serial) built by GCC-KNC at -O2 -march=knc fails NPB verification on the card | lead | Pilot clue: the GCC-KNC OpenMP build of NPB-MG class A, -O2 -march=knc -fopenmp from the same prefix, passe... |
-| S11-28 | HPCG run that fits every card model - fixed work instead of fixed duration, grid sized to the 3100's memory | In progress |  |
+| S11-28 | HPCG run that fits every card model - fixed work instead of fixed duration, grid sized to the 3100's memory | Question for the tech lead | Lead card round needed at ede7b91c: run .work/_shared/S11-28/lead-memory.ps1; return memory-results.json an... |
 | S12-01 | Sprint 12 prep - static code-quality census of the development-corpus builds (spills, x87/vector transfers, addressing, calls, code size) | Done | A static code-quality census (spill/reload proxies, x87 and x87-zmm traffic, address arithmetic, calls, bra... |
 | S12-02 | Sprint 12 prep - the unscored generality check set (S11-20's six programs in the code styles our corpus lacks) | Done | The six unscored generality checks (Q1-Q6: ray tracer hit dispatch and vec3 AoS, Burkardt MD, Reference BLA... |
 | S2-01 | Design for zmm and mask registers under -march=knc | Done | The register design for KNC is settled on paper: all 32 zmm and 8 mask registers become usable under -march... |
@@ -237,6 +237,7 @@ Current tickets: `[###################-]` 205 of 212
 
 ## Recent activity
 
+- 2026-11-13 14:43 **S11-28** engineer ask: Lead card round needed at ede7b91c: run .work/_shared/S11-28/lead-memory.ps1; return memory-results.json and captures. README.md there records sour...
 - 2026-11-13 14:30 **S11-27** lead note: Pilot clue: the GCC-KNC OpenMP build of NPB-MG class A, -O2 -march=knc -fopenmp from the same prefix, passes verification at 56 to 240 threads in a...
 - 2026-11-13 14:30 **S11-15** lead note: HPCG's launch-to-exit time is fixed by hpcg.dat's 60 s run time, so use its 'rating for historical reasons' GFLOP/s from stdout, not time_seconds. ...
 - 2026-11-13 09:45 **S11-27** lead note: Owner rule: correctness-only card rounds run cases in parallel, one serial case per core. The first round's card.py stays as staged. Write later ro...
@@ -244,7 +245,6 @@ Current tickets: `[###################-]` 205 of 212
 - 2026-11-13 09:10 **S11-26** lead note: Owner 2026-11-13: the S11-24 WRF build is removed. Deleted:
 - 2026-11-13 09:00 **S11-26** lead note: PhiWeather's owner paused their WRF trial until this build is staged. Their r2 plans and comparison tools stay ready. When staged, the lead message...
 - 2026-11-13 08:55 **S11-17** lead note: Owner asked whether PhiWeather's PGO conclusion can close this ticket. PhiWeather's lead says no. Their result is WRF-only, GCC 5.1.1:
-- 2026-11-13 08:40 **S11-26** lead note: Owner 2026-11-13: WRF compile work moves after Sprint 12, when the compiler work is complete and no workaround gap remains. Sprint set to s13; stay...
 
 ## Cost
 
@@ -256,4 +256,4 @@ Current tickets: `[###################-]` 205 of 212
 
 ## Disk
 
-The project uses 26.2 GiB of 100 GiB. 244 GiB free on the drive.
+The project uses 26.3 GiB of 100 GiB. 244 GiB free on the drive.
