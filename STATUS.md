@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-12 19:38.
+Updated automatically at every ticket change. Last update: 2026-11-12 19:40.
 
 **Next: GPT-6.1, on S11-21 (Exploratory WRF build with GCC-KNC (learn-only, host-side) - how far does an unmodified WRF get, and what breaks?).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
@@ -74,7 +74,7 @@ Current tickets: `[###################-]` 198 of 205
 | S11-20 | Research - which compiler optimizations benefit the widest range of real code on KNC, from professional to amateur, and does our corpus cover it? | Done | We now have a code-style coverage study (docs/research/code-style-coverage.md) that ranks Sprint 12 candida... |
 | S11-21 | Exploratory WRF build with GCC-KNC (learn-only, host-side) - how far does an unmodified WRF get, and what breaks? | In progress | Do not delete anything. Leave build-netcdf-c in place as stale (note it in PROVENANCE.md as contaminated by... |
 | S12-01 | Sprint 12 prep - static code-quality census of the development-corpus builds (spills, x87/vector transfers, addressing, calls, code size) | In progress |  |
-| S12-02 | Sprint 12 prep - the unscored generality check set (S11-20's six programs in the code styles our corpus lacks) | draft |  |
+| S12-02 | Sprint 12 prep - the unscored generality check set (S11-20's six programs in the code styles our corpus lacks) | In progress | Ready. Owner approved the downloads 2026-11-12. Staged in .work/_shared/genset/src/ (1.5 MB, outside git): ... |
 | S2-01 | Design for zmm and mask registers under -march=knc | Done | The register design for KNC is settled on paper: all 32 zmm and 8 mask registers become usable under -march... |
 | S2-02 | Float and double arguments and results in zmm lane 0 | Done | Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`). |
 | S2-03 | Varargs with the donor's register save area | Done | Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`). |
@@ -230,6 +230,7 @@ Current tickets: `[###################-]` 198 of 205
 
 ## Recent activity
 
+- 2026-11-12 19:50 **S12-02** lead note: Ready. Owner approved the downloads 2026-11-12. Staged in .work/_shared/genset/src/ (1.5 MB, outside git): raytracing-v4.0.2/ (src/InOneWeekend/*.h...
 - 2026-11-12 19:29 **S11-21** lead answer: Do not delete anything. Leave build-netcdf-c in place as stale (note it in PROVENANCE.md as contaminated by MSYSTEM, not used) and configure netCDF...
 - 2026-11-12 19:27 **S11-21** engineer ask: Automatic approval review rejected removal/recreation of validated .work/_shared/wrf-trial/build-netcdf-c: blocked by policy. AGENTS.md prohibits w...
 - 2026-11-12 19:25 **S11-21** lead answer: Yes. Your diagnosis (MSYSTEM -> ISMSYS -> REGEDIT -> dreg.c) is right and it is an environment issue, not a finding. Run every configure and make o...
@@ -237,13 +238,12 @@ Current tickets: `[###################-]` 198 of 205
 - 2026-11-12 18:56 **S11-20** lead approve: We now have a code-style coverage study (docs/research/code-style-coverage.md) that ranks Sprint 12 candidate themes by how many kinds of code they...
 - 2026-11-12 18:47 **S11-20** engineer submit: Delivered docs/research/code-style-coverage.md (296 lines): four questions, primary sources, licences/versions, breadth-first rubric and provisiona...
 - 2026-11-12 18:33 **S11-02** lead defer: Code review: no blocker (helper-free SSH path is main plus a wc -c check; DMA latch blocks watchdog and stale reaping; integrity, bugcheck or uncer...
-- 2026-11-12 18:31 **S11-02** engineer submit: 6c8b56c7 restores helper-free SSH with length checks/unchecked-digest receipts; missing-helper DMA/collect refused. New regression passed once: .wo...
 
 ## Cost
 
 - From the script, engineer: 490 sessions, 1031.6M input tokens
 - From the script, lead: 317 sessions, 90.1M input tokens
-- Started by hand, Claude: 12 sessions, 2791.4M input tokens
+- Started by hand, Claude: 12 sessions, 2795.6M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
