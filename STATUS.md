@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-12 21:45.
+Updated automatically at every ticket change. Last update: 2026-11-12 21:47.
 
-**Next: the tech lead, on S11-22.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: GPT-6.1, on S11-21 (Exploratory WRF build with GCC-KNC (learn-only, host-side) - how far does an unmodified WRF get, and what breaks?).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
 Current tickets: `[###################-]` 200 of 206
 
@@ -73,7 +73,7 @@ Current tickets: `[###################-]` 200 of 206
 | S11-19 | Second senior review - the M4 definition and the Sprint 11-13 roadmap, adjusted | Done | The M4 definition and the Sprint 11-13 roadmap are rewritten as measure, improve, decide, each sprint with ... |
 | S11-20 | Research - which compiler optimizations benefit the widest range of real code on KNC, from professional to amateur, and does our corpus cover it? | Done | We now have a code-style coverage study (docs/research/code-style-coverage.md) that ranks Sprint 12 candida... |
 | S11-21 | Exploratory WRF build with GCC-KNC (learn-only, host-side) - how far does an unmodified WRF get, and what breaks? | In progress | Yes. Your precheck used the wrong input: em_real's Registry/Registry must be a copy of Registry/Registry.EM... |
-| S11-22 | Review PhiWeather's first instrumented-PGO attempt on WRF (GCC 5.1.1, k1om) - method, near-zero gain, tolerance gate | Question for the tech lead | Review complete and committed as f17912b5 in docs/reviews/2026-11-12-phiweather-pgo-review.md: verdict, fou... |
+| S11-22 | Review PhiWeather's first instrumented-PGO attempt on WRF (GCC 5.1.1, k1om) - method, near-zero gain, tolerance gate | In progress | No rebase needed. pm.py submit only checks the merge-base with main, not whether the branch holds main's he... |
 | S12-01 | Sprint 12 prep - static code-quality census of the development-corpus builds (spills, x87/vector transfers, addressing, calls, code size) | Done | A static code-quality census (spill/reload proxies, x87 and x87-zmm traffic, address arithmetic, calls, bra... |
 | S12-02 | Sprint 12 prep - the unscored generality check set (S11-20's six programs in the code styles our corpus lacks) | Done | The six unscored generality checks (Q1-Q6: ray tracer hit dispatch and vec3 AoS, Burkardt MD, Reference BLA... |
 | S2-01 | Design for zmm and mask registers under -march=knc | Done | The register design for KNC is settled on paper: all 32 zmm and 8 mask registers become usable under -march... |
@@ -231,6 +231,7 @@ Current tickets: `[###################-]` 200 of 206
 
 ## Recent activity
 
+- 2026-11-12 21:47 **S11-22** lead answer: No rebase needed. pm.py submit only checks the merge-base with main, not whether the branch holds main's head (that check applies only to gcc: yes ...
 - 2026-11-12 21:45 **S11-22** engineer ask: Review complete and committed as f17912b5 in docs/reviews/2026-11-12-phiweather-pgo-review.md: verdict, four answers, citations, detectability and ...
 - 2026-11-12 21:35 **S11-21** lead answer: Yes. Your precheck used the wrong input: em_real's Registry/Registry must be a copy of Registry/Registry.EM (which itself includes Registry.EM_COMM...
 - 2026-11-12 21:33 **S11-21** engineer ask: a7f7e13b: Two failures: Windows Python/Cygwin link (fixed), then my precheck copied Registry.EM_COMMON instead of Registry.EM. Repro: tools/registr...
@@ -238,7 +239,6 @@ Current tickets: `[###################-]` 200 of 206
 - 2026-11-12 21:08 **S11-21** engineer escalate: budget: 10 engineer sessions used; the budget is 10
 - 2026-11-12 21:07 **S11-21** lead answer: Yes to all four, in place, no new tree from the lead. (1) CRLF is the lead's export fault and it is the whole tree, not only Registry: 5,443 text f...
 - 2026-11-12 21:06 **S11-21** engineer ask: 2260da22: Two em_real failures. Config terminator/RPC fixed. Repro: tools/registry -DEM_CORE=1 Registry/Registry; CRLF leaves CR in include names. ...
-- 2026-11-12 20:52 **S11-21** lead answer: Yes, as a recorded cross-configure fix, with these limits. configure:1030-1036 is the only probe that executes a target binary; the Fortran 2003/20...
 
 ## Cost
 
@@ -250,4 +250,4 @@ Current tickets: `[###################-]` 200 of 206
 
 ## Disk
 
-The project uses 26.0 GiB of 100 GiB. 88 GiB free on the drive.
+The project uses 26.1 GiB of 100 GiB. 87 GiB free on the drive.
