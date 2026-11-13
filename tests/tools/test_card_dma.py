@@ -3,7 +3,7 @@
 The proposed card_dma.transfer_file API takes source/destination names, the
 declared size, direction (up/down), method (auto/ssh/dma), threshold_bytes,
 and backends keyed by method. A backend stages into a private destination and
-returns bytes, seconds, source_sha256 and received_sha256. Only the policy
+returns bytes, seconds and file_complete. Only the policy
 may call publish(private, destination) after checking that evidence.
 
 TransferFailure carries kind, data_started and cleanup_confirmed. These are
@@ -11,7 +11,6 @@ endpoint observations, never guesses from a timeout or process exit. The fake
 models file visibility and reported cleanup; it does not emulate SCIF lifetime,
 registration, DMA completion, or native throughput.
 """
-import hashlib
 import importlib.util
 from pathlib import Path, PurePosixPath
 import sys
@@ -34,11 +33,11 @@ DESTINATION = "/destination/claude-payload"
 
 class FakeEndpoint:
     def __init__(self, method, data, events, visible, *, failure=None,
-                 corrupt=False, count_delta=0, seconds=2.0):
+                 completed=True, count_delta=0, seconds=2.0):
         self.method, self.data = method, data
         self.events, self.visible = events, visible
         self.failure = failure
-        self.corrupt, self.count_delta = corrupt, count_delta
+        self.completed, self.count_delta = completed, count_delta
         self.seconds = seconds
         self.private = {}
 
@@ -62,12 +61,10 @@ class FakeEndpoint:
             raise card_dma.TransferFailure(
                 "injected " + kind, kind=kind, data_started=started,
                 cleanup_confirmed=cleaned)
-        received = (bytes([self.data[0] ^ 1]) + self.data[1:]
-                    if self.corrupt else self.data)
+        received = self.data
         self.private[private] = received
         result = dict(bytes=len(received) + self.count_delta, seconds=self.seconds,
-                      source_sha256=hashlib.sha256(self.data).hexdigest(),
-                      received_sha256=hashlib.sha256(received).hexdigest())
+                      file_complete=self.completed)
         self.events.append((self.method, "evidence", result))
         return result
 
@@ -77,10 +74,41 @@ class FakeEndpoint:
 
 
 class TransferPolicy(unittest.TestCase):
+    def test_mode_before_publish_and_lf_validation_program(self):
+        # The old fake modeled bytes only; it never ran the publication shell
+        # or the generated script, so it could not catch modes or CRLF shebangs.
+        import host_card_transfer as build
+        runner = runpy.run_path(str(ROOT / "tools/card_run"))
+        with tempfile.TemporaryDirectory(dir=build.SHARED) as temp:
+            root = Path(temp)
+            build.stage_production_validation(root)
+            self.assertEqual((root / "claude-check.sh").read_bytes(),
+                             b"#!/bin/sh\ntest -f claude-payload\n")
+            for method in ("dma", "ssh"):
+                for name, data, mode in (("claude-program", b"#!/bin/sh\n", "700"),
+                                         ("claude-pin", b"elf", "700"),
+                                         ("claude-unpack", b"elf", "700"),
+                                         ("claude-extra", b"\x7fELF", "700"),
+                                         ("claude-payload", b"data", "600")):
+                    with self.subTest(method=method, name=name):
+                        source = root / name
+                        source.write_bytes(data)
+                        session = object.__new__(runner["SSHSession"])
+                        session.helper_free = False
+                        session.transfer_method, session.threshold_bytes = method, 1
+                        session.transfers, session.rpc = [], Mock()
+                        session.file_helpers = Mock(return_value=dict(
+                            bytes=len(data), seconds=0.01, file_complete=True))
+                        session.send_path(name, source, 10)
+                        command = session.rpc.call_args.args[0]
+                        self.assertRegex(command, r"^guard_boot && chmod " + mode +
+                                         r" -- (claude-part-[0-9a-f]+) && mv -- \1 " + name + r"$")
+                        row = session.transfers[0]
+                        self.assertGreaterEqual(row["wall_seconds"], row["publish_seconds"])
+
     def test_native_window_offsets(self):
         # The policy fake never executes registration or the C transfer loop.
         # Compile that actual loop with fake SCIF/file IO: no endpoint, card,
-        # gigabyte file, or digest throughput measurement is involved.
         import host_card_transfer as build
         source = (ROOT / "tools/transfer_bench.c").read_text()
         start = source.index("static int transfer_file(")
@@ -109,9 +137,7 @@ static int close_fake(endpoint e) {return close_result;}
 static int recv_fake(endpoint e,void *p,int n,int flags) {errno=ECONNRESET;return -1;}
 static int stat_fake(int fd,struct stat *s) {s->st_mode=S_IFREG;s->st_size=total;return 0;}
 static void exact_fake(void *p,size_t n,int send) {
-  static unsigned char digest[32];
   if(n==8 && !send)memcpy(p,&peer,8);
-  if(n==32) {if(send)memcpy(digest,p,32);else memcpy(p,digest,32);}
 }
 #define open(...) 7
 #define close_file_fake(...) 0
@@ -121,7 +147,6 @@ static void exact_fake(void *p,size_t n,int send) {
 #define exact exact_fake
 #define token(...) ((void)0)
 #define file_io(fd,p,n,w) (moved+=(n))
-#define sha_add(...) ((void)0)
 '''
         main = r'''
 int main(int argc,char **argv) {
@@ -200,10 +225,13 @@ int main(int argc,char **argv) {
             session.helper_free, session.transfer_method, session.transfers = True, method, []
             session.upload, session.rpc = Mock(), Mock(return_value="3")
             session.send_file("claude-payload", b"abc", 10)
-            self.assertEqual(session.upload.call_args.args[:3],
-                             ("upload-claude-payload", "cat > claude-payload", b"abc"))
+            command = session.upload.call_args.args[1]
+            self.assertRegex(command, r"^cat > claude-part-[0-9a-f]+$")
+            self.assertEqual(session.upload.call_args.args[2], b"abc")
+            self.assertIn(" && mv -- " + command[6:] + " claude-payload",
+                          session.rpc.call_args.args[0])
             row = session.transfers[0]
-            self.assertEqual((row["method"], row["bytes"], row["digest_match"]), ("ssh", 3, None))
+            self.assertEqual((row["method"], row["bytes"], row["file_complete"]), ("ssh", 3, True))
             self.assertEqual(row["fallback"], dict(method="dma", reason="dma unavailable: helper missing")
                              if method == "auto" else None)
         with patch.object(Path, "is_file", return_value=False):
@@ -237,7 +265,7 @@ int main(int argc,char **argv) {
         self.assertEqual(receipt["bytes"], len(self.data))
         self.assertEqual(receipt["seconds"], 2.0)
         self.assertAlmostEqual(receipt["mib_per_second"], len(self.data) / MIB / 2)
-        self.assertIs(receipt["digest_match"], True)
+        self.assertIs(receipt["file_complete"], True)
         self.assertEqual(receipt["fallback"], fallback)
         self.assertEqual(self.visible[DESTINATION], self.data)
 
@@ -302,15 +330,15 @@ int main(int argc,char **argv) {
         self.assertEqual(self.attempts(), ["dma", "ssh"])
         self.assertEqual(self.visible[DESTINATION], b"previous complete file")
 
-    def test_digest_and_exact_length_are_required_before_publish(self):
+    def test_completion_and_exact_length_are_required_before_publish(self):
         for direction in ("up", "down"):
             for method in ("dma", "ssh"):
-                for corruption in ("digest", "short", "long"):
+                for corruption in ("incomplete", "short", "long"):
                     with self.subTest(direction=direction, method=method, corruption=corruption):
                         self.fixture()
                         endpoint = self.backends[method]
-                        endpoint.corrupt = corruption == "digest"
-                        endpoint.count_delta = {"digest": 0, "short": -1, "long": 1}[corruption]
+                        endpoint.completed = corruption != "incomplete"
+                        endpoint.count_delta = {"incomplete": 0, "short": -1, "long": 1}[corruption]
                         with self.assertRaises(card_dma.TransferFailure) as caught:
                             self.transfer(direction, method=method)
                         self.assertEqual(caught.exception.kind, "integrity")
