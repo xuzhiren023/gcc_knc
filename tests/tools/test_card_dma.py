@@ -12,6 +12,7 @@ models file visibility and reported cleanup; it does not emulate SCIF lifetime,
 registration, DMA completion, or native throughput.
 """
 import importlib.util
+import json
 from pathlib import Path, PurePosixPath
 import sys
 import unittest
@@ -118,7 +119,7 @@ class TransferPolicy(unittest.TestCase):
         mocks = r'''
 #include <assert.h>
 static uint64_t total, moved, peer, base;
-static unsigned calls, registrations, releases;
+static unsigned calls, registrations, releases, completions, file_closed;
 static int sending, close_result;
 static int *errno_fake(void) {return &errno;}
 static int64_t reg_fake(endpoint e,void *p,size_t n,int64_t o,int prot,int flags) {
@@ -131,7 +132,8 @@ static int read_fake(endpoint e,int64_t local,size_t n,int64_t remote,int flags)
   assert(n==((expected+63)&~(size_t)63) && n<=window_size);calls++;return 0;
 }
 static int unreg_fake(endpoint e,int64_t offset,size_t n) {
-  assert((uint64_t)offset==base && n==window_size && moved==total);releases++;return 0;
+  assert((uint64_t)offset==base && n==window_size && moved==total);
+  assert(completions==2 && file_closed);releases++;return 0;
 }
 static int close_fake(endpoint e) {return close_result;}
 static int recv_fake(endpoint e,void *p,int n,int flags) {errno=ECONNRESET;return -1;}
@@ -139,13 +141,16 @@ static int stat_fake(int fd,struct stat *s) {s->st_mode=S_IFREG;s->st_size=total
 static void exact_fake(void *p,size_t n,int send) {
   if(n==8 && !send)memcpy(p,&peer,8);
 }
+static void token_fake(char c,int send) {
+  if(c=='V') {assert(moved==total && file_closed);completions++;}
+}
 #define open(...) 7
-#define close_file_fake(...) 0
+#define close_file_fake(...) (file_closed=1,0)
 #define read_file_fake(...) 0
 #define fstat stat_fake
 #define connect_transport(...) (opened=1)
 #define exact exact_fake
-#define token(...) ((void)0)
+#define token token_fake
 #define file_io(fd,p,n,w) (moved+=(n))
 '''
         main = r'''
@@ -178,6 +183,12 @@ int main(int argc,char **argv) {
                         result = subprocess.run([str(exe), str(size), str(peer), str(sender)],
                                                 env=build.ENV, capture_output=True, text=True)
                         self.assertEqual(result.returncode, 0, (size, peer, sender, result.stderr))
+                        row = json.loads(result.stderr)
+                        self.assertEqual(set(row), {"file_complete", "bytes", "cleanup_confirmed",
+                                                    "seconds", "wall_seconds", "io_seconds"})
+                        self.assertEqual(row["bytes"], size)
+                        self.assertIs(row["file_complete"], True)
+                        self.assertGreaterEqual(row["wall_seconds"], row["io_seconds"])
             for peer in (4097, (1 << 63) - 4096, 1 << 63):
                 result = subprocess.run([str(exe), "1073741824", str(peer), "0"],
                                         env=build.ENV, capture_output=True, text=True)
@@ -266,6 +277,8 @@ int main(int argc,char **argv) {
         self.assertEqual(receipt["seconds"], 2.0)
         self.assertAlmostEqual(receipt["mib_per_second"], len(self.data) / MIB / 2)
         self.assertIs(receipt["file_complete"], True)
+        self.assertEqual(set(receipt), {"method", "bytes", "seconds", "file_complete", "fallback",
+                                       "mib_per_second", "publish_seconds", "wall_seconds"})
         self.assertEqual(receipt["fallback"], fallback)
         self.assertEqual(self.visible[DESTINATION], self.data)
 

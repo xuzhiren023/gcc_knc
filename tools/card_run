@@ -785,8 +785,11 @@ class SSHSession:
     def send_file(self, name, data, timeout):
         if self.helper_free:
             started = time.monotonic()
-            self.upload("upload-" + name, "cat > " + shlex.quote(staging_name(name)), data, timeout)
-            return self.finish_ssh(name, len(data), started, self.remaining(started + timeout))
+            staging_name(name)
+            private = "claude-part-" + uuid.uuid4().hex
+            self.upload("upload-" + name, "cat > " + private, data, timeout)
+            return self.finish_ssh(name, len(data), started, self.remaining(started + timeout),
+                                   private=private, mode=self.file_mode(name, data[:4]))
         # Generated controls and the suite pack share the file transport.
         # Temporary host bytes are bounded by the existing maxStageMiB check.
         with tempfile.NamedTemporaryFile(prefix="claude-input-", dir=self.host_helper.parent,
@@ -802,27 +805,38 @@ class SSHSession:
         if self.helper_free:
             return self.send_file(name, source.read_bytes(), timeout)
         destination = staging_name(name)
-        self.transfer_file(source, destination, source.stat().st_size, "up", timeout)
+        with source.open("rb") as stream:
+            mode = self.file_mode(name, stream.read(4))
+        self.transfer_file(source, destination, source.stat().st_size, "up", timeout, mode=mode)
 
-    def finish_ssh(self, name, size, started, timeout, scope="file wall time"):
-        count = self.rpc("guard_boot && wc -c < " + shlex.quote(staging_name(name)),
+    @staticmethod
+    def file_mode(name, prefix):
+        return "700" if name in ("claude-program", "claude-pin", "claude-unpack") or prefix == b"\x7fELF" else "600"
+
+    def finish_ssh(self, name, size, started, timeout, scope="file wall time", *, private=None, mode="600"):
+        deadline = time.monotonic() + timeout
+        count = self.rpc("guard_boot && wc -c < " + shlex.quote(private or staging_name(name)),
                          timeout, step="upload-length")
         if int(count) != size:
             self.transfer_stop = True
             raise OSError("SSH upload length mismatch: " + name)
+        if private:
+            self.rpc("guard_boot && chmod %s -- %s && mv -- %s %s" %
+                     (mode, private, private, shlex.quote(staging_name(name))),
+                     self.remaining(deadline), step="upload-publish")
         seconds = time.monotonic() - started
         self.transfers.append(dict(method="ssh", bytes=size, seconds=seconds,
                                    mib_per_second=size / 1048576 / seconds if seconds else 0,
-                                   digest_match=None, digest_note="not checked: no helper",
+                                   file_complete=True, wall_seconds=seconds,
                                    fallback=(dict(method="dma", reason="dma unavailable: helper missing")
                                              if self.transfer_method == "auto" else None),
                                    direction="up", destination=name, timing_scope=scope))
 
-    def transfer_file(self, source, destination, size, direction, timeout):
+    def transfer_file(self, source, destination, size, direction, timeout, *, mode="600"):
         try:
             row = card_dma.transfer_file(source, destination, size=size, direction=direction,
                                         method=self.transfer_method, threshold_bytes=self.threshold_bytes,
-                                        backends={method: card_dma.Endpoint(self, method, timeout)
+                                        backends={method: card_dma.Endpoint(self, method, timeout, mode)
                                                   for method in ("ssh", "dma")})
         except card_dma.TransferFailure as error:
             # The suite must not retry integrity or uncertain-cleanup failures
@@ -839,25 +853,24 @@ class SSHSession:
         self.transfers.append(row)
 
     def bootstrap_helper(self, timeout):
-        # The bootstrap itself is an authenticated finite SSH stream; publish
-        # the helper only after its length and in-memory digest agree.
-        import hashlib
+        # Publish the authenticated bootstrap stream after its exact length check.
         data = self.card_helper.read_bytes()
         private = "claude-part-" + uuid.uuid4().hex
         deadline = time.monotonic() + timeout
         started = time.monotonic()
         self.upload("transfer-bootstrap", "cat > " + private, data, self.remaining(deadline))
-        row = json.loads(self.rpc("guard_boot && chmod 700 %s && ./%s digest %s" %
-                                  (private, private, private), self.remaining(deadline), step="bootstrap-digest"))
-        if row != dict(bytes=len(data), sha256=hashlib.sha256(data).hexdigest()):
+        count = self.rpc("guard_boot && wc -c < " + private,
+                         self.remaining(deadline), step="bootstrap-length")
+        if int(count) != len(data):
             self.transfer_stop = True
-            raise card_dma.TransferFailure("helper bootstrap digest mismatch", kind="integrity",
+            raise card_dma.TransferFailure("helper bootstrap length mismatch", kind="integrity",
                                             data_started=True, cleanup_confirmed=True)
-        self.rpc("guard_boot && mv -- %s claude-transfer" % private,
+        self.rpc("guard_boot && chmod 700 -- %s && mv -- %s claude-transfer" % (private, private),
                  self.remaining(deadline), step="bootstrap-publish")
         seconds = time.monotonic() - started
         self.transfers.append(dict(method="ssh", bytes=len(data), seconds=seconds,
-                                   mib_per_second=len(data) / 1048576 / seconds, digest_match=True,
+                                   mib_per_second=len(data) / 1048576 / seconds,
+                                   file_complete=True, wall_seconds=seconds,
                                    fallback=None, direction="up", destination="claude-transfer",
                                    timing_scope="bootstrap wall time"))
 

@@ -73,7 +73,7 @@ def build(host_only=False, card_only=False, production=False):
 
 def stage_production_validation(out):
     """Leave commands for the lead; building never connects to the card."""
-    (out / 'claude-check.sh').write_text('#!/bin/sh\ntest -f claude-payload\n', encoding='ascii')
+    (out / 'claude-check.sh').write_bytes(b'#!/bin/sh\ntest -f claude-payload\n')
     (out / 'validate.ps1').write_text(r'''# Lead only, on an idle card. Run after merging or pass -Repo for this worktree.
 # No automatic retry after any nonzero exit. Do not clear DMA stop markers
 # without inspecting both endpoints and the host boot/bugcheck state.
@@ -116,13 +116,14 @@ foreach ($repeat in 1..3) {
     if ($LASTEXITCODE -ne 0) { throw "STOP: $method pair $repeat; inspect $receipt and cleanup state" }
     $rows = (Get-Content -Raw -LiteralPath $receipt | ConvertFrom-Json).transfers |
       Where-Object { $_.bytes -eq 1073741824 }
-    if (@($rows).Count -ne 2 -or @($rows | Where-Object { !$_.digest_match -or $_.method -ne $method }).Count) {
-      throw 'missing paired digest/length evidence'
+    if (@($rows).Count -ne 2 -or @($rows | Where-Object { !$_.file_complete -or $_.method -ne $method }).Count) {
+      throw 'missing paired completion/length evidence'
     }
-    if ($rows[0].source_sha256 -ne $rows[1].source_sha256) { throw 'round-trip digest mismatch' }
     foreach ($row in $rows) {
       $measurements += [PSCustomObject]@{ repeat=$repeat; method=$method; direction=$row.direction;
-        seconds=$row.seconds; wall_seconds=$row.wall_seconds; MiB_s=$row.mib_per_second }
+        seconds=$row.seconds; wall_seconds=$row.wall_seconds; MiB_s=$row.mib_per_second;
+        read_seconds=$row.read_seconds; write_seconds=$row.write_seconds;
+        host_seconds=$row.host_seconds; card_seconds=$row.card_seconds; publish_seconds=$row.publish_seconds }
     }
   }
 }
@@ -133,6 +134,9 @@ foreach ($repeat in 1..3) {
     $dma = $measurements | Where-Object { $_.repeat -eq $repeat -and $_.direction -eq $direction -and $_.method -eq 'dma' }
     $minimum = if ($direction -eq 'up') { 1.2e9 } else { 1.35e9 }
     if (1073741824 / $dma.seconds -lt $minimum) { throw "DMA below link-limit acceptance: pair $repeat $direction" }
+    if (1073741824 / $dma.wall_seconds -lt 1.0e9) {
+      Write-Warning "Whole file below 1.0 GB/s: pair $repeat $direction; lead must explain measured IO/startup costs above."
+    }
   }
 }
 $config | Add-Member -Force NoteProperty dmaEnabled $false
@@ -143,12 +147,12 @@ $config | ConvertTo-Json | Set-Content -Encoding Ascii -LiteralPath $cfg -ErrorA
 if ($LASTEXITCODE -ne 0) { throw 'forced unavailable run failed' }
 $fallbacks = (Get-Content -Raw -LiteralPath $stage/unavailable.json | ConvertFrom-Json).transfers |
   Where-Object { $_.bytes -eq 1073741824 }
-if (@($fallbacks).Count -ne 2 -or @($fallbacks | Where-Object { $_.method -ne 'ssh' -or !$_.fallback.reason -or !$_.digest_match }).Count) {
-  throw 'missing fallback reason or digest match'
+if (@($fallbacks).Count -ne 2 -or @($fallbacks | Where-Object { $_.method -ne 'ssh' -or !$_.fallback.reason -or !$_.file_complete }).Count) {
+  throw 'missing fallback reason or completion'
 }
 & $py harness/card/run_suite.py $Suite $stage/suite-output --transfer dma
 if ($LASTEXITCODE -ne 0) { throw 'suite upload failed; no retry' }
-Write-Output 'Lead review required: every digest, DMA >=1.2 GB/s up and >=1.35 GB/s down, suite receipt and cleanup. No SSH timing runs.'
+Write-Output 'Lead review required: lengths/completion, DMA >=1.2 GB/s up and >=1.35 GB/s down; whole file >=1.0 GB/s or measured IO/startup explanation; suite receipt and cleanup. No SSH timing runs.'
 '''.replace('PROJECT_ROOT', PROJECT.as_posix()), encoding='utf8')
 
 

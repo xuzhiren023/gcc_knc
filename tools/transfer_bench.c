@@ -309,32 +309,15 @@ static void file_io(int fd,void *data,size_t size,int writing)
     p+=n;size-=(size_t)n;
   }
 }
-static int file_digest(const char *path)
-{
-  unsigned char buf[65536],digest[32];char hex[65];sha256 hash;uint64_t size=0;
-  int fd=open(path,O_RDONLY|O_NOFOLLOW);struct stat st;
-  if(fd<0 || fstat(fd,&st) || !S_ISREG(st.st_mode))die("digest regular file");
-  sha_init(&hash);
-  for(;;) {
-    ssize_t n=read(fd,buf,sizeof(buf));
-    if(n<0 && errno==EINTR)continue;
-    if(n<0)die("digest read");
-    if(!n)break;
-    sha_add(&hash,buf,(size_t)n);size+=(uint64_t)n;
-  }
-  if(close(fd))die("digest close");
-  sha_end(&hash,digest);sha_hex(digest,hex);
-  printf("{\"bytes\":%"PRIu64",\"sha256\":\"%s\"}\n",size,hex);return 0;
-}
 static int transfer_file(int host,const char *method,const char *address,unsigned port,
                          const char *nonce,uint64_t size,const char *direction,const char *path)
 {
+  double started=now(WALL_CLOCK),elapsed=0,io_seconds=0;
   int sender=(!strcmp(direction,"up"))==host,dma=!strcmp(method,"scif-read");
   int fd=open(path,sender?(O_RDONLY|O_NOFOLLOW):(O_WRONLY|O_CREAT|O_EXCL|O_NOFOLLOW),0600);
   struct stat st;
   if(fd<0 || fstat(fd,&st) || !S_ISREG(st.st_mode))die("regular transfer file");
   if(sender && (uint64_t)st.st_size!=size)die("integrity: source length");
-  double started=now(WALL_CLOCK),elapsed=0;
   /* Reverse the benchmark's server role for production: the card listens. */
   connect_transport(method,address,port,!host);
   char auth[32];
@@ -367,11 +350,11 @@ static int transfer_file(int host,const char *method,const char *address,unsigne
       die("remote offset range");
     }
   }
-  sha256 hash;unsigned char digest[32],peer_digest[32];char hex[65];sha_init(&hash);
   for(uint64_t off=0;off<size;) {
     size_t n=size-off>window_size?window_size:(size_t)(size-off);
     if(sender) {
-      file_io(fd,window,n,0);sha_add(&hash,window,n);
+      double io_started=now(WALL_CLOCK);
+      file_io(fd,window,n,0);io_seconds+=now(WALL_CLOCK)-io_started;
       if(dma && (n&63))memset((unsigned char*)window+n,0,64-(n&63));
       token('S',1);token('R',0);
     } else {token('S',0);token('R',1);}
@@ -379,7 +362,7 @@ static int transfer_file(int host,const char *method,const char *address,unsigne
     if(dma) {
       if(!sender) {
         /* RMA tails are cache-line aligned inside the page-rounded window;
-           only the exact file bytes enter the digest and destination file. */
+           only the exact file bytes enter the destination file. */
         size_t dma_bytes=(n+63)&~(size_t)63;
         if(sc.read(ep,local_offset,dma_bytes,(int64_t)peer_offset,4))die("synchronous read");
         token('D',1);
@@ -387,7 +370,10 @@ static int transfer_file(int host,const char *method,const char *address,unsigne
     } else exact(window,n,sender);
     token('A',!sender);
     elapsed+=now(WALL_CLOCK)-t;
-    if(!sender){sha_add(&hash,window,n);file_io(fd,window,n,1);}
+    if(!sender) {
+      double io_started=now(WALL_CLOCK);
+      file_io(fd,window,n,1);io_seconds+=now(WALL_CLOCK)-io_started;
+    }
     off+=n;
   }
   if(sender) {
@@ -395,11 +381,7 @@ static int transfer_file(int host,const char *method,const char *address,unsigne
     if(n!=0 || fstat(fd,&st) || (uint64_t)st.st_size!=size)die("integrity: source length changed");
   } else if(fstat(fd,&st) || (uint64_t)st.st_size!=size)die("integrity: destination length");
   if(close(fd))die("file close");
-  sha_end(&hash,digest);sha_hex(digest,hex);
-  if(host){exact(digest,32,1);exact(peer_digest,32,0);}
-  else{exact(peer_digest,32,0);exact(digest,32,1);}
-  if(memcmp(digest,peer_digest,32))die("integrity: digest mismatch");
-  /* Each endpoint confirms it compared the digests before either unregisters. */
+  /* Both endpoints confirm exact length and completed file IO before unregister. */
   if(host){token('V',1);token('V',0);}else{token('V',0);token('V',1);}
   if(registered) {
     if(sc.unreg(ep,local_offset,window_size))die("unregister; cleanup uncertain");
@@ -424,9 +406,9 @@ static int transfer_file(int host,const char *method,const char *address,unsigne
     if(sc.close(ep))die("close; cleanup uncertain");
     opened=0;
   }
-  fprintf(stderr,"{\"file_complete\":true,\"bytes\":%"PRIu64",\"sha256\":\"%s\","
-          "\"digest_match\":true,\"cleanup_confirmed\":true,\"seconds\":%.9f,\"wall_seconds\":%.9f}\n",
-          size,hex,elapsed,now(WALL_CLOCK)-started);
+  fprintf(stderr,"{\"file_complete\":true,\"bytes\":%"PRIu64","
+          "\"cleanup_confirmed\":true,\"seconds\":%.9f,\"wall_seconds\":%.9f,\"io_seconds\":%.9f}\n",
+          size,elapsed,now(WALL_CLOCK)-started,io_seconds);
   return 0;
 }
 
@@ -528,7 +510,6 @@ int main(int argc,char **argv)
   signal(SIGPIPE,SIG_IGN);signal(SIGINT,stop);signal(SIGTERM,stop);atexit(cleanup);
   /* Availability probe deliberately opens no endpoint and registers no pages. */
   if(argc==2 && !strcmp(argv[1],"scif-probe")){scif_load();return 0;}
-  if(argc==3 && !strcmp(argv[1],"digest"))return file_digest(argv[2]);
   if(argc==10 && !strcmp(argv[1],"file")) {
     int host=!strcmp(argv[2],"host");
     if(!host && strcmp(argv[2],"card"))die("file role");

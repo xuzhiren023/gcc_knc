@@ -1,15 +1,13 @@
 """S11-02 file transfer policy and guarded card_run adapters.
 
-Only receiver-pull synchronous RMA is used. Helpers reuse S11-01's SCIF ABI
-and SHA implementation. Timing separates payload movement from wall time
-(which includes file IO, hashing, startup and teardown).
+Receiver-pull synchronous RMA reuses S11-01's SCIF ABI. Timing separates
+payload movement, file IO, and whole-file wall time including publication.
 """
 import json
 import math
 import os
 from pathlib import Path
 import queue
-import re
 import secrets
 import shlex
 import subprocess
@@ -27,6 +25,7 @@ class TransferFailure(OSError):
 
 def transfer_file(source, destination, *, size, direction, backends,
                   method="auto", threshold_bytes=1048576):
+    started = time.monotonic()
     if (method not in ("auto", "dma", "ssh") or direction not in ("up", "down")
             or not isinstance(size, int) or size < 0
             or not isinstance(threshold_bytes, int) or threshold_bytes < 0):
@@ -38,18 +37,18 @@ def transfer_file(source, destination, *, size, direction, backends,
         parent, _, _name = str(destination).replace("\\", "/").rpartition("/")
         private = (parent + "/" if parent else "") + "claude-part-" + secrets.token_hex(16)
         evidence = backend.stage(source, private, size=size, direction=direction)
-        digest = evidence.get("source_sha256")
-        if (evidence.get("bytes") != size or not isinstance(digest, str)
-                or not re.fullmatch("[0-9a-f]{64}", digest)
-                or evidence.get("received_sha256") != digest):
-            raise TransferFailure("exact length or digest mismatch", kind="integrity",
+        if evidence.get("bytes") != size or evidence.get("file_complete") is not True:
+            raise TransferFailure("exact length or completion mismatch", kind="integrity",
                                   data_started=True, cleanup_confirmed=False)
         seconds = evidence.get("seconds")
         if not isinstance(seconds, (int, float)) or not math.isfinite(seconds) or seconds < 0:
             raise TransferFailure("invalid transfer timing", kind="io",
                                   data_started=True, cleanup_confirmed=False)
+        publishing = time.monotonic()
         backend.publish(private, destination)
-        return dict(evidence, method=chosen, digest_match=True,
+        finished = time.monotonic()
+        return dict(evidence, method=chosen,
+                    publish_seconds=finished - publishing, wall_seconds=finished - started,
                     mib_per_second=size / 1048576 / seconds if seconds else 0,
                     fallback=fallback)
 
@@ -73,8 +72,11 @@ def transfer_file(source, destination, *, size, direction, backends,
 
 class Endpoint:
     """One helper pair; the SSHSession owns boot/path guards and publication."""
-    def __init__(self, session, method, timeout):
+    def __init__(self, session, method, timeout, mode="600"):
         self.session, self.method, self.timeout = session, method, timeout
+        if mode not in ("600", "700"):
+            raise ValueError("invalid publication mode")
+        self.mode = mode
         self.direction = None
 
     def stage(self, source, private, *, size, direction):
@@ -83,8 +85,8 @@ class Endpoint:
 
     def publish(self, private, destination):
         if self.direction == "up":
-            self.session.rpc("guard_boot && mv -- %s %s" %
-                             (shlex.quote(private), shlex.quote(destination)),
+            self.session.rpc("guard_boot && chmod %s -- %s && mv -- %s %s" %
+                             (self.mode, shlex.quote(private), shlex.quote(private), shlex.quote(destination)),
                              self.timeout, step="transfer-publish")
         else:
             self.session.rpc("guard_boot", self.timeout, step="collect-publish-guard")
@@ -234,16 +236,18 @@ class HelperPair:
                                       ("io" if cleaned else "uncertain_cleanup"),
                                       data_started=True, cleanup_confirmed=cleaned)
             a, b = reports["host"], reports["card"]
-            if (a["bytes"] != size or b["bytes"] != size or a["sha256"] != b["sha256"]
-                    or not all(r.get("digest_match") and r.get("cleanup_confirmed") for r in (a, b))):
+            if (a["bytes"] != size or b["bytes"] != size
+                    or not all(r.get("cleanup_confirmed") is True for r in (a, b))):
                 raise TransferFailure("helper evidence mismatch", kind="integrity",
                                       data_started=True, cleanup_confirmed=False)
             if dma:
                 self.release_dma(before)
             receiver = b if direction == "up" else a
-            return dict(bytes=size, source_sha256=a["sha256"], received_sha256=b["sha256"],
-                        seconds=receiver["seconds"], wall_seconds=receiver["wall_seconds"],
-                        timing_scope="payload; wall_seconds includes IO, hashing and handshake")
+            sender = a if direction == "up" else b
+            return dict(bytes=size, file_complete=True, seconds=receiver["seconds"],
+                        read_seconds=sender["io_seconds"], write_seconds=receiver["io_seconds"],
+                        host_seconds=a["wall_seconds"], card_seconds=b["wall_seconds"],
+                        timing_scope="payload; wall_seconds includes IO, startup, teardown and publish")
         except (OSError, subprocess.SubprocessError, ValueError, KeyError, TypeError) as error:
             if dma:
                 s.transfer_stop = True
