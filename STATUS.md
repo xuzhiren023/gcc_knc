@@ -2,7 +2,7 @@
 
 Updated automatically at every ticket change. Last update: 2026-11-12 19:59.
 
-**Next: the tech lead, on S11-21.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: the tech lead, on S12-02.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[###################-]` 199 of 205
 
@@ -72,7 +72,7 @@ Current tickets: `[###################-]` 199 of 205
 | S11-18 | M4 corpus harness v2 - card profiles, prefix record, held-out sealing, stronger checks, and the donor-failure rule | Done | The M4 corpus harness now stages all 17 programs for the 7120 and the 3100/5100 profiles with serial voting... |
 | S11-19 | Second senior review - the M4 definition and the Sprint 11-13 roadmap, adjusted | Done | The M4 definition and the Sprint 11-13 roadmap are rewritten as measure, improve, decide, each sprint with ... |
 | S11-20 | Research - which compiler optimizations benefit the widest range of real code on KNC, from professional to amateur, and does our corpus cover it? | Done | We now have a code-style coverage study (docs/research/code-style-coverage.md) that ranks Sprint 12 candida... |
-| S11-21 | Exploratory WRF build with GCC-KNC (learn-only, host-side) - how far does an unmodified WRF get, and what breaks? | Question for the tech lead | 1aacb570: C install passed with relative MKDIR_P. Two failures: absolute install, then Fortran. Repro under... |
+| S11-21 | Exploratory WRF build with GCC-KNC (learn-only, host-side) - how far does an unmodified WRF get, and what breaks? | In progress | Yes, patch the copied 4.6.1 source; no new release. Root cause (from your config.log and configure.ac:558-5... |
 | S12-01 | Sprint 12 prep - static code-quality census of the development-corpus builds (spills, x87/vector transfers, addressing, calls, code size) | Done | A static code-quality census (spill/reload proxies, x87 and x87-zmm traffic, address arithmetic, calls, bra... |
 | S12-02 | Sprint 12 prep - the unscored generality check set (S11-20's six programs in the code styles our corpus lacks) | Question for the tech lead | Stopping after two failed host attempts per AGENTS.md. Red committed: 7e8836e0. Cygwin infinity() conflicts... |
 | S2-01 | Design for zmm and mask registers under -march=knc | Done | The register design for KNC is settled on paper: all 32 zmm and 8 mask registers become usable under -march... |
@@ -231,13 +231,13 @@ Current tickets: `[###################-]` 199 of 205
 ## Recent activity
 
 - 2026-11-12 19:59 **S12-01** lead approve: A static code-quality census (spill/reload proxies, x87 and x87-zmm traffic, address arithmetic, calls, branches, code size, vector share) now cove...
+- 2026-11-12 19:59 **S11-21** lead answer: Yes, patch the copied 4.6.1 source; no new release. Root cause (from your config.log and configure.ac:558-571): 4.6.1 sets USE_NETCDF4 only when ne...
 - 2026-11-12 19:50 **S12-02** lead note: Ready. Owner approved the downloads 2026-11-12. Staged in .work/_shared/genset/src/ (1.5 MB, outside git): raytracing-v4.0.2/ (src/InOneWeekend/*.h...
 - 2026-11-12 19:48 **S12-02** engineer ask: Stopping after two failed host attempts per AGENTS.md. Red committed: 7e8836e0. Cygwin infinity() conflicts with rtweekend.h infinity constant. Dri...
 - 2026-11-12 19:48 **S12-01** engineer submit: Acceptance completed at a98d26a0 after red-first 0ede0d44; clarification cec7193c explicitly states SQLite D is -O3. Report counts whole executable...
 - 2026-11-12 19:48 **S11-21** engineer ask: 1aacb570: C install passed with relative MKDIR_P. Two failures: absolute install, then Fortran. Repro under trial-env.sh: make -C ../_shared/wrf-tr...
 - 2026-11-12 19:46 **S12-01** lead answer: Size approved, do not split: 334 of the 819 lines are the generated report, and a 400-line tool plus an 85-line test is right for a research census...
 - 2026-11-12 19:45 **S12-01** engineer ask: Acceptance work is committed at a98d26a0 after red-first 0ede0d44. Submit refused: 819 changed lines exceed the 500-line budget. May the lead appro...
-- 2026-11-12 19:41 **S11-21** lead answer: The lead created the install tree (.work/_shared/wrf-trial/install/{include,lib,lib/pkgconfig,bin,share/man/man1,man3,man5,share/doc,share/netcdf,l...
 
 ## Cost
 
