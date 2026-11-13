@@ -62,9 +62,10 @@ python tools/run.py --name S11-21-netcdf-c-make --inputs ../_shared/wrf-trial/tr
 ## Stage reached and blockers
 
 **Stage 2 complete: both dependency libraries are built and installed, and
-`nf_create`/`nf90_create` now link. Stage 3 is blocked by an incomplete
-lead-supplied WRF source export: only physics submodule directories are
-present, and the root `configure` file is absent.** The installed static archives are
+`nf_create`/`nf90_create` now link. The lead completed the WRF export.
+Stage 3 generated a serial, no-nesting GCC-KNC configuration, but its RPC
+configure probe tried to execute a target binary on Windows. Configuration
+needs that probe resolved before the em_real build starts.** The installed static archives are
 `install/lib/libnetcdf.a` (1,770,676 bytes) and `libnetcdff.a` (1,561,006 bytes).
 Both use GCC-KNC 16.2.0 at `-O2 -march=knc`. Fortran needed the classic-path
 patch below. Installed module verification passed in the preceding session
@@ -321,6 +322,70 @@ The first E7-20 work package below must first complete the main WRF export;
 the seven submodule directories alone are insufficient. Compiler override
 selection, static-runtime WRF link flags, and hot-loop reports remain
 pending actual WRF configuration and compilation.
+
+### Continuation after the corrected main export
+
+The lead's 20:42 answer and `src/PROVENANCE-WRF.md` correction supersede
+the incomplete-export blocker above. No dependency test was repeated.
+`configure-wrf.py` added a serial Linux k1om entry derived from upstream's
+GNU Linux entry. Target C and Fortran use GCC-KNC; `CC_TOOLS=gcc` selects
+Cygwin host utilities. Flags are `-O2 -march=knc`, static GCC/Fortran runtime
+link options and `-fopt-info-vec` for optimized Fortran. No fast math.
+
+`src/patches/wrf-4.8.0-knc-cross.patch` retains the architecture addition and
+a cross-configuration patch. Upstream `configure:700-717` executes a program
+compiled with bare host `gfortran` to select compatibility flags. The patch
+queries the selected cross compiler with `-dumpversion` instead, preserving
+the upstream major-version-greater-than-nine condition. Generated `FCCOMPAT`
+contains `-fallow-argument-mismatch` and `-fallow-invalid-boz`. These are WRF's
+existing compatibility choices, not observed scientific-source failures.
+
+`wrf-configure.sh` runs through `trial-env.sh`, selects `-os Linux -mach k1om`,
+compiler 1 and nesting 0. `NETCDF_classic=1` disables HDF5 features, and
+`NETCDF_LDFLAGS` selects the installed archives plus `-lm -ldl`, without C++.
+Inspection found no MSYSTEM/MINGW test in WRF configure. The wrapper continues
+to unset all four variables. MPI and OpenMP are disabled.
+
+Two failed attempts require a ticket handoff under AGENTS.md:
+
+1. Preparation initially used `Path.write_text(newline=...)`, unsupported by
+   the Windows Python version. It failed before modifying WRF. Using
+   `Path.open(..., newline=...)` fixed it. Classification: host tooling.
+2. Configure returned zero and the wrapper printed PASS, but log lines 93-94
+   report that `tools/rpc_test.exe` cannot execute on Windows, followed by an
+   empty shell comparison. Classification: **cross-configuration**.
+   `configure:1031` executes a target program to distinguish RPC header
+   families. `tools/rpc_test.c` checks `_RPC_TYPES_H` and `_TIRPC_TYPES_H`.
+   Generated `CFLAGS_LOCAL` has no `RPC_TYPES`: the following sed also assumes
+   a comment marker absent from the custom entry. Proposed next action:
+   identify the target header family by preprocessing, set `RPC_TYPES`
+   explicitly, and replace the execution probe with that compile-time answer
+   in the retained patch. This fix is **not applied or tested**. The reduced
+   reproducer is the command substitution at `configure:1031`; the target
+   executable need not be run again on Windows.
+
+No WRF scientific source changed. No ICE or assembler defect occurred; no
+compiler reproducer is applicable. No em_real compilation, WRF link, hot-loop
+report or card run occurred. Configuration took **0.2 minute**, including its
+compile/link probes. Logical trial size before this update: **532,862,730
+bytes** in 10,221 files (532.9 MB decimal), below 25 GB. Nothing was deleted.
+
+Configuration command:
+
+```text
+python tools/run.py --name S11-21-wrf-configure --inputs ../_shared/wrf-trial/trial-env.sh ../_shared/wrf-trial/wrf-configure.sh ../_shared/wrf-trial/src/patches/wrf-4.8.0-knc-cross.patch -- C:/Users/xuzhi/Documents/PhiWeather/.tools/knc-bootstrap/cygwin/bin/bash.exe ../_shared/wrf-trial/trial-env.sh bash ../_shared/wrf-trial/wrf-configure.sh
+```
+
+Log: `.work/_state/logs/S11_21_wrf_configure-20261112-204658.log`.
+Read-only inspection log: `S11_21_wrf_config_inspect-20261112-204505.log`.
+The hook required the initial combined inspection to use the wrapper and
+rejected a broad log read; subsequent reads used targeted searches.
+
+E7-20 plan update: work package 1 below now starts from the complete export,
+not a new export request. Its remaining work is the RPC cross-probe correction
+and making configure diagnostics fail the wrapper. Host/target tool selection,
+static runtime flags and classic netCDF configuration are established. Other
+work packages and effort estimates remain pending the serial build.
 
 ## Vectorization
 
