@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-13 16:54.
+Updated automatically at every ticket change. Last update: 2026-11-13 16:58.
 
-**Next: GPT-6.1, on S11-02 (card_run and run_suite move bulk data by SCIF DMA at the PCIe link limit, with the SSH stream as fallback).** Run `python tools/dispatch.py`, or ask the tech lead to.
+**Next: the tech lead, on S11-27.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[###################-]` 205 of 213
 
@@ -78,7 +78,7 @@ Current tickets: `[###################-]` 205 of 213
 | S11-24 | WRF OpenMP (smpar) build with GCC-KNC at -mphinix, for PhiWeather's benchmark - replaces the serial trial build | Done | WRF v4.8.0 now builds as an OpenMP card binary at -mphinix with GCC-KNC (wrf.exe and real.exe linked, needi... |
 | S11-25 | ICE in do_store_flag (expr.cc) on WRF's surface layer (SFCLAY1D) at -O2 -march=knc | Done | The last WRF file that crashed GCC-KNC (surface layer, SFCLAY1D) now compiles: vector 'ordered and not equa... |
 | S11-26 | WRF OpenMP build at -mphinix with no per-file workarounds (S11-23 and S11-25 fixed), restaged for PhiWeather | draft | Owner 2026-11-13: the S11-24 WRF build is removed. Deleted: |
-| S11-27 | Wrong code - NPB-MG (class A, serial) built by GCC-KNC at -O2 -march=knc fails NPB verification on the card | In progress | Do not use t1-fix2: the lead's check created it and its ACL is not yours, and the lead does not change ACLs... |
+| S11-27 | Wrong code - NPB-MG (class A, serial) built by GCC-KNC at -O2 -march=knc fails NPB verification on the card | Question for the tech lead | GCC build needed at e0bc456a11e (lane gcc). Persistent O1/O2 TI/TF dumps show pair loads recognized as stor... |
 | S11-28 | HPCG run that fits every card model - fixed work instead of fixed duration, grid sized to the 3100's memory | lead | After S11-29 merges (still ready): run .work/_shared/S11-28/lead-pilot.ps1 at 242936bf+ (30 exclusive timed... |
 | S11-29 | card_run profiles limit memory in use, not address space, so a 3100 or 5100 run fails only where the real card would | Not started | Dependency on S11-02 removed, so the HPCG chain (S11-29, then S11-28) does not wait on the DMA debugging. B... |
 | S12-01 | Sprint 12 prep - static code-quality census of the development-corpus builds (spills, x87/vector transfers, addressing, calls, code size) | Done | A static code-quality census (spill/reload proxies, x87 and x87-zmm traffic, address arithmetic, calls, bra... |
@@ -238,6 +238,7 @@ Current tickets: `[###################-]` 205 of 213
 
 ## Recent activity
 
+- 2026-11-13 16:58 **S11-27** engineer ask: GCC build needed at e0bc456a11e (lane gcc). Persistent O1/O2 TI/TF dumps show pair loads recognized as stores: TI insn 42 creates NO_REGS r122, ALL...
 - 2026-11-13 16:54 **S11-17** lead answer: zlib evaluation done at ce3d9920, 2026-11-13. Every launch passed CORPUS_CHECK. Host was loaded (PhiWeather downloads and WPS, lead builds); timing...
 - 2026-11-13 16:53 **S11-27** lead answer: Do not use t1-fix2: the lead's check created it and its ACL is not yours, and the lead does not change ACLs. Write the dumps to a directory you cre...
 - 2026-11-13 16:53 **S11-17** lead resume: Lead finished the zlib evaluation at 16:55 EST.
@@ -245,16 +246,15 @@ Current tickets: `[###################-]` 205 of 213
 - 2026-11-13 16:50 **S11-27** lead note: Correction: the check deleted its temporary directory, so .work/_shared/S11-27/t1-fix2 is empty. Regenerate the dumps with the lane-gcc build at b5...
 - 2026-11-13 16:47 **S11-27** lead answer: Built b56d5090c86 (PASS, 13.0 min). Targeted T1 on the new build:
 - 2026-11-13 16:46 **S11-27** lead resume: Lead built b56d5090c86 and ran targeted T1: TI/TF ICE persists.
-- 2026-11-13 16:45 **S11-02** lead note: Legacy latch released per validate.ps1 recovery steps:
 
 ## Cost
 
 - From the script, engineer: 540 sessions, 1102.7M input tokens
 - From the script, lead: 356 sessions, 99.5M input tokens
-- Started by hand, Claude: 12 sessions, 3007.8M input tokens
+- Started by hand, Claude: 12 sessions, 3009.0M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 27.5 GiB of 100 GiB. 203 GiB free on the drive.
+The project uses 27.5 GiB of 100 GiB. 201 GiB free on the drive.
