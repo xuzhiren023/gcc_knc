@@ -2,7 +2,7 @@
 
 Updated automatically at every ticket change. Last update: 2026-11-13 15:09.
 
-**Next: the tech lead, on S11-27.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: GPT-6.1, on S11-27 (Wrong code - NPB-MG (class A, serial) built by GCC-KNC at -O2 -march=knc fails NPB verification on the card).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
 Current tickets: `[###################-]` 205 of 213
 
@@ -78,7 +78,7 @@ Current tickets: `[###################-]` 205 of 213
 | S11-24 | WRF OpenMP (smpar) build with GCC-KNC at -mphinix, for PhiWeather's benchmark - replaces the serial trial build | Done | WRF v4.8.0 now builds as an OpenMP card binary at -mphinix with GCC-KNC (wrf.exe and real.exe linked, needi... |
 | S11-25 | ICE in do_store_flag (expr.cc) on WRF's surface layer (SFCLAY1D) at -O2 -march=knc | Done | The last WRF file that crashed GCC-KNC (surface layer, SFCLAY1D) now compiles: vector 'ordered and not equa... |
 | S11-26 | WRF OpenMP build at -mphinix with no per-file workarounds (S11-23 and S11-25 fixed), restaged for PhiWeather | draft | Owner 2026-11-13: the S11-24 WRF build is removed. Deleted: |
-| S11-27 | Wrong code - NPB-MG (class A, serial) built by GCC-KNC at -O2 -march=knc fails NPB verification on the card | Question for the tech lead | Lead ran narrow-card.py at 15:15 EST: results in the answer. |
+| S11-27 | Wrong code - NPB-MG (class A, serial) built by GCC-KNC at -O2 -march=knc fails NPB verification on the card | In progress | Narrowing round at ebc62958, 2026-11-13 15:15 EST: card_run exit 0, all 43 class-S cases ran, log .work/_sh... |
 | S11-28 | HPCG run that fits every card model - fixed work instead of fixed duration, grid sized to the 3100's memory | lead | Needs the interactive lead: one card round, run .work/_shared/S11-28/lead-memory.ps1 at ede7b91c (11 correc... |
 | S11-29 | card_run profiles limit memory in use, not address space, so a 3100 or 5100 run fails only where the real card would | Not started |  |
 | S12-01 | Sprint 12 prep - static code-quality census of the development-corpus builds (spills, x87/vector transfers, addressing, calls, code size) | Done | A static code-quality census (spill/reload proxies, x87 and x87-zmm traffic, address arithmetic, calls, bra... |
@@ -238,6 +238,7 @@ Current tickets: `[###################-]` 205 of 213
 
 ## Recent activity
 
+- 2026-11-13 15:09 **S11-27** lead answer: Narrowing round at ebc62958, 2026-11-13 15:15 EST: card_run exit 0, all 43 class-S cases ran, log .work/_shared/S11-27/narrow-card.log.
 - 2026-11-13 15:09 **S11-27** lead resume: Lead ran narrow-card.py at 15:15 EST: results in the answer.
 - 2026-11-13 15:04 **S11-27** lead defer: Card round needed (interactive lead): run python C:/Users/xuzhi/Documents/gcc_knc/.work/_shared/S11-27/narrow-card.py at ebc62958 (one card_run --t...
 - 2026-11-13 15:03 **S11-27** engineer ask: Card round needed at ebc62958: run python .work/_shared/S11-27/narrow-card.py. Which CASEs verify, with what L2 norms? 43 linted class-S cases: O2,...
@@ -245,7 +246,6 @@ Current tickets: `[###################-]` 205 of 213
 - 2026-11-13 14:58 **S11-27** lead answer: Card round at 498a154b, 2026-11-13 15:00 EST; log .work/_shared/S11-27/card.log; card_run exit 124 because the total budget ran out at 9 min.
 - 2026-11-13 14:58 **S11-27** lead resume: Lead ran card.py at 15:00 EST: results posted in the answer.
 - 2026-11-13 14:57 **S11-15** engineer ask: Committed df72e0a6. Please run from main: python tools/run.py --name S11-15-profile-sigprof -- powershell -NoProfile -File .work\_shared\S11-15\lea...
-- 2026-11-13 14:53 **S11-17** lead defer: Needs the interactive lead's card runs at bf894ae5, in an exclusive turn, from the S11-17 worktree: the pilot then confirm commands in docs/researc...
 
 ## Cost
 
