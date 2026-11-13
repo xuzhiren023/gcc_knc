@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-12 19:24.
+Updated automatically at every ticket change. Last update: 2026-11-12 19:25.
 
-**Next: the tech lead, on S11-21.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: GPT-6.1, on S11-21 (Exploratory WRF build with GCC-KNC (learn-only, host-side) - how far does an unmodified WRF get, and what breaks?).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
 Current tickets: `[###################-]` 198 of 203
 
@@ -72,7 +72,7 @@ Current tickets: `[###################-]` 198 of 203
 | S11-18 | M4 corpus harness v2 - card profiles, prefix record, held-out sealing, stronger checks, and the donor-failure rule | Done | The M4 corpus harness now stages all 17 programs for the 7120 and the 3100/5100 profiles with serial voting... |
 | S11-19 | Second senior review - the M4 definition and the Sprint 11-13 roadmap, adjusted | Done | The M4 definition and the Sprint 11-13 roadmap are rewritten as measure, improve, decide, each sprint with ... |
 | S11-20 | Research - which compiler optimizations benefit the widest range of real code on KNC, from professional to amateur, and does our corpus cover it? | Done | We now have a code-style coverage study (docs/research/code-style-coverage.md) that ranks Sprint 12 candida... |
-| S11-21 | Exploratory WRF build with GCC-KNC (learn-only, host-side) - how far does an unmodified WRF get, and what breaks? | Question for the tech lead | Two failed attempts: mkdir infrastructure issue resolved; netCDF-C build then failed at dreg.c:13, windows.... |
+| S11-21 | Exploratory WRF build with GCC-KNC (learn-only, host-side) - how far does an unmodified WRF get, and what breaks? | In progress | Yes. Your diagnosis (MSYSTEM -> ISMSYS -> REGEDIT -> dreg.c) is right and it is an environment issue, not a... |
 | S2-01 | Design for zmm and mask registers under -march=knc | Done | The register design for KNC is settled on paper: all 32 zmm and 8 mask registers become usable under -march... |
 | S2-02 | Float and double arguments and results in zmm lane 0 | Done | Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`). |
 | S2-03 | Varargs with the donor's register save area | Done | Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`). |
@@ -228,6 +228,7 @@ Current tickets: `[###################-]` 198 of 203
 
 ## Recent activity
 
+- 2026-11-12 19:25 **S11-21** lead answer: Yes. Your diagnosis (MSYSTEM -> ISMSYS -> REGEDIT -> dreg.c) is right and it is an environment issue, not a finding. Run every configure and make o...
 - 2026-11-12 19:24 **S11-21** engineer ask: Two failed attempts: mkdir infrastructure issue resolved; netCDF-C build then failed at dreg.c:13, windows.h missing. Repro with trial PATH: make -...
 - 2026-11-12 18:56 **S11-20** lead approve: We now have a code-style coverage study (docs/research/code-style-coverage.md) that ranks Sprint 12 candidate themes by how many kinds of code they...
 - 2026-11-12 18:47 **S11-20** engineer submit: Delivered docs/research/code-style-coverage.md (296 lines): four questions, primary sources, licences/versions, breadth-first rubric and provisiona...
@@ -235,7 +236,6 @@ Current tickets: `[###################-]` 198 of 203
 - 2026-11-12 18:31 **S11-02** engineer submit: 6c8b56c7 restores helper-free SSH with length checks/unchecked-digest receipts; missing-helper DMA/collect refused. New regression passed once: .wo...
 - 2026-11-12 18:28 **S11-02** lead answer: No to 1050 lines and no card SHA-256 command (it is not guaranteed; do not add one to check_tools). Do this instead, within about 950 lines total (...
 - 2026-11-12 18:26 **S11-02** engineer ask: 0b5b6f25 fixes shared helper defaults; S11-02/validate.ps1 now stages both binaries in .work/_shared. No card jobs or repeated tests. Fix (1): skip...
-- 2026-11-12 18:25 **S11-02** lead amend: Owner 2026-11-12: the card check no longer includes SSH timing runs. Acceptance item 2 now asks only that DMA works near the link limit (at least 1...
 
 ## Cost
 
