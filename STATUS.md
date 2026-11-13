@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-13 16:52.
+Updated automatically at every ticket change. Last update: 2026-11-13 16:53.
 
-**Next: the tech lead, on S11-27.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: the tech lead, on S11-17.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[###################-]` 205 of 213
 
@@ -68,7 +68,7 @@ Current tickets: `[###################-]` 205 of 213
 | S11-14 | M4 scoring contract and measurement protocol, frozen before any tuning | Done | M4's scoring contract is frozen in ADR-0015 with a tested scorer: strict serial -O2 versus -O2 over 17 prog... |
 | S11-15 | First development-corpus baseline and profile, GCC 5.1.1 vs GCC-KNC at -O2 (E7-03 part 1) | In progress | SIGPROF pilot ran 2026-11-13 15:20 EST: PASS, exit 0, 0.9 min, 843 log lines with PROFILE_PC samples. Log: ... |
 | S11-16 | Long-double libm hazard audit - do other MPSS long double entry points fault like cbrtl? (E7-21, bounded) | Done | The card's MPSS long double libm was probed on the card: of 12 entry points only cbrtl faults, and S10-13 a... |
-| S11-17 | PGO feasibility on one complete development program (reuse of S9-18's train/use path) | lead | Owner 2026-11-13 ("Yes"): add a PGO positive-control set, so we can tell 'PGO does not help zlib' from 'our... |
+| S11-17 | PGO feasibility on one complete development program (reuse of S9-18's train/use path) | Question for the tech lead | Lead finished the zlib evaluation at 16:55 EST. |
 | S11-18 | M4 corpus harness v2 - card profiles, prefix record, held-out sealing, stronger checks, and the donor-failure rule | Done | The M4 corpus harness now stages all 17 programs for the 7120 and the 3100/5100 profiles with serial voting... |
 | S11-19 | Second senior review - the M4 definition and the Sprint 11-13 roadmap, adjusted | Done | The M4 definition and the Sprint 11-13 roadmap are rewritten as measure, improve, decide, each sprint with ... |
 | S11-20 | Research - which compiler optimizations benefit the widest range of real code on KNC, from professional to amateur, and does our corpus cover it? | Done | We now have a code-style coverage study (docs/research/code-style-coverage.md) that ranks Sprint 12 candida... |
@@ -238,6 +238,7 @@ Current tickets: `[###################-]` 205 of 213
 
 ## Recent activity
 
+- 2026-11-13 16:53 **S11-17** lead resume: Lead finished the zlib evaluation at 16:55 EST.
 - 2026-11-13 16:52 **S11-27** engineer ask: Cannot regenerate requested dumps: lane-gcc b56d5090c86 compiling knc-secondary-pressure.c at O2/march=knc, PRESSURE_MODE=9, fdump-rtl-reload fails...
 - 2026-11-13 16:50 **S11-27** lead note: Correction: the check deleted its temporary directory, so .work/_shared/S11-27/t1-fix2 is empty. Regenerate the dumps with the lane-gcc build at b5...
 - 2026-11-13 16:47 **S11-27** lead answer: Built b56d5090c86 (PASS, 13.0 min). Targeted T1 on the new build:
@@ -245,16 +246,15 @@ Current tickets: `[###################-]` 205 of 213
 - 2026-11-13 16:45 **S11-02** lead note: Legacy latch released per validate.ps1 recovery steps:
 - 2026-11-13 16:43 **S11-02** lead changes: Card validation 2 at 3953ab96, 2026-11-13 16:40-16:42 EST, with PhiWeather's OK. The legacy latch was released first per the recovery steps (see th...
 - 2026-11-13 16:42 **S11-02** lead resume: Lead reran validate.ps1 at 16:40 EST: DMA payload works; two new problems.
-- 2026-11-13 16:28 **S11-02** lead defer: Code at 3953ab96 reviewed, no blocker. Missing: acceptance item 2 card rerun. Interactive lead: recover the legacy latch .work/_state/card-dma-acti...
 
 ## Cost
 
 - From the script, engineer: 540 sessions, 1102.7M input tokens
 - From the script, lead: 355 sessions, 99.3M input tokens
-- Started by hand, Claude: 12 sessions, 3006.9M input tokens
+- Started by hand, Claude: 12 sessions, 3007.8M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 27.5 GiB of 100 GiB. 208 GiB free on the drive.
+The project uses 27.5 GiB of 100 GiB. 206 GiB free on the drive.
