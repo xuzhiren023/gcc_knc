@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-12 21:09.
+Updated automatically at every ticket change. Last update: 2026-11-12 21:33.
 
-**Next: GPT-6.1, on S11-21 (Exploratory WRF build with GCC-KNC (learn-only, host-side) - how far does an unmodified WRF get, and what breaks?).** Run `python tools/dispatch.py`, or ask the tech lead to.
+**Next: the tech lead, on S11-21.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[###################-]` 200 of 205
 
@@ -72,7 +72,7 @@ Current tickets: `[###################-]` 200 of 205
 | S11-18 | M4 corpus harness v2 - card profiles, prefix record, held-out sealing, stronger checks, and the donor-failure rule | Done | The M4 corpus harness now stages all 17 programs for the 7120 and the 3100/5100 profiles with serial voting... |
 | S11-19 | Second senior review - the M4 definition and the Sprint 11-13 roadmap, adjusted | Done | The M4 definition and the Sprint 11-13 roadmap are rewritten as measure, improve, decide, each sprint with ... |
 | S11-20 | Research - which compiler optimizations benefit the widest range of real code on KNC, from professional to amateur, and does our corpus cover it? | Done | We now have a code-style coverage study (docs/research/code-style-coverage.md) that ranks Sprint 12 candida... |
-| S11-21 | Exploratory WRF build with GCC-KNC (learn-only, host-side) - how far does an unmodified WRF get, and what breaks? | In progress | Owner standing rule (feedback 2026-11-09/10): session budget raised to 14, second extension; progress since... |
+| S11-21 | Exploratory WRF build with GCC-KNC (learn-only, host-side) - how far does an unmodified WRF get, and what breaks? | Question for the tech lead | a7f7e13b: Two failures: Windows Python/Cygwin link (fixed), then my precheck copied Registry.EM_COMMON inst... |
 | S12-01 | Sprint 12 prep - static code-quality census of the development-corpus builds (spills, x87/vector transfers, addressing, calls, code size) | Done | A static code-quality census (spill/reload proxies, x87 and x87-zmm traffic, address arithmetic, calls, bra... |
 | S12-02 | Sprint 12 prep - the unscored generality check set (S11-20's six programs in the code styles our corpus lacks) | Done | The six unscored generality checks (Q1-Q6: ray tracer hit dispatch and vec3 AoS, Burkardt MD, Reference BLA... |
 | S2-01 | Design for zmm and mask registers under -march=knc | Done | The register design for KNC is settled on paper: all 32 zmm and 8 mask registers become usable under -march... |
@@ -230,6 +230,7 @@ Current tickets: `[###################-]` 200 of 205
 
 ## Recent activity
 
+- 2026-11-12 21:33 **S11-21** engineer ask: a7f7e13b: Two failures: Windows Python/Cygwin link (fixed), then my precheck copied Registry.EM_COMMON instead of Registry.EM. Repro: tools/registr...
 - 2026-11-12 21:09 **S11-21** owner decide: Owner standing rule (feedback 2026-11-09/10): session budget raised to 14, second extension; progress since the first: WRF v4.8.0 exported, configu...
 - 2026-11-12 21:08 **S11-21** engineer escalate: budget: 10 engineer sessions used; the budget is 10
 - 2026-11-12 21:07 **S11-21** lead answer: Yes to all four, in place, no new tree from the lead. (1) CRLF is the lead's export fault and it is the whole tree, not only Registry: 5,443 text f...
@@ -237,16 +238,15 @@ Current tickets: `[###################-]` 200 of 205
 - 2026-11-12 20:52 **S11-21** lead answer: Yes, as a recorded cross-configure fix, with these limits. configure:1030-1036 is the only probe that executes a target binary; the Fortran 2003/20...
 - 2026-11-12 20:50 **S11-21** engineer ask: 9089a9bd: serial/no-nesting configure generated. Two failures: Python keyword (fixed), then RPC probe. Repro: configure:1031 executes tools/rpc_tes...
 - 2026-11-12 20:42 **S11-21** lead answer: Fixed and checked this time: .work/_shared/wrf-trial/src/WRF-4.8.0 now has the full v4.8.0 tree (4,944 tracked files copied from PhiWeather's clean...
-- 2026-11-12 20:41 **S11-21** lead resume: Lead re-exported the WRF main tree (partial-clone archive was empty); see PROVENANCE-WRF.md correction.
 
 ## Cost
 
 - From the script, engineer: 502 sessions, 1045.3M input tokens
 - From the script, lead: 328 sessions, 92.8M input tokens
-- Started by hand, Claude: 12 sessions, 2831.0M input tokens
+- Started by hand, Claude: 12 sessions, 2831.9M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 26.0 GiB of 100 GiB. 76 GiB free on the drive.
+The project uses 26.0 GiB of 100 GiB. 97 GiB free on the drive.
