@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-12 20:20.
+Updated automatically at every ticket change. Last update: 2026-11-12 20:21.
 
-**Next: the tech lead, on S11-21.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: GPT-6.1, on S11-21 (Exploratory WRF build with GCC-KNC (learn-only, host-side) - how far does an unmodified WRF get, and what breaks?).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
 Current tickets: `[###################-]` 200 of 205
 
@@ -72,7 +72,7 @@ Current tickets: `[###################-]` 200 of 205
 | S11-18 | M4 corpus harness v2 - card profiles, prefix record, held-out sealing, stronger checks, and the donor-failure rule | Done | The M4 corpus harness now stages all 17 programs for the 7120 and the 3100/5100 profiles with serial voting... |
 | S11-19 | Second senior review - the M4 definition and the Sprint 11-13 roadmap, adjusted | Done | The M4 definition and the Sprint 11-13 roadmap are rewritten as measure, improve, decide, each sprint with ... |
 | S11-20 | Research - which compiler optimizations benefit the widest range of real code on KNC, from professional to amateur, and does our corpus cover it? | Done | We now have a code-style coverage study (docs/research/code-style-coverage.md) that ranks Sprint 12 candida... |
-| S11-21 | Exploratory WRF build with GCC-KNC (learn-only, host-side) - how far does an unmodified WRF get, and what breaks? | Question for the tech lead | 58a905d1: Fortran patch build/install passed; GCC 16 modules verified. Two failures: p1 make (fixed), then ... |
+| S11-21 | Exploratory WRF build with GCC-KNC (learn-only, host-side) - how far does an unmodified WRF get, and what breaks? | In progress | Yes, with one change. Root cause: -static-libgcc plus the shared GCC 16 libstdc++.so, whose DT_NEEDED libgc... |
 | S12-01 | Sprint 12 prep - static code-quality census of the development-corpus builds (spills, x87/vector transfers, addressing, calls, code size) | Done | A static code-quality census (spill/reload proxies, x87 and x87-zmm traffic, address arithmetic, calls, bra... |
 | S12-02 | Sprint 12 prep - the unscored generality check set (S11-20's six programs in the code styles our corpus lacks) | Done | The six unscored generality checks (Q1-Q6: ray tracer hit dispatch and vec3 AoS, Burkardt MD, Reference BLA... |
 | S2-01 | Design for zmm and mask registers under -march=knc | Done | The register design for KNC is settled on paper: all 32 zmm and 8 mask registers become usable under -march... |
@@ -230,6 +230,7 @@ Current tickets: `[###################-]` 200 of 205
 
 ## Recent activity
 
+- 2026-11-12 20:21 **S11-21** lead answer: Yes, with one change. Root cause: -static-libgcc plus the shared GCC 16 libstdc++.so, whose DT_NEEDED libgcc_s.so.1 the linker never resolves; it i...
 - 2026-11-12 20:20 **S11-21** engineer ask: 58a905d1: Fortran patch build/install passed; GCC 16 modules verified. Two failures: p1 make (fixed), then API link. Repro: trial-env.sh bash netcd...
 - 2026-11-12 20:19 **S12-02** lead approve: The six unscored generality checks (Q1-Q6: ray tracer hit dispatch and vec3 AoS, Burkardt MD, Reference BLAS dgemm with C traversals, smallpt, re2c...
 - 2026-11-12 20:07 **S12-02** engineer submit: Host PASS; Q1 hit/miss+O0, Q2 component/guards, Q3 Python MD, Q4 dot/padding, Q5 O0 radiance, Q6 codes/fields. Q1/3/5 atol=1e-10 rtol=1e-8; Q2/4/6 ...
@@ -237,13 +238,12 @@ Current tickets: `[###################-]` 200 of 205
 - 2026-11-12 20:04 **S12-02** engineer ask: Acceptance work committed at 61b89978; host checks including corruption controls PASS and all 12 target builds/lint PASS. Submit refused: 637 chang...
 - 2026-11-12 19:59 **S12-02** lead answer: Take the driver namespace. In the Q1/Q2 driver, include every system header the Ray headers use first (<cmath> <limits> <memory> <iostream> <vector...
 - 2026-11-12 19:59 **S12-01** lead approve: A static code-quality census (spill/reload proxies, x87 and x87-zmm traffic, address arithmetic, calls, branches, code size, vector share) now cove...
-- 2026-11-12 19:59 **S11-21** lead answer: Yes, patch the copied 4.6.1 source; no new release. Root cause (from your config.log and configure.ac:558-571): 4.6.1 sets USE_NETCDF4 only when ne...
 
 ## Cost
 
 - From the script, engineer: 498 sessions, 1039.9M input tokens
 - From the script, lead: 323 sessions, 91.2M input tokens
-- Started by hand, Claude: 12 sessions, 2810.1M input tokens
+- Started by hand, Claude: 12 sessions, 2811.0M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
