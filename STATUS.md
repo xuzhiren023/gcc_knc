@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-13 15:50.
+Updated automatically at every ticket change. Last update: 2026-11-13 15:51.
 
-**Next: the tech lead, on S11-02.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: the tech lead, on S11-27.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[###################-]` 205 of 213
 
@@ -53,7 +53,7 @@ Current tickets: `[###################-]` 205 of 213
 | S10-12 | cbrt and cbrtf crash (SIGSEGV) in qualify_v1 on the card - root cause and fix | Done | The cbrt and cbrtf qualification jobs no longer crash on the card and pass (worst 0.4996 and 0.4991 ULP): t... |
 | S10-13 | User story - code that calls cbrtl under -march=knc gets a safe replacement and a compile-time warning (MPSS libm cbrtl faults) | Done | Under -march=knc, calls to cbrtl (and std::cbrt on long double) now go to GCC-KNC's own safe cube root with... |
 | S11-01 | User story - the best way to move data between the host and the card, measured, and how our projects use it | Done | We now have a sourced inventory of every host-card transfer path that works without changing MPSS (SSH, tar... |
-| S11-02 | card_run and run_suite move bulk data by SCIF DMA at the PCIe link limit, with the SSH stream as fallback | Waiting for review | Lead ran validate.ps1 at 15:48 EST: DMA failed on the first 1 GiB upload. |
+| S11-02 | card_run and run_suite move bulk data by SCIF DMA at the PCIe link limit, with the SSH stream as fallback | Changes requested | Card validation 2026-11-13 15:48 EST, at 6c8b56c7 from the S11-02 worktree, idle card, no host bugcheck, ca... |
 | S11-03 | S11-01 transfer tool rejects the card's physical /tmp path, so the native study never starts | Done | The transfer study's tool now accepts the card's real /tmp location (/var/volatile/tmp), so its card run ca... |
 | S11-04 | S11-01 transfer tool - the host opens every connection, because Windows Firewall blocks inbound TCP from the card | Done | The transfer study's host side now opens every connection to the card, so Windows Firewall no longer blocks... |
 | S11-05 | Research - raise KNC's real memory bandwidth from about 175 GB/s toward 75-85% of peak, with a measured plan | Done | The memory-bandwidth research plan and a validated multithreaded KNC bandwidth benchmark are ready, with a ... |
@@ -78,7 +78,7 @@ Current tickets: `[###################-]` 205 of 213
 | S11-24 | WRF OpenMP (smpar) build with GCC-KNC at -mphinix, for PhiWeather's benchmark - replaces the serial trial build | Done | WRF v4.8.0 now builds as an OpenMP card binary at -mphinix with GCC-KNC (wrf.exe and real.exe linked, needi... |
 | S11-25 | ICE in do_store_flag (expr.cc) on WRF's surface layer (SFCLAY1D) at -O2 -march=knc | Done | The last WRF file that crashed GCC-KNC (surface layer, SFCLAY1D) now compiles: vector 'ordered and not equa... |
 | S11-26 | WRF OpenMP build at -mphinix with no per-file workarounds (S11-23 and S11-25 fixed), restaged for PhiWeather | draft | Owner 2026-11-13: the S11-24 WRF build is removed. Deleted: |
-| S11-27 | Wrong code - NPB-MG (class A, serial) built by GCC-KNC at -O2 -march=knc fails NPB verification on the card | In progress | Lead results at 0297f57d723, 2026-11-13 15:45 EST: |
+| S11-27 | Wrong code - NPB-MG (class A, serial) built by GCC-KNC at -O2 -march=knc fails NPB verification on the card | Question for the tech lead | Card round ready at be59bbe2: run python .work/_shared/S11-27/verify-card.py; post verification/L2 per CASE... |
 | S11-28 | HPCG run that fits every card model - fixed work instead of fixed duration, grid sized to the 3100's memory | lead | After S11-29 merges (still ready): run .work/_shared/S11-28/lead-pilot.ps1 at 242936bf+ (30 exclusive timed... |
 | S11-29 | card_run profiles limit memory in use, not address space, so a 3100 or 5100 run fails only where the real card would | Not started |  |
 | S12-01 | Sprint 12 prep - static code-quality census of the development-corpus builds (spills, x87/vector transfers, addressing, calls, code size) | Done | A static code-quality census (spill/reload proxies, x87 and x87-zmm traffic, address arithmetic, calls, bra... |
@@ -238,23 +238,23 @@ Current tickets: `[###################-]` 205 of 213
 
 ## Recent activity
 
+- 2026-11-13 15:51 **S11-27** engineer ask: Card round ready at be59bbe2: run python .work/_shared/S11-27/verify-card.py; post verification/L2 per CASE. S-O2,A-O2,S-noslp,A-default,A-novec re...
 - 2026-11-13 15:50 **S11-27** lead note: Reduced cases at 0297f57d723 on the card (reduce-card-new.log): stencil-O2, novec and noreuse all PASS (old: O2 and noreuse FAIL 142). MG S/A rerun...
+- 2026-11-13 15:50 **S11-02** lead changes: Card validation 2026-11-13 15:48 EST, at 6c8b56c7 from the S11-02 worktree, idle card, no host bugcheck, card boot da3144f1 unchanged. It failed on...
 - 2026-11-13 15:50 **S11-02** lead resume: Lead ran validate.ps1 at 15:48 EST: DMA failed on the first 1 GiB upload.
 - 2026-11-13 15:47 **S11-27** lead answer: Lead results at 0297f57d723, 2026-11-13 15:45 EST:
 - 2026-11-13 15:45 **S11-27** lead resume: Lead built GCC at 0297f57d723 and ran checks at 15:45 EST: results in the answer.
 - 2026-11-13 15:33 **S11-17** lead defer: Needs the interactive lead's card runs at ce3d9920, exclusive turn. Fix looks right: peer workload was 0660 (execl 127); now USTAR with 0755, and s...
 - 2026-11-13 15:32 **S11-27** lead defer: GCC build needed (interactive lead) at gcc 0297f57d723, lane gcc. Fix direction accepted: LRA now spills the bridge slots, so the elimination offse...
-- 2026-11-13 15:30 **S11-17** engineer ask: Fix ce3d9920: peer workload was 0660 (execl returned 127); now 0755 in USTAR. Two host tests pass; actual launch/archive/ELF/input checks pass. Log...
-- 2026-11-13 15:28 **S11-27** engineer ask: GCC build needed at 0297f57d723 (lane gcc). LRA owns bridge spill slots via memory-only constraints. T1 integrated: expected red O2/noreuse, PASS n...
 
 ## Cost
 
 - From the script, engineer: 535 sessions, 1096.2M input tokens
 - From the script, lead: 351 sessions, 98.3M input tokens
-- Started by hand, Claude: 12 sessions, 2974.0M input tokens
+- Started by hand, Claude: 12 sessions, 2974.4M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 27.6 GiB of 100 GiB. 223 GiB free on the drive.
+The project uses 27.6 GiB of 100 GiB. 214 GiB free on the drive.
