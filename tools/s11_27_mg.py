@@ -66,7 +66,7 @@ def link(output, objects):
     print(run(sys.executable, ROOT / 'tools/knc_lint', output))
 
 
-def build():
+def prepare():
     OUT.mkdir(exist_ok=True)
     os.environ['PATH'] = ':'.join([str(TC / 'cross/bin'), str(TC / 'cygwin/bin'),
                                  os.environ.get('PATH', '')])
@@ -82,6 +82,56 @@ def build():
     config.mkdir(exist_ok=True)
     (config / 'make.def').write_text('F77 = gfortran\nFLINK = gfortran\n'
                                    'FFLAGS = -O2 -march=knc\nRAND = randi8\n')
+
+
+def build_verification():
+    """Stage only the lead's five post-fix MG cases, one serial case per core."""
+    prepare()
+    cases = []
+    for cls, variant in [('S', 'O2'), ('A', 'O2'), ('S', 'noslp'),
+                         ('A', 'default'), ('A', 'novec')]:
+        directory = OUT / cls
+        directory.mkdir(exist_ok=True)
+        # The class parameters and every object must come from this build.
+        print(run(SHARED / 'S11-18/setparams', 'mg', cls, cwd=directory))
+        objects = directory / variant
+        compile_set(objects, OPTIONS[variant])
+        name = 'mg-' + cls + '-' + variant
+        link(OUT / name, [objects / (n + '.o') for n in NAMES])
+        cases.append(name)
+    for lib in ('libgfortran.so.5', 'libgcc_s.so.1'):
+        path = run(*compiler('gfortran', True), '-print-file-name=' + lib).strip()
+        shutil.copyfile(path, OUT / lib)
+    source = (ROOT / 'tools/s11_27_parallel.c').read_text()
+    source = source.replace('/* CASES */', ',\n'.join('"' + n + '"' for n in cases))
+    # Class A controls took about 33 seconds alone; allow parallel contention.
+    source = source.replace('alarm(60);', 'alarm(180);')
+    (OUT / 'verify-parallel.c').write_text(source)
+    print(run(TC / 'cross/bin/k1om-mpss-linux-gcc', '-O2',
+              OUT / 'verify-parallel.c', '-o', OUT / 'verify-parallel'))
+    print(run(sys.executable, ROOT / 'tools/knc_lint', OUT / 'verify-parallel'))
+    card = '''#!/usr/bin/env python3
+import pathlib
+import subprocess
+import sys
+root = pathlib.Path(__file__).resolve().parent
+repo = root.parent.parent / 'S11-27'
+cmd = [sys.executable, str(repo / 'tools/card_run'), '--threads', '240', '--timeout', '540']
+for name in CASE_NAMES + ['libgfortran.so.5', 'libgcc_s.so.1']:
+    cmd += ['--file', str(root / name)]
+cmd += [str(root / 'verify-parallel')]
+with (root / 'verify-card.log').open('w') as log:
+    code = subprocess.call(cmd, stdout=log, stderr=subprocess.STDOUT)
+print('card_run exit:', code, 'log:', root / 'verify-card.log')
+raise SystemExit(code)
+'''.replace('CASE_NAMES', repr(cases))
+    (OUT / 'verify-card.py').write_text(card)
+    print('Prepared', len(cases), 'linted MG cases; lead entry point:', OUT / 'verify-card.py')
+    print('Parallel serial cases, separate cores, 180-second per-case timeout; read NPB verification in each CASE.')
+
+
+def build():
+    prepare()
     diff = []
     summary = []
     binaries = []
@@ -152,9 +202,12 @@ def main():
         env['PATH'] = os.pathsep.join(str(TC / p) for p in ('cross/bin', 'cygwin/bin')) + os.pathsep + env.get('PATH', '')
         script = subprocess.check_output([str(TC / 'cygwin/bin/cygpath.exe'), '-u',
                                           str(Path(__file__).resolve())], env=env, text=True).strip()
-        return subprocess.call([str(TC / 'cygwin/bin/python3.12.exe'), script], env=env)
+        return subprocess.call([str(TC / 'cygwin/bin/python3.12.exe'), script, *sys.argv[1:]], env=env)
     try:
-        build()
+        if '--verify-fix' in sys.argv:
+            build_verification()
+        else:
+            build()
     except subprocess.CalledProcessError as error:
         print(error.output, flush=True)
         raise
