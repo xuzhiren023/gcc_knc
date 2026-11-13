@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-12 23:54.
+Updated automatically at every ticket change. Last update: 2026-11-12 23:56.
 
-**Next: GPT-6.1, on S11-21 (Exploratory WRF build with GCC-KNC (learn-only, host-side) - how far does an unmodified WRF get, and what breaks?).** Run `python tools/dispatch.py`, or ask the tech lead to.
+**Next: the tech lead, on S11-23.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[###################-]` 201 of 207
 
@@ -74,7 +74,7 @@ Current tickets: `[###################-]` 201 of 207
 | S11-20 | Research - which compiler optimizations benefit the widest range of real code on KNC, from professional to amateur, and does our corpus cover it? | Done | We now have a code-style coverage study (docs/research/code-style-coverage.md) that ranks Sprint 12 candida... |
 | S11-21 | Exploratory WRF build with GCC-KNC (learn-only, host-side) - how far does an unmodified WRF get, and what breaks? | In progress | Owner standing rule (feedback 2026-11-09/10): session budget raised to 17, third extension, granted because... |
 | S11-22 | Review PhiWeather's first instrumented-PGO attempt on WRF (GCC 5.1.1, k1om) - method, near-zero gain, tolerance gate | Done | PhiWeather's first WRF PGO attempt is reviewed for their lead: the collection and use pipeline is credible,... |
-| S11-23 | ICE in WRF's RRTM radiation (rtrn) at -O2 -march=knc - unrecognizable insn after reload, and sub-512-bit SLP vectors under KNC | In progress | Fix 3 built; see the 23:55 note: WRF compiles, but 5 FP torture files still differ in float constant stores... |
+| S11-23 | ICE in WRF's RRTM radiation (rtrn) at -O2 -march=knc - unrecognizable insn after reload, and sub-512-bit SLP vectors under KNC | Question for the tech lead | GCC build needed at 64c033d1255. RTL: complex-5 SF insns 24/29 change from *movsf_internal to *knc_copysf i... |
 | S12-01 | Sprint 12 prep - static code-quality census of the development-corpus builds (spills, x87/vector transfers, addressing, calls, code size) | Done | A static code-quality census (spill/reload proxies, x87 and x87-zmm traffic, address arithmetic, calls, bra... |
 | S12-02 | Sprint 12 prep - the unscored generality check set (S11-20's six programs in the code styles our corpus lacks) | Done | The six unscored generality checks (Q1-Q6: ray tracer hit dispatch and vec3 AoS, Burkardt MD, Reference BLA... |
 | S2-01 | Design for zmm and mask registers under -march=knc | Done | The register design for KNC is settled on paper: all 32 zmm and 8 mask registers become usable under -march... |
@@ -232,6 +232,7 @@ Current tickets: `[###################-]` 201 of 207
 
 ## Recent activity
 
+- 2026-11-12 23:56 **S11-23** engineer ask: GCC build needed at 64c033d1255. RTL: complex-5 SF insns 24/29 change from *movsf_internal to *knc_copysf in LRA, losing immediate stores; va-arg-2...
 - 2026-11-12 23:55 **S11-23** lead note: Lead built 5c4f29faa51 (log S11_23_lead_build3-20261112-232944.log). WRF rtrn reproducer compiles (rc 0). Torture diff against the installed prefix...
 - 2026-11-12 23:54 **S11-21** owner decide: Owner standing rule (feedback 2026-11-09/10): session budget raised to 17, third extension, granted because the last extension made the decisive pr...
 - 2026-11-12 23:52 **S11-21** engineer escalate: budget: 14 engineer sessions used; the budget is 14
@@ -239,16 +240,15 @@ Current tickets: `[###################-]` 201 of 207
 - 2026-11-12 23:40 **S11-23** lead resume: Fix 3 build and checks in the 23:55 note.
 - 2026-11-12 23:40 **S11-23** lead note: Lead built 3bfe7d827fa (log .work/_state/logs/S11_23_lead_build2-20261112-230849.log). The WRF rtrn reproducer now compiles (rc 0): ICE and LRA cyc...
 - 2026-11-12 23:32 **S11-23** lead defer: Interactive lead: build GCC at 5c4f29faa51; run check.py t1 --compiler gcc16 --rrtm and --rrtm-constants, the 165-file FP torture asm diff vs knc t...
-- 2026-11-12 23:25 **S11-23** engineer ask: GCC build needed at 5c4f29faa51. Red test 96e066fb: --rrtm-constants fails on 3bfe7d827fa (missing immediate float store); log .work/_state/logs/S1...
 
 ## Cost
 
 - From the script, engineer: 513 sessions, 1057.6M input tokens
 - From the script, lead: 333 sessions, 94.0M input tokens
-- Started by hand, Claude: 12 sessions, 2888.6M input tokens
+- Started by hand, Claude: 12 sessions, 2889.6M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 26.5 GiB of 100 GiB. 64 GiB free on the drive.
+The project uses 26.5 GiB of 100 GiB. 66 GiB free on the drive.
