@@ -1,10 +1,10 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-13 03:34.
+Updated automatically at every ticket change. Last update: 2026-11-13 03:46.
 
-**Next: the tech lead, on S11-25.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+Nothing can move right now.
 
-Current tickets: `[###################-]` 204 of 210
+Current tickets: `[###################-]` 205 of 210
 
 ## Milestones
 
@@ -14,7 +14,7 @@ Current tickets: `[###################-]` 204 of 210
 | M1 | Mixed native code | Done | 43 of 43 tickets |
 | M2 | Useful vector target | Done | 51 of 51 tickets |
 | M3 | Runtimes | Done | 48 of 48 tickets |
-| M4 | Broad optimization | In progress | 22 of 28 tickets |
+| M4 | Broad optimization | In progress | 23 of 28 tickets |
 | M5 | Program corpus | Not started | Not planned in detail yet |
 | M6 | Release | Not started | Not planned in detail yet |
 
@@ -76,7 +76,7 @@ Current tickets: `[###################-]` 204 of 210
 | S11-22 | Review PhiWeather's first instrumented-PGO attempt on WRF (GCC 5.1.1, k1om) - method, near-zero gain, tolerance gate | Done | PhiWeather's first WRF PGO attempt is reviewed for their lead: the collection and use pipeline is credible,... |
 | S11-23 | ICE in WRF's RRTM radiation (rtrn) at -O2 -march=knc - unrecognizable insn after reload, and sub-512-bit SLP vectors under KNC | Done | WRF's RRTM radiation and the -O3 OpenMP WRF files that crashed GCC-KNC after reload (rtrn, kfcps, advance_u... |
 | S11-24 | WRF OpenMP (smpar) build with GCC-KNC at -mphinix, for PhiWeather's benchmark - replaces the serial trial build | Done | WRF v4.8.0 now builds as an OpenMP card binary at -mphinix with GCC-KNC (wrf.exe and real.exe linked, needi... |
-| S11-25 | ICE in do_store_flag (expr.cc) on WRF's surface layer (SFCLAY1D) at -O2 -march=knc | Waiting for review | Lead rebased onto knc and rebuilt tree 2 at 58d2d07db42. Lead results: sfclay1d/rtrn -O2 -march=knc and kfc... |
+| S11-25 | ICE in do_store_flag (expr.cc) on WRF's surface layer (SFCLAY1D) at -O2 -march=knc | Done | The last WRF file that crashed GCC-KNC (surface layer, SFCLAY1D) now compiles: vector 'ordered and not equa... |
 | S11-26 | WRF OpenMP build at -mphinix with no per-file workarounds (S11-23 and S11-25 fixed), restaged for PhiWeather | draft |  |
 | S12-01 | Sprint 12 prep - static code-quality census of the development-corpus builds (spills, x87/vector transfers, addressing, calls, code size) | Done | A static code-quality census (spill/reload proxies, x87 and x87-zmm traffic, address arithmetic, calls, bra... |
 | S12-02 | Sprint 12 prep - the unscored generality check set (S11-20's six programs in the code styles our corpus lacks) | Done | The six unscored generality checks (Q1-Q6: ray tracer hit dispatch and vec3 AoS, Burkardt MD, Reference BLA... |
@@ -235,6 +235,7 @@ Current tickets: `[###################-]` 204 of 210
 
 ## Recent activity
 
+- 2026-11-13 03:46 **S11-25** lead approve: The last WRF file that crashed GCC-KNC (surface layer, SFCLAY1D) now compiles: vector 'ordered and not equal' float comparisons are expanded as two...
 - 2026-11-13 03:34 **S11-25** engineer submit: Lead rebased onto knc and rebuilt tree 2 at 58d2d07db42. Lead results: sfclay1d/rtrn -O2 -march=knc and kfcps/advance_uv -mphinix -mknc-card=7120 c...
 - 2026-11-13 03:33 **S11-25** lead answer: Lead rebased s11/S11-25 onto knc (HEAD 58d2d07db42, includes S11-23) and rebuilt tree 2 there. All green on the combined tree: sfclay1d.f90 and rtr...
 - 2026-11-13 03:31 **S11-25** lead resume: Lead rebased and rebuilt; see the answer.
@@ -242,16 +243,15 @@ Current tickets: `[###################-]` 204 of 210
 - 2026-11-13 03:13 **S11-25** engineer ask: Test-only commit c3a4ef89365 uses plain scan-assembler for immediate 1; keeps forbids for 4/7. Loop-copy count is optimizer-dependent. Whitespace P...
 - 2026-11-13 03:11 **S11-25** lead answer: Fix is good; one test edit, then rebase and submit. Lead results at 3cd892904ec (tree 2): sfclay1d.f90 compiles at -O2 -march=knc and at -mphinix -...
 - 2026-11-13 03:10 **S11-25** lead resume: Built tree 2 at 3cd892904ec and checked; see the next answer.
-- 2026-11-13 02:47 **S11-24** lead approve: WRF v4.8.0 now builds as an OpenMP card binary at -mphinix with GCC-KNC (wrf.exe and real.exe linked, needing only the card's libc, libm, libdl, li...
 
 ## Cost
 
 - From the script, engineer: 526 sessions, 1082.2M input tokens
 - From the script, lead: 342 sessions, 96.2M input tokens
-- Started by hand, Claude: 12 sessions, 2923.1M input tokens
+- Started by hand, Claude: 12 sessions, 2923.8M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 26.7 GiB of 100 GiB. 60 GiB free on the drive.
+The project uses 26.7 GiB of 100 GiB. 180 GiB free on the drive.
