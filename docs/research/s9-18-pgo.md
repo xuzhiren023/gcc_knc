@@ -41,7 +41,7 @@ in-order core). The pgo/pgox columns of the `use` REPORT show `.text.hot`/`.text
 splitting, `.cold` parts and whether `calls` gained direct calls; read the card ratios against
 them.
 
-## S11-17: complete development zlib program (evaluation pending)
+## S11-17: complete development zlib program
 
 `tools/s11_17_pgo.py` reuses the S11-18 zlib 1.3.1 source list,
 `roundtrip.c`, `-O2 -march=knc`, includes, defines and linker search paths.
@@ -110,8 +110,8 @@ build, rather than merely successful profile lookup. Dumps remain under
 | zutil | 6 | 2 | 6 |
 
 The crc32 and infback files are present with zero measured edges; they are not
-missing profiles. Native correctness of the use binary and paired evaluation
-timings remain pending on all three profiles. No speedup is claimed.
+missing profiles. Native evaluation subsequently passed on all three profiles;
+the paired results are recorded below.
 
 The 2026-11-13 pilot stopped after the base program's successful byte check;
 it is an infrastructure failure, not a completed pilot. The donor decoder in
@@ -143,8 +143,98 @@ was denied by file permissions through both Cygwin and Windows Python; neither
 attempt changed that script. Logs:
 `.work/_state/logs/S11_17_restage-20261113-152749.log` and
 `.work/_state/logs/S11_17_lead_restage-20261113-152809.log`.
-The lead must resolve ownership if regeneration is needed. Pilot and confirmation
-remain pending; rerun the same commands above after the host prerequisites.
+The existing staged script was sufficient for the lead's completed evaluation.
+
+### Zlib card evaluation, 2026-11-13
+
+The lead completed five pilot pairs and ten confirmatory pairs per profile at
+`ce3d9920`. Every launch passed `CORPUS_CHECK`: 30/30 pilot, 60/60 confirmatory.
+Times are measured on the card; the host was loaded with downloads, WPS and lead
+builds. Each base run takes about 1.25 seconds. Ratios below are **base time / PGO
+time** (greater than one means PGO is faster), in chronological pair order.
+Spread is the observed min–max, not a confidence interval. No outlier was removed.
+
+| Phase | Profile | Per-pair speedups (zero-based order) | Median | Min–max |
+|---|---|---|---:|---|
+| pilot | full 7120 | 1.0010, 1.0123, 0.9942, 1.0164, 0.9951 | 1.0010 | 0.9942–1.0164 |
+| pilot | 3100 | 1.0124, 1.0153, 1.0060, 1.0000, 1.0084 | 1.0084 | 1.0000–1.0153 |
+| pilot | 5100 | 1.0048, 1.0155, 1.0362, 1.0084, 1.0089 | 1.0089 | 1.0048–1.0362 |
+| confirm | full 7120 | 0.8971, 1.0085, 1.0079, 1.0006, 1.0082, 1.0220, 1.0089, 1.0183, 1.0105, 0.9787 | 1.0084 | 0.8971–1.0220 |
+| confirm | 3100 | 1.0446, 1.0040, 0.9676, 1.0070, 1.0146, 1.0077, 1.0106, 0.9937, 1.0061, 1.0067 | 1.0069 | 0.9676–1.0446 |
+| confirm | 5100 | 1.0047, 1.0001, 1.0089, 1.0179, 1.0176, 1.0040, 1.0120, 1.0099, 1.0028, 1.0132 | 1.0094 | 1.0001–1.0179 |
+
+Captures: `.work/_shared/S11-17/{pilot,confirm}-<profile>-<pair>-{base,pgo}.stdout`
+and `.stderr` (PowerShell UTF-16LE). An SSH upload-deadline infrastructure stop
+occurred at confirm/3100/pair 7/base; its captures have suffix `.infra`. The lead
+resumed pairs 7–9 and all 5100 pairs through `lead-rest.ps1`. The table uses the
+successful replacements. Earlier pilot attempts are in `pilot-run1/` (full median
+0.996); they are separate from the completed pilot above.
+
+The pipeline works end to end: atomic instrumented training on distinct input,
+twelve matching profiles, positive applied counts, profile-use build and correct
+evaluation. Confirmatory median gains are approximately 0.7–0.9%, with substantial
+pair variation on full and 3100. This is a small observed gain, far below the
+19–21% microcase gains; these ranges alone do not establish statistical significance.
+
+### Positive controls (lead's 2026-11-13 amendment; training pending)
+
+`tools/s11_17_controls.py` stages five independent integer kernels: a 99%-zero
+branch against GCC's nonzero static guess, a volatile function-pointer table with
+one 99% target, division with divisor seven 99% of the time, a large hot callee
+beside an out-of-line alternative, and a switch with 99% case zero. Each computes
+an unsigned sum checked against a separately compiled scalar reference on every
+timed batch. Defined unsigned wraparound is part of the result. The inline helper
+has 24 dependent arithmetic steps; its actual base/use assembly is the gate for
+whether it straddles the effective inline threshold.
+
+Matching training uses seed 29 and the 99% mix; inverted training reverses the
+mix. Evaluation uses seed 11 and the matching mix. No corpus or held-out input
+is involved. KNC GCC is 16.2.0 and the installed Cygwin host GCC is 14, so host
+profiles cannot be used directly with fatal version/mismatch checks. The staged
+fallback trains the actual KNC binaries on the card and captures ten `.gcda`
+files through the existing octal protocol. No synthetic counters are used.
+
+One new T1 test file, `tests/tools/test_s11_17_controls.py`, requires hot branch
+fall-through, guarded indirect-call promotion plus inlining, a guarded constant
+division fast path, hot-callee inlining, and dominant switch-case fall-through.
+Run it with `--variant base` for the red baseline, then with `--variant pgo`
+after importing real training profiles for green. The profile-use builder makes
+missing/mismatched profiles fatal and requires positive applied edge counts for
+each matched and inverted object. Assembly or timing failures remain failures;
+no kernel is yet claimed to be a passing positive control.
+
+The plain `-O2` T1 run failed all five assertions for the intended missing
+transformations, without test errors:
+`.work/_state/logs/S11_17_controls_red-20261113-170126.log`.
+Initial stage/lint passed in
+`.work/_state/logs/S11_17_controls_stage-20261113-165822.log`; the revised inline
+candidate (external linkage prevents static called-once inlining) compiled and
+linted in `.work/_state/logs/S11_17_controls_inline-20261113-170116.log`.
+
+Lead sequence (host commands use the shared Cygwin Python and bin directories
+on PATH; card commands run only by the lead):
+
+1. Instrumented binaries and the lead script are under
+   `.work/_shared/S11-17/controls/`. Run
+   `python tools/run.py --name S11-17-controls-train -- powershell -NoProfile -File ../_shared/S11-17/controls/controls-lead.ps1`.
+   Return `controls/train.stdout` and `.stderr` to the engineer. The script runs
+   ten short checked training programs in parallel, waits for every exit status,
+   and only then exports their independent profiles. No timed results are inferred
+   from them. The training programs currently share the first allowed CPU; this
+   is a correctness/profile collection step, not a throughput measurement.
+2. Engineer: `python tools/run.py --name S11-17-controls-use --inputs tools/s11_17_controls.py -- ../_shared/toolchain/cygwin/bin/python3.12.exe tools/s11_17_controls.py use ../_shared/S11-17/controls/train.stdout`.
+   Then run the T1 test with `--variant pgo`. Retain the genuine profile data
+   as test fixtures if directed by the lead; binaries and assembly stay shared.
+3. Once assembly checks pass, lead runs the same PowerShell script with
+   `-Phase pilot`, reviews correctness/spread, then `-Phase confirm`. Each phase
+   visits full/3100/5100. All five kernels share one uploaded timing script.
+   Each binary pins to its first allowed CPU, calibrates a base batch to about
+   0.2 seconds, and runs five or ten pairs separately for matched and inverted
+   profiles. Pairs alternate C/T then T/C; every batch checks the reference.
+   Intended timing work is about three minutes total plus launch overhead,
+   below fifteen minutes; each individual native process is under a minute.
+   Output: `controls/<phase>-<profile>.stdout` and `.stderr`, retaining every
+   per-pair time. Speedup and spread for all five controls remain pending.
 
 ### Lessons from PhiWeather
 
@@ -158,8 +248,11 @@ five pilot pairs and ten confirmatory pairs per profile, as requested by the lea
 Keep pilot and confirmatory results separate; report paired PGO/base ratios and
 variation for each hardware profile before deciding whether PGO pays.
 
-Sprint 12 plan: first finish this train/use/evaluation cycle and record every
-missing/mismatched profile and per-profile paired time ratio. Freeze a separate
+Sprint 12 plan: complete the positive-control assembly and native timing gates
+before treating one-flag automatic PGO as qualified. Preserve matched/inverted
+controls as regression cases and require the inverted profile to lose or reverse
+the gain. Zlib's completed cycle establishes functionality, with no missing or
+mismatched profiles and only a small observed median gain. Freeze a separate
 training input per development program, preserve compiler/source/output names
 between generate/use, and keep diagnostics fatal. Extend to further development
 programs only after this complete-program path works; retain plain -O2 pairs and
