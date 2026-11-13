@@ -77,28 +77,40 @@ def stage_production_validation(out):
     (out / 'validate.ps1').write_text(r'''# Lead only, on an idle card. Run after merging or pass -Repo for this worktree.
 # No automatic retry after any nonzero exit. Do not clear DMA stop markers
 # without inspecting both endpoints and the host boot/bugcheck state.
+# Legacy failure recovery (lead only, before rerunning): read card-dma-active.lock.
+# Compare host_card_transfer.event_log() with its host_state; verify the card's
+# current boot ID matches boot_id. Check host helper processes and remote /proc
+# cwd/exe users of run_dir. No signals, DMA retries or deletion while unresolved.
+# The old helper left no close report: the lead must establish endpoint teardown,
+# not just trust exit 126. Once established, use the guarded card control shell
+# in that exact run_dir to remove ONLY claude-dma-active, then remove the host
+# .work/_state/card-dma-active.lock. Normal guarded stale recovery owns the rest.
+# New helpers report endpoint_closed after successful scif_close on errors;
+# both reports AND exits plus host-health/boot guards now resolve those errors.
 param([Parameter(Mandatory=$true)][string]$Suite,
       [string]$Repo = "PROJECT_ROOT")
-$ErrorActionPreference = 'Stop'
-Set-Location -LiteralPath $Repo
+$ErrorActionPreference = 'Continue'  # lead 2026-11-13: native stderr must not abort mid card_run; exit codes and throws are explicit
+# Lead 2026-11-13: resolve Windows Python before the cygwin PATH prepend (its extensionless 'python' cannot run from PowerShell).
+$py = (Get-Command python.exe -ErrorAction Stop).Source
+Set-Location -LiteralPath $Repo -ErrorAction Stop
 $project = $Repo
 if ((Split-Path -Leaf (Split-Path -Parent $Repo)) -eq '.work') { $project = Split-Path -Parent (Split-Path -Parent $Repo) }
 $stage = Join-Path $project '.work/_shared/S11-02'
-Copy-Item -LiteralPath "$stage/claude-transfer.mic", "$stage/claude-transfer.exe" -Destination (Join-Path $project '.work/_shared')
+Copy-Item -LiteralPath "$stage/claude-transfer.mic", "$stage/claude-transfer.exe" -Destination (Join-Path $project '.work/_shared') -ErrorAction Stop
 $env:PATH = (Join-Path $project '.work/_shared/toolchain/cygwin/bin') + ';' + $env:PATH
-$config = Get-Content -Raw -LiteralPath (Join-Path $project 'config/card.local.json') | ConvertFrom-Json
+$config = Get-Content -Raw -LiteralPath (Join-Path $project 'config/card.local.json') -ErrorAction Stop | ConvertFrom-Json -ErrorAction Stop
 $config | Add-Member -Force NoteProperty maxStageMiB 1100
 $config | Add-Member -Force NoteProperty memoryMB 2048
 $cfg = Join-Path $stage 'validation-config.json'
-$config | ConvertTo-Json | Set-Content -Encoding Ascii -LiteralPath $cfg
+$config | ConvertTo-Json | Set-Content -Encoding Ascii -LiteralPath $cfg -ErrorAction Stop
 $payload = Join-Path $stage 'claude-payload'
 & (Join-Path $stage 'claude-transfer.exe') generate $payload.Replace('\','/') 1073741824 0 -
 if ($LASTEXITCODE -ne 0) { throw 'payload generation failed' }
 $measurements = @()
 foreach ($repeat in 1..3) {
-  foreach ($method in 'dma','ssh') {
+  foreach ($method in 'dma') {
     $receipt = Join-Path $stage ("pair-{0}-{1}.json" -f $repeat,$method)
-    python tools/card_run --config $cfg --benchmark --threads 1 --timeout 1800 `
+    & $py tools/card_run --config $cfg --benchmark --threads 1 --timeout 1800 `
       --stage-timeout 1200 --transport-timeout 1200 --transfer $method --file $payload `
       --collect claude-payload --collect-dir $stage/collected --receipt $receipt $stage/claude-check.sh
     if ($LASTEXITCODE -ne 0) { throw "STOP: $method pair $repeat; inspect $receipt and cleanup state" }
@@ -119,13 +131,13 @@ $measurements | Format-Table
 foreach ($repeat in 1..3) {
   foreach ($direction in 'up','down') {
     $dma = $measurements | Where-Object { $_.repeat -eq $repeat -and $_.direction -eq $direction -and $_.method -eq 'dma' }
-    $ssh = $measurements | Where-Object { $_.repeat -eq $repeat -and $_.direction -eq $direction -and $_.method -eq 'ssh' }
-    Write-Output ("pair {0} {1}: payload speedup {2:N2}x; file wall speedup {3:N2}x" -f $repeat,$direction,($ssh.seconds/$dma.seconds),($ssh.wall_seconds/$dma.wall_seconds))
+    $minimum = if ($direction -eq 'up') { 1.2e9 } else { 1.35e9 }
+    if (1073741824 / $dma.seconds -lt $minimum) { throw "DMA below link-limit acceptance: pair $repeat $direction" }
   }
 }
 $config | Add-Member -Force NoteProperty dmaEnabled $false
-$config | ConvertTo-Json | Set-Content -Encoding Ascii -LiteralPath $cfg
-python tools/card_run --config $cfg --benchmark --timeout 1800 --stage-timeout 1200 `
+$config | ConvertTo-Json | Set-Content -Encoding Ascii -LiteralPath $cfg -ErrorAction Stop
+& $py tools/card_run --config $cfg --benchmark --timeout 1800 --stage-timeout 1200 `
   --transport-timeout 1200 --transfer auto --file $payload --collect claude-payload `
   --collect-dir $stage/collected --receipt $stage/unavailable.json $stage/claude-check.sh
 if ($LASTEXITCODE -ne 0) { throw 'forced unavailable run failed' }
@@ -134,9 +146,9 @@ $fallbacks = (Get-Content -Raw -LiteralPath $stage/unavailable.json | ConvertFro
 if (@($fallbacks).Count -ne 2 -or @($fallbacks | Where-Object { $_.method -ne 'ssh' -or !$_.fallback.reason -or !$_.digest_match }).Count) {
   throw 'missing fallback reason or digest match'
 }
-python harness/card/run_suite.py $Suite $stage/suite-output --transfer dma
+& $py harness/card/run_suite.py $Suite $stage/suite-output --transfer dma
 if ($LASTEXITCODE -ne 0) { throw 'suite upload failed; no retry' }
-Write-Output 'Lead review required: every digest, paired speedups (>=50x both directions), suite receipt and cleanup.'
+Write-Output 'Lead review required: every digest, DMA >=1.2 GB/s up and >=1.35 GB/s down, suite receipt and cleanup. No SSH timing runs.'
 '''.replace('PROJECT_ROOT', PROJECT.as_posix()), encoding='utf8')
 
 

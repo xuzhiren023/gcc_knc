@@ -91,7 +91,7 @@ class TransferPolicy(unittest.TestCase):
 #include <assert.h>
 static uint64_t total, moved, peer, base;
 static unsigned calls, registrations, releases;
-static int sending;
+static int sending, close_result;
 static int *errno_fake(void) {return &errno;}
 static int64_t reg_fake(endpoint e,void *p,size_t n,int64_t o,int prot,int flags) {
   assert(!o && !flags && n==67108864 && prot==(sending?1:2));
@@ -105,7 +105,7 @@ static int read_fake(endpoint e,int64_t local,size_t n,int64_t remote,int flags)
 static int unreg_fake(endpoint e,int64_t offset,size_t n) {
   assert((uint64_t)offset==base && n==window_size && moved==total);releases++;return 0;
 }
-static int close_fake(endpoint e) {return 0;}
+static int close_fake(endpoint e) {return close_result;}
 static int recv_fake(endpoint e,void *p,int n,int flags) {errno=ECONNRESET;return -1;}
 static int stat_fake(int fd,struct stat *s) {s->st_mode=S_IFREG;s->st_size=total;return 0;}
 static void exact_fake(void *p,size_t n,int send) {
@@ -125,6 +125,10 @@ static void exact_fake(void *p,size_t n,int send) {
 '''
         main = r'''
 int main(int argc,char **argv) {
+  if(!strcmp(argv[1],"cleanup")) {
+    cancelled=opened=registered=1;sc.close=close_fake;close_result=atoi(argv[2]);
+    cleanup();return 0;
+  }
   total=strtoull(argv[1],0,0);peer=strtoull(argv[2],0,0);
   base=(UINT64_C(1)<<62)+4096;sending=atoi(argv[3]);
   sc.reg=reg_fake;sc.read=read_fake;sc.unreg=unreg_fake;
@@ -153,6 +157,35 @@ int main(int argc,char **argv) {
                 result = subprocess.run([str(exe), "1073741824", str(peer), "0"],
                                         env=build.ENV, capture_output=True, text=True)
                 self.assertNotEqual(result.returncode, 0)
+            for failed in (0, 1):
+                result = subprocess.run([str(exe), "cleanup", str(failed)],
+                                        env=build.ENV, capture_output=True, text=True)
+                self.assertEqual('"endpoint_closed":true' in result.stderr, not failed)
+                self.assertEqual(result.returncode, 2 if failed else 0)
+
+    def test_error_cleanup_requires_both_close_reports_and_exits(self):
+        before = {"boot": "same", "bugcheckRecord": 123}
+        for missing, live, changed, guard_error in ((False, False, False, False),
+                (True, False, False, False), (False, True, False, False),
+                (False, False, True, False), (False, False, False, True)):
+            session = Mock()
+            pair = card_dma.HelperPair(session, 10)
+            pair.procs = [Mock(returncode=2), Mock(returncode=None if live else 2)]
+            pair.rows = {"host": [{"endpoint_closed": True}],
+                         "card": [] if missing else [{"endpoint_closed": True}]}
+            if guard_error:
+                session.rpc.side_effect = OSError("boot guard refused")
+            with patch("host_card_transfer.event_log", return_value={} if changed else before):
+                if changed or guard_error:
+                    with self.assertRaises(OSError):
+                        pair.release_dma(before)
+                else:
+                    self.assertEqual(pair.release_dma(before), not (missing or live))
+            self.assertEqual(session.dma_latch.unlink.call_count,
+                             int(not (missing or live or changed or guard_error)))
+            if not (missing or live or changed):
+                self.assertEqual(session.rpc.call_args.args[0],
+                                 "guard_boot && rm -- claude-dma-active")
 
     def test_helper_free_ssh(self):
         runner = runpy.run_path(str(ROOT / "tools/card_run"))

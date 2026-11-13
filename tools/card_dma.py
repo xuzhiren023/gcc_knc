@@ -99,9 +99,9 @@ def cygpath(path):
 class HelperPair:
     """Drain both helpers without ever force-killing a SCIF process.
 
-    The durable active marker is cleared only on two successful close reports.
-    A timeout, lost SSH session or failed helper leaves it for the lead; process
-    exit alone is not proof of safe cleanup. No native action at import time.
+    The durable active marker requires two explicit close reports and exits,
+    including error exits. A timeout or lost report leaves it for the lead;
+    process exit alone is not proof of safe cleanup. No native action at import time.
     """
     def __init__(self, session, timeout):
         self.session = session
@@ -137,6 +137,23 @@ class HelperPair:
             self.errors.append(row["error"])
         self.rows[side].append(row)
         return side, row
+
+    def release_dma(self, before):
+        # A successful scif_close report plus process exit keeps pinned pages
+        # alive through endpoint teardown. Missing evidence must retain both
+        # latches, even if a process listing happens to be empty.
+        if (len(self.procs) != 2 or any(p.returncode is None for p in self.procs)
+                or not all(any(r.get("endpoint_closed") is True or
+                               (r.get("file_complete") is True and r.get("cleanup_confirmed") is True)
+                               for r in rows) for rows in self.rows.values())):
+            return False
+        from host_card_transfer import event_log
+        if event_log() != before:
+            raise TransferFailure("host boot/bugcheck state changed", kind="bugcheck",
+                                  data_started=True, cleanup_confirmed=False)
+        self.session.rpc("guard_boot && rm -- claude-dma-active", self.left(), step="dma-release")
+        self.session.dma_latch.unlink()
+        return True
 
     def run(self, source, private, size, direction, method):
         s = self.session
@@ -211,20 +228,18 @@ class HelperPair:
                        for side, rows in self.rows.items()}
             if any(p.returncode for p in self.procs) or not all(reports.values()):
                 detail = "; ".join(self.errors)[-2000:]
+                cleaned = ("cleanup uncertain" not in detail and self.release_dma(before)) if dma else True
                 raise TransferFailure("file helper failed: " + detail,
-                                      kind="integrity" if "integrity" in detail else "uncertain_cleanup",
-                                      data_started=True, cleanup_confirmed=False)
+                                      kind="integrity" if "integrity" in detail else
+                                      ("io" if cleaned else "uncertain_cleanup"),
+                                      data_started=True, cleanup_confirmed=cleaned)
             a, b = reports["host"], reports["card"]
             if (a["bytes"] != size or b["bytes"] != size or a["sha256"] != b["sha256"]
                     or not all(r.get("digest_match") and r.get("cleanup_confirmed") for r in (a, b))):
                 raise TransferFailure("helper evidence mismatch", kind="integrity",
                                       data_started=True, cleanup_confirmed=False)
             if dma:
-                if event_log() != before:
-                    raise TransferFailure("host boot/bugcheck state changed", kind="bugcheck",
-                                          data_started=True, cleanup_confirmed=False)
-                s.rpc("guard_boot && rm -- claude-dma-active", self.left(), step="dma-release")
-                s.dma_latch.unlink()
+                self.release_dma(before)
             receiver = b if direction == "up" else a
             return dict(bytes=size, source_sha256=a["sha256"], received_sha256=b["sha256"],
                         seconds=receiver["seconds"], wall_seconds=receiver["wall_seconds"],

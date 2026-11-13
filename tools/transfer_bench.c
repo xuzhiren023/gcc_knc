@@ -73,6 +73,8 @@ static void cleanup(void)
       }
     }
     if(sc.close(ep)){fprintf(stderr,"ERROR close; cleanup uncertain\n");_Exit(2);}
+    opened=0;
+    if(cancelled)fprintf(stderr,"{\"endpoint_closed\":true}\n");
   }
   /* On abnormal shutdown leave the pages allocated until process teardown. */
   if(!cancelled) {
@@ -357,7 +359,13 @@ static int transfer_file(int host,const char *method,const char *address,unsigne
     uint64_t mine=(uint64_t)local_offset;
     if(host){exact(&mine,8,1);exact(&peer_offset,8,0);}
     else{exact(&peer_offset,8,0);exact(&mine,8,1);}
-    if(peer_offset>(UINT64_C(1)<<62)-window_size || (peer_offset&4095))die("remote offset range");
+    /* MPSS 3.7 scif.h, scif_register: 2^62 bounds FIXED requests only.
+       Driver-assigned windows may be higher; bound the final byte, not the
+       file length. Every chunk reuses these same registered base offsets. */
+    if(peer_offset>(uint64_t)INT64_MAX-(window_size-1) || (peer_offset&4095)) {
+      fprintf(stderr,"SCIF remote offset=%"PRIu64" window=%zu\n",peer_offset,window_size);
+      die("remote offset range");
+    }
   }
   sha256 hash;unsigned char digest[32],peer_digest[32];char hex[65];sha_init(&hash);
   for(uint64_t off=0;off<size;) {
