@@ -74,12 +74,16 @@ done
     # Reuse the harness's resident timer and donor decoder without changing them.
     shutil.copyfile(corpus.SHARED / 'S11-18/launch', OUT / 'launch')
     shutil.copyfile(corpus.SHARED / 'S11-18/input.bin', OUT / 'input.bin')
+    stage_peer()
+    stage_lead()
+
+
+def stage_peer():
     peer = corpus.SHARED / 'S11-18' / corpus.DONOR / '0/serial/zlib'
     with tarfile.open(OUT / 'peer.tar', 'w') as archive:
         archive.add(peer / 'workload', arcname='workload')
         for runtime in peer.glob('*.so*'):
             archive.add(runtime, arcname=runtime.name)
-    stage_lead()
 
 
 def stage_lead():

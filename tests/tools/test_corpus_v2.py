@@ -432,5 +432,39 @@ int main(void) {
                 self.assertEqual((directory / 'packed.bin').read_bytes(), packed)
 
 
+class PgoPeerPackaging(unittest.TestCase):
+    """S11-17: BusyBox-compatible archive and an executable decoder after unpack."""
+
+    def test_peer_unpack_and_decode_commands(self):
+        import tarfile
+        import s11_17_pgo as pgo
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            donor = root / 'S11-18' / corpus.DONOR / '0/serial/zlib'
+            donor.mkdir(parents=True)
+            decoder = donor / 'workload'
+            decoder.write_text('#!/bin/sh\necho "PEER $1"\n')
+            decoder.chmod(0o644)  # Host file permissions must not leak into tar.
+            (donor / 'libfixture.so').write_bytes(b'fixture')
+            out = root / 'S11-17'
+            out.mkdir()
+            with patch.object(corpus, 'SHARED', root), patch.object(pgo, 'OUT', out):
+                pgo.stage_peer()
+            with tarfile.open(out / 'peer.tar') as archive:
+                members = archive.getmembers()
+                self.assertFalse(any(m.pax_headers for m in members),
+                                 'card BusyBox must not encounter pax headers')
+                self.assertEqual(archive.getmember('workload').mode, 0o755)
+                self.assertEqual(archive.getmember('libfixture.so').mode, 0o644)
+            # The actual launcher shell commands followed by its two execl calls.
+            result = subprocess.run(
+                ['sh', '-ec', 'mkdir -p peer && tar -xf peer.tar -C peer; '
+                 './peer/workload decode; ./peer/workload control'],
+                cwd=out, capture_output=True, text=True)
+            self.assertEqual(result.returncode, 0, result.stderr)
+            self.assertEqual(result.stdout.splitlines(), ['PEER decode', 'PEER control'])
+            self.assertEqual(result.stderr, '')
+
+
 if __name__ == '__main__':
     unittest.main()
