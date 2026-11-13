@@ -147,6 +147,10 @@ M1 is accepted and tagged `m1` locally; nothing is pushed. Engineers are Claude 
 - **Restore target runtime files after replacing the GCC build tree.** `tools/toolchain.py gcc16` builds `all-gcc` only and removes the old tree, including `crtbegin.o`, `crtend.o` and `libgcc`. S3-04's first T2 regression therefore failed to link; `tools/toolchain.py libgcc` through `tools/run.py` restored the fork-built runtime, and the failed T2 checks then passed. Do this after a full rebuild before link checks.
 
 ## Open items not on a ticket
+- 2026-11-13 10:50 EST (owner): PGO must be one flag. The user never runs the instrumented build or the profile run by hand; GCC does the counted build, runs the training, and does the rebuild by itself. The user supplies only the training command. Lead plan: a Sprint 12 work item once S11-17 shows a real gain on zlib. Design points:
+  - The driver records each compile command and replays them with -fprofile-use at link time, so Makefile projects work too, much as LTO recompiles at link.
+  - The training run goes through card_run from the host; on PhiNix it is a local run.
+  - It fails loudly if any profile is missing or unused.
 - 2026-11-13 09:45 EST (owner): card runs whose only job is checking answers (bisection rounds, correctness and crash sweeps, the batch-check native suite) run in parallel, one serial job per core. Timed runs keep the frozen S11-14 rule: an exclusive card, one launch at a time. No concurrency calibration.
 - 2026-11-13 09:10 EST (owner): the S11-24 WRF build is removed (WRF-4.8.0-smpar tree and the smpar binaries; wrf-trial 1.1 GB to 96 MB). Kept: the scripts, reproducers, netCDF, run notes. S11-26 will be a clean build from a fresh tree.
 - 2026-11-13 09:00 EST: PhiWeather paused their WRF trial of our build until S11-26 (Sprint 13) is staged; nobody times the current smpar build. Message their lead when S11-26 stages.
