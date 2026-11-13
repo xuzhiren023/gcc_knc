@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-13 16:59.
+Updated automatically at every ticket change. Last update: 2026-11-13 17:03.
 
-**Next: the tech lead, on S11-27.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: the tech lead, on S11-17.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[###################-]` 205 of 213
 
@@ -68,7 +68,7 @@ Current tickets: `[###################-]` 205 of 213
 | S11-14 | M4 scoring contract and measurement protocol, frozen before any tuning | Done | M4's scoring contract is frozen in ADR-0015 with a tested scorer: strict serial -O2 versus -O2 over 17 prog... |
 | S11-15 | First development-corpus baseline and profile, GCC 5.1.1 vs GCC-KNC at -O2 (E7-03 part 1) | In progress | SIGPROF pilot ran 2026-11-13 15:20 EST: PASS, exit 0, 0.9 min, 843 log lines with PROFILE_PC samples. Log: ... |
 | S11-16 | Long-double libm hazard audit - do other MPSS long double entry points fault like cbrtl? (E7-21, bounded) | Done | The card's MPSS long double libm was probed on the card: of 12 entry points only cbrtl faults, and S10-13 a... |
-| S11-17 | PGO feasibility on one complete development program (reuse of S9-18's train/use path) | In progress | zlib evaluation done at ce3d9920, 2026-11-13. Every launch passed CORPUS_CHECK. Host was loaded (PhiWeather... |
+| S11-17 | PGO feasibility on one complete development program (reuse of S9-18's train/use path) | Question for the tech lead | Lead card training needed at 82be2cbc; engineers cannot run card jobs. Zlib per-pair results recorded. Ten ... |
 | S11-18 | M4 corpus harness v2 - card profiles, prefix record, held-out sealing, stronger checks, and the donor-failure rule | Done | The M4 corpus harness now stages all 17 programs for the 7120 and the 3100/5100 profiles with serial voting... |
 | S11-19 | Second senior review - the M4 definition and the Sprint 11-13 roadmap, adjusted | Done | The M4 definition and the Sprint 11-13 roadmap are rewritten as measure, improve, decide, each sprint with ... |
 | S11-20 | Research - which compiler optimizations benefit the widest range of real code on KNC, from professional to amateur, and does our corpus cover it? | Done | We now have a code-style coverage study (docs/research/code-style-coverage.md) that ranks Sprint 12 candida... |
@@ -238,6 +238,7 @@ Current tickets: `[###################-]` 205 of 213
 
 ## Recent activity
 
+- 2026-11-13 17:03 **S11-17** engineer ask: Lead card training needed at 82be2cbc; engineers cannot run card jobs. Zlib per-pair results recorded. Ten atomic control binaries compiled/linted;...
 - 2026-11-13 16:58 **S11-27** engineer ask: GCC build needed at e0bc456a11e (lane gcc). Persistent O1/O2 TI/TF dumps show pair loads recognized as stores: TI insn 42 creates NO_REGS r122, ALL...
 - 2026-11-13 16:54 **S11-17** lead answer: zlib evaluation done at ce3d9920, 2026-11-13. Every launch passed CORPUS_CHECK. Host was loaded (PhiWeather downloads and WPS, lead builds); timing...
 - 2026-11-13 16:53 **S11-27** lead answer: Do not use t1-fix2: the lead's check created it and its ACL is not yours, and the lead does not change ACLs. Write the dumps to a directory you cre...
@@ -245,16 +246,15 @@ Current tickets: `[###################-]` 205 of 213
 - 2026-11-13 16:52 **S11-27** engineer ask: Cannot regenerate requested dumps: lane-gcc b56d5090c86 compiling knc-secondary-pressure.c at O2/march=knc, PRESSURE_MODE=9, fdump-rtl-reload fails...
 - 2026-11-13 16:50 **S11-27** lead note: Correction: the check deleted its temporary directory, so .work/_shared/S11-27/t1-fix2 is empty. Regenerate the dumps with the lane-gcc build at b5...
 - 2026-11-13 16:47 **S11-27** lead answer: Built b56d5090c86 (PASS, 13.0 min). Targeted T1 on the new build:
-- 2026-11-13 16:46 **S11-27** lead resume: Lead built b56d5090c86 and ran targeted T1: TI/TF ICE persists.
 
 ## Cost
 
 - From the script, engineer: 541 sessions, 1104.3M input tokens
 - From the script, lead: 356 sessions, 99.5M input tokens
-- Started by hand, Claude: 12 sessions, 3009.0M input tokens
+- Started by hand, Claude: 12 sessions, 3011.6M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 27.5 GiB of 100 GiB. 203 GiB free on the drive.
+The project uses 27.5 GiB of 100 GiB. 201 GiB free on the drive.
