@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-13 15:19.
+Updated automatically at every ticket change. Last update: 2026-11-13 15:22.
 
-**Next: GPT-6.1, on S11-15 (First development-corpus baseline and profile, GCC 5.1.1 vs GCC-KNC at -O2 (E7-03 part 1)).** Run `python tools/dispatch.py`, or ask the tech lead to.
+**Next: the tech lead, on S11-17.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[###################-]` 205 of 213
 
@@ -68,7 +68,7 @@ Current tickets: `[###################-]` 205 of 213
 | S11-14 | M4 scoring contract and measurement protocol, frozen before any tuning | Done | M4's scoring contract is frozen in ADR-0015 with a tested scorer: strict serial -O2 versus -O2 over 17 prog... |
 | S11-15 | First development-corpus baseline and profile, GCC 5.1.1 vs GCC-KNC at -O2 (E7-03 part 1) | In progress | SIGPROF pilot ran 2026-11-13 15:20 EST: PASS, exit 0, 0.9 min, 843 log lines with PROFILE_PC samples. Log: ... |
 | S11-16 | Long-double libm hazard audit - do other MPSS long double entry points fault like cbrtl? (E7-21, bounded) | Done | The card's MPSS long double libm was probed on the card: of 12 entry points only cbrtl faults, and S10-13 a... |
-| S11-17 | PGO feasibility on one complete development program (reuse of S9-18's train/use path) | lead | Needs the interactive lead's card runs at bf894ae5, in an exclusive turn, from the S11-17 worktree: the pil... |
+| S11-17 | PGO feasibility on one complete development program (reuse of S9-18's train/use path) | Question for the tech lead | Lead ran the evaluation pilot at 15:22 EST: harness failures, results in the answer. |
 | S11-18 | M4 corpus harness v2 - card profiles, prefix record, held-out sealing, stronger checks, and the donor-failure rule | Done | The M4 corpus harness now stages all 17 programs for the 7120 and the 3100/5100 profiles with serial voting... |
 | S11-19 | Second senior review - the M4 definition and the Sprint 11-13 roadmap, adjusted | Done | The M4 definition and the Sprint 11-13 roadmap are rewritten as measure, improve, decide, each sprint with ... |
 | S11-20 | Research - which compiler optimizations benefit the widest range of real code on KNC, from professional to amateur, and does our corpus cover it? | Done | We now have a code-style coverage study (docs/research/code-style-coverage.md) that ranks Sprint 12 candida... |
@@ -238,6 +238,7 @@ Current tickets: `[###################-]` 205 of 213
 
 ## Recent activity
 
+- 2026-11-13 15:22 **S11-17** lead resume: Lead ran the evaluation pilot at 15:22 EST: harness failures, results in the answer.
 - 2026-11-13 15:19 **S11-27** lead approve-red: The NPB-MG wrong answer is traced to a reload bug: on vectorized stencil loops, KNC's x87-to-vector scratch slot is addressed 48 bytes too high and...
 - 2026-11-13 15:18 **S11-27** engineer red: Red at 9e76de00: stencil asm check FAIL O2/noreuse, PASS novec. LRA bridge scratch overwrites six live array elements: missing -48 frame-to-rbp off...
 - 2026-11-13 15:14 **S11-28** lead defer: After S11-29 merges (still ready): run .work/_shared/S11-28/lead-pilot.ps1 at 242936bf+ (30 exclusive timed launches, 4-7 h; owner OK if longer tha...
@@ -245,16 +246,15 @@ Current tickets: `[###################-]` 205 of 213
 - 2026-11-13 15:10 **S11-15** lead answer: SIGPROF pilot ran 2026-11-13 15:20 EST: PASS, exit 0, 0.9 min, 843 log lines with PROFILE_PC samples. Log: .work/_state/logs/S11_15_profile_sigprof...
 - 2026-11-13 15:10 **S11-15** lead resume: Lead ran the SIGPROF pilot at 15:20 EST: PASS.
 - 2026-11-13 15:09 **S11-28** lead answer: Memory round ran 2026-11-13 15:00-15:10 EST: 10.5 min, memory-results.json, log .work/_state/logs/S11_28_memory-20261113-145740.log. Exit 124 means...
-- 2026-11-13 15:09 **S11-28** lead resume: Lead ran lead-memory.ps1 at 15:10 EST: results in the answer.
 
 ## Cost
 
 - From the script, engineer: 533 sessions, 1091.2M input tokens
 - From the script, lead: 349 sessions, 97.8M input tokens
-- Started by hand, Claude: 12 sessions, 2956.6M input tokens
+- Started by hand, Claude: 12 sessions, 2958.0M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 26.6 GiB of 100 GiB. 243 GiB free on the drive.
+The project uses 26.6 GiB of 100 GiB. 239 GiB free on the drive.
