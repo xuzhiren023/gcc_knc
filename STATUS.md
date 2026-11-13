@@ -78,7 +78,7 @@ Current tickets: `[###################-]` 205 of 213
 | S11-24 | WRF OpenMP (smpar) build with GCC-KNC at -mphinix, for PhiWeather's benchmark - replaces the serial trial build | Done | WRF v4.8.0 now builds as an OpenMP card binary at -mphinix with GCC-KNC (wrf.exe and real.exe linked, needi... |
 | S11-25 | ICE in do_store_flag (expr.cc) on WRF's surface layer (SFCLAY1D) at -O2 -march=knc | Done | The last WRF file that crashed GCC-KNC (surface layer, SFCLAY1D) now compiles: vector 'ordered and not equa... |
 | S11-26 | WRF OpenMP build at -mphinix with no per-file workarounds (S11-23 and S11-25 fixed), restaged for PhiWeather | draft | Owner 2026-11-13: the S11-24 WRF build is removed. Deleted: |
-| S11-27 | Wrong code - NPB-MG (class A, serial) built by GCC-KNC at -O2 -march=knc fails NPB verification on the card | Question for the tech lead | Cannot regenerate requested dumps: lane-gcc b56d5090c86 compiling knc-secondary-pressure.c at O2/march=knc,... |
+| S11-27 | Wrong code - NPB-MG (class A, serial) built by GCC-KNC at -O2 -march=knc fails NPB verification on the card | In progress | Do not use t1-fix2: the lead's check created it and its ACL is not yours, and the lead does not change ACLs... |
 | S11-28 | HPCG run that fits every card model - fixed work instead of fixed duration, grid sized to the 3100's memory | lead | After S11-29 merges (still ready): run .work/_shared/S11-28/lead-pilot.ps1 at 242936bf+ (30 exclusive timed... |
 | S11-29 | card_run profiles limit memory in use, not address space, so a 3100 or 5100 run fails only where the real card would | Not started | Dependency on S11-02 removed, so the HPCG chain (S11-29, then S11-28) does not wait on the DMA debugging. B... |
 | S12-01 | Sprint 12 prep - static code-quality census of the development-corpus builds (spills, x87/vector transfers, addressing, calls, code size) | Done | A static code-quality census (spill/reload proxies, x87 and x87-zmm traffic, address arithmetic, calls, bra... |
@@ -238,6 +238,7 @@ Current tickets: `[###################-]` 205 of 213
 
 ## Recent activity
 
+- 2026-11-13 16:53 **S11-27** lead answer: Do not use t1-fix2: the lead's check created it and its ACL is not yours, and the lead does not change ACLs. Write the dumps to a directory you cre...
 - 2026-11-13 16:53 **S11-17** lead resume: Lead finished the zlib evaluation at 16:55 EST.
 - 2026-11-13 16:52 **S11-27** engineer ask: Cannot regenerate requested dumps: lane-gcc b56d5090c86 compiling knc-secondary-pressure.c at O2/march=knc, PRESSURE_MODE=9, fdump-rtl-reload fails...
 - 2026-11-13 16:50 **S11-27** lead note: Correction: the check deleted its temporary directory, so .work/_shared/S11-27/t1-fix2 is empty. Regenerate the dumps with the lane-gcc build at b5...
@@ -245,7 +246,6 @@ Current tickets: `[###################-]` 205 of 213
 - 2026-11-13 16:46 **S11-27** lead resume: Lead built b56d5090c86 and ran targeted T1: TI/TF ICE persists.
 - 2026-11-13 16:45 **S11-02** lead note: Legacy latch released per validate.ps1 recovery steps:
 - 2026-11-13 16:43 **S11-02** lead changes: Card validation 2 at 3953ab96, 2026-11-13 16:40-16:42 EST, with PhiWeather's OK. The legacy latch was released first per the recovery steps (see th...
-- 2026-11-13 16:42 **S11-02** lead resume: Lead reran validate.ps1 at 16:40 EST: DMA payload works; two new problems.
 
 ## Cost
 
@@ -257,4 +257,4 @@ Current tickets: `[###################-]` 205 of 213
 
 ## Disk
 
-The project uses 27.5 GiB of 100 GiB. 206 GiB free on the drive.
+The project uses 27.5 GiB of 100 GiB. 205 GiB free on the drive.
