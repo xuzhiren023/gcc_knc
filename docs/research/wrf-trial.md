@@ -1,12 +1,29 @@
 # Exploratory WRF build with GCC-KNC (S11-21)
 
-**Final stage: dependencies built and API-linked; serial WRF compilation
-stopped at a reproduced GCC-KNC postreload ICE in radiation routine `RTRN`.
-Neither `wrf.exe` nor `real.exe` linked. No card run occurred.** The isolated,
-self-contained 235-line Fortran reproducer and WRF licence are retained in
-`.work/_shared/wrf-trial/repro/`. The final finding below supersedes pending
-status in the chronological continuation notes. No GCC change or build was
-attempted; the compiler defect requires a separate ticket.
+**Stage reached: serial, no-nesting WRF 4.8.0 `em_real` built both
+`wrf.exe` and `real.exe`. ELF/runtime and internal-I/O archive checks passed.
+Binary lint has no recorded completion; no card run occurred.** Two distinct GCC-KNC ICEs
+required per-file `-O1` workarounds: `module_ra_rrtm` (S11-23) and
+`module_sf_sfclay` (new `do_store_flag` failure). Both have isolated
+Fortran reproducers in `.work/_shared/wrf-trial/repro/`. Disabling SLP alone
+failed for each. No GCC source change or GCC build was attempted.
+Full success/miss vector reports were collected for WSM5 and advection.
+This stage supersedes the historical stops recorded below.
+
+The owner's 23:54 continuation limits the remaining work to this report and
+submission, with no further build work. The completed build and vector
+checks below are retained results, not rerun in this final documentation
+session. The trial establishes that the serial model links with the two
+compiler workarounds; it does not qualify these binaries for native use.
+
+| Blocker class | Final disposition |
+| --- | --- |
+| GCC-KNC defects | Two distinct ICE sites: RTRN (S11-23) and SFCLAY1D (`do_store_flag`). Both isolated; both require per-file `-O1` after SLP disabling failed. Compiler fixes remain E7-20 prerequisites. |
+| Dependency source compatibility | netCDF-Fortran 4.6.1 classic-path include names and guarded constants corrected in a retained patch. GCC 16 modules and the API link passed. |
+| Cross configuration and host infrastructure | MSYS environment contamination, install paths, incomplete/CRLF export, target RPC execution probe, architecture configuration, Registry preparation, stale host object, runtime link propagation and exported-submodule checks resolved as detailed below. |
+| WRF build ordering | `ccpp_kind_types` parallel-make failure avoided by the authorized serial physics submake. No scientific source change. |
+| GCC 16 source strictness | WRF's compatibility switches `-fallow-argument-mismatch` and `-fallow-invalid-boz` retained. No remaining strictness blocker in the completed build. |
+| Outstanding qualification | Binary instruction lint has no recorded result; native smoke, scientific comparison, memory measurement and MPI/OpenMP remain unperformed. |
 
 ## Scope and inventory
 
@@ -67,9 +84,12 @@ python tools/run.py --name S11-21-inputs -- python ../_shared/wrf-trial/prepare.
 python tools/run.py --name S11-21-netcdf-c-make --inputs ../_shared/wrf-trial/trial-env.sh ../_shared/wrf-trial/netcdf-c.sh -- C:/Users/xuzhi/Documents/PhiWeather/.tools/knc-bootstrap/cygwin/bin/bash.exe ../_shared/wrf-trial/trial-env.sh bash ../_shared/wrf-trial/netcdf-c.sh build-only
 ```
 
-## Stage reached and blockers
+## Historical stages and blockers
 
-**Latest resume: the corrected Registry.EM precheck passed. A new em_real
+These chronological notes describe earlier attempts. The current stage is
+at the top; later continuation sections record subsequent resolutions.
+
+**Historical resume: the corrected Registry.EM precheck passed. A new em_real
 attempt reached framework, I/O and physics compilation, but exposed a second
 trial Registry preparation error (12 streams instead of 25) and the anticipated
 physics parallel-make dependency failure. Neither model executable linked.
@@ -225,7 +245,7 @@ build/test invocation (including the requested dynamic-dependency check):
 python tools/run.py --name S11-21-netcdf-link-no-cxx --inputs ../_shared/wrf-trial/netcdf-link.sh ../_shared/wrf-trial/netcdf-link.f90 -- C:/Users/xuzhi/Documents/PhiWeather/.tools/knc-bootstrap/cygwin/bin/bash.exe ../_shared/wrf-trial/trial-env.sh bash ../_shared/wrf-trial/netcdf-link.sh
 ```
 
-### Current blocker: WRF source preparation
+### Historical blocker: WRF source preparation
 
 Read-only inspection identifies upstream tag `v4.8.0` at
 `06d4240ae989cc3e50af412bb472df3d9048783c` in
@@ -621,7 +641,7 @@ The recorded `src/patches/wrf-4.8.0-serial-physics.patch` sets `-j1 J=-j1`
 only on the physics `non_nmm` recursive make for the authorized serial retry;
 other stages retain at most eight jobs. No scientific source was changed.
 
-## Final finding: GCC-KNC postreload ICE
+## First compiler finding: GCC-KNC postreload ICE (S11-23)
 
 The corrected attempt ran through `trial-env.sh` and `wrf-retry.sh`: WRF's
 own cleanup/configure followed by `./compile -j 8 em_real`, with the recorded
@@ -674,6 +694,66 @@ additions, below the 25 GB budget. Earlier build durations and failures are
 retained above; they must not be interpreted as a successful total compile
 time.
 
+## Continuation requested at 22:13: per-file compiler workaround
+
+The first continuation appended a private target-specific `FCOPTIM` addition
+in `configure.wrf`, also retained in `wrf-post-configure.sh`, for
+`module_ra_rrtm.o` only. The logged command confirms `-O2 -march=knc
+-fno-tree-slp-vectorize`. It **still ICEs** at exactly the same `RTRN` SF
+register move, source lines 6427/6602, in postreload (log lines 529-534).
+This is another occurrence of S11-23, not a second distinct compiler defect.
+The existing isolated reproducer remains applicable. WRF's `make -i`
+continued into physics; the attempt was terminated after **5.5 minutes**
+(wrapper exit 3840). No build process remained before the next attempt.
+
+Log: `.work/_state/logs/S11_21_wrf_slp_workaround-20261112-221954.log`.
+
+The authorized fallback replaces only that object's `FCOPTIM` with
+`-O1 -march=knc -fopt-info-vec`. It retains the static runtime flags, endian
+I/O options, GCC compatibility flags and all other files' optimization.
+This is a compiler workaround for S11-23, not a WRF source patch or a
+change to floating-point precision policy. The incremental continuation
+uses `wrf-build.sh`; no clean rebuild or GCC build is needed.
+
+RTRN compiled successfully at `-O1` (156,936-byte object). That continuation
+then exposed **a second distinct GCC-KNC defect**, in surface-layer routine
+`SFCLAY1D`, generated `phys/module_sf_sfclay.f90:261`. During RTL expansion,
+`do_store_flag` aborts at `expr.cc:13879`. This is not source strictness,
+cross configuration or an assembler diagnostic. The attempt was stopped
+at **6.1 minutes** (wrapper exit 3840), with no process left before resuming.
+Log: `.work/_state/logs/S11_21_wrf_rtrn_O1-20261112-222601.log:26701`.
+
+`repro/sfclay1d.f90` isolates the 701-line routine and its module constants
+and saved lookup arrays, with no WRF module dependencies. It is derived
+from the copied WRF 4.8.0 source; `repro/LICENSE-WRF.txt` retains its licence.
+`repro/reproduce-sfclay.sh` reproduces the same ICE with only `-O2
+-march=knc -ffree-line-length-none` plus an optimized-tree diagnostic dump.
+Log: `.work/_state/logs/S11_21_sfclay_repro-20261112-223324.log` (exit 1).
+This is a routine-level reproducer; the exact triggering expression has
+not yet been isolated, so no specific comparison-mode diagnosis is claimed.
+
+The full SFCLAY module also failed with `-fno-tree-slp-vectorize`:
+`.work/_state/logs/S11_21_sfclay_no_slp-20261112-223409.log` (exit 1).
+The authorized `-O1` fallback **passed**, using the original logged compile
+command with only its optimization level changed:
+`.work/_state/logs/S11_21_sfclay_O1-20261112-223440.log` (exit 0).
+The private target-specific rule in `configure.wrf` and the post-configure
+script retain this second per-file workaround. `wrf-sfclay-workaround.py`
+records the single-module command; the rest of WRF remains at its configured
+optimization settings. `wrf-resume.py` now supervises the unchanged build
+script and stops its process group on the first compiler/link error, after
+retaining the diagnostic, to avoid WRF's `make -i` continuing indefinitely.
+
+| Distinct compiler ICE | Isolated input | Failed narrow workaround | Passing per-file workaround |
+| --- | --- | --- | --- |
+| RTRN postreload SF move constraints (S11-23) | `repro/rtrn.f90` | `-O2 -fno-tree-slp-vectorize` | `module_ra_rrtm.o`: `-O1 -march=knc` |
+| SFCLAY1D `do_store_flag` during expand | `repro/sfclay1d.f90` | `-O2 -fno-tree-slp-vectorize` | `module_sf_sfclay.o`: `-O1 -march=knc` |
+
+At this point the trial has **two distinct ICE sites**, each seen in the
+original full module, its isolated routine, and its failed SLP-disabled
+module compile (six failing compiler invocations across sessions). Neither
+workaround is a compiler fix or evidence of native correctness.
+
 ## Vectorization
 
 The interrupted second attempt emitted `-fopt-info-vec` output while WRF's
@@ -689,16 +769,97 @@ preprocessed Fortran in `src/WRF-4.8.0/phys/`:
 
 The first two match the input's short-row/inner-horizontal-loop concerns;
 no particular short trip count or performance gain was established here.
-No `missed:` diagnostics were emitted by the selected `-fopt-info-vec`
-setting. Absence of a success message does not establish a missed-vector
-reason. Dynamics and systematic missed-reason analysis remain blocked;
-collect `-fopt-info-vec-all` on selected files after the build blockers clear.
+The earlier `-fopt-info-vec` setting did not emit `missed:` diagnostics.
+The continuation collected `-fopt-info-vec-all` on generated WSM5 physics
+and advection sources at `-O2 -march=knc`, with the same language/I/O
+compatibility flags and no fast math. This **passed in 0.9 minute**:
+`.work/_state/logs/S11_21_wrf_vector_notes-20261112-231545.log`.
+`wrf-vector-notes.py` writes module outputs into `vector-notes/` and sends
+assembly to `/dev/null`; it does not replace the model's objects or modules.
+It ran independently while one remaining model compiler process was active.
+The full reports are `vector-notes/module_mp_wsm5.vec.txt` and
+`vector-notes/module_advect_em.vec.txt` under the trial root.
+
+| Generated file/routine and loop line | Construct | Observed result/reason |
+| --- | --- | --- |
+| `phys/module_mp_wsm5.f90:147`, `wsm5` | Innermost horizontal `i` row in `j/k/i`, temperature product and species copies | 64-byte vectors, factor 16; masked epilogue. Outer `j`/`k` at 145/146 are not vectorized because the nests contain multiple consecutive inner loops. |
+| `phys/module_mp_wsm5.f90:1896`, `effectRad_wsm5` | Vertical `k` loop with a conditional `CYCLE`, fractional power and effective-radius update | Not vectorized: unsupported control flow. The neighboring ice/snow loops at 1904/1912 receive the same reported reason. No claim that a specific math call alone causes the miss. |
+| `dyn_em/module_advect_em.f90:186`, `advect_u` | Innermost `i` row for sixth-order y flux, inside `j/k/i` | 64-byte vectors, factor 16, masked epilogue. The outer `k` at 185 reports unsupported control flow; the `j` loop at 181 reports multiple consecutive inner loops. These outer misses do not negate the vectorized inner row. |
+| `dyn_em/module_advect_em.f90:199`, `advect_u` | Horizontal second-order boundary flux row | 64-byte vectors, factor 16, masked epilogue. |
+
+These are compiler decisions for actual configured WRF sources. The reports
+do not establish the runtime trip counts, lane utilization, performance,
+correctness, or exact final gather/spill costs. No separate constant-divide
+accuracy or invariant-hoisting experiment was added to this ticket.
 The input in
 `docs/research/wrf-input-2026-11-06.md` prioritizes short innermost `i` rows in
 `j/k/i` loops, k extents around 50–51, constant `/12` and `/60`, gathers,
 unaligned accesses, and invariant `sin`/`SIZE`. Its GCC 5 and hand-written
 kernel measurements are prior input, not observations about this compiler.
 Do not substitute synthetic kernel results for whole WRF loop reports.
+
+## Successful continuation and staged model binaries
+
+`S11-21-wrf-two-workarounds` **passed, exit 0, in 65.4 minutes**,
+including the build and ELF/archive checks. It started at 22:35:24 on
+2026-11-12. This was an **incremental** continuation using objects retained
+from the preceding attempts, not a clean-build benchmark. The two earlier
+continuations in this session took 5.5 and 6.1 minutes and failed as recorded
+above; diagnostic vector compilation added 0.9 minute. The final build log
+contains 231,717 lines:
+`.work/_state/logs/S11_21_wrf_two_workarounds-20261112-223524.log`.
+No additional compiler ICE occurred in this successful continuation.
+
+The configuration is serial `em_real`, no nesting, no MPI/OpenMP, with
+`-O2 -march=knc` as the baseline, no fast math, the existing upstream special
+optimization rules, and the two additional private per-object `-O1`
+workarounds. Physics retains the previously authorized single-job submake;
+other WRF stages use at most eight make jobs. One long-running host compiler
+was observed with 986 CPU seconds and approximately 1.53 GB resident memory;
+this is a build-process snapshot, not a model-memory estimate.
+
+The final `check-wrf-links.py` pass checked every linked target ELF it found,
+including the model programs, ndown/tc, configure probes and I/O utilities.
+All were K1OM (ELF machine 181), with no NEEDED entry for `libgfortran.so.5`,
+`libstdc++.so.6`, or `libgcc_s.so.1`. It also confirmed K1OM machine headers
+for all members reported from `external/io_int/libwrfio_int.a`. The former
+stale-host-object problem is therefore resolved in the completed build.
+These checks were not repeated after passing.
+
+The separate instruction-lint log
+`.work/_state/logs/S11_21_wrf_binary_lint-20261112-234105.log` is empty;
+there is no recorded completion status available for it. An empty log is
+not a lint pass. Per the owner's documentation-only completion direction,
+no new validation or build was started. The lead must obtain an instruction
+lint result before any card run; the passed ELF/runtime checks above do not
+substitute for instruction lint.
+
+Staging remains in place under the shared trial directory:
+
+| Artifact relative to `.work/_shared/wrf-trial/` | Size | Dynamic NEEDED entries |
+| --- | --- | --- |
+| `src/WRF-4.8.0/main/wrf.exe` | 65,234,334 bytes | `libm.so.6`, `libdl.so.2`, `libc.so.6` |
+| `src/WRF-4.8.0/main/real.exe` | 48,208,178 bytes | `libm.so.6`, `libdl.so.2`, `libc.so.6` |
+
+Final measured trial storage is **984,383,044 logical bytes (about 984 MB)**,
+including retained stale dependency trees, source copies, reproducers and
+vector reports, below the 25 GB budget. Run logs live separately in `_state`.
+A first Windows size traversal followed a Cygwin link and failed with
+WinError 1920; the reported measurement instead uses `lstat` without
+following links. This was a measurement issue, not a build failure.
+
+After instruction lint, for a first **lead-coordinated** card smoke, supply a small single-domain
+WPS `met_em` case and matching `namelist.input`, with no nesting; include
+the runtime tables needed by the selected physics from the copied WRF
+release and writable output space. Run `real.exe` first, then a short
+`wrf.exe` integration with **one process and one thread** for this serial
+build. Native libc/libm/libdl and the target loader must be available;
+GCC 16 shared runtime libraries are not needed by these binaries. Model
+memory has **not been measured**: domain dimensions, levels and physics
+must be agreed with PhiWeather before choosing a card memory allocation,
+and peak RSS should be recorded on the first run. Executable file size is
+not a working-memory estimate. No native correctness, timing or scientific
+comparison has been performed. No engineer card job or x86 check was run.
 
 ## Proposed E7-20 work
 
@@ -710,20 +871,29 @@ reconfiguration, static runtime propagation and exported-source submodule
 patching are implemented. Package 1 must retain the normal top-level
 `toolsdir` build flags as well as the complete `Registry.EM` input: generating
 some includes is insufficient if the tool and model use different stream
-limits. Package 3 must verify the auxiliary runtime links and retain serial
+limits. Package 3 must retain the now-passed auxiliary runtime checks and serial
 physics compilation until its demonstrated `ccpp_kind_types` make dependency
 is fixed. A new prerequisite is now concrete: **E7-20 compiler-blocker ticket
 (1-3 engineering days initially, subject to diagnosis)** must turn the
 retained `RTRN` reproducer into a failing regression, fix the SF register-move
 constraint failure without enabling SSE/AVX flags, and obtain a lead-built
-compiler. This precedes package 3; do not work around it by changing WRF's
-optimization or floating-point policy. The remaining estimates are unchanged.
+compiler. S11-23 owns the RTRN defect. A second compiler ticket is needed for the
+SFCLAY1D do_store_flag reproducer (initially 1-3 engineering days);
+its trigger and relation to any existing backend issue remain undiagnosed.
+For exploratory package 3 only, the lead
+authorized disabling SLP for module_ra_rrtm, with -O1 as a fallback, and
+the same reproducer-first, per-file approach to further ICEs. A production
+baseline must remove these workarounds after compiler fixes and revalidate
+the affected files. Floating-point policy remains unchanged. The remaining
+estimates are unchanged.
 
 1. **Reproducible source/configuration baseline (0.5–1 day):** export a pristine
    WRF 4.8.0 revision from the read-only source repository, preserve its licence,
    and isolate only the necessary cross configuration from PhiWeather's local
-   changes. First obtain a lead-approved export path; include all seven pinned
-   physics submodules and replace host/target execution configure probes. Establish host tools versus target tools and classic netCDF options.
+   changes. Retain the lead-supplied export and its recorded correction;
+   include all seven pinned
+   physics submodules and replace host/target execution configure probes.
+   Establish host tools versus target tools and classic netCDF options.
 2. **GCC 16 dependency stack (1–2 days, after this trial):** retain the
    corrected environment and successful relative-directory installation of
    netCDF-C, retain the now-built classic Fortran compatibility patch and fresh GCC 16
@@ -731,14 +901,20 @@ optimization or floating-point policy. The remaining estimates are unchanged.
    rule;
    classify strictness versus cross-probe failures without executing target
    probes on the host. Any compiler defect gets a separate reduced case and
-   lead-built compiler fix before this work resumes.
-3. **Serial `em_real` compile/link (1–3 days after dependencies):** generate
-   configuration, use documented compatibility flags only where diagnostics
-   justify them, and build `real.exe`/`wrf.exe`. Record every source/strictness,
-   cross-configuration or compiler blocker and any minimal patch.
-4. **Hot-loop compiler evidence (0.5–1 day after compilation):** collect
+   lead-built compiler fix before production qualification; exploratory
+   continuation may use the explicitly authorized per-file workarounds.
+3. **Serial `em_real` qualification (1-3 days after dependency/compiler fixes):**
+   the exploratory link is now complete. Turn the retained trial recipes into
+   a clean reproducible build, remove the two per-file compiler workarounds
+   after the relevant compiler fixes, and repeat ELF/lint checks on those
+   changed artifacts. Preserve the passed static runtime policy and the
+   serial physics ordering until its make dependency is fixed. Measure a
+   clean build separately from this incremental continuation.
+4. **Extend hot-loop compiler evidence (0.5–1 day after compilation):** collect
    `-fopt-info-vec-all` with file/line/routine identification on selected
-   dynamics/physics loops matching the supplied hot-loop input. Record missed
+   dynamics/physics loops matching the supplied hot-loop input. The trial now
+   covers WSM5 and advect_u success/miss reasons; extend to representative
+   configured short rows and invariant math. Record missed
    legality/cost/data-dependence reasons; do not enable fast math to improve
    counts. Split demonstrated backend gaps into separate tickets.
 5. **Lead-coordinated serial native smoke (0.5–1 day plus card scheduling):**
