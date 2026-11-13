@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-13 14:49.
+Updated automatically at every ticket change. Last update: 2026-11-13 14:52.
 
-**Next: GPT-6.1, on S11-15 (First development-corpus baseline and profile, GCC 5.1.1 vs GCC-KNC at -O2 (E7-03 part 1)).** Run `python tools/dispatch.py`, or ask the tech lead to.
+**Next: the tech lead, on S11-17.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[###################-]` 205 of 212
 
@@ -68,7 +68,7 @@ Current tickets: `[###################-]` 205 of 212
 | S11-14 | M4 scoring contract and measurement protocol, frozen before any tuning | Done | M4's scoring contract is frozen in ADR-0015 with a tested scorer: strict serial -O2 versus -O2 over 17 prog... |
 | S11-15 | First development-corpus baseline and profile, GCC 5.1.1 vs GCC-KNC at -O2 (E7-03 part 1) | In progress | Card 2026-11-13 14:47 EST: .work/_shared/S11-15/lead.ps1 exited 3 in 0.3 min with 'PROFILE_BLOCKED no exist... |
 | S11-16 | Long-double libm hazard audit - do other MPSS long double entry points fault like cbrtl? (E7-21, bounded) | Done | The card's MPSS long double libm was probed on the card: of 12 entry points only cbrtl faults, and S10-13 a... |
-| S11-17 | PGO feasibility on one complete development program (reuse of S9-18's train/use path) | In progress | Training ran on the card 2026-11-13 14:47 EST: exit 0, 0.4 min, stderr empty. Output in .work/_shared/S11-1... |
+| S11-17 | PGO feasibility on one complete development program (reuse of S9-18's train/use path) | Question for the tech lead | Lead card evaluation needed at bf894ae5; engineer card jobs forbidden. All 12 profiles imported; profile-us... |
 | S11-18 | M4 corpus harness v2 - card profiles, prefix record, held-out sealing, stronger checks, and the donor-failure rule | Done | The M4 corpus harness now stages all 17 programs for the 7120 and the 3100/5100 profiles with serial voting... |
 | S11-19 | Second senior review - the M4 definition and the Sprint 11-13 roadmap, adjusted | Done | The M4 definition and the Sprint 11-13 roadmap are rewritten as measure, improve, decide, each sprint with ... |
 | S11-20 | Research - which compiler optimizations benefit the widest range of real code on KNC, from professional to amateur, and does our corpus cover it? | Done | We now have a code-style coverage study (docs/research/code-style-coverage.md) that ranks Sprint 12 candida... |
@@ -237,6 +237,7 @@ Current tickets: `[###################-]` 205 of 212
 
 ## Recent activity
 
+- 2026-11-13 14:52 **S11-17** engineer ask: Lead card evaluation needed at bf894ae5; engineer card jobs forbidden. All 12 profiles imported; profile-use compiled/linted with fatal missing/mis...
 - 2026-11-13 14:49 **S11-15** lead answer: Card 2026-11-13 14:47 EST: .work/_shared/S11-15/lead.ps1 exited 3 in 0.3 min with 'PROFILE_BLOCKED no existing perf executable'. The card has no pe...
 - 2026-11-13 14:48 **S11-17** lead answer: Training ran on the card 2026-11-13 14:47 EST: exit 0, 0.4 min, stderr empty. Output in .work/_shared/S11-17/train.stdout (146 KB). It is UTF-16LE ...
 - 2026-11-13 14:48 **S11-17** lead resume: Lead ran the training at 14:47 EST: train exit 0, 0.4 min.
@@ -244,13 +245,12 @@ Current tickets: `[###################-]` 205 of 212
 - 2026-11-13 14:45 **S11-28** lead defer: Needs the interactive lead: one card round, run .work/_shared/S11-28/lead-memory.ps1 at ede7b91c (11 correctness-only jobs, about 11 min plus trans...
 - 2026-11-13 14:43 **S11-28** engineer ask: Lead card round needed at ede7b91c: run .work/_shared/S11-28/lead-memory.ps1; return memory-results.json and captures. README.md there records sour...
 - 2026-11-13 14:30 **S11-27** lead note: Pilot clue: the GCC-KNC OpenMP build of NPB-MG class A, -O2 -march=knc -fopenmp from the same prefix, passes verification at 56 to 240 threads in a...
-- 2026-11-13 14:30 **S11-15** lead note: HPCG's launch-to-exit time is fixed by hpcg.dat's 60 s run time, so use its 'rating for historical reasons' GFLOP/s from stdout, not time_seconds. ...
 
 ## Cost
 
 - From the script, engineer: 528 sessions, 1085.5M input tokens
 - From the script, lead: 344 sessions, 96.6M input tokens
-- Started by hand, Claude: 12 sessions, 2943.5M input tokens
+- Started by hand, Claude: 12 sessions, 2944.2M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
