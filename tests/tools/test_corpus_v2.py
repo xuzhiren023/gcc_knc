@@ -465,6 +465,38 @@ class PgoPeerPackaging(unittest.TestCase):
             self.assertEqual(result.stdout.splitlines(), ['PEER decode', 'PEER control'])
             self.assertEqual(result.stderr, '')
 
+    def test_lead_native_stderr_and_exit_status(self):
+        import s11_17_pgo as pgo
+        with tempfile.TemporaryDirectory() as temp:
+            out = Path(temp)
+            (out / 'pgo').mkdir()
+            (out / 'pgo/workload').touch()
+            with patch.object(pgo, 'OUT', out), redirect_stdout(io.StringIO()):
+                pgo.stage_lead()
+            # A native command emits stderr but exits successfully; Windows
+            # PowerShell 5.1 must continue to all thirty pilot launches.
+            lead = corpus.windows_path(out / 'lead.ps1').replace("'", "''")
+            wrapper = out / 'mock.ps1'
+            for code in (0, 7):
+                wrapper.write_text(
+                    "$global:launches = 0\n"
+                    "function python {\n"
+                    "  $global:launches++\n"
+                    "  & $env:COMSPEC /d /c 'echo benign-native-stderr 1>&2'\n"
+                    "  $global:LASTEXITCODE = " + str(code) + "\n}\n"
+                    "& '" + lead + "' -Evaluate -Phase pilot\n"
+                    "if ($global:launches -ne 30) { exit 9 }\n")
+                result = subprocess.run(
+                    ['powershell.exe', '-NoProfile', '-ExecutionPolicy', 'Bypass',
+                     '-File', corpus.windows_path(wrapper)],
+                    capture_output=True, text=True)
+                with self.subTest(native_exit=code):
+                    if code:
+                        self.assertNotEqual(result.returncode, 0)
+                        self.assertIn('Evaluation failed: full 0 base', result.stderr)
+                    else:
+                        self.assertEqual(result.returncode, 0, result.stderr)
+
 
 if __name__ == '__main__':
     unittest.main()

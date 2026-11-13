@@ -113,6 +113,39 @@ The crc32 and infback files are present with zero measured edges; they are not
 missing profiles. Native correctness of the use binary and paired evaluation
 timings remain pending on all three profiles. No speedup is claimed.
 
+The 2026-11-13 pilot stopped after the base program's successful byte check;
+it is an infrastructure failure, not a completed pilot. The donor decoder in
+`peer.tar` had mode `0660`. The launcher's subsequent `execl("./peer/workload", ...)`
+therefore failed and its child returned 127, without an exec diagnostic. This
+was not evidence of a missing BusyBox command. Unlike S11-18's peer packaging,
+the original S11-17 packager did not force executable permissions. Packaging now
+sets the decoder to `0755`, libraries to `0644`, and uses USTAR instead of PAX.
+The generator also preserves the lead's Windows PowerShell 5.1 fix: native stderr
+does not terminate the script; `$LASTEXITCODE` still stops failed card launches.
+
+Host regressions reproduced the PAX failure before the fix and now pass archive
+extraction, both decoder argument paths, and mocked PowerShell launches with
+benign native stderr and nonzero native exit status. Log:
+`.work/_state/logs/S11_17_peer_green-20261113-152708.log` (two tests).
+The actual peer archive has been rebuilt without changing the trained binaries.
+`tools/s11_17_pgo.py check` passed extraction/executable checks, interpreter and
+dynamic dependency resolution for the launcher, base, PGO and donor, and exact
+evaluation-input equality with S11-18 plus inequality with training. Log:
+`.work/_state/logs/S11_17_launch_check-20261113-152819.log`.
+The zlib launch calls only `mkdir -p` and `tar -xf ... -C ...` through `/bin/sh`,
+then directly executes the workload and donor decoder twice. The failed native
+pilot already demonstrated the shell/unpack commands work on the card. No cached
+BusyBox applet list was supplied with the ticket; comparison with that literal
+list remains a lead prerequisite before rerunning the pilot.
+
+The shared `lead.ps1` already contains the lead's `Continue` fix. Regeneration
+was denied by file permissions through both Cygwin and Windows Python; neither
+attempt changed that script. Logs:
+`.work/_state/logs/S11_17_restage-20261113-152749.log` and
+`.work/_state/logs/S11_17_lead_restage-20261113-152809.log`.
+The lead must resolve ownership if regeneration is needed. Pilot and confirmation
+remain pending; rerun the same commands above after the host prerequisites.
+
 ### Lessons from PhiWeather
 
 The lead's 2026-11-13 ticket note reports that PhiWeather's WRF-only GCC 5.1.1

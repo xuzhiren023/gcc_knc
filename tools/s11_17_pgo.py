@@ -7,8 +7,10 @@ import argparse
 from pathlib import Path
 import re
 import shutil
+import subprocess
 import sys
 import tarfile
+import tempfile
 
 import corpus
 from s9_18_pgo import parse_gcda
@@ -80,16 +82,20 @@ done
 
 def stage_peer():
     peer = corpus.SHARED / 'S11-18' / corpus.DONOR / '0/serial/zlib'
-    with tarfile.open(OUT / 'peer.tar', 'w') as archive:
-        archive.add(peer / 'workload', arcname='workload')
+    def peer_mode(member):
+        # execl in corpus/launch.c requires the extracted donor to be executable.
+        member.mode = 0o755 if member.name == 'workload' else 0o644
+        return member
+    with tarfile.open(OUT / 'peer.tar', 'w', format=tarfile.USTAR_FORMAT) as archive:
+        archive.add(peer / 'workload', arcname='workload', filter=peer_mode)
         for runtime in peer.glob('*.so*'):
-            archive.add(runtime, arcname=runtime.name)
+            archive.add(runtime, arcname=runtime.name, filter=peer_mode)
 
 
 def stage_lead():
     write(OUT / 'lead.ps1', r'''# Lead only. Run from this ticket worktree, through tools/run.py.
 param([switch]$Evaluate, [ValidateSet('pilot', 'confirm')][string]$Phase = 'pilot')
-$ErrorActionPreference = 'Stop'
+$ErrorActionPreference = 'Continue'  # Windows PowerShell 5.1 treats native stderr as errors.
 $stage = [IO.Path]::GetFullPath("$PSScriptRoot")
 if (!$Evaluate) {
     python tools/card_run --timeout 600 --threads 1 --file-list "$stage/train-files.txt" "$stage/train/train.sh" > "$stage/train.stdout" 2> "$stage/train.stderr"
@@ -114,6 +120,48 @@ foreach ($profile in @('full', '3100', '5100')) {
 }
 ''')
     print('Lead commands staged in ' + str(OUT / 'lead.ps1'))
+
+
+def check_launch():
+    """Host packaging checks only; never execute a KNC binary or contact card."""
+    with tarfile.open(OUT / 'peer.tar') as archive:
+        members = archive.getmembers()
+        if any(m.pax_headers or not m.isfile() or '/' in m.name for m in members):
+            raise ValueError('peer archive must contain plain USTAR files')
+        if archive.getmember('workload').mode != 0o755:
+            raise ValueError('peer decoder is not executable')
+    # Match the launcher's actual shell command, including tar option syntax.
+    # The failed pilot already exercised mkdir and tar on the card successfully.
+    with tempfile.TemporaryDirectory(dir=OUT) as temp:
+        directory = Path(temp)
+        shutil.copyfile(OUT / 'peer.tar', directory / 'peer.tar')
+        subprocess.run(['sh', '-ec', 'mkdir -p peer && tar -xf peer.tar -C peer; '
+                        'test -x peer/workload'], cwd=directory, check=True)
+        readelf = corpus.SHARED / 'toolchain/cross/bin/k1om-mpss-linux-readelf'
+        sysroot = corpus.SHARED / 'toolchain/sysroot'
+        binaries = [OUT / 'launch', OUT / 'base/workload', OUT / 'pgo/workload',
+                    directory / 'peer/workload']
+        binaries.extend(p for p in (directory / 'peer').glob('*.so*'))
+        for binary in binaries:
+            headers = subprocess.check_output([str(readelf), '-l', str(binary)], text=True)
+            interpreter = re.findall(r'Requesting program interpreter: (.*?)\]', headers)
+            for name in interpreter:
+                if not (sysroot / name.lstrip('/')).exists():
+                    raise ValueError('interpreter missing from card sysroot: ' + name)
+            dynamic = subprocess.check_output([str(readelf), '-d', str(binary)], text=True)
+            needed = re.findall(r'\(NEEDED\).*\[(.*?)\]', dynamic)
+            for name in needed:
+                if not any((folder / name).exists() for folder in
+                           (binary.parent, sysroot / 'lib64', sysroot / 'usr/lib64')):
+                    raise ValueError('unresolved dependency for %s: %s' % (binary.name, name))
+            print('%s: interpreter=%s needed=%s' %
+                  (binary.name, interpreter, needed), flush=True)
+    if (OUT / 'input.bin').read_bytes() != (corpus.SHARED / 'S11-18/input.bin').read_bytes():
+        raise ValueError('evaluation input changed')
+    if (OUT / 'input.bin').read_bytes() == (OUT / 'train/input.bin').read_bytes():
+        raise ValueError('training and evaluation inputs must differ')
+    print('Host launch check passed: shell mkdir/tar, executable peer, ELF dependencies; '
+          'frozen evaluation input distinct from training. No native execution.')
 
 
 def use(capture):
@@ -152,11 +200,17 @@ def use(capture):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('step', choices=['stage', 'use'])
+    parser.add_argument('step', choices=['stage', 'use', 'restage', 'check'])
     parser.add_argument('capture', nargs='?')
     args = parser.parse_args()
     if args.step == 'stage':
         stage()
+    elif args.step == 'restage':
+        # Preserve the trained/use binaries and profiles: only repair packaging.
+        stage_peer()
+        stage_lead()
+    elif args.step == 'check':
+        check_launch()
     elif args.capture:
         use(args.capture)
     else:
