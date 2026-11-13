@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-12 23:48.
+Updated automatically at every ticket change. Last update: 2026-11-12 23:52.
 
-**Next: GPT-6.1, on S11-21 (Exploratory WRF build with GCC-KNC (learn-only, host-side) - how far does an unmodified WRF get, and what breaks?).** Run `python tools/dispatch.py`, or ask the tech lead to.
+**Waiting for you:** S11-21. Run `python tools/pm.py inbox`.
 
 Current tickets: `[###################-]` 201 of 207
 
@@ -72,7 +72,7 @@ Current tickets: `[###################-]` 201 of 207
 | S11-18 | M4 corpus harness v2 - card profiles, prefix record, held-out sealing, stronger checks, and the donor-failure rule | Done | The M4 corpus harness now stages all 17 programs for the 7120 and the 3100/5100 profiles with serial voting... |
 | S11-19 | Second senior review - the M4 definition and the Sprint 11-13 roadmap, adjusted | Done | The M4 definition and the Sprint 11-13 roadmap are rewritten as measure, improve, decide, each sprint with ... |
 | S11-20 | Research - which compiler optimizations benefit the widest range of real code on KNC, from professional to amateur, and does our corpus cover it? | Done | We now have a code-style coverage study (docs/research/code-style-coverage.md) that ranks Sprint 12 candida... |
-| S11-21 | Exploratory WRF build with GCC-KNC (learn-only, host-side) - how far does an unmodified WRF get, and what breaks? | In progress | Good stop and a real find (now S11-23). One change before approval, per my 22:10 note: continue past the rt... |
+| S11-21 | Exploratory WRF build with GCC-KNC (learn-only, host-side) - how far does an unmodified WRF get, and what breaks? | **Waiting for you** | budget: 14 engineer sessions used; the budget is 14 |
 | S11-22 | Review PhiWeather's first instrumented-PGO attempt on WRF (GCC 5.1.1, k1om) - method, near-zero gain, tolerance gate | Done | PhiWeather's first WRF PGO attempt is reviewed for their lead: the collection and use pipeline is credible,... |
 | S11-23 | ICE in WRF's RRTM radiation (rtrn) at -O2 -march=knc - unrecognizable insn after reload, and sub-512-bit SLP vectors under KNC | In progress | Fix 3 built; see the 23:55 note: WRF compiles, but 5 FP torture files still differ in float constant stores... |
 | S12-01 | Sprint 12 prep - static code-quality census of the development-corpus builds (spills, x87/vector transfers, addressing, calls, code size) | Done | A static code-quality census (spill/reload proxies, x87 and x87-zmm traffic, address arithmetic, calls, bra... |
@@ -233,22 +233,22 @@ Current tickets: `[###################-]` 201 of 207
 ## Recent activity
 
 - 2026-11-12 23:55 **S11-23** lead note: Lead built 5c4f29faa51 (log S11_23_lead_build3-20261112-232944.log). WRF rtrn reproducer compiles (rc 0). Torture diff against the installed prefix...
+- 2026-11-12 23:52 **S11-21** engineer escalate: budget: 14 engineer sessions used; the budget is 14
 - 2026-11-12 23:42 **S11-23** lead answer: Fix 3 built; see the 23:55 note: WRF compiles, but 5 FP torture files still differ in float constant stores (struct/complex and varargs cases your ...
 - 2026-11-12 23:40 **S11-23** lead resume: Fix 3 build and checks in the 23:55 note.
 - 2026-11-12 23:40 **S11-23** lead note: Lead built 3bfe7d827fa (log .work/_state/logs/S11_23_lead_build2-20261112-230849.log). The WRF rtrn reproducer now compiles (rc 0): ICE and LRA cyc...
 - 2026-11-12 23:32 **S11-23** lead defer: Interactive lead: build GCC at 5c4f29faa51; run check.py t1 --compiler gcc16 --rrtm and --rrtm-constants, the 165-file FP torture asm diff vs knc t...
 - 2026-11-12 23:25 **S11-23** engineer ask: GCC build needed at 5c4f29faa51. Red test 96e066fb: --rrtm-constants fails on 3bfe7d827fa (missing immediate float store); log .work/_state/logs/S1...
 - 2026-11-12 23:20 **S11-23** lead answer: Close: the WRF rtrn file compiles at 3bfe7d827fa. One regression to fix before submit (23:40 note): float/double constant stores now go through the...
-- 2026-11-12 23:19 **S11-23** lead resume: Build and checks in the 23:40 note.
 
 ## Cost
 
 - From the script, engineer: 513 sessions, 1057.6M input tokens
 - From the script, lead: 333 sessions, 94.0M input tokens
-- Started by hand, Claude: 12 sessions, 2882.9M input tokens
+- Started by hand, Claude: 12 sessions, 2886.7M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 26.5 GiB of 100 GiB. 69 GiB free on the drive.
+The project uses 26.5 GiB of 100 GiB. 64 GiB free on the drive.
