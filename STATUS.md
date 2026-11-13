@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-13 01:45.
+Updated automatically at every ticket change. Last update: 2026-11-13 01:46.
 
 **Next: GPT-6.1, on S11-23 (ICE in WRF's RRTM radiation (rtrn) at -O2 -march=knc - unrecognizable insn after reload, and sub-512-bit SLP vectors under KNC).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
@@ -246,7 +246,7 @@ Current tickets: `[###################-]` 202 of 209
 ## Cost
 
 - From the script, engineer: 518 sessions, 1067.3M input tokens
-- From the script, lead: 336 sessions, 94.6M input tokens
+- From the script, lead: 337 sessions, 94.8M input tokens
 - Started by hand, Claude: 12 sessions, 2907.5M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
