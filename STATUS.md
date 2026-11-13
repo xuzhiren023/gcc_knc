@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-13 15:55.
+Updated automatically at every ticket change. Last update: 2026-11-13 15:56.
 
 **Next: GPT-6.1, on S11-02 (card_run and run_suite move bulk data by SCIF DMA at the PCIe link limit, with the SSH stream as fallback).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
@@ -78,7 +78,7 @@ Current tickets: `[###################-]` 205 of 213
 | S11-24 | WRF OpenMP (smpar) build with GCC-KNC at -mphinix, for PhiWeather's benchmark - replaces the serial trial build | Done | WRF v4.8.0 now builds as an OpenMP card binary at -mphinix with GCC-KNC (wrf.exe and real.exe linked, needi... |
 | S11-25 | ICE in do_store_flag (expr.cc) on WRF's surface layer (SFCLAY1D) at -O2 -march=knc | Done | The last WRF file that crashed GCC-KNC (surface layer, SFCLAY1D) now compiles: vector 'ordered and not equa... |
 | S11-26 | WRF OpenMP build at -mphinix with no per-file workarounds (S11-23 and S11-25 fixed), restaged for PhiWeather | draft | Owner 2026-11-13: the S11-24 WRF build is removed. Deleted: |
-| S11-27 | Wrong code - NPB-MG (class A, serial) built by GCC-KNC at -O2 -march=knc fails NPB verification on the card | lead | Card round needed (interactive lead): run python C:/Users/xuzhi/Documents/gcc_knc/.work/_shared/S11-27/veri... |
+| S11-27 | Wrong code - NPB-MG (class A, serial) built by GCC-KNC at -O2 -march=knc fails NPB verification on the card | lead | MG at 0297f57d723 on the card (verify-card.log, parallel, card_run exit 0): S-O2, S-noslp SUCCESSFUL L2 0.5... |
 | S11-28 | HPCG run that fits every card model - fixed work instead of fixed duration, grid sized to the 3100's memory | lead | After S11-29 merges (still ready): run .work/_shared/S11-28/lead-pilot.ps1 at 242936bf+ (30 exclusive timed... |
 | S11-29 | card_run profiles limit memory in use, not address space, so a 3100 or 5100 run fails only where the real card would | Not started |  |
 | S12-01 | Sprint 12 prep - static code-quality census of the development-corpus builds (spills, x87/vector transfers, addressing, calls, code size) | Done | A static code-quality census (spill/reload proxies, x87 and x87-zmm traffic, address arithmetic, calls, bra... |
@@ -238,6 +238,7 @@ Current tickets: `[###################-]` 205 of 213
 
 ## Recent activity
 
+- 2026-11-13 16:00 **S11-27** lead note: MG at 0297f57d723 on the card (verify-card.log, parallel, card_run exit 0): S-O2, S-noslp SUCCESSFUL L2 0.5307707005735E-04; A-O2 (14.16 s), A-defa...
 - 2026-11-13 15:55 **S11-27** lead defer: Card round needed (interactive lead): run python C:/Users/xuzhi/Documents/gcc_knc/.work/_shared/S11-27/verify-card.py at be59bbe2 (one card_run --t...
 - 2026-11-13 15:54 **S11-02** owner decide: Budget raised by the lead under the owner's standing rule (2026-11-09/10: the lead extends session and token budgets itself; ask only after two ext...
 - 2026-11-13 15:52 **S11-02** engineer escalate: budget: 6 engineer sessions used; the budget is 6
@@ -245,13 +246,12 @@ Current tickets: `[###################-]` 205 of 213
 - 2026-11-13 15:50 **S11-27** lead note: Reduced cases at 0297f57d723 on the card (reduce-card-new.log): stencil-O2, novec and noreuse all PASS (old: O2 and noreuse FAIL 142). MG S/A rerun...
 - 2026-11-13 15:50 **S11-02** lead changes: Card validation 2026-11-13 15:48 EST, at 6c8b56c7 from the S11-02 worktree, idle card, no host bugcheck, card boot da3144f1 unchanged. It failed on...
 - 2026-11-13 15:50 **S11-02** lead resume: Lead ran validate.ps1 at 15:48 EST: DMA failed on the first 1 GiB upload.
-- 2026-11-13 15:47 **S11-27** lead answer: Lead results at 0297f57d723, 2026-11-13 15:45 EST:
 
 ## Cost
 
 - From the script, engineer: 536 sessions, 1097.0M input tokens
-- From the script, lead: 351 sessions, 98.3M input tokens
-- Started by hand, Claude: 12 sessions, 2977.8M input tokens
+- From the script, lead: 352 sessions, 98.5M input tokens
+- Started by hand, Claude: 12 sessions, 2978.8M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
