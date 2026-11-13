@@ -261,7 +261,7 @@ def report(results):
         'All executable sections from `objdump -d` are included: startup, PLT and statically linked helpers can contribute. '
         'Different linked helpers and inlining prevent treating whole-executable differences as isolated backend effects.', '',
         'Primary requested flags are `-O2`. Actual flags and variants are recorded below; '
-        'SQLite donor uses its staged assembly fallback, so its comparison is not an equal-optimization-level backend experiment.', '',
+        'the SQLite D build is `-O3` and uses its staged assembly fallback, so its comparison is not an equal-optimization-level backend experiment.', '',
         'Counts are sites. Bytes sum decoded instruction bytes (including wrapped byte lines), not ELF file size. '
         'Vector means an explicit zmm/ymm operand; mask-only instructions are separate. Scalar includes integer, x87, '
         'control, padding and setup. Vector share is instruction share, not lane utilization or FP work.', '',
