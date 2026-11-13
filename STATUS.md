@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-12 20:51.
+Updated automatically at every ticket change. Last update: 2026-11-12 20:52.
 
-**Next: the tech lead, on S11-21.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: GPT-6.1, on S11-21 (Exploratory WRF build with GCC-KNC (learn-only, host-side) - how far does an unmodified WRF get, and what breaks?).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
 Current tickets: `[###################-]` 200 of 205
 
@@ -72,7 +72,7 @@ Current tickets: `[###################-]` 200 of 205
 | S11-18 | M4 corpus harness v2 - card profiles, prefix record, held-out sealing, stronger checks, and the donor-failure rule | Done | The M4 corpus harness now stages all 17 programs for the 7120 and the 3100/5100 profiles with serial voting... |
 | S11-19 | Second senior review - the M4 definition and the Sprint 11-13 roadmap, adjusted | Done | The M4 definition and the Sprint 11-13 roadmap are rewritten as measure, improve, decide, each sprint with ... |
 | S11-20 | Research - which compiler optimizations benefit the widest range of real code on KNC, from professional to amateur, and does our corpus cover it? | Done | We now have a code-style coverage study (docs/research/code-style-coverage.md) that ranks Sprint 12 candida... |
-| S11-21 | Exploratory WRF build with GCC-KNC (learn-only, host-side) - how far does an unmodified WRF get, and what breaks? | Question for the tech lead | 9089a9bd: serial/no-nesting configure generated. Two failures: Python keyword (fixed), then RPC probe. Repr... |
+| S11-21 | Exploratory WRF build with GCC-KNC (learn-only, host-side) - how far does an unmodified WRF get, and what breaks? | In progress | Yes, as a recorded cross-configure fix, with these limits. configure:1030-1036 is the only probe that execu... |
 | S12-01 | Sprint 12 prep - static code-quality census of the development-corpus builds (spills, x87/vector transfers, addressing, calls, code size) | Done | A static code-quality census (spill/reload proxies, x87 and x87-zmm traffic, address arithmetic, calls, bra... |
 | S12-02 | Sprint 12 prep - the unscored generality check set (S11-20's six programs in the code styles our corpus lacks) | Done | The six unscored generality checks (Q1-Q6: ray tracer hit dispatch and vec3 AoS, Burkardt MD, Reference BLA... |
 | S2-01 | Design for zmm and mask registers under -march=knc | Done | The register design for KNC is settled on paper: all 32 zmm and 8 mask registers become usable under -march... |
@@ -230,6 +230,7 @@ Current tickets: `[###################-]` 200 of 205
 
 ## Recent activity
 
+- 2026-11-12 20:52 **S11-21** lead answer: Yes, as a recorded cross-configure fix, with these limits. configure:1030-1036 is the only probe that executes a target binary; the Fortran 2003/20...
 - 2026-11-12 20:50 **S11-21** engineer ask: 9089a9bd: serial/no-nesting configure generated. Two failures: Python keyword (fixed), then RPC probe. Repro: configure:1031 executes tools/rpc_tes...
 - 2026-11-12 20:42 **S11-21** lead answer: Fixed and checked this time: .work/_shared/wrf-trial/src/WRF-4.8.0 now has the full v4.8.0 tree (4,944 tracked files copied from PhiWeather's clean...
 - 2026-11-12 20:41 **S11-21** lead resume: Lead re-exported the WRF main tree (partial-clone archive was empty); see PROVENANCE-WRF.md correction.
@@ -237,7 +238,6 @@ Current tickets: `[###################-]` 200 of 205
 - 2026-11-12 20:35 **S11-21** engineer ask: 8111c156: supplied WRF-4.8.0 export contains only phys/ with seven submodule directories (645 files, 167825584 bytes); root configure is absent. Re...
 - 2026-11-12 20:32 **S11-21** lead answer: WRF v4.8.0 (06d4240a) and the 7 physics submodules at their v4.8.0 gitlinks are exported to .work/_shared/wrf-trial/src/WRF-4.8.0 (162 MB; provenan...
 - 2026-11-12 20:31 **S11-21** lead resume: Lead exported WRF v4.8.0 and its 7 pinned physics submodules to .work/_shared/wrf-trial/src/WRF-4.8.0 (see PROVENANCE-WRF.md).
-- 2026-11-12 20:30 **S11-21** lead defer: Lead must export WRF sources by hand (hook refused the engineer's script; no bypass was tried). From PhiWeather/native/upstream/WRF (read-only): gi...
 
 ## Cost
 
