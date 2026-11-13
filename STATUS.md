@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-13 14:57.
+Updated automatically at every ticket change. Last update: 2026-11-13 14:58.
 
 **Next: the tech lead, on S11-15.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
@@ -78,7 +78,7 @@ Current tickets: `[###################-]` 205 of 212
 | S11-24 | WRF OpenMP (smpar) build with GCC-KNC at -mphinix, for PhiWeather's benchmark - replaces the serial trial build | Done | WRF v4.8.0 now builds as an OpenMP card binary at -mphinix with GCC-KNC (wrf.exe and real.exe linked, needi... |
 | S11-25 | ICE in do_store_flag (expr.cc) on WRF's surface layer (SFCLAY1D) at -O2 -march=knc | Done | The last WRF file that crashed GCC-KNC (surface layer, SFCLAY1D) now compiles: vector 'ordered and not equa... |
 | S11-26 | WRF OpenMP build at -mphinix with no per-file workarounds (S11-23 and S11-25 fixed), restaged for PhiWeather | draft | Owner 2026-11-13: the S11-24 WRF build is removed. Deleted: |
-| S11-27 | Wrong code - NPB-MG (class A, serial) built by GCC-KNC at -O2 -march=knc fails NPB verification on the card | lead | Pilot clue: the GCC-KNC OpenMP build of NPB-MG class A, -O2 -march=knc -fopenmp from the same prefix, passe... |
+| S11-27 | Wrong code - NPB-MG (class A, serial) built by GCC-KNC at -O2 -march=knc fails NPB verification on the card | Question for the tech lead | Lead ran card.py at 15:00 EST: results posted in the answer. |
 | S11-28 | HPCG run that fits every card model - fixed work instead of fixed duration, grid sized to the 3100's memory | lead | Needs the interactive lead: one card round, run .work/_shared/S11-28/lead-memory.ps1 at ede7b91c (11 correc... |
 | S12-01 | Sprint 12 prep - static code-quality census of the development-corpus builds (spills, x87/vector transfers, addressing, calls, code size) | Done | A static code-quality census (spill/reload proxies, x87 and x87-zmm traffic, address arithmetic, calls, bra... |
 | S12-02 | Sprint 12 prep - the unscored generality check set (S11-20's six programs in the code styles our corpus lacks) | Done | The six unscored generality checks (Q1-Q6: ray tracer hit dispatch and vec3 AoS, Burkardt MD, Reference BLA... |
@@ -237,6 +237,7 @@ Current tickets: `[###################-]` 205 of 212
 
 ## Recent activity
 
+- 2026-11-13 14:58 **S11-27** lead resume: Lead ran card.py at 15:00 EST: results posted in the answer.
 - 2026-11-13 14:57 **S11-15** engineer ask: Committed df72e0a6. Please run from main: python tools/run.py --name S11-15-profile-sigprof -- powershell -NoProfile -File .work\_shared\S11-15\lea...
 - 2026-11-13 14:53 **S11-17** lead defer: Needs the interactive lead's card runs at bf894ae5, in an exclusive turn, from the S11-17 worktree: the pilot then confirm commands in docs/researc...
 - 2026-11-13 14:52 **S11-17** engineer ask: Lead card evaluation needed at bf894ae5; engineer card jobs forbidden. All 12 profiles imported; profile-use compiled/linted with fatal missing/mis...
@@ -244,13 +245,12 @@ Current tickets: `[###################-]` 205 of 212
 - 2026-11-13 14:48 **S11-17** lead answer: Training ran on the card 2026-11-13 14:47 EST: exit 0, 0.4 min, stderr empty. Output in .work/_shared/S11-17/train.stdout (146 KB). It is UTF-16LE ...
 - 2026-11-13 14:48 **S11-17** lead resume: Lead ran the training at 14:47 EST: train exit 0, 0.4 min.
 - 2026-11-13 14:48 **S11-15** lead resume: Lead ran the profile pilot at 14:47 EST: blocked, no perf on the card.
-- 2026-11-13 14:45 **S11-28** lead defer: Needs the interactive lead: one card round, run .work/_shared/S11-28/lead-memory.ps1 at ede7b91c (11 correctness-only jobs, about 11 min plus trans...
 
 ## Cost
 
 - From the script, engineer: 529 sessions, 1086.1M input tokens
 - From the script, lead: 345 sessions, 96.8M input tokens
-- Started by hand, Claude: 12 sessions, 2946.0M input tokens
+- Started by hand, Claude: 12 sessions, 2946.2M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
