@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-13 02:11.
+Updated automatically at every ticket change. Last update: 2026-11-13 02:13.
 
-**Next: the tech lead, on S11-25.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: GPT-6.1, on S11-24 (WRF OpenMP (smpar) build with GCC-KNC at -mphinix, for PhiWeather's benchmark - replaces the serial trial build).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
 Current tickets: `[###################-]` 203 of 209
 
@@ -76,7 +76,7 @@ Current tickets: `[###################-]` 203 of 209
 | S11-22 | Review PhiWeather's first instrumented-PGO attempt on WRF (GCC 5.1.1, k1om) - method, near-zero gain, tolerance gate | Done | PhiWeather's first WRF PGO attempt is reviewed for their lead: the collection and use pipeline is credible,... |
 | S11-23 | ICE in WRF's RRTM radiation (rtrn) at -O2 -march=knc - unrecognizable insn after reload, and sub-512-bit SLP vectors under KNC | Done | WRF's RRTM radiation and the -O3 OpenMP WRF files that crashed GCC-KNC after reload (rtrn, kfcps, advance_u... |
 | S11-24 | WRF OpenMP (smpar) build with GCC-KNC at -mphinix, for PhiWeather's benchmark - replaces the serial trial build | In progress | Build, staging, readelf (models need only libm/libdl/libgomp/libpthread/libc), lint and vector notes are ac... |
-| S11-25 | ICE in do_store_flag (expr.cc) on WRF's surface layer (SFCLAY1D) at -O2 -march=knc | Question for the tech lead | GCC build needed at 3cd892904ec (tree 2). Applied lead correction: LTGT = LT(a,b) OR LT(b,a), using gen_ior... |
+| S11-25 | ICE in do_store_flag (expr.cc) on WRF's surface layer (SFCLAY1D) at -O2 -march=knc | lead | Reviewed 3cd892904ec: LTGT = LT(a,b) / LT(b,a) with signaling imm 1 and gen_iorhi3/qi3, predicate adds ltgt... |
 | S12-01 | Sprint 12 prep - static code-quality census of the development-corpus builds (spills, x87/vector transfers, addressing, calls, code size) | Done | A static code-quality census (spill/reload proxies, x87 and x87-zmm traffic, address arithmetic, calls, bra... |
 | S12-02 | Sprint 12 prep - the unscored generality check set (S11-20's six programs in the code styles our corpus lacks) | Done | The six unscored generality checks (Q1-Q6: ray tracer hit dispatch and vec3 AoS, Burkardt MD, Reference BLA... |
 | S2-01 | Design for zmm and mask registers under -march=knc | Done | The register design for KNC is settled on paper: all 32 zmm and 8 mask registers become usable under -march... |
@@ -234,6 +234,7 @@ Current tickets: `[###################-]` 203 of 209
 
 ## Recent activity
 
+- 2026-11-13 02:13 **S11-25** lead defer: Reviewed 3cd892904ec: LTGT = LT(a,b) | LT(b,a) with signaling imm 1 and gen_iorhi3/qi3, predicate adds ltgt, comments fixed, test scans two vcmpps ...
 - 2026-11-13 02:10 **S11-25** engineer ask: GCC build needed at 3cd892904ec (tree 2). Applied lead correction: LTGT = LT(a,b) OR LT(b,a), using gen_iorhi3/gen_iorqi3; signaling immediate 1 pr...
 - 2026-11-13 02:04 **S11-24** lead changes: Build, staging, readelf (models need only libm/libdl/libgomp/libpthread/libc), lint and vector notes are accepted; two fixes before merge. 1. docs/...
 - 2026-11-13 02:03 **S11-25** lead answer: Not building e5dd129d6a6 yet: one FP-semantics change first. GCC treats LTGT as a signaling compare (rtlanal.cc:3210 may_trap_p_1 lists it with LT/...
@@ -241,7 +242,6 @@ Current tickets: `[###################-]` 203 of 209
 - 2026-11-13 02:01 **S11-23** lead approve: WRF's RRTM radiation and the -O3 OpenMP WRF files that crashed GCC-KNC after reload (rtrn, kfcps, advance_uv) now compile: scalar float copies betw...
 - 2026-11-13 01:51 **S11-25** engineer ask: GCC build needed at e5dd129d6a6 (tree 2). WRF dump:4752 _632 = vect__550.537_1327 <> zero is V16SF LTGT -> HI mask. Late folding introduces LTGT; k...
 - 2026-11-13 01:47 **S11-23** engineer submit: Test fdfc79f1 reduces complex-5/va-arg-26: baseline passes; archived regression asm rejected. Full T1: 327 PASS, 0 FAIL; log .work/_state/logs/S11_...
-- 2026-11-13 01:45 **S11-25** lead approve-red: The WRF surface-layer crash is now reproduced by a 16-line Fortran test: at -O2 -march=knc, a vector 'not equal and ordered' (LTGT) comparison on 1...
 
 ## Cost
 
