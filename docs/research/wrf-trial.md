@@ -61,13 +61,15 @@ python tools/run.py --name S11-21-netcdf-c-make --inputs ../_shared/wrf-trial/tr
 
 ## Stage reached and blockers
 
-**Stage 2: netCDF-C compiled successfully; installation failed.** The clean
+**Stage 2: netCDF-C compiled and installed successfully; netCDF-Fortran compilation failed.** The clean
 build produced `build-netcdf-c-nomsys/liblib/.libs/libnetcdf.a` (1,770,676 bytes)
 with GCC-KNC 16.2.0, `-O2 -march=knc`, and no source patch. `make -j8` completed;
-`make install` then failed while creating the include directory. This is a
+the first `make install` failed while creating the include directory. The
+relative-directory installation described below succeeded. This was a
 host filesystem/tool interaction, not a compiler diagnostic. netCDF-Fortran
-sources and a GCC 16 build script are prepared but have not been configured
-or compiled. WRF and MPI remain unbuilt; no executable is staged for the card.
+configured with GCC 16 and the installed C library, then failed on the classic
+Fortran source path. No Fortran library or complete module set was installed. WRF and MPI
+remain unbuilt; no executable is staged for the card.
 There was no observed GCC-KNC ICE or wrong assembler output, so no compiler
 reproducer is applicable.
 
@@ -91,15 +93,18 @@ uses this successful configuration without repeating configure.
 | `libdispatch/dreg.c:13:10: fatal error: windows.h: No such file or directory`. | Cross-configuration/environment contamination. | Inherited `MSYSTEM=MINGW64` enabled `REGEDIT` despite Linux host. The clean environment now disables it; no source patch. |
 | Removal/recreation of the old build directory was blocked by host policy. | Host execution policy. | Lead explicitly authorized retaining it and using `build-netcdf-c-nomsys`; nothing was deleted. |
 | Preparation used a `Path.write_text(newline=...)` keyword unsupported by the host Python. | Trial orchestration. | No edit occurred. An inadvertently launched old-directory configure was interrupted and its orphan subprocess group terminated before make. Changed file writing to `Path.open`; accepted results use only the new directory. |
-| `make install` could not create `install/include`; Cygwin reported permission denied on `/cygdrive/c/Users/xuzhi`. | Host infrastructure during dependency installation. | Clean compilation and archive creation completed. Stopped after the second failed wrapped attempt in this resume, as required by AGENTS.md. Request native precreation of install destinations before retrying install only. |
+| `make install` could not create `install/include`; Cygwin reported permission denied on `/cygdrive/c/Users/xuzhi`. | Host infrastructure during dependency installation. | Lead precreated destinations; an install-only retry still failed at the absolute path. The authorized relative-directory approach succeeded without recompilation. |
 | Guard required `ISMSYS='no'`, while configure represents false with an empty value. | Trial verification script. | Fresh configure exited zero; wrapper exited one before make. Guard corrected from observed configuration semantics. |
+| netCDF-Fortran configure warns that `--enable-netcdf-4` and `--disable-examples` are unrecognized. | Dependency recipe/configuration mismatch. | These inherited recipe switches do not select the intended features in 4.6.1. Configure succeeded, reported netCDF-4 API disabled, and selected `netcdf.F90`. |
+| `fortran/netcdf.F90:57` includes missing `netcdf_expanded_subset.f90`; the diagnostic is displayed at line 58. | Dependency source/build-input issue, not demonstrated GCC strictness or backend defect. | The copied source has `netcdf_expanded.F90` instead. The subsequent includes name `netcdf_get_nd_expanded.f90` and `netcdf_eightbyte_subset.f90`; no generation rule for the first two was found in the inspected Automake/CMake/configure inputs. Only the first missing file was diagnosed by this compile. |
+| `fortran/module_netcdf_nf_data.F90:167-168` refers to undefined `NC_NOQUANTIZE` and `NC_QUANTIZE_BITGROOM`. | Dependency source/configuration guard inconsistency. | Their definitions in `module_netcdf_nc_data.F90:420-421` are inside `USE_NETCDF4` (lines 317-423), while these uses are unconditional. The actual classic configuration omits `USE_NETCDF4`. No ICE or assembler error occurred. |
 
 No GCC build, x86 check, benchmark or card job was started. MPI remains
 deferred for the lead-approved serial, no-nesting target. The netCDF-Fortran
 4.6.1 configure script contains no `MSYSTEM`, `ISMSYS`, or `ISMINGW` detection;
-its build will nevertheless use the same environment wrapper. WRF's configure
-has not been evaluated for MSYSTEM contamination because its stage was not
-reached.
+its build used the same environment wrapper. A read-only search of PhiWeather's
+WRF `configure` also found no `MSYSTEM`, `ISMSYS`, or `ISMINGW` test. WRF
+configuration itself was not run.
 
 The successful C compilation emitted nonfatal warnings for `strndup`
 redefinition in `libdispatch/ncuri.c:81`, an old-style definition in
@@ -114,13 +119,36 @@ install log, not a separately rerun test:
 /usr/bin/mkdir -p /cygdrive/c/Users/xuzhi/Documents/gcc_knc/.work/_shared/wrf-trial/install/include
 ```
 
-The proposed next step is to precreate the trial's install destinations using
-native PowerShell (as worked for build directories), then run only
-`make install` in `build-netcdf-c-nomsys`, through `trial-env.sh` and
-`tools/run.py`. Include, lib, lib/pkgconfig, bin and required share subdirectories
-should be derived from the generated install targets. Do not reconfigure or
-recompile the passing C build. No deletion or change to PhiWeather is needed.
-This continuation requires the lead's ticket response after the two failures.
+The lead precreated the install destinations. The install-only retry still
+failed because absolute Cygwin `mkdir -p` walked the inaccessible parent.
+`install-netcdf-c.sh` then ran `make install` from the trial root with
+`MKDIR_P="bash $TRIAL/mkdir-relative.sh"`. That helper validates destinations
+are inside the trial install prefix, changes to the trial root, and calls
+plain `mkdir -p` on relative paths. This lead-authorized approach succeeded
+without deleting anything, changing sources, or recompiling C. It is also
+selected for netCDF-Fortran installation. All commands use `trial-env.sh`
+and `tools/run.py`.
+
+The next wrapped command ran `netcdf-fortran.sh`. Configure succeeded and
+automatically added `-fallow-argument-mismatch` to the GCC 16 Fortran flags;
+the compile errors above are not argument-mismatch diagnostics. `make -j8`
+failed before installation. No dependency patch was applied. Two failed
+wrapped attempts in this resume (absolute C install, then Fortran build)
+require a ticket question before another attempt under AGENTS.md.
+
+Reduced build targets for the lead (extracted from the failure; not rerun):
+
+```sh
+# Under trial-env.sh, from the worktree:
+make -C ../_shared/wrf-trial/build-netcdf-fortran/fortran netcdf.lo module_netcdf_nf_data.lo
+```
+
+The specific next decision is whether to patch the copied classic Fortran
+path to use the distributed expanded/eight-byte sources and make its
+quantization constants available consistently, or select a corrected
+netCDF-Fortran source baseline. The proposed patch is not implemented or
+tested; its exact replacement includes need source inspection before editing.
+The analogous PhiWeather source directory also lacks the subset include files.
 
 ### Time, disk and logs
 
@@ -129,12 +157,13 @@ contaminated configuration plus partial compilation took 4.4 minutes.
 The fresh configuration and overly strict pre-build guard took **4.2 minutes**;
 this was configuration time, with no make invocation. The subsequent clean
 compilation plus failed install took **0.8 minutes**. No WRF compilation time
-is available. Make was capped at 8 jobs.
+is available. The successful C install took **0.1 minute**; Fortran configure
+and partial compilation took **1.9 minutes** together. Make was capped at 8 jobs.
 
-After these attempts, the trial contains **62,213,665 logical file bytes**
-(62.2 MB decimal, 59.3 MiB) in 4,179 file entries, including both build trees,
-the copied archives, and extracted netCDF-Fortran sources. This measurement
-uses `lstat`, without following 16 Cygwin reparse-file entries; allocated disk
+After the Fortran failure, the trial contains **65,435,787 logical file bytes**
+(65.4 MB decimal, 62.4 MiB) in 4,229 file entries, including both C build trees,
+the installed C library, archives, and partial Fortran build. This measurement
+uses `os.walk` and `lstat` without following Cygwin reparse files; allocated disk
 blocks were not measured. It is well below the 25 GB budget. A first size walk
 that followed links failed on a Cygwin link in the stale build; it made no
 changes. Stale files remain for lead cleanup as directed.
@@ -147,6 +176,9 @@ Logs under `.work/_state/logs/`:
 - `S11_21_netcdf_c_nomsys-20261112-193023.log`: interrupted old-directory configure; not an accepted build result.
 - `S11_21_netcdf_c_clean_build-20261112-193107.log`: fresh configure succeeded; overly strict guard stopped the wrapper before make.
 - `S11_21_netcdf_c_make-20261112-193558.log`: disabled-platform checks and C compilation passed; install failed at mkdir (line 392). Archive creation is at lines 358-359.
+- `S11_21_netcdf_c_install-20261112-194235.log`: install-only retry after destination precreation failed at absolute mkdir (less than 0.1 minute).
+- `S11_21_netcdf_c_install_relative-20261112-194327.log`: relative-directory installation passed (0.1 minute).
+- `S11_21_netcdf_fortran-20261112-194351.log`: configure passed; classic Fortran compilation failed (1.9 minutes). Missing-include diagnostic at line 307; undefined constants at lines 313-322.
 
 ## Vectorization
 
@@ -169,8 +201,9 @@ engineering effort, not measured build times.
    and isolate only the necessary cross configuration from PhiWeather's local
    changes. Establish host tools versus target tools and classic netCDF options.
 2. **GCC 16 dependency stack (1–2 days, after this trial):** retain the
-   corrected environment, resolve installation directory creation, install the
-   built netCDF-C library, then build netCDF-Fortran with fresh modules and
+   corrected environment and successful relative-directory installation of
+   netCDF-C, resolve the classic Fortran missing includes and quantization
+   guards (or select a corrected dependency release), then build fresh modules and
    target-runtime links;
    classify strictness versus cross-probe failures without executing target
    probes on the host. Any compiler defect gets a separate reduced case and
