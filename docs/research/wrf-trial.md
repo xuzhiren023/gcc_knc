@@ -62,8 +62,9 @@ python tools/run.py --name S11-21-netcdf-c-make --inputs ../_shared/wrf-trial/tr
 ## Stage reached and blockers
 
 **Stage 2 complete: both dependency libraries are built and installed, and
-`nf_create`/`nf90_create` now link. Stage 3 is blocked by the project hook
-rejecting WRF source-export preparation.** The installed static archives are
+`nf_create`/`nf90_create` now link. Stage 3 is blocked by an incomplete
+lead-supplied WRF source export: only physics submodule directories are
+present, and the root `configure` file is absent.** The installed static archives are
 `install/lib/libnetcdf.a` (1,770,676 bytes) and `libnetcdff.a` (1,561,006 bytes).
 Both use GCC-KNC 16.2.0 at `-O2 -march=knc`. Fortran needed the classic-path
 patch below. Installed module verification passed in the preceding session
@@ -286,6 +287,40 @@ Current logical disk usage before this documentation append is **84,286,462 byte
 could not follow a stale Cygwin HDF4 link; no build was involved.
 Log: `.work/_state/logs/S11_21_netcdf_link_no_cxx-20261112-202434.log`.
 The source-preparation refusal is in the tool response, not a build log.
+
+### Continuation after the lead's WRF export
+
+The lead's 20:32 ticket answer authorizes building the exported source at
+`src/WRF-4.8.0`; `src/PROVENANCE-WRF.md` records the intended v4.8.0 tag
+and seven pinned submodules. Inspection in this continuation found that
+the export root contains **only `phys/`**. That directory contains all seven
+named submodule directories, with 645 files totaling 167,825,584 logical
+bytes. The top-level WRF sources, including `configure`, are absent.
+The recorded export size therefore does not establish that the main WRF
+repository was exported successfully.
+
+Classification: **build-input preparation / host infrastructure**, not a
+WRF compile error, GCC 16 strictness change, or GCC-KNC defect. A reduced
+reproducer is `Get-ChildItem ../_shared/wrf-trial/src/WRF-4.8.0 -Force`:
+the only entry is `phys`. Reading its `configure` fails with file not found.
+No WRF configure or compilation was attempted. The earlier source-export
+hook refusal remains applicable; no alternative export or copying method
+was tried. The lead needs to supply the main repository export into this
+directory before the authorized serial build can proceed.
+
+The existing dependency results were not rerun. Additional build time is
+zero. A PowerShell recursive file-length measurement gives **252,113,993
+logical bytes** across 5,267 trial files, below the 25 GB budget; this is
+not allocated disk usage. A preceding Python measurement command failed
+at argument parsing because PowerShell removed its string quotes and
+made no filesystem changes. No new build/test log exists for this
+continuation; the last successful test remains
+`S11_21_netcdf_link_no_cxx-20261112-202434.log`.
+
+The first E7-20 work package below must first complete the main WRF export;
+the seven submodule directories alone are insufficient. Compiler override
+selection, static-runtime WRF link flags, and hot-loop reports remain
+pending actual WRF configuration and compilation.
 
 ## Vectorization
 
