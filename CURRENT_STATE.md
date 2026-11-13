@@ -282,3 +282,5 @@ Engineer sessions never get the key. The old hold of 2026-11-02 for the owner's 
 - Sysroot redistribution review is open, so no release package may contain it.
 
 - 2026-11-13 01:40 (lead): S11-23 fix 4 (64c033d1255, imci.md only) fixes the WRF rtrn ICE and also the two -O3 WRF ICEs S11-24 hit (kfcps, advance_uv: same postreload extract_constrain_insn); FP torture asm identical to the knc compiler, full T1 326 pass, x86 identical=1962. Only its new constant-store test needs rewriting (red on the baseline too). S11-25 (sfclay do_store_flag) is a separate bug, dispatched on gcc2.
+
+- 2026-11-13 02:35 (lead): S11-23 merged. WRF OpenMP build (S11-24) linked at -mphinix: .work/_shared/wrf-trial/smpar/ (wrf.exe, real.exe, libgomp.so.1, RUN-NOTES.md); 4 per-file workarounds (3 removed by S11-23 after a prefix reinstall, sfclay waits for S11-25). WRF lead told the build is ready to time after their job. Serial tree src/WRF-4.8.0 deleted (owner). Prefix reinstall with S11-23 is pending (do it when no WRF build is using the prefix). S11-24 lead-rebased (c8810be1), waiting for the engineer's submit.
