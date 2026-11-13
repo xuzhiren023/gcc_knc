@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-13 16:30.
+Updated automatically at every ticket change. Last update: 2026-11-13 16:42.
 
-**Next: GPT-6.1, on S11-15 (First development-corpus baseline and profile, GCC 5.1.1 vs GCC-KNC at -O2 (E7-03 part 1)).** Run `python tools/dispatch.py`, or ask the tech lead to.
+**Next: the tech lead, on S11-02.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[###################-]` 205 of 213
 
@@ -53,7 +53,7 @@ Current tickets: `[###################-]` 205 of 213
 | S10-12 | cbrt and cbrtf crash (SIGSEGV) in qualify_v1 on the card - root cause and fix | Done | The cbrt and cbrtf qualification jobs no longer crash on the card and pass (worst 0.4996 and 0.4991 ULP): t... |
 | S10-13 | User story - code that calls cbrtl under -march=knc gets a safe replacement and a compile-time warning (MPSS libm cbrtl faults) | Done | Under -march=knc, calls to cbrtl (and std::cbrt on long double) now go to GCC-KNC's own safe cube root with... |
 | S11-01 | User story - the best way to move data between the host and the card, measured, and how our projects use it | Done | We now have a sourced inventory of every host-card transfer path that works without changing MPSS (SSH, tar... |
-| S11-02 | card_run and run_suite move bulk data by SCIF DMA at the PCIe link limit, with the SSH stream as fallback | lead | Code at 3953ab96 reviewed, no blocker. Missing: acceptance item 2 card rerun. Interactive lead: recover the... |
+| S11-02 | card_run and run_suite move bulk data by SCIF DMA at the PCIe link limit, with the SSH stream as fallback | Waiting for review | Lead reran validate.ps1 at 16:40 EST: DMA payload works; two new problems. |
 | S11-03 | S11-01 transfer tool rejects the card's physical /tmp path, so the native study never starts | Done | The transfer study's tool now accepts the card's real /tmp location (/var/volatile/tmp), so its card run ca... |
 | S11-04 | S11-01 transfer tool - the host opens every connection, because Windows Firewall blocks inbound TCP from the card | Done | The transfer study's host side now opens every connection to the card, so Windows Firewall no longer blocks... |
 | S11-05 | Research - raise KNC's real memory bandwidth from about 175 GB/s toward 75-85% of peak, with a measured plan | Done | The memory-bandwidth research plan and a validated multithreaded KNC bandwidth benchmark are ready, with a ... |
@@ -238,23 +238,23 @@ Current tickets: `[###################-]` 205 of 213
 
 ## Recent activity
 
+- 2026-11-13 16:45 **S11-02** lead note: Legacy latch released per validate.ps1 recovery steps:
+- 2026-11-13 16:42 **S11-02** lead resume: Lead reran validate.ps1 at 16:40 EST: DMA payload works; two new problems.
 - 2026-11-13 16:28 **S11-02** lead defer: Code at 3953ab96 reviewed, no blocker. Missing: acceptance item 2 card rerun. Interactive lead: recover the legacy latch .work/_state/card-dma-acti...
 - 2026-11-13 16:25 **S11-17** lead amend: Owner 2026-11-13 ("Yes"): add a PGO positive-control set, so we can tell 'PGO does not help zlib' from 'our PGO pipeline is broken'. It is also the...
 - 2026-11-13 16:24 **S11-02** engineer submit: 3953ab96, no further code/tests. Prior 2 regressions passed; helpers rebuilt/linted. Logs: .work/_state/logs/s11_02_offset_cleanup_green-20261113-1...
 - 2026-11-13 16:21 **S11-02** lead answer: Yes: submit with --override 'size 1081/800: card validation found the SCIF offset bug; native C window test and error-cleanup evidence are required...
 - 2026-11-13 16:19 **S11-27** lead defer: GCC build needed (interactive lead) at gcc b56d5090c86, lane gcc (project 4724284e): NO_REGS LRA bridge pseudos. Then: T1 secondary-reload and sten...
 - 2026-11-13 16:17 **S11-02** engineer ask: 3953ab96 fixes driver-assigned offsets above 2^62; the old fake bypassed C. New C window/tail and cleanup-evidence tests pass. Error cleanup requir...
-- 2026-11-13 16:15 **S11-27** engineer ask: GCC build needed at b56d5090c86 (lane gcc). Bridge pseudos start in NO_REGS via LRA API; spill allocation/elimination retained. Red T1: four TI/TF ...
-- 2026-11-13 16:08 **S11-29** lead note: Dependency on S11-02 removed, so the HPCG chain (S11-29, then S11-28) does not wait on the DMA debugging. Base on main. Whichever of S11-02 and S11...
 
 ## Cost
 
 - From the script, engineer: 539 sessions, 1102.0M input tokens
 - From the script, lead: 355 sessions, 99.3M input tokens
-- Started by hand, Claude: 12 sessions, 2999.2M input tokens
+- Started by hand, Claude: 12 sessions, 3003.6M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 27.5 GiB of 100 GiB. 208 GiB free on the drive.
+The project uses 27.5 GiB of 100 GiB. 205 GiB free on the drive.
