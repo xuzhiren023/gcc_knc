@@ -60,6 +60,31 @@ python tools/run.py --name S11-21-netcdf-c-configure -- C:/Users/xuzhi/Documents
 
 ## Stage reached and blockers
 
+### Resume attempt after lead response (2026-11-12)
+
+The lead approved a fresh netCDF-C configuration with the inherited MSYS
+variables removed, then netCDF-Fortran and serial `em_real` with no nesting
+or MPI. Prepared `wrf-trial/trial-env.sh`, which runs commands through
+`env -u MSYSTEM -u MSYSTEM_PREFIX -u MINGW_PREFIX -u MSYSTEM_CHOST` and
+selects the GCC 16 toolchain. Updated `src/PROVENANCE.md` and added pre-build
+checks in `netcdf-c.sh` for `ISMSYS=no`, `ISMINGW=no`, and disabled `dreg.c`.
+The intended invocation is:
+
+```text
+python tools/run.py --name S11-21-netcdf-c-clean-env -- C:/Users/xuzhi/Documents/PhiWeather/.tools/knc-bootstrap/cygwin/bin/bash.exe ../_shared/wrf-trial/trial-env.sh bash ../_shared/wrf-trial/netcdf-c.sh
+```
+
+**New blocker: host execution policy.** The command to remove only the
+contaminated `build-netcdf-c` directory and recreate it was rejected before
+execution with `blocked by policy`. It used native PowerShell `Remove-Item
+-LiteralPath`, after resolving and checking the target against the trial
+root. AGENTS.md prohibits working around a refused command. The contaminated
+directory remains; the lead must remove/recreate that directory or provide
+an approved way forward. No configure, make, or test ran in this resume
+attempt. The environment fix and pre-build checks remain untested. Earlier
+timings and disk measurements below describe the preceding build attempt.
+There is no new compiler finding or compiler-defect reproducer.
+
 **Stopped in stage 2, during netCDF-C compilation.** Configure completed and
 some C objects compiled, but no complete dependency library was installed.
 netCDF-Fortran, MPI and WRF were not built. No `wrf.exe` or `real.exe` exists
