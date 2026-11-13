@@ -1,5 +1,13 @@
 # Exploratory WRF build with GCC-KNC (S11-21)
 
+**Final stage: dependencies built and API-linked; serial WRF compilation
+stopped at a reproduced GCC-KNC postreload ICE in radiation routine `RTRN`.
+Neither `wrf.exe` nor `real.exe` linked. No card run occurred.** The isolated,
+self-contained 235-line Fortran reproducer and WRF licence are retained in
+`.work/_shared/wrf-trial/repro/`. The final finding below supersedes pending
+status in the chronological continuation notes. No GCC change or build was
+attempted; the compiler defect requires a separate ticket.
+
 ## Scope and inventory
 
 This is a host-side, learn-only investigation dated 2026-11-12. It is not an
@@ -61,10 +69,11 @@ python tools/run.py --name S11-21-netcdf-c-make --inputs ../_shared/wrf-trial/tr
 
 ## Stage reached and blockers
 
-**Latest resume: export line endings corrected, WRF cleaned and reconfigured;
-the standalone Registry precheck was stopped after an engineer-selected wrong
-input caused a warning loop. No new em_real build ran. See the resume section
-below for the reduced cause and pending correction.**
+**Latest resume: the corrected Registry.EM precheck passed. A new em_real
+attempt reached framework, I/O and physics compilation, but exposed a second
+trial Registry preparation error (12 streams instead of 25) and the anticipated
+physics parallel-make dependency failure. Neither model executable linked.
+The following continuation section supersedes earlier pending status.**
 
 **Stage 2 complete: both dependency libraries are built and installed, and
 `nf_create`/`nf90_create` now link. The lead completed the WRF export.
@@ -565,6 +574,106 @@ bounded Registry precheck (do not repeat the passed clean/configure), then
 the prepared em_real build and link/archive checks. If ccpp_kind_types
 ordering fails, the lead has already authorized one serial physics retry.
 
+## Continuation after the 21:35 lead answer
+
+The bounded `wrf-registry-check.sh` precheck passed in **0.1 minute**:
+`Registry.EM` generated the expected includes without CR in filenames.
+Log: `.work/_state/logs/S11_21_wrf_registry_em-20261112-213630.log`.
+This checked generation and filenames, not the host utility's compiled stream
+limit. The subsequent `./compile -j 8 em_real` exposed that separate problem.
+
+The earlier helper had built the host utility using
+`make -C tools CC_TOOLS=gcc registry`. This omitted the top-level `toolsdir`
+rule's `-DIWORDSIZE=4 -DMAX_HISTORY=25` (`Makefile:1152`). Consequently,
+`inc/streams.h:1-2` selected its default **12** for the utility while model
+preprocessing used **25**. Reusing that executable generated incomplete
+interfaces. This is a **trial cross-build preparation error**, not WRF
+scientific source incompatibility, GCC 16 strictness, or a GCC-KNC defect.
+The successful generation precheck did not establish interface correctness.
+
+Every compile-error family in this attempt is accounted for below; line
+numbers refer to generated Fortran at the time of the failed build. The full
+individual diagnostics remain in the named log.
+
+| File | Construct and diagnostics | Classification |
+| --- | --- | --- |
+| `share/module_check_a_mundo.f90:1421-1895` | 19 diagnostics: missing `io_form_auxinput17`, `auxinput17_interval` and its y/d/h/m/s variants, `auxhist22_interval`, `auxhist23_interval`; cascading expression and END SUBROUTINE/DO errors | Generated stream-limit mismatch |
+| `share/input_wrf.f90:1175-1195` | 20 diagnostics: absent `auxinput17_only`, followed by CASE/END SELECT errors | Same mismatch |
+| `share/output_wrf.f90:494,649` | 2 diagnostics: absent `auxhist24_only` and `auxhist23_only` | Same mismatch |
+| `share/mediation_integrate.f90:110,1861` and later uses | 7 diagnostics: absent `auxinput17_alarm` and `auxinput17_oid`, cascading END SUBROUTINE error | Same mismatch |
+| `phys/physics_mmm/bl_shinhong.tmp.f90:3` | `use ccpp_kind_types` before its module exists; log line 60834 precedes the compiler invocation for `ccpp_kind_types` at 60854 | WRF upstream parallel-make dependency/order issue; lead-authorized serial retry |
+| Assembler input `cc3CONxo.s` | Missing temporary assembly during process-group termination, log line 83839 | Cancellation artifact; not wrong assembly |
+
+The build was terminated after **5.2 minutes**, once the missing-stream
+failure was diagnosed; WRF's `make -i` had continued into physics. The runner
+reported exit **3840**, with 83,916 log lines; this is an interrupted failed
+build, not a pass. Log:
+`.work/_state/logs/S11_21_wrf_em_real_lf-20261112-213642.log`.
+Cygwin `ps -l` confirmed the trial process group was gone before the retry.
+The patched exported-submodule setup ran without its former Git failures.
+No ICE was observed. No card program ran.
+
+For the corrective attempt, `wrf-retry.sh` uses the already authorized
+`./clean -a` and trial configure to discard interfaces compiled with the wrong
+stream limit, then lets `./compile` build the host tools through `toolsdir`.
+`wrf-clean-configure.sh` is also corrected to use that top-level rule if reused.
+The recorded `src/patches/wrf-4.8.0-serial-physics.patch` sets `-j1 J=-j1`
+only on the physics `non_nmm` recursive make for the authorized serial retry;
+other stages retain at most eight jobs. No scientific source was changed.
+
+## Final finding: GCC-KNC postreload ICE
+
+The corrected attempt ran through `trial-env.sh` and `wrf-retry.sh`: WRF's
+own cleanup/configure followed by `./compile -j 8 em_real`, with the recorded
+single-job physics submake. Its log spans **21:44:23 to 21:58:46** on
+2026-11-12, approximately **14.4 minutes** of partial build wall time,
+including cleanup/configuration. This is not a completed-build timing.
+The retained log has no final runner summary, so no wrapper exit status is
+claimed. The trial is stopped, with no build process left running at handoff.
+
+Log: `.work/_state/logs/S11_21_wrf_em_real_streams25-20261112-214423.log`.
+The previous missing-stream errors did not recur. `ccpp_kind_types` compiled
+before `physics_mmm/bl_shinhong` (log lines 61629 and 65636); the former
+missing-module diagnostic did not recur in the serial physics retry.
+
+The hard blocker is **a GCC-KNC compiler defect**, not WRF source strictness
+or cross configuration:
+
+- File: `phys/module_ra_rrtm.f90:6602`, end of `RTRN`, with the offending
+  scalar move attributed to line 6427 (use of the saved real `bpade`).
+- Construct: single-precision register-to-register move after register
+  allocation, `(set (reg:SF 49 xmm13) (reg:SF 21 xmm1))`, pattern
+  `*movsf_internal`; the compiler reports unsatisfied instruction constraints.
+- Failure: RTL pass `postreload`, `extract_constrain_insn` at `recog.cc:2793`.
+  The original diagnostic starts at log line 113883. WRF's `make -i`
+  continued into subsequent radiation files before the build stopped; that
+  continuation is not evidence the failed routine compiled.
+
+`repro/rtrn.f90` reduces the full module to one routine plus its required
+module data declarations, with no WRF/netCDF module dependency. Its supplied
+`module_ra_rrtm.mod` is a generated output, not an input. `LICENSE-WRF.txt`
+retains the source notice. The isolated command is:
+
+```text
+python tools/run.py --name S11-21-rtrn-repro --inputs ../_shared/wrf-trial/repro/rtrn.f90 ../_shared/wrf-trial/repro/reproduce.sh -- C:/Users/xuzhi/Documents/PhiWeather/.tools/knc-bootstrap/cygwin/bin/bash.exe ../_shared/wrf-trial/trial-env.sh bash ../_shared/wrf-trial/repro/reproduce.sh
+```
+
+The script compiles with just `-O2 -march=knc -ffree-line-length-none`.
+The retained isolated run reproduced the same instruction and postreload
+ICE at `rtrn.f90:234` (move at line 118), without WRF's compatibility flags.
+Log: `.work/_state/logs/S11_21_rtrn_repro-20261112-220005.log`; elapsed log
+interval about two seconds. It was not repeated in the final handoff.
+No assembler-output or native correctness claim follows from an ICE.
+
+The full-tree link/archive checker was not reached. Therefore WRF auxiliary
+runtime checks and the `libwrfio_int.a` machine check remain unverified;
+only the earlier netCDF API executable's runtime check passed. No WRF
+executables are staged for a card smoke run. Final measured trial size was
+**644,505,651 logical bytes (about 645 MB)** before these small documentation
+additions, below the 25 GB budget. Earlier build durations and failures are
+retained above; they must not be interpreted as a successful total compile
+time.
+
 ## Vectorization
 
 The interrupted second attempt emitted `-fopt-info-vec` output while WRF's
@@ -598,11 +707,17 @@ engineering effort, not measured build times.
 
 Latest ordering correction: export-wide text normalization, source cleanup,
 reconfiguration, static runtime propagation and exported-source submodule
-patching are implemented. Package 1 must validate Registry generation with
-the complete `Registry.EM` input before package 3 runs em_real. Package 3
-must verify the patched auxiliary runtime links and investigate the
-`ccpp_kind_types` parallel dependency if it recurs. The estimates below
-are unchanged.
+patching are implemented. Package 1 must retain the normal top-level
+`toolsdir` build flags as well as the complete `Registry.EM` input: generating
+some includes is insufficient if the tool and model use different stream
+limits. Package 3 must verify the auxiliary runtime links and retain serial
+physics compilation until its demonstrated `ccpp_kind_types` make dependency
+is fixed. A new prerequisite is now concrete: **E7-20 compiler-blocker ticket
+(1-3 engineering days initially, subject to diagnosis)** must turn the
+retained `RTRN` reproducer into a failing regression, fix the SF register-move
+constraint failure without enabling SSE/AVX flags, and obtain a lead-built
+compiler. This precedes package 3; do not work around it by changing WRF's
+optimization or floating-point policy. The remaining estimates are unchanged.
 
 1. **Reproducible source/configuration baseline (0.5–1 day):** export a pristine
    WRF 4.8.0 revision from the read-only source repository, preserve its licence,
