@@ -78,7 +78,7 @@ Current tickets: `[###################-]` 205 of 212
 | S11-24 | WRF OpenMP (smpar) build with GCC-KNC at -mphinix, for PhiWeather's benchmark - replaces the serial trial build | Done | WRF v4.8.0 now builds as an OpenMP card binary at -mphinix with GCC-KNC (wrf.exe and real.exe linked, needi... |
 | S11-25 | ICE in do_store_flag (expr.cc) on WRF's surface layer (SFCLAY1D) at -O2 -march=knc | Done | The last WRF file that crashed GCC-KNC (surface layer, SFCLAY1D) now compiles: vector 'ordered and not equa... |
 | S11-26 | WRF OpenMP build at -mphinix with no per-file workarounds (S11-23 and S11-25 fixed), restaged for PhiWeather | draft | Owner 2026-11-13: the S11-24 WRF build is removed. Deleted: |
-| S11-27 | Wrong code - NPB-MG (class A, serial) built by GCC-KNC at -O2 -march=knc fails NPB verification on the card | Question for the tech lead | Lead ran card.py at 15:00 EST: results posted in the answer. |
+| S11-27 | Wrong code - NPB-MG (class A, serial) built by GCC-KNC at -O2 -march=knc fails NPB verification on the card | In progress | Card round at 498a154b, 2026-11-13 15:00 EST; log .work/_shared/S11-27/card.log; card_run exit 124 because ... |
 | S11-28 | HPCG run that fits every card model - fixed work instead of fixed duration, grid sized to the 3100's memory | lead | Needs the interactive lead: one card round, run .work/_shared/S11-28/lead-memory.ps1 at ede7b91c (11 correc... |
 | S12-01 | Sprint 12 prep - static code-quality census of the development-corpus builds (spills, x87/vector transfers, addressing, calls, code size) | Done | A static code-quality census (spill/reload proxies, x87 and x87-zmm traffic, address arithmetic, calls, bra... |
 | S12-02 | Sprint 12 prep - the unscored generality check set (S11-20's six programs in the code styles our corpus lacks) | Done | The six unscored generality checks (Q1-Q6: ray tracer hit dispatch and vec3 AoS, Burkardt MD, Reference BLA... |
@@ -237,6 +237,7 @@ Current tickets: `[###################-]` 205 of 212
 
 ## Recent activity
 
+- 2026-11-13 14:58 **S11-27** lead answer: Card round at 498a154b, 2026-11-13 15:00 EST; log .work/_shared/S11-27/card.log; card_run exit 124 because the total budget ran out at 9 min.
 - 2026-11-13 14:58 **S11-27** lead resume: Lead ran card.py at 15:00 EST: results posted in the answer.
 - 2026-11-13 14:57 **S11-15** engineer ask: Committed df72e0a6. Please run from main: python tools/run.py --name S11-15-profile-sigprof -- powershell -NoProfile -File .work\_shared\S11-15\lea...
 - 2026-11-13 14:53 **S11-17** lead defer: Needs the interactive lead's card runs at bf894ae5, in an exclusive turn, from the S11-17 worktree: the pilot then confirm commands in docs/researc...
@@ -244,7 +245,6 @@ Current tickets: `[###################-]` 205 of 212
 - 2026-11-13 14:49 **S11-15** lead answer: Card 2026-11-13 14:47 EST: .work/_shared/S11-15/lead.ps1 exited 3 in 0.3 min with 'PROFILE_BLOCKED no existing perf executable'. The card has no pe...
 - 2026-11-13 14:48 **S11-17** lead answer: Training ran on the card 2026-11-13 14:47 EST: exit 0, 0.4 min, stderr empty. Output in .work/_shared/S11-17/train.stdout (146 KB). It is UTF-16LE ...
 - 2026-11-13 14:48 **S11-17** lead resume: Lead ran the training at 14:47 EST: train exit 0, 0.4 min.
-- 2026-11-13 14:48 **S11-15** lead resume: Lead ran the profile pilot at 14:47 EST: blocked, no perf on the card.
 
 ## Cost
 
