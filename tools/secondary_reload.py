@@ -172,15 +172,20 @@ def t1(runner):
                                for level in ('-O1', '-O2')
                                for number, mode in enumerate(('si', 'di', 'sf', 'df',
                                    'sf_u32', 'u32_sf', 'df_u64', 'u64_df', 'ti', 'tf'), 1)):
-        asm = runner.out / 'secondary-pressure.s'
+        asm = runner.out / ('secondary-pressure-' + level[1:] + '-' + mode + '.s')
+        dump = asm.with_suffix('.reload')
         compiled = runner.command(runner.cc, *runner.cc_flags, level, '-march=knc',
             '-fomit-frame-pointer', '-fno-tree-vectorize', '-ffp-contract=off',
+            '-fdump-rtl-reload=' + str(dump),
             '-DPRESSURE_MODE=' + str(number), '-S', source, '-o', asm, check=False)
         failures = []
         if compiled.returncode:
             failures.append('compile: ' + compiled.stdout[-2200:])
         else:
             assembly = asm.read_text()
+            if number > 8:
+                from s11_27_reduce import bridge_scan
+                failures.extend(bridge_scan(dump.read_text(), 'pressure_' + mode))
             body = runner.function_body(assembly, 'pressure_' + mode)
             failures.extend(pressure_scan(body, live=number <= 8,
                                           mask_value=3 if number > 8 else 1)

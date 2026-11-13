@@ -9,6 +9,31 @@ import sys
 import s11_27_mg as mg
 
 
+def bridge_scan(dump, function):
+    """Require LRA's bridge pseudos to stay memory-only through allocation."""
+    sections = re.split(r'^;; Function ', dump, flags=re.M)
+    body = next((part for part in sections
+                 if part.startswith(function + ' (')), '')
+    bridges = set(re.findall(
+        r'Creating newreg=(\d+), assigning class NO_REGS to KNC bridge r\1\b', body))
+    if not bridges:
+        return ['missing NO_REGS bridge creation in ' + function]
+    errors = []
+    for reg in sorted(bridges, key=int):
+        if re.search(r'Assign \d+ to [^\n]*\br' + reg + r'\b', body):
+            errors.append('bridge r' + reg + ' assigned a hard register')
+        if re.search(r'class (?!NO_REGS\b)\w+ (?:for|to) [^\n]*\br' + reg + r'\b', body):
+            errors.append('bridge r' + reg + ' changed out of NO_REGS')
+    if 'Dataflow summary:' not in body:
+        errors.append('missing final reload RTL in ' + function)
+    else:
+        final = body.split('Dataflow summary:', 1)[1]
+        for reg in sorted(bridges, key=int):
+            if re.search(r'\(reg(?::\w+|/\w+)* ' + reg + r'\b', final):
+                errors.append('unspilled bridge r' + reg + ' in final RTL')
+    return errors
+
+
 def scan(asm, vector=True):
     """Check scratch stores against the two live 40-double local arrays.
 
@@ -56,12 +81,16 @@ def t1(runner):
                         ('noreuse', ['-fstack-reuse=none'])]:
         asm = runner.out / ('stencil-' + name + '.s')
         obj = asm.with_suffix('.o')
+        dump = asm.with_suffix('.reload')
         label = 't1 stencil reload ' + name
         try:
             runner.command(compiler, *runner.cc_flags, '-O2', '-march=knc',
                            *flags, '--sysroot=' + str(runner.sysroot),
+                           '-fdump-rtl-reload=' + str(dump),
                            '-S', source, '-o', asm)
             errors = scan(asm.read_text(), vector=name != 'novec')
+            if name != 'novec':
+                errors.extend(bridge_scan(dump.read_text(), 'stencil'))
             runner.command(runner.tool('as'), '--march=k1om', asm, '-o', obj)
             runner.command(sys.executable, runner.root / 'tools/knc_lint', asm, obj)
             runner.result(label + ' scratch bounds, assembly and knc_lint', errors)
