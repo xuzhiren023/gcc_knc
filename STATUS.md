@@ -1,10 +1,10 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-13 04:05.
+Updated automatically at every ticket change. Last update: 2026-11-13 14:36.
 
-Nothing can move right now.
+**Next: GPT-6.1, on S11-28 (HPCG run that fits every card model - fixed work instead of fixed duration, grid sized to the 3100's memory).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
-Current tickets: `[###################-]` 205 of 211
+Current tickets: `[###################-]` 205 of 212
 
 ## Milestones
 
@@ -14,7 +14,7 @@ Current tickets: `[###################-]` 205 of 211
 | M1 | Mixed native code | Done | 43 of 43 tickets |
 | M2 | Useful vector target | Done | 51 of 51 tickets |
 | M3 | Runtimes | Done | 48 of 48 tickets |
-| M4 | Broad optimization | In progress | 23 of 29 tickets |
+| M4 | Broad optimization | In progress | 23 of 30 tickets |
 | M5 | Program corpus | Not started | Not planned in detail yet |
 | M6 | Release | Not started | Not planned in detail yet |
 
@@ -66,9 +66,9 @@ Current tickets: `[###################-]` 205 of 211
 | S11-12 | Sprint 11 batch check - full native suite, x86 identity, forward-port drill, ICE sweeps, runtime prefix consistency | draft |  |
 | S11-13 | Senior compiler review of the Sprint 11-13 scope (Milestone M4) against our research, with recommended plan changes | Done | A senior compiler review of the Sprint 11-13 plan is in: M4 is plausible but needs a frozen scoring and mea... |
 | S11-14 | M4 scoring contract and measurement protocol, frozen before any tuning | Done | M4's scoring contract is frozen in ADR-0015 with a tested scorer: strict serial -O2 versus -O2 over 17 prog... |
-| S11-15 | First development-corpus baseline and profile, GCC 5.1.1 vs GCC-KNC at -O2 (E7-03 part 1) | lead | Card runs needed. Staged method at e6b8d1c1 reviewed and fine (bounded perf cpu-clock:u 99 Hz on serial PB-... |
+| S11-15 | First development-corpus baseline and profile, GCC 5.1.1 vs GCC-KNC at -O2 (E7-03 part 1) | lead | HPCG's launch-to-exit time is fixed by hpcg.dat's 60 s run time, so use its 'rating for historical reasons'... |
 | S11-16 | Long-double libm hazard audit - do other MPSS long double entry points fault like cbrtl? (E7-21, bounded) | Done | The card's MPSS long double libm was probed on the card: of 12 entry points only cbrtl faults, and S10-13 a... |
-| S11-17 | PGO feasibility on one complete development program (reuse of S9-18's train/use path) | lead | Needs the interactive lead's card run: from the S11-17 worktree at 1d096574, run python tools/run.py --name... |
+| S11-17 | PGO feasibility on one complete development program (reuse of S9-18's train/use path) | lead | Owner 2026-11-13: keep S11-17 open. PhiWeather's WRF result does not close it. |
 | S11-18 | M4 corpus harness v2 - card profiles, prefix record, held-out sealing, stronger checks, and the donor-failure rule | Done | The M4 corpus harness now stages all 17 programs for the 7120 and the 3100/5100 profiles with serial voting... |
 | S11-19 | Second senior review - the M4 definition and the Sprint 11-13 roadmap, adjusted | Done | The M4 definition and the Sprint 11-13 roadmap are rewritten as measure, improve, decide, each sprint with ... |
 | S11-20 | Research - which compiler optimizations benefit the widest range of real code on KNC, from professional to amateur, and does our corpus cover it? | Done | We now have a code-style coverage study (docs/research/code-style-coverage.md) that ranks Sprint 12 candida... |
@@ -77,8 +77,9 @@ Current tickets: `[###################-]` 205 of 211
 | S11-23 | ICE in WRF's RRTM radiation (rtrn) at -O2 -march=knc - unrecognizable insn after reload, and sub-512-bit SLP vectors under KNC | Done | WRF's RRTM radiation and the -O3 OpenMP WRF files that crashed GCC-KNC after reload (rtrn, kfcps, advance_u... |
 | S11-24 | WRF OpenMP (smpar) build with GCC-KNC at -mphinix, for PhiWeather's benchmark - replaces the serial trial build | Done | WRF v4.8.0 now builds as an OpenMP card binary at -mphinix with GCC-KNC (wrf.exe and real.exe linked, needi... |
 | S11-25 | ICE in do_store_flag (expr.cc) on WRF's surface layer (SFCLAY1D) at -O2 -march=knc | Done | The last WRF file that crashed GCC-KNC (surface layer, SFCLAY1D) now compiles: vector 'ordered and not equa... |
-| S11-26 | WRF OpenMP build at -mphinix with no per-file workarounds (S11-23 and S11-25 fixed), restaged for PhiWeather | draft |  |
-| S11-27 | Wrong code - NPB-MG (class A, serial) built by GCC-KNC at -O2 -march=knc fails NPB verification on the card | lead | Card round needed (interactive lead): run python C:/Users/xuzhi/Documents/gcc_knc/.work/_shared/S11-27/card... |
+| S11-26 | WRF OpenMP build at -mphinix with no per-file workarounds (S11-23 and S11-25 fixed), restaged for PhiWeather | draft | Owner 2026-11-13: the S11-24 WRF build is removed. Deleted: |
+| S11-27 | Wrong code - NPB-MG (class A, serial) built by GCC-KNC at -O2 -march=knc fails NPB verification on the card | lead | Pilot clue: the GCC-KNC OpenMP build of NPB-MG class A, -O2 -march=knc -fopenmp from the same prefix, passe... |
+| S11-28 | HPCG run that fits every card model - fixed work instead of fixed duration, grid sized to the 3100's memory | In progress |  |
 | S12-01 | Sprint 12 prep - static code-quality census of the development-corpus builds (spills, x87/vector transfers, addressing, calls, code size) | Done | A static code-quality census (spill/reload proxies, x87 and x87-zmm traffic, address arithmetic, calls, bra... |
 | S12-02 | Sprint 12 prep - the unscored generality check set (S11-20's six programs in the code styles our corpus lacks) | Done | The six unscored generality checks (Q1-Q6: ray tracer hit dispatch and vec3 AoS, Burkardt MD, Reference BLA... |
 | S2-01 | Design for zmm and mask registers under -march=knc | Done | The register design for KNC is settled on paper: all 32 zmm and 8 mask registers become usable under -march... |
@@ -236,23 +237,23 @@ Current tickets: `[###################-]` 205 of 211
 
 ## Recent activity
 
-- 2026-11-13 04:05 **S11-27** lead defer: Card round needed (interactive lead): run python C:/Users/xuzhi/Documents/gcc_knc/.work/_shared/S11-27/card.py at 498a154b (one card_run, --threads...
-- 2026-11-13 04:02 **S11-27** engineer ask: Card round needed at 498a154b: run python .work/_shared/S11-27/card.py; which CASEs verify? 24 linted serial S/A binaries: O0/O1/O2/no-vectorize/no...
-- 2026-11-13 03:46 **S11-25** lead approve: The last WRF file that crashed GCC-KNC (surface layer, SFCLAY1D) now compiles: vector 'ordered and not equal' float comparisons are expanded as two...
-- 2026-11-13 03:34 **S11-25** engineer submit: Lead rebased onto knc and rebuilt tree 2 at 58d2d07db42. Lead results: sfclay1d/rtrn -O2 -march=knc and kfcps/advance_uv -mphinix -mknc-card=7120 c...
-- 2026-11-13 03:33 **S11-25** lead answer: Lead rebased s11/S11-25 onto knc (HEAD 58d2d07db42, includes S11-23) and rebuilt tree 2 there. All green on the combined tree: sfclay1d.f90 and rtr...
-- 2026-11-13 03:31 **S11-25** lead resume: Lead rebased and rebuilt; see the answer.
-- 2026-11-13 03:16 **S11-25** lead defer: Test-only c3a4ef89365 is correct (plain scan for vcmpps $1, keeps the $4/$7 forbids; no rebuild needed). Needs the interactive lead: rebase gcc bra...
-- 2026-11-13 03:13 **S11-25** engineer ask: Test-only commit c3a4ef89365 uses plain scan-assembler for immediate 1; keeps forbids for 4/7. Loop-copy count is optimizer-dependent. Whitespace P...
+- 2026-11-13 14:30 **S11-27** lead note: Pilot clue: the GCC-KNC OpenMP build of NPB-MG class A, -O2 -march=knc -fopenmp from the same prefix, passes verification at 56 to 240 threads in a...
+- 2026-11-13 14:30 **S11-15** lead note: HPCG's launch-to-exit time is fixed by hpcg.dat's 60 s run time, so use its 'rating for historical reasons' GFLOP/s from stdout, not time_seconds. ...
+- 2026-11-13 09:45 **S11-27** lead note: Owner rule: correctness-only card rounds run cases in parallel, one serial case per core. The first round's card.py stays as staged. Write later ro...
+- 2026-11-13 09:20 **S11-17** lead note: Owner 2026-11-13: keep S11-17 open. PhiWeather's WRF result does not close it.
+- 2026-11-13 09:10 **S11-26** lead note: Owner 2026-11-13: the S11-24 WRF build is removed. Deleted:
+- 2026-11-13 09:00 **S11-26** lead note: PhiWeather's owner paused their WRF trial until this build is staged. Their r2 plans and comparison tools stay ready. When staged, the lead message...
+- 2026-11-13 08:55 **S11-17** lead note: Owner asked whether PhiWeather's PGO conclusion can close this ticket. PhiWeather's lead says no. Their result is WRF-only, GCC 5.1.1:
+- 2026-11-13 08:40 **S11-26** lead note: Owner 2026-11-13: WRF compile work moves after Sprint 12, when the compiler work is complete and no workaround gap remains. Sprint set to s13; stay...
 
 ## Cost
 
 - From the script, engineer: 527 sessions, 1083.6M input tokens
 - From the script, lead: 343 sessions, 96.4M input tokens
-- Started by hand, Claude: 12 sessions, 2927.3M input tokens
+- Started by hand, Claude: 12 sessions, 2941.8M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 26.8 GiB of 100 GiB. 179 GiB free on the drive.
+The project uses 26.2 GiB of 100 GiB. 244 GiB free on the drive.
