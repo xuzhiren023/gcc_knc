@@ -51,102 +51,102 @@ modified. No vendor headers or vendor implementation material is involved.
 `prepare.py` copies inputs; `netcdf-c.sh` extracts the C archive and configures,
 builds (`make -j8`) and installs it under `wrf-trial/install`. Its PATH selects
 `.work/_shared/gcc-knc-16.2.0/bin` first, then PhiWeather's cross binutils and
-Cygwin host utilities. Both run through `tools/run.py`:
+Cygwin host utilities. The preparation and current clean build use `tools/run.py` (the build-only
+continuation follows the already completed fresh configure):
 
 ```text
 python tools/run.py --name S11-21-inputs -- python ../_shared/wrf-trial/prepare.py
-python tools/run.py --name S11-21-netcdf-c-configure -- C:/Users/xuzhi/Documents/PhiWeather/.tools/knc-bootstrap/cygwin/bin/bash.exe ../_shared/wrf-trial/netcdf-c.sh
+python tools/run.py --name S11-21-netcdf-c-make --inputs ../_shared/wrf-trial/trial-env.sh ../_shared/wrf-trial/netcdf-c.sh -- C:/Users/xuzhi/Documents/PhiWeather/.tools/knc-bootstrap/cygwin/bin/bash.exe ../_shared/wrf-trial/trial-env.sh bash ../_shared/wrf-trial/netcdf-c.sh build-only
 ```
 
 ## Stage reached and blockers
 
-### Resume attempt after lead response (2026-11-12)
+**Stage 2: netCDF-C compiled successfully; installation failed.** The clean
+build produced `build-netcdf-c-nomsys/liblib/.libs/libnetcdf.a` (1,770,676 bytes)
+with GCC-KNC 16.2.0, `-O2 -march=knc`, and no source patch. `make -j8` completed;
+`make install` then failed while creating the include directory. This is a
+host filesystem/tool interaction, not a compiler diagnostic. netCDF-Fortran
+sources and a GCC 16 build script are prepared but have not been configured
+or compiled. WRF and MPI remain unbuilt; no executable is staged for the card.
+There was no observed GCC-KNC ICE or wrong assembler output, so no compiler
+reproducer is applicable.
 
-The lead approved a fresh netCDF-C configuration with the inherited MSYS
-variables removed, then netCDF-Fortran and serial `em_real` with no nesting
-or MPI. Prepared `wrf-trial/trial-env.sh`, which runs commands through
-`env -u MSYSTEM -u MSYSTEM_PREFIX -u MINGW_PREFIX -u MSYSTEM_CHOST` and
-selects the GCC 16 toolchain. Updated `src/PROVENANCE.md` and added pre-build
-checks in `netcdf-c.sh` for `ISMSYS=no`, `ISMINGW=no`, and disabled `dreg.c`.
-The intended invocation is:
+The lead authorized retaining the contaminated `build-netcdf-c` as stale and
+using `build-netcdf-c-nomsys`. Every configure and make runs through
+`trial-env.sh`, which unsets `MSYSTEM`, `MSYSTEM_PREFIX`, `MINGW_PREFIX`, and
+`MSYSTEM_CHOST` and selects the GCC 16 installation first on PATH.
 
-```text
-python tools/run.py --name S11-21-netcdf-c-clean-env -- C:/Users/xuzhi/Documents/PhiWeather/.tools/knc-bootstrap/cygwin/bin/bash.exe ../_shared/wrf-trial/trial-env.sh bash ../_shared/wrf-trial/netcdf-c.sh
-```
-
-**New blocker: host execution policy.** The command to remove only the
-contaminated `build-netcdf-c` directory and recreate it was rejected before
-execution with `blocked by policy`. It used native PowerShell `Remove-Item
--LiteralPath`, after resolving and checking the target against the trial
-root. AGENTS.md prohibits working around a refused command. The contaminated
-directory remains; the lead must remove/recreate that directory or provide
-an approved way forward. No configure, make, or test ran in this resume
-attempt. The environment fix and pre-build checks remain untested. Earlier
-timings and disk measurements below describe the preceding build attempt.
-There is no new compiler finding or compiler-defect reproducer.
-
-**Stopped in stage 2, during netCDF-C compilation.** Configure completed and
-some C objects compiled, but no complete dependency library was installed.
-netCDF-Fortran, MPI and WRF were not built. No `wrf.exe` or `real.exe` exists
-from this trial, nothing is staged for a card run, and no native test ran.
-No GCC-KNC ICE or assembler defect was observed.
+The fresh netCDF-C configure completed successfully. In this release, false
+`ISMSYS` and `ISMINGW` values are **empty**, rather than literal `no`;
+`ISMSYS_TRUE`, `ISMINGW_TRUE`, and `REGEDIT_TRUE` are all `#`. The generated
+makefile comments out `am__append_8 = dreg.c`, excluding the registry source
+from compilation. The initial pre-build guard incorrectly required literal
+`no` and stopped before make. It was corrected to accept the false values
+and require all three disabled conditionals. The build-only continuation
+uses this successful configuration without repeating configure.
 
 | Finding | Classification | Evidence and disposition |
 | --- | --- | --- |
-| Cygwin `mkdir -p` failed on `/cygdrive/c/Users/xuzhi` while trying to create the authorized trial build/install directories. | Host infrastructure, before cross configuration; not a WRF or GCC defect. | Initial wrapped attempt exited 1 before configure. Created just the two trial directories with native PowerShell and removed the shell directory-creation step. The next attempt passed this point. |
-| `libdispatch/dreg.c:13:10: fatal error: windows.h: No such file or directory`. | Cross-configuration/environment contamination; not GCC 16 strictness or a GCC-KNC defect. | The parent environment has `MSYSTEM=MINGW64`. netCDF-C `configure:5945–5948` sets `ISMINGW=yes` and `ISMSYS=yes` for any nonempty `MSYSTEM`, even with Linux `--host`. `configure:24278` enables `REGEDIT` from `ISMSYS`; `libdispatch/Makefile.am:55–57` consequently adds Windows registry source `dreg.c` to the target library. The generated makefile has `am__append_8 = dreg.c`; `config.log` confirms `ISMSYS=yes`, `ISMINGW=yes`, and enabled `REGEDIT`. |
+| Cygwin `mkdir -p` failed on a parent of the trial directory. | Host infrastructure. | Resolved in the earlier session by creating authorized directories with native PowerShell. |
+| `libdispatch/dreg.c:13:10: fatal error: windows.h: No such file or directory`. | Cross-configuration/environment contamination. | Inherited `MSYSTEM=MINGW64` enabled `REGEDIT` despite Linux host. The clean environment now disables it; no source patch. |
+| Removal/recreation of the old build directory was blocked by host policy. | Host execution policy. | Lead explicitly authorized retaining it and using `build-netcdf-c-nomsys`; nothing was deleted. |
+| Preparation used a `Path.write_text(newline=...)` keyword unsupported by the host Python. | Trial orchestration. | No edit occurred. An inadvertently launched old-directory configure was interrupted and its orphan subprocess group terminated before make. Changed file writing to `Path.open`; accepted results use only the new directory. |
+| `make install` could not create `install/include`; Cygwin reported permission denied on `/cygdrive/c/Users/xuzhi`. | Host infrastructure during dependency installation. | Clean compilation and archive creation completed. Stopped after the second failed wrapped attempt in this resume, as required by AGENTS.md. Request native precreation of install destinations before retrying install only. |
+| Guard required `ISMSYS='no'`, while configure represents false with an empty value. | Trial verification script. | Fresh configure exited zero; wrapper exited one before make. Guard corrected from observed configuration semantics. |
 
-The second attempt selected the intended GCC 16.2.0 C and C++ executables
-(the wrapper log records their paths) and used `-O2 -march=knc`. The missing
-Windows header is the only fatal compiler diagnostic in that attempt.
-Warnings also reported `strndup` redefinition in `libdispatch/ncuri.c:81`
-and an old-style function definition in `libdispatch/dcrc32.c:263`; both
-were nonfatal and were not changed or suppressed. Configure warnings about
-disabled DAP/S3/filter features, a missing documentation `dot` tool and the
-cross-prefix/host-alias difference were also nonfatal.
+No GCC build, x86 check, benchmark or card job was started. MPI remains
+deferred for the lead-approved serial, no-nesting target. The netCDF-Fortran
+4.6.1 configure script contains no `MSYSTEM`, `ISMSYS`, or `ISMINGW` detection;
+its build will nevertheless use the same environment wrapper. WRF's configure
+has not been evaluated for MSYSTEM contamination because its stage was not
+reached.
 
-The likely next action is to **unset inherited `MSYSTEM` for the Cygwin
-build subprocess**, reconfigure the existing trial build directory, and resume
-the same build with no netCDF source patch. This fix has **not been tested**.
-The session stops with a ticket question because AGENTS.md requires `pm.py ask`
-after two real failed attempts. This is a procedural stop with a concrete
-environment diagnosis, not evidence that netCDF or WRF cannot build with
-GCC-KNC. No third attempt was made.
+The successful C compilation emitted nonfatal warnings for `strndup`
+redefinition in `libdispatch/ncuri.c:81`, an old-style definition in
+`libdispatch/dcrc32.c:263`, and moved `libstdc++.la` paths. None was suppressed
+or patched. The log contains no fatal compiler diagnostic.
 
-A reduced reproduction using the retained generated makefile is:
+The reduced infrastructure command below is the failing command from the
+install log, not a separately rerun test:
 
 ```sh
-# In the supplied Cygwin, with the PATH from wrf-trial/netcdf-c.sh:
-make -C /cygdrive/c/Users/xuzhi/Documents/gcc_knc/.work/_shared/wrf-trial/build-netcdf-c/libdispatch libdispatch_la-dreg.lo
+# Under trial-env.sh:
+/usr/bin/mkdir -p /cygdrive/c/Users/xuzhi/Documents/gcc_knc/.work/_shared/wrf-trial/install/include
 ```
 
-This target is the failing command identified in the build log; it has not
-been rerun as a separate test. The issue can also be inspected without a build
-by tracing `MSYSTEM` → `ISMSYS` → `REGEDIT` in the retained configure script
-and generated makefile. A compiler-defect reproducer is not applicable.
+The proposed next step is to precreate the trial's install destinations using
+native PowerShell (as worked for build directories), then run only
+`make install` in `build-netcdf-c-nomsys`, through `trial-env.sh` and
+`tools/run.py`. Include, lib, lib/pkgconfig, bin and required share subdirectories
+should be derived from the generated install targets. Do not reconfigure or
+recompile the passing C build. No deletion or change to PhiWeather is needed.
+This continuation requires the lead's ticket response after the two failures.
 
 ### Time, disk and logs
 
-The initial directory-creation failure took less than 0.1 minute. The second
-wrapper reports **4.4 minutes** for configuration plus the failed parallel
-build, including partial compilation; it does not measure compilation alone.
-No WRF compilation time is available. Parallel make was capped at **8** jobs.
-After the failed build, the trial tree held **46,685,850 logical file bytes**
-(46.7 MB decimal, about 44.5 MiB), across 3,044 files, including the copied
-archives and extracted C source. This is well below either interpretation of
-the 25 GB budget; filesystem allocation overhead was not measured.
+Earlier attempts: directory creation failed in less than 0.1 minute;
+contaminated configuration plus partial compilation took 4.4 minutes.
+The fresh configuration and overly strict pre-build guard took **4.2 minutes**;
+this was configuration time, with no make invocation. The subsequent clean
+compilation plus failed install took **0.8 minutes**. No WRF compilation time
+is available. Make was capped at 8 jobs.
 
-Logs, relative to `.work/_state/logs/`:
+After these attempts, the trial contains **62,213,665 logical file bytes**
+(62.2 MB decimal, 59.3 MiB) in 4,179 file entries, including both build trees,
+the copied archives, and extracted netCDF-Fortran sources. This measurement
+uses `lstat`, without following 16 Cygwin reparse-file entries; allocated disk
+blocks were not measured. It is well below the 25 GB budget. A first size walk
+that followed links failed on a Cygwin link in the stale build; it made no
+changes. Stale files remain for lead cleanup as directed.
 
-- `S11_21_inputs-20261112-191724.log`: input copying passed; 8,389,536 initial
-  trial bytes.
-- `S11_21_netcdf_c-20261112-191731.log`: initial mkdir infrastructure failure.
-- `S11_21_netcdf_c_configure-20261112-191753.log`: configure and partial build;
-  exit 2, 644 lines, fatal diagnostic at line 632.
+Logs under `.work/_state/logs/`:
 
-The current source, configuration, partial objects, reference recipes and
-scripts remain in `.work/_shared/wrf-trial/`; no per-attempt build tree was
-created. No GCC build, x86 check, benchmark or card job was started.
+- `S11_21_inputs-20261112-191724.log`: input copying passed.
+- `S11_21_netcdf_c-20261112-191731.log`: initial mkdir failure.
+- `S11_21_netcdf_c_configure-20261112-191753.log`: original registry-source failure.
+- `S11_21_netcdf_c_nomsys-20261112-193023.log`: interrupted old-directory configure; not an accepted build result.
+- `S11_21_netcdf_c_clean_build-20261112-193107.log`: fresh configure succeeded; overly strict guard stopped the wrapper before make.
+- `S11_21_netcdf_c_make-20261112-193558.log`: disabled-platform checks and C compilation passed; install failed at mkdir (line 392). Archive creation is at lines 358-359.
 
 ## Vectorization
 
@@ -168,10 +168,10 @@ engineering effort, not measured build times.
    WRF 4.8.0 revision from the read-only source repository, preserve its licence,
    and isolate only the necessary cross configuration from PhiWeather's local
    changes. Establish host tools versus target tools and classic netCDF options.
-2. **GCC 16 dependency stack (1–2 days, after the ticket response):** remove
-   inherited MSYS detection from the Cygwin subprocess environment, reconfigure,
-   and build static
-   netCDF-C followed by netCDF-Fortran, fresh modules and target-runtime links;
+2. **GCC 16 dependency stack (1–2 days, after this trial):** retain the
+   corrected environment, resolve installation directory creation, install the
+   built netCDF-C library, then build netCDF-Fortran with fresh modules and
+   target-runtime links;
    classify strictness versus cross-probe failures without executing target
    probes on the host. Any compiler defect gets a separate reduced case and
    lead-built compiler fix before this work resumes.
