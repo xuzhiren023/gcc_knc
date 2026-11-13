@@ -63,9 +63,11 @@ python tools/run.py --name S11-21-netcdf-c-make --inputs ../_shared/wrf-trial/tr
 
 **Stage 2 complete: both dependency libraries are built and installed, and
 `nf_create`/`nf90_create` now link. The lead completed the WRF export.
-Stage 3 generated a serial, no-nesting GCC-KNC configuration, but its RPC
-configure probe tried to execute a target binary on Windows. Configuration
-needs that probe resolved before the em_real build starts.** The installed static archives are
+Stage 3 now has a complete serial, no-nesting GCC-KNC configuration, with
+RPC selected by target preprocessing. Two em_real attempts failed: first
+on the trial architecture terminator, then on CRLF Registry input and a
+stale host object. Partial physics compilation produced vectorization
+reports; neither wrf.exe nor real.exe linked.** The installed static archives are
 `install/lib/libnetcdf.a` (1,770,676 bytes) and `libnetcdff.a` (1,561,006 bytes).
 Both use GCC-KNC 16.2.0 at `-O2 -march=knc`. Fortran needed the classic-path
 patch below. Installed module verification passed in the preceding session
@@ -387,10 +389,129 @@ and making configure diagnostics fail the wrapper. Host/target tool selection,
 static runtime flags and classic netCDF configuration are established. Other
 work packages and effort estimates remain pending the serial build.
 
+### Continuation after the 20:52 RPC answer
+
+`wrf-post-configure.sh` preprocesses a file including `<rpc/types.h>` with
+`k1om-mpss-linux-gcc -march=knc -E -dM`. The target defines `_RPC_TYPES_H=1`.
+It writes `-DRPC_TYPES=1` into generated `CFLAGS_LOCAL`; no target program
+is executed. No TIRPC probe or landread fallback was needed. This resolves
+the preceding **cross-configuration** blocker. The initial post-configure
+step passed in less than 0.1 minute, log
+`S11_21_wrf_rpc-20261112-205505.log`.
+
+The first `./compile -j 8 em_real` failed in **0.4 minute**. The trial's
+custom stanza had been appended after `#ARCH NULL` without a following
+`#ARCH` marker. `arch/Config.pl:490` only switches to the postamble when it
+sees that next marker. Consequently `configure.wrf` lacked suffix rules,
+`NETCDFPATH`, combined compiler/link flags and other common definitions.
+This is a **trial cross-configuration error**, not an upstream WRF or GCC
+defect. Log: `S11_21_wrf_em_real-20261112-205523.log`.
+
+The resulting error inventory is:
+
+| Location | Construct/diagnostic | Classification |
+| --- | --- | --- |
+| `frame`, log 56/142 | Missing `externals` rule and `module_state_description.o` prerequisite | Missing generated postamble/rules |
+| `external/io_netcdf/diffwrf.F90:56` (preprocessor diagnostic), log 152/162 | `netcdf.inc` absent from `-I/include`; then `wrf_data.mod` missing | Empty `NETCDFPATH`, cascading configuration failure |
+| `external/io_netcdf/wrf_io.f:369`, `field_routines.f:41`, `module_wrfsi_static.f:9`, log 185/193/201 | `netcdf.inc` cannot be opened | Same configuration failure |
+| `external/io_netcdfpar/diffwrf.F90:56`, log 224/234 | `netcdf.inc`, then `wrf_data_ncpar.mod` missing | Missing I/O selection from postamble also attempted this unselected parallel backend |
+| `external/io_netcdfpar/wrf_io.f`, `field_routines.f`, `module_wrfsi_static.f`, log 257/265/273 | Missing `mpif.h` or `netcdf.inc` | Same unselected parallel backend/configuration failure |
+| `share`, `phys`, `dyn_em`, `main`, log 364/423/451/458 | Missing rules/prerequisites for `module_model_constants.o`, `ccpp_kind_types.o`, `module_bc.o`, `module_wrf_top.o` | Cascades from missing common rules |
+| `phys/Makefile:441` submodule recipes, log 382-408 | Git searches upward into GCC-KNC and rejects dubious ownership | Exported-source host integration; no Git safety configuration was relaxed |
+
+`fix-wrf-configure.py` adds the terminating marker and retains the diff in
+`src/patches/wrf-4.8.0-knc-configure-fix.patch`, applied after the previous
+cross patch. It also makes `WRF_KNC_CROSS=1` defer the RPC execution probe
+to the post-configure script; normal configure behavior is unchanged.
+Both wrappers set `GIT_CEILING_DIRECTORIES` to the trial root to keep source
+export Git discovery out of the parent repository.
+
+Regeneration with the corrected stanza passed in **0.1 minute**, including
+post-configure checks for `NETCDFPATH` and the `.F.o` rule. Log:
+`S11_21_wrf_configure_complete-20261112-205716.log`. The Fortran 2003 IEEE,
+ISO_C and FLUSH and Fortran 2008 GAMMA executables exist; `ARCH_LOCAL` has
+none of their disabling macros. These are compile/link probe outcomes, not
+native execution results. `NETCDF_classic=1` selected classic output, so the
+nc4 probe was not run and has no executable. `NETCDF4_IO_OPTS` is a template
+definition, while configure reports classic output and no HDF5 libraries.
+Generated top-level link flags select static GCC 16 runtimes; the auxiliary
+link exception discovered below still needs correction. No dependency tests
+were repeated.
+
+The corrected `em_real` attempt ran from **20:57:31 to approximately
+21:00:48 (3.3 minutes)** before termination after the second failed attempt.
+WRF's recursive `make -i` continued past fatal errors into physics. Interrupting
+the wrapper left Cygwin children alive, so its process group's working
+directory was checked against the trial source tree and that group was
+terminated. A subsequent Cygwin `ps -l` showed no remaining build processes.
+The wrapper has no final PASS/FAIL summary for this interrupted attempt.
+Log: `S11_21_wrf_em_real_complete_config-20261112-205731.log`.
+
+Two actionable causes remain:
+
+1. **Source-export/host compatibility:** Registry preprocessing at log 1976
+   cannot open `Registry/registry.dimspec`, although that regular file exists
+   (8,791 bytes). `Registry.EM_COMMON` contains 3,727 CR bytes. In
+   `tools/reg_parse.c:127-139`, the include parser copies the name from the
+   line and removes LF only, leaving the CR in the filename. The split
+   diagnostic in the log agrees with this cause. Proposed correction:
+   normalize the copied Registry text to LF, recording it as an export
+   compatibility transformation. This correction is **not applied/tested**.
+   A reduced invocation for follow-up is `tools/registry -DEM_CORE=1
+   -DNMM_CORE=0 -DDA_CORE=0 -DWRFPLUS=0 Registry/Registry` from the copied
+   WRF root; the full command actually used is in log 1971. Validate Registry
+   generation before rebuilding the model.
+2. **Cross-build contamination from the first attempt:** the auxiliary
+   `external/io_int/test_io_idx` link fails at log 1362-1366 for `io_int_loc`
+   and `io_int_index`, called by the `bind(c)` interfaces in
+   `module_io_int_idx.F90:74,84`. The first log, line 314, shows `io_int_idx.c`
+   compiled with bare host `cc` because the postamble was missing; the second
+   attempt reused that object in `libwrfio_int.a`. Rebuild all products from
+   that malformed configuration in a clean trial build, not only this one
+   object. This is not evidence of a compiler ABI defect. Also propagate
+   `-static-libgcc -static-libgfortran` to auxiliary Fortran link rules:
+   `test_io_idx` does not consume the top-level `LDFLAGS`. It failed before
+   creating an executable; no dynamic-runtime check was possible.
+
+Remaining diagnostics from that attempt are classified below. Repeated
+instances and exact compile commands remain in the log.
+
+| Files/constructs | Diagnostics and classification |
+| --- | --- |
+| `frame/module_state_description.F`; `module_streams`, `module_driver_constants`, `module_domain_type`, `module_configure`, `module_domain`, `module_io`, `nl_access_routines` | Missing generated source or `switches_and_alarms.inc`, `model_data_order.inc`, `state_subtypes.inc`, `scalar_tables.inc`, `allocs.inc`, `io_form_for_dataset.inc`, `nl_config.inc`; Registry cascade |
+| `share/module_io_domain`, `set_timekeeping`, `wrf_bdyin`, `wrf_bdyout`, `dfi`, `mediation_feedback_domain`, `mediation_force_domain`, `mediation_interp_domain`, `mediation_integrate`, `mediation_wrfmain` | Missing `module_io_domain_defs.inc`, `set_timekeeping_defs.inc`, `wrf_bdyin.inc`, `wrf_bdyout.inc`, `actual_new_args.inc`, `dummy_new_args.inc`, `med_last_solve_io.inc`, `fine_stream_input.inc`; Registry cascade |
+| `dyn_em/solve_em.int`, `start_domain_em.int` | Missing `dummy_new_args.inc`; Registry cascade |
+| Generated `module_streams.f90`, `module_driver_constants.f90`, `module_configure.f90` (including `../frame` paths) | Unexpected EOF after failed preprocessing; Registry cascade, not a Fortran strictness finding |
+| Consumers of `module_bc`, `module_comm_dm_0`, `module_configure`, `module_cpl`, `module_date_time`, `module_domain`, `module_domain_type`, `module_driver_constants`, `module_io`, `module_machine`, `module_state_description` | Missing `.mod` files downstream of failed generation/compilation |
+| Physics consumer of `ccpp_kind_types` (log 5899-5901) | Missing `.mod` before its producer compile appears at log 5921; possible upstream parallel dependency ordering issue, unresolved independently of Registry |
+| `phys/Makefile` submodule checks, log 5840/5842 | Export is not a Git repository; ceiling now prevents parent discovery. Export-aware checks/link setup still needed; no successful network checkout |
+
+No ICE or wrong-assembly diagnostic was found. No GCC defect is claimed and
+no compiler reproducer is warranted. These are not native failures. Total
+new configure/build time is approximately **3.8 minutes**; the second build
+was deliberately interrupted. Logical trial disk use after termination:
+**556,344,525 bytes in 11,071 files** (556.3 MB decimal), below 25 GB. No WRF
+executable or native run was staged. Stale outputs await lead-directed cleanup.
+
 ## Vectorization
 
-No WRF loop compilation result is available: stage 4 was not reached. No
-`-fopt-info-vec` report was generated, and no loop is claimed to have vectorized.
+The interrupted second attempt emitted `-fopt-info-vec` output while WRF's
+make continued into physics. These are partial compiler reports, not proof
+of linked/native correctness or measured hotness. Lines refer to retained
+preprocessed Fortran in `src/WRF-4.8.0/phys/`:
+
+| Routine and generated source | Loop/construct | Compiler report |
+| --- | --- | --- |
+| `wsm5`, `module_mp_wsm5.f90:147` | Inner `i` loop under `j/k`, computing temperature from `th*pii` and copying cloud/rain/snow arrays | 64-byte vectors, factor 16; masked epilogue reported |
+| `cuddrafn`, `physics_mmm/cu_ntiedtke.tmp.f90:2617` | Inner `jl` loop under descending `jk`, zeroing a rate and conditionally updating a cloud-top index | 64-byte vectors, factor 16; masked epilogue reported |
+| `THL_RT_FROM_TH_R_MF`, `module_bl_mfshconvpbl.f90:2095,2098` | Array expressions summing water species and correcting potential temperature | 64-byte vectors, factor 16 (log 13688/13786) |
+
+The first two match the input's short-row/inner-horizontal-loop concerns;
+no particular short trip count or performance gain was established here.
+No `missed:` diagnostics were emitted by the selected `-fopt-info-vec`
+setting. Absence of a success message does not establish a missed-vector
+reason. Dynamics and systematic missed-reason analysis remain blocked;
+collect `-fopt-info-vec-all` on selected files after the build blockers clear.
 The input in
 `docs/research/wrf-input-2026-11-06.md` prioritizes short innermost `i` rows in
 `j/k/i` loops, k extents around 50–51, constant `/12` and `/60`, gathers,
@@ -402,6 +523,14 @@ Do not substitute synthetic kernel results for whole WRF loop reports.
 
 These are proposed work packages, not dispatched tickets. Estimates are
 engineering effort, not measured build times.
+
+Latest ordering correction: package 1 starts with the supplied export,
+normalizes copied Registry text to LF, fixes exported-source submodule
+checks, and regenerates in a clean build state to discard stale host
+objects. Retain the architecture terminator and RPC preprocessing patches;
+validate Registry generation first. Package 3 must propagate static-runtime
+flags to auxiliary links and investigate the `ccpp_kind_types` parallel
+dependency before another full attempt. The estimates below are unchanged.
 
 1. **Reproducible source/configuration baseline (0.5–1 day):** export a pristine
    WRF 4.8.0 revision from the read-only source repository, preserve its licence,
