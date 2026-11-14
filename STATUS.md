@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-14 15:03.
+Updated automatically at every ticket change. Last update: 2026-11-14 15:04.
 
 **Next: the tech lead, on S11-26.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
@@ -101,7 +101,7 @@ Current tickets: `[##################--]` 220 of 237
 | S12-18 | Double-precision vector exp, log and pow ran slower than scalar libm on the card (0.82x, 0.63x, 0.49x) - confirm with valid batches, then fix the library or stop the vectorizer calling them where they lose | lead | Needs interactive lead: (1) exclusive card turn running .work/_shared/S12-18/vmath-bench.mic at full, 3100 ... |
 | S12-19 | Profile-guided missed-vectorization triage - join hot loops with the vectorizer's reasons and observed strides/masks, so tuning targets what is hot and fixable | In progress | S12-19 red is approved: 10 host tests in 2 files now pin the vectorizer triage contract (six real GCC misse... |
 | S12-20 | libknc_vmath accuracy and exception contract, with an independent validation design (rounding modes, special values, flags, scalar fallback) | draft |  |
-| S12-21 | Scheduling model for M4's serial runs - measure density-1 tuning and the integer-multiply cost against today's density-4 defaults (S12-14 B02, B04, B05) | Not started |  |
+| S12-21 | Scheduling model for M4's serial runs - measure density-1 tuning and the integer-multiply cost against today's density-4 defaults (S12-14 B02, B04, B05) | In progress |  |
 | S12-22 | Low-risk corrections from the S12-14 audit - wrong comments and citations (N01-N09) and the far-prefetch-distance range bug (B10) | Not started |  |
 | S12-23 | Floating-point environment correctness on KNC - fix the underflow probe that cannot tell flushing from rounding, and handle x87 erratum CD28 (S12-14 N06, N07, B16, B17) | Not started |  |
 | S13-01 | M4 final gate - stage the ADR-0015 gate run at the final head (17 programs, held-out unsealed, six pairs, three profiles) | draft |  |
@@ -274,11 +274,11 @@ Current tickets: `[##################--]` 220 of 237
 ## Cost
 
 - From the script, engineer: 610 sessions, 1239.3M input tokens
-- From the script, lead: 400 sessions, 110.7M input tokens
-- Started by hand, Claude: 12 sessions, 3194.5M input tokens
+- From the script, lead: 401 sessions, 111.1M input tokens
+- Started by hand, Claude: 12 sessions, 3195.0M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 32.6 GiB of 100 GiB. 151 GiB free on the drive.
+The project uses 32.7 GiB of 100 GiB. 151 GiB free on the drive.
