@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-14 18:15.
+Updated automatically at every ticket change. Last update: 2026-11-14 18:31.
 
-**Next: the tech lead, on S12-23.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: the tech lead, on S12-18.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[##################--]` 226 of 244
 
@@ -98,7 +98,7 @@ Current tickets: `[##################--]` 226 of 244
 | S12-15 | Research - literature survey of published Xeon Phi (KNC) and Xeon Phi system research that matches our goals; what have we overlooked? | Done | Literature survey done: 30 groups of published Xeon Phi work ranked against our goals, with 14 overlooked i... |
 | S12-16 | Research - whole-system tuning playbook for the Z840 + Xeon Phi (BIOS, host OS, MPSS and card, transfers, runtimes), as HPC centres tuned Xeon + KNC systems | Done | Whole-system tuning playbook for the Z840 + Phi done: 13 ordered steps (BIOS, host Linux, card power/pages/... |
 | S12-17 | claude-torture -j N refuses to start in exclusive card runs (no inherited RLIMIT_AS since S11-29), so the execute suite cannot run | Done | The parallel execute-suite runner starts again in exclusive card runs: claude-torture -j N with an explicit... |
-| S12-18 | Double-precision vector exp, log and pow ran slower than scalar libm on the card (0.82x, 0.63x, 0.49x) - confirm with valid batches, then fix the library or stop the vectorizer calling them where they lose | lead | Needs interactive lead: (1) exclusive card turn running .work/_shared/S12-18/vmath-bench.mic at full, 3100 ... |
+| S12-18 | Double-precision vector exp, log and pow ran slower than scalar libm on the card (0.82x, 0.63x, 0.49x) - confirm with valid batches, then fix the library or stop the vectorizer calling them where they lose | Question for the tech lead | Lead, card window 1 (22:29-22:47Z, all batches valid, outputs .work/_shared/tmp/claude-s12-window1/s12-18-{... |
 | S12-19 | Profile-guided missed-vectorization triage - join hot loops with the vectorizer's reasons and observed strides/masks, so tuning targets what is hot and fixable | Done | tools/vec_triage.py now ranks each development program's hot loops by sampled time with GCC's vectorizer ve... |
 | S12-20 | libknc_vmath accuracy and exception contract, with an independent validation design (rounding modes, special values, flags, scalar fallback) | draft |  |
 | S12-21 | Scheduling model for M4's serial runs - measure density-1 tuning and the integer-multiply cost against today's density-4 defaults (S12-14 B02, B04, B05) | lead | Card run needed (interactive lead): 037aee42 removes the shell timeout calls (card_run keeps the 1740 s lim... |
@@ -269,6 +269,7 @@ Current tickets: `[##################--]` 226 of 244
 
 ## Recent activity
 
+- 2026-11-14 18:31 **S12-18** lead resume: Lead, card window 1 (22:29-22:47Z, all batches valid, outputs .work/_shared/tmp/claude-s12-window1/s12-18-{full,3100,5100}.out): vector over scalar...
 - 2026-11-14 18:14 **S12-29** lead defer: GCC build needed, lane gcc at 51126f4c232 (s12/S12-29, .work/_shared/gcc): interactive lead runs python tools/run.py --name s12_29_build -- python ...
 - 2026-11-14 18:14 **S12-23** engineer submit: Green gate, payload build/lint, T0/T1 PASS (prior session). Lead T2: 36 PASS, 0 FAIL; log .work/_state/logs/s12_23_t2-20261114-181240.log. Earlier ...
 - 2026-11-14 18:13 **S12-23** lead answer: T2 passed (lead run); submit.
@@ -276,16 +277,15 @@ Current tickets: `[##################--]` 226 of 244
 - 2026-11-14 18:12 **S12-29** engineer ask: GCC build needed at 51126f4c232; please build lane gcc and return for tests (AGENTS.md forbids Codex builds). Fix applies Bm scalar alignment check...
 - 2026-11-14 18:11 **S12-23** lead defer: Interactive lead must run T2: engineer's green gate, T0 and T1 pass, but T2 failed on infrastructure (Permission denied writing .work/_shared/S5-21...
 - 2026-11-14 18:10 **S12-23** engineer ask: Green and payload build/lint PASS; T0/T1 PASS. T2 infrastructure failure: Permission denied writing .work/_shared/S5-21/short-vector-O2-0.mic. Sand...
-- 2026-11-14 18:06 **S12-29** lead approve-red: S12-29 red approved: the new T1 test catches pr38969's card fault (a complex-float constant broadcast from 4-byte-aligned memory, including folded ...
 
 ## Cost
 
 - From the script, engineer: 641 sessions, 1271.8M input tokens
 - From the script, lead: 422 sessions, 116.1M input tokens
-- Started by hand, Claude: 12 sessions, 3297.1M input tokens
+- Started by hand, Claude: 12 sessions, 3302.3M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 33.3 GiB of 100 GiB. 146 GiB free on the drive.
+The project uses 33.3 GiB of 100 GiB. 144 GiB free on the drive.
