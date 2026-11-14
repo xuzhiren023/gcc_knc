@@ -2,7 +2,7 @@
 
 Updated automatically at every ticket change. Last update: 2026-11-14 15:30.
 
-**Waiting for you:** S12-17. Run `python tools/pm.py inbox`.
+**Next: the tech lead, on S12-19.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[##################--]` 221 of 238
 
@@ -97,7 +97,7 @@ Current tickets: `[##################--]` 221 of 238
 | S12-14 | Audit GCC-KNC's tuning model and runtime defaults against the digested sources - every mismatch with a proposed change and its proof | Done | The lead now has a ranked audit in docs/research/s12-14-model-audit.md of 42 places where GCC-KNC tuning nu... |
 | S12-15 | Research - literature survey of published Xeon Phi (KNC) and Xeon Phi system research that matches our goals; what have we overlooked? | Done | Literature survey done: 30 groups of published Xeon Phi work ranked against our goals, with 14 overlooked i... |
 | S12-16 | Research - whole-system tuning playbook for the Z840 + Xeon Phi (BIOS, host OS, MPSS and card, transfers, runtimes), as HPC centres tuned Xeon + KNC systems | Done | Whole-system tuning playbook for the Z840 + Phi done: 13 ordered steps (BIOS, host Linux, card power/pages/... |
-| S12-17 | claude-torture -j N refuses to start in exclusive card runs (no inherited RLIMIT_AS since S11-29), so the execute suite cannot run | **Waiting for you** | budget: 6 engineer sessions used; the budget is 6 |
+| S12-17 | claude-torture -j N refuses to start in exclusive card runs (no inherited RLIMIT_AS since S11-29), so the execute suite cannot run | In progress | Lead raises sessions 6 -> 7: the last raise made progress (green test passed); one session to rebuild the s... |
 | S12-18 | Double-precision vector exp, log and pow ran slower than scalar libm on the card (0.82x, 0.63x, 0.49x) - confirm with valid batches, then fix the library or stop the vectorizer calling them where they lose | lead | Needs interactive lead: (1) exclusive card turn running .work/_shared/S12-18/vmath-bench.mic at full, 3100 ... |
 | S12-19 | Profile-guided missed-vectorization triage - join hot loops with the vectorizer's reasons and observed strides/masks, so tuning targets what is hot and fixable | Question for the tech lead | 6c999a43: join core; 10 host tests pass. Audit: 0/15109 workload samples resolve to source; HPCG has no cap... |
 | S12-20 | libknc_vmath accuracy and exception contract, with an independent validation design (rounding modes, special values, flags, scalar fallback) | draft |  |
@@ -263,6 +263,7 @@ Current tickets: `[##################--]` 221 of 238
 
 ## Recent activity
 
+- 2026-11-14 15:30 **S12-17** owner decide: Lead raises sessions 6 -> 7: the last raise made progress (green test passed); one session to rebuild the staged binary and submit.
 - 2026-11-14 15:28 **S12-04** lead approve: card_run's profile memory monitor no longer floods stderr and scans /proc far less often: it uses usleep with a sleep 1 fallback instead of the Bus...
 - 2026-11-14 15:13 **S12-21** lead changes: FLAGS['density1'] pins -mknc-density=1, but no such option exists: the density control is --param=knc-threads-per-core= (i386.opt:1400, Init 4, ran...
 - 2026-11-14 15:13 **S12-17** engineer escalate: budget: 6 engineer sessions used; the budget is 6
@@ -270,13 +271,12 @@ Current tickets: `[##################--]` 221 of 238
 - 2026-11-14 15:12 **S12-19** engineer ask: 6c999a43: join core; 10 host tests pass. Audit: 0/15109 workload samples resolve to source; HPCG has no capture. Repro: python tools/vec_triage.py ...
 - 2026-11-14 15:11 **S12-08** lead defer: Closure done: 7f2df59d states 'premise failed, no compiler change' up front, keeps both reproducers, no GCC commit (knc..s12/S12-08 empty). pm.py s...
 - 2026-11-14 15:09 **S12-04** owner decide: Lead raises sessions 7 -> 8: the last raise made progress (usleep fallback, red/green logs); one session to submit.
-- 2026-11-14 15:08 **S12-21** engineer red: fc734fd3 adds phase-1 contracts: 28 serial development builds, default/density1 flags, top-four selection, three alternating pairs, full exclusive ...
 
 ## Cost
 
 - From the script, engineer: 617 sessions, 1244.2M input tokens
 - From the script, lead: 404 sessions, 112.0M input tokens
-- Started by hand, Claude: 12 sessions, 3206.1M input tokens
+- Started by hand, Claude: 12 sessions, 3206.6M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
