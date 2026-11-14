@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-14 15:04.
+Updated automatically at every ticket change. Last update: 2026-11-14 15:05.
 
-**Next: the tech lead, on S11-26.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: GPT-6.1, on S12-04 (card_run profile memory monitor costs under 5% of one card thread).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
 Current tickets: `[##################--]` 220 of 237
 
@@ -77,7 +77,7 @@ Current tickets: `[##################--]` 220 of 237
 | S11-23 | ICE in WRF's RRTM radiation (rtrn) at -O2 -march=knc - unrecognizable insn after reload, and sub-512-bit SLP vectors under KNC | Done | WRF's RRTM radiation and the -O3 OpenMP WRF files that crashed GCC-KNC after reload (rtrn, kfcps, advance_u... |
 | S11-24 | WRF OpenMP (smpar) build with GCC-KNC at -mphinix, for PhiWeather's benchmark - replaces the serial trial build | Done | WRF v4.8.0 now builds as an OpenMP card binary at -mphinix with GCC-KNC (wrf.exe and real.exe linked, needi... |
 | S11-25 | ICE in do_store_flag (expr.cc) on WRF's surface layer (SFCLAY1D) at -O2 -march=knc | Done | The last WRF file that crashed GCC-KNC (surface layer, SFCLAY1D) now compiles: vector 'ordered and not equa... |
-| S11-26 | WRF OpenMP build at -mphinix with no per-file workarounds (S11-23 and S11-25 fixed), restaged for PhiWeather | Question for the tech lead | Blocked as recorded in f8fe9c32: knc 619e14b479a passes four original reproducers, but clean WRF build and ... |
+| S11-26 | WRF OpenMP build at -mphinix with no per-file workarounds (S11-23 and S11-25 fixed), restaged for PhiWeather | lead | Needs the interactive lead: clean WRF build hits a new ICE (REMEZ, vect_transform_stmt, knc 619e14b479a; re... |
 | S11-27 | Wrong code - NPB-MG (class A, serial) built by GCC-KNC at -O2 -march=knc fails NPB verification on the card | Done | NPB-MG built by GCC-KNC at -O2 -march=knc now verifies on the card (class A in 14.1 s, against 33.8 s for G... |
 | S11-28 | HPCG run that fits every card model - fixed work instead of fixed duration, grid sized to the 3100's memory | Done | HPCG now runs a fixed amount of work (one CG set on the 104-cubed grid) that passes on the full card, 3100 ... |
 | S11-29 | card_run profiles limit memory in use, not address space, so a 3100 or 5100 run fails only where the real card would | Done | Under --profile 3100 and 5100, card_run now limits the memory a job actually uses (sampled resident plus sw... |
@@ -262,6 +262,7 @@ Current tickets: `[##################--]` 220 of 237
 
 ## Recent activity
 
+- 2026-11-14 15:05 **S11-26** lead defer: Needs the interactive lead: clean WRF build hits a new ICE (REMEZ, vect_transform_stmt, knc 619e14b479a; repro .work/_shared/wrf-trial/repro/remez....
 - 2026-11-14 15:03 **S12-08** lead answer: Decision: close on the failed premise; no card run. The staged pair only measures the fold-left bridge cost, and your note shows those bridges sit ...
 - 2026-11-14 15:03 **S11-26** engineer ask: Blocked as recorded in f8fe9c32: knc 619e14b479a passes four original reproducers, but clean WRF build and standalone repro/remez.f90 fail in vect_...
 - 2026-11-14 15:02 **S12-07** lead defer: Card run needed (interactive lead only): run .work/_shared/S12-07/sparse-paired via tools/card_run --threads 1 --timeout 200 in our card turn (one ...
@@ -269,7 +270,6 @@ Current tickets: `[##################--]` 220 of 237
 - 2026-11-14 15:01 **S12-17** owner decide: Lead raises sessions 4 -> 6 (second raise): red proof done (exit 125 with main's file); the restore was blocked by a git lock permission, now done ...
 - 2026-11-14 15:01 **S12-08** engineer ask: Phase-1 proof 248edd72: hot ludcmp/cholesky/CG bodies have no stack operands. Ludcmp 128/130 x87 reads are fold-left transfers; outer GPR spills ha...
 - 2026-11-14 15:00 **S12-17** engineer escalate: budget: 4 engineer sessions used; the budget is 4
-- 2026-11-14 14:59 **S12-19** engineer red: Revised red d3ee9323: 10 cases, 2 test files; real GCC messages with citations, both in-order refusals, actual strict-FP cost refusal, captured add...
 
 ## Cost
 
