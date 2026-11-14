@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-14 08:42.
+Updated automatically at every ticket change. Last update: 2026-11-14 08:43.
 
-**Next: the tech lead, on S11-28.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+Nothing can move right now.
 
 Current tickets: `[###################-]` 209 of 216
 
@@ -79,7 +79,7 @@ Current tickets: `[###################-]` 209 of 216
 | S11-25 | ICE in do_store_flag (expr.cc) on WRF's surface layer (SFCLAY1D) at -O2 -march=knc | Done | The last WRF file that crashed GCC-KNC (surface layer, SFCLAY1D) now compiles: vector 'ordered and not equa... |
 | S11-26 | WRF OpenMP build at -mphinix with no per-file workarounds (S11-23 and S11-25 fixed), restaged for PhiWeather | draft | Owner 2026-11-13: the S11-24 WRF build is removed. Deleted: |
 | S11-27 | Wrong code - NPB-MG (class A, serial) built by GCC-KNC at -O2 -march=knc fails NPB verification on the card | Done | NPB-MG built by GCC-KNC at -O2 -march=knc now verifies on the card (class A in 14.1 s, against 33.8 s for G... |
-| S11-28 | HPCG run that fits every card model - fixed work instead of fixed duration, grid sized to the 3100's memory | Question for the tech lead | aad1ae22 records native pilot: 30 effective launches VALID/sets=1; six equal-work serial pairs. Reconciliat... |
+| S11-28 | HPCG run that fits every card model - fixed work instead of fixed duration, grid sized to the 3100's memory | lead | Needs the interactive lead (write access to .work/_shared/S11-28/): from repo root at aad1ae22 run the stag... |
 | S11-29 | card_run profiles limit memory in use, not address space, so a 3100 or 5100 run fails only where the real card would | Done | Under --profile 3100 and 5100, card_run now limits the memory a job actually uses (sampled resident plus sw... |
 | S12-01 | Sprint 12 prep - static code-quality census of the development-corpus builds (spills, x87/vector transfers, addressing, calls, code size) | Done | A static code-quality census (spill/reload proxies, x87 and x87-zmm traffic, address arithmetic, calls, bra... |
 | S12-02 | Sprint 12 prep - the unscored generality check set (S11-20's six programs in the code styles our corpus lacks) | Done | The six unscored generality checks (Q1-Q6: ray tracer hit dispatch and vec3 AoS, Burkardt MD, Reference BLA... |
@@ -241,6 +241,7 @@ Current tickets: `[###################-]` 209 of 216
 
 ## Recent activity
 
+- 2026-11-14 08:43 **S11-28** lead defer: Needs the interactive lead (write access to .work/_shared/S11-28/): from repo root at aad1ae22 run the staged finalize-pilot.py so results.jsonl ke...
 - 2026-11-14 08:42 **S11-17** lead defer: Interactive lead at 8601f1fb, S11-17 worktree. Yes, main is the target for gcc: no (knc applies only to the gcc tree). The engineer cannot write .g...
 - 2026-11-14 08:33 **S11-28** engineer ask: aad1ae22 records native pilot: 30 effective launches VALID/sets=1; six equal-work serial pairs. Reconciliation validates captures but results.jsonl...
 - 2026-11-14 08:31 **S11-17** engineer ask: 8601f1fb: final write-up records all pilot/confirm spreads, 900 checked batches, 30/30 launches; T1 previously 5/5 green. Branch/indirect/division ...
@@ -248,7 +249,6 @@ Current tickets: `[###################-]` 209 of 216
 - 2026-11-14 08:22 **S11-28** lead answer: HPCG pilot ran 2026-11-14 02:15-07:40 EST (325 min), log .work/_state/logs/S11_28_pilot-20261114-021459.log, captures .work/_shared/S11-28/pilot/, ...
 - 2026-11-14 08:22 **S11-28** lead resume: Lead ran the pilot 02:15-07:40 EST and reran launch 27 at 08:06: results in the answer.
 - 2026-11-14 08:22 **S11-17** lead escalate: budget: 9 engineer sessions used; the budget is 9
-- 2026-11-14 08:21 **S11-17** lead answer: Timing ran 2026-11-14 08:16-08:21 EST, exclusive, on a quiet host: pilot PASS 1.9 min (log .work/_state/logs/S11_17_controls_pilot-20261114-081627....
 
 ## Cost
 
@@ -260,4 +260,4 @@ Current tickets: `[###################-]` 209 of 216
 
 ## Disk
 
-The project uses 31.7 GiB of 100 GiB. 157 GiB free on the drive.
+The project uses 31.7 GiB of 100 GiB. 156 GiB free on the drive.
