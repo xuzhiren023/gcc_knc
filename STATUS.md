@@ -4,7 +4,7 @@ Updated automatically at every ticket change. Last update: 2026-11-14 15:06.
 
 **Next: the tech lead, on S12-04.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
-Current tickets: `[##################--]` 220 of 237
+Current tickets: `[##################--]` 220 of 238
 
 ## Milestones
 
@@ -14,7 +14,7 @@ Current tickets: `[##################--]` 220 of 237
 | M1 | Mixed native code | Done | 43 of 43 tickets |
 | M2 | Useful vector target | Done | 51 of 51 tickets |
 | M3 | Runtimes | Done | 48 of 48 tickets |
-| M4 | Broad optimization | In progress | 38 of 55 tickets |
+| M4 | Broad optimization | In progress | 38 of 56 tickets |
 | M5 | Program corpus | Not started | Not planned in detail yet |
 | M6 | Release | Not started | Not planned in detail yet |
 
@@ -88,7 +88,7 @@ Current tickets: `[##################--]` 220 of 237
 | S12-05 | DMA end-to-end time - overlap file read, DMA and file write, and copy on the card with more than one thread | draft |  |
 | S12-06 | M4 theme 1 - strict scalar FP conversions and call boundaries (NPB-EP transform and log path, NPB-IS randlc) | Done | Theme 1 (scalar FP conversions and calls in NPB-EP/IS) closed with no compiler change: a card diagnostic sh... |
 | S12-07 | M4 theme 2 - indexed-load scheduling with strict sparse reduction (NPB-CG) | lead | Card run needed (interactive lead only): run .work/_shared/S12-07/sparse-paired via tools/card_run --thread... |
-| S12-08 | M4 theme 3 - dependency-preserving scalar updates and register pressure in dense loops (PB-ludcmp, x87 stack traffic) | In progress | Decision: close on the failed premise; no card run. The staged pair only measures the fold-left bridge cost... |
+| S12-08 | M4 theme 3 - dependency-preserving scalar updates and register pressure in dense loops (PB-ludcmp, x87 stack traffic) | Question for the tech lead | Closure documentation committed as 7f2df59d; reproducers retained. Requested submit --override was refused:... |
 | S12-09 | Sprint 12 batch check - integrated themes at the final Sprint 12 head, regression evidence, optional modes frozen | draft |  |
 | S12-10 | Research - what KNC hardware and runtime knowledge are we still missing to tune GCC-KNC, the OS runtime and broad optimization, and where is it documented? | Done | KNC reference-gap research done: 16 gaps ranked, 32 primary sources (98 MB, outside git) with page-cited fa... |
 | S12-11 | Research - best practices for a dual Xeon E5-2690 v3 + Xeon Phi (KNC) workstation (HP Z840) for LLM inference and scientific computing | Done | Z840 dual E5-2690 v3 + Xeon Phi setup guide done: slot/BIOS/memory/power/cooling checklist, MPSS-on-modern-... |
@@ -104,6 +104,7 @@ Current tickets: `[##################--]` 220 of 237
 | S12-21 | Scheduling model for M4's serial runs - measure density-1 tuning and the integer-multiply cost against today's density-4 defaults (S12-14 B02, B04, B05) | In progress |  |
 | S12-22 | Low-risk corrections from the S12-14 audit - wrong comments and citations (N01-N09) and the far-prefetch-distance range bug (B10) | Not started |  |
 | S12-23 | Floating-point environment correctness on KNC - fix the underflow probe that cannot tell flushing from rounding, and handle x87 erratum CD28 (S12-14 N06, N07, B16, B17) | Not started |  |
+| S12-24 | ICE in vect_transform_stmt (tree-vect-stmts.cc:13381) on WRF's REMEZ at -mphinix (-O3 -march=knc) | Not started |  |
 | S13-01 | M4 final gate - stage the ADR-0015 gate run at the final head (17 programs, held-out unsealed, six pairs, three profiles) | draft |  |
 | S13-02 | Libgomp per-region thread density - choose 1-4 workers per core per parallel region instead of once per program | draft |  |
 | S13-03 | M4 retrospective - what we did wrong, what worked, and the practice changes carried into the next milestone and the agent-team skill | draft |  |
@@ -262,6 +263,7 @@ Current tickets: `[##################--]` 220 of 237
 
 ## Recent activity
 
+- 2026-11-14 15:06 **S12-08** engineer ask: Closure documentation committed as 7f2df59d; reproducers retained. Requested submit --override was refused: deep ticket: run pm.py red and wait for...
 - 2026-11-14 15:05 **S12-04** engineer ask: The strengthened fallback test fails against HEAD's original tools/card_run (log: C:\Users\xuzhi\Documents\gcc_knc\.work\_state\logs\S12_04_profile...
 - 2026-11-14 15:05 **S11-26** lead defer: Needs the interactive lead: clean WRF build hits a new ICE (REMEZ, vect_transform_stmt, knc 619e14b479a; repro .work/_shared/wrf-trial/repro/remez....
 - 2026-11-14 15:03 **S12-08** lead answer: Decision: close on the failed premise; no card run. The staged pair only measures the fold-left bridge cost, and your note shows those bridges sit ...
@@ -269,13 +271,12 @@ Current tickets: `[##################--]` 220 of 237
 - 2026-11-14 15:02 **S12-07** lead defer: Card run needed (interactive lead only): run .work/_shared/S12-07/sparse-paired via tools/card_run --threads 1 --timeout 200 in our card turn (one ...
 - 2026-11-14 15:01 **S12-19** lead approve-red: S12-19 red is approved: 10 host tests in 2 files now pin the vectorizer triage contract (six real GCC missed reasons, vectorized vs SLP vs unknown,...
 - 2026-11-14 15:01 **S12-17** owner decide: Lead raises sessions 4 -> 6 (second raise): red proof done (exit 125 with main's file); the restore was blocked by a git lock permission, now done ...
-- 2026-11-14 15:01 **S12-08** engineer ask: Phase-1 proof 248edd72: hot ludcmp/cholesky/CG bodies have no stack operands. Ludcmp 128/130 x87 reads are fold-left transfers; outer GPR spills ha...
 
 ## Cost
 
 - From the script, engineer: 612 sessions, 1240.4M input tokens
 - From the script, lead: 402 sessions, 111.3M input tokens
-- Started by hand, Claude: 12 sessions, 3195.0M input tokens
+- Started by hand, Claude: 12 sessions, 3196.9M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
