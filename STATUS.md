@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-14 14:01.
+Updated automatically at every ticket change. Last update: 2026-11-14 14:02.
 
 **Next: the tech lead, on S11-12.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
@@ -98,7 +98,7 @@ Current tickets: `[##################--]` 216 of 230
 | S12-15 | Research - literature survey of published Xeon Phi (KNC) and Xeon Phi system research that matches our goals; what have we overlooked? | Question for the tech lead | Ran submit as instructed; it refused because the committed survey has 848 changed lines against the 800-lin... |
 | S12-16 | Research - whole-system tuning playbook for the Z840 + Xeon Phi (BIOS, host OS, MPSS and card, transfers, runtimes), as HPC centres tuned Xeon + KNC systems | Done | Whole-system tuning playbook for the Z840 + Phi done: 13 ordered steps (BIOS, host Linux, card power/pages/... |
 | S12-17 | claude-torture -j N refuses to start in exclusive card runs (no inherited RLIMIT_AS since S11-29), so the execute suite cannot run | In progress | Do not amend or split 71cbcf86. Instead prove red: temporarily check out tools/claude-torture.c from main (... |
-| S12-18 | Double-precision vector exp, log and pow ran slower than scalar libm on the card (0.82x, 0.63x, 0.49x) - confirm with valid batches, then fix the library or stop the vectorizer calling them where they lose | Tests waiting for review | Commit 6a256a79. Host Cygwin regression: exp/log/pow each fail as expected after a timing transient; steady... |
+| S12-18 | Double-precision vector exp, log and pow ran slower than scalar libm on the card (0.82x, 0.63x, 0.49x) - confirm with valid batches, then fix the library or stop the vectorizer calling them where they lose | In progress | A host test now reproduces the short vmath benchmark batches: the calibration accepts one slow early sample... |
 | S13-01 | M4 final gate - stage the ADR-0015 gate run at the final head (17 programs, held-out unsealed, six pairs, three profiles) | draft |  |
 | S2-01 | Design for zmm and mask registers under -march=knc | Done | The register design for KNC is settled on paper: all 32 zmm and 8 mask registers become usable under -march... |
 | S2-02 | Float and double arguments and results in zmm lane 0 | Done | Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`). |
@@ -255,6 +255,7 @@ Current tickets: `[##################--]` 216 of 230
 
 ## Recent activity
 
+- 2026-11-14 14:02 **S12-18** lead approve-red: A host test now reproduces the short vmath benchmark batches: the calibration accepts one slow early sample, picks too few repetitions and then rec...
 - 2026-11-14 14:01 **S12-04** lead changes: Red stage must hold only the failing test: commit c122120a also carries the card_run fix, so red-then-green cannot be shown; split it (test commit ...
 - 2026-11-14 14:01 **S11-12** engineer submit: 437b2a35: T0 56/T1 327 PASS; lead T2 7/7 PASS. Both ICE sweeps zero ICE. Refreshed drill complete: master 14 conflicts, gcc-16 4; PR128640 reviewed...
 - 2026-11-14 14:00 **S12-18** engineer red: Commit 6a256a79. Host Cygwin regression: exp/log/pow each fail as expected after a timing transient; steady controls pass. Real driver accepts one ...
@@ -262,7 +263,6 @@ Current tickets: `[##################--]` 216 of 230
 - 2026-11-14 13:59 **S12-04** engineer red: Expected regression confirmed: test fails because generated monitor contains unsupported fractional sleep 0.01. Log: C:\Users\xuzhi\Documents\gcc_k...
 - 2026-11-14 13:58 **S12-13** lead approve: The project now has a numbered KNC reference index (R01-R27), corrected KNC notes that cite source pages and keep superseded text visible, and an o...
 - 2026-11-14 13:58 **S12-06** lead answer: See the resume note: close as premise fails and submit.
-- 2026-11-14 13:49 **S12-15** lead answer: Lead: no rebase needed. submit only checks rebase for gcc: yes tickets; your diff is one new note and the lead merges. Run pm.py submit now as is.
 
 ## Cost
 
