@@ -16,119 +16,52 @@ available from `.work/_state/logs/S11_15_profile_sigprof-20261113-150906.log`.
 It identifies PB-gemm's vector inner loop as the dominant sampled region.
 Capture, overhead and CPU-accounting gates pass. The lead's 2026-11-14 00:23
 decision accepts the sysroot libc naming and bounded CPU-share estimates;
-these are not measured wall-time fractions. The remaining authorized batch
-is staged below. No corpus-wide removable-time ranking or S12 implementation
-theme is established yet. Donor and restricted-profile sampling are no longer
-required; paired primary timings already cover those comparisons.
+these are not measured wall-time fractions. The development batch is now
+attributed. The ranking below uses qualified serial CPU estimates and clearly
+marked local-speedup scenarios. OpenMP delivery loses 96.5-97.5% of the nominal
+sample cadence and cannot supply qualified wait seconds. Donor and restricted-
+profile sampling were waived by the lead; paired primary timings retain those
+comparisons. HPCG remains pending S11-28 and serial MG remains excluded.
 
-## Current handoff: development profiling batch
+## Completed batch and scope decisions
 
-The 2026-11-14 lead decision supersedes the pilot's module-identity and
-wall-fraction blockers. Name the libc rows **named against sysroot libc**;
-the accepted name/version and executable-segment extent checks require no
-card identity check. Estimate region CPU seconds as each launch's sample
-share times its measured user CPU seconds. Report system CPU and off-CPU
-time separately as unassigned, along with unsampled timing boundaries.
-For serial runs, off-CPU residual is `max(0, wall - user - system)`; retain
-any negative residual as accounting-resolution uncertainty rather than
-silently treating the accounting as exact. For OpenMP, report user and
-system CPU seconds and `user / (wall * threads)`; the analogous unused
-capacity residual is not a measurement of elapsed wait time. Process CPU
-seconds summed across workers can exceed wall seconds.
+The lead ran nine serial plain/sample pairs on 2026-11-14, 01:07-01:32 EST,
+then serial zlib/SQLite and five OpenMP pairs at 01:57-02:02 EST. All **32
+planned non-HPCG launches passed** their existing collector and perturbation
+checks, including complete PolyBench live-outs. This does not mean every
+profile qualifies. The first batch's serial HPCG plain launch hit the 600 s
+cap; the lead attributes this to its requested-duration workload taking
+10-14 minutes including setup, not a workload fault. HPCG was then omitted
+from both profiling panels, as authorized. No failed duration enters a table.
 
-The first batch ran on 2026-11-14 from 01:07 to 01:32 EST. Nine serial
-plain/sample pairs passed: STREAM, PB-atax, PB-cholesky, PB-heat-3d,
-PB-jacobi-2d, PB-ludcmp, NPB-CG, NPB-EP and NPB-IS. The next launch,
-serial HPCG plain, hit the 600-second deadline (exit 124). The lead reports
-its requested-duration input takes 10–14 minutes including setup; this is
-a cap failure, not evidence of a workload fault. Returned evidence:
-`.work/_state/logs/S11_15_profile_batch-20261114-010719.log` and
-`.work/_shared/S11-15/batch-capture/`. The 18 successful launches still
-need host attribution and overhead qualification.
+Evidence is in `.work/_shared/S11-15/batch-capture/` and:
 
-Per the lead's 01:39 instruction, `tools/s11_15_batch.py restage` prepares
-only serial zlib and SQLite, plus OpenMP STREAM, NPB-CG, NPB-EP, NPB-MG
-and NPB-IS, with one worker per compute core. The explicit remaining-key
-allowlist skips all nine completed serial pairs and HPCG in both profiling
-panels. PB-gemm already has its accepted pilot; NPB-MG serial stays excluded
-pending S11-27. HPCG awaits S11-28 fixed work. Every workload uses the unchanged S11-18 GCC-KNC
-strict -O2 binary and original input. The zlib donor decoder remains only
-as the harness correctness check. No donor profiling or held-out input is
-staged or opened.
+- `.work/_state/logs/S11_15_profile_batch-20261114-010719.log`
+- `.work/_state/logs/S11_15_profile_remaining-20261114-015727.log`
+- Final host attribution: `.work/_state/logs/S11_15_batch_attribution-20261114-021134.log`
 
-The remaining batch contains **14 launches**, one plain followed by one sampled
-launch per build, on the full 7120 allocation (240 granted CPUs, 60 cores;
-one selected CPU for serial or 60 for OpenMP). Each separate `card_run`
-has a **600-second cap**. Allow about **10–15 minutes of card time**, mostly
-queue/transfer overhead (the primary full-profile medians sum to about
-15 seconds for these paired workloads). This is an estimate; the sum of
-launch caps is 140 minutes. Each launch is subject to normal card coordination.
-The lead script stops on a failed launch or correctness/capture check;
-there are no automatic retries. Successful output is not yet a qualified
-profile or a replacement for the primary pilot timings.
+The unchanged S11-18 GCC-KNC strict -O2 executables used their original inputs,
+one plain and one sampled launch per build, 600 s cap, full 7120 allocation,
+one selected CPU for serial and 60 workers for OpenMP. NPB-MG serial was not
+opened; PB-gemm uses its completed six-sample pilot. No donor profiling,
+held-out capture, corpus edit, compiler rebuild or engineer card job occurred.
 
-The same 10 ms process-wide ITIMER_PROF method now uses lock-free atomic
-slot reservation: simultaneous worker handlers cannot overwrite each other's
-PCs. Shutdown disables the timer, closes admission and drains admitted
-handlers before reading the buffer. The bounded buffer holds four million
-PC/TID pairs (48 MB BSS); overflow is explicit. Worker TIDs are recorded
-to expose observed delivery coverage. No handler allocation, symbol lookup
-or I/O is added. The separate `profile-batch.so` preserves the old pilot DSO
-and returned pilot evidence. Native concurrency/coverage is still untested.
+The batch's separate `profile-batch.so` uses process-wide ITIMER_PROF at 10 ms,
+atomic slot reservation and PC/TID records. Shutdown disables the timer,
+closes admission and drains handlers. Its bounded four-million-record buffer
+had no reported overflow. Buffer completeness does not measure lost signals.
+The existing staging, lint and shell checks remain valid; they were not rerun.
+`lead.ps1` remains the historical remaining-batch entry point, **not a request
+to rerun**. The host script only reads the explicit development allowlist.
 
-The launcher and primary correctness checks are reused. Complete PolyBench
-live-outs are retained and compared exactly between plain and sampled runs;
-NPB, STREAM, SQLite and zlib retain their existing validations. Captures
-use fixed paths in `.work/_shared/S11-15/batch-capture/`, overwritten on an
-explicit rerun, and are kept out of git. This handoff preserves the completed
-captures. Existing corpus binaries are not copied or rebuilt. Restaging
-reuses the previously built/linted diagnostic DSO, launcher and file lists;
-it checks that the selected inputs exist and rewrites the lead entry point.
-
-Stage on the host (already run for this handoff):
-
-```powershell
-python tools/run.py --name S11-15-batch-restage --inputs tools/s11_15_batch.py -- python tools/s11_15_batch.py restage
-```
-
-Original host staging passed (exit 0): sampler build/lint/runtime dependencies, shell
-syntax and all 18 file lists. Log:
-`.work/_state/logs/S11_15_batch_stage-20261114-004142.log`.
-Those passing checks are reused. Native OpenMP coverage and all batch
-overhead qualification remain pending.
-Restaging passed (exit 0), selecting exactly seven keys / 14 launches:
-`.work/_state/logs/S11_15_batch_restage-20261114-014809.log`.
-
-Lead-only command from the main checkout:
-
-```powershell
-python tools/run.py --name S11-15-profile-remaining -- powershell -NoProfile -File .work\_shared\S11-15\lead.ps1
-```
-
-From this worktree use `..\_shared\S11-15\lead.ps1` instead. Return the
-wrapper log and the fixed batch-capture directory through the ticket.
-`lead.ps1` now runs only the seven remaining keys. It retains the 600-second
-cap and stops at the first launch or correctness/capture failure.
-
-After return, attribute each launch against its own maps, frozen executable
-and runtime DSOs; retain unknown PCs in the denominator. Classify libgomp
-spin/barrier/wait functions as sampled wait and other named functions as
-compute; keep unknowns separate. Blocking waits consume little CPU and
-cannot be inferred from a CPU-sample wait fraction. Report observed TID
-coverage, sample cadence against process CPU accounting, sample count and
-plain/sample overhead per build. Process-directed standard signals can
-coalesce and favor particular workers; the serial cadence qualification
-does not establish OpenMP representativeness. Flag deficient coverage or
-cadence rather than treating the observed split as an unbiased wall share.
-One sampled launch of a short program may have few PCs; report that limit
-without silently scheduling repetitions beyond the authorized batch.
-
-Combine accepted CPU estimates with the existing pilot medians for a
-bounded opportunity ranking, with unassigned costs and overlap explicit.
-A region's estimated CPU seconds are an upper bound on attributable work,
-not evidence that all of it is removable. HPCG remains the historical
-rating proxy **pending S11-28 fixed work** and stays outside the
-removable-seconds sum. Do not wait for S11-28 to complete this report.
+Per the lead's 00:23 decision, region CPU seconds are `PC share * user CPU`.
+System time and `wall - user - system` remain unassigned for serial runs;
+negative residuals are accounting-resolution uncertainty. Launcher minus
+interior wall is separately unsampled. OpenMP unused capacity is
+`wall * 60 - user - system`, not elapsed waiting time. No waiting fractions
+are inferred from low utilization alone. The lead accepted libc naming
+against the sysroot without a further card identity check. HPCG's rating
+proxy is pending S11-28 fixed work and contributes no removable seconds.
 
 ## Primary pilot observations
 
@@ -197,7 +130,8 @@ except HPCG's historical GFLOP/s rating. No donor speedup or primary vote is
 assigned. All 12 HPCG launches at two/four threads per core in restricted
 profiles fail (the lead diagnoses `bad_alloc`; for example capture/340.stderr).
 Their short failure durations are excluded. The other 150 OpenMP launches
-pass the existing collector checks. Runtime wait versus compute is unmeasured.
+pass the existing collector checks. The returned wait/compute sample split is
+reported below; its cadence failure prevents a quantitative wait-time claim.
 
 | Program | Profile | Threads | GCC-KNC median [min, max] | Status |
 | --- | --- | --- | --- | --- |
@@ -320,7 +254,7 @@ log. No card job was started by the engineer.
 
 ## Original pilot qualification rules
 
-These describe the completed serial pilot. The current handoff above records
+These describe the completed serial pilot. The completed-batch scope above records
 the lead's subsequent exceptions for libc naming and CPU-share estimates;
 the old wall-share blocker is not a prerequisite for the new batch.
 
@@ -452,61 +386,312 @@ prove that the fallback ran. Likewise, the 300 PCs at the load address
 `0x40132f` do not establish memory stalls, bandwidth saturation or a profitable
 prefetch change: delivery bias and neighboring execution remain possible.
 
+## Returned batch: attribution and qualification
+
+Each PC uses its own launch's executable mapping and ELF PT_LOAD load bias.
+The executable and staged runtime DSOs come from that build's frozen file
+list; system libraries use the matching mapped path in the toolchain sysroot.
+**Libc rows are named against sysroot libc.** No new identity claim is made.
+Source-line debug information is unavailable; symbols and inspected code
+ranges supply the attribution. Unsampled functions are not declared cold.
+
+Sized symbols alone miss internal helpers. The final analysis verifies the
+explicit `memcpy` call at sysroot offset `0x7f5e8` to `0x7f600`, then names
+PCs in the inspected aligned-copy helper `[0x7f600,0x7f734)`. Likewise,
+libm `log` jumps at `0xc156` to the x87 helper `[0x8090,0x80fc)`; that
+helper is labelled by the traced branch, not objdump's misleading nearest
+`__lgamma_r_finite` name. Libm attribution is conditional on the mapped
+2.21 library matching this sysroot code. EP's `0x400a90` is the exact
+`log@plt` entry. No nearest-symbol extrapolation is used. Other unknowns
+stay in the denominator (zlib 1/121; SQLite 12/173). SQLite's remaining
+libc PCs are not silently reclassified by the lead's naming exception.
+
+### Serial capture quality
+
+One plain/sample pair per build cannot establish a median overhead or
+run-to-run stability. The pilot's per-run 10% overhead and 20% cadence limits
+are used here; fewer than 300 PCs is a low-count limitation. A negative
+overhead is variation, not negative sampler cost. All serial runs observed
+one TID; none reported overflow. Cadence is `100*(N*.010/(U+S)-1)`.
+
+| Program | Plain / sample s | PCs | Overhead % | Cadence error % | Interpretation |
+| --- | --- | --- | --- | --- | --- |
+| STREAM | 7.963383 / 8.018154 | 797 | 0.69 | -0.25 | Pass these checks; single sample launch |
+| PB-atax | 0.939344 / 0.956512 | 93 | 1.83 | -1.06 | fewer than 300 PCs |
+| PB-cholesky | 10.458517 / 12.481861 | 1244 | 19.35 | -0.16 | overhead |
+| PB-heat-3d | 0.510553 / 0.518388 | 49 | 1.53 | -3.92 | fewer than 300 PCs |
+| PB-jacobi-2d | 0.703100 / 0.712763 | 68 | 1.37 | -2.86 | fewer than 300 PCs |
+| PB-ludcmp | 18.295150 / 17.616010 | 1756 | -3.71 | -0.17 | Pass these checks; single sample launch |
+| NPB-CG | 29.278496 / 29.816683 | 2976 | 1.84 | -0.07 | Pass these checks; single sample launch |
+| NPB-EP | 97.404273 / 98.081339 | 9798 | 0.70 | -0.02 | Pass these checks; single sample launch |
+| NPB-IS | 11.998320 / 12.051705 | 1201 | 0.44 | -0.17 | Pass these checks; single sample launch |
+| zlib | 1.245582 / 1.262175 | 121 | 1.33 | -2.42 | fewer than 300 PCs |
+| SQLite | 1.754100 / 1.763001 | 173 | 0.51 | -1.14 | unknown PCs, fewer than 300 PCs |
+
+Cholesky's +19.35% observed overhead fails the limit. Its dominant location
+is still described, but its seconds are withheld from the qualified ranking.
+This does not distinguish profiler perturbation from the existing timing
+variability. No automatic retry was authorized. Atax, both stencils, zlib
+and SQLite remain descriptive low-count profiles; SQLite also exceeds the
+5% function-unknown threshold. They do not enter the qualified sum.
+
+| Program | Interior wall s | User s | System s (unassigned) | Signed wall-U-S s | Unsampled boundary s |
+| --- | --- | --- | --- | --- | --- |
+| STREAM | 7.993571 | 7.850 | 0.140 | +0.003571 | 0.024583 |
+| PB-atax | 0.945022 | 0.860 | 0.080 | +0.005022 | 0.011490 |
+| PB-cholesky | 12.462380 | 12.440 | 0.020 | +0.002380 | 0.019481 |
+| PB-heat-3d | 0.506034 | 0.500 | 0.010 | -0.003966 | 0.012354 |
+| PB-jacobi-2d | 0.701587 | 0.690 | 0.010 | +0.001587 | 0.011176 |
+| PB-ludcmp | 17.593218 | 17.580 | 0.010 | +0.003218 | 0.022791 |
+| NPB-CG | 29.779208 | 29.730 | 0.050 | -0.000792 | 0.037476 |
+| NPB-EP | 97.999557 | 97.990 | 0.010 | -0.000443 | 0.081782 |
+| NPB-IS | 12.030315 | 11.970 | 0.060 | +0.000315 | 0.021390 |
+| zlib | 1.250411 | 1.180 | 0.060 | +0.010411 | 0.011764 |
+| SQLite | 1.750312 | 1.730 | 0.020 | +0.000312 | 0.012689 |
+
+The small negative residuals for heat-3d, CG and EP are retained, not turned
+into precise off-CPU estimates. Serial off-CPU estimates are the positive
+part of this column. SIGPROF can deliver a kernel interval at a user return
+PC, so even a named region's CPU estimate is approximate. Tables never
+interpret delivered PCs as measured wall fractions or independent samples.
+
+### Hot functions and inspected regions
+
+Percentages include all delivered PCs, including runtime, setup, correctness
+output and unknowns. Function seconds below are `U * share`, exclusive of
+callees. The tables show leading functions, not every function. The JSON
+retains the complete attribution. Whole-function byte sizes are static code
+extents, not a measured instruction-cache footprint.
+
+| Program | Leading functions: PC share; estimated CPU seconds | Largest listed executable function bytes |
+| --- | --- | --- |
+| STREAM | main 57.84%; 4.541 s; libc-2.21.so: memcpy aligned helper 36.26%; 2.846 s; checkSTREAMresults 3.76%; 0.295 s | main: 1776 |
+| PB-atax | main 98.92%; 0.851 s; corpus_fprintf 1.08%; 0.009 s | main: 1820 |
+| PB-cholesky | main 99.52%; 12.380 s; libc-2.21.so: memcpy 0.24%; 0.030 s; libc-2.21.so: strcmp 0.16%; 0.020 s | main: 1629 |
+| PB-heat-3d | main 73.47%; 0.367 s; libc-2.21.so: strcmp 10.20%; 0.051 s; libc-2.21.so: memcpy 8.16%; 0.041 s | main: 2940 |
+| PB-jacobi-2d | main 82.35%; 0.568 s; corpus_fprintf 7.35%; 0.051 s; libc-2.21.so: _IO_fwrite/fwrite 4.41%; 0.030 s | main: 3659 |
+| PB-ludcmp | main 99.94%; 17.570 s; libc-2.21.so: munmap 0.06%; 0.010 s | main: 5713 |
+| NPB-CG | conj_grad_ 88.98%; 26.453 s; sparse_ 10.55%; 3.137 s; libc-2.21.so: memcpy aligned helper 0.17%; 0.050 s | conj_grad_: 9162 |
+| NPB-EP | MAIN__ 53.18%; 52.115 s; libm-2.21.so: log internal x87 path 31.84%; 31.203 s; vranlc_ 8.64%; 8.471 s | MAIN__: 3225 |
+| NPB-IS | rank 47.04%; 5.631 s; randlc 43.38%; 5.193 s; create_seq 6.33%; 0.757 s | rank: 1797 |
+| zlib | deflate_slow 33.88%; 0.400 s; slide_hash 17.36%; 0.205 s; inflate_fast 11.57%; 0.137 s | deflate_slow: 1537 |
+| SQLite | sqlite3VdbeExec 29.48%; 0.510 s; libc-2.21.so: ?? 6.94%; 0.120 s; vdbeSorterCompareInt 6.36%; 0.110 s | sqlite3VdbeExec: 43271 |
+
+These inspected ranges are disjoint within a program. Bytes span the stated
+half-open address range. A range may contain a call; its PC count excludes
+callee execution. Candidate backedge envelopes in the machine-readable
+output can overlap or include non-loop paths and are never summed. The
+following ranges were manually checked against disassembly; source-level
+setup identification additionally uses the authorized PolyBench sources.
+
+| Program / region | Address range | Bytes | PCs / total (%) | Estimated CPU s |
+| --- | --- | --- | --- | --- |
+| STREAM / scale | `0x400960..0x400996` | 54 | 91/797 (11.42%) | 0.896 |
+| STREAM / add | `0x400a00..0x400a4a` | 74 | 165/797 (20.70%) | 1.625 |
+| STREAM / triad | `0x400ac0..0x400b0a` | 74 | 183/797 (22.96%) | 1.802 |
+| PB-atax / matrix initialization | `0x400be0..0x400c9c` | 188 | 72/93 (77.42%) | 0.666 |
+| PB-atax / strict reduction | `0x400d30..0x400da7` | 119 | 15/93 (16.13%) | 0.139 |
+| PB-atax / vector update | `0x400e00..0x400e56` | 86 | 5/93 (5.38%) | 0.046 |
+| PB-cholesky / matrix initialization | `0x400b50..0x400c5a` | 266 | 1199/1244 (96.38%) | 11.990 |
+| PB-cholesky / factorization reduction | `0x400eb0..0x400ec5` | 21 | 37/1244 (2.97%) | 0.370 |
+| PB-heat-3d / stencil A | `0x400c20..0x400ce4` | 196 | 13/49 (26.53%) | 0.133 |
+| PB-heat-3d / stencil B | `0x400fc0..0x401084` | 196 | 18/49 (36.73%) | 0.184 |
+| PB-jacobi-2d / unrolled stencil A | `0x400ba0..0x400f1d` | 893 | 29/68 (42.65%) | 0.294 |
+| PB-jacobi-2d / unrolled stencil B | `0x4010b0..0x40142d` | 893 | 26/68 (38.24%) | 0.264 |
+| PB-ludcmp / matrix initialization | `0x400c80..0x400d8c` | 268 | 1065/1756 (60.65%) | 10.662 |
+| PB-ludcmp / factorization reduction A | `0x400fc0..0x4010b7` | 247 | 342/1756 (19.48%) | 3.424 |
+| PB-ludcmp / factorization reduction B | `0x4011e0..0x4012da` | 250 | 322/1756 (18.34%) | 3.224 |
+| NPB-CG / indexed reduction | `0x402480..0x402499` | 25 | 2507/2976 (84.24%) | 25.045 |
+| NPB-CG / sparse setup search | `0x403e90..0x403eae` | 30 | 209/2976 (7.02%) | 2.088 |
+| NPB-EP / scalar transform/call site | `0x4010ff..0x40122f` | 304 | 5153/9798 (52.59%) | 51.535 |
+| NPB-EP / random generation loop | `0x402510..0x4025eb` | 219 | 846/9798 (8.63%) | 8.461 |
+| NPB-IS / random generator function | `0x400ec0..0x400ffc` | 316 | 521/1201 (43.38%) | 5.193 |
+| NPB-IS / rank bucket loop | `0x401743..0x4019bd` | 634 | 423/1201 (35.22%) | 4.216 |
+| zlib / slide hash loop A | `0x401d70..0x401d8b` | 27 | 5/121 (4.13%) | 0.049 |
+| zlib / slide hash loop B | `0x401da0..0x401dbb` | 27 | 16/121 (13.22%) | 0.156 |
+| SQLite / index search envelope | `0x481f60..0x481fb5` | 85 | 7/173 (4.05%) | 0.070 |
+
+The two stencil ranges explain 63.27% of heat-3d PCs and 80.88% of jacobi-2d
+PCs. Their output paths and libraries are real costs inside the frozen timing
+boundary. Atax's largest region is matrix initialization, not its multiply
+kernel. Cholesky and ludcmp construct their input matrix with a substantial
+scalar product/update loop before factorization. Those costs cannot be
+removed by changing benchmark inputs or timing boundaries.
+
+### Vectorization, transfers, spills and code size
+
+These are properties of the frozen generated code, not measured stall costs.
+Original optimization-decision dumps were not captured. Observed scalar or
+vector code is reported; a specific compiler rejection reason is unknown.
+Stack references alone do not prove register spills: ABI transfers, saved
+addresses and local variables are distinguished below. No positive spill
+removal budget is inferred from instruction counts.
+
+| Program | Observed code at the hot region; transfer/spill evidence |
+| --- | --- |
+| PB-gemm | 63-byte vector FMA loop, no stack reference or call; outer x87/store/broadcast bridge described in the pilot above. |
+| PB-atax | 188-byte initialization loop uses x87 divides and stack integer-to-FP conversions at `-0x3c(%rbp)`. The 119-byte strict reduction stays x87; the 86-byte update is vector FMA. An x87 result is stored to the program array and broadcast for the update. Neither compute loop has stack spills; conversion traffic is outside them. |
+| PB-cholesky | 266-byte initialization inner loop is unrolled scalar x87, with many address calculations and prefetches; no stack access inside it. Outer counters/pointers use stack slots. Factorization remains scalar, including divide/sqrt; overhead failure bars a cost estimate. |
+| PB-ludcmp | 268-byte initialization loop and 247/250-byte factorization reductions use x87 and indexed/strided loads with prefetches. No stack access in these selected inner loops; address/counter save/reload traffic appears around them, e.g. `0x400fb1..0x400fb8` and `0x4010b7`. No vector bridge in the selected loops. |
+| PB-jacobi-2d | Two 893-byte unrolled loops use unpack loads, vector adds/multiply and pack stores. The inspected inner bodies have no calls or stack accesses; no visible inner FP/address spills. Size alone does not establish instruction-cache stalls. |
+| PB-heat-3d | Two 196-byte vector FMA stencil loops use unpack loads and pack stores, with no stack references/calls. Masked gather tails follow; their cost is not isolated by 49 PCs. |
+| STREAM | Scale/add/triad loops are 54/74/74 bytes, vector arithmetic with prefetch and non-temporal stores, no inner-loop stack access. The aligned libc copy helper uses scalar loads/stores. Runtime copy PCs are separate from vector-loop PCs; caller stacks are unavailable. |
+| NPB-CG | Dominant 25-byte loop performs indexed scalar x87 multiply/add in order, with no call or stack access. Address registers are loaded from stack outside the loop (`0x402450..0x402478`). Other paths include vector/gather code; its presence does not mean this hot reduction is vectorized. |
+| NPB-EP | 304-byte transform region uses x87 divide/sqrt and calls log. It stores/broadcasts the argument at `0x40113b..0x401148`, preserves x87 values across the call in stack slots, then pack-stores/reloads the return at `0x40116c..0x401173`. The 108-byte internal log helper also bridges vector ABI to x87 and back; it uses x87 log instructions. Control-word conversion traffic follows. Bridge, math and spill costs overlap and are not isolated. |
+| NPB-IS | 316-byte randlc uses x87 arithmetic and repeated control-word save/change/restore for integer conversions; return store/broadcast at `0x400f75..0x400f79`. The 634-byte rank bucket loop uses scalar indexed integer loads/stores and branches. RNG setup is inside primary latency. |
+| zlib | 124-byte slide_hash contains two scalar 27-byte loops with narrow loads/stores and conditional updates, no stack access. deflate_slow is 1,537 bytes and branch/call-heavy; sampled function extent does not isolate its spills or branch-misprediction cost. |
+| SQLite | sqlite3VdbeExec is 43,271 bytes with dispersed PCs; no single hot VM loop is established. The 85-byte sampled index-search envelope has an indirect comparator call and stack-held pointer arguments. This is address/call traffic, not evidence of a removable FP bridge. Spills across the large interpreter remain unquantified. |
+| NPB-MG | Serial invalid and unprofiled under S11-27; no serial code-cost claim. OpenMP function locations are described below, without qualified time attribution. |
+| HPCG | Both profiles omitted pending S11-28 fixed work; no hot-code or spill claim from the rating proxy. |
+
+### OpenMP: observed wait/compute, unqualified time attribution
+
+All rows use 60 workers, one per compute core. Wait means named libgomp
+spin/barrier/wait functions; compute means all other named PCs (including
+setup, runtime and output), not just useful parallel arithmetic. Unknown
+PCs stay separate. Here all wait PCs are `gomp_barrier_wait_end` or
+`gomp_team_barrier_wait_end`; no other libgomp function received a PC.
+
+| Program | PCs; observed TIDs / 60 (min-max PCs/TID) | Wait / compute / unknown PC % | Overhead % | Cadence error % |
+| --- | --- | --- | --- | --- |
+| STREAM | 97; 42/60 (1-7) | 56.70 / 43.30 / 0.00 | 7.47 | -97.03 |
+| NPB-CG | 130; 46/60 (1-9) | 25.38 / 74.62 / 0.00 | 9.29 | -97.50 |
+| NPB-EP | 416; 59/60 (1-22) | 19.23 / 80.77 / 0.00 | 3.78 | -96.50 |
+| NPB-MG | 78; 43/60 (1-5) | 33.33 / 66.67 / 0.00 | 10.43 | -97.14 |
+| NPB-IS | 54; 35/60 (1-3) | 18.52 / 81.48 / 0.00 | 6.19 | -97.05 |
+
+| Program | Interior wall s | User / system CPU s | U/(wall*60) | Unused CPU-capacity s | Unsampled boundary s |
+| --- | --- | --- | --- | --- | --- |
+| STREAM | 0.634391 | 31.91 / 0.74 | 83.83% | 5.413 | 0.054062 |
+| NPB-CG | 0.888459 | 51.80 / 0.12 | 97.17% | 1.388 | 0.053228 |
+| NPB-EP | 2.053061 | 118.65 / 0.11 | 96.32% | 4.424 | 0.079267 |
+| NPB-MG | 0.497407 | 26.68 / 0.59 | 89.40% | 2.574 | 0.059813 |
+| NPB-IS | 0.324744 | 17.66 / 0.62 | 90.64% | 1.205 | 0.049755 |
+
+**Every OpenMP row fails the cadence gate**, with incomplete observed worker
+coverage. Delivery is only 2.50-3.50% of nominal process CPU cadence. This is
+consistent with coalescing/process-directed delivery bias, not proof of a
+specific loss mechanism. No conversion of these wait shares to CPU or wall
+seconds is admitted; the analysis leaves OpenMP function seconds unset.
+MG also exceeds 10% observed overhead. High CPU occupancy includes spinning
+and does not prove useful compute efficiency. The CPU-capacity residual
+includes startup, serial work and unscheduled workers, not just blocking.
+
+Among delivered compute PCs, CG's `conj_grad_._omp_fn.0` has 60.77% of all
+PCs (7,883-byte function); EP's `MAIN__._omp_fn.1` has 50.24% (1,238 bytes),
+plus 27.16% in log and its internal path. MG's `resid_._omp_fn.0` has 23.08%
+(2,971 bytes), `rprj3_._omp_fn.0` 11.54% (6,257 bytes) and
+`psinv_._omp_fn.0` 8.97% (2,693 bytes). IS's randlc has 38.89% (338 bytes)
+and rank worker 37.04% (3,965 bytes). STREAM's leading two worker functions
+have 9.28% and 7.22% (545/625 bytes). These locate code for diagnosis but
+cannot rank removable parallel seconds. The method is inadequate for a
+quantitative OpenMP split; no further recorder project or card retry is
+implicitly authorized by this report.
+
 ## Planning estimates and removable-time ranking
 
-PB-gemm now has a dominant sampled loop, code size and bridge/spill inspection;
-its bounded CPU-share estimate is admitted, while removable cost remains
-unestimated. Nine other serial programs await attribution, zlib and SQLite
-await the remaining batch, and HPCG awaits S11-28; NPB-MG
-serial remains excluded. These programs lack sampled functions/loops,
-hot code sizes and measured costs. All
-OpenMP wait-versus-compute splits remain unknown. The review ranges below
-are future-work scenarios, not predictions validated by donor comparisons.
-Every program's admitted prospective gain remains **unestimated**; no gain
-is admitted to the S12 budget from these scenarios.
+The ranking is an **opportunity ceiling and conditional-removal ranking**,
+not measured speedup from an optimization. For primary full-profile GCC-KNC
+median `T`, sampled launch-to-exit time `L`, sampled user CPU `U`, and region
+PC fraction `p`, normalize the diagnostic estimate onto the primary boundary:
 
-| Program | Review scenario | Updated planning evidence and next constraint |
+`A = T * (U / L) * p`; conditional removable seconds `D(s) = A * (1 - 1/s)`.
+
+This preserves the primary timing, discounts system/off-CPU/boundary costs,
+and assumes the diagnostic composition represents the primary run. `A` is
+an estimated ceiling for that region's opportunity, not a statistical upper
+confidence bound or evidence that the whole region is removable. All proven
+removable lower bounds are **zero**. A local `s=1.20` below is an explicit
+sensitivity assumption, not a forecast. No positive gain is booked into the
+M4 budget. Positive gains require a matched implementation A/B and correctness
+check. Use the 7120 column for this ranking; do not project sampling shares
+onto restricted profiles. Three primary timing pairs and one profile launch
+provide no reliable confidence interval for these estimates.
+
+Only serial programs passing the reported cadence, attribution, sample-count
+and per-run overhead checks enter this numerical opportunity ordering. GEMM
+uses the median of six per-launch normalized estimates (0.719 s; range
+0.700-0.740 s). Unknown/system/residual/boundary costs and unlisted regions
+receive no assumed gain. Cholesky, low-count programs, serial MG, HPCG and
+all OpenMP rows are outside the qualified sum.
+
+| Rank | Program / disjoint opportunity | Primary KNC median T s | Estimated A s | D if local 1.20x, s | Interpretation |
+| --- | --- | --- | --- | --- | --- |
+| 1 | NPB-EP scalar transform/call site | 97.394 | 51.174 | 8.529 | x87 arithmetic, divide/sqrt, conversions and call-save traffic; no isolated bridge cost |
+| 2 | NPB-EP log wrapper + internal path | 97.394 | 36.794 | 6.132 | Library execution; exclusive of row 1; not removable by an ordinary caller scheduling change |
+| 3 | NPB-CG indexed reduction | 29.224 | 24.547 | 4.091 | 25-byte scalar loop; indexed access and ordered arithmetic costs unresolved |
+| 4 | PB-ludcmp matrix initialization | 18.150 | 10.985 | 1.831 | General scalar update/locality opportunity; setup must remain in the benchmark |
+| 5 | NPB-EP random generation loop | 97.394 | 8.402 | 1.400 | Separate RNG code; strict arithmetic/conversions, no independent gain proof |
+| 6 | PB-ludcmp two factorization reductions | 18.150 | 6.849 | 1.142 | Two disjoint ranges; recurrence and prefetch/address work overlap within them |
+| 7 | NPB-IS random generator function | 11.997 | 5.169 | 0.862 | Control-word conversion and return bridge; includes setup work |
+| 8 | STREAM three vector loops | 7.9535 | 4.289 | 0.715 | Already vectorized; bandwidth/scheduling headroom unmeasured |
+| 9 | NPB-IS rank bucket loop | 11.997 | 4.197 | 0.699 | Scalar integer indexing; no evidence of a profitable gather replacement |
+| 10 | STREAM aligned libc copy helper | 7.9535 | 2.823 | 0.470 | Runtime copy; caller unknown, not all compiler-removable |
+| 11 | NPB-CG sparse setup search | 29.224 | 2.046 | 0.341 | Separate from the repeated indexed reduction |
+| 12 | PB-gemm vector inner loop | 0.89267 | 0.719 | 0.120 | Already compact vector code; bridge sits outside the counted region |
+
+Rank denotes cost exposure under the same hypothetical local gain. Different
+feasible local gains can reverse the ordering. Summing every row would not
+be a compiler forecast: library work, conversions and strict recurrences
+have different implementation constraints. In particular, reducing ABI
+transfers cannot claim the entire EP log/math budget. No sample pinpointing
+a load or a sqrt instruction proves a cache miss or instruction latency.
+
+### Updated per-program planning estimates
+
+The review's ranges were conditional donor-relative whole-program scenarios.
+The comparison medians above measure changes already present in GCC-KNC;
+they cannot be multiplied by those old scenarios. The updated default for
+**additional** GCC-KNC improvement is 1.00x budget credit for every program
+until a local gain is demonstrated. The sensitivity column below instead
+asks what a hypothetical 1.20x change in the specified observed region alone
+would do to the current GCC-KNC program: `T/(T-D(1.20))`. It is not a new
+baseline measurement or donor-relative prediction.
+
+| Program | Review scenario | Updated evidence / incremental planning constraint |
 | --- | --- | --- |
-| PB-gemm | 1.33-1.60x | KNC 0.89 s; vector inner loop 82.56-86.21% of delivered PCs, 63 bytes; bounded CPU estimate admitted, local improvement unestimated |
-| PB-atax | 1.33-1.60x | KNC 0.94 s; strict-reduction/reuse share unknown |
-| PB-cholesky | 1.11-1.25x | KNC 11.2-11.5 s profile medians; recurrence/scalar-FP share unknown; pair spread |
-| PB-ludcmp | 1.11-1.25x | KNC 18.1-18.4 s; recurrence/scalar-replacement share unknown; pair spread |
-| PB-jacobi-2d | 1.25-1.43x | KNC 0.70 s; stencil/locality share unknown |
-| PB-heat-3d | 1.25-1.43x | KNC 0.50-0.51 s; stencil/locality share unknown |
-| STREAM | 1.08-1.23x | KNC 7.94-7.95 s serial; memory-cost share unknown; OpenMP separate |
-| NPB-CG | 1.09-1.36x | KNC 29.2-29.4 s; sparse/reduction share unknown; donor pair spread |
-| NPB-EP | 1.05-1.28x | KNC 97.4 s; largest valid non-HPCG serial latency, but math-call share/binding unknown |
-| NPB-MG | 1.20-1.36x | Serial estimate withheld until S11-27 validity repair; OpenMP pass does not repair it |
-| NPB-IS | 1.05-1.19x | KNC 12.0 s; address/branch/memory share unknown |
-| HPCG | 1.09-1.36x | Historical throughput slightly lower; fixed-work contract S11-28 and sparse/reduction profile pending |
-| zlib | 1.10-1.20x | KNC 1.25-1.26 s; scalar profile needed; optional PGO grants no baseline credit |
-| SQLite | 1.10-1.20x | KNC 1.75-1.76 s against donor -O3 fallback; scalar profile and equal-flags qualification absent |
+| PB-gemm | 1.33-1.60x | 0.719 s estimated vector-loop exposure; hypothetical 1.20x local gives 1.155x whole program. No transfer-removal credit from that loop. |
+| PB-atax | 1.33-1.60x | 77.42% initialization versus 21.51% combined reduction/update PCs. This does not support assigning the old 50-75% hot-fraction assumption to remaining kernel work. 93 PCs: numeric gain withheld. |
+| PB-cholesky | 1.11-1.25x | 96.38% of sampled PCs in input-matrix construction, 2.97% in one factorization reduction. +19.35% overhead blocks seconds; target diagnosis shifts toward setup, not unqualified divide/sqrt replacement. |
+| PB-ludcmp | 1.11-1.25x | 60.65% initialization, 37.81% in two factorization reductions. 1.20x on initialization alone implies 1.112x; on the two reductions alone 1.067x. These are separate conditional cases. |
+| PB-jacobi-2d | 1.25-1.43x | 80.88% in two vector stencils, but only 68 PCs. Hot fraction is descriptively compatible with the review; 1.5x local gain is unproved, numeric budget withheld. |
+| PB-heat-3d | 1.25-1.43x | 63.27% in two vector loops, only 49 PCs; masked tails/output remain separate. No demonstrated locality headroom or numeric gain. |
+| STREAM | 1.08-1.23x | Three vector loops expose 4.289 s, libc copy another 2.823 s. Improving vector loops alone 1.20x would give 1.099x overall. Runtime copy is a separate opportunity, not a fourth recommended theme. |
+| NPB-CG | 1.09-1.36x | 84.24% indexed reduction, 24.547 s normalized exposure. Local 1.20x would give 1.163x overall. Scalar reduction order and memory behavior must both be preserved/diagnosed. |
+| NPB-EP | 1.05-1.28x | Scalar transform and log expose 87.968 s together; 1.20x on both would give 1.177x overall. Math, ABI and conversions cannot each claim this same budget. |
+| NPB-MG | 1.20-1.36x | Serial validity remains S11-27's gate. OpenMP passed workload checks but its profile failed cadence/overhead; no primary speed or removable-time credit. |
+| NPB-IS | 1.05-1.19x | randlc is 43.38% of delivered PCs, bucket loop 35.22%. 1.20x on randlc alone implies 1.077x overall; benchmark setup remains included. |
+| HPCG | 1.09-1.36x | Historical rating proxy only; pending S11-28 fixed work. Omitted from profiling panels and removable-seconds sum; no latency-based estimate. |
+| zlib | 1.10-1.20x | Deflate, slide_hash and inflate lead the 121-PC profile; scalar narrow loops are visible. Count is too low for a qualified gain. Optional PGO has no automatic credit. |
+| SQLite | 1.10-1.20x | VM 29.48%, distributed B-tree/sorter work; 173 PCs and 6.94% unknown libc PCs. Gain withheld; donor remains the documented -O3 exception. |
 
-There is no defensible removable-time ordering yet. Total runtime only sets
-an upper bound, and a donor speedup does not identify removable KNC costs.
-The next ranking must report measured KNC wall seconds, estimated hot CPU
-seconds, justified local improvement and overlap. Full-profile sampling
-informs the ranking; paired timings retain the restricted-profile context.
-The scenario `T * f * (1 - 1/s)` is usable only with supported quantities.
-Select at most three general mechanisms with uncertainty, implementation cost
-and unaffected controls after profiles qualify; do not sum overlapping gains.
+### At most three general mechanisms for S12 proof work
 
-The current evidence supports this **measurement priority**, not a ranking
-of removable seconds or selection of implementation themes:
+These are ranked **diagnostic proposals**, not approved performance changes.
+Expected benefit is not yet identified; the ranges are local-1.10x to
+local-1.20x sensitivities on disjoint qualified exposure. Engineering hours
+are this report's rough planning allowances for one bounded proof, not
+measured task durations or commitments. They exclude implementation roll-out,
+lead GCC builds, and the sprint-end batch gates. Stop a proof when its gain
+or strict-correctness premise fails; do not keep expanding it to meet a vote.
 
-| Candidate | Evidence and potential benefit | Cost/uncertainty and required control |
+| Priority / mechanism | Qualified exposure and conditional removal | Proof allowance / controls / principal uncertainty |
 | --- | --- | --- |
-| Vector-loop data access and scheduling | PB-gemm's inner loop is consistently dominant in CPU samples | Local gain and generality unknown; use accepted CPU estimates and other development-loop profiles; require matched diagnostic A/B and reuse/cache-resident controls before claiming gains |
-| x87/vector transfer reduction | A bridge exists outside that loop | Its cost is not isolated; reject the review's numerical gain as a budget estimate; require measured bridge time and strict-FP correctness controls before implementation |
-| Runtime/output overhead | corpus_fprintf and mapped libc PCs are visible, separate from GEMM | These are not all compiler-removable; keep complete correctness output and timing boundary fixed; caller attribution remains unavailable |
+| 1. Strict scalar FP conversions and call boundaries | EP transform + log, plus IS randlc: 93.137 s; **8.47-15.52 s** if the entire selected exposure improves 1.10-1.20x | 8-16 engineer hours, one lead-run paired diagnostic batch of at most 30 min plus any required GCC build. Separate call-save/return transfers, conversions and math before choosing a change. Preserve precision, rounding, exceptions and reduction order; include no-call scalar and already-vectorized controls. Libm body costs may be outside compiler scope. If only bridges change, remeasure their smaller exposure and discard this whole-path sensitivity. |
+| 2. Indexed-load scheduling / strict sparse reduction | CG indexed reduction: 24.547 s; **2.23-4.09 s** under the same conditional local gains | 6-12 engineer hours, at most 20 min lead-run diagnostic pairs plus build. Keep input/index order and FP accumulation fixed; compare cache-resident and memory-resident controls and a contiguous loop. Do not infer prefetch or gather profitability from load-PC concentration. |
+| 3. Dependency-preserving scalar update / locality transformations | ludcmp initialization only: 10.985 s; **1.00-1.83 s** conditionally. Cholesky is a descriptive second instance, with zero credited seconds | 8-16 engineer hours, at most 20 min lead-run diagnostic pairs plus build. Prove legal alias/dependence handling and preserve per-element arithmetic order; include independent-update and recurrence controls. Keep initialization and live-out checks inside timing. General loop transforms, not a benchmark-specific initialization replacement. |
 
-**Admitted themes: zero.** No positive removable-seconds estimate or
-implementation-hours estimate is defensible from a single program's PC
-capture. EP, CG and ludcmp have longer valid primary runtimes, but they cannot
-be ranked above or below GEMM for removable cost without their profiles.
-NPB-MG's failed serial rows remain excluded. The historical HPCG proxy remains
-labelled above; no S11-28 fixed-work measurements were supplied in this ticket,
-so a fixed-work baseline or ranking for HPCG is still pending.
+The three selected exposure sets are disjoint: 128.669 s in total, with a
+**conditional** 11.70-21.44 s removal if all of those regions actually attain
+the assumed local gains. This sum is not a claim of achievable removal,
+aggregate speedup, or a 17-program vote. It excludes low-count profiles,
+Cholesky, serial MG, HPCG, every OpenMP profile, output changes and unassigned
+time. Expected proven removal remains 0 s; implementation selection awaits
+the proof results. The lead should select fewer than three if the estimated
+22-44 engineer hours or bounded card windows do not fit. No automatic card
+job, compiler change, or further sampling project is requested here.
+
+
 
 ## Reproduction and handoff
 
@@ -546,11 +731,22 @@ python tools/run.py --name S11-15-attribution --inputs tools/s11_15_attribution.
 It writes `.work/_shared/S11-15/attribution.md` and `attribution-pcs.txt`;
 the latter retains per-launch module-relative PCs and symbol/source status.
 It does not read held-out data or change any corpus source or primary harness.
-Full profiling and removable-time acceptance remain open. The 2026-11-14
-lead decision resolved the libc-naming and CPU-estimation questions and
-removed S11-28 as a prerequisite. The staged development batch above is
-the remaining native handoff. Engineers cannot start these card jobs under
-AGENTS.md. x86 was not run.
+The final batch analysis adds the development profiles and bounded ranking above.
+Its first symbol-only pass left stripped internal helpers unnamed; the final
+pass follows explicit branches from exported entries and retains unresolved
+PCs. No native rerun was needed. Host attribution passed with the native
+qualification limits retained, not converted into passes.
+
+```powershell
+python tools/run.py --name S11-15-batch-attribution --inputs tools/s11_15_batch_attribution.py tools/s11_15_attribution.py -- python tools/s11_15_batch_attribution.py
+```
+
+Outputs are `.work/_shared/S11-15/batch-attribution.json`,
+`batch-attribution-pcs.txt`, and fixed per-build disassembly files in that
+same directory. They are analysis outputs, not primary timing replacements.
+Large captures and disassemblies remain outside git. The report contains the
+results needed after the engineer worktree is removed. No further card run
+is staged by this report. x86 was not run.
 
 References: S11-15 lead notes dated 2026-11-13; `docs/sprints/SPRINT-11.md`,
 Theme B; `docs/reviews/2026-11-12-s11-s13-scope-review.md`, planning table and
