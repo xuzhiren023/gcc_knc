@@ -125,6 +125,22 @@ class ProfileMemory(unittest.TestCase):
                 launch = next(script for step, script in scripts if step == "start-job")
                 self.assertIn("start_job 35 0,1 0 ", launch)
 
+    def test_timeout_records_unreadable_memory_without_masking_deadline(self):
+        session = self.runner["SSHSession"].__new__(self.runner["SSHSession"])
+        session.run_dir = "/tmp/claude/claude-" + "a" * 32
+        session.boot_id = fixtures.BOOT
+        session.transport_timeout = 1
+        session.profile = "3100"
+        for error in (OSError("read-memory failed"), None):
+            with self.subTest(error=error):
+                session.rpc = mock.Mock(side_effect=[b"", error or b"malformed"])
+                with mock.patch.object(self.runner["time"], "monotonic",
+                                       side_effect=[0, 0, 31]):
+                    with self.assertRaisesRegex(TimeoutError, "deadline exceeded"):
+                        session.execute(session.run_dir, [], timeout=30, card_timeout=35,
+                                        cpus=[1], memory_mb=5632)
+                self.assertIn("memory_report_error", session.memory_report)
+
 
 if __name__ == "__main__":
     unittest.main()

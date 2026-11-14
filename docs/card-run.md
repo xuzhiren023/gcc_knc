@@ -176,7 +176,11 @@ after S2-17, with later batches using the full execute suite.
 - The owner-reported card has no taskset, and its cgroup memory controller is
   disabled with no mounted controllers. Enabling it needs a forbidden kernel/boot
   change (S11-29 lead answer). Profiles therefore use one persistent BusyBox awk
-  reader: scan `/proc/*/stat` for ancestry, then sum `VmRSS` and `VmSwap` from
+  reader pinned to OS CPU 0 with `claude-pin` (its marker is isolated from the
+  program's marker). Shell globbing lists PIDs without spawning `ls`; only PIDs
+  at or above the job root need `/proc/*/stat` reads for ancestry. A new PID below
+  the root that was absent at the initial sample signals wraparound and enables
+  full scanning for the remainder of the job. Sum `VmRSS` and `VmSwap` from
   each live member's status. Retain observed descendants across reparenting,
   identify PIDs by start time, skip vanished/short records, and kill the tree
   when its usage exceeds the profile cap. The initial sample precedes program
@@ -186,9 +190,12 @@ after S2-17, with later batches using the full execute suite.
   Receipt fields `profile_memory_limit_mib`, `peak_resident_kib`, and
   `peak_memory_kib` record the cap and sampled tree peaks (KiB). An excess is
   `resource`, with peak and limit in the reason. `monitor_cpu_ticks` measures
-  reader user/system CPU plus reaped ls/sleep children from its own proc stat;
-  divide by the card's CLK_TCK and receipt wall time (`card_minutes * 60`) to
-  measure overhead in the lead round. There is no busy loop or arena/stack
+  reader user/system CPU plus reaped listing-shell/sleep children from its own
+  proc stat; divide by the card's CLK_TCK and receipt wall time (`card_minutes * 60`)
+  to measure overhead in the lead round (target below 5% of one core).
+  A report read failure on
+  timeout is recorded as `memory_report_error` while preserving the timeout.
+  There is no busy loop or arena/stack
   environment override. Full/7100 collect peaks without a profile cap.
   For non-profile declared limits, `claude-pin` still sets soft and hard
   `RLIMIT_AS` to the declared MiB before

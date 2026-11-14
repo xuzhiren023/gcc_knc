@@ -44,16 +44,17 @@ STAGE_TIMEOUT = 120.0  # S5-04: no start row of ours stays open through a slow u
 PACK_MAGIC = b"claude-pack 1\n"
 STAGING_RESERVED = {"claude-program", "claude-pin", "claude-watchdog.sh",
                     "claude-pinned", "stdout", "stderr", "status", "memory-ready", "memory-report",
-                    "memory-error"}
+                    "memory-error", "memory-monitor"}
 
 
 # MPSS has no enabled memory controller (lead answer, S11-29). One persistent
 # awk reader samples the entire tree, retaining identities across reparenting.
-# sleep/ls are short-lived utilities, never additional /proc readers.
+# Shell globbing lists PIDs without ls; only candidate descendants need stat.
 PROFILE_START = r'''
 start_job() {
     guard_boot && [ -f claude-watchdog.sh ] && [ -x claude-pin ] || return 92
     job_limit=$1; job_cpus=$2; shift 3
+    mkdir memory-monitor || return 92
     : > stdout; : > stderr
     (trap '' HUP; exec sh ./claude-watchdog.sh "$run_dir" "$boot_id" "$job_limit") \
         > /dev/null 2>&1 < /dev/null &
@@ -61,7 +62,10 @@ start_job() {
      (while [ ! -f memory-ready ]; do sleep 0.01; done
       exec ./claude-pin "$job_cpus" 0 ./claude-program "$@") &
      root=$!
-     awk -v root="$root" -v limit="$profile_memory_kib" -v boot="$boot_id" '
+     # Isolate claude-pin's marker from the program's exec-success marker.
+     (cd memory-monitor && exec ../claude-pin 0 0 /bin/sh -c \
+         'cd .. && exec awk "$@"' memory-monitor \
+         -v root="$root" -v limit="$profile_memory_kib" -v boot="$boot_id" '
      function identity(pid,    f,line,n,a) {
          f="/proc/" pid "/stat"
          n=(getline line < f); close(f)
@@ -73,7 +77,7 @@ start_job() {
      function report(    line,a,f) {
          f="/proc/self/stat"; getline line < f; close(f)
          sub(/^.*\) /,"",line); split(line,a," ")
-         # Include reaped ls/sleep CPU (cutime/cstime), in kernel clock ticks.
+         # Include reaped listing-shell/sleep CPU, in kernel clock ticks.
          printf "%d %d %d %d\n", peakrss, peakmem, a[12]+a[13]+a[14]+a[15], exceeded > "memory-report"
          close("memory-report")
      }
@@ -83,11 +87,20 @@ start_job() {
              f="/proc/sys/kernel/random/boot_id"; getline current < f; close(f)
              if (current!=boot) exit 92
              for (p in ids) delete ids[p]
-             cmd="ls -d /proc/[0-9]*"
+             cmd="printf \047%s\\n\047 /proc/[0-9]*"
              while ((cmd | getline path)>0) {
-                 sub(/^.*\//,"",path); ids[path]=identity(path)
+                 sub(/^.*\//,"",path); ids[path]=""
+                 # PIDs normally grow. A new low PID means wraparound:
+                 # from then on inspect every PID, preserving ancestry checks.
+                 if (path+0<root+0) {
+                     if (sampled && !(path in initial_low)) wrapped=1
+                     if (!sampled) initial_low[path]=1
+                 }
              }
              close(cmd)
+             for (p in ids)
+                 if (wrapped || p+0>=root+0) ids[p]=identity(p)
+             sampled=1
              # Discover grandchildren regardless of PID/directory ordering.
              do {
                  changed=0
@@ -127,7 +140,7 @@ start_job() {
              print "ready" > "memory-ready"; close("memory-ready")
              system("sleep 0.1")
          }
-     }' &
+     }') &
      reader=$!
      wait "$root"; code=$?
      wait "$reader" || { code=126; echo failed > memory-error; }
@@ -924,7 +937,11 @@ class SSHSession:
         while True:
             if time.monotonic() >= deadline:
                 if profile is not None:
-                    read_memory()
+                    try:
+                        read_memory()
+                    except OSError as error:
+                        self.memory_report = dict(getattr(self, "memory_report", {}),
+                                                  memory_report_error=str(error))
                 raise TimeoutError("card program deadline exceeded")
             if status is None:
                 answer = operation("guard_boot && if [ -f memory-error ]; then echo memory-monitor-failed; "
