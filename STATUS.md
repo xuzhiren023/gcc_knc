@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-14 02:00.
+Updated automatically at every ticket change. Last update: 2026-11-14 02:01.
 
 **Waiting for you:** S11-17. Run `python tools/pm.py inbox`.
 
@@ -53,7 +53,7 @@ Current tickets: `[###################-]` 206 of 213
 | S10-12 | cbrt and cbrtf crash (SIGSEGV) in qualify_v1 on the card - root cause and fix | Done | The cbrt and cbrtf qualification jobs no longer crash on the card and pass (worst 0.4996 and 0.4991 ULP): t... |
 | S10-13 | User story - code that calls cbrtl under -march=knc gets a safe replacement and a compile-time warning (MPSS libm cbrtl faults) | Done | Under -march=knc, calls to cbrtl (and std::cbrt on long double) now go to GCC-KNC's own safe cube root with... |
 | S11-01 | User story - the best way to move data between the host and the card, measured, and how our projects use it | Done | We now have a sourced inventory of every host-card transfer path that works without changing MPSS (SSH, tar... |
-| S11-02 | card_run and run_suite move bulk data by SCIF DMA at the PCIe link limit, with the SSH stream as fallback | In progress | The lead merged main into s11/S11-02 at 7deb440b. build() now takes production and output_dir: production w... |
+| S11-02 | card_run and run_suite move bulk data by SCIF DMA at the PCIe link limit, with the SSH stream as fallback | Waiting for review | 7deb440b: production/output_dir retained. Both helpers rebuilt; GCC-KNC card helper lint passed, staged .wo... |
 | S11-03 | S11-01 transfer tool rejects the card's physical /tmp path, so the native study never starts | Done | The transfer study's tool now accepts the card's real /tmp location (/var/volatile/tmp), so its card run ca... |
 | S11-04 | S11-01 transfer tool - the host opens every connection, because Windows Firewall blocks inbound TCP from the card | Done | The transfer study's host side now opens every connection to the card, so Windows Firewall no longer blocks... |
 | S11-05 | Research - raise KNC's real memory bandwidth from about 175 GB/s toward 75-85% of peak, with a measured plan | Done | The memory-bandwidth research plan and a validated multithreaded KNC bandwidth benchmark are ready, with a ... |
@@ -238,6 +238,7 @@ Current tickets: `[###################-]` 206 of 213
 
 ## Recent activity
 
+- 2026-11-14 02:01 **S11-02** engineer submit: 7deb440b: production/output_dir retained. Both helpers rebuilt; GCC-KNC card helper lint passed, staged .work/_shared/S11-02. Log: .work/_state/log...
 - 2026-11-14 01:59 **S11-29** engineer submit: Both acceptance items met (lead 01:55). Six host tests passed: .work/_state/logs/S11_29_revision-20261114-011227.log; not rerun. Lead card round: H...
 - 2026-11-14 01:58 **S11-17** engineer escalate: budget: 7 engineer sessions used; the budget is 7
 - 2026-11-14 01:56 **S11-17** lead answer: Scripts regenerated (old ones kept as *.prev; LF; branch, division, indirect, inline, loop; no switch). Training ran 2026-11-14 01:32 EST at a3258f...
@@ -245,7 +246,6 @@ Current tickets: `[###################-]` 206 of 213
 - 2026-11-14 01:56 **S11-02** lead answer: The lead merged main into s11/S11-02 at 7deb440b. build() now takes production and output_dir: production writes to _shared/S11-02, otherwise outpu...
 - 2026-11-14 01:55 **S11-29** lead answer: Second card round at cbe9a3d6, 2026-11-14 01:32-01:52 EST, receipts .work/_shared/S11-29/*.json, log .work/_state/logs/S11_29_card2-20261114-013238...
 - 2026-11-14 01:54 **S11-29** lead resume: Lead ran the second card round at cbe9a3d6, 01:32-01:52 EST.
-- 2026-11-14 01:48 **S11-15** engineer ask: 70049a7e: restaged .work/_shared/S11-15/lead.ps1, 14 remaining launches, expected 10-15 min; 18 PASS captures preserved, HPCG excluded, 600 s cap a...
 
 ## Cost
 
