@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-14 11:59.
+Updated automatically at every ticket change. Last update: 2026-11-14 12:00.
 
-**Next: GPT-6.1, on S12-06 (M4 theme 1 - strict scalar FP conversions and call boundaries (NPB-EP transform and log path, NPB-IS randlc)).** Run `python tools/dispatch.py`, or ask the tech lead to.
+**Next: the tech lead, on S11-12.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[###################-]` 211 of 222
 
@@ -63,7 +63,7 @@ Current tickets: `[###################-]` 211 of 222
 | S11-09 | Memory bandwidth for LLM decode - a weight-streaming GEMV workload, pushed toward 264-299 GB/s of weight bytes | Done | Weight-streaming GEMV for LLM decode is measured on the card: int8 weights reach 70 billion weights/s (2.2x... |
 | S11-10 | S11-01 transfer runner - choose repetitions, sizes and load states per run, so slow methods fit a card turn | Done | The transfer runner now takes --repeats, --sizes, --loads and --concurrency so a slow method fits a card tu... |
 | S11-11 | M4 corpus run harness - every corpus program built by GCC 5.1.1 and GCC-KNC, run on the card with frozen inputs and a correctness check, in one command | Done | The M4 corpus harness builds 17 programs with GCC 5.1.1 and GCC-KNC and stages checked card runs; GCC-KNC b... |
-| S11-12 | Sprint 11 batch check - full native suite, x86 identity, forward-port drill, ICE sweeps, runtime prefix consistency | lead | Needs the interactive lead: change S11-12's ticket field type: code -> type: check (as S10-05, the Sprint 1... |
+| S11-12 | Sprint 11 batch check - full native suite, x86 identity, forward-port drill, ICE sweeps, runtime prefix consistency | Question for the tech lead | Lead: type changed to check (as S10-05; S12-09 too). Submit 437b2a35 with docs/research/S11-12-batch.md. |
 | S11-13 | Senior compiler review of the Sprint 11-13 scope (Milestone M4) against our research, with recommended plan changes | Done | A senior compiler review of the Sprint 11-13 plan is in: M4 is plausible but needs a frozen scoring and mea... |
 | S11-14 | M4 scoring contract and measurement protocol, frozen before any tuning | Done | M4's scoring contract is frozen in ADR-0015 with a tested scorer: strict serial -O2 versus -O2 over 17 prog... |
 | S11-15 | First development-corpus baseline and profile, GCC 5.1.1 vs GCC-KNC at -O2 (E7-03 part 1) | Done | The M4 development baseline is written up in docs/research/m4-baseline.md: GCC-KNC vs GCC 5.1.1 paired -O2 ... |
@@ -247,6 +247,7 @@ Current tickets: `[###################-]` 211 of 222
 
 ## Recent activity
 
+- 2026-11-14 12:00 **S11-12** lead resume: Lead: type changed to check (as S10-05; S12-09 too). Submit 437b2a35 with docs/research/S11-12-batch.md.
 - 2026-11-14 11:59 **S11-12** lead defer: Needs the interactive lead: change S11-12's ticket field type: code -> type: check (as S10-05, the Sprint 10 batch check) so submit no longer requi...
 - 2026-11-14 11:58 **S11-12** engineer ask: 437b2a35: drill complete (master 14 conflicts, gcc-16 4; PR128640 reviewed); both prefixes GCC 16.2.0 at 619e14b479a per lead, vmath 26 members eac...
 - 2026-11-14 11:54 **S12-10** lead answer: Lead 12:25 EST: phase 1 accepted; the corrections table is useful. Start phase 2: broad, deep live web research and document retrieval. Priorities:...
@@ -254,13 +255,12 @@ Current tickets: `[###################-]` 211 of 222
 - 2026-11-14 11:54 **S11-12** engineer escalate: budget: 6539034 input tokens used; the budget is 6000000
 - 2026-11-14 11:53 **S12-10** engineer ask: Phase 1 dcf5eaaa: docs/research/knc-reference-gaps.md. Which priorities should guide phase 2? 1. G01 Scalar FP, ABI bridges and conversions. 2. G02...
 - 2026-11-14 11:53 **S11-12** lead answer: Answered above (lead 12:15 EST): T2 short-vector 7/7 PASS by the lead, upstream refs fetched, lane 2 installed with 26 vmath members. Continue: dri...
-- 2026-11-14 11:53 **S11-12** lead resume: Lead 12:15 EST: (1) T2 --short-vector-abi rerun by the lead: 7/7 PASS (log .work/_state/logs/check_gcc16_t2-20261114-115203.log); the two 11-13 fil...
 
 ## Cost
 
 - From the script, engineer: 571 sessions, 1163.4M input tokens
 - From the script, lead: 379 sessions, 105.5M input tokens
-- Started by hand, Claude: 12 sessions, 3123.8M input tokens
+- Started by hand, Claude: 12 sessions, 3124.5M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
