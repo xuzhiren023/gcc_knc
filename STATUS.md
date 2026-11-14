@@ -90,7 +90,7 @@ Current tickets: `[###################-]` 211 of 222
 | S12-07 | M4 theme 2 - indexed-load scheduling with strict sparse reduction (NPB-CG) | Not started |  |
 | S12-08 | M4 theme 3 - dependency-preserving scalar updates and register pressure in dense loops (PB-ludcmp, x87 stack traffic) | Not started |  |
 | S12-09 | Sprint 12 batch check - integrated themes at the final Sprint 12 head, regression evidence, optional modes frozen | draft |  |
-| S12-10 | Research - what KNC hardware and runtime knowledge are we still missing to tune GCC-KNC, the OS runtime and broad optimization, and where is it documented? | Question for the tech lead | Phase 1 dcf5eaaa: docs/research/knc-reference-gaps.md. Which priorities should guide phase 2? 1. G01 Scalar... |
+| S12-10 | Research - what KNC hardware and runtime knowledge are we still missing to tune GCC-KNC, the OS runtime and broad optimization, and where is it documented? | In progress | Lead 12:25 EST: phase 1 accepted; the corrections table is useful. Start phase 2: broad, deep live web rese... |
 | S13-01 | M4 final gate - stage the ADR-0015 gate run at the final head (17 programs, held-out unsealed, six pairs, three profiles) | draft |  |
 | S2-01 | Design for zmm and mask registers under -march=knc | Done | The register design for KNC is settled on paper: all 32 zmm and 8 mask registers become usable under -march... |
 | S2-02 | Float and double arguments and results in zmm lane 0 | Done | Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`). |
@@ -247,6 +247,7 @@ Current tickets: `[###################-]` 211 of 222
 
 ## Recent activity
 
+- 2026-11-14 11:54 **S12-10** lead answer: Lead 12:25 EST: phase 1 accepted; the corrections table is useful. Start phase 2: broad, deep live web research and document retrieval. Priorities:...
 - 2026-11-14 11:54 **S11-12** engineer escalate: budget: 6539034 input tokens used; the budget is 6000000
 - 2026-11-14 11:53 **S12-10** engineer ask: Phase 1 dcf5eaaa: docs/research/knc-reference-gaps.md. Which priorities should guide phase 2? 1. G01 Scalar FP, ABI bridges and conversions. 2. G02...
 - 2026-11-14 11:53 **S11-12** lead answer: Answered above (lead 12:15 EST): T2 short-vector 7/7 PASS by the lead, upstream refs fetched, lane 2 installed with 26 vmath members. Continue: dri...
@@ -254,13 +255,12 @@ Current tickets: `[###################-]` 211 of 222
 - 2026-11-14 11:50 **S11-12** lead defer: Needs the interactive lead: (1) fix write access on .work/_shared/S5-21/short-vector-O2-0.mic (T2 PermissionError; rerun python tools/check.py t2 -...
 - 2026-11-14 11:49 **S11-12** engineer ask: fe2a3682: T0 56/T1 327 PASS; O2-vect/O3 each 1969 pass, 32 errors, 2 user-asm rejects, 0 ICE. T2 PermissionError: _shared/S5-21/short-vector-O2-0.m...
 - 2026-11-14 09:27 **S11-17** lead approve: PGO works end to end on KNC: zlib trains on the card and the profile-use build runs correctly about 0.8% faster, and the branch, indirect and divis...
-- 2026-11-14 09:20 **S11-17** lead defer: Review passed; branch merged into main (0d5afaa2), but approve was refused at 'git worktree remove --force .work/S11-17': Permission denied. Intera...
 
 ## Cost
 
 - From the script, engineer: 570 sessions, 1162.6M input tokens
 - From the script, lead: 378 sessions, 105.3M input tokens
-- Started by hand, Claude: 12 sessions, 3121.6M input tokens
+- Started by hand, Claude: 12 sessions, 3121.8M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
