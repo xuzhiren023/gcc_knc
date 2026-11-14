@@ -1,10 +1,10 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-14 12:30.
+Updated automatically at every ticket change. Last update: 2026-11-14 12:31.
 
 **Next: the tech lead, on S12-10.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
-Current tickets: `[###################-]` 211 of 222
+Current tickets: `[##################--]` 211 of 223
 
 ## Milestones
 
@@ -14,7 +14,7 @@ Current tickets: `[###################-]` 211 of 222
 | M1 | Mixed native code | Done | 43 of 43 tickets |
 | M2 | Useful vector target | Done | 51 of 51 tickets |
 | M3 | Runtimes | Done | 48 of 48 tickets |
-| M4 | Broad optimization | In progress | 29 of 40 tickets |
+| M4 | Broad optimization | In progress | 29 of 41 tickets |
 | M5 | Program corpus | Not started | Not planned in detail yet |
 | M6 | Release | Not started | Not planned in detail yet |
 
@@ -91,6 +91,7 @@ Current tickets: `[###################-]` 211 of 222
 | S12-08 | M4 theme 3 - dependency-preserving scalar updates and register pressure in dense loops (PB-ludcmp, x87 stack traffic) | Not started |  |
 | S12-09 | Sprint 12 batch check - integrated themes at the final Sprint 12 head, regression evidence, optional modes frozen | draft |  |
 | S12-10 | Research - what KNC hardware and runtime knowledge are we still missing to tune GCC-KNC, the OS runtime and broad optimization, and where is it documented? | Waiting for review | Phase 2: docs/research/knc-reference-gaps.md, d54380ba; 32 artifacts, 98 MiB; S12-06/07/08 facts and ranked... |
+| S12-11 | Research - best practices for a dual Xeon E5-2690 v3 + Xeon Phi (KNC) workstation (HP Z840) for LLM inference and scientific computing | In progress |  |
 | S13-01 | M4 final gate - stage the ADR-0015 gate run at the final head (17 programs, held-out unsealed, six pairs, three profiles) | draft |  |
 | S2-01 | Design for zmm and mask registers under -march=knc | Done | The register design for KNC is settled on paper: all 32 zmm and 8 mask registers become usable under -march... |
 | S2-02 | Float and double arguments and results in zmm lane 0 | Done | Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`). |
@@ -260,7 +261,7 @@ Current tickets: `[###################-]` 211 of 222
 
 - From the script, engineer: 575 sessions, 1173.0M input tokens
 - From the script, lead: 382 sessions, 106.2M input tokens
-- Started by hand, Claude: 12 sessions, 3131.8M input tokens
+- Started by hand, Claude: 12 sessions, 3133.2M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
