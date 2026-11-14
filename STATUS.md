@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-14 16:04.
+Updated automatically at every ticket change. Last update: 2026-11-14 16:07.
 
-**Next: GPT-6.1, on S12-19 (Profile-guided missed-vectorization triage - join hot loops with the vectorizer's reasons and observed strides/masks, so tuning targets what is hot and fixable).** Run `python tools/dispatch.py`, or ask the tech lead to.
+**Next: the tech lead, on S12-22.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[##################--]` 223 of 239
 
@@ -102,7 +102,7 @@ Current tickets: `[##################--]` 223 of 239
 | S12-19 | Profile-guided missed-vectorization triage - join hot loops with the vectorizer's reasons and observed strides/masks, so tuning targets what is hot and fixable | In progress | Lead raises sessions 4 -> 6 (standing rule): the tool and 14-program collection are done; one requested cha... |
 | S12-20 | libknc_vmath accuracy and exception contract, with an independent validation design (rounding modes, special values, flags, scalar fallback) | draft |  |
 | S12-21 | Scheduling model for M4's serial runs - measure density-1 tuning and the integer-multiply cost against today's density-4 defaults (S12-14 B02, B04, B05) | In progress | No deletion needed. Stage into a fresh, empty folder instead of cleaning the old one: change the tool's out... |
-| S12-22 | Low-risk corrections from the S12-14 audit - wrong comments and citations (N01-N09) and the far-prefetch-distance range bug (B10) | In progress | rg missing is not a reason to stop. Use 'git grep -n' (works in both repos, incl. git -C .work/_shared/gcc ... |
+| S12-22 | Low-risk corrections from the S12-14 audit - wrong comments and citations (N01-N09) and the far-prefetch-distance range bug (B10) | Question for the tech lead | Lane-2 GCC is out of sync: shared gcc-2 is on s12/S12-07 at 619e14b and lacks knc-prefetch-far (only knc-pr... |
 | S12-23 | Floating-point environment correctness on KNC - fix the underflow probe that cannot tell flushing from rounding, and handle x87 erratum CD28 (S12-14 N06, N07, B16, B17) | Not started |  |
 | S12-24 | ICE in vect_transform_stmt (tree-vect-stmts.cc:13381) on WRF's REMEZ at -mphinix (-O3 -march=knc) | Not started |  |
 | S12-25 | WRF smpar build arm with --param=knc-threads-per-core=2 for PhiWeather's 2-threads-per-core runs (A/B against S11-26's default-4 build) | Not started |  |
@@ -264,6 +264,7 @@ Current tickets: `[##################--]` 223 of 239
 
 ## Recent activity
 
+- 2026-11-14 16:06 **S12-22** engineer ask: Lane-2 GCC is out of sync: shared gcc-2 is on s12/S12-07 at 619e14b and lacks knc-prefetch-far (only knc-prefetch-l2-distance exists). Two real T1 ...
 - 2026-11-14 16:04 **S12-21** lead answer: No deletion needed. Stage into a fresh, empty folder instead of cleaning the old one: change the tool's output dir from corpus.SHARED/'S12-21' to c...
 - 2026-11-14 16:03 **S12-19** owner decide: Lead raises sessions 4 -> 6 (standing rule): the tool and 14-program collection are done; one requested change (per-function match instead of whole...
 - 2026-11-14 16:03 **S12-19** lead escalate: budget: 4 engineer sessions used; the budget is 4
@@ -271,11 +272,10 @@ Current tickets: `[##################--]` 223 of 239
 - 2026-11-14 16:02 **S12-19** lead answer: Lead: the size override is approved (one 699-line tool, tests stay in the 2 approved files), so use submit --override 'lead-approved size, S12-19 a...
 - 2026-11-14 16:01 **S12-22** lead answer: rg missing is not a reason to stop. Use 'git grep -n' (works in both repos, incl. git -C .work/_shared/gcc grep) or PowerShell Select-String instea...
 - 2026-11-14 16:00 **S12-22** engineer ask: Blocked: rg is unavailable in this PowerShell environment, and AGENTS.md says not to work around a refused command. Please provide the prescribed s...
-- 2026-11-14 16:00 **S12-21** lead answer: See the 15:55 owner-decide note: one session only from now; rebuild .work/_shared/S12-21 from your branch commits, apply the compression fix, rerun...
 
 ## Cost
 
-- From the script, engineer: 622 sessions, 1254.8M input tokens
+- From the script, engineer: 623 sessions, 1256.6M input tokens
 - From the script, lead: 407 sessions, 112.9M input tokens
 - Started by hand, Claude: 12 sessions, 3225.5M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
