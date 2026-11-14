@@ -109,7 +109,7 @@ Current tickets: `[##################--]` 226 of 244
 | S12-26 | WRF hot scalar routines - classify with the S12-19 triage tool and stage bitwise-safe per-file flag arms for PhiWeather to time | draft |  |
 | S12-27 | Latency-aware scalar loops - GCC-KNC unrolls and interleaves independent iterations and hoists conversions so one thread's every-other-cycle issue and long latencies are hidden automatically | draft |  |
 | S12-28 | dispatch.py refuses to start a second dispatcher on a lane that already has a live one | Done | dispatch.py now refuses to start a second dispatcher on a lane that already has a live one (a lock per lane... |
-| S12-29 | Wrong code - vbroadcastsd reads a 4-byte-aligned SCmode constant (complex float) straight from the constant pool and faults on the card (gcc.c-torture pr38969.c, regression from S11-27) | In progress |  |
+| S12-29 | Wrong code - vbroadcastsd reads a 4-byte-aligned SCmode constant (complex float) straight from the constant pool and faults on the card (gcc.c-torture pr38969.c, regression from S11-27) | Tests waiting for review | Red commit c75bded5. Ran tools/run.py --name S12-29-red wrapping tools/check.py t1 --compiler gcc16 --compl... |
 | S13-01 | M4 final gate - stage the ADR-0015 gate run at the final head (17 programs, held-out unsealed, six pairs, three profiles) | draft |  |
 | S13-02 | Libgomp per-region thread density - choose 1-4 workers per core per parallel region instead of once per program | draft |  |
 | S13-03 | M4 retrospective - what we did wrong, what worked, and the practice changes carried into the next milestone and the agent-team skill | draft |  |
@@ -269,6 +269,7 @@ Current tickets: `[##################--]` 226 of 244
 
 ## Recent activity
 
+- 2026-11-14 17:59 **S12-29** engineer red: Red commit c75bded5. Ran tools/run.py --name S12-29-red wrapping tools/check.py t1 --compiler gcc16 --complex-broadcast-align --worker. Expected fa...
 - 2026-11-14 17:58 **S12-21** engineer ask: Fixed at 037aee42: removed shell timeout calls; card_run retains 1740 s limit. Payload and peer archives use ustar. Repackaged r2: 16329850 bytes, ...
 - 2026-11-14 17:58 **S12-07** lead defer: Card run needed (interactive lead only): in an exclusive timing turn, run .work/_shared/S12-07/sparse-paired via tools/card_run --threads 1 --timeo...
 - 2026-11-14 17:57 **S12-07** engineer ask: Restaged 936bad16: pins first granted CPU, verifies singleton affinity, reports three reserved idle siblings. Fixes window-1 failure on the four-CP...
@@ -276,13 +277,12 @@ Current tickets: `[##################--]` 226 of 244
 - 2026-11-14 17:56 **S12-23** lead resume: Lead: lane 2 built at s12/S12-23 (see log s12_23_build). Diff reviewed: CD28 fnsave/edit/frstor clear routes, KNC_RESERVED now includes bit 20, DUE...
 - 2026-11-14 17:55 **S12-21** owner decide: Lead raises sessions 4 -> 6 (standing rule): a session was lost to the lead's duplicate dispatcher; staging is done, only the card-window fixes (no...
 - 2026-11-14 17:55 **S12-21** engineer escalate: budget: 4 engineer sessions used; the budget is 4
-- 2026-11-14 17:54 **S12-07** lead answer: Go: fix and restage.
 
 ## Cost
 
 - From the script, engineer: 636 sessions, 1267.1M input tokens
 - From the script, lead: 417 sessions, 114.6M input tokens
-- Started by hand, Claude: 12 sessions, 3283.2M input tokens
+- Started by hand, Claude: 12 sessions, 3286.9M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
