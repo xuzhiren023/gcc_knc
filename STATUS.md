@@ -1,10 +1,10 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-14 00:54.
+Updated automatically at every ticket change. Last update: 2026-11-14 00:55.
 
-**Next: the tech lead, on S11-27.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: GPT-6.1, on S11-02 (card_run and run_suite move bulk data by SCIF DMA at the PCIe link limit, with the SSH stream as fallback).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
-Current tickets: `[###################-]` 205 of 213
+Current tickets: `[###################-]` 206 of 213
 
 ## Milestones
 
@@ -14,7 +14,7 @@ Current tickets: `[###################-]` 205 of 213
 | M1 | Mixed native code | Done | 43 of 43 tickets |
 | M2 | Useful vector target | Done | 51 of 51 tickets |
 | M3 | Runtimes | Done | 48 of 48 tickets |
-| M4 | Broad optimization | In progress | 23 of 31 tickets |
+| M4 | Broad optimization | In progress | 24 of 31 tickets |
 | M5 | Program corpus | Not started | Not planned in detail yet |
 | M6 | Release | Not started | Not planned in detail yet |
 
@@ -78,7 +78,7 @@ Current tickets: `[###################-]` 205 of 213
 | S11-24 | WRF OpenMP (smpar) build with GCC-KNC at -mphinix, for PhiWeather's benchmark - replaces the serial trial build | Done | WRF v4.8.0 now builds as an OpenMP card binary at -mphinix with GCC-KNC (wrf.exe and real.exe linked, needi... |
 | S11-25 | ICE in do_store_flag (expr.cc) on WRF's surface layer (SFCLAY1D) at -O2 -march=knc | Done | The last WRF file that crashed GCC-KNC (surface layer, SFCLAY1D) now compiles: vector 'ordered and not equa... |
 | S11-26 | WRF OpenMP build at -mphinix with no per-file workarounds (S11-23 and S11-25 fixed), restaged for PhiWeather | draft | Owner 2026-11-13: the S11-24 WRF build is removed. Deleted: |
-| S11-27 | Wrong code - NPB-MG (class A, serial) built by GCC-KNC at -O2 -march=knc fails NPB verification on the card | Waiting for review | Acceptance complete; checked report and per-case results: .work/_shared/S11-27/notes.txt. GCC e0bc456a11e r... |
+| S11-27 | Wrong code - NPB-MG (class A, serial) built by GCC-KNC at -O2 -march=knc fails NPB verification on the card | Done | NPB-MG built by GCC-KNC at -O2 -march=knc now verifies on the card (class A in 14.1 s, against 33.8 s for G... |
 | S11-28 | HPCG run that fits every card model - fixed work instead of fixed duration, grid sized to the 3100's memory | lead | After S11-29 merges (still ready): run .work/_shared/S11-28/lead-pilot.ps1 at 242936bf+ (30 exclusive timed... |
 | S11-29 | card_run profiles limit memory in use, not address space, so a 3100 or 5100 run fails only where the real card would | lead | Interactive lead: no rebase needed (main changed only ticket/status files; card_run untouched). Run card ro... |
 | S12-01 | Sprint 12 prep - static code-quality census of the development-corpus builds (spills, x87/vector transfers, addressing, calls, code size) | Done | A static code-quality census (spill/reload proxies, x87 and x87-zmm traffic, address arithmetic, calls, bra... |
@@ -238,6 +238,7 @@ Current tickets: `[###################-]` 205 of 213
 
 ## Recent activity
 
+- 2026-11-14 00:55 **S11-27** lead approve: NPB-MG built by GCC-KNC at -O2 -march=knc now verifies on the card (class A in 14.1 s, against 33.8 s for GCC 5.1.1): reload no longer puts its x87...
 - 2026-11-14 00:41 **S11-29** lead defer: Interactive lead: no rebase needed (main changed only ticket/status files; card_run untouched). Run card round per .work/_shared/S11-29/README.md: ...
 - 2026-11-14 00:41 **S11-17** owner decide: Budget raised by the lead under the owner's standing rule (2026-11-09/10: the lead extends session and token budgets itself; ask only after two ext...
 - 2026-11-14 00:40 **S11-17** engineer escalate: budget: 8962374 input tokens used; the budget is 6000000
@@ -245,13 +246,12 @@ Current tickets: `[###################-]` 205 of 213
 - 2026-11-14 00:39 **S11-29** engineer ask: Committed 9520fce6; red 36b48b4e. Five fake-card tests pass: .work/_state/logs/S11_29_green-20261114-002903.log. Profile proc monitor records RSS+s...
 - 2026-11-14 00:39 **S11-02** lead escalate: over 2 review rounds: Card validation passed (00:14-00:23 EST; numbers below) but approval's host check fails at 45e732b9: 111 tests, 1 failure, 5 ...
 - 2026-11-14 00:26 **S11-27** engineer submit: Acceptance complete; checked report and per-case results: .work/_shared/S11-27/notes.txt. GCC e0bc456a11e rebased on knc (already current). Lead na...
-- 2026-11-14 00:24 **S11-02** lead resume: Lead ran validate.ps1 at 45e732b9, 00:14-00:23 EST: results in the answer.
 
 ## Cost
 
 - From the script, engineer: 550 sessions, 1119.8M input tokens
 - From the script, lead: 362 sessions, 101.5M input tokens
-- Started by hand, Claude: 12 sessions, 3048.7M input tokens
+- Started by hand, Claude: 12 sessions, 3050.0M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
