@@ -2,7 +2,7 @@
 
 Updated automatically at every ticket change. Last update: 2026-11-14 14:49.
 
-**Next: the tech lead, on S12-18.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: the tech lead, on S12-19.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[##################--]` 220 of 237
 
@@ -98,7 +98,7 @@ Current tickets: `[##################--]` 220 of 237
 | S12-15 | Research - literature survey of published Xeon Phi (KNC) and Xeon Phi system research that matches our goals; what have we overlooked? | Done | Literature survey done: 30 groups of published Xeon Phi work ranked against our goals, with 14 overlooked i... |
 | S12-16 | Research - whole-system tuning playbook for the Z840 + Xeon Phi (BIOS, host OS, MPSS and card, transfers, runtimes), as HPC centres tuned Xeon + KNC systems | Done | Whole-system tuning playbook for the Z840 + Phi done: 13 ordered steps (BIOS, host Linux, card power/pages/... |
 | S12-17 | claude-torture -j N refuses to start in exclusive card runs (no inherited RLIMIT_AS since S11-29), so the execute suite cannot run | In progress | Do not amend or split 71cbcf86. Instead prove red: temporarily check out tools/claude-torture.c from main (... |
-| S12-18 | Double-precision vector exp, log and pow ran slower than scalar libm on the card (0.82x, 0.63x, 0.49x) - confirm with valid batches, then fix the library or stop the vectorizer calling them where they lose | Question for the tech lead | Phase 1 committed d29d7c74. Host regression passes 12 scenarios; built/linted .work/_shared/S12-18/vmath-be... |
+| S12-18 | Double-precision vector exp, log and pow ran slower than scalar libm on the card (0.82x, 0.63x, 0.49x) - confirm with valid batches, then fix the library or stop the vectorizer calling them where they lose | lead | Needs interactive lead: (1) exclusive card turn running .work/_shared/S12-18/vmath-bench.mic at full, 3100 ... |
 | S12-19 | Profile-guided missed-vectorization triage - join hot loops with the vectorizer's reasons and observed strides/masks, so tuning targets what is hot and fixable | Tests waiting for review | Red commit b111b1d4: 7 host fixture cases cover six missed reasons, optimized/SLP distinction, exclusive ne... |
 | S12-20 | libknc_vmath accuracy and exception contract, with an independent validation design (rounding modes, special values, flags, scalar fallback) | draft |  |
 | S12-21 | Scheduling model for M4's serial runs - measure density-1 tuning and the integer-multiply cost against today's density-4 defaults (S12-14 B02, B04, B05) | Not started |  |
@@ -262,6 +262,7 @@ Current tickets: `[##################--]` 220 of 237
 
 ## Recent activity
 
+- 2026-11-14 14:49 **S12-18** lead defer: Needs interactive lead: (1) exclusive card turn running .work/_shared/S12-18/vmath-bench.mic at full, 3100 and 5100 per docs/research/s12-18-double...
 - 2026-11-14 14:49 **S12-06** lead approve: Theme 1 (scalar FP conversions and calls in NPB-EP/IS) closed with no compiler change: a card diagnostic shows GCC-KNC already equal or faster than...
 - 2026-11-14 14:40 **S12-19** engineer red: Red commit b111b1d4: 7 host fixture cases cover six missed reasons, optimized/SLP distinction, exclusive nested time, PC/module/program mapping, de...
 - 2026-11-14 14:40 **S11-26** lead resume: Lead 14:45: (1) tree staged at .work/_shared/wrf-trial/src/WRF-4.8.0-smpar (see my 14:28 answer). (2) gcc-knc-16.2.0 = knc 619e14b479a. (3) Do list...
@@ -269,13 +270,12 @@ Current tickets: `[##################--]` 220 of 237
 - 2026-11-14 14:39 **S12-15** lead approve: Literature survey done: 30 groups of published Xeon Phi work ranked against our goals, with 14 overlooked ideas; the compiler ones are now tickets,...
 - 2026-11-14 14:39 **S12-04** owner decide: Lead raises sessions 3 -> 5 (standing owner rule): the third session was the requested-changes round (split red commit); the fix is written.
 - 2026-11-14 14:30 **S12-04** engineer escalate: budget: 3 engineer sessions used; the budget is 3
-- 2026-11-14 14:29 **S12-06** engineer submit: Restored .gitignore to main in 66ef8806 as requested; tracked assembly control retained. Phase-one results and premise-fails conclusion remain at a...
 
 ## Cost
 
 - From the script, engineer: 599 sessions, 1229.0M input tokens
 - From the script, lead: 394 sessions, 109.2M input tokens
-- Started by hand, Claude: 12 sessions, 3179.4M input tokens
+- Started by hand, Claude: 12 sessions, 3179.8M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
