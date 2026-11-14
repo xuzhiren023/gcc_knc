@@ -2,7 +2,7 @@
 
 Updated automatically at every ticket change. Last update: 2026-11-14 15:00.
 
-**Next: the tech lead, on S12-07.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Waiting for you:** S12-17. Run `python tools/pm.py inbox`.
 
 Current tickets: `[##################--]` 220 of 237
 
@@ -97,7 +97,7 @@ Current tickets: `[##################--]` 220 of 237
 | S12-14 | Audit GCC-KNC's tuning model and runtime defaults against the digested sources - every mismatch with a proposed change and its proof | Done | The lead now has a ranked audit in docs/research/s12-14-model-audit.md of 42 places where GCC-KNC tuning nu... |
 | S12-15 | Research - literature survey of published Xeon Phi (KNC) and Xeon Phi system research that matches our goals; what have we overlooked? | Done | Literature survey done: 30 groups of published Xeon Phi work ranked against our goals, with 14 overlooked i... |
 | S12-16 | Research - whole-system tuning playbook for the Z840 + Xeon Phi (BIOS, host OS, MPSS and card, transfers, runtimes), as HPC centres tuned Xeon + KNC systems | Done | Whole-system tuning playbook for the Z840 + Phi done: 13 ordered steps (BIOS, host Linux, card power/pages/... |
-| S12-17 | claude-torture -j N refuses to start in exclusive card runs (no inherited RLIMIT_AS since S11-29), so the execute suite cannot run | In progress | The new tests are in tests/tools/test_torture_driver.py (committed in 71cbcf86); YOUR_TEST was a placeholde... |
+| S12-17 | claude-torture -j N refuses to start in exclusive card runs (no inherited RLIMIT_AS since S11-29), so the execute suite cannot run | **Waiting for you** | budget: 4 engineer sessions used; the budget is 4 |
 | S12-18 | Double-precision vector exp, log and pow ran slower than scalar libm on the card (0.82x, 0.63x, 0.49x) - confirm with valid batches, then fix the library or stop the vectorizer calling them where they lose | lead | Needs interactive lead: (1) exclusive card turn running .work/_shared/S12-18/vmath-bench.mic at full, 3100 ... |
 | S12-19 | Profile-guided missed-vectorization triage - join hot loops with the vectorizer's reasons and observed strides/masks, so tuning targets what is hot and fixable | Tests waiting for review | Revised red d3ee9323: 10 cases, 2 test files; real GCC messages with citations, both in-order refusals, act... |
 | S12-20 | libknc_vmath accuracy and exception contract, with an independent validation design (rounding modes, special values, flags, scalar fallback) | draft |  |
@@ -262,6 +262,7 @@ Current tickets: `[##################--]` 220 of 237
 
 ## Recent activity
 
+- 2026-11-14 15:00 **S12-17** engineer escalate: budget: 4 engineer sessions used; the budget is 4
 - 2026-11-14 14:59 **S12-19** engineer red: Revised red d3ee9323: 10 cases, 2 test files; real GCC messages with citations, both in-order refusals, actual strict-FP cost refusal, captured add...
 - 2026-11-14 14:59 **S12-07** engineer ask: Phase-one staged at 9823e291; installed drivers fixed headers. Host build/lint PASS: .work/_state/logs/s12_07_stage-20261114-145549.log. Please run...
 - 2026-11-14 14:57 **S12-04** owner decide: Lead raises sessions 5 -> 7 (second raise; standing owner rule): sessions 4-5 delivered the throttled scan and host tests; one small requested chan...
@@ -269,7 +270,6 @@ Current tickets: `[##################--]` 220 of 237
 - 2026-11-14 14:56 **S12-17** lead answer: The new tests are in tests/tools/test_torture_driver.py (committed in 71cbcf86); YOUR_TEST was a placeholder. With tools/claude-torture.c from main...
 - 2026-11-14 14:55 **S12-04** lead changes: The scan throttling is good. One change: nothing confirms the card BusyBox has usleep. Make both waits fall back silently: in the awk loop use syst...
 - 2026-11-14 14:53 **S12-17** engineer ask: Red proof blocked: tools/claude-torture.c was restored from main, but the new test file named in the lead instruction is absent (tests/tools/test_c...
-- 2026-11-14 14:53 **S12-04** engineer submit: Host profile memory tests passed (7 tests): C:\Users\xuzhi\Documents\gcc_knc\.work\_state\logs\S12_04_profile_memory-20261114-145253.log. Awaiting ...
 
 ## Cost
 
