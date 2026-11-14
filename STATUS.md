@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-14 17:55.
+Updated automatically at every ticket change. Last update: 2026-11-14 17:56.
 
 **Next: GPT-6.1, on S12-07 (M4 theme 2 - indexed-load scheduling with strict sparse reduction (NPB-CG)).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
@@ -109,7 +109,7 @@ Current tickets: `[##################--]` 226 of 244
 | S12-26 | WRF hot scalar routines - classify with the S12-19 triage tool and stage bitwise-safe per-file flag arms for PhiWeather to time | draft |  |
 | S12-27 | Latency-aware scalar loops - GCC-KNC unrolls and interleaves independent iterations and hoists conversions so one thread's every-other-cycle issue and long latencies are hidden automatically | draft |  |
 | S12-28 | dispatch.py refuses to start a second dispatcher on a lane that already has a live one | Done | dispatch.py now refuses to start a second dispatcher on a lane that already has a live one (a lock per lane... |
-| S12-29 | Wrong code - vbroadcastsd reads a 4-byte-aligned SCmode constant (complex float) straight from the constant pool and faults on the card (gcc.c-torture pr38969.c, regression from S11-27) | Not started |  |
+| S12-29 | Wrong code - vbroadcastsd reads a 4-byte-aligned SCmode constant (complex float) straight from the constant pool and faults on the card (gcc.c-torture pr38969.c, regression from S11-27) | In progress |  |
 | S13-01 | M4 final gate - stage the ADR-0015 gate run at the final head (17 programs, held-out unsealed, six pairs, three profiles) | draft |  |
 | S13-02 | Libgomp per-region thread density - choose 1-4 workers per core per parallel region instead of once per program | draft |  |
 | S13-03 | M4 retrospective - what we did wrong, what worked, and the practice changes carried into the next milestone and the agent-team skill | draft |  |
@@ -282,7 +282,7 @@ Current tickets: `[##################--]` 226 of 244
 
 - From the script, engineer: 634 sessions, 1266.2M input tokens
 - From the script, lead: 416 sessions, 114.4M input tokens
-- Started by hand, Claude: 12 sessions, 3280.1M input tokens
+- Started by hand, Claude: 12 sessions, 3280.7M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
