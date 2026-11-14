@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-14 16:51.
+Updated automatically at every ticket change. Last update: 2026-11-14 16:52.
 
-**Next: GPT-6.1, on S12-21 (Scheduling model for M4's serial runs - measure density-1 tuning and the integer-multiply cost against today's density-4 defaults (S12-14 B02, B04, B05)).** Run `python tools/dispatch.py`, or ask the tech lead to.
+**Next: the tech lead, on S12-28.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[##################--]` 224 of 242
 
@@ -108,7 +108,7 @@ Current tickets: `[##################--]` 224 of 242
 | S12-25 | WRF smpar build arm with --param=knc-threads-per-core=2 for PhiWeather's 2-threads-per-core runs (A/B against S11-26's default-4 build) | draft |  |
 | S12-26 | WRF hot scalar routines - classify with the S12-19 triage tool and stage bitwise-safe per-file flag arms for PhiWeather to time | draft |  |
 | S12-27 | Latency-aware scalar loops - GCC-KNC unrolls and interleaves independent iterations and hoists conversions so one thread's every-other-cycle issue and long latencies are hidden automatically | draft |  |
-| S12-28 | dispatch.py refuses to start a second dispatcher on a lane that already has a live one | In progress |  |
+| S12-28 | dispatch.py refuses to start a second dispatcher on a lane that already has a live one | Question for the tech lead | Implementation and acceptance tests are committed at 06c94150 (red 73aa76d0). All 3 isolated host tests pas... |
 | S13-01 | M4 final gate - stage the ADR-0015 gate run at the final head (17 programs, held-out unsealed, six pairs, three profiles) | draft |  |
 | S13-02 | Libgomp per-region thread density - choose 1-4 workers per core per parallel region instead of once per program | draft |  |
 | S13-03 | M4 retrospective - what we did wrong, what worked, and the practice changes carried into the next milestone and the agent-team skill | draft |  |
@@ -267,6 +267,7 @@ Current tickets: `[##################--]` 224 of 242
 
 ## Recent activity
 
+- 2026-11-14 16:52 **S12-28** engineer ask: Implementation and acceptance tests are committed at 06c94150 (red 73aa76d0). All 3 isolated host tests pass: same-lane refusal includes PID, diffe...
 - 2026-11-14 16:51 **S12-22** lead answer: Built; run green and submit.
 - 2026-11-14 16:51 **S12-22** lead resume: Lead 17:00: lane 2 built at f0534648890 (PASS, 5.4 min). Run T1 green on bf225397 red test, T0, and submit. The lead runs x86 identity. ADR-0009 (N...
 - 2026-11-14 16:45 **S12-22** lead defer: Interactive lead needed: build lane-2 GCC (KNC_GCC_SLOT=2) at gcc-2 s12/S12-22 f0534648890 (B10 fix: l2 range 2..4096, silent l1=l2-1 clamp; N01-N0...
@@ -274,13 +275,12 @@ Current tickets: `[##################--]` 224 of 242
 - 2026-11-14 16:40 **S12-22** lead answer: See the resume note: deeper model, edit gcc-2 directly.
 - 2026-11-14 16:39 **S12-22** lead resume: Owner 2026-11-14: retry on a deeper model. Depth light -> standard (gpt-6.1-sol), sessions 8 (3 new). .work/_shared/gcc-2 is writable for engineers...
 - 2026-11-14 16:31 **S12-22** lead defer: Interactive lead needed: engineer still reports it cannot write .work/_shared/gcc-2 (third time, no exact error text pasted). Check sandbox writabl...
-- 2026-11-14 16:30 **S12-22** engineer ask: The scoped lane-2 GCC tree is visible but this engineer session cannot write it: a harmless boundary-test candidate is staged in no way and no trac...
 
 ## Cost
 
 - From the script, engineer: 629 sessions, 1261.9M input tokens
 - From the script, lead: 413 sessions, 113.7M input tokens
-- Started by hand, Claude: 12 sessions, 3257.2M input tokens
+- Started by hand, Claude: 12 sessions, 3258.4M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
