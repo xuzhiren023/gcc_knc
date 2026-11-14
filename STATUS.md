@@ -94,7 +94,7 @@ Current tickets: `[##################--]` 217 of 230
 | S12-11 | Research - best practices for a dual Xeon E5-2690 v3 + Xeon Phi (KNC) workstation (HP Z840) for LLM inference and scientific computing | Done | Z840 dual E5-2690 v3 + Xeon Phi setup guide done: slot/BIOS/memory/power/cooling checklist, MPSS-on-modern-... |
 | S12-12 | Stage S12-10's residual-gap card experiments as one combined Sprint 12 diagnostic batch (PMU access, prefetch, page backing, libm route, branches, allocator) | Done | The six follow-up card experiments (counter access, prefetch, page backing, libm route, branches, allocator... |
 | S12-13 | Digest the S12-10 sources into our knowledge base - correct our KNC notes, build a reference index, and list what our practice should change | Done | The project now has a numbered KNC reference index (R01-R27), corrected KNC notes that cite source pages an... |
-| S12-14 | Audit GCC-KNC's tuning model and runtime defaults against the digested sources - every mismatch with a proposed change and its proof | In progress |  |
+| S12-14 | Audit GCC-KNC's tuning model and runtime defaults against the digested sources - every mismatch with a proposed change and its proof | Waiting for review | Delivered docs/research/s12-14-model-audit.md at 67df0e91: 42 ranked findings (9 wording/citation fixes, 23... |
 | S12-15 | Research - literature survey of published Xeon Phi (KNC) and Xeon Phi system research that matches our goals; what have we overlooked? | Waiting for review | Survey committed at 61ecb62e: docs/research/phi-literature-survey.md, 30 ranked source groups. Document che... |
 | S12-16 | Research - whole-system tuning playbook for the Z840 + Xeon Phi (BIOS, host OS, MPSS and card, transfers, runtimes), as HPC centres tuned Xeon + KNC systems | Done | Whole-system tuning playbook for the Z840 + Phi done: 13 ordered steps (BIOS, host Linux, card power/pages/... |
 | S12-17 | claude-torture -j N refuses to start in exclusive card runs (no inherited RLIMIT_AS since S11-29), so the execute suite cannot run | In progress | Do not amend or split 71cbcf86. Instead prove red: temporarily check out tools/claude-torture.c from main (... |
@@ -255,6 +255,7 @@ Current tickets: `[##################--]` 217 of 230
 
 ## Recent activity
 
+- 2026-11-14 14:15 **S12-14** engineer submit: Delivered docs/research/s12-14-model-audit.md at 67df0e91: 42 ranked findings (9 wording/citation fixes, 23 measurement/qualification rows, 10 keep...
 - 2026-11-14 14:14 **S12-06** engineer ask: Submitting a80a7e9b as instructed now fails: python tools/pm.py submit S12-06 --note ... returns protected path changed: .gitignore (raise it with ...
 - 2026-11-14 14:13 **S11-12** lead approve: Sprint 11 final head checked: both compiler installs at knc 619e14b4, T0-T2 pass, no ICEs, x86 output identical, forward-port drill current, and al...
 - 2026-11-14 14:03 **S12-15** engineer submit: Survey committed at 61ecb62e: docs/research/phi-literature-survey.md, 30 ranked source groups. Document check PASS; log .work/_state/logs/s12_15_su...
@@ -262,7 +263,6 @@ Current tickets: `[##################--]` 217 of 230
 - 2026-11-14 14:02 **S12-18** lead approve-red: A host test now reproduces the short vmath benchmark batches: the calibration accepts one slow early sample, picks too few repetitions and then rec...
 - 2026-11-14 14:02 **S12-15** lead answer: Lead: approved. Submit 61ecb62e with --override 'single research note, 848 lines, 6% over; 30 annotated sources'.
 - 2026-11-14 14:02 **S12-06** engineer ask: Phase-one closure docs committed a80a7e9b per your instruction, with eight native medians and 240-worker/overlap caveat. Log .work/_shared/S12-06/c...
-- 2026-11-14 14:01 **S12-04** lead changes: Red stage must hold only the failing test: commit c122120a also carries the card_run fix, so red-then-green cannot be shown; split it (test commit ...
 
 ## Cost
 
