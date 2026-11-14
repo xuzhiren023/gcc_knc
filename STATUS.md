@@ -2,7 +2,7 @@
 
 Updated automatically at every ticket change. Last update: 2026-11-14 14:29.
 
-**Next: the tech lead, on S12-15.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: the tech lead, on S12-06.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[##################--]` 218 of 234
 
@@ -86,7 +86,7 @@ Current tickets: `[##################--]` 218 of 234
 | S12-03 | pm.py approve aborts its own merge on conflict and refuses cleanly, so main is never left mid-merge | draft |  |
 | S12-04 | card_run profile memory monitor costs under 5% of one card thread | In progress | Red stage must hold only the failing test: commit c122120a also carries the card_run fix, so red-then-green... |
 | S12-05 | DMA end-to-end time - overlap file read, DMA and file write, and copy on the card with more than one thread | draft |  |
-| S12-06 | M4 theme 1 - strict scalar FP conversions and call boundaries (NPB-EP transform and log path, NPB-IS randlc) | In progress | Lead: do not change .gitignore. Restore it (git checkout main -- .gitignore), commit, and submit. tools/s12... |
+| S12-06 | M4 theme 1 - strict scalar FP conversions and call boundaries (NPB-EP transform and log path, NPB-IS randlc) | Waiting for review | Restored .gitignore to main in 66ef8806 as requested; tracked assembly control retained. Phase-one results ... |
 | S12-07 | M4 theme 2 - indexed-load scheduling with strict sparse reduction (NPB-CG) | In progress |  |
 | S12-08 | M4 theme 3 - dependency-preserving scalar updates and register pressure in dense loops (PB-ludcmp, x87 stack traffic) | Not started |  |
 | S12-09 | Sprint 12 batch check - integrated themes at the final Sprint 12 head, regression evidence, optional modes frozen | draft |  |
@@ -259,6 +259,7 @@ Current tickets: `[##################--]` 218 of 234
 
 ## Recent activity
 
+- 2026-11-14 14:29 **S12-06** engineer submit: Restored .gitignore to main in 66ef8806 as requested; tracked assembly control retained. Phase-one results and premise-fails conclusion remain at a...
 - 2026-11-14 14:28 **S12-14** lead approve: The lead now has a ranked audit in docs/research/s12-14-model-audit.md of 42 places where GCC-KNC tuning numbers, runtime defaults or comments disa...
 - 2026-11-14 14:28 **S11-26** lead defer: Needs the interactive lead: (1) stage a fresh WRF v4.8.0 tree at .work/_shared/wrf-trial/src/WRF-4.8.0-smpar (PhiWeather's clean tree plus the 7 pi...
 - 2026-11-14 14:28 **S11-26** lead answer: Lead 14:30: fresh tree at .work/_shared/wrf-trial/src/WRF-4.8.0-smpar (WRF v4.8.0 06d4240a + 7 pinned phys submodules, 441 MB, 5,589 files; provena...
@@ -266,12 +267,11 @@ Current tickets: `[##################--]` 218 of 234
 - 2026-11-14 14:16 **S11-26** engineer ask: All four installed-prefix reproducers PASS without overrides: rtrn/sfclay1d at -O2 -march=knc; kfcps/advance_uv at WRF phinix/OpenMP flags. Log: .w...
 - 2026-11-14 14:15 **S12-14** engineer submit: Delivered docs/research/s12-14-model-audit.md at 67df0e91: 42 ranked findings (9 wording/citation fixes, 23 measurement/qualification rows, 10 keep...
 - 2026-11-14 14:14 **S12-06** engineer ask: Submitting a80a7e9b as instructed now fails: python tools/pm.py submit S12-06 --note ... returns protected path changed: .gitignore (raise it with ...
-- 2026-11-14 14:13 **S11-12** lead approve: Sprint 11 final head checked: both compiler installs at knc 619e14b4, T0-T2 pass, no ICEs, x86 output identical, forward-port drill current, and al...
 
 ## Cost
 
 - From the script, engineer: 595 sessions, 1216.0M input tokens
-- From the script, lead: 393 sessions, 109.2M input tokens
+- From the script, lead: 394 sessions, 109.2M input tokens
 - Started by hand, Claude: 12 sessions, 3176.3M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
