@@ -1,5 +1,4 @@
 """S12-28: isolated host dispatchers with a fake session command."""
-import os
 from pathlib import Path
 import subprocess
 import sys
@@ -113,8 +112,8 @@ class DispatcherLock(unittest.TestCase):
         locks = list((self.root / '.work' / '_state').glob('dispatch*.lock'))
         self.assertEqual(len(locks), 1)
         first.kill()
-        first.communicate(timeout=10)
         release.touch()
+        first.communicate(timeout=10)
         second, marker, release = self.start('corpus2', interrupt=True)
         self.ready(second, marker)
         self.assertIn(str(second.pid), locks[0].read_text())
