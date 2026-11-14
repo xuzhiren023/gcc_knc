@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-14 00:40.
+Updated automatically at every ticket change. Last update: 2026-11-14 00:41.
 
-**Waiting for you:** S11-17. Run `python tools/pm.py inbox`.
+**Next: the tech lead, on S11-27.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[###################-]` 205 of 213
 
@@ -68,7 +68,7 @@ Current tickets: `[###################-]` 205 of 213
 | S11-14 | M4 scoring contract and measurement protocol, frozen before any tuning | Done | M4's scoring contract is frozen in ADR-0015 with a tested scorer: strict serial -O2 versus -O2 over 17 prog... |
 | S11-15 | First development-corpus baseline and profile, GCC 5.1.1 vs GCC-KNC at -O2 (E7-03 part 1) | In progress | Lead decisions: (1) libc identity: accept the sysroot libc-2.21.so names with no card check; same MPSS glib... |
 | S11-16 | Long-double libm hazard audit - do other MPSS long double entry points fault like cbrtl? (E7-21, bounded) | Done | The card's MPSS long double libm was probed on the card: of 12 entry points only cbrtl faults, and S10-13 a... |
-| S11-17 | PGO feasibility on one complete development program (reuse of S9-18's train/use path) | **Waiting for you** | budget: 8962374 input tokens used; the budget is 6000000 |
+| S11-17 | PGO feasibility on one complete development program (reuse of S9-18's train/use path) | In progress | Budget raised by the lead under the owner's standing rule (2026-11-09/10: the lead extends session and toke... |
 | S11-18 | M4 corpus harness v2 - card profiles, prefix record, held-out sealing, stronger checks, and the donor-failure rule | Done | The M4 corpus harness now stages all 17 programs for the 7120 and the 3100/5100 profiles with serial voting... |
 | S11-19 | Second senior review - the M4 definition and the Sprint 11-13 roadmap, adjusted | Done | The M4 definition and the Sprint 11-13 roadmap are rewritten as measure, improve, decide, each sprint with ... |
 | S11-20 | Research - which compiler optimizations benefit the widest range of real code on KNC, from professional to amateur, and does our corpus cover it? | Done | We now have a code-style coverage study (docs/research/code-style-coverage.md) that ranks Sprint 12 candida... |
@@ -238,6 +238,7 @@ Current tickets: `[###################-]` 205 of 213
 
 ## Recent activity
 
+- 2026-11-14 00:41 **S11-17** owner decide: Budget raised by the lead under the owner's standing rule (2026-11-09/10: the lead extends session and token budgets itself; ask only after two ext...
 - 2026-11-14 00:40 **S11-17** engineer escalate: budget: 8962374 input tokens used; the budget is 6000000
 - 2026-11-14 00:40 **S11-02** owner decide: One more review round, granted by the lead under the owner's standing rule (2026-11-09/10: the lead extends limits itself; ask only after two exten...
 - 2026-11-14 00:39 **S11-29** engineer ask: Committed 9520fce6; red 36b48b4e. Five fake-card tests pass: .work/_state/logs/S11_29_green-20261114-002903.log. Profile proc monitor records RSS+s...
@@ -245,16 +246,15 @@ Current tickets: `[###################-]` 205 of 213
 - 2026-11-14 00:26 **S11-27** engineer submit: Acceptance complete; checked report and per-case results: .work/_shared/S11-27/notes.txt. GCC e0bc456a11e rebased on knc (already current). Lead na...
 - 2026-11-14 00:24 **S11-02** lead resume: Lead ran validate.ps1 at 45e732b9, 00:14-00:23 EST: results in the answer.
 - 2026-11-14 00:23 **S11-15** lead answer: Lead decisions: (1) libc identity: accept the sysroot libc-2.21.so names with no card check; same MPSS glibc, same soname and segment extent is eno...
-- 2026-11-14 00:21 **S11-29** lead answer: No probe needed; use the card-side /proc monitor. Already established (docs/card-run.md ~line 175, docs/research/for-the-other-agent.md item 4): th...
 
 ## Cost
 
 - From the script, engineer: 550 sessions, 1119.8M input tokens
 - From the script, lead: 361 sessions, 101.2M input tokens
-- Started by hand, Claude: 12 sessions, 3046.6M input tokens
+- Started by hand, Claude: 12 sessions, 3047.0M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 31.7 GiB of 100 GiB. 168 GiB free on the drive.
+The project uses 31.7 GiB of 100 GiB. 169 GiB free on the drive.
