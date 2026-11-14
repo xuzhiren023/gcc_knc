@@ -111,23 +111,26 @@ per-set and total). OpenMP optimized iterations vary between 50 and 51,
 so that panel remains diagnostic. All profiles use 104 cubed and rt=0.
 
 These actual wall times differ in every serial pair: KNC is slower in five
-pairs, faster in the final 5100 pair. The lead's statement that all six were
-about 1.8% slower describes neither this wall-time table nor the score;
-GFLOP/s ratings are diagnostic only. No repeated timing run was requested.
+pairs (KNC/donor 1.007-1.016), faster in the final 5100 pair (0.993).
+HPCG's GFLOP/s rating is lower for KNC in all six pairs (0.0845-0.0847
+versus donor 0.0860-0.0863); ratings are diagnostic only, never the score.
+No repeated timing run was requested.
 
 Acceptance evidence:
 - [x] Red-first recorded-report fixture test: 75ce3838; green ede7b91c.
 - [x] Returned memory table, arena diagnosis, and lead's frozen grid decision.
 - [x] Lead pilot: all 30 intended launches complete and pass after one upload
   retry; six serial pairs have equal work and differing build wall times.
-- [ ] Final results reconciliation: Windows denied overwriting the lead's
-  results.jsonl. status.json therefore still reports the initial failure.
-  The original error must remain marked superseded by 27r, and 27r must be
-  appended; raw-results.jsonl must retain the original 30 attempts.
+- [x] Final results reconciliation: the lead ran finalize-pilot.py at
+  aad1ae22 on 2026-11-14 at 08:46 EST and reported PASS. results.jsonl
+  retains launch 27's infrastructure error marked superseded_by 27r and
+  appends 27r: 31 attempts, 30/30 effective launches. status.json is pass.
+  raw-results.jsonl retains the original 30 attempts.
 
 The staged finalize-pilot.py validates the returned captures, then performs
 that reconciliation and writes status for 30 successful intended launches
-and 31 recorded attempts. Its acceptance checks passed before the write was
-denied. Log: .work/_state/logs/S11_28_pilot_reconcile-20261114-082848.log.
-No engineer card jobs or GCC builds ran. The lead must complete the protected
-results/status update and refresh staged README.md from this tracked file.
+and 31 recorded attempts. The engineer's first write was denied; the lead
+completed the protected update and refreshed staged README.md.
+Successful finalization log:
+.work/_state/logs/S11_28_finalize_pilot-20261114-084648.log.
+No engineer card jobs or GCC builds ran.
