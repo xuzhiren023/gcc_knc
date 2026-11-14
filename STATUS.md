@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-14 15:31.
+Updated automatically at every ticket change. Last update: 2026-11-14 15:32.
 
-**Next: GPT-6.1, on S12-08 (M4 theme 3 - dependency-preserving scalar updates and register pressure in dense loops (PB-ludcmp, x87 stack traffic)).** Run `python tools/dispatch.py`, or ask the tech lead to.
+**Waiting for you:** S12-17. Run `python tools/pm.py inbox`.
 
 Current tickets: `[##################--]` 221 of 238
 
@@ -97,7 +97,7 @@ Current tickets: `[##################--]` 221 of 238
 | S12-14 | Audit GCC-KNC's tuning model and runtime defaults against the digested sources - every mismatch with a proposed change and its proof | Done | The lead now has a ranked audit in docs/research/s12-14-model-audit.md of 42 places where GCC-KNC tuning nu... |
 | S12-15 | Research - literature survey of published Xeon Phi (KNC) and Xeon Phi system research that matches our goals; what have we overlooked? | Done | Literature survey done: 30 groups of published Xeon Phi work ranked against our goals, with 14 overlooked i... |
 | S12-16 | Research - whole-system tuning playbook for the Z840 + Xeon Phi (BIOS, host OS, MPSS and card, transfers, runtimes), as HPC centres tuned Xeon + KNC systems | Done | Whole-system tuning playbook for the Z840 + Phi done: 13 ordered steps (BIOS, host Linux, card power/pages/... |
-| S12-17 | claude-torture -j N refuses to start in exclusive card runs (no inherited RLIMIT_AS since S11-29), so the execute suite cannot run | In progress | Lead raises sessions 6 -> 7: the last raise made progress (green test passed); one session to rebuild the s... |
+| S12-17 | claude-torture -j N refuses to start in exclusive card runs (no inherited RLIMIT_AS since S11-29), so the execute suite cannot run | **Waiting for you** | budget: 2208651 input tokens used; the budget is 2000000 |
 | S12-18 | Double-precision vector exp, log and pow ran slower than scalar libm on the card (0.82x, 0.63x, 0.49x) - confirm with valid batches, then fix the library or stop the vectorizer calling them where they lose | lead | Needs interactive lead: (1) exclusive card turn running .work/_shared/S12-18/vmath-bench.mic at full, 3100 ... |
 | S12-19 | Profile-guided missed-vectorization triage - join hot loops with the vectorizer's reasons and observed strides/masks, so tuning targets what is hot and fixable | In progress | Lead: no card capture needed. GCC does not change generated code for -g. Rebuild each development program w... |
 | S12-20 | libknc_vmath accuracy and exception contract, with an independent validation design (rounding modes, special values, flags, scalar fallback) | draft |  |
@@ -263,6 +263,7 @@ Current tickets: `[##################--]` 221 of 238
 
 ## Recent activity
 
+- 2026-11-14 15:32 **S12-17** engineer escalate: budget: 2208651 input tokens used; the budget is 2000000
 - 2026-11-14 15:31 **S12-19** lead answer: Lead: no card capture needed. GCC does not change generated code for -g. Rebuild each development program with exactly the S11-18 builds.json flags...
 - 2026-11-14 15:31 **S12-08** lead answer: Submit now.
 - 2026-11-14 15:30 **S12-17** owner decide: Lead raises sessions 6 -> 7: the last raise made progress (green test passed); one session to rebuild the staged binary and submit.
@@ -270,16 +271,15 @@ Current tickets: `[##################--]` 221 of 238
 - 2026-11-14 15:28 **S12-04** lead approve: card_run's profile memory monitor no longer floods stderr and scans /proc far less often: it uses usleep with a sleep 1 fallback instead of the Bus...
 - 2026-11-14 15:13 **S12-21** lead changes: FLAGS['density1'] pins -mknc-density=1, but no such option exists: the density control is --param=knc-threads-per-core= (i386.opt:1400, Init 4, ran...
 - 2026-11-14 15:13 **S12-17** engineer escalate: budget: 6 engineer sessions used; the budget is 6
-- 2026-11-14 15:13 **S12-04** engineer submit: Host profile memory tests passed (7 tests); strengthened fallback test red against original card_run and green with fix. Logs: .work/_state/logs/S1...
 
 ## Cost
 
 - From the script, engineer: 617 sessions, 1244.2M input tokens
 - From the script, lead: 404 sessions, 112.0M input tokens
-- Started by hand, Claude: 12 sessions, 3206.6M input tokens
+- Started by hand, Claude: 12 sessions, 3208.1M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 32.6 GiB of 100 GiB. 140 GiB free on the drive.
+The project uses 32.6 GiB of 100 GiB. 142 GiB free on the drive.
