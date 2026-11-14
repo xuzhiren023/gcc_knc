@@ -10,6 +10,7 @@
 #include <signal.h>
 #include <time.h>
 #include <fcntl.h>
+#include <poll.h>
 #include <sys/socket.h>
 #include <sys/types.h>
 #include <sys/resource.h>
@@ -135,7 +136,7 @@ static void token(char expected,int sending)
 { char x=expected;exact(&x,1,sending);if(x!=expected){cancelled=1;die("protocol token");} }
 static uint64_t number(const char *s,uint64_t max)
 { char *end;errno=0;unsigned long long n=strtoull(s,&end,10);if(errno||!*s||*end||n>max)die("argument range");return n; }
-static int tcp(const char *address,unsigned port,int server)
+static int tcp(const char *address,unsigned port,int server,const char *lease_nonce)
 {
   struct sockaddr_in a;int s=socket(AF_INET,SOCK_STREAM,0),one=1;
   if(s<0)die("socket");
@@ -144,9 +145,26 @@ static int tcp(const char *address,unsigned port,int server)
   if(server) {
     socklen_t n=sizeof(a);
     if(bind(s,(struct sockaddr*)&a,sizeof(a))||listen(s,1)||getsockname(s,(struct sockaddr*)&a,&n))die("listen");
-    fprintf(stderr,"{\"ready\":true,\"port\":%u,\"node\":0}\n",ntohs(a.sin_port));fflush(stderr);
+    FILE *announcement=lease_nonce?stdout:stderr;
+    fprintf(announcement,"{\"ready\":true,\"port\":%u,\"node\":0,\"nonce\":\"%s\"}\n",
+            ntohs(a.sin_port),lease_nonce?lease_nonce:"");fflush(announcement);
+    struct pollfd wait={s,POLLIN,0};
+    /* card_run relays every 10 s; exceed the host's 60 s announcement wait plus the relay interval. */
+    if(poll(&wait,1,90000)!=1)die("card TCP listener unreachable: no host connection within 90 seconds");
     int t=accept(s,NULL,NULL);close(s);s=t;if(s<0)die("accept");
-  } else if(connect(s,(struct sockaddr*)&a,sizeof(a)))die("connect");
+  } else {
+    int flags=fcntl(s,F_GETFL,0);if(flags<0||fcntl(s,F_SETFL,flags|O_NONBLOCK))die("connect flags");
+    if(connect(s,(struct sockaddr*)&a,sizeof(a))) {
+      if(errno!=EINPROGRESS)die("card TCP listener unreachable: connect failed");
+      struct pollfd wait={s,POLLOUT,0};int error=0;socklen_t n=sizeof(error);
+      if(poll(&wait,1,5000)!=1)die("card TCP listener unreachable: connect deadline (5 seconds)");
+      if(getsockopt(s,SOL_SOCKET,SO_ERROR,&error,&n)||error) {
+        if(error)errno=error;
+        die("card TCP listener unreachable: connect failed");
+      }
+    }
+    if(fcntl(s,F_SETFL,flags))die("connect flags restore");
+  }
   struct timeval timeout={120,0};
   setsockopt(s,SOL_SOCKET,SO_RCVTIMEO,&timeout,sizeof(timeout));
   setsockopt(s,SOL_SOCKET,SO_SNDTIMEO,&timeout,sizeof(timeout));
@@ -164,6 +182,7 @@ static void connect_transport(const char *method,const char *address,unsigned po
       int bound=sc.bind(ep,0);if(bound<0||sc.listen(ep,1))die("scif listen");
       if(sc.nodes(nodes,32,&self)<0)die("node enumeration");
       fprintf(stderr,"{\"ready\":true,\"port\":%d,\"node\":%u}\n",bound,self);fflush(stderr);
+      /* SSH starts this endpoint directly, so exceed the host's 20 s announcement wait. */
       if(sc.accept(ep,&peer,&accepted,1))die("scif accept");
       if(sc.close(ep))die("listener close; cleanup uncertain");
       ep=accepted;
@@ -172,7 +191,7 @@ static void connect_transport(const char *method,const char *address,unsigned po
       node_port target={(uint16_t)number(address,65535),(uint16_t)port};
       if(sc.connect(ep,&target)<0)die("scif connect");
     }
-  } else if(strcmp(method,"pipe")) fdin=fdout=tcp(address,port,host);
+  } else if(strcmp(method,"pipe")) fdin=fdout=tcp(address,port,!host,NULL);
 }
 static void affinity(const char *list)
 {
@@ -472,16 +491,21 @@ static void *burn(void *arg)
 static int lease(const char *address,unsigned port,const char *nonce)
 {
   cpu_set_t set;pthread_t threads[CPU_SETSIZE];unsigned n=0;int cpu;
-  char cpus[4096]="",cwd[4096],line[9000];size_t used=0;
+  char cpus[4096]="",cwd[4096],root[4096],line[9000];size_t used=0;
   if(sched_getaffinity(0,sizeof(set),&set)||!getcwd(cwd,sizeof(cwd)))die("lease affinity/cwd");
-  /* The current guarded card_run directory has a simple ASCII name. */
-  if(strncmp(cwd,"/tmp/claude/claude-",19)||strchr(cwd,'"'))die("not a card_run directory");
+  if(!realpath("/tmp",root))die("realpath /tmp");
+  size_t root_len=strlen(root);
+  const char *suffix=cwd+root_len;
+  if(strncmp(cwd,root,root_len)||strncmp(suffix,"/claude/claude-",15)
+     ||strlen(suffix+15)!=32)die("not a card_run directory");
+  for(const char *p=suffix+15;*p;p++)
+    if(!((*p>='0'&&*p<='9')||(*p>='a'&&*p<='f')))die("not a card_run directory");
   for(cpu=0;cpu<CPU_SETSIZE;cpu++)if(CPU_ISSET(cpu,&set)) {
     used+=(size_t)snprintf(cpus+used,sizeof(cpus)-used,"%s%d",n?",":"",cpu);
     if(pthread_create(&threads[n++],NULL,burn,(void*)(intptr_t)cpu))die("busy worker");
   }
   if(n!=240)die("exclusive 240 CPU lease required");
-  fdin=fdout=tcp(address,port,0);
+  fdin=fdout=tcp(address,port,1,nonce);
   int len=snprintf(line,sizeof(line),"{\"nonce\":\"%s\",\"directory\":\"%s\",\"cpus\":\"%s\"}\n",nonce,cwd,cpus);
   exact(line,(size_t)len,1);
   for(;;){

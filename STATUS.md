@@ -1,10 +1,10 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-12 09:26.
+Updated automatically at every ticket change. Last update: 2026-11-14 01:48.
 
-**Next: GPT-6.1, on S11-02 (card_run and run_suite move data by S11-01's recommended method, with fallback).** Run `python tools/dispatch.py`, or ask the tech lead to.
+**Next: the tech lead, on S11-02.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
-Current tickets: `[###################-]` 182 of 184
+Current tickets: `[###################-]` 206 of 213
 
 ## Milestones
 
@@ -13,8 +13,8 @@ Current tickets: `[###################-]` 182 of 184
 | M0 | Foundation | In progress | 17 of 17 tickets |
 | M1 | Mixed native code | Done | 43 of 43 tickets |
 | M2 | Useful vector target | Done | 51 of 51 tickets |
-| M3 | Runtimes | Done | 47 of 48 tickets |
-| M4 | Broad optimization | In progress | 1 of 2 tickets |
+| M3 | Runtimes | Done | 48 of 48 tickets |
+| M4 | Broad optimization | In progress | 24 of 31 tickets |
 | M5 | Program corpus | Not started | Not planned in detail yet |
 | M6 | Release | Not started | Not planned in detail yet |
 
@@ -51,9 +51,38 @@ Current tickets: `[###################-]` 182 of 184
 | S10-10 | Card harness fixes from the Sprint 10 card turn - card_qualify binary folder, vmath bench batch sizing | Done | card_qualify now runs the card binaries from knc/ and stops before any card job when one is missing, and th... |
 | S10-11 | Card-only vector math failures - double sin, cos, tan, atan2 above 1 ULP, and cbrt/cbrtf crash (SIGSEGV) | Done | Double sin, cos, tan and atan2 from the KNC vector math library are now within 1 ULP on the card (0.76 to 0... |
 | S10-12 | cbrt and cbrtf crash (SIGSEGV) in qualify_v1 on the card - root cause and fix | Done | The cbrt and cbrtf qualification jobs no longer crash on the card and pass (worst 0.4996 and 0.4991 ULP): t... |
-| S10-13 | User story - code that calls cbrtl under -march=knc gets a safe replacement and a compile-time warning (MPSS libm cbrtl faults) | lead | Waits for S10-12's approval; then the lead moves it to lane gcc (tree 1) to build. |
+| S10-13 | User story - code that calls cbrtl under -march=knc gets a safe replacement and a compile-time warning (MPSS libm cbrtl faults) | Done | Under -march=knc, calls to cbrtl (and std::cbrt on long double) now go to GCC-KNC's own safe cube root with... |
 | S11-01 | User story - the best way to move data between the host and the card, measured, and how our projects use it | Done | We now have a sourced inventory of every host-card transfer path that works without changing MPSS (SSH, tar... |
-| S11-02 | card_run and run_suite move data by S11-01's recommended method, with fallback | Not started | ready; waits on its dep S11-01, the lead writes acceptance before it starts |
+| S11-02 | card_run and run_suite move bulk data by SCIF DMA at the PCIe link limit, with the SSH stream as fallback | Question for the tech lead | The 01:43 lead instruction requires merging main into s11/S11-02, but the first git merge --no-commit main ... |
+| S11-03 | S11-01 transfer tool rejects the card's physical /tmp path, so the native study never starts | Done | The transfer study's tool now accepts the card's real /tmp location (/var/volatile/tmp), so its card run ca... |
+| S11-04 | S11-01 transfer tool - the host opens every connection, because Windows Firewall blocks inbound TCP from the card | Done | The transfer study's host side now opens every connection to the card, so Windows Firewall no longer blocks... |
+| S11-05 | Research - raise KNC's real memory bandwidth from about 175 GB/s toward 75-85% of peak, with a measured plan | Done | The memory-bandwidth research plan and a validated multithreaded KNC bandwidth benchmark are ready, with a ... |
+| S11-06 | Memory bandwidth - read the first card sweep, find why our numbers sit below STREAM's, and stage sweep 2 toward 264-299 GB/s | Done | The memory-bandwidth benchmark now times only the worker passes and has a corrected long-sample baseline on... |
+| S11-07 | S11-01 transfer tool - the card's listener gives up before card_run relays its announcement | Done | The transfer study's card listener now waits long enough for card_run to relay its address to the host; che... |
+| S11-08 | -Wknc-unsafe-cbrtl cannot be used in #pragma GCC diagnostic ("valid for  but not for C") | Done | The cbrtl warning can now be silenced around one deliberate call with #pragma GCC diagnostic in C and C++; ... |
+| S11-09 | Memory bandwidth for LLM decode - a weight-streaming GEMV workload, pushed toward 264-299 GB/s of weight bytes | Done | Weight-streaming GEMV for LLM decode is measured on the card: int8 weights reach 70 billion weights/s (2.2x... |
+| S11-10 | S11-01 transfer runner - choose repetitions, sizes and load states per run, so slow methods fit a card turn | Done | The transfer runner now takes --repeats, --sizes, --loads and --concurrency so a slow method fits a card tu... |
+| S11-11 | M4 corpus run harness - every corpus program built by GCC 5.1.1 and GCC-KNC, run on the card with frozen inputs and a correctness check, in one command | Done | The M4 corpus harness builds 17 programs with GCC 5.1.1 and GCC-KNC and stages checked card runs; GCC-KNC b... |
+| S11-12 | Sprint 11 batch check - full native suite, x86 identity, forward-port drill, ICE sweeps, runtime prefix consistency | draft |  |
+| S11-13 | Senior compiler review of the Sprint 11-13 scope (Milestone M4) against our research, with recommended plan changes | Done | A senior compiler review of the Sprint 11-13 plan is in: M4 is plausible but needs a frozen scoring and mea... |
+| S11-14 | M4 scoring contract and measurement protocol, frozen before any tuning | Done | M4's scoring contract is frozen in ADR-0015 with a tested scorer: strict serial -O2 versus -O2 over 17 prog... |
+| S11-15 | First development-corpus baseline and profile, GCC 5.1.1 vs GCC-KNC at -O2 (E7-03 part 1) | In progress | Profile batch ran 2026-11-14 01:07-01:32 EST, log .work/_state/logs/S11_15_profile_batch-20261114-010719.lo... |
+| S11-16 | Long-double libm hazard audit - do other MPSS long double entry points fault like cbrtl? (E7-21, bounded) | Done | The card's MPSS long double libm was probed on the card: of 12 entry points only cbrtl faults, and S10-13 a... |
+| S11-17 | PGO feasibility on one complete development program (reuse of S9-18's train/use path) | lead | Needs the interactive lead at a3258fe0, S11-17 worktree: 1) engineer cannot overwrite lead-owned controls/c... |
+| S11-18 | M4 corpus harness v2 - card profiles, prefix record, held-out sealing, stronger checks, and the donor-failure rule | Done | The M4 corpus harness now stages all 17 programs for the 7120 and the 3100/5100 profiles with serial voting... |
+| S11-19 | Second senior review - the M4 definition and the Sprint 11-13 roadmap, adjusted | Done | The M4 definition and the Sprint 11-13 roadmap are rewritten as measure, improve, decide, each sprint with ... |
+| S11-20 | Research - which compiler optimizations benefit the widest range of real code on KNC, from professional to amateur, and does our corpus cover it? | Done | We now have a code-style coverage study (docs/research/code-style-coverage.md) that ranks Sprint 12 candida... |
+| S11-21 | Exploratory WRF build with GCC-KNC (learn-only, host-side) - how far does an unmodified WRF get, and what breaks? | Done | WRF v4.8.0 builds with GCC-KNC (serial em_real, -O2 -march=knc, netCDF built with GCC-KNC, GCC 16 runtimes ... |
+| S11-22 | Review PhiWeather's first instrumented-PGO attempt on WRF (GCC 5.1.1, k1om) - method, near-zero gain, tolerance gate | Done | PhiWeather's first WRF PGO attempt is reviewed for their lead: the collection and use pipeline is credible,... |
+| S11-23 | ICE in WRF's RRTM radiation (rtrn) at -O2 -march=knc - unrecognizable insn after reload, and sub-512-bit SLP vectors under KNC | Done | WRF's RRTM radiation and the -O3 OpenMP WRF files that crashed GCC-KNC after reload (rtrn, kfcps, advance_u... |
+| S11-24 | WRF OpenMP (smpar) build with GCC-KNC at -mphinix, for PhiWeather's benchmark - replaces the serial trial build | Done | WRF v4.8.0 now builds as an OpenMP card binary at -mphinix with GCC-KNC (wrf.exe and real.exe linked, needi... |
+| S11-25 | ICE in do_store_flag (expr.cc) on WRF's surface layer (SFCLAY1D) at -O2 -march=knc | Done | The last WRF file that crashed GCC-KNC (surface layer, SFCLAY1D) now compiles: vector 'ordered and not equa... |
+| S11-26 | WRF OpenMP build at -mphinix with no per-file workarounds (S11-23 and S11-25 fixed), restaged for PhiWeather | draft | Owner 2026-11-13: the S11-24 WRF build is removed. Deleted: |
+| S11-27 | Wrong code - NPB-MG (class A, serial) built by GCC-KNC at -O2 -march=knc fails NPB verification on the card | Done | NPB-MG built by GCC-KNC at -O2 -march=knc now verifies on the card (class A in 14.1 s, against 33.8 s for G... |
+| S11-28 | HPCG run that fits every card model - fixed work instead of fixed duration, grid sized to the 3100's memory | lead | After S11-29 merges (still ready): run .work/_shared/S11-28/lead-pilot.ps1 at 242936bf+ (30 exclusive timed... |
+| S11-29 | card_run profiles limit memory in use, not address space, so a 3100 or 5100 run fails only where the real card would | lead | Interactive lead: card round needed at cbe9a3d6 (about 45 min, needs a card turn). Run .work/_shared/S11-29... |
+| S12-01 | Sprint 12 prep - static code-quality census of the development-corpus builds (spills, x87/vector transfers, addressing, calls, code size) | Done | A static code-quality census (spill/reload proxies, x87 and x87-zmm traffic, address arithmetic, calls, bra... |
+| S12-02 | Sprint 12 prep - the unscored generality check set (S11-20's six programs in the code styles our corpus lacks) | Done | The six unscored generality checks (Q1-Q6: ray tracer hit dispatch and vec3 AoS, Burkardt MD, Reference BLA... |
 | S2-01 | Design for zmm and mask registers under -march=knc | Done | The register design for KNC is settled on paper: all 32 zmm and 8 mask registers become usable under -march... |
 | S2-02 | Float and double arguments and results in zmm lane 0 | Done | Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`). |
 | S2-03 | Varargs with the donor's register save area | Done | Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`). |
@@ -209,23 +238,23 @@ Current tickets: `[###################-]` 182 of 184
 
 ## Recent activity
 
-- 2026-11-12 09:26 **S10-12** lead approve: The cbrt and cbrtf qualification jobs no longer crash on the card and pass (worst 0.4996 and 0.4991 ULP): the crash was in the card's MPSS libm cbr...
-- 2026-11-12 09:16 **S10-12** engineer submit: Submitted by the lead for the engineer: red 1ff46888 (host model of the MPSS cbrtl negative table offset), fix 7ae4d224 (qualifier keeps cbrtl's ar...
-- 2026-11-12 09:15 **S10-12** lead answer: Card PASS; the lead submits for the engineer.
-- 2026-11-12 09:15 **S10-12** lead note: Card 2026-11-12 14:05-14:15Z (boot da3144f1), fixed qualifier .work/_shared/S10-12/knc/qualify_v1.mic, 240 threads: cmp-cbrt PASS exact max_ulp 0.4...
-- 2026-11-12 09:14 **S10-12** lead resume: Card PASS for cbrt and cbrtf (09:15 note).
-- 2026-11-12 08:38 **S11-01** lead approve: We now have a sourced inventory of every host-card transfer path that works without changing MPSS (SSH, tar, raw TCP, SCIF messages and DMA, COI), ...
-- 2026-11-12 08:35 **S10-13** lead note: Interactive lead: tree 2's build folder .work/_shared/gcc-build-2 was created outside the Codex sandbox (owner xuzhi, Cygwin deny entries for other...
-- 2026-11-12 08:27 **S11-01** engineer submit: Submitted by the lead for the engineer after rebasing (engineer sandbox cannot write .git). Engineer 07:57: loopback/FIPS/corruption tests and K1OM...
+- 2026-11-14 01:48 **S11-02** engineer ask: The 01:43 lead instruction requires merging main into s11/S11-02, but the first git merge --no-commit main command was refused by the PreToolUse ho...
+- 2026-11-14 01:46 **S11-02** owner decide: Budget raised by the lead under the owner's standing rule: sessions 12 -> 14, the third session extension. Each extension made progress; since the ...
+- 2026-11-14 01:46 **S11-02** engineer escalate: budget: 12 engineer sessions used; the budget is 12
+- 2026-11-14 01:45 **S11-02** owner decide: One more review round, granted by the lead under the owner's standing rule. This round is a merge conflict with main (S11-10's output_dir in host_c...
+- 2026-11-14 01:43 **S11-02** lead escalate: over 2 review rounds: Review of 4aae037c passes, but approval's merge conflicts with main in tools/host_card_transfer.py build(): main has S11-10's...
+- 2026-11-14 01:42 **S11-02** owner decide: Lead under the owner's standing rule: back to review. The scripted lead session ended after a merge conflict it could not resolve; the interactive ...
+- 2026-11-14 01:42 **S11-02** lead escalate: lead session ended without a decision (exit 0)
+- 2026-11-14 01:42 **S11-02** lead resume: Lead aborted the failed approval merge; main is clean at 6361d2aa.
 
 ## Cost
 
-- From the script, engineer: 434 sessions, 950.9M input tokens
-- From the script, lead: 274 sessions, 80.4M input tokens
-- Started by hand, Claude: 11 sessions, 2497.8M input tokens
+- From the script, engineer: 557 sessions, 1132.3M input tokens
+- From the script, lead: 368 sessions, 103.1M input tokens
+- Started by hand, Claude: 12 sessions, 3061.8M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 24.6 GiB of 100 GiB. 96 GiB free on the drive.
+The project uses 31.7 GiB of 100 GiB. 168 GiB free on the drive.

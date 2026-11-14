@@ -17,6 +17,45 @@ are in [work/tickets](../work/tickets/).
 
 Do not pass SSE, AVX or MMX options: `-march=knc` rejects them (ADR-0002).
 
+## Safe long double cube root
+
+With `-march=knc`, calls recognized as `cbrtl(long double)`, `__builtin_cbrtl`,
+the standard `std::cbrt(long double)` overload, and C's type-generic `cbrt` on
+a long double use `__knc_cbrtl` from libgcc. MPSS libm's `cbrtl` can fault on
+finite inputs, including `1e-5L`. The compiler warns at each surviving call
+site with `-Wknc-unsafe-cbrtl`, enabled by default. `-Wno-knc-unsafe-cbrtl`
+silences the diagnostic while retaining the replacement. Calls folded to
+constants before lowering need no runtime replacement. x86 is unaffected.
+
+The scalar implementation normalizes by an exact power of two, uses an x87
+Newton core with a binary128 residual correction from libgcc's soft-fp
+helpers, and rescales exactly. It has no libm dependency. It preserves signed
+zeros, infinities and NaNs and supports negative and subnormal inputs. Against
+192-bit MPFR in round-to-nearest, the measured worst error was
+**0.499999954905 ULP** over 16,974,074 inputs: all normal exponents with three
+significands and both signs, subnormal boundaries, specials, and 2^24 random
+values. Native bit-for-bit validation is staged for the lead; this host result
+is not a native result. `tests/vmath/qualify_v1.c` keeps its existing
+`screen_cbrt` scaling rule; its recognized `cbrtl` call also gets this replacement
+when rebuilt with the KNC compiler.
+
+An indirect function-pointer call, a call lacking a matching declaration with
+`-fno-builtin`, a previously compiled object, or a symbol obtained with `dlsym`
+is not covered. Rebuild callers and use a direct, correctly declared call.
+Where this is impossible, explicitly declare and call
+`extern long double __knc_cbrtl(long double);` (with `extern "C"` in C++).
+With `-nostdlib` or `-nodefaultlibs`, also provide libgcc and its usual runtime
+dependencies on the link line. The replacement does not interpose MPSS's
+symbol for other objects.
+
+`python tools/run.py --name cbrtl-audit --inputs tools/s10_13_checks.py -- python tools/s10_13_checks.py audit`
+checks every installed target archive and shared-library symbol table for
+unsafe references. The `model` action produces the host reference corpus;
+`stage` builds and lints the card programs and prints the exact `card_run`
+commands. Four reference files keep each staged command below 64 MiB. Run
+all four comparison commands with `--threads 240`, then run the fault probe
+separately; the latter deliberately calls MPSS and is expected to fault.
+
 ## What `-march=knc` implies
 
 Each default yields to an explicit user setting.

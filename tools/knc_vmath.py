@@ -98,7 +98,8 @@ def build(target):
              'pow_reference': compile_unit(ROOT / 'tests/vmath/pow_reference.c', TEST_FLAGS),
              # The host passes 64-byte vectors in memory, which GCC notes with -Wpsabi.
              'qualify_v1': compile_unit(ROOT / 'tests/vmath/qualify_v1.c', TEST_FLAGS + (
-                 [] if target == 'knc' else ['-DVMATH_MPFR', '-Wno-psabi']))}
+                 # S10-13 redirects the screen's deliberate cbrtl call to __knc_cbrtl and warns.
+                 ['-Wno-knc-unsafe-cbrtl'] if target == 'knc' else ['-DVMATH_MPFR', '-Wno-psabi']))}
     if errors:
         print('FAIL %s: %d compile steps' % (target, errors))
         return 1

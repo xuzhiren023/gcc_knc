@@ -78,11 +78,11 @@ refined when they come near.
 | | **S8** | Tuning block: the M2 weak spots (short lengths, prefetch, mat8/mat16, code-shape wins) | |
 | | **S9** | libgomp and libstdc++ on the card (exceptions, RTTI, threads, atomics) | **M3** (accepted 2026-11-11) |
 | | **S10** | 512-bit vector ABI, libknc_vmath v0/v1a/v1b and loops calling it, correctly rounded V8DF div/sqrt, card-only vmath fixes, safe `cbrtl` | |
-| **M4** Broad optimization | **S11–13** | Host-card transfer best practice; optimization ranked by corpus-wide profiles, scalar and vector (scheduling, prefetch, alignment, PGO, `-mphinix`), compared with GCC 5.1.1 | **M4** |
-| **M5** Program corpus | **S14–15** | The full corpus built and run, with matched benchmarks, and the corpus widened (llama.cpp, WRF) | |
+| **M4** Broad optimization | **S11–13** | S11: frozen scoring contract, runnable 17-program corpus and its first baseline (plus transport at the PCIe link limit and the LLM-decode bandwidth study); S12: at most three profile-chosen themes and PGO; S13: qualification and decision. The fixed 17-program corpus is an M4 dependency; M5 widens it. Every benchmark also runs under the 3100 and 5100 card profiles | **M4** |
+| **M5** Program corpus | **S14–15** | The corpus widened beyond M4's frozen 17-program set (llama.cpp, WRF, more applications), with matched benchmarks | |
 | **M6** Release | **S16** | Packaging, documentation, known-limits list and update procedure | |
 
-Updated 2026-11-12 to match `work/milestones.json`: Sprint 8 became a tuning block, the runtimes ran through Sprint 10, and later sprints moved by one.
+Updated 2026-11-12 to match `work/milestones.json` and the S11-13 scope review (`docs/reviews/2026-11-12-s11-s13-scope-review.md`): Sprint 8 became a tuning block, the runtimes ran through Sprint 10, and later sprints moved by one.
 
 M2 to M4 can overlap where dependencies allow. Runtime investigation, for example, can
 start before S6 ends.
