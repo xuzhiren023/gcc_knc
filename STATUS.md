@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-14 16:10.
+Updated automatically at every ticket change. Last update: 2026-11-14 16:11.
 
-**Waiting for you:** S12-22. Run `python tools/pm.py inbox`.
+**Next: GPT-6.1, on S12-19 (Profile-guided missed-vectorization triage - join hot loops with the vectorizer's reasons and observed strides/masks, so tuning targets what is hot and fixable).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
 Current tickets: `[##################--]` 223 of 239
 
@@ -102,7 +102,7 @@ Current tickets: `[##################--]` 223 of 239
 | S12-19 | Profile-guided missed-vectorization triage - join hot loops with the vectorizer's reasons and observed strides/masks, so tuning targets what is hot and fixable | In progress | Lead raises sessions 4 -> 6 (standing rule): the tool and 14-program collection are done; one requested cha... |
 | S12-20 | libknc_vmath accuracy and exception contract, with an independent validation design (rounding modes, special values, flags, scalar fallback) | draft |  |
 | S12-21 | Scheduling model for M4's serial runs - measure density-1 tuning and the integer-multiply cost against today's density-4 defaults (S12-14 B02, B04, B05) | In progress | No deletion needed. Stage into a fresh, empty folder instead of cleaning the old one: change the tool's out... |
-| S12-22 | Low-risk corrections from the S12-14 audit - wrong comments and citations (N01-N09) and the far-prefetch-distance range bug (B10) | **Waiting for you** | budget: 2039970 input tokens used; the budget is 2000000 |
+| S12-22 | Low-risk corrections from the S12-14 audit - wrong comments and citations (N01-N09) and the far-prefetch-distance range bug (B10) | In progress | Lead raises input_tokens 2M -> 6M (second raise; tokens went to the wrong-parameter round caused by the tic... |
 | S12-23 | Floating-point environment correctness on KNC - fix the underflow probe that cannot tell flushing from rounding, and handle x87 erratum CD28 (S12-14 N06, N07, B16, B17) | Not started |  |
 | S12-24 | ICE in vect_transform_stmt (tree-vect-stmts.cc:13381) on WRF's REMEZ at -mphinix (-O3 -march=knc) | Not started |  |
 | S12-25 | WRF smpar build arm with --param=knc-threads-per-core=2 for PhiWeather's 2-threads-per-core runs (A/B against S11-26's default-4 build) | Not started |  |
@@ -264,6 +264,7 @@ Current tickets: `[##################--]` 223 of 239
 
 ## Recent activity
 
+- 2026-11-14 16:11 **S12-22** owner decide: Lead raises input_tokens 2M -> 6M (second raise; tokens went to the wrong-parameter round caused by the ticket). If it stalls again the lead asks t...
 - 2026-11-14 16:10 **S12-22** engineer escalate: budget: 2039970 input tokens used; the budget is 2000000
 - 2026-11-14 16:10 **S12-22** owner decide: Lead raises sessions 2 -> 4: both sessions were lost to the lead's wrong parameter name in the ticket (now fixed).
 - 2026-11-14 16:09 **S12-22** engineer escalate: budget: 2 engineer sessions used; the budget is 2
@@ -271,13 +272,12 @@ Current tickets: `[##################--]` 223 of 239
 - 2026-11-14 16:09 **S12-22** lead resume: Lead 16:12: the gcc-2 tree is correct (s12/S12-22 at knc 619e14b479a, clean, no git lock now). My ticket used a wrong parameter name: there is no k...
 - 2026-11-14 16:07 **S12-22** lead defer: Interactive lead needed: lane-2 shared gcc worktree (gcc-2) is on s12/S12-07 at 619e14b, which lacks knc-prefetch-far; reset it to s12/S12-22 based...
 - 2026-11-14 16:06 **S12-22** engineer ask: Lane-2 GCC is out of sync: shared gcc-2 is on s12/S12-07 at 619e14b and lacks knc-prefetch-far (only knc-prefetch-l2-distance exists). Two real T1 ...
-- 2026-11-14 16:04 **S12-21** lead answer: No deletion needed. Stage into a fresh, empty folder instead of cleaning the old one: change the tool's output dir from corpus.SHARED/'S12-21' to c...
 
 ## Cost
 
 - From the script, engineer: 623 sessions, 1256.6M input tokens
 - From the script, lead: 408 sessions, 113.0M input tokens
-- Started by hand, Claude: 12 sessions, 3230.3M input tokens
+- Started by hand, Claude: 12 sessions, 3231.4M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
