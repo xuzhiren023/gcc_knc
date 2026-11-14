@@ -2,7 +2,7 @@
 
 Updated automatically at every ticket change. Last update: 2026-11-14 15:05.
 
-**Next: GPT-6.1, on S12-04 (card_run profile memory monitor costs under 5% of one card thread).** Run `python tools/dispatch.py`, or ask the tech lead to.
+**Next: the tech lead, on S12-04.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[##################--]` 220 of 237
 
@@ -84,7 +84,7 @@ Current tickets: `[##################--]` 220 of 237
 | S12-01 | Sprint 12 prep - static code-quality census of the development-corpus builds (spills, x87/vector transfers, addressing, calls, code size) | Done | A static code-quality census (spill/reload proxies, x87 and x87-zmm traffic, address arithmetic, calls, bra... |
 | S12-02 | Sprint 12 prep - the unscored generality check set (S11-20's six programs in the code styles our corpus lacks) | Done | The six unscored generality checks (Q1-Q6: ray tracer hit dispatch and vec3 AoS, Burkardt MD, Reference BLA... |
 | S12-03 | pm.py approve aborts its own merge on conflict and refuses cleanly, so main is never left mid-merge | draft |  |
-| S12-04 | card_run profile memory monitor costs under 5% of one card thread | In progress | Lead raises sessions 5 -> 7 (second raise; standing owner rule): sessions 4-5 delivered the throttled scan ... |
+| S12-04 | card_run profile memory monitor costs under 5% of one card thread | Question for the tech lead | The strengthened fallback test fails against HEAD's original tools/card_run (log: C:\Users\xuzhi\Documents\... |
 | S12-05 | DMA end-to-end time - overlap file read, DMA and file write, and copy on the card with more than one thread | draft |  |
 | S12-06 | M4 theme 1 - strict scalar FP conversions and call boundaries (NPB-EP transform and log path, NPB-IS randlc) | Done | Theme 1 (scalar FP conversions and calls in NPB-EP/IS) closed with no compiler change: a card diagnostic sh... |
 | S12-07 | M4 theme 2 - indexed-load scheduling with strict sparse reduction (NPB-CG) | lead | Card run needed (interactive lead only): run .work/_shared/S12-07/sparse-paired via tools/card_run --thread... |
@@ -262,6 +262,7 @@ Current tickets: `[##################--]` 220 of 237
 
 ## Recent activity
 
+- 2026-11-14 15:05 **S12-04** engineer ask: The strengthened fallback test fails against HEAD's original tools/card_run (log: C:\Users\xuzhi\Documents\gcc_knc\.work\_state\logs\S12_04_profile...
 - 2026-11-14 15:05 **S11-26** lead defer: Needs the interactive lead: clean WRF build hits a new ICE (REMEZ, vect_transform_stmt, knc 619e14b479a; repro .work/_shared/wrf-trial/repro/remez....
 - 2026-11-14 15:03 **S12-08** lead answer: Decision: close on the failed premise; no card run. The staged pair only measures the fold-left bridge cost, and your note shows those bridges sit ...
 - 2026-11-14 15:03 **S11-26** engineer ask: Blocked as recorded in f8fe9c32: knc 619e14b479a passes four original reproducers, but clean WRF build and standalone repro/remez.f90 fail in vect_...
@@ -269,7 +270,6 @@ Current tickets: `[##################--]` 220 of 237
 - 2026-11-14 15:01 **S12-19** lead approve-red: S12-19 red is approved: 10 host tests in 2 files now pin the vectorizer triage contract (six real GCC missed reasons, vectorized vs SLP vs unknown,...
 - 2026-11-14 15:01 **S12-17** owner decide: Lead raises sessions 4 -> 6 (second raise): red proof done (exit 125 with main's file); the restore was blocked by a git lock permission, now done ...
 - 2026-11-14 15:01 **S12-08** engineer ask: Phase-1 proof 248edd72: hot ludcmp/cholesky/CG bodies have no stack operands. Ludcmp 128/130 x87 reads are fold-left transfers; outer GPR spills ha...
-- 2026-11-14 15:00 **S12-17** engineer escalate: budget: 4 engineer sessions used; the budget is 4
 
 ## Cost
 
