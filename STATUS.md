@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-14 01:47.
+Updated automatically at every ticket change. Last update: 2026-11-14 01:48.
 
-**Next: GPT-6.1, on S11-02 (card_run and run_suite move bulk data by SCIF DMA at the PCIe link limit, with the SSH stream as fallback).** Run `python tools/dispatch.py`, or ask the tech lead to.
+**Next: the tech lead, on S11-02.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[###################-]` 206 of 213
 
@@ -53,7 +53,7 @@ Current tickets: `[###################-]` 206 of 213
 | S10-12 | cbrt and cbrtf crash (SIGSEGV) in qualify_v1 on the card - root cause and fix | Done | The cbrt and cbrtf qualification jobs no longer crash on the card and pass (worst 0.4996 and 0.4991 ULP): t... |
 | S10-13 | User story - code that calls cbrtl under -march=knc gets a safe replacement and a compile-time warning (MPSS libm cbrtl faults) | Done | Under -march=knc, calls to cbrtl (and std::cbrt on long double) now go to GCC-KNC's own safe cube root with... |
 | S11-01 | User story - the best way to move data between the host and the card, measured, and how our projects use it | Done | We now have a sourced inventory of every host-card transfer path that works without changing MPSS (SSH, tar... |
-| S11-02 | card_run and run_suite move bulk data by SCIF DMA at the PCIe link limit, with the SSH stream as fallback | In progress | Budget raised by the lead under the owner's standing rule: sessions 12 -> 14, the third session extension. ... |
+| S11-02 | card_run and run_suite move bulk data by SCIF DMA at the PCIe link limit, with the SSH stream as fallback | Question for the tech lead | The 01:43 lead instruction requires merging main into s11/S11-02, but the first git merge --no-commit main ... |
 | S11-03 | S11-01 transfer tool rejects the card's physical /tmp path, so the native study never starts | Done | The transfer study's tool now accepts the card's real /tmp location (/var/volatile/tmp), so its card run ca... |
 | S11-04 | S11-01 transfer tool - the host opens every connection, because Windows Firewall blocks inbound TCP from the card | Done | The transfer study's host side now opens every connection to the card, so Windows Firewall no longer blocks... |
 | S11-05 | Research - raise KNC's real memory bandwidth from about 175 GB/s toward 75-85% of peak, with a measured plan | Done | The memory-bandwidth research plan and a validated multithreaded KNC bandwidth benchmark are ready, with a ... |
@@ -238,6 +238,7 @@ Current tickets: `[###################-]` 206 of 213
 
 ## Recent activity
 
+- 2026-11-14 01:48 **S11-02** engineer ask: The 01:43 lead instruction requires merging main into s11/S11-02, but the first git merge --no-commit main command was refused by the PreToolUse ho...
 - 2026-11-14 01:46 **S11-02** owner decide: Budget raised by the lead under the owner's standing rule: sessions 12 -> 14, the third session extension. Each extension made progress; since the ...
 - 2026-11-14 01:46 **S11-02** engineer escalate: budget: 12 engineer sessions used; the budget is 12
 - 2026-11-14 01:45 **S11-02** owner decide: One more review round, granted by the lead under the owner's standing rule. This round is a merge conflict with main (S11-10's output_dir in host_c...
@@ -245,7 +246,6 @@ Current tickets: `[###################-]` 206 of 213
 - 2026-11-14 01:42 **S11-02** owner decide: Lead under the owner's standing rule: back to review. The scripted lead session ended after a merge conflict it could not resolve; the interactive ...
 - 2026-11-14 01:42 **S11-02** lead escalate: lead session ended without a decision (exit 0)
 - 2026-11-14 01:42 **S11-02** lead resume: Lead aborted the failed approval merge; main is clean at 6361d2aa.
-- 2026-11-14 01:40 **S11-02** lead defer: Review of 4aae037c passes, but approve's merge failed: CONFLICT in tools/host_card_transfer.py build() (main's S11-10 output_dir vs branch producti...
 
 ## Cost
 
@@ -257,4 +257,4 @@ Current tickets: `[###################-]` 206 of 213
 
 ## Disk
 
-The project uses 31.7 GiB of 100 GiB. 172 GiB free on the drive.
+The project uses 31.7 GiB of 100 GiB. 169 GiB free on the drive.
