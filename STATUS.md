@@ -84,7 +84,7 @@ Current tickets: `[##################--]` 216 of 230
 | S12-01 | Sprint 12 prep - static code-quality census of the development-corpus builds (spills, x87/vector transfers, addressing, calls, code size) | Done | A static code-quality census (spill/reload proxies, x87 and x87-zmm traffic, address arithmetic, calls, bra... |
 | S12-02 | Sprint 12 prep - the unscored generality check set (S11-20's six programs in the code styles our corpus lacks) | Done | The six unscored generality checks (Q1-Q6: ray tracer hit dispatch and vec3 AoS, Burkardt MD, Reference BLA... |
 | S12-03 | pm.py approve aborts its own merge on conflict and refuses cleanly, so main is never left mid-merge | draft |  |
-| S12-04 | card_run profile memory monitor costs under 5% of one card thread | Tests waiting for review | Expected regression confirmed: test fails because generated monitor contains unsupported fractional sleep 0... |
+| S12-04 | card_run profile memory monitor costs under 5% of one card thread | Changes requested | Red stage must hold only the failing test: commit c122120a also carries the card_run fix, so red-then-green... |
 | S12-05 | DMA end-to-end time - overlap file read, DMA and file write, and copy on the card with more than one thread | draft |  |
 | S12-06 | M4 theme 1 - strict scalar FP conversions and call boundaries (NPB-EP transform and log path, NPB-IS randlc) | In progress | See the resume note: close as premise fails and submit. |
 | S12-07 | M4 theme 2 - indexed-load scheduling with strict sparse reduction (NPB-CG) | Not started |  |
@@ -255,6 +255,7 @@ Current tickets: `[##################--]` 216 of 230
 
 ## Recent activity
 
+- 2026-11-14 14:01 **S12-04** lead changes: Red stage must hold only the failing test: commit c122120a also carries the card_run fix, so red-then-green cannot be shown; split it (test commit ...
 - 2026-11-14 14:01 **S11-12** engineer submit: 437b2a35: T0 56/T1 327 PASS; lead T2 7/7 PASS. Both ICE sweeps zero ICE. Refreshed drill complete: master 14 conflicts, gcc-16 4; PR128640 reviewed...
 - 2026-11-14 14:00 **S12-18** engineer red: Commit 6a256a79. Host Cygwin regression: exp/log/pow each fail as expected after a timing transient; steady controls pass. Real driver accepts one ...
 - 2026-11-14 14:00 **S12-15** engineer ask: Ran submit as instructed; it refused because the committed survey has 848 changed lines against the 800-line budget. The tool permits --override on...
@@ -262,11 +263,10 @@ Current tickets: `[##################--]` 216 of 230
 - 2026-11-14 13:58 **S12-13** lead approve: The project now has a numbered KNC reference index (R01-R27), corrected KNC notes that cite source pages and keep superseded text visible, and an o...
 - 2026-11-14 13:58 **S12-06** lead answer: See the resume note: close as premise fails and submit.
 - 2026-11-14 13:49 **S12-15** lead answer: Lead: no rebase needed. submit only checks rebase for gcc: yes tickets; your diff is one new note and the lead merges. Run pm.py submit now as is.
-- 2026-11-14 13:49 **S12-06** lead resume: Lead 13:50: card result at .work/_shared/S12-06/card.stdout (S12_06_CHECK PASS, 3 pairs per case, cpu=240 label): GCC-KNC is equal or faster than G...
 
 ## Cost
 
-- From the script, engineer: 587 sessions, 1209.5M input tokens
+- From the script, engineer: 588 sessions, 1209.7M input tokens
 - From the script, lead: 388 sessions, 108.3M input tokens
 - Started by hand, Claude: 12 sessions, 3163.3M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
