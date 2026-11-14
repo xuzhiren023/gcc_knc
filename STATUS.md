@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-14 18:13.
+Updated automatically at every ticket change. Last update: 2026-11-14 18:14.
 
-**Next: the tech lead, on S12-29.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: GPT-6.1, on S12-23 (Floating-point environment correctness on KNC - fix the underflow probe that cannot tell flushing from rounding, and handle x87 erratum CD28 (S12-14 N06, N07, B16, B17)).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
 Current tickets: `[##################--]` 226 of 244
 
@@ -109,7 +109,7 @@ Current tickets: `[##################--]` 226 of 244
 | S12-26 | WRF hot scalar routines - classify with the S12-19 triage tool and stage bitwise-safe per-file flag arms for PhiWeather to time | draft |  |
 | S12-27 | Latency-aware scalar loops - GCC-KNC unrolls and interleaves independent iterations and hoists conversions so one thread's every-other-cycle issue and long latencies are hidden automatically | draft |  |
 | S12-28 | dispatch.py refuses to start a second dispatcher on a lane that already has a live one | Done | dispatch.py now refuses to start a second dispatcher on a lane that already has a live one (a lock per lane... |
-| S12-29 | Wrong code - vbroadcastsd reads a 4-byte-aligned SCmode constant (complex float) straight from the constant pool and faults on the card (gcc.c-torture pr38969.c, regression from S11-27) | Question for the tech lead | GCC build needed at 51126f4c232; please build lane gcc and return for tests (AGENTS.md forbids Codex builds... |
+| S12-29 | Wrong code - vbroadcastsd reads a 4-byte-aligned SCmode constant (complex float) straight from the constant pool and faults on the card (gcc.c-torture pr38969.c, regression from S11-27) | lead | GCC build needed, lane gcc at 51126f4c232 (s12/S12-29, .work/_shared/gcc): interactive lead runs python too... |
 | S13-01 | M4 final gate - stage the ADR-0015 gate run at the final head (17 programs, held-out unsealed, six pairs, three profiles) | draft |  |
 | S13-02 | Libgomp per-region thread density - choose 1-4 workers per core per parallel region instead of once per program | draft |  |
 | S13-03 | M4 retrospective - what we did wrong, what worked, and the practice changes carried into the next milestone and the agent-team skill | draft |  |
@@ -269,6 +269,7 @@ Current tickets: `[##################--]` 226 of 244
 
 ## Recent activity
 
+- 2026-11-14 18:14 **S12-29** lead defer: GCC build needed, lane gcc at 51126f4c232 (s12/S12-29, .work/_shared/gcc): interactive lead runs python tools/run.py --name s12_29_build -- python ...
 - 2026-11-14 18:13 **S12-23** lead answer: T2 passed (lead run); submit.
 - 2026-11-14 18:13 **S12-23** lead resume: Lead 18:13: T2 run by the lead on lane 2 (the S5-21 files are lead-owned, not writable by the sandbox): 36 PASS, 0 FAIL, log .work/_state/logs/s12_...
 - 2026-11-14 18:12 **S12-29** engineer ask: GCC build needed at 51126f4c232; please build lane gcc and return for tests (AGENTS.md forbids Codex builds). Fix applies Bm scalar alignment check...
@@ -276,13 +277,12 @@ Current tickets: `[##################--]` 226 of 244
 - 2026-11-14 18:10 **S12-23** engineer ask: Green and payload build/lint PASS; T0/T1 PASS. T2 infrastructure failure: Permission denied writing .work/_shared/S5-21/short-vector-O2-0.mic. Sand...
 - 2026-11-14 18:06 **S12-29** lead approve-red: S12-29 red approved: the new T1 test catches pr38969's card fault (a complex-float constant broadcast from 4-byte-aligned memory, including folded ...
 - 2026-11-14 18:04 **S12-29** engineer red: Red revision 0a8ffa2c: scanner now checks {1to8}/{1to16} memory operands with existing constant/stack alignment checks; unknown addresses fail clos...
-- 2026-11-14 18:01 **S12-29** lead changes: Red is right: main's vbroadcastsd .LC0(%rip) is flagged for 4-byte alignment, which is the pr38969 fault, and the constant/stack-residue tracking a...
 
 ## Cost
 
 - From the script, engineer: 640 sessions, 1271.6M input tokens
 - From the script, lead: 421 sessions, 115.5M input tokens
-- Started by hand, Claude: 12 sessions, 3295.8M input tokens
+- Started by hand, Claude: 12 sessions, 3296.5M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
