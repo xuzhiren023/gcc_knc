@@ -2,7 +2,7 @@
 
 Updated automatically at every ticket change. Last update: 2026-11-14 13:49.
 
-**Next: the tech lead, on S12-13.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: the tech lead, on S12-06.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[##################--]` 215 of 230
 
@@ -86,7 +86,7 @@ Current tickets: `[##################--]` 215 of 230
 | S12-03 | pm.py approve aborts its own merge on conflict and refuses cleanly, so main is never left mid-merge | draft |  |
 | S12-04 | card_run profile memory monitor costs under 5% of one card thread | In progress |  |
 | S12-05 | DMA end-to-end time - overlap file read, DMA and file write, and copy on the card with more than one thread | draft |  |
-| S12-06 | M4 theme 1 - strict scalar FP conversions and call boundaries (NPB-EP transform and log path, NPB-IS randlc) | lead | Needs a card run by the interactive lead (M4 card authorization, <=30 min): run the card_run command in doc... |
+| S12-06 | M4 theme 1 - strict scalar FP conversions and call boundaries (NPB-EP transform and log path, NPB-IS randlc) | Question for the tech lead | Lead 13:50: card result at .work/_shared/S12-06/card.stdout (S12_06_CHECK PASS, 3 pairs per case, cpu=240 l... |
 | S12-07 | M4 theme 2 - indexed-load scheduling with strict sparse reduction (NPB-CG) | Not started |  |
 | S12-08 | M4 theme 3 - dependency-preserving scalar updates and register pressure in dense loops (PB-ludcmp, x87 stack traffic) | Not started |  |
 | S12-09 | Sprint 12 batch check - integrated themes at the final Sprint 12 head, regression evidence, optional modes frozen | draft |  |
@@ -256,13 +256,13 @@ Current tickets: `[##################--]` 215 of 230
 ## Recent activity
 
 - 2026-11-14 13:49 **S12-15** lead answer: Lead: no rebase needed. submit only checks rebase for gcc: yes tickets; your diff is one new note and the lead merges. Run pm.py submit now as is.
+- 2026-11-14 13:49 **S12-06** lead resume: Lead 13:50: card result at .work/_shared/S12-06/card.stdout (S12_06_CHECK PASS, 3 pairs per case, cpu=240 label): GCC-KNC is equal or faster than G...
 - 2026-11-14 13:44 **S12-16** lead approve: Whole-system tuning playbook for the Z840 + Phi done: 13 ordered steps (BIOS, host Linux, card power/pages/service core, transfers, MPI, runtimes) ...
 - 2026-11-14 13:36 **S12-15** engineer ask: Survey committed: 61ecb62e, docs/research/phi-literature-survey.md. 30 ranked source groups; 30 PDFs/extracts in .work/_shared/phi-literature/ (45....
 - 2026-11-14 13:35 **S12-17** lead answer: Do not amend or split 71cbcf86. Instead prove red: temporarily check out tools/claude-torture.c from main (git checkout main -- tools/claude-tortur...
 - 2026-11-14 13:35 **S12-13** engineer submit: Corrected all four R09 passages at 173633ac after reading local pp.4-5: p.4 libhugetlbfs on MPSS 2.1.4346-16; p.5 THP-stack results on 7110P 2.1.49...
 - 2026-11-14 13:34 **S12-16** engineer submit: Committed 100ecad0: docs/research/system-tuning-playbook.md covers versioned evidence, settings, verification, effects, risks, rollback and a 75-12...
 - 2026-11-14 13:33 **S12-17** engineer ask: Red test unexpectedly passed because the pending fix was included in the worktree and pm.py commit stages all changes: commit 71cbcf86 contains bot...
-- 2026-11-14 13:32 **S12-17** lead answer: See the resume note above for the working host-test command.
 
 ## Cost
 
