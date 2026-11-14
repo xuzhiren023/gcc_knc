@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-14 17:06.
+Updated automatically at every ticket change. Last update: 2026-11-14 17:07.
 
-**Next: GPT-6.1, on S12-21 (Scheduling model for M4's serial runs - measure density-1 tuning and the integer-multiply cost against today's density-4 defaults (S12-14 B02, B04, B05)).** Run `python tools/dispatch.py`, or ask the tech lead to.
+**Next: the tech lead, on S12-22.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[##################--]` 225 of 242
 
@@ -102,7 +102,7 @@ Current tickets: `[##################--]` 225 of 242
 | S12-19 | Profile-guided missed-vectorization triage - join hot loops with the vectorizer's reasons and observed strides/masks, so tuning targets what is hot and fixable | Done | tools/vec_triage.py now ranks each development program's hot loops by sampled time with GCC's vectorizer ve... |
 | S12-20 | libknc_vmath accuracy and exception contract, with an independent validation design (rounding modes, special values, flags, scalar fallback) | draft |  |
 | S12-21 | Scheduling model for M4's serial runs - measure density-1 tuning and the integer-multiply cost against today's density-4 defaults (S12-14 B02, B04, B05) | In progress | Lead 16:20: phase 1 accepted as staged (r2). No submit yet: the lead runs r2/batch.sh tonight in card windo... |
-| S12-22 | Low-risk corrections from the S12-14 audit - wrong comments and citations (N01-N09) and the far-prefetch-distance range bug (B10) | In progress | Built; run green and submit. |
+| S12-22 | Low-risk corrections from the S12-14 audit - wrong comments and citations (N01-N09) and the far-prefetch-distance range bug (B10) | Waiting for review | Lead built gcc2 f0534648890. T1 green: all 6 boundary/prefetch checks PASS (red bf225397); log .work/_state... |
 | S12-23 | Floating-point environment correctness on KNC - fix the underflow probe that cannot tell flushing from rounding, and handle x87 erratum CD28 (S12-14 N06, N07, B16, B17) | Not started |  |
 | S12-24 | ICE in vect_transform_stmt (tree-vect-stmts.cc:13381) on WRF's REMEZ at -mphinix (-O3 -march=knc) | Not started |  |
 | S12-25 | WRF smpar build arm with --param=knc-threads-per-core=2 for PhiWeather's 2-threads-per-core runs (A/B against S11-26's default-4 build) | draft |  |
@@ -267,6 +267,7 @@ Current tickets: `[##################--]` 225 of 242
 
 ## Recent activity
 
+- 2026-11-14 17:07 **S12-22** engineer submit: Lead built gcc2 f0534648890. T1 green: all 6 boundary/prefetch checks PASS (red bf225397); log .work/_state/logs/S12_22_b10_green-20261114-165258.l...
 - 2026-11-14 17:06 **S12-28** lead approve: dispatch.py now refuses to start a second dispatcher on a lane that already has a live one (a lock per lane, reclaimed when its process is gone), s...
 - 2026-11-14 16:55 **S12-28** engineer submit: Implementation 06c94150; red test 73aa76d0. Prior session ran all 3 isolated host tests successfully: same-lane refusal with PID, different-lane ov...
 - 2026-11-14 16:53 **S12-28** lead answer: Yes, submit with --override 'test size: ticket requires real subprocess dispatchers with fake sessions; 3 tests cover the 5 asked behaviours'. Revi...
@@ -274,13 +275,12 @@ Current tickets: `[##################--]` 225 of 242
 - 2026-11-14 16:51 **S12-22** lead answer: Built; run green and submit.
 - 2026-11-14 16:51 **S12-22** lead resume: Lead 17:00: lane 2 built at f0534648890 (PASS, 5.4 min). Run T1 green on bf225397 red test, T0, and submit. The lead runs x86 identity. ADR-0009 (N...
 - 2026-11-14 16:45 **S12-22** lead defer: Interactive lead needed: build lane-2 GCC (KNC_GCC_SLOT=2) at gcc-2 s12/S12-22 f0534648890 (B10 fix: l2 range 2..4096, silent l1=l2-1 clamp; N01-N0...
-- 2026-11-14 16:43 **S12-22** engineer ask: GCC build needed at f0534648890 (gcc2). Red bf225397: S8-03 runner rejects neither L2=1 nor wrong near hint for L1=8/L2=4; four existing tests pass...
 
 ## Cost
 
 - From the script, engineer: 631 sessions, 1262.8M input tokens
 - From the script, lead: 414 sessions, 113.9M input tokens
-- Started by hand, Claude: 12 sessions, 3260.7M input tokens
+- Started by hand, Claude: 12 sessions, 3261.3M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
