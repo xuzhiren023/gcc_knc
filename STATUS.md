@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-14 17:54.
+Updated automatically at every ticket change. Last update: 2026-11-14 17:55.
 
-**Next: GPT-6.1, on S12-07 (M4 theme 2 - indexed-load scheduling with strict sparse reduction (NPB-CG)).** Run `python tools/dispatch.py`, or ask the tech lead to.
+**Waiting for you:** S12-21. Run `python tools/pm.py inbox`.
 
 Current tickets: `[##################--]` 226 of 244
 
@@ -101,7 +101,7 @@ Current tickets: `[##################--]` 226 of 244
 | S12-18 | Double-precision vector exp, log and pow ran slower than scalar libm on the card (0.82x, 0.63x, 0.49x) - confirm with valid batches, then fix the library or stop the vectorizer calling them where they lose | lead | Needs interactive lead: (1) exclusive card turn running .work/_shared/S12-18/vmath-bench.mic at full, 3100 ... |
 | S12-19 | Profile-guided missed-vectorization triage - join hot loops with the vectorizer's reasons and observed strides/masks, so tuning targets what is hot and fixable | Done | tools/vec_triage.py now ranks each development program's hot loops by sampled time with GCC's vectorizer ve... |
 | S12-20 | libknc_vmath accuracy and exception contract, with an independent validation design (rounding modes, special values, flags, scalar fallback) | draft |  |
-| S12-21 | Scheduling model for M4's serial runs - measure density-1 tuning and the integer-multiply cost against today's density-4 defaults (S12-14 B02, B04, B05) | In progress | Lead 16:20: phase 1 accepted as staged (r2). No submit yet: the lead runs r2/batch.sh tonight in card windo... |
+| S12-21 | Scheduling model for M4's serial runs - measure density-1 tuning and the integer-multiply cost against today's density-4 defaults (S12-14 B02, B04, B05) | **Waiting for you** | budget: 4 engineer sessions used; the budget is 4 |
 | S12-22 | Low-risk corrections from the S12-14 audit - wrong comments and citations (N01-N09) and the far-prefetch-distance range bug (B10) | Done | The audit's comment and citation fixes are in GCC-KNC and the far prefetch distance can no longer be set eq... |
 | S12-23 | Floating-point environment correctness on KNC - fix the underflow probe that cannot tell flushing from rounding, and handle x87 erratum CD28 (S12-14 N06, N07, B16, B17) | lead | GCC build needed on lane gcc2 at gcc commit 02f32213c0d (branch s12/S12-23 in .work/_shared/gcc-2 tree): in... |
 | S12-24 | ICE in vect_transform_stmt (tree-vect-stmts.cc:13381) on WRF's REMEZ at -mphinix (-O3 -march=knc) | Not started |  |
@@ -269,6 +269,7 @@ Current tickets: `[##################--]` 226 of 244
 
 ## Recent activity
 
+- 2026-11-14 17:55 **S12-21** engineer escalate: budget: 4 engineer sessions used; the budget is 4
 - 2026-11-14 17:54 **S12-07** lead answer: Go: fix and restage.
 - 2026-11-14 17:54 **S12-07** lead resume: Card window 1 result is in the ticket body: fix the single-CPU check and restage.
 - 2026-11-14 17:53 **S12-23** lead defer: GCC build needed on lane gcc2 at gcc commit 02f32213c0d (branch s12/S12-23 in .work/_shared/gcc-2 tree): interactive lead runs python tools/run.py ...
@@ -276,13 +277,12 @@ Current tickets: `[##################--]` 226 of 244
 - 2026-11-14 17:47 **S12-23** lead approve-red: S12-23 red accepted: the tests fail for the right reasons (the old underflow probe rounds to zero in both modes, the Fortran clear routes lack the ...
 - 2026-11-14 17:45 **S12-23** engineer red: Red b385d00b. s12-23-red failed as expected: old underflow probe rounds to zero; both Fortran clear routes lack FNSAVE/FRSTOR; fixture sets reserve...
 - 2026-11-14 17:39 **S12-22** lead approve: The audit's comment and citation fixes are in GCC-KNC and the far prefetch distance can no longer be set equal to the near one (range now 2-4096, n...
-- 2026-11-14 17:07 **S12-22** engineer submit: Lead built gcc2 f0534648890. T1 green: all 6 boundary/prefetch checks PASS (red bf225397); log .work/_state/logs/S12_22_b10_green-20261114-165258.l...
 
 ## Cost
 
 - From the script, engineer: 634 sessions, 1266.2M input tokens
 - From the script, lead: 416 sessions, 114.4M input tokens
-- Started by hand, Claude: 12 sessions, 3275.1M input tokens
+- Started by hand, Claude: 12 sessions, 3277.0M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
