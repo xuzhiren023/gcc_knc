@@ -170,6 +170,10 @@ M1 is accepted and tagged `m1` locally; nothing is pushed. Engineers are Claude 
   - PhiWeather's card queue: 8 forecast runs of about 2.1 h from 09:12 EST, ending about 02:00-03:00 EST 2026-11-15. Their chain yields between runs to a queued GCC-KNC ledger row: for S11-12, queue a ledger row and message them.
   - Card turn ended 08:25 EST; PhiWeather told "done". S11-12 (batch check) and any S11-17/S11-28 follow-up card work go to the next turn.
 
+- **Owner 2026-11-14 11:10 EST: "Bring M4 to closure dont wait for my approval, coordinate with wrf project".** The lead runs S11-12, Sprints 12-13 and the M4 final gate without per-step approval.
+  - 11:20: tree 1 already built at knc 619e14b479a (S11-27 merged); lane 1 prefix reinstall started from a temporary lead worktree `.work/lead-prefix` (s7_09_checks.py must run under `.work/`). Lane 2 tree moved to the same head; its build and install follow.
+  - PhiWeather 11:25: chain hn12b yields to a queued ledger row at each run boundary (~2.1 h runs, last ends ~2-3 AM Nov 15). Their physics batch (~8.5 h, not queued yet) will wait behind our M4 timed row if we send size and timing first. They want S11-26 after our S11-12 staging uploads finish.
+
 - **Next card turn plan, owner 2026-11-13 19:55 EST: batch every job that can share the card. Owner approved the whole plan at 20:05 EST, the HPCG pilot included.** Card_run holds an exclusive lock, so batching means one combined card_run with cases pinned one per core, not concurrent card_runs.
   - Round 1 (correctness only, cases pinned per core), chained with no gap: S11-27 `verify-card.py` (8 cases in one card_run, staged at 89a3657a), then S11-17 `controls/controls-lead.ps1` train phase (about 1 min). S11-17's run is its own card_run because its script fetches the .gcda profiles back; merging them would save about a minute.
   - Round 2: S11-29 profile cases (one card_run per profile, per its ticket; HPCG at 224/236 threads fills the card).
