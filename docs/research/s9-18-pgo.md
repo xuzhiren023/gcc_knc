@@ -539,3 +539,32 @@ completed zlib path for further development-program experiments, retaining plain
 -O2 pairs, separate pilot/confirm results and per-profile variation. Zlib's
 0.7-0.9% observed median gain does not promise a general performance win.
 Never train on held-out programs or the frozen evaluation input.
+
+## Lessons from PhiWeather's first WRF PGO attempt (2026-11-12, for our own PGO work)
+
+Source: our review `docs/reviews/2026-11-12-phiweather-pgo-review.md` (S11-22) of PhiWeather's GCC 5.1.1 k1om
+instrumented PGO on WRF (their write-up: `PhiWeather/docs/implementation/PGO_KNC_LESSONS_20261112.md`, read-only).
+Apply these when S11-17 and Sprint 12 put PGO on whole programs.
+
+- **Build identity:** GCC 5 hashes the object's `-o` path into non-public function ids, so the `-fprofile-use` build
+  must reuse the instrumented `-o` path (check whether GCC 16 does the same before relying on it).
+- **Silent failures:** under `-w`, a missing or mismatched `.gcda` is silent. Never build `-fprofile-use` with `-w`;
+  treat "profile not found", "coverage mismatch" and checksum warnings as errors, and **enforce** that the profile was
+  consumed (positive execution counts in the use build), not only that the code changed.
+- **Instrumentation changes the code:** `-fprofile-generate` changes inlining, so the training binary is not the
+  production binary; `-fprofile-use` re-enables loop-to-`memset`/`memcpy` idiom recognition (their use build gained
+  694 memset and 182 memcpy call sites and grew hot objects 26.8%). Check hot-code growth and helper calls in the A/B.
+- **Threads:** GCC 5's counters are not atomic, so they trained one thread per rank; GCC 16 has
+  `-fprofile-update=atomic` (we already use it, S9-18), which lets training use the production thread layout.
+- **Representativeness is the main risk:** train on inputs and layouts like production; exclude warm-up from both
+  training and the timing statistic consistently; keep training and evaluation inputs distinct and never train on
+  held-out programs; when merging profiles (`gcov-tool`), know that the default weights cases unequally.
+- **Where PGO pays:** branchy, call-heavy, indirect-dispatch code (our 19-21% microcases, SQLite/zlib-style code), not
+  regular floating-point loops with predictable branches (their near-zero WRF result is plausible even with correct
+  feedback). Diagnose a restricted-flags twin against the full PGO build before adding objects; check hot/cold
+  placement (`-freorder-functions`, `-freorder-blocks-and-partition`); value profiling is on by default.
+- **Measurement:** one A/B pair cannot detect 1-2%. Freeze one statistic, run about 5 pilot pairs to estimate the paired
+  spread, then a frozen confirmatory block (about 10 pairs at 1% spread, more if larger), balanced ordering (C T T C),
+  keeping every valid result (ADR-0010, ADR-0015).
+- **Numerics:** a PGO image is not bitwise identical (x87 rounding can change through spills); validate with a
+  calibrated tolerance gate that is shown to reject a faulty result.

@@ -1,10 +1,10 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-12 18:05.
+Updated automatically at every ticket change. Last update: 2026-11-14 08:48.
 
-**Next: the tech lead, on S11-02.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: GPT-6.1, on S11-28 (HPCG run that fits every card model - fixed work instead of fixed duration, grid sized to the 3100's memory).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
-Current tickets: `[###################-]` 197 of 201
+Current tickets: `[###################-]` 209 of 216
 
 ## Milestones
 
@@ -14,7 +14,7 @@ Current tickets: `[###################-]` 197 of 201
 | M1 | Mixed native code | Done | 43 of 43 tickets |
 | M2 | Useful vector target | Done | 51 of 51 tickets |
 | M3 | Runtimes | Done | 48 of 48 tickets |
-| M4 | Broad optimization | In progress | 15 of 19 tickets |
+| M4 | Broad optimization | In progress | 27 of 34 tickets |
 | M5 | Program corpus | Not started | Not planned in detail yet |
 | M6 | Release | Not started | Not planned in detail yet |
 
@@ -53,7 +53,7 @@ Current tickets: `[###################-]` 197 of 201
 | S10-12 | cbrt and cbrtf crash (SIGSEGV) in qualify_v1 on the card - root cause and fix | Done | The cbrt and cbrtf qualification jobs no longer crash on the card and pass (worst 0.4996 and 0.4991 ULP): t... |
 | S10-13 | User story - code that calls cbrtl under -march=knc gets a safe replacement and a compile-time warning (MPSS libm cbrtl faults) | Done | Under -march=knc, calls to cbrtl (and std::cbrt on long double) now go to GCC-KNC's own safe cube root with... |
 | S11-01 | User story - the best way to move data between the host and the card, measured, and how our projects use it | Done | We now have a sourced inventory of every host-card transfer path that works without changing MPSS (SSH, tar... |
-| S11-02 | card_run and run_suite move bulk data by SCIF DMA at the PCIe link limit, with the SSH stream as fallback | Tests waiting for review | Red commit f8d553f8. tools/run.py --name s11-02-dma-red ran tests/tools/test_card_dma.py once: 7 expected f... |
+| S11-02 | card_run and run_suite move bulk data by SCIF DMA at the PCIe link limit, with the SSH stream as fallback | Done | card_run and run_suite now move large files to and from the card by SCIF DMA at about 1.4 GB/s up and 1.67 ... |
 | S11-03 | S11-01 transfer tool rejects the card's physical /tmp path, so the native study never starts | Done | The transfer study's tool now accepts the card's real /tmp location (/var/volatile/tmp), so its card run ca... |
 | S11-04 | S11-01 transfer tool - the host opens every connection, because Windows Firewall blocks inbound TCP from the card | Done | The transfer study's host side now opens every connection to the card, so Windows Firewall no longer blocks... |
 | S11-05 | Research - raise KNC's real memory bandwidth from about 175 GB/s toward 75-85% of peak, with a measured plan | Done | The memory-bandwidth research plan and a validated multithreaded KNC bandwidth benchmark are ready, with a ... |
@@ -66,11 +66,26 @@ Current tickets: `[###################-]` 197 of 201
 | S11-12 | Sprint 11 batch check - full native suite, x86 identity, forward-port drill, ICE sweeps, runtime prefix consistency | draft |  |
 | S11-13 | Senior compiler review of the Sprint 11-13 scope (Milestone M4) against our research, with recommended plan changes | Done | A senior compiler review of the Sprint 11-13 plan is in: M4 is plausible but needs a frozen scoring and mea... |
 | S11-14 | M4 scoring contract and measurement protocol, frozen before any tuning | Done | M4's scoring contract is frozen in ADR-0015 with a tested scorer: strict serial -O2 versus -O2 over 17 prog... |
-| S11-15 | First development-corpus baseline and profile, GCC 5.1.1 vs GCC-KNC at -O2 (E7-03 part 1) | Not started | Ready. S11-18 (harness v2) is merged and staged at .work/_shared/S11-18/ (lead.ps1: 468 launches, 7120/3100... |
+| S11-15 | First development-corpus baseline and profile, GCC 5.1.1 vs GCC-KNC at -O2 (E7-03 part 1) | Done | The M4 development baseline is written up in docs/research/m4-baseline.md: GCC-KNC vs GCC 5.1.1 paired -O2 ... |
 | S11-16 | Long-double libm hazard audit - do other MPSS long double entry points fault like cbrtl? (E7-21, bounded) | Done | The card's MPSS long double libm was probed on the card: of 12 entry points only cbrtl faults, and S10-13 a... |
-| S11-17 | PGO feasibility on one complete development program (reuse of S9-18's train/use path) | Not started | Ready (S11-18 merged; corpus builds staged in .work/_shared/S11-18/). Lane pgo. Build the training and use ... |
+| S11-17 | PGO feasibility on one complete development program (reuse of S9-18's train/use path) | lead | Interactive lead at 8601f1fb, S11-17 worktree. Yes, main is the target for gcc: no (knc applies only to the... |
 | S11-18 | M4 corpus harness v2 - card profiles, prefix record, held-out sealing, stronger checks, and the donor-failure rule | Done | The M4 corpus harness now stages all 17 programs for the 7120 and the 3100/5100 profiles with serial voting... |
 | S11-19 | Second senior review - the M4 definition and the Sprint 11-13 roadmap, adjusted | Done | The M4 definition and the Sprint 11-13 roadmap are rewritten as measure, improve, decide, each sprint with ... |
+| S11-20 | Research - which compiler optimizations benefit the widest range of real code on KNC, from professional to amateur, and does our corpus cover it? | Done | We now have a code-style coverage study (docs/research/code-style-coverage.md) that ranks Sprint 12 candida... |
+| S11-21 | Exploratory WRF build with GCC-KNC (learn-only, host-side) - how far does an unmodified WRF get, and what breaks? | Done | WRF v4.8.0 builds with GCC-KNC (serial em_real, -O2 -march=knc, netCDF built with GCC-KNC, GCC 16 runtimes ... |
+| S11-22 | Review PhiWeather's first instrumented-PGO attempt on WRF (GCC 5.1.1, k1om) - method, near-zero gain, tolerance gate | Done | PhiWeather's first WRF PGO attempt is reviewed for their lead: the collection and use pipeline is credible,... |
+| S11-23 | ICE in WRF's RRTM radiation (rtrn) at -O2 -march=knc - unrecognizable insn after reload, and sub-512-bit SLP vectors under KNC | Done | WRF's RRTM radiation and the -O3 OpenMP WRF files that crashed GCC-KNC after reload (rtrn, kfcps, advance_u... |
+| S11-24 | WRF OpenMP (smpar) build with GCC-KNC at -mphinix, for PhiWeather's benchmark - replaces the serial trial build | Done | WRF v4.8.0 now builds as an OpenMP card binary at -mphinix with GCC-KNC (wrf.exe and real.exe linked, needi... |
+| S11-25 | ICE in do_store_flag (expr.cc) on WRF's surface layer (SFCLAY1D) at -O2 -march=knc | Done | The last WRF file that crashed GCC-KNC (surface layer, SFCLAY1D) now compiles: vector 'ordered and not equa... |
+| S11-26 | WRF OpenMP build at -mphinix with no per-file workarounds (S11-23 and S11-25 fixed), restaged for PhiWeather | draft | Owner 2026-11-13: the S11-24 WRF build is removed. Deleted: |
+| S11-27 | Wrong code - NPB-MG (class A, serial) built by GCC-KNC at -O2 -march=knc fails NPB verification on the card | Done | NPB-MG built by GCC-KNC at -O2 -march=knc now verifies on the card (class A in 14.1 s, against 33.8 s for G... |
+| S11-28 | HPCG run that fits every card model - fixed work instead of fixed duration, grid sized to the 3100's memory | In progress | finalize-pilot.py ran 2026-11-14 08:46 EST at aad1ae22 from the S11-28 worktree: PASS, log .work/_state/log... |
+| S11-29 | card_run profiles limit memory in use, not address space, so a 3100 or 5100 run fails only where the real card would | Done | Under --profile 3100 and 5100, card_run now limits the memory a job actually uses (sampled resident plus sw... |
+| S12-01 | Sprint 12 prep - static code-quality census of the development-corpus builds (spills, x87/vector transfers, addressing, calls, code size) | Done | A static code-quality census (spill/reload proxies, x87 and x87-zmm traffic, address arithmetic, calls, bra... |
+| S12-02 | Sprint 12 prep - the unscored generality check set (S11-20's six programs in the code styles our corpus lacks) | Done | The six unscored generality checks (Q1-Q6: ray tracer hit dispatch and vec3 AoS, Burkardt MD, Reference BLA... |
+| S12-03 | pm.py approve aborts its own merge on conflict and refuses cleanly, so main is never left mid-merge | draft |  |
+| S12-04 | card_run profile memory monitor costs under 5% of one card thread | draft |  |
+| S12-05 | DMA end-to-end time - overlap file read, DMA and file write, and copy on the card with more than one thread | draft |  |
 | S2-01 | Design for zmm and mask registers under -march=knc | Done | The register design for KNC is settled on paper: all 32 zmm and 8 mask registers become usable under -march... |
 | S2-02 | Float and double arguments and results in zmm lane 0 | Done | Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`). |
 | S2-03 | Varargs with the donor's register save area | Done | Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`). |
@@ -226,23 +241,23 @@ Current tickets: `[###################-]` 197 of 201
 
 ## Recent activity
 
-- 2026-11-12 18:10 **S11-17** lead note: Ready (S11-18 merged; corpus builds staged in .work/_shared/S11-18/). Lane pgo. Build the training and use variants for one development program (zl...
-- 2026-11-12 18:10 **S11-15** lead note: Ready. S11-18 (harness v2) is merged and staged at .work/_shared/S11-18/ (lead.ps1: 468 launches, 7120/3100/5100, pilot pairs 3). The lead runs the...
-- 2026-11-12 18:05 **S11-18** lead approve: The M4 corpus harness now stages all 17 programs for the 7120 and the 3100/5100 profiles with serial voting builds, launch-to-exit timing, complete...
-- 2026-11-12 18:05 **S11-02** engineer red: Red commit f8d553f8. tools/run.py --name s11-02-dma-red ran tests/tools/test_card_dma.py once: 7 expected failures, missing tools/card_dma.py. Fake...
-- 2026-11-12 17:55 **S11-19** lead approve: The M4 definition and the Sprint 11-13 roadmap are rewritten as measure, improve, decide, each sprint with a plain-language goal, reason and comple...
-- 2026-11-12 17:55 **S11-18** engineer submit: 3684eca9: ADR-0015 RAW launch-to-exit; --pairs 3/6. 9 host tests pass; launcher+20 builds linted. Logs: .work/_state/logs/S11_18_adr_{green-2026111...
-- 2026-11-12 17:54 **S11-02** lead answer: Acceptance is written (top of the ticket): DMA by receiver-pull scif_readfrom for files of 1 MiB or more, SSH stream for small files and fallback, ...
-- 2026-11-12 17:54 **S11-02** owner decide: Owner 2026-11-12 17:50 EST: "s11-02 approved by me". Acceptance written by the lead from the measured DMA results.
+- 2026-11-14 08:48 **S11-28** lead answer: finalize-pilot.py ran 2026-11-14 08:46 EST at aad1ae22 from the S11-28 worktree: PASS, log .work/_state/logs/S11_28_finalize_pilot-20261114-084648....
+- 2026-11-14 08:47 **S11-28** lead resume: Lead ran finalize-pilot at 08:46 EST: results in the answer.
+- 2026-11-14 08:43 **S11-28** lead defer: Needs the interactive lead (write access to .work/_shared/S11-28/): from repo root at aad1ae22 run the staged finalize-pilot.py so results.jsonl ke...
+- 2026-11-14 08:42 **S11-17** lead defer: Interactive lead at 8601f1fb, S11-17 worktree. Yes, main is the target for gcc: no (knc applies only to the gcc tree). The engineer cannot write .g...
+- 2026-11-14 08:33 **S11-28** engineer ask: aad1ae22 records native pilot: 30 effective launches VALID/sets=1; six equal-work serial pairs. Reconciliation validates captures but results.jsonl...
+- 2026-11-14 08:31 **S11-17** engineer ask: 8601f1fb: final write-up records all pilot/confirm spreads, 900 checked batches, 30/30 launches; T1 previously 5/5 green. Branch/indirect/division ...
+- 2026-11-14 08:23 **S11-17** owner decide: Budget raised by the lead under the owner's standing rule: sessions 9 -> 11. Progress since the last raise: 10 profiles trained, T1 5/5 green, timi...
+- 2026-11-14 08:22 **S11-28** lead answer: HPCG pilot ran 2026-11-14 02:15-07:40 EST (325 min), log .work/_state/logs/S11_28_pilot-20261114-021459.log, captures .work/_shared/S11-28/pilot/, ...
 
 ## Cost
 
-- From the script, engineer: 481 sessions, 1019.3M input tokens
-- From the script, lead: 308 sessions, 88.3M input tokens
-- Started by hand, Claude: 12 sessions, 2737.8M input tokens
+- From the script, engineer: 566 sessions, 1148.9M input tokens
+- From the script, lead: 375 sessions, 104.7M input tokens
+- Started by hand, Claude: 12 sessions, 3093.9M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 25.2 GiB of 100 GiB. 78 GiB free on the drive.
+The project uses 31.7 GiB of 100 GiB. 152 GiB free on the drive.

@@ -27,6 +27,7 @@ class CardBackend(unittest.TestCase):
         self.addCleanup(receipt_patch.stop)
         self.remote = (ROOT / "tools/card_run_remote.sh").read_text()
         self.session = object.__new__(self.runner["SSHSession"])
+        self.session.transfers = []
         self.session.run_dir = "/tmp/claude/claude-" + uuid.uuid4().hex
         self.session.boot_id = "test-boot"
         self.session.transport_timeout = 1
@@ -62,6 +63,7 @@ class CardBackend(unittest.TestCase):
         child = mock.Mock(returncode=0)
         child.communicate.return_value = (b"", b"")
         data = bytes(range(256)) + b"\ncard_rc=0\x00\xff"
+        self.session.rpc.return_value = str(len(data)).encode()
         with mock.patch.object(self.runner["subprocess"], "Popen", return_value=child) as spawn:
             self.assertTrue(hasattr(self.session, "send_file"), "raw SSH upload must be implemented")
             self.session.send_file("claude-program", data, 2)
@@ -69,7 +71,10 @@ class CardBackend(unittest.TestCase):
         command = spawn.call_args.args[0]
         self.assertEqual(command[0], "fake-ssh")
         self.assertIn("guard_boot", command[-1])
-        self.assertIn("cat > claude-program", command[-1])
+        self.assertIn("cat > claude-part-", command[-1])
+        length, publish = self.session.rpc.call_args_list
+        self.assertIn("wc -c < claude-part-", length.args[0])
+        self.assertRegex(publish.args[0], r"chmod 700 -- (claude-part-[0-9a-f]+) && mv -- \1 claude-program$")
         self.assertNotIn("base64", command[-1])
 
     def test_extra_files_raw_upload_modes_and_cleanup_with_card_sized_proc(self):

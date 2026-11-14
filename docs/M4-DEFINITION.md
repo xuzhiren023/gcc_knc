@@ -52,7 +52,7 @@ Classify each proposed ticket before accepting it:
 | Work | Admission and exit evidence | Boundary |
 |---|---|---|
 | Harness, donor and runtime setup, profiles (S11) | Frozen equal work, independent checks, sealed held-out data, usable profiles | Infrastructure enables tuning; no speedup required |
-| Scalar, locality, scheduling and register pressure, prefetch and stores, unroll, calls and code size (S12) | Profile-selected general remedy; the intended generated code and paired whole-program benefit with controls | At most three implementation themes; no kernel-only justification |
+| Scalar, locality, scheduling and register pressure, prefetch and stores, unroll, calls and code size (S12) | Profile-selected general remedy; the intended generated code and paired whole-program benefit with controls | One round of three to at most five implementation themes, chosen for the widest benefit across code styles (S11-20); no kernel-only justification |
 | Strict defaults (S12) | Same proof as a primary performance change | No implicit fast-math, FTZ or reassociation |
 | PGO, `-mphinix`, OpenMP (S11 feasibility, S12 qualification) | Disclosed semantics and resources, measured panel results; separate PGO training and evaluation | No primary credit; donor PGO required for PGO competitiveness |
 | Libm, ABI and prefix hazards and batches (S11-S13) | Reproducer or contract obligation, correctness and portability evidence at the relevant head | Bounded repairs, not a replacement library or runtime project |
@@ -70,7 +70,7 @@ required, but DMA rollout or a bandwidth target is not: transfers are outside pr
 only through the admission rules ([ADR-0015], Timed boundaries; [first review], finding 3).
 
 - **S11 - measure:** valid experiment, private held-out performance data, development measurements and an affordable shortlist.
-- **S12 - improve:** at most three measured themes, integrated regression evidence and frozen optional modes.
+- **S12 - improve:** one round of three to at most five broad, measured themes, integrated regression evidence and frozen optional modes.
 - **S13 - decide:** final-head qualification, complete gate, at most one repair retry and owner decision.
 
 [ADR-0015]: adr/0015-m4-scoring-and-measurement.md
