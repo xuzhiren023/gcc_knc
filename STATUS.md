@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-14 12:04.
+Updated automatically at every ticket change. Last update: 2026-11-14 12:05.
 
-**Next: the tech lead, on S12-06.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: GPT-6.1, on S11-12 (Sprint 11 batch check - full native suite, x86 identity, forward-port drill, ICE sweeps, runtime prefix consistency).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
 Current tickets: `[###################-]` 211 of 222
 
@@ -86,7 +86,7 @@ Current tickets: `[###################-]` 211 of 222
 | S12-03 | pm.py approve aborts its own merge on conflict and refuses cleanly, so main is never left mid-merge | draft |  |
 | S12-04 | card_run profile memory monitor costs under 5% of one card thread | draft |  |
 | S12-05 | DMA end-to-end time - overlap file read, DMA and file write, and copy on the card with more than one thread | draft |  |
-| S12-06 | M4 theme 1 - strict scalar FP conversions and call boundaries (NPB-EP transform and log path, NPB-IS randlc) | Question for the tech lead | Phase-1 diagnostics committed at 6de080e6; GCC unchanged. AGENTS bars engineer card jobs. Please run the si... |
+| S12-06 | M4 theme 1 - strict scalar FP conversions and call boundaries (NPB-EP transform and log path, NPB-IS randlc) | lead | Needs a card run by the interactive lead (M4 card authorization, <=30 min): run the card_run command in doc... |
 | S12-07 | M4 theme 2 - indexed-load scheduling with strict sparse reduction (NPB-CG) | Not started |  |
 | S12-08 | M4 theme 3 - dependency-preserving scalar updates and register pressure in dense loops (PB-ludcmp, x87 stack traffic) | Not started |  |
 | S12-09 | Sprint 12 batch check - integrated themes at the final Sprint 12 head, regression evidence, optional modes frozen | draft |  |
@@ -247,6 +247,7 @@ Current tickets: `[###################-]` 211 of 222
 
 ## Recent activity
 
+- 2026-11-14 12:05 **S12-06** lead defer: Needs a card run by the interactive lead (M4 card authorization, <=30 min): run the card_run command in docs/research/s12-06-scalar-fp.md (threads ...
 - 2026-11-14 12:04 **S12-06** engineer ask: Phase-1 diagnostics committed at 6de080e6; GCC unchanged. AGENTS bars engineer card jobs. Please run the single paired batch in docs/research/s12-0...
 - 2026-11-14 12:03 **S11-12** lead answer: Yes: submit 437b2a35 with --override 'batch check: 1092 lines are research notes, drill record and the staging script; tests/baseline/S11-12-prefix...
 - 2026-11-14 12:01 **S11-12** engineer ask: Submission of lead-approved 437b2a35 is blocked by budget checks: 1092 changed lines versus 500, and 1 new test file versus 0. Reproducer: python t...
@@ -254,13 +255,12 @@ Current tickets: `[###################-]` 211 of 222
 - 2026-11-14 12:00 **S11-12** lead resume: Lead: type changed to check (as S10-05; S12-09 too). Submit 437b2a35 with docs/research/S11-12-batch.md.
 - 2026-11-14 11:59 **S11-12** lead defer: Needs the interactive lead: change S11-12's ticket field type: code -> type: check (as S10-05, the Sprint 10 batch check) so submit no longer requi...
 - 2026-11-14 11:58 **S11-12** engineer ask: 437b2a35: drill complete (master 14 conflicts, gcc-16 4; PR128640 reviewed); both prefixes GCC 16.2.0 at 619e14b479a per lead, vmath 26 members eac...
-- 2026-11-14 11:54 **S12-10** lead answer: Lead 12:25 EST: phase 1 accepted; the corrections table is useful. Start phase 2: broad, deep live web research and document retrieval. Priorities:...
 
 ## Cost
 
 - From the script, engineer: 573 sessions, 1165.1M input tokens
 - From the script, lead: 380 sessions, 105.7M input tokens
-- Started by hand, Claude: 12 sessions, 3127.1M input tokens
+- Started by hand, Claude: 12 sessions, 3128.1M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
