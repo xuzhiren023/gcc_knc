@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-14 17:53.
+Updated automatically at every ticket change. Last update: 2026-11-14 17:54.
 
-**Next: GPT-6.1, on S12-21 (Scheduling model for M4's serial runs - measure density-1 tuning and the integer-multiply cost against today's density-4 defaults (S12-14 B02, B04, B05)).** Run `python tools/dispatch.py`, or ask the tech lead to.
+**Next: the tech lead, on S12-07.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[##################--]` 226 of 244
 
@@ -87,7 +87,7 @@ Current tickets: `[##################--]` 226 of 244
 | S12-04 | card_run profile memory monitor costs under 5% of one card thread | Done | card_run's profile memory monitor no longer floods stderr and scans /proc far less often: it uses usleep wi... |
 | S12-05 | DMA end-to-end time - overlap file read, DMA and file write, and copy on the card with more than one thread | draft |  |
 | S12-06 | M4 theme 1 - strict scalar FP conversions and call boundaries (NPB-EP transform and log path, NPB-IS randlc) | Done | Theme 1 (scalar FP conversions and calls in NPB-EP/IS) closed with no compiler change: a card diagnostic sh... |
-| S12-07 | M4 theme 2 - indexed-load scheduling with strict sparse reduction (NPB-CG) | lead | Card run needed (interactive lead only): run .work/_shared/S12-07/sparse-paired via tools/card_run --thread... |
+| S12-07 | M4 theme 2 - indexed-load scheduling with strict sparse reduction (NPB-CG) | Question for the tech lead | Card window 1 result is in the ticket body: fix the single-CPU check and restage. |
 | S12-08 | M4 theme 3 - dependency-preserving scalar updates and register pressure in dense loops (PB-ludcmp, x87 stack traffic) | Done | Theme 3 (register pressure in dense loops) closed with no compiler change: PB-ludcmp's extra x87 stack traf... |
 | S12-09 | Sprint 12 batch check - integrated themes at the final Sprint 12 head, regression evidence, optional modes frozen | draft |  |
 | S12-10 | Research - what KNC hardware and runtime knowledge are we still missing to tune GCC-KNC, the OS runtime and broad optimization, and where is it documented? | Done | KNC reference-gap research done: 16 gaps ranked, 32 primary sources (98 MB, outside git) with page-cited fa... |
@@ -269,6 +269,7 @@ Current tickets: `[##################--]` 226 of 244
 
 ## Recent activity
 
+- 2026-11-14 17:54 **S12-07** lead resume: Card window 1 result is in the ticket body: fix the single-CPU check and restage.
 - 2026-11-14 17:53 **S12-23** lead defer: GCC build needed on lane gcc2 at gcc commit 02f32213c0d (branch s12/S12-23 in .work/_shared/gcc-2 tree): interactive lead runs python tools/run.py ...
 - 2026-11-14 17:52 **S12-23** engineer ask: GCC build needed at 02f32213c0d (gcc2), per AGENTS.md Codex build restriction. Both Fortran clear routes now use FNSAVE/edit/FRSTOR; live x87 regis...
 - 2026-11-14 17:47 **S12-23** lead approve-red: S12-23 red accepted: the tests fail for the right reasons (the old underflow probe rounds to zero in both modes, the Fortran clear routes lack the ...
@@ -276,13 +277,12 @@ Current tickets: `[##################--]` 226 of 244
 - 2026-11-14 17:39 **S12-22** lead approve: The audit's comment and citation fixes are in GCC-KNC and the far prefetch distance can no longer be set equal to the near one (range now 2-4096, n...
 - 2026-11-14 17:07 **S12-22** engineer submit: Lead built gcc2 f0534648890. T1 green: all 6 boundary/prefetch checks PASS (red bf225397); log .work/_state/logs/S12_22_b10_green-20261114-165258.l...
 - 2026-11-14 17:06 **S12-28** lead approve: dispatch.py now refuses to start a second dispatcher on a lane that already has a live one (a lock per lane, reclaimed when its process is gone), s...
-- 2026-11-14 16:55 **S12-28** engineer submit: Implementation 06c94150; red test 73aa76d0. Prior session ran all 3 isolated host tests successfully: same-lane refusal with PID, different-lane ov...
 
 ## Cost
 
 - From the script, engineer: 634 sessions, 1266.2M input tokens
 - From the script, lead: 416 sessions, 114.4M input tokens
-- Started by hand, Claude: 12 sessions, 3273.9M input tokens
+- Started by hand, Claude: 12 sessions, 3275.1M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
