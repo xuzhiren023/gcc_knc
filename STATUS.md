@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-14 14:54.
+Updated automatically at every ticket change. Last update: 2026-11-14 14:55.
 
-**Next: the tech lead, on S12-04.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: the tech lead, on S12-17.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[##################--]` 220 of 237
 
@@ -84,7 +84,7 @@ Current tickets: `[##################--]` 220 of 237
 | S12-01 | Sprint 12 prep - static code-quality census of the development-corpus builds (spills, x87/vector transfers, addressing, calls, code size) | Done | A static code-quality census (spill/reload proxies, x87 and x87-zmm traffic, address arithmetic, calls, bra... |
 | S12-02 | Sprint 12 prep - the unscored generality check set (S11-20's six programs in the code styles our corpus lacks) | Done | The six unscored generality checks (Q1-Q6: ray tracer hit dispatch and vec3 AoS, Burkardt MD, Reference BLA... |
 | S12-03 | pm.py approve aborts its own merge on conflict and refuses cleanly, so main is never left mid-merge | draft |  |
-| S12-04 | card_run profile memory monitor costs under 5% of one card thread | Waiting for review | Host profile memory tests passed (7 tests): C:\Users\xuzhi\Documents\gcc_knc\.work\_state\logs\S12_04_profi... |
+| S12-04 | card_run profile memory monitor costs under 5% of one card thread | Changes requested | The scan throttling is good. One change: nothing confirms the card BusyBox has usleep. Make both waits fall... |
 | S12-05 | DMA end-to-end time - overlap file read, DMA and file write, and copy on the card with more than one thread | draft |  |
 | S12-06 | M4 theme 1 - strict scalar FP conversions and call boundaries (NPB-EP transform and log path, NPB-IS randlc) | Done | Theme 1 (scalar FP conversions and calls in NPB-EP/IS) closed with no compiler change: a card diagnostic sh... |
 | S12-07 | M4 theme 2 - indexed-load scheduling with strict sparse reduction (NPB-CG) | In progress | Do not hand-roll include paths for the build-tree xg++. For the 'before' compiler use the installed driver ... |
@@ -262,6 +262,7 @@ Current tickets: `[##################--]` 220 of 237
 
 ## Recent activity
 
+- 2026-11-14 14:55 **S12-04** lead changes: The scan throttling is good. One change: nothing confirms the card BusyBox has usleep. Make both waits fall back silently: in the awk loop use syst...
 - 2026-11-14 14:53 **S12-17** engineer ask: Red proof blocked: tools/claude-torture.c was restored from main, but the new test file named in the lead instruction is absent (tests/tools/test_c...
 - 2026-11-14 14:53 **S12-04** engineer submit: Host profile memory tests passed (7 tests): C:\Users\xuzhi\Documents\gcc_knc\.work\_state\logs\S12_04_profile_memory-20261114-145253.log. Awaiting ...
 - 2026-11-14 14:52 **S12-07** lead answer: Do not hand-roll include paths for the build-tree xg++. For the 'before' compiler use the installed driver exactly as tools/corpus does: corpus.com...
@@ -269,16 +270,15 @@ Current tickets: `[##################--]` 220 of 237
 - 2026-11-14 14:51 **S12-17** owner decide: Lead raises sessions 2 -> 4 (standing owner rule): session 1 was lost to the sandbox host-test launcher, now solved; the fix and test exist.
 - 2026-11-14 14:50 **S12-07** engineer ask: Phase-1 staging failed twice. Donor dump-filename rejection is fixed; GCC-KNC xg++ now fails on missing cassert in HPCG Vector.hpp:23. Reproducer: ...
 - 2026-11-14 14:49 **S12-18** lead defer: Needs interactive lead: (1) exclusive card turn running .work/_shared/S12-18/vmath-bench.mic at full, 3100 and 5100 per docs/research/s12-18-double...
-- 2026-11-14 14:49 **S12-17** engineer escalate: budget: 2 engineer sessions used; the budget is 2
 
 ## Cost
 
 - From the script, engineer: 603 sessions, 1231.5M input tokens
 - From the script, lead: 397 sessions, 110.1M input tokens
-- Started by hand, Claude: 12 sessions, 3184.3M input tokens
+- Started by hand, Claude: 12 sessions, 3187.1M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 32.5 GiB of 100 GiB. 151 GiB free on the drive.
+The project uses 32.6 GiB of 100 GiB. 151 GiB free on the drive.
