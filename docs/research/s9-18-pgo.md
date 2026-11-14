@@ -176,7 +176,7 @@ evaluation. Confirmatory median gains are approximately 0.7–0.9%, with substan
 pair variation on full and 3100. This is a small observed gain, far below the
 19–21% microcase gains; these ranges alone do not establish statistical significance.
 
-### Positive controls (lead's 2026-11-13 amendment; assembly gate incomplete)
+### Positive controls: initial candidates (historical)
 
 `tools/s11_17_controls.py` stages five independent integer kernels: a 99%-zero
 branch against GCC's nonzero static guess, a volatile function-pointer table with
@@ -429,6 +429,90 @@ the staged protocol under fifteen minutes absent infrastructure delays. Return
 required loss/reversal under inverted training remain pending. Sprint 12's PGO
 regression qualification remains open until those native results are reviewed.
 
+### Positive-control card evaluation, 2026-11-14 08:16-08:21 EST
+
+The lead ran pilot (1.9 minutes) and confirm (2.8 minutes) at `b1151831`,
+exclusively on the card with a quiet host. All 30 kernel launches reported
+`CONTROL_CHECK pass`; all 900 timed batches reported `check=pass` (300 pilot,
+600 confirmatory). Every batch checks against the separately compiled reference.
+The engineer performed no native run. These results supersede the historical
+pending statements above. T1 remains five red baseline gates followed by five
+matched-profile green gates, recorded in the train3 section.
+
+The table gives **time reduction = 100 * (1 - treatment time / adjacent base
+time)**: median and observed min-max in percentage points. Positive means faster.
+This is the lead's percentage convention; the zlib table instead gives base/PGO
+speedup ratios. For example, division saves about 39.1% of time on full confirm,
+equivalent to about 1.642 times base throughput. Spread is not a confidence
+interval; no pair was removed. Pilot has five pairs per treatment, confirm ten,
+with separate adjacent baselines and alternating CT/TC order.
+
+| Phase | Profile | Kernel | Matched: median (min to max) | Inverted: median (min to max) |
+|---|---|---|---:|---:|
+| pilot | full | branch | +2.07% (+2.03 to +2.35) | +0.06% (-0.09 to +0.38) |
+| pilot | full | indirect | +12.71% (+12.42 to +12.89) | -18.15% (-18.53 to -17.78) |
+| pilot | full | division | +38.93% (+38.80 to +39.14) | -17.38% (-17.47 to -17.04) |
+| pilot | full | inline | +5.73% (+5.64 to +5.88) | +6.00% (+5.80 to +6.11) |
+| pilot | full | loop | +30.14% (+29.89 to +30.40) | +5.87% (+5.63 to +5.92) |
+| pilot | 3100 | branch | +2.23% (+2.01 to +2.31) | -0.04% (-0.12 to +0.39) |
+| pilot | 3100 | indirect | +12.72% (+12.41 to +13.05) | -18.18% (-18.24 to -18.11) |
+| pilot | 3100 | division | +39.02% (+38.88 to +39.19) | -17.14% (-17.27 to -16.96) |
+| pilot | 3100 | inline | +5.81% (+5.74 to +5.91) | +5.78% (+5.66 to +5.98) |
+| pilot | 3100 | loop | +30.18% (+29.88 to +30.32) | +5.83% (+5.64 to +5.90) |
+| pilot | 5100 | branch | +2.11% (+2.01 to +2.40) | +0.31% (-0.04 to +0.42) |
+| pilot | 5100 | indirect | +12.76% (+12.65 to +12.88) | -18.17% (-18.31 to -17.97) |
+| pilot | 5100 | division | +38.87% (+38.83 to +39.52) | -17.34% (-17.40 to -17.18) |
+| pilot | 5100 | inline | +5.73% (+5.61 to +6.03) | +5.63% (+5.18 to +5.88) |
+| pilot | 5100 | loop | +30.27% (+30.04 to +31.25) | +5.80% (+5.25 to +5.81) |
+| confirm | full | branch | +2.19% (+1.90 to +2.66) | +0.07% (-0.32 to +0.52) |
+| confirm | full | indirect | +12.81% (+12.72 to +13.09) | -18.07% (-18.35 to -17.45) |
+| confirm | full | division | +39.11% (+38.80 to +39.29) | -16.97% (-17.31 to -16.83) |
+| confirm | full | inline | +5.88% (+5.58 to +6.05) | +5.90% (+5.70 to +6.34) |
+| confirm | full | loop | +30.35% (+30.02 to +30.83) | +5.69% (+5.31 to +5.97) |
+| confirm | 3100 | branch | +2.24% (+1.98 to +2.68) | +0.04% (-0.30 to +0.47) |
+| confirm | 3100 | indirect | +12.71% (+12.17 to +13.20) | -18.02% (-18.19 to -17.24) |
+| confirm | 3100 | division | +38.97% (+38.80 to +39.12) | -17.00% (-17.18 to -16.74) |
+| confirm | 3100 | inline | +5.77% (+5.31 to +6.35) | +5.83% (+5.59 to +5.94) |
+| confirm | 3100 | loop | +30.25% (+30.08 to +30.48) | +5.73% (+5.61 to +5.83) |
+| confirm | 5100 | branch | +2.06% (+1.89 to +2.39) | +0.11% (-0.08 to +0.52) |
+| confirm | 5100 | indirect | +12.57% (+12.06 to +12.88) | -18.27% (-18.58 to -17.81) |
+| confirm | 5100 | division | +38.95% (+38.77 to +39.19) | -17.31% (-17.54 to -17.14) |
+| confirm | 5100 | inline | +5.73% (+5.50 to +6.87) | +5.84% (+5.65 to +6.33) |
+| confirm | 5100 | loop | +30.29% (+29.99 to +30.36) | +5.79% (+5.43 to +5.97) |
+
+Raw captures retain every pair and elapsed time (UTF-16LE):
+`.work/_shared/S11-17/controls/pilot-{full,3100,5100}.stdout` and separately
+`controls/confirm-{full,3100,5100}.stdout`, with corresponding `.stderr` files.
+Logs: `.work/_state/logs/S11_17_controls_pilot-20261114-081627.log` and
+`.work/_state/logs/S11_17_controls_confirm-20261114-081824.log`.
+No tests or card jobs were rerun for this write-up.
+
+Branch, indirect and division demonstrate profile-dependent gains: approximately
+2.2%, 12.7% and 39.0% time reductions. Inverted training removes the branch gain
+within observed variation and reverses indirect and division into approximately
+18.1% and 17.0% slowdowns. These three qualify under the matching/inverted rule;
+the branch's near-zero inverted result is distinct from its consistent matched gain.
+
+Inline is **not demonstrated** as a profile-dependent control: inverted training
+matches the approximately 5.8-5.9% time saving of matched training. Its green
+assembly gate does not establish a profile-dependent timing benefit.
+
+Loop saves about 30.2% with matching training and 5.7% with inverted training.
+Report that residual separately as a profile-independent benefit of the use
+build. Matched elapsed time is about 26% lower than inverted, demonstrating a
+substantial profile-dependent component. However, loop fails the strict timing
+requirement that inverted training show no gain or a loss. The removed switch
+remains a GCC capability gap (no profile-driven dominant-case peeling), with no
+follow-up ticket requested. No gate or acceptance criterion was weakened.
+
+The whole-program feasibility question is answered: zlib generate/train/use
+works with complete matching profiles, positive counts and 90/90 correct launches,
+with only a small observed gain. Three controls show that this pipeline can
+produce much larger gains where the decisions matter. The full five-control
+acceptance clause is not met: inline is not demonstrated and loop retains an
+inverted-profile benefit. Per the lead's 08:21 instruction, this final research
+result is submitted with those limitations, without claiming all controls passed.
+
 ### Lessons from PhiWeather
 
 The lead's 2026-11-13 ticket note reports that PhiWeather's WRF-only GCC 5.1.1
@@ -441,12 +525,17 @@ five pilot pairs and ten confirmatory pairs per profile, as requested by the lea
 Keep pilot and confirmatory results separate; report paired PGO/base ratios and
 variation for each hardware profile before deciding whether PGO pays.
 
-Sprint 12 plan: complete the positive-control assembly and native timing gates
-before treating one-flag automatic PGO as qualified. Preserve matched/inverted
-controls as regression cases and require the inverted profile to lose or reverse
-the gain. Zlib's completed cycle establishes functionality, with no missing or
-mismatched profiles and only a small observed median gain. Freeze a separate
-training input per development program, preserve compiler/source/output names
-between generate/use, and keep diagnostics fatal. Extend to further development
-programs only after this complete-program path works; retain plain -O2 pairs and
-keep training separate from frozen evaluation and held-out programs.
+Sprint 12 plan: preserve branch, indirect and division as demonstrated
+matched/inverted regression controls for one-flag automatic PGO. Keep all five
+assembly gates, but label inline and loop timing qualification incomplete.
+Any future inline candidate must distinguish matching from inverted training;
+loop reporting must separate its residual profile-independent gain. Do not
+claim that the five-control suite is fully qualified from this experiment.
+
+Freeze separate training inputs for development programs; preserve compiler,
+source and output names between generate/use; require complete profiles and
+positive applied counts, with missing/mismatch diagnostics fatal. Reuse the
+completed zlib path for further development-program experiments, retaining plain
+-O2 pairs, separate pilot/confirm results and per-profile variation. Zlib's
+0.7-0.9% observed median gain does not promise a general performance win.
+Never train on held-out programs or the frozen evaluation input.
