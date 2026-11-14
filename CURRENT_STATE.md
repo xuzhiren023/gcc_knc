@@ -148,6 +148,13 @@ M1 is accepted and tagged `m1` locally; nothing is pushed. Engineers are Claude 
 
 ## Open items not on a ticket
 
+- **Card turn 2026-11-14 from 00:03 EST (PhiWeather handed over; their HRRR fetcher paused until our "done").**
+  - S11-27 card verify: 8/8 pass at e0bc456a11e. MG A-O2 14.13 s. Approving.
+  - S11-17 control training: 10/10 profiles back. The staged script had CRLF line endings (claude-pinned missing); the lead converted it to LF.
+  - S11-02 DMA validation at 45e732b9: link 1.41 GB/s up and 1.67 GB/s down; 1 GiB end to end 6.1 s up and 4.6-5.3 s down, against about 100 s over SSH; fallback and run_suite (1681/1681) pass. Approval's host tests fail (helper_free default, stat count), so changes requested, with one extra review round granted by the lead.
+  - Host at 100% CPU (PhiWeather's HRRR fetch, 8 workers, plus an orphan `find /`, PID 3064) made SSH uploads crawl at 0.2 MB/s and staging time out. Check host load before blaming card_run. PID 3064 is the owner's call (PhiWeather asked).
+  - Wall-time follow-up for DMA: overlap read/DMA/write and copy on the card with more than one thread (card tmpfs write is 2.9 s per GiB single-threaded).
+
 - **Next card turn plan, owner 2026-11-13 19:55 EST: batch every job that can share the card. Owner approved the whole plan at 20:05 EST, the HPCG pilot included.** Card_run holds an exclusive lock, so batching means one combined card_run with cases pinned one per core, not concurrent card_runs.
   - Round 1 (correctness only, cases pinned per core), chained with no gap: S11-27 `verify-card.py` (8 cases in one card_run, staged at 89a3657a), then S11-17 `controls/controls-lead.ps1` train phase (about 1 min). S11-17's run is its own card_run because its script fetches the .gcda profiles back; merging them would save about a minute.
   - Round 2: S11-29 profile cases (one card_run per profile, per its ticket; HPCG at 224/236 threads fills the card).
