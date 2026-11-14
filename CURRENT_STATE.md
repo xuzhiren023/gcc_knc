@@ -147,6 +147,49 @@ M1 is accepted and tagged `m1` locally; nothing is pushed. Engineers are Claude 
 - **Restore target runtime files after replacing the GCC build tree.** `tools/toolchain.py gcc16` builds `all-gcc` only and removes the old tree, including `crtbegin.o`, `crtend.o` and `libgcc`. S3-04's first T2 regression therefore failed to link; `tools/toolchain.py libgcc` through `tools/run.py` restored the fork-built runtime, and the failed T2 checks then passed. Do this after a full rebuild before link checks.
 
 ## Open items not on a ticket
+
+- **Card turn 2026-11-14 from 00:03 EST (PhiWeather handed over; their HRRR fetcher paused until our "done").**
+  - S11-27 card verify: 8/8 pass at e0bc456a11e. MG A-O2 14.13 s. Approving.
+  - S11-17 control training: 10/10 profiles back. The staged script had CRLF line endings (claude-pinned missing); the lead converted it to LF.
+  - S11-02 DMA validation at 45e732b9: link 1.41 GB/s up and 1.67 GB/s down; 1 GiB end to end 6.1 s up and 4.6-5.3 s down, against about 100 s over SSH; fallback and run_suite (1681/1681) pass. Approval's host tests fail (helper_free default, stat count), so changes requested, with one extra review round granted by the lead.
+  - Host at 100% CPU (PhiWeather's HRRR fetch, 8 workers, plus an orphan `find /`, PID 3064) made SSH uploads crawl at 0.2 MB/s and staging time out. Check host load before blaming card_run. PID 3064 is the owner's call (PhiWeather asked).
+  - pm.py approve hazard (01:40 EST): a merge conflict (S11-02 vs main's S11-10 in tools/host_card_transfer.py) left main mid-merge, and the next pm.py commands staged ticket edits into the merge index. The lead aborted the merge and recovered the notes. Follow-up: approve must run `git merge --abort` itself on conflict and refuse cleanly.
+  - S11-29 first round: memory fix works (HPCG peak 0.93 GB, 6 GiB toucher killed as resource, 1 GiB passes), but the monitor used about 95% of one card core (it stat-ed all 1029 PIDs every 0.1 s). Fixed at cbe9a3d6 (descendant-only scan, pinned to CPU 0); rerun in progress.
+  - Wall-time follow-up for DMA: overlap read/DMA/write and copy on the card with more than one thread (card tmpfs write is 2.9 s per GiB single-threaded).
+
+- **Next card turn plan, owner 2026-11-13 19:55 EST: batch every job that can share the card. Owner approved the whole plan at 20:05 EST, the HPCG pilot included.** Card_run holds an exclusive lock, so batching means one combined card_run with cases pinned one per core, not concurrent card_runs.
+  - Round 1 (correctness only, cases pinned per core), chained with no gap: S11-27 `verify-card.py` (8 cases in one card_run, staged at 89a3657a), then S11-17 `controls/controls-lead.ps1` train phase (about 1 min). S11-17's run is its own card_run because its script fetches the .gcda profiles back; merging them would save about a minute.
+  - Round 2: S11-29 profile cases (one card_run per profile, per its ticket; HPCG at 224/236 threads fills the card).
+  - Round 3: S11-02 DMA validation, alone (it measures transfer rate), after PhiWeather's OK.
+  - Round 4: timed and exclusive, chained in one driver with no idle gaps: S11-17 controls timing, then the S11-28 HPCG pilot (4-7 h).
+  - Round 5: S11-12 batch check, its native suites run concurrently per core.
+- 2026-11-13 18:10 EST (lead): harness/hook_policy.py's 'hash' rule (anywhere: hashlib|file_digest) also blocks shell edits that remove digest code (S11-02, 17:31). Follow-up: when the command is a patch, match only added lines. For now engineers delete by line range.
+- 2026-11-13 16:55 EST (lead): Card turn ended; card handed back to PhiWeather ('done'), with no locks and the ledger closed. Results:
+  - S11-17 zlib PGO, 30 pilot and 60 confirm launches, all correct: PGO/base +0.7-0.9% (confirm medians full 1.0084, 3100 1.0069, 5100 1.0094). Positive-control set next.
+  - S11-02 DMA rerun at 3953ab96: offset bug fixed, 1 GiB up at 1347.7 MiB/s payload with digests matching and no bugcheck. It failed on two things: DMA-published files lose the exec bit ('helper did not exec program'), and the 1 GiB wall time is 93.6 s, dominated by digest and I/O, probably single-core card SHA-256. Changes requested, with a wall-clock target of at least 0.5 GB/s. Legacy latch released after the documented checks.
+  - S11-27 second fix b56d5090c86: stencil T1 green, secondary-reload TI/TF still ICEs (reload cycle). Back to the engineer. MG card check next turn.
+- 2026-11-13 16:10 EST (lead): S11-27 at 0297f57d723.
+  - On the card: MG S and A verify (A-O2 14.2 s vs GCC 5.1.1 33.8 s), and the reduced cases pass.
+  - T0 and T2 pass. T1 regresses: 4 ICEs in knc-secondary-pressure ti/tf at -O1/-O2, LRA 'maximum number of generated reload insns' (a bridge-pseudo reload cycle). Back to the engineer.
+  - Lead mistakes, both cleaned up: the first torture diff script broke on Windows glob backslashes; the x86 check with a relative --shared made a stray releases/gcc-16.2.0 worktree inside .work/_shared/gcc/.work, now removed and pruned, and git status in the GCC tree is clean.
+  - S11-17 first pilot: full profile 5 pairs, PGO/base median 0.996 (spread 1.2%), so no gain on zlib. It stopped at 3100 pair 1 on an SSH upload deadline under heavy host load. Rerun at 16:10.
+- 2026-11-13 15:55 EST (lead): S11-02 DMA validation FAILED safely, with PhiWeather's OK.
+  - The first 1 GiB dma upload gave 'ERROR remote offset range' from the card helper, then 'SCIF endpoint cleanup unresolved' (status 92). Receipt .work/_shared/S11-02/pair-1-dma.json.
+  - No host bugcheck; card boot unchanged; no leftover card process (ps, 15:52 EST).
+  - .work/_state/card-dma-active.lock is left for the engineer. Only the S11-02 branch's card_run reads it; main card_run has no DMA code.
+  - Changes requested on S11-02: the offset bug, resolvable cleanup, and validate.ps1's PATH and 'Stop' bugs, which the lead fixed in the staged copy.
+  - S11-27 at 0297f57d723: reduced cases PASS on the card (old compiler: FAIL), green T1 PASS. MG S/A waits for the engineer's rebuild, because NPB3.4.2 sources have a DENY read ACE for xuzhi owned by CodexSandboxOffline, and the lead does not change sandbox ACLs.
+- 2026-11-13 15:45 EST (lead): S12-02 genset card run, stopped by the lead after 44 of 108 launches.
+  - Every launch failed the oracle check, GCC 5.1.1 included, with plausible-looking output (Q1). That makes it a harness bug in genset's matches()/payload, not the compilers.
+  - Q4 built by GCC-KNC segfaults (card_run exit 139) on all three profiles. That could be a real GCC-KNC bug and needs a reproducer.
+  - The later launches would only have repeated these. I stopped only the parent script, so the in-flight card_run finished and released its locks cleanly.
+  - Results: .work/_shared/S12-02/results.jsonl. Needs a follow-up ticket for the harness fix and the Q4 crash.
+- 2026-11-13 15:15 EST (lead): Two harness problems found in the S11-17 evaluation.
+  1. Any staged lead .ps1 with $ErrorActionPreference='Stop' aborts on a native program's stderr. Here it was BusyBox tar's 'skipping header x' pax warning from card_run's upload, a PS 5.1 NativeCommandError. I set S11-17's staged lead.ps1 to 'Continue'; the original is lead.ps1.orig, and exit codes are still checked.
+  2. That abort left .work/_state/card.lock behind with no card_run process alive, and the next card_run refused with 'own lock present'. I removed it by hand after checking no python/ssh card job was running.
+  3. The abort also left the shared admission lock (card-coordination/claude-admission.lock) and an open ledger 'start' for claude-81bffc7d (15:10 EST). I appended a matching 'finish' with outcome 'aborted' and removed the lock.
+  Engineers' staged scripts should not use 'Stop' around native calls. card_run could recover its own stale lock by PID, which would be a small tools ticket.
+- 2026-11-13 15:00 EST (lead): S11-28 memory round staged: .work/_shared/S11-28/lead-memory.ps1 at ede7b91c, 11 correctness-only jobs, about 11 min. Card order after claude-next30.sh: S11-27 card.py, then S11-28 lead-memory.ps1, then post both, then message WRF, then claude-next31.sh (DMA), then 'done'.
 - 2026-11-13 14:55 EST (owner): the HPCG case must fit the 3100 and 5100 hardware, so redesign it and rerun. That is S11-28. Correction to the 14:30 note: the HPCG score stays wall time (ADR-0015 makes the rating diagnostic only), with fixed work; rt=0 gives exactly one CG set (main.cpp:316-317). Suspected cause of the bad_alloc: card_run profiles cap address space (RLIMIT_AS), which counts thread stacks and malloc arenas, not memory in use, so they may be stricter than a real 6 GB card. S11-28 measures VmHWM before choosing the grid.
 - 2026-11-13 14:30 EST (lead), M4 pilot at launch 446/468: 376 pass, 17 fail. New findings:
   1. HPCG time is not a speed measure. hpcg.dat asks for 60 s of benchmark time, so wall time is fixed by design, and this morning's 0.99 'speedup' was meaningless. Compare its GFLOP/s rating instead. Serial: GCC-KNC 0.0850 vs GCC 5.1.1 0.0864, so GCC-KNC is 1.7% slower. OpenMP: 0.12 at 60, 120 and 240 threads, only 1.4x serial; the reference HPCG's SYMGS is serial. S11-14's contract must score HPCG by rating or drop it from timing; README already flags HPCG's duration-driven work as pilot-only.
