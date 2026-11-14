@@ -2,7 +2,7 @@
 
 Updated automatically at every ticket change. Last update: 2026-11-14 15:02.
 
-**Next: the tech lead, on S12-07.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: the tech lead, on S12-08.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[##################--]` 220 of 237
 
@@ -87,7 +87,7 @@ Current tickets: `[##################--]` 220 of 237
 | S12-04 | card_run profile memory monitor costs under 5% of one card thread | In progress | Lead raises sessions 5 -> 7 (second raise; standing owner rule): sessions 4-5 delivered the throttled scan ... |
 | S12-05 | DMA end-to-end time - overlap file read, DMA and file write, and copy on the card with more than one thread | draft |  |
 | S12-06 | M4 theme 1 - strict scalar FP conversions and call boundaries (NPB-EP transform and log path, NPB-IS randlc) | Done | Theme 1 (scalar FP conversions and calls in NPB-EP/IS) closed with no compiler change: a card diagnostic sh... |
-| S12-07 | M4 theme 2 - indexed-load scheduling with strict sparse reduction (NPB-CG) | Question for the tech lead | Phase-one staged at 9823e291; installed drivers fixed headers. Host build/lint PASS: .work/_state/logs/s12_... |
+| S12-07 | M4 theme 2 - indexed-load scheduling with strict sparse reduction (NPB-CG) | lead | Card run needed (interactive lead only): run .work/_shared/S12-07/sparse-paired via tools/card_run --thread... |
 | S12-08 | M4 theme 3 - dependency-preserving scalar updates and register pressure in dense loops (PB-ludcmp, x87 stack traffic) | Question for the tech lead | Phase-1 proof 248edd72: hot ludcmp/cholesky/CG bodies have no stack operands. Ludcmp 128/130 x87 reads are ... |
 | S12-09 | Sprint 12 batch check - integrated themes at the final Sprint 12 head, regression evidence, optional modes frozen | draft |  |
 | S12-10 | Research - what KNC hardware and runtime knowledge are we still missing to tune GCC-KNC, the OS runtime and broad optimization, and where is it documented? | Done | KNC reference-gap research done: 16 gaps ranked, 32 primary sources (98 MB, outside git) with page-cited fa... |
@@ -262,6 +262,7 @@ Current tickets: `[##################--]` 220 of 237
 
 ## Recent activity
 
+- 2026-11-14 15:02 **S12-07** lead defer: Card run needed (interactive lead only): run .work/_shared/S12-07/sparse-paired via tools/card_run --threads 1 --timeout 200 in our card turn (one ...
 - 2026-11-14 15:01 **S12-19** lead approve-red: S12-19 red is approved: 10 host tests in 2 files now pin the vectorizer triage contract (six real GCC missed reasons, vectorized vs SLP vs unknown,...
 - 2026-11-14 15:01 **S12-17** owner decide: Lead raises sessions 4 -> 6 (second raise): red proof done (exit 125 with main's file); the restore was blocked by a git lock permission, now done ...
 - 2026-11-14 15:01 **S12-08** engineer ask: Phase-1 proof 248edd72: hot ludcmp/cholesky/CG bodies have no stack operands. Ludcmp 128/130 x87 reads are fold-left transfers; outer GPR spills ha...
@@ -269,11 +270,10 @@ Current tickets: `[##################--]` 220 of 237
 - 2026-11-14 14:59 **S12-19** engineer red: Revised red d3ee9323: 10 cases, 2 test files; real GCC messages with citations, both in-order refusals, actual strict-FP cost refusal, captured add...
 - 2026-11-14 14:59 **S12-07** engineer ask: Phase-one staged at 9823e291; installed drivers fixed headers. Host build/lint PASS: .work/_state/logs/s12_07_stage-20261114-145549.log. Please run...
 - 2026-11-14 14:57 **S12-04** owner decide: Lead raises sessions 5 -> 7 (second raise; standing owner rule): sessions 4-5 delivered the throttled scan and host tests; one small requested chan...
-- 2026-11-14 14:57 **S12-04** engineer escalate: budget: 5 engineer sessions used; the budget is 5
 
 ## Cost
 
-- From the script, engineer: 608 sessions, 1238.5M input tokens
+- From the script, engineer: 609 sessions, 1239.0M input tokens
 - From the script, lead: 399 sessions, 110.6M input tokens
 - Started by hand, Claude: 12 sessions, 3192.2M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
