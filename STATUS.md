@@ -109,7 +109,7 @@ Current tickets: `[##################--]` 226 of 244
 | S12-26 | WRF hot scalar routines - classify with the S12-19 triage tool and stage bitwise-safe per-file flag arms for PhiWeather to time | draft |  |
 | S12-27 | Latency-aware scalar loops - GCC-KNC unrolls and interleaves independent iterations and hoists conversions so one thread's every-other-cycle issue and long latencies are hidden automatically | draft |  |
 | S12-28 | dispatch.py refuses to start a second dispatcher on a lane that already has a live one | Done | dispatch.py now refuses to start a second dispatcher on a lane that already has a live one (a lock per lane... |
-| S12-29 | Wrong code - vbroadcastsd reads a 4-byte-aligned SCmode constant (complex float) straight from the constant pool and faults on the card (gcc.c-torture pr38969.c, regression from S11-27) | Changes requested | Red is right: main's vbroadcastsd .LC0(%rip) is flagged for 4-byte alignment, which is the pr38969 fault, a... |
+| S12-29 | Wrong code - vbroadcastsd reads a 4-byte-aligned SCmode constant (complex float) straight from the constant pool and faults on the card (gcc.c-torture pr38969.c, regression from S11-27) | In progress | Red is right: main's vbroadcastsd .LC0(%rip) is flagged for 4-byte alignment, which is the pr38969 fault, a... |
 | S13-01 | M4 final gate - stage the ADR-0015 gate run at the final head (17 programs, held-out unsealed, six pairs, three profiles) | draft |  |
 | S13-02 | Libgomp per-region thread density - choose 1-4 workers per core per parallel region instead of once per program | draft |  |
 | S13-03 | M4 retrospective - what we did wrong, what worked, and the practice changes carried into the next milestone and the agent-team skill | draft |  |
