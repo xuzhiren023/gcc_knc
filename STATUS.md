@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-14 00:25.
+Updated automatically at every ticket change. Last update: 2026-11-14 00:26.
 
 **Next: the tech lead, on S11-02.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
@@ -78,7 +78,7 @@ Current tickets: `[###################-]` 205 of 213
 | S11-24 | WRF OpenMP (smpar) build with GCC-KNC at -mphinix, for PhiWeather's benchmark - replaces the serial trial build | Done | WRF v4.8.0 now builds as an OpenMP card binary at -mphinix with GCC-KNC (wrf.exe and real.exe linked, needi... |
 | S11-25 | ICE in do_store_flag (expr.cc) on WRF's surface layer (SFCLAY1D) at -O2 -march=knc | Done | The last WRF file that crashed GCC-KNC (surface layer, SFCLAY1D) now compiles: vector 'ordered and not equa... |
 | S11-26 | WRF OpenMP build at -mphinix with no per-file workarounds (S11-23 and S11-25 fixed), restaged for PhiWeather | draft | Owner 2026-11-13: the S11-24 WRF build is removed. Deleted: |
-| S11-27 | Wrong code - NPB-MG (class A, serial) built by GCC-KNC at -O2 -march=knc fails NPB verification on the card | In progress | Card round at 89a3657a ran 2026-11-14 00:11 EST, one card_run, 0.6 card-min, log .work/_shared/S11-27/verif... |
+| S11-27 | Wrong code - NPB-MG (class A, serial) built by GCC-KNC at -O2 -march=knc fails NPB verification on the card | Waiting for review | Acceptance complete; checked report and per-case results: .work/_shared/S11-27/notes.txt. GCC e0bc456a11e r... |
 | S11-28 | HPCG run that fits every card model - fixed work instead of fixed duration, grid sized to the 3100's memory | lead | After S11-29 merges (still ready): run .work/_shared/S11-28/lead-pilot.ps1 at 242936bf+ (30 exclusive timed... |
 | S11-29 | card_run profiles limit memory in use, not address space, so a 3100 or 5100 run fails only where the real card would | In progress | No probe needed; use the card-side /proc monitor. Already established (docs/card-run.md ~line 175, docs/res... |
 | S12-01 | Sprint 12 prep - static code-quality census of the development-corpus builds (spills, x87/vector transfers, addressing, calls, code size) | Done | A static code-quality census (spill/reload proxies, x87 and x87-zmm traffic, address arithmetic, calls, bra... |
@@ -238,6 +238,7 @@ Current tickets: `[###################-]` 205 of 213
 
 ## Recent activity
 
+- 2026-11-14 00:26 **S11-27** engineer submit: Acceptance complete; checked report and per-case results: .work/_shared/S11-27/notes.txt. GCC e0bc456a11e rebased on knc (already current). Lead na...
 - 2026-11-14 00:24 **S11-02** lead resume: Lead ran validate.ps1 at 45e732b9, 00:14-00:23 EST: results in the answer.
 - 2026-11-14 00:23 **S11-15** lead answer: Lead decisions: (1) libc identity: accept the sysroot libc-2.21.so names with no card check; same MPSS glibc, same soname and segment extent is eno...
 - 2026-11-14 00:21 **S11-29** lead answer: No probe needed; use the card-side /proc monitor. Already established (docs/card-run.md ~line 175, docs/research/for-the-other-agent.md item 4): th...
@@ -245,7 +246,6 @@ Current tickets: `[###################-]` 205 of 213
 - 2026-11-14 00:19 **S11-17** lead resume: Lead ran control training at 00:12 EST: results in the answer.
 - 2026-11-14 00:18 **S11-15** engineer ask: 75976eb9: attribution/report done. 521 PCs; GEMM loop 82.56-86.21%; overhead median 0.361%. Log .work/_state/logs/S11_15_attribution-20261114-00130...
 - 2026-11-14 00:17 **S11-27** lead answer: Card round at 89a3657a ran 2026-11-14 00:11 EST, one card_run, 0.6 card-min, log .work/_shared/S11-27/verify-card.log. All 8 pass: MG S-O2, S-noslp...
-- 2026-11-14 00:15 **S11-29** engineer ask: Red commit 36b48b4e exposes AS caps, missing peaks/resource classification; full/exclusive regression passes. Log .work/_state/logs/S11_29_red-2026...
 
 ## Cost
 
