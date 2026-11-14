@@ -1,10 +1,10 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-14 13:45.
+Updated automatically at every ticket change. Last update: 2026-11-14 13:49.
 
 **Next: the tech lead, on S12-13.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
-Current tickets: `[##################--]` 215 of 229
+Current tickets: `[##################--]` 215 of 230
 
 ## Milestones
 
@@ -14,7 +14,7 @@ Current tickets: `[##################--]` 215 of 229
 | M1 | Mixed native code | Done | 43 of 43 tickets |
 | M2 | Useful vector target | Done | 51 of 51 tickets |
 | M3 | Runtimes | Done | 48 of 48 tickets |
-| M4 | Broad optimization | In progress | 33 of 47 tickets |
+| M4 | Broad optimization | In progress | 33 of 48 tickets |
 | M5 | Program corpus | Not started | Not planned in detail yet |
 | M6 | Release | Not started | Not planned in detail yet |
 
@@ -84,7 +84,7 @@ Current tickets: `[##################--]` 215 of 229
 | S12-01 | Sprint 12 prep - static code-quality census of the development-corpus builds (spills, x87/vector transfers, addressing, calls, code size) | Done | A static code-quality census (spill/reload proxies, x87 and x87-zmm traffic, address arithmetic, calls, bra... |
 | S12-02 | Sprint 12 prep - the unscored generality check set (S11-20's six programs in the code styles our corpus lacks) | Done | The six unscored generality checks (Q1-Q6: ray tracer hit dispatch and vec3 AoS, Burkardt MD, Reference BLA... |
 | S12-03 | pm.py approve aborts its own merge on conflict and refuses cleanly, so main is never left mid-merge | draft |  |
-| S12-04 | card_run profile memory monitor costs under 5% of one card thread | draft |  |
+| S12-04 | card_run profile memory monitor costs under 5% of one card thread | Not started |  |
 | S12-05 | DMA end-to-end time - overlap file read, DMA and file write, and copy on the card with more than one thread | draft |  |
 | S12-06 | M4 theme 1 - strict scalar FP conversions and call boundaries (NPB-EP transform and log path, NPB-IS randlc) | lead | Needs a card run by the interactive lead (M4 card authorization, <=30 min): run the card_run command in doc... |
 | S12-07 | M4 theme 2 - indexed-load scheduling with strict sparse reduction (NPB-CG) | Not started |  |
@@ -95,9 +95,10 @@ Current tickets: `[##################--]` 215 of 229
 | S12-12 | Stage S12-10's residual-gap card experiments as one combined Sprint 12 diagnostic batch (PMU access, prefetch, page backing, libm route, branches, allocator) | Done | The six follow-up card experiments (counter access, prefetch, page backing, libm route, branches, allocator... |
 | S12-13 | Digest the S12-10 sources into our knowledge base - correct our KNC notes, build a reference index, and list what our practice should change | Waiting for review | Corrected all four R09 passages at 173633ac after reading local pp.4-5: p.4 libhugetlbfs on MPSS 2.1.4346-1... |
 | S12-14 | Audit GCC-KNC's tuning model and runtime defaults against the digested sources - every mismatch with a proposed change and its proof | Not started |  |
-| S12-15 | Research - literature survey of published Xeon Phi (KNC) and Xeon Phi system research that matches our goals; what have we overlooked? | Question for the tech lead | Survey committed: 61ecb62e, docs/research/phi-literature-survey.md. 30 ranked source groups; 30 PDFs/extrac... |
+| S12-15 | Research - literature survey of published Xeon Phi (KNC) and Xeon Phi system research that matches our goals; what have we overlooked? | In progress | Lead: no rebase needed. submit only checks rebase for gcc: yes tickets; your diff is one new note and the l... |
 | S12-16 | Research - whole-system tuning playbook for the Z840 + Xeon Phi (BIOS, host OS, MPSS and card, transfers, runtimes), as HPC centres tuned Xeon + KNC systems | Done | Whole-system tuning playbook for the Z840 + Phi done: 13 ordered steps (BIOS, host Linux, card power/pages/... |
 | S12-17 | claude-torture -j N refuses to start in exclusive card runs (no inherited RLIMIT_AS since S11-29), so the execute suite cannot run | In progress | Do not amend or split 71cbcf86. Instead prove red: temporarily check out tools/claude-torture.c from main (... |
+| S12-18 | Double-precision vector exp, log and pow ran slower than scalar libm on the card (0.82x, 0.63x, 0.49x) - confirm with valid batches, then fix the library or stop the vectorizer calling them where they lose | Not started |  |
 | S13-01 | M4 final gate - stage the ADR-0015 gate run at the final head (17 programs, held-out unsealed, six pairs, three profiles) | draft |  |
 | S2-01 | Design for zmm and mask registers under -march=knc | Done | The register design for KNC is settled on paper: all 32 zmm and 8 mask registers become usable under -march... |
 | S2-02 | Float and double arguments and results in zmm lane 0 | Done | Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`). |
@@ -254,6 +255,7 @@ Current tickets: `[##################--]` 215 of 229
 
 ## Recent activity
 
+- 2026-11-14 13:49 **S12-15** lead answer: Lead: no rebase needed. submit only checks rebase for gcc: yes tickets; your diff is one new note and the lead merges. Run pm.py submit now as is.
 - 2026-11-14 13:44 **S12-16** lead approve: Whole-system tuning playbook for the Z840 + Phi done: 13 ordered steps (BIOS, host Linux, card power/pages/service core, transfers, MPI, runtimes) ...
 - 2026-11-14 13:36 **S12-15** engineer ask: Survey committed: 61ecb62e, docs/research/phi-literature-survey.md. 30 ranked source groups; 30 PDFs/extracts in .work/_shared/phi-literature/ (45....
 - 2026-11-14 13:35 **S12-17** lead answer: Do not amend or split 71cbcf86. Instead prove red: temporarily check out tools/claude-torture.c from main (git checkout main -- tools/claude-tortur...
@@ -261,13 +263,12 @@ Current tickets: `[##################--]` 215 of 229
 - 2026-11-14 13:34 **S12-16** engineer submit: Committed 100ecad0: docs/research/system-tuning-playbook.md covers versioned evidence, settings, verification, effects, risks, rollback and a 75-12...
 - 2026-11-14 13:33 **S12-17** engineer ask: Red test unexpectedly passed because the pending fix was included in the worktree and pm.py commit stages all changes: commit 71cbcf86 contains bot...
 - 2026-11-14 13:32 **S12-17** lead answer: See the resume note above for the working host-test command.
-- 2026-11-14 13:32 **S12-17** lead resume: Lead 13:32: Cygwin python3 is a symlink Windows cannot spawn. Use Windows python for run.py, and Cygwin bash by absolute path with /usr/bin first a...
 
 ## Cost
 
 - From the script, engineer: 584 sessions, 1205.9M input tokens
 - From the script, lead: 386 sessions, 108.0M input tokens
-- Started by hand, Claude: 12 sessions, 3151.4M input tokens
+- Started by hand, Claude: 12 sessions, 3158.7M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
