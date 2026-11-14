@@ -75,7 +75,8 @@ def _lock_holder_gone(path):
     """True only when the lock names a process that certainly no longer exists; any doubt keeps the lock."""
     try:
         with open(path, encoding="ascii") as f:
-            pid = int(f.read().strip())
+            # Dispatcher locks add a start time after the PID line.
+            pid = int(f.readline().strip())
     except (OSError, ValueError):
         return False  # being written, or unreadable: wait as before
     if os.name != "nt":
