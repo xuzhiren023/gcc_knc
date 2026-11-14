@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """Host-only phase-one S12-07 assembly audit and paired diagnostic staging."""
+import argparse
 import os
 from pathlib import Path
 import subprocess
@@ -24,6 +25,10 @@ def cc(language, donor=False):
 
 
 def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--driver-only', action='store_true',
+                        help='relink the driver with existing, unchanged kernel objects')
+    args = parser.parse_args()
     if sys.platform != 'cygwin':
         raise RuntimeError('use shared Cygwin python3')
     OUT.mkdir(exist_ok=True)
@@ -34,6 +39,13 @@ def main():
                 ('nopf', False, ['-fno-prefetch-loop-arrays'])]
     for variant, donor, extra in variants:
         directory = OUT / variant
+        if args.driver_only:
+            for language in ['gcc', 'gfortran']:
+                obj = directory / (language + '.o')
+                if not obj.is_file():
+                    raise FileNotFoundError(obj)
+                objects.append(obj)
+            continue
         directory.mkdir(exist_ok=True)
         flags = ['-O2'] + ([] if donor else ['-march=knc']) + extra
         run(*cc('gcc', donor), '--version')

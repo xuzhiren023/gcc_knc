@@ -95,13 +95,41 @@ static void pages(void *p) {
   fclose(f);
 }
 int main(void) {
-  cpu_set_t cpus;
+  cpu_set_t cpus, pinned, actual;
+  int selected = -1;
   setvbuf(stdout, NULL, _IOLBF, 0);
   alarm(180); /* Hard bound: one serial diagnostic, including validation. */
-  if (sched_getaffinity(0, sizeof cpus, &cpus) || CPU_COUNT(&cpus) != 1) {
-    fputs("FAIL: single-core timing requires exactly one granted CPU\n", stderr);
+  if (sched_getaffinity(0, sizeof cpus, &cpus)) {
+    perror("FAIL: sched_getaffinity granted CPUs");
     return 2;
   }
+  for (int cpu = 0; cpu < CPU_SETSIZE; ++cpu)
+    if (CPU_ISSET(cpu, &cpus)) { selected = cpu; break; }
+  if (selected < 0) {
+    fputs("FAIL: no granted CPU\n", stderr);
+    return 2;
+  }
+  CPU_ZERO(&pinned);
+  CPU_SET(selected, &pinned);
+  if (sched_setaffinity(0, sizeof pinned, &pinned)) {
+    perror("FAIL: sched_setaffinity selected CPU");
+    return 2;
+  }
+  if (sched_getaffinity(0, sizeof actual, &actual)) {
+    perror("FAIL: sched_getaffinity pinned CPU");
+    return 2;
+  }
+  if (CPU_COUNT(&actual) != 1 || !CPU_ISSET(selected, &actual)) {
+    fputs("FAIL: selected CPU affinity not retained\n", stderr);
+    return 2;
+  }
+  printf("AFFINITY granted=");
+  for (int cpu = 0; cpu < CPU_SETSIZE; ++cpu)
+    if (CPU_ISSET(cpu, &cpus)) printf("%d,", cpu);
+  printf(" pinned=%d idle_siblings_reserved=", selected);
+  for (int cpu = 0; cpu < CPU_SETSIZE; ++cpu)
+    if (cpu != selected && CPU_ISSET(cpu, &cpus)) printf("%d,", cpu);
+  putchar('\n');
   printf("CLOCK monotonic CPU %d\n", sched_getcpu());
   for (int size = 0; size < 2; ++size)
     for (int kind = 0; kind < 4; ++kind)

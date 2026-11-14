@@ -63,8 +63,13 @@ The batch covers:
 Every output is compared byte-for-byte with the donor, including repeated
 SymGS updates, outside timing. These finite dyadic inputs are an equivalence
 check for the diagnostic, not a proof for arbitrary FP values. CLOCK_MONOTONIC
-times whole kernel calls. The program requires exactly one granted CPU,
-prints the executing CPU and page-size information from `smaps`, and has a
+times whole kernel calls. The program pins itself to the first granted CPU,
+verifies the resulting singleton affinity, and prints the original grant and
+remaining CPUs as reserved idle siblings. With `card_run --threads 1`, the
+grant is one whole core (four logical CPUs), so three siblings remain unused
+by this diagnostic. This reservation does not measure unrelated OS activity;
+the lead must still record sibling activity. The program also prints the
+executing CPU and page-size information from `smaps`, and has a
 180-second alarm. This is explicitly single-core timing; parallel case
 execution would change the cache and bandwidth experiment.
 
@@ -105,6 +110,25 @@ loops. Their cache/page, timing-envelope and instruction-overhead distinctions
 apply here; their measured bandwidths are not this diagnostic's ceiling.
 
 ## Validation and pending work
+
+Card window 1 failed before any cases: the previous driver required a
+singleton grant, but `card_run --threads 1` grants four logical CPUs. The
+lead reported exit 2 after 17 seconds in
+`.work/_shared/tmp/claude-s12-window1/s12-07-sparse.out`. This is an affinity
+infrastructure failure, not a native correctness or timing result. The driver
+now narrows the grant before allocation or timing. The `--driver-only` staging
+option reuses the unchanged kernel objects from the previous successful host
+build and rebuilds/links the driver, then runs `knc_lint`.
+
+Restaging passed once (exit 0, including `knc_lint`):
+
+```
+python tools/run.py --name s12_07_restage --inputs tools/s12_07_stage.py tools/s12_07_sparse.c -- ..\_shared\toolchain\cygwin\bin\python3.12.exe tools/s12_07_stage.py --driver-only
+```
+
+Log: `.work/_state/logs/s12_07_restage-20261114-175645.log`.
+The restaged binary is at the same path. Affinity narrowing and all paired
+checks still require the lead's next native window; no native pass is claimed.
 
 Passed once after the lead's installed-driver correction:
 
