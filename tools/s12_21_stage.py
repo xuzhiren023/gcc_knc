@@ -232,9 +232,9 @@ def package(out, plan):
     # workload to the same first granted CPU; shell retains full granted affinity.
     lines = ['#!/bin/sh', 'set -eu', 'cd -- "$(dirname -- "$0")"',
              'tar -xzf payload.tar.gz', 'chmod +x launch imul.mic',
-             'echo S12_21_IMUL_BEGIN', 'timeout 120 ./imul.mic', 'echo S12_21_IMUL_END']
+             'echo S12_21_IMUL_BEGIN', './imul.mic', 'echo S12_21_IMUL_END']
     runtimes = {}
-    with tarfile.open(out / 'payload.tar.gz', 'w:gz') as archive:
+    with tarfile.open(out / 'payload.tar.gz', 'w:gz', format=tarfile.USTAR_FORMAT) as archive:
         for name in ('launch', 'imul.mic', 'input.bin', 'input.sql', 'hpcg.dat'):
             archive.add(out / name, arcname=name)
         for label in FLAGS:
@@ -247,7 +247,7 @@ def package(out, plan):
                     runtimes.setdefault(p.name, p)
                 if program == 'zlib':
                     peer = out / ('density1' if label == 'default' else 'default') / program
-                    with tarfile.open(folder / 'peer.tar', 'w') as peer_archive:
+                    with tarfile.open(folder / 'peer.tar', 'w', format=tarfile.USTAR_FORMAT) as peer_archive:
                         for p in [peer / 'workload', *peer.glob('*.so*')]:
                             peer_archive.add(p, arcname=p.name)
                     archive.add(folder / 'peer.tar', arcname=label+'/'+program+'/peer.tar')
@@ -262,7 +262,7 @@ def package(out, plan):
                   'chmod +x workload', 'ln -sf ../../input.bin input.bin',
                   'ln -sf ../../input.sql input.sql', 'ln -sf ../../hpcg.dat hpcg.dat',
                   'for lib in ../../runtime/*; do [ ! -f "$lib" ] || ln -sf "$lib" "${lib##*/}"; done',
-                  'timeout %d ../../launch serial %s' % (row['timeout'], row['program']),
+                  '../../launch serial %s' % row['program'],
                   ')', 'echo S12_21_PAIR_END '+str(index)]
     lines += ['echo "RESULT S12-21 PASS"', '']
     write(out / 'batch.sh', '\n'.join(lines))
@@ -271,8 +271,9 @@ def package(out, plan):
     save_json(out / 'card-plan.json', plan)
     write(out / 'README.txt',
           'Lead only; one exclusive full-profile reservation, no smaller inputs or profiles.\n'
-          'Serial workload timeout 60 s each; IMUL 120 s; total work deadlines 1560 s; outer 1740 s.\n'
-          'Timeout/failure stops the batch and is not a result or a reason to shorten fixed inputs.\n'
+          'Estimated work budgets: 60 s per workload, IMUL 120 s, total 1560 s.\n'
+          'Only card_run enforces the 1740 s outer deadline; card BusyBox has no timeout.\n'
+          'Timeout/failure is not a result or a reason to shorten fixed inputs.\n'
           'IMUL pins one granted CPU; register and hot-L1 memory operands, 64 unrolled operations,\n'
           'one dependent stream versus eight independent streams, three samples, checked answers.\n'
           'TSC ticks/op include loop overhead; tsc_hz is measured against MONOTONIC_RAW.\n'

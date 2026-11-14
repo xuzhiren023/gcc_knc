@@ -8,7 +8,8 @@ building, preventing stale assembly from entering the census.
 
 The recovered stage uses gzip and one copy of each runtime DSO to stay within
 the card runner's 64 MiB payload limit. All 28 fresh builds and lints passed. The compressed payload is
-16,328,655 bytes; package size and shell syntax checks passed during staging.
+16,329,850 bytes after the card-window fix; package size and shell syntax
+checks passed during repackaging.
 
 This phase uses the installed `gcc-knc-16.2.0` prefix and the fourteen
 development programs only. There is no GCC source or default change.
@@ -66,10 +67,11 @@ Recovered static census (each count pair is default / density 1):
 
 The lead entry point is `.work/_shared/S12-21/r2/batch.sh`, with `payload.tar.gz`
 listed in `files.txt`. It uses one exclusive `full` reservation, a 1740-second
-outer deadline, a 120-second IMUL deadline, and 24 workload deadlines of
-60 seconds each (1560 seconds total inner deadlines). A timeout or nonzero
-exit stops the batch. Fixed corpus sizes are retained; a workload that
-cannot complete within its deadline requires lead review, not smaller input.
+outer deadline enforced by `card_run`. The 120-second IMUL and 24 workload
+budgets of 60 seconds each (1560 seconds total) are estimates, not enforced
+inner deadlines: the card BusyBox has no `timeout` command. A nonzero exit
+stops the batch; the runner bounds the entire job. Fixed corpus sizes are
+retained; an incomplete batch requires lead review, not smaller input.
 
 The IMUL executable pins itself to one granted CPU and reports actual
 affinity, core/sibling topology, available frequency before/after, and timer
@@ -117,5 +119,17 @@ variants, the launcher and the eight-form IMUL executable, and generating the
 census and compressed package:
 `.work/_state/logs/s12_21_r2_stage-20261114-160641.log`.
 The measured code-difference selection is SQLite, NPB-MG, NPB-CG and HPCG.
-No card execution, native latency, speedup, or phase-two eligibility is
-claimed. x86 identity and ICE sweeps are not phase-one checks.
+The lead's first card window exited 127 in 22 seconds because BusyBox has no
+`timeout`; extraction also warned about pax extended headers. That is an
+infrastructure failure, with no native latency, speedup, or phase-two
+eligibility result. Lead output:
+`.work/_shared/tmp/claude-s12-window1/s12-21-sched.out`.
+
+The card-window fix removes both shell `timeout` invocations and writes the
+payload and zlib peer archives in ustar format. The existing r2 binaries were
+repackaged without rebuilding. All four contracts passed:
+`.work/_state/logs/s12_21_window_fix_contracts-20261114-175732.log`.
+The refreshed package passed its size and shell syntax checks:
+`.work/_state/logs/s12_21_window_fix_package-20261114-175739.log`.
+The lead command above is ready for the next window; no engineer card run
+was made. x86 identity and ICE sweeps are not phase-one checks.
