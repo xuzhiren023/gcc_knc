@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-14 01:02.
+Updated automatically at every ticket change. Last update: 2026-11-14 01:03.
 
-**Next: the tech lead, on S11-02.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: GPT-6.1, on S11-02 (card_run and run_suite move bulk data by SCIF DMA at the PCIe link limit, with the SSH stream as fallback).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
 Current tickets: `[###################-]` 206 of 213
 
@@ -53,7 +53,7 @@ Current tickets: `[###################-]` 206 of 213
 | S10-12 | cbrt and cbrtf crash (SIGSEGV) in qualify_v1 on the card - root cause and fix | Done | The cbrt and cbrtf qualification jobs no longer crash on the card and pass (worst 0.4996 and 0.4991 ULP): t... |
 | S10-13 | User story - code that calls cbrtl under -march=knc gets a safe replacement and a compile-time warning (MPSS libm cbrtl faults) | Done | Under -march=knc, calls to cbrtl (and std::cbrt on long double) now go to GCC-KNC's own safe cube root with... |
 | S11-01 | User story - the best way to move data between the host and the card, measured, and how our projects use it | Done | We now have a sourced inventory of every host-card transfer path that works without changing MPSS (SSH, tar... |
-| S11-02 | card_run and run_suite move bulk data by SCIF DMA at the PCIe link limit, with the SSH stream as fallback | Question for the tech lead | 4aae037c fixes defaults/fixtures; extra stat was POSIX Path.resolve. validate.ps1 resolves Suite before cd.... |
+| S11-02 | card_run and run_suite move bulk data by SCIF DMA at the PCIe link limit, with the SSH stream as fallback | In progress | Reviewed 4aae037c: the class defaults (helper_free True, transfer_method ssh, transfers list), the fixture ... |
 | S11-03 | S11-01 transfer tool rejects the card's physical /tmp path, so the native study never starts | Done | The transfer study's tool now accepts the card's real /tmp location (/var/volatile/tmp), so its card run ca... |
 | S11-04 | S11-01 transfer tool - the host opens every connection, because Windows Firewall blocks inbound TCP from the card | Done | The transfer study's host side now opens every connection to the card, so Windows Firewall no longer blocks... |
 | S11-05 | Research - raise KNC's real memory bandwidth from about 175 GB/s toward 75-85% of peak, with a measured plan | Done | The memory-bandwidth research plan and a validated multithreaded KNC bandwidth benchmark are ready, with a ... |
@@ -238,6 +238,7 @@ Current tickets: `[###################-]` 206 of 213
 
 ## Recent activity
 
+- 2026-11-14 01:03 **S11-02** lead answer: Reviewed 4aae037c: the class defaults (helper_free True, transfer_method ssh, transfers list), the fixture updates for private publication, and pat...
 - 2026-11-14 01:02 **S11-17** lead answer: Revise candidates in this ticket; no compiler work here (gcc: no stays). Make each gate name a transformation GCC 16 actually performs with -fprofi...
 - 2026-11-14 01:00 **S11-15** lead defer: Card run needed. Batch at 31272757 reviewed and fine (36 launches: 12 serial + 6 OpenMP GCC-KNC dev builds, plain+sampled, full 7120, 600 s cap eac...
 - 2026-11-14 00:58 **S11-17** engineer ask: eb3c2f3b: ten profiles imported; five binaries compiled/linted, positive counts, fatal mismatch checks. T1: 2 pass, 3 fail. Reproducer: tools/s11_1...
@@ -245,7 +246,6 @@ Current tickets: `[###################-]` 206 of 213
 - 2026-11-14 00:55 **S11-27** lead approve: NPB-MG built by GCC-KNC at -O2 -march=knc now verifies on the card (class A in 14.1 s, against 33.8 s for GCC 5.1.1): reload no longer puts its x87...
 - 2026-11-14 00:55 **S11-15** engineer ask: Committed 31272757. Please run from main: python tools/run.py --name S11-15-profile-batch -- powershell -NoProfile -File .work\_shared\S11-15\lead....
 - 2026-11-14 00:41 **S11-29** lead defer: Interactive lead: no rebase needed (main changed only ticket/status files; card_run untouched). Run card round per .work/_shared/S11-29/README.md: ...
-- 2026-11-14 00:41 **S11-17** owner decide: Budget raised by the lead under the owner's standing rule (2026-11-09/10: the lead extends session and token budgets itself; ask only after two ext...
 
 ## Cost
 
@@ -257,4 +257,4 @@ Current tickets: `[###################-]` 206 of 213
 
 ## Disk
 
-The project uses 31.7 GiB of 100 GiB. 165 GiB free on the drive.
+The project uses 31.7 GiB of 100 GiB. 163 GiB free on the drive.
