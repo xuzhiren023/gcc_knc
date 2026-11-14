@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-14 16:23.
+Updated automatically at every ticket change. Last update: 2026-11-14 16:25.
 
-**Next: GPT-6.1, on S12-21 (Scheduling model for M4's serial runs - measure density-1 tuning and the integer-multiply cost against today's density-4 defaults (S12-14 B02, B04, B05)).** Run `python tools/dispatch.py`, or ask the tech lead to.
+**Next: the tech lead, on S12-22.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[##################--]` 224 of 240
 
@@ -102,7 +102,7 @@ Current tickets: `[##################--]` 224 of 240
 | S12-19 | Profile-guided missed-vectorization triage - join hot loops with the vectorizer's reasons and observed strides/masks, so tuning targets what is hot and fixable | Done | tools/vec_triage.py now ranks each development program's hot loops by sampled time with GCC's vectorizer ve... |
 | S12-20 | libknc_vmath accuracy and exception contract, with an independent validation design (rounding modes, special values, flags, scalar fallback) | draft |  |
 | S12-21 | Scheduling model for M4's serial runs - measure density-1 tuning and the integer-multiply cost against today's density-4 defaults (S12-14 B02, B04, B05) | In progress | Lead 16:20: phase 1 accepted as staged (r2). No submit yet: the lead runs r2/batch.sh tonight in card windo... |
-| S12-22 | Low-risk corrections from the S12-14 audit - wrong comments and citations (N01-N09) and the far-prefetch-distance range bug (B10) | In progress | Do both, in one change: (a) knc-prefetch-l2-distance IntegerRange(2, 4096) in i386.opt; (b) in the KNC opti... |
+| S12-22 | Low-risk corrections from the S12-14 audit - wrong comments and citations (N01-N09) and the far-prefetch-distance range bug (B10) | Question for the tech lead | The lane-2 GCC source is in the shared gcc-2 worktree (.work/_shared/gcc-2), outside this ticket worktree. ... |
 | S12-23 | Floating-point environment correctness on KNC - fix the underflow probe that cannot tell flushing from rounding, and handle x87 erratum CD28 (S12-14 N06, N07, B16, B17) | Not started |  |
 | S12-24 | ICE in vect_transform_stmt (tree-vect-stmts.cc:13381) on WRF's REMEZ at -mphinix (-O3 -march=knc) | Not started |  |
 | S12-25 | WRF smpar build arm with --param=knc-threads-per-core=2 for PhiWeather's 2-threads-per-core runs (A/B against S11-26's default-4 build) | Not started |  |
@@ -265,6 +265,7 @@ Current tickets: `[##################--]` 224 of 240
 
 ## Recent activity
 
+- 2026-11-14 16:25 **S12-22** engineer ask: The lane-2 GCC source is in the shared gcc-2 worktree (.work/_shared/gcc-2), outside this ticket worktree. This agent's writable roots exclude it, ...
 - 2026-11-14 16:22 **S12-21** lead answer: Lead 16:20: phase 1 accepted as staged (r2). No submit yet: the lead runs r2/batch.sh tonight in card window 1 (after ~5:35 PM EST) and saves nativ...
 - 2026-11-14 16:22 **S12-19** lead approve: tools/vec_triage.py now ranks each development program's hot loops by sampled time with GCC's vectorizer verdict and reason, but only 11% of profil...
 - 2026-11-14 16:14 **S12-22** lead answer: Do both, in one change: (a) knc-prefetch-l2-distance IntegerRange(2, 4096) in i386.opt; (b) in the KNC option override, if l1 >= l2 after both are ...
@@ -272,13 +273,12 @@ Current tickets: `[##################--]` 224 of 240
 - 2026-11-14 16:13 **S12-21** engineer ask: Recovery complete at 0711ba08: fresh r2, four contracts and all 28 builds/lints plus IMUL/launcher/package checks pass. Logs: .work/_state/logs/s12...
 - 2026-11-14 16:12 **S12-19** engineer submit: 501aa8bf: function gate/offset mapping; 11 host tests pass; analyze/report done. Coverage 1715/15109 (11.35%); rejections, compiler-version uncerta...
 - 2026-11-14 16:11 **S12-22** owner decide: Lead raises input_tokens 2M -> 6M (second raise; tokens went to the wrong-parameter round caused by the ticket). If it stalls again the lead asks t...
-- 2026-11-14 16:10 **S12-22** engineer escalate: budget: 2039970 input tokens used; the budget is 2000000
 
 ## Cost
 
 - From the script, engineer: 626 sessions, 1260.0M input tokens
 - From the script, lead: 410 sessions, 113.3M input tokens
-- Started by hand, Claude: 12 sessions, 3239.0M input tokens
+- Started by hand, Claude: 12 sessions, 3240.7M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
