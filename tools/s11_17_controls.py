@@ -160,7 +160,9 @@ def run(args, cwd=OUT):
 
 
 def write(path, text):
-    path.write_text(text, encoding='utf8')
+    # Card /bin/sh requires LF even when staging with Windows Python.
+    with path.open('w', encoding='utf8', newline='\n') as output:
+        output.write(text)
 
 
 def compile_kernel(kernel, variant, flags):

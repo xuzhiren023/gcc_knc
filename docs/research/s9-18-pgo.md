@@ -176,7 +176,7 @@ evaluation. Confirmatory median gains are approximately 0.7–0.9%, with substan
 pair variation on full and 3100. This is a small observed gain, far below the
 19–21% microcase gains; these ranges alone do not establish statistical significance.
 
-### Positive controls (lead's 2026-11-13 amendment; training pending)
+### Positive controls (lead's 2026-11-13 amendment; assembly gate incomplete)
 
 `tools/s11_17_controls.py` stages five independent integer kernels: a 99%-zero
 branch against GCC's nonzero static guess, a volatile function-pointer table with
@@ -216,7 +216,7 @@ on PATH; card commands run only by the lead):
 
 1. Instrumented binaries and the lead script are under
    `.work/_shared/S11-17/controls/`. Run
-   `python tools/run.py --name S11-17-controls-train -- powershell -NoProfile -File ../_shared/S11-17/controls/controls-lead.ps1`.
+   `python tools/run.py --name S11-17-controls-train -- powershell -NoProfile -ExecutionPolicy Bypass -File ../_shared/S11-17/controls/controls-lead.ps1`.
    Return `controls/train.stdout` and `.stderr` to the engineer. The script runs
    ten short checked training programs in parallel, waits for every exit status,
    and only then exports their independent profiles. No timed results are inferred
@@ -224,7 +224,7 @@ on PATH; card commands run only by the lead):
    is a correctness/profile collection step, not a throughput measurement.
 2. Engineer: `python tools/run.py --name S11-17-controls-use --inputs tools/s11_17_controls.py -- ../_shared/toolchain/cygwin/bin/python3.12.exe tools/s11_17_controls.py use ../_shared/S11-17/controls/train.stdout`.
    Then run the T1 test with `--variant pgo`. Retain the genuine profile data
-   as test fixtures if directed by the lead; binaries and assembly stay shared.
+   as the card-training fixtures requested by the amendment; binaries and assembly stay shared.
 3. Once assembly checks pass, lead runs the same PowerShell script with
    `-Phase pilot`, reviews correctness/spread, then `-Phase confirm`. Each phase
    visits full/3100/5100. All five kernels share one uploaded timing script.
@@ -235,6 +235,47 @@ on PATH; card commands run only by the lead):
    below fifteen minutes; each individual native process is under a minute.
    Output: `controls/<phase>-<profile>.stdout` and `.stderr`, retaining every
    per-pair time. Speedup and spread for all five controls remain pending.
+
+The lead's 2026-11-14 00:12 EST training returned all ten profiles and ten
+successful correctness checks. The host use build imported all ten, made missing
+and mismatched profiles fatal, and compiled/linted all five timing binaries.
+Every matched and inverted profile had positive edge counts:
+
+| Kernel | Positive edges, matched / inverted | Maximum count, matched / inverted |
+|---|---:|---:|
+| branch | 7 / 7 | 2141304 / 2141304 |
+| indirect | 5 / 5 | 2162688 / 2162688 |
+| division | 2 / 2 | 2162688 / 2162688 |
+| inline | 6 / 6 | 2141304 / 2141304 |
+| switch | 25 / 25 | 2141304 / 310365 |
+
+Use log: `.work/_state/logs/S11_17_controls_use-20261114-002518.log`.
+The real card profiles (3112 bytes total) are retained in
+`tests/tools/data/s11_17_controls/`, as the card-training fallback requested by
+the amendment. Their names, the `SOURCE` constant in `tools/s11_17_controls.py`, and
+compiler version must remain matched; they are not portable host-GCC profiles.
+
+The first matching-profile T1 run passed indirect-call promotion/inlining and
+the constant-divisor fast path, but failed three gates. Branch assembly still
+takes `je` to the 99% hot call; inverted training reverses that arrangement.
+The profile dump does read the correct 99.01% hot edge, so this is not an absent
+profile. The inline caller retains `call inline_pgo_hot`. The switch retains
+an indexed jump table without a dominant-case guard. These are real missing
+transformations for these candidates, not regex spelling differences. The tests
+remain unchanged and failing. Log:
+`.work/_state/logs/S11_17_controls_green-20261114-002545.log` (2 pass, 3 fail).
+No native timing result for the controls is claimed. The assembly prerequisite
+has not been met; compiler changes are outside this research ticket's `gcc: no`
+scope. Lead direction is needed on revised candidates and card retraining versus
+separate compiler investigation tickets.
+
+The generator now writes LF explicitly, preserving the lead's shell-script
+repair under Windows Python as well as Cygwin Python. PowerShell invocations
+above include the lead's required `-ExecutionPolicy Bypass`. The generated timing
+script is `.work/_shared/S11-17/controls/controls-lead.ps1`; when cleared by the
+lead, run it through `tools/run.py` and PowerShell with that option, first
+`-Phase pilot`, then `-Phase confirm`. Its binaries are staged and linted, but
+this is not a request to accept the failed controls as qualified.
 
 ### Lessons from PhiWeather
 
