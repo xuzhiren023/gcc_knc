@@ -24,13 +24,25 @@ PROJECT = ROOT.parent.parent if ROOT.parent.name == '.work' else ROOT
 sys.path.insert(0, str(ROOT / 'tools'))
 
 PREFETCH_SOURCES = ('knc-prefetch-O2.c', 'knc-prefetch-O3.c',
-                    'knc-prefetch-param.c', 'knc-prefetch-density.c')
+                    'knc-prefetch-param.c', 'knc-prefetch-density.c',
+                    'knc-prefetch-distance-boundary.c')
 
 
 def t1():
     from check import Runner
     runner = Runner(SimpleNamespace(compiler='gcc16', cc=None))
     with runner._output:
+        source = runner.source_dir / 'knc-prefetch-distance-boundary.c'
+        rejected = runner.command(
+            runner.cc, *runner.cc_flags, '--param=knc-prefetch-l2-distance=1',
+            '--sysroot=' + str(runner.sysroot), '-fsyntax-only', source,
+            check=False)
+        runner.result('t1 prefetch L2 distance one rejected', [] if
+                      rejected.returncode != 0 and re.search(
+                          r'knc-prefetch-l2-distance.*(?:range|between).*2.*4096',
+                          rejected.stdout) else [
+                              'expected range 2..4096 diagnostic; exit %d: %s' %
+                              (rejected.returncode, rejected.stdout[-1000:])])
         runner.t1_sources(runner.source_dir / name for name in PREFETCH_SOURCES)
     return int(runner.failed)
 
