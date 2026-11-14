@@ -22,6 +22,13 @@ DEVELOPMENT = ('PB-gemm', 'PB-atax', 'PB-cholesky', 'PB-ludcmp',
                'NPB-MG', 'NPB-IS', 'HPCG', 'zlib', 'SQLite')
 FLAGS = {'default': ['-O2', '-march=knc'],
          'density1': ['-O2', '-march=knc', '--param=knc-threads-per-core=1']}
+STAGE_SUBDIR = Path('S12-21/r2')
+
+
+def prepare_stage(out):
+    if out.exists() and any(out.iterdir()):
+        raise ValueError('stage must be empty; refusing existing outputs in '+str(out))
+    out.mkdir(parents=True, exist_ok=True)
 
 
 def build_plan():
@@ -220,6 +227,7 @@ def census(out):
 
 def package(out, plan):
     import corpus
+    lead_path = '.work/_shared/' + STAGE_SUBDIR.as_posix()
     # One reservation for IMUL and all adjacent pairs. Serial launcher pins each
     # workload to the same first granted CPU; shell retains full granted affinity.
     lines = ['#!/bin/sh', 'set -eu', 'cd -- "$(dirname -- "$0")"',
@@ -270,17 +278,17 @@ def package(out, plan):
           'TSC ticks/op include loop overhead; tsc_hz is measured against MONOTONIC_RAW.\n'
           'Do not equate TSC ticks to core clocks without reviewing clock/power conditions.\n'
           'The card runner records reservation/environment. No native result exists at staging.\n'
-          'LEAD (Windows project root, preserve stdout/stderr in .work/_shared/S12-21/native.log):\n'
+          f'LEAD (Windows project root, preserve stdout/stderr in {lead_path}/native.log):\n'
           'python tools/card_run --benchmark --profile full --threads 240 --timeout 1740 '
-          '--file-list .work/_shared/S12-21/files.txt .work/_shared/S12-21/batch.sh\n'
-          'COLLECT: python tools/s12_21_stage.py collect .work/_shared/S12-21/native.log\n')
+          f'--file-list {lead_path}/files.txt {lead_path}/batch.sh\n'
+          f'COLLECT: python tools/s12_21_stage.py collect {lead_path}/native.log\n')
 
 
 def stage(only):
     import corpus
-    out = corpus.SHARED / 'S12-21'
+    out = corpus.SHARED / STAGE_SUBDIR
     source = corpus.SHARED / 'corpus-build/sources'
-    out.mkdir(exist_ok=True)
+    prepare_stage(out)
     with (out / 'support.log').open('w' if not only else 'a') as log:
         if not only:
             corpus.execute(['gcc', source / 'NPB3.4.2/NPB3.4-OMP/sys/setparams.c',
@@ -333,7 +341,7 @@ def stage(only):
 
 def collect(path):
     import corpus
-    out = corpus.SHARED / 'S12-21'
+    out = corpus.SHARED / STAGE_SUBDIR
     plan = json.loads((out / 'card-plan.json').read_text())
     text = path.read_text(errors='replace')
     if text.count('RESULT S12-21 PASS') != 1 or text.count('RESULT IMUL PASS') != 1:
@@ -388,7 +396,7 @@ def main():
         return subprocess.call([str(tc / 'cygwin/bin/python3.12.exe'), script, *sys.argv[1:]], env=env)
     elif args.action == 'package':
         import corpus
-        out = corpus.SHARED / 'S12-21'
+        out = corpus.SHARED / STAGE_SUBDIR
         package(out, json.loads((out / 'card-plan.json').read_text()))
         print('PACKAGED', (out / 'payload.tar.gz').stat().st_size, 'bytes; shell syntax PASS; no rebuild or card run')
     else:

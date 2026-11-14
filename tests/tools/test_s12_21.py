@@ -7,6 +7,7 @@ These tests deliberately do not assert a performance gain or an IMUL latency.
 import importlib.util
 from collections import Counter
 from pathlib import Path
+import tempfile
 import unittest
 
 
@@ -89,6 +90,18 @@ class PhaseOne(unittest.TestCase):
         for differences in (incomplete, foreign):
             with self.subTest(programs=sorted(differences)), self.assertRaises(ValueError):
                 self.stage.card_plan(differences)
+
+    def test_fresh_stage_rejects_existing_outputs_before_building(self):
+        self.assertEqual(self.stage.STAGE_SUBDIR, Path('S12-21/r2'))
+        with tempfile.TemporaryDirectory() as temporary:
+            out = Path(temporary) / self.stage.STAGE_SUBDIR
+            self.stage.prepare_stage(out)
+            stale = out / 'default' / 'NPB-MG' / 'stale.s'
+            stale.parent.mkdir(parents=True)
+            stale.write_text('stale assembly')
+            with self.assertRaisesRegex(ValueError, 'stage must be empty'):
+                self.stage.prepare_stage(out)
+            self.assertEqual(stale.read_text(), 'stale assembly')
 
 
 if __name__ == '__main__':
