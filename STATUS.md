@@ -99,7 +99,7 @@ Current tickets: `[##################--]` 220 of 237
 | S12-16 | Research - whole-system tuning playbook for the Z840 + Xeon Phi (BIOS, host OS, MPSS and card, transfers, runtimes), as HPC centres tuned Xeon + KNC systems | Done | Whole-system tuning playbook for the Z840 + Phi done: 13 ordered steps (BIOS, host Linux, card power/pages/... |
 | S12-17 | claude-torture -j N refuses to start in exclusive card runs (no inherited RLIMIT_AS since S11-29), so the execute suite cannot run | In progress | Lead raises sessions 2 -> 4 (standing owner rule): session 1 was lost to the sandbox host-test launcher, no... |
 | S12-18 | Double-precision vector exp, log and pow ran slower than scalar libm on the card (0.82x, 0.63x, 0.49x) - confirm with valid batches, then fix the library or stop the vectorizer calling them where they lose | lead | Needs interactive lead: (1) exclusive card turn running .work/_shared/S12-18/vmath-bench.mic at full, 3100 ... |
-| S12-19 | Profile-guided missed-vectorization triage - join hot loops with the vectorizer's reasons and observed strides/masks, so tuning targets what is hot and fixable | Tests waiting for review | Red commit b111b1d4: 7 host fixture cases cover six missed reasons, optimized/SLP distinction, exclusive ne... |
+| S12-19 | Profile-guided missed-vectorization triage - join hot loops with the vectorizer's reasons and observed strides/masks, so tuning targets what is hot and fixable | Changes requested | Red fails for the right reason (no vec_triage module), and the ranking, exclusive nested time, half-open PC... |
 | S12-20 | libknc_vmath accuracy and exception contract, with an independent validation design (rounding modes, special values, flags, scalar fallback) | draft |  |
 | S12-21 | Scheduling model for M4's serial runs - measure density-1 tuning and the integer-multiply cost against today's density-4 defaults (S12-14 B02, B04, B05) | Not started |  |
 | S12-22 | Low-risk corrections from the S12-14 audit - wrong comments and citations (N01-N09) and the far-prefetch-distance range bug (B10) | Not started |  |
@@ -262,6 +262,7 @@ Current tickets: `[##################--]` 220 of 237
 
 ## Recent activity
 
+- 2026-11-14 14:51 **S12-19** lead changes: Red fails for the right reason (no vec_triage module), and the ranking, exclusive nested time, half-open PC, program filter, dedup and allowlist ca...
 - 2026-11-14 14:51 **S12-17** owner decide: Lead raises sessions 2 -> 4 (standing owner rule): session 1 was lost to the sandbox host-test launcher, now solved; the fix and test exist.
 - 2026-11-14 14:50 **S12-07** engineer ask: Phase-1 staging failed twice. Donor dump-filename rejection is fixed; GCC-KNC xg++ now fails on missing cassert in HPCG Vector.hpp:23. Reproducer: ...
 - 2026-11-14 14:49 **S12-18** lead defer: Needs interactive lead: (1) exclusive card turn running .work/_shared/S12-18/vmath-bench.mic at full, 3100 and 5100 per docs/research/s12-18-double...
@@ -269,7 +270,6 @@ Current tickets: `[##################--]` 220 of 237
 - 2026-11-14 14:49 **S12-06** lead approve: Theme 1 (scalar FP conversions and calls in NPB-EP/IS) closed with no compiler change: a card diagnostic shows GCC-KNC already equal or faster than...
 - 2026-11-14 14:40 **S12-19** engineer red: Red commit b111b1d4: 7 host fixture cases cover six missed reasons, optimized/SLP distinction, exclusive nested time, PC/module/program mapping, de...
 - 2026-11-14 14:40 **S11-26** lead resume: Lead 14:45: (1) tree staged at .work/_shared/wrf-trial/src/WRF-4.8.0-smpar (see my 14:28 answer). (2) gcc-knc-16.2.0 = knc 619e14b479a. (3) Do list...
-- 2026-11-14 14:39 **S12-18** engineer ask: Phase 1 committed d29d7c74. Host regression passes 12 scenarios; built/linted .work/_shared/S12-18/vmath-bench.mic. Report, logs and exclusive full...
 
 ## Cost
 
