@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-14 00:56.
+Updated automatically at every ticket change. Last update: 2026-11-14 00:57.
 
-**Next: the tech lead, on S11-15.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: the tech lead, on S11-02.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[###################-]` 206 of 213
 
@@ -53,7 +53,7 @@ Current tickets: `[###################-]` 206 of 213
 | S10-12 | cbrt and cbrtf crash (SIGSEGV) in qualify_v1 on the card - root cause and fix | Done | The cbrt and cbrtf qualification jobs no longer crash on the card and pass (worst 0.4996 and 0.4991 ULP): t... |
 | S10-13 | User story - code that calls cbrtl under -march=knc gets a safe replacement and a compile-time warning (MPSS libm cbrtl faults) | Done | Under -march=knc, calls to cbrtl (and std::cbrt on long double) now go to GCC-KNC's own safe cube root with... |
 | S11-01 | User story - the best way to move data between the host and the card, measured, and how our projects use it | Done | We now have a sourced inventory of every host-card transfer path that works without changing MPSS (SSH, tar... |
-| S11-02 | card_run and run_suite move bulk data by SCIF DMA at the PCIe link limit, with the SSH stream as fallback | In progress | One more review round, granted by the lead under the owner's standing rule (2026-11-09/10: the lead extends... |
+| S11-02 | card_run and run_suite move bulk data by SCIF DMA at the PCIe link limit, with the SSH stream as fallback | Question for the tech lead | 4aae037c fixes defaults/fixtures; extra stat was POSIX Path.resolve. validate.ps1 resolves Suite before cd.... |
 | S11-03 | S11-01 transfer tool rejects the card's physical /tmp path, so the native study never starts | Done | The transfer study's tool now accepts the card's real /tmp location (/var/volatile/tmp), so its card run ca... |
 | S11-04 | S11-01 transfer tool - the host opens every connection, because Windows Firewall blocks inbound TCP from the card | Done | The transfer study's host side now opens every connection to the card, so Windows Firewall no longer blocks... |
 | S11-05 | Research - raise KNC's real memory bandwidth from about 175 GB/s toward 75-85% of peak, with a measured plan | Done | The memory-bandwidth research plan and a validated multithreaded KNC bandwidth benchmark are ready, with a ... |
@@ -238,6 +238,7 @@ Current tickets: `[###################-]` 206 of 213
 
 ## Recent activity
 
+- 2026-11-14 00:57 **S11-02** engineer ask: 4aae037c fixes defaults/fixtures; extra stat was POSIX Path.resolve. validate.ps1 resolves Suite before cd. Full tools suite: 236 tests, 48 failure...
 - 2026-11-14 00:55 **S11-27** lead approve: NPB-MG built by GCC-KNC at -O2 -march=knc now verifies on the card (class A in 14.1 s, against 33.8 s for GCC 5.1.1): reload no longer puts its x87...
 - 2026-11-14 00:55 **S11-15** engineer ask: Committed 31272757. Please run from main: python tools/run.py --name S11-15-profile-batch -- powershell -NoProfile -File .work\_shared\S11-15\lead....
 - 2026-11-14 00:41 **S11-29** lead defer: Interactive lead: no rebase needed (main changed only ticket/status files; card_run untouched). Run card round per .work/_shared/S11-29/README.md: ...
@@ -245,7 +246,6 @@ Current tickets: `[###################-]` 206 of 213
 - 2026-11-14 00:40 **S11-17** engineer escalate: budget: 8962374 input tokens used; the budget is 6000000
 - 2026-11-14 00:40 **S11-02** owner decide: One more review round, granted by the lead under the owner's standing rule (2026-11-09/10: the lead extends limits itself; ask only after two exten...
 - 2026-11-14 00:39 **S11-29** engineer ask: Committed 9520fce6; red 36b48b4e. Five fake-card tests pass: .work/_state/logs/S11_29_green-20261114-002903.log. Profile proc monitor records RSS+s...
-- 2026-11-14 00:39 **S11-02** lead escalate: over 2 review rounds: Card validation passed (00:14-00:23 EST; numbers below) but approval's host check fails at 45e732b9: 111 tests, 1 failure, 5 ...
 
 ## Cost
 
@@ -257,4 +257,4 @@ Current tickets: `[###################-]` 206 of 213
 
 ## Disk
 
-The project uses 31.7 GiB of 100 GiB. 173 GiB free on the drive.
+The project uses 31.7 GiB of 100 GiB. 165 GiB free on the drive.
