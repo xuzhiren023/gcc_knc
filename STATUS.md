@@ -1,10 +1,10 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-14 01:48.
+Updated automatically at every ticket change. Last update: 2026-11-14 02:33.
 
-**Next: the tech lead, on S11-02.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: GPT-6.1, on S11-15 (First development-corpus baseline and profile, GCC 5.1.1 vs GCC-KNC at -O2 (E7-03 part 1)).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
-Current tickets: `[###################-]` 206 of 213
+Current tickets: `[###################-]` 207 of 213
 
 ## Milestones
 
@@ -14,7 +14,7 @@ Current tickets: `[###################-]` 206 of 213
 | M1 | Mixed native code | Done | 43 of 43 tickets |
 | M2 | Useful vector target | Done | 51 of 51 tickets |
 | M3 | Runtimes | Done | 48 of 48 tickets |
-| M4 | Broad optimization | In progress | 24 of 31 tickets |
+| M4 | Broad optimization | In progress | 25 of 31 tickets |
 | M5 | Program corpus | Not started | Not planned in detail yet |
 | M6 | Release | Not started | Not planned in detail yet |
 
@@ -53,7 +53,7 @@ Current tickets: `[###################-]` 206 of 213
 | S10-12 | cbrt and cbrtf crash (SIGSEGV) in qualify_v1 on the card - root cause and fix | Done | The cbrt and cbrtf qualification jobs no longer crash on the card and pass (worst 0.4996 and 0.4991 ULP): t... |
 | S10-13 | User story - code that calls cbrtl under -march=knc gets a safe replacement and a compile-time warning (MPSS libm cbrtl faults) | Done | Under -march=knc, calls to cbrtl (and std::cbrt on long double) now go to GCC-KNC's own safe cube root with... |
 | S11-01 | User story - the best way to move data between the host and the card, measured, and how our projects use it | Done | We now have a sourced inventory of every host-card transfer path that works without changing MPSS (SSH, tar... |
-| S11-02 | card_run and run_suite move bulk data by SCIF DMA at the PCIe link limit, with the SSH stream as fallback | Question for the tech lead | The 01:43 lead instruction requires merging main into s11/S11-02, but the first git merge --no-commit main ... |
+| S11-02 | card_run and run_suite move bulk data by SCIF DMA at the PCIe link limit, with the SSH stream as fallback | lead | Review of 7deb440b passes; card acceptance (2026-11-14 00:14-00:23 EST) passes. Approve did not finish: its... |
 | S11-03 | S11-01 transfer tool rejects the card's physical /tmp path, so the native study never starts | Done | The transfer study's tool now accepts the card's real /tmp location (/var/volatile/tmp), so its card run ca... |
 | S11-04 | S11-01 transfer tool - the host opens every connection, because Windows Firewall blocks inbound TCP from the card | Done | The transfer study's host side now opens every connection to the card, so Windows Firewall no longer blocks... |
 | S11-05 | Research - raise KNC's real memory bandwidth from about 175 GB/s toward 75-85% of peak, with a measured plan | Done | The memory-bandwidth research plan and a validated multithreaded KNC bandwidth benchmark are ready, with a ... |
@@ -66,9 +66,9 @@ Current tickets: `[###################-]` 206 of 213
 | S11-12 | Sprint 11 batch check - full native suite, x86 identity, forward-port drill, ICE sweeps, runtime prefix consistency | draft |  |
 | S11-13 | Senior compiler review of the Sprint 11-13 scope (Milestone M4) against our research, with recommended plan changes | Done | A senior compiler review of the Sprint 11-13 plan is in: M4 is plausible but needs a frozen scoring and mea... |
 | S11-14 | M4 scoring contract and measurement protocol, frozen before any tuning | Done | M4's scoring contract is frozen in ADR-0015 with a tested scorer: strict serial -O2 versus -O2 over 17 prog... |
-| S11-15 | First development-corpus baseline and profile, GCC 5.1.1 vs GCC-KNC at -O2 (E7-03 part 1) | In progress | Profile batch ran 2026-11-14 01:07-01:32 EST, log .work/_state/logs/S11_15_profile_batch-20261114-010719.lo... |
+| S11-15 | First development-corpus baseline and profile, GCC 5.1.1 vs GCC-KNC at -O2 (E7-03 part 1) | In progress | Do not split. Submit with --override 'research ticket: 754-line baseline report plus profiling tools alread... |
 | S11-16 | Long-double libm hazard audit - do other MPSS long double entry points fault like cbrtl? (E7-21, bounded) | Done | The card's MPSS long double libm was probed on the card: of 12 entry points only cbrtl faults, and S10-13 a... |
-| S11-17 | PGO feasibility on one complete development program (reuse of S9-18's train/use path) | lead | Needs the interactive lead at a3258fe0, S11-17 worktree: 1) engineer cannot overwrite lead-owned controls/c... |
+| S11-17 | PGO feasibility on one complete development program (reuse of S9-18's train/use path) | In progress | Budget raised by the lead under the owner's standing rule: sessions 7 -> 9, the second session extension. P... |
 | S11-18 | M4 corpus harness v2 - card profiles, prefix record, held-out sealing, stronger checks, and the donor-failure rule | Done | The M4 corpus harness now stages all 17 programs for the 7120 and the 3100/5100 profiles with serial voting... |
 | S11-19 | Second senior review - the M4 definition and the Sprint 11-13 roadmap, adjusted | Done | The M4 definition and the Sprint 11-13 roadmap are rewritten as measure, improve, decide, each sprint with ... |
 | S11-20 | Research - which compiler optimizations benefit the widest range of real code on KNC, from professional to amateur, and does our corpus cover it? | Done | We now have a code-style coverage study (docs/research/code-style-coverage.md) that ranks Sprint 12 candida... |
@@ -80,7 +80,7 @@ Current tickets: `[###################-]` 206 of 213
 | S11-26 | WRF OpenMP build at -mphinix with no per-file workarounds (S11-23 and S11-25 fixed), restaged for PhiWeather | draft | Owner 2026-11-13: the S11-24 WRF build is removed. Deleted: |
 | S11-27 | Wrong code - NPB-MG (class A, serial) built by GCC-KNC at -O2 -march=knc fails NPB verification on the card | Done | NPB-MG built by GCC-KNC at -O2 -march=knc now verifies on the card (class A in 14.1 s, against 33.8 s for G... |
 | S11-28 | HPCG run that fits every card model - fixed work instead of fixed duration, grid sized to the 3100's memory | lead | After S11-29 merges (still ready): run .work/_shared/S11-28/lead-pilot.ps1 at 242936bf+ (30 exclusive timed... |
-| S11-29 | card_run profiles limit memory in use, not address space, so a 3100 or 5100 run fails only where the real card would | lead | Interactive lead: card round needed at cbe9a3d6 (about 45 min, needs a card turn). Run .work/_shared/S11-29... |
+| S11-29 | card_run profiles limit memory in use, not address space, so a 3100 or 5100 run fails only where the real card would | Done | Under --profile 3100 and 5100, card_run now limits the memory a job actually uses (sampled resident plus sw... |
 | S12-01 | Sprint 12 prep - static code-quality census of the development-corpus builds (spills, x87/vector transfers, addressing, calls, code size) | Done | A static code-quality census (spill/reload proxies, x87 and x87-zmm traffic, address arithmetic, calls, bra... |
 | S12-02 | Sprint 12 prep - the unscored generality check set (S11-20's six programs in the code styles our corpus lacks) | Done | The six unscored generality checks (Q1-Q6: ray tracer hit dispatch and vec3 AoS, Burkardt MD, Reference BLA... |
 | S2-01 | Design for zmm and mask registers under -march=knc | Done | The register design for KNC is settled on paper: all 32 zmm and 8 mask registers become usable under -march... |
@@ -238,23 +238,23 @@ Current tickets: `[###################-]` 206 of 213
 
 ## Recent activity
 
-- 2026-11-14 01:48 **S11-02** engineer ask: The 01:43 lead instruction requires merging main into s11/S11-02, but the first git merge --no-commit main command was refused by the PreToolUse ho...
-- 2026-11-14 01:46 **S11-02** owner decide: Budget raised by the lead under the owner's standing rule: sessions 12 -> 14, the third session extension. Each extension made progress; since the ...
-- 2026-11-14 01:46 **S11-02** engineer escalate: budget: 12 engineer sessions used; the budget is 12
-- 2026-11-14 01:45 **S11-02** owner decide: One more review round, granted by the lead under the owner's standing rule. This round is a merge conflict with main (S11-10's output_dir in host_c...
-- 2026-11-14 01:43 **S11-02** lead escalate: over 2 review rounds: Review of 4aae037c passes, but approval's merge conflicts with main in tools/host_card_transfer.py build(): main has S11-10's...
-- 2026-11-14 01:42 **S11-02** owner decide: Lead under the owner's standing rule: back to review. The scripted lead session ended after a merge conflict it could not resolve; the interactive ...
-- 2026-11-14 01:42 **S11-02** lead escalate: lead session ended without a decision (exit 0)
-- 2026-11-14 01:42 **S11-02** lead resume: Lead aborted the failed approval merge; main is clean at 6361d2aa.
+- 2026-11-14 02:33 **S11-17** owner decide: Budget raised by the lead under the owner's standing rule: sessions 7 -> 9, the second session extension. Progress since the last: the revised cont...
+- 2026-11-14 02:32 **S11-15** lead answer: Do not split. Submit with --override 'research ticket: 754-line baseline report plus profiling tools already reviewed at each card run (e6b8d1c1, d...
+- 2026-11-14 02:26 **S11-15** engineer ask: cc16208a completes attribution/report and three conditional S12 proof proposals. Host analysis and diff check PASS; log .work/_state/logs/S11_15_ba...
+- 2026-11-14 02:25 **S11-02** lead defer: Review of 7deb440b passes; card acceptance (2026-11-14 00:14-00:23 EST) passes. Approve did not finish: its host check ran past 20 min and was kill...
+- 2026-11-14 02:13 **S11-29** lead approve: Under --profile 3100 and 5100, card_run now limits the memory a job actually uses (sampled resident plus swap) instead of reserved address space, s...
+- 2026-11-14 02:02 **S11-15** lead answer: Remaining batch ran 2026-11-14 01:57-02:02 EST: all 14 launches PASS (PROFILE_BATCH_COMPLETE). Log .work/_state/logs/S11_15_profile_remaining-20261...
+- 2026-11-14 02:01 **S11-02** engineer submit: 7deb440b: production/output_dir retained. Both helpers rebuilt; GCC-KNC card helper lint passed, staged .work/_shared/S11-02. Log: .work/_state/log...
+- 2026-11-14 01:59 **S11-29** engineer submit: Both acceptance items met (lead 01:55). Six host tests passed: .work/_state/logs/S11_29_revision-20261114-011227.log; not rerun. Lead card round: H...
 
 ## Cost
 
-- From the script, engineer: 557 sessions, 1132.3M input tokens
-- From the script, lead: 368 sessions, 103.1M input tokens
-- Started by hand, Claude: 12 sessions, 3061.8M input tokens
+- From the script, engineer: 561 sessions, 1140.2M input tokens
+- From the script, lead: 370 sessions, 103.6M input tokens
+- Started by hand, Claude: 12 sessions, 3074.5M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 31.7 GiB of 100 GiB. 168 GiB free on the drive.
+The project uses 31.7 GiB of 100 GiB. 172 GiB free on the drive.
