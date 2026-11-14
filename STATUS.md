@@ -2,7 +2,7 @@
 
 Updated automatically at every ticket change. Last update: 2026-11-14 14:39.
 
-**Waiting for you:** S12-04. Run `python tools/pm.py inbox`.
+**Next: the tech lead, on S12-06.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[##################--]` 219 of 237
 
@@ -84,7 +84,7 @@ Current tickets: `[##################--]` 219 of 237
 | S12-01 | Sprint 12 prep - static code-quality census of the development-corpus builds (spills, x87/vector transfers, addressing, calls, code size) | Done | A static code-quality census (spill/reload proxies, x87 and x87-zmm traffic, address arithmetic, calls, bra... |
 | S12-02 | Sprint 12 prep - the unscored generality check set (S11-20's six programs in the code styles our corpus lacks) | Done | The six unscored generality checks (Q1-Q6: ray tracer hit dispatch and vec3 AoS, Burkardt MD, Reference BLA... |
 | S12-03 | pm.py approve aborts its own merge on conflict and refuses cleanly, so main is never left mid-merge | draft |  |
-| S12-04 | card_run profile memory monitor costs under 5% of one card thread | **Waiting for you** | budget: 3 engineer sessions used; the budget is 3 |
+| S12-04 | card_run profile memory monitor costs under 5% of one card thread | In progress | Lead raises sessions 3 -> 5 (standing owner rule): the third session was the requested-changes round (split... |
 | S12-05 | DMA end-to-end time - overlap file read, DMA and file write, and copy on the card with more than one thread | draft |  |
 | S12-06 | M4 theme 1 - strict scalar FP conversions and call boundaries (NPB-EP transform and log path, NPB-IS randlc) | Waiting for review | Restored .gitignore to main in 66ef8806 as requested; tracked assembly control retained. Phase-one results ... |
 | S12-07 | M4 theme 2 - indexed-load scheduling with strict sparse reduction (NPB-CG) | In progress |  |
@@ -264,12 +264,12 @@ Current tickets: `[##################--]` 219 of 237
 
 - 2026-11-14 14:39 **S12-18** engineer ask: Phase 1 committed d29d7c74. Host regression passes 12 scenarios; built/linted .work/_shared/S12-18/vmath-bench.mic. Report, logs and exclusive full...
 - 2026-11-14 14:39 **S12-15** lead approve: Literature survey done: 30 groups of published Xeon Phi work ranked against our goals, with 14 overlooked ideas; the compiler ones are now tickets,...
+- 2026-11-14 14:39 **S12-04** owner decide: Lead raises sessions 3 -> 5 (standing owner rule): the third session was the requested-changes round (split red commit); the fix is written.
 - 2026-11-14 14:30 **S12-04** engineer escalate: budget: 3 engineer sessions used; the budget is 3
 - 2026-11-14 14:29 **S12-06** engineer submit: Restored .gitignore to main in 66ef8806 as requested; tracked assembly control retained. Phase-one results and premise-fails conclusion remain at a...
 - 2026-11-14 14:28 **S12-14** lead approve: The lead now has a ranked audit in docs/research/s12-14-model-audit.md of 42 places where GCC-KNC tuning numbers, runtime defaults or comments disa...
 - 2026-11-14 14:28 **S11-26** lead defer: Needs the interactive lead: (1) stage a fresh WRF v4.8.0 tree at .work/_shared/wrf-trial/src/WRF-4.8.0-smpar (PhiWeather's clean tree plus the 7 pi...
 - 2026-11-14 14:28 **S11-26** lead answer: Lead 14:30: fresh tree at .work/_shared/wrf-trial/src/WRF-4.8.0-smpar (WRF v4.8.0 06d4240a + 7 pinned phys submodules, 441 MB, 5,589 files; provena...
-- 2026-11-14 14:17 **S12-06** lead answer: Lead: do not change .gitignore. Restore it (git checkout main -- .gitignore), commit, and submit. tools/s12_06_controls.S is already tracked at 6de...
 
 ## Cost
 
