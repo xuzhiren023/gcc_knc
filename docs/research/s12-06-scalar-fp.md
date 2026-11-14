@@ -1,9 +1,9 @@
 # S12-06: strict scalar FP, phase-one proof
 
-Status: paired diagnostics built and linted; native execution awaits the lead.
-The >=3 s implementation gate is **not established**. No backend change,
-strict-FP relaxation, or benchmark A/B has been made. Native medians and a
-compiler-removable exposure share are unknown, not zero measured cost.
+Status: **phase one closed: premise fails**, following the lead's returned
+card results and close instruction on 2026-11-14. Native diagnostic checks
+passed. The >=3 s compiler-removable exposure gate is **not established**;
+no backend change, strict-FP relaxation, or benchmark A/B has been made.
 
 ## Scope and construction
 
@@ -119,15 +119,47 @@ arithmetic. In particular, a donor/KNC speed difference does not itself prove
 that any remaining sequence is removable. Do not project it directly onto the
 5.169 s baseline callee exposure.
 
-At present, redundant stack traffic is a candidate compiler-removable cost;
-the required ABI transfers, preserved live values, and libm arithmetic are
-not established as removable. The demonstrated lower bound is still **0 s**,
-and the measured removable share is **unknown**. Native diagnostic results
-must precede selecting a general mechanism and a defensible exposure share.
-If the >=3 s premise fails, stop phase one. If it holds, the intended generated
-sequence needs a failing T1 commit and deep-ticket red approval before a backend
-implementation; strict-FP and ABI proof remain required. T0-T2, ICE inputs and
-the whole-program paired panel belong to that subsequent phase. x86 not run.
+## Returned native results and conclusion
+
+The lead supplied `.work/_shared/S12-06/card.stdout`, ending in
+`S12_06_CHECK PASS`, with program exit code 0 and 0.324 card minutes.
+The actual run reports `workers=240` and CPUs 1 through 240, rather than the
+requested one-worker serial allocation. The table records the median of the
+three paired samples labeled `cpu=240`, matching the lead's cited result;
+these are one worker's durations during the concurrent run, not serial
+whole-program timings or medians across all workers. The transport metadata
+also lists an overlapping job, so no isolated serial performance claim follows.
+
+| Case | Rounds per sample | GCC 5.1.1 median (s) | GCC-KNC median (s) |
+| --- | ---: | ---: | ---: |
+| `transform_log` | 64 | 0.149616 | 0.144664 |
+| `transform_table` | 128 | 0.152983 | 0.150083 |
+| `transform_identity` | 128 | 0.175162 | 0.167692 |
+| `transform_memory` | 128 | 0.183584 | 0.176304 |
+| `recurrence` | 256 | 0.188744 | 0.186465 |
+| `conversion` | 1024 | 0.147169 | 0.127164 |
+| `scalar_control` | 1024 | 0.044156 | 0.021511 |
+| `vector_control` | 1024 | 0.017493 | 0.017689 |
+
+Each round processes 2,048 inputs; durations across different cases require
+normalization by that count and the rounds column. GCC-KNC is faster in all
+scalar cases in this selected worker's samples. The identical vector control
+is slightly slower (about 1.1% by the ratio of medians), so the result is not
+literally faster in every case and does not establish statistical significance.
+
+Both compilers retain the same ABI bridges, conversions and necessary call
+saves. The extra dead `fstl` in the KNC transform remains a candidate removable
+store, but this batch does not isolate its cost or show that removing it saves
+>=3 s of the 93.137 s EP+IS exposure. Faster diagnostic timings alone cannot
+establish that a shared sequence is removable under strict FP and the ABI.
+The demonstrated removable-time lower bound remains **0 s (0% of exposure)**;
+the actual removable share is **unknown**, not measured as zero. Libm bodies
+remain out of scope.
+
+The phase-two premise therefore fails to be established. Per the lead's
+instruction, close at phase one with no GCC change and no further tuning or
+card batch. Phase-two T1 red/green, T0-T2, ICE sweep and the whole-program paired
+EP/IS/control panel were not run; no benchmark benefit is claimed. x86 not run.
 
 ## Host validation
 
@@ -139,4 +171,5 @@ python tools/run.py --name S12-06-stage --inputs tools/s12_06_scalar.c tools/s12
 ```
 
 Log: `.work/_state/logs/S12_06_stage-20261114-120126.log`.
-Native checks and timings have **not run**. Phase two is pending, not passed.
+Native checks and diagnostic timings passed in the lead's returned run above.
+Phase two was not entered because its removable-cost gate was not established.
