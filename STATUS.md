@@ -1,10 +1,10 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-14 15:14.
+Updated automatically at every ticket change. Last update: 2026-11-14 15:29.
 
 **Waiting for you:** S12-17. Run `python tools/pm.py inbox`.
 
-Current tickets: `[##################--]` 220 of 238
+Current tickets: `[##################--]` 221 of 238
 
 ## Milestones
 
@@ -14,7 +14,7 @@ Current tickets: `[##################--]` 220 of 238
 | M1 | Mixed native code | Done | 43 of 43 tickets |
 | M2 | Useful vector target | Done | 51 of 51 tickets |
 | M3 | Runtimes | Done | 48 of 48 tickets |
-| M4 | Broad optimization | In progress | 38 of 56 tickets |
+| M4 | Broad optimization | In progress | 39 of 56 tickets |
 | M5 | Program corpus | Not started | Not planned in detail yet |
 | M6 | Release | Not started | Not planned in detail yet |
 
@@ -84,7 +84,7 @@ Current tickets: `[##################--]` 220 of 238
 | S12-01 | Sprint 12 prep - static code-quality census of the development-corpus builds (spills, x87/vector transfers, addressing, calls, code size) | Done | A static code-quality census (spill/reload proxies, x87 and x87-zmm traffic, address arithmetic, calls, bra... |
 | S12-02 | Sprint 12 prep - the unscored generality check set (S11-20's six programs in the code styles our corpus lacks) | Done | The six unscored generality checks (Q1-Q6: ray tracer hit dispatch and vec3 AoS, Burkardt MD, Reference BLA... |
 | S12-03 | pm.py approve aborts its own merge on conflict and refuses cleanly, so main is never left mid-merge | draft |  |
-| S12-04 | card_run profile memory monitor costs under 5% of one card thread | Waiting for review | Host profile memory tests passed (7 tests); strengthened fallback test red against original card_run and gr... |
+| S12-04 | card_run profile memory monitor costs under 5% of one card thread | Done | card_run's profile memory monitor no longer floods stderr and scans /proc far less often: it uses usleep wi... |
 | S12-05 | DMA end-to-end time - overlap file read, DMA and file write, and copy on the card with more than one thread | draft |  |
 | S12-06 | M4 theme 1 - strict scalar FP conversions and call boundaries (NPB-EP transform and log path, NPB-IS randlc) | Done | Theme 1 (scalar FP conversions and calls in NPB-EP/IS) closed with no compiler change: a card diagnostic sh... |
 | S12-07 | M4 theme 2 - indexed-load scheduling with strict sparse reduction (NPB-CG) | lead | Card run needed (interactive lead only): run .work/_shared/S12-07/sparse-paired via tools/card_run --thread... |
@@ -263,6 +263,7 @@ Current tickets: `[##################--]` 220 of 238
 
 ## Recent activity
 
+- 2026-11-14 15:28 **S12-04** lead approve: card_run's profile memory monitor no longer floods stderr and scans /proc far less often: it uses usleep with a sleep 1 fallback instead of the Bus...
 - 2026-11-14 15:13 **S12-21** lead changes: FLAGS['density1'] pins -mknc-density=1, but no such option exists: the density control is --param=knc-threads-per-core= (i386.opt:1400, Init 4, ran...
 - 2026-11-14 15:13 **S12-17** engineer escalate: budget: 6 engineer sessions used; the budget is 6
 - 2026-11-14 15:13 **S12-04** engineer submit: Host profile memory tests passed (7 tests); strengthened fallback test red against original card_run and green with fix. Logs: .work/_state/logs/S1...
@@ -270,16 +271,15 @@ Current tickets: `[##################--]` 220 of 238
 - 2026-11-14 15:11 **S12-08** lead defer: Closure done: 7f2df59d states 'premise failed, no compiler change' up front, keeps both reproducers, no GCC commit (knc..s12/S12-08 empty). pm.py s...
 - 2026-11-14 15:09 **S12-04** owner decide: Lead raises sessions 7 -> 8: the last raise made progress (usleep fallback, red/green logs); one session to submit.
 - 2026-11-14 15:08 **S12-21** engineer red: fc734fd3 adds phase-1 contracts: 28 serial development builds, default/density1 flags, top-four selection, three alternating pairs, full exclusive ...
-- 2026-11-14 15:07 **S12-04** engineer escalate: budget: 7 engineer sessions used; the budget is 7
 
 ## Cost
 
 - From the script, engineer: 617 sessions, 1244.2M input tokens
-- From the script, lead: 403 sessions, 111.5M input tokens
-- Started by hand, Claude: 12 sessions, 3204.7M input tokens
+- From the script, lead: 404 sessions, 112.0M input tokens
+- Started by hand, Claude: 12 sessions, 3205.1M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 32.7 GiB of 100 GiB. 145 GiB free on the drive.
+The project uses 32.6 GiB of 100 GiB. 141 GiB free on the drive.
