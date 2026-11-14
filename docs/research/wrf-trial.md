@@ -2,6 +2,20 @@
 
 ## OpenMP continuation (S11-24, 2026-11-13)
 
+S11-26 clean rebuild (2026-11-14): installed GCC-KNC is `619e14b479a`
+(lead-confirmed); all four earlier reproducers passed without overrides
+(`S11_26_four_reproducers-20261114-141637.log`). Fresh smpar configuration
+at `-mphinix -mknc-card=7120` with no per-file overrides passed, but the
+build stopped after 7.1 min on a new `REMEZ` vectorizer ICE in `share/dfi.f90`
+(`vect_transform_stmt`, `tree-vect-stmts.cc:13381`). Standalone
+`repro/remez.f90` reproduces it without WRF module inputs; run
+`trial-env.sh bash "$TRIAL/s11-26-remez.sh"`. Logs are
+`S11_26_smpar_build-20261114-145228.log` and
+`S11_26_remez_reproducer-20261114-150009.log` under `.work/_state/logs/`.
+No workaround was applied, no new binaries staged, and no card run occurred.
+The S11-24 results below describe the earlier build, whose tree and binaries
+were subsequently removed by the lead.
+
 Both OpenMP executables linked and are staged with GCC-KNC's shared
 libgomp in `smpar/`. ELF/dependency checks and instruction lint passed. No native result is claimed. The lead runs the smoke, scientific
 comparison and timing.
