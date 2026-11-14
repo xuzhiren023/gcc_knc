@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-14 13:27.
+Updated automatically at every ticket change. Last update: 2026-11-14 13:29.
 
-**Next: the tech lead, on S12-13.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: the tech lead, on S12-17.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[##################--]` 214 of 229
 
@@ -93,11 +93,11 @@ Current tickets: `[##################--]` 214 of 229
 | S12-10 | Research - what KNC hardware and runtime knowledge are we still missing to tune GCC-KNC, the OS runtime and broad optimization, and where is it documented? | Done | KNC reference-gap research done: 16 gaps ranked, 32 primary sources (98 MB, outside git) with page-cited fa... |
 | S12-11 | Research - best practices for a dual Xeon E5-2690 v3 + Xeon Phi (KNC) workstation (HP Z840) for LLM inference and scientific computing | Done | Z840 dual E5-2690 v3 + Xeon Phi setup guide done: slot/BIOS/memory/power/cooling checklist, MPSS-on-modern-... |
 | S12-12 | Stage S12-10's residual-gap card experiments as one combined Sprint 12 diagnostic batch (PMU access, prefetch, page backing, libm route, branches, allocator) | Done | The six follow-up card experiments (counter access, prefetch, page backing, libm route, branches, allocator... |
-| S12-13 | Digest the S12-10 sources into our knowledge base - correct our KNC notes, build a reference index, and list what our practice should change | Waiting for review | Added R01-R27 reference index and 521-word owner digest with three ranked tables; corrected 17 notes with s... |
+| S12-13 | Digest the S12-10 sources into our knowledge base - correct our KNC notes, build a reference index, and list what our practice should change | Changes requested | 1. R09 is misread in four places: it says R09's results only cover the older MPSS 2.1.4346-16 stack, but R0... |
 | S12-14 | Audit GCC-KNC's tuning model and runtime defaults against the digested sources - every mismatch with a proposed change and its proof | Not started |  |
 | S12-15 | Research - literature survey of published Xeon Phi (KNC) and Xeon Phi system research that matches our goals; what have we overlooked? | In progress |  |
 | S12-16 | Research - whole-system tuning playbook for the Z840 + Xeon Phi (BIOS, host OS, MPSS and card, transfers, runtimes), as HPC centres tuned Xeon + KNC systems | In progress |  |
-| S12-17 | claude-torture -j N refuses to start in exclusive card runs (no inherited RLIMIT_AS since S11-29), so the execute suite cannot run | In progress |  |
+| S12-17 | claude-torture -j N refuses to start in exclusive card runs (no inherited RLIMIT_AS since S11-29), so the execute suite cannot run | Question for the tech lead | Test execution is blocked by Windows launcher permissions: tools/run.py launched via Cygwin python cannot s... |
 | S13-01 | M4 final gate - stage the ADR-0015 gate run at the final head (17 programs, held-out unsealed, six pairs, three profiles) | draft |  |
 | S2-01 | Design for zmm and mask registers under -march=knc | Done | The register design for KNC is settled on paper: all 32 zmm and 8 mask registers become usable under -march... |
 | S2-02 | Float and double arguments and results in zmm lane 0 | Done | Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`). |
@@ -254,14 +254,14 @@ Current tickets: `[##################--]` 214 of 229
 
 ## Recent activity
 
+- 2026-11-14 13:29 **S12-17** engineer ask: Test execution is blocked by Windows launcher permissions: tools/run.py launched via Cygwin python cannot spawn its command ('PermissionError: [Err...
+- 2026-11-14 13:29 **S12-13** lead changes: 1. R09 is misread in four places: it says R09's results only cover the older MPSS 2.1.4346-16 stack, but R09 p.5 (raman-stream-2013.txt:206-228) ha...
 - 2026-11-14 13:27 **S12-12** lead approve: The six follow-up card experiments (counter access, prefetch, page backing, libm route, branches, allocator) are staged as one 32-68 min batch for ...
 - 2026-11-14 13:18 **S12-13** engineer submit: Added R01-R27 reference index and 521-word owner digest with three ranked tables; corrected 17 notes with supersession markers and source pages. Re...
 - 2026-11-14 13:17 **S12-12** engineer submit: Six linked and linted diagnostic binaries, per-experiment run.sh files, README with card_run commands, and batch.sh staged under .work/_shared/S12-...
 - 2026-11-14 13:15 **S12-12** lead answer: Yes. Submit with --override 'six experiments plus plan; 899 lines, 12% over the 800 budget'. Do not cut scope: six C programs, the stager and a 300...
 - 2026-11-14 13:13 **S12-12** engineer ask: Submission is blocked by the 800-line budget: pm.py reports 899 changed lines for commits fba1336b and 21140d8d. Six linked/linted binaries, run sc...
 - 2026-11-14 13:06 **S12-11** lead approve: Z840 dual E5-2690 v3 + Xeon Phi setup guide done: slot/BIOS/memory/power/cooling checklist, MPSS-on-modern-OS options, measured host and Phi result...
-- 2026-11-14 12:56 **S12-11** engineer submit: Completed docs/research/host-phi-workstation.md at fe643e13, with 33 source entries and machine-specific next checks. Primary refs: .work/_shared/h...
-- 2026-11-14 12:41 **S12-10** lead approve: KNC reference-gap research done: 16 gaps ranked, 32 primary sources (98 MB, outside git) with page-cited facts, and a 10-row list of bounded card e...
 
 ## Cost
 
