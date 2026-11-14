@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-14 17:45.
+Updated automatically at every ticket change. Last update: 2026-11-14 17:47.
 
-**Next: the tech lead, on S12-23.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: GPT-6.1, on S12-21 (Scheduling model for M4's serial runs - measure density-1 tuning and the integer-multiply cost against today's density-4 defaults (S12-14 B02, B04, B05)).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
 Current tickets: `[##################--]` 226 of 243
 
@@ -103,7 +103,7 @@ Current tickets: `[##################--]` 226 of 243
 | S12-20 | libknc_vmath accuracy and exception contract, with an independent validation design (rounding modes, special values, flags, scalar fallback) | draft |  |
 | S12-21 | Scheduling model for M4's serial runs - measure density-1 tuning and the integer-multiply cost against today's density-4 defaults (S12-14 B02, B04, B05) | In progress | Lead 16:20: phase 1 accepted as staged (r2). No submit yet: the lead runs r2/batch.sh tonight in card windo... |
 | S12-22 | Low-risk corrections from the S12-14 audit - wrong comments and citations (N01-N09) and the far-prefetch-distance range bug (B10) | Done | The audit's comment and citation fixes are in GCC-KNC and the far prefetch distance can no longer be set eq... |
-| S12-23 | Floating-point environment correctness on KNC - fix the underflow probe that cannot tell flushing from rounding, and handle x87 erratum CD28 (S12-14 N06, N07, B16, B17) | Tests waiting for review | Red b385d00b. s12-23-red failed as expected: old underflow probe rounds to zero; both Fortran clear routes ... |
+| S12-23 | Floating-point environment correctness on KNC - fix the underflow probe that cannot tell flushing from rounding, and handle x87 erratum CD28 (S12-14 N06, N07, B16, B17) | In progress | S12-23 red accepted: the tests fail for the right reasons (the old underflow probe rounds to zero in both m... |
 | S12-24 | ICE in vect_transform_stmt (tree-vect-stmts.cc:13381) on WRF's REMEZ at -mphinix (-O3 -march=knc) | Not started |  |
 | S12-25 | WRF smpar build arm with --param=knc-threads-per-core=2 for PhiWeather's 2-threads-per-core runs (A/B against S11-26's default-4 build) | draft |  |
 | S12-26 | WRF hot scalar routines - classify with the S12-19 triage tool and stage bitwise-safe per-file flag arms for PhiWeather to time | draft |  |
@@ -268,6 +268,7 @@ Current tickets: `[##################--]` 226 of 243
 
 ## Recent activity
 
+- 2026-11-14 17:47 **S12-23** lead approve-red: S12-23 red accepted: the tests fail for the right reasons (the old underflow probe rounds to zero in both modes, the Fortran clear routes lack the ...
 - 2026-11-14 17:45 **S12-23** engineer red: Red b385d00b. s12-23-red failed as expected: old underflow probe rounds to zero; both Fortran clear routes lack FNSAVE/FRSTOR; fixture sets reserve...
 - 2026-11-14 17:39 **S12-22** lead approve: The audit's comment and citation fixes are in GCC-KNC and the far prefetch distance can no longer be set equal to the near one (range now 2-4096, n...
 - 2026-11-14 17:07 **S12-22** engineer submit: Lead built gcc2 f0534648890. T1 green: all 6 boundary/prefetch checks PASS (red bf225397); log .work/_state/logs/S12_22_b10_green-20261114-165258.l...
@@ -275,7 +276,6 @@ Current tickets: `[##################--]` 226 of 243
 - 2026-11-14 16:55 **S12-28** engineer submit: Implementation 06c94150; red test 73aa76d0. Prior session ran all 3 isolated host tests successfully: same-lane refusal with PID, different-lane ov...
 - 2026-11-14 16:53 **S12-28** lead answer: Yes, submit with --override 'test size: ticket requires real subprocess dispatchers with fake sessions; 3 tests cover the 5 asked behaviours'. Revi...
 - 2026-11-14 16:52 **S12-28** engineer ask: Implementation and acceptance tests are committed at 06c94150 (red 73aa76d0). All 3 isolated host tests pass: same-lane refusal includes PID, diffe...
-- 2026-11-14 16:51 **S12-22** lead answer: Built; run green and submit.
 
 ## Cost
 
