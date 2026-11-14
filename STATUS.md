@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-14 17:57.
+Updated automatically at every ticket change. Last update: 2026-11-14 17:58.
 
 **Next: the tech lead, on S12-07.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
@@ -101,7 +101,7 @@ Current tickets: `[##################--]` 226 of 244
 | S12-18 | Double-precision vector exp, log and pow ran slower than scalar libm on the card (0.82x, 0.63x, 0.49x) - confirm with valid batches, then fix the library or stop the vectorizer calling them where they lose | lead | Needs interactive lead: (1) exclusive card turn running .work/_shared/S12-18/vmath-bench.mic at full, 3100 ... |
 | S12-19 | Profile-guided missed-vectorization triage - join hot loops with the vectorizer's reasons and observed strides/masks, so tuning targets what is hot and fixable | Done | tools/vec_triage.py now ranks each development program's hot loops by sampled time with GCC's vectorizer ve... |
 | S12-20 | libknc_vmath accuracy and exception contract, with an independent validation design (rounding modes, special values, flags, scalar fallback) | draft |  |
-| S12-21 | Scheduling model for M4's serial runs - measure density-1 tuning and the integer-multiply cost against today's density-4 defaults (S12-14 B02, B04, B05) | In progress | Lead raises sessions 4 -> 6 (standing rule): a session was lost to the lead's duplicate dispatcher; staging... |
+| S12-21 | Scheduling model for M4's serial runs - measure density-1 tuning and the integer-multiply cost against today's density-4 defaults (S12-14 B02, B04, B05) | Question for the tech lead | Fixed at 037aee42: removed shell timeout calls; card_run retains 1740 s limit. Payload and peer archives us... |
 | S12-22 | Low-risk corrections from the S12-14 audit - wrong comments and citations (N01-N09) and the far-prefetch-distance range bug (B10) | Done | The audit's comment and citation fixes are in GCC-KNC and the far prefetch distance can no longer be set eq... |
 | S12-23 | Floating-point environment correctness on KNC - fix the underflow probe that cannot tell flushing from rounding, and handle x87 erratum CD28 (S12-14 N06, N07, B16, B17) | In progress | Built; run green and submit. |
 | S12-24 | ICE in vect_transform_stmt (tree-vect-stmts.cc:13381) on WRF's REMEZ at -mphinix (-O3 -march=knc) | Not started |  |
@@ -269,6 +269,7 @@ Current tickets: `[##################--]` 226 of 244
 
 ## Recent activity
 
+- 2026-11-14 17:58 **S12-21** engineer ask: Fixed at 037aee42: removed shell timeout calls; card_run retains 1740 s limit. Payload and peer archives use ustar. Repackaged r2: 16329850 bytes, ...
 - 2026-11-14 17:57 **S12-07** engineer ask: Restaged 936bad16: pins first granted CPU, verifies singleton affinity, reports three reserved idle siblings. Fixes window-1 failure on the four-CP...
 - 2026-11-14 17:56 **S12-23** lead answer: Built; run green and submit.
 - 2026-11-14 17:56 **S12-23** lead resume: Lead: lane 2 built at s12/S12-23 (see log s12_23_build). Diff reviewed: CD28 fnsave/edit/frstor clear routes, KNC_RESERVED now includes bit 20, DUE...
@@ -276,7 +277,6 @@ Current tickets: `[##################--]` 226 of 244
 - 2026-11-14 17:55 **S12-21** engineer escalate: budget: 4 engineer sessions used; the budget is 4
 - 2026-11-14 17:54 **S12-07** lead answer: Go: fix and restage.
 - 2026-11-14 17:54 **S12-07** lead resume: Card window 1 result is in the ticket body: fix the single-CPU check and restage.
-- 2026-11-14 17:53 **S12-23** lead defer: GCC build needed on lane gcc2 at gcc commit 02f32213c0d (branch s12/S12-23 in .work/_shared/gcc-2 tree): interactive lead runs python tools/run.py ...
 
 ## Cost
 
