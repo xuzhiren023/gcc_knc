@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-14 15:00.
+Updated automatically at every ticket change. Last update: 2026-11-14 15:01.
 
 **Waiting for you:** S12-17. Run `python tools/pm.py inbox`.
 
@@ -88,7 +88,7 @@ Current tickets: `[##################--]` 220 of 237
 | S12-05 | DMA end-to-end time - overlap file read, DMA and file write, and copy on the card with more than one thread | draft |  |
 | S12-06 | M4 theme 1 - strict scalar FP conversions and call boundaries (NPB-EP transform and log path, NPB-IS randlc) | Done | Theme 1 (scalar FP conversions and calls in NPB-EP/IS) closed with no compiler change: a card diagnostic sh... |
 | S12-07 | M4 theme 2 - indexed-load scheduling with strict sparse reduction (NPB-CG) | Question for the tech lead | Phase-one staged at 9823e291; installed drivers fixed headers. Host build/lint PASS: .work/_state/logs/s12_... |
-| S12-08 | M4 theme 3 - dependency-preserving scalar updates and register pressure in dense loops (PB-ludcmp, x87 stack traffic) | In progress |  |
+| S12-08 | M4 theme 3 - dependency-preserving scalar updates and register pressure in dense loops (PB-ludcmp, x87 stack traffic) | Question for the tech lead | Phase-1 proof 248edd72: hot ludcmp/cholesky/CG bodies have no stack operands. Ludcmp 128/130 x87 reads are ... |
 | S12-09 | Sprint 12 batch check - integrated themes at the final Sprint 12 head, regression evidence, optional modes frozen | draft |  |
 | S12-10 | Research - what KNC hardware and runtime knowledge are we still missing to tune GCC-KNC, the OS runtime and broad optimization, and where is it documented? | Done | KNC reference-gap research done: 16 gaps ranked, 32 primary sources (98 MB, outside git) with page-cited fa... |
 | S12-11 | Research - best practices for a dual Xeon E5-2690 v3 + Xeon Phi (KNC) workstation (HP Z840) for LLM inference and scientific computing | Done | Z840 dual E5-2690 v3 + Xeon Phi setup guide done: slot/BIOS/memory/power/cooling checklist, MPSS-on-modern-... |
@@ -262,6 +262,7 @@ Current tickets: `[##################--]` 220 of 237
 
 ## Recent activity
 
+- 2026-11-14 15:01 **S12-08** engineer ask: Phase-1 proof 248edd72: hot ludcmp/cholesky/CG bodies have no stack operands. Ludcmp 128/130 x87 reads are fold-left transfers; outer GPR spills ha...
 - 2026-11-14 15:00 **S12-17** engineer escalate: budget: 4 engineer sessions used; the budget is 4
 - 2026-11-14 14:59 **S12-19** engineer red: Revised red d3ee9323: 10 cases, 2 test files; real GCC messages with citations, both in-order refusals, actual strict-FP cost refusal, captured add...
 - 2026-11-14 14:59 **S12-07** engineer ask: Phase-one staged at 9823e291; installed drivers fixed headers. Host build/lint PASS: .work/_state/logs/s12_07_stage-20261114-145549.log. Please run...
@@ -269,7 +270,6 @@ Current tickets: `[##################--]` 220 of 237
 - 2026-11-14 14:57 **S12-04** engineer escalate: budget: 5 engineer sessions used; the budget is 5
 - 2026-11-14 14:56 **S12-17** lead answer: The new tests are in tests/tools/test_torture_driver.py (committed in 71cbcf86); YOUR_TEST was a placeholder. With tools/claude-torture.c from main...
 - 2026-11-14 14:55 **S12-04** lead changes: The scan throttling is good. One change: nothing confirms the card BusyBox has usleep. Make both waits fall back silently: in the awk loop use syst...
-- 2026-11-14 14:53 **S12-17** engineer ask: Red proof blocked: tools/claude-torture.c was restored from main, but the new test file named in the lead instruction is absent (tests/tools/test_c...
 
 ## Cost
 
