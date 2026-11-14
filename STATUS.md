@@ -1,10 +1,10 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-14 14:40.
+Updated automatically at every ticket change. Last update: 2026-11-14 14:49.
 
-**Next: the tech lead, on S12-06.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: the tech lead, on S12-18.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
-Current tickets: `[##################--]` 219 of 237
+Current tickets: `[##################--]` 220 of 237
 
 ## Milestones
 
@@ -14,7 +14,7 @@ Current tickets: `[##################--]` 219 of 237
 | M1 | Mixed native code | Done | 43 of 43 tickets |
 | M2 | Useful vector target | Done | 51 of 51 tickets |
 | M3 | Runtimes | Done | 48 of 48 tickets |
-| M4 | Broad optimization | In progress | 37 of 55 tickets |
+| M4 | Broad optimization | In progress | 38 of 55 tickets |
 | M5 | Program corpus | Not started | Not planned in detail yet |
 | M6 | Release | Not started | Not planned in detail yet |
 
@@ -86,7 +86,7 @@ Current tickets: `[##################--]` 219 of 237
 | S12-03 | pm.py approve aborts its own merge on conflict and refuses cleanly, so main is never left mid-merge | draft |  |
 | S12-04 | card_run profile memory monitor costs under 5% of one card thread | In progress | Lead raises sessions 3 -> 5 (standing owner rule): the third session was the requested-changes round (split... |
 | S12-05 | DMA end-to-end time - overlap file read, DMA and file write, and copy on the card with more than one thread | draft |  |
-| S12-06 | M4 theme 1 - strict scalar FP conversions and call boundaries (NPB-EP transform and log path, NPB-IS randlc) | Waiting for review | Restored .gitignore to main in 66ef8806 as requested; tracked assembly control retained. Phase-one results ... |
+| S12-06 | M4 theme 1 - strict scalar FP conversions and call boundaries (NPB-EP transform and log path, NPB-IS randlc) | Done | Theme 1 (scalar FP conversions and calls in NPB-EP/IS) closed with no compiler change: a card diagnostic sh... |
 | S12-07 | M4 theme 2 - indexed-load scheduling with strict sparse reduction (NPB-CG) | In progress |  |
 | S12-08 | M4 theme 3 - dependency-preserving scalar updates and register pressure in dense loops (PB-ludcmp, x87 stack traffic) | Not started |  |
 | S12-09 | Sprint 12 batch check - integrated themes at the final Sprint 12 head, regression evidence, optional modes frozen | draft |  |
@@ -262,6 +262,7 @@ Current tickets: `[##################--]` 219 of 237
 
 ## Recent activity
 
+- 2026-11-14 14:49 **S12-06** lead approve: Theme 1 (scalar FP conversions and calls in NPB-EP/IS) closed with no compiler change: a card diagnostic shows GCC-KNC already equal or faster than...
 - 2026-11-14 14:40 **S12-19** engineer red: Red commit b111b1d4: 7 host fixture cases cover six missed reasons, optimized/SLP distinction, exclusive nested time, PC/module/program mapping, de...
 - 2026-11-14 14:40 **S11-26** lead resume: Lead 14:45: (1) tree staged at .work/_shared/wrf-trial/src/WRF-4.8.0-smpar (see my 14:28 answer). (2) gcc-knc-16.2.0 = knc 619e14b479a. (3) Do list...
 - 2026-11-14 14:39 **S12-18** engineer ask: Phase 1 committed d29d7c74. Host regression passes 12 scenarios; built/linted .work/_shared/S12-18/vmath-bench.mic. Report, logs and exclusive full...
@@ -269,11 +270,10 @@ Current tickets: `[##################--]` 219 of 237
 - 2026-11-14 14:39 **S12-04** owner decide: Lead raises sessions 3 -> 5 (standing owner rule): the third session was the requested-changes round (split red commit); the fix is written.
 - 2026-11-14 14:30 **S12-04** engineer escalate: budget: 3 engineer sessions used; the budget is 3
 - 2026-11-14 14:29 **S12-06** engineer submit: Restored .gitignore to main in 66ef8806 as requested; tracked assembly control retained. Phase-one results and premise-fails conclusion remain at a...
-- 2026-11-14 14:28 **S12-14** lead approve: The lead now has a ranked audit in docs/research/s12-14-model-audit.md of 42 places where GCC-KNC tuning numbers, runtime defaults or comments disa...
 
 ## Cost
 
-- From the script, engineer: 598 sessions, 1227.3M input tokens
+- From the script, engineer: 599 sessions, 1229.0M input tokens
 - From the script, lead: 394 sessions, 109.2M input tokens
 - Started by hand, Claude: 12 sessions, 3179.4M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
