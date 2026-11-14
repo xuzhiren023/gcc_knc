@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-14 00:22.
+Updated automatically at every ticket change. Last update: 2026-11-14 00:23.
 
-**Next: the tech lead, on S11-15.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: GPT-6.1, on S11-15 (First development-corpus baseline and profile, GCC 5.1.1 vs GCC-KNC at -O2 (E7-03 part 1)).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
 Current tickets: `[###################-]` 205 of 213
 
@@ -66,7 +66,7 @@ Current tickets: `[###################-]` 205 of 213
 | S11-12 | Sprint 11 batch check - full native suite, x86 identity, forward-port drill, ICE sweeps, runtime prefix consistency | draft |  |
 | S11-13 | Senior compiler review of the Sprint 11-13 scope (Milestone M4) against our research, with recommended plan changes | Done | A senior compiler review of the Sprint 11-13 plan is in: M4 is plausible but needs a frozen scoring and mea... |
 | S11-14 | M4 scoring contract and measurement protocol, frozen before any tuning | Done | M4's scoring contract is frozen in ADR-0015 with a tested scorer: strict serial -O2 versus -O2 over 17 prog... |
-| S11-15 | First development-corpus baseline and profile, GCC 5.1.1 vs GCC-KNC at -O2 (E7-03 part 1) | Question for the tech lead | 75976eb9: attribution/report done. 521 PCs; GEMM loop 82.56-86.21%; overhead median 0.361%. Log .work/_stat... |
+| S11-15 | First development-corpus baseline and profile, GCC 5.1.1 vs GCC-KNC at -O2 (E7-03 part 1) | In progress | Lead decisions: (1) libc identity: accept the sysroot libc-2.21.so names with no card check; same MPSS glib... |
 | S11-16 | Long-double libm hazard audit - do other MPSS long double entry points fault like cbrtl? (E7-21, bounded) | Done | The card's MPSS long double libm was probed on the card: of 12 entry points only cbrtl faults, and S10-13 a... |
 | S11-17 | PGO feasibility on one complete development program (reuse of S9-18's train/use path) | In progress | Control training ran on the card 2026-11-14 00:12 EST at 82be2cbc, exit 0, 0.3 min. All 10 profiles came ba... |
 | S11-18 | M4 corpus harness v2 - card profiles, prefix record, held-out sealing, stronger checks, and the donor-failure rule | Done | The M4 corpus harness now stages all 17 programs for the 7120 and the 3100/5100 profiles with serial voting... |
@@ -238,6 +238,7 @@ Current tickets: `[###################-]` 205 of 213
 
 ## Recent activity
 
+- 2026-11-14 00:23 **S11-15** lead answer: Lead decisions: (1) libc identity: accept the sysroot libc-2.21.so names with no card check; same MPSS glibc, same soname and segment extent is eno...
 - 2026-11-14 00:21 **S11-29** lead answer: No probe needed; use the card-side /proc monitor. Already established (docs/card-run.md ~line 175, docs/research/for-the-other-agent.md item 4): th...
 - 2026-11-14 00:21 **S11-17** lead answer: Control training ran on the card 2026-11-14 00:12 EST at 82be2cbc, exit 0, 0.3 min. All 10 profiles came back in .work/_shared/S11-17/controls/trai...
 - 2026-11-14 00:19 **S11-17** lead resume: Lead ran control training at 00:12 EST: results in the answer.
@@ -245,13 +246,12 @@ Current tickets: `[###################-]` 205 of 213
 - 2026-11-14 00:17 **S11-27** lead answer: Card round at 89a3657a ran 2026-11-14 00:11 EST, one card_run, 0.6 card-min, log .work/_shared/S11-27/verify-card.log. All 8 pass: MG S-O2, S-noslp...
 - 2026-11-14 00:15 **S11-29** engineer ask: Red commit 36b48b4e exposes AS caps, missing peaks/resource classification; full/exclusive regression passes. Log .work/_state/logs/S11_29_red-2026...
 - 2026-11-14 00:15 **S11-27** lead resume: Lead ran verify-card.py at 00:11 EST: results in the answer.
-- 2026-11-14 00:12 **S11-29** lead note: Lane moved from tools to tools-mem so this starts now instead of waiting behind S11-02 (lead state, card round tonight). Both change tools/card_run...
 
 ## Cost
 
 - From the script, engineer: 547 sessions, 1112.9M input tokens
 - From the script, lead: 360 sessions, 101.0M input tokens
-- Started by hand, Claude: 12 sessions, 3042.2M input tokens
+- Started by hand, Claude: 12 sessions, 3043.5M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
