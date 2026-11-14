@@ -88,7 +88,7 @@ Current tickets: `[##################--]` 220 of 237
 | S12-05 | DMA end-to-end time - overlap file read, DMA and file write, and copy on the card with more than one thread | draft |  |
 | S12-06 | M4 theme 1 - strict scalar FP conversions and call boundaries (NPB-EP transform and log path, NPB-IS randlc) | Done | Theme 1 (scalar FP conversions and calls in NPB-EP/IS) closed with no compiler change: a card diagnostic sh... |
 | S12-07 | M4 theme 2 - indexed-load scheduling with strict sparse reduction (NPB-CG) | lead | Card run needed (interactive lead only): run .work/_shared/S12-07/sparse-paired via tools/card_run --thread... |
-| S12-08 | M4 theme 3 - dependency-preserving scalar updates and register pressure in dense loops (PB-ludcmp, x87 stack traffic) | Question for the tech lead | Phase-1 proof 248edd72: hot ludcmp/cholesky/CG bodies have no stack operands. Ludcmp 128/130 x87 reads are ... |
+| S12-08 | M4 theme 3 - dependency-preserving scalar updates and register pressure in dense loops (PB-ludcmp, x87 stack traffic) | In progress | Decision: close on the failed premise; no card run. The staged pair only measures the fold-left bridge cost... |
 | S12-09 | Sprint 12 batch check - integrated themes at the final Sprint 12 head, regression evidence, optional modes frozen | draft |  |
 | S12-10 | Research - what KNC hardware and runtime knowledge are we still missing to tune GCC-KNC, the OS runtime and broad optimization, and where is it documented? | Done | KNC reference-gap research done: 16 gaps ranked, 32 primary sources (98 MB, outside git) with page-cited fa... |
 | S12-11 | Research - best practices for a dual Xeon E5-2690 v3 + Xeon Phi (KNC) workstation (HP Z840) for LLM inference and scientific computing | Done | Z840 dual E5-2690 v3 + Xeon Phi setup guide done: slot/BIOS/memory/power/cooling checklist, MPSS-on-modern-... |
@@ -262,6 +262,7 @@ Current tickets: `[##################--]` 220 of 237
 
 ## Recent activity
 
+- 2026-11-14 15:03 **S12-08** lead answer: Decision: close on the failed premise; no card run. The staged pair only measures the fold-left bridge cost, and your note shows those bridges sit ...
 - 2026-11-14 15:03 **S11-26** engineer ask: Blocked as recorded in f8fe9c32: knc 619e14b479a passes four original reproducers, but clean WRF build and standalone repro/remez.f90 fail in vect_...
 - 2026-11-14 15:02 **S12-07** lead defer: Card run needed (interactive lead only): run .work/_shared/S12-07/sparse-paired via tools/card_run --threads 1 --timeout 200 in our card turn (one ...
 - 2026-11-14 15:01 **S12-19** lead approve-red: S12-19 red is approved: 10 host tests in 2 files now pin the vectorizer triage contract (six real GCC missed reasons, vectorized vs SLP vs unknown,...
@@ -269,13 +270,12 @@ Current tickets: `[##################--]` 220 of 237
 - 2026-11-14 15:01 **S12-08** engineer ask: Phase-1 proof 248edd72: hot ludcmp/cholesky/CG bodies have no stack operands. Ludcmp 128/130 x87 reads are fold-left transfers; outer GPR spills ha...
 - 2026-11-14 15:00 **S12-17** engineer escalate: budget: 4 engineer sessions used; the budget is 4
 - 2026-11-14 14:59 **S12-19** engineer red: Revised red d3ee9323: 10 cases, 2 test files; real GCC messages with citations, both in-order refusals, actual strict-FP cost refusal, captured add...
-- 2026-11-14 14:59 **S12-07** engineer ask: Phase-one staged at 9823e291; installed drivers fixed headers. Host build/lint PASS: .work/_state/logs/s12_07_stage-20261114-145549.log. Please run...
 
 ## Cost
 
-- From the script, engineer: 609 sessions, 1239.0M input tokens
+- From the script, engineer: 610 sessions, 1239.3M input tokens
 - From the script, lead: 400 sessions, 110.7M input tokens
-- Started by hand, Claude: 12 sessions, 3193.1M input tokens
+- Started by hand, Claude: 12 sessions, 3194.5M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
