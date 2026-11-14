@@ -98,6 +98,10 @@ ADR-0013 in short. It applies to intrinsics, math and any code that follows a ve
 - Never open ICC headers (`zmmintrin.h`, `immintrin.h` from ICC), Intel SVML or `libimf`. Never
   read the Intrinsics Guide XML, and do not read ISPC code unless your ticket says so.
 - Cite a source by reference (ISA manual section and page, ICC guide GUID), never by quotation.
+- A KNC hardware or runtime fact in code, comments or notes cites its R-number from
+  `docs/research/knc-references.md` with page, and says whether it is verified (read in the source),
+  reported (secondhand) or inference, and whether the hardware was production or pre-production. If the
+  source is not in the index, ask the lead to add it.
 - Copy third-party code only when your ticket allows it. Keep its licence notice in its own file
   (ADR-0011, ADR-0013 point 6).
 - Name Intel products only factually ("for the Intel® Xeon Phi™ x100 coprocessor"). Never
