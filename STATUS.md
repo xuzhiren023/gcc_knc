@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-14 01:24.
+Updated automatically at every ticket change. Last update: 2026-11-14 01:41.
 
-**Next: the tech lead, on S11-02.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: GPT-6.1, on S11-15 (First development-corpus baseline and profile, GCC 5.1.1 vs GCC-KNC at -O2 (E7-03 part 1)).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
 Current tickets: `[###################-]` 206 of 213
 
@@ -53,7 +53,7 @@ Current tickets: `[###################-]` 206 of 213
 | S10-12 | cbrt and cbrtf crash (SIGSEGV) in qualify_v1 on the card - root cause and fix | Done | The cbrt and cbrtf qualification jobs no longer crash on the card and pass (worst 0.4996 and 0.4991 ULP): t... |
 | S10-13 | User story - code that calls cbrtl under -march=knc gets a safe replacement and a compile-time warning (MPSS libm cbrtl faults) | Done | Under -march=knc, calls to cbrtl (and std::cbrt on long double) now go to GCC-KNC's own safe cube root with... |
 | S11-01 | User story - the best way to move data between the host and the card, measured, and how our projects use it | Done | We now have a sourced inventory of every host-card transfer path that works without changing MPSS (SSH, tar... |
-| S11-02 | card_run and run_suite move bulk data by SCIF DMA at the PCIe link limit, with the SSH stream as fallback | Waiting for review | 4aae037c fixes defaults/fixtures and absolute Suite resolution; DMA behavior unchanged. Prior 236-test run:... |
+| S11-02 | card_run and run_suite move bulk data by SCIF DMA at the PCIe link limit, with the SSH stream as fallback | lead | Review of 4aae037c passes, but approve's merge failed: CONFLICT in tools/host_card_transfer.py build() (mai... |
 | S11-03 | S11-01 transfer tool rejects the card's physical /tmp path, so the native study never starts | Done | The transfer study's tool now accepts the card's real /tmp location (/var/volatile/tmp), so its card run ca... |
 | S11-04 | S11-01 transfer tool - the host opens every connection, because Windows Firewall blocks inbound TCP from the card | Done | The transfer study's host side now opens every connection to the card, so Windows Firewall no longer blocks... |
 | S11-05 | Research - raise KNC's real memory bandwidth from about 175 GB/s toward 75-85% of peak, with a measured plan | Done | The memory-bandwidth research plan and a validated multithreaded KNC bandwidth benchmark are ready, with a ... |
@@ -66,7 +66,7 @@ Current tickets: `[###################-]` 206 of 213
 | S11-12 | Sprint 11 batch check - full native suite, x86 identity, forward-port drill, ICE sweeps, runtime prefix consistency | draft |  |
 | S11-13 | Senior compiler review of the Sprint 11-13 scope (Milestone M4) against our research, with recommended plan changes | Done | A senior compiler review of the Sprint 11-13 plan is in: M4 is plausible but needs a frozen scoring and mea... |
 | S11-14 | M4 scoring contract and measurement protocol, frozen before any tuning | Done | M4's scoring contract is frozen in ADR-0015 with a tested scorer: strict serial -O2 versus -O2 over 17 prog... |
-| S11-15 | First development-corpus baseline and profile, GCC 5.1.1 vs GCC-KNC at -O2 (E7-03 part 1) | lead | Card run needed. Batch at 31272757 reviewed and fine (36 launches: 12 serial + 6 OpenMP GCC-KNC dev builds,... |
+| S11-15 | First development-corpus baseline and profile, GCC 5.1.1 vs GCC-KNC at -O2 (E7-03 part 1) | In progress | Profile batch ran 2026-11-14 01:07-01:32 EST, log .work/_state/logs/S11_15_profile_batch-20261114-010719.lo... |
 | S11-16 | Long-double libm hazard audit - do other MPSS long double entry points fault like cbrtl? (E7-21, bounded) | Done | The card's MPSS long double libm was probed on the card: of 12 entry points only cbrtl faults, and S10-13 a... |
 | S11-17 | PGO feasibility on one complete development program (reuse of S9-18's train/use path) | lead | Needs the interactive lead at a3258fe0, S11-17 worktree: 1) engineer cannot overwrite lead-owned controls/c... |
 | S11-18 | M4 corpus harness v2 - card profiles, prefix record, held-out sealing, stronger checks, and the donor-failure rule | Done | The M4 corpus harness now stages all 17 programs for the 7120 and the 3100/5100 profiles with serial voting... |
@@ -238,20 +238,20 @@ Current tickets: `[###################-]` 206 of 213
 
 ## Recent activity
 
+- 2026-11-14 01:40 **S11-02** lead defer: Review of 4aae037c passes, but approve's merge failed: CONFLICT in tools/host_card_transfer.py build() (main's S11-10 output_dir vs branch producti...
+- 2026-11-14 01:39 **S11-15** lead answer: Profile batch ran 2026-11-14 01:07-01:32 EST, log .work/_state/logs/S11_15_profile_batch-20261114-010719.log, captures .work/_shared/S11-15/batch-c...
+- 2026-11-14 01:39 **S11-15** lead resume: Lead ran the profile batch at 31272757, 01:07-01:32 EST: results in the answer.
 - 2026-11-14 01:23 **S11-02** engineer submit: 4aae037c fixes defaults/fixtures and absolute Suite resolution; DMA behavior unchanged. Prior 236-test run: 48 failures/54 errors; original six res...
 - 2026-11-14 01:22 **S11-02** owner decide: Budget raised by the lead under the owner's standing rule (2026-11-09/10: the lead extends session and token budgets itself; ask only after two ext...
 - 2026-11-14 01:18 **S11-29** lead defer: Interactive lead: card round needed at cbe9a3d6 (about 45 min, needs a card turn). Run .work/_shared/S11-29/lead-round.py per its README: HPCG 104 ...
 - 2026-11-14 01:17 **S11-17** lead defer: Needs the interactive lead at a3258fe0, S11-17 worktree: 1) engineer cannot overwrite lead-owned controls/controls-train.sh, controls-lead.ps1, tra...
 - 2026-11-14 01:16 **S11-29** engineer ask: Committed cbe9a3d6: filter baseline low PIDs before stat, full scan on new low PID, printf replaces ls; monitor pinned CPU 0 with isolated marker. ...
-- 2026-11-14 01:15 **S11-17** engineer ask: a3258fe0: revised branch/inline/loop; ten atomic binaries compiled/linted, five O2 gates red. Log: .work/_state/logs/S11_17_controls_revised_stage-...
-- 2026-11-14 01:08 **S11-02** engineer escalate: budget: 13309292 input tokens used; the budget is 12000000
-- 2026-11-14 01:06 **S11-29** lead answer: Card round at 9520fce6, 2026-11-14 00:54-01:04 EST, receipts .work/_shared/S11-29/*.json, log .work/_state/logs/S11_29_card-20261114-005443.log.
 
 ## Cost
 
 - From the script, engineer: 556 sessions, 1132.1M input tokens
-- From the script, lead: 367 sessions, 102.5M input tokens
-- Started by hand, Claude: 12 sessions, 3054.6M input tokens
+- From the script, lead: 368 sessions, 103.1M input tokens
+- Started by hand, Claude: 12 sessions, 3058.4M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
