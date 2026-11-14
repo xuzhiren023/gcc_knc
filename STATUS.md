@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-14 15:32.
+Updated automatically at every ticket change. Last update: 2026-11-14 15:33.
 
 **Waiting for you:** S12-17. Run `python tools/pm.py inbox`.
 
@@ -88,7 +88,7 @@ Current tickets: `[##################--]` 221 of 238
 | S12-05 | DMA end-to-end time - overlap file read, DMA and file write, and copy on the card with more than one thread | draft |  |
 | S12-06 | M4 theme 1 - strict scalar FP conversions and call boundaries (NPB-EP transform and log path, NPB-IS randlc) | Done | Theme 1 (scalar FP conversions and calls in NPB-EP/IS) closed with no compiler change: a card diagnostic sh... |
 | S12-07 | M4 theme 2 - indexed-load scheduling with strict sparse reduction (NPB-CG) | lead | Card run needed (interactive lead only): run .work/_shared/S12-07/sparse-paired via tools/card_run --thread... |
-| S12-08 | M4 theme 3 - dependency-preserving scalar updates and register pressure in dense loops (PB-ludcmp, x87 stack traffic) | In progress | Submit now. |
+| S12-08 | M4 theme 3 - dependency-preserving scalar updates and register pressure in dense loops (PB-ludcmp, x87 stack traffic) | Waiting for review | Closure documentation 7f2df59d submitted as is per lead. Phase-1 premise failed; no compiler change. Reprod... |
 | S12-09 | Sprint 12 batch check - integrated themes at the final Sprint 12 head, regression evidence, optional modes frozen | draft |  |
 | S12-10 | Research - what KNC hardware and runtime knowledge are we still missing to tune GCC-KNC, the OS runtime and broad optimization, and where is it documented? | Done | KNC reference-gap research done: 16 gaps ranked, 32 primary sources (98 MB, outside git) with page-cited fa... |
 | S12-11 | Research - best practices for a dual Xeon E5-2690 v3 + Xeon Phi (KNC) workstation (HP Z840) for LLM inference and scientific computing | Done | Z840 dual E5-2690 v3 + Xeon Phi setup guide done: slot/BIOS/memory/power/cooling checklist, MPSS-on-modern-... |
@@ -263,6 +263,7 @@ Current tickets: `[##################--]` 221 of 238
 
 ## Recent activity
 
+- 2026-11-14 15:33 **S12-08** engineer submit: Closure documentation 7f2df59d submitted as is per lead. Phase-1 premise failed; no compiler change. Reproducers retained. Prior host build/lint PA...
 - 2026-11-14 15:32 **S12-17** engineer escalate: budget: 2208651 input tokens used; the budget is 2000000
 - 2026-11-14 15:31 **S12-19** lead answer: Lead: no card capture needed. GCC does not change generated code for -g. Rebuild each development program with exactly the S11-18 builds.json flags...
 - 2026-11-14 15:31 **S12-08** lead answer: Submit now.
@@ -270,16 +271,15 @@ Current tickets: `[##################--]` 221 of 238
 - 2026-11-14 15:30 **S12-08** lead resume: Lead: type is now research (negative result, no compiler change), so submit needs no red commit. Submit 7f2df59d as is.
 - 2026-11-14 15:28 **S12-04** lead approve: card_run's profile memory monitor no longer floods stderr and scans /proc far less often: it uses usleep with a sleep 1 fallback instead of the Bus...
 - 2026-11-14 15:13 **S12-21** lead changes: FLAGS['density1'] pins -mknc-density=1, but no such option exists: the density control is --param=knc-threads-per-core= (i386.opt:1400, Init 4, ran...
-- 2026-11-14 15:13 **S12-17** engineer escalate: budget: 6 engineer sessions used; the budget is 6
 
 ## Cost
 
 - From the script, engineer: 617 sessions, 1244.2M input tokens
 - From the script, lead: 404 sessions, 112.0M input tokens
-- Started by hand, Claude: 12 sessions, 3208.1M input tokens
+- Started by hand, Claude: 12 sessions, 3209.6M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 32.6 GiB of 100 GiB. 142 GiB free on the drive.
+The project uses 32.6 GiB of 100 GiB. 141 GiB free on the drive.
