@@ -1,10 +1,10 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-14 18:34.
+Updated automatically at every ticket change. Last update: 2026-11-14 18:45.
 
-**Next: the tech lead, on S12-18.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: the tech lead, on S12-23.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
-Current tickets: `[##################--]` 226 of 244
+Current tickets: `[##################--]` 227 of 244
 
 ## Milestones
 
@@ -14,7 +14,7 @@ Current tickets: `[##################--]` 226 of 244
 | M1 | Mixed native code | Done | 43 of 43 tickets |
 | M2 | Useful vector target | Done | 51 of 51 tickets |
 | M3 | Runtimes | Done | 48 of 48 tickets |
-| M4 | Broad optimization | In progress | 44 of 62 tickets |
+| M4 | Broad optimization | In progress | 45 of 62 tickets |
 | M5 | Program corpus | Not started | Not planned in detail yet |
 | M6 | Release | Not started | Not planned in detail yet |
 
@@ -98,7 +98,7 @@ Current tickets: `[##################--]` 226 of 244
 | S12-15 | Research - literature survey of published Xeon Phi (KNC) and Xeon Phi system research that matches our goals; what have we overlooked? | Done | Literature survey done: 30 groups of published Xeon Phi work ranked against our goals, with 14 overlooked i... |
 | S12-16 | Research - whole-system tuning playbook for the Z840 + Xeon Phi (BIOS, host OS, MPSS and card, transfers, runtimes), as HPC centres tuned Xeon + KNC systems | Done | Whole-system tuning playbook for the Z840 + Phi done: 13 ordered steps (BIOS, host Linux, card power/pages/... |
 | S12-17 | claude-torture -j N refuses to start in exclusive card runs (no inherited RLIMIT_AS since S11-29), so the execute suite cannot run | Done | The parallel execute-suite runner starts again in exclusive card runs: claude-torture -j N with an explicit... |
-| S12-18 | Double-precision vector exp, log and pow ran slower than scalar libm on the card (0.82x, 0.63x, 0.49x) - confirm with valid batches, then fix the library or stop the vectorizer calling them where they lose | Waiting for review | e015d913 records lead native full/3100/5100 results and closes phase 2. Double exp/log/pow faster in both s... |
+| S12-18 | Double-precision vector exp, log and pow ran slower than scalar libm on the card (0.82x, 0.63x, 0.49x) - confirm with valid batches, then fix the library or stop the vectorizer calling them where they lose | Done | The vector math benchmark now always times valid 50-200 ms batches, and the valid card runs show double exp... |
 | S12-19 | Profile-guided missed-vectorization triage - join hot loops with the vectorizer's reasons and observed strides/masks, so tuning targets what is hot and fixable | Done | tools/vec_triage.py now ranks each development program's hot loops by sampled time with GCC's vectorizer ve... |
 | S12-20 | libknc_vmath accuracy and exception contract, with an independent validation design (rounding modes, special values, flags, scalar fallback) | draft |  |
 | S12-21 | Scheduling model for M4's serial runs - measure density-1 tuning and the integer-multiply cost against today's density-4 defaults (S12-14 B02, B04, B05) | lead | Card run needed (interactive lead): 037aee42 removes the shell timeout calls (card_run keeps the 1740 s lim... |
@@ -269,6 +269,7 @@ Current tickets: `[##################--]` 226 of 244
 
 ## Recent activity
 
+- 2026-11-14 18:45 **S12-18** lead approve: The vector math benchmark now always times valid 50-200 ms batches, and the valid card runs show double exp, log and pow are faster than scalar on ...
 - 2026-11-14 18:34 **S12-18** engineer submit: e015d913 records lead native full/3100/5100 results and closes phase 2. Double exp/log/pow faster in both sets; all accepted batches valid, exits 0...
 - 2026-11-14 18:32 **S12-18** lead answer: Valid results show vector faster everywhere; record and submit.
 - 2026-11-14 18:31 **S12-18** lead resume: Lead, card window 1 (22:29-22:47Z, all batches valid, outputs .work/_shared/tmp/claude-s12-window1/s12-18-{full,3100,5100}.out): vector over scalar...
@@ -276,7 +277,6 @@ Current tickets: `[##################--]` 226 of 244
 - 2026-11-14 18:14 **S12-23** engineer submit: Green gate, payload build/lint, T0/T1 PASS (prior session). Lead T2: 36 PASS, 0 FAIL; log .work/_state/logs/s12_23_t2-20261114-181240.log. Earlier ...
 - 2026-11-14 18:13 **S12-23** lead answer: T2 passed (lead run); submit.
 - 2026-11-14 18:13 **S12-23** lead resume: Lead 18:13: T2 run by the lead on lane 2 (the S5-21 files are lead-owned, not writable by the sandbox): 36 PASS, 0 FAIL, log .work/_state/logs/s12_...
-- 2026-11-14 18:12 **S12-29** engineer ask: GCC build needed at 51126f4c232; please build lane gcc and return for tests (AGENTS.md forbids Codex builds). Fix applies Bm scalar alignment check...
 
 ## Cost
 
