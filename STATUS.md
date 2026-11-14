@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-14 00:17.
+Updated automatically at every ticket change. Last update: 2026-11-14 00:18.
 
-**Next: the tech lead, on S11-29.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: the tech lead, on S11-15.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[###################-]` 205 of 213
 
@@ -66,7 +66,7 @@ Current tickets: `[###################-]` 205 of 213
 | S11-12 | Sprint 11 batch check - full native suite, x86 identity, forward-port drill, ICE sweeps, runtime prefix consistency | draft |  |
 | S11-13 | Senior compiler review of the Sprint 11-13 scope (Milestone M4) against our research, with recommended plan changes | Done | A senior compiler review of the Sprint 11-13 plan is in: M4 is plausible but needs a frozen scoring and mea... |
 | S11-14 | M4 scoring contract and measurement protocol, frozen before any tuning | Done | M4's scoring contract is frozen in ADR-0015 with a tested scorer: strict serial -O2 versus -O2 over 17 prog... |
-| S11-15 | First development-corpus baseline and profile, GCC 5.1.1 vs GCC-KNC at -O2 (E7-03 part 1) | In progress | SIGPROF pilot ran 2026-11-13 15:20 EST: PASS, exit 0, 0.9 min, 843 log lines with PROFILE_PC samples. Log: ... |
+| S11-15 | First development-corpus baseline and profile, GCC 5.1.1 vs GCC-KNC at -O2 (E7-03 part 1) | Question for the tech lead | 75976eb9: attribution/report done. 521 PCs; GEMM loop 82.56-86.21%; overhead median 0.361%. Log .work/_stat... |
 | S11-16 | Long-double libm hazard audit - do other MPSS long double entry points fault like cbrtl? (E7-21, bounded) | Done | The card's MPSS long double libm was probed on the card: of 12 entry points only cbrtl faults, and S10-13 a... |
 | S11-17 | PGO feasibility on one complete development program (reuse of S9-18's train/use path) | lead | Needs the interactive lead's card run at 82be2cbc, from the S11-17 worktree: python tools/run.py --name S11... |
 | S11-18 | M4 corpus harness v2 - card profiles, prefix record, held-out sealing, stronger checks, and the donor-failure rule | Done | The M4 corpus harness now stages all 17 programs for the 7120 and the 3100/5100 profiles with serial voting... |
@@ -238,6 +238,7 @@ Current tickets: `[###################-]` 205 of 213
 
 ## Recent activity
 
+- 2026-11-14 00:18 **S11-15** engineer ask: 75976eb9: attribution/report done. 521 PCs; GEMM loop 82.56-86.21%; overhead median 0.361%. Log .work/_state/logs/S11_15_attribution-20261114-00130...
 - 2026-11-14 00:17 **S11-27** lead answer: Card round at 89a3657a ran 2026-11-14 00:11 EST, one card_run, 0.6 card-min, log .work/_shared/S11-27/verify-card.log. All 8 pass: MG S-O2, S-noslp...
 - 2026-11-14 00:15 **S11-29** engineer ask: Red commit 36b48b4e exposes AS caps, missing peaks/resource classification; full/exclusive regression passes. Log .work/_state/logs/S11_29_red-2026...
 - 2026-11-14 00:15 **S11-27** lead resume: Lead ran verify-card.py at 00:11 EST: results in the answer.
@@ -245,7 +246,6 @@ Current tickets: `[###################-]` 205 of 213
 - 2026-11-13 20:35 **S11-27** lead defer: Needs the interactive lead's card turn (PhiWeather has the card until about 04:30 EST 2026-11-14). Run python .work/_shared/S11-27/verify-card.py a...
 - 2026-11-13 20:32 **S11-27** engineer ask: Card round ready at 89a3657a: run python .work/_shared/S11-27/verify-card.py; post verification/L2 or PASS/FAIL per CASE. All 8 rebuilt with lane-g...
 - 2026-11-13 20:27 **S11-27** owner decide: Budget raised by the lead under the owner's standing rule (2026-11-09/10: the lead extends session and token budgets itself; ask only after two ext...
-- 2026-11-13 18:36 **S11-27** lead escalate: budget: 8 engineer sessions used; the budget is 8
 
 ## Cost
 
@@ -257,4 +257,4 @@ Current tickets: `[###################-]` 205 of 213
 
 ## Disk
 
-The project uses 31.7 GiB of 100 GiB. 164 GiB free on the drive.
+The project uses 31.7 GiB of 100 GiB. 166 GiB free on the drive.
