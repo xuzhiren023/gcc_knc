@@ -8,7 +8,6 @@
 *.o
 *.s
 !/tests/**/*.s
-!/tools/s12_06_controls.S
 *.mic
 *.exe
 *.sum
