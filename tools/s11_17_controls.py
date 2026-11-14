@@ -13,7 +13,7 @@ import corpus
 from s9_18_pgo import parse_gcda
 
 OUT = corpus.SHARED / 'S11-17/controls'
-KINDS = ('branch', 'indirect', 'division', 'inline', 'switch')
+KINDS = ('branch', 'indirect', 'division', 'inline', 'loop')
 FLAGS = ['-O2', '-march=knc', '-std=gnu11', '-Wall', '-Wextra', '-Werror']
 SOURCE = r'''
 #include <stddef.h>
@@ -21,7 +21,6 @@ SOURCE = r'''
 #define CAT(a,b) CAT_(a,b)
 #define LOCAL(n) CAT(NAME,n)
 static __attribute__((noipa)) unsigned LOCAL(_cold)(unsigned x) { return x * 13u + 5u; }
-static __attribute__((noipa)) unsigned LOCAL(_branch_hot)(unsigned x) { return x * 3u + 1u; }
 #if KIND == 1
 static unsigned LOCAL(_first)(unsigned x) { return x * 3u + 1u; }
 static unsigned LOCAL(_second)(unsigned x) { return x * 13u + 5u; }
@@ -34,14 +33,16 @@ unsigned LOCAL(_hot)(unsigned x) {
 }
 #endif
 #if KIND == 4
-#define CASE(N) static __attribute__((noipa)) unsigned LOCAL(CAT(_case,N))(unsigned x) { return x * (3u + N) + N; }
-CASE(0) CASE(1) CASE(2) CASE(3) CASE(4) CASE(5) CASE(6) CASE(7)
+static __attribute__((noipa)) unsigned LOCAL(_trip)(unsigned x, unsigned n) {
+    for (unsigned j = 0; j < n; ++j) x = (x ^ (x >> 5)) * 1664525u;
+    return x;
+}
 #endif
 unsigned NAME(const unsigned *a, const unsigned *b, unsigned n) {
     unsigned s = 0;
     for (unsigned i = 0; i < n; ++i) {
 #if KIND == 0
-        if (a[i] == 0) s += LOCAL(_branch_hot)(b[i]);
+        if (a[i] == 0) s += b[i] * 3u + 1u;
         else s += LOCAL(_cold)(b[i]);
 #elif KIND == 1
         s += LOCAL(_targets)[a[i] != 0](b[i]);
@@ -51,17 +52,13 @@ unsigned NAME(const unsigned *a, const unsigned *b, unsigned n) {
         if (a[i] == 0) s += LOCAL(_hot)(b[i]);
         else s += LOCAL(_cold)(b[i]);
 #elif KIND == 4
-        switch (a[i]) {
-#define ARM(N) case N: s += LOCAL(CAT(_case,N))(b[i]); break;
-        ARM(0) ARM(1) ARM(2) ARM(3) ARM(4) ARM(5) ARM(6) ARM(7)
-        default: s += LOCAL(_cold)(b[i]); break;
-        }
+        s += LOCAL(_trip)(b[i], a[i]);
 #endif
     }
     return s;
 }
 '''.replace('@HOT@', '\n'.join('    x = (x ^ (x >> %d)) * %du;' %
-                              (3 + i % 13, 1664525 + 2 * i) for i in range(24)))
+                              (3 + i % 13, 1664525 + 2 * i) for i in range(6)))
 
 DRIVER = r'''
 #define _GNU_SOURCE
@@ -88,7 +85,8 @@ static unsigned reference(unsigned x, unsigned y) {
 @REFHOT@
     return y;
 #elif KIND == 4
-    return x < 8 ? y * (3u + x) + x : y * 13u + 5u;
+    for (unsigned j = 0; j < x; ++j) y = (y ^ (y >> 5)) * 1664525u;
+    return y;
 #else
     return x ? y * 13u + 5u : y * 3u + 1u;
 #endif
@@ -118,7 +116,7 @@ int main(int argc, char **argv) {
 #if KIND == 2
         a[i] = other ? 11u : 7u;
 #elif KIND == 4
-        a[i] = other ? 1u + (state >> 24) % 7u : 0u;
+        a[i] = other ? 20u + (state >> 24) % 32u : 3u;
 #else
         a[i] = other;
 #endif
@@ -151,7 +149,7 @@ int main(int argc, char **argv) {
     puts("CONTROL_CHECK pass"); return 0;
 }
 '''.replace('@REFHOT@', '\n'.join('    y = (y ^ (y >> %d)) * %du;' %
-                                 (3 + i % 13, 1664525 + 2 * i) for i in range(24)))
+                                 (3 + i % 13, 1664525 + 2 * i) for i in range(6)))
 
 
 def run(args, cwd=OUT):
@@ -194,7 +192,6 @@ def link(kernel, variants, objs, output, profile=False):
 
 def stage(kernels=KINDS):
     OUT.mkdir(parents=True, exist_ok=True)
-    binaries, commands = [], []
     for kernel in kernels:
         compile_kernel(kernel, 'base', [])
         for variant, mix in [('pgo', 0), ('pgox', 1)]:
@@ -205,6 +202,12 @@ def stage(kernels=KINDS):
             obj = compile_kernel(kernel, variant, ['-fprofile-generate', '-fprofile-update=atomic'])
             binary = OUT / (kernel + '-' + variant + '-train')
             link(kernel, [variant], [obj], binary, profile=True)
+    stage_scripts()
+
+
+def stage_scripts():
+    """Regenerate lead scripts without repeating successful compile/lint work."""
+    binaries, commands = [], []
     for kernel in KINDS:
         for variant, mix in [('pgo', 0), ('pgox', 1)]:
             binary = OUT / (kernel + '-' + variant + '-train')
@@ -273,12 +276,14 @@ foreach ($profile in @('full','3100','5100')) {
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('step', choices=['stage', 'use'])
+    parser.add_argument('step', choices=['stage', 'scripts', 'use'])
     parser.add_argument('capture', nargs='?')
     parser.add_argument('--kernel', choices=KINDS, help='restage only a changed candidate')
     args = parser.parse_args()
     if args.step == 'stage':
         stage([args.kernel] if args.kernel else KINDS)
+    elif args.step == 'scripts':
+        stage_scripts()
     elif args.capture:
         use(args.capture)
     else:

@@ -277,6 +277,66 @@ lead, run it through `tools/run.py` and PowerShell with that option, first
 `-Phase pilot`, then `-Phase confirm`. Its binaries are staged and linted, but
 this is not a request to accept the failed controls as qualified.
 
+### Revised positive-control candidates, 2026-11-14
+
+Following the lead's 01:02 answer, the branch's hot side is now straight-line
+unsigned arithmetic; its T1 gate requires zero-input fall-through into that
+arithmetic while preserving the cold call. The inline helper has six dependent
+shift/xor/multiply steps instead of 24. GCC 16's `gcc/params.opt` sets
+`max-inline-insns-auto` to 15; `gcc/opts.cc` raises it to 30 at `-O3`.
+`gcc/ipa-inline.cc`, `inline_insns_auto` and `want_inline_small_function_p`,
+scale the limit for the known-hot hint (default hint factor 200%). The new
+candidate targets that interval: plain `-O2` still keeps the hot call; matched
+profile-use must remove it. Its green result remains unmeasured.
+
+The switch is dropped as a gate: GCC has no profile-driven dominant-case
+peeling, per the lead's capability assessment. No follow-up ticket is requested.
+Its replacement, `loop`, calls a helper containing a variable-trip recurrence.
+Matching training uses trip count three for 99% of elements; inverted training
+uses varied counts 20 through 51 for 99%. Evaluation uses the matching mix with
+the separate evaluation seed. The T1 assembly gate requires at least three
+recurrence bodies before the first backward branch in that helper, identifying
+loop peeling rather than an arbitrary assembly difference. GCC's
+`gcc/tree-ssa-loop-ivcanon.cc`, `try_peel_loop`, uses estimated iterations for
+this transformation. Indirect-call and division kernel semantics and gates
+are unchanged. Every batch still checks its separately compiled reference.
+
+All ten revised atomic training binaries compiled and linted. Staging then
+failed writing the existing lead-owned
+`.work/_shared/S11-17/controls/controls-train.sh` with `PermissionError`.
+No attempt was made to bypass that permission. Log:
+`.work/_state/logs/S11_17_controls_revised_stage-20261114-011218.log`.
+The revised plain `-O2` T1 run failed all five transformation assertions, with
+no test errors; the loop helper has one recurrence body. Red log:
+`.work/_state/logs/S11_17_controls_revised_red-20261114-011318.log`.
+
+The lead must resolve the script's ownership, then regenerate scripts without
+repeating the successful builds:
+
+```
+python tools/run.py --name S11-17-controls-revised-scripts --inputs tools/s11_17_controls.py -- ../_shared/toolchain/cygwin/bin/python3.12.exe tools/s11_17_controls.py scripts
+python tools/run.py --name S11-17-controls-revised-train -- powershell -NoProfile -ExecutionPolicy Bypass -File ../_shared/S11-17/controls/controls-lead.ps1
+```
+
+Use the shared Cygwin and cross bin directories on PATH as above. The second
+command is **training only**, under three minutes including its timeout;
+the script runs ten correctness checks in parallel and returns ten profiles.
+Its path is `.work/_shared/S11-17/controls/controls-lead.ps1`. Script generation
+writes LF, and the PowerShell command includes `-ExecutionPolicy Bypass`.
+The existing staged training script/file list still names the old switch:
+do not run it until regeneration succeeds. Likewise do not run the old timing
+files. A combined training/timing run cannot qualify the changed candidates
+before the host imports profiles, builds use variants and checks T1 green.
+
+Retrain all ten variants because source locations changed even for the two
+semantically unchanged kernels. Earlier captured profiles and the checked-in
+fixtures describe the original source, not this revision. Replace those
+fixtures with the new genuine card profiles after a successful use build.
+Return `controls/train.stdout` and `controls/train.stderr`; the engineer then
+imports profiles with the existing fatal missing/mismatch checks, verifies
+positive counts and T1 green, and stages the pilot and confirm timing phases.
+Revised profile-use correctness, transformations and native timings are pending.
+
 ### Lessons from PhiWeather
 
 The lead's 2026-11-13 ticket note reports that PhiWeather's WRF-only GCC 5.1.1

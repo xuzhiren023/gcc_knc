@@ -16,9 +16,10 @@ from s11_17_controls import OUT
 VARIANT = 'pgo'
 
 
-def body(kernel):
-    name = kernel + '_' + VARIANT
-    asm = (OUT / kernel / VARIANT / (name + '.s')).read_text()
+def body(kernel, suffix=''):
+    unit = kernel + '_' + VARIANT
+    name = unit + suffix
+    asm = (OUT / kernel / VARIANT / (unit + '.s')).read_text()
     start = asm.index('\n' + name + ':')
     # Include any compiler-created .cold portion before the function size.
     end = asm.index('\n\t.size\t' + name + ',', start)
@@ -28,8 +29,10 @@ def body(kernel):
 class PositiveControls(unittest.TestCase):
     def test_branch_hot_falls_through(self):
         asm, name = body('branch')
-        self.assertRegex(asm, r'(?s)\ttestl\t[^\n]+\n\tjne\t[^\n]+\n(?:\t(?!j|call)[^\n]*\n)*\tcall\t' +
-                         name + '_branch_hot', 'zero (99%) branch must fall through to hot call')
+        self.assertRegex(asm, r'\ttestl\t[^\n]+\n\tjne\t([^\n]+)\n'
+                         r'(?:\t(?!j|call)[^\n]*\n)*\tleal\t1\(',
+                         'zero (99%) branch must fall through to hot arithmetic')
+        self.assertRegex(asm, r'\tcall\t' + name + r'_cold\b', 'cold alternative must remain supported')
 
     def test_indirect_promoted_and_inlined(self):
         asm, name = body('indirect')
@@ -49,12 +52,21 @@ class PositiveControls(unittest.TestCase):
         self.assertRegex(asm, r'\timull\t\$1664525,', 'hot callee arithmetic must be present in caller')
         self.assertRegex(asm, r'\tcall\t' + name + r'_cold\b', 'cold alternative must remain supported')
 
-    def test_switch_dominant_case_peeled(self):
-        asm, name = body('switch')
-        # The first case test must send zero straight to case 0 before jump-table dispatch.
-        self.assertRegex(asm, r'(?s)\t(?:testl\t[^\n]+|cmpl\t\$0,[^\n]+)\n\tjne\t[^\n]+\n'
-                         r'(?:\t(?!j|call)[^\n]*\n)*\tcall\t' + name + '_case0',
-                         'dominant case zero must bypass the jump table on fall-through')
+    def test_short_loop_peeled(self):
+        asm, _ = body('loop', '_trip')
+        # Three recurrence bodies before the first back edge demonstrate peeling,
+        # rather than merely a changed register choice or branch direction.
+        labels = {}
+        multiplies = 0
+        for i, line in enumerate(asm.splitlines()):
+            if line.startswith('.L') and line.endswith(':'):
+                labels[line[:-1]] = i
+            if re.search(r'\timull\t\$1664525,', line):
+                multiplies += 1
+            jump = re.match(r'\tj\w+\t(\.L\w+)$', line)
+            if jump and jump[1] in labels:
+                break
+        self.assertGreaterEqual(multiplies, 3, 'short trip profile must peel at least three recurrence bodies')
 
 
 if __name__ == '__main__':
