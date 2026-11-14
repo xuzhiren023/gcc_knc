@@ -223,33 +223,43 @@ def package(out, plan):
     # One reservation for IMUL and all adjacent pairs. Serial launcher pins each
     # workload to the same first granted CPU; shell retains full granted affinity.
     lines = ['#!/bin/sh', 'set -eu', 'cd -- "$(dirname -- "$0")"',
-             'tar -xf payload.tar', 'chmod +x launch imul.mic',
+             'tar -xzf payload.tar.gz', 'chmod +x launch imul.mic',
              'echo S12_21_IMUL_BEGIN', 'timeout 120 ./imul.mic', 'echo S12_21_IMUL_END']
-    with tarfile.open(out / 'payload.tar', 'w') as archive:
+    runtimes = {}
+    with tarfile.open(out / 'payload.tar.gz', 'w:gz') as archive:
         for name in ('launch', 'imul.mic', 'input.bin', 'input.sql', 'hpcg.dat'):
             archive.add(out / name, arcname=name)
         for label in FLAGS:
             for program in plan['selected']:
                 folder = out / label / program
-                for p in [folder / 'workload', *folder.glob('*.so*')]:
-                    archive.add(p, arcname=label+'/'+program+'/'+p.name)
+                archive.add(folder / 'workload', arcname=label+'/'+program+'/workload')
+                # All variants resolve DSOs from the same installed prefix.
+                # Keep one archive copy of each, without copying source trees.
+                for p in folder.glob('*.so*'):
+                    runtimes.setdefault(p.name, p)
                 if program == 'zlib':
                     peer = out / ('density1' if label == 'default' else 'default') / program
                     with tarfile.open(folder / 'peer.tar', 'w') as peer_archive:
                         for p in [peer / 'workload', *peer.glob('*.so*')]:
                             peer_archive.add(p, arcname=p.name)
                     archive.add(folder / 'peer.tar', arcname=label+'/'+program+'/peer.tar')
+        for name, path in sorted(runtimes.items()):
+            archive.add(path, arcname='runtime/'+name)
+    (out / 'payload.tar').unlink(missing_ok=True)
+    if (out / 'payload.tar.gz').stat().st_size > 64 * 1024 * 1024:
+        raise ValueError('payload exceeds the card runner default staging limit')
     for index, row in enumerate(plan['pairs']):
         folder = row['label']+'/'+row['program']
         lines += ['echo S12_21_PAIR_BEGIN '+str(index), '(', 'cd '+folder,
                   'chmod +x workload', 'ln -sf ../../input.bin input.bin',
                   'ln -sf ../../input.sql input.sql', 'ln -sf ../../hpcg.dat hpcg.dat',
+                  'for lib in ../../runtime/*; do [ ! -f "$lib" ] || ln -sf "$lib" "${lib##*/}"; done',
                   'timeout %d ../../launch serial %s' % (row['timeout'], row['program']),
                   ')', 'echo S12_21_PAIR_END '+str(index)]
     lines += ['echo "RESULT S12-21 PASS"', '']
     write(out / 'batch.sh', '\n'.join(lines))
     subprocess.run(['sh', '-n', str(out / 'batch.sh')], check=True)
-    write(out / 'files.txt', corpus.windows_path(out / 'payload.tar')+'\n')
+    write(out / 'files.txt', corpus.windows_path(out / 'payload.tar.gz')+'\n')
     save_json(out / 'card-plan.json', plan)
     write(out / 'README.txt',
           'Lead only; one exclusive full-profile reservation, no smaller inputs or profiles.\n'
@@ -363,6 +373,7 @@ def main():
     sub = parser.add_subparsers(dest='action', required=True)
     build = sub.add_parser('stage')
     build.add_argument('--only', nargs='+', default=[], help='resume failed/unbuilt label/program rows only')
+    sub.add_parser('package', help='refresh only the lead package after a packaging change')
     result = sub.add_parser('collect')
     result.add_argument('log', type=Path)
     args = parser.parse_args()
@@ -375,6 +386,11 @@ def main():
         env['PATH'] = os.pathsep.join(str(tc / p) for p in ('cross/bin', 'cygwin/bin')) + os.pathsep + env['PATH']
         script = subprocess.check_output([str(tc / 'cygwin/bin/cygpath.exe'), '-u', __file__], env=env, text=True).strip()
         return subprocess.call([str(tc / 'cygwin/bin/python3.12.exe'), script, *sys.argv[1:]], env=env)
+    elif args.action == 'package':
+        import corpus
+        out = corpus.SHARED / 'S12-21'
+        package(out, json.loads((out / 'card-plan.json').read_text()))
+        print('PACKAGED', (out / 'payload.tar.gz').stat().st_size, 'bytes; shell syntax PASS; no rebuild or card run')
     else:
         stage(args.only)
     return 0
