@@ -2,7 +2,7 @@
 
 Updated automatically at every ticket change. Last update: 2026-11-14 13:59.
 
-**Next: GPT-6.1, on S11-12 (Sprint 11 batch check - full native suite, x86 identity, forward-port drill, ICE sweeps, runtime prefix consistency).** Run `python tools/dispatch.py`, or ask the tech lead to.
+**Next: the tech lead, on S12-04.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[##################--]` 216 of 230
 
@@ -84,7 +84,7 @@ Current tickets: `[##################--]` 216 of 230
 | S12-01 | Sprint 12 prep - static code-quality census of the development-corpus builds (spills, x87/vector transfers, addressing, calls, code size) | Done | A static code-quality census (spill/reload proxies, x87 and x87-zmm traffic, address arithmetic, calls, bra... |
 | S12-02 | Sprint 12 prep - the unscored generality check set (S11-20's six programs in the code styles our corpus lacks) | Done | The six unscored generality checks (Q1-Q6: ray tracer hit dispatch and vec3 AoS, Burkardt MD, Reference BLA... |
 | S12-03 | pm.py approve aborts its own merge on conflict and refuses cleanly, so main is never left mid-merge | draft |  |
-| S12-04 | card_run profile memory monitor costs under 5% of one card thread | In progress |  |
+| S12-04 | card_run profile memory monitor costs under 5% of one card thread | Tests waiting for review | Expected regression confirmed: test fails because generated monitor contains unsupported fractional sleep 0... |
 | S12-05 | DMA end-to-end time - overlap file read, DMA and file write, and copy on the card with more than one thread | draft |  |
 | S12-06 | M4 theme 1 - strict scalar FP conversions and call boundaries (NPB-EP transform and log path, NPB-IS randlc) | In progress | See the resume note: close as premise fails and submit. |
 | S12-07 | M4 theme 2 - indexed-load scheduling with strict sparse reduction (NPB-CG) | Not started |  |
@@ -255,6 +255,7 @@ Current tickets: `[##################--]` 216 of 230
 
 ## Recent activity
 
+- 2026-11-14 13:59 **S12-04** engineer red: Expected regression confirmed: test fails because generated monitor contains unsupported fractional sleep 0.01. Log: C:\Users\xuzhi\Documents\gcc_k...
 - 2026-11-14 13:58 **S12-13** lead approve: The project now has a numbered KNC reference index (R01-R27), corrected KNC notes that cite source pages and keep superseded text visible, and an o...
 - 2026-11-14 13:58 **S12-06** lead answer: See the resume note: close as premise fails and submit.
 - 2026-11-14 13:49 **S12-15** lead answer: Lead: no rebase needed. submit only checks rebase for gcc: yes tickets; your diff is one new note and the lead merges. Run pm.py submit now as is.
@@ -262,13 +263,12 @@ Current tickets: `[##################--]` 216 of 230
 - 2026-11-14 13:44 **S12-16** lead approve: Whole-system tuning playbook for the Z840 + Phi done: 13 ordered steps (BIOS, host Linux, card power/pages/service core, transfers, MPI, runtimes) ...
 - 2026-11-14 13:36 **S12-15** engineer ask: Survey committed: 61ecb62e, docs/research/phi-literature-survey.md. 30 ranked source groups; 30 PDFs/extracts in .work/_shared/phi-literature/ (45....
 - 2026-11-14 13:35 **S12-17** lead answer: Do not amend or split 71cbcf86. Instead prove red: temporarily check out tools/claude-torture.c from main (git checkout main -- tools/claude-tortur...
-- 2026-11-14 13:35 **S12-13** engineer submit: Corrected all four R09 passages at 173633ac after reading local pp.4-5: p.4 libhugetlbfs on MPSS 2.1.4346-16; p.5 THP-stack results on 7110P 2.1.49...
 
 ## Cost
 
 - From the script, engineer: 584 sessions, 1205.9M input tokens
 - From the script, lead: 388 sessions, 108.3M input tokens
-- Started by hand, Claude: 12 sessions, 3159.5M input tokens
+- Started by hand, Claude: 12 sessions, 3160.2M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
