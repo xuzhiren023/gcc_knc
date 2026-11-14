@@ -228,9 +228,13 @@ int main(int argc,char **argv) {
         for method, present in (("ssh", False), ("ssh", True), ("auto", False)):
             with patch.object(Path, "is_file", return_value=present):
                 transport = runner["SSHTransport"]({}, 10, transfer=method)
-            with patch.object(Path, "stat", return_value=Mock(st_size=123)) as stat:
+            pin = Mock()
+            pin.stat.return_value.st_size = 123
+            # Path.resolve may stat the root on POSIX; only helper lookup matters.
+            with patch.object(transport, "helper", return_value=pin) as helper:
                 overhead = transport.stage_overhead()
-            self.assertEqual((transport.helper_free, stat.call_count, overhead),
+            helper.assert_called_once_with("pinHelper", "claude-pin.mic")
+            self.assertEqual((transport.helper_free, pin.stat.call_count, overhead),
                              (True, 1, 123 + len(runner["watchdog_bytes"]())))
             session = object.__new__(runner["SSHSession"])
             session.helper_free, session.transfer_method, session.transfers = True, method, []

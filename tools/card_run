@@ -612,8 +612,11 @@ class SSHTransport:
 
 class SSHSession:
     stage_timeout = STAGE_TIMEOUT
+    helper_free = True
+    transfer_method = "ssh"
 
     def __init__(self, command, run_dir, transport_timeout):
+        self.transfers = []
         self.run_dir, self.transport_timeout = run_dir, transport_timeout
         self.command = command
         self.process = subprocess.Popen(command, stdin=subprocess.PIPE, stdout=subprocess.PIPE,

@@ -144,6 +144,7 @@ class PackedStage(PackFixture):
         (proc / "sys/kernel/random").mkdir(parents=True)
         (proc / "sys/kernel/random/boot_id").write_text(BOOT + "\n")
         session = object.__new__(runner["SSHSession"])
+        session.transfers = []
         session.run_dir = "/tmp/claude/claude-" + uuid.uuid4().hex
         session.boot_id, session.transport_timeout = BOOT, 1
         session.command = ["fake-ssh", "exec sh"]
@@ -194,9 +195,13 @@ class PackedStage(PackFixture):
         # Today: 303 upload connections and 301 chmod round trips. Packed: the
         # helper's own upload, then one stream for every other staged file.
         self.assertEqual(len(uploads), 2, uploads)
-        self.assertIn("cat > claude-unpack", uploads[0])
+        self.assertIn("cat > claude-part-", uploads[0])
         self.assertIn("./claude-unpack", uploads[1])
-        self.assertLessEqual(len(rpcs), 3, rpcs)
+        # Completion checks now add one length RPC per file and private helper publication.
+        self.assertEqual(rpcs.count("upload-length"), len(files) + 4)
+        self.assertEqual(rpcs.count("upload-publish"), 1)
+        self.assertEqual([step for step in rpcs if step not in ("upload-length", "upload-publish")],
+                         ["stage-create", "stage-chmod", "stage-chmod"])
         expected = {"claude-program": (program.read_bytes(), 0o700),
                     "claude-pin": (session.pin_helper.read_bytes(), 0o700),
                     "claude-watchdog.sh": (runner["watchdog_bytes"](), 0o600)}
