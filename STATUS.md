@@ -4,7 +4,7 @@ Updated automatically at every ticket change. Last update: 2026-11-14 17:53.
 
 **Next: GPT-6.1, on S12-21 (Scheduling model for M4's serial runs - measure density-1 tuning and the integer-multiply cost against today's density-4 defaults (S12-14 B02, B04, B05)).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
-Current tickets: `[##################--]` 226 of 243
+Current tickets: `[##################--]` 226 of 244
 
 ## Milestones
 
@@ -14,7 +14,7 @@ Current tickets: `[##################--]` 226 of 243
 | M1 | Mixed native code | Done | 43 of 43 tickets |
 | M2 | Useful vector target | Done | 51 of 51 tickets |
 | M3 | Runtimes | Done | 48 of 48 tickets |
-| M4 | Broad optimization | In progress | 44 of 61 tickets |
+| M4 | Broad optimization | In progress | 44 of 62 tickets |
 | M5 | Program corpus | Not started | Not planned in detail yet |
 | M6 | Release | Not started | Not planned in detail yet |
 
@@ -109,6 +109,7 @@ Current tickets: `[##################--]` 226 of 243
 | S12-26 | WRF hot scalar routines - classify with the S12-19 triage tool and stage bitwise-safe per-file flag arms for PhiWeather to time | draft |  |
 | S12-27 | Latency-aware scalar loops - GCC-KNC unrolls and interleaves independent iterations and hoists conversions so one thread's every-other-cycle issue and long latencies are hidden automatically | draft |  |
 | S12-28 | dispatch.py refuses to start a second dispatcher on a lane that already has a live one | Done | dispatch.py now refuses to start a second dispatcher on a lane that already has a live one (a lock per lane... |
+| S12-29 | Wrong code - vbroadcastsd reads a 4-byte-aligned SCmode constant (complex float) straight from the constant pool and faults on the card (gcc.c-torture pr38969.c, regression from S11-27) | Not started |  |
 | S13-01 | M4 final gate - stage the ADR-0015 gate run at the final head (17 programs, held-out unsealed, six pairs, three profiles) | draft |  |
 | S13-02 | Libgomp per-region thread density - choose 1-4 workers per core per parallel region instead of once per program | draft |  |
 | S13-03 | M4 retrospective - what we did wrong, what worked, and the practice changes carried into the next milestone and the agent-team skill | draft |  |
@@ -280,8 +281,8 @@ Current tickets: `[##################--]` 226 of 243
 ## Cost
 
 - From the script, engineer: 634 sessions, 1266.2M input tokens
-- From the script, lead: 415 sessions, 114.2M input tokens
-- Started by hand, Claude: 12 sessions, 3273.3M input tokens
+- From the script, lead: 416 sessions, 114.4M input tokens
+- Started by hand, Claude: 12 sessions, 3273.9M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
