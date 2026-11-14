@@ -64,7 +64,7 @@ start_job() {
     (trap '' HUP; exec sh ./claude-watchdog.sh "$run_dir" "$boot_id" "$job_limit") \
         > /dev/null 2>&1 < /dev/null &
     (trap '' HUP
-     (while [ ! -f memory-ready ]; do usleep 10000; done
+     (while [ ! -f memory-ready ]; do usleep 10000 2>/dev/null || sleep 1; done
       exec ./claude-pin "$job_cpus" 0 ./claude-program "$@") &
      root=$!
      # Isolate claude-pin's marker from the program's exec-success marker.
@@ -152,7 +152,7 @@ start_job() {
              }
              if (!live) exit
              print "ready" > "memory-ready"; close("memory-ready")
-             system("usleep 100000")
+             system("usleep 100000 2>/dev/null || sleep 1")
          }
      }') &
      reader=$!
