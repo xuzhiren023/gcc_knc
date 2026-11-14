@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-14 07:45.
+Updated automatically at every ticket change. Last update: 2026-11-14 07:46.
 
-**Next: the tech lead, on S11-17.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: GPT-6.1, on S11-15 (First development-corpus baseline and profile, GCC 5.1.1 vs GCC-KNC at -O2 (E7-03 part 1)).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
 Current tickets: `[###################-]` 208 of 216
 
@@ -68,7 +68,7 @@ Current tickets: `[###################-]` 208 of 216
 | S11-14 | M4 scoring contract and measurement protocol, frozen before any tuning | Done | M4's scoring contract is frozen in ADR-0015 with a tested scorer: strict serial -O2 versus -O2 over 17 prog... |
 | S11-15 | First development-corpus baseline and profile, GCC 5.1.1 vs GCC-KNC at -O2 (E7-03 part 1) | In progress | Do not split. Submit with --override 'research ticket: 754-line baseline report plus profiling tools alread... |
 | S11-16 | Long-double libm hazard audit - do other MPSS long double entry points fault like cbrtl? (E7-21, bounded) | Done | The card's MPSS long double libm was probed on the card: of 12 entry points only cbrtl faults, and S10-13 a... |
-| S11-17 | PGO feasibility on one complete development program (reuse of S9-18's train/use path) | Question for the tech lead | Lead ran train3 at 07:44 EST: results in the answer. |
+| S11-17 | PGO feasibility on one complete development program (reuse of S9-18's train/use path) | In progress | Train3 ran 2026-11-14 07:44 EST at 4954896d scripts: PASS, 0.4 min, card exit 0, log .work/_state/logs/S11_... |
 | S11-18 | M4 corpus harness v2 - card profiles, prefix record, held-out sealing, stronger checks, and the donor-failure rule | Done | The M4 corpus harness now stages all 17 programs for the 7120 and the 3100/5100 profiles with serial voting... |
 | S11-19 | Second senior review - the M4 definition and the Sprint 11-13 roadmap, adjusted | Done | The M4 definition and the Sprint 11-13 roadmap are rewritten as measure, improve, decide, each sprint with ... |
 | S11-20 | Research - which compiler optimizations benefit the widest range of real code on KNC, from professional to amateur, and does our corpus cover it? | Done | We now have a code-style coverage study (docs/research/code-style-coverage.md) that ranks Sprint 12 candida... |
@@ -241,6 +241,7 @@ Current tickets: `[###################-]` 208 of 216
 
 ## Recent activity
 
+- 2026-11-14 07:46 **S11-17** lead answer: Train3 ran 2026-11-14 07:44 EST at 4954896d scripts: PASS, 0.4 min, card exit 0, log .work/_state/logs/S11_17_controls_train3-20261114-074418.log. ...
 - 2026-11-14 07:45 **S11-17** lead resume: Lead ran train3 at 07:44 EST: results in the answer.
 - 2026-11-14 02:55 **S11-17** lead defer: Interactive lead at 4954896d, S11-17 worktree. Branch candidate (noipa helper, expect-unlikely vs 99% training) is a fair gate. 1) Move lead-owned ...
 - 2026-11-14 02:52 **S11-17** engineer ask: 4954896d: ten profiles imported, five use binaries compiled/linted; T1 four pass, branch fails. Revised branch helper staged; five O2 gates red, te...
@@ -248,7 +249,6 @@ Current tickets: `[###################-]` 208 of 216
 - 2026-11-14 02:38 **S11-02** lead resume: Lead merged main again at 31698412 (STAGING_RESERVED union with S11-29); test_card_*.py 117 OK in 162 s, log .work/_state/logs/s11_02_lead_merge2_c...
 - 2026-11-14 02:36 **S11-17** owner decide: Budget raised by the lead under the owner's standing rule: input tokens 12M -> 20M, the second token extension. Progress since the first: the contr...
 - 2026-11-14 02:35 **S11-17** engineer escalate: budget: 12640587 input tokens used; the budget is 12000000
-- 2026-11-14 02:33 **S11-17** owner decide: Budget raised by the lead under the owner's standing rule: sessions 7 -> 9, the second session extension. Progress since the last: the revised cont...
 
 ## Cost
 
@@ -260,4 +260,4 @@ Current tickets: `[###################-]` 208 of 216
 
 ## Disk
 
-The project uses 31.7 GiB of 100 GiB. 154 GiB free on the drive.
+The project uses 31.7 GiB of 100 GiB. 153 GiB free on the drive.
