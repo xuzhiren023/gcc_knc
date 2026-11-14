@@ -1,7 +1,53 @@
-# S12-18: double vector math before the valid card rerun
+# S12-18: valid batches confirm double vector math is faster
 
-Phase 1, 2026-11-14. No new card result is claimed. The library and compiler
-are unchanged. The staged benchmark is `.work/_shared/S12-18/vmath-bench.mic`.
+Completed 2026-11-14 after the lead's valid card rerun. The calibration fix
+is commit `d29d7c74`; the library and compiler are unchanged. The staged
+benchmark is `.work/_shared/S12-18/vmath-bench.mic`.
+
+## Valid card results and decision
+
+The lead ran full, 3100 and 5100 in exclusive card window 1, 2026-11-14
+22:29-22:47 UTC, and accepted the results in the ticket at 18:31-18:32 EST.
+All three programs exited 0; all accepted batches met 50-200 ms. Each profile
+has 21 rounds of five batches per build for both sets and all seven kernels.
+The logs are `.work/_shared/tmp/claude-s12-window1/s12-18-full.out`,
+`.work/_shared/tmp/claude-s12-window1/s12-18-3100.out`, and
+`.work/_shared/tmp/claude-s12-window1/s12-18-5100.out`.
+
+Each cell below is the median vector/scalar time ratio, followed by the
+reported scalar/vector speedup. Lower time ratios and higher speedups are
+better. These are native measurements run by the lead.
+
+| Profile | Set | exp ratio / speedup | log ratio / speedup | pow ratio / speedup |
+| --- | --- | ---: | ---: | ---: |
+| full | L2 | 0.5605 / 1.78x | 0.7653 / 1.31x | 0.3904 / 2.56x |
+| 3100 | L2 | 0.6596 / 1.52x | 0.7621 / 1.31x | 0.4316 / 2.32x |
+| 5100 | L2 | 0.6366 / 1.57x | 0.8055 / 1.24x | 0.4651 / 2.15x |
+| full | memory | 0.6076 / 1.65x | 0.7970 / 1.25x | 0.4141 / 2.41x |
+| 3100 | memory | 0.6826 / 1.47x | 0.8662 / 1.15x | 0.3707 / 2.70x |
+| 5100 | memory | 0.6233 / 1.60x | 0.9161 / 1.09x | 0.4136 / 2.42x |
+
+L2 expf speedups are 3.57x/3.08x/3.24x for full/3100/5100; theta-e column
+speedups are 3.23x/3.00x/2.99x. All double summary medians favor vector code.
+Individual rounds can differ: 5100 L2 log has vector/scalar ratios from
+0.8019 to 1.1698 despite its favorable 0.8055 median. The supplied results
+contain one launch per profile, so they do not establish launch-to-launch
+variation from the originally proposed three launches.
+
+The fix rejected and repaired short groups on the card. For example, full
+L2 exp initially recorded roughly 20 ms vector batches at two repetitions;
+`retry_batches` excluded that group and recalibration produced valid results.
+This confirms that accepting short batches was a real benchmark problem.
+The lead concludes that the earlier slower-than-scalar result was caused by
+the calibration bug. It is not evidence for suppressing these vector calls.
+The precise source of the original timing transient remains unproven.
+
+Phase 2 is unnecessary: retain the library and vectorizer costs and submit
+the calibration fix, as directed by the lead. No library rewrite or new S10
+qualification is needed. The analysis below documents real overhead but
+cannot predict performance from instruction counts, especially against x87
+transcendentals. The changed memory traversal also means the new memory
+ratios cannot be compared directly with the old whole-sweep measurements.
 
 ## What failed in the old measurement
 
@@ -138,7 +184,9 @@ __finite 0x10b20. x87 transcendental instructions have substantial internal
 latency; an instruction count is not a cycle prediction. Nevertheless, the
 vector log adapter plus just its table loops already costs 62.375 instructions
 per element, before its main arithmetic, versus 38 for the scalar callee path.
-This makes the observed ordering plausible without proving its timing ratios.
+Before the valid rerun, this made the apparent slowdown plausible, but the
+valid native results above show that instruction counts did not predict the
+actual ordering.
 
 The exp benchmark's prefetched vector loop has 13 instructions/eight elements
 (1.625/element, including the vector call). The scalar prefetched loop has
@@ -159,17 +207,17 @@ NPB-IS, HPCG, SQLite, PB-gemm, PB-atax, PB-cholesky, PB-ludcmp, PB-jacobi-2d,
 PB-heat-3d, zlib. NPB-CG has scalar pow@plt and NPB-EP scalar log@plt;
 SQLite's sqlite3_log is unrelated. No held-out executable was accessed.
 
-If valid reruns confirm the losses, the cheaper scoped option is a measured
+Before the rerun, the cheaper scoped option if losses were confirmed was a measured
 vectorizer cost correction for these three double calls. Removing adapter
 overhead alone does not remove the table loops, scalarized integer operations
 or compensated math. A library rewrite also needs S10 qualification at 1 ULP.
 The cost correction should preserve ADR-0014's library binding and public
 entries, while making profitability reflect the measured per-element costs;
 it should not globally disable the binding or affect the profitable float calls.
-No cost values are selected from the invalid run. This ticket is currently
-gcc:no/tools3; implementing phase 2 requires lead results and a GCC lane/build.
+No cost values were selected from the invalid run. The valid rerun did not
+confirm losses, so no cost correction or GCC lane/build is required.
 
-## Staged exclusive rerun for the lead
+## Original staged rerun instructions (historical)
 
 Use the staged binary above. Both sets and all seven kernels are enabled;
 21 rounds x 5 batches, three launches per profile, targeting roughly 10-30
@@ -187,4 +235,6 @@ core/memory limits, not physical SKU clocks. Require successful exit, all
 correctness checks, all accepted batches in range, and the full 14 summaries.
 Inspect retry_batches and monitoring errors before accepting a timing comparison;
 report each profile/set separately, with round ratios and launch variation.
+The lead accepted the one-launch-per-profile results above and directed
+submission; the additional proposed launches are not pending work.
 No engineer card execution, GCC rebuild, or x86 check was performed.
