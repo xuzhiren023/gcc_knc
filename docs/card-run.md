@@ -24,8 +24,9 @@ running in the ledger) the memory budget is `MemFree` less 1536 MiB
 (`MEMORY_MARGIN_MIB`) and jobs may use any of cores 0-59. While another project's
 job runs, the 10240 MiB budget (`MEMORY_BUDGET_MIB`) applies and its ledger cores
 (0-39) stay taken. `--profile 3100|5100|7100|full` runs a job as that card would:
-cores 0-55, 0-58 or 0-59 and an `RLIMIT_AS` of 5632 MiB, 7680 MiB, or the budget
-(7100 and full). S9-23 (owner 2026-11-10): an exclusive job with no declared `memoryMB` and no
+cores 0-55, 0-58 or 0-59 and a sampled resident-plus-swap tree limit of
+5632 MiB (3100) or 7680 MiB (5100); 7100 and full have no profile memory cap.
+Profiles never set `RLIMIT_AS`. S9-23 (owner 2026-11-10): an exclusive job with no declared `memoryMB` and no
 3100/5100 profile gets no `RLIMIT_AS` (`claude-pin` memory 0; receipt and ledger `memoryLimitMiB`
 null); the MemFree admission check still runs, and shared mode keeps the 10240 MiB cap. `--benchmark --profile` keeps the whole card (ledger cores 0-59)
 but pins to the profile's cores. The receipt and ledger rows carry `profile`. A
@@ -173,8 +174,24 @@ after S2-17, with later batches using the full execute suite.
   our start row never stays open through a slow upload. The S3-10 torture row
   stages its 1,680 files through `--file-list`, in one pack.
 - The owner-reported card has no taskset, and its cgroup memory controller is
-  disabled with no mounted controllers. Nothing is mounted or enabled. Instead,
-  `claude-pin` sets both soft and hard `RLIMIT_AS` to the declared MiB before
+  disabled with no mounted controllers. Enabling it needs a forbidden kernel/boot
+  change (S11-29 lead answer). Profiles therefore use one persistent BusyBox awk
+  reader: scan `/proc/*/stat` for ancestry, then sum `VmRSS` and `VmSwap` from
+  each live member's status. Retain observed descendants across reparenting,
+  identify PIDs by start time, skip vanished/short records, and kill the tree
+  when its usage exceeds the profile cap. The initial sample precedes program
+  execution. Each subsequent sample sleeps 0.1 seconds; scan time adds to that
+  interval. Spikes or entire short-lived descendants between samples can pass.
+  Shared resident pages count once per process mapping, as reported by VmRSS.
+  Receipt fields `profile_memory_limit_mib`, `peak_resident_kib`, and
+  `peak_memory_kib` record the cap and sampled tree peaks (KiB). An excess is
+  `resource`, with peak and limit in the reason. `monitor_cpu_ticks` measures
+  reader user/system CPU plus reaped ls/sleep children from its own proc stat;
+  divide by the card's CLK_TCK and receipt wall time (`card_minutes * 60`) to
+  measure overhead in the lead round. There is no busy loop or arena/stack
+  environment override. Full/7100 collect peaks without a profile cap.
+  For non-profile declared limits, `claude-pin` still sets soft and hard
+  `RLIMIT_AS` to the declared MiB before
   exec; failure prevents execution. Address space is stricter than resident
   memory for a single process, and includes mappings and reservations as well
   as resident pages. The limit survives fork/exec, but is per process, not an

@@ -114,6 +114,8 @@ class ProfileMemory(unittest.TestCase):
 
                 def rpc(script, timeout, *, step):
                     scripts.append((step, script))
+                    if step == "read-memory":
+                        return b"921600 921600 2 0"
                     return b"0" if step == "read-status" else b""
 
                 session.rpc = rpc

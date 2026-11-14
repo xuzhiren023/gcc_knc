@@ -33,7 +33,7 @@ CARD_MEMORY_MIB = 16384  # 7120P: 16 GB GDDR5, the most any one job can declare.
 # exclusive job.
 PROFILE_CORES = {"3100": 56, "5100": 59, "7100": 60, "full": 60}
 PROFILE_MEMORY_MIB = {"3100": 5632, "5100": 7680, "7100": None, "full": None}
-PROFILE_HELP = ("run as that card would: its compute cores, and its usable memory as RLIMIT_AS. "
+PROFILE_HELP = ("run as that card would: its compute cores, and sampled resident plus swap memory. "
                 "A profile cannot stand in for the clock (1.1, 1.053, 1.238 GHz) or the memory "
                 "bandwidth per core (about 4.2, 5.3, 5.8 GB/s): fewer active cores each get more "
                 "bandwidth, so it is a fair test of correctness, memory size and core count, and "
@@ -43,7 +43,97 @@ OWN_JOB = re.compile(r"claude-[0-9a-f]{32}\Z")
 STAGE_TIMEOUT = 120.0  # S5-04: no start row of ours stays open through a slow upload.
 PACK_MAGIC = b"claude-pack 1\n"
 STAGING_RESERVED = {"claude-program", "claude-pin", "claude-watchdog.sh",
-                    "claude-pinned", "stdout", "stderr", "status"}
+                    "claude-pinned", "stdout", "stderr", "status", "memory-ready", "memory-report",
+                    "memory-error"}
+
+
+# MPSS has no enabled memory controller (lead answer, S11-29). One persistent
+# awk reader samples the entire tree, retaining identities across reparenting.
+# sleep/ls are short-lived utilities, never additional /proc readers.
+PROFILE_START = r'''
+start_job() {
+    guard_boot && [ -f claude-watchdog.sh ] && [ -x claude-pin ] || return 92
+    job_limit=$1; job_cpus=$2; shift 3
+    : > stdout; : > stderr
+    (trap '' HUP; exec sh ./claude-watchdog.sh "$run_dir" "$boot_id" "$job_limit") \
+        > /dev/null 2>&1 < /dev/null &
+    (trap '' HUP
+     (while [ ! -f memory-ready ]; do sleep 0.01; done
+      exec ./claude-pin "$job_cpus" 0 ./claude-program "$@") &
+     root=$!
+     awk -v root="$root" -v limit="$profile_memory_kib" -v boot="$boot_id" '
+     function identity(pid,    f,line,n,a) {
+         f="/proc/" pid "/stat"
+         n=(getline line < f); close(f)
+         if (n<=0) return ""
+         sub(/^.*\) /,"",line); split(line,a," ")
+         parent[pid]=a[2]; state[pid]=a[1]
+         return a[20]
+     }
+     function report(    line,a,f) {
+         f="/proc/self/stat"; getline line < f; close(f)
+         sub(/^.*\) /,"",line); split(line,a," ")
+         # Include reaped ls/sleep CPU (cutime/cstime), in kernel clock ticks.
+         printf "%d %d %d %d\n", peakrss, peakmem, a[12]+a[13]+a[14]+a[15], exceeded > "memory-report"
+         close("memory-report")
+     }
+     BEGIN {
+         known[root]=identity(root)
+         while (1) {
+             f="/proc/sys/kernel/random/boot_id"; getline current < f; close(f)
+             if (current!=boot) exit 92
+             for (p in ids) delete ids[p]
+             cmd="ls -d /proc/[0-9]*"
+             while ((cmd | getline path)>0) {
+                 sub(/^.*\//,"",path); ids[path]=identity(path)
+             }
+             close(cmd)
+             # Discover grandchildren regardless of PID/directory ordering.
+             do {
+                 changed=0
+                 for (p in ids)
+                     if (ids[p]!="" && !(p in known) && parent[p] in known &&
+                         ids[parent[p]]==known[parent[p]]) {
+                         known[p]=ids[p]; changed=1
+                     }
+             } while (changed)
+             rss=0; swap=0; live=0
+             for (p in known) {
+                 if (ids[p]!=known[p] || ids[p]=="" || state[p]=="Z") {
+                     delete known[p]; continue
+                 }
+                 live++
+                 f="/proc/" p "/status"
+                 while ((getline line < f)>0) {
+                     split(line,a,/[ \t]+/)
+                     if (a[1]=="VmRSS:") rss+=a[2]
+                     if (a[1]=="VmSwap:") swap+=a[2]
+                 }
+                 close(f)
+             }
+             if (rss>peakrss) peakrss=rss
+             if (rss+swap>peakmem) peakmem=rss+swap
+             if (limit>0 && rss+swap>limit) exceeded=1
+             report()
+             if (exceeded) {
+                 f="/proc/sys/kernel/random/boot_id"; getline current < f; close(f)
+                 if (current!=boot) exit 92
+                 # Recheck start time immediately before signalling, including
+                 # descendants that changed cwd/executable or were reparented.
+                 for (p in known)
+                     if (identity(p)==known[p]) system("kill -KILL " p " 2>/dev/null")
+             }
+             if (!live) exit
+             print "ready" > "memory-ready"; close("memory-ready")
+             system("sleep 0.1")
+         }
+     }' &
+     reader=$!
+     wait "$root"; code=$?
+     wait "$reader" || { code=126; echo failed > memory-error; }
+     printf '%s\n' "$code" > status) > stdout 2> stderr < /dev/null &
+}
+'''
 
 
 class Refused(OSError):
@@ -227,6 +317,9 @@ def run(program, argv, *, lock_path, external_locks, baseline_names, timeout,
     job_id = "claude-" + uuid.uuid4().hex
     run_dir = "/tmp/claude/" + job_id
     result.update(job_id=job_id, run_dir=run_dir, memory_mb=memory_mb, profile=profile)
+    if profile is not None:
+        result.update(profile_memory_limit_mib=PROFILE_MEMORY_MIB.get(profile),
+                      peak_resident_kib=None, peak_memory_kib=None, monitor_cpu_ticks=None)
     recorded, card_fault, ledger_offset = False, False, 0
     admission_lock = None
     overlaps = set()
@@ -407,6 +500,7 @@ def run(program, argv, *, lock_path, external_locks, baseline_names, timeout,
         refuse_foreign_workload(snap)
         started = monotonic()
         execution_started = True
+        session.profile = profile
         try:
             status = session.execute(run_dir, argv, timeout=timeout,
                                      card_timeout=math.ceil(timeout + max(5.0, 2 * transport_timeout)),
@@ -416,6 +510,14 @@ def run(program, argv, *, lock_path, external_locks, baseline_names, timeout,
             failure("timeout", TIMEOUT_EXIT, error)
         finally:
             result["card_minutes"] = (monotonic() - started) / 60.0
+            if profile is not None:
+                report = getattr(session, "memory_report", {})
+                result.update(report)
+                peak = report.get("peak_memory_kib")
+                limit = PROFILE_MEMORY_MIB[profile]
+                if limit is not None and peak is not None and peak > limit * 1024:
+                    failure("resource", 137, "peak resident plus swap %d KiB exceeds limit %d KiB" %
+                            (peak, limit * 1024))
         execution_finished = True
     except Refused as error:
         failure("refused", REFUSED_EXIT, error)
@@ -801,29 +903,47 @@ class SSHSession:
         def operation(script, step):
             return self.rpc(script, self.transport_timeout, step=step)
         command = " ".join(shlex.quote(str(arg)) for arg in argv)
-        operation("boot_id=%s\nstart_job %s %s %s %s" %
+        profile = getattr(self, "profile", None)
+        prefix = (PROFILE_START + "\nprofile_memory_kib=%d\n" %
+                  ((PROFILE_MEMORY_MIB[profile] or 0) * 1024) if profile is not None else "")
+        operation(prefix + "boot_id=%s\nstart_job %s %s %s %s" %
                   (shlex.quote(self.boot_id), shlex.quote(str(card_timeout)),
-                   shlex.quote(",".join(str(cpu) for cpu in cpus)), memory_mb or 0, command), "start-job")
+                   shlex.quote(",".join(str(cpu) for cpu in cpus)),
+                   0 if profile is not None else memory_mb or 0, command), "start-job")
         offsets = [0, 0]
         status = None
         poll_delay = 0.5
         next_output = time.monotonic() + 10.0
+        def read_memory():
+            values = operation("guard_boot && cat memory-report", "read-memory").split()
+            if len(values) != 4 or any(not value.isdigit() for value in values):
+                raise OSError("missing or malformed memory monitor report")
+            self.memory_report = dict(zip(
+                ("peak_resident_kib", "peak_memory_kib", "monitor_cpu_ticks"),
+                map(int, values[:3])))
         while True:
             if time.monotonic() >= deadline:
+                if profile is not None:
+                    read_memory()
                 raise TimeoutError("card program deadline exceeded")
             if status is None:
-                answer = operation("guard_boot && if [ -f status ]; then "
+                answer = operation("guard_boot && if [ -f memory-error ]; then echo memory-monitor-failed; "
+                                   "elif [ -f status ]; then "
                                    "if [ -f claude-pinned ]; then cat status; "
                                    "else echo claude-pinned-missing; fi; "
                                    "else echo running; fi", "read-status")
                 # A helper failure leaves SSH usable for guarded cleanup.
                 if answer == b"claude-pinned-missing":
                     raise OSError("claude-pinned missing: helper did not exec program")
+                if answer == b"memory-monitor-failed":
+                    raise OSError("profile memory monitor failed")
                 if answer != b"running":
                     try:
                         status = int(answer)
                     except ValueError:
                         raise OSError("missing program exit status")
+                    if profile is not None:
+                        read_memory()
             # Status uses the existing control session. Only these binary reads
             # open connections: at most one pair per ten seconds while running.
             if status is not None or time.monotonic() >= next_output:
