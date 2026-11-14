@@ -1,5 +1,5 @@
 S11-12 compiler/runtime/library record
-Project HEAD: 4669ddadfd9559fc8c3c15e8c89ee51be9f0491a
+Project HEAD: fe2a3682dc6e35338f8d2ccf29a33ff6a44a272b
 GCC knc: 619e14b479a952edff32e94f22573710d0b8ac17
 GCC built tree: {
   "commit": "e0bc456a11e9364c1573f97d3a319bc902e44ed7",
@@ -71,8 +71,8 @@ libstdc++.a: /cygdrive/c/Users/xuzhi/Documents/gcc_knc/.work/_shared/gcc-knc-16.
 libatomic.a: /cygdrive/c/Users/xuzhi/Documents/gcc_knc/.work/_shared/gcc-knc-16.2.0-2/bin/../lib/gcc/k1om-mpss-linux/16.2.0/../../../../k1om-mpss-linux/lib/../lib64/libatomic.a
 libgomp.a: /cygdrive/c/Users/xuzhi/Documents/gcc_knc/.work/_shared/gcc-knc-16.2.0-2/bin/../lib/gcc/k1om-mpss-linux/16.2.0/../../../../k1om-mpss-linux/lib/../lib64/libgomp.a
 libknc_vmath.a: /cygdrive/c/Users/xuzhi/Documents/gcc_knc/.work/_shared/gcc-knc-16.2.0-2/bin/../lib/gcc/k1om-mpss-linux/16.2.0/libknc_vmath.a
-vmath archive entries: 11
-vmath members: vmath_expf.o vmath_logf.o vmath_powf.o vmath_exp.o vmath_log.o vmath_pow.o exp_data.o log_data.o pow_log_data.o powf_log2_data.o exp2f_data.o
+vmath archive entries: 26
+vmath members: vmath_asin.o vmath_atan.o vmath_cbrt.o vmath_erf.o vmath_exp.o vmath_exp2.o vmath_expf.o vmath_hyperbolic.o vmath_log.o vmath_log10.o vmath_log10f.o vmath_log2.o vmath_logf.o vmath_pow.o vmath_powf.o vmath_reducer.o vmath_sincos.o vmath_tan.o exp_data.o log_data.o pow_log_data.o powf_log2_data.o exp2f_data.o log2_data.o v_erf_data.o v_erfc_data.o
 bin: k1om-mpss-linux-c++.exe, k1om-mpss-linux-cpp.exe, k1om-mpss-linux-g++.exe, k1om-mpss-linux-gcc-16.2.0.exe, k1om-mpss-linux-gcc-ar.exe, k1om-mpss-linux-gcc-nm.exe, k1om-mpss-linux-gcc-ranlib.exe, k1om-mpss-linux-gcc.exe, k1om-mpss-linux-gcov-dump.exe, k1om-mpss-linux-gcov-tool.exe, k1om-mpss-linux-gcov.exe, k1om-mpss-linux-gfortran.exe, k1om-mpss-linux-lto-dump.exe
 lib/gcc/k1om-mpss-linux/16.2.0: crtbegin.o, crtbeginS.o, crtbeginT.o, crtend.o, crtendS.o, crtfastmath.o, finclude, include, include-fixed, install-tools, libcaf_shmem.a, libcaf_shmem.la, libcaf_single.a, libcaf_single.la, libgcc.a, libgcc_eh.a, libgcov.a, libknc_vmath.a
 k1om-mpss-linux/lib: 
