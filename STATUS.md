@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-14 13:12.
+Updated automatically at every ticket change. Last update: 2026-11-14 13:13.
 
-**Next: GPT-6.1, on S11-12 (Sprint 11 batch check - full native suite, x86 identity, forward-port drill, ICE sweeps, runtime prefix consistency).** Run `python tools/dispatch.py`, or ask the tech lead to.
+**Next: the tech lead, on S12-12.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[##################--]` 213 of 228
 
@@ -92,7 +92,7 @@ Current tickets: `[##################--]` 213 of 228
 | S12-09 | Sprint 12 batch check - integrated themes at the final Sprint 12 head, regression evidence, optional modes frozen | draft |  |
 | S12-10 | Research - what KNC hardware and runtime knowledge are we still missing to tune GCC-KNC, the OS runtime and broad optimization, and where is it documented? | Done | KNC reference-gap research done: 16 gaps ranked, 32 primary sources (98 MB, outside git) with page-cited fa... |
 | S12-11 | Research - best practices for a dual Xeon E5-2690 v3 + Xeon Phi (KNC) workstation (HP Z840) for LLM inference and scientific computing | Done | Z840 dual E5-2690 v3 + Xeon Phi setup guide done: slot/BIOS/memory/power/cooling checklist, MPSS-on-modern-... |
-| S12-12 | Stage S12-10's residual-gap card experiments as one combined Sprint 12 diagnostic batch (PMU access, prefetch, page backing, libm route, branches, allocator) | In progress |  |
+| S12-12 | Stage S12-10's residual-gap card experiments as one combined Sprint 12 diagnostic batch (PMU access, prefetch, page backing, libm route, branches, allocator) | Question for the tech lead | Submission is blocked by the 800-line budget: pm.py reports 899 changed lines for commits fba1336b and 2114... |
 | S12-13 | Digest the S12-10 sources into our knowledge base - correct our KNC notes, build a reference index, and list what our practice should change | In progress |  |
 | S12-14 | Audit GCC-KNC's tuning model and runtime defaults against the digested sources - every mismatch with a proposed change and its proof | Not started |  |
 | S12-15 | Research - literature survey of published Xeon Phi (KNC) and Xeon Phi system research that matches our goals; what have we overlooked? | In progress |  |
@@ -253,6 +253,7 @@ Current tickets: `[##################--]` 213 of 228
 
 ## Recent activity
 
+- 2026-11-14 13:13 **S12-12** engineer ask: Submission is blocked by the 800-line budget: pm.py reports 899 changed lines for commits fba1336b and 21140d8d. Six linked/linted binaries, run sc...
 - 2026-11-14 13:06 **S12-11** lead approve: Z840 dual E5-2690 v3 + Xeon Phi setup guide done: slot/BIOS/memory/power/cooling checklist, MPSS-on-modern-OS options, measured host and Phi result...
 - 2026-11-14 12:56 **S12-11** engineer submit: Completed docs/research/host-phi-workstation.md at fe643e13, with 33 source entries and machine-specific next checks. Primary refs: .work/_shared/h...
 - 2026-11-14 12:41 **S12-10** lead approve: KNC reference-gap research done: 16 gaps ranked, 32 primary sources (98 MB, outside git) with page-cited facts, and a 10-row list of bounded card e...
@@ -260,7 +261,6 @@ Current tickets: `[##################--]` 213 of 228
 - 2026-11-14 12:29 **S12-10** lead answer: Lead: no rebase needed. submit only checks rebase for gcc: yes tickets, and your diff is one new file (docs/research/knc-reference-gaps.md) that do...
 - 2026-11-14 12:27 **S12-10** engineer ask: Phase 2 committed d54380ba: docs/research/knc-reference-gaps.md. 32 cited artifacts, 98 MiB; checks PASS, log .work/_state/logs/s12_10_reference_no...
 - 2026-11-14 12:05 **S12-06** lead defer: Needs a card run by the interactive lead (M4 card authorization, <=30 min): run the card_run command in docs/research/s12-06-scalar-fp.md (threads ...
-- 2026-11-14 12:04 **S12-06** engineer ask: Phase-1 diagnostics committed at 6de080e6; GCC unchanged. AGENTS bars engineer card jobs. Please run the single paired batch in docs/research/s12-0...
 
 ## Cost
 
@@ -272,4 +272,4 @@ Current tickets: `[##################--]` 213 of 228
 
 ## Disk
 
-The project uses 32.0 GiB of 100 GiB. 157 GiB free on the drive.
+The project uses 32.0 GiB of 100 GiB. 155 GiB free on the drive.
