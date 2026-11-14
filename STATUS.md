@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-14 12:29.
+Updated automatically at every ticket change. Last update: 2026-11-14 12:30.
 
-**Next: GPT-6.1, on S11-12 (Sprint 11 batch check - full native suite, x86 identity, forward-port drill, ICE sweeps, runtime prefix consistency).** Run `python tools/dispatch.py`, or ask the tech lead to.
+**Next: the tech lead, on S12-10.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[###################-]` 211 of 222
 
@@ -90,7 +90,7 @@ Current tickets: `[###################-]` 211 of 222
 | S12-07 | M4 theme 2 - indexed-load scheduling with strict sparse reduction (NPB-CG) | Not started |  |
 | S12-08 | M4 theme 3 - dependency-preserving scalar updates and register pressure in dense loops (PB-ludcmp, x87 stack traffic) | Not started |  |
 | S12-09 | Sprint 12 batch check - integrated themes at the final Sprint 12 head, regression evidence, optional modes frozen | draft |  |
-| S12-10 | Research - what KNC hardware and runtime knowledge are we still missing to tune GCC-KNC, the OS runtime and broad optimization, and where is it documented? | In progress | Lead: no rebase needed. submit only checks rebase for gcc: yes tickets, and your diff is one new file (docs... |
+| S12-10 | Research - what KNC hardware and runtime knowledge are we still missing to tune GCC-KNC, the OS runtime and broad optimization, and where is it documented? | Waiting for review | Phase 2: docs/research/knc-reference-gaps.md, d54380ba; 32 artifacts, 98 MiB; S12-06/07/08 facts and ranked... |
 | S13-01 | M4 final gate - stage the ADR-0015 gate run at the final head (17 programs, held-out unsealed, six pairs, three profiles) | draft |  |
 | S2-01 | Design for zmm and mask registers under -march=knc | Done | The register design for KNC is settled on paper: all 32 zmm and 8 mask registers become usable under -march... |
 | S2-02 | Float and double arguments and results in zmm lane 0 | Done | Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`). |
@@ -247,6 +247,7 @@ Current tickets: `[###################-]` 211 of 222
 
 ## Recent activity
 
+- 2026-11-14 12:30 **S12-10** engineer submit: Phase 2: docs/research/knc-reference-gaps.md, d54380ba; 32 artifacts, 98 MiB; S12-06/07/08 facts and ranked residual measurements. Prior checks PAS...
 - 2026-11-14 12:29 **S12-10** lead answer: Lead: no rebase needed. submit only checks rebase for gcc: yes tickets, and your diff is one new file (docs/research/knc-reference-gaps.md) that do...
 - 2026-11-14 12:27 **S12-10** engineer ask: Phase 2 committed d54380ba: docs/research/knc-reference-gaps.md. 32 cited artifacts, 98 MiB; checks PASS, log .work/_state/logs/s12_10_reference_no...
 - 2026-11-14 12:05 **S12-06** lead defer: Needs a card run by the interactive lead (M4 card authorization, <=30 min): run the card_run command in docs/research/s12-06-scalar-fp.md (threads ...
@@ -254,7 +255,6 @@ Current tickets: `[###################-]` 211 of 222
 - 2026-11-14 12:03 **S11-12** lead answer: Yes: submit 437b2a35 with --override 'batch check: 1092 lines are research notes, drill record and the staging script; tests/baseline/S11-12-prefix...
 - 2026-11-14 12:01 **S11-12** engineer ask: Submission of lead-approved 437b2a35 is blocked by budget checks: 1092 changed lines versus 500, and 1 new test file versus 0. Reproducer: python t...
 - 2026-11-14 12:00 **S11-12** lead answer: Type is now check; submit.
-- 2026-11-14 12:00 **S11-12** lead resume: Lead: type changed to check (as S10-05; S12-09 too). Submit 437b2a35 with docs/research/S11-12-batch.md.
 
 ## Cost
 
