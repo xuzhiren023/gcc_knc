@@ -2,7 +2,7 @@
 
 Updated automatically at every ticket change. Last update: 2026-11-14 18:12.
 
-**Next: GPT-6.1, on S12-29 (Wrong code - vbroadcastsd reads a 4-byte-aligned SCmode constant (complex float) straight from the constant pool and faults on the card (gcc.c-torture pr38969.c, regression from S11-27)).** Run `python tools/dispatch.py`, or ask the tech lead to.
+**Next: the tech lead, on S12-29.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[##################--]` 226 of 244
 
@@ -109,7 +109,7 @@ Current tickets: `[##################--]` 226 of 244
 | S12-26 | WRF hot scalar routines - classify with the S12-19 triage tool and stage bitwise-safe per-file flag arms for PhiWeather to time | draft |  |
 | S12-27 | Latency-aware scalar loops - GCC-KNC unrolls and interleaves independent iterations and hoists conversions so one thread's every-other-cycle issue and long latencies are hidden automatically | draft |  |
 | S12-28 | dispatch.py refuses to start a second dispatcher on a lane that already has a live one | Done | dispatch.py now refuses to start a second dispatcher on a lane that already has a live one (a lock per lane... |
-| S12-29 | Wrong code - vbroadcastsd reads a 4-byte-aligned SCmode constant (complex float) straight from the constant pool and faults on the card (gcc.c-torture pr38969.c, regression from S11-27) | In progress | S12-29 red approved: the new T1 test catches pr38969's card fault (a complex-float constant broadcast from ... |
+| S12-29 | Wrong code - vbroadcastsd reads a 4-byte-aligned SCmode constant (complex float) straight from the constant pool and faults on the card (gcc.c-torture pr38969.c, regression from S11-27) | Question for the tech lead | GCC build needed at 51126f4c232; please build lane gcc and return for tests (AGENTS.md forbids Codex builds... |
 | S13-01 | M4 final gate - stage the ADR-0015 gate run at the final head (17 programs, held-out unsealed, six pairs, three profiles) | draft |  |
 | S13-02 | Libgomp per-region thread density - choose 1-4 workers per core per parallel region instead of once per program | draft |  |
 | S13-03 | M4 retrospective - what we did wrong, what worked, and the practice changes carried into the next milestone and the agent-team skill | draft |  |
@@ -269,6 +269,7 @@ Current tickets: `[##################--]` 226 of 244
 
 ## Recent activity
 
+- 2026-11-14 18:12 **S12-29** engineer ask: GCC build needed at 51126f4c232; please build lane gcc and return for tests (AGENTS.md forbids Codex builds). Fix applies Bm scalar alignment check...
 - 2026-11-14 18:11 **S12-23** lead defer: Interactive lead must run T2: engineer's green gate, T0 and T1 pass, but T2 failed on infrastructure (Permission denied writing .work/_shared/S5-21...
 - 2026-11-14 18:10 **S12-23** engineer ask: Green and payload build/lint PASS; T0/T1 PASS. T2 infrastructure failure: Permission denied writing .work/_shared/S5-21/short-vector-O2-0.mic. Sand...
 - 2026-11-14 18:06 **S12-29** lead approve-red: S12-29 red approved: the new T1 test catches pr38969's card fault (a complex-float constant broadcast from 4-byte-aligned memory, including folded ...
@@ -276,7 +277,6 @@ Current tickets: `[##################--]` 226 of 244
 - 2026-11-14 18:01 **S12-29** lead changes: Red is right: main's vbroadcastsd .LC0(%rip) is flagged for 4-byte alignment, which is the pr38969 fault, and the constant/stack-residue tracking a...
 - 2026-11-14 18:00 **S12-21** lead defer: Card run needed (interactive lead): 037aee42 removes the shell timeout calls (card_run keeps the 1740 s limit) and writes payload/peer archives as ...
 - 2026-11-14 17:59 **S12-29** engineer red: Red commit c75bded5. Ran tools/run.py --name S12-29-red wrapping tools/check.py t1 --compiler gcc16 --complex-broadcast-align --worker. Expected fa...
-- 2026-11-14 17:58 **S12-21** engineer ask: Fixed at 037aee42: removed shell timeout calls; card_run retains 1740 s limit. Payload and peer archives use ustar. Repackaged r2: 16329850 bytes, ...
 
 ## Cost
 
