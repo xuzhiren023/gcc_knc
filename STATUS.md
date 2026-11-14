@@ -80,7 +80,7 @@ Current tickets: `[###################-]` 205 of 213
 | S11-26 | WRF OpenMP build at -mphinix with no per-file workarounds (S11-23 and S11-25 fixed), restaged for PhiWeather | draft | Owner 2026-11-13: the S11-24 WRF build is removed. Deleted: |
 | S11-27 | Wrong code - NPB-MG (class A, serial) built by GCC-KNC at -O2 -march=knc fails NPB verification on the card | Waiting for review | Acceptance complete; checked report and per-case results: .work/_shared/S11-27/notes.txt. GCC e0bc456a11e r... |
 | S11-28 | HPCG run that fits every card model - fixed work instead of fixed duration, grid sized to the 3100's memory | lead | After S11-29 merges (still ready): run .work/_shared/S11-28/lead-pilot.ps1 at 242936bf+ (30 exclusive timed... |
-| S11-29 | card_run profiles limit memory in use, not address space, so a 3100 or 5100 run fails only where the real card would | Question for the tech lead | Committed 9520fce6; red 36b48b4e. Five fake-card tests pass: .work/_state/logs/S11_29_green-20261114-002903... |
+| S11-29 | card_run profiles limit memory in use, not address space, so a 3100 or 5100 run fails only where the real card would | lead | Interactive lead: no rebase needed (main changed only ticket/status files; card_run untouched). Run card ro... |
 | S12-01 | Sprint 12 prep - static code-quality census of the development-corpus builds (spills, x87/vector transfers, addressing, calls, code size) | Done | A static code-quality census (spill/reload proxies, x87 and x87-zmm traffic, address arithmetic, calls, bra... |
 | S12-02 | Sprint 12 prep - the unscored generality check set (S11-20's six programs in the code styles our corpus lacks) | Done | The six unscored generality checks (Q1-Q6: ray tracer hit dispatch and vec3 AoS, Burkardt MD, Reference BLA... |
 | S2-01 | Design for zmm and mask registers under -march=knc | Done | The register design for KNC is settled on paper: all 32 zmm and 8 mask registers become usable under -march... |
@@ -238,6 +238,7 @@ Current tickets: `[###################-]` 205 of 213
 
 ## Recent activity
 
+- 2026-11-14 00:41 **S11-29** lead defer: Interactive lead: no rebase needed (main changed only ticket/status files; card_run untouched). Run card round per .work/_shared/S11-29/README.md: ...
 - 2026-11-14 00:41 **S11-17** owner decide: Budget raised by the lead under the owner's standing rule (2026-11-09/10: the lead extends session and token budgets itself; ask only after two ext...
 - 2026-11-14 00:40 **S11-17** engineer escalate: budget: 8962374 input tokens used; the budget is 6000000
 - 2026-11-14 00:40 **S11-02** owner decide: One more review round, granted by the lead under the owner's standing rule (2026-11-09/10: the lead extends limits itself; ask only after two exten...
@@ -245,16 +246,15 @@ Current tickets: `[###################-]` 205 of 213
 - 2026-11-14 00:39 **S11-02** lead escalate: over 2 review rounds: Card validation passed (00:14-00:23 EST; numbers below) but approval's host check fails at 45e732b9: 111 tests, 1 failure, 5 ...
 - 2026-11-14 00:26 **S11-27** engineer submit: Acceptance complete; checked report and per-case results: .work/_shared/S11-27/notes.txt. GCC e0bc456a11e rebased on knc (already current). Lead na...
 - 2026-11-14 00:24 **S11-02** lead resume: Lead ran validate.ps1 at 45e732b9, 00:14-00:23 EST: results in the answer.
-- 2026-11-14 00:23 **S11-15** lead answer: Lead decisions: (1) libc identity: accept the sysroot libc-2.21.so names with no card check; same MPSS glibc, same soname and segment extent is eno...
 
 ## Cost
 
 - From the script, engineer: 550 sessions, 1119.8M input tokens
 - From the script, lead: 361 sessions, 101.2M input tokens
-- Started by hand, Claude: 12 sessions, 3047.0M input tokens
+- Started by hand, Claude: 12 sessions, 3047.4M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 31.7 GiB of 100 GiB. 169 GiB free on the drive.
+The project uses 31.7 GiB of 100 GiB. 170 GiB free on the drive.
