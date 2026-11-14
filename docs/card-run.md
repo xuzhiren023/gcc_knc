@@ -192,7 +192,11 @@ after S2-17, with later batches using the full execute suite.
   `resource`, with peak and limit in the reason. `monitor_cpu_ticks` measures
   reader user/system CPU plus reaped listing-shell/sleep children from its own
   proc stat; divide by the card's CLK_TCK and receipt wall time (`card_minutes * 60`)
-  to measure overhead in the lead round (target below 5% of one core).
+  to measure overhead. The lead's 2026-11-14 round at cbe9a3d6 measured
+  46456 and 47497 ticks in 549 and 555 seconds: about 85% of one hardware
+  thread on OS CPU 0, above the original 5% target. The lead accepted this
+  cost because CPU 0 is outside the 3100/5100 jobs' affinity, so it does not
+  consume their assigned CPUs. Reducing monitor cost is a follow-up.
   A report read failure on
   timeout is recorded as `memory_report_error` while preserving the timeout.
   There is no busy loop or arena/stack
@@ -412,3 +416,17 @@ binary and corrected timeout cases then passed in
 All logs are under `.work/_state/logs/`. The interactive lead reruns donor hello
 at the default 10-second transport timeout, checks native acceptance, and
 confirms our watchdog/program are absent from foreign-process evidence.
+
+
+S11-29 native acceptance (lead round, 2026-11-14 01:32-01:52 EST,
+cbe9a3d6): HPCG 104 cubed OpenMP completed under 3100 at 224 threads
+(exit 0, VALID, all checks PASSED, 51 optimized iterations, 549 seconds,
+peak resident 942804 KiB) and 5100 at 236 threads (exit 0, VALID, all
+checks PASSED, 50 iterations, 555 seconds, peak resident 933108 KiB).
+The 6 GiB toucher under 3100 failed as `resource`, peak resident plus swap
+5874952 KiB over the 5767168 KiB limit; the 1 GiB toucher exited zero.
+Receipts are under `.work/_shared/S11-29/`; the lead log is
+`.work/_state/logs/S11_29_card2-20261114-013238.log`. Host validation passed
+six tests in `.work/_state/logs/S11_29_revision-20261114-011227.log`;
+passing checks were not repeated. The monitor cost and lead acceptance
+of its CPU 0 isolation are recorded above. No engineer card jobs ran.
