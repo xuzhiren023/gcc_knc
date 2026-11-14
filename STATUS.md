@@ -2,7 +2,7 @@
 
 Updated automatically at every ticket change. Last update: 2026-11-14 00:39.
 
-**Next: the tech lead, on S11-02.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Waiting for you:** S11-02. Run `python tools/pm.py inbox`.
 
 Current tickets: `[###################-]` 205 of 213
 
@@ -53,7 +53,7 @@ Current tickets: `[###################-]` 205 of 213
 | S10-12 | cbrt and cbrtf crash (SIGSEGV) in qualify_v1 on the card - root cause and fix | Done | The cbrt and cbrtf qualification jobs no longer crash on the card and pass (worst 0.4996 and 0.4991 ULP): t... |
 | S10-13 | User story - code that calls cbrtl under -march=knc gets a safe replacement and a compile-time warning (MPSS libm cbrtl faults) | Done | Under -march=knc, calls to cbrtl (and std::cbrt on long double) now go to GCC-KNC's own safe cube root with... |
 | S11-01 | User story - the best way to move data between the host and the card, measured, and how our projects use it | Done | We now have a sourced inventory of every host-card transfer path that works without changing MPSS (SSH, tar... |
-| S11-02 | card_run and run_suite move bulk data by SCIF DMA at the PCIe link limit, with the SSH stream as fallback | Waiting for review | Lead ran validate.ps1 at 45e732b9, 00:14-00:23 EST: results in the answer. |
+| S11-02 | card_run and run_suite move bulk data by SCIF DMA at the PCIe link limit, with the SSH stream as fallback | **Waiting for you** | over 2 review rounds: Card validation passed (00:14-00:23 EST; numbers below) but approval's host check fai... |
 | S11-03 | S11-01 transfer tool rejects the card's physical /tmp path, so the native study never starts | Done | The transfer study's tool now accepts the card's real /tmp location (/var/volatile/tmp), so its card run ca... |
 | S11-04 | S11-01 transfer tool - the host opens every connection, because Windows Firewall blocks inbound TCP from the card | Done | The transfer study's host side now opens every connection to the card, so Windows Firewall no longer blocks... |
 | S11-05 | Research - raise KNC's real memory bandwidth from about 175 GB/s toward 75-85% of peak, with a measured plan | Done | The memory-bandwidth research plan and a validated multithreaded KNC bandwidth benchmark are ready, with a ... |
@@ -238,6 +238,7 @@ Current tickets: `[###################-]` 205 of 213
 
 ## Recent activity
 
+- 2026-11-14 00:39 **S11-02** lead escalate: over 2 review rounds: Card validation passed (00:14-00:23 EST; numbers below) but approval's host check fails at 45e732b9: 111 tests, 1 failure, 5 ...
 - 2026-11-14 00:26 **S11-27** engineer submit: Acceptance complete; checked report and per-case results: .work/_shared/S11-27/notes.txt. GCC e0bc456a11e rebased on knc (already current). Lead na...
 - 2026-11-14 00:24 **S11-02** lead resume: Lead ran validate.ps1 at 45e732b9, 00:14-00:23 EST: results in the answer.
 - 2026-11-14 00:23 **S11-15** lead answer: Lead decisions: (1) libc identity: accept the sysroot libc-2.21.so names with no card check; same MPSS glibc, same soname and segment extent is eno...
@@ -245,7 +246,6 @@ Current tickets: `[###################-]` 205 of 213
 - 2026-11-14 00:21 **S11-17** lead answer: Control training ran on the card 2026-11-14 00:12 EST at 82be2cbc, exit 0, 0.3 min. All 10 profiles came back in .work/_shared/S11-17/controls/trai...
 - 2026-11-14 00:19 **S11-17** lead resume: Lead ran control training at 00:12 EST: results in the answer.
 - 2026-11-14 00:18 **S11-15** engineer ask: 75976eb9: attribution/report done. 521 PCs; GEMM loop 82.56-86.21%; overhead median 0.361%. Log .work/_state/logs/S11_15_attribution-20261114-00130...
-- 2026-11-14 00:17 **S11-27** lead answer: Card round at 89a3657a ran 2026-11-14 00:11 EST, one card_run, 0.6 card-min, log .work/_shared/S11-27/verify-card.log. All 8 pass: MG S-O2, S-noslp...
 
 ## Cost
 
@@ -257,4 +257,4 @@ Current tickets: `[###################-]` 205 of 213
 
 ## Disk
 
-The project uses 31.7 GiB of 100 GiB. 172 GiB free on the drive.
+The project uses 31.7 GiB of 100 GiB. 171 GiB free on the drive.
