@@ -4,7 +4,7 @@ Updated automatically at every ticket change. Last update: 2026-11-14 09:22.
 
 Nothing can move right now.
 
-Current tickets: `[###################-]` 210 of 216
+Current tickets: `[###################-]` 211 of 216
 
 ## Milestones
 
@@ -14,7 +14,7 @@ Current tickets: `[###################-]` 210 of 216
 | M1 | Mixed native code | Done | 43 of 43 tickets |
 | M2 | Useful vector target | Done | 51 of 51 tickets |
 | M3 | Runtimes | Done | 48 of 48 tickets |
-| M4 | Broad optimization | In progress | 28 of 34 tickets |
+| M4 | Broad optimization | In progress | 29 of 34 tickets |
 | M5 | Program corpus | Not started | Not planned in detail yet |
 | M6 | Release | Not started | Not planned in detail yet |
 
@@ -68,7 +68,7 @@ Current tickets: `[###################-]` 210 of 216
 | S11-14 | M4 scoring contract and measurement protocol, frozen before any tuning | Done | M4's scoring contract is frozen in ADR-0015 with a tested scorer: strict serial -O2 versus -O2 over 17 prog... |
 | S11-15 | First development-corpus baseline and profile, GCC 5.1.1 vs GCC-KNC at -O2 (E7-03 part 1) | Done | The M4 development baseline is written up in docs/research/m4-baseline.md: GCC-KNC vs GCC 5.1.1 paired -O2 ... |
 | S11-16 | Long-double libm hazard audit - do other MPSS long double entry points fault like cbrtl? (E7-21, bounded) | Done | The card's MPSS long double libm was probed on the card: of 12 entry points only cbrtl faults, and S10-13 a... |
-| S11-17 | PGO feasibility on one complete development program (reuse of S9-18's train/use path) | lead | Review passed; branch merged into main (0d5afaa2), but approve was refused at 'git worktree remove --force ... |
+| S11-17 | PGO feasibility on one complete development program (reuse of S9-18's train/use path) | Done | PGO works end to end on KNC: zlib trains on the card and the profile-use build runs correctly about 0.8% fa... |
 | S11-18 | M4 corpus harness v2 - card profiles, prefix record, held-out sealing, stronger checks, and the donor-failure rule | Done | The M4 corpus harness now stages all 17 programs for the 7120 and the 3100/5100 profiles with serial voting... |
 | S11-19 | Second senior review - the M4 definition and the Sprint 11-13 roadmap, adjusted | Done | The M4 definition and the Sprint 11-13 roadmap are rewritten as measure, improve, decide, each sprint with ... |
 | S11-20 | Research - which compiler optimizations benefit the widest range of real code on KNC, from professional to amateur, and does our corpus cover it? | Done | We now have a code-style coverage study (docs/research/code-style-coverage.md) that ranks Sprint 12 candida... |
@@ -241,6 +241,7 @@ Current tickets: `[###################-]` 210 of 216
 
 ## Recent activity
 
+- 2026-11-14 09:27 **S11-17** lead approve: PGO works end to end on KNC: zlib trains on the card and the profile-use build runs correctly about 0.8% faster, and the branch, indirect and divis...
 - 2026-11-14 09:20 **S11-17** lead defer: Review passed; branch merged into main (0d5afaa2), but approve was refused at 'git worktree remove --force .work/S11-17': Permission denied. Intera...
 - 2026-11-14 09:09 **S11-28** lead approve: HPCG now runs a fixed amount of work (one CG set on the 104-cubed grid) that passes on the full card, 3100 and 5100 profiles, and the harness rejec...
 - 2026-11-14 09:08 **S11-17** engineer submit: 6ba8ddd6 contains main (lead merge). tools/check t0 PASS, 56 tests; log .work/_state/logs/check_donor_t0-20261114-085440.log. Prior T1 5/5 green; l...
@@ -248,13 +249,12 @@ Current tickets: `[###################-]` 210 of 216
 - 2026-11-14 08:51 **S11-17** lead answer: Yes, main is the target for gcc: no. A rebase conflicts in docs/research/s9-18-pgo.md on every commit, so the lead merged main into s11/S11-17 inst...
 - 2026-11-14 08:50 **S11-17** lead resume: Lead merged main into s11/S11-17 at 08:55 EST: details in the answer.
 - 2026-11-14 08:48 **S11-28** lead answer: finalize-pilot.py ran 2026-11-14 08:46 EST at aad1ae22 from the S11-28 worktree: PASS, log .work/_state/logs/S11_28_finalize_pilot-20261114-084648....
-- 2026-11-14 08:47 **S11-28** lead resume: Lead ran finalize-pilot at 08:46 EST: results in the answer.
 
 ## Cost
 
 - From the script, engineer: 568 sessions, 1152.2M input tokens
 - From the script, lead: 377 sessions, 105.2M input tokens
-- Started by hand, Claude: 12 sessions, 3100.8M input tokens
+- Started by hand, Claude: 12 sessions, 3102.2M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
