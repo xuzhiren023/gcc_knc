@@ -1,10 +1,10 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-14 02:02.
+Updated automatically at every ticket change. Last update: 2026-11-14 02:13.
 
 **Waiting for you:** S11-17. Run `python tools/pm.py inbox`.
 
-Current tickets: `[###################-]` 206 of 213
+Current tickets: `[###################-]` 207 of 213
 
 ## Milestones
 
@@ -14,7 +14,7 @@ Current tickets: `[###################-]` 206 of 213
 | M1 | Mixed native code | Done | 43 of 43 tickets |
 | M2 | Useful vector target | Done | 51 of 51 tickets |
 | M3 | Runtimes | Done | 48 of 48 tickets |
-| M4 | Broad optimization | In progress | 24 of 31 tickets |
+| M4 | Broad optimization | In progress | 25 of 31 tickets |
 | M5 | Program corpus | Not started | Not planned in detail yet |
 | M6 | Release | Not started | Not planned in detail yet |
 
@@ -80,7 +80,7 @@ Current tickets: `[###################-]` 206 of 213
 | S11-26 | WRF OpenMP build at -mphinix with no per-file workarounds (S11-23 and S11-25 fixed), restaged for PhiWeather | draft | Owner 2026-11-13: the S11-24 WRF build is removed. Deleted: |
 | S11-27 | Wrong code - NPB-MG (class A, serial) built by GCC-KNC at -O2 -march=knc fails NPB verification on the card | Done | NPB-MG built by GCC-KNC at -O2 -march=knc now verifies on the card (class A in 14.1 s, against 33.8 s for G... |
 | S11-28 | HPCG run that fits every card model - fixed work instead of fixed duration, grid sized to the 3100's memory | lead | After S11-29 merges (still ready): run .work/_shared/S11-28/lead-pilot.ps1 at 242936bf+ (30 exclusive timed... |
-| S11-29 | card_run profiles limit memory in use, not address space, so a 3100 or 5100 run fails only where the real card would | Waiting for review | Both acceptance items met (lead 01:55). Six host tests passed: .work/_state/logs/S11_29_revision-20261114-0... |
+| S11-29 | card_run profiles limit memory in use, not address space, so a 3100 or 5100 run fails only where the real card would | Done | Under --profile 3100 and 5100, card_run now limits the memory a job actually uses (sampled resident plus sw... |
 | S12-01 | Sprint 12 prep - static code-quality census of the development-corpus builds (spills, x87/vector transfers, addressing, calls, code size) | Done | A static code-quality census (spill/reload proxies, x87 and x87-zmm traffic, address arithmetic, calls, bra... |
 | S12-02 | Sprint 12 prep - the unscored generality check set (S11-20's six programs in the code styles our corpus lacks) | Done | The six unscored generality checks (Q1-Q6: ray tracer hit dispatch and vec3 AoS, Burkardt MD, Reference BLA... |
 | S2-01 | Design for zmm and mask registers under -march=knc | Done | The register design for KNC is settled on paper: all 32 zmm and 8 mask registers become usable under -march... |
@@ -238,6 +238,7 @@ Current tickets: `[###################-]` 206 of 213
 
 ## Recent activity
 
+- 2026-11-14 02:13 **S11-29** lead approve: Under --profile 3100 and 5100, card_run now limits the memory a job actually uses (sampled resident plus swap) instead of reserved address space, s...
 - 2026-11-14 02:02 **S11-15** lead answer: Remaining batch ran 2026-11-14 01:57-02:02 EST: all 14 launches PASS (PROFILE_BATCH_COMPLETE). Log .work/_state/logs/S11_15_profile_remaining-20261...
 - 2026-11-14 02:01 **S11-02** engineer submit: 7deb440b: production/output_dir retained. Both helpers rebuilt; GCC-KNC card helper lint passed, staged .work/_shared/S11-02. Log: .work/_state/log...
 - 2026-11-14 01:59 **S11-29** engineer submit: Both acceptance items met (lead 01:55). Six host tests passed: .work/_state/logs/S11_29_revision-20261114-011227.log; not rerun. Lead card round: H...
@@ -245,16 +246,15 @@ Current tickets: `[###################-]` 206 of 213
 - 2026-11-14 01:56 **S11-17** lead answer: Scripts regenerated (old ones kept as *.prev; LF; branch, division, indirect, inline, loop; no switch). Training ran 2026-11-14 01:32 EST at a3258f...
 - 2026-11-14 01:56 **S11-17** lead resume: Lead regenerated the scripts and ran training at a3258fe0, 01:32 EST.
 - 2026-11-14 01:56 **S11-02** lead answer: The lead merged main into s11/S11-02 at 7deb440b. build() now takes production and output_dir: production writes to _shared/S11-02, otherwise outpu...
-- 2026-11-14 01:55 **S11-29** lead answer: Second card round at cbe9a3d6, 2026-11-14 01:32-01:52 EST, receipts .work/_shared/S11-29/*.json, log .work/_state/logs/S11_29_card2-20261114-013238...
 
 ## Cost
 
 - From the script, engineer: 560 sessions, 1134.4M input tokens
 - From the script, lead: 368 sessions, 103.1M input tokens
-- Started by hand, Claude: 12 sessions, 3069.1M input tokens
+- Started by hand, Claude: 12 sessions, 3071.2M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 31.7 GiB of 100 GiB. 170 GiB free on the drive.
+The project uses 31.7 GiB of 100 GiB. 168 GiB free on the drive.
