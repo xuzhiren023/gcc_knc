@@ -95,7 +95,7 @@ int main(int argc, char **argv)
   /* Division avoids overflow, and uses the actual inherited reservation,
      never a caller's assertion of the ledger's memoryMB. Serial runs with no
      explicit limit retain their existing inherited limits, even if unlimited. */
-  if ((jobs > 1 && budget.rlim_cur == RLIM_INFINITY)
+  if ((jobs > 1 && !mib && budget.rlim_cur == RLIM_INFINITY)
       || child_limit.rlim_cur == 0
       || (budget.rlim_cur != RLIM_INFINITY
           && child_limit.rlim_cur > budget.rlim_cur / jobs))
