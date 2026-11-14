@@ -13,7 +13,9 @@
    loop, see below), then each build's batch is sized to 50-200 ms, then R rounds each time one
    group of each build, order drawn per round (ADR-0010 amendment 2 point 7).  A group is one
    warm-up and B timed batches; its time is the median batch.  The statistic is the per-round
-   ratio of times per element, vec / scl.  Every batch is printed.
+   ratio of times per element, vec / scl.  Every batch is printed. Memory-set repetitions
+   advance through L2-sized chunks of the full working set, wrapping at its end; a whole
+   memory sweep can exceed 200 ms. Each build has its own cursor, retained between batches.
    Exit 0 when every check passed and every round ran, 1 on a mismatch, 2 on an error.  */
 #define _GNU_SOURCE
 #include <math.h>
@@ -76,6 +78,7 @@ static pthread_barrier_t barrier;
 static volatile int cmd_kernel, cmd_build, cmd_fill, cmd_stop;
 static volatile long cmd_reps;
 static volatile int cmd_n;
+static int timing_span, timing_position[2], cmd_offset;
 
 static void
 die (const char *what)
@@ -164,8 +167,18 @@ work (int w)
     }
   kernel_fn fn = kernels[k].fn[b];
   char *const *a = arrays[w];
+  int offset = cmd_offset;
   for (long r = 0; r < cmd_reps; r++)
-    fn (a[3 + b], a[0], a[1], a[2], n);
+    {
+      size_t bytes = (size_t) offset * kernels[k].size;
+      fn (a[3 + b] + bytes, a[0] + bytes, a[1] + bytes, a[2] + bytes, n);
+      if (timing_span)
+        {
+          offset += n;
+          if (offset == timing_span)
+            offset = 0;
+        }
+    }
 }
 
 static void *
@@ -188,6 +201,9 @@ static double
 command (int k, int b, int n, long reps, int fill_only)
 {
   cmd_kernel = k, cmd_build = b, cmd_n = n, cmd_reps = reps, cmd_fill = fill_only;
+  cmd_offset = timing_span ? timing_position[b] : 0;
+  if (timing_span)
+    timing_position[b] = (cmd_offset + (reps % (timing_span / n)) * n) % timing_span;
   double start = now ();
   sync_workers ();
   work (0);
@@ -338,12 +354,11 @@ size_batch (int k, int b, int n)
      again until the requested interval is reached. */
   long reps = 1;
   double t = command (k, b, n, reps, 0);
-  long calibration_reps = 1;
+  int stable = 0;
   if (t < 0.05 || t > 0.2)
     {
       double scale = 0.1 / (t > 1e-6 ? t : 1e-6);
-      calibration_reps = (long) (scale + 0.5);
-      reps = calibration_reps;
+      reps = (long) (scale + 0.5);
       if (reps < 1)
         reps = 1;
     }
@@ -351,34 +366,49 @@ size_batch (int k, int b, int n)
     {
       t = command (k, b, n, reps, 0);
       if (t >= 0.05 && t <= 0.2)
-        return reps;
+        {
+          /* An early slow sample need not represent warmed-up execution. */
+          if (++stable == 2)
+            return reps;
+          continue;
+        }
+      stable = 0;
       double scale = 0.1 / (t > 1e-6 ? t : 1e-6);
-      calibration_reps = (long) (reps * scale + 0.5);
-      reps = calibration_reps;
+      reps = (long) (reps * scale + 0.5);
       if (reps < 1)
         reps = 1;
     }
-  t = command (k, b, n, reps, 0);
-  if (t < 0.05 || t > 0.2)
-    die ("batch calibration did not reach 50-200 ms");
-  return reps;
+  die ("batch calibration did not reach stable 50-200 ms samples");
+  return 0;
 }
 
 /* Returns the median batch time of one group.  */
 static double
-group (int k, int set, int b, int n, long reps, int round)
+group (int k, int set, int b, int n, long *reps, int round)
 {
   double t[64];
-  command (k, b, n, reps, 0);
-  printf ("batches kernel=%s set=%s round=%d build=%s reps=%ld seconds=", kernels[k].name,
-          sets[set], round, builds[b], reps);
-  for (int i = 0; i < batches; i++)
+  for (int attempt = 0; attempt < 8; attempt++)
     {
-      t[i] = command (k, b, n, reps, 0);
-      printf ("%s%.6f", i ? "," : "", t[i]);
+      command (k, b, n, *reps, 0);
+      int valid = 1;
+      for (int i = 0; i < batches; i++)
+        {
+          t[i] = command (k, b, n, *reps, 0);
+          valid &= t[i] >= 0.05 && t[i] <= 0.2;
+        }
+      /* Keep rejected timings visible, but never include them in a ratio. */
+      printf ("%s kernel=%s set=%s round=%d build=%s reps=%ld seconds=",
+              valid ? "batches" : "retry_batches", kernels[k].name,
+              sets[set], round, builds[b], *reps);
+      for (int i = 0; i < batches; i++)
+        printf ("%s%.6f", i ? "," : "", t[i]);
+      putchar ('\n');
+      if (valid)
+        return median (t, batches);
+      *reps = size_batch (k, b, n);
     }
-  putchar ('\n');
-  return median (t, batches);
+  die ("timed batches did not remain within 50-200 ms");
+  return 0;
 }
 
 static int
@@ -387,30 +417,39 @@ measure (int k, int set)
   int size = kernels[k].size;
   int n = (int) (set_bytes[set] / density / ((kernels[k].inputs + 1) * size));
   n -= n % 16;
+  int batch_n = (int) (set_bytes[0] / density / ((kernels[k].inputs + 1) * size));
+  batch_n -= batch_n % 16;
+  /* Keep fixed-sized chunks and account for exactly the elements timed. */
+  n -= n % batch_n;
+  timing_span = 0;
   command (k, 0, n, 0, 1);
   command (k, 0, n, 1, 0);
   command (k, 1, n, 1, 0);
   if (check (k, set, n))
     return 1;
 
+  timing_span = n;
+  timing_position[0] = timing_position[1] = 0;
   long reps[2];
   double elements[2], ratio[100], batch_med[2][100];
   for (int b = 0; b < 2; b++)
     {
-      reps[b] = size_batch (k, b, n);
-      elements[b] = (double) reps[b] * n * workers;
+      reps[b] = size_batch (k, b, batch_n);
     }
-  printf ("sizing kernel=%s set=%s n_per_worker=%d bytes_per_worker=%zu reps_vec=%ld "
-          "reps_scl=%ld\n", kernels[k].name, sets[set], n,
+  printf ("sizing kernel=%s set=%s n_per_worker=%d batch_n=%d bytes_per_worker=%zu reps_vec=%ld "
+          "reps_scl=%ld\n", kernels[k].name, sets[set], n, batch_n,
           (size_t) n * size * (kernels[k].inputs + 1), reps[0], reps[1]);
   for (int r = 0; r < rounds; r++)
     {
       double t[2];
       int first = rand () & 1;
-      t[first] = group (k, set, first, n, reps[first], r + 1);
-      t[!first] = group (k, set, !first, n, reps[!first], r + 1);
+      t[first] = group (k, set, first, batch_n, &reps[first], r + 1);
+      t[!first] = group (k, set, !first, batch_n, &reps[!first], r + 1);
       for (int b = 0; b < 2; b++)
-        batch_med[b][r] = t[b];
+        {
+          batch_med[b][r] = t[b];
+          elements[b] = (double) reps[b] * batch_n * workers;
+        }
       ratio[r] = (t[0] / elements[0]) / (t[1] / elements[1]);
       printf ("round kernel=%s set=%s round=%d first=%s ns_per_elem_vec=%.4f ns_per_elem_scl=%.4f "
               "ratio_vec_over_scl=%.4f\n", kernels[k].name, sets[set], r + 1, builds[first],
@@ -424,7 +463,7 @@ measure (int k, int set)
           "batch_ms_scl=%.1f batches=%s\n", kernels[k].name, sets[set], cores, density, rounds, m,
           1 / m, ratio[0], ratio[rounds - 1], 1e3 * med_vec, 1e3 * med_scl,
           valid ? "valid" : "INVALID");
-  return 0;
+  return valid ? 0 : 2;
 }
 
 int
