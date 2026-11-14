@@ -112,3 +112,19 @@ adds the SSDG, the ISA manual, Tian et al. (ICC's KNC vectorizer) and PRACE. Cha
 5. Point 3, chains: two independent accumulators are the density-robust default, subject to C7.
 6. Point 6: the `-mtune=knc` tune-flag set is chosen for an in-order U/V core, not inherited from
    generic x86 (I-10).
+
+## Amendment 3 (lead, 2026-11-14, from S12-13/S12-14; sources in docs/research/knc-references.md)
+
+1. Context, pairing: "only the U-pipe takes vector instructions" is our conservative scheduling model, not a
+   complete hardware rule. R02 Table 3-1 p.34 lists some vector stores, packstores and mask operations as V-pipe
+   candidates, and p.56 adds encoding limits (instructions over 8 bytes, displacement plus immediate, some prefixes
+   with disp32 do not pair). The model stays until a production-card pairing experiment (S12-12/S12-21) says
+   otherwise; knc.md and i386-knc.cc comments now say so (S12-22, N01).
+2. Context, address interlock: the vendor 3-clock address setup (R01 p.19) is not an instruction-count recipe; our
+   own probe measured about one extra tick for the adjacent case at one thread.
+3. Context, latency: 4-cycle vector arithmetic does not mean four threads hide every latency. Permute, swizzle and
+   reciprocal take 6, double-to-int 7, longer for memory chains. One thread issues at most every other cycle, so a
+   4-cycle dependency needs two independent chains at 1-3 threads per core (amendment 2 point 5 stands).
+4. The default --param=knc-threads-per-core=4 is a scheduling assumption, not a fact about the program's run;
+   M4's serial programs run one thread per core and WRF runs two. S12-21 measures whether the default should
+   change; S12-27 makes scalar loops hide latency without user flags. Until then the default stays 4.

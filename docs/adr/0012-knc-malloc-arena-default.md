@@ -46,3 +46,14 @@ GCC-KNC must work on every KNC card, and their memory differs: 3120 (6 GB, 57 co
   opt-out, like the default thread binding of S9-07.
 - 240-thread programs no longer fail under an address-space limit that can hold their stacks.
 - Card jobs that start 240 threads use the 10 GiB budget until this lands.
+
+## Amendment 1 (lead, 2026-11-14, from the S12-14 audit, row N09)
+
+The implementation differs from decision 3: when there is no finite RLIMIT_AS and no strict CommitLimit (the
+normal case since owner rules S9-23/S11-29 removed job address-space limits), libgomp caps arenas at the number of
+CPUs the process may run on and does not use a share of MemTotal. This is accepted as the current behaviour:
+glibc arena reservations are virtual address space, not resident memory (R24a new_heap), and no measurement yet
+supports a MemTotal share. A recorded malloc-heavy case was faster near 169 arenas than at 60-64, so the "fastest
+cap" of decision 4 is workload-dependent. The MemTotal-share branch stays unimplemented until S12-12's G10
+allocator experiment (arena caps, first touch, retained memory) shows a cap below the CPU count helps; then this
+ADR is amended again with the measured rule.
