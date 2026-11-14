@@ -29,6 +29,8 @@ PACKED = re.compile(r'\bv(?:addn?|subr?|mul|div|max|min|sqrt|rcp(?:23)?|rsqrt(?:
 # Each entry supplies its CLI help and handlers for the tiers it selects.
 # Imports stay lazy so T0 and source-only selections need no probe modules.
 SELECTIONS = {
+    'complex_broadcast_align': ('S12-29 complex-float broadcast memory alignment', {
+        't1': lambda runner: runner.t1_sources([runner.source_dir / 'knc-complex-broadcast-align.c'])}),
     'stencil_reload': ('S11-27 Fortran stencil reload scratch bounds', {
         't1': lambda runner: importlib.import_module('s11_27_reduce').t1(runner)}),
     'rrtm_constants': ('S11-23 immediate floating constant stores', {
@@ -435,7 +437,7 @@ class Runner:
                 directives = []
                 options = ['-O2']
                 for line in source.read_text().splitlines():
-                    match = re.match(r'^\s*//\s*(options|scan-asm|scan-asm-not|scan-output|scan-debug-info|error):\s*(.*)$', line)
+                    match = re.match(r'^\s*//\s*(options|scan-asm|scan-asm-not|scan-output|scan-debug-info|scan-broadcast-alignment|error):\s*(.*)$', line)
                     function = re.match(r'^\s*//\s*(scan-asm-func|scan-asm-loop-not|scan-asm-loop-accumulators)\s+(\S+):\s*(.*)$', line)
                     if match:
                         kind, pattern = match.groups()
@@ -473,7 +475,13 @@ class Runner:
                         body = (compiled.stdout if kind == 'scan-output' else
                                 debug_info if kind == 'scan-debug-info' else
                                 function_body(assembly, name) if name else assembly)
-                        if kind == 'scan-asm-loop-accumulators':
+                        if kind == 'scan-broadcast-alignment':
+                            from s12_29_checks import broadcast_alignment
+                            failures.extend(broadcast_alignment(assembly))
+                            if failures:
+                                break
+                            continue
+                        elif kind == 'scan-asm-loop-accumulators':
                             # Count distinct self-updating vector sums within
                             # one backward loop, never the horizontal epilogue.
                             counts = []
