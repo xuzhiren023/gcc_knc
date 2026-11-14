@@ -381,6 +381,54 @@ sources; do not time them as this revision. Replace fixtures after the next
 successful use build. Return `controls/train.stdout` and `controls/train.stderr`.
 Native control timing and the full five-gate green result remain pending.
 
+### Train3 profile-use and timing handoff, 2026-11-14 07:52 EST
+
+The lead's 07:44 EST card training at `4954896d` returned ten clean checks
+and all ten real profiles in `controls/train3.stdout`. All ten matching/inverted
+use objects compiled with fatal missing-profile and coverage-mismatch diagnostics;
+all five timing binaries linked and passed binary lint. No missing or mismatched
+profile was reported. The current card profiles replace the older fixtures in
+`tests/tools/data/s11_17_controls/`, including removal of the obsolete switch data.
+
+| Kernel | Positive edges, matched / inverted | Maximum count, matched / inverted |
+|---|---:|---:|
+| branch | 7 / 7 | 2162688 / 2162688 |
+| indirect | 5 / 5 | 2162688 / 2162688 |
+| division | 2 / 2 | 2162688 / 2162688 |
+| inline | 6 / 6 | 2141304 / 2141304 |
+| loop | 5 / 5 | 7173672 / 76031472 |
+
+All five matching-profile T1 gates now pass: hot zero branch falls through,
+indirect target is promoted and inlined, division has a guarded constant-seven
+fast path, the hot callee is inlined, and the short loop is peeled. The unchanged
+gates were red for plain `-O2` in the branch3 red log above. Use log:
+`.work/_state/logs/S11_17_controls_branch3_use-20261114-075123.log`.
+T1 log: `.work/_state/logs/S11_17_controls_branch3_green-20261114-075136.log`.
+This supersedes the earlier pending/failed assembly results, without claiming
+native profile-use correctness or a timing gain.
+
+The fresh LF scripts are staged successfully (log
+`.work/_state/logs/S11_17_controls_timing_scripts-20261114-075148.log`).
+Lead only, from the S11-17 worktree in an exclusive card turn:
+
+```
+python tools/run.py --name S11-17-controls-pilot -- powershell -NoProfile -ExecutionPolicy Bypass -File ../_shared/S11-17/controls/controls-lead.ps1 -Phase pilot
+python tools/run.py --name S11-17-controls-confirm -- powershell -NoProfile -ExecutionPolicy Bypass -File ../_shared/S11-17/controls/controls-lead.ps1 -Phase confirm
+```
+
+Run pilot first; review correctness and spread before confirm. Each phase visits
+full, 3100 and 5100 and runs all five controls with base, matched and inverted
+variants on the distinct evaluation seed. Every batch checks its reference sum;
+matched and inverted treatments each have adjacent alternating CT/TC pairs
+(5 pilot, 10 confirmatory). Native processes are short single-core timing checks.
+Nominal timed batches total about 180 seconds across both phases and all profiles,
+plus calibration/upload overhead; each profile has a 240-second timeout, keeping
+the staged protocol under fifteen minutes absent infrastructure delays. Return
+`controls/pilot-{full,3100,5100}.stdout/.stderr` and separately
+`controls/confirm-{full,3100,5100}.stdout/.stderr`. Control speedups, spread and the
+required loss/reversal under inverted training remain pending. Sprint 12's PGO
+regression qualification remains open until those native results are reviewed.
+
 ### Lessons from PhiWeather
 
 The lead's 2026-11-13 ticket note reports that PhiWeather's WRF-only GCC 5.1.1
