@@ -2,7 +2,7 @@
 
 Updated automatically at every ticket change. Last update: 2026-11-14 15:01.
 
-**Waiting for you:** S12-17. Run `python tools/pm.py inbox`.
+**Next: the tech lead, on S12-07.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[##################--]` 220 of 237
 
@@ -97,7 +97,7 @@ Current tickets: `[##################--]` 220 of 237
 | S12-14 | Audit GCC-KNC's tuning model and runtime defaults against the digested sources - every mismatch with a proposed change and its proof | Done | The lead now has a ranked audit in docs/research/s12-14-model-audit.md of 42 places where GCC-KNC tuning nu... |
 | S12-15 | Research - literature survey of published Xeon Phi (KNC) and Xeon Phi system research that matches our goals; what have we overlooked? | Done | Literature survey done: 30 groups of published Xeon Phi work ranked against our goals, with 14 overlooked i... |
 | S12-16 | Research - whole-system tuning playbook for the Z840 + Xeon Phi (BIOS, host OS, MPSS and card, transfers, runtimes), as HPC centres tuned Xeon + KNC systems | Done | Whole-system tuning playbook for the Z840 + Phi done: 13 ordered steps (BIOS, host Linux, card power/pages/... |
-| S12-17 | claude-torture -j N refuses to start in exclusive card runs (no inherited RLIMIT_AS since S11-29), so the execute suite cannot run | **Waiting for you** | budget: 4 engineer sessions used; the budget is 4 |
+| S12-17 | claude-torture -j N refuses to start in exclusive card runs (no inherited RLIMIT_AS since S11-29), so the execute suite cannot run | In progress | Lead raises sessions 4 -> 6 (second raise): red proof done (exit 125 with main's file); the restore was blo... |
 | S12-18 | Double-precision vector exp, log and pow ran slower than scalar libm on the card (0.82x, 0.63x, 0.49x) - confirm with valid batches, then fix the library or stop the vectorizer calling them where they lose | lead | Needs interactive lead: (1) exclusive card turn running .work/_shared/S12-18/vmath-bench.mic at full, 3100 ... |
 | S12-19 | Profile-guided missed-vectorization triage - join hot loops with the vectorizer's reasons and observed strides/masks, so tuning targets what is hot and fixable | In progress | S12-19 red is approved: 10 host tests in 2 files now pin the vectorizer triage contract (six real GCC misse... |
 | S12-20 | libknc_vmath accuracy and exception contract, with an independent validation design (rounding modes, special values, flags, scalar fallback) | draft |  |
@@ -263,19 +263,19 @@ Current tickets: `[##################--]` 220 of 237
 ## Recent activity
 
 - 2026-11-14 15:01 **S12-19** lead approve-red: S12-19 red is approved: 10 host tests in 2 files now pin the vectorizer triage contract (six real GCC missed reasons, vectorized vs SLP vs unknown,...
+- 2026-11-14 15:01 **S12-17** owner decide: Lead raises sessions 4 -> 6 (second raise): red proof done (exit 125 with main's file); the restore was blocked by a git lock permission, now done ...
 - 2026-11-14 15:01 **S12-08** engineer ask: Phase-1 proof 248edd72: hot ludcmp/cholesky/CG bodies have no stack operands. Ludcmp 128/130 x87 reads are fold-left transfers; outer GPR spills ha...
 - 2026-11-14 15:00 **S12-17** engineer escalate: budget: 4 engineer sessions used; the budget is 4
 - 2026-11-14 14:59 **S12-19** engineer red: Revised red d3ee9323: 10 cases, 2 test files; real GCC messages with citations, both in-order refusals, actual strict-FP cost refusal, captured add...
 - 2026-11-14 14:59 **S12-07** engineer ask: Phase-one staged at 9823e291; installed drivers fixed headers. Host build/lint PASS: .work/_state/logs/s12_07_stage-20261114-145549.log. Please run...
 - 2026-11-14 14:57 **S12-04** owner decide: Lead raises sessions 5 -> 7 (second raise; standing owner rule): sessions 4-5 delivered the throttled scan and host tests; one small requested chan...
 - 2026-11-14 14:57 **S12-04** engineer escalate: budget: 5 engineer sessions used; the budget is 5
-- 2026-11-14 14:56 **S12-17** lead answer: The new tests are in tests/tools/test_torture_driver.py (committed in 71cbcf86); YOUR_TEST was a placeholder. With tools/claude-torture.c from main...
 
 ## Cost
 
 - From the script, engineer: 608 sessions, 1238.5M input tokens
-- From the script, lead: 398 sessions, 110.3M input tokens
-- Started by hand, Claude: 12 sessions, 3191.7M input tokens
+- From the script, lead: 399 sessions, 110.6M input tokens
+- Started by hand, Claude: 12 sessions, 3192.2M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
