@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-14 01:55.
+Updated automatically at every ticket change. Last update: 2026-11-14 01:56.
 
 **Next: the tech lead, on S11-02.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
@@ -68,7 +68,7 @@ Current tickets: `[###################-]` 206 of 213
 | S11-14 | M4 scoring contract and measurement protocol, frozen before any tuning | Done | M4's scoring contract is frozen in ADR-0015 with a tested scorer: strict serial -O2 versus -O2 over 17 prog... |
 | S11-15 | First development-corpus baseline and profile, GCC 5.1.1 vs GCC-KNC at -O2 (E7-03 part 1) | Question for the tech lead | 70049a7e: restaged .work/_shared/S11-15/lead.ps1, 14 remaining launches, expected 10-15 min; 18 PASS captur... |
 | S11-16 | Long-double libm hazard audit - do other MPSS long double entry points fault like cbrtl? (E7-21, bounded) | Done | The card's MPSS long double libm was probed on the card: of 12 entry points only cbrtl faults, and S10-13 a... |
-| S11-17 | PGO feasibility on one complete development program (reuse of S9-18's train/use path) | lead | Needs the interactive lead at a3258fe0, S11-17 worktree: 1) engineer cannot overwrite lead-owned controls/c... |
+| S11-17 | PGO feasibility on one complete development program (reuse of S9-18's train/use path) | Question for the tech lead | Lead regenerated the scripts and ran training at a3258fe0, 01:32 EST. |
 | S11-18 | M4 corpus harness v2 - card profiles, prefix record, held-out sealing, stronger checks, and the donor-failure rule | Done | The M4 corpus harness now stages all 17 programs for the 7120 and the 3100/5100 profiles with serial voting... |
 | S11-19 | Second senior review - the M4 definition and the Sprint 11-13 roadmap, adjusted | Done | The M4 definition and the Sprint 11-13 roadmap are rewritten as measure, improve, decide, each sprint with ... |
 | S11-20 | Research - which compiler optimizations benefit the widest range of real code on KNC, from professional to amateur, and does our corpus cover it? | Done | We now have a code-style coverage study (docs/research/code-style-coverage.md) that ranks Sprint 12 candida... |
@@ -238,6 +238,7 @@ Current tickets: `[###################-]` 206 of 213
 
 ## Recent activity
 
+- 2026-11-14 01:56 **S11-17** lead resume: Lead regenerated the scripts and ran training at a3258fe0, 01:32 EST.
 - 2026-11-14 01:55 **S11-29** lead answer: Second card round at cbe9a3d6, 2026-11-14 01:32-01:52 EST, receipts .work/_shared/S11-29/*.json, log .work/_state/logs/S11_29_card2-20261114-013238...
 - 2026-11-14 01:54 **S11-29** lead resume: Lead ran the second card round at cbe9a3d6, 01:32-01:52 EST.
 - 2026-11-14 01:48 **S11-15** engineer ask: 70049a7e: restaged .work/_shared/S11-15/lead.ps1, 14 remaining launches, expected 10-15 min; 18 PASS captures preserved, HPCG excluded, 600 s cap a...
@@ -245,13 +246,12 @@ Current tickets: `[###################-]` 206 of 213
 - 2026-11-14 01:46 **S11-02** owner decide: Budget raised by the lead under the owner's standing rule: sessions 12 -> 14, the third session extension. Each extension made progress; since the ...
 - 2026-11-14 01:46 **S11-02** engineer escalate: budget: 12 engineer sessions used; the budget is 12
 - 2026-11-14 01:45 **S11-02** owner decide: One more review round, granted by the lead under the owner's standing rule. This round is a merge conflict with main (S11-10's output_dir in host_c...
-- 2026-11-14 01:43 **S11-02** lead escalate: over 2 review rounds: Review of 4aae037c passes, but approval's merge conflicts with main in tools/host_card_transfer.py build(): main has S11-10's...
 
 ## Cost
 
 - From the script, engineer: 558 sessions, 1132.8M input tokens
 - From the script, lead: 368 sessions, 103.1M input tokens
-- Started by hand, Claude: 12 sessions, 3065.9M input tokens
+- Started by hand, Claude: 12 sessions, 3066.7M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
