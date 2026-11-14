@@ -66,7 +66,7 @@ Current tickets: `[###################-]` 206 of 213
 | S11-12 | Sprint 11 batch check - full native suite, x86 identity, forward-port drill, ICE sweeps, runtime prefix consistency | draft |  |
 | S11-13 | Senior compiler review of the Sprint 11-13 scope (Milestone M4) against our research, with recommended plan changes | Done | A senior compiler review of the Sprint 11-13 plan is in: M4 is plausible but needs a frozen scoring and mea... |
 | S11-14 | M4 scoring contract and measurement protocol, frozen before any tuning | Done | M4's scoring contract is frozen in ADR-0015 with a tested scorer: strict serial -O2 versus -O2 over 17 prog... |
-| S11-15 | First development-corpus baseline and profile, GCC 5.1.1 vs GCC-KNC at -O2 (E7-03 part 1) | In progress | Profile batch ran 2026-11-14 01:07-01:32 EST, log .work/_state/logs/S11_15_profile_batch-20261114-010719.lo... |
+| S11-15 | First development-corpus baseline and profile, GCC 5.1.1 vs GCC-KNC at -O2 (E7-03 part 1) | Question for the tech lead | 70049a7e: restaged .work/_shared/S11-15/lead.ps1, 14 remaining launches, expected 10-15 min; 18 PASS captur... |
 | S11-16 | Long-double libm hazard audit - do other MPSS long double entry points fault like cbrtl? (E7-21, bounded) | Done | The card's MPSS long double libm was probed on the card: of 12 entry points only cbrtl faults, and S10-13 a... |
 | S11-17 | PGO feasibility on one complete development program (reuse of S9-18's train/use path) | lead | Needs the interactive lead at a3258fe0, S11-17 worktree: 1) engineer cannot overwrite lead-owned controls/c... |
 | S11-18 | M4 corpus harness v2 - card profiles, prefix record, held-out sealing, stronger checks, and the donor-failure rule | Done | The M4 corpus harness now stages all 17 programs for the 7120 and the 3100/5100 profiles with serial voting... |
@@ -238,6 +238,7 @@ Current tickets: `[###################-]` 206 of 213
 
 ## Recent activity
 
+- 2026-11-14 01:48 **S11-15** engineer ask: 70049a7e: restaged .work/_shared/S11-15/lead.ps1, 14 remaining launches, expected 10-15 min; 18 PASS captures preserved, HPCG excluded, 600 s cap a...
 - 2026-11-14 01:48 **S11-02** engineer ask: The 01:43 lead instruction requires merging main into s11/S11-02, but the first git merge --no-commit main command was refused by the PreToolUse ho...
 - 2026-11-14 01:46 **S11-02** owner decide: Budget raised by the lead under the owner's standing rule: sessions 12 -> 14, the third session extension. Each extension made progress; since the ...
 - 2026-11-14 01:46 **S11-02** engineer escalate: budget: 12 engineer sessions used; the budget is 12
@@ -245,16 +246,15 @@ Current tickets: `[###################-]` 206 of 213
 - 2026-11-14 01:43 **S11-02** lead escalate: over 2 review rounds: Review of 4aae037c passes, but approval's merge conflicts with main in tools/host_card_transfer.py build(): main has S11-10's...
 - 2026-11-14 01:42 **S11-02** owner decide: Lead under the owner's standing rule: back to review. The scripted lead session ended after a merge conflict it could not resolve; the interactive ...
 - 2026-11-14 01:42 **S11-02** lead escalate: lead session ended without a decision (exit 0)
-- 2026-11-14 01:42 **S11-02** lead resume: Lead aborted the failed approval merge; main is clean at 6361d2aa.
 
 ## Cost
 
 - From the script, engineer: 557 sessions, 1132.3M input tokens
 - From the script, lead: 368 sessions, 103.1M input tokens
-- Started by hand, Claude: 12 sessions, 3061.8M input tokens
+- Started by hand, Claude: 12 sessions, 3062.0M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 31.7 GiB of 100 GiB. 168 GiB free on the drive.
+The project uses 31.7 GiB of 100 GiB. 166 GiB free on the drive.
