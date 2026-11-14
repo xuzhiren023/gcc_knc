@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-14 16:07.
+Updated automatically at every ticket change. Last update: 2026-11-14 16:08.
 
 **Next: GPT-6.1, on S12-19 (Profile-guided missed-vectorization triage - join hot loops with the vectorizer's reasons and observed strides/masks, so tuning targets what is hot and fixable).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
@@ -276,7 +276,7 @@ Current tickets: `[##################--]` 223 of 239
 ## Cost
 
 - From the script, engineer: 623 sessions, 1256.6M input tokens
-- From the script, lead: 407 sessions, 112.9M input tokens
+- From the script, lead: 408 sessions, 113.0M input tokens
 - Started by hand, Claude: 12 sessions, 3225.5M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
