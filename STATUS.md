@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-14 01:46.
+Updated automatically at every ticket change. Last update: 2026-11-14 01:47.
 
 **Next: GPT-6.1, on S11-02 (card_run and run_suite move bulk data by SCIF DMA at the PCIe link limit, with the SSH stream as fallback).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
@@ -53,7 +53,7 @@ Current tickets: `[###################-]` 206 of 213
 | S10-12 | cbrt and cbrtf crash (SIGSEGV) in qualify_v1 on the card - root cause and fix | Done | The cbrt and cbrtf qualification jobs no longer crash on the card and pass (worst 0.4996 and 0.4991 ULP): t... |
 | S10-13 | User story - code that calls cbrtl under -march=knc gets a safe replacement and a compile-time warning (MPSS libm cbrtl faults) | Done | Under -march=knc, calls to cbrtl (and std::cbrt on long double) now go to GCC-KNC's own safe cube root with... |
 | S11-01 | User story - the best way to move data between the host and the card, measured, and how our projects use it | Done | We now have a sourced inventory of every host-card transfer path that works without changing MPSS (SSH, tar... |
-| S11-02 | card_run and run_suite move bulk data by SCIF DMA at the PCIe link limit, with the SSH stream as fallback | Changes requested | Budget raised by the lead under the owner's standing rule: sessions 12 -> 14, the third session extension. ... |
+| S11-02 | card_run and run_suite move bulk data by SCIF DMA at the PCIe link limit, with the SSH stream as fallback | In progress | Budget raised by the lead under the owner's standing rule: sessions 12 -> 14, the third session extension. ... |
 | S11-03 | S11-01 transfer tool rejects the card's physical /tmp path, so the native study never starts | Done | The transfer study's tool now accepts the card's real /tmp location (/var/volatile/tmp), so its card run ca... |
 | S11-04 | S11-01 transfer tool - the host opens every connection, because Windows Firewall blocks inbound TCP from the card | Done | The transfer study's host side now opens every connection to the card, so Windows Firewall no longer blocks... |
 | S11-05 | Research - raise KNC's real memory bandwidth from about 175 GB/s toward 75-85% of peak, with a measured plan | Done | The memory-bandwidth research plan and a validated multithreaded KNC bandwidth benchmark are ready, with a ... |
@@ -251,10 +251,10 @@ Current tickets: `[###################-]` 206 of 213
 
 - From the script, engineer: 556 sessions, 1132.1M input tokens
 - From the script, lead: 368 sessions, 103.1M input tokens
-- Started by hand, Claude: 12 sessions, 3061.2M input tokens
+- Started by hand, Claude: 12 sessions, 3061.8M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 31.7 GiB of 100 GiB. 165 GiB free on the drive.
+The project uses 31.7 GiB of 100 GiB. 172 GiB free on the drive.
