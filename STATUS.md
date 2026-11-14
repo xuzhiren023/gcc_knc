@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-14 14:58.
+Updated automatically at every ticket change. Last update: 2026-11-14 14:59.
 
-**Next: GPT-6.1, on S11-26 (WRF OpenMP build at -mphinix with no per-file workarounds (S11-23 and S11-25 fixed), restaged for PhiWeather).** Run `python tools/dispatch.py`, or ask the tech lead to.
+**Next: the tech lead, on S12-19.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[##################--]` 220 of 237
 
@@ -99,7 +99,7 @@ Current tickets: `[##################--]` 220 of 237
 | S12-16 | Research - whole-system tuning playbook for the Z840 + Xeon Phi (BIOS, host OS, MPSS and card, transfers, runtimes), as HPC centres tuned Xeon + KNC systems | Done | Whole-system tuning playbook for the Z840 + Phi done: 13 ordered steps (BIOS, host Linux, card power/pages/... |
 | S12-17 | claude-torture -j N refuses to start in exclusive card runs (no inherited RLIMIT_AS since S11-29), so the execute suite cannot run | In progress | The new tests are in tests/tools/test_torture_driver.py (committed in 71cbcf86); YOUR_TEST was a placeholde... |
 | S12-18 | Double-precision vector exp, log and pow ran slower than scalar libm on the card (0.82x, 0.63x, 0.49x) - confirm with valid batches, then fix the library or stop the vectorizer calling them where they lose | lead | Needs interactive lead: (1) exclusive card turn running .work/_shared/S12-18/vmath-bench.mic at full, 3100 ... |
-| S12-19 | Profile-guided missed-vectorization triage - join hot loops with the vectorizer's reasons and observed strides/masks, so tuning targets what is hot and fixable | In progress | Red fails for the right reason (no vec_triage module), and the ranking, exclusive nested time, half-open PC... |
+| S12-19 | Profile-guided missed-vectorization triage - join hot loops with the vectorizer's reasons and observed strides/masks, so tuning targets what is hot and fixable | Tests waiting for review | Revised red d3ee9323: 10 cases, 2 test files; real GCC messages with citations, both in-order refusals, act... |
 | S12-20 | libknc_vmath accuracy and exception contract, with an independent validation design (rounding modes, special values, flags, scalar fallback) | draft |  |
 | S12-21 | Scheduling model for M4's serial runs - measure density-1 tuning and the integer-multiply cost against today's density-4 defaults (S12-14 B02, B04, B05) | Not started |  |
 | S12-22 | Low-risk corrections from the S12-14 audit - wrong comments and citations (N01-N09) and the far-prefetch-distance range bug (B10) | Not started |  |
@@ -262,6 +262,7 @@ Current tickets: `[##################--]` 220 of 237
 
 ## Recent activity
 
+- 2026-11-14 14:59 **S12-19** engineer red: Revised red d3ee9323: 10 cases, 2 test files; real GCC messages with citations, both in-order refusals, actual strict-FP cost refusal, captured add...
 - 2026-11-14 14:57 **S12-04** owner decide: Lead raises sessions 5 -> 7 (second raise; standing owner rule): sessions 4-5 delivered the throttled scan and host tests; one small requested chan...
 - 2026-11-14 14:57 **S12-04** engineer escalate: budget: 5 engineer sessions used; the budget is 5
 - 2026-11-14 14:56 **S12-17** lead answer: The new tests are in tests/tools/test_torture_driver.py (committed in 71cbcf86); YOUR_TEST was a placeholder. With tools/claude-torture.c from main...
@@ -269,7 +270,6 @@ Current tickets: `[##################--]` 220 of 237
 - 2026-11-14 14:53 **S12-17** engineer ask: Red proof blocked: tools/claude-torture.c was restored from main, but the new test file named in the lead instruction is absent (tests/tools/test_c...
 - 2026-11-14 14:53 **S12-04** engineer submit: Host profile memory tests passed (7 tests): C:\Users\xuzhi\Documents\gcc_knc\.work\_state\logs\S12_04_profile_memory-20261114-145253.log. Awaiting ...
 - 2026-11-14 14:52 **S12-07** lead answer: Do not hand-roll include paths for the build-tree xg++. For the 'before' compiler use the installed driver exactly as tools/corpus does: corpus.com...
-- 2026-11-14 14:51 **S12-19** lead changes: Red fails for the right reason (no vec_triage module), and the ranking, exclusive nested time, half-open PC, program filter, dedup and allowlist ca...
 
 ## Cost
 
