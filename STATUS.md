@@ -77,7 +77,7 @@ Current tickets: `[##################--]` 219 of 237
 | S11-23 | ICE in WRF's RRTM radiation (rtrn) at -O2 -march=knc - unrecognizable insn after reload, and sub-512-bit SLP vectors under KNC | Done | WRF's RRTM radiation and the -O3 OpenMP WRF files that crashed GCC-KNC after reload (rtrn, kfcps, advance_u... |
 | S11-24 | WRF OpenMP (smpar) build with GCC-KNC at -mphinix, for PhiWeather's benchmark - replaces the serial trial build | Done | WRF v4.8.0 now builds as an OpenMP card binary at -mphinix with GCC-KNC (wrf.exe and real.exe linked, needi... |
 | S11-25 | ICE in do_store_flag (expr.cc) on WRF's surface layer (SFCLAY1D) at -O2 -march=knc | Done | The last WRF file that crashed GCC-KNC (surface layer, SFCLAY1D) now compiles: vector 'ordered and not equa... |
-| S11-26 | WRF OpenMP build at -mphinix with no per-file workarounds (S11-23 and S11-25 fixed), restaged for PhiWeather | lead | Needs the interactive lead: (1) stage a fresh WRF v4.8.0 tree at .work/_shared/wrf-trial/src/WRF-4.8.0-smpa... |
+| S11-26 | WRF OpenMP build at -mphinix with no per-file workarounds (S11-23 and S11-25 fixed), restaged for PhiWeather | In progress | Lead 14:45: (1) tree staged at .work/_shared/wrf-trial/src/WRF-4.8.0-smpar (see my 14:28 answer). (2) gcc-k... |
 | S11-27 | Wrong code - NPB-MG (class A, serial) built by GCC-KNC at -O2 -march=knc fails NPB verification on the card | Done | NPB-MG built by GCC-KNC at -O2 -march=knc now verifies on the card (class A in 14.1 s, against 33.8 s for G... |
 | S11-28 | HPCG run that fits every card model - fixed work instead of fixed duration, grid sized to the 3100's memory | Done | HPCG now runs a fixed amount of work (one CG set on the 104-cubed grid) that passes on the full card, 3100 ... |
 | S11-29 | card_run profiles limit memory in use, not address space, so a 3100 or 5100 run fails only where the real card would | Done | Under --profile 3100 and 5100, card_run now limits the memory a job actually uses (sampled resident plus sw... |
@@ -262,6 +262,7 @@ Current tickets: `[##################--]` 219 of 237
 
 ## Recent activity
 
+- 2026-11-14 14:40 **S11-26** lead resume: Lead 14:45: (1) tree staged at .work/_shared/wrf-trial/src/WRF-4.8.0-smpar (see my 14:28 answer). (2) gcc-knc-16.2.0 = knc 619e14b479a. (3) Do list...
 - 2026-11-14 14:39 **S12-18** engineer ask: Phase 1 committed d29d7c74. Host regression passes 12 scenarios; built/linted .work/_shared/S12-18/vmath-bench.mic. Report, logs and exclusive full...
 - 2026-11-14 14:39 **S12-15** lead approve: Literature survey done: 30 groups of published Xeon Phi work ranked against our goals, with 14 overlooked ideas; the compiler ones are now tickets,...
 - 2026-11-14 14:39 **S12-04** owner decide: Lead raises sessions 3 -> 5 (standing owner rule): the third session was the requested-changes round (split red commit); the fix is written.
@@ -269,13 +270,12 @@ Current tickets: `[##################--]` 219 of 237
 - 2026-11-14 14:29 **S12-06** engineer submit: Restored .gitignore to main in 66ef8806 as requested; tracked assembly control retained. Phase-one results and premise-fails conclusion remain at a...
 - 2026-11-14 14:28 **S12-14** lead approve: The lead now has a ranked audit in docs/research/s12-14-model-audit.md of 42 places where GCC-KNC tuning numbers, runtime defaults or comments disa...
 - 2026-11-14 14:28 **S11-26** lead defer: Needs the interactive lead: (1) stage a fresh WRF v4.8.0 tree at .work/_shared/wrf-trial/src/WRF-4.8.0-smpar (PhiWeather's clean tree plus the 7 pi...
-- 2026-11-14 14:28 **S11-26** lead answer: Lead 14:30: fresh tree at .work/_shared/wrf-trial/src/WRF-4.8.0-smpar (WRF v4.8.0 06d4240a + 7 pinned phys submodules, 441 MB, 5,589 files; provena...
 
 ## Cost
 
 - From the script, engineer: 598 sessions, 1227.3M input tokens
 - From the script, lead: 394 sessions, 109.2M input tokens
-- Started by hand, Claude: 12 sessions, 3178.9M input tokens
+- Started by hand, Claude: 12 sessions, 3179.4M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
