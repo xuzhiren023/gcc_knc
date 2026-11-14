@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-14 02:36.
+Updated automatically at every ticket change. Last update: 2026-11-14 02:38.
 
-**Next: GPT-6.1, on S11-15 (First development-corpus baseline and profile, GCC 5.1.1 vs GCC-KNC at -O2 (E7-03 part 1)).** Run `python tools/dispatch.py`, or ask the tech lead to.
+**Next: the tech lead, on S11-02.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[###################-]` 207 of 213
 
@@ -53,7 +53,7 @@ Current tickets: `[###################-]` 207 of 213
 | S10-12 | cbrt and cbrtf crash (SIGSEGV) in qualify_v1 on the card - root cause and fix | Done | The cbrt and cbrtf qualification jobs no longer crash on the card and pass (worst 0.4996 and 0.4991 ULP): t... |
 | S10-13 | User story - code that calls cbrtl under -march=knc gets a safe replacement and a compile-time warning (MPSS libm cbrtl faults) | Done | Under -march=knc, calls to cbrtl (and std::cbrt on long double) now go to GCC-KNC's own safe cube root with... |
 | S11-01 | User story - the best way to move data between the host and the card, measured, and how our projects use it | Done | We now have a sourced inventory of every host-card transfer path that works without changing MPSS (SSH, tar... |
-| S11-02 | card_run and run_suite move bulk data by SCIF DMA at the PCIe link limit, with the SSH stream as fallback | lead | Review of 7deb440b passes; card acceptance (2026-11-14 00:14-00:23 EST) passes. Approve did not finish: its... |
+| S11-02 | card_run and run_suite move bulk data by SCIF DMA at the PCIe link limit, with the SSH stream as fallback | Waiting for review | Lead merged main again at 31698412 (STAGING_RESERVED union with S11-29); test_card_*.py 117 OK in 162 s, lo... |
 | S11-03 | S11-01 transfer tool rejects the card's physical /tmp path, so the native study never starts | Done | The transfer study's tool now accepts the card's real /tmp location (/var/volatile/tmp), so its card run ca... |
 | S11-04 | S11-01 transfer tool - the host opens every connection, because Windows Firewall blocks inbound TCP from the card | Done | The transfer study's host side now opens every connection to the card, so Windows Firewall no longer blocks... |
 | S11-05 | Research - raise KNC's real memory bandwidth from about 175 GB/s toward 75-85% of peak, with a measured plan | Done | The memory-bandwidth research plan and a validated multithreaded KNC bandwidth benchmark are ready, with a ... |
@@ -238,6 +238,7 @@ Current tickets: `[###################-]` 207 of 213
 
 ## Recent activity
 
+- 2026-11-14 02:38 **S11-02** lead resume: Lead merged main again at 31698412 (STAGING_RESERVED union with S11-29); test_card_*.py 117 OK in 162 s, log .work/_state/logs/s11_02_lead_merge2_c...
 - 2026-11-14 02:36 **S11-17** owner decide: Budget raised by the lead under the owner's standing rule: input tokens 12M -> 20M, the second token extension. Progress since the first: the contr...
 - 2026-11-14 02:35 **S11-17** engineer escalate: budget: 12640587 input tokens used; the budget is 12000000
 - 2026-11-14 02:33 **S11-17** owner decide: Budget raised by the lead under the owner's standing rule: sessions 7 -> 9, the second session extension. Progress since the last: the revised cont...
@@ -245,16 +246,15 @@ Current tickets: `[###################-]` 207 of 213
 - 2026-11-14 02:26 **S11-15** engineer ask: cc16208a completes attribution/report and three conditional S12 proof proposals. Host analysis and diff check PASS; log .work/_state/logs/S11_15_ba...
 - 2026-11-14 02:25 **S11-02** lead defer: Review of 7deb440b passes; card acceptance (2026-11-14 00:14-00:23 EST) passes. Approve did not finish: its host check ran past 20 min and was kill...
 - 2026-11-14 02:13 **S11-29** lead approve: Under --profile 3100 and 5100, card_run now limits the memory a job actually uses (sampled resident plus swap) instead of reserved address space, s...
-- 2026-11-14 02:02 **S11-15** lead answer: Remaining batch ran 2026-11-14 01:57-02:02 EST: all 14 launches PASS (PROFILE_BATCH_COMPLETE). Log .work/_state/logs/S11_15_profile_remaining-20261...
 
 ## Cost
 
 - From the script, engineer: 561 sessions, 1140.2M input tokens
 - From the script, lead: 370 sessions, 103.6M input tokens
-- Started by hand, Claude: 12 sessions, 3077.0M input tokens
+- Started by hand, Claude: 12 sessions, 3078.0M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 31.7 GiB of 100 GiB. 166 GiB free on the drive.
+The project uses 31.7 GiB of 100 GiB. 174 GiB free on the drive.
