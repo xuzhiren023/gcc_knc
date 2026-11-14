@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-14 07:46.
+Updated automatically at every ticket change. Last update: 2026-11-14 07:49.
 
-**Next: GPT-6.1, on S11-15 (First development-corpus baseline and profile, GCC 5.1.1 vs GCC-KNC at -O2 (E7-03 part 1)).** Run `python tools/dispatch.py`, or ask the tech lead to.
+**Waiting for you:** S11-15. Run `python tools/pm.py inbox`.
 
 Current tickets: `[###################-]` 208 of 216
 
@@ -66,7 +66,7 @@ Current tickets: `[###################-]` 208 of 216
 | S11-12 | Sprint 11 batch check - full native suite, x86 identity, forward-port drill, ICE sweeps, runtime prefix consistency | draft |  |
 | S11-13 | Senior compiler review of the Sprint 11-13 scope (Milestone M4) against our research, with recommended plan changes | Done | A senior compiler review of the Sprint 11-13 plan is in: M4 is plausible but needs a frozen scoring and mea... |
 | S11-14 | M4 scoring contract and measurement protocol, frozen before any tuning | Done | M4's scoring contract is frozen in ADR-0015 with a tested scorer: strict serial -O2 versus -O2 over 17 prog... |
-| S11-15 | First development-corpus baseline and profile, GCC 5.1.1 vs GCC-KNC at -O2 (E7-03 part 1) | In progress | Do not split. Submit with --override 'research ticket: 754-line baseline report plus profiling tools alread... |
+| S11-15 | First development-corpus baseline and profile, GCC 5.1.1 vs GCC-KNC at -O2 (E7-03 part 1) | **Waiting for you** | budget: 6 engineer sessions used; the budget is 6 |
 | S11-16 | Long-double libm hazard audit - do other MPSS long double entry points fault like cbrtl? (E7-21, bounded) | Done | The card's MPSS long double libm was probed on the card: of 12 entry points only cbrtl faults, and S10-13 a... |
 | S11-17 | PGO feasibility on one complete development program (reuse of S9-18's train/use path) | In progress | Train3 ran 2026-11-14 07:44 EST at 4954896d scripts: PASS, 0.4 min, card exit 0, log .work/_state/logs/S11_... |
 | S11-18 | M4 corpus harness v2 - card profiles, prefix record, held-out sealing, stronger checks, and the donor-failure rule | Done | The M4 corpus harness now stages all 17 programs for the 7120 and the 3100/5100 profiles with serial voting... |
@@ -241,6 +241,7 @@ Current tickets: `[###################-]` 208 of 216
 
 ## Recent activity
 
+- 2026-11-14 07:49 **S11-15** engineer escalate: budget: 6 engineer sessions used; the budget is 6
 - 2026-11-14 07:46 **S11-17** lead answer: Train3 ran 2026-11-14 07:44 EST at 4954896d scripts: PASS, 0.4 min, card exit 0, log .work/_state/logs/S11_17_controls_train3-20261114-074418.log. ...
 - 2026-11-14 07:45 **S11-17** lead resume: Lead ran train3 at 07:44 EST: results in the answer.
 - 2026-11-14 02:55 **S11-17** lead defer: Interactive lead at 4954896d, S11-17 worktree. Branch candidate (noipa helper, expect-unlikely vs 99% training) is a fair gate. 1) Move lead-owned ...
@@ -248,13 +249,12 @@ Current tickets: `[###################-]` 208 of 216
 - 2026-11-14 02:51 **S11-02** lead approve: card_run and run_suite now move large files to and from the card by SCIF DMA at about 1.4 GB/s up and 1.67 GB/s down on the link (a 1 GiB file take...
 - 2026-11-14 02:38 **S11-02** lead resume: Lead merged main again at 31698412 (STAGING_RESERVED union with S11-29); test_card_*.py 117 OK in 162 s, log .work/_state/logs/s11_02_lead_merge2_c...
 - 2026-11-14 02:36 **S11-17** owner decide: Budget raised by the lead under the owner's standing rule: input tokens 12M -> 20M, the second token extension. Progress since the first: the contr...
-- 2026-11-14 02:35 **S11-17** engineer escalate: budget: 12640587 input tokens used; the budget is 12000000
 
 ## Cost
 
 - From the script, engineer: 562 sessions, 1143.6M input tokens
 - From the script, lead: 371 sessions, 103.9M input tokens
-- Started by hand, Claude: 12 sessions, 3085.1M input tokens
+- Started by hand, Claude: 12 sessions, 3087.3M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
