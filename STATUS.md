@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-14 01:16.
+Updated automatically at every ticket change. Last update: 2026-11-14 01:17.
 
 **Waiting for you:** S11-02. Run `python tools/pm.py inbox`.
 
@@ -68,7 +68,7 @@ Current tickets: `[###################-]` 206 of 213
 | S11-14 | M4 scoring contract and measurement protocol, frozen before any tuning | Done | M4's scoring contract is frozen in ADR-0015 with a tested scorer: strict serial -O2 versus -O2 over 17 prog... |
 | S11-15 | First development-corpus baseline and profile, GCC 5.1.1 vs GCC-KNC at -O2 (E7-03 part 1) | lead | Card run needed. Batch at 31272757 reviewed and fine (36 launches: 12 serial + 6 OpenMP GCC-KNC dev builds,... |
 | S11-16 | Long-double libm hazard audit - do other MPSS long double entry points fault like cbrtl? (E7-21, bounded) | Done | The card's MPSS long double libm was probed on the card: of 12 entry points only cbrtl faults, and S10-13 a... |
-| S11-17 | PGO feasibility on one complete development program (reuse of S9-18's train/use path) | Question for the tech lead | a3258fe0: revised branch/inline/loop; ten atomic binaries compiled/linted, five O2 gates red. Log: .work/_s... |
+| S11-17 | PGO feasibility on one complete development program (reuse of S9-18's train/use path) | lead | Needs the interactive lead at a3258fe0, S11-17 worktree: 1) engineer cannot overwrite lead-owned controls/c... |
 | S11-18 | M4 corpus harness v2 - card profiles, prefix record, held-out sealing, stronger checks, and the donor-failure rule | Done | The M4 corpus harness now stages all 17 programs for the 7120 and the 3100/5100 profiles with serial voting... |
 | S11-19 | Second senior review - the M4 definition and the Sprint 11-13 roadmap, adjusted | Done | The M4 definition and the Sprint 11-13 roadmap are rewritten as measure, improve, decide, each sprint with ... |
 | S11-20 | Research - which compiler optimizations benefit the widest range of real code on KNC, from professional to amateur, and does our corpus cover it? | Done | We now have a code-style coverage study (docs/research/code-style-coverage.md) that ranks Sprint 12 candida... |
@@ -238,6 +238,7 @@ Current tickets: `[###################-]` 206 of 213
 
 ## Recent activity
 
+- 2026-11-14 01:17 **S11-17** lead defer: Needs the interactive lead at a3258fe0, S11-17 worktree: 1) engineer cannot overwrite lead-owned controls/controls-train.sh, controls-lead.ps1, tra...
 - 2026-11-14 01:16 **S11-29** engineer ask: Committed cbe9a3d6: filter baseline low PIDs before stat, full scan on new low PID, printf replaces ls; monitor pinned CPU 0 with isolated marker. ...
 - 2026-11-14 01:15 **S11-17** engineer ask: a3258fe0: revised branch/inline/loop; ten atomic binaries compiled/linted, five O2 gates red. Log: .work/_state/logs/S11_17_controls_revised_stage-...
 - 2026-11-14 01:08 **S11-02** engineer escalate: budget: 13309292 input tokens used; the budget is 12000000
@@ -245,7 +246,6 @@ Current tickets: `[###################-]` 206 of 213
 - 2026-11-14 01:05 **S11-29** lead resume: Lead ran lead-round.py at 9520fce6, 00:54-01:04 EST: results in the answer.
 - 2026-11-14 01:03 **S11-02** lead answer: Reviewed 4aae037c: the class defaults (helper_free True, transfer_method ssh, transfers list), the fixture updates for private publication, and pat...
 - 2026-11-14 01:02 **S11-17** lead answer: Revise candidates in this ticket; no compiler work here (gcc: no stays). Make each gate name a transformation GCC 16 actually performs with -fprofi...
-- 2026-11-14 01:00 **S11-15** lead defer: Card run needed. Batch at 31272757 reviewed and fine (36 launches: 12 serial + 6 OpenMP GCC-KNC dev builds, plain+sampled, full 7120, 600 s cap eac...
 
 ## Cost
 
@@ -257,4 +257,4 @@ Current tickets: `[###################-]` 206 of 213
 
 ## Disk
 
-The project uses 31.7 GiB of 100 GiB. 165 GiB free on the drive.
+The project uses 31.7 GiB of 100 GiB. 173 GiB free on the drive.
