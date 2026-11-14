@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-14 15:08.
+Updated automatically at every ticket change. Last update: 2026-11-14 15:09.
 
-**Waiting for you:** S12-04. Run `python tools/pm.py inbox`.
+**Next: the tech lead, on S12-08.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[##################--]` 220 of 238
 
@@ -84,7 +84,7 @@ Current tickets: `[##################--]` 220 of 238
 | S12-01 | Sprint 12 prep - static code-quality census of the development-corpus builds (spills, x87/vector transfers, addressing, calls, code size) | Done | A static code-quality census (spill/reload proxies, x87 and x87-zmm traffic, address arithmetic, calls, bra... |
 | S12-02 | Sprint 12 prep - the unscored generality check set (S11-20's six programs in the code styles our corpus lacks) | Done | The six unscored generality checks (Q1-Q6: ray tracer hit dispatch and vec3 AoS, Burkardt MD, Reference BLA... |
 | S12-03 | pm.py approve aborts its own merge on conflict and refuses cleanly, so main is never left mid-merge | draft |  |
-| S12-04 | card_run profile memory monitor costs under 5% of one card thread | **Waiting for you** | budget: 7 engineer sessions used; the budget is 7 |
+| S12-04 | card_run profile memory monitor costs under 5% of one card thread | In progress | Lead raises sessions 7 -> 8: the last raise made progress (usleep fallback, red/green logs); one session to... |
 | S12-05 | DMA end-to-end time - overlap file read, DMA and file write, and copy on the card with more than one thread | draft |  |
 | S12-06 | M4 theme 1 - strict scalar FP conversions and call boundaries (NPB-EP transform and log path, NPB-IS randlc) | Done | Theme 1 (scalar FP conversions and calls in NPB-EP/IS) closed with no compiler change: a card diagnostic sh... |
 | S12-07 | M4 theme 2 - indexed-load scheduling with strict sparse reduction (NPB-CG) | lead | Card run needed (interactive lead only): run .work/_shared/S12-07/sparse-paired via tools/card_run --thread... |
@@ -263,6 +263,7 @@ Current tickets: `[##################--]` 220 of 238
 
 ## Recent activity
 
+- 2026-11-14 15:09 **S12-04** owner decide: Lead raises sessions 7 -> 8: the last raise made progress (usleep fallback, red/green logs); one session to submit.
 - 2026-11-14 15:08 **S12-21** engineer red: fc734fd3 adds phase-1 contracts: 28 serial development builds, default/density1 flags, top-four selection, three alternating pairs, full exclusive ...
 - 2026-11-14 15:07 **S12-04** engineer escalate: budget: 7 engineer sessions used; the budget is 7
 - 2026-11-14 15:06 **S12-08** engineer ask: Closure documentation committed as 7f2df59d; reproducers retained. Requested submit --override was refused: deep ticket: run pm.py red and wait for...
@@ -270,16 +271,15 @@ Current tickets: `[##################--]` 220 of 238
 - 2026-11-14 15:05 **S12-04** engineer ask: The strengthened fallback test fails against HEAD's original tools/card_run (log: C:\Users\xuzhi\Documents\gcc_knc\.work\_state\logs\S12_04_profile...
 - 2026-11-14 15:05 **S11-26** lead defer: Needs the interactive lead: clean WRF build hits a new ICE (REMEZ, vect_transform_stmt, knc 619e14b479a; repro .work/_shared/wrf-trial/repro/remez....
 - 2026-11-14 15:03 **S12-08** lead answer: Decision: close on the failed premise; no card run. The staged pair only measures the fold-left bridge cost, and your note shows those bridges sit ...
-- 2026-11-14 15:03 **S11-26** engineer ask: Blocked as recorded in f8fe9c32: knc 619e14b479a passes four original reproducers, but clean WRF build and standalone repro/remez.f90 fail in vect_...
 
 ## Cost
 
 - From the script, engineer: 614 sessions, 1241.1M input tokens
 - From the script, lead: 402 sessions, 111.3M input tokens
-- Started by hand, Claude: 12 sessions, 3198.3M input tokens
+- Started by hand, Claude: 12 sessions, 3199.3M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 32.7 GiB of 100 GiB. 145 GiB free on the drive.
+The project uses 32.7 GiB of 100 GiB. 147 GiB free on the drive.
