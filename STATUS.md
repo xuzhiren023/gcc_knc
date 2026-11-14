@@ -86,7 +86,7 @@ Current tickets: `[##################--]` 216 of 230
 | S12-03 | pm.py approve aborts its own merge on conflict and refuses cleanly, so main is never left mid-merge | draft |  |
 | S12-04 | card_run profile memory monitor costs under 5% of one card thread | Changes requested | Red stage must hold only the failing test: commit c122120a also carries the card_run fix, so red-then-green... |
 | S12-05 | DMA end-to-end time - overlap file read, DMA and file write, and copy on the card with more than one thread | draft |  |
-| S12-06 | M4 theme 1 - strict scalar FP conversions and call boundaries (NPB-EP transform and log path, NPB-IS randlc) | Question for the tech lead | Phase-one closure docs committed a80a7e9b per your instruction, with eight native medians and 240-worker/ov... |
+| S12-06 | M4 theme 1 - strict scalar FP conversions and call boundaries (NPB-EP transform and log path, NPB-IS randlc) | In progress | Lead: closed at phase 1 (premise fails), so the ticket is now type research and needs no red commit. Submit... |
 | S12-07 | M4 theme 2 - indexed-load scheduling with strict sparse reduction (NPB-CG) | Not started |  |
 | S12-08 | M4 theme 3 - dependency-preserving scalar updates and register pressure in dense loops (PB-ludcmp, x87 stack traffic) | Not started |  |
 | S12-09 | Sprint 12 batch check - integrated themes at the final Sprint 12 head, regression evidence, optional modes frozen | draft |  |
@@ -256,13 +256,13 @@ Current tickets: `[##################--]` 216 of 230
 ## Recent activity
 
 - 2026-11-14 14:03 **S12-15** engineer submit: Survey committed at 61ecb62e: docs/research/phi-literature-survey.md, 30 ranked source groups. Document check PASS; log .work/_state/logs/s12_15_su...
+- 2026-11-14 14:03 **S12-06** lead answer: Lead: closed at phase 1 (premise fails), so the ticket is now type research and needs no red commit. Submit a80a7e9b as is.
 - 2026-11-14 14:02 **S12-18** lead approve-red: A host test now reproduces the short vmath benchmark batches: the calibration accepts one slow early sample, picks too few repetitions and then rec...
 - 2026-11-14 14:02 **S12-15** lead answer: Lead: approved. Submit 61ecb62e with --override 'single research note, 848 lines, 6% over; 30 annotated sources'.
 - 2026-11-14 14:02 **S12-06** engineer ask: Phase-one closure docs committed a80a7e9b per your instruction, with eight native medians and 240-worker/overlap caveat. Log .work/_shared/S12-06/c...
 - 2026-11-14 14:01 **S12-04** lead changes: Red stage must hold only the failing test: commit c122120a also carries the card_run fix, so red-then-green cannot be shown; split it (test commit ...
 - 2026-11-14 14:01 **S11-12** engineer submit: 437b2a35: T0 56/T1 327 PASS; lead T2 7/7 PASS. Both ICE sweeps zero ICE. Refreshed drill complete: master 14 conflicts, gcc-16 4; PR128640 reviewed...
 - 2026-11-14 14:00 **S12-18** engineer red: Commit 6a256a79. Host Cygwin regression: exp/log/pow each fail as expected after a timing transient; steady controls pass. Real driver accepts one ...
-- 2026-11-14 14:00 **S12-15** engineer ask: Ran submit as instructed; it refused because the committed survey has 848 changed lines against the 800-line budget. The tool permits --override on...
 
 ## Cost
 
