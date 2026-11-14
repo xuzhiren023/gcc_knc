@@ -234,6 +234,92 @@ def query_sampled_elf(binary, pcs, addr2line, env):
     return result.stdout
 
 
+def function_dump(text):
+    """Parse objdump -h -t -d --no-show-raw-insn; never infer symbol sizes."""
+    sections, symbols, instructions = [], defaultdict(list), {}
+    lines = text.splitlines()
+    for i, line in enumerate(lines):
+        section = re.match(r'^\s*\d+\s+\S+\s+([\da-f]+)\s+([\da-f]+)\s', line)
+        if section and i + 1 < len(lines) and 'ALLOC' in lines[i + 1]:
+            size, start = (int(v, 16) for v in section.groups())
+            sections.append((start, start + size))
+        symbol = re.match(r'^([\da-f]+)\s+.*?\bF\s+(\.\S+)\s+([\da-f]+)\s+(\S+)$', line)
+        if symbol:
+            symbols[symbol[4]].append((int(symbol[1], 16), int(symbol[3], 16)))
+        instruction = re.match(r'^\s*([\da-f]+):\s+(\S.*)$', line)
+        if instruction:
+            instructions[int(instruction[1], 16)] = instruction[2]
+    addresses = sorted(instructions)
+    result = {}
+    for name, entries in symbols.items():
+        start, size = entries[0]
+        body = []
+        for pc in addresses[bisect_right(addresses, start - 1):bisect_right(addresses, start + size - 1)]:
+            insn = instructions[pc].split('#', 1)[0]
+            insn = re.sub(r'<[^>]*>', '', insn).strip()
+            insn = re.sub(r'-?0x[\da-f]+(?=\(%rip\))', 'ADDR', insn)
+            # Branch/call destinations and allocated absolute addresses may move.
+            # Keep registers, stack offsets, scalar constants and instruction offsets.
+            insn = re.sub(r'^(j\w+|callq?|loop\w*)\s+[\da-f]+\b', r'\1 TARGET', insn)
+            insn = re.sub(r'(?<![\w-])0x[\da-f]+', lambda m:
+                'ADDR' if any(a <= int(m[0], 16) < b for a, b in sections) else m[0], insn)
+            body.append((pc - start, ' '.join(insn.split())))
+        valid = (len(entries) == 1 and size > 0 and body and body[0][0] == 0
+                 and not any('(bad)' in insn or '.byte' in insn for _, insn in body))
+        result[name] = dict(start=start, size=size, instructions=body, valid=bool(valid))
+    return result
+
+
+def match_functions(frozen_text, debug_text):
+    frozen, debug = function_dump(frozen_text), function_dump(debug_text)
+    matches, rejected = [], []
+    for name, old in sorted(frozen.items()):
+        new = debug.get(name)
+        if (old['valid'] and new and new['valid'] and old['size'] == new['size']
+                and old['instructions'] == new['instructions']):
+            matches.append(dict(name=name, frozen=old['start'], debug=new['start'], size=old['size']))
+        else:
+            reason = ('missing debug symbol' if new is None else
+                      'zero size, ambiguous symbol or incomplete decode' if not old['valid'] or not new['valid'] else
+                      'size differs' if old['size'] != new['size'] else 'instructions differ')
+            rejected.append(dict(name=name, reason=reason))
+    return dict(matched=matches, rejected=rejected)
+
+
+def translate_pcs(pcs, gate):
+    translated = {}
+    for pc in set(pcs):
+        targets = {f['debug'] + pc - f['frozen'] for f in gate['matched']
+                   if f['frozen'] <= pc < f['frozen'] + f['size']}
+        if len(targets) == 1:
+            translated[pc] = targets.pop()
+    return translated
+
+
+def map_companion(capture, directory, pcs, shared, env):
+    dumps = []
+    for kind in ('frozen', 'debug'):
+        dump = subprocess.run([str(shared / 'toolchain/cross/bin/k1om-mpss-linux-objdump.exe'),
+            '-h', '-t', '-d', '--no-show-raw-insn', capture[kind]],
+            text=True, capture_output=True, env=env, check=True).stdout
+        (directory / (kind + '.functions')).write_text(dump)
+        dumps.append(dump)
+    gate = match_functions(*dumps)
+    translated = translate_pcs(pcs, gate)
+    gate.update(workload_samples=len(pcs), accepted_samples=sum(pc in translated for pc in pcs))
+    (directory / 'function-map.json').write_text(json.dumps(gate, indent=2) + '\n')
+    addr = query_sampled_elf(Path(capture['debug']), translated.values(),
+                            shared / 'toolchain/cygwin/bin/addr2line.exe', env) if translated else ''
+    (directory / 'debug.addr2line').write_text(addr)
+    locations = {loc['pc']: loc for loc in parse_addr2line(addr)}
+    # Restore frozen addresses before joining against the frozen sample stream.
+    remapped = ''.join(f'{hex(pc)}\n{locations[target]["function"]}\n'
+                      f'{locations[target]["file"] or "??"}:{locations[target]["line"]}\n'
+                      for pc, target in sorted(translated.items()))
+    (directory / 'sampled.addr2line').write_text(remapped)
+    return gate, remapped
+
+
 def audit_profiles(shared, output):
     """Check the prerequisite for the production source join, for all 14 programs.
 
@@ -390,7 +476,7 @@ def source_loops(filename, text):
 
 
 def analyze_collection(shared, output, programs, resume=False):
-    """Rank observed loops only after the frozen/debug .text identity gate."""
+    """Rank observed loops after matching frozen/debug functions by instruction."""
     profiles = {r['key']: r for r in json.loads(
         (shared / 'S11-15/batch-attribution.json').read_text())}
     batch = (shared / 'S11-15/batch-attribution-pcs.txt').read_text()
@@ -440,16 +526,10 @@ def analyze_collection(shared, output, programs, resume=False):
             samples = list(samples_for(pc_text, program, variant)) if profile else []
             cpu = (profile['account']['user'] + profile['account']['system']
                    if profile and profile.get('account') else len(samples) * .01)
-            locations = []
-            if capture['text_equal'] and samples:
-                addr = query_sampled_elf(Path(capture['debug']),
-                    [pc for module, pc in samples if module == 'profile-workload'],
-                    shared / 'toolchain/cygwin/bin/addr2line.exe', env)
-                (directory / 'sampled.addr2line').write_text(addr)
-                locations = parse_addr2line(addr)
-                mapped = regions_from_addr2line(addr, regions, 'profile-workload')
-            else:
-                mapped = []
+            gate, addr = map_companion(capture, directory,
+                [pc for module, pc in samples if module == 'profile-workload'], shared, env)
+            locations = parse_addr2line(addr)
+            mapped = regions_from_addr2line(addr, regions, 'profile-workload')
             mapped_by_id = {r['id']: r for r in mapped}
             regions = [mapped_by_id.get(r['id'], dict(r, module='profile-workload', pc_ranges=[]))
                        for r in regions]
@@ -474,7 +554,7 @@ def analyze_collection(shared, output, programs, resume=False):
                             pc_ranges=[(loc['pc'], loc['pc'] + 1)]))
             result = triage_program(program, opt, regions, pc_text if profile else '', cpu,
                                     variant, include_unsampled=True)
-            result.update(text_equal=capture['text_equal'], profile=profile,
+            result.update(text_equal=capture['text_equal'], function_gate=gate, profile=profile,
                           static_only=not any(r['samples'] for r in result['rows']),
                           observed_strides=None, observed_masks=None)
             # Unmatched diagnostics are evidence too; never silently discard them.
@@ -519,6 +599,11 @@ def write_tables(results, summary, path):
                         f'{row["samples"]} | {row["cpu_seconds"]:.4f} |')
         if not any(r['samples'] for r in result['rows']):
             text.append('| No attributable source loops | unknown | | unavailable | unavailable |')
+        gate = result.get('function_gate', {})
+        text += ['', f'Function gate: {len(gate.get("matched", []))} matched; '
+                 f'{gate.get("accepted_samples", 0)}/{gate.get("workload_samples", 0)} workload samples accepted.',
+                 '', 'Rejected frozen functions:', '']
+        text.extend('- `' + f['name'] + '`: ' + f['reason'] for f in gate.get('rejected', []))
         functions = (result.get('profile') or {}).get('functions', [])
         if functions:
             text += ['', 'Existing hot functions (no implied source-loop ownership):', '',

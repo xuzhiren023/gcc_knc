@@ -141,6 +141,62 @@ class VecTriageMappingTest(unittest.TestCase):
         self.assertEqual(result['unmapped_samples'], 1)
         self.assertEqual(result['rows'], [])
 
+    def test_captured_function_gate_maps_shift_and_rejects_code_change(self):
+        # objdump -t -d --no-show-raw-insn, frozen S11-18 and S12-19 debug:
+        # serial-PB-atax __libc_csu_fini (one-byte symbol, excludes padding),
+        # serial-STREAM mysecond (actual differing stack operands and sizes).
+        frozen = '''
+0000000000401870 g F .text 0000000000000001 __libc_csu_fini
+0000000000400fc0 g F .text 0000000000000034 mysecond
+401870: retq
+400fc0: sub $0x38,%rsp
+400fc4: lea 0x18(%rsp),%rsi
+400fc9: lea 0x20(%rsp),%rdi
+400fce: callq 4005a0 <gettimeofday@plt>
+400fd3: fildll 0x28(%rsp)
+400fd7: fmull 0xf63(%rip) # 401f40 <label+0x160>
+400fdd: fildll 0x20(%rsp)
+400fe1: faddp %st,%st(1)
+400fe3: fstpl 0x8(%rsp)
+400fe7: vbroadcastsd 0x8(%rsp),%zmm0
+400fef: add $0x38,%rsp
+400ff3: retq
+'''
+        debug = '''
+0000000000401cb0 g F .text 0000000000000001 __libc_csu_fini
+0000000000400fc0 g F .text 0000000000000032 mysecond
+401cb0: retq
+400fc0: sub $0x38,%rsp
+400fc4: lea 0x18(%rsp),%rsi
+400fc9: lea 0x20(%rsp),%rdi
+400fce: callq 4005a0 <gettimeofday@plt>
+400fd3: fildll 0x28(%rsp)
+400fd7: fmull 0xfa3(%rip) # 401f80 <label+0x160>
+400fdd: fildll 0x20(%rsp)
+400fe1: faddp %st,%st(1)
+400fe3: fstpl (%rsp)
+400fe6: vbroadcastsd (%rsp),%zmm0
+400fed: add $0x38,%rsp
+400ff1: retq
+'''
+        gate = self.triage.match_functions(frozen, debug)
+        self.assertEqual([f['name'] for f in gate['matched']], ['__libc_csu_fini'])
+        self.assertEqual(gate['rejected'], [dict(name='mysecond', reason='size differs')])
+        self.assertEqual(self.triage.translate_pcs([0x401870, 0x401871, 0x400fd7], gate),
+                         {0x401870: 0x401cb0})
+        # Equal symbol size alone cannot admit changed instructions/operands.
+        same_size = debug.replace('0000000000000032', '0000000000000034')
+        self.assertEqual(self.triage.match_functions(frozen, same_size)['rejected'],
+                         [dict(name='mysecond', reason='instructions differ')])
+        old = self.triage.function_dump(frozen)['mysecond']['instructions']
+        new = self.triage.function_dump(debug)['mysecond']['instructions']
+        self.assertEqual(old[5], new[5])  # relocated RIP-relative constant
+        # A multi-byte matching function maps interior PCs by symbol offset.
+        shifted = frozen.replace('400f', '500f')
+        gate = self.triage.match_functions(frozen, shifted)
+        self.assertEqual(self.triage.translate_pcs([0x400fd7, 0x400ff4], gate),
+                         {0x400fd7: 0x500fd7})
+
 
 if __name__ == '__main__':
     unittest.main()
