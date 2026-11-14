@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-14 14:00.
+Updated automatically at every ticket change. Last update: 2026-11-14 14:01.
 
-**Next: the tech lead, on S12-04.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: the tech lead, on S11-12.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[##################--]` 216 of 230
 
@@ -63,7 +63,7 @@ Current tickets: `[##################--]` 216 of 230
 | S11-09 | Memory bandwidth for LLM decode - a weight-streaming GEMV workload, pushed toward 264-299 GB/s of weight bytes | Done | Weight-streaming GEMV for LLM decode is measured on the card: int8 weights reach 70 billion weights/s (2.2x... |
 | S11-10 | S11-01 transfer runner - choose repetitions, sizes and load states per run, so slow methods fit a card turn | Done | The transfer runner now takes --repeats, --sizes, --loads and --concurrency so a slow method fits a card tu... |
 | S11-11 | M4 corpus run harness - every corpus program built by GCC 5.1.1 and GCC-KNC, run on the card with frozen inputs and a correctness check, in one command | Done | The M4 corpus harness builds 17 programs with GCC 5.1.1 and GCC-KNC and stages checked card runs; GCC-KNC b... |
-| S11-12 | Sprint 11 batch check - full native suite, x86 identity, forward-port drill, ICE sweeps, runtime prefix consistency | In progress | Yes: submit 437b2a35 with --override 'batch check: 1092 lines are research notes, drill record and the stag... |
+| S11-12 | Sprint 11 batch check - full native suite, x86 identity, forward-port drill, ICE sweeps, runtime prefix consistency | Waiting for review | 437b2a35: T0 56/T1 327 PASS; lead T2 7/7 PASS. Both ICE sweeps zero ICE. Refreshed drill complete: master 1... |
 | S11-13 | Senior compiler review of the Sprint 11-13 scope (Milestone M4) against our research, with recommended plan changes | Done | A senior compiler review of the Sprint 11-13 plan is in: M4 is plausible but needs a frozen scoring and mea... |
 | S11-14 | M4 scoring contract and measurement protocol, frozen before any tuning | Done | M4's scoring contract is frozen in ADR-0015 with a tested scorer: strict serial -O2 versus -O2 over 17 prog... |
 | S11-15 | First development-corpus baseline and profile, GCC 5.1.1 vs GCC-KNC at -O2 (E7-03 part 1) | Done | The M4 development baseline is written up in docs/research/m4-baseline.md: GCC-KNC vs GCC 5.1.1 paired -O2 ... |
@@ -255,6 +255,7 @@ Current tickets: `[##################--]` 216 of 230
 
 ## Recent activity
 
+- 2026-11-14 14:01 **S11-12** engineer submit: 437b2a35: T0 56/T1 327 PASS; lead T2 7/7 PASS. Both ICE sweeps zero ICE. Refreshed drill complete: master 14 conflicts, gcc-16 4; PR128640 reviewed...
 - 2026-11-14 14:00 **S12-18** engineer red: Commit 6a256a79. Host Cygwin regression: exp/log/pow each fail as expected after a timing transient; steady controls pass. Real driver accepts one ...
 - 2026-11-14 14:00 **S12-15** engineer ask: Ran submit as instructed; it refused because the committed survey has 848 changed lines against the 800-line budget. The tool permits --override on...
 - 2026-11-14 13:59 **S12-04** engineer red: Expected regression confirmed: test fails because generated monitor contains unsupported fractional sleep 0.01. Log: C:\Users\xuzhi\Documents\gcc_k...
@@ -262,7 +263,6 @@ Current tickets: `[##################--]` 216 of 230
 - 2026-11-14 13:58 **S12-06** lead answer: See the resume note: close as premise fails and submit.
 - 2026-11-14 13:49 **S12-15** lead answer: Lead: no rebase needed. submit only checks rebase for gcc: yes tickets; your diff is one new note and the lead merges. Run pm.py submit now as is.
 - 2026-11-14 13:49 **S12-06** lead resume: Lead 13:50: card result at .work/_shared/S12-06/card.stdout (S12_06_CHECK PASS, 3 pairs per case, cpu=240 label): GCC-KNC is equal or faster than G...
-- 2026-11-14 13:44 **S12-16** lead approve: Whole-system tuning playbook for the Z840 + Phi done: 13 ordered steps (BIOS, host Linux, card power/pages/service core, transfers, MPI, runtimes) ...
 
 ## Cost
 
