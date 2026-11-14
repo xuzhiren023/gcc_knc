@@ -1,5 +1,52 @@
 # M4 development baseline: S11-15
 
+## Review summary
+
+The qualified serial ranking below estimates CPU exposure, not measured
+removal. Estimated seconds are `A = primary KNC median * (sampled user CPU /
+sampled launch wall) * PC share`; the final column assumes a **hypothetical
+1.20x local speedup**, giving `A / 6` removable seconds. System, off-CPU and
+unsampled boundary time receive no gain. Proven removable time is **0 s**.
+
+| Rank | Disjoint region | Estimated CPU exposure, s | Conditional removal, s |
+| --- | --- | --- | --- |
+| 1 | NPB-EP scalar transform/call site | 51.174 | 8.529 |
+| 2 | NPB-EP log wrapper/internal path | 36.794 | 6.132 |
+| 3 | NPB-CG indexed reduction | 24.547 | 4.091 |
+| 4 | PB-ludcmp initialization | 10.985 | 1.831 |
+| 5 | NPB-EP random generation | 8.402 | 1.400 |
+| 6 | PB-ludcmp factorization reductions | 6.849 | 1.142 |
+| 7 | NPB-IS random generator | 5.169 | 0.862 |
+| 8 | STREAM vector loops | 4.289 | 0.715 |
+| 9 | NPB-IS rank bucket loop | 4.197 | 0.699 |
+| 10 | STREAM libc copy helper | 2.823 | 0.470 |
+| 11 | NPB-CG sparse setup search | 2.046 | 0.341 |
+| 12 | PB-gemm vector inner loop | 0.719 | 0.120 |
+
+Exclusions: NPB-MG serial remains pending S11-27; OpenMP profiles fail sample
+cadence qualification, and cholesky fails overhead qualification. Low-count
+profiles also receive no numerical gain. HPCG now has S11-28 equal-work
+results: GCC-KNC is about 1.8% slower across six serial pairs (two per
+profile), superseding the duration-based proxy. It still has no qualified
+profile and stays outside the removable-seconds sum. SQLite's donor uses
+the documented -O3 exception, so its comparison is not at equal flags.
+
+At most three Sprint 12 proof candidates, in priority order:
+
+1. Strict scalar FP conversions and call boundaries: EP transform/log plus
+   IS randlc, 93.137 s exposure; separate math from transfers before claiming
+   any compiler-removable cost.
+2. Indexed-load scheduling with strict sparse reduction: CG, 24.547 s
+   exposure; preserve index and accumulation order.
+3. Dependency-preserving scalar updates and locality: ludcmp initialization,
+   10.985 s exposure; retain setup work and per-element arithmetic order.
+
+These disjoint candidates imply only a conditional 11.70-21.44 s removal
+at local gains of 1.10-1.20x. They are bounded proof proposals, not forecast
+gains or an aggregate performance vote; correctness and paired A/B evidence
+must precede implementation selection. Detailed constraints and allowances
+appear under "Planning estimates and removable-time ranking" below.
+
 ## Evidence status
 
 The lead completed the S11-18 pilot at 2026-11-13 19:47Z. This report uses
@@ -21,7 +68,8 @@ attributed. The ranking below uses qualified serial CPU estimates and clearly
 marked local-speedup scenarios. OpenMP delivery loses 96.5-97.5% of the nominal
 sample cadence and cannot supply qualified wait seconds. Donor and restricted-
 profile sampling were waived by the lead; paired primary timings retain those
-comparisons. HPCG remains pending S11-28 and serial MG remains excluded.
+comparisons. The S11-28 fixed-work HPCG pilot now replaces its primary proxy;
+serial MG remains excluded.
 
 ## Completed batch and scope decisions
 
@@ -60,18 +108,20 @@ negative residuals are accounting-resolution uncertainty. Launcher minus
 interior wall is separately unsampled. OpenMP unused capacity is
 `wall * 60 - user - system`, not elapsed waiting time. No waiting fractions
 are inferred from low utilization alone. The lead accepted libc naming
-against the sysroot without a further card identity check. HPCG's rating
-proxy is pending S11-28 fixed work and contributes no removable seconds.
+against the sysroot without a further card identity check. HPCG's S11-28
+fixed-work rating supplies a primary comparison but, without a qualified
+profile, contributes no removable seconds.
 
 ## Primary pilot observations
 
 Each cell is **donor median / GCC-KNC median; median paired speedup [min, max]**.
-Durations are seconds, except HPCG, which reports the historical GFLOP/s rating
-from its existing stdout as directed by the lead. For latency, speedup is
+Durations are seconds, except HPCG, which reports S11-28's valid GFLOP/s rating
+for equal work from its existing stdout. For latency, speedup is
 `donor_seconds / knc_seconds`; for HPCG it is `knc_GFLOPs / donor_GFLOPs`.
 A value above one favors GCC-KNC. The paired median need not equal the ratio
 of the two marginal medians. Ranges cover the three observed pairs, not a
-confidence interval. Pair order was AB, BA, AB. These are pilot observations,
+confidence interval. Pair order was AB, BA, AB. HPCG instead has two pairs
+per profile (AB, BA), six across all profiles, from S11-28. These are pilot observations,
 not ADR-0015's six-pair gate, a regression decision, or a 17-program aggregate.
 
 Serial builds use donor `-O2` and GCC-KNC `-O2 -march=knc`. SQLite is explicitly
@@ -98,7 +148,7 @@ clock speed is not emulated. Keep profile observations separate.
 | NPB-EP | 106.69 / 97.394; **1.096x** [1.095, 1.096] | 106.68 / 97.41; **1.095x** [1.095, 1.096] | 106.68 / 97.372; **1.096x** [1.095, 1.096] |
 | NPB-MG | Excluded: 3/6 failed; S11-27 | Excluded: 3/6 failed; S11-27 | Excluded: 3/6 failed; S11-27 |
 | NPB-IS | 13.241 / 11.997; **1.104x** [1.104, 1.105] | 13.246 / 12.007; **1.105x** [1.102, 1.106] | 13.238 / 11.995; **1.104x** [1.104, 1.105] |
-| HPCG | 0.086358 / 0.085054; **0.985x** [0.983, 0.986] | 0.086383 / 0.084921; **0.983x** [0.982, 0.984] | 0.086362 / 0.084906; **0.982x** [0.981, 0.988] |
+| HPCG (S11-28 fixed work) | 0.086248 / 0.084613; **0.981x** [0.980, 0.982] | 0.086140 / 0.084593; **0.982x** [0.980, 0.984] | 0.086185 / 0.084722; **0.983x** [0.983, 0.983] |
 | zlib | 1.3176 / 1.251; **1.054x** [1.049, 1.055] | 1.3158 / 1.259; **1.051x** [1.042, 1.077] | 1.3191 / 1.2523; **1.053x** [1.050, 1.055] |
 | SQLite | 1.8412 / 1.7585; **1.038x** [1.030, 1.051] | 1.8328 / 1.7483; **1.048x** [1.037, 1.059] | 1.8327 / 1.7625; **1.048x** [1.032, 1.049] |
 
@@ -109,11 +159,16 @@ checks, including PolyBench's complete live-out comparison against the donor.
 That comparison is not an independent high-precision oracle; the harness's
 independent-reference follow-up remains a gate prerequisite.
 
-HPCG's requested-duration workload does not have equal work across compilers,
-so its launch-to-exit latency is excluded from performance comparisons.
-The historical throughput observations put GCC-KNC about 1.5-1.8% below the
-donor in the three profile medians. These are the lead-authorized pilot
-throughput proxy, not a substitute for S11-28's fixed-work scoring contract.
+HPCG now uses `.work/_shared/S11-28/results.jsonl` and its referenced stdout,
+with input `104x104x104`, requested time `rt=0`, and equal work in all six
+serial pairs: one set, 50 reference iterations and 51 optimized iterations.
+All 12 serial launches pass the collector. The reported metric is the valid
+GFLOP/s rating including convergence and optimization overhead, not the
+historical 2.4 rating or launch-to-exit latency. GCC-KNC ranges from
+0.084495 to 0.084728 GFLOP/s versus donor 0.086065 to 0.086263; the median
+paired ratio across the six pairs is 0.98263x, about 1.8% slower. The table
+keeps profiles separate; two pairs per profile do not establish a six-pair
+gate for any one profile. This replaces the requested-duration primary proxy.
 No HPCG removable wall seconds are inferred from the throughput ratio.
 
 Cholesky and CG show substantial across-pair spread, and ludcmp's 5100 range
@@ -122,6 +177,9 @@ The comparisons describe existing compilers; they do not validate the review's
 prospective gains from future GCC-KNC work.
 
 ## OpenMP side panel
+
+HPCG rows in this historical S11-18 panel retain the duration-based proxy;
+they are not S11-28 fixed-work results or qualified profiling evidence.
 
 **The donor toolchain has no OpenMP runtime.** These are GCC-KNC-only
 `-O2 -march=knc -fopenmp` observations, with one, two or four threads per
@@ -542,7 +600,7 @@ removal budget is inferred from instruction counts.
 | zlib | 124-byte slide_hash contains two scalar 27-byte loops with narrow loads/stores and conditional updates, no stack access. deflate_slow is 1,537 bytes and branch/call-heavy; sampled function extent does not isolate its spills or branch-misprediction cost. |
 | SQLite | sqlite3VdbeExec is 43,271 bytes with dispersed PCs; no single hot VM loop is established. The 85-byte sampled index-search envelope has an indirect comparator call and stack-held pointer arguments. This is address/call traffic, not evidence of a removable FP bridge. Spills across the large interpreter remain unquantified. |
 | NPB-MG | Serial invalid and unprofiled under S11-27; no serial code-cost claim. OpenMP function locations are described below, without qualified time attribution. |
-| HPCG | Both profiles omitted pending S11-28 fixed work; no hot-code or spill claim from the rating proxy. |
+| HPCG | Both profiling panels omitted; S11-28 now supplies equal-work throughput, but no hot-code or spill evidence. |
 
 ### OpenMP: observed wait/compute, unqualified time attribution
 
@@ -661,7 +719,7 @@ baseline measurement or donor-relative prediction.
 | NPB-EP | 1.05-1.28x | Scalar transform and log expose 87.968 s together; 1.20x on both would give 1.177x overall. Math, ABI and conversions cannot each claim this same budget. |
 | NPB-MG | 1.20-1.36x | Serial validity remains S11-27's gate. OpenMP passed workload checks but its profile failed cadence/overhead; no primary speed or removable-time credit. |
 | NPB-IS | 1.05-1.19x | randlc is 43.38% of delivered PCs, bucket loop 35.22%. 1.20x on randlc alone implies 1.077x overall; benchmark setup remains included. |
-| HPCG | 1.09-1.36x | Historical rating proxy only; pending S11-28 fixed work. Omitted from profiling panels and removable-seconds sum; no latency-based estimate. |
+| HPCG | 1.09-1.36x | S11-28 equal-work pilot: paired median 0.98263x across six pairs, about 1.8% slower than donor. Omitted from profiling panels and removable-seconds sum; no latency-based estimate or incremental gain credit. |
 | zlib | 1.10-1.20x | Deflate, slide_hash and inflate lead the 121-PC profile; scalar narrow loops are visible. Count is too low for a qualified gain. Optional PGO has no automatic credit. |
 | SQLite | 1.10-1.20x | VM 29.48%, distributed B-tree/sorter work; 173 PCs and 6.94% unknown libc PCs. Gain withheld; donor remains the documented -O3 exception. |
 
@@ -700,6 +758,11 @@ launch metadata, preserves collector failures and extracts HPCG historical
 ratings only from development captures. It emits pilot tables under
 `.work/_shared/S11-15/baseline-tables.md`, reproduced above. It does not run
 programs, modify the primary harness, rescore held-out programs or issue a vote.
+The primary HPCG row above supersedes that script's historical proxy using
+S11-28 results and referenced stdout. The corrected profile-keyed extraction
+is logged at `.work/_state/logs/S11_15_fixed_work_by_profile-20261114-075319.log`;
+the earlier extraction keyed only by compiler/run and overwrote profiles,
+so its summary statistics are discarded. No native run was repeated.
 
 ```powershell
 python tools/run.py --name S11-15-baseline --inputs tools/s11_15_baseline.py -- python tools/s11_15_baseline.py
