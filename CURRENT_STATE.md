@@ -147,6 +147,13 @@ M1 is accepted and tagged `m1` locally; nothing is pushed. Engineers are Claude 
 - **Restore target runtime files after replacing the GCC build tree.** `tools/toolchain.py gcc16` builds `all-gcc` only and removes the old tree, including `crtbegin.o`, `crtend.o` and `libgcc`. S3-04's first T2 regression therefore failed to link; `tools/toolchain.py libgcc` through `tools/run.py` restored the fork-built runtime, and the failed T2 checks then passed. Do this after a full rebuild before link checks.
 
 ## Open items not on a ticket
+
+- **Next card turn plan, owner 2026-11-13 19:55 EST: batch every job that can share the card. Owner approved the whole plan at 20:05 EST, the HPCG pilot included.** Card_run holds an exclusive lock, so batching means one combined card_run with cases pinned one per core, not concurrent card_runs.
+  - Round 1 (correctness only, cases pinned per core), chained with no gap: S11-27 `verify-card.py` (8 cases in one card_run, staged at 89a3657a), then S11-17 `controls/controls-lead.ps1` train phase (about 1 min). S11-17's run is its own card_run because its script fetches the .gcda profiles back; merging them would save about a minute.
+  - Round 2: S11-29 profile cases (one card_run per profile, per its ticket; HPCG at 224/236 threads fills the card).
+  - Round 3: S11-02 DMA validation, alone (it measures transfer rate), after PhiWeather's OK.
+  - Round 4: timed and exclusive, chained in one driver with no idle gaps: S11-17 controls timing, then the S11-28 HPCG pilot (4-7 h).
+  - Round 5: S11-12 batch check, its native suites run concurrently per core.
 - 2026-11-13 18:10 EST (lead): harness/hook_policy.py's 'hash' rule (anywhere: hashlib|file_digest) also blocks shell edits that remove digest code (S11-02, 17:31). Follow-up: when the command is a patch, match only added lines. For now engineers delete by line range.
 - 2026-11-13 16:55 EST (lead): Card turn ended; card handed back to PhiWeather ('done'), with no locks and the ledger closed. Results:
   - S11-17 zlib PGO, 30 pilot and 60 confirm launches, all correct: PGO/base +0.7-0.9% (confirm medians full 1.0084, 3100 1.0069, 5100 1.0094). Positive-control set next.
