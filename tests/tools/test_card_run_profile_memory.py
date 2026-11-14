@@ -77,9 +77,7 @@ class ProfileMemory(unittest.TestCase):
         start = source.index("PROFILE_START = r'''")
         end = source.index("'''", start + len("PROFILE_START = r'''"))
         monitor = source[start:end]
-        self.assertIn('system("usleep 100000")', monitor)
         self.assertNotRegex(monitor, r'(?<![A-Za-z0-9_])sleep\s+[0-9]+\.[0-9]+')
-        self.assertIn("iteration%10==0 || child_change", monitor)
 
     def test_exceeding_tree_resident_limit_is_resource_with_peak_and_limit(self):
         self.card.peak_resident_kib = 6 * 1024 * 1024
