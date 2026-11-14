@@ -64,7 +64,7 @@ start_job() {
     (trap '' HUP; exec sh ./claude-watchdog.sh "$run_dir" "$boot_id" "$job_limit") \
         > /dev/null 2>&1 < /dev/null &
     (trap '' HUP
-     (while [ ! -f memory-ready ]; do sleep 0.01; done
+     (while [ ! -f memory-ready ]; do usleep 10000 2>/dev/null || sleep 1; done
       exec ./claude-pin "$job_cpus" 0 ./claude-program "$@") &
      root=$!
      # Isolate claude-pin's marker from the program's exec-success marker.
@@ -91,6 +91,8 @@ start_job() {
          while (1) {
              f="/proc/sys/kernel/random/boot_id"; getline current < f; close(f)
              if (current!=boot) exit 92
+             fullscan=(!sampled || iteration%10==0 || child_change)
+             if (fullscan) {
              for (p in ids) delete ids[p]
              cmd="printf \047%s\\n\047 /proc/[0-9]*"
              while ((cmd | getline path)>0) {
@@ -106,6 +108,9 @@ start_job() {
              for (p in ids)
                  if (wrapped || p+0>=root+0) ids[p]=identity(p)
              sampled=1
+             } else {
+                 for (p in known) ids[p]=identity(p)
+             }
              # Discover grandchildren regardless of PID/directory ordering.
              do {
                  changed=0
@@ -115,12 +120,13 @@ start_job() {
                          known[p]=ids[p]; changed=1
                      }
              } while (changed)
-             rss=0; swap=0; live=0
+             rss=0; swap=0; live=0; children=0
              for (p in known) {
                  if (ids[p]!=known[p] || ids[p]=="" || state[p]=="Z") {
                      delete known[p]; continue
                  }
                  live++
+                 children++
                  f="/proc/" p "/status"
                  while ((getline line < f)>0) {
                      split(line,a,/[ \t]+/)
@@ -133,6 +139,9 @@ start_job() {
              if (rss+swap>peakmem) peakmem=rss+swap
              if (limit>0 && rss+swap>limit) exceeded=1
              report()
+             child_change=(children!=previous_children)
+             previous_children=children
+             iteration++
              if (exceeded) {
                  f="/proc/sys/kernel/random/boot_id"; getline current < f; close(f)
                  if (current!=boot) exit 92
@@ -143,7 +152,7 @@ start_job() {
              }
              if (!live) exit
              print "ready" > "memory-ready"; close("memory-ready")
-             system("sleep 0.1")
+             system("usleep 100000 2>/dev/null || sleep 1")
          }
      }') &
      reader=$!
