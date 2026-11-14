@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-14 15:35.
+Updated automatically at every ticket change. Last update: 2026-11-14 15:36.
 
 **Next: the tech lead, on S12-08.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
@@ -97,7 +97,7 @@ Current tickets: `[##################--]` 221 of 238
 | S12-14 | Audit GCC-KNC's tuning model and runtime defaults against the digested sources - every mismatch with a proposed change and its proof | Done | The lead now has a ranked audit in docs/research/s12-14-model-audit.md of 42 places where GCC-KNC tuning nu... |
 | S12-15 | Research - literature survey of published Xeon Phi (KNC) and Xeon Phi system research that matches our goals; what have we overlooked? | Done | Literature survey done: 30 groups of published Xeon Phi work ranked against our goals, with 14 overlooked i... |
 | S12-16 | Research - whole-system tuning playbook for the Z840 + Xeon Phi (BIOS, host OS, MPSS and card, transfers, runtimes), as HPC centres tuned Xeon + KNC systems | Done | Whole-system tuning playbook for the Z840 + Phi done: 13 ordered steps (BIOS, host Linux, card power/pages/... |
-| S12-17 | claude-torture -j N refuses to start in exclusive card runs (no inherited RLIMIT_AS since S11-29), so the execute suite cannot run | In progress | Lead raises input_tokens 2M -> 3M: all work is done (fix, red/green, rebuilt and linted binary); the lead s... |
+| S12-17 | claude-torture -j N refuses to start in exclusive card runs (no inherited RLIMIT_AS since S11-29), so the execute suite cannot run | Waiting for review | Fix 71cbcf86: an explicit --limit-mb permits -j N with unlimited RLIMIT_AS; no --limit-mb with unlimited bu... |
 | S12-18 | Double-precision vector exp, log and pow ran slower than scalar libm on the card (0.82x, 0.63x, 0.49x) - confirm with valid batches, then fix the library or stop the vectorizer calling them where they lose | lead | Needs interactive lead: (1) exclusive card turn running .work/_shared/S12-18/vmath-bench.mic at full, 3100 ... |
 | S12-19 | Profile-guided missed-vectorization triage - join hot loops with the vectorizer's reasons and observed strides/masks, so tuning targets what is hot and fixable | In progress | Lead: no card capture needed. GCC does not change generated code for -g. Rebuild each development program w... |
 | S12-20 | libknc_vmath accuracy and exception contract, with an independent validation design (rounding modes, special values, flags, scalar fallback) | draft |  |
@@ -263,6 +263,7 @@ Current tickets: `[##################--]` 221 of 238
 
 ## Recent activity
 
+- 2026-11-14 15:36 **S12-17** engineer submit: Fix 71cbcf86: an explicit --limit-mb permits -j N with unlimited RLIMIT_AS; no --limit-mb with unlimited budget still refuses. Red: t_s12_17_red-20...
 - 2026-11-14 15:35 **S12-17** owner decide: Lead raises input_tokens 2M -> 3M: all work is done (fix, red/green, rebuilt and linted binary); the lead submits it.
 - 2026-11-14 15:33 **S12-08** engineer submit: Closure documentation 7f2df59d submitted as is per lead. Phase-1 premise failed; no compiler change. Reproducers retained. Prior host build/lint PA...
 - 2026-11-14 15:32 **S12-17** engineer escalate: budget: 2208651 input tokens used; the budget is 2000000
@@ -270,7 +271,6 @@ Current tickets: `[##################--]` 221 of 238
 - 2026-11-14 15:31 **S12-08** lead answer: Submit now.
 - 2026-11-14 15:30 **S12-17** owner decide: Lead raises sessions 6 -> 7: the last raise made progress (green test passed); one session to rebuild the staged binary and submit.
 - 2026-11-14 15:30 **S12-08** lead resume: Lead: type is now research (negative result, no compiler change), so submit needs no red commit. Submit 7f2df59d as is.
-- 2026-11-14 15:28 **S12-04** lead approve: card_run's profile memory monitor no longer floods stderr and scans /proc far less often: it uses usleep with a sleep 1 fallback instead of the Bus...
 
 ## Cost
 
@@ -282,4 +282,4 @@ Current tickets: `[##################--]` 221 of 238
 
 ## Disk
 
-The project uses 32.6 GiB of 100 GiB. 142 GiB free on the drive.
+The project uses 32.7 GiB of 100 GiB. 141 GiB free on the drive.
