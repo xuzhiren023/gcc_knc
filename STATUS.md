@@ -1,10 +1,10 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-14 14:30.
+Updated automatically at every ticket change. Last update: 2026-11-14 14:39.
 
 **Waiting for you:** S12-04. Run `python tools/pm.py inbox`.
 
-Current tickets: `[##################--]` 218 of 234
+Current tickets: `[##################--]` 219 of 237
 
 ## Milestones
 
@@ -14,7 +14,7 @@ Current tickets: `[##################--]` 218 of 234
 | M1 | Mixed native code | Done | 43 of 43 tickets |
 | M2 | Useful vector target | Done | 51 of 51 tickets |
 | M3 | Runtimes | Done | 48 of 48 tickets |
-| M4 | Broad optimization | In progress | 36 of 52 tickets |
+| M4 | Broad optimization | In progress | 37 of 55 tickets |
 | M5 | Program corpus | Not started | Not planned in detail yet |
 | M6 | Release | Not started | Not planned in detail yet |
 
@@ -95,12 +95,15 @@ Current tickets: `[##################--]` 218 of 234
 | S12-12 | Stage S12-10's residual-gap card experiments as one combined Sprint 12 diagnostic batch (PMU access, prefetch, page backing, libm route, branches, allocator) | Done | The six follow-up card experiments (counter access, prefetch, page backing, libm route, branches, allocator... |
 | S12-13 | Digest the S12-10 sources into our knowledge base - correct our KNC notes, build a reference index, and list what our practice should change | Done | The project now has a numbered KNC reference index (R01-R27), corrected KNC notes that cite source pages an... |
 | S12-14 | Audit GCC-KNC's tuning model and runtime defaults against the digested sources - every mismatch with a proposed change and its proof | Done | The lead now has a ranked audit in docs/research/s12-14-model-audit.md of 42 places where GCC-KNC tuning nu... |
-| S12-15 | Research - literature survey of published Xeon Phi (KNC) and Xeon Phi system research that matches our goals; what have we overlooked? | Waiting for review | Survey committed at 61ecb62e: docs/research/phi-literature-survey.md, 30 ranked source groups. Document che... |
+| S12-15 | Research - literature survey of published Xeon Phi (KNC) and Xeon Phi system research that matches our goals; what have we overlooked? | Done | Literature survey done: 30 groups of published Xeon Phi work ranked against our goals, with 14 overlooked i... |
 | S12-16 | Research - whole-system tuning playbook for the Z840 + Xeon Phi (BIOS, host OS, MPSS and card, transfers, runtimes), as HPC centres tuned Xeon + KNC systems | Done | Whole-system tuning playbook for the Z840 + Phi done: 13 ordered steps (BIOS, host Linux, card power/pages/... |
 | S12-17 | claude-torture -j N refuses to start in exclusive card runs (no inherited RLIMIT_AS since S11-29), so the execute suite cannot run | In progress | Do not amend or split 71cbcf86. Instead prove red: temporarily check out tools/claude-torture.c from main (... |
 | S12-18 | Double-precision vector exp, log and pow ran slower than scalar libm on the card (0.82x, 0.63x, 0.49x) - confirm with valid batches, then fix the library or stop the vectorizer calling them where they lose | In progress | A host test now reproduces the short vmath benchmark batches: the calibration accepts one slow early sample... |
 | S12-19 | Profile-guided missed-vectorization triage - join hot loops with the vectorizer's reasons and observed strides/masks, so tuning targets what is hot and fixable | In progress |  |
 | S12-20 | libknc_vmath accuracy and exception contract, with an independent validation design (rounding modes, special values, flags, scalar fallback) | draft |  |
+| S12-21 | Scheduling model for M4's serial runs - measure density-1 tuning and the integer-multiply cost against today's density-4 defaults (S12-14 B02, B04, B05) | Not started |  |
+| S12-22 | Low-risk corrections from the S12-14 audit - wrong comments and citations (N01-N09) and the far-prefetch-distance range bug (B10) | Not started |  |
+| S12-23 | Floating-point environment correctness on KNC - fix the underflow probe that cannot tell flushing from rounding, and handle x87 erratum CD28 (S12-14 N06, N07, B16, B17) | Not started |  |
 | S13-01 | M4 final gate - stage the ADR-0015 gate run at the final head (17 programs, held-out unsealed, six pairs, three profiles) | draft |  |
 | S13-02 | Libgomp per-region thread density - choose 1-4 workers per core per parallel region instead of once per program | draft |  |
 | S13-03 | M4 retrospective - what we did wrong, what worked, and the practice changes carried into the next milestone and the agent-team skill | draft |  |
@@ -259,6 +262,7 @@ Current tickets: `[##################--]` 218 of 234
 
 ## Recent activity
 
+- 2026-11-14 14:39 **S12-15** lead approve: Literature survey done: 30 groups of published Xeon Phi work ranked against our goals, with 14 overlooked ideas; the compiler ones are now tickets,...
 - 2026-11-14 14:30 **S12-04** engineer escalate: budget: 3 engineer sessions used; the budget is 3
 - 2026-11-14 14:29 **S12-06** engineer submit: Restored .gitignore to main in 66ef8806 as requested; tracked assembly control retained. Phase-one results and premise-fails conclusion remain at a...
 - 2026-11-14 14:28 **S12-14** lead approve: The lead now has a ranked audit in docs/research/s12-14-model-audit.md of 42 places where GCC-KNC tuning numbers, runtime defaults or comments disa...
@@ -266,13 +270,12 @@ Current tickets: `[##################--]` 218 of 234
 - 2026-11-14 14:28 **S11-26** lead answer: Lead 14:30: fresh tree at .work/_shared/wrf-trial/src/WRF-4.8.0-smpar (WRF v4.8.0 06d4240a + 7 pinned phys submodules, 441 MB, 5,589 files; provena...
 - 2026-11-14 14:17 **S12-06** lead answer: Lead: do not change .gitignore. Restore it (git checkout main -- .gitignore), commit, and submit. tools/s12_06_controls.S is already tracked at 6de...
 - 2026-11-14 14:16 **S11-26** engineer ask: All four installed-prefix reproducers PASS without overrides: rtrn/sfclay1d at -O2 -march=knc; kfcps/advance_uv at WRF phinix/OpenMP flags. Log: .w...
-- 2026-11-14 14:15 **S12-14** engineer submit: Delivered docs/research/s12-14-model-audit.md at 67df0e91: 42 ranked findings (9 wording/citation fixes, 23 measurement/qualification rows, 10 keep...
 
 ## Cost
 
-- From the script, engineer: 596 sessions, 1216.8M input tokens
+- From the script, engineer: 597 sessions, 1220.1M input tokens
 - From the script, lead: 394 sessions, 109.2M input tokens
-- Started by hand, Claude: 12 sessions, 3176.3M input tokens
+- Started by hand, Claude: 12 sessions, 3178.0M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
