@@ -1,10 +1,10 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-14 09:08.
+Updated automatically at every ticket change. Last update: 2026-11-14 09:09.
 
 **Next: the tech lead, on S11-17.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
-Current tickets: `[###################-]` 209 of 216
+Current tickets: `[###################-]` 210 of 216
 
 ## Milestones
 
@@ -14,7 +14,7 @@ Current tickets: `[###################-]` 209 of 216
 | M1 | Mixed native code | Done | 43 of 43 tickets |
 | M2 | Useful vector target | Done | 51 of 51 tickets |
 | M3 | Runtimes | Done | 48 of 48 tickets |
-| M4 | Broad optimization | In progress | 27 of 34 tickets |
+| M4 | Broad optimization | In progress | 28 of 34 tickets |
 | M5 | Program corpus | Not started | Not planned in detail yet |
 | M6 | Release | Not started | Not planned in detail yet |
 
@@ -79,7 +79,7 @@ Current tickets: `[###################-]` 209 of 216
 | S11-25 | ICE in do_store_flag (expr.cc) on WRF's surface layer (SFCLAY1D) at -O2 -march=knc | Done | The last WRF file that crashed GCC-KNC (surface layer, SFCLAY1D) now compiles: vector 'ordered and not equa... |
 | S11-26 | WRF OpenMP build at -mphinix with no per-file workarounds (S11-23 and S11-25 fixed), restaged for PhiWeather | draft | Owner 2026-11-13: the S11-24 WRF build is removed. Deleted: |
 | S11-27 | Wrong code - NPB-MG (class A, serial) built by GCC-KNC at -O2 -march=knc fails NPB verification on the card | Done | NPB-MG built by GCC-KNC at -O2 -march=knc now verifies on the card (class A in 14.1 s, against 33.8 s for G... |
-| S11-28 | HPCG run that fits every card model - fixed work instead of fixed duration, grid sized to the 3100's memory | Waiting for review | Acceptance complete: red 75ce3838, green ede7b91c. Lead memory diagnosis supports 104 cubed, rt=0. Native p... |
+| S11-28 | HPCG run that fits every card model - fixed work instead of fixed duration, grid sized to the 3100's memory | Done | HPCG now runs a fixed amount of work (one CG set on the 104-cubed grid) that passes on the full card, 3100 ... |
 | S11-29 | card_run profiles limit memory in use, not address space, so a 3100 or 5100 run fails only where the real card would | Done | Under --profile 3100 and 5100, card_run now limits the memory a job actually uses (sampled resident plus sw... |
 | S12-01 | Sprint 12 prep - static code-quality census of the development-corpus builds (spills, x87/vector transfers, addressing, calls, code size) | Done | A static code-quality census (spill/reload proxies, x87 and x87-zmm traffic, address arithmetic, calls, bra... |
 | S12-02 | Sprint 12 prep - the unscored generality check set (S11-20's six programs in the code styles our corpus lacks) | Done | The six unscored generality checks (Q1-Q6: ray tracer hit dispatch and vec3 AoS, Burkardt MD, Reference BLA... |
@@ -241,6 +241,7 @@ Current tickets: `[###################-]` 209 of 216
 
 ## Recent activity
 
+- 2026-11-14 09:09 **S11-28** lead approve: HPCG now runs a fixed amount of work (one CG set on the 104-cubed grid) that passes on the full card, 3100 and 5100 profiles, and the harness rejec...
 - 2026-11-14 09:08 **S11-17** engineer submit: 6ba8ddd6 contains main (lead merge). tools/check t0 PASS, 56 tests; log .work/_state/logs/check_donor_t0-20261114-085440.log. Prior T1 5/5 green; l...
 - 2026-11-14 08:54 **S11-28** engineer submit: Acceptance complete: red 75ce3838, green ede7b91c. Lead memory diagnosis supports 104 cubed, rt=0. Native pilot: 30/30 effective VALID/sets=1; six ...
 - 2026-11-14 08:51 **S11-17** lead answer: Yes, main is the target for gcc: no. A rebase conflicts in docs/research/s9-18-pgo.md on every commit, so the lead merged main into s11/S11-17 inst...
@@ -248,16 +249,15 @@ Current tickets: `[###################-]` 209 of 216
 - 2026-11-14 08:48 **S11-28** lead answer: finalize-pilot.py ran 2026-11-14 08:46 EST at aad1ae22 from the S11-28 worktree: PASS, log .work/_state/logs/S11_28_finalize_pilot-20261114-084648....
 - 2026-11-14 08:47 **S11-28** lead resume: Lead ran finalize-pilot at 08:46 EST: results in the answer.
 - 2026-11-14 08:43 **S11-28** lead defer: Needs the interactive lead (write access to .work/_shared/S11-28/): from repo root at aad1ae22 run the staged finalize-pilot.py so results.jsonl ke...
-- 2026-11-14 08:42 **S11-17** lead defer: Interactive lead at 8601f1fb, S11-17 worktree. Yes, main is the target for gcc: no (knc applies only to the gcc tree). The engineer cannot write .g...
 
 ## Cost
 
 - From the script, engineer: 567 sessions, 1149.3M input tokens
 - From the script, lead: 375 sessions, 104.7M input tokens
-- Started by hand, Claude: 12 sessions, 3097.5M input tokens
+- Started by hand, Claude: 12 sessions, 3097.7M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 31.7 GiB of 100 GiB. 144 GiB free on the drive.
+The project uses 31.7 GiB of 100 GiB. 145 GiB free on the drive.
