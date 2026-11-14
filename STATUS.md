@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-14 00:18.
+Updated automatically at every ticket change. Last update: 2026-11-14 00:19.
 
 **Next: the tech lead, on S11-15.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
@@ -68,7 +68,7 @@ Current tickets: `[###################-]` 205 of 213
 | S11-14 | M4 scoring contract and measurement protocol, frozen before any tuning | Done | M4's scoring contract is frozen in ADR-0015 with a tested scorer: strict serial -O2 versus -O2 over 17 prog... |
 | S11-15 | First development-corpus baseline and profile, GCC 5.1.1 vs GCC-KNC at -O2 (E7-03 part 1) | Question for the tech lead | 75976eb9: attribution/report done. 521 PCs; GEMM loop 82.56-86.21%; overhead median 0.361%. Log .work/_stat... |
 | S11-16 | Long-double libm hazard audit - do other MPSS long double entry points fault like cbrtl? (E7-21, bounded) | Done | The card's MPSS long double libm was probed on the card: of 12 entry points only cbrtl faults, and S10-13 a... |
-| S11-17 | PGO feasibility on one complete development program (reuse of S9-18's train/use path) | lead | Needs the interactive lead's card run at 82be2cbc, from the S11-17 worktree: python tools/run.py --name S11... |
+| S11-17 | PGO feasibility on one complete development program (reuse of S9-18's train/use path) | Question for the tech lead | Lead ran control training at 00:12 EST: results in the answer. |
 | S11-18 | M4 corpus harness v2 - card profiles, prefix record, held-out sealing, stronger checks, and the donor-failure rule | Done | The M4 corpus harness now stages all 17 programs for the 7120 and the 3100/5100 profiles with serial voting... |
 | S11-19 | Second senior review - the M4 definition and the Sprint 11-13 roadmap, adjusted | Done | The M4 definition and the Sprint 11-13 roadmap are rewritten as measure, improve, decide, each sprint with ... |
 | S11-20 | Research - which compiler optimizations benefit the widest range of real code on KNC, from professional to amateur, and does our corpus cover it? | Done | We now have a code-style coverage study (docs/research/code-style-coverage.md) that ranks Sprint 12 candida... |
@@ -238,6 +238,7 @@ Current tickets: `[###################-]` 205 of 213
 
 ## Recent activity
 
+- 2026-11-14 00:19 **S11-17** lead resume: Lead ran control training at 00:12 EST: results in the answer.
 - 2026-11-14 00:18 **S11-15** engineer ask: 75976eb9: attribution/report done. 521 PCs; GEMM loop 82.56-86.21%; overhead median 0.361%. Log .work/_state/logs/S11_15_attribution-20261114-00130...
 - 2026-11-14 00:17 **S11-27** lead answer: Card round at 89a3657a ran 2026-11-14 00:11 EST, one card_run, 0.6 card-min, log .work/_shared/S11-27/verify-card.log. All 8 pass: MG S-O2, S-noslp...
 - 2026-11-14 00:15 **S11-29** engineer ask: Red commit 36b48b4e exposes AS caps, missing peaks/resource classification; full/exclusive regression passes. Log .work/_state/logs/S11_29_red-2026...
@@ -245,7 +246,6 @@ Current tickets: `[###################-]` 205 of 213
 - 2026-11-14 00:12 **S11-29** lead note: Lane moved from tools to tools-mem so this starts now instead of waiting behind S11-02 (lead state, card round tonight). Both change tools/card_run...
 - 2026-11-13 20:35 **S11-27** lead defer: Needs the interactive lead's card turn (PhiWeather has the card until about 04:30 EST 2026-11-14). Run python .work/_shared/S11-27/verify-card.py a...
 - 2026-11-13 20:32 **S11-27** engineer ask: Card round ready at 89a3657a: run python .work/_shared/S11-27/verify-card.py; post verification/L2 or PASS/FAIL per CASE. All 8 rebuilt with lane-g...
-- 2026-11-13 20:27 **S11-27** owner decide: Budget raised by the lead under the owner's standing rule (2026-11-09/10: the lead extends session and token budgets itself; ask only after two ext...
 
 ## Cost
 
