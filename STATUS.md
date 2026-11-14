@@ -1,10 +1,10 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-14 16:14.
+Updated automatically at every ticket change. Last update: 2026-11-14 16:22.
 
-**Next: the tech lead, on S12-19.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: the tech lead, on S12-21.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
-Current tickets: `[##################--]` 223 of 239
+Current tickets: `[##################--]` 224 of 240
 
 ## Milestones
 
@@ -14,7 +14,7 @@ Current tickets: `[##################--]` 223 of 239
 | M1 | Mixed native code | Done | 43 of 43 tickets |
 | M2 | Useful vector target | Done | 51 of 51 tickets |
 | M3 | Runtimes | Done | 48 of 48 tickets |
-| M4 | Broad optimization | In progress | 41 of 57 tickets |
+| M4 | Broad optimization | In progress | 42 of 58 tickets |
 | M5 | Program corpus | Not started | Not planned in detail yet |
 | M6 | Release | Not started | Not planned in detail yet |
 
@@ -99,13 +99,14 @@ Current tickets: `[##################--]` 223 of 239
 | S12-16 | Research - whole-system tuning playbook for the Z840 + Xeon Phi (BIOS, host OS, MPSS and card, transfers, runtimes), as HPC centres tuned Xeon + KNC systems | Done | Whole-system tuning playbook for the Z840 + Phi done: 13 ordered steps (BIOS, host Linux, card power/pages/... |
 | S12-17 | claude-torture -j N refuses to start in exclusive card runs (no inherited RLIMIT_AS since S11-29), so the execute suite cannot run | Done | The parallel execute-suite runner starts again in exclusive card runs: claude-torture -j N with an explicit... |
 | S12-18 | Double-precision vector exp, log and pow ran slower than scalar libm on the card (0.82x, 0.63x, 0.49x) - confirm with valid batches, then fix the library or stop the vectorizer calling them where they lose | lead | Needs interactive lead: (1) exclusive card turn running .work/_shared/S12-18/vmath-bench.mic at full, 3100 ... |
-| S12-19 | Profile-guided missed-vectorization triage - join hot loops with the vectorizer's reasons and observed strides/masks, so tuning targets what is hot and fixable | Waiting for review | 501aa8bf: function gate/offset mapping; 11 host tests pass; analyze/report done. Coverage 1715/15109 (11.35... |
+| S12-19 | Profile-guided missed-vectorization triage - join hot loops with the vectorizer's reasons and observed strides/masks, so tuning targets what is hot and fixable | Done | tools/vec_triage.py now ranks each development program's hot loops by sampled time with GCC's vectorizer ve... |
 | S12-20 | libknc_vmath accuracy and exception contract, with an independent validation design (rounding modes, special values, flags, scalar fallback) | draft |  |
 | S12-21 | Scheduling model for M4's serial runs - measure density-1 tuning and the integer-multiply cost against today's density-4 defaults (S12-14 B02, B04, B05) | Question for the tech lead | Recovery complete at 0711ba08: fresh r2, four contracts and all 28 builds/lints plus IMUL/launcher/package ... |
 | S12-22 | Low-risk corrections from the S12-14 audit - wrong comments and citations (N01-N09) and the far-prefetch-distance range bug (B10) | In progress | Do both, in one change: (a) knc-prefetch-l2-distance IntegerRange(2, 4096) in i386.opt; (b) in the KNC opti... |
 | S12-23 | Floating-point environment correctness on KNC - fix the underflow probe that cannot tell flushing from rounding, and handle x87 erratum CD28 (S12-14 N06, N07, B16, B17) | Not started |  |
 | S12-24 | ICE in vect_transform_stmt (tree-vect-stmts.cc:13381) on WRF's REMEZ at -mphinix (-O3 -march=knc) | Not started |  |
 | S12-25 | WRF smpar build arm with --param=knc-threads-per-core=2 for PhiWeather's 2-threads-per-core runs (A/B against S11-26's default-4 build) | Not started |  |
+| S12-26 | WRF hot scalar routines - classify with the S12-19 triage tool and stage bitwise-safe per-file flag arms for PhiWeather to time | draft |  |
 | S13-01 | M4 final gate - stage the ADR-0015 gate run at the final head (17 programs, held-out unsealed, six pairs, three profiles) | draft |  |
 | S13-02 | Libgomp per-region thread density - choose 1-4 workers per core per parallel region instead of once per program | draft |  |
 | S13-03 | M4 retrospective - what we did wrong, what worked, and the practice changes carried into the next milestone and the agent-team skill | draft |  |
@@ -264,6 +265,7 @@ Current tickets: `[##################--]` 223 of 239
 
 ## Recent activity
 
+- 2026-11-14 16:22 **S12-19** lead approve: tools/vec_triage.py now ranks each development program's hot loops by sampled time with GCC's vectorizer verdict and reason, but only 11% of profil...
 - 2026-11-14 16:14 **S12-22** lead answer: Do both, in one change: (a) knc-prefetch-l2-distance IntegerRange(2, 4096) in i386.opt; (b) in the KNC option override, if l1 >= l2 after both are ...
 - 2026-11-14 16:13 **S12-22** engineer ask: Reduced reproducer: the shared gcc-2 build currently accepts --param=knc-prefetch-l2-distance=1 (i386.opt has IntegerRange(1, 4096)); l1 also permi...
 - 2026-11-14 16:13 **S12-21** engineer ask: Recovery complete at 0711ba08: fresh r2, four contracts and all 28 builds/lints plus IMUL/launcher/package checks pass. Logs: .work/_state/logs/s12...
@@ -271,13 +273,12 @@ Current tickets: `[##################--]` 223 of 239
 - 2026-11-14 16:11 **S12-22** owner decide: Lead raises input_tokens 2M -> 6M (second raise; tokens went to the wrong-parameter round caused by the ticket). If it stalls again the lead asks t...
 - 2026-11-14 16:10 **S12-22** engineer escalate: budget: 2039970 input tokens used; the budget is 2000000
 - 2026-11-14 16:10 **S12-22** owner decide: Lead raises sessions 2 -> 4: both sessions were lost to the lead's wrong parameter name in the ticket (now fixed).
-- 2026-11-14 16:09 **S12-22** engineer escalate: budget: 2 engineer sessions used; the budget is 2
 
 ## Cost
 
 - From the script, engineer: 626 sessions, 1260.0M input tokens
-- From the script, lead: 408 sessions, 113.0M input tokens
-- Started by hand, Claude: 12 sessions, 3231.9M input tokens
+- From the script, lead: 409 sessions, 113.2M input tokens
+- Started by hand, Claude: 12 sessions, 3237.9M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
