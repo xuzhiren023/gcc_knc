@@ -14,11 +14,104 @@ The 2026-11-13 14:47 EST profiling attempt failed because the card has no
 The replacement SIGPROF pilot completed on the card; host attribution is now
 available from `.work/_state/logs/S11_15_profile_sigprof-20261113-150906.log`.
 It identifies PB-gemm's vector inner loop as the dominant sampled region.
-Capture, overhead and CPU-accounting gates pass. Library naming is conditional
-on the local sysroot ELF matching the card, and CPU samples are not qualified
-wall-time fractions. No corpus-wide removable-time ranking or S12 implementation
-theme is established: the other 13 development programs, donor profiles,
-restricted-profile samples and OpenMP wait/compute profiles remain absent.
+Capture, overhead and CPU-accounting gates pass. The lead's 2026-11-14 00:23
+decision accepts the sysroot libc naming and bounded CPU-share estimates;
+these are not measured wall-time fractions. The remaining authorized batch
+is staged below. No corpus-wide removable-time ranking or S12 implementation
+theme is established yet. Donor and restricted-profile sampling are no longer
+required; paired primary timings already cover those comparisons.
+
+## Current handoff: development profiling batch
+
+The 2026-11-14 lead decision supersedes the pilot's module-identity and
+wall-fraction blockers. Name the libc rows **named against sysroot libc**;
+the accepted name/version and executable-segment extent checks require no
+card identity check. Estimate region CPU seconds as each launch's sample
+share times its measured user CPU seconds. Report system CPU and off-CPU
+time separately as unassigned, along with unsampled timing boundaries.
+For serial runs, off-CPU residual is `max(0, wall - user - system)`; retain
+any negative residual as accounting-resolution uncertainty rather than
+silently treating the accounting as exact. For OpenMP, report user and
+system CPU seconds and `user / (wall * threads)`; the analogous unused
+capacity residual is not a measurement of elapsed wait time. Process CPU
+seconds summed across workers can exceed wall seconds.
+
+`tools/s11_15_batch.py stage` stages 12 serial programs: PB-atax,
+PB-cholesky, PB-ludcmp, PB-jacobi-2d, PB-heat-3d, STREAM, NPB-CG, NPB-EP,
+NPB-IS, HPCG, zlib and SQLite. PB-gemm already has its accepted pilot;
+NPB-MG serial stays excluded pending S11-27. It also stages all six existing
+OpenMP builds (STREAM, NPB-CG, NPB-EP, NPB-MG, NPB-IS and HPCG), with one
+worker per compute core. Every workload uses the unchanged S11-18 GCC-KNC
+strict -O2 binary and original input. The zlib donor decoder remains only
+as the harness correctness check. No donor profiling or held-out input is
+staged or opened.
+
+The batch contains **36 launches**, one plain followed by one sampled
+launch per build, on the full 7120 allocation (240 granted CPUs, 60 cores;
+one selected CPU for serial or 60 for OpenMP). Each separate `card_run`
+has a **600-second cap**. Plan about 30 minutes of card time, subject to
+queue/transfer overhead; the worst-case sum of caps is six hours, not a
+30-minute batch timeout. Each launch is subject to normal card coordination.
+The lead script stops on a failed launch or correctness/capture check;
+there are no automatic retries. Successful output is not yet a qualified
+profile or a replacement for the primary pilot timings.
+
+The same 10 ms process-wide ITIMER_PROF method now uses lock-free atomic
+slot reservation: simultaneous worker handlers cannot overwrite each other's
+PCs. Shutdown disables the timer, closes admission and drains admitted
+handlers before reading the buffer. The bounded buffer holds four million
+PC/TID pairs (48 MB BSS); overflow is explicit. Worker TIDs are recorded
+to expose observed delivery coverage. No handler allocation, symbol lookup
+or I/O is added. The separate `profile-batch.so` preserves the old pilot DSO
+and returned pilot evidence. Native concurrency/coverage is still untested.
+
+The launcher and primary correctness checks are reused. Complete PolyBench
+live-outs are retained and compared exactly between plain and sampled runs;
+NPB, STREAM, HPCG, SQLite and zlib retain their existing validations. Captures
+use fixed paths in `.work/_shared/S11-15/batch-capture/`, overwritten on an
+explicit rerun, and are kept out of git. Existing corpus binaries are not
+copied or rebuilt. Only the diagnostic DSO is built and linted on the host.
+
+Stage on the host (already run for this handoff):
+
+```powershell
+python tools/run.py --name S11-15-batch-stage --inputs tools/s11_15_batch.py tools/corpus/profile-batch.sh tools/corpus/profile-sigprof.c -- python tools/s11_15_batch.py stage
+```
+
+Host staging passed (exit 0): sampler build/lint/runtime dependencies, shell
+syntax and all 18 file lists. Log:
+`.work/_state/logs/S11_15_batch_stage-20261114-004142.log`.
+No native batch launch, coverage test or overhead qualification has run.
+
+Lead-only command from the main checkout:
+
+```powershell
+python tools/run.py --name S11-15-profile-batch -- powershell -NoProfile -File .work\_shared\S11-15\lead.ps1
+```
+
+From this worktree use `..\_shared\S11-15\lead.ps1` instead. Return the
+wrapper log and the fixed batch-capture directory through the ticket.
+`lead.ps1` now runs this batch, replacing the historical pilot entry point.
+
+After return, attribute each launch against its own maps, frozen executable
+and runtime DSOs; retain unknown PCs in the denominator. Classify libgomp
+spin/barrier/wait functions as sampled wait and other named functions as
+compute; keep unknowns separate. Blocking waits consume little CPU and
+cannot be inferred from a CPU-sample wait fraction. Report observed TID
+coverage, sample cadence against process CPU accounting, sample count and
+plain/sample overhead per build. Process-directed standard signals can
+coalesce and favor particular workers; the serial cadence qualification
+does not establish OpenMP representativeness. Flag deficient coverage or
+cadence rather than treating the observed split as an unbiased wall share.
+One sampled launch of a short program may have few PCs; report that limit
+without silently scheduling repetitions beyond the authorized batch.
+
+Combine accepted CPU estimates with the existing pilot medians for a
+bounded opportunity ranking, with unassigned costs and overlap explicit.
+A region's estimated CPU seconds are an upper bound on attributable work,
+not evidence that all of it is removable. HPCG remains the historical
+rating proxy **pending S11-28 fixed work** and stays outside the
+removable-seconds sum. Do not wait for S11-28 to complete this report.
 
 ## Primary pilot observations
 
@@ -146,7 +239,7 @@ pass the existing collector checks. Runtime wait versus compute is unmeasured.
 | STREAM | 7120 | 120 | 0.65536 [0.65135, 0.66263] | 3/3 collector pass |
 | STREAM | 7120 | 240 | 0.7662 [0.76449, 0.78548] | 3/3 collector pass |
 
-## Replacement profiling-method pilot
+## Replacement profiling-method pilot (completed history)
 
 `tools/s11_15_profile.py` builds `profile-sigprof.so` with the installed
 GCC-KNC prefix, lints it, checks its dynamic dependencies, and stages it under
@@ -208,7 +301,11 @@ all-CPU parallelization. Return the wrapper log path through S11-15. All
 PROFILE sections, launcher timings and affinity records are returned in that
 log. No card job was started by the engineer.
 
-## Qualification after the lead run
+## Original pilot qualification rules
+
+These describe the completed serial pilot. The current handoff above records
+the lead's subsequent exceptions for libc naming and CPU-share estimates;
+the old wall-share blocker is not a prerequisite for the new batch.
 
 1. Require all 12 successful exits, matching affinity and complete live-outs,
    six sampler completion markers and no PROFILE_BLOCKED output. Keep each
@@ -278,12 +375,13 @@ containment in sized dynamic text symbols from `nm -D -S` names the 55 libc
 PCs in the sysroot's `libc-2.21.so`; the staged disassembly identifies the two
 exact PLT entry addresses. No nearest-symbol interpolation is used.
 
-**Runtime identity qualification remains open.** The card reports glibc 2.21
+The card reports glibc 2.21
 and maps `/lib64/libc-2.21.so`; the local ELF has that version/name and compatible
-executable segment extent. These facts do not prove identical code. The table's
-libc names are conditional on that match. Unknowns are 0/521 with that condition,
-or 55/521 (10.557%, above the 5% gate) if card library identity is unresolved.
-The main-executable hot-region result does not depend on this condition.
+executable segment extent. The lead accepted these checks on 2026-11-14;
+the libc rows are named against sysroot libc. There are 0/521 unnamed PCs
+under that accepted convention. The 55 libc PCs (10.557%) no longer block
+qualification. The main-executable hot-region result is independent of
+library naming.
 
 | Region/function | Samples | Pooled conditional PC share | Per-launch share range |
 | --- | --- | --- | --- |
@@ -309,9 +407,11 @@ timer/accounting resolution and unscheduled time are not separated. System
 time itself is 1.112-3.395% of interior wall time. SIGPROF can attribute a
 kernel interval to its user return PC. The further 10.991-11.731 ms outside
 the interior includes launch, loading and sampler output, with no measured
-split. Consequently **84.261% is not an established wall-time fraction**;
-neither multiplying it by the primary 0.89267 seconds nor interpreting the
-result as removable time passes the existing wall-attribution gate.
+split. Consequently **84.261% is not an established wall-time fraction**.
+Per the lead's updated rule, use each run's loop share times its user CPU
+seconds as an estimate; keep system, residual and boundary time unassigned.
+This supplies bounded CPU evidence for ranking without claiming that every
+second in the vector loop can be removed.
 
 ### Code properties at the sampled PB-gemm region
 
@@ -338,8 +438,10 @@ prefetch change: delivery bias and neighboring execution remain possible.
 ## Planning estimates and removable-time ranking
 
 PB-gemm now has a dominant sampled loop, code size and bridge/spill inspection;
-its wall share and removable cost remain unqualified. The other 13 programs
-still lack sampled functions/loops, hot code sizes and measured costs. All
+its bounded CPU-share estimate is admitted, while removable cost remains
+unestimated. Twelve other serial programs await the staged batch; NPB-MG
+serial remains excluded. These programs lack sampled functions/loops,
+hot code sizes and measured costs. All
 OpenMP wait-versus-compute splits remain unknown. The review ranges below
 are future-work scenarios, not predictions validated by donor comparisons.
 Every program's admitted prospective gain remains **unestimated**; no gain
@@ -347,7 +449,7 @@ is admitted to the S12 budget from these scenarios.
 
 | Program | Review scenario | Updated planning evidence and next constraint |
 | --- | --- | --- |
-| PB-gemm | 1.33-1.60x | KNC 0.89 s; vector inner loop 82.56-86.21% of delivered PCs, 63 bytes; wall fraction and local improvement unqualified |
+| PB-gemm | 1.33-1.60x | KNC 0.89 s; vector inner loop 82.56-86.21% of delivered PCs, 63 bytes; bounded CPU estimate admitted, local improvement unestimated |
 | PB-atax | 1.33-1.60x | KNC 0.94 s; strict-reduction/reuse share unknown |
 | PB-cholesky | 1.11-1.25x | KNC 11.2-11.5 s profile medians; recurrence/scalar-FP share unknown; pair spread |
 | PB-ludcmp | 1.11-1.25x | KNC 18.1-18.4 s; recurrence/scalar-replacement share unknown; pair spread |
@@ -364,8 +466,9 @@ is admitted to the S12 budget from these scenarios.
 
 There is no defensible removable-time ordering yet. Total runtime only sets
 an upper bound, and a donor speedup does not identify removable KNC costs.
-The next ranking must report measured KNC wall seconds, hot wall fraction,
-justified local improvement and overlap, separately for each resource profile.
+The next ranking must report measured KNC wall seconds, estimated hot CPU
+seconds, justified local improvement and overlap. Full-profile sampling
+informs the ranking; paired timings retain the restricted-profile context.
 The scenario `T * f * (1 - 1/s)` is usable only with supported quantities.
 Select at most three general mechanisms with uncertainty, implementation cost
 and unaffected controls after profiles qualify; do not sum overlapping gains.
@@ -375,9 +478,9 @@ of removable seconds or selection of implementation themes:
 
 | Candidate | Evidence and potential benefit | Cost/uncertainty and required control |
 | --- | --- | --- |
-| Vector-loop data access and scheduling | PB-gemm's inner loop is consistently dominant in CPU samples | Local gain and generality unknown; require qualified wall attribution, matched diagnostic A/B and other development-loop profiles; include reuse/cache-resident controls |
+| Vector-loop data access and scheduling | PB-gemm's inner loop is consistently dominant in CPU samples | Local gain and generality unknown; use accepted CPU estimates and other development-loop profiles; require matched diagnostic A/B and reuse/cache-resident controls before claiming gains |
 | x87/vector transfer reduction | A bridge exists outside that loop | Its cost is not isolated; reject the review's numerical gain as a budget estimate; require measured bridge time and strict-FP correctness controls before implementation |
-| Runtime/output overhead | corpus_fprintf and mapped libc PCs are visible, separate from GEMM | These are not all compiler-removable; keep complete correctness output and timing boundary fixed; runtime ELF identity and caller attribution pending |
+| Runtime/output overhead | corpus_fprintf and mapped libc PCs are visible, separate from GEMM | These are not all compiler-removable; keep complete correctness output and timing boundary fixed; caller attribution remains unavailable |
 
 **Admitted themes: zero.** No positive removable-seconds estimate or
 implementation-hours estimate is defensible from a single program's PC
@@ -425,13 +528,11 @@ python tools/run.py --name S11-15-attribution --inputs tools/s11_15_attribution.
 It writes `.work/_shared/S11-15/attribution.md` and `attribution-pcs.txt`;
 the latter retains per-launch module-relative PCs and symbol/source status.
 It does not read held-out data or change any corpus source or primary harness.
-Full profiling and removable-time acceptance remain open. Before expanding,
-the lead needs to establish whether the sysroot libc is the card's deployed
-ELF (or supply matching symbols), resolve the wall-attribution limitation,
-and supply the development-only S11-28 fixed-work output. Subsequent card
-profiles for the remaining programs and resource settings, and a separately
-qualified OpenMP method, are still necessary. Engineers cannot start these
-card jobs under AGENTS.md. x86 was not run.
+Full profiling and removable-time acceptance remain open. The 2026-11-14
+lead decision resolved the libc-naming and CPU-estimation questions and
+removed S11-28 as a prerequisite. The staged development batch above is
+the remaining native handoff. Engineers cannot start these card jobs under
+AGENTS.md. x86 was not run.
 
 References: S11-15 lead notes dated 2026-11-13; `docs/sprints/SPRINT-11.md`,
 Theme B; `docs/reviews/2026-11-12-s11-s13-scope-review.md`, planning table and
