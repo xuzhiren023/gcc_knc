@@ -2,7 +2,7 @@
 
 Updated automatically at every ticket change. Last update: 2026-11-14 14:14.
 
-**Next: the tech lead, on S12-15.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: the tech lead, on S12-06.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[##################--]` 217 of 230
 
@@ -77,7 +77,7 @@ Current tickets: `[##################--]` 217 of 230
 | S11-23 | ICE in WRF's RRTM radiation (rtrn) at -O2 -march=knc - unrecognizable insn after reload, and sub-512-bit SLP vectors under KNC | Done | WRF's RRTM radiation and the -O3 OpenMP WRF files that crashed GCC-KNC after reload (rtrn, kfcps, advance_u... |
 | S11-24 | WRF OpenMP (smpar) build with GCC-KNC at -mphinix, for PhiWeather's benchmark - replaces the serial trial build | Done | WRF v4.8.0 now builds as an OpenMP card binary at -mphinix with GCC-KNC (wrf.exe and real.exe linked, needi... |
 | S11-25 | ICE in do_store_flag (expr.cc) on WRF's surface layer (SFCLAY1D) at -O2 -march=knc | Done | The last WRF file that crashed GCC-KNC (surface layer, SFCLAY1D) now compiles: vector 'ordered and not equa... |
-| S11-26 | WRF OpenMP build at -mphinix with no per-file workarounds (S11-23 and S11-25 fixed), restaged for PhiWeather | draft | Owner 2026-11-13: the S11-24 WRF build is removed. Deleted: |
+| S11-26 | WRF OpenMP build at -mphinix with no per-file workarounds (S11-23 and S11-25 fixed), restaged for PhiWeather | Not started | Owner 2026-11-13: the S11-24 WRF build is removed. Deleted: |
 | S11-27 | Wrong code - NPB-MG (class A, serial) built by GCC-KNC at -O2 -march=knc fails NPB verification on the card | Done | NPB-MG built by GCC-KNC at -O2 -march=knc now verifies on the card (class A in 14.1 s, against 33.8 s for G... |
 | S11-28 | HPCG run that fits every card model - fixed work instead of fixed duration, grid sized to the 3100's memory | Done | HPCG now runs a fixed amount of work (one CG set on the 104-cubed grid) that passes on the full card, 3100 ... |
 | S11-29 | card_run profiles limit memory in use, not address space, so a 3100 or 5100 run fails only where the real card would | Done | Under --profile 3100 and 5100, card_run now limits the memory a job actually uses (sampled resident plus sw... |
@@ -86,7 +86,7 @@ Current tickets: `[##################--]` 217 of 230
 | S12-03 | pm.py approve aborts its own merge on conflict and refuses cleanly, so main is never left mid-merge | draft |  |
 | S12-04 | card_run profile memory monitor costs under 5% of one card thread | In progress | Red stage must hold only the failing test: commit c122120a also carries the card_run fix, so red-then-green... |
 | S12-05 | DMA end-to-end time - overlap file read, DMA and file write, and copy on the card with more than one thread | draft |  |
-| S12-06 | M4 theme 1 - strict scalar FP conversions and call boundaries (NPB-EP transform and log path, NPB-IS randlc) | In progress | Lead: closed at phase 1 (premise fails), so the ticket is now type research and needs no red commit. Submit... |
+| S12-06 | M4 theme 1 - strict scalar FP conversions and call boundaries (NPB-EP transform and log path, NPB-IS randlc) | Question for the tech lead | Submitting a80a7e9b as instructed now fails: python tools/pm.py submit S12-06 --note ... returns protected ... |
 | S12-07 | M4 theme 2 - indexed-load scheduling with strict sparse reduction (NPB-CG) | Not started |  |
 | S12-08 | M4 theme 3 - dependency-preserving scalar updates and register pressure in dense loops (PB-ludcmp, x87 stack traffic) | Not started |  |
 | S12-09 | Sprint 12 batch check - integrated themes at the final Sprint 12 head, regression evidence, optional modes frozen | draft |  |
@@ -255,6 +255,7 @@ Current tickets: `[##################--]` 217 of 230
 
 ## Recent activity
 
+- 2026-11-14 14:14 **S12-06** engineer ask: Submitting a80a7e9b as instructed now fails: python tools/pm.py submit S12-06 --note ... returns protected path changed: .gitignore (raise it with ...
 - 2026-11-14 14:13 **S11-12** lead approve: Sprint 11 final head checked: both compiler installs at knc 619e14b4, T0-T2 pass, no ICEs, x86 output identical, forward-port drill current, and al...
 - 2026-11-14 14:03 **S12-15** engineer submit: Survey committed at 61ecb62e: docs/research/phi-literature-survey.md, 30 ranked source groups. Document check PASS; log .work/_state/logs/s12_15_su...
 - 2026-11-14 14:03 **S12-06** lead answer: Lead: closed at phase 1 (premise fails), so the ticket is now type research and needs no red commit. Submit a80a7e9b as is.
@@ -262,13 +263,12 @@ Current tickets: `[##################--]` 217 of 230
 - 2026-11-14 14:02 **S12-15** lead answer: Lead: approved. Submit 61ecb62e with --override 'single research note, 848 lines, 6% over; 30 annotated sources'.
 - 2026-11-14 14:02 **S12-06** engineer ask: Phase-one closure docs committed a80a7e9b per your instruction, with eight native medians and 240-worker/overlap caveat. Log .work/_shared/S12-06/c...
 - 2026-11-14 14:01 **S12-04** lead changes: Red stage must hold only the failing test: commit c122120a also carries the card_run fix, so red-then-green cannot be shown; split it (test commit ...
-- 2026-11-14 14:01 **S11-12** engineer submit: 437b2a35: T0 56/T1 327 PASS; lead T2 7/7 PASS. Both ICE sweeps zero ICE. Refreshed drill complete: master 14 conflicts, gcc-16 4; PR128640 reviewed...
 
 ## Cost
 
 - From the script, engineer: 590 sessions, 1210.4M input tokens
 - From the script, lead: 390 sessions, 108.8M input tokens
-- Started by hand, Claude: 12 sessions, 3166.8M input tokens
+- Started by hand, Claude: 12 sessions, 3167.6M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
