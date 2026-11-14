@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-14 01:58.
+Updated automatically at every ticket change. Last update: 2026-11-14 01:59.
 
 **Waiting for you:** S11-17. Run `python tools/pm.py inbox`.
 
@@ -80,7 +80,7 @@ Current tickets: `[###################-]` 206 of 213
 | S11-26 | WRF OpenMP build at -mphinix with no per-file workarounds (S11-23 and S11-25 fixed), restaged for PhiWeather | draft | Owner 2026-11-13: the S11-24 WRF build is removed. Deleted: |
 | S11-27 | Wrong code - NPB-MG (class A, serial) built by GCC-KNC at -O2 -march=knc fails NPB verification on the card | Done | NPB-MG built by GCC-KNC at -O2 -march=knc now verifies on the card (class A in 14.1 s, against 33.8 s for G... |
 | S11-28 | HPCG run that fits every card model - fixed work instead of fixed duration, grid sized to the 3100's memory | lead | After S11-29 merges (still ready): run .work/_shared/S11-28/lead-pilot.ps1 at 242936bf+ (30 exclusive timed... |
-| S11-29 | card_run profiles limit memory in use, not address space, so a 3100 or 5100 run fails only where the real card would | In progress | Second card round at cbe9a3d6, 2026-11-14 01:32-01:52 EST, receipts .work/_shared/S11-29/*.json, log .work/... |
+| S11-29 | card_run profiles limit memory in use, not address space, so a 3100 or 5100 run fails only where the real card would | Waiting for review | Both acceptance items met (lead 01:55). Six host tests passed: .work/_state/logs/S11_29_revision-20261114-0... |
 | S12-01 | Sprint 12 prep - static code-quality census of the development-corpus builds (spills, x87/vector transfers, addressing, calls, code size) | Done | A static code-quality census (spill/reload proxies, x87 and x87-zmm traffic, address arithmetic, calls, bra... |
 | S12-02 | Sprint 12 prep - the unscored generality check set (S11-20's six programs in the code styles our corpus lacks) | Done | The six unscored generality checks (Q1-Q6: ray tracer hit dispatch and vec3 AoS, Burkardt MD, Reference BLA... |
 | S2-01 | Design for zmm and mask registers under -march=knc | Done | The register design for KNC is settled on paper: all 32 zmm and 8 mask registers become usable under -march... |
@@ -238,6 +238,7 @@ Current tickets: `[###################-]` 206 of 213
 
 ## Recent activity
 
+- 2026-11-14 01:59 **S11-29** engineer submit: Both acceptance items met (lead 01:55). Six host tests passed: .work/_state/logs/S11_29_revision-20261114-011227.log; not rerun. Lead card round: H...
 - 2026-11-14 01:58 **S11-17** engineer escalate: budget: 7 engineer sessions used; the budget is 7
 - 2026-11-14 01:56 **S11-17** lead answer: Scripts regenerated (old ones kept as *.prev; LF; branch, division, indirect, inline, loop; no switch). Training ran 2026-11-14 01:32 EST at a3258f...
 - 2026-11-14 01:56 **S11-17** lead resume: Lead regenerated the scripts and ran training at a3258fe0, 01:32 EST.
@@ -245,7 +246,6 @@ Current tickets: `[###################-]` 206 of 213
 - 2026-11-14 01:55 **S11-29** lead answer: Second card round at cbe9a3d6, 2026-11-14 01:32-01:52 EST, receipts .work/_shared/S11-29/*.json, log .work/_state/logs/S11_29_card2-20261114-013238...
 - 2026-11-14 01:54 **S11-29** lead resume: Lead ran the second card round at cbe9a3d6, 01:32-01:52 EST.
 - 2026-11-14 01:48 **S11-15** engineer ask: 70049a7e: restaged .work/_shared/S11-15/lead.ps1, 14 remaining launches, expected 10-15 min; 18 PASS captures preserved, HPCG excluded, 600 s cap a...
-- 2026-11-14 01:48 **S11-02** engineer ask: The 01:43 lead instruction requires merging main into s11/S11-02, but the first git merge --no-commit main command was refused by the PreToolUse ho...
 
 ## Cost
 
@@ -257,4 +257,4 @@ Current tickets: `[###################-]` 206 of 213
 
 ## Disk
 
-The project uses 31.7 GiB of 100 GiB. 169 GiB free on the drive.
+The project uses 31.7 GiB of 100 GiB. 165 GiB free on the drive.
