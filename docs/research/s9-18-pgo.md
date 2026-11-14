@@ -337,6 +337,50 @@ imports profiles with the existing fatal missing/mismatch checks, verifies
 positive counts and T1 green, and stages the pilot and confirm timing phases.
 Revised profile-use correctness, transformations and native timings are pending.
 
+### Revised profile-use result and branch retry, 2026-11-14 02:40 EST
+
+The lead's 01:32 training capture decoded successfully: ten checks and exactly
+ten profiles. All matched/inverted use objects compiled with fatal missing and
+mismatched profile diagnostics, and all five timing binaries linked and linted.
+Use log: `.work/_state/logs/S11_17_controls_revised_use-20261114-023827.log`.
+Positive edges and maximum counts were:
+
+| Kernel | Positive edges, matched / inverted | Maximum count, matched / inverted |
+|---|---:|---:|
+| branch | 5 / 5 | 2141304 / 2141304 |
+| indirect | 5 / 5 | 2162688 / 2162688 |
+| division | 2 / 2 | 2162688 / 2162688 |
+| inline | 6 / 6 | 2141304 / 2141304 |
+| loop | 5 / 5 | 7173672 / 76031472 |
+
+T1 passed indirect promotion/inlining, division specialization, hot-call
+inlining and short-loop peeling. Branch alone failed: both base and matching
+builds jumped backwards to the zero-input arithmetic; inverted training made
+that arithmetic fall through. This is not a passing branch control.
+Log: `.work/_state/logs/S11_17_controls_revised_green-20261114-023842.log`.
+
+The next branch candidate isolates the decision in a `noipa` helper, outside
+the accumulation loop. An explicit unlikely static expectation for zero is
+opposed by the matching 99%-zero training input. The required transformation
+remains zero-input fall-through into arithmetic, preserving the other outcome
+through a cold helper call or tail jump. Plain `-O2` emits `testl; je` to the
+arithmetic and falls through to the cold tail jump. All five plain gates fail
+by assertion, with no errors, in
+`.work/_state/logs/S11_17_controls_branch3_red-20261114-024016.log`.
+Matching-profile behavior of this new candidate is still unknown.
+
+All ten current atomic training binaries compiled and linted. Regeneration
+then failed on the lead-owned `controls-train.sh` with `PermissionError`:
+`.work/_state/logs/S11_17_controls_branch3_stage-20261114-023955.log`.
+The lead must resolve ownership and run the scripts-only regeneration command
+above, then the training command with `-ExecutionPolicy Bypass`. Script path:
+`.work/_shared/S11-17/controls/controls-lead.ps1`; training only, under three
+minutes. Source line changes require fresh profiles for all ten variants.
+The previous timing binaries and checked-in profile fixtures belong to older
+sources; do not time them as this revision. Replace fixtures after the next
+successful use build. Return `controls/train.stdout` and `controls/train.stderr`.
+Native control timing and the full five-gate green result remain pending.
+
 ### Lessons from PhiWeather
 
 The lead's 2026-11-13 ticket note reports that PhiWeather's WRF-only GCC 5.1.1

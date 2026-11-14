@@ -28,11 +28,12 @@ def body(kernel, suffix=''):
 
 class PositiveControls(unittest.TestCase):
     def test_branch_hot_falls_through(self):
-        asm, name = body('branch')
+        asm, _ = body('branch', '_choose')
+        name = 'branch_' + VARIANT
         self.assertRegex(asm, r'\ttestl\t[^\n]+\n\tjne\t([^\n]+)\n'
                          r'(?:\t(?!j|call)[^\n]*\n)*\tleal\t1\(',
                          'zero (99%) branch must fall through to hot arithmetic')
-        self.assertRegex(asm, r'\tcall\t' + name + r'_cold\b', 'cold alternative must remain supported')
+        self.assertRegex(asm, r'\t(?:call|jmp)\t' + name + r'_cold\b', 'cold alternative must remain supported')
 
     def test_indirect_promoted_and_inlined(self):
         asm, name = body('indirect')

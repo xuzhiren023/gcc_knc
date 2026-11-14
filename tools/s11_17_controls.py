@@ -21,6 +21,12 @@ SOURCE = r'''
 #define CAT(a,b) CAT_(a,b)
 #define LOCAL(n) CAT(NAME,n)
 static __attribute__((noipa)) unsigned LOCAL(_cold)(unsigned x) { return x * 13u + 5u; }
+#if KIND == 0
+static __attribute__((noipa)) unsigned LOCAL(_choose)(unsigned x, unsigned y) {
+    if (__builtin_expect(x == 0, 0)) return y * 3u + 1u;
+    return LOCAL(_cold)(y);
+}
+#endif
 #if KIND == 1
 static unsigned LOCAL(_first)(unsigned x) { return x * 3u + 1u; }
 static unsigned LOCAL(_second)(unsigned x) { return x * 13u + 5u; }
@@ -42,8 +48,7 @@ unsigned NAME(const unsigned *a, const unsigned *b, unsigned n) {
     unsigned s = 0;
     for (unsigned i = 0; i < n; ++i) {
 #if KIND == 0
-        if (a[i] == 0) s += b[i] * 3u + 1u;
-        else s += LOCAL(_cold)(b[i]);
+        s += LOCAL(_choose)(a[i], b[i]);
 #elif KIND == 1
         s += LOCAL(_targets)[a[i] != 0](b[i]);
 #elif KIND == 2
