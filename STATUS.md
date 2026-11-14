@@ -2,7 +2,7 @@
 
 Updated automatically at every ticket change. Last update: 2026-11-14 12:56.
 
-**Next: GPT-6.1, on S11-12 (Sprint 11 batch check - full native suite, x86 identity, forward-port drill, ICE sweeps, runtime prefix consistency).** Run `python tools/dispatch.py`, or ask the tech lead to.
+**Next: the tech lead, on S12-11.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[##################--]` 212 of 227
 
@@ -91,7 +91,7 @@ Current tickets: `[##################--]` 212 of 227
 | S12-08 | M4 theme 3 - dependency-preserving scalar updates and register pressure in dense loops (PB-ludcmp, x87 stack traffic) | Not started |  |
 | S12-09 | Sprint 12 batch check - integrated themes at the final Sprint 12 head, regression evidence, optional modes frozen | draft |  |
 | S12-10 | Research - what KNC hardware and runtime knowledge are we still missing to tune GCC-KNC, the OS runtime and broad optimization, and where is it documented? | Done | KNC reference-gap research done: 16 gaps ranked, 32 primary sources (98 MB, outside git) with page-cited fa... |
-| S12-11 | Research - best practices for a dual Xeon E5-2690 v3 + Xeon Phi (KNC) workstation (HP Z840) for LLM inference and scientific computing | In progress |  |
+| S12-11 | Research - best practices for a dual Xeon E5-2690 v3 + Xeon Phi (KNC) workstation (HP Z840) for LLM inference and scientific computing | Waiting for review | Completed docs/research/host-phi-workstation.md at fe643e13, with 33 source entries and machine-specific ne... |
 | S12-12 | Stage S12-10's residual-gap card experiments as one combined Sprint 12 diagnostic batch (PMU access, prefetch, page backing, libm route, branches, allocator) | In progress |  |
 | S12-13 | Digest the S12-10 sources into our knowledge base - correct our KNC notes, build a reference index, and list what our practice should change | In progress |  |
 | S12-14 | Audit GCC-KNC's tuning model and runtime defaults against the digested sources - every mismatch with a proposed change and its proof | Not started |  |
@@ -252,6 +252,7 @@ Current tickets: `[##################--]` 212 of 227
 
 ## Recent activity
 
+- 2026-11-14 12:56 **S12-11** engineer submit: Completed docs/research/host-phi-workstation.md at fe643e13, with 33 source entries and machine-specific next checks. Primary refs: .work/_shared/h...
 - 2026-11-14 12:41 **S12-10** lead approve: KNC reference-gap research done: 16 gaps ranked, 32 primary sources (98 MB, outside git) with page-cited facts, and a 10-row list of bounded card e...
 - 2026-11-14 12:30 **S12-10** engineer submit: Phase 2: docs/research/knc-reference-gaps.md, d54380ba; 32 artifacts, 98 MiB; S12-06/07/08 facts and ranked residual measurements. Prior checks PAS...
 - 2026-11-14 12:29 **S12-10** lead answer: Lead: no rebase needed. submit only checks rebase for gcc: yes tickets, and your diff is one new file (docs/research/knc-reference-gaps.md) that do...
@@ -259,7 +260,6 @@ Current tickets: `[##################--]` 212 of 227
 - 2026-11-14 12:05 **S12-06** lead defer: Needs a card run by the interactive lead (M4 card authorization, <=30 min): run the card_run command in docs/research/s12-06-scalar-fp.md (threads ...
 - 2026-11-14 12:04 **S12-06** engineer ask: Phase-1 diagnostics committed at 6de080e6; GCC unchanged. AGENTS bars engineer card jobs. Please run the single paired batch in docs/research/s12-0...
 - 2026-11-14 12:03 **S11-12** lead answer: Yes: submit 437b2a35 with --override 'batch check: 1092 lines are research notes, drill record and the staging script; tests/baseline/S11-12-prefix...
-- 2026-11-14 12:01 **S11-12** engineer ask: Submission of lead-approved 437b2a35 is blocked by budget checks: 1092 changed lines versus 500, and 1 new test file versus 0. Reproducer: python t...
 
 ## Cost
 
