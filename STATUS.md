@@ -1,10 +1,10 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-14 13:36.
+Updated automatically at every ticket change. Last update: 2026-11-14 13:44.
 
 **Next: the tech lead, on S12-13.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
-Current tickets: `[##################--]` 214 of 229
+Current tickets: `[##################--]` 215 of 229
 
 ## Milestones
 
@@ -14,7 +14,7 @@ Current tickets: `[##################--]` 214 of 229
 | M1 | Mixed native code | Done | 43 of 43 tickets |
 | M2 | Useful vector target | Done | 51 of 51 tickets |
 | M3 | Runtimes | Done | 48 of 48 tickets |
-| M4 | Broad optimization | In progress | 32 of 47 tickets |
+| M4 | Broad optimization | In progress | 33 of 47 tickets |
 | M5 | Program corpus | Not started | Not planned in detail yet |
 | M6 | Release | Not started | Not planned in detail yet |
 
@@ -96,7 +96,7 @@ Current tickets: `[##################--]` 214 of 229
 | S12-13 | Digest the S12-10 sources into our knowledge base - correct our KNC notes, build a reference index, and list what our practice should change | Waiting for review | Corrected all four R09 passages at 173633ac after reading local pp.4-5: p.4 libhugetlbfs on MPSS 2.1.4346-1... |
 | S12-14 | Audit GCC-KNC's tuning model and runtime defaults against the digested sources - every mismatch with a proposed change and its proof | Not started |  |
 | S12-15 | Research - literature survey of published Xeon Phi (KNC) and Xeon Phi system research that matches our goals; what have we overlooked? | Question for the tech lead | Survey committed: 61ecb62e, docs/research/phi-literature-survey.md. 30 ranked source groups; 30 PDFs/extrac... |
-| S12-16 | Research - whole-system tuning playbook for the Z840 + Xeon Phi (BIOS, host OS, MPSS and card, transfers, runtimes), as HPC centres tuned Xeon + KNC systems | Waiting for review | Committed 100ecad0: docs/research/system-tuning-playbook.md covers versioned evidence, settings, verificati... |
+| S12-16 | Research - whole-system tuning playbook for the Z840 + Xeon Phi (BIOS, host OS, MPSS and card, transfers, runtimes), as HPC centres tuned Xeon + KNC systems | Done | Whole-system tuning playbook for the Z840 + Phi done: 13 ordered steps (BIOS, host Linux, card power/pages/... |
 | S12-17 | claude-torture -j N refuses to start in exclusive card runs (no inherited RLIMIT_AS since S11-29), so the execute suite cannot run | In progress | Do not amend or split 71cbcf86. Instead prove red: temporarily check out tools/claude-torture.c from main (... |
 | S13-01 | M4 final gate - stage the ADR-0015 gate run at the final head (17 programs, held-out unsealed, six pairs, three profiles) | draft |  |
 | S2-01 | Design for zmm and mask registers under -march=knc | Done | The register design for KNC is settled on paper: all 32 zmm and 8 mask registers become usable under -march... |
@@ -254,6 +254,7 @@ Current tickets: `[##################--]` 214 of 229
 
 ## Recent activity
 
+- 2026-11-14 13:44 **S12-16** lead approve: Whole-system tuning playbook for the Z840 + Phi done: 13 ordered steps (BIOS, host Linux, card power/pages/service core, transfers, MPI, runtimes) ...
 - 2026-11-14 13:36 **S12-15** engineer ask: Survey committed: 61ecb62e, docs/research/phi-literature-survey.md. 30 ranked source groups; 30 PDFs/extracts in .work/_shared/phi-literature/ (45....
 - 2026-11-14 13:35 **S12-17** lead answer: Do not amend or split 71cbcf86. Instead prove red: temporarily check out tools/claude-torture.c from main (git checkout main -- tools/claude-tortur...
 - 2026-11-14 13:35 **S12-13** engineer submit: Corrected all four R09 passages at 173633ac after reading local pp.4-5: p.4 libhugetlbfs on MPSS 2.1.4346-16; p.5 THP-stack results on 7110P 2.1.49...
@@ -261,16 +262,15 @@ Current tickets: `[##################--]` 214 of 229
 - 2026-11-14 13:33 **S12-17** engineer ask: Red test unexpectedly passed because the pending fix was included in the worktree and pm.py commit stages all changes: commit 71cbcf86 contains bot...
 - 2026-11-14 13:32 **S12-17** lead answer: See the resume note above for the working host-test command.
 - 2026-11-14 13:32 **S12-17** lead resume: Lead 13:32: Cygwin python3 is a symlink Windows cannot spawn. Use Windows python for run.py, and Cygwin bash by absolute path with /usr/bin first a...
-- 2026-11-14 13:30 **S12-17** lead defer: Engineer's test runner is blocked by host environment: Cygwin python cannot spawn python3 via tools/run.py (Errno 13) and the Windows python alias ...
 
 ## Cost
 
-- From the script, engineer: 583 sessions, 1195.7M input tokens
+- From the script, engineer: 584 sessions, 1205.9M input tokens
 - From the script, lead: 386 sessions, 108.0M input tokens
-- Started by hand, Claude: 12 sessions, 3150.4M input tokens
+- Started by hand, Claude: 12 sessions, 3151.4M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 32.1 GiB of 100 GiB. 151 GiB free on the drive.
+The project uses 32.1 GiB of 100 GiB. 150 GiB free on the drive.
