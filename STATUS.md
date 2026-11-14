@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-14 13:31.
+Updated automatically at every ticket change. Last update: 2026-11-14 13:32.
 
-**Next: GPT-6.1, on S11-12 (Sprint 11 batch check - full native suite, x86 identity, forward-port drill, ICE sweeps, runtime prefix consistency).** Run `python tools/dispatch.py`, or ask the tech lead to.
+**Next: the tech lead, on S12-17.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[##################--]` 214 of 229
 
@@ -97,7 +97,7 @@ Current tickets: `[##################--]` 214 of 229
 | S12-14 | Audit GCC-KNC's tuning model and runtime defaults against the digested sources - every mismatch with a proposed change and its proof | Not started |  |
 | S12-15 | Research - literature survey of published Xeon Phi (KNC) and Xeon Phi system research that matches our goals; what have we overlooked? | In progress |  |
 | S12-16 | Research - whole-system tuning playbook for the Z840 + Xeon Phi (BIOS, host OS, MPSS and card, transfers, runtimes), as HPC centres tuned Xeon + KNC systems | In progress |  |
-| S12-17 | claude-torture -j N refuses to start in exclusive card runs (no inherited RLIMIT_AS since S11-29), so the execute suite cannot run | lead | Engineer's test runner is blocked by host environment: Cygwin python cannot spawn python3 via tools/run.py ... |
+| S12-17 | claude-torture -j N refuses to start in exclusive card runs (no inherited RLIMIT_AS since S11-29), so the execute suite cannot run | Question for the tech lead | Lead 13:32: Cygwin python3 is a symlink Windows cannot spawn. Use Windows python for run.py, and Cygwin bas... |
 | S13-01 | M4 final gate - stage the ADR-0015 gate run at the final head (17 programs, held-out unsealed, six pairs, three profiles) | draft |  |
 | S2-01 | Design for zmm and mask registers under -march=knc | Done | The register design for KNC is settled on paper: all 32 zmm and 8 mask registers become usable under -march... |
 | S2-02 | Float and double arguments and results in zmm lane 0 | Done | Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`). |
@@ -254,6 +254,7 @@ Current tickets: `[##################--]` 214 of 229
 
 ## Recent activity
 
+- 2026-11-14 13:32 **S12-17** lead resume: Lead 13:32: Cygwin python3 is a symlink Windows cannot spawn. Use Windows python for run.py, and Cygwin bash by absolute path with /usr/bin first a...
 - 2026-11-14 13:30 **S12-17** lead defer: Engineer's test runner is blocked by host environment: Cygwin python cannot spawn python3 via tools/run.py (Errno 13) and the Windows python alias ...
 - 2026-11-14 13:29 **S12-17** engineer ask: Test execution is blocked by Windows launcher permissions: tools/run.py launched via Cygwin python cannot spawn its command ('PermissionError: [Err...
 - 2026-11-14 13:29 **S12-13** lead changes: 1. R09 is misread in four places: it says R09's results only cover the older MPSS 2.1.4346-16 stack, but R09 p.5 (raman-stream-2013.txt:206-228) ha...
@@ -261,13 +262,12 @@ Current tickets: `[##################--]` 214 of 229
 - 2026-11-14 13:18 **S12-13** engineer submit: Added R01-R27 reference index and 521-word owner digest with three ranked tables; corrected 17 notes with supersession markers and source pages. Re...
 - 2026-11-14 13:17 **S12-12** engineer submit: Six linked and linted diagnostic binaries, per-experiment run.sh files, README with card_run commands, and batch.sh staged under .work/_shared/S12-...
 - 2026-11-14 13:15 **S12-12** lead answer: Yes. Submit with --override 'six experiments plus plan; 899 lines, 12% over the 800 budget'. Do not cut scope: six C programs, the stager and a 300...
-- 2026-11-14 13:13 **S12-12** engineer ask: Submission is blocked by the 800-line budget: pm.py reports 899 changed lines for commits fba1336b and 21140d8d. Six linked/linted binaries, run sc...
 
 ## Cost
 
 - From the script, engineer: 580 sessions, 1188.7M input tokens
 - From the script, lead: 385 sessions, 107.9M input tokens
-- Started by hand, Claude: 12 sessions, 3145.4M input tokens
+- Started by hand, Claude: 12 sessions, 3147.7M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
