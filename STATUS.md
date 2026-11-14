@@ -1,10 +1,10 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-14 14:03.
+Updated automatically at every ticket change. Last update: 2026-11-14 14:13.
 
-**Next: the tech lead, on S11-12.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: the tech lead, on S12-15.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
-Current tickets: `[##################--]` 216 of 230
+Current tickets: `[##################--]` 217 of 230
 
 ## Milestones
 
@@ -14,7 +14,7 @@ Current tickets: `[##################--]` 216 of 230
 | M1 | Mixed native code | Done | 43 of 43 tickets |
 | M2 | Useful vector target | Done | 51 of 51 tickets |
 | M3 | Runtimes | Done | 48 of 48 tickets |
-| M4 | Broad optimization | In progress | 34 of 48 tickets |
+| M4 | Broad optimization | In progress | 35 of 48 tickets |
 | M5 | Program corpus | Not started | Not planned in detail yet |
 | M6 | Release | Not started | Not planned in detail yet |
 
@@ -63,7 +63,7 @@ Current tickets: `[##################--]` 216 of 230
 | S11-09 | Memory bandwidth for LLM decode - a weight-streaming GEMV workload, pushed toward 264-299 GB/s of weight bytes | Done | Weight-streaming GEMV for LLM decode is measured on the card: int8 weights reach 70 billion weights/s (2.2x... |
 | S11-10 | S11-01 transfer runner - choose repetitions, sizes and load states per run, so slow methods fit a card turn | Done | The transfer runner now takes --repeats, --sizes, --loads and --concurrency so a slow method fits a card tu... |
 | S11-11 | M4 corpus run harness - every corpus program built by GCC 5.1.1 and GCC-KNC, run on the card with frozen inputs and a correctness check, in one command | Done | The M4 corpus harness builds 17 programs with GCC 5.1.1 and GCC-KNC and stages checked card runs; GCC-KNC b... |
-| S11-12 | Sprint 11 batch check - full native suite, x86 identity, forward-port drill, ICE sweeps, runtime prefix consistency | Waiting for review | 437b2a35: T0 56/T1 327 PASS; lead T2 7/7 PASS. Both ICE sweeps zero ICE. Refreshed drill complete: master 1... |
+| S11-12 | Sprint 11 batch check - full native suite, x86 identity, forward-port drill, ICE sweeps, runtime prefix consistency | Done | Sprint 11 final head checked: both compiler installs at knc 619e14b4, T0-T2 pass, no ICEs, x86 output ident... |
 | S11-13 | Senior compiler review of the Sprint 11-13 scope (Milestone M4) against our research, with recommended plan changes | Done | A senior compiler review of the Sprint 11-13 plan is in: M4 is plausible but needs a frozen scoring and mea... |
 | S11-14 | M4 scoring contract and measurement protocol, frozen before any tuning | Done | M4's scoring contract is frozen in ADR-0015 with a tested scorer: strict serial -O2 versus -O2 over 17 prog... |
 | S11-15 | First development-corpus baseline and profile, GCC 5.1.1 vs GCC-KNC at -O2 (E7-03 part 1) | Done | The M4 development baseline is written up in docs/research/m4-baseline.md: GCC-KNC vs GCC 5.1.1 paired -O2 ... |
@@ -255,6 +255,7 @@ Current tickets: `[##################--]` 216 of 230
 
 ## Recent activity
 
+- 2026-11-14 14:13 **S11-12** lead approve: Sprint 11 final head checked: both compiler installs at knc 619e14b4, T0-T2 pass, no ICEs, x86 output identical, forward-port drill current, and al...
 - 2026-11-14 14:03 **S12-15** engineer submit: Survey committed at 61ecb62e: docs/research/phi-literature-survey.md, 30 ranked source groups. Document check PASS; log .work/_state/logs/s12_15_su...
 - 2026-11-14 14:03 **S12-06** lead answer: Lead: closed at phase 1 (premise fails), so the ticket is now type research and needs no red commit. Submit a80a7e9b as is.
 - 2026-11-14 14:02 **S12-18** lead approve-red: A host test now reproduces the short vmath benchmark batches: the calibration accepts one slow early sample, picks too few repetitions and then rec...
@@ -262,16 +263,15 @@ Current tickets: `[##################--]` 216 of 230
 - 2026-11-14 14:02 **S12-06** engineer ask: Phase-one closure docs committed a80a7e9b per your instruction, with eight native medians and 240-worker/overlap caveat. Log .work/_shared/S12-06/c...
 - 2026-11-14 14:01 **S12-04** lead changes: Red stage must hold only the failing test: commit c122120a also carries the card_run fix, so red-then-green cannot be shown; split it (test commit ...
 - 2026-11-14 14:01 **S11-12** engineer submit: 437b2a35: T0 56/T1 327 PASS; lead T2 7/7 PASS. Both ICE sweeps zero ICE. Refreshed drill complete: master 14 conflicts, gcc-16 4; PR128640 reviewed...
-- 2026-11-14 14:00 **S12-18** engineer red: Commit 6a256a79. Host Cygwin regression: exp/log/pow each fail as expected after a timing transient; steady controls pass. Real driver accepts one ...
 
 ## Cost
 
 - From the script, engineer: 590 sessions, 1210.4M input tokens
 - From the script, lead: 390 sessions, 108.8M input tokens
-- Started by hand, Claude: 12 sessions, 3165.3M input tokens
+- Started by hand, Claude: 12 sessions, 3165.6M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 32.1 GiB of 100 GiB. 153 GiB free on the drive.
+The project uses 32.1 GiB of 100 GiB. 152 GiB free on the drive.
