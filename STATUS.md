@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-14 11:53.
+Updated automatically at every ticket change. Last update: 2026-11-14 11:54.
 
-**Next: the tech lead, on S12-10.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Waiting for you:** S11-12. Run `python tools/pm.py inbox`.
 
 Current tickets: `[###################-]` 211 of 222
 
@@ -63,7 +63,7 @@ Current tickets: `[###################-]` 211 of 222
 | S11-09 | Memory bandwidth for LLM decode - a weight-streaming GEMV workload, pushed toward 264-299 GB/s of weight bytes | Done | Weight-streaming GEMV for LLM decode is measured on the card: int8 weights reach 70 billion weights/s (2.2x... |
 | S11-10 | S11-01 transfer runner - choose repetitions, sizes and load states per run, so slow methods fit a card turn | Done | The transfer runner now takes --repeats, --sizes, --loads and --concurrency so a slow method fits a card tu... |
 | S11-11 | M4 corpus run harness - every corpus program built by GCC 5.1.1 and GCC-KNC, run on the card with frozen inputs and a correctness check, in one command | Done | The M4 corpus harness builds 17 programs with GCC 5.1.1 and GCC-KNC and stages checked card runs; GCC-KNC b... |
-| S11-12 | Sprint 11 batch check - full native suite, x86 identity, forward-port drill, ICE sweeps, runtime prefix consistency | In progress | Answered above (lead 12:15 EST): T2 short-vector 7/7 PASS by the lead, upstream refs fetched, lane 2 instal... |
+| S11-12 | Sprint 11 batch check - full native suite, x86 identity, forward-port drill, ICE sweeps, runtime prefix consistency | **Waiting for you** | budget: 6539034 input tokens used; the budget is 6000000 |
 | S11-13 | Senior compiler review of the Sprint 11-13 scope (Milestone M4) against our research, with recommended plan changes | Done | A senior compiler review of the Sprint 11-13 plan is in: M4 is plausible but needs a frozen scoring and mea... |
 | S11-14 | M4 scoring contract and measurement protocol, frozen before any tuning | Done | M4's scoring contract is frozen in ADR-0015 with a tested scorer: strict serial -O2 versus -O2 over 17 prog... |
 | S11-15 | First development-corpus baseline and profile, GCC 5.1.1 vs GCC-KNC at -O2 (E7-03 part 1) | Done | The M4 development baseline is written up in docs/research/m4-baseline.md: GCC-KNC vs GCC 5.1.1 paired -O2 ... |
@@ -247,6 +247,7 @@ Current tickets: `[###################-]` 211 of 222
 
 ## Recent activity
 
+- 2026-11-14 11:54 **S11-12** engineer escalate: budget: 6539034 input tokens used; the budget is 6000000
 - 2026-11-14 11:53 **S12-10** engineer ask: Phase 1 dcf5eaaa: docs/research/knc-reference-gaps.md. Which priorities should guide phase 2? 1. G01 Scalar FP, ABI bridges and conversions. 2. G02...
 - 2026-11-14 11:53 **S11-12** lead answer: Answered above (lead 12:15 EST): T2 short-vector 7/7 PASS by the lead, upstream refs fetched, lane 2 installed with 26 vmath members. Continue: dri...
 - 2026-11-14 11:53 **S11-12** lead resume: Lead 12:15 EST: (1) T2 --short-vector-abi rerun by the lead: 7/7 PASS (log .work/_state/logs/check_gcc16_t2-20261114-115203.log); the two 11-13 fil...
@@ -254,13 +255,12 @@ Current tickets: `[###################-]` 211 of 222
 - 2026-11-14 11:49 **S11-12** engineer ask: fe2a3682: T0 56/T1 327 PASS; O2-vect/O3 each 1969 pass, 32 errors, 2 user-asm rejects, 0 ICE. T2 PermissionError: _shared/S5-21/short-vector-O2-0.m...
 - 2026-11-14 09:27 **S11-17** lead approve: PGO works end to end on KNC: zlib trains on the card and the profile-use build runs correctly about 0.8% faster, and the branch, indirect and divis...
 - 2026-11-14 09:20 **S11-17** lead defer: Review passed; branch merged into main (0d5afaa2), but approve was refused at 'git worktree remove --force .work/S11-17': Permission denied. Intera...
-- 2026-11-14 09:09 **S11-28** lead approve: HPCG now runs a fixed amount of work (one CG set on the 104-cubed grid) that passes on the full card, 3100 and 5100 profiles, and the harness rejec...
 
 ## Cost
 
 - From the script, engineer: 570 sessions, 1162.6M input tokens
 - From the script, lead: 378 sessions, 105.3M input tokens
-- Started by hand, Claude: 12 sessions, 3120.9M input tokens
+- Started by hand, Claude: 12 sessions, 3121.6M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
