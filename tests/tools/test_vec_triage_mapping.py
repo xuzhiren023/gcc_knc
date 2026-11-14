@@ -95,6 +95,9 @@ class VecTriageMappingTest(unittest.TestCase):
         cls.triage = importlib.import_module('vec_triage')
 
     def test_captured_addresses_map_to_source_loops_without_filling_gaps(self):
+        discovered = self.triage.source_loops('src/mapping.c', SOURCE)
+        self.assertEqual([(r['line_start'], r['line_end']) for r in discovered],
+                         [(5, 6), (12, 13)])
         regions = self.triage.regions_from_addr2line(
             ADDR2LINE,
             [source_region('sum', 5, 6, 'strict_sum'),
