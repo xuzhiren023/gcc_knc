@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-14 01:03.
+Updated automatically at every ticket change. Last update: 2026-11-14 01:04.
 
 **Next: GPT-6.1, on S11-02 (card_run and run_suite move bulk data by SCIF DMA at the PCIe link limit, with the SSH stream as fallback).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
@@ -250,11 +250,11 @@ Current tickets: `[###################-]` 206 of 213
 ## Cost
 
 - From the script, engineer: 553 sessions, 1129.1M input tokens
-- From the script, lead: 364 sessions, 102.0M input tokens
-- Started by hand, Claude: 12 sessions, 3050.8M input tokens
+- From the script, lead: 365 sessions, 102.1M input tokens
+- Started by hand, Claude: 12 sessions, 3051.1M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 31.7 GiB of 100 GiB. 163 GiB free on the drive.
+The project uses 31.7 GiB of 100 GiB. 165 GiB free on the drive.
