@@ -2,7 +2,7 @@
 
 Updated automatically at every ticket change. Last update: 2026-11-14 07:54.
 
-**Next: GPT-6.1, on S11-15 (First development-corpus baseline and profile, GCC 5.1.1 vs GCC-KNC at -O2 (E7-03 part 1)).** Run `python tools/dispatch.py`, or ask the tech lead to.
+**Next: the tech lead, on S11-15.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[###################-]` 208 of 216
 
@@ -66,7 +66,7 @@ Current tickets: `[###################-]` 208 of 216
 | S11-12 | Sprint 11 batch check - full native suite, x86 identity, forward-port drill, ICE sweeps, runtime prefix consistency | draft |  |
 | S11-13 | Senior compiler review of the Sprint 11-13 scope (Milestone M4) against our research, with recommended plan changes | Done | A senior compiler review of the Sprint 11-13 plan is in: M4 is plausible but needs a frozen scoring and mea... |
 | S11-14 | M4 scoring contract and measurement protocol, frozen before any tuning | Done | M4's scoring contract is frozen in ADR-0015 with a tested scorer: strict serial -O2 versus -O2 over 17 prog... |
-| S11-15 | First development-corpus baseline and profile, GCC 5.1.1 vs GCC-KNC at -O2 (E7-03 part 1) | In progress | Budget raised by the lead under the owner's standing rule, same first extension as 07:50: input tokens 12M ... |
+| S11-15 | First development-corpus baseline and profile, GCC 5.1.1 vs GCC-KNC at -O2 (E7-03 part 1) | Waiting for review | cf7b6ed1: report opens with CPU-share ranking, exclusions and three conditional Sprint 12 proof candidates.... |
 | S11-16 | Long-double libm hazard audit - do other MPSS long double entry points fault like cbrtl? (E7-21, bounded) | Done | The card's MPSS long double libm was probed on the card: of 12 entry points only cbrtl faults, and S10-13 a... |
 | S11-17 | PGO feasibility on one complete development program (reuse of S9-18's train/use path) | lead | Interactive lead, exclusive card turn, at b1151831. T1 5/5 green; staged controls-lead.ps1 checked (Continu... |
 | S11-18 | M4 corpus harness v2 - card profiles, prefix record, held-out sealing, stronger checks, and the donor-failure rule | Done | The M4 corpus harness now stages all 17 programs for the 7120 and the 3100/5100 profiles with serial voting... |
@@ -242,13 +242,13 @@ Current tickets: `[###################-]` 208 of 216
 ## Recent activity
 
 - 2026-11-14 07:54 **S11-17** lead defer: Interactive lead, exclusive card turn, at b1151831. T1 5/5 green; staged controls-lead.ps1 checked (Continue+LASTEXITCODE, full/3100/5100, five ker...
+- 2026-11-14 07:54 **S11-15** engineer submit: cf7b6ed1: report opens with CPU-share ranking, exclusions and three conditional Sprint 12 proof candidates. S11-28 fixed-work HPCG replaces pending...
 - 2026-11-14 07:52 **S11-17** engineer ask: b1151831: train3 imported 10 profiles; five use binaries compiled/linted, fatal mismatch checks, positive counts; T1 5/5 green. Logs: .work/_state/...
 - 2026-11-14 07:51 **S11-15** owner decide: Budget raised by the lead under the owner's standing rule, same first extension as 07:50: input tokens 12M -> 18M (14.7M used). Remaining work is s...
 - 2026-11-14 07:51 **S11-15** engineer escalate: budget: 14730250 input tokens used; the budget is 12000000
 - 2026-11-14 07:50 **S11-15** owner decide: Budget raised by the lead under the owner's standing rule: sessions 6 -> 8, the first extension. Progress: profiling done on the card, attribution ...
 - 2026-11-14 07:49 **S11-15** engineer escalate: budget: 6 engineer sessions used; the budget is 6
 - 2026-11-14 07:46 **S11-17** lead answer: Train3 ran 2026-11-14 07:44 EST at 4954896d scripts: PASS, 0.4 min, card exit 0, log .work/_state/logs/S11_17_controls_train3-20261114-074418.log. ...
-- 2026-11-14 07:45 **S11-17** lead resume: Lead ran train3 at 07:44 EST: results in the answer.
 
 ## Cost
 
