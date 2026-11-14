@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-14 15:07.
+Updated automatically at every ticket change. Last update: 2026-11-14 15:08.
 
 **Waiting for you:** S12-04. Run `python tools/pm.py inbox`.
 
@@ -101,7 +101,7 @@ Current tickets: `[##################--]` 220 of 238
 | S12-18 | Double-precision vector exp, log and pow ran slower than scalar libm on the card (0.82x, 0.63x, 0.49x) - confirm with valid batches, then fix the library or stop the vectorizer calling them where they lose | lead | Needs interactive lead: (1) exclusive card turn running .work/_shared/S12-18/vmath-bench.mic at full, 3100 ... |
 | S12-19 | Profile-guided missed-vectorization triage - join hot loops with the vectorizer's reasons and observed strides/masks, so tuning targets what is hot and fixable | In progress | S12-19 red is approved: 10 host tests in 2 files now pin the vectorizer triage contract (six real GCC misse... |
 | S12-20 | libknc_vmath accuracy and exception contract, with an independent validation design (rounding modes, special values, flags, scalar fallback) | draft |  |
-| S12-21 | Scheduling model for M4's serial runs - measure density-1 tuning and the integer-multiply cost against today's density-4 defaults (S12-14 B02, B04, B05) | In progress |  |
+| S12-21 | Scheduling model for M4's serial runs - measure density-1 tuning and the integer-multiply cost against today's density-4 defaults (S12-14 B02, B04, B05) | Tests waiting for review | fc734fd3 adds phase-1 contracts: 28 serial development builds, default/density1 flags, top-four selection, ... |
 | S12-22 | Low-risk corrections from the S12-14 audit - wrong comments and citations (N01-N09) and the far-prefetch-distance range bug (B10) | Not started |  |
 | S12-23 | Floating-point environment correctness on KNC - fix the underflow probe that cannot tell flushing from rounding, and handle x87 erratum CD28 (S12-14 N06, N07, B16, B17) | Not started |  |
 | S12-24 | ICE in vect_transform_stmt (tree-vect-stmts.cc:13381) on WRF's REMEZ at -mphinix (-O3 -march=knc) | Not started |  |
@@ -263,6 +263,7 @@ Current tickets: `[##################--]` 220 of 238
 
 ## Recent activity
 
+- 2026-11-14 15:08 **S12-21** engineer red: fc734fd3 adds phase-1 contracts: 28 serial development builds, default/density1 flags, top-four selection, three alternating pairs, full exclusive ...
 - 2026-11-14 15:07 **S12-04** engineer escalate: budget: 7 engineer sessions used; the budget is 7
 - 2026-11-14 15:06 **S12-08** engineer ask: Closure documentation committed as 7f2df59d; reproducers retained. Requested submit --override was refused: deep ticket: run pm.py red and wait for...
 - 2026-11-14 15:06 **S12-04** lead answer: Lead: submit with the mixed commit. Red and green are shown by the two logs (red 150442 against the old card_run, green 150451); no history correct...
@@ -270,11 +271,10 @@ Current tickets: `[##################--]` 220 of 238
 - 2026-11-14 15:05 **S11-26** lead defer: Needs the interactive lead: clean WRF build hits a new ICE (REMEZ, vect_transform_stmt, knc 619e14b479a; repro .work/_shared/wrf-trial/repro/remez....
 - 2026-11-14 15:03 **S12-08** lead answer: Decision: close on the failed premise; no card run. The staged pair only measures the fold-left bridge cost, and your note shows those bridges sit ...
 - 2026-11-14 15:03 **S11-26** engineer ask: Blocked as recorded in f8fe9c32: knc 619e14b479a passes four original reproducers, but clean WRF build and standalone repro/remez.f90 fail in vect_...
-- 2026-11-14 15:02 **S12-07** lead defer: Card run needed (interactive lead only): run .work/_shared/S12-07/sparse-paired via tools/card_run --threads 1 --timeout 200 in our card turn (one ...
 
 ## Cost
 
-- From the script, engineer: 613 sessions, 1240.7M input tokens
+- From the script, engineer: 614 sessions, 1241.1M input tokens
 - From the script, lead: 402 sessions, 111.3M input tokens
 - Started by hand, Claude: 12 sessions, 3198.3M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
@@ -282,4 +282,4 @@ Current tickets: `[##################--]` 220 of 238
 
 ## Disk
 
-The project uses 32.7 GiB of 100 GiB. 146 GiB free on the drive.
+The project uses 32.7 GiB of 100 GiB. 145 GiB free on the drive.
