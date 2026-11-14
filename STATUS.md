@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-14 11:50.
+Updated automatically at every ticket change. Last update: 2026-11-14 11:53.
 
-**Next: GPT-6.1, on S12-10 (Research - what KNC hardware and runtime knowledge are we still missing to tune GCC-KNC, the OS runtime and broad optimization, and where is it documented?).** Run `python tools/dispatch.py`, or ask the tech lead to.
+**Next: the tech lead, on S11-12.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[###################-]` 211 of 222
 
@@ -63,7 +63,7 @@ Current tickets: `[###################-]` 211 of 222
 | S11-09 | Memory bandwidth for LLM decode - a weight-streaming GEMV workload, pushed toward 264-299 GB/s of weight bytes | Done | Weight-streaming GEMV for LLM decode is measured on the card: int8 weights reach 70 billion weights/s (2.2x... |
 | S11-10 | S11-01 transfer runner - choose repetitions, sizes and load states per run, so slow methods fit a card turn | Done | The transfer runner now takes --repeats, --sizes, --loads and --concurrency so a slow method fits a card tu... |
 | S11-11 | M4 corpus run harness - every corpus program built by GCC 5.1.1 and GCC-KNC, run on the card with frozen inputs and a correctness check, in one command | Done | The M4 corpus harness builds 17 programs with GCC 5.1.1 and GCC-KNC and stages checked card runs; GCC-KNC b... |
-| S11-12 | Sprint 11 batch check - full native suite, x86 identity, forward-port drill, ICE sweeps, runtime prefix consistency | lead | Needs the interactive lead: (1) fix write access on .work/_shared/S5-21/short-vector-O2-0.mic (T2 Permissio... |
+| S11-12 | Sprint 11 batch check - full native suite, x86 identity, forward-port drill, ICE sweeps, runtime prefix consistency | Question for the tech lead | Lead 12:15 EST: (1) T2 --short-vector-abi rerun by the lead: 7/7 PASS (log .work/_state/logs/check_gcc16_t2... |
 | S11-13 | Senior compiler review of the Sprint 11-13 scope (Milestone M4) against our research, with recommended plan changes | Done | A senior compiler review of the Sprint 11-13 plan is in: M4 is plausible but needs a frozen scoring and mea... |
 | S11-14 | M4 scoring contract and measurement protocol, frozen before any tuning | Done | M4's scoring contract is frozen in ADR-0015 with a tested scorer: strict serial -O2 versus -O2 over 17 prog... |
 | S11-15 | First development-corpus baseline and profile, GCC 5.1.1 vs GCC-KNC at -O2 (E7-03 part 1) | Done | The M4 development baseline is written up in docs/research/m4-baseline.md: GCC-KNC vs GCC 5.1.1 paired -O2 ... |
@@ -247,6 +247,7 @@ Current tickets: `[###################-]` 211 of 222
 
 ## Recent activity
 
+- 2026-11-14 11:53 **S11-12** lead resume: Lead 12:15 EST: (1) T2 --short-vector-abi rerun by the lead: 7/7 PASS (log .work/_state/logs/check_gcc16_t2-20261114-115203.log); the two 11-13 fil...
 - 2026-11-14 11:50 **S11-12** lead defer: Needs the interactive lead: (1) fix write access on .work/_shared/S5-21/short-vector-O2-0.mic (T2 PermissionError; rerun python tools/check.py t2 -...
 - 2026-11-14 11:49 **S11-12** engineer ask: fe2a3682: T0 56/T1 327 PASS; O2-vect/O3 each 1969 pass, 32 errors, 2 user-asm rejects, 0 ICE. T2 PermissionError: _shared/S5-21/short-vector-O2-0.m...
 - 2026-11-14 09:27 **S11-17** lead approve: PGO works end to end on KNC: zlib trains on the card and the profile-use build runs correctly about 0.8% faster, and the branch, indirect and divis...
@@ -254,16 +255,15 @@ Current tickets: `[###################-]` 211 of 222
 - 2026-11-14 09:09 **S11-28** lead approve: HPCG now runs a fixed amount of work (one CG set on the 104-cubed grid) that passes on the full card, 3100 and 5100 profiles, and the harness rejec...
 - 2026-11-14 09:08 **S11-17** engineer submit: 6ba8ddd6 contains main (lead merge). tools/check t0 PASS, 56 tests; log .work/_state/logs/check_donor_t0-20261114-085440.log. Prior T1 5/5 green; l...
 - 2026-11-14 08:54 **S11-28** engineer submit: Acceptance complete: red 75ce3838, green ede7b91c. Lead memory diagnosis supports 104 cubed, rt=0. Native pilot: 30/30 effective VALID/sets=1; six ...
-- 2026-11-14 08:51 **S11-17** lead answer: Yes, main is the target for gcc: no. A rebase conflicts in docs/research/s9-18-pgo.md on every commit, so the lead merged main into s11/S11-17 inst...
 
 ## Cost
 
 - From the script, engineer: 569 sessions, 1158.7M input tokens
 - From the script, lead: 378 sessions, 105.3M input tokens
-- Started by hand, Claude: 12 sessions, 3118.2M input tokens
+- Started by hand, Claude: 12 sessions, 3120.7M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 32.5 GiB of 100 GiB. 157 GiB free on the drive.
+The project uses 31.8 GiB of 100 GiB. 158 GiB free on the drive.
