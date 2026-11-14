@@ -1,10 +1,10 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-14 13:49.
+Updated automatically at every ticket change. Last update: 2026-11-14 13:58.
 
 **Next: the tech lead, on S12-06.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
-Current tickets: `[##################--]` 215 of 230
+Current tickets: `[##################--]` 216 of 230
 
 ## Milestones
 
@@ -14,7 +14,7 @@ Current tickets: `[##################--]` 215 of 230
 | M1 | Mixed native code | Done | 43 of 43 tickets |
 | M2 | Useful vector target | Done | 51 of 51 tickets |
 | M3 | Runtimes | Done | 48 of 48 tickets |
-| M4 | Broad optimization | In progress | 33 of 48 tickets |
+| M4 | Broad optimization | In progress | 34 of 48 tickets |
 | M5 | Program corpus | Not started | Not planned in detail yet |
 | M6 | Release | Not started | Not planned in detail yet |
 
@@ -93,7 +93,7 @@ Current tickets: `[##################--]` 215 of 230
 | S12-10 | Research - what KNC hardware and runtime knowledge are we still missing to tune GCC-KNC, the OS runtime and broad optimization, and where is it documented? | Done | KNC reference-gap research done: 16 gaps ranked, 32 primary sources (98 MB, outside git) with page-cited fa... |
 | S12-11 | Research - best practices for a dual Xeon E5-2690 v3 + Xeon Phi (KNC) workstation (HP Z840) for LLM inference and scientific computing | Done | Z840 dual E5-2690 v3 + Xeon Phi setup guide done: slot/BIOS/memory/power/cooling checklist, MPSS-on-modern-... |
 | S12-12 | Stage S12-10's residual-gap card experiments as one combined Sprint 12 diagnostic batch (PMU access, prefetch, page backing, libm route, branches, allocator) | Done | The six follow-up card experiments (counter access, prefetch, page backing, libm route, branches, allocator... |
-| S12-13 | Digest the S12-10 sources into our knowledge base - correct our KNC notes, build a reference index, and list what our practice should change | Waiting for review | Corrected all four R09 passages at 173633ac after reading local pp.4-5: p.4 libhugetlbfs on MPSS 2.1.4346-1... |
+| S12-13 | Digest the S12-10 sources into our knowledge base - correct our KNC notes, build a reference index, and list what our practice should change | Done | The project now has a numbered KNC reference index (R01-R27), corrected KNC notes that cite source pages an... |
 | S12-14 | Audit GCC-KNC's tuning model and runtime defaults against the digested sources - every mismatch with a proposed change and its proof | Not started |  |
 | S12-15 | Research - literature survey of published Xeon Phi (KNC) and Xeon Phi system research that matches our goals; what have we overlooked? | In progress | Lead: no rebase needed. submit only checks rebase for gcc: yes tickets; your diff is one new note and the l... |
 | S12-16 | Research - whole-system tuning playbook for the Z840 + Xeon Phi (BIOS, host OS, MPSS and card, transfers, runtimes), as HPC centres tuned Xeon + KNC systems | Done | Whole-system tuning playbook for the Z840 + Phi done: 13 ordered steps (BIOS, host Linux, card power/pages/... |
@@ -255,6 +255,7 @@ Current tickets: `[##################--]` 215 of 230
 
 ## Recent activity
 
+- 2026-11-14 13:58 **S12-13** lead approve: The project now has a numbered KNC reference index (R01-R27), corrected KNC notes that cite source pages and keep superseded text visible, and an o...
 - 2026-11-14 13:49 **S12-15** lead answer: Lead: no rebase needed. submit only checks rebase for gcc: yes tickets; your diff is one new note and the lead merges. Run pm.py submit now as is.
 - 2026-11-14 13:49 **S12-06** lead resume: Lead 13:50: card result at .work/_shared/S12-06/card.stdout (S12_06_CHECK PASS, 3 pairs per case, cpu=240 label): GCC-KNC is equal or faster than G...
 - 2026-11-14 13:44 **S12-16** lead approve: Whole-system tuning playbook for the Z840 + Phi done: 13 ordered steps (BIOS, host Linux, card power/pages/service core, transfers, MPI, runtimes) ...
@@ -262,16 +263,15 @@ Current tickets: `[##################--]` 215 of 230
 - 2026-11-14 13:35 **S12-17** lead answer: Do not amend or split 71cbcf86. Instead prove red: temporarily check out tools/claude-torture.c from main (git checkout main -- tools/claude-tortur...
 - 2026-11-14 13:35 **S12-13** engineer submit: Corrected all four R09 passages at 173633ac after reading local pp.4-5: p.4 libhugetlbfs on MPSS 2.1.4346-16; p.5 THP-stack results on 7110P 2.1.49...
 - 2026-11-14 13:34 **S12-16** engineer submit: Committed 100ecad0: docs/research/system-tuning-playbook.md covers versioned evidence, settings, verification, effects, risks, rollback and a 75-12...
-- 2026-11-14 13:33 **S12-17** engineer ask: Red test unexpectedly passed because the pending fix was included in the worktree and pm.py commit stages all changes: commit 71cbcf86 contains bot...
 
 ## Cost
 
 - From the script, engineer: 584 sessions, 1205.9M input tokens
-- From the script, lead: 386 sessions, 108.0M input tokens
-- Started by hand, Claude: 12 sessions, 3158.7M input tokens
+- From the script, lead: 387 sessions, 108.2M input tokens
+- Started by hand, Claude: 12 sessions, 3159.5M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 32.1 GiB of 100 GiB. 150 GiB free on the drive.
+The project uses 32.1 GiB of 100 GiB. 153 GiB free on the drive.
