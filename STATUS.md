@@ -84,7 +84,7 @@ Current tickets: `[##################--]` 220 of 238
 | S12-01 | Sprint 12 prep - static code-quality census of the development-corpus builds (spills, x87/vector transfers, addressing, calls, code size) | Done | A static code-quality census (spill/reload proxies, x87 and x87-zmm traffic, address arithmetic, calls, bra... |
 | S12-02 | Sprint 12 prep - the unscored generality check set (S11-20's six programs in the code styles our corpus lacks) | Done | The six unscored generality checks (Q1-Q6: ray tracer hit dispatch and vec3 AoS, Burkardt MD, Reference BLA... |
 | S12-03 | pm.py approve aborts its own merge on conflict and refuses cleanly, so main is never left mid-merge | draft |  |
-| S12-04 | card_run profile memory monitor costs under 5% of one card thread | In progress | Lead raises sessions 7 -> 8: the last raise made progress (usleep fallback, red/green logs); one session to... |
+| S12-04 | card_run profile memory monitor costs under 5% of one card thread | Waiting for review | Host profile memory tests passed (7 tests); strengthened fallback test red against original card_run and gr... |
 | S12-05 | DMA end-to-end time - overlap file read, DMA and file write, and copy on the card with more than one thread | draft |  |
 | S12-06 | M4 theme 1 - strict scalar FP conversions and call boundaries (NPB-EP transform and log path, NPB-IS randlc) | Done | Theme 1 (scalar FP conversions and calls in NPB-EP/IS) closed with no compiler change: a card diagnostic sh... |
 | S12-07 | M4 theme 2 - indexed-load scheduling with strict sparse reduction (NPB-CG) | lead | Card run needed (interactive lead only): run .work/_shared/S12-07/sparse-paired via tools/card_run --thread... |
@@ -264,19 +264,19 @@ Current tickets: `[##################--]` 220 of 238
 ## Recent activity
 
 - 2026-11-14 15:13 **S12-17** engineer escalate: budget: 6 engineer sessions used; the budget is 6
+- 2026-11-14 15:13 **S12-04** engineer submit: Host profile memory tests passed (7 tests); strengthened fallback test red against original card_run and green with fix. Logs: .work/_state/logs/S1...
 - 2026-11-14 15:12 **S12-19** engineer ask: 6c999a43: join core; 10 host tests pass. Audit: 0/15109 workload samples resolve to source; HPCG has no capture. Repro: python tools/vec_triage.py ...
 - 2026-11-14 15:11 **S12-08** lead defer: Closure done: 7f2df59d states 'premise failed, no compiler change' up front, keeps both reproducers, no GCC commit (knc..s12/S12-08 empty). pm.py s...
 - 2026-11-14 15:09 **S12-04** owner decide: Lead raises sessions 7 -> 8: the last raise made progress (usleep fallback, red/green logs); one session to submit.
 - 2026-11-14 15:08 **S12-21** engineer red: fc734fd3 adds phase-1 contracts: 28 serial development builds, default/density1 flags, top-four selection, three alternating pairs, full exclusive ...
 - 2026-11-14 15:07 **S12-04** engineer escalate: budget: 7 engineer sessions used; the budget is 7
 - 2026-11-14 15:06 **S12-08** engineer ask: Closure documentation committed as 7f2df59d; reproducers retained. Requested submit --override was refused: deep ticket: run pm.py red and wait for...
-- 2026-11-14 15:06 **S12-04** lead answer: Lead: submit with the mixed commit. Red and green are shown by the two logs (red 150442 against the old card_run, green 150451); no history correct...
 
 ## Cost
 
-- From the script, engineer: 616 sessions, 1242.1M input tokens
+- From the script, engineer: 617 sessions, 1244.2M input tokens
 - From the script, lead: 403 sessions, 111.5M input tokens
-- Started by hand, Claude: 12 sessions, 3203.7M input tokens
+- Started by hand, Claude: 12 sessions, 3204.2M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
