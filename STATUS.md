@@ -1,10 +1,10 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-14 15:50.
+Updated automatically at every ticket change. Last update: 2026-11-14 15:59.
 
 **Waiting for you:** S12-21. Run `python tools/pm.py inbox`.
 
-Current tickets: `[##################--]` 222 of 238
+Current tickets: `[##################--]` 223 of 238
 
 ## Milestones
 
@@ -14,7 +14,7 @@ Current tickets: `[##################--]` 222 of 238
 | M1 | Mixed native code | Done | 43 of 43 tickets |
 | M2 | Useful vector target | Done | 51 of 51 tickets |
 | M3 | Runtimes | Done | 48 of 48 tickets |
-| M4 | Broad optimization | In progress | 40 of 56 tickets |
+| M4 | Broad optimization | In progress | 41 of 56 tickets |
 | M5 | Program corpus | Not started | Not planned in detail yet |
 | M6 | Release | Not started | Not planned in detail yet |
 
@@ -88,7 +88,7 @@ Current tickets: `[##################--]` 222 of 238
 | S12-05 | DMA end-to-end time - overlap file read, DMA and file write, and copy on the card with more than one thread | draft |  |
 | S12-06 | M4 theme 1 - strict scalar FP conversions and call boundaries (NPB-EP transform and log path, NPB-IS randlc) | Done | Theme 1 (scalar FP conversions and calls in NPB-EP/IS) closed with no compiler change: a card diagnostic sh... |
 | S12-07 | M4 theme 2 - indexed-load scheduling with strict sparse reduction (NPB-CG) | lead | Card run needed (interactive lead only): run .work/_shared/S12-07/sparse-paired via tools/card_run --thread... |
-| S12-08 | M4 theme 3 - dependency-preserving scalar updates and register pressure in dense loops (PB-ludcmp, x87 stack traffic) | Waiting for review | Closure documentation 7f2df59d submitted as is per lead. Phase-1 premise failed; no compiler change. Reprod... |
+| S12-08 | M4 theme 3 - dependency-preserving scalar updates and register pressure in dense loops (PB-ludcmp, x87 stack traffic) | Done | Theme 3 (register pressure in dense loops) closed with no compiler change: PB-ludcmp's extra x87 stack traf... |
 | S12-09 | Sprint 12 batch check - integrated themes at the final Sprint 12 head, regression evidence, optional modes frozen | draft |  |
 | S12-10 | Research - what KNC hardware and runtime knowledge are we still missing to tune GCC-KNC, the OS runtime and broad optimization, and where is it documented? | Done | KNC reference-gap research done: 16 gaps ranked, 32 primary sources (98 MB, outside git) with page-cited fa... |
 | S12-11 | Research - best practices for a dual Xeon E5-2690 v3 + Xeon Phi (KNC) workstation (HP Z840) for LLM inference and scientific computing | Done | Z840 dual E5-2690 v3 + Xeon Phi setup guide done: slot/BIOS/memory/power/cooling checklist, MPSS-on-modern-... |
@@ -263,6 +263,7 @@ Current tickets: `[##################--]` 222 of 238
 
 ## Recent activity
 
+- 2026-11-14 15:59 **S12-08** lead approve: Theme 3 (register pressure in dense loops) closed with no compiler change: PB-ludcmp's extra x87 stack traffic is ordered reduction storage outside...
 - 2026-11-14 15:50 **S12-21** engineer escalate: Duplicate-session collision; ask refused because the other session already blocked this ticket. Commits 39ebc1bf/113aa468 and docs/research/s12-21-...
 - 2026-11-14 15:49 **S12-21** engineer ask: Concurrent S12-21 session committed 39ebc1bf while I wrote the same staging tool. Overlapping build logs: .work/_state/logs/s12_21_stage-20261114-1...
 - 2026-11-14 15:48 **S12-17** lead approve: The parallel execute-suite runner starts again in exclusive card runs: claude-torture -j N with an explicit per-program limit no longer needs an in...
@@ -270,7 +271,6 @@ Current tickets: `[##################--]` 222 of 238
 - 2026-11-14 15:35 **S12-17** owner decide: Lead raises input_tokens 2M -> 3M: all work is done (fix, red/green, rebuilt and linted binary); the lead submits it.
 - 2026-11-14 15:33 **S12-08** engineer submit: Closure documentation 7f2df59d submitted as is per lead. Phase-1 premise failed; no compiler change. Reproducers retained. Prior host build/lint PA...
 - 2026-11-14 15:32 **S12-17** engineer escalate: budget: 2208651 input tokens used; the budget is 2000000
-- 2026-11-14 15:31 **S12-19** lead answer: Lead: no card capture needed. GCC does not change generated code for -g. Rebuild each development program with exactly the S11-18 builds.json flags...
 
 ## Cost
 
@@ -282,4 +282,4 @@ Current tickets: `[##################--]` 222 of 238
 
 ## Disk
 
-The project uses 33.0 GiB of 100 GiB. 144 GiB free on the drive.
+The project uses 33.0 GiB of 100 GiB. 149 GiB free on the drive.
