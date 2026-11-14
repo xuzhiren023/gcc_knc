@@ -2,7 +2,7 @@
 
 Updated automatically at every ticket change. Last update: 2026-11-14 13:34.
 
-**Next: the tech lead, on S12-17.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: the tech lead, on S12-16.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[##################--]` 214 of 229
 
@@ -96,7 +96,7 @@ Current tickets: `[##################--]` 214 of 229
 | S12-13 | Digest the S12-10 sources into our knowledge base - correct our KNC notes, build a reference index, and list what our practice should change | In progress | 1. R09 is misread in four places: it says R09's results only cover the older MPSS 2.1.4346-16 stack, but R0... |
 | S12-14 | Audit GCC-KNC's tuning model and runtime defaults against the digested sources - every mismatch with a proposed change and its proof | Not started |  |
 | S12-15 | Research - literature survey of published Xeon Phi (KNC) and Xeon Phi system research that matches our goals; what have we overlooked? | In progress |  |
-| S12-16 | Research - whole-system tuning playbook for the Z840 + Xeon Phi (BIOS, host OS, MPSS and card, transfers, runtimes), as HPC centres tuned Xeon + KNC systems | In progress |  |
+| S12-16 | Research - whole-system tuning playbook for the Z840 + Xeon Phi (BIOS, host OS, MPSS and card, transfers, runtimes), as HPC centres tuned Xeon + KNC systems | Waiting for review | Committed 100ecad0: docs/research/system-tuning-playbook.md covers versioned evidence, settings, verificati... |
 | S12-17 | claude-torture -j N refuses to start in exclusive card runs (no inherited RLIMIT_AS since S11-29), so the execute suite cannot run | Question for the tech lead | Red test unexpectedly passed because the pending fix was included in the worktree and pm.py commit stages a... |
 | S13-01 | M4 final gate - stage the ADR-0015 gate run at the final head (17 programs, held-out unsealed, six pairs, three profiles) | draft |  |
 | S2-01 | Design for zmm and mask registers under -march=knc | Done | The register design for KNC is settled on paper: all 32 zmm and 8 mask registers become usable under -march... |
@@ -254,6 +254,7 @@ Current tickets: `[##################--]` 214 of 229
 
 ## Recent activity
 
+- 2026-11-14 13:34 **S12-16** engineer submit: Committed 100ecad0: docs/research/system-tuning-playbook.md covers versioned evidence, settings, verification, effects, risks, rollback and a 75-12...
 - 2026-11-14 13:33 **S12-17** engineer ask: Red test unexpectedly passed because the pending fix was included in the worktree and pm.py commit stages all changes: commit 71cbcf86 contains bot...
 - 2026-11-14 13:32 **S12-17** lead answer: See the resume note above for the working host-test command.
 - 2026-11-14 13:32 **S12-17** lead resume: Lead 13:32: Cygwin python3 is a symlink Windows cannot spawn. Use Windows python for run.py, and Cygwin bash by absolute path with /usr/bin first a...
@@ -261,7 +262,6 @@ Current tickets: `[##################--]` 214 of 229
 - 2026-11-14 13:29 **S12-17** engineer ask: Test execution is blocked by Windows launcher permissions: tools/run.py launched via Cygwin python cannot spawn its command ('PermissionError: [Err...
 - 2026-11-14 13:29 **S12-13** lead changes: 1. R09 is misread in four places: it says R09's results only cover the older MPSS 2.1.4346-16 stack, but R09 p.5 (raman-stream-2013.txt:206-228) ha...
 - 2026-11-14 13:27 **S12-12** lead approve: The six follow-up card experiments (counter access, prefetch, page backing, libm route, branches, allocator) are staged as one 32-68 min batch for ...
-- 2026-11-14 13:18 **S12-13** engineer submit: Added R01-R27 reference index and 521-word owner digest with three ranked tables; corrected 17 notes with supersession markers and source pages. Re...
 
 ## Cost
 
