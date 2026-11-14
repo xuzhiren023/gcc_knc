@@ -66,7 +66,7 @@ Current tickets: `[###################-]` 206 of 213
 | S11-12 | Sprint 11 batch check - full native suite, x86 identity, forward-port drill, ICE sweeps, runtime prefix consistency | draft |  |
 | S11-13 | Senior compiler review of the Sprint 11-13 scope (Milestone M4) against our research, with recommended plan changes | Done | A senior compiler review of the Sprint 11-13 plan is in: M4 is plausible but needs a frozen scoring and mea... |
 | S11-14 | M4 scoring contract and measurement protocol, frozen before any tuning | Done | M4's scoring contract is frozen in ADR-0015 with a tested scorer: strict serial -O2 versus -O2 over 17 prog... |
-| S11-15 | First development-corpus baseline and profile, GCC 5.1.1 vs GCC-KNC at -O2 (E7-03 part 1) | Question for the tech lead | Committed 31272757. Please run from main: python tools/run.py --name S11-15-profile-batch -- powershell -No... |
+| S11-15 | First development-corpus baseline and profile, GCC 5.1.1 vs GCC-KNC at -O2 (E7-03 part 1) | lead | Card run needed. Batch at 31272757 reviewed and fine (36 launches: 12 serial + 6 OpenMP GCC-KNC dev builds,... |
 | S11-16 | Long-double libm hazard audit - do other MPSS long double entry points fault like cbrtl? (E7-21, bounded) | Done | The card's MPSS long double libm was probed on the card: of 12 entry points only cbrtl faults, and S10-13 a... |
 | S11-17 | PGO feasibility on one complete development program (reuse of S9-18's train/use path) | Question for the tech lead | eb3c2f3b: ten profiles imported; five binaries compiled/linted, positive counts, fatal mismatch checks. T1:... |
 | S11-18 | M4 corpus harness v2 - card profiles, prefix record, held-out sealing, stronger checks, and the donor-failure rule | Done | The M4 corpus harness now stages all 17 programs for the 7120 and the 3100/5100 profiles with serial voting... |
@@ -238,6 +238,7 @@ Current tickets: `[###################-]` 206 of 213
 
 ## Recent activity
 
+- 2026-11-14 01:00 **S11-15** lead defer: Card run needed. Batch at 31272757 reviewed and fine (36 launches: 12 serial + 6 OpenMP GCC-KNC dev builds, plain+sampled, full 7120, 600 s cap eac...
 - 2026-11-14 00:58 **S11-17** engineer ask: eb3c2f3b: ten profiles imported; five binaries compiled/linted, positive counts, fatal mismatch checks. T1: 2 pass, 3 fail. Reproducer: tools/s11_1...
 - 2026-11-14 00:57 **S11-02** engineer ask: 4aae037c fixes defaults/fixtures; extra stat was POSIX Path.resolve. validate.ps1 resolves Suite before cd. Full tools suite: 236 tests, 48 failure...
 - 2026-11-14 00:55 **S11-27** lead approve: NPB-MG built by GCC-KNC at -O2 -march=knc now verifies on the card (class A in 14.1 s, against 33.8 s for GCC 5.1.1): reload no longer puts its x87...
@@ -245,7 +246,6 @@ Current tickets: `[###################-]` 206 of 213
 - 2026-11-14 00:41 **S11-29** lead defer: Interactive lead: no rebase needed (main changed only ticket/status files; card_run untouched). Run card round per .work/_shared/S11-29/README.md: ...
 - 2026-11-14 00:41 **S11-17** owner decide: Budget raised by the lead under the owner's standing rule (2026-11-09/10: the lead extends session and token budgets itself; ask only after two ext...
 - 2026-11-14 00:40 **S11-17** engineer escalate: budget: 8962374 input tokens used; the budget is 6000000
-- 2026-11-14 00:40 **S11-02** owner decide: One more review round, granted by the lead under the owner's standing rule (2026-11-09/10: the lead extends limits itself; ask only after two exten...
 
 ## Cost
 
