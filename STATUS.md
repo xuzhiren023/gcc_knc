@@ -2,7 +2,7 @@
 
 Updated automatically at every ticket change. Last update: 2026-11-14 13:35.
 
-**Next: the tech lead, on S12-16.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: the tech lead, on S12-13.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[##################--]` 214 of 229
 
@@ -93,7 +93,7 @@ Current tickets: `[##################--]` 214 of 229
 | S12-10 | Research - what KNC hardware and runtime knowledge are we still missing to tune GCC-KNC, the OS runtime and broad optimization, and where is it documented? | Done | KNC reference-gap research done: 16 gaps ranked, 32 primary sources (98 MB, outside git) with page-cited fa... |
 | S12-11 | Research - best practices for a dual Xeon E5-2690 v3 + Xeon Phi (KNC) workstation (HP Z840) for LLM inference and scientific computing | Done | Z840 dual E5-2690 v3 + Xeon Phi setup guide done: slot/BIOS/memory/power/cooling checklist, MPSS-on-modern-... |
 | S12-12 | Stage S12-10's residual-gap card experiments as one combined Sprint 12 diagnostic batch (PMU access, prefetch, page backing, libm route, branches, allocator) | Done | The six follow-up card experiments (counter access, prefetch, page backing, libm route, branches, allocator... |
-| S12-13 | Digest the S12-10 sources into our knowledge base - correct our KNC notes, build a reference index, and list what our practice should change | In progress | 1. R09 is misread in four places: it says R09's results only cover the older MPSS 2.1.4346-16 stack, but R0... |
+| S12-13 | Digest the S12-10 sources into our knowledge base - correct our KNC notes, build a reference index, and list what our practice should change | Waiting for review | Corrected all four R09 passages at 173633ac after reading local pp.4-5: p.4 libhugetlbfs on MPSS 2.1.4346-1... |
 | S12-14 | Audit GCC-KNC's tuning model and runtime defaults against the digested sources - every mismatch with a proposed change and its proof | Not started |  |
 | S12-15 | Research - literature survey of published Xeon Phi (KNC) and Xeon Phi system research that matches our goals; what have we overlooked? | In progress |  |
 | S12-16 | Research - whole-system tuning playbook for the Z840 + Xeon Phi (BIOS, host OS, MPSS and card, transfers, runtimes), as HPC centres tuned Xeon + KNC systems | Waiting for review | Committed 100ecad0: docs/research/system-tuning-playbook.md covers versioned evidence, settings, verificati... |
@@ -255,17 +255,17 @@ Current tickets: `[##################--]` 214 of 229
 ## Recent activity
 
 - 2026-11-14 13:35 **S12-17** lead answer: Do not amend or split 71cbcf86. Instead prove red: temporarily check out tools/claude-torture.c from main (git checkout main -- tools/claude-tortur...
+- 2026-11-14 13:35 **S12-13** engineer submit: Corrected all four R09 passages at 173633ac after reading local pp.4-5: p.4 libhugetlbfs on MPSS 2.1.4346-16; p.5 THP-stack results on 7110P 2.1.49...
 - 2026-11-14 13:34 **S12-16** engineer submit: Committed 100ecad0: docs/research/system-tuning-playbook.md covers versioned evidence, settings, verification, effects, risks, rollback and a 75-12...
 - 2026-11-14 13:33 **S12-17** engineer ask: Red test unexpectedly passed because the pending fix was included in the worktree and pm.py commit stages all changes: commit 71cbcf86 contains bot...
 - 2026-11-14 13:32 **S12-17** lead answer: See the resume note above for the working host-test command.
 - 2026-11-14 13:32 **S12-17** lead resume: Lead 13:32: Cygwin python3 is a symlink Windows cannot spawn. Use Windows python for run.py, and Cygwin bash by absolute path with /usr/bin first a...
 - 2026-11-14 13:30 **S12-17** lead defer: Engineer's test runner is blocked by host environment: Cygwin python cannot spawn python3 via tools/run.py (Errno 13) and the Windows python alias ...
 - 2026-11-14 13:29 **S12-17** engineer ask: Test execution is blocked by Windows launcher permissions: tools/run.py launched via Cygwin python cannot spawn its command ('PermissionError: [Err...
-- 2026-11-14 13:29 **S12-13** lead changes: 1. R09 is misread in four places: it says R09's results only cover the older MPSS 2.1.4346-16 stack, but R09 p.5 (raman-stream-2013.txt:206-228) ha...
 
 ## Cost
 
-- From the script, engineer: 581 sessions, 1188.9M input tokens
+- From the script, engineer: 582 sessions, 1195.3M input tokens
 - From the script, lead: 385 sessions, 107.9M input tokens
 - Started by hand, Claude: 12 sessions, 3148.7M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
