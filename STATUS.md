@@ -1,10 +1,10 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-14 16:45.
+Updated automatically at every ticket change. Last update: 2026-11-14 16:47.
 
 **Next: GPT-6.1, on S12-21 (Scheduling model for M4's serial runs - measure density-1 tuning and the integer-multiply cost against today's density-4 defaults (S12-14 B02, B04, B05)).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
-Current tickets: `[##################--]` 224 of 241
+Current tickets: `[##################--]` 224 of 242
 
 ## Milestones
 
@@ -14,7 +14,7 @@ Current tickets: `[##################--]` 224 of 241
 | M1 | Mixed native code | Done | 43 of 43 tickets |
 | M2 | Useful vector target | Done | 51 of 51 tickets |
 | M3 | Runtimes | Done | 48 of 48 tickets |
-| M4 | Broad optimization | In progress | 42 of 59 tickets |
+| M4 | Broad optimization | In progress | 42 of 60 tickets |
 | M5 | Program corpus | Not started | Not planned in detail yet |
 | M6 | Release | Not started | Not planned in detail yet |
 
@@ -108,6 +108,7 @@ Current tickets: `[##################--]` 224 of 241
 | S12-25 | WRF smpar build arm with --param=knc-threads-per-core=2 for PhiWeather's 2-threads-per-core runs (A/B against S11-26's default-4 build) | draft |  |
 | S12-26 | WRF hot scalar routines - classify with the S12-19 triage tool and stage bitwise-safe per-file flag arms for PhiWeather to time | draft |  |
 | S12-27 | Latency-aware scalar loops - GCC-KNC unrolls and interleaves independent iterations and hoists conversions so one thread's every-other-cycle issue and long latencies are hidden automatically | draft |  |
+| S12-28 | dispatch.py refuses to start a second dispatcher on a lane that already has a live one | In progress |  |
 | S13-01 | M4 final gate - stage the ADR-0015 gate run at the final head (17 programs, held-out unsealed, six pairs, three profiles) | draft |  |
 | S13-02 | Libgomp per-region thread density - choose 1-4 workers per core per parallel region instead of once per program | draft |  |
 | S13-03 | M4 retrospective - what we did wrong, what worked, and the practice changes carried into the next milestone and the agent-team skill | draft |  |
@@ -279,7 +280,7 @@ Current tickets: `[##################--]` 224 of 241
 
 - From the script, engineer: 629 sessions, 1261.9M input tokens
 - From the script, lead: 413 sessions, 113.7M input tokens
-- Started by hand, Claude: 12 sessions, 3249.1M input tokens
+- Started by hand, Claude: 12 sessions, 3256.0M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
