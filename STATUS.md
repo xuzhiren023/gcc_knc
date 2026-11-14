@@ -2,7 +2,7 @@
 
 Updated automatically at every ticket change. Last update: 2026-11-14 14:59.
 
-**Next: the tech lead, on S12-19.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: the tech lead, on S12-07.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[##################--]` 220 of 237
 
@@ -87,7 +87,7 @@ Current tickets: `[##################--]` 220 of 237
 | S12-04 | card_run profile memory monitor costs under 5% of one card thread | In progress | Lead raises sessions 5 -> 7 (second raise; standing owner rule): sessions 4-5 delivered the throttled scan ... |
 | S12-05 | DMA end-to-end time - overlap file read, DMA and file write, and copy on the card with more than one thread | draft |  |
 | S12-06 | M4 theme 1 - strict scalar FP conversions and call boundaries (NPB-EP transform and log path, NPB-IS randlc) | Done | Theme 1 (scalar FP conversions and calls in NPB-EP/IS) closed with no compiler change: a card diagnostic sh... |
-| S12-07 | M4 theme 2 - indexed-load scheduling with strict sparse reduction (NPB-CG) | In progress | Do not hand-roll include paths for the build-tree xg++. For the 'before' compiler use the installed driver ... |
+| S12-07 | M4 theme 2 - indexed-load scheduling with strict sparse reduction (NPB-CG) | Question for the tech lead | Phase-one staged at 9823e291; installed drivers fixed headers. Host build/lint PASS: .work/_state/logs/s12_... |
 | S12-08 | M4 theme 3 - dependency-preserving scalar updates and register pressure in dense loops (PB-ludcmp, x87 stack traffic) | In progress |  |
 | S12-09 | Sprint 12 batch check - integrated themes at the final Sprint 12 head, regression evidence, optional modes frozen | draft |  |
 | S12-10 | Research - what KNC hardware and runtime knowledge are we still missing to tune GCC-KNC, the OS runtime and broad optimization, and where is it documented? | Done | KNC reference-gap research done: 16 gaps ranked, 32 primary sources (98 MB, outside git) with page-cited fa... |
@@ -263,13 +263,13 @@ Current tickets: `[##################--]` 220 of 237
 ## Recent activity
 
 - 2026-11-14 14:59 **S12-19** engineer red: Revised red d3ee9323: 10 cases, 2 test files; real GCC messages with citations, both in-order refusals, actual strict-FP cost refusal, captured add...
+- 2026-11-14 14:59 **S12-07** engineer ask: Phase-one staged at 9823e291; installed drivers fixed headers. Host build/lint PASS: .work/_state/logs/s12_07_stage-20261114-145549.log. Please run...
 - 2026-11-14 14:57 **S12-04** owner decide: Lead raises sessions 5 -> 7 (second raise; standing owner rule): sessions 4-5 delivered the throttled scan and host tests; one small requested chan...
 - 2026-11-14 14:57 **S12-04** engineer escalate: budget: 5 engineer sessions used; the budget is 5
 - 2026-11-14 14:56 **S12-17** lead answer: The new tests are in tests/tools/test_torture_driver.py (committed in 71cbcf86); YOUR_TEST was a placeholder. With tools/claude-torture.c from main...
 - 2026-11-14 14:55 **S12-04** lead changes: The scan throttling is good. One change: nothing confirms the card BusyBox has usleep. Make both waits fall back silently: in the awk loop use syst...
 - 2026-11-14 14:53 **S12-17** engineer ask: Red proof blocked: tools/claude-torture.c was restored from main, but the new test file named in the lead instruction is absent (tests/tools/test_c...
 - 2026-11-14 14:53 **S12-04** engineer submit: Host profile memory tests passed (7 tests): C:\Users\xuzhi\Documents\gcc_knc\.work\_state\logs\S12_04_profile_memory-20261114-145253.log. Awaiting ...
-- 2026-11-14 14:52 **S12-07** lead answer: Do not hand-roll include paths for the build-tree xg++. For the 'before' compiler use the installed driver exactly as tools/corpus does: corpus.com...
 
 ## Cost
 
