@@ -109,7 +109,7 @@ Current tickets: `[##################--]` 227 of 244
 | S12-26 | WRF hot scalar routines - classify with the S12-19 triage tool and stage bitwise-safe per-file flag arms for PhiWeather to time | draft |  |
 | S12-27 | Latency-aware scalar loops - GCC-KNC unrolls and interleaves independent iterations and hoists conversions so one thread's every-other-cycle issue and long latencies are hidden automatically | draft |  |
 | S12-28 | dispatch.py refuses to start a second dispatcher on a lane that already has a live one | Done | dispatch.py now refuses to start a second dispatcher on a lane that already has a live one (a lock per lane... |
-| S12-29 | Wrong code - vbroadcastsd reads a 4-byte-aligned SCmode constant (complex float) straight from the constant pool and faults on the card (gcc.c-torture pr38969.c, regression from S11-27) | Question for the tech lead | Lead 18:58: lane gcc built at 51126f4c232 (log s12_29_build-20261114-184627.log). Run green T1, T0-T2, the ... |
+| S12-29 | Wrong code - vbroadcastsd reads a 4-byte-aligned SCmode constant (complex float) straight from the constant pool and faults on the card (gcc.c-torture pr38969.c, regression from S11-27) | In progress | Built; run green and restage. |
 | S13-01 | M4 final gate - stage the ADR-0015 gate run at the final head (17 programs, held-out unsealed, six pairs, three profiles) | draft |  |
 | S13-02 | Libgomp per-region thread density - choose 1-4 workers per core per parallel region instead of once per program | draft |  |
 | S13-03 | M4 retrospective - what we did wrong, what worked, and the practice changes carried into the next milestone and the agent-team skill | draft |  |
@@ -269,6 +269,7 @@ Current tickets: `[##################--]` 227 of 244
 
 ## Recent activity
 
+- 2026-11-14 18:51 **S12-29** lead answer: Built; run green and restage.
 - 2026-11-14 18:51 **S12-29** lead resume: Lead 18:58: lane gcc built at 51126f4c232 (log s12_29_build-20261114-184627.log). Run green T1, T0-T2, the S11-27 preservation checks and ICE sweep...
 - 2026-11-14 18:45 **S12-18** lead approve: The vector math benchmark now always times valid 50-200 ms batches, and the valid card runs show double exp, log and pow are faster than scalar on ...
 - 2026-11-14 18:34 **S12-18** engineer submit: e015d913 records lead native full/3100/5100 results and closes phase 2. Double exp/log/pow faster in both sets; all accepted batches valid, exits 0...
@@ -276,7 +277,6 @@ Current tickets: `[##################--]` 227 of 244
 - 2026-11-14 18:31 **S12-18** lead resume: Lead, card window 1 (22:29-22:47Z, all batches valid, outputs .work/_shared/tmp/claude-s12-window1/s12-18-{full,3100,5100}.out): vector over scalar...
 - 2026-11-14 18:14 **S12-29** lead defer: GCC build needed, lane gcc at 51126f4c232 (s12/S12-29, .work/_shared/gcc): interactive lead runs python tools/run.py --name s12_29_build -- python ...
 - 2026-11-14 18:14 **S12-23** engineer submit: Green gate, payload build/lint, T0/T1 PASS (prior session). Lead T2: 36 PASS, 0 FAIL; log .work/_state/logs/s12_23_t2-20261114-181240.log. Earlier ...
-- 2026-11-14 18:13 **S12-23** lead answer: T2 passed (lead run); submit.
 
 ## Cost
 
