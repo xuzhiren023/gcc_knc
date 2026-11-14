@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-14 02:01.
+Updated automatically at every ticket change. Last update: 2026-11-14 02:02.
 
 **Waiting for you:** S11-17. Run `python tools/pm.py inbox`.
 
@@ -66,7 +66,7 @@ Current tickets: `[###################-]` 206 of 213
 | S11-12 | Sprint 11 batch check - full native suite, x86 identity, forward-port drill, ICE sweeps, runtime prefix consistency | draft |  |
 | S11-13 | Senior compiler review of the Sprint 11-13 scope (Milestone M4) against our research, with recommended plan changes | Done | A senior compiler review of the Sprint 11-13 plan is in: M4 is plausible but needs a frozen scoring and mea... |
 | S11-14 | M4 scoring contract and measurement protocol, frozen before any tuning | Done | M4's scoring contract is frozen in ADR-0015 with a tested scorer: strict serial -O2 versus -O2 over 17 prog... |
-| S11-15 | First development-corpus baseline and profile, GCC 5.1.1 vs GCC-KNC at -O2 (E7-03 part 1) | Question for the tech lead | 70049a7e: restaged .work/_shared/S11-15/lead.ps1, 14 remaining launches, expected 10-15 min; 18 PASS captur... |
+| S11-15 | First development-corpus baseline and profile, GCC 5.1.1 vs GCC-KNC at -O2 (E7-03 part 1) | In progress | Remaining batch ran 2026-11-14 01:57-02:02 EST: all 14 launches PASS (PROFILE_BATCH_COMPLETE). Log .work/_s... |
 | S11-16 | Long-double libm hazard audit - do other MPSS long double entry points fault like cbrtl? (E7-21, bounded) | Done | The card's MPSS long double libm was probed on the card: of 12 entry points only cbrtl faults, and S10-13 a... |
 | S11-17 | PGO feasibility on one complete development program (reuse of S9-18's train/use path) | **Waiting for you** | budget: 7 engineer sessions used; the budget is 7 |
 | S11-18 | M4 corpus harness v2 - card profiles, prefix record, held-out sealing, stronger checks, and the donor-failure rule | Done | The M4 corpus harness now stages all 17 programs for the 7120 and the 3100/5100 profiles with serial voting... |
@@ -238,6 +238,7 @@ Current tickets: `[###################-]` 206 of 213
 
 ## Recent activity
 
+- 2026-11-14 02:02 **S11-15** lead answer: Remaining batch ran 2026-11-14 01:57-02:02 EST: all 14 launches PASS (PROFILE_BATCH_COMPLETE). Log .work/_state/logs/S11_15_profile_remaining-20261...
 - 2026-11-14 02:01 **S11-02** engineer submit: 7deb440b: production/output_dir retained. Both helpers rebuilt; GCC-KNC card helper lint passed, staged .work/_shared/S11-02. Log: .work/_state/log...
 - 2026-11-14 01:59 **S11-29** engineer submit: Both acceptance items met (lead 01:55). Six host tests passed: .work/_state/logs/S11_29_revision-20261114-011227.log; not rerun. Lead card round: H...
 - 2026-11-14 01:58 **S11-17** engineer escalate: budget: 7 engineer sessions used; the budget is 7
@@ -245,16 +246,15 @@ Current tickets: `[###################-]` 206 of 213
 - 2026-11-14 01:56 **S11-17** lead resume: Lead regenerated the scripts and ran training at a3258fe0, 01:32 EST.
 - 2026-11-14 01:56 **S11-02** lead answer: The lead merged main into s11/S11-02 at 7deb440b. build() now takes production and output_dir: production writes to _shared/S11-02, otherwise outpu...
 - 2026-11-14 01:55 **S11-29** lead answer: Second card round at cbe9a3d6, 2026-11-14 01:32-01:52 EST, receipts .work/_shared/S11-29/*.json, log .work/_state/logs/S11_29_card2-20261114-013238...
-- 2026-11-14 01:54 **S11-29** lead resume: Lead ran the second card round at cbe9a3d6, 01:32-01:52 EST.
 
 ## Cost
 
 - From the script, engineer: 560 sessions, 1134.4M input tokens
 - From the script, lead: 368 sessions, 103.1M input tokens
-- Started by hand, Claude: 12 sessions, 3068.2M input tokens
+- Started by hand, Claude: 12 sessions, 3069.1M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 31.7 GiB of 100 GiB. 173 GiB free on the drive.
+The project uses 31.7 GiB of 100 GiB. 170 GiB free on the drive.
