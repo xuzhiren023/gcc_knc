@@ -2,7 +2,7 @@
 
 Updated automatically at every ticket change. Last update: 2026-11-14 15:30.
 
-**Next: the tech lead, on S12-19.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: the tech lead, on S12-08.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[##################--]` 221 of 238
 
@@ -88,7 +88,7 @@ Current tickets: `[##################--]` 221 of 238
 | S12-05 | DMA end-to-end time - overlap file read, DMA and file write, and copy on the card with more than one thread | draft |  |
 | S12-06 | M4 theme 1 - strict scalar FP conversions and call boundaries (NPB-EP transform and log path, NPB-IS randlc) | Done | Theme 1 (scalar FP conversions and calls in NPB-EP/IS) closed with no compiler change: a card diagnostic sh... |
 | S12-07 | M4 theme 2 - indexed-load scheduling with strict sparse reduction (NPB-CG) | lead | Card run needed (interactive lead only): run .work/_shared/S12-07/sparse-paired via tools/card_run --thread... |
-| S12-08 | M4 theme 3 - dependency-preserving scalar updates and register pressure in dense loops (PB-ludcmp, x87 stack traffic) | lead | Closure done: 7f2df59d states 'premise failed, no compiler change' up front, keeps both reproducers, no GCC... |
+| S12-08 | M4 theme 3 - dependency-preserving scalar updates and register pressure in dense loops (PB-ludcmp, x87 stack traffic) | Question for the tech lead | Lead: type is now research (negative result, no compiler change), so submit needs no red commit. Submit 7f2... |
 | S12-09 | Sprint 12 batch check - integrated themes at the final Sprint 12 head, regression evidence, optional modes frozen | draft |  |
 | S12-10 | Research - what KNC hardware and runtime knowledge are we still missing to tune GCC-KNC, the OS runtime and broad optimization, and where is it documented? | Done | KNC reference-gap research done: 16 gaps ranked, 32 primary sources (98 MB, outside git) with page-cited fa... |
 | S12-11 | Research - best practices for a dual Xeon E5-2690 v3 + Xeon Phi (KNC) workstation (HP Z840) for LLM inference and scientific computing | Done | Z840 dual E5-2690 v3 + Xeon Phi setup guide done: slot/BIOS/memory/power/cooling checklist, MPSS-on-modern-... |
@@ -264,13 +264,13 @@ Current tickets: `[##################--]` 221 of 238
 ## Recent activity
 
 - 2026-11-14 15:30 **S12-17** owner decide: Lead raises sessions 6 -> 7: the last raise made progress (green test passed); one session to rebuild the staged binary and submit.
+- 2026-11-14 15:30 **S12-08** lead resume: Lead: type is now research (negative result, no compiler change), so submit needs no red commit. Submit 7f2df59d as is.
 - 2026-11-14 15:28 **S12-04** lead approve: card_run's profile memory monitor no longer floods stderr and scans /proc far less often: it uses usleep with a sleep 1 fallback instead of the Bus...
 - 2026-11-14 15:13 **S12-21** lead changes: FLAGS['density1'] pins -mknc-density=1, but no such option exists: the density control is --param=knc-threads-per-core= (i386.opt:1400, Init 4, ran...
 - 2026-11-14 15:13 **S12-17** engineer escalate: budget: 6 engineer sessions used; the budget is 6
 - 2026-11-14 15:13 **S12-04** engineer submit: Host profile memory tests passed (7 tests); strengthened fallback test red against original card_run and green with fix. Logs: .work/_state/logs/S1...
 - 2026-11-14 15:12 **S12-19** engineer ask: 6c999a43: join core; 10 host tests pass. Audit: 0/15109 workload samples resolve to source; HPCG has no capture. Repro: python tools/vec_triage.py ...
 - 2026-11-14 15:11 **S12-08** lead defer: Closure done: 7f2df59d states 'premise failed, no compiler change' up front, keeps both reproducers, no GCC commit (knc..s12/S12-08 empty). pm.py s...
-- 2026-11-14 15:09 **S12-04** owner decide: Lead raises sessions 7 -> 8: the last raise made progress (usleep fallback, red/green logs); one session to submit.
 
 ## Cost
 
