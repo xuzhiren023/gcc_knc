@@ -1,6 +1,8 @@
 # S12-08: distinguish pressure spills from ordered-reduction storage
 
-2026-11-14, phase 1. No compiler change and no native execution.
+2026-11-14, phase 1: **premise failed, no compiler change**. No native
+execution. The lead closed the failed premise without a card run; phase 2
+is not entered.
 
 The large x87 stack count does **not** establish an x87-pressure problem in
 the qualified ludcmp loops. Its 128 floating-point stack reads are ordered
@@ -8,6 +10,7 @@ consumption of vector products in the later triangular solves, outside the
 three selected hot regions. The remaining two reads convert integers.
 There are real GPR spills around the dense loops, but no demonstrated
 removable spill inside their hot bodies. Phase 2 has not started.
+The hot matrix-construction exposure stays unexplained by pressure.
 
 ## Evidence and scope
 
@@ -172,8 +175,12 @@ AGENTS.md. No T0--T2/ICE/x86 or whole-corpus acceptance is claimed. No
 before/after compiler pair exists, so the phase-2 ludcmp/cholesky/CG/zlib
 full/3100/5100 corpus batch has not been staged. x86 not run.
 
-The original hot-x87-spill premise fails this static inspection. Request
-lead review of that phase boundary and, if useful, the staged timing batch
-before deciding whether a narrower ordered-reduction cost question
-warrants continuing. Outer GPR spills alone do not establish the benefit
-required to enter phase 2.
+## Open for a later ticket
+
+- The fold-left vector-to-x87 bridge through stack memory in the ludcmp
+  solves and CG `conj_grad_` (168 sites) has unmeasured cost. The staged
+  `.work/_shared/S12-08/diagnostic.sh` is the ready measurement; these
+  bridges do not explain the qualified ludcmp hot-region exposure.
+- Outer GPR induction-variable spills around the strided loops have not
+  been shown removable. They do not establish a benefit that would justify
+  entering phase 2.
