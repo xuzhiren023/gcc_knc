@@ -1,5 +1,15 @@
 # KNC register design (S2-01)
 
+**ABI qualification, S12-13 (2026-11-14).** R03 §§3.2.1–3 pp.15–22,
+especially Fig.3.4 p.21 ([index](knc-references.md)), is the recovered K1OM
+ABI authority for this historical design: all 32 ZMM and eight mask registers
+are caller-clobbered; MXCSR control bits and x87 control word are callee-saved,
+status is caller-clobbered. Its SSE class name does not enable SSE. Register
+availability does not establish a free GPR/x87/ZMM transfer, and a call save
+is not necessarily a removable allocator spill. R12 CD14 p.22 separately
+requires OS mask-state handling across context switches; ABI call clobbers
+do not relax that requirement.
+
 Recommendation: reuse GCC 16's existing vector and mask hard-register numbers,
 but give KNC its own mode whitelist, constraints and IMCI moves. Do not enable
 SSE/AVX feature bits to obtain ABI registers. This is a source design, with no

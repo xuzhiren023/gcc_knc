@@ -4,11 +4,29 @@ Status: measured from six lead-run exclusive card windows. The 60-core,
 four-thread production configuration meets the proposed <2% variation criterion;
 density 3 does not. TSC invariance remains unproven. No compiler change.
 
+**S12-13 qualification (2026-11-14):** this is the original proposal, not
+the current ADR-0010 decision. Amendment 2 supersedes spread-based rejection
+and the earlier physical-page explanation; retain all valid launches and the
+prescribed interleaved comparison. The 240-worker setting here is the M2
+protocol, not M4's primary single-worker profile. R10 p.11
+([reference index](knc-references.md)) cautions against TSC wall-clock use;
+RAW and RDTSC sharing a TSC clocksource is not independent calibration.
+R12 CD34 p.26 supports explicit worker affinity; CD31/32 pp.25–26 and CD42
+p.28 motivate recording actual power/frequency state, not assuming fixes.
+R09 p.4 documents card-side THP and later local runs obtained explicit huge
+pages; old zero `AnonHugePages`/`nr_hugepages` observations do not establish
+every future mapping. Record actual backing per experiment. ADR changes are
+listed in the digest for the lead; none is applied here.
+
 Evidence shorthand: `R1` through `R6` mean
 `.work/_shared/S6-01/claude-bench/run1.out` through `run6.out`, with physical
 line numbers below. These outputs stay in the shared area. Intel 330991 pages
 and Klemm slides are cited through [knc-microarch.md](knc-microarch.md), as the
 lead directed; the Intel document itself is not stored locally.
+
+These unpadded `R1`–`R6` names are historical **run-log aliases**, not the
+new `R01`–`R06` document identifiers. New document citations use the padded
+index numbers; new log citations should name their path and run explicitly.
 
 ## Proposed ADR protocol (one-page body)
 

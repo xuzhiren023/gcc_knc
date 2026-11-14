@@ -1,5 +1,16 @@
 # S5-01: gather, scatter, permutes, reductions and FP min/max on KNC
 
+**Cost qualification, S12-13 (2026-11-14).** R05 §V.D/Table II p.4
+([index](knc-references.md)) measures complete gather loops, not a single
+universal gather cost: active lines, cache residence, mask tests and retries
+matter. R05 p.5 reports ineffective/blocking gather-prefetch behavior in that
+5110P application; it does not establish every hint's behavior or scatter
+cost. R14 §§4.2–3 pp.7–10 is pre-release SE10P sparse-locality evidence,
+not permission to reorder strict FP reductions. Current cost interpolation
+and scatter reuse in `ix86_knc_stmt_cost` remain estimates; S12-07 owns their
+missing production measurements. Source citations do not replace existing
+native fault/scale/restart evidence recorded by ADR-0008.
+
 Research for backlog E4-02 and E4-06 (`docs/BACKLOG.md:65,69`), input to ADR-0008.
 Read only: no GCC build and no card job. The probe in item 6 has not run on the card,
 so every hardware statement below is what the manual says, not what the card does.

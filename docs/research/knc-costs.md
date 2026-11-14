@@ -24,6 +24,7 @@ multiplication reductions feed the existing x86 `reduc_lat_mult_thr` /
 the existing `--param=ix86-vect-unroll-limit` remains available. Floating
 point reassociation still requires explicit permission such as `-ffast-math`.
 
+**Historical S6 defaults, superseded as current settings (S12-13, 2026-11-14).**
 The cache defaults are L1 32 KB, L2 512 KB and 64-byte lines; both caches
 are 8-way. GCC's processor costs and cache parameters have no associativity
 field, so no fictitious associativity option is added. Prefetch latency is
@@ -31,6 +32,14 @@ estimated as 360 instructions from the measured memory latency and one issue
 per cycle. Four simultaneous prefetches are an estimate of one per hardware
 thread. Explicit user parameter values take precedence. This change supplies
 costs; prefetch insertion and streaming-store tuning remain future work.
+
+**Current source:** `knc_processor_costs` at GCC `619e14b479a9` exposes
+32/256/64 for L1 KiB/effective L2 KiB/line bytes and 1024 software-prefetch
+bookkeeping slots. Physical L2 remains 512 KiB; 256 KiB models the 64×4 KiB
+first-level translation reach (R01 pp.22–23, [index](knc-references.md)).
+Two-level prefetch is implemented at 16/32 lines with a stream/density footprint
+rule, and NGO stores have eligibility/fencing support. Neither four nor 1024
+is a measured hardware queue size (R01 p.19; R27 pp.393–398,641).
 
 Gather costs estimate the lines touched. Unknown indices assume one line per
 lane. Known constant strides use `ceil(lanes * abs(byte_stride) / 64)`, at
@@ -40,6 +49,11 @@ alignment; arbitrary starting alignment may touch one more line. The estimate
 cost of 7 and sixteen-line cost of 127 cycles. Its intermediate values are
 interpolations, not measurements; a stride-2 FP32 gather costs 14. Scatter
 uses the same line-service estimate until it is measured separately.
+
+**S12-13 qualification:** R05 §V.D/Table II p.4 measures full gather loops,
+with distinct L1/L2 costs and active-line distributions. It does not validate
+our interpolation or scatter estimate. Retain setup/mask/retry work and cache
+residence in any replacement; S12-07 owns that diagnostic.
 
 Masked moves and memory conversions cost one vector issue; unaligned pairs
 cost two. Permutes cost one issue, with the existing two-input lowering
@@ -51,6 +65,12 @@ remain conservative at the full dependent latency. x87 add/multiply/divide
 cost 1/2/38 cycles per core. Unmeasured integer division, branches, size
 thresholds and alignment are estimates; comments identify the retained
 generic heuristics. String operations use libc pending measured crossovers.
+
+**S12-13 qualification:** R03 pp.15–22 establishes call clobbers and preserved
+controls, not transfer latency. R02 pp.32–34,56 requires operand/encoding-aware
+pairing; a throughput price does not make every scalar or mask spill free.
+Source sqrt=38 is still an estimate. S12-06/08 and S12-12 G05/G07 supply the
+missing scalar-path and branch/library evidence.
 
 The accepted T1 checks are the scattered gather rejection and the runtime
 double reduction with one default accumulator and at least two at density 1.
@@ -361,6 +381,11 @@ their passing verdicts. No additional T1 verdict changes were observed.
 `set_ix86_tune_features` before `-mtune-ctrl`, which still wins) changes only flags with a
 documented or measured KNC reason. `-mdump-tune-features` shows the result. Sources: SSDG p.16-22
 (`knc-optimization-sources.md` I-10, I-12), `knc-characterization.md` points 1-8.
+
+**Locator correction, S12-13:** the SSDG pp.16–22 citation above and p.16
+prefix citation below belong to the earlier unidentified 163-page edition.
+They are superseded for new work by R01 p.19 (prefix/latency facts) and
+pp.23–24 (threading/ready buffers), with R02 p.56 for pairing restrictions.
 
 | Flag (generic value) | KNC | Reason |
 |---|---|---|

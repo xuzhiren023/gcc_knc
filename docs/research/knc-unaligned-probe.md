@@ -1,5 +1,14 @@
 # S3-03: boundary behavior of KNC unaligned and masked moves
 
+**Errata qualification, S12-13 (2026-11-14).** The ordinary-memory probes
+below do not cover every memory type. R12 CD26 p.25
+([index](knc-references.md)) concerns a 64-byte-aligned high packstore to
+**uncacheable** memory paired with another memory operation. Its adjacency
+workaround belongs in a separately scoped UC/driver audit, not an assumption
+that WB masked tails fail. R12 CD19 p.23 also permits unexpected MXCSR after
+a faulting vector instruction; fault-state flags cannot serve as an unqualified
+arithmetic oracle. No new native result or deployed workaround is claimed.
+
 Native execution is pending the lead. Host checks do not establish native safety.
 This is a research probe, not an implementation of `movmisalign` or masked tails.
 

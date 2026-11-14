@@ -1,5 +1,13 @@
 # S4-01: masks on KNC (ADR-0007 input)
 
+**Context/issue qualification, S12-13 (2026-11-14).** Architectural mask
+semantics below do not certify OS state preservation. R12 CD14 p.22 requires
+mask save/restore on context switches because paired JKZD/JKNZD can miss a
+lazy #NM trigger. The deployed kernel workaround is unestablished. R03 p.21
+separately makes mask registers caller-clobbered. R02 pp.34,56 makes pairing
+dependent on encoding and operands, so mask work beside a vector instruction
+is not universally free. Sources: [reference index](knc-references.md).
+
 Read only; no build, no card run. GCC citations are `file:line` in `.work/_shared/gcc` at `knc`
 `0d3c0152fe3` (line numbers moved since ADR-0005: `ix86_get_mask_mode` is now `i386.cc:26073`,
 the partial-vector default `i386-options.cc:3176`). Manual pages are printed pages of Intel

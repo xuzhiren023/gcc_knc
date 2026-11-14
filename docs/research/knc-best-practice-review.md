@@ -13,8 +13,8 @@ Facts and references only (ADR-0013). Where each item went is in the last column
 | # | Practice | Source | Status before | Goes to |
 |---|---|---|---|---|
 | 1 | Prefetch for indirect access: the index stream and the gathered lines, gather prefetch hints, unrolled gather completion | ICC `-qopt-gather-scatter-unroll` (GUID-9AE10FC5-BB6C-4F22-A346-E84CDD79BF33); Rahman ch. 11; ISA pp. 303-310 | Not adopted (`knc-gather-reduce.md:87`) | BACKLOG E7-09 |
-| 2 | 2 MB pages for large arrays | McCalpin (STREAM 162 to 175 GB/s); Rahman ch. 10 | Partly: THP never promotes on the card (`card-runs-s6.md`), hugetlbfs needs root | Parked: PhiNix (kernel) |
-| 3 | Spin far longer before sleeping between parallel regions (Intel's runtime: about 200 ms) | PRACE BPG §13.2.4-13.2.5 | Partly: our 3 ms default is unmeasured against fork-heavy code; S9-08 shows spinning with `delay` costs siblings little | S9-15 |
+| 2 | 2 MB pages for large arrays | R08 slides 23–25; R09 p.4 ([index](knc-references.md)) | ~~THP never promotes on the card; hugetlbfs needs root~~ **Superseded S12-13:** earlier snapshot only. Card-side THP is documented for a named MPSS update; later local sweep has actual explicit huge pages. Ordinary malloc backing remains unestablished. | S12-12 G08; kernel changes only if evidence warrants |
+| 3 | Spin longer before sleeping between parallel regions | R18 §§13.2.4–5 pp.59–61 | ~~Our 3 ms default is unmeasured~~ **Superseded S12-13:** current `card.h` defaults to delay 128 and 200 ms; Intel runtime advice does not establish libgomp performance. | Implemented; realistic wait/barrier follow-up is G09, later |
 | 4 | Reuse large heap blocks instead of repeated mmap/munmap; allocation is serial and page zeroing slow | ICC `-qopt-malloc-options` (GUID-D0078E73-2EAA-4944-8D67-81E7D2D7CD26); Colfax | Not adopted | S9-17 (user guidance); E6-08 if an option is warranted |
 | 5 | Alignment peeling and versioning at `-O2` for long loops (ICC does it by default) | ICC `-qopt-dynamic-align` (GUID-C00A2B11-E69B-4822-890F-5A35E60F5F45); McCalpin | Partly: `-O3` and `-mphinix` only (S8-09) | BACKLOG E7-10 |
 | 6 | Exclusive prefetch (`vprefetche1/e0`) before stores that are not streaming | ISA pp. 641-656 | Partly: `knc_prefetch` drops the write hint (`imci.md:2132`) | BACKLOG E7-06 (amended) |
@@ -43,6 +43,11 @@ contraction by default (GCC's `-ffp-contract=fast`).
    check agrees (packed add/sub/mul match x87 on subnormals, `CURRENT_STATE.md`). G6 is corrected.
    WRF's observation was likely ICC's or `-ffast-math`'s FTZ. The VPU cost of a subnormal operand is
    unmeasured: S9-16.
+   **Qualification, S12-13:** R04 slides 9,18 and R27 pp.36,39,55–56
+   document gradual underflow, flags and no vector FP traps. The WRF cause
+   above remains an inference. Input-subnormal success does not resolve the
+   current `fpu-knc.h` tiny-output-flush observation; recover the exact test,
+   FZ/DAZ state and instruction before claiming agreement.
 2. **L1 prefetch distance.** McCalpin uses 8, PRACE 32, we 16 (measured on a 7120P, S8-03/C5).
    No change.
 3. **Thread density for bandwidth-bound code.** McCalpin finds 1 per core best for STREAM; the

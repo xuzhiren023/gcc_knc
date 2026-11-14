@@ -5,6 +5,12 @@ phase 2 follows below. Part 1 records the local-only investigation before
 that review. Part 2 records subsequent web research and document retrieval.
 Code is unchanged; no compiler build, program test or card job was run.
 
+**S12-13 follow-through (2026-11-14):** the stable R-number catalogue is now
+[knc-references.md](knc-references.md); implementation/practice consequences
+and ADR proposals are in [the digest](knc-digest-2026-11.md). Parts 1 and 2
+remain the history of the investigation. Source-specific qualifications below
+record additional configuration details found in the PDFs.
+
 ## Part 1 — What the existing evidence leaves unresolved
 
 ### Scope and evidence boundaries
@@ -810,6 +816,12 @@ explicit HugeTLB. Current policy, promotion success and backing remain unknown.
 Store legality/order still comes from the ISA conditions in part 1; a
 memory-bound recipe is not a generic default.
 
+**S12-13 qualification:** R09 p.4 explicitly labels its results
+**pre-production**, despite the 5110P/7110P column names, and identifies
+MPSS 2.1.4346-16 for that performance table. Its later-stack THP guidance is
+a separate claim. Those results do not measure transparent promotion under
+the recommended update or establish today's card allocation policy.
+
 
 #### R10 — Core PMU definitions recovered
 
@@ -886,6 +898,11 @@ The safe-padding option assumes another 64 bytes after objects, an extra
 program contract. **I:** ordinary GCC programs cannot be presumed padded.
 Tail and mask overhead belong in costs; reported option-dependent gains
 do not establish strict M4 gains or legal extra memory accesses.
+
+**S12-13 configuration qualification:** R13's introduction names a 5110P,
+but Table 6.1 p.1155 (PDF p.7) describes the measured system as 61 cores,
+1 GHz and 7936 MB. Its exact model/production status is not established;
+do not label the experiments 5110P from the introductory example.
 
 #### R14 — Sparse locality is not nominal bandwidth
 
@@ -1026,6 +1043,12 @@ in OpenMP using perf. **I:** this demonstrates an application synchronization
 bottleneck and historical profiling, not access on our image or a transferable
 percentage. Some numerals extract poorly; no hardware/compiler version is
 inferred from damaged text. Its generated-code transformations are not applied.
+
+**S12-13 source update:** direct PDF text at §4.1 p.29 (PDF p.37) gives
+57 cores at 1.1 GHz and ICC 16.0.1.150. This supersedes the earlier inability
+to establish those configuration fields from the damaged extraction. The
+commercial model, stepping and production qualification remain unspecified;
+they must not be inferred from core count.
 
 
 #### R24 — Allocator policy and an upstream x87 math reference

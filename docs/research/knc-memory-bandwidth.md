@@ -1,5 +1,14 @@
 # S11-05: a measured route to higher KNC memory bandwidth
 
+**Reference update, S12-13 (2026-11-14).** Existing numbered bibliography
+entries remain historical; new notes use [the R-number index](knc-references.md).
+Entry [2]'s 488596 transcription is not recovered R01 (328207-001EN,
+November 2012, 201 pages), nor the unidentified 163-page SSDG cited elsewhere.
+For cache/TLB facts use R01 pp.19,22–23; for PMU counts/units use R10
+pp.5–7,11–16. R06 is explicitly an engineering sample (p.55:10), R08 is
+SE10P, and R09 p.4 labels its performance results pre-production even though
+the table names 5110P/7110P. Keep those configurations with their results.
+
 The next experiment should combine completed NGO stores, the right thread
 density, explicit huge pages and coordinated prefetch, then attack mixed-stream
 conflicts with relative array placement and chunking. The deliverable is a
@@ -166,6 +175,14 @@ huge-page results separate. Page coloring remains an experiment, not a promised
 allocator fix: establishing physical color requires a verified channel map and
 access to physical page identities. No `/proc/pagemap` privileges are requested.
 
+**S12-13 qualification:** the zero-promotion observation is a snapshot, not
+“huge pages cannot be allocated.” Sweep 2 below reports 48 actual huge-page
+configurations. R09 p.4 documents THP in KNC_gold_update_1-2.1.4982-15 or later,
+but its result table uses an older stack; neither proves current malloc backing.
+R26a's `MIC_USE_2MB_BUFFERS` concerns offload transfers. The MPSS-guide setting
+in [12] remains a **reported** later-edition source, not a verified native
+allocation control. S12-12 G08 separates these cases.
+
 **Power and clocks.** Record firmware/MPSS/kernel versions, ECC state, GDDR
 transfer rate, core governor, turbo policy, current/min/max core frequencies,
 temperatures, throttling flags, free/huge memory, affinity, load and competing jobs.
@@ -194,6 +211,15 @@ MPSS exposes it to this user. Intel's PMU manual 327357-001 is identified by [2,
 section 2.1.7] and [13]; its old downloadable attachment returned 404 during this
 research. No KNL or Xeon-server event encoding is substituted. This is a source
 and installed-interface gap, not a claim that GBOX counters cannot work.
+
+**The core-document gap is superseded (S12-13):** R10 is now local. It and
+R11a `knc_pmu` establish **two 40-bit counters per hardware thread**, overriding
+R01 p.24's conflicting overview. R10 pp.12–16 distinguishes event units:
+active elements are not FLOPS; L2 misses can double-count a demand and prefetch;
+some events lack thread context. R11a's generic cache map uses L1 events and
+restricts several CRI events to counter 0. Core access still needs S12-12 G06.
+The GBOX interface/source gap remains; R12 CD37 p.27 additionally constrains
+driver writes during heavy memory traffic. No raw register access is proposed.
 
 The probe inventory distinguishes ENOSYS (syscall), EACCES/EPERM (permission),
 and absent GBOX PMU registration/event aliases. If GBOX events are exposed,
