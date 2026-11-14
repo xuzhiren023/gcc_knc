@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-14 14:13.
+Updated automatically at every ticket change. Last update: 2026-11-14 14:14.
 
 **Next: the tech lead, on S12-15.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
@@ -84,7 +84,7 @@ Current tickets: `[##################--]` 217 of 230
 | S12-01 | Sprint 12 prep - static code-quality census of the development-corpus builds (spills, x87/vector transfers, addressing, calls, code size) | Done | A static code-quality census (spill/reload proxies, x87 and x87-zmm traffic, address arithmetic, calls, bra... |
 | S12-02 | Sprint 12 prep - the unscored generality check set (S11-20's six programs in the code styles our corpus lacks) | Done | The six unscored generality checks (Q1-Q6: ray tracer hit dispatch and vec3 AoS, Burkardt MD, Reference BLA... |
 | S12-03 | pm.py approve aborts its own merge on conflict and refuses cleanly, so main is never left mid-merge | draft |  |
-| S12-04 | card_run profile memory monitor costs under 5% of one card thread | Changes requested | Red stage must hold only the failing test: commit c122120a also carries the card_run fix, so red-then-green... |
+| S12-04 | card_run profile memory monitor costs under 5% of one card thread | In progress | Red stage must hold only the failing test: commit c122120a also carries the card_run fix, so red-then-green... |
 | S12-05 | DMA end-to-end time - overlap file read, DMA and file write, and copy on the card with more than one thread | draft |  |
 | S12-06 | M4 theme 1 - strict scalar FP conversions and call boundaries (NPB-EP transform and log path, NPB-IS randlc) | In progress | Lead: closed at phase 1 (premise fails), so the ticket is now type research and needs no red commit. Submit... |
 | S12-07 | M4 theme 2 - indexed-load scheduling with strict sparse reduction (NPB-CG) | Not started |  |
@@ -268,10 +268,10 @@ Current tickets: `[##################--]` 217 of 230
 
 - From the script, engineer: 590 sessions, 1210.4M input tokens
 - From the script, lead: 390 sessions, 108.8M input tokens
-- Started by hand, Claude: 12 sessions, 3165.6M input tokens
+- Started by hand, Claude: 12 sessions, 3166.8M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 32.1 GiB of 100 GiB. 152 GiB free on the drive.
+The project uses 32.1 GiB of 100 GiB. 151 GiB free on the drive.
