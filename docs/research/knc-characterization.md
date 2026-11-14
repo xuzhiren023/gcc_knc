@@ -18,9 +18,16 @@ figure by 4: the core's cost per operation when all four threads issue.
    Two threads already reach the core's limit of **one vector op per cycle** (2.07 per thread); four
    threads stay at one per cycle (4.19 per thread). Vector latency is **4** (add, mul, FMA, integer,
    logic, int/float conversions), **6** for permutes, swizzles and `vrcp23ps`, **7** for double to
-   int conversions. At 4 threads the latency is hidden (4.19 per thread, the same as throughput).
+   int conversions. ~~At 4 threads the latency is hidden (4.19 per thread, the same as throughput).~~
+   **S12-13 correction:** this describes the four-cycle arithmetic rows only.
+   The 6/7-cycle rows below retain dependency cost. R02 pp.32–33 and R17
+   slide 12 ([index](knc-references.md)) distinguish typical arithmetic from
+   longer paths; raw latency and per-thread ticks are different quantities.
 2. **Pairing.** A vector op pairs with a scalar op (2.08 per pair at one thread, 4.20 at four);
-   two vector ops never pair (4.09 and 8.20). Scalar integer and mask ops pair with each other
+   ~~two vector ops never pair~~ **the tested vector-op pair did not pair**
+   (4.09 and 8.20). **S12-13:** R02 pp.34,56 and R10 p.16 leave selected
+   stores/packstores eligible subject to encoding restrictions; this experiment
+   does not cover all vector instructions. Scalar integer and mask ops pair with each other
    (1.07 per op at one thread): latency 2, two per cycle per core.
 3. **Memory-operand forms** (masked load and store, convert up and down, spill-reload): latency
    **12** (13 at four threads), throughput as a plain vector op. `unpack` (the `vloadunpackld/hd`
@@ -47,15 +54,27 @@ figure by 4: the core's cost per operation when all four threads issue.
    stores; L1- and L2-sized streaming stores cost 27-36 against 2-25. Do not use them by default;
    E5-08 must measure them at 60 cores, where bandwidth rather than latency may decide.
 
+   **Superseded conclusion, S12-13:** the NR measurements remain valid history;
+   “NGO untested” and “do not use them by default” no longer describe the project.
+   C1 below measured NGO with completion; its completed-worker estimate is
+   204.5 GB/s, distinct from the 226.1 worker-median aggregate. Later sweep 2's
+   best write is 169.74 GB/s under different benchmark work. R27 pp.393–398
+   supplies the ordering/eligibility contract; current `imci.md` implements NGO
+   and `knc_storent_fence`. The discrepancy is unresolved, not a new speedup.
+
 ## For S6-05 and S6-06
 
 - Costs (S6-05): vector op 1 per core-cycle, latency 4/6/7 as above; memory-operand latency 12;
   unaligned load pair 2 ops; spill about 1 op; gather by lines touched (about 7 per core per line,
   127 for 16 lines); x87 add 1, mul 2, divide 38 per core; L2 miss 24, memory miss about 360.
-- Scheduler (S6-06): pair each vector op with a scalar or mask op; never expect two vector ops in
+- **Historical scheduler recommendation, superseded by the qualifications above (S12-13):**
+  pair each vector op with a scalar or mask op; never expect two vector ops in
   one cycle; separate an address computation from its load by at least one instruction; at the
   production density of 4 threads, latencies of 4 to 7 are mostly hidden, so issue order and pairing
   matter more than latency.
+  **Current interpretation:** pair only eligible encodings, retain 6/7-cycle
+  dependencies, and do not turn the measured AGI case into a universal gap
+  recipe (R01 p.19; R02 pp.32–34,56). S12-08 owns missing pairing evidence.
 - M2 baseline for red-test design: `docs/research/card-runs-s6.md` (launches 2-3 tables; the final
   three-launch baseline follows the placement test).
 
@@ -441,6 +460,11 @@ mispredict if half of the random branches miss; at 4 threads it costs 2.7 cycles
 `BRANCH_COST` from about 10 cycles; a branchless sequence pays when it adds under about 5 ticks per
 unpredictable branch.
 
+**Interpretation superseded, S12-13:** the measured ~5 extra ticks remain;
+10 cycles/mispredict assumes a 50% miss rate, not measured here. R10 p.14's
+branch-misprediction event excludes BTB misses. S12-12 G07 must separate
+predictor accuracy, refill and penalty before changing the generic branch cost.
+
 ### C11: ring traffic, 60 cores x 4 threads (S8-10, card 2026-11-09 10:53Z)
 
 Three launches, median of five groups each; reader on cpu 1 (core 0), near owner cpu 5 (core 1),
@@ -457,6 +481,8 @@ far owner cpu 121 (core 30). `.work/_shared/tmp/claude-s8-10-out/c11-*.out`.
 | barrier, fan-in-4 tree (ns) | 5,722 | 5,521 | 6,469 |
 
 Decides (E5-16, E6-03):
+**The universal distance and default-tree conclusions below are superseded
+(S12-13); the measured rows remain historical results.**
 - A line from another core's L2 costs about 190-195 ns, nine times an own-L2 hit, and the same
   for a near or a far core: distance on the ring does not matter, the crossing does. (Launch 2's
   44.5 ns own-L2 hit is likely a page-placement conflict in L2; the other two agree.)
@@ -464,6 +490,13 @@ Decides (E5-16, E6-03):
   increment). Padding per-thread data to a 64-byte line is worth it, as S8-10 does.
 - At 240 threads a fan-in-4 tree barrier is about 4.7x faster than one shared counter (about 5.5-6.5
   against 27-28 us). The ring-aware libgomp barrier (S9-09) should be a tree.
+
+**Correction:** R22 §II pp.2–3 controls physical address as well as core pair;
+our near/far comparison cannot prove distance never matters or diagnose the
+own-L2 outlier as page coloring. ADR-0010 amendment 2 withdrew the analogous
+M2 attribution. Current `libgomp/config/linux/knc/bar.h` reports its real
+grouped barrier 1.5–1.7× slower than the Linux baseline and keeps it optional.
+R18 pp.59–61 and R21 pp.7–8 reinforce separating barrier/dock/useful-work costs.
 
 ### C12: card power by rail, 60 cores x 4 threads (S8-17, card 2026-11-08 16:30Z)
 

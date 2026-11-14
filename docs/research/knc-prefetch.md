@@ -3,6 +3,16 @@
 Status: green 2026-11-08 (GCC s8/S8-03 at 8c18be9; T1 scans pass). Card results are the
 lead's: the paired M2 run and s4_masks / s5_ops are staged under `.work/_shared/S8-03/`.
 
+**Scope update, S12-13 (2026-11-14).** The rules below describe implemented
+policy, not a universal hardware optimum. R01 p.19 documents the 16-stream,
+4 KiB-bounded hardware prefetcher; R09 p.4's 64/8-line STREAM recipe is a
+different experiment, with explicitly pre-production performance results.
+R06 Table V p.55:19 is also an engineering-sample measurement. None converts
+the pass's 1024 slots into hardware queue capacity. R12 CD9 pp.21–22 concerns
+specific FS/GS and segment-state conditions, not all vprefetch instructions.
+See [reference index](knc-references.md). S12-12 G04/G08 must establish any
+change to distances, store hints or page assumptions on our actual workloads.
+
 ## Rules the T1 scans encode (`tests/t1/knc-prefetch-*.c`)
 
 Source: `docs/research/knc-characterization.md` C2, C4, C5 and the S8-12 rerun.

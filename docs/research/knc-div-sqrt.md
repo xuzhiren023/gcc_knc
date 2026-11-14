@@ -23,11 +23,19 @@ Where I read a garbled table, I say so and give the reading that agrees with the
   failure. The fast path is about 27 instructions for 16 lanes, plus a branch to a rare path. The
   rare path handles special operands, and subnormal results, which need a midpoint fix after scaling.
   Implement it now, after square root.
-- **FP64 needs about 34 instructions (division) and 31 (square root) for 8 lanes.** By instruction
+- **Historical FP64 status, superseded 2026-11-14 (S12-13): FP64 needs about 34 instructions (division) and 31 (square root) for 8 lanes.** By instruction
   count this is probably cheaper than 8 scalar x87 divides. But no KNC x87 timing is published,
   and none can be measured under the shared-card rules. Division is mostly proven (section 3.1).
   Square root has one open proof obligation (section 3.2). Do FP64 later. Until then it stays
   scalar, as ADR-0003 requires.
+  **Current inventory:** GCC `619e14b479a9` contains FP64 divide/sqrt
+  expansions, including masked sqrt, with `KNC_DIV_DF_INSNS=34` and
+  `KNC_SQRT_DF_INSNS=35` in `i386-knc.cc`. The old proof questions below
+  belong to this proposal; source presence does not close them or certify
+  a native pass. Reconcile the implemented algorithm and its existing
+  qualification before commissioning new proof work. R04 slides 9,18 and
+  R27 pp.39,55–56 ([index](knc-references.md)) constrain flags, traps and
+  precision; instruction counts are neither dependency costs nor proofs.
 - **Three findings for the lead, outside the sequences:**
   - Scalar x87 FP64 division and square root are not correctly rounded on the card. The card's
     x87 runs at 64-bit precision (glibc default), so the result is rounded twice, and 64 < 2·53+2.
@@ -642,6 +650,11 @@ other user.
   their output can only strengthen the proofs.
 
 ### FP64: later, not by default yet
+
+**Historical ticket proposal, superseded as an implementation inventory
+(S12-13).** See the summary correction above. No current FP permission is
+granted or withdrawn by this annotation. R03 pp.15–22 also requires complete
+ABI/call-state accounting when comparing expanded arithmetic with scalar calls.
 
 - **Ticket C (deep, research then code): FP64 division.**
   - First close the obligations in section 3.1: the written bounds, and a 53-bit host model on

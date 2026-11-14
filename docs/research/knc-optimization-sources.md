@@ -1,5 +1,24 @@
 # KNC optimization sources: six documents checked against ADR-0009 (2026-11-07)
 
+**S12-13 edition/status correction (2026-11-14).** This is a historical
+review; proposals and “today” statements are not a current feature list.
+Use [knc-references.md](knc-references.md) for new citations. Original SSDG
+page citations below are **superseded as usable current locators**: the
+163-page PDF's edition is unidentified. Recovered R01 is 328207-001EN,
+November 2012, **201 pages**. 328207-002 (June 2013, reported by R22 p.8)
+and 488596 rev.2.03 are separate, unrecovered editions.
+
+| Topic in the old SSDG citations | Verified replacement locator and qualification |
+| --- | --- |
+| Latency, prefixes, AGI and hardware prefetch | R01 p.19; typical latency is not every instruction's latency; also R02 pp.32–34,56 |
+| L2 capacity/banks/access rate | R01 pp.19,22: 512 KiB; bank count and duty-cycle descriptions disagree internally, so no unqualified port constant follows |
+| TLB structure | R01 pp.22–23: 64 small-page plus eight large-page first-level data entries; the second level is not 64 additional small-page translations |
+| Ready buffers and alternate-cycle issue | R01 pp.19,23–24; no modern decoded-loop-cache claim follows |
+| PMU overview | R01 p.24's counter count is superseded by R10 pp.5–7,11 and R11a `knc_pmu`: two 40-bit counters per hardware thread; access remains unverified |
+
+Instruction semantics below use R27. Other unrecovered section/page references
+remain historical citations, not silently remapped to R01.
+
 Research note for the lead (owner's request: check six documents, update the optimization approach
 where they add something). Nothing here is applied yet: ADRs, backlog and code are unchanged.
 Tags: **[fact]** documented hardware or ISA behaviour; **[vendor]** Intel or PRACE recommendation or
@@ -79,6 +98,13 @@ No document was unreachable. Fetched PDFs were saved by the fetch tool under
 Each entry lists: the claim, its source, what the card says, and the consequence.
 
 **I-1. NR stores: we measured the wrong instruction for the streaming case.**
+
+**Status superseded, S12-13:** C1 subsequently measured NGO including
+completion, and `imci.md` implements NGO with `knc_storent_fence`. The
+completed-worker estimate is 204.5 GB/s, distinct from the 226.1 worker-median
+aggregate; later sweep 2 reports 169.74 GB/s best write under different work.
+R27 pp.393–398 remains the eligibility/ordering authority. The earlier
+measurement request below is history, not outstanding acceptance.
 - **Claim:** `vmovnraps` saves the read only on a miss, only unmasked and only without
   down-conversion. The weakly ordered `vmovnrngoaps` exists to raise store throughput and needs a
   fence. [fact, ISA pp.388-398] PRACE saw almost no gain on STREAM at full card. [vendor]
@@ -93,6 +119,13 @@ Each entry lists: the claim, its source, what the card says, and the consequence
   Never use NR or NGO under a mask or with down-conversion; that gives no benefit. Card check C1.
 
 **I-2. The L1 dTLB covers only 256 KB, half of L2, and our card has 4 KB pages only.**
+
+**“4 KB pages only” and the keep-512 policy below are superseded (S12-13).**
+R09 p.4 documents card-side THP in a named MPSS update; the later local
+bandwidth sweep obtained actual huge pages in 48 configurations. Ordinary
+malloc promotion remains unknown. R01 pp.22–23 supports the translation
+distinction. Current `knc_processor_costs` uses **256 KiB effective L2** while
+physical capacity is 512 KiB. S12-12 G08 checks real mappings before any retune.
 - **Claim:** 64 x 4 KB L1 dTLB entries, with the L2 TLB acting as a PDE cache for 4 KB pages.
   [fact, SSDG p.21]
 - **Card:** we have no huge pages. Our "L2 working set" rows (M2 L2 rows; `l2.*` in the
@@ -116,6 +149,12 @@ Each entry lists: the claim, its source, what the card says, and the consequence
   stride is unit. Loops with few unit-stride streams may need only `vprefetch0`.
 
 **I-4. Our prefetch parameters are off by the density factor.**
+
+**Historical parameter proposal, superseded (S12-13).** Current
+`ix86_knc_prefetch_distances` uses 16/32-line near/far defaults with a
+stream×density footprint rule; `simultaneous_prefetches=1024` is pass
+bookkeeping. Neither 4, 8 nor 1024 measures a hardware queue (R01 p.19;
+R06 Table V p.55:19 is a different, pre-production experiment).
 - **Claim:**
   - About 38 outstanding requests per core. [fact, SSDG p.17]
   - A thread issues at most every other core cycle, and every 4th at 4 threads. [fact]
@@ -162,6 +201,11 @@ Each entry lists: the claim, its source, what the card says, and the consequence
   - E5-06 should report length 7 and 9.
 
 **I-8. Small matrices: plain loop vectorization can be slower than scalar.**
+
+**S12-13 qualification:** the blanket lane-use rejection proposed below is
+superseded by the later diagnosis in `knc-small-matrix.md`. R13 §V pp.1153–1154
+describes one transformation, not a universal 25% threshold. Static lane or
+instruction counts alone do not establish a bottleneck or removable time.
 - **Claim:** 4x4 matmul vectorized conventionally runs about 50% slower than scalar. [vendor, Tian
   Fig. 6.4]
 - **Card:** mat8 has about 2% of the IMCI gain and mat16 about 26%.
@@ -326,7 +370,7 @@ checked here against the sources above, our ADRs, our measured tables and the GC
 | 8 mask registers `k0`-`k7` | Correct | ISA 327364; ADR-0007 |
 | "32 64-bit general registers per thread" | **Wrong.** x86-64 has 16 GPRs, replicated per thread | SSDG §2.1.5 |
 | "IMCI uses VEX-like multibyte prefixes" | **Half right.** Vector instructions use **MVEX** (62h). Only mask and some scalar instructions use the C4/C5 "VEX-like" prefix | ISA §3.1-3.3, p.40 |
-| Two pipes; vectors only on U | Correct | SSDG p.16; `pair.*` rows |
+| Two pipes; vectors only on U | ~~Correct~~ **Superseded S12-13:** selected vector stores/packstores may use V; the measured pairs do not cover every opcode/encoding | R02 pp.34,56; R10 p.16; old citation SSDG p.16 retained as history |
 | "V-pipe handles most scalar"; "some integer ops only on V" | **Wrong as stated.** Scalar integer and mask ops issue on either pipe: two per issue slot, `scalar_add.rt` 1.07 at one thread. The restricted pipe is V ("cannot execute all instruction types"), not U | SSDG p.16; characterization point 2; `knc.md` |
 | One thread reaches at most 50% of issue | Correct | SSDG p.17; characterization point 1 |
 | 16 SP or 8 DP FMA lanes per cycle per core | Correct | Tian §I; characterization |
@@ -351,11 +395,13 @@ checked here against the sources above, our ADRs, our measured tables and the GC
 **(a) Swing modulo scheduling: not now. [inference]**
 - **Cost:** SMS needs a `doloop_end` expander for i386. That means a new loop-counter RTL form in
   shared i386 code (ADR-0006 hook rules), plus SMS's own maintenance risk.
-- **Benefit:** at the production density of 4, our tables show latency hidden. At 2 threads per core
+- **Benefit (historical overgeneralization, superseded S12-13):** at the production density of 4, our tables show latency hidden. At 2 threads per core
   (WRF's best), a thread issues every other cycle. A 4-cycle vector chain then needs 2 independent
   operations, and a 12-cycle memory-operand chain about 6. Unroll by 2, multiple accumulators
   (ADR-0009 point 3) and the haifa scheduler with `knc.md` supply that for reductions and simple
   streams.
+  **Correction:** four ready siblings cover a four-cycle arithmetic chain,
+  not every 6/7-cycle or memory dependency (R02 pp.32–33; R17 slide 12).
 - **Where SMS would add something:** long load-compute-store chains without a reduction, at 1-2
   threads per core.
 - **Plan:** measure first (C9). Adopt only if unroll+schedule leaves a gap.

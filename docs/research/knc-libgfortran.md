@@ -17,6 +17,12 @@ note; the settled facts are taken directly from S7-02 rather than re-derived.
 
 ## 1. FP environment: the entry points and the missing KNC policy
 
+**S12-13 supersession (2026-11-14).** The missing-backend proposal and
+selection gap below are historical. Current `libgfortran/config/fpu-knc.h`
+implements KNC flag, rounding and state handling with conservative unsupported
+mixed-domain halting/underflow-control reports. Source presence is not a
+native qualification. References below resolve in [the index](knc-references.md).
+
 **Proven (ticket facts).** KNC reports no SSE, so the existing fpu-387 SSE
 paths do not manage its MXCSR. The lead's 2026-11-03 card probe establishes
 that MXCSR exception-mask bits 7-12 are reserved and setting them faults;
@@ -64,6 +70,15 @@ and warns that its controls touch only x87 (`:23-24`).
 
 ### MXCSR fields: what is and is not established
 
+**Historical knowledge table, superseded by the architectural definitions
+(S12-13).** R27 §2.4 p.39 and §4.1 pp.55–56 defines sticky flags 0–5, DAZ 6,
+RC 13–14 and FZ 15. Bits 7–12, 16–20 and 22–31 are reserved; DUE bit 21
+must remain one (§B.3 p.660). Bit 20 must not be enabled merely because an
+MXCSR mask reports it writable. Vector FP traps are explicitly unsupported
+(R04 slides 9,18). These replace “unknown” below for the architecture;
+instruction-specific native behavior and mixed-domain runtime support remain
+separate proof obligations.
+
 | Bits | Status and evidence | Safe implementation consequence |
 | --- | --- | --- |
 | 0-5 | **Inferred** candidate sticky-exception positions from `libgfortran/config/fpu-387.h:46-54,243-269`; **unknown** which KNC vector instructions set each bit, especially the denormal bit. This x86 definition is not a complete KNC ISA specification. | Establish the KNC valid-flag mask before enabling union/clear behavior and advertising support. Do not equate all six x87 flags with proven vector support. |
@@ -107,7 +122,8 @@ still shifts MXCSR by seven (`libgcc/config/i386/sfp-machine.h:65`,
 `libgcc/config/i386/64/sfp-machine.h:24`); its meaning on KNC needs a separate
 audit rather than treating the existing soft-fp port as IEEE validation.
 
-**Unknown / release gate:** KNC vector halting support and the full flag mask.
+**Historical unknown/release-gate rationale, superseded by R27 pp.39,55–56
+(S12-13):** KNC vector halting support and the full flag mask.
 The absence of x86 mask bits does not by itself prove that KNC has no other
 trap mechanism. Until resolved, conservatively report vector-wide halting
 unsupported and reject or clearly constrain requests for it; do not report
@@ -118,6 +134,16 @@ Likewise, initially report underflow control unsupported across mixed x87/IMCI
 execution; the current x87 backend already returns false without SSE
 (`libgfortran/config/fpu-387.h:459-498`). Full IEEE modules must not advertise
 unsupported capabilities merely to make a smoke test pass.
+
+**Current unresolved issue (S12-13):** R04 slide 9 and R27 pp.36,39 describe
+gradual output underflow with FZ clear, whereas current `fpu-knc.h` reports
+observed output flushing regardless of FTZ. Input-subnormal tests do not settle
+that discrepancy. Retrieve original instruction/control-state evidence before
+changing policy. R12 CD19 p.23 also means a faulting vector instruction's
+MXCSR snapshot is not a clean arithmetic oracle. CD28 p.25 affects clearing
+unmasked x87 exceptions with FNCLEX; the current flag helper uses
+`fnstenv`/status edit/`fldenv`, which avoids that instruction but is not proof
+of all libc/libgcc recovery paths or the specified FNSAVE/FRSTOR workaround.
 
 ## 2. Descriptors, objects, modules and runtime isolation
 

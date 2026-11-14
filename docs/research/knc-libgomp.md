@@ -1,5 +1,10 @@
 # KNC libgomp: E6-03 implementation input (S9-01)
 
+**S12-13 status update (2026-11-14).** This document retains the original
+design. Current-source checks at GCC `619e14b479a9` supersede the waiting,
+barrier and allocator proposals at their sections below. They do not certify
+the deployed runtime. Sources use [knc-references.md](knc-references.md).
+
 Read-only research, 2026-11-08. Nothing was built and nothing ran on the card. Sources are the
 GCC checkout `.work/_shared/gcc` (branch `knc`, head `497bbe8bedf`, file:line below), the card
 sysroot `.work/_shared/toolchain/sysroot`, the Intel KNC ISA text
@@ -201,7 +206,7 @@ The thread pool's dock is a `gomp_simple_barrier_t` wrapping the same type
 (`config/posix/simple-bar.h:34-36`; `team.c:123-133,873`), so fork/join pays the same cost twice
 per region (dock release and final team barrier). **Proven.**
 
-**Spin defaults.** Without `GOMP_SPINCOUNT`: 300,000 spins when `OMP_WAIT_POLICY` is unset
+**Historical generic spin defaults (superseded for KNC, S12-13).** Without `GOMP_SPINCOUNT`: 300,000 spins when `OMP_WAIT_POLICY` is unset
 (a 3 ms estimate at 100,000 spins per ms, `env.c:2432-2447`), 30,000,000,000 for `active`, 0 for
 `passive`; throttled 100 or 1,000 (`env.c:2448-2454`); `do_adjust_default_spincount` is the only
 target hook and sets 1 on x86 hybrid parts (`config/linux/x86/spincount.h:34-41`). `cpu_relax` is
@@ -212,7 +217,14 @@ not fetch/issue instructions for the current thread for the specified number of 
 exits early on interrupts and may be a NOP on some implementations (ISA text lines 24644-24668).
 **Proven.**
 
-**Design: `delay`-based spin.** In `config/linux/knc/futex.h` define
+**Current KNC correction:** `config/linux/knc/card.h` defines delay 128 and
+`GOMP_KNC_SPIN_MSEC=200`; `spincount.h` applies it with user overrides. R18
+pp.59–61 describes Intel's 200 ms policy and distinguishes barriers from
+region formation; it does not independently validate ours. R27 p.628 allows
+interrupt-related early exit from DELAY, so its operand is not exact elapsed
+sleep time. The 3 ms conversion below is a **superseded design**, not today's default.
+
+**Historical design: `delay`-based spin.** In `config/linux/knc/futex.h` define
 `cpu_relax ()` as `__asm volatile ("delay %0" :: "r" (gomp_knc_delay) : "memory")` with
 `gomp_knc_delay` a runtime variable (default from the one-core measurement, candidates 32, 128,
 512; env `GOMP_KNC_DELAY` for tuning), and keep `do_spin`'s structure: the spin count then counts
@@ -221,7 +233,15 @@ delay periods, so the KNC default `gomp_spin_count_var` in `knc/spincount.h` bec
 `OMP_WAIT_POLICY` keep their meaning. Since `__builtin_ia32_pause` already emits `delay 32` on KNC,
 the inline asm is only needed for a variable count. **Design.**
 
-**Design: hierarchical barrier.** Two levels, in `config/linux/knc/bar.h` and `bar.c`, keeping
+**S12-13 barrier correction:** `config/linux/knc/bar.h` keeps the grouped
+implementation behind `GOMP_KNC_GROUP_BARRIER`; its comment reports a
+1.5–1.7× slowdown against the default Linux barrier. C11's synthetic tree
+versus one-counter result does not establish a real libgomp win. R18 pp.59–61,
+R21 §6.5 pp.7–8 and R22 pp.4–7 require the algorithm, useful work, placement
+and synchronization denominator to stay explicit. The following proposal is
+**superseded as the default recommendation**, retained as design history.
+
+**Historical design: hierarchical barrier.** Two levels, in `config/linux/knc/bar.h` and `bar.c`, keeping
 the `gomp_barrier_t` API and the `BAR_*` flag protocol so `team.c`, `task.c`, `work.c` and
 `single.c` need no change:
 
@@ -380,13 +400,26 @@ the master (`team.c:181-184`, `work.c:82-86`); `gomp_thread_start` allocates not
 extra arenas; one `malloc` per worker is enough to reserve 64 MB each. **Proven for the code
 paths named, inferred for the arena effect.**
 
-**Recommendation.** libgomp must not call `mallopt` on the program's behalf: it changes the
+**Historical recommendation, superseded by ADR-0012 (S12-13 annotation).** libgomp must not call `mallopt` on the program's behalf: it changes the
 program's allocator behaviour globally and a library has no standing to do that. It should
 document, in the KNC section of the libgomp manual page and in `omp_display_env` output, the two
 knobs: `MALLOC_ARENA_MAX=60` (one arena per core, 3.75 GB reserved, no serialization across cores)
 as the setting for 240 threads under `RLIMIT_AS`, and `OMP_STACKSIZE=2M` or similar for the stacks;
 `MALLOC_ARENA_MAX=1` is the wrong fix because it funnels 240 threads through one arena mutex.
 `card_run` jobs that start 240 threads should set both in the job line. **Design.**
+
+**Current correction:** `card.h` `gomp_knc_arena_cap` derives a cap and startup
+applies it unless `MALLOC_ARENA_MAX` is set. Finite address-space/strict-commit
+budgets account for stacks and a 512 MiB reserve; without either budget it
+uses one arena per allowed CPU. Its comment reports about 169 arenas faster
+than 60–64 on a malloc-heavy case. Neither 60 nor 64 is universally fastest,
+and one arena/core does not guarantee absence of lock contention. R24a
+`new_heap`/`arena_get2` and R24b `mallopt` establish virtual reservation and
+upstream allocator mechanisms, not installed MPSS behavior; code has no page
+number. R19 pp.376–377's first-touch NUMA example is a Xeon host, not a KNC
+placement proof. The digest lists the ADR-0012 unlimited-budget wording
+discrepancy for the lead; no ADR or allocator change is made here.
+
 Measurement item 7 (lead): 240 threads each doing 100,000 `malloc`/`free` of 1 KiB, with
 `MALLOC_ARENA_MAX` unset, 60, 8 and 1; record `VmPeak` and `VmRSS` from `/proc/self/status` and
 the wall time; and the same program at 60 and 120 threads.

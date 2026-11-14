@@ -1,5 +1,39 @@
 # KNC optimization gaps: what the plans do not cover (2026-11-07)
 
+**S12-13 status correction (2026-11-14).** Preserve this proposal as history;
+its headroom percentages are **superseded as current forecasts** and supply
+no measured M4 gain. A static code/stack count or sampled load PC does not
+prove spills, misses, alias rejection or removable time. Current policy and
+ranked proof obligations are in [the digest](knc-digest-2026-11.md), with
+sources in [the reference index](knc-references.md).
+
+The following premises in the old rows are explicitly superseded:
+
+- **G2:** lack of IMCI traps does not justify a blanket `-fno-trapping-math`
+  default for mixed x87/IMCI execution. Flags, traps and precision differ
+  (R04 slides 9,18; R27 pp.39,55–56). The current compiler already uses the
+  cheap vectorizer cost model and stride versioning at `-O2`.
+- **G3/G4:** delay 128 and 200 ms libgomp spin already exist. THP is not
+  merely a future PhiNix facility: R09 p.4 documents an early MPSS update.
+  Actual ordinary allocations still need S12-12 G08; later explicit
+  huge-page allocations do not establish transparent promotion.
+- **G5/G6:** R24c is an upstream i386 log reference, not proof that installed
+  K1OM libm is generic C. IMCI documents gradual underflow (R04 slide 9);
+  the historical explanation of WRF flushing is not proof of its cause.
+  Separate input subnormals from tiny outputs and the Fortran runtime's
+  conflicting observation before closing this question.
+- **G9 and section 3:** R01 p.19's AGI setup is not a count of intervening
+  instructions. R02 pp.34,56 restricts pairing by opcode and encoding, so
+  mask spills are not universally free. Four siblings do not hide all
+  latencies (R02 pp.32–33).
+- **Streaming stores in section 3:** C1 subsequently measured completed NGO
+  stores and the compiler implements them with a fence; retain R27 pp.393–398
+  eligibility/ordering. The NR-only/“expect little” recommendation is stale.
+- **G4/G12/G13:** page, bandwidth and cache-conflict gains below are hypotheses
+  for their original workloads, not a generic ceiling. R06 p.55:10 is an
+  engineering sample; R14 p.2 is pre-release SE10P; R22 pp.2–7 controls
+  physical addresses and does not establish our earlier color attribution.
+
 Consultant note for the lead, answering the owner's question "have we exhausted all possible means
 of optimization for KNC?". Inputs: `BACKLOG.md`, ADR-0009 with amendment 1, `knc-optimization-sources.md`,
 `imci-vs-avx512.md`, `knc-characterization.md`, `m2-result.md`, `wrf-input-2026-11-06.md`, PhiNix
