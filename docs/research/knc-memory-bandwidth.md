@@ -177,8 +177,13 @@ access to physical page identities. No `/proc/pagemap` privileges are requested.
 
 **S12-13 qualification:** the zero-promotion observation is a snapshot, not
 “huge pages cannot be allocated.” Sweep 2 below reports 48 actual huge-page
-configurations. R09 p.4 documents THP in KNC_gold_update_1-2.1.4982-15 or later,
-but its result table uses an older stack; neither proves current malloc backing.
+configurations. R09 p.4 documents THP in KNC_gold_update_1-2.1.4982-15 or later.
+**Superseded:** ~~but its result table uses an older stack; neither proves
+current malloc backing.~~ The p.4 libhugetlbfs table uses MPSS 2.1.4346-16;
+R09 p.5 also reports THP-stack results without libhugetlbfs: 7110P on MPSS
+2.1.4982-15 at 174/181 GB/s (ECC on/off), and 7120P on MPSS 2.1.6720-15 at
+177 GB/s with ECC on. All are pre-production on MPSS 2.1 and 2.6.x uOS;
+none establishes today's MPSS 3.7 malloc promotion or backing.
 R26a's `MIC_USE_2MB_BUFFERS` concerns offload transfers. The MPSS-guide setting
 in [12] remains a **reported** later-edition source, not a verified native
 allocation control. S12-12 G08 separates these cases.

@@ -818,9 +818,14 @@ memory-bound recipe is not a generic default.
 
 **S12-13 qualification:** R09 p.4 explicitly labels its results
 **pre-production**, despite the 5110P/7110P column names, and identifies
-MPSS 2.1.4346-16 for that performance table. Its later-stack THP guidance is
-a separate claim. Those results do not measure transparent promotion under
-the recommended update or establish today's card allocation policy.
+MPSS 2.1.4346-16 for that libhugetlbfs performance table. **Superseded:** ~~Its
+later-stack THP guidance is a separate claim. Those results do not measure
+transparent promotion under the recommended update or establish today's card
+allocation policy.~~ R09 p.5 adds two **pre-production** THP-stack tables,
+both without libhugetlbfs: 7110P on MPSS 2.1.4982-15 reports 174/181 GB/s
+(ECC on/off), and 7120P on MPSS 2.1.6720-15 reports 177 GB/s with ECC on.
+All three tables use MPSS 2.1 and 2.6.x uOS. They do not establish promotion
+or backing for today's MPSS 3.7 malloc; S12-12 G08 remains needed.
 
 
 #### R10 — Core PMU definitions recovered

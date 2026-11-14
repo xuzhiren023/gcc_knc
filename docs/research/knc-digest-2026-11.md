@@ -35,8 +35,12 @@ Huge pages are possible. Intel documented card-side THP in a named early MPSS
 update, and our later bandwidth note reports actual explicit huge-page
 allocations. Neither establishes the backing of today's ordinary malloc.
 The 4 KiB hardware-prefetch boundary, translation reach and actual mapping
-must be distinguished (R01 pp.19,22–23; R09 p.4). R09's performance table is
-explicitly pre-production and used an older stack than its THP advice.
+must be distinguished (R01 pp.19,22–23; R09 pp.4–5). **Superseded:** ~~R09's
+performance table is explicitly pre-production and used an older stack than
+its THP advice.~~ R09 p.4 reports libhugetlbfs results on MPSS 2.1.4346-16;
+p.5 adds THP-stack results on 7110P (2.1.4982-15) and 7120P (2.1.6720-15).
+All are pre-production on 2.6.x uOS. None establishes current MPSS 3.7 malloc
+promotion or backing; S12-12 G08 is still needed.
 
 Strict floating point remains a correctness gate. IMCI documents gradual
 underflow and sticky exception flags but no vector FP traps; x87 has different
