@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-14 14:29.
+Updated automatically at every ticket change. Last update: 2026-11-14 14:30.
 
-**Next: the tech lead, on S12-06.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Waiting for you:** S12-04. Run `python tools/pm.py inbox`.
 
 Current tickets: `[##################--]` 218 of 234
 
@@ -84,7 +84,7 @@ Current tickets: `[##################--]` 218 of 234
 | S12-01 | Sprint 12 prep - static code-quality census of the development-corpus builds (spills, x87/vector transfers, addressing, calls, code size) | Done | A static code-quality census (spill/reload proxies, x87 and x87-zmm traffic, address arithmetic, calls, bra... |
 | S12-02 | Sprint 12 prep - the unscored generality check set (S11-20's six programs in the code styles our corpus lacks) | Done | The six unscored generality checks (Q1-Q6: ray tracer hit dispatch and vec3 AoS, Burkardt MD, Reference BLA... |
 | S12-03 | pm.py approve aborts its own merge on conflict and refuses cleanly, so main is never left mid-merge | draft |  |
-| S12-04 | card_run profile memory monitor costs under 5% of one card thread | In progress | Red stage must hold only the failing test: commit c122120a also carries the card_run fix, so red-then-green... |
+| S12-04 | card_run profile memory monitor costs under 5% of one card thread | **Waiting for you** | budget: 3 engineer sessions used; the budget is 3 |
 | S12-05 | DMA end-to-end time - overlap file read, DMA and file write, and copy on the card with more than one thread | draft |  |
 | S12-06 | M4 theme 1 - strict scalar FP conversions and call boundaries (NPB-EP transform and log path, NPB-IS randlc) | Waiting for review | Restored .gitignore to main in 66ef8806 as requested; tracked assembly control retained. Phase-one results ... |
 | S12-07 | M4 theme 2 - indexed-load scheduling with strict sparse reduction (NPB-CG) | In progress |  |
@@ -259,6 +259,7 @@ Current tickets: `[##################--]` 218 of 234
 
 ## Recent activity
 
+- 2026-11-14 14:30 **S12-04** engineer escalate: budget: 3 engineer sessions used; the budget is 3
 - 2026-11-14 14:29 **S12-06** engineer submit: Restored .gitignore to main in 66ef8806 as requested; tracked assembly control retained. Phase-one results and premise-fails conclusion remain at a...
 - 2026-11-14 14:28 **S12-14** lead approve: The lead now has a ranked audit in docs/research/s12-14-model-audit.md of 42 places where GCC-KNC tuning numbers, runtime defaults or comments disa...
 - 2026-11-14 14:28 **S11-26** lead defer: Needs the interactive lead: (1) stage a fresh WRF v4.8.0 tree at .work/_shared/wrf-trial/src/WRF-4.8.0-smpar (PhiWeather's clean tree plus the 7 pi...
@@ -266,7 +267,6 @@ Current tickets: `[##################--]` 218 of 234
 - 2026-11-14 14:17 **S12-06** lead answer: Lead: do not change .gitignore. Restore it (git checkout main -- .gitignore), commit, and submit. tools/s12_06_controls.S is already tracked at 6de...
 - 2026-11-14 14:16 **S11-26** engineer ask: All four installed-prefix reproducers PASS without overrides: rtrn/sfclay1d at -O2 -march=knc; kfcps/advance_uv at WRF phinix/OpenMP flags. Log: .w...
 - 2026-11-14 14:15 **S12-14** engineer submit: Delivered docs/research/s12-14-model-audit.md at 67df0e91: 42 ranked findings (9 wording/citation fixes, 23 measurement/qualification rows, 10 keep...
-- 2026-11-14 14:14 **S12-06** engineer ask: Submitting a80a7e9b as instructed now fails: python tools/pm.py submit S12-06 --note ... returns protected path changed: .gitignore (raise it with ...
 
 ## Cost
 
