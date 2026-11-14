@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-14 16:40.
+Updated automatically at every ticket change. Last update: 2026-11-14 16:43.
 
-**Next: GPT-6.1, on S12-21 (Scheduling model for M4's serial runs - measure density-1 tuning and the integer-multiply cost against today's density-4 defaults (S12-14 B02, B04, B05)).** Run `python tools/dispatch.py`, or ask the tech lead to.
+**Next: the tech lead, on S12-22.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[##################--]` 224 of 241
 
@@ -102,7 +102,7 @@ Current tickets: `[##################--]` 224 of 241
 | S12-19 | Profile-guided missed-vectorization triage - join hot loops with the vectorizer's reasons and observed strides/masks, so tuning targets what is hot and fixable | Done | tools/vec_triage.py now ranks each development program's hot loops by sampled time with GCC's vectorizer ve... |
 | S12-20 | libknc_vmath accuracy and exception contract, with an independent validation design (rounding modes, special values, flags, scalar fallback) | draft |  |
 | S12-21 | Scheduling model for M4's serial runs - measure density-1 tuning and the integer-multiply cost against today's density-4 defaults (S12-14 B02, B04, B05) | In progress | Lead 16:20: phase 1 accepted as staged (r2). No submit yet: the lead runs r2/batch.sh tonight in card windo... |
-| S12-22 | Low-risk corrections from the S12-14 audit - wrong comments and citations (N01-N09) and the far-prefetch-distance range bug (B10) | In progress | See the resume note: deeper model, edit gcc-2 directly. |
+| S12-22 | Low-risk corrections from the S12-14 audit - wrong comments and citations (N01-N09) and the far-prefetch-distance range bug (B10) | Question for the tech lead | GCC build needed at f0534648890 (gcc2). Red bf225397: S8-03 runner rejects neither L2=1 nor wrong near hint... |
 | S12-23 | Floating-point environment correctness on KNC - fix the underflow probe that cannot tell flushing from rounding, and handle x87 erratum CD28 (S12-14 N06, N07, B16, B17) | Not started |  |
 | S12-24 | ICE in vect_transform_stmt (tree-vect-stmts.cc:13381) on WRF's REMEZ at -mphinix (-O3 -march=knc) | Not started |  |
 | S12-25 | WRF smpar build arm with --param=knc-threads-per-core=2 for PhiWeather's 2-threads-per-core runs (A/B against S11-26's default-4 build) | draft |  |
@@ -266,6 +266,7 @@ Current tickets: `[##################--]` 224 of 241
 
 ## Recent activity
 
+- 2026-11-14 16:43 **S12-22** engineer ask: GCC build needed at f0534648890 (gcc2). Red bf225397: S8-03 runner rejects neither L2=1 nor wrong near hint for L1=8/L2=4; four existing tests pass...
 - 2026-11-14 16:40 **S12-22** lead answer: See the resume note: deeper model, edit gcc-2 directly.
 - 2026-11-14 16:39 **S12-22** lead resume: Owner 2026-11-14: retry on a deeper model. Depth light -> standard (gpt-6.1-sol), sessions 8 (3 new). .work/_shared/gcc-2 is writable for engineers...
 - 2026-11-14 16:31 **S12-22** lead defer: Interactive lead needed: engineer still reports it cannot write .work/_shared/gcc-2 (third time, no exact error text pasted). Check sandbox writabl...
@@ -273,13 +274,12 @@ Current tickets: `[##################--]` 224 of 241
 - 2026-11-14 16:28 **S12-22** lead answer: Per the 16:27 decide: .work/_shared/gcc-2 is writable for engineer sessions (dispatch.py passes .work/_shared as a writable root). Edit i386.opt an...
 - 2026-11-14 16:27 **S12-22** owner decide: Lead: .work/_shared/gcc-2 IS writable for this session: dispatch passes .work/_shared as a sandbox writable root (dispatch.py:89) and CodexSandboxU...
 - 2026-11-14 16:26 **S12-22** engineer escalate: Blocked by workspace permissions: required GCC files are in .work/_shared/gcc-2, which is outside this session's writable roots. The ticket is alre...
-- 2026-11-14 16:25 **S12-22** engineer ask: The lane-2 GCC source is in the shared gcc-2 worktree (.work/_shared/gcc-2), outside this ticket worktree. This agent's writable roots exclude it, ...
 
 ## Cost
 
 - From the script, engineer: 628 sessions, 1261.0M input tokens
 - From the script, lead: 412 sessions, 113.5M input tokens
-- Started by hand, Claude: 12 sessions, 3248.0M input tokens
+- Started by hand, Claude: 12 sessions, 3249.1M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
