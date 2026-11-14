@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-14 18:11.
+Updated automatically at every ticket change. Last update: 2026-11-14 18:12.
 
 **Next: GPT-6.1, on S12-29 (Wrong code - vbroadcastsd reads a 4-byte-aligned SCmode constant (complex float) straight from the constant pool and faults on the card (gcc.c-torture pr38969.c, regression from S11-27)).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
@@ -281,7 +281,7 @@ Current tickets: `[##################--]` 226 of 244
 ## Cost
 
 - From the script, engineer: 639 sessions, 1269.7M input tokens
-- From the script, lead: 420 sessions, 115.3M input tokens
+- From the script, lead: 421 sessions, 115.5M input tokens
 - Started by hand, Claude: 12 sessions, 3293.3M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
