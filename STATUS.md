@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-14 16:11.
+Updated automatically at every ticket change. Last update: 2026-11-14 16:12.
 
-**Next: GPT-6.1, on S12-19 (Profile-guided missed-vectorization triage - join hot loops with the vectorizer's reasons and observed strides/masks, so tuning targets what is hot and fixable).** Run `python tools/dispatch.py`, or ask the tech lead to.
+**Next: the tech lead, on S12-19.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[##################--]` 223 of 239
 
@@ -99,7 +99,7 @@ Current tickets: `[##################--]` 223 of 239
 | S12-16 | Research - whole-system tuning playbook for the Z840 + Xeon Phi (BIOS, host OS, MPSS and card, transfers, runtimes), as HPC centres tuned Xeon + KNC systems | Done | Whole-system tuning playbook for the Z840 + Phi done: 13 ordered steps (BIOS, host Linux, card power/pages/... |
 | S12-17 | claude-torture -j N refuses to start in exclusive card runs (no inherited RLIMIT_AS since S11-29), so the execute suite cannot run | Done | The parallel execute-suite runner starts again in exclusive card runs: claude-torture -j N with an explicit... |
 | S12-18 | Double-precision vector exp, log and pow ran slower than scalar libm on the card (0.82x, 0.63x, 0.49x) - confirm with valid batches, then fix the library or stop the vectorizer calling them where they lose | lead | Needs interactive lead: (1) exclusive card turn running .work/_shared/S12-18/vmath-bench.mic at full, 3100 ... |
-| S12-19 | Profile-guided missed-vectorization triage - join hot loops with the vectorizer's reasons and observed strides/masks, so tuning targets what is hot and fixable | In progress | Lead raises sessions 4 -> 6 (standing rule): the tool and 14-program collection are done; one requested cha... |
+| S12-19 | Profile-guided missed-vectorization triage - join hot loops with the vectorizer's reasons and observed strides/masks, so tuning targets what is hot and fixable | Waiting for review | 501aa8bf: function gate/offset mapping; 11 host tests pass; analyze/report done. Coverage 1715/15109 (11.35... |
 | S12-20 | libknc_vmath accuracy and exception contract, with an independent validation design (rounding modes, special values, flags, scalar fallback) | draft |  |
 | S12-21 | Scheduling model for M4's serial runs - measure density-1 tuning and the integer-multiply cost against today's density-4 defaults (S12-14 B02, B04, B05) | In progress | No deletion needed. Stage into a fresh, empty folder instead of cleaning the old one: change the tool's out... |
 | S12-22 | Low-risk corrections from the S12-14 audit - wrong comments and citations (N01-N09) and the far-prefetch-distance range bug (B10) | In progress | Lead raises input_tokens 2M -> 6M (second raise; tokens went to the wrong-parameter round caused by the tic... |
@@ -264,6 +264,7 @@ Current tickets: `[##################--]` 223 of 239
 
 ## Recent activity
 
+- 2026-11-14 16:12 **S12-19** engineer submit: 501aa8bf: function gate/offset mapping; 11 host tests pass; analyze/report done. Coverage 1715/15109 (11.35%); rejections, compiler-version uncerta...
 - 2026-11-14 16:11 **S12-22** owner decide: Lead raises input_tokens 2M -> 6M (second raise; tokens went to the wrong-parameter round caused by the ticket). If it stalls again the lead asks t...
 - 2026-11-14 16:10 **S12-22** engineer escalate: budget: 2039970 input tokens used; the budget is 2000000
 - 2026-11-14 16:10 **S12-22** owner decide: Lead raises sessions 2 -> 4: both sessions were lost to the lead's wrong parameter name in the ticket (now fixed).
@@ -271,16 +272,15 @@ Current tickets: `[##################--]` 223 of 239
 - 2026-11-14 16:09 **S12-22** lead answer: See the 16:12 resume note.
 - 2026-11-14 16:09 **S12-22** lead resume: Lead 16:12: the gcc-2 tree is correct (s12/S12-22 at knc 619e14b479a, clean, no git lock now). My ticket used a wrong parameter name: there is no k...
 - 2026-11-14 16:07 **S12-22** lead defer: Interactive lead needed: lane-2 shared gcc worktree (gcc-2) is on s12/S12-07 at 619e14b, which lacks knc-prefetch-far; reset it to s12/S12-22 based...
-- 2026-11-14 16:06 **S12-22** engineer ask: Lane-2 GCC is out of sync: shared gcc-2 is on s12/S12-07 at 619e14b and lacks knc-prefetch-far (only knc-prefetch-l2-distance exists). Two real T1 ...
 
 ## Cost
 
 - From the script, engineer: 623 sessions, 1256.6M input tokens
 - From the script, lead: 408 sessions, 113.0M input tokens
-- Started by hand, Claude: 12 sessions, 3231.4M input tokens
+- Started by hand, Claude: 12 sessions, 3231.9M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 33.2 GiB of 100 GiB. 149 GiB free on the drive.
+The project uses 33.3 GiB of 100 GiB. 149 GiB free on the drive.
