@@ -94,7 +94,7 @@ Current tickets: `[##################--]` 216 of 230
 | S12-11 | Research - best practices for a dual Xeon E5-2690 v3 + Xeon Phi (KNC) workstation (HP Z840) for LLM inference and scientific computing | Done | Z840 dual E5-2690 v3 + Xeon Phi setup guide done: slot/BIOS/memory/power/cooling checklist, MPSS-on-modern-... |
 | S12-12 | Stage S12-10's residual-gap card experiments as one combined Sprint 12 diagnostic batch (PMU access, prefetch, page backing, libm route, branches, allocator) | Done | The six follow-up card experiments (counter access, prefetch, page backing, libm route, branches, allocator... |
 | S12-13 | Digest the S12-10 sources into our knowledge base - correct our KNC notes, build a reference index, and list what our practice should change | Done | The project now has a numbered KNC reference index (R01-R27), corrected KNC notes that cite source pages an... |
-| S12-14 | Audit GCC-KNC's tuning model and runtime defaults against the digested sources - every mismatch with a proposed change and its proof | Not started |  |
+| S12-14 | Audit GCC-KNC's tuning model and runtime defaults against the digested sources - every mismatch with a proposed change and its proof | In progress |  |
 | S12-15 | Research - literature survey of published Xeon Phi (KNC) and Xeon Phi system research that matches our goals; what have we overlooked? | In progress | Lead: no rebase needed. submit only checks rebase for gcc: yes tickets; your diff is one new note and the l... |
 | S12-16 | Research - whole-system tuning playbook for the Z840 + Xeon Phi (BIOS, host OS, MPSS and card, transfers, runtimes), as HPC centres tuned Xeon + KNC systems | Done | Whole-system tuning playbook for the Z840 + Phi done: 13 ordered steps (BIOS, host Linux, card power/pages/... |
 | S12-17 | claude-torture -j N refuses to start in exclusive card runs (no inherited RLIMIT_AS since S11-29), so the execute suite cannot run | In progress | Do not amend or split 71cbcf86. Instead prove red: temporarily check out tools/claude-torture.c from main (... |
@@ -268,7 +268,7 @@ Current tickets: `[##################--]` 216 of 230
 
 - From the script, engineer: 584 sessions, 1205.9M input tokens
 - From the script, lead: 388 sessions, 108.3M input tokens
-- Started by hand, Claude: 12 sessions, 3160.2M input tokens
+- Started by hand, Claude: 12 sessions, 3161.0M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
