@@ -70,6 +70,9 @@ static void reset(void)
   model_mxcsr = 0x308040; /* bit 20/21, FTZ and DAZ: opaque controls. */
 #endif
   controls = read_mx() & ~0x603fu;
+  /* R27 Table 2.15 p.39 (verified, early KNC specification): bit 20
+     is reserved too.  A synthetic fixture must obey the legal bit map. */
+  check(!(read_mx() & 0x101f80u), "fixture sets reserved MXCSR bits 7-12 or 20");
 }
 
 int main(void)
