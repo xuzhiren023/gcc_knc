@@ -80,7 +80,7 @@ Current tickets: `[###################-]` 206 of 213
 | S11-26 | WRF OpenMP build at -mphinix with no per-file workarounds (S11-23 and S11-25 fixed), restaged for PhiWeather | draft | Owner 2026-11-13: the S11-24 WRF build is removed. Deleted: |
 | S11-27 | Wrong code - NPB-MG (class A, serial) built by GCC-KNC at -O2 -march=knc fails NPB verification on the card | Done | NPB-MG built by GCC-KNC at -O2 -march=knc now verifies on the card (class A in 14.1 s, against 33.8 s for G... |
 | S11-28 | HPCG run that fits every card model - fixed work instead of fixed duration, grid sized to the 3100's memory | lead | After S11-29 merges (still ready): run .work/_shared/S11-28/lead-pilot.ps1 at 242936bf+ (30 exclusive timed... |
-| S11-29 | card_run profiles limit memory in use, not address space, so a 3100 or 5100 run fails only where the real card would | In progress | Card round at 9520fce6, 2026-11-14 00:54-01:04 EST, receipts .work/_shared/S11-29/*.json, log .work/_state/... |
+| S11-29 | card_run profiles limit memory in use, not address space, so a 3100 or 5100 run fails only where the real card would | Question for the tech lead | Committed cbe9a3d6: filter baseline low PIDs before stat, full scan on new low PID, printf replaces ls; mon... |
 | S12-01 | Sprint 12 prep - static code-quality census of the development-corpus builds (spills, x87/vector transfers, addressing, calls, code size) | Done | A static code-quality census (spill/reload proxies, x87 and x87-zmm traffic, address arithmetic, calls, bra... |
 | S12-02 | Sprint 12 prep - the unscored generality check set (S11-20's six programs in the code styles our corpus lacks) | Done | The six unscored generality checks (Q1-Q6: ray tracer hit dispatch and vec3 AoS, Burkardt MD, Reference BLA... |
 | S2-01 | Design for zmm and mask registers under -march=knc | Done | The register design for KNC is settled on paper: all 32 zmm and 8 mask registers become usable under -march... |
@@ -238,6 +238,7 @@ Current tickets: `[###################-]` 206 of 213
 
 ## Recent activity
 
+- 2026-11-14 01:16 **S11-29** engineer ask: Committed cbe9a3d6: filter baseline low PIDs before stat, full scan on new low PID, printf replaces ls; monitor pinned CPU 0 with isolated marker. ...
 - 2026-11-14 01:15 **S11-17** engineer ask: a3258fe0: revised branch/inline/loop; ten atomic binaries compiled/linted, five O2 gates red. Log: .work/_state/logs/S11_17_controls_revised_stage-...
 - 2026-11-14 01:08 **S11-02** engineer escalate: budget: 13309292 input tokens used; the budget is 12000000
 - 2026-11-14 01:06 **S11-29** lead answer: Card round at 9520fce6, 2026-11-14 00:54-01:04 EST, receipts .work/_shared/S11-29/*.json, log .work/_state/logs/S11_29_card-20261114-005443.log.
@@ -245,7 +246,6 @@ Current tickets: `[###################-]` 206 of 213
 - 2026-11-14 01:03 **S11-02** lead answer: Reviewed 4aae037c: the class defaults (helper_free True, transfer_method ssh, transfers list), the fixture updates for private publication, and pat...
 - 2026-11-14 01:02 **S11-17** lead answer: Revise candidates in this ticket; no compiler work here (gcc: no stays). Make each gate name a transformation GCC 16 actually performs with -fprofi...
 - 2026-11-14 01:00 **S11-15** lead defer: Card run needed. Batch at 31272757 reviewed and fine (36 launches: 12 serial + 6 OpenMP GCC-KNC dev builds, plain+sampled, full 7120, 600 s cap eac...
-- 2026-11-14 00:58 **S11-17** engineer ask: eb3c2f3b: ten profiles imported; five binaries compiled/linted, positive counts, fatal mismatch checks. T1: 2 pass, 3 fail. Reproducer: tools/s11_1...
 
 ## Cost
 
