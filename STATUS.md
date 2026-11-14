@@ -87,7 +87,7 @@ Current tickets: `[##################--]` 220 of 237
 | S12-04 | card_run profile memory monitor costs under 5% of one card thread | In progress | Lead raises sessions 3 -> 5 (standing owner rule): the third session was the requested-changes round (split... |
 | S12-05 | DMA end-to-end time - overlap file read, DMA and file write, and copy on the card with more than one thread | draft |  |
 | S12-06 | M4 theme 1 - strict scalar FP conversions and call boundaries (NPB-EP transform and log path, NPB-IS randlc) | Done | Theme 1 (scalar FP conversions and calls in NPB-EP/IS) closed with no compiler change: a card diagnostic sh... |
-| S12-07 | M4 theme 2 - indexed-load scheduling with strict sparse reduction (NPB-CG) | In progress |  |
+| S12-07 | M4 theme 2 - indexed-load scheduling with strict sparse reduction (NPB-CG) | Question for the tech lead | Phase-1 staging failed twice. Donor dump-filename rejection is fixed; GCC-KNC xg++ now fails on missing cas... |
 | S12-08 | M4 theme 3 - dependency-preserving scalar updates and register pressure in dense loops (PB-ludcmp, x87 stack traffic) | Not started |  |
 | S12-09 | Sprint 12 batch check - integrated themes at the final Sprint 12 head, regression evidence, optional modes frozen | draft |  |
 | S12-10 | Research - what KNC hardware and runtime knowledge are we still missing to tune GCC-KNC, the OS runtime and broad optimization, and where is it documented? | Done | KNC reference-gap research done: 16 gaps ranked, 32 primary sources (98 MB, outside git) with page-cited fa... |
@@ -262,6 +262,7 @@ Current tickets: `[##################--]` 220 of 237
 
 ## Recent activity
 
+- 2026-11-14 14:50 **S12-07** engineer ask: Phase-1 staging failed twice. Donor dump-filename rejection is fixed; GCC-KNC xg++ now fails on missing cassert in HPCG Vector.hpp:23. Reproducer: ...
 - 2026-11-14 14:49 **S12-18** lead defer: Needs interactive lead: (1) exclusive card turn running .work/_shared/S12-18/vmath-bench.mic at full, 3100 and 5100 per docs/research/s12-18-double...
 - 2026-11-14 14:49 **S12-17** engineer escalate: budget: 2 engineer sessions used; the budget is 2
 - 2026-11-14 14:49 **S12-06** lead approve: Theme 1 (scalar FP conversions and calls in NPB-EP/IS) closed with no compiler change: a card diagnostic shows GCC-KNC already equal or faster than...
@@ -269,13 +270,12 @@ Current tickets: `[##################--]` 220 of 237
 - 2026-11-14 14:40 **S11-26** lead resume: Lead 14:45: (1) tree staged at .work/_shared/wrf-trial/src/WRF-4.8.0-smpar (see my 14:28 answer). (2) gcc-knc-16.2.0 = knc 619e14b479a. (3) Do list...
 - 2026-11-14 14:39 **S12-18** engineer ask: Phase 1 committed d29d7c74. Host regression passes 12 scenarios; built/linted .work/_shared/S12-18/vmath-bench.mic. Report, logs and exclusive full...
 - 2026-11-14 14:39 **S12-15** lead approve: Literature survey done: 30 groups of published Xeon Phi work ranked against our goals, with 14 overlooked ideas; the compiler ones are now tickets,...
-- 2026-11-14 14:39 **S12-04** owner decide: Lead raises sessions 3 -> 5 (standing owner rule): the third session was the requested-changes round (split red commit); the fix is written.
 
 ## Cost
 
 - From the script, engineer: 599 sessions, 1229.0M input tokens
 - From the script, lead: 395 sessions, 109.4M input tokens
-- Started by hand, Claude: 12 sessions, 3180.3M input tokens
+- Started by hand, Claude: 12 sessions, 3180.7M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
