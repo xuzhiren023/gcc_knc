@@ -99,7 +99,7 @@ Current tickets: `[##################--]` 218 of 234
 | S12-16 | Research - whole-system tuning playbook for the Z840 + Xeon Phi (BIOS, host OS, MPSS and card, transfers, runtimes), as HPC centres tuned Xeon + KNC systems | Done | Whole-system tuning playbook for the Z840 + Phi done: 13 ordered steps (BIOS, host Linux, card power/pages/... |
 | S12-17 | claude-torture -j N refuses to start in exclusive card runs (no inherited RLIMIT_AS since S11-29), so the execute suite cannot run | In progress | Do not amend or split 71cbcf86. Instead prove red: temporarily check out tools/claude-torture.c from main (... |
 | S12-18 | Double-precision vector exp, log and pow ran slower than scalar libm on the card (0.82x, 0.63x, 0.49x) - confirm with valid batches, then fix the library or stop the vectorizer calling them where they lose | In progress | A host test now reproduces the short vmath benchmark batches: the calibration accepts one slow early sample... |
-| S12-19 | Profile-guided missed-vectorization triage - join hot loops with the vectorizer's reasons and observed strides/masks, so tuning targets what is hot and fixable | Not started |  |
+| S12-19 | Profile-guided missed-vectorization triage - join hot loops with the vectorizer's reasons and observed strides/masks, so tuning targets what is hot and fixable | In progress |  |
 | S12-20 | libknc_vmath accuracy and exception contract, with an independent validation design (rounding modes, special values, flags, scalar fallback) | draft |  |
 | S13-01 | M4 final gate - stage the ADR-0015 gate run at the final head (17 programs, held-out unsealed, six pairs, three profiles) | draft |  |
 | S13-02 | Libgomp per-region thread density - choose 1-4 workers per core per parallel region instead of once per program | draft |  |
@@ -270,7 +270,7 @@ Current tickets: `[##################--]` 218 of 234
 
 ## Cost
 
-- From the script, engineer: 595 sessions, 1216.0M input tokens
+- From the script, engineer: 596 sessions, 1216.8M input tokens
 - From the script, lead: 394 sessions, 109.2M input tokens
 - Started by hand, Claude: 12 sessions, 3176.3M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
