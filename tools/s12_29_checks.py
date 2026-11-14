@@ -56,20 +56,26 @@ def broadcast_alignment(assembly):
             residues[re.search(r'%(rsp|rbp)$', text)[1]] = None
         # pushq/popq change rsp by eight, so preserve its residue.
         broadcast = re.match(r'v(?:broadcasts([sd])|pbroadcast([dq]))\s+([^,]+),', text)
-        if not broadcast or '(' not in broadcast[3]:
-            continue
-        size = 8 if broadcast[1] == 'd' or broadcast[2] == 'q' else 4
-        operand = broadcast[3].strip()
-        constant = re.fullmatch(r'(\.LC[\w.]+)([+-]\d+)?\(%rip\)', operand)
-        stack = re.fullmatch(r'(-?\d+)?\(%(rsp|rbp)\)', operand)
-        if constant:
-            known = constants.get(constant[1], 1)
-            known = math.gcd(known, int(constant[2] or 0))
-        elif stack and residues[stack[2]] is not None:
-            known = math.gcd(8, residues[stack[2]] + int(stack[1] or 0))
-        else:
-            known = 1
-        if known % size:
-            failures.append('%s line %d: %s has only %d-byte proven alignment; needs %d'
-                            % (function, number, text, known, size))
+        operands = []
+        if broadcast and '(' in broadcast[3]:
+            size = 8 if broadcast[1] == 'd' or broadcast[2] == 'q' else 4
+            operands.append((broadcast[3].strip(), size))
+        # Folded broadcasts carry their element size in the memory decorator.
+        # Keep indexed addresses intact so unsupported forms fail closed too.
+        for folded in re.finditer(
+                r'([^\s,{}()]*\([^)]*\)|[^\s,{}()]+)\s*\{1to(8|16)\}', text):
+            operands.append((folded[1], 8 if folded[2] == '8' else 4))
+        for operand, size in operands:
+            constant = re.fullmatch(r'(\.LC[\w.]+)([+-]\d+)?\(%rip\)', operand)
+            stack = re.fullmatch(r'(-?\d+)?\(%(rsp|rbp)\)', operand)
+            if constant:
+                known = constants.get(constant[1], 1)
+                known = math.gcd(known, int(constant[2] or 0))
+            elif stack and residues[stack[2]] is not None:
+                known = math.gcd(8, residues[stack[2]] + int(stack[1] or 0))
+            else:
+                known = 1
+            if known % size:
+                failures.append('%s line %d: %s has only %d-byte proven alignment; needs %d'
+                                % (function, number, text, known, size))
     return failures
