@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-14 00:20.
+Updated automatically at every ticket change. Last update: 2026-11-14 00:21.
 
 **Next: the tech lead, on S11-15.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
@@ -80,7 +80,7 @@ Current tickets: `[###################-]` 205 of 213
 | S11-26 | WRF OpenMP build at -mphinix with no per-file workarounds (S11-23 and S11-25 fixed), restaged for PhiWeather | draft | Owner 2026-11-13: the S11-24 WRF build is removed. Deleted: |
 | S11-27 | Wrong code - NPB-MG (class A, serial) built by GCC-KNC at -O2 -march=knc fails NPB verification on the card | In progress | Card round at 89a3657a ran 2026-11-14 00:11 EST, one card_run, 0.6 card-min, log .work/_shared/S11-27/verif... |
 | S11-28 | HPCG run that fits every card model - fixed work instead of fixed duration, grid sized to the 3100's memory | lead | After S11-29 merges (still ready): run .work/_shared/S11-28/lead-pilot.ps1 at 242936bf+ (30 exclusive timed... |
-| S11-29 | card_run profiles limit memory in use, not address space, so a 3100 or 5100 run fails only where the real card would | Question for the tech lead | Red commit 36b48b4e exposes AS caps, missing peaks/resource classification; full/exclusive regression passe... |
+| S11-29 | card_run profiles limit memory in use, not address space, so a 3100 or 5100 run fails only where the real card would | In progress | No probe needed; use the card-side /proc monitor. Already established (docs/card-run.md ~line 175, docs/res... |
 | S12-01 | Sprint 12 prep - static code-quality census of the development-corpus builds (spills, x87/vector transfers, addressing, calls, code size) | Done | A static code-quality census (spill/reload proxies, x87 and x87-zmm traffic, address arithmetic, calls, bra... |
 | S12-02 | Sprint 12 prep - the unscored generality check set (S11-20's six programs in the code styles our corpus lacks) | Done | The six unscored generality checks (Q1-Q6: ray tracer hit dispatch and vec3 AoS, Burkardt MD, Reference BLA... |
 | S2-01 | Design for zmm and mask registers under -march=knc | Done | The register design for KNC is settled on paper: all 32 zmm and 8 mask registers become usable under -march... |
@@ -238,6 +238,7 @@ Current tickets: `[###################-]` 205 of 213
 
 ## Recent activity
 
+- 2026-11-14 00:21 **S11-29** lead answer: No probe needed; use the card-side /proc monitor. Already established (docs/card-run.md ~line 175, docs/research/for-the-other-agent.md item 4): th...
 - 2026-11-14 00:19 **S11-17** lead resume: Lead ran control training at 00:12 EST: results in the answer.
 - 2026-11-14 00:18 **S11-15** engineer ask: 75976eb9: attribution/report done. 521 PCs; GEMM loop 82.56-86.21%; overhead median 0.361%. Log .work/_state/logs/S11_15_attribution-20261114-00130...
 - 2026-11-14 00:17 **S11-27** lead answer: Card round at 89a3657a ran 2026-11-14 00:11 EST, one card_run, 0.6 card-min, log .work/_shared/S11-27/verify-card.log. All 8 pass: MG S-O2, S-noslp...
@@ -245,7 +246,6 @@ Current tickets: `[###################-]` 205 of 213
 - 2026-11-14 00:15 **S11-27** lead resume: Lead ran verify-card.py at 00:11 EST: results in the answer.
 - 2026-11-14 00:12 **S11-29** lead note: Lane moved from tools to tools-mem so this starts now instead of waiting behind S11-02 (lead state, card round tonight). Both change tools/card_run...
 - 2026-11-13 20:35 **S11-27** lead defer: Needs the interactive lead's card turn (PhiWeather has the card until about 04:30 EST 2026-11-14). Run python .work/_shared/S11-27/verify-card.py a...
-- 2026-11-13 20:32 **S11-27** engineer ask: Card round ready at 89a3657a: run python .work/_shared/S11-27/verify-card.py; post verification/L2 or PASS/FAIL per CASE. All 8 rebuilt with lane-g...
 
 ## Cost
 
