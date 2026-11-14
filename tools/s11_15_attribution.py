@@ -201,8 +201,9 @@ def main():
     require(total >= 300 and median(overheads) <= 5 and max(overheads) <= 10,
             'sample count or overhead gate failed')
     output += ['', 'Capture, count, cadence and overhead gates PASS.',
-               'Function-attribution gate: ' + ('PASS' if sum(unknowns)/total <= .05 else 'BLOCKED'),
-               'Wall attribution and hot-order qualification require interpretation; no expansion authorized here.']
+               'Function-attribution gate (conditional on matching card/sysroot ELF): ' +
+               ('PASS' if sum(unknowns)/total <= .05 else 'BLOCKED'),
+               'Wall attribution, module identity and hot-order qualification require interpretation.']
     (OUT / 'attribution.md').write_text('\n'.join(output) + '\n')
     (OUT / 'attribution-pcs.txt').write_text('\n'.join(details) + '\n')
     print('\n'.join(output))

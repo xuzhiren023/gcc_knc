@@ -11,10 +11,14 @@ programs; their data was not opened and is not included here.
 The 2026-11-13 14:47 EST profiling attempt failed because the card has no
 `perf` executable. Its log is
 `.work/_state/logs/S11_15_profile_cpu-20261113-144706.log`.
-A replacement SIGPROF pilot is built and staged, but has not run on the card.
-No hot-function/loop time share, removable-time ranking, or S12 implementation
-theme is established. Baseline timing analysis is available; profiling acceptance
-remains blocked on native method qualification and subsequent program profiles.
+The replacement SIGPROF pilot completed on the card; host attribution is now
+available from `.work/_state/logs/S11_15_profile_sigprof-20261113-150906.log`.
+It identifies PB-gemm's vector inner loop as the dominant sampled region.
+Capture, overhead and CPU-accounting gates pass. Library naming is conditional
+on the local sysroot ELF matching the card, and CPU samples are not qualified
+wall-time fractions. No corpus-wide removable-time ranking or S12 implementation
+theme is established: the other 13 development programs, donor profiles,
+restricted-profile samples and OpenMP wait/compute profiles remain absent.
 
 ## Primary pilot observations
 
@@ -241,18 +245,109 @@ diagnostics, x87/vector bridges, address and FP spills, and byte size.
 These are code properties until their time cost is measured. Further
 per-program profiles and coverage checks are required before choosing themes.
 
+## Returned pilot: attribution and qualification
+
+The lead's successful capture contains all 12 launches, identical complete
+live-outs, the same one-worker affinity (`cpus=1`, 60 cores, 240 granted CPUs),
+six completion markers and no blocker or overflow. This is perturbation
+checking, not a new independent correctness oracle. There are 521 samples.
+The counts by launch are 87, 87, 87, 87, 86 and 87. The analysis ran on the
+host; no additional card job or compiler build was performed.
+
+| Block/repeat | Plain seconds | Sampled seconds | Overhead | User/interior wall | System/interior wall | Sample-clock deficit | Launcher minus interior |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| 1/1 | 0.906655 | 0.909943 | 0.363% | 97.892% | 1.112% | 2.247% | 10.991 ms |
+| 1/2 | 0.898928 | 0.909115 | 1.133% | 95.779% | 3.341% | 2.247% | 11.218 ms |
+| 2/1 | 0.891481 | 0.904835 | 1.498% | 97.413% | 2.239% | 2.247% | 11.731 ms |
+| 2/2 | 0.898553 | 0.901651 | 0.345% | 97.698% | 2.246% | 2.247% | 11.151 ms |
+| 3/1 | 0.906115 | 0.894623 | -1.268% | 96.197% | 3.395% | 2.273% | 11.018 ms |
+| 3/2 | 0.900258 | 0.903486 | 0.359% | 96.384% | 2.241% | 1.136% | 11.222 ms |
+
+Median paired overhead is **0.361%**, range **[-1.268%, 1.498%]**;
+block medians are 0.748%, 0.921%, -0.455%. Thus the 5% median and 10%
+individual limits pass. A negative observation reflects run variability,
+not negative interrupt cost. `samples * 0.010 / (user + system) - 1`
+is between -2.273% and -1.136%, within the 20% sanity limit. Signals can
+still coalesce; this does not establish zero loss or unbiased sampling.
+
+Each PC uses its own launch's executable map. ELF PT_LOAD offsets and virtual
+addresses establish the load bias before host `addr2line -f -C` lookup.
+The executable has symbols but no available source lines. `addr2line` alone
+leaves 57 PCs unnamed (10.940%): 55 in libc and two PLT entries. Exact
+containment in sized dynamic text symbols from `nm -D -S` names the 55 libc
+PCs in the sysroot's `libc-2.21.so`; the staged disassembly identifies the two
+exact PLT entry addresses. No nearest-symbol interpolation is used.
+
+**Runtime identity qualification remains open.** The card reports glibc 2.21
+and maps `/lib64/libc-2.21.so`; the local ELF has that version/name and compatible
+executable segment extent. These facts do not prove identical code. The table's
+libc names are conditional on that match. Unknowns are 0/521 with that condition,
+or 55/521 (10.557%, above the 5% gate) if card library identity is unresolved.
+The main-executable hot-region result does not depend on this condition.
+
+| Region/function | Samples | Pooled conditional PC share | Per-launch share range |
+| --- | --- | --- | --- |
+| main: vector GEMM inner loop | 439 | 84.261% | 82.56-86.21% |
+| libc strcmp | 17 | 3.263% | 0.00-6.90% |
+| libc _IO_fwrite/fwrite | 15 | 2.879% | 1.15-5.75% |
+| corpus_fprintf | 13 | 2.495% | 1.15-5.75% |
+| libc memcpy | 11 | 2.111% | 0.00-3.45% |
+| main: GEMM setup/outer/scalar path | 8 | 1.536% | 0.00-2.33% |
+| libc __write/write | 6 | 1.152% | 0.00-2.30% |
+| libc _IO_file_xsputn | 5 | 0.960% | 0.00-1.16% |
+| main: live-out emission | 4 | 0.768% | 0.00-2.30% |
+| strcmp@plt, fwrite@plt, libc munmap | 1 each | 0.192% each | 0.00-1.16% each |
+
+The vector loop ranks first in every launch. The small functions below it
+change order and are not stably ranked. Counts describe interrupted PCs;
+there is no call stack to assign every library sample to a caller. Library
+and unknown PCs remain in the denominator. Six launches support a descriptive
+range, not an independent-sample confidence interval.
+
+The user+system accounting falls 0.056-1.375% below interior wall time;
+timer/accounting resolution and unscheduled time are not separated. System
+time itself is 1.112-3.395% of interior wall time. SIGPROF can attribute a
+kernel interval to its user return PC. The further 10.991-11.731 ms outside
+the interior includes launch, loading and sampler output, with no measured
+split. Consequently **84.261% is not an established wall-time fraction**;
+neither multiplying it by the primary 0.89267 seconds nor interpreting the
+result as removable time passes the existing wall-attribution gate.
+
+### Code properties at the sampled PB-gemm region
+
+The vector inner loop occupies `[0x401320, 0x40135f)`, **63 bytes**,
+inside the 2,966-byte `main`. Its observed code loads C and B through paired
+unpack loads, performs `vfmadd231pd`, and writes C through paired pack stores,
+advancing 64 bytes per iteration. It has no stack references or calls.
+Thus no address or FP spill is visible inside this loop. This is observed
+vectorized code; optimization-decision diagnostics were not captured for
+this frozen executable and have not been reconstructed with a new build.
+
+The enclosing path contains runtime alias checks, an x87 scalar fallback at
+`[0x401440, 0x40145a)`, and an x87-to-vector bridge at
+`[0x4012fe, 0x40130f)`: multiply, store a double at `-0x48(%rbp)`, then
+broadcast it. That stack transfer is outside the vector inner loop, once
+per enclosing k iteration on this path; it is not a measured inner-loop spill
+cost. The vectorized C-scaling loop is `[0x401290, 0x4012b9)`.
+Initialization precedes this kernel; output calls follow it. The 8 samples
+in the combined setup/outer/scalar category cannot isolate bridge cost or
+prove that the fallback ran. Likewise, the 300 PCs at the load address
+`0x40132f` do not establish memory stalls, bandwidth saturation or a profitable
+prefetch change: delivery bias and neighboring execution remain possible.
+
 ## Planning estimates and removable-time ranking
 
-All 14 programs still have unknown hot functions/loops with wall shares,
-vectorization decisions tied to hot paths, bridge/spill cost, hot code size,
-and (where applicable) OpenMP wait versus compute. The review ranges below
+PB-gemm now has a dominant sampled loop, code size and bridge/spill inspection;
+its wall share and removable cost remain unqualified. The other 13 programs
+still lack sampled functions/loops, hot code sizes and measured costs. All
+OpenMP wait-versus-compute splits remain unknown. The review ranges below
 are future-work scenarios, not predictions validated by donor comparisons.
 Every program's admitted prospective gain remains **unestimated**; no gain
 is admitted to the S12 budget from these scenarios.
 
 | Program | Review scenario | Updated planning evidence and next constraint |
 | --- | --- | --- |
-| PB-gemm | 1.33-1.60x | KNC 0.89 s; bounded sampler staged; hot fraction/local gain unknown |
+| PB-gemm | 1.33-1.60x | KNC 0.89 s; vector inner loop 82.56-86.21% of delivered PCs, 63 bytes; wall fraction and local improvement unqualified |
 | PB-atax | 1.33-1.60x | KNC 0.94 s; strict-reduction/reuse share unknown |
 | PB-cholesky | 1.11-1.25x | KNC 11.2-11.5 s profile medians; recurrence/scalar-FP share unknown; pair spread |
 | PB-ludcmp | 1.11-1.25x | KNC 18.1-18.4 s; recurrence/scalar-replacement share unknown; pair spread |
@@ -275,6 +370,23 @@ The scenario `T * f * (1 - 1/s)` is usable only with supported quantities.
 Select at most three general mechanisms with uncertainty, implementation cost
 and unaffected controls after profiles qualify; do not sum overlapping gains.
 
+The current evidence supports this **measurement priority**, not a ranking
+of removable seconds or selection of implementation themes:
+
+| Candidate | Evidence and potential benefit | Cost/uncertainty and required control |
+| --- | --- | --- |
+| Vector-loop data access and scheduling | PB-gemm's inner loop is consistently dominant in CPU samples | Local gain and generality unknown; require qualified wall attribution, matched diagnostic A/B and other development-loop profiles; include reuse/cache-resident controls |
+| x87/vector transfer reduction | A bridge exists outside that loop | Its cost is not isolated; reject the review's numerical gain as a budget estimate; require measured bridge time and strict-FP correctness controls before implementation |
+| Runtime/output overhead | corpus_fprintf and mapped libc PCs are visible, separate from GEMM | These are not all compiler-removable; keep complete correctness output and timing boundary fixed; runtime ELF identity and caller attribution pending |
+
+**Admitted themes: zero.** No positive removable-seconds estimate or
+implementation-hours estimate is defensible from a single program's PC
+capture. EP, CG and ludcmp have longer valid primary runtimes, but they cannot
+be ranked above or below GEMM for removable cost without their profiles.
+NPB-MG's failed serial rows remain excluded. The historical HPCG proxy remains
+labelled above; no S11-28 fixed-work measurements were supplied in this ticket,
+so a fixed-work baseline or ranking for HPCG is still pending.
+
 ## Reproduction and handoff
 
 `tools/s11_15_baseline.py` reads the public raw and checked records, matches
@@ -296,8 +408,30 @@ Host results:
 - Baseline extraction passed:
   `.work/_state/logs/S11_15_baseline-20261113-145415.log`.
 
-Native sampling, overhead and attribution are untested. Full profiling and
-removable-time acceptance remain open. x86 was not run.
+Native pilot capture and overhead passed; host attribution is recorded above.
+The final host analysis log is
+`.work/_state/logs/S11_15_attribution-20261114-001302.log`.
+The initial addr2line-only attempt is
+`.work/_state/logs/S11_15_attribution-20261114-001156.log`; dynamic-symbol
+containment resolves its stripped-library naming limitation conditionally.
+No baseline extraction or passing native pilot was rerun.
+
+Reproduce the host analysis with:
+
+```powershell
+python tools/run.py --name S11-15-attribution --inputs tools/s11_15_attribution.py -- python tools/s11_15_attribution.py
+```
+
+It writes `.work/_shared/S11-15/attribution.md` and `attribution-pcs.txt`;
+the latter retains per-launch module-relative PCs and symbol/source status.
+It does not read held-out data or change any corpus source or primary harness.
+Full profiling and removable-time acceptance remain open. Before expanding,
+the lead needs to establish whether the sysroot libc is the card's deployed
+ELF (or supply matching symbols), resolve the wall-attribution limitation,
+and supply the development-only S11-28 fixed-work output. Subsequent card
+profiles for the remaining programs and resource settings, and a separately
+qualified OpenMP method, are still necessary. Engineers cannot start these
+card jobs under AGENTS.md. x86 was not run.
 
 References: S11-15 lead notes dated 2026-11-13; `docs/sprints/SPRINT-11.md`,
 Theme B; `docs/reviews/2026-11-12-s11-s13-scope-review.md`, planning table and
