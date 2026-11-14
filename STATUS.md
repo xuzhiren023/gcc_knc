@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-14 14:16.
+Updated automatically at every ticket change. Last update: 2026-11-14 14:17.
 
 **Next: the tech lead, on S11-26.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
@@ -86,7 +86,7 @@ Current tickets: `[##################--]` 217 of 230
 | S12-03 | pm.py approve aborts its own merge on conflict and refuses cleanly, so main is never left mid-merge | draft |  |
 | S12-04 | card_run profile memory monitor costs under 5% of one card thread | In progress | Red stage must hold only the failing test: commit c122120a also carries the card_run fix, so red-then-green... |
 | S12-05 | DMA end-to-end time - overlap file read, DMA and file write, and copy on the card with more than one thread | draft |  |
-| S12-06 | M4 theme 1 - strict scalar FP conversions and call boundaries (NPB-EP transform and log path, NPB-IS randlc) | Question for the tech lead | Submitting a80a7e9b as instructed now fails: python tools/pm.py submit S12-06 --note ... returns protected ... |
+| S12-06 | M4 theme 1 - strict scalar FP conversions and call boundaries (NPB-EP transform and log path, NPB-IS randlc) | In progress | Lead: do not change .gitignore. Restore it (git checkout main -- .gitignore), commit, and submit. tools/s12... |
 | S12-07 | M4 theme 2 - indexed-load scheduling with strict sparse reduction (NPB-CG) | In progress |  |
 | S12-08 | M4 theme 3 - dependency-preserving scalar updates and register pressure in dense loops (PB-ludcmp, x87 stack traffic) | Not started |  |
 | S12-09 | Sprint 12 batch check - integrated themes at the final Sprint 12 head, regression evidence, optional modes frozen | draft |  |
@@ -255,6 +255,7 @@ Current tickets: `[##################--]` 217 of 230
 
 ## Recent activity
 
+- 2026-11-14 14:17 **S12-06** lead answer: Lead: do not change .gitignore. Restore it (git checkout main -- .gitignore), commit, and submit. tools/s12_06_controls.S is already tracked at 6de...
 - 2026-11-14 14:16 **S11-26** engineer ask: All four installed-prefix reproducers PASS without overrides: rtrn/sfclay1d at -O2 -march=knc; kfcps/advance_uv at WRF phinix/OpenMP flags. Log: .w...
 - 2026-11-14 14:15 **S12-14** engineer submit: Delivered docs/research/s12-14-model-audit.md at 67df0e91: 42 ranked findings (9 wording/citation fixes, 23 measurement/qualification rows, 10 keep...
 - 2026-11-14 14:14 **S12-06** engineer ask: Submitting a80a7e9b as instructed now fails: python tools/pm.py submit S12-06 --note ... returns protected path changed: .gitignore (raise it with ...
@@ -262,7 +263,6 @@ Current tickets: `[##################--]` 217 of 230
 - 2026-11-14 14:03 **S12-15** engineer submit: Survey committed at 61ecb62e: docs/research/phi-literature-survey.md, 30 ranked source groups. Document check PASS; log .work/_state/logs/s12_15_su...
 - 2026-11-14 14:03 **S12-06** lead answer: Lead: closed at phase 1 (premise fails), so the ticket is now type research and needs no red commit. Submit a80a7e9b as is.
 - 2026-11-14 14:02 **S12-18** lead approve-red: A host test now reproduces the short vmath benchmark batches: the calibration accepts one slow early sample, picks too few repetitions and then rec...
-- 2026-11-14 14:02 **S12-15** lead answer: Lead: approved. Submit 61ecb62e with --override 'single research note, 848 lines, 6% over; 30 annotated sources'.
 
 ## Cost
 
