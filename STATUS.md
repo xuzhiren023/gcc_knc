@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-14 18:01.
+Updated automatically at every ticket change. Last update: 2026-11-14 18:02.
 
 **Next: GPT-6.1, on S12-23 (Floating-point environment correctness on KNC - fix the underflow probe that cannot tell flushing from rounding, and handle x87 erratum CD28 (S12-14 N06, N07, B16, B17)).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
@@ -281,7 +281,7 @@ Current tickets: `[##################--]` 226 of 244
 ## Cost
 
 - From the script, engineer: 637 sessions, 1267.6M input tokens
-- From the script, lead: 418 sessions, 114.8M input tokens
+- From the script, lead: 419 sessions, 115.1M input tokens
 - Started by hand, Claude: 12 sessions, 3291.4M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
