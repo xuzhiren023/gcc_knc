@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-14 17:59.
+Updated automatically at every ticket change. Last update: 2026-11-14 18:00.
 
-**Next: the tech lead, on S12-21.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: the tech lead, on S12-29.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[##################--]` 226 of 244
 
@@ -101,7 +101,7 @@ Current tickets: `[##################--]` 226 of 244
 | S12-18 | Double-precision vector exp, log and pow ran slower than scalar libm on the card (0.82x, 0.63x, 0.49x) - confirm with valid batches, then fix the library or stop the vectorizer calling them where they lose | lead | Needs interactive lead: (1) exclusive card turn running .work/_shared/S12-18/vmath-bench.mic at full, 3100 ... |
 | S12-19 | Profile-guided missed-vectorization triage - join hot loops with the vectorizer's reasons and observed strides/masks, so tuning targets what is hot and fixable | Done | tools/vec_triage.py now ranks each development program's hot loops by sampled time with GCC's vectorizer ve... |
 | S12-20 | libknc_vmath accuracy and exception contract, with an independent validation design (rounding modes, special values, flags, scalar fallback) | draft |  |
-| S12-21 | Scheduling model for M4's serial runs - measure density-1 tuning and the integer-multiply cost against today's density-4 defaults (S12-14 B02, B04, B05) | Question for the tech lead | Fixed at 037aee42: removed shell timeout calls; card_run retains 1740 s limit. Payload and peer archives us... |
+| S12-21 | Scheduling model for M4's serial runs - measure density-1 tuning and the integer-multiply cost against today's density-4 defaults (S12-14 B02, B04, B05) | lead | Card run needed (interactive lead): 037aee42 removes the shell timeout calls (card_run keeps the 1740 s lim... |
 | S12-22 | Low-risk corrections from the S12-14 audit - wrong comments and citations (N01-N09) and the far-prefetch-distance range bug (B10) | Done | The audit's comment and citation fixes are in GCC-KNC and the far prefetch distance can no longer be set eq... |
 | S12-23 | Floating-point environment correctness on KNC - fix the underflow probe that cannot tell flushing from rounding, and handle x87 erratum CD28 (S12-14 N06, N07, B16, B17) | In progress | Built; run green and submit. |
 | S12-24 | ICE in vect_transform_stmt (tree-vect-stmts.cc:13381) on WRF's REMEZ at -mphinix (-O3 -march=knc) | Not started |  |
@@ -269,6 +269,7 @@ Current tickets: `[##################--]` 226 of 244
 
 ## Recent activity
 
+- 2026-11-14 18:00 **S12-21** lead defer: Card run needed (interactive lead): 037aee42 removes the shell timeout calls (card_run keeps the 1740 s limit) and writes payload/peer archives as ...
 - 2026-11-14 17:59 **S12-29** engineer red: Red commit c75bded5. Ran tools/run.py --name S12-29-red wrapping tools/check.py t1 --compiler gcc16 --complex-broadcast-align --worker. Expected fa...
 - 2026-11-14 17:58 **S12-21** engineer ask: Fixed at 037aee42: removed shell timeout calls; card_run retains 1740 s limit. Payload and peer archives use ustar. Repackaged r2: 16329850 bytes, ...
 - 2026-11-14 17:58 **S12-07** lead defer: Card run needed (interactive lead only): in an exclusive timing turn, run .work/_shared/S12-07/sparse-paired via tools/card_run --threads 1 --timeo...
@@ -276,13 +277,12 @@ Current tickets: `[##################--]` 226 of 244
 - 2026-11-14 17:56 **S12-23** lead answer: Built; run green and submit.
 - 2026-11-14 17:56 **S12-23** lead resume: Lead: lane 2 built at s12/S12-23 (see log s12_23_build). Diff reviewed: CD28 fnsave/edit/frstor clear routes, KNC_RESERVED now includes bit 20, DUE...
 - 2026-11-14 17:55 **S12-21** owner decide: Lead raises sessions 4 -> 6 (standing rule): a session was lost to the lead's duplicate dispatcher; staging is done, only the card-window fixes (no...
-- 2026-11-14 17:55 **S12-21** engineer escalate: budget: 4 engineer sessions used; the budget is 4
 
 ## Cost
 
 - From the script, engineer: 636 sessions, 1267.1M input tokens
 - From the script, lead: 417 sessions, 114.6M input tokens
-- Started by hand, Claude: 12 sessions, 3286.9M input tokens
+- Started by hand, Claude: 12 sessions, 3287.6M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
