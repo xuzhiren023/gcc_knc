@@ -42,13 +42,18 @@ def command(argv):
     subprocess.run([v.as_posix() if isinstance(v, Path) else str(v) for v in argv], env=ENV, check=True)
 
 
-def build(host_only=False, card_only=False, output_dir=None):
-    output_dir = OUT if output_dir is None else Path(output_dir)
-    output_dir.mkdir(parents=True, exist_ok=True)
+def build(host_only=False, card_only=False, production=False, output_dir=None):
+    if production:
+        out = SHARED / 'S11-02'
+    else:
+        out = OUT if output_dir is None else Path(output_dir)
+    host_name = 'claude-transfer.exe' if production else 'transfer-host.exe'
+    card_name = 'claude-transfer.mic' if production else 'transfer-card.mic'
+    out.mkdir(parents=True, exist_ok=True)
     flags = ['-O2', '-std=gnu11', '-Wall', '-Wextra', '-pthread']
     if not card_only:
         command([TC / 'cygwin/bin/gcc.exe', *flags, HERE / 'transfer_bench.c',
-                 '-o', output_dir / 'transfer-host.exe'])
+                 '-o', out / host_name])
     if host_only:
         return
     import storage
@@ -58,12 +63,102 @@ def build(host_only=False, card_only=False, output_dir=None):
     command([prefix / 'bin/k1om-mpss-linux-gcc.exe',
              '--sysroot=' + (TC / 'sysroot').as_posix(), *flags, '-march=knc',
              '-fno-tree-vectorize', HERE / 'transfer_bench.c', '-ldl',
-             '-o', OUT / 'transfer-card.mic'])
-    command([sys.executable, HERE / 'knc_lint', OUT / 'transfer-card.mic'])
+             '-o', out / card_name])
+    command([sys.executable, HERE / 'knc_lint', out / card_name])
+    if production:
+        command([TC / 'cygwin/bin/chmod.exe', '755', out / card_name])
+        stage_production_validation(out)
+        print('STAGED (no card execution): ' + str(out))
+        return
     for name in ('host_card_transfer.py', 'transfer-card.sh'):
         shutil.copyfile(HERE / name, OUT / name)
     command([TC / 'cygwin/bin/chmod.exe', '755', OUT / 'transfer-card.mic', OUT / 'transfer-card.sh'])
     print('STAGED (no card execution): ' + str(OUT))
+
+
+def stage_production_validation(out):
+    """Leave commands for the lead; building never connects to the card."""
+    (out / 'claude-check.sh').write_bytes(b'#!/bin/sh\ntest -f claude-payload\n')
+    (out / 'validate.ps1').write_text(r'''# Lead only, on an idle card. Run after merging or pass -Repo for this worktree.
+# No automatic retry after any nonzero exit. Do not clear DMA stop markers
+# without inspecting both endpoints and the host boot/bugcheck state.
+# Legacy failure recovery (lead only, before rerunning): read card-dma-active.lock.
+# Compare host_card_transfer.event_log() with its host_state; verify the card's
+# current boot ID matches boot_id. Check host helper processes and remote /proc
+# cwd/exe users of run_dir. No signals, DMA retries or deletion while unresolved.
+# The old helper left no close report: the lead must establish endpoint teardown,
+# not just trust exit 126. Once established, use the guarded card control shell
+# in that exact run_dir to remove ONLY claude-dma-active, then remove the host
+# .work/_state/card-dma-active.lock. Normal guarded stale recovery owns the rest.
+# New helpers report endpoint_closed after successful scif_close on errors;
+# both reports AND exits plus host-health/boot guards now resolve those errors.
+param([Parameter(Mandatory=$true)][string]$Suite,
+      [string]$Repo = "PROJECT_ROOT")
+$ErrorActionPreference = 'Continue'  # lead 2026-11-13: native stderr must not abort mid card_run; exit codes and throws are explicit
+# Lead 2026-11-13: resolve Windows Python before the cygwin PATH prepend (its extensionless 'python' cannot run from PowerShell).
+$py = (Get-Command python.exe -ErrorAction Stop).Source
+Set-Location -LiteralPath $Repo -ErrorAction Stop
+$project = $Repo
+if ((Split-Path -Leaf (Split-Path -Parent $Repo)) -eq '.work') { $project = Split-Path -Parent (Split-Path -Parent $Repo) }
+$stage = Join-Path $project '.work/_shared/S11-02'
+Copy-Item -LiteralPath "$stage/claude-transfer.mic", "$stage/claude-transfer.exe" -Destination (Join-Path $project '.work/_shared') -ErrorAction Stop
+$env:PATH = (Join-Path $project '.work/_shared/toolchain/cygwin/bin') + ';' + $env:PATH
+$config = Get-Content -Raw -LiteralPath (Join-Path $project 'config/card.local.json') -ErrorAction Stop | ConvertFrom-Json -ErrorAction Stop
+$config | Add-Member -Force NoteProperty maxStageMiB 1100
+$config | Add-Member -Force NoteProperty memoryMB 2048
+$cfg = Join-Path $stage 'validation-config.json'
+$config | ConvertTo-Json | Set-Content -Encoding Ascii -LiteralPath $cfg -ErrorAction Stop
+$payload = Join-Path $stage 'claude-payload'
+& (Join-Path $stage 'claude-transfer.exe') generate $payload.Replace('\','/') 1073741824 0 -
+if ($LASTEXITCODE -ne 0) { throw 'payload generation failed' }
+$measurements = @()
+foreach ($repeat in 1..3) {
+  foreach ($method in 'dma') {
+    $receipt = Join-Path $stage ("pair-{0}-{1}.json" -f $repeat,$method)
+    & $py tools/card_run --config $cfg --benchmark --threads 1 --timeout 1800 `
+      --stage-timeout 1200 --transport-timeout 1200 --transfer $method --file $payload `
+      --collect claude-payload --collect-dir $stage/collected --receipt $receipt $stage/claude-check.sh
+    if ($LASTEXITCODE -ne 0) { throw "STOP: $method pair $repeat; inspect $receipt and cleanup state" }
+    $rows = (Get-Content -Raw -LiteralPath $receipt | ConvertFrom-Json).transfers |
+      Where-Object { $_.bytes -eq 1073741824 }
+    if (@($rows).Count -ne 2 -or @($rows | Where-Object { !$_.file_complete -or $_.method -ne $method }).Count) {
+      throw 'missing paired completion/length evidence'
+    }
+    foreach ($row in $rows) {
+      $measurements += [PSCustomObject]@{ repeat=$repeat; method=$method; direction=$row.direction;
+        seconds=$row.seconds; wall_seconds=$row.wall_seconds; MiB_s=$row.mib_per_second;
+        read_seconds=$row.read_seconds; write_seconds=$row.write_seconds;
+        host_seconds=$row.host_seconds; card_seconds=$row.card_seconds; publish_seconds=$row.publish_seconds }
+    }
+  }
+}
+# Show both actual file wall time and payload-only DMA timing; do not conflate them.
+$measurements | Format-Table
+foreach ($repeat in 1..3) {
+  foreach ($direction in 'up','down') {
+    $dma = $measurements | Where-Object { $_.repeat -eq $repeat -and $_.direction -eq $direction -and $_.method -eq 'dma' }
+    $minimum = if ($direction -eq 'up') { 1.2e9 } else { 1.35e9 }
+    if (1073741824 / $dma.seconds -lt $minimum) { throw "DMA below link-limit acceptance: pair $repeat $direction" }
+    if (1073741824 / $dma.wall_seconds -lt 1.0e9) {
+      Write-Warning "Whole file below 1.0 GB/s: pair $repeat $direction; lead must explain measured IO/startup costs above."
+    }
+  }
+}
+$config | Add-Member -Force NoteProperty dmaEnabled $false
+$config | ConvertTo-Json | Set-Content -Encoding Ascii -LiteralPath $cfg -ErrorAction Stop
+& $py tools/card_run --config $cfg --benchmark --timeout 1800 --stage-timeout 1200 `
+  --transport-timeout 1200 --transfer auto --file $payload --collect claude-payload `
+  --collect-dir $stage/collected --receipt $stage/unavailable.json $stage/claude-check.sh
+if ($LASTEXITCODE -ne 0) { throw 'forced unavailable run failed' }
+$fallbacks = (Get-Content -Raw -LiteralPath $stage/unavailable.json | ConvertFrom-Json).transfers |
+  Where-Object { $_.bytes -eq 1073741824 }
+if (@($fallbacks).Count -ne 2 -or @($fallbacks | Where-Object { $_.method -ne 'ssh' -or !$_.fallback.reason -or !$_.file_complete }).Count) {
+  throw 'missing fallback reason or completion'
+}
+& $py harness/card/run_suite.py $Suite $stage/suite-output --transfer dma
+if ($LASTEXITCODE -ne 0) { throw 'suite upload failed; no retry' }
+Write-Output 'Lead review required: lengths/completion, DMA >=1.2 GB/s up and >=1.35 GB/s down; whole file >=1.0 GB/s or measured IO/startup explanation; suite receipt and cleanup. No SSH timing runs.'
+'''.replace('PROJECT_ROOT', PROJECT.as_posix()), encoding='utf8')
 
 
 def start_endpoint(role, method, address, port, nonce, size, repeats, direction, cpus='-', corrupt=False, **kwargs):
@@ -481,6 +576,7 @@ def main():
     b = sub.add_parser('build')
     b.add_argument('--host-only', action='store_true')
     b.add_argument('--card-only', action='store_true')
+    b.add_argument('--production', action='store_true', help='build S11-02 file helpers and stage lead validation commands')
     n = sub.add_parser('run')
     n.add_argument('--project', type=Path, default=PROJECT)
     n.add_argument('--config', type=Path, required=True)
@@ -502,7 +598,7 @@ def main():
         size_values = dict(zip(('4K', '1M', '64M', '1G'), SIZES))
         args.sizes = tuple(size_values[value] for value in args.sizes)
     if args.action == 'build':
-        build(args.host_only, args.card_only)
+        build(args.host_only, args.card_only, args.production)
     else:
         run_native(args)
 

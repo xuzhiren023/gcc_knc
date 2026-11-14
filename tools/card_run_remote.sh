@@ -140,6 +140,12 @@ reap_one() {
     cd -- "$run_dir" || return 92
     guard_dir || return 0
     check_boot || return 92
+    # A host interruption may leave a live SCIF endpoint or uncertain driver
+    # cleanup. Only two successful endpoint close reports release this marker.
+    if [ -e claude-dma-active ]; then
+        printf 'STALE_KEPT\t%s\n' "$run_dir"
+        return 0
+    fi
     # Stale recovery never signals: any live user of this exact cwd/exe keeps it.
     for proc in /proc/[0-9]*; do
         if owned_pid "${proc##*/}"; then
@@ -166,6 +172,10 @@ reap_stale() {
 }
 stop_owned() {
     guard_boot || return 92
+    [ ! -e claude-dma-active ] || {
+        echo 'SCIF endpoint cleanup unresolved; no signalling or removal' >&2
+        return 93
+    }
     for sig in TERM KILL; do
         for proc in /proc/[0-9]*; do
             proc_pid=${proc##*/}

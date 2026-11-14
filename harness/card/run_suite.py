@@ -9,6 +9,7 @@ for infrastructure is retried up to twice. Receipts go to OUTDIR/result<N>.json.
 usage: python harness/card/run_suite.py PROGDIR OUTDIR
 """
 import json
+import argparse
 import os
 import subprocess
 import sys
@@ -16,10 +17,17 @@ from collections import Counter
 from pathlib import Path
 
 REPO = Path(__file__).resolve().parents[2]
-SHARED = REPO / ".work/_shared"
-STATE = REPO / ".work/_state/card"
-P = Path(sys.argv[1]).resolve()
-OUT = Path(sys.argv[2]).resolve()
+PROJECT = REPO.parent.parent if REPO.parent.name == ".work" else REPO
+SHARED = PROJECT / ".work/_shared"
+STATE = PROJECT / ".work/_state/card"
+parser = argparse.ArgumentParser(description=__doc__)
+parser.add_argument("programs", type=Path)
+parser.add_argument("output", type=Path)
+parser.add_argument("--transfer", choices=("ssh", "dma", "auto"), default="auto")
+parser.add_argument("--dma-threshold", type=int, default=1048576)
+args = parser.parse_args()
+P = args.programs.resolve()
+OUT = args.output.resolve()
 OUT.mkdir(parents=True, exist_ok=True)
 STATE.mkdir(parents=True, exist_ok=True)
 
@@ -32,7 +40,7 @@ if not driver.exists():
                     str(REPO / "tools/claude-torture.c"), "-o", str(driver)], check=True, env=env)
 
 # card_run takes memoryMB only from its config: 80 programs x 96 MiB = 7680 MiB, within our 10 GiB budget (owner, 2026-11-04).
-config = json.loads((REPO / "config/card.local.json").read_text(encoding="utf8"))
+config = json.loads((PROJECT / "config/card.local.json").read_text(encoding="utf8"))
 config["memoryMB"] = 7680
 cfg = STATE / "card-j80.json"
 cfg.write_text(json.dumps(config, indent=1), encoding="utf8")
@@ -43,6 +51,12 @@ rel = os.path.relpath(P, REPO)
 # The stage also carries the driver, claude-pin and claude-unpack; keep 64 KiB for the list.
 limit = config.get("maxStageMiB", 64) * 1024 * 1024 - 64 * 1024 - driver.stat().st_size - sum(
     (SHARED / name).stat().st_size for name in ("claude-pin.mic", "claude-unpack.mic"))
+helpers = [Path(config.get(key, str(SHARED / name))) for key, name in
+           (("transferHelper", "claude-transfer.mic"), ("transferHost", "claude-transfer.exe"))]
+if args.transfer != "ssh" and all(path.is_file() for path in helpers):
+    limit -= helpers[0].stat().st_size
+elif args.transfer == "dma":
+    raise SystemExit("DMA requires both transfer helpers")
 chunks, size = [[]], 0
 for e in entries:
     n = (P / e.split()[0]).stat().st_size
@@ -61,7 +75,8 @@ for k, chunk in enumerate(chunks):
     for attempt in range(3):
         cmd = [sys.executable, "tools/card_run", "--config", str(cfg), "--timeout", "900",
                "--transport-timeout", "120", "--receipt", str(OUT / ("result%d.json" % k)),
-               "--file-list", str(stage), "--threads", "80"]  # S5-19: cores 59-40, packed
+               "--file-list", str(stage), "--threads", "80", "--transfer", args.transfer,
+               "--dma-threshold", str(args.dma_threshold)]  # Shared packed file transport.
         cmd += [str(driver), "-j", "80", "--limit-mb", "96", lst.name]
         done = subprocess.run(cmd, cwd=REPO, stdout=subprocess.PIPE, stderr=subprocess.PIPE, timeout=3600)
         lines = [l for l in done.stdout.decode("utf8", "replace").splitlines()
@@ -69,6 +84,8 @@ for k, chunk in enumerate(chunks):
         r = json.loads((OUT / ("result%d.json" % k)).read_text(encoding="utf8"))
         print("chunk", k, "attempt", attempt, "exit", done.returncode, r.get("result_class"),
               dict(Counter(l.split(" ")[0] for l in lines)), str(r.get("detail") or "")[:160], flush=True)
+        if r.get("transfer_stop"):
+            raise SystemExit("STOP: transfer integrity or cleanup unresolved; no suite retry")
         if r.get("result_class") != "infrastructure":
             break
     all_lines += lines
