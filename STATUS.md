@@ -2,7 +2,7 @@
 
 Updated automatically at every ticket change. Last update: 2026-11-14 15:31.
 
-**Next: the tech lead, on S12-19.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: GPT-6.1, on S12-08 (M4 theme 3 - dependency-preserving scalar updates and register pressure in dense loops (PB-ludcmp, x87 stack traffic)).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
 Current tickets: `[##################--]` 221 of 238
 
@@ -99,7 +99,7 @@ Current tickets: `[##################--]` 221 of 238
 | S12-16 | Research - whole-system tuning playbook for the Z840 + Xeon Phi (BIOS, host OS, MPSS and card, transfers, runtimes), as HPC centres tuned Xeon + KNC systems | Done | Whole-system tuning playbook for the Z840 + Phi done: 13 ordered steps (BIOS, host Linux, card power/pages/... |
 | S12-17 | claude-torture -j N refuses to start in exclusive card runs (no inherited RLIMIT_AS since S11-29), so the execute suite cannot run | In progress | Lead raises sessions 6 -> 7: the last raise made progress (green test passed); one session to rebuild the s... |
 | S12-18 | Double-precision vector exp, log and pow ran slower than scalar libm on the card (0.82x, 0.63x, 0.49x) - confirm with valid batches, then fix the library or stop the vectorizer calling them where they lose | lead | Needs interactive lead: (1) exclusive card turn running .work/_shared/S12-18/vmath-bench.mic at full, 3100 ... |
-| S12-19 | Profile-guided missed-vectorization triage - join hot loops with the vectorizer's reasons and observed strides/masks, so tuning targets what is hot and fixable | Question for the tech lead | 6c999a43: join core; 10 host tests pass. Audit: 0/15109 workload samples resolve to source; HPCG has no cap... |
+| S12-19 | Profile-guided missed-vectorization triage - join hot loops with the vectorizer's reasons and observed strides/masks, so tuning targets what is hot and fixable | In progress | Lead: no card capture needed. GCC does not change generated code for -g. Rebuild each development program w... |
 | S12-20 | libknc_vmath accuracy and exception contract, with an independent validation design (rounding modes, special values, flags, scalar fallback) | draft |  |
 | S12-21 | Scheduling model for M4's serial runs - measure density-1 tuning and the integer-multiply cost against today's density-4 defaults (S12-14 B02, B04, B05) | In progress | FLAGS['density1'] pins -mknc-density=1, but no such option exists: the density control is --param=knc-threa... |
 | S12-22 | Low-risk corrections from the S12-14 audit - wrong comments and citations (N01-N09) and the far-prefetch-distance range bug (B10) | Not started |  |
@@ -263,6 +263,7 @@ Current tickets: `[##################--]` 221 of 238
 
 ## Recent activity
 
+- 2026-11-14 15:31 **S12-19** lead answer: Lead: no card capture needed. GCC does not change generated code for -g. Rebuild each development program with exactly the S11-18 builds.json flags...
 - 2026-11-14 15:31 **S12-08** lead answer: Submit now.
 - 2026-11-14 15:30 **S12-17** owner decide: Lead raises sessions 6 -> 7: the last raise made progress (green test passed); one session to rebuild the staged binary and submit.
 - 2026-11-14 15:30 **S12-08** lead resume: Lead: type is now research (negative result, no compiler change), so submit needs no red commit. Submit 7f2df59d as is.
@@ -270,7 +271,6 @@ Current tickets: `[##################--]` 221 of 238
 - 2026-11-14 15:13 **S12-21** lead changes: FLAGS['density1'] pins -mknc-density=1, but no such option exists: the density control is --param=knc-threads-per-core= (i386.opt:1400, Init 4, ran...
 - 2026-11-14 15:13 **S12-17** engineer escalate: budget: 6 engineer sessions used; the budget is 6
 - 2026-11-14 15:13 **S12-04** engineer submit: Host profile memory tests passed (7 tests); strengthened fallback test red against original card_run and green with fix. Logs: .work/_state/logs/S1...
-- 2026-11-14 15:12 **S12-19** engineer ask: 6c999a43: join core; 10 host tests pass. Audit: 0/15109 workload samples resolve to source; HPCG has no capture. Repro: python tools/vec_triage.py ...
 
 ## Cost
 
