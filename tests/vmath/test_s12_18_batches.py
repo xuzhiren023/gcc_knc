@@ -23,10 +23,10 @@ class BatchCalibration(unittest.TestCase):
                 text=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
             self.assertEqual(build.returncode, 0, build.stdout)
             for k, name in enumerate(('exp', 'log', 'pow'), start=3):
-                for cold_calls in (0, 7):
-                    with self.subTest(kernel=name, cold_calls=cold_calls):
+                for cold_calls, working_set in ((0, 0), (7, 0), (-1, 0), (0, 1)):
+                    with self.subTest(kernel=name, cold_calls=cold_calls, working_set=working_set):
                         run = subprocess.run(
-                            [str(binary), str(k), str(cold_calls)],
+                            [str(binary), str(k), str(cold_calls), str(working_set)],
                             text=True, stdout=subprocess.PIPE,
                             stderr=subprocess.STDOUT, timeout=10)
                         self.assertEqual(run.returncode, 0, run.stdout)
@@ -40,13 +40,16 @@ class BatchCalibration(unittest.TestCase):
                                 self.assertGreaterEqual(value, .05, run.stdout)
                                 self.assertLessEqual(value, .2, run.stdout)
                         self.assertIn('batches=valid', run.stdout)
+                        if cold_calls == -1:
+                            self.assertIn('retry_batches ', run.stdout)
                         ratios = re.findall(
                             r'^round .*ratio_vec_over_scl=([0-9.]+)$',
                             run.stdout, re.M)
                         self.assertEqual(len(ratios), 3, run.stdout)
                         for ratio in ratios:
                             # Changing reps must preserve time-per-element ratios.
-                            self.assertAlmostEqual(float(ratio), 1.25, delta=.001)
+                            expected = .3125 if cold_calls == -1 else 1.25
+                            self.assertAlmostEqual(float(ratio), expected, delta=.001)
 
 
 if __name__ == '__main__':
