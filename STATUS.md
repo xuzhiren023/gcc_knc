@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-14 14:14.
+Updated automatically at every ticket change. Last update: 2026-11-14 14:15.
 
 **Next: the tech lead, on S12-06.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
@@ -77,7 +77,7 @@ Current tickets: `[##################--]` 217 of 230
 | S11-23 | ICE in WRF's RRTM radiation (rtrn) at -O2 -march=knc - unrecognizable insn after reload, and sub-512-bit SLP vectors under KNC | Done | WRF's RRTM radiation and the -O3 OpenMP WRF files that crashed GCC-KNC after reload (rtrn, kfcps, advance_u... |
 | S11-24 | WRF OpenMP (smpar) build with GCC-KNC at -mphinix, for PhiWeather's benchmark - replaces the serial trial build | Done | WRF v4.8.0 now builds as an OpenMP card binary at -mphinix with GCC-KNC (wrf.exe and real.exe linked, needi... |
 | S11-25 | ICE in do_store_flag (expr.cc) on WRF's surface layer (SFCLAY1D) at -O2 -march=knc | Done | The last WRF file that crashed GCC-KNC (surface layer, SFCLAY1D) now compiles: vector 'ordered and not equa... |
-| S11-26 | WRF OpenMP build at -mphinix with no per-file workarounds (S11-23 and S11-25 fixed), restaged for PhiWeather | Not started | Owner 2026-11-13: the S11-24 WRF build is removed. Deleted: |
+| S11-26 | WRF OpenMP build at -mphinix with no per-file workarounds (S11-23 and S11-25 fixed), restaged for PhiWeather | In progress | Owner 2026-11-13: the S11-24 WRF build is removed. Deleted: |
 | S11-27 | Wrong code - NPB-MG (class A, serial) built by GCC-KNC at -O2 -march=knc fails NPB verification on the card | Done | NPB-MG built by GCC-KNC at -O2 -march=knc now verifies on the card (class A in 14.1 s, against 33.8 s for G... |
 | S11-28 | HPCG run that fits every card model - fixed work instead of fixed duration, grid sized to the 3100's memory | Done | HPCG now runs a fixed amount of work (one CG set on the 104-cubed grid) that passes on the full card, 3100 ... |
 | S11-29 | card_run profiles limit memory in use, not address space, so a 3100 or 5100 run fails only where the real card would | Done | Under --profile 3100 and 5100, card_run now limits the memory a job actually uses (sampled resident plus sw... |
@@ -268,7 +268,7 @@ Current tickets: `[##################--]` 217 of 230
 
 - From the script, engineer: 590 sessions, 1210.4M input tokens
 - From the script, lead: 390 sessions, 108.8M input tokens
-- Started by hand, Claude: 12 sessions, 3167.6M input tokens
+- Started by hand, Claude: 12 sessions, 3168.8M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
