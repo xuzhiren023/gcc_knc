@@ -166,6 +166,7 @@ M1 is accepted and tagged `m1` locally; nothing is pushed. Engineers are Claude 
   - Host CPU again: PhiWeather builds (radar with 8 workers, WPS ungrib) from 07:36 made the HPCG launch-27 rerun fail at staging too. PhiWeather paused new steps at the lead's request; the host was quiet by 08:05.
   - Launch 27 rerun at 08:06 on a quiet host: pass, VALID, 589 s. All 30 pilot launches pass.
   - S11-17 controls, 08:16-08:21 EST, exclusive: 30/30 checks pass. Median gain over base, matched/inverted profile: branch +2.2/+0.1%, indirect +12.7/-18.1%, division +39.0/-17.0%, inline +5.8/+5.9% (profile-independent, so not a PGO control), loop +30.2/+5.7%. Full, 3100 and 5100 agree within 0.3 points.
+  - PhiWeather's card queue: 8 forecast runs of about 2.1 h from 09:12 EST, ending about 02:00-03:00 EST 2026-11-15. Their chain yields between runs to a queued GCC-KNC ledger row: for S11-12, queue a ledger row and message them.
   - Card turn ended 08:25 EST; PhiWeather told "done". S11-12 (batch check) and any S11-17/S11-28 follow-up card work go to the next turn.
 
 - **Next card turn plan, owner 2026-11-13 19:55 EST: batch every job that can share the card. Owner approved the whole plan at 20:05 EST, the HPCG pilot included.** Card_run holds an exclusive lock, so batching means one combined card_run with cases pinned one per core, not concurrent card_runs.
