@@ -2,7 +2,7 @@
 
 Updated automatically at every ticket change. Last update: 2026-11-14 16:03.
 
-**Waiting for you:** S12-19. Run `python tools/pm.py inbox`.
+**Next: the tech lead, on S12-21.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[##################--]` 223 of 239
 
@@ -99,7 +99,7 @@ Current tickets: `[##################--]` 223 of 239
 | S12-16 | Research - whole-system tuning playbook for the Z840 + Xeon Phi (BIOS, host OS, MPSS and card, transfers, runtimes), as HPC centres tuned Xeon + KNC systems | Done | Whole-system tuning playbook for the Z840 + Phi done: 13 ordered steps (BIOS, host Linux, card power/pages/... |
 | S12-17 | claude-torture -j N refuses to start in exclusive card runs (no inherited RLIMIT_AS since S11-29), so the execute suite cannot run | Done | The parallel execute-suite runner starts again in exclusive card runs: claude-torture -j N with an explicit... |
 | S12-18 | Double-precision vector exp, log and pow ran slower than scalar libm on the card (0.82x, 0.63x, 0.49x) - confirm with valid batches, then fix the library or stop the vectorizer calling them where they lose | lead | Needs interactive lead: (1) exclusive card turn running .work/_shared/S12-18/vmath-bench.mic at full, 3100 ... |
-| S12-19 | Profile-guided missed-vectorization triage - join hot loops with the vectorizer's reasons and observed strides/masks, so tuning targets what is hot and fixable | **Waiting for you** | budget: 4 engineer sessions used; the budget is 4 |
+| S12-19 | Profile-guided missed-vectorization triage - join hot loops with the vectorizer's reasons and observed strides/masks, so tuning targets what is hot and fixable | In progress | Lead raises sessions 4 -> 6 (standing rule): the tool and 14-program collection are done; one requested cha... |
 | S12-20 | libknc_vmath accuracy and exception contract, with an independent validation design (rounding modes, special values, flags, scalar fallback) | draft |  |
 | S12-21 | Scheduling model for M4's serial runs - measure density-1 tuning and the integer-multiply cost against today's density-4 defaults (S12-14 B02, B04, B05) | Question for the tech lead | Recovery blocked: sandbox rejected PowerShell Remove-Item -LiteralPath cleanup under .work/_shared/S12-21 a... |
 | S12-22 | Low-risk corrections from the S12-14 audit - wrong comments and citations (N01-N09) and the far-prefetch-distance range bug (B10) | In progress | rg missing is not a reason to stop. Use 'git grep -n' (works in both repos, incl. git -C .work/_shared/gcc ... |
@@ -264,6 +264,7 @@ Current tickets: `[##################--]` 223 of 239
 
 ## Recent activity
 
+- 2026-11-14 16:03 **S12-19** owner decide: Lead raises sessions 4 -> 6 (standing rule): the tool and 14-program collection are done; one requested change (per-function match instead of whole...
 - 2026-11-14 16:03 **S12-19** lead escalate: budget: 4 engineer sessions used; the budget is 4
 - 2026-11-14 16:02 **S12-21** engineer ask: Recovery blocked: sandbox rejected PowerShell Remove-Item -LiteralPath cleanup under .work/_shared/S12-21 as 'blocked by policy', despite absolute-...
 - 2026-11-14 16:02 **S12-19** lead answer: Lead: the size override is approved (one 699-line tool, tests stay in the 2 approved files), so use submit --override 'lead-approved size, S12-19 a...
@@ -271,13 +272,12 @@ Current tickets: `[##################--]` 223 of 239
 - 2026-11-14 16:00 **S12-22** engineer ask: Blocked: rg is unavailable in this PowerShell environment, and AGENTS.md says not to work around a refused command. Please provide the prescribed s...
 - 2026-11-14 16:00 **S12-21** lead answer: See the 15:55 owner-decide note: one session only from now; rebuild .work/_shared/S12-21 from your branch commits, apply the compression fix, rerun...
 - 2026-11-14 16:00 **S12-21** owner decide: Lead (owner-delegated): the duplicate session was the lead's mistake (two dispatchers on one lane) and has been stopped; only one session runs from...
-- 2026-11-14 15:59 **S12-19** engineer ask: 447cf31f is ready for review, but submit refuses 1286 changed lines against the 800-line budget. Approve this size override, or specify the split? ...
 
 ## Cost
 
 - From the script, engineer: 622 sessions, 1254.8M input tokens
 - From the script, lead: 406 sessions, 112.7M input tokens
-- Started by hand, Claude: 12 sessions, 3223.4M input tokens
+- Started by hand, Claude: 12 sessions, 3225.0M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
