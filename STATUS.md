@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-14 08:05.
+Updated automatically at every ticket change. Last update: 2026-11-14 08:21.
 
-Nothing can move right now.
+**Next: the tech lead, on S11-17.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[###################-]` 209 of 216
 
@@ -68,7 +68,7 @@ Current tickets: `[###################-]` 209 of 216
 | S11-14 | M4 scoring contract and measurement protocol, frozen before any tuning | Done | M4's scoring contract is frozen in ADR-0015 with a tested scorer: strict serial -O2 versus -O2 over 17 prog... |
 | S11-15 | First development-corpus baseline and profile, GCC 5.1.1 vs GCC-KNC at -O2 (E7-03 part 1) | Done | The M4 development baseline is written up in docs/research/m4-baseline.md: GCC-KNC vs GCC 5.1.1 paired -O2 ... |
 | S11-16 | Long-double libm hazard audit - do other MPSS long double entry points fault like cbrtl? (E7-21, bounded) | Done | The card's MPSS long double libm was probed on the card: of 12 entry points only cbrtl faults, and S10-13 a... |
-| S11-17 | PGO feasibility on one complete development program (reuse of S9-18's train/use path) | lead | Interactive lead, exclusive card turn, at b1151831. T1 5/5 green; staged controls-lead.ps1 checked (Continu... |
+| S11-17 | PGO feasibility on one complete development program (reuse of S9-18's train/use path) | Question for the tech lead | Lead ran pilot and confirm at 08:16-08:21 EST: results in the answer. |
 | S11-18 | M4 corpus harness v2 - card profiles, prefix record, held-out sealing, stronger checks, and the donor-failure rule | Done | The M4 corpus harness now stages all 17 programs for the 7120 and the 3100/5100 profiles with serial voting... |
 | S11-19 | Second senior review - the M4 definition and the Sprint 11-13 roadmap, adjusted | Done | The M4 definition and the Sprint 11-13 roadmap are rewritten as measure, improve, decide, each sprint with ... |
 | S11-20 | Research - which compiler optimizations benefit the widest range of real code on KNC, from professional to amateur, and does our corpus cover it? | Done | We now have a code-style coverage study (docs/research/code-style-coverage.md) that ranks Sprint 12 candida... |
@@ -241,6 +241,7 @@ Current tickets: `[###################-]` 209 of 216
 
 ## Recent activity
 
+- 2026-11-14 08:21 **S11-17** lead resume: Lead ran pilot and confirm at 08:16-08:21 EST: results in the answer.
 - 2026-11-14 08:05 **S11-15** lead approve: The M4 development baseline is written up in docs/research/m4-baseline.md: GCC-KNC vs GCC 5.1.1 paired -O2 timings on 13 of 14 development programs...
 - 2026-11-14 07:54 **S11-17** lead defer: Interactive lead, exclusive card turn, at b1151831. T1 5/5 green; staged controls-lead.ps1 checked (Continue+LASTEXITCODE, full/3100/5100, five ker...
 - 2026-11-14 07:54 **S11-15** engineer submit: cf7b6ed1: report opens with CPU-share ranking, exclusions and three conditional Sprint 12 proof candidates. S11-28 fixed-work HPCG replaces pending...
@@ -248,13 +249,12 @@ Current tickets: `[###################-]` 209 of 216
 - 2026-11-14 07:51 **S11-15** owner decide: Budget raised by the lead under the owner's standing rule, same first extension as 07:50: input tokens 12M -> 18M (14.7M used). Remaining work is s...
 - 2026-11-14 07:51 **S11-15** engineer escalate: budget: 14730250 input tokens used; the budget is 12000000
 - 2026-11-14 07:50 **S11-15** owner decide: Budget raised by the lead under the owner's standing rule: sessions 6 -> 8, the first extension. Progress: profiling done on the card, attribution ...
-- 2026-11-14 07:49 **S11-15** engineer escalate: budget: 6 engineer sessions used; the budget is 6
 
 ## Cost
 
 - From the script, engineer: 564 sessions, 1144.7M input tokens
 - From the script, lead: 373 sessions, 104.3M input tokens
-- Started by hand, Claude: 12 sessions, 3089.4M input tokens
+- Started by hand, Claude: 12 sessions, 3091.1M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
