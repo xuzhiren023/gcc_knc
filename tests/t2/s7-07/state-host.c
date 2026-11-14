@@ -28,7 +28,7 @@ static void check(int ok, const char *name)
 static void model_write(unsigned int value)
 {
   ++writes;
-  check(!(value & 0x1f80), "setter writes reserved MXCSR bits 7-12");
+  check(!(value & 0x101f80), "setter writes reserved MXCSR bits 7-12 or 20");
   check((value & ~0x603fu) == (model_mxcsr & ~0x603fu),
         "setter preserves bit 21 and all unsupported controls");
   model_mxcsr = value;
@@ -67,7 +67,7 @@ static void reset(void)
 #ifdef S7_07_NATIVE
   write_mx(read_mx() & ~0x603fu);
 #else
-  model_mxcsr = 0x308040; /* bit 20/21, FTZ and DAZ: opaque controls. */
+  model_mxcsr = 0x208040; /* Synthetic DUE (21), FZ and DAZ controls. */
 #endif
   controls = read_mx() & ~0x603fu;
   /* R27 Table 2.15 p.39 (verified, early KNC specification): bit 20
