@@ -1,4 +1,4 @@
-"""S12-19 host contract: synthetic diagnostics and S11-15 attributed PC rows.
+"""S12-19 host contract: GCC diagnostic text and S11-15 attributed PC rows.
 
 No compiler, corpus source, or card is needed. Region addresses describe the
 SAMPLED executable, not a newly rebuilt executable. Production collection must
@@ -45,13 +45,21 @@ class VecTriageTest(unittest.TestCase):
             pc_text=samples, cpu_seconds=seconds)
 
     def test_known_reasons_rank_by_samples_and_preserve_nonloops(self):
+        # Message templates from the shared GCC tree; only %T/%G operands
+        # and source coordinates are fixture substitutions.
         cases = [
+            # gcc/tree-vect-data-refs.cc:484
             ('alias', 'possible alias involving gather/scatter between a and b'),
-            ('unknown stride', 'not vectorized: not suitable for strided load'),
-            ('control flow', 'not vectorized: control flow in loop.'),
-            ('cost model', 'not vectorized: vectorization is not profitable.'),
+            # gcc/tree-vect-data-refs.cc:5445-5446
+            ('unknown stride', 'not vectorized: not suitable for strided load x = *a;'),
+            # gcc/tree-vect-loop.cc:1475-1476
+            ('control flow', 'not vectorized: unsupported control flow in loop.'),
+            # gcc/tree-vect-loop.cc:1865
+            ('cost model', 'not vectorized: vectorization not profitable.'),
+            # gcc/tree-vect-stmts.cc:13329-13330
             ('unsupported operation', 'not vectorized: relevant stmt not supported: x = foo ();'),
-            ('reduction order', 'not vectorized: cannot prove it is safe to reassociate floating-point operations'),
+            # gcc/tree-vect-loop.cc:7480
+            ('reduction order', 'in-order reduction chain without SLP.'),
         ]
         diagnostics, regions, samples = [], [], []
         for index, (reason, message) in enumerate(cases, 1):
@@ -105,7 +113,7 @@ src/kernel.c:20:3: optimized: basic block part vectorized using 64 byte vectors
         outer.update(line_end=40, end=0x1100)
         inner = region('inner', 20, 0x1040)
         result = self.analyze(
-            'src/kernel.c:21:9: missed: not vectorized: control flow in loop.',
+            'src/kernel.c:21:9: missed: not vectorized: unsupported control flow in loop.',
             [outer, inner], pcs(0x1044, 7) + pcs(0x1010, 3))
         rows = {r['id']: r for r in result['rows']}
         self.assertEqual(rows['inner']['samples'], 7)
@@ -130,8 +138,8 @@ src/kernel.c:20:3: optimized: basic block part vectorized using 64 byte vectors
         self.assertAlmostEqual(result['rows'][0]['cpu_seconds'], 0.2)
 
     def test_repeated_blockers_count_once_and_file_paths_disambiguate(self):
-        diagnostics = '''src/kernel.c:11:4: missed: not vectorized: control flow in loop.
-src/kernel.c:11:4: missed: not vectorized: control flow in loop.
+        diagnostics = '''src/kernel.c:11:4: missed: not vectorized: unsupported control flow in loop.
+src/kernel.c:11:4: missed: not vectorized: unsupported control flow in loop.
 src/kernel.c:12:4: missed: possible alias involving gather/scatter between a and b
 other/kernel.c:10:4: optimized: loop vectorized using 64 byte vectors
 '''
@@ -147,7 +155,7 @@ other/kernel.c:10:4: optimized: loop vectorized using 64 byte vectors
 
     def test_corpus_summary_sums_time_not_raw_counts_across_programs(self):
         first = self.analyze(
-            'src/kernel.c:11:4: missed: not vectorized: control flow in loop.',
+            'src/kernel.c:11:4: missed: not vectorized: unsupported control flow in loop.',
             [region('loop', 10, 0x1000)], pcs(0x1004, 10), seconds=0.1)
         second = self.analyze(
             'src/kernel.c:11:4: missed: possible alias involving gather/scatter between a and b',
@@ -162,6 +170,15 @@ other/kernel.c:10:4: optimized: loop vectorized using 64 byte vectors
         for name in ('PB-adi', 'adi', 'PB-durbin', 'durbin', 'bzip2', 'unknown'):
             with self.subTest(program=name), self.assertRaises(ValueError):
                 self.analyze('', [], '', program=name)
+
+    def test_in_order_double_reduction_refusal(self):
+        # gcc/tree-vect-loop.cc:7652. Do not infer this reason merely from
+        # the presence of a floating-point sum in the source.
+        result = self.analyze(
+            'src/kernel.c:10:3: missed: in-order double reduction not supported.',
+            [region('loop', 10, 0x1000)], pcs(0x1004, 1))
+        self.assertEqual(result['rows'][0]['status'], 'missed-with-reason')
+        self.assertEqual(result['rows'][0]['reasons'], ['reduction order'])
 
 
 if __name__ == '__main__':
