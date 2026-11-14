@@ -17,7 +17,7 @@ DEVELOPMENT = {
 }
 FLAGS = {
     'default': ['-O2', '-march=knc'],
-    'density1': ['-O2', '-march=knc', '-mknc-density=1'],
+    'density1': ['-O2', '-march=knc', '--param=knc-threads-per-core=1'],
 }
 
 

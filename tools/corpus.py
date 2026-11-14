@@ -304,7 +304,8 @@ def stage_runtimes(binary, compiler, directory, log):
     return files
 
 
-def build_program(program, compiler, flags, source, out, log, setparams, variant='openmp'):
+def build_program(program, compiler, flags, source, out, log, setparams, variant='openmp',
+                  runtime_stager=stage_runtimes):
     cc = compiler_path(compiler)
     common = list(flags)
     sources, extra, language = [], [], 'gcc'
@@ -376,7 +377,7 @@ def build_program(program, compiler, flags, source, out, log, setparams, variant
     binary = out / 'workload'
     execute([compiler_path(compiler, language), *common, *extra, *sources, *link_paths(), '-lm', '-o', binary], out, log)
     execute([sys.executable, ROOT / 'tools/knc_lint', binary], out, log)
-    return [binary] + stage_runtimes(binary, compiler, out, log)
+    return [binary] + runtime_stager(binary, compiler, out, log)
 
 
 def write_json(path, value):
