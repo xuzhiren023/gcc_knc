@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-14 14:53.
+Updated automatically at every ticket change. Last update: 2026-11-14 14:54.
 
 **Next: the tech lead, on S12-04.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
@@ -97,7 +97,7 @@ Current tickets: `[##################--]` 220 of 237
 | S12-14 | Audit GCC-KNC's tuning model and runtime defaults against the digested sources - every mismatch with a proposed change and its proof | Done | The lead now has a ranked audit in docs/research/s12-14-model-audit.md of 42 places where GCC-KNC tuning nu... |
 | S12-15 | Research - literature survey of published Xeon Phi (KNC) and Xeon Phi system research that matches our goals; what have we overlooked? | Done | Literature survey done: 30 groups of published Xeon Phi work ranked against our goals, with 14 overlooked i... |
 | S12-16 | Research - whole-system tuning playbook for the Z840 + Xeon Phi (BIOS, host OS, MPSS and card, transfers, runtimes), as HPC centres tuned Xeon + KNC systems | Done | Whole-system tuning playbook for the Z840 + Phi done: 13 ordered steps (BIOS, host Linux, card power/pages/... |
-| S12-17 | claude-torture -j N refuses to start in exclusive card runs (no inherited RLIMIT_AS since S11-29), so the execute suite cannot run | In progress | Lead raises sessions 2 -> 4 (standing owner rule): session 1 was lost to the sandbox host-test launcher, no... |
+| S12-17 | claude-torture -j N refuses to start in exclusive card runs (no inherited RLIMIT_AS since S11-29), so the execute suite cannot run | Question for the tech lead | Red proof blocked: tools/claude-torture.c was restored from main, but the new test file named in the lead i... |
 | S12-18 | Double-precision vector exp, log and pow ran slower than scalar libm on the card (0.82x, 0.63x, 0.49x) - confirm with valid batches, then fix the library or stop the vectorizer calling them where they lose | lead | Needs interactive lead: (1) exclusive card turn running .work/_shared/S12-18/vmath-bench.mic at full, 3100 ... |
 | S12-19 | Profile-guided missed-vectorization triage - join hot loops with the vectorizer's reasons and observed strides/masks, so tuning targets what is hot and fixable | In progress | Red fails for the right reason (no vec_triage module), and the ranking, exclusive nested time, half-open PC... |
 | S12-20 | libknc_vmath accuracy and exception contract, with an independent validation design (rounding modes, special values, flags, scalar fallback) | draft |  |
@@ -262,6 +262,7 @@ Current tickets: `[##################--]` 220 of 237
 
 ## Recent activity
 
+- 2026-11-14 14:53 **S12-17** engineer ask: Red proof blocked: tools/claude-torture.c was restored from main, but the new test file named in the lead instruction is absent (tests/tools/test_c...
 - 2026-11-14 14:53 **S12-04** engineer submit: Host profile memory tests passed (7 tests): C:\Users\xuzhi\Documents\gcc_knc\.work\_state\logs\S12_04_profile_memory-20261114-145253.log. Awaiting ...
 - 2026-11-14 14:52 **S12-07** lead answer: Do not hand-roll include paths for the build-tree xg++. For the 'before' compiler use the installed driver exactly as tools/corpus does: corpus.com...
 - 2026-11-14 14:51 **S12-19** lead changes: Red fails for the right reason (no vec_triage module), and the ranking, exclusive nested time, half-open PC, program filter, dedup and allowlist ca...
@@ -269,13 +270,12 @@ Current tickets: `[##################--]` 220 of 237
 - 2026-11-14 14:50 **S12-07** engineer ask: Phase-1 staging failed twice. Donor dump-filename rejection is fixed; GCC-KNC xg++ now fails on missing cassert in HPCG Vector.hpp:23. Reproducer: ...
 - 2026-11-14 14:49 **S12-18** lead defer: Needs interactive lead: (1) exclusive card turn running .work/_shared/S12-18/vmath-bench.mic at full, 3100 and 5100 per docs/research/s12-18-double...
 - 2026-11-14 14:49 **S12-17** engineer escalate: budget: 2 engineer sessions used; the budget is 2
-- 2026-11-14 14:49 **S12-06** lead approve: Theme 1 (scalar FP conversions and calls in NPB-EP/IS) closed with no compiler change: a card diagnostic shows GCC-KNC already equal or faster than...
 
 ## Cost
 
-- From the script, engineer: 601 sessions, 1230.9M input tokens
+- From the script, engineer: 602 sessions, 1231.2M input tokens
 - From the script, lead: 397 sessions, 110.1M input tokens
-- Started by hand, Claude: 12 sessions, 3183.0M input tokens
+- Started by hand, Claude: 12 sessions, 3184.3M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
