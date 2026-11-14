@@ -1,10 +1,10 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-14 12:56.
+Updated automatically at every ticket change. Last update: 2026-11-14 13:06.
 
-**Next: the tech lead, on S12-11.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: GPT-6.1, on S11-12 (Sprint 11 batch check - full native suite, x86 identity, forward-port drill, ICE sweeps, runtime prefix consistency).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
-Current tickets: `[##################--]` 212 of 227
+Current tickets: `[##################--]` 213 of 227
 
 ## Milestones
 
@@ -14,7 +14,7 @@ Current tickets: `[##################--]` 212 of 227
 | M1 | Mixed native code | Done | 43 of 43 tickets |
 | M2 | Useful vector target | Done | 51 of 51 tickets |
 | M3 | Runtimes | Done | 48 of 48 tickets |
-| M4 | Broad optimization | In progress | 30 of 45 tickets |
+| M4 | Broad optimization | In progress | 31 of 45 tickets |
 | M5 | Program corpus | Not started | Not planned in detail yet |
 | M6 | Release | Not started | Not planned in detail yet |
 
@@ -91,7 +91,7 @@ Current tickets: `[##################--]` 212 of 227
 | S12-08 | M4 theme 3 - dependency-preserving scalar updates and register pressure in dense loops (PB-ludcmp, x87 stack traffic) | Not started |  |
 | S12-09 | Sprint 12 batch check - integrated themes at the final Sprint 12 head, regression evidence, optional modes frozen | draft |  |
 | S12-10 | Research - what KNC hardware and runtime knowledge are we still missing to tune GCC-KNC, the OS runtime and broad optimization, and where is it documented? | Done | KNC reference-gap research done: 16 gaps ranked, 32 primary sources (98 MB, outside git) with page-cited fa... |
-| S12-11 | Research - best practices for a dual Xeon E5-2690 v3 + Xeon Phi (KNC) workstation (HP Z840) for LLM inference and scientific computing | Waiting for review | Completed docs/research/host-phi-workstation.md at fe643e13, with 33 source entries and machine-specific ne... |
+| S12-11 | Research - best practices for a dual Xeon E5-2690 v3 + Xeon Phi (KNC) workstation (HP Z840) for LLM inference and scientific computing | Done | Z840 dual E5-2690 v3 + Xeon Phi setup guide done: slot/BIOS/memory/power/cooling checklist, MPSS-on-modern-... |
 | S12-12 | Stage S12-10's residual-gap card experiments as one combined Sprint 12 diagnostic batch (PMU access, prefetch, page backing, libm route, branches, allocator) | In progress |  |
 | S12-13 | Digest the S12-10 sources into our knowledge base - correct our KNC notes, build a reference index, and list what our practice should change | In progress |  |
 | S12-14 | Audit GCC-KNC's tuning model and runtime defaults against the digested sources - every mismatch with a proposed change and its proof | Not started |  |
@@ -252,6 +252,7 @@ Current tickets: `[##################--]` 212 of 227
 
 ## Recent activity
 
+- 2026-11-14 13:06 **S12-11** lead approve: Z840 dual E5-2690 v3 + Xeon Phi setup guide done: slot/BIOS/memory/power/cooling checklist, MPSS-on-modern-OS options, measured host and Phi result...
 - 2026-11-14 12:56 **S12-11** engineer submit: Completed docs/research/host-phi-workstation.md at fe643e13, with 33 source entries and machine-specific next checks. Primary refs: .work/_shared/h...
 - 2026-11-14 12:41 **S12-10** lead approve: KNC reference-gap research done: 16 gaps ranked, 32 primary sources (98 MB, outside git) with page-cited facts, and a 10-row list of bounded card e...
 - 2026-11-14 12:30 **S12-10** engineer submit: Phase 2: docs/research/knc-reference-gaps.md, d54380ba; 32 artifacts, 98 MiB; S12-06/07/08 facts and ranked residual measurements. Prior checks PAS...
@@ -259,13 +260,12 @@ Current tickets: `[##################--]` 212 of 227
 - 2026-11-14 12:27 **S12-10** engineer ask: Phase 2 committed d54380ba: docs/research/knc-reference-gaps.md. 32 cited artifacts, 98 MiB; checks PASS, log .work/_state/logs/s12_10_reference_no...
 - 2026-11-14 12:05 **S12-06** lead defer: Needs a card run by the interactive lead (M4 card authorization, <=30 min): run the card_run command in docs/research/s12-06-scalar-fp.md (threads ...
 - 2026-11-14 12:04 **S12-06** engineer ask: Phase-1 diagnostics committed at 6de080e6; GCC unchanged. AGENTS bars engineer card jobs. Please run the single paired batch in docs/research/s12-0...
-- 2026-11-14 12:03 **S11-12** lead answer: Yes: submit 437b2a35 with --override 'batch check: 1092 lines are research notes, drill record and the staging script; tests/baseline/S11-12-prefix...
 
 ## Cost
 
 - From the script, engineer: 576 sessions, 1178.4M input tokens
 - From the script, lead: 382 sessions, 106.2M input tokens
-- Started by hand, Claude: 12 sessions, 3136.9M input tokens
+- Started by hand, Claude: 12 sessions, 3138.1M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
