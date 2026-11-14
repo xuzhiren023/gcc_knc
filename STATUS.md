@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-13 20:35.
+Updated automatically at every ticket change. Last update: 2026-11-14 00:08.
 
 **Next: GPT-6.1, on S11-15 (First development-corpus baseline and profile, GCC 5.1.1 vs GCC-KNC at -O2 (E7-03 part 1)).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
@@ -80,7 +80,7 @@ Current tickets: `[###################-]` 205 of 213
 | S11-26 | WRF OpenMP build at -mphinix with no per-file workarounds (S11-23 and S11-25 fixed), restaged for PhiWeather | draft | Owner 2026-11-13: the S11-24 WRF build is removed. Deleted: |
 | S11-27 | Wrong code - NPB-MG (class A, serial) built by GCC-KNC at -O2 -march=knc fails NPB verification on the card | lead | Needs the interactive lead's card turn (PhiWeather has the card until about 04:30 EST 2026-11-14). Run pyth... |
 | S11-28 | HPCG run that fits every card model - fixed work instead of fixed duration, grid sized to the 3100's memory | lead | After S11-29 merges (still ready): run .work/_shared/S11-28/lead-pilot.ps1 at 242936bf+ (30 exclusive timed... |
-| S11-29 | card_run profiles limit memory in use, not address space, so a 3100 or 5100 run fails only where the real card would | Not started | Dependency on S11-02 removed, so the HPCG chain (S11-29, then S11-28) does not wait on the DMA debugging. B... |
+| S11-29 | card_run profiles limit memory in use, not address space, so a 3100 or 5100 run fails only where the real card would | In progress | Lane moved from tools to tools-mem so this starts now instead of waiting behind S11-02 (lead state, card ro... |
 | S12-01 | Sprint 12 prep - static code-quality census of the development-corpus builds (spills, x87/vector transfers, addressing, calls, code size) | Done | A static code-quality census (spill/reload proxies, x87 and x87-zmm traffic, address arithmetic, calls, bra... |
 | S12-02 | Sprint 12 prep - the unscored generality check set (S11-20's six programs in the code styles our corpus lacks) | Done | The six unscored generality checks (Q1-Q6: ray tracer hit dispatch and vec3 AoS, Burkardt MD, Reference BLA... |
 | S2-01 | Design for zmm and mask registers under -march=knc | Done | The register design for KNC is settled on paper: all 32 zmm and 8 mask registers become usable under -march... |
@@ -238,6 +238,7 @@ Current tickets: `[###################-]` 205 of 213
 
 ## Recent activity
 
+- 2026-11-14 00:12 **S11-29** lead note: Lane moved from tools to tools-mem so this starts now instead of waiting behind S11-02 (lead state, card round tonight). Both change tools/card_run...
 - 2026-11-13 20:35 **S11-27** lead defer: Needs the interactive lead's card turn (PhiWeather has the card until about 04:30 EST 2026-11-14). Run python .work/_shared/S11-27/verify-card.py a...
 - 2026-11-13 20:32 **S11-27** engineer ask: Card round ready at 89a3657a: run python .work/_shared/S11-27/verify-card.py; post verification/L2 or PASS/FAIL per CASE. All 8 rebuilt with lane-g...
 - 2026-11-13 20:27 **S11-27** owner decide: Budget raised by the lead under the owner's standing rule (2026-11-09/10: the lead extends session and token budgets itself; ask only after two ext...
@@ -245,16 +246,15 @@ Current tickets: `[###################-]` 205 of 213
 - 2026-11-13 18:34 **S11-27** lead answer: Host results at e0bc456a11e: build PASS; T0 PASS; T1 PASS 327, including all secondary-reload and stencil-reload cases; T2 PASS. Torture asm diff r...
 - 2026-11-13 18:05 **S11-27** lead note: e0bc456a11e built (PASS, 29.8 min).
 - 2026-11-13 17:51 **S11-02** lead defer: Code at 45e732b9 reviewed, no blocker (digests removed per owner, exact length and completion before publish, mode set before rename). Missing: acc...
-- 2026-11-13 17:48 **S11-02** engineer submit: 45e732b9 removes production transfer hashes; keeps exact lengths/completion and private publication. Mode before rename; LF script. Old fake modele...
 
 ## Cost
 
 - From the script, engineer: 545 sessions, 1109.3M input tokens
 - From the script, lead: 359 sessions, 100.7M input tokens
-- Started by hand, Claude: 12 sessions, 3034.1M input tokens
+- Started by hand, Claude: 12 sessions, 3036.4M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 30.7 GiB of 100 GiB. 193 GiB free on the drive.
+The project uses 30.7 GiB of 100 GiB. 167 GiB free on the drive.
