@@ -43,8 +43,7 @@ must never enter the primary environment.
 These are bounded samples: aborted samples may miss the last allocation and
 timeout VmHWM is a lower bound on whole-run peak memory. The grid choice and
 arena conclusion above are the lead's explicit decision, not a claim that
-these diagnostics completed TestCG, TestSymmetry or TestNorms. Full native
-correctness and timings still require the pilot after S11-29 lands.
+these diagnostics completed TestCG, TestSymmetry or TestNorms. The lead subsequently completed the native pilot after S11-29; see below.
 
 Source confirmation (HPCG 3.1, shared corpus-build/sources/hpcg-3.1):
 - ReadHpcgDat.cpp accepts zero runtime (only negative values are replaced).
@@ -76,11 +75,59 @@ reference/optimized iterations per set and totals, derives set counts, and
 rejects anything other than one set or unequal work in a serial pair.
 Wall time uses launch-to-exit CLOCK_MONOTONIC_RAW; GFLOP/s is diagnostic only.
 Outputs: pilot/NN.stdout and .stderr, plan.json, raw-results.jsonl,
-results.jsonl and status.json. The lead must review all thirty launches,
-equal paired work and wall-time differences between builds. These native
-acceptance results are pending; host fixture success is not native success.
+results.jsonl and status.json. The lead returned the thirty completed launches and the staging rerun described below.
+Host fixtures and native results are recorded separately.
 
 Host unequal-work fixtures already passed in the preceding session (red
 commit 75ce3838; implementation ede7b91c). The memory supervisor was already
 cross-built and linted. Do not rerun the memory round or rebuild to launch
 the pilot. The prior red-first evidence remains unchanged.
+
+
+Returned native pilot (2026-11-14)
+---------------------------------
+
+The lead ran the pilot 02:15-07:40 EST (325 minutes), then reran launch 27
+at 08:06. Log: .work/_state/logs/S11_28_pilot-20261114-021459.log.
+The first attempt at 27 failed during SSH upload before HPCG started;
+this is an infrastructure failure, not a native failure. Its captures are
+pilot/27.stdout and pilot/27.stderr. The successful replacement is
+rerun27.json with pilot/27r.stdout and pilot/27r.stderr (589.441 seconds).
+
+| Profile | Run | Donor serial (s) | KNC serial (s) | KNC / donor | KNC OMP 1/core (s) | 2/core (s) | 4/core (s) |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| full | 0 | 765.986 | 771.323 | 1.00697 | 568.735 | 582.155 | 544.404 |
+| full | 1 | 766.324 | 772.794 | 1.00844 | 569.480 | 563.332 | 530.073 |
+| 3100 | 0 | 772.886 | 782.841 | 1.01288 | 569.961 | 565.163 | 548.715 |
+| 3100 | 1 | 768.728 | 780.126 | 1.01483 | 574.329 | 562.475 | 543.194 |
+| 5100 | 0 | 771.454 | 783.899 | 1.01613 | 573.857 | 579.223 | 553.093 |
+| 5100 | 1 | 778.779 | 773.041 | 0.99263 | 589.441 | 570.862 | 550.301 |
+
+Times are launch-to-exit CLOCK_MONOTONIC_RAW; run indices are zero-based.
+The last row uses 27r for OpenMP 1/core. Every completed capture passes the
+required correctness report sections and reports VALID with one CG set.
+All six serial pairs have reference 50 and optimized 51 iterations (both
+per-set and total). OpenMP optimized iterations vary between 50 and 51,
+so that panel remains diagnostic. All profiles use 104 cubed and rt=0.
+
+These actual wall times differ in every serial pair: KNC is slower in five
+pairs, faster in the final 5100 pair. The lead's statement that all six were
+about 1.8% slower describes neither this wall-time table nor the score;
+GFLOP/s ratings are diagnostic only. No repeated timing run was requested.
+
+Acceptance evidence:
+- [x] Red-first recorded-report fixture test: 75ce3838; green ede7b91c.
+- [x] Returned memory table, arena diagnosis, and lead's frozen grid decision.
+- [x] Lead pilot: all 30 intended launches complete and pass after one upload
+  retry; six serial pairs have equal work and differing build wall times.
+- [ ] Final results reconciliation: Windows denied overwriting the lead's
+  results.jsonl. status.json therefore still reports the initial failure.
+  The original error must remain marked superseded by 27r, and 27r must be
+  appended; raw-results.jsonl must retain the original 30 attempts.
+
+The staged finalize-pilot.py validates the returned captures, then performs
+that reconciliation and writes status for 30 successful intended launches
+and 31 recorded attempts. Its acceptance checks passed before the write was
+denied. Log: .work/_state/logs/S11_28_pilot_reconcile-20261114-082848.log.
+No engineer card jobs or GCC builds ran. The lead must complete the protected
+results/status update and refresh staged README.md from this tracked file.
