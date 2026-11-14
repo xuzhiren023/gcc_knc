@@ -1,10 +1,10 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-14 16:56.
+Updated automatically at every ticket change. Last update: 2026-11-14 17:06.
 
-**Next: the tech lead, on S12-28.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: GPT-6.1, on S12-21 (Scheduling model for M4's serial runs - measure density-1 tuning and the integer-multiply cost against today's density-4 defaults (S12-14 B02, B04, B05)).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
-Current tickets: `[##################--]` 224 of 242
+Current tickets: `[##################--]` 225 of 242
 
 ## Milestones
 
@@ -14,7 +14,7 @@ Current tickets: `[##################--]` 224 of 242
 | M1 | Mixed native code | Done | 43 of 43 tickets |
 | M2 | Useful vector target | Done | 51 of 51 tickets |
 | M3 | Runtimes | Done | 48 of 48 tickets |
-| M4 | Broad optimization | In progress | 42 of 60 tickets |
+| M4 | Broad optimization | In progress | 43 of 60 tickets |
 | M5 | Program corpus | Not started | Not planned in detail yet |
 | M6 | Release | Not started | Not planned in detail yet |
 
@@ -108,7 +108,7 @@ Current tickets: `[##################--]` 224 of 242
 | S12-25 | WRF smpar build arm with --param=knc-threads-per-core=2 for PhiWeather's 2-threads-per-core runs (A/B against S11-26's default-4 build) | draft |  |
 | S12-26 | WRF hot scalar routines - classify with the S12-19 triage tool and stage bitwise-safe per-file flag arms for PhiWeather to time | draft |  |
 | S12-27 | Latency-aware scalar loops - GCC-KNC unrolls and interleaves independent iterations and hoists conversions so one thread's every-other-cycle issue and long latencies are hidden automatically | draft |  |
-| S12-28 | dispatch.py refuses to start a second dispatcher on a lane that already has a live one | Waiting for review | Implementation 06c94150; red test 73aa76d0. Prior session ran all 3 isolated host tests successfully: same-... |
+| S12-28 | dispatch.py refuses to start a second dispatcher on a lane that already has a live one | Done | dispatch.py now refuses to start a second dispatcher on a lane that already has a live one (a lock per lane... |
 | S13-01 | M4 final gate - stage the ADR-0015 gate run at the final head (17 programs, held-out unsealed, six pairs, three profiles) | draft |  |
 | S13-02 | Libgomp per-region thread density - choose 1-4 workers per core per parallel region instead of once per program | draft |  |
 | S13-03 | M4 retrospective - what we did wrong, what worked, and the practice changes carried into the next milestone and the agent-team skill | draft |  |
@@ -267,6 +267,7 @@ Current tickets: `[##################--]` 224 of 242
 
 ## Recent activity
 
+- 2026-11-14 17:06 **S12-28** lead approve: dispatch.py now refuses to start a second dispatcher on a lane that already has a live one (a lock per lane, reclaimed when its process is gone), s...
 - 2026-11-14 16:55 **S12-28** engineer submit: Implementation 06c94150; red test 73aa76d0. Prior session ran all 3 isolated host tests successfully: same-lane refusal with PID, different-lane ov...
 - 2026-11-14 16:53 **S12-28** lead answer: Yes, submit with --override 'test size: ticket requires real subprocess dispatchers with fake sessions; 3 tests cover the 5 asked behaviours'. Revi...
 - 2026-11-14 16:52 **S12-28** engineer ask: Implementation and acceptance tests are committed at 06c94150 (red 73aa76d0). All 3 isolated host tests pass: same-lane refusal includes PID, diffe...
@@ -274,13 +275,12 @@ Current tickets: `[##################--]` 224 of 242
 - 2026-11-14 16:51 **S12-22** lead resume: Lead 17:00: lane 2 built at f0534648890 (PASS, 5.4 min). Run T1 green on bf225397 red test, T0, and submit. The lead runs x86 identity. ADR-0009 (N...
 - 2026-11-14 16:45 **S12-22** lead defer: Interactive lead needed: build lane-2 GCC (KNC_GCC_SLOT=2) at gcc-2 s12/S12-22 f0534648890 (B10 fix: l2 range 2..4096, silent l1=l2-1 clamp; N01-N0...
 - 2026-11-14 16:43 **S12-22** engineer ask: GCC build needed at f0534648890 (gcc2). Red bf225397: S8-03 runner rejects neither L2=1 nor wrong near hint for L1=8/L2=4; four existing tests pass...
-- 2026-11-14 16:40 **S12-22** lead answer: See the resume note: deeper model, edit gcc-2 directly.
 
 ## Cost
 
 - From the script, engineer: 631 sessions, 1262.8M input tokens
 - From the script, lead: 414 sessions, 113.9M input tokens
-- Started by hand, Claude: 12 sessions, 3258.4M input tokens
+- Started by hand, Claude: 12 sessions, 3260.7M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
