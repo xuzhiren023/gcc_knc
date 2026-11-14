@@ -102,7 +102,7 @@ Current tickets: `[##################--]` 223 of 239
 | S12-19 | Profile-guided missed-vectorization triage - join hot loops with the vectorizer's reasons and observed strides/masks, so tuning targets what is hot and fixable | Waiting for review | 501aa8bf: function gate/offset mapping; 11 host tests pass; analyze/report done. Coverage 1715/15109 (11.35... |
 | S12-20 | libknc_vmath accuracy and exception contract, with an independent validation design (rounding modes, special values, flags, scalar fallback) | draft |  |
 | S12-21 | Scheduling model for M4's serial runs - measure density-1 tuning and the integer-multiply cost against today's density-4 defaults (S12-14 B02, B04, B05) | In progress | No deletion needed. Stage into a fresh, empty folder instead of cleaning the old one: change the tool's out... |
-| S12-22 | Low-risk corrections from the S12-14 audit - wrong comments and citations (N01-N09) and the far-prefetch-distance range bug (B10) | In progress | Lead raises input_tokens 2M -> 6M (second raise; tokens went to the wrong-parameter round caused by the tic... |
+| S12-22 | Low-risk corrections from the S12-14 audit - wrong comments and citations (N01-N09) and the far-prefetch-distance range bug (B10) | Question for the tech lead | Reduced reproducer: the shared gcc-2 build currently accepts --param=knc-prefetch-l2-distance=1 (i386.opt h... |
 | S12-23 | Floating-point environment correctness on KNC - fix the underflow probe that cannot tell flushing from rounding, and handle x87 erratum CD28 (S12-14 N06, N07, B16, B17) | Not started |  |
 | S12-24 | ICE in vect_transform_stmt (tree-vect-stmts.cc:13381) on WRF's REMEZ at -mphinix (-O3 -march=knc) | Not started |  |
 | S12-25 | WRF smpar build arm with --param=knc-threads-per-core=2 for PhiWeather's 2-threads-per-core runs (A/B against S11-26's default-4 build) | Not started |  |
@@ -264,6 +264,7 @@ Current tickets: `[##################--]` 223 of 239
 
 ## Recent activity
 
+- 2026-11-14 16:13 **S12-22** engineer ask: Reduced reproducer: the shared gcc-2 build currently accepts --param=knc-prefetch-l2-distance=1 (i386.opt has IntegerRange(1, 4096)); l1 also permi...
 - 2026-11-14 16:12 **S12-19** engineer submit: 501aa8bf: function gate/offset mapping; 11 host tests pass; analyze/report done. Coverage 1715/15109 (11.35%); rejections, compiler-version uncerta...
 - 2026-11-14 16:11 **S12-22** owner decide: Lead raises input_tokens 2M -> 6M (second raise; tokens went to the wrong-parameter round caused by the ticket). If it stalls again the lead asks t...
 - 2026-11-14 16:10 **S12-22** engineer escalate: budget: 2039970 input tokens used; the budget is 2000000
@@ -271,11 +272,10 @@ Current tickets: `[##################--]` 223 of 239
 - 2026-11-14 16:09 **S12-22** engineer escalate: budget: 2 engineer sessions used; the budget is 2
 - 2026-11-14 16:09 **S12-22** lead answer: See the 16:12 resume note.
 - 2026-11-14 16:09 **S12-22** lead resume: Lead 16:12: the gcc-2 tree is correct (s12/S12-22 at knc 619e14b479a, clean, no git lock now). My ticket used a wrong parameter name: there is no k...
-- 2026-11-14 16:07 **S12-22** lead defer: Interactive lead needed: lane-2 shared gcc worktree (gcc-2) is on s12/S12-07 at 619e14b, which lacks knc-prefetch-far; reset it to s12/S12-22 based...
 
 ## Cost
 
-- From the script, engineer: 624 sessions, 1258.1M input tokens
+- From the script, engineer: 625 sessions, 1258.7M input tokens
 - From the script, lead: 408 sessions, 113.0M input tokens
 - Started by hand, Claude: 12 sessions, 3231.9M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
