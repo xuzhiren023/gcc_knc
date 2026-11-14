@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-14 15:59.
+Updated automatically at every ticket change. Last update: 2026-11-14 16:00.
 
-**Waiting for you:** S12-21. Run `python tools/pm.py inbox`.
+**Next: the tech lead, on S12-19.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[##################--]` 223 of 238
 
@@ -101,7 +101,7 @@ Current tickets: `[##################--]` 223 of 238
 | S12-18 | Double-precision vector exp, log and pow ran slower than scalar libm on the card (0.82x, 0.63x, 0.49x) - confirm with valid batches, then fix the library or stop the vectorizer calling them where they lose | lead | Needs interactive lead: (1) exclusive card turn running .work/_shared/S12-18/vmath-bench.mic at full, 3100 ... |
 | S12-19 | Profile-guided missed-vectorization triage - join hot loops with the vectorizer's reasons and observed strides/masks, so tuning targets what is hot and fixable | Question for the tech lead | 447cf31f is ready for review, but submit refuses 1286 changed lines against the 800-line budget. Approve th... |
 | S12-20 | libknc_vmath accuracy and exception contract, with an independent validation design (rounding modes, special values, flags, scalar fallback) | draft |  |
-| S12-21 | Scheduling model for M4's serial runs - measure density-1 tuning and the integer-multiply cost against today's density-4 defaults (S12-14 B02, B04, B05) | **Waiting for you** | Duplicate-session collision; ask refused because the other session already blocked this ticket. Commits 39e... |
+| S12-21 | Scheduling model for M4's serial runs - measure density-1 tuning and the integer-multiply cost against today's density-4 defaults (S12-14 B02, B04, B05) | Question for the tech lead | Lead (owner-delegated): the duplicate session was the lead's mistake (two dispatchers on one lane) and has ... |
 | S12-22 | Low-risk corrections from the S12-14 audit - wrong comments and citations (N01-N09) and the far-prefetch-distance range bug (B10) | In progress |  |
 | S12-23 | Floating-point environment correctness on KNC - fix the underflow probe that cannot tell flushing from rounding, and handle x87 erratum CD28 (S12-14 N06, N07, B16, B17) | Not started |  |
 | S12-24 | ICE in vect_transform_stmt (tree-vect-stmts.cc:13381) on WRF's REMEZ at -mphinix (-O3 -march=knc) | Not started |  |
@@ -263,6 +263,7 @@ Current tickets: `[##################--]` 223 of 238
 
 ## Recent activity
 
+- 2026-11-14 16:00 **S12-21** owner decide: Lead (owner-delegated): the duplicate session was the lead's mistake (two dispatchers on one lane) and has been stopped; only one session runs from...
 - 2026-11-14 15:59 **S12-19** engineer ask: 447cf31f is ready for review, but submit refuses 1286 changed lines against the 800-line budget. Approve this size override, or specify the split? ...
 - 2026-11-14 15:59 **S12-08** lead approve: Theme 3 (register pressure in dense loops) closed with no compiler change: PB-ludcmp's extra x87 stack traffic is ordered reduction storage outside...
 - 2026-11-14 15:50 **S12-21** engineer escalate: Duplicate-session collision; ask refused because the other session already blocked this ticket. Commits 39ebc1bf/113aa468 and docs/research/s12-21-...
@@ -270,13 +271,12 @@ Current tickets: `[##################--]` 223 of 238
 - 2026-11-14 15:48 **S12-17** lead approve: The parallel execute-suite runner starts again in exclusive card runs: claude-torture -j N with an explicit per-program limit no longer needs an in...
 - 2026-11-14 15:36 **S12-17** engineer submit: Fix 71cbcf86: an explicit --limit-mb permits -j N with unlimited RLIMIT_AS; no --limit-mb with unlimited budget still refuses. Red: t_s12_17_red-20...
 - 2026-11-14 15:35 **S12-17** owner decide: Lead raises input_tokens 2M -> 3M: all work is done (fix, red/green, rebuilt and linted binary); the lead submits it.
-- 2026-11-14 15:33 **S12-08** engineer submit: Closure documentation 7f2df59d submitted as is per lead. Phase-1 premise failed; no compiler change. Reproducers retained. Prior host build/lint PA...
 
 ## Cost
 
 - From the script, engineer: 619 sessions, 1248.0M input tokens
 - From the script, lead: 404 sessions, 112.0M input tokens
-- Started by hand, Claude: 12 sessions, 3220.3M input tokens
+- Started by hand, Claude: 12 sessions, 3221.3M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
