@@ -84,8 +84,8 @@ def prepare():
                                    'FFLAGS = -O2 -march=knc\nRAND = randi8\n')
 
 
-def build_verification():
-    """Stage only the lead's five post-fix MG cases, one serial case per core."""
+def build_verification(include_stencil=False):
+    """Stage the post-fix card round, one serial case per core."""
     prepare()
     cases = []
     for cls, variant in [('S', 'O2'), ('A', 'O2'), ('S', 'noslp'),
@@ -99,6 +99,11 @@ def build_verification():
         name = 'mg-' + cls + '-' + variant
         link(OUT / name, [objects / (n + '.o') for n in NAMES])
         cases.append(name)
+    if include_stencil:
+        import s11_27_reduce
+        if s11_27_reduce.build():
+            raise RuntimeError('reduced stencil assembly check failed')
+        cases += ['stencil-O2', 'stencil-novec', 'stencil-noreuse']
     for lib in ('libgfortran.so.5', 'libgcc_s.so.1'):
         path = run(*compiler('gfortran', True), '-print-file-name=' + lib).strip()
         shutil.copyfile(path, OUT / lib)
@@ -126,7 +131,7 @@ print('card_run exit:', code, 'log:', root / 'verify-card.log')
 raise SystemExit(code)
 '''.replace('CASE_NAMES', repr(cases))
     (OUT / 'verify-card.py').write_text(card)
-    print('Prepared', len(cases), 'linted MG cases; lead entry point:', OUT / 'verify-card.py')
+    print('Prepared', len(cases), 'linted cases; lead entry point:', OUT / 'verify-card.py')
     print('Parallel serial cases, separate cores, 180-second per-case timeout; read NPB verification in each CASE.')
 
 
@@ -204,7 +209,9 @@ def main():
                                           str(Path(__file__).resolve())], env=env, text=True).strip()
         return subprocess.call([str(TC / 'cygwin/bin/python3.12.exe'), script, *sys.argv[1:]], env=env)
     try:
-        if '--verify-fix' in sys.argv:
+        if '--verify-all' in sys.argv:
+            build_verification(include_stencil=True)
+        elif '--verify-fix' in sys.argv:
             build_verification()
         else:
             build()
