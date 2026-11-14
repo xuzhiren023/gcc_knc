@@ -95,7 +95,7 @@ Current tickets: `[##################--]` 216 of 230
 | S12-12 | Stage S12-10's residual-gap card experiments as one combined Sprint 12 diagnostic batch (PMU access, prefetch, page backing, libm route, branches, allocator) | Done | The six follow-up card experiments (counter access, prefetch, page backing, libm route, branches, allocator... |
 | S12-13 | Digest the S12-10 sources into our knowledge base - correct our KNC notes, build a reference index, and list what our practice should change | Done | The project now has a numbered KNC reference index (R01-R27), corrected KNC notes that cite source pages an... |
 | S12-14 | Audit GCC-KNC's tuning model and runtime defaults against the digested sources - every mismatch with a proposed change and its proof | In progress |  |
-| S12-15 | Research - literature survey of published Xeon Phi (KNC) and Xeon Phi system research that matches our goals; what have we overlooked? | In progress | Lead: no rebase needed. submit only checks rebase for gcc: yes tickets; your diff is one new note and the l... |
+| S12-15 | Research - literature survey of published Xeon Phi (KNC) and Xeon Phi system research that matches our goals; what have we overlooked? | Question for the tech lead | Ran submit as instructed; it refused because the committed survey has 848 changed lines against the 800-lin... |
 | S12-16 | Research - whole-system tuning playbook for the Z840 + Xeon Phi (BIOS, host OS, MPSS and card, transfers, runtimes), as HPC centres tuned Xeon + KNC systems | Done | Whole-system tuning playbook for the Z840 + Phi done: 13 ordered steps (BIOS, host Linux, card power/pages/... |
 | S12-17 | claude-torture -j N refuses to start in exclusive card runs (no inherited RLIMIT_AS since S11-29), so the execute suite cannot run | In progress | Do not amend or split 71cbcf86. Instead prove red: temporarily check out tools/claude-torture.c from main (... |
 | S12-18 | Double-precision vector exp, log and pow ran slower than scalar libm on the card (0.82x, 0.63x, 0.49x) - confirm with valid batches, then fix the library or stop the vectorizer calling them where they lose | Tests waiting for review | Commit 6a256a79. Host Cygwin regression: exp/log/pow each fail as expected after a timing transient; steady... |
@@ -256,13 +256,13 @@ Current tickets: `[##################--]` 216 of 230
 ## Recent activity
 
 - 2026-11-14 14:00 **S12-18** engineer red: Commit 6a256a79. Host Cygwin regression: exp/log/pow each fail as expected after a timing transient; steady controls pass. Real driver accepts one ...
+- 2026-11-14 14:00 **S12-15** engineer ask: Ran submit as instructed; it refused because the committed survey has 848 changed lines against the 800-line budget. The tool permits --override on...
 - 2026-11-14 13:59 **S12-04** engineer red: Expected regression confirmed: test fails because generated monitor contains unsupported fractional sleep 0.01. Log: C:\Users\xuzhi\Documents\gcc_k...
 - 2026-11-14 13:58 **S12-13** lead approve: The project now has a numbered KNC reference index (R01-R27), corrected KNC notes that cite source pages and keep superseded text visible, and an o...
 - 2026-11-14 13:58 **S12-06** lead answer: See the resume note: close as premise fails and submit.
 - 2026-11-14 13:49 **S12-15** lead answer: Lead: no rebase needed. submit only checks rebase for gcc: yes tickets; your diff is one new note and the lead merges. Run pm.py submit now as is.
 - 2026-11-14 13:49 **S12-06** lead resume: Lead 13:50: card result at .work/_shared/S12-06/card.stdout (S12_06_CHECK PASS, 3 pairs per case, cpu=240 label): GCC-KNC is equal or faster than G...
 - 2026-11-14 13:44 **S12-16** lead approve: Whole-system tuning playbook for the Z840 + Phi done: 13 ordered steps (BIOS, host Linux, card power/pages/service core, transfers, MPI, runtimes) ...
-- 2026-11-14 13:36 **S12-15** engineer ask: Survey committed: 61ecb62e, docs/research/phi-literature-survey.md. 30 ranked source groups; 30 PDFs/extracts in .work/_shared/phi-literature/ (45....
 
 ## Cost
 
