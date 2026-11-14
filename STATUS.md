@@ -2,7 +2,7 @@
 
 Updated automatically at every ticket change. Last update: 2026-11-14 15:12.
 
-**Next: the tech lead, on S12-21.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: the tech lead, on S12-19.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[##################--]` 220 of 238
 
@@ -99,7 +99,7 @@ Current tickets: `[##################--]` 220 of 238
 | S12-16 | Research - whole-system tuning playbook for the Z840 + Xeon Phi (BIOS, host OS, MPSS and card, transfers, runtimes), as HPC centres tuned Xeon + KNC systems | Done | Whole-system tuning playbook for the Z840 + Phi done: 13 ordered steps (BIOS, host Linux, card power/pages/... |
 | S12-17 | claude-torture -j N refuses to start in exclusive card runs (no inherited RLIMIT_AS since S11-29), so the execute suite cannot run | In progress | Lead raises sessions 4 -> 6 (second raise): red proof done (exit 125 with main's file); the restore was blo... |
 | S12-18 | Double-precision vector exp, log and pow ran slower than scalar libm on the card (0.82x, 0.63x, 0.49x) - confirm with valid batches, then fix the library or stop the vectorizer calling them where they lose | lead | Needs interactive lead: (1) exclusive card turn running .work/_shared/S12-18/vmath-bench.mic at full, 3100 ... |
-| S12-19 | Profile-guided missed-vectorization triage - join hot loops with the vectorizer's reasons and observed strides/masks, so tuning targets what is hot and fixable | In progress | S12-19 red is approved: 10 host tests in 2 files now pin the vectorizer triage contract (six real GCC misse... |
+| S12-19 | Profile-guided missed-vectorization triage - join hot loops with the vectorizer's reasons and observed strides/masks, so tuning targets what is hot and fixable | Question for the tech lead | 6c999a43: join core; 10 host tests pass. Audit: 0/15109 workload samples resolve to source; HPCG has no cap... |
 | S12-20 | libknc_vmath accuracy and exception contract, with an independent validation design (rounding modes, special values, flags, scalar fallback) | draft |  |
 | S12-21 | Scheduling model for M4's serial runs - measure density-1 tuning and the integer-multiply cost against today's density-4 defaults (S12-14 B02, B04, B05) | Tests waiting for review | fc734fd3 adds phase-1 contracts: 28 serial development builds, default/density1 flags, top-four selection, ... |
 | S12-22 | Low-risk corrections from the S12-14 audit - wrong comments and citations (N01-N09) and the far-prefetch-distance range bug (B10) | Not started |  |
@@ -263,6 +263,7 @@ Current tickets: `[##################--]` 220 of 238
 
 ## Recent activity
 
+- 2026-11-14 15:12 **S12-19** engineer ask: 6c999a43: join core; 10 host tests pass. Audit: 0/15109 workload samples resolve to source; HPCG has no capture. Repro: python tools/vec_triage.py ...
 - 2026-11-14 15:11 **S12-08** lead defer: Closure done: 7f2df59d states 'premise failed, no compiler change' up front, keeps both reproducers, no GCC commit (knc..s12/S12-08 empty). pm.py s...
 - 2026-11-14 15:09 **S12-04** owner decide: Lead raises sessions 7 -> 8: the last raise made progress (usleep fallback, red/green logs); one session to submit.
 - 2026-11-14 15:08 **S12-21** engineer red: fc734fd3 adds phase-1 contracts: 28 serial development builds, default/density1 flags, top-four selection, three alternating pairs, full exclusive ...
@@ -270,13 +271,12 @@ Current tickets: `[##################--]` 220 of 238
 - 2026-11-14 15:06 **S12-08** engineer ask: Closure documentation committed as 7f2df59d; reproducers retained. Requested submit --override was refused: deep ticket: run pm.py red and wait for...
 - 2026-11-14 15:06 **S12-04** lead answer: Lead: submit with the mixed commit. Red and green are shown by the two logs (red 150442 against the old card_run, green 150451); no history correct...
 - 2026-11-14 15:05 **S12-04** engineer ask: The strengthened fallback test fails against HEAD's original tools/card_run (log: C:\Users\xuzhi\Documents\gcc_knc\.work\_state\logs\S12_04_profile...
-- 2026-11-14 15:05 **S11-26** lead defer: Needs the interactive lead: clean WRF build hits a new ICE (REMEZ, vect_transform_stmt, knc 619e14b479a; repro .work/_shared/wrf-trial/repro/remez....
 
 ## Cost
 
 - From the script, engineer: 616 sessions, 1242.1M input tokens
 - From the script, lead: 403 sessions, 111.5M input tokens
-- Started by hand, Claude: 12 sessions, 3201.7M input tokens
+- Started by hand, Claude: 12 sessions, 3202.2M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
