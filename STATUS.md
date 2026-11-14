@@ -87,7 +87,7 @@ Current tickets: `[##################--]` 217 of 230
 | S12-04 | card_run profile memory monitor costs under 5% of one card thread | In progress | Red stage must hold only the failing test: commit c122120a also carries the card_run fix, so red-then-green... |
 | S12-05 | DMA end-to-end time - overlap file read, DMA and file write, and copy on the card with more than one thread | draft |  |
 | S12-06 | M4 theme 1 - strict scalar FP conversions and call boundaries (NPB-EP transform and log path, NPB-IS randlc) | Question for the tech lead | Submitting a80a7e9b as instructed now fails: python tools/pm.py submit S12-06 --note ... returns protected ... |
-| S12-07 | M4 theme 2 - indexed-load scheduling with strict sparse reduction (NPB-CG) | Not started |  |
+| S12-07 | M4 theme 2 - indexed-load scheduling with strict sparse reduction (NPB-CG) | In progress |  |
 | S12-08 | M4 theme 3 - dependency-preserving scalar updates and register pressure in dense loops (PB-ludcmp, x87 stack traffic) | Not started |  |
 | S12-09 | Sprint 12 batch check - integrated themes at the final Sprint 12 head, regression evidence, optional modes frozen | draft |  |
 | S12-10 | Research - what KNC hardware and runtime knowledge are we still missing to tune GCC-KNC, the OS runtime and broad optimization, and where is it documented? | Done | KNC reference-gap research done: 16 gaps ranked, 32 primary sources (98 MB, outside git) with page-cited fa... |
@@ -266,9 +266,9 @@ Current tickets: `[##################--]` 217 of 230
 
 ## Cost
 
-- From the script, engineer: 590 sessions, 1210.4M input tokens
+- From the script, engineer: 591 sessions, 1211.4M input tokens
 - From the script, lead: 390 sessions, 108.8M input tokens
-- Started by hand, Claude: 12 sessions, 3168.8M input tokens
+- Started by hand, Claude: 12 sessions, 3169.6M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
