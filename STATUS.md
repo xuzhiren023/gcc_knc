@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-14 18:10.
+Updated automatically at every ticket change. Last update: 2026-11-14 18:11.
 
-**Next: the tech lead, on S12-23.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: GPT-6.1, on S12-29 (Wrong code - vbroadcastsd reads a 4-byte-aligned SCmode constant (complex float) straight from the constant pool and faults on the card (gcc.c-torture pr38969.c, regression from S11-27)).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
 Current tickets: `[##################--]` 226 of 244
 
@@ -103,7 +103,7 @@ Current tickets: `[##################--]` 226 of 244
 | S12-20 | libknc_vmath accuracy and exception contract, with an independent validation design (rounding modes, special values, flags, scalar fallback) | draft |  |
 | S12-21 | Scheduling model for M4's serial runs - measure density-1 tuning and the integer-multiply cost against today's density-4 defaults (S12-14 B02, B04, B05) | lead | Card run needed (interactive lead): 037aee42 removes the shell timeout calls (card_run keeps the 1740 s lim... |
 | S12-22 | Low-risk corrections from the S12-14 audit - wrong comments and citations (N01-N09) and the far-prefetch-distance range bug (B10) | Done | The audit's comment and citation fixes are in GCC-KNC and the far prefetch distance can no longer be set eq... |
-| S12-23 | Floating-point environment correctness on KNC - fix the underflow probe that cannot tell flushing from rounding, and handle x87 erratum CD28 (S12-14 N06, N07, B16, B17) | Question for the tech lead | Green and payload build/lint PASS; T0/T1 PASS. T2 infrastructure failure: Permission denied writing .work/_... |
+| S12-23 | Floating-point environment correctness on KNC - fix the underflow probe that cannot tell flushing from rounding, and handle x87 erratum CD28 (S12-14 N06, N07, B16, B17) | lead | Interactive lead must run T2: engineer's green gate, T0 and T1 pass, but T2 failed on infrastructure (Permi... |
 | S12-24 | ICE in vect_transform_stmt (tree-vect-stmts.cc:13381) on WRF's REMEZ at -mphinix (-O3 -march=knc) | Not started |  |
 | S12-25 | WRF smpar build arm with --param=knc-threads-per-core=2 for PhiWeather's 2-threads-per-core runs (A/B against S11-26's default-4 build) | draft |  |
 | S12-26 | WRF hot scalar routines - classify with the S12-19 triage tool and stage bitwise-safe per-file flag arms for PhiWeather to time | draft |  |
@@ -269,6 +269,7 @@ Current tickets: `[##################--]` 226 of 244
 
 ## Recent activity
 
+- 2026-11-14 18:11 **S12-23** lead defer: Interactive lead must run T2: engineer's green gate, T0 and T1 pass, but T2 failed on infrastructure (Permission denied writing .work/_shared/S5-21...
 - 2026-11-14 18:10 **S12-23** engineer ask: Green and payload build/lint PASS; T0/T1 PASS. T2 infrastructure failure: Permission denied writing .work/_shared/S5-21/short-vector-O2-0.mic. Sand...
 - 2026-11-14 18:06 **S12-29** lead approve-red: S12-29 red approved: the new T1 test catches pr38969's card fault (a complex-float constant broadcast from 4-byte-aligned memory, including folded ...
 - 2026-11-14 18:04 **S12-29** engineer red: Red revision 0a8ffa2c: scanner now checks {1to8}/{1to16} memory operands with existing constant/stack alignment checks; unknown addresses fail clos...
@@ -276,7 +277,6 @@ Current tickets: `[##################--]` 226 of 244
 - 2026-11-14 18:00 **S12-21** lead defer: Card run needed (interactive lead): 037aee42 removes the shell timeout calls (card_run keeps the 1740 s limit) and writes payload/peer archives as ...
 - 2026-11-14 17:59 **S12-29** engineer red: Red commit c75bded5. Ran tools/run.py --name S12-29-red wrapping tools/check.py t1 --compiler gcc16 --complex-broadcast-align --worker. Expected fa...
 - 2026-11-14 17:58 **S12-21** engineer ask: Fixed at 037aee42: removed shell timeout calls; card_run retains 1740 s limit. Payload and peer archives use ustar. Repackaged r2: 16329850 bytes, ...
-- 2026-11-14 17:58 **S12-07** lead defer: Card run needed (interactive lead only): in an exclusive timing turn, run .work/_shared/S12-07/sparse-paired via tools/card_run --threads 1 --timeo...
 
 ## Cost
 
