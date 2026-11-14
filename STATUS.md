@@ -1,10 +1,10 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-14 02:52.
+Updated automatically at every ticket change. Last update: 2026-11-14 02:53.
 
 **Next: the tech lead, on S11-17.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
-Current tickets: `[###################-]` 208 of 213
+Current tickets: `[###################-]` 208 of 216
 
 ## Milestones
 
@@ -14,7 +14,7 @@ Current tickets: `[###################-]` 208 of 213
 | M1 | Mixed native code | Done | 43 of 43 tickets |
 | M2 | Useful vector target | Done | 51 of 51 tickets |
 | M3 | Runtimes | Done | 48 of 48 tickets |
-| M4 | Broad optimization | In progress | 26 of 31 tickets |
+| M4 | Broad optimization | In progress | 26 of 34 tickets |
 | M5 | Program corpus | Not started | Not planned in detail yet |
 | M6 | Release | Not started | Not planned in detail yet |
 
@@ -83,6 +83,9 @@ Current tickets: `[###################-]` 208 of 213
 | S11-29 | card_run profiles limit memory in use, not address space, so a 3100 or 5100 run fails only where the real card would | Done | Under --profile 3100 and 5100, card_run now limits the memory a job actually uses (sampled resident plus sw... |
 | S12-01 | Sprint 12 prep - static code-quality census of the development-corpus builds (spills, x87/vector transfers, addressing, calls, code size) | Done | A static code-quality census (spill/reload proxies, x87 and x87-zmm traffic, address arithmetic, calls, bra... |
 | S12-02 | Sprint 12 prep - the unscored generality check set (S11-20's six programs in the code styles our corpus lacks) | Done | The six unscored generality checks (Q1-Q6: ray tracer hit dispatch and vec3 AoS, Burkardt MD, Reference BLA... |
+| S12-03 | pm.py approve aborts its own merge on conflict and refuses cleanly, so main is never left mid-merge | draft |  |
+| S12-04 | card_run profile memory monitor costs under 5% of one card thread | draft |  |
+| S12-05 | DMA end-to-end time - overlap file read, DMA and file write, and copy on the card with more than one thread | draft |  |
 | S2-01 | Design for zmm and mask registers under -march=knc | Done | The register design for KNC is settled on paper: all 32 zmm and 8 mask registers become usable under -march... |
 | S2-02 | Float and double arguments and results in zmm lane 0 | Done | Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`). |
 | S2-03 | Varargs with the donor's register save area | Done | Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`). |
@@ -249,12 +252,12 @@ Current tickets: `[###################-]` 208 of 213
 
 ## Cost
 
-- From the script, engineer: 561 sessions, 1140.2M input tokens
+- From the script, engineer: 562 sessions, 1143.6M input tokens
 - From the script, lead: 370 sessions, 103.6M input tokens
-- Started by hand, Claude: 12 sessions, 3079.2M input tokens
+- Started by hand, Claude: 12 sessions, 3080.8M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 31.7 GiB of 100 GiB. 174 GiB free on the drive.
+The project uses 31.7 GiB of 100 GiB. 172 GiB free on the drive.
