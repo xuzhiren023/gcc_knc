@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-14 13:15.
+Updated automatically at every ticket change. Last update: 2026-11-14 13:17.
 
-**Next: GPT-6.1, on S11-12 (Sprint 11 batch check - full native suite, x86 identity, forward-port drill, ICE sweeps, runtime prefix consistency).** Run `python tools/dispatch.py`, or ask the tech lead to.
+**Next: the tech lead, on S12-12.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[##################--]` 213 of 228
 
@@ -92,7 +92,7 @@ Current tickets: `[##################--]` 213 of 228
 | S12-09 | Sprint 12 batch check - integrated themes at the final Sprint 12 head, regression evidence, optional modes frozen | draft |  |
 | S12-10 | Research - what KNC hardware and runtime knowledge are we still missing to tune GCC-KNC, the OS runtime and broad optimization, and where is it documented? | Done | KNC reference-gap research done: 16 gaps ranked, 32 primary sources (98 MB, outside git) with page-cited fa... |
 | S12-11 | Research - best practices for a dual Xeon E5-2690 v3 + Xeon Phi (KNC) workstation (HP Z840) for LLM inference and scientific computing | Done | Z840 dual E5-2690 v3 + Xeon Phi setup guide done: slot/BIOS/memory/power/cooling checklist, MPSS-on-modern-... |
-| S12-12 | Stage S12-10's residual-gap card experiments as one combined Sprint 12 diagnostic batch (PMU access, prefetch, page backing, libm route, branches, allocator) | In progress | Yes. Submit with --override 'six experiments plus plan; 899 lines, 12% over the 800 budget'. Do not cut sco... |
+| S12-12 | Stage S12-10's residual-gap card experiments as one combined Sprint 12 diagnostic batch (PMU access, prefetch, page backing, libm route, branches, allocator) | Waiting for review | Six linked and linted diagnostic binaries, per-experiment run.sh files, README with card_run commands, and ... |
 | S12-13 | Digest the S12-10 sources into our knowledge base - correct our KNC notes, build a reference index, and list what our practice should change | In progress |  |
 | S12-14 | Audit GCC-KNC's tuning model and runtime defaults against the digested sources - every mismatch with a proposed change and its proof | Not started |  |
 | S12-15 | Research - literature survey of published Xeon Phi (KNC) and Xeon Phi system research that matches our goals; what have we overlooked? | In progress |  |
@@ -253,6 +253,7 @@ Current tickets: `[##################--]` 213 of 228
 
 ## Recent activity
 
+- 2026-11-14 13:17 **S12-12** engineer submit: Six linked and linted diagnostic binaries, per-experiment run.sh files, README with card_run commands, and batch.sh staged under .work/_shared/S12-...
 - 2026-11-14 13:15 **S12-12** lead answer: Yes. Submit with --override 'six experiments plus plan; 899 lines, 12% over the 800 budget'. Do not cut scope: six C programs, the stager and a 300...
 - 2026-11-14 13:13 **S12-12** engineer ask: Submission is blocked by the 800-line budget: pm.py reports 899 changed lines for commits fba1336b and 21140d8d. Six linked/linted binaries, run sc...
 - 2026-11-14 13:06 **S12-11** lead approve: Z840 dual E5-2690 v3 + Xeon Phi setup guide done: slot/BIOS/memory/power/cooling checklist, MPSS-on-modern-OS options, measured host and Phi result...
@@ -260,13 +261,12 @@ Current tickets: `[##################--]` 213 of 228
 - 2026-11-14 12:41 **S12-10** lead approve: KNC reference-gap research done: 16 gaps ranked, 32 primary sources (98 MB, outside git) with page-cited facts, and a 10-row list of bounded card e...
 - 2026-11-14 12:30 **S12-10** engineer submit: Phase 2: docs/research/knc-reference-gaps.md, d54380ba; 32 artifacts, 98 MiB; S12-06/07/08 facts and ranked residual measurements. Prior checks PAS...
 - 2026-11-14 12:29 **S12-10** lead answer: Lead: no rebase needed. submit only checks rebase for gcc: yes tickets, and your diff is one new file (docs/research/knc-reference-gaps.md) that do...
-- 2026-11-14 12:27 **S12-10** engineer ask: Phase 2 committed d54380ba: docs/research/knc-reference-gaps.md. 32 cited artifacts, 98 MiB; checks PASS, log .work/_state/logs/s12_10_reference_no...
 
 ## Cost
 
 - From the script, engineer: 577 sessions, 1181.4M input tokens
 - From the script, lead: 383 sessions, 106.4M input tokens
-- Started by hand, Claude: 12 sessions, 3140.0M input tokens
+- Started by hand, Claude: 12 sessions, 3140.9M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
