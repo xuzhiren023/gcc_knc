@@ -96,9 +96,14 @@ def engineer_command(board, ticket, worktree):
     if ledger:
         roots.append(os.path.dirname(os.path.abspath(ledger)))
     writable = "sandbox_workspace_write.writable_roots=" + json.dumps(roots)
+    # A research ticket with "web: live" gets live web search and network access for downloads (owner, 2026-11-14).
+    web = ticket.fields.get("web")
+    # Codex has renamed this setting; older builds read tools.web_search and ignore the other key.
+    web_args = ["-c", 'web_search="%s"' % web, "-c", "tools.web_search=true",
+                "-c", "sandbox_workspace_write.network_access=true"] if web else []
     return [codex, "exec"] + (["-m", model] if model else []) + ["--json", "--ephemeral", "-C", worktree, "--sandbox", "workspace-write",
             "--dangerously-bypass-hook-trust", "-c", trust, "-c", writable, "-c", 'approval_policy="never"',
-            "-c", 'model_reasoning_effort="%s"' % effort] + (["-c", 'service_tier="%s"' % tier] if tier else []) + [
+            "-c", 'model_reasoning_effort="%s"' % effort] + (["-c", 'service_tier="%s"' % tier] if tier else []) + web_args + [
             ENGINEER_PROMPT.format(id=ticket.id)]
 
 

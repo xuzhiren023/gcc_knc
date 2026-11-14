@@ -158,6 +158,9 @@ class Board:
         for limit in ("new_test_files", "sessions", "input_tokens"):
             if ticket.fields.get(limit):
                 budget[limit] = int(ticket.fields[limit])
+        # Owner, 2026-11-14: a research ticket can ask for maximum reasoning effort.
+        if ticket.fields.get("effort"):
+            budget["effort"] = ticket.fields["effort"]
         return budget
 
     def worktree(self, ticket):
