@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-13 20:27.
+Updated automatically at every ticket change. Last update: 2026-11-13 20:32.
 
-**Next: GPT-6.1, on S11-15 (First development-corpus baseline and profile, GCC 5.1.1 vs GCC-KNC at -O2 (E7-03 part 1)).** Run `python tools/dispatch.py`, or ask the tech lead to.
+**Next: the tech lead, on S11-27.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[###################-]` 205 of 213
 
@@ -78,7 +78,7 @@ Current tickets: `[###################-]` 205 of 213
 | S11-24 | WRF OpenMP (smpar) build with GCC-KNC at -mphinix, for PhiWeather's benchmark - replaces the serial trial build | Done | WRF v4.8.0 now builds as an OpenMP card binary at -mphinix with GCC-KNC (wrf.exe and real.exe linked, needi... |
 | S11-25 | ICE in do_store_flag (expr.cc) on WRF's surface layer (SFCLAY1D) at -O2 -march=knc | Done | The last WRF file that crashed GCC-KNC (surface layer, SFCLAY1D) now compiles: vector 'ordered and not equa... |
 | S11-26 | WRF OpenMP build at -mphinix with no per-file workarounds (S11-23 and S11-25 fixed), restaged for PhiWeather | draft | Owner 2026-11-13: the S11-24 WRF build is removed. Deleted: |
-| S11-27 | Wrong code - NPB-MG (class A, serial) built by GCC-KNC at -O2 -march=knc fails NPB verification on the card | In progress | Budget raised by the lead under the owner's standing rule (2026-11-09/10: the lead extends session and toke... |
+| S11-27 | Wrong code - NPB-MG (class A, serial) built by GCC-KNC at -O2 -march=knc fails NPB verification on the card | Question for the tech lead | Card round ready at 89a3657a: run python .work/_shared/S11-27/verify-card.py; post verification/L2 or PASS/... |
 | S11-28 | HPCG run that fits every card model - fixed work instead of fixed duration, grid sized to the 3100's memory | lead | After S11-29 merges (still ready): run .work/_shared/S11-28/lead-pilot.ps1 at 242936bf+ (30 exclusive timed... |
 | S11-29 | card_run profiles limit memory in use, not address space, so a 3100 or 5100 run fails only where the real card would | Not started | Dependency on S11-02 removed, so the HPCG chain (S11-29, then S11-28) does not wait on the DMA debugging. B... |
 | S12-01 | Sprint 12 prep - static code-quality census of the development-corpus builds (spills, x87/vector transfers, addressing, calls, code size) | Done | A static code-quality census (spill/reload proxies, x87 and x87-zmm traffic, address arithmetic, calls, bra... |
@@ -238,6 +238,7 @@ Current tickets: `[###################-]` 205 of 213
 
 ## Recent activity
 
+- 2026-11-13 20:32 **S11-27** engineer ask: Card round ready at 89a3657a: run python .work/_shared/S11-27/verify-card.py; post verification/L2 or PASS/FAIL per CASE. All 8 rebuilt with lane-g...
 - 2026-11-13 20:27 **S11-27** owner decide: Budget raised by the lead under the owner's standing rule (2026-11-09/10: the lead extends session and token budgets itself; ask only after two ext...
 - 2026-11-13 18:36 **S11-27** lead escalate: budget: 8 engineer sessions used; the budget is 8
 - 2026-11-13 18:34 **S11-27** lead answer: Host results at e0bc456a11e: build PASS; T0 PASS; T1 PASS 327, including all secondary-reload and stencil-reload cases; T2 PASS. Torture asm diff r...
@@ -245,13 +246,12 @@ Current tickets: `[###################-]` 205 of 213
 - 2026-11-13 17:51 **S11-02** lead defer: Code at 45e732b9 reviewed, no blocker (digests removed per owner, exact length and completion before publish, mode set before rename). Missing: acc...
 - 2026-11-13 17:48 **S11-02** engineer submit: 45e732b9 removes production transfer hashes; keeps exact lengths/completion and private publication. Mode before rename; LF script. Old fake modele...
 - 2026-11-13 17:41 **S11-02** owner decide: Budget raised by the lead under the owner's standing rule: sessions 9 -> 12, the second extension. Since the first, the card showed 1 GiB DMA at 1....
-- 2026-11-13 17:39 **S11-02** lead escalate: budget: 9 engineer sessions used; the budget is 9
 
 ## Cost
 
 - From the script, engineer: 544 sessions, 1108.5M input tokens
 - From the script, lead: 359 sessions, 100.7M input tokens
-- Started by hand, Claude: 12 sessions, 3032.9M input tokens
+- Started by hand, Claude: 12 sessions, 3033.3M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
