@@ -2,7 +2,7 @@
 
 Updated automatically at every ticket change. Last update: 2026-11-14 18:13.
 
-**Next: the tech lead, on S12-23.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: the tech lead, on S12-29.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[##################--]` 226 of 244
 
@@ -103,7 +103,7 @@ Current tickets: `[##################--]` 226 of 244
 | S12-20 | libknc_vmath accuracy and exception contract, with an independent validation design (rounding modes, special values, flags, scalar fallback) | draft |  |
 | S12-21 | Scheduling model for M4's serial runs - measure density-1 tuning and the integer-multiply cost against today's density-4 defaults (S12-14 B02, B04, B05) | lead | Card run needed (interactive lead): 037aee42 removes the shell timeout calls (card_run keeps the 1740 s lim... |
 | S12-22 | Low-risk corrections from the S12-14 audit - wrong comments and citations (N01-N09) and the far-prefetch-distance range bug (B10) | Done | The audit's comment and citation fixes are in GCC-KNC and the far prefetch distance can no longer be set eq... |
-| S12-23 | Floating-point environment correctness on KNC - fix the underflow probe that cannot tell flushing from rounding, and handle x87 erratum CD28 (S12-14 N06, N07, B16, B17) | Question for the tech lead | Lead 18:13: T2 run by the lead on lane 2 (the S5-21 files are lead-owned, not writable by the sandbox): 36 ... |
+| S12-23 | Floating-point environment correctness on KNC - fix the underflow probe that cannot tell flushing from rounding, and handle x87 erratum CD28 (S12-14 N06, N07, B16, B17) | In progress | T2 passed (lead run); submit. |
 | S12-24 | ICE in vect_transform_stmt (tree-vect-stmts.cc:13381) on WRF's REMEZ at -mphinix (-O3 -march=knc) | Not started |  |
 | S12-25 | WRF smpar build arm with --param=knc-threads-per-core=2 for PhiWeather's 2-threads-per-core runs (A/B against S11-26's default-4 build) | draft |  |
 | S12-26 | WRF hot scalar routines - classify with the S12-19 triage tool and stage bitwise-safe per-file flag arms for PhiWeather to time | draft |  |
@@ -269,6 +269,7 @@ Current tickets: `[##################--]` 226 of 244
 
 ## Recent activity
 
+- 2026-11-14 18:13 **S12-23** lead answer: T2 passed (lead run); submit.
 - 2026-11-14 18:13 **S12-23** lead resume: Lead 18:13: T2 run by the lead on lane 2 (the S5-21 files are lead-owned, not writable by the sandbox): 36 PASS, 0 FAIL, log .work/_state/logs/s12_...
 - 2026-11-14 18:12 **S12-29** engineer ask: GCC build needed at 51126f4c232; please build lane gcc and return for tests (AGENTS.md forbids Codex builds). Fix applies Bm scalar alignment check...
 - 2026-11-14 18:11 **S12-23** lead defer: Interactive lead must run T2: engineer's green gate, T0 and T1 pass, but T2 failed on infrastructure (Permission denied writing .work/_shared/S5-21...
@@ -276,7 +277,6 @@ Current tickets: `[##################--]` 226 of 244
 - 2026-11-14 18:06 **S12-29** lead approve-red: S12-29 red approved: the new T1 test catches pr38969's card fault (a complex-float constant broadcast from 4-byte-aligned memory, including folded ...
 - 2026-11-14 18:04 **S12-29** engineer red: Red revision 0a8ffa2c: scanner now checks {1to8}/{1to16} memory operands with existing constant/stack alignment checks; unknown addresses fail clos...
 - 2026-11-14 18:01 **S12-29** lead changes: Red is right: main's vbroadcastsd .LC0(%rip) is flagged for 4-byte alignment, which is the pr38969 fault, and the constant/stack-residue tracking a...
-- 2026-11-14 18:00 **S12-21** lead defer: Card run needed (interactive lead): 037aee42 removes the shell timeout calls (card_run keeps the 1740 s limit) and writes payload/peer archives as ...
 
 ## Cost
 
