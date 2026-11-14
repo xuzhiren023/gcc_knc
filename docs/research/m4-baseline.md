@@ -36,22 +36,33 @@ system CPU seconds and `user / (wall * threads)`; the analogous unused
 capacity residual is not a measurement of elapsed wait time. Process CPU
 seconds summed across workers can exceed wall seconds.
 
-`tools/s11_15_batch.py stage` stages 12 serial programs: PB-atax,
-PB-cholesky, PB-ludcmp, PB-jacobi-2d, PB-heat-3d, STREAM, NPB-CG, NPB-EP,
-NPB-IS, HPCG, zlib and SQLite. PB-gemm already has its accepted pilot;
-NPB-MG serial stays excluded pending S11-27. It also stages all six existing
-OpenMP builds (STREAM, NPB-CG, NPB-EP, NPB-MG, NPB-IS and HPCG), with one
-worker per compute core. Every workload uses the unchanged S11-18 GCC-KNC
+The first batch ran on 2026-11-14 from 01:07 to 01:32 EST. Nine serial
+plain/sample pairs passed: STREAM, PB-atax, PB-cholesky, PB-heat-3d,
+PB-jacobi-2d, PB-ludcmp, NPB-CG, NPB-EP and NPB-IS. The next launch,
+serial HPCG plain, hit the 600-second deadline (exit 124). The lead reports
+its requested-duration input takes 10–14 minutes including setup; this is
+a cap failure, not evidence of a workload fault. Returned evidence:
+`.work/_state/logs/S11_15_profile_batch-20261114-010719.log` and
+`.work/_shared/S11-15/batch-capture/`. The 18 successful launches still
+need host attribution and overhead qualification.
+
+Per the lead's 01:39 instruction, `tools/s11_15_batch.py restage` prepares
+only serial zlib and SQLite, plus OpenMP STREAM, NPB-CG, NPB-EP, NPB-MG
+and NPB-IS, with one worker per compute core. The explicit remaining-key
+allowlist skips all nine completed serial pairs and HPCG in both profiling
+panels. PB-gemm already has its accepted pilot; NPB-MG serial stays excluded
+pending S11-27. HPCG awaits S11-28 fixed work. Every workload uses the unchanged S11-18 GCC-KNC
 strict -O2 binary and original input. The zlib donor decoder remains only
 as the harness correctness check. No donor profiling or held-out input is
 staged or opened.
 
-The batch contains **36 launches**, one plain followed by one sampled
+The remaining batch contains **14 launches**, one plain followed by one sampled
 launch per build, on the full 7120 allocation (240 granted CPUs, 60 cores;
 one selected CPU for serial or 60 for OpenMP). Each separate `card_run`
-has a **600-second cap**. Plan about 30 minutes of card time, subject to
-queue/transfer overhead; the worst-case sum of caps is six hours, not a
-30-minute batch timeout. Each launch is subject to normal card coordination.
+has a **600-second cap**. Allow about **10–15 minutes of card time**, mostly
+queue/transfer overhead (the primary full-profile medians sum to about
+15 seconds for these paired workloads). This is an estimate; the sum of
+launch caps is 140 minutes. Each launch is subject to normal card coordination.
 The lead script stops on a failed launch or correctness/capture check;
 there are no automatic retries. Successful output is not yet a qualified
 profile or a replacement for the primary pilot timings.
@@ -67,31 +78,37 @@ and returned pilot evidence. Native concurrency/coverage is still untested.
 
 The launcher and primary correctness checks are reused. Complete PolyBench
 live-outs are retained and compared exactly between plain and sampled runs;
-NPB, STREAM, HPCG, SQLite and zlib retain their existing validations. Captures
+NPB, STREAM, SQLite and zlib retain their existing validations. Captures
 use fixed paths in `.work/_shared/S11-15/batch-capture/`, overwritten on an
-explicit rerun, and are kept out of git. Existing corpus binaries are not
-copied or rebuilt. Only the diagnostic DSO is built and linted on the host.
+explicit rerun, and are kept out of git. This handoff preserves the completed
+captures. Existing corpus binaries are not copied or rebuilt. Restaging
+reuses the previously built/linted diagnostic DSO, launcher and file lists;
+it checks that the selected inputs exist and rewrites the lead entry point.
 
 Stage on the host (already run for this handoff):
 
 ```powershell
-python tools/run.py --name S11-15-batch-stage --inputs tools/s11_15_batch.py tools/corpus/profile-batch.sh tools/corpus/profile-sigprof.c -- python tools/s11_15_batch.py stage
+python tools/run.py --name S11-15-batch-restage --inputs tools/s11_15_batch.py -- python tools/s11_15_batch.py restage
 ```
 
-Host staging passed (exit 0): sampler build/lint/runtime dependencies, shell
+Original host staging passed (exit 0): sampler build/lint/runtime dependencies, shell
 syntax and all 18 file lists. Log:
 `.work/_state/logs/S11_15_batch_stage-20261114-004142.log`.
-No native batch launch, coverage test or overhead qualification has run.
+Those passing checks are reused. Native OpenMP coverage and all batch
+overhead qualification remain pending.
+Restaging passed (exit 0), selecting exactly seven keys / 14 launches:
+`.work/_state/logs/S11_15_batch_restage-20261114-014809.log`.
 
 Lead-only command from the main checkout:
 
 ```powershell
-python tools/run.py --name S11-15-profile-batch -- powershell -NoProfile -File .work\_shared\S11-15\lead.ps1
+python tools/run.py --name S11-15-profile-remaining -- powershell -NoProfile -File .work\_shared\S11-15\lead.ps1
 ```
 
 From this worktree use `..\_shared\S11-15\lead.ps1` instead. Return the
 wrapper log and the fixed batch-capture directory through the ticket.
-`lead.ps1` now runs this batch, replacing the historical pilot entry point.
+`lead.ps1` now runs only the seven remaining keys. It retains the 600-second
+cap and stops at the first launch or correctness/capture failure.
 
 After return, attribute each launch against its own maps, frozen executable
 and runtime DSOs; retain unknown PCs in the denominator. Classify libgomp
@@ -439,7 +456,8 @@ prefetch change: delivery bias and neighboring execution remain possible.
 
 PB-gemm now has a dominant sampled loop, code size and bridge/spill inspection;
 its bounded CPU-share estimate is admitted, while removable cost remains
-unestimated. Twelve other serial programs await the staged batch; NPB-MG
+unestimated. Nine other serial programs await attribution, zlib and SQLite
+await the remaining batch, and HPCG awaits S11-28; NPB-MG
 serial remains excluded. These programs lack sampled functions/loops,
 hot code sizes and measured costs. All
 OpenMP wait-versus-compute splits remain unknown. The review ranges below

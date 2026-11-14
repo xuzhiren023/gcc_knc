@@ -12,10 +12,10 @@ import tarfile
 from s11_15_profile import ROOT, SHARED, OUT, host_path
 from corpus import output_result
 
-SERIAL = ('PB-atax', 'PB-cholesky', 'PB-ludcmp', 'PB-jacobi-2d',
-          'PB-heat-3d', 'STREAM', 'NPB-CG', 'NPB-EP', 'NPB-IS',
-          'HPCG', 'zlib', 'SQLite')
-OPENMP = ('STREAM', 'NPB-CG', 'NPB-EP', 'NPB-MG', 'NPB-IS', 'HPCG')
+# Remaining keys authorized by the lead on 2026-11-14 at 01:39.
+# Preserve the nine completed serial pairs; HPCG awaits S11-28 fixed work.
+SERIAL = ('zlib', 'SQLite')
+OPENMP = ('STREAM', 'NPB-CG', 'NPB-EP', 'NPB-MG', 'NPB-IS')
 FROZEN = SHARED / 'S11-18'
 
 
@@ -92,6 +92,13 @@ def stage():
         key = row['variant'] + '-' + row['program']
         (OUT / (key + '.files.txt')).write_text(''.join(str(p) + '\n' for p in files))
         print('STAGED ' + key + ' plain + sample; existing binary lint reused')
+    write_lead_script()
+    print('PASS sampler build/lint/dependencies, shell syntax, %d file lists; %d launches staged'
+          % (len(selected), 2 * len(selected)))
+    print('NOT RUN: native sampler qualification, OpenMP attribution or removable-time ranking')
+
+
+def write_lead_script():
     quote = lambda p: "'" + str(p).replace("'", "''") + "'"
     project = ROOT.parent.parent if ROOT.parent.name == '.work' else ROOT
     lead_script = "$ErrorActionPreference = 'Stop'\n"
@@ -99,8 +106,23 @@ def stage():
     lead_script += 'if (!(Test-Path -LiteralPath $entry)) { $entry = ' + quote(project / 'tools/s11_15_batch.py') + ' }\n'
     lead_script += '& (Get-Command python.exe).Source $entry lead\nexit $LASTEXITCODE\n'
     (OUT / 'lead.ps1').write_text(lead_script)
-    print('PASS sampler build/lint/dependencies, shell syntax, 18 file lists; 36 launches staged')
-    print('NOT RUN: native sampler qualification, OpenMP attribution or removable-time ranking')
+
+
+def restage():
+    """Reuse the already built/linted DSO and inputs for the remaining keys."""
+    selected = list(jobs())
+    for row in selected:
+        key = row['variant'] + '-' + row['program']
+        paths = (OUT / (key + '.files.txt')).read_text().splitlines()
+        if not paths or not all(Path(p).is_file() for p in paths):
+            raise ValueError('missing previously staged input: ' + key)
+        print('RESTAGED ' + key + ' plain + sample; prior host checks reused')
+    if not (OUT / 'profile-batch.sh').is_file():
+        raise ValueError('missing previously staged launcher')
+    write_lead_script()
+    print('PASS remaining batch: %d keys, %d launches; existing captures preserved'
+          % (len(selected), 2 * len(selected)))
+    print('NOT RUN: card jobs, native qualification or attribution')
 
 
 def lead():
@@ -145,11 +167,12 @@ def lead():
                     raise RuntimeError('incomplete sampled launch: ' + key)
             print('PROFILE_BATCH_PASS %s %s seconds=%.9f stdout=%s stderr=%s' %
                   (key, mode, result['time_seconds'], stdout, stderr), flush=True)
-    print('PROFILE_BATCH_COMPLETE 36 launches; host attribution/overhead qualification pending')
+    print('PROFILE_BATCH_COMPLETE %d launches; host attribution/overhead qualification pending'
+          % (2 * (len(SERIAL) + len(OPENMP))))
 
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('action', choices=('stage', 'lead'))
+    parser.add_argument('action', choices=('stage', 'restage', 'lead'))
     args = parser.parse_args()
-    (stage if args.action == 'stage' else lead)()
+    {'stage': stage, 'restage': restage, 'lead': lead}[args.action]()
