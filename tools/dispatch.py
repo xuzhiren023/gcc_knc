@@ -115,8 +115,10 @@ def lead_command(board, ticket):
     state = ticket.state
     prompt = LEAD_PROMPT.format(id=ticket.id, state=state, branch=ticket.fields.get("branch", ""),
                                 task=LEAD_TASKS[state])
+    # Owner, 2026-11-14: scripted lead sessions (answers, reviews) use the policy's lead_model, Fable when it has budget.
+    model = board.policy.get("lead_model") or "opus"
     return [claude, "-p", prompt, "--output-format", "json", "--no-session-persistence",
-            "--model", "opus", "--effort", board.budget(ticket)["effort"],
+            "--model", model, "--effort", board.budget(ticket)["effort"],
             "--allowedTools", "Read,Grep,Glob,Bash(git log*),Bash(git diff*),Bash(git show*),"
             "Bash(git -C .work/_shared/gcc log*),Bash(git -C .work/_shared/gcc diff*),"
             "Bash(git -C .work/_shared/gcc show*),Bash(python tools/pm.py*)"]
