@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-14 01:06.
+Updated automatically at every ticket change. Last update: 2026-11-14 01:08.
 
-**Next: GPT-6.1, on S11-02 (card_run and run_suite move bulk data by SCIF DMA at the PCIe link limit, with the SSH stream as fallback).** Run `python tools/dispatch.py`, or ask the tech lead to.
+**Waiting for you:** S11-02. Run `python tools/pm.py inbox`.
 
 Current tickets: `[###################-]` 206 of 213
 
@@ -53,7 +53,7 @@ Current tickets: `[###################-]` 206 of 213
 | S10-12 | cbrt and cbrtf crash (SIGSEGV) in qualify_v1 on the card - root cause and fix | Done | The cbrt and cbrtf qualification jobs no longer crash on the card and pass (worst 0.4996 and 0.4991 ULP): t... |
 | S10-13 | User story - code that calls cbrtl under -march=knc gets a safe replacement and a compile-time warning (MPSS libm cbrtl faults) | Done | Under -march=knc, calls to cbrtl (and std::cbrt on long double) now go to GCC-KNC's own safe cube root with... |
 | S11-01 | User story - the best way to move data between the host and the card, measured, and how our projects use it | Done | We now have a sourced inventory of every host-card transfer path that works without changing MPSS (SSH, tar... |
-| S11-02 | card_run and run_suite move bulk data by SCIF DMA at the PCIe link limit, with the SSH stream as fallback | In progress | Reviewed 4aae037c: the class defaults (helper_free True, transfer_method ssh, transfers list), the fixture ... |
+| S11-02 | card_run and run_suite move bulk data by SCIF DMA at the PCIe link limit, with the SSH stream as fallback | **Waiting for you** | budget: 13309292 input tokens used; the budget is 12000000 |
 | S11-03 | S11-01 transfer tool rejects the card's physical /tmp path, so the native study never starts | Done | The transfer study's tool now accepts the card's real /tmp location (/var/volatile/tmp), so its card run ca... |
 | S11-04 | S11-01 transfer tool - the host opens every connection, because Windows Firewall blocks inbound TCP from the card | Done | The transfer study's host side now opens every connection to the card, so Windows Firewall no longer blocks... |
 | S11-05 | Research - raise KNC's real memory bandwidth from about 175 GB/s toward 75-85% of peak, with a measured plan | Done | The memory-bandwidth research plan and a validated multithreaded KNC bandwidth benchmark are ready, with a ... |
@@ -238,6 +238,7 @@ Current tickets: `[###################-]` 206 of 213
 
 ## Recent activity
 
+- 2026-11-14 01:08 **S11-02** engineer escalate: budget: 13309292 input tokens used; the budget is 12000000
 - 2026-11-14 01:06 **S11-29** lead answer: Card round at 9520fce6, 2026-11-14 00:54-01:04 EST, receipts .work/_shared/S11-29/*.json, log .work/_state/logs/S11_29_card-20261114-005443.log.
 - 2026-11-14 01:05 **S11-29** lead resume: Lead ran lead-round.py at 9520fce6, 00:54-01:04 EST: results in the answer.
 - 2026-11-14 01:03 **S11-02** lead answer: Reviewed 4aae037c: the class defaults (helper_free True, transfer_method ssh, transfers list), the fixture updates for private publication, and pat...
@@ -245,16 +246,15 @@ Current tickets: `[###################-]` 206 of 213
 - 2026-11-14 01:00 **S11-15** lead defer: Card run needed. Batch at 31272757 reviewed and fine (36 launches: 12 serial + 6 OpenMP GCC-KNC dev builds, plain+sampled, full 7120, 600 s cap eac...
 - 2026-11-14 00:58 **S11-17** engineer ask: eb3c2f3b: ten profiles imported; five binaries compiled/linted, positive counts, fatal mismatch checks. T1: 2 pass, 3 fail. Reproducer: tools/s11_1...
 - 2026-11-14 00:57 **S11-02** engineer ask: 4aae037c fixes defaults/fixtures; extra stat was POSIX Path.resolve. validate.ps1 resolves Suite before cd. Full tools suite: 236 tests, 48 failure...
-- 2026-11-14 00:55 **S11-27** lead approve: NPB-MG built by GCC-KNC at -O2 -march=knc now verifies on the card (class A in 14.1 s, against 33.8 s for GCC 5.1.1): reload no longer puts its x87...
 
 ## Cost
 
 - From the script, engineer: 553 sessions, 1129.1M input tokens
 - From the script, lead: 365 sessions, 102.1M input tokens
-- Started by hand, Claude: 12 sessions, 3051.5M input tokens
+- Started by hand, Claude: 12 sessions, 3052.5M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 31.7 GiB of 100 GiB. 173 GiB free on the drive.
+The project uses 31.7 GiB of 100 GiB. 165 GiB free on the drive.
