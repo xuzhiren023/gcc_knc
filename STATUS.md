@@ -2,7 +2,7 @@
 
 Updated automatically at every ticket change. Last update: 2026-11-14 17:56.
 
-**Next: the tech lead, on S12-23.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: GPT-6.1, on S12-07 (M4 theme 2 - indexed-load scheduling with strict sparse reduction (NPB-CG)).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
 Current tickets: `[##################--]` 226 of 244
 
@@ -103,7 +103,7 @@ Current tickets: `[##################--]` 226 of 244
 | S12-20 | libknc_vmath accuracy and exception contract, with an independent validation design (rounding modes, special values, flags, scalar fallback) | draft |  |
 | S12-21 | Scheduling model for M4's serial runs - measure density-1 tuning and the integer-multiply cost against today's density-4 defaults (S12-14 B02, B04, B05) | In progress | Lead raises sessions 4 -> 6 (standing rule): a session was lost to the lead's duplicate dispatcher; staging... |
 | S12-22 | Low-risk corrections from the S12-14 audit - wrong comments and citations (N01-N09) and the far-prefetch-distance range bug (B10) | Done | The audit's comment and citation fixes are in GCC-KNC and the far prefetch distance can no longer be set eq... |
-| S12-23 | Floating-point environment correctness on KNC - fix the underflow probe that cannot tell flushing from rounding, and handle x87 erratum CD28 (S12-14 N06, N07, B16, B17) | Question for the tech lead | Lead: lane 2 built at s12/S12-23 (see log s12_23_build). Diff reviewed: CD28 fnsave/edit/frstor clear route... |
+| S12-23 | Floating-point environment correctness on KNC - fix the underflow probe that cannot tell flushing from rounding, and handle x87 erratum CD28 (S12-14 N06, N07, B16, B17) | In progress | Built; run green and submit. |
 | S12-24 | ICE in vect_transform_stmt (tree-vect-stmts.cc:13381) on WRF's REMEZ at -mphinix (-O3 -march=knc) | Not started |  |
 | S12-25 | WRF smpar build arm with --param=knc-threads-per-core=2 for PhiWeather's 2-threads-per-core runs (A/B against S11-26's default-4 build) | draft |  |
 | S12-26 | WRF hot scalar routines - classify with the S12-19 triage tool and stage bitwise-safe per-file flag arms for PhiWeather to time | draft |  |
@@ -269,6 +269,7 @@ Current tickets: `[##################--]` 226 of 244
 
 ## Recent activity
 
+- 2026-11-14 17:56 **S12-23** lead answer: Built; run green and submit.
 - 2026-11-14 17:56 **S12-23** lead resume: Lead: lane 2 built at s12/S12-23 (see log s12_23_build). Diff reviewed: CD28 fnsave/edit/frstor clear routes, KNC_RESERVED now includes bit 20, DUE...
 - 2026-11-14 17:55 **S12-21** owner decide: Lead raises sessions 4 -> 6 (standing rule): a session was lost to the lead's duplicate dispatcher; staging is done, only the card-window fixes (no...
 - 2026-11-14 17:55 **S12-21** engineer escalate: budget: 4 engineer sessions used; the budget is 4
@@ -276,7 +277,6 @@ Current tickets: `[##################--]` 226 of 244
 - 2026-11-14 17:54 **S12-07** lead resume: Card window 1 result is in the ticket body: fix the single-CPU check and restage.
 - 2026-11-14 17:53 **S12-23** lead defer: GCC build needed on lane gcc2 at gcc commit 02f32213c0d (branch s12/S12-23 in .work/_shared/gcc-2 tree): interactive lead runs python tools/run.py ...
 - 2026-11-14 17:52 **S12-23** engineer ask: GCC build needed at 02f32213c0d (gcc2), per AGENTS.md Codex build restriction. Both Fortran clear routes now use FNSAVE/edit/FRSTOR; live x87 regis...
-- 2026-11-14 17:47 **S12-23** lead approve-red: S12-23 red accepted: the tests fail for the right reasons (the old underflow probe rounds to zero in both modes, the Fortran clear routes lack the ...
 
 ## Cost
 
