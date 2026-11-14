@@ -1,8 +1,9 @@
 # KNC reference gaps: compiler, card runtime and broad optimization
 
-S12-10, phase 1, 2026-11-14. **Awaiting the lead's ranked-gap review before
-phase 2.** This part uses existing local material only. No web research,
-document download, build, test or card job was performed. Code is unchanged.
+S12-10, 2026-11-14. Phase 1 was accepted by the lead at `dcf5eaaa`;
+phase 2 follows below. Part 1 records the local-only investigation before
+that review. Part 2 records subsequent web research and document retrieval.
+Code is unchanged; no compiler build, program test or card job was run.
 
 ## Part 1 — What the existing evidence leaves unresolved
 
@@ -599,7 +600,542 @@ directly verified facts from secondhand reports.
 | Intel/Klemm, PRACE, TACC/Colfax/LRZ/Jülich guidance and theses | Recover precise configurations and measurements behind pairing, page, placement and runtime advice. Tian et al., IPDPSW 2013 §§III–VI and PRACE v2.0 are already reported sources; they do not prove our workload's gains (G03/G04/G09/G12/G16). |
 | K1OM ABI and public compiler/math release notes | Seek scalar/vector calling convention and FP behavior/cost evidence. The ICC guide GUID pointers in the best-practice/intrinsics notes are permissible interface references; they do not authorize vendor header, SVML, libimf, ISPC-code or Intrinsics Guide XML access (G01/G05/G13/G14). |
 
-The next decision is which of the ranked gaps deserves deeper document
-acquisition. Phase 2 has not started. Its final residual-gap list and card-time
-estimates must follow the document search; the experiments above are closure
-criteria, not scheduled card jobs or new implementation tickets.
+This was the phase-1 stopping point. The lead accepted the analysis and
+authorized phase 2, prioritizing G01 for S12-06, G03 for S12-07, G02/G08
+for S12-08, then G06 and G04. The experiments above remain closure criteria,
+not scheduled card jobs or new implementation tickets.
+
+
+## Part 2 — Retrieved evidence and remaining measurements
+
+Research date: 2026-11-14. Local filenames below are relative to
+`.work/_shared/knc-refs/`, outside git and this disposable worktree.
+The 22 PDFs, two saved web pages and eight small source files are accompanied
+by PDF text extracts. Temporary PDF inspection tools/images also remain in
+this shared directory because cleanup was blocked by command policy.
+Total directory usage is 102,319,508 bytes (about 98 MiB), below the 2 GB limit.
+References use printed pages unless marked PDF page or slide. No vendor prose, examples or code is reproduced here.
+
+**Verified (V)** means read in the identified source, including a paper's own
+experiment. It does **not** mean reproduced on our card. **Reported (R)**
+means a secondhand reference whose underlying document was not recovered.
+**Inference (I)** identifies a proposed consequence for GCC-KNC. Production
+model names do not establish stepping, firmware or correspondence with our
+7120. Source versions do not establish installed binary identity.
+
+### Facts for S12-06/07/08
+
+- **S12-06 — scalar FP, conversions and bridges.** **V:** the K1OM ABI assigns
+  float/double arguments to ZMM registers and makes all ZMM and mask registers
+  caller-clobbered (R03, §§3.2.1–3). Cornea distinguishes IMCI gradual underflow
+  from unsupported SIMD traps and documents ICC's use of x87 for trapping
+  semantics (R04, slides 9, 18). **I:** compare complete ABI-to-arithmetic paths,
+  including memory bridges, rounding and live values across calls. Neither
+  source supplies production timings for our conversions, x87 divide, sqrt
+  or log; lane-zero VPU arithmetic is not automatically a strict replacement.
+  Keep EP's arithmetic/bridge and libm questions separate.
+- **S12-07 — CG/HPCG and gathers.** **V:** measured gather completion costs
+  depend on cache level and occupied lines, and include repeated gather/mask
+  control (R05, §V.D/Table II). Sparse-matrix work distinguishes useful bytes
+  from repeated private-cache transfers (R14, §§4.2–4.3). **I:** the current
+  cost formula is not validated by matching one L2 endpoint. Cost indices,
+  masks, address generation and ordered reduction separately; no retrieved
+  source makes strict CG's FP reduction legally associative. Gather evidence
+  does not establish scatter cost.
+- **S12-08 — pressure, pairing and x87 versus scalar VPU.** **V:** pairing
+  has instruction-length, displacement/immediate and prefix restrictions;
+  some vector stores appear in a V-pipe eligibility table (R02, pp.34, 56).
+  One context cannot issue in adjacent cycles (R17, slides 10–12). The ABI
+  exposes call clobbers, not free scalar/vector transfers (R03). **I:** inspect
+  encodings and reload causes before attributing spills or assuming every
+  vector operation monopolizes U. Density four is not the serial M4 setting.
+  Verify page mappings before explaining cache/TLB effects (R01, R09);
+  requesting a 2 MiB allocation does not prove its backing.
+
+### Editions, applicability and corrections
+
+| Evidence | What is established | What must not be inferred |
+| --- | --- | --- |
+| SSDG R01 | Original Intel PDF **328207-001EN, November 2012, 201 pages** recovered. | It is not the 163-page edition previously cited at pp.16–22. Do not transfer pagination. |
+| Later SSDG | **R:** Dolbeau R22 bibliography identifies **328207-002, June 2013**. No original PDF recovered. A transcription of **488596 rev.2.03, November 8, 2012** is another early reference, not the June edition. | The earlier note's 163-page PDF is not positively identified by similar prose. No edition-change claim is justified. |
+| Optimization material | Original Klemm 2013/2014 decks, Rahman's 2013 book and Tian's compiler paper recovered. | None supplies a complete, stepping-qualified timing/pairing table. R16 and R17 are different decks. |
+| Memory measurements | R06 explicitly uses an engineering sample; R14 uses pre-release SE10P; R20 is preproduction. R05 uses 5110P; R22 uses 7120P. | Absolute timings and saturation counts are not interchangeable. R08's SE10P results retain their own configuration. |
+| Internal disagreements | R01 p.22 prose gives alternate-cycle L2 access while its table gives one/clock; pp.19/22 differ on L2 bank count. R17 slides 13–14 give different L1 latency descriptions. | Raw SRAM access, dependent-load latency, issue occupancy and loaded-memory latency cannot become one cost. |
+| Vector issue | R01's overview puts vector execution on U; R02's V-pipe table includes vector stores/packstores and masks. R10 has a VPU V-pipe event. | The blanket claim that two vector instructions never pair needs opcode/operand qualification. Reconcile R02's old mnemonics with the ISA before implementation. |
+| PMU | R10/R11 agree on **two 40-bit counters per hardware thread**, unlike R01's overview. | Counter count proves neither access nor attribution accuracy, and says nothing about an uncore interface. |
+| Huge pages | R09 documents card-side THP in a named MPSS gold update; R26's offload-buffer setting has narrower scope. | Neither proves today's native malloc backing or makes a host SCIF driver option govern native card allocations. |
+
+### Sources and specific findings
+
+#### R01 — Original system software guide
+
+Intel, *Intel Xeon Phi Coprocessor System Software Developers Guide*,
+328207-001EN, November 2012.
+[Original PDF in a document mirror](https://raw.githubusercontent.com/tpn/pdfs/master/Intel%20Xeon%20Phi%20-%20System%20Software%20Developers%20Guide%20%28Nov%202012%29.pdf).
+Local: **ssdg-2012.pdf**. G02/G04/G07/G08/G11.
+
+**V:** pp.19, 23–24 describe a two-cycle decoder, two ready bundles per
+context, and selection of the next ready context in round-robin order; a
+context cannot issue in consecutive cycles. A transfer outside the ready
+buffer refetches from the instruction cache. This is not a documented decoded
+loop cache. Slow prefixes include 66/67, LOCK, segment and REP; fast prefixes
+include 62/C4/C5, REX and 0F. Address-generation interlock is at least three
+clocks. Page 19 describes 16 L2 prefetch streams constrained to 4 KiB pages,
+with up to four requests per stream. Pages 22–23 give 64 small-page plus eight
+2 MiB data translations, 32 small-page instruction translations, and a
+64-entry second-level structure serving large translations or small-page PDEs.
+**I:** these constrain models but do not settle branch prediction, mixed-page
+replacement, loaded latency or simultaneous memory issue.
+
+#### R02 — Pairing and operand-dependent forwarding
+
+Rezaur Rahman, *Intel Xeon Phi Coprocessor Architecture and Tools*, Apress,
+2013. [Publisher PDF](https://link.springer.com/content/pdf/10.1007/978-1-4302-5927-5.pdf).
+Local: **rahman-2013.pdf**. G01/G02/G07/G12.
+
+**V:** p.56 (PDF 59) excludes pairing for instructions longer than eight
+bytes, combined displacement/immediate operands, microcode, and 62/C4/C5
+prefixes with disp32; dependency exceptions include CMP/Jcc.
+Table 3-1, p.34, lists masks and selected vector stores among V-pipe candidates,
+using some historical names. Page 33 distinguishes forwarding to the ordinary
+arithmetic stage from earlier swizzle/EMU consumers; dependent swizzle paths
+can add delay. **I:** these are encoding/operand constraints, not a ready-made
+reservation table. Independent swizzle throughput does not prove zero extra
+dependent latency. The integer-multiply explanation does not quantify bridges.
+
+#### R03 — Scalar/vector ABI and call pressure
+
+H.J. Lu, Milind Girkar, Michael Matz, Jan Hubicka, Andreas Jaeger and Mark
+Mitchell, *System V Application Binary Interface: K1OM Architecture Processor
+Supplement*, version 1.0, April 26, 2012.
+[Archived Intel PDF](https://web.archive.org/web/20230720214845id_/https://www.intel.com/content/dam/develop/external/us/en/documents/k1om-psabi-1-0.pdf).
+Local: **k1om-psabi-1.0.pdf**. G01/G02/G05/G14.
+
+**V:** §§3.2.1–3, pp.15–22 (PDF pages one higher), specify argument classes,
+ZMM0–7 argument allocation and ZMM0/1 returns for the relevant vector class.
+The class name SSE is ABI terminology; it does not enable SSE instructions.
+Figure 3.4, p.21, marks all 32 ZMM and eight mask registers caller-clobbered.
+MXCSR control bits and the x87 control word are callee-preserved; their status
+bits are caller-clobbered. Long-double arguments/returns have separate rules.
+**I:** preserve these obligations when comparing calls with inline arithmetic;
+ABI conformance says nothing about helper quality or transfer latency.
+
+#### R04 — Floating-point modes and strictness
+
+Marius Cornea, Intel, *Numerical Computation on Intel Xeon Phi Coprocessors
+Using the Intel Compilers and Math Libraries*, October 15, 2013.
+[Slides](https://www.lip6.fr/public/2013-10-15_Cornea.pdf).
+Local: **cornea-2013.pdf**. G01/G05/G13.
+
+**V:** slides 9 and 18 distinguish x87 extended precision from IMCI FP;
+IMCI supports gradual underflow, DAZ/FZ, rounding modes and exception flags,
+but not SIMD exception traps. ICC's strict/exception-support route uses x87.
+**I:** distinguish numerical equivalence, flags, traps and excess precision.
+Fast-mode advice and vendor math performance claims do not establish a
+conforming GCC replacement. No vendor math implementation was opened.
+
+#### R05 — Gather completion on a production model
+
+Johannes Hofmann, Jan Treibig, Georg Hager and Gerhard Wellein, *Performance
+Engineering for a Medical Imaging Application on the Intel Xeon Phi
+Accelerator*, arXiv:1401.3615, 2014.
+[Authors' paper](https://arxiv.org/pdf/1401.3615).
+Local: **hofmann-gather-2014.pdf**. G03/G04/G12/G16.
+
+**V:** §V.D, p.4/Table II, on a 5110P, reports completion-loop cycles for
+16 active SP lanes. One versus sixteen occupied lines gives 9.0 versus 36.8
+cycles in L1 and 13.6 versus 129.6 in L2. The L1 two-line case is 8.4:
+a monotone per-line formula is not an exact fit even here. Section VI, p.5,
+reports no benefit from the gather hint, blocking behavior for another
+gather-prefetch instruction, and excessive scalar-prefetch index extraction
+overhead in this application. **I:** measure the full loop; do not assume an
+asynchronous gather-prefetch queue or transplant its tuned distances,
+approximate division or application speedup into strict M4.
+
+#### R06 — Detailed memory experiments, explicitly preproduction
+
+Zhenman Fang et al., *Measuring Microarchitectural Details of Multi- and
+Many-Core Memory Systems through Microbenchmarking*, ACM TACO 11(4), article
+55, publication footer December 2014.
+[Author PDF](https://zhenman.github.io/files/J1-TACO2015-uBench-XeonPhi.pdf).
+Local: **fang-taco2015.pdf** (host filename says 2015). G04/G08/G11.
+
+**V:** §4, p.55:10, identifies a 1 GHz engineering sample, Linux 2.6.38.8
+and ICC 13.0.1. Sections 5–6/Table V, p.55:19, report eight L1 miss-handling
+entries shared across siblings and 56–60 L2 entries. These measured capacities
+need not be the SSDG's roughly 38 combined requests. Hardware prefetch remains
+bounded by 4 KiB even with large pages; software prefetch can cross pages and
+initiate translation without servicing a page fault. **I:** useful methodology
+and hypotheses; no production constants are imported from this sample.
+
+#### R07 — Independent latency and concurrency measurements
+
+Jianbin Fang, Henk Sips, Lilun Zhang, Chuanfu Xu, Yonggang Che and Ana Lucia
+Varbanescu, *Test-Driving Intel Xeon Phi*, ICPE 2014, pp.137–148.
+[Proceedings PDF](https://research.spec.org/icpe_proceedings/2014/proceedings/p137.pdf).
+Local: **fang-icpe2014.pdf**. G01/G02/G08/G11.
+
+**V:** §3.1 distinguishes dependent-instruction latency from aggregate
+throughput; §3.2 measures cache/memory access. The paper describes a 60-core,
+1.05 GHz 5100-series configuration (p.139), a different experiment from R06.
+**I:** preserve the distinction between latency, available parallelism and
+occupancy; neither the series label nor ICC identifies our scalar strict mix.
+
+#### R08 — TACC bandwidth and prefetch tuning
+
+John D. McCalpin, *Native Computing and Optimization on the Intel Xeon Phi Coprocessor*,
+IXPUG 2014. [Slides](https://www.ixpug.org/docs/IXPUG_2014_MIC_Native-new.pdf).
+Local: **mccalpin-ixpug2014.pdf**. G04/G08/G11.
+
+**V:** slides 23–25 and 28 relate latency, outstanding cache lines and useful
+bandwidth on SE10P. They distinguish eight outstanding L1 requests from
+additional L2 prefetch traffic, show STREAM behavior changing with density,
+and report a 16-stream L2 prefetcher bounded by 4 KiB pages. Stream count and
+prefetch aggressiveness change the preferred density. **I:** adding workers
+can increase concurrency or contention. Whole-card STREAM maxima and idle
+latency do not supply serial M4 prefetch distances.
+
+#### R09 — STREAM, store hints and card-side THP
+
+Karthik Raman, Intel, *Stream on Intel Xeon Phi Coprocessors*, updated
+October 22, 2013.
+[Intel PDF](https://www.intel.com/content/dam/develop/external/us/en/documents/streamtriad-xeonphi-3.pdf).
+Local: **raman-stream-2013.pdf**. G04/G08/G10/G11.
+
+**V:** pp.2–4 give a 7110P STREAM recipe with 60 workers and ICC distances of
+64 lines to L2 and eight to L1, plus streaming-store/eviction choices. Page 4
+identifies MPSS KNC_gold_update_1-2.1.4982-15 or later as providing THP promotion
+for heap/stack data. **I:** native huge pages historically need not require
+explicit HugeTLB. Current policy, promotion success and backing remain unknown.
+Store legality/order still comes from the ISA conditions in part 1; a
+memory-bound recipe is not a generic default.
+
+
+#### R10 — Core PMU definitions recovered
+
+Intel, *Intel Xeon Phi Coprocessor Performance Monitoring Units*,
+327357-001, revision 1.01, July 10, 2012.
+[Archived original](https://web.archive.org/web/20240000000000id_/http://software.intel.com/sites/default/files/forum/278102/intelr-xeon-phitm-pmu-rev1.01.pdf).
+Local: **pmu-327357-001.pdf**. G02/G03/G06/G07/G08/G11/G12.
+
+**V:** pp.5–7 specify two 40-bit counters per thread; configuration requires
+ring 0. User-mode counter instructions do not establish OS permission.
+Pages 11–12 distinguish per-thread filtering from events lacking thread
+context, and warn that TSC is not a wall-clock source. Table 1-6, pp.12–16,
+provides these interpretation constraints (identifiers are interface facts,
+not a reproduction of the vendor event table):
+
+| Diagnostic | Verified definition or limitation |
+| --- | --- |
+| Pairing | INSTRUCTIONS_EXECUTED_V_PIPE counts paired execution. |
+| AGI | Ordinary AGI can count both pipes in a cycle; gather/scatter AGI counts that interlock, not full gather time. |
+| Branches | BRANCHES_MISPREDICTED excludes BTB misses. |
+| L2 traffic | L2_READ_MISS can count prefetch and demand for the same address. Separate events distinguish cache versus memory fills. |
+| VPU | Read transactions, register-conflict occurrences and active elements are different units; active elements are not FLOPS. |
+
+**I:** qualify event scope and stepping before ratios. Several definitions
+explicitly mention A0. This core guide does not close GBOX/uncore access.
+
+#### R11 — Public KNC perf implementations, not the deployed kernel
+
+Linux contributors, Linux **v3.10**, 2013,
+[arch/x86/kernel/cpu/perf_event_knc.c](https://raw.githubusercontent.com/torvalds/linux/v3.10/arch/x86/kernel/cpu/perf_event_knc.c).
+Local: **linux-v3.10-perf_event_knc.c**. G06/G14.
+Also Mpss-vt Linux fork, revision **b76c20**, version **3.2.14** in its
+[Makefile](https://sourceforge.net/p/mpssvt/linux/ci/b76c20/tree/Makefile?format=raw),
+[driver](https://sourceforge.net/p/mpssvt/linux/ci/b76c20/tree/arch/x86/kernel/cpu/perf_event_knc.c?format=raw).
+Local: **mpssvt-Makefile**, **mpssvt-perf_event_knc.c**; snapshot date not established.
+
+**V:** v3.10's knc_pmu declares two 40-bit counters and maximum period
+2^39-1. Its event-constraint table restricts listed CRI/L2 events to counter
+0; it contains no corresponding VPU-only-counter-1 table. The generic event
+map assigns cache references/misses to L1 data events 0x28/0x29, not a
+universal last-level metric. Its cache-event map treats event zero as a valid
+data-read event. **I:** checking perf_event_open registration and exact errors
+is justified even without a perf executable. Neither tree matches the installed
+2.6.38-based MPSS kernel; backports, permissions and sampling remain open.
+
+#### R12 — Production errata change the correctness envelope
+
+Intel, *Intel Xeon Phi Coprocessor Specification Update*, 328205-016,
+March 2015.
+[Intel PDF](https://www.intel.com/content/dam/www/public/us/en/documents/specification-updates/xeon-phi-coprocessor-specification-update.pdf).
+Local: **errata-328205.pdf**. G02/G09/G13/G14/G15.
+
+**V:** CD14 p.22 concerns mask-state lazy switching and a paired mask branch
+missing the expected device-not-available exception. CD19 p.23 allows a
+faulting vector instruction to affect MXCSR. CD26 p.25 concerns a paired,
+uncacheable aligned packstore, not ordinary write-back stores. CD28 p.25
+concerns clearing an unmasked x87 exception with FNCLEX. CD34 p.26 describes
+unpinned thread migration and variable performance. CD16/17 p.23 concern
+DMA completion/interrupt behavior. **I:** match stepping and workaround status
+before fenv, signal, pairing or SCIF experiments. A planned MPSS fix is not
+proof our image contains it. Not every erratum applies to every card.
+
+#### R13 — Compiler authors on masks, tails and alignment
+
+Xinmin Tian et al., Intel, *Practical SIMD Vectorization Techniques for
+Intel Xeon Phi Coprocessors*, IPDPSW 2013, pp.1149–1158.
+[Paper](https://faculty.kfupm.edu.sa/coe/mayez/ps-coe502/references/Practical%20SIMD%20Vectorization%20Techniques%20for%20Intel%C2%AE%20Xeon%20Phi%E2%84%A2%20Coprocessors.pdf).
+Local: **tian-vectorization-2013.pdf**. G03/G04/G12/G13/G16.
+
+**V:** §§III–V, PDF pp.2–6, discuss masked tails, alignment peeling,
+multi-versioning and two-dimensional vectorization. Masked/converting unaligned
+accesses distinguish unpack/pack fault behavior from gather/scatter.
+The safe-padding option assumes another 64 bytes after objects, an extra
+program contract. **I:** ordinary GCC programs cannot be presumed padded.
+Tail and mask overhead belong in costs; reported option-dependent gains
+do not establish strict M4 gains or legal extra memory accesses.
+
+#### R14 — Sparse locality is not nominal bandwidth
+
+Erik Saule, Kamer Kaya and Umit V. Catalyurek, *Performance Evaluation of
+Sparse Matrix Multiplication Kernels on Intel Xeon Phi*, arXiv:1302.1078,
+v1, February 2013. [Paper](https://arxiv.org/pdf/1302.1078).
+Local: **saulea-spmv-2013.pdf**. G03/G08/G11/G16.
+
+**V:** §2 p.2 identifies a **pre-release SE10P**. Sections 4.2–4.3,
+pp.7–10, relate useful cache-line density to vectorization and distinguish
+one-copy application traffic from input-vector replication/reloads in private
+caches. The rendering's later generated date does not make it a 2024 experiment.
+**I:** layout and reuse can explain low useful bandwidth without saturating
+GDDR. Its reordering/register blocking are algorithmic transformations,
+not automatically legal fixes for CG's ordered arithmetic or benchmark inputs.
+
+#### R15 — Alternative vectorization for indirect layouts
+
+Mingfei Ma, Jinlong Hou, Jason Ye, Meena Arunachalam and Rafael Gutierrez,
+Intel, *Optimizing Non-Contiguous Memory Access on Intel Xeon Phi
+Coprocessors*, HPCC 2015.
+[Paper](https://aiichironakano.github.io/cs653/Ma-XeonPhiOpt-HPCC15.pdf).
+Local: **ma-noncontiguous-2015.pdf**. G03/G12/G16.
+
+**V:** §§III–IV, pp.2–4, compare intra-loop/inter-loop vectorization,
+alignment/padding and layout/conversion choices for molecular dynamics.
+**I:** alternatives include changing which independent work occupies lanes
+and separating movement from computation. They require actual independence
+and observable-layout legality; this application study does not prove that
+more gathers improve generic sparse code.
+
+#### R16 — Original optimization slides, 2013 edition
+
+Michael Klemm, Intel, *Optimization Strategies for Intel Xeon Phi
+Coprocessors*, 2013.
+[HPC2N-hosted slides](https://www.hpc2n.umu.se/sites/default/files/2.03%20Optimization%20Strategies.pdf).
+Local: **klemm-optimization-2013.pdf**. G02/G04/G08/G09/G16.
+
+**V:** slides 51–54 separate placement, vectorization decisions, memory/TLB
+behavior and eviction control. The density-sensitive compiler hint on
+slide 51 is experimental. **I:** retain actual density and inspect reasons
+for missed vectorization; this does not validate a universal four-thread
+model. Intel runtime variables/ICC flags are not libgomp/GCC controls.
+Slide numbers from the 2014 deck do not apply.
+
+#### R17 — Original microarchitecture slides, 2014 edition
+
+Michael Klemm, Intel, *The Intel Xeon Phi Coprocessor*, LMU seminar,
+December 11, 2014.
+[Slides](https://www.nm.ifi.lmu.de/teaching/Seminare/2014ws/Hauptseminar/doc/2014-12-11.Xeon.Phi.pdf).
+Local: **klemm-microarch-2014.pdf**. G02/G07/G08/G11/G12.
+
+**V:** slides 10–12 describe next-ready selection, the adjacent-cycle
+restriction, 32 ZMM/eight mask registers per context, and usual four-cycle
+vector latency/one-cycle throughput. Slides 13–14 give cache geometry and
+distinguish raw L2 from memory latency but differ on L1 access-time wording.
+**I:** these corroborate capacities, not a complete timing model. Labeled
+ring bandwidth, GDDR pin rate, useful bytes and bidirectional traffic are
+different quantities.
+
+#### R18 — PRACE/LRZ best practices, version and runtime scope
+
+Emil Atanassov et al., editor Volker Weinberg (LRZ), *Best Practice Guide
+Intel Xeon Phi*, **v2.0, January 31, 2017**.
+[PRACE PDF](https://prace-ri.eu/wp-content/uploads/Best-Practice-Guide_Intel-Xeon-Phi.pdf).
+Local: **prace-bpg-v2.pdf**. G04/G08/G09/G10/G16.
+
+**V:** KNC §§13.2.4–13.2.5, pp.59–61, discuss Intel OpenMP's 200 ms blocktime
+and distinguish repeated parallel regions from barriers remaining inside
+a persistent region. **I:** reducing region count need not reduce barriers
+or wakeups. These Intel-library controls do not establish libgomp's policy.
+The guide also contains KNL material, which is not imported into KNC advice.
+
+#### R19 — Colfax application-level guidance
+
+Andrey Vladimirov, Ryo Asai and Vadim Karpusenko, *Parallel Programming and
+Optimization with Intel Xeon Phi Coprocessors*, second edition,
+Colfax International, copyright **2013–2015** (free release announced 2019).
+[Publisher PDF](https://colfaxresearch.com/download/8609/).
+Local: **colfax-2ed.pdf**. G04/G09/G10/G16.
+
+**V:** §4.4.5 p.341 separates placement choices for memory/compute-bound
+work. Section 4.5.4 pp.376–377 explains first-touch NUMA placement using a
+multi-socket **Xeon host** example. **I:** that example does not establish
+socket-style NUMA placement on KNC. Card first touch still affects faults,
+zeroing and cache residency; measure the actual allocation path.
+Recommendations are workload-dependent, not runtime defaults.
+
+#### R20 — Early OpenMP synchronization experiments
+
+Tim Cramer, Dirk Schmidl, Michael Klemm and Dieter an Mey, *OpenMP Programming
+on Intel Xeon Phi Coprocessors: An Early Performance Comparison*, MARC 2012.
+[Authors' PDF](https://www.lfbs.rwth-aachen.de/marc2012/07_Cramer.pdf).
+Local: **cramer-openmp-2012.pdf**. G09/G16.
+
+**V:** §II p.2 identifies preproduction hardware; EPCC measurements and
+applications, pp.3–6, distinguish synchronization overhead from kernel
+throughput. **I:** measure realistic grain sizes; do not transplant early
+Intel-library costs to libgomp or equate synthetic and application gains.
+
+#### R21 — Lab measurements on 5110P
+
+Subhash Saini et al., NASA Ames/SGI/CSC, *An Early Performance Evaluation of
+Many Integrated Core Architecture Based SGI Rackable Computing System*,
+NAS Technical Report **NAS-2015-04**.
+[NASA PDF](https://www.nas.nasa.gov/assets/nas/pdf/papers/NAS_Technical_Report_NAS-2015-04.pdf).
+Local: **nasa-2015-04.pdf**. G08/G09/G11/G16.
+
+**V:** p.3 identifies 5110P; §6.5, pp.7–8, measures OpenMP synchronization and
+loop scheduling with EPCC. **I:** synchronization, scheduling and memory need
+separate denominators/configuration. This is production-model laboratory
+evidence, not proof the local optional libgomp barrier beats its baseline.
+
+#### R22 — Physical-address effects on communication
+
+Romain Dolbeau, CAPS, *Address Selection for Efficient Barriers on the Intel
+Xeon Phi*, revision 1.40, April 8, 2014.
+[Author PDF](http://www.dolbeau.name/dolbeau/publications/barrierphi.pdf).
+Local: **dolbeau-barriers-2014.pdf**. G08/G09/G11.
+
+**V:** §II pp.1–3 studies cache-line ping-pong on a **7120P**, controlling
+the physical page and changing offsets/core pairs. Section III/Figures 7–8
+shows address-dependent barrier cost for that algorithm and placement.
+DTD mapping is not exposed as a portable formula. **I:** physical placement
+is a credible communication variable. It does not revive the withdrawn C4
+coloring attribution: our experiments did not control those variables.
+Do not copy this paper's reboot/page-reservation procedure into M4.
+
+#### R23 — A thesis with application synchronization attribution
+
+Thomas Lang, University of Passau, *An Intel Xeon Phi Backend for the
+ExaStencils Code Generator*, bachelor thesis, April 27, 2016.
+[University PDF](https://infosun.fim.uni-passau.de/cl/arbeiten/lang-b.pdf).
+Local: **lang-thesis-2016.pdf**. G06/G09/G16.
+
+**V:** §4.3 p.33 (PDF 41) reports about 57% of one stencil program's runtime
+in OpenMP using perf. **I:** this demonstrates an application synchronization
+bottleneck and historical profiling, not access on our image or a transferable
+percentage. Some numerals extract poorly; no hardware/compiler version is
+inferred from damaged text. Its generated-code transformations are not applied.
+
+
+#### R24 — Allocator policy and an upstream x87 math reference
+
+GNU C Library contributors, **glibc-2.21**, 2015:
+[malloc/arena.c](https://raw.githubusercontent.com/bminor/glibc/glibc-2.21/malloc/arena.c),
+[malloc/malloc.c](https://raw.githubusercontent.com/bminor/glibc/glibc-2.21/malloc/malloc.c),
+[sysdeps/i386/fpu/e_log.S](https://raw.githubusercontent.com/bminor/glibc/glibc-2.21/sysdeps/i386/fpu/e_log.S).
+Local: **glibc-2.21-arena.c**, **glibc-2.21-malloc.c**, **glibc-2.21-e_log.S**.
+G01/G05/G10.
+
+**V:** arena_get2 uses an explicit maximum when supplied, otherwise
+__get_nprocs() and the architecture-dependent arena factor (eight for 64-bit).
+new_heap reserves space with PROT_NONE/MAP_NORESERVE before enabling the used
+portion. The i386 math source uses x87 logarithm instructions with a near-one
+path. **I:** reported CPUs are not affinity, and virtual reserve is not RSS.
+The math file is a mechanism reference, **not K1OM's installed log**.
+Neither a version string nor a matching sysroot proves source identity;
+MPSS patches and installed symbol paths remain unresolved.
+
+#### R25 — SCIF synchronization and CPU-versus-DMA paths
+
+Intel MPSS contributors, MPSS modules **3.6.1-1** source mirror, revision
+**2850ead25b5c81ece2006d7ae06c2b3149175565** (release metadata; calendar date
+not established):
+[include/scif.h](https://raw.githubusercontent.com/CIRCL/mpss-modules/2850ead25b5c81ece2006d7ae06c2b3149175565/include/scif.h),
+[micscif/micscif_rma.c](https://raw.githubusercontent.com/CIRCL/mpss-modules/2850ead25b5c81ece2006d7ae06c2b3149175565/micscif/micscif_rma.c).
+Local: **scif-3.6.1.h**, **scif-3.6.1-rma.c**. G10/G14/G15.
+
+**V:** the scif_readfrom/write API descriptions distinguish synchronous
+completion, CPU copies and ordered final-cache-line visibility. RMA copy
+setup selects DMA polling for synchronous final chunks and a separate CPU
+route; registration caching depends on configuration. **I:** initiation is
+not completion; pinning/cache resources and CPU/DMA interference are separate
+costs. These small files preserve original notices outside git. They do not
+establish MPSS 3.7 behavior.
+
+#### R26 — MKL tuning scope and ICC release boundary
+
+Intel, *Intel MKL 11.3 Update 4 Developer Guide*, 2016, section on improving
+performance on Intel Xeon Phi coprocessors:
+[Guide page](https://portal.nacad.ufrj.br/online/intel/mkl/common/mkl_userguide/GUID-7F67CA7F-0B2D-4584-AE90-63A64A58F0EC.htm).
+Local: **mkl-11.3-knc-tuning.html**. G05/G08/G09/G10.
+**V:** large-buffer advice describes MIC_USE_2MB_BUFFERS for pointer-based
+**offload transfers**, not general native allocation. **I:** do not apply
+that variable to GCC native malloc or infer glibc behavior from MKL choices.
+
+Intel, *Intel C++ Compiler 18.0 for Linux Release Notes for Intel Parallel
+Studio XE 2018*, initial release 2017:
+[Release notes](https://www.intel.com/content/www/us/en/developer/articles/release-notes/c-compiler-legacy/18-0-linux-for-psxe2018.html).
+Local: **icc18-release-notes.html**. G01/G05/G16.
+**V:** the new-features section identifies removal of x100/KNC support in
+18.0. **I:** later Intel compiler/AVX-512 advice cannot be assumed to describe
+IMCI. No recovered release note provides complete KNC timings or warrants
+replacing strict library calls with fast vector math.
+
+### Sources not recovered and claims still reported
+
+| Target | Retrieval result and evidentiary limit |
+| --- | --- |
+| Intel **330991-001**, *Xeon Phi Coprocessor x100 Product Family: Registers*, December 2014 | **R:** identified in [knc-microarch.md](knc-microarch.md); no recoverable original URL/PDF found through title/number searches and Intel/archive paths. Local file: **none**. Its cited TUNE_PREFQ pp.17–18, counters pp.35–37 and GBOX p.39 remain secondhand. R10 closes core PMU definitions, not uncore programming or queue controls. |
+| Intel SSDG **328207-002**, June 2013 | **R:** R22 reference [10] supplies the [old Intel URL](http://software.intel.com/sites/default/files/article/334766/intel-xeon-phi-systemssoftwaredevelopersguide_0.pdf). Direct/archive retrievals failed or redirected to a landing page; local file: **none**. Do not substitute R01's pagination or claim an edition comparison. |
+| SSDG **488596 rev.2.03**, November 8, 2012 | A [transcription](https://doczz.net/doc/21375/intel%C2%AE-xeon-phi%E2%84%A2-coprocessor-system-software-developers-g...) exposed the identifier; PDF download failed. Local file: **none**. Used only to distinguish bibliographic identities, not as new hardware constants. |
+| Matching **MPSS 3.7** kernel/libc patches and guide | Small snapshots R11/R24/R25 were obtainable; none establishes the installed patchset. An MPSS **3.8**, April 2017 [guide transcription](https://manualzz.com/doc/48993479/intel%C2%AE-manycore-platform-software-stack--intel%C2%AE-mpss-) was found; original PDF unavailable. No 3.8 host-driver setting becomes a verified 3.7 card-side fact. Local file: **none**. |
+| Complete production instruction timing, branch predictor and uncore-event manuals | Not recovered. Original guides, errata, papers and slides provide partial constraints. Failure to find a document is not evidence that a hardware facility is absent. |
+
+The corpus covers Intel originals, compiler papers, independent experiments,
+a thesis, TACC/PRACE/LRZ/Colfax guidance, release notes and small kernel/libc
+sources. Acquisition failures are recorded rather than filled with KNL advice.
+No ICC headers, SVML, libimf, Intrinsics Guide XML or ISPC code was accessed.
+
+### Ranked residual gaps and bounded closure experiments
+
+These are **estimates of exclusive card wall time**, including repetitions
+and simple calibration, after host preparation/builds. They are proposals for
+the lead, not jobs launched here. Setup, document acquisition, compiler builds,
+full M4 scoring and scheduling delays are extra. Each row is a bounded
+diagnostic, not a request to repeat passing acceptance.
+
+Checks exceeding about a minute must split independent work over assigned
+CPUs. Timing cases requiring one isolated core must retain their single-core
+meaning; parallel case execution must not contaminate shared-memory/cache
+measurements. Record affinity, sibling activity, actual page backing, clock
+source and power state. No speedup is forecast.
+
+| M4 priority | Residual gap and why documents do not close it | Smallest discriminating experiment | Card time |
+| --- | --- | --- | --- |
+| 1 | **G01**, S12-06: full scalar FP/conversion/call-bridge cost and strict semantics on our production card | Compare hot sequences with known-live inputs, dependent chains and independent work at density one; include subnormal, range, rounding and exception boundaries for proposed alternatives. Separate arithmetic from spills/call transfers. | 20–40 min |
+| 2 | **G03**, S12-07: indexed loads/gather completion versus ordered scalar reduction; scatter remains unmeasured | Fix active lanes/arithmetic; vary occupied lines, cache residence and index extraction. Time complete loops, masks and setup. Test scatter separately only if a candidate emits it. | 20–35 min |
+| 3 | **G02/G12**, S12-08: production pairing/forwarding and real serial pressure | For classes in candidate RTL, vary pair order, dependencies, encoding length and disp32. Separate reload spills from program storage; add one/two/four siblings only to resolve ambiguous issue behavior. | 20–40 min |
+| 4 | **G06**: working event access and unbiased attribution, enabling several later rows | Inventory registration/permissions; count known work with one feasible event pair, retaining exact errors and enabled/running times. Calibrate counts and sampling loss/perturbation before profiling. Stop if infrastructure prevents trustworthy counting. | 10–20 min; driver repair extra |
+| 5 | **G04**: profitable prefetch distances, queues and stores for real access mixes | Fix alignment, mappings and initialization; compare no hint with a small distance set on identified streams. Distinguish temporal/no-read/weakly-ordered stores only where legal; count traffic if PMU access qualifies. | 20–35 min |
+| 6 | **G08**, S12-08: actual page backing and cache-versus-TLB effects | Inspect mappings/faults; compare verified 4 KiB/2 MiB pages with distributed offsets. Vary working set and stride independently; avoid the known same-offset cache-conflict mistake. | 15–30 min |
+| 7 | **G05**: installed libc/libm route, bridge share and numerical quality | Identify loaded objects/symbols first; time actual log and copy/set paths on representative inputs/sizes, separating process setup from steady state. Correctness checks are required for a proposed replacement. | 15–30 min; accuracy campaign extra |
+| 8 | **G16**: whether a general mechanism removes an observed hot cost | Preserve decisions/RTL for approved themes; use region A/B diagnostics with fixed inputs and two controls. Attribute eliminated work or better scheduling before requesting full M4 qualification. | 20–45 min diagnostic budget |
+| 9 | **G07**: prediction/refill, footprint and alignment costs | Restrict to a hot branch family; control predictability, target placement, work and cache footprint. Separate BTB misses from the incomplete PMU misprediction event. | 15–25 min |
+| 10 | **G10**: arena limits, first touch and retained memory on this image | Observe CPU count versus affinity, allocator settings, faults, RSS and mappings. Compare a small arena-cap set only if allocation is material; preserve fresh-process timing. | 10–20 min |
+
+Other gaps have higher expected value for later parallel/runtime sprints than
+the primary serial M4 vote. Correctness gates precede dependent optimizations.
+
+| Later-sprint priority | Residual gap | Closure experiment | Card time |
+| --- | --- | --- | --- |
+| 1 | **G09** waits, affinity and realistic barrier grain | Compare current/optional libgomp paths with useful work, fixed topology and active/passive waits; observe wakeups/migrations if possible. Preserve the existing measured regression as baseline. | 20–40 min |
+| 2 | **G11** loaded ring/GDDR traffic and ownership | With qualified counters, compare read/write/RFO/remote-cache mixes under fixed affinity/pages. Vary physical/directory placement only if observable and controllable; distinguish useful and transferred bytes. | 30–60 min |
+| 3 | **G13/G14** FP environment, masks, signals and switching | Match errata/workarounds; for a proposed path test flags/rounding/traps, signal return and deliberate migration with nontrivial vector/mask state. ABI text does not prove kernel correctness. | 15–30 min |
+| 4 | **G15** SCIF and system interference | With lead coordination, separate registration, submission and fenced completion; compare CPU/DMA and concurrent native work, recording pinned memory/traffic. Transfer time remains outside M4 where specified. | 20–40 min |
+| 5 | **G16** transfer beyond development code | After establishing mechanisms, sample independent sparse, branch-heavy, abstraction-heavy and parallel programs; retain decisions/regressions without opening held-out artifacts. | 1–2 h initial sample; not full qualification |
+
+Documents resolve interface and resource constraints. Scalar bridges,
+production pairing, gathers/scatters and deployed runtimes still need bounded
+measurements or source identification. They do not justify precision changes,
+reassociation, invisible memory transfers or benchmark-specific tuning.
