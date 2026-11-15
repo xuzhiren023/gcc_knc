@@ -4,6 +4,8 @@ from datetime import datetime, timedelta, timezone
 from pathlib import Path
 import re
 import runpy
+import shutil
+import subprocess
 import tempfile
 import unittest
 from unittest import mock
@@ -619,6 +621,59 @@ class CardRun(unittest.TestCase):
         self.other_start(jobId="claude-mentor-2")
         self.other_start(jobId="claude-mentor-2", event="finish")
         self.assert_result(self.run_card(), "program", 0, seconds=12.0, program_status=0)
+
+    def test_queued_turn_row_is_not_an_overlap_but_a_running_foreign_job_is(self):
+        # S13-01: our own turn reservation made every M4 receipt report an overlap.
+        self.other_start(project="gcc-knc", jobId="claude-turn-s13-m4", event="queued", cores=[],
+                         queuedTime=datetime.now(timezone.utc).isoformat())
+        self.other_start(jobId="wrf-running", timingValid=False, cores=[0])
+        result = self.run_card()
+        self.assert_result(result, "program", 0, seconds=12.0, program_status=0)
+        self.assertEqual(result["overlapping_jobs"], ["wrf-running"])
+
+    def test_descendants_of_our_helpers_are_ours_but_a_foreign_sleep_is_not(self):
+        run_dir = "/tmp/claude/claude-" + "a" * 32
+        process = lambda pid, ppid, name, exe="", cwd="": dict(pid=pid, ppid=ppid, name=name,
+                                                               exe=exe, cwd=cwd)
+        snapshot = {"own_pids": ["500", "501"], "processes": [
+            process("516", "500", "sleep"),  # The watchdog's sleep shows no exe or cwd.
+            process("601", "501", "awk"), process("602", "601", "sh"), process("603", "602", "sleep"),
+            process("610", "501", "claude-program", run_dir + "/claude-program", run_dir),
+            process("611", "610", "worker", "/bin/busybox", "/"),
+            process("699", "1", "sh", "/bin/busybox", "/root"),
+            process("700", "699", "sleep", "/bin/busybox", "/root"),
+            process("701", "1", "sleep")]}
+        foreign = self.runner["foreign_processes"](snapshot, run_dir, set())
+        self.assertEqual([p["pid"] for p in foreign], ["699", "700", "701"])
+
+    @unittest.skipUnless(shutil.which("sh"), "needs a POSIX shell")
+    def test_card_listing_reports_control_shell_children_so_their_sleep_is_ours(self):
+        proc = self.directory / "proc"
+        (proc / "sys/kernel/random").mkdir(parents=True)
+        (proc / "sys/kernel/random/boot_id").write_text(BOOT + "\n")
+        (proc / "cpuinfo").write_text("processor : 0\ncore id : 0\n\n")
+        (proc / "meminfo").write_text("MemFree: 4000000 kB\n")
+        # No exe or cwd links: like the card's listing, ownership cannot come from paths.
+        for pid, ppid, name in ((51, 50, "sleep"), (60, 1, "sh"), (61, 60, "sleep")):
+            (proc / str(pid)).mkdir()
+            (proc / str(pid) / "status").write_bytes(b"Name:\t%s\nPPid:\t%d\n" % (name.encode(), ppid))
+            (proc / str(pid) / "comm").write_bytes(name.encode() + b"\n")
+        (proc / "50").mkdir()
+        (proc / "50/comm").write_bytes(b"claude-watchdog\n")
+        remote = (ROOT / "tools/card_run_remote.sh").read_text(encoding="utf8")
+        script = remote.replace("/proc/", proc.as_posix() + "/") + (
+            # The watchdog is a child of the control shell, which only the shell itself knows.
+            "\nprintf 'Name:\\tclaude-watchdog\\nPPid:\\t%%s\\n' \"$$\" > '%s/50/status'\n"
+            "run_dir=/tmp/claude/claude-%s\nsnapshot\n" % (proc.as_posix(), "a" * 32))
+        answer = subprocess.run([shutil.which("sh")], input=script.encode("utf8"), capture_output=True,
+                                timeout=60)
+        self.assertEqual(answer.returncode, 0, answer.stderr)
+        session = object.__new__(self.runner["SSHSession"])
+        session.boot_id = None
+        session.rpc = mock.Mock(return_value=answer.stdout.rstrip(b"\n"))
+        snapshot = session.snapshot(timeout=1)
+        foreign = self.runner["foreign_processes"](snapshot, "/tmp/claude/claude-" + "a" * 32, set())
+        self.assertEqual(sorted(p["pid"] for p in foreign), ["60", "61"])
 
     def test_slow_staging_is_an_infrastructure_failure_and_closes_our_row(self):
         self.transport.stage_seconds = 130.0  # Past the 120 s default.

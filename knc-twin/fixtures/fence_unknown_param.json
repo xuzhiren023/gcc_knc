@@ -1,0 +1,75 @@
+{
+ "schema": "knc-twin.kernel/1",
+ "name": "fence_unknown_param",
+ "description": "a lock-prefixed add used as a publication fence (timing-only, so use --trace-source static; addr fields supply the addresses); latency.fence is unknown in every bundled profile, so simulate stops with missing_parameter instead of guessing",
+ "unit_of_work": {
+  "description": "whole kernel",
+  "count": 1
+ },
+ "init": {
+  "memory": [
+   {
+    "addr": "0x4000",
+    "u32": [
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0
+    ]
+   }
+  ],
+  "registers": {
+   "rax": "0x4000",
+   "zmm0": {
+    "u32_broadcast": 7
+   }
+  }
+ },
+ "streams": [
+  {
+   "context": 0,
+   "instructions": [
+    {
+     "id": "st",
+     "op": "vmovaps",
+     "ops": [
+      {
+       "base": "rax"
+      },
+      "zmm0"
+     ],
+     "addr": {
+      "start": "0x4000"
+     }
+    },
+    {
+     "id": "fence",
+     "op": "lock_add",
+     "ops": [
+      {
+       "base": "rax",
+       "disp": 64
+      },
+      0
+     ],
+     "width": 32,
+     "addr": {
+      "start": "0x4040"
+     }
+    }
+   ]
+  }
+ ]
+}

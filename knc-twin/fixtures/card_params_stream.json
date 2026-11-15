@@ -1,0 +1,11 @@
+{
+ "schema": "knc-twin.analytic-params/1",
+ "description": "card scenario for a bandwidth-bound stream: 16 M units of 128 bytes read-modify-write, one barrier",
+ "units": 16777216,
+ "bytes_per_unit": 128,
+ "traffic_type": "read_modify_write",
+ "per_core_cycles_per_unit": 6.0,
+ "barriers": 1,
+ "barrier_kind": "tree",
+ "imbalance_factor": 1.05
+}

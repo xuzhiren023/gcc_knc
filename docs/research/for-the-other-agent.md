@@ -4,6 +4,26 @@ The owner asked on 2026-11-03 to be told of anything worth sharing with the othe
 (GPT, PhiWeather's WRF-to-IMCI translation). The lead adds items here as they are found; the owner
 passes on what they choose. Each item says how it was shown. Newest first.
 
+## 2026-11-15: GPT Pro essay items for PhiNix, PhiChat and PhiWeather (plan stage, owner relays)
+
+Source: owner-provided GPT Pro essays, triaged in `docs/research/gpt-pro-2026-11-15-triage.md` (row ids below).
+Proposals only; evidence status is in that file. Nothing here was measured by GCC-KNC.
+
+| For | Row | Item |
+| --- | --- | --- |
+| PhiNix | P1 | Keep the existing KNC Linux kernel first; change kernel or driver only for a measured limit (migration, page faults, translation, interrupts, transport, missing PMU events). |
+| PhiNix | P2 | Four separate schedulers (compiler, KNC thread picker, user-space runtime, Linux); latency hiding belongs to compiler and runtime, not a new Linux scheduler. |
+| PhiNix | P3 | Affinity, page preparation, huge pages and interrupt placement through existing OS controls first (see S12-16 playbook). |
+| PhiNix | P5 | Four agent tracks: compiler, compute library, user-space runtime, measurement/platform; the measurement track owns kernel investigation. |
+| PhiChat | Q1 | Resolve quantization format, shapes, strides and alignment at load or dispatch time, outside hot kernels. |
+| PhiChat | Q2 | Reuse activation preparation across Q/K/V and gate/up projections; multi-row kernels (GCC-KNC S14-08 will measure the kernel side). |
+| PhiChat | Q3 | RMSNorm before a linear layer: y = r * (W (gamma . x)) + b lets the norm reduction and the matvec run independently (FlashNorm); not bitwise identical. |
+| PhiChat | Q4 | Tiled online-softmax attention for prefill, a separate decode kernel; profile LFM2.5's short-conv and state blocks explicitly. |
+| PhiChat | Q5-Q6 | Exact speculative decoding (host draft possible; hybrid state rollback), lookahead decoding, continuous batching; report throughput and single-request latency separately. |
+| PhiChat | Q7 | Split decode time into activation prep, unpack, accumulate, attention/state, sync, dispatch at fixed model, quant, context and batch. |
+| PhiWeather | W1 | Profile WRF hot regions by control uncertainty, dependency depth, independence, memory behaviour, visibility, numeric contract and runtime overhead, not as one "science" class. |
+| PhiWeather | W2 | Vectorize strict column reductions across independent cells instead of splitting a sum. |
+
 ## 2026-11-15: multi-job card windows (S12-36)
 
 Host fake-ledger tests show that `tools/card_run --benchmark` keeps an open turn

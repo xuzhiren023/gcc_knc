@@ -83,7 +83,9 @@ snapshot() {
         done 2>/dev/null < "$proc/status"
         # The control shell and its snapshot utilities are ours even before cd.
         # Match identities, never names that a foreign process could also use.
-        [ "$proc_ppid" != "$$" ] || continue
+        # Name its other children (watchdog, launch shells): their descendants,
+        # such as the watchdog's sleep, are ours on the host.
+        if [ "$proc_ppid" = "$$" ]; then printf 'OWN\t%s\n' "$proc_pid"; continue; fi
         [ "$proc_pid" != 2 ] && [ "$proc_ppid" != 2 ] || continue
         printf 'IDENT\t%s\t%s\n' "$proc_pid" "$proc_ppid"
         set -- "$@" "$proc/exe" "$proc/cwd"
@@ -94,7 +96,7 @@ snapshot() {
     if [ "$#" -gt 0 ]; then LC_ALL=C ls -ldnq -- "$@" 2>/dev/null || :; fi
     } | awk '
         BEGIN { FS = "\t" }
-        /^CPU\t|^MEM\t/ { print; next }
+        /^CPU\t|^MEM\t|^OWN\t/ { print; next }
         /^IDENT\t/ { ppid[$2] = $3; next }
         /^l/ && match($0, /\/[0-9]+\/(exe|cwd) -> /) {
             split(substr($0, RSTART, RLENGTH), link, "/")
