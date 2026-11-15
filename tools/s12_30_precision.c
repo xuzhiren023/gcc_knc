@@ -1,3 +1,55 @@
+#ifdef PHASE2_T1
+/* Compiler-only probes: no hints in the two eligible reductions.  The
+   available bound is the current row/end, never an assumed CSR nnz. */
+void sparse_rows(int rows, const int *row, const int *col,
+                 const double *val, const double *x, double *out)
+{
+  for (int i = 0; i < rows; ++i) {
+    double sum = 0;
+    for (int j = row[i]; j < row[i+1]; ++j)
+      sum += val[j] * x[col[j]];
+    out[i] = sum;
+  }
+}
+double sparse_slice(int begin, int end, const int *col,
+                    const double *val, const double *x)
+{
+  double sum = 0;
+  for (int j = begin; j < end; ++j)
+    sum += val[j] * x[col[j]];
+  return sum;
+}
+double volatile_indices(int end, const volatile int *col,
+                        const double *val, const double *x)
+{
+  double sum = 0;
+  for (int j = 0; j < end; ++j)
+    sum += val[j] * x[col[j]];
+  return sum;
+}
+/* An early exit makes even an in-row speculative ordinary index load unsafe. */
+double sentinel_slice(int end, const int *col,
+                      const double *val, const double *x)
+{
+  double sum = 0;
+  for (int j = 0; j < end; ++j) {
+    if (val[j] == 0) break;
+    sum += val[j] * x[col[j]];
+  }
+  return sum;
+}
+/* Scanner controls: distinguish an indirect hint from a stream hint. */
+void explicit_indirect(int j, int end, const int *col, const double *x)
+{
+  if ((long long)end - j > 32)
+    __builtin_prefetch(x + col[j+32], 0, 3);
+}
+void explicit_stream(int j, const int *col, const double *x)
+{
+  __builtin_prefetch(col + j + 32, 0, 3);
+  __builtin_prefetch(x + j + 32, 0, 3);
+}
+#else
 /* S12-30 phase-one harness. Compile DRIVER and kernels as separate TUs.
    No LTO: all matrix data is generated at run time in the driver.
    nnz bounds the accessible col/val arrays, independently of the row slice. */
@@ -433,3 +485,4 @@ int main(int argc, char **argv)
   return failures ? 1 : 0;
 }
 #endif
+#endif /* PHASE2_T1 */

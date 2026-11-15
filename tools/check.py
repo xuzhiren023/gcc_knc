@@ -29,6 +29,8 @@ PACKED = re.compile(r'\bv(?:addn?|subr?|mul|div|max|min|sqrt|rcp(?:23)?|rsqrt(?:
 # Each entry supplies its CLI help and handlers for the tiers it selects.
 # Imports stay lazy so T0 and source-only selections need no probe modules.
 SELECTIONS = {
+    'sparse_indirect': ('S12-30 strict sparse reductions and bounds-safe indirect prefetch', {
+        't1': lambda runner: importlib.import_module('s12_30_precision').t1(runner)}),
     'complex_broadcast_align': ('S12-29 complex-float broadcast memory alignment', {
         't1': lambda runner: runner.t1_sources([runner.source_dir / 'knc-complex-broadcast-align.c'])}),
     'stencil_reload': ('S11-27 Fortran stencil reload scratch bounds', {
@@ -408,6 +410,8 @@ class Runner:
             native_tls.t1(self)
             import s10_13_checks
             s10_13_checks.t1(self)
+            import s12_30_precision
+            s12_30_precision.t1(self)
         source = (self.fixture / 'loops.c').read_text()
         for mode in ('off', 'fast'):
             asm = self.out / ('loops-' + mode + '.s')
