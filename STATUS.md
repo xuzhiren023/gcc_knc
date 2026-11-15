@@ -1,10 +1,10 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-14 21:33.
+Updated automatically at every ticket change. Last update: 2026-11-14 21:35.
 
-**Next: the tech lead, on S12-30.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: the tech lead, on S12-21.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
-Current tickets: `[##################--]` 230 of 246
+Current tickets: `[##################--]` 230 of 248
 
 ## Milestones
 
@@ -14,7 +14,7 @@ Current tickets: `[##################--]` 230 of 246
 | M1 | Mixed native code | Done | 43 of 43 tickets |
 | M2 | Useful vector target | Done | 51 of 51 tickets |
 | M3 | Runtimes | Done | 48 of 48 tickets |
-| M4 | Broad optimization | In progress | 48 of 64 tickets |
+| M4 | Broad optimization | In progress | 48 of 66 tickets |
 | M5 | Program corpus | Not started | Not planned in detail yet |
 | M6 | Release | Not started | Not planned in detail yet |
 
@@ -101,7 +101,7 @@ Current tickets: `[##################--]` 230 of 246
 | S12-18 | Double-precision vector exp, log and pow ran slower than scalar libm on the card (0.82x, 0.63x, 0.49x) - confirm with valid batches, then fix the library or stop the vectorizer calling them where they lose | Done | The vector math benchmark now always times valid 50-200 ms batches, and the valid card runs show double exp... |
 | S12-19 | Profile-guided missed-vectorization triage - join hot loops with the vectorizer's reasons and observed strides/masks, so tuning targets what is hot and fixable | Done | tools/vec_triage.py now ranks each development program's hot loops by sampled time with GCC's vectorizer ve... |
 | S12-20 | libknc_vmath accuracy and exception contract, with an independent validation design (rounding modes, special values, flags, scalar fallback) | draft |  |
-| S12-21 | Scheduling model for M4's serial runs - measure density-1 tuning and the integer-multiply cost against today's density-4 defaults (S12-14 B02, B04, B05) | lead | Interactive lead needed; diff reviewed (one imul-cost hunk, scanner fix fine). (1) Rebase gcc s12/S12-21 on... |
+| S12-21 | Scheduling model for M4's serial runs - measure density-1 tuning and the integer-multiply cost against today's density-4 defaults (S12-14 B02, B04, B05) | Question for the tech lead | Lead 21:36: T2 run by the lead on lane gcc2: 36 PASS, 0 FAIL (log s12_21_t2-20261114-213433.log); the S5-21... |
 | S12-22 | Low-risk corrections from the S12-14 audit - wrong comments and citations (N01-N09) and the far-prefetch-distance range bug (B10) | Done | The audit's comment and citation fixes are in GCC-KNC and the far prefetch distance can no longer be set eq... |
 | S12-23 | Floating-point environment correctness on KNC - fix the underflow probe that cannot tell flushing from rounding, and handle x87 erratum CD28 (S12-14 N06, N07, B16, B17) | Done | GCC-KNC's floating-point environment handling is now correct on the card: x87 exception clearing uses the C... |
 | S12-24 | ICE in vect_transform_stmt (tree-vect-stmts.cc:13381) on WRF's REMEZ at -mphinix (-O3 -march=knc) | In progress | The WRF REMEZ compiler crash is now reproduced by a 10-line k=-k loop test (int and unsigned char) that fai... |
@@ -112,6 +112,8 @@ Current tickets: `[##################--]` 230 of 246
 | S12-29 | Wrong code - vbroadcastsd reads a 4-byte-aligned SCmode constant (complex float) straight from the constant pool and faults on the card (gcc.c-torture pr38969.c, regression from S11-27) | Done | The pr38969 crash from S11-27 is fixed: GCC-KNC no longer broadcasts a vector from memory aligned below its... |
 | S12-30 | Sparse indexed reductions faster than today - vector gather of products with an ordered scalar sum, and indirect prefetch, for CSR-style loops (NPB-CG, HPCG) | Question for the tech lead | 429c7653: A/B/A+B staged; target build/lint PASS; host model 599300 checks PASS. Log: .work/_state/logs/s12... |
 | S12-31 | HPCG is 1.8% slower with GCC-KNC than with GCC 5.1.1 - find the cause and make it faster (owner: never slower than 5.1.1) | lead | Needs one card run by the interactive lead. Phase 1 at 6b413629 reviewed and sound; staged binary exists. I... |
+| S12-32 | ICE (reload) in gcc.c-torture O3-vect-pr32243.c on the installed GCC-KNC, found by the S12-21 torture sweep | Not started |  |
+| S12-33 | T2 writes its short-vector test binaries into a per-run folder, so Claude, Codex and lead runs never block each other | Not started |  |
 | S13-01 | M4 final gate - stage the ADR-0015 gate run at the final head (17 programs, held-out unsealed, six pairs, three profiles) | draft |  |
 | S13-02 | Libgomp per-region thread density - choose 1-4 workers per core per parallel region instead of once per program | draft |  |
 | S13-03 | M4 retrospective - what we did wrong, what worked, and the practice changes carried into the next milestone and the agent-team skill | draft |  |
@@ -271,6 +273,7 @@ Current tickets: `[##################--]` 230 of 246
 
 ## Recent activity
 
+- 2026-11-14 21:35 **S12-21** lead resume: Lead 21:36: T2 run by the lead on lane gcc2: 36 PASS, 0 FAIL (log s12_21_t2-20261114-213433.log); the S5-21 file is fixed for good by S12-33. No re...
 - 2026-11-14 21:33 **S12-21** lead defer: Interactive lead needed; diff reviewed (one imul-cost hunk, scanner fix fine). (1) Rebase gcc s12/S12-21 onto knc 2e70e4115e2 (engineer: Permission...
 - 2026-11-14 21:32 **S12-30** engineer ask: 429c7653: A/B/A+B staged; target build/lint PASS; host model 599300 checks PASS. Log: .work/_state/logs/s12_30_phase1_routes-20261114-213007.log. A...
 - 2026-11-14 21:31 **S12-21** engineer ask: df7f240e: T0 passed; corrected T1 IMUL scan is red on installed/green on gcc2, other T1 passed. Torture: 8012 cases, 0 ICEs. Vector O3-vect-pr32243...
@@ -278,13 +281,12 @@ Current tickets: `[##################--]` 230 of 246
 - 2026-11-14 21:19 **S12-31** lead defer: Needs one card run by the interactive lead. Phase 1 at 6b413629 reviewed and sound; staged binary exists. In our exclusive card turn run the comman...
 - 2026-11-14 21:18 **S12-30** engineer red: 570710ae: replacement red; target build/lint PASS. Host exit 1: nine missing A/B/A+B slots only; 60,458 scalar/reference/bounds checks pass. Both s...
 - 2026-11-14 21:14 **S12-31** engineer ask: Phase 1 at 6b413629, see docs/research/s12-31-hpcg.md. Loss is only SpMV (+2.1%) and SymGS/MG (+3.9%). Likely cause, unproven: -falign-loops=16 pad...
-- 2026-11-14 20:59 **S12-30** lead changes: Red not accepted: wrong oracle, and nothing in Phase 1 can turn it green. (1) Route A is eligible. ADR-0003 item 2 and DEVELOPMENT_CYCLE Oracles: x...
 
 ## Cost
 
 - From the script, engineer: 657 sessions, 1299.3M input tokens
 - From the script, lead: 434 sessions, 121.4M input tokens
-- Started by hand, Claude: 12 sessions, 3361.2M input tokens
+- Started by hand, Claude: 12 sessions, 3364.1M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
