@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-15 10:08.
+Updated automatically at every ticket change. Last update: 2026-11-15 10:33.
 
-**Next: GPT-6.1, on S12-09 (Sprint 12 batch check - integrated themes at the final Sprint 12 head, regression evidence, optional modes frozen).** Run `python tools/dispatch.py`, or ask the tech lead to.
+**Next: the tech lead, on S12-09.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[##################--]` 241 of 258
 
@@ -89,7 +89,7 @@ Current tickets: `[##################--]` 241 of 258
 | S12-06 | M4 theme 1 - strict scalar FP conversions and call boundaries (NPB-EP transform and log path, NPB-IS randlc) | Done | Theme 1 (scalar FP conversions and calls in NPB-EP/IS) closed with no compiler change: a card diagnostic sh... |
 | S12-07 | M4 theme 2 - indexed-load scheduling with strict sparse reduction (NPB-CG) | Done | Theme 2 (sparse indexed loads in NPB-CG/HPCG) closed with no compiler change: GCC-KNC is already at parity ... |
 | S12-08 | M4 theme 3 - dependency-preserving scalar updates and register pressure in dense loops (PB-ludcmp, x87 stack traffic) | Done | Theme 3 (register pressure in dense loops) closed with no compiler change: PB-ludcmp's extra x87 stack traf... |
-| S12-09 | Sprint 12 batch check - integrated themes at the final Sprint 12 head, regression evidence, optional modes frozen | In progress | Target libraries rebuilt from scratch at knc b2ce6a9eebf (old objects moved to .work/_shared/gcc-build/targ... |
+| S12-09 | Sprint 12 batch check - integrated themes at the final Sprint 12 head, regression evidence, optional modes frozen | Question for the tech lead | c31011cb: GCC b2ce6a9eebf; records tests/baseline/S12-09-*. Torture/vect: zero ICEs, no new failures. Drill... |
 | S12-10 | Research - what KNC hardware and runtime knowledge are we still missing to tune GCC-KNC, the OS runtime and broad optimization, and where is it documented? | Done | KNC reference-gap research done: 16 gaps ranked, 32 primary sources (98 MB, outside git) with page-cited fa... |
 | S12-11 | Research - best practices for a dual Xeon E5-2690 v3 + Xeon Phi (KNC) workstation (HP Z840) for LLM inference and scientific computing | Done | Z840 dual E5-2690 v3 + Xeon Phi setup guide done: slot/BIOS/memory/power/cooling checklist, MPSS-on-modern-... |
 | S12-12 | Stage S12-10's residual-gap card experiments as one combined Sprint 12 diagnostic batch (PMU access, prefetch, page backing, libm route, branches, allocator) | Done | The six follow-up card experiments (counter access, prefetch, page backing, libm route, branches, allocator... |
@@ -283,6 +283,7 @@ Current tickets: `[##################--]` 241 of 258
 
 ## Recent activity
 
+- 2026-11-15 10:33 **S12-09** engineer ask: c31011cb: GCC b2ce6a9eebf; records tests/baseline/S12-09-*. Torture/vect: zero ICEs, no new failures. Drill: 14/4 conflicts. Fixed T0/T1 adapter fa...
 - 2026-11-15 10:10 **S13-02** lead note: Owner 2026-11-15 ("yes delay to M5"): deferred to M5 (sprint s14). The M4 primary score is serial -O2, so this does not affect the M4 target.
 - 2026-11-15 10:10 **S12-09** lead note: Target libraries rebuilt from scratch at knc b2ce6a9eebf (old objects moved to .work/_shared/gcc-build/target-libs-pre-s12-09-20261115; new libgcc_...
 - 2026-11-15 09:50 **S12-42** lead note: Deferred to M5 (sprint s14) by the owner's 2026-11-15 scope cut ("we are scope creeping the entire Sprint 12 ... make sure the whole Sprint 12 can ...
@@ -290,16 +291,15 @@ Current tickets: `[##################--]` 241 of 258
 - 2026-11-15 09:50 **S12-40** lead note: Deferred to M5 (sprint s14) by the owner's 2026-11-15 scope cut ("we are scope creeping the entire Sprint 12 ... make sure the whole Sprint 12 can ...
 - 2026-11-15 09:50 **S12-38** lead note: Deferred to M5 (sprint s14) by the owner's 2026-11-15 scope cut ("we are scope creeping the entire Sprint 12 ... make sure the whole Sprint 12 can ...
 - 2026-11-15 09:50 **S12-34** lead note: Deferred to M5 (sprint s14) by the owner's 2026-11-15 scope cut ("we are scope creeping the entire Sprint 12 ... make sure the whole Sprint 12 can ...
-- 2026-11-15 09:50 **S12-30** lead note: Deferred to M5 (sprint s14) by the owner's 2026-11-15 scope cut ("we are scope creeping the entire Sprint 12 ... make sure the whole Sprint 12 can ...
 
 ## Cost
 
 - From the script, engineer: 700 sessions, 1451.6M input tokens
 - From the script, lead: 468 sessions, 133.3M input tokens
-- Started by hand, Claude: 12 sessions, 3590.0M input tokens
+- Started by hand, Claude: 12 sessions, 3590.7M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 36.0 GiB of 100 GiB. 119 GiB free on the drive.
+The project uses 36.1 GiB of 100 GiB. 123 GiB free on the drive.
