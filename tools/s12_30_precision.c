@@ -21,8 +21,124 @@ void FN(scalar)(ARGS)
     out[i] = sum;
   }
 }
-/* RED: absent routes are failures, not scalar fallbacks. */
-kernel const FN(routes)[4] = {FN(scalar), NULL, NULL, NULL};
+/* Fixed lookahead: 360 estimated instructions / about 11 instructions per
+   scalar nonzero, rounded to 32. This is a hypothesis, not measured latency;
+   see docs/research/knc-costs.md and s12-30-phase1.md. */
+#define DISTANCE 32
+static inline void indirect(int j, int nnz, const int *col, const double *x)
+{
+  if (nnz-j > DISTANCE) {
+    const double *future = x + col[j+DISTANCE];
+#ifdef HOST_MODEL
+    __builtin_prefetch(future,0,3);
+#else
+    /* R27 p.641, verified architectural hint semantics (early KNC spec,
+       not a production measurement): only the hint may address protected x. */
+    __asm__ volatile ("vprefetch0 (%0)" : : "r"(future));
+#endif
+  }
+}
+void FN(prefetch)(ARGS)
+{
+  for (int i = 0; i < rows; ++i) {
+    double sum = 0;
+    for (int j = row[i]; j < row[i+1]; ++j) {
+      indirect(j,nnz,col,x);
+      sum += val[j] * x[col[j]];
+    }
+    out[i] = sum;
+  }
+}
+
+#ifdef HOST_MODEL
+/* Fixture model only. This code is never linked into a card binary. */
+static void FN(products)(const int *c, const double *v, const double *x,
+                         double *p, int n)
+{
+  for (int i = 0; i < n; ++i) {
+    volatile double rounded = v[i] * x[c[i]];
+    p[i] = rounded;
+  }
+}
+#else
+#define STR_(s) #s
+#define STR(s) STR_(s)
+/* One call handles up to 16 products as two eight-FP64 vectors. The same
+   file-scope inline assembly is assembled for donor/off, KNC/off and fast.
+   A regular call exposes register clobbers even to the scalar-only donor.
+   p has 64-byte alignment and space for 16 doubles; 1 <= n <= 16.
+   R27 pp.297-299,349-354,361-366,399-401: verified instruction semantics,
+   early KNC specification, not a production performance measurement.
+   R03 pp.15-22: verified ABI, independent of production stepping. */
+extern void FN(products)(const int *, const double *, const double *, double *, int);
+__asm__(
+  ".text\n.local " STR(FN(products)) "\n"
+  ".type " STR(FN(products)) ",@function\n"
+  STR(FN(products)) ":\n"
+  "movq %rcx,%r11\n"
+  "1:\n"
+  "movl $8,%ecx\n"
+  "cmpl %ecx,%r8d\n"
+  "jge 5f\n"
+  "movl %r8d,%ecx\n"
+  "5:\n"
+  "movl $1,%r9d\n"
+  "shll %cl,%r9d\n"
+  "decl %r9d\n"
+  "kmov %r9d,%k1\n"
+  "kmov %r9d,%k2\n"
+  "vloadunpackld (%rdi),%zmm0{%k1}\n"
+  /* Do not issue a high-line load unless that line contains active data. */
+  "movl %edi,%eax\n"
+  "andl $63,%eax\n"
+  "leal (%rax,%rcx,4),%eax\n"
+  "cmpl $64,%eax\n"
+  "jle 2f\n"
+  "vloadunpackhd 64(%rdi),%zmm0{%k1}\n"
+  "2:\n"
+  "vloadunpacklpd (%rsi),%zmm2{%k1}\n"
+  "movl %esi,%eax\n"
+  "andl $63,%eax\n"
+  "leal (%rax,%rcx,8),%eax\n"
+  "cmpl $64,%eax\n"
+  "jle 3f\n"
+  "vloadunpackhpd 64(%rsi),%zmm2{%k1}\n"
+  "3:\n"
+  "vgatherdpd (%rdx,%zmm0,8),%zmm1{%k2}\n"
+  "jknzd 3b,%k2\n"
+  "vmulpd %zmm2,%zmm1,%zmm1{%k1}\n"
+  "vmovapd %zmm1,(%r11){%k1}\n"
+  "subl $8,%r8d\n"
+  "jle 4f\n"
+  "addq $32,%rdi\n"
+  "addq $64,%rsi\n"
+  "addq $64,%r11\n"
+  "jmp 1b\n"
+  "4: ret\n"
+  ".size " STR(FN(products)) ",.-" STR(FN(products)) "\n"
+);
+#endif
+
+static __attribute__((always_inline)) inline void vector_fold(ARGS, int pf)
+{
+  double p[16] __attribute__((aligned(64)));
+  for (int i = 0; i < rows; ++i) {
+    /* Preserve the x87 accumulator across helper calls without FP64 spills. */
+    long double sum = 0;
+    for (int j = row[i]; j < row[i+1];) {
+      int n = row[i+1]-j;
+      if (n > 16) n = 16;
+      if (pf) for (int k = 0; k < n; ++k) indirect(j+k,nnz,col,x);
+      FN(products)(col+j,val+j,x,p,n);
+      for (int k = 0; k < n; ++k) sum += p[k];
+      j += n;
+    }
+    out[i] = (double)sum;
+  }
+}
+void FN(gather)(ARGS) { vector_fold(rows,row,col,val,x,out,nnz,0); }
+void FN(combined)(ARGS) { vector_fold(rows,row,col,val,x,out,nnz,1); }
+kernel const FN(routes)[4] = {FN(scalar), FN(gather), FN(prefetch), FN(combined)};
 
 #ifdef SEED_TREES
 /* Deliberate order mutations, never timed. Volatile stores impose the
@@ -176,7 +292,7 @@ static void bounds_cases(void)
     double *x = guarded(page,page,&mx);
     x[0] = 1;
     for (int j = 0; j < nnz; ++j) { c[j] = j < n ? 0 : page/sizeof *x; v[j] = 1; }
-    for (int t = 0; t < 2; ++t) for (int k = 0; k < 4; ++k) if (tables[t][k]) {
+    for (int t = 0; t < 3; ++t) for (int k = 0; k < 4; ++k) if (tables[t][k]) {
       fflush(stdout);
       pid_t child = fork();
       if (child < 0) die("fork");
@@ -229,6 +345,19 @@ static double timed(kernel fn, int repeat, int rows, int *row, int *c,
   for (int j = 0; j < repeat; ++j) fn(rows,row,c,v,x,out,row[rows]);
   double elapsed = now()-start; sink = out[rows-1]; return elapsed;
 }
+static double sample_time(kernel fn, int *batch, uint64_t *calls, int rows,
+                          int *row, int *c, double *v, double *x, double *out)
+{
+  double seconds = 0;
+  *calls = 0;
+  do {
+    double part = timed(fn,*batch,rows,row,c,v,x,out);
+    seconds += part;
+    *calls += *batch;
+    if (part < 0.25 && *batch < 33554432) *batch *= 2;
+  } while (seconds < 0.5);
+  return seconds;
+}
 static void performance(void)
 {
   for (int memory = 0; memory < 2; ++memory) for (int length = 13; length <= 27; length += 14)
@@ -253,24 +382,24 @@ static void performance(void)
         for (int r = 0; r < rows; ++r) compare("timing-input",t,k,length,out[r],want[r],0);
       }
       if (failures != before) return;
-      int repeat = 1;
-      double elapsed;
-      do {
-        elapsed = timed(knc_routes[0],repeat,rows,row,c,v,x,out);
-        if (elapsed < 0.03 && repeat < 1048576) repeat *= 2; else break;
-      } while (1);
-      printf("CASE %s n=%d rows=%d rhs_bytes=%zu packed=%d repeat=%d\n",
-             memory ? "memory-sized" : "cache-sized",length,rows,nx*sizeof *x,packed,repeat);
-      for (int sample = 0; sample < 3; ++sample) {
-        double seconds[8];
+      int batch[8] = {1,1,1,1,1,1,1,1};
+      printf("CASE %s n=%d rows=%d rhs_bytes=%zu packed=%d min_seconds=0.5 samples=5\n",
+             memory ? "memory-sized" : "cache-sized",length,rows,nx*sizeof *x,packed);
+      for (int sample = 0; sample < 5; ++sample) {
+        double seconds[8], per_call[8];
+        uint64_t calls[8];
         for (int j = 0; j < 8; ++j) {
           int id = sample%2 ? 7-j : j;
-          seconds[id] = timed(tables[id/4][id%4],repeat,rows,row,c,v,x,out);
+          seconds[id] = sample_time(tables[id/4][id%4],&batch[id],&calls[id],
+                                    rows,row,c,v,x,out);
+          per_call[id] = seconds[id]/calls[id];
           for (int r = 0; r < rows; ++r) compare("post-timing",id/4,id%4,length,out[r],want[r],0);
         }
         for (int id = 0; id < 8; ++id)
-          printf("TIME sample=%d %s/%s seconds=%.9f speedup_vs_knc=%.6f speedup_vs_donor=%.6f\n",
-                 sample,compilers[id/4],routes[id%4],seconds[id],seconds[4]/seconds[id],seconds[0]/seconds[id]);
+          printf("TIME sample=%d %s/%s seconds=%.9f calls=%" PRIu64
+                 " seconds_per_call=%.12g speedup_vs_knc=%.6f speedup_vs_donor=%.6f\n",
+                 sample,compilers[id/4],routes[id%4],seconds[id],calls[id],per_call[id],
+                 per_call[4]/per_call[id],per_call[0]/per_call[id]);
       }
       free(row); free(c); free(v); free(x); free(out); free(want);
     }
@@ -284,6 +413,11 @@ int main(int argc, char **argv)
   rng = (uint32_t)seed;
   if (argc == 3 && strcmp(argv[2],"--seed-tree") && strcmp(argv[2],"--correctness")) return 2;
   printf("S12-30 seed=%u LDBL_MANT_DIG=%d fp-contract=off; fast=contraction-only\n",rng,LDBL_MANT_DIG);
+#ifdef HOST_MODEL
+  puts("HOST MODEL ONLY: scalar FP64 products, no IMCI execution, no performance evidence");
+#else
+  puts("NATIVE: A/A+B IMCI FP64 products, ordered x87 long-double fold; B lookahead=32");
+#endif
   if (LDBL_MANT_DIG < 64) { puts("INFRA long double oracle needs >=64 bits"); return 2; }
   if (argc == 3 && !strcmp(argv[2],"--seed-tree")) { order_cases(1); return failures ? 1 : 2; }
   alarm(1100);

@@ -1,8 +1,9 @@
-# S12-30: replacement phase-one red
+# S12-30: phase-one sparse routes
 
-2026-11-14. This replaces the product-precision gate rejected in the ticket.
-It is a test-only red, not a Route A/B implementation or a performance result.
-The same two test files are reused; no GCC source is changed.
+2026-11-14. The approved replacement red now has Route A, B and A+B
+implementations. Target build/lint and the host model pass. The single native
+correctness/timing run is staged for the lead; no native result or speedup is
+claimed. The same two test files are reused; no GCC source is changed.
 
 ## Numerical contract
 
@@ -19,9 +20,10 @@ command-line seed. The kernel ABI accepts a CSR row slice and an independent
 `nnz` bound on the accessible index/value arrays. All kernels receive the
 same arrays. Objects use `-O2 -ffp-contract=off`; a third kernel object uses
 `-ffp-contract=fast` only, not `-ffast-math`. Scalar baselines disable tree
-vectorization. The baseline fold uses x87, not a zmm lane. A and A+B have no
-fold yet: the intended green implementation will materialize FP64 products
-and fold them in order through x87; its actual assembly must be checked then.
+vectorization. The baseline fold uses x87, not a zmm lane. A and A+B
+materialize FP64 products and fold them in order through x87. Their C
+accumulator is long double so helper calls preserve the accumulator with
+80-bit stores, rather than introducing a double rounding at each chunk.
 
 The checks are:
 
@@ -41,15 +43,61 @@ The checks are:
   `PROT_NONE` page. Unguarded future index loads fault. A second case exposes
   64 valid future entries whose indices point into a protected x page;
   only the selected row is evaluated, so these x addresses are prefetch-only.
-  Each call runs in a child; a signal or wrong output is a failure.
+  Each call runs in a child; a signal or wrong output is a failure. All
+  three compiler tables, including contract-fast, run these bounds cases.
 
-The kernel tables deliberately contain null A/B/A+B slots for donor-off,
-knc-off and knc-contract-fast. Every missing slot is an explicit failure;
-there is no scalar substitute, xfail or success-on-missing behavior. Timing
-cannot run until all routes exist and correctness succeeds. This is the
-requested failing test before implementation.
+The approved red deliberately contained null A/B/A+B slots for donor-off,
+knc-off and knc-contract-fast. All slots now contain implementations; the
+missing-slot gate remains. Timing cannot run until all routes exist and
+correctness succeeds. No test or tolerance was weakened.
 
-## Host evidence
+## Implementations and static audit
+
+Route A processes up to 16 products per chunk using two eight-FP64 vector
+operations. The product helper is file-scope inline assembly identical under
+all three prefixes, including the donor. It loads the low active index/value
+lanes, conditionally loads a second cache line only when active data crosses
+the boundary, completes the masked gather with its retry loop, multiplies
+under the original active mask, and stores into a 64-byte-aligned product
+array. The C loop consumes only active products, in increasing source order.
+No padded source arrays or speculative ordinary tail loads are required.
+
+Instruction semantics were verified in R27 pp.297-299 (gather), pp.349-354
+and 361-366 (unpack loads), and pp.399-401 (multiply). This is the early KNC
+architectural specification, not a production measurement. Helper argument
+registers and clobbers follow R03 pp.15-22, verified ABI facts independent of
+production stepping. The normal helper call lets the scalar-only donor
+account for clobbers without pretending it has an IMCI register allocator.
+The call, product-array transfers and 80-bit accumulator spill/reload are
+included in timing; they are costs of this prototype, not a claimed lower
+bound for an inlined compiler implementation.
+
+Route B prefetches `x[col[j+32]]` only when `nnz-j > 32`. This guards the
+ordinary index load at the array end and permits lookahead across CSR rows.
+It never evaluates a future product. A+B issues the same hints for each
+active position before calling the vector helper for that chunk. R27 p.641
+verifies the non-faulting hint interface (early architectural specification,
+not a production measurement); ordinary col/val loads do not inherit it.
+The protected-x bounds fixture tests that distinction natively.
+
+Distance 32 is a fixed hypothesis from knc-costs.md's estimated 360-instruction
+prefetch latency: allowing roughly 11 instructions per scalar nonzero gives
+about 33 entries. Static inspection of the installed KNC output actually
+finds 7 instructions in the short scalar loop, and 16 on Route B's hint-taken
+path (including its guard and address generation). Thus 32 entries spans
+roughly 224 to 512 instructions in those bodies. This bracket is an inference,
+not a measured issue/latency conversion or a queue-capacity claim. Gather
+retry and chunked hint scheduling further change A+B's effective lead time.
+No distance sweep or stream hints were added to this one-run experiment.
+
+Generated donor/off, KNC/off and KNC/fast assembly was inspected under
+`.work/_shared/S12-30/*-precision.s`: A/A+B call the IMCI helper, accumulate
+with ordered `faddl`, preserve the running sum with `fstpt`/`fldt`, and store
+FP64 only at row output. B retains ordered scalar `fmull`/`faddp` and the
+guarded indirect hint. Fast enables contraction only; the explicit vector
+multiply and x87 fold cannot become an FMA. There is no zmm-lane fold.
+
+## Approved red evidence
 
 Ran once:
 
@@ -73,16 +121,33 @@ The host objects use the host compiler under all three labels; they do not
 establish donor-versus-GCC-KNC native agreement. No A/B/A+B correctness or
 speed result is claimed. Neither the native binary nor the timing path has run.
 
-## Single card entry point and green continuation
+## Current build and host model
+
+Ran through tools/run.py with the same staging command and name
+`s12_30_phase1_routes`. The first target assembly attempt rejected `cmovl`
+under `--march=k1om`; replacing it with a branch resolved that error without
+opaque encodings. The second attempt passed target compile/link/lint and
+the host model: **599,300 comparisons, zero failures, zero missing routes**.
+Log: `.work/_state/logs/s12_30_phase1_routes-20261114-213007.log`.
+The failed attempt is in `s12_30_phase1_routes-20261114-212930.log` in the
+same log directory.
+
+The host build is explicitly marked HOST_MODEL. It replaces only the IMCI
+product helper with scalar products rounded through volatile doubles and
+uses the host prefetch hint. It checks C control flow, ordered folds,
+fixtures and guards; it cannot validate IMCI masking, register behavior or
+card accuracy/performance. Native binaries never contain this substitute.
+The approved seeded-tree demonstration was not rerun.
+
+## Single card entry point and continuation
 
 Staged binary: `.work/_shared/S12-30/precision-gate`, argument `12345`.
 Lead launch: `tools/card_run --threads 1 --timeout 1150`, passing that binary
 and argument using the wrapper's normal interface. The program's alarm is
-1100 seconds, keeping the process budget below 20 minutes. At this red it
-reports missing routes and exits 1 before timing; the lead may review the
-host red without spending a card window. After implementing the routes,
-the same entry point performs correctness and the entire paired timing batch
-in one launch. It is explicitly single-core timing, pins to one granted CPU,
+1100 seconds, keeping the process budget below 20 minutes. It performs
+native correctness first and exits before timing on any failure. On success,
+the same entry point performs the entire paired timing batch in one launch.
+It is explicitly single-core timing, pins to one granted CPU,
 and prints the original affinity and chosen CPU. Other granted CPUs are not
 claimed to be idle siblings. Record actual sibling activity and resource/
 frequency profile with the lead-run output.
@@ -90,9 +155,16 @@ frequency profile with the lead-run output.
 The timing path has row lengths 13 and 27; 32 rows with a 32 KiB RHS, and
 8192 rows with a 16 MiB RHS; grouped-eight versus spread indices. Exact
 integer data permits bit comparisons before and after timed samples. Each
-case calibrates repetitions once against current GCC-KNC, then uses identical
-counts for every route/compiler, with three samples reversing execution order.
-It prints raw seconds and paired speedups against both baselines. These are
+case uses five samples reversing route/compiler execution order. Every
+route/compiler sample accumulates at least 0.5 seconds of timed kernel calls,
+doubling batch size when a batch is shorter than 0.25 seconds. Repetition
+counts can differ: raw seconds and actual call counts are printed, and
+paired speedups compare seconds per call against both scalar baselines.
+Identical rows and nonzeros are processed by every call. This prevents a
+faster route from receiving a sample below 0.5 seconds and keeps slow routes
+from dominating the 20-minute budget. There are 320 timed samples (160 seconds
+minimum); the alarm bounds unexpected runtime. A timeout is not a pass.
+These are
 cache-sized and memory-sized working sets, not measured cache-residence or
 GDDR traffic claims. The isolated CSR experiment is not whole-CG/HPCG evidence.
 
@@ -105,9 +177,9 @@ whole-solver effects. S12-10/R05 section V.D, Table II p.4 (reported here
 through the research notes; production-model 5110P, stepping unspecified)
 concerns complete gather loops and line/cache distributions, not a universal
 single-instruction cost. `knc-costs.md` explicitly labels the gather
-interpolation and prefetch-distance model as estimates. Green must choose
-and document the actual fixed lookahead from that model and its loop's
-instruction count; no distance or gain has been measured by this red.
+interpolation and prefetch-distance model as estimates. The fixed lookahead
+and actual scalar instruction counts are recorded above; no gain has yet
+been measured.
 
 Phase two remains conditional on at least a 5% gain over current GCC-KNC on
 realistic inputs. T0-T2, ICE sweeps and whole-program A/B staging belong to
