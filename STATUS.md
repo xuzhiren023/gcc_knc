@@ -1,10 +1,10 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-15 12:01.
+Updated automatically at every ticket change. Last update: 2026-11-15 12:05.
 
 **Next: GPT-6.1, on S12-09 (Sprint 12 batch check - integrated themes at the final Sprint 12 head, regression evidence, optional modes frozen).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
-Current tickets: `[##################--]` 241 of 266
+Current tickets: `[##################--]` 241 of 267
 
 ## Milestones
 
@@ -14,7 +14,7 @@ Current tickets: `[##################--]` 241 of 266
 | M1 | Mixed native code | Done | 43 of 43 tickets |
 | M2 | Useful vector target | Done | 51 of 51 tickets |
 | M3 | Runtimes | Done | 48 of 48 tickets |
-| M4 | Broad optimization | In progress | 59 of 63 tickets |
+| M4 | Broad optimization | In progress | 59 of 64 tickets |
 | M5 | Program corpus | In progress | 0 of 21 tickets |
 | M6 | Release | Not started | Not planned in detail yet |
 
@@ -127,6 +127,7 @@ Current tickets: `[##################--]` 241 of 266
 | S13-02 | Libgomp per-region thread density - choose 1-4 workers per core per parallel region instead of once per program | draft | Owner 2026-11-15 ("yes delay to M5"): deferred to M5 (sprint s14). The M4 primary score is serial -O2, so t... |
 | S13-03 | M4 retrospective - what we did wrong, what worked, and the practice changes carried into the next milestone and the agent-team skill | draft |  |
 | S13-04 | Clean source repositories for a fresh build - GCC-KNC fork and project code without build artifacts, plus a Linux-host build recipe the owner runs on the new workstation | draft |  |
+| S13-05 | model-first skill - a project Claude Code skill that models a hot region and its run-time lower bound before any optimization, plus one sourced KNC machine file | In progress |  |
 | S14-01 | 16- and 32-byte GCC generic vectors compile to IMCI in the low lanes of a zmm register, with a by-value ABI, so FFTW's generic-simd128/256 paths run vectorized | draft |  |
 | S14-02 | Software pipelining on KNC - probe whether SMS can run (a KNC counted-loop pattern) and whether it speeds up in-order loops | draft |  |
 | S14-03 | KNC scheduler model completeness - bypasses, folded memory operand cost, pairing by encoding, checked on post-RA schedules | draft |  |
@@ -304,7 +305,7 @@ Current tickets: `[##################--]` 241 of 266
 
 - From the script, engineer: 703 sessions, 1464.5M input tokens
 - From the script, lead: 471 sessions, 134.3M input tokens
-- Started by hand, Claude: 12 sessions, 3600.0M input tokens
+- Started by hand, Claude: 12 sessions, 3600.9M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
