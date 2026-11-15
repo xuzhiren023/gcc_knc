@@ -1,10 +1,10 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-15 16:35.
+Updated automatically at every ticket change. Last update: 2026-11-15 16:47.
 
 **Next: the tech lead, on S12-09.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
-Current tickets: `[##################--]` 242 of 268
+Current tickets: `[##################--]` 243 of 268
 
 ## Milestones
 
@@ -14,7 +14,7 @@ Current tickets: `[##################--]` 242 of 268
 | M1 | Mixed native code | Done | 43 of 43 tickets |
 | M2 | Useful vector target | Done | 51 of 51 tickets |
 | M3 | Runtimes | Done | 48 of 48 tickets |
-| M4 | Broad optimization | In progress | 60 of 65 tickets |
+| M4 | Broad optimization | In progress | 61 of 65 tickets |
 | M5 | Program corpus | In progress | 0 of 21 tickets |
 | M6 | Release | Not started | Not planned in detail yet |
 
@@ -128,7 +128,7 @@ Current tickets: `[##################--]` 242 of 268
 | S13-03 | M4 retrospective - what we did wrong, what worked, and the practice changes carried into the next milestone and the agent-team skill | draft |  |
 | S13-04 | Clean source repositories for a fresh build - GCC-KNC fork and project code without build artifacts, plus a Linux-host build recipe the owner runs on the new workstation | draft |  |
 | S13-05 | model-first skill - a project Claude Code skill that models a hot region and its run-time lower bound before any optimization, plus one sourced KNC machine file | Done | The model-first skill (.claude/skills/model-first with formulas, levers and a worked C7 example) and a sour... |
-| S13-06 | knc-twin trial and validation - run the KNC core twin on real GCC-KNC loop output, check it against characterization rows and held-out kernels we already timed, and report what it rejects or gets wrong | Waiting for review | Submitted by the lead: one knc-twin (0.2.1) with GCC .s converter, held-out harness (119 characterization r... |
+| S13-06 | knc-twin trial and validation - run the KNC core twin on real GCC-KNC loop output, check it against characterization rows and held-out kernels we already timed, and report what it rejects or gets wrong | Done | knc-twin 0.2.1 is in the repo: it reads GCC-KNC assembly, predicts one-core cycles and loop bounds, and is ... |
 | S14-01 | 16- and 32-byte GCC generic vectors compile to IMCI in the low lanes of a zmm register, with a by-value ABI, so FFTW's generic-simd128/256 paths run vectorized | draft |  |
 | S14-02 | Software pipelining on KNC - probe whether SMS can run (a KNC counted-loop pattern) and whether it speeds up in-order loops | draft |  |
 | S14-03 | KNC scheduler model completeness - bypasses, folded memory operand cost, pairing by encoding, checked on post-RA schedules | draft |  |
@@ -293,6 +293,7 @@ Current tickets: `[##################--]` 242 of 268
 
 ## Recent activity
 
+- 2026-11-15 16:47 **S13-06** lead approve: knc-twin 0.2.1 is in the repo: it reads GCC-KNC assembly, predicts one-core cycles and loop bounds, and is checked against card data (median 0.4-1....
 - 2026-11-15 16:35 **S13-06** engineer submit: Submitted by the lead: one knc-twin (0.2.1) with GCC .s converter, held-out harness (119 characterization rows, 11 compiled rows, 4 card cases), re...
 - 2026-11-15 16:35 **S13-06** lead answer: Merged; lead submits.
 - 2026-11-15 16:34 **S13-06** lead resume: Lead: knc-twin 0.2.0 (twin session) and this ticket's validation merged on twin/merge-s13-06 by a lead subagent, plus ADR-0013 rewording, labelled ...
@@ -300,13 +301,12 @@ Current tickets: `[##################--]` 242 of 268
 - 2026-11-15 15:42 **S12-09** lead answer: The size is not from the merge: main...s12/S12-09 is only your own c31011cb/c87d5c15, and ~2900 of the 3183 lines are the tests/baseline/S12-09-* e...
 - 2026-11-15 15:37 **S12-09** engineer ask: After the lead merge 4f40bda2, submit refuses: 3190 changed lines (budget 500), 5 new test files (budget 0), and 2887 test lines for 303 code lines...
 - 2026-11-15 15:36 **S12-09** lead answer: Merged; submit.
-- 2026-11-15 15:35 **S12-09** lead resume: Lead merged main into s12/S12-09 (4f40bda2, clean). Submit now with your T0/T1/T2 evidence and the 930529-1 harness note.
 
 ## Cost
 
 - From the script, engineer: 712 sessions, 1501.1M input tokens
 - From the script, lead: 479 sessions, 136.4M input tokens
-- Started by hand, Claude: 13 sessions, 3744.1M input tokens
+- Started by hand, Claude: 13 sessions, 3745.0M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
