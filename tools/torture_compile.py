@@ -28,7 +28,7 @@ PROJECT = ROOT.parent.parent if ROOT.parent.name == '.work' else ROOT
 SHARED = PROJECT / '.work/_shared'
 TC = SHARED / 'toolchain'
 BUILD = Path(storage.gcc_build_dir(PROJECT)) / 'gcc'
-CORPUS = SHARED / 'gcc/gcc/testsuite/gcc.c-torture/compile'
+CORPUS = Path(storage.gcc_tree(PROJECT)) / 'gcc/testsuite/gcc.c-torture/compile'
 LEVELS = {'O0': ['-O0'], 'O2': ['-O2'], 'O2-g': ['-O2', '-g'], 'O3': ['-O3']}
 CLASSES = ('pass', 'slow', 'hang', 'ICE', 'compiler error', 'float/double ABI error',
            'assembler rejection', 'lint failure', 'infrastructure failure',

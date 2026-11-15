@@ -1,4 +1,9 @@
-"""S2-07 static-runtime T2 lint/link and native donor comparison."""
+"""S2-07 static-runtime T2 lint/link and native donor comparison.
+
+Lead: check.py t2 --compiler gcc16 --libgcc --stage-to <ticket-card-folder>,
+then libgcc.py --stage-from <ticket-card-folder>. See check-card-staging.md.
+"""
+import argparse
 import re
 import subprocess
 import sys
@@ -18,7 +23,7 @@ def t2(runner):
 
 
 def link(runner, tag):
-    out = runner.tc.parent / 'tmp/S2-07'
+    out = runner.out / 'libgcc'
     out.mkdir(parents=True, exist_ok=True)
     source = runner.root / 'tests/t2/knc-libgcc.c'
     cc, flags = ((runner.cc, runner.cc_flags)
@@ -37,10 +42,12 @@ def link(runner, tag):
     runner.result('t2 ' + tag + ' integer/soft-fp helpers', failures)
 
 
-def native():
+def native(stage_from):
     root = Path(__file__).resolve().parents[1]
-    project = root.parent.parent if root.parent.name == '.work' else root
-    out = project / '.work/_shared/tmp/S2-07'
+    out = Path(stage_from) / 'libgcc'
+    for tag in ('donor', 'gcc16'):
+        if not (out / (tag + '-libgcc.mic')).is_file():
+            raise FileNotFoundError('stage T2 with --libgcc --stage-to first: ' + str(out))
     outputs = []
     for tag in ('donor', 'gcc16'):
         run = subprocess.run([sys.executable, str(root / 'tools/card_run'),
@@ -58,4 +65,7 @@ def native():
 
 
 if __name__ == '__main__':
-    raise SystemExit(native())
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--stage-from', required=True, type=Path,
+                        help='lead-staged ticket card folder from check.py --stage-to')
+    raise SystemExit(native(parser.parse_args().stage_from))

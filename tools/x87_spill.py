@@ -8,11 +8,9 @@ table: its legacy quiet relational compares must not dictate GCC 16 semantics.
 Simulate XI spill addresses for all four possible 16-byte incoming alignments;
 do not add -mstackrealign or an aligned local that could mask a backend defect.
 """
-from pathlib import Path
 import re
 import sys
 
-import storage
 from scalar_abi import allowlist, instructions
 
 
@@ -184,7 +182,7 @@ def host_table(runner, asm, source, tag):
 
 def t1(runner):
     source = runner.source_dir / 'knc-x87-compare.c'
-    output = Path(storage.shared_area(storage.main_root(runner.root))) / 'tmp/S2-05'
+    output = runner.out / 'x87-spill'
     output.mkdir(parents=True, exist_ok=True)
     assemblies = {}
     for tag, cc, flags in (('donor', runner.tool('gcc'), []),

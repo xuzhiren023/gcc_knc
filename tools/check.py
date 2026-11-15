@@ -13,6 +13,7 @@ import os
 from pathlib import Path
 import re
 import shlex
+import shutil
 import struct
 import subprocess
 import sys
@@ -29,6 +30,10 @@ PACKED = re.compile(r'\bv(?:addn?|subr?|mul|div|max|min|sqrt|rcp(?:23)?|rsqrt(?:
 # Each entry supplies its CLI help and handlers for the tiers it selects.
 # Imports stay lazy so T0 and source-only selections need no probe modules.
 SELECTIONS = {
+    'neg_induction': ('S12-24 sign-alternating induction with a vector epilogue', {
+        't1': lambda runner: runner.t1_sources([runner.source_dir / 'knc-vec-neg-induction.c'])}),
+    'imul_cost': ('S12-21 scalar constant multiply strength reduction', {
+        't1': lambda runner: runner.t1_sources([runner.source_dir / 'knc-imul-cost.c'])}),
     'complex_broadcast_align': ('S12-29 complex-float broadcast memory alignment', {
         't1': lambda runner: runner.t1_sources([runner.source_dir / 'knc-complex-broadcast-align.c'])}),
     'stencil_reload': ('S11-27 Fortran stencil reload scratch bounds', {
@@ -636,7 +641,23 @@ class Runner:
 
     def run(self):
         with self._output:
-            return self._run()
+            status = self._run()
+            if not status and getattr(self.args, 'stage_to', None):
+                self.stage_card_inputs(Path(self.args.stage_to))
+            return status
+
+    def stage_card_inputs(self, destination):
+        """Explicit lead-only export before the temporary run is cleaned up."""
+        if destination.resolve() == self.out.resolve() or self.out.resolve() in destination.resolve().parents:
+            raise ValueError('card staging destination must survive run cleanup')
+        binaries = sorted(self.out.rglob('*.mic'))
+        if not binaries:
+            raise RuntimeError('no card binaries produced by this run')
+        for source in binaries:
+            target = destination / source.relative_to(self.out)
+            target.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copyfile(source, target)
+            self.say('Lead card input: ' + str(target))
 
     def _run(self):
         start = time.monotonic()
@@ -673,6 +694,7 @@ def main():
                                  for role in ('caller', 'callee') for level in ('O0', 'O2')],
                         help='limit varargs T1 to TAG-ROLE-O0 or TAG-ROLE-O2')
     parser.add_argument('--record', help='small baseline result file')
+    parser.add_argument('--stage-to', help='lead only: copy successful run card binaries to this ticket card folder')
     parser.add_argument('--worker', action='store_true', help=argparse.SUPPRESS)
     args = parser.parse_args()
     if os.name == 'nt':
@@ -685,7 +707,7 @@ def main():
         script = subprocess.check_output([str(tc / 'cygwin/bin/cygpath.exe'), '-u',
                                           str(Path(__file__).resolve())], env=env, text=True).strip()
         arguments = list(sys.argv[1:])
-        for flag in ('--cc', '--record'):
+        for flag in ('--cc', '--record', '--stage-to'):
             if flag in arguments:
                 index = arguments.index(flag) + 1
                 arguments[index] = subprocess.check_output(

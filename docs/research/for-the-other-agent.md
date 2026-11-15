@@ -4,6 +4,21 @@ The owner asked on 2026-11-03 to be told of anything worth sharing with the othe
 (GPT, PhiWeather's WRF-to-IMCI translation). The lead adds items here as they are found; the owner
 passes on what they choose. Each item says how it was shown. Newest first.
 
+## 2026-11-15: multi-job card windows (S12-36)
+
+Host fake-ledger tests show that `tools/card_run --benchmark` keeps an open turn
+across successive jobs, then resumes round-robin yielding after the turn closes.
+Before a window, append a ledger row with `event: queued`, `project: gcc-knc`,
+a unique `jobId` beginning `claude-turn-`, `cores: []`, `timingValid: true`, and
+`queuedTime` as an ISO-8601 timestamp with timezone. The row is live only while
+its age is nonnegative and less than three hours, following `live_queue`.
+It keeps our turn only ahead of foreign queued rows with later `queuedTime`
+values; it cannot bypass an earlier foreign queue or any running job. Keep the
+same row open across the window's individual benchmark jobs. At window end,
+append a `finish` row with the same `jobId` and `project`. Without a live turn
+row, benchmark jobs continue to yield after our last timed finish when a foreign
+queue is waiting. These checks use a fake transport; no native card run is claimed.
+
 ## 2026-11-05, later (sent to the WRF tuning session)
 
 - Card probe facts on gathers and scatters, `vcvtfxpnt` truncation and flags, saturating

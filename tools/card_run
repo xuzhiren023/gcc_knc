@@ -1,5 +1,14 @@
 #!/usr/bin/env python3
-"""Shared-card runner; see docs/card-run.md. Fake transport never uses SSH."""
+"""Shared-card runner; see docs/card-run.md. Fake transport never uses SSH.
+
+Turn-row protocol: before a multi-job benchmark window, append a ledger row with
+event=queued, project=gcc-knc, a unique jobId beginning claude-turn-, cores=[],
+timingValid=true, and queuedTime as an ISO-8601 timestamp with timezone. While
+live (age under three hours), that row keeps our benchmark turn ahead of foreign
+queues with later queuedTime values. Running jobs must still drain. Close the
+window by appending event=finish with the same jobId and project; ordinary
+round-robin yielding then resumes. A later turn row cannot jump an older queue.
+"""
 import argparse
 from collections import deque
 from datetime import datetime, timedelta, timezone
@@ -461,13 +470,23 @@ def run(program, argv, *, lock_path, external_locks, baseline_names, timeout,
             active.pop(job_id, None)  # Our queue is replaced by our start, never a reservation.
             if not benchmark:
                 refuse_if_timed_job_open(active)  # Their chain may start while we wait for memory.
-            foreign_queue = any(j.get("event") == "queued" and not is_ours(j)
-                                for j in active.values())
+            foreign_queues = [j for j in active.values()
+                              if j.get("event") == "queued" and not is_ours(j)]
+            foreign_queue = bool(foreign_queues)
+            first_foreign_queue = min((datetime.fromisoformat(j["queuedTime"].replace("Z", "+00:00"))
+                                       for j in foreign_queues), default=None)
+            # active_jobs has already removed closed and non-live queues.
+            own_turn = first_foreign_queue is not None and any(
+                j.get("event") == "queued" and j.get("project") == PROJECT
+                and str(j.get("jobId", "")).startswith("claude-turn-") and j.get("cores") == []
+                and datetime.fromisoformat(j["queuedTime"].replace("Z", "+00:00")) < first_foreign_queue
+                for j in active.values())
             last_timed = next((j for j in reversed(lines) if j.get("event") in ("finish", "end")
                                and j.get("timingValid") is True), None)
-            their_turn = benchmark and foreign_queue and last_timed is not None and is_ours(last_timed)
-            # Benchmark queues express turns, not reservations: only running
-            # jobs must drain before the round-robin winner can start.
+            their_turn = (benchmark and foreign_queue and not own_turn
+                          and last_timed is not None and is_ours(last_timed))
+            # Job queues do not reserve cores: running jobs must drain even
+            # when an open turn row keeps our multi-job window.
             running = [j for j in active.values() if j.get("event") == "start"]
             shared = any(not is_ours(j) for j in running)
             occupied = {c for j in (running if benchmark else active.values())
