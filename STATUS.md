@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-15 11:31.
+Updated automatically at every ticket change. Last update: 2026-11-15 11:32.
 
-**Next: the tech lead, on S13-01.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: GPT-6.1, on S12-09 (Sprint 12 batch check - integrated themes at the final Sprint 12 head, regression evidence, optional modes frozen).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
 Current tickets: `[##################--]` 241 of 258
 
@@ -123,7 +123,7 @@ Current tickets: `[##################--]` 241 of 258
 | S12-40 | Indirect prefetch recognizes Fortran sparse loops (array descriptors, ARRAY_REF offsets, nonzero and OpenMP-outlined starts) so NPB-CG benefits | draft | Deferred to M5 (sprint s14) by the owner's 2026-11-15 scope cut ("we are scope creeping the entire Sprint 1... |
 | S12-41 | Early donor check - corpus.py stages and runs only the development programs (no held-out build or run), smallest margins first, so the lead can measure every development program against GCC 5.1.1 now | draft | Deferred to M5 (sprint s14) by the owner's 2026-11-15 scope cut ("we are scope creeping the entire Sprint 1... |
 | S12-42 | Small sparse row loops are 1.5-3% slower than GCC 5.1.1, worse when two loop nests share one function (found by S12-30's window 8 gate) | draft | Owner 2026-11-15 ("I have reset Fable, so subagent back to codex with default selection rule"): Fable overr... |
-| S13-01 | M4 final gate - stage the ADR-0015 gate run at the final head (17 programs, held-out unsealed, six pairs, three profiles) | Question for the tech lead | ADR-0015 readiness blocks complete gate staging: corpus.py collect compares PB outputs only to donor; parse... |
+| S13-01 | M4 final gate - stage the ADR-0015 gate run at the final head (17 programs, held-out unsealed, six pairs, three profiles) | In progress | Implementing the missing readiness is authorized in this ticket. The follow-up promised at S11-18 (2026-11-... |
 | S13-02 | Libgomp per-region thread density - choose 1-4 workers per core per parallel region instead of once per program | draft | Owner 2026-11-15 ("yes delay to M5"): deferred to M5 (sprint s14). The M4 primary score is serial -O2, so t... |
 | S13-03 | M4 retrospective - what we did wrong, what worked, and the practice changes carried into the next milestone and the agent-team skill | draft |  |
 | S13-04 | Clean source repositories for a fresh build - GCC-KNC fork and project code without build artifacts, plus a Linux-host build recipe the owner runs on the new workstation | draft |  |
@@ -284,13 +284,13 @@ Current tickets: `[##################--]` 241 of 258
 ## Recent activity
 
 - 2026-11-15 11:40 **S13-01** lead note: Start now, in parallel with S12-09 (owner 2026-11-15: close M4 fast; PhiWeather holds the card for us from ~18:31Z until M4 ends). Frozen final GCC...
+- 2026-11-15 11:32 **S13-01** lead answer: Implementing the missing readiness is authorized in this ticket. The follow-up promised at S11-18 (2026-11-12 17:35) was never opened, and that gap...
 - 2026-11-15 11:30 **S13-01** engineer ask: ADR-0015 readiness blocks complete gate staging: corpus.py collect compares PB outputs only to donor; parse_native accepts STREAM's Solution Valida...
 - 2026-11-15 11:25 **S12-09** owner decide: Lead raises input_tokens 6M -> 12M (owner rule 2026-11-09: lead extends budgets): the check is nearly done (ICE sweeps clean, x86 1962/0, card jobs...
 - 2026-11-15 11:20 **S12-42** lead note: Owner 2026-11-15 ("I have reset Fable, so subagent back to codex with default selection rule"): Fable override removed; the policy default applies ...
 - 2026-11-15 11:20 **S12-38** lead note: Owner 2026-11-15 ("I have reset Fable, so subagent back to codex with default selection rule"): Fable override removed; the policy default applies ...
 - 2026-11-15 11:20 **S12-34** lead note: Owner 2026-11-15 ("I have reset Fable, so subagent back to codex with default selection rule"): Fable override removed; the policy default applies ...
 - 2026-11-15 11:20 **S12-30** lead note: Owner 2026-11-15 ("I have reset Fable, so subagent back to codex with default selection rule"): Fable override removed; the policy default applies ...
-- 2026-11-15 10:37 **S12-09** lead escalate: budget: 7466553 input tokens used; the budget is 6000000
 
 ## Cost
 
