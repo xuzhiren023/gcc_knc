@@ -352,6 +352,8 @@ def t1(runner):
     runner.result('t1 switch-off -O2 scalar baseline identity',
                   [] if baselines[0] == baselines[1]
                   else ['switch-off -O2 scalar function differs with vectorization disabled; inspect assembly'])
+    runner.result('t1 HPCG application-shaped recognition',
+                  ['see hpcg-shapes on/off failures above'] if hpcg_shapes_t1() else [])
     runner.say('S12-30 phase2 outputs: ' + str(OUT) + '/phase2-*; no native phase2 run')
 
 
@@ -518,6 +520,42 @@ def ice_sweep(corpora=('gcc.c-torture/compile', 'gcc.dg/vect')):
     return int(bool(totals['ICE'] or totals['timeout']))
 
 
+def hpcg_shapes_t1():
+    """Focused recognition gate; native bounds safety remains a separate gate."""
+    gcc = Path(storage.gcc_build_dir(ROOT.parent.parent, '2')) / 'gcc'
+    failures = 0
+    names = ('sparse_struct_spmv', 'sparse_struct_forward', 'sparse_struct_backward')
+    for enabled in (False, True):
+        stem = 'hpcg-shapes-' + ('on' if enabled else 'off')
+        asm, dump = OUT/(stem + '.s'), OUT/(stem + '.aprefetch')
+        dump.unlink(missing_ok=True)
+        run(gcc/'xgcc', '-B' + str(gcc) + '/', '--sysroot=' + str(TC/'sysroot'),
+            '-O2', '-march=knc', '-std=gnu99', '-ffp-contract=off', '-DPHASE2_T1',
+            '-mknc-indirect-prefetch' if enabled else '-mno-knc-indirect-prefetch',
+            '-fdump-tree-aprefetch-details=' + str(dump), '-S', SOURCE, '-o', asm)
+        obj = asm.with_suffix('.o')
+        run(TC/'cross/bin/k1om-mpss-linux-as', '--march=k1om', asm, '-o', obj)
+        run(sys.executable, ROOT/'tools/knc_lint', asm, obj)
+        chunks = re.split(r'^;; Function (\w+) .*$', dump.read_text(), flags=re.M)
+        bodies = dict(zip(chunks[1::2], chunks[2::2]))
+        assembly = asm_bodies(asm.read_text())
+        for name in names:
+            body = bodies[name]
+            cross_row = bool(re.search(r'Bounded indirect prefetch in loop \d+: next-row pointers', body))
+            indirect = bool(Gimple(body).indirect())
+            fold = r'\bfadd\w*\b' if name.endswith('spmv') else r'\bfsub\w*\b'
+            errors = []
+            if cross_row != enabled or indirect != enabled:
+                errors.append('missing cross-row indexed hint' if enabled else 'unexpected indexed hint')
+            if not re.search(fold, assembly[name]):
+                errors.append('ordered scalar fold missing')
+            if re.search(r'\bv(?:add|sub|fmadd|fmsub|fnmadd)\w*\b', assembly[name]):
+                errors.append('unexpected vector fold or contraction')
+            failures += bool(errors)
+            print(('FAIL' if errors else 'PASS'), stem, name, '; '.join(errors), flush=True)
+    return int(bool(failures))
+
+
 def application_dumps(hpcg_only=False):
     """Inspect the actual class-A CG and HPCG translation units, without linking."""
     gcc = Path(storage.gcc_build_dir(ROOT.parent.parent, '2')) / 'gcc'
@@ -559,6 +597,8 @@ def main():
         raise RuntimeError('use shared Cygwin python3')
     OUT.mkdir(exist_ok=True)
     os.environ['PATH'] = ':'.join(map(str, [TC/'cross/bin', TC/'cygwin/bin', os.environ['PATH']]))
+    if sys.argv[1:] == ['--hpcg-shapes-t1']:
+        return hpcg_shapes_t1()
     if sys.argv[1:] == ['--application-dumps']:
         return application_dumps()
     if sys.argv[1:] == ['--application-dumps', 'hpcg']:

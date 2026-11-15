@@ -564,6 +564,44 @@ void sparse_hpcg(int rows, const int *count, const int *const *cols,
     out[i] = sum;
   }
 }
+/* Reduced application shapes: byte counts and pointer tables arrive through
+   a struct.  The SpMV start models an outlined worker's assigned interval.
+   These are compiler probes, not a numerical application implementation. */
+struct sparse_matrix_probe {
+  const char *count;
+  const int *const *cols;
+  const double *const *vals;
+};
+void sparse_struct_spmv(int begin, int rows, const struct sparse_matrix_probe *m,
+                        const double *x, double *out)
+{
+  for (int i = begin; i < rows; ++i) {
+    double sum = 0;
+    for (int j = 0; j < m->count[i]; ++j)
+      sum += m->vals[i][j] * x[m->cols[i][j]];
+    out[i] = sum;
+  }
+}
+void sparse_struct_forward(int rows, const struct sparse_matrix_probe *m,
+                           const double *rhs, double *x)
+{
+  for (int i = 0; i < rows; ++i) {
+    double sum = rhs[i];
+    for (int j = 0; j < m->count[i]; ++j)
+      sum -= m->vals[i][j] * x[m->cols[i][j]];
+    x[i] = sum;
+  }
+}
+void sparse_struct_backward(int rows, const struct sparse_matrix_probe *m,
+                            const double *rhs, double *x)
+{
+  for (int i = rows - 1; i >= 0; --i) {
+    double sum = rhs[i];
+    for (int j = 0; j < m->count[i]; ++j)
+      sum -= m->vals[i][j] * x[m->cols[i][j]];
+    x[i] = sum;
+  }
+}
 /* int output may change a later row bound; no cross-row speculation. */
 void alias_bounds(int rows, const int *row, const int *col,
                   const double *val, const double *x, int *out)

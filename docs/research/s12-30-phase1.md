@@ -1104,3 +1104,70 @@ separate default-on commit are unchanged. Window-6 guard/timing output
 is still absent from the ticket; the threshold remains provisional.
 No build, native test, application A/B, T0/T1/T2 or sweep was rerun;
 x86 not run.
+
+### Completed HPCG dumps and focused coverage red (2026-11-15)
+
+The authorized `--application-dumps hpcg` command now compiles both real
+translation units successfully with the installed lane-2 C++ headers and
+the libgomp build include. Log:
+`.work/_state/logs/s12_30_hpcg_dumps-20261115-054907.log`.
+The compiler is the previously built default-off GCC head; every dump
+explicitly enables `-mknc-indirect-prefetch`.
+
+Results from `.work/_shared/S12-30/application-*.aprefetch`:
+
+* SpMV: one **row-local** transformation (spmv line 132), no cross-row
+  recognition. Lines 318-320 load the matrixValues, mtxIndL and
+  nonzerosInRow struct fields. The outer PHI at line 323 starts at `_19`,
+  the OpenMP worker's assigned start, rather than zero. Lines 327-329
+  load the byte count and widen it to `cur_nnz_33`. Lines 352-354 require
+  `_76 > 131071`, where `_76` is eight times that count: the fallback
+  needs at least 16384 inner iterations and cannot execute for a byte
+  count (or HPCG's 27 entries). This is a functional recognition miss,
+  despite the one transformation message.
+* SymGS forward: no transformation. Lines 260 and 267-269 load and
+  promote the byte count. The reduction at line 300 is
+  `sum_95 = sum_106 - _25`, which the addition-only recognizer rejects.
+* SymGS backward: no transformation. Lines 334 and 392-393 show the
+  descending outer recurrence, with start `nrow_69 - 1` (line 331).
+  Lines 338-340 load/promote the byte count; line 371 subtracts the
+  product. Both subtraction and descending outer iteration are outside
+  the current recognizer.
+
+Source inspection of `gcc/tree-ssa-loop-prefetch.cc` identifies additional
+requirements after the first rejection: `indirect_array` only matches an
+unconverted load, so it cannot recover the char array behind the promoted
+inner limit. `indirect_emit` must load the original byte type and then
+widen, rather than load an int from that address. The whole-array alias
+gate conservatively rejects a char bound against the outer double store.
+Simply removing this check would be unsafe: char accesses may alias that
+store. Cross-row speculation needs a valid disjointness proof or a runtime
+alias guard. Struct field loads themselves are already hoisted in the real
+dumps; they must remain invariant under any new alias proof.
+
+Added three reduced C probes to the existing test file, covering struct
+pointer tables and byte counts, a worker interval with a nonzero start,
+and forward/backward subtract recurrences with an outer x store. The new
+`--hpcg-shapes-t1` entry is also called by normal S12-30 T1. It requires an
+actual indexed prefetch plus cross-row transformation, not a stream hint
+or an ineffective row-local hint; it also checks scalar add/sub folds.
+This is a recognition gate, not a substitute for the native guard suite
+or the disjointness proof.
+
+One focused run compiled, assembled and linted on/off probes. All three
+switch-off controls pass. Switch-on fails exactly three recognition
+checks, with ordered scalar folds retained. Log:
+`.work/_state/logs/s12_30_hpcg_shapes_red-20261115-055114.log`.
+Command:
+
+```text
+python tools/run.py --name s12_30_hpcg_shapes_red --inputs tools/s12_30_precision.c tools/s12_30_precision.py -- C:/Users/xuzhi/Documents/gcc_knc/.work/_shared/toolchain/cygwin/bin/python3.12.exe tools/s12_30_precision.py --hpcg-shapes-t1
+```
+
+The narrowed scope assigns nonzero-start recognition to S12-40, but real
+OpenMP HPCG SpMV needs that same C mechanism. The interval probe records
+this dependency for lead review; it makes no Fortran requirement. No GCC
+source was changed or built in this session. The separate default-on
+commit and provisional 16384 threshold are unchanged. Window-6 results,
+native safety, measured threshold, default-on validation, application A/B,
+and lead x86 remain pending. Prior passing suites were not rerun.
