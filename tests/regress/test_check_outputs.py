@@ -17,9 +17,49 @@ ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / 'tools'))
 import check
 import knc_vmath
+import libgcc
 
 
 class CheckOutputs(unittest.TestCase):
+    def test_native_reads_explicitly_staged_t2_outputs(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            base = Path(temporary)
+            runner = check.Runner.__new__(check.Runner)
+            runner._output = tempfile.TemporaryDirectory(dir=base)
+            runner.out = Path(runner._output.name)
+            runner.args = SimpleNamespace(stage_to=str(base / 'card'))
+            runner.root, runner.cc, runner.cc_flags = ROOT, 'fake-gcc', []
+            runner.tool = lambda name: 'fake-' + name
+            runner.say = lambda text: None
+            runner.result = lambda label, failures: self.assertFalse(failures)
+
+            def compile(*args, **kwargs):
+                if '-o' not in args:
+                    return ''
+                Path(args[args.index('-o') + 1]).write_text('fresh T2 binary')
+                return SimpleNamespace(returncode=0, stdout='')
+
+            runner.command = compile
+
+            def t2():
+                for tag in ('donor', 'gcc16'):
+                    # Symbol scans need real ELF; this test exercises file handoff.
+                    with patch.object(libgcc.re, 'findall', return_value=[]):
+                        libgcc.link(runner, tag)
+                return 0
+
+            runner._run = t2
+            self.assertEqual(runner.run(), 0)
+            self.assertFalse(runner.out.exists())
+
+            def card_run(args, **kwargs):
+                self.assertEqual(Path(args[-1]).read_text(), 'fresh T2 binary')
+                return SimpleNamespace(returncode=0, stdout='libgcc match\n' * 5)
+
+            with patch.object(libgcc.subprocess, 'run', side_effect=card_run) as card:
+                self.assertEqual(libgcc.native(base / 'card'), 0)
+                self.assertEqual(card.call_count, 2)
+
     def test_fake_t1_t2_with_old_destinations_unwritable(self):
         with tempfile.TemporaryDirectory() as temporary, ExitStack() as stack:
             base = Path(temporary)
