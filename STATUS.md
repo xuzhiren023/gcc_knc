@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-14 21:47.
+Updated automatically at every ticket change. Last update: 2026-11-14 21:50.
 
 **Next: the tech lead, on S12-24.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
@@ -113,7 +113,7 @@ Current tickets: `[##################--]` 230 of 248
 | S12-30 | Sparse indexed reductions faster than today - vector gather of products with an ordered scalar sum, and indirect prefetch, for CSR-style loops (NPB-CG, HPCG) | lead | Needs the one Phase 1 card run (lead only): tools/card_run --threads 1 --timeout 1150, binary .work/_shared... |
 | S12-31 | HPCG is 1.8% slower with GCC-KNC than with GCC 5.1.1 - find the cause and make it faster (owner: never slower than 5.1.1) | lead | Needs one card run by the interactive lead. Phase 1 at 6b413629 reviewed and sound; staged binary exists. I... |
 | S12-32 | ICE (reload) in gcc.c-torture O3-vect-pr32243.c on the installed GCC-KNC, found by the S12-21 torture sweep | Not started |  |
-| S12-33 | T2 writes its short-vector test binaries into a per-run folder, so Claude, Codex and lead runs never block each other | In progress | Yes, simplify. Replace t2_crosscheck with a recording stub (mock.patch.object(scalar_abi, 't2_crosscheck'))... |
+| S12-33 | T2 writes its short-vector test binaries into a per-run folder, so Claude, Codex and lead runs never block each other | Waiting for review | Host regression passed (1 test). The earlier red commit 41691642 failed because the test double was incompl... |
 | S13-01 | M4 final gate - stage the ADR-0015 gate run at the final head (17 programs, held-out unsealed, six pairs, three profiles) | draft |  |
 | S13-02 | Libgomp per-region thread density - choose 1-4 workers per core per parallel region instead of once per program | draft |  |
 | S13-03 | M4 retrospective - what we did wrong, what worked, and the practice changes carried into the next milestone and the agent-team skill | draft |  |
@@ -273,6 +273,7 @@ Current tickets: `[##################--]` 230 of 248
 
 ## Recent activity
 
+- 2026-11-14 21:50 **S12-33** engineer submit: Host regression passed (1 test). The earlier red commit 41691642 failed because the test double was incomplete; after simplifying the fixture, veri...
 - 2026-11-14 21:46 **S12-33** lead answer: Yes, simplify. Replace t2_crosscheck with a recording stub (mock.patch.object(scalar_abi, 't2_crosscheck')) and make runner.command return returnco...
 - 2026-11-14 21:45 **S12-24** engineer submit: GCC e3c5b822619 (tree-vect-loop.cc, on knc), lane gcc built. Green T1 PASS, both main loops vector incl. vmulps zmm; T0-T2 PASS; 5 reproducers comp...
 - 2026-11-14 21:44 **S12-33** engineer ask: Red test commit 41691642 fails as intended when t2_short_vector attempts to compile and link; this test double is incomplete (nm output comes throu...
@@ -280,13 +281,12 @@ Current tickets: `[##################--]` 230 of 248
 - 2026-11-14 21:36 **S12-21** engineer escalate: budget: 9 engineer sessions used; the budget is 9
 - 2026-11-14 21:35 **S12-30** lead defer: Needs the one Phase 1 card run (lead only): tools/card_run --threads 1 --timeout 1150, binary .work/_shared/S12-30/precision-gate, argument 12345 (...
 - 2026-11-14 21:35 **S12-21** lead answer: Submit.
-- 2026-11-14 21:35 **S12-21** lead resume: Lead 21:36: T2 run by the lead on lane gcc2: 36 PASS, 0 FAIL (log s12_21_t2-20261114-213433.log); the S5-21 file is fixed for good by S12-33. No re...
 
 ## Cost
 
 - From the script, engineer: 659 sessions, 1304.1M input tokens
 - From the script, lead: 436 sessions, 121.8M input tokens
-- Started by hand, Claude: 12 sessions, 3372.9M input tokens
+- Started by hand, Claude: 12 sessions, 3375.9M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
