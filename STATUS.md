@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-15 01:14.
+Updated automatically at every ticket change. Last update: 2026-11-15 01:23.
 
-**Next: GPT-6.1, on S12-35 (Clean single-compiler rebuild of the S11-26 WRF smpar build (the staged wrf.exe mixes objects from knc 619e14b479a and 71e9b2d00fc)).** Run `python tools/dispatch.py`, or ask the tech lead to.
+**Next: the tech lead, on S12-35.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[##################--]` 236 of 250
 
@@ -115,7 +115,7 @@ Current tickets: `[##################--]` 236 of 250
 | S12-32 | ICE (reload) in gcc.c-torture O3-vect-pr32243.c on the installed GCC-KNC, found by the S12-21 torture sweep | Done | The -O3 vector reload crash in pr32243 is fixed: byte/word vector extends now reload through an aligned sta... |
 | S12-33 | T2 writes its short-vector test binaries into a per-run folder, so Claude, Codex and lead runs never block each other | Done | T2's short-vector cross-check now writes its binaries into the run's own output folder instead of the share... |
 | S12-34 | Unrecognizable insn for a truncating vector store to a 1-byte-aligned V16QI destination (found by S12-32) | Not started |  |
-| S12-35 | Clean single-compiler rebuild of the S11-26 WRF smpar build (the staged wrf.exe mixes objects from knc 619e14b479a and 71e9b2d00fc) | In progress |  |
+| S12-35 | Clean single-compiler WRF build as dm+sm (MPI + OpenMP) against PhiWeather's k1om MPICH, plus a build recipe PhiWeather can apply to its own patched tree | Question for the tech lead | Image evidence/s3/link.command.json overrides MPICH 3.4.3 prefix/libmpi.a with item21/mpich-thr/libmpi.a pl... |
 | S13-01 | M4 final gate - stage the ADR-0015 gate run at the final head (17 programs, held-out unsealed, six pairs, three profiles) | draft |  |
 | S13-02 | Libgomp per-region thread density - choose 1-4 workers per core per parallel region instead of once per program | draft |  |
 | S13-03 | M4 retrospective - what we did wrong, what worked, and the practice changes carried into the next milestone and the agent-team skill | draft |  |
@@ -275,6 +275,7 @@ Current tickets: `[##################--]` 236 of 250
 
 ## Recent activity
 
+- 2026-11-15 01:23 **S12-35** engineer ask: Image evidence/s3/link.command.json overrides MPICH 3.4.3 prefix/libmpi.a with item21/mpich-thr/libmpi.a plus phi_thr_copy.o. nm confirms undefined...
 - 2026-11-15 01:09 **S12-26** lead approve: The hot WRF scalar loops in Thompson, MYNN-EDMF, advection, scalar update and RRTMG are now classified statically (vectorized or why not, dependent...
 - 2026-11-15 00:59 **S12-26** engineer submit: cb5a500c: classified loop list + 15 shapes in docs/research/s12-26-wrf-scalar.md and s12-26-shapes.f90. Six authorized debug -S compiles PASS; lite...
 - 2026-11-15 00:56 **S12-32** lead approve: The -O3 vector reload crash in pr32243 is fixed: byte/word vector extends now reload through an aligned stack slot (imci.md Bm to Ba) and the exten...
@@ -282,16 +283,15 @@ Current tickets: `[##################--]` 236 of 250
 - 2026-11-15 00:45 **S12-26** engineer ask: 3bbc33a7: partial loop list + 10 reduced shapes in docs/research/s12-26-wrf-scalar.md. Six exact-flag -S compiles and shape compile PASS; ELF/funct...
 - 2026-11-15 00:35 **S12-26** lead answer: Static, unsampled classification; no WRF adapter and no change to vec_triage.py. (1) Hotness: take the routine ranking from the PhiWeather shares a...
 - 2026-11-15 00:33 **S12-26** engineer ask: Blocked by no-WRF-rebuild rule: vec_triage.py join --program WRF exits 2 (corpus-only choices). Log: .work/_state/logs/S12_26_wrf_triage_interface-...
-- 2026-11-15 00:30 **S11-26** lead approve: WRF 4.8.0 OpenMP (wrf.exe, real.exe) now builds at -mphinix -mknc-card=7120 with no per-file workarounds on knc 71e9b2d00fc and is staged in wrf-tr...
 
 ## Cost
 
 - From the script, engineer: 669 sessions, 1333.4M input tokens
 - From the script, lead: 443 sessions, 123.7M input tokens
-- Started by hand, Claude: 12 sessions, 3446.0M input tokens
+- Started by hand, Claude: 12 sessions, 3454.3M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 34.4 GiB of 100 GiB. 134 GiB free on the drive.
+The project uses 34.0 GiB of 100 GiB. 135 GiB free on the drive.
