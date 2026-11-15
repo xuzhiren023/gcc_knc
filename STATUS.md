@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-15 15:12.
+Updated automatically at every ticket change. Last update: 2026-11-15 15:13.
 
-**Waiting for you:** S12-09. Run `python tools/pm.py inbox`.
+**Next: GPT-6.1, on S12-09 (Sprint 12 batch check - integrated themes at the final Sprint 12 head, regression evidence, optional modes frozen).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
 Current tickets: `[#################---]` 241 of 268
 
@@ -89,7 +89,7 @@ Current tickets: `[#################---]` 241 of 268
 | S12-06 | M4 theme 1 - strict scalar FP conversions and call boundaries (NPB-EP transform and log path, NPB-IS randlc) | Done | Theme 1 (scalar FP conversions and calls in NPB-EP/IS) closed with no compiler change: a card diagnostic sh... |
 | S12-07 | M4 theme 2 - indexed-load scheduling with strict sparse reduction (NPB-CG) | Done | Theme 2 (sparse indexed loads in NPB-CG/HPCG) closed with no compiler change: GCC-KNC is already at parity ... |
 | S12-08 | M4 theme 3 - dependency-preserving scalar updates and register pressure in dense loops (PB-ludcmp, x87 stack traffic) | Done | Theme 3 (register pressure in dense loops) closed with no compiler change: PB-ludcmp's extra x87 stack traf... |
-| S12-09 | Sprint 12 batch check - integrated themes at the final Sprint 12 head, regression evidence, optional modes frozen | **Waiting for you** | budget: 7466553 input tokens used; the budget is 6000000 |
+| S12-09 | Sprint 12 batch check - integrated themes at the final Sprint 12 head, regression evidence, optional modes frozen | In progress | Lead sets input_tokens 6M -> 12M in the ticket fields (the 11:25 decision recorded it but did not set the f... |
 | S12-10 | Research - what KNC hardware and runtime knowledge are we still missing to tune GCC-KNC, the OS runtime and broad optimization, and where is it documented? | Done | KNC reference-gap research done: 16 gaps ranked, 32 primary sources (98 MB, outside git) with page-cited fa... |
 | S12-11 | Research - best practices for a dual Xeon E5-2690 v3 + Xeon Phi (KNC) workstation (HP Z840) for LLM inference and scientific computing | Done | Z840 dual E5-2690 v3 + Xeon Phi setup guide done: slot/BIOS/memory/power/cooling checklist, MPSS-on-modern-... |
 | S12-12 | Stage S12-10's residual-gap card experiments as one combined Sprint 12 diagnostic batch (PMU access, prefetch, page backing, libm route, branches, allocator) | Done | The six follow-up card experiments (counter access, prefetch, page backing, libm route, branches, allocator... |
@@ -293,6 +293,7 @@ Current tickets: `[#################---]` 241 of 268
 
 ## Recent activity
 
+- 2026-11-15 15:13 **S12-09** owner decide: Lead sets input_tokens 6M -> 12M in the ticket fields (the 11:25 decision recorded it but did not set the field); remaining: T0/T1 wrapper rerun an...
 - 2026-11-15 15:12 **S12-09** engineer escalate: budget: 7466553 input tokens used; the budget is 6000000
 - 2026-11-15 15:11 **S13-05** lead changes: Approve refused by the machine check: tools/check t0 runs tests/regress under Cygwin python3.12, which has no PyYAML, so test_model_first.py fails ...
 - 2026-11-15 14:58 **S13-05** engineer submit: Submitted by the lead: model-first skill (.claude/skills/model-first, 160 lines + 3 references incl. a C7 worked example), docs/research/knc-machin...
@@ -300,13 +301,12 @@ Current tickets: `[#################---]` 241 of 268
 - 2026-11-15 14:58 **S13-05** lead resume: Lead merged main into s13/S13-05 (f08b31d9, clean); test passes with Windows Python (log .work/_state/logs/s13_05_lead_retest_win-20261115-145803.l...
 - 2026-11-15 14:25 **S13-06** lead defer: Green 22944844 reviewed, OK in substance. Interactive lead must: (1) approve protected .gitignore line !/knc-twin/**/*.s; (2) grant size override (...
 - 2026-11-15 14:23 **S13-06** engineer ask: Green 22944844 is ready (movslq/movsx* now unsupported, no source; test 3/3 OK, .work/_state/logs/s13_06_test-20261115-142205.log), but submit refu...
-- 2026-11-15 14:15 **S13-06** lead approve-red: S13-06 red approved: one host test pins the knc-twin selftest, trial-kernel conversion and functional checks against independently computed outputs...
 
 ## Cost
 
 - From the script, engineer: 708 sessions, 1497.3M input tokens
 - From the script, lead: 476 sessions, 136.0M input tokens
-- Started by hand, Claude: 13 sessions, 3699.5M input tokens
+- Started by hand, Claude: 13 sessions, 3702.0M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
