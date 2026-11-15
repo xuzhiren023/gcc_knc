@@ -2,7 +2,7 @@
 
 Updated automatically at every ticket change. Last update: 2026-11-15 05:30.
 
-**Waiting for you:** S12-37. Run `python tools/pm.py inbox`.
+**Next: GPT-6.1, on S12-30 (Sparse indexed reductions faster than today - vector gather of products with an ordered scalar sum, and indirect prefetch, for CSR-style loops (NPB-CG, HPCG)).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
 Current tickets: `[##################--]` 238 of 255
 
@@ -117,7 +117,7 @@ Current tickets: `[##################--]` 238 of 255
 | S12-34 | Unrecognizable insn for a truncating vector store to a 1-byte-aligned V16QI destination (found by S12-32) | Not started |  |
 | S12-35 | Clean single-compiler WRF build as dm+sm (MPI + OpenMP) against PhiWeather's k1om MPICH, plus a build recipe PhiWeather can apply to its own patched tree | Done | Upstream WRF 4.8.0 now builds clean as dm+sm (MPI + OpenMP) with the one GCC-KNC compiler (knc 7a3b34430e3,... |
 | S12-36 | card_run yields to a foreign queued row in the middle of our own turn - honor an open turn-level reservation so a multi-job window is not refused | Done | card_run --benchmark now keeps our turn across several jobs while an open claude-turn- ledger row was queue... |
-| S12-37 | Every T1/T2 check writes into the run's own output folder - no fixed paths in shared ticket folders (S10-01 vecarg, and any others) | **Waiting for you** | budget: 3 engineer sessions used; the budget is 3 |
+| S12-37 | Every T1/T2 check writes into the run's own output folder - no fixed paths in shared ticket folders (S10-01 vecarg, and any others) | In progress | Lead raises sessions 3 -> 4: the work is complete and rebased (fe42b548); the lead submits it. |
 | S12-38 | ICE in the SLP vectorizer on gcc.dg vect-pr123221.c at -O3 -march=knc (found by S12-30's torture sweep) | Not started |  |
 | S12-39 | pm.py submit stops demanding an engineer-side rebase that the sandbox cannot perform (Permission denied on .git/worktrees/<id>/rebase-merge) | In progress |  |
 | S12-40 | Indirect prefetch recognizes Fortran sparse loops (array descriptors, ARRAY_REF offsets, nonzero and OpenMP-outlined starts) so NPB-CG benefits | draft |  |
@@ -280,6 +280,7 @@ Current tickets: `[##################--]` 238 of 255
 
 ## Recent activity
 
+- 2026-11-15 05:30 **S12-37** owner decide: Lead raises sessions 3 -> 4: the work is complete and rebased (fe42b548); the lead submits it.
 - 2026-11-15 05:30 **S12-30** owner decide: Lead raises input_tokens 20M -> 30M and narrows scope: C form only (HPCG); Fortran recognition for NPB-CG split to S12-40. Progress since the last ...
 - 2026-11-15 05:29 **S12-37** engineer escalate: budget: 3 engineer sessions used; the budget is 3
 - 2026-11-15 05:29 **S12-30** engineer escalate: budget: 21800400 input tokens used; the budget is 20000000
@@ -287,13 +288,12 @@ Current tickets: `[##################--]` 238 of 255
 - 2026-11-15 05:27 **S12-37** lead answer: Approved: keep the tests as they are. The 140-line file is the ticket's own acceptance deliverable (one fake-mode T1/T2 run with old destinations d...
 - 2026-11-15 05:26 **S12-30** engineer ask: Two dump attempts failed: missing Fortran module (fixed), then HPCG stl_pair.h:65 cannot find compare. May I retry HPCG with installed lane-2 C++ h...
 - 2026-11-15 05:25 **S12-37** engineer ask: After the lead rebase onto main, both tests in tests/regress/test_check_outputs.py passed through tools/run.py with Cygwin Python 3.12; log C:/User...
-- 2026-11-15 05:22 **S12-37** lead answer: Lead: rebased on main. Rerun the two tests and submit.
 
 ## Cost
 
 - From the script, engineer: 688 sessions, 1369.8M input tokens
 - From the script, lead: 458 sessions, 128.9M input tokens
-- Started by hand, Claude: 12 sessions, 3530.0M input tokens
+- Started by hand, Claude: 12 sessions, 3531.9M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
