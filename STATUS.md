@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-15 05:06.
+Updated automatically at every ticket change. Last update: 2026-11-15 05:07.
 
 **Next: GPT-6.1, on S12-31 (HPCG is 1.8% slower with GCC-KNC than with GCC 5.1.1 - find the cause and make it faster (owner: never slower than 5.1.1)).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
@@ -288,7 +288,7 @@ Current tickets: `[##################--]` 238 of 251
 ## Cost
 
 - From the script, engineer: 683 sessions, 1364.4M input tokens
-- From the script, lead: 454 sessions, 127.4M input tokens
+- From the script, lead: 455 sessions, 128.3M input tokens
 - Started by hand, Claude: 12 sessions, 3505.5M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
