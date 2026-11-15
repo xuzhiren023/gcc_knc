@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <sqlite3.h>
+extern void corpus_environment(const char *) __attribute__((weak));
 
 static long long expected[3];
 static int rows, correct;
@@ -12,7 +13,10 @@ static int check(void *unused, int columns, char **values, char **names)
   ++rows;
   if (columns != 3) return 1;
   for (i = 0; i < 3; ++i)
-    if (!values[i] || atoll(values[i]) != expected[i]) return 1;
+    if (!values[i] || atoll(values[i]) + (getenv("CORPUS_CORRUPT") && i == 0 ? 1 : 0) != expected[i]) {
+      if (values[i] && i == 0 && getenv("CORPUS_CORRUPT")) puts("CORPUS_INJECTED SQLite");
+      return 1;
+    }
   correct = 1;
   return 0;
 }
@@ -38,6 +42,7 @@ int main(void)
   status = sqlite3_exec(db, sql, check, 0, &error);
   if (error) fprintf(stderr, "%s\n", error);
   sqlite3_free(error);
+  if (corpus_environment) corpus_environment("materialize");
   sqlite3_close(db);
   if (status != SQLITE_OK || rows != 1 || !correct) return 1;
   puts("CORPUS_CHECK pass");

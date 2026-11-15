@@ -30,6 +30,157 @@ import corpus
 
 
 class GateReadiness(unittest.TestCase):
+    def test_gate_scorer_requires_all_raw_pairs_and_reports_owner_misses(self):
+        import m4_gate as gate
+        import m4_score as scorer
+        from dataclasses import asdict
+        spec = scorer.freeze_primary_spec({level: dict(assembled=True,diagnostic='')
+                                           for level in scorer.SQLITE_LEVELS})
+        with tempfile.TemporaryDirectory() as temporary:
+            stage = Path(temporary)
+            records = {}
+            for profile in ('full','3100','5100'):
+                rows = gate.schedule(profile)
+                for row in rows:
+                    speedup = 1.0 if row['program'] in ('PB-gemm','PB-adi') else 1.5
+                    row.update(check='pass',time_seconds=3. if row['compiler']==corpus.DONOR else 3./speedup,
+                               primary=json.loads(json.dumps(asdict(spec[row['program']]))),
+                               flags=list(spec[row['program']].donor_flags if row['compiler']==corpus.DONOR
+                                          else spec[row['program']].new_flags),
+                               timing=dict(utc_start_ns=row['launch_order']+1),
+                               lead_environment_policy=dict(lead_verified=True,exclusive_window='fixture',
+                                                            clock_power_policy='fixed fixture'),
+                               environment=dict(start={}))
+                records['initial-'+profile+'-checked.jsonl']=rows
+            output = io.StringIO()
+            with patch.object(gate,'load_freeze',return_value=({},spec)), \
+                    patch.object(gate,'check_block',return_value=True), \
+                    patch.object(corpus,'read_partition',side_effect=lambda stage,name: records[name]), \
+                    patch.object(corpus,'sealed_dir',return_value=stage), \
+                    patch.object(scorer,'SEALED_ROOT',stage), redirect_stdout(output):
+                gate.score(SimpleNamespace(stage=stage,extended=False))
+                report=json.loads((stage/'score.json').read_text())
+                self.assertTrue(report['ready'] and report['pass'])
+                self.assertTrue(len(report['owner_target_misses'])==6)
+                self.assertTrue(all(r['status']==('found; held out, never tuned' if r['program']=='PB-adi'
+                                                else 'development defect') for r in report['owner_target_misses']))
+                records['initial-5100-checked.jsonl'].pop()
+                gate.score(SimpleNamespace(stage=stage,extended=False))
+                report=json.loads((stage/'score.json').read_text())
+                self.assertTrue(not report['ready'] and not report['passed'])
+            self.assertNotIn('speedup',output.getvalue())
+
+    def test_initial_and_extension_have_exact_pairs_and_separate_profiles(self):
+        import m4_gate as gate
+        for profile in ('full', '3100', '5100'):
+            for extended in (False, True):
+                plan = gate.schedule(profile, extended)
+                self.assertEqual(len(plan), 204)
+                self.assertEqual({j['profile'] for j in plan}, {profile})
+                self.assertEqual({j['panel'] for j in plan}, {'primary'})
+                for offset in range(0, len(plan), 34):
+                    round_rows = plan[offset:offset+34]
+                    self.assertEqual([r['program'] for r in round_rows[::2]], list(corpus.PROGRAMS))
+                    for a,b in zip(round_rows[::2], round_rows[1::2]):
+                        expected = ((corpus.DONOR, corpus.KNC) if (a['run']%2 == 0) != extended
+                                    else (corpus.KNC, corpus.DONOR))
+                        self.assertEqual((a['compiler'],b['compiler']), expected)
+                        self.assertEqual((a['start_order'],b['start_order']), (0,1))
+                        self.assertEqual(a['pair_id'],b['pair_id'])
+                        self.assertEqual(a['threads'],1)
+
+    def test_package_checker_corruption_uses_output_result(self):
+        clock = ('CORPUS_META {"threads":1}\nCORPUS_TIME 1\n'
+                 'CORPUS_CLOCK {"clock":"CLOCK_MONOTONIC_RAW","boundary":"launch-to-exit",'
+                 '"start_ns":1,"end_ns":1000000001,"utc_start_ns":2}\n')
+        hpcg = 'HPCG result is VALID\n'
+        for section in ('Spectral Convergence Tests','Iteration Count Information','Reproducibility Information'):
+            hpcg += section + '::Result=PASSED\n'
+        hpcg += 'Departure from Symmetry test::Result=PASSED\n'
+        for label in ('Reference CG iterations per set','Optimized CG iterations per set',
+                      'Total number of reference iterations','Total number of optimized iterations'):
+            hpcg += 'Iteration Count Information::' + label + '=50\n'
+        for program, good, corrupt in (('NPB-CG','Verification = SUCCESSFUL\n','VERIFICATION FAILED\n'),
+                                       ('HPCG',hpcg,'INVALID\n')):
+            self.assertEqual(corpus.output_result(dict(program=program,threads=1),clock+good,'',0)['check'],'pass')
+            self.assertEqual(corpus.output_result(dict(program=program,threads=1),clock+good+corrupt,'',0)['check'],'fail')
+
+    def test_stream_run_encoding_covers_every_component(self):
+        arrays = [dict(array=k,runs=[[3,v]]) for k,v in corpus.stream_expected().items()]
+        self.assertTrue(corpus.stream_matches(arrays,count=3))
+        arrays[2]['runs'][0][0] = 2
+        self.assertFalse(corpus.stream_matches(arrays,count=3))
+        arrays[2]['runs'] = [[2,corpus.stream_expected()['c']],[1,float('inf')]]
+        self.assertFalse(corpus.stream_matches(arrays,count=3))
+
+    def test_native_sqlite_corruption_reaches_integer_checker(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            folder = Path(temporary)
+            binary = folder / 'workload'
+            lib = corpus.SHARED / 'corpus-build/sources/sqlite-amalgamation-3460100'
+            subprocess.run(['gcc','-O0','-I'+str(lib),str(lib/'sqlite3.c'),str(corpus.SUPPORT/'sqlite.c'),
+                            '-lpthread','-ldl','-lm','-o',str(binary)],check=True,capture_output=True)
+            (folder / 'input.sql').write_bytes((corpus.SUPPORT / 'input.sql').read_bytes())
+            clean = subprocess.run([str(binary)],cwd=folder,capture_output=True,text=True)
+            bad = subprocess.run([str(binary)],cwd=folder,capture_output=True,text=True,
+                                 env=dict(os.environ,CORPUS_CORRUPT='1'))
+            self.assertEqual(clean.returncode,0)
+            self.assertIn('CORPUS_CHECK pass',clean.stdout)
+            self.assertEqual(bad.returncode,1)
+            self.assertIn('CORPUS_INJECTED SQLite',bad.stdout)
+            self.assertNotIn('CORPUS_CHECK pass',bad.stdout)
+
+    def test_native_stream_capture_keeps_full_precision(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            folder = Path(temporary)
+            binary = folder / 'workload'
+            source = corpus.SHARED / 'corpus-build/sources'
+            subprocess.run(['gcc','-O0','-I'+str(source),'-DSTREAM_ARRAY_SIZE=256','-DNTIMES=20',
+                            str(corpus.SUPPORT/'stream_capture.c'),'-lm','-o',str(binary)],check=True,capture_output=True)
+            result = subprocess.run([str(binary)],cwd=folder,capture_output=True)
+            self.assertEqual(result.returncode,0)
+            arrays=[]
+            with (folder/'arrays.bin').open('rb') as data:
+                while name := data.read(80):
+                    count,=struct.unpack('=Q',data.read(8))
+                    values=struct.unpack('='+'d'*count,data.read(8*count))
+                    arrays.append(dict(array=name.rstrip(b'\0').decode(),values=list(values)))
+            self.assertTrue(corpus.stream_matches(arrays,count=256))
+            arrays[-1]['values'][-1]*=1.01
+            self.assertFalse(corpus.stream_matches(arrays,count=256))
+    def test_host_references_against_small_package_workloads(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            folder = Path(temporary)
+            reference = folder / 'reference'
+            subprocess.run(['gcc', '-O0', '-ffp-contract=off', str(corpus.SUPPORT / 'reference.c'),
+                            '-lm', '-o', str(reference)], check=True, capture_output=True)
+            sources = corpus.SHARED / 'corpus-build/sources/polybench-c-4.2.1-beta'
+            for name in corpus.PB:
+                # Held-out fixtures deliberately expose only the pass/fail assertion.
+                with self.subTest(program=name):
+                    benchmark = next(sources.rglob(name + '.c'))
+                    binary = folder / 'workload'
+                    compile_run = subprocess.run(['gcc', '-O0', '-ffp-contract=off',
+                        '-I' + str(sources / 'utilities'), '-DPOLYBENCH_DUMP_ARRAYS', '-DDATA_TYPE_IS_DOUBLE',
+                        '-DN=8', '-DM=8', '-DNI=8', '-DNJ=8', '-DNK=8', '-DTSTEPS=3',
+                        '-include', str(corpus.SUPPORT / 'polybench_capture.h'),
+                        str(benchmark), str(sources / 'utilities/polybench.c'),
+                        str(corpus.SUPPORT / 'polybench_capture.c'), '-lm', '-o', str(binary)], capture_output=True)
+                    self.assertTrue(compile_run.returncode == 0)
+                    result = subprocess.run([str(binary)], cwd=folder, capture_output=True)
+                    self.assertTrue(result.returncode == 0)
+                    arrays = []
+                    with (folder / 'arrays.bin').open('rb') as data:
+                        while raw_name := data.read(80):
+                            count, = struct.unpack('=Q', data.read(8))
+                            values = struct.unpack('=' + 'd' * count, data.read(count * 8))
+                            arrays.append(dict(array=raw_name.rstrip(b'\0').decode(), values=list(values)))
+                    ref = subprocess.run([str(reference), name, '8', '8', '3'], capture_output=True)
+                    self.assertTrue(ref.returncode == 0)
+                    expected = json.loads(ref.stdout)
+                    self.assertTrue(corpus.reference_matches(arrays, expected))
+                    arrays[0]['values'][0] += 1.
+                    self.assertFalse(corpus.reference_matches(arrays, expected))
     def test_independent_reference_rejects_agreeing_wrong_compilers(self):
         with tempfile.TemporaryDirectory() as temporary:
             stage = Path(temporary) / 'S13-01'
@@ -81,6 +232,12 @@ def observations(program, candidate=(1., 3., 2.)):
 
 def collect_at(stage, plan, rows):
     stage.mkdir(parents=True, exist_ok=True)
+    # Explicit independent synthetic fixture, never a copy of the observations.
+    for program in {j['program'] for j in plan if j['program'].startswith('PB-')}:
+        base = corpus.sealed_dir(stage) if program in corpus.HELD_OUT else stage
+        (base / 'references').mkdir(parents=True, exist_ok=True)
+        corpus.write_json(base / 'references' / (program + '.json'),
+                          [dict(array='A', values=[1., 3., 2.])])
     corpus.write_json(stage / 'plan.json', plan)
     (stage / 'raw-results.jsonl').write_text(
         ''.join(json.dumps(row) + '\n' for row in rows))
@@ -458,6 +615,11 @@ int main(void) {
                 self.assertEqual(missing.returncode, 2)
                 self.assertNotIn('CORPUS_CONTROL rejected', missing.stdout)
                 self.assertEqual((directory / 'packed.bin').read_bytes(), packed)
+                bad = subprocess.run([str(binary)],cwd=directory,capture_output=True,text=True,
+                                     env=dict(os.environ,CORPUS_CORRUPT='1'))
+                self.assertEqual(bad.returncode,1)
+                self.assertIn('CORPUS_INJECTED '+name,bad.stdout)
+                self.assertNotIn('CORPUS_CHECK pass',bad.stdout)
 
 
 class PgoPeerPackaging(unittest.TestCase):
