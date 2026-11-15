@@ -1,10 +1,10 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-15 05:35.
+Updated automatically at every ticket change. Last update: 2026-11-15 05:45.
 
 **Next: the tech lead, on S12-30.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
-Current tickets: `[##################--]` 238 of 255
+Current tickets: `[##################--]` 239 of 255
 
 ## Milestones
 
@@ -14,7 +14,7 @@ Current tickets: `[##################--]` 238 of 255
 | M1 | Mixed native code | Done | 43 of 43 tickets |
 | M2 | Useful vector target | Done | 51 of 51 tickets |
 | M3 | Runtimes | Done | 48 of 48 tickets |
-| M4 | Broad optimization | In progress | 56 of 73 tickets |
+| M4 | Broad optimization | In progress | 57 of 73 tickets |
 | M5 | Program corpus | Not started | Not planned in detail yet |
 | M6 | Release | Not started | Not planned in detail yet |
 
@@ -119,7 +119,7 @@ Current tickets: `[##################--]` 238 of 255
 | S12-36 | card_run yields to a foreign queued row in the middle of our own turn - honor an open turn-level reservation so a multi-job window is not refused | Done | card_run --benchmark now keeps our turn across several jobs while an open claude-turn- ledger row was queue... |
 | S12-37 | Every T1/T2 check writes into the run's own output folder - no fixed paths in shared ticket folders (S10-01 vecarg, and any others) | In progress | One defect: some of the moved outputs were card inputs. tools/libgcc.py native() (lead card run) still read... |
 | S12-38 | ICE in the SLP vectorizer on gcc.dg vect-pr123221.c at -O3 -march=knc (found by S12-30's torture sweep) | Not started |  |
-| S12-39 | pm.py submit stops demanding an engineer-side rebase that the sandbox cannot perform (Permission denied on .git/worktrees/<id>/rebase-merge) | Waiting for review | Implementation committed at 29afee64. Red run failed as expected; all 23 host tests passed. Log: .work/_sta... |
+| S12-39 | pm.py submit stops demanding an engineer-side rebase that the sandbox cannot perform (Permission denied on .git/worktrees/<id>/rebase-merge) | Done | Engineers no longer need to rebase before submitting: submit only refuses when main has real changes the br... |
 | S12-40 | Indirect prefetch recognizes Fortran sparse loops (array descriptors, ARRAY_REF offsets, nonzero and OpenMP-outlined starts) so NPB-CG benefits | draft |  |
 | S13-01 | M4 final gate - stage the ADR-0015 gate run at the final head (17 programs, held-out unsealed, six pairs, three profiles) | draft |  |
 | S13-02 | Libgomp per-region thread density - choose 1-4 workers per core per parallel region instead of once per program | draft |  |
@@ -280,6 +280,7 @@ Current tickets: `[##################--]` 238 of 255
 
 ## Recent activity
 
+- 2026-11-15 05:45 **S12-39** lead approve: Engineers no longer need to rebase before submitting: submit only refuses when main has real changes the branch lacks, and approve merges main (and...
 - 2026-11-15 05:34 **S12-39** engineer submit: Implementation committed at 29afee64. Red run failed as expected; all 23 host tests passed. Log: .work/_state/logs/s12_39_integration-20261115-0528...
 - 2026-11-15 05:33 **S12-39** lead answer: Yes: submit with --override 'test/code ratio 123:64; seven host tests each map to one ticket deliverable (status-only submit, real-change refusal, ...
 - 2026-11-15 05:33 **S12-30** engineer ask: 1d9532db: HPCG retry with installed C++ headers failed at ComputeSPMV_ref.cpp:28: omp.h missing. Prior launch failed: python3.exe absent; corrected...
@@ -287,13 +288,12 @@ Current tickets: `[##################--]` 238 of 255
 - 2026-11-15 05:31 **S12-39** engineer ask: Implementation committed at 29afee64; red run failed as expected and all 23 host tests passed. Submit refused only the soft test/code ratio: 123 te...
 - 2026-11-15 05:31 **S12-37** engineer submit: T1/T2 checks keep every generated file inside runner.out (9 modules incl. scalar_abi, libgcc, secondary_reload, storent, x87_spill); red b7660998 d...
 - 2026-11-15 05:30 **S12-37** owner decide: Lead raises sessions 3 -> 4: the work is complete and rebased (fe42b548); the lead submits it.
-- 2026-11-15 05:30 **S12-30** owner decide: Lead raises input_tokens 20M -> 30M and narrows scope: C form only (HPCG); Fortran recognition for NPB-CG split to S12-40. Progress since the last ...
 
 ## Cost
 
 - From the script, engineer: 691 sessions, 1371.9M input tokens
 - From the script, lead: 459 sessions, 129.1M input tokens
-- Started by hand, Claude: 12 sessions, 3537.4M input tokens
+- Started by hand, Claude: 12 sessions, 3540.2M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
