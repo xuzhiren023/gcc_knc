@@ -1,10 +1,10 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-14 20:39.
+Updated automatically at every ticket change. Last update: 2026-11-14 20:48.
 
 **Next: the tech lead, on S12-21.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
-Current tickets: `[##################--]` 229 of 244
+Current tickets: `[##################--]` 230 of 244
 
 ## Milestones
 
@@ -14,7 +14,7 @@ Current tickets: `[##################--]` 229 of 244
 | M1 | Mixed native code | Done | 43 of 43 tickets |
 | M2 | Useful vector target | Done | 51 of 51 tickets |
 | M3 | Runtimes | Done | 48 of 48 tickets |
-| M4 | Broad optimization | In progress | 47 of 62 tickets |
+| M4 | Broad optimization | In progress | 48 of 62 tickets |
 | M5 | Program corpus | Not started | Not planned in detail yet |
 | M6 | Release | Not started | Not planned in detail yet |
 
@@ -109,7 +109,7 @@ Current tickets: `[##################--]` 229 of 244
 | S12-26 | WRF hot scalar routines - classify with the S12-19 triage tool and stage bitwise-safe per-file flag arms for PhiWeather to time | draft |  |
 | S12-27 | Latency-aware scalar loops - GCC-KNC unrolls and interleaves independent iterations and hoists conversions so one thread's every-other-cycle issue and long latencies are hidden automatically | draft |  |
 | S12-28 | dispatch.py refuses to start a second dispatcher on a lane that already has a live one | Done | dispatch.py now refuses to start a second dispatcher on a lane that already has a live one (a lock per lane... |
-| S12-29 | Wrong code - vbroadcastsd reads a 4-byte-aligned SCmode constant (complex float) straight from the constant pool and faults on the card (gcc.c-torture pr38969.c, regression from S11-27) | Waiting for review | NOT DONE: MG verify cases not restaged; NPB3.4.2 sources are DENY-ACL unreadable here (ACL untouched). Lead... |
+| S12-29 | Wrong code - vbroadcastsd reads a 4-byte-aligned SCmode constant (complex float) straight from the constant pool and faults on the card (gcc.c-torture pr38969.c, regression from S11-27) | Done | The pr38969 crash from S11-27 is fixed: GCC-KNC no longer broadcasts a vector from memory aligned below its... |
 | S13-01 | M4 final gate - stage the ADR-0015 gate run at the final head (17 programs, held-out unsealed, six pairs, three profiles) | draft |  |
 | S13-02 | Libgomp per-region thread density - choose 1-4 workers per core per parallel region instead of once per program | draft |  |
 | S13-03 | M4 retrospective - what we did wrong, what worked, and the practice changes carried into the next milestone and the agent-team skill | draft |  |
@@ -269,6 +269,7 @@ Current tickets: `[##################--]` 229 of 244
 
 ## Recent activity
 
+- 2026-11-14 20:48 **S12-29** lead approve: The pr38969 crash from S11-27 is fixed: GCC-KNC no longer broadcasts a vector from memory aligned below its element size (alignment-checked predica...
 - 2026-11-14 20:38 **S12-21** engineer red: Phase-two red at 8aed9208: added T1 unsigned 32/64-bit multiply-by-123 cost-decision test and --imul-cost selection. On lane gcc2, tools/run.py --n...
 - 2026-11-14 20:38 **S12-07** lead approve: Theme 2 (sparse indexed loads in NPB-CG/HPCG) closed with no compiler change: GCC-KNC is already at parity with GCC 5.1.1 on the sparse kernel, and...
 - 2026-11-14 20:28 **S12-07** engineer submit: Lead-authorized phase-1 premise-failure closure, 9cef3599; docs/research/s12-07-sparse.md records all 168 timings. Prior host build/lint PASS; lead...
@@ -276,13 +277,12 @@ Current tickets: `[##################--]` 229 of 244
 - 2026-11-14 20:27 **S12-21** lead resume: Lead: phase 1 accepted (window 2 timings were uncontended: PhiWeather ended 00:34:37Z, S12-21 ran 00:35:40Z-01:05:01Z alone; claude-turn-s12-w2 is ...
 - 2026-11-14 20:26 **S12-07** lead answer: Submit the closure.
 - 2026-11-14 20:26 **S12-07** lead resume: Type is now research: submit the phase-1 premise-failure closure (9cef3599). Record in the note that window 2 exclusivity is unproven (card_run JSO...
-- 2026-11-14 20:25 **S12-21** lead defer: Field change needed: move S12-21 to a GCC lane for phase 2 (gcc: yes, lane; sessions 6/6 may be used). Overlap checked (jobs.jsonl rows 7434-7441):...
 
 ## Cost
 
 - From the script, engineer: 650 sessions, 1280.2M input tokens
 - From the script, lead: 427 sessions, 119.1M input tokens
-- Started by hand, Claude: 12 sessions, 3346.1M input tokens
+- Started by hand, Claude: 12 sessions, 3347.5M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
