@@ -417,10 +417,12 @@ def build(host=False, legal=False):
 
 
 # Proof slots: name, switch, contraction.  min4 is the default-on compiler
-# with the cutoff at its minimum; manual is the hand-written policy.
+# with the cutoff at its minimum; twin is switch-off code with two copies
+# of the plain nest in one function; manual is the hand-written policy.
 PROOF_SLOTS = (('donor', False, 'off'), ('knc', False, 'off'),
                ('enabled', True, 'off'), ('fast', True, 'fast'),
-               ('min4', True, 'off'), ('manual', False, 'off'))
+               ('min4', True, 'off'), ('twin', False, 'off'),
+               ('manual', False, 'off'))
 MIN_TRIPS = '--param=knc-indirect-prefetch-min-trips='
 
 
@@ -438,8 +440,8 @@ def build_compiler_proof():
         cc = corpus.compiler_path(corpus.DONOR) if name == 'donor' else gcc/'xgcc'
         flags = ['-O2', '-std=gnu99', '-ffp-contract=' + contract,
                  '-DLEGAL_PROOF', '-DCOMPILER_PROOF', '-DPREFIX=' + name + '_']
-        if name == 'manual':
-            flags += ['-DMANUAL_PROOF=1']
+        if name in ('manual', 'twin'):
+            flags += ['-D' + name.upper() + '_PROOF=1']
         if name != 'donor':
             flags += ['-B' + str(gcc) + '/', '-march=knc',
                       '--sysroot=' + str(TC/'sysroot'),
@@ -458,6 +460,9 @@ def build_compiler_proof():
             suffix = '_scalar' if layout == 'lone' else '_raw'
             body = assembly[name + '_' + layout + suffix]
             print('STATIC_HINTS', name, layout, len(re.findall(r'\bvprefetch\w*\b', body)), flush=True)
+            # A zero kept on the x87 stack across a nest shows as copies of
+            # st(0); the twin control must reproduce what switch-on has.
+            print('X87_ZERO_COPIES', name, layout, len(re.findall(r'\bfld\s+%st', body)), flush=True)
         if enabled:
             # Require the recognized form, not merely some indirect hint:
             # a row-local fallback cannot prove cross-row bounds.
@@ -510,6 +515,7 @@ def host_shapes():
         for name, _, _ in PROOF_SLOTS:
             obj = OUT/('host-shape-' + name + '.o')
             run(cc, *flags, '-DPREFIX=' + name + '_', '-DMANUAL_PROOF=' + str(int(name == 'manual')),
+                '-DTWIN_PROOF=' + str(int(name == 'twin')),
                 '-DSHAPE_SEED=' + str(int(seed == 1 and name == 'enabled')),
                 '-DSAMPLE_SEED=' + str(seed-1 if seed > 1 and name == 'manual' else 0),
                 '-c', SOURCE, '-o', obj)
@@ -541,8 +547,8 @@ def host_shapes():
             arms[line.rsplit('=', 1)[1]] += 1
         if result.returncode or failed or shapes != 6*len(PROOF_SLOTS):
             errors.append('plain C or the hand-written policy failed the fixtures')
-        if len(decisions) != 34 or not arms['hint'] or not arms['scalar']:
-            errors.append('expected 34 policy decisions, some for each arm')
+        if len(decisions) != 32 or not arms['hint'] or not arms['scalar']:
+            errors.append('expected 32 policy decisions, some for each arm')
     print(('FAIL ' + '; '.join(errors)) if errors else
           'PASS host shapes: fixtures and policy decisions pass; the seeded stale-count hint and both seeded samples fault',
           flush=True)

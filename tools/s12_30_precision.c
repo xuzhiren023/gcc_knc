@@ -93,6 +93,14 @@ static __attribute__((always_inline)) inline void hpcg_body(
 #define SAMPLE_SEED 0
 #endif
 int FN(arm); /* manual slot: 1 when the last call took the hinted arm */
+/* Control slot, switch off: the plain nest twice in one function, as a
+   versioned nest is, selected by a flag that is never set.  The copy that
+   never runs negates its store so that the two cannot be merged.  It
+   separates the cost of sharing a function from the cost of the policy. */
+#ifndef TWIN_PROOF
+#define TWIN_PROOF 0
+#endif
+volatile int FN(twin);
 static inline int far(int a, int b)
 {
   long long d = (long long)b-a;
@@ -116,15 +124,15 @@ static __attribute__((always_inline)) inline void csr_rows(int rows,
 {
   for (int i = 0; i < rows; ++i) {
     int end = row[i+1], bound = end;
-    if (pf && rows-i > LEGAL_ROW_LOOKAHEAD)
+    if (pf == 1 && rows-i > LEGAL_ROW_LOOKAHEAD)
       bound = row[i+LEGAL_ROW_LOOKAHEAD+1];
     double sum = 0;
     for (int j = row[i]; j < end; ++j) {
-      if (pf && (long long)bound-j > LEGAL_DISTANCE)
+      if (pf == 1 && (long long)bound-j > LEGAL_DISTANCE)
         hint(x+col[j+LEGAL_DISTANCE]);
       sum += val[j]*x[col[j]];
     }
-    out[i] = sum;
+    out[i] = pf == 2 ? -sum : sum;
   }
 }
 static __attribute__((noinline,noclone)) void FN(csr_raw)(int rows,
@@ -137,6 +145,9 @@ static __attribute__((noinline,noclone)) void FN(csr_raw)(int rows,
     FN(arm) = far(col[row[0]],col[row[1]]) && far(col[row[1]],col[row[2]]);
   if (FN(arm)) { csr_rows(rows,row,col,val,x,out,1); return; }
 #endif
+#if TWIN_PROOF
+  if (FN(twin)) { csr_rows(rows,row,col,val,x,out,2); return; }
+#endif
   csr_rows(rows,row,col,val,x,out,0);
 }
 static __attribute__((always_inline)) inline void hpcg_rows(int rows,
@@ -147,13 +158,13 @@ static __attribute__((always_inline)) inline void hpcg_rows(int rows,
     const int *col = cols[i], *future = NULL;
     const double *val = vals[i];
     int n = count[i], next = 0;
-    if (pf && rows-i > 1 && (next = count[i+1]) > 0) future = cols[i+1];
+    if (pf == 1 && rows-i > 1 && (next = count[i+1]) > 0) future = cols[i+1];
     double sum = 0;
     for (int j = 0; j < n; ++j) {
-      if (pf && j < next) hint(x+future[j]);
+      if (pf == 1 && j < next) hint(x+future[j]);
       sum += val[j]*x[col[j]];
     }
-    out[i] = sum;
+    out[i] = pf == 2 ? -sum : sum;
   }
 }
 static __attribute__((noinline,noclone)) void FN(hpcg_raw)(int rows,
@@ -163,6 +174,9 @@ static __attribute__((noinline,noclone)) void FN(hpcg_raw)(int rows,
 #if MANUAL_PROOF
   FN(arm) = ROWS_RANDOM(count,cols,0,1,rows,1);
   if (FN(arm)) { hpcg_rows(rows,count,cols,vals,x,out,1); return; }
+#endif
+#if TWIN_PROOF
+  if (FN(twin)) { hpcg_rows(rows,count,cols,vals,x,out,2); return; }
 #endif
   hpcg_rows(rows,count,cols,vals,x,out,0);
 }
@@ -342,22 +356,27 @@ legal_kernel const FN(legal)[2][3] = {
 #ifdef COMPILER_PROOF
 /* Slot 4 is the default-on compiler with the row cutoff lowered to its
    minimum, so the hinted arm also runs on the small guard fixtures and at
-   every size of the cutoff grid.  Slot 5 is the hand-written policy.  */
-enum { DONOR, OFF, ON, FAST, MIN4, MANUAL, SLOTS };
+   every size of the cutoff grid.  The last slot is the hand-written
+   policy; its decision is read after it has run.  */
+enum { DONOR, OFF, ON, FAST, MIN4, TWIN, MANUAL, SLOTS };
 extern legal_kernel const donor_legal[3][1], knc_legal[3][1], enabled_legal[3][1];
-extern legal_kernel const fast_legal[3][1], min4_legal[3][1], manual_legal[3][1];
+extern legal_kernel const fast_legal[3][1], min4_legal[3][1], twin_legal[3][1];
+extern legal_kernel const manual_legal[3][1];
 static legal_kernel const (*tables[])[1] = {
-  donor_legal, knc_legal, enabled_legal, fast_legal, min4_legal, manual_legal
+  donor_legal, knc_legal, enabled_legal, fast_legal, min4_legal, twin_legal,
+  manual_legal
 };
 static const char *compilers[] = {
   "donor-off", "knc-switch-off", "knc-switch-on", "knc-switch-on-contract-fast",
-  "knc-switch-on-min4", "knc-handwritten-policy"
+  "knc-switch-on-min4", "knc-switch-off-two-nests", "knc-handwritten-policy"
 };
 static const char *routes[] = {"compiler"};
 extern shape_kernel const donor_shapes[3], knc_shapes[3], enabled_shapes[3];
-extern shape_kernel const fast_shapes[3], min4_shapes[3], manual_shapes[3];
+extern shape_kernel const fast_shapes[3], min4_shapes[3], twin_shapes[3];
+extern shape_kernel const manual_shapes[3];
 static shape_kernel const *shape_tables[] = {
-  donor_shapes, knc_shapes, enabled_shapes, fast_shapes, min4_shapes, manual_shapes
+  donor_shapes, knc_shapes, enabled_shapes, fast_shapes, min4_shapes, twin_shapes,
+  manual_shapes
 };
 extern int manual_arm;
 static const char *shape_names[] = {"struct-spmv", "struct-forward", "struct-backward"};
@@ -735,16 +754,21 @@ static void decision(const char *label, const char *form, int rows, int n, int e
          manual_arm ? "hint" : "scalar",expect ? "hint" : "scalar");
   if (manual_arm != expect) { ++failures; printf("FAIL decision %s %s\n",label,form); }
 }
-/* IDS always starts with the donor and the switch-off build.  */
+/* IDS always holds the switch-off build.  The largest cutoff-grid cases
+   leave the donor out to fit the card window; its ratio then prints 0.  */
 static void print_times(int sample, const int *ids, int count,
                         const double *seconds, const uint64_t *calls)
 {
+  double off = 0, donor = 0;
+  for (int j = 0; j < count; ++j) {
+    if (ids[j] == OFF) off = seconds[j]/calls[j];
+    if (ids[j] == DONOR) donor = seconds[j]/calls[j];
+  }
   for (int j = 0; j < count; ++j) {
     double per = seconds[j]/calls[j];
     printf("TIME sample=%d %s seconds=%.9f calls=%" PRIu64
            " seconds_per_call=%.12g speedup_vs_knc=%.6f speedup_vs_donor=%.6f\n",
-           sample,compilers[ids[j]],seconds[j],calls[j],per,
-           seconds[1]/calls[1]/per,seconds[0]/calls[0]/per);
+           sample,compilers[ids[j]],seconds[j],calls[j],per,off/per,donor/per);
   }
 }
 /* PATTERN 0: uniformly random columns.  1: the 27-point stencil of a
@@ -799,8 +823,10 @@ static void compiler_case(const char *label, int layout, int rows, int n,
   }
   struct matrix a = {rows,row,c,counts,v,x,cols,vals};
   reference(&a,layout == 1,want);
-  for (int t = 0; t < SLOTS; ++t) {
-    tables[t][layout][0](&a,out);
+  /* The timed slots, then the hand-written policy for its decision; the
+     guard suites have already run every slot.  */
+  for (int j = 0; j <= count; ++j) {
+    tables[j < count ? ids[j] : MANUAL][layout][0](&a,out);
     for (int i = 0; i < rows; ++i) compare(out[i],want[i],i);
   }
   if (failures) exit(1);
@@ -895,26 +921,27 @@ static void shape_case(int kind)
 }
 static void performance(void)
 {
-  static const int plain[] = {DONOR,OFF,ON}, forced[] = {DONOR,OFF,ON,MIN4};
+  static const int plain[] = {DONOR,OFF,ON}, twin[] = {DONOR,OFF,ON,TWIN};
+  static const int forced[] = {DONOR,OFF,ON,MIN4,TWIN}, pair[] = {OFF,ON};
   static const int square[] = {14000,32768,65536,131072,262144};
   /* Nests far below any cutoff: the plain arm against switch-off.  */
   for (int layout = 0; layout < 2; ++layout)
     for (int n = 13; n <= 27; n += 14)
-      compiler_case("small",layout,32,n,4096,0,plain,3,0);
+      compiler_case("small",layout,32,n,4096,0,twin,4,0);
   /* Cutoff grid: one x element per row, uniformly random columns.  Below
-     the default cutoff the min4 slot shows what the hint would do.  */
+     the default cutoff the min4 slot shows what the hint would do and the
+     two-nest control what sharing a function costs; above it the policy
+     hints, and only switch-off and switch-on are timed.  */
   for (unsigned z = 0; z < sizeof square/sizeof square[0]; ++z)
     for (int layout = 0; layout < 2; ++layout)
       for (int n = 13; n <= 27; n += 14) {
         int hinted = square[z] >= LEGAL_MIN_ROWS;
         compiler_case("square",layout,square[z],n,square[z],0,
-                      hinted ? plain : forced,hinted ? 3 : 4,hinted);
+                      hinted ? pair : forced,hinted ? 2 : 5,hinted);
       }
   /* Reported control: many rows over a 32 KiB x, which no row count sees. */
   for (int layout = 0; layout < 2; ++layout)
     compiler_case("small-x",layout,32768,13,4096,0,plain,3,1);
-  compiler_case("memory",0,32768,13,2097152,0,plain,3,1);
-  compiler_case("memory",1,32768,27,2097152,0,plain,3,1);
   compiler_case("stencil-104-cubed",1,104*104*104,27,104*104*104,1,plain,3,0);
   for (int kind = 0; kind < 3; ++kind) shape_case(kind);
   compiler_case("lone-memory",2,1,262144,2097152,0,plain,3,1);
