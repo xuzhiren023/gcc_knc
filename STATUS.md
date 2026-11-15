@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-15 05:45.
+Updated automatically at every ticket change. Last update: 2026-11-15 05:46.
 
-**Next: the tech lead, on S12-30.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: GPT-6.1, on S12-30 (Sparse indexed reductions faster than today - vector gather of products with an ordered scalar sum, and indirect prefetch, for CSR-style loops (NPB-CG, HPCG)).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
 Current tickets: `[##################--]` 239 of 255
 
@@ -110,7 +110,7 @@ Current tickets: `[##################--]` 239 of 255
 | S12-27 | Latency-aware scalar loops - GCC-KNC unrolls and interleaves independent iterations and hoists conversions so one thread's every-other-cycle issue and long latencies are hidden automatically | draft |  |
 | S12-28 | dispatch.py refuses to start a second dispatcher on a lane that already has a live one | Done | dispatch.py now refuses to start a second dispatcher on a lane that already has a live one (a lock per lane... |
 | S12-29 | Wrong code - vbroadcastsd reads a 4-byte-aligned SCmode constant (complex float) straight from the constant pool and faults on the card (gcc.c-torture pr38969.c, regression from S11-27) | Done | The pr38969 crash from S11-27 is fixed: GCC-KNC no longer broadcasts a vector from memory aligned below its... |
-| S12-30 | Sparse indexed reductions faster than today - vector gather of products with an ordered scalar sum, and indirect prefetch, for CSR-style loops (NPB-CG, HPCG) | Question for the tech lead | 1d9532db: HPCG retry with installed C++ headers failed at ComputeSPMV_ref.cpp:28: omp.h missing. Prior laun... |
+| S12-30 | Sparse indexed reductions faster than today - vector gather of products with an ordered scalar sum, and indirect prefetch, for CSR-style loops (NPB-CG, HPCG) | In progress | Yes: run the corrected HPCG dump command in docs/research/s12-30-phase1.md (--application-dumps hpcg). Read... |
 | S12-31 | HPCG is 1.8% slower with GCC-KNC than with GCC 5.1.1 - find the cause and make it faster (owner: never slower than 5.1.1) | In progress | Red approved: the two new T1 tests fail on today's compiler for the intended reasons (x87 loops emit cmp; f... |
 | S12-32 | ICE (reload) in gcc.c-torture O3-vect-pr32243.c on the installed GCC-KNC, found by the S12-21 torture sweep | Done | The -O3 vector reload crash in pr32243 is fixed: byte/word vector extends now reload through an aligned sta... |
 | S12-33 | T2 writes its short-vector test binaries into a per-run folder, so Claude, Codex and lead runs never block each other | Done | T2's short-vector cross-check now writes its binaries into the run's own output folder instead of the share... |
@@ -280,6 +280,7 @@ Current tickets: `[##################--]` 239 of 255
 
 ## Recent activity
 
+- 2026-11-15 05:46 **S12-30** lead answer: Yes: run the corrected HPCG dump command in docs/research/s12-30-phase1.md (--application-dumps hpcg). Read 1d9532db: the fix is right. Checked: .w...
 - 2026-11-15 05:45 **S12-39** lead approve: Engineers no longer need to rebase before submitting: submit only refuses when main has real changes the branch lacks, and approve merges main (and...
 - 2026-11-15 05:34 **S12-39** engineer submit: Implementation committed at 29afee64. Red run failed as expected; all 23 host tests passed. Log: .work/_state/logs/s12_39_integration-20261115-0528...
 - 2026-11-15 05:33 **S12-39** lead answer: Yes: submit with --override 'test/code ratio 123:64; seven host tests each map to one ticket deliverable (status-only submit, real-change refusal, ...
@@ -287,7 +288,6 @@ Current tickets: `[##################--]` 239 of 255
 - 2026-11-15 05:32 **S12-37** lead changes: One defect: some of the moved outputs were card inputs. tools/libgcc.py native() (lead card run) still reads .work/_shared/tmp/S2-07/*-libgcc.mic, ...
 - 2026-11-15 05:31 **S12-39** engineer ask: Implementation committed at 29afee64; red run failed as expected and all 23 host tests passed. Submit refused only the soft test/code ratio: 123 te...
 - 2026-11-15 05:31 **S12-37** engineer submit: T1/T2 checks keep every generated file inside runner.out (9 modules incl. scalar_abi, libgcc, secondary_reload, storent, x87_spill); red b7660998 d...
-- 2026-11-15 05:30 **S12-37** owner decide: Lead raises sessions 3 -> 4: the work is complete and rebased (fe42b548); the lead submits it.
 
 ## Cost
 
