@@ -345,3 +345,38 @@ to `2e70e4115e2` with the scalar-broadcast alignment fixes. The lead must
 perform the rebase and any resulting GCC build before final acceptance.
 The current checks and staged candidate refer to `1a4f5aab0a2`. X86 identity
 and native card execution have not run here and remain lead-owned.
+
+### T0-T2 result and scanner correction
+
+The complete `tools/check.py t0 t1 t2 --compiler gcc16 --worker` run ended
+with exit 1 after 22.6 minutes, in
+`.work/_state/logs/s12_21_green-20261114-205734.log`.
+T0 passed all four groups: 36 compiler regressions, 8 doctor tests,
+6 portability tests and 6 lint tests. All T1 checks other than the original
+IMUL scan passed. T2 passed the first V16HI hidden-result-pointer check,
+then stopped with a permission error writing
+`.work/_shared/S5-21/short-vector-O2-0.mic`. This is an infrastructure
+failure; the remaining T2 work is unverified. No bypass was attempted.
+
+Inspection of the failing IMUL assembly showed the intended shift/subtract
+sequences in both functions, with no IMUL instruction. The original regex
+also matched the source filename in `.file "knc-imul-cost.c"`. The test now
+anchors its prohibition to an instruction line, preserving the requirement
+to reject every scalar IMUL opcode while excluding metadata. The positive
+per-function strength-reduction requirements are unchanged.
+
+Only that corrected case was rerun. It still fails on an actual IMUL with
+the installed compiler, and passes with the lead-built lane-2 compiler:
+
+```text
+python tools/run.py --name s12-21-imul-baseline-scan --inputs tools/check.py tests/t1/knc-imul-cost.c -- python tools/check.py t1 --compiler donor --cc ../_shared/gcc-knc-16.2.0/bin/k1om-mpss-linux-gcc.exe --imul-cost --worker
+python tools/run.py --name s12-21-imul-green-scan --inputs tools/check.py tests/t1/knc-imul-cost.c -- python tools/check.py t1 --compiler gcc16 --imul-cost --worker
+```
+
+The first command's `--compiler donor` selects the runner without the
+build-tree `-B` override; its explicit `--cc` is the installed GCC 16 KNC
+compiler, not GCC 5. Logs are
+`.work/_state/logs/s12_21_imul_baseline_scan-20261114-212026.log` (expected
+failure on an instruction) and `s12_21_imul_green_scan-20261114-212026.log`
+(pass). Passing unrelated T0/T1 checks were not repeated, and neither the
+cost value nor the compiler source changed to accommodate the scanner fix.

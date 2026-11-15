@@ -6,7 +6,7 @@
 // Unsigned arithmetic makes every input valid, including modular overflow.
 // Keep default density four and do not enable fast math or PhiNix.
 // options: -O2 -march=knc
-// scan-asm-not: \bimul[lq]?\b
+// scan-asm-not: ^[ \t]+imul[lq]?[ \t]
 // scan-asm-func multiply32: \b(?:sal|shl|lea|add|sub)l\b
 // scan-asm-func multiply64: \b(?:sal|shl|lea|add|sub)q\b
 
