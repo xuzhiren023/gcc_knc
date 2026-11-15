@@ -2,7 +2,7 @@
 
 Updated automatically at every ticket change. Last update: 2026-11-14 20:56.
 
-**Next: the tech lead, on S12-24.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: the tech lead, on S12-30.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[##################--]` 230 of 246
 
@@ -104,7 +104,7 @@ Current tickets: `[##################--]` 230 of 246
 | S12-21 | Scheduling model for M4's serial runs - measure density-1 tuning and the integer-multiply cost against today's density-4 defaults (S12-14 B02, B04, B05) | In progress | Built; run green and stage. |
 | S12-22 | Low-risk corrections from the S12-14 audit - wrong comments and citations (N01-N09) and the far-prefetch-distance range bug (B10) | Done | The audit's comment and citation fixes are in GCC-KNC and the far prefetch distance can no longer be set eq... |
 | S12-23 | Floating-point environment correctness on KNC - fix the underflow probe that cannot tell flushing from rounding, and handle x87 erratum CD28 (S12-14 N06, N07, B16, B17) | Done | GCC-KNC's floating-point environment handling is now correct on the card: x87 exception clearing uses the C... |
-| S12-24 | ICE in vect_transform_stmt (tree-vect-stmts.cc:13381) on WRF's REMEZ at -mphinix (-O3 -march=knc) | Tests waiting for review | Red b753a488: tests/t1/knc-vec-neg-induction.c ('check t1 --compiler gcc16 --neg-induction') fails with the... |
+| S12-24 | ICE in vect_transform_stmt (tree-vect-stmts.cc:13381) on WRF's REMEZ at -mphinix (-O3 -march=knc) | In progress | The WRF REMEZ compiler crash is now reproduced by a 10-line k=-k loop test (int and unsigned char) that fai... |
 | S12-25 | WRF smpar build arm with --param=knc-threads-per-core=2 for PhiWeather's 2-threads-per-core runs (A/B against S11-26's default-4 build) | draft |  |
 | S12-26 | WRF hot scalar routines - classify with the S12-19 triage tool and stage bitwise-safe per-file flag arms for PhiWeather to time | draft |  |
 | S12-27 | Latency-aware scalar loops - GCC-KNC unrolls and interleaves independent iterations and hoists conversions so one thread's every-other-cycle issue and long latencies are hidden automatically | draft |  |
@@ -272,13 +272,13 @@ Current tickets: `[##################--]` 230 of 246
 ## Recent activity
 
 - 2026-11-14 20:56 **S12-30** engineer red: f36bc172: host x87 model FAIL as intended at row lengths 2/13/27: -1+(1+2^-27)*(1-2^-27) yields -2^-54; double products yield zero. Both target sca...
+- 2026-11-14 20:56 **S12-24** lead approve-red: The WRF REMEZ compiler crash is now reproduced by a 10-line k=-k loop test (int and unsigned char) that fails with the ticket's ICE, and the root c...
 - 2026-11-14 20:55 **S12-21** lead answer: Built; run green and stage.
 - 2026-11-14 20:55 **S12-21** lead resume: Lead: lane gcc2 built at 1a4f5aab0a2 (log s12_21_build). Run T0-T2 with tests/t1/knc-imul-cost.c green, the ICE sweeps, and stage the short paired ...
 - 2026-11-14 20:54 **S12-24** engineer red: Red b753a488: tests/t1/knc-vec-neg-induction.c ('check t1 --compiler gcc16 --neg-induction') fails with the ticket's ICE; log .work/_state/logs/che...
 - 2026-11-14 20:52 **S12-21** lead defer: GCC build needed (interactive lead): build lane gcc2 at 1a4f5aab0a2 (branch s12/S12-21). Diff reviewed: one hunk in i386-knc.cc knc_processor_costs...
 - 2026-11-14 20:50 **S12-21** engineer ask: GCC build needed at 1a4f5aab0a2 (lane gcc2). Approved red followed by KNC-only multiply costs 10 for QI/HI/SI/DI and 20 for TI, based on R02 p.56 a...
 - 2026-11-14 20:48 **S12-29** lead approve: The pr38969 crash from S11-27 is fixed: GCC-KNC no longer broadcasts a vector from memory aligned below its element size (alignment-checked predica...
-- 2026-11-14 20:48 **S12-21** lead approve-red: Phase-2 red approved: tests/t1/knc-imul-cost.c fails on today's compiler only because x*123 (32- and 64-bit) is still emitted as IMUL under the 3-c...
 
 ## Cost
 
