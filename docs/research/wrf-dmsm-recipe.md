@@ -1,12 +1,10 @@
 # WRF 4.8.0 dm+sm with GCC-KNC (S12-35)
 
-**Draft: blocked by an incompatible MPICH Fortran module.** The resumed
-build stopped in `phys/module_firebrand_spotting_mpi.F`, whose `USE MPI`
-reads the GCC 5-built `mpi.mod`. GCC-KNC 16 reports that the module was
-created by a different version of GNU Fortran. RSL_LITE itself uses the
-legacy interface described below, but that does not cover all WRF physics.
-No model workaround or MPI rebuild has been applied; do not treat this
-recipe as a completed or validated build.
+**Draft: host build in progress.** The image's GCC 5 `mpi.mod` cannot be
+read by GCC-KNC 16. S12-35 authorizes rebuilding only the four MPICH
+`use mpi` interface modules with GCC-KNC 16, preserving the image's
+configured constants and linking its existing libraries. The module
+and data-model checks passed; WRF has resumed with the new include path.
 
 The primary build uses the three prebuilt MPI inputs authorized in S12-35:
 `mpich-thr/libmpi.a`, `phi_thr_copy.o`, and `k17-memcpy/copy.o`.
@@ -61,9 +59,9 @@ objects target K1OM through its explicit cross compilers. Its wrapper records
 WRF's RSL_LITE uses the MPI C interface and the legacy Fortran interface
 declared by the text `mpif.h`. Include that prefix's headers; link its
 `libmpifort.a` for the legacy Fortran entry points. No MPI `.mod` from GCC 5
-is consumed by RSL_LITE. Other WRF physics does consume `mpi.mod` (see the
-blocker above); modules from different GFortran versions are not
-interchangeable.
+is consumed by RSL_LITE. Firebrand spotting physics does consume `mpi.mod`;
+use the GCC 16 modules prepared below before the original include directory.
+Modules from different GFortran versions are not interchangeable.
 
 The primary image MPI is the read-only prebuilt
 `$ITEM21/mpich-thr/libmpi.a`, `$ITEM21/obj/thr/phi_thr_copy.o`, and
@@ -73,6 +71,88 @@ explicit lead authorization. No helper source or other model kernel is copied.
 The recorded helper build uses bootstrap GCC 5.1.1 with `-mknc -O1
 -fno-pic -fno-tree-vectorize -std=gnu99 -fopenmp`. Its build notes and the
 reduced link both expose the `phi_copy_dwords` dependency supplied by `copy.o`.
+
+## GCC 16 MPI modules
+
+The scientific-sources MPICH directory contains only repository metadata
+and submodule directories on this host. The complete release export and
+configured sources are beside the MPI install: `$MPI/../source/mpich-3.4.3`
+and `$MPI/../build/src/binding/fortran/use_mpi`. Read them without changes.
+Copy only the four module sources, `mpifnoext.h`, and COPYRIGHT into an
+owned module directory. This preserves the image's configure substitutions;
+no MPI implementation, wrapper or library is rebuilt.
+
+Run this with the environment above before configuring WRF. It compares
+all 262 parameter definitions with installed `mpif.h`, builds the modules
+in dependency order, and checks kinds, storage sizes and precision/range
+against the configured data model. Stop on any mismatch.
+
+```sh
+export TRIAL
+python3 - <<'PY'
+from pathlib import Path
+import os
+import re
+import shutil
+import subprocess
+
+trial = Path(os.environ['TRIAL'])
+experiment = Path('/cygdrive/c/Users/xuzhi/Documents/PhiWeather/.tools/knc-bootstrap/experiments/mpich-nemesis-mmap/4cd8ccceb34a460d8841adf17c0b15b1')
+source = experiment / 'source/mpich-3.4.3'
+configured = experiment / 'build/src/binding/fortran/use_mpi'
+output = trial / 'dmsm-mpi'
+output.mkdir(exist_ok=True)
+
+# Preserve the original license with the authorized module-source copies.
+for name in ('mpi_constants.f90', 'mpi_sizeofs.f90', 'mpi_base.f90', 'mpifnoext.h'):
+    shutil.copyfile(configured / name, output / name)
+shutil.copyfile(source / 'src/binding/fortran/use_mpi/mpi.f90', output / 'mpi.f90')
+shutil.copyfile(source / 'COPYRIGHT', output / 'COPYRIGHT')
+
+def parameters(path):
+    text = path.read_text().upper()
+    blocks = re.findall(r'PARAMETER\s*\(([^\n]+)\)', text)
+    return {key: value.strip() for block in blocks
+            for key, value in re.findall(r'(MPI_\w+)\s*=\s*([^,]+)', block)}
+
+installed = parameters(experiment / 'prefix/include/mpif.h')
+local = parameters(output / 'mpifnoext.h')
+assert installed == local, (installed.keys() ^ local.keys(),
+    [(k, installed[k], local.get(k)) for k in installed if installed[k] != local.get(k)])
+assert {k: local[k] for k in ('MPI_INTEGER_KIND', 'MPI_ADDRESS_KIND', 'MPI_OFFSET_KIND', 'MPI_COUNT_KIND')} == {
+    'MPI_INTEGER_KIND': '4', 'MPI_ADDRESS_KIND': '8', 'MPI_OFFSET_KIND': '8', 'MPI_COUNT_KIND': '8'}
+print('Matched all', len(local), 'mpif.h parameters; integer kind 4, address/offset/count kinds 8.', flush=True)
+compiler = 'k1om-mpss-linux-gfortran'
+flags = ['-mphinix', '-mknc-card=7120']
+subprocess.check_call([compiler, '--version'])
+for name in ('mpi_constants', 'mpi_sizeofs', 'mpi_base', 'mpi'):
+    subprocess.check_call([compiler] + flags + ['-c', name + '.f90'], cwd=output)
+
+# Compile-time checks of the configured data model, without executing card code.
+checks = ['kind(0) == MPI_INTEGER_KIND', 'storage_size(0) == 32',
+          'storage_size(0_MPI_ADDRESS_KIND) == 64', 'storage_size(0_MPI_OFFSET_KIND) == 64',
+          'storage_size(0_MPI_COUNT_KIND) == 64', 'storage_size(0.0) == 32',
+          'storage_size(0.0d0) == 64', 'storage_size(.true.) == 32',
+          'kind(0.0) == 4', 'kind(0.0d0) == 8', 'kind(.true.) == 4',
+          'range(0) == 9', 'precision(0.0) == 6', 'range(0.0) == 37',
+          'precision(0.0d0) == 15', 'range(0.0d0) == 307']
+for kind, digits in ((1, 2), (2, 4), (4, 9), (8, 18)):
+    checks += [f'storage_size(0_{kind}) == {kind * 8}', f'range(0_{kind}) == {digits}']
+with (output / 'kind-check.f90').open('w', newline='\n') as stream:
+    stream.write('module kind_check\nuse mpi\nimplicit none\n')
+    for i, condition in enumerate(checks):
+        stream.write(f'integer, parameter :: check_{i} = 1 / merge(1, 0, {condition})\n')
+    stream.write('end module\n')
+subprocess.check_call([compiler] + flags + ['-c', 'kind-check.f90'], cwd=output)
+print('GCC16 kinds and storage sizes match configured MPICH data model. Modules built; no libraries replaced.', flush=True)
+PY
+```
+
+Put this module directory before `$MPI/include` in `DM_FC`. The four `.mod`
+files are GCC 16 inputs; their `.o` files are not added to WRF's link.
+Calls still resolve through the image `libmpifort.a`. This validates the
+configured data model and compilation; runtime interoperability needs the
+coordinated card run.
 
 ## Source and export preparation
 
@@ -165,7 +245,7 @@ OMPCC           =       # -fopenmp
 SFC = k1om-mpss-linux-gfortran -static-libgcc -static-libgfortran
 SCC = k1om-mpss-linux-gcc -static-libgcc
 CCOMP = k1om-mpss-linux-gcc -static-libgcc
-DM_FC = $(SFC) -I/cygdrive/c/Users/xuzhi/Documents/PhiWeather/.tools/knc-bootstrap/experiments/mpich-nemesis-mmap/4cd8ccceb34a460d8841adf17c0b15b1/prefix/include
+DM_FC = $(SFC) -I/cygdrive/c/Users/xuzhi/Documents/gcc_knc/.work/_shared/wrf-trial/dmsm-mpi -I/cygdrive/c/Users/xuzhi/Documents/PhiWeather/.tools/knc-bootstrap/experiments/mpich-nemesis-mmap/4cd8ccceb34a460d8841adf17c0b15b1/prefix/include
 DM_CC = $(SCC) -I/cygdrive/c/Users/xuzhi/Documents/PhiWeather/.tools/knc-bootstrap/experiments/mpich-nemesis-mmap/4cd8ccceb34a460d8841adf17c0b15b1/prefix/include
 FC              =       CONFIGURE_FC
 CC              =       CONFIGURE_CC
