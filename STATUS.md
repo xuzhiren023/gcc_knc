@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-15 04:20.
+Updated automatically at every ticket change. Last update: 2026-11-15 04:21.
 
 **Next: GPT-6.1, on S12-34 (Unrecognizable insn for a truncating vector store to a 1-byte-aligned V16QI destination (found by S12-32)).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
@@ -288,7 +288,7 @@ Current tickets: `[##################--]` 238 of 251
 ## Cost
 
 - From the script, engineer: 681 sessions, 1355.7M input tokens
-- From the script, lead: 452 sessions, 126.3M input tokens
+- From the script, lead: 453 sessions, 127.0M input tokens
 - Started by hand, Claude: 12 sessions, 3496.6M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
