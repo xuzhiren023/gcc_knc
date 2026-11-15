@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-15 15:32.
+Updated automatically at every ticket change. Last update: 2026-11-15 15:33.
 
-**Next: the tech lead, on S12-09.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+Nothing can move right now.
 
 Current tickets: `[##################--]` 242 of 268
 
@@ -89,7 +89,7 @@ Current tickets: `[##################--]` 242 of 268
 | S12-06 | M4 theme 1 - strict scalar FP conversions and call boundaries (NPB-EP transform and log path, NPB-IS randlc) | Done | Theme 1 (scalar FP conversions and calls in NPB-EP/IS) closed with no compiler change: a card diagnostic sh... |
 | S12-07 | M4 theme 2 - indexed-load scheduling with strict sparse reduction (NPB-CG) | Done | Theme 2 (sparse indexed loads in NPB-CG/HPCG) closed with no compiler change: GCC-KNC is already at parity ... |
 | S12-08 | M4 theme 3 - dependency-preserving scalar updates and register pressure in dense loops (PB-ludcmp, x87 stack traffic) | Done | Theme 3 (register pressure in dense loops) closed with no compiler change: PB-ludcmp's extra x87 stack traf... |
-| S12-09 | Sprint 12 batch check - integrated themes at the final Sprint 12 head, regression evidence, optional modes frozen | Question for the tech lead | c87d5c15 completes the remaining work: full T0 PASS (59 tests), T1 PASS; T2 retained PASS. Logs: .work/_sta... |
+| S12-09 | Sprint 12 batch check - integrated themes at the final Sprint 12 head, regression evidence, optional modes frozen | lead | Interactive lead: merge main into s12/S12-09 (main is 74 commits ahead, incl. S13-05 docs/research/knc-mach... |
 | S12-10 | Research - what KNC hardware and runtime knowledge are we still missing to tune GCC-KNC, the OS runtime and broad optimization, and where is it documented? | Done | KNC reference-gap research done: 16 gaps ranked, 32 primary sources (98 MB, outside git) with page-cited fa... |
 | S12-11 | Research - best practices for a dual Xeon E5-2690 v3 + Xeon Phi (KNC) workstation (HP Z840) for LLM inference and scientific computing | Done | Z840 dual E5-2690 v3 + Xeon Phi setup guide done: slot/BIOS/memory/power/cooling checklist, MPSS-on-modern-... |
 | S12-12 | Stage S12-10's residual-gap card experiments as one combined Sprint 12 diagnostic batch (PMU access, prefetch, page backing, libm route, branches, allocator) | Done | The six follow-up card experiments (counter access, prefetch, page backing, libm route, branches, allocator... |
@@ -293,6 +293,7 @@ Current tickets: `[##################--]` 242 of 268
 
 ## Recent activity
 
+- 2026-11-15 15:33 **S12-09** lead defer: Interactive lead: merge main into s12/S12-09 (main is 74 commits ahead, incl. S13-05 docs/research/knc-machine.yaml and model-first-optimization-me...
 - 2026-11-15 15:32 **S12-09** engineer ask: c87d5c15 completes the remaining work: full T0 PASS (59 tests), T1 PASS; T2 retained PASS. Logs: .work/_state/logs/check_gcc16_t0-20261115-151528.l...
 - 2026-11-15 15:31 **S13-05** lead approve: The model-first skill (.claude/skills/model-first with formulas, levers and a worked C7 example) and a sourced KNC machine file (docs/research/knc-...
 - 2026-11-15 15:17 **S13-05** engineer submit: Removed the PyYAML dependency only in tests/regress/test_model_first.py, using a strict standard-library YAML subset reader with duplicate-key reje...
@@ -300,7 +301,6 @@ Current tickets: `[##################--]` 242 of 268
 - 2026-11-15 15:12 **S12-09** engineer escalate: budget: 7466553 input tokens used; the budget is 6000000
 - 2026-11-15 15:11 **S13-05** lead changes: Approve refused by the machine check: tools/check t0 runs tests/regress under Cygwin python3.12, which has no PyYAML, so test_model_first.py fails ...
 - 2026-11-15 14:58 **S13-05** engineer submit: Submitted by the lead: model-first skill (.claude/skills/model-first, 160 lines + 3 references incl. a C7 worked example), docs/research/knc-machin...
-- 2026-11-15 14:58 **S13-05** lead answer: Merged; lead submits now.
 
 ## Cost
 
