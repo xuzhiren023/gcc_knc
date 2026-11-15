@@ -10,7 +10,7 @@ from dataclasses import asdict
 import json
 import math
 import os
-from pathlib import Path
+from pathlib import Path, PureWindowsPath
 import shutil
 import subprocess
 import sys
@@ -164,16 +164,89 @@ def run_job(stage, job, build, builds, folder, number, timeout):
     transport = {}
     rc = c.card_call(stage, files, program + ('-control' if job.get('control') else ''),
                      'serial', out, err, job['profile'], timeout, record=transport)
-    row = c.output_result(job, out.read_text(errors='replace'), err.read_text(errors='replace'), rc)
+    return derive_row(job, build, out, err, rc, transport)
+
+
+def derive_row(job, build, out, err, rc, transport):
+    """One launch row from its stored captures; run and recheck share it."""
+    stdout = out.read_text(errors='replace')
+    row = c.output_result(job, stdout, err.read_text(errors='replace'), rc)
     row.update(stdout=str(out), stderr=str(err), transport=transport,
                runtime_prefix=next(c.windows_path(f) for f in build['files'] if f.endswith('runtime-prefix.json')))
-    row['control_injected'] = ('CORPUS_INJECTED ' + program) in out.read_text(errors='replace')
+    row['control_injected'] = ('CORPUS_INJECTED ' + job['program']) in stdout
     # Keep the transport observations in the launch row, not a receipt artifact.
     if (transport.get('result_class') != 'program' or transport.get('program_exit_code') not in ((0,1) if job.get('control') else (0,))
             or transport.get('foreign_processes') or transport.get('overlapping_jobs')
             or transport.get('timingValid') is False):
         row.update(check='fail', cause='transport, exclusivity or resource validity failure')
     return row
+
+
+def launches(profile, block, builds, spec):
+    plan = schedule(profile, block == 'extension')
+    for job in plan:
+        prepare_job(job, builds, spec)
+    # Negative controls are native launches outside the scored windows.
+    controls = [dict(next(j for j in plan if j['program'] == program and j['compiler'] == c.KNC), control=True)
+                for program in CONTROLS]
+    return controls, plan
+
+
+def rederive_block(stage, profile, block):
+    """Re-derive every launch row of a block from its stored captures.
+
+    Jobs come from the frozen schedule, transport and lead policy from the stored
+    launch record; the raw records and captures are only read.
+    """
+    _, spec = load_freeze(stage)
+    builds = c.read_partition(stage, 'builds.json')
+    tag = paths(stage, profile, block)
+    controls, plan = launches(profile, block, builds, spec)
+    stored = {PureWindowsPath(r['stdout']).name: r for r in c.read_partition(stage, tag + '-raw.jsonl')}
+    if len(stored) != len(controls + plan):
+        raise ValueError('stored launch records do not cover the block')
+    rows = []
+    for number, job in enumerate(controls + plan):
+        name = '%03d.stdout' % number
+        raw = stored.get(name)
+        if raw is None or any(raw.get(k) != job.get(k) for k in ('program','compiler','run','profile','block','control')):
+            raise ValueError('stored launch record does not match the frozen schedule')
+        build = prepare_job(job, builds, spec)
+        folder = (c.sealed_dir(stage) if job['program'] in c.HELD_OUT else stage) / (tag + '-capture')
+        transport = raw.get('transport', {})
+        row = derive_row(job, build, folder / name, folder / ('%03d.stderr' % number),
+                         transport.get('exit_code', 255), transport)
+        row['lead_environment_policy'] = raw.get('lead_environment_policy')
+        if raw.get('negative_control'):
+            row['negative_control'] = True
+        rows.append(row)
+    return rows
+
+
+def recheck(args):
+    """Lead only: re-derive a completed block's launches from its stored captures.
+
+    Never rewrites captures or the -raw.jsonl records. Writes the -recheck record
+    (launches whose check changed; held-out ones sealed), then the derived
+    -checked/-controls/-done files; check_block re-derives from then on.
+    """
+    tag = paths(args.stage, args.profile, args.block)
+    if not (args.stage / (tag + '-done.json')).exists():
+        raise ValueError('recheck needs a completed block')
+    stored = {PureWindowsPath(r['stdout']).name: r for r in c.read_partition(args.stage, tag + '-raw.jsonl')}
+    changes = []
+    for row in rederive_block(args.stage, args.profile, args.block):
+        old = stored[PureWindowsPath(row['stdout']).name]
+        if row['check'] != old['check']:
+            changes.append(dict(launch=PureWindowsPath(row['stdout']).name, program=row['program'], compiler=row['compiler'],
+                                run=row['run'], negative_control=bool(row.get('negative_control')),
+                                stored_check=old['check'], stored_cause=old.get('cause'),
+                                check=row['check'], cause=row.get('cause')))
+    c.write_partition(args.stage, tag + '-recheck.json', changes)
+    checked = check_block(args.stage, args.profile, args.block)
+    c.write_json(args.stage / (tag + '-done.json'), dict(ready=True, passed=checked, rechecked=True))
+    print('Primary block recheck: ' + ('pass' if checked else 'fail'))
+    return 0 if checked else 1
 
 
 def run(args):
@@ -198,15 +271,8 @@ def run(args):
                 raise ValueError('all three initial profiles must finish first')
     if (args.stage / (tag + '-started.json')).exists():
         raise ValueError('block already attempted; preserve it and obtain a lead recovery decision')
-    plan = schedule(args.profile, args.block == 'extension')
-    for job in plan:
-        prepare_job(job, builds, spec)
+    controls, plan = launches(args.profile, args.block, builds, spec)
     c.write_json(args.stage / (tag + '-started.json'), dict(attempted=True))
-    # Negative controls are native launches outside the scored windows.
-    controls = []
-    for program in CONTROLS:
-        job = dict(next(j for j in plan if j['program'] == program and j['compiler'] == c.KNC), control=True)
-        controls.append(job)
     c.write_partition(args.stage, 'plan.json', controls + plan)
     public_folder = args.stage / (tag + '-capture')
     private_folder = c.sealed_dir(args.stage) / (tag + '-capture')
@@ -231,7 +297,9 @@ def run(args):
 
 def check_block(stage, profile, block):
     tag = paths(stage, profile, block)
-    rows = c.read_partition(stage, tag + '-raw.jsonl')
+    # After a lead recheck, launches are re-derived from the stored captures.
+    rows = (rederive_block(stage, profile, block) if (stage / (tag + '-recheck.json')).exists()
+            else c.read_partition(stage, tag + '-raw.jsonl'))
     # collect is the same independent correctness path used for pilot records.
     controls = [r for r in rows if r.get('negative_control')]
     normal = [r for r in rows if not r.get('negative_control')]
@@ -323,7 +391,7 @@ def score(args):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('action', choices=('stage','freeze','run','score'))
+    parser.add_argument('action', choices=('stage','freeze','run','recheck','score'))
     parser.add_argument('--stage', type=Path, default=c.SHARED / 'S13-01')
     parser.add_argument('--profile', choices=('full','3100','5100'))
     parser.add_argument('--block', choices=('initial','extension'), default='initial')
@@ -332,8 +400,8 @@ def main():
     parser.add_argument('--timeout', type=int, default=3600)
     args = parser.parse_args()
     args.stage = args.stage.resolve()
-    if args.action == 'run' and not args.profile:
-        parser.error('run requires --profile')
+    if args.action in ('run', 'recheck') and not args.profile:
+        parser.error(args.action + ' requires --profile')
     try:
         return globals()[args.action](args) or 0
     except Exception:

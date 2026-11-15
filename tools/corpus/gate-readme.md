@@ -110,6 +110,15 @@ must reject them and record evidence of injection; transport failures do not
 count as rejection. Normal codec launches also exercise peer cross-decoding
 and rejection of a corrupted compressed stream. Native controls are not votes
 or timing samples. The host fixtures exercise these checker families too.
+Each fresh process prints one start/materialize/end environment set, so a codec
+launch carries up to three in process order; the timed workload's set is the
+launch's, and a repeated or interleaved set in one process is an error.
+
+If a completed block was checked by an older parser, the lead re-derives it
+from its stored captures (`entry.py recheck --stage ../_shared/S13-01 --profile
+full --block initial`). Captures and `-raw.jsonl` stay as written; the command
+records changed checks in `-recheck.json` (held-out ones sealed), rewrites
+`-checked`, `-controls` and `-done`, and later collection re-derives too.
 
 The scorer re-collects the raw records, requires all launches and all controls,
 and uses tools/m4_score.py's frozen 10,000-replicate random.Random(1514)

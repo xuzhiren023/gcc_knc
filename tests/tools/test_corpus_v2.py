@@ -688,5 +688,81 @@ class PgoPeerPackaging(unittest.TestCase):
                         self.assertEqual(result.returncode, 0, result.stderr)
 
 
+class CodecSnapshots(unittest.TestCase):
+    """Real initial-full zlib captures (launches 034/035): workload, peer decode, control."""
+    DATA = Path(__file__).resolve().parent / 'data/s13_01_codec'
+    TRANSPORT = dict(result_class='program', exit_code=0, program_exit_code=0,
+                     foreign_processes=[], overlapping_jobs=[])
+
+    def job(self, compiler, program='zlib'):
+        return dict(program=program, compiler=compiler, flags=['-O2'], run=0, threads=1,
+                    input=corpus.INPUTS['zlib'], profile='full', variant='serial', block='initial')
+
+    def test_one_snapshot_set_per_process_attributes_the_timed_workload(self):
+        import m4_gate as gate
+        for compiler in (corpus.DONOR, corpus.KNC):
+            text = (self.DATA / ('zlib-%s.stdout' % compiler)).read_text()
+            row = corpus.output_result(self.job(compiler), text, '', 0)
+            workload = text[:text.index('CORPUS_ENV_END end\n')] + 'CORPUS_ENV_END end\n'
+            with self.subTest(compiler=compiler):
+                self.assertEqual(text.count('CORPUS_ENV_BEGIN start'), 3)
+                self.assertEqual(row['check'], 'pass', row.get('cause'))
+                self.assertEqual(row['environment'], corpus.parse_environment(workload, 'zlib'))
+                self.assertEqual(sorted(row['environment']), ['end', 'materialize', 'start'])
+                self.assertTrue(gate.environment_valid(row))
+        first = text.index('CORPUS_ENV_END start\n') + len('CORPUS_ENV_END start\n')
+        start = text[text.index('CORPUS_ENV_BEGIN start'):first]
+        materialize = text[first:text.index('CORPUS_ENV_END materialize\n') + len('CORPUS_ENV_END materialize\n')]
+        inside = first - len('CORPUS_ENV_END start\n')
+        for case, bad, program in (
+                ('repeated start in one process', text[:first] + start + text[first:], 'zlib'),
+                ('repeated materialize in one process', text.replace(materialize, materialize * 2, 1), 'zlib'),
+                ('interleaved set', text[:inside] + start + text[inside:], 'zlib'),
+                ('peer verdict in the wrong process', text.replace('CORPUS_CROSS pass\n', '', 1).replace(
+                    'CORPUS_CONTROL rejected\n', 'CORPUS_CONTROL rejected\nCORPUS_CROSS pass\n', 1), 'zlib'),
+                ('several sets outside a codec launch', text, 'SQLite')):
+            row = corpus.output_result(self.job(corpus.KNC, program), bad, '', 0)
+            with self.subTest(case=case):
+                self.assertEqual(row['check'], 'error')
+                self.assertRegex(row['cause'], 'duplicate|interleaved|attributable')
+
+    def test_recheck_rederives_a_completed_block_from_captures_only(self):
+        import m4_gate as gate
+        with tempfile.TemporaryDirectory() as temporary:
+            stage, sealed = Path(temporary) / 'S13-01', Path(temporary) / 'sealed'
+            capture = stage / 'initial-full-capture'
+            capture.mkdir(parents=True); sealed.mkdir()
+            plan, raw = [], []
+            for number, compiler in enumerate((corpus.DONOR, corpus.KNC)):
+                (capture / ('%03d.stdout' % number)).write_bytes((self.DATA / ('zlib-%s.stdout' % compiler)).read_bytes())
+                (capture / ('%03d.stderr' % number)).write_text('')
+                plan.append(self.job(compiler))
+                # As written by the original parser at launch time.
+                raw.append(dict(self.job(compiler), check='error', time_seconds=None, cause='duplicate environment snapshot',
+                                stdout=str(capture / ('%03d.stdout' % number)), stderr=str(capture / ('%03d.stderr' % number)),
+                                transport=self.TRANSPORT, lead_environment_policy=dict(lead_verified=True)))
+            (stage / 'initial-full-raw.jsonl').write_text(''.join(json.dumps(r) + '\n' for r in raw))
+            (stage / 'initial-full-done.json').write_text('{"ready": true, "passed": false}\n')
+            frozen = {p: p.read_bytes() for p in [stage / 'initial-full-raw.jsonl', *capture.iterdir()]}
+            with patch.object(corpus, 'sealed_dir', return_value=sealed), \
+                    patch.object(gate, 'load_freeze', return_value=({}, {})), \
+                    patch.object(gate, 'launches', return_value=([], plan)), \
+                    patch.object(gate, 'prepare_job', return_value=dict(files=['runtime-prefix.json'])), \
+                    redirect_stdout(io.StringIO()):
+                self.assertFalse(gate.check_block(stage, 'full', 'initial'))  # stored field: error
+                gate.recheck(SimpleNamespace(stage=stage, profile='full', block='initial'))
+                checked = corpus.read_partition(stage, 'initial-full-checked.jsonl')
+                gate.check_block(stage, 'full', 'initial')  # score's path keeps re-deriving
+                again = corpus.read_partition(stage, 'initial-full-checked.jsonl')
+            self.assertEqual({p: p.read_bytes() for p in frozen}, frozen)
+            for rows in (checked, again):
+                self.assertEqual([r['check'] for r in rows], ['pass', 'pass'])
+                self.assertTrue(all(gate.environment_valid(r) and r['lead_environment_policy'] for r in rows))
+            record = json.loads((stage / 'initial-full-recheck.json').read_text())
+            self.assertEqual([(r['launch'], r['stored_check'], r['check']) for r in record],
+                             [('000.stdout', 'error', 'pass'), ('001.stdout', 'error', 'pass')])
+            self.assertTrue(json.loads((stage / 'initial-full-done.json').read_text())['rechecked'])
+
+
 if __name__ == '__main__':
     unittest.main()

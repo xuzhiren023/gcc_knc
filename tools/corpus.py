@@ -660,7 +660,7 @@ def output_result(job, stdout, stderr, returncode):
                                     times[0], rel_tol=1e-9, abs_tol=1e-9)):
             raise ValueError('invalid launch-to-exit clock record')
         row.update(time_seconds=times[0], affinity=meta[0], timing=timing,
-                   environment=parse_environment(stdout),
+                   environment=parse_environment(stdout, job['program']),
                    secondary_timing_output=[line for line in (stdout + '\n' + stderr).splitlines()
                        if re.search(r'Time in seconds|(?:time|Time|seconds|Seconds).*[:=]|Avg time|Min time|Max time', line)],
                    system_runtime=[line for line in stdout.splitlines() if line.startswith('CORPUS_RUNTIME ')])
@@ -688,20 +688,53 @@ def output_result(job, stdout, stderr, returncode):
     return row
 
 
-def parse_environment(stdout):
-    result, current = {}, None
-    for line in stdout.splitlines():
+# A codec launch runs three fresh processes in this order (launch.c): the timed
+# workload, the peer cross-decoder and the corrupted-stream rejection.
+CODEC_VERDICTS = ('CORPUS_CHECK ', 'CORPUS_CROSS ', 'CORPUS_CONTROL ')
+
+
+def parse_environment(stdout, program=None):
+    """Return the timed workload's environment snapshots (start/materialize/end).
+
+    Each process prints exactly one set, opened by 'start' and closed by 'end'.
+    Codec launches carry up to one set per process, and each verdict line must
+    lie inside its own process's set; other launches carry exactly one set.
+    """
+    codec = program in ('zlib', 'bzip2')
+    processes, current, phase = [], None, None
+    lines = stdout.splitlines()
+    for number, line in enumerate(lines):
         if line.startswith('CORPUS_ENV_BEGIN '):
-            current = line.split()[-1]
-            if current in result:
+            name = line.split()[-1]
+            if phase is not None:
+                raise ValueError('interleaved environment snapshot')
+            if current is None or 'end' in current['sets']:
+                if name != 'start':
+                    raise ValueError('environment snapshot outside a process')
+                current = dict(sets={}, first=number, last=len(lines))
+                processes.append(current)
+            elif name in current['sets'] or name == 'start':
                 raise ValueError('duplicate environment snapshot')
-            result[current] = defaultdict(list)
+            phase = name
+            current['sets'][phase] = defaultdict(list)
         elif line.startswith('CORPUS_ENV_END '):
-            current = None
-        elif line.startswith('CORPUS_ENV ') and current:
+            if phase is None or line.split()[-1] != phase:
+                raise ValueError('interleaved environment snapshot')
+            if phase == 'end':
+                current['last'] = number
+            phase = None
+        elif line.startswith('CORPUS_ENV ') and phase is not None:
             key, _, value = line[len('CORPUS_ENV '):].partition(' ')
-            result[current][key].append(value)
-    return result
+            current['sets'][phase][key].append(value)
+    if len(processes) > (len(CODEC_VERDICTS) if codec else 1):
+        raise ValueError('duplicate environment snapshot')
+    if codec:
+        for number, line in enumerate(lines):
+            for index, verdict in enumerate(CODEC_VERDICTS):
+                if line.startswith(verdict) and not (index < len(processes) and
+                        processes[index]['first'] < number < processes[index]['last']):
+                    raise ValueError('codec environment snapshot not attributable to its process')
+    return processes[0]['sets'] if processes else {}
 
 
 def hpcg_work(text):

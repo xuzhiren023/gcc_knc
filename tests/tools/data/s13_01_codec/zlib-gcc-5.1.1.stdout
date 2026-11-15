@@ -1,0 +1,654 @@
+CORPUS_META {"cores":60,"granted_cpus":240,"threads":1,"cpus":"1"}
+CORPUS_RUNTIME glibc 2.21
+
+CORPUS_TIME 1.334380802
+CORPUS_CLOCK {"clock":"CLOCK_MONOTONIC_RAW","boundary":"launch-to-exit","start_ns":346243699121120,"end_ns":346245033501922,"utc_start_ns":1794778616496486081,"clocksource":"tsc"}
+CORPUS_ENV_BEGIN start
+CORPUS_ENV governor performance
+CORPUS_ENV minimum_frequency 619047
+CORPUS_ENV maximum_frequency 1238094
+CORPUS_ENV boost unavailable
+CORPUS_ENV clocksource tsc
+CORPUS_ENV transparent_hugepage [always] madvise never
+CORPUS_ENV MALLOC_ARENA_MAX unset
+CORPUS_ENV MALLOC_MMAP_THRESHOLD_ unset
+CORPUS_ENV MALLOC_TRIM_THRESHOLD_ unset
+CORPUS_ENV LD_LIBRARY_PATH .
+CORPUS_ENV LD_PRELOAD unset
+CORPUS_ENV OMP_NUM_THREADS 1
+CORPUS_ENV OMP_DYNAMIC FALSE
+CORPUS_ENV OMP_PROC_BIND TRUE
+CORPUS_ENV GOMP_CPU_AFFINITY 1
+CORPUS_ENV affinity 1
+CORPUS_ENV pages KernelPageSize:        4 kB
+CORPUS_ENV pages MMUPageSize:           4 kB
+CORPUS_ENV pages KernelPageSize:        4 kB
+CORPUS_ENV pages MMUPageSize:           4 kB
+CORPUS_ENV pages KernelPageSize:        4 kB
+CORPUS_ENV pages MMUPageSize:           4 kB
+CORPUS_ENV pages KernelPageSize:        4 kB
+CORPUS_ENV pages MMUPageSize:           4 kB
+CORPUS_ENV pages KernelPageSize:        4 kB
+CORPUS_ENV pages MMUPageSize:           4 kB
+CORPUS_ENV pages KernelPageSize:        4 kB
+CORPUS_ENV pages MMUPageSize:           4 kB
+CORPUS_ENV pages KernelPageSize:        4 kB
+CORPUS_ENV pages MMUPageSize:           4 kB
+CORPUS_ENV pages KernelPageSize:        4 kB
+CORPUS_ENV pages MMUPageSize:           4 kB
+CORPUS_ENV pages KernelPageSize:        4 kB
+CORPUS_ENV pages MMUPageSize:           4 kB
+CORPUS_ENV pages KernelPageSize:        4 kB
+CORPUS_ENV pages MMUPageSize:           4 kB
+CORPUS_ENV pages KernelPageSize:        4 kB
+CORPUS_ENV pages MMUPageSize:           4 kB
+CORPUS_ENV pages KernelPageSize:        4 kB
+CORPUS_ENV pages MMUPageSize:           4 kB
+CORPUS_ENV pages KernelPageSize:        4 kB
+CORPUS_ENV pages MMUPageSize:           4 kB
+CORPUS_ENV pages KernelPageSize:        4 kB
+CORPUS_ENV pages MMUPageSize:           4 kB
+CORPUS_ENV pages KernelPageSize:        4 kB
+CORPUS_ENV pages MMUPageSize:           4 kB
+CORPUS_ENV pages KernelPageSize:        4 kB
+CORPUS_ENV pages MMUPageSize:           4 kB
+CORPUS_ENV pages KernelPageSize:        4 kB
+CORPUS_ENV pages MMUPageSize:           4 kB
+CORPUS_ENV pages KernelPageSize:        4 kB
+CORPUS_ENV pages MMUPageSize:           4 kB
+CORPUS_ENV pages KernelPageSize:        4 kB
+CORPUS_ENV pages MMUPageSize:           4 kB
+CORPUS_ENV pages KernelPageSize:        4 kB
+CORPUS_ENV pages MMUPageSize:           4 kB
+CORPUS_ENV linked 00400000-00413000 r-xp 00000000 00:0c 4919798                            /var/volatile/tmp/claude/claude-25e5a866a8064eb0b17a0abc6a0fba06/workload
+CORPUS_ENV linked 00612000-00613000 rw-p 00012000 00:0c 4919798                            /var/volatile/tmp/claude/claude-25e5a866a8064eb0b17a0abc6a0fba06/workload
+CORPUS_ENV linked 7f4e0de63000-7f4e0dfb3000 r-xp 00000000 00:0c 46475                      /lib64/libc-2.21.so
+CORPUS_ENV linked 7f4e0dfb3000-7f4e0e1b2000 ---p 00150000 00:0c 46475                      /lib64/libc-2.21.so
+CORPUS_ENV linked 7f4e0e1b2000-7f4e0e1b6000 r--p 0014f000 00:0c 46475                      /lib64/libc-2.21.so
+CORPUS_ENV linked 7f4e0e1b6000-7f4e0e1b8000 rw-p 00153000 00:0c 46475                      /lib64/libc-2.21.so
+CORPUS_ENV linked 7f4e0e1bc000-7f4e0e1fa000 r-xp 00000000 00:0c 46472                      /lib64/libm-2.21.so
+CORPUS_ENV linked 7f4e0e1fa000-7f4e0e3f9000 ---p 0003e000 00:0c 46472                      /lib64/libm-2.21.so
+CORPUS_ENV linked 7f4e0e3f9000-7f4e0e3fa000 r--p 0003d000 00:0c 46472                      /lib64/libm-2.21.so
+CORPUS_ENV linked 7f4e0e3fa000-7f4e0e3fb000 rw-p 0003e000 00:0c 46472                      /lib64/libm-2.21.so
+CORPUS_ENV linked 7f4e0e3fb000-7f4e0e41b000 r-xp 00000000 00:0c 46478                      /lib64/ld-2.21.so
+CORPUS_ENV linked 7f4e0e61a000-7f4e0e61b000 r--p 0001f000 00:0c 46478                      /lib64/ld-2.21.so
+CORPUS_ENV linked 7f4e0e61b000-7f4e0e61c000 rw-p 00020000 00:0c 46478                      /lib64/ld-2.21.so
+CORPUS_ENV_END start
+CORPUS_ENV_BEGIN materialize
+CORPUS_ENV governor performance
+CORPUS_ENV minimum_frequency 619047
+CORPUS_ENV maximum_frequency 1238094
+CORPUS_ENV boost unavailable
+CORPUS_ENV clocksource tsc
+CORPUS_ENV transparent_hugepage [always] madvise never
+CORPUS_ENV MALLOC_ARENA_MAX unset
+CORPUS_ENV MALLOC_MMAP_THRESHOLD_ unset
+CORPUS_ENV MALLOC_TRIM_THRESHOLD_ unset
+CORPUS_ENV LD_LIBRARY_PATH .
+CORPUS_ENV LD_PRELOAD unset
+CORPUS_ENV OMP_NUM_THREADS 1
+CORPUS_ENV OMP_DYNAMIC FALSE
+CORPUS_ENV OMP_PROC_BIND TRUE
+CORPUS_ENV GOMP_CPU_AFFINITY 1
+CORPUS_ENV affinity 1
+CORPUS_ENV pages KernelPageSize:        4 kB
+CORPUS_ENV pages MMUPageSize:           4 kB
+CORPUS_ENV pages KernelPageSize:        4 kB
+CORPUS_ENV pages MMUPageSize:           4 kB
+CORPUS_ENV pages KernelPageSize:        4 kB
+CORPUS_ENV pages MMUPageSize:           4 kB
+CORPUS_ENV pages KernelPageSize:        4 kB
+CORPUS_ENV pages MMUPageSize:           4 kB
+CORPUS_ENV pages KernelPageSize:        4 kB
+CORPUS_ENV pages MMUPageSize:           4 kB
+CORPUS_ENV pages KernelPageSize:        4 kB
+CORPUS_ENV pages MMUPageSize:           4 kB
+CORPUS_ENV pages KernelPageSize:        4 kB
+CORPUS_ENV pages MMUPageSize:           4 kB
+CORPUS_ENV pages KernelPageSize:        4 kB
+CORPUS_ENV pages MMUPageSize:           4 kB
+CORPUS_ENV pages KernelPageSize:        4 kB
+CORPUS_ENV pages MMUPageSize:           4 kB
+CORPUS_ENV pages KernelPageSize:        4 kB
+CORPUS_ENV pages MMUPageSize:           4 kB
+CORPUS_ENV pages KernelPageSize:        4 kB
+CORPUS_ENV pages MMUPageSize:           4 kB
+CORPUS_ENV pages KernelPageSize:        4 kB
+CORPUS_ENV pages MMUPageSize:           4 kB
+CORPUS_ENV pages KernelPageSize:        4 kB
+CORPUS_ENV pages MMUPageSize:           4 kB
+CORPUS_ENV pages KernelPageSize:        4 kB
+CORPUS_ENV pages MMUPageSize:           4 kB
+CORPUS_ENV pages KernelPageSize:        4 kB
+CORPUS_ENV pages MMUPageSize:           4 kB
+CORPUS_ENV pages KernelPageSize:        4 kB
+CORPUS_ENV pages MMUPageSize:           4 kB
+CORPUS_ENV pages KernelPageSize:        4 kB
+CORPUS_ENV pages MMUPageSize:           4 kB
+CORPUS_ENV pages KernelPageSize:        4 kB
+CORPUS_ENV pages MMUPageSize:           4 kB
+CORPUS_ENV pages KernelPageSize:        4 kB
+CORPUS_ENV pages MMUPageSize:           4 kB
+CORPUS_ENV pages KernelPageSize:        4 kB
+CORPUS_ENV pages MMUPageSize:           4 kB
+CORPUS_ENV pages KernelPageSize:        4 kB
+CORPUS_ENV pages MMUPageSize:           4 kB
+CORPUS_ENV linked 00400000-00413000 r-xp 00000000 00:0c 4919798                            /var/volatile/tmp/claude/claude-25e5a866a8064eb0b17a0abc6a0fba06/workload
+CORPUS_ENV linked 00612000-00613000 rw-p 00012000 00:0c 4919798                            /var/volatile/tmp/claude/claude-25e5a866a8064eb0b17a0abc6a0fba06/workload
+CORPUS_ENV linked 7f4e0de63000-7f4e0dfb3000 r-xp 00000000 00:0c 46475                      /lib64/libc-2.21.so
+CORPUS_ENV linked 7f4e0dfb3000-7f4e0e1b2000 ---p 00150000 00:0c 46475                      /lib64/libc-2.21.so
+CORPUS_ENV linked 7f4e0e1b2000-7f4e0e1b6000 r--p 0014f000 00:0c 46475                      /lib64/libc-2.21.so
+CORPUS_ENV linked 7f4e0e1b6000-7f4e0e1b8000 rw-p 00153000 00:0c 46475                      /lib64/libc-2.21.so
+CORPUS_ENV linked 7f4e0e1bc000-7f4e0e1fa000 r-xp 00000000 00:0c 46472                      /lib64/libm-2.21.so
+CORPUS_ENV linked 7f4e0e1fa000-7f4e0e3f9000 ---p 0003e000 00:0c 46472                      /lib64/libm-2.21.so
+CORPUS_ENV linked 7f4e0e3f9000-7f4e0e3fa000 r--p 0003d000 00:0c 46472                      /lib64/libm-2.21.so
+CORPUS_ENV linked 7f4e0e3fa000-7f4e0e3fb000 rw-p 0003e000 00:0c 46472                      /lib64/libm-2.21.so
+CORPUS_ENV linked 7f4e0e3fb000-7f4e0e41b000 r-xp 00000000 00:0c 46478                      /lib64/ld-2.21.so
+CORPUS_ENV linked 7f4e0e61a000-7f4e0e61b000 r--p 0001f000 00:0c 46478                      /lib64/ld-2.21.so
+CORPUS_ENV linked 7f4e0e61b000-7f4e0e61c000 rw-p 00020000 00:0c 46478                      /lib64/ld-2.21.so
+CORPUS_ENV_END materialize
+CORPUS_CHECK pass
+CORPUS_ENV_BEGIN end
+CORPUS_ENV governor performance
+CORPUS_ENV minimum_frequency 619047
+CORPUS_ENV maximum_frequency 1238094
+CORPUS_ENV boost unavailable
+CORPUS_ENV clocksource tsc
+CORPUS_ENV transparent_hugepage [always] madvise never
+CORPUS_ENV MALLOC_ARENA_MAX unset
+CORPUS_ENV MALLOC_MMAP_THRESHOLD_ unset
+CORPUS_ENV MALLOC_TRIM_THRESHOLD_ unset
+CORPUS_ENV LD_LIBRARY_PATH .
+CORPUS_ENV LD_PRELOAD unset
+CORPUS_ENV OMP_NUM_THREADS 1
+CORPUS_ENV OMP_DYNAMIC FALSE
+CORPUS_ENV OMP_PROC_BIND TRUE
+CORPUS_ENV GOMP_CPU_AFFINITY 1
+CORPUS_ENV affinity 1
+CORPUS_ENV pages KernelPageSize:        4 kB
+CORPUS_ENV pages MMUPageSize:           4 kB
+CORPUS_ENV pages KernelPageSize:        4 kB
+CORPUS_ENV pages MMUPageSize:           4 kB
+CORPUS_ENV pages KernelPageSize:        4 kB
+CORPUS_ENV pages MMUPageSize:           4 kB
+CORPUS_ENV pages KernelPageSize:        4 kB
+CORPUS_ENV pages MMUPageSize:           4 kB
+CORPUS_ENV pages KernelPageSize:        4 kB
+CORPUS_ENV pages MMUPageSize:           4 kB
+CORPUS_ENV pages KernelPageSize:        4 kB
+CORPUS_ENV pages MMUPageSize:           4 kB
+CORPUS_ENV pages KernelPageSize:        4 kB
+CORPUS_ENV pages MMUPageSize:           4 kB
+CORPUS_ENV pages KernelPageSize:        4 kB
+CORPUS_ENV pages MMUPageSize:           4 kB
+CORPUS_ENV pages KernelPageSize:        4 kB
+CORPUS_ENV pages MMUPageSize:           4 kB
+CORPUS_ENV pages KernelPageSize:        4 kB
+CORPUS_ENV pages MMUPageSize:           4 kB
+CORPUS_ENV pages KernelPageSize:        4 kB
+CORPUS_ENV pages MMUPageSize:           4 kB
+CORPUS_ENV pages KernelPageSize:        4 kB
+CORPUS_ENV pages MMUPageSize:           4 kB
+CORPUS_ENV pages KernelPageSize:        4 kB
+CORPUS_ENV pages MMUPageSize:           4 kB
+CORPUS_ENV pages KernelPageSize:        4 kB
+CORPUS_ENV pages MMUPageSize:           4 kB
+CORPUS_ENV pages KernelPageSize:        4 kB
+CORPUS_ENV pages MMUPageSize:           4 kB
+CORPUS_ENV pages KernelPageSize:        4 kB
+CORPUS_ENV pages MMUPageSize:           4 kB
+CORPUS_ENV pages KernelPageSize:        4 kB
+CORPUS_ENV pages MMUPageSize:           4 kB
+CORPUS_ENV pages KernelPageSize:        4 kB
+CORPUS_ENV pages MMUPageSize:           4 kB
+CORPUS_ENV pages KernelPageSize:        4 kB
+CORPUS_ENV pages MMUPageSize:           4 kB
+CORPUS_ENV pages KernelPageSize:        4 kB
+CORPUS_ENV pages MMUPageSize:           4 kB
+CORPUS_ENV linked 00400000-00413000 r-xp 00000000 00:0c 4919798                            /var/volatile/tmp/claude/claude-25e5a866a8064eb0b17a0abc6a0fba06/workload
+CORPUS_ENV linked 00612000-00613000 rw-p 00012000 00:0c 4919798                            /var/volatile/tmp/claude/claude-25e5a866a8064eb0b17a0abc6a0fba06/workload
+CORPUS_ENV linked 7f4e0de63000-7f4e0dfb3000 r-xp 00000000 00:0c 46475                      /lib64/libc-2.21.so
+CORPUS_ENV linked 7f4e0dfb3000-7f4e0e1b2000 ---p 00150000 00:0c 46475                      /lib64/libc-2.21.so
+CORPUS_ENV linked 7f4e0e1b2000-7f4e0e1b6000 r--p 0014f000 00:0c 46475                      /lib64/libc-2.21.so
+CORPUS_ENV linked 7f4e0e1b6000-7f4e0e1b8000 rw-p 00153000 00:0c 46475                      /lib64/libc-2.21.so
+CORPUS_ENV linked 7f4e0e1bc000-7f4e0e1fa000 r-xp 00000000 00:0c 46472                      /lib64/libm-2.21.so
+CORPUS_ENV linked 7f4e0e1fa000-7f4e0e3f9000 ---p 0003e000 00:0c 46472                      /lib64/libm-2.21.so
+CORPUS_ENV linked 7f4e0e3f9000-7f4e0e3fa000 r--p 0003d000 00:0c 46472                      /lib64/libm-2.21.so
+CORPUS_ENV linked 7f4e0e3fa000-7f4e0e3fb000 rw-p 0003e000 00:0c 46472                      /lib64/libm-2.21.so
+CORPUS_ENV linked 7f4e0e3fb000-7f4e0e41b000 r-xp 00000000 00:0c 46478                      /lib64/ld-2.21.so
+CORPUS_ENV linked 7f4e0e61a000-7f4e0e61b000 r--p 0001f000 00:0c 46478                      /lib64/ld-2.21.so
+CORPUS_ENV linked 7f4e0e61b000-7f4e0e61c000 rw-p 00020000 00:0c 46478                      /lib64/ld-2.21.so
+CORPUS_ENV_END end
+CORPUS_ENV_BEGIN start
+CORPUS_ENV governor performance
+CORPUS_ENV minimum_frequency 619047
+CORPUS_ENV maximum_frequency 1238094
+CORPUS_ENV boost unavailable
+CORPUS_ENV clocksource tsc
+CORPUS_ENV transparent_hugepage [always] madvise never
+CORPUS_ENV MALLOC_ARENA_MAX unset
+CORPUS_ENV MALLOC_MMAP_THRESHOLD_ unset
+CORPUS_ENV MALLOC_TRIM_THRESHOLD_ unset
+CORPUS_ENV LD_LIBRARY_PATH peer
+CORPUS_ENV LD_PRELOAD unset
+CORPUS_ENV OMP_NUM_THREADS 1
+CORPUS_ENV OMP_DYNAMIC FALSE
+CORPUS_ENV OMP_PROC_BIND TRUE
+CORPUS_ENV GOMP_CPU_AFFINITY 1
+CORPUS_ENV affinity 1
+CORPUS_ENV pages KernelPageSize:        4 kB
+CORPUS_ENV pages MMUPageSize:           4 kB
+CORPUS_ENV pages KernelPageSize:        4 kB
+CORPUS_ENV pages MMUPageSize:           4 kB
+CORPUS_ENV pages KernelPageSize:        4 kB
+CORPUS_ENV pages MMUPageSize:           4 kB
+CORPUS_ENV pages KernelPageSize:        4 kB
+CORPUS_ENV pages MMUPageSize:           4 kB
+CORPUS_ENV pages KernelPageSize:        4 kB
+CORPUS_ENV pages MMUPageSize:           4 kB
+CORPUS_ENV pages KernelPageSize:        4 kB
+CORPUS_ENV pages MMUPageSize:           4 kB
+CORPUS_ENV pages KernelPageSize:        4 kB
+CORPUS_ENV pages MMUPageSize:           4 kB
+CORPUS_ENV pages KernelPageSize:        4 kB
+CORPUS_ENV pages MMUPageSize:           4 kB
+CORPUS_ENV pages KernelPageSize:        4 kB
+CORPUS_ENV pages MMUPageSize:           4 kB
+CORPUS_ENV pages KernelPageSize:        4 kB
+CORPUS_ENV pages MMUPageSize:           4 kB
+CORPUS_ENV pages KernelPageSize:        4 kB
+CORPUS_ENV pages MMUPageSize:           4 kB
+CORPUS_ENV pages KernelPageSize:        4 kB
+CORPUS_ENV pages MMUPageSize:           4 kB
+CORPUS_ENV pages KernelPageSize:        4 kB
+CORPUS_ENV pages MMUPageSize:           4 kB
+CORPUS_ENV pages KernelPageSize:        4 kB
+CORPUS_ENV pages MMUPageSize:           4 kB
+CORPUS_ENV pages KernelPageSize:        4 kB
+CORPUS_ENV pages MMUPageSize:           4 kB
+CORPUS_ENV pages KernelPageSize:        4 kB
+CORPUS_ENV pages MMUPageSize:           4 kB
+CORPUS_ENV pages KernelPageSize:        4 kB
+CORPUS_ENV pages MMUPageSize:           4 kB
+CORPUS_ENV pages KernelPageSize:        4 kB
+CORPUS_ENV pages MMUPageSize:           4 kB
+CORPUS_ENV pages KernelPageSize:        4 kB
+CORPUS_ENV pages MMUPageSize:           4 kB
+CORPUS_ENV pages KernelPageSize:        4 kB
+CORPUS_ENV pages MMUPageSize:           4 kB
+CORPUS_ENV linked 00400000-00414000 r-xp 00000000 00:0c 4937630                            /var/volatile/tmp/claude/claude-25e5a866a8064eb0b17a0abc6a0fba06/peer/workload
+CORPUS_ENV linked 00613000-00614000 rw-p 00013000 00:0c 4937630                            /var/volatile/tmp/claude/claude-25e5a866a8064eb0b17a0abc6a0fba06/peer/workload
+CORPUS_ENV linked 7f428de1f000-7f428df6f000 r-xp 00000000 00:0c 46475                      /lib64/libc-2.21.so
+CORPUS_ENV linked 7f428df6f000-7f428e16e000 ---p 00150000 00:0c 46475                      /lib64/libc-2.21.so
+CORPUS_ENV linked 7f428e16e000-7f428e172000 r--p 0014f000 00:0c 46475                      /lib64/libc-2.21.so
+CORPUS_ENV linked 7f428e172000-7f428e174000 rw-p 00153000 00:0c 46475                      /lib64/libc-2.21.so
+CORPUS_ENV linked 7f428e178000-7f428e1b6000 r-xp 00000000 00:0c 46472                      /lib64/libm-2.21.so
+CORPUS_ENV linked 7f428e1b6000-7f428e3b5000 ---p 0003e000 00:0c 46472                      /lib64/libm-2.21.so
+CORPUS_ENV linked 7f428e3b5000-7f428e3b6000 r--p 0003d000 00:0c 46472                      /lib64/libm-2.21.so
+CORPUS_ENV linked 7f428e3b6000-7f428e3b7000 rw-p 0003e000 00:0c 46472                      /lib64/libm-2.21.so
+CORPUS_ENV linked 7f428e3b7000-7f428e3d7000 r-xp 00000000 00:0c 46478                      /lib64/ld-2.21.so
+CORPUS_ENV linked 7f428e5d6000-7f428e5d7000 r--p 0001f000 00:0c 46478                      /lib64/ld-2.21.so
+CORPUS_ENV linked 7f428e5d7000-7f428e5d8000 rw-p 00020000 00:0c 46478                      /lib64/ld-2.21.so
+CORPUS_ENV_END start
+CORPUS_ENV_BEGIN materialize
+CORPUS_ENV governor performance
+CORPUS_ENV minimum_frequency 619047
+CORPUS_ENV maximum_frequency 1238094
+CORPUS_ENV boost unavailable
+CORPUS_ENV clocksource tsc
+CORPUS_ENV transparent_hugepage [always] madvise never
+CORPUS_ENV MALLOC_ARENA_MAX unset
+CORPUS_ENV MALLOC_MMAP_THRESHOLD_ unset
+CORPUS_ENV MALLOC_TRIM_THRESHOLD_ unset
+CORPUS_ENV LD_LIBRARY_PATH peer
+CORPUS_ENV LD_PRELOAD unset
+CORPUS_ENV OMP_NUM_THREADS 1
+CORPUS_ENV OMP_DYNAMIC FALSE
+CORPUS_ENV OMP_PROC_BIND TRUE
+CORPUS_ENV GOMP_CPU_AFFINITY 1
+CORPUS_ENV affinity 1
+CORPUS_ENV pages KernelPageSize:        4 kB
+CORPUS_ENV pages MMUPageSize:           4 kB
+CORPUS_ENV pages KernelPageSize:        4 kB
+CORPUS_ENV pages MMUPageSize:           4 kB
+CORPUS_ENV pages KernelPageSize:        4 kB
+CORPUS_ENV pages MMUPageSize:           4 kB
+CORPUS_ENV pages KernelPageSize:        4 kB
+CORPUS_ENV pages MMUPageSize:           4 kB
+CORPUS_ENV pages KernelPageSize:        4 kB
+CORPUS_ENV pages MMUPageSize:           4 kB
+CORPUS_ENV pages KernelPageSize:        4 kB
+CORPUS_ENV pages MMUPageSize:           4 kB
+CORPUS_ENV pages KernelPageSize:        4 kB
+CORPUS_ENV pages MMUPageSize:           4 kB
+CORPUS_ENV pages KernelPageSize:        4 kB
+CORPUS_ENV pages MMUPageSize:           4 kB
+CORPUS_ENV pages KernelPageSize:        4 kB
+CORPUS_ENV pages MMUPageSize:           4 kB
+CORPUS_ENV pages KernelPageSize:        4 kB
+CORPUS_ENV pages MMUPageSize:           4 kB
+CORPUS_ENV pages KernelPageSize:        4 kB
+CORPUS_ENV pages MMUPageSize:           4 kB
+CORPUS_ENV pages KernelPageSize:        4 kB
+CORPUS_ENV pages MMUPageSize:           4 kB
+CORPUS_ENV pages KernelPageSize:        4 kB
+CORPUS_ENV pages MMUPageSize:           4 kB
+CORPUS_ENV pages KernelPageSize:        4 kB
+CORPUS_ENV pages MMUPageSize:           4 kB
+CORPUS_ENV pages KernelPageSize:        4 kB
+CORPUS_ENV pages MMUPageSize:           4 kB
+CORPUS_ENV pages KernelPageSize:        4 kB
+CORPUS_ENV pages MMUPageSize:           4 kB
+CORPUS_ENV pages KernelPageSize:        4 kB
+CORPUS_ENV pages MMUPageSize:           4 kB
+CORPUS_ENV pages KernelPageSize:        4 kB
+CORPUS_ENV pages MMUPageSize:           4 kB
+CORPUS_ENV pages KernelPageSize:        4 kB
+CORPUS_ENV pages MMUPageSize:           4 kB
+CORPUS_ENV pages KernelPageSize:        4 kB
+CORPUS_ENV pages MMUPageSize:           4 kB
+CORPUS_ENV pages KernelPageSize:        4 kB
+CORPUS_ENV pages MMUPageSize:           4 kB
+CORPUS_ENV linked 00400000-00414000 r-xp 00000000 00:0c 4937630                            /var/volatile/tmp/claude/claude-25e5a866a8064eb0b17a0abc6a0fba06/peer/workload
+CORPUS_ENV linked 00613000-00614000 rw-p 00013000 00:0c 4937630                            /var/volatile/tmp/claude/claude-25e5a866a8064eb0b17a0abc6a0fba06/peer/workload
+CORPUS_ENV linked 7f428de1f000-7f428df6f000 r-xp 00000000 00:0c 46475                      /lib64/libc-2.21.so
+CORPUS_ENV linked 7f428df6f000-7f428e16e000 ---p 00150000 00:0c 46475                      /lib64/libc-2.21.so
+CORPUS_ENV linked 7f428e16e000-7f428e172000 r--p 0014f000 00:0c 46475                      /lib64/libc-2.21.so
+CORPUS_ENV linked 7f428e172000-7f428e174000 rw-p 00153000 00:0c 46475                      /lib64/libc-2.21.so
+CORPUS_ENV linked 7f428e178000-7f428e1b6000 r-xp 00000000 00:0c 46472                      /lib64/libm-2.21.so
+CORPUS_ENV linked 7f428e1b6000-7f428e3b5000 ---p 0003e000 00:0c 46472                      /lib64/libm-2.21.so
+CORPUS_ENV linked 7f428e3b5000-7f428e3b6000 r--p 0003d000 00:0c 46472                      /lib64/libm-2.21.so
+CORPUS_ENV linked 7f428e3b6000-7f428e3b7000 rw-p 0003e000 00:0c 46472                      /lib64/libm-2.21.so
+CORPUS_ENV linked 7f428e3b7000-7f428e3d7000 r-xp 00000000 00:0c 46478                      /lib64/ld-2.21.so
+CORPUS_ENV linked 7f428e5d6000-7f428e5d7000 r--p 0001f000 00:0c 46478                      /lib64/ld-2.21.so
+CORPUS_ENV linked 7f428e5d7000-7f428e5d8000 rw-p 00020000 00:0c 46478                      /lib64/ld-2.21.so
+CORPUS_ENV_END materialize
+CORPUS_CROSS pass
+CORPUS_ENV_BEGIN end
+CORPUS_ENV governor performance
+CORPUS_ENV minimum_frequency 619047
+CORPUS_ENV maximum_frequency 1238094
+CORPUS_ENV boost unavailable
+CORPUS_ENV clocksource tsc
+CORPUS_ENV transparent_hugepage [always] madvise never
+CORPUS_ENV MALLOC_ARENA_MAX unset
+CORPUS_ENV MALLOC_MMAP_THRESHOLD_ unset
+CORPUS_ENV MALLOC_TRIM_THRESHOLD_ unset
+CORPUS_ENV LD_LIBRARY_PATH peer
+CORPUS_ENV LD_PRELOAD unset
+CORPUS_ENV OMP_NUM_THREADS 1
+CORPUS_ENV OMP_DYNAMIC FALSE
+CORPUS_ENV OMP_PROC_BIND TRUE
+CORPUS_ENV GOMP_CPU_AFFINITY 1
+CORPUS_ENV affinity 1
+CORPUS_ENV pages KernelPageSize:        4 kB
+CORPUS_ENV pages MMUPageSize:           4 kB
+CORPUS_ENV pages KernelPageSize:        4 kB
+CORPUS_ENV pages MMUPageSize:           4 kB
+CORPUS_ENV pages KernelPageSize:        4 kB
+CORPUS_ENV pages MMUPageSize:           4 kB
+CORPUS_ENV pages KernelPageSize:        4 kB
+CORPUS_ENV pages MMUPageSize:           4 kB
+CORPUS_ENV pages KernelPageSize:        4 kB
+CORPUS_ENV pages MMUPageSize:           4 kB
+CORPUS_ENV pages KernelPageSize:        4 kB
+CORPUS_ENV pages MMUPageSize:           4 kB
+CORPUS_ENV pages KernelPageSize:        4 kB
+CORPUS_ENV pages MMUPageSize:           4 kB
+CORPUS_ENV pages KernelPageSize:        4 kB
+CORPUS_ENV pages MMUPageSize:           4 kB
+CORPUS_ENV pages KernelPageSize:        4 kB
+CORPUS_ENV pages MMUPageSize:           4 kB
+CORPUS_ENV pages KernelPageSize:        4 kB
+CORPUS_ENV pages MMUPageSize:           4 kB
+CORPUS_ENV pages KernelPageSize:        4 kB
+CORPUS_ENV pages MMUPageSize:           4 kB
+CORPUS_ENV pages KernelPageSize:        4 kB
+CORPUS_ENV pages MMUPageSize:           4 kB
+CORPUS_ENV pages KernelPageSize:        4 kB
+CORPUS_ENV pages MMUPageSize:           4 kB
+CORPUS_ENV pages KernelPageSize:        4 kB
+CORPUS_ENV pages MMUPageSize:           4 kB
+CORPUS_ENV pages KernelPageSize:        4 kB
+CORPUS_ENV pages MMUPageSize:           4 kB
+CORPUS_ENV pages KernelPageSize:        4 kB
+CORPUS_ENV pages MMUPageSize:           4 kB
+CORPUS_ENV pages KernelPageSize:        4 kB
+CORPUS_ENV pages MMUPageSize:           4 kB
+CORPUS_ENV pages KernelPageSize:        4 kB
+CORPUS_ENV pages MMUPageSize:           4 kB
+CORPUS_ENV pages KernelPageSize:        4 kB
+CORPUS_ENV pages MMUPageSize:           4 kB
+CORPUS_ENV pages KernelPageSize:        4 kB
+CORPUS_ENV pages MMUPageSize:           4 kB
+CORPUS_ENV linked 00400000-00414000 r-xp 00000000 00:0c 4937630                            /var/volatile/tmp/claude/claude-25e5a866a8064eb0b17a0abc6a0fba06/peer/workload
+CORPUS_ENV linked 00613000-00614000 rw-p 00013000 00:0c 4937630                            /var/volatile/tmp/claude/claude-25e5a866a8064eb0b17a0abc6a0fba06/peer/workload
+CORPUS_ENV linked 7f428de1f000-7f428df6f000 r-xp 00000000 00:0c 46475                      /lib64/libc-2.21.so
+CORPUS_ENV linked 7f428df6f000-7f428e16e000 ---p 00150000 00:0c 46475                      /lib64/libc-2.21.so
+CORPUS_ENV linked 7f428e16e000-7f428e172000 r--p 0014f000 00:0c 46475                      /lib64/libc-2.21.so
+CORPUS_ENV linked 7f428e172000-7f428e174000 rw-p 00153000 00:0c 46475                      /lib64/libc-2.21.so
+CORPUS_ENV linked 7f428e178000-7f428e1b6000 r-xp 00000000 00:0c 46472                      /lib64/libm-2.21.so
+CORPUS_ENV linked 7f428e1b6000-7f428e3b5000 ---p 0003e000 00:0c 46472                      /lib64/libm-2.21.so
+CORPUS_ENV linked 7f428e3b5000-7f428e3b6000 r--p 0003d000 00:0c 46472                      /lib64/libm-2.21.so
+CORPUS_ENV linked 7f428e3b6000-7f428e3b7000 rw-p 0003e000 00:0c 46472                      /lib64/libm-2.21.so
+CORPUS_ENV linked 7f428e3b7000-7f428e3d7000 r-xp 00000000 00:0c 46478                      /lib64/ld-2.21.so
+CORPUS_ENV linked 7f428e5d6000-7f428e5d7000 r--p 0001f000 00:0c 46478                      /lib64/ld-2.21.so
+CORPUS_ENV linked 7f428e5d7000-7f428e5d8000 rw-p 00020000 00:0c 46478                      /lib64/ld-2.21.so
+CORPUS_ENV_END end
+CORPUS_ENV_BEGIN start
+CORPUS_ENV governor performance
+CORPUS_ENV minimum_frequency 619047
+CORPUS_ENV maximum_frequency 1238094
+CORPUS_ENV boost unavailable
+CORPUS_ENV clocksource tsc
+CORPUS_ENV transparent_hugepage [always] madvise never
+CORPUS_ENV MALLOC_ARENA_MAX unset
+CORPUS_ENV MALLOC_MMAP_THRESHOLD_ unset
+CORPUS_ENV MALLOC_TRIM_THRESHOLD_ unset
+CORPUS_ENV LD_LIBRARY_PATH peer
+CORPUS_ENV LD_PRELOAD unset
+CORPUS_ENV OMP_NUM_THREADS 1
+CORPUS_ENV OMP_DYNAMIC FALSE
+CORPUS_ENV OMP_PROC_BIND TRUE
+CORPUS_ENV GOMP_CPU_AFFINITY 1
+CORPUS_ENV affinity 1
+CORPUS_ENV pages KernelPageSize:        4 kB
+CORPUS_ENV pages MMUPageSize:           4 kB
+CORPUS_ENV pages KernelPageSize:        4 kB
+CORPUS_ENV pages MMUPageSize:           4 kB
+CORPUS_ENV pages KernelPageSize:        4 kB
+CORPUS_ENV pages MMUPageSize:           4 kB
+CORPUS_ENV pages KernelPageSize:        4 kB
+CORPUS_ENV pages MMUPageSize:           4 kB
+CORPUS_ENV pages KernelPageSize:        4 kB
+CORPUS_ENV pages MMUPageSize:           4 kB
+CORPUS_ENV pages KernelPageSize:        4 kB
+CORPUS_ENV pages MMUPageSize:           4 kB
+CORPUS_ENV pages KernelPageSize:        4 kB
+CORPUS_ENV pages MMUPageSize:           4 kB
+CORPUS_ENV pages KernelPageSize:        4 kB
+CORPUS_ENV pages MMUPageSize:           4 kB
+CORPUS_ENV pages KernelPageSize:        4 kB
+CORPUS_ENV pages MMUPageSize:           4 kB
+CORPUS_ENV pages KernelPageSize:        4 kB
+CORPUS_ENV pages MMUPageSize:           4 kB
+CORPUS_ENV pages KernelPageSize:        4 kB
+CORPUS_ENV pages MMUPageSize:           4 kB
+CORPUS_ENV pages KernelPageSize:        4 kB
+CORPUS_ENV pages MMUPageSize:           4 kB
+CORPUS_ENV pages KernelPageSize:        4 kB
+CORPUS_ENV pages MMUPageSize:           4 kB
+CORPUS_ENV pages KernelPageSize:        4 kB
+CORPUS_ENV pages MMUPageSize:           4 kB
+CORPUS_ENV pages KernelPageSize:        4 kB
+CORPUS_ENV pages MMUPageSize:           4 kB
+CORPUS_ENV pages KernelPageSize:        4 kB
+CORPUS_ENV pages MMUPageSize:           4 kB
+CORPUS_ENV pages KernelPageSize:        4 kB
+CORPUS_ENV pages MMUPageSize:           4 kB
+CORPUS_ENV pages KernelPageSize:        4 kB
+CORPUS_ENV pages MMUPageSize:           4 kB
+CORPUS_ENV pages KernelPageSize:        4 kB
+CORPUS_ENV pages MMUPageSize:           4 kB
+CORPUS_ENV pages KernelPageSize:        4 kB
+CORPUS_ENV pages MMUPageSize:           4 kB
+CORPUS_ENV linked 00400000-00414000 r-xp 00000000 00:0c 4937630                            /var/volatile/tmp/claude/claude-25e5a866a8064eb0b17a0abc6a0fba06/peer/workload
+CORPUS_ENV linked 00613000-00614000 rw-p 00013000 00:0c 4937630                            /var/volatile/tmp/claude/claude-25e5a866a8064eb0b17a0abc6a0fba06/peer/workload
+CORPUS_ENV linked 7f0e19838000-7f0e19988000 r-xp 00000000 00:0c 46475                      /lib64/libc-2.21.so
+CORPUS_ENV linked 7f0e19988000-7f0e19b87000 ---p 00150000 00:0c 46475                      /lib64/libc-2.21.so
+CORPUS_ENV linked 7f0e19b87000-7f0e19b8b000 r--p 0014f000 00:0c 46475                      /lib64/libc-2.21.so
+CORPUS_ENV linked 7f0e19b8b000-7f0e19b8d000 rw-p 00153000 00:0c 46475                      /lib64/libc-2.21.so
+CORPUS_ENV linked 7f0e19b91000-7f0e19bcf000 r-xp 00000000 00:0c 46472                      /lib64/libm-2.21.so
+CORPUS_ENV linked 7f0e19bcf000-7f0e19dce000 ---p 0003e000 00:0c 46472                      /lib64/libm-2.21.so
+CORPUS_ENV linked 7f0e19dce000-7f0e19dcf000 r--p 0003d000 00:0c 46472                      /lib64/libm-2.21.so
+CORPUS_ENV linked 7f0e19dcf000-7f0e19dd0000 rw-p 0003e000 00:0c 46472                      /lib64/libm-2.21.so
+CORPUS_ENV linked 7f0e19dd0000-7f0e19df0000 r-xp 00000000 00:0c 46478                      /lib64/ld-2.21.so
+CORPUS_ENV linked 7f0e19fef000-7f0e19ff0000 r--p 0001f000 00:0c 46478                      /lib64/ld-2.21.so
+CORPUS_ENV linked 7f0e19ff0000-7f0e19ff1000 rw-p 00020000 00:0c 46478                      /lib64/ld-2.21.so
+CORPUS_ENV_END start
+CORPUS_ENV_BEGIN materialize
+CORPUS_ENV governor performance
+CORPUS_ENV minimum_frequency 619047
+CORPUS_ENV maximum_frequency 1238094
+CORPUS_ENV boost unavailable
+CORPUS_ENV clocksource tsc
+CORPUS_ENV transparent_hugepage [always] madvise never
+CORPUS_ENV MALLOC_ARENA_MAX unset
+CORPUS_ENV MALLOC_MMAP_THRESHOLD_ unset
+CORPUS_ENV MALLOC_TRIM_THRESHOLD_ unset
+CORPUS_ENV LD_LIBRARY_PATH peer
+CORPUS_ENV LD_PRELOAD unset
+CORPUS_ENV OMP_NUM_THREADS 1
+CORPUS_ENV OMP_DYNAMIC FALSE
+CORPUS_ENV OMP_PROC_BIND TRUE
+CORPUS_ENV GOMP_CPU_AFFINITY 1
+CORPUS_ENV affinity 1
+CORPUS_ENV pages KernelPageSize:        4 kB
+CORPUS_ENV pages MMUPageSize:           4 kB
+CORPUS_ENV pages KernelPageSize:        4 kB
+CORPUS_ENV pages MMUPageSize:           4 kB
+CORPUS_ENV pages KernelPageSize:        4 kB
+CORPUS_ENV pages MMUPageSize:           4 kB
+CORPUS_ENV pages KernelPageSize:        4 kB
+CORPUS_ENV pages MMUPageSize:           4 kB
+CORPUS_ENV pages KernelPageSize:        4 kB
+CORPUS_ENV pages MMUPageSize:           4 kB
+CORPUS_ENV pages KernelPageSize:        4 kB
+CORPUS_ENV pages MMUPageSize:           4 kB
+CORPUS_ENV pages KernelPageSize:        4 kB
+CORPUS_ENV pages MMUPageSize:           4 kB
+CORPUS_ENV pages KernelPageSize:        4 kB
+CORPUS_ENV pages MMUPageSize:           4 kB
+CORPUS_ENV pages KernelPageSize:        4 kB
+CORPUS_ENV pages MMUPageSize:           4 kB
+CORPUS_ENV pages KernelPageSize:        4 kB
+CORPUS_ENV pages MMUPageSize:           4 kB
+CORPUS_ENV pages KernelPageSize:        4 kB
+CORPUS_ENV pages MMUPageSize:           4 kB
+CORPUS_ENV pages KernelPageSize:        4 kB
+CORPUS_ENV pages MMUPageSize:           4 kB
+CORPUS_ENV pages KernelPageSize:        4 kB
+CORPUS_ENV pages MMUPageSize:           4 kB
+CORPUS_ENV pages KernelPageSize:        4 kB
+CORPUS_ENV pages MMUPageSize:           4 kB
+CORPUS_ENV pages KernelPageSize:        4 kB
+CORPUS_ENV pages MMUPageSize:           4 kB
+CORPUS_ENV pages KernelPageSize:        4 kB
+CORPUS_ENV pages MMUPageSize:           4 kB
+CORPUS_ENV pages KernelPageSize:        4 kB
+CORPUS_ENV pages MMUPageSize:           4 kB
+CORPUS_ENV pages KernelPageSize:        4 kB
+CORPUS_ENV pages MMUPageSize:           4 kB
+CORPUS_ENV pages KernelPageSize:        4 kB
+CORPUS_ENV pages MMUPageSize:           4 kB
+CORPUS_ENV pages KernelPageSize:        4 kB
+CORPUS_ENV pages MMUPageSize:           4 kB
+CORPUS_ENV pages KernelPageSize:        4 kB
+CORPUS_ENV pages MMUPageSize:           4 kB
+CORPUS_ENV linked 00400000-00414000 r-xp 00000000 00:0c 4937630                            /var/volatile/tmp/claude/claude-25e5a866a8064eb0b17a0abc6a0fba06/peer/workload
+CORPUS_ENV linked 00613000-00614000 rw-p 00013000 00:0c 4937630                            /var/volatile/tmp/claude/claude-25e5a866a8064eb0b17a0abc6a0fba06/peer/workload
+CORPUS_ENV linked 7f0e19838000-7f0e19988000 r-xp 00000000 00:0c 46475                      /lib64/libc-2.21.so
+CORPUS_ENV linked 7f0e19988000-7f0e19b87000 ---p 00150000 00:0c 46475                      /lib64/libc-2.21.so
+CORPUS_ENV linked 7f0e19b87000-7f0e19b8b000 r--p 0014f000 00:0c 46475                      /lib64/libc-2.21.so
+CORPUS_ENV linked 7f0e19b8b000-7f0e19b8d000 rw-p 00153000 00:0c 46475                      /lib64/libc-2.21.so
+CORPUS_ENV linked 7f0e19b91000-7f0e19bcf000 r-xp 00000000 00:0c 46472                      /lib64/libm-2.21.so
+CORPUS_ENV linked 7f0e19bcf000-7f0e19dce000 ---p 0003e000 00:0c 46472                      /lib64/libm-2.21.so
+CORPUS_ENV linked 7f0e19dce000-7f0e19dcf000 r--p 0003d000 00:0c 46472                      /lib64/libm-2.21.so
+CORPUS_ENV linked 7f0e19dcf000-7f0e19dd0000 rw-p 0003e000 00:0c 46472                      /lib64/libm-2.21.so
+CORPUS_ENV linked 7f0e19dd0000-7f0e19df0000 r-xp 00000000 00:0c 46478                      /lib64/ld-2.21.so
+CORPUS_ENV linked 7f0e19fef000-7f0e19ff0000 r--p 0001f000 00:0c 46478                      /lib64/ld-2.21.so
+CORPUS_ENV linked 7f0e19ff0000-7f0e19ff1000 rw-p 00020000 00:0c 46478                      /lib64/ld-2.21.so
+CORPUS_ENV_END materialize
+CORPUS_CONTROL rejected
+CORPUS_ENV_BEGIN end
+CORPUS_ENV governor performance
+CORPUS_ENV minimum_frequency 619047
+CORPUS_ENV maximum_frequency 1238094
+CORPUS_ENV boost unavailable
+CORPUS_ENV clocksource tsc
+CORPUS_ENV transparent_hugepage [always] madvise never
+CORPUS_ENV MALLOC_ARENA_MAX unset
+CORPUS_ENV MALLOC_MMAP_THRESHOLD_ unset
+CORPUS_ENV MALLOC_TRIM_THRESHOLD_ unset
+CORPUS_ENV LD_LIBRARY_PATH peer
+CORPUS_ENV LD_PRELOAD unset
+CORPUS_ENV OMP_NUM_THREADS 1
+CORPUS_ENV OMP_DYNAMIC FALSE
+CORPUS_ENV OMP_PROC_BIND TRUE
+CORPUS_ENV GOMP_CPU_AFFINITY 1
+CORPUS_ENV affinity 1
+CORPUS_ENV pages KernelPageSize:        4 kB
+CORPUS_ENV pages MMUPageSize:           4 kB
+CORPUS_ENV pages KernelPageSize:        4 kB
+CORPUS_ENV pages MMUPageSize:           4 kB
+CORPUS_ENV pages KernelPageSize:        4 kB
+CORPUS_ENV pages MMUPageSize:           4 kB
+CORPUS_ENV pages KernelPageSize:        4 kB
+CORPUS_ENV pages MMUPageSize:           4 kB
+CORPUS_ENV pages KernelPageSize:        4 kB
+CORPUS_ENV pages MMUPageSize:           4 kB
+CORPUS_ENV pages KernelPageSize:        4 kB
+CORPUS_ENV pages MMUPageSize:           4 kB
+CORPUS_ENV pages KernelPageSize:        4 kB
+CORPUS_ENV pages MMUPageSize:           4 kB
+CORPUS_ENV pages KernelPageSize:        4 kB
+CORPUS_ENV pages MMUPageSize:           4 kB
+CORPUS_ENV pages KernelPageSize:        4 kB
+CORPUS_ENV pages MMUPageSize:           4 kB
+CORPUS_ENV pages KernelPageSize:        4 kB
+CORPUS_ENV pages MMUPageSize:           4 kB
+CORPUS_ENV pages KernelPageSize:        4 kB
+CORPUS_ENV pages MMUPageSize:           4 kB
+CORPUS_ENV pages KernelPageSize:        4 kB
+CORPUS_ENV pages MMUPageSize:           4 kB
+CORPUS_ENV pages KernelPageSize:        4 kB
+CORPUS_ENV pages MMUPageSize:           4 kB
+CORPUS_ENV pages KernelPageSize:        4 kB
+CORPUS_ENV pages MMUPageSize:           4 kB
+CORPUS_ENV pages KernelPageSize:        4 kB
+CORPUS_ENV pages MMUPageSize:           4 kB
+CORPUS_ENV pages KernelPageSize:        4 kB
+CORPUS_ENV pages MMUPageSize:           4 kB
+CORPUS_ENV pages KernelPageSize:        4 kB
+CORPUS_ENV pages MMUPageSize:           4 kB
+CORPUS_ENV pages KernelPageSize:        4 kB
+CORPUS_ENV pages MMUPageSize:           4 kB
+CORPUS_ENV pages KernelPageSize:        4 kB
+CORPUS_ENV pages MMUPageSize:           4 kB
+CORPUS_ENV pages KernelPageSize:        4 kB
+CORPUS_ENV pages MMUPageSize:           4 kB
+CORPUS_ENV linked 00400000-00414000 r-xp 00000000 00:0c 4937630                            /var/volatile/tmp/claude/claude-25e5a866a8064eb0b17a0abc6a0fba06/peer/workload
+CORPUS_ENV linked 00613000-00614000 rw-p 00013000 00:0c 4937630                            /var/volatile/tmp/claude/claude-25e5a866a8064eb0b17a0abc6a0fba06/peer/workload
+CORPUS_ENV linked 7f0e19838000-7f0e19988000 r-xp 00000000 00:0c 46475                      /lib64/libc-2.21.so
+CORPUS_ENV linked 7f0e19988000-7f0e19b87000 ---p 00150000 00:0c 46475                      /lib64/libc-2.21.so
+CORPUS_ENV linked 7f0e19b87000-7f0e19b8b000 r--p 0014f000 00:0c 46475                      /lib64/libc-2.21.so
+CORPUS_ENV linked 7f0e19b8b000-7f0e19b8d000 rw-p 00153000 00:0c 46475                      /lib64/libc-2.21.so
+CORPUS_ENV linked 7f0e19b91000-7f0e19bcf000 r-xp 00000000 00:0c 46472                      /lib64/libm-2.21.so
+CORPUS_ENV linked 7f0e19bcf000-7f0e19dce000 ---p 0003e000 00:0c 46472                      /lib64/libm-2.21.so
+CORPUS_ENV linked 7f0e19dce000-7f0e19dcf000 r--p 0003d000 00:0c 46472                      /lib64/libm-2.21.so
+CORPUS_ENV linked 7f0e19dcf000-7f0e19dd0000 rw-p 0003e000 00:0c 46472                      /lib64/libm-2.21.so
+CORPUS_ENV linked 7f0e19dd0000-7f0e19df0000 r-xp 00000000 00:0c 46478                      /lib64/ld-2.21.so
+CORPUS_ENV linked 7f0e19fef000-7f0e19ff0000 r--p 0001f000 00:0c 46478                      /lib64/ld-2.21.so
+CORPUS_ENV linked 7f0e19ff0000-7f0e19ff1000 rw-p 00020000 00:0c 46478                      /lib64/ld-2.21.so
+CORPUS_ENV_END end
+{"boot_id_after": "da3144f1-552e-4305-bd17-84a3835da020", "boot_id_before": "da3144f1-552e-4305-bd17-84a3835da020", "card_minutes": 0.08463333333299185, "cpus": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99, 100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, 123, 124, 125, 126, 127, 128, 129, 130, 131, 132, 133, 134, 135, 136, 137, 138, 139, 140, 141, 142, 143, 144, 145, 146, 147, 148, 149, 150, 151, 152, 153, 154, 155, 156, 157, 158, 159, 160, 161, 162, 163, 164, 165, 166, 167, 168, 169, 170, 171, 172, 173, 174, 175, 176, 177, 178, 179, 180, 181, 182, 183, 184, 185, 186, 187, 188, 189, 190, 191, 192, 193, 194, 195, 196, 197, 198, 199, 200, 201, 202, 203, 204, 205, 206, 207, 208, 209, 210, 211, 212, 213, 214, 215, 216, 217, 218, 219, 220, 221, 222, 223, 224, 225, 226, 227, 228, 229, 230, 231, 232, 233, 234, 235, 236, 237, 238, 239, 240], "detail": "", "exit_code": 0, "foreign_processes": [], "job_id": "claude-25e5a866a8064eb0b17a0abc6a0fba06", "memory_mb": null, "overlapping_jobs": [], "profile": null, "program_exit_code": 0, "reaped": [], "result_class": "program", "run_dir": "/tmp/claude/claude-25e5a866a8064eb0b17a0abc6a0fba06", "skipped_processes": [], "stale_kept": [], "transfer_stop": false, "transfers": [{"bytes": 40896, "destination": "claude-transfer", "direction": "up", "fallback": null, "file_complete": true, "method": "ssh", "mib_per_second": 0.09242053280060755, "seconds": 0.4220000000204891, "timing_scope": "bootstrap wall time", "wall_seconds": 0.4220000000204891}, {"bytes": 21461, "card_seconds": 0.026846887, "destination": "claude-program", "direction": "up", "fallback": null, "file_complete": true, "host_seconds": 0.3477449, "method": "ssh", "mib_per_second": 4.272427747100951, "publish_seconds": 0.031000000017229468, "read_seconds": 8.85e-05, "seconds": 0.004790439, "source": "C:\\Users\\xuzhi\\Documents\\gcc_knc\\.work\\_shared\\S13-01\\launch", "timing_scope": "payload; wall_seconds includes IO, startup, teardown and publish", "wall_seconds": 0.4529999999795109, "write_seconds": 0.00012976}, {"bytes": 3344624, "card_seconds": 0.138614611, "destination": "claude-pin", "direction": "up", "fallback": null, "file_complete": true, "host_seconds": 0.1297115, "method": "dma", "mib_per_second": 1345.9033860802574, "publish_seconds": 0.0470000000204891, "read_seconds": 0.0007273, "seconds": 0.002369919, "source": "C:\\Users\\xuzhi\\Documents\\gcc_knc\\.work\\_shared\\claude-input-c5_n_018", "timing_scope": "payload; wall_seconds includes IO, startup, teardown and publish", "wall_seconds": 2.2810000000172295, "write_seconds": 0.009550716}, {"bytes": 9465, "card_seconds": 0.02307022, "destination": "claude-watchdog.sh", "direction": "up", "fallback": null, "file_complete": true, "host_seconds": 0.3499948, "method": "ssh", "mib_per_second": 3.147821955415258, "publish_seconds": 0.0470000000204891, "read_seconds": 6.07e-05, "seconds": 0.002867547, "source": "C:\\Users\\xuzhi\\Documents\\gcc_knc\\.work\\_shared\\claude-input-cvkzfjbw", "timing_scope": "payload; wall_seconds includes IO, startup, teardown and publish", "wall_seconds": 0.4380000000237487, "write_seconds": 9.3796e-05}, {"bytes": 89916, "card_seconds": 0.034956187, "destination": "workload", "direction": "up", "fallback": null, "file_complete": true, "host_seconds": 0.3548796, "method": "ssh", "mib_per_second": 6.127706093477247, "publish_seconds": 0.045999999972991645, "read_seconds": 9.9e-05, "seconds": 0.013993912, "source": "C:\\Users\\xuzhi\\Documents\\gcc_knc\\.work\\_shared\\S13-01\\gcc-5.1.1\\0\\serial\\zlib\\workload", "timing_scope": "payload; wall_seconds includes IO, startup, teardown and publish", "wall_seconds": 0.4369999999762513, "write_seconds": 0.000495067}, {"bytes": 8388608, "card_seconds": 0.162217705, "destination": "input.bin", "direction": "up", "fallback": null, "file_complete": true, "host_seconds": 0.1415406, "method": "dma", "mib_per_second": 1359.394050102167, "publish_seconds": 0.031000000017229468, "read_seconds": 0.0051558, "seconds": 0.005884975, "source": "C:\\Users\\xuzhi\\Documents\\gcc_knc\\.work\\_shared\\S13-01\\input.bin", "timing_scope": "payload; wall_seconds includes IO, startup, teardown and publish", "wall_seconds": 1.9060000000172295, "write_seconds": 0.023736167}, {"bytes": 102400, "card_seconds": 0.036895388, "destination": "peer.tar", "direction": "up", "fallback": null, "file_complete": true, "host_seconds": 0.3484582, "method": "ssh", "mib_per_second": 6.236756920249598, "publish_seconds": 0.031000000017229468, "read_seconds": 0.0001129, "seconds": 0.015658178, "source": "C:\\Users\\xuzhi\\Documents\\gcc_knc\\.work\\_shared\\S13-01\\initial-full-capture\\peer.tar", "timing_scope": "payload; wall_seconds includes IO, startup, teardown and publish", "wall_seconds": 0.4369999999762513, "write_seconds": 0.001170127}]}
