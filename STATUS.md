@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-15 03:20.
+Updated automatically at every ticket change. Last update: 2026-11-15 03:21.
 
 **Next: GPT-6.1, on S12-30 (Sparse indexed reductions faster than today - vector gather of products with an ordered scalar sum, and indirect prefetch, for CSR-style loops (NPB-CG, HPCG)).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
@@ -288,7 +288,7 @@ Current tickets: `[##################--]` 238 of 251
 ## Cost
 
 - From the script, engineer: 679 sessions, 1351.9M input tokens
-- From the script, lead: 450 sessions, 125.2M input tokens
+- From the script, lead: 451 sessions, 125.7M input tokens
 - Started by hand, Claude: 12 sessions, 3485.1M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
