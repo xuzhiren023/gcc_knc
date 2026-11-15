@@ -1,10 +1,10 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-15 03:02.
+Updated automatically at every ticket change. Last update: 2026-11-15 03:13.
 
-**Next: the tech lead, on S12-35.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: GPT-6.1, on S12-30 (Sparse indexed reductions faster than today - vector gather of products with an ordered scalar sum, and indirect prefetch, for CSR-style loops (NPB-CG, HPCG)).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
-Current tickets: `[##################--]` 237 of 251
+Current tickets: `[##################--]` 238 of 251
 
 ## Milestones
 
@@ -14,7 +14,7 @@ Current tickets: `[##################--]` 237 of 251
 | M1 | Mixed native code | Done | 43 of 43 tickets |
 | M2 | Useful vector target | Done | 51 of 51 tickets |
 | M3 | Runtimes | Done | 48 of 48 tickets |
-| M4 | Broad optimization | In progress | 55 of 69 tickets |
+| M4 | Broad optimization | In progress | 56 of 69 tickets |
 | M5 | Program corpus | Not started | Not planned in detail yet |
 | M6 | Release | Not started | Not planned in detail yet |
 
@@ -115,7 +115,7 @@ Current tickets: `[##################--]` 237 of 251
 | S12-32 | ICE (reload) in gcc.c-torture O3-vect-pr32243.c on the installed GCC-KNC, found by the S12-21 torture sweep | Done | The -O3 vector reload crash in pr32243 is fixed: byte/word vector extends now reload through an aligned sta... |
 | S12-33 | T2 writes its short-vector test binaries into a per-run folder, so Claude, Codex and lead runs never block each other | Done | T2's short-vector cross-check now writes its binaries into the run's own output folder instead of the share... |
 | S12-34 | Unrecognizable insn for a truncating vector store to a 1-byte-aligned V16QI destination (found by S12-32) | Not started |  |
-| S12-35 | Clean single-compiler WRF build as dm+sm (MPI + OpenMP) against PhiWeather's k1om MPICH, plus a build recipe PhiWeather can apply to its own patched tree | Waiting for review | Staged .work/_shared/wrf-trial/dmsm/: wrf.exe, real.exe (image MPI), wrf-stockmpi.exe, libgomp.so.1, recipe... |
+| S12-35 | Clean single-compiler WRF build as dm+sm (MPI + OpenMP) against PhiWeather's k1om MPICH, plus a build recipe PhiWeather can apply to its own patched tree | Done | Upstream WRF 4.8.0 now builds clean as dm+sm (MPI + OpenMP) with the one GCC-KNC compiler (knc 7a3b34430e3,... |
 | S12-36 | card_run yields to a foreign queued row in the middle of our own turn - honor an open turn-level reservation so a multi-job window is not refused | Done | card_run --benchmark now keeps our turn across several jobs while an open claude-turn- ledger row was queue... |
 | S13-01 | M4 final gate - stage the ADR-0015 gate run at the final head (17 programs, held-out unsealed, six pairs, three profiles) | draft |  |
 | S13-02 | Libgomp per-region thread density - choose 1-4 workers per core per parallel region instead of once per program | draft |  |
@@ -276,6 +276,7 @@ Current tickets: `[##################--]` 237 of 251
 
 ## Recent activity
 
+- 2026-11-15 03:13 **S12-35** lead approve: Upstream WRF 4.8.0 now builds clean as dm+sm (MPI + OpenMP) with the one GCC-KNC compiler (knc 7a3b34430e3, no per-file workarounds) and is staged ...
 - 2026-11-15 03:02 **S12-30** owner decide: Lead raises sessions 6 -> 9 (standing rule): phase 1 and the legal gate are done and proven on the card (1.62x, 8.99M checks); the sessions now go ...
 - 2026-11-15 03:01 **S12-35** engineer submit: Staged .work/_shared/wrf-trial/dmsm/: wrf.exe, real.exe (image MPI), wrf-stockmpi.exe, libgomp.so.1, recipe and notes. One WRF compiler 7a3b34430e3...
 - 2026-11-15 03:01 **S12-30** lead escalate: budget: 6 engineer sessions used; the budget is 6
@@ -283,13 +284,12 @@ Current tickets: `[##################--]` 237 of 251
 - 2026-11-15 02:48 **S12-30** lead answer: Use the pre-ivopts dump; do not add PHI-recurrence normalization. Source read 2cde1d8d: the scanner is already about 200 lines and a recurrence sol...
 - 2026-11-15 02:37 **S12-36** engineer submit: Lead rebased on main without conflicts. Reran python tests/tools/test_card_turn.py through tools/run.py: PASS, 3 tests. Log: C:/Users/xuzhi/Documen...
 - 2026-11-15 02:37 **S12-30** engineer ask: 2cde1d8d: after two T1 attempts, scanner rejects legal controls: p=PHI(row,p+4), bound=MEM[p+16]; HPCG has paired count/cols PHIs with strides 4/8....
-- 2026-11-15 02:36 **S12-36** lead answer: Lead: rebased on main (no conflicts). Rerun tests/tools/test_card_turn.py via tools/run.py and submit.
 
 ## Cost
 
 - From the script, engineer: 677 sessions, 1349.0M input tokens
 - From the script, lead: 448 sessions, 124.7M input tokens
-- Started by hand, Claude: 12 sessions, 3479.0M input tokens
+- Started by hand, Claude: 12 sessions, 3479.9M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
