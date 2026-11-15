@@ -330,7 +330,7 @@ int main(int argc, char **argv)
 }
 #endif /* DRIVER */
 #elif defined(PHASE2_T1)
-/* Compiler-only probes: no hints in the two eligible reductions.  The
+/* Compiler-only probes: no hints in the eligible reductions.  The
    available bound is the current row/end, never an assumed CSR nnz. */
 void sparse_rows(int rows, const int *row, const int *col,
                  const double *val, const double *x, double *out)
@@ -349,6 +349,57 @@ double sparse_slice(int begin, int end, const int *col,
   for (int j = begin; j < end; ++j)
     sum += val[j] * x[col[j]];
   return sum;
+}
+void sparse_hpcg(int rows, const int *count, const int *const *cols,
+                 const double *const *vals, const double *x, double *out)
+{
+  for (int i = 0; i < rows; ++i) {
+    const int *col = cols[i];
+    const double *val = vals[i];
+    double sum = 0;
+    for (int j = 0; j < count[i]; ++j)
+      sum += val[j] * x[col[j]];
+    out[i] = sum;
+  }
+}
+/* int output may change a later row bound; no cross-row speculation. */
+void alias_bounds(int rows, const int *row, const int *col,
+                  const double *val, const double *x, int *out)
+{
+  for (int i = 0; i < rows; ++i) {
+    double sum = 0;
+    for (int j = row[i]; j < row[i+1]; ++j)
+      sum += val[j] * x[col[j]];
+    out[i] = (int)sum;
+  }
+}
+/* Executable scanner controls, including a deliberately row-local hint
+   that must NOT satisfy the short-row cross-row acceptance check. */
+#define CSR_CONTROL(NAME, LOOK) \
+void NAME(int rows, const int *row, const int *col, const double *x) \
+{ \
+  for (int i = 0; i < rows; ++i) \
+    for (int j = row[i]; j < row[i+1]; ++j) \
+      if (rows-i > LOOK) { \
+        int bound = row[i+LOOK+1]; \
+        if ((long long)bound-j > 32) \
+          __builtin_prefetch(x + col[j+32], 0, 3); \
+      } \
+}
+CSR_CONTROL(explicit_csr, 3)
+CSR_CONTROL(explicit_rowlocal, 0)
+void explicit_hpcg(int rows, const int *count, const int *const *cols,
+                   const double *x)
+{
+  for (int i = 0; i < rows; ++i)
+    for (int j = 0; j < count[i]; ++j)
+      if (rows-i > 1 && j < count[i+1])
+        __builtin_prefetch(x + cols[i+1][j], 0, 3);
+}
+void explicit_loop(int n, const int *col, const double *x)
+{
+  for (int j = 0; j < n; ++j)
+    __builtin_prefetch(x + col[j], 0, 3);
 }
 double volatile_indices(int end, const volatile int *col,
                         const double *val, const double *x)

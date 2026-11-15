@@ -7,8 +7,9 @@ not prove an executing short-row lookahead, the disabled mode also disabled
 stream hints, and unconditional enablement contradicted the cache-sized
 losses. Its straight-line scanner controls do not prove post-ivopts loop
 handling. That red is **not accepted** and the earlier native result does
-not validate a compiler transform. Step 1 now stages handwritten legal
-forms; Step 2 and all GCC changes wait for the lead's native answer.
+not validate a compiler transform. Step 1 has now passed the lead card run (2026-11-15 02:29 ticket answer).
+Step 2 is in progress; the revised scanner is blocked as described below.
+No GCC source has changed.
 
 `LEGAL_PROOF` in the same C test file supplies a new, separately compiled
 driver and kernel family. Its kernel ABI has rows, row bounds or per-row
@@ -523,3 +524,119 @@ The installed compiler's plain -O2 and measured -fno-tree-vectorize scalar
 function bodies were identical. The selector is also included in default
 GCC16 T1. No GCC build or native phase-two test ran; no compiler speedup is
 claimed. Red approval precedes the compiler implementation.
+
+
+## Legal-form native result and revised T1 continuation (2026-11-15)
+
+Lead card window 4 returned exit 0 and PASS 8,985,618 comparisons and
+children, zero failures. Source output:
+`.work/_shared/tmp/claude-s12-window4/s12-30-legal.out`.
+The lead authorized Phase 2 for the legal forms. These are handwritten
+kernels; no compiler-generated transformation has passed natively.
+
+Every legal-hint/policy timing sample below is shown as speedup over
+current KNC scalar / donor scalar, using the same sample number. All
+samples are retained, including 0 and 1. Values below 1 are regressions.
+
+| Case | Route | Sample 0 | Sample 1 | Sample 2 | Sample 3 | Sample 4 |
+|---|---|---:|---:|---:|---:|---:|
+| cache-sized CSR n=13 rows=32 RHS=32768 packed=0 | legal-hint | 0.5006 / 0.5068 | 0.5006 / 0.5072 | 0.4999 / 0.5061 | 0.5006 / 0.5070 | 0.5011 / 0.5073 |
+| cache-sized CSR n=13 rows=32 RHS=32768 packed=0 | legal-policy | 0.9782 / 0.9903 | 0.9768 / 0.9898 | 0.9763 / 0.9885 | 0.9776 / 0.9901 | 0.9790 / 0.9912 |
+| cache-sized HPCG-pointers n=13 rows=32 RHS=32768 packed=0 | legal-hint | 0.6544 / 0.6272 | 0.6551 / 0.6279 | 0.6560 / 0.6281 | 0.6551 / 0.6300 | 0.6552 / 0.6281 |
+| cache-sized HPCG-pointers n=13 rows=32 RHS=32768 packed=0 | legal-policy | 0.9986 / 0.9571 | 1.0015 / 0.9599 | 1.0025 / 0.9597 | 1.0015 / 0.9630 | 1.0012 / 0.9599 |
+| cache-sized CSR n=13 rows=32 RHS=32768 packed=1 | legal-hint | 0.4908 / 0.4966 | 0.4903 / 0.4978 | 0.4902 / 0.4975 | 0.4901 / 0.4961 | 0.4903 / 0.4967 |
+| cache-sized CSR n=13 rows=32 RHS=32768 packed=1 | legal-policy | 0.9785 / 0.9902 | 0.9775 / 0.9924 | 0.9776 / 0.9920 | 0.9781 / 0.9901 | 0.9769 / 0.9895 |
+| cache-sized HPCG-pointers n=13 rows=32 RHS=32768 packed=1 | legal-hint | 0.6316 / 0.6057 | 0.6321 / 0.6045 | 0.6315 / 0.6048 | 0.6310 / 0.6038 | 0.6312 / 0.6045 |
+| cache-sized HPCG-pointers n=13 rows=32 RHS=32768 packed=1 | legal-policy | 1.0016 / 0.9605 | 1.0025 / 0.9587 | 1.0008 / 0.9585 | 1.0002 / 0.9571 | 1.0000 / 0.9578 |
+| cache-sized CSR n=27 rows=32 RHS=32768 packed=0 | legal-hint | 0.5848 / 0.5884 | 0.5864 / 0.5905 | 0.5851 / 0.5893 | 0.5852 / 0.5889 | 0.5853 / 0.5885 |
+| cache-sized CSR n=27 rows=32 RHS=32768 packed=0 | legal-policy | 0.9898 / 0.9960 | 0.9925 / 0.9996 | 0.9902 / 0.9974 | 0.9913 / 0.9976 | 0.9912 / 0.9966 |
+| cache-sized HPCG-pointers n=27 rows=32 RHS=32768 packed=0 | legal-hint | 0.7683 / 0.7562 | 0.7683 / 0.7563 | 0.7669 / 0.7559 | 0.7678 / 0.7553 | 0.7682 / 0.7566 |
+| cache-sized HPCG-pointers n=27 rows=32 RHS=32768 packed=0 | legal-policy | 0.9981 / 0.9824 | 0.9965 / 0.9810 | 0.9995 / 0.9852 | 0.9986 / 0.9824 | 0.9998 / 0.9846 |
+| cache-sized CSR n=27 rows=32 RHS=32768 packed=1 | legal-hint | 0.4781 / 0.4815 | 0.4780 / 0.4813 | 0.4776 / 0.4808 | 0.4765 / 0.4799 | 0.4778 / 0.4807 |
+| cache-sized CSR n=27 rows=32 RHS=32768 packed=1 | legal-policy | 0.9889 / 0.9958 | 0.9888 / 0.9956 | 0.9880 / 0.9947 | 0.9869 / 0.9939 | 0.9873 / 0.9933 |
+| cache-sized HPCG-pointers n=27 rows=32 RHS=32768 packed=1 | legal-hint | 0.6127 / 0.5989 | 0.6136 / 0.5983 | 0.6126 / 0.5992 | 0.6127 / 0.5989 | 0.6128 / 0.5990 |
+| cache-sized HPCG-pointers n=27 rows=32 RHS=32768 packed=1 | legal-policy | 1.0006 / 0.9780 | 1.0031 / 0.9781 | 1.0004 / 0.9785 | 0.9999 / 0.9774 | 0.9987 / 0.9762 |
+| CG-A-sized CSR n=13 rows=14000 RHS=112000 packed=0 | legal-hint | 0.9241 / 0.9295 | 0.9200 / 0.9268 | 0.9225 / 0.9298 | 0.9236 / 0.9293 | 0.9222 / 0.9275 |
+| CG-A-sized CSR n=13 rows=14000 RHS=112000 packed=0 | legal-policy | 0.9902 / 0.9960 | 0.9895 / 0.9968 | 0.9865 / 0.9943 | 0.9839 / 0.9899 | 0.9897 / 0.9953 |
+| CG-A-sized HPCG-pointers n=13 rows=14000 RHS=112000 packed=0 | legal-hint | 1.1243 / 1.1167 | 1.1361 / 1.1262 | 1.1228 / 1.1188 | 1.1242 / 1.1198 | 1.1251 / 1.1167 |
+| CG-A-sized HPCG-pointers n=13 rows=14000 RHS=112000 packed=0 | legal-policy | 0.9991 / 0.9924 | 1.0083 / 0.9995 | 0.9974 / 0.9938 | 0.9987 / 0.9947 | 1.0005 / 0.9930 |
+| CG-A-sized CSR n=13 rows=14000 RHS=112000 packed=1 | legal-hint | 0.7421 / 0.7488 | 0.7420 / 0.7482 | 0.7422 / 0.7486 | 0.7420 / 0.7487 | 0.7394 / 0.7459 |
+| CG-A-sized CSR n=13 rows=14000 RHS=112000 packed=1 | legal-policy | 0.9829 / 0.9918 | 0.9805 / 0.9887 | 0.9821 / 0.9905 | 0.9860 / 0.9949 | 0.9830 / 0.9916 |
+| CG-A-sized HPCG-pointers n=13 rows=14000 RHS=112000 packed=1 | legal-hint | 1.1134 / 1.1051 | 1.1130 / 1.1086 | 1.1130 / 1.1062 | 1.1133 / 1.1046 | 1.1207 / 1.1139 |
+| CG-A-sized HPCG-pointers n=13 rows=14000 RHS=112000 packed=1 | legal-policy | 0.9988 / 0.9913 | 0.9985 / 0.9945 | 0.9985 / 0.9924 | 1.0005 / 0.9926 | 1.0055 / 0.9994 |
+| CG-A-sized CSR n=27 rows=14000 RHS=112000 packed=0 | legal-hint | 0.9764 / 0.9802 | 0.9768 / 0.9801 | 0.9774 / 0.9765 | 0.9771 / 0.9814 | 0.9766 / 0.9817 |
+| CG-A-sized CSR n=27 rows=14000 RHS=112000 packed=0 | legal-policy | 0.9930 / 0.9969 | 0.9939 / 0.9973 | 0.9982 / 0.9973 | 0.9940 / 0.9984 | 0.9937 / 0.9989 |
+| CG-A-sized HPCG-pointers n=27 rows=14000 RHS=112000 packed=0 | legal-hint | 1.4245 / 1.4160 | 1.4324 / 1.4265 | 1.4318 / 1.4250 | 1.4323 / 1.4260 | 1.4330 / 1.4261 |
+| CG-A-sized HPCG-pointers n=27 rows=14000 RHS=112000 packed=0 | legal-policy | 1.0001 / 0.9941 | 0.9996 / 0.9954 | 0.9966 / 0.9920 | 1.0001 / 0.9958 | 0.9990 / 0.9941 |
+| CG-A-sized CSR n=27 rows=14000 RHS=112000 packed=1 | legal-hint | 0.7453 / 0.7527 | 0.7371 / 0.7326 | 0.7285 / 0.7319 | 0.7314 / 0.7372 | 0.7281 / 0.7326 |
+| CG-A-sized CSR n=27 rows=14000 RHS=112000 packed=1 | legal-policy | 0.9946 / 1.0046 | 0.9836 / 0.9776 | 0.9933 / 0.9979 | 0.9970 / 1.0050 | 0.9920 / 0.9981 |
+| CG-A-sized HPCG-pointers n=27 rows=14000 RHS=112000 packed=1 | legal-hint | 1.3400 / 1.3315 | 1.3408 / 1.3363 | 1.3416 / 1.3429 | 1.3432 / 1.3339 | 1.3408 / 1.3347 |
+| CG-A-sized HPCG-pointers n=27 rows=14000 RHS=112000 packed=1 | legal-policy | 1.0007 / 0.9944 | 0.9996 / 0.9962 | 0.9999 / 1.0008 | 1.0014 / 0.9945 | 0.9977 / 0.9931 |
+| memory-sized CSR n=13 rows=32768 RHS=16777216 packed=0 | legal-hint | 6.9602 / 6.9710 | 6.9719 / 7.0123 | 6.9516 / 6.9542 | 6.9639 / 6.9998 | 6.9506 / 7.0166 |
+| memory-sized CSR n=13 rows=32768 RHS=16777216 packed=0 | legal-policy | 6.9136 / 6.9243 | 6.9123 / 6.9524 | 6.9513 / 6.9539 | 6.9165 / 6.9522 | 6.9697 / 7.0359 |
+| memory-sized HPCG-pointers n=13 rows=32768 RHS=16777216 packed=0 | legal-hint | 3.6362 / 3.6258 | 3.6378 / 3.6292 | 3.6312 / 3.6233 | 3.6373 / 3.6309 | 3.6354 / 3.6288 |
+| memory-sized HPCG-pointers n=13 rows=32768 RHS=16777216 packed=0 | legal-policy | 3.6346 / 3.6242 | 3.6467 / 3.6381 | 3.6131 / 3.6053 | 3.6434 / 3.6370 | 3.6312 / 3.6246 |
+| memory-sized CSR n=13 rows=32768 RHS=16777216 packed=1 | legal-hint | 1.5011 / 1.5076 | 1.5223 / 1.5138 | 1.5063 / 1.5125 | 1.5117 / 1.5138 | 1.5054 / 1.5125 |
+| memory-sized CSR n=13 rows=32768 RHS=16777216 packed=1 | legal-policy | 1.4773 / 1.4837 | 1.4968 / 1.4885 | 1.4822 / 1.4883 | 1.4861 / 1.4882 | 1.4814 / 1.4884 |
+| memory-sized HPCG-pointers n=13 rows=32768 RHS=16777216 packed=1 | legal-hint | 1.3419 / 1.4024 | 1.3421 / 1.3346 | 1.3457 / 1.3351 | 1.3432 / 1.3352 | 1.3449 / 1.3450 |
+| memory-sized HPCG-pointers n=13 rows=32768 RHS=16777216 packed=1 | legal-policy | 1.3555 / 1.4166 | 1.3466 / 1.3391 | 1.3503 / 1.3398 | 1.3476 / 1.3396 | 1.3485 / 1.3486 |
+| memory-sized CSR n=27 rows=32768 RHS=16777216 packed=0 | legal-hint | 6.9725 / 6.9790 | 7.0189 / 7.0207 | 6.9870 / 6.9816 | 7.0127 / 7.0123 | 7.0158 / 7.0125 |
+| memory-sized CSR n=27 rows=32768 RHS=16777216 packed=0 | legal-policy | 6.9654 / 6.9719 | 6.9719 / 6.9737 | 6.9086 / 6.9032 | 6.9680 / 6.9677 | 6.9606 / 6.9574 |
+| memory-sized HPCG-pointers n=27 rows=32768 RHS=16777216 packed=0 | legal-hint | 5.1782 / 4.9148 | 4.9080 / 4.8882 | 4.8616 / 4.8568 | 4.8636 / 4.8668 | 4.8163 / 4.8219 |
+| memory-sized HPCG-pointers n=27 rows=32768 RHS=16777216 packed=0 | legal-policy | 5.1849 / 4.9212 | 4.9156 / 4.8958 | 4.8618 / 4.8570 | 4.8611 / 4.8643 | 4.8924 / 4.8980 |
+| memory-sized CSR n=27 rows=32768 RHS=16777216 packed=1 | legal-hint | 1.5138 / 1.5171 | 1.5179 / 1.5208 | 1.5184 / 1.5208 | 1.5175 / 1.5209 | 1.5138 / 1.5157 |
+| memory-sized CSR n=27 rows=32768 RHS=16777216 packed=1 | legal-policy | 1.4950 / 1.4984 | 1.4993 / 1.5022 | 1.5002 / 1.5026 | 1.5055 / 1.5089 | 1.4961 / 1.4979 |
+| memory-sized HPCG-pointers n=27 rows=32768 RHS=16777216 packed=1 | legal-hint | 1.6071 / 1.6009 | 1.6198 / 1.5539 | 1.6262 / 1.6209 | 1.6187 / 1.6137 | 1.6260 / 1.6195 |
+| memory-sized HPCG-pointers n=27 rows=32768 RHS=16777216 packed=1 | legal-policy | 1.6075 / 1.6013 | 1.6219 / 1.5559 | 1.6270 / 1.6217 | 1.6192 / 1.6142 | 1.6286 / 1.6222 |
+
+Across all memory-sized cases, both legal routes beat 1.05 in every
+sample: KNC-relative speedup range 1.3419..7.0189. The layouts and locality
+patterns must remain separate; the ticket's 1.62x is not a universal
+speedup for every case. The HPCG fixture is indexed synthetic work,
+not the application stencil. NPB-CG/HPCG application A/B is pending.
+
+For cache/CG-A cases the policy chooses the scalar arm, but that does
+not establish identical generated code or timings. 10 of the policy
+samples exceed a 2% elapsed-time regression; the largest is 2.429%
+(cache-sized CSR n=13 rows=32 RHS=32768 packed=0, sample 2). Default-on is not justified by this result alone.
+The implementation switch remains explicit; the lead decides its default.
+
+### Revised red is not ready for approval
+
+The same two test files now request `-mknc-indirect-prefetch` for
+positive off/fast contraction modes and for the `-Os` exclusion.
+Disabled requests `-mno-knc-indirect-prefetch -fprefetch-loop-arrays`.
+Positive assembly counts must strictly exceed that disabled baseline.
+The HPCG per-row-pointer/count reduction and aliasing `int *out`
+negative nest are present. No absent switch is silently substituted:
+each requested compilation fails on the current compiler.
+
+The new scanner follows dotted SSA names and PHI ancestry. A compiled
+in-loop hint exercises actual post-ivopts `ivtmp.N_M` PHIs and passes;
+the straight hint, stream rejection and row-local rejection controls
+also pass. It attempts to require a branch edge dominating the ordinary
+hinted-index load, with that index bounded by a later row's bound.
+However, both legal cross-row positive controls fail the scanner, so
+this is NOT an acceptable missing-feature-only red yet.
+
+Reduced cause, visible in `phase2-controls.optimized`: CSR has a
+pointer PHI initialized from `row`, incremented by four bytes; the
+start load uses that PHI and the future bound loads at byte offset 16.
+The scanner treats PHIs as independent affine atoms and cannot recover
+the `row` base. HPCG has separate count-pointer and cols-pointer PHIs
+(four/eight-byte strides, matching predecessors); it cannot prove that
+the count and pointer refer to the same next row. Presence scanning
+works because ancestry tracing crosses PHIs; affine normalization does not.
+
+First attempt failed on a missing C closing brace (fixed). The second
+compiled/assembled/linted controls and passed scalar-fold and installed
+baseline identity checks, but had the two scanner failures above plus
+four expected missing-switch errors. No third attempt, GCC modification,
+GCC build, native rerun or x86 run was performed. Logs:
+`.work/_state/logs/s12_30_phase2_revised_red-20261115-023501.log` and
+`.work/_state/logs/s12_30_phase2_revised_red-20261115-023546.log`.
+
+Per AGENTS.md's two-failed-attempt rule, ask whether to prove bounds in
+the transformation's SSA dump before ivopts (retaining optimized-dump
+loop controls/count checks), or add paired pointer-PHI recurrence
+normalization to the optimized-dump checker. No checks were weakened.

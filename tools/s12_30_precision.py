@@ -4,6 +4,8 @@
 No GCC checkout/build or card execution. Native slots share IMCI assembly.
 The host model validates C control flow only, never IMCI behavior/performance.
 """
+import ast
+from fractions import Fraction
 import os
 from pathlib import Path
 import re
@@ -24,31 +26,203 @@ def asm_bodies(text):
                            text, re.M | re.S))
 
 
-def indirect_hints(body):
-    """Trace prefetch address SSA operands, rejecting plain col/x streams.
+SSA = r'(?<![\w.])(?:[A-Za-z][\w.]*|)_\d+\b'
 
-    This is a codegen presence check, not a bounds or future-distance proof.
-    Native guard pages and a GIMPLE/assembly audit remain required at green.
+
+def plus(a, b, scale=1):
+    result = dict(a)
+    for key, value in b.items():
+        result[key] = result.get(key, 0) + scale * value
+    return {k: v for k, v in result.items() if v}
+
+
+def times(a, scale):
+    return {k: v * scale for k, v in a.items() if v * scale}
+
+
+class Gimple:
+    """Fail-closed SSA/address and branch-edge checks for these T1 probes.
+
+    PHI ancestry is followed with a visited set; affine expressions keep
+    PHIs as atoms so a loop backedge cannot invent an equality. Unsupported
+    address algebra fails the bounds check, rather than counting a hint.
+    This does not replace the native guard suite or the green legality audit.
     """
-    names = r'\b(?:[a-zA-Z]\w*)?_\d+\b'
-    definitions = dict(re.findall(r'^\s*(' + names + r') = ([^;]+);', body, re.M))
-    result = []
-    for arg in re.findall(r'__builtin_prefetch\s*\(([^,]+),', body):
-        pending, seen, terms = re.findall(names, arg), set(), [arg]
+    def __init__(self, body):
+        self.body, self.defs, self.where, self.hints = body, {}, {}, []
+        parts = re.split(r'^\s*<bb (\d+)>[^\n]*\n', body, flags=re.M)
+        self.blocks = {int(k): v for k, v in zip(parts[1::2], parts[2::2])}
+        self.edges, self.guards = {}, []
+        for bb, text in self.blocks.items():
+            for name, value in re.findall(r'^\s*(?:# )?(' + SSA +
+                                          r') = (.*?)(?:;|$)', text, re.M):
+                self.defs[name], self.where[name] = value, bb
+            for arg in re.findall(r'__builtin_prefetch\s*\(([^,]+),', text):
+                self.hints.append((bb, arg))
+            dest = list(map(int, re.findall(r'goto <bb (\d+)>', text)))
+            # Optimized dumps omit a goto for layout fallthrough.
+            if not dest and not re.search(r'\breturn\b', text):
+                keys = list(self.blocks)
+                pos = keys.index(bb)
+                if pos+1 < len(keys):
+                    dest = [keys[pos+1]]
+            self.edges[bb] = dest
+            condition = re.search(r'if \((.*?)\)\s*\n\s*goto <bb', text)
+            if condition and len(dest) == 2:
+                self.guards.append((bb, condition[1], dest))
+
+    def ancestry(self, expression):
+        pending, seen = re.findall(SSA, expression), set()
         while pending:
             name = pending.pop()
-            if name in seen:
+            if name not in seen:
+                seen.add(name)
+                pending.extend(re.findall(SSA, self.defs.get(name, '')))
+        return seen
+
+    def param(self, stem):
+        names = re.findall(r'\b' + stem + r'_\d+\(D\)', self.body)
+        return names[0][:-3] if names else None
+
+    def address(self, name):
+        value = self.defs.get(name, '')
+        if value.startswith('*'):
+            return value[1:]
+        match = re.fullmatch(r'MEM(?: <[^>]+>)?\[(.*)\]', value)
+        return match[1] if match else None
+
+    def affine(self, expression, seen=frozenset()):
+        expression = expression.replace('(D)', '')
+        expression = re.sub(r'\((?:const |unsigned |signed |long |short |int|double|float|sizetype|void|char|\*| )+\)', '', expression)
+        expression = re.sub(r'(?<=\d)B\b', '', expression).strip()
+        names = {}
+        def rename(match):
+            key = 'ssa' + str(len(names))
+            names[key] = match[0]
+            return key
+        expression = re.sub(SSA, rename, expression)
+        def walk(node):
+            if isinstance(node, ast.Constant) and isinstance(node.value, int):
+                return {'#': node.value} if node.value else {}
+            if isinstance(node, ast.Name) and node.id in names:
+                name = names[node.id]
+                value = self.defs.get(name, '')
+                if not value or name in seen or value.startswith('PHI') or self.address(name):
+                    return {name: 1}
+                return self.affine(value, seen | {name})
+            if isinstance(node, ast.UnaryOp) and isinstance(node.op, ast.USub):
+                return times(walk(node.operand), -1)
+            if isinstance(node, ast.BinOp):
+                a, b = walk(node.left), walk(node.right)
+                if isinstance(node.op, (ast.Add, ast.Sub)):
+                    return plus(a, b, -1 if isinstance(node.op, ast.Sub) else 1)
+                if isinstance(node.op, ast.Mult):
+                    if not (a.keys() - {'#'}):
+                        return times(b, a.get('#', 0))
+                    if not (b.keys() - {'#'}):
+                        return times(a, b.get('#', 0))
+            raise ValueError('unsupported affine expression')
+        return walk(ast.parse(expression, mode='eval').body)
+
+    def offset(self, name, base, size):
+        address = self.address(name)
+        if not address or not base:
+            return None
+        try:
+            value = self.affine(address)
+            if value.pop(base, 0) != 1:
+                return None
+            return times(value, Fraction(1, size))
+        except (ValueError, SyntaxError):
+            return None
+
+    def indirect(self):
+        result = []
+        for bb, arg in self.hints:
+            ancestors = self.ancestry(arg)
+            if self.param('x') not in ancestors:
                 continue
-            seen.add(name)
-            value = definitions.get(name, '')
-            terms.append(value)
-            pending.extend(re.findall(names, value))
-        expression = ' '.join(terms)
-        if (re.search(r'\bcol_\d+', expression)
-                and re.search(r'\bx_\d+', expression)
-                and re.search(r'\*_|\bMEM\[', expression)):
-            result.append(expression)
-    return result
+            for name in ancestors:
+                address = self.address(name)
+                if address and (self.param('col') in self.ancestry(address)
+                                or self.param('cols') in self.ancestry(address)):
+                    result.append((bb, name))
+        return result
+
+    def edge_dominates(self, edge, target):
+        pending, seen = [min(self.blocks)], set()
+        while pending:
+            bb = pending.pop()
+            if bb == target:
+                return False
+            if bb not in seen:
+                seen.add(bb)
+                pending.extend(dst for dst in self.edges[bb] if (bb, dst) != edge)
+        return True
+
+    def bounded(self, load, bound, index):
+        # Demand an edge that dominates the ORDINARY hinted index load,
+        # not merely the nonfaulting prefetch instruction.
+        wanted = plus({bound: 1}, index, -1)
+        for bb, condition, destinations in self.guards:
+            match = re.fullmatch(r'(.*?) (<=|>=|<|>) (.*)', condition)
+            if not match:
+                continue
+            try:
+                difference = plus(self.affine(match[3]), self.affine(match[1]), -1)
+            except (ValueError, SyntaxError):
+                continue
+            op = match[2]
+            if op in ('>', '>='):
+                difference = times(difference, -1)
+            for branch, dst in enumerate(destinations):
+                actual = difference if branch == 0 else times(difference, -1)
+                # True strict or false nonstrict means an integer gap >= 1.
+                gap = int((op in ('<', '>')) == (branch == 0))
+                delta = plus(actual, wanted, -1)
+                if not (delta.keys() - {'#'}) and gap - delta.get('#', 0) >= 1:
+                    if self.edge_dominates((bb, dst), self.where[load]):
+                        return True
+        return False
+
+    def cross_row(self, layout):
+        """Require a later-row bound on the very index loaded for a hint."""
+        for _, load in self.indirect():
+            if layout == 'csr':
+                index = self.offset(load, self.param('col'), 4)
+                if index is None:
+                    continue
+                # A current j has a PHI ancestry rooted in row[i]. A bound
+                # only at row[i+1] is insufficient for the d32/n13,n27 case.
+                starts = [self.offset(n, self.param('row'), 4)
+                          for n in self.ancestry(self.address(load))]
+                starts = [s for s in starts if s is not None]
+                for bound in self.defs:
+                    future = self.offset(bound, self.param('row'), 4)
+                    if future is None or not self.bounded(load, bound, index):
+                        continue
+                    for start in starts:
+                        delta = plus(future, start, -1)
+                        if not (delta.keys() - {'#'}) and delta.get('#', 0) >= 2:
+                            return True
+            else:
+                # Pointer and count must describe the SAME future row.
+                for pointer in self.ancestry(self.address(load)):
+                    future = self.offset(pointer, self.param('cols'), 8)
+                    index = self.offset(load, pointer, 4)
+                    if future is None or index is None:
+                        continue
+                    for bound in self.defs:
+                        count = self.offset(bound, self.param('count'), 4)
+                        if count != future or not self.bounded(load, bound, index):
+                            continue
+                        for current in self.defs:
+                            now = self.offset(current, self.param('count'), 4)
+                            if now is not None:
+                                delta = plus(future, now, -1)
+                                if not (delta.keys() - {'#'}) and delta.get('#', 0) >= 1:
+                                    return True
+        return False
 
 
 def t1(runner):
@@ -56,15 +230,31 @@ def t1(runner):
     OUT.mkdir(exist_ok=True)
     source_flags = ['-std=gnu99', '-DPHASE2_T1', '-march=knc',
                     '--sysroot=' + str(runner.sysroot)]
+    enabled = '-mknc-indirect-prefetch'
+    disabled = '-mno-knc-indirect-prefetch'
+    eligible = ('sparse_rows', 'sparse_slice', 'sparse_hpcg')
+    counts = {}
     for mode, options, expected in (
-            ('off', ['-O2', '-ffp-contract=off'], True),
-            ('fast', ['-O2', '-ffp-contract=fast'], True),
-            ('disabled', ['-O2', '-ffp-contract=off', '-fno-prefetch-loop-arrays'], False),
-            ('size', ['-Os', '-ffp-contract=off'], False)):
+            ('controls', ['-O2', '-ffp-contract=off'], False),
+            ('disabled', ['-O2', '-ffp-contract=off', disabled,
+                          '-fprefetch-loop-arrays'], False),
+            ('off', ['-O2', '-ffp-contract=off', enabled,
+                     '-fprefetch-loop-arrays'], True),
+            ('fast', ['-O2', '-ffp-contract=fast', enabled,
+                      '-fprefetch-loop-arrays'], True),
+            ('size', ['-Os', '-ffp-contract=off', enabled], False)):
         asm = OUT / ('phase2-' + mode + '.s')
         dump = OUT / ('phase2-' + mode + '.optimized')
-        runner.command(runner.cc, *runner.cc_flags, *source_flags, *options,
-                       '-fdump-tree-optimized=' + str(dump), '-S', SOURCE, '-o', asm)
+        # Do not let an old dump masquerade as output from an unsupported flag.
+        asm.unlink(missing_ok=True)
+        dump.unlink(missing_ok=True)
+        compiled = runner.command(runner.cc, *runner.cc_flags, *source_flags, *options,
+                                  '-fdump-tree-optimized=' + str(dump), '-S', SOURCE,
+                                  '-o', asm, check=False)
+        if compiled.returncode:
+            runner.result('t1 sparse ' + mode + ' requested option/compile',
+                          [compiled.stdout.strip()[-1200:]])
+            continue
         obj = asm.with_suffix('.o')
         runner.command(runner.tool('as'), '--march=k1om', asm, '-o', obj)
         runner.command(sys.executable, ROOT/'tools/knc_lint', asm, obj)
@@ -72,19 +262,42 @@ def t1(runner):
         chunks = re.split(r'^;; Function (\w+) .*$', dump.read_text(), flags=re.M)
         bodies = dict(zip(chunks[1::2], chunks[2::2]))
         assembly = asm_bodies(asm.read_text())
-        runner.result('t1 sparse ' + mode + ' scanner controls',
-                      [] if indirect_hints(bodies['explicit_indirect'])
-                      and not indirect_hints(bodies['explicit_stream'])
-                      else ['cannot distinguish indexed and affine hints'])
-        for name in ('sparse_rows', 'sparse_slice', 'volatile_indices', 'sentinel_slice'):
-            want = expected and name in ('sparse_rows', 'sparse_slice')
-            found = bool(indirect_hints(bodies[name]))
+        counts[mode] = {name: len(re.findall(r'\bvprefetch\w*\b', assembly[name]))
+                        for name in eligible}
+        if mode == 'controls':
+            controls = {
+                'straight indexed hint': bool(Gimple(bodies['explicit_indirect']).indirect()),
+                'affine stream rejected': not Gimple(bodies['explicit_stream']).indirect(),
+                'post-ivopts loop indexed hint': bool(Gimple(bodies['explicit_loop']).indirect()),
+                'loop has ivtmp PHI': bool(re.search(r'# ivtmp\.\d+_\d+ = PHI', bodies['explicit_loop'])),
+                'CSR future-bound guard': Gimple(bodies['explicit_csr']).cross_row('csr'),
+                'row-local d32 rejected': not Gimple(bodies['explicit_rowlocal']).cross_row('csr'),
+                'HPCG future-pointer/count guard': Gimple(bodies['explicit_hpcg']).cross_row('hpcg'),
+            }
+            for label, ok in controls.items():
+                runner.result('t1 sparse scanner ' + label, [] if ok else ['control failed'])
+        if mode == 'disabled':
+            runner.result('t1 sparse disabled keeps stream prefetch enabled',
+                          [] if counts[mode]['sparse_rows'] > 0 else ['no stream hints in CSR'])
+        for name in (*eligible, 'volatile_indices', 'sentinel_slice', 'alias_bounds'):
+            want = expected and name in eligible
+            graph = Gimple(bodies[name])
+            found = bool(graph.indirect())
             errors = []
-            if found != want:
+            if mode != 'controls' and found != want:
                 errors.append(('missing' if want else 'unexpected') + ' automatic indirect prefetch')
-            if want and not re.search(r'\bvprefetch\w*\b', assembly[name]):
-                errors.append('no emitted prefetch instruction')
-            if name in ('sparse_rows', 'sparse_slice'):
+            if want:
+                if 'disabled' not in counts or counts[mode][name] <= counts['disabled'][name]:
+                    errors.append('vprefetch count must exceed switch-off with stream hints on')
+                if name in ('sparse_rows', 'sparse_hpcg'):
+                    if not graph.cross_row('csr' if name == 'sparse_rows' else 'hpcg'):
+                        errors.append('hinted index lacks a dominating later-row bound')
+                elif not any(graph.bounded(load, graph.param('end'), index)
+                             for _, load in graph.indirect()
+                             for index in [graph.offset(load, graph.param('col'), 4)]
+                             if index is not None):
+                    errors.append('slice hinted index lacks an end bound')
+            if name in eligible:
                 if not re.search(r'\bfadd\w*\b', assembly[name]):
                     errors.append('ordered scalar x87 fold missing')
                 if re.search(r'\bv(?:add|fmadd|fmsub|fnmadd)\w*\b', assembly[name]):
