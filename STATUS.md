@@ -1,10 +1,10 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-14 20:28.
+Updated automatically at every ticket change. Last update: 2026-11-14 20:38.
 
-**Next: the tech lead, on S12-07.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: the tech lead, on S12-29.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
-Current tickets: `[##################--]` 228 of 244
+Current tickets: `[##################--]` 229 of 244
 
 ## Milestones
 
@@ -14,7 +14,7 @@ Current tickets: `[##################--]` 228 of 244
 | M1 | Mixed native code | Done | 43 of 43 tickets |
 | M2 | Useful vector target | Done | 51 of 51 tickets |
 | M3 | Runtimes | Done | 48 of 48 tickets |
-| M4 | Broad optimization | In progress | 46 of 62 tickets |
+| M4 | Broad optimization | In progress | 47 of 62 tickets |
 | M5 | Program corpus | Not started | Not planned in detail yet |
 | M6 | Release | Not started | Not planned in detail yet |
 
@@ -87,7 +87,7 @@ Current tickets: `[##################--]` 228 of 244
 | S12-04 | card_run profile memory monitor costs under 5% of one card thread | Done | card_run's profile memory monitor no longer floods stderr and scans /proc far less often: it uses usleep wi... |
 | S12-05 | DMA end-to-end time - overlap file read, DMA and file write, and copy on the card with more than one thread | draft |  |
 | S12-06 | M4 theme 1 - strict scalar FP conversions and call boundaries (NPB-EP transform and log path, NPB-IS randlc) | Done | Theme 1 (scalar FP conversions and calls in NPB-EP/IS) closed with no compiler change: a card diagnostic sh... |
-| S12-07 | M4 theme 2 - indexed-load scheduling with strict sparse reduction (NPB-CG) | Waiting for review | Lead-authorized phase-1 premise-failure closure, 9cef3599; docs/research/s12-07-sparse.md records all 168 t... |
+| S12-07 | M4 theme 2 - indexed-load scheduling with strict sparse reduction (NPB-CG) | Done | Theme 2 (sparse indexed loads in NPB-CG/HPCG) closed with no compiler change: GCC-KNC is already at parity ... |
 | S12-08 | M4 theme 3 - dependency-preserving scalar updates and register pressure in dense loops (PB-ludcmp, x87 stack traffic) | Done | Theme 3 (register pressure in dense loops) closed with no compiler change: PB-ludcmp's extra x87 stack traf... |
 | S12-09 | Sprint 12 batch check - integrated themes at the final Sprint 12 head, regression evidence, optional modes frozen | draft |  |
 | S12-10 | Research - what KNC hardware and runtime knowledge are we still missing to tune GCC-KNC, the OS runtime and broad optimization, and where is it documented? | Done | KNC reference-gap research done: 16 gaps ranked, 32 primary sources (98 MB, outside git) with page-cited fa... |
@@ -269,6 +269,7 @@ Current tickets: `[##################--]` 228 of 244
 
 ## Recent activity
 
+- 2026-11-14 20:38 **S12-07** lead approve: Theme 2 (sparse indexed loads in NPB-CG/HPCG) closed with no compiler change: GCC-KNC is already at parity with GCC 5.1.1 on the sparse kernel, and...
 - 2026-11-14 20:28 **S12-07** engineer submit: Lead-authorized phase-1 premise-failure closure, 9cef3599; docs/research/s12-07-sparse.md records all 168 timings. Prior host build/lint PASS; lead...
 - 2026-11-14 20:27 **S12-21** lead answer: Go to phase 2 on lane gcc2 per the resume note.
 - 2026-11-14 20:27 **S12-21** lead resume: Lead: phase 1 accepted (window 2 timings were uncontended: PhiWeather ended 00:34:37Z, S12-21 ran 00:35:40Z-01:05:01Z alone; claude-turn-s12-w2 is ...
@@ -276,13 +277,12 @@ Current tickets: `[##################--]` 228 of 244
 - 2026-11-14 20:26 **S12-07** lead resume: Type is now research: submit the phase-1 premise-failure closure (9cef3599). Record in the note that window 2 exclusivity is unproven (card_run JSO...
 - 2026-11-14 20:25 **S12-21** lead defer: Field change needed: move S12-21 to a GCC lane for phase 2 (gcc: yes, lane; sessions 6/6 may be used). Overlap checked (jobs.jsonl rows 7434-7441):...
 - 2026-11-14 20:25 **S12-07** lead defer: Field change needed (interactive lead only): set type: research on S12-07 (as for S12-06/08) so the engineer can submit the phase-1 premise-failure...
-- 2026-11-14 20:23 **S12-21** engineer ask: 01b172ea: collected 12 runs = 6 A/B pairs; checks PASS, batch timeout remains. MG density1 slower 8.7%; retain density4. IMUL medians 9.06-9.08 TSC...
 
 ## Cost
 
 - From the script, engineer: 649 sessions, 1278.0M input tokens
 - From the script, lead: 427 sessions, 119.1M input tokens
-- Started by hand, Claude: 12 sessions, 3344.0M input tokens
+- Started by hand, Claude: 12 sessions, 3345.4M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
