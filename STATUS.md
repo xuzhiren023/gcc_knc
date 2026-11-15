@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-15 15:13.
+Updated automatically at every ticket change. Last update: 2026-11-15 15:17.
 
-**Next: GPT-6.1, on S12-09 (Sprint 12 batch check - integrated themes at the final Sprint 12 head, regression evidence, optional modes frozen).** Run `python tools/dispatch.py`, or ask the tech lead to.
+**Next: the tech lead, on S13-05.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[#################---]` 241 of 268
 
@@ -127,7 +127,7 @@ Current tickets: `[#################---]` 241 of 268
 | S13-02 | Libgomp per-region thread density - choose 1-4 workers per core per parallel region instead of once per program | draft | Owner 2026-11-15 ("yes delay to M5"): deferred to M5 (sprint s14). The M4 primary score is serial -O2, so t... |
 | S13-03 | M4 retrospective - what we did wrong, what worked, and the practice changes carried into the next milestone and the agent-team skill | draft |  |
 | S13-04 | Clean source repositories for a fresh build - GCC-KNC fork and project code without build artifacts, plus a Linux-host build recipe the owner runs on the new workstation | draft |  |
-| S13-05 | model-first skill - a project Claude Code skill that models a hot region and its run-time lower bound before any optimization, plus one sourced KNC machine file | In progress | Approve refused by the machine check: tools/check t0 runs tests/regress under Cygwin python3.12, which has ... |
+| S13-05 | model-first skill - a project Claude Code skill that models a hot region and its run-time lower bound before any optimization, plus one sourced KNC machine file | Waiting for review | Removed the PyYAML dependency only in tests/regress/test_model_first.py, using a strict standard-library YA... |
 | S13-06 | knc-twin trial and validation - run the KNC core twin on real GCC-KNC loop output, check it against characterization rows and held-out kernels we already timed, and report what it rejects or gets wrong | lead | Green 22944844 reviewed, OK in substance. Interactive lead must: (1) approve protected .gitignore line !/kn... |
 | S14-01 | 16- and 32-byte GCC generic vectors compile to IMCI in the low lanes of a zmm register, with a by-value ABI, so FFTW's generic-simd128/256 paths run vectorized | draft |  |
 | S14-02 | Software pipelining on KNC - probe whether SMS can run (a KNC counted-loop pattern) and whether it speeds up in-order loops | draft |  |
@@ -293,6 +293,7 @@ Current tickets: `[#################---]` 241 of 268
 
 ## Recent activity
 
+- 2026-11-15 15:17 **S13-05** engineer submit: Removed the PyYAML dependency only in tests/regress/test_model_first.py, using a strict standard-library YAML subset reader with duplicate-key reje...
 - 2026-11-15 15:13 **S12-09** owner decide: Lead sets input_tokens 6M -> 12M in the ticket fields (the 11:25 decision recorded it but did not set the field); remaining: T0/T1 wrapper rerun an...
 - 2026-11-15 15:12 **S12-09** engineer escalate: budget: 7466553 input tokens used; the budget is 6000000
 - 2026-11-15 15:11 **S13-05** lead changes: Approve refused by the machine check: tools/check t0 runs tests/regress under Cygwin python3.12, which has no PyYAML, so test_model_first.py fails ...
@@ -300,16 +301,15 @@ Current tickets: `[#################---]` 241 of 268
 - 2026-11-15 14:58 **S13-05** lead answer: Merged; lead submits now.
 - 2026-11-15 14:58 **S13-05** lead resume: Lead merged main into s13/S13-05 (f08b31d9, clean); test passes with Windows Python (log .work/_state/logs/s13_05_lead_retest_win-20261115-145803.l...
 - 2026-11-15 14:25 **S13-06** lead defer: Green 22944844 reviewed, OK in substance. Interactive lead must: (1) approve protected .gitignore line !/knc-twin/**/*.s; (2) grant size override (...
-- 2026-11-15 14:23 **S13-06** engineer ask: Green 22944844 is ready (movslq/movsx* now unsupported, no source; test 3/3 OK, .work/_state/logs/s13_06_test-20261115-142205.log), but submit refu...
 
 ## Cost
 
 - From the script, engineer: 708 sessions, 1497.3M input tokens
 - From the script, lead: 476 sessions, 136.0M input tokens
-- Started by hand, Claude: 13 sessions, 3702.0M input tokens
+- Started by hand, Claude: 13 sessions, 3714.9M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 36.5 GiB of 100 GiB. 107 GiB free on the drive.
+The project uses 36.6 GiB of 100 GiB. 107 GiB free on the drive.
