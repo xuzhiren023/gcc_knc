@@ -2,6 +2,8 @@
 // A byte/word vector that keeps a register (its extension is colder than its
 // definitions) must reload through an aligned stack slot: the up-conversion
 // reads memory only.  masked_local_s8 is reduced from gcc.dg/vect/O3-vect-pr32243.c.
+// The memory must also be naturally aligned: an under-aligned source, hot or
+// cold, is copied to an aligned stack slot and never converted in place.
 // options: -O3
 // scan-asm-not: %[xy]mm\d+
 // scan-asm-func cold_u8: \bvmovdqa32\s+-?\d*\(%r[sb]p\)\{uint8\},\s*%zmm\d+
@@ -42,4 +44,20 @@ void masked_local_s8 (int count, const char *value, const char *mask)
     if (!mask || mask[i])
       temp[i] = (temp[i] & 0xffffff) | val;
   sink (temp);
+}
+
+typedef bytes loose_bytes __attribute__((aligned(1)));
+struct __attribute__((packed)) packed_words { char c; words w; };
+
+dwords under_u8 (const loose_bytes *p)
+{
+  return __builtin_convertvector (*p, dwords);
+}
+
+dwords cold_packed_s16 (const struct packed_words *p, int c)
+{
+  words w = p->w;
+  if (__builtin_expect (c, 0))
+    return __builtin_convertvector (w, dwords);
+  return (dwords) {};
 }
