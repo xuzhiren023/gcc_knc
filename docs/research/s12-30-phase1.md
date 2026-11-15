@@ -1343,3 +1343,496 @@ Policy, unchanged and for the lead: SymGS is serial, so at 104^3 its two
 nests see 1,124,864 rows and take the hinted arm; outlined SpMV sees one
 worker interval (about 4,687 rows at 240 threads) and takes the unhinted
 arm at 16384.
+
+### Window 6 read and the locality policy (2026-11-15, after the 06:48 answer)
+
+#### Window 6: every case and sample
+
+Source: `.work/_shared/tmp/claude-s12-window6/s12-30-gate.out` (compiler
+`a36fc224773`, one core, exit 0, 38,731,845 comparisons, 0 failures).
+Slots: `donor` GCC 5.1.1, `off` switch off, `on` switch on (compiler
+policy, cutoff 16384), `hand` hand-written hint forced on at every size.
+`arm` is the arm the compiler policy takes. `vs off` is the range over the
+five samples of off time per call divided by this slot's time per call.
+
+Equal work per call, confirmed: within a case every slot is called with
+the same matrix (`compiler_case` builds one `struct matrix` and passes it
+to all four kernels), so the nonzeros per call are the same number in
+every row of a case. Only `calls` differs, because each sample repeats the
+call until 0.5 s have passed. All outputs were compared with the same
+reference after every sample (the comparisons in the PASS line).
+
+| Case | Form | n | rows | x bytes | nnz per call | arm | slot | calls per sample | s/call, samples 0-4 | vs off, min-max |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| cache-threshold | CSR | 13 | 32 | 32768 | 416 | scalar | donor | 73727-73728 | 6.917e-06 6.909e-06 6.907e-06 6.908e-06 6.909e-06 | 1.013-1.016 |
+| cache-threshold | CSR | 13 | 32 | 32768 | 416 | scalar | off | 73727-73728 | 7.007e-06 7.006e-06 7.017e-06 7.006e-06 7.008e-06 | 1.000-1.000 |
+| cache-threshold | CSR | 13 | 32 | 32768 | 416 | scalar | on | 69632-73728 | 7.179e-06 7.177e-06 7.194e-06 7.182e-06 7.179e-06 | 0.975-0.976 |
+| cache-threshold | CSR | 13 | 32 | 32768 | 416 | scalar | hand | 36863-36864 | 1.367e-05 1.368e-05 1.37e-05 1.367e-05 1.367e-05 | 0.512-0.513 |
+| cache-threshold | CSR | 27 | 32 | 32768 | 864 | scalar | donor | 28671-28672 | 1.801e-05 1.798e-05 1.799e-05 1.798e-05 1.8e-05 | 1.004-1.006 |
+| cache-threshold | CSR | 27 | 32 | 32768 | 864 | scalar | off | 28671-28672 | 1.812e-05 1.808e-05 1.808e-05 1.808e-05 1.807e-05 | 1.000-1.000 |
+| cache-threshold | CSR | 27 | 32 | 32768 | 864 | scalar | on | 28671-28672 | 1.824e-05 1.825e-05 1.828e-05 1.824e-05 1.826e-05 | 0.989-0.993 |
+| cache-threshold | CSR | 27 | 32 | 32768 | 864 | scalar | hand | 17407-17408 | 2.927e-05 2.926e-05 2.934e-05 2.933e-05 2.925e-05 | 0.616-0.619 |
+| cache-threshold | per-row | 13 | 32 | 32768 | 416 | scalar | donor | 73727-73728 | 7.068e-06 7.056e-06 7.066e-06 7.064e-06 7.062e-06 | 1.015-1.018 |
+| cache-threshold | per-row | 13 | 32 | 32768 | 416 | scalar | off | 73727-73728 | 7.183e-06 7.183e-06 7.175e-06 7.175e-06 7.174e-06 | 1.000-1.000 |
+| cache-threshold | per-row | 13 | 32 | 32768 | 416 | scalar | on | 69631-69632 | 7.405e-06 7.401e-06 7.402e-06 7.403e-06 7.398e-06 | 0.969-0.971 |
+| cache-threshold | per-row | 13 | 32 | 32768 | 416 | scalar | hand | 49151-49152 | 1.079e-05 1.079e-05 1.081e-05 1.08e-05 1.078e-05 | 0.664-0.666 |
+| cache-threshold | per-row | 27 | 32 | 32768 | 864 | scalar | donor | 28671-28672 | 1.869e-05 1.87e-05 1.87e-05 1.871e-05 1.87e-05 | 1.005-1.008 |
+| cache-threshold | per-row | 27 | 32 | 32768 | 864 | scalar | off | 26623-26624 | 1.884e-05 1.881e-05 1.883e-05 1.882e-05 1.883e-05 | 1.000-1.000 |
+| cache-threshold | per-row | 27 | 32 | 32768 | 864 | scalar | on | 26623-26624 | 1.907e-05 1.906e-05 1.903e-05 1.91e-05 1.903e-05 | 0.985-0.989 |
+| cache-threshold | per-row | 27 | 32 | 32768 | 864 | scalar | hand | 22527-22528 | 2.362e-05 2.359e-05 2.361e-05 2.366e-05 2.362e-05 | 0.795-0.798 |
+| cache-threshold | CSR | 13 | 4096 | 32768 | 53248 | scalar | donor | 351-352 | 0.001456 0.001456 0.001456 0.001456 0.001455 | 1.006-1.013 |
+| cache-threshold | CSR | 13 | 4096 | 32768 | 53248 | scalar | off | 351-352 | 0.001466 0.001465 0.001466 0.001475 0.001468 | 1.000-1.000 |
+| cache-threshold | CSR | 13 | 4096 | 32768 | 53248 | scalar | on | 351-352 | 0.00149 0.00149 0.00149 0.001501 0.00149 | 0.982-0.985 |
+| cache-threshold | CSR | 13 | 4096 | 32768 | 53248 | scalar | hand | 255-256 | 0.002053 0.002047 0.002047 0.00205 0.002046 | 0.714-0.720 |
+| cache-threshold | CSR | 27 | 4096 | 32768 | 110592 | scalar | donor | 175-176 | 0.002923 0.002924 0.002922 0.002932 0.002924 | 1.003-1.008 |
+| cache-threshold | CSR | 27 | 4096 | 32768 | 110592 | scalar | off | 175-176 | 0.002933 0.002932 0.002932 0.002956 0.002934 | 1.000-1.000 |
+| cache-threshold | CSR | 27 | 4096 | 32768 | 110592 | scalar | on | 175-176 | 0.002957 0.002958 0.002957 0.002964 0.002957 | 0.991-0.997 |
+| cache-threshold | CSR | 27 | 4096 | 32768 | 110592 | scalar | hand | 127-128 | 0.004125 0.004123 0.004119 0.004118 0.004119 | 0.711-0.718 |
+| cache-threshold | per-row | 13 | 4096 | 32768 | 53248 | scalar | donor | 119-120 | 0.004356 0.004359 0.004359 0.004385 0.004366 | 1.002-1.006 |
+| cache-threshold | per-row | 13 | 4096 | 32768 | 53248 | scalar | off | 119-120 | 0.004375 0.004377 0.00437 0.00441 0.004375 | 1.000-1.000 |
+| cache-threshold | per-row | 13 | 4096 | 32768 | 53248 | scalar | on | 119-120 | 0.004408 0.004403 0.004406 0.004401 0.004401 | 0.992-1.002 |
+| cache-threshold | per-row | 13 | 4096 | 32768 | 53248 | scalar | hand | 111-112 | 0.004568 0.004579 0.004562 0.004563 0.00456 | 0.956-0.967 |
+| cache-threshold | per-row | 27 | 4096 | 32768 | 110592 | scalar | donor | 71-72 | 0.007056 0.007051 0.007045 0.007086 0.007107 | 0.997-1.003 |
+| cache-threshold | per-row | 27 | 4096 | 32768 | 110592 | scalar | off | 71-72 | 0.007064 0.007067 0.007066 0.007071 0.007083 | 1.000-1.000 |
+| cache-threshold | per-row | 27 | 4096 | 32768 | 110592 | scalar | on | 71-72 | 0.007102 0.007127 0.007106 0.00711 0.007107 | 0.992-0.997 |
+| cache-threshold | per-row | 27 | 4096 | 32768 | 110592 | scalar | hand | 79-80 | 0.006346 0.006345 0.006345 0.006341 0.006343 | 1.113-1.117 |
+| cache-threshold | CSR | 13 | 8192 | 32768 | 106496 | scalar | donor | 175-176 | 0.002948 0.002951 0.00295 0.002957 0.002969 | 1.005-1.011 |
+| cache-threshold | CSR | 13 | 8192 | 32768 | 106496 | scalar | off | 175-176 | 0.002973 0.002983 0.002971 0.002972 0.002995 | 1.000-1.000 |
+| cache-threshold | CSR | 13 | 8192 | 32768 | 106496 | scalar | on | 175-176 | 0.003016 0.003019 0.003017 0.003019 0.00302 | 0.984-0.992 |
+| cache-threshold | CSR | 13 | 8192 | 32768 | 106496 | scalar | hand | 127-128 | 0.004135 0.004134 0.004132 0.004134 0.004133 | 0.719-0.725 |
+| cache-threshold | CSR | 27 | 8192 | 32768 | 221184 | scalar | donor | 87-88 | 0.005864 0.00588 0.005863 0.005873 0.00588 | 1.003-1.012 |
+| cache-threshold | CSR | 27 | 8192 | 32768 | 221184 | scalar | off | 87-88 | 0.005889 0.005902 0.005886 0.005892 0.005948 | 1.000-1.000 |
+| cache-threshold | CSR | 27 | 8192 | 32768 | 221184 | scalar | on | 87-88 | 0.005938 0.005936 0.005937 0.005929 0.00595 | 0.991-1.000 |
+| cache-threshold | CSR | 27 | 8192 | 32768 | 221184 | scalar | hand | 63-64 | 0.008246 0.008238 0.008238 0.008241 0.008242 | 0.714-0.722 |
+| cache-threshold | per-row | 13 | 8192 | 32768 | 106496 | scalar | donor | 55-56 | 0.009158 0.009188 0.009151 0.00915 0.009209 | 0.991-1.003 |
+| cache-threshold | per-row | 13 | 8192 | 32768 | 106496 | scalar | off | 55-56 | 0.009181 0.009184 0.009176 0.009173 0.009127 | 1.000-1.000 |
+| cache-threshold | per-row | 13 | 8192 | 32768 | 106496 | scalar | on | 55-56 | 0.009239 0.009249 0.009236 0.009242 0.009181 | 0.993-0.994 |
+| cache-threshold | per-row | 13 | 8192 | 32768 | 106496 | scalar | hand | 55-56 | 0.009583 0.009576 0.009575 0.009576 0.009449 | 0.958-0.966 |
+| cache-threshold | per-row | 27 | 8192 | 32768 | 221184 | scalar | donor | 34-36 | 0.01508 0.0151 0.01509 0.01526 0.01394 | 0.991-1.006 |
+| cache-threshold | per-row | 27 | 8192 | 32768 | 221184 | scalar | off | 34-36 | 0.01511 0.01512 0.01511 0.01512 0.01402 | 1.000-1.000 |
+| cache-threshold | per-row | 27 | 8192 | 32768 | 221184 | scalar | on | 33-36 | 0.01518 0.01519 0.01518 0.01518 0.01412 | 0.993-0.996 |
+| cache-threshold | per-row | 27 | 8192 | 32768 | 221184 | scalar | hand | 38-40 | 0.01326 0.01327 0.01327 0.01327 0.01284 | 1.092-1.140 |
+| cache-threshold | CSR | 13 | 14000 | 32768 | 182000 | scalar | donor | 103-104 | 0.004984 0.004984 0.00499 0.004986 0.004987 | 1.007-1.010 |
+| cache-threshold | CSR | 13 | 14000 | 32768 | 182000 | scalar | off | 103-104 | 0.005028 0.005026 0.005039 0.005024 0.005022 | 1.000-1.000 |
+| cache-threshold | CSR | 13 | 14000 | 32768 | 182000 | scalar | on | 103-104 | 0.005097 0.0051 0.0051 0.0051 0.005116 | 0.982-0.988 |
+| cache-threshold | CSR | 13 | 14000 | 32768 | 182000 | scalar | hand | 72-75 | 0.007024 0.00702 0.007023 0.007023 0.007069 | 0.710-0.718 |
+| cache-threshold | CSR | 27 | 14000 | 32768 | 378000 | scalar | donor | 51-52 | 0.009897 0.009875 0.009884 0.009874 0.009885 | 1.002-1.008 |
+| cache-threshold | CSR | 27 | 14000 | 32768 | 378000 | scalar | off | 51-52 | 0.009922 0.009922 0.009962 0.00992 0.009917 | 1.000-1.000 |
+| cache-threshold | CSR | 27 | 14000 | 32768 | 378000 | scalar | on | 51-52 | 0.009999 0.00999 0.009991 0.009987 0.009989 | 0.992-0.997 |
+| cache-threshold | CSR | 27 | 14000 | 32768 | 378000 | scalar | hand | 36-37 | 0.01401 0.01402 0.01401 0.01401 0.01404 | 0.706-0.711 |
+| cache-threshold | per-row | 13 | 14000 | 32768 | 182000 | scalar | donor | 31-34 | 0.01622 0.01611 0.01612 0.01553 0.01554 | 0.997-1.004 |
+| cache-threshold | per-row | 13 | 14000 | 32768 | 182000 | scalar | off | 31-34 | 0.01618 0.01616 0.01615 0.0156 0.0156 | 1.000-1.000 |
+| cache-threshold | per-row | 13 | 14000 | 32768 | 182000 | scalar | on | 31-32 | 0.01625 0.01626 0.01634 0.01619 0.01568 | 0.963-0.996 |
+| cache-threshold | per-row | 13 | 14000 | 32768 | 182000 | scalar | hand | 30-32 | 0.01676 0.01675 0.01675 0.01674 0.01631 | 0.932-0.965 |
+| cache-threshold | per-row | 27 | 14000 | 32768 | 378000 | scalar | donor | 20-22 | 0.02571 0.02549 0.02546 0.0245 0.02453 | 0.995-1.005 |
+| cache-threshold | per-row | 27 | 14000 | 32768 | 378000 | scalar | off | 20-22 | 0.0256 0.02559 0.02558 0.02462 0.02459 | 1.000-1.000 |
+| cache-threshold | per-row | 27 | 14000 | 32768 | 378000 | scalar | on | 20-22 | 0.02564 0.0256 0.02572 0.02471 0.0247 | 0.994-0.999 |
+| cache-threshold | per-row | 27 | 14000 | 32768 | 378000 | scalar | hand | 22-24 | 0.02286 0.02288 0.02287 0.02319 0.0222 | 1.062-1.120 |
+| cache-threshold | CSR | 13 | 16384 | 32768 | 212992 | hint | donor | 87-88 | 0.005879 0.005847 0.005847 0.005846 0.005839 | 1.006-1.008 |
+| cache-threshold | CSR | 13 | 16384 | 32768 | 212992 | hint | off | 87-88 | 0.005929 0.00588 0.005886 0.005886 0.00588 | 1.000-1.000 |
+| cache-threshold | CSR | 13 | 16384 | 32768 | 212992 | hint | on | 76-79 | 0.006657 0.006661 0.00666 0.006659 0.00666 | 0.883-0.891 |
+| cache-threshold | CSR | 13 | 16384 | 32768 | 212992 | hint | hand | 60-64 | 0.008233 0.008232 0.008351 0.008232 0.008231 | 0.705-0.720 |
+| cache-threshold | CSR | 27 | 16384 | 32768 | 442368 | hint | donor | 44-47 | 0.01162 0.0116 0.01159 0.01159 0.01159 | 1.003-1.009 |
+| cache-threshold | CSR | 27 | 16384 | 32768 | 442368 | hint | off | 43-44 | 0.01172 0.01163 0.01163 0.01164 0.01164 | 1.000-1.000 |
+| cache-threshold | CSR | 27 | 16384 | 32768 | 442368 | hint | on | 38-39 | 0.01337 0.01332 0.01334 0.01333 0.01333 | 0.872-0.877 |
+| cache-threshold | CSR | 27 | 16384 | 32768 | 442368 | hint | hand | 31-32 | 0.0164 0.01641 0.01643 0.01643 0.0164 | 0.708-0.715 |
+| cache-threshold | per-row | 13 | 16384 | 32768 | 212992 | hint | donor | 27-28 | 0.0186 0.0186 0.0186 0.01839 0.0184 | 1.003-1.012 |
+| cache-threshold | per-row | 13 | 16384 | 32768 | 212992 | hint | off | 27-28 | 0.01883 0.01865 0.0187 0.01845 0.01846 | 1.000-1.000 |
+| cache-threshold | per-row | 13 | 16384 | 32768 | 212992 | hint | on | 27-28 | 0.0191 0.01895 0.01876 0.01877 0.01876 | 0.983-0.996 |
+| cache-threshold | per-row | 13 | 16384 | 32768 | 212992 | hint | hand | 26-27 | 0.01948 0.01947 0.01925 0.01934 0.01926 | 0.954-0.971 |
+| cache-threshold | per-row | 27 | 16384 | 32768 | 442368 | hint | donor | 16-18 | 0.03082 0.03174 0.02914 0.02917 0.02916 | 0.973-1.009 |
+| cache-threshold | per-row | 27 | 16384 | 32768 | 442368 | hint | off | 17-18 | 0.03109 0.0309 0.02925 0.02921 0.02923 | 1.000-1.000 |
+| cache-threshold | per-row | 27 | 16384 | 32768 | 442368 | hint | on | 19-20 | 0.02674 0.02657 0.02522 0.02521 0.02518 | 1.159-1.163 |
+| cache-threshold | per-row | 27 | 16384 | 32768 | 442368 | hint | hand | 19-20 | 0.02768 0.02764 0.02627 0.02632 0.02627 | 1.110-1.123 |
+| cache-threshold | CSR | 13 | 32768 | 32768 | 425984 | hint | donor | 43-44 | 0.01167 0.01168 0.01169 0.01169 0.01169 | 1.006-1.010 |
+| cache-threshold | CSR | 13 | 32768 | 32768 | 425984 | hint | off | 43-44 | 0.01179 0.01178 0.01176 0.01178 0.01177 | 1.000-1.000 |
+| cache-threshold | CSR | 13 | 32768 | 32768 | 425984 | hint | on | 38-39 | 0.0134 0.01332 0.01332 0.01334 0.01331 | 0.880-0.884 |
+| cache-threshold | CSR | 13 | 32768 | 32768 | 425984 | hint | hand | 31-32 | 0.01651 0.01647 0.01646 0.0165 0.01646 | 0.714-0.715 |
+| cache-threshold | CSR | 27 | 32768 | 32768 | 884736 | hint | donor | 22-23 | 0.02312 0.02314 0.02313 0.02312 0.02314 | 1.004-1.005 |
+| cache-threshold | CSR | 27 | 32768 | 32768 | 884736 | hint | off | 22-23 | 0.02324 0.02323 0.02321 0.0232 0.02324 | 1.000-1.000 |
+| cache-threshold | CSR | 27 | 32768 | 32768 | 884736 | hint | on | 19 | 0.02679 0.0266 0.0266 0.02666 0.02658 | 0.867-0.874 |
+| cache-threshold | CSR | 27 | 32768 | 32768 | 884736 | hint | hand | 16 | 0.03296 0.03274 0.03274 0.03272 0.03276 | 0.705-0.709 |
+| cache-threshold | per-row | 13 | 32768 | 32768 | 425984 | hint | donor | 13-14 | 0.03881 0.0369 0.03693 0.03695 0.03693 | 1.002-1.003 |
+| cache-threshold | per-row | 13 | 32768 | 32768 | 425984 | hint | off | 13-14 | 0.0389 0.03702 0.03702 0.03702 0.03704 | 1.000-1.000 |
+| cache-threshold | per-row | 13 | 32768 | 32768 | 425984 | hint | on | 13-14 | 0.03966 0.03763 0.03768 0.03782 0.03765 | 0.979-0.984 |
+| cache-threshold | per-row | 13 | 32768 | 32768 | 425984 | hint | hand | 13 | 0.04058 0.04118 0.03864 0.03866 0.03865 | 0.899-0.959 |
+| cache-threshold | per-row | 27 | 32768 | 32768 | 884736 | hint | donor | 9 | 0.06181 0.05865 0.05866 0.0586 0.05861 | 1.001-1.076 |
+| cache-threshold | per-row | 27 | 32768 | 32768 | 884736 | hint | off | 8-9 | 0.06651 0.0587 0.05882 0.05878 0.05879 | 1.000-1.000 |
+| cache-threshold | per-row | 27 | 32768 | 32768 | 884736 | hint | on | 10 | 0.05177 0.05101 0.05099 0.05104 0.05102 | 1.151-1.285 |
+| cache-threshold | per-row | 27 | 32768 | 32768 | 884736 | hint | hand | 10 | 0.05322 0.05309 0.05314 0.05334 0.05313 | 1.102-1.250 |
+| CG-A-sized | CSR | 13 | 14000 | 112000 | 182000 | scalar | donor | 80-83 | 0.006328 0.006324 0.006329 0.006327 0.006323 | 1.004-1.007 |
+| CG-A-sized | CSR | 13 | 14000 | 112000 | 182000 | scalar | off | 79-80 | 0.006375 0.006358 0.006354 0.006352 0.006353 | 1.000-1.000 |
+| CG-A-sized | CSR | 13 | 14000 | 112000 | 182000 | scalar | on | 79-80 | 0.006504 0.006441 0.006442 0.006456 0.006452 | 0.980-0.987 |
+| CG-A-sized | CSR | 13 | 14000 | 112000 | 182000 | scalar | hand | 71-72 | 0.007047 0.007034 0.007033 0.007045 0.007031 | 0.902-0.905 |
+| memory-sized | CSR | 13 | 32768 | 16777216 | 425984 | hint | donor | 4 | 0.1396 0.1395 0.1395 0.1395 0.1395 | 1.001-1.009 |
+| memory-sized | CSR | 13 | 32768 | 16777216 | 425984 | hint | off | 4 | 0.1408 0.1396 0.1396 0.1396 0.1396 | 1.000-1.000 |
+| memory-sized | CSR | 13 | 32768 | 16777216 | 425984 | hint | on | 27-28 | 0.01871 0.01857 0.01859 0.01857 0.01857 | 7.511-7.527 |
+| memory-sized | CSR | 13 | 32768 | 16777216 | 425984 | hint | hand | 25-26 | 0.02022 0.02022 0.02021 0.02023 0.02022 | 6.901-6.966 |
+| CG-A-sized | CSR | 27 | 14000 | 112000 | 378000 | scalar | donor | 40-43 | 0.01268 0.01267 0.01267 0.01265 0.01268 | 1.000-1.007 |
+| CG-A-sized | CSR | 27 | 14000 | 112000 | 378000 | scalar | off | 40-43 | 0.01276 0.01269 0.01268 0.01271 0.01269 | 1.000-1.000 |
+| CG-A-sized | CSR | 27 | 14000 | 112000 | 378000 | scalar | on | 39-40 | 0.01286 0.01278 0.0128 0.01279 0.01279 | 0.991-0.993 |
+| CG-A-sized | CSR | 27 | 14000 | 112000 | 378000 | scalar | hand | 36-37 | 0.01401 0.01401 0.014 0.01405 0.01401 | 0.905-0.911 |
+| memory-sized | CSR | 27 | 32768 | 16777216 | 884736 | hint | donor | 2 | 0.2901 0.2869 0.2866 0.2847 0.2846 | 0.993-1.002 |
+| memory-sized | CSR | 27 | 32768 | 16777216 | 884736 | hint | off | 2 | 0.288 0.2867 0.2871 0.2848 0.2846 | 1.000-1.000 |
+| memory-sized | CSR | 27 | 32768 | 16777216 | 884736 | hint | on | 14 | 0.03799 0.03804 0.03817 0.03769 0.03772 | 7.522-7.580 |
+| memory-sized | CSR | 27 | 32768 | 16777216 | 884736 | hint | hand | 13 | 0.04077 0.04078 0.04072 0.041 0.04059 | 6.945-7.063 |
+| CG-A-sized | per-row | 13 | 14000 | 112000 | 182000 | scalar | donor | 29-30 | 0.01756 0.01747 0.01744 0.01744 0.01748 | 1.000-1.007 |
+| CG-A-sized | per-row | 13 | 14000 | 112000 | 182000 | scalar | off | 29-30 | 0.01755 0.01751 0.01756 0.01748 0.0175 | 1.000-1.000 |
+| CG-A-sized | per-row | 13 | 14000 | 112000 | 182000 | scalar | on | 29-30 | 0.01761 0.01762 0.01767 0.0176 0.01759 | 0.993-0.997 |
+| CG-A-sized | per-row | 13 | 14000 | 112000 | 182000 | scalar | hand | 31-32 | 0.01617 0.01618 0.01617 0.01616 0.01623 | 1.078-1.086 |
+| memory-sized | per-row | 13 | 32768 | 16777216 | 425984 | hint | donor | 4 | 0.1619 0.1622 0.162 0.1618 0.1631 | 0.998-1.001 |
+| memory-sized | per-row | 13 | 32768 | 16777216 | 425984 | hint | off | 4 | 0.162 0.162 0.162 0.162 0.163 | 1.000-1.000 |
+| memory-sized | per-row | 13 | 32768 | 16777216 | 425984 | hint | on | 12 | 0.0449 0.0449 0.04493 0.0449 0.04488 | 3.605-3.632 |
+| memory-sized | per-row | 13 | 32768 | 16777216 | 425984 | hint | hand | 11 | 0.04553 0.04555 0.04554 0.04557 0.04556 | 3.554-3.578 |
+| CG-A-sized | per-row | 27 | 14000 | 112000 | 378000 | scalar | donor | 13-15 | 0.03873 0.03495 0.035 0.03507 0.03539 | 0.993-1.005 |
+| CG-A-sized | per-row | 27 | 14000 | 112000 | 378000 | scalar | off | 13-15 | 0.03887 0.03513 0.03504 0.03496 0.03514 | 1.000-1.000 |
+| CG-A-sized | per-row | 27 | 14000 | 112000 | 378000 | scalar | on | 13-15 | 0.03901 0.03528 0.0352 0.03517 0.03521 | 0.994-0.998 |
+| CG-A-sized | per-row | 27 | 14000 | 112000 | 378000 | scalar | hand | 21-24 | 0.02398 0.02366 0.02218 0.02216 0.02216 | 1.485-1.621 |
+| memory-sized | per-row | 27 | 32768 | 16777216 | 884736 | hint | donor | 2 | 0.3197 0.3145 0.3143 0.3142 0.3142 | 0.984-1.014 |
+| memory-sized | per-row | 27 | 32768 | 16777216 | 884736 | hint | off | 2 | 0.3146 0.3143 0.3144 0.3143 0.3185 | 1.000-1.000 |
+| memory-sized | per-row | 27 | 32768 | 16777216 | 884736 | hint | on | 8 | 0.06706 0.067 0.06702 0.06721 0.06581 | 4.676-4.839 |
+| memory-sized | per-row | 27 | 32768 | 16777216 | 884736 | hint | hand | 8 | 0.06824 0.06799 0.06827 0.06859 0.06676 | 4.582-4.771 |
+| HPCG-104-cubed-stencil | per-row | 27 | 1124864 | 8998912 | 29791000 | hint | donor | 1 | 0.6281 0.627 0.626 0.627 0.6256 | 1.004-1.012 |
+| HPCG-104-cubed-stencil | per-row | 27 | 1124864 | 8998912 | 29791000 | hint | off | 1 | 0.6331 0.6293 0.6293 0.6344 0.6293 | 1.000-1.000 |
+| HPCG-104-cubed-stencil | per-row | 27 | 1124864 | 8998912 | 29791000 | hint | on | 1 | 0.8282 0.8282 0.8279 0.8293 0.8281 | 0.760-0.765 |
+| HPCG-104-cubed-stencil | per-row | 27 | 1124864 | 8998912 | 29791000 | hint | hand | 1 | 0.9027 0.9029 0.9029 0.9027 0.9031 | 0.697-0.703 |
+| lone-memory | lone | 262144 | 1 | 16777216 | 262144 | hint | donor | 6 | 0.08349 0.0835 0.08356 0.08358 0.08349 | 0.927-0.932 |
+| lone-memory | lone | 262144 | 1 | 16777216 | 262144 | hint | off | 7 | 0.07779 0.07742 0.07743 0.07746 0.07737 | 1.000-1.000 |
+| lone-memory | lone | 262144 | 1 | 16777216 | 262144 | hint | on | 47-48 | 0.01087 0.01087 0.01087 0.01086 0.01087 | 7.121-7.157 |
+| lone-memory | lone | 262144 | 1 | 16777216 | 262144 | hint | hand | 47-48 | 0.01124 0.01124 0.01132 0.01131 0.01124 | 6.843-6.918 |
+
+What the table says:
+
+* Stencil (104^3, 27 points, 1,124,864 rows, per-row form): `on` 0.760-0.765,
+  `hand` 0.697-0.703. The row count is far above any cutoff, so a row
+  cutoff alone cannot protect it.
+* Rows of one index array (CSR), x 32 KiB, 16384 and 32768 rows (hinted
+  arm): 0.867-0.891. x 112 KB, 14000 rows, forced by hand: 0.902-0.911.
+  x 16 MiB: 7.51-7.58.
+* Rows with their own index pointer, forced by hand: 14000 rows over 112 KB
+  1.078-1.086 (n=13) and 1.485-1.621 (n=27); x 32 KiB 0.90-0.97 (n=13) and
+  1.06-1.25 (n=27) from 4096 rows up; x 16 MiB 3.6 (n=13) and 4.7-4.8
+  (n=27). This form gains at sizes where the flat form loses. Inference,
+  not measured: its hint first loads the next row's index line, which in
+  these inputs is a separate allocation. The two forms therefore cannot
+  share a cutoff; the policy hook now takes the form (below).
+* Lone loop, 262144 iterations over 16 MiB: 7.12-7.16.
+* Unhinted arm of the switch-on build (`arm` = scalar): 0.969-0.976 at
+  32 rows n=13, 0.985-0.993 at 32 rows n=27, 0.980-0.992 for CSR n=13 at
+  4096 to 14000 rows, 0.991-1.000 for CSR n=27, 0.992-1.002 for per-row
+  rows (one sample 0.963). Cause and correction below.
+* Separate from this ticket: the donor is 1.3-1.8% faster than switch-off
+  at 32 rows, n=13, in both forms (1.013-1.018).
+
+Why 7.5x here against 1.62x in window 4: the inputs differ, not the code.
+Window 4 timed each memory-sized case twice, with uniformly random columns
+(`packed=0`) and with columns in groups of eight neighbours (`packed=1`).
+Its `packed=0` numbers were already 6.95-7.02 (CSR) and 3.63-5.18
+(per-row); 1.61-1.63 is its `packed=1` per-row n=27 case, the best of the
+grouped cases (the others: 1.34-1.52). Window 6 has no grouped input, so
+all its memory-sized numbers are the random-column kind, and they agree
+with window 4's (CSR 6.9-7.0 by hand there, 6.9-7.1 by hand here; the
+compiler's own form reaches 7.5). The unhinted loop takes 0.140 s for
+425,984 nonzeros, about 330 ns each. Inference from the inputs, not from
+counters: with random columns over 16 MiB every nonzero misses, and
+grouped columns miss once per eight nonzeros, which leaves less to hide.
+Real matrices lie between the two, so 1.3-1.6 is the fairer expectation
+for an application and 7 the upper end.
+
+#### Policy: a locality sample in the version test
+
+Ruling (a). The hinted arm of a nest now needs three things, tested once
+per execution of the nest, before the row loop:
+
+1. at least the cutoff number of rows (a lone loop: iterations);
+2. for a byte-typed count array, counts disjoint from the stored vector
+   (unchanged);
+3. new: the first indices of the first three rows in iteration order are
+   each more than one cache line of values (8 FP64 elements) from the one
+   before. A lone loop uses its first three indices.
+
+Both gaps must be large. On the 104^3 stencil consecutive rows start 0, 1
+or 2 elements apart, except twice per plane (after the first grid line,
+102 apart, and at the step to the next plane, 106 apart), and those two
+are never neighbours; one large gap out of two therefore still means
+stencil. With uniformly random columns over nx elements the chance that
+a gap is within 8 is 17/nx.
+
+Legality of the sample, as implemented by hand and in the pass:
+
+* nothing is read unless test 1 holds, so the three rows exist, and they
+  are rows the nest itself reads (no call or early exit in the nest);
+* a row's first index is read only when all three rows are nonempty; the
+  per-row pointer only for a positive count; an empty sampled row selects
+  the unhinted arm;
+* row bounds, counts and pointers are not changed by the nest (alias sets
+  as before; test 2 for byte counts comes before the sample);
+* the index and value arrays may change before their row runs: that only
+  makes the choice stale, never a load invalid.
+
+Nothing runs per element or per row; the stencil takes the unhinted arm.
+
+#### Hand-written proof (host model)
+
+`tools/s12_30_precision.c`, manual slot (`-DMANUAL_PROOF=1`): the policy
+above written in C around the legal hinted kernels, for the flat, per-row
+and lone forms and for the three struct nests (SpMV, forward sweep,
+backward sweep; the backward sample reads rows `rows-1`, `rows-2`,
+`rows-3`). The slot records which arm each call took.
+
+Fixtures changed for the sample:
+
+* Long fixtures now begin (in sweep order) with three nonempty rows whose
+  first indices are 0, 33 and 66, so the hinted arm runs and the lookahead
+  guards at the array end stay exercised; every fourth length starts them
+  at 5, 6, 7 instead and takes the unhinted arm.
+* New flat shape 3: the first four rows are empty and bounded at the end
+  of `col`, which is a protected page. Per-row and struct fixtures keep
+  empty sampled rows whose index pointer is a protected page.
+* Lone loop: lengths 0 to 5 added (a three-index sample of a shorter loop
+  crosses the guard), each with far and near first indices; the lone
+  fixtures now run in a child per slot.
+* Count-inside-the-stored-vector case: the first three rows in sweep order
+  hold one zero-valued entry each, 4096 elements apart, so the sample
+  alone would choose the hinted arm; only the disjointness test keeps the
+  stale count unread.
+* A sweep's vector has 67 elements beyond its rows, so first indices can
+  be far apart in a seven-row fixture.
+
+Host run, `--shape-host` (control flow only, no IMCI, no timing), log
+`.work/_state/logs/s12_30_shape_host-20261115-075411.log`: PASS.
+
+* Plain C and the manual slot pass all 42 struct children (seven slots),
+  the flat, per-row and lone guard children, and every timing case built
+  without the clock.
+* Decisions of the manual slot, all as expected (32 cases): scalar for
+  32-row nests, scalar for 14000 square rows (below the cutoff), hint for
+  square 32768 to 262144 rows in both forms and both lengths, hint for
+  32768 rows over a 32 KiB x (the known weakness of a row count), scalar
+  for the 104^3 stencil in the per-row form
+  and in the struct SpMV, forward and backward nests, hint for the random
+  lone loop, scalar for the ascending lone loop.
+* Three seeded defects are each caught, by a fault, in the seeded slot
+  only: a next-row hint without the count/store disjointness test (as
+  before); a sample taken below the row cutoff (flat, per-row, lone and
+  all three struct children fault); a sample that reads the first index of
+  rows not known nonempty (flat, per-row and the three struct children
+  fault).
+
+#### Unhinted arm against switch-off (ruling c): cause not settled, control staged
+
+What it is not. The version test and the sample run once, before the row
+loop; the unhinted nest is the untouched GIMPLE copy; it keeps all four
+stream hints of its unrolled loop (`vprefetch1 2048`/`vprefetch0 1024` on
+values, `vprefetch1 1024`/`vprefetch0 512` on indices); nothing is spilled
+in either arm.
+
+What differs in the generated code of the unhinted arm (flat form; the
+per-row form is alike), from `compiler-knc.s` and `compiler-enabled.s`:
+
+1. A zero stays on the x87 stack for the whole nest: each row starts with
+   `fld %st(0)` where switch-off has `fldz`, and the function ends with
+   `fstp %st(0)`. RTL invariant motion hoists the zero in both builds;
+   `late_combine2` puts it back into its three uses in switch-off code
+   (`original cost = 5 + 4 + 4 + 4 ... keeping replacement`) but fails in
+   the two-nest function with `no viable insn position assignment`, once
+   per nest. This is not specific to this pass: a plain function with two
+   strict sparse nests compiled with the switch off shows the same six
+   `fld %st(0)` and the same two failures (`.work/_shared/S12-30/scratch/
+   two.c`, `one_nest` in the same file has none).
+2. The short-row loop is one byte longer (22 against 21): the value
+   pointer lives in `%r10` instead of `%rbx`, so `fmull` carries a REX
+   prefix.
+3. One more taken branch per short row: the row header is laid out after
+   the long-row code, so a short row takes `jne`, `jg`, `jbe` where
+   switch-off takes `jne`, `jbe`.
+4. Per call: `subq`/`movq` saves instead of pushes, the cutoff compare,
+   and now the sample (at most 7 loads and 6 branches).
+
+Placement in the linked binaries (functions start on a 64-byte line;
+offset of each short loop, its length, start modulo 64, and whether it
+crosses a line):
+
+| Binary | Function | Short plain loops |
+| --- | --- | --- |
+| window 6 | `knc_csr_raw` (off) | +288 len 21 mod 32; +352 len 21 mod 32 |
+| window 6 | `enabled_csr_raw` (on) | +480 len 22 mod 32; +560 len 22 mod 48 crosses; +880 len 22 mod 48 crosses; +976 len 22 mod 16 (short rows of the unhinted arm) |
+| new | `enabled_csr_raw` (on) | +560 len 22 mod 48 crosses; +656 len 22 mod 16 (short rows of the unhinted arm); +928 len 22 mod 32; +1024 len 22 mod 0 |
+| new | `twin_csr_raw` (control) | +320 len 22 mod 0; +400 len 22 mod 16; +752 len 22 mod 48 crosses; +848 len 22 mod 16 |
+
+The loops that cross a line are the remainder loops after an unrolled
+loop, which rows of 13 or 27 entries never reach; the short-row loop of
+the unhinted arm does not cross one in either binary. So placement does
+not explain the loss either.
+
+The loss in window 6 halves from n=13 to n=27 at 32 rows (2.4-3.1% and
+0.7-1.5%), so it is a cost per row, about 5 ns (2.4% of 7.0 us per call
+over 32 rows), not per nonzero. Items 1 and 3 are per row.
+None of the four can be timed on the host, and the donor code, the
+fastest slot at 32 rows, also keeps a zero copy (3 `fld %st`), so item 1
+alone is unlikely.
+
+Done here: the two arms now have even probability (they were 80/20 for
+the hinted arm), so the unhinted copy is no longer optimised as the
+unlikely path. That did not remove items 1 to 3.
+
+Staged to settle it in the one card run: a control slot,
+`knc-switch-off-two-nests`. It is switch-off code in which the plain nest
+appears twice in one function, selected by a flag that is never set (the
+copy that never runs negates its store, so the two cannot be merged). It
+has the same three properties as the unhinted arm (5 `fld %st`, 22-byte
+loop, row header after the long-row code) and none of the policy. It is
+timed next to `off` and `on` in the four 32-row cases and the four
+14000-row cases.
+
+* If the control loses what `on` loses, the cost comes from two nests
+  sharing a function, which any function with two FP reduction nests has
+  today; the correction belongs in general code generation (late-combine
+  on x87, or block layout) and needs its own ticket.
+* If the control equals `off` and `on` still loses, the cost is in the
+  policy path and stays in this ticket.
+
+So ruling (c) is reported, not met: the target of 1% on every
+policy=scalar case is unproven until that run.
+
+#### GCC change (lane gcc2, `679766e8d25`, two commits on `c70cf1ed484`)
+
+`git diff --check knc...HEAD` clean, LF, 8 files, 877 insertions.
+
+* `gcc/tree-ssa-loop-prefetch.cc`: `indirect_sample` builds the sample
+  before the nest as a chain of guarded blocks ending in a PHI (false on
+  every skipped edge), and the nest is versioned on that PHI. Order of
+  the tests: row count, store disjointness, sampled rows nonempty, then
+  the index loads. Flat form: `bounds[s..s+3]`, then `indices[bounds[s+k]]`
+  for k = 0..2 under `bounds[s+k] < bounds[s+k+1]`. Per-row form:
+  `bounds[s], bounds[s±1], bounds[s±2]` (minus for a descending nest, s its
+  first row), then pointer and first index of each under `count > 0`.
+  Lone loop: `indices[start..start+2]`. The gap test is
+  `(unsigned long long)(b - a + 8) > 16` on 64-bit differences, both
+  pairs. The tolerance is the L1 line size divided by the value size.
+* Same file: the store-disjointness test of the flat form now covers
+  `bounds[high]` (ruling d). It has no effect today, because a byte-typed
+  bound array cannot be the flat form.
+* Same file: nest version arms even; minimum rows clamped to the three the
+  sample reads.
+* `gcc/target.def`, `gcc/doc/tm.texi`, `gcc/config/i386/i386-knc.{h,cc}`:
+  the policy hook receives the form (0 flat rows, 1 per-row pointers,
+  2 lone loop) and KNC keeps one cutoff per form, all still the
+  provisional 16384. Reason: window 6 shows the forms break even at
+  different sizes (above), and a prototype change costs a full rebuild,
+  so it shares the rebuild the new parameter needs anyway.
+* `gcc/config/i386/i386.opt`: `--param=knc-indirect-prefetch-min-trips=N`
+  overrides the cutoff of all forms (0, the default, keeps the built-in
+  values). It exists so that the gate can time the hinted arm below the
+  default cutoff with the shipped pass; the locality sample still applies.
+
+Sample in the flat T1 probe (`phase2-default.aprefetch`, `sparse_rows`):
+
+```text
+  <bb 13>: _64 = (long long unsigned int) rows * 8;
+           if (_64 > 131071) goto <bb 15>; else goto <bb 14>;
+  <bb 15>: _68 = *row;  _71 = *(row + 4);  _70 = *(row + 8);  _62 = *(row + 12);
+           if (_68 < _71) goto <bb 16>; else goto <bb 14>;
+  <bb 16>: if (_71 < _70) goto <bb 17>; else goto <bb 14>;
+  <bb 17>: if (_70 < _62) goto <bb 18>; else goto <bb 14>;
+  <bb 18>: _58 = *(col + _68 * 4);  _54 = *(col + _71 * 4);  _40 = *(col + _70 * 4);
+           _22 = (unsigned long long) (_54 - _58) + 8 > 16;
+           _75 = (unsigned long long) (_40 - _54) + 8 > 16;
+           _76 = _22 & _75;
+  <bb 14>: # _77 = PHI <_76(18), 0(13), 0(15), 0(16), 0(17)>
+           if (_77 != 0) goto <bb 27>; [50.00%] else goto <bb 28>; [50.00%]
+```
+
+#### Results (compiler built by this session, `tools/gcc_build.py --if-stale`, PASS, 24.7 min)
+
+| Check | Result | Log in `.work/_state/logs/` |
+| --- | --- | --- |
+| T1 before the GCC change | FAIL as intended, 13 FAIL lines: the hinted probes lack the sample (flat, slice, per-row in default, explicit and contract-fast modes; three struct nests), and the parameter is unknown | `s12_30_t1_locality_red-20261115-071321.log` |
+| T1, `check t1 --sparse-indirect` | PASS, 73 results, 0 failures (new mode `min4`: parameter accepted, hints present, assembly differs from the default) | `s12_30_t1_locality-20261115-080944.log` |
+| `--application-dumps hpcg` | SpMV 1 and SymGS 2 transformations, all `next-row pointers; locality sample of 3, more than 8 apart` | `s12_30_hpcg_dumps-20261115-075016.log` |
+| `--shape-host` (host model, seven slots) | PASS: 42 struct children, 32 decisions as expected, three seeded defects fault in their slot only | `s12_30_shape_host-20261115-075411.log` |
+| `--compiler-proof` staging | PASS: six transformation lines with the sample in the default, contract-fast and min4 slots; lint clean | `s12_30_compiler_gate_hpcg-20261115-074953.log` |
+| `check t0` | PASS, 56 tests (36 regression, 8 doctor, 6 portability, 6 lint) | `s12_30_t0-20261115-075037.log` |
+| `--ice-sweep` (torture and vect, O2 and O3, 8704 compiles, default-on compiler) | 0 timeouts, 1 ICE: `vect-pr123221.c` at O3, the known S12-38 one; 8277 compiled, 426 ordinary errors | `s12_30_indirect_ice_sweeps-20261115-075852.log` |
+
+Not run: T2 and x86 identity (lead), any card job. The HPCG A/B is not
+staged (ruling d: only after the card run below).
+
+Code size, `.text` of the proof unit (six kernels): donor 811, switch off
+1926, switch on 4938 (4641 before the sample), two-nest control 2886,
+hand-written policy 4110.
+
+#### Staged for one card run
+
+`.work/_shared/S12-30/compiler-gate-hpcg`, argument `12345`,
+`card_run --threads 1 --timeout 590` (single-core timing; the program
+pins itself to the first granted CPU and has `alarm(570)`). Add
+`--correctness` for everything except the clock. The old `compiler-gate`
+binary (window 6) is superseded.
+
+Slots: `donor-off`; `knc-switch-off`; `knc-switch-on` (default build);
+`knc-switch-on-contract-fast`; `knc-switch-on-min4` (default build with
+`--param=knc-indirect-prefetch-min-trips=4`); `knc-switch-off-two-nests`
+(control above); `knc-handwritten-policy`.
+
+Correctness part: the flat and per-row guard suites (now four shapes),
+the lone-loop suite and the struct suites (guards and
+count-in-stored-vector) for all seven slots, each in a child. With min4
+the hinted arm of compiler-generated code also runs on the 4- and 7-row
+nests and on the 4- to 33-iteration lone loops.
+
+Timing part, five samples of at least 0.5 s per slot; each case first
+checks every timed slot and the hand-written policy against the
+reference and prints the policy's decision:
+
+| Cases | Input | Timed slots |
+| --- | --- | --- |
+| `small` (4) | 32 rows, x 32 KiB, n 13 and 27, both forms | donor, off, on, two-nests |
+| `square` 14000 (4) | x elements = rows, random columns, n 13 and 27, both forms | donor, off, on, min4, two-nests |
+| `square` 32768, 65536, 131072, 262144 (16) | same | off, on (the policy hints here; the donor is left out to fit the window) |
+| `small-x` (2) | 32768 rows over a 32 KiB x, n 13, both forms: reported control | donor, off, on |
+| `stencil-104-cubed` per-row (1) | as window 6 | donor, off, on |
+| `stencil-104-cubed` struct SpMV, forward, backward (3) | byte counts, pointer tables, diagonal pointers, values 26 and -1 | donor, off, on |
+| `lone-memory`, `lone-ascending` (2) | 262144 iterations over 16 MiB, random and ascending columns | donor, off, on |
+
+The struct stencil cases restart each sweep from the same vector before
+every call, outside the clock, and compare every slot bit for bit with
+the switch-off result; the values are inexact, so the long-double
+reference is only reported (`reference_mismatches=`; 0 on the host).
+
+Estimated card time 6.3 minutes (from window 6 times per nonzero: 41 s
+small, 52 s square 14000, 140 s larger squares, 16 s small-x, 16 s and
+57 s stencil, 16 s lone, about 40 s correctness). An alarm kill is an
+infrastructure failure, not a result.
+
+How to read it:
+
+* Cutoff per form (ruling b): at 14000 rows `min4` against `off`; from
+  32768 rows `on` against `off`. The cutoff of a form is the smallest
+  size from which the ratio is never below 0.99 for both n. The values
+  go into `knc_indirect_prefetch_default_min_trips[]` in `i386-knc.cc`
+  (flat, per-row, lone; an `i386-knc.cc`-only build, about 3 minutes) and
+  into `LEGAL_MIN_ROWS` of the harness, which today holds one value for
+  all forms and would need one per form.
+* Stencil: the four `stencil-104-cubed` cases must show `on` within 1%
+  of `off` (window 6: 0.76).
+* Unhinted arm: `small` and `square` 14000, `on` and `two-nests` against
+  `off`, as above.
+* Still expected to lose: `small-x`, flat form (window 6: 0.87-0.89). A
+  row count cannot see the size of x.
+
+#### For the lead
+
+1. Ruling (c) is not met in this session; the cause is narrowed to code
+   generation of two nests in one function, and the control that decides
+   it is in the gate.
+2. The two-nest behaviour of `late_combine2` on x87 (item 1 above) exists
+   without this ticket and may deserve its own ticket whatever the
+   control shows.
+3. The donor is 1.3-1.8% faster than switch-off at 32 rows, n=13
+   (window 6), in both forms: an existing gap under the owner rule, not
+   caused by this ticket.
+4. OpenMP SpMV at 104^3 and 240 threads still sees about 4,687 rows per
+   worker, below 16384; a per-row cutoff measured lower than that would
+   bring it into the policy, where the sample then keeps the stencil
+   unhinted.

@@ -542,6 +542,12 @@ def host_shapes():
                 errors.append('seeded sample defect %d was not caught in the manual slot alone' % (seed-1))
             continue
         print(*decisions, sep='\n', flush=True)
+        # On the host the x87 struct sweeps must also equal the long-double
+        # reference; natively that figure is only reported.
+        stencil = [line for line in lines if 'reference_mismatches=' in line]
+        print(*stencil, sep='\n', flush=True)
+        if len(stencil) != 3 or not all('reference_mismatches=0 ' in line for line in stencil):
+            errors.append('struct stencil cases differ from the long-double reference')
         arms = {'hint': 0, 'scalar': 0}
         for line in decisions:
             arms[line.rsplit('=', 1)[1]] += 1
