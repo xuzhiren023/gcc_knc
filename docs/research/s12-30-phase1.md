@@ -1222,3 +1222,124 @@ with a guard-page count and one overlapping-count case; then
 `--application-dumps hpcg` must print next-row pointers for SpMV and both
 sweeps. `compiler-gate` was not rebuilt: the staged binary is the one
 queued for window 6. No GCC change or build; no native run; x86 not run.
+
+### HPCG shapes green (2026-11-15, GCC `c70cf1ed484`)
+
+GCC change, `gcc/tree-ssa-loop-prefetch.cc` only (lane gcc2, on top of the
+default-on commit `36cb8b9ff30`; `git diff --check knc...HEAD` clean, LF):
+
+* Byte count: the inner end may be one widening of the bound-array load.
+  The emitted next-row load uses the array's own element type and repeats
+  that one conversion (`_137 = *_136; _138 = (int) _137`). Per-row form
+  only; flat CSR bounds stay unwidened.
+* Subtract: `MINUS_EXPR` accepted only as `sum - product`.
+* Outer start: any loop-invariant start; the zero-start test is gone.
+  Nothing else used it: the guards use the loop's own end, and the policy
+  count is `end - start`.
+* Descending outer loop (per-row form only): step -1 with latch
+  `next >= end`, `end` inclusive. No entry test is required, because the
+  real SymGS backward nest has none (the forward nest's exit falls into
+  it); the version test carries `start >= end` instead, and the
+  lookahead guard is `row - 1 >= end`.
+* Alias gate: unchanged for same-typed stores (`alias_bounds` still gets
+  no cross-row hint) and for stores that may alias the pointer array.
+  Where the store conflicts only because the bound array is byte-typed
+  (alias set 0) and the store is `BASE[outer iv]` with an invariant base,
+  the nest version test also requires the count range and the stored range
+  to be disjoint. At most two such stores; anything else is rejected.
+  The false arm is the untouched copy, so the unhinted code is today's.
+
+Backward sweep, T1 probe (`hpcg-shapes-on.aprefetch`, function
+`sparse_struct_backward`). Version test in the nest preheader, lower end 0,
+start `i_35 = rows - 1`:
+
+```text
+  _86 = i_35 >= 0;                     start >= end
+  _85 = _84 + 1;  _87 = _88 * 8;  _91 = _87 > 131071;     16384 rows
+  _81 = _82 + 1;                       count + i_35 + 1
+  _79 = _80 >= _81;                    x >= end of the count range
+  _74 = _75 + _76;                     x + (i_35 + 1) * 8
+  _72 = _73 >= _74;                    count >= end of the stored range
+  _70 = (_72 | _79) & (_86 & _91);
+```
+
+Hinted row is `i - 1`, loaded only under `i - 1 >= 0` (folded to `i > 0`),
+once per nonempty current row:
+
+```text
+  <bb 5>:  cur_inds_39 = *_6;
+           if (i_54 > 0) goto <bb 28>; else goto <bb 27>;
+  <bb 28>: _133 = (long long int) i_54;  _134 = _133 + -1;
+           _136 = _7 + (sizetype) _134;  _137 = *_136;  _138 = (int) _137;
+           if (_138 > 0) goto <bb 34>; else goto <bb 33>;
+  <bb 34>: _159 = _5 + (sizetype) _134 * 8;  _160 = *_159;
+  <bb 6>:  if (j_57 < _138) goto <bb 36>; else goto <bb 35>;
+  <bb 36>: _163 = _160 + (sizetype) j_57 * 4;  _164 = *_163;
+           __builtin_prefetch (x_44(D) + (sizetype) _164 * 8, 0, 3);
+  <bb 35>: ... sum_48 = sum_55 - _25;
+```
+
+`_7` is `m->count`, `_5` is `m->cols`. Blocks 27 and 33 lead to unhinted
+copies of the inner loop. The real SymGS backward nest has the same form
+(`application-symgs.aprefetch` lines 2066-2159: `if (i_109 > 0)`, count at
+`_9 + (i_109 - 1)`, pointer at `_7 + (i_109 - 1) * 8`).
+
+Results (compiler built by this session, `tools/gcc_build.py --if-stale`,
+PASS, 2.3 min, log `s12_30_gcc2_build-20261115-062303.log`):
+
+| Check | Result | Log in `.work/_state/logs/` |
+| --- | --- | --- |
+| `--hpcg-shapes-t1` | PASS, on and off, three probes and the control | `s12_30_hpcg_shapes_green-20261115-062616.log` |
+| `--application-dumps hpcg` | SpMV 1, SymGS 2 transformations, all `next-row pointers` | `s12_30_hpcg_dumps-20261115-062641.log` |
+| `check t1 --sparse-indirect` on the default-on build | PASS, 65 results, 0 failures | `s12_30_t1_default_on-20261115-062909.log` |
+| `--shape-host` | PASS: plain C passes 24 children; seeded hint faults | `s12_30_shape_host-20261115-062851.log` |
+| `--compiler-proof` staging | PASS, six transformation diagnostics in both contraction modes | `s12_30_compiler_gate_hpcg-20261115-063046.log` |
+| `check t0` | PASS, 56 tests | `s12_30_t0-20261115-063107.log` |
+| `--ice-sweep` (torture and vect, O2 and O3, 8704 compiles) | 0 timeouts, 1 ICE: `vect-pr123221.c` at O3, in `vect_analyze_slp_reduc_chain` before this pass (S12-38) | `s12_30_indirect_ice_sweeps-20261115-063101.log` |
+
+Not run here: T2 (lead; the sandbox cannot write its shared files), x86
+identity (lead), any card job. The HPCG paired A/B is not staged: it
+measures the default build, so it waits for the measured cutoff.
+
+This is the first T1 run of the default-on end state: plain
+`-O2 -march=knc` emits the bounded hints, its probe bodies equal explicit
+switch-on, and the scalar baseline identity holds for the switch-off
+build. The cutoff is still the provisional 16384.
+
+Native proof staged, not run: `.work/_shared/S12-30/compiler-gate-hpcg`,
+argument `12345`, `card_run --threads 1 --timeout 590`; add
+`--correctness` to run the guard suites without the timing grid. It is
+the compiler-gate program rebuilt with this compiler plus the new suites.
+It has a new name because `compiler-gate` (previous compiler head) is in
+the window-6 queue and that window had not run when this was staged;
+delete the old binary once window 6 is read. New in it, for the donor,
+switch-off, switch-on and switch-on contract-fast slots:
+
+* `struct-spmv`, `struct-forward`, `struct-backward` kernels in the T1
+  probe form, compiled from unhinted C.
+* Guard fixtures: byte counts and the three pointer tables end at a
+  protected page, or start right after one (so row `-1` of the backward
+  sweep faults); each row's indices and values end at their own page;
+  empty rows point at a protected page; row lengths 1/13/27/33 with
+  uniform, longer-next, shorter-next and empty-next patterns; 1, 2, 7,
+  16384 and 16385 rows so both version arms run; SpMV runs rows 5 to
+  rows+5 of biased tables.
+* Overlap case, 16384 rows: the byte counts live inside the stored vector.
+  Row 3 is nonempty and its store clears the count of the next row in
+  sweep order, which read 27 until then and whose index pointer is a
+  protected page. The program never enters that row; a hint taken from
+  the stale count faults. On the host a seeded next-row hint without the
+  overlap test dies in exactly that child (status 11) and nothing else
+  fails.
+
+Also fixed in the driver: forked children inherited the parent's failure
+count, so one failing kernel made every later child report failure.
+
+Code size, `.text` of the six-kernel proof unit: donor 811, switch off
+1926, switch on 4641 (both contraction modes). Static hint counts of the
+three earlier kernels are unchanged (9 / 13 / 5).
+
+Policy, unchanged and for the lead: SymGS is serial, so at 104^3 its two
+nests see 1,124,864 rows and take the hinted arm; outlined SpMV sees one
+worker interval (about 4,687 rows at 240 threads) and takes the unhinted
+arm at 16384.

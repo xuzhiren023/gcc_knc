@@ -449,23 +449,66 @@ def build_compiler_proof():
                 raise RuntimeError('missing compiler proof aprefetch dump: ' + str(dump))
             chunks = re.split(r'^;; Function (\w+) .*$', dump.read_text(), flags=re.M)
             bodies = dict(zip(chunks[1::2], chunks[2::2]))
-            for layout, shape in (('csr', 'future row bound'), ('hpcg', 'next-row pointers'),
-                                  ('lone', 'row-local bound')):
-                suffix = '_scalar' if layout == 'lone' else '_raw'
-                body = bodies.get(name + '_' + layout + suffix, '')
+            for function, shape in (('csr_raw', 'future row bound'),
+                                    ('hpcg_raw', 'next-row pointers'),
+                                    ('lone_scalar', 'row-local bound'),
+                                    ('shape_spmv', 'next-row pointers'),
+                                    ('shape_forward', 'next-row pointers'),
+                                    ('shape_backward', 'next-row pointers')):
+                body = bodies.get(name + '_' + function, '')
                 if not re.search(r'Bounded indirect prefetch in loop \d+: ' + shape, body):
-                    raise RuntimeError('compiler proof did not transform ' + name + '_' + layout)
+                    raise RuntimeError('compiler proof did not transform ' + name + '_' + function)
                 if '__builtin_prefetch' not in body:
-                    raise RuntimeError('compiler proof lacks emitted hints: ' + name + '_' + layout)
+                    raise RuntimeError('compiler proof lacks emitted hints: ' + name + '_' + function)
         objects.append(obj)
-    binary = OUT/'compiler-gate'
+    # Not 'compiler-gate': that binary, from the previous compiler head, is
+    # queued for card window 6 and must not change under the queue.
+    binary = OUT/'compiler-gate-hpcg'
     run(corpus.compiler_path(corpus.DONOR), '-O2', '-std=gnu99',
         '-ffp-contract=off', '-fno-tree-vectorize', '-DLEGAL_PROOF',
         '-DCOMPILER_PROOF', '-DDRIVER', SOURCE, *objects,
         *corpus.link_paths(), '-lrt', '-lm', '-o', binary)
     run(sys.executable, ROOT/'tools/knc_lint', binary)
-    print('STAGED:', binary, '; lead card_run --threads 1 --timeout 590; argument: 12345', flush=True)
+    print('STAGED:', binary, '; lead card_run --threads 1 --timeout 590; argument: 12345',
+          '(add --correctness for the guard suites without timing)', flush=True)
     return 0
+
+
+def host_shapes():
+    """Host model of the compiler-proof driver, control flow only.
+
+    Plain C must pass every fixture.  Then one slot gets a next-row hint
+    with no count/stored-vector overlap test: only that slot's overlap
+    child may die, which shows that the fixture can fail.
+    """
+    cc = TC/'cygwin/bin/gcc'
+    flags = ['-O2', '-std=gnu99', '-ffp-contract=off', '-mfpmath=387',
+             '-fexcess-precision=fast', '-DHOST_MODEL', '-DLEGAL_PROOF', '-DCOMPILER_PROOF']
+    seeded = 'FAIL shape child struct-spmv count-in-stored-vector knc-switch-on status='
+    errors = []
+    for seed in (0, 1):
+        objects = []
+        for name in ('donor', 'knc', 'enabled', 'fast', 'manual'):
+            obj = OUT/('host-shape-' + name + '.o')
+            run(cc, *flags, '-DPREFIX=' + name + '_',
+                '-DSHAPE_SEED=' + str(int(seed and name == 'enabled')), '-c', SOURCE, '-o', obj)
+            objects.append(obj)
+        binary = OUT/'host-shapes.exe'
+        run(cc, *flags, '-DDRIVER', SOURCE, *objects, '-lrt', '-lm', '-o', binary)
+        result = subprocess.run([str(binary), '12345', '--correctness'], cwd=OUT,
+                                stdout=subprocess.PIPE, text=True)
+        failed = [line for line in result.stdout.splitlines() if line.startswith('FAIL')]
+        shapes = sum(line.startswith('SHAPES') for line in result.stdout.splitlines())
+        print('HOST_SHAPES seed=' + str(seed), 'exit=' + str(result.returncode),
+              'shape_children=' + str(shapes), *failed, sep=' | ', flush=True)
+        if seed:
+            if not result.returncode or len(failed) != 1 or not failed[0].startswith(seeded):
+                errors.append('seeded stale-count hint was not caught as the only failure')
+        elif result.returncode or failed or shapes != 24:
+            errors.append('plain C failed the fixtures')
+    print(('FAIL ' + '; '.join(errors)) if errors else
+          'PASS host shapes: plain C passes; seeded stale-count hint faults', flush=True)
+    return int(bool(errors))
 
 
 def ice_sweep(corpora=('gcc.c-torture/compile', 'gcc.dg/vect')):
@@ -619,6 +662,8 @@ def main():
         return application_dumps(hpcg_only=True)
     if sys.argv[1:] == ['--compiler-proof']:
         return build_compiler_proof()
+    if sys.argv[1:] == ['--shape-host']:
+        return host_shapes()
     if sys.argv[1:] == ['--ice-sweep']:
         return ice_sweep()
     if sys.argv[1:] == ['--ice-sweep', 'vect']:

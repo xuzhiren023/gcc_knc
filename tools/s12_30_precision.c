@@ -13,6 +13,13 @@ struct matrix {
   const double *const *vals;
 };
 typedef void (*legal_kernel)(const struct matrix *, double *);
+struct shape {
+  const char *count;
+  const int *const *cols;
+  const double *const *vals;
+  double *const *diag;
+};
+typedef void (*shape_kernel)(int, int, const struct shape *, const double *, double *);
 #ifndef DRIVER
 #define CAT_(a,b) a##b
 #define CAT(a,b) CAT_(a,b)
@@ -127,6 +134,67 @@ void FN(lone_scalar)(const struct matrix *a, double *out)
 legal_kernel const FN(legal)[3][1] = {
   {FN(csr_scalar)}, {FN(hpcg_scalar)}, {FN(lone_scalar)}
 };
+/* Application-form kernels, as the T1 struct probes: byte counts and
+   pointer tables through a struct, a worker interval, subtract folds and
+   a backward sweep.  SHAPE_SEED is a one-time host defect: a next-row hint
+   with no test that the count bytes are disjoint from the stored vector. */
+#ifndef SHAPE_SEED
+#define SHAPE_SEED 0
+#endif
+void FN(shape_spmv)(int begin, int rows, const struct shape *m,
+                    const double *x, double *out)
+{
+  for (int i = begin; i < rows; ++i) {
+    double sum = 0;
+    const double *const cur_vals = m->vals[i];
+    const int *const cur_inds = m->cols[i];
+    const int cur_nnz = m->count[i];
+    const int *future = NULL;
+    int next = 0;
+    if (SHAPE_SEED && rows-i > 1 && (next = m->count[i+1]) > 0)
+      future = m->cols[i+1];
+    for (int j = 0; j < cur_nnz; ++j) {
+      if (SHAPE_SEED && j < next) hint(x+future[j]);
+      sum += cur_vals[j] * x[cur_inds[j]];
+    }
+    out[i] = sum;
+  }
+}
+void FN(shape_forward)(int begin, int rows, const struct shape *m,
+                       const double *rhs, double *x)
+{
+  (void)begin;
+  for (int i = 0; i < rows; ++i) {
+    const double *const cur_vals = m->vals[i];
+    const int *const cur_inds = m->cols[i];
+    const int cur_nnz = m->count[i];
+    const double diag = m->diag[i][0];
+    double sum = rhs[i];
+    for (int j = 0; j < cur_nnz; ++j)
+      sum -= cur_vals[j] * x[cur_inds[j]];
+    sum += x[i] * diag;
+    x[i] = sum / diag;
+  }
+}
+void FN(shape_backward)(int begin, int rows, const struct shape *m,
+                        const double *rhs, double *x)
+{
+  (void)begin;
+  for (int i = rows - 1; i >= 0; --i) {
+    const double *const cur_vals = m->vals[i];
+    const int *const cur_inds = m->cols[i];
+    const int cur_nnz = m->count[i];
+    const double diag = m->diag[i][0];
+    double sum = rhs[i];
+    for (int j = 0; j < cur_nnz; ++j)
+      sum -= cur_vals[j] * x[cur_inds[j]];
+    sum += x[i] * diag;
+    x[i] = sum / diag;
+  }
+}
+shape_kernel const FN(shapes)[3] = {
+  FN(shape_spmv), FN(shape_forward), FN(shape_backward)
+};
 #else
 void FN(csr_scalar)(const struct matrix *a, double *out) { csr_body(a,out,0); }
 void FN(csr_hint)(const struct matrix *a, double *out) { csr_body(a,out,1); }
@@ -170,6 +238,12 @@ static const char *compilers[] = {
   "knc-handwritten-forced-hint"
 };
 static const char *routes[] = {"compiler"};
+extern shape_kernel const donor_shapes[3], knc_shapes[3];
+extern shape_kernel const enabled_shapes[3], fast_shapes[3];
+static shape_kernel const *shape_tables[] = {
+  donor_shapes, knc_shapes, enabled_shapes, fast_shapes
+};
+static const char *shape_names[] = {"struct-spmv", "struct-forward", "struct-backward"};
 #else
 extern legal_kernel const donor_legal[2][3], knc_legal[2][3], fast_legal[2][3];
 static legal_kernel const (*tables[])[3] = {donor_legal, knc_legal, fast_legal};
@@ -275,6 +349,7 @@ static void correctness(void)
       pid_t child = fork(); if (child < 0) die("fork");
       if (!child) {
         struct rlimit limit = {0,0}; setrlimit(RLIMIT_CORE,&limit);
+        failures = 0; /* report this kernel alone, not earlier children */
         guarded_cases(layout,tables[t][layout][k]);
         printf("GUARDS %s %s/%s comparisons=%lu failures=%d\n",
                layouts[layout],compilers[t],routes[k],checks,failures);
@@ -306,6 +381,142 @@ static void lone_guards(void)
     }
     release(&gc); release(&gv);
   }
+}
+/* Application-form fixtures.  LOW puts the tables after a guard page, so
+   a row below the first faults; otherwise they end at one, so a row past
+   the last faults.  Small integers, unit values and +-1 diagonals keep
+   every product, sum and quotient exact. */
+static void *edge(size_t bytes, struct guard *g, int low)
+{
+  if (!low) return guarded(bytes,g);
+  size_t page = sysconf(_SC_PAGESIZE), usable = (bytes+page-1)/page*page;
+  g->bytes = usable+page;
+  g->base = mmap(NULL,g->bytes,PROT_READ|PROT_WRITE,MAP_PRIVATE|MAP_ANONYMOUS,-1,0);
+  if (g->base == MAP_FAILED || mprotect(g->base,page,PROT_NONE)) die("guard");
+  return (char *)g->base+page;
+}
+static void shape_reference(int kind, int begin, int rows, const struct shape *m,
+                            const double *in, double *out)
+{
+  for (int k = begin; k < rows; ++k) {
+    int i = kind == 2 ? rows-1-k : k, n = m->count[i];
+    if (!kind) {
+      long double sum = 0;
+      for (int j = 0; j < n; ++j) sum += (long double)m->vals[i][j]*in[m->cols[i][j]];
+      out[i] = (double)sum;
+    } else {
+      long double diag = m->diag[i][0], sum = in[i];
+      for (int j = 0; j < n; ++j) sum -= (long double)m->vals[i][j]*out[m->cols[i][j]];
+      sum += out[i]*diag;
+      out[i] = (double)(sum/diag);
+    }
+  }
+}
+/* The kernel sees rows [begin,begin+rows) of tables biased by -begin. */
+#define BIAS(p,b) ((void *)((uintptr_t)(p)-(uintptr_t)(b)*sizeof *(p)))
+static void shape_cases(int kind, shape_kernel fn, void *trap)
+{
+  const int lengths[] = {1,13,27,33}, sizes[] = {1,2,7,LEGAL_MIN_ROWS,LEGAL_MIN_ROWS+1};
+  const int vary[2][7] = {{1,0,1,2,1,1,2},{2,1,1,2,1,0,1}};
+  for (unsigned l = 0; l < 4; ++l) for (int shape = 0; shape < 3; ++shape)
+    for (unsigned z = 0; z < sizeof sizes/sizeof sizes[0]; ++z)
+      for (int low = 0; low < 2; ++low) {
+        int rows = sizes[z], active = rows < 7 ? rows : 7;
+        int first = low ? 0 : rows-active, begin = kind ? 0 : 5;
+        int nx = kind ? rows : 67;
+        struct guard gn, gc, gv, gd;
+        char *count = edge(rows,&gn,low);
+        const int **cols = edge(rows*sizeof *cols,&gc,low);
+        const double **vals = edge(rows*sizeof *vals,&gv,low);
+        double **diag = edge(rows*sizeof *diag,&gd,low);
+        struct guard *cg = alloc(rows*sizeof *cg), *vg = alloc(rows*sizeof *vg);
+        double *x = alloc(nx*sizeof *x), *rhs = alloc(rows*sizeof *rhs);
+        double *dv = alloc(rows*sizeof *dv);
+        double *got = alloc(rows*sizeof *got), *want = alloc(rows*sizeof *want);
+        for (int i = 0; i < nx; ++i) x[i] = (int)(random32()%9)-4;
+        for (int i = 0; i < rows; ++i) {
+          int r = i-first;
+          count[i] = r < 0 || r >= active ? 0 : lengths[l]*(shape ? vary[shape-1][r] : 1);
+          rhs[i] = (int)(random32()%9)-4; dv[i] = i&1 ? -1 : 1; diag[i] = &dv[i];
+          cols[i] = trap; vals[i] = trap;
+          if (count[i]) {
+            int *ci = guarded(count[i]*sizeof *ci,&cg[i]);
+            double *vi = guarded(count[i]*sizeof *vi,&vg[i]);
+            for (int j = 0; j < count[i]; ++j) { ci[j] = random32()%nx; vi[j] = (int)(random32()%3)-1; }
+            cols[i] = ci; vals[i] = vi;
+          }
+        }
+        struct shape m = {BIAS(count,begin),BIAS(cols,begin),BIAS(vals,begin),BIAS(diag,begin)};
+        if (kind) { memcpy(want,x,rows*sizeof *x); memcpy(got,x,rows*sizeof *x); }
+        shape_reference(kind,begin,begin+rows,&m,kind ? rhs : x,BIAS(want,begin));
+        fn(begin,begin+rows,&m,kind ? rhs : x,BIAS(got,begin));
+        for (int i = 0; i < rows; ++i) compare(got[i],want[i],i);
+        for (int i = 0; i < rows; ++i) if (count[i]) { release(&cg[i]); release(&vg[i]); }
+        free(cg); free(vg); free(x); free(rhs); free(dv); free(got); free(want);
+        release(&gn); release(&gc); release(&gv); release(&gd);
+      }
+}
+/* The byte counts live inside the vector the nest stores.  Row HOT has
+   five zero-valued entries and its store clears the count of the row that
+   follows it in sweep order, which was 27 until then and whose index
+   pointer is a protected page.  The program never enters that row; a
+   next-row hint taken from the stale count faults. */
+static void shape_overlap(int kind, shape_kernel fn, void *trap)
+{
+  enum { HOT = 3 };
+  int rows = LEGAL_MIN_ROWS, index[5] = {0,1,2,3,4};
+  size_t bias = 7*HOT+(kind == 2);
+  double zero[5] = {0}, *stored[2], hot;
+  const int **cols = alloc(rows*sizeof *cols);
+  const double **vals = alloc(rows*sizeof *vals);
+  double **diag = alloc(rows*sizeof *diag), one = 1;
+  double *in = alloc(rows*sizeof *in);
+  for (int i = 0; i < rows; ++i) { cols[i] = trap; vals[i] = trap; diag[i] = &one; in[i] = 0; }
+  cols[HOT] = index; vals[HOT] = zero;
+  for (int pass = 0; pass < 2; ++pass) {
+    unsigned char *bytes = alloc(rows*sizeof(double));
+    memset(bytes,0,rows*sizeof(double));
+    bytes[bias+HOT] = 5; bytes[bias+HOT+(kind == 2 ? -1 : 1)] = 27;
+    stored[pass] = (double *)bytes;
+    memcpy(&hot,bytes+HOT*sizeof hot,sizeof hot);
+    /* SpMV reads a separate nonnegative vector; a sweep cancels the stored
+       denormal exactly, so both store +0.0 over the stale count. */
+    for (int i = 0; kind == 0 && i < 5; ++i) in[i] = i;
+    if (kind) in[HOT] = -hot;
+    struct shape m = {(const char *)bytes+bias,cols,vals,diag};
+    if (pass) fn(0,rows,&m,in,stored[1]);
+    else shape_reference(kind,0,rows,&m,in,stored[0]);
+  }
+  compare(stored[0][HOT],0.0,HOT);
+  for (int i = 0; i < rows; ++i) compare(stored[1][i],stored[0][i],i);
+  free(stored[0]); free(stored[1]); free(cols); free(vals); free(diag); free(in);
+}
+static void shape_guards(void)
+{
+  size_t page = sysconf(_SC_PAGESIZE);
+  void *trap = mmap(NULL,page,PROT_NONE,MAP_PRIVATE|MAP_ANONYMOUS,-1,0);
+  if (trap == MAP_FAILED) die("trap");
+  for (unsigned t = 0; t < sizeof shape_tables/sizeof shape_tables[0]; ++t)
+    for (int kind = 0; kind < 3; ++kind) for (int overlap = 0; overlap < 2; ++overlap) {
+      fflush(stdout);
+      pid_t child = fork(); if (child < 0) die("fork");
+      if (!child) {
+        struct rlimit limit = {0,0}; setrlimit(RLIMIT_CORE,&limit);
+        failures = 0;
+        if (overlap) shape_overlap(kind,shape_tables[t][kind],trap);
+        else shape_cases(kind,shape_tables[t][kind],trap);
+        printf("SHAPES %s %s %s comparisons=%lu failures=%d\n",shape_names[kind],
+               overlap ? "count-in-stored-vector" : "guards",compilers[t],checks,failures);
+        _exit(failures ? 1 : 0);
+      }
+      int status; if (waitpid(child,&status,0) != child) die("waitpid");
+      ++checks;
+      if (!WIFEXITED(status) || WEXITSTATUS(status)) {
+        ++failures;
+        printf("FAIL shape child %s %s %s status=%d\n",shape_names[kind],
+               overlap ? "count-in-stored-vector" : "guards",compilers[t],status);
+      }
+    }
 }
 #endif
 static double now(void)
@@ -522,6 +733,7 @@ int main(int argc, char **argv)
   correctness();
 #ifdef COMPILER_PROOF
   lone_guards();
+  shape_guards();
 #endif
   printf("CORRECTNESS children=%lu failures=%d\n",checks,failures);
   if (failures) return 1;
