@@ -28,6 +28,34 @@ from unittest.mock import patch
 sys.path.insert(0, str(Path(__file__).resolve().parents[2] / 'tools'))
 import corpus
 
+
+class GateReadiness(unittest.TestCase):
+    def test_independent_reference_rejects_agreeing_wrong_compilers(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            stage = Path(temporary) / 'S13-01'
+            plan, rows = observations('PB-gemm')
+            for row in rows:
+                row['arrays'][0]['values'][1] = 99.
+            with patch.object(corpus, 'load_reference', return_value=[
+                    dict(array='A', values=[1., 3., 2.])]), redirect_stdout(io.StringIO()):
+                collect_at(stage, plan, rows)
+            result = corpus.parse_results((stage / 'results.jsonl').read_text())
+            self.assertTrue(all(r['check'] == 'fail' for r in result))
+
+    def test_frozen_element_tolerance_and_finiteness(self):
+        ref = [dict(array='x', values=[0., 10.])]
+        self.assertTrue(corpus.reference_matches([dict(array='x', values=[1e-8, 10.00001])], ref))
+        for values in ([2e-8, 10.], [0., float('nan')], [0., float('inf')]):
+            self.assertFalse(corpus.reference_matches([dict(array='x', values=values)], ref))
+
+    def test_stream_checks_each_component_not_package_marker(self):
+        expected = corpus.stream_expected()
+        arrays = [dict(array=k, values=[v] * 3) for k, v in expected.items()]
+        self.assertTrue(corpus.stream_matches(arrays, count=3))
+        arrays[1]['values'][1] *= 1.01
+        self.assertFalse(corpus.stream_matches(arrays, count=3))
+        self.assertFalse(corpus.stream_matches([], count=3))
+
 OPENMP_PANEL = 'the donor toolchain has no OpenMP runtime'
 
 
