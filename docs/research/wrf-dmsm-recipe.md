@@ -1,5 +1,13 @@
 # WRF 4.8.0 dm+sm with GCC-KNC (S12-35)
 
+**Draft: blocked by an incompatible MPICH Fortran module.** The resumed
+build stopped in `phys/module_firebrand_spotting_mpi.F`, whose `USE MPI`
+reads the GCC 5-built `mpi.mod`. GCC-KNC 16 reports that the module was
+created by a different version of GNU Fortran. RSL_LITE itself uses the
+legacy interface described below, but that does not cover all WRF physics.
+No model workaround or MPI rebuild has been applied; do not treat this
+recipe as a completed or validated build.
+
 The primary build uses the three prebuilt MPI inputs authorized in S12-35:
 `mpich-thr/libmpi.a`, `phi_thr_copy.o`, and `k17-memcpy/copy.o`.
 The last object closes the helper's `phi_copy_dwords` dependency; `nm -u`
@@ -53,7 +61,8 @@ objects target K1OM through its explicit cross compilers. Its wrapper records
 WRF's RSL_LITE uses the MPI C interface and the legacy Fortran interface
 declared by the text `mpif.h`. Include that prefix's headers; link its
 `libmpifort.a` for the legacy Fortran entry points. No MPI `.mod` from GCC 5
-is consumed. This does not make modules from different GFortran versions
+is consumed by RSL_LITE. Other WRF physics does consume `mpi.mod` (see the
+blocker above); modules from different GFortran versions are not
 interchangeable.
 
 The primary image MPI is the read-only prebuilt
