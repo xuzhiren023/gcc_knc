@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-14 20:55.
+Updated automatically at every ticket change. Last update: 2026-11-14 20:56.
 
 **Next: the tech lead, on S12-24.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
@@ -110,7 +110,7 @@ Current tickets: `[##################--]` 230 of 246
 | S12-27 | Latency-aware scalar loops - GCC-KNC unrolls and interleaves independent iterations and hoists conversions so one thread's every-other-cycle issue and long latencies are hidden automatically | draft |  |
 | S12-28 | dispatch.py refuses to start a second dispatcher on a lane that already has a live one | Done | dispatch.py now refuses to start a second dispatcher on a lane that already has a live one (a lock per lane... |
 | S12-29 | Wrong code - vbroadcastsd reads a 4-byte-aligned SCmode constant (complex float) straight from the constant pool and faults on the card (gcc.c-torture pr38969.c, regression from S11-27) | Done | The pr38969 crash from S11-27 is fixed: GCC-KNC no longer broadcasts a vector from memory aligned below its... |
-| S12-30 | Sparse indexed reductions faster than today - vector gather of products with an ordered scalar sum, and indirect prefetch, for CSR-style loops (NPB-CG, HPCG) | In progress |  |
+| S12-30 | Sparse indexed reductions faster than today - vector gather of products with an ordered scalar sum, and indirect prefetch, for CSR-style loops (NPB-CG, HPCG) | Tests waiting for review | f36bc172: host x87 model FAIL as intended at row lengths 2/13/27: -1+(1+2^-27)*(1-2^-27) yields -2^-54; dou... |
 | S12-31 | HPCG is 1.8% slower with GCC-KNC than with GCC 5.1.1 - find the cause and make it faster (owner: never slower than 5.1.1) | In progress |  |
 | S13-01 | M4 final gate - stage the ADR-0015 gate run at the final head (17 programs, held-out unsealed, six pairs, three profiles) | draft |  |
 | S13-02 | Libgomp per-region thread density - choose 1-4 workers per core per parallel region instead of once per program | draft |  |
@@ -271,6 +271,7 @@ Current tickets: `[##################--]` 230 of 246
 
 ## Recent activity
 
+- 2026-11-14 20:56 **S12-30** engineer red: f36bc172: host x87 model FAIL as intended at row lengths 2/13/27: -1+(1+2^-27)*(1-2^-27) yields -2^-54; double products yield zero. Both target sca...
 - 2026-11-14 20:55 **S12-21** lead answer: Built; run green and stage.
 - 2026-11-14 20:55 **S12-21** lead resume: Lead: lane gcc2 built at 1a4f5aab0a2 (log s12_21_build). Run T0-T2 with tests/t1/knc-imul-cost.c green, the ICE sweeps, and stage the short paired ...
 - 2026-11-14 20:54 **S12-24** engineer red: Red b753a488: tests/t1/knc-vec-neg-induction.c ('check t1 --compiler gcc16 --neg-induction') fails with the ticket's ICE; log .work/_state/logs/che...
@@ -278,7 +279,6 @@ Current tickets: `[##################--]` 230 of 246
 - 2026-11-14 20:50 **S12-21** engineer ask: GCC build needed at 1a4f5aab0a2 (lane gcc2). Approved red followed by KNC-only multiply costs 10 for QI/HI/SI/DI and 20 for TI, based on R02 p.56 a...
 - 2026-11-14 20:48 **S12-29** lead approve: The pr38969 crash from S11-27 is fixed: GCC-KNC no longer broadcasts a vector from memory aligned below its element size (alignment-checked predica...
 - 2026-11-14 20:48 **S12-21** lead approve-red: Phase-2 red approved: tests/t1/knc-imul-cost.c fails on today's compiler only because x*123 (32- and 64-bit) is still emitted as IMUL under the 3-c...
-- 2026-11-14 20:38 **S12-21** engineer red: Phase-two red at 8aed9208: added T1 unsigned 32/64-bit multiply-by-123 cost-decision test and --imul-cost selection. On lane gcc2, tools/run.py --n...
 
 ## Cost
 
