@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-14 22:57.
+Updated automatically at every ticket change. Last update: 2026-11-14 23:03.
 
-**Next: GPT-6.1, on S12-30 (Sparse indexed reductions faster than today - vector gather of products with an ordered scalar sum, and indirect prefetch, for CSR-style loops (NPB-CG, HPCG)).** Run `python tools/dispatch.py`, or ask the tech lead to.
+**Next: the tech lead, on S11-26.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[##################--]` 233 of 248
 
@@ -77,7 +77,7 @@ Current tickets: `[##################--]` 233 of 248
 | S11-23 | ICE in WRF's RRTM radiation (rtrn) at -O2 -march=knc - unrecognizable insn after reload, and sub-512-bit SLP vectors under KNC | Done | WRF's RRTM radiation and the -O3 OpenMP WRF files that crashed GCC-KNC after reload (rtrn, kfcps, advance_u... |
 | S11-24 | WRF OpenMP (smpar) build with GCC-KNC at -mphinix, for PhiWeather's benchmark - replaces the serial trial build | Done | WRF v4.8.0 now builds as an OpenMP card binary at -mphinix with GCC-KNC (wrf.exe and real.exe linked, needi... |
 | S11-25 | ICE in do_store_flag (expr.cc) on WRF's surface layer (SFCLAY1D) at -O2 -march=knc | Done | The last WRF file that crashed GCC-KNC (surface layer, SFCLAY1D) now compiles: vector 'ordered and not equa... |
-| S11-26 | WRF OpenMP build at -mphinix with no per-file workarounds (S11-23 and S11-25 fixed), restaged for PhiWeather | lead | Needs the interactive lead: clean WRF build hits a new ICE (REMEZ, vect_transform_stmt, knc 619e14b479a; re... |
+| S11-26 | WRF OpenMP build at -mphinix with no per-file workarounds (S11-23 and S11-25 fixed), restaged for PhiWeather | Question for the tech lead | Lead 23:02: S12-24 (REMEZ ICE fix) is merged and the prefix gcc-knc-16.2.0 is reinstalled from knc 71e9b2d0... |
 | S11-27 | Wrong code - NPB-MG (class A, serial) built by GCC-KNC at -O2 -march=knc fails NPB verification on the card | Done | NPB-MG built by GCC-KNC at -O2 -march=knc now verifies on the card (class A in 14.1 s, against 33.8 s for G... |
 | S11-28 | HPCG run that fits every card model - fixed work instead of fixed duration, grid sized to the 3100's memory | Done | HPCG now runs a fixed amount of work (one CG set on the 104-cubed grid) that passes on the full card, 3100 ... |
 | S11-29 | card_run profiles limit memory in use, not address space, so a 3100 or 5100 run fails only where the real card would | Done | Under --profile 3100 and 5100, card_run now limits the memory a job actually uses (sampled resident plus sw... |
@@ -273,6 +273,7 @@ Current tickets: `[##################--]` 233 of 248
 
 ## Recent activity
 
+- 2026-11-14 23:03 **S11-26** lead resume: Lead 23:02: S12-24 (REMEZ ICE fix) is merged and the prefix gcc-knc-16.2.0 is reinstalled from knc 71e9b2d00fc (includes S11-23, S11-25, S11-27, S1...
 - 2026-11-14 22:57 **S12-24** lead approve: The vectorizer crash in WRF's REMEZ routine at -mphinix is fixed in general (negative-step induction handling in tree-vect-loop.cc); the reproducer...
 - 2026-11-14 22:39 **S12-21** lead approve: GCC-KNC now prices scalar integer multiply at its measured cost (about 10 cycles instead of 3) and keeps scheduling for 4 threads per core, which b...
 - 2026-11-14 22:19 **S12-31** lead answer: Results in; interpret and decide.
@@ -280,16 +281,15 @@ Current tickets: `[##################--]` 233 of 248
 - 2026-11-14 22:19 **S12-30** lead answer: Route B wins; phase 2 for Route B.
 - 2026-11-14 22:18 **S12-30** lead resume: Lead, card window 3 (03:14-03:18Z, 256 s, exit 0, exclusive; output .work/_shared/tmp/claude-s12-window3/s12-30-sparse.out): PASS 2,178,308 compari...
 - 2026-11-14 22:02 **S12-33** lead approve: T2's short-vector cross-check now writes its binaries into the run's own output folder instead of the shared S5-21 path, so lead, Claude and Codex ...
-- 2026-11-14 21:50 **S12-33** engineer submit: Host regression passed (1 test). The earlier red commit 41691642 failed because the test double was incomplete; after simplifying the fixture, veri...
 
 ## Cost
 
 - From the script, engineer: 660 sessions, 1304.5M input tokens
 - From the script, lead: 436 sessions, 121.8M input tokens
-- Started by hand, Claude: 12 sessions, 3399.3M input tokens
+- Started by hand, Claude: 12 sessions, 3404.7M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 33.6 GiB of 100 GiB. 138 GiB free on the drive.
+The project uses 33.6 GiB of 100 GiB. 139 GiB free on the drive.
