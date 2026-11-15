@@ -7,8 +7,7 @@ t1 runs tests/t1/knc-storent.c.  t2 compiles tests/t2/knc-storent-publish.c
 at -O2, requires its stream_fill to take the no-read store path (vmovnrngoaps
 and the lock addl fence, so the card run exercises what it claims) and its
 --control writer to stream without a fence, links the pthread program and
-lints it.  The binary is staged for the lead under
-.work/_shared/S8-13/knc-storent-publish.mic; the engineer never runs it.
+lints it. The binary is written under runner.out; the engineer never runs it.
 """
 import re
 import sys
@@ -23,7 +22,7 @@ def t1(runner):
 
 def t2(runner):
     from check import function_body
-    out = runner.tc.parent / 'S8-13'
+    out = runner.out / 'storent'
     out.mkdir(parents=True, exist_ok=True)
     source = runner.root / 'tests/t2/knc-storent-publish.c'
     asm = out / 'knc-storent-publish.s'

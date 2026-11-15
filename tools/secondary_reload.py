@@ -207,7 +207,7 @@ def t2(runner):
     source = runner.root / 'tests/regress/knc-secondary-pressure.c'
     flags = ['-O2', '-fomit-frame-pointer', '-fno-tree-vectorize',
              '-ffp-contract=off', '-DPRESSURE_MAIN']
-    out = runner.tc.parent / 'tmp/S2-04'
+    out = runner.out / 'secondary-reload'
     out.mkdir(parents=True, exist_ok=True)
     host = out / 'secondary-host.exe'
     compiled = runner.command(runner.tc / 'cygwin/bin/gcc.exe', *flags,

@@ -18,7 +18,7 @@ def t2(runner):
 
 
 def link(runner, tag):
-    out = runner.tc.parent / 'tmp/S2-07'
+    out = runner.out / 'libgcc'
     out.mkdir(parents=True, exist_ok=True)
     source = runner.root / 'tests/t2/knc-libgcc.c'
     cc, flags = ((runner.cc, runner.cc_flags)

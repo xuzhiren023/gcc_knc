@@ -70,7 +70,7 @@ def t1(runner):
 
 
 def t2(runner):
-    out = runner.tc.parent / 'tmp/S2-06'
+    out = runner.out / 'atomics'
     out.mkdir(parents=True, exist_ok=True)
     libraries = runner.tc / 'cross/k1om-mpss-linux/lib64'
     elf = out / 'atomic-counter.mic'

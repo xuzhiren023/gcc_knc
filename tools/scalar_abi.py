@@ -393,7 +393,7 @@ def t2_vector(runner):
     """S10-01: caller and callee in separate GCC 16 objects, one of them at
     -O0, staged for the card. The donor has no register ABI for these types."""
     sources = runner.root / 'tests/t2'
-    output = runner.tc.parent / 'S10-01'
+    output = runner.out / 'vector-abi'
     output.mkdir(exist_ok=True)
     for levels in (('-O0', '-O2'), ('-O2', '-O0')):
         label = 't2 knc-vecarg caller %s / callee %s' % levels
@@ -427,8 +427,7 @@ def t2(runner):
     t2_short_vector(runner)
     t2_vector(runner)
     sources = runner.root / 'tests/t2'
-    # Fixed shared paths are the S3-10 native inputs; never execute on the host.
-    output = runner.tc.parent / 'scalar-abi'
+    output = runner.out / 'scalar-abi'
     output.mkdir(exist_ok=True)
     # Keep the existing scalar suite at O2: its ff aggregate has a documented
     # donor O0 ICE.  Every new complex/rounding test runs at both levels.

@@ -42,6 +42,7 @@ class CheckOutputs(unittest.TestCase):
             runner.off_object = None
             runner.say = lambda text: None
             runner.t2_abi = lambda elf, trace, **kw: None  # Fake output is not ELF.
+            runner.function_body = lambda assembly, name: ''  # Fake bodies for path coverage.
             results, writes = [], []
 
             def result(label, failures):
