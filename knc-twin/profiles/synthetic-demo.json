@@ -7,30 +7,199 @@
   "synthetic": true,
   "description": "SYNTHETIC demonstration profile. Its numbers are round, invented values for exercising the engine (tests, examples of missing parameters). They describe no real card and must not be used for a prediction that anyone acts on.",
   "native_measurement_ids": [],
-  "calibration": {"state": "synthetic", "statement": "Synthetic values; no measurement, no calibration.", "held_out_validation_cases": 0},
+  "calibration": {
+    "state": "synthetic",
+    "statement": "Synthetic values; no measurement, no calibration.",
+    "held_out_validation_cases": 0
+  },
   "parameters": {
-    "card.model": {"value": "SYNTHETIC demo card", "unit": "text", "status": "synthetic"},
-    "card.clock_hz": {"value": 1000000000, "unit": "Hz", "status": "synthetic"},
-    "card.cores": {"value": 8, "unit": "cores", "status": "synthetic"},
-    "card.usable_cores": {"value": 8, "unit": "cores", "status": "synthetic"},
-    "card.memory_bytes": {"value": 1073741824, "unit": "bytes", "status": "synthetic"},
-    "card.peak_memory_bandwidth_gbs": {"value": 100, "unit": "GB/s", "status": "synthetic"},
-    "card.sustained_bandwidth_gbs": {"value": {"read_only": 50, "read_modify_write": 40, "write_normal": 30, "write_ngo": 60}, "unit": "GB/s", "status": "synthetic"},
-    "card.barrier_ns": {"value": {"tree": 5000, "counter": 20000}, "unit": "ns", "status": "synthetic"},
-    "latency.remote_l2_line_ns": {"value": 200, "unit": "ns", "status": "synthetic"},
-    "latency.vector_long": {"value": 6, "unit": "cycles", "status": "synthetic"},
-    "latency.vector_convert_df": {"value": 7, "unit": "cycles", "status": "synthetic"},
-    "latency.l2_hit": {"value": 20, "unit": "cycles", "status": "synthetic"},
-    "latency.memory": {"value": 300, "unit": "cycles", "status": "synthetic"},
-    "latency.scalar_load_l1": {"value": 3, "unit": "cycles", "status": "synthetic"},
-    "latency.vector_load_l1": {"value": 3, "unit": "cycles", "status": "synthetic"},
-    "latency.branch_mispredict_penalty": {"value": 8, "unit": "cycles", "status": "synthetic"},
-    "latency.gather_first_line": {"value": 15, "unit": "cycles", "status": "synthetic"},
-    "occupancy.gather_cycles_per_line": {"value": 7, "unit": "core cycles", "status": "synthetic"},
-    "latency.x87_add": {"value": 3, "unit": "cycles", "status": "synthetic"},
-    "latency.x87_mul": {"value": 3, "unit": "cycles", "status": "synthetic"},
-    "latency.x87_div": {"value": 38, "unit": "cycles", "status": "synthetic"},
-    "occupancy.x87_mul": {"value": 2, "unit": "core cycles", "status": "synthetic"},
-    "occupancy.x87_div": {"value": 38, "unit": "core cycles", "status": "synthetic"}
+    "card.model": {
+      "value": "SYNTHETIC demo card",
+      "unit": "text",
+      "status": "synthetic"
+    },
+    "card.clock_hz": {
+      "value": 1000000000,
+      "unit": "Hz",
+      "status": "synthetic"
+    },
+    "card.cores": {
+      "value": 8,
+      "unit": "cores",
+      "status": "synthetic"
+    },
+    "card.usable_cores": {
+      "value": 8,
+      "unit": "cores",
+      "status": "synthetic"
+    },
+    "card.memory_bytes": {
+      "value": 1073741824,
+      "unit": "bytes",
+      "status": "synthetic"
+    },
+    "card.peak_memory_bandwidth_gbs": {
+      "value": 100,
+      "unit": "GB/s",
+      "status": "synthetic"
+    },
+    "card.sustained_bandwidth_gbs": {
+      "value": {
+        "read_only": 50,
+        "read_modify_write": 40,
+        "write_normal": 30,
+        "write_ngo": 60
+      },
+      "unit": "GB/s",
+      "status": "synthetic"
+    },
+    "card.barrier_ns": {
+      "value": {
+        "tree": 5000,
+        "counter": 20000
+      },
+      "unit": "ns",
+      "status": "synthetic"
+    },
+    "latency.remote_l2_line_ns": {
+      "value": 200,
+      "unit": "ns",
+      "status": "synthetic"
+    },
+    "latency.vector_long": {
+      "value": 6,
+      "unit": "cycles",
+      "status": "synthetic"
+    },
+    "latency.vector_convert_df": {
+      "value": 7,
+      "unit": "cycles",
+      "status": "synthetic"
+    },
+    "latency.l2_hit": {
+      "value": 20,
+      "unit": "cycles",
+      "status": "synthetic"
+    },
+    "latency.memory": {
+      "value": 300,
+      "unit": "cycles",
+      "status": "synthetic"
+    },
+    "latency.scalar_load_l1": {
+      "value": 3,
+      "unit": "cycles",
+      "status": "synthetic"
+    },
+    "latency.vector_load_l1": {
+      "value": 3,
+      "unit": "cycles",
+      "status": "synthetic"
+    },
+    "latency.branch_mispredict_penalty": {
+      "value": 8,
+      "unit": "cycles",
+      "status": "synthetic"
+    },
+    "latency.gather_first_line": {
+      "value": 15,
+      "unit": "cycles",
+      "status": "synthetic"
+    },
+    "occupancy.gather_cycles_per_line": {
+      "value": 7,
+      "unit": "core cycles",
+      "status": "synthetic"
+    },
+    "latency.x87_add": {
+      "value": 3,
+      "unit": "cycles",
+      "status": "synthetic"
+    },
+    "latency.x87_mul": {
+      "value": 3,
+      "unit": "cycles",
+      "status": "synthetic"
+    },
+    "latency.x87_div": {
+      "value": 38,
+      "unit": "cycles",
+      "status": "synthetic"
+    },
+    "occupancy.x87_mul": {
+      "value": 2,
+      "unit": "core cycles",
+      "status": "synthetic"
+    },
+    "occupancy.x87_div": {
+      "value": 38,
+      "unit": "core cycles",
+      "status": "synthetic"
+    },
+    "latency.x87_move": {
+      "value": 1,
+      "unit": "cycles",
+      "status": "synthetic"
+    },
+    "latency.x87_compare": {
+      "value": 3,
+      "unit": "cycles",
+      "status": "synthetic"
+    },
+    "latency.x87_control": {
+      "value": 10,
+      "unit": "cycles",
+      "status": "synthetic"
+    },
+    "latency.x87_sqrt": {
+      "value": 40,
+      "unit": "cycles",
+      "status": "synthetic"
+    },
+    "latency.scalar_idiv": {
+      "value": 30,
+      "unit": "cycles",
+      "status": "synthetic"
+    },
+    "occupancy.scatter_cycles_per_line": {
+      "value": 7,
+      "unit": "cycles",
+      "status": "synthetic"
+    },
+    "memory.core_service_cycles_per_line": {
+      "value": 20,
+      "unit": "core cycles",
+      "status": "synthetic"
+    },
+    "tlb.l1_entries_2m": {
+      "value": 8,
+      "unit": "pages",
+      "status": "synthetic"
+    },
+    "latency.vector_load_merge_l1": {
+      "value": 12,
+      "unit": "cycles",
+      "status": "synthetic"
+    },
+    "store.nr_stall_cycles_resident": {
+      "value": 27,
+      "unit": "cycles",
+      "status": "synthetic"
+    },
+    "store.nr_stall_cycles_memory": {
+      "value": 157,
+      "unit": "cycles",
+      "status": "synthetic"
+    },
+    "store.nr_occupancy_core_cycles": {
+      "value": 9,
+      "unit": "cycles",
+      "status": "synthetic"
+    },
+    "latency.gather_mask_cycles": {
+      "value": 2,
+      "unit": "cycles",
+      "status": "synthetic"
+    }
   }
 }

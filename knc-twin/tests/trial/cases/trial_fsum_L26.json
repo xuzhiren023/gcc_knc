@@ -1,0 +1,105 @@
+{
+ "name": "trial_fsum_L26",
+ "kind": "trial",
+ "source": "trial.s",
+ "loop": ".L26",
+ "contexts": 1,
+ "spec": {
+  "name": "fsum_L26",
+  "unit_of_work": {
+   "description": "one float added",
+   "count": 32
+  },
+  "numerical_policy": {
+   "rounding": "rn",
+   "ftz": false,
+   "daz": false,
+   "nan_compare": "bits"
+  },
+  "scenario": {
+   "memory": {
+    "type": "fixed_level",
+    "level": "l1"
+   },
+   "branch": {
+    "type": "all_predicted"
+   }
+  },
+  "memory_default": 0,
+  "loop": {
+   "trip_count": 2
+  },
+  "init": {
+   "memory": [
+    {
+     "addr": "0x200000",
+     "f32": [
+      1.0,
+      2.0,
+      3.0,
+      4.0,
+      5.0,
+      6.0,
+      7.0,
+      8.0,
+      9.0,
+      10.0,
+      11.0,
+      12.0,
+      13.0,
+      14.0,
+      15.0,
+      16.0,
+      17.0,
+      18.0,
+      19.0,
+      20.0,
+      21.0,
+      22.0,
+      23.0,
+      24.0,
+      25.0,
+      26.0,
+      27.0,
+      28.0,
+      29.0,
+      30.0,
+      31.0,
+      32.0
+     ]
+    }
+   ],
+   "registers": {
+    "rax": "0x200000",
+    "rsi": "0x200000",
+    "rdx": 0,
+    "rcx": 32,
+    "x87": [
+     0.0
+    ]
+   }
+  },
+  "expected": {
+   "registers": {
+    "0": {
+     "st0": 528.0,
+     "x87_depth": 1,
+     "rdx": 32,
+     "rax": "0x200080"
+    }
+   }
+  }
+ },
+ "trace_source": "functional",
+ "simulate": [
+  [
+   0
+  ]
+ ],
+ "bounds_loop": true,
+ "expect": {
+  "conversion": "ok",
+  "functional": "ok"
+ },
+ "schema": "knc-twin.trial-case/1"
+}

@@ -25,7 +25,7 @@ CASES = [
     ("simulate-saxpy-1ctx", "saxpy loop, one context", ["simulate", "saxpy_loop.json"]),
     ("simulate-saxpy-4ctx", "saxpy loop on four contexts", ["simulate", "saxpy_4ctx.json"]),
     ("simulate-saxpy-asm", "the same loop given as GAS AT&T assembly", ["simulate", "saxpy_asm.json"]),
-    ("simulate-saxpy-overlay", "sensitivity: vector load latency 3 instead of 12", ["simulate", "saxpy_loop.json", "--overlay", os.path.join(ROOT, "profiles", "overlay-vector-load-3.json")]),
+    ("simulate-saxpy-overlay", "sensitivity: vector load latency 3 instead of 12", ["simulate", "saxpy_loop.json", "--overlay", os.path.join(ROOT, "profiles", "overlay-vector-load-12.json")]),
     ("simulate-cold-nopf", "cold stream without prefetch: demand-miss stalls", ["simulate", "stream_cold_nopf.json"]),
     ("simulate-cold-pf", "cold stream with vprefetch0: nonblocking prefetch", ["simulate", "stream_cold_pf.json"]),
     ("simulate-reduce-1acc", "reduction, one accumulator", ["simulate", "reduce_1acc.json"]),
@@ -48,6 +48,10 @@ CASES = [
     ("compare-prefetch", "compare cold stream without/with prefetch", ["compare", "@simulate-cold-nopf", "@simulate-cold-pf"]),
     ("compare-incompatible", "compare across different profiles: incompatible", ["compare", "@simulate-saxpy-1ctx", "@simulate-synthetic"]),
     ("prepare-native", "export a hardware-queue request (no card)", ["prepare-native", "saxpy_loop.json", "--prediction", "@simulate-saxpy-1ctx"]),
+    ("gcc-x87-f", "GCC-KNC x87 double function, adapter output, exact check", ["functional", os.path.join(FX, "gcc", "x87test_f.json")]),
+    ("gcc-x87-g", "GCC-KNC x87 float dot-product loop with prefetches, timing", ["simulate", os.path.join(FX, "gcc", "x87test_g.json")]),
+    ("gcc-int-h", "GCC-KNC scalar integer loop, loop bounds", ["bounds", os.path.join(FX, "gcc", "x87test_h.json")]),
+    ("batch-gate-csr", "real candidate batch: S12-30 gate CSR variants, frozen profile, queue routing", ["batch", os.path.join(FX, "batch", "manifest.json")]),
 ]
 
 
@@ -70,6 +74,8 @@ def main():
         out = os.path.join(out_root, name)
         results[name] = out
         cmd = [sys.executable, KT] + argv + ["--out", out]
+        if name.startswith("gcc-") or name.startswith("batch-"):
+            cmd += ["--force"]
         p = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True)
         rp = os.path.join(out, "result.json")
         status, msg = "(no result.json)", p.stderr.strip()

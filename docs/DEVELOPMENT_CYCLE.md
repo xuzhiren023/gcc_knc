@@ -167,6 +167,7 @@ to undo.
 3. Is the legality right? Do transformations respect dependence and the FP contract?
 4. Does it hide a cost, such as hidden spills or helper calls that look cheap to the optimizer?
 5. Does it follow the ADRs? Is the shared-file change as small as possible? Are provenance and sources recorded?
+6. For an optimization: is there a model-first Model table (tier by depth) with sourced inputs, a prediction written before the measurement, and a change aimed at the dominant term? Over-modeling counts as a finding, as over-testing does.
 
 **Verdict:** `tools/pm.py approve`, or `tools/pm.py changes` with numbered findings, each with
 `file:line`. Over-testing and needless validation count as findings, and the fix is to
@@ -214,6 +215,7 @@ goes through `tools/card_run`, which does the following:
 - Kernel gains are not added to one another or projected onto whole programs without the §13 model from the report.
 - No tuning rule may be justified by a single program. Check it against the wider corpus, including held-out programs.
 - Negative results are kept on the ticket. They are useful, and they should not be rerun unchanged.
+- An optimization claim states its distance from the model-first bound (for example "1.1x its memory bound on 7120"). knc-twin cycles are predictions; only card runs are measurements.
 
 ## 11. Documentation weight
 

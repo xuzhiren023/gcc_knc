@@ -1,26 +1,37 @@
 """GAS AT&T syntax subset -> normalized records.
 
 Accepted (documented in references/input-format.md):
-  label:                       labels
-  # comment                    comments (also trailing)
-  .directives                  ignored and listed in notes (.text, .globl, .p2align, .type, .size, .cfi_*)
-  mnemonic[q|l] ops            AT&T operand order (source first); q/l suffix on scalar ops sets width 64/32
-  %reg  $imm  disp(%base,%index,scale)   operands
-  dest{%k1}                    write mask on the destination operand
-  mem{1to16} / mem{1to8}       memory broadcast
-  dest{rn}|{rd}|{ru}|{rz}      rounding on the destination (KNC swizzle field used for rounding)
-  lock addl $imm, mem          -> lock_add
-Rejected: any other swizzle ({cdab}, {aaaa}, ...), 8/16-bit registers, segment prefixes, unknown mnemonics.
+  label:  .Lname:  1:             labels, including numeric local labels (targets 1b / 1f)
+  # comment                       comments (trailing too)
+  .directives                     ignored (listed in notes): .text .globl .p2align .type .size .cfi_* .section .file
+                                  .ident .align .loc .string? -> no: data directives are rejected here (the adapter handles them)
+  mnemonic[q|l|w|b] ops           AT&T operand order (source first); size suffix on scalar ops sets the width
+  %reg  $imm  disp(%base,%index,scale)  symbol(%rip)  disp expressions like 4+0(%rsi)
+  %st  %st(i)                     x87 stack registers
+  dest{%k1}                       write mask on the destination operand
+  reg{cdab} ...                   register swizzles (cdab badc dacb aaaa bbbb cccc dddd)
+  mem{1to16} {4to16} {1to8} {4to8}  memory broadcasts
+  mem{float16} {uint8} {sint8} {uint16} {sint16}   up-conversion on a memory source
+  reg{float16} ...                down-conversion on the register source of a store
+  dest{rn}|{rd}|{ru}|{rz}         rounding on the destination (KNC swizzle field)
+  lock addl / lock; addl          -> lock_add
+  rep; ret / rep ret              -> ret
+Rejected: 8/16-bit forms outside the table, segment prefixes, unknown mnemonics and directives.
 """
 import re
 
 from .errors import InvalidInput, Unsupported
+from . import isa
 
-_IGNORED_DIRECTIVES = (".text", ".globl", ".global", ".p2align", ".align", ".type", ".size", ".cfi_", ".file", ".section", ".ident", ".ret")
-_LABEL_RE = re.compile(r"^([A-Za-z_.$][\w.$]*):(.*)$")
-_MEM_RE = re.compile(r"^(?P<disp>[-+]?(0x[0-9a-fA-F]+|\d+))?\((?P<inner>[^)]*)\)$")
-_SIZE_SUFFIX_OPS = ("mov", "add", "sub", "and", "or", "xor", "cmp", "test", "lea", "inc", "dec", "neg", "not", "shl", "shr", "sar", "imul")
+_IGNORED_DIRECTIVES = (".text", ".globl", ".global", ".p2align", ".align", ".type", ".size", ".cfi_", ".file", ".section",
+                       ".ident", ".loc", ".local", ".weak", ".hidden", ".balign", ".data", ".bss", ".rodata")
+_LABEL_RE = re.compile(r"^([A-Za-z_.$][\w.$]*|\d+):(.*)$")
+_MEM_RE = re.compile(r"^(?P<disp>[^()]*)\((?P<inner>[^)]*)\)$")
+_SIZE_SUFFIX_OPS = ("mov", "add", "sub", "and", "or", "xor", "adc", "sbb", "cmp", "test", "lea", "inc", "dec", "neg", "not",
+                    "shl", "shr", "sar", "sal", "imul", "idiv", "div", "push", "pop", "bt")
 _ROUNDING = {"rn": "rn", "rd": "rd", "ru": "ru", "rz": "rz", "rn-sae": "rn", "rd-sae": "rd", "ru-sae": "ru", "rz-sae": "rz"}
+_NO_SUFFIX = {"movslq", "movsbl", "movsbq", "movswl", "movswq", "movzbl", "movzbq", "movzwl", "movzwq", "movsbw", "movzbw",
+              "cltq", "cltd", "cqto", "leave", "nop", "ret", "call", "jmp", "movabsq"}
 
 
 def _split_operands(s):
@@ -40,18 +51,38 @@ def _split_operands(s):
     return out
 
 
+def _eval_disp(text, where):
+    """Integer displacement expressions: digits, hex, + and -; optionally a leading symbol."""
+    t = text.strip()
+    if not t:
+        return 0, None
+    m = re.match(r"^([A-Za-z_.$][\w.$]*)?(.*)$", t)
+    sym = m.group(1)
+    rest = m.group(2).strip()
+    if sym and rest and rest[0] not in "+-":
+        raise InvalidInput("%s: bad displacement %r" % (where, text))
+    total = 0
+    for sign, num in re.findall(r"([+-]?)\s*(0x[0-9a-fA-F]+|\d+)", rest):
+        v = int(num, 0)
+        total += -v if sign == "-" else v
+    if not re.fullmatch(r"(\s*[+-]?\s*(0x[0-9a-fA-F]+|\d+))*\s*", rest):
+        raise InvalidInput("%s: cannot evaluate displacement %r" % (where, text))
+    return total, sym
+
+
 def _parse_reg(tok, where):
     if not tok.startswith("%"):
         raise InvalidInput("%s: expected register, got %r" % (where, tok))
     return tok[1:].lower()
 
 
-def _parse_operand(tok, where, idx, n_ops):
+def _parse_operand(tok, where):
     """Returns (operand, mask, rounding)."""
     mask = None
     rounding = None
     broadcast = None
-    # trailing {...} groups
+    conv = None
+    swizzle = None
     while tok.endswith("}"):
         pos = tok.rfind("{")
         if pos < 0:
@@ -62,22 +93,45 @@ def _parse_operand(tok, where, idx, n_ops):
             mask = grp[1:].lower()
         elif grp in _ROUNDING:
             rounding = _ROUNDING[grp]
-        elif grp in ("1to16", "1to8"):
+        elif grp in isa.BROADCASTS:
             broadcast = grp
+        elif grp in isa.SWIZZLES:
+            swizzle = grp
+        elif grp in isa.UPCONV_PS:
+            conv = grp
         else:
-            raise Unsupported("%s: swizzle/modifier {%s} is not supported" % (where, grp))
+            raise Unsupported("%s: modifier {%s} is not supported" % (where, grp))
     if tok.startswith("$"):
-        return {"imm": tok[1:]}, mask, rounding
+        v, sym = _eval_disp(tok[1:], where)
+        if sym:
+            raise Unsupported("%s: symbolic immediate %r not supported" % (where, tok))
+        return {"imm": v}, mask, rounding
     if tok.startswith("%"):
-        return tok[1:].lower(), mask, rounding
+        name = tok[1:].lower()
+        if swizzle or conv:
+            d = {"reg": name}
+            if swizzle:
+                d["swizzle"] = swizzle
+            if conv:
+                d["conv"] = conv
+            return d, mask, rounding
+        return name, mask, rounding
     m = _MEM_RE.match(tok)
     if m:
         d = {}
-        if m.group("disp"):
-            d["disp"] = m.group("disp")
+        disp, sym = _eval_disp(m.group("disp"), where)
+        if disp:
+            d["disp"] = disp
         inner = [p.strip() for p in m.group("inner").split(",")]
         if inner and inner[0]:
-            d["base"] = _parse_reg(inner[0], where)
+            base = _parse_reg(inner[0], where)
+            if base == "rip":
+                if not sym:
+                    raise InvalidInput("%s: rip-relative operand without a symbol" % where)
+            else:
+                d["base"] = base
+        if sym:
+            d["symbol"] = sym
         if len(inner) > 1 and inner[1]:
             r = _parse_reg(inner[1], where)
             if r.startswith("zmm"):
@@ -90,29 +144,56 @@ def _parse_operand(tok, where, idx, n_ops):
             raise InvalidInput("%s: bad memory operand %r" % (where, tok))
         if broadcast:
             d["broadcast"] = broadcast
+        if conv:
+            d["conv"] = conv
         return d, mask, rounding
     if re.match(r"^[A-Za-z_.$][\w.$]*$", tok):
         return tok, mask, rounding  # label
+    if re.match(r"^\d+[bf]$", tok):
+        return tok, mask, rounding  # numeric local label reference
+    if re.match(r"^[A-Za-z_.$][\w.$]*(\+\d+)?$", tok):
+        raise Unsupported("%s: absolute symbol operand %r not supported" % (where, tok))
     raise InvalidInput("%s: cannot parse operand %r" % (where, tok))
+
+
+def _strip_suffix(mnem, where):
+    """(base mnemonic, width or None)."""
+    if mnem in _NO_SUFFIX or mnem.startswith(("v", "k", "j", "f", "set", "cmov")) or isa.lookup(mnem) is not None and mnem not in ("mov",):
+        if mnem == "movabsq":
+            return "movabs", 64
+        return mnem, None
+    for b in _SIZE_SUFFIX_OPS:
+        for suf, w in (("q", 64), ("l", 32), ("w", 16), ("b", 8)):
+            if mnem == b + suf:
+                return b, w
+    return mnem, None
 
 
 def parse_gas(text):
     """Return (records, notes). Raises InvalidInput/Unsupported on anything outside the subset."""
     records = []
     notes = []
-    pending_label = None
+    pending_labels = []
+    numeric_defs = {}   # "1" -> count of definitions so far
+    pending_numeric_refs = []  # (record index, token) for 'Nf' references
     for lineno, raw in enumerate(text.splitlines(), 1):
         line = raw.split("#", 1)[0].strip()
         if not line:
             continue
-        m = _LABEL_RE.match(line)
-        if m:
-            if pending_label is not None:
-                raise InvalidInput("line %d: two labels without an instruction between them (%s, %s)" % (lineno, pending_label, m.group(1)))
-            pending_label = m.group(1)
+        while True:
+            m = _LABEL_RE.match(line)
+            if not m:
+                break
+            name = m.group(1)
+            if name.isdigit():
+                n = numeric_defs.get(name, 0) + 1
+                numeric_defs[name] = n
+                pending_labels.append("L%s_%d" % (name, n))
+            else:
+                pending_labels.append(name)
             line = m.group(2).strip()
-            if not line:
-                continue
+        if not line:
+            continue
         if line.startswith("."):
             if any(line.startswith(p) for p in _IGNORED_DIRECTIVES):
                 notes.append("line %d: directive ignored: %s" % (lineno, line))
@@ -122,53 +203,72 @@ def parse_gas(text):
         parts = line.split(None, 1)
         mnem = parts[0].lower()
         rest = parts[1] if len(parts) > 1 else ""
-        if mnem == "lock":
+        width = None
+        if mnem in ("lock", "lock;"):
             sub = rest.split(None, 1)
             if not sub or not sub[0].lower().startswith("add"):
                 raise Unsupported("%s: only 'lock add' is accepted among lock-prefixed instructions" % where)
             mnem = "lock_add"
             rest = sub[1] if len(sub) > 1 else ""
             width = 32 if sub[0].lower().endswith("l") else 64
-        else:
-            width = None
-        if mnem in ("ret", "nop"):
-            raise Unsupported("%s: %r is outside the kernel subset (strip the function epilogue)" % (where, mnem))
+        elif mnem in ("rep", "rep;"):
+            sub = rest.split(None, 1)
+            if sub and sub[0].lower() == "ret":
+                mnem, rest = "ret", ""
+            else:
+                raise Unsupported("%s: rep prefix not supported" % where)
         base = mnem
-        if mnem not in ("lock_add",) and not mnem.startswith(("v", "k", "j", "f")):
-            for b in _SIZE_SUFFIX_OPS:
-                if mnem == b + "q":
-                    base, width = b, 64
-                    break
-                if mnem == b + "l":
-                    base, width = b, 32
-                    break
-                if mnem in (b + "w", b + "b"):
-                    raise Unsupported("%s: 8/16-bit operation %r not supported" % (where, mnem))
+        if mnem != "lock_add":
+            base, w = _strip_suffix(mnem, where)
+            if w is not None:
+                width = w
         toks = _split_operands(rest) if rest else []
         ops = []
         mask = None
         rounding = None
-        for i, tok in enumerate(toks):
-            o, mk, rd = _parse_operand(tok, where, i, len(toks))
+        for tok in toks:
+            o, mk, rd = _parse_operand(tok, where)
             ops.append(o)
             if mk:
                 mask = mk
             if rd:
                 rounding = rd
         ops.reverse()  # AT&T source-first -> Intel destination-first
-        rec = {"id": "L%d" % lineno, "op": base, "ops": ops}
+        rec = {"id": "L%d" % lineno, "op": base, "ops": ops, "source": lineno}
         if mask:
             rec["mask"] = mask
         if rounding:
             rec["rounding"] = rounding
         if width:
             rec["width"] = width
-        if pending_label:
-            rec["label"] = pending_label
-            pending_label = None
+        if pending_labels:
+            rec["label"] = pending_labels[0]
+            for extra in pending_labels[1:]:
+                notes.append("line %d: labels %s and %s name the same instruction; %s kept as alias" % (lineno, pending_labels[0], extra, extra))
+                rec.setdefault("aliases", []).append(extra)
+            pending_labels = []
+        # numeric label references
+        for k, o in enumerate(ops):
+            if isinstance(o, str) and re.match(r"^\d+[bf]$", o):
+                num, dirn = o[:-1], o[-1]
+                if dirn == "b":
+                    n = numeric_defs.get(num, 0)
+                    if n == 0:
+                        raise InvalidInput("%s: backward reference %s has no definition" % (where, o))
+                    ops[k] = "L%s_%d" % (num, n)
+                else:
+                    ops[k] = "L%s_%d" % (num, numeric_defs.get(num, 0) + 1)
         records.append(rec)
-    if pending_label is not None:
-        raise InvalidInput("trailing label %r without an instruction" % pending_label)
+    if pending_labels:
+        raise InvalidInput("trailing label %r without an instruction" % pending_labels[0])
+    # label aliases: rewrite branch targets to the kept label
+    alias_map = {}
+    for rec in records:
+        for a in rec.pop("aliases", []):
+            alias_map[a] = rec["label"]
+    if alias_map:
+        for rec in records:
+            rec["ops"] = [alias_map.get(o, o) if isinstance(o, str) else o for o in rec["ops"]]
     return records, notes
 
 
@@ -179,15 +279,24 @@ def emit_gas(stream):
         if insn.label:
             lines.append("%s:" % insn.label)
         mnem = insn.op
-        if insn.kind in ("scalar", "load", "store") and insn.op in _SIZE_SUFFIX_OPS and insn.width:
-            mnem = insn.op + ("q" if insn.width == 64 else "l")
+        if insn.op in _SIZE_SUFFIX_OPS and insn.width and insn.spec.get("fn") != "x87":
+            mnem = insn.op + {64: "q", 32: "l", 16: "w", 8: "b"}[insn.width]
+        if insn.op == "movabs":
+            mnem = "movabsq"
         if insn.op == "lock_add":
             mnem = "lock addl" if insn.width == 32 else "lock addq"
         toks = []
         for k, (opnd, role) in enumerate(zip(insn.operands, insn.roles)):
             name = type(opnd).__name__
             if name == "Reg":
-                t = "%" + opnd.name
+                if opnd.kind == "x":
+                    t = "%st" if opnd.index == 0 else "%%st(%d)" % opnd.index
+                else:
+                    t = "%" + opnd.name
+                if opnd.swizzle:
+                    t += "{%s}" % opnd.swizzle
+                if opnd.conv:
+                    t += "{%s}" % opnd.conv
             elif name == "Imm":
                 t = "$%d" % opnd.value
             elif name == "Label":
@@ -202,6 +311,8 @@ def emit_gas(stream):
                 t += "(" + inner + ")"
                 if opnd.broadcast:
                     t += "{%s}" % opnd.broadcast
+                if opnd.conv:
+                    t += "{%s}" % opnd.conv
             if k == 0 and insn.mask is not None:
                 t += "{%%%s}" % insn.mask.name
             if k == 0 and insn.rounding is not None and insn.kind == "vector":

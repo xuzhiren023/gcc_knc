@@ -48,7 +48,7 @@ class TestLoopBounds(unittest.TestCase):
         k = load_kernel(helpers.fixture("saxpy_loop.json"))
         notes, assume = assume_list()
         res = bounds.loop_bounds(k, profile(), assume)
-        self.assertEqual(res["iteration_critical_path_cycles"], 12 + 4 + 1, "load 12 -> fma 4 -> store")
+        self.assertEqual(res["iteration_critical_path_cycles"], 5 + 4 + 1, "plain load 5 -> fma 4 -> store")
         self.assertEqual(res["rec_mii_ceiling"], 1, "only the induction variables are loop-carried")
         self.assertEqual(res["mii_cycles_per_iteration"], 8)
 

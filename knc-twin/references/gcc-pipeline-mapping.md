@@ -11,12 +11,12 @@ assembly GCC emits (GAS subset) when the instruction forms are in the table.
 
 | knc.md | twin class(es) | twin latency parameter | note |
 |---|---|---|---|
-| `knc_scalar` (alu, imov, lea, incdec, ishift, icmp, test, ibr, setcc, icmov; `knc-u\|knc-v`, 2) | `scalar_alu`, `branch`, `mask_op` | `latency.scalar_alu` (1 core cycle), `latency.mask_op` | knc.md's 2 is one issue opportunity, i.e. the twin's spacing rule, not a core latency |
+| `knc_scalar` (alu, imov, lea, incdec, ishift, icmp, test, ibr, setcc, icmov; `knc-u\|knc-v`, 2) | `scalar_alu`, `scalar_rmw`, `branch`, `mask_op` (nop takes no V partner, jmp does not go to V: `validation.md`) | `latency.scalar_alu` (1 core cycle), `latency.mask_op` | knc.md's 2 is one issue opportunity, i.e. the twin's spacing rule, not a core latency |
 | `knc_scalar_load` (3) | `scalar_load` | `latency.scalar_load_l1` 3 (measured) | |
 | `knc_vector` (`knc-u`, 4) | `vector_arith` | `latency.vector_arith` 4 | U-only in both |
-| `knc_vector_mem` (`knc-u`, 12) | `vector_load`, folded loads | `latency.vector_load_l1` 12 (measured chain; R08 says 3: overlay provided) | the twin charges folded loads no extra latency on an L1 hit (C9) |
+| `knc_vector_mem` (`knc-u`, 12) | `vector_load`, folded loads | `latency.vector_load_l1` 5 and `latency.store_to_load_same_line` 7 (the measured 12-cycle chains are store-then-reload chains, `validation.md`); R08 says 3 | the twin charges folded loads no extra latency on an L1 hit (C9); knc.md's 12 is the whole spill/reload path |
 | `knc_vector_long` (6), `knc_convert_df` (7) | `vector_long`, `vector_convert_df` | `latency.vector_long`, `latency.vector_convert_df` | |
-| `knc_gather` (`(knc-u+knc-v)*7`, 15) | `vector_gather` | `latency.gather_first_line`, `occupancy.gather_cycles_per_line` | the twin scales occupancy and latency with the distinct lines actually touched |
+| `knc_gather` (`(knc-u+knc-v)*7`, 15) | `vector_gather` | `latency.gather_first_line`, `occupancy.gather_cycles_per_line`, `latency.gather_mask_cycles` | the twin scales occupancy and latency with the distinct lines actually touched; the measured catalog shows the gather occupying a gather unit, not both pipes (kmov/gather/jknzd fit in 7 ticks), and the completion mask readable after 2 cycles |
 | `knc_pair` (unpack/pack, two U issues) | `vector_load` x2 records | | write the two instructions as two records |
 | `knc_fp`, `knc_fmul`, `knc_fdiv` | `x87_*` | `latency.x87_*`, `occupancy.x87_*` | x87 serialized per context in the twin |
 | `knc_special=prefetch` -> scalar slot | `prefetch_l1`, `prefetch_l2` | `occupancy.vprefetch_l2_core_cycles` | the twin also models the prefetch's memory effect |

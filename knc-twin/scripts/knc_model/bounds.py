@@ -78,11 +78,16 @@ class _Lat(object):
             if insn.folded_load:
                 arith = self.p.get(isa.CLASSES[insn.cls]["latency"])
                 return arith if lvl == "l1" else lat - self.load_latency("l1", True) + arith
-            return lat
+            if insn.cls in ("x87_add", "x87_mul", "x87_div", "x87_sqrt"):
+                return lat + self.p.get(isa.CLASSES[insn.cls]["latency"])  # load, then the op on the x87 unit
+            return lat + self._extend(insn)
         key = isa.CLASSES[insn.cls]["latency"]
         if key is None:
             return 1
-        return self.p.get(key)
+        return self.p.get(key) + self._extend(insn)
+
+    def _extend(self, insn):
+        return self.p.get("latency.scalar_extend_extra") if insn.op in isa.EXTEND_OPS else 0
 
 
 def _v_eligible(profile):

@@ -1,0 +1,92 @@
+{
+ "name": "c9_vector_u2",
+ "kind": "consistency",
+ "source": "char.s",
+ "loop": ".Lc9_vector_u2",
+ "contexts": 2,
+ "spec": {
+  "name": "c9_vector_u2",
+  "unit_of_work": {
+   "description": "one 16-lane vaddps update",
+   "count": 128
+  },
+  "numerical_policy": {
+   "rounding": "rn",
+   "ftz": false,
+   "daz": false,
+   "nan_compare": "bits"
+  },
+  "scenario": {
+   "memory": {
+    "type": "fixed_level",
+    "level": "l1"
+   },
+   "branch": {
+    "type": "all_predicted"
+   }
+  },
+  "loop": {
+   "trip_count": 32
+  },
+  "init": {
+   "registers": {
+    "zmm31": {
+     "f32_broadcast": 1.0
+    },
+    "zmm0": {
+     "f32_broadcast": 1.0
+    },
+    "zmm1": {
+     "f32_broadcast": 1.0
+    },
+    "rdi": 32
+   }
+  },
+  "expected": {
+   "registers": {
+    "0": {
+     "zmm0": {
+      "f32_broadcast": 33.0
+     },
+     "zmm1": {
+      "f32_broadcast": 33.0
+     },
+     "rdi": 0
+    },
+    "1": {
+     "zmm0": {
+      "f32_broadcast": 33.0
+     },
+     "zmm1": {
+      "f32_broadcast": 33.0
+     },
+     "rdi": 0
+    }
+   }
+  }
+ },
+ "trace_source": "functional",
+ "simulate": [
+  [
+   0
+  ],
+  [
+   0,
+   1
+  ]
+ ],
+ "bounds_loop": true,
+ "measured": {
+  "source": "docs/research/knc-characterization.md C9 (S8-01), register chain",
+  "unit": "TSC ticks per update per thread",
+  "threads": {
+   "1": 3.02,
+   "2": 3.01
+  }
+ },
+ "expect": {
+  "conversion": "ok",
+  "functional": "ok"
+ },
+ "schema": "knc-twin.trial-case/1"
+}
