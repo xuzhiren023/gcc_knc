@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-15 02:34.
+Updated automatically at every ticket change. Last update: 2026-11-15 02:35.
 
-**Next: GPT-6.1, on S12-30 (Sparse indexed reductions faster than today - vector gather of products with an ordered scalar sum, and indirect prefetch, for CSR-style loops (NPB-CG, HPCG)).** Run `python tools/dispatch.py`, or ask the tech lead to.
+**Next: the tech lead, on S12-36.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[##################--]` 236 of 251
 
@@ -116,7 +116,7 @@ Current tickets: `[##################--]` 236 of 251
 | S12-33 | T2 writes its short-vector test binaries into a per-run folder, so Claude, Codex and lead runs never block each other | Done | T2's short-vector cross-check now writes its binaries into the run's own output folder instead of the share... |
 | S12-34 | Unrecognizable insn for a truncating vector store to a 1-byte-aligned V16QI destination (found by S12-32) | Not started |  |
 | S12-35 | Clean single-compiler WRF build as dm+sm (MPI + OpenMP) against PhiWeather's k1om MPICH, plus a build recipe PhiWeather can apply to its own patched tree | In progress | Lead 02:20: yes. Build only the MPICH 3.4.3 Fortran use-mpi module set with GCC-KNC 16 (mpi.mod and the mod... |
-| S12-36 | card_run yields to a foreign queued row in the middle of our own turn - honor an open turn-level reservation so a multi-job window is not refused | In progress | Rebase on main. knc is the branch of the GCC repo (.work/_shared/gcc) and applies only to gcc: yes tickets;... |
+| S12-36 | card_run yields to a foreign queued row in the middle of our own turn - honor an open turn-level reservation so a multi-job window is not refused | Question for the tech lead | Required git rebase main is blocked by filesystem permissions: error: could not create temporary C:/Users/x... |
 | S13-01 | M4 final gate - stage the ADR-0015 gate run at the final head (17 programs, held-out unsealed, six pairs, three profiles) | draft |  |
 | S13-02 | Libgomp per-region thread density - choose 1-4 workers per core per parallel region instead of once per program | draft |  |
 | S13-03 | M4 retrospective - what we did wrong, what worked, and the practice changes carried into the next milestone and the agent-team skill | draft |  |
@@ -276,6 +276,7 @@ Current tickets: `[##################--]` 236 of 251
 
 ## Recent activity
 
+- 2026-11-15 02:35 **S12-36** engineer ask: Required git rebase main is blocked by filesystem permissions: error: could not create temporary C:/Users/xuzhi/Documents/gcc_knc/.git/worktrees/S1...
 - 2026-11-15 02:34 **S12-36** lead answer: Rebase on main. knc is the branch of the GCC repo (.work/_shared/gcc) and applies only to gcc: yes tickets; this ticket is gcc: no, tools-only, so ...
 - 2026-11-15 02:32 **S12-36** engineer ask: Fix e5f446dd follows red commit c1699bdd. Host test_card_turn.py via tools/run.py passed 3 tests: open turn starts immediately, finish closes turn ...
 - 2026-11-15 02:29 **S12-30** lead answer: Legal prefetch confirmed at 1.62x; go to phase 2.
@@ -283,7 +284,6 @@ Current tickets: `[##################--]` 236 of 251
 - 2026-11-15 02:15 **S12-35** lead answer: Lead 02:20: yes. Build only the MPICH 3.4.3 Fortran use-mpi module set with GCC-KNC 16 (mpi.mod and the modules it needs, e.g. mpi_constants, mpi_s...
 - 2026-11-15 02:13 **S12-35** engineer ask: copy.o nm -u empty. Build stopped at firebrand spotting USE MPI: mpi.mod was created by a different GNU Fortran version. Three-line repro fails ide...
 - 2026-11-15 01:40 **S12-35** lead answer: Yes. Add PhiWeather k17-memcpy/copy.o as a third prebuilt MPI-closure input for the primary dmsm/wrf.exe and dmsm/real.exe, placed right after phi_...
-- 2026-11-15 01:38 **S12-35** engineer ask: MPI_Init/Finalize link with approved MPI inputs fails: phi_thr_copy.o has undefined reference to phi_copy_dwords. nm identifies PhiWeather k17-memc...
 
 ## Cost
 
