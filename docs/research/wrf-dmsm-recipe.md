@@ -1,12 +1,12 @@
 # WRF 4.8.0 dm+sm with GCC-KNC (S12-35)
 
-**Draft: blocked at the image MPI dependency check.** The specified image
-MPI plus `phi_thr_copy.o` does not link alone: that helper calls
-`phi_copy_dwords`, defined by the additional prebuilt
-`$IMAGE/k17-memcpy/copy.o` (where `IMAGE` is
-`/cygdrive/c/Users/xuzhi/Documents/PhiWeather/artifacts/test-state/claude-mentor-performance-20261105`).
-The ticket excludes other hand kernels, so this object has not been added.
-The following records the prepared configuration, not a completed build.
+The primary build uses the three prebuilt MPI inputs authorized in S12-35:
+`mpich-thr/libmpi.a`, `phi_thr_copy.o`, and `k17-memcpy/copy.o`.
+The last object closes the helper's `phi_copy_dwords` dependency; `nm -u`
+confirmed that `copy.o` has no undefined symbols. These are GCC 5.1.1-era
+PhiWeather image objects, excluded from the one-compiler proof for WRF.
+The image additionally wraps `memcpy`/`memmove`; this build does not.
+No `memcpy_wrap.o`, `len_trim_wrap`, or other image kernel is added.
 
 This recipe cross-builds an owned WRF tree on the Windows host using Cygwin.
 PhiWeather can apply its model patches to that tree before building. The
@@ -29,7 +29,8 @@ SHARED=/cygdrive/c/Users/xuzhi/Documents/gcc_knc/.work/_shared
 TRIAL=$SHARED/wrf-trial
 PREFIX=$SHARED/gcc-knc-16.2.0
 MPI=$BOOT/experiments/mpich-nemesis-mmap/4cd8ccceb34a460d8841adf17c0b15b1/prefix
-ITEM21=/cygdrive/c/Users/xuzhi/Documents/PhiWeather/artifacts/test-state/claude-mentor-performance-20261105/sirocco-gf-rlh-c1b2-01/item21
+IMAGE=/cygdrive/c/Users/xuzhi/Documents/PhiWeather/artifacts/test-state/claude-mentor-performance-20261105
+ITEM21=$IMAGE/sirocco-gf-rlh-c1b2-01/item21
 export PATH="$PREFIX/bin:$BOOT/cross/bin:/usr/bin:/bin"
 unset MSYSTEM MSYSTEM_PREFIX MINGW_PREFIX MSYSTEM_CHOST
 export NETCDF="$TRIAL/install" NETCDF_classic=1
@@ -56,12 +57,13 @@ is consumed. This does not make modules from different GFortran versions
 interchangeable.
 
 The primary image MPI is the read-only prebuilt
-`$ITEM21/mpich-thr/libmpi.a` plus `$ITEM21/obj/thr/phi_thr_copy.o`.
-The helper comes from PhiWeather's image and is used by explicit lead
-authorization. No helper source or other PhiWeather model kernel is copied.
+`$ITEM21/mpich-thr/libmpi.a`, `$ITEM21/obj/thr/phi_thr_copy.o`, and
+`$IMAGE/k17-memcpy/copy.o`, in that order after `$MPI/lib/libmpifort.a`.
+The two helpers come from PhiWeather's image and are used read-only by
+explicit lead authorization. No helper source or other model kernel is copied.
 The recorded helper build uses bootstrap GCC 5.1.1 with `-mknc -O1
 -fno-pic -fno-tree-vectorize -std=gnu99 -fopenmp`. Its build notes and the
-reduced link both expose the additional `phi_copy_dwords` dependency.
+reduced link both expose the `phi_copy_dwords` dependency supplied by `copy.o`.
 
 ## Source and export preparation
 
@@ -191,7 +193,7 @@ CC_TOOLS = gcc
 
 
 
-LIB_LOCAL = /cygdrive/c/Users/xuzhi/Documents/PhiWeather/.tools/knc-bootstrap/experiments/mpich-nemesis-mmap/4cd8ccceb34a460d8841adf17c0b15b1/prefix/lib/libmpifort.a /cygdrive/c/Users/xuzhi/Documents/PhiWeather/artifacts/test-state/claude-mentor-performance-20261105/sirocco-gf-rlh-c1b2-01/item21/mpich-thr/libmpi.a /cygdrive/c/Users/xuzhi/Documents/PhiWeather/artifacts/test-state/claude-mentor-performance-20261105/sirocco-gf-rlh-c1b2-01/item21/obj/thr/phi_thr_copy.o -lm -lpthread -lrt
+LIB_LOCAL = /cygdrive/c/Users/xuzhi/Documents/PhiWeather/.tools/knc-bootstrap/experiments/mpich-nemesis-mmap/4cd8ccceb34a460d8841adf17c0b15b1/prefix/lib/libmpifort.a /cygdrive/c/Users/xuzhi/Documents/PhiWeather/artifacts/test-state/claude-mentor-performance-20261105/sirocco-gf-rlh-c1b2-01/item21/mpich-thr/libmpi.a /cygdrive/c/Users/xuzhi/Documents/PhiWeather/artifacts/test-state/claude-mentor-performance-20261105/sirocco-gf-rlh-c1b2-01/item21/obj/thr/phi_thr_copy.o /cygdrive/c/Users/xuzhi/Documents/PhiWeather/artifacts/test-state/claude-mentor-performance-20261105/k17-memcpy/copy.o -lm -lpthread -lrt
 ```
 
 ## Configure and build
@@ -233,7 +235,7 @@ $(LD) -o real.exe $(LDFLAGS) real_em.o ../dyn_em/module_initialize_real.o $(LIBW
 `$(LIB)` ends with the selected MPI libraries. Image MPI tail:
 
 ```sh
-$MPI/lib/libmpifort.a $ITEM21/mpich-thr/libmpi.a $ITEM21/obj/thr/phi_thr_copy.o -lm -lpthread -lrt
+$MPI/lib/libmpifort.a $ITEM21/mpich-thr/libmpi.a $ITEM21/obj/thr/phi_thr_copy.o $IMAGE/k17-memcpy/copy.o -lm -lpthread -lrt
 ```
 
 Original MPI tail (no image helper):
