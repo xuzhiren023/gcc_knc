@@ -128,7 +128,7 @@ Current tickets: `[##################--]` 242 of 268
 | S13-03 | M4 retrospective - what we did wrong, what worked, and the practice changes carried into the next milestone and the agent-team skill | draft |  |
 | S13-04 | Clean source repositories for a fresh build - GCC-KNC fork and project code without build artifacts, plus a Linux-host build recipe the owner runs on the new workstation | draft |  |
 | S13-05 | model-first skill - a project Claude Code skill that models a hot region and its run-time lower bound before any optimization, plus one sourced KNC machine file | Done | The model-first skill (.claude/skills/model-first with formulas, levers and a worked C7 example) and a sour... |
-| S13-06 | knc-twin trial and validation - run the KNC core twin on real GCC-KNC loop output, check it against characterization rows and held-out kernels we already timed, and report what it rejects or gets wrong | In progress | Merged; lead submits. |
+| S13-06 | knc-twin trial and validation - run the KNC core twin on real GCC-KNC loop output, check it against characterization rows and held-out kernels we already timed, and report what it rejects or gets wrong | Waiting for review | Submitted by the lead: one knc-twin (0.2.1) with GCC .s converter, held-out harness (119 characterization r... |
 | S14-01 | 16- and 32-byte GCC generic vectors compile to IMCI in the low lanes of a zmm register, with a by-value ABI, so FFTW's generic-simd128/256 paths run vectorized | draft |  |
 | S14-02 | Software pipelining on KNC - probe whether SMS can run (a KNC counted-loop pattern) and whether it speeds up in-order loops | draft |  |
 | S14-03 | KNC scheduler model completeness - bypasses, folded memory operand cost, pairing by encoding, checked on post-RA schedules | draft |  |
@@ -293,6 +293,7 @@ Current tickets: `[##################--]` 242 of 268
 
 ## Recent activity
 
+- 2026-11-15 16:35 **S13-06** engineer submit: Submitted by the lead: one knc-twin (0.2.1) with GCC .s converter, held-out harness (119 characterization rows, 11 compiled rows, 4 card cases), re...
 - 2026-11-15 16:35 **S13-06** lead answer: Merged; lead submits.
 - 2026-11-15 16:34 **S13-06** lead resume: Lead: knc-twin 0.2.0 (twin session) and this ticket's validation merged on twin/merge-s13-06 by a lead subagent, plus ADR-0013 rewording, labelled ...
 - 2026-11-15 15:45 **S12-09** engineer submit: T0 PASS (59 tests), T1 PASS, T2 retained PASS. Logs: .work/_state/logs/check_gcc16_t0-20261115-151528.log and check_gcc16_t1-20261115-151543.log. E...
@@ -300,7 +301,6 @@ Current tickets: `[##################--]` 242 of 268
 - 2026-11-15 15:37 **S12-09** engineer ask: After the lead merge 4f40bda2, submit refuses: 3190 changed lines (budget 500), 5 new test files (budget 0), and 2887 test lines for 303 code lines...
 - 2026-11-15 15:36 **S12-09** lead answer: Merged; submit.
 - 2026-11-15 15:35 **S12-09** lead resume: Lead merged main into s12/S12-09 (4f40bda2, clean). Submit now with your T0/T1/T2 evidence and the 930529-1 harness note.
-- 2026-11-15 15:33 **S12-09** lead defer: Interactive lead: merge main into s12/S12-09 (main is 74 commits ahead, incl. S13-05 docs/research/knc-machine.yaml and model-first-optimization-me...
 
 ## Cost
 
