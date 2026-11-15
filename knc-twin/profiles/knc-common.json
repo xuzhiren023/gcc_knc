@@ -634,6 +634,24 @@
       "unit": "boolean",
       "status": "documented",
       "source": "R01 TUNE_PREFQ bits (separate enables for non-RFO data reads and RFO/store reads) show the L2 prefetcher tracks store streams"
+    },
+    "pairing.v_jmp_pairs": {
+      "value": false,
+      "unit": "boolean: may an unconditional jmp issue in the V slot",
+      "status": "measured",
+      "source": "S8-01 C10 fixed-direction row: cmp/je, add, jmp cost three issue events per unit (6.22 ticks at one thread), so the jmp did not pair with the add; conditional branches keep the cmp/jcc pairing (R02 p.56)"
+    },
+    "latency.gather_mask_cycles": {
+      "value": null,
+      "unit": "cycles until a gather's completion mask is readable",
+      "status": "unknown",
+      "source": "not documented; derived on the owner's card from gather_all.rt"
+    },
+    "occupancy.gather_unit": {
+      "value": "per_line",
+      "unit": "policy",
+      "status": "assumed",
+      "source": "the gather occupies a gather unit for occupancy.gather_cycles_per_line per distinct line; other instructions of the core keep issuing (S6-03 gather_all.rt: kmov+gather+jknzd fit in 7 ticks)"
     }
   }
 }

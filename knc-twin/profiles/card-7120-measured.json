@@ -14,9 +14,41 @@
     "S8-17 C12: .work/_shared/tmp/claude-s8-17/c12.out (2026-11-08)"
   ],
   "calibration": {
-    "state": "imported_microbenchmarks",
-    "statement": "Single-core instruction latencies, throughputs, cache/memory latencies and a few whole-card bandwidth and barrier figures are imported from native microbenchmarks on this card. No end-to-end kernel prediction of this engine has yet been compared against a native measurement; the held-out validation set is empty. Predictions are therefore model outputs built from measured parameters, not validated predictions.",
-    "held_out_validation_cases": 0
+    "state": "imported_microbenchmarks_with_heldout_check",
+    "statement": "Single-core instruction latencies, throughputs, cache/memory latencies, store costs and a few whole-card figures are imported from native microbenchmarks on this card, and the engine's predictions were compared with 119 measured characterization rows (tests/heldout_native/characterization-run, references/validation.md): held-out median error about 1%, ranking reliability 0.98. No prediction of a compiler-generated region has been compared with a native run of that region; shapes outside validated_shapes are unvalidated_scenario_estimate.",
+    "held_out_validation_cases": 62,
+    "validated_shapes": {
+      "register_vector_chain_l1": {
+        "evidence": "S6-03 vector .lat/.rt rows, swizzles, conversions, C7, C9 register chains at 1/2/4 threads",
+        "median_abs_error_pct": 1.0,
+        "worst_abs_error_pct": 11.0,
+        "note": "L1-resident vector arithmetic with register dependencies, pairing and loop control; worst case vpaddd.rt at two threads (measured 2.32, a flagged row)"
+      },
+      "scalar_mask_l1": {
+        "evidence": "S6-03 scalar_add/xor, kmov/kand/kxor rows, pair.* rows, agi.gap0-4",
+        "median_abs_error_pct": 1.0,
+        "worst_abs_error_pct": 5.0,
+        "note": "scalar integer and mask chains, pairing, address-generation interlock"
+      },
+      "x87_register_chain": {
+        "evidence": "S6-03 x87_add/mul/div .lat/.rt rows",
+        "median_abs_error_pct": 1.0,
+        "worst_abs_error_pct": 3.0,
+        "note": "x87 register chains and the divider occupancy; memory-form x87 chains not separately measured"
+      },
+      "l1_l2_dependent_loads": {
+        "evidence": "S6-03 l1.load_lat/rt, l2.load_lat/rt, memory.load_lat, masked/convert store-reload chains",
+        "median_abs_error_pct": 2.0,
+        "worst_abs_error_pct": 14.0,
+        "note": "pointer chases and independent loads with L1/L2-resident or cold footprints; independent store/reload pairs are over-charged (spill_reload.rt +78%)"
+      },
+      "l1_resident_stores_prefetch_pairing": {
+        "evidence": "S6-03 l1.store_normal, masked_store rows, store_stream rows, C2 prefetch pairing",
+        "median_abs_error_pct": 2.0,
+        "worst_abs_error_pct": 12.0,
+        "note": "stores to resident lines, no-read stores, vprefetch0/1 pairing"
+      }
+    }
   },
   "parameters": {
     "card.model": {
@@ -371,13 +403,22 @@
       "source": "S6-03 l1.store_stream 36.16 per thread at four threads / 4"
     },
     "l2.hw_prefetch_depth_lines": {
-      "value": 8,
+      "value": 16,
       "unit": "lines ahead per confirmed stream",
       "status": "derived",
-      "source": "S6-03 memory.load_rt 37.35 ticks per sequential line at one thread with the hardware prefetcher active; depth chosen so the HWP sub-model reproduces that row (see references/validation.md)",
+      "source": "S6-03 memory.load_rt 37.35 ticks per sequential line at one thread with the hardware prefetcher active: the HWP sub-model reproduces 37.4 with depth 16 (40.2 at 12, 51.4 at 8); at four threads it gives 85.5 against 77.9 (see references/validation.md)",
       "alternatives": [
-        4,
-        16
+        8,
+        24
+      ]
+    },
+    "latency.gather_mask_cycles": {
+      "value": 2,
+      "unit": "cycles",
+      "status": "derived",
+      "source": "S6-03 gather_all.rt 7.08 per kmov/gather/jknzd unit: the completion-mask branch issues long before the 15-cycle data latency; 2 reproduces the row together with the 7-cycle gather unit occupancy",
+      "alternatives": [
+        7
       ]
     }
   }

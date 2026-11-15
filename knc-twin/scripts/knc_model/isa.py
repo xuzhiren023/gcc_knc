@@ -27,7 +27,7 @@ CLASSES = {
     "vector_load":       {"pipes": "U", "latency": "memory", "kind": "load"},
     "vector_store":      {"pipes": "UV", "latency": None, "kind": "store"},
     "vector_packstore":  {"pipes": "UV", "latency": None, "kind": "store"},
-    "vector_gather":     {"pipes": "UV_both", "latency": "gather", "kind": "gather"},
+    "vector_gather":     {"pipes": "U", "latency": "gather", "kind": "gather", "occupancy": "occupancy.gather_cycles_per_line"},
     "vector_scatter":    {"pipes": "UV_both", "latency": None, "kind": "scatter", "occupancy": "occupancy.scatter_cycles_per_line"},
     "prefetch_l1":       {"pipes": "UV", "latency": None, "kind": "prefetch"},
     "prefetch_l2":       {"pipes": "UV", "latency": None, "kind": "prefetch"},

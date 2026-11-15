@@ -92,6 +92,7 @@ class CoreSim(object):
         self.x87_free_at = 0
         self.l2pf_free_at = 0
         self.nr_store_free_at = 0
+        self.gather_free_at = 0
         self.cycle = 0
         self.issue_log = []
         self.branch_sc = kernel.scenario["branch"]
@@ -184,6 +185,8 @@ class CoreSim(object):
             return "resource"
         if insn.op.startswith("vmovnr") and self.nr_store_free_at > now:
             return "resource"
+        if insn.cls == "vector_gather" and self.gather_free_at > now:
+            return "resource"
         touches_l1 = (insn.is_load or insn.is_store or insn.folded_load) and insn.cls not in ("vector_gather", "vector_scatter")
         if touches_l1:
             if l1_used >= self.l1_per_cycle:
@@ -198,12 +201,14 @@ class CoreSim(object):
                 if fills and not self.mem.can_take_fill(now, fills):
                     return "outstanding_limit"
         if insn.cls in ("vector_gather", "vector_scatter"):
-            if l1_used:
+            if l1_used and insn.cls == "vector_scatter":
                 return "l1_port"
             if ev.lines:
                 _, _, fills, _ = self.mem.plan_demand(ev.lines, now, True, insn.cls == "vector_scatter")
-                if fills and not self.mem.can_take_fill(now, fills):
+                if fills and not self.mem.can_take_fill(now, min(fills, self.mem.max_outstanding)):
                     return "outstanding_limit"
+                if fills > self.mem.max_outstanding:
+                    self.assume("a gather/scatter missing on more lines than the outstanding-miss slots is charged all misses in parallel (optimistic by up to one extra latency per window)")
         if insn.cls in ("prefetch_l1", "prefetch_l2") and ev.lines:
             if not self.mem.can_take_fill(now, 1):
                 return "outstanding_limit"
@@ -233,14 +238,15 @@ class CoreSim(object):
             if lines:
                 ready, level = self.mem.commit_demand(lines, now, True, False)
                 extra = max(0, ready - now - self.mem.latency("l1", True))
-            self.core_busy_until = now + per * n
+            self.gather_free_at = now + per * n
             done = now + first + per * (n - 1) + extra
             if extra and self.miss_stalls:
                 cs.stall_until = max(cs.stall_until, done)
             if insn.mask is not None:
-                # the completion mask is final once the gather has issued all its lines; the data comes later (S6-03 gather_all.rt 7 vs .lat 15)
-                cs.reg_ready[insn.mask.base] = now + per * n
+                # the completion mask is readable long before the data (S6-03 gather_all.rt 7 vs .lat 15)
+                cs.reg_ready[insn.mask.base] = now + self._param("latency.gather_mask_cycles") + (per * (n - 1) if n > 1 else 0)
                 cs.reg_written_at[insn.mask.base] = now
+            self.assume("a gather occupies the gather unit for occupancy.gather_cycles_per_line per distinct line while other instructions keep issuing; its data is ready after latency.gather_first_line plus per-line occupancy")
         elif cls == "vector_scatter":
             lines = ev.lines if ev.lines else ()
             n = max(1, len(lines))
@@ -271,7 +277,7 @@ class CoreSim(object):
                     self.mem.line_store_ready[la] = now + (self._param("latency.store_to_load_same_line") if self.p.has("latency.store_to_load_same_line") else 1)
                 done = now
                 if ngo:
-                    stall = self._param("store.nr_stall_cycles_resident") if level == "l1" else self._param("store.nr_stall_cycles_memory")
+                    stall = self._param("store.nr_stall_cycles_resident") if level in ("l1", "l2") else self._param("store.nr_stall_cycles_memory")
                     self.nr_store_free_at = now + self._param("store.nr_occupancy_core_cycles")
                     cs.stall_until = max(cs.stall_until, now + stall)
                     done = now + stall
@@ -334,8 +340,8 @@ class CoreSim(object):
 
     def _mispredicted(self, cs, ev):
         t = self.branch_sc["type"]
-        if t == "all_predicted":
-            return False
+        if t == "all_predicted" or ev.insn.op == "jmp":
+            return False  # an unconditional jump has no direction to mispredict
         if t == "all_mispredicted":
             return True
         if t == "ids_mispredicted":
@@ -349,6 +355,8 @@ class CoreSim(object):
         if u.is_branch and not self.p.get("pairing.u_instruction_can_be_branch"):
             return False
         if u.op == "nop" and not self.p.get("pairing.u_nop_pairs"):
+            return False
+        if v.op == "jmp" and not self.p.get("pairing.v_jmp_pairs"):
             return False
         if v.cls not in self.v_eligible:
             return False

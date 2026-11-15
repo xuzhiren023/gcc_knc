@@ -1,0 +1,106 @@
+{
+  "baseline": "knc-switch-off",
+  "candidates": [
+    {
+      "coverage": {
+        "functional": true,
+        "isa": true,
+        "parser": true,
+        "timing": true
+      },
+      "description": "GCC 5.1.1 donor, -O2",
+      "kernel": "donor-off.json",
+      "name": "donor-off",
+      "shape": "x87_csr_spmv_rows_l1_resident"
+    },
+    {
+      "coverage": {
+        "functional": true,
+        "isa": true,
+        "parser": true,
+        "timing": true
+      },
+      "description": "GCC-KNC -O2 -march=knc, S12-30 switch off",
+      "kernel": "knc-switch-off.json",
+      "name": "knc-switch-off",
+      "shape": "x87_csr_spmv_rows_l1_resident"
+    },
+    {
+      "coverage": {
+        "functional": true,
+        "isa": true,
+        "parser": true,
+        "timing": true
+      },
+      "description": "GCC-KNC, S12-30 switch on",
+      "kernel": "knc-switch-on.json",
+      "name": "knc-switch-on",
+      "shape": "x87_csr_spmv_rows_l1_resident"
+    },
+    {
+      "coverage": {
+        "functional": true,
+        "isa": true,
+        "parser": true,
+        "timing": true
+      },
+      "description": "GCC-KNC, switch on, contraction fast",
+      "kernel": "knc-switch-on-contract-fast.json",
+      "name": "knc-switch-on-contract-fast",
+      "shape": "x87_csr_spmv_rows_l1_resident"
+    },
+    {
+      "coverage": {
+        "functional": true,
+        "isa": true,
+        "parser": true,
+        "timing": true
+      },
+      "description": "GCC-KNC, switch on, min4 policy",
+      "kernel": "knc-switch-on-min4.json",
+      "name": "knc-switch-on-min4",
+      "shape": "x87_csr_spmv_rows_l1_resident"
+    },
+    {
+      "coverage": {
+        "functional": true,
+        "isa": true,
+        "parser": true,
+        "timing": true
+      },
+      "description": "GCC-KNC, hand-written policy",
+      "kernel": "knc-handwritten-policy.json",
+      "name": "knc-handwritten-policy",
+      "shape": "x87_csr_spmv_rows_l1_resident"
+    },
+    {
+      "coverage": {
+        "functional": true,
+        "isa": true,
+        "parser": true,
+        "timing": true
+      },
+      "description": "GCC-KNC, switch off, two nests",
+      "kernel": "knc-switch-off-two-nests.json",
+      "name": "knc-switch-off-two-nests",
+      "shape": "x87_csr_spmv_rows_l1_resident"
+    }
+  ],
+  "frozen_profile_hash": "ad82d111c1f87a406d95ed7407b12b900a3585bf73e053209632c151d7c1bb96",
+  "measured_seconds_per_call": {
+    "donor-off": 6.749e-06,
+    "knc-switch-off": 6.853e-06,
+    "knc-switch-off-two-nests": 6.69e-06,
+    "knc-switch-on": 6.85e-06
+  },
+  "name": "S12-30 gate CSR SpMV variants (small CSR n=13 rows=32), warm L1, one call",
+  "not_convertible": [],
+  "notes": [
+    "the input is deterministic (seed 12345) integer-valued data so the expected y is exact under any accumulation order",
+    "measured values are the card's S12-30 gate medians for the same case shape, not for this exact input; they rank the variants within 2.5%"
+  ],
+  "profile": "card-7120-measured",
+  "queue_uncertain": true,
+  "schema": "knc-twin.batch/1",
+  "too_close_fraction": 0.05
+}

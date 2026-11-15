@@ -195,6 +195,11 @@
       "value": 9,
       "unit": "cycles",
       "status": "synthetic"
+    },
+    "latency.gather_mask_cycles": {
+      "value": 2,
+      "unit": "cycles",
+      "status": "synthetic"
     }
   }
 }

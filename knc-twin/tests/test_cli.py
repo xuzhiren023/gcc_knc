@@ -176,5 +176,53 @@ class TestCLI(unittest.TestCase):
         self.assertIn("not empty", p.stderr)
 
 
+class TestBatchAndAdapter(unittest.TestCase):
+    def test_batch_ranks_and_queues(self):
+        rc, res, out, p = run("batch", helpers.fixture(os.path.join("batch", "manifest.json")))
+        self.assertEqual(rc, 0, p.stderr + p.stdout[-800:])
+        pred = res["prediction"]
+        self.assertEqual(pred["kind"], "batch_ranking")
+        self.assertEqual(len(pred["ranking"]), 7)
+        self.assertEqual(pred["ranking"][0], "donor-off")
+        self.assertTrue(all(c["result_class"] == "unvalidated_scenario_estimate" for c in pred["candidates"]))
+        self.assertTrue(all(c["uncertain"] for c in pred["candidates"]), "every variant is within 5% of the baseline or has unvalidated memory behaviour")
+        self.assertEqual(len(pred["queued_for_native"]), 7)
+        self.assertTrue(os.path.exists(os.path.join(out, "queue", "knc-switch-off", "request.json")))
+        self.assertTrue(os.path.exists(os.path.join(out, "batch.md")))
+
+    def test_batch_refuses_changed_profile(self):
+        import tempfile as _tf
+        with open(helpers.fixture(os.path.join("batch", "manifest.json")), encoding="utf-8") as f:
+            man = json.load(f)
+        man["frozen_profile_hash"] = "0" * 64
+        d = _tf.mkdtemp()
+        mp = os.path.join(d, "manifest.json")
+        for c in man["candidates"]:
+            c["kernel"] = os.path.join(helpers.FIXTURES, "batch", c["kernel"])
+        with open(mp, "w", encoding="utf-8") as f:
+            json.dump(man, f)
+        rc, res, out, p = run("batch", mp)
+        self.assertEqual(rc, 2)
+        self.assertEqual(res["status"], "invalid_input")
+
+    def test_adapter_cli(self):
+        import tempfile as _tf
+        d = _tf.mkdtemp()
+        out = os.path.join(d, "k.json")
+        p = subprocess.run([sys.executable, os.path.join(helpers.SCRIPTS, "from_gcc_s.py"), os.path.join(helpers.FIXTURES, "gcc", "x87test.s"),
+                            "--function", "g", "--init", os.path.join(helpers.FIXTURES, "gcc", "g_init.json"), "--out", out],
+                           stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True)
+        self.assertEqual(p.returncode, 0, p.stderr)
+        self.assertTrue(os.path.exists(out) and os.path.exists(os.path.join(d, "k.coverage.json")))
+        rc, res, out2, p2 = run("simulate", out)
+        self.assertEqual(rc, 0, p2.stderr)
+        self.assertEqual(res["functional_check"]["status"], "ok")
+        self.assertEqual(res["prediction"]["result_class"]["class"], "unvalidated_scenario_estimate")
+        p = subprocess.run([sys.executable, os.path.join(helpers.SCRIPTS, "from_gcc_s.py"), os.path.join(helpers.FIXTURES, "gcc", "s12-30-compiler-knc.s"), "--audit"],
+                           stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True)
+        self.assertEqual(p.returncode, 0, p.stderr)
+        self.assertIn("knc_csr_raw", p.stdout)
+
+
 if __name__ == "__main__":
     unittest.main()

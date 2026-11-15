@@ -111,6 +111,10 @@ class MemoryModel(object):
                 entries = profile.get("tlb.l1_entries_4k") if self.page == 4096 else profile.get("tlb.l1_entries_2m")
                 self.tlb = LRU(entries)
                 self.tlb_penalty = profile.get("tlb.l1_miss_penalty_cycles")
+                # warm ranges are resident data: their pages are in the TLB too (up to its capacity)
+                for rng in self.sc.get("warm", []):
+                    for pg in range(rng["start"] // self.page, (rng["end"] - 1) // self.page + 1):
+                        self.tlb.touch(pg)
                 self.submodels.append("tlb")
                 assume("TLB sub-model: %d-entry fully associative LRU first-level DTLB for %d-byte pages; a miss adds %d cycles; second-level TLB reach and page walks are not modeled" % (entries, self.page, self.tlb_penalty))
             else:
@@ -284,7 +288,11 @@ class MemoryModel(object):
         if self.type == "line_tracking":
             for la in lines:
                 if ngo and self.l1.lookup(la, touch=False) is None:
-                    continue  # no-read store: no fill
+                    # no-read store: no L1 fill; a non-resident line is left in L2 after the write (assumed: the store
+                    # path writes through the L2, which is what makes later NR stores to a small footprint cheap)
+                    if self.l2.lookup(la) is None:
+                        self.l2.insert(la, now + self.p.get("store.nr_stall_cycles_memory"))
+                    continue
                 arr1 = self.l1.lookup(la)
                 if arr1 is None:
                     arr2 = self.l2.lookup(la)

@@ -64,6 +64,7 @@ CALIBRATION_ROWS = {
     "masked_load.lat": "latency.vector_load_merge_l1", "convert_up.lat": "latency.vector_load_merge_l1",
     "agi.gap1": "pairing.u_nop_pairs", "agi.gap2": "pairing.u_nop_pairs", "agi.gap3": "pairing.u_nop_pairs", "agi.gap4": "pairing.u_nop_pairs",
     "unpack.lat": "model rule: vloadunpack halves do not serialize on the destination merge",
+    "c10.branch.fixed": "pairing.v_jmp_pairs", "l1.store_stream": "store.nr_stall_cycles_resident / store.nr_occupancy_core_cycles / NR residency rule",
     "gather_all.rt": "occupancy.gather_cycles_per_line / model rule: completion mask ready after the occupancy",
 }
 
@@ -206,21 +207,27 @@ def main(argv=None):
                 print("%-28s %s" % (name, row["message"][:100]), flush=True)
                 continue
             memory_kind = test["kind"] in (1, 2, 3) or name.startswith(("c1.", "c4.", "c5.", "l1.", "l2.", "memory."))
+            row_a = json.loads(json.dumps(scen_a))
+            row_b = json.loads(json.dumps(scen_b))
             if name.startswith("c10."):
-                scen_a = dict(scen_a, branch={"type": "all_predicted" if name.endswith("fixed") else "exit_mispredicted"})
-            scenarios = [("A", scen_a)] + ([("B_hwp", scen_b)] if memory_kind else [])
+                # fixed direction: predicted; pseudorandom direction bits: every branch charged the measured penalty
+                row_a["branch"] = {"type": "all_predicted" if name.endswith("fixed") else "all_mispredicted"}
+            scenarios = [("A", row_a)] + ([("B_hwp", row_b)] if memory_kind else [])
             for t in threads:
                 if t not in (1, 2, 4):
                     continue
                 # rounds: enough to warm a cache-resident footprint before the measured slope; cold for memory-sized ones
                 fp = budget(name, test["core_bytes"], t)
-                if memory_kind and fp < (1 << 20):
-                    warm = -(-fp // 64 // 32)
-                    rr1, rr2 = warm + 2, warm + 6
-                else:
-                    rr1, rr2 = r1, r2
+                # the driver measures a warm steady state: declare footprints that fit a cache level as resident there
+                total = fp * t
+                warm_level = "l1" if total <= profile.get("l1.size_bytes") else ("l2" if total <= profile.get("l2.size_bytes") else None)
+                rr1, rr2 = r1, r2
                 row.setdefault("rounds", {})["threads_%d" % t] = [rr1, rr2]
+                row.setdefault("warm", {})["threads_%d" % t] = warm_level
                 for label, sc in scenarios:
+                    sc = json.loads(json.dumps(sc))
+                    if warm_level:
+                        sc["memory"]["warm"] = [{"start": "0x%x" % (BUF_BASE + c * BUF_STRIDE), "end": "0x%x" % (BUF_BASE + c * BUF_STRIDE + fp), "level": warm_level} for c in range(t)]
                     c1, res1, _ = run_case(kernel_dict, test, profile, t, rr1, sc, args.max_seconds)
                     c2, res2, assumptions = run_case(kernel_dict, test, profile, t, rr2, sc, args.max_seconds)
                     per_unit = (c2 - c1) / float((rr2 - rr1) * 32)
@@ -301,6 +308,7 @@ def summarize(rows, threads, profile, args):
             "ranking": {"pairs_agree": agree_total, "pairs_total": agree_total + disagree_total,
                         "reliability": round(agree_total / float(agree_total + disagree_total), 3) if agree_total + disagree_total else None, "groups": ranking},
             "notes": ["predicted = slope of completion cycles between %s and %s rounds, divided by 32 units per round; TSC ticks and core cycles are treated as equal (0.5%% difference on this card)" % (args.rounds.split(",")[0], args.rounds.split(",")[1]),
+                      "footprints that fit L1 (L2) with all active threads are declared warm in L1 (L2) because the driver measures a warm steady state; larger footprints start cold",
                       "the kernel catalog was regenerated from tests/bench/knc-char/kernels.py; S8-07 additions shift kernel indices but the measured S6-03 bodies are the same templates",
                       "calibration rows set a parameter of the profile and are excluded from the held-out statistics",
                       "every prediction is a model output; the measured column is native"]}

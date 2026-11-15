@@ -1,15 +1,14 @@
 # Test results, knc-twin 0.1.0
 
-Actual run of `python scripts/knc_twin.py selftest` on 2026-11-15T18:18:14Z (host: Windows 10, Python 3.8.5). 72 tests, 0 failures, 0 errors, 0 skipped.
+Actual run of `python scripts/knc_twin.py selftest` on 2026-11-15T20:27:59Z (host: Windows 10, Python 3.8.5). 95 tests, 0 failures, 0 errors, 0 skipped.
 
-These are synthetic model tests (the engine behaves as specified) plus checks against independent oracles
-(binary64 double-rounding oracle for binary32 add/sub/mul, Python binary64 for f64, hand-derived FMA/rounding/
-special-value vectors, Python integers for integer semantics, hand-derived bounds). They are not validation against
-hardware: `tests/heldout_native/` is empty and `card-7120-measured` says `held_out_validation_cases: 0`.
+Synthetic model tests plus checks against independent oracles (binary64 double-rounding oracle for binary32 add/sub/mul,
+Python binary64 for f64, hand-derived FMA/rounding/special-value/x87 vectors, GCC-KNC's own output for the x87 operand
+conventions, hand-computed results for the compiled fixtures, Python integers for integer semantics, hand-derived bounds).
+They are not validation against hardware; that is `references/validation.md` (held-out comparison with 119 measured rows).
 
-The example suite (`examples/run_examples.py`, results in `examples/RESULTS.md`) ran 31 commands: 24 with status ok and
-7 that exercise the explicit non-ok statuses (functional_mismatch, needs_parameters, unsupported, missing_parameter x2,
-budget_exhausted, incompatible), each with the matching exit code.
+The example suite (`examples/run_examples.py`, results in `examples/RESULTS.md`) covers every command on the fixtures,
+the compiled GCC-KNC functions and the S12-30 gate batch, with the intended non-ok statuses and exit codes.
 
 ## test_asm (4)
 
@@ -30,8 +29,11 @@ budget_exhausted, incompatible), each with the matching exit code.
 - TestTraceBounds.test_critical_path_term: ok
 - TestTraceBounds.test_issue_and_spacing_terms: ok
 
-## test_cli (11)
+## test_cli (14)
 
+- TestBatchAndAdapter.test_adapter_cli: ok
+- TestBatchAndAdapter.test_batch_ranks_and_queues: ok
+- TestBatchAndAdapter.test_batch_refuses_changed_profile: ok
 - TestCLI.test_analytic_scales: ok
 - TestCLI.test_bounds_loop_and_search: ok
 - TestCLI.test_capabilities: ok
@@ -43,6 +45,29 @@ budget_exhausted, incompatible), each with the matching exit code.
 - TestCLI.test_statuses_and_exit_codes: ok
 - TestCLI.test_synthetic_profile_is_labeled: ok
 - TestCLI.test_validate_and_result_fields: ok
+
+## test_extended (20)
+
+- TestCompiledFunctions.test_adapter_audit_reports_blockers: ok
+- TestCompiledFunctions.test_adapter_regenerates_the_fixture: ok
+- TestCompiledFunctions.test_scalar_integer_loop: ok
+- TestCompiledFunctions.test_x87_double_function: ok
+- TestCompiledFunctions.test_x87_float_dot_product_loop: ok
+- TestMemorySubmodels.test_hardware_prefetcher_hides_sequential_misses: ok
+- TestMemorySubmodels.test_memory_service_spaces_fills: ok
+- TestMemorySubmodels.test_result_class_labels: ok
+- TestMemorySubmodels.test_tlb_penalty_after_64_pages: ok
+- TestVectorForms.test_byte_registers_and_partial_writes: ok
+- TestVectorForms.test_memory_destination_rmw_and_setcc: ok
+- TestVectorForms.test_scatter_semantics_and_missing_occupancy: ok
+- TestVectorForms.test_swizzle_semantics_and_latency: ok
+- TestVectorForms.test_unpack_pack_round_trip_unaligned: ok
+- TestVectorForms.test_up_and_down_conversion: ok
+- TestX87Semantics.test_att_subtraction_forms: ok
+- TestX87Semantics.test_control_word_rounding_and_fistp: ok
+- TestX87Semantics.test_extended_precision_and_rounding_on_store: ok
+- TestX87Semantics.test_fcom_fnstsw_pattern: ok
+- TestX87Semantics.test_sqrt_and_stack_errors: ok
 
 ## test_fp (13)
 
@@ -105,15 +130,16 @@ budget_exhausted, incompatible), each with the matching exit code.
 
 | topic | tests |
 |---|---|
-| producer-to-consumer latency | test_timing.TestLatencyAndSpacing.test_producer_consumer_latency; test_bounds critical path |
+| producer-to-consumer latency | test_timing.TestLatencyAndSpacing.test_producer_consumer_latency; test_bounds critical path; test_extended swizzle latency |
 | per-context issue-spacing | test_independent_ops_one_context_every_other_cycle; test_two_contexts_fill_every_cycle |
 | progress by other eligible contexts | test_stalled_context_lets_others_progress; test_four_contexts_round_robin |
-| legal and illegal pairing | TestPairing (vector+scalar, vector+vector, RAW inside a pair, cmp/jcc exception, encoding hint, gather both pipes) |
-| demand-miss stalls vs prefetch | TestMemory.test_demand_miss_stalls_context, test_prefetch_is_nonblocking_and_hides_latency, test_outstanding_miss_limit, test_fixed_level_l2 |
-| arithmetic and mask edge cases | test_fp (oracle, FMA, directed rounding, zero sign, inf/NaN, subnormal FTZ/DAZ, conversions, compare); test_functional (flags, inc/dec CF, shifts, imul, kortest, masked merge, gather, conversions) |
-| deliberately incorrect candidates | test_functional.test_deliberately_wrong_candidate_is_caught; test_cli statuses (functional_mismatch, exit 6, no prediction reported) |
-| unknown instructions, missing parameters | test_unknown_instruction_rejected_at_load; test_missing_parameter_is_explicit; test_cli statuses (unsupported 3, missing_parameter 4, needs_parameters 7) |
-| deterministic results | test_deterministic (identical result and issue log across runs) |
+| legal and illegal pairing | TestPairing (vector+scalar, vector+vector, RAW inside a pair, cmp/jcc exception, encoding hint, gather) |
+| demand-miss stalls vs prefetch | TestMemory (demand miss, prefetch nonblocking, outstanding limit, fixed-level L2); TestMemorySubmodels (TLB, hardware prefetcher, memory service) |
+| arithmetic and mask edge cases | test_fp (oracles, FMA, rounding, zero sign, inf/NaN, subnormal FTZ/DAZ, conversions, compare, sqrt, f16/f80); test_functional; test_extended (x87 forms, swizzles, unpack, conversions, scatter, byte registers, RMW) |
+| deliberately incorrect candidates | test_deliberately_wrong_candidate_is_caught; test_cli statuses (functional_mismatch, exit 6, no prediction reported) |
+| unknown instructions, missing parameters | test_unknown_instruction_rejected_at_load; test_missing_parameter_is_explicit; scatter/fsqrt missing parameters; test_cli statuses |
+| deterministic results | test_deterministic |
 | bounded execution, explicit timeout | test_cycle_budget_reports_partial; test_cli budget_exhausted (cycles and steps), partial block |
-| independent concurrent runs | test_concurrent_runs_share_no_state (ThreadPoolExecutor, 12 runs vs serial) |
-| bounds with known answers | test_bounds (RecMII 4 for one accumulator, ResMII 6 for two, spacing bound 11 met exactly, critical path 12, bound <= simulation on every fixture, exhaustive search finds the known optimum) |
+| independent concurrent runs | test_concurrent_runs_share_no_state |
+| bound calculations with known answers | test_bounds (RecMII 4, ResMII 6, spacing bound met, critical path, bound <= simulation, exhaustive search optimum) |
+| compiler output, batch, result classes | test_extended.TestCompiledFunctions (adapter, audit); test_cli.TestBatchAndAdapter (batch ranking, frozen hash, queue requests, adapter CLI); test_result_class_labels |
