@@ -4,6 +4,8 @@
 Usage: python tools/knc_lint FILE [...]
 Exit 0: no violations, 1: forbidden instructions, 2: input/tool error.
 Assembly is checked before assembly, then decoded just like binary inputs.
+The KNC binutils are <toolchain>/cross/bin/k1om-mpss-linux-{as,objdump}, with or without .exe.
+<toolchain> is $KNC_TOOLCHAIN if set, else the manifest root (.work/_shared/toolchain).
 The deny list is deliberately also applied after --march=k1om assembly:
 binutils 2.22 accepts f3 90 (pause, also spelled repz nop).
 """
@@ -107,8 +109,14 @@ def decoded_violations(path, objdump, env, display=None):
             raise ValueError('%s: objdump failed: %s' % (display, errors.read().strip()))
 
 
+def tool(toolchain, name):
+    """TOOLCHAIN's cross/bin/k1om-mpss-linux-NAME: the .exe on Windows hosts, else the plain name."""
+    path = toolchain / 'cross/bin' / ('k1om-mpss-linux-' + name)
+    return path.with_name(path.name + '.exe') if path.with_name(path.name + '.exe').is_file() else path
+
+
 def lint(path, toolchain, env):
-    objdump = toolchain / 'cross/bin/k1om-mpss-linux-objdump.exe'
+    objdump = tool(toolchain, 'objdump')
     if path.suffix.lower() != '.s':
         yield from decoded_violations(path, objdump, env)
         return
@@ -118,7 +126,7 @@ def lint(path, toolchain, env):
         return
     with tempfile.TemporaryDirectory() as directory:
         obj = Path(directory) / 'input.o'
-        result = subprocess.run([str(toolchain / 'cross/bin/k1om-mpss-linux-as.exe'),
+        result = subprocess.run([str(tool(toolchain, 'as')),
                                  '-march=k1om', str(path), '-o', str(obj)], env=env,
                                 stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
                                 universal_newlines=True, errors='replace')
@@ -134,7 +142,7 @@ def main():
     checkout = Path(__file__).resolve().parents[1]
     project = checkout.parent.parent if checkout.parent.name == '.work' else checkout
     manifest = json.loads((checkout / 'toolchain/manifest.json').read_text())
-    toolchain = project / manifest['root']
+    toolchain = Path(os.environ.get('KNC_TOOLCHAIN') or project / manifest['root'])
     env = os.environ.copy()
     env['PATH'] = os.pathsep.join(str(toolchain / p) for p in ('cross/bin', 'cygwin/bin')) + os.pathsep + env.get('PATH', '')
     status = 0

@@ -5,7 +5,8 @@ import subprocess
 import time
 
 
-shared = Path('/cygdrive/c/Users/xuzhi/Documents/gcc_knc/.work/_shared')
+# The shared build area of the checkout that holds this script (run under Cygwin's python3).
+shared = Path(__file__).resolve().parents[1] / '.work/_shared'
 source = shared / 'gcc'
 build = shared / 'gcc-build'
 os.environ['PATH'] = '/usr/bin:/bin'
