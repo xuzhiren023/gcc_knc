@@ -29,6 +29,8 @@ PACKED = re.compile(r'\bv(?:addn?|subr?|mul|div|max|min|sqrt|rcp(?:23)?|rsqrt(?:
 # Each entry supplies its CLI help and handlers for the tiers it selects.
 # Imports stay lazy so T0 and source-only selections need no probe modules.
 SELECTIONS = {
+    'neg_induction': ('S12-24 sign-alternating induction with a vector epilogue', {
+        't1': lambda runner: runner.t1_sources([runner.source_dir / 'knc-vec-neg-induction.c'])}),
     'complex_broadcast_align': ('S12-29 complex-float broadcast memory alignment', {
         't1': lambda runner: runner.t1_sources([runner.source_dir / 'knc-complex-broadcast-align.c'])}),
     'stencil_reload': ('S11-27 Fortran stencil reload scratch bounds', {
