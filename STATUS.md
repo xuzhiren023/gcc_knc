@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-14 20:48.
+Updated automatically at every ticket change. Last update: 2026-11-14 20:50.
 
-**Next: GPT-6.1, on S12-21 (Scheduling model for M4's serial runs - measure density-1 tuning and the integer-multiply cost against today's density-4 defaults (S12-14 B02, B04, B05)).** Run `python tools/dispatch.py`, or ask the tech lead to.
+**Next: the tech lead, on S12-21.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[##################--]` 230 of 244
 
@@ -101,7 +101,7 @@ Current tickets: `[##################--]` 230 of 244
 | S12-18 | Double-precision vector exp, log and pow ran slower than scalar libm on the card (0.82x, 0.63x, 0.49x) - confirm with valid batches, then fix the library or stop the vectorizer calling them where they lose | Done | The vector math benchmark now always times valid 50-200 ms batches, and the valid card runs show double exp... |
 | S12-19 | Profile-guided missed-vectorization triage - join hot loops with the vectorizer's reasons and observed strides/masks, so tuning targets what is hot and fixable | Done | tools/vec_triage.py now ranks each development program's hot loops by sampled time with GCC's vectorizer ve... |
 | S12-20 | libknc_vmath accuracy and exception contract, with an independent validation design (rounding modes, special values, flags, scalar fallback) | draft |  |
-| S12-21 | Scheduling model for M4's serial runs - measure density-1 tuning and the integer-multiply cost against today's density-4 defaults (S12-14 B02, B04, B05) | In progress | Phase-2 red approved: tests/t1/knc-imul-cost.c fails on today's compiler only because x*123 (32- and 64-bit... |
+| S12-21 | Scheduling model for M4's serial runs - measure density-1 tuning and the integer-multiply cost against today's density-4 defaults (S12-14 B02, B04, B05) | Question for the tech lead | GCC build needed at 1a4f5aab0a2 (lane gcc2). Approved red followed by KNC-only multiply costs 10 for QI/HI/... |
 | S12-22 | Low-risk corrections from the S12-14 audit - wrong comments and citations (N01-N09) and the far-prefetch-distance range bug (B10) | Done | The audit's comment and citation fixes are in GCC-KNC and the far prefetch distance can no longer be set eq... |
 | S12-23 | Floating-point environment correctness on KNC - fix the underflow probe that cannot tell flushing from rounding, and handle x87 erratum CD28 (S12-14 N06, N07, B16, B17) | Done | GCC-KNC's floating-point environment handling is now correct on the card: x87 exception clearing uses the C... |
 | S12-24 | ICE in vect_transform_stmt (tree-vect-stmts.cc:13381) on WRF's REMEZ at -mphinix (-O3 -march=knc) | In progress |  |
@@ -269,6 +269,7 @@ Current tickets: `[##################--]` 230 of 244
 
 ## Recent activity
 
+- 2026-11-14 20:50 **S12-21** engineer ask: GCC build needed at 1a4f5aab0a2 (lane gcc2). Approved red followed by KNC-only multiply costs 10 for QI/HI/SI/DI and 20 for TI, based on R02 p.56 a...
 - 2026-11-14 20:48 **S12-29** lead approve: The pr38969 crash from S11-27 is fixed: GCC-KNC no longer broadcasts a vector from memory aligned below its element size (alignment-checked predica...
 - 2026-11-14 20:48 **S12-21** lead approve-red: Phase-2 red approved: tests/t1/knc-imul-cost.c fails on today's compiler only because x*123 (32- and 64-bit) is still emitted as IMUL under the 3-c...
 - 2026-11-14 20:38 **S12-21** engineer red: Phase-two red at 8aed9208: added T1 unsigned 32/64-bit multiply-by-123 cost-decision test and --imul-cost selection. On lane gcc2, tools/run.py --n...
@@ -276,13 +277,12 @@ Current tickets: `[##################--]` 230 of 244
 - 2026-11-14 20:28 **S12-07** engineer submit: Lead-authorized phase-1 premise-failure closure, 9cef3599; docs/research/s12-07-sparse.md records all 168 timings. Prior host build/lint PASS; lead...
 - 2026-11-14 20:27 **S12-21** lead answer: Go to phase 2 on lane gcc2 per the resume note.
 - 2026-11-14 20:27 **S12-21** lead resume: Lead: phase 1 accepted (window 2 timings were uncontended: PhiWeather ended 00:34:37Z, S12-21 ran 00:35:40Z-01:05:01Z alone; claude-turn-s12-w2 is ...
-- 2026-11-14 20:26 **S12-07** lead answer: Submit the closure.
 
 ## Cost
 
 - From the script, engineer: 650 sessions, 1280.2M input tokens
 - From the script, lead: 428 sessions, 119.2M input tokens
-- Started by hand, Claude: 12 sessions, 3348.9M input tokens
+- Started by hand, Claude: 12 sessions, 3350.4M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
