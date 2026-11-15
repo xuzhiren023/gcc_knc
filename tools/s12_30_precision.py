@@ -250,6 +250,7 @@ def t1(runner):
                      '-fprefetch-loop-arrays'], True),
             ('fast', ['-O2', '-ffp-contract=fast', enabled,
                       '-fprefetch-loop-arrays'], True),
+            ('min4', ['-O2', '-ffp-contract=off', MIN_TRIPS + '4'], True),
             ('size', ['-Os', '-ffp-contract=off', enabled], False)):
         asm = OUT / ('phase2-' + mode + '.s')
         dump = OUT / ('phase2-' + mode + '.optimized')
@@ -328,6 +329,15 @@ def t1(runner):
                 bounds_graph = Gimple(bounds_bodies.get(name, ''))
                 if 'disabled' not in counts or counts[mode][name] <= counts['disabled'][name]:
                     errors.append('vprefetch count must exceed switch-off with stream hints on')
+                # The hinted arm is chosen at run time from a locality
+                # sample (one FP64 line apart), never from the count alone.
+                if not re.search(r'Bounded indirect prefetch in loop \d+: [^\n]*'
+                                 r'locality sample of 3, more than 8 apart',
+                                 bounds_bodies.get(name, '')):
+                    errors.append('hinted arm lacks the locality sample')
+                if mode == 'min4' and (default_assembly is None
+                                       or assembly[name] == default_assembly[name]):
+                    errors.append('row cutoff parameter has no effect')
                 if name in ('sparse_rows', 'sparse_hpcg'):
                     if not bounds_graph.cross_row('csr' if name == 'sparse_rows' else 'hpcg'):
                         errors.append('hinted index lacks a dominating later-row bound')
@@ -626,7 +636,8 @@ def hpcg_shapes_t1():
         print(('FAIL' if errors else 'PASS'), stem, 'explicit_struct', '; '.join(errors), flush=True)
         for name in names:
             body = bodies[name]
-            cross_row = bool(re.search(r'Bounded indirect prefetch in loop \d+: next-row pointers', body))
+            cross_row = bool(re.search(r'Bounded indirect prefetch in loop \d+: next-row pointers'
+                                       r'[^\n]*locality sample of 3, more than 8 apart', body))
             indirect = bool(Gimple(body).indirect())
             fold = r'\bfadd\w*\b' if name.endswith('spmv') else r'\bfsub\w*\b'
             errors = []
