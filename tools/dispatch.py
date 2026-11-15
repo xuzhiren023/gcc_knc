@@ -9,6 +9,7 @@ when a ticket needs the owner, or at --max-sessions.
     python tools/dispatch.py --max-sessions 6
 """
 import argparse
+import contextlib
 import datetime
 import glob
 import json
@@ -114,8 +115,10 @@ def lead_command(board, ticket):
     state = ticket.state
     prompt = LEAD_PROMPT.format(id=ticket.id, state=state, branch=ticket.fields.get("branch", ""),
                                 task=LEAD_TASKS[state])
+    # Owner, 2026-11-14: scripted lead sessions (answers, reviews) use the policy's lead_model, Fable when it has budget.
+    model = board.policy.get("lead_model") or "opus"
     return [claude, "-p", prompt, "--output-format", "json", "--no-session-persistence",
-            "--model", "opus", "--effort", board.budget(ticket)["effort"],
+            "--model", model, "--effort", board.budget(ticket)["effort"],
             "--allowedTools", "Read,Grep,Glob,Bash(git log*),Bash(git diff*),Bash(git show*),"
             "Bash(git -C .work/_shared/gcc log*),Bash(git -C .work/_shared/gcc diff*),"
             "Bash(git -C .work/_shared/gcc show*),Bash(python tools/pm.py*)"]
@@ -293,14 +296,44 @@ def run_session(board, ticket, role, dry_run):
     return True
 
 
-def main(argv=None):
-    parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    parser.add_argument("--max-sessions", type=int, default=4)
-    parser.add_argument("--dry-run", action="store_true")
-    # One dispatcher per lane may run at once: gcc tickets share the GCC checkout, tools tickets do not.
-    parser.add_argument("--lane", help="gcc, tools, or any research lane named on tickets")
-    args = parser.parse_args(argv)
-    board = pm.Board()
+@contextlib.contextmanager
+def lane_lock(board, lane):
+    """Keep one dispatcher per lane; an unfiltered dispatcher holds every lane."""
+    state = board.state_dir()
+    name = 'all' if lane is None else lane.encode('utf8').hex()
+    path = os.path.join(state, 'dispatch-%s.lock' % name)
+    acquired = False
+    try:
+        # Serialize create/reclaim/release so two contenders cannot both remove a
+        # dead holder's file and accidentally replace a newly acquired lock.
+        with pm.board_lock(board.root):
+            candidates = (glob.glob(os.path.join(state, 'dispatch-*.lock')) if lane is None
+                          else [path, os.path.join(state, 'dispatch-all.lock')])
+            for candidate in candidates:
+                if not os.path.exists(candidate):
+                    continue
+                if pm._lock_holder_gone(candidate):
+                    os.remove(candidate)
+                    continue
+                try:
+                    with open(candidate, encoding='ascii') as holder:
+                        pid = holder.readline().strip() or 'unknown'
+                except OSError:
+                    pid = 'unknown'
+                raise pm.Refused('dispatcher lane %s is held by PID %s (%s)'
+                                 % (lane or 'all', pid, candidate))
+            with open(path, 'x', encoding='ascii') as lock:
+                acquired = True
+                lock.write('%d\n%s\n' % (os.getpid(), datetime.datetime.now(
+                    datetime.timezone.utc).isoformat()))
+        yield
+    finally:
+        if acquired:
+            with pm.board_lock(board.root):
+                os.remove(path)
+
+
+def dispatch_loop(board, args):
     for _ in range(args.max_sessions):
         if any(t.state in ("owner", "lead") and args.lane in (None, pm.lane_of(t)) for t in board.tickets()):
             break
@@ -314,6 +347,24 @@ def main(argv=None):
         if action is None or not run_session(board, action[1], action[0], args.dry_run):
             break
     pm.cmd_board(board, None)
+
+
+def main(argv=None):
+    parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+    parser.add_argument("--max-sessions", type=int, default=4)
+    parser.add_argument("--dry-run", action="store_true")
+    # One dispatcher per lane may run at once: gcc tickets share the GCC checkout, tools tickets do not.
+    parser.add_argument("--lane", help="gcc, tools, or any research lane named on tickets")
+    args = parser.parse_args(argv)
+    board = pm.Board()
+    try:
+        with lane_lock(board, args.lane):
+            dispatch_loop(board, args)
+    except pm.Refused as refused:
+        print('REFUSED: %s' % refused, file=sys.stderr)
+        return 1
+    except KeyboardInterrupt:
+        return 130
     return 0
 
 

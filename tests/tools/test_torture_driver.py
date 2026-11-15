@@ -75,6 +75,36 @@ class TortureDriverTest(unittest.TestCase):
         self.assertEqual(result.stdout, '')
         self.assertNotIn('failure diagnostic', result.stderr)
 
+    def test_explicit_limit_allows_parallel_jobs_with_unlimited_budget(self):
+        listing = OUT / 'list'
+        names = ['sleep-0', 'sleep-1', 'sleep-2', 'sleep-3']
+        listing.write_text(''.join('claude-t-%s.exe %s\n' % (n, n) for n in names))
+
+        def unlimited():
+            resource.setrlimit(resource.RLIMIT_AS,
+                               (resource.RLIM_INFINITY, resource.RLIM_INFINITY))
+
+        result = subprocess.run([str(self.driver), '-j', '4', '--limit-mb', '64', 'list'],
+                                cwd=OUT, preexec_fn=unlimited, capture_output=True,
+                                text=True, timeout=15)
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertEqual(result.stdout.splitlines(), ['PASS ' + n for n in names])
+
+    def test_parallel_jobs_without_limit_refuse_unlimited_budget(self):
+        listing = OUT / 'list'
+        listing.write_text('claude-t-ok.exe ok\n')
+
+        def unlimited():
+            resource.setrlimit(resource.RLIMIT_AS,
+                               (resource.RLIM_INFINITY, resource.RLIM_INFINITY))
+
+        result = subprocess.run([str(self.driver), '-j', '4', 'list'], cwd=OUT,
+                                preexec_fn=unlimited, capture_output=True, text=True,
+                                timeout=15)
+        self.assertEqual(result.returncode, 125)
+        self.assertIn('memory budget', result.stderr)
+        self.assertEqual(result.stdout, '')
+
     def test_default_serial_inherits_existing_limit(self):
         result, _ = self.run_batch(['sleep-0', 'sleep-1'], budget_mb=64)
         self.assertEqual(result.returncode, 0, result.stderr)

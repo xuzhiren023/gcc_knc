@@ -1,7 +1,8 @@
 /* S7-07 discovery, not a libgfortran conformance pass.
    Sources: S7-02 field table; imci.md's legacy MXCSR and IMCI mnemonics.
    All flag positions are candidates. Log complete words before/after/clear.
-   Never set MXCSR 7-12 or change bit 21/unknown controls. x87 unmasking
+   Never set MXCSR 7-12 or 20, or change DUE (21)/unknown controls.
+   R27 Table 2.15 p.39: verified early KNC specification. x87 unmasking
    probes only whether that mechanism controls IMCI, not every possible trap
    mechanism. Each experiment runs in a child; the lead runs this binary. */
 #include <stdio.h>
@@ -34,10 +35,23 @@ static unsigned short cw(void)
   __asm__ volatile("fnstcw %0" : "=m"(v));
   return v;
 }
+
+static void clear_x87(unsigned short control)
+{
+  /* R12 CD28 p.25 (verified production x100 erratum): use the full
+     save/edit/restore recovery even when foreign code unmasked x87.
+     Preserve the stack, tags and condition codes while clearing status. */
+  struct { unsigned short w[54]; } state;
+  __asm__ volatile("fnsave %0" : "=m"(state) : : "memory");
+  state.w[0] = control;
+  state.w[2] &= ~0x80ffu;
+  __asm__ volatile("frstor %0" : : "m"(state) : "memory");
+}
+
 static void put_mx(unsigned int value)
 {
   unsigned int old = mx();
-  if ((value & 0x1f80) || ((value ^ old) & ~0x603fu))
+  if ((value & 0x101f80) || ((value ^ old) & ~0x603fu))
     { puts("ERROR unsafe MXCSR request"); _exit(90); }
   __asm__ volatile("ldmxcsr %0" : : "m"(value) : "memory");
 }
@@ -78,7 +92,9 @@ static const struct flag_case cases[] = {
   {"denormal-input", 1, 0x3f800000, 2, 0},
   {"zero-div-or-recip", 0x3f800000, 0, 4, 2},
   {"overflow", 0x7f7fffff, 0x40000000, 8, 1},
-  {"underflow", 0x00800000, 0x00800000, 16, 1},
+  /* Normal inputs; nearest-even gives 2^-127, with inexact underflow.
+     Unlike 2^-252, this distinguishes a tiny rounded result from zero. */
+  {"underflow", 0x00800000, 0x3f000001, 16, 1},
   {"inexact", 0x3f800000, 0x33800000, 32, 0}
 };
 
@@ -94,13 +110,13 @@ static void flag_probe(int n, int vector, int unmask)
   put_mx(before & ~63u);
   control = cw() | 63;
   if (unmask) control &= ~c->bit;
-  __asm__ volatile("fnclex; fldcw %0" : : "m"(control) : "memory");
+  clear_x87(control);
   operation(vector, c->op);
   after = mx();
   status = sw();
   /* Mask and clear x87 before libc output; MXCSR remains directly observed. */
   control |= 63;
-  __asm__ volatile("fnclex; fldcw %0" : : "m"(control) : "memory");
+  clear_x87(control);
   put_mx(after & ~63u);
   cleared = mx();
   printf("OBSERVE flag=%s domain=%s unmask-x87=%d mx=%08x sw=%04x result=%08x clear-mx=%08x clear-sw=%04x\n",
@@ -119,7 +135,7 @@ static void rounding_probe(int mode, int negative)
   int i, all_lanes = 1;
   printf("BEGIN rounding=%d negative=%d initial-mx=%08x\n", mode, negative, initial);
   put_mx((initial & ~0x603fu) | (mode << 13));
-  __asm__ volatile("fnclex; fldcw %0" : : "m"(control) : "memory");
+  clear_x87(control);
   inputs(negative ? 0xbf800000 : 0x3f800000, negative ? 0xb3800000 : 0x33800000);
   operation(0, 0);
   scalar = result.u[0];

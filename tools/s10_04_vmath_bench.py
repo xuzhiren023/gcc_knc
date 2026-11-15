@@ -159,13 +159,17 @@ def summary(launches):
 
 
 def main():
+    global OUT, ELF
     parser = argparse.ArgumentParser(description=__doc__,
                                      formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument('action', choices=['build', 'card', 'summary'])
     parser.add_argument('--launches', type=int, default=3)
     parser.add_argument('--timeout', type=int, default=1800, help='card_run timeout per job, s')
     parser.add_argument('--dry-run', action='store_true')
+    parser.add_argument('--out', type=Path, default=OUT, help='build/output directory')
     args = parser.parse_args()
+    OUT = args.out.resolve()
+    ELF = OUT / 'vmath-bench.mic'
     if args.action == 'build':
         return build()
     if args.action == 'card':
