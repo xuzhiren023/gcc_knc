@@ -1074,3 +1074,33 @@ A/B is claimed; x86 not run.
 Default-on preparation commit: GCC `36cb8b9ff30`. Main-worktree whitespace
 and GCC diff against `knc` are clean; edits preserve LF. The installed
 and build-tree compilers still represent `bfc31546ede`, not this commit.
+
+### HPCG include-path retry (2026-11-15)
+
+Applied the 05:28 authorization to use the installed lane-2 C++ headers.
+The tool now accepts `--application-dumps hpcg`, which compiles only SpMV
+and SymGS and leaves the completed CG check alone. Fortran recognition
+belongs to S12-40 under the narrowed ticket scope.
+
+Two invocations failed in this session:
+
+1. The Windows wrapper could not launch `cygwin/bin/python3.exe`; the
+   executable is `python3.12.exe`. No compiler ran in this invocation.
+2. Using `python3.12.exe` reached SpMV compilation with the installed C++
+   headers, then failed at `ComputeSPMV_ref.cpp:28` because `omp.h` was
+   absent from the build-tree driver's include search. Log:
+   `.work/_state/logs/s12_30_hpcg_dumps-20261115-053225.log`.
+
+Prepared an explicit system include for the existing lane-2
+`gcc-build-2/k1om-mpss-linux/libgomp/omp.h`. This correction has not been
+run: stopping for the two-attempt rule. Resume command:
+
+```text
+python tools/run.py --name s12_30_hpcg_dumps --inputs tools/s12_30_precision.py -- C:/Users/xuzhi/Documents/gcc_knc/.work/_shared/toolchain/cygwin/bin/python3.12.exe tools/s12_30_precision.py --application-dumps hpcg
+```
+
+No HPCG dump or recognition result is available yet. GCC source and the
+separate default-on commit are unchanged. Window-6 guard/timing output
+is still absent from the ticket; the threshold remains provisional.
+No build, native test, application A/B, T0/T1/T2 or sweep was rerun;
+x86 not run.

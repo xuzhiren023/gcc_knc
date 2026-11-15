@@ -518,7 +518,7 @@ def ice_sweep(corpora=('gcc.c-torture/compile', 'gcc.dg/vect')):
     return int(bool(totals['ICE'] or totals['timeout']))
 
 
-def application_dumps():
+def application_dumps(hpcg_only=False):
     """Inspect the actual class-A CG and HPCG translation units, without linking."""
     gcc = Path(storage.gcc_build_dir(ROOT.parent.parent, '2')) / 'gcc'
     sources = SHARED / 'corpus-build/sources'
@@ -529,15 +529,17 @@ def application_dumps():
     includes = ['-I' + str(SHARED/'corpus-build/gcc-knc/0/NPB-CG'),
                 '-I' + str(npb/'common'), '-J' + str(OUT),
                 '-fintrinsic-modules-path=' + str(gcc.parent/'k1om-mpss-linux/libgfortran')]
-    cxx_headers = gcc.parent/'k1om-mpss-linux/libstdc++-v3/include'
-    cxx_flags = ['-DHPCG_NO_MPI', '-I' + str(hpcg), '-nostdinc++']
+    cxx_headers = SHARED/'gcc-knc-16.2.0-2/k1om-mpss-linux/include/c++/16.2.0'
+    cxx_flags = ['-DHPCG_NO_MPI', '-I' + str(hpcg), '-nostdinc++',
+                 '-isystem', str(gcc.parent/'k1om-mpss-linux/libgomp')]
     for directory in (cxx_headers, cxx_headers/'k1om-mpss-linux', cxx_headers/'backward'):
         cxx_flags += ['-isystem', str(directory)]
-    run(gcc/'gfortran', *flags, *includes, '-c', npb/'CG/cg_data.f90',
-        '-o', OUT/'application-cg-data.o')
-    units = [('cg', gcc/'gfortran', npb/'CG/cg.f90', includes),
-             ('spmv', gcc/'xg++', hpcg/'ComputeSPMV_ref.cpp', cxx_flags),
+    units = [('spmv', gcc/'xg++', hpcg/'ComputeSPMV_ref.cpp', cxx_flags),
              ('symgs', gcc/'xg++', hpcg/'ComputeSYMGS_ref.cpp', cxx_flags)]
+    if not hpcg_only:
+        run(gcc/'gfortran', *flags, *includes, '-c', npb/'CG/cg_data.f90',
+            '-o', OUT/'application-cg-data.o')
+        units.insert(0, ('cg', gcc/'gfortran', npb/'CG/cg.f90', includes))
     for name, cc, source, extra in units:
         dump = OUT/('application-' + name + '.aprefetch')
         dump.unlink(missing_ok=True)
@@ -559,6 +561,8 @@ def main():
     os.environ['PATH'] = ':'.join(map(str, [TC/'cross/bin', TC/'cygwin/bin', os.environ['PATH']]))
     if sys.argv[1:] == ['--application-dumps']:
         return application_dumps()
+    if sys.argv[1:] == ['--application-dumps', 'hpcg']:
+        return application_dumps(hpcg_only=True)
     if sys.argv[1:] == ['--compiler-proof']:
         return build_compiler_proof()
     if sys.argv[1:] == ['--ice-sweep']:
