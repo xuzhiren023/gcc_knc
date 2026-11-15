@@ -1,5 +1,126 @@
 # S12-30: phase-one sparse routes
 
+## Current continuation: legal-form proof before GCC implementation
+
+The lead rejected the phase-two red below on 2026-11-14 at 23:50. It did
+not prove an executing short-row lookahead, the disabled mode also disabled
+stream hints, and unconditional enablement contradicted the cache-sized
+losses. Its straight-line scanner controls do not prove post-ivopts loop
+handling. That red is **not accepted** and the earlier native result does
+not validate a compiler transform. Step 1 now stages handwritten legal
+forms; Step 2 and all GCC changes wait for the lead's native answer.
+
+`LEGAL_PROOF` in the same C test file supplies a new, separately compiled
+driver and kernel family. Its kernel ABI has rows, row bounds or per-row
+pointers/counts, col/val/x and output, **no nnz or RHS-size parameter**.
+The old nnz-based experiment remains available only as historical Phase 1.
+The Python staging command accepts `--legal`, uses the installed prefixes
+(no GCC checkout/build), and writes `legal-gate` in the existing shared
+S12-30 directory. No third test file was added.
+
+The two forms are:
+
+- Flat CSR: R=3; load `row[i+4]` only under `rows-i > 3`, otherwise use
+  the current `row[i+1]`. Hint `x[col[j+32]]` only under
+  `(long long)bound-j > 32`. The subtraction cannot overflow, and the
+  guard proves the int addition representable. The lead's union-of-row
+  intervals argument applies even to non-monotone rows. There are no
+  early exits, calls with observable effects, volatile loads or stores
+  aliasing the int bounds. Output has double type under strict aliasing.
+- HPCG layout: under `rows-i > 1`, load row i+1's own index pointer and
+  count. At current-row position j, hint `x[next_col[j]]` only if
+  `j < next_count`. It never extends the current row's allocation, and
+  never loads a future value. This is one-row lookahead (13 or 27
+  positions in the uniform timing cases), not a claim of fixed d=32.
+
+Each has scalar, unconditional-hint and policy versions. The policy tests
+`rows >= 16384` once outside the nest, selecting whole hint/scalar loop
+versions. It is a deliberately conservative **hypothesis**, not a proof
+that RHS accesses miss cache: row count cannot establish RHS locality.
+No default-on recommendation follows without measurements. A compiler
+implementation would still need the lead's switch and alias/control-flow
+proofs; these hand-written kernels only exercise the permitted forms.
+
+All three compiler/contraction tables (donor-off, installed KNC-off and
+KNC-contract-fast) run both layouts and all three routes. The kernels use
+ordinary ordered scalar multiplication/addition with `-O2`; the legal
+experiment does not disable tree vectorization. There is no vector product
+rounding change. Both compiler scalar outputs and every new route must
+equal an independent long-double ordered reference bit for bit on exact
+small-integer inputs generated at runtime.
+
+Each kernel's guard-page suite runs in a child. It covers lengths 1..33;
+0, 1, 2, 4, 7, 16384 and 16385 outer rows; regular, empty-last-row and
+non-monotone CSR bounds. Large outer counts contain empty prefixes and
+seven active trailing rows, exercising both policy arms at the allocation
+end. CSR row[], col and val end exactly at protected pages. HPCG counts
+and pointer tables also end at protected pages; every nonempty row has
+independent col/val allocations ending at guards, and empty rows point
+directly at protected memory. Signal termination is failure. The future
+ordinary loads are tested against these guards, not padded buffers.
+
+The new native batch is one single-core timing launch:
+
+```
+tools/card_run --threads 1 --timeout 590
+# binary: .work/_shared/S12-30/legal-gate
+# argument: 12345
+```
+
+An internal 570-second alarm includes correctness and timing. Timeout is
+an infrastructure failure, never a pass. This is single-core timing, not
+a long-running parallel correctness job. The process records its granted
+affinity and pins to its first granted CPU; the lead reserves the timed
+turn and records the card profile/sibling activity.
+
+There are 24 cases: two layouts, n=13/27, grouped-eight/spread indices,
+and three working-set sizes. Cache-sized is 32 rows with a 32-KiB RHS;
+CG-A-sized is 14000 rows with a 112000-byte RHS; memory-sized is 32768
+rows with a 16-MiB RHS. The memory case is larger than the historical
+8192-row case, to exercise the conservative policy's enabled arm. The
+policy disables hints for both smaller cases. These sizes are proxies,
+not measured cache residency or whole-application inputs. HPCG layout
+uses independent row allocations in shuffled physical order, with the
+same mathematical data as CSR; indices are not a geometric HPCG stencil.
+
+Each case times donor scalar, KNC scalar, KNC legal-hint and KNC
+legal-policy, five samples of at least 0.5 seconds each, reversing order
+on alternate samples: 480 samples, at least 240 seconds of kernel timing.
+Only baselines and KNC variants are timed to fit the ten-minute budget;
+donor hint/policy and contract-fast still receive the complete correctness
+suite. Every timed output is checked before and after sampling. Raw
+seconds, call counts and paired ratios against both baselines are printed.
+The lead must decide whether either legal form gains at least 5% for
+memory-sized n=13 and 27, and whether policy cases stay within 2% on the
+smaller inputs. No native result for these forms is claimed yet.
+
+Staging and the host model passed once:
+
+```
+python tools/run.py --name s12_30_legal_proof --inputs tools/s12_30_precision.c tools/s12_30_precision.py -- ..\_shared\toolchain\cygwin\bin\python3.12.exe tools/s12_30_precision.py --legal
+```
+
+Log: `.work/_state/logs/s12_30_legal_proof-20261114-235659.log`.
+Target compile/assemble/link and lint passed. All 18 host guard suites
+passed with zero failures. Host tables use the same host compiler under
+all three labels; they establish control-flow/fixture correctness, not
+native donor/KNC agreement or card hint behavior. Each child's printed
+comparison counter includes the parent's previously completed child checks;
+the final parent count is 18 successful suites, not 18 scalar comparisons.
+Installed KNC assembly shows scalar `fmull`/`faddp`, the explicit indirect
+`vprefetch0`, and both policy entry comparisons against 16383. Existing
+stream-prefetch paths remain in the scalar bodies. This is a static
+observation, not a performance or native-correctness result. No previously
+passing Phase 1/T1 tests were rerun and no GCC source was changed.
+
+Step 2 remains pending: explicit on/off switch in T1, stream hints still
+on in the disabled mode, strictly higher assembly hint counts with the
+switch, HPCG-shaped nest, later-row-bound dependence, int-output alias
+negative, and an in-loop explicit hint scanner control. Existing volatile,
+early-exit, -Os and baseline-identity checks are to be preserved. GCC
+implementation, T0-T2, sweeps and paired whole-NPB-CG/HPCG plus controls
+follow only after the legal-form result. x86 not run.
+
 2026-11-14, updated after the lead card run. All three handwritten routes
 passed native correctness. Route B wins on the memory-sized cases but loses
 on every cache-sized case. The lead authorized phase two for Route B only.

@@ -111,9 +111,9 @@ def run(*args):
     subprocess.run(list(map(str, args)), cwd=OUT, check=True)
 
 
-def build(host=False):
+def build(host=False, legal=False):
     objects = []
-    stem = 'host-' if host else ''
+    stem = ('host-' if host else '') + ('legal-' if legal else '')
     for name, compiler in [('donor', corpus.DONOR), ('knc', corpus.KNC),
                            ('fast', corpus.KNC)]:
         cc = TC/'cygwin/bin/gcc' if host else corpus.compiler_path(compiler)
@@ -123,8 +123,9 @@ def build(host=False):
         elif name != 'donor':
             flags += ['-march=knc']
         # Explicit assembly supplies gathers to both scalar-only donor and KNC.
-        flags += ['-fno-tree-vectorize', '-DPREFIX=' + name + '_']
-        if name == 'donor':
+        flags += (['-DLEGAL_PROOF'] if legal else ['-fno-tree-vectorize'])
+        flags += ['-DPREFIX=' + name + '_']
+        if name == 'donor' and not legal:
             flags += ['-DSEED_TREES']
         obj = OUT/(stem+name+'-precision.o')
         if host:
@@ -136,10 +137,13 @@ def build(host=False):
             run(TC/'cross/bin/k1om-mpss-linux-as', '--march=k1om', asm, '-o', obj)
         objects.append(obj)
     cc = TC/'cygwin/bin/gcc' if host else corpus.compiler_path(corpus.DONOR)
-    binary = OUT/('host-precision.exe' if host else 'precision-gate')
+    binary = OUT/(('host-legal.exe' if host else 'legal-gate') if legal
+                  else ('host-precision.exe' if host else 'precision-gate'))
     flags = ['-O2', '-std=gnu99', '-ffp-contract=off', '-fno-tree-vectorize']
     if host:
         flags += ['-mfpmath=387', '-fexcess-precision=fast', '-DHOST_MODEL']
+    if legal:
+        flags += ['-DLEGAL_PROOF']
     run(cc, *flags, '-DDRIVER', SOURCE, *objects,
         *([] if host else corpus.link_paths()), '-lrt', '-lm', '-o', binary)
     if not host:
@@ -152,9 +156,13 @@ def main():
         raise RuntimeError('use shared Cygwin python3')
     OUT.mkdir(exist_ok=True)
     os.environ['PATH'] = ':'.join(map(str, [TC/'cross/bin', TC/'cygwin/bin', os.environ['PATH']]))
-    binary = build()
-    print('STAGED:', binary, '; lead card_run --threads 1 --timeout 1150; binary argument: 12345', flush=True)
-    host = build(host=True)
+    legal = sys.argv[1:] == ['--legal']
+    if sys.argv[1:] and not legal:
+        raise ValueError('expected --legal or no arguments')
+    binary = build(legal=legal)
+    print('STAGED:', binary, '; lead card_run --threads 1 --timeout',
+          590 if legal else 1150, '; binary argument: 12345', flush=True)
+    host = build(host=True, legal=legal)
     # The approved red already demonstrated both seeded tree failures once.
     print('HOST MODEL ONLY: all routes; native correctness/timing pending', flush=True)
     return subprocess.run([str(host), '12345', '--correctness'], cwd=OUT).returncode
