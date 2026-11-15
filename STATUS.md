@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-15 05:26.
+Updated automatically at every ticket change. Last update: 2026-11-15 05:27.
 
 **Next: the tech lead, on S12-30.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
@@ -117,7 +117,7 @@ Current tickets: `[##################--]` 238 of 254
 | S12-34 | Unrecognizable insn for a truncating vector store to a 1-byte-aligned V16QI destination (found by S12-32) | Not started |  |
 | S12-35 | Clean single-compiler WRF build as dm+sm (MPI + OpenMP) against PhiWeather's k1om MPICH, plus a build recipe PhiWeather can apply to its own patched tree | Done | Upstream WRF 4.8.0 now builds clean as dm+sm (MPI + OpenMP) with the one GCC-KNC compiler (knc 7a3b34430e3,... |
 | S12-36 | card_run yields to a foreign queued row in the middle of our own turn - honor an open turn-level reservation so a multi-job window is not refused | Done | card_run --benchmark now keeps our turn across several jobs while an open claude-turn- ledger row was queue... |
-| S12-37 | Every T1/T2 check writes into the run's own output folder - no fixed paths in shared ticket folders (S10-01 vecarg, and any others) | Question for the tech lead | After the lead rebase onto main, both tests in tests/regress/test_check_outputs.py passed through tools/run... |
+| S12-37 | Every T1/T2 check writes into the run's own output folder - no fixed paths in shared ticket folders (S10-01 vecarg, and any others) | In progress | Approved: keep the tests as they are. The 140-line file is the ticket's own acceptance deliverable (one fak... |
 | S12-38 | ICE in the SLP vectorizer on gcc.dg vect-pr123221.c at -O3 -march=knc (found by S12-30's torture sweep) | Not started |  |
 | S12-39 | pm.py submit stops demanding an engineer-side rebase that the sandbox cannot perform (Permission denied on .git/worktrees/<id>/rebase-merge) | In progress |  |
 | S13-01 | M4 final gate - stage the ADR-0015 gate run at the final head (17 programs, held-out unsealed, six pairs, three profiles) | draft |  |
@@ -279,6 +279,7 @@ Current tickets: `[##################--]` 238 of 254
 
 ## Recent activity
 
+- 2026-11-15 05:27 **S12-37** lead answer: Approved: keep the tests as they are. The 140-line file is the ticket's own acceptance deliverable (one fake-mode T1/T2 run with old destinations d...
 - 2026-11-15 05:26 **S12-30** engineer ask: Two dump attempts failed: missing Fortran module (fixed), then HPCG stl_pair.h:65 cannot find compare. May I retry HPCG with installed lane-2 C++ h...
 - 2026-11-15 05:25 **S12-37** engineer ask: After the lead rebase onto main, both tests in tests/regress/test_check_outputs.py passed through tools/run.py with Cygwin Python 3.12; log C:/User...
 - 2026-11-15 05:22 **S12-37** lead answer: Lead: rebased on main. Rerun the two tests and submit.
@@ -286,7 +287,6 @@ Current tickets: `[##################--]` 238 of 254
 - 2026-11-15 05:19 **S12-37** lead answer: Yes. This is a gcc: no ticket, so the pre-submit rebase target is main in the tools repository; knc exists only in .work/_shared/gcc and does not a...
 - 2026-11-15 05:19 **S12-30** lead answer: No merge needed: carry on without it, and do not try git merge or rebase again (the hook refuses both; the lead merges main into the branch at revi...
 - 2026-11-15 05:17 **S12-37** engineer ask: Implementation committed at b1856e29 (red test 1a3a01af): nine fixed T1/T2 output destinations moved under runner.out. Host fake default T1/T2 plus...
-- 2026-11-15 05:17 **S12-30** engineer ask: The 05:14 resume requires merging main into this worktree for S12-33/S12-37. git merge main was rejected by the PreToolUse hook: The tech lead merg...
 
 ## Cost
 
