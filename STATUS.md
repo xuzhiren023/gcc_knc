@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-15 01:40.
+Updated automatically at every ticket change. Last update: 2026-11-15 02:13.
 
-**Next: GPT-6.1, on S12-35 (Clean single-compiler WRF build as dm+sm (MPI + OpenMP) against PhiWeather's k1om MPICH, plus a build recipe PhiWeather can apply to its own patched tree).** Run `python tools/dispatch.py`, or ask the tech lead to.
+**Next: the tech lead, on S12-35.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[##################--]` 236 of 250
 
@@ -115,7 +115,7 @@ Current tickets: `[##################--]` 236 of 250
 | S12-32 | ICE (reload) in gcc.c-torture O3-vect-pr32243.c on the installed GCC-KNC, found by the S12-21 torture sweep | Done | The -O3 vector reload crash in pr32243 is fixed: byte/word vector extends now reload through an aligned sta... |
 | S12-33 | T2 writes its short-vector test binaries into a per-run folder, so Claude, Codex and lead runs never block each other | Done | T2's short-vector cross-check now writes its binaries into the run's own output folder instead of the share... |
 | S12-34 | Unrecognizable insn for a truncating vector store to a 1-byte-aligned V16QI destination (found by S12-32) | Not started |  |
-| S12-35 | Clean single-compiler WRF build as dm+sm (MPI + OpenMP) against PhiWeather's k1om MPICH, plus a build recipe PhiWeather can apply to its own patched tree | In progress | Yes. Add PhiWeather k17-memcpy/copy.o as a third prebuilt MPI-closure input for the primary dmsm/wrf.exe an... |
+| S12-35 | Clean single-compiler WRF build as dm+sm (MPI + OpenMP) against PhiWeather's k1om MPICH, plus a build recipe PhiWeather can apply to its own patched tree | Question for the tech lead | copy.o nm -u empty. Build stopped at firebrand spotting USE MPI: mpi.mod was created by a different GNU For... |
 | S13-01 | M4 final gate - stage the ADR-0015 gate run at the final head (17 programs, held-out unsealed, six pairs, three profiles) | draft |  |
 | S13-02 | Libgomp per-region thread density - choose 1-4 workers per core per parallel region instead of once per program | draft |  |
 | S13-03 | M4 retrospective - what we did wrong, what worked, and the practice changes carried into the next milestone and the agent-team skill | draft |  |
@@ -275,6 +275,7 @@ Current tickets: `[##################--]` 236 of 250
 
 ## Recent activity
 
+- 2026-11-15 02:13 **S12-35** engineer ask: copy.o nm -u empty. Build stopped at firebrand spotting USE MPI: mpi.mod was created by a different GNU Fortran version. Three-line repro fails ide...
 - 2026-11-15 01:40 **S12-35** lead answer: Yes. Add PhiWeather k17-memcpy/copy.o as a third prebuilt MPI-closure input for the primary dmsm/wrf.exe and dmsm/real.exe, placed right after phi_...
 - 2026-11-15 01:38 **S12-35** engineer ask: MPI_Init/Finalize link with approved MPI inputs fails: phi_thr_copy.o has undefined reference to phi_copy_dwords. nm identifies PhiWeather k17-memc...
 - 2026-11-15 01:26 **S12-35** lead answer: Build now; primary links their image MPI (mpich-thr + phi_thr_copy.o), extra wrf-stockmpi.exe.
@@ -282,16 +283,15 @@ Current tickets: `[##################--]` 236 of 250
 - 2026-11-15 01:25 **S12-35** lead defer: Needed: tell PhiWeather the S12-35 host WRF build is starting and confirm their host-build pause (none recorded; this session cannot message them)....
 - 2026-11-15 01:23 **S12-35** engineer ask: Image evidence/s3/link.command.json overrides MPICH 3.4.3 prefix/libmpi.a with item21/mpich-thr/libmpi.a plus phi_thr_copy.o. nm confirms undefined...
 - 2026-11-15 01:09 **S12-26** lead approve: The hot WRF scalar loops in Thompson, MYNN-EDMF, advection, scalar update and RRTMG are now classified statically (vectorized or why not, dependent...
-- 2026-11-15 00:59 **S12-26** engineer submit: cb5a500c: classified loop list + 15 shapes in docs/research/s12-26-wrf-scalar.md and s12-26-shapes.f90. Six authorized debug -S compiles PASS; lite...
 
 ## Cost
 
 - From the script, engineer: 671 sessions, 1337.1M input tokens
 - From the script, lead: 445 sessions, 124.3M input tokens
-- Started by hand, Claude: 12 sessions, 3459.3M input tokens
+- Started by hand, Claude: 12 sessions, 3461.0M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 34.0 GiB of 100 GiB. 135 GiB free on the drive.
+The project uses 34.2 GiB of 100 GiB. 128 GiB free on the drive.
