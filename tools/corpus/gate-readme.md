@@ -1,5 +1,12 @@
 # S13-01 primary gate handoff
 
+Host staging has two steps: run `tools/m4_gate.py stage` with the shared Cygwin
+Python through tools/run.py for compilation/lint/references, then run
+`python tools/m4_gate.py freeze` with Windows Python for the final configuration
+and script writes. The latter uses Windows Git for the ticket revision and does
+not rebuild or retest anything. This avoids Cygwin/Windows ownership-identity
+differences without changing Git's ownership protection.
+
 This is serial -O2 GCC-KNC versus GCC 5.1.1 **with the SQLite donor assembly
 exception**. `freeze.json` records all four ordinary SQLite assembly outcomes,
 their retained diagnostics (including failed kmov assembly), and the highest

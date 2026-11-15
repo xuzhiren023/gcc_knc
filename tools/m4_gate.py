@@ -9,6 +9,7 @@ from collections import Counter
 from dataclasses import asdict
 import json
 import math
+import os
 from pathlib import Path
 import shutil
 import subprocess
@@ -81,6 +82,12 @@ def environment_valid(row):
 def stage(args):
     args.stage.mkdir(parents=True, exist_ok=True)
     c.stage(SimpleNamespace(stage=args.stage, extra_flags={}, repetitions=6, only=None, primary_only=True))
+    print('Host builds/references staged. Finalize with Windows Python: tools/m4_gate.py freeze')
+
+
+def freeze(args):
+    if os.name != 'nt':
+        raise ValueError('freeze uses Windows Python and Windows Git; stage uses Cygwin Python')
     builds = c.read_partition(args.stage, 'builds.json')
     pilot = {}
     for level in scoring.SQLITE_LEVELS:
@@ -316,7 +323,7 @@ def score(args):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('action', choices=('stage','run','score'))
+    parser.add_argument('action', choices=('stage','freeze','run','score'))
     parser.add_argument('--stage', type=Path, default=c.SHARED / 'S13-01')
     parser.add_argument('--profile', choices=('full','3100','5100'))
     parser.add_argument('--block', choices=('initial','extension'), default='initial')
