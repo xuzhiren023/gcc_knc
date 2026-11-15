@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-14 23:50.
+Updated automatically at every ticket change. Last update: 2026-11-14 23:51.
 
 **Next: GPT-6.1, on S11-26 (WRF OpenMP build at -mphinix with no per-file workarounds (S11-23 and S11-25 fixed), restaged for PhiWeather).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
@@ -285,7 +285,7 @@ Current tickets: `[##################--]` 233 of 248
 ## Cost
 
 - From the script, engineer: 662 sessions, 1309.0M input tokens
-- From the script, lead: 437 sessions, 122.2M input tokens
+- From the script, lead: 438 sessions, 122.6M input tokens
 - Started by hand, Claude: 12 sessions, 3410.8M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
