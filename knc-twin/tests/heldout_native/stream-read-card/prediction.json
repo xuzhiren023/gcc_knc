@@ -1,0 +1,19 @@
+{
+  "case": "stream-read-card",
+  "core": {
+    "contexts": 1,
+    "cycles_per_unit_core": 4.125,
+    "limiting": [
+      {
+        "constraint": "spacing",
+        "context_cycles": 16
+      }
+    ],
+    "predicted_cycles": 33,
+    "status": "ok"
+  },
+  "engine_version": "0.2.0",
+  "message": "sustained bandwidth for traffic type 'read_only' is unknown in profile card-7120-measured; give bandwidth_sweep_gbs: [...] to run a declared sweep, or import a native measurement",
+  "profile_hash": "ad82d111c1f87a406d95ed7407b12b900a3585bf73e053209632c151d7c1bb96",
+  "status": "needs_parameters"
+}

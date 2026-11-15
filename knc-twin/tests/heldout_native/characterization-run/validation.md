@@ -1,21 +1,25 @@
 # Held-out validation against the characterization microbenchmarks
 
-Generated 2026-11-15T20:27:12Z. Profile card-7120-measured (hash ad82d111c1f8...). line_tracking cold memory, TLB modeled, hardware prefetcher off, memory service modeled
+Generated 2026-11-15T20:58:43Z. Profile card-7120-measured (hash ad82d111c1f8...). line_tracking cold memory, TLB modeled, hardware prefetcher off, memory service modeled
 
 ## Error statistics (scenario A, per thread count)
 
 | rows | n | median abs err % | worst abs err % | within 15% | within 30% | mean signed err % |
 |---|---:|---:|---:|---:|---:|---:|
+| all_held_out_threads_1 | 73 | 0.9 | 834.5 | 59 | 66 | 9.9 |
+| all_held_out_threads_2 | 62 | 0.4 | 631.1 | 57 | 58 | 9.8 |
+| all_held_out_threads_4 | 59 | 1.6 | 348.6 | 57 | 57 | 7.4 |
 | calibration_threads_1 | 53 | 0.7 | 863.1 | 50 | 52 | 16.9 |
 | calibration_threads_2 | 51 | 1.5 | 652.8 | 48 | 50 | 10.8 |
 | calibration_threads_4 | 52 | 1.8 | 362.1 | 48 | 50 | 3.2 |
+| compiled_held_out_threads_1 | 11 | 17.2 | 32.3 | 3 | 8 | -9.5 |
 | held_out_threads_1 | 62 | 0.9 | 834.5 | 56 | 58 | 13.3 |
 | held_out_threads_2 | 62 | 0.4 | 631.1 | 57 | 58 | 9.8 |
 | held_out_threads_4 | 59 | 1.6 | 348.6 | 57 | 57 | 7.4 |
 
 ## Ranking reliability
 
-306 of 313 measured pairwise orderings (within groups, measured difference > 3%) reproduced: reliability 0.978.
+310 of 323 measured pairwise orderings (within groups, measured difference > 3%) reproduced: reliability 0.96.
 
 | group | agree | pairs | disagreements (a, b: measured -> predicted) |
 |---|---:|---:|---|
@@ -49,6 +53,7 @@ Generated 2026-11-15T20:27:12Z. Profile card-7120-measured (hash ad82d111c1f8...
 | prefetch_pairing@threads_1 | 7 | 7 |  |
 | prefetch_pairing@threads_2 | 9 | 9 |  |
 | prefetch_pairing@threads_4 | 8 | 8 |  |
+| s12_31_layout@threads_1 | 4 | 10 | s12-31-microbench/gas_0 vs s12-31-microbench/adj_0: 488.90/433.50 -> 331.00/358.00; s12-31-microbench/gas_0 vs s12-31-microbench/mid_0: 488.90/432.50 -> 331.00/358.00; s12-31-microbench/mis_44 vs s12-31-microbench/adj_0: 489.20/433.50 -> 331.00/358.00; s12-31-microbench/mis_44 vs s12-31-microbench/mid_0: 489.20/432.50 -> 331.00/358.00; s12-31-microbench/inc_0 vs s12-31-microbench/adj_0: 489.00/433.50 -> 331.00/358.00; s12-31-microbench/inc_0 vs s12-31-microbench/mid_0: 489.00/432.50 -> 331.00/358.00 |
 | stores@threads_1 | 13 | 14 | memory.store_normal vs memory.store_stream: 38.28/157.12 -> 357.73/157.28 |
 | stores@threads_2 | 13 | 14 | memory.store_normal vs memory.store_stream: 48.93/158.07 -> 357.73/157.31 |
 | stores@threads_4 | 13 | 14 | memory.store_normal vs memory.store_stream: 79.83/160.26 -> 358.08/157.31 |
@@ -179,9 +184,30 @@ Generated 2026-11-15T20:27:12Z. Profile card-7120-measured (hash ad82d111c1f8...
 | c9.memory.u4 | held_out | ok | 8.30/11.01/- | 6.50/6.50/9.00 | -22/-41/- |  | miss_stall, spacing |
 | c10.branch.fixed | calibration | ok | 6.22/-/17.02 | 6.19/6.19/12.38 | -1/-/-27 |  | miss_stall, spacing |
 | c10.branch.random | calibration | ok | 11.27/-/27.76 | 11.34/11.34/14.47 | +1/-/-48 |  | miss_stall, spacing |
+| s12-30-small-csr/donor-off | held_out | ok | 8355.60/-/- | 9518.00/-/- | +14/-/- |  | miss_stall, spacing |
+| s12-30-small-csr/knc-switch-off | held_out | ok | 8484.20/-/- | 9527.00/-/- | +12/-/- |  | miss_stall, spacing |
+| s12-30-small-csr/knc-switch-on | held_out | ok | 8480.60/-/- | 9535.00/-/- | +12/-/- |  | miss_stall, spacing |
+| s12-30-small-csr/knc-switch-off-two-nests | held_out | ok | 8283.60/-/- | 9941.00/-/- | +20/-/- |  | miss_stall, spacing |
+| s12-31-microbench/gas_0 | held_out | ok | 488.90/-/- | 331.00/-/- | -32/-/- |  | spacing, dependency |
+| s12-31-microbench/mis_44 | held_out | ok | 489.20/-/- | 331.00/-/- | -32/-/- |  | spacing, dependency |
+| s12-31-microbench/inc_0 | held_out | ok | 489.00/-/- | 331.00/-/- | -32/-/- |  | spacing, dependency |
+| s12-31-microbench/adj_0 | held_out | ok | 433.50/-/- | 358.00/-/- | -17/-/- |  | spacing, dependency |
+| s12-31-microbench/mid_0 | held_out | ok | 432.50/-/- | 358.00/-/- | -17/-/- |  | spacing, dependency |
+| s12-31-microbench/mov_adj_0 | held_out | ok | 487.90/-/- | 412.00/-/- | -16/-/- |  | spacing, dependency |
+| s12-31-microbench/mov_split_0 | held_out | ok | 487.60/-/- | 412.00/-/- | -16/-/- |  | spacing, dependency |
+
+## Card-scale cases (analytical card scale; outside the core model, not in the statistics)
+
+| case | status | per-core cycles per unit (stand-in loop) | predicted GB/s | measured GB/s (median) |
+|---|---|---:|---:|---:|
+| gemv-fp32-card | needs_parameters | 2.125 | - | 125.30 |
+| stream-read-card | needs_parameters | 4.125 | - | 147.24 |
+| stream-rmw-card | ok | 13.125 | 156.5 | 179.11 |
+| stream-write-ngo-card | ok | 31.125 | 226.1 | 169.23 |
 
 - predicted = slope of completion cycles between 2 and 4 rounds, divided by 32 units per round; TSC ticks and core cycles are treated as equal (0.5% difference on this card)
 - footprints that fit L1 (L2) with all active threads are declared warm in L1 (L2) because the driver measures a warm steady state; larger footprints start cold
 - the kernel catalog was regenerated from tests/bench/knc-char/kernels.py; S8-07 additions shift kernel indices but the measured S6-03 bodies are the same templates
 - calibration rows set a parameter of the profile and are excluded from the held-out statistics
 - every prediction is a model output; the measured column is native
+- compiled rows (tests/heldout_native/<case>/) are held out: S12-31 row loops (core cycles per row, window 5) and S12-30 csr_raw calls (core cycles per call, window 8), seconds converted with card.clock_hz 1.238 GHz; each prediction is also recorded in the case's prediction.json

@@ -3,6 +3,8 @@
 
   from_gcc_s.py FILE.s --function NAME [--init INIT.json] --out KERNEL.json [--profile ID]
   from_gcc_s.py FILE.s --loop NAME:LABEL [--trip-count N] [--init INIT.json] --out KERNEL.json
+  from_gcc_s.py FILE.s --loop LABEL [--function NAME] [--spec SPEC.json] [--contexts N]
+                [--out KERNEL.json] [--report REPORT.json]
   from_gcc_s.py FILE.s [FILE2.s ...] --audit [--profile ID] [--weights W.json] [--out REPORT.json]
 
 Regions: a whole function (every `ret` becomes a jump to a synthetic end label) or one
@@ -101,7 +103,10 @@ def parse_file(path):
         m = re.match(r"^([A-Za-z_.$][\w.$]*):(.*)$", line)
         if m and section.startswith((".text", ".text.")):
             name = m.group(1)
-            if name in func_types and cur is None:
+            if name in func_types and (cur is None or name != cur.name):
+                if cur is not None:
+                    # a file without .size directives: the next function ends this one
+                    cur.end = lineno
                 cur = Function(name, lineno)
                 functions[name] = cur
                 order.append(name)
@@ -113,7 +118,12 @@ def parse_file(path):
             line = rest
         if section.startswith((".text", ".text.")):
             if cur is not None:
-                cur.lines.append((lineno, raw))
+                m = re.match(r"^\.(skip|space)\s+(\d+)\s*,\s*(0x90|144)\s*$", line)
+                if m:
+                    # padding of single-byte NOPs (0x90) inside code executes as that many nops
+                    cur.lines.extend((lineno, "\tnop") for _ in range(int(m.group(2))))
+                else:
+                    cur.lines.append((lineno, raw))
             continue
         # data sections
         m = re.match(r"^([A-Za-z_.$][\w.$]*):(.*)$", line)
@@ -389,6 +399,135 @@ def convert(path, func_name, loop_label=None, trip_count=None, init_overlay=None
     return kernel, rows, summary
 
 
+SPEC_KERNEL_KEYS = ("name", "description", "unit_of_work", "numerical_policy", "init", "expected", "scenario",
+                    "max_steps", "memory_default", "notes")
+
+
+def _text_function(raw_lines):
+    """Every line of the file as one pseudo-function, for hand-written loops without `.type @function`."""
+    func = Function("__text__", 1)
+    func.lines = list(enumerate(raw_lines, 1))
+    func.end = len(raw_lines) + 1
+    return func
+
+
+def _function_with_label(functions, order, raw_lines, label):
+    for name in order:
+        if any(_label_of(raw) == label for _, raw in functions[name].lines):
+            return functions[name]
+    func = _text_function(raw_lines)
+    if any(_label_of(raw) == label for _, raw in func.lines):
+        return func
+    raise InvalidInput("loop label %r not found" % label)
+
+
+def apply_spec(kernel, spec, contexts=1):
+    """Merge a spec (S13-06 trial format) into an adapter kernel.
+
+    Keys: name, description, unit_of_work, numerical_policy, init (replaces the adapter's
+    placeholder init), expected, scenario, max_steps, memory_default, notes, loop (merged),
+    stream_init (one init per context), addr / lines (hints by record id), plus `contexts`
+    copies of the stream. Nothing here changes an instruction.
+    """
+    spec = dict(spec or {})
+    if "kernel" in spec:
+        spec = dict(spec["kernel"])
+    prov = kernel.get("provenance", {})
+    for key in SPEC_KERNEL_KEYS:
+        if key == "init" and key in spec:
+            # merged as with --init: spec registers override the adapter's zero placeholders
+            for sub, val in spec["init"].items():
+                val = json.loads(json.dumps(val))
+                if isinstance(val, dict) and isinstance(kernel["init"].get(sub), dict):
+                    kernel["init"][sub].update(val)
+                elif isinstance(val, list) and isinstance(kernel["init"].get(sub), list):
+                    kernel["init"][sub].extend(val)
+                else:
+                    kernel["init"][sub] = val
+        elif key in spec:
+            kernel[key] = json.loads(json.dumps(spec[key]))
+    if "loop" in spec:
+        kernel["loop"] = dict(kernel.get("loop", {}), **spec["loop"])
+    base = kernel["streams"][0]["instructions"]
+    hints = {k: spec.get(k, {}) for k in ("addr", "lines")}
+    stream_init = spec.get("stream_init", [])
+    streams = []
+    for ctx in range(contexts):
+        recs = json.loads(json.dumps(base))
+        for rec in recs:
+            for key, table in hints.items():
+                if rec["id"] in table:
+                    rec[key] = table[rec["id"]]
+        stream = {"context": ctx, "instructions": recs}
+        if ctx < len(stream_init):
+            stream["init"] = stream_init[ctx]
+        streams.append(stream)
+    kernel["streams"] = streams
+    kernel["provenance"] = prov
+    return kernel
+
+
+def convert_loop(path, loop, function=None, spec=None, contexts=1, profile=None):
+    """One loop (or a whole function when loop is None) -> (conversion report, kernel or None).
+
+    The report (knc-twin.conversion/1) lists every instruction the twin cannot read or does not
+    know, with its source line, exact text and reason; the kernel is returned only when that
+    list is empty. Timing-only instructions convert (functional reports them).
+    """
+    functions, order, data, raw_lines = parse_file(path)
+    if function is not None and function not in functions:
+        raise InvalidInput("function %r not in %s" % (function, path))
+    if loop is None:
+        if function is None:
+            raise InvalidInput("give a loop label or a function")
+        func = functions[function]
+    else:
+        func = functions[function] if function is not None else _function_with_label(functions, order, raw_lines, loop)
+        if func.name not in functions:
+            functions[func.name] = func
+            order.append(func.name)
+    if loop is not None:
+        lines, _ = loop_region(func, loop)
+    else:
+        lines, _ = function_region(func)
+    text, origin = region_text(lines)
+    unsupported = []
+    try:
+        records, notes = asm_mod.parse_gas(text)
+    except TwinError as e:
+        # report the failing source line
+        m = re.match(r"^line (\d+)", e.message)
+        src = origin.get(int(m.group(1))) if m else None
+        unsupported.append({"line": src, "text": raw_lines[src - 1].strip() if src else "", "reason": e.message})
+        records, notes = [], []
+    remap_ids(records, origin)
+    for rec in records:
+        if rec["op"] == "nop" and rec.get("label") == "__knc_twin_end":
+            rec["id"] = "__knc_twin_end"
+    rows = classify_records(records, profile)
+    for r in rows:
+        if not r["isa"] or not r["parser"]:
+            src = r["line"]
+            unsupported.append({"line": src, "text": raw_lines[src - 1].strip() if isinstance(src, int) else r["text"], "reason": r["reason"]})
+    code_lines = [ln for ln, raw in lines if _is_code(raw) and ln <= len(raw_lines)]
+    report = {"schema": "knc-twin.conversion/1", "source": os.path.basename(path), "function": func.name if func.name != "__text__" else function,
+              "loop": loop, "lines": [code_lines[0] if code_lines else None, code_lines[-1] if code_lines else None] if loop is None else
+              [lines[0][0], lines[-2][0] if len(lines) > 1 else lines[0][0]],
+              "status": "unsupported" if unsupported else "ok", "instructions": len(records),
+              "unsupported": sorted(unsupported, key=lambda u: (u["line"] or 0)),
+              "coverage": summarize(rows) if rows else None,
+              "notes": [n for n in notes if "directive" not in n]}
+    if unsupported:
+        return report, None
+    name = "%s_%s" % (os.path.splitext(os.path.basename(path))[0], (loop or function).lstrip("."))
+    kernel = build_kernel(name, records, data, None, None, loop,
+                          description="Converted by from_gcc_s.py from %s, %s." % (os.path.basename(path), ("loop %s" % loop) if loop else ("function %s" % function)))
+    kernel["provenance"].update({"source_file": os.path.basename(path), "function": report["function"], "loop_label": loop,
+                                 "lines": report["lines"]})
+    apply_spec(kernel, spec, contexts)
+    return report, kernel
+
+
 def innermost_loops(func):
     """Labels with a backward branch and no other loop label strictly inside their body."""
     loops = []
@@ -475,7 +614,11 @@ def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("files", nargs="+")
     ap.add_argument("--function")
-    ap.add_argument("--loop", help="NAME:LABEL")
+    ap.add_argument("--loop", help="NAME:LABEL, or LABEL (the function is found, or given with --function)")
+    ap.add_argument("--spec", help="trial spec JSON (name, unit_of_work, init, stream_init, expected, scenario, loop, addr, lines); "
+                    "writes a conversion report and a kernel only when nothing is unsupported")
+    ap.add_argument("--contexts", type=int, default=1, help="with --spec or --loop LABEL: streams to create, one copy each (1-4)")
+    ap.add_argument("--report", help="conversion report JSON (default: stdout)")
     ap.add_argument("--trip-count", type=int)
     ap.add_argument("--init", help="JSON with init/expected/unit_of_work/scenario to merge into the kernel")
     ap.add_argument("--profile", default="card-7120-measured")
@@ -503,6 +646,23 @@ def main(argv=None):
         if not args.function and not args.loop:
             print("give --function NAME, --loop NAME:LABEL or --audit", file=sys.stderr)
             return 2
+        if args.spec or (args.loop and ":" not in args.loop):
+            if not 1 <= args.contexts <= 4:
+                raise InvalidInput("--contexts must be 1..4")
+            spec = load_json(args.spec, "spec") if args.spec else None
+            report, kernel = convert_loop(args.files[0], args.loop, args.function, spec, args.contexts, profile)
+            if kernel is not None and args.out:
+                dump_json(kernel, args.out)
+                report["kernel"] = args.out
+            text = json.dumps(report, indent=1)
+            if args.report:
+                with open(args.report, "w", encoding="utf-8", newline="\n") as f:
+                    f.write(text + "\n")
+            else:
+                print(text)
+            for u in report["unsupported"]:
+                sys.stderr.write("unsupported line %s: %s -- %s\n" % (u["line"], u["text"], u["reason"]))
+            return 3 if report["unsupported"] else 0
         func = args.function
         label = None
         if args.loop:

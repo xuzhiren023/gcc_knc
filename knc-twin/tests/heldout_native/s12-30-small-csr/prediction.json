@@ -1,0 +1,93 @@
+{
+  "case": "s12-30-small-csr",
+  "engine_version": "0.2.0",
+  "profile_hash": "ad82d111c1f87a406d95ed7407b12b900a3585bf73e053209632c151d7c1bb96",
+  "scenario": "each kernel's own scenario (fixtures/batch: line tracking, TLB, HWP and memory service modeled, arrays warm in L1, branches predicted)",
+  "unit": "one csr_raw call (32 rows, 416 nonzeros)",
+  "variants": [
+    {
+      "completion_cycles": [
+        9518
+      ],
+      "functional": [
+        "ok"
+      ],
+      "limiting": [
+        {
+          "constraint": "miss_stall",
+          "context_cycles": 3909
+        },
+        {
+          "constraint": "spacing",
+          "context_cycles": 2310
+        }
+      ],
+      "predicted_cycles_per_unit": 9518.0,
+      "status": "ok",
+      "variant": "donor-off"
+    },
+    {
+      "completion_cycles": [
+        9527
+      ],
+      "functional": [
+        "ok"
+      ],
+      "limiting": [
+        {
+          "constraint": "miss_stall",
+          "context_cycles": 3909
+        },
+        {
+          "constraint": "spacing",
+          "context_cycles": 2313
+        }
+      ],
+      "predicted_cycles_per_unit": 9527.0,
+      "status": "ok",
+      "variant": "knc-switch-off"
+    },
+    {
+      "completion_cycles": [
+        9535
+      ],
+      "functional": [
+        "ok"
+      ],
+      "limiting": [
+        {
+          "constraint": "miss_stall",
+          "context_cycles": 3909
+        },
+        {
+          "constraint": "spacing",
+          "context_cycles": 2318
+        }
+      ],
+      "predicted_cycles_per_unit": 9535.0,
+      "status": "ok",
+      "variant": "knc-switch-on"
+    },
+    {
+      "completion_cycles": [
+        9941
+      ],
+      "functional": [
+        "ok"
+      ],
+      "limiting": [
+        {
+          "constraint": "miss_stall",
+          "context_cycles": 4317
+        },
+        {
+          "constraint": "spacing",
+          "context_cycles": 2317
+        }
+      ],
+      "predicted_cycles_per_unit": 9941.0,
+      "status": "ok",
+      "variant": "knc-switch-off-two-nests"
+    }
+  ]
+}

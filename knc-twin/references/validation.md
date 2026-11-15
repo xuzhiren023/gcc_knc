@@ -23,19 +23,21 @@ touched to fit them.
 
 ## Results (profile card-7120-measured, scenario A: TLB modeled, hardware prefetcher off)
 
-| rows | n | median abs err % | within 15% | within 30% | mean signed err % |
-|---|---:|---:|---:|---:|---:|
-| held-out, 1 thread | 62 | 0.9 | 56 | 58 | +13 |
-| held-out, 2 threads | 62 | 0.4 | 57 | 58 | +10 |
-| held-out, 4 threads | 59 | 1.6 | 57 | 57 | +7 |
-| calibration, 1 thread | 53 | 0.7 | 49 | 51 | +18 |
+| rows | n | median abs err % | worst abs err % (row) | within 15% | within 30% | mean signed err % |
+|---|---:|---:|---|---:|---:|---:|
+| held-out characterization, 1 thread | 62 | 0.9 | 834 (memory.store_normal, HWP off); next 78 (spill_reload.rt) | 56 | 58 | +13 |
+| held-out characterization, 2 threads | 62 | 0.4 | 631 (memory.store_normal); next 116 (spill_reload.rt) | 57 | 58 | +10 |
+| held-out characterization, 4 threads | 59 | 1.6 | 349 (memory.store_normal); next 161 (spill_reload.rt) | 57 | 57 | +7 |
+| held-out compiled code (S12-31, S12-30), 1 thread | 11 | 17.2 | 32 (S12-31 gas_0/mis_44/inc_0) | 3 | 8 | -10 |
+| calibration, 1 thread | 53 | 0.7 | 863 (memory.load_rt, HWP off) | 50 | 52 | +17 |
 
 The mean signed error is dominated by two memory rows that the HWP-off scenario cannot
-reproduce (below); the median held-out error is about 1%.
+reproduce (below); the median held-out characterization error is about 1%. Compiled code is a
+different matter: the eleven compiled-code rows (below) have a median error of 17%.
 
-**Ranking reliability**: 306 of 313 measured pairwise orderings within the named groups
-(measured difference above 3%) are reproduced at the right order, 0.978. The seven
-disagreements: masked_load.lat vs spill_reload.lat at 2 threads (12.17 vs 12.98 measured, both
+**Ranking reliability**: 310 of 323 measured pairwise orderings within the named groups
+(measured difference above 3%) are reproduced at the right order, 0.960; without the S12-31
+group (4 of 10) it is 306 of 313, 0.978. The seven characterization disagreements: masked_load.lat vs spill_reload.lat at 2 threads (12.17 vs 12.98 measured, both
 12.00 modeled), unpack.rt vs spill_reload.rt at 4 threads (the over-charged independent
 reload pairs), memory.store_normal vs memory.store_stream at every thread count under scenario A
 (no hardware prefetcher: the normal stream is charged full misses; scenario B orders them
@@ -91,6 +93,40 @@ Not validated (unvalidated_scenario_estimate): any region with cold memory strea
 memory-form chains of compiled code, gathers on scattered lines, scatters, branch-dense code at
 four threads, and every pair/card scenario.
 
+## Compiled code: S12-31 and S12-30 (held out, S13-06)
+
+Cases in `tests/heldout_native/<case>/`; predictions recorded in each `prediction.json` by
+`validate_heldout.py --cases ... --record`; measured seconds converted with `card.clock_hz`
+1.238 GHz. Both are single core, one thread, cache-resident and fully supported by the adapter
+and the engine, so they are inside the model; neither shape is a validated shape.
+
+| case / variant | unit | measured | predicted | error | limiting (model) |
+|---|---|---:|---:|---:|---|
+| S12-31 gas_0, mis_44, inc_0 | core cycles per 27-product row | 488.9 / 489.2 / 489.0 | 331 | -32% | spacing, x87 dependency |
+| S12-31 adj_0, mid_0 | same | 433.5 / 432.5 | 358 | -17% | spacing, x87 dependency |
+| S12-31 mov_adj_0, mov_split_0 | same | 487.9 / 487.6 | 412 | -16% | spacing, x87 dependency |
+| S12-30 donor-off | core cycles per csr_raw call (416 nonzeros) | 8356 | 9518 | +14% | miss stalls, spacing |
+| S12-30 knc-switch-off / knc-switch-on | same | 8484 / 8481 | 9527 / 9535 | +12% | miss stalls, spacing |
+| S12-30 knc-switch-off-two-nests | same | 8284 | 9941 | +20% | miss stalls, spacing |
+
+S12-31 (window 5 of `.work/_shared/S12-31/native-mb.log`; window 3 agrees within 0.5%): the
+model is 16-32% fast and orders the variants wrongly: on the card the two orders with `faddp`
+before the compare (adj_0, mid_0) are 11% faster than the rest, and adding a dead `movl`
+(mov_*) costs nothing; the model makes adj/mid 8% slower than gas_0 and mov_* another 15%
+slower. Open (not tuned): the per-row cost of an x87 row loop with a memory-operand `fmull`,
+`movslq` costed as a one-cycle V-pairable scalar op (no source), and front-end effects of the
+instruction order. S12-30: 12-20% slow on a deterministic input (the card's columns are random);
+the model ranks two-nests slowest where the card measured it fastest (2% apart, inside the
+3% ranking threshold).
+
+## Card-scale cases (analytical; outside the core model)
+
+| case | predicted GB/s | measured GB/s (median, 60 threads) | note |
+|---|---:|---:|---|
+| stream-rmw-card | 156.5 | 179.11 | -13% |
+| stream-write-ngo-card | 226.1 | 169.23 | +34% |
+| stream-read-card, gemv-fp32-card | needs_parameters | 147.24, 125.30 | no sustained read bandwidth in the profile |
+
 ## A real candidate batch (`fixtures/batch`)
 
 The S12-30 gate's CSR SpMV kernel (`csr_raw`: 32 rows of 13 nonzeros, x87 double) as emitted by
@@ -120,7 +156,8 @@ for a batch the model cannot separate.
 ```
 cd tests/bench/knc-char && python -c "from pathlib import Path; import kernels; kernels.emit(Path(OUT))"
 python scripts/validate_heldout.py --kernels-s OUT/kernels.s --kernels-h OUT/kernels.h \
-    --measured tests/heldout_native/measured-characterization.json --out tests/heldout_native/characterization-run
+    --measured tests/heldout_native/measured-characterization.json --out tests/heldout_native/characterization-run \
+    --cases tests/heldout_native [--record]
 python fixtures/batch/make_csr_batch.py --asm-dir <S12-30 .s directory> --out fixtures/batch
 python scripts/knc_twin.py batch fixtures/batch/manifest.json --out <dir>
 ```

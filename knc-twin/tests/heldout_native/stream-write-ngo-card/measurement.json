@@ -1,0 +1,17 @@
+{
+ "schema": "knc-twin.heldout-measurement/1",
+ "case": "stream-write-ngo-card",
+ "source_log": ".work/_shared/tmp/claude-next23/membw-second.out lines 85-87 (CASE 9: write, NGO stores, 2048 MiB x 32 passes, 60 threads spread, huge pages)",
+ "source_doc": "docs/research/knc-memory-bandwidth.md, S11-06 sweep-2 calibration table (write long baseline)",
+ "measured_on": "2026-11-12 18:32-18:52Z, boot da3144f1",
+ "unit": "decimal GB/s, logical bytes over wall time (min/median/max of five samples)",
+ "rows": [
+  {
+   "threads": 60,
+   "median_GBs": 169.226382,
+   "min_GBs": 169.096658,
+   "max_GBs": 170.001472
+  }
+ ],
+ "used_to_set_parameters": false
+}

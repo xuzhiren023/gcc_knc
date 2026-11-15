@@ -19,8 +19,9 @@ relative to that file; the current directory does not matter.
    instead of approximating.
 2. **Prepare the input faithfully.** From compiler output use the adapter:
    `python scripts/from_gcc_s.py file.s --function NAME --out k.json` (whole function) or
-   `--loop NAME:LABEL` (one loop), then supply `--init init.json` with initial registers,
-   memory and expected outputs derived independently of the twin (host reference, hand
+   `--loop NAME:LABEL` (one loop; `--loop .L7 --spec spec.json [--contexts N]` finds the
+   function itself and writes a conversion report listing every unsupported line), then supply
+   `--init init.json` with initial registers, memory and expected outputs derived independently of the twin (host reference, hand
    calculation, integer-valued data). `--audit` over several `.s` files reports complete-region
    coverage by parser/isa/functional/timing before any run. Hand-written records follow
    `schemas/kernel.schema.json`. Keep every dependency and side effect the real code has

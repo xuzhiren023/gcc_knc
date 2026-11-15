@@ -9,6 +9,7 @@ Schema: `schemas/kernel.schema.json` (`knc-twin.kernel/1`). Examples: `fixtures/
 from_gcc_s.py FILE.s --function NAME [--init INIT.json] --out KERNEL.json [--profile ID]
 from_gcc_s.py FILE.s --loop NAME:LABEL [--trip-count N] [--init INIT.json] --out KERNEL.json
 from_gcc_s.py FILE.s [FILE2.s ...] --audit [--profile ID] [--weights W.json] --out REPORT.json
+from_gcc_s.py FILE.s --loop LABEL [--function NAME] [--spec SPEC.json] [--contexts N] [--out KERNEL.json] [--report R.json]
 ```
 
 - A **function** region is the whole function; every `ret` becomes a jump to a synthetic end
@@ -25,6 +26,15 @@ from_gcc_s.py FILE.s [FILE2.s ...] --audit [--profile ID] [--weights W.json] --o
 - Live-in registers (read before written) are listed and given placeholder zeros; `--init`
   merges a JSON with `init`, `expected`, `unit_of_work`, `numerical_policy`, `scenario`, `loop`,
   `memory_default` from an independent reference (host run, hand calculation).
+- `--loop LABEL` without a function name finds the function that holds the label (or treats
+  a file without `.type @function` as one region); `--spec` (the S13-06 trial format) merges
+  `name`, `unit_of_work`, `init`, `expected`, `scenario`, `loop`, `memory_default`,
+  `stream_init` (one init per context), and `addr`/`lines` hints by record id, and `--contexts`
+  makes that many copies of the stream. It writes a conversion report
+  (`knc-twin.conversion/1`: every unsupported line with its exact text and reason) and a
+  kernel only when that list is empty; exit 3 when something is unsupported. In code,
+  `.skip N, 0x90` / `.space N, 0x90` padding executes as N `nop`s; a file without `.size`
+  directives ends a function at the next `@function` label.
 - `--audit` reports per function and per innermost loop: instructions, parser/isa/functional/
   timing coverage with the chosen profile, blockers, and "complete" flags. `--weights` maps
   function (or `file.s:function`) to native seconds so the report can say how much measured

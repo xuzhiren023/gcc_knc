@@ -1,0 +1,60 @@
+{
+ "schema": "knc-twin.heldout-case/1",
+ "scale": "card",
+ "params": "params.json",
+ "description": "card scenario: read_only at 120 threads (2 per core); per-core compute term from a twin simulate of core.s at 2 context(s), data in L1",
+ "core": {
+  "source": "core.s",
+  "loop": ".Lgemv_fp32",
+  "contexts": 2,
+  "spec": {
+   "unit_of_work": {
+    "description": "one 64-byte line",
+    "count": 16
+   },
+   "numerical_policy": {
+    "rounding": "rn",
+    "ftz": false,
+    "daz": false,
+    "nan_compare": "bits"
+   },
+   "scenario": {
+    "memory": {
+     "type": "fixed_level",
+     "level": "l1"
+    },
+    "branch": {
+     "type": "all_predicted"
+    }
+   },
+   "loop": {
+    "trip_count": 8
+   },
+   "memory_default": 0,
+   "init": {
+    "registers": {
+     "zmm1": {
+      "f32_broadcast": 1.0
+     },
+     "zmm0": {
+      "f32_broadcast": 0.0
+     }
+    }
+   },
+   "stream_init": [
+    {
+     "registers": {
+      "rax": "0x100000",
+      "rdx": "0x100200"
+     }
+    },
+    {
+     "registers": {
+      "rax": "0x110000",
+      "rdx": "0x110200"
+     }
+    }
+   ]
+  }
+ }
+}

@@ -1,0 +1,1515 @@
+{
+ "schema": "knc-twin.trial-results/1",
+ "cases": [
+  {
+   "name": "agi_gap0",
+   "kind": "consistency",
+   "source": "char.s",
+   "loop": ".Lagi_gap0",
+   "lines": [
+    223,
+    289
+   ],
+   "conversion": "ok",
+   "unsupported": [],
+   "measured": {
+    "source": "docs/research/knc-characterization.md Full table agi.gap0 (S6-03)",
+    "unit": "TSC ticks per probe per thread",
+    "threads": {
+     "1": 3.11,
+     "2": 3.17,
+     "4": 4.26
+    }
+   },
+   "functional": {
+    "status": "ok",
+    "message": "executed 1060 dynamic instructions; all 8 expected items match"
+   },
+   "engine_version": "0.2.0",
+   "profile_hash": "ad82d111c1f87a406d95ed7407b12b900a3585bf73e053209632c151d7c1bb96",
+   "simulate": {
+    "1": {
+     "status": "ok",
+     "contexts": 1,
+     "predicted_cycles": 401,
+     "cycles_per_unit_core": 3.1328125,
+     "cycles_per_unit_per_thread": 3.1328,
+     "pair_fraction": 0.966,
+     "limiting": [
+      {
+       "constraint": "spacing",
+       "context_cycles": 136
+      },
+      {
+       "constraint": "agi",
+       "context_cycles": 128
+      }
+     ]
+    },
+    "2": {
+     "status": "ok",
+     "contexts": 2,
+     "predicted_cycles": 402,
+     "cycles_per_unit_core": 1.5703125,
+     "cycles_per_unit_per_thread": 3.1406,
+     "pair_fraction": 0.966,
+     "limiting": [
+      {
+       "constraint": "spacing",
+       "context_cycles": 272
+      },
+      {
+       "constraint": "agi",
+       "context_cycles": 256
+      },
+      {
+       "constraint": "not_picked",
+       "context_cycles": 1
+      }
+     ]
+    },
+    "4": {
+     "status": "ok",
+     "contexts": 4,
+     "predicted_cycles": 548,
+     "cycles_per_unit_core": 1.0703125,
+     "cycles_per_unit_per_thread": 4.2812,
+     "pair_fraction": 0.966,
+     "limiting": [
+      {
+       "constraint": "core_issue_slots",
+       "detail": "issue utilization 1.00: the core issues nearly every cycle"
+      },
+      {
+       "constraint": "not_picked",
+       "context_cycles": 582
+      },
+      {
+       "constraint": "spacing",
+       "context_cycles": 544
+      },
+      {
+       "constraint": "agi",
+       "context_cycles": 512
+      }
+     ]
+    }
+   },
+   "bounds_loop": {
+    "status": "ok",
+    "mii_cycles_per_iteration": 132,
+    "res_mii": 132,
+    "rec_mii": "32",
+    "binding": "resources",
+    "critical_path": 35
+   },
+   "consistency": [
+    {
+     "threads": 1,
+     "measured_ticks": 3.11,
+     "predicted_cycles": 3.1328,
+     "ratio": 1.007
+    },
+    {
+     "threads": 2,
+     "measured_ticks": 3.17,
+     "predicted_cycles": 3.1406,
+     "ratio": 0.991
+    },
+    {
+     "threads": 4,
+     "measured_ticks": 4.26,
+     "predicted_cycles": 4.2812,
+     "ratio": 1.005
+    }
+   ]
+  },
+  {
+   "name": "agi_gap1",
+   "kind": "consistency",
+   "source": "char.s",
+   "loop": ".Lagi_gap1",
+   "lines": [
+    290,
+    388
+   ],
+   "conversion": "ok",
+   "unsupported": [],
+   "measured": {
+    "source": "docs/research/knc-characterization.md Full table agi.gap1 (S6-03)",
+    "unit": "TSC ticks per probe per thread",
+    "threads": {
+     "1": 4.15,
+     "2": 4.15,
+     "4": 8.27
+    }
+   },
+   "functional": {
+    "status": "ok",
+    "message": "executed 1572 dynamic instructions; all 8 expected items match"
+   },
+   "engine_version": "0.2.0",
+   "profile_hash": "ad82d111c1f87a406d95ed7407b12b900a3585bf73e053209632c151d7c1bb96",
+   "simulate": {
+    "1": {
+     "status": "ok",
+     "contexts": 1,
+     "predicted_cycles": 525,
+     "cycles_per_unit_core": 4.1015625,
+     "cycles_per_unit_per_thread": 4.1016,
+     "pair_fraction": 0.6718,
+     "limiting": [
+      {
+       "constraint": "spacing",
+       "context_cycles": 260
+      },
+      {
+       "constraint": "agi",
+       "context_cycles": 4
+      }
+     ]
+    },
+    "2": {
+     "status": "ok",
+     "contexts": 2,
+     "predicted_cycles": 526,
+     "cycles_per_unit_core": 2.0546875,
+     "cycles_per_unit_per_thread": 4.1094,
+     "pair_fraction": 0.6718,
+     "limiting": [
+      {
+       "constraint": "core_issue_slots",
+       "detail": "issue utilization 0.99: the core issues nearly every cycle"
+      },
+      {
+       "constraint": "spacing",
+       "context_cycles": 520
+      },
+      {
+       "constraint": "agi",
+       "context_cycles": 8
+      },
+      {
+       "constraint": "not_picked",
+       "context_cycles": 1
+      }
+     ]
+    },
+    "4": {
+     "status": "ok",
+     "contexts": 4,
+     "predicted_cycles": 1044,
+     "cycles_per_unit_core": 2.0390625,
+     "cycles_per_unit_per_thread": 8.1562,
+     "pair_fraction": 0.6718,
+     "limiting": [
+      {
+       "constraint": "core_issue_slots",
+       "detail": "issue utilization 1.00: the core issues nearly every cycle"
+      },
+      {
+       "constraint": "not_picked",
+       "context_cycles": 2070
+      },
+      {
+       "constraint": "spacing",
+       "context_cycles": 1040
+      },
+      {
+       "constraint": "agi",
+       "context_cycles": 16
+      }
+     ]
+    }
+   },
+   "bounds_loop": {
+    "status": "ok",
+    "mii_cycles_per_iteration": 196,
+    "res_mii": 196,
+    "rec_mii": "32",
+    "binding": "resources",
+    "critical_path": 35
+   },
+   "consistency": [
+    {
+     "threads": 1,
+     "measured_ticks": 4.15,
+     "predicted_cycles": 4.1016,
+     "ratio": 0.988
+    },
+    {
+     "threads": 2,
+     "measured_ticks": 4.15,
+     "predicted_cycles": 4.1094,
+     "ratio": 0.99
+    },
+    {
+     "threads": 4,
+     "measured_ticks": 8.27,
+     "predicted_cycles": 8.1562,
+     "ratio": 0.986
+    }
+   ]
+  },
+  {
+   "name": "c7_reduce_a1",
+   "kind": "consistency",
+   "source": "char.s",
+   "loop": ".Lc7_reduce_a1",
+   "lines": [
+    19,
+    53
+   ],
+   "conversion": "ok",
+   "unsupported": [],
+   "measured": {
+    "source": "docs/research/knc-characterization.md C7 (S8-01)",
+    "unit": "TSC ticks per update per thread",
+    "threads": {
+     "4": 4.13
+    }
+   },
+   "functional": {
+    "status": "ok",
+    "message": "executed 548 dynamic instructions; all 8 expected items match"
+   },
+   "engine_version": "0.2.0",
+   "profile_hash": "ad82d111c1f87a406d95ed7407b12b900a3585bf73e053209632c151d7c1bb96",
+   "simulate": {
+    "1": {
+     "status": "ok",
+     "contexts": 1,
+     "predicted_cycles": 513,
+     "cycles_per_unit_core": 4.0078125,
+     "cycles_per_unit_per_thread": 4.0078,
+     "pair_fraction": 0.0584,
+     "limiting": [
+      {
+       "constraint": "dependency",
+       "context_cycles": 248
+      },
+      {
+       "constraint": "spacing",
+       "context_cycles": 132
+      }
+     ]
+    },
+    "2": {
+     "status": "ok",
+     "contexts": 2,
+     "predicted_cycles": 514,
+     "cycles_per_unit_core": 2.0078125,
+     "cycles_per_unit_per_thread": 4.0156,
+     "pair_fraction": 0.0584,
+     "limiting": [
+      {
+       "constraint": "dependency",
+       "context_cycles": 496
+      },
+      {
+       "constraint": "spacing",
+       "context_cycles": 264
+      },
+      {
+       "constraint": "not_picked",
+       "context_cycles": 1
+      }
+     ]
+    },
+    "4": {
+     "status": "ok",
+     "contexts": 4,
+     "predicted_cycles": 532,
+     "cycles_per_unit_core": 1.0390625,
+     "cycles_per_unit_per_thread": 4.1562,
+     "pair_fraction": 0.0584,
+     "limiting": [
+      {
+       "constraint": "core_issue_slots",
+       "detail": "issue utilization 1.00: the core issues nearly every cycle"
+      },
+      {
+       "constraint": "dependency",
+       "context_cycles": 992
+      },
+      {
+       "constraint": "spacing",
+       "context_cycles": 528
+      },
+      {
+       "constraint": "not_picked",
+       "context_cycles": 70
+      }
+     ]
+    }
+   },
+   "bounds_loop": {
+    "status": "ok",
+    "mii_cycles_per_iteration": 128,
+    "res_mii": 128,
+    "rec_mii": "128",
+    "binding": "resources",
+    "critical_path": 128
+   },
+   "consistency": [
+    {
+     "threads": 4,
+     "measured_ticks": 4.13,
+     "predicted_cycles": 4.1562,
+     "ratio": 1.006
+    }
+   ]
+  },
+  {
+   "name": "c7_reduce_a2",
+   "kind": "consistency",
+   "source": "char.s",
+   "loop": ".Lc7_reduce_a2",
+   "lines": [
+    54,
+    88
+   ],
+   "conversion": "ok",
+   "unsupported": [],
+   "measured": {
+    "source": "docs/research/knc-characterization.md C7 (S8-01)",
+    "unit": "TSC ticks per update per thread",
+    "threads": {
+     "4": 4.13
+    }
+   },
+   "functional": {
+    "status": "ok",
+    "message": "executed 548 dynamic instructions; all 12 expected items match"
+   },
+   "engine_version": "0.2.0",
+   "profile_hash": "ad82d111c1f87a406d95ed7407b12b900a3585bf73e053209632c151d7c1bb96",
+   "simulate": {
+    "1": {
+     "status": "ok",
+     "contexts": 1,
+     "predicted_cycles": 265,
+     "cycles_per_unit_core": 2.0703125,
+     "cycles_per_unit_per_thread": 2.0703,
+     "pair_fraction": 0.0584,
+     "limiting": [
+      {
+       "constraint": "spacing",
+       "context_cycles": 132
+      }
+     ]
+    },
+    "2": {
+     "status": "ok",
+     "contexts": 2,
+     "predicted_cycles": 266,
+     "cycles_per_unit_core": 1.0390625,
+     "cycles_per_unit_per_thread": 2.0781,
+     "pair_fraction": 0.0584,
+     "limiting": [
+      {
+       "constraint": "core_issue_slots",
+       "detail": "issue utilization 1.00: the core issues nearly every cycle"
+      },
+      {
+       "constraint": "spacing",
+       "context_cycles": 264
+      },
+      {
+       "constraint": "not_picked",
+       "context_cycles": 1
+      }
+     ]
+    },
+    "4": {
+     "status": "ok",
+     "contexts": 4,
+     "predicted_cycles": 532,
+     "cycles_per_unit_core": 1.0390625,
+     "cycles_per_unit_per_thread": 4.1562,
+     "pair_fraction": 0.0584,
+     "limiting": [
+      {
+       "constraint": "core_issue_slots",
+       "detail": "issue utilization 1.00: the core issues nearly every cycle"
+      },
+      {
+       "constraint": "not_picked",
+       "context_cycles": 1062
+      },
+      {
+       "constraint": "spacing",
+       "context_cycles": 528
+      }
+     ]
+    }
+   },
+   "bounds_loop": {
+    "status": "ok",
+    "mii_cycles_per_iteration": 128,
+    "res_mii": 128,
+    "rec_mii": "64",
+    "binding": "resources",
+    "critical_path": 64
+   },
+   "consistency": [
+    {
+     "threads": 4,
+     "measured_ticks": 4.13,
+     "predicted_cycles": 4.1562,
+     "ratio": 1.006
+    }
+   ]
+  },
+  {
+   "name": "c9_vector_u1",
+   "kind": "consistency",
+   "source": "char.s",
+   "loop": ".Lc9_vector_u1",
+   "lines": [
+    3,
+    6
+   ],
+   "conversion": "ok",
+   "unsupported": [],
+   "measured": {
+    "source": "docs/research/knc-characterization.md C9 (S8-01), register chain",
+    "unit": "TSC ticks per update per thread",
+    "threads": {
+     "1": 4.02,
+     "2": 4.02
+    }
+   },
+   "functional": {
+    "status": "ok",
+    "message": "executed 386 dynamic instructions; all 4 expected items match"
+   },
+   "engine_version": "0.2.0",
+   "profile_hash": "ad82d111c1f87a406d95ed7407b12b900a3585bf73e053209632c151d7c1bb96",
+   "simulate": {
+    "1": {
+     "status": "ok",
+     "contexts": 1,
+     "predicted_cycles": 257,
+     "cycles_per_unit_core": 4.015625,
+     "cycles_per_unit_per_thread": 4.0156,
+     "pair_fraction": 0.6632,
+     "limiting": [
+      {
+       "constraint": "spacing",
+       "context_cycles": 128
+      }
+     ]
+    },
+    "2": {
+     "status": "ok",
+     "contexts": 2,
+     "predicted_cycles": 258,
+     "cycles_per_unit_core": 2.015625,
+     "cycles_per_unit_per_thread": 4.0312,
+     "pair_fraction": 0.6632,
+     "limiting": [
+      {
+       "constraint": "core_issue_slots",
+       "detail": "issue utilization 1.00: the core issues nearly every cycle"
+      },
+      {
+       "constraint": "spacing",
+       "context_cycles": 256
+      },
+      {
+       "constraint": "not_picked",
+       "context_cycles": 1
+      }
+     ]
+    }
+   },
+   "bounds_loop": {
+    "status": "ok",
+    "mii_cycles_per_iteration": 4,
+    "res_mii": 4,
+    "rec_mii": "4",
+    "binding": "resources",
+    "critical_path": 4
+   },
+   "consistency": [
+    {
+     "threads": 1,
+     "measured_ticks": 4.02,
+     "predicted_cycles": 4.0156,
+     "ratio": 0.999
+    },
+    {
+     "threads": 2,
+     "measured_ticks": 4.02,
+     "predicted_cycles": 4.0312,
+     "ratio": 1.003
+    }
+   ]
+  },
+  {
+   "name": "c9_vector_u2",
+   "kind": "consistency",
+   "source": "char.s",
+   "loop": ".Lc9_vector_u2",
+   "lines": [
+    7,
+    11
+   ],
+   "conversion": "ok",
+   "unsupported": [],
+   "measured": {
+    "source": "docs/research/knc-characterization.md C9 (S8-01), register chain",
+    "unit": "TSC ticks per update per thread",
+    "threads": {
+     "1": 3.02,
+     "2": 3.01
+    }
+   },
+   "functional": {
+    "status": "ok",
+    "message": "executed 258 dynamic instructions; all 6 expected items match"
+   },
+   "engine_version": "0.2.0",
+   "profile_hash": "ad82d111c1f87a406d95ed7407b12b900a3585bf73e053209632c151d7c1bb96",
+   "simulate": {
+    "1": {
+     "status": "ok",
+     "contexts": 1,
+     "predicted_cycles": 193,
+     "cycles_per_unit_core": 3.015625,
+     "cycles_per_unit_per_thread": 3.0156,
+     "pair_fraction": 0.4961,
+     "limiting": [
+      {
+       "constraint": "spacing",
+       "context_cycles": 96
+      }
+     ]
+    },
+    "2": {
+     "status": "ok",
+     "contexts": 2,
+     "predicted_cycles": 194,
+     "cycles_per_unit_core": 1.515625,
+     "cycles_per_unit_per_thread": 3.0312,
+     "pair_fraction": 0.4961,
+     "limiting": [
+      {
+       "constraint": "core_issue_slots",
+       "detail": "issue utilization 1.00: the core issues nearly every cycle"
+      },
+      {
+       "constraint": "spacing",
+       "context_cycles": 192
+      },
+      {
+       "constraint": "not_picked",
+       "context_cycles": 1
+      }
+     ]
+    }
+   },
+   "bounds_loop": {
+    "status": "ok",
+    "mii_cycles_per_iteration": 4,
+    "res_mii": 4,
+    "rec_mii": "4",
+    "binding": "resources",
+    "critical_path": 4
+   },
+   "consistency": [
+    {
+     "threads": 1,
+     "measured_ticks": 3.02,
+     "predicted_cycles": 3.0156,
+     "ratio": 0.999
+    },
+    {
+     "threads": 2,
+     "measured_ticks": 3.01,
+     "predicted_cycles": 3.0312,
+     "ratio": 1.007
+    }
+   ]
+  },
+  {
+   "name": "c9_vector_u4",
+   "kind": "consistency",
+   "source": "char.s",
+   "loop": ".Lc9_vector_u4",
+   "lines": [
+    12,
+    18
+   ],
+   "conversion": "ok",
+   "unsupported": [],
+   "measured": {
+    "source": "docs/research/knc-characterization.md C9 (S8-01), register chain",
+    "unit": "TSC ticks per update per thread",
+    "threads": {
+     "1": 2.52,
+     "2": 2.51
+    }
+   },
+   "functional": {
+    "status": "ok",
+    "message": "executed 194 dynamic instructions; all 10 expected items match"
+   },
+   "engine_version": "0.2.0",
+   "profile_hash": "ad82d111c1f87a406d95ed7407b12b900a3585bf73e053209632c151d7c1bb96",
+   "simulate": {
+    "1": {
+     "status": "ok",
+     "contexts": 1,
+     "predicted_cycles": 161,
+     "cycles_per_unit_core": 2.515625,
+     "cycles_per_unit_per_thread": 2.5156,
+     "pair_fraction": 0.3299,
+     "limiting": [
+      {
+       "constraint": "spacing",
+       "context_cycles": 80
+      }
+     ]
+    },
+    "2": {
+     "status": "ok",
+     "contexts": 2,
+     "predicted_cycles": 162,
+     "cycles_per_unit_core": 1.265625,
+     "cycles_per_unit_per_thread": 2.5312,
+     "pair_fraction": 0.3299,
+     "limiting": [
+      {
+       "constraint": "core_issue_slots",
+       "detail": "issue utilization 1.00: the core issues nearly every cycle"
+      },
+      {
+       "constraint": "spacing",
+       "context_cycles": 160
+      },
+      {
+       "constraint": "not_picked",
+       "context_cycles": 1
+      }
+     ]
+    }
+   },
+   "bounds_loop": {
+    "status": "ok",
+    "mii_cycles_per_iteration": 8,
+    "res_mii": 8,
+    "rec_mii": "4",
+    "binding": "resources",
+    "critical_path": 4
+   },
+   "consistency": [
+    {
+     "threads": 1,
+     "measured_ticks": 2.52,
+     "predicted_cycles": 2.5156,
+     "ratio": 0.998
+    },
+    {
+     "threads": 2,
+     "measured_ticks": 2.51,
+     "predicted_cycles": 2.5312,
+     "ratio": 1.008
+    }
+   ]
+  },
+  {
+   "name": "gcc_forms_movslq",
+   "kind": "form_fixture",
+   "source": "../../fixtures/gcc_o2_forms.s",
+   "loop": ".Lmovslq",
+   "lines": [
+    25,
+    30
+   ],
+   "conversion": "ok",
+   "unsupported": [],
+   "functional": {
+    "status": "ok",
+    "message": "executed 21 dynamic instructions; all 3 expected items match"
+   },
+   "engine_version": "0.2.0",
+   "profile_hash": "ad82d111c1f87a406d95ed7407b12b900a3585bf73e053209632c151d7c1bb96",
+   "simulate": {
+    "1": {
+     "status": "ok",
+     "contexts": 1,
+     "predicted_cycles": 29,
+     "cycles_per_unit_core": 7.25,
+     "cycles_per_unit_per_thread": 7.25,
+     "pair_fraction": 0.7619,
+     "limiting": [
+      {
+       "constraint": "spacing",
+       "context_cycles": 12
+      },
+      {
+       "constraint": "dependency",
+       "context_cycles": 4
+      }
+     ]
+    }
+   }
+  },
+  {
+   "name": "gcc_forms_scalar",
+   "kind": "form_fixture",
+   "source": "../../fixtures/gcc_o2_forms.s",
+   "loop": ".Lscalar",
+   "lines": [
+    5,
+    23
+   ],
+   "conversion": "ok",
+   "unsupported": [],
+   "functional": {
+    "status": "ok",
+    "message": "executed 43 dynamic instructions; all 5 expected items match"
+   },
+   "engine_version": "0.2.0",
+   "profile_hash": "ad82d111c1f87a406d95ed7407b12b900a3585bf73e053209632c151d7c1bb96",
+   "simulate": {
+    "1": {
+     "status": "ok",
+     "contexts": 1,
+     "predicted_cycles": 61,
+     "cycles_per_unit_core": 15.25,
+     "cycles_per_unit_per_thread": 15.25,
+     "pair_fraction": 0.6512,
+     "limiting": [
+      {
+       "constraint": "spacing",
+       "context_cycles": 28
+      },
+      {
+       "constraint": "dependency",
+       "context_cycles": 4
+      }
+     ]
+    }
+   }
+  },
+  {
+   "name": "gcc_forms_unpack",
+   "kind": "form_fixture",
+   "source": "../../fixtures/gcc_o2_forms.s",
+   "loop": ".Lunpack",
+   "lines": [
+    32,
+    40
+   ],
+   "conversion": "ok",
+   "unsupported": [],
+   "functional": {
+    "status": "ok",
+    "message": "executed 33 dynamic instructions; all 1 expected items match"
+   },
+   "engine_version": "0.2.0",
+   "profile_hash": "ad82d111c1f87a406d95ed7407b12b900a3585bf73e053209632c151d7c1bb96",
+   "simulate": {
+    "1": {
+     "status": "ok",
+     "contexts": 1,
+     "predicted_cycles": 69,
+     "cycles_per_unit_core": 17.25,
+     "cycles_per_unit_per_thread": 17.25,
+     "pair_fraction": 0.4848,
+     "limiting": [
+      {
+       "constraint": "spacing",
+       "context_cycles": 24
+      },
+      {
+       "constraint": "dependency",
+       "context_cycles": 20
+      }
+     ]
+    }
+   }
+  },
+  {
+   "name": "pair_vector_scalar",
+   "kind": "consistency",
+   "source": "char.s",
+   "loop": ".Lpair_vector_scalar",
+   "lines": [
+    89,
+    155
+   ],
+   "conversion": "ok",
+   "unsupported": [],
+   "measured": {
+    "source": "docs/research/knc-characterization.md Full table pair.vector_scalar (S6-03)",
+    "unit": "TSC ticks per pair per thread",
+    "threads": {
+     "1": 2.08,
+     "2": 2.1,
+     "4": 4.2
+    }
+   },
+   "functional": {
+    "status": "ok",
+    "message": "executed 1060 dynamic instructions; all 40 expected items match"
+   },
+   "engine_version": "0.2.0",
+   "profile_hash": "ad82d111c1f87a406d95ed7407b12b900a3585bf73e053209632c151d7c1bb96",
+   "simulate": {
+    "1": {
+     "status": "ok",
+     "contexts": 1,
+     "predicted_cycles": 273,
+     "cycles_per_unit_core": 2.1328125,
+     "cycles_per_unit_per_thread": 2.1328,
+     "pair_fraction": 0.966,
+     "limiting": [
+      {
+       "constraint": "spacing",
+       "context_cycles": 136
+      }
+     ]
+    },
+    "2": {
+     "status": "ok",
+     "contexts": 2,
+     "predicted_cycles": 274,
+     "cycles_per_unit_core": 1.0703125,
+     "cycles_per_unit_per_thread": 2.1406,
+     "pair_fraction": 0.966,
+     "limiting": [
+      {
+       "constraint": "core_issue_slots",
+       "detail": "issue utilization 1.00: the core issues nearly every cycle"
+      },
+      {
+       "constraint": "spacing",
+       "context_cycles": 272
+      },
+      {
+       "constraint": "not_picked",
+       "context_cycles": 1
+      }
+     ]
+    },
+    "4": {
+     "status": "ok",
+     "contexts": 4,
+     "predicted_cycles": 548,
+     "cycles_per_unit_core": 1.0703125,
+     "cycles_per_unit_per_thread": 4.2812,
+     "pair_fraction": 0.966,
+     "limiting": [
+      {
+       "constraint": "core_issue_slots",
+       "detail": "issue utilization 1.00: the core issues nearly every cycle"
+      },
+      {
+       "constraint": "not_picked",
+       "context_cycles": 1094
+      },
+      {
+       "constraint": "spacing",
+       "context_cycles": 544
+      }
+     ]
+    }
+   },
+   "bounds_loop": {
+    "status": "ok",
+    "mii_cycles_per_iteration": 132,
+    "res_mii": 132,
+    "rec_mii": "32",
+    "binding": "resources",
+    "critical_path": 32
+   },
+   "consistency": [
+    {
+     "threads": 1,
+     "measured_ticks": 2.08,
+     "predicted_cycles": 2.1328,
+     "ratio": 1.025
+    },
+    {
+     "threads": 2,
+     "measured_ticks": 2.1,
+     "predicted_cycles": 2.1406,
+     "ratio": 1.019
+    },
+    {
+     "threads": 4,
+     "measured_ticks": 4.2,
+     "predicted_cycles": 4.2812,
+     "ratio": 1.019
+    }
+   ]
+  },
+  {
+   "name": "pair_vector_vector",
+   "kind": "consistency",
+   "source": "char.s",
+   "loop": ".Lpair_vector_vector",
+   "lines": [
+    156,
+    222
+   ],
+   "conversion": "ok",
+   "unsupported": [],
+   "measured": {
+    "source": "docs/research/knc-characterization.md Full table pair.vector_vector (S6-03)",
+    "unit": "TSC ticks per pair per thread",
+    "threads": {
+     "1": 4.09,
+     "2": 4.08,
+     "4": 8.2
+    }
+   },
+   "functional": {
+    "status": "ok",
+    "message": "executed 1060 dynamic instructions; all 68 expected items match"
+   },
+   "engine_version": "0.2.0",
+   "profile_hash": "ad82d111c1f87a406d95ed7407b12b900a3585bf73e053209632c151d7c1bb96",
+   "simulate": {
+    "1": {
+     "status": "ok",
+     "contexts": 1,
+     "predicted_cycles": 521,
+     "cycles_per_unit_core": 4.0703125,
+     "cycles_per_unit_per_thread": 4.0703,
+     "pair_fraction": 0.0302,
+     "limiting": [
+      {
+       "constraint": "spacing",
+       "context_cycles": 260
+      }
+     ]
+    },
+    "2": {
+     "status": "ok",
+     "contexts": 2,
+     "predicted_cycles": 522,
+     "cycles_per_unit_core": 2.0390625,
+     "cycles_per_unit_per_thread": 4.0781,
+     "pair_fraction": 0.0302,
+     "limiting": [
+      {
+       "constraint": "core_issue_slots",
+       "detail": "issue utilization 1.00: the core issues nearly every cycle"
+      },
+      {
+       "constraint": "spacing",
+       "context_cycles": 520
+      },
+      {
+       "constraint": "not_picked",
+       "context_cycles": 1
+      }
+     ]
+    },
+    "4": {
+     "status": "ok",
+     "contexts": 4,
+     "predicted_cycles": 1044,
+     "cycles_per_unit_core": 2.0390625,
+     "cycles_per_unit_per_thread": 8.1562,
+     "pair_fraction": 0.0302,
+     "limiting": [
+      {
+       "constraint": "core_issue_slots",
+       "detail": "issue utilization 1.00: the core issues nearly every cycle"
+      },
+      {
+       "constraint": "not_picked",
+       "context_cycles": 2086
+      },
+      {
+       "constraint": "spacing",
+       "context_cycles": 1040
+      }
+     ]
+    }
+   },
+   "bounds_loop": {
+    "status": "ok",
+    "mii_cycles_per_iteration": 256,
+    "res_mii": 256,
+    "rec_mii": "16",
+    "binding": "resources",
+    "critical_path": 16
+   },
+   "consistency": [
+    {
+     "threads": 1,
+     "measured_ticks": 4.09,
+     "predicted_cycles": 4.0703,
+     "ratio": 0.995
+    },
+    {
+     "threads": 2,
+     "measured_ticks": 4.08,
+     "predicted_cycles": 4.0781,
+     "ratio": 1.0
+    },
+    {
+     "threads": 4,
+     "measured_ticks": 8.2,
+     "predicted_cycles": 8.1562,
+     "ratio": 0.995
+    }
+   ]
+  },
+  {
+   "name": "trial_fsum_L26",
+   "kind": "trial",
+   "source": "trial.s",
+   "loop": ".L26",
+   "lines": [
+    163,
+    185
+   ],
+   "conversion": "ok",
+   "unsupported": [],
+   "functional": {
+    "status": "ok",
+    "message": "executed 45 dynamic instructions; all 4 expected items match"
+   },
+   "engine_version": "0.2.0",
+   "profile_hash": "ad82d111c1f87a406d95ed7407b12b900a3585bf73e053209632c151d7c1bb96",
+   "simulate": {
+    "1": {
+     "status": "ok",
+     "contexts": 1,
+     "predicted_cycles": 99,
+     "cycles_per_unit_core": 3.09375,
+     "cycles_per_unit_per_thread": 3.0938,
+     "pair_fraction": 0.4444,
+     "limiting": [
+      {
+       "constraint": "spacing",
+       "context_cycles": 34
+      },
+      {
+       "constraint": "dependency",
+       "context_cycles": 30
+      }
+     ]
+    }
+   },
+   "bounds_loop": {
+    "status": "ok",
+    "mii_cycles_per_iteration": 48,
+    "res_mii": 32,
+    "rec_mii": "48",
+    "binding": "recurrence",
+    "critical_path": 48
+   }
+  },
+  {
+   "name": "trial_saxpy_L5",
+   "kind": "trial",
+   "source": "trial.s",
+   "loop": ".L5",
+   "lines": [
+    40,
+    52
+   ],
+   "conversion": "ok",
+   "unsupported": [],
+   "functional": {
+    "status": "ok",
+    "message": "executed 388 dynamic instructions; all 4 expected items match"
+   },
+   "engine_version": "0.2.0",
+   "profile_hash": "ad82d111c1f87a406d95ed7407b12b900a3585bf73e053209632c151d7c1bb96",
+   "simulate": {
+    "1": {
+     "status": "ok",
+     "contexts": 1,
+     "predicted_cycles": 113,
+     "cycles_per_unit_core": 14.125,
+     "cycles_per_unit_per_thread": 14.125,
+     "pair_fraction": 0.8247,
+     "limiting": [
+      {
+       "constraint": "spacing",
+       "context_cycles": 56
+      }
+     ]
+    },
+    "2": {
+     "status": "ok",
+     "contexts": 2,
+     "predicted_cycles": 138,
+     "cycles_per_unit_core": 8.625,
+     "cycles_per_unit_per_thread": 17.25,
+     "pair_fraction": 0.8247,
+     "limiting": [
+      {
+       "constraint": "spacing",
+       "context_cycles": 112
+      },
+      {
+       "constraint": "not_picked",
+       "context_cycles": 25
+      },
+      {
+       "constraint": "resource",
+       "context_cycles": 24
+      }
+     ]
+    },
+    "4": {
+     "status": "ok",
+     "contexts": 4,
+     "predicted_cycles": 203,
+     "cycles_per_unit_core": 6.34375,
+     "cycles_per_unit_per_thread": 25.375,
+     "pair_fraction": 0.9845,
+     "limiting": [
+      {
+       "constraint": "core_issue_slots",
+       "detail": "issue utilization 0.97: the core issues nearly every cycle"
+      },
+      {
+       "constraint": "not_picked",
+       "context_cycles": 335
+      },
+      {
+       "constraint": "spacing",
+       "context_cycles": 193
+      },
+      {
+       "constraint": "resource",
+       "context_cycles": 74
+      }
+     ]
+    }
+   },
+   "bounds_loop": {
+    "status": "ok",
+    "mii_cycles_per_iteration": 24,
+    "res_mii": 24,
+    "rec_mii": "1",
+    "binding": "resources",
+    "critical_path": 10
+   }
+  },
+  {
+   "name": "trial_saxpy_L7",
+   "kind": "trial",
+   "source": "trial.s",
+   "loop": ".L7",
+   "lines": [
+    126,
+    132
+   ],
+   "conversion": "ok",
+   "unsupported": [],
+   "functional": {
+    "status": "ok",
+    "message": "executed 196 dynamic instructions; all 4 expected items match"
+   },
+   "engine_version": "0.2.0",
+   "profile_hash": "ad82d111c1f87a406d95ed7407b12b900a3585bf73e053209632c151d7c1bb96",
+   "simulate": {
+    "1": {
+     "status": "ok",
+     "contexts": 1,
+     "predicted_cycles": 105,
+     "cycles_per_unit_core": 13.125,
+     "cycles_per_unit_per_thread": 13.125,
+     "pair_fraction": 0.6531,
+     "limiting": [
+      {
+       "constraint": "dependency",
+       "context_cycles": 40
+      },
+      {
+       "constraint": "spacing",
+       "context_cycles": 32
+      }
+     ]
+    },
+    "2": {
+     "status": "ok",
+     "contexts": 2,
+     "predicted_cycles": 106,
+     "cycles_per_unit_core": 6.625,
+     "cycles_per_unit_per_thread": 13.25,
+     "pair_fraction": 0.6531,
+     "limiting": [
+      {
+       "constraint": "dependency",
+       "context_cycles": 80
+      },
+      {
+       "constraint": "spacing",
+       "context_cycles": 64
+      },
+      {
+       "constraint": "not_picked",
+       "context_cycles": 1
+      }
+     ]
+    },
+    "4": {
+     "status": "ok",
+     "contexts": 4,
+     "predicted_cycles": 140,
+     "cycles_per_unit_core": 4.375,
+     "cycles_per_unit_per_thread": 17.5,
+     "pair_fraction": 0.6531,
+     "limiting": [
+      {
+       "constraint": "core_issue_slots",
+       "detail": "issue utilization 0.94: the core issues nearly every cycle"
+      },
+      {
+       "constraint": "dependency",
+       "context_cycles": 160
+      },
+      {
+       "constraint": "not_picked",
+       "context_cycles": 134
+      },
+      {
+       "constraint": "spacing",
+       "context_cycles": 128
+      }
+     ]
+    }
+   },
+   "bounds_loop": {
+    "status": "ok",
+    "mii_cycles_per_iteration": 12,
+    "res_mii": 12,
+    "rec_mii": "1",
+    "binding": "resources",
+    "critical_path": 10
+   }
+  },
+  {
+   "name": "trial_stencil_L51",
+   "kind": "trial",
+   "source": "trial.s",
+   "loop": ".L51",
+   "lines": [
+    580,
+    611
+   ],
+   "conversion": "ok",
+   "unsupported": [],
+   "functional": {
+    "status": "ok",
+    "message": "executed 500 dynamic instructions; all 4 expected items match"
+   },
+   "engine_version": "0.2.0",
+   "profile_hash": "ad82d111c1f87a406d95ed7407b12b900a3585bf73e053209632c151d7c1bb96",
+   "simulate": {
+    "1": {
+     "status": "ok",
+     "contexts": 1,
+     "predicted_cycles": 297,
+     "cycles_per_unit_core": 18.5625,
+     "cycles_per_unit_per_thread": 18.5625,
+     "pair_fraction": 0.128,
+     "limiting": [
+      {
+       "constraint": "spacing",
+       "context_cycles": 116
+      },
+      {
+       "constraint": "dependency",
+       "context_cycles": 64
+      }
+     ]
+    },
+    "2": {
+     "status": "ok",
+     "contexts": 2,
+     "predicted_cycles": 298,
+     "cycles_per_unit_core": 9.3125,
+     "cycles_per_unit_per_thread": 18.625,
+     "pair_fraction": 0.128,
+     "limiting": [
+      {
+       "constraint": "spacing",
+       "context_cycles": 232
+      },
+      {
+       "constraint": "dependency",
+       "context_cycles": 128
+      },
+      {
+       "constraint": "not_picked",
+       "context_cycles": 1
+      }
+     ]
+    },
+    "4": {
+     "status": "ok",
+     "contexts": 4,
+     "predicted_cycles": 468,
+     "cycles_per_unit_core": 7.3125,
+     "cycles_per_unit_per_thread": 29.25,
+     "pair_fraction": 0.128,
+     "limiting": [
+      {
+       "constraint": "core_issue_slots",
+       "detail": "issue utilization 1.00: the core issues nearly every cycle"
+      },
+      {
+       "constraint": "not_picked",
+       "context_cycles": 678
+      },
+      {
+       "constraint": "spacing",
+       "context_cycles": 464
+      },
+      {
+       "constraint": "dependency",
+       "context_cycles": 256
+      }
+     ]
+    }
+   },
+   "bounds_loop": {
+    "status": "ok",
+    "mii_cycles_per_iteration": 96,
+    "res_mii": 96,
+    "rec_mii": "1",
+    "binding": "resources",
+    "critical_path": 14
+   }
+  }
+ ],
+ "compare": [
+  {
+   "baseline": "trial_saxpy_L7",
+   "candidate": "trial_saxpy_L5",
+   "contexts": 1,
+   "status": "ok",
+   "message": "predicted_cycles_per_unit: baseline 13.1250, candidate 14.1250 (ratio 1.0762); same engine, profile and scenario",
+   "deltas": {
+    "assumptions_only_in_baseline": [],
+    "assumptions_only_in_candidate": [],
+    "baseline_status": "ok",
+    "candidate_status": "ok",
+    "compatible": true,
+    "metrics": [
+     {
+      "baseline": 105,
+      "candidate": 113,
+      "delta": 8,
+      "metric": "predicted_cycles",
+      "ratio_candidate_over_baseline": 1.0761904761904761
+     },
+     {
+      "baseline": 13.125,
+      "candidate": 14.125,
+      "delta": 1.0,
+      "metric": "predicted_cycles_per_unit",
+      "ratio_candidate_over_baseline": 1.0761904761904761
+     },
+     {
+      "baseline": 105,
+      "candidate": 113,
+      "delta": 8,
+      "metric": "issue_span_cycles",
+      "ratio_candidate_over_baseline": 1.0761904761904761
+     },
+     {
+      "baseline": 49,
+      "candidate": 97,
+      "delta": 48,
+      "metric": "dynamic_instructions",
+      "ratio_candidate_over_baseline": 1.9795918367346939
+     },
+     {
+      "baseline": 33,
+      "candidate": 57,
+      "delta": 24,
+      "metric": "issue_events",
+      "ratio_candidate_over_baseline": 1.7272727272727273
+     },
+     {
+      "baseline": 0.3143,
+      "candidate": 0.5044,
+      "delta": 0.19009999999999994,
+      "metric": "core_issue_utilization",
+      "ratio_candidate_over_baseline": 1.6048361438116447
+     },
+     {
+      "baseline": 0.6531,
+      "candidate": 0.8247,
+      "delta": 0.17159999999999997,
+      "metric": "pair_fraction",
+      "ratio_candidate_over_baseline": 1.262746899402848
+     }
+    ],
+    "result_class": {
+     "baseline": "unvalidated_scenario_estimate",
+     "candidate": "unvalidated_scenario_estimate",
+     "note": "a ranking between two unvalidated estimates is itself unvalidated; see the held-out ranking reliability in references/validation.md"
+    },
+    "scenarios": [
+     {
+      "baseline": 105,
+      "candidate": 113,
+      "delta": 8,
+      "metric": "predicted_cycles",
+      "ratio_candidate_over_baseline": 1.0761904761904761
+     },
+     {
+      "baseline": 13.125,
+      "candidate": 14.125,
+      "delta": 1.0,
+      "metric": "predicted_cycles_per_unit",
+      "ratio_candidate_over_baseline": 1.0761904761904761
+     },
+     {
+      "baseline": 105,
+      "candidate": 113,
+      "delta": 8,
+      "metric": "issue_span_cycles",
+      "ratio_candidate_over_baseline": 1.0761904761904761
+     },
+     {
+      "baseline": 49,
+      "candidate": 97,
+      "delta": 48,
+      "metric": "dynamic_instructions",
+      "ratio_candidate_over_baseline": 1.9795918367346939
+     },
+     {
+      "baseline": 33,
+      "candidate": 57,
+      "delta": 24,
+      "metric": "issue_events",
+      "ratio_candidate_over_baseline": 1.7272727272727273
+     },
+     {
+      "baseline": 0.3143,
+      "candidate": 0.5044,
+      "delta": 0.19009999999999994,
+      "metric": "core_issue_utilization",
+      "ratio_candidate_over_baseline": 1.6048361438116447
+     },
+     {
+      "baseline": 0.6531,
+      "candidate": 0.8247,
+      "delta": 0.17159999999999997,
+      "metric": "pair_fraction",
+      "ratio_candidate_over_baseline": 1.262746899402848
+     }
+    ]
+   }
+  }
+ ],
+ "heldout": "scripts/validate_heldout.py --cases tests/heldout_native (references/validation.md)"
+}

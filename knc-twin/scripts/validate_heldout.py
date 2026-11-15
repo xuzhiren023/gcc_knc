@@ -83,6 +83,8 @@ RANK_GROUPS = {
     "latency_rows": ["scalar_add.lat", "vaddps.lat", "vpermd.lat", "vcvtfxpntpd2dq.lat", "x87_add.lat", "masked_load.lat", "x87_div.lat"],
     "gathers": ["gather_all.lat", "gather_scattered.lat", "gather_all.rt", "gather_scattered.rt"],
     "branches": ["c10.branch.fixed", "c10.branch.random"],
+    "s12_31_layout": ["s12-31-microbench/" + v for v in ("gas_0", "mis_44", "inc_0", "adj_0", "mid_0", "mov_adj_0", "mov_split_0")],
+    "s12_30_csr": ["s12-30-small-csr/" + v for v in ("donor-off", "knc-switch-off", "knc-switch-on", "knc-switch-off-two-nests")],
 }
 
 
@@ -168,11 +170,170 @@ def run_case(kernel_dict, test, profile, threads, rounds, scenario, max_seconds)
     return res["completion_cycles"], res, sim.assumptions
 
 
+# ---------------------------------------------------------------------------------------------
+# Compiled-code and card cases (tests/heldout_native/<case>/case.json, S13-06): one directory per
+# case with the assembly or kernel, measurement.json citing its native log and prediction.json
+# recorded before the comparison. predict_case() is deterministic; tests/regress/test_knc_twin.py
+# checks that it reproduces prediction.json for the same engine and profile.
+
+def _case_profile(profile_id):
+    return load_profile(profile_id)
+
+
+def _run_kernel(raw, path, profile, max_seconds):
+    kernel = Kernel(raw, path)
+    deadline = time.time() + max_seconds
+    interp, steps, check = functional.run_functional(kernel, deadline=deadline)
+    if check["status"] == "mismatch":
+        raise TwinError("functional_mismatch: %s" % json.dumps(check["mismatches"][:3]))
+    sim = timing.CoreSim(kernel, profile, interp.traces, deadline=deadline, record_issue=False)
+    res = sim.run()
+    return res, check["status"]
+
+
+def _predict_compiled_function(case_dir, case, variant, profile, max_seconds):
+    """A function region; per-unit cycles = slope of completion cycles between two unit counts."""
+    source = os.path.join(case_dir, variant.get("source", case["source"]))
+    kernel, rows, summary = from_gcc_s.convert(source, variant["function"], profile=profile)
+    if not summary["complete"]["isa"] or not summary["complete"]["functional"] or not summary["complete"]["timing"]:
+        return {"status": "unsupported", "message": "; ".join(summary["unsupported"] + summary["timing_only_or_missing"])[:400]}
+    points = []
+    res = None
+    checks = []
+    for units in case["slope_units"]:
+        raw = json.loads(json.dumps(kernel))
+        raw["init"]["registers"].update(case["init"]["registers"])
+        raw["init"]["registers"][case["slope_register"]] = units
+        raw["init"]["memory"] = raw["init"].get("memory", []) + case["init"]["memory"]
+        raw["expected"] = case["expected"][str(units)]
+        raw["scenario"] = case["scenario"]
+        raw["memory_default"] = 0
+        raw["max_steps"] = 4000000
+        raw["unit_of_work"] = {"description": case["unit"], "count": units}
+        res, chk = _run_kernel(raw, source, profile, max_seconds)
+        checks.append(chk)
+        points.append(res["completion_cycles"])
+    per_unit = (points[1] - points[0]) / float(case["slope_units"][1] - case["slope_units"][0])
+    return {"status": "ok", "functional": checks, "completion_cycles": points, "predicted_cycles_per_unit": round(per_unit, 3),
+            "limiting": timing.limiting_constraints(res)[:2]}
+
+
+def _predict_compiled_kernel(case_dir, case, variant, profile, max_seconds):
+    """A ready kernel (adapter output plus input and expected result); cycles of one unit."""
+    path = os.path.normpath(os.path.join(case_dir, variant["kernel"]))
+    raw = load_json(path, "kernel")
+    if raw["unit_of_work"]["count"] != 1:
+        raise TwinError("compiled_kernel variants must define one unit of work")
+    res, chk = _run_kernel(raw, path, profile, max_seconds)
+    return {"status": "ok", "functional": [chk], "completion_cycles": [res["completion_cycles"]],
+            "predicted_cycles_per_unit": float(res["completion_cycles"]), "limiting": timing.limiting_constraints(res)[:2]}
+
+
+def _twin_cli(args, out):
+    import subprocess
+    proc = subprocess.run([sys.executable, os.path.join(HERE, "knc_twin.py")] + [str(a) for a in args] + ["--out", str(out), "--force"],
+                          stdout=subprocess.PIPE, stderr=subprocess.STDOUT, universal_newlines=True)
+    result = os.path.join(str(out), "result.json")
+    if not os.path.exists(result):
+        raise TwinError("twin %s wrote no result.json (exit %d): %s" % (args[0], proc.returncode, proc.stdout[-1500:]))
+    return load_json(result, "result")
+
+
+def _predict_card(case_dir, case, tmp):
+    """Card scale: per-core compute term from a simulate of the stand-in loop, then bounds --scale card."""
+    core = case["core"]
+    report, kernel = from_gcc_s.convert_loop(os.path.join(case_dir, core["source"]), core["loop"], core.get("function"),
+                                             core.get("spec"), core.get("contexts", 1))
+    name = os.path.basename(case_dir)
+    pred = {"case": name}
+    if kernel is None:
+        pred.update(status="unsupported", unsupported=report["unsupported"])
+        return pred
+    kpath = os.path.join(tmp, name + "-core.kernel.json")
+    dump_json(kernel, kpath)
+    r = _twin_cli(["simulate", kpath], os.path.join(tmp, name + "-core"))
+    if r["status"] != "ok":
+        pred.update(status=r["status"], message=r["message"])
+        return pred
+    p = r["prediction"]
+    pred["core"] = {"status": "ok", "contexts": core.get("contexts", 1), "predicted_cycles": p["predicted_cycles"],
+                    "cycles_per_unit_core": p["predicted_cycles_per_unit"], "limiting": r.get("limiting_constraints")}
+    params = load_json(os.path.join(case_dir, case["params"]), "params")
+    params["per_core_cycles_per_unit"] = pred["core"]["cycles_per_unit_core"]
+    ppath = os.path.join(tmp, name + "-params.json")
+    dump_json(params, ppath)
+    r = _twin_cli(["bounds", "--scale", "card", "--params", ppath], os.path.join(tmp, name + "-card"))
+    pred.update(status=r["status"], engine_version=r["engine_version"], profile_hash=r["profile"]["hash"])
+    if r["status"] == "ok":
+        pred["scenarios"] = [{k: s.get(k) for k in ("bandwidth_gbs", "binding", "compute_seconds", "memory_seconds", "total_seconds",
+                                                       "achieved_bandwidth_gbs_if_total")} for s in r["prediction"]["scenarios"]]
+    else:
+        pred["message"] = r["message"]
+    return pred
+
+
+def predict_case(case_dir, profile_id="card-7120-measured", tmp=None, max_seconds=120.0):
+    """The prediction a held-out case records in prediction.json (no timestamps: reproducible)."""
+    case_dir = os.path.abspath(str(case_dir))
+    case = load_json(os.path.join(case_dir, "case.json"), "case")
+    if case["scale"] == "card":
+        import tempfile
+        return _predict_card(case_dir, case, tmp or tempfile.mkdtemp(prefix="knc-heldout-"))
+    profile = _case_profile(profile_id)
+    from knc_model import ENGINE_VERSION
+    pred = {"case": os.path.basename(case_dir), "engine_version": ENGINE_VERSION, "profile_hash": profile.hash,
+            "unit": case["unit"], "scenario": case.get("scenario_name"), "variants": []}
+    for v in case["variants"]:
+        try:
+            if case["kind"] == "compiled_function":
+                row = _predict_compiled_function(case_dir, case, v, profile, max_seconds)
+            else:
+                row = _predict_compiled_kernel(case_dir, case, v, profile, max_seconds)
+        except TwinError as e:
+            row = {"status": e.status, "message": e.message}
+        pred["variants"].append(dict({"variant": v["name"]}, **row))
+    return pred
+
+
+def compiled_rows(cases_dir, profile_id, record=False, max_seconds=120.0):
+    """Held-out rows for every core-scale case directory, compared with measurement.json; card cases listed apart."""
+    rows, card = [], []
+    for name in sorted(os.listdir(cases_dir)):
+        d = os.path.join(cases_dir, name)
+        if not os.path.isfile(os.path.join(d, "case.json")):
+            continue
+        pred = predict_case(d, profile_id, max_seconds=max_seconds)
+        rec_path = os.path.join(d, "prediction.json")
+        recorded = load_json(rec_path, "prediction") if os.path.exists(rec_path) else None
+        if record:
+            dump_json(pred, rec_path)
+        elif recorded != pred:
+            print("%-28s prediction differs from the recorded prediction.json (engine or profile changed?)" % name, flush=True)
+        meas = load_json(os.path.join(d, "measurement.json"), "measurement")
+        if load_json(os.path.join(d, "case.json"), "case")["scale"] == "card":
+            card.append({"case": name, "prediction": pred, "measurement": meas})
+            print("%-28s card        %s" % (name, pred.get("status")), flush=True)
+            continue
+        for v in pred["variants"]:
+            m = meas["per_variant"].get(v["variant"])
+            row = {"name": "%s/%s" % (name, v["variant"]), "suite": "compiled", "kind": "compiled", "unit": pred["unit"],
+                   "measured": {"threads_1": m} if m is not None else {}, "class": "held_out", "calibrates": None,
+                   "predicted": {}, "status": v["status"], "message": v.get("message"), "source_log": meas["source_log"]}
+            if v["status"] == "ok":
+                row["predicted"]["A"] = {"threads_1": v["predicted_cycles_per_unit"]}
+                row["limiting"] = {"threads_1": v["limiting"]}
+            rows.append(row)
+            print("%-28s held_out    meas %s pred %s" % (row["name"], m, v.get("predicted_cycles_per_unit", v["status"])), flush=True)
+    return rows, card
+
+
 def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--kernels-s", required=True)
     ap.add_argument("--kernels-h", required=True)
     ap.add_argument("--measured", required=True)
+    ap.add_argument("--cases", help="tests/heldout_native: also predict every compiled-code and card case there")
+    ap.add_argument("--record", action="store_true", help="with --cases: (re)write each case's prediction.json")
     ap.add_argument("--profile", default="card-7120-measured")
     ap.add_argument("--out", required=True)
     ap.add_argument("--only", default=None)
@@ -250,11 +411,18 @@ def main(argv=None):
             row["message"] = "%s: %s" % (type(e).__name__, e)
             rows.append(row)
             print("%-28s error: %s" % (name, row["message"][:110]), flush=True)
+    for r in rows:
+        r.setdefault("suite", "characterization")
+    card = []
+    if args.cases:
+        crow, card = compiled_rows(args.cases, args.profile, record=args.record, max_seconds=args.max_seconds)
+        rows += crow
     report = summarize(rows, threads, profile, args)
+    report["card_cases"] = card
     report["python_seconds"] = round(time.time() - t_start, 1)
     dump_json(report, os.path.join(args.out, "validation.json"))
     md = markdown(report)
-    with open(os.path.join(args.out, "validation.md"), "w", encoding="utf-8") as f:
+    with open(os.path.join(args.out, "validation.md"), "w", encoding="utf-8", newline="\n") as f:
         f.write(md)
     print(md)
     return 0
@@ -272,7 +440,9 @@ def summarize(rows, threads, profile, args):
             p = r["predicted"].get("A", {}).get(key)
             if m is None or p is None or m == 0:
                 continue
-            errs[r["class"]].append(100.0 * (p - m) / m)
+            errs.setdefault(r["class"] if r.get("suite", "characterization") == "characterization" else "%s_%s" % (r["suite"], r["class"]), []).append(100.0 * (p - m) / m)
+            if r["class"] == "held_out":
+                errs.setdefault("all_held_out", []).append(100.0 * (p - m) / m)
         for cls, e in errs.items():
             if e:
                 ae = [abs(x) for x in e]
@@ -311,7 +481,8 @@ def summarize(rows, threads, profile, args):
                       "footprints that fit L1 (L2) with all active threads are declared warm in L1 (L2) because the driver measures a warm steady state; larger footprints start cold",
                       "the kernel catalog was regenerated from tests/bench/knc-char/kernels.py; S8-07 additions shift kernel indices but the measured S6-03 bodies are the same templates",
                       "calibration rows set a parameter of the profile and are excluded from the held-out statistics",
-                      "every prediction is a model output; the measured column is native"]}
+                      "every prediction is a model output; the measured column is native",
+                      "compiled rows (tests/heldout_native/<case>/) are held out: S12-31 row loops (core cycles per row, window 5) and S12-30 csr_raw calls (core cycles per call, window 8), seconds converted with card.clock_hz 1.238 GHz; each prediction is also recorded in the case's prediction.json"]}
 
 
 def markdown(rep):
@@ -357,6 +528,17 @@ def markdown(rep):
         lim = ", ".join(c.get("constraint", "") for c in r.get("limiting", {}).get("threads_1", [])) if r.get("limiting") else ""
         status = r["status"] if r["status"] == "ok" else "%s: %s" % (r["status"], (r["message"] or "")[:70])
         L.append("| %s | %s | %s | %s | %s | %s | %s | %s |" % (r["name"], r["class"], status, fmt(m), fmt(pa), "/".join(errs), fmt(pb) if pb else "", lim))
+    if rep.get("card_cases"):
+        L.append("")
+        L.append("## Card-scale cases (analytical card scale; outside the core model, not in the statistics)")
+        L.append("")
+        L.append("| case | status | per-core cycles per unit (stand-in loop) | predicted GB/s | measured GB/s (median) |")
+        L.append("|---|---|---:|---:|---:|")
+        for c in rep["card_cases"]:
+            p, m = c["prediction"], c["measurement"]
+            bw = "/".join("%.1f" % s["bandwidth_gbs"] for s in p.get("scenarios", []) if s.get("bandwidth_gbs") is not None) or "-"
+            meas = "/".join("%.2f" % r["median_GBs"] for r in m.get("rows", []) if "median_GBs" in r) or "-"
+            L.append("| %s | %s | %s | %s | %s |" % (c["case"], p.get("status"), p.get("core", {}).get("cycles_per_unit_core", "-"), bw, meas))
     L.append("")
     for n in rep["notes"]:
         L.append("- " + n)

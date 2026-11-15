@@ -1,0 +1,109 @@
+{
+ "schema": "knc-twin.heldout-measurement/1",
+ "case": "s12-31-microbench",
+ "source_log": ".work/_shared/S12-31/native.log (window 3, 2026-11-15 02:57Z) and .work/_shared/S12-31/native-mb.log (window 5, 2026-11-15 09:17-09:23Z): lines 'S12_31 mb_median <variant> ns_per_row'",
+ "source_doc": "docs/research/s12-31-hpcg.md, first and second diagnostic",
+ "unit": "median ns per row over five samples, one core, one thread",
+ "clock": "core cycles = ns x 1.238 GHz (card.clock_hz of card-7120-measured, S6-01 run logs; micsmc reports 1.24 GHz)",
+ "used_to_set_parameters": false,
+ "rows": [
+  {
+   "variant": "gas_0",
+   "window": "window 3",
+   "source_log": ".work/_shared/S12-31/native.log",
+   "ns_per_row": 393.458,
+   "core_cycles_per_row": 487.1,
+   "threads": 1
+  },
+  {
+   "variant": "mis_44",
+   "window": "window 3",
+   "source_log": ".work/_shared/S12-31/native.log",
+   "ns_per_row": 393.73,
+   "core_cycles_per_row": 487.4,
+   "threads": 1
+  },
+  {
+   "variant": "inc_0",
+   "window": "window 3",
+   "source_log": ".work/_shared/S12-31/native.log",
+   "ns_per_row": 393.293,
+   "core_cycles_per_row": 486.9,
+   "threads": 1
+  },
+  {
+   "variant": "adj_0",
+   "window": "window 3",
+   "source_log": ".work/_shared/S12-31/native.log",
+   "ns_per_row": 349.494,
+   "core_cycles_per_row": 432.7,
+   "threads": 1
+  },
+  {
+   "variant": "gas_0",
+   "window": "window 5",
+   "source_log": ".work/_shared/S12-31/native-mb.log",
+   "ns_per_row": 394.923,
+   "core_cycles_per_row": 488.9,
+   "threads": 1
+  },
+  {
+   "variant": "mis_44",
+   "window": "window 5",
+   "source_log": ".work/_shared/S12-31/native-mb.log",
+   "ns_per_row": 395.154,
+   "core_cycles_per_row": 489.2,
+   "threads": 1
+  },
+  {
+   "variant": "inc_0",
+   "window": "window 5",
+   "source_log": ".work/_shared/S12-31/native-mb.log",
+   "ns_per_row": 394.978,
+   "core_cycles_per_row": 489.0,
+   "threads": 1
+  },
+  {
+   "variant": "adj_0",
+   "window": "window 5",
+   "source_log": ".work/_shared/S12-31/native-mb.log",
+   "ns_per_row": 350.132,
+   "core_cycles_per_row": 433.5,
+   "threads": 1
+  },
+  {
+   "variant": "mid_0",
+   "window": "window 5",
+   "source_log": ".work/_shared/S12-31/native-mb.log",
+   "ns_per_row": 349.324,
+   "core_cycles_per_row": 432.5,
+   "threads": 1
+  },
+  {
+   "variant": "mov_adj_0",
+   "window": "window 5",
+   "source_log": ".work/_shared/S12-31/native-mb.log",
+   "ns_per_row": 394.077,
+   "core_cycles_per_row": 487.9,
+   "threads": 1
+  },
+  {
+   "variant": "mov_split_0",
+   "window": "window 5",
+   "source_log": ".work/_shared/S12-31/native-mb.log",
+   "ns_per_row": 393.829,
+   "core_cycles_per_row": 487.6,
+   "threads": 1
+  }
+ ],
+ "per_variant": {
+  "gas_0": 488.9,
+  "mis_44": 489.2,
+  "inc_0": 489.0,
+  "adj_0": 433.5,
+  "mid_0": 432.5,
+  "mov_adj_0": 487.9,
+  "mov_split_0": 487.6
+ },
+ "per_variant_note": "window 5 (all seven variants measured in one window); window 3 agrees within 0.5% for the four variants it measured"
+}
