@@ -1,0 +1,19 @@
+{
+  "schema": "knc-twin.profile/1",
+  "id": "card-3120-documented",
+  "version": "0.1.0",
+  "kind": "card",
+  "extends": "knc-common",
+  "synthetic": false,
+  "description": "Xeon Phi 3120A/3120P (57 cores, 1.1 GHz, 6 GB GDDR5, 240 GB/s peak). Only Intel's published card constants are filled in. Latencies that the common profile leaves unknown stay unknown here, so simulations that need them stop with missing_parameter until measurements are imported.",
+  "native_measurement_ids": [],
+  "calibration": {"state": "uncalibrated", "statement": "No native measurement imported; no literature latencies assumed.", "held_out_validation_cases": 0},
+  "parameters": {
+    "card.model": {"value": "Xeon Phi 3120A/3120P", "unit": "text", "status": "documented", "source": "Intel product specification (ark.intel.com, Xeon Phi Coprocessor 3120A/3120P)"},
+    "card.clock_hz": {"value": 1100000000, "unit": "Hz", "status": "documented", "source": "Intel product specification 3120 (1.1 GHz)"},
+    "card.cores": {"value": 57, "unit": "cores", "status": "documented", "source": "Intel product specification 3120"},
+    "card.usable_cores": {"value": 56, "unit": "cores", "status": "assumed", "source": "one core reserved for the card OS; not measured"},
+    "card.memory_bytes": {"value": 6442450944, "unit": "bytes", "status": "documented", "source": "Intel product specification 3120 (6 GB)"},
+    "card.peak_memory_bandwidth_gbs": {"value": 240, "unit": "GB/s", "status": "documented", "source": "Intel product specification 3120"}
+  }
+}

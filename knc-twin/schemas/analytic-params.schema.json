@@ -1,0 +1,25 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "knc-twin.analytic-params/1",
+  "title": "knc-twin pair/card analytic scenario parameters",
+  "type": "object",
+  "properties": {
+    "schema": {"const": "knc-twin.analytic-params/1"},
+    "description": {"type": "string"},
+    "core_a_cycles": {"type": "number", "description": "pair: producer core cycles per unit (from a core-scale simulate result)"},
+    "core_b_cycles": {"type": "number", "description": "pair: consumer core cycles per unit"},
+    "lines_exchanged": {"type": "number", "description": "pair: cache lines crossing between the two cores per unit"},
+    "handoffs": {"type": "number", "description": "pair: synchronization events per unit (default 0)"},
+    "concurrency": {"type": "number", "description": "pair: overlapping line transfers; absent -> declared sweep 1,2,4,8"},
+    "concurrency_sweep": {"type": "array", "items": {"type": "number"}},
+    "units": {"type": "number", "description": "card: units of work in the whole run"},
+    "bytes_per_unit": {"type": "number", "description": "card: bytes moved to/from memory per unit"},
+    "traffic_type": {"enum": ["read_only", "read_modify_write", "write_normal", "write_ngo"]},
+    "per_core_cycles_per_unit": {"type": "number", "description": "card: core-scale predicted cycles per unit at the intended thread count"},
+    "cores": {"type": "integer", "description": "card: cores used (default profile card.usable_cores)"},
+    "barriers": {"type": "number"},
+    "barrier_kind": {"enum": ["tree", "counter"]},
+    "imbalance_factor": {"type": "number", "minimum": 1.0},
+    "bandwidth_sweep_gbs": {"type": "array", "items": {"type": "number"}, "description": "card: declared bandwidth sweep when the profile has no measured value for the traffic type"}
+  }
+}

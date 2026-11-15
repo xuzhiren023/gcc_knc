@@ -1,0 +1,20 @@
+{
+  "schema": "knc-twin.profile/1",
+  "id": "overlay-vector-load-3",
+  "version": "0.1.0",
+  "kind": "overlay",
+  "synthetic": false,
+  "description": "Sensitivity overlay: vector load-to-use latency 3 cycles (R08 documented value) instead of the measured 12-cycle chain figure. Apply with --overlay profiles/overlay-vector-load-3.json to see how much a prediction depends on this uncertain parameter.",
+  "native_measurement_ids": [],
+  "parameters": {
+    "latency.vector_load_l1": {
+      "value": 3,
+      "unit": "cycles",
+      "status": "documented",
+      "source": "R08 cache slide ('3 cycles for vector loads'); alternative scenario to card-7120-measured's 12",
+      "alternatives": [
+        12
+      ]
+    }
+  }
+}
