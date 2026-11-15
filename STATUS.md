@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-15 14:24.
+Updated automatically at every ticket change. Last update: 2026-11-15 14:25.
 
-**Next: the tech lead, on S13-06.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: GPT-6.1, on S12-09 (Sprint 12 batch check - integrated themes at the final Sprint 12 head, regression evidence, optional modes frozen).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
 Current tickets: `[#################---]` 241 of 268
 
@@ -128,7 +128,7 @@ Current tickets: `[#################---]` 241 of 268
 | S13-03 | M4 retrospective - what we did wrong, what worked, and the practice changes carried into the next milestone and the agent-team skill | draft |  |
 | S13-04 | Clean source repositories for a fresh build - GCC-KNC fork and project code without build artifacts, plus a Linux-host build recipe the owner runs on the new workstation | draft |  |
 | S13-05 | model-first skill - a project Claude Code skill that models a hot region and its run-time lower bound before any optimization, plus one sourced KNC machine file | lead | Interactive lead: merge main (e55d72cf+) into s13/S13-05 by hand; engineers cannot write git metadata. My 1... |
-| S13-06 | knc-twin trial and validation - run the KNC core twin on real GCC-KNC loop output, check it against characterization rows and held-out kernels we already timed, and report what it rejects or gets wrong | Question for the tech lead | Green 22944844 is ready (movslq/movsx* now unsupported, no source; test 3/3 OK, .work/_state/logs/s13_06_te... |
+| S13-06 | knc-twin trial and validation - run the KNC core twin on real GCC-KNC loop output, check it against characterization rows and held-out kernels we already timed, and report what it rejects or gets wrong | lead | Green 22944844 reviewed, OK in substance. Interactive lead must: (1) approve protected .gitignore line !/kn... |
 | S14-01 | 16- and 32-byte GCC generic vectors compile to IMCI in the low lanes of a zmm register, with a by-value ABI, so FFTW's generic-simd128/256 paths run vectorized | draft |  |
 | S14-02 | Software pipelining on KNC - probe whether SMS can run (a KNC counted-loop pattern) and whether it speeds up in-order loops | draft |  |
 | S14-03 | KNC scheduler model completeness - bypasses, folded memory operand cost, pairing by encoding, checked on post-RA schedules | draft |  |
@@ -293,6 +293,7 @@ Current tickets: `[#################---]` 241 of 268
 
 ## Recent activity
 
+- 2026-11-15 14:25 **S13-06** lead defer: Green 22944844 reviewed, OK in substance. Interactive lead must: (1) approve protected .gitignore line !/knc-twin/**/*.s; (2) grant size override (...
 - 2026-11-15 14:23 **S13-06** engineer ask: Green 22944844 is ready (movslq/movsx* now unsupported, no source; test 3/3 OK, .work/_state/logs/s13_06_test-20261115-142205.log), but submit refu...
 - 2026-11-15 14:15 **S13-06** lead approve-red: S13-06 red approved: one host test pins the knc-twin selftest, trial-kernel conversion and functional checks against independently computed outputs...
 - 2026-11-15 14:11 **S13-06** engineer red: Red 56c122d1: tests/regress/test_knc_twin.py fails as expected (selftest 2 errors: fixtures/saxpy.s never reached git, *.s ignored; trial library, ...
@@ -300,13 +301,12 @@ Current tickets: `[#################---]` 241 of 268
 - 2026-11-15 13:56 **S13-05** engineer ask: Ran the authorized submit for clean HEAD 6966ce88 with the exact size override approved at 2026-11-15 12:30. pm.py refused: the branch lacks real c...
 - 2026-11-15 12:30 **S13-05** lead answer: Yes: submit 6966ce88 with --override 'S13-05 size: 1173 lines are mostly data and docs the ticket requires (672-line sourced machine YAML with per-...
 - 2026-11-15 12:27 **S13-05** engineer ask: Submission blocked: pm.py submit reports 1173 changed lines against the 800-line budget. Deliverables are committed at 6966ce88: 160-line skill, so...
-- 2026-11-15 12:10 **S13-05** lead approve-red: S13-05 has one host test that fails until the sourced KNC machine file and the model-first skill exist, and then checks every filled value has unit...
 
 ## Cost
 
 - From the script, engineer: 708 sessions, 1497.3M input tokens
 - From the script, lead: 475 sessions, 135.7M input tokens
-- Started by hand, Claude: 13 sessions, 3652.3M input tokens
+- Started by hand, Claude: 13 sessions, 3654.4M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
