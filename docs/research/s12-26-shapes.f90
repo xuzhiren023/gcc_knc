@@ -135,4 +135,66 @@ contains
         (1.0-absorption(level))*radiation(level+1)
     end do
   end subroutine
+
+  subroutine bounded_search(n, m, key, threshold, found)
+    integer, intent(in) :: n, m
+    real, intent(in) :: key(m,n), threshold(n)
+    integer, intent(out) :: found(n)
+    integer :: lane, probe
+    do lane = 1, n
+      found(lane) = m
+      do probe = 1, m
+        if (key(probe,lane) > threshold(lane)) then
+          found(lane) = probe
+          exit
+        endif
+      enddo
+    enddo
+  end subroutine
+
+  subroutine table_mix(n, bands, entries, index, weight, table, result)
+    integer, intent(in) :: n, bands, entries, index(n)
+    real, intent(in) :: weight(n), table(entries,bands)
+    real, intent(out) :: result(n,bands)
+    integer :: lane, band, slot
+    ! Caller supplies 1 <= index <= entries-1.
+    do lane = 1, n
+      slot = index(lane)
+      do band = 1, bands
+        result(lane,band) = table(slot,band) + weight(lane)* &
+          (table(slot+1,band)-table(slot,band))
+      enddo
+    enddo
+  end subroutine
+
+  subroutine quotient(n, numerator, denominator, result)
+    integer, intent(in) :: n
+    real, intent(in) :: numerator(n), denominator(n)
+    real, intent(out) :: result(n)
+    integer :: lane
+    do lane = 1, n
+      result(lane) = numerator(lane)/denominator(lane)
+    enddo
+  end subroutine
+
+  subroutine zero_array(n, result)
+    integer, intent(in) :: n
+    real, intent(out) :: result(n)
+    integer :: lane
+    do lane = 1, n
+      result(lane) = 0.0
+    enddo
+  end subroutine
+
+  subroutine transport_reset(n, active, absorption, source, radiation)
+    integer, intent(in) :: n
+    logical, intent(in) :: active(n)
+    real, intent(in) :: absorption(n), source(n)
+    real, intent(inout) :: radiation(n+1)
+    integer :: layer
+    do layer = n, 1, -1
+      if (.not. active(layer)) exit
+      radiation(layer) = source(layer)+absorption(layer)*radiation(layer+1)
+    enddo
+  end subroutine
 end module
