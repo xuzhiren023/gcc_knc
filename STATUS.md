@@ -2,7 +2,7 @@
 
 Updated automatically at every ticket change. Last update: 2026-11-14 20:27.
 
-**Next: the tech lead, on S12-21.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: the tech lead, on S12-29.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[##################--]` 228 of 244
 
@@ -101,7 +101,7 @@ Current tickets: `[##################--]` 228 of 244
 | S12-18 | Double-precision vector exp, log and pow ran slower than scalar libm on the card (0.82x, 0.63x, 0.49x) - confirm with valid batches, then fix the library or stop the vectorizer calling them where they lose | Done | The vector math benchmark now always times valid 50-200 ms batches, and the valid card runs show double exp... |
 | S12-19 | Profile-guided missed-vectorization triage - join hot loops with the vectorizer's reasons and observed strides/masks, so tuning targets what is hot and fixable | Done | tools/vec_triage.py now ranks each development program's hot loops by sampled time with GCC's vectorizer ve... |
 | S12-20 | libknc_vmath accuracy and exception contract, with an independent validation design (rounding modes, special values, flags, scalar fallback) | draft |  |
-| S12-21 | Scheduling model for M4's serial runs - measure density-1 tuning and the integer-multiply cost against today's density-4 defaults (S12-14 B02, B04, B05) | Question for the tech lead | Lead: phase 1 accepted (window 2 timings were uncontended: PhiWeather ended 00:34:37Z, S12-21 ran 00:35:40Z... |
+| S12-21 | Scheduling model for M4's serial runs - measure density-1 tuning and the integer-multiply cost against today's density-4 defaults (S12-14 B02, B04, B05) | In progress | Go to phase 2 on lane gcc2 per the resume note. |
 | S12-22 | Low-risk corrections from the S12-14 audit - wrong comments and citations (N01-N09) and the far-prefetch-distance range bug (B10) | Done | The audit's comment and citation fixes are in GCC-KNC and the far prefetch distance can no longer be set eq... |
 | S12-23 | Floating-point environment correctness on KNC - fix the underflow probe that cannot tell flushing from rounding, and handle x87 erratum CD28 (S12-14 N06, N07, B16, B17) | Done | GCC-KNC's floating-point environment handling is now correct on the card: x87 exception clearing uses the C... |
 | S12-24 | ICE in vect_transform_stmt (tree-vect-stmts.cc:13381) on WRF's REMEZ at -mphinix (-O3 -march=knc) | Not started |  |
@@ -269,6 +269,7 @@ Current tickets: `[##################--]` 228 of 244
 
 ## Recent activity
 
+- 2026-11-14 20:27 **S12-21** lead answer: Go to phase 2 on lane gcc2 per the resume note.
 - 2026-11-14 20:27 **S12-21** lead resume: Lead: phase 1 accepted (window 2 timings were uncontended: PhiWeather ended 00:34:37Z, S12-21 ran 00:35:40Z-01:05:01Z alone; claude-turn-s12-w2 is ...
 - 2026-11-14 20:26 **S12-07** lead answer: Submit the closure.
 - 2026-11-14 20:26 **S12-07** lead resume: Type is now research: submit the phase-1 premise-failure closure (9cef3599). Record in the note that window 2 exclusivity is unproven (card_run JSO...
@@ -276,7 +277,6 @@ Current tickets: `[##################--]` 228 of 244
 - 2026-11-14 20:25 **S12-07** lead defer: Field change needed (interactive lead only): set type: research on S12-07 (as for S12-06/08) so the engineer can submit the phase-1 premise-failure...
 - 2026-11-14 20:23 **S12-21** engineer ask: 01b172ea: collected 12 runs = 6 A/B pairs; checks PASS, batch timeout remains. MG density1 slower 8.7%; retain density4. IMUL medians 9.06-9.08 TSC...
 - 2026-11-14 20:23 **S12-07** engineer ask: 9cef3599 records all 168 timings in docs/research/s12-07-sparse.md; decision: stop, gain premise unproven. Lead log .work/_shared/tmp/claude-s12-wi...
-- 2026-11-14 20:19 **S12-21** lead answer: Collect the 12 pairs and decide.
 
 ## Cost
 
