@@ -76,6 +76,18 @@ Code tickets: a `test(<ID>): ... [red]` commit that fails for the expected reaso
 smallest passing change, then an optional refactor. Tests must be able to fail. Do not weaken,
 skip or `xfail` a test to make progress.
 
+## Model before optimizing
+
+A ticket that makes code or a compiler heuristic faster follows `.claude/skills/model-first/SKILL.md`
+(Codex: read that file; Claude loads it as a skill). The tier comes from the ticket's `depth`. KNC values
+come from `docs/research/knc-machine.yaml`, never from memory. For a loop or kernel on one core, get the
+bound and the prediction from knc-twin (`knc-twin/SKILL.md`, `python knc-twin/scripts/knc_twin.py`;
+`from_gcc_s.py` reads our `.s` output). Report its status, assumptions and unsupported forms as it prints
+them; a twin cycle count is a prediction, never a measurement. On compiled loops it is currently 12-32% off
+and can rank close variants wrongly (docs/research/knc-twin-trial.md): use it for bounds, mechanisms and large
+differences, never to choose between variants within about 30%; those are decided on the card. Put the Model table in the ticket note or the
+research note before the first timed run. Not for correctness, ABI or build tickets.
+
 ## Report results as they are
 
 A test that has not run on the card has not passed natively. Never invent or extrapolate a
