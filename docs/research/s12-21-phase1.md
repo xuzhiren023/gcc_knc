@@ -271,3 +271,77 @@ were attempted in this continuation. After the lead builds, T0-T2 and ICE
 sweeps remain due, along with a short full-profile paired A/B for affected
 development programs and two controls, excluding HPCG, within 25 minutes.
 The lead owns x86 identity and card execution; neither has run for this change.
+
+## Phase two: host validation and short A/B staging
+
+The lead built lane 2 at `1a4f5aab0a2`. The candidate stage uses that lane's
+`cc1`/`f951` with the installed drivers, startup files and runtime libraries.
+Its baseline is the existing phase-one default build, with unchanged fixed
+inputs and density four. These are installed-prefix versus lane-2 compiler
+artifacts; the installed prefix does not identify its exact source commit,
+so later timing differences require that qualification when attributing them.
+
+`tools/s12_21_phase2.py stage` built and linted all thirteen permitted
+development programs, excluding HPCG. It reuses the phase-one baselines
+without rebuilding them. Results under `.work/_shared/S12-21/phase2/`:
+
+| Program | Changed instructions | IMUL old / new |
+| --- | ---: | ---: |
+| PB-gemm | 12 | 2 / 1 |
+| PB-atax | 11 | 2 / 1 |
+| PB-cholesky | 16 | 2 / 1 |
+| PB-ludcmp | 11 | 2 / 1 |
+| PB-jacobi-2d | 174 | 2 / 1 |
+| PB-heat-3d | 23 | 2 / 1 |
+| STREAM | 0 | 0 / 0 |
+| NPB-CG | 0 | 11 / 11 |
+| NPB-EP | 0 | 11 / 11 |
+| NPB-MG | 278 | 64 / 62 |
+| NPB-IS | 0 | 2 / 2 |
+| zlib | 137 | 19 / 8 |
+| SQLite | 9620 | 529 / 148 |
+
+The package selects all nine changed programs and unchanged NPB-IS/STREAM
+as controls. It stages two adjacent pairs per program, reversing order on
+the second pair: 44 serial runs in one exclusive full-profile reservation.
+The runner limit is 1440 seconds, leaving 60 seconds of the 25-minute budget
+for transport overhead. There is no inner BusyBox timeout command. The
+ustar/gzip payload, peer archives and generated shell syntax checks passed.
+No native timings have been collected for this phase.
+
+With `KNC_GCC_SLOT=2`, the host commands were:
+
+```text
+python tools/run.py --name s12-21-cost-stage --inputs tools/s12_21_phase2.py tools/corpus.py tools/s12_21_stage.py -- python tools/s12_21_phase2.py stage
+python tools/run.py --name s12-21-cost-package --inputs tools/s12_21_phase2.py -- python tools/s12_21_phase2.py package
+```
+
+Logs are `.work/_state/logs/s12_21_cost_stage-20261114-210129.log` and
+`s12_21_cost_package-20261114-211411.log`. The second command only refreshed
+the package to select the shorter unchanged controls and reserve transport
+time; it did not repeat any build or lint. The lead command and collection
+command are in `.work/_shared/S12-21/phase2/README.txt`.
+
+The sweep tools now select their corpus from the assigned GCC lane.
+The vector tool also accepts output/summary paths and compile-only mode,
+allowing this check to stay under S12-21 without staging unrelated card jobs
+or overwriting the checked-in baseline. The vector sweep compiled 1345 of
+2001 files, skipped 632 by target requirements, reported 23 compile errors
+and one ICE. The ICE is `O3-vect-pr32243.c`, a `V16QI` to `V16SI` sign
+extension failing in `curr_insn_transform` during reload. Compiling its
+original, header-free source with the installed compiler and the same flags
+reproduced the same ICE. Thus it is not specific to the new IMUL cost,
+although the older checked-in baseline calls it compiled. The sweep is not
+reported as passing. Logs:
+`.work/_state/logs/s12_21_vect-20261114-205847.log` and
+`s12_21_ice_baseline-20261114-210942.log`. The detailed vector results and
+reproducer command are under `phase2/vect.txt` and
+`phase2/vect/O3-vect-pr32243.log`.
+
+The required `git -C ../_shared/gcc-2 rebase knc` failed creating
+`gcc/.git/worktrees/gcc-2/rebase-merge` with `Permission denied`; it did not
+change the clean GCC branch. No workaround was attempted. `knc` has advanced
+to `2e70e4115e2` with the scalar-broadcast alignment fixes. The lead must
+perform the rebase and any resulting GCC build before final acceptance.
+The current checks and staged candidate refer to `1a4f5aab0a2`. X86 identity
+and native card execution have not run here and remain lead-owned.
