@@ -93,7 +93,7 @@ class Gimple:
 
     def affine(self, expression, seen=frozenset()):
         expression = expression.replace('(D)', '')
-        expression = re.sub(r'\((?:const |unsigned |signed |long |short |int|double|float|sizetype|void|char|\*| )+\)', '', expression)
+        expression = re.sub(r'\((?:const ?|unsigned ?|signed ?|long ?|short ?|int|double|float|sizetype|void|char|\*| )+\)', '', expression)
         expression = re.sub(r'(?<=\d)B\b', '', expression).strip()
         names = {}
         def rename(match):
@@ -121,7 +121,7 @@ class Gimple:
                         return times(b, a.get('#', 0))
                     if not (b.keys() - {'#'}):
                         return times(a, b.get('#', 0))
-            raise ValueError('unsupported affine expression')
+            raise ValueError('unsupported affine expression: ' + expression)
         return walk(ast.parse(expression, mode='eval').body)
 
     def offset(self, name, base, size):

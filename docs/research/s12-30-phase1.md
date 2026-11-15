@@ -678,3 +678,28 @@ This is a source inspection diagnosis, not a verified fix. Per ruling
 item 4, stopped after the failed aprefetch controls; no affine walker
 extension, second test, GCC change, build or native run. Ask whether to
 make the small cast-token parsing correction and rerun the T1 red.
+
+### Cast-token correction and accepted-shape red (2026-11-15)
+
+Applied the lead's 03:15 ruling: made the trailing space optional on
+the const/unsigned/signed/long/short cast tokens, and included the
+unsupported expression in the affine ValueError diagnostic. No other
+affine-walker changes or new test files.
+
+The single authorized T1 rerun passes CSR future-bound and HPCG
+future-pointer/count controls on the aprefetch dump, the row-local
+rejection, optimized presence and ivtmp PHI controls, compile/assemble/
+lint, scalar folds, negatives and installed baseline identity. Its only
+four failures are the unrecognized indirect-prefetch switch in disabled,
+off, fast and size modes. This is the missing-feature-only phase-two red.
+
+Command: `python tools/run.py --name s12_30_phase2_cast_red --inputs
+tools/s12_30_precision.py tools/s12_30_precision.c -- python tools/check
+t1 --compiler gcc16 --sparse-indirect` (lane gcc2). Exit 1 as expected.
+Log: `.work/_state/logs/s12_30_phase2_cast_red-20261115-031754.log`;
+inner results: `.work/_state/logs/check_gcc16_t1-20261115-031754.log`.
+No GCC change/build or native phase-two run; application A/B, T0/T2,
+ICE sweeps and x86 identity remain pending. The implementation must keep
+the switch explicit and default off, test the threshold outside a
+versioned nest, and insert hints in or before loop prefetch with target
+specifics behind a hook, as ruled on the ticket.
