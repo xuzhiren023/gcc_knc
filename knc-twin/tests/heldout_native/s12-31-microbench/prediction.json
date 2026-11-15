@@ -1,0 +1,138 @@
+{
+ "case": "s12-31-microbench",
+ "variants": [
+  {
+   "variant": "gas_0",
+   "loop": ".Li_gas_0",
+   "lines": [
+    13,
+    20
+   ],
+   "conversion": "unsupported",
+   "unsupported": [
+    {
+     "line": 15,
+     "text": "fldl\t(%rdx,%r10,8)"
+    },
+    {
+     "line": 16,
+     "text": "fmull\t(%rcx,%rax,8)"
+    }
+   ]
+  },
+  {
+   "variant": "mis_44",
+   "loop": ".Li_mis_44",
+   "lines": [
+    34,
+    41
+   ],
+   "conversion": "unsupported",
+   "unsupported": [
+    {
+     "line": 36,
+     "text": "fldl\t(%rdx,%r10,8)"
+    },
+    {
+     "line": 37,
+     "text": "fmull\t(%rcx,%rax,8)"
+    }
+   ]
+  },
+  {
+   "variant": "inc_0",
+   "loop": ".Li_inc_0",
+   "lines": [
+    55,
+    62
+   ],
+   "conversion": "unsupported",
+   "unsupported": [
+    {
+     "line": 57,
+     "text": "fldl\t(%rdx,%r10,8)"
+    },
+    {
+     "line": 58,
+     "text": "fmull\t(%rcx,%rax,8)"
+    }
+   ]
+  },
+  {
+   "variant": "adj_0",
+   "loop": ".Li_adj_0",
+   "lines": [
+    76,
+    83
+   ],
+   "conversion": "unsupported",
+   "unsupported": [
+    {
+     "line": 78,
+     "text": "fldl\t(%rdx,%r10,8)"
+    },
+    {
+     "line": 79,
+     "text": "fmull\t(%rcx,%rax,8)"
+    }
+   ]
+  },
+  {
+   "variant": "mid_0",
+   "loop": ".Li_mid_0",
+   "lines": [
+    97,
+    104
+   ],
+   "conversion": "unsupported",
+   "unsupported": [
+    {
+     "line": 99,
+     "text": "fldl\t(%rdx,%r10,8)"
+    },
+    {
+     "line": 100,
+     "text": "fmull\t(%rcx,%rax,8)"
+    }
+   ]
+  },
+  {
+   "variant": "mov_adj_0",
+   "loop": ".Li_mov_adj_0",
+   "lines": [
+    118,
+    126
+   ],
+   "conversion": "unsupported",
+   "unsupported": [
+    {
+     "line": 120,
+     "text": "fldl\t(%rdx,%r10,8)"
+    },
+    {
+     "line": 121,
+     "text": "fmull\t(%rcx,%rax,8)"
+    }
+   ]
+  },
+  {
+   "variant": "mov_split_0",
+   "loop": ".Li_mov_split_0",
+   "lines": [
+    140,
+    148
+   ],
+   "conversion": "unsupported",
+   "unsupported": [
+    {
+     "line": 142,
+     "text": "fldl\t(%rdx,%r10,8)"
+    },
+    {
+     "line": 143,
+     "text": "fmull\t(%rcx,%rax,8)"
+    }
+   ]
+  }
+ ]
+}

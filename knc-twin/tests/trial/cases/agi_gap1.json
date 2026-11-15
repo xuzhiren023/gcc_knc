@@ -1,0 +1,24 @@
+{
+ "name": "agi_gap1",
+ "kind": "consistency",
+ "source": "char.s",
+ "loop": ".Lagi_gap1",
+ "contexts": 1,
+ "spec": {},
+ "trace_source": "functional",
+ "simulate": [],
+ "bounds_loop": false,
+ "measured": {
+  "source": "docs/research/knc-characterization.md Full table agi.gap1 (S6-03)",
+  "unit": "TSC ticks per probe per thread",
+  "threads": {
+   "1": 4.15,
+   "2": 4.15,
+   "4": 8.27
+  }
+ },
+ "expect": {
+  "conversion": "unsupported"
+ },
+ "schema": "knc-twin.trial-case/1"
+}

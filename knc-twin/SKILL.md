@@ -18,7 +18,8 @@ relative to that file; the current directory does not matter.
    Pick the scale and profile that cover the question; if the kernel uses anything not listed,
    stop and report it as unsupported instead of approximating.
 2. **Prepare the input faithfully.** Write the kernel as normalized records
-   (`schemas/kernel.schema.json`, `references/input-format.md`) or the GAS AT&T subset. Keep
+   (`schemas/kernel.schema.json`, `references/input-format.md`) or the GAS AT&T subset. For GCC
+   output use `python scripts/from_gcc_s.py file.s --loop .L7 --spec spec.json --out kernel.json`. Keep
    every dependency and side effect the real code has: spills and reloads, masks, address
    updates, flags, stores. Give initial state and expected outputs derived independently of
    the twin (hand calculation, host reference, integer-valued data). Say what one unit of work is.

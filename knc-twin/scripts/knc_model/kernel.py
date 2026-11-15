@@ -266,7 +266,7 @@ class Insn(object):
             self.cls = "scalar_store" if self.is_store else "scalar_load"
         elif self.op in ("add", "sub", "and", "or", "xor", "inc", "dec", "neg", "not", "shl", "shr", "sar") and self.mem is not None:
             raise Unsupported("instruction %s: read-modify-write memory form of %s is not supported" % (self.id, self.op))
-        elif self.op in ("cmp", "test", "imul", "movzx") and self.mem is not None:
+        elif self.op in ("cmp", "test", "imul", "movzx", "movsxd") and self.mem is not None:
             self.cls = "scalar_load"
         elif self.op in ("vmovaps", "vmovapd", "vmovdqa32", "vmovdqa64"):
             if self.mem is None:
@@ -284,6 +284,8 @@ class Insn(object):
         self.pipes = isa.CLASSES[self.cls]["pipes"]
         self.kind = isa.CLASSES[self.cls]["kind"]
         # scalar operand width
+        if self.width is None and self.op == "movsxd":
+            self.width = 64  # 32-bit source, 64-bit destination by definition
         if self.width is None:
             widths = {o.width for o in self.operands if isinstance(o, Reg) and o.kind == "g"}
             if len(widths) > 1:

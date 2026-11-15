@@ -1,0 +1,65 @@
+{
+ "name": "gcc_forms_unpack",
+ "kind": "form_fixture",
+ "source": "../../fixtures/gcc_o2_forms.s",
+ "loop": ".Lunpack",
+ "contexts": 1,
+ "spec": {
+  "unit_of_work": {
+   "description": "16 floats",
+   "count": 4
+  },
+  "numerical_policy": {
+   "rounding": "rn",
+   "ftz": false,
+   "daz": false,
+   "nan_compare": "bits"
+  },
+  "scenario": {
+   "memory": {
+    "type": "fixed_level",
+    "level": "l1"
+   },
+   "branch": {
+    "type": "all_predicted"
+   }
+  },
+  "loop": {
+   "trip_count": 4
+  },
+  "addr": {
+   "L26": {
+    "start": "0x2ffffc",
+    "stride": 64
+   },
+   "L27": {
+    "start": "0x30003c",
+    "stride": 64
+   },
+   "L28": {
+    "start": "0x300000",
+    "stride": 64
+   },
+   "L29": {
+    "start": "0x400000",
+    "stride": 64
+   },
+   "L30": {
+    "start": "0x400040",
+    "stride": 64
+   }
+  }
+ },
+ "trace_source": "static",
+ "simulate": [
+  [
+   0
+  ]
+ ],
+ "bounds_loop": false,
+ "expect": {
+  "conversion": "ok",
+  "functional": "unsupported"
+ },
+ "schema": "knc-twin.trial-case/1"
+}

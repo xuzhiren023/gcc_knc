@@ -10,7 +10,10 @@ Accepted (documented in references/input-format.md):
   mem{1to16} / mem{1to8}       memory broadcast
   dest{rn}|{rd}|{ru}|{rz}      rounding on the destination (KNC swizzle field used for rounding)
   lock addl $imm, mem          -> lock_add
-Rejected: any other swizzle ({cdab}, {aaaa}, ...), 8/16-bit registers, segment prefixes, unknown mnemonics.
+  salq/sall                    -> shl (the same instruction)
+  movslq src, %r64             -> movsxd (sign-extend 32 to 64 bits)
+Rejected: any other swizzle ({cdab}, {aaaa}, ...), 8/16-bit registers, segment prefixes, unknown mnemonics,
+x87 instructions with a memory operand (x87 records carry no operands, so the access would be lost).
 """
 import re
 
@@ -20,6 +23,7 @@ _IGNORED_DIRECTIVES = (".text", ".globl", ".global", ".p2align", ".align", ".typ
 _LABEL_RE = re.compile(r"^([A-Za-z_.$][\w.$]*):(.*)$")
 _MEM_RE = re.compile(r"^(?P<disp>[-+]?(0x[0-9a-fA-F]+|\d+))?\((?P<inner>[^)]*)\)$")
 _SIZE_SUFFIX_OPS = ("mov", "add", "sub", "and", "or", "xor", "cmp", "test", "lea", "inc", "dec", "neg", "not", "shl", "shr", "sar", "imul")
+_SYNONYMS = {"salq": ("shl", 64), "sall": ("shl", 32), "movslq": ("movsxd", 64)}
 _ROUNDING = {"rn": "rn", "rd": "rd", "ru": "ru", "rz": "rz", "rn-sae": "rn", "rd-sae": "rd", "ru-sae": "ru", "rz-sae": "rz"}
 
 
@@ -134,7 +138,9 @@ def parse_gas(text):
         if mnem in ("ret", "nop"):
             raise Unsupported("%s: %r is outside the kernel subset (strip the function epilogue)" % (where, mnem))
         base = mnem
-        if mnem not in ("lock_add",) and not mnem.startswith(("v", "k", "j", "f")):
+        if mnem in _SYNONYMS:
+            base, width = _SYNONYMS[mnem]
+        elif mnem not in ("lock_add",) and not mnem.startswith(("v", "k", "j", "f")):
             for b in _SIZE_SUFFIX_OPS:
                 if mnem == b + "q":
                     base, width = b, 64
@@ -155,6 +161,9 @@ def parse_gas(text):
                 mask = mk
             if rd:
                 rounding = rd
+        if mnem.startswith("f") and any(isinstance(o, dict) and "imm" not in o for o in ops):
+            raise Unsupported("%s: x87 instruction %r with a memory operand: x87 records carry no operands, so the load or "
+                              "store and its address dependency would be dropped; no sourced cost for x87 memory forms" % (where, mnem))
         ops.reverse()  # AT&T source-first -> Intel destination-first
         rec = {"id": "L%d" % lineno, "op": base, "ops": ops}
         if mask:
@@ -183,6 +192,8 @@ def emit_gas(stream):
             mnem = insn.op + ("q" if insn.width == 64 else "l")
         if insn.op == "lock_add":
             mnem = "lock addl" if insn.width == 32 else "lock addq"
+        if insn.op == "movsxd":
+            mnem = "movslq"
         toks = []
         for k, (opnd, role) in enumerate(zip(insn.operands, insn.roles)):
             name = type(opnd).__name__

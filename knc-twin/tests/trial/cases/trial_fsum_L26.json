@@ -1,0 +1,33 @@
+{
+ "name": "trial_fsum_L26",
+ "kind": "trial",
+ "source": "trial.s",
+ "loop": ".L26",
+ "contexts": 1,
+ "spec": {},
+ "trace_source": "functional",
+ "simulate": [],
+ "bounds_loop": false,
+ "expect": {
+  "conversion": "unsupported",
+  "unsupported_lines": [
+   164,
+   166,
+   168,
+   170,
+   172,
+   173,
+   174,
+   175,
+   176,
+   177,
+   178,
+   179,
+   180,
+   181,
+   182,
+   183
+  ]
+ },
+ "schema": "knc-twin.trial-case/1"
+}

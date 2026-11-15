@@ -1,0 +1,92 @@
+{
+ "schema": "knc-twin.heldout-case/1",
+ "scale": "core",
+ "source": "mb.s",
+ "description": "S12-31 SpMV-shaped x87 row loop, 27 products per row, data in L1, one thread; variants differ in the order of counter, compare and FP add",
+ "variants": [
+  {
+   "name": "gas_0",
+   "loop": ".Li_gas_0",
+   "contexts": 1,
+   "spec": {
+    "name": "mb_gas_0",
+    "unit_of_work": {
+     "description": "one 27-product row (27 inner iterations plus the outer loop step)",
+     "count": 1
+    }
+   }
+  },
+  {
+   "name": "mis_44",
+   "loop": ".Li_mis_44",
+   "contexts": 1,
+   "spec": {
+    "name": "mb_mis_44",
+    "unit_of_work": {
+     "description": "one 27-product row (27 inner iterations plus the outer loop step)",
+     "count": 1
+    }
+   }
+  },
+  {
+   "name": "inc_0",
+   "loop": ".Li_inc_0",
+   "contexts": 1,
+   "spec": {
+    "name": "mb_inc_0",
+    "unit_of_work": {
+     "description": "one 27-product row (27 inner iterations plus the outer loop step)",
+     "count": 1
+    }
+   }
+  },
+  {
+   "name": "adj_0",
+   "loop": ".Li_adj_0",
+   "contexts": 1,
+   "spec": {
+    "name": "mb_adj_0",
+    "unit_of_work": {
+     "description": "one 27-product row (27 inner iterations plus the outer loop step)",
+     "count": 1
+    }
+   }
+  },
+  {
+   "name": "mid_0",
+   "loop": ".Li_mid_0",
+   "contexts": 1,
+   "spec": {
+    "name": "mb_mid_0",
+    "unit_of_work": {
+     "description": "one 27-product row (27 inner iterations plus the outer loop step)",
+     "count": 1
+    }
+   }
+  },
+  {
+   "name": "mov_adj_0",
+   "loop": ".Li_mov_adj_0",
+   "contexts": 1,
+   "spec": {
+    "name": "mb_mov_adj_0",
+    "unit_of_work": {
+     "description": "one 27-product row (27 inner iterations plus the outer loop step)",
+     "count": 1
+    }
+   }
+  },
+  {
+   "name": "mov_split_0",
+   "loop": ".Li_mov_split_0",
+   "contexts": 1,
+   "spec": {
+    "name": "mb_mov_split_0",
+    "unit_of_work": {
+     "description": "one 27-product row (27 inner iterations plus the outer loop step)",
+     "count": 1
+    }
+   }
+  }
+ ]
+}

@@ -31,8 +31,7 @@ class KncTwin(unittest.TestCase):
             out = subprocess.run([sys.executable, str(TWIN / "scripts" / "knc_twin.py"), "selftest"], cwd=tmp,
                                  stdout=subprocess.PIPE, stderr=subprocess.STDOUT, universal_newlines=True)
         self.assertEqual(out.returncode, 0, out.stdout[-3000:])
-        self.assertRegex(out.stdout, r"Ran \d+ tests")
-        self.assertRegex(out.stdout, r"\nOK\b")
+        self.assertRegex(out.stdout, r"selftest: ok\n\d+ tests, 0 failures, 0 errors")
 
     def test_trial_cases_convert_and_run_as_recorded(self):
         lib = trial_lib()

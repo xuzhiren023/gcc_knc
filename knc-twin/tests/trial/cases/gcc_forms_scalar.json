@@ -1,0 +1,73 @@
+{
+ "name": "gcc_forms_scalar",
+ "kind": "form_fixture",
+ "source": "../../fixtures/gcc_o2_forms.s",
+ "loop": ".Lscalar",
+ "contexts": 1,
+ "spec": {
+  "unit_of_work": {
+   "description": "one int32 element",
+   "count": 4
+  },
+  "numerical_policy": {
+   "rounding": "rn",
+   "ftz": false,
+   "daz": false,
+   "nan_compare": "bits"
+  },
+  "scenario": {
+   "memory": {
+    "type": "fixed_level",
+    "level": "l1"
+   },
+   "branch": {
+    "type": "all_predicted"
+   }
+  },
+  "init": {
+   "memory": [
+    {
+     "addr": "0x10000",
+     "i32": [
+      3,
+      -2,
+      5,
+      -7
+     ]
+    }
+   ],
+   "registers": {
+    "r8": "0x10000",
+    "rax": 0,
+    "rsi": 0,
+    "rdi": 5
+   }
+  },
+  "expected": {
+   "registers": {
+    "0": {
+     "rsi": 96,
+     "rax": 4,
+     "rdi": 10,
+     "r10": "0xfffffffffffffff9",
+     "r11": "0xffffffffffffffe4"
+    }
+   }
+  },
+  "loop": {
+   "trip_count": 4
+  }
+ },
+ "trace_source": "functional",
+ "simulate": [
+  [
+   0
+  ]
+ ],
+ "bounds_loop": false,
+ "expect": {
+  "conversion": "ok",
+  "functional": "ok"
+ },
+ "schema": "knc-twin.trial-case/1"
+}

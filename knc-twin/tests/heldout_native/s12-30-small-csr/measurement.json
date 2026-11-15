@@ -1,0 +1,29 @@
+{
+ "schema": "knc-twin.heldout-measurement/1",
+ "case": "s12-30-small-csr",
+ "source_log": ".work/_shared/tmp/claude-s12-window8/s12-30-gate-hpcg.out lines 68-88 (CASE small CSR n=13 rows=32, TIME samples 0-4)",
+ "source_doc": "docs/research/s12-30-phase1.md (branch s12/S12-30), gate slots and window tables",
+ "unit": "median seconds per call over five samples, one core; nonzeros per call from the CASE line",
+ "clock": "core cycles = ns x 1.238 GHz (card.clock_hz, S6-01)",
+ "used_to_set_parameters": false,
+ "rows": [
+  {
+   "case": "small CSR n=13 rows=32",
+   "slot": "knc-switch-off",
+   "seconds_per_call_median": 6.85312310209e-06,
+   "nnz_per_call": 416,
+   "ns_per_nonzero": 16.474,
+   "core_cycles_per_nonzero": 20.39,
+   "threads": 1
+  },
+  {
+   "case": "small CSR n=13 rows=32",
+   "slot": "donor-off",
+   "seconds_per_call_median": 6.74927472451e-06,
+   "nnz_per_call": 416,
+   "ns_per_nonzero": 16.224,
+   "core_cycles_per_nonzero": 20.09,
+   "threads": 1
+  }
+ ]
+}

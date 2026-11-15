@@ -67,12 +67,15 @@ for _n in ("shl", "shr", "sar"):
     _add(_n, "scalar_alu", ["rw:gm", "r:i"], fn="shift", flags_w=True, note="immediate count only; CF/OF after count>1 follow the SDM for CF, OF is left unchanged (documented undefined)")
 _add("imul", "scalar_imul", ["rw:g", "r:gm"], fn="imul", flags_w=True, note="two-operand form; result truncated to operand width")
 _add("movzx", "scalar_alu", ["w:g", "r:gm"], fn=None, note="timing only; functional not implemented")
+_add("movsxd", "scalar_alu", ["w:g", "r:gm"], fn="movsxd", mem_size=4,
+     note="AT&T movslq: sign-extends a 32-bit register or memory source into a 64-bit register; costed as movzx (scalar ALU, memory form a scalar load)")
 
 # ---- branches ---------------------------------------------------------------------
 _add("jmp", "branch", ["t"], fn="jmp")
 for _n, _cond in (("jz", "zf"), ("je", "zf"), ("jnz", "nzf"), ("jne", "nzf"), ("jl", "lt"), ("jge", "ge"),
                   ("jg", "gt"), ("jle", "le"), ("jb", "cf"), ("jc", "cf"), ("jae", "ncf"), ("jnc", "ncf"),
-                  ("js", "sf"), ("jns", "nsf")):
+                  ("js", "sf"), ("jns", "nsf"), ("jnb", "ncf"), ("jnae", "cf"),
+                  ("jbe", "be"), ("jna", "be"), ("ja", "a"), ("jnbe", "a")):
     _add(_n, "branch", ["t"], fn="jcc", flags_r=True, cond=_cond)
 _add("jkzd", "branch", ["r:k", "t"], fn="jk", cond="kz", note="branch if mask is zero")
 _add("jknzd", "branch", ["r:k", "t"], fn="jk", cond="knz", note="branch if mask is nonzero")
@@ -134,10 +137,12 @@ for _n in ("vmovaps", "vmovapd", "vmovdqa32", "vmovdqa64"):
     _add(_n, "vector_load", ["w:vm", "r:vm"], fn="vmov", mem_size=64, note="register<->aligned memory, masked merge; store forms take the vector_store class")
 _add("vmovnrngoaps", "vector_store", ["w:m", "r:v"], fn="vstore_ngo", mem_size=64, note="no-read, non-globally-ordered store; functionally a store, timing as a store (no RFO modeled)")
 _add("vmovnraps", "vector_store", ["w:m", "r:v"], fn="vstore_ngo", mem_size=64)
-_add("vloadunpackld", "vector_load", ["rw:v", "r:m"], fn=None, mem_size=64, note="timing only")
-_add("vloadunpackhd", "vector_load", ["rw:v", "r:m"], fn=None, mem_size=64, note="timing only")
-_add("vpackstoreld", "vector_packstore", ["w:m", "r:v"], fn=None, mem_size=64, note="timing only")
-_add("vpackstorehd", "vector_packstore", ["w:m", "r:v"], fn=None, mem_size=64, note="timing only")
+# The ps forms move the same 32-bit elements without conversion (R27 VLOADUNPACKLPS/HPS,
+# VPACKSTORELPS/HPS); GCC-KNC emits them for unaligned float loads and stores.
+_add("vloadunpackld", "vector_load", ["rw:v", "r:m"], fn=None, mem_size=64, note="timing only", aliases=("vloadunpacklps",))
+_add("vloadunpackhd", "vector_load", ["rw:v", "r:m"], fn=None, mem_size=64, note="timing only", aliases=("vloadunpackhps",))
+_add("vpackstoreld", "vector_packstore", ["w:m", "r:v"], fn=None, mem_size=64, note="timing only", aliases=("vpackstorelps",))
+_add("vpackstorehd", "vector_packstore", ["w:m", "r:v"], fn=None, mem_size=64, note="timing only", aliases=("vpackstorehps",))
 _add("vgatherdps", "vector_gather", ["w:v", "r:mi"], fn="vgather", elem=4, note="dword gather with masked completion: lanes gathered have their mask bit cleared")
 _add("vgatherdpd", "vector_gather", ["w:v", "r:mi"], fn=None, elem=8, note="timing only")
 _add("vscatterdps", "vector_gather", ["w:mi", "r:v"], fn=None, elem=4, note="timing only; same class as gather (per-line occupancy)")

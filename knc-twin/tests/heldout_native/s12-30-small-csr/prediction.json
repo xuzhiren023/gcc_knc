@@ -1,0 +1,118 @@
+{
+ "case": "s12-30-small-csr",
+ "variants": [
+  {
+   "variant": "knc_off_short_rows",
+   "loop": ".L8",
+   "lines": [
+    130,
+    137
+   ],
+   "conversion": "unsupported",
+   "unsupported": [
+    {
+     "line": 132,
+     "text": "fldl\t(%r8,%rdx,8)"
+    },
+    {
+     "line": 133,
+     "text": "fmull\t(%rbx,%rax,8)"
+    }
+   ]
+  },
+  {
+   "variant": "knc_off_unrolled",
+   "loop": ".L6",
+   "lines": [
+    52,
+    94
+   ],
+   "conversion": "unsupported",
+   "unsupported": [
+    {
+     "line": 55,
+     "text": "fldl\t(%r8,%rsi,8)"
+    },
+    {
+     "line": 57,
+     "text": "fmull\t(%rdx)"
+    },
+    {
+     "line": 63,
+     "text": "fldl\t(%r8,%rsi,8)"
+    },
+    {
+     "line": 65,
+     "text": "fmull\t-56(%rdx)"
+    },
+    {
+     "line": 68,
+     "text": "fldl\t(%r8,%rsi,8)"
+    },
+    {
+     "line": 70,
+     "text": "fmull\t-48(%rdx)"
+    },
+    {
+     "line": 72,
+     "text": "fldl\t(%r8,%rsi,8)"
+    },
+    {
+     "line": 74,
+     "text": "fmull\t-40(%rdx)"
+    },
+    {
+     "line": 76,
+     "text": "fldl\t(%r8,%rsi,8)"
+    },
+    {
+     "line": 78,
+     "text": "fmull\t-32(%rdx)"
+    },
+    {
+     "line": 80,
+     "text": "fldl\t(%r8,%rsi,8)"
+    },
+    {
+     "line": 82,
+     "text": "fmull\t-24(%rdx)"
+    },
+    {
+     "line": 84,
+     "text": "fldl\t(%r8,%rsi,8)"
+    },
+    {
+     "line": 86,
+     "text": "fmull\t-16(%rdx)"
+    },
+    {
+     "line": 88,
+     "text": "fldl\t(%r8,%rsi,8)"
+    },
+    {
+     "line": 90,
+     "text": "fmull\t-8(%rdx)"
+    }
+   ]
+  },
+  {
+   "variant": "donor",
+   "loop": ".L4",
+   "lines": [
+    200,
+    207
+   ],
+   "conversion": "unsupported",
+   "unsupported": [
+    {
+     "line": 202,
+     "text": "fldl\t(%r8,%r10,8)"
+    },
+    {
+     "line": 203,
+     "text": "fmull\t0(%rbp,%rax,8)"
+    }
+   ]
+  }
+ ]
+}

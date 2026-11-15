@@ -1,0 +1,44 @@
+{
+ "schema": "knc-twin.heldout-case/1",
+ "scale": "core",
+ "source": "csr.s",
+ "description": "S12-30 CSR SpMV, 32 rows of 13 nonzeros, random columns into a 32 KiB x; rows this short take .L8 in knc_csr_raw (length-1 <= 1022) and .L4 in donor_csr_raw",
+ "variants": [
+  {
+   "name": "knc_off_short_rows",
+   "loop": ".L8",
+   "function": "knc_csr_raw",
+   "contexts": 1,
+   "spec": {
+    "unit_of_work": {
+     "description": "one stored nonzero of a 32-row CSR matrix (row overhead included)",
+     "count": 1
+    }
+   }
+  },
+  {
+   "name": "knc_off_unrolled",
+   "loop": ".L6",
+   "function": "knc_csr_raw",
+   "contexts": 1,
+   "spec": {
+    "unit_of_work": {
+     "description": "one stored nonzero of a 32-row CSR matrix (row overhead included)",
+     "count": 1
+    }
+   }
+  },
+  {
+   "name": "donor",
+   "loop": ".L4",
+   "function": "donor_csr_raw",
+   "contexts": 1,
+   "spec": {
+    "unit_of_work": {
+     "description": "one stored nonzero of a 32-row CSR matrix (row overhead included)",
+     "count": 1
+    }
+   }
+  }
+ ]
+}

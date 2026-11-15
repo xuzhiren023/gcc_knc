@@ -472,6 +472,16 @@ class Interpreter(object):
         else:
             self.gset(cx, dst, v, w)
 
+    def h_movsxd(self, cx, insn, ev, trace_mem, stream):
+        dst, src = insn.operands
+        if isinstance(src, Mem):
+            addr = self.ea(cx, src)
+            v = int.from_bytes(self.memory.read(addr, 4, cx.ctx), "little")
+            trace_mem.append((addr, 4))
+        else:
+            v = cx.gpr[src.base] & 0xFFFFFFFF
+        self.gset(cx, dst, v - (1 << 32) if v & 0x80000000 else v, 64)
+
     def h_lea(self, cx, insn, ev, trace_mem, stream):
         dst, mem = insn.operands
         self.gset(cx, dst, self.ea(cx, mem), insn.width)
@@ -563,7 +573,8 @@ class Interpreter(object):
         cond = insn.spec["cond"]
         taken = {"zf": f["ZF"], "nzf": not f["ZF"], "lt": f["SF"] != f["OF"], "ge": f["SF"] == f["OF"],
                  "gt": (not f["ZF"]) and f["SF"] == f["OF"], "le": f["ZF"] or f["SF"] != f["OF"],
-                 "cf": f["CF"], "ncf": not f["CF"], "sf": f["SF"], "nsf": not f["SF"]}[cond]
+                 "cf": f["CF"], "ncf": not f["CF"], "sf": f["SF"], "nsf": not f["SF"],
+                 "be": f["CF"] or f["ZF"], "a": not (f["CF"] or f["ZF"])}[cond]
         return self._branch(cx, insn, ev, stream, taken)
 
     def h_jk(self, cx, insn, ev, trace_mem, stream):

@@ -61,8 +61,11 @@ instead of `instructions`. Accepted: labels `L:`, `#` comments, ignored directiv
 `.globl`, `.p2align`, `.type`, `.size`, `.cfi_*`, `.section`, `.file`), mnemonics with `q`/`l`
 size suffixes on scalar ops, operands `%reg`, `$imm`, `disp(%base,%index,scale)`, a write mask
 `{%k1}` and rounding `{rn}`/`{rd}`/`{ru}`/`{rz}` on the destination, `{1to16}`/`{1to8}` on a
-memory source, `lock addl $imm, mem`. Rejected: any other swizzle, `w`/`b` suffixes, segment
-prefixes, `ret`/`nop` (strip the epilogue), unknown mnemonics and directives. Operands are
+memory source, `lock addl $imm, mem`, `movslq` (as `movsxd`), `salq`/`sall` (as `shl`). Rejected: any
+other swizzle, `w`/`b` suffixes, segment prefixes, `ret`/`nop` (strip the epilogue), x87 instructions
+with a memory operand (no sourced cost; the access would be lost), unknown mnemonics and directives.
+`scripts/from_gcc_s.py` cuts one loop out of a GCC `.s` file (`--loop .L7` or `--function f`), lists
+every line it cannot convert, and merges a spec (data, expected outputs, unit of work) into a kernel. Operands are
 reversed into Intel order; record ids become `L<line>`.
 
 ## Scenarios

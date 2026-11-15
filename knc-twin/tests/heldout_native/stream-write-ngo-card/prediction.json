@@ -1,0 +1,30 @@
+{
+ "case": "stream-write-ngo-card",
+ "core": {
+  "status": "ok",
+  "contexts": 1,
+  "predicted_cycles": 31,
+  "cycles_per_unit_core": 3.875,
+  "cycles_per_unit_per_thread": 3.875,
+  "pair_fraction": 1.0,
+  "limiting": [
+   {
+    "constraint": "spacing",
+    "context_cycles": 15
+   }
+  ]
+ },
+ "status": "ok",
+ "engine_version": "0.1.0",
+ "profile_hash": "7ba039d9aac0c34729af3a4743a38334147ca84296b982ebaa2894f825289a9a",
+ "scenarios": [
+  {
+   "bandwidth_gbs": 226.1,
+   "binding": "memory",
+   "compute_seconds": 0.05601439913839527,
+   "memory_seconds": 0.30393399706324636,
+   "total_seconds": 0.30393399706324636,
+   "achieved_bandwidth_gbs_if_total": 226.1
+  }
+ ]
+}
