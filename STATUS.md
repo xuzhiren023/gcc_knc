@@ -1,10 +1,10 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-15 09:29.
+Updated automatically at every ticket change. Last update: 2026-11-15 09:30.
 
 **Next: GPT-6.1, on S12-30 (Sparse indexed reductions faster than today - vector gather of products with an ordered scalar sum, and indirect prefetch, for CSR-style loops (NPB-CG, HPCG)).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
-Current tickets: `[##################--]` 240 of 256
+Current tickets: `[##################--]` 240 of 258
 
 ## Milestones
 
@@ -14,7 +14,7 @@ Current tickets: `[##################--]` 240 of 256
 | M1 | Mixed native code | Done | 43 of 43 tickets |
 | M2 | Useful vector target | Done | 51 of 51 tickets |
 | M3 | Runtimes | Done | 48 of 48 tickets |
-| M4 | Broad optimization | In progress | 58 of 73 tickets |
+| M4 | Broad optimization | In progress | 58 of 75 tickets |
 | M5 | Program corpus | In progress | 0 of 1 tickets |
 | M6 | Release | Not started | Not planned in detail yet |
 
@@ -121,6 +121,8 @@ Current tickets: `[##################--]` 240 of 256
 | S12-38 | ICE in the SLP vectorizer on gcc.dg vect-pr123221.c at -O3 -march=knc (found by S12-30's torture sweep) | Not started |  |
 | S12-39 | pm.py submit stops demanding an engineer-side rebase that the sandbox cannot perform (Permission denied on .git/worktrees/<id>/rebase-merge) | Done | Engineers no longer need to rebase before submitting: submit only refuses when main has real changes the br... |
 | S12-40 | Indirect prefetch recognizes Fortran sparse loops (array descriptors, ARRAY_REF offsets, nonzero and OpenMP-outlined starts) so NPB-CG benefits | draft |  |
+| S12-41 | Early donor check - corpus.py stages and runs only the development programs (no held-out build or run), smallest margins first, so the lead can measure every development program against GCC 5.1.1 now | In progress |  |
+| S12-42 | Small sparse row loops are 1.5-3% slower than GCC 5.1.1, worse when two loop nests share one function (found by S12-30's window 8 gate) | draft |  |
 | S13-01 | M4 final gate - stage the ADR-0015 gate run at the final head (17 programs, held-out unsealed, six pairs, three profiles) | draft |  |
 | S13-02 | Libgomp per-region thread density - choose 1-4 workers per core per parallel region instead of once per program | draft |  |
 | S13-03 | M4 retrospective - what we did wrong, what worked, and the practice changes carried into the next milestone and the agent-team skill | draft |  |
@@ -294,10 +296,10 @@ Current tickets: `[##################--]` 240 of 256
 
 - From the script, engineer: 699 sessions, 1450.8M input tokens
 - From the script, lead: 468 sessions, 133.3M input tokens
-- Started by hand, Claude: 12 sessions, 3583.4M input tokens
+- Started by hand, Claude: 12 sessions, 3584.0M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 34.8 GiB of 100 GiB. 119 GiB free on the drive.
+The project uses 34.7 GiB of 100 GiB. 120 GiB free on the drive.
