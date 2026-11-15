@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-15 06:14.
+Updated automatically at every ticket change. Last update: 2026-11-15 06:42.
 
-**Next: the tech lead, on S12-31.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: the tech lead, on S12-30.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[##################--]` 240 of 255
 
@@ -110,7 +110,7 @@ Current tickets: `[##################--]` 240 of 255
 | S12-27 | Latency-aware scalar loops - GCC-KNC unrolls and interleaves independent iterations and hoists conversions so one thread's every-other-cycle issue and long latencies are hidden automatically | draft |  |
 | S12-28 | dispatch.py refuses to start a second dispatcher on a lane that already has a live one | Done | dispatch.py now refuses to start a second dispatcher on a lane that already has a live one (a lock per lane... |
 | S12-29 | Wrong code - vbroadcastsd reads a 4-byte-aligned SCmode constant (complex float) straight from the constant pool and faults on the card (gcc.c-torture pr38969.c, regression from S11-27) | Done | The pr38969 crash from S11-27 is fixed: GCC-KNC no longer broadcasts a vector from memory aligned below its... |
-| S12-30 | Sparse indexed reductions faster than today - vector gather of products with an ordered scalar sum, and indirect prefetch, for CSR-style loops (NPB-CG, HPCG) | In progress | The HPCG-shaped compiler test is accepted: its scanner follows struct ->cols loads (hand-written control pa... |
+| S12-30 | Sparse indexed reductions faster than today - vector gather of products with an ordered scalar sum, and indirect prefetch, for CSR-style loops (NPB-CG, HPCG) | Question for the tech lead | fef90348, GCC c70cf1ed484 built by me (gcc_build.py, PASS): HPCG shapes green. T1 65/0 on default-on build,... |
 | S12-31 | HPCG is 1.8% slower with GCC-KNC than with GCC 5.1.1 - find the cause and make it faster (owner: never slower than 5.1.1) | Waiting for review | Green at f2cfc87f, GCC s12/S12-31 299aaf16b72: KNC compare/branch pairing kept adjacent in scalar blocks (p... |
 | S12-32 | ICE (reload) in gcc.c-torture O3-vect-pr32243.c on the installed GCC-KNC, found by the S12-21 torture sweep | Done | The -O3 vector reload crash in pr32243 is fixed: byte/word vector extends now reload through an aligned sta... |
 | S12-33 | T2 writes its short-vector test binaries into a per-run folder, so Claude, Codex and lead runs never block each other | Done | T2's short-vector cross-check now writes its binaries into the run's own output folder instead of the share... |
@@ -280,6 +280,7 @@ Current tickets: `[##################--]` 240 of 255
 
 ## Recent activity
 
+- 2026-11-15 06:42 **S12-30** engineer ask: fef90348, GCC c70cf1ed484 built by me (gcc_build.py, PASS): HPCG shapes green. T1 65/0 on default-on build, T0 56 PASS; HPCG dumps: next-row pointe...
 - 2026-11-15 06:14 **S12-30** lead approve-red: The HPCG-shaped compiler test is accepted: its scanner follows struct ->cols loads (hand-written control passes on and off), the probes match the r...
 - 2026-11-15 06:13 **S12-37** lead approve: T1 and T2 checks now write every generated file into the run's own output folder, so a file left by another account in a shared ticket folder can n...
 - 2026-11-15 06:01 **S12-37** engineer submit: 6bab700d updates only existing x87 test for runner.out and no escaped outputs. Cygwin suites via run.py: shared_area 3 PASS, check_outputs 3 PASS. ...
@@ -287,16 +288,15 @@ Current tickets: `[##################--]` 240 of 255
 - 2026-11-15 05:58 **S12-37** owner decide: Lead raises input_tokens 6M -> 10M: one requested change (update test_shared_area.py in place) remains.
 - 2026-11-15 05:57 **S12-30** owner decide: Owner rule (2026-11-14: Fable for troubleshooting): the recognizer now needs troubleshooting on real HPCG shapes (struct ->cols field loads, hoiste...
 - 2026-11-15 05:57 **S12-30** lead escalate: over 2 review rounds: Red not accepted: the three failures are the right kind, but the gate cannot go green and the probes are not in HPCG form. (1...
-- 2026-11-15 05:56 **S12-37** engineer escalate: budget: 6336450 input tokens used; the budget is 6000000
 
 ## Cost
 
 - From the script, engineer: 697 sessions, 1395.6M input tokens
 - From the script, lead: 466 sessions, 131.1M input tokens
-- Started by hand, Claude: 12 sessions, 3562.9M input tokens
+- Started by hand, Claude: 12 sessions, 3572.5M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 34.8 GiB of 100 GiB. 125 GiB free on the drive.
+The project uses 34.8 GiB of 100 GiB. 117 GiB free on the drive.
