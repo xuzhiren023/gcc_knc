@@ -2,7 +2,7 @@
 
 Updated automatically at every ticket change. Last update: 2026-11-14 21:50.
 
-**Next: the tech lead, on S12-24.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: the tech lead, on S12-21.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[##################--]` 230 of 248
 
@@ -101,7 +101,7 @@ Current tickets: `[##################--]` 230 of 248
 | S12-18 | Double-precision vector exp, log and pow ran slower than scalar libm on the card (0.82x, 0.63x, 0.49x) - confirm with valid batches, then fix the library or stop the vectorizer calling them where they lose | Done | The vector math benchmark now always times valid 50-200 ms batches, and the valid card runs show double exp... |
 | S12-19 | Profile-guided missed-vectorization triage - join hot loops with the vectorizer's reasons and observed strides/masks, so tuning targets what is hot and fixable | Done | tools/vec_triage.py now ranks each development program's hot loops by sampled time with GCC's vectorizer ve... |
 | S12-20 | libknc_vmath accuracy and exception contract, with an independent validation design (rounding modes, special values, flags, scalar fallback) | draft |  |
-| S12-21 | Scheduling model for M4's serial runs - measure density-1 tuning and the integer-multiply cost against today's density-4 defaults (S12-14 B02, B04, B05) | In progress | Lead raises sessions 9 -> 10: the work is complete (imul cost fix 1a4f5aab0a2, T1 green, T0/T1 pass, lead T... |
+| S12-21 | Scheduling model for M4's serial runs - measure density-1 tuning and the integer-multiply cost against today's density-4 defaults (S12-14 B02, B04, B05) | Waiting for review | KNC-only scalar integer multiply cost 3 -> 10 (QI/HI/SI/DI) and 6 -> 20 (TI) in knc_processor_costs (gcc 9c... |
 | S12-22 | Low-risk corrections from the S12-14 audit - wrong comments and citations (N01-N09) and the far-prefetch-distance range bug (B10) | Done | The audit's comment and citation fixes are in GCC-KNC and the far prefetch distance can no longer be set eq... |
 | S12-23 | Floating-point environment correctness on KNC - fix the underflow probe that cannot tell flushing from rounding, and handle x87 erratum CD28 (S12-14 N06, N07, B16, B17) | Done | GCC-KNC's floating-point environment handling is now correct on the card: x87 exception clearing uses the C... |
 | S12-24 | ICE in vect_transform_stmt (tree-vect-stmts.cc:13381) on WRF's REMEZ at -mphinix (-O3 -march=knc) | Waiting for review | GCC e3c5b822619 (tree-vect-loop.cc, on knc), lane gcc built. Green T1 PASS, both main loops vector incl. vm... |
@@ -274,13 +274,13 @@ Current tickets: `[##################--]` 230 of 248
 ## Recent activity
 
 - 2026-11-14 21:50 **S12-33** engineer submit: Host regression passed (1 test). The earlier red commit 41691642 failed because the test double was incomplete; after simplifying the fixture, veri...
+- 2026-11-14 21:50 **S12-21** engineer submit: KNC-only scalar integer multiply cost 3 -> 10 (QI/HI/SI/DI) and 6 -> 20 (TI) in knc_processor_costs (gcc 9c9a66819fa, rebased on knc 2e70e4115e2 by...
 - 2026-11-14 21:46 **S12-33** lead answer: Yes, simplify. Replace t2_crosscheck with a recording stub (mock.patch.object(scalar_abi, 't2_crosscheck')) and make runner.command return returnco...
 - 2026-11-14 21:45 **S12-24** engineer submit: GCC e3c5b822619 (tree-vect-loop.cc, on knc), lane gcc built. Green T1 PASS, both main loops vector incl. vmulps zmm; T0-T2 PASS; 5 reproducers comp...
 - 2026-11-14 21:44 **S12-33** engineer ask: Red test commit 41691642 fails as intended when t2_short_vector attempts to compile and link; this test double is incomplete (nm output comes throu...
 - 2026-11-14 21:37 **S12-21** owner decide: Lead raises sessions 9 -> 10: the work is complete (imul cost fix 1a4f5aab0a2, T1 green, T0/T1 pass, lead T2 36/0, A/B staged); the lead submits it.
 - 2026-11-14 21:36 **S12-21** engineer escalate: budget: 9 engineer sessions used; the budget is 9
 - 2026-11-14 21:35 **S12-30** lead defer: Needs the one Phase 1 card run (lead only): tools/card_run --threads 1 --timeout 1150, binary .work/_shared/S12-30/precision-gate, argument 12345 (...
-- 2026-11-14 21:35 **S12-21** lead answer: Submit.
 
 ## Cost
 
