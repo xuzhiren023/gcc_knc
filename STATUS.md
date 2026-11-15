@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-15 12:10.
+Updated automatically at every ticket change. Last update: 2026-11-15 12:27.
 
-**Next: GPT-6.1, on S12-09 (Sprint 12 batch check - integrated themes at the final Sprint 12 head, regression evidence, optional modes frozen).** Run `python tools/dispatch.py`, or ask the tech lead to.
+**Next: the tech lead, on S13-05.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[##################--]` 241 of 267
 
@@ -127,7 +127,7 @@ Current tickets: `[##################--]` 241 of 267
 | S13-02 | Libgomp per-region thread density - choose 1-4 workers per core per parallel region instead of once per program | draft | Owner 2026-11-15 ("yes delay to M5"): deferred to M5 (sprint s14). The M4 primary score is serial -O2, so t... |
 | S13-03 | M4 retrospective - what we did wrong, what worked, and the practice changes carried into the next milestone and the agent-team skill | draft |  |
 | S13-04 | Clean source repositories for a fresh build - GCC-KNC fork and project code without build artifacts, plus a Linux-host build recipe the owner runs on the new workstation | draft |  |
-| S13-05 | model-first skill - a project Claude Code skill that models a hot region and its run-time lower bound before any optimization, plus one sourced KNC machine file | In progress | S13-05 has one host test that fails until the sourced KNC machine file and the model-first skill exist, and... |
+| S13-05 | model-first skill - a project Claude Code skill that models a hot region and its run-time lower bound before any optimization, plus one sourced KNC machine file | Question for the tech lead | Submission blocked: pm.py submit reports 1173 changed lines against the 800-line budget. Deliverables are c... |
 | S14-01 | 16- and 32-byte GCC generic vectors compile to IMCI in the low lanes of a zmm register, with a by-value ABI, so FFTW's generic-simd128/256 paths run vectorized | draft |  |
 | S14-02 | Software pipelining on KNC - probe whether SMS can run (a KNC counted-loop pattern) and whether it speeds up in-order loops | draft |  |
 | S14-03 | KNC scheduler model completeness - bypasses, folded memory operand cost, pairing by encoding, checked on post-RA schedules | draft |  |
@@ -292,6 +292,7 @@ Current tickets: `[##################--]` 241 of 267
 
 ## Recent activity
 
+- 2026-11-15 12:27 **S13-05** engineer ask: Submission blocked: pm.py submit reports 1173 changed lines against the 800-line budget. Deliverables are committed at 6966ce88: 160-line skill, so...
 - 2026-11-15 12:10 **S13-05** lead approve-red: S13-05 has one host test that fails until the sourced KNC machine file and the model-first skill exist, and then checks every filled value has unit...
 - 2026-11-15 12:08 **S13-05** engineer red: Commit 0dd02944 adds the single host test tests/regress/test_model_first.py. Ran once through tools/run.py --name s13-05-model-first: exit 1, one t...
 - 2026-11-15 12:01 **S13-01** lead defer: Primary gate staged at a74a0c2e; spot-check OK (frozen 1e-8+1e-6|r| bound, full STREAM element check, AB/BA and profile order in scorer). Interacti...
@@ -299,16 +300,15 @@ Current tickets: `[##################--]` 241 of 267
 - 2026-11-15 11:40 **S13-01** lead note: Start now, in parallel with S12-09 (owner 2026-11-15: close M4 fast; PhiWeather holds the card for us from ~18:31Z until M4 ends). Frozen final GCC...
 - 2026-11-15 11:32 **S13-01** lead answer: Implementing the missing readiness is authorized in this ticket. The follow-up promised at S11-18 (2026-11-12 17:35) was never opened, and that gap...
 - 2026-11-15 11:30 **S13-01** engineer ask: ADR-0015 readiness blocks complete gate staging: corpus.py collect compares PB outputs only to donor; parse_native accepts STREAM's Solution Valida...
-- 2026-11-15 11:25 **S12-09** owner decide: Lead raises input_tokens 6M -> 12M (owner rule 2026-11-09: lead extends budgets): the check is nearly done (ICE sweeps clean, x86 1962/0, card jobs...
 
 ## Cost
 
 - From the script, engineer: 704 sessions, 1464.9M input tokens
 - From the script, lead: 472 sessions, 134.6M input tokens
-- Started by hand, Claude: 12 sessions, 3601.6M input tokens
+- Started by hand, Claude: 13 sessions, 3602.1M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 36.3 GiB of 100 GiB. 120 GiB free on the drive.
+The project uses 36.3 GiB of 100 GiB. 119 GiB free on the drive.
