@@ -1,10 +1,10 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-15 00:18.
+Updated automatically at every ticket change. Last update: 2026-11-15 00:30.
 
-**Next: the tech lead, on S11-26.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: the tech lead, on S12-32.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
-Current tickets: `[##################--]` 233 of 249
+Current tickets: `[##################--]` 234 of 249
 
 ## Milestones
 
@@ -14,7 +14,7 @@ Current tickets: `[##################--]` 233 of 249
 | M1 | Mixed native code | Done | 43 of 43 tickets |
 | M2 | Useful vector target | Done | 51 of 51 tickets |
 | M3 | Runtimes | Done | 48 of 48 tickets |
-| M4 | Broad optimization | In progress | 51 of 67 tickets |
+| M4 | Broad optimization | In progress | 52 of 67 tickets |
 | M5 | Program corpus | Not started | Not planned in detail yet |
 | M6 | Release | Not started | Not planned in detail yet |
 
@@ -77,7 +77,7 @@ Current tickets: `[##################--]` 233 of 249
 | S11-23 | ICE in WRF's RRTM radiation (rtrn) at -O2 -march=knc - unrecognizable insn after reload, and sub-512-bit SLP vectors under KNC | Done | WRF's RRTM radiation and the -O3 OpenMP WRF files that crashed GCC-KNC after reload (rtrn, kfcps, advance_u... |
 | S11-24 | WRF OpenMP (smpar) build with GCC-KNC at -mphinix, for PhiWeather's benchmark - replaces the serial trial build | Done | WRF v4.8.0 now builds as an OpenMP card binary at -mphinix with GCC-KNC (wrf.exe and real.exe linked, needi... |
 | S11-25 | ICE in do_store_flag (expr.cc) on WRF's surface layer (SFCLAY1D) at -O2 -march=knc | Done | The last WRF file that crashed GCC-KNC (surface layer, SFCLAY1D) now compiles: vector 'ordered and not equa... |
-| S11-26 | WRF OpenMP build at -mphinix with no per-file workarounds (S11-23 and S11-25 fixed), restaged for PhiWeather | Waiting for review | PASS with installed knc 71e9b2d00fc: four original reproducers plus REMEZ; smpar build/link (66.2 min), che... |
+| S11-26 | WRF OpenMP build at -mphinix with no per-file workarounds (S11-23 and S11-25 fixed), restaged for PhiWeather | Done | WRF 4.8.0 OpenMP (wrf.exe, real.exe) now builds at -mphinix -mknc-card=7120 with no per-file workarounds on... |
 | S11-27 | Wrong code - NPB-MG (class A, serial) built by GCC-KNC at -O2 -march=knc fails NPB verification on the card | Done | NPB-MG built by GCC-KNC at -O2 -march=knc now verifies on the card (class A in 14.1 s, against 33.8 s for G... |
 | S11-28 | HPCG run that fits every card model - fixed work instead of fixed duration, grid sized to the 3100's memory | Done | HPCG now runs a fixed amount of work (one CG set on the 104-cubed grid) that passes on the full card, 3100 ... |
 | S11-29 | card_run profiles limit memory in use, not address space, so a 3100 or 5100 run fails only where the real card would | Done | Under --profile 3100 and 5100, card_run now limits the memory a job actually uses (sampled resident plus sw... |
@@ -274,6 +274,7 @@ Current tickets: `[##################--]` 233 of 249
 
 ## Recent activity
 
+- 2026-11-15 00:30 **S11-26** lead approve: WRF 4.8.0 OpenMP (wrf.exe, real.exe) now builds at -mphinix -mknc-card=7120 with no per-file workarounds on knc 71e9b2d00fc and is staged in wrf-tr...
 - 2026-11-15 00:18 **S11-26** engineer submit: PASS with installed knc 71e9b2d00fc: four original reproducers plus REMEZ; smpar build/link (66.2 min), check-wrf-links.py, ELF/dependency checks, ...
 - 2026-11-15 00:12 **S12-31** lead defer: Needs the interactive lead. (1) Card, our exclusive turn: the 4 commands in docs/research/s12-31-hpcg.md 'Second diagnostic' at 7bae9403 (1 core, a...
 - 2026-11-15 00:10 **S12-31** engineer ask: At 7bae9403, docs/research/s12-31-hpcg.md 'First diagnostic: result' onwards. Padding confirmed but small (0.3-0.5%, then level with donor); pilot ...
@@ -281,7 +282,6 @@ Current tickets: `[##################--]` 233 of 249
 - 2026-11-15 00:00 **S12-30** engineer ask: e49a34b8: Step 1 legal CSR R3/d32 and HPCG next-row hints plus rows>=16384 policy staged; no nnz or GCC change. Target build/lint and 18 host guard...
 - 2026-11-14 23:59 **S12-32** engineer submit: Green: knc f559e49271c (imci.md Bm->Ba) + 6b79c6f0566 (sse.md: extend expanders passed a folded under-aligned MEM, a second ICE in vregs; red f422e...
 - 2026-11-14 23:50 **S12-30** lead changes: Phase-2 red not accepted: the four failures are the right kind, but the positive checks do not prove the acceptance, and the form Phase 1 measured ...
-- 2026-11-14 23:45 **S12-30** engineer red: 489b7dc4: Phase-two T1 red: four missing indirect-prefetch failures; compile/lint, exclusions, scalar folds and installed O2 baseline identity PASS...
 
 ## Cost
 
