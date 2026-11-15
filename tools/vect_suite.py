@@ -216,7 +216,7 @@ def main():
         env = os.environ.copy()
         env['PATH'] = os.pathsep.join(str(TC / p) for p in ('cross/bin', 'cygwin/bin')) + os.pathsep + env.get('PATH', '')
         arguments = list(sys.argv[1:])
-        for flag in ('--output', '--summary'):
+        for flag in ('--output', '--summary', '--cc'):
             if flag in arguments:
                 index = arguments.index(flag) + 1
                 arguments[index] = subprocess.check_output(
@@ -224,6 +224,7 @@ def main():
         script = subprocess.check_output([str(TC / 'cygwin/bin/cygpath.exe'), '-u', str(Path(__file__))], text=True).strip()
         return subprocess.call([str(TC / 'cygwin/bin/python3.12.exe'), script, *arguments], env=env)
     parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--cc', type=Path, help='installed compiler, without a build-tree -B')
     parser.add_argument('--jobs', type=int, choices=range(1, 9), default=8)
     parser.add_argument('--output', type=Path, default=SHARED / 'S6-07')
     parser.add_argument('--summary', type=Path, default=ROOT / 'tests/baseline/gcc16-vect.txt')
@@ -239,7 +240,7 @@ def main():
     env['TMPDIR'] = str(SHARED / 'tmp')
     env['LC_ALL'] = 'C'
     build = Path(storage.gcc_build_dir(PROJECT)) / 'gcc'
-    cc = [str(build / 'xgcc.exe'), '-B' + str(build) + '/']
+    cc = [str(args.cc)] if args.cc else [str(build / 'xgcc.exe'), '-B' + str(build) + '/']
     lint = runpy.run_path(str(ROOT / 'tools/knc_lint'))['lint']
 
     def invoke(command):

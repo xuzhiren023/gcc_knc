@@ -131,7 +131,8 @@ def t1(runner):
     asm = runner.out / 'secondary-fortran.s'
     # Use the language driver as well as f951: a C-only xgcc does not accept
     # Fortran options such as -J, even with -x f95.
-    compiler, flags = ((runner.cc.with_name('gfortran'), runner.cc_flags) if runner.args.compiler == 'gcc16'
+    name = runner.cc.name.replace('gcc', 'gfortran') if getattr(runner.args, 'cc', None) else 'gfortran'
+    compiler, flags = ((runner.cc.with_name(name), runner.cc_flags) if runner.args.compiler == 'gcc16'
                        else (runner.tool('gfortran'), []))
     if not compiler.exists() and not compiler.with_suffix('.exe').exists():
         runner.result('t1 secondary Fortran infrastructure',

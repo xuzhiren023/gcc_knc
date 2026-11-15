@@ -1,0 +1,125 @@
+S12-09 installed compiler/runtime record
+Installed compiler output below reports GCC 16.2.0 without a Git revision.
+The lane 1 checkout/build stamp is recorded separately; it does not attest lane 2 installation.
+Project HEAD: a06cb6812a0314694db6702c7e205decf0c9ecc2
+GCC knc: b2ce6a9eebffcb5c23512c2cec4ba3d8b9e2f046
+Lane 1 build stamp: {
+  "commit": "b2ce6a9eebffcb5c23512c2cec4ba3d8b9e2f046",
+  "tree": "b74f8074c1dea39f67a13c22292f76ab19aa10ec",
+  "clean": true,
+  "make_args": [
+    "-j8",
+    "all-gcc",
+    "all-target-libgcc",
+    "all-target-libgfortran",
+    "all-target-libstdc++-v3",
+    "all-target-libatomic",
+    "all-target-libgomp",
+    "CFLAGS=-O2 -g1",
+    "CXXFLAGS=-O2 -g1"
+  ]
+}
+
+vmath source: 97b7abf741c9d3457154bd2543ca83480ec93d40 fix(S10-11): scope contraction control to compensated trig helpers
+
+Prefix: C:\Users\xuzhi\Documents\gcc_knc\.work\_shared\gcc-knc-16.2.0
+Using built-in specs.
+COLLECT_GCC=/cygdrive/c/Users/xuzhi/Documents/gcc_knc/.work/_shared/gcc-knc-16.2.0/bin/k1om-mpss-linux-gcc
+COLLECT_LTO_WRAPPER=/cygdrive/c/Users/xuzhi/Documents/gcc_knc/.work/_shared/gcc-knc-16.2.0/bin/../libexec/gcc/k1om-mpss-linux/16.2.0/lto-wrapper.exe
+Target: k1om-mpss-linux
+Configured with: /cygdrive/c/Users/xuzhi/Documents/gcc_knc/.work/_shared/gcc/configure --target=k1om-mpss-linux --prefix=/cygdrive/c/Users/xuzhi/Documents/gcc_knc/.work/_shared/gcc-install --with-sysroot=/cygdrive/c/Users/xuzhi/Documents/gcc_knc/.work/_shared/toolchain/sysroot --with-as=/cygdrive/c/Users/xuzhi/Documents/gcc_knc/.work/_shared/toolchain/cross/bin/k1om-mpss-linux-as --with-ld=/cygdrive/c/Users/xuzhi/Documents/gcc_knc/.work/_shared/toolchain/cross/bin/k1om-mpss-linux-ld --disable-bootstrap --disable-multilib --disable-nls --without-isl --disable-libssp --disable-libquadmath --disable-libquadmath-support --disable-libsanitizer --disable-libitm --disable-libcilkrts --disable-libvtv --disable-libmpx --disable-libgomp target_alias=k1om-mpss-linux --enable-languages=c,c++,fortran,lto --enable-clocale=generic --with-libstdcxx-zoneinfo=static : (reconfigured) /cygdrive/c/Users/xuzhi/Documents/gcc_knc/.work/_shared/gcc/configure --target=k1om-mpss-linux --prefix=/cygdrive/c/Users/xuzhi/Documents/gcc_knc/.work/_shared/gcc-install --with-sysroot=/cygdrive/c/Users/xuzhi/Documents/gcc_knc/.work/_shared/toolchain/sysroot --with-as=/cygdrive/c/Users/xuzhi/Documents/gcc_knc/.work/_shared/toolchain/cross/bin/k1om-mpss-linux-as --with-ld=/cygdrive/c/Users/xuzhi/Documents/gcc_knc/.work/_shared/toolchain/cross/bin/k1om-mpss-linux-ld --disable-bootstrap --disable-multilib --disable-nls --without-isl --disable-libssp --disable-libquadmath --disable-libquadmath-support --disable-libsanitizer --disable-libitm --disable-libcilkrts --disable-libvtv --disable-libmpx target_alias=k1om-mpss-linux --enable-languages=c,c++,fortran,lto --enable-clocale=generic --with-libstdcxx-zoneinfo=static --enable-linux-futex
+Thread model: posix
+Supported LTO compression algorithms: zlib
+gcc version 16.2.0 (GCC)
+libgcc.a: /cygdrive/c/Users/xuzhi/Documents/gcc_knc/.work/_shared/gcc-knc-16.2.0/bin/../lib/gcc/k1om-mpss-linux/16.2.0/libgcc.a
+libgcc_s.so: /cygdrive/c/Users/xuzhi/Documents/gcc_knc/.work/_shared/gcc-knc-16.2.0/bin/../lib/gcc/k1om-mpss-linux/16.2.0/../../../../k1om-mpss-linux/lib/../lib64/libgcc_s.so
+libgomp.a: /cygdrive/c/Users/xuzhi/Documents/gcc_knc/.work/_shared/gcc-knc-16.2.0/bin/../lib/gcc/k1om-mpss-linux/16.2.0/../../../../k1om-mpss-linux/lib/../lib64/libgomp.a
+libgfortran.a: /cygdrive/c/Users/xuzhi/Documents/gcc_knc/.work/_shared/gcc-knc-16.2.0/bin/../lib/gcc/k1om-mpss-linux/16.2.0/../../../../k1om-mpss-linux/lib/../lib64/libgfortran.a
+libstdc++.a: /cygdrive/c/Users/xuzhi/Documents/gcc_knc/.work/_shared/gcc-knc-16.2.0/bin/../lib/gcc/k1om-mpss-linux/16.2.0/../../../../k1om-mpss-linux/lib/../lib64/libstdc++.a
+libatomic.a: /cygdrive/c/Users/xuzhi/Documents/gcc_knc/.work/_shared/gcc-knc-16.2.0/bin/../lib/gcc/k1om-mpss-linux/16.2.0/../../../../k1om-mpss-linux/lib/../lib64/libatomic.a
+libknc_vmath.a: /cygdrive/c/Users/xuzhi/Documents/gcc_knc/.work/_shared/gcc-knc-16.2.0/bin/../lib/gcc/k1om-mpss-linux/16.2.0/libknc_vmath.a
+bin: k1om-mpss-linux-c++.exe, k1om-mpss-linux-cpp.exe, k1om-mpss-linux-g++.exe, k1om-mpss-linux-gcc-16.2.0.exe, k1om-mpss-linux-gcc-ar.exe, k1om-mpss-linux-gcc-nm.exe, k1om-mpss-linux-gcc-ranlib.exe, k1om-mpss-linux-gcc.exe, k1om-mpss-linux-gcov-dump.exe, k1om-mpss-linux-gcov-tool.exe, k1om-mpss-linux-gcov.exe, k1om-mpss-linux-gfortran.exe, k1om-mpss-linux-lto-dump.exe
+lib/gcc/k1om-mpss-linux/16.2.0: crtbegin.o, crtbeginS.o, crtbeginT.o, crtend.o, crtendS.o, crtfastmath.o, finclude, include, include-fixed, install-tools, libcaf_shmem.a, libcaf_shmem.la, libcaf_single.a, libcaf_single.la, libgcc.a, libgcc_eh.a, libgcov.a, libknc_vmath.a
+k1om-mpss-linux/lib: 
+vmath members: vmath_asin.o
+vmath_atan.o
+vmath_cbrt.o
+vmath_erf.o
+vmath_exp.o
+vmath_exp2.o
+vmath_expf.o
+vmath_hyperbolic.o
+vmath_log.o
+vmath_log10.o
+vmath_log10f.o
+vmath_log2.o
+vmath_logf.o
+vmath_pow.o
+vmath_powf.o
+vmath_reducer.o
+vmath_sincos.o
+vmath_tan.o
+exp_data.o
+log_data.o
+pow_log_data.o
+powf_log2_data.o
+exp2f_data.o
+log2_data.o
+v_erf_data.o
+v_erfc_data.o
+
+Prefix: C:\Users\xuzhi\Documents\gcc_knc\.work\_shared\gcc-knc-16.2.0-2
+Using built-in specs.
+COLLECT_GCC=/cygdrive/c/Users/xuzhi/Documents/gcc_knc/.work/_shared/gcc-knc-16.2.0-2/bin/k1om-mpss-linux-gcc
+COLLECT_LTO_WRAPPER=/cygdrive/c/Users/xuzhi/Documents/gcc_knc/.work/_shared/gcc-knc-16.2.0-2/bin/../libexec/gcc/k1om-mpss-linux/16.2.0/lto-wrapper.exe
+Target: k1om-mpss-linux
+Configured with: /cygdrive/c/Users/xuzhi/Documents/gcc_knc/.work/_shared/gcc-2/configure --target=k1om-mpss-linux --prefix=/cygdrive/c/Users/xuzhi/Documents/gcc_knc/.work/_shared/gcc-install --with-sysroot=/cygdrive/c/Users/xuzhi/Documents/gcc_knc/.work/_shared/toolchain/sysroot --with-as=/cygdrive/c/Users/xuzhi/Documents/gcc_knc/.work/_shared/toolchain/cross/bin/k1om-mpss-linux-as --with-ld=/cygdrive/c/Users/xuzhi/Documents/gcc_knc/.work/_shared/toolchain/cross/bin/k1om-mpss-linux-ld --disable-bootstrap --disable-multilib --disable-nls --without-isl --disable-libssp --disable-libquadmath --disable-libquadmath-support --disable-libsanitizer --disable-libitm --disable-libcilkrts --disable-libvtv --disable-libmpx --disable-libgomp target_alias=k1om-mpss-linux --enable-languages=c,fortran,lto : (reconfigured) /cygdrive/c/Users/xuzhi/Documents/gcc_knc/.work/_shared/gcc-2/configure --target=k1om-mpss-linux --prefix=/cygdrive/c/Users/xuzhi/Documents/gcc_knc/.work/_shared/gcc-install --with-sysroot=/cygdrive/c/Users/xuzhi/Documents/gcc_knc/.work/_shared/toolchain/sysroot --with-as=/cygdrive/c/Users/xuzhi/Documents/gcc_knc/.work/_shared/toolchain/cross/bin/k1om-mpss-linux-as --with-ld=/cygdrive/c/Users/xuzhi/Documents/gcc_knc/.work/_shared/toolchain/cross/bin/k1om-mpss-linux-ld --disable-bootstrap --disable-multilib --disable-nls --without-isl --disable-libssp --disable-libquadmath --disable-libquadmath-support --disable-libsanitizer --disable-libitm --disable-libcilkrts --disable-libvtv --disable-libmpx --disable-libgomp target_alias=k1om-mpss-linux --enable-languages=c,c++,fortran,lto --enable-clocale=generic --with-libstdcxx-zoneinfo=static : (reconfigured) /cygdrive/c/Users/xuzhi/Documents/gcc_knc/.work/_shared/gcc-2/configure --target=k1om-mpss-linux --prefix=/cygdrive/c/Users/xuzhi/Documents/gcc_knc/.work/_shared/gcc-install --with-sysroot=/cygdrive/c/Users/xuzhi/Documents/gcc_knc/.work/_shared/toolchain/sysroot --with-as=/cygdrive/c/Users/xuzhi/Documents/gcc_knc/.work/_shared/toolchain/cross/bin/k1om-mpss-linux-as --with-ld=/cygdrive/c/Users/xuzhi/Documents/gcc_knc/.work/_shared/toolchain/cross/bin/k1om-mpss-linux-ld --disable-bootstrap --disable-multilib --disable-nls --without-isl --disable-libssp --disable-libquadmath --disable-libquadmath-support --disable-libsanitizer --disable-libitm --disable-libcilkrts --disable-libvtv --disable-libmpx target_alias=k1om-mpss-linux --enable-languages=c,c++,fortran,lto --enable-clocale=generic --with-libstdcxx-zoneinfo=static --enable-linux-futex
+Thread model: posix
+Supported LTO compression algorithms: zlib
+gcc version 16.2.0 (GCC)
+libgcc.a: /cygdrive/c/Users/xuzhi/Documents/gcc_knc/.work/_shared/gcc-knc-16.2.0-2/bin/../lib/gcc/k1om-mpss-linux/16.2.0/libgcc.a
+libgcc_s.so: /cygdrive/c/Users/xuzhi/Documents/gcc_knc/.work/_shared/gcc-knc-16.2.0-2/bin/../lib/gcc/k1om-mpss-linux/16.2.0/../../../../k1om-mpss-linux/lib/../lib64/libgcc_s.so
+libgomp.a: /cygdrive/c/Users/xuzhi/Documents/gcc_knc/.work/_shared/gcc-knc-16.2.0-2/bin/../lib/gcc/k1om-mpss-linux/16.2.0/../../../../k1om-mpss-linux/lib/../lib64/libgomp.a
+libgfortran.a: /cygdrive/c/Users/xuzhi/Documents/gcc_knc/.work/_shared/gcc-knc-16.2.0-2/bin/../lib/gcc/k1om-mpss-linux/16.2.0/../../../../k1om-mpss-linux/lib/../lib64/libgfortran.a
+libstdc++.a: /cygdrive/c/Users/xuzhi/Documents/gcc_knc/.work/_shared/gcc-knc-16.2.0-2/bin/../lib/gcc/k1om-mpss-linux/16.2.0/../../../../k1om-mpss-linux/lib/../lib64/libstdc++.a
+libatomic.a: /cygdrive/c/Users/xuzhi/Documents/gcc_knc/.work/_shared/gcc-knc-16.2.0-2/bin/../lib/gcc/k1om-mpss-linux/16.2.0/../../../../k1om-mpss-linux/lib/../lib64/libatomic.a
+libknc_vmath.a: /cygdrive/c/Users/xuzhi/Documents/gcc_knc/.work/_shared/gcc-knc-16.2.0-2/bin/../lib/gcc/k1om-mpss-linux/16.2.0/libknc_vmath.a
+bin: k1om-mpss-linux-c++.exe, k1om-mpss-linux-cpp.exe, k1om-mpss-linux-g++.exe, k1om-mpss-linux-gcc-16.2.0.exe, k1om-mpss-linux-gcc-ar.exe, k1om-mpss-linux-gcc-nm.exe, k1om-mpss-linux-gcc-ranlib.exe, k1om-mpss-linux-gcc.exe, k1om-mpss-linux-gcov-dump.exe, k1om-mpss-linux-gcov-tool.exe, k1om-mpss-linux-gcov.exe, k1om-mpss-linux-gfortran.exe, k1om-mpss-linux-lto-dump.exe
+lib/gcc/k1om-mpss-linux/16.2.0: crtbegin.o, crtbeginS.o, crtbeginT.o, crtend.o, crtendS.o, crtfastmath.o, finclude, include, include-fixed, install-tools, libcaf_shmem.a, libcaf_shmem.la, libcaf_single.a, libcaf_single.la, libgcc.a, libgcc_eh.a, libgcov.a, libknc_vmath.a
+k1om-mpss-linux/lib: 
+vmath members: vmath_asin.o
+vmath_atan.o
+vmath_cbrt.o
+vmath_erf.o
+vmath_exp.o
+vmath_exp2.o
+vmath_expf.o
+vmath_hyperbolic.o
+vmath_log.o
+vmath_log10.o
+vmath_log10f.o
+vmath_log2.o
+vmath_logf.o
+vmath_pow.o
+vmath_powf.o
+vmath_reducer.o
+vmath_sincos.o
+vmath_tan.o
+exp_data.o
+log_data.o
+pow_log_data.o
+powf_log2_data.o
+exp2f_data.o
+log2_data.o
+v_erf_data.o
+v_erfc_data.o
+libgcc oldest object: C:\Users\xuzhi\Documents\gcc_knc\.work\_shared\gcc-build\k1om-mpss-linux\libgcc\_ucmpdi2.o; modified 2026-11-15T09:49:01.741993-05:00
+libgcc newest object: C:\Users\xuzhi\Documents\gcc_knc\.work\_shared\gcc-build\k1om-mpss-linux\libgcc\unwind-dw2-fde-dip_s.o; modified 2026-11-15T09:49:19.978935-05:00
+libgomp oldest object: C:\Users\xuzhi\Documents\gcc_knc\.work\_shared\gcc-build\k1om-mpss-linux\libgomp\.libs\critical.o; modified 2026-11-15T09:53:42.295306-05:00
+libgomp newest object: C:\Users\xuzhi\Documents\gcc_knc\.work\_shared\gcc-build\k1om-mpss-linux\libgomp\target.o; modified 2026-11-15T09:54:01.583667-05:00
+libgfortran oldest object: C:\Users\xuzhi\Documents\gcc_knc\.work\_shared\gcc-build\k1om-mpss-linux\libgfortran\runtime\.libs\in_pack_generic.o; modified 2026-11-15T09:58:40.298153-05:00
+libgfortran newest object: C:\Users\xuzhi\Documents\gcc_knc\.work\_shared\gcc-build\k1om-mpss-linux\libgfortran\ieee\ieee_arithmetic.o; modified 2026-11-15T10:04:01.918521-05:00
+libstdc++-v3 oldest object: C:\Users\xuzhi\Documents\gcc_knc\.work\_shared\gcc-build\k1om-mpss-linux\libstdc++-v3\libsupc++\atexit_arm.o; modified 2026-11-15T10:00:48.356730-05:00
+libstdc++-v3 newest object: C:\Users\xuzhi\Documents\gcc_knc\.work\_shared\gcc-build\k1om-mpss-linux\libstdc++-v3\src\compatibility-thread-c++0x.o; modified 2026-11-15T10:04:12.070516-05:00
+libatomic oldest object: C:\Users\xuzhi\Documents\gcc_knc\.work\_shared\gcc-build\k1om-mpss-linux\libatomic\.libs\init.o; modified 2026-11-15T09:51:06.364020-05:00
+libatomic newest object: C:\Users\xuzhi\Documents\gcc_knc\.work\_shared\gcc-build\k1om-mpss-linux\libatomic\tas_16_.o; modified 2026-11-15T09:51:15.803686-05:00

@@ -83,7 +83,7 @@ def main():
                                     ('cross/bin', 'cygwin/bin')) + os.pathsep + env.get('PATH', '')
         cygpath = str(TC / 'cygwin/bin/cygpath.exe')
         arguments = sys.argv[1:]
-        for flag in ('--source', '--output', '--summary'):
+        for flag in ('--source', '--output', '--summary', '--cc'):
             if flag in arguments:
                 index = arguments.index(flag) + 1
                 arguments[index] = subprocess.check_output(
@@ -94,6 +94,7 @@ def main():
                                 *arguments], env=env)
 
     parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--cc', type=Path, help='installed compiler, without a build-tree -B')
     parser.add_argument('--source', type=Path, help='one reduced case instead of the corpus')
     parser.add_argument('--level', choices=tuple(LEVELS), action='append')
     parser.add_argument('--jobs', type=int, default=8, choices=range(1, 9))
@@ -170,7 +171,8 @@ def main():
 
         kind = 'infrastructure failure'
         try:
-            result = invoke([BUILD / 'xgcc', '-B' + str(BUILD) + '/', '-march=knc',
+            cc = [args.cc] if args.cc else [BUILD / 'xgcc', '-B' + str(BUILD) + '/']
+            result = invoke([*cc, '-march=knc',
                              *LEVELS[level], *options[source], '-S', source, '-o', asm],
                             compiler=True)
             if result.returncode:
