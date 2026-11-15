@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-14 23:51.
+Updated automatically at every ticket change. Last update: 2026-11-14 23:52.
 
 **Next: GPT-6.1, on S11-26 (WRF OpenMP build at -mphinix with no per-file workarounds (S11-23 and S11-25 fixed), restaged for PhiWeather).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
@@ -110,7 +110,7 @@ Current tickets: `[##################--]` 233 of 248
 | S12-27 | Latency-aware scalar loops - GCC-KNC unrolls and interleaves independent iterations and hoists conversions so one thread's every-other-cycle issue and long latencies are hidden automatically | draft |  |
 | S12-28 | dispatch.py refuses to start a second dispatcher on a lane that already has a live one | Done | dispatch.py now refuses to start a second dispatcher on a lane that already has a live one (a lock per lane... |
 | S12-29 | Wrong code - vbroadcastsd reads a 4-byte-aligned SCmode constant (complex float) straight from the constant pool and faults on the card (gcc.c-torture pr38969.c, regression from S11-27) | Done | The pr38969 crash from S11-27 is fixed: GCC-KNC no longer broadcasts a vector from memory aligned below its... |
-| S12-30 | Sparse indexed reductions faster than today - vector gather of products with an ordered scalar sum, and indirect prefetch, for CSR-style loops (NPB-CG, HPCG) | Changes requested | Phase-2 red not accepted: the four failures are the right kind, but the positive checks do not prove the ac... |
+| S12-30 | Sparse indexed reductions faster than today - vector gather of products with an ordered scalar sum, and indirect prefetch, for CSR-style loops (NPB-CG, HPCG) | In progress | Phase-2 red not accepted: the four failures are the right kind, but the positive checks do not prove the ac... |
 | S12-31 | HPCG is 1.8% slower with GCC-KNC than with GCC 5.1.1 - find the cause and make it faster (owner: never slower than 5.1.1) | In progress | Results in; interpret and decide. |
 | S12-32 | ICE (reload) in gcc.c-torture O3-vect-pr32243.c on the installed GCC-KNC, found by the S12-21 torture sweep | In progress | Red accepted: knc-convert-byte-register.c reproduces the ticket's reload ICE and passes only when a registe... |
 | S12-33 | T2 writes its short-vector test binaries into a per-run folder, so Claude, Codex and lead runs never block each other | Done | T2's short-vector cross-check now writes its binaries into the run's own output folder instead of the share... |
@@ -292,4 +292,4 @@ Current tickets: `[##################--]` 233 of 248
 
 ## Disk
 
-The project uses 33.7 GiB of 100 GiB. 139 GiB free on the drive.
+The project uses 33.8 GiB of 100 GiB. 139 GiB free on the drive.
