@@ -1,10 +1,10 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-15 01:09.
+Updated automatically at every ticket change. Last update: 2026-11-15 01:14.
 
-**Next: GPT-6.1, on S12-34 (Unrecognizable insn for a truncating vector store to a 1-byte-aligned V16QI destination (found by S12-32)).** Run `python tools/dispatch.py`, or ask the tech lead to.
+**Next: GPT-6.1, on S12-35 (Clean single-compiler rebuild of the S11-26 WRF smpar build (the staged wrf.exe mixes objects from knc 619e14b479a and 71e9b2d00fc)).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
-Current tickets: `[##################--]` 236 of 249
+Current tickets: `[##################--]` 236 of 250
 
 ## Milestones
 
@@ -14,7 +14,7 @@ Current tickets: `[##################--]` 236 of 249
 | M1 | Mixed native code | Done | 43 of 43 tickets |
 | M2 | Useful vector target | Done | 51 of 51 tickets |
 | M3 | Runtimes | Done | 48 of 48 tickets |
-| M4 | Broad optimization | In progress | 54 of 67 tickets |
+| M4 | Broad optimization | In progress | 54 of 68 tickets |
 | M5 | Program corpus | Not started | Not planned in detail yet |
 | M6 | Release | Not started | Not planned in detail yet |
 
@@ -115,6 +115,7 @@ Current tickets: `[##################--]` 236 of 249
 | S12-32 | ICE (reload) in gcc.c-torture O3-vect-pr32243.c on the installed GCC-KNC, found by the S12-21 torture sweep | Done | The -O3 vector reload crash in pr32243 is fixed: byte/word vector extends now reload through an aligned sta... |
 | S12-33 | T2 writes its short-vector test binaries into a per-run folder, so Claude, Codex and lead runs never block each other | Done | T2's short-vector cross-check now writes its binaries into the run's own output folder instead of the share... |
 | S12-34 | Unrecognizable insn for a truncating vector store to a 1-byte-aligned V16QI destination (found by S12-32) | Not started |  |
+| S12-35 | Clean single-compiler rebuild of the S11-26 WRF smpar build (the staged wrf.exe mixes objects from knc 619e14b479a and 71e9b2d00fc) | In progress |  |
 | S13-01 | M4 final gate - stage the ADR-0015 gate run at the final head (17 programs, held-out unsealed, six pairs, three profiles) | draft |  |
 | S13-02 | Libgomp per-region thread density - choose 1-4 workers per core per parallel region instead of once per program | draft |  |
 | S13-03 | M4 retrospective - what we did wrong, what worked, and the practice changes carried into the next milestone and the agent-team skill | draft |  |
@@ -287,7 +288,7 @@ Current tickets: `[##################--]` 236 of 249
 
 - From the script, engineer: 669 sessions, 1333.4M input tokens
 - From the script, lead: 443 sessions, 123.7M input tokens
-- Started by hand, Claude: 12 sessions, 3438.6M input tokens
+- Started by hand, Claude: 12 sessions, 3446.0M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
