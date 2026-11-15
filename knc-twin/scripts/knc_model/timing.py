@@ -1,7 +1,8 @@
 """Cycle-level core model: four in-order hardware contexts, U/V issue with pairing rules,
 same-context issue spacing, round-robin context selection, scoreboarded register
-dependencies, address-generation interlock, demand-miss stalls, nonblocking software
-prefetches, resource occupancy. No speculation, no out-of-order issue.
+dependencies (including x87 physical registers from the functional trace), address-
+generation interlock, demand-miss stalls, nonblocking software prefetches, resource
+occupancy. No speculation, no out-of-order issue.
 
 Cycles here are predicted KNC core cycles. Python wall time is reported separately.
 """
@@ -16,8 +17,25 @@ STALL_REASONS = ("spacing", "miss_stall", "dependency", "agi", "flags", "explici
 
 
 def _vector_access(insn):
-    """A 64-byte (zmm) memory access, as opposed to a scalar one."""
-    return insn.cls.startswith("vector") or insn.folded_load
+    """False for scalar accesses, True for plain vector loads/stores, "merge" for masked,
+    converting or unpacking vector loads (longer measured load-to-use path)."""
+    if not (insn.cls.startswith("vector") or insn.folded_load or insn.has_conv):
+        return False
+    if insn.is_load and (insn.mask is not None or insn.has_conv or insn.op.startswith("vloadunpack")):
+        return "merge"
+    return True
+
+
+def _reads(insn, ev):
+    if ev.xreads is not None:
+        return (insn.reads - {"x87"}) | ev.xreads
+    return insn.reads
+
+
+def _writes(insn, ev):
+    if ev.xwrites is not None:
+        return (insn.writes - {"x87"}) | ev.xwrites
+    return insn.writes
 
 
 class CtxState(object):
@@ -32,7 +50,6 @@ class CtxState(object):
         self.reg_written_at = {}
         self.flags_ready = 0
         self.last_done = {}
-        self.x87_ready = 0
         self.issued = 0
         self.pairs = 0
         self.stalls = {r: 0 for r in STALL_REASONS}
@@ -74,6 +91,7 @@ class CoreSim(object):
         self.core_busy_until = 0
         self.x87_free_at = 0
         self.l2pf_free_at = 0
+        self.nr_store_free_at = 0
         self.cycle = 0
         self.issue_log = []
         self.branch_sc = kernel.scenario["branch"]
@@ -83,12 +101,21 @@ class CoreSim(object):
         self.assume("register results are available to any context's dependent instruction exactly latency cycles after issue; no bypass penalties beyond the measured latencies")
         if not any(ev.insn.encoding for c in self.ctx for ev in c.events):
             self.assume("no record carries encoding hints, so every V-eligible instruction is assumed to satisfy the R02 p.56 encoding pairing rules")
+        if any(ev.insn.kind in ("x87", "x87load", "x87store") and ev.xreads is None for c in self.ctx for ev in c.events):
+            self.assume("x87 instructions without a functional trace are serialized within their context (stack registers unknown statically)")
+        if any(ev.insn.kind in ("x87", "x87load", "x87store") for c in self.ctx for ev in c.events):
+            self.assume("x87 loads deliver their value at the scalar load latency and x87 stores retire like scalar stores; x87 instructions issue on U only (register-file diagram, R01)")
 
     # --------------------------------------------------------------------------------------------
     def assume(self, text):
         if text not in self._aset:
             self._aset.add(text)
             self.assumptions.append(text)
+
+    def _param(self, key):
+        if key not in self._lat_cache:
+            self._lat_cache[key] = self.p.get(key)
+        return self._lat_cache[key]
 
     def latency_of(self, insn, ev):
         """Result latency in cycles for register-writing instructions (not loads)."""
@@ -98,9 +125,10 @@ class CoreSim(object):
             return 0
         if key in ("memory", "gather"):
             return None
-        if key not in self._lat_cache:
-            self._lat_cache[key] = self.p.get(key)
-        return self._lat_cache[key]
+        if insn.has_swizzle and cls == "vector_arith":
+            self.assume("a swizzled register source raises the operation to the long-vector latency (S6-03 swizzle_*.lat 6)")
+            return self._param("latency.vector_long")
+        return self._param(key)
 
     def _encoding_pairable(self, insn):
         enc = insn.encoding
@@ -115,13 +143,30 @@ class CoreSim(object):
             return False
         return True
 
+    def _occupancy(self, insn, ev):
+        """Core cycles both pipes are busy for UV_both instructions (0 = none)."""
+        cls = insn.cls
+        if cls == "vector_gather":
+            n = max(1, len(ev.lines)) if ev.lines else 1
+            return self._param("occupancy.gather_cycles_per_line") * n
+        if cls == "vector_scatter":
+            n = max(1, len(ev.lines)) if ev.lines else 1
+            return self._param("occupancy.scatter_cycles_per_line") * n
+        if cls == "fence":
+            return self._param("latency.fence")
+        if cls == "x87_control":
+            return self._param("latency.x87_control")
+        if cls == "scalar_idiv":
+            return self._param("latency.scalar_idiv")
+        return 0
+
     # --------------------------------------------------------------------------------------------
     def _blockers(self, cs, ev, now, l1_used, paired_with=None):
         """Return None if the event can issue now, else the stall reason."""
         insn = ev.insn
-        if insn.cls == "fence":
-            self.p.get("latency.fence")
-        for r in insn.reads:
+        if isa.CLASSES[insn.cls]["pipes"] == "UV_both":
+            self._occupancy(insn, ev)  # raises MissingParameter early when the profile lacks it
+        for r in _reads(insn, ev):
             if cs.reg_ready.get(r, 0) > now:
                 return "dependency"
         for r in insn.addr_regs:
@@ -133,28 +178,30 @@ class CoreSim(object):
         for dep in insn.explicit_deps:
             if cs.last_done.get(dep, 0) > now:
                 return "explicit_dep"
-        if insn.kind == "x87" and cs.x87_ready > now:
-            return "x87_serial"
-        if insn.cls in ("x87_mul", "x87_div") and self.x87_free_at > now:
+        if insn.cls in ("x87_mul", "x87_div", "x87_sqrt") and self.x87_free_at > now:
             return "resource"
         if insn.cls == "prefetch_l2" and self.l2pf_free_at > now:
             return "resource"
-        if (insn.is_load or insn.is_store or insn.folded_load) and insn.cls != "vector_gather":
+        if insn.op.startswith("vmovnr") and self.nr_store_free_at > now:
+            return "resource"
+        touches_l1 = (insn.is_load or insn.is_store or insn.folded_load) and insn.cls not in ("vector_gather", "vector_scatter")
+        if touches_l1:
             if l1_used >= self.l1_per_cycle:
                 return "l1_port"
             if ev.lines:
-                for la in ev.lines:
-                    if self.mem.line_store_ready.get(la, 0) > now and insn.is_load:
-                        return "dependency"
-                ngo = insn.op in ("vmovnrngoaps", "vmovnraps")
-                _, _, fills, _ = self.mem.plan_demand(ev.lines, now, _vector_access(insn), insn.is_store, ngo)
+                if insn.is_load or insn.folded_load:
+                    for la in ev.lines:
+                        if self.mem.line_store_ready.get(la, 0) > now:
+                            return "dependency"
+                ngo = insn.op.startswith("vmovnr")
+                _, _, fills, _ = self.mem.plan_demand(ev.lines, now, _vector_access(insn), insn.is_store and not insn.is_load, ngo)
                 if fills and not self.mem.can_take_fill(now, fills):
                     return "outstanding_limit"
-        if insn.cls == "vector_gather":
+        if insn.cls in ("vector_gather", "vector_scatter"):
             if l1_used:
                 return "l1_port"
             if ev.lines:
-                _, _, fills, _ = self.mem.plan_demand(ev.lines, now, True, insn.is_store)
+                _, _, fills, _ = self.mem.plan_demand(ev.lines, now, True, insn.cls == "vector_scatter")
                 if fills and not self.mem.can_take_fill(now, fills):
                     return "outstanding_limit"
         if insn.cls in ("prefetch_l1", "prefetch_l2") and ev.lines:
@@ -171,74 +218,111 @@ class CoreSim(object):
             cs.first_issue = now
         done = now
         level = None
-        if insn.cls in ("prefetch_l1", "prefetch_l2"):
+        cls = insn.cls
+        if cls in ("prefetch_l1", "prefetch_l2"):
             if ev.lines:
                 self.mem.prefetch(ev.lines[0], insn.spec["level"], now)
-            if insn.cls == "prefetch_l2":
-                self.l2pf_free_at = now + self.p.get("occupancy.vprefetch_l2_core_cycles")
-        elif insn.cls == "vector_gather":
+            if cls == "prefetch_l2":
+                self.l2pf_free_at = now + self._param("occupancy.vprefetch_l2_core_cycles")
+        elif cls == "vector_gather":
             lines = ev.lines if ev.lines else ()
             n = max(1, len(lines))
-            per = self.p.get("occupancy.gather_cycles_per_line")
-            first = self.p.get("latency.gather_first_line")
+            per = self._param("occupancy.gather_cycles_per_line")
+            first = self._param("latency.gather_first_line")
+            extra = 0
             if lines:
-                ready, level = self.mem.commit_demand(lines, now, True, insn.is_store)
+                ready, level = self.mem.commit_demand(lines, now, True, False)
                 extra = max(0, ready - now - self.mem.latency("l1", True))
-            else:
-                extra = 0
             self.core_busy_until = now + per * n
             done = now + first + per * (n - 1) + extra
             if extra and self.miss_stalls:
                 cs.stall_until = max(cs.stall_until, done)
+            if insn.mask is not None:
+                # the completion mask is final once the gather has issued all its lines; the data comes later (S6-03 gather_all.rt 7 vs .lat 15)
+                cs.reg_ready[insn.mask.base] = now + per * n
+                cs.reg_written_at[insn.mask.base] = now
+        elif cls == "vector_scatter":
+            lines = ev.lines if ev.lines else ()
+            n = max(1, len(lines))
+            per = self._param("occupancy.scatter_cycles_per_line")
+            if lines:
+                self.mem.commit_demand(lines, now, True, True)
+                for la in lines:
+                    self.mem.line_store_ready[la] = now + per * n
+            self.core_busy_until = now + per * n
+            done = now + per * n
+            self.assume("scatter: occupancy per distinct line like a gather, no result latency, stores visible after the occupancy (assumed)")
+        elif cls in ("fence", "x87_control", "scalar_idiv"):
+            occ = self._occupancy(insn, ev)
+            self.core_busy_until = now + occ
+            done = now + occ
+            if cls == "x87_control" and ev.lines:
+                self.mem.commit_demand(ev.lines, now, False, insn.is_store)
         elif insn.is_load or insn.folded_load or insn.is_store:
             vector = _vector_access(insn)
-            ngo = insn.op in ("vmovnrngoaps", "vmovnraps")
+            ngo = insn.op.startswith("vmovnr")
             if ev.lines:
-                ready, level = self.mem.commit_demand(ev.lines, now, vector, insn.is_store, ngo)
+                ready, level = self.mem.commit_demand(ev.lines, now, vector, insn.is_store and not insn.is_load, ngo)
             else:
                 ready, level = now + self.mem.latency("l1", vector), "l1"
                 self.assume("memory accesses without addresses (static trace with no addr) are treated as L1 hits")
-            if insn.is_store:
+            if insn.is_store and not insn.is_load:
                 for la in ev.lines:
-                    self.mem.line_store_ready[la] = now + self.p.get("latency.store_to_load_same_line") if self.p.has("latency.store_to_load_same_line") else now + 1
+                    self.mem.line_store_ready[la] = now + (self._param("latency.store_to_load_same_line") if self.p.has("latency.store_to_load_same_line") else 1)
                 done = now
-                if level != "l1" and not self.p.get("l1.store_miss_stalls_context"):
-                    pass  # store misses do not stall (R08)
+                if ngo:
+                    stall = self._param("store.nr_stall_cycles_resident") if level == "l1" else self._param("store.nr_stall_cycles_memory")
+                    self.nr_store_free_at = now + self._param("store.nr_occupancy_core_cycles")
+                    cs.stall_until = max(cs.stall_until, now + stall)
+                    done = now + stall
+                    self.assume("no-read stores stall their context for the measured per-line cost and occupy a shared store path (S6-03 store_stream rows)")
+                elif level != "l1" and self._param("l1.store_miss_stalls_context"):
+                    cs.stall_until = max(cs.stall_until, ready)
+                    done = ready
             else:
                 if insn.folded_load:
-                    # folded load: arithmetic latency applies once the data is there
                     base_lat = self.latency_of(insn, ev)
                     l1lat = self.mem.latency("l1", True)
-                    done = max(now + base_lat, ready - l1lat + base_lat) if level != "l1" else now + base_lat
+                    done = (now + base_lat) if level == "l1" else max(now + base_lat, ready - l1lat + base_lat)
                     if level != "l1" and self.miss_stalls:
                         cs.stall_until = max(cs.stall_until, ready - l1lat)
+                elif cls == "scalar_rmw":
+                    alu = self._param("latency.scalar_alu")
+                    done = ready + alu
+                    for la in ev.lines:
+                        self.mem.line_store_ready[la] = done
+                    if level != "l1" and self.miss_stalls:
+                        cs.stall_until = max(cs.stall_until, ready)
                 else:
                     done = ready
                     if level != "l1" and self.miss_stalls:
                         cs.stall_until = max(cs.stall_until, ready)
-        elif insn.cls == "fence":
-            lat = self.p.get("latency.fence")
-            self.core_busy_until = now + lat
-            done = now + lat
+                    if insn.is_store:
+                        for la in ev.lines:
+                            self.mem.line_store_ready[la] = done
         else:
             lat = self.latency_of(insn, ev)
+            if lat is None:
+                raise Unsupported("instruction %s (%s, class %s) has no result latency rule in the timing model" % (insn.id, insn.op, cls))
             done = now + lat
-            if insn.cls in ("x87_mul", "x87_div"):
-                self.x87_free_at = now + self.p.get(isa.CLASSES[insn.cls]["occupancy"])
-        if insn.kind == "x87":
-            cs.x87_ready = done
-            self.assume("x87 instructions are serialized within a context (stack dependencies are not tracked)")
-        for r in insn.writes:
+            if cls in ("x87_mul", "x87_div", "x87_sqrt"):
+                occ = isa.CLASSES[cls].get("occupancy")
+                self.x87_free_at = now + self._param(occ)
+        for r in _writes(insn, ev):
+            if cls == "vector_gather" and insn.mask is not None and r == insn.mask.base:
+                continue
             cs.reg_ready[r] = done
             cs.reg_written_at[r] = now
         if insn.flags_w:
-            cs.flags_ready = now + (self.latency_of(insn, ev) or 1)
+            if cls in ("scalar_alu", "scalar_imul", "mask_op", "x87_compare"):
+                cs.flags_ready = now + (self.latency_of(insn, ev) or 1)
+            else:
+                cs.flags_ready = max(now + 1, done)
         cs.last_done[insn.id] = done
         if insn.is_branch:
             mis = self._mispredicted(cs, ev)
             if mis:
-                pen = self.p.get("latency.branch_mispredict_penalty")
-                # penalty = extra cycles before this context's next issue, beyond the normal spacing
+                pen = self._param("latency.branch_mispredict_penalty")
                 cs.next_issue = max(cs.next_issue, now + self.gap + pen)
                 cs.stalls["branch_penalty"] += pen
             elif ev.taken and self.taken_bubble:
@@ -256,7 +340,6 @@ class CoreSim(object):
             return True
         if t == "ids_mispredicted":
             return ev.insn.id in self.mispredict_ids
-        # exit_mispredicted: a change of direction relative to the previous instance is mispredicted
         prev = cs.prev_direction.get(ev.insn.id)
         cs.prev_direction[ev.insn.id] = ev.taken
         return prev is not None and prev != ev.taken
@@ -265,19 +348,21 @@ class CoreSim(object):
         u, v = u_ev.insn, v_ev.insn
         if u.is_branch and not self.p.get("pairing.u_instruction_can_be_branch"):
             return False
+        if u.op == "nop" and not self.p.get("pairing.u_nop_pairs"):
+            return False
         if v.cls not in self.v_eligible:
             return False
         if isa.CLASSES[v.cls]["pipes"] == "UV_both" or isa.CLASSES[u.cls]["pipes"] == "UV_both":
             return False
         if not self._encoding_pairable(u) or not self._encoding_pairable(v):
             return False
-        # RAW between the pair
-        if v.reads & u.writes or v.addr_regs & u.writes:
+        uw = _writes(u, u_ev)
+        if _reads(v, v_ev) & uw or v.addr_regs & uw:
             return False
         if v.flags_r and u.flags_w:
             if (u.op, "jcc") not in self.dep_pairs or not v.spec.get("cond"):
                 return False
-        if v.writes & u.writes:
+        if _writes(v, v_ev) & uw:
             return False
         if u.id in v.explicit_deps:
             return False

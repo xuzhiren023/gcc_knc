@@ -1,0 +1,8805 @@
+{
+  "error_stats": {
+    "calibration_threads_1": {
+      "mean_signed_error_pct": 25.4,
+      "median_abs_error_pct": 0.7,
+      "rows": 42,
+      "within_15pct": 36,
+      "within_30pct": 38,
+      "worst_abs_error_pct": 857.8
+    },
+    "calibration_threads_2": {
+      "mean_signed_error_pct": 16.8,
+      "median_abs_error_pct": 2.0,
+      "rows": 41,
+      "within_15pct": 35,
+      "within_30pct": 37,
+      "worst_abs_error_pct": 648.7
+    },
+    "calibration_threads_4": {
+      "mean_signed_error_pct": 7.1,
+      "median_abs_error_pct": 1.8,
+      "rows": 42,
+      "within_15pct": 37,
+      "within_30pct": 39,
+      "worst_abs_error_pct": 359.6
+    },
+    "held_out_threads_1": {
+      "mean_signed_error_pct": 0.1,
+      "median_abs_error_pct": 0.9,
+      "rows": 71,
+      "within_15pct": 53,
+      "within_30pct": 61,
+      "worst_abs_error_pct": 243.8
+    },
+    "held_out_threads_2": {
+      "mean_signed_error_pct": -1.5,
+      "median_abs_error_pct": 0.7,
+      "rows": 70,
+      "within_15pct": 52,
+      "within_30pct": 57,
+      "worst_abs_error_pct": 244.7
+    },
+    "held_out_threads_4": {
+      "mean_signed_error_pct": -2.2,
+      "median_abs_error_pct": 1.8,
+      "rows": 67,
+      "within_15pct": 55,
+      "within_30pct": 57,
+      "worst_abs_error_pct": 129.6
+    }
+  },
+  "generated_utc": "2026-11-15T19:46:24Z",
+  "invocation": [
+    "C:/Users/xuzhi/Documents/gcc_knc/knc-twin/scripts/validate_heldout.py",
+    "--kernels-s",
+    "C:/tmp/kt/knc-char/kernels.s",
+    "--kernels-h",
+    "C:/tmp/kt/knc-char/kernels.h",
+    "--measured",
+    "C:/Users/xuzhi/Documents/gcc_knc/knc-twin/tests/heldout_native/measured-characterization.json",
+    "--out",
+    "C:/Users/xuzhi/Documents/gcc_knc/knc-twin/tests/heldout_native/characterization-run",
+    "--threads",
+    "1,2,4"
+  ],
+  "notes": [
+    "predicted = slope of completion cycles between 2 and 4 rounds, divided by 32 units per round; TSC ticks and core cycles are treated as equal (0.5% difference on this card)",
+    "the kernel catalog was regenerated from tests/bench/knc-char/kernels.py; S8-07 additions shift kernel indices but the measured S6-03 bodies are the same templates",
+    "calibration rows set a parameter of the profile and are excluded from the held-out statistics",
+    "every prediction is a model output; the measured column is native"
+  ],
+  "profile": {
+    "calibration": {
+      "held_out_validation_cases": 0,
+      "state": "imported_microbenchmarks",
+      "statement": "Single-core instruction latencies, throughputs, cache/memory latencies and a few whole-card bandwidth and barrier figures are imported from native microbenchmarks on this card. No end-to-end kernel prediction of this engine has yet been compared against a native measurement; the held-out validation set is empty. Predictions are therefore model outputs built from measured parameters, not validated predictions."
+    },
+    "chain": [
+      "knc-common",
+      "card-7120-measured"
+    ],
+    "hash": "f28472ab6793a9adb518fedfdc1ad37556cd96621e47416174104f39329f6cdf",
+    "id": "card-7120-measured",
+    "kind": "card",
+    "native_measurement_ids": [
+      "S6-03: card_run jobs claude-0380b2ec, claude-7191652b, claude-b1f534af (2026-11-06), .work/_shared/S6-03/knc-char.mic, median of five group medians, spread <2% unless starred",
+      "S8-01: .work/_shared/tmp/claude-s8-01/job1..job19 (2026-11-07/08), one launch each",
+      "S8-10 C11: .work/_shared/tmp/claude-s8-10-out/c11-*.out (2026-11-09), three launches",
+      "S8-12 reruns: .work/_shared/tmp/claude-s8-12/job{1..6}-*.out (2026-11-08)",
+      "S8-17 C12: .work/_shared/tmp/claude-s8-17/c12.out (2026-11-08)"
+    ],
+    "parameter_status_counts": {
+      "assumed": 11,
+      "derived": 1,
+      "documented": 38,
+      "measured": 28,
+      "unknown": 8
+    },
+    "synthetic": false,
+    "version": "0.1.0"
+  },
+  "python_seconds": 357.4,
+  "ranking": {
+    "groups": {
+      "agi_gap@threads_1": {
+        "agree": 10,
+        "detail": [],
+        "pairs": 10
+      },
+      "agi_gap@threads_2": {
+        "agree": 9,
+        "detail": [
+          {
+            "a": "agi.gap1",
+            "agree": false,
+            "b": "agi.gap2",
+            "measured": [
+              4.15,
+              6.16
+            ],
+            "predicted": [
+              4.125,
+              4.125
+            ]
+          }
+        ],
+        "pairs": 10
+      },
+      "agi_gap@threads_4": {
+        "agree": 10,
+        "detail": [],
+        "pairs": 10
+      },
+      "branches@threads_1": {
+        "agree": 1,
+        "detail": [],
+        "pairs": 1
+      },
+      "branches@threads_4": {
+        "agree": 1,
+        "detail": [],
+        "pairs": 1
+      },
+      "c9_memory_unroll@threads_1": {
+        "agree": 3,
+        "detail": [],
+        "pairs": 3
+      },
+      "c9_memory_unroll@threads_2": {
+        "agree": 3,
+        "detail": [],
+        "pairs": 3
+      },
+      "c9_register_unroll@threads_1": {
+        "agree": 3,
+        "detail": [],
+        "pairs": 3
+      },
+      "c9_register_unroll@threads_2": {
+        "agree": 3,
+        "detail": [],
+        "pairs": 3
+      },
+      "gathers@threads_1": {
+        "agree": 1,
+        "detail": [],
+        "pairs": 1
+      },
+      "gathers@threads_2": {
+        "agree": 1,
+        "detail": [],
+        "pairs": 1
+      },
+      "gathers@threads_4": {
+        "agree": 1,
+        "detail": [],
+        "pairs": 1
+      },
+      "latency_rows@threads_1": {
+        "agree": 21,
+        "detail": [],
+        "pairs": 21
+      },
+      "latency_rows@threads_2": {
+        "agree": 21,
+        "detail": [],
+        "pairs": 21
+      },
+      "latency_rows@threads_4": {
+        "agree": 18,
+        "detail": [],
+        "pairs": 18
+      },
+      "load_levels_lat@threads_1": {
+        "agree": 3,
+        "detail": [],
+        "pairs": 3
+      },
+      "load_levels_lat@threads_2": {
+        "agree": 3,
+        "detail": [],
+        "pairs": 3
+      },
+      "load_levels_lat@threads_4": {
+        "agree": 3,
+        "detail": [],
+        "pairs": 3
+      },
+      "load_levels_rt@threads_1": {
+        "agree": 3,
+        "detail": [],
+        "pairs": 3
+      },
+      "load_levels_rt@threads_2": {
+        "agree": 3,
+        "detail": [],
+        "pairs": 3
+      },
+      "load_levels_rt@threads_4": {
+        "agree": 3,
+        "detail": [],
+        "pairs": 3
+      },
+      "memory_forms@threads_1": {
+        "agree": 10,
+        "detail": [
+          {
+            "a": "spill_reload.lat",
+            "agree": false,
+            "b": "unpack.rt",
+            "measured": [
+              12.11,
+              4.09
+            ],
+            "predicted": [
+              6.031,
+              14.062
+            ]
+          },
+          {
+            "a": "unpack.rt",
+            "agree": false,
+            "b": "spill_reload.rt",
+            "measured": [
+              4.09,
+              5.09
+            ],
+            "predicted": [
+              14.062,
+              5.062
+            ]
+          }
+        ],
+        "pairs": 12
+      },
+      "memory_forms@threads_2": {
+        "agree": 12,
+        "detail": [
+          {
+            "a": "masked_load.lat",
+            "agree": false,
+            "b": "spill_reload.lat",
+            "measured": [
+              12.17,
+              12.98
+            ],
+            "predicted": [
+              15.0,
+              6.062
+            ]
+          },
+          {
+            "a": "spill_reload.lat",
+            "agree": false,
+            "b": "unpack.rt",
+            "measured": [
+              12.98,
+              4.08
+            ],
+            "predicted": [
+              6.062,
+              14.062
+            ]
+          }
+        ],
+        "pairs": 14
+      },
+      "memory_forms@threads_4": {
+        "agree": 13,
+        "detail": [
+          {
+            "a": "spill_reload.lat",
+            "agree": false,
+            "b": "unpack.rt",
+            "measured": [
+              13.14,
+              8.14
+            ],
+            "predicted": [
+              8.125,
+              14.062
+            ]
+          }
+        ],
+        "pairs": 14
+      },
+      "pairing@threads_1": {
+        "agree": 2,
+        "detail": [],
+        "pairs": 2
+      },
+      "pairing@threads_2": {
+        "agree": 2,
+        "detail": [],
+        "pairs": 2
+      },
+      "pairing@threads_4": {
+        "agree": 2,
+        "detail": [],
+        "pairs": 2
+      },
+      "prefetch_pairing@threads_1": {
+        "agree": 7,
+        "detail": [],
+        "pairs": 7
+      },
+      "prefetch_pairing@threads_2": {
+        "agree": 9,
+        "detail": [],
+        "pairs": 9
+      },
+      "prefetch_pairing@threads_4": {
+        "agree": 8,
+        "detail": [],
+        "pairs": 8
+      },
+      "stores@threads_1": {
+        "agree": 5,
+        "detail": [
+          {
+            "a": "l1.store_normal",
+            "agree": false,
+            "b": "l1.store_stream",
+            "measured": [
+              2.2,
+              27.19
+            ],
+            "predicted": [
+              2.219,
+              2.219
+            ]
+          },
+          {
+            "a": "l1.store_normal",
+            "agree": false,
+            "b": "l2.store_stream",
+            "measured": [
+              2.2,
+              27.49
+            ],
+            "predicted": [
+              2.219,
+              2.219
+            ]
+          },
+          {
+            "a": "l1.store_normal",
+            "agree": false,
+            "b": "memory.store_stream",
+            "measured": [
+              2.2,
+              157.12
+            ],
+            "predicted": [
+              2.219,
+              2.219
+            ]
+          },
+          {
+            "a": "l1.store_stream",
+            "agree": false,
+            "b": "l2.store_normal",
+            "measured": [
+              27.19,
+              23.39
+            ],
+            "predicted": [
+              2.219,
+              3.0
+            ]
+          },
+          {
+            "a": "l1.store_stream",
+            "agree": false,
+            "b": "memory.store_stream",
+            "measured": [
+              27.19,
+              157.12
+            ],
+            "predicted": [
+              2.219,
+              2.219
+            ]
+          },
+          {
+            "a": "l2.store_normal",
+            "agree": false,
+            "b": "l2.store_stream",
+            "measured": [
+              23.39,
+              27.49
+            ],
+            "predicted": [
+              3.0,
+              2.219
+            ]
+          },
+          {
+            "a": "l2.store_normal",
+            "agree": false,
+            "b": "memory.store_stream",
+            "measured": [
+              23.39,
+              157.12
+            ],
+            "predicted": [
+              3.0,
+              2.219
+            ]
+          },
+          {
+            "a": "l2.store_stream",
+            "agree": false,
+            "b": "memory.store_stream",
+            "measured": [
+              27.49,
+              157.12
+            ],
+            "predicted": [
+              2.219,
+              2.219
+            ]
+          },
+          {
+            "a": "memory.store_normal",
+            "agree": false,
+            "b": "memory.store_stream",
+            "measured": [
+              38.28,
+              157.12
+            ],
+            "predicted": [
+              44.938,
+              2.219
+            ]
+          }
+        ],
+        "pairs": 14
+      },
+      "stores@threads_2": {
+        "agree": 5,
+        "detail": [
+          {
+            "a": "l1.store_normal",
+            "agree": false,
+            "b": "l1.store_stream",
+            "measured": [
+              2.27,
+              30.09
+            ],
+            "predicted": [
+              2.25,
+              2.219
+            ]
+          },
+          {
+            "a": "l1.store_normal",
+            "agree": false,
+            "b": "l2.store_stream",
+            "measured": [
+              2.27,
+              30.22
+            ],
+            "predicted": [
+              2.25,
+              2.219
+            ]
+          },
+          {
+            "a": "l1.store_normal",
+            "agree": false,
+            "b": "memory.store_stream",
+            "measured": [
+              2.27,
+              158.07
+            ],
+            "predicted": [
+              2.25,
+              2.219
+            ]
+          },
+          {
+            "a": "l1.store_stream",
+            "agree": false,
+            "b": "l2.store_normal",
+            "measured": [
+              30.09,
+              23.66
+            ],
+            "predicted": [
+              2.219,
+              6.0
+            ]
+          },
+          {
+            "a": "l1.store_stream",
+            "agree": false,
+            "b": "memory.store_stream",
+            "measured": [
+              30.09,
+              158.07
+            ],
+            "predicted": [
+              2.219,
+              2.219
+            ]
+          },
+          {
+            "a": "l2.store_normal",
+            "agree": false,
+            "b": "l2.store_stream",
+            "measured": [
+              23.66,
+              30.22
+            ],
+            "predicted": [
+              6.0,
+              2.219
+            ]
+          },
+          {
+            "a": "l2.store_normal",
+            "agree": false,
+            "b": "memory.store_stream",
+            "measured": [
+              23.66,
+              158.07
+            ],
+            "predicted": [
+              6.0,
+              2.219
+            ]
+          },
+          {
+            "a": "l2.store_stream",
+            "agree": false,
+            "b": "memory.store_stream",
+            "measured": [
+              30.22,
+              158.07
+            ],
+            "predicted": [
+              2.219,
+              2.219
+            ]
+          },
+          {
+            "a": "memory.store_normal",
+            "agree": false,
+            "b": "memory.store_stream",
+            "measured": [
+              48.93,
+              158.07
+            ],
+            "predicted": [
+              89.703,
+              2.219
+            ]
+          }
+        ],
+        "pairs": 14
+      },
+      "stores@threads_4": {
+        "agree": 5,
+        "detail": [
+          {
+            "a": "l1.store_normal",
+            "agree": false,
+            "b": "l1.store_stream",
+            "measured": [
+              4.38,
+              36.16
+            ],
+            "predicted": [
+              4.375,
+              4.375
+            ]
+          },
+          {
+            "a": "l1.store_normal",
+            "agree": false,
+            "b": "l2.store_stream",
+            "measured": [
+              4.38,
+              36.29
+            ],
+            "predicted": [
+              4.375,
+              4.375
+            ]
+          },
+          {
+            "a": "l1.store_normal",
+            "agree": false,
+            "b": "memory.store_stream",
+            "measured": [
+              4.38,
+              160.26
+            ],
+            "predicted": [
+              4.375,
+              4.375
+            ]
+          },
+          {
+            "a": "l1.store_stream",
+            "agree": false,
+            "b": "l2.store_normal",
+            "measured": [
+              36.16,
+              25.04
+            ],
+            "predicted": [
+              4.375,
+              12.0
+            ]
+          },
+          {
+            "a": "l1.store_stream",
+            "agree": false,
+            "b": "memory.store_stream",
+            "measured": [
+              36.16,
+              160.26
+            ],
+            "predicted": [
+              4.375,
+              4.375
+            ]
+          },
+          {
+            "a": "l2.store_normal",
+            "agree": false,
+            "b": "l2.store_stream",
+            "measured": [
+              25.04,
+              36.29
+            ],
+            "predicted": [
+              12.0,
+              4.375
+            ]
+          },
+          {
+            "a": "l2.store_normal",
+            "agree": false,
+            "b": "memory.store_stream",
+            "measured": [
+              25.04,
+              160.26
+            ],
+            "predicted": [
+              12.0,
+              4.375
+            ]
+          },
+          {
+            "a": "l2.store_stream",
+            "agree": false,
+            "b": "memory.store_stream",
+            "measured": [
+              36.29,
+              160.26
+            ],
+            "predicted": [
+              4.375,
+              4.375
+            ]
+          },
+          {
+            "a": "memory.store_normal",
+            "agree": false,
+            "b": "memory.store_stream",
+            "measured": [
+              79.83,
+              160.26
+            ],
+            "predicted": [
+              183.25,
+              4.375
+            ]
+          }
+        ],
+        "pairs": 14
+      },
+      "throughput_rows@threads_1": {
+        "agree": 17,
+        "detail": [],
+        "pairs": 17
+      },
+      "throughput_rows@threads_2": {
+        "agree": 22,
+        "detail": [
+          {
+            "a": "vaddps.rt",
+            "agree": false,
+            "b": "masked_load.rt",
+            "measured": [
+              2.07,
+              2.37
+            ],
+            "predicted": [
+              2.062,
+              2.062
+            ]
+          },
+          {
+            "a": "vpermd.rt",
+            "agree": false,
+            "b": "masked_load.rt",
+            "measured": [
+              2.07,
+              2.37
+            ],
+            "predicted": [
+              2.062,
+              2.062
+            ]
+          }
+        ],
+        "pairs": 24
+      },
+      "throughput_rows@threads_4": {
+        "agree": 21,
+        "detail": [],
+        "pairs": 21
+      }
+    },
+    "pairs_agree": 264,
+    "pairs_total": 299,
+    "reliability": 0.883
+  },
+  "rows": [
+    {
+      "calibrates": "latency.vector_arith",
+      "class": "calibration",
+      "kind": 0,
+      "limiting": {
+        "threads_1": [
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 749
+          },
+          {
+            "constraint": "dependency",
+            "context_cycles": 248
+          }
+        ],
+        "threads_2": [
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 814
+          },
+          {
+            "constraint": "dependency",
+            "context_cycles": 508
+          }
+        ],
+        "threads_4": [
+          {
+            "constraint": "dependency",
+            "context_cycles": 1879
+          },
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 869
+          }
+        ]
+      },
+      "measured": {
+        "per_core_at_4": 1.05,
+        "table": "S6-03 full table",
+        "threads_1": 4.02,
+        "threads_2": 4.08,
+        "threads_4": 4.19
+      },
+      "message": null,
+      "name": "vaddps.lat",
+      "predicted": {
+        "A": {
+          "threads_1": 4.0,
+          "threads_2": 4.0,
+          "threads_4": 4.125
+        }
+      },
+      "rounds": {
+        "threads_1": [
+          2,
+          4
+        ],
+        "threads_2": [
+          2,
+          4
+        ],
+        "threads_4": [
+          2,
+          4
+        ]
+      },
+      "status": "ok",
+      "unit": 1
+    },
+    {
+      "calibrates": "core.min_issue_gap_same_context (documented; measurement consistent)",
+      "class": "calibration",
+      "kind": 0,
+      "limiting": {
+        "threads_1": [
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 749
+          },
+          {
+            "constraint": "spacing",
+            "context_cycles": 159
+          }
+        ],
+        "threads_2": [
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 814
+          },
+          {
+            "constraint": "spacing",
+            "context_cycles": 320
+          }
+        ],
+        "threads_4": [
+          {
+            "constraint": "not_picked",
+            "context_cycles": 1284
+          },
+          {
+            "constraint": "dependency",
+            "context_cycles": 887
+          }
+        ]
+      },
+      "measured": {
+        "per_core_at_4": 1.05,
+        "table": "S6-03 full table",
+        "threads_1": 2.08,
+        "threads_2": 2.07,
+        "threads_4": 4.18
+      },
+      "message": null,
+      "name": "vaddps.rt",
+      "predicted": {
+        "A": {
+          "threads_1": 2.062,
+          "threads_2": 2.062,
+          "threads_4": 4.125
+        }
+      },
+      "rounds": {
+        "threads_1": [
+          2,
+          4
+        ],
+        "threads_2": [
+          2,
+          4
+        ],
+        "threads_4": [
+          2,
+          4
+        ]
+      },
+      "status": "ok",
+      "unit": 1
+    },
+    {
+      "calibrates": "latency.vector_arith",
+      "class": "calibration",
+      "kind": 0,
+      "limiting": {
+        "threads_1": [
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 749
+          },
+          {
+            "constraint": "dependency",
+            "context_cycles": 248
+          }
+        ],
+        "threads_2": [
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 814
+          },
+          {
+            "constraint": "dependency",
+            "context_cycles": 508
+          }
+        ],
+        "threads_4": [
+          {
+            "constraint": "dependency",
+            "context_cycles": 1879
+          },
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 869
+          }
+        ]
+      },
+      "measured": {
+        "per_core_at_4": 1.05,
+        "table": "S6-03 full table",
+        "threads_1": 4.03,
+        "threads_2": 4.08,
+        "threads_4": 4.2
+      },
+      "message": null,
+      "name": "vmulps.lat",
+      "predicted": {
+        "A": {
+          "threads_1": 4.0,
+          "threads_2": 4.0,
+          "threads_4": 4.125
+        }
+      },
+      "rounds": {
+        "threads_1": [
+          2,
+          4
+        ],
+        "threads_2": [
+          2,
+          4
+        ],
+        "threads_4": [
+          2,
+          4
+        ]
+      },
+      "status": "ok",
+      "unit": 1
+    },
+    {
+      "calibrates": null,
+      "class": "held_out",
+      "kind": 0,
+      "limiting": {
+        "threads_1": [
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 749
+          },
+          {
+            "constraint": "spacing",
+            "context_cycles": 159
+          }
+        ],
+        "threads_2": [
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 814
+          },
+          {
+            "constraint": "spacing",
+            "context_cycles": 320
+          }
+        ],
+        "threads_4": [
+          {
+            "constraint": "not_picked",
+            "context_cycles": 1284
+          },
+          {
+            "constraint": "dependency",
+            "context_cycles": 887
+          }
+        ]
+      },
+      "measured": {
+        "per_core_at_4": 1.05,
+        "table": "S6-03 full table",
+        "threads_1": 2.08,
+        "threads_2": 2.07,
+        "threads_4": 4.19
+      },
+      "message": null,
+      "name": "vmulps.rt",
+      "predicted": {
+        "A": {
+          "threads_1": 2.062,
+          "threads_2": 2.062,
+          "threads_4": 4.125
+        }
+      },
+      "rounds": {
+        "threads_1": [
+          2,
+          4
+        ],
+        "threads_2": [
+          2,
+          4
+        ],
+        "threads_4": [
+          2,
+          4
+        ]
+      },
+      "status": "ok",
+      "unit": 1
+    },
+    {
+      "calibrates": "latency.vector_arith",
+      "class": "calibration",
+      "kind": 0,
+      "limiting": {
+        "threads_1": [
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 749
+          },
+          {
+            "constraint": "dependency",
+            "context_cycles": 248
+          }
+        ],
+        "threads_2": [
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 814
+          },
+          {
+            "constraint": "dependency",
+            "context_cycles": 508
+          }
+        ],
+        "threads_4": [
+          {
+            "constraint": "dependency",
+            "context_cycles": 1879
+          },
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 869
+          }
+        ]
+      },
+      "measured": {
+        "per_core_at_4": 1.05,
+        "table": "S6-03 full table",
+        "threads_1": 4.02,
+        "threads_2": 4.08,
+        "threads_4": 4.2
+      },
+      "message": null,
+      "name": "vfmadd213ps.lat",
+      "predicted": {
+        "A": {
+          "threads_1": 4.0,
+          "threads_2": 4.0,
+          "threads_4": 4.125
+        }
+      },
+      "rounds": {
+        "threads_1": [
+          2,
+          4
+        ],
+        "threads_2": [
+          2,
+          4
+        ],
+        "threads_4": [
+          2,
+          4
+        ]
+      },
+      "status": "ok",
+      "unit": 1
+    },
+    {
+      "calibrates": null,
+      "class": "held_out",
+      "kind": 0,
+      "limiting": {
+        "threads_1": [
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 749
+          },
+          {
+            "constraint": "spacing",
+            "context_cycles": 159
+          }
+        ],
+        "threads_2": [
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 814
+          },
+          {
+            "constraint": "spacing",
+            "context_cycles": 320
+          }
+        ],
+        "threads_4": [
+          {
+            "constraint": "not_picked",
+            "context_cycles": 1284
+          },
+          {
+            "constraint": "dependency",
+            "context_cycles": 887
+          }
+        ]
+      },
+      "measured": {
+        "per_core_at_4": 1.05,
+        "table": "S6-03 full table",
+        "threads_1": 2.08,
+        "threads_2": 2.07,
+        "threads_4": 4.2
+      },
+      "message": null,
+      "name": "vfmadd213ps.rt",
+      "predicted": {
+        "A": {
+          "threads_1": 2.062,
+          "threads_2": 2.062,
+          "threads_4": 4.125
+        }
+      },
+      "rounds": {
+        "threads_1": [
+          2,
+          4
+        ],
+        "threads_2": [
+          2,
+          4
+        ],
+        "threads_4": [
+          2,
+          4
+        ]
+      },
+      "status": "ok",
+      "unit": 1
+    },
+    {
+      "calibrates": "latency.vector_arith",
+      "class": "calibration",
+      "kind": 0,
+      "limiting": {
+        "threads_1": [
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 749
+          },
+          {
+            "constraint": "dependency",
+            "context_cycles": 248
+          }
+        ],
+        "threads_2": [
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 814
+          },
+          {
+            "constraint": "dependency",
+            "context_cycles": 508
+          }
+        ],
+        "threads_4": [
+          {
+            "constraint": "dependency",
+            "context_cycles": 1879
+          },
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 869
+          }
+        ]
+      },
+      "measured": {
+        "per_core_at_4": 1.05,
+        "table": "S6-03 full table",
+        "threads_1": 4.03,
+        "threads_2": 4.08,
+        "threads_4": 4.2
+      },
+      "message": null,
+      "name": "vpaddd.lat",
+      "predicted": {
+        "A": {
+          "threads_1": 4.0,
+          "threads_2": 4.0,
+          "threads_4": 4.125
+        }
+      },
+      "rounds": {
+        "threads_1": [
+          2,
+          4
+        ],
+        "threads_2": [
+          2,
+          4
+        ],
+        "threads_4": [
+          2,
+          4
+        ]
+      },
+      "status": "ok",
+      "unit": 1
+    },
+    {
+      "calibrates": null,
+      "class": "held_out",
+      "kind": 0,
+      "limiting": {
+        "threads_1": [
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 749
+          },
+          {
+            "constraint": "spacing",
+            "context_cycles": 159
+          }
+        ],
+        "threads_2": [
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 814
+          },
+          {
+            "constraint": "spacing",
+            "context_cycles": 320
+          }
+        ],
+        "threads_4": [
+          {
+            "constraint": "not_picked",
+            "context_cycles": 1284
+          },
+          {
+            "constraint": "dependency",
+            "context_cycles": 887
+          }
+        ]
+      },
+      "measured": {
+        "per_core_at_4": 1.05,
+        "table": "S6-03 full table",
+        "threads_1": 2.08,
+        "threads_2": 2.32,
+        "threads_4": 4.19
+      },
+      "message": null,
+      "name": "vpaddd.rt",
+      "predicted": {
+        "A": {
+          "threads_1": 2.062,
+          "threads_2": 2.062,
+          "threads_4": 4.125
+        }
+      },
+      "rounds": {
+        "threads_1": [
+          2,
+          4
+        ],
+        "threads_2": [
+          2,
+          4
+        ],
+        "threads_4": [
+          2,
+          4
+        ]
+      },
+      "status": "ok",
+      "unit": 1
+    },
+    {
+      "calibrates": "latency.vector_arith",
+      "class": "calibration",
+      "kind": 0,
+      "limiting": {
+        "threads_1": [
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 749
+          },
+          {
+            "constraint": "dependency",
+            "context_cycles": 248
+          }
+        ],
+        "threads_2": [
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 814
+          },
+          {
+            "constraint": "dependency",
+            "context_cycles": 508
+          }
+        ],
+        "threads_4": [
+          {
+            "constraint": "dependency",
+            "context_cycles": 1879
+          },
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 869
+          }
+        ]
+      },
+      "measured": {
+        "per_core_at_4": 1.05,
+        "table": "S6-03 full table",
+        "threads_1": 4.03,
+        "threads_2": 4.08,
+        "threads_4": 4.21
+      },
+      "message": null,
+      "name": "vpxord.lat",
+      "predicted": {
+        "A": {
+          "threads_1": 4.0,
+          "threads_2": 4.0,
+          "threads_4": 4.125
+        }
+      },
+      "rounds": {
+        "threads_1": [
+          2,
+          4
+        ],
+        "threads_2": [
+          2,
+          4
+        ],
+        "threads_4": [
+          2,
+          4
+        ]
+      },
+      "status": "ok",
+      "unit": 1
+    },
+    {
+      "calibrates": null,
+      "class": "held_out",
+      "kind": 0,
+      "limiting": {
+        "threads_1": [
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 749
+          },
+          {
+            "constraint": "spacing",
+            "context_cycles": 159
+          }
+        ],
+        "threads_2": [
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 814
+          },
+          {
+            "constraint": "spacing",
+            "context_cycles": 320
+          }
+        ],
+        "threads_4": [
+          {
+            "constraint": "not_picked",
+            "context_cycles": 1284
+          },
+          {
+            "constraint": "dependency",
+            "context_cycles": 887
+          }
+        ]
+      },
+      "measured": {
+        "per_core_at_4": 1.05,
+        "table": "S6-03 full table",
+        "threads_1": 2.07,
+        "threads_2": 2.07,
+        "threads_4": 4.19
+      },
+      "message": null,
+      "name": "vpxord.rt",
+      "predicted": {
+        "A": {
+          "threads_1": 2.062,
+          "threads_2": 2.062,
+          "threads_4": 4.125
+        }
+      },
+      "rounds": {
+        "threads_1": [
+          2,
+          4
+        ],
+        "threads_2": [
+          2,
+          4
+        ],
+        "threads_4": [
+          2,
+          4
+        ]
+      },
+      "status": "ok",
+      "unit": 1
+    },
+    {
+      "calibrates": "latency.vector_long",
+      "class": "calibration",
+      "kind": 0,
+      "limiting": {
+        "threads_1": [
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 749
+          },
+          {
+            "constraint": "dependency",
+            "context_cycles": 502
+          }
+        ],
+        "threads_2": [
+          {
+            "constraint": "dependency",
+            "context_cycles": 1016
+          },
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 814
+          }
+        ],
+        "threads_4": [
+          {
+            "constraint": "dependency",
+            "context_cycles": 2871
+          },
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 869
+          }
+        ]
+      },
+      "measured": {
+        "per_core_at_4": 1.54,
+        "table": "S6-03 full table",
+        "threads_1": 6.04,
+        "threads_2": 6.09,
+        "threads_4": 6.16
+      },
+      "message": null,
+      "name": "vpermd.lat",
+      "predicted": {
+        "A": {
+          "threads_1": 6.0,
+          "threads_2": 6.0,
+          "threads_4": 6.062
+        }
+      },
+      "rounds": {
+        "threads_1": [
+          2,
+          4
+        ],
+        "threads_2": [
+          2,
+          4
+        ],
+        "threads_4": [
+          2,
+          4
+        ]
+      },
+      "status": "ok",
+      "unit": 1
+    },
+    {
+      "calibrates": null,
+      "class": "held_out",
+      "kind": 0,
+      "limiting": {
+        "threads_1": [
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 749
+          },
+          {
+            "constraint": "spacing",
+            "context_cycles": 159
+          }
+        ],
+        "threads_2": [
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 814
+          },
+          {
+            "constraint": "spacing",
+            "context_cycles": 320
+          }
+        ],
+        "threads_4": [
+          {
+            "constraint": "not_picked",
+            "context_cycles": 1284
+          },
+          {
+            "constraint": "dependency",
+            "context_cycles": 887
+          }
+        ]
+      },
+      "measured": {
+        "per_core_at_4": 1.05,
+        "table": "S6-03 full table",
+        "threads_1": 2.08,
+        "threads_2": 2.07,
+        "threads_4": 4.19
+      },
+      "message": null,
+      "name": "vpermd.rt",
+      "predicted": {
+        "A": {
+          "threads_1": 2.062,
+          "threads_2": 2.062,
+          "threads_4": 4.125
+        }
+      },
+      "rounds": {
+        "threads_1": [
+          2,
+          4
+        ],
+        "threads_2": [
+          2,
+          4
+        ],
+        "threads_4": [
+          2,
+          4
+        ]
+      },
+      "status": "ok",
+      "unit": 1
+    },
+    {
+      "calibrates": "latency.vector_long",
+      "class": "calibration",
+      "kind": 0,
+      "limiting": {
+        "threads_1": [
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 749
+          },
+          {
+            "constraint": "dependency",
+            "context_cycles": 502
+          }
+        ],
+        "threads_2": [
+          {
+            "constraint": "dependency",
+            "context_cycles": 1016
+          },
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 814
+          }
+        ],
+        "threads_4": [
+          {
+            "constraint": "dependency",
+            "context_cycles": 2871
+          },
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 869
+          }
+        ]
+      },
+      "measured": {
+        "per_core_at_4": 1.54,
+        "table": "S6-03 full table",
+        "threads_1": 6.04,
+        "threads_2": 6.09,
+        "threads_4": 6.16
+      },
+      "message": null,
+      "name": "vpermf32x4.lat",
+      "predicted": {
+        "A": {
+          "threads_1": 6.0,
+          "threads_2": 6.0,
+          "threads_4": 6.062
+        }
+      },
+      "rounds": {
+        "threads_1": [
+          2,
+          4
+        ],
+        "threads_2": [
+          2,
+          4
+        ],
+        "threads_4": [
+          2,
+          4
+        ]
+      },
+      "status": "ok",
+      "unit": 1
+    },
+    {
+      "calibrates": null,
+      "class": "held_out",
+      "kind": 0,
+      "limiting": {
+        "threads_1": [
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 749
+          },
+          {
+            "constraint": "spacing",
+            "context_cycles": 159
+          }
+        ],
+        "threads_2": [
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 814
+          },
+          {
+            "constraint": "spacing",
+            "context_cycles": 320
+          }
+        ],
+        "threads_4": [
+          {
+            "constraint": "not_picked",
+            "context_cycles": 1284
+          },
+          {
+            "constraint": "dependency",
+            "context_cycles": 887
+          }
+        ]
+      },
+      "measured": {
+        "per_core_at_4": 1.05,
+        "table": "S6-03 full table",
+        "threads_1": 2.08,
+        "threads_2": 2.07,
+        "threads_4": 4.2
+      },
+      "message": null,
+      "name": "vpermf32x4.rt",
+      "predicted": {
+        "A": {
+          "threads_1": 2.062,
+          "threads_2": 2.062,
+          "threads_4": 4.125
+        }
+      },
+      "rounds": {
+        "threads_1": [
+          2,
+          4
+        ],
+        "threads_2": [
+          2,
+          4
+        ],
+        "threads_4": [
+          2,
+          4
+        ]
+      },
+      "status": "ok",
+      "unit": 1
+    },
+    {
+      "calibrates": "latency.vector_long",
+      "class": "calibration",
+      "kind": 0,
+      "measured": {
+        "per_core_at_4": 1.54,
+        "table": "S6-03 full table",
+        "threads_1": 6.04,
+        "threads_2": 6.09,
+        "threads_4": 6.16
+      },
+      "message": "not functionally complete: timing only: timing only (23-bit approximate reciprocal; exact bit pattern not modeled)",
+      "name": "vrcp23ps.lat",
+      "predicted": {},
+      "status": "unsupported",
+      "unit": 1
+    },
+    {
+      "calibrates": null,
+      "class": "held_out",
+      "kind": 0,
+      "measured": {
+        "per_core_at_4": 1.05,
+        "table": "S6-03 full table",
+        "threads_1": 2.08,
+        "threads_2": 2.07,
+        "threads_4": 4.2
+      },
+      "message": "not functionally complete: timing only: timing only (23-bit approximate reciprocal; exact bit pattern not modeled)",
+      "name": "vrcp23ps.rt",
+      "predicted": {},
+      "status": "unsupported",
+      "unit": 1
+    },
+    {
+      "calibrates": "latency.scalar_alu (bound only)",
+      "class": "calibration",
+      "kind": 0,
+      "limiting": {
+        "threads_1": [
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 749
+          },
+          {
+            "constraint": "spacing",
+            "context_cycles": 158
+          }
+        ],
+        "threads_2": [
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 814
+          },
+          {
+            "constraint": "spacing",
+            "context_cycles": 318
+          }
+        ],
+        "threads_4": [
+          {
+            "constraint": "not_picked",
+            "context_cycles": 1276
+          },
+          {
+            "constraint": "dependency",
+            "context_cycles": 887
+          }
+        ]
+      },
+      "measured": {
+        "per_core_at_4": 1.05,
+        "table": "S6-03 full table",
+        "threads_1": 2.08,
+        "threads_2": 2.07,
+        "threads_4": 4.19
+      },
+      "message": null,
+      "name": "scalar_add.lat",
+      "predicted": {
+        "A": {
+          "threads_1": 2.062,
+          "threads_2": 2.062,
+          "threads_4": 4.125
+        }
+      },
+      "rounds": {
+        "threads_1": [
+          2,
+          4
+        ],
+        "threads_2": [
+          2,
+          4
+        ],
+        "threads_4": [
+          2,
+          4
+        ]
+      },
+      "status": "ok",
+      "unit": 1
+    },
+    {
+      "calibrates": null,
+      "class": "held_out",
+      "kind": 0,
+      "limiting": {
+        "threads_1": [
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 749
+          },
+          {
+            "constraint": "spacing",
+            "context_cycles": 98
+          }
+        ],
+        "threads_2": [
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 814
+          },
+          {
+            "constraint": "spacing",
+            "context_cycles": 198
+          }
+        ],
+        "threads_4": [
+          {
+            "constraint": "dependency",
+            "context_cycles": 887
+          },
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 869
+          }
+        ]
+      },
+      "measured": {
+        "per_core_at_4": 0.55,
+        "table": "S6-03 full table",
+        "threads_1": 1.07,
+        "threads_2": 1.07,
+        "threads_4": 2.19
+      },
+      "message": null,
+      "name": "scalar_add.rt",
+      "predicted": {
+        "A": {
+          "threads_1": 1.125,
+          "threads_2": 1.125,
+          "threads_4": 2.25
+        }
+      },
+      "rounds": {
+        "threads_1": [
+          2,
+          4
+        ],
+        "threads_2": [
+          2,
+          4
+        ],
+        "threads_4": [
+          2,
+          4
+        ]
+      },
+      "status": "ok",
+      "unit": 1
+    },
+    {
+      "calibrates": null,
+      "class": "held_out",
+      "kind": 0,
+      "limiting": {
+        "threads_1": [
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 749
+          },
+          {
+            "constraint": "spacing",
+            "context_cycles": 158
+          }
+        ],
+        "threads_2": [
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 814
+          },
+          {
+            "constraint": "spacing",
+            "context_cycles": 318
+          }
+        ],
+        "threads_4": [
+          {
+            "constraint": "not_picked",
+            "context_cycles": 1276
+          },
+          {
+            "constraint": "dependency",
+            "context_cycles": 887
+          }
+        ]
+      },
+      "measured": {
+        "per_core_at_4": 1.05,
+        "table": "S6-03 full table",
+        "threads_1": 2.08,
+        "threads_2": 2.07,
+        "threads_4": 4.2
+      },
+      "message": null,
+      "name": "scalar_xor.lat",
+      "predicted": {
+        "A": {
+          "threads_1": 2.062,
+          "threads_2": 2.062,
+          "threads_4": 4.125
+        }
+      },
+      "rounds": {
+        "threads_1": [
+          2,
+          4
+        ],
+        "threads_2": [
+          2,
+          4
+        ],
+        "threads_4": [
+          2,
+          4
+        ]
+      },
+      "status": "ok",
+      "unit": 1
+    },
+    {
+      "calibrates": null,
+      "class": "held_out",
+      "kind": 0,
+      "limiting": {
+        "threads_1": [
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 749
+          },
+          {
+            "constraint": "spacing",
+            "context_cycles": 98
+          }
+        ],
+        "threads_2": [
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 814
+          },
+          {
+            "constraint": "spacing",
+            "context_cycles": 198
+          }
+        ],
+        "threads_4": [
+          {
+            "constraint": "dependency",
+            "context_cycles": 887
+          },
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 869
+          }
+        ]
+      },
+      "measured": {
+        "per_core_at_4": 0.54,
+        "table": "S6-03 full table",
+        "threads_1": 1.07,
+        "threads_2": 1.07,
+        "threads_4": 2.18
+      },
+      "message": null,
+      "name": "scalar_xor.rt",
+      "predicted": {
+        "A": {
+          "threads_1": 1.125,
+          "threads_2": 1.125,
+          "threads_4": 2.25
+        }
+      },
+      "rounds": {
+        "threads_1": [
+          2,
+          4
+        ],
+        "threads_2": [
+          2,
+          4
+        ],
+        "threads_4": [
+          2,
+          4
+        ]
+      },
+      "status": "ok",
+      "unit": 1
+    },
+    {
+      "calibrates": null,
+      "class": "held_out",
+      "kind": 0,
+      "limiting": {
+        "threads_1": [
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 749
+          },
+          {
+            "constraint": "spacing",
+            "context_cycles": 158
+          }
+        ],
+        "threads_2": [
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 814
+          },
+          {
+            "constraint": "spacing",
+            "context_cycles": 318
+          }
+        ],
+        "threads_4": [
+          {
+            "constraint": "not_picked",
+            "context_cycles": 1276
+          },
+          {
+            "constraint": "dependency",
+            "context_cycles": 887
+          }
+        ]
+      },
+      "measured": {
+        "per_core_at_4": 1.05,
+        "table": "S6-03 full table",
+        "threads_1": 2.08,
+        "threads_2": 2.07,
+        "threads_4": 4.19
+      },
+      "message": null,
+      "name": "kmov.lat",
+      "predicted": {
+        "A": {
+          "threads_1": 2.062,
+          "threads_2": 2.062,
+          "threads_4": 4.125
+        }
+      },
+      "rounds": {
+        "threads_1": [
+          2,
+          4
+        ],
+        "threads_2": [
+          2,
+          4
+        ],
+        "threads_4": [
+          2,
+          4
+        ]
+      },
+      "status": "ok",
+      "unit": 1
+    },
+    {
+      "calibrates": null,
+      "class": "held_out",
+      "kind": 0,
+      "limiting": {
+        "threads_1": [
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 749
+          },
+          {
+            "constraint": "spacing",
+            "context_cycles": 98
+          }
+        ],
+        "threads_2": [
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 814
+          },
+          {
+            "constraint": "spacing",
+            "context_cycles": 198
+          }
+        ],
+        "threads_4": [
+          {
+            "constraint": "dependency",
+            "context_cycles": 887
+          },
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 869
+          }
+        ]
+      },
+      "measured": {
+        "per_core_at_4": 0.55,
+        "table": "S6-03 full table",
+        "threads_1": 1.07,
+        "threads_2": 1.07,
+        "threads_4": 2.19
+      },
+      "message": null,
+      "name": "kmov.rt",
+      "predicted": {
+        "A": {
+          "threads_1": 1.125,
+          "threads_2": 1.125,
+          "threads_4": 2.25
+        }
+      },
+      "rounds": {
+        "threads_1": [
+          2,
+          4
+        ],
+        "threads_2": [
+          2,
+          4
+        ],
+        "threads_4": [
+          2,
+          4
+        ]
+      },
+      "status": "ok",
+      "unit": 1
+    },
+    {
+      "calibrates": null,
+      "class": "held_out",
+      "kind": 0,
+      "limiting": {
+        "threads_1": [
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 749
+          },
+          {
+            "constraint": "spacing",
+            "context_cycles": 158
+          }
+        ],
+        "threads_2": [
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 814
+          },
+          {
+            "constraint": "spacing",
+            "context_cycles": 318
+          }
+        ],
+        "threads_4": [
+          {
+            "constraint": "not_picked",
+            "context_cycles": 1276
+          },
+          {
+            "constraint": "dependency",
+            "context_cycles": 887
+          }
+        ]
+      },
+      "measured": {
+        "per_core_at_4": 1.05,
+        "table": "S6-03 full table",
+        "threads_1": 2.08,
+        "threads_2": 2.07,
+        "threads_4": 4.2
+      },
+      "message": null,
+      "name": "kand.lat",
+      "predicted": {
+        "A": {
+          "threads_1": 2.062,
+          "threads_2": 2.062,
+          "threads_4": 4.125
+        }
+      },
+      "rounds": {
+        "threads_1": [
+          2,
+          4
+        ],
+        "threads_2": [
+          2,
+          4
+        ],
+        "threads_4": [
+          2,
+          4
+        ]
+      },
+      "status": "ok",
+      "unit": 1
+    },
+    {
+      "calibrates": null,
+      "class": "held_out",
+      "kind": 0,
+      "limiting": {
+        "threads_1": [
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 749
+          },
+          {
+            "constraint": "spacing",
+            "context_cycles": 98
+          }
+        ],
+        "threads_2": [
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 814
+          },
+          {
+            "constraint": "spacing",
+            "context_cycles": 198
+          }
+        ],
+        "threads_4": [
+          {
+            "constraint": "dependency",
+            "context_cycles": 887
+          },
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 869
+          }
+        ]
+      },
+      "measured": {
+        "per_core_at_4": 0.55,
+        "table": "S6-03 full table",
+        "threads_1": 1.07,
+        "threads_2": 1.07,
+        "threads_4": 2.19
+      },
+      "message": null,
+      "name": "kand.rt",
+      "predicted": {
+        "A": {
+          "threads_1": 1.125,
+          "threads_2": 1.125,
+          "threads_4": 2.25
+        }
+      },
+      "rounds": {
+        "threads_1": [
+          2,
+          4
+        ],
+        "threads_2": [
+          2,
+          4
+        ],
+        "threads_4": [
+          2,
+          4
+        ]
+      },
+      "status": "ok",
+      "unit": 1
+    },
+    {
+      "calibrates": null,
+      "class": "held_out",
+      "kind": 0,
+      "limiting": {
+        "threads_1": [
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 749
+          },
+          {
+            "constraint": "spacing",
+            "context_cycles": 158
+          }
+        ],
+        "threads_2": [
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 814
+          },
+          {
+            "constraint": "spacing",
+            "context_cycles": 318
+          }
+        ],
+        "threads_4": [
+          {
+            "constraint": "not_picked",
+            "context_cycles": 1276
+          },
+          {
+            "constraint": "dependency",
+            "context_cycles": 887
+          }
+        ]
+      },
+      "measured": {
+        "per_core_at_4": 1.05,
+        "table": "S6-03 full table",
+        "threads_1": 2.08,
+        "threads_2": 2.07,
+        "threads_4": 4.19
+      },
+      "message": null,
+      "name": "kxor.lat",
+      "predicted": {
+        "A": {
+          "threads_1": 2.062,
+          "threads_2": 2.062,
+          "threads_4": 4.125
+        }
+      },
+      "rounds": {
+        "threads_1": [
+          2,
+          4
+        ],
+        "threads_2": [
+          2,
+          4
+        ],
+        "threads_4": [
+          2,
+          4
+        ]
+      },
+      "status": "ok",
+      "unit": 1
+    },
+    {
+      "calibrates": null,
+      "class": "held_out",
+      "kind": 0,
+      "limiting": {
+        "threads_1": [
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 749
+          },
+          {
+            "constraint": "spacing",
+            "context_cycles": 98
+          }
+        ],
+        "threads_2": [
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 814
+          },
+          {
+            "constraint": "spacing",
+            "context_cycles": 198
+          }
+        ],
+        "threads_4": [
+          {
+            "constraint": "dependency",
+            "context_cycles": 887
+          },
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 869
+          }
+        ]
+      },
+      "measured": {
+        "per_core_at_4": 0.55,
+        "table": "S6-03 full table",
+        "threads_1": 1.07,
+        "threads_2": 1.07,
+        "threads_4": 2.18
+      },
+      "message": null,
+      "name": "kxor.rt",
+      "predicted": {
+        "A": {
+          "threads_1": 1.125,
+          "threads_2": 1.125,
+          "threads_4": 2.25
+        }
+      },
+      "rounds": {
+        "threads_1": [
+          2,
+          4
+        ],
+        "threads_2": [
+          2,
+          4
+        ],
+        "threads_4": [
+          2,
+          4
+        ]
+      },
+      "status": "ok",
+      "unit": 1
+    },
+    {
+      "calibrates": "latency.vector_long",
+      "class": "calibration",
+      "kind": 0,
+      "limiting": {
+        "threads_1": [
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 749
+          },
+          {
+            "constraint": "dependency",
+            "context_cycles": 502
+          }
+        ],
+        "threads_2": [
+          {
+            "constraint": "dependency",
+            "context_cycles": 1016
+          },
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 814
+          }
+        ],
+        "threads_4": [
+          {
+            "constraint": "dependency",
+            "context_cycles": 2871
+          },
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 869
+          }
+        ]
+      },
+      "measured": {
+        "per_core_at_4": 1.54,
+        "table": "S6-03 full table",
+        "threads_1": 6.04,
+        "threads_2": 6.09,
+        "threads_4": 6.16
+      },
+      "message": null,
+      "name": "swizzle_cdab.lat",
+      "predicted": {
+        "A": {
+          "threads_1": 6.0,
+          "threads_2": 6.0,
+          "threads_4": 6.062
+        }
+      },
+      "rounds": {
+        "threads_1": [
+          2,
+          4
+        ],
+        "threads_2": [
+          2,
+          4
+        ],
+        "threads_4": [
+          2,
+          4
+        ]
+      },
+      "status": "ok",
+      "unit": 1
+    },
+    {
+      "calibrates": null,
+      "class": "held_out",
+      "kind": 0,
+      "limiting": {
+        "threads_1": [
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 749
+          },
+          {
+            "constraint": "spacing",
+            "context_cycles": 159
+          }
+        ],
+        "threads_2": [
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 814
+          },
+          {
+            "constraint": "spacing",
+            "context_cycles": 320
+          }
+        ],
+        "threads_4": [
+          {
+            "constraint": "not_picked",
+            "context_cycles": 1284
+          },
+          {
+            "constraint": "dependency",
+            "context_cycles": 887
+          }
+        ]
+      },
+      "measured": {
+        "per_core_at_4": 1.05,
+        "table": "S6-03 full table",
+        "threads_1": 2.08,
+        "threads_2": 2.07,
+        "threads_4": 4.19
+      },
+      "message": null,
+      "name": "swizzle_cdab.rt",
+      "predicted": {
+        "A": {
+          "threads_1": 2.062,
+          "threads_2": 2.062,
+          "threads_4": 4.125
+        }
+      },
+      "rounds": {
+        "threads_1": [
+          2,
+          4
+        ],
+        "threads_2": [
+          2,
+          4
+        ],
+        "threads_4": [
+          2,
+          4
+        ]
+      },
+      "status": "ok",
+      "unit": 1
+    },
+    {
+      "calibrates": "latency.vector_long",
+      "class": "calibration",
+      "kind": 0,
+      "limiting": {
+        "threads_1": [
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 749
+          },
+          {
+            "constraint": "dependency",
+            "context_cycles": 502
+          }
+        ],
+        "threads_2": [
+          {
+            "constraint": "dependency",
+            "context_cycles": 1016
+          },
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 814
+          }
+        ],
+        "threads_4": [
+          {
+            "constraint": "dependency",
+            "context_cycles": 2871
+          },
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 869
+          }
+        ]
+      },
+      "measured": {
+        "per_core_at_4": 1.54,
+        "table": "S6-03 full table",
+        "threads_1": 6.04,
+        "threads_2": 6.09,
+        "threads_4": 6.16
+      },
+      "message": null,
+      "name": "swizzle_badc.lat",
+      "predicted": {
+        "A": {
+          "threads_1": 6.0,
+          "threads_2": 6.0,
+          "threads_4": 6.062
+        }
+      },
+      "rounds": {
+        "threads_1": [
+          2,
+          4
+        ],
+        "threads_2": [
+          2,
+          4
+        ],
+        "threads_4": [
+          2,
+          4
+        ]
+      },
+      "status": "ok",
+      "unit": 1
+    },
+    {
+      "calibrates": null,
+      "class": "held_out",
+      "kind": 0,
+      "limiting": {
+        "threads_1": [
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 749
+          },
+          {
+            "constraint": "spacing",
+            "context_cycles": 159
+          }
+        ],
+        "threads_2": [
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 814
+          },
+          {
+            "constraint": "spacing",
+            "context_cycles": 320
+          }
+        ],
+        "threads_4": [
+          {
+            "constraint": "not_picked",
+            "context_cycles": 1284
+          },
+          {
+            "constraint": "dependency",
+            "context_cycles": 887
+          }
+        ]
+      },
+      "measured": {
+        "per_core_at_4": 1.05,
+        "table": "S6-03 full table",
+        "threads_1": 2.07,
+        "threads_2": 2.07,
+        "threads_4": 4.19
+      },
+      "message": null,
+      "name": "swizzle_badc.rt",
+      "predicted": {
+        "A": {
+          "threads_1": 2.062,
+          "threads_2": 2.062,
+          "threads_4": 4.125
+        }
+      },
+      "rounds": {
+        "threads_1": [
+          2,
+          4
+        ],
+        "threads_2": [
+          2,
+          4
+        ],
+        "threads_4": [
+          2,
+          4
+        ]
+      },
+      "status": "ok",
+      "unit": 1
+    },
+    {
+      "calibrates": "latency.vector_long",
+      "class": "calibration",
+      "kind": 0,
+      "limiting": {
+        "threads_1": [
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 749
+          },
+          {
+            "constraint": "dependency",
+            "context_cycles": 502
+          }
+        ],
+        "threads_2": [
+          {
+            "constraint": "dependency",
+            "context_cycles": 1016
+          },
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 814
+          }
+        ],
+        "threads_4": [
+          {
+            "constraint": "dependency",
+            "context_cycles": 2871
+          },
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 869
+          }
+        ]
+      },
+      "measured": {
+        "per_core_at_4": 1.54,
+        "table": "S6-03 full table",
+        "threads_1": 6.04,
+        "threads_2": 6.09,
+        "threads_4": 6.16
+      },
+      "message": null,
+      "name": "swizzle_dacb.lat",
+      "predicted": {
+        "A": {
+          "threads_1": 6.0,
+          "threads_2": 6.0,
+          "threads_4": 6.062
+        }
+      },
+      "rounds": {
+        "threads_1": [
+          2,
+          4
+        ],
+        "threads_2": [
+          2,
+          4
+        ],
+        "threads_4": [
+          2,
+          4
+        ]
+      },
+      "status": "ok",
+      "unit": 1
+    },
+    {
+      "calibrates": null,
+      "class": "held_out",
+      "kind": 0,
+      "limiting": {
+        "threads_1": [
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 749
+          },
+          {
+            "constraint": "spacing",
+            "context_cycles": 159
+          }
+        ],
+        "threads_2": [
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 814
+          },
+          {
+            "constraint": "spacing",
+            "context_cycles": 320
+          }
+        ],
+        "threads_4": [
+          {
+            "constraint": "not_picked",
+            "context_cycles": 1284
+          },
+          {
+            "constraint": "dependency",
+            "context_cycles": 887
+          }
+        ]
+      },
+      "measured": {
+        "per_core_at_4": 1.05,
+        "table": "S6-03 full table",
+        "threads_1": 2.07,
+        "threads_2": 2.07,
+        "threads_4": 4.19
+      },
+      "message": null,
+      "name": "swizzle_dacb.rt",
+      "predicted": {
+        "A": {
+          "threads_1": 2.062,
+          "threads_2": 2.062,
+          "threads_4": 4.125
+        }
+      },
+      "rounds": {
+        "threads_1": [
+          2,
+          4
+        ],
+        "threads_2": [
+          2,
+          4
+        ],
+        "threads_4": [
+          2,
+          4
+        ]
+      },
+      "status": "ok",
+      "unit": 1
+    },
+    {
+      "calibrates": "latency.vector_long",
+      "class": "calibration",
+      "kind": 0,
+      "limiting": {
+        "threads_1": [
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 749
+          },
+          {
+            "constraint": "dependency",
+            "context_cycles": 502
+          }
+        ],
+        "threads_2": [
+          {
+            "constraint": "dependency",
+            "context_cycles": 1016
+          },
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 814
+          }
+        ],
+        "threads_4": [
+          {
+            "constraint": "dependency",
+            "context_cycles": 2871
+          },
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 869
+          }
+        ]
+      },
+      "measured": {
+        "per_core_at_4": 1.54,
+        "table": "S6-03 full table",
+        "threads_1": 6.04,
+        "threads_2": 6.09,
+        "threads_4": 6.16
+      },
+      "message": null,
+      "name": "swizzle_aaaa.lat",
+      "predicted": {
+        "A": {
+          "threads_1": 6.0,
+          "threads_2": 6.0,
+          "threads_4": 6.062
+        }
+      },
+      "rounds": {
+        "threads_1": [
+          2,
+          4
+        ],
+        "threads_2": [
+          2,
+          4
+        ],
+        "threads_4": [
+          2,
+          4
+        ]
+      },
+      "status": "ok",
+      "unit": 1
+    },
+    {
+      "calibrates": null,
+      "class": "held_out",
+      "kind": 0,
+      "limiting": {
+        "threads_1": [
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 749
+          },
+          {
+            "constraint": "spacing",
+            "context_cycles": 159
+          }
+        ],
+        "threads_2": [
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 814
+          },
+          {
+            "constraint": "spacing",
+            "context_cycles": 320
+          }
+        ],
+        "threads_4": [
+          {
+            "constraint": "not_picked",
+            "context_cycles": 1284
+          },
+          {
+            "constraint": "dependency",
+            "context_cycles": 887
+          }
+        ]
+      },
+      "measured": {
+        "per_core_at_4": 1.05,
+        "table": "S6-03 full table",
+        "threads_1": 2.08,
+        "threads_2": 2.07,
+        "threads_4": 4.19
+      },
+      "message": null,
+      "name": "swizzle_aaaa.rt",
+      "predicted": {
+        "A": {
+          "threads_1": 2.062,
+          "threads_2": 2.062,
+          "threads_4": 4.125
+        }
+      },
+      "rounds": {
+        "threads_1": [
+          2,
+          4
+        ],
+        "threads_2": [
+          2,
+          4
+        ],
+        "threads_4": [
+          2,
+          4
+        ]
+      },
+      "status": "ok",
+      "unit": 1
+    },
+    {
+      "calibrates": "latency.vector_long",
+      "class": "calibration",
+      "kind": 0,
+      "limiting": {
+        "threads_1": [
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 749
+          },
+          {
+            "constraint": "dependency",
+            "context_cycles": 502
+          }
+        ],
+        "threads_2": [
+          {
+            "constraint": "dependency",
+            "context_cycles": 1016
+          },
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 814
+          }
+        ],
+        "threads_4": [
+          {
+            "constraint": "dependency",
+            "context_cycles": 2871
+          },
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 869
+          }
+        ]
+      },
+      "measured": {
+        "per_core_at_4": 1.54,
+        "table": "S6-03 full table",
+        "threads_1": 6.04,
+        "threads_2": 6.09,
+        "threads_4": 6.16
+      },
+      "message": null,
+      "name": "swizzle_bbbb.lat",
+      "predicted": {
+        "A": {
+          "threads_1": 6.0,
+          "threads_2": 6.0,
+          "threads_4": 6.062
+        }
+      },
+      "rounds": {
+        "threads_1": [
+          2,
+          4
+        ],
+        "threads_2": [
+          2,
+          4
+        ],
+        "threads_4": [
+          2,
+          4
+        ]
+      },
+      "status": "ok",
+      "unit": 1
+    },
+    {
+      "calibrates": null,
+      "class": "held_out",
+      "kind": 0,
+      "limiting": {
+        "threads_1": [
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 749
+          },
+          {
+            "constraint": "spacing",
+            "context_cycles": 159
+          }
+        ],
+        "threads_2": [
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 814
+          },
+          {
+            "constraint": "spacing",
+            "context_cycles": 320
+          }
+        ],
+        "threads_4": [
+          {
+            "constraint": "not_picked",
+            "context_cycles": 1284
+          },
+          {
+            "constraint": "dependency",
+            "context_cycles": 887
+          }
+        ]
+      },
+      "measured": {
+        "per_core_at_4": 1.05,
+        "table": "S6-03 full table",
+        "threads_1": 2.08,
+        "threads_2": 2.07,
+        "threads_4": 4.2
+      },
+      "message": null,
+      "name": "swizzle_bbbb.rt",
+      "predicted": {
+        "A": {
+          "threads_1": 2.062,
+          "threads_2": 2.062,
+          "threads_4": 4.125
+        }
+      },
+      "rounds": {
+        "threads_1": [
+          2,
+          4
+        ],
+        "threads_2": [
+          2,
+          4
+        ],
+        "threads_4": [
+          2,
+          4
+        ]
+      },
+      "status": "ok",
+      "unit": 1
+    },
+    {
+      "calibrates": "latency.vector_long",
+      "class": "calibration",
+      "kind": 0,
+      "limiting": {
+        "threads_1": [
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 749
+          },
+          {
+            "constraint": "dependency",
+            "context_cycles": 502
+          }
+        ],
+        "threads_2": [
+          {
+            "constraint": "dependency",
+            "context_cycles": 1016
+          },
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 814
+          }
+        ],
+        "threads_4": [
+          {
+            "constraint": "dependency",
+            "context_cycles": 2871
+          },
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 869
+          }
+        ]
+      },
+      "measured": {
+        "per_core_at_4": 1.54,
+        "table": "S6-03 full table",
+        "threads_1": 6.04,
+        "threads_2": 6.09,
+        "threads_4": 6.16
+      },
+      "message": null,
+      "name": "swizzle_cccc.lat",
+      "predicted": {
+        "A": {
+          "threads_1": 6.0,
+          "threads_2": 6.0,
+          "threads_4": 6.062
+        }
+      },
+      "rounds": {
+        "threads_1": [
+          2,
+          4
+        ],
+        "threads_2": [
+          2,
+          4
+        ],
+        "threads_4": [
+          2,
+          4
+        ]
+      },
+      "status": "ok",
+      "unit": 1
+    },
+    {
+      "calibrates": null,
+      "class": "held_out",
+      "kind": 0,
+      "limiting": {
+        "threads_1": [
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 749
+          },
+          {
+            "constraint": "spacing",
+            "context_cycles": 159
+          }
+        ],
+        "threads_2": [
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 814
+          },
+          {
+            "constraint": "spacing",
+            "context_cycles": 320
+          }
+        ],
+        "threads_4": [
+          {
+            "constraint": "not_picked",
+            "context_cycles": 1284
+          },
+          {
+            "constraint": "dependency",
+            "context_cycles": 887
+          }
+        ]
+      },
+      "measured": {
+        "per_core_at_4": 1.05,
+        "table": "S6-03 full table",
+        "threads_1": 2.08,
+        "threads_2": 2.07,
+        "threads_4": 4.19
+      },
+      "message": null,
+      "name": "swizzle_cccc.rt",
+      "predicted": {
+        "A": {
+          "threads_1": 2.062,
+          "threads_2": 2.062,
+          "threads_4": 4.125
+        }
+      },
+      "rounds": {
+        "threads_1": [
+          2,
+          4
+        ],
+        "threads_2": [
+          2,
+          4
+        ],
+        "threads_4": [
+          2,
+          4
+        ]
+      },
+      "status": "ok",
+      "unit": 1
+    },
+    {
+      "calibrates": "latency.vector_long",
+      "class": "calibration",
+      "kind": 0,
+      "limiting": {
+        "threads_1": [
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 749
+          },
+          {
+            "constraint": "dependency",
+            "context_cycles": 502
+          }
+        ],
+        "threads_2": [
+          {
+            "constraint": "dependency",
+            "context_cycles": 1016
+          },
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 814
+          }
+        ],
+        "threads_4": [
+          {
+            "constraint": "dependency",
+            "context_cycles": 2871
+          },
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 869
+          }
+        ]
+      },
+      "measured": {
+        "per_core_at_4": 1.54,
+        "table": "S6-03 full table",
+        "threads_1": 6.04,
+        "threads_2": 6.09,
+        "threads_4": 6.16
+      },
+      "message": null,
+      "name": "swizzle_dddd.lat",
+      "predicted": {
+        "A": {
+          "threads_1": 6.0,
+          "threads_2": 6.0,
+          "threads_4": 6.062
+        }
+      },
+      "rounds": {
+        "threads_1": [
+          2,
+          4
+        ],
+        "threads_2": [
+          2,
+          4
+        ],
+        "threads_4": [
+          2,
+          4
+        ]
+      },
+      "status": "ok",
+      "unit": 1
+    },
+    {
+      "calibrates": null,
+      "class": "held_out",
+      "kind": 0,
+      "limiting": {
+        "threads_1": [
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 749
+          },
+          {
+            "constraint": "spacing",
+            "context_cycles": 159
+          }
+        ],
+        "threads_2": [
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 814
+          },
+          {
+            "constraint": "spacing",
+            "context_cycles": 320
+          }
+        ],
+        "threads_4": [
+          {
+            "constraint": "not_picked",
+            "context_cycles": 1284
+          },
+          {
+            "constraint": "dependency",
+            "context_cycles": 887
+          }
+        ]
+      },
+      "measured": {
+        "per_core_at_4": 1.05,
+        "table": "S6-03 full table",
+        "threads_1": 2.08,
+        "threads_2": 2.07,
+        "threads_4": 4.2
+      },
+      "message": null,
+      "name": "swizzle_dddd.rt",
+      "predicted": {
+        "A": {
+          "threads_1": 2.062,
+          "threads_2": 2.062,
+          "threads_4": 4.125
+        }
+      },
+      "rounds": {
+        "threads_1": [
+          2,
+          4
+        ],
+        "threads_2": [
+          2,
+          4
+        ],
+        "threads_4": [
+          2,
+          4
+        ]
+      },
+      "status": "ok",
+      "unit": 1
+    },
+    {
+      "calibrates": "latency.vector_arith",
+      "class": "calibration",
+      "kind": 0,
+      "limiting": {
+        "threads_1": [
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 1105
+          },
+          {
+            "constraint": "dependency",
+            "context_cycles": 248
+          }
+        ],
+        "threads_2": [
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 1170
+          },
+          {
+            "constraint": "dependency",
+            "context_cycles": 865
+          }
+        ],
+        "threads_4": [
+          {
+            "constraint": "dependency",
+            "context_cycles": 2947
+          },
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 1225
+          }
+        ]
+      },
+      "measured": {
+        "per_core_at_4": 1.05,
+        "table": "S6-03 full table",
+        "threads_1": 4.03,
+        "threads_2": 4.08,
+        "threads_4": 4.2
+      },
+      "message": null,
+      "name": "vaddpd.lat",
+      "predicted": {
+        "A": {
+          "threads_1": 4.0,
+          "threads_2": 4.0,
+          "threads_4": 4.125
+        }
+      },
+      "rounds": {
+        "threads_1": [
+          2,
+          4
+        ],
+        "threads_2": [
+          2,
+          4
+        ],
+        "threads_4": [
+          2,
+          4
+        ]
+      },
+      "status": "ok",
+      "unit": 1
+    },
+    {
+      "calibrates": null,
+      "class": "held_out",
+      "kind": 0,
+      "limiting": {
+        "threads_1": [
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 1105
+          },
+          {
+            "constraint": "spacing",
+            "context_cycles": 167
+          }
+        ],
+        "threads_2": [
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 1170
+          },
+          {
+            "constraint": "dependency",
+            "context_cycles": 369
+          }
+        ],
+        "threads_4": [
+          {
+            "constraint": "dependency",
+            "context_cycles": 1955
+          },
+          {
+            "constraint": "not_picked",
+            "context_cycles": 1346
+          }
+        ]
+      },
+      "measured": {
+        "per_core_at_4": 1.05,
+        "table": "S6-03 full table",
+        "threads_1": 2.08,
+        "threads_2": 2.07,
+        "threads_4": 4.19
+      },
+      "message": null,
+      "name": "vaddpd.rt",
+      "predicted": {
+        "A": {
+          "threads_1": 2.062,
+          "threads_2": 2.062,
+          "threads_4": 4.125
+        }
+      },
+      "rounds": {
+        "threads_1": [
+          2,
+          4
+        ],
+        "threads_2": [
+          2,
+          4
+        ],
+        "threads_4": [
+          2,
+          4
+        ]
+      },
+      "status": "ok",
+      "unit": 1
+    },
+    {
+      "calibrates": "latency.vector_arith",
+      "class": "calibration",
+      "kind": 0,
+      "limiting": {
+        "threads_1": [
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 1105
+          },
+          {
+            "constraint": "dependency",
+            "context_cycles": 248
+          }
+        ],
+        "threads_2": [
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 1170
+          },
+          {
+            "constraint": "dependency",
+            "context_cycles": 865
+          }
+        ],
+        "threads_4": [
+          {
+            "constraint": "dependency",
+            "context_cycles": 2947
+          },
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 1225
+          }
+        ]
+      },
+      "measured": {
+        "per_core_at_4": 1.05,
+        "table": "S6-03 full table",
+        "threads_1": 4.03,
+        "threads_2": 4.08,
+        "threads_4": 4.2
+      },
+      "message": null,
+      "name": "vmulpd.lat",
+      "predicted": {
+        "A": {
+          "threads_1": 4.0,
+          "threads_2": 4.0,
+          "threads_4": 4.125
+        }
+      },
+      "rounds": {
+        "threads_1": [
+          2,
+          4
+        ],
+        "threads_2": [
+          2,
+          4
+        ],
+        "threads_4": [
+          2,
+          4
+        ]
+      },
+      "status": "ok",
+      "unit": 1
+    },
+    {
+      "calibrates": null,
+      "class": "held_out",
+      "kind": 0,
+      "limiting": {
+        "threads_1": [
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 1105
+          },
+          {
+            "constraint": "spacing",
+            "context_cycles": 167
+          }
+        ],
+        "threads_2": [
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 1170
+          },
+          {
+            "constraint": "dependency",
+            "context_cycles": 369
+          }
+        ],
+        "threads_4": [
+          {
+            "constraint": "dependency",
+            "context_cycles": 1955
+          },
+          {
+            "constraint": "not_picked",
+            "context_cycles": 1346
+          }
+        ]
+      },
+      "measured": {
+        "per_core_at_4": 1.05,
+        "table": "S6-03 full table",
+        "threads_1": 2.08,
+        "threads_2": 2.07,
+        "threads_4": 4.19
+      },
+      "message": null,
+      "name": "vmulpd.rt",
+      "predicted": {
+        "A": {
+          "threads_1": 2.062,
+          "threads_2": 2.062,
+          "threads_4": 4.125
+        }
+      },
+      "rounds": {
+        "threads_1": [
+          2,
+          4
+        ],
+        "threads_2": [
+          2,
+          4
+        ],
+        "threads_4": [
+          2,
+          4
+        ]
+      },
+      "status": "ok",
+      "unit": 1
+    },
+    {
+      "calibrates": "latency.vector_arith",
+      "class": "calibration",
+      "kind": 0,
+      "limiting": {
+        "threads_1": [
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 1105
+          },
+          {
+            "constraint": "dependency",
+            "context_cycles": 248
+          }
+        ],
+        "threads_2": [
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 1170
+          },
+          {
+            "constraint": "dependency",
+            "context_cycles": 865
+          }
+        ],
+        "threads_4": [
+          {
+            "constraint": "dependency",
+            "context_cycles": 2947
+          },
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 1225
+          }
+        ]
+      },
+      "measured": {
+        "per_core_at_4": 1.05,
+        "table": "S6-03 full table",
+        "threads_1": 4.03,
+        "threads_2": 4.08,
+        "threads_4": 4.2
+      },
+      "message": null,
+      "name": "vfmadd213pd.lat",
+      "predicted": {
+        "A": {
+          "threads_1": 4.0,
+          "threads_2": 4.0,
+          "threads_4": 4.125
+        }
+      },
+      "rounds": {
+        "threads_1": [
+          2,
+          4
+        ],
+        "threads_2": [
+          2,
+          4
+        ],
+        "threads_4": [
+          2,
+          4
+        ]
+      },
+      "status": "ok",
+      "unit": 1
+    },
+    {
+      "calibrates": null,
+      "class": "held_out",
+      "kind": 0,
+      "limiting": {
+        "threads_1": [
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 1105
+          },
+          {
+            "constraint": "spacing",
+            "context_cycles": 167
+          }
+        ],
+        "threads_2": [
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 1170
+          },
+          {
+            "constraint": "dependency",
+            "context_cycles": 369
+          }
+        ],
+        "threads_4": [
+          {
+            "constraint": "dependency",
+            "context_cycles": 1955
+          },
+          {
+            "constraint": "not_picked",
+            "context_cycles": 1346
+          }
+        ]
+      },
+      "measured": {
+        "per_core_at_4": 1.05,
+        "table": "S6-03 full table",
+        "threads_1": 2.08,
+        "threads_2": 2.08,
+        "threads_4": 4.19
+      },
+      "message": null,
+      "name": "vfmadd213pd.rt",
+      "predicted": {
+        "A": {
+          "threads_1": 2.062,
+          "threads_2": 2.062,
+          "threads_4": 4.125
+        }
+      },
+      "rounds": {
+        "threads_1": [
+          2,
+          4
+        ],
+        "threads_2": [
+          2,
+          4
+        ],
+        "threads_4": [
+          2,
+          4
+        ]
+      },
+      "status": "ok",
+      "unit": 1
+    },
+    {
+      "calibrates": "latency.vector_arith",
+      "class": "calibration",
+      "kind": 0,
+      "limiting": {
+        "threads_1": [
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 749
+          },
+          {
+            "constraint": "dependency",
+            "context_cycles": 248
+          }
+        ],
+        "threads_2": [
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 814
+          },
+          {
+            "constraint": "dependency",
+            "context_cycles": 508
+          }
+        ],
+        "threads_4": [
+          {
+            "constraint": "dependency",
+            "context_cycles": 1879
+          },
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 869
+          }
+        ]
+      },
+      "measured": {
+        "per_core_at_4": 1.05,
+        "table": "S6-03 full table",
+        "threads_1": 4.03,
+        "threads_2": 4.08,
+        "threads_4": 4.2
+      },
+      "message": null,
+      "name": "vcvtfxpntdq2ps.lat",
+      "predicted": {
+        "A": {
+          "threads_1": 4.0,
+          "threads_2": 4.0,
+          "threads_4": 4.125
+        }
+      },
+      "rounds": {
+        "threads_1": [
+          2,
+          4
+        ],
+        "threads_2": [
+          2,
+          4
+        ],
+        "threads_4": [
+          2,
+          4
+        ]
+      },
+      "status": "ok",
+      "unit": 1
+    },
+    {
+      "calibrates": null,
+      "class": "held_out",
+      "kind": 0,
+      "limiting": {
+        "threads_1": [
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 749
+          },
+          {
+            "constraint": "spacing",
+            "context_cycles": 159
+          }
+        ],
+        "threads_2": [
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 814
+          },
+          {
+            "constraint": "spacing",
+            "context_cycles": 320
+          }
+        ],
+        "threads_4": [
+          {
+            "constraint": "not_picked",
+            "context_cycles": 1284
+          },
+          {
+            "constraint": "dependency",
+            "context_cycles": 887
+          }
+        ]
+      },
+      "measured": {
+        "per_core_at_4": 1.05,
+        "table": "S6-03 full table",
+        "threads_1": 2.08,
+        "threads_2": 2.07,
+        "threads_4": 4.2
+      },
+      "message": null,
+      "name": "vcvtfxpntdq2ps.rt",
+      "predicted": {
+        "A": {
+          "threads_1": 2.062,
+          "threads_2": 2.062,
+          "threads_4": 4.125
+        }
+      },
+      "rounds": {
+        "threads_1": [
+          2,
+          4
+        ],
+        "threads_2": [
+          2,
+          4
+        ],
+        "threads_4": [
+          2,
+          4
+        ]
+      },
+      "status": "ok",
+      "unit": 1
+    },
+    {
+      "calibrates": "latency.vector_arith",
+      "class": "calibration",
+      "kind": 0,
+      "limiting": {
+        "threads_1": [
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 749
+          },
+          {
+            "constraint": "dependency",
+            "context_cycles": 248
+          }
+        ],
+        "threads_2": [
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 814
+          },
+          {
+            "constraint": "dependency",
+            "context_cycles": 508
+          }
+        ],
+        "threads_4": [
+          {
+            "constraint": "dependency",
+            "context_cycles": 1879
+          },
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 869
+          }
+        ]
+      },
+      "measured": {
+        "per_core_at_4": 1.05,
+        "table": "S6-03 full table",
+        "threads_1": 4.03,
+        "threads_2": 4.08,
+        "threads_4": 4.21
+      },
+      "message": null,
+      "name": "vcvtfxpntudq2ps.lat",
+      "predicted": {
+        "A": {
+          "threads_1": 4.0,
+          "threads_2": 4.0,
+          "threads_4": 4.125
+        }
+      },
+      "rounds": {
+        "threads_1": [
+          2,
+          4
+        ],
+        "threads_2": [
+          2,
+          4
+        ],
+        "threads_4": [
+          2,
+          4
+        ]
+      },
+      "status": "ok",
+      "unit": 1
+    },
+    {
+      "calibrates": null,
+      "class": "held_out",
+      "kind": 0,
+      "limiting": {
+        "threads_1": [
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 749
+          },
+          {
+            "constraint": "spacing",
+            "context_cycles": 159
+          }
+        ],
+        "threads_2": [
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 814
+          },
+          {
+            "constraint": "spacing",
+            "context_cycles": 320
+          }
+        ],
+        "threads_4": [
+          {
+            "constraint": "not_picked",
+            "context_cycles": 1284
+          },
+          {
+            "constraint": "dependency",
+            "context_cycles": 887
+          }
+        ]
+      },
+      "measured": {
+        "per_core_at_4": 1.05,
+        "table": "S6-03 full table",
+        "threads_1": 2.08,
+        "threads_2": 2.07,
+        "threads_4": 4.2
+      },
+      "message": null,
+      "name": "vcvtfxpntudq2ps.rt",
+      "predicted": {
+        "A": {
+          "threads_1": 2.062,
+          "threads_2": 2.062,
+          "threads_4": 4.125
+        }
+      },
+      "rounds": {
+        "threads_1": [
+          2,
+          4
+        ],
+        "threads_2": [
+          2,
+          4
+        ],
+        "threads_4": [
+          2,
+          4
+        ]
+      },
+      "status": "ok",
+      "unit": 1
+    },
+    {
+      "calibrates": "latency.vector_arith",
+      "class": "calibration",
+      "kind": 0,
+      "limiting": {
+        "threads_1": [
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 749
+          },
+          {
+            "constraint": "dependency",
+            "context_cycles": 248
+          }
+        ],
+        "threads_2": [
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 814
+          },
+          {
+            "constraint": "dependency",
+            "context_cycles": 508
+          }
+        ],
+        "threads_4": [
+          {
+            "constraint": "dependency",
+            "context_cycles": 1879
+          },
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 869
+          }
+        ]
+      },
+      "measured": {
+        "per_core_at_4": 1.05,
+        "table": "S6-03 full table",
+        "threads_1": 4.03,
+        "threads_2": 4.08,
+        "threads_4": 4.2
+      },
+      "message": null,
+      "name": "vcvtfxpntps2dq.lat",
+      "predicted": {
+        "A": {
+          "threads_1": 4.0,
+          "threads_2": 4.0,
+          "threads_4": 4.125
+        }
+      },
+      "rounds": {
+        "threads_1": [
+          2,
+          4
+        ],
+        "threads_2": [
+          2,
+          4
+        ],
+        "threads_4": [
+          2,
+          4
+        ]
+      },
+      "status": "ok",
+      "unit": 1
+    },
+    {
+      "calibrates": null,
+      "class": "held_out",
+      "kind": 0,
+      "limiting": {
+        "threads_1": [
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 749
+          },
+          {
+            "constraint": "spacing",
+            "context_cycles": 159
+          }
+        ],
+        "threads_2": [
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 814
+          },
+          {
+            "constraint": "spacing",
+            "context_cycles": 320
+          }
+        ],
+        "threads_4": [
+          {
+            "constraint": "not_picked",
+            "context_cycles": 1284
+          },
+          {
+            "constraint": "dependency",
+            "context_cycles": 887
+          }
+        ]
+      },
+      "measured": {
+        "per_core_at_4": 1.05,
+        "table": "S6-03 full table",
+        "threads_1": 2.08,
+        "threads_2": 2.07,
+        "threads_4": 4.2
+      },
+      "message": null,
+      "name": "vcvtfxpntps2dq.rt",
+      "predicted": {
+        "A": {
+          "threads_1": 2.062,
+          "threads_2": 2.062,
+          "threads_4": 4.125
+        }
+      },
+      "rounds": {
+        "threads_1": [
+          2,
+          4
+        ],
+        "threads_2": [
+          2,
+          4
+        ],
+        "threads_4": [
+          2,
+          4
+        ]
+      },
+      "status": "ok",
+      "unit": 1
+    },
+    {
+      "calibrates": "latency.vector_arith",
+      "class": "calibration",
+      "kind": 0,
+      "limiting": {
+        "threads_1": [
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 749
+          },
+          {
+            "constraint": "dependency",
+            "context_cycles": 248
+          }
+        ],
+        "threads_2": [
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 814
+          },
+          {
+            "constraint": "dependency",
+            "context_cycles": 508
+          }
+        ],
+        "threads_4": [
+          {
+            "constraint": "dependency",
+            "context_cycles": 1879
+          },
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 869
+          }
+        ]
+      },
+      "measured": {
+        "per_core_at_4": 1.05,
+        "table": "S6-03 full table",
+        "threads_1": 4.03,
+        "threads_2": 4.08,
+        "threads_4": 4.2
+      },
+      "message": null,
+      "name": "vcvtfxpntps2udq.lat",
+      "predicted": {
+        "A": {
+          "threads_1": 4.0,
+          "threads_2": 4.0,
+          "threads_4": 4.125
+        }
+      },
+      "rounds": {
+        "threads_1": [
+          2,
+          4
+        ],
+        "threads_2": [
+          2,
+          4
+        ],
+        "threads_4": [
+          2,
+          4
+        ]
+      },
+      "status": "ok",
+      "unit": 1
+    },
+    {
+      "calibrates": null,
+      "class": "held_out",
+      "kind": 0,
+      "limiting": {
+        "threads_1": [
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 749
+          },
+          {
+            "constraint": "spacing",
+            "context_cycles": 159
+          }
+        ],
+        "threads_2": [
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 814
+          },
+          {
+            "constraint": "spacing",
+            "context_cycles": 320
+          }
+        ],
+        "threads_4": [
+          {
+            "constraint": "not_picked",
+            "context_cycles": 1284
+          },
+          {
+            "constraint": "dependency",
+            "context_cycles": 887
+          }
+        ]
+      },
+      "measured": {
+        "per_core_at_4": 1.05,
+        "table": "S6-03 full table",
+        "threads_1": 2.08,
+        "threads_2": 2.07,
+        "threads_4": 4.2
+      },
+      "message": null,
+      "name": "vcvtfxpntps2udq.rt",
+      "predicted": {
+        "A": {
+          "threads_1": 2.062,
+          "threads_2": 2.062,
+          "threads_4": 4.125
+        }
+      },
+      "rounds": {
+        "threads_1": [
+          2,
+          4
+        ],
+        "threads_2": [
+          2,
+          4
+        ],
+        "threads_4": [
+          2,
+          4
+        ]
+      },
+      "status": "ok",
+      "unit": 1
+    },
+    {
+      "calibrates": "latency.vector_convert_df",
+      "class": "calibration",
+      "kind": 0,
+      "limiting": {
+        "threads_1": [
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 749
+          },
+          {
+            "constraint": "dependency",
+            "context_cycles": 629
+          }
+        ],
+        "threads_2": [
+          {
+            "constraint": "dependency",
+            "context_cycles": 1270
+          },
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 814
+          }
+        ],
+        "threads_4": [
+          {
+            "constraint": "dependency",
+            "context_cycles": 3379
+          },
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 869
+          }
+        ]
+      },
+      "measured": {
+        "per_core_at_4": 1.79,
+        "table": "S6-03 full table",
+        "threads_1": 7.04,
+        "threads_2": 7.11,
+        "threads_4": 7.18
+      },
+      "message": null,
+      "name": "vcvtfxpntpd2dq.lat",
+      "predicted": {
+        "A": {
+          "threads_1": 7.0,
+          "threads_2": 7.0,
+          "threads_4": 7.031
+        }
+      },
+      "rounds": {
+        "threads_1": [
+          2,
+          4
+        ],
+        "threads_2": [
+          2,
+          4
+        ],
+        "threads_4": [
+          2,
+          4
+        ]
+      },
+      "status": "ok",
+      "unit": 1
+    },
+    {
+      "calibrates": null,
+      "class": "held_out",
+      "kind": 0,
+      "limiting": {
+        "threads_1": [
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 749
+          },
+          {
+            "constraint": "spacing",
+            "context_cycles": 159
+          }
+        ],
+        "threads_2": [
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 814
+          },
+          {
+            "constraint": "spacing",
+            "context_cycles": 320
+          }
+        ],
+        "threads_4": [
+          {
+            "constraint": "not_picked",
+            "context_cycles": 1284
+          },
+          {
+            "constraint": "dependency",
+            "context_cycles": 887
+          }
+        ]
+      },
+      "measured": {
+        "per_core_at_4": 1.05,
+        "table": "S6-03 full table",
+        "threads_1": 2.08,
+        "threads_2": 2.07,
+        "threads_4": 4.2
+      },
+      "message": null,
+      "name": "vcvtfxpntpd2dq.rt",
+      "predicted": {
+        "A": {
+          "threads_1": 2.062,
+          "threads_2": 2.062,
+          "threads_4": 4.125
+        }
+      },
+      "rounds": {
+        "threads_1": [
+          2,
+          4
+        ],
+        "threads_2": [
+          2,
+          4
+        ],
+        "threads_4": [
+          2,
+          4
+        ]
+      },
+      "status": "ok",
+      "unit": 1
+    },
+    {
+      "calibrates": "latency.vector_convert_df",
+      "class": "calibration",
+      "kind": 0,
+      "limiting": {
+        "threads_1": [
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 749
+          },
+          {
+            "constraint": "dependency",
+            "context_cycles": 629
+          }
+        ],
+        "threads_2": [
+          {
+            "constraint": "dependency",
+            "context_cycles": 1270
+          },
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 814
+          }
+        ],
+        "threads_4": [
+          {
+            "constraint": "dependency",
+            "context_cycles": 3379
+          },
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 869
+          }
+        ]
+      },
+      "measured": {
+        "per_core_at_4": 1.79,
+        "table": "S6-03 full table",
+        "threads_1": 7.05,
+        "threads_2": 7.11,
+        "threads_4": 7.18
+      },
+      "message": null,
+      "name": "vcvtfxpntpd2udq.lat",
+      "predicted": {
+        "A": {
+          "threads_1": 7.0,
+          "threads_2": 7.0,
+          "threads_4": 7.031
+        }
+      },
+      "rounds": {
+        "threads_1": [
+          2,
+          4
+        ],
+        "threads_2": [
+          2,
+          4
+        ],
+        "threads_4": [
+          2,
+          4
+        ]
+      },
+      "status": "ok",
+      "unit": 1
+    },
+    {
+      "calibrates": null,
+      "class": "held_out",
+      "kind": 0,
+      "limiting": {
+        "threads_1": [
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 749
+          },
+          {
+            "constraint": "spacing",
+            "context_cycles": 159
+          }
+        ],
+        "threads_2": [
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 814
+          },
+          {
+            "constraint": "spacing",
+            "context_cycles": 320
+          }
+        ],
+        "threads_4": [
+          {
+            "constraint": "not_picked",
+            "context_cycles": 1284
+          },
+          {
+            "constraint": "dependency",
+            "context_cycles": 887
+          }
+        ]
+      },
+      "measured": {
+        "per_core_at_4": 1.05,
+        "table": "S6-03 full table",
+        "threads_1": 2.08,
+        "threads_2": 2.07,
+        "threads_4": 4.2
+      },
+      "message": null,
+      "name": "vcvtfxpntpd2udq.rt",
+      "predicted": {
+        "A": {
+          "threads_1": 2.062,
+          "threads_2": 2.062,
+          "threads_4": 4.125
+        }
+      },
+      "rounds": {
+        "threads_1": [
+          2,
+          4
+        ],
+        "threads_2": [
+          2,
+          4
+        ],
+        "threads_4": [
+          2,
+          4
+        ]
+      },
+      "status": "ok",
+      "unit": 1
+    },
+    {
+      "calibrates": "latency.x87_add",
+      "class": "calibration",
+      "kind": 0,
+      "limiting": {
+        "threads_1": [
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 749
+          },
+          {
+            "constraint": "spacing",
+            "context_cycles": 175
+          }
+        ],
+        "threads_2": [
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 814
+          },
+          {
+            "constraint": "spacing",
+            "context_cycles": 352
+          }
+        ],
+        "threads_4": [
+          {
+            "constraint": "dependency",
+            "context_cycles": 1383
+          },
+          {
+            "constraint": "not_picked",
+            "context_cycles": 916
+          }
+        ]
+      },
+      "measured": {
+        "per_core_at_4": 1.03,
+        "table": "S6-03 full table",
+        "threads_1": 3.02,
+        "threads_2": 3.08,
+        "threads_4": 4.13
+      },
+      "message": null,
+      "name": "x87_add.lat",
+      "predicted": {
+        "A": {
+          "threads_1": 3.031,
+          "threads_2": 3.031,
+          "threads_4": 4.125
+        }
+      },
+      "rounds": {
+        "threads_1": [
+          2,
+          4
+        ],
+        "threads_2": [
+          2,
+          4
+        ],
+        "threads_4": [
+          2,
+          4
+        ]
+      },
+      "status": "ok",
+      "unit": 1
+    },
+    {
+      "calibrates": null,
+      "class": "held_out",
+      "kind": 0,
+      "limiting": {
+        "threads_1": [
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 749
+          },
+          {
+            "constraint": "spacing",
+            "context_cycles": 175
+          }
+        ],
+        "threads_2": [
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 814
+          },
+          {
+            "constraint": "spacing",
+            "context_cycles": 352
+          }
+        ],
+        "threads_4": [
+          {
+            "constraint": "not_picked",
+            "context_cycles": 1412
+          },
+          {
+            "constraint": "dependency",
+            "context_cycles": 887
+          }
+        ]
+      },
+      "measured": {
+        "per_core_at_4": 1.03,
+        "table": "S6-03 full table",
+        "threads_1": 2.08,
+        "threads_2": 2.07,
+        "threads_4": 4.13
+      },
+      "message": null,
+      "name": "x87_add.rt",
+      "predicted": {
+        "A": {
+          "threads_1": 2.062,
+          "threads_2": 2.062,
+          "threads_4": 4.125
+        }
+      },
+      "rounds": {
+        "threads_1": [
+          2,
+          4
+        ],
+        "threads_2": [
+          2,
+          4
+        ],
+        "threads_4": [
+          2,
+          4
+        ]
+      },
+      "status": "ok",
+      "unit": 1
+    },
+    {
+      "calibrates": "latency.x87_mul",
+      "class": "calibration",
+      "kind": 0,
+      "limiting": {
+        "threads_1": [
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 749
+          },
+          {
+            "constraint": "spacing",
+            "context_cycles": 175
+          }
+        ],
+        "threads_2": [
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 814
+          },
+          {
+            "constraint": "spacing",
+            "context_cycles": 352
+          }
+        ],
+        "threads_4": [
+          {
+            "constraint": "resource",
+            "context_cycles": 1517
+          },
+          {
+            "constraint": "dependency",
+            "context_cycles": 1383
+          }
+        ]
+      },
+      "measured": {
+        "per_core_at_4": 2.0,
+        "table": "S6-03 full table",
+        "threads_1": 3.02,
+        "threads_2": 4.08,
+        "threads_4": 8.02
+      },
+      "message": null,
+      "name": "x87_mul.lat",
+      "predicted": {
+        "A": {
+          "threads_1": 3.031,
+          "threads_2": 4.031,
+          "threads_4": 8.0
+        }
+      },
+      "rounds": {
+        "threads_1": [
+          2,
+          4
+        ],
+        "threads_2": [
+          2,
+          4
+        ],
+        "threads_4": [
+          2,
+          4
+        ]
+      },
+      "status": "ok",
+      "unit": 1
+    },
+    {
+      "calibrates": "occupancy.x87_mul",
+      "class": "calibration",
+      "kind": 0,
+      "limiting": {
+        "threads_1": [
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 749
+          },
+          {
+            "constraint": "spacing",
+            "context_cycles": 175
+          }
+        ],
+        "threads_2": [
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 814
+          },
+          {
+            "constraint": "spacing",
+            "context_cycles": 352
+          }
+        ],
+        "threads_4": [
+          {
+            "constraint": "not_picked",
+            "context_cycles": 1873
+          },
+          {
+            "constraint": "resource",
+            "context_cycles": 1517
+          }
+        ]
+      },
+      "measured": {
+        "per_core_at_4": 2.0,
+        "table": "S6-03 full table",
+        "threads_1": 2.08,
+        "threads_2": 4.02,
+        "threads_4": 8.02
+      },
+      "message": null,
+      "name": "x87_mul.rt",
+      "predicted": {
+        "A": {
+          "threads_1": 2.062,
+          "threads_2": 4.031,
+          "threads_4": 8.0
+        }
+      },
+      "rounds": {
+        "threads_1": [
+          2,
+          4
+        ],
+        "threads_2": [
+          2,
+          4
+        ],
+        "threads_4": [
+          2,
+          4
+        ]
+      },
+      "status": "ok",
+      "unit": 1
+    },
+    {
+      "calibrates": "latency.x87_div",
+      "class": "calibration",
+      "kind": 0,
+      "limiting": {
+        "threads_1": [
+          {
+            "constraint": "dependency",
+            "context_cycles": 4598
+          },
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 749
+          }
+        ],
+        "threads_2": [
+          {
+            "constraint": "resource",
+            "context_cycles": 9435
+          },
+          {
+            "constraint": "dependency",
+            "context_cycles": 9208
+          }
+        ],
+        "threads_4": [
+          {
+            "constraint": "resource",
+            "context_cycles": 56610
+          },
+          {
+            "constraint": "dependency",
+            "context_cycles": 19279
+          }
+        ]
+      },
+      "measured": {
+        "per_core_at_4": 37.95,
+        "table": "S6-03 full table",
+        "threads_1": 39.25,
+        "threads_2": 76.3,
+        "threads_4": 151.79
+      },
+      "message": null,
+      "name": "x87_div.lat",
+      "predicted": {
+        "A": {
+          "threads_1": 38.0,
+          "threads_2": 76.0,
+          "threads_4": 152.0
+        }
+      },
+      "rounds": {
+        "threads_1": [
+          2,
+          4
+        ],
+        "threads_2": [
+          2,
+          4
+        ],
+        "threads_4": [
+          2,
+          4
+        ]
+      },
+      "status": "ok",
+      "unit": 1
+    },
+    {
+      "calibrates": "occupancy.x87_div",
+      "class": "calibration",
+      "kind": 0,
+      "limiting": {
+        "threads_1": [
+          {
+            "constraint": "resource",
+            "context_cycles": 4566
+          },
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 749
+          }
+        ],
+        "threads_2": [
+          {
+            "constraint": "resource",
+            "context_cycles": 18567
+          },
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 814
+          }
+        ],
+        "threads_4": [
+          {
+            "constraint": "resource",
+            "context_cycles": 74874
+          },
+          {
+            "constraint": "not_picked",
+            "context_cycles": 1811
+          }
+        ]
+      },
+      "measured": {
+        "per_core_at_4": 37.94,
+        "table": "S6-03 full table",
+        "threads_1": 38.24,
+        "threads_2": 76.27,
+        "threads_4": 151.76
+      },
+      "message": null,
+      "name": "x87_div.rt",
+      "predicted": {
+        "A": {
+          "threads_1": 38.0,
+          "threads_2": 76.0,
+          "threads_4": 152.0
+        }
+      },
+      "rounds": {
+        "threads_1": [
+          2,
+          4
+        ],
+        "threads_2": [
+          2,
+          4
+        ],
+        "threads_4": [
+          2,
+          4
+        ]
+      },
+      "status": "ok",
+      "unit": 1
+    },
+    {
+      "calibrates": "latency.vector_load_l1",
+      "class": "calibration",
+      "kind": 0,
+      "limiting": {
+        "threads_1": [
+          {
+            "constraint": "dependency",
+            "context_cycles": 1775
+          },
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 749
+          }
+        ],
+        "threads_2": [
+          {
+            "constraint": "dependency",
+            "context_cycles": 3578
+          },
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 814
+          }
+        ],
+        "threads_4": [
+          {
+            "constraint": "dependency",
+            "context_cycles": 8085
+          },
+          {
+            "constraint": "spacing",
+            "context_cycles": 1150
+          }
+        ]
+      },
+      "measured": {
+        "per_core_at_4": 3.28,
+        "table": "S6-03 full table",
+        "threads_1": 12.11,
+        "threads_2": 12.17,
+        "threads_4": 13.14
+      },
+      "message": null,
+      "name": "masked_load.lat",
+      "predicted": {
+        "A": {
+          "threads_1": 15.0,
+          "threads_2": 15.0,
+          "threads_4": 15.0
+        }
+      },
+      "rounds": {
+        "threads_1": [
+          2,
+          4
+        ],
+        "threads_2": [
+          2,
+          4
+        ],
+        "threads_4": [
+          2,
+          4
+        ]
+      },
+      "status": "ok",
+      "unit": 2
+    },
+    {
+      "calibrates": null,
+      "class": "held_out",
+      "kind": 0,
+      "limiting": {
+        "threads_1": [
+          {
+            "constraint": "dependency",
+            "context_cycles": 1775
+          },
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 749
+          }
+        ],
+        "threads_2": [
+          {
+            "constraint": "dependency",
+            "context_cycles": 3578
+          },
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 814
+          }
+        ],
+        "threads_4": [
+          {
+            "constraint": "dependency",
+            "context_cycles": 8085
+          },
+          {
+            "constraint": "spacing",
+            "context_cycles": 1150
+          }
+        ]
+      },
+      "measured": {
+        "per_core_at_4": 3.29,
+        "table": "S6-03 full table",
+        "threads_1": 12.11,
+        "threads_2": 12.17,
+        "threads_4": 13.17
+      },
+      "message": null,
+      "name": "masked_store.lat",
+      "predicted": {
+        "A": {
+          "threads_1": 15.0,
+          "threads_2": 15.0,
+          "threads_4": 15.0
+        }
+      },
+      "rounds": {
+        "threads_1": [
+          2,
+          4
+        ],
+        "threads_2": [
+          2,
+          4
+        ],
+        "threads_4": [
+          2,
+          4
+        ]
+      },
+      "status": "ok",
+      "unit": 2
+    },
+    {
+      "calibrates": null,
+      "class": "held_out",
+      "kind": 0,
+      "limiting": {
+        "threads_1": [
+          {
+            "constraint": "dependency",
+            "context_cycles": 2926
+          },
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 749
+          }
+        ],
+        "threads_2": [
+          {
+            "constraint": "dependency",
+            "context_cycles": 5883
+          },
+          {
+            "constraint": "spacing",
+            "context_cycles": 1086
+          }
+        ],
+        "threads_4": [
+          {
+            "constraint": "dependency",
+            "context_cycles": 12839
+          },
+          {
+            "constraint": "spacing",
+            "context_cycles": 2174
+          }
+        ]
+      },
+      "measured": {
+        "per_core_at_4": 6.1,
+        "table": "S6-03 full table",
+        "threads_1": 12.11,
+        "threads_2": 16.79,
+        "threads_4": 24.4
+      },
+      "message": null,
+      "name": "unpack.lat",
+      "predicted": {
+        "A": {
+          "threads_1": 28.0,
+          "threads_2": 28.0,
+          "threads_4": 28.031
+        }
+      },
+      "rounds": {
+        "threads_1": [
+          2,
+          4
+        ],
+        "threads_2": [
+          2,
+          4
+        ],
+        "threads_4": [
+          2,
+          4
+        ]
+      },
+      "status": "ok",
+      "unit": 4
+    },
+    {
+      "calibrates": "latency.vector_load_l1",
+      "class": "calibration",
+      "kind": 0,
+      "limiting": {
+        "threads_1": [
+          {
+            "constraint": "dependency",
+            "context_cycles": 1775
+          },
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 749
+          }
+        ],
+        "threads_2": [
+          {
+            "constraint": "dependency",
+            "context_cycles": 3578
+          },
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 814
+          }
+        ],
+        "threads_4": [
+          {
+            "constraint": "dependency",
+            "context_cycles": 8085
+          },
+          {
+            "constraint": "spacing",
+            "context_cycles": 1150
+          }
+        ]
+      },
+      "measured": {
+        "per_core_at_4": 3.3,
+        "table": "S6-03 full table",
+        "threads_1": 12.11,
+        "threads_2": 12.18,
+        "threads_4": 13.18
+      },
+      "message": null,
+      "name": "convert_up.lat",
+      "predicted": {
+        "A": {
+          "threads_1": 15.0,
+          "threads_2": 15.0,
+          "threads_4": 15.0
+        }
+      },
+      "rounds": {
+        "threads_1": [
+          2,
+          4
+        ],
+        "threads_2": [
+          2,
+          4
+        ],
+        "threads_4": [
+          2,
+          4
+        ]
+      },
+      "status": "ok",
+      "unit": 2
+    },
+    {
+      "calibrates": null,
+      "class": "held_out",
+      "kind": 0,
+      "limiting": {
+        "threads_1": [
+          {
+            "constraint": "dependency",
+            "context_cycles": 1775
+          },
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 749
+          }
+        ],
+        "threads_2": [
+          {
+            "constraint": "dependency",
+            "context_cycles": 3578
+          },
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 814
+          }
+        ],
+        "threads_4": [
+          {
+            "constraint": "dependency",
+            "context_cycles": 8085
+          },
+          {
+            "constraint": "spacing",
+            "context_cycles": 1150
+          }
+        ]
+      },
+      "measured": {
+        "per_core_at_4": 3.29,
+        "table": "S6-03 full table",
+        "threads_1": 12.11,
+        "threads_2": 12.95,
+        "threads_4": 13.14
+      },
+      "message": null,
+      "name": "convert_down.lat",
+      "predicted": {
+        "A": {
+          "threads_1": 15.0,
+          "threads_2": 15.0,
+          "threads_4": 15.0
+        }
+      },
+      "rounds": {
+        "threads_1": [
+          2,
+          4
+        ],
+        "threads_2": [
+          2,
+          4
+        ],
+        "threads_4": [
+          2,
+          4
+        ]
+      },
+      "status": "ok",
+      "unit": 2
+    },
+    {
+      "calibrates": "latency.vector_load_l1 / latency.spill_reload_chain",
+      "class": "calibration",
+      "kind": 0,
+      "limiting": {
+        "threads_1": [
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 749
+          },
+          {
+            "constraint": "dependency",
+            "context_cycles": 606
+          }
+        ],
+        "threads_2": [
+          {
+            "constraint": "dependency",
+            "context_cycles": 1243
+          },
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 814
+          }
+        ],
+        "threads_4": [
+          {
+            "constraint": "dependency",
+            "context_cycles": 3421
+          },
+          {
+            "constraint": "not_picked",
+            "context_cycles": 1209
+          }
+        ]
+      },
+      "measured": {
+        "per_core_at_4": 3.29,
+        "table": "S6-03 full table",
+        "threads_1": 12.11,
+        "threads_2": 12.98,
+        "threads_4": 13.14
+      },
+      "message": null,
+      "name": "spill_reload.lat",
+      "predicted": {
+        "A": {
+          "threads_1": 6.031,
+          "threads_2": 6.062,
+          "threads_4": 8.125
+        }
+      },
+      "rounds": {
+        "threads_1": [
+          2,
+          4
+        ],
+        "threads_2": [
+          2,
+          4
+        ],
+        "threads_4": [
+          2,
+          4
+        ]
+      },
+      "status": "ok",
+      "unit": 2
+    },
+    {
+      "calibrates": null,
+      "class": "held_out",
+      "kind": 0,
+      "limiting": {
+        "threads_1": [
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 3689
+          },
+          {
+            "constraint": "spacing",
+            "context_cycles": 151
+          }
+        ],
+        "threads_2": [
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 6713
+          },
+          {
+            "constraint": "spacing",
+            "context_cycles": 304
+          }
+        ],
+        "threads_4": [
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 12743
+          },
+          {
+            "constraint": "not_picked",
+            "context_cycles": 1068
+          }
+        ]
+      },
+      "measured": {
+        "per_core_at_4": 1.03,
+        "table": "S6-03 full table",
+        "threads_1": 2.08,
+        "threads_2": 2.37,
+        "threads_4": 4.13
+      },
+      "message": null,
+      "name": "masked_load.rt",
+      "predicted": {
+        "A": {
+          "threads_1": 2.062,
+          "threads_2": 2.062,
+          "threads_4": 4.125
+        }
+      },
+      "rounds": {
+        "threads_1": [
+          2,
+          4
+        ],
+        "threads_2": [
+          2,
+          4
+        ],
+        "threads_4": [
+          2,
+          4
+        ]
+      },
+      "status": "ok",
+      "unit": 1
+    },
+    {
+      "calibrates": null,
+      "class": "held_out",
+      "kind": 0,
+      "limiting": {
+        "threads_1": [
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 749
+          },
+          {
+            "constraint": "spacing",
+            "context_cycles": 158
+          }
+        ],
+        "threads_2": [
+          {
+            "constraint": "outstanding_limit",
+            "context_cycles": 938
+          },
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 814
+          }
+        ],
+        "threads_4": [
+          {
+            "constraint": "outstanding_limit",
+            "context_cycles": 4701
+          },
+          {
+            "constraint": "not_picked",
+            "context_cycles": 1145
+          }
+        ]
+      },
+      "measured": {
+        "per_core_at_4": 1.03,
+        "table": "S6-03 full table",
+        "threads_1": 2.08,
+        "threads_2": 2.08,
+        "threads_4": 4.13
+      },
+      "message": null,
+      "name": "masked_store.rt",
+      "predicted": {
+        "A": {
+          "threads_1": 2.062,
+          "threads_2": 2.062,
+          "threads_4": 4.125
+        }
+      },
+      "rounds": {
+        "threads_1": [
+          2,
+          4
+        ],
+        "threads_2": [
+          2,
+          4
+        ],
+        "threads_4": [
+          2,
+          4
+        ]
+      },
+      "status": "ok",
+      "unit": 1
+    },
+    {
+      "calibrates": null,
+      "class": "held_out",
+      "kind": 0,
+      "limiting": {
+        "threads_1": [
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 6609
+          },
+          {
+            "constraint": "dependency",
+            "context_cycles": 1200
+          }
+        ],
+        "threads_2": [
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 12553
+          },
+          {
+            "constraint": "dependency",
+            "context_cycles": 2412
+          }
+        ],
+        "threads_4": [
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 24423
+          },
+          {
+            "constraint": "dependency",
+            "context_cycles": 5687
+          }
+        ]
+      },
+      "measured": {
+        "per_core_at_4": 2.04,
+        "table": "S6-03 full table",
+        "threads_1": 4.09,
+        "threads_2": 4.08,
+        "threads_4": 8.14
+      },
+      "message": null,
+      "name": "unpack.rt",
+      "predicted": {
+        "A": {
+          "threads_1": 14.062,
+          "threads_2": 14.062,
+          "threads_4": 14.062
+        }
+      },
+      "rounds": {
+        "threads_1": [
+          2,
+          4
+        ],
+        "threads_2": [
+          2,
+          4
+        ],
+        "threads_4": [
+          2,
+          4
+        ]
+      },
+      "status": "ok",
+      "unit": 2
+    },
+    {
+      "calibrates": null,
+      "class": "held_out",
+      "kind": 0,
+      "limiting": {
+        "threads_1": [
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 3689
+          },
+          {
+            "constraint": "spacing",
+            "context_cycles": 151
+          }
+        ],
+        "threads_2": [
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 6713
+          },
+          {
+            "constraint": "spacing",
+            "context_cycles": 304
+          }
+        ],
+        "threads_4": [
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 12743
+          },
+          {
+            "constraint": "not_picked",
+            "context_cycles": 1068
+          }
+        ]
+      },
+      "measured": {
+        "per_core_at_4": 1.03,
+        "table": "S6-03 full table",
+        "threads_1": 2.08,
+        "threads_2": 2.07,
+        "threads_4": 4.13
+      },
+      "message": null,
+      "name": "convert_up.rt",
+      "predicted": {
+        "A": {
+          "threads_1": 2.062,
+          "threads_2": 2.062,
+          "threads_4": 4.125
+        }
+      },
+      "rounds": {
+        "threads_1": [
+          2,
+          4
+        ],
+        "threads_2": [
+          2,
+          4
+        ],
+        "threads_4": [
+          2,
+          4
+        ]
+      },
+      "status": "ok",
+      "unit": 1
+    },
+    {
+      "calibrates": null,
+      "class": "held_out",
+      "kind": 0,
+      "limiting": {
+        "threads_1": [
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 749
+          },
+          {
+            "constraint": "spacing",
+            "context_cycles": 158
+          }
+        ],
+        "threads_2": [
+          {
+            "constraint": "outstanding_limit",
+            "context_cycles": 938
+          },
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 814
+          }
+        ],
+        "threads_4": [
+          {
+            "constraint": "outstanding_limit",
+            "context_cycles": 4701
+          },
+          {
+            "constraint": "not_picked",
+            "context_cycles": 1145
+          }
+        ]
+      },
+      "measured": {
+        "per_core_at_4": 1.03,
+        "table": "S6-03 full table",
+        "threads_1": 2.08,
+        "threads_2": 2.07,
+        "threads_4": 4.13
+      },
+      "message": null,
+      "name": "convert_down.rt",
+      "predicted": {
+        "A": {
+          "threads_1": 2.062,
+          "threads_2": 2.062,
+          "threads_4": 4.125
+        }
+      },
+      "rounds": {
+        "threads_1": [
+          2,
+          4
+        ],
+        "threads_2": [
+          2,
+          4
+        ],
+        "threads_4": [
+          2,
+          4
+        ]
+      },
+      "status": "ok",
+      "unit": 1
+    },
+    {
+      "calibrates": null,
+      "class": "held_out",
+      "kind": 0,
+      "limiting": {
+        "threads_1": [
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 749
+          },
+          {
+            "constraint": "dependency",
+            "context_cycles": 553
+          }
+        ],
+        "threads_2": [
+          {
+            "constraint": "dependency",
+            "context_cycles": 907
+          },
+          {
+            "constraint": "outstanding_limit",
+            "context_cycles": 896
+          }
+        ],
+        "threads_4": [
+          {
+            "constraint": "outstanding_limit",
+            "context_cycles": 4496
+          },
+          {
+            "constraint": "dependency",
+            "context_cycles": 2676
+          }
+        ]
+      },
+      "measured": {
+        "per_core_at_4": 1.07,
+        "table": "S6-03 full table",
+        "threads_1": 5.09,
+        "threads_2": 4.2,
+        "threads_4": 4.26
+      },
+      "message": null,
+      "name": "spill_reload.rt",
+      "predicted": {
+        "A": {
+          "threads_1": 5.062,
+          "threads_2": 5.094,
+          "threads_4": 8.125
+        }
+      },
+      "rounds": {
+        "threads_1": [
+          2,
+          4
+        ],
+        "threads_2": [
+          2,
+          4
+        ],
+        "threads_4": [
+          2,
+          4
+        ]
+      },
+      "status": "ok",
+      "unit": 2
+    },
+    {
+      "calibrates": null,
+      "class": "held_out",
+      "kind": 0,
+      "limiting": {
+        "threads_1": [
+          {
+            "constraint": "dependency",
+            "context_cycles": 1775
+          },
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 749
+          }
+        ],
+        "threads_2": [
+          {
+            "constraint": "dependency",
+            "context_cycles": 3578
+          },
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 814
+          }
+        ],
+        "threads_4": [
+          {
+            "constraint": "dependency",
+            "context_cycles": 8085
+          },
+          {
+            "constraint": "spacing",
+            "context_cycles": 1158
+          }
+        ]
+      },
+      "measured": {
+        "per_core_at_4": 3.29,
+        "table": "S6-03 full table",
+        "threads_1": 12.11,
+        "threads_2": 12.17,
+        "threads_4": 13.15
+      },
+      "message": null,
+      "name": "masked_load_sparse.lat",
+      "predicted": {
+        "A": {
+          "threads_1": 15.0,
+          "threads_2": 15.0,
+          "threads_4": 15.0
+        }
+      },
+      "rounds": {
+        "threads_1": [
+          2,
+          4
+        ],
+        "threads_2": [
+          2,
+          4
+        ],
+        "threads_4": [
+          2,
+          4
+        ]
+      },
+      "status": "ok",
+      "unit": 2
+    },
+    {
+      "calibrates": null,
+      "class": "held_out",
+      "kind": 0,
+      "limiting": {
+        "threads_1": [
+          {
+            "constraint": "dependency",
+            "context_cycles": 1775
+          },
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 749
+          }
+        ],
+        "threads_2": [
+          {
+            "constraint": "dependency",
+            "context_cycles": 3578
+          },
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 814
+          }
+        ],
+        "threads_4": [
+          {
+            "constraint": "dependency",
+            "context_cycles": 8085
+          },
+          {
+            "constraint": "spacing",
+            "context_cycles": 1158
+          }
+        ]
+      },
+      "measured": {
+        "per_core_at_4": 3.29,
+        "table": "S6-03 full table",
+        "threads_1": 12.11,
+        "threads_2": 12.18,
+        "threads_4": 13.14
+      },
+      "message": null,
+      "name": "masked_store_sparse.lat",
+      "predicted": {
+        "A": {
+          "threads_1": 15.0,
+          "threads_2": 15.0,
+          "threads_4": 15.0
+        }
+      },
+      "rounds": {
+        "threads_1": [
+          2,
+          4
+        ],
+        "threads_2": [
+          2,
+          4
+        ],
+        "threads_4": [
+          2,
+          4
+        ]
+      },
+      "status": "ok",
+      "unit": 2
+    },
+    {
+      "calibrates": null,
+      "class": "held_out",
+      "kind": 0,
+      "limiting": {
+        "threads_1": [
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 3689
+          },
+          {
+            "constraint": "spacing",
+            "context_cycles": 153
+          }
+        ],
+        "threads_2": [
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 6713
+          },
+          {
+            "constraint": "spacing",
+            "context_cycles": 308
+          }
+        ],
+        "threads_4": [
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 12743
+          },
+          {
+            "constraint": "not_picked",
+            "context_cycles": 1084
+          }
+        ]
+      },
+      "measured": {
+        "per_core_at_4": 1.03,
+        "table": "S6-03 full table",
+        "threads_1": 2.08,
+        "threads_2": 2.07,
+        "threads_4": 4.13
+      },
+      "message": null,
+      "name": "masked_load_sparse.rt",
+      "predicted": {
+        "A": {
+          "threads_1": 2.062,
+          "threads_2": 2.062,
+          "threads_4": 4.125
+        }
+      },
+      "rounds": {
+        "threads_1": [
+          2,
+          4
+        ],
+        "threads_2": [
+          2,
+          4
+        ],
+        "threads_4": [
+          2,
+          4
+        ]
+      },
+      "status": "ok",
+      "unit": 1
+    },
+    {
+      "calibrates": null,
+      "class": "held_out",
+      "kind": 0,
+      "limiting": {
+        "threads_1": [
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 749
+          },
+          {
+            "constraint": "spacing",
+            "context_cycles": 160
+          }
+        ],
+        "threads_2": [
+          {
+            "constraint": "outstanding_limit",
+            "context_cycles": 938
+          },
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 814
+          }
+        ],
+        "threads_4": [
+          {
+            "constraint": "outstanding_limit",
+            "context_cycles": 4701
+          },
+          {
+            "constraint": "not_picked",
+            "context_cycles": 1161
+          }
+        ]
+      },
+      "measured": {
+        "per_core_at_4": 1.03,
+        "table": "S6-03 full table",
+        "threads_1": 2.08,
+        "threads_2": 2.07,
+        "threads_4": 4.13
+      },
+      "message": null,
+      "name": "masked_store_sparse.rt",
+      "predicted": {
+        "A": {
+          "threads_1": 2.062,
+          "threads_2": 2.062,
+          "threads_4": 4.125
+        }
+      },
+      "rounds": {
+        "threads_1": [
+          2,
+          4
+        ],
+        "threads_2": [
+          2,
+          4
+        ],
+        "threads_4": [
+          2,
+          4
+        ]
+      },
+      "status": "ok",
+      "unit": 1
+    },
+    {
+      "calibrates": "latency.gather_first_line",
+      "class": "calibration",
+      "kind": 0,
+      "limiting": {
+        "threads_1": [
+          {
+            "constraint": "dependency",
+            "context_cycles": 1272
+          },
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 1140
+          }
+        ],
+        "threads_2": [
+          {
+            "constraint": "core_busy",
+            "context_cycles": 3072
+          },
+          {
+            "constraint": "dependency",
+            "context_cycles": 2300
+          }
+        ],
+        "threads_4": [
+          {
+            "constraint": "core_busy",
+            "context_cycles": 12222
+          },
+          {
+            "constraint": "dependency",
+            "context_cycles": 3175
+          }
+        ]
+      },
+      "measured": {
+        "per_core_at_4": 7.29,
+        "table": "S6-03 full table",
+        "threads_1": 15.1,
+        "threads_2": 18.27,
+        "threads_4": 29.17
+      },
+      "message": null,
+      "name": "gather_all.lat",
+      "predicted": {
+        "A": {
+          "threads_1": 21.125,
+          "threads_2": 26.156,
+          "threads_4": 36.5
+        }
+      },
+      "rounds": {
+        "threads_1": [
+          2,
+          4
+        ],
+        "threads_2": [
+          2,
+          4
+        ],
+        "threads_4": [
+          2,
+          4
+        ]
+      },
+      "status": "ok",
+      "unit": 0
+    },
+    {
+      "calibrates": "occupancy.gather_cycles_per_line",
+      "class": "calibration",
+      "kind": 0,
+      "limiting": {
+        "threads_1": [
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 1140
+          },
+          {
+            "constraint": "dependency",
+            "context_cycles": 1016
+          }
+        ],
+        "threads_2": [
+          {
+            "constraint": "core_busy",
+            "context_cycles": 3066
+          },
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 1597
+          }
+        ],
+        "threads_4": [
+          {
+            "constraint": "core_busy",
+            "context_cycles": 12264
+          },
+          {
+            "constraint": "dependency",
+            "context_cycles": 2455
+          }
+        ]
+      },
+      "measured": {
+        "per_core_at_4": 7.02,
+        "table": "S6-03 full table",
+        "threads_1": 7.08,
+        "threads_2": 14.09,
+        "threads_4": 28.1
+      },
+      "message": null,
+      "name": "gather_all.rt",
+      "predicted": {
+        "A": {
+          "threads_1": 19.125,
+          "threads_2": 22.188,
+          "threads_4": 36.25
+        }
+      },
+      "rounds": {
+        "threads_1": [
+          2,
+          4
+        ],
+        "threads_2": [
+          2,
+          4
+        ],
+        "threads_4": [
+          2,
+          4
+        ]
+      },
+      "status": "ok",
+      "unit": 0
+    },
+    {
+      "calibrates": null,
+      "class": "held_out",
+      "kind": 0,
+      "measured": {
+        "per_core_at_4": 127.29,
+        "table": "S6-03 full table",
+        "threads_1": 183.58,
+        "threads_2": 275.1,
+        "threads_4": 509.15
+      },
+      "message": "python time budget exhausted after 1497088 simulated cycles (partial, not a result)",
+      "name": "gather_scattered.lat",
+      "predicted": {},
+      "rounds": {
+        "threads_1": [
+          2,
+          4
+        ]
+      },
+      "status": "budget_exhausted",
+      "unit": 0
+    },
+    {
+      "calibrates": null,
+      "class": "held_out",
+      "kind": 0,
+      "measured": {
+        "per_core_at_4": 126.7,
+        "table": "S6-03 full table",
+        "threads_1": 175.14,
+        "threads_2": 259.58,
+        "threads_4": 506.78
+      },
+      "message": "python time budget exhausted after 1456128 simulated cycles (partial, not a result)",
+      "name": "gather_scattered.rt",
+      "predicted": {},
+      "rounds": {
+        "threads_1": [
+          2,
+          4
+        ]
+      },
+      "status": "budget_exhausted",
+      "unit": 0
+    },
+    {
+      "calibrates": null,
+      "class": "held_out",
+      "kind": 0,
+      "limiting": {
+        "threads_1": [
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 749
+          },
+          {
+            "constraint": "spacing",
+            "context_cycles": 163
+          }
+        ],
+        "threads_2": [
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 814
+          },
+          {
+            "constraint": "spacing",
+            "context_cycles": 328
+          }
+        ],
+        "threads_4": [
+          {
+            "constraint": "not_picked",
+            "context_cycles": 1316
+          },
+          {
+            "constraint": "dependency",
+            "context_cycles": 887
+          }
+        ]
+      },
+      "measured": {
+        "per_core_at_4": 1.05,
+        "table": "S6-03 full table",
+        "threads_1": 2.08,
+        "threads_2": 2.1,
+        "threads_4": 4.2
+      },
+      "message": null,
+      "name": "pair.vector_scalar",
+      "predicted": {
+        "A": {
+          "threads_1": 2.125,
+          "threads_2": 2.125,
+          "threads_4": 4.25
+        }
+      },
+      "rounds": {
+        "threads_1": [
+          2,
+          4
+        ],
+        "threads_2": [
+          2,
+          4
+        ],
+        "threads_4": [
+          2,
+          4
+        ]
+      },
+      "status": "ok",
+      "unit": 2
+    },
+    {
+      "calibrates": null,
+      "class": "held_out",
+      "kind": 0,
+      "limiting": {
+        "threads_1": [
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 749
+          },
+          {
+            "constraint": "spacing",
+            "context_cycles": 287
+          }
+        ],
+        "threads_2": [
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 814
+          },
+          {
+            "constraint": "spacing",
+            "context_cycles": 576
+          }
+        ],
+        "threads_4": [
+          {
+            "constraint": "not_picked",
+            "context_cycles": 2308
+          },
+          {
+            "constraint": "spacing",
+            "context_cycles": 1154
+          }
+        ]
+      },
+      "measured": {
+        "per_core_at_4": 2.05,
+        "table": "S6-03 full table",
+        "threads_1": 4.09,
+        "threads_2": 4.08,
+        "threads_4": 8.2
+      },
+      "message": null,
+      "name": "pair.vector_vector",
+      "predicted": {
+        "A": {
+          "threads_1": 4.062,
+          "threads_2": 4.062,
+          "threads_4": 8.125
+        }
+      },
+      "rounds": {
+        "threads_1": [
+          2,
+          4
+        ],
+        "threads_2": [
+          2,
+          4
+        ],
+        "threads_4": [
+          2,
+          4
+        ]
+      },
+      "status": "ok",
+      "unit": 2
+    },
+    {
+      "calibrates": null,
+      "class": "held_out",
+      "kind": 0,
+      "limiting": {
+        "threads_1": [
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 749
+          },
+          {
+            "constraint": "spacing",
+            "context_cycles": 162
+          }
+        ],
+        "threads_2": [
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 814
+          },
+          {
+            "constraint": "spacing",
+            "context_cycles": 326
+          }
+        ],
+        "threads_4": [
+          {
+            "constraint": "not_picked",
+            "context_cycles": 1308
+          },
+          {
+            "constraint": "dependency",
+            "context_cycles": 887
+          }
+        ]
+      },
+      "measured": {
+        "per_core_at_4": 1.05,
+        "table": "S6-03 full table",
+        "threads_1": 2.08,
+        "threads_2": 2.07,
+        "threads_4": 4.19
+      },
+      "message": null,
+      "name": "pair.scalar_scalar",
+      "predicted": {
+        "A": {
+          "threads_1": 2.125,
+          "threads_2": 2.125,
+          "threads_4": 4.25
+        }
+      },
+      "rounds": {
+        "threads_1": [
+          2,
+          4
+        ],
+        "threads_2": [
+          2,
+          4
+        ],
+        "threads_4": [
+          2,
+          4
+        ]
+      },
+      "status": "ok",
+      "unit": 2
+    },
+    {
+      "calibrates": "latency.agi_cycles",
+      "class": "calibration",
+      "kind": 0,
+      "limiting": {
+        "threads_1": [
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 1134
+          },
+          {
+            "constraint": "spacing",
+            "context_cycles": 162
+          }
+        ],
+        "threads_2": [
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 1603
+          },
+          {
+            "constraint": "spacing",
+            "context_cycles": 326
+          }
+        ],
+        "threads_4": [
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 2523
+          },
+          {
+            "constraint": "dependency",
+            "context_cycles": 887
+          }
+        ]
+      },
+      "measured": {
+        "per_core_at_4": 1.06,
+        "table": "S6-03 full table",
+        "threads_1": 3.11,
+        "threads_2": 3.17,
+        "threads_4": 4.26
+      },
+      "message": null,
+      "name": "agi.gap0",
+      "predicted": {
+        "A": {
+          "threads_1": 3.125,
+          "threads_2": 3.156,
+          "threads_4": 4.25
+        }
+      },
+      "rounds": {
+        "threads_1": [
+          2,
+          4
+        ],
+        "threads_2": [
+          2,
+          4
+        ],
+        "threads_4": [
+          2,
+          4
+        ]
+      },
+      "status": "ok",
+      "unit": 2
+    },
+    {
+      "calibrates": null,
+      "class": "held_out",
+      "kind": 0,
+      "limiting": {
+        "threads_1": [
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 1134
+          },
+          {
+            "constraint": "spacing",
+            "context_cycles": 286
+          }
+        ],
+        "threads_2": [
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 1603
+          },
+          {
+            "constraint": "spacing",
+            "context_cycles": 574
+          }
+        ],
+        "threads_4": [
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 2523
+          },
+          {
+            "constraint": "not_picked",
+            "context_cycles": 1452
+          }
+        ]
+      },
+      "measured": {
+        "per_core_at_4": 2.07,
+        "table": "S6-03 full table",
+        "threads_1": 4.15,
+        "threads_2": 4.15,
+        "threads_4": 8.27
+      },
+      "message": null,
+      "name": "agi.gap1",
+      "predicted": {
+        "A": {
+          "threads_1": 4.094,
+          "threads_2": 4.125,
+          "threads_4": 6.25
+        }
+      },
+      "rounds": {
+        "threads_1": [
+          2,
+          4
+        ],
+        "threads_2": [
+          2,
+          4
+        ],
+        "threads_4": [
+          2,
+          4
+        ]
+      },
+      "status": "ok",
+      "unit": 3
+    },
+    {
+      "calibrates": null,
+      "class": "held_out",
+      "kind": 0,
+      "limiting": {
+        "threads_1": [
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 1134
+          },
+          {
+            "constraint": "spacing",
+            "context_cycles": 290
+          }
+        ],
+        "threads_2": [
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 1603
+          },
+          {
+            "constraint": "spacing",
+            "context_cycles": 582
+          }
+        ],
+        "threads_4": [
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 2523
+          },
+          {
+            "constraint": "not_picked",
+            "context_cycles": 2180
+          }
+        ]
+      },
+      "measured": {
+        "per_core_at_4": 3.07,
+        "table": "S6-03 full table",
+        "threads_1": 6.16,
+        "threads_2": 6.16,
+        "threads_4": 12.27
+      },
+      "message": null,
+      "name": "agi.gap2",
+      "predicted": {
+        "A": {
+          "threads_1": 4.125,
+          "threads_2": 4.125,
+          "threads_4": 8.25
+        }
+      },
+      "rounds": {
+        "threads_1": [
+          2,
+          4
+        ],
+        "threads_2": [
+          2,
+          4
+        ],
+        "threads_4": [
+          2,
+          4
+        ]
+      },
+      "status": "ok",
+      "unit": 4
+    },
+    {
+      "calibrates": null,
+      "class": "held_out",
+      "kind": 0,
+      "limiting": {
+        "threads_1": [
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 1134
+          },
+          {
+            "constraint": "spacing",
+            "context_cycles": 353
+          }
+        ],
+        "threads_2": [
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 1603
+          },
+          {
+            "constraint": "spacing",
+            "context_cycles": 708
+          }
+        ],
+        "threads_4": [
+          {
+            "constraint": "not_picked",
+            "context_cycles": 2684
+          },
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 2523
+          }
+        ]
+      },
+      "measured": {
+        "per_core_at_4": 4.07,
+        "table": "S6-03 full table",
+        "threads_1": 8.18,
+        "threads_2": 8.16,
+        "threads_4": 16.28
+      },
+      "message": null,
+      "name": "agi.gap3",
+      "predicted": {
+        "A": {
+          "threads_1": 5.125,
+          "threads_2": 5.125,
+          "threads_4": 10.25
+        }
+      },
+      "rounds": {
+        "threads_1": [
+          2,
+          4
+        ],
+        "threads_2": [
+          2,
+          4
+        ],
+        "threads_4": [
+          2,
+          4
+        ]
+      },
+      "status": "ok",
+      "unit": 5
+    },
+    {
+      "calibrates": null,
+      "class": "held_out",
+      "kind": 0,
+      "limiting": {
+        "threads_1": [
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 1134
+          },
+          {
+            "constraint": "spacing",
+            "context_cycles": 418
+          }
+        ],
+        "threads_2": [
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 1603
+          },
+          {
+            "constraint": "spacing",
+            "context_cycles": 838
+          }
+        ],
+        "threads_4": [
+          {
+            "constraint": "not_picked",
+            "context_cycles": 3204
+          },
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 2523
+          }
+        ]
+      },
+      "measured": {
+        "per_core_at_4": 5.07,
+        "table": "S6-03 full table",
+        "threads_1": 10.19,
+        "threads_2": 10.18,
+        "threads_4": 20.29
+      },
+      "message": null,
+      "name": "agi.gap4",
+      "predicted": {
+        "A": {
+          "threads_1": 6.125,
+          "threads_2": 6.125,
+          "threads_4": 12.25
+        }
+      },
+      "rounds": {
+        "threads_1": [
+          2,
+          4
+        ],
+        "threads_2": [
+          2,
+          4
+        ],
+        "threads_4": [
+          2,
+          4
+        ]
+      },
+      "status": "ok",
+      "unit": 6
+    },
+    {
+      "calibrates": "latency.scalar_load_l1",
+      "class": "calibration",
+      "kind": 1,
+      "limiting": {
+        "threads_1": [
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 92001
+          },
+          {
+            "constraint": "spacing",
+            "context_cycles": 242
+          }
+        ],
+        "threads_2": [
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 92085
+          },
+          {
+            "constraint": "spacing",
+            "context_cycles": 470
+          }
+        ],
+        "threads_4": [
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 92235
+          },
+          {
+            "constraint": "dependency",
+            "context_cycles": 1631
+          }
+        ]
+      },
+      "measured": {
+        "per_core_at_4": 1.03,
+        "table": "S6-03 full table",
+        "threads_1": 3.03,
+        "threads_2": 3.08,
+        "threads_4": 4.13
+      },
+      "message": null,
+      "name": "l1.load_lat",
+      "predicted": {
+        "A": {
+          "threads_1": 3.031,
+          "threads_2": 3.062,
+          "threads_4": 4.125
+        },
+        "B_hwp": {
+          "threads_1": 3.031,
+          "threads_2": 3.031,
+          "threads_4": 3.031
+        }
+      },
+      "rounds": {
+        "threads_1": [
+          10,
+          14
+        ],
+        "threads_2": [
+          6,
+          10
+        ],
+        "threads_4": [
+          4,
+          8
+        ]
+      },
+      "status": "ok",
+      "unit": 1
+    },
+    {
+      "calibrates": null,
+      "class": "held_out",
+      "kind": 2,
+      "limiting": {
+        "threads_1": [
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 92001
+          },
+          {
+            "constraint": "spacing",
+            "context_cycles": 268
+          }
+        ],
+        "threads_2": [
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 92085
+          },
+          {
+            "constraint": "spacing",
+            "context_cycles": 506
+          }
+        ],
+        "threads_4": [
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 92235
+          },
+          {
+            "constraint": "not_picked",
+            "context_cycles": 1758
+          }
+        ]
+      },
+      "measured": {
+        "per_core_at_4": 1.1,
+        "table": "S6-03 full table",
+        "threads_1": 2.2,
+        "threads_2": 2.27,
+        "threads_4": 4.38
+      },
+      "message": null,
+      "name": "l1.load_rt",
+      "predicted": {
+        "A": {
+          "threads_1": 2.219,
+          "threads_2": 2.25,
+          "threads_4": 4.375
+        },
+        "B_hwp": {
+          "threads_1": 2.219,
+          "threads_2": 2.25,
+          "threads_4": 4.008
+        }
+      },
+      "rounds": {
+        "threads_1": [
+          10,
+          14
+        ],
+        "threads_2": [
+          6,
+          10
+        ],
+        "threads_4": [
+          4,
+          8
+        ]
+      },
+      "status": "ok",
+      "unit": 1
+    },
+    {
+      "calibrates": null,
+      "class": "held_out",
+      "kind": 2,
+      "limiting": {
+        "threads_1": [
+          {
+            "constraint": "outstanding_limit",
+            "context_cycles": 10728
+          },
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 749
+          }
+        ],
+        "threads_2": [
+          {
+            "constraint": "outstanding_limit",
+            "context_cycles": 21712
+          },
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 814
+          }
+        ],
+        "threads_4": [
+          {
+            "constraint": "outstanding_limit",
+            "context_cycles": 43537
+          },
+          {
+            "constraint": "not_picked",
+            "context_cycles": 2507
+          }
+        ]
+      },
+      "measured": {
+        "per_core_at_4": 1.1,
+        "table": "S6-03 full table",
+        "threads_1": 2.2,
+        "threads_2": 2.27,
+        "threads_4": 4.38
+      },
+      "message": null,
+      "name": "l1.store_normal",
+      "predicted": {
+        "A": {
+          "threads_1": 2.219,
+          "threads_2": 2.25,
+          "threads_4": 4.375
+        },
+        "B_hwp": {
+          "threads_1": 2.219,
+          "threads_2": 2.25,
+          "threads_4": 4.375
+        }
+      },
+      "rounds": {
+        "threads_1": [
+          10,
+          14
+        ],
+        "threads_2": [
+          6,
+          10
+        ],
+        "threads_4": [
+          4,
+          8
+        ]
+      },
+      "status": "ok",
+      "unit": 1
+    },
+    {
+      "calibrates": null,
+      "class": "held_out",
+      "kind": 2,
+      "limiting": {
+        "threads_1": [
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 749
+          },
+          {
+            "constraint": "spacing",
+            "context_cycles": 516
+          }
+        ],
+        "threads_2": [
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 814
+          },
+          {
+            "constraint": "spacing",
+            "context_cycles": 754
+          }
+        ],
+        "threads_4": [
+          {
+            "constraint": "not_picked",
+            "context_cycles": 2428
+          },
+          {
+            "constraint": "spacing",
+            "context_cycles": 1230
+          }
+        ]
+      },
+      "measured": {
+        "per_core_at_4": 9.04,
+        "table": "S6-03 full table",
+        "threads_1": 27.19,
+        "threads_2": 30.09,
+        "threads_4": 36.16
+      },
+      "message": null,
+      "name": "l1.store_stream",
+      "predicted": {
+        "A": {
+          "threads_1": 2.219,
+          "threads_2": 2.219,
+          "threads_4": 4.375
+        },
+        "B_hwp": {
+          "threads_1": 2.219,
+          "threads_2": 2.219,
+          "threads_4": 4.375
+        }
+      },
+      "rounds": {
+        "threads_1": [
+          10,
+          14
+        ],
+        "threads_2": [
+          6,
+          10
+        ],
+        "threads_4": [
+          4,
+          8
+        ]
+      },
+      "status": "ok",
+      "unit": 1
+    },
+    {
+      "calibrates": "latency.l2_hit",
+      "class": "calibration",
+      "kind": 1,
+      "limiting": {
+        "threads_1": [
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 1465249
+          },
+          {
+            "constraint": "spacing",
+            "context_cycles": 296
+          }
+        ],
+        "threads_2": [
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 1469867
+          },
+          {
+            "constraint": "spacing",
+            "context_cycles": 338
+          }
+        ],
+        "threads_4": [
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 1479167
+          },
+          {
+            "constraint": "dependency",
+            "context_cycles": 887
+          }
+        ]
+      },
+      "measured": {
+        "per_core_at_4": 6.42,
+        "table": "S6-03 full table",
+        "threads_1": 24.42,
+        "threads_2": 24.93,
+        "threads_4": 25.68
+      },
+      "message": null,
+      "name": "l2.load_lat",
+      "predicted": {
+        "A": {
+          "threads_1": 24.125,
+          "threads_2": 24.125,
+          "threads_4": 24.125
+        },
+        "B_hwp": {
+          "threads_1": 24.125,
+          "threads_2": 24.352,
+          "threads_4": 23.445
+        }
+      },
+      "rounds": {
+        "threads_1": [
+          130,
+          134
+        ],
+        "threads_2": [
+          66,
+          70
+        ],
+        "threads_4": [
+          34,
+          38
+        ]
+      },
+      "status": "ok",
+      "unit": 1
+    },
+    {
+      "calibrates": null,
+      "class": "held_out",
+      "kind": 2,
+      "limiting": {
+        "threads_1": [
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 1465249
+          },
+          {
+            "constraint": "spacing",
+            "context_cycles": 562
+          }
+        ],
+        "threads_2": [
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 1469801
+          },
+          {
+            "constraint": "spacing",
+            "context_cycles": 614
+          }
+        ],
+        "threads_4": [
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 1478887
+          },
+          {
+            "constraint": "dependency",
+            "context_cycles": 887
+          }
+        ]
+      },
+      "measured": {
+        "per_core_at_4": 5.96,
+        "table": "S6-03 full table",
+        "threads_1": 23.38,
+        "threads_2": 23.51,
+        "threads_4": 23.85
+      },
+      "message": null,
+      "name": "l2.load_rt",
+      "predicted": {
+        "A": {
+          "threads_1": 24.281,
+          "threads_2": 24.281,
+          "threads_4": 24.281
+        },
+        "B_hwp": {
+          "threads_1": 24.281,
+          "threads_2": 24.312,
+          "threads_4": 24.344
+        }
+      },
+      "rounds": {
+        "threads_1": [
+          130,
+          134
+        ],
+        "threads_2": [
+          66,
+          70
+        ],
+        "threads_4": [
+          34,
+          38
+        ]
+      },
+      "status": "ok",
+      "unit": 1
+    },
+    {
+      "calibrates": null,
+      "class": "held_out",
+      "kind": 2,
+      "limiting": {
+        "threads_1": [
+          {
+            "constraint": "outstanding_limit",
+            "context_cycles": 175194
+          },
+          {
+            "constraint": "spacing",
+            "context_cycles": 4716
+          }
+        ],
+        "threads_2": [
+          {
+            "constraint": "outstanding_limit",
+            "context_cycles": 355551
+          },
+          {
+            "constraint": "spacing",
+            "context_cycles": 4954
+          }
+        ],
+        "threads_4": [
+          {
+            "constraint": "outstanding_limit",
+            "context_cycles": 717278
+          },
+          {
+            "constraint": "not_picked",
+            "context_cycles": 14622
+          }
+        ]
+      },
+      "measured": {
+        "per_core_at_4": 6.26,
+        "table": "S6-03 full table",
+        "threads_1": 23.39,
+        "threads_2": 23.66,
+        "threads_4": 25.04
+      },
+      "message": null,
+      "name": "l2.store_normal",
+      "predicted": {
+        "A": {
+          "threads_1": 3.0,
+          "threads_2": 6.0,
+          "threads_4": 12.0
+        },
+        "B_hwp": {
+          "threads_1": 3.0,
+          "threads_2": 6.0,
+          "threads_4": 12.0
+        }
+      },
+      "rounds": {
+        "threads_1": [
+          130,
+          134
+        ],
+        "threads_2": [
+          66,
+          70
+        ],
+        "threads_4": [
+          34,
+          38
+        ]
+      },
+      "status": "ok",
+      "unit": 1
+    },
+    {
+      "calibrates": null,
+      "class": "held_out",
+      "kind": 2,
+      "limiting": {
+        "threads_1": [
+          {
+            "constraint": "spacing",
+            "context_cycles": 4716
+          },
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 749
+          }
+        ],
+        "threads_2": [
+          {
+            "constraint": "core_issue_slots",
+            "detail": "issue utilization 0.91: the core issues nearly every cycle"
+          },
+          {
+            "constraint": "spacing",
+            "context_cycles": 4954
+          }
+        ],
+        "threads_4": [
+          {
+            "constraint": "core_issue_slots",
+            "detail": "issue utilization 0.93: the core issues nearly every cycle"
+          },
+          {
+            "constraint": "not_picked",
+            "context_cycles": 10708
+          }
+        ]
+      },
+      "measured": {
+        "per_core_at_4": 9.07,
+        "table": "S6-03 full table",
+        "threads_1": 27.49,
+        "threads_2": 30.22,
+        "threads_4": 36.29
+      },
+      "message": null,
+      "name": "l2.store_stream",
+      "predicted": {
+        "A": {
+          "threads_1": 2.219,
+          "threads_2": 2.219,
+          "threads_4": 4.375
+        },
+        "B_hwp": {
+          "threads_1": 2.219,
+          "threads_2": 2.219,
+          "threads_4": 4.375
+        }
+      },
+      "rounds": {
+        "threads_1": [
+          130,
+          134
+        ],
+        "threads_2": [
+          66,
+          70
+        ],
+        "threads_4": [
+          34,
+          38
+        ]
+      },
+      "status": "ok",
+      "unit": 1
+    },
+    {
+      "calibrates": "latency.memory",
+      "class": "calibration",
+      "kind": 1,
+      "limiting": {
+        "threads_1": [
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 50029
+          },
+          {
+            "constraint": "spacing",
+            "context_cycles": 36
+          }
+        ],
+        "threads_2": [
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 99259
+          },
+          {
+            "constraint": "spacing",
+            "context_cycles": 74
+          }
+        ],
+        "threads_4": [
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 198231
+          },
+          {
+            "constraint": "dependency",
+            "context_cycles": 887
+          }
+        ]
+      },
+      "measured": {
+        "per_core_at_4": 91.44,
+        "table": "S6-03 full table",
+        "threads_1": 356.53,
+        "threads_2": 357.96,
+        "threads_4": 365.76
+      },
+      "message": null,
+      "name": "memory.load_lat",
+      "predicted": {
+        "A": {
+          "threads_1": 386.125,
+          "threads_2": 385.672,
+          "threads_4": 386.5
+        },
+        "B_hwp": {
+          "threads_1": 386.125,
+          "threads_2": 385.672,
+          "threads_4": 387.609
+        }
+      },
+      "rounds": {
+        "threads_1": [
+          2,
+          4
+        ],
+        "threads_2": [
+          2,
+          4
+        ],
+        "threads_4": [
+          2,
+          4
+        ]
+      },
+      "status": "ok",
+      "unit": 1
+    },
+    {
+      "calibrates": "memory.core_service_cycles_per_line",
+      "class": "calibration",
+      "kind": 2,
+      "limiting": {
+        "threads_1": [
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 46375
+          },
+          {
+            "constraint": "spacing",
+            "context_cycles": 42
+          }
+        ],
+        "threads_2": [
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 92085
+          },
+          {
+            "constraint": "spacing",
+            "context_cycles": 86
+          }
+        ],
+        "threads_4": [
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 183579
+          },
+          {
+            "constraint": "dependency",
+            "context_cycles": 887
+          }
+        ]
+      },
+      "measured": {
+        "per_core_at_4": 19.48,
+        "table": "S6-03 full table",
+        "threads_1": 37.35,
+        "threads_2": 47.78,
+        "threads_4": 77.92
+      },
+      "message": null,
+      "name": "memory.load_rt",
+      "predicted": {
+        "A": {
+          "threads_1": 357.734,
+          "threads_2": 357.734,
+          "threads_4": 358.109
+        },
+        "B_hwp": {
+          "threads_1": 84.25,
+          "threads_2": 84.375,
+          "threads_4": 88.281
+        }
+      },
+      "rounds": {
+        "threads_1": [
+          2,
+          4
+        ],
+        "threads_2": [
+          2,
+          4
+        ],
+        "threads_4": [
+          2,
+          4
+        ]
+      },
+      "status": "ok",
+      "unit": 1
+    },
+    {
+      "calibrates": null,
+      "class": "held_out",
+      "kind": 2,
+      "limiting": {
+        "threads_1": [
+          {
+            "constraint": "outstanding_limit",
+            "context_cycles": 5260
+          },
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 749
+          }
+        ],
+        "threads_2": [
+          {
+            "constraint": "outstanding_limit",
+            "context_cycles": 21712
+          },
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 814
+          }
+        ],
+        "threads_4": [
+          {
+            "constraint": "outstanding_limit",
+            "context_cycles": 89049
+          },
+          {
+            "constraint": "not_picked",
+            "context_cycles": 1746
+          }
+        ]
+      },
+      "measured": {
+        "per_core_at_4": 19.96,
+        "table": "S6-03 full table",
+        "threads_1": 38.28,
+        "threads_2": 48.93,
+        "threads_4": 79.83
+      },
+      "message": null,
+      "name": "memory.store_normal",
+      "predicted": {
+        "A": {
+          "threads_1": 44.938,
+          "threads_2": 89.703,
+          "threads_4": 183.25
+        },
+        "B_hwp": {
+          "threads_1": 44.938,
+          "threads_2": 89.703,
+          "threads_4": 183.25
+        }
+      },
+      "rounds": {
+        "threads_1": [
+          2,
+          4
+        ],
+        "threads_2": [
+          2,
+          4
+        ],
+        "threads_4": [
+          2,
+          4
+        ]
+      },
+      "status": "ok",
+      "unit": 1
+    },
+    {
+      "calibrates": null,
+      "class": "held_out",
+      "kind": 2,
+      "limiting": {
+        "threads_1": [
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 749
+          },
+          {
+            "constraint": "spacing",
+            "context_cycles": 166
+          }
+        ],
+        "threads_2": [
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 814
+          },
+          {
+            "constraint": "spacing",
+            "context_cycles": 334
+          }
+        ],
+        "threads_4": [
+          {
+            "constraint": "not_picked",
+            "context_cycles": 1324
+          },
+          {
+            "constraint": "dependency",
+            "context_cycles": 887
+          }
+        ]
+      },
+      "measured": {
+        "per_core_at_4": 40.07,
+        "table": "S6-03 full table",
+        "threads_1": 157.12,
+        "threads_2": 158.07,
+        "threads_4": 160.26
+      },
+      "message": null,
+      "name": "memory.store_stream",
+      "predicted": {
+        "A": {
+          "threads_1": 2.219,
+          "threads_2": 2.219,
+          "threads_4": 4.375
+        },
+        "B_hwp": {
+          "threads_1": 2.219,
+          "threads_2": 2.219,
+          "threads_4": 4.375
+        }
+      },
+      "rounds": {
+        "threads_1": [
+          2,
+          4
+        ],
+        "threads_2": [
+          2,
+          4
+        ],
+        "threads_4": [
+          2,
+          4
+        ]
+      },
+      "status": "ok",
+      "unit": 1
+    },
+    {
+      "calibrates": null,
+      "class": "held_out",
+      "kind": 0,
+      "limiting": {
+        "threads_1": [
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 749
+          },
+          {
+            "constraint": "spacing",
+            "context_cycles": 159
+          }
+        ],
+        "threads_2": [
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 814
+          },
+          {
+            "constraint": "spacing",
+            "context_cycles": 320
+          }
+        ],
+        "threads_4": [
+          {
+            "constraint": "not_picked",
+            "context_cycles": 1284
+          },
+          {
+            "constraint": "dependency",
+            "context_cycles": 887
+          }
+        ]
+      },
+      "measured": {
+        "table": "S8-01 C2 (ticks per instruction or pair)",
+        "threads_1": 2.08,
+        "threads_2": 2.07,
+        "threads_4": 4.19
+      },
+      "message": null,
+      "name": "c2.vector",
+      "predicted": {
+        "A": {
+          "threads_1": 2.062,
+          "threads_2": 2.062,
+          "threads_4": 4.125
+        }
+      },
+      "rounds": {
+        "threads_1": [
+          2,
+          4
+        ],
+        "threads_2": [
+          2,
+          4
+        ],
+        "threads_4": [
+          2,
+          4
+        ]
+      },
+      "status": "ok",
+      "unit": 1
+    },
+    {
+      "calibrates": null,
+      "class": "held_out",
+      "kind": 0,
+      "limiting": {
+        "threads_1": [
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 749
+          },
+          {
+            "constraint": "outstanding_limit",
+            "context_cycles": 367
+          }
+        ],
+        "threads_2": [
+          {
+            "constraint": "outstanding_limit",
+            "context_cycles": 1449
+          },
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 814
+          }
+        ],
+        "threads_4": [
+          {
+            "constraint": "outstanding_limit",
+            "context_cycles": 5675
+          },
+          {
+            "constraint": "dependency",
+            "context_cycles": 887
+          }
+        ]
+      },
+      "measured": {
+        "table": "S8-01 C2 (ticks per instruction or pair)",
+        "threads_1": 1.07,
+        "threads_2": 1.09,
+        "threads_4": 2.13
+      },
+      "message": null,
+      "name": "c2.prefetch0",
+      "predicted": {
+        "A": {
+          "threads_1": 1.125,
+          "threads_2": 1.125,
+          "threads_4": 2.25
+        }
+      },
+      "rounds": {
+        "threads_1": [
+          2,
+          4
+        ],
+        "threads_2": [
+          2,
+          4
+        ],
+        "threads_4": [
+          2,
+          4
+        ]
+      },
+      "status": "ok",
+      "unit": 1
+    },
+    {
+      "calibrates": "occupancy.vprefetch_l2_core_cycles",
+      "class": "calibration",
+      "kind": 0,
+      "limiting": {
+        "threads_1": [
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 749
+          },
+          {
+            "constraint": "outstanding_limit",
+            "context_cycles": 361
+          }
+        ],
+        "threads_2": [
+          {
+            "constraint": "outstanding_limit",
+            "context_cycles": 1400
+          },
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 814
+          }
+        ],
+        "threads_4": [
+          {
+            "constraint": "outstanding_limit",
+            "context_cycles": 5556
+          },
+          {
+            "constraint": "not_picked",
+            "context_cycles": 1733
+          }
+        ]
+      },
+      "measured": {
+        "table": "S8-01 C2 (ticks per instruction or pair)",
+        "threads_1": 1.92,
+        "threads_2": 4.52,
+        "threads_4": 9.01
+      },
+      "message": null,
+      "name": "c2.prefetch1",
+      "predicted": {
+        "A": {
+          "threads_1": 2.062,
+          "threads_2": 4.0,
+          "threads_4": 8.0
+        }
+      },
+      "rounds": {
+        "threads_1": [
+          2,
+          4
+        ],
+        "threads_2": [
+          2,
+          4
+        ],
+        "threads_4": [
+          2,
+          4
+        ]
+      },
+      "status": "ok",
+      "unit": 1
+    },
+    {
+      "calibrates": null,
+      "class": "held_out",
+      "kind": 0,
+      "limiting": {
+        "threads_1": [
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 749
+          },
+          {
+            "constraint": "outstanding_limit",
+            "context_cycles": 359
+          }
+        ],
+        "threads_2": [
+          {
+            "constraint": "outstanding_limit",
+            "context_cycles": 1425
+          },
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 814
+          }
+        ],
+        "threads_4": [
+          {
+            "constraint": "outstanding_limit",
+            "context_cycles": 5614
+          },
+          {
+            "constraint": "not_picked",
+            "context_cycles": 1346
+          }
+        ]
+      },
+      "measured": {
+        "table": "S8-01 C2 (ticks per instruction or pair)",
+        "threads_1": 2.08,
+        "threads_2": 2.2,
+        "threads_4": 4.13
+      },
+      "message": null,
+      "name": "c2.vector_prefetch0",
+      "predicted": {
+        "A": {
+          "threads_1": 2.125,
+          "threads_2": 2.125,
+          "threads_4": 4.25
+        }
+      },
+      "rounds": {
+        "threads_1": [
+          2,
+          4
+        ],
+        "threads_2": [
+          2,
+          4
+        ],
+        "threads_4": [
+          2,
+          4
+        ]
+      },
+      "status": "ok",
+      "unit": 2
+    },
+    {
+      "calibrates": null,
+      "class": "held_out",
+      "kind": 0,
+      "limiting": {
+        "threads_1": [
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 749
+          },
+          {
+            "constraint": "outstanding_limit",
+            "context_cycles": 359
+          }
+        ],
+        "threads_2": [
+          {
+            "constraint": "outstanding_limit",
+            "context_cycles": 1386
+          },
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 814
+          }
+        ],
+        "threads_4": [
+          {
+            "constraint": "outstanding_limit",
+            "context_cycles": 5512
+          },
+          {
+            "constraint": "not_picked",
+            "context_cycles": 1307
+          }
+        ]
+      },
+      "measured": {
+        "table": "S8-01 C2 (ticks per instruction or pair)",
+        "threads_1": 2.09,
+        "threads_2": 4.52,
+        "threads_4": 9.02
+      },
+      "message": null,
+      "name": "c2.vector_prefetch1",
+      "predicted": {
+        "A": {
+          "threads_1": 2.125,
+          "threads_2": 4.031,
+          "threads_4": 8.016
+        }
+      },
+      "rounds": {
+        "threads_1": [
+          2,
+          4
+        ],
+        "threads_2": [
+          2,
+          4
+        ],
+        "threads_4": [
+          2,
+          4
+        ]
+      },
+      "status": "ok",
+      "unit": 2
+    },
+    {
+      "calibrates": null,
+      "class": "held_out",
+      "kind": 0,
+      "limiting": {
+        "threads_1": [
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 12074
+          },
+          {
+            "constraint": "dependency",
+            "context_cycles": 310
+          }
+        ],
+        "threads_2": [
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 23483
+          },
+          {
+            "constraint": "dependency",
+            "context_cycles": 632
+          }
+        ],
+        "threads_4": [
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 46283
+          },
+          {
+            "constraint": "dependency",
+            "context_cycles": 2127
+          }
+        ]
+      },
+      "measured": {
+        "table": "S8-01 C7 (ticks per 16-lane update)",
+        "threads_4": 4.13
+      },
+      "message": null,
+      "name": "c7.reduce.a1",
+      "predicted": {
+        "A": {
+          "threads_1": 4.0,
+          "threads_2": 4.0,
+          "threads_4": 4.125
+        }
+      },
+      "rounds": {
+        "threads_1": [
+          2,
+          4
+        ],
+        "threads_2": [
+          2,
+          4
+        ],
+        "threads_4": [
+          2,
+          4
+        ]
+      },
+      "status": "ok",
+      "unit": 1
+    },
+    {
+      "calibrates": null,
+      "class": "held_out",
+      "kind": 0,
+      "limiting": {
+        "threads_1": [
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 12074
+          },
+          {
+            "constraint": "spacing",
+            "context_cycles": 132
+          }
+        ],
+        "threads_2": [
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 23483
+          },
+          {
+            "constraint": "spacing",
+            "context_cycles": 266
+          }
+        ],
+        "threads_4": [
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 46283
+          },
+          {
+            "constraint": "not_picked",
+            "context_cycles": 913
+          }
+        ]
+      },
+      "measured": {
+        "table": "S8-01 C7 (ticks per 16-lane update)",
+        "threads_4": 4.13
+      },
+      "message": null,
+      "name": "c7.reduce.a2",
+      "predicted": {
+        "A": {
+          "threads_1": 2.062,
+          "threads_2": 2.062,
+          "threads_4": 4.125
+        }
+      },
+      "rounds": {
+        "threads_1": [
+          2,
+          4
+        ],
+        "threads_2": [
+          2,
+          4
+        ],
+        "threads_4": [
+          2,
+          4
+        ]
+      },
+      "status": "ok",
+      "unit": 1
+    },
+    {
+      "calibrates": null,
+      "class": "held_out",
+      "kind": 0,
+      "limiting": {
+        "threads_1": [
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 749
+          },
+          {
+            "constraint": "spacing",
+            "context_cycles": 284
+          }
+        ],
+        "threads_2": [
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 814
+          },
+          {
+            "constraint": "spacing",
+            "context_cycles": 570
+          }
+        ],
+        "threads_4": [
+          {
+            "constraint": "not_picked",
+            "context_cycles": 2276
+          },
+          {
+            "constraint": "spacing",
+            "context_cycles": 1142
+          }
+        ]
+      },
+      "measured": {
+        "table": "S8-01 C9 register chain (ticks per update)",
+        "threads_1": 4.02,
+        "threads_2": 4.02
+      },
+      "message": null,
+      "name": "c9.vector.u1",
+      "predicted": {
+        "A": {
+          "threads_1": 4.0,
+          "threads_2": 4.0,
+          "threads_4": 8.0
+        }
+      },
+      "rounds": {
+        "threads_1": [
+          2,
+          4
+        ],
+        "threads_2": [
+          2,
+          4
+        ],
+        "threads_4": [
+          2,
+          4
+        ]
+      },
+      "status": "ok",
+      "unit": 1
+    },
+    {
+      "calibrates": null,
+      "class": "held_out",
+      "kind": 0,
+      "limiting": {
+        "threads_1": [
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 749
+          },
+          {
+            "constraint": "spacing",
+            "context_cycles": 220
+          }
+        ],
+        "threads_2": [
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 814
+          },
+          {
+            "constraint": "spacing",
+            "context_cycles": 442
+          }
+        ],
+        "threads_4": [
+          {
+            "constraint": "not_picked",
+            "context_cycles": 1772
+          },
+          {
+            "constraint": "dependency",
+            "context_cycles": 887
+          }
+        ]
+      },
+      "measured": {
+        "table": "S8-01 C9 register chain (ticks per update)",
+        "threads_1": 3.02,
+        "threads_2": 3.01
+      },
+      "message": null,
+      "name": "c9.vector.u2",
+      "predicted": {
+        "A": {
+          "threads_1": 3.0,
+          "threads_2": 3.0,
+          "threads_4": 6.0
+        }
+      },
+      "rounds": {
+        "threads_1": [
+          2,
+          4
+        ],
+        "threads_2": [
+          2,
+          4
+        ],
+        "threads_4": [
+          2,
+          4
+        ]
+      },
+      "status": "ok",
+      "unit": 1
+    },
+    {
+      "calibrates": null,
+      "class": "held_out",
+      "kind": 0,
+      "limiting": {
+        "threads_1": [
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 749
+          },
+          {
+            "constraint": "spacing",
+            "context_cycles": 188
+          }
+        ],
+        "threads_2": [
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 814
+          },
+          {
+            "constraint": "spacing",
+            "context_cycles": 378
+          }
+        ],
+        "threads_4": [
+          {
+            "constraint": "not_picked",
+            "context_cycles": 1508
+          },
+          {
+            "constraint": "dependency",
+            "context_cycles": 887
+          }
+        ]
+      },
+      "measured": {
+        "table": "S8-01 C9 register chain (ticks per update)",
+        "threads_1": 2.52,
+        "threads_2": 2.51
+      },
+      "message": null,
+      "name": "c9.vector.u4",
+      "predicted": {
+        "A": {
+          "threads_1": 2.5,
+          "threads_2": 2.5,
+          "threads_4": 5.0
+        }
+      },
+      "rounds": {
+        "threads_1": [
+          2,
+          4
+        ],
+        "threads_2": [
+          2,
+          4
+        ],
+        "threads_4": [
+          2,
+          4
+        ]
+      },
+      "status": "ok",
+      "unit": 1
+    },
+    {
+      "calibrates": null,
+      "class": "held_out",
+      "kind": 0,
+      "limiting": {
+        "threads_1": [
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 1131
+          },
+          {
+            "constraint": "spacing",
+            "context_cycles": 410
+          }
+        ],
+        "threads_2": [
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 1597
+          },
+          {
+            "constraint": "spacing",
+            "context_cycles": 822
+          }
+        ],
+        "threads_4": [
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 2511
+          },
+          {
+            "constraint": "not_picked",
+            "context_cycles": 2188
+          }
+        ]
+      },
+      "measured": {
+        "table": "S8-12 C9 memory chain rerun (ticks per load-add-store link)",
+        "threads_1": 11.07,
+        "threads_2": 13.08
+      },
+      "message": null,
+      "name": "c9.memory.u1",
+      "predicted": {
+        "A": {
+          "threads_1": 8.0,
+          "threads_2": 8.0,
+          "threads_4": 12.0
+        }
+      },
+      "rounds": {
+        "threads_1": [
+          2,
+          4
+        ],
+        "threads_2": [
+          2,
+          4
+        ],
+        "threads_4": [
+          2,
+          4
+        ]
+      },
+      "status": "ok",
+      "unit": 2
+    },
+    {
+      "calibrates": null,
+      "class": "held_out",
+      "kind": 0,
+      "limiting": {
+        "threads_1": [
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 1484
+          },
+          {
+            "constraint": "spacing",
+            "context_cycles": 345
+          }
+        ],
+        "threads_2": [
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 2303
+          },
+          {
+            "constraint": "spacing",
+            "context_cycles": 692
+          }
+        ],
+        "threads_4": [
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 3923
+          },
+          {
+            "constraint": "dependency",
+            "context_cycles": 1927
+          }
+        ]
+      },
+      "measured": {
+        "table": "S8-12 C9 memory chain rerun (ticks per load-add-store link)",
+        "threads_1": 8.56,
+        "threads_2": 12.03
+      },
+      "message": null,
+      "name": "c9.memory.u2",
+      "predicted": {
+        "A": {
+          "threads_1": 7.0,
+          "threads_2": 7.0,
+          "threads_4": 10.0
+        }
+      },
+      "rounds": {
+        "threads_1": [
+          2,
+          4
+        ],
+        "threads_2": [
+          2,
+          4
+        ],
+        "threads_4": [
+          2,
+          4
+        ]
+      },
+      "status": "ok",
+      "unit": 2
+    },
+    {
+      "calibrates": null,
+      "class": "held_out",
+      "kind": 0,
+      "limiting": {
+        "threads_1": [
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 2190
+          },
+          {
+            "constraint": "spacing",
+            "context_cycles": 311
+          }
+        ],
+        "threads_2": [
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 3715
+          },
+          {
+            "constraint": "spacing",
+            "context_cycles": 624
+          }
+        ],
+        "threads_4": [
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 6747
+          },
+          {
+            "constraint": "dependency",
+            "context_cycles": 1943
+          }
+        ]
+      },
+      "measured": {
+        "table": "S8-12 C9 memory chain rerun (ticks per load-add-store link)",
+        "threads_1": 8.3,
+        "threads_2": 11.01
+      },
+      "message": null,
+      "name": "c9.memory.u4",
+      "predicted": {
+        "A": {
+          "threads_1": 6.5,
+          "threads_2": 6.5,
+          "threads_4": 9.0
+        }
+      },
+      "rounds": {
+        "threads_1": [
+          2,
+          4
+        ],
+        "threads_2": [
+          2,
+          4
+        ],
+        "threads_4": [
+          2,
+          4
+        ]
+      },
+      "status": "ok",
+      "unit": 2
+    },
+    {
+      "calibrates": null,
+      "class": "held_out",
+      "kind": 6,
+      "limiting": {
+        "threads_1": [
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 1490
+          },
+          {
+            "constraint": "spacing",
+            "context_cycles": 294
+          }
+        ],
+        "threads_2": [
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 2316
+          },
+          {
+            "constraint": "spacing",
+            "context_cycles": 590
+          }
+        ],
+        "threads_4": [
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 3954
+          },
+          {
+            "constraint": "not_picked",
+            "context_cycles": 2034
+          }
+        ]
+      },
+      "measured": {
+        "table": "S8-01 C10 (ticks per branch)",
+        "threads_1": 6.22,
+        "threads_4": 17.02
+      },
+      "message": null,
+      "name": "c10.branch.fixed",
+      "predicted": {
+        "A": {
+          "threads_1": 9.766,
+          "threads_2": 9.781,
+          "threads_4": 13.344
+        }
+      },
+      "rounds": {
+        "threads_1": [
+          2,
+          4
+        ],
+        "threads_2": [
+          2,
+          4
+        ],
+        "threads_4": [
+          2,
+          4
+        ]
+      },
+      "status": "ok",
+      "unit": 0
+    },
+    {
+      "calibrates": "latency.branch_mispredict_penalty",
+      "class": "calibration",
+      "kind": 5,
+      "limiting": {
+        "threads_1": [
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 1490
+          },
+          {
+            "constraint": "spacing",
+            "context_cycles": 524
+          }
+        ],
+        "threads_2": [
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 2315
+          },
+          {
+            "constraint": "spacing",
+            "context_cycles": 1105
+          }
+        ],
+        "threads_4": [
+          {
+            "constraint": "miss_stall",
+            "context_cycles": 3962
+          },
+          {
+            "constraint": "spacing",
+            "context_cycles": 2207
+          }
+        ]
+      },
+      "measured": {
+        "table": "S8-01 C10 (ticks per branch)",
+        "threads_1": 11.27,
+        "threads_4": 27.76
+      },
+      "message": null,
+      "name": "c10.branch.random",
+      "predicted": {
+        "A": {
+          "threads_1": 12.188,
+          "threads_2": 12.797,
+          "threads_4": 14.422
+        }
+      },
+      "rounds": {
+        "threads_1": [
+          2,
+          4
+        ],
+        "threads_2": [
+          2,
+          4
+        ],
+        "threads_4": [
+          2,
+          4
+        ]
+      },
+      "status": "ok",
+      "unit": 0
+    }
+  ],
+  "scenario_A": "line_tracking cold memory, TLB modeled, hardware prefetcher off, memory service modeled",
+  "scenario_B_hwp": "same with the streaming L2 hardware prefetcher sub-model (assumed depth) for memory-kind rows"
+}

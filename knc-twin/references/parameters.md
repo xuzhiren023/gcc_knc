@@ -173,9 +173,9 @@ Calibration: uncalibrated. No calibration block in profile.
 | `vpu.throughput_per_core` | 1 | vector instructions per core cycle | documented | R17 slide 12 (1-cycle throughput); S6-03 point 1 (two threads reach one vector op per cycle) |  |
 | `vpu.zmm_registers` | 32 | registers per thread | documented | R17 slide 12; R27 |  |
 
-## overlay-vector-load-3
+## overlay-vector-load-12
 
-Sensitivity overlay: vector load-to-use latency 3 cycles (R08 documented value) instead of the measured 12-cycle chain figure. Apply with --overlay profiles/overlay-vector-load-3.json to see how much a prediction depends on this uncertain parameter.
+Sensitivity overlay: vector load-to-use latency 3 cycles (R08 documented value) instead of the measured 12-cycle chain figure. Apply with --overlay profiles/overlay-vector-load-12.json to see how much a prediction depends on this uncertain parameter.
 
 Calibration: uncalibrated. No calibration block in profile.
 

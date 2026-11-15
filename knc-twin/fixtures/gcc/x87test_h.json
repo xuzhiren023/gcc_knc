@@ -1,0 +1,1631 @@
+{
+  "description": "function region from x87test.s (adapter from_gcc_s.py)",
+  "expected": {
+    "memory": [
+      {
+        "addr": "0x3000",
+        "i32": [
+          -23,
+          -20,
+          -17,
+          -13,
+          -10,
+          -7,
+          -4,
+          0,
+          3,
+          6,
+          9,
+          13,
+          16,
+          19,
+          22,
+          26,
+          29,
+          32,
+          35,
+          39,
+          42,
+          45,
+          48,
+          52,
+          55,
+          58,
+          61,
+          65,
+          68,
+          71,
+          74,
+          78,
+          81,
+          84,
+          87,
+          91,
+          94,
+          97,
+          100,
+          104
+        ]
+      }
+    ]
+  },
+  "init": {
+    "memory": [
+      {
+        "addr": "0x1000",
+        "i32": [
+          -7,
+          -6,
+          -5,
+          -4,
+          -3,
+          -2,
+          -1,
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31,
+          32
+        ]
+      }
+    ],
+    "registers": {
+      "rcx": 0,
+      "rdi": "0x3000",
+      "rdx": 40,
+      "rsi": "0x1000",
+      "rsp": "0x7f000"
+    },
+    "symbols": {}
+  },
+  "memory_default": 0,
+  "name": "x87test__h",
+  "provenance": {
+    "adapter": "from_gcc_s.py",
+    "coverage": {
+      "complete": {
+        "functional": true,
+        "isa": true,
+        "parser": true,
+        "timing": true
+      },
+      "functional_exact": 124,
+      "instructions": 124,
+      "isa_known": 124,
+      "memory_records": 40,
+      "mnemonics_unknown": [],
+      "parser_ok": 124,
+      "timing_only_or_missing": [],
+      "timing_params_known": 124,
+      "unsupported": []
+    },
+    "function": "h",
+    "live_in_registers_placeholders": [
+      "rcx",
+      "rdi",
+      "rdx",
+      "rsi"
+    ],
+    "loop_label": null,
+    "parser_notes": [
+      "line 147: labels h and .LFB2 name the same instruction; .LFB2 kept as alias",
+      "line 291: labels .LFE2 and __knc_twin_end name the same instruction; __knc_twin_end kept as alias"
+    ],
+    "source_file": "C:\\Users\\xuzhi\\AppData\\Local\\Temp\\kt\\cc\\x87test.s",
+    "source_sha256": "1d660704f55a154e22664e1663b572730e2f68118ab6d6c3277c6368c7cc4ad6",
+    "unresolved_symbols": []
+  },
+  "schema": "knc-twin.kernel/1",
+  "streams": [
+    {
+      "context": 0,
+      "instructions": [
+        {
+          "id": "L147",
+          "label": "h",
+          "op": "mov",
+          "ops": [
+            "r9d",
+            "edx"
+          ],
+          "source": 147,
+          "width": 32
+        },
+        {
+          "id": "L148",
+          "op": "mov",
+          "ops": [
+            "r8",
+            "rsi"
+          ],
+          "source": 148,
+          "width": 64
+        },
+        {
+          "id": "L149",
+          "op": "test",
+          "ops": [
+            "r9d",
+            "r9d"
+          ],
+          "source": 149,
+          "width": 32
+        },
+        {
+          "id": "L150",
+          "op": "jle",
+          "ops": [
+            ".L13"
+          ],
+          "source": 150
+        },
+        {
+          "id": "L151",
+          "op": "lea",
+          "ops": [
+            "eax",
+            {
+              "base": "r9",
+              "disp": -1
+            }
+          ],
+          "source": 151,
+          "width": 32
+        },
+        {
+          "id": "L152",
+          "op": "cmp",
+          "ops": [
+            "eax",
+            {
+              "imm": 2046
+            }
+          ],
+          "source": 152,
+          "width": 32
+        },
+        {
+          "id": "L153",
+          "op": "jbe",
+          "ops": [
+            ".L15"
+          ],
+          "source": 153
+        },
+        {
+          "id": "L154",
+          "op": "lea",
+          "ops": [
+            "r10d",
+            {
+              "base": "r9",
+              "disp": -17
+            }
+          ],
+          "source": 154,
+          "width": 32
+        },
+        {
+          "id": "L155",
+          "op": "mov",
+          "ops": [
+            "rdx",
+            "rsi"
+          ],
+          "source": 155,
+          "width": 64
+        },
+        {
+          "id": "L156",
+          "op": "and",
+          "ops": [
+            "r10d",
+            {
+              "imm": -16
+            }
+          ],
+          "source": 156,
+          "width": 32
+        },
+        {
+          "id": "L157",
+          "op": "mov",
+          "ops": [
+            "rax",
+            "rdi"
+          ],
+          "source": 157,
+          "width": 64
+        },
+        {
+          "id": "L158",
+          "op": "add",
+          "ops": [
+            "r10d",
+            {
+              "imm": 16
+            }
+          ],
+          "source": 158,
+          "width": 32
+        },
+        {
+          "id": "L159",
+          "op": "xor",
+          "ops": [
+            "ecx",
+            "ecx"
+          ],
+          "source": 159,
+          "width": 32
+        },
+        {
+          "id": "L163",
+          "label": ".L16",
+          "op": "mov",
+          "ops": [
+            "esi",
+            {
+              "base": "rdx"
+            }
+          ],
+          "source": 163,
+          "width": 32
+        },
+        {
+          "id": "L164",
+          "op": "vprefetch1",
+          "ops": [
+            {
+              "base": "rdx",
+              "disp": 2048
+            }
+          ],
+          "source": 164
+        },
+        {
+          "id": "L165",
+          "op": "lea",
+          "ops": [
+            "r11d",
+            {
+              "base": "rsi",
+              "index": "rsi",
+              "scale": 2
+            }
+          ],
+          "source": 165,
+          "width": 32
+        },
+        {
+          "id": "L166",
+          "op": "sar",
+          "ops": [
+            "esi",
+            {
+              "imm": 2
+            }
+          ],
+          "source": 166,
+          "width": 32
+        },
+        {
+          "id": "L167",
+          "op": "add",
+          "ops": [
+            "esi",
+            "r11d"
+          ],
+          "source": 167,
+          "width": 32
+        },
+        {
+          "id": "L168",
+          "op": "vprefetch0",
+          "ops": [
+            {
+              "base": "rdx",
+              "disp": 1024
+            }
+          ],
+          "source": 168
+        },
+        {
+          "id": "L169",
+          "op": "mov",
+          "ops": [
+            {
+              "base": "rax"
+            },
+            "esi"
+          ],
+          "source": 169,
+          "width": 32
+        },
+        {
+          "id": "L170",
+          "op": "vprefetch1",
+          "ops": [
+            {
+              "base": "rax",
+              "disp": 2048
+            }
+          ],
+          "source": 170
+        },
+        {
+          "id": "L171",
+          "op": "mov",
+          "ops": [
+            "esi",
+            {
+              "base": "rdx",
+              "disp": 4
+            }
+          ],
+          "source": 171,
+          "width": 32
+        },
+        {
+          "id": "L172",
+          "op": "vprefetch0",
+          "ops": [
+            {
+              "base": "rax",
+              "disp": 1024
+            }
+          ],
+          "source": 172
+        },
+        {
+          "id": "L173",
+          "op": "lea",
+          "ops": [
+            "r11d",
+            {
+              "base": "rsi",
+              "index": "rsi",
+              "scale": 2
+            }
+          ],
+          "source": 173,
+          "width": 32
+        },
+        {
+          "id": "L174",
+          "op": "sar",
+          "ops": [
+            "esi",
+            {
+              "imm": 2
+            }
+          ],
+          "source": 174,
+          "width": 32
+        },
+        {
+          "id": "L175",
+          "op": "add",
+          "ops": [
+            "esi",
+            "r11d"
+          ],
+          "source": 175,
+          "width": 32
+        },
+        {
+          "id": "L176",
+          "op": "mov",
+          "ops": [
+            {
+              "base": "rax",
+              "disp": 4
+            },
+            "esi"
+          ],
+          "source": 176,
+          "width": 32
+        },
+        {
+          "id": "L177",
+          "op": "mov",
+          "ops": [
+            "esi",
+            {
+              "base": "rdx",
+              "disp": 8
+            }
+          ],
+          "source": 177,
+          "width": 32
+        },
+        {
+          "id": "L178",
+          "op": "lea",
+          "ops": [
+            "r11d",
+            {
+              "base": "rsi",
+              "index": "rsi",
+              "scale": 2
+            }
+          ],
+          "source": 178,
+          "width": 32
+        },
+        {
+          "id": "L179",
+          "op": "sar",
+          "ops": [
+            "esi",
+            {
+              "imm": 2
+            }
+          ],
+          "source": 179,
+          "width": 32
+        },
+        {
+          "id": "L180",
+          "op": "add",
+          "ops": [
+            "esi",
+            "r11d"
+          ],
+          "source": 180,
+          "width": 32
+        },
+        {
+          "id": "L181",
+          "op": "mov",
+          "ops": [
+            {
+              "base": "rax",
+              "disp": 8
+            },
+            "esi"
+          ],
+          "source": 181,
+          "width": 32
+        },
+        {
+          "id": "L182",
+          "op": "mov",
+          "ops": [
+            "esi",
+            {
+              "base": "rdx",
+              "disp": 12
+            }
+          ],
+          "source": 182,
+          "width": 32
+        },
+        {
+          "id": "L183",
+          "op": "lea",
+          "ops": [
+            "r11d",
+            {
+              "base": "rsi",
+              "index": "rsi",
+              "scale": 2
+            }
+          ],
+          "source": 183,
+          "width": 32
+        },
+        {
+          "id": "L184",
+          "op": "sar",
+          "ops": [
+            "esi",
+            {
+              "imm": 2
+            }
+          ],
+          "source": 184,
+          "width": 32
+        },
+        {
+          "id": "L185",
+          "op": "add",
+          "ops": [
+            "esi",
+            "r11d"
+          ],
+          "source": 185,
+          "width": 32
+        },
+        {
+          "id": "L186",
+          "op": "mov",
+          "ops": [
+            {
+              "base": "rax",
+              "disp": 12
+            },
+            "esi"
+          ],
+          "source": 186,
+          "width": 32
+        },
+        {
+          "id": "L187",
+          "op": "mov",
+          "ops": [
+            "esi",
+            {
+              "base": "rdx",
+              "disp": 16
+            }
+          ],
+          "source": 187,
+          "width": 32
+        },
+        {
+          "id": "L188",
+          "op": "lea",
+          "ops": [
+            "r11d",
+            {
+              "base": "rsi",
+              "index": "rsi",
+              "scale": 2
+            }
+          ],
+          "source": 188,
+          "width": 32
+        },
+        {
+          "id": "L189",
+          "op": "sar",
+          "ops": [
+            "esi",
+            {
+              "imm": 2
+            }
+          ],
+          "source": 189,
+          "width": 32
+        },
+        {
+          "id": "L190",
+          "op": "add",
+          "ops": [
+            "esi",
+            "r11d"
+          ],
+          "source": 190,
+          "width": 32
+        },
+        {
+          "id": "L191",
+          "op": "mov",
+          "ops": [
+            {
+              "base": "rax",
+              "disp": 16
+            },
+            "esi"
+          ],
+          "source": 191,
+          "width": 32
+        },
+        {
+          "id": "L192",
+          "op": "mov",
+          "ops": [
+            "esi",
+            {
+              "base": "rdx",
+              "disp": 20
+            }
+          ],
+          "source": 192,
+          "width": 32
+        },
+        {
+          "id": "L193",
+          "op": "lea",
+          "ops": [
+            "r11d",
+            {
+              "base": "rsi",
+              "index": "rsi",
+              "scale": 2
+            }
+          ],
+          "source": 193,
+          "width": 32
+        },
+        {
+          "id": "L194",
+          "op": "sar",
+          "ops": [
+            "esi",
+            {
+              "imm": 2
+            }
+          ],
+          "source": 194,
+          "width": 32
+        },
+        {
+          "id": "L195",
+          "op": "add",
+          "ops": [
+            "esi",
+            "r11d"
+          ],
+          "source": 195,
+          "width": 32
+        },
+        {
+          "id": "L196",
+          "op": "mov",
+          "ops": [
+            {
+              "base": "rax",
+              "disp": 20
+            },
+            "esi"
+          ],
+          "source": 196,
+          "width": 32
+        },
+        {
+          "id": "L197",
+          "op": "mov",
+          "ops": [
+            "esi",
+            {
+              "base": "rdx",
+              "disp": 24
+            }
+          ],
+          "source": 197,
+          "width": 32
+        },
+        {
+          "id": "L198",
+          "op": "lea",
+          "ops": [
+            "r11d",
+            {
+              "base": "rsi",
+              "index": "rsi",
+              "scale": 2
+            }
+          ],
+          "source": 198,
+          "width": 32
+        },
+        {
+          "id": "L199",
+          "op": "sar",
+          "ops": [
+            "esi",
+            {
+              "imm": 2
+            }
+          ],
+          "source": 199,
+          "width": 32
+        },
+        {
+          "id": "L200",
+          "op": "add",
+          "ops": [
+            "esi",
+            "r11d"
+          ],
+          "source": 200,
+          "width": 32
+        },
+        {
+          "id": "L201",
+          "op": "mov",
+          "ops": [
+            {
+              "base": "rax",
+              "disp": 24
+            },
+            "esi"
+          ],
+          "source": 201,
+          "width": 32
+        },
+        {
+          "id": "L202",
+          "op": "mov",
+          "ops": [
+            "esi",
+            {
+              "base": "rdx",
+              "disp": 28
+            }
+          ],
+          "source": 202,
+          "width": 32
+        },
+        {
+          "id": "L203",
+          "op": "lea",
+          "ops": [
+            "r11d",
+            {
+              "base": "rsi",
+              "index": "rsi",
+              "scale": 2
+            }
+          ],
+          "source": 203,
+          "width": 32
+        },
+        {
+          "id": "L204",
+          "op": "sar",
+          "ops": [
+            "esi",
+            {
+              "imm": 2
+            }
+          ],
+          "source": 204,
+          "width": 32
+        },
+        {
+          "id": "L205",
+          "op": "add",
+          "ops": [
+            "esi",
+            "r11d"
+          ],
+          "source": 205,
+          "width": 32
+        },
+        {
+          "id": "L206",
+          "op": "mov",
+          "ops": [
+            {
+              "base": "rax",
+              "disp": 28
+            },
+            "esi"
+          ],
+          "source": 206,
+          "width": 32
+        },
+        {
+          "id": "L207",
+          "op": "mov",
+          "ops": [
+            "esi",
+            {
+              "base": "rdx",
+              "disp": 32
+            }
+          ],
+          "source": 207,
+          "width": 32
+        },
+        {
+          "id": "L208",
+          "op": "lea",
+          "ops": [
+            "r11d",
+            {
+              "base": "rsi",
+              "index": "rsi",
+              "scale": 2
+            }
+          ],
+          "source": 208,
+          "width": 32
+        },
+        {
+          "id": "L209",
+          "op": "sar",
+          "ops": [
+            "esi",
+            {
+              "imm": 2
+            }
+          ],
+          "source": 209,
+          "width": 32
+        },
+        {
+          "id": "L210",
+          "op": "add",
+          "ops": [
+            "esi",
+            "r11d"
+          ],
+          "source": 210,
+          "width": 32
+        },
+        {
+          "id": "L211",
+          "op": "mov",
+          "ops": [
+            {
+              "base": "rax",
+              "disp": 32
+            },
+            "esi"
+          ],
+          "source": 211,
+          "width": 32
+        },
+        {
+          "id": "L212",
+          "op": "mov",
+          "ops": [
+            "esi",
+            {
+              "base": "rdx",
+              "disp": 36
+            }
+          ],
+          "source": 212,
+          "width": 32
+        },
+        {
+          "id": "L213",
+          "op": "lea",
+          "ops": [
+            "r11d",
+            {
+              "base": "rsi",
+              "index": "rsi",
+              "scale": 2
+            }
+          ],
+          "source": 213,
+          "width": 32
+        },
+        {
+          "id": "L214",
+          "op": "sar",
+          "ops": [
+            "esi",
+            {
+              "imm": 2
+            }
+          ],
+          "source": 214,
+          "width": 32
+        },
+        {
+          "id": "L215",
+          "op": "add",
+          "ops": [
+            "esi",
+            "r11d"
+          ],
+          "source": 215,
+          "width": 32
+        },
+        {
+          "id": "L216",
+          "op": "mov",
+          "ops": [
+            {
+              "base": "rax",
+              "disp": 36
+            },
+            "esi"
+          ],
+          "source": 216,
+          "width": 32
+        },
+        {
+          "id": "L217",
+          "op": "mov",
+          "ops": [
+            "esi",
+            {
+              "base": "rdx",
+              "disp": 40
+            }
+          ],
+          "source": 217,
+          "width": 32
+        },
+        {
+          "id": "L218",
+          "op": "lea",
+          "ops": [
+            "r11d",
+            {
+              "base": "rsi",
+              "index": "rsi",
+              "scale": 2
+            }
+          ],
+          "source": 218,
+          "width": 32
+        },
+        {
+          "id": "L219",
+          "op": "sar",
+          "ops": [
+            "esi",
+            {
+              "imm": 2
+            }
+          ],
+          "source": 219,
+          "width": 32
+        },
+        {
+          "id": "L220",
+          "op": "add",
+          "ops": [
+            "esi",
+            "r11d"
+          ],
+          "source": 220,
+          "width": 32
+        },
+        {
+          "id": "L221",
+          "op": "mov",
+          "ops": [
+            {
+              "base": "rax",
+              "disp": 40
+            },
+            "esi"
+          ],
+          "source": 221,
+          "width": 32
+        },
+        {
+          "id": "L222",
+          "op": "mov",
+          "ops": [
+            "esi",
+            {
+              "base": "rdx",
+              "disp": 44
+            }
+          ],
+          "source": 222,
+          "width": 32
+        },
+        {
+          "id": "L223",
+          "op": "lea",
+          "ops": [
+            "r11d",
+            {
+              "base": "rsi",
+              "index": "rsi",
+              "scale": 2
+            }
+          ],
+          "source": 223,
+          "width": 32
+        },
+        {
+          "id": "L224",
+          "op": "sar",
+          "ops": [
+            "esi",
+            {
+              "imm": 2
+            }
+          ],
+          "source": 224,
+          "width": 32
+        },
+        {
+          "id": "L225",
+          "op": "add",
+          "ops": [
+            "esi",
+            "r11d"
+          ],
+          "source": 225,
+          "width": 32
+        },
+        {
+          "id": "L226",
+          "op": "mov",
+          "ops": [
+            {
+              "base": "rax",
+              "disp": 44
+            },
+            "esi"
+          ],
+          "source": 226,
+          "width": 32
+        },
+        {
+          "id": "L227",
+          "op": "mov",
+          "ops": [
+            "esi",
+            {
+              "base": "rdx",
+              "disp": 48
+            }
+          ],
+          "source": 227,
+          "width": 32
+        },
+        {
+          "id": "L228",
+          "op": "lea",
+          "ops": [
+            "r11d",
+            {
+              "base": "rsi",
+              "index": "rsi",
+              "scale": 2
+            }
+          ],
+          "source": 228,
+          "width": 32
+        },
+        {
+          "id": "L229",
+          "op": "sar",
+          "ops": [
+            "esi",
+            {
+              "imm": 2
+            }
+          ],
+          "source": 229,
+          "width": 32
+        },
+        {
+          "id": "L230",
+          "op": "add",
+          "ops": [
+            "esi",
+            "r11d"
+          ],
+          "source": 230,
+          "width": 32
+        },
+        {
+          "id": "L231",
+          "op": "mov",
+          "ops": [
+            {
+              "base": "rax",
+              "disp": 48
+            },
+            "esi"
+          ],
+          "source": 231,
+          "width": 32
+        },
+        {
+          "id": "L232",
+          "op": "mov",
+          "ops": [
+            "esi",
+            {
+              "base": "rdx",
+              "disp": 52
+            }
+          ],
+          "source": 232,
+          "width": 32
+        },
+        {
+          "id": "L233",
+          "op": "lea",
+          "ops": [
+            "r11d",
+            {
+              "base": "rsi",
+              "index": "rsi",
+              "scale": 2
+            }
+          ],
+          "source": 233,
+          "width": 32
+        },
+        {
+          "id": "L234",
+          "op": "sar",
+          "ops": [
+            "esi",
+            {
+              "imm": 2
+            }
+          ],
+          "source": 234,
+          "width": 32
+        },
+        {
+          "id": "L235",
+          "op": "add",
+          "ops": [
+            "esi",
+            "r11d"
+          ],
+          "source": 235,
+          "width": 32
+        },
+        {
+          "id": "L236",
+          "op": "mov",
+          "ops": [
+            {
+              "base": "rax",
+              "disp": 52
+            },
+            "esi"
+          ],
+          "source": 236,
+          "width": 32
+        },
+        {
+          "id": "L237",
+          "op": "mov",
+          "ops": [
+            "esi",
+            {
+              "base": "rdx",
+              "disp": 56
+            }
+          ],
+          "source": 237,
+          "width": 32
+        },
+        {
+          "id": "L238",
+          "op": "lea",
+          "ops": [
+            "r11d",
+            {
+              "base": "rsi",
+              "index": "rsi",
+              "scale": 2
+            }
+          ],
+          "source": 238,
+          "width": 32
+        },
+        {
+          "id": "L239",
+          "op": "sar",
+          "ops": [
+            "esi",
+            {
+              "imm": 2
+            }
+          ],
+          "source": 239,
+          "width": 32
+        },
+        {
+          "id": "L240",
+          "op": "add",
+          "ops": [
+            "esi",
+            "r11d"
+          ],
+          "source": 240,
+          "width": 32
+        },
+        {
+          "id": "L241",
+          "op": "mov",
+          "ops": [
+            {
+              "base": "rax",
+              "disp": 56
+            },
+            "esi"
+          ],
+          "source": 241,
+          "width": 32
+        },
+        {
+          "id": "L242",
+          "op": "mov",
+          "ops": [
+            "esi",
+            {
+              "base": "rdx",
+              "disp": 60
+            }
+          ],
+          "source": 242,
+          "width": 32
+        },
+        {
+          "id": "L243",
+          "op": "lea",
+          "ops": [
+            "r11d",
+            {
+              "base": "rsi",
+              "index": "rsi",
+              "scale": 2
+            }
+          ],
+          "source": 243,
+          "width": 32
+        },
+        {
+          "id": "L244",
+          "op": "sar",
+          "ops": [
+            "esi",
+            {
+              "imm": 2
+            }
+          ],
+          "source": 244,
+          "width": 32
+        },
+        {
+          "id": "L245",
+          "op": "add",
+          "ops": [
+            "esi",
+            "r11d"
+          ],
+          "source": 245,
+          "width": 32
+        },
+        {
+          "id": "L246",
+          "op": "add",
+          "ops": [
+            "ecx",
+            {
+              "imm": 16
+            }
+          ],
+          "source": 246,
+          "width": 32
+        },
+        {
+          "id": "L247",
+          "op": "mov",
+          "ops": [
+            {
+              "base": "rax",
+              "disp": 60
+            },
+            "esi"
+          ],
+          "source": 247,
+          "width": 32
+        },
+        {
+          "id": "L248",
+          "op": "add",
+          "ops": [
+            "rdx",
+            {
+              "imm": 64
+            }
+          ],
+          "source": 248,
+          "width": 64
+        },
+        {
+          "id": "L249",
+          "op": "add",
+          "ops": [
+            "rax",
+            {
+              "imm": 64
+            }
+          ],
+          "source": 249,
+          "width": 64
+        },
+        {
+          "id": "L250",
+          "op": "cmp",
+          "ops": [
+            "ecx",
+            "r10d"
+          ],
+          "source": 250,
+          "width": 32
+        },
+        {
+          "id": "L251",
+          "op": "jne",
+          "ops": [
+            ".L16"
+          ],
+          "source": 251
+        },
+        {
+          "id": "L252",
+          "op": "mov",
+          "ops": [
+            "eax",
+            "ecx"
+          ],
+          "source": 252,
+          "width": 32
+        },
+        {
+          "id": "L256",
+          "label": ".L17",
+          "op": "mov",
+          "ops": [
+            "edx",
+            {
+              "base": "r8",
+              "index": "rax",
+              "scale": 4
+            }
+          ],
+          "source": 256,
+          "width": 32
+        },
+        {
+          "id": "L257",
+          "op": "lea",
+          "ops": [
+            "ecx",
+            {
+              "base": "rdx",
+              "index": "rdx",
+              "scale": 2
+            }
+          ],
+          "source": 257,
+          "width": 32
+        },
+        {
+          "id": "L258",
+          "op": "sar",
+          "ops": [
+            "edx",
+            {
+              "imm": 2
+            }
+          ],
+          "source": 258,
+          "width": 32
+        },
+        {
+          "id": "L259",
+          "op": "add",
+          "ops": [
+            "edx",
+            "ecx"
+          ],
+          "source": 259,
+          "width": 32
+        },
+        {
+          "id": "L260",
+          "op": "mov",
+          "ops": [
+            {
+              "base": "rdi",
+              "index": "rax",
+              "scale": 4
+            },
+            "edx"
+          ],
+          "source": 260,
+          "width": 32
+        },
+        {
+          "id": "L261",
+          "op": "add",
+          "ops": [
+            "rax",
+            {
+              "imm": 1
+            }
+          ],
+          "source": 261,
+          "width": 64
+        },
+        {
+          "id": "L262",
+          "op": "cmp",
+          "ops": [
+            "r9d",
+            "eax"
+          ],
+          "source": 262,
+          "width": 32
+        },
+        {
+          "id": "L263",
+          "op": "jg",
+          "ops": [
+            ".L17"
+          ],
+          "source": 263
+        },
+        {
+          "id": "L264",
+          "op": "jmp",
+          "ops": [
+            ".LFE2"
+          ],
+          "source": 264
+        },
+        {
+          "id": "L268",
+          "label": ".L15",
+          "op": "sal",
+          "ops": [
+            "r9",
+            {
+              "imm": 2
+            }
+          ],
+          "source": 268,
+          "width": 64
+        },
+        {
+          "id": "L269",
+          "op": "xor",
+          "ops": [
+            "edx",
+            "edx"
+          ],
+          "source": 269,
+          "width": 32
+        },
+        {
+          "id": "L273",
+          "label": ".L18",
+          "op": "mov",
+          "ops": [
+            "eax",
+            {
+              "base": "r8",
+              "index": "rdx"
+            }
+          ],
+          "source": 273,
+          "width": 32
+        },
+        {
+          "id": "L274",
+          "op": "lea",
+          "ops": [
+            "ecx",
+            {
+              "base": "rax",
+              "index": "rax",
+              "scale": 2
+            }
+          ],
+          "source": 274,
+          "width": 32
+        },
+        {
+          "id": "L275",
+          "op": "sar",
+          "ops": [
+            "eax",
+            {
+              "imm": 2
+            }
+          ],
+          "source": 275,
+          "width": 32
+        },
+        {
+          "id": "L276",
+          "op": "add",
+          "ops": [
+            "eax",
+            "ecx"
+          ],
+          "source": 276,
+          "width": 32
+        },
+        {
+          "id": "L277",
+          "op": "mov",
+          "ops": [
+            {
+              "base": "rdi",
+              "index": "rdx"
+            },
+            "eax"
+          ],
+          "source": 277,
+          "width": 32
+        },
+        {
+          "id": "L278",
+          "op": "add",
+          "ops": [
+            "rdx",
+            {
+              "imm": 4
+            }
+          ],
+          "source": 278,
+          "width": 64
+        },
+        {
+          "id": "L279",
+          "op": "cmp",
+          "ops": [
+            "r9",
+            "rdx"
+          ],
+          "source": 279,
+          "width": 64
+        },
+        {
+          "id": "L280",
+          "op": "jne",
+          "ops": [
+            ".L18"
+          ],
+          "source": 280
+        },
+        {
+          "id": "L282",
+          "label": ".L13",
+          "op": "jmp",
+          "ops": [
+            ".LFE2"
+          ],
+          "source": 282
+        },
+        {
+          "id": "L291",
+          "label": ".LFE2",
+          "op": "nop",
+          "ops": [],
+          "source": 291
+        }
+      ]
+    }
+  ],
+  "unit_of_work": {
+    "count": 40,
+    "description": "one call of h with n=40"
+  }
+}

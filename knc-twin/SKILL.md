@@ -64,7 +64,7 @@ characterization runs, see `references/parameters.md`), `card-5110p-literature`,
 `card-3120-documented` (card constants only; latencies stay unknown), `knc-common` (rules and
 documented values only), `synthetic-demo` (labeled synthetic, for exercising the engine).
 Unknown parameters stop a run with `missing_parameter`; nothing gets a default cost.
-Sensitivity: `--overlay profiles/overlay-vector-load-3.json`.
+Sensitivity: `--overlay profiles/overlay-vector-load-12.json`.
 
 ## References
 

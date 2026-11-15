@@ -145,7 +145,7 @@ class TestCLI(unittest.TestCase):
         meas = {"schema": "knc-twin.native-measurement/1", "request_hash_sha256": req["request_hash_sha256"], "job_id": "test-job-0001",
                 "measured_utc": "2026-01-01T00:00:00Z", "card_profile": "card-7120-measured",
                 "results": [{"threads_per_core": 1, "ticks_per_unit_per_thread": 20.0, "spread_pct": 0.5, "check": "ok"}],
-                "parameters": [{"name": "latency.vector_load_l1", "value": 9, "unit": "cycles", "note": "hypothetical test value"}]}
+                "parameters": [{"name": "latency.vector_arith", "value": 2, "unit": "cycles", "note": "hypothetical test value"}]}
         mp = os.path.join(out, "measurement.json")
         with open(mp, "w") as f:
             json.dump(meas, f)

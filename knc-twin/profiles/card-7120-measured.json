@@ -19,40 +19,366 @@
     "held_out_validation_cases": 0
   },
   "parameters": {
-    "card.model": {"value": "Xeon Phi x100, 61 cores, 1.238 GHz, 16 GB (7120-class; exact SKU not recorded)", "unit": "text", "status": "documented", "source": "project config; core count and clock read on the card (S6-01 R1 logs)"},
-    "card.clock_hz": {"value": 1238000000, "unit": "Hz", "status": "measured", "source": "S6-01 run logs (governor performance, 1,238,094 kHz; S8-17 C12 confirmed no throttling)"},
-    "card.tsc_hz": {"value": 1232199000, "unit": "Hz", "status": "measured", "source": "S6-01 R1 lines 245-265 (about 1232.199 MHz); invariance not proven"},
-    "card.cores": {"value": 61, "unit": "cores", "status": "documented", "source": "card cpuinfo (S6-01); Intel 7120 specification"},
-    "card.usable_cores": {"value": 60, "unit": "cores", "status": "measured", "source": "S6-01 placement protocol: cores 0-59 for jobs, OS core CPUs {0,241,242,243} excluded"},
-    "card.memory_bytes": {"value": 17179869184, "unit": "bytes", "status": "documented", "source": "Intel 7120 specification; project card-full.json allows 13312 MB per job"},
-    "card.peak_memory_bandwidth_gbs": {"value": 352, "unit": "GB/s", "status": "documented", "source": "Intel 7120 specification; R08 ('Peak Memory Bandwidth of Xeon Phi SE10P is 352 GB/s')"},
-    "card.sustained_bandwidth_gbs": {"value": {"read_only": null, "read_modify_write": 156.5, "write_normal": 83.5, "write_ngo": 226.1}, "unit": "GB/s by traffic type, 60 cores x 4 threads", "status": "measured", "source": "read_modify_write: S8-17 C12 stream phase 156.5 GB/s; write_normal/write_ngo: S8-01 C1 at 60x4 (83.5 and 226.1 GB/s median worker; NGO completed-worker estimate 204.5)", "uncertainty": "read_only is not measured (the project's target is 264-299 GB/s); NGO figures differ between estimates (204.5 vs 226.1) and a later sweep gave 169.7 under different work."},
-    "card.barrier_ns": {"value": {"tree": 6000, "counter": 27500}, "unit": "ns per 240-thread barrier", "status": "measured", "source": "S8-10 C11: fan-in-4 tree 5,521-6,469 ns; one shared counter 26,810-28,410 ns (three launches)"},
-    "latency.remote_l2_line_ns": {"value": 192, "unit": "ns per load of a line in another core's L2", "status": "measured", "source": "S8-10 C11: 190.6-195.0 ns, near and far owner alike", "uncertainty": "R08 reports ~275 ns on SE10P; R22 shows physical address matters."},
-    "latency.scalar_alu": {"value": 1, "unit": "cycles", "status": "documented", "source": "R17 slide 10; S6-03 scalar_add.lat 2.08 (<=2 bound)"},
-    "latency.mask_op": {"value": 1, "unit": "cycles", "status": "assumed", "source": "S6-03 kand.lat 2.08 bounds it at <=2; 1 assumed like scalar", "alternatives": [2]},
-    "latency.vector_arith": {"value": 4, "unit": "cycles", "status": "measured", "source": "S6-03 vaddps.lat 4.02, vmulps.lat 4.03, vfmadd213ps.lat 4.02, vpaddd.lat 4.03, vpxord.lat 4.03, vaddpd/vmulpd/vfmadd213pd 4.03, vcvtfxpntdq2ps/ps2dq 4.03", "applies_to": "all vector arithmetic, logic, SP/DP FMA and dq<->ps conversions"},
-    "latency.vector_long": {"value": 6, "unit": "cycles", "status": "measured", "source": "S6-03 vpermd.lat 6.04, vpermf32x4.lat 6.04, vrcp23ps.lat 6.04, swizzle_*.lat 6.04", "applies_to": "permutes, swizzles, vrcp23ps; vrsqrt23ps/vlog2ps/vexp223ps assumed in the same class (not measured)"},
-    "latency.vector_convert_df": {"value": 7, "unit": "cycles", "status": "measured", "source": "S6-03 vcvtfxpntpd2dq.lat 7.04, vcvtfxpntpd2udq.lat 7.05"},
-    "latency.scalar_load_l1": {"value": 3, "unit": "cycles", "status": "measured", "source": "S6-03 l1.load_lat 3.03 (one thread)", "uncertainty": "R08 and R17 document 1 (or 2) cycles."},
-    "latency.vector_load_l1": {"value": 12, "unit": "cycles", "status": "measured", "source": "S6-03 masked_load.lat 12.11, convert_up.lat 12.11, spill_reload.lat 12.11 (dependent chains through memory-operand forms, one thread)", "alternatives": [3], "uncertainty": "R08 documents 3 cycles for vector loads; the measured chains include a store or a vector-to-address path and may overstate a pure load-to-use. Use the alternative scenario for a sensitivity check."},
-    "latency.l2_hit": {"value": 24, "unit": "cycles", "status": "measured", "source": "S6-03 l2.load_lat 24.42 (one thread), 25.68 at four threads", "alternatives": [11], "uncertainty": "R17 slide 14 documents 11 raw cycles; literature (R06, R08) measures 22-25."},
-    "latency.memory": {"value": 357, "unit": "cycles", "status": "measured", "source": "S6-03 memory.load_lat 356.53 (one thread, idle); 365.76 at four threads", "uncertainty": "Loaded latency is higher (R08); not measured under load here."},
-    "latency.agi_cycles": {"value": 3, "unit": "cycles", "status": "measured", "source": "S6-03 agi.gap0 3.11 vs 2.08 baseline at one thread: the dependent load issued one cycle after its earliest slot, i.e. address usable 3 cycles after the write issued; R01 p.19"},
-    "latency.branch_mispredict_penalty": {"value": 5, "unit": "cycles per branch in the pseudorandom test", "status": "measured", "source": "S8-01 C10: 11.27 vs 6.22 ticks per branch at one thread (difference 5.05)", "alternatives": [10], "uncertainty": "The test did not separate the miss rate; if half the branches missed, the penalty per miss is about 10. The model charges this value per branch the scenario marks mispredicted."},
-    "latency.branch_taken_bubble": {"value": 0, "unit": "cycles", "status": "derived", "source": "S8-01 C9: loop costs about 2 ticks per vector op plus 2 per loop branch at one thread (the branch costs its issue slot only)"},
-    "latency.scalar_imul": {"value": 10, "unit": "cycles", "status": "documented", "source": "R02 p.56; not measured on this card by the imported runs"},
-    "latency.x87_add": {"value": 3, "unit": "cycles", "status": "measured", "source": "S6-03 x87_add.lat 3.02"},
-    "latency.x87_mul": {"value": 3, "unit": "cycles", "status": "measured", "source": "S6-03 x87_mul.lat 3.02"},
-    "latency.x87_div": {"value": 38, "unit": "cycles", "status": "measured", "source": "S6-03 x87_div.lat 39.25, .rt 38.24; one divide per 38 cycles per core at four threads"},
-    "occupancy.x87_mul": {"value": 2, "unit": "core cycles", "status": "measured", "source": "S6-03 x87_mul.rt 4.02 per thread at two threads (one per 2 cycles per core)"},
-    "occupancy.x87_div": {"value": 38, "unit": "core cycles", "status": "measured", "source": "S6-03 x87_div.rt 151.76 per thread at four threads (37.9 per core)"},
-    "latency.gather_first_line": {"value": 15, "unit": "cycles", "status": "measured", "source": "S6-03 gather_all.lat 15.10 (16 lanes in one line, one thread)"},
-    "occupancy.gather_cycles_per_line": {"value": 7, "unit": "core cycles per distinct line", "status": "measured", "source": "S6-03 gather_all.rt 7.08 per gather at one thread, 7.02 per core at four; gather_scattered (16 lines) 127 per core", "uncertainty": "16 lines measured 127 per core, more than 16 x 7 = 112; the per-line figure is optimistic for scattered gathers."},
-    "occupancy.vprefetch_l2_core_cycles": {"value": 2, "unit": "core cycles between vprefetch1 issues", "status": "measured", "source": "S8-01 C2: vprefetch1 4.52 per thread at two threads, 9.01 at four (about 2.25 per core); modeled as 2 (integer cycles)", "uncertainty": "2.25 measured; the integer model understates by about 11%."},
-    "memory.lines_per_cycle_per_core_measured": {"value": 0.0513, "unit": "lines per core cycle, sequential loads at four threads with the hardware prefetcher active", "status": "measured", "source": "S6-03 memory.load_rt 77.92 per thread at four threads (19.5 ticks per line per core, about 4 GB/s per core at one core)", "note": "Informational: includes the L2 hardware prefetcher, which the simulator does not model."},
-    "latency.spill_reload_chain": {"value": 12, "unit": "cycles for a store followed by a dependent reload", "status": "measured", "source": "S6-03 spill_reload.lat 12.11 (one thread), 13.14 at four"},
-    "latency.store_to_load_same_line": {"value": 3, "unit": "cycles after a store issues before a load of the same line can use the data in L1", "status": "assumed", "source": "chosen so that store->vector reload matches the measured 12-cycle spill/reload chain with latency.vector_load_l1 = 12 only if the load waits no extra; S8-12 C9 memory chain 11 per link", "alternatives": [1, 8]},
-    "latency.fence": {"value": null, "unit": "cycles", "status": "unknown", "source": "lock addl is used as a publication fence by the project but its latency was not measured"}
+    "card.model": {
+      "value": "Xeon Phi x100, 61 cores, 1.238 GHz, 16 GB (7120-class; exact SKU not recorded)",
+      "unit": "text",
+      "status": "documented",
+      "source": "project config; core count and clock read on the card (S6-01 R1 logs)"
+    },
+    "card.clock_hz": {
+      "value": 1238000000,
+      "unit": "Hz",
+      "status": "measured",
+      "source": "S6-01 run logs (governor performance, 1,238,094 kHz; S8-17 C12 confirmed no throttling)"
+    },
+    "card.tsc_hz": {
+      "value": 1232199000,
+      "unit": "Hz",
+      "status": "measured",
+      "source": "S6-01 R1 lines 245-265 (about 1232.199 MHz); invariance not proven"
+    },
+    "card.cores": {
+      "value": 61,
+      "unit": "cores",
+      "status": "documented",
+      "source": "card cpuinfo (S6-01); Intel 7120 specification"
+    },
+    "card.usable_cores": {
+      "value": 60,
+      "unit": "cores",
+      "status": "measured",
+      "source": "S6-01 placement protocol: cores 0-59 for jobs, OS core CPUs {0,241,242,243} excluded"
+    },
+    "card.memory_bytes": {
+      "value": 17179869184,
+      "unit": "bytes",
+      "status": "documented",
+      "source": "Intel 7120 specification; project card-full.json allows 13312 MB per job"
+    },
+    "card.peak_memory_bandwidth_gbs": {
+      "value": 352,
+      "unit": "GB/s",
+      "status": "documented",
+      "source": "Intel 7120 specification; R08 ('Peak Memory Bandwidth of Xeon Phi SE10P is 352 GB/s')"
+    },
+    "card.sustained_bandwidth_gbs": {
+      "value": {
+        "read_only": null,
+        "read_modify_write": 156.5,
+        "write_normal": 83.5,
+        "write_ngo": 226.1
+      },
+      "unit": "GB/s by traffic type, 60 cores x 4 threads",
+      "status": "measured",
+      "source": "read_modify_write: S8-17 C12 stream phase 156.5 GB/s; write_normal/write_ngo: S8-01 C1 at 60x4 (83.5 and 226.1 GB/s median worker; NGO completed-worker estimate 204.5)",
+      "uncertainty": "read_only is not measured (the project's target is 264-299 GB/s); NGO figures differ between estimates (204.5 vs 226.1) and a later sweep gave 169.7 under different work."
+    },
+    "card.barrier_ns": {
+      "value": {
+        "tree": 6000,
+        "counter": 27500
+      },
+      "unit": "ns per 240-thread barrier",
+      "status": "measured",
+      "source": "S8-10 C11: fan-in-4 tree 5,521-6,469 ns; one shared counter 26,810-28,410 ns (three launches)"
+    },
+    "latency.remote_l2_line_ns": {
+      "value": 192,
+      "unit": "ns per load of a line in another core's L2",
+      "status": "measured",
+      "source": "S8-10 C11: 190.6-195.0 ns, near and far owner alike",
+      "uncertainty": "R08 reports ~275 ns on SE10P; R22 shows physical address matters."
+    },
+    "latency.scalar_alu": {
+      "value": 1,
+      "unit": "cycles",
+      "status": "documented",
+      "source": "R17 slide 10; S6-03 scalar_add.lat 2.08 (<=2 bound)"
+    },
+    "latency.mask_op": {
+      "value": 1,
+      "unit": "cycles",
+      "status": "assumed",
+      "source": "S6-03 kand.lat 2.08 bounds it at <=2; 1 assumed like scalar",
+      "alternatives": [
+        2
+      ]
+    },
+    "latency.vector_arith": {
+      "value": 4,
+      "unit": "cycles",
+      "status": "measured",
+      "source": "S6-03 vaddps.lat 4.02, vmulps.lat 4.03, vfmadd213ps.lat 4.02, vpaddd.lat 4.03, vpxord.lat 4.03, vaddpd/vmulpd/vfmadd213pd 4.03, vcvtfxpntdq2ps/ps2dq 4.03",
+      "applies_to": "all vector arithmetic, logic, SP/DP FMA and dq<->ps conversions"
+    },
+    "latency.vector_long": {
+      "value": 6,
+      "unit": "cycles",
+      "status": "measured",
+      "source": "S6-03 vpermd.lat 6.04, vpermf32x4.lat 6.04, vrcp23ps.lat 6.04, swizzle_*.lat 6.04",
+      "applies_to": "permutes, swizzles, vrcp23ps; vrsqrt23ps/vlog2ps/vexp223ps assumed in the same class (not measured)"
+    },
+    "latency.vector_convert_df": {
+      "value": 7,
+      "unit": "cycles",
+      "status": "measured",
+      "source": "S6-03 vcvtfxpntpd2dq.lat 7.04, vcvtfxpntpd2udq.lat 7.05"
+    },
+    "latency.scalar_load_l1": {
+      "value": 3,
+      "unit": "cycles",
+      "status": "measured",
+      "source": "S6-03 l1.load_lat 3.03 (one thread)",
+      "uncertainty": "R08 and R17 document 1 (or 2) cycles."
+    },
+    "latency.vector_load_l1": {
+      "value": 5,
+      "unit": "cycles, L1 hit plain vector load to dependent use",
+      "status": "derived",
+      "source": "S6-03 spill_reload.lat 12.11 = store-to-load path (7, from c9.memory.u1) + load-to-use; R08 documents 3 for vector loads",
+      "alternatives": [
+        3
+      ],
+      "uncertainty": "not isolated by a native row (a dependent plain vector-load chain is a native request candidate); 3 would make the spill/reload chain 10"
+    },
+    "latency.l2_hit": {
+      "value": 24,
+      "unit": "cycles",
+      "status": "measured",
+      "source": "S6-03 l2.load_lat 24.42 (one thread), 25.68 at four threads",
+      "alternatives": [
+        11
+      ],
+      "uncertainty": "R17 slide 14 documents 11 raw cycles; literature (R06, R08) measures 22-25."
+    },
+    "latency.memory": {
+      "value": 357,
+      "unit": "cycles",
+      "status": "measured",
+      "source": "S6-03 memory.load_lat 356.53 (one thread, idle); 365.76 at four threads",
+      "uncertainty": "Loaded latency is higher (R08); not measured under load here."
+    },
+    "latency.agi_cycles": {
+      "value": 3,
+      "unit": "cycles",
+      "status": "measured",
+      "source": "S6-03 agi.gap0 3.11 vs 2.08 baseline at one thread: the dependent load issued one cycle after its earliest slot, i.e. address usable 3 cycles after the write issued; R01 p.19"
+    },
+    "latency.branch_mispredict_penalty": {
+      "value": 5,
+      "unit": "cycles per branch in the pseudorandom test",
+      "status": "measured",
+      "source": "S8-01 C10: 11.27 vs 6.22 ticks per branch at one thread (difference 5.05)",
+      "alternatives": [
+        10
+      ],
+      "uncertainty": "The test did not separate the miss rate; if half the branches missed, the penalty per miss is about 10. The model charges this value per branch the scenario marks mispredicted."
+    },
+    "latency.branch_taken_bubble": {
+      "value": 0,
+      "unit": "cycles",
+      "status": "derived",
+      "source": "S8-01 C9: loop costs about 2 ticks per vector op plus 2 per loop branch at one thread (the branch costs its issue slot only)"
+    },
+    "latency.scalar_imul": {
+      "value": 10,
+      "unit": "cycles",
+      "status": "documented",
+      "source": "R02 p.56; not measured on this card by the imported runs"
+    },
+    "latency.x87_add": {
+      "value": 3,
+      "unit": "cycles",
+      "status": "measured",
+      "source": "S6-03 x87_add.lat 3.02"
+    },
+    "latency.x87_mul": {
+      "value": 3,
+      "unit": "cycles",
+      "status": "measured",
+      "source": "S6-03 x87_mul.lat 3.02"
+    },
+    "latency.x87_div": {
+      "value": 38,
+      "unit": "cycles",
+      "status": "measured",
+      "source": "S6-03 x87_div.lat 39.25, .rt 38.24; one divide per 38 cycles per core at four threads"
+    },
+    "occupancy.x87_mul": {
+      "value": 2,
+      "unit": "core cycles",
+      "status": "measured",
+      "source": "S6-03 x87_mul.rt 4.02 per thread at two threads (one per 2 cycles per core)"
+    },
+    "occupancy.x87_div": {
+      "value": 38,
+      "unit": "core cycles",
+      "status": "measured",
+      "source": "S6-03 x87_div.rt 151.76 per thread at four threads (37.9 per core)"
+    },
+    "latency.gather_first_line": {
+      "value": 15,
+      "unit": "cycles",
+      "status": "measured",
+      "source": "S6-03 gather_all.lat 15.10 (16 lanes in one line, one thread)"
+    },
+    "occupancy.gather_cycles_per_line": {
+      "value": 7,
+      "unit": "core cycles per distinct line",
+      "status": "measured",
+      "source": "S6-03 gather_all.rt 7.08 per gather at one thread, 7.02 per core at four; gather_scattered (16 lines) 127 per core",
+      "uncertainty": "16 lines measured 127 per core, more than 16 x 7 = 112; the per-line figure is optimistic for scattered gathers."
+    },
+    "occupancy.vprefetch_l2_core_cycles": {
+      "value": 2,
+      "unit": "core cycles between vprefetch1 issues",
+      "status": "measured",
+      "source": "S8-01 C2: vprefetch1 4.52 per thread at two threads, 9.01 at four (about 2.25 per core); modeled as 2 (integer cycles)",
+      "uncertainty": "2.25 measured; the integer model understates by about 11%."
+    },
+    "memory.lines_per_cycle_per_core_measured": {
+      "value": 0.0513,
+      "unit": "lines per core cycle, sequential loads at four threads with the hardware prefetcher active",
+      "status": "measured",
+      "source": "S6-03 memory.load_rt 77.92 per thread at four threads (19.5 ticks per line per core, about 4 GB/s per core at one core)",
+      "note": "Informational: includes the L2 hardware prefetcher, which the simulator does not model."
+    },
+    "latency.spill_reload_chain": {
+      "value": 12,
+      "unit": "cycles for a store followed by a dependent reload",
+      "status": "measured",
+      "source": "S6-03 spill_reload.lat 12.11 (one thread), 13.14 at four"
+    },
+    "latency.store_to_load_same_line": {
+      "value": 7,
+      "unit": "cycles after a store issues before a load of the same line sees the data",
+      "status": "derived",
+      "source": "S8-12 C9 memory chain u1 11.07 per link = folded-load add (4) + store-to-load path; spill_reload.lat 12.11 = path + plain load (5)",
+      "alternatives": [
+        3,
+        9
+      ]
+    },
+    "latency.fence": {
+      "value": null,
+      "unit": "cycles",
+      "status": "unknown",
+      "source": "lock addl is used as a publication fence by the project but its latency was not measured"
+    },
+    "latency.x87_move": {
+      "value": 3,
+      "unit": "cycles",
+      "status": "assumed",
+      "source": "same pipeline as the measured x87 add (S6-03 x87_add.lat 3.02); fld from memory uses the load latency instead",
+      "alternatives": [
+        1
+      ],
+      "uncertainty": "fxch may be cheaper; not measured"
+    },
+    "latency.x87_compare": {
+      "value": 3,
+      "unit": "cycles",
+      "status": "assumed",
+      "source": "assumed equal to the measured x87 add latency",
+      "alternatives": [
+        1,
+        4
+      ]
+    },
+    "latency.x87_control": {
+      "value": null,
+      "unit": "cycles",
+      "status": "unknown",
+      "source": "fldcw/fnstcw/fnstsw not measured; a region using them stops with missing_parameter (native request candidate)"
+    },
+    "latency.x87_sqrt": {
+      "value": null,
+      "unit": "cycles",
+      "status": "unknown",
+      "source": "not measured (native request candidate)"
+    },
+    "latency.scalar_idiv": {
+      "value": null,
+      "unit": "cycles",
+      "status": "unknown",
+      "source": "not measured (native request candidate)"
+    },
+    "occupancy.scatter_cycles_per_line": {
+      "value": null,
+      "unit": "core cycles per distinct line",
+      "status": "unknown",
+      "source": "not measured; S6-03 measured gathers only (native request candidate)"
+    },
+    "tlb.l1_entries_4k": {
+      "value": 64,
+      "unit": "pages",
+      "status": "measured",
+      "source": "S8-12 C4 rerun (2026-11-08): loads cost L1 latency up to 64 4 KiB pages per core and about 29 ticks more beyond"
+    },
+    "tlb.l1_miss_penalty_cycles": {
+      "value": 29,
+      "unit": "cycles",
+      "status": "measured",
+      "source": "S8-12 C4 rerun: 31.76-31.79 vs 3.01-3.02 ticks per load at one thread",
+      "alternatives": [
+        91
+      ]
+    },
+    "memory.core_service_cycles_per_line": {
+      "value": 20,
+      "unit": "core cycles between memory fills for one core (sequential stream, hardware prefetcher active)",
+      "status": "measured",
+      "source": "S6-03 memory.load_rt per core at four threads 19.48 ticks per line (37.35 at one thread); modeled as the integer 20",
+      "alternatives": [
+        37
+      ],
+      "uncertainty": "measured with the hardware prefetcher streaming; one core alone on the card; not a card-level bandwidth share"
+    },
+    "latency.vector_load_merge_l1": {
+      "value": 5,
+      "unit": "cycles",
+      "status": "derived",
+      "source": "S6-03 masked_load.lat, masked_load_sparse.lat, convert_up.lat and convert_down.lat all equal spill_reload.lat (12.11): no measurable extra cost for the merge or conversion form",
+      "alternatives": [
+        12
+      ]
+    },
+    "l1.store_miss_stalls_context": {
+      "value": true,
+      "unit": "boolean",
+      "status": "measured",
+      "source": "S6-03 l2.store_normal 23.39 ticks per store at one thread (an L2-resident footprint): each store waits for its line; R08's 'except store misses' does not hold for this card/pattern",
+      "alternatives": [
+        false
+      ]
+    },
+    "store.nr_stall_cycles_resident": {
+      "value": 27,
+      "unit": "cycles per vmovnr* store, cache-resident line, per context",
+      "status": "measured",
+      "source": "S6-03 l1.store_stream 27.19, l2.store_stream 27.49 (one thread)"
+    },
+    "store.nr_stall_cycles_memory": {
+      "value": 157,
+      "unit": "cycles per vmovnr* store to a non-resident line, per context",
+      "status": "measured",
+      "source": "S6-03 memory.store_stream 157.12/158.07/160.26 at 1/2/4 threads"
+    },
+    "store.nr_occupancy_core_cycles": {
+      "value": 9,
+      "unit": "core cycles",
+      "status": "derived",
+      "source": "S6-03 l1.store_stream 36.16 per thread at four threads / 4"
+    },
+    "l2.hw_prefetch_depth_lines": {
+      "value": 8,
+      "unit": "lines ahead per confirmed stream",
+      "status": "derived",
+      "source": "S6-03 memory.load_rt 37.35 ticks per sequential line at one thread with the hardware prefetcher active; depth chosen so the HWP sub-model reproduces that row (see references/validation.md)",
+      "alternatives": [
+        4,
+        16
+      ]
+    }
   }
 }

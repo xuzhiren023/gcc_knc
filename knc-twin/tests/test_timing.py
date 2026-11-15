@@ -121,7 +121,7 @@ class TestMemory(unittest.TestCase):
         res, sim, _ = simulate(self.cold_kernel(False))
         ic = issue_cycles(sim)
         p = profile()
-        self.assertEqual(ic[(0, "use", 0)], 357 + (12 - 3), "load to use = memory latency + (vector_load_l1 - scalar_load_l1)")
+        self.assertEqual(ic[(0, "use", 0)], 357, "plain vector load to use = memory latency (vector_load_l1 3 = scalar_load_l1 3)")
         self.assertGreater(res["per_context"]["0"]["stall_cycles"]["miss_stall"], 300)
 
     def test_prefetch_is_nonblocking_and_hides_latency(self):
@@ -140,7 +140,7 @@ class TestMemory(unittest.TestCase):
                    scenario={"memory": {"type": "fixed_level", "level": "l2"}, "branch": {"type": "all_predicted"}})
         res, sim, _ = simulate(k)
         ic = issue_cycles(sim)
-        self.assertEqual(ic[(0, "use", 0)], 24 + (12 - 3))
+        self.assertEqual(ic[(0, "use", 0)], 24)
 
     def test_outstanding_miss_limit(self):
         ins = [{"op": "vprefetch0", "ops": [{"base": "rax", "disp": 64 * i}], "id": "pf%d" % i} for i in range(10)]

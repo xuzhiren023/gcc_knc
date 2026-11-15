@@ -25,7 +25,7 @@ CASES = [
     ("simulate-saxpy-1ctx", "saxpy loop, one context", ["simulate", "saxpy_loop.json"]),
     ("simulate-saxpy-4ctx", "saxpy loop on four contexts", ["simulate", "saxpy_4ctx.json"]),
     ("simulate-saxpy-asm", "the same loop given as GAS AT&T assembly", ["simulate", "saxpy_asm.json"]),
-    ("simulate-saxpy-overlay", "sensitivity: vector load latency 3 instead of 12", ["simulate", "saxpy_loop.json", "--overlay", os.path.join(ROOT, "profiles", "overlay-vector-load-3.json")]),
+    ("simulate-saxpy-overlay", "sensitivity: vector load latency 3 instead of 12", ["simulate", "saxpy_loop.json", "--overlay", os.path.join(ROOT, "profiles", "overlay-vector-load-12.json")]),
     ("simulate-cold-nopf", "cold stream without prefetch: demand-miss stalls", ["simulate", "stream_cold_nopf.json"]),
     ("simulate-cold-pf", "cold stream with vprefetch0: nonblocking prefetch", ["simulate", "stream_cold_pf.json"]),
     ("simulate-reduce-1acc", "reduction, one accumulator", ["simulate", "reduce_1acc.json"]),
