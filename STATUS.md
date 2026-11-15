@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-14 21:44.
+Updated automatically at every ticket change. Last update: 2026-11-14 21:46.
 
-**Next: the tech lead, on S12-33.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: the tech lead, on S12-24.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[##################--]` 230 of 248
 
@@ -104,7 +104,7 @@ Current tickets: `[##################--]` 230 of 248
 | S12-21 | Scheduling model for M4's serial runs - measure density-1 tuning and the integer-multiply cost against today's density-4 defaults (S12-14 B02, B04, B05) | In progress | Lead raises sessions 9 -> 10: the work is complete (imul cost fix 1a4f5aab0a2, T1 green, T0/T1 pass, lead T... |
 | S12-22 | Low-risk corrections from the S12-14 audit - wrong comments and citations (N01-N09) and the far-prefetch-distance range bug (B10) | Done | The audit's comment and citation fixes are in GCC-KNC and the far prefetch distance can no longer be set eq... |
 | S12-23 | Floating-point environment correctness on KNC - fix the underflow probe that cannot tell flushing from rounding, and handle x87 erratum CD28 (S12-14 N06, N07, B16, B17) | Done | GCC-KNC's floating-point environment handling is now correct on the card: x87 exception clearing uses the C... |
-| S12-24 | ICE in vect_transform_stmt (tree-vect-stmts.cc:13381) on WRF's REMEZ at -mphinix (-O3 -march=knc) | In progress | The WRF REMEZ compiler crash is now reproduced by a 10-line k=-k loop test (int and unsigned char) that fai... |
+| S12-24 | ICE in vect_transform_stmt (tree-vect-stmts.cc:13381) on WRF's REMEZ at -mphinix (-O3 -march=knc) | Waiting for review | GCC e3c5b822619 (tree-vect-loop.cc, on knc), lane gcc built. Green T1 PASS, both main loops vector incl. vm... |
 | S12-25 | WRF smpar build arm with --param=knc-threads-per-core=2 for PhiWeather's 2-threads-per-core runs (A/B against S11-26's default-4 build) | draft |  |
 | S12-26 | WRF hot scalar routines - classify with the S12-19 triage tool and stage bitwise-safe per-file flag arms for PhiWeather to time | draft |  |
 | S12-27 | Latency-aware scalar loops - GCC-KNC unrolls and interleaves independent iterations and hoists conversions so one thread's every-other-cycle issue and long latencies are hidden automatically | draft |  |
@@ -273,6 +273,7 @@ Current tickets: `[##################--]` 230 of 248
 
 ## Recent activity
 
+- 2026-11-14 21:45 **S12-24** engineer submit: GCC e3c5b822619 (tree-vect-loop.cc, on knc), lane gcc built. Green T1 PASS, both main loops vector incl. vmulps zmm; T0-T2 PASS; 5 reproducers comp...
 - 2026-11-14 21:44 **S12-33** engineer ask: Red test commit 41691642 fails as intended when t2_short_vector attempts to compile and link; this test double is incomplete (nm output comes throu...
 - 2026-11-14 21:37 **S12-21** owner decide: Lead raises sessions 9 -> 10: the work is complete (imul cost fix 1a4f5aab0a2, T1 green, T0/T1 pass, lead T2 36/0, A/B staged); the lead submits it.
 - 2026-11-14 21:36 **S12-21** engineer escalate: budget: 9 engineer sessions used; the budget is 9
@@ -280,7 +281,6 @@ Current tickets: `[##################--]` 230 of 248
 - 2026-11-14 21:35 **S12-21** lead answer: Submit.
 - 2026-11-14 21:35 **S12-21** lead resume: Lead 21:36: T2 run by the lead on lane gcc2: 36 PASS, 0 FAIL (log s12_21_t2-20261114-213433.log); the S5-21 file is fixed for good by S12-33. No re...
 - 2026-11-14 21:33 **S12-21** lead defer: Interactive lead needed; diff reviewed (one imul-cost hunk, scanner fix fine). (1) Rebase gcc s12/S12-21 onto knc 2e70e4115e2 (engineer: Permission...
-- 2026-11-14 21:32 **S12-30** engineer ask: 429c7653: A/B/A+B staged; target build/lint PASS; host model 599300 checks PASS. Log: .work/_state/logs/s12_30_phase1_routes-20261114-213007.log. A...
 
 ## Cost
 
