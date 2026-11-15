@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-15 10:36.
+Updated automatically at every ticket change. Last update: 2026-11-15 10:37.
 
 **Next: GPT-6.1, on S12-09 (Sprint 12 batch check - integrated themes at the final Sprint 12 head, regression evidence, optional modes frozen).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
@@ -295,7 +295,7 @@ Current tickets: `[##################--]` 241 of 258
 ## Cost
 
 - From the script, engineer: 701 sessions, 1459.0M input tokens
-- From the script, lead: 468 sessions, 133.3M input tokens
+- From the script, lead: 469 sessions, 133.6M input tokens
 - Started by hand, Claude: 12 sessions, 3590.7M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
