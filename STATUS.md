@@ -104,7 +104,7 @@ Current tickets: `[##################--]` 230 of 244
 | S12-21 | Scheduling model for M4's serial runs - measure density-1 tuning and the integer-multiply cost against today's density-4 defaults (S12-14 B02, B04, B05) | In progress | Phase-2 red approved: tests/t1/knc-imul-cost.c fails on today's compiler only because x*123 (32- and 64-bit... |
 | S12-22 | Low-risk corrections from the S12-14 audit - wrong comments and citations (N01-N09) and the far-prefetch-distance range bug (B10) | Done | The audit's comment and citation fixes are in GCC-KNC and the far prefetch distance can no longer be set eq... |
 | S12-23 | Floating-point environment correctness on KNC - fix the underflow probe that cannot tell flushing from rounding, and handle x87 erratum CD28 (S12-14 N06, N07, B16, B17) | Done | GCC-KNC's floating-point environment handling is now correct on the card: x87 exception clearing uses the C... |
-| S12-24 | ICE in vect_transform_stmt (tree-vect-stmts.cc:13381) on WRF's REMEZ at -mphinix (-O3 -march=knc) | Not started |  |
+| S12-24 | ICE in vect_transform_stmt (tree-vect-stmts.cc:13381) on WRF's REMEZ at -mphinix (-O3 -march=knc) | In progress |  |
 | S12-25 | WRF smpar build arm with --param=knc-threads-per-core=2 for PhiWeather's 2-threads-per-core runs (A/B against S11-26's default-4 build) | draft |  |
 | S12-26 | WRF hot scalar routines - classify with the S12-19 triage tool and stage bitwise-safe per-file flag arms for PhiWeather to time | draft |  |
 | S12-27 | Latency-aware scalar loops - GCC-KNC unrolls and interleaves independent iterations and hoists conversions so one thread's every-other-cycle issue and long latencies are hidden automatically | draft |  |
