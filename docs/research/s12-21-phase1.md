@@ -218,3 +218,32 @@ the cost mechanically to nine or ten from these ticks alone. Phase two still
 needs its intended cost-decision red test, lead-built compiler and required
 validation. No GCC changes, compiler rebuilds, new card jobs, held-out reads,
 x86 checks or ICE sweeps were performed in this continuation.
+
+## Phase two: scalar IMUL cost red test
+
+The lead confirmed that window 2 was uncontended and accepted phase one.
+The default density remains four. Phase two is limited to scalar integer
+multiply cost, on lane `gcc2`; HPCG is excluded from the later paired batch.
+
+`tests/t1/knc-imul-cost.c` checks the optimizer's decision for unsigned
+32-bit and 64-bit multiplication by 123 at `-O2 -march=knc`. Unsigned
+arithmetic preserves defined modular results for every input. The test
+requires arithmetic strength reduction in both functions and rejects IMUL;
+it does not inspect the cost-table source or hardcode a replacement cost.
+A dedicated `--imul-cost` selection runs just this T1 case, which is also
+included in the ordinary complete T1 suite.
+
+With `KNC_GCC_SLOT=2`, ran once:
+
+```text
+python tools/run.py --name s12-21-imul-red --inputs tools/check.py tests/t1/knc-imul-cost.c -- python tools/check.py t1 --compiler gcc16 --imul-cost --worker
+```
+
+The existing GCC 16.2.0 compiler compiled the case successfully; the test
+failed on the forbidden IMUL instruction, as intended. Log:
+`.work/_state/logs/s12_21_imul_red-20261114-203002.log`.
+The lane's build stamp names GCC commit `02f32213c0d6eda6fbf5a262b6c3cc25501a4748`.
+No GCC source changes, rebuild, whole-program restaging or native execution
+were made. Red review precedes the cost correction and lead-owned rebuild;
+T0-T2, ICE sweeps and the short affected-program/control A/B remain pending,
+with x86 identity reserved for the lead.
