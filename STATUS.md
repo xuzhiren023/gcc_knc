@@ -284,7 +284,7 @@ Current tickets: `[##################--]` 230 of 248
 
 ## Cost
 
-- From the script, engineer: 659 sessions, 1304.1M input tokens
+- From the script, engineer: 660 sessions, 1304.5M input tokens
 - From the script, lead: 436 sessions, 121.8M input tokens
 - Started by hand, Claude: 12 sessions, 3375.9M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
