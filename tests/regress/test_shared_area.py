@@ -69,12 +69,16 @@ class SharedOutputTest(unittest.TestCase):
         module = self.load('tools/x87_spill.py')
         before = set(self.base.rglob('*'))
         runner = SimpleNamespace(
+            out=self.base / 'run-output',
             root=self.root, source_dir=self.root / 'tests/t1', cc='gcc16', cc_flags=[],
             tool=lambda name: name,
             command=lambda *args, **kwargs: SimpleNamespace(returncode=1, stdout='stub compiler'),
             result=lambda *args: None)
         module['t1'](runner)
-        self.assert_shared_outputs(before, 'tmp/S2-05')
+        self.assertTrue((runner.out / 'x87-spill').is_dir())
+        for path in set(self.base.rglob('*')) - before:
+            self.assertTrue(path == runner.out or runner.out in path.parents,
+                            'output escaped runner.out: ' + str(path))
 
 
 if __name__ == '__main__':
