@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-15 05:47.
+Updated automatically at every ticket change. Last update: 2026-11-15 05:48.
 
-**Waiting for you:** S12-30. Run `python tools/pm.py inbox`.
+**Next: the tech lead, on S12-31.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[##################--]` 239 of 255
 
@@ -110,7 +110,7 @@ Current tickets: `[##################--]` 239 of 255
 | S12-27 | Latency-aware scalar loops - GCC-KNC unrolls and interleaves independent iterations and hoists conversions so one thread's every-other-cycle issue and long latencies are hidden automatically | draft |  |
 | S12-28 | dispatch.py refuses to start a second dispatcher on a lane that already has a live one | Done | dispatch.py now refuses to start a second dispatcher on a lane that already has a live one (a lock per lane... |
 | S12-29 | Wrong code - vbroadcastsd reads a 4-byte-aligned SCmode constant (complex float) straight from the constant pool and faults on the card (gcc.c-torture pr38969.c, regression from S11-27) | Done | The pr38969 crash from S11-27 is fixed: GCC-KNC no longer broadcasts a vector from memory aligned below its... |
-| S12-30 | Sparse indexed reductions faster than today - vector gather of products with an ordered scalar sum, and indirect prefetch, for CSR-style loops (NPB-CG, HPCG) | **Waiting for you** | budget: 14 engineer sessions used; the budget is 14 |
+| S12-30 | Sparse indexed reductions faster than today - vector gather of products with an ordered scalar sum, and indirect prefetch, for CSR-style loops (NPB-CG, HPCG) | In progress | Lead raises sessions 14 -> 18: progress continues (HPCG dump command fixed, 1d9532db reviewed right); sessi... |
 | S12-31 | HPCG is 1.8% slower with GCC-KNC than with GCC 5.1.1 - find the cause and make it faster (owner: never slower than 5.1.1) | Question for the tech lead | Green is done at f2cfc87f, GCC s12/S12-31 299aaf16b72 (built): both T1 pass, T0-T2 371/0, torture and vect ... |
 | S12-32 | ICE (reload) in gcc.c-torture O3-vect-pr32243.c on the installed GCC-KNC, found by the S12-21 torture sweep | Done | The -O3 vector reload crash in pr32243 is fixed: byte/word vector extends now reload through an aligned sta... |
 | S12-33 | T2 writes its short-vector test binaries into a per-run folder, so Claude, Codex and lead runs never block each other | Done | T2's short-vector cross-check now writes its binaries into the run's own output folder instead of the share... |
@@ -280,6 +280,7 @@ Current tickets: `[##################--]` 239 of 255
 
 ## Recent activity
 
+- 2026-11-15 05:48 **S12-30** owner decide: Lead raises sessions 14 -> 18: progress continues (HPCG dump command fixed, 1d9532db reviewed right); sessions are short ask/answer rounds, not sta...
 - 2026-11-15 05:47 **S12-30** lead escalate: budget: 14 engineer sessions used; the budget is 14
 - 2026-11-15 05:46 **S12-37** engineer ask: bb3f10cc fixes lead card handoff (red ffe52e80): check.py --stage-to explicitly exports successful run binaries; libgcc.py --stage-from reads them....
 - 2026-11-15 05:46 **S12-31** engineer ask: Green is done at f2cfc87f, GCC s12/S12-31 299aaf16b72 (built): both T1 pass, T0-T2 371/0, torture and vect sweeps 0 ICE, A/B staged (python tools/s...
@@ -287,13 +288,12 @@ Current tickets: `[##################--]` 239 of 255
 - 2026-11-15 05:45 **S12-39** lead approve: Engineers no longer need to rebase before submitting: submit only refuses when main has real changes the branch lacks, and approve merges main (and...
 - 2026-11-15 05:34 **S12-39** engineer submit: Implementation committed at 29afee64. Red run failed as expected; all 23 host tests passed. Log: .work/_state/logs/s12_39_integration-20261115-0528...
 - 2026-11-15 05:33 **S12-39** lead answer: Yes: submit with --override 'test/code ratio 123:64; seven host tests each map to one ticket deliverable (status-only submit, real-change refusal, ...
-- 2026-11-15 05:33 **S12-30** engineer ask: 1d9532db: HPCG retry with installed C++ headers failed at ComputeSPMV_ref.cpp:28: omp.h missing. Prior launch failed: python3.exe absent; corrected...
 
 ## Cost
 
 - From the script, engineer: 693 sessions, 1392.3M input tokens
 - From the script, lead: 460 sessions, 129.2M input tokens
-- Started by hand, Claude: 12 sessions, 3542.1M input tokens
+- Started by hand, Claude: 12 sessions, 3544.0M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
