@@ -40,8 +40,11 @@ python knc-twin/scripts/knc_twin.py selftest --out out/selftest
 python knc-twin/scripts/knc_twin.py simulate knc-twin/fixtures/saxpy_loop.json --out out/saxpy
 ```
 
-`selftest` runs the bundled synthetic tests. Passing them means the engine works as specified
-here; it is not validation against hardware (see `references/calibration.md`).
+`selftest` runs the bundled synthetic tests and oracle checks. Passing them means the engine works as
+specified here; the comparison with hardware is `references/validation.md`.
+
+To read compiler output: `python knc-twin/scripts/from_gcc_s.py file.s --function NAME --init init.json --out k.json`
+(see `references/input-format.md`). To rank a candidate set off-card: `python knc-twin/scripts/knc_twin.py batch manifest.json --out out/batch`.
 
 ## Updating a profile with native data
 

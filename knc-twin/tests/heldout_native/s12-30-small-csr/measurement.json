@@ -1,0 +1,46 @@
+{
+ "schema": "knc-twin.heldout-measurement/1",
+ "case": "s12-30-small-csr",
+ "source_log": ".work/_shared/tmp/claude-s12-window8/s12-30-gate-hpcg.out lines 68-88 (CASE small CSR n=13 rows=32 nnz=416 rhs_bytes=32768 columns=random, TIME samples 0-4)",
+ "source_doc": "docs/research/s12-30-phase1.md (branch s12/S12-30), gate slots and window tables",
+ "unit": "median seconds per csr_raw call over five samples (about 74000-78000 calls each), one core, one thread",
+ "clock": "core cycles = seconds x 1.238e9 (card.clock_hz of card-7120-measured, S6-01 run logs; micsmc reports 1.24 GHz)",
+ "used_to_set_parameters": false,
+ "input_note": "the card's columns are random into a 32 KiB x; the twin's kernels (fixtures/batch) use one deterministic input of the same shape (32 rows, 13 nonzeros, 32 KiB x)",
+ "rows": [
+  {
+   "slot": "donor-off",
+   "seconds_per_call_median": 6.74927472451e-06,
+   "nnz_per_call": 416,
+   "core_cycles_per_call": 8355.6,
+   "threads": 1
+  },
+  {
+   "slot": "knc-switch-off",
+   "seconds_per_call_median": 6.85312310209e-06,
+   "nnz_per_call": 416,
+   "core_cycles_per_call": 8484.2,
+   "threads": 1
+  },
+  {
+   "slot": "knc-switch-on",
+   "seconds_per_call_median": 6.85022532958e-06,
+   "nnz_per_call": 416,
+   "core_cycles_per_call": 8480.6,
+   "threads": 1
+  },
+  {
+   "slot": "knc-switch-off-two-nests",
+   "seconds_per_call_median": 6.69109006424e-06,
+   "nnz_per_call": 416,
+   "core_cycles_per_call": 8283.6,
+   "threads": 1
+  }
+ ],
+ "per_variant": {
+  "donor-off": 8355.6,
+  "knc-switch-off": 8484.2,
+  "knc-switch-on": 8480.6,
+  "knc-switch-off-two-nests": 8283.6
+ }
+}

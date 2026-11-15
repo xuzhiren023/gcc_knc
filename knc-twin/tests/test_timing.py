@@ -100,10 +100,17 @@ class TestPairing(unittest.TestCase):
         from knc_model.kernel import load_kernel
         k = load_kernel(helpers.fixture("gather_scattered.json"))
         res, sim, _ = simulate(k)
-        self.assertEqual(res["completion_cycles"], 15 + 7 * 15 + 4)
+        self.assertEqual(res["completion_cycles"], 15 + 7 * 15 + 4, "data ready after first-line latency plus per-line occupancy")
         k1 = load_kernel(helpers.fixture("gather_one_line.json"))
         res1, _, _ = simulate(k1)
         self.assertEqual(res1["completion_cycles"], 15 + 4)
+        # the completion mask is readable after latency.gather_mask_cycles, not after the data
+        k2 = kernel([{"op": "vgatherdps", "ops": ["zmm0", {"base": "rax", "vindex": "zmm1", "scale": 4}], "mask": "k1", "id": "g"},
+                     {"op": "kmov", "ops": ["eax", "k1"], "id": "m"}],
+                    init={"memory": [{"addr": "0x2000", "u32": [0] * 16}], "registers": {"rax": "0x2000", "k1": "0xffff", "zmm1": {"u32": list(range(16))}}})
+        res2, sim2, _ = simulate(k2)
+        ic = issue_cycles(sim2)
+        self.assertEqual(ic[(0, "m", 0)], 2)
 
 
 class TestMemory(unittest.TestCase):
@@ -121,7 +128,7 @@ class TestMemory(unittest.TestCase):
         res, sim, _ = simulate(self.cold_kernel(False))
         ic = issue_cycles(sim)
         p = profile()
-        self.assertEqual(ic[(0, "use", 0)], 357 + (12 - 3), "load to use = memory latency + (vector_load_l1 - scalar_load_l1)")
+        self.assertEqual(ic[(0, "use", 0)], 357 + (5 - 3), "plain vector load to use = memory latency + (vector_load_l1 - scalar_load_l1)")
         self.assertGreater(res["per_context"]["0"]["stall_cycles"]["miss_stall"], 300)
 
     def test_prefetch_is_nonblocking_and_hides_latency(self):
@@ -140,7 +147,7 @@ class TestMemory(unittest.TestCase):
                    scenario={"memory": {"type": "fixed_level", "level": "l2"}, "branch": {"type": "all_predicted"}})
         res, sim, _ = simulate(k)
         ic = issue_cycles(sim)
-        self.assertEqual(ic[(0, "use", 0)], 24 + (12 - 3))
+        self.assertEqual(ic[(0, "use", 0)], 24 + (5 - 3))
 
     def test_outstanding_miss_limit(self):
         ins = [{"op": "vprefetch0", "ops": [{"base": "rax", "disp": 64 * i}], "id": "pf%d" % i} for i in range(10)]
@@ -220,6 +227,28 @@ class TestBudgetsAndDeterminism(unittest.TestCase):
         k.scenario["branch"] = {"type": "ids_mispredicted", "ids": ["br"]}
         ids, _, _ = simulate(k)
         self.assertEqual(ids["completion_cycles"], mis["completion_cycles"])
+
+
+class TestX87MemoryOperand(unittest.TestCase):
+    """An x87 op with a memory source pays the load and then its own latency on the x87 unit."""
+
+    def chain_cycles_per_op(self, op, n):
+        def run(count):
+            asm = "\tfld1\n" + ("\t%s\t(%%rsi)\n" % op) * count
+            k = kernel(None, streams=[{"context": 0, "asm": asm}],
+                       init={"registers": {"rsi": "0x100000"}, "memory": [{"addr": "0x100000", "f64": [1.0]}]},
+                       scenario={"memory": {"type": "fixed_level", "level": "l1"}, "branch": {"type": "all_predicted"}})
+            return simulate(k)[0]["completion_cycles"]
+        return (run(2 * n) - run(n)) / float(n)
+
+    def test_fdivl_chain_pays_load_plus_divide(self):
+        p = profile()
+        per_op = self.chain_cycles_per_op("fdivl", 8)
+        self.assertEqual(per_op, p.get("latency.scalar_load_l1") + p.get("latency.x87_div"))
+
+    def test_fmull_chain_pays_load_plus_multiply(self):
+        p = profile()
+        self.assertEqual(self.chain_cycles_per_op("fmull", 8), p.get("latency.scalar_load_l1") + p.get("latency.x87_mul"))
 
 
 if __name__ == "__main__":

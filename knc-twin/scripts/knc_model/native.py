@@ -29,13 +29,18 @@ def _memory_image(kernel):
         else:
             data = encode_values(blk, "init.memory[%d]" % i)
         blocks.append((addr, data))
+    for i, blk in enumerate(kernel.expected.get("memory", [])):
+        # expected output ranges belong to the relocated image too (zero-filled unless initialized)
+        addr = parse_int(blk["addr"], "expected.memory.addr")
+        n = len(encode_values(blk, "expected.memory[%d]" % i))
+        blocks.append((addr, bytes(n)))
     if not blocks:
         return None, 0, b""
     base = min(a for a, _ in blocks) & ~0xFFF
     end = max(a + len(d) for a, d in blocks)
     span = (end - base + 63) & ~63
     img = bytearray(span)
-    for a, d in blocks:
+    for a, d in sorted(blocks, key=lambda t: 1 if any(t[1]) else 0):
         img[a - base:a - base + len(d)] = d
     return base, span, bytes(img)
 
@@ -56,9 +61,9 @@ def gen_kernel_asm(kernel, mem_base, mem_span):
     for stream in kernel.streams:
         fn = "knc_twin_kernel_ctx%d" % stream.context
         regs = _reg_inits(kernel, stream)
-        for insn in stream.insns:
-            if "rsp" in insn.writes:
-                raise Unsupported("prepare-native: kernel writes rsp; cannot wrap it in a function")
+        uses_stack = any("rsp" in insn.writes for insn in stream.insns)
+        if uses_stack:
+            out.append("# NOTE: the region adjusts rsp (push/pop/sub): the driver's own stack is used, so rsp/rbp from the kernel's init are not loaded.")
         out.append("\t.globl %s" % fn)
         out.append("\t.p2align 6")
         out.append("%s:" % fn)
@@ -78,7 +83,7 @@ def gen_kernel_asm(kernel, mem_base, mem_span):
                 out.append("\tvmovaps knc_twin_zmm_init+%d(%%rip), %%%s" % (64 * idx, n))
         for name, val in regs.items():
             n = name.lower()
-            if n in GPR64:
+            if n in GPR64 and n not in ("rsp", "rbp"):
                 v = parse_int(val, name)
                 if mem_base is not None and mem_base <= v < mem_base + mem_span:
                     out.append("\tleaq knc_twin_mem+%d(%%rip), %%%s" % (v - mem_base, n))

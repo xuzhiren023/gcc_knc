@@ -1,0 +1,69 @@
+{
+ "name": "gcc_forms_movslq",
+ "kind": "form_fixture",
+ "source": "../../fixtures/gcc_o2_forms.s",
+ "loop": ".Lmovslq",
+ "contexts": 1,
+ "spec": {
+  "unit_of_work": {
+   "description": "one int32 index",
+   "count": 4
+  },
+  "numerical_policy": {
+   "rounding": "rn",
+   "ftz": false,
+   "daz": false,
+   "nan_compare": "bits"
+  },
+  "scenario": {
+   "memory": {
+    "type": "fixed_level",
+    "level": "l1"
+   },
+   "branch": {
+    "type": "all_predicted"
+   }
+  },
+  "init": {
+   "memory": [
+    {
+     "addr": "0x10000",
+     "i32": [
+      3,
+      -2,
+      5,
+      -7
+     ]
+    }
+   ],
+   "registers": {
+    "r8": "0x10000",
+    "rax": 0
+   }
+  },
+  "expected": {
+   "registers": {
+    "0": {
+     "rax": 4,
+     "r10": "0xfffffffffffffff9",
+     "r11": "0xfffffffffffffff9"
+    }
+   }
+  },
+  "loop": {
+   "trip_count": 4
+  }
+ },
+ "trace_source": "functional",
+ "simulate": [
+  [
+   0
+  ]
+ ],
+ "bounds_loop": false,
+ "expect": {
+  "conversion": "ok",
+  "functional": "ok"
+ },
+ "schema": "knc-twin.trial-case/1"
+}

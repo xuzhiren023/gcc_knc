@@ -43,7 +43,7 @@ def load_json(path, what="file"):
 
 
 def dump_json(obj, path):
-    with open(path, "w", encoding="utf-8") as f:
+    with open(path, "w", encoding="utf-8", newline="\n") as f:
         json.dump(obj, f, indent=2, sort_keys=True)
         f.write("\n")
 

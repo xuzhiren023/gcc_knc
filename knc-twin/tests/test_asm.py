@@ -22,27 +22,36 @@ class TestAsm(unittest.TestCase):
         """)
         self.assertEqual(len(recs), 8)
         self.assertEqual(recs[0]["op"], "vmovaps")
-        self.assertEqual(recs[0]["ops"], ["zmm0", {"disp": "64", "base": "rax", "index": "rcx", "scale": 4}])
+        self.assertEqual(recs[0]["ops"], ["zmm0", {"disp": 64, "base": "rax", "index": "rcx", "scale": 4}])
         self.assertEqual(recs[0]["label"], "L")
         self.assertEqual(recs[1]["ops"][2], {"base": "rbx", "broadcast": "1to16"})
         self.assertEqual(recs[1]["mask"], "k1")
         self.assertEqual(recs[2]["rounding"], "rd")
         self.assertEqual(recs[3]["op"], "add")
         self.assertEqual(recs[3]["width"], 64)
-        self.assertEqual(recs[3]["ops"], ["rcx", {"imm": "16"}])
+        self.assertEqual(recs[3]["ops"], ["rcx", {"imm": 16}])
         self.assertEqual(recs[4]["width"], 32)
         self.assertEqual(recs[7]["ops"], ["L"])
         self.assertTrue(any("directive ignored" in n for n in notes))
 
     def test_rejections(self):
         with self.assertRaises(Unsupported):
-            asm.parse_gas("vaddps %zmm1{cdab}, %zmm2, %zmm3")
-        with self.assertRaises(Unsupported):
-            asm.parse_gas("movw $1, %ax")
+            asm.parse_gas("vaddps %zmm1{sint32}, %zmm2, %zmm3")
+        recs, _ = asm.parse_gas("vaddps %zmm1{cdab}, %zmm2, %zmm3")
+        self.assertEqual(recs[0]["ops"], ["zmm3", "zmm2", {"reg": "zmm1", "swizzle": "cdab"}])
+        recs, _ = asm.parse_gas("movw $1, %ax")
+        self.assertEqual((recs[0]["op"], recs[0]["width"]), ("mov", 16))
         with self.assertRaises(Unsupported):
             asm.parse_gas(".byte 0x90")
+        recs, notes = asm.parse_gas("L1:\nL2:\n addq $1, %rax\n jne L2")
+        self.assertEqual(recs[0]["label"], "L1")
+        self.assertEqual(recs[1]["ops"], ["L1"], "an alias label is redirected to the kept label")
+        recs, _ = asm.parse_gas("1:\n addq $1, %rax\n jne 1b\n2:\n decq %rdx\n jne 2b")
+        self.assertEqual(recs[0]["label"], "L1_1")
+        self.assertEqual(recs[1]["ops"], ["L1_1"])
+        self.assertEqual(recs[3]["ops"], ["L2_1"])
         with self.assertRaises(InvalidInput):
-            asm.parse_gas("L1:\nL2:\n addq $1, %rax")
+            asm.parse_gas(" jne 3b")
 
     def test_asm_fixture_matches_records(self):
         a = load_kernel(helpers.fixture("saxpy_asm.json"))
