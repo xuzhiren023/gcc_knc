@@ -76,16 +76,20 @@ L1 = {"memory": {"type": "fixed_level", "level": "l1"}, "branch": {"type": "all_
 # ---------------------------------------------------------------------------------------------
 # instruction forms added for real -O2 output (fixtures/gcc_o2_forms.s)
 values = [3, -2, 5, -7]
-rsi = sum(4 * v for v in values) + 100  # the jbe loop, then ja not taken (+100), jnb taken (skips +1000)
+zext = [v & 0xFFFFFFFF for v in values]  # movl zero-extends into the 64-bit register
+rsi = sum(4 * v for v in zext) + 100  # the jbe loop, then ja not taken (+100), jnb taken (skips +1000)
 write_case({
     "name": "gcc_forms_scalar", "kind": "form_fixture", "source": "../../fixtures/gcc_o2_forms.s", "loop": ".Lscalar", "contexts": 1,
     "spec": {"unit_of_work": {"description": "one int32 element", "count": 4}, "numerical_policy": POLICY, "scenario": L1,
              "init": {"memory": [{"addr": "0x10000", "i32": values}],
                       "registers": {"r8": "0x10000", "rax": 0, "rsi": 0, "rdi": 5}},
-             "expected": {"registers": {"0": {"rsi": rsi, "rax": 4, "rdi": 10, "r10": u64(values[-1]), "r11": u64(4 * values[-1])}}},
+             "expected": {"registers": {"0": {"rsi": rsi, "rax": 4, "rdi": 10, "r10": u64(zext[-1]), "r11": u64(4 * zext[-1])}}},
              "loop": {"trip_count": 4}},
     "trace_source": "functional", "simulate": [[0]], "bounds_loop": False,
     "expect": {"conversion": "ok", "functional": "ok"}})
+write_case({
+    "name": "gcc_forms_movslq", "kind": "form_fixture", "source": "../../fixtures/gcc_o2_forms.s", "loop": ".Lmovslq", "contexts": 1,
+    "spec": {}, "expect": {"conversion": "unsupported", "unsupported_lines": [26, 27]}})
 
 def static_addr(path, label, bases, stride):
     """addr hints for the loop at `label`: each memory operand's base register value + disp, fixed stride."""

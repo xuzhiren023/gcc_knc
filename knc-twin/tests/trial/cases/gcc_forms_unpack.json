@@ -28,23 +28,23 @@
    "trip_count": 4
   },
   "addr": {
-   "L26": {
+   "L33": {
     "start": "0x2ffffc",
     "stride": 64
    },
-   "L27": {
+   "L34": {
     "start": "0x30003c",
     "stride": 64
    },
-   "L28": {
+   "L35": {
     "start": "0x300000",
     "stride": 64
    },
-   "L29": {
+   "L36": {
     "start": "0x400000",
     "stride": 64
    },
-   "L30": {
+   "L37": {
     "start": "0x400040",
     "stride": 64
    }

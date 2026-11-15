@@ -11,9 +11,9 @@ Accepted (documented in references/input-format.md):
   dest{rn}|{rd}|{ru}|{rz}      rounding on the destination (KNC swizzle field used for rounding)
   lock addl $imm, mem          -> lock_add
   salq/sall                    -> shl (the same instruction)
-  movslq src, %r64             -> movsxd (sign-extend 32 to 64 bits)
 Rejected: any other swizzle ({cdab}, {aaaa}, ...), 8/16-bit registers, segment prefixes, unknown mnemonics,
-x87 instructions with a memory operand (x87 records carry no operands, so the access would be lost).
+x87 instructions with a memory operand (x87 records carry no operands, so the access would be lost),
+sign-extending moves (movslq, movsx*: no sourced KNC cost; R02 Table 3-1 p.34 does not list them).
 """
 import re
 
@@ -23,7 +23,7 @@ _IGNORED_DIRECTIVES = (".text", ".globl", ".global", ".p2align", ".align", ".typ
 _LABEL_RE = re.compile(r"^([A-Za-z_.$][\w.$]*):(.*)$")
 _MEM_RE = re.compile(r"^(?P<disp>[-+]?(0x[0-9a-fA-F]+|\d+))?\((?P<inner>[^)]*)\)$")
 _SIZE_SUFFIX_OPS = ("mov", "add", "sub", "and", "or", "xor", "cmp", "test", "lea", "inc", "dec", "neg", "not", "shl", "shr", "sar", "imul")
-_SYNONYMS = {"salq": ("shl", 64), "sall": ("shl", 32), "movslq": ("movsxd", 64)}
+_SYNONYMS = {"salq": ("shl", 64), "sall": ("shl", 32)}
 _ROUNDING = {"rn": "rn", "rd": "rd", "ru": "ru", "rz": "rz", "rn-sae": "rn", "rd-sae": "rd", "ru-sae": "ru", "rz-sae": "rz"}
 
 
@@ -137,6 +137,9 @@ def parse_gas(text):
             width = None
         if mnem in ("ret", "nop"):
             raise Unsupported("%s: %r is outside the kernel subset (strip the function epilogue)" % (where, mnem))
+        if mnem.startswith("movs") and mnem not in ("movsb", "movsw", "movsd", "movsq"):
+            raise Unsupported("%s: sign-extending move %r has no sourced KNC cost (R02 Table 3-1 p.34 lists no "
+                              "MOVSX/MOVSXD); unsupported until a source or a lead answer" % (where, mnem))
         base = mnem
         if mnem in _SYNONYMS:
             base, width = _SYNONYMS[mnem]
@@ -192,8 +195,6 @@ def emit_gas(stream):
             mnem = insn.op + ("q" if insn.width == 64 else "l")
         if insn.op == "lock_add":
             mnem = "lock addl" if insn.width == 32 else "lock addq"
-        if insn.op == "movsxd":
-            mnem = "movslq"
         toks = []
         for k, (opnd, role) in enumerate(zip(insn.operands, insn.roles)):
             name = type(opnd).__name__

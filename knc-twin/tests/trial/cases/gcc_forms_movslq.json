@@ -1,0 +1,16 @@
+{
+ "name": "gcc_forms_movslq",
+ "kind": "form_fixture",
+ "source": "../../fixtures/gcc_o2_forms.s",
+ "loop": ".Lmovslq",
+ "contexts": 1,
+ "spec": {},
+ "expect": {
+  "conversion": "unsupported",
+  "unsupported_lines": [
+   26,
+   27
+  ]
+ },
+ "schema": "knc-twin.trial-case/1"
+}

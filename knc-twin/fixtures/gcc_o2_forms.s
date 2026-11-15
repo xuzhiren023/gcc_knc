@@ -1,10 +1,10 @@
 # S13-06: instruction forms of real GCC-KNC -O2 output that the parser or ISA table lacked.
 # Each loop is converted by scripts/from_gcc_s.py in tests/trial/cases (gcc_forms_*).
 	.text
-# movslq (register and memory), salq/sall, jbe, ja, jnb: functional, exact expected values
+# salq/sall, jbe, ja, jnb: functional, exact expected values (32-bit movl zero-extends)
 .Lscalar:
-	movslq	(%r8,%rax,4), %r10
-	movslq	%r10d, %r11
+	movl	(%r8,%rax,4), %r10d
+	movl	%r10d, %r11d
 	salq	$2, %r11
 	addq	%r11, %rsi
 	addq	$1, %rax
@@ -21,6 +21,13 @@
 .Lscalar_next:
 	cmpq	$4, %rax
 	jne	.Lscalar
+# movslq (S12-30/S12-31 SpMV index loads): rejected, no sourced cost
+.Lmovslq:
+	movslq	(%r8,%rax,4), %r10
+	movslq	%r10d, %r11
+	addq	$1, %rax
+	cmpq	$4, %rax
+	jne	.Lmovslq
 # vloadunpacklps/hps and vpackstorelps/hps (stencil1 and saxpy prologue of trial.s): timing only
 .Lunpack:
 	vloadunpacklps	-4(%r8,%rax), %zmm0

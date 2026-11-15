@@ -11,6 +11,10 @@
    "conversion": "unsupported",
    "unsupported": [
     {
+     "line": 14,
+     "text": "movslq\t(%r8,%rax,4), %r10"
+    },
+    {
      "line": 15,
      "text": "fldl\t(%rdx,%r10,8)"
     },
@@ -29,6 +33,10 @@
    ],
    "conversion": "unsupported",
    "unsupported": [
+    {
+     "line": 35,
+     "text": "movslq\t(%r8,%rax,4), %r10"
+    },
     {
      "line": 36,
      "text": "fldl\t(%rdx,%r10,8)"
@@ -49,6 +57,10 @@
    "conversion": "unsupported",
    "unsupported": [
     {
+     "line": 56,
+     "text": "movslq\t(%r8,%rax,4), %r10"
+    },
+    {
      "line": 57,
      "text": "fldl\t(%rdx,%r10,8)"
     },
@@ -67,6 +79,10 @@
    ],
    "conversion": "unsupported",
    "unsupported": [
+    {
+     "line": 77,
+     "text": "movslq\t(%r8,%rax,4), %r10"
+    },
     {
      "line": 78,
      "text": "fldl\t(%rdx,%r10,8)"
@@ -87,6 +103,10 @@
    "conversion": "unsupported",
    "unsupported": [
     {
+     "line": 98,
+     "text": "movslq\t(%r8,%rax,4), %r10"
+    },
+    {
      "line": 99,
      "text": "fldl\t(%rdx,%r10,8)"
     },
@@ -106,6 +126,10 @@
    "conversion": "unsupported",
    "unsupported": [
     {
+     "line": 119,
+     "text": "movslq\t(%r8,%rax,4), %r10"
+    },
+    {
      "line": 120,
      "text": "fldl\t(%rdx,%r10,8)"
     },
@@ -124,6 +148,10 @@
    ],
    "conversion": "unsupported",
    "unsupported": [
+    {
+     "line": 141,
+     "text": "movslq\t(%r8,%rax,4), %r10"
+    },
     {
      "line": 142,
      "text": "fldl\t(%rdx,%r10,8)"

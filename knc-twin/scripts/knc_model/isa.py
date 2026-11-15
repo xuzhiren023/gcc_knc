@@ -67,8 +67,6 @@ for _n in ("shl", "shr", "sar"):
     _add(_n, "scalar_alu", ["rw:gm", "r:i"], fn="shift", flags_w=True, note="immediate count only; CF/OF after count>1 follow the SDM for CF, OF is left unchanged (documented undefined)")
 _add("imul", "scalar_imul", ["rw:g", "r:gm"], fn="imul", flags_w=True, note="two-operand form; result truncated to operand width")
 _add("movzx", "scalar_alu", ["w:g", "r:gm"], fn=None, note="timing only; functional not implemented")
-_add("movsxd", "scalar_alu", ["w:g", "r:gm"], fn="movsxd", mem_size=4,
-     note="AT&T movslq: sign-extends a 32-bit register or memory source into a 64-bit register; costed as movzx (scalar ALU, memory form a scalar load)")
 
 # ---- branches ---------------------------------------------------------------------
 _add("jmp", "branch", ["t"], fn="jmp")

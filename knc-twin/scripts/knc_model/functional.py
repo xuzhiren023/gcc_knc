@@ -472,16 +472,6 @@ class Interpreter(object):
         else:
             self.gset(cx, dst, v, w)
 
-    def h_movsxd(self, cx, insn, ev, trace_mem, stream):
-        dst, src = insn.operands
-        if isinstance(src, Mem):
-            addr = self.ea(cx, src)
-            v = int.from_bytes(self.memory.read(addr, 4, cx.ctx), "little")
-            trace_mem.append((addr, 4))
-        else:
-            v = cx.gpr[src.base] & 0xFFFFFFFF
-        self.gset(cx, dst, v - (1 << 32) if v & 0x80000000 else v, 64)
-
     def h_lea(self, cx, insn, ev, trace_mem, stream):
         dst, mem = insn.operands
         self.gset(cx, dst, self.ea(cx, mem), insn.width)

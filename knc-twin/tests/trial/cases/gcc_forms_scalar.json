@@ -46,11 +46,11 @@
   "expected": {
    "registers": {
     "0": {
-     "rsi": 96,
+     "rsi": 34359738464,
      "rax": 4,
      "rdi": 10,
-     "r10": "0xfffffffffffffff9",
-     "r11": "0xffffffffffffffe4"
+     "r10": "0x00000000fffffff9",
+     "r11": "0x00000003ffffffe4"
     }
    }
   },

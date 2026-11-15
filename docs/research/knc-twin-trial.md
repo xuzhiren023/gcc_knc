@@ -1,8 +1,7 @@
 # knc-twin trial and validation (S13-06, 2026-11-15)
 
 Engine 0.1.0, profile `card-7120-measured` v0.1.0 (hash `7ba039d9aac0...`); no card run, no GCC build. Numbers are
-**(pred)** (twin output, status ok) or **(meas)** (native, existing log); simulated cycles are never measurements.
-Reproduce: `python knc-twin/tests/trial/knc_trial.py` (writes `results.json`); host test `tests/regress/test_knc_twin.py`.
+**(pred)** (twin output, status ok) or **(meas)** (native, existing log); simulated cycles are never measurements. Reproduce: `python knc-twin/tests/trial/knc_trial.py` (writes `results.json`); host test `tests/regress/test_knc_twin.py`.
 
 **In short.** The twin reproduces its own characterization rows within 2%. That is consistency, because those
 rows built the profile. It cannot read GCC-KNC's scalar floating-point code: every measured held-out
@@ -31,11 +30,11 @@ rows inside the model are two card-scale STREAM scenarios, and their predicted b
 from the label to the last branch back to it. Every line is either converted (ids `L<line>`) or listed with
 its line, exact text and reason, and the kernel is written only when nothing is listed. `--function` takes the
 only innermost loop; regions that `ret` are not loops. Fixes, each in `fixtures/gcc_o2_forms.s` (cases
-`gcc_forms_scalar`, functional ok, and `gcc_forms_unpack`, static):
+`gcc_forms_scalar`, functional ok, `gcc_forms_unpack`, static, `gcc_forms_movslq`, rejected):
 
 - `jbe`/`ja`/`jnb` (and `jna`, `jnbe`, `jnae`): missing from the ISA table; in the trial prologues (saxpy, stencil1) and in `fsum`.
-- `movslq` -> new `movsxd` (sign-extend; costed like the existing `movzx`, memory form a scalar load;
-  `kernel.py` needed the matching one-word class switch and a width default). It is in every S12-30/S12-31 SpMV loop.
+- `movslq`/`movsx*`: rejected with a reason, no sourced cost (R02 p.34 Table 3-1 lists neither MOVSX nor the
+  existing `movzx` row). In every S12-30/S12-31 SpMV loop; costing it needs a source or a lead answer.
 - `salq`/`sall` -> `shl`; `vloadunpacklps/hps`, `vpackstorelps/hps`: aliases of the `ld/hd` rows, timing only.
 - x87 with a memory operand is now rejected with a reason in `asm.py`. Before this, the parser rejected only the
   suffixed mnemonic. A JSON record such as `{"op": "fld", "ops": [mem]}` still silently loses the operand,
@@ -45,7 +44,8 @@ Rejected in the trial loops and held-out kernels, exact text (status `unsupporte
 `fadds\t(%rax)` ... `fadds\t-4(%rax)` (trial.s 164-183, all 16 of `fsum` .L26); `fldl\t(%rdx,%r10,8)`,
 `fmull\t(%rcx,%rax,8)` (every S12-31 variant); `fldl\t(%r8,%rdx,8)`, `fmull\t(%rbx,%rax,8)` (S12-30 `.L8`);
 8x `fldl\t(%r8,%rsi,8)` + `fmull\t(%rdx)`/`-56(%rdx)`...`-8(%rdx)` (S12-30 `.L6`); `fldl\t(%r8,%r10,8)`,
-`fmull\t0(%rbp,%rax,8)` (donor `.L4`); `nop` (char.s `agi.gap1`). Outside the converted loops: `lock; addl`,
+`fmull\t0(%rbp,%rax,8)` (donor `.L4`); `movslq\t(%r8,%rax,4), %r10` (every S12-31 variant), `movslq\t(%rax), %rsi`,
+`4(%rax)`...`-4(%rax)`, `(%r10,%rax,4), %rdx`, `(%rbx,%rax,4), %r10` (S12-30); `nop` (char.s `agi.gap1`). Outside the converted loops: `lock; addl`,
 `setne`, `sbbq`, `sall %cl`, `leave`. Parameters a run stopped on: `card.sustained_bandwidth_gbs.read_only`
 (`needs_parameters`: STREAM read, GEMV). No `missing_parameter` stops.
 
@@ -117,8 +117,9 @@ bind. Core-scale held-out rows inside the model: **none**.
   `vloadunpack` chains, gathers over many lines (16 lines: 15 + 7 x 15 = 120 **(pred, by parameter)** against 183.58
   ticks **(meas)** `gather_scattered.lat`, one thread), card bandwidth scenarios (above), mispredicted branches
   (penalty 5 is the C10 per-branch delta, not a per-miss penalty).
-- Unusable: scalar FP code from GCC-KNC (x87 memory forms), so SpMV/HPCG/PhiWeather scalar kernels and any
-  stopped by `nop`, `lock;`, side exits or cl-count shifts.
+- Unusable: scalar FP code from GCC-KNC (x87 memory forms) and `movslq` index loads, so SpMV/HPCG/PhiWeather
+  scalar kernels; any loop stopped by `nop`, `lock;`, side exits or cl-count shifts. Merge: main's checkout has uncommitted
+  twin edits (asm/isa/functional/kernel.py, profiles, untracked `from_gcc_s.py`) that overlap this branch.
 
 ## 7. `card-7120-measured` against `docs/research/knc-machine.yaml` (branch s13/S13-05, 6966ce88)
 
@@ -146,5 +147,4 @@ Staged with `prepare-native` and cross-built with the MPSS toolchain in `.work/_
    iteration per thread (10.875 / - / 16.0 if the vector load is 3), so it decides `latency.vector_load_l1`.
 2. `trial_stencil_L51` (`--no-check`, no expected output): pred 44.44 / 44.5 / 49.0 (20.44 / - / 29.0); unpack merge chain.
 3. `c7_reduce_a1`, `c7_reduce_a2` at 1 and 2 threads: pred 4.0 / 2.06 and 4.01 / 2.07, the gain C7 never measured.
-4. Not stageable (the twin cannot export x87): chains of `fldl`/`fmull`/`fadds` with memory operands and `faddp`
-   in the knc-char harness; they would open the S12-31/S12-30 rows and all GCC-KNC scalar FP.
+4. Not stageable (the twin cannot export x87): chains of `fldl`/`fmull`/`fadds` with memory operands and `faddp` in the knc-char harness; they would open the S12-31/S12-30 rows and all GCC-KNC scalar FP.

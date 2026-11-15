@@ -775,6 +775,29 @@
    ]
   },
   {
+   "name": "gcc_forms_movslq",
+   "kind": "form_fixture",
+   "source": "../../fixtures/gcc_o2_forms.s",
+   "loop": ".Lmovslq",
+   "lines": [
+    25,
+    30
+   ],
+   "conversion": "unsupported",
+   "unsupported": [
+    {
+     "line": 26,
+     "text": "movslq\t(%r8,%rax,4), %r10",
+     "reason": "sign-extending move 'movslq' has no sourced KNC cost (R02 Table 3-1 p.34 lists no MOVSX/MOVSXD); unsupported until a source or a lead answer"
+    },
+    {
+     "line": 27,
+     "text": "movslq\t%r10d, %r11",
+     "reason": "sign-extending move 'movslq' has no sourced KNC cost (R02 Table 3-1 p.34 lists no MOVSX/MOVSXD); unsupported until a source or a lead answer"
+    }
+   ]
+  },
+  {
    "name": "gcc_forms_scalar",
    "kind": "form_fixture",
    "source": "../../fixtures/gcc_o2_forms.s",
@@ -818,14 +841,14 @@
    "source": "../../fixtures/gcc_o2_forms.s",
    "loop": ".Lunpack",
    "lines": [
-    25,
-    33
+    32,
+    40
    ],
    "conversion": "ok",
    "unsupported": [],
    "functional": {
     "status": "unsupported",
-    "message": "instruction L26 (vloadunpacklps) has timing support only; functional execution is not implemented for it"
+    "message": "instruction L33 (vloadunpacklps) has timing support only; functional execution is not implemented for it"
    },
    "engine_version": "0.1.0",
    "profile_hash": "7ba039d9aac0c34729af3a4743a38334147ca84296b982ebaa2894f825289a9a",
@@ -1617,6 +1640,10 @@
      "conversion": "unsupported",
      "unsupported": [
       {
+       "line": 131,
+       "text": "movslq\t(%r10,%rax,4), %rdx"
+      },
+      {
        "line": 132,
        "text": "fldl\t(%r8,%rdx,8)"
       },
@@ -1636,8 +1663,16 @@
      "conversion": "unsupported",
      "unsupported": [
       {
+       "line": 53,
+       "text": "movslq\t(%rax), %rsi"
+      },
+      {
        "line": 55,
        "text": "fldl\t(%r8,%rsi,8)"
+      },
+      {
+       "line": 56,
+       "text": "movslq\t4(%rax), %rsi"
       },
       {
        "line": 57,
@@ -1648,12 +1683,20 @@
        "text": "fldl\t(%r8,%rsi,8)"
       },
       {
+       "line": 64,
+       "text": "movslq\t8(%rax), %rsi"
+      },
+      {
        "line": 65,
        "text": "fmull\t-56(%rdx)"
       },
       {
        "line": 68,
        "text": "fldl\t(%r8,%rsi,8)"
+      },
+      {
+       "line": 69,
+       "text": "movslq\t-20(%rax), %rsi"
       },
       {
        "line": 70,
@@ -1664,12 +1707,20 @@
        "text": "fldl\t(%r8,%rsi,8)"
       },
       {
+       "line": 73,
+       "text": "movslq\t-16(%rax), %rsi"
+      },
+      {
        "line": 74,
        "text": "fmull\t-40(%rdx)"
       },
       {
        "line": 76,
        "text": "fldl\t(%r8,%rsi,8)"
+      },
+      {
+       "line": 77,
+       "text": "movslq\t-12(%rax), %rsi"
       },
       {
        "line": 78,
@@ -1680,12 +1731,20 @@
        "text": "fldl\t(%r8,%rsi,8)"
       },
       {
+       "line": 81,
+       "text": "movslq\t-8(%rax), %rsi"
+      },
+      {
        "line": 82,
        "text": "fmull\t-24(%rdx)"
       },
       {
        "line": 84,
        "text": "fldl\t(%r8,%rsi,8)"
+      },
+      {
+       "line": 85,
+       "text": "movslq\t-4(%rax), %rsi"
       },
       {
        "line": 86,
@@ -1711,6 +1770,10 @@
      "conversion": "unsupported",
      "unsupported": [
       {
+       "line": 201,
+       "text": "movslq\t(%rbx,%rax,4), %r10"
+      },
+      {
        "line": 202,
        "text": "fldl\t(%r8,%r10,8)"
       },
@@ -1735,6 +1798,10 @@
      "conversion": "unsupported",
      "unsupported": [
       {
+       "line": 14,
+       "text": "movslq\t(%r8,%rax,4), %r10"
+      },
+      {
        "line": 15,
        "text": "fldl\t(%rdx,%r10,8)"
       },
@@ -1753,6 +1820,10 @@
      ],
      "conversion": "unsupported",
      "unsupported": [
+      {
+       "line": 35,
+       "text": "movslq\t(%r8,%rax,4), %r10"
+      },
       {
        "line": 36,
        "text": "fldl\t(%rdx,%r10,8)"
@@ -1773,6 +1844,10 @@
      "conversion": "unsupported",
      "unsupported": [
       {
+       "line": 56,
+       "text": "movslq\t(%r8,%rax,4), %r10"
+      },
+      {
        "line": 57,
        "text": "fldl\t(%rdx,%r10,8)"
       },
@@ -1791,6 +1866,10 @@
      ],
      "conversion": "unsupported",
      "unsupported": [
+      {
+       "line": 77,
+       "text": "movslq\t(%r8,%rax,4), %r10"
+      },
       {
        "line": 78,
        "text": "fldl\t(%rdx,%r10,8)"
@@ -1811,6 +1890,10 @@
      "conversion": "unsupported",
      "unsupported": [
       {
+       "line": 98,
+       "text": "movslq\t(%r8,%rax,4), %r10"
+      },
+      {
        "line": 99,
        "text": "fldl\t(%rdx,%r10,8)"
       },
@@ -1830,6 +1913,10 @@
      "conversion": "unsupported",
      "unsupported": [
       {
+       "line": 119,
+       "text": "movslq\t(%r8,%rax,4), %r10"
+      },
+      {
        "line": 120,
        "text": "fldl\t(%rdx,%r10,8)"
       },
@@ -1848,6 +1935,10 @@
      ],
      "conversion": "unsupported",
      "unsupported": [
+      {
+       "line": 141,
+       "text": "movslq\t(%r8,%rax,4), %r10"
+      },
       {
        "line": 142,
        "text": "fldl\t(%rdx,%r10,8)"
