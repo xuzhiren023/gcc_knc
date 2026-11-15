@@ -3,6 +3,7 @@ import importlib.util
 from pathlib import Path
 import tempfile
 import unittest
+from unittest import mock
 
 ROOT = Path(__file__).resolve().parents[2]
 import sys
@@ -29,20 +30,22 @@ class OutputIsolation(unittest.TestCase):
                 'source_dir': root / 'tests' / 't1',
                 'cc': 'cc',
                 'cc_flags': [],
+                'sysroot': root / 'sysroot',
             })()
             runner.out.mkdir()
-            calls = []
-            runner.command = lambda *args, **kwargs: calls.append(args) or type(
-                'Result', (), {'returncode': 0, 'stdout': ''})()
+            runner.command = lambda *args, **kwargs: type(
+                'Result', (), {'returncode': 1, 'stdout': ''})()
             runner.function_body = lambda *args: ''
-            runner.tool = lambda name: name
-            runner.result = lambda label, failures: calls.append((label, failures))
-            scalar_abi.t2_short_vector(runner)
+            runner.t2_abi = lambda *args: None
+            runner.result = lambda label, failures: None
+            with mock.patch.object(scalar_abi, 't2_crosscheck') as crosscheck:
+                scalar_abi.t2_short_vector(runner)
             output = runner.out / 'short-vector-cross'
-            self.assertEqual(sorted(path.name for path in output.iterdir()), [
-                'vector-O2-0.mic', 'vector-O2-1.mic'])
+            self.assertEqual(crosscheck.call_count, 2)
+            for call in crosscheck.call_args_list:
+                self.assertEqual(call.args[4], output)
+            self.assertEqual(output.parent, runner.out)
             self.assertEqual(blocked.read_bytes(), b'from another run')
-            self.assertTrue(calls)
 
 
 if __name__ == '__main__':
