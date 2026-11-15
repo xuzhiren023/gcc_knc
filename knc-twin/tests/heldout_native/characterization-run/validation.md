@@ -1,18 +1,18 @@
 # Held-out validation against the characterization microbenchmarks
 
-Generated 2026-11-15T21:14:04Z. Profile card-7120-measured (hash 44e9c3bb3ae0...). line_tracking cold memory, TLB modeled, hardware prefetcher off, memory service modeled
+Generated 2026-11-15T21:28:52Z. Profile card-7120-measured (hash 44e9c3bb3ae0...). line_tracking cold memory, TLB modeled, hardware prefetcher off, memory service modeled
 
 ## Error statistics (scenario A, per thread count)
 
 | rows | n | median abs err % | worst abs err % | within 15% | within 30% | mean signed err % |
 |---|---:|---:|---:|---:|---:|---:|
-| all_held_out_threads_1 | 73 | 0.9 | 834.5 | 59 | 66 | 9.9 |
+| all_held_out_threads_1 | 73 | 0.9 | 834.5 | 60 | 69 | 11.8 |
 | all_held_out_threads_2 | 62 | 0.4 | 631.1 | 57 | 58 | 9.8 |
 | all_held_out_threads_4 | 59 | 1.6 | 348.6 | 57 | 57 | 7.4 |
 | calibration_threads_1 | 53 | 0.7 | 863.1 | 50 | 52 | 16.9 |
 | calibration_threads_2 | 51 | 1.5 | 652.8 | 48 | 50 | 10.8 |
 | calibration_threads_4 | 52 | 1.8 | 362.1 | 48 | 50 | 3.2 |
-| compiled_held_out_threads_1 | 11 | 17.2 | 32.3 | 3 | 8 | -9.5 |
+| compiled_held_out_threads_1 | 11 | 21.0 | 28.8 | 4 | 11 | 3.1 |
 | held_out_threads_1 | 62 | 0.9 | 834.5 | 56 | 58 | 13.3 |
 | held_out_threads_2 | 62 | 0.4 | 631.1 | 57 | 58 | 9.8 |
 | held_out_threads_4 | 59 | 1.6 | 348.6 | 57 | 57 | 7.4 |
@@ -53,7 +53,7 @@ Generated 2026-11-15T21:14:04Z. Profile card-7120-measured (hash 44e9c3bb3ae0...
 | prefetch_pairing@threads_1 | 7 | 7 |  |
 | prefetch_pairing@threads_2 | 9 | 9 |  |
 | prefetch_pairing@threads_4 | 8 | 8 |  |
-| s12_31_layout@threads_1 | 4 | 10 | s12-31-microbench/gas_0 vs s12-31-microbench/adj_0: 488.90/433.50 -> 331.00/358.00; s12-31-microbench/gas_0 vs s12-31-microbench/mid_0: 488.90/432.50 -> 331.00/358.00; s12-31-microbench/mis_44 vs s12-31-microbench/adj_0: 489.20/433.50 -> 331.00/358.00; s12-31-microbench/mis_44 vs s12-31-microbench/mid_0: 489.20/432.50 -> 331.00/358.00; s12-31-microbench/inc_0 vs s12-31-microbench/adj_0: 489.00/433.50 -> 331.00/358.00; s12-31-microbench/inc_0 vs s12-31-microbench/mid_0: 489.00/432.50 -> 331.00/358.00 |
+| s12_31_layout@threads_1 | 4 | 10 | s12-31-microbench/gas_0 vs s12-31-microbench/adj_0: 488.90/433.50 -> 385.00/439.00; s12-31-microbench/gas_0 vs s12-31-microbench/mid_0: 488.90/432.50 -> 385.00/439.00; s12-31-microbench/mis_44 vs s12-31-microbench/adj_0: 489.20/433.50 -> 385.00/439.00; s12-31-microbench/mis_44 vs s12-31-microbench/mid_0: 489.20/432.50 -> 385.00/439.00; s12-31-microbench/inc_0 vs s12-31-microbench/adj_0: 489.00/433.50 -> 385.00/439.00; s12-31-microbench/inc_0 vs s12-31-microbench/mid_0: 489.00/432.50 -> 385.00/439.00 |
 | stores@threads_1 | 13 | 14 | memory.store_normal vs memory.store_stream: 38.28/157.12 -> 357.73/157.28 |
 | stores@threads_2 | 13 | 14 | memory.store_normal vs memory.store_stream: 48.93/158.07 -> 357.73/157.31 |
 | stores@threads_4 | 13 | 14 | memory.store_normal vs memory.store_stream: 79.83/160.26 -> 358.08/157.31 |
@@ -184,17 +184,17 @@ Generated 2026-11-15T21:14:04Z. Profile card-7120-measured (hash 44e9c3bb3ae0...
 | c9.memory.u4 | held_out | ok | 8.30/11.01/- | 6.50/6.50/9.00 | -22/-41/- |  | miss_stall, spacing |
 | c10.branch.fixed | calibration | ok | 6.22/-/17.02 | 6.19/6.19/12.38 | -1/-/-27 |  | miss_stall, spacing |
 | c10.branch.random | calibration | ok | 11.27/-/27.76 | 11.34/11.34/14.47 | +1/-/-48 |  | miss_stall, spacing |
-| s12-30-small-csr/donor-off | held_out | ok | 8355.60/-/- | 9518.00/-/- | +14/-/- |  | miss_stall, spacing |
-| s12-30-small-csr/knc-switch-off | held_out | ok | 8484.20/-/- | 9527.00/-/- | +12/-/- |  | miss_stall, spacing |
-| s12-30-small-csr/knc-switch-on | held_out | ok | 8480.60/-/- | 9535.00/-/- | +12/-/- |  | miss_stall, spacing |
-| s12-30-small-csr/knc-switch-off-two-nests | held_out | ok | 8283.60/-/- | 9941.00/-/- | +20/-/- |  | miss_stall, spacing |
-| s12-31-microbench/gas_0 | held_out | ok | 488.90/-/- | 331.00/-/- | -32/-/- |  | spacing, dependency |
-| s12-31-microbench/mis_44 | held_out | ok | 489.20/-/- | 331.00/-/- | -32/-/- |  | spacing, dependency |
-| s12-31-microbench/inc_0 | held_out | ok | 489.00/-/- | 331.00/-/- | -32/-/- |  | spacing, dependency |
-| s12-31-microbench/adj_0 | held_out | ok | 433.50/-/- | 358.00/-/- | -17/-/- |  | spacing, dependency |
-| s12-31-microbench/mid_0 | held_out | ok | 432.50/-/- | 358.00/-/- | -17/-/- |  | spacing, dependency |
-| s12-31-microbench/mov_adj_0 | held_out | ok | 487.90/-/- | 412.00/-/- | -16/-/- |  | spacing, dependency |
-| s12-31-microbench/mov_split_0 | held_out | ok | 487.60/-/- | 412.00/-/- | -16/-/- |  | spacing, dependency |
+| s12-30-small-csr/donor-off | held_out | ok | 8355.60/-/- | 10246.00/-/- | +23/-/- |  | miss_stall, spacing |
+| s12-30-small-csr/knc-switch-off | held_out | ok | 8484.20/-/- | 10255.00/-/- | +21/-/- |  | miss_stall, spacing |
+| s12-30-small-csr/knc-switch-on | held_out | ok | 8480.60/-/- | 10263.00/-/- | +21/-/- |  | miss_stall, spacing |
+| s12-30-small-csr/knc-switch-off-two-nests | held_out | ok | 8283.60/-/- | 10669.00/-/- | +29/-/- |  | miss_stall, spacing |
+| s12-31-microbench/gas_0 | held_out | ok | 488.90/-/- | 385.00/-/- | -21/-/- |  | spacing, dependency |
+| s12-31-microbench/mis_44 | held_out | ok | 489.20/-/- | 385.00/-/- | -21/-/- |  | spacing, dependency |
+| s12-31-microbench/inc_0 | held_out | ok | 489.00/-/- | 385.00/-/- | -21/-/- |  | spacing, dependency |
+| s12-31-microbench/adj_0 | held_out | ok | 433.50/-/- | 439.00/-/- | +1/-/- |  | dependency, spacing |
+| s12-31-microbench/mid_0 | held_out | ok | 432.50/-/- | 439.00/-/- | +2/-/- |  | dependency, spacing |
+| s12-31-microbench/mov_adj_0 | held_out | ok | 487.90/-/- | 493.00/-/- | +1/-/- |  | spacing, dependency |
+| s12-31-microbench/mov_split_0 | held_out | ok | 487.60/-/- | 493.00/-/- | +1/-/- |  | spacing, dependency |
 
 ## Card-scale cases (analytical card scale; outside the core model, not in the statistics)
 

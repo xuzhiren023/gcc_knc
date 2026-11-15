@@ -1,13 +1,13 @@
 {
   "case": "s12-30-small-csr",
-  "engine_version": "0.2.0",
+  "engine_version": "0.2.1",
   "profile_hash": "44e9c3bb3ae07b5f3f8a54a8854f2936c34cce38ac100fa99414234793a3a9ae",
   "scenario": "each kernel's own scenario (fixtures/batch: line tracking, TLB, HWP and memory service modeled, arrays warm in L1, branches predicted)",
   "unit": "one csr_raw call (32 rows, 416 nonzeros)",
   "variants": [
     {
       "completion_cycles": [
-        9518
+        10246
       ],
       "functional": [
         "ok"
@@ -22,13 +22,13 @@
           "context_cycles": 2310
         }
       ],
-      "predicted_cycles_per_unit": 9518.0,
+      "predicted_cycles_per_unit": 10246.0,
       "status": "ok",
       "variant": "donor-off"
     },
     {
       "completion_cycles": [
-        9527
+        10255
       ],
       "functional": [
         "ok"
@@ -43,13 +43,13 @@
           "context_cycles": 2313
         }
       ],
-      "predicted_cycles_per_unit": 9527.0,
+      "predicted_cycles_per_unit": 10255.0,
       "status": "ok",
       "variant": "knc-switch-off"
     },
     {
       "completion_cycles": [
-        9535
+        10263
       ],
       "functional": [
         "ok"
@@ -64,13 +64,13 @@
           "context_cycles": 2318
         }
       ],
-      "predicted_cycles_per_unit": 9535.0,
+      "predicted_cycles_per_unit": 10263.0,
       "status": "ok",
       "variant": "knc-switch-on"
     },
     {
       "completion_cycles": [
-        9941
+        10669
       ],
       "functional": [
         "ok"
@@ -85,7 +85,7 @@
           "context_cycles": 2317
         }
       ],
-      "predicted_cycles_per_unit": 9941.0,
+      "predicted_cycles_per_unit": 10669.0,
       "status": "ok",
       "variant": "knc-switch-off-two-nests"
     }

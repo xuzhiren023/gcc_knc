@@ -1,14 +1,14 @@
 {
   "case": "s12-31-microbench",
-  "engine_version": "0.2.0",
+  "engine_version": "0.2.1",
   "profile_hash": "44e9c3bb3ae07b5f3f8a54a8854f2936c34cce38ac100fa99414234793a3a9ae",
   "scenario": "harness scenario A (line tracking, TLB modeled, hardware prefetcher off), arrays warm in L1, branches predicted",
   "unit": "one 27-product row (27 inner iterations plus the outer loop step)",
   "variants": [
     {
       "completion_cycles": [
-        1449,
-        2773
+        1665,
+        3205
       ],
       "functional": [
         "ok",
@@ -21,17 +21,17 @@
         },
         {
           "constraint": "dependency",
-          "context_cycles": 432
+          "context_cycles": 864
         }
       ],
-      "predicted_cycles_per_unit": 331.0,
+      "predicted_cycles_per_unit": 385.0,
       "status": "ok",
       "variant": "gas_0"
     },
     {
       "completion_cycles": [
-        1409,
-        2733
+        1625,
+        3165
       ],
       "functional": [
         "ok",
@@ -44,17 +44,17 @@
         },
         {
           "constraint": "dependency",
-          "context_cycles": 432
+          "context_cycles": 864
         }
       ],
-      "predicted_cycles_per_unit": 331.0,
+      "predicted_cycles_per_unit": 385.0,
       "status": "ok",
       "variant": "mis_44"
     },
     {
       "completion_cycles": [
-        1449,
-        2773
+        1665,
+        3205
       ],
       "functional": [
         "ok",
@@ -67,17 +67,17 @@
         },
         {
           "constraint": "dependency",
-          "context_cycles": 432
+          "context_cycles": 864
         }
       ],
-      "predicted_cycles_per_unit": 331.0,
+      "predicted_cycles_per_unit": 385.0,
       "status": "ok",
       "variant": "inc_0"
     },
     {
       "completion_cycles": [
-        1557,
-        2989
+        1881,
+        3637
       ],
       "functional": [
         "ok",
@@ -85,22 +85,22 @@
       ],
       "limiting": [
         {
-          "constraint": "spacing",
-          "context_cycles": 1166
+          "constraint": "dependency",
+          "context_cycles": 1296
         },
         {
-          "constraint": "dependency",
-          "context_cycles": 648
+          "constraint": "spacing",
+          "context_cycles": 1166
         }
       ],
-      "predicted_cycles_per_unit": 358.0,
+      "predicted_cycles_per_unit": 439.0,
       "status": "ok",
       "variant": "adj_0"
     },
     {
       "completion_cycles": [
-        1557,
-        2989
+        1881,
+        3637
       ],
       "functional": [
         "ok",
@@ -108,22 +108,22 @@
       ],
       "limiting": [
         {
-          "constraint": "spacing",
-          "context_cycles": 1166
+          "constraint": "dependency",
+          "context_cycles": 1296
         },
         {
-          "constraint": "dependency",
-          "context_cycles": 648
+          "constraint": "spacing",
+          "context_cycles": 1166
         }
       ],
-      "predicted_cycles_per_unit": 358.0,
+      "predicted_cycles_per_unit": 439.0,
       "status": "ok",
       "variant": "mid_0"
     },
     {
       "completion_cycles": [
-        1773,
-        3421
+        2097,
+        4069
       ],
       "functional": [
         "ok",
@@ -136,17 +136,17 @@
         },
         {
           "constraint": "dependency",
-          "context_cycles": 648
+          "context_cycles": 1296
         }
       ],
-      "predicted_cycles_per_unit": 412.0,
+      "predicted_cycles_per_unit": 493.0,
       "status": "ok",
       "variant": "mov_adj_0"
     },
     {
       "completion_cycles": [
-        1773,
-        3421
+        2097,
+        4069
       ],
       "functional": [
         "ok",
@@ -159,10 +159,10 @@
         },
         {
           "constraint": "dependency",
-          "context_cycles": 648
+          "context_cycles": 1296
         }
       ],
-      "predicted_cycles_per_unit": 412.0,
+      "predicted_cycles_per_unit": 493.0,
       "status": "ok",
       "variant": "mov_split_0"
     }

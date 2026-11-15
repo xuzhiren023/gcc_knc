@@ -229,5 +229,27 @@ class TestBudgetsAndDeterminism(unittest.TestCase):
         self.assertEqual(ids["completion_cycles"], mis["completion_cycles"])
 
 
+class TestX87MemoryOperand(unittest.TestCase):
+    """An x87 op with a memory source pays the load and then its own latency on the x87 unit."""
+
+    def chain_cycles_per_op(self, op, n):
+        def run(count):
+            asm = "\tfld1\n" + ("\t%s\t(%%rsi)\n" % op) * count
+            k = kernel(None, streams=[{"context": 0, "asm": asm}],
+                       init={"registers": {"rsi": "0x100000"}, "memory": [{"addr": "0x100000", "f64": [1.0]}]},
+                       scenario={"memory": {"type": "fixed_level", "level": "l1"}, "branch": {"type": "all_predicted"}})
+            return simulate(k)[0]["completion_cycles"]
+        return (run(2 * n) - run(n)) / float(n)
+
+    def test_fdivl_chain_pays_load_plus_divide(self):
+        p = profile()
+        per_op = self.chain_cycles_per_op("fdivl", 8)
+        self.assertEqual(per_op, p.get("latency.scalar_load_l1") + p.get("latency.x87_div"))
+
+    def test_fmull_chain_pays_load_plus_multiply(self):
+        p = profile()
+        self.assertEqual(self.chain_cycles_per_op("fmull", 8), p.get("latency.scalar_load_l1") + p.get("latency.x87_mul"))
+
+
 if __name__ == "__main__":
     unittest.main()

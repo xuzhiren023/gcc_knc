@@ -12,6 +12,7 @@ from .cache import MemoryModel
 from .errors import BudgetExhausted, MissingParameter, Unsupported
 from . import isa
 
+X87_ARITH = ("x87_add", "x87_mul", "x87_div", "x87_sqrt")
 STALL_REASONS = ("spacing", "miss_stall", "dependency", "agi", "flags", "explicit_dep", "x87_serial", "resource",
                  "outstanding_limit", "l1_port", "core_busy", "not_picked", "branch_penalty", "done")
 
@@ -304,6 +305,15 @@ class CoreSim(object):
                     done = ready + alu
                     for la in ev.lines:
                         self.mem.line_store_ready[la] = done
+                    if level != "l1" and self.miss_stalls:
+                        cs.stall_until = max(cs.stall_until, ready)
+                elif cls in X87_ARITH:
+                    # x87 arithmetic with a memory source: the load, then the op on the x87 unit with the
+                    # register form's latency and occupancy
+                    done = ready + self.latency_of(insn, ev)
+                    occ = isa.CLASSES[cls].get("occupancy")
+                    if occ:
+                        self.x87_free_at = max(self.x87_free_at, ready) + self._param(occ)
                     if level != "l1" and self.miss_stalls:
                         cs.stall_until = max(cs.stall_until, ready)
                 else:

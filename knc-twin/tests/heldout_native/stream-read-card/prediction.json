@@ -12,7 +12,7 @@
     "predicted_cycles": 33,
     "status": "ok"
   },
-  "engine_version": "0.2.0",
+  "engine_version": "0.2.1",
   "message": "sustained bandwidth for traffic type 'read_only' is unknown in profile card-7120-measured; give bandwidth_sweep_gbs: [...] to run a declared sweep, or import a native measurement",
   "profile_hash": "44e9c3bb3ae07b5f3f8a54a8854f2936c34cce38ac100fa99414234793a3a9ae",
   "status": "needs_parameters"

@@ -28,12 +28,12 @@ touched to fit them.
 | held-out characterization, 1 thread | 62 | 0.9 | 834 (memory.store_normal, HWP off); next 78 (spill_reload.rt) | 56 | 58 | +13 |
 | held-out characterization, 2 threads | 62 | 0.4 | 631 (memory.store_normal); next 116 (spill_reload.rt) | 57 | 58 | +10 |
 | held-out characterization, 4 threads | 59 | 1.6 | 349 (memory.store_normal); next 161 (spill_reload.rt) | 57 | 57 | +7 |
-| held-out compiled code (S12-31, S12-30), 1 thread | 11 | 17.2 | 32 (S12-31 gas_0/mis_44/inc_0) | 3 | 8 | -10 |
+| held-out compiled code (S12-31, S12-30), 1 thread | 11 | 21.0 | 29 (S12-30 two-nests) | 4 | 11 | +3 |
 | calibration, 1 thread | 53 | 0.7 | 863 (memory.load_rt, HWP off) | 50 | 52 | +17 |
 
 The mean signed error is dominated by two memory rows that the HWP-off scenario cannot
 reproduce (below); the median held-out characterization error is about 1%. Compiled code is a
-different matter: the eleven compiled-code rows (below) have a median error of 17%.
+different matter: the eleven compiled-code rows (below) have a median error of 21%.
 
 **Ranking reliability**: 310 of 323 measured pairwise orderings within the named groups
 (measured difference above 3%) are reproduced at the right order, 0.960; without the S12-31
@@ -102,22 +102,22 @@ and the engine, so they are inside the model; neither shape is a validated shape
 
 | case / variant | unit | measured | predicted | error | limiting (model) |
 |---|---|---:|---:|---:|---|
-| S12-31 gas_0, mis_44, inc_0 | core cycles per 27-product row | 488.9 / 489.2 / 489.0 | 331 | -32% | spacing, x87 dependency |
-| S12-31 adj_0, mid_0 | same | 433.5 / 432.5 | 358 | -17% | spacing, x87 dependency |
-| S12-31 mov_adj_0, mov_split_0 | same | 487.9 / 487.6 | 412 | -16% | spacing, x87 dependency |
-| S12-30 donor-off | core cycles per csr_raw call (416 nonzeros) | 8356 | 9518 | +14% | miss stalls, spacing |
-| S12-30 knc-switch-off / knc-switch-on | same | 8484 / 8481 | 9527 / 9535 | +12% | miss stalls, spacing |
-| S12-30 knc-switch-off-two-nests | same | 8284 | 9941 | +20% | miss stalls, spacing |
+| S12-31 gas_0, mis_44, inc_0 | core cycles per 27-product row | 488.9 / 489.2 / 489.0 | 385 | -21% | spacing, x87 dependency |
+| S12-31 adj_0, mid_0 | same | 433.5 / 432.5 | 439 | +1% | x87 dependency, spacing |
+| S12-31 mov_adj_0, mov_split_0 | same | 487.9 / 487.6 | 493 | +1% | spacing, x87 dependency |
+| S12-30 donor-off | core cycles per csr_raw call (416 nonzeros) | 8356 | 10246 | +23% | miss stalls, spacing |
+| S12-30 knc-switch-off / knc-switch-on | same | 8484 / 8481 | 10255 / 10263 | +21% | miss stalls, spacing |
+| S12-30 knc-switch-off-two-nests | same | 8284 | 10669 | +29% | miss stalls, spacing |
 
 S12-31 (window 5 of `.work/_shared/S12-31/native-mb.log`; window 3 agrees within 0.5%): the
-model is 16-32% fast and orders the variants wrongly: on the card the two orders with `faddp`
+model (engine 0.2.1) is 21% fast on gas_0/mis_44/inc_0, within 2% on the other four, and orders the variants wrongly: on the card the two orders with `faddp`
 before the compare (adj_0, mid_0) are 11% faster than the rest, and adding a dead `movl`
-(mov_*) costs nothing; the model makes adj/mid 8% slower than gas_0 and mov_* another 15%
-slower. Known defect (not fixed, timing-rule change pending a lead answer): x87 arithmetic with a memory
-operand gets its result at the load latency, without the multiply/divide latency or divider occupancy.
+(mov_*) costs nothing; the model makes adj/mid 14% slower than gas_0 and mov_* another 12%
+slower. Engine 0.2.1 fixed a defect: x87 arithmetic with a memory operand now pays the load latency plus the
+op's own latency and occupancy (before: load latency only; S12-31 was -16..-32%, S12-30 +12..+20%).
 Open (not tuned): the per-row cost of an x87 row loop with a memory-operand `fmull`,
 `movslq` costed as a one-cycle V-pairable scalar op (no source), and front-end effects of the
-instruction order. S12-30: 12-20% slow on a deterministic input (the card's columns are random);
+instruction order. S12-30: 21-29% slow on a deterministic input (the card's columns are random);
 the model ranks two-nests slowest where the card measured it fastest (2% apart, inside the
 3% ranking threshold).
 
@@ -137,15 +137,15 @@ input, ranked off-card with the frozen profile (`knc_twin.py batch fixtures/batc
 
 | candidate | predicted cycles per call | ratio | measured seconds per call (gate, same case shape) |
 |---|---:|---:|---:|
-| donor-off | 9518 | 0.999 | 6.749e-6 (about 8315 ticks) |
-| knc-switch-off (baseline) | 9527 | 1.000 | 6.853e-6 (about 8443 ticks) |
-| knc-switch-on | 9535 | 1.001 | 6.850e-6 |
-| knc-switch-on-contract-fast | 9535 | 1.001 | - |
-| knc-handwritten-policy | 9939 | 1.043 | - |
-| knc-switch-off-two-nests | 9941 | 1.044 | 6.690e-6 (about 8242 ticks) |
-| knc-switch-on-min4 | 12255 | 1.286 | - |
+| donor-off | 10246 | 0.999 | 6.749e-6 (about 8315 ticks) |
+| knc-switch-off (baseline) | 10255 | 1.000 | 6.853e-6 (about 8443 ticks) |
+| knc-switch-on | 10263 | 1.001 | 6.850e-6 |
+| knc-switch-on-contract-fast | 10263 | 1.001 | - |
+| knc-handwritten-policy | 10667 | 1.040 | - |
+| knc-switch-off-two-nests | 10669 | 1.040 | 6.690e-6 (about 8242 ticks) |
+| knc-switch-on-min4 | 12983 | 1.266 | - |
 
-The predicted absolute time is 13% above the measured call (unvalidated shape; the measured
+The predicted absolute time (engine 0.2.1) is 21% above the measured call (unvalidated shape; the measured
 input differs in its random columns). Three of the four measured variants are within 1% of each
 other both measured and predicted; the model ranks the two-nests variant 4% slower where the
 card measured it 2% faster. Every candidate lies within the manifest's 5% band of the baseline or

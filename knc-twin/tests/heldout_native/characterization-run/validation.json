@@ -41,7 +41,7 @@
           "predicted_cycles": 34,
           "status": "ok"
         },
-        "engine_version": "0.2.0",
+        "engine_version": "0.2.1",
         "message": "sustained bandwidth for traffic type 'read_only' is unknown in profile card-7120-measured; give bandwidth_sweep_gbs: [...] to run a declared sweep, or import a native measurement",
         "profile_hash": "44e9c3bb3ae07b5f3f8a54a8854f2936c34cce38ac100fa99414234793a3a9ae",
         "status": "needs_parameters"
@@ -80,7 +80,7 @@
           "predicted_cycles": 33,
           "status": "ok"
         },
-        "engine_version": "0.2.0",
+        "engine_version": "0.2.1",
         "message": "sustained bandwidth for traffic type 'read_only' is unknown in profile card-7120-measured; give bandwidth_sweep_gbs: [...] to run a declared sweep, or import a native measurement",
         "profile_hash": "44e9c3bb3ae07b5f3f8a54a8854f2936c34cce38ac100fa99414234793a3a9ae",
         "status": "needs_parameters"
@@ -123,7 +123,7 @@
           "predicted_cycles": 105,
           "status": "ok"
         },
-        "engine_version": "0.2.0",
+        "engine_version": "0.2.1",
         "profile_hash": "44e9c3bb3ae07b5f3f8a54a8854f2936c34cce38ac100fa99414234793a3a9ae",
         "scenarios": [
           {
@@ -175,7 +175,7 @@
           "predicted_cycles": 249,
           "status": "ok"
         },
-        "engine_version": "0.2.0",
+        "engine_version": "0.2.1",
         "profile_hash": "44e9c3bb3ae07b5f3f8a54a8854f2936c34cce38ac100fa99414234793a3a9ae",
         "scenarios": [
           {
@@ -193,11 +193,11 @@
   ],
   "error_stats": {
     "all_held_out_threads_1": {
-      "mean_signed_error_pct": 9.9,
+      "mean_signed_error_pct": 11.8,
       "median_abs_error_pct": 0.9,
       "rows": 73,
-      "within_15pct": 59,
-      "within_30pct": 66,
+      "within_15pct": 60,
+      "within_30pct": 69,
       "worst_abs_error_pct": 834.5
     },
     "all_held_out_threads_2": {
@@ -241,12 +241,12 @@
       "worst_abs_error_pct": 362.1
     },
     "compiled_held_out_threads_1": {
-      "mean_signed_error_pct": -9.5,
-      "median_abs_error_pct": 17.2,
+      "mean_signed_error_pct": 3.1,
+      "median_abs_error_pct": 21.0,
       "rows": 11,
-      "within_15pct": 3,
-      "within_30pct": 8,
-      "worst_abs_error_pct": 32.3
+      "within_15pct": 4,
+      "within_30pct": 11,
+      "worst_abs_error_pct": 28.8
     },
     "held_out_threads_1": {
       "mean_signed_error_pct": 13.3,
@@ -273,7 +273,7 @@
       "worst_abs_error_pct": 348.6
     }
   },
-  "generated_utc": "2026-11-15T21:14:04Z",
+  "generated_utc": "2026-11-15T21:28:52Z",
   "invocation": [
     "knc-twin/scripts/validate_heldout.py",
     "--kernels-s",
@@ -358,7 +358,7 @@
     "synthetic": false,
     "version": "0.1.0"
   },
-  "python_seconds": 139.2,
+  "python_seconds": 160.8,
   "ranking": {
     "groups": {
       "agi_gap@threads_1": {
@@ -551,8 +551,8 @@
               433.5
             ],
             "predicted": [
-              331.0,
-              358.0
+              385.0,
+              439.0
             ]
           },
           {
@@ -564,8 +564,8 @@
               432.5
             ],
             "predicted": [
-              331.0,
-              358.0
+              385.0,
+              439.0
             ]
           },
           {
@@ -577,8 +577,8 @@
               433.5
             ],
             "predicted": [
-              331.0,
-              358.0
+              385.0,
+              439.0
             ]
           },
           {
@@ -590,8 +590,8 @@
               432.5
             ],
             "predicted": [
-              331.0,
-              358.0
+              385.0,
+              439.0
             ]
           },
           {
@@ -603,8 +603,8 @@
               433.5
             ],
             "predicted": [
-              331.0,
-              358.0
+              385.0,
+              439.0
             ]
           },
           {
@@ -616,8 +616,8 @@
               432.5
             ],
             "predicted": [
-              331.0,
-              358.0
+              385.0,
+              439.0
             ]
           }
         ],
@@ -9595,7 +9595,7 @@
       "name": "s12-30-small-csr/donor-off",
       "predicted": {
         "A": {
-          "threads_1": 9518.0
+          "threads_1": 10246.0
         }
       },
       "source_log": ".work/_shared/tmp/claude-s12-window8/s12-30-gate-hpcg.out lines 68-88 (CASE small CSR n=13 rows=32 nnz=416 rhs_bytes=32768 columns=random, TIME samples 0-4)",
@@ -9626,7 +9626,7 @@
       "name": "s12-30-small-csr/knc-switch-off",
       "predicted": {
         "A": {
-          "threads_1": 9527.0
+          "threads_1": 10255.0
         }
       },
       "source_log": ".work/_shared/tmp/claude-s12-window8/s12-30-gate-hpcg.out lines 68-88 (CASE small CSR n=13 rows=32 nnz=416 rhs_bytes=32768 columns=random, TIME samples 0-4)",
@@ -9657,7 +9657,7 @@
       "name": "s12-30-small-csr/knc-switch-on",
       "predicted": {
         "A": {
-          "threads_1": 9535.0
+          "threads_1": 10263.0
         }
       },
       "source_log": ".work/_shared/tmp/claude-s12-window8/s12-30-gate-hpcg.out lines 68-88 (CASE small CSR n=13 rows=32 nnz=416 rhs_bytes=32768 columns=random, TIME samples 0-4)",
@@ -9688,7 +9688,7 @@
       "name": "s12-30-small-csr/knc-switch-off-two-nests",
       "predicted": {
         "A": {
-          "threads_1": 9941.0
+          "threads_1": 10669.0
         }
       },
       "source_log": ".work/_shared/tmp/claude-s12-window8/s12-30-gate-hpcg.out lines 68-88 (CASE small CSR n=13 rows=32 nnz=416 rhs_bytes=32768 columns=random, TIME samples 0-4)",
@@ -9708,7 +9708,7 @@
           },
           {
             "constraint": "dependency",
-            "context_cycles": 432
+            "context_cycles": 864
           }
         ]
       },
@@ -9719,7 +9719,7 @@
       "name": "s12-31-microbench/gas_0",
       "predicted": {
         "A": {
-          "threads_1": 331.0
+          "threads_1": 385.0
         }
       },
       "source_log": ".work/_shared/S12-31/native.log (window 3, 2026-11-15 02:57Z) and .work/_shared/S12-31/native-mb.log (window 5, 2026-11-15 09:17-09:23Z): lines 'S12_31 mb_median <variant> ns_per_row'",
@@ -9739,7 +9739,7 @@
           },
           {
             "constraint": "dependency",
-            "context_cycles": 432
+            "context_cycles": 864
           }
         ]
       },
@@ -9750,7 +9750,7 @@
       "name": "s12-31-microbench/mis_44",
       "predicted": {
         "A": {
-          "threads_1": 331.0
+          "threads_1": 385.0
         }
       },
       "source_log": ".work/_shared/S12-31/native.log (window 3, 2026-11-15 02:57Z) and .work/_shared/S12-31/native-mb.log (window 5, 2026-11-15 09:17-09:23Z): lines 'S12_31 mb_median <variant> ns_per_row'",
@@ -9770,7 +9770,7 @@
           },
           {
             "constraint": "dependency",
-            "context_cycles": 432
+            "context_cycles": 864
           }
         ]
       },
@@ -9781,7 +9781,7 @@
       "name": "s12-31-microbench/inc_0",
       "predicted": {
         "A": {
-          "threads_1": 331.0
+          "threads_1": 385.0
         }
       },
       "source_log": ".work/_shared/S12-31/native.log (window 3, 2026-11-15 02:57Z) and .work/_shared/S12-31/native-mb.log (window 5, 2026-11-15 09:17-09:23Z): lines 'S12_31 mb_median <variant> ns_per_row'",
@@ -9796,12 +9796,12 @@
       "limiting": {
         "threads_1": [
           {
-            "constraint": "spacing",
-            "context_cycles": 1166
+            "constraint": "dependency",
+            "context_cycles": 1296
           },
           {
-            "constraint": "dependency",
-            "context_cycles": 648
+            "constraint": "spacing",
+            "context_cycles": 1166
           }
         ]
       },
@@ -9812,7 +9812,7 @@
       "name": "s12-31-microbench/adj_0",
       "predicted": {
         "A": {
-          "threads_1": 358.0
+          "threads_1": 439.0
         }
       },
       "source_log": ".work/_shared/S12-31/native.log (window 3, 2026-11-15 02:57Z) and .work/_shared/S12-31/native-mb.log (window 5, 2026-11-15 09:17-09:23Z): lines 'S12_31 mb_median <variant> ns_per_row'",
@@ -9827,12 +9827,12 @@
       "limiting": {
         "threads_1": [
           {
-            "constraint": "spacing",
-            "context_cycles": 1166
+            "constraint": "dependency",
+            "context_cycles": 1296
           },
           {
-            "constraint": "dependency",
-            "context_cycles": 648
+            "constraint": "spacing",
+            "context_cycles": 1166
           }
         ]
       },
@@ -9843,7 +9843,7 @@
       "name": "s12-31-microbench/mid_0",
       "predicted": {
         "A": {
-          "threads_1": 358.0
+          "threads_1": 439.0
         }
       },
       "source_log": ".work/_shared/S12-31/native.log (window 3, 2026-11-15 02:57Z) and .work/_shared/S12-31/native-mb.log (window 5, 2026-11-15 09:17-09:23Z): lines 'S12_31 mb_median <variant> ns_per_row'",
@@ -9863,7 +9863,7 @@
           },
           {
             "constraint": "dependency",
-            "context_cycles": 648
+            "context_cycles": 1296
           }
         ]
       },
@@ -9874,7 +9874,7 @@
       "name": "s12-31-microbench/mov_adj_0",
       "predicted": {
         "A": {
-          "threads_1": 412.0
+          "threads_1": 493.0
         }
       },
       "source_log": ".work/_shared/S12-31/native.log (window 3, 2026-11-15 02:57Z) and .work/_shared/S12-31/native-mb.log (window 5, 2026-11-15 09:17-09:23Z): lines 'S12_31 mb_median <variant> ns_per_row'",
@@ -9894,7 +9894,7 @@
           },
           {
             "constraint": "dependency",
-            "context_cycles": 648
+            "context_cycles": 1296
           }
         ]
       },
@@ -9905,7 +9905,7 @@
       "name": "s12-31-microbench/mov_split_0",
       "predicted": {
         "A": {
-          "threads_1": 412.0
+          "threads_1": 493.0
         }
       },
       "source_log": ".work/_shared/S12-31/native.log (window 3, 2026-11-15 02:57Z) and .work/_shared/S12-31/native-mb.log (window 5, 2026-11-15 09:17-09:23Z): lines 'S12_31 mb_median <variant> ns_per_row'",

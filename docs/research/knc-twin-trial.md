@@ -1,6 +1,6 @@
 # knc-twin trial and validation (S13-06 merged with knc-twin 0.2.0, 2026-11-15)
 
-Engine 0.2.0, profile `card-7120-measured` (hash `44e9c3bb3ae0...`). No card run, no GCC build. Numbers are
+Engine 0.2.1, profile `card-7120-measured` (hash `44e9c3bb3ae0...`). No card run, no GCC build. Numbers are
 **(pred)** (twin output, status ok) or **(meas)** (native, existing logs); simulated cycles are never measurements.
 This replaces the S13-06 branch report (engine 0.1.0). Full tables: `knc-twin/references/validation.md`,
 `knc-twin/tests/heldout_native/characterization-run/validation.md`.
@@ -31,7 +31,7 @@ and prefetch pairing 2/12%. Everything else is an unvalidated estimate.
 
 ## 3. Runs on the merged tree (Windows Python 3.8 through `tools/run.py`, after the follow-up commit)
 
-selftest 95 tests, 0 failures; `examples/run_examples.py` 36 examples (28 ok, 8 intended non-ok); `validate_heldout.py
+selftest 97 tests, 0 failures; `examples/run_examples.py` 36 examples (28 ok, 8 intended non-ok); `validate_heldout.py
 --cases --record` 119 characterization rows (2 unsupported, `vrcp23ps`) + 11 compiled rows + 4 card cases;
 `tests/trial/knc_trial.py` 16 of 16 converted and functional ok; `tests/regress/test_knc_twin.py` 3 tests OK.
 
@@ -51,22 +51,22 @@ with `card.clock_hz` 1.238 GHz; characterization ticks treated as cycles (TSC 0.
 | characterization | 1 | 62 | 0.9% | 834% memory.store_normal (no prefetcher in scenario A); next 78% spill_reload.rt |
 | characterization | 2 | 62 | 0.4% | 631% memory.store_normal; next 116% spill_reload.rt |
 | characterization | 4 | 59 | 1.6% | 349% memory.store_normal; next 161% spill_reload.rt |
-| compiled code (S12-31 + S12-30) | 1 | 11 | 17.2% | 32.3% S12-31 gas_0 |
+| compiled code (S12-31 + S12-30) | 1 | 11 | 21.0% (was 17.2%) | 28.8% S12-30 two-nests (was 32.3% S12-31 gas_0) |
 | all held-out | 1 / 2 / 4 | 73 / 62 / 59 | 0.9% / 0.4% / 1.6% | as above |
 
 | compiled case | unit | meas | pred | error | twin's limit |
 |---|---|---:|---:|---:|---|
-| S12-31 gas_0 / mis_44 / inc_0 (window 5) | cycles per 27-product row | 488.9 / 489.2 / 489.0 | 331 | -32% | spacing, x87 dependency |
-| S12-31 adj_0 / mid_0 | same | 433.5 / 432.5 | 358 | -17% | same |
-| S12-31 mov_adj_0 / mov_split_0 | same | 487.9 / 487.6 | 412 | -16% | same |
-| S12-30 donor-off (window 8, small CSR n=13) | cycles per csr_raw call | 8356 | 9518 | +14% | miss stalls, spacing |
-| S12-30 knc-switch-off / knc-switch-on | same | 8484 / 8481 | 9527 / 9535 | +12% | same |
-| S12-30 knc-switch-off-two-nests | same | 8284 | 9941 | +20% | same |
+| S12-31 gas_0 / mis_44 / inc_0 (window 5) | cycles per 27-product row | 488.9 / 489.2 / 489.0 | 385 (331) | -21% (-32%) | spacing, x87 dependency |
+| S12-31 adj_0 / mid_0 | same | 433.5 / 432.5 | 439 (358) | +1% (-17%) | same |
+| S12-31 mov_adj_0 / mov_split_0 | same | 487.9 / 487.6 | 493 (412) | +1% (-16%) | same |
+| S12-30 donor-off (window 8, small CSR n=13) | cycles per csr_raw call | 8356 | 10246 (9518) | +23% (+14%) | miss stalls, spacing |
+| S12-30 knc-switch-off / knc-switch-on | same | 8484 / 8481 | 10255 / 10263 (9527 / 9535) | +21% (+12%) | same |
+| S12-30 knc-switch-off-two-nests | same | 8284 | 10669 (9941) | +29% (+20%) | same |
 | STREAM RMW / write NGO, 60 thr (card scale, out of core model) | GB/s | 179.11 / 169.23 | 156.5 / 226.1 | -13% / +34% | profile bandwidth |
 | STREAM read, GEMV fp32 (card scale) | GB/s | 147.24 / 125.30 | needs_parameters | - | read bandwidth unknown |
 
 Ranking: 306 of 313 characterization orderings (0.978); S12-31 4 of 10 (card: adj/mid 11% faster, dead `movl`
-free; twin: adj/mid 8% slower than gas_0, mov_* 15% slower again). S12-30: the twin puts two-nests last, the
+free; twin: adj/mid 14% slower than gas_0, mov_* 12% slower again; same count before the fix). S12-30: the twin puts two-nests last, the
 card first (within 3%). The card cases only test the profile's bandwidth entries.
 
 ## 6. Open misses (not tuned)
@@ -77,8 +77,8 @@ card first (within 3%). The card cases only test the profile's bandwidth entries
 | scattered gathers (16 lines) | .lat 184/275/509 -> 124/224/448; .rt 175 -> 112 (-32..-36% at 1 thread) | per-line occupancy 7 fits one line, about 11 for scattered lines |
 | four-thread sequential streams (scenario B; calibration row) | memory.load_rt 78 -> 85.5 (+10%) | memory service 20 cycles per line is itself a four-thread figure |
 | branch-dense code at four threads (c10.branch.fixed; calibration row) | 17.02 -> 12.38 (-27%) | prefetch-buffer refill after taken branches not modeled |
-| S12-31 x87 row loop | -16..-32%, wrong order | per-row cost of `fmull` mem + `faddp` chain, `movslq` cost (unsourced), instruction-order front-end effects |
-| S12-30 csr_raw call | +12..+20% | deterministic vs random columns; L1/L2 split of a 32 KiB x |
+| S12-31 x87 row loop | -21% (gas/mis/inc), +1% (others), wrong order | per-row cost of `fmull` mem + `faddp` chain, `movslq` cost (unsourced), instruction-order front-end effects |
+| S12-30 csr_raw call | +21..+29% | deterministic vs random columns; L1/L2 split of a 32 KiB x |
 
 ## 7. Forms still unsupported in real `-O2` output
 
@@ -128,23 +128,22 @@ AGI 3, cache geometry, DTLB 64, L1/L2/memory latency, 19.48 ticks per line, 16 L
 | `pairing.u_instruction_can_be_branch` | false | every loop |
 | engine rule: x87 loads at the scalar load latency, x87 issues on U only | - | every `fldl`/`fmull` row |
 
-Results that use them list them under `parameters_used` (status assumed) and in `assumptions`. **Defect found**
-while listing: x87 arithmetic with a memory operand (`fmull (%rcx,%rax,8)`, `fdivl`) gets its result at the load
-latency only; the multiply or divide latency and the divider occupancy are not charged (an `fdivl` chain costs
-3 cycles per op, `fldl`+`fdivrp` 38). S12-31 and S12-30 contain such `fmull`s. Not fixed (a timing-rule
-change for the lead); fix it before trusting any x87 compiled-code prediction.
+Results that use them list them under `parameters_used` (status assumed) and in `assumptions`. **Defect fixed**
+in engine 0.2.1: x87 arithmetic with a memory operand (`fmull (%rcx,%rax,8)`, `fdivl`) got its result at the
+load latency only; it now pays the load plus the op's latency and occupancy (an `fdivl` chain: 3 -> 41 cycles
+per op; tests `TestX87MemoryOperand`, red before the fix). The compiled rows above are the 0.2.1 figures.
 
 ## 11. How far to trust it
 
 Good on characterization-style microbenchmarks (median held-out error about 1%), with a caveat: those rows
 come from the same harness and instruction families as the calibration rows. On compiled loops it is
-currently 12-32% off and gets the order of close variants wrong (S12-31 4 of 10). Use it for bounds,
+currently up to 29% off (median 21%) and gets the order of close variants wrong (S12-31 4 of 10). Use it for bounds,
 mechanisms (what binds, which dependency or resource) and differences well above 30%; do not use it to choose
 between variants predicted within about 30% of each other.
 
 ## 12. Native requests staged in `.work/_shared/S13-06/` (prepare-native, not built, not run)
 
-`s12_31_gas_0`/`adj_0`/`mov_adj_0` (S12-31 ordering miss; pred 346.6/373.6/427.6 per row in an 8-row call),
+`s12_31_gas_0`/`adj_0`/`mov_adj_0` (S12-31 ordering miss; pred 400.6/454.6/508.6 per row in an 8-row call),
 `sr_alias`/`sr_noalias` (store/reload pairs: issue blocker or overlap; 9.25 vs 4.25 per pair at one thread),
 `st_seq`/`st_stride3` (memory.store_normal: is the speed the L2 prefetcher's; 39.1 vs 362.4 per store),
 `trial_saxpy_L7`, `trial_stencil_L51`, `c7_reduce_a1`/`a2` (new predictions); index `README.md`; 0.1.0 ones superseded.

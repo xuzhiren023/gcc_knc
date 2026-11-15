@@ -1,6 +1,6 @@
 # Example runs
 
-Generated 20261115T211928Z by `examples/run_examples.py` (engine output, not hand-written). Outputs: `C:/Users/xuzhi/AppData/Local/Temp/claude/C--Users-xuzhi-Documents-gcc-knc/0db74468-c696-4493-8124-90d1cd76e81e/scratchpad/examples2`.
+Generated 20261115T213052Z by `examples/run_examples.py` (engine output, not hand-written). Outputs: `C:/Users/xuzhi/AppData/Local/Temp/claude/C--Users-xuzhi-Documents-gcc-knc/0db74468-c696-4493-8124-90d1cd76e81e/scratchpad/examples3`.
 
 | example | what | command | exit | status | message |
 |---|---|---|---:|---|---|
@@ -34,7 +34,7 @@ Generated 20261115T211928Z by `examples/run_examples.py` (engine output, not han
 | budget | cycle budget exhausted: partial, not a result | `python scripts/knc_twin.py simulate fixtures/budget_long_loop.json --max-cycles 2000` | 5 | budget_exhausted | cycle budget 2000 exhausted; 1502 of 60000 dynamic instructions issued (partial, not a result) |
 | compare-prefetch | compare cold stream without/with prefetch | `python scripts/knc_twin.py compare <simulate-cold-nopf>/result.json <simulate-cold-pf>/result.json` | 0 | ok | predicted_cycles_per_unit: baseline 727.9688, candidate 169.4062 (ratio 0.2327); same engine, profile and scenario |
 | compare-incompatible | compare across different profiles: incompatible | `python scripts/knc_twin.py compare <simulate-saxpy-1ctx>/result.json <simulate-synthetic>/result.json` | 8 | incompatible | results are not comparable: profile hash differs (44e9c3bb3ae0 vs 7efdd9875270): the model changed between baseline and candidate |
-| prepare-native | export a hardware-queue request (no card) | `python scripts/knc_twin.py prepare-native fixtures/saxpy_loop.json --prediction <simulate-saxpy-1ctx>/result.json` | 0 | ok | native request written (hash 06a6dd4a18c2...); nothing was executed on hardware |
+| prepare-native | export a hardware-queue request (no card) | `python scripts/knc_twin.py prepare-native fixtures/saxpy_loop.json --prediction <simulate-saxpy-1ctx>/result.json` | 0 | ok | native request written (hash 8148b2fd71a6...); nothing was executed on hardware |
 | gcc-x87-f | GCC-KNC x87 double function, adapter output, exact check | `python scripts/knc_twin.py functional fixtures/x87test_f.json` | 0 | ok | executed 15 dynamic instructions; all 2 expected items match |
 | gcc-x87-g | GCC-KNC x87 float dot-product loop with prefetches, timing | `python scripts/knc_twin.py simulate fixtures/x87test_g.json` | 0 | ok | predicted 423 core cycles (10.575 per unit) for 252 dynamic instructions on 1 context(s); unvalidated_scenario_estimate |
 | gcc-int-h | GCC-KNC scalar integer loop, loop bounds | `python scripts/knc_twin.py bounds fixtures/x87test_h.json` | 0 | ok | trace lower bound: 331 cycles (binding term: per_context_issue_spacing); conditional_bound |
