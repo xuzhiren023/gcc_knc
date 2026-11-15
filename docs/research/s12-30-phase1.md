@@ -768,3 +768,61 @@ No GCC build or new test was run in this session: AGENTS.md reserves GCC
 builds for the lead. T1 green, T0/T2, ICE sweeps, compiler-generated native
 guard/timing results, NPB-CG/HPCG/control A/B, and default-on are pending;
 x86 not run. Resume with the built gcc2 compiler, not the installed prefix.
+
+
+### First built compiler T1 and guard-placement correction (2026-11-15)
+
+Ran the requested default-off T1 once against lane gcc2 at
+`4e2b026712d`, through `tools/run.py --name s12_30_phase2_green --inputs
+tools/s12_30_precision.py tools/s12_30_precision.c -- python tools/check
+t1 --compiler gcc16 --sparse-indirect`. It failed only the two
+`sparse_slice` assembly-count assertions (contract-off and contract-fast).
+Compile/assemble/lint, all presence/exclusion and bounds checks,
+default-off identity, scalar folds and installed baseline identity passed.
+Log: `.work/_state/logs/s12_30_phase2_green-20261115-041029.log`.
+
+The emitted slice with the switch off has four static stream-prefetch
+instructions in its long-loop arm. With the switch on it has one bounded
+indirect hint and no stream hints: inserting the conditional index load
+prevents the ordinary stream pass from recognizing its straight-line
+body. The checker correctly fails the required greater-than comparison;
+its assertions have not been changed. This is a compiler interaction,
+not a missing or unsafe indirect hint.
+
+The correction versions lone/row-local loops on their widened trip count
+at 16384, just as nests are versioned on their outer count. Its unchanged
+short arm remains eligible for the existing stream pass. This also avoids
+unconditional short-loop hints in the eventual default-on step. That
+threshold for lone loops is a conservative policy choice, not a measured
+lone-loop speedup. The current switch still defaults off pending the
+required intermediate green and native proof.
+
+Also addressed the lead's 03:41 row-invariant-work request. The measured
+handwritten legal gate computed metadata outside the inner loop; the
+first compiler build did not. The correction versions the inner loop
+once per nonempty current row on `rows-i > R`, loads the future bound in
+its true preheader, and keeps only the column bound check and hint in
+the inner body. HPCG additionally versions on a positive future count
+before loading its future pointer once. Empty future rows therefore do
+not read an uninitialized pointer. The false versions keep the original
+reduction; no speculative sentinel or merged pointer is needed. This
+adds loop copies, whose code-size and timing costs remain to be checked.
+The existing pre-ivopts structural scanner is unchanged.
+
+The implementation uses the existing `loop_version` mechanism in
+`gcc/cfgloopmanip.cc`; the new metadata blocks are reached only after the
+current inner-loop entry test. Index bounds and arithmetic order are
+unchanged. These are source-level claims awaiting the lead build and
+native guard-page proof, not passing test or performance results.
+
+GCC builds remain reserved for the lead by AGENTS.md. No second T1 run,
+GCC build, T0/T2, ICE sweep or native run was attempted against these
+unbuilt edits. `compiler-gate` is not staged. After the build, resume T1,
+check for duplicate per-iteration stream hints in the new hinted arms,
+then T0/T2, ICE and compiler-proof staging. Default-on and the default
+-O2 NPB-CG/HPCG/control A/B remain pending; x86 not run.
+
+GCC correction commit: `a36fc224773` (lane gcc2). GCC diff against `knc`
+has no whitespace errors. The three ticket-owned main-repository source
+and note files are LF. Hook documentation and its generated copy were
+updated together; no i386 file changed in this correction.
