@@ -1,7 +1,11 @@
 # M4 optional-mode freeze for S13-01
 
 Frozen by S12-09 at GCC `b2ce6a9eebffcb5c23512c2cec4ba3d8b9e2f046`.
-S13-01 must read this file before staging its optional panels. ADR-0015 remains
+S13-01 must read this file before staging its optional panels. The S13 gate
+uses lane 1, `$SHARED/gcc-knc-16.2.0`, exclusively. Every frozen GCC-KNC
+line below refers to that prefix at the revision above. Lane 2 is stale
+(Sprint 11 head `619e14b479a`, installed 2026-11-14 11:50 EST) and is not
+validated by S12-09. ADR-0015 remains
 the scoring authority. The primary serial flags remain donor `-O2` (SQLite's
 previously frozen assembling level excepted) and GCC-KNC `-O2 -march=knc`.
 Optional results never enter that score. Build or correctness failures remain
@@ -93,13 +97,27 @@ This recipe provides a GCC-KNC-only PGO feasibility panel against its own
 untrained `-O2 -march=knc` binary. A donor-PGO competitiveness panel remains
 unqualified: the existing implementation does not generate donor profiles.
 Do not label this as GCC-KNC PGO versus donor PGO or extrapolate it to all
-17 programs. A matched donor-PGO panel needs a lead decision before execution.
+17 programs. A matched donor-PGO panel is not part of M4.
 
-## Known limits and pending native evidence
+## Known limits and lead evidence
 
 Carry S12-34 and S12-38 (O3 ICEs), S12-42 and S12-31's zlib loss (minor) into
 the M4 report. These are ticket-reported limits, not new native observations
 from this batch. The owner cut the Sprint 11/Sprint 12 corpus comparison and
 per-program donor comparison from S12-09; S13-01 performs its final-head gate.
-S12-09's native execute suite and timed vmath captures require the lead's card
-window. x86 identity is lead-owned and is not run by this engineer.
+Lead card window 9 (2026-11-15, 18:31-18:51Z): execute suite 1680 PASS,
+1 FAIL (`930529-1.c`, exit 4). The S12-09 builder misses its brace-form
+`dg-options { "-fwrapv" }`; the emitted command omits `-fwrapv`. This is the
+known S3/S6 harness miss, not a compiler result; no rerun was performed.
+See `tests/baseline/S12-09-t0-t2.txt` for the builder command and evidence.
+
+All six timed vmath launches were valid (zero invalid rows). Vector speedup
+was 1.22-3.40x except double log at density 1: 0.85x (l2), 0.87x (mem).
+At density 4 double log was 1.25-1.32x. Carry density-1 double log as a known
+minor limit into the M4 report; no Sprint 12 fix is in scope. Summary log:
+`.work/_state/logs/s12_09_vmath_summary-20261115-135441.log`.
+
+Lead x86 identity at `b2ce6a9eebf` versus `releases/gcc-16.2.0`,
+`-O2 -mavx512f`: identical=1962, different=0, both-failed=41 (header-only
+failures in both trees), errors=0. Log:
+`.work/_state/logs/s12_09_x86-20261115-100743.log`.

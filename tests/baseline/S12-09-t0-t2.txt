@@ -1,3 +1,6 @@
+Historical initial T0-T2 run below: initial T0/T1 adapter failures are superseded
+by the full wrapper rerun results at the end. T2 passed in this initial run.
+
 Compiler: k1om-mpss-linux-gcc (GCC) 16.2.0
 Compiler ld: /cygdrive/c/Users/xuzhi/Documents/gcc_knc/.work/_shared/toolchain/cross/bin/k1om-mpss-linux-ld
 Compiler as: /cygdrive/c/Users/xuzhi/Documents/gcc_knc/.work/_shared/toolchain/cross/bin/k1om-mpss-linux-as
@@ -446,3 +449,36 @@ T2 link trace: /cygdrive/c/Users/xuzhi/Documents/gcc_knc/.work/_shared/toolchain
 PASS t2 ELF machine and interpreter
 PASS t2 symbol versions against card sysroot
 Elapsed: 1164.12 seconds
+
+S12-09 native and x86 evidence (lead-reported, 2026-11-15)
+GCC lane 1 b2ce6a9eebffcb5c23512c2cec4ba3d8b9e2f046.
+Card window 9: 18:31-18:51Z, exclusive.
+Execute: 1680 PASS; 1 FAIL 930529-1.c, exit 4.
+Builder inspected: tools/s12_09_stage.py:execute; its options regex accepts
+quoted or bare options but not brace-form dg-options. Source line 1 is
+/* { dg-options { "-fwrapv" } } */
+Consequently flags=[] and the constructed command is:
+$SHARED/gcc-knc-16.2.0/bin/k1om-mpss-linux-gcc -march=knc -O2 -w $SHARED/gcc/gcc/testsuite/gcc.c-torture/execute/930529-1.c -lm -o $SHARED/S12-09/execute/claude-t-930529-1.mic
+No -fwrapv is passed. Record this as the known harness miss from S3/S6,
+not a compiler failure. Lead reports prior -fwrapv passes in S3-21/S6-08.
+No rerun or builder change in this check.
+
+Vmath: all six launches valid; zero invalid rows. Vector faster everywhere
+(1.22-3.40x) except double log at density 1: l2 0.85x, mem 0.87x.
+Double log at density 4: 1.25-1.32x. Density 1 is a known minor M4 limit.
+Log: .work/_state/logs/s12_09_vmath_summary-20261115-135441.log
+
+Lead x86: knc b2ce6a9eebf vs releases/gcc-16.2.0, -O2 -mavx512f;
+identical=1962 different=0 both-failed=41 (header-only, both trees) errors=0.
+Log: .work/_state/logs/s12_09_x86-20261115-100743.log
+
+Full wrapper rerun after the lead repaired log pruning (2026-11-15):
+T1 PASS (exit 0), 144.23 seconds, 352 log lines.
+Command: python tools/check.py t1 --compiler gcc16 --cc ../_shared/gcc-knc-16.2.0/bin/k1om-mpss-linux-gcc --record ../_shared/S12-09/t1-rerun.txt
+Log: .work/_state/logs/check_gcc16_t1-20261115-151543.log
+T0 PASS (exit 0), 669.39 seconds: regress 39, doctor 8, portability 6,
+knc_lint 6 tests, all OK. Full wrappers completed without log ACL errors.
+Command: python tools/check.py t0 --compiler gcc16 --cc ../_shared/gcc-knc-16.2.0/bin/k1om-mpss-linux-gcc --record ../_shared/S12-09/t0-rerun.txt
+Log: .work/_state/logs/check_gcc16_t0-20261115-151528.log
+Final T0/T1 status: PASS. T2 retains the initial passing result above;
+not rerun, as requested by the lead.

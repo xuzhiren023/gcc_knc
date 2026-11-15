@@ -1,6 +1,9 @@
 S12-09 installed compiler/runtime record
 Installed compiler output below reports GCC 16.2.0 without a Git revision.
 The lane 1 checkout/build stamp is recorded separately; it does not attest lane 2 installation.
+Lead confirmation 2026-11-15: lane 2 is STALE, not rebuilt or validated here;
+gcc-knc-16.2.0-2 remains Sprint 11 knc 619e14b479a, installed 2026-11-14 11:50 EST.
+Every S12-09 validation result and S13 frozen GCC-KNC line uses lane 1 only.
 Project HEAD: a06cb6812a0314694db6702c7e205decf0c9ecc2
 GCC knc: b2ce6a9eebffcb5c23512c2cec4ba3d8b9e2f046
 Lane 1 build stamp: {
