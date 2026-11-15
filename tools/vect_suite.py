@@ -26,7 +26,7 @@ ROOT = Path(__file__).resolve().parents[1]
 PROJECT = ROOT.parent.parent if ROOT.parent.name == '.work' else ROOT
 SHARED = PROJECT / '.work/_shared'
 TC = SHARED / 'toolchain'
-CORPUS = SHARED / 'gcc/gcc/testsuite/gcc.dg/vect'
+CORPUS = Path(storage.gcc_tree(PROJECT)) / 'gcc/testsuite/gcc.dg/vect'
 DEFAULT = ['-O2', '-ftree-vectorize', '-fno-tree-loop-distribute-patterns',
            '-fno-vect-cost-model', '-fno-common']
 # Basic 32-bit integer and FP vectors are implemented by the KNC backend;
@@ -215,15 +215,25 @@ def main():
     if os.name == 'nt':
         env = os.environ.copy()
         env['PATH'] = os.pathsep.join(str(TC / p) for p in ('cross/bin', 'cygwin/bin')) + os.pathsep + env.get('PATH', '')
+        arguments = list(sys.argv[1:])
+        for flag in ('--output', '--summary'):
+            if flag in arguments:
+                index = arguments.index(flag) + 1
+                arguments[index] = subprocess.check_output(
+                    [str(TC / 'cygwin/bin/cygpath.exe'), '-u', arguments[index]], text=True).strip()
         script = subprocess.check_output([str(TC / 'cygwin/bin/cygpath.exe'), '-u', str(Path(__file__))], text=True).strip()
-        return subprocess.call([str(TC / 'cygwin/bin/python3.12.exe'), script, *sys.argv[1:]], env=env)
+        return subprocess.call([str(TC / 'cygwin/bin/python3.12.exe'), script, *arguments], env=env)
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--jobs', type=int, choices=range(1, 9), default=8)
+    parser.add_argument('--output', type=Path, default=SHARED / 'S6-07')
+    parser.add_argument('--summary', type=Path, default=ROOT / 'tests/baseline/gcc16-vect.txt')
+    parser.add_argument('--compile-only', action='store_true',
+                        help='compile the corpus without linking or staging card jobs')
     parser.add_argument('--stage-only', action='store_true',
                         help='finish driver/pack staging from the recorded baseline without recompiling tests')
     args = parser.parse_args()
-    out = SHARED / 'S6-07'
-    out.mkdir(exist_ok=True)
+    out = args.output
+    out.mkdir(parents=True, exist_ok=True)
     env = os.environ.copy()
     env['PATH'] = ':'.join(str(TC / p) for p in ('cross/bin', 'cygwin/bin')) + ':' + env.get('PATH', '')
     env['TMPDIR'] = str(SHARED / 'tmp')
@@ -278,7 +288,7 @@ def main():
                 note = (diagnostic.strip().splitlines() or ['unknown error'])[-1]
             else:
                 compiled, result = 1, 'compiled'
-                if spec.action == 'run':
+                if spec.action == 'run' and not args.compile_only:
                     command = [*cc, *flags, obj, '-lm', '-o', prog]
                     code, diagnostic = invoke(command)
                     with log.open('a') as stream:
@@ -306,7 +316,7 @@ def main():
     if not sources:
         raise RuntimeError('empty vect corpus')
     if args.stage_only:
-        report = (ROOT / 'tests/baseline/gcc16-vect.txt').read_text()
+        report = args.summary.read_text()
         rows = []
         for line in report.split('\n\nsource\t', 1)[1].splitlines()[1:]:
             r = line.split('\t')
@@ -320,7 +330,8 @@ def main():
                'Scans counted only; no scan or native execution verdict.',
                'Unverified effective targets and option bundles conservatively skipped.',
                'tree-vect.h adapted for __k1om__ to avoid the upstream SSE2 early exit.',
-               'Run executables linted; list and driver staged for one packed card_run job.',
+               ('Compile only; no link, card staging, or native verdict.' if args.compile_only else
+                'Run executables linted; list and driver staged for one packed card_run job.'),
                'sources: ' + str(len(rows)),
                'compiled (including linked/link failures): ' + str(sum(r[3] for r in rows)),
                'scan-tree-dump directives: ' + str(sum(r[5] for r in rows))]
@@ -329,7 +340,12 @@ def main():
     report = '\n'.join(summary) + '\n\nsource\taction\tresult\tcompiled\tlinked\tscans\treason/notes\n'
     report += ''.join('\t'.join(map(str, row)) + '\n' for row in rows)
     if not args.stage_only:
-        (ROOT / 'tests/baseline/gcc16-vect.txt').write_text(report)
+        args.summary.parent.mkdir(parents=True, exist_ok=True)
+        args.summary.write_text(report)
+    if args.compile_only:
+        print('\n'.join(summary))
+        print('Compile only; no link, card staging, or native verdict.')
+        return int(bool(counts['ICE']))
     (out / 'claude-vect.list').write_text(''.join('claude-t-vect-' + Path(r[0]).stem + '.mic ' + r[0] + '\n'
                                                for r in rows if r[4]))
     driver = out / 'claude-vect.mic'
