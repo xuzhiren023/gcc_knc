@@ -2,7 +2,7 @@
 
 Updated automatically at every ticket change. Last update: 2026-11-15 05:57.
 
-**Waiting for you:** S12-30, S12-37. Run `python tools/pm.py inbox`.
+**Waiting for you:** S12-37. Run `python tools/pm.py inbox`.
 
 Current tickets: `[##################--]` 239 of 255
 
@@ -110,7 +110,7 @@ Current tickets: `[##################--]` 239 of 255
 | S12-27 | Latency-aware scalar loops - GCC-KNC unrolls and interleaves independent iterations and hoists conversions so one thread's every-other-cycle issue and long latencies are hidden automatically | draft |  |
 | S12-28 | dispatch.py refuses to start a second dispatcher on a lane that already has a live one | Done | dispatch.py now refuses to start a second dispatcher on a lane that already has a live one (a lock per lane... |
 | S12-29 | Wrong code - vbroadcastsd reads a 4-byte-aligned SCmode constant (complex float) straight from the constant pool and faults on the card (gcc.c-torture pr38969.c, regression from S11-27) | Done | The pr38969 crash from S11-27 is fixed: GCC-KNC no longer broadcasts a vector from memory aligned below its... |
-| S12-30 | Sparse indexed reductions faster than today - vector gather of products with an ordered scalar sum, and indirect prefetch, for CSR-style loops (NPB-CG, HPCG) | **Waiting for you** | over 2 review rounds: Red not accepted: the three failures are the right kind, but the gate cannot go green... |
+| S12-30 | Sparse indexed reductions faster than today - vector gather of products with an ordered scalar sum, and indirect prefetch, for CSR-style loops (NPB-CG, HPCG) | Changes requested | Owner rule (2026-11-14: Fable for troubleshooting): the recognizer now needs troubleshooting on real HPCG s... |
 | S12-31 | HPCG is 1.8% slower with GCC-KNC than with GCC 5.1.1 - find the cause and make it faster (owner: never slower than 5.1.1) | Waiting for review | Green at f2cfc87f, GCC s12/S12-31 299aaf16b72: KNC compare/branch pairing kept adjacent in scalar blocks (p... |
 | S12-32 | ICE (reload) in gcc.c-torture O3-vect-pr32243.c on the installed GCC-KNC, found by the S12-21 torture sweep | Done | The -O3 vector reload crash in pr32243 is fixed: byte/word vector extends now reload through an aligned sta... |
 | S12-33 | T2 writes its short-vector test binaries into a per-run folder, so Claude, Codex and lead runs never block each other | Done | T2's short-vector cross-check now writes its binaries into the run's own output folder instead of the share... |
@@ -280,6 +280,7 @@ Current tickets: `[##################--]` 239 of 255
 
 ## Recent activity
 
+- 2026-11-15 05:57 **S12-30** owner decide: Owner rule (2026-11-14: Fable for troubleshooting): the recognizer now needs troubleshooting on real HPCG shapes (struct ->cols field loads, hoiste...
 - 2026-11-15 05:57 **S12-30** lead escalate: over 2 review rounds: Red not accepted: the three failures are the right kind, but the gate cannot go green and the probes are not in HPCG form. (1...
 - 2026-11-15 05:56 **S12-37** engineer escalate: budget: 6336450 input tokens used; the budget is 6000000
 - 2026-11-15 05:55 **S12-37** lead changes: 1. tools/x87_spill.py:185 breaks an existing test: tests/regress/test_shared_area.py:68-77 (test_x87_probe_from_main_checkout) calls x87_spill t1 w...
@@ -287,13 +288,12 @@ Current tickets: `[##################--]` 239 of 255
 - 2026-11-15 05:52 **S12-30** engineer red: e3a0cf42: HPCG dumps compile PASS. SpMV has ineffective row-local hint; SymGS sweeps missed. Focused T1: compile/assemble/lint and off controls PAS...
 - 2026-11-15 05:51 **S12-37** lead answer: Merged; rerun and submit.
 - 2026-11-15 05:50 **S12-37** lead resume: Lead: merged main into s12/S12-37 (clean). Rerun the 3 tests in tests/regress/test_check_outputs.py via tools/run.py and submit with the approved t...
-- 2026-11-15 05:50 **S12-31** engineer submit: Green at f2cfc87f, GCC s12/S12-31 299aaf16b72: KNC compare/branch pairing kept adjacent in scalar blocks (pair hook leaves blocks with vector instr...
 
 ## Cost
 
 - From the script, engineer: 695 sessions, 1393.8M input tokens
 - From the script, lead: 464 sessions, 130.9M input tokens
-- Started by hand, Claude: 12 sessions, 3556.2M input tokens
+- Started by hand, Claude: 12 sessions, 3559.1M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
