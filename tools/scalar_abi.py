@@ -5,6 +5,9 @@ stack slots relative to entry RSP, plus result registers for constant returns.
 Instruction selection inside the function may differ. Scalar probes and the
 donor fixture use the scalar KNC allowlist; GCC16 affine loops may vectorize.
 Cross-links are T2, not native proof.
+The lead retains native inputs with check.py --stage-to <ticket-card-folder>;
+scalar-abi/, vector-abi/ and short-vector-cross/ keep their run-relative layout.
+See tools/check-card-staging.md for the card handoff.
 """
 import re
 import sys

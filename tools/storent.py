@@ -8,6 +8,8 @@ at -O2, requires its stream_fill to take the no-read store path (vmovnrngoaps
 and the lock addl fence, so the card run exercises what it claims) and its
 --control writer to stream without a fence, links the pthread program and
 lints it. The binary is written under runner.out; the engineer never runs it.
+The lead uses check.py --stage-to <ticket-card-folder> to retain
+storent/knc-storent-publish.mic for card_run (see check-card-staging.md).
 """
 import re
 import sys
@@ -53,4 +55,4 @@ def t2(runner):
         if lint.returncode:
             failures.append('lint: ' + lint.stdout[-1600:])
     runner.result('t2 storent publish test links and lints', failures)
-    runner.say('Staged, not run: ' + str(elf))
+    runner.say('Built, not run (lead retains with --stage-to): ' + str(elf))
