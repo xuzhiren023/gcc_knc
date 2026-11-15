@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-15 04:21.
+Updated automatically at every ticket change. Last update: 2026-11-15 04:23.
 
-**Next: GPT-6.1, on S12-34 (Unrecognizable insn for a truncating vector store to a 1-byte-aligned V16QI destination (found by S12-32)).** Run `python tools/dispatch.py`, or ask the tech lead to.
+**Next: the tech lead, on S12-31.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[##################--]` 238 of 251
 
@@ -111,7 +111,7 @@ Current tickets: `[##################--]` 238 of 251
 | S12-28 | dispatch.py refuses to start a second dispatcher on a lane that already has a live one | Done | dispatch.py now refuses to start a second dispatcher on a lane that already has a live one (a lock per lane... |
 | S12-29 | Wrong code - vbroadcastsd reads a 4-byte-aligned SCmode constant (complex float) straight from the constant pool and faults on the card (gcc.c-torture pr38969.c, regression from S11-27) | Done | The pr38969 crash from S11-27 is fixed: GCC-KNC no longer broadcasts a vector from memory aligned below its... |
 | S12-30 | Sparse indexed reductions faster than today - vector gather of products with an ordered scalar sum, and indirect prefetch, for CSR-style loops (NPB-CG, HPCG) | lead | Needs a GCC build (interactive lead): lane gcc2 at s12/S12-30 head a36fc224773; return the result to the en... |
-| S12-31 | HPCG is 1.8% slower with GCC-KNC than with GCC 5.1.1 - find the cause and make it faster (owner: never slower than 5.1.1) | lead | Needs the interactive lead. (1) Card, our exclusive turn: the 4 commands in docs/research/s12-31-hpcg.md 'S... |
+| S12-31 | HPCG is 1.8% slower with GCC-KNC than with GCC 5.1.1 - find the cause and make it faster (owner: never slower than 5.1.1) | Question for the tech lead | Lead, card window 5 (09:17-09:23Z, exclusive, all three exit 0; S12-36 kept our turn): logs .work/_shared/S... |
 | S12-32 | ICE (reload) in gcc.c-torture O3-vect-pr32243.c on the installed GCC-KNC, found by the S12-21 torture sweep | Done | The -O3 vector reload crash in pr32243 is fixed: byte/word vector extends now reload through an aligned sta... |
 | S12-33 | T2 writes its short-vector test binaries into a per-run folder, so Claude, Codex and lead runs never block each other | Done | T2's short-vector cross-check now writes its binaries into the run's own output folder instead of the share... |
 | S12-34 | Unrecognizable insn for a truncating vector store to a 1-byte-aligned V16QI destination (found by S12-32) | Not started |  |
@@ -276,6 +276,7 @@ Current tickets: `[##################--]` 238 of 251
 
 ## Recent activity
 
+- 2026-11-15 04:23 **S12-31** lead resume: Lead, card window 5 (09:17-09:23Z, exclusive, all three exit 0; S12-36 kept our turn): logs .work/_shared/S12-31/native-mb.log, native-layout-knc.l...
 - 2026-11-15 04:20 **S12-30** lead defer: Needs a GCC build (interactive lead): lane gcc2 at s12/S12-30 head a36fc224773; return the result to the engineer. Source read a36fc224773: no lega...
 - 2026-11-15 04:15 **S12-30** engineer ask: GCC build needed at a36fc224773 (gcc2). T1 failed only sparse_slice hint count: on 1 vs off 4; guard suppresses stream recognition. Other checks pa...
 - 2026-11-15 03:42 **S12-30** owner decide: Lead raises sessions 9 -> 11 (second raise; the last raise produced the implementation and a clean legality review). Lead restored LF in i386-knc.c...
@@ -283,16 +284,15 @@ Current tickets: `[##################--]` 238 of 251
 - 2026-11-15 03:41 **S12-30** lead answer: Not built yet: fix line endings first, then ask again. Read gcc a8e7c0eb385 and e13ff4df9a4. (1) Blocker: a8e7c0eb385 rewrites gcc/config/i386/i386...
 - 2026-11-15 03:37 **S12-30** engineer ask: GCC build needed at e13ff4df9a4 (gcc2; hook commit a8e7c0eb385). AGENTS.md reserves builds for lead. Implemented opt-in bounded CSR/HPCG/row-local ...
 - 2026-11-15 03:20 **S12-30** lead approve-red: The compiler test for automatic sparse-loop indirect prefetch is accepted: it fails only because the -mknc-indirect-prefetch switch does not exist ...
-- 2026-11-15 03:18 **S12-30** engineer red: 177b4006: single authorized T1 rerun now fails only on four missing-switch compilations. CSR/HPCG aprefetch bounds controls, row-local rejection, o...
 
 ## Cost
 
 - From the script, engineer: 681 sessions, 1355.7M input tokens
 - From the script, lead: 453 sessions, 127.0M input tokens
-- Started by hand, Claude: 12 sessions, 3496.6M input tokens
+- Started by hand, Claude: 12 sessions, 3501.9M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 34.7 GiB of 100 GiB. 125 GiB free on the drive.
+The project uses 34.7 GiB of 100 GiB. 128 GiB free on the drive.
