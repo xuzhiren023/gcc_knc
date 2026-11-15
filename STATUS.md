@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-14 21:37.
+Updated automatically at every ticket change. Last update: 2026-11-14 21:44.
 
-**Next: GPT-6.1, on S12-21 (Scheduling model for M4's serial runs - measure density-1 tuning and the integer-multiply cost against today's density-4 defaults (S12-14 B02, B04, B05)).** Run `python tools/dispatch.py`, or ask the tech lead to.
+**Next: the tech lead, on S12-33.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[##################--]` 230 of 248
 
@@ -113,7 +113,7 @@ Current tickets: `[##################--]` 230 of 248
 | S12-30 | Sparse indexed reductions faster than today - vector gather of products with an ordered scalar sum, and indirect prefetch, for CSR-style loops (NPB-CG, HPCG) | lead | Needs the one Phase 1 card run (lead only): tools/card_run --threads 1 --timeout 1150, binary .work/_shared... |
 | S12-31 | HPCG is 1.8% slower with GCC-KNC than with GCC 5.1.1 - find the cause and make it faster (owner: never slower than 5.1.1) | lead | Needs one card run by the interactive lead. Phase 1 at 6b413629 reviewed and sound; staged binary exists. I... |
 | S12-32 | ICE (reload) in gcc.c-torture O3-vect-pr32243.c on the installed GCC-KNC, found by the S12-21 torture sweep | Not started |  |
-| S12-33 | T2 writes its short-vector test binaries into a per-run folder, so Claude, Codex and lead runs never block each other | In progress |  |
+| S12-33 | T2 writes its short-vector test binaries into a per-run folder, so Claude, Codex and lead runs never block each other | Question for the tech lead | Red test commit 41691642 fails as intended when t2_short_vector attempts to compile and link; this test dou... |
 | S13-01 | M4 final gate - stage the ADR-0015 gate run at the final head (17 programs, held-out unsealed, six pairs, three profiles) | draft |  |
 | S13-02 | Libgomp per-region thread density - choose 1-4 workers per core per parallel region instead of once per program | draft |  |
 | S13-03 | M4 retrospective - what we did wrong, what worked, and the practice changes carried into the next milestone and the agent-team skill | draft |  |
@@ -273,6 +273,7 @@ Current tickets: `[##################--]` 230 of 248
 
 ## Recent activity
 
+- 2026-11-14 21:44 **S12-33** engineer ask: Red test commit 41691642 fails as intended when t2_short_vector attempts to compile and link; this test double is incomplete (nm output comes throu...
 - 2026-11-14 21:37 **S12-21** owner decide: Lead raises sessions 9 -> 10: the work is complete (imul cost fix 1a4f5aab0a2, T1 green, T0/T1 pass, lead T2 36/0, A/B staged); the lead submits it.
 - 2026-11-14 21:36 **S12-21** engineer escalate: budget: 9 engineer sessions used; the budget is 9
 - 2026-11-14 21:35 **S12-30** lead defer: Needs the one Phase 1 card run (lead only): tools/card_run --threads 1 --timeout 1150, binary .work/_shared/S12-30/precision-gate, argument 12345 (...
@@ -280,13 +281,12 @@ Current tickets: `[##################--]` 230 of 248
 - 2026-11-14 21:35 **S12-21** lead resume: Lead 21:36: T2 run by the lead on lane gcc2: 36 PASS, 0 FAIL (log s12_21_t2-20261114-213433.log); the S5-21 file is fixed for good by S12-33. No re...
 - 2026-11-14 21:33 **S12-21** lead defer: Interactive lead needed; diff reviewed (one imul-cost hunk, scanner fix fine). (1) Rebase gcc s12/S12-21 onto knc 2e70e4115e2 (engineer: Permission...
 - 2026-11-14 21:32 **S12-30** engineer ask: 429c7653: A/B/A+B staged; target build/lint PASS; host model 599300 checks PASS. Log: .work/_state/logs/s12_30_phase1_routes-20261114-213007.log. A...
-- 2026-11-14 21:31 **S12-21** engineer ask: df7f240e: T0 passed; corrected T1 IMUL scan is red on installed/green on gcc2, other T1 passed. Torture: 8012 cases, 0 ICEs. Vector O3-vect-pr32243...
 
 ## Cost
 
-- From the script, engineer: 657 sessions, 1299.3M input tokens
+- From the script, engineer: 658 sessions, 1301.0M input tokens
 - From the script, lead: 435 sessions, 121.6M input tokens
-- Started by hand, Claude: 12 sessions, 3370.7M input tokens
+- Started by hand, Claude: 12 sessions, 3372.9M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
