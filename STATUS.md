@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-15 15:33.
+Updated automatically at every ticket change. Last update: 2026-11-15 15:34.
 
 Nothing can move right now.
 
@@ -305,7 +305,7 @@ Current tickets: `[##################--]` 242 of 268
 ## Cost
 
 - From the script, engineer: 710 sessions, 1500.7M input tokens
-- From the script, lead: 476 sessions, 136.0M input tokens
+- From the script, lead: 477 sessions, 136.2M input tokens
 - Started by hand, Claude: 13 sessions, 3727.4M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
