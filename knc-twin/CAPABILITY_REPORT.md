@@ -1,74 +1,109 @@
-# Capability report, knc-twin 0.1.0
+# Capability and acceptance-gap report, knc-twin 0.2
 
-Machine-readable version: `python scripts/knc_twin.py capabilities --out <dir>` writes
-`capabilities.json` (scales, per-mnemonic table, scenarios, profiles). This page separates what
-is implemented from what is not, and says how much of it is backed by hardware evidence.
+Machine-readable: `python scripts/knc_twin.py capabilities --out <dir>` (`capabilities.json`);
+coverage of real compiler output: `AUDIT.md` / `AUDIT.json` (regenerate with
+`scripts/from_gcc_s.py ... --audit`); hardware agreement: `references/validation.md`.
 
-## Implemented
+## 1. Where native test time goes, and what the twin covers
 
-**Scales**
+The regions that consume repeated native testing in gcc_knc are the M4 gate programs (HPCG and
+its CSR/SymGS shapes, STREAM, the PolyBench/NPB corpus) and the characterization and gate
+microbenchmarks (S6-03/S8 catalog, S12-30 gate variants, S12-31 layout tests). Their hot
+regions, as GCC-KNC emits them at `-O2 -march=knc`, are scalar x87 double loops with `movslq`
+index loads and software prefetches, x87 float reductions, scalar integer loops, and the
+vector microkernels of the catalog.
 
-| scale | kind | what |
-|---|---|---|
-| instruction | simulated | timing class, pipe eligibility and latency per supported mnemonic; exact semantics for the mnemonics marked functional |
-| region | simulated | straight-line or single-loop record streams, 1-4 contexts; functional execution, cycle prediction, trace bounds, loop MII, exhaustive reorder search (<= 12 instructions) |
-| core | simulated | 4 hardware contexts with 1-4 active, in-order per context, U/V issue with documented pairing classes and the cmp/jcc exception, 2-cycle same-context issue gap, least-recently-issued round-robin picker, scoreboarded register/flag/mask dependencies, 3-cycle address-generation interlock, demand-load-miss stalls per context (others progress), nonblocking software prefetch with in-flight tracking, 8-entry outstanding-miss limit, L1 port limit, LRU L1/L2 line tracking, gather/x87/L2-prefetch occupancy, fence serialization, branch misprediction scenarios |
-| pair | analytical | two cores exchanging lines over the ring: max(core work) + handoffs and lines at remote-L2 latency over a declared concurrency |
-| card | analytical | max(compute term, bandwidth term) x imbalance + barriers, per traffic type; needs_parameters when the bandwidth is unknown unless a sweep is declared; never one-core throughput x cores |
+Audit of real output (`AUDIT.md`, 13 files: seven S12-30 gate variants, the HPCG shapes file,
+the CG application, SpMV/SymGS applications, the 364-kernel characterization catalog, the
+compiled fixtures):
 
-**Functional (exact) coverage**: scalar integer add/sub/and/or/xor/cmp/test/mov/lea/inc/dec/
-neg/not/shl/shr/sar/imul with flags, 32/64-bit registers; jmp and conditional branches on flags
-and on masks (jkzd/jknzd); kmov/kand/kor/kxor/kxnor/kandn/kandnr/knot/kortest; int32 vector
-add/sub/and/andn/or/xor/mullo/min/max/shifts (immediate and variable), compares to mask;
-f32 and f64 add/sub/mul and all FMA forms (fmadd/fmsub/fnmadd/fnmsub x 132/213/231) with a
-single rounding in rn/rd/ru/rz, FTZ/DAZ policy, signed zeros, infinities, NaN propagation;
-f32/f64 compares to mask; dq/udq <-> ps conversions with rounding immediate; vmovaps/apd/dqa32/
-dqa64 loads and stores with merge masks; no-read stores; vbroadcastss/sd, vpbroadcastd; dword
-gather with completion mask; vpermd. Expected outputs are checked lane by lane; NaNs match any
-NaN unless bitwise comparison is requested.
+| what | count | parser reads | ISA known | functional exact | timing complete |
+|---|---:|---:|---:|---:|---:|
+| functions | 455 | all but 9 (TLS `@gottpoff` operands, symbolic immediates, `rep`/`lock` prefixes other than `rep ret`/`lock add`) | | | |
+| innermost loops | 317 | | | 295 | 294 |
+| instructions in innermost loops | 5432 | | | | 4848 (89%) |
 
-**Timing-only mnemonics** (no semantics; usable in static traces): vcvtfxpntpd2dq/udq,
-vrcp23ps, vrsqrt23ps, vlog2ps, vexp223ps, vpermf32x4, vloadunpackld/hd, vpackstoreld/hd,
-vgatherdpd, vscatterdps, movzx, x87 fadd/fmul/fdiv families and moves, lock_add, mfence.
+Every hot loop of the gate kernels (`knc_csr_raw:.L6`, 43 instructions; the SymGS forward and
+backward shapes; the CG application's scalar loops) is complete for functional execution and
+timing. The incomplete loops are those that call a function, use `fsqrt`, `idiv`, `fldcw/
+fnstsw` (latencies unknown in every profile) or `vrcp23ps` (timing-only).
 
-**Inputs**: normalized JSON records (schema provided) and a GAS AT&T subset (labels, size
-suffixes, masks, rounding, 1toN broadcasts, lock add). Dynamic traces come from functional
-execution or static unrolling with explicit address descriptions; no card trace is needed.
+Native time potentially displaced: one S12-30 gate pass spends about 2.5 s of card time per
+variant per case shape (five 0.5 s samples) across seven variants and several case shapes, plus
+correctness children; its CSR variants are evaluated off-card by `fixtures/batch` in seconds.
+The characterization catalog's 119 measured rows (S6-03: three exclusive card windows) are
+reproduced off-card to a median error of about 1%; a new microkernel of the validated shapes
+no longer needs a card window for a first answer. The M4 gate itself (15-21 h) is not displaced:
+its programs run millions of iterations over cold data, outside the validated shapes.
 
-**Reports**: result.json + summary.md with result type, status, engine version, profile id/
-version/hash, input hash, scale and representation, calibration status, functional-check
-status, assumptions, unsupported features, prediction or bound, limiting constraints, exact
-invocation, artifact paths, Python wall time (separate from predicted cycles). Statuses:
-ok, invalid_input, unsupported, missing_parameter, budget_exhausted (with a partial block
-that is never a result), functional_mismatch, needs_parameters, incompatible.
+## 2. Implemented
 
-**Evidence**: `card-7120-measured` imports native single-core microbenchmarks (latencies 4/6/7/
-12/3/24/357, AGI, gather, x87, prefetch issue rate, bandwidths, barrier times) with job ids.
-`card-5110p-literature` uses published measurements by others. `card-3120-documented` and
-`knc-common` carry documented values only and leave the rest unknown. `synthetic-demo` is
-labeled synthetic in every result.
+**Inputs**: GCC-KNC and GCC 5.1.1 k1om assembly through `scripts/from_gcc_s.py` (function or
+loop regions; `.rept`, data symbols, numeric labels, size suffixes, swizzles, conversions,
+masks, x87 forms, `lock add`, `rep ret`); hand-written JSON records; the GAS subset inline.
+Nothing is simplified: unsupported instructions are kept and reported.
 
-## Not implemented (explicit)
+**Functional (exact)**: scalar integer ALU in 8/16/32/64 bits with flags (add/sub/adc/sbb/
+and/or/xor/cmp/test/bt/inc/dec/neg/not/shifts by immediate or cl/imul 2- and 3-operand/idiv/
+movsx/movzx/cltq/cltd/cqto/lea/mov/movabs/push/pop/leave/nop), conditional branches and setcc,
+mask ops; int32 vector ops and int64 logic; f32/f64 add/sub/subr/mul/max/min and all FMA forms
+with one rounding in rn/rd/ru/rz, FTZ/DAZ, signed zeros, infinities, NaN propagation; compares
+to mask; blends; conversions dq/udq<->ps, pd->dq/udq, ps<->pd, vrndfxpntps; register swizzles;
+broadcasts; up/down conversions (float16/uint8/sint8/uint16/sint16); masked loads/stores;
+vloadunpack/vpackstore halves; gather/scatter (dword and qword) with completion masks; vpermd,
+vpermf32x4; the x87 stack with extended precision, control word, fld/fst/fild/fistp/fisttp/
+fxch/fchs/fabs/fsqrt/fcom/fucom/fcomi/fnstsw/fldcw/fnstcw. Oracles: binary64 double-rounding
+for binary32 add/sub/mul, Python binary64 for f64, hand-derived vectors, and GCC-KNC's own
+output for the x87 operand conventions.
 
-- Any mnemonic outside the table: rejected, never costed. Swizzles other than 1toN broadcasts.
-  Semantics of x87, approximations, unpack/packstore, scatter, pd->dq. 8/16-bit registers,
-  memory-destination ALU forms.
-- Contexts that communicate through memory (sequential functional model). Inter-core coherence
-  traffic, TLBs, page size, instruction cache, the L2 hardware prefetcher, pseudo-LRU details,
-  bank conflicts, the decoder's refill bubble, loaded-latency growth, frequency/thermal effects.
-- Whether `dec/jnz` (and other flag producers besides cmp/test) pair; `latency.fence`;
-  `latency.vector_long` and `vector_convert_df` on the 3120/common profiles; read-only sustained
-  bandwidth; any 3120/5110P latency not published: all surface as missing_parameter or
-  needs_parameters.
-- C, Fortran, arbitrary assembly or binaries: no translation. Encodings, loader, ABI.
-- Pair and card scales are formulas; no ring, directory or memory-controller simulation.
-- Hardware calibration of end-to-end predictions: none yet (`tests/heldout_native/` is empty).
-  Passing the bundled tests is not validation against the card.
+**Timing (core scale)**: 1-4 in-order contexts, U/V pairing with the documented classes and
+the measured exceptions (cmp/jcc pair, nop and jmp do not), 2-cycle same-context spacing,
+round-robin picker, register/flag/mask/x87-physical-register scoreboard, 3-cycle AGI,
+demand-miss and store-miss stalls, nonblocking software prefetch, 8-entry outstanding-miss
+limit, L1 port limit, LRU L1/L2 line tracking, no-read store costs, gather unit occupancy,
+x87 multiplier/divider occupancy, L2-prefetch issue rate, fence serialization; optional DTLB,
+streaming L2 hardware prefetcher and per-core memory service sub-models.
 
-## Known model uncertainties carried as alternatives
+**Bounds**: trace bounds (issue events, spacing, resources, critical path, memory
+concurrency), loop MII (ResMII, RecMII, iteration critical path), exhaustive reorder search.
 
-`latency.vector_load_l1` 12 (measured chain) vs 3 (R08) — overlay provided; `latency.l2_hit`
-24 vs 11 (R17); `l1.accesses_per_cycle` 1 vs 2; `l1.outstanding_demand_misses_per_core` 8 vs
-38; `latency.branch_mispredict_penalty` 5 per branch vs ~10 per miss; `fp.ftz_rule` tiny vs
-tiny_and_inexact; `occupancy.vprefetch_l2_core_cycles` 2 vs measured 2.25; gather per-line
-occupancy understates scattered gathers (112 vs measured 127 per 16 lines).
+**Scales**: instruction, region, core simulated; pair and card analytical with explicit
+parameters and `needs_parameters` otherwise.
+
+**Workflow**: result classes on every number (`conditional_bound`,
+`unvalidated_scenario_estimate`, `calibrated_forecast`), `compare` and `batch` with a frozen
+profile hash, native requests for anything the model cannot rank, `prepare-native` /
+`import-native` round trip, held-out validation harness.
+
+## 3. Not implemented (explicit)
+
+- Mnemonics outside the table (rejected, never costed); `call`/`ret` are region boundaries;
+  symbolic immediates, TLS operands, `rep`/`lock` prefixes beyond the two accepted forms.
+- Exact bit patterns of `vrcp23ps`, `vrsqrt23ps`, `vlog2ps`, `vexp223ps`, `vscaleps`
+  (timing-only).
+- Latencies unknown in every bundled profile: `fsqrt`, `idiv`, `fldcw/fnstcw/fnstsw`, fences,
+  scatter occupancy; a region using them stops with `missing_parameter` (native request
+  candidates in `references/calibration.md`).
+- Second-level TLB and page walks, instruction cache and prefetch-buffer refill, cross-core
+  coherence traffic, card-level bandwidth sharing, ring/memory-controller simulation, loaded
+  latency growth, frequency/thermal effects; contexts communicating through memory (the
+  sequential functional model).
+- Pair and card scales are formulas; no pair/card prediction has been compared with a native run.
+- End-to-end validation of a compiler-generated region against a native run of that region:
+  not yet done (the gate CSR batch is 13% above the measured call on a different random input).
+
+## 4. Memory result classes
+
+Every memory-dependent number is labeled: `bounds` results are conditional bounds under the
+model's listed assumptions; `simulate` results are unvalidated scenario estimates unless the
+kernel declares a validated shape (five shapes, `references/validation.md`), in which case the
+result is a calibrated forecast with that shape's error band; pair/card totals are unvalidated
+scenario estimates whose memory term is a conditional bound given the stated bandwidth.
+
+## 5. Known model uncertainties carried as alternatives
+
+`latency.vector_load_l1` 5 derived (R08: 3; overlay with 12); `latency.l2_hit` 24 vs 11
+(R17); `l1.accesses_per_cycle` 1 vs 2; `l1.outstanding_demand_misses_per_core` 8 vs 38;
+`l2.hw_prefetch_depth_lines` 16 derived (8, 24); `latency.branch_mispredict_penalty` 5 per
+branch; `fp.ftz_rule` tiny vs tiny_and_inexact; `occupancy.gather_cycles_per_line` 7 (about 11
+for scattered lines); `latency.store_to_load_same_line` 7 (independent pairs over-charged).

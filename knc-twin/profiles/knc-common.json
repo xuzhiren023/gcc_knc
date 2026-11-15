@@ -56,6 +56,7 @@
     "pairing.v_eligible_classes": {
       "value": [
         "scalar_alu",
+        "scalar_rmw",
         "scalar_load",
         "scalar_store",
         "branch",
@@ -160,13 +161,13 @@
     },
     "latency.vector_load_l1": {
       "value": 3,
-      "unit": "cycles, L1 hit vector load to dependent use",
+      "unit": "cycles, L1 hit plain (unmasked, unconverted) vector load to dependent use",
       "status": "documented",
       "source": "R08 cache slide ('3 cycles for vector loads')",
       "alternatives": [
         12
       ],
-      "uncertainty": "S6-03 masked_load.lat measured 12 on a dependent chain of memory-operand forms; see card-7120-measured."
+      "uncertainty": "the 12-cycle figure measured on the owner's card belongs to merge/convert forms (latency.vector_load_merge_l1)"
     },
     "latency.l2_hit": {
       "value": 11,
@@ -507,6 +508,150 @@
       "status": "documented",
       "source": "R17 slide 13",
       "uncertainty": "Not used by any current model term; informational."
+    },
+    "latency.x87_move": {
+      "value": null,
+      "unit": "cycles",
+      "status": "unknown",
+      "source": "not documented (fld/fst/fxch/fchs/fabs)"
+    },
+    "latency.x87_compare": {
+      "value": null,
+      "unit": "cycles",
+      "status": "unknown",
+      "source": "not documented (fcom/fucom/fcomi)"
+    },
+    "latency.x87_control": {
+      "value": null,
+      "unit": "cycles",
+      "status": "unknown",
+      "source": "not documented (fldcw/fnstcw/fnstsw); these serialize the core in the model"
+    },
+    "latency.x87_sqrt": {
+      "value": null,
+      "unit": "cycles",
+      "status": "unknown",
+      "source": "not documented; not measured by the imported characterization"
+    },
+    "latency.scalar_idiv": {
+      "value": null,
+      "unit": "cycles",
+      "status": "unknown",
+      "source": "not documented; not measured"
+    },
+    "occupancy.scatter_cycles_per_line": {
+      "value": null,
+      "unit": "core cycles per distinct line",
+      "status": "unknown",
+      "source": "R05 Table II measures gathers only; scatter not measured by the imported characterization"
+    },
+    "tlb.l1_entries_4k": {
+      "value": 64,
+      "unit": "pages",
+      "status": "literature",
+      "source": "R06 \u00a75.1.3 (level-1 TLB miss cost measured beyond 64 4 KiB pages); gcc_knc C4 rerun (S8-12) finds the knee at 64 pages per core",
+      "applies_to": "first-level data TLB, 4 KiB pages"
+    },
+    "tlb.l1_entries_2m": {
+      "value": null,
+      "unit": "pages",
+      "status": "unknown",
+      "source": "not documented in the imported sources"
+    },
+    "tlb.l1_miss_penalty_cycles": {
+      "value": 29,
+      "unit": "cycles added to a load that misses the first-level DTLB and hits the second level",
+      "status": "literature",
+      "source": "R06 Table II (level-1 TLB miss, 4 KiB page: 29 cycles); gcc_knc C4 rerun measured about 29 ticks (31.8 vs 3.0 at one thread)",
+      "alternatives": [
+        91
+      ],
+      "uncertainty": "a second-level TLB miss costs about 91 cycles (R06 Table II); not modeled"
+    },
+    "l2.hw_prefetch_streams": {
+      "value": 16,
+      "unit": "streams per core",
+      "status": "documented",
+      "source": "R01 p.19 (16-stream L2 hardware prefetcher, 4 KiB bounded)"
+    },
+    "l2.hw_prefetch_depth_lines": {
+      "value": 4,
+      "unit": "lines prefetched ahead per confirmed stream",
+      "status": "assumed",
+      "source": "R08 ('prefetches up to ~24 cache lines per core') gives a per-core total, not a per-stream depth; 4 assumed",
+      "alternatives": [
+        2,
+        8
+      ]
+    },
+    "l2.hw_prefetch_max_stride_lines": {
+      "value": 2,
+      "unit": "lines",
+      "status": "documented",
+      "source": "R08 ('identifies strides up to 2 cache lines')"
+    },
+    "memory.core_service_cycles_per_line": {
+      "value": null,
+      "unit": "core cycles between memory fills for one core",
+      "status": "unknown",
+      "source": "card-specific; measured on the 7120 card as 19.5 (S6-03 memory.load_rt per core at four threads)"
+    },
+    "latency.vector_load_merge_l1": {
+      "value": 3,
+      "unit": "cycles",
+      "status": "assumed",
+      "source": "no documented difference between masked/converting and plain vector loads; the owner's card shows none either (S6-03 masked_load.lat equals spill_reload.lat)",
+      "alternatives": [
+        12
+      ]
+    },
+    "store.nr_stall_cycles_resident": {
+      "value": null,
+      "unit": "cycles the issuing context stalls per no-read (vmovnr*) store to a cache-resident line",
+      "status": "unknown",
+      "source": "not documented; measured on the owner's card (S6-03 l1/l2.store_stream)"
+    },
+    "store.nr_stall_cycles_memory": {
+      "value": null,
+      "unit": "cycles the issuing context stalls per no-read store to a non-resident line",
+      "status": "unknown",
+      "source": "not documented; measured on the owner's card (S6-03 memory.store_stream)"
+    },
+    "store.nr_occupancy_core_cycles": {
+      "value": null,
+      "unit": "core cycles a no-read store occupies a shared store path",
+      "status": "unknown",
+      "source": "derived on the owner's card from the four-thread l1.store_stream row"
+    },
+    "pairing.u_nop_pairs": {
+      "value": false,
+      "unit": "boolean: may a nop in the U slot take a V partner",
+      "status": "measured",
+      "source": "S6-03 agi.gap1-4: each nop beyond the first costs a full issue slot (4.15, 6.16, 8.18, 10.19 ticks), so nop+nop never pair; a nop still fills a V slot"
+    },
+    "l2.hw_prefetch_trains_on_stores": {
+      "value": true,
+      "unit": "boolean",
+      "status": "documented",
+      "source": "R01 TUNE_PREFQ bits (separate enables for non-RFO data reads and RFO/store reads) show the L2 prefetcher tracks store streams"
+    },
+    "pairing.v_jmp_pairs": {
+      "value": false,
+      "unit": "boolean: may an unconditional jmp issue in the V slot",
+      "status": "measured",
+      "source": "S8-01 C10 fixed-direction row: cmp/je, add, jmp cost three issue events per unit (6.22 ticks at one thread), so the jmp did not pair with the add; conditional branches keep the cmp/jcc pairing (R02 p.56)"
+    },
+    "latency.gather_mask_cycles": {
+      "value": null,
+      "unit": "cycles until a gather's completion mask is readable",
+      "status": "unknown",
+      "source": "not documented; derived on the owner's card from gather_all.rt"
+    },
+    "occupancy.gather_unit": {
+      "value": "per_line",
+      "unit": "policy",
+      "status": "assumed",
+      "source": "the gather occupies a gather unit for occupancy.gather_cycles_per_line per distinct line; other instructions of the core keep issuing (S6-03 gather_all.rt: kmov+gather+jknzd fit in 7 ticks)"
     }
   }
 }

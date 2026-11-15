@@ -55,7 +55,7 @@ The GCC-KNC project's card: Xeon Phi x100 with 61 cores at 1.238 GHz and 16 GB G
 
 Native measurement identifiers: S6-03: card_run jobs claude-0380b2ec, claude-7191652b, claude-b1f534af (2026-11-06), .work/_shared/S6-03/knc-char.mic, median of five group medians, spread <2% unless starred; S8-01: .work/_shared/tmp/claude-s8-01/job1..job19 (2026-11-07/08), one launch each; S8-10 C11: .work/_shared/tmp/claude-s8-10-out/c11-*.out (2026-11-09), three launches; S8-12 reruns: .work/_shared/tmp/claude-s8-12/job{1..6}-*.out (2026-11-08); S8-17 C12: .work/_shared/tmp/claude-s8-17/c12.out (2026-11-08)
 
-Calibration: imported_microbenchmarks. Single-core instruction latencies, throughputs, cache/memory latencies and a few whole-card bandwidth and barrier figures are imported from native microbenchmarks on this card. No end-to-end kernel prediction of this engine has yet been compared against a native measurement; the held-out validation set is empty. Predictions are therefore model outputs built from measured parameters, not validated predictions.
+Calibration: imported_microbenchmarks_with_heldout_check. Single-core instruction latencies, throughputs, cache/memory latencies, store costs and a few whole-card figures are imported from native microbenchmarks on this card, and the engine's predictions were compared with 119 measured characterization rows (tests/heldout_native/characterization-run, references/validation.md): held-out median error about 1%, ranking reliability 0.98. No prediction of a compiler-generated region has been compared with a native run of that region; shapes outside validated_shapes are unvalidated_scenario_estimate.
 
 Extends `knc-common`; the rows below are this profile's own values (inherited rows are not repeated).
 
@@ -70,32 +70,48 @@ Extends `knc-common`; the rows below are this profile's own values (inherited ro
 | `card.sustained_bandwidth_gbs` | {"read_modify_write": 156.5, "read_only": null, "write_ng... | GB/s by traffic type, 60 cores x 4 threads | measured | read_modify_write: S8-17 C12 stream phase 156.5 GB/s; write_normal/write_ngo: S8-01 C1 at 60x4 (83.5 and 226.1 GB/s median worker; NGO completed-worker estimate 204.5) | read_only is not measured (the project's target is 264-299 GB/s); NGO figures differ between estimates (204.5 vs 226.1) and a later sweep gave 169.7 under different work. |
 | `card.tsc_hz` | 1232199000 | Hz | measured | S6-01 R1 lines 245-265 (about 1232.199 MHz); invariance not proven |  |
 | `card.usable_cores` | 60 | cores | measured | S6-01 placement protocol: cores 0-59 for jobs, OS core CPUs {0,241,242,243} excluded |  |
+| `l1.store_miss_stalls_context` | True | boolean | measured | S6-03 l2.store_normal 23.39 ticks per store at one thread (an L2-resident footprint): each store waits for its line; R08's 'except store misses' does not hold for this card/pattern | alt: False |
+| `l2.hw_prefetch_depth_lines` | 16 | lines ahead per confirmed stream | derived | S6-03 memory.load_rt 37.35 ticks per sequential line at one thread with the hardware prefetcher active: the HWP sub-model reproduces 37.4 with depth 16 (40.2 at 12, 51.4 at 8); at four threads it gives 85.5 against 77.9 (see references/validation.md) | alt: 8, 24 |
 | `latency.agi_cycles` | 3 | cycles | measured | S6-03 agi.gap0 3.11 vs 2.08 baseline at one thread: the dependent load issued one cycle after its earliest slot, i.e. address usable 3 cycles after the write issued; R01 p.19 |  |
 | `latency.branch_mispredict_penalty` | 5 | cycles per branch in the pseudorandom test | measured | S8-01 C10: 11.27 vs 6.22 ticks per branch at one thread (difference 5.05) | alt: 10; The test did not separate the miss rate; if half the branches missed, the penalty per miss is about 10. The model charges this value per branch the scenario marks mispredicted. |
 | `latency.branch_taken_bubble` | 0 | cycles | derived | S8-01 C9: loop costs about 2 ticks per vector op plus 2 per loop branch at one thread (the branch costs its issue slot only) |  |
 | `latency.fence` | None | cycles | unknown | lock addl is used as a publication fence by the project but its latency was not measured |  |
 | `latency.gather_first_line` | 15 | cycles | measured | S6-03 gather_all.lat 15.10 (16 lanes in one line, one thread) |  |
+| `latency.gather_mask_cycles` | 2 | cycles | derived | S6-03 gather_all.rt 7.08 per kmov/gather/jknzd unit: the completion-mask branch issues long before the 15-cycle data latency; 2 reproduces the row together with the 7-cycle gather unit occupancy | alt: 7 |
 | `latency.l2_hit` | 24 | cycles | measured | S6-03 l2.load_lat 24.42 (one thread), 25.68 at four threads | alt: 11; R17 slide 14 documents 11 raw cycles; literature (R06, R08) measures 22-25. |
 | `latency.mask_op` | 1 | cycles | assumed | S6-03 kand.lat 2.08 bounds it at <=2; 1 assumed like scalar | alt: 2 |
 | `latency.memory` | 357 | cycles | measured | S6-03 memory.load_lat 356.53 (one thread, idle); 365.76 at four threads | Loaded latency is higher (R08); not measured under load here. |
 | `latency.remote_l2_line_ns` | 192 | ns per load of a line in another core's L2 | measured | S8-10 C11: 190.6-195.0 ns, near and far owner alike | R08 reports ~275 ns on SE10P; R22 shows physical address matters. |
 | `latency.scalar_alu` | 1 | cycles | documented | R17 slide 10; S6-03 scalar_add.lat 2.08 (<=2 bound) |  |
+| `latency.scalar_idiv` | None | cycles | unknown | not measured (native request candidate) |  |
 | `latency.scalar_imul` | 10 | cycles | documented | R02 p.56; not measured on this card by the imported runs |  |
 | `latency.scalar_load_l1` | 3 | cycles | measured | S6-03 l1.load_lat 3.03 (one thread) | R08 and R17 document 1 (or 2) cycles. |
 | `latency.spill_reload_chain` | 12 | cycles for a store followed by a dependent reload | measured | S6-03 spill_reload.lat 12.11 (one thread), 13.14 at four |  |
-| `latency.store_to_load_same_line` | 3 | cycles after a store issues before a load of the same line can use the data in L1 | assumed | chosen so that store->vector reload matches the measured 12-cycle spill/reload chain with latency.vector_load_l1 = 12 only if the load waits no extra; S8-12 C9 memory chain 11 per link | alt: 1, 8 |
+| `latency.store_to_load_same_line` | 7 | cycles after a store issues before a load of the same line sees the data | derived | S8-12 C9 memory chain u1 11.07 per link = folded-load add (4) + store-to-load path; spill_reload.lat 12.11 = path + plain load (5) | alt: 3, 9 |
 | `latency.vector_arith` | 4 | cycles | measured | S6-03 vaddps.lat 4.02, vmulps.lat 4.03, vfmadd213ps.lat 4.02, vpaddd.lat 4.03, vpxord.lat 4.03, vaddpd/vmulpd/vfmadd213pd 4.03, vcvtfxpntdq2ps/ps2dq 4.03 |  |
 | `latency.vector_convert_df` | 7 | cycles | measured | S6-03 vcvtfxpntpd2dq.lat 7.04, vcvtfxpntpd2udq.lat 7.05 |  |
-| `latency.vector_load_l1` | 12 | cycles | measured | S6-03 masked_load.lat 12.11, convert_up.lat 12.11, spill_reload.lat 12.11 (dependent chains through memory-operand forms, one thread) | alt: 3; R08 documents 3 cycles for vector loads; the measured chains include a store or a vector-to-address path and may overstate a pure load-to-use. Use the alternative scenario for a sensitivity check. |
+| `latency.vector_load_l1` | 5 | cycles, L1 hit plain vector load to dependent use | derived | S6-03 spill_reload.lat 12.11 = store-to-load path (7, from c9.memory.u1) + load-to-use; R08 documents 3 for vector loads | alt: 3; not isolated by a native row (a dependent plain vector-load chain is a native request candidate); 3 would make the spill/reload chain 10 |
+| `latency.vector_load_merge_l1` | 5 | cycles | derived | S6-03 masked_load.lat, masked_load_sparse.lat, convert_up.lat and convert_down.lat all equal spill_reload.lat (12.11): no measurable extra cost for the merge or conversion form | alt: 12 |
 | `latency.vector_long` | 6 | cycles | measured | S6-03 vpermd.lat 6.04, vpermf32x4.lat 6.04, vrcp23ps.lat 6.04, swizzle_*.lat 6.04 |  |
 | `latency.x87_add` | 3 | cycles | measured | S6-03 x87_add.lat 3.02 |  |
+| `latency.x87_compare` | 3 | cycles | assumed | assumed equal to the measured x87 add latency | alt: 1, 4 |
+| `latency.x87_control` | None | cycles | unknown | fldcw/fnstcw/fnstsw not measured; a region using them stops with missing_parameter (native request candidate) |  |
 | `latency.x87_div` | 38 | cycles | measured | S6-03 x87_div.lat 39.25, .rt 38.24; one divide per 38 cycles per core at four threads |  |
+| `latency.x87_move` | 3 | cycles | assumed | same pipeline as the measured x87 add (S6-03 x87_add.lat 3.02); fld from memory uses the load latency instead | alt: 1; fxch may be cheaper; not measured |
 | `latency.x87_mul` | 3 | cycles | measured | S6-03 x87_mul.lat 3.02 |  |
+| `latency.x87_sqrt` | None | cycles | unknown | not measured (native request candidate) |  |
+| `memory.core_service_cycles_per_line` | 20 | core cycles between memory fills for one core (sequential stream, hardware prefetcher active) | measured | S6-03 memory.load_rt per core at four threads 19.48 ticks per line (37.35 at one thread); modeled as the integer 20 | alt: 37; measured with the hardware prefetcher streaming; one core alone on the card; not a card-level bandwidth share |
 | `memory.lines_per_cycle_per_core_measured` | 0.0513 | lines per core cycle, sequential loads at four threads with the hardware prefetcher active | measured | S6-03 memory.load_rt 77.92 per thread at four threads (19.5 ticks per line per core, about 4 GB/s per core at one core) | Informational: includes the L2 hardware prefetcher, which the simulator does not model. |
 | `occupancy.gather_cycles_per_line` | 7 | core cycles per distinct line | measured | S6-03 gather_all.rt 7.08 per gather at one thread, 7.02 per core at four; gather_scattered (16 lines) 127 per core | 16 lines measured 127 per core, more than 16 x 7 = 112; the per-line figure is optimistic for scattered gathers. |
+| `occupancy.scatter_cycles_per_line` | None | core cycles per distinct line | unknown | not measured; S6-03 measured gathers only (native request candidate) |  |
 | `occupancy.vprefetch_l2_core_cycles` | 2 | core cycles between vprefetch1 issues | measured | S8-01 C2: vprefetch1 4.52 per thread at two threads, 9.01 at four (about 2.25 per core); modeled as 2 (integer cycles) | 2.25 measured; the integer model understates by about 11%. |
 | `occupancy.x87_div` | 38 | core cycles | measured | S6-03 x87_div.rt 151.76 per thread at four threads (37.9 per core) |  |
 | `occupancy.x87_mul` | 2 | core cycles | measured | S6-03 x87_mul.rt 4.02 per thread at two threads (one per 2 cycles per core) |  |
+| `store.nr_occupancy_core_cycles` | 9 | core cycles | derived | S6-03 l1.store_stream 36.16 per thread at four threads / 4 |  |
+| `store.nr_stall_cycles_memory` | 157 | cycles per vmovnr* store to a non-resident line, per context | measured | S6-03 memory.store_stream 157.12/158.07/160.26 at 1/2/4 threads |  |
+| `store.nr_stall_cycles_resident` | 27 | cycles per vmovnr* store, cache-resident line, per context | measured | S6-03 l1.store_stream 27.19, l2.store_stream 27.49 (one thread) |  |
+| `tlb.l1_entries_4k` | 64 | pages | measured | S8-12 C4 rerun (2026-11-08): loads cost L1 latency up to 64 4 KiB pages per core and about 29 ticks more beyond |  |
+| `tlb.l1_miss_penalty_cycles` | 29 | cycles | measured | S8-12 C4 rerun: 31.76-31.79 vs 3.01-3.02 ticks per load at one thread | alt: 91 |
 
 ## knc-common
 
@@ -134,6 +150,10 @@ Calibration: uncalibrated. No calibration block in profile.
 | `l1.store_miss_stalls_context` | False | boolean | documented | R08 (except for store misses) |  |
 | `l1.ways` | 8 | ways | documented | R01 §2.1; R17 slide 13 |  |
 | `l2.hardware_prefetcher` | not_modeled | policy | documented | R01 p.19 (16-stream L2 prefetcher); R08 (strides up to 2 lines, ~24 lines per core); no L1 hardware prefetcher | The model does not simulate the L2 hardware prefetcher. A scenario that relies on it must say so and is reported as unsupported. |
+| `l2.hw_prefetch_depth_lines` | 4 | lines prefetched ahead per confirmed stream | assumed | R08 ('prefetches up to ~24 cache lines per core') gives a per-core total, not a per-stream depth; 4 assumed | alt: 2, 8 |
+| `l2.hw_prefetch_max_stride_lines` | 2 | lines | documented | R08 ('identifies strides up to 2 cache lines') |  |
+| `l2.hw_prefetch_streams` | 16 | streams per core | documented | R01 p.19 (16-stream L2 hardware prefetcher, 4 KiB bounded) |  |
+| `l2.hw_prefetch_trains_on_stores` | True | boolean | documented | R01 TUNE_PREFQ bits (separate enables for non-RFO data reads and RFO/store reads) show the L2 prefetcher tracks store streams |  |
 | `l2.inclusive_of_l1` | True | boolean | documented | R08 ('L2 (unified, private, inclusive)') |  |
 | `l2.line_bytes` | 64 | bytes | documented | R17 slide 14 |  |
 | `l2.outstanding_prefetches_per_core` | None | cache lines | unknown | R06 §5.2.2 measured on an engineering sample; not imported as a production constant |  |
@@ -144,28 +164,46 @@ Calibration: uncalibrated. No calibration block in profile.
 | `latency.branch_taken_bubble` | 0 | extra cycles after a correctly predicted taken branch | assumed | S6-03 C9: a loop costs about 2 ticks per vector op plus 2 per loop branch at one thread, i.e. the branch costs its issue slot only | alt: 1 |
 | `latency.fence` | None | cycles until a lock-prefixed read-modify-write or fence retires | unknown | not documented; microcode/locked instructions do not pair (R02 p.56) |  |
 | `latency.gather_first_line` | None | cycles until a one-line vgatherd* result is ready | unknown | R02 p.32 describes the scatter/gather pipeline; no number |  |
+| `latency.gather_mask_cycles` | None | cycles until a gather's completion mask is readable | unknown | not documented; derived on the owner's card from gather_all.rt |  |
 | `latency.l2_hit` | 11 | cycles, raw L2 hit latency | documented | R17 slide 14 (11 cycles raw); R01 §2.1 | alt: 22, 23, 25; Literature measurements: R06 §5.1.1 22-23 cycles; R08 ~25 idle; owner's card 24-26 (card-7120-measured). |
 | `latency.mask_op` | 1 | cycles | assumed | Mask ops execute in the scalar pipeline class per R02 Table 3-1; S6-03 kand.lat/kmov.lat 2.08 at one thread bounds it at <=2 | alt: 2 |
 | `latency.memory` | None | cycles, idle demand miss to memory | unknown | Depends on clock and board. R08: ~275-280 ns (~300 cycles on SE10P); R06 §5.1.1: 318-346 cycles at 1 GHz engineering sample; R17 slide 13: about 275 ns | Card profiles set it. Left unknown here so a memory-level simulation needs a card profile. |
 | `latency.remote_l2_line_ns` | None | ns, read of a line held in another core's L2 | unknown | R08: ~275 ns average, independent of core distance; R06 §5.1.2: ~243 cycles average, sd 32 (engineering sample) | Card profiles set it. |
 | `latency.scalar_alu` | 1 | cycles, result ready for a dependent scalar instruction | documented | R17 slide 10 (1-cycle latency scalar unit) | S6-03 scalar_add.lat 2.08 at one thread only bounds it at <=2 because of the issue gap. |
+| `latency.scalar_idiv` | None | cycles | unknown | not documented; not measured |  |
 | `latency.scalar_imul` | 10 | cycles | documented | R02 p.56 (imul executes in the x87 unit, 10 cycles) | Not measured on the owner's card by the imported characterization. |
 | `latency.scalar_load_l1` | 1 | cycles, L1 hit load to dependent use (scalar) | documented | R08 cache slide ('1 cycle latency for scalar loads'); R17 slide 13 ('1 cycle') vs slide 14 ('2 cycle') | alt: 2, 3; Documented values disagree; the owner's card measured 3 (card-7120-measured overrides). |
 | `latency.vector_arith` | 4 | cycles | documented | R17 slide 12 ('most vector operations: 4-cycle latency, 1-cycle throughput'); R02 ch.3 VPU pipeline |  |
 | `latency.vector_convert_df` | None | cycles | unknown | R02 p.33 (DP pipeline paths are longer) |  |
-| `latency.vector_load_l1` | 3 | cycles, L1 hit vector load to dependent use | documented | R08 cache slide ('3 cycles for vector loads') | alt: 12; S6-03 masked_load.lat measured 12 on a dependent chain of memory-operand forms; see card-7120-measured. |
+| `latency.vector_load_l1` | 3 | cycles, L1 hit plain (unmasked, unconverted) vector load to dependent use | documented | R08 cache slide ('3 cycles for vector loads') | alt: 12; the 12-cycle figure measured on the owner's card belongs to merge/convert forms (latency.vector_load_merge_l1) |
+| `latency.vector_load_merge_l1` | 3 | cycles | assumed | no documented difference between masked/converting and plain vector loads; the owner's card shows none either (S6-03 masked_load.lat equals spill_reload.lat) | alt: 12 |
 | `latency.vector_long` | None | cycles | unknown | R02 pp.32-33 describes longer swizzle/EMU paths without a number | Card profiles with measurements set this; the common profile leaves it unknown on purpose so a simulation of these ops without a measured profile stops with missing_parameter. |
 | `latency.x87_add` | None | cycles | unknown | not documented in R01/R02/R17 |  |
+| `latency.x87_compare` | None | cycles | unknown | not documented (fcom/fucom/fcomi) |  |
+| `latency.x87_control` | None | cycles | unknown | not documented (fldcw/fnstcw/fnstsw); these serialize the core in the model |  |
 | `latency.x87_div` | None | cycles | unknown | not documented |  |
+| `latency.x87_move` | None | cycles | unknown | not documented (fld/fst/fxch/fchs/fabs) |  |
 | `latency.x87_mul` | None | cycles | unknown | not documented |  |
+| `latency.x87_sqrt` | None | cycles | unknown | not documented; not measured by the imported characterization |  |
+| `memory.core_service_cycles_per_line` | None | core cycles between memory fills for one core | unknown | card-specific; measured on the 7120 card as 19.5 (S6-03 memory.load_rt per core at four threads) |  |
 | `occupancy.gather_cycles_per_line` | None | core cycles both pipes are busy per distinct cache line gathered | unknown |  |  |
+| `occupancy.gather_unit` | per_line | policy | assumed | the gather occupies a gather unit for occupancy.gather_cycles_per_line per distinct line; other instructions of the core keep issuing (S6-03 gather_all.rt: kmov+gather+jknzd fit in 7 ticks) |  |
+| `occupancy.scatter_cycles_per_line` | None | core cycles per distinct line | unknown | R05 Table II measures gathers only; scatter not measured by the imported characterization |  |
 | `occupancy.vprefetch_l2_core_cycles` | 1 | core cycles between two vprefetch1/2 issues | assumed | no documented limit; S8-01 C2 measured about 2.25 on the owner's card (card-7120-measured overrides) | alt: 2 |
 | `occupancy.x87_div` | None | core cycles the x87 divider is busy | unknown |  |  |
 | `occupancy.x87_mul` | None | core cycles the x87 multiplier is busy | unknown |  |  |
 | `pairing.dependent_pairs_allowed` | [["cmp", "jcc"], ["test", "jcc"]] | U/V pairs allowed despite a flag dependency | documented | R02 p.56 (cmp/jcc, push/push, pop/pop); push/pop not modeled |  |
 | `pairing.encoding_rules` | {"max_bytes": 8, "no_displacement_and_immediate": true, "... | rules | documented | R02 p.56 | Applied only when a record carries encoding hints (encoding.bytes, encoding.disp32, encoding.imm). Without hints the model assumes the encoding is pairable and records that assumption. |
 | `pairing.u_instruction_can_be_branch` | False | boolean | assumed | model assumption: an instruction after a control transfer in the same issue slot is not paired |  |
-| `pairing.v_eligible_classes` | ["scalar_alu", "scalar_load", "scalar_store", "branch", "... | instruction classes that may issue on the V pipe | documented | R02 p.34 Table 3-1 (mask, vector store, packstore, prefetch, scalar); R17 slide 10 (scalar dual issue) | Table 3-1 lists mnemonics; the class mapping here is the model's. Ordinary vector arithmetic is U-only. S6-03 pair.vector_vector (4.09 at one thread) confirms two vector arithmetic ops do not pair. |
+| `pairing.u_nop_pairs` | False | boolean: may a nop in the U slot take a V partner | measured | S6-03 agi.gap1-4: each nop beyond the first costs a full issue slot (4.15, 6.16, 8.18, 10.19 ticks), so nop+nop never pair; a nop still fills a V slot |  |
+| `pairing.v_eligible_classes` | ["scalar_alu", "scalar_rmw", "scalar_load", "scalar_store... | instruction classes that may issue on the V pipe | documented | R02 p.34 Table 3-1 (mask, vector store, packstore, prefetch, scalar); R17 slide 10 (scalar dual issue) | Table 3-1 lists mnemonics; the class mapping here is the model's. Ordinary vector arithmetic is U-only. S6-03 pair.vector_vector (4.09 at one thread) confirms two vector arithmetic ops do not pair. |
+| `pairing.v_jmp_pairs` | False | boolean: may an unconditional jmp issue in the V slot | measured | S8-01 C10 fixed-direction row: cmp/je, add, jmp cost three issue events per unit (6.22 ticks at one thread), so the jmp did not pair with the add; conditional branches keep the cmp/jcc pairing (R02 p.56) |  |
+| `store.nr_occupancy_core_cycles` | None | core cycles a no-read store occupies a shared store path | unknown | derived on the owner's card from the four-thread l1.store_stream row |  |
+| `store.nr_stall_cycles_memory` | None | cycles the issuing context stalls per no-read store to a non-resident line | unknown | not documented; measured on the owner's card (S6-03 memory.store_stream) |  |
+| `store.nr_stall_cycles_resident` | None | cycles the issuing context stalls per no-read (vmovnr*) store to a cache-resident line | unknown | not documented; measured on the owner's card (S6-03 l1/l2.store_stream) |  |
+| `tlb.l1_entries_2m` | None | pages | unknown | not documented in the imported sources |  |
+| `tlb.l1_entries_4k` | 64 | pages | literature | R06 §5.1.3 (level-1 TLB miss cost measured beyond 64 4 KiB pages); gcc_knc C4 rerun (S8-12) finds the knee at 64 pages per core |  |
+| `tlb.l1_miss_penalty_cycles` | 29 | cycles added to a load that misses the first-level DTLB and hits the second level | literature | R06 Table II (level-1 TLB miss, 4 KiB page: 29 cycles); gcc_knc C4 rerun measured about 29 ticks (31.8 vs 3.0 at one thread) | alt: 91; a second-level TLB miss costs about 91 cycles (R06 Table II); not modeled |
 | `vpu.lanes_f32` | 16 | lanes | documented | R27; R17 slide 12 |  |
 | `vpu.lanes_f64` | 8 | lanes | documented | R27; R17 slide 12 |  |
 | `vpu.mask_registers` | 8 | registers per thread | documented | R17 slide 12; R27 |  |
@@ -173,15 +211,15 @@ Calibration: uncalibrated. No calibration block in profile.
 | `vpu.throughput_per_core` | 1 | vector instructions per core cycle | documented | R17 slide 12 (1-cycle throughput); S6-03 point 1 (two threads reach one vector op per cycle) |  |
 | `vpu.zmm_registers` | 32 | registers per thread | documented | R17 slide 12; R27 |  |
 
-## overlay-vector-load-3
+## overlay-vector-load-12
 
-Sensitivity overlay: vector load-to-use latency 3 cycles (R08 documented value) instead of the measured 12-cycle chain figure. Apply with --overlay profiles/overlay-vector-load-3.json to see how much a prediction depends on this uncertain parameter.
+Sensitivity overlay: plain vector load-to-use latency 12 cycles (the measured merge-form chain figure) instead of the documented 3. Apply with --overlay profiles/overlay-vector-load-12.json to bound how much a prediction depends on this parameter.
 
 Calibration: uncalibrated. No calibration block in profile.
 
 | parameter | value | unit | status | source | alternatives / uncertainty |
 |---|---|---|---|---|---|
-| `latency.vector_load_l1` | 3 | cycles | documented | R08 cache slide ('3 cycles for vector loads'); alternative scenario to card-7120-measured's 12 | alt: 12 |
+| `latency.vector_load_l1` | 12 | cycles | assumed | S6-03 merge-form chains applied to plain loads; alternative scenario to the documented 3 (R08) | alt: 3 |
 
 ## synthetic-demo (SYNTHETIC)
 
@@ -203,16 +241,29 @@ Extends `knc-common`; the rows below are this profile's own values (inherited ro
 | `card.usable_cores` | 8 | cores | synthetic |  |  |
 | `latency.branch_mispredict_penalty` | 8 | cycles | synthetic |  |  |
 | `latency.gather_first_line` | 15 | cycles | synthetic |  |  |
+| `latency.gather_mask_cycles` | 2 | cycles | synthetic |  |  |
 | `latency.l2_hit` | 20 | cycles | synthetic |  |  |
 | `latency.memory` | 300 | cycles | synthetic |  |  |
 | `latency.remote_l2_line_ns` | 200 | ns | synthetic |  |  |
+| `latency.scalar_idiv` | 30 | cycles | synthetic |  |  |
 | `latency.scalar_load_l1` | 3 | cycles | synthetic |  |  |
 | `latency.vector_convert_df` | 7 | cycles | synthetic |  |  |
 | `latency.vector_load_l1` | 3 | cycles | synthetic |  |  |
+| `latency.vector_load_merge_l1` | 12 | cycles | synthetic |  |  |
 | `latency.vector_long` | 6 | cycles | synthetic |  |  |
 | `latency.x87_add` | 3 | cycles | synthetic |  |  |
+| `latency.x87_compare` | 3 | cycles | synthetic |  |  |
+| `latency.x87_control` | 10 | cycles | synthetic |  |  |
 | `latency.x87_div` | 38 | cycles | synthetic |  |  |
+| `latency.x87_move` | 1 | cycles | synthetic |  |  |
 | `latency.x87_mul` | 3 | cycles | synthetic |  |  |
+| `latency.x87_sqrt` | 40 | cycles | synthetic |  |  |
+| `memory.core_service_cycles_per_line` | 20 | core cycles | synthetic |  |  |
 | `occupancy.gather_cycles_per_line` | 7 | core cycles | synthetic |  |  |
+| `occupancy.scatter_cycles_per_line` | 7 | cycles | synthetic |  |  |
 | `occupancy.x87_div` | 38 | core cycles | synthetic |  |  |
 | `occupancy.x87_mul` | 2 | core cycles | synthetic |  |  |
+| `store.nr_occupancy_core_cycles` | 9 | cycles | synthetic |  |  |
+| `store.nr_stall_cycles_memory` | 157 | cycles | synthetic |  |  |
+| `store.nr_stall_cycles_resident` | 27 | cycles | synthetic |  |  |
+| `tlb.l1_entries_2m` | 8 | pages | synthetic |  |  |

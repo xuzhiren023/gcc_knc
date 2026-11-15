@@ -402,3 +402,122 @@ def fmt_bits(bits, fmt):
     if k == ZERO:
         return "-0.0" if s else "0.0"
     return repr(float_from_f32_bits(bits) if fmt is F32 else float_from_f64_bits(bits))
+
+
+# --- additional formats: binary16 and the x87 extended format ---------------------------
+
+F16 = Fmt("f16", 16, 10, 5)
+# x87 double extended, represented internally like the other formats (implicit leading bit,
+# 64-bit precision, 15-bit exponent). Memory images use the explicit-integer-bit layout below.
+F80 = Fmt("f80", 80, 63, 15)
+# precision-control variants: 53- and 24-bit significands with the extended exponent range
+F80_P53 = Fmt("f80p53", 80, 52, 15)
+F80_P24 = Fmt("f80p24", 80, 23, 15)
+
+
+def f80_from_memory(data):
+    """10-byte little-endian x87 extended image -> internal F80 bits. Rejects unnormals."""
+    if len(data) != 10:
+        raise Unsupported("x87 extended image must be 10 bytes")
+    raw = int.from_bytes(data, "little")
+    sign = (raw >> 79) & 1
+    exp = (raw >> 64) & 0x7FFF
+    mant = raw & 0xFFFFFFFFFFFFFFFF
+    intbit = mant >> 63
+    frac = mant & ((1 << 63) - 1)
+    if exp == 0x7FFF:
+        if frac == 0 and intbit:
+            return (sign << 79) | (0x7FFF << 63)
+        if intbit:
+            return (sign << 79) | (0x7FFF << 63) | frac
+        raise Unsupported("x87 pseudo-NaN/pseudo-infinity image is not supported")
+    if exp == 0:
+        if intbit:
+            raise Unsupported("x87 pseudo-denormal image is not supported")
+        return (sign << 79) | frac  # subnormal: exponent field 0, same fraction
+    if not intbit:
+        raise Unsupported("x87 unnormal image is not supported")
+    return (sign << 79) | (exp << 63) | frac
+
+
+def f80_to_memory(bits):
+    sign = (bits >> 79) & 1
+    exp = (bits >> 63) & 0x7FFF
+    frac = bits & ((1 << 63) - 1)
+    intbit = 1 if exp != 0 else 0
+    raw = (sign << 79) | (exp << 64) | (intbit << 63) | frac
+    return raw.to_bytes(10, "little")
+
+
+def to_fraction(bits, fmt, policy=DEFAULT_POLICY):
+    """Finite nonzero -> Fraction; zero -> Fraction(0); special -> None."""
+    k, s, v = classify(bits, fmt, policy)
+    if k == NUM:
+        return v
+    if k == ZERO:
+        return Fraction(0)
+    return None
+
+
+def convert(bits, src, dst, policy=DEFAULT_POLICY):
+    """Exact format conversion with one rounding (e.g. f32 -> f64 is exact; f64 -> f32, f80 -> f64 round)."""
+    k, s, v = classify(bits, src, policy)
+    if k == NAN:
+        payload = v & src.mant_mask
+        if dst.mant >= src.mant:
+            payload <<= (dst.mant - src.mant)
+        else:
+            payload >>= (src.mant - dst.mant)
+        out = (dst.sign_bit if s else 0) | dst.inf | payload | dst.quiet_bit
+        return out, {}
+    if k == INF:
+        return (dst.sign_bit if s else 0) | dst.inf, {}
+    if k == ZERO:
+        return (dst.sign_bit if s else 0), {}
+    b, flags = round_exact(v, dst, policy)
+    return b, {"flags": sorted(flags)}
+
+
+def _isqrt(n):
+    if n < 0:
+        raise ValueError
+    if n == 0:
+        return 0
+    x = 1 << ((n.bit_length() + 1) // 2)
+    while True:
+        y = (x + n // x) // 2
+        if y >= x:
+            return x
+        x = y
+
+
+def fsqrt(bits, fmt, policy=DEFAULT_POLICY):
+    """Correctly rounded square root in the requested mode."""
+    k, s, v = classify(bits, fmt, policy)
+    if k == NAN:
+        return quiet(bits, fmt), {}
+    if k == ZERO:
+        return bits, {}
+    if s:
+        return fmt.default_nan, {"invalid": True}
+    if k == INF:
+        return bits, {}
+    p = v.numerator
+    q = v.denominator
+    m = p * q  # sqrt(p/q) = sqrt(p*q) / q
+    prec = fmt.mant + 1
+    kbits = prec + 4
+    need = 2 * (prec + 4) - m.bit_length()
+    if need > 0:
+        kbits += (need + 1) // 2
+    scaled = m << (2 * kbits)
+    root = _isqrt(scaled)
+    inexact = root * root != scaled
+    if inexact:
+        approx = Fraction(2 * root + 1, 2 * (q << kbits))  # strictly between root and root+1 grid points
+    else:
+        approx = Fraction(root, q << kbits)
+    b, flags = round_exact(approx, fmt, policy)
+    if inexact:
+        flags.add("inexact")
+    return b, {"flags": sorted(flags)}
