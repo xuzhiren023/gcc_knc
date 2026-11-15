@@ -116,7 +116,7 @@ Current tickets: `[##################--]` 236 of 251
 | S12-33 | T2 writes its short-vector test binaries into a per-run folder, so Claude, Codex and lead runs never block each other | Done | T2's short-vector cross-check now writes its binaries into the run's own output folder instead of the share... |
 | S12-34 | Unrecognizable insn for a truncating vector store to a 1-byte-aligned V16QI destination (found by S12-32) | Not started |  |
 | S12-35 | Clean single-compiler WRF build as dm+sm (MPI + OpenMP) against PhiWeather's k1om MPICH, plus a build recipe PhiWeather can apply to its own patched tree | In progress | Lead 02:20: yes. Build only the MPICH 3.4.3 Fortran use-mpi module set with GCC-KNC 16 (mpi.mod and the mod... |
-| S12-36 | card_run yields to a foreign queued row in the middle of our own turn - honor an open turn-level reservation so a multi-job window is not refused | In progress | Lead: rebased on main (no conflicts). Rerun tests/tools/test_card_turn.py via tools/run.py and submit. |
+| S12-36 | card_run yields to a foreign queued row in the middle of our own turn - honor an open turn-level reservation so a multi-job window is not refused | Waiting for review | Lead rebased on main without conflicts. Reran python tests/tools/test_card_turn.py through tools/run.py: PA... |
 | S13-01 | M4 final gate - stage the ADR-0015 gate run at the final head (17 programs, held-out unsealed, six pairs, three profiles) | draft |  |
 | S13-02 | Libgomp per-region thread density - choose 1-4 workers per core per parallel region instead of once per program | draft |  |
 | S13-03 | M4 retrospective - what we did wrong, what worked, and the practice changes carried into the next milestone and the agent-team skill | draft |  |
@@ -276,6 +276,7 @@ Current tickets: `[##################--]` 236 of 251
 
 ## Recent activity
 
+- 2026-11-15 02:37 **S12-36** engineer submit: Lead rebased on main without conflicts. Reran python tests/tools/test_card_turn.py through tools/run.py: PASS, 3 tests. Log: C:/Users/xuzhi/Documen...
 - 2026-11-15 02:37 **S12-30** engineer ask: 2cde1d8d: after two T1 attempts, scanner rejects legal controls: p=PHI(row,p+4), bound=MEM[p+16]; HPCG has paired count/cols PHIs with strides 4/8....
 - 2026-11-15 02:36 **S12-36** lead answer: Lead: rebased on main (no conflicts). Rerun tests/tools/test_card_turn.py via tools/run.py and submit.
 - 2026-11-15 02:35 **S12-36** engineer ask: Required git rebase main is blocked by filesystem permissions: error: could not create temporary C:/Users/xuzhi/Documents/gcc_knc/.git/worktrees/S1...
@@ -283,7 +284,6 @@ Current tickets: `[##################--]` 236 of 251
 - 2026-11-15 02:32 **S12-36** engineer ask: Fix e5f446dd follows red commit c1699bdd. Host test_card_turn.py via tools/run.py passed 3 tests: open turn starts immediately, finish closes turn ...
 - 2026-11-15 02:29 **S12-30** lead answer: Legal prefetch confirmed at 1.62x; go to phase 2.
 - 2026-11-15 02:29 **S12-30** lead resume: Lead, card window 4 (06:51-06:58Z, exit 0, exclusive; .work/_shared/tmp/claude-s12-window4/s12-30-legal.out): PASS 8,985,618 comparisons and childr...
-- 2026-11-15 02:15 **S12-35** lead answer: Lead 02:20: yes. Build only the MPICH 3.4.3 Fortran use-mpi module set with GCC-KNC 16 (mpi.mod and the modules it needs, e.g. mpi_constants, mpi_s...
 
 ## Cost
 
