@@ -158,7 +158,7 @@ def t2(runner):
     root, libdir = prefix()
     driver = root / 'bin/k1om-mpss-linux-gcc'
     source = ROOT / 'tests/t2/knc-vmath-loop.c'
-    output = SHARED / 'S10-03'
+    output = runner.out / 'vmath'
     output.mkdir(exist_ok=True)
     elf = output / 'vmath-loop.mic'
     elf.unlink(missing_ok=True)

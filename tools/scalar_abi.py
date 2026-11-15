@@ -5,6 +5,9 @@ stack slots relative to entry RSP, plus result registers for constant returns.
 Instruction selection inside the function may differ. Scalar probes and the
 donor fixture use the scalar KNC allowlist; GCC16 affine loops may vectorize.
 Cross-links are T2, not native proof.
+The lead retains native inputs with check.py --stage-to <ticket-card-folder>;
+scalar-abi/, vector-abi/ and short-vector-cross/ keep their run-relative layout.
+See tools/check-card-staging.md for the card handoff.
 """
 import re
 import sys
@@ -393,7 +396,7 @@ def t2_vector(runner):
     """S10-01: caller and callee in separate GCC 16 objects, one of them at
     -O0, staged for the card. The donor has no register ABI for these types."""
     sources = runner.root / 'tests/t2'
-    output = runner.tc.parent / 'S10-01'
+    output = runner.out / 'vector-abi'
     output.mkdir(exist_ok=True)
     for levels in (('-O0', '-O2'), ('-O2', '-O0')):
         label = 't2 knc-vecarg caller %s / callee %s' % levels
@@ -427,8 +430,7 @@ def t2(runner):
     t2_short_vector(runner)
     t2_vector(runner)
     sources = runner.root / 'tests/t2'
-    # Fixed shared paths are the S3-10 native inputs; never execute on the host.
-    output = runner.tc.parent / 'scalar-abi'
+    output = runner.out / 'scalar-abi'
     output.mkdir(exist_ok=True)
     # Keep the existing scalar suite at O2: its ff aggregate has a documented
     # donor O0 ICE.  Every new complex/rounding test runs at both levels.
