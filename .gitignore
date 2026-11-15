@@ -30,3 +30,4 @@ __pycache__/
 *.c.[0-9][0-9][0-9][rtil].*
 *.opt-record.json.gz
 /tmp*/
+dist/
