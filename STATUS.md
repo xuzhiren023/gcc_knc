@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-15 05:21.
+Updated automatically at every ticket change. Last update: 2026-11-15 05:22.
 
-**Next: the tech lead, on S12-37.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: GPT-6.1, on S12-30 (Sparse indexed reductions faster than today - vector gather of products with an ordered scalar sum, and indirect prefetch, for CSR-style loops (NPB-CG, HPCG)).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
 Current tickets: `[##################--]` 238 of 253
 
@@ -117,7 +117,7 @@ Current tickets: `[##################--]` 238 of 253
 | S12-34 | Unrecognizable insn for a truncating vector store to a 1-byte-aligned V16QI destination (found by S12-32) | Not started |  |
 | S12-35 | Clean single-compiler WRF build as dm+sm (MPI + OpenMP) against PhiWeather's k1om MPICH, plus a build recipe PhiWeather can apply to its own patched tree | Done | Upstream WRF 4.8.0 now builds clean as dm+sm (MPI + OpenMP) with the one GCC-KNC compiler (knc 7a3b34430e3,... |
 | S12-36 | card_run yields to a foreign queued row in the middle of our own turn - honor an open turn-level reservation so a multi-job window is not refused | Done | card_run --benchmark now keeps our turn across several jobs while an open claude-turn- ledger row was queue... |
-| S12-37 | Every T1/T2 check writes into the run's own output folder - no fixed paths in shared ticket folders (S10-01 vecarg, and any others) | Question for the tech lead | The authorized pre-submit git rebase main failed: error: could not create temporary C:/Users/xuzhi/Document... |
+| S12-37 | Every T1/T2 check writes into the run's own output folder - no fixed paths in shared ticket folders (S10-01 vecarg, and any others) | In progress | Lead: rebased on main. Rerun the two tests and submit. |
 | S12-38 | ICE in the SLP vectorizer on gcc.dg vect-pr123221.c at -O3 -march=knc (found by S12-30's torture sweep) | Not started |  |
 | S13-01 | M4 final gate - stage the ADR-0015 gate run at the final head (17 programs, held-out unsealed, six pairs, three profiles) | draft |  |
 | S13-02 | Libgomp per-region thread density - choose 1-4 workers per core per parallel region instead of once per program | draft |  |
@@ -278,6 +278,7 @@ Current tickets: `[##################--]` 238 of 253
 
 ## Recent activity
 
+- 2026-11-15 05:22 **S12-37** lead answer: Lead: rebased on main. Rerun the two tests and submit.
 - 2026-11-15 05:21 **S12-37** engineer ask: The authorized pre-submit git rebase main failed: error: could not create temporary C:/Users/xuzhi/Documents/gcc_knc/.git/worktrees/S12-37/rebase-m...
 - 2026-11-15 05:19 **S12-37** lead answer: Yes. This is a gcc: no ticket, so the pre-submit rebase target is main in the tools repository; knc exists only in .work/_shared/gcc and does not a...
 - 2026-11-15 05:19 **S12-30** lead answer: No merge needed: carry on without it, and do not try git merge or rebase again (the hook refuses both; the lead merges main into the branch at revi...
@@ -285,13 +286,12 @@ Current tickets: `[##################--]` 238 of 253
 - 2026-11-15 05:17 **S12-30** engineer ask: The 05:14 resume requires merging main into this worktree for S12-33/S12-37. git merge main was rejected by the PreToolUse hook: The tech lead merg...
 - 2026-11-15 05:15 **S12-30** owner decide: Lead raises sessions 11 -> 14 (the last raise made progress: implementation, T1/T0 pass, knc merged, lead T2 36/0); most sessions went to build and...
 - 2026-11-15 05:15 **S12-30** engineer escalate: budget: 11 engineer sessions used; the budget is 11
-- 2026-11-15 05:14 **S12-30** lead answer: Continue per the resume note.
 
 ## Cost
 
 - From the script, engineer: 686 sessions, 1367.5M input tokens
 - From the script, lead: 457 sessions, 128.8M input tokens
-- Started by hand, Claude: 12 sessions, 3519.9M input tokens
+- Started by hand, Claude: 12 sessions, 3521.8M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
