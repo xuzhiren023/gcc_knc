@@ -66,12 +66,66 @@ static __attribute__((always_inline)) inline void hpcg_body(
   }
 }
 #ifdef COMPILER_PROOF
-/* All four TUs compile the same unhinted source.  Only compiler/options
-   differ; no handwritten hint or policy is present in this proof. */
-void FN(csr_scalar)(const struct matrix *a, double *out) { csr_body(a,out,0); }
-void FN(hpcg_scalar)(const struct matrix *a, double *out) { hpcg_body(a,out,0); }
-legal_kernel const FN(legal)[2][1] = {
-  {FN(csr_scalar)}, {FN(hpcg_scalar)}
+/* The generated slots compile unhinted C; the separate manual slot
+   measures the original legal hint even below the current policy floor. */
+#ifndef MANUAL_PROOF
+#define MANUAL_PROOF 0
+#endif
+/* Match the raw-argument T1 probes.  A struct-based loop reloads fields
+   in its outer body and currently receives only the row-local fallback;
+   that cannot exercise cross-row guards on 13/27-entry rows. */
+static __attribute__((noinline,noclone)) void FN(csr_raw)(int rows,
+    const int *row, const int *col, const double *val, const double *x, double *out)
+{
+  for (int i = 0; i < rows; ++i) {
+    int end = row[i+1], bound = end;
+    if (MANUAL_PROOF && rows-i > LEGAL_ROW_LOOKAHEAD)
+      bound = row[i+LEGAL_ROW_LOOKAHEAD+1];
+    double sum = 0;
+    for (int j = row[i]; j < end; ++j) {
+      if (MANUAL_PROOF && (long long)bound-j > LEGAL_DISTANCE)
+        hint(x+col[j+LEGAL_DISTANCE]);
+      sum += val[j]*x[col[j]];
+    }
+    out[i] = sum;
+  }
+}
+static __attribute__((noinline,noclone)) void FN(hpcg_raw)(int rows,
+    const int *count, const int *const *cols, const double *const *vals,
+    const double *x, double *out)
+{
+  for (int i = 0; i < rows; ++i) {
+    const int *col = cols[i], *future = NULL;
+    const double *val = vals[i];
+    int n = count[i], next = 0;
+    if (MANUAL_PROOF && rows-i > 1) { next = count[i+1]; future = cols[i+1]; }
+    double sum = 0;
+    for (int j = 0; j < n; ++j) {
+      if (MANUAL_PROOF && j < next) hint(x+future[j]);
+      sum += val[j]*x[col[j]];
+    }
+    out[i] = sum;
+  }
+}
+void FN(csr_scalar)(const struct matrix *a, double *out)
+{ FN(csr_raw)(a->rows,a->row,a->col,a->val,a->x,out); }
+void FN(hpcg_scalar)(const struct matrix *a, double *out)
+{ FN(hpcg_raw)(a->rows,a->count,a->cols,a->vals,a->x,out); }
+void FN(lone_scalar)(const struct matrix *a, double *out)
+{
+  const int *col = a->col;
+  const double *val = a->val, *x = a->x;
+  int end = a->count[0];
+  double sum = 0;
+  for (int j = 0; j < end; ++j) {
+    if (MANUAL_PROOF && (long long)end-j > LEGAL_DISTANCE)
+      hint(x+col[j+LEGAL_DISTANCE]);
+    sum += val[j]*x[col[j]];
+  }
+  out[0] = sum;
+}
+legal_kernel const FN(legal)[3][1] = {
+  {FN(csr_scalar)}, {FN(hpcg_scalar)}, {FN(lone_scalar)}
 };
 #else
 void FN(csr_scalar)(const struct matrix *a, double *out) { csr_body(a,out,0); }
@@ -106,13 +160,14 @@ legal_kernel const FN(legal)[2][3] = {
 #include <sys/wait.h>
 #include <sys/resource.h>
 #ifdef COMPILER_PROOF
-extern legal_kernel const donor_legal[2][1], knc_legal[2][1];
-extern legal_kernel const enabled_legal[2][1], fast_legal[2][1];
+extern legal_kernel const donor_legal[3][1], knc_legal[3][1];
+extern legal_kernel const enabled_legal[3][1], fast_legal[3][1], manual_legal[3][1];
 static legal_kernel const (*tables[])[1] = {
-  donor_legal, knc_legal, enabled_legal, fast_legal
+  donor_legal, knc_legal, enabled_legal, fast_legal, manual_legal
 };
 static const char *compilers[] = {
-  "donor-off", "knc-switch-off", "knc-switch-on", "knc-switch-on-contract-fast"
+  "donor-off", "knc-switch-off", "knc-switch-on", "knc-switch-on-contract-fast",
+  "knc-handwritten-forced-hint"
 };
 static const char *routes[] = {"compiler"};
 #else
@@ -121,7 +176,7 @@ static legal_kernel const (*tables[])[3] = {donor_legal, knc_legal, fast_legal};
 static const char *compilers[] = {"donor-off", "knc-off", "knc-contract-fast"};
 static const char *routes[] = {"scalar", "legal-hint", "legal-policy"};
 #endif
-static const char *layouts[] = {"CSR", "HPCG-pointers"};
+static const char *layouts[] = {"CSR", "HPCG-pointers", "lone-loop"};
 static uint32_t rng;
 static unsigned long checks;
 static int failures;
@@ -233,6 +288,26 @@ static void correctness(void)
       }
     }
 }
+#ifdef COMPILER_PROOF
+static void lone_guards(void)
+{
+  const int sizes[] = {0,1,32,33,16383,16384,16385};
+  for (unsigned z = 0; z < sizeof sizes/sizeof sizes[0]; ++z) {
+    int n = sizes[z], row[] = {0,n};
+    struct guard gc, gv;
+    int *col = guarded(n*sizeof *col,&gc);
+    double *val = guarded(n*sizeof *val,&gv), x[67], out, want;
+    for (int i = 0; i < 67; ++i) x[i] = (int)(random32()%9)-4;
+    for (int j = 0; j < n; ++j) { col[j] = random32()%67; val[j] = (int)(random32()%7)-3; }
+    struct matrix a = {1,row,col,&n,val,x,NULL,NULL};
+    reference(&a,0,&want);
+    for (unsigned t = 0; t < sizeof tables/sizeof tables[0]; ++t) {
+      tables[t][2][0](&a,&out); compare(out,want,0);
+    }
+    release(&gc); release(&gv);
+  }
+}
+#endif
 static double now(void)
 {
   struct timespec ts; if (clock_gettime(CLOCK_MONOTONIC,&ts)) die("clock");
@@ -262,10 +337,106 @@ static double sample_time(legal_kernel fn, const struct matrix *a,
     for (int j = 0; j < *batch; ++j) fn(a,out);
     double part = now()-start; sink = out[a->rows-1];
     seconds += part; *calls += *batch;
+#ifdef COMPILER_PROOF
+    /* Keep half-second samples close to their minimum so the expanded
+       threshold grid fits the lead's single ten-minute card window. */
+    if (part < 0.025 && *batch < 33554432) *batch *= 2;
+#else
     if (part < 0.25 && *batch < 33554432) *batch *= 2;
+#endif
   } while (seconds < 0.5);
   return seconds;
 }
+#ifdef COMPILER_PROOF
+static void compiler_case(const char *label, int layout, int rows, int n,
+                          int nx, int stencil)
+{
+  int nz = rows*n;
+  int *row = alloc((rows+1)*sizeof *row), *c = alloc(nz*sizeof *c);
+  int *count = alloc(rows*sizeof *count);
+  const int **cols = alloc(rows*sizeof *cols);
+  const double **vals = alloc(rows*sizeof *vals);
+  double *v = alloc(nz*sizeof *v), *x = alloc(nx*sizeof *x);
+  double *out = alloc(rows*sizeof *out), *want = alloc(rows*sizeof *want);
+  for (int i = 0; i <= rows; ++i) row[i] = i*n;
+  for (int i = 0; i < nx; ++i) x[i] = (int)(random32()%9)-4;
+  for (int i = 0; i < rows; ++i) {
+    count[i] = n; cols[i] = c+i*n; vals[i] = v+i*n;
+    if (stencil) {
+      int ix = i%104, iy = i/104%104, iz = i/(104*104), k = 0;
+      for (int dz = -1; dz <= 1; ++dz)
+        for (int dy = -1; dy <= 1; ++dy)
+          for (int dx = -1; dx <= 1; ++dx)
+            if (ix+dx >= 0 && ix+dx < 104 && iy+dy >= 0 && iy+dy < 104
+                && iz+dz >= 0 && iz+dz < 104) {
+              c[i*n+k] = i+dx+104*dy+104*104*dz;
+              v[i*n+k++] = dx || dy || dz ? -1 : 26;
+            }
+      count[i] = k;
+    } else for (int j = 0; j < n; ++j) {
+      c[i*n+j] = random32()%nx; v[i*n+j] = (int)(random32()%7)-3;
+    }
+  }
+  /* Random pointer layout retains independent shuffled row allocations;
+     the stencil uses contiguous row storage with genuine boundary counts. */
+  int *perm = alloc(rows*sizeof *perm);
+  for (int i = 0; i < rows; ++i) perm[i] = i;
+  if (layout == 1 && !stencil) {
+    for (int i = rows-1; i > 0; --i) {
+      int j = random32()%(i+1), t = perm[i]; perm[i] = perm[j]; perm[j] = t;
+    }
+    for (int r = 0; r < rows; ++r) {
+      int i = perm[r]; int *ci = alloc(n*sizeof *ci); double *vi = alloc(n*sizeof *vi);
+      memcpy(ci,c+i*n,n*sizeof *ci); memcpy(vi,v+i*n,n*sizeof *vi);
+      cols[i] = ci; vals[i] = vi;
+    }
+  }
+  struct matrix a = {rows,row,c,count,v,x,cols,vals};
+  reference(&a,layout == 1,want);
+  const int ids[] = {0,1,2,4};
+  int batch[] = {1,1,1,1};
+  for (int id = 0; id < 4; ++id) {
+    tables[ids[id]][layout][0](&a,out);
+    for (int i = 0; i < rows; ++i) compare(out[i],want[i],i);
+  }
+  if (failures) exit(1);
+  printf("CASE %s %s n=%d rows=%d rhs_bytes=%zu compiler_policy=%s manual=forced-on min_seconds=0.5 samples=5\n",
+         label,layouts[layout],n,rows,nx*sizeof *x,
+         (layout == 2 ? n : rows) >= LEGAL_MIN_ROWS ? "hint" : "scalar");
+  for (int sample = 0; sample < 5; ++sample) {
+    double seconds[4], per_call[4]; uint64_t calls[4];
+    for (int j = 0; j < 4; ++j) {
+      int id = sample%2 ? 3-j : j;
+      seconds[id] = sample_time(tables[ids[id]][layout][0],&a,out,&batch[id],&calls[id]);
+      per_call[id] = seconds[id]/calls[id];
+      for (int i = 0; i < rows; ++i) compare(out[i],want[i],i);
+    }
+    for (int id = 0; id < 4; ++id)
+      printf("TIME sample=%d %s seconds=%.9f calls=%" PRIu64
+             " seconds_per_call=%.12g speedup_vs_knc=%.6f speedup_vs_donor=%.6f\n",
+             sample,compilers[ids[id]],seconds[id],calls[id],per_call[id],
+             per_call[1]/per_call[id],per_call[0]/per_call[id]);
+  }
+  if (layout == 1 && !stencil)
+    for (int i = 0; i < rows; ++i) { free((void *)cols[i]); free((void *)vals[i]); }
+  free(perm); free(cols); free(vals); free(count); free(row); free(c); free(v); free(x); free(out); free(want);
+}
+static void performance(void)
+{
+  const int candidates[] = {32,4096,8192,14000,16384,32768};
+  for (unsigned z = 0; z < sizeof candidates/sizeof candidates[0]; ++z)
+    for (int layout = 0; layout < 2; ++layout)
+      for (int n = 13; n <= 27; n += 14)
+        compiler_case("cache-threshold",layout,candidates[z],n,4096,0);
+  for (int layout = 0; layout < 2; ++layout)
+    for (int n = 13; n <= 27; n += 14) {
+      compiler_case("CG-A-sized",layout,14000,n,14000,0);
+      compiler_case("memory-sized",layout,32768,n,2097152,0);
+    }
+  compiler_case("HPCG-104-cubed-stencil",1,104*104*104,27,104*104*104,1);
+  compiler_case("lone-memory",2,1,262144,2097152,0);
+}
+#else
 static void performance(void)
 {
   const int row_sizes[] = {32,14000,32768}, rhs_sizes[] = {4096,14000,2097152};
@@ -336,6 +507,7 @@ static void performance(void)
       free(perm); free(cols); free(vals); free(count); free(row); free(c); free(v); free(x); free(out); free(want);
     }
 }
+#endif
 int main(int argc, char **argv)
 {
   setvbuf(stdout,NULL,_IOLBF,0);
@@ -348,6 +520,9 @@ int main(int argc, char **argv)
 #endif
   alarm(570);
   correctness();
+#ifdef COMPILER_PROOF
+  lone_guards();
+#endif
   printf("CORRECTNESS children=%lu failures=%d\n",checks,failures);
   if (failures) return 1;
   if (argc == 2) { pin(); performance(); }

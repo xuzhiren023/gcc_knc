@@ -398,7 +398,7 @@ def build(host=False, legal=False):
 
 
 def build_compiler_proof():
-    """Stage the unchanged legal guard/timing fixtures with generated hints.
+    """Stage legal guard/timing fixtures with generated and manual hints.
 
     This requires the lead's built gcc2 compiler.  Assembly plus the
     aprefetch dump must demonstrate actual automatic cross-row hints;
@@ -410,10 +410,13 @@ def build_compiler_proof():
     for name, enabled, contract in (('donor', False, 'off'),
                                      ('knc', False, 'off'),
                                      ('enabled', True, 'off'),
-                                     ('fast', True, 'fast')):
+                                     ('fast', True, 'fast'),
+                                     ('manual', False, 'off')):
         cc = corpus.compiler_path(corpus.DONOR) if name == 'donor' else gcc/'xgcc'
         flags = ['-O2', '-std=gnu99', '-ffp-contract=' + contract,
                  '-DLEGAL_PROOF', '-DCOMPILER_PROOF', '-DPREFIX=' + name + '_']
+        if name == 'manual':
+            flags += ['-DMANUAL_PROOF=1']
         if name != 'donor':
             flags += ['-B' + str(gcc) + '/', '-march=knc',
                       '--sysroot=' + str(TC/'sysroot'),
@@ -421,19 +424,26 @@ def build_compiler_proof():
         stem = OUT/('compiler-' + name)
         asm, obj, dump = stem.with_suffix('.s'), stem.with_suffix('.o'), stem.with_suffix('.aprefetch')
         dump.unlink(missing_ok=True)
-        run(cc, *flags, '-fdump-tree-aprefetch=' + str(dump), '-S', SOURCE, '-o', asm)
+        run(cc, *flags, '-fdump-tree-aprefetch-details=' + str(dump), '-S', SOURCE, '-o', asm)
         run(TC/'cross/bin/k1om-mpss-linux-as', '--march=k1om', asm, '-o', obj)
         run(sys.executable, ROOT/'tools/knc_lint', asm, obj)
+        run(TC/'cross/bin/k1om-mpss-linux-size', '-A', obj)
+        assembly = asm_bodies(asm.read_text())
+        for layout in ('csr', 'hpcg', 'lone'):
+            suffix = '_scalar' if layout == 'lone' else '_raw'
+            body = assembly[name + '_' + layout + suffix]
+            print('STATIC_HINTS', name, layout, len(re.findall(r'\bvprefetch\w*\b', body)), flush=True)
         if enabled:
-            # The structural scanner uses parameter names in the T1
-            # probes. These struct-based kernels instead require the
-            # pass's recognition diagnostic for each of their two bodies.
+            # Require the recognized form, not merely some indirect hint:
+            # a row-local fallback cannot prove cross-row bounds.
             if not dump.exists():
                 raise RuntimeError('missing compiler proof aprefetch dump: ' + str(dump))
             chunks = re.split(r'^;; Function (\w+) .*$', dump.read_text(), flags=re.M)
             bodies = dict(zip(chunks[1::2], chunks[2::2]))
-            for layout, shape in (('csr', 'future row bound'), ('hpcg', 'next-row pointers')):
-                body = bodies.get(name + '_' + layout + '_scalar', '')
+            for layout, shape in (('csr', 'future row bound'), ('hpcg', 'next-row pointers'),
+                                  ('lone', 'row-local bound')):
+                suffix = '_scalar' if layout == 'lone' else '_raw'
+                body = bodies.get(name + '_' + layout + suffix, '')
                 if not re.search(r'Bounded indirect prefetch in loop \d+: ' + shape, body):
                     raise RuntimeError('compiler proof did not transform ' + name + '_' + layout)
                 if '__builtin_prefetch' not in body:
@@ -449,6 +459,62 @@ def build_compiler_proof():
     return 0
 
 
+def ice_sweep(corpora=('gcc.c-torture/compile', 'gcc.dg/vect')):
+    """Compile the lane's torture/vector corpora with the new switch enabled.
+
+    This is an ICE check, not a dg diagnostic/assembly/native verdict.
+    Unsupported options and ordinary compile errors are counted separately.
+    """
+    from collections import Counter
+    from concurrent.futures import ThreadPoolExecutor
+    import shlex
+    import signal
+    project = ROOT.parent.parent
+    gcc = Path(storage.gcc_build_dir(project, '2')) / 'gcc'
+    tests = Path(storage.gcc_tree(project, '2')) / 'gcc/testsuite'
+    totals = Counter()
+    report = OUT/'ice-sweep.log'
+    def compile_one(job):
+        source, level = job
+        options = [flag for match in re.finditer(
+            r'\{\s*dg-(?:additional-)?options\s+(?:"((?:\\.|[^"\\\n])*)"|([^\s{}]+))'
+            r'(\s*\{\s*target\b)?', source.read_text(errors='replace'))
+            if match[3] is None
+            for flag in shlex.split(match[1] if match[1] is not None else match[2])
+            if not flag.startswith(('-fdump', '-save-temps', '-flto'))]
+        command = list(map(str, [gcc/'xgcc', '-B' + str(gcc) + '/',
+                       *options, '-' + level, '-march=knc', '-mknc-indirect-prefetch',
+                       '--sysroot=' + str(TC/'sysroot'), '-w', '-S', source, '-o', '/dev/null']))
+        with subprocess.Popen(command, cwd=OUT, stdout=subprocess.PIPE,
+                              stderr=subprocess.STDOUT, text=True,
+                              start_new_session=True) as proc:
+            try:
+                diagnostic, _ = proc.communicate(timeout=120)
+                kind = ('ICE' if re.search(r'internal compiler error|segmentation fault', diagnostic, re.I)
+                        else 'compile-error' if proc.returncode else 'compiled')
+            except subprocess.TimeoutExpired:
+                os.killpg(proc.pid, signal.SIGKILL)
+                diagnostic, _ = proc.communicate()
+                kind = 'timeout'
+        return level, kind, source.relative_to(tests), command, diagnostic
+    with report.open('w', newline='\n') as log:
+        for corpus_path in corpora:
+            sources = sorted((tests/corpus_path).rglob('*.c'))
+            if not sources:
+                raise RuntimeError('empty ICE corpus ' + corpus_path)
+            counts = Counter()
+            with ThreadPoolExecutor(max_workers=4) as pool:
+                for level, kind, name, command, diagnostic in pool.map(
+                        compile_one, ((source, level) for level in ('O2', 'O3') for source in sources)):
+                    counts[level, kind] += 1
+                    totals[kind] += 1
+                    if kind != 'compiled':
+                        log.write(f'{level} {kind} {name}\n' + shlex.join(command) + '\n' + diagnostic + '\n')
+            print('ICE_SWEEP', corpus_path, 'files=' + str(len(sources)), dict(counts), flush=True)
+        print('ICE_SWEEP totals', dict(totals), 'details=' + str(report), flush=True)
+    return int(bool(totals['ICE'] or totals['timeout']))
+
+
 def main():
     if sys.platform != 'cygwin':
         raise RuntimeError('use shared Cygwin python3')
@@ -456,6 +522,10 @@ def main():
     os.environ['PATH'] = ':'.join(map(str, [TC/'cross/bin', TC/'cygwin/bin', os.environ['PATH']]))
     if sys.argv[1:] == ['--compiler-proof']:
         return build_compiler_proof()
+    if sys.argv[1:] == ['--ice-sweep']:
+        return ice_sweep()
+    if sys.argv[1:] == ['--ice-sweep', 'vect']:
+        return ice_sweep(('gcc.dg/vect',))
     legal = sys.argv[1:] == ['--legal']
     if sys.argv[1:] and not legal:
         raise ValueError('expected --compiler-proof, --legal or no arguments')

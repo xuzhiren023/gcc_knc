@@ -826,3 +826,167 @@ GCC correction commit: `a36fc224773` (lane gcc2). GCC diff against `knc`
 has no whitespace errors. The three ticket-owned main-repository source
 and note files are LF. Hook documentation and its generated copy were
 updated together; no i386 file changed in this correction.
+
+### Built hoisted version: intermediate green and native staging (2026-11-15)
+
+The targeted T1 rerun against built gcc2 `a36fc224773` passes. This is
+the required default-off intermediate step: default probe identity with
+explicit switch-off, cross-row and slice bounds, scalar folds, exclusions,
+compile/assemble/lint and the installed baseline check all pass. The slice
+now has five static hints with the switch on and four with it off.
+Command: `python tools/run.py --name s12_30_phase2_green_hoisted --inputs
+tools/s12_30_precision.py tools/s12_30_precision.c -- python tools/check
+t1 --compiler gcc16 --sparse-indirect`.
+Log: `.work/_state/logs/s12_30_phase2_green_hoisted-20261115-043829.log`.
+
+The first compiler-proof staging attempt correctly rejected its struct
+kernels: both received only `row-local bound`, which does nothing at
+13/27 entries. Fields loaded within the outer loop do not satisfy the
+current recognizer's outer-invariant requirements. The proof now uses
+raw-argument, noinline/noclone kernels matching T1, called by identical
+matrix wrappers in all slots. It still requires the exact `future row
+bound` and `next-row pointers` diagnostics, plus a row-local transformation
+in the separate lone-loop kernel. No assertion was weakened. This is a
+compiler coverage limitation, not proof that the real applications are
+transformed: their dumps must be checked when their A/B is staged.
+Source inspection also finds that HPCG 3.1 `SparseMatrix.hpp` declares
+`nonzerosInRow` as `char *`, promoted to `int` in `ComputeSPMV_ref.cpp`;
+the present raw probe uses `int *`. `indirect_array` currently requires a
+direct load, without stripping that promotion. SymGS uses subtraction,
+whereas `indirect_product` currently matches addition. These are additional
+application-coverage risks, not measured application outcomes, and must
+be resolved or explicitly reported before claiming the HPCG A/B acceptance.
+Failed staging log:
+`.work/_state/logs/s12_30_compiler_gate-20261115-044149.log`.
+
+Code size (ELF `.text`, including the three kernels and their wrappers):
+
+| Build | Bytes | Static hints CSR / HPCG / lone |
+| --- | ---: | --- |
+| GCC 5.1.1 | 364 | 0 / 0 / 0 |
+| gcc2 switch off | 1334 | 4 / 4 / 4 |
+| gcc2 switch on, contract off | 2891 | 9 / 13 / 5 |
+| gcc2 switch on, contract fast | 2891 | 9 / 13 / 5 |
+| gcc2 handwritten forced hint, automatic switch off | 606 | 1 / 1 / 1 |
+
+Versioning adds 1557 bytes (116.7%) to this three-kernel `.text`. These
+are static instruction counts across mutually exclusive versions. The
+hinted inner arms contain one indirect hint and no stream hints; the
+remaining eight/twelve/four stream instructions are in unhinted versions.
+There is no second per-iteration hint for the new future-column load.
+
+The detailed dump corrects the earlier suggestion that stream references
+were not recognized. `compiler-enabled.aprefetch` does recognize val/col
+streams, with prefetch moduli 8/16, but chooses unroll factor 1 in the
+hinted arms (CSR lines 1397-1547, HPCG 4751-4873). In
+`tree-ssa-loop-prefetch.cc::schedule_prefetches`, the existing rule rejects
+`prefetch_mod / unroll_factor > 4`. The extra CSR column reference is also
+pruned by `prefetch_before`. Unhinted copies have factor 8 and receive
+their ordinary stream hints. The dump establishes that scheduling reason;
+no performance benefit from the changed scheduling is assumed.
+
+`compiler-gate` compares donor, gcc2 switch-off, gcc2 switch-on, and a
+handwritten forced-hint slot on identical runtime inputs. Contract-fast
+also runs the full guard suite. The raw kernels retain the legal gate's
+metadata placement and guard rules. Cross-row guard fixtures cover empty
+and decreasing rows, every length 1..33, metadata/index/value arrays ending
+at protected pages, and both policy arms. A separate lone-loop guard check
+covers lengths 0/1/32/33/16383/16384/16385. Exact arithmetic is compared
+against the ordered long-double reference. No native result is claimed.
+
+The timing grid has 34 cases, five alternating-order paired samples of at
+least 0.5 seconds for four kernels per case. Batches target 25 ms to limit
+overshoot within the one 590-second lead window; the program alarms at
+570 seconds. It pins one granted CPU for this single-core timing experiment.
+Cases: CSR and independent shuffled per-row pointers, n=13/27, 32 KiB RHS
+at 32/4096/8192/14000/16384/32768 rows; CG-A-sized 14000-row/112000-byte RHS;
+32768 rows with 16 MiB RHS; a 104^3 HPCG-shaped 27-neighbor stencil with
+real boundary counts; and a 262144-entry lone loop with 16 MiB RHS.
+The stencil is a SpMV shape fixture, not the full HPCG fixed-work benchmark.
+
+Threshold selection is pending those measurements. The manual slot forces
+hints on below 16384, while the existing compiler switch retains its
+16384-row/trip policy. Output labels distinguish these facts. Consequently
+the below-threshold manual comparison is policy evidence, not a claim
+that the compiler's hinted arm ran there. Select the smallest measured
+candidate that meets the ticket's <=1% slowdown criterion on all relevant
+small/cache controls; if none does, report that rather than inventing a
+threshold. Any changed compiler threshold still requires its own proof.
+M4's application A/B must use NPB class A (CG 14000 rows), HPCG S11-28 fixed
+work and two controls at full/3100/5100, with default `-O2 -march=knc` on.
+It is not staged with the current default-off compiler.
+
+Final staging command: `python tools/run.py --name
+s12_30_compiler_gate_final --inputs tools/s12_30_precision.py
+tools/s12_30_precision.c --
+..\_shared\toolchain\cygwin\bin\python3.12.exe
+tools/s12_30_precision.py --compiler-proof`. PASS compile/assemble/lint
+and the three required transformation diagnostics for both contraction
+modes. Log:
+`.work/_state/logs/s12_30_compiler_gate_final-20261115-044552.log`.
+Binary: `.work/_shared/S12-30/compiler-gate`, argument `12345`; lead only,
+`tools/card_run --threads 1 --timeout 590`. All inputs are generated at
+runtime; no additional staged files are needed. A timeout or fault is a
+failure, not a partial timing pass. The final source/note files are LF and
+both main-worktree and GCC `knc...HEAD` whitespace checks are clean.
+
+T0/T2 command: `python tools/run.py --name s12_30_t0_t2 --inputs tools
+tests/regress tests/tools -- python tools/check t0 t2 --compiler gcc16`.
+T0 passes all 56 tests (36 regressions, 8 doctor, 6 portability, 6 lint).
+T2 passes the initial short-vector cross-compiler link/ABI checks, then
+stops with `[Errno 13] Permission denied` writing
+`.work/_shared/S10-01/vecarg-O0-O2.mic`. This is an infrastructure failure;
+T2 is incomplete, not passed. No permission change, removal of the existing
+binary, or rerun was attempted. Logs:
+`.work/_state/logs/s12_30_t0_t2-20261115-043930.log` and
+`.work/_state/logs/check_gcc16_t0_t2-20261115-043930.log`.
+
+The switch-on ICE sweep compiles the gcc2 lane's C torture and vector
+corpora at O2/O3, retaining unselected per-test option directives, with
+four workers. It counts ordinary compiler diagnostics separately; it is
+not a DejaGnu, assembly, or native pass claim. The C torture portion
+completed: 2003 sources per level, 1971 compiled and 32 ordinary compile
+errors at each level, zero ICEs or timeouts. The first vector attempt
+stopped in the harness option parser on the escaped quotes in
+`gcc.dg/vect/pr63530.c`'s directive. The regex now treats escaped characters
+inside quoted directives as part of that token. Only the incomplete vector
+portion is rerun; the completed torture portion is not repeated. First log:
+`.work/_state/logs/s12_30_indirect_ice_sweeps-20261115-044434.log`.
+
+The vector-only rerun completed and **failed**: 2349 sources per level;
+O2 has 2168 compiled / 181 ordinary errors / zero ICEs; O3 has 2166
+compiled / 181 ordinary errors / two ICEs; zero timeouts. Command:
+`python tools/run.py --name s12_30_indirect_vect_ice --inputs
+tools/s12_30_precision.py --
+..\_shared\toolchain\cygwin\bin\python3.12.exe
+tools/s12_30_precision.py --ice-sweep vect`.
+Log: `.work/_state/logs/s12_30_indirect_vect_ice-20261115-045317.log`;
+commands and diagnostics: `.work/_shared/S12-30/ice-sweep.log`.
+
+The two isolated upstream inputs are in gcc2's `gcc/testsuite/gcc.dg/vect/`:
+
+- `O3-vect-pr32243.c`, `-O3 -fno-ipa-cp-clone -march=knc
+  -mknc-indirect-prefetch`: `put_mono_values_s8` cannot reload
+  `*knc_sign_extendv16qiv16si2`, then ICEs in `curr_insn_transform`,
+  `lra-constraints.cc:4553` (diagnostic starts at log line 1944).
+- `vect-pr123221.c`, `-O3 -fno-tree-pre -march=knc
+  -mknc-indirect-prefetch`: segmentation fault during `vect`, with
+  `vect_analyze_slp_reduc_chain`, `tree-vect-slp.cc:4275` in the backtrace
+  (log line 3695).
+
+Both commands also use the gcc2 `-B` prefix and shared sysroot, with
+`-w -S <source> -o /dev/null`; the exact invocations are in the log.
+No switch-off rerun was made, so neither ICE is claimed to be new or
+pre-existing. The scan's ordinary-error category also contains a remaining
+harness limitation: `pr63530.c`'s escaped quotes survive into its `--param`
+argument, which the driver rejects at both levels (log lines 1506/3482).
+Thus that source has not received a valid compiler test. No third sweep
+or further parser/compiler fix was attempted after these two failed
+sweep attempts, per AGENTS.md.
+
+Handoff requires the lead to classify the two ICE inputs and resolve the
+T2 output permission, as well as run the staged compiler guard/timing
+binary and return its complete output. No GCC change/build in this session;
+native proof, measured threshold choice, default-on, application A/B and
+x86 identity remain pending. The intermediate T1 and T0 passes do not
+make the ticket ready to submit.
