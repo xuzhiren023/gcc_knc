@@ -4,7 +4,7 @@ Updated automatically at every ticket change. Last update: 2026-11-15 00:00.
 
 **Next: the tech lead, on S12-30.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
-Current tickets: `[##################--]` 233 of 248
+Current tickets: `[##################--]` 233 of 249
 
 ## Milestones
 
@@ -14,7 +14,7 @@ Current tickets: `[##################--]` 233 of 248
 | M1 | Mixed native code | Done | 43 of 43 tickets |
 | M2 | Useful vector target | Done | 51 of 51 tickets |
 | M3 | Runtimes | Done | 48 of 48 tickets |
-| M4 | Broad optimization | In progress | 51 of 66 tickets |
+| M4 | Broad optimization | In progress | 51 of 67 tickets |
 | M5 | Program corpus | Not started | Not planned in detail yet |
 | M6 | Release | Not started | Not planned in detail yet |
 
@@ -114,6 +114,7 @@ Current tickets: `[##################--]` 233 of 248
 | S12-31 | HPCG is 1.8% slower with GCC-KNC than with GCC 5.1.1 - find the cause and make it faster (owner: never slower than 5.1.1) | In progress | Results in; interpret and decide. |
 | S12-32 | ICE (reload) in gcc.c-torture O3-vect-pr32243.c on the installed GCC-KNC, found by the S12-21 torture sweep | Waiting for review | Green: knc f559e49271c (imci.md Bm->Ba) + 6b79c6f0566 (sse.md: extend expanders passed a folded under-align... |
 | S12-33 | T2 writes its short-vector test binaries into a per-run folder, so Claude, Codex and lead runs never block each other | Done | T2's short-vector cross-check now writes its binaries into the run's own output folder instead of the share... |
+| S12-34 | Unrecognizable insn for a truncating vector store to a 1-byte-aligned V16QI destination (found by S12-32) | Not started |  |
 | S13-01 | M4 final gate - stage the ADR-0015 gate run at the final head (17 programs, held-out unsealed, six pairs, three profiles) | draft |  |
 | S13-02 | Libgomp per-region thread density - choose 1-4 workers per core per parallel region instead of once per program | draft |  |
 | S13-03 | M4 retrospective - what we did wrong, what worked, and the practice changes carried into the next milestone and the agent-team skill | draft |  |
@@ -284,9 +285,9 @@ Current tickets: `[##################--]` 233 of 248
 
 ## Cost
 
-- From the script, engineer: 663 sessions, 1309.9M input tokens
+- From the script, engineer: 664 sessions, 1310.8M input tokens
 - From the script, lead: 438 sessions, 122.6M input tokens
-- Started by hand, Claude: 12 sessions, 3410.8M input tokens
+- Started by hand, Claude: 12 sessions, 3413.2M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
