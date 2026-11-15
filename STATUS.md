@@ -117,7 +117,7 @@ Current tickets: `[##################--]` 239 of 255
 | S12-34 | Unrecognizable insn for a truncating vector store to a 1-byte-aligned V16QI destination (found by S12-32) | Not started |  |
 | S12-35 | Clean single-compiler WRF build as dm+sm (MPI + OpenMP) against PhiWeather's k1om MPICH, plus a build recipe PhiWeather can apply to its own patched tree | Done | Upstream WRF 4.8.0 now builds clean as dm+sm (MPI + OpenMP) with the one GCC-KNC compiler (knc 7a3b34430e3,... |
 | S12-36 | card_run yields to a foreign queued row in the middle of our own turn - honor an open turn-level reservation so a multi-job window is not refused | Done | card_run --benchmark now keeps our turn across several jobs while an open claude-turn- ledger row was queue... |
-| S12-37 | Every T1/T2 check writes into the run's own output folder - no fixed paths in shared ticket folders (S10-01 vecarg, and any others) | In progress | Lead raises input_tokens 6M -> 10M: one requested change (update test_shared_area.py in place) remains. |
+| S12-37 | Every T1/T2 check writes into the run's own output folder - no fixed paths in shared ticket folders (S10-01 vecarg, and any others) | Waiting for review | 6bab700d updates only existing x87 test for runner.out and no escaped outputs. Cygwin suites via run.py: sh... |
 | S12-38 | ICE in the SLP vectorizer on gcc.dg vect-pr123221.c at -O3 -march=knc (found by S12-30's torture sweep) | Not started |  |
 | S12-39 | pm.py submit stops demanding an engineer-side rebase that the sandbox cannot perform (Permission denied on .git/worktrees/<id>/rebase-merge) | Done | Engineers no longer need to rebase before submitting: submit only refuses when main has real changes the br... |
 | S12-40 | Indirect prefetch recognizes Fortran sparse loops (array descriptors, ARRAY_REF offsets, nonzero and OpenMP-outlined starts) so NPB-CG benefits | draft |  |
@@ -280,6 +280,7 @@ Current tickets: `[##################--]` 239 of 255
 
 ## Recent activity
 
+- 2026-11-15 06:01 **S12-37** engineer submit: 6bab700d updates only existing x87 test for runner.out and no escaped outputs. Cygwin suites via run.py: shared_area 3 PASS, check_outputs 3 PASS. ...
 - 2026-11-15 06:01 **S12-30** engineer red: 6b7a02cc: corrected HPCG-shape red per 05:57 review. Scanner follows ->cols field loads; explicit_struct control PASS on/off. Probes in HPCG form; ...
 - 2026-11-15 05:58 **S12-37** owner decide: Lead raises input_tokens 6M -> 10M: one requested change (update test_shared_area.py in place) remains.
 - 2026-11-15 05:57 **S12-30** owner decide: Owner rule (2026-11-14: Fable for troubleshooting): the recognizer now needs troubleshooting on real HPCG shapes (struct ->cols field loads, hoiste...
@@ -287,7 +288,6 @@ Current tickets: `[##################--]` 239 of 255
 - 2026-11-15 05:56 **S12-37** engineer escalate: budget: 6336450 input tokens used; the budget is 6000000
 - 2026-11-15 05:55 **S12-37** lead changes: 1. tools/x87_spill.py:185 breaks an existing test: tests/regress/test_shared_area.py:68-77 (test_x87_probe_from_main_checkout) calls x87_spill t1 w...
 - 2026-11-15 05:53 **S12-37** engineer submit: After main merge, 3 Cygwin host tests pass; log .work/_state/logs/S12_37_merged-20261115-055233.log. Card mocked; no GCC/card run. Lead staging: ch...
-- 2026-11-15 05:52 **S12-30** engineer red: e3a0cf42: HPCG dumps compile PASS. SpMV has ineffective row-local hint; SymGS sweeps missed. Focused T1: compile/assemble/lint and off controls PAS...
 
 ## Cost
 
@@ -299,4 +299,4 @@ Current tickets: `[##################--]` 239 of 255
 
 ## Disk
 
-The project uses 34.5 GiB of 100 GiB. 128 GiB free on the drive.
+The project uses 34.8 GiB of 100 GiB. 128 GiB free on the drive.
