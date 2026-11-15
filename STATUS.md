@@ -111,7 +111,7 @@ Current tickets: `[##################--]` 230 of 246
 | S12-28 | dispatch.py refuses to start a second dispatcher on a lane that already has a live one | Done | dispatch.py now refuses to start a second dispatcher on a lane that already has a live one (a lock per lane... |
 | S12-29 | Wrong code - vbroadcastsd reads a 4-byte-aligned SCmode constant (complex float) straight from the constant pool and faults on the card (gcc.c-torture pr38969.c, regression from S11-27) | Done | The pr38969 crash from S11-27 is fixed: GCC-KNC no longer broadcasts a vector from memory aligned below its... |
 | S12-30 | Sparse indexed reductions faster than today - vector gather of products with an ordered scalar sum, and indirect prefetch, for CSR-style loops (NPB-CG, HPCG) | Tests waiting for review | 570710ae: replacement red; target build/lint PASS. Host exit 1: nine missing A/B/A+B slots only; 60,458 sca... |
-| S12-31 | HPCG is 1.8% slower with GCC-KNC than with GCC 5.1.1 - find the cause and make it faster (owner: never slower than 5.1.1) | Question for the tech lead | Phase 1 at 6b413629, see docs/research/s12-31-hpcg.md. Loss is only SpMV (+2.1%) and SymGS/MG (+3.9%). Like... |
+| S12-31 | HPCG is 1.8% slower with GCC-KNC than with GCC 5.1.1 - find the cause and make it faster (owner: never slower than 5.1.1) | lead | Needs one card run by the interactive lead. Phase 1 at 6b413629 reviewed and sound; staged binary exists. I... |
 | S13-01 | M4 final gate - stage the ADR-0015 gate run at the final head (17 programs, held-out unsealed, six pairs, three profiles) | draft |  |
 | S13-02 | Libgomp per-region thread density - choose 1-4 workers per core per parallel region instead of once per program | draft |  |
 | S13-03 | M4 retrospective - what we did wrong, what worked, and the practice changes carried into the next milestone and the agent-team skill | draft |  |
@@ -271,6 +271,7 @@ Current tickets: `[##################--]` 230 of 246
 
 ## Recent activity
 
+- 2026-11-14 21:19 **S12-31** lead defer: Needs one card run by the interactive lead. Phase 1 at 6b413629 reviewed and sound; staged binary exists. In our exclusive card turn run the comman...
 - 2026-11-14 21:18 **S12-30** engineer red: 570710ae: replacement red; target build/lint PASS. Host exit 1: nine missing A/B/A+B slots only; 60,458 scalar/reference/bounds checks pass. Both s...
 - 2026-11-14 21:14 **S12-31** engineer ask: Phase 1 at 6b413629, see docs/research/s12-31-hpcg.md. Loss is only SpMV (+2.1%) and SymGS/MG (+3.9%). Likely cause, unproven: -falign-loops=16 pad...
 - 2026-11-14 20:59 **S12-30** lead changes: Red not accepted: wrong oracle, and nothing in Phase 1 can turn it green. (1) Route A is eligible. ADR-0003 item 2 and DEVELOPMENT_CYCLE Oracles: x...
@@ -278,7 +279,6 @@ Current tickets: `[##################--]` 230 of 246
 - 2026-11-14 20:56 **S12-24** lead approve-red: The WRF REMEZ compiler crash is now reproduced by a 10-line k=-k loop test (int and unsigned char) that fails with the ticket's ICE, and the root c...
 - 2026-11-14 20:55 **S12-21** lead answer: Built; run green and stage.
 - 2026-11-14 20:55 **S12-21** lead resume: Lead: lane gcc2 built at 1a4f5aab0a2 (log s12_21_build). Run T0-T2 with tests/t1/knc-imul-cost.c green, the ICE sweeps, and stage the short paired ...
-- 2026-11-14 20:54 **S12-24** engineer red: Red b753a488: tests/t1/knc-vec-neg-induction.c ('check t1 --compiler gcc16 --neg-induction') fails with the ticket's ICE; log .work/_state/logs/che...
 
 ## Cost
 
@@ -290,4 +290,4 @@ Current tickets: `[##################--]` 230 of 246
 
 ## Disk
 
-The project uses 33.1 GiB of 100 GiB. 142 GiB free on the drive.
+The project uses 33.4 GiB of 100 GiB. 142 GiB free on the drive.
