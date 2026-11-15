@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-15 05:32.
+Updated automatically at every ticket change. Last update: 2026-11-15 05:33.
 
-**Next: the tech lead, on S12-39.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: GPT-6.1, on S12-30 (Sparse indexed reductions faster than today - vector gather of products with an ordered scalar sum, and indirect prefetch, for CSR-style loops (NPB-CG, HPCG)).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
 Current tickets: `[##################--]` 238 of 255
 
@@ -119,7 +119,7 @@ Current tickets: `[##################--]` 238 of 255
 | S12-36 | card_run yields to a foreign queued row in the middle of our own turn - honor an open turn-level reservation so a multi-job window is not refused | Done | card_run --benchmark now keeps our turn across several jobs while an open claude-turn- ledger row was queue... |
 | S12-37 | Every T1/T2 check writes into the run's own output folder - no fixed paths in shared ticket folders (S10-01 vecarg, and any others) | Changes requested | One defect: some of the moved outputs were card inputs. tools/libgcc.py native() (lead card run) still read... |
 | S12-38 | ICE in the SLP vectorizer on gcc.dg vect-pr123221.c at -O3 -march=knc (found by S12-30's torture sweep) | Not started |  |
-| S12-39 | pm.py submit stops demanding an engineer-side rebase that the sandbox cannot perform (Permission denied on .git/worktrees/<id>/rebase-merge) | Question for the tech lead | Implementation committed at 29afee64; red run failed as expected and all 23 host tests passed. Submit refus... |
+| S12-39 | pm.py submit stops demanding an engineer-side rebase that the sandbox cannot perform (Permission denied on .git/worktrees/<id>/rebase-merge) | In progress | Yes: submit with --override 'test/code ratio 123:64; seven host tests each map to one ticket deliverable (s... |
 | S12-40 | Indirect prefetch recognizes Fortran sparse loops (array descriptors, ARRAY_REF offsets, nonzero and OpenMP-outlined starts) so NPB-CG benefits | draft |  |
 | S13-01 | M4 final gate - stage the ADR-0015 gate run at the final head (17 programs, held-out unsealed, six pairs, three profiles) | draft |  |
 | S13-02 | Libgomp per-region thread density - choose 1-4 workers per core per parallel region instead of once per program | draft |  |
@@ -280,6 +280,7 @@ Current tickets: `[##################--]` 238 of 255
 
 ## Recent activity
 
+- 2026-11-15 05:33 **S12-39** lead answer: Yes: submit with --override 'test/code ratio 123:64; seven host tests each map to one ticket deliverable (status-only submit, real-change refusal, ...
 - 2026-11-15 05:32 **S12-37** lead changes: One defect: some of the moved outputs were card inputs. tools/libgcc.py native() (lead card run) still reads .work/_shared/tmp/S2-07/*-libgcc.mic, ...
 - 2026-11-15 05:31 **S12-39** engineer ask: Implementation committed at 29afee64; red run failed as expected and all 23 host tests passed. Submit refused only the soft test/code ratio: 123 te...
 - 2026-11-15 05:31 **S12-37** engineer submit: T1/T2 checks keep every generated file inside runner.out (9 modules incl. scalar_abi, libgcc, secondary_reload, storent, x87_spill); red b7660998 d...
@@ -287,7 +288,6 @@ Current tickets: `[##################--]` 238 of 255
 - 2026-11-15 05:30 **S12-30** owner decide: Lead raises input_tokens 20M -> 30M and narrows scope: C form only (HPCG); Fortran recognition for NPB-CG split to S12-40. Progress since the last ...
 - 2026-11-15 05:29 **S12-37** engineer escalate: budget: 3 engineer sessions used; the budget is 3
 - 2026-11-15 05:29 **S12-30** engineer escalate: budget: 21800400 input tokens used; the budget is 20000000
-- 2026-11-15 05:28 **S12-30** lead answer: Lead 05:35: (1) Yes, retry HPCG with the installed prefix C++ headers: for the lane-2 build-tree xg++ add --sysroot=.work/_shared/toolchain/sysroot...
 
 ## Cost
 
