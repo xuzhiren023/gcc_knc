@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-15 04:38.
+Updated automatically at every ticket change. Last update: 2026-11-15 05:02.
 
-**Next: GPT-6.1, on S12-30 (Sparse indexed reductions faster than today - vector gather of products with an ordered scalar sum, and indirect prefetch, for CSR-style loops (NPB-CG, HPCG)).** Run `python tools/dispatch.py`, or ask the tech lead to.
+**Next: the tech lead, on S12-30.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[##################--]` 238 of 251
 
@@ -110,7 +110,7 @@ Current tickets: `[##################--]` 238 of 251
 | S12-27 | Latency-aware scalar loops - GCC-KNC unrolls and interleaves independent iterations and hoists conversions so one thread's every-other-cycle issue and long latencies are hidden automatically | draft |  |
 | S12-28 | dispatch.py refuses to start a second dispatcher on a lane that already has a live one | Done | dispatch.py now refuses to start a second dispatcher on a lane that already has a live one (a lock per lane... |
 | S12-29 | Wrong code - vbroadcastsd reads a 4-byte-aligned SCmode constant (complex float) straight from the constant pool and faults on the card (gcc.c-torture pr38969.c, regression from S11-27) | Done | The pr38969 crash from S11-27 is fixed: GCC-KNC no longer broadcasts a vector from memory aligned below its... |
-| S12-30 | Sparse indexed reductions faster than today - vector gather of products with an ordered scalar sum, and indirect prefetch, for CSR-style loops (NPB-CG, HPCG) | In progress | Built; continue. |
+| S12-30 | Sparse indexed reductions faster than today - vector gather of products with an ordered scalar sum, and indirect prefetch, for CSR-style loops (NPB-CG, HPCG) | Question for the tech lead | 01f3c80c: T1/T0 PASS. T2 permission denied on S10-01/vecarg-O0-O2.mic. Torture: zero ICEs; vect O3 ICEs: O3... |
 | S12-31 | HPCG is 1.8% slower with GCC-KNC than with GCC 5.1.1 - find the cause and make it faster (owner: never slower than 5.1.1) | In progress | Red approved: the two new T1 tests fail on today's compiler for the intended reasons (x87 loops emit cmp; f... |
 | S12-32 | ICE (reload) in gcc.c-torture O3-vect-pr32243.c on the installed GCC-KNC, found by the S12-21 torture sweep | Done | The -O3 vector reload crash in pr32243 is fixed: byte/word vector extends now reload through an aligned sta... |
 | S12-33 | T2 writes its short-vector test binaries into a per-run folder, so Claude, Codex and lead runs never block each other | Done | T2's short-vector cross-check now writes its binaries into the run's own output folder instead of the share... |
@@ -276,6 +276,7 @@ Current tickets: `[##################--]` 238 of 251
 
 ## Recent activity
 
+- 2026-11-15 05:02 **S12-30** engineer ask: 01f3c80c: T1/T0 PASS. T2 permission denied on S10-01/vecarg-O0-O2.mic. Torture: zero ICEs; vect O3 ICEs: O3-vect-pr32243.c (reload), vect-pr123221....
 - 2026-11-15 04:38 **S12-31** lead approve-red: Red approved: the two new T1 tests fail on today's compiler for the intended reasons (x87 loops emit cmp; faddp; jg, and inner loop heads get unbou...
 - 2026-11-15 04:37 **S12-30** lead answer: Built; continue.
 - 2026-11-15 04:37 **S12-30** lead resume: Lead 04:30: lane gcc2 built at a36fc224773. Do the five follow-ups from the 04:20 note and the threshold note in the ticket body (measure the thres...
@@ -283,7 +284,6 @@ Current tickets: `[##################--]` 238 of 251
 - 2026-11-15 04:24 **S12-31** lead answer: Diagnostics ran; interpret and start phase 2.
 - 2026-11-15 04:23 **S12-31** lead resume: Lead, card window 5 (09:17-09:23Z, exclusive, all three exit 0; S12-36 kept our turn): logs .work/_shared/S12-31/native-mb.log, native-layout-knc.l...
 - 2026-11-15 04:20 **S12-30** lead defer: Needs a GCC build (interactive lead): lane gcc2 at s12/S12-30 head a36fc224773; return the result to the engineer. Source read a36fc224773: no lega...
-- 2026-11-15 04:15 **S12-30** engineer ask: GCC build needed at a36fc224773 (gcc2). T1 failed only sparse_slice hint count: on 1 vs off 4; guard suppresses stream recognition. Other checks pa...
 
 ## Cost
 
