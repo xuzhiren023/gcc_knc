@@ -1,10 +1,10 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-15 11:32.
+Updated automatically at every ticket change. Last update: 2026-11-15 11:59.
 
-**Next: GPT-6.1, on S12-09 (Sprint 12 batch check - integrated themes at the final Sprint 12 head, regression evidence, optional modes frozen).** Run `python tools/dispatch.py`, or ask the tech lead to.
+**Next: the tech lead, on S13-01.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
-Current tickets: `[##################--]` 241 of 258
+Current tickets: `[##################--]` 241 of 266
 
 ## Milestones
 
@@ -15,7 +15,7 @@ Current tickets: `[##################--]` 241 of 258
 | M2 | Useful vector target | Done | 51 of 51 tickets |
 | M3 | Runtimes | Done | 48 of 48 tickets |
 | M4 | Broad optimization | In progress | 59 of 63 tickets |
-| M5 | Program corpus | In progress | 0 of 13 tickets |
+| M5 | Program corpus | In progress | 0 of 21 tickets |
 | M6 | Release | Not started | Not planned in detail yet |
 
 ## Tickets
@@ -123,11 +123,19 @@ Current tickets: `[##################--]` 241 of 258
 | S12-40 | Indirect prefetch recognizes Fortran sparse loops (array descriptors, ARRAY_REF offsets, nonzero and OpenMP-outlined starts) so NPB-CG benefits | draft | Deferred to M5 (sprint s14) by the owner's 2026-11-15 scope cut ("we are scope creeping the entire Sprint 1... |
 | S12-41 | Early donor check - corpus.py stages and runs only the development programs (no held-out build or run), smallest margins first, so the lead can measure every development program against GCC 5.1.1 now | draft | Deferred to M5 (sprint s14) by the owner's 2026-11-15 scope cut ("we are scope creeping the entire Sprint 1... |
 | S12-42 | Small sparse row loops are 1.5-3% slower than GCC 5.1.1, worse when two loop nests share one function (found by S12-30's window 8 gate) | draft | Owner 2026-11-15 ("I have reset Fable, so subagent back to codex with default selection rule"): Fable overr... |
-| S13-01 | M4 final gate - stage the ADR-0015 gate run at the final head (17 programs, held-out unsealed, six pairs, three profiles) | In progress | Implementing the missing readiness is authorized in this ticket. The follow-up promised at S11-18 (2026-11-... |
+| S13-01 | M4 final gate - stage the ADR-0015 gate run at the final head (17 programs, held-out unsealed, six pairs, three profiles) | Question for the tech lead | Primary gate staged: .work/_shared/S13-01/, a74a0c2e; 34 selected binaries built/linted, 17 votes, referenc... |
 | S13-02 | Libgomp per-region thread density - choose 1-4 workers per core per parallel region instead of once per program | draft | Owner 2026-11-15 ("yes delay to M5"): deferred to M5 (sprint s14). The M4 primary score is serial -O2, so t... |
 | S13-03 | M4 retrospective - what we did wrong, what worked, and the practice changes carried into the next milestone and the agent-team skill | draft |  |
 | S13-04 | Clean source repositories for a fresh build - GCC-KNC fork and project code without build artifacts, plus a Linux-host build recipe the owner runs on the new workstation | draft |  |
 | S14-01 | 16- and 32-byte GCC generic vectors compile to IMCI in the low lanes of a zmm register, with a by-value ABI, so FFTW's generic-simd128/256 paths run vectorized | draft |  |
+| S14-02 | Software pipelining on KNC - probe whether SMS can run (a KNC counted-loop pattern) and whether it speeds up in-order loops | draft |  |
+| S14-03 | KNC scheduler model completeness - bypasses, folded memory operand cost, pairing by encoding, checked on post-RA schedules | draft |  |
+| S14-04 | M5 measurement method - per-hot-region properties, a lower bound per region, four separately reported outcomes, four measurement levels | draft |  |
+| S14-05 | Paired source-form generality cases for N, C and G code (one algorithm written several ways), unscored, for M5 | draft |  |
+| S14-06 | Branch cost and if-conversion thresholds for KNC from measured branch loss (C10 plus S12-12 G07), judged by cycles | draft |  |
+| S14-07 | C++ abstraction removal on KNC - does LTO work for k1om, and do devirtualization and indirect-call promotion fire at -O2 -march=knc | draft |  |
+| S14-08 | Quantized GEMV kernels on KNC - multi-row activation reuse, FP vs int32 VPMADD231D vs VPERMD lookup table, bandwidth-normalized | draft |  |
+| S14-09 | KNC vs the Z840 host (dual E5-2690 v3) on the same algorithms and numerical contract - where running on the card actually pays | draft |  |
 | S2-01 | Design for zmm and mask registers under -march=knc | Done | The register design for KNC is settled on paper: all 32 zmm and 8 mask registers become usable under -march... |
 | S2-02 | Float and double arguments and results in zmm lane 0 | Done | Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`). |
 | S2-03 | Varargs with the donor's register save area | Done | Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`). |
@@ -283,6 +291,7 @@ Current tickets: `[##################--]` 241 of 258
 
 ## Recent activity
 
+- 2026-11-15 11:59 **S13-01** engineer ask: Primary gate staged: .work/_shared/S13-01/, a74a0c2e; 34 selected binaries built/linted, 17 votes, references, scorer, profile scripts and extensio...
 - 2026-11-15 11:40 **S13-01** lead note: Start now, in parallel with S12-09 (owner 2026-11-15: close M4 fast; PhiWeather holds the card for us from ~18:31Z until M4 ends). Frozen final GCC...
 - 2026-11-15 11:32 **S13-01** lead answer: Implementing the missing readiness is authorized in this ticket. The follow-up promised at S11-18 (2026-11-12 17:35) was never opened, and that gap...
 - 2026-11-15 11:30 **S13-01** engineer ask: ADR-0015 readiness blocks complete gate staging: corpus.py collect compares PB outputs only to donor; parse_native accepts STREAM's Solution Valida...
@@ -290,16 +299,15 @@ Current tickets: `[##################--]` 241 of 258
 - 2026-11-15 11:20 **S12-42** lead note: Owner 2026-11-15 ("I have reset Fable, so subagent back to codex with default selection rule"): Fable override removed; the policy default applies ...
 - 2026-11-15 11:20 **S12-38** lead note: Owner 2026-11-15 ("I have reset Fable, so subagent back to codex with default selection rule"): Fable override removed; the policy default applies ...
 - 2026-11-15 11:20 **S12-34** lead note: Owner 2026-11-15 ("I have reset Fable, so subagent back to codex with default selection rule"): Fable override removed; the policy default applies ...
-- 2026-11-15 11:20 **S12-30** lead note: Owner 2026-11-15 ("I have reset Fable, so subagent back to codex with default selection rule"): Fable override removed; the policy default applies ...
 
 ## Cost
 
 - From the script, engineer: 702 sessions, 1459.5M input tokens
 - From the script, lead: 470 sessions, 134.0M input tokens
-- Started by hand, Claude: 12 sessions, 3596.9M input tokens
+- Started by hand, Claude: 12 sessions, 3600.0M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 36.1 GiB of 100 GiB. 116 GiB free on the drive.
+The project uses 36.3 GiB of 100 GiB. 120 GiB free on the drive.
