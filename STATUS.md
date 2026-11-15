@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-15 05:49.
+Updated automatically at every ticket change. Last update: 2026-11-15 05:50.
 
-**Waiting for you:** S12-31. Run `python tools/pm.py inbox`.
+**Next: GPT-6.1, on S12-30 (Sparse indexed reductions faster than today - vector gather of products with an ordered scalar sum, and indirect prefetch, for CSR-style loops (NPB-CG, HPCG)).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
 Current tickets: `[##################--]` 239 of 255
 
@@ -111,7 +111,7 @@ Current tickets: `[##################--]` 239 of 255
 | S12-28 | dispatch.py refuses to start a second dispatcher on a lane that already has a live one | Done | dispatch.py now refuses to start a second dispatcher on a lane that already has a live one (a lock per lane... |
 | S12-29 | Wrong code - vbroadcastsd reads a 4-byte-aligned SCmode constant (complex float) straight from the constant pool and faults on the card (gcc.c-torture pr38969.c, regression from S11-27) | Done | The pr38969 crash from S11-27 is fixed: GCC-KNC no longer broadcasts a vector from memory aligned below its... |
 | S12-30 | Sparse indexed reductions faster than today - vector gather of products with an ordered scalar sum, and indirect prefetch, for CSR-style loops (NPB-CG, HPCG) | In progress | Lead raises sessions 14 -> 18: progress continues (HPCG dump command fixed, 1d9532db reviewed right); sessi... |
-| S12-31 | HPCG is 1.8% slower with GCC-KNC than with GCC 5.1.1 - find the cause and make it faster (owner: never slower than 5.1.1) | **Waiting for you** | budget: 36744556 input tokens used; the budget is 20000000 |
+| S12-31 | HPCG is 1.8% slower with GCC-KNC than with GCC 5.1.1 - find the cause and make it faster (owner: never slower than 5.1.1) | In progress | Lead raises input_tokens 20M -> 40M (Fable engineer, owner wants Fable used fully): green done at f2cfc87f ... |
 | S12-32 | ICE (reload) in gcc.c-torture O3-vect-pr32243.c on the installed GCC-KNC, found by the S12-21 torture sweep | Done | The -O3 vector reload crash in pr32243 is fixed: byte/word vector extends now reload through an aligned sta... |
 | S12-33 | T2 writes its short-vector test binaries into a per-run folder, so Claude, Codex and lead runs never block each other | Done | T2's short-vector cross-check now writes its binaries into the run's own output folder instead of the share... |
 | S12-34 | Unrecognizable insn for a truncating vector store to a 1-byte-aligned V16QI destination (found by S12-32) | Not started |  |
@@ -280,6 +280,7 @@ Current tickets: `[##################--]` 239 of 255
 
 ## Recent activity
 
+- 2026-11-15 05:50 **S12-31** owner decide: Lead raises input_tokens 20M -> 40M (Fable engineer, owner wants Fable used fully): green done at f2cfc87f / GCC 299aaf16b72; the lead submits it w...
 - 2026-11-15 05:49 **S12-31** engineer escalate: budget: 36744556 input tokens used; the budget is 20000000
 - 2026-11-15 05:48 **S12-37** lead defer: Needs a git write the engineer sandbox cannot do: merge main into s12/S12-37 (branch tip bb3f10cc) in the S12-37 worktree. Since S12-39 (d6b753ab) ...
 - 2026-11-15 05:48 **S12-31** lead answer: Size approved: resubmit with --override 'phase-1 diagnostics reviewed at 7bae9403 (892 lines of tools, 491-line note); GCC is +64/-8; nothing moves...
@@ -287,13 +288,12 @@ Current tickets: `[##################--]` 239 of 255
 - 2026-11-15 05:47 **S12-30** lead escalate: budget: 14 engineer sessions used; the budget is 14
 - 2026-11-15 05:46 **S12-37** engineer ask: bb3f10cc fixes lead card handoff (red ffe52e80): check.py --stage-to explicitly exports successful run binaries; libgcc.py --stage-from reads them....
 - 2026-11-15 05:46 **S12-31** engineer ask: Green is done at f2cfc87f, GCC s12/S12-31 299aaf16b72 (built): both T1 pass, T0-T2 371/0, torture and vect sweeps 0 ICE, A/B staged (python tools/s...
-- 2026-11-15 05:46 **S12-30** lead answer: Yes: run the corrected HPCG dump command in docs/research/s12-30-phase1.md (--application-dumps hpcg). Read 1d9532db: the fix is right. Checked: .w...
 
 ## Cost
 
 - From the script, engineer: 693 sessions, 1392.3M input tokens
 - From the script, lead: 462 sessions, 129.7M input tokens
-- Started by hand, Claude: 12 sessions, 3547.7M input tokens
+- Started by hand, Claude: 12 sessions, 3551.5M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
