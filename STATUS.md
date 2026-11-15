@@ -1,10 +1,10 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-15 12:30.
+Updated automatically at every ticket change. Last update: 2026-11-15 13:41.
 
 **Next: GPT-6.1, on S12-09 (Sprint 12 batch check - integrated themes at the final Sprint 12 head, regression evidence, optional modes frozen).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
-Current tickets: `[##################--]` 241 of 267
+Current tickets: `[#################---]` 241 of 268
 
 ## Milestones
 
@@ -14,7 +14,7 @@ Current tickets: `[##################--]` 241 of 267
 | M1 | Mixed native code | Done | 43 of 43 tickets |
 | M2 | Useful vector target | Done | 51 of 51 tickets |
 | M3 | Runtimes | Done | 48 of 48 tickets |
-| M4 | Broad optimization | In progress | 59 of 64 tickets |
+| M4 | Broad optimization | In progress | 59 of 65 tickets |
 | M5 | Program corpus | In progress | 0 of 21 tickets |
 | M6 | Release | Not started | Not planned in detail yet |
 
@@ -128,6 +128,7 @@ Current tickets: `[##################--]` 241 of 267
 | S13-03 | M4 retrospective - what we did wrong, what worked, and the practice changes carried into the next milestone and the agent-team skill | draft |  |
 | S13-04 | Clean source repositories for a fresh build - GCC-KNC fork and project code without build artifacts, plus a Linux-host build recipe the owner runs on the new workstation | draft |  |
 | S13-05 | model-first skill - a project Claude Code skill that models a hot region and its run-time lower bound before any optimization, plus one sourced KNC machine file | In progress | Yes: submit 6966ce88 with --override 'S13-05 size: 1173 lines are mostly data and docs the ticket requires ... |
+| S13-06 | knc-twin trial and validation - run the KNC core twin on real GCC-KNC loop output, check it against characterization rows and held-out kernels we already timed, and report what it rejects or gets wrong | In progress |  |
 | S14-01 | 16- and 32-byte GCC generic vectors compile to IMCI in the low lanes of a zmm register, with a by-value ABI, so FFTW's generic-simd128/256 paths run vectorized | draft |  |
 | S14-02 | Software pipelining on KNC - probe whether SMS can run (a KNC counted-loop pattern) and whether it speeds up in-order loops | draft |  |
 | S14-03 | KNC scheduler model completeness - bypasses, folded memory operand cost, pairing by encoding, checked on post-RA schedules | draft |  |
@@ -305,10 +306,10 @@ Current tickets: `[##################--]` 241 of 267
 
 - From the script, engineer: 705 sessions, 1466.8M input tokens
 - From the script, lead: 473 sessions, 135.0M input tokens
-- Started by hand, Claude: 13 sessions, 3602.3M input tokens
+- Started by hand, Claude: 13 sessions, 3631.2M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 36.3 GiB of 100 GiB. 119 GiB free on the drive.
+The project uses 36.3 GiB of 100 GiB. 110 GiB free on the drive.
