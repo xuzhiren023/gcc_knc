@@ -1,7 +1,11 @@
 # S12-31: why HPCG is slower with GCC-KNC than with GCC 5.1.1
 
-2026-11-15. **Status after the second card diagnostic:** phase 2 has its red tests and its design
-("Second diagnostic: result" and "Phase 2 design"); green waits for the lead's approval. The compare
+2026-11-15. **Status, phase 2 green:** both changes are in GCC `s12/S12-31` at `299aaf16b72` and the
+two T1 tests pass ("Phase 2: green"). The paired HPCG A/B and two controls are staged for the lead;
+nothing here has run on the card with the new compiler, so the gain is still the diagnostic's
+prediction (about 8% on SpMV and MG, HPCG about 6% above GCC 5.1.1), not a result.
+
+**Status after the second card diagnostic:** the compare
 and its jump must issue as one pair, which an x87 instruction between them prevents: that is worth
 8% on SpMV and 8% on MG in the pilot's own code, several times the loss. Part of the loss (about 1-2%)
 belongs to the process (where the C++ default puts HPCG's coarse arrays), not to generated code.
@@ -351,6 +355,86 @@ the paired HPCG A/B from `tools/hpcg_round.py stage` (S11-28 fixed work, two pai
 two controls: one with no x87 in its loops (expected identical code apart from loop padding) and one
 x87 loop program. x86 identity is the lead's.
 
+## Phase 2: green (GCC `s12/S12-31` at `299aaf16b72`, five commits on `knc` `7a3b34430e3`)
+
+What was built differs from the design in two places, both found by the first build:
+
+- **B needed one more line.** `ix86_default_align` takes loop alignment from the shared per-processor
+  table, not from the KNC cost table, so `"16:8:8"` there changed nothing. `ix86_knc_vectorizer_params`
+  (`i386-knc.cc`) already replaces the function alignment for that reason (S8-08) and now replaces the
+  loop alignment the same way. An explicit `-falign-loops=` still wins. As for functions, an `optimize`
+  attribute or pragma reruns `ix86_default_align` and gets the old unbounded 16 for that function.
+- **A is narrower than designed: x87 in the block and no vector instruction.** With "any block that
+  has an x87 instruction", preheaders that spill an x87 value beside vector setup
+  (`fstps; vbroadcastss; cmp; vpermf32x4; ...; jbe`) had the compare pulled away from the vector
+  instruction it paired with (S6-06) to sit before the jump: one issue more, none saved, and no
+  measurement behind it. The card result covers blocks of x87 and scalar instructions only, and that is
+  now the condition. Blocks with vector instructions, and blocks without x87, are scheduled as before.
+
+Shared i386 code: `x86-tune-sched.cc` only, 5 lines added and 3 removed in 2 hunks (`e3ec6feec45`), both conditions on
+`ix86_schedule == CPU_KNC`. `pass_dep_fusion` calls the same pair hook; for KNC the generic answer was
+true only for a flag setter and its jump (`fuse_mov_and_alu` is not a generic flag), the pass never
+moves a jump (`can_move_insn_p`), and `sched2` clears the group flag before it reads any, so that pass
+does the same as before.
+
+Loops of the two T1 functions (`-O2 -march=knc`), as the lead asked. `row_products`, unrolled by 8
+(the first seven products each end `fmull; faddp` with loads and pointer updates between them), then
+the remainder loop, then the short-count loop; `row_sweep` is the same with `fsubrp`:
+
+```
+.L4:    ...                              .L5:                              .L6:
+        fldl    (%rsi,%rdi,8)                    movslq  (%r9,%rax,4), %rdx        movslq  (%r9,%rax,4), %rdx
+        fmull   -8(%rdx)                         fldl    (%rsi,%rdx,8)             fldl    (%rsi,%rdx,8)
+        faddp   %st, %st(1)                      fmull   (%r8,%rax,8)              fmull   (%r8,%rax,8)
+        cmpl    %r11d, %ecx                      addq    $1, %rax                  addq    $1, %rax
+        jne     .L4                              faddp   %st, %st(1)               faddp   %st, %st(1)
+                                                 cmpl    %eax, %r10d               cmpq    %rax, %r10
+                                                 jg      .L5                       jne     .L6
+```
+
+Before, each had `cmp` one line higher, ahead of the last `faddp`/`fsubrp`. The remainder and
+short-count loops are the measured `mid_0` order (counter, accumulate, compare, jump: -45.6 ns per
+row). In the unrolled loop an x87 instruction precedes the compare, so no integer instruction takes
+it as partner. None of the six is the `mov`-before-`cmp` form. That form does occur outside inner
+loops, for example the outer latch of `knc-tune-align-loops.c` (`leaq; leaq; cmpq; jne`): the
+scheduler is not told which instruction should precede the compare, so the jump gains nothing there
+and loses nothing against before. Each loop head has `.p2align 4,,7` then `.p2align 3`.
+
+All 85 listings of the T1 C sources that compile to assembly, built by `knc` `7a3b34430e3` and by this branch and compared:
+`knc-scheduler.s` and 43 others differ only in `.p2align` lines; seven differ in instruction order,
+always a compare moved down to its jump in a block of x87 and scalar instructions, with the scalar
+instructions around it reordered (`knc-broadcast-load`, `knc-loop-report-rejected`, `knc-perm-loops`, `knc-phinix-nest`,
+`knc-vec-fold-fma` and the two new tests); the rest are identical.
+
+HPCG at the pilot's flags, installed compiler against this branch: 13 of 40 listings change beyond
+`.p2align`. In `ComputeSPMV_ref` the only change is the inner loop, now
+`fldl; fmull; addq; faddp; cmpl; jg`; in `ComputeSYMGS_ref` the two inner loops likewise, and in each
+sweep's row block the length load and its `testl` move down to the `jle`. zlib (no floating point): 0
+of 12 listings change beyond `.p2align`.
+
+### Staged A/B (lead runs it)
+
+`tools/s12_31_ab.py stage` built `.work/_shared/S12-31/ab`: HPCG serial (S11-28's fixed-work
+`hpcg.dat`, 104 cubed), PB-cholesky (x87 inner loops) and zlib (no floating point), each as `before`
+(installed GCC-KNC, which is `knc` `7a3b34430e3`, installed 2026-11-15 01:11) and `after` (this
+branch's `cc1`/`cc1plus` through the same driver). Both arms are assembled and linked by the installed
+driver with its runtimes, so only the generated assembly differs. All six programs lint clean.
+
+```
+python tools/s12_31_ab.py lead
+```
+
+Windows Python, serial launches through `card_run --benchmark` with S11-28's launcher: two pairs per
+profile (full, 3100, 5100), the second pair in the opposite order, HPCG then the two controls. About
+13 minutes per HPCG launch (12 launches), about 15 s and 2 s per control launch (12 each): about 2.7
+hours in all. A launch that passed is not repeated, so the round can be split over card turns
+(`--profile full`, `--program HPCG`); `report` prints the table again. The table gives launch time,
+and for HPCG the rating and the SpMV, MG and total timers, per arm and after/before; it also prints the
+donor's rating range from the S11-28 pilot. No donor launch is in the round.
+
+What would count: HPCG `after` rating above the donor's 0.0861-0.0863 in every profile (predicted
+about 0.091); PB-cholesky `after` not slower than `before` and its arrays the same; zlib within noise.
+
 ## What phase 2 would change (written before the first run; superseded by "Phase 2" above)
 
 - Executed loop padding on KNC: stop aligning loop heads that are entered by fallthrough, or bound the
@@ -385,3 +469,23 @@ x87 loop program. x86 identity is the lead's.
   four pilot page images checked, layout checks, `knc_lint` on all four programs. Log
   `.work/_state/logs/s12_31_stage-20261115-000419.log`.
 - No card job by me, no GCC build, no T1 test (phase 2). x86 not run. No held-out program built or read.
+
+2026-11-15, phase 2 green (GCC `s12/S12-31` at `299aaf16b72`, built by `tools/gcc_build.py --if-stale`,
+log `.work/_state/logs/s12_31_gcc_build-20261115-050001.log`):
+
+- `python tools/check.py t1 --compiler gcc16 --knc-scheduler --tune-align`: 5 of 5 pass, the two new
+  tests among them. Log `.work/_state/logs/check_gcc16_t1-20261115-050204.log`. The first green build
+  passed `knc-scheduler-cmp-jump.c` and still failed `knc-tune-align-loops.c` (the cost-table string
+  alone does not reach `-falign-loops`); fixed in `149e5ee8197`.
+- `python tools/check.py t0 t1 t2 --compiler gcc16`: 371 pass, 0 fail. Log
+  `.work/_state/logs/check_gcc16_t0_t1_t2-20261115-050259.log`.
+- `python tools/torture_compile.py` (2003 files, four levels): 0 ICE; pass 1968/1969/1969/1969,
+  compiler error 33/32/32/32, user inline asm rejected 2 at each level, as in S12-32's sweep. Summary
+  `.work/_shared/S12-31/torture.txt`, log `.work/_state/logs/s12_31_torture-20261115-051713.log`.
+- `python tools/vect_suite.py`: 0 ICE, 23 compile errors, 632 skipped, as in S12-32's sweep. Log
+  `.work/_state/logs/s12_31_vect-20261115-053357.log`.
+- `tools/s12_31_ab.py stage`: pass, six programs built and linted. Log
+  `.work/_state/logs/s12_31_ab_stage-20261115-051303.log`. Its `report` step was tried on the host
+  with the S11-28 captures standing in for the two arms (it reproduces the pilot's 0.981-0.983).
+- No card job by me: the new compiler's code has not run on the card. x86 not run. No held-out program
+  built or read.

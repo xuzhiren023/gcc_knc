@@ -392,7 +392,7 @@ pp.23–24 (threading/ready buffers), with R02 p.56 for pairing restrictions.
 | `fast_prefix` (on) | **off** | 0x66/0x67 prefixes take 2 decode cycles (SSDG p.16). HImode register ALU, `and`+test and `and $-65536` become SImode forms; 16-bit memory operands, stores and compares keep the prefix (no equivalent unprefixed form). T1 `knc-tune-prefix.c`. |
 | `lcp_stall` (on) | on | Avoids 16-bit immediates with a 0x66 prefix; same direction as the prefix cost. |
 | `schedule` (on) | on | KNC scheduler `knc.md` (S6-06). |
-| `fuse_cmp_and_branch_*`, `fuse_alu_and_branch*` (on) | on, inert | Only read by `x86-tune-sched.cc`, where `ix86_macro_fusion_p` already returns false for `CPU_KNC` (S6-06: KNC pairs, it does not fuse). |
+| `fuse_cmp_and_branch_*`, `fuse_alu_and_branch*` (on) | on, inert | Only read by `x86-tune-sched.cc`, where `ix86_macro_fusion_pair_p` hands `CPU_KNC` to `ix86_knc_macro_fusion_pair_p` before reading them. KNC pairs, it does not fuse (S6-06); the KNC hook keeps a scalar flag setter next to the conditional jump that reads it only in a block with an x87 instruction (S12-31: x87 issues alone, so `cmp; faddp; jg` leaves the jump an issue of its own; lead card 2026-11-15, 1.66 ns per iteration, 8% on HPCG's SpMV and MG code). Blocks without x87 are scheduled as before. T1 `knc-scheduler-cmp-jump.c`. |
 | `partial_reg_dependency` (on), `partial_reg_stall` (off), `partial_flag_reg_stall` (off), `movx` (on) | unchanged | No partial-register penalty is documented or measured for KNC; zero-extending loads (`movx`) are one op either way. |
 | `read_modify`, `read_modify_write` (on) | unchanged | P5 turns them off for U/V pairing; KNC's pairing of memory-operand integer forms is not measured (characterization measures vector memory operands only). KNC is not P5 (I-10). |
 | `use_incdec` (off) | unchanged | Off avoids the partial-flags write; no KNC measurement either way. |
@@ -402,14 +402,20 @@ pp.23–24 (threading/ready buffers), with R02 p.56 for pairing restrictions.
 | `use_sahf` (on) | inert | `-march=knc` sets `PTA_NO_SAHF`. |
 | `use_cltd`, `use_bt`, `shift1`, `double_with_add`, `promote_himode_imul`, `promote_qimode`, `himode_math`, `qimode_math`, `unroll_strlen`, `misaligned_move_string_pro_epilogues` (on) | unchanged | Generic scalar code shape; no KNC measurement. |
 | `ext_80387_constants`, `always_fancy_math_387` (on) | unchanged | x87 is KNC's scalar FP unit; no measurement against loading constants from memory. |
-| `align_tight_loops` (on) | **off** (S8-19) | `pass_align_tight_loops` puts `.p2align ceil_log2(size)` with no max-skip before every loop up to `prefetch_block` (64) bytes, for the decoded-icache rules of big cores; KNC has none. Entered by fallthrough, the gap is nops run on every outer trip: m2_mat8 `.L101` got `.p2align 6`, 56 nops per outer trip, 1.105x slower at L2 (lead card 2026-11-10). Loops keep the generic alignment (below). T1 `knc-tune-tight-loops*.c`. |
+| `align_tight_loops` (on) | **off** (S8-19) | `pass_align_tight_loops` puts `.p2align ceil_log2(size)` with no max-skip before every loop up to `prefetch_block` (64) bytes, for the decoded-icache rules of big cores; KNC has none. Entered by fallthrough, the gap is nops run on every outer trip: m2_mat8 `.L101` got `.p2align 6`, 56 nops per outer trip, 1.105x slower at L2 (lead card 2026-11-10). Loops keep the 16-byte alignment with a bounded skip (below). T1 `knc-tune-tight-loops*.c`. |
 | `sse_*`, `avx*`, `inter_unit_*`, `use_gather_*`, `use_scatter_*`, `avoid_*fma*_chains`, `prefer_bcst_from_integer`, `avoid_false_dep_for_bmi` | inert | KNC never sets SSE/AVX/AVX-512F/BMI; IMCI gathers and scatters use their own expanders (`i386-knc.cc`). |
 | every other flag (off in generic) | unchanged | No KNC reason found. |
 
 ### Code alignment
 
-`-mtune=knc` defaults `-falign-functions=64`; loops, jumps and labels keep the generic
-alignment (loops `.p2align 4,,10` then `3`). The lead's A/A pairs on the card (2026-11-09, L2, 4 threads: one
+`-mtune=knc` defaults `-falign-functions=64` and `-falign-loops=16:8:8` (`.p2align 4,,7` then
+`3`); jumps and labels keep the generic alignment. Until S12-31 the KNC table said `16` for loops,
+an unbounded `.p2align 4` (not the `4,,10` this section used to state): a loop entered by
+fallthrough runs its padding on every outer trip, and the assembler fills 9 to 15 bytes with one
+nop carrying `66`/`2e` prefixes, two decode cycles each (R02 p.56, verified in the source;
+production or pre-production hardware not stated there). Lead card 2026-11-15, one core: about
+1.5 ns per such prefix after the second per trip, 0.3% and 0.5% on HPCG's sparse kernels
+(`docs/research/s12-31-hpcg.md`). T1 `knc-tune-align-loops.c`. The lead's A/A pairs on the card (2026-11-09, L2, 4 threads: one
 `kernels-gcc.s` linked twice, the second copy shifted half a line, a whole line at 64) measure
 the placement swing as the ratio away from 1.00:
 
@@ -420,7 +426,7 @@ the placement swing as the ratio away from 1.00:
 | 32 | 0.764 | 1.005 | 1.004 | 1.074 | 1.051 |
 | 64 | 1.001 | 1.018 | 1.001 | 1.006 | 1.002 |
 
-64 removes the mat8 swing. Loops stay generic: `-falign-loops=64` has no max-skip, so an inner
+64 removes the mat8 swing. Loops stay at 16: `-falign-loops=64` has no max-skip, so an inner
 loop entered by fallthrough (mat8 `.L101`) ran up to 63 bytes of nops per outer trip. Against
 knc with only `.p2align` changed (lead, card 2026-11-10) the loop-and-function 64 build ran
 mat8 1.106, mat16 1.173, short 5 1.048/1.027, short 13 1.044/1.052 and stencil2 L1 1.064
