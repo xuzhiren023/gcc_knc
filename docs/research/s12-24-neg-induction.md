@@ -58,3 +58,18 @@ ICE.
 
 KNC has no integer vector negate, so `x[i] = -y[i]` on integers is not vectorized, and after the
 planned fix these loops get a scalar epilogue instead of a masked one.
+
+## Results (2026-11-14, GCC `e3c5b822619` on knc `2e70e4115e2`, lane gcc build)
+
+Logs are in `.work/_state/logs`.
+
+- Build: PASS, `gcc_build-20261114-210033.log`.
+- `check t1 --compiler gcc16 --neg-induction`: PASS, `check_gcc16_t1-20261114-211853.log`.
+- T0-T2: PASS, `check_gcc16_t0_t1_t2-20261114-212041.log`.
+- rtrn, sfclay1d, kfcps, advance_uv and remez.f90 compile with the build-tree gfortran and the
+  S11-26 flags, no ICE: `S12_24_repro-20261114-213524.log` (`.work/_shared/S12-24/repro.sh`). Not
+  compiled with the installed prefix, which is older than this fix.
+- ICE sweeps over the torture compile corpus (2003 files), `-O2 -ftree-vectorize` and `-O3`: 1969
+  pass, 0 ICE, 32 compiler error, 2 user inline asm at each level, the S12-29 counts:
+  `S12_24_sweep-20261114-213554.log`.
+- x86 identity: not run. Card: nothing to run, the test is compile-only.
