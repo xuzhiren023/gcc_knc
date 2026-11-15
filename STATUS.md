@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-14 21:31.
+Updated automatically at every ticket change. Last update: 2026-11-14 21:32.
 
 **Next: the tech lead, on S12-21.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
@@ -110,7 +110,7 @@ Current tickets: `[##################--]` 230 of 246
 | S12-27 | Latency-aware scalar loops - GCC-KNC unrolls and interleaves independent iterations and hoists conversions so one thread's every-other-cycle issue and long latencies are hidden automatically | draft |  |
 | S12-28 | dispatch.py refuses to start a second dispatcher on a lane that already has a live one | Done | dispatch.py now refuses to start a second dispatcher on a lane that already has a live one (a lock per lane... |
 | S12-29 | Wrong code - vbroadcastsd reads a 4-byte-aligned SCmode constant (complex float) straight from the constant pool and faults on the card (gcc.c-torture pr38969.c, regression from S11-27) | Done | The pr38969 crash from S11-27 is fixed: GCC-KNC no longer broadcasts a vector from memory aligned below its... |
-| S12-30 | Sparse indexed reductions faster than today - vector gather of products with an ordered scalar sum, and indirect prefetch, for CSR-style loops (NPB-CG, HPCG) | In progress | The sparse-loop Phase 1 harness is accepted: it fails only because the three new routes do not exist yet, a... |
+| S12-30 | Sparse indexed reductions faster than today - vector gather of products with an ordered scalar sum, and indirect prefetch, for CSR-style loops (NPB-CG, HPCG) | Question for the tech lead | 429c7653: A/B/A+B staged; target build/lint PASS; host model 599300 checks PASS. Log: .work/_state/logs/s12... |
 | S12-31 | HPCG is 1.8% slower with GCC-KNC than with GCC 5.1.1 - find the cause and make it faster (owner: never slower than 5.1.1) | lead | Needs one card run by the interactive lead. Phase 1 at 6b413629 reviewed and sound; staged binary exists. I... |
 | S13-01 | M4 final gate - stage the ADR-0015 gate run at the final head (17 programs, held-out unsealed, six pairs, three profiles) | draft |  |
 | S13-02 | Libgomp per-region thread density - choose 1-4 workers per core per parallel region instead of once per program | draft |  |
@@ -271,6 +271,7 @@ Current tickets: `[##################--]` 230 of 246
 
 ## Recent activity
 
+- 2026-11-14 21:32 **S12-30** engineer ask: 429c7653: A/B/A+B staged; target build/lint PASS; host model 599300 checks PASS. Log: .work/_state/logs/s12_30_phase1_routes-20261114-213007.log. A...
 - 2026-11-14 21:31 **S12-21** engineer ask: df7f240e: T0 passed; corrected T1 IMUL scan is red on installed/green on gcc2, other T1 passed. Torture: 8012 cases, 0 ICEs. Vector O3-vect-pr32243...
 - 2026-11-14 21:23 **S12-30** lead approve-red: The sparse-loop Phase 1 harness is accepted: it fails only because the three new routes do not exist yet, and its exact, ordering, 1-ULP and guard-...
 - 2026-11-14 21:19 **S12-31** lead defer: Needs one card run by the interactive lead. Phase 1 at 6b413629 reviewed and sound; staged binary exists. In our exclusive card turn run the comman...
@@ -278,7 +279,6 @@ Current tickets: `[##################--]` 230 of 246
 - 2026-11-14 21:14 **S12-31** engineer ask: Phase 1 at 6b413629, see docs/research/s12-31-hpcg.md. Loss is only SpMV (+2.1%) and SymGS/MG (+3.9%). Likely cause, unproven: -falign-loops=16 pad...
 - 2026-11-14 20:59 **S12-30** lead changes: Red not accepted: wrong oracle, and nothing in Phase 1 can turn it green. (1) Route A is eligible. ADR-0003 item 2 and DEVELOPMENT_CYCLE Oracles: x...
 - 2026-11-14 20:56 **S12-30** engineer red: f36bc172: host x87 model FAIL as intended at row lengths 2/13/27: -1+(1+2^-27)*(1-2^-27) yields -2^-54; double products yield zero. Both target sca...
-- 2026-11-14 20:56 **S12-24** lead approve-red: The WRF REMEZ compiler crash is now reproduced by a 10-line k=-k loop test (int and unsigned char) that fails with the ticket's ICE, and the root c...
 
 ## Cost
 
