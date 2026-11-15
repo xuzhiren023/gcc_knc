@@ -1,10 +1,10 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-15 00:46.
+Updated automatically at every ticket change. Last update: 2026-11-15 00:56.
 
-**Next: the tech lead, on S12-32.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: GPT-6.1, on S12-26 (WRF hot scalar routines - classify with the S12-19 triage tool and stage bitwise-safe per-file flag arms for PhiWeather to time).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
-Current tickets: `[##################--]` 234 of 249
+Current tickets: `[##################--]` 235 of 249
 
 ## Milestones
 
@@ -14,7 +14,7 @@ Current tickets: `[##################--]` 234 of 249
 | M1 | Mixed native code | Done | 43 of 43 tickets |
 | M2 | Useful vector target | Done | 51 of 51 tickets |
 | M3 | Runtimes | Done | 48 of 48 tickets |
-| M4 | Broad optimization | In progress | 52 of 67 tickets |
+| M4 | Broad optimization | In progress | 53 of 67 tickets |
 | M5 | Program corpus | Not started | Not planned in detail yet |
 | M6 | Release | Not started | Not planned in detail yet |
 
@@ -112,7 +112,7 @@ Current tickets: `[##################--]` 234 of 249
 | S12-29 | Wrong code - vbroadcastsd reads a 4-byte-aligned SCmode constant (complex float) straight from the constant pool and faults on the card (gcc.c-torture pr38969.c, regression from S11-27) | Done | The pr38969 crash from S11-27 is fixed: GCC-KNC no longer broadcasts a vector from memory aligned below its... |
 | S12-30 | Sparse indexed reductions faster than today - vector gather of products with an ordered scalar sum, and indirect prefetch, for CSR-style loops (NPB-CG, HPCG) | lead | Needs the Step 1 card run (lead, exclusive): tools/card_run --threads 1 --timeout 590, binary .work/_shared... |
 | S12-31 | HPCG is 1.8% slower with GCC-KNC than with GCC 5.1.1 - find the cause and make it faster (owner: never slower than 5.1.1) | lead | Needs the interactive lead. (1) Card, our exclusive turn: the 4 commands in docs/research/s12-31-hpcg.md 'S... |
-| S12-32 | ICE (reload) in gcc.c-torture O3-vect-pr32243.c on the installed GCC-KNC, found by the S12-21 torture sweep | Waiting for review | Green: knc f559e49271c (imci.md Bm->Ba) + 6b79c6f0566 (sse.md: extend expanders passed a folded under-align... |
+| S12-32 | ICE (reload) in gcc.c-torture O3-vect-pr32243.c on the installed GCC-KNC, found by the S12-21 torture sweep | Done | The -O3 vector reload crash in pr32243 is fixed: byte/word vector extends now reload through an aligned sta... |
 | S12-33 | T2 writes its short-vector test binaries into a per-run folder, so Claude, Codex and lead runs never block each other | Done | T2's short-vector cross-check now writes its binaries into the run's own output folder instead of the share... |
 | S12-34 | Unrecognizable insn for a truncating vector store to a 1-byte-aligned V16QI destination (found by S12-32) | Not started |  |
 | S13-01 | M4 final gate - stage the ADR-0015 gate run at the final head (17 programs, held-out unsealed, six pairs, three profiles) | draft |  |
@@ -274,6 +274,7 @@ Current tickets: `[##################--]` 234 of 249
 
 ## Recent activity
 
+- 2026-11-15 00:56 **S12-32** lead approve: The -O3 vector reload crash in pr32243 is fixed: byte/word vector extends now reload through an aligned stack slot (imci.md Bm to Ba) and the exten...
 - 2026-11-15 00:46 **S12-26** lead answer: Lead: authorized. One diagnostic-only -S pass on the same six sources with the exact S11-26 flags plus -g and -fdump-tree-aprefetch-details (and -f...
 - 2026-11-15 00:45 **S12-26** engineer ask: 3bbc33a7: partial loop list + 10 reduced shapes in docs/research/s12-26-wrf-scalar.md. Six exact-flag -S compiles and shape compile PASS; ELF/funct...
 - 2026-11-15 00:35 **S12-26** lead answer: Static, unsampled classification; no WRF adapter and no change to vec_triage.py. (1) Hotness: take the routine ranking from the PhiWeather shares a...
@@ -281,16 +282,15 @@ Current tickets: `[##################--]` 234 of 249
 - 2026-11-15 00:30 **S11-26** lead approve: WRF 4.8.0 OpenMP (wrf.exe, real.exe) now builds at -mphinix -mknc-card=7120 with no per-file workarounds on knc 71e9b2d00fc and is staged in wrf-tr...
 - 2026-11-15 00:18 **S11-26** engineer submit: PASS with installed knc 71e9b2d00fc: four original reproducers plus REMEZ; smpar build/link (66.2 min), check-wrf-links.py, ELF/dependency checks, ...
 - 2026-11-15 00:12 **S12-31** lead defer: Needs the interactive lead. (1) Card, our exclusive turn: the 4 commands in docs/research/s12-31-hpcg.md 'Second diagnostic' at 7bae9403 (1 core, a...
-- 2026-11-15 00:10 **S12-31** engineer ask: At 7bae9403, docs/research/s12-31-hpcg.md 'First diagnostic: result' onwards. Padding confirmed but small (0.3-0.5%, then level with donor); pilot ...
 
 ## Cost
 
 - From the script, engineer: 668 sessions, 1328.8M input tokens
 - From the script, lead: 442 sessions, 123.6M input tokens
-- Started by hand, Claude: 12 sessions, 3432.2M input tokens
+- Started by hand, Claude: 12 sessions, 3434.6M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 34.2 GiB of 100 GiB. 135 GiB free on the drive.
+The project uses 34.4 GiB of 100 GiB. 135 GiB free on the drive.
