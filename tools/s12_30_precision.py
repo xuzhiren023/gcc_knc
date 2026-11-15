@@ -227,7 +227,7 @@ class Gimple:
 
 
 def t1(runner):
-    """Phase-two red: automatic hints in strict indexed reductions only."""
+    """Default-on automatic hints in strict indexed reductions only."""
     OUT.mkdir(exist_ok=True)
     source_flags = ['-std=gnu99', '-DPHASE2_T1', '-march=knc',
                     '--sysroot=' + str(runner.sysroot)]
@@ -237,10 +237,11 @@ def t1(runner):
     counts = {}
     default_assembly = None
     for mode, options, expected in (
-            ('controls', ['-O2', '-ffp-contract=off',
+            ('controls', ['-O2', '-ffp-contract=off', disabled,
                           '-fprefetch-loop-arrays'], False),
             ('disabled', ['-O2', '-ffp-contract=off', disabled,
                           '-fprefetch-loop-arrays'], False),
+            ('default', ['-O2', '-ffp-contract=off'], True),
             ('off', ['-O2', '-ffp-contract=off', enabled,
                      '-fprefetch-loop-arrays'], True),
             ('fast', ['-O2', '-ffp-contract=fast', enabled,
@@ -281,7 +282,7 @@ def t1(runner):
             runner.result('t1 sparse ' + mode + ' pre-ivopts bounds dump',
                           ['missing aprefetch function ' + name for name in missing])
         assembly = asm_bodies(asm.read_text())
-        if mode == 'controls':
+        if mode == 'default':
             default_assembly = assembly
         counts[mode] = {name: len(re.findall(r'\bvprefetch\w*\b', assembly[name]))
                         for name in eligible}
@@ -300,8 +301,9 @@ def t1(runner):
         if mode == 'disabled':
             runner.result('t1 sparse disabled keeps stream prefetch enabled',
                           [] if counts[mode]['sparse_rows'] > 0 else ['no stream hints in CSR'])
-            runner.result('t1 sparse default-off probe identity',
-                          [name + ' differs from explicit switch-off'
+        if mode == 'off':
+            runner.result('t1 sparse default-on probe identity',
+                          [name + ' differs from default -O2'
                            for name in (*eligible, 'volatile_indices',
                                         'sentinel_slice', 'alias_bounds')
                            if default_assembly is None
@@ -337,18 +339,19 @@ def t1(runner):
                     errors.append('unexpected vector reduction or contraction')
             runner.result('t1 sparse ' + mode + ' ' + name, errors)
 
-    # Lead requested that the measured -fno-tree-vectorize baseline be checked
-    # against ordinary -O2. Use the installed Phase 1 compiler, not gcc2 xgcc.
+    # Preserve the scalar baseline comparison with the current compiler's
+    # explicit switch-off build now that plain -O2 enables the new policy.
     baselines = []
     for label, extra in (('plain', []), ('novect', ['-fno-tree-vectorize'])):
         asm = OUT / ('phase1-baseline-' + label + '.s')
-        runner.command(corpus.compiler_path(corpus.KNC), '-O2', '-std=gnu99',
+        runner.command(runner.cc, *runner.cc_flags, '-O2', '-std=gnu99',
+                       '--sysroot=' + str(runner.sysroot), disabled,
                        '-march=knc', '-ffp-contract=off', '-DPREFIX=knc_',
                        *extra, '-S', SOURCE, '-o', asm)
         baselines.append(asm_bodies(asm.read_text())['knc_scalar'])
-    runner.result('t1 phase1 installed -O2 scalar baseline identity',
+    runner.result('t1 switch-off -O2 scalar baseline identity',
                   [] if baselines[0] == baselines[1]
-                  else ['plain -O2 scalar function differs from measured baseline; inspect assembly'])
+                  else ['switch-off -O2 scalar function differs with vectorization disabled; inspect assembly'])
     runner.say('S12-30 phase2 outputs: ' + str(OUT) + '/phase2-*; no native phase2 run')
 
 
@@ -515,11 +518,47 @@ def ice_sweep(corpora=('gcc.c-torture/compile', 'gcc.dg/vect')):
     return int(bool(totals['ICE'] or totals['timeout']))
 
 
+def application_dumps():
+    """Inspect the actual class-A CG and HPCG translation units, without linking."""
+    gcc = Path(storage.gcc_build_dir(ROOT.parent.parent, '2')) / 'gcc'
+    sources = SHARED / 'corpus-build/sources'
+    npb = sources / 'NPB3.4.2/NPB3.4-OMP'
+    hpcg = sources / 'hpcg-3.1/src'
+    flags = ['-B' + str(gcc) + '/', '--sysroot=' + str(TC/'sysroot'),
+             '-O2', '-march=knc', '-mknc-indirect-prefetch', '-fopenmp']
+    includes = ['-I' + str(SHARED/'corpus-build/gcc-knc/0/NPB-CG'),
+                '-I' + str(npb/'common'), '-J' + str(OUT),
+                '-fintrinsic-modules-path=' + str(gcc.parent/'k1om-mpss-linux/libgfortran')]
+    cxx_headers = gcc.parent/'k1om-mpss-linux/libstdc++-v3/include'
+    cxx_flags = ['-DHPCG_NO_MPI', '-I' + str(hpcg), '-nostdinc++']
+    for directory in (cxx_headers, cxx_headers/'k1om-mpss-linux', cxx_headers/'backward'):
+        cxx_flags += ['-isystem', str(directory)]
+    run(gcc/'gfortran', *flags, *includes, '-c', npb/'CG/cg_data.f90',
+        '-o', OUT/'application-cg-data.o')
+    units = [('cg', gcc/'gfortran', npb/'CG/cg.f90', includes),
+             ('spmv', gcc/'xg++', hpcg/'ComputeSPMV_ref.cpp', cxx_flags),
+             ('symgs', gcc/'xg++', hpcg/'ComputeSYMGS_ref.cpp', cxx_flags)]
+    for name, cc, source, extra in units:
+        dump = OUT/('application-' + name + '.aprefetch')
+        dump.unlink(missing_ok=True)
+        run(cc, *flags, *extra, '-fdump-tree-aprefetch-details=' + str(dump),
+            '-S', source, '-o', OUT/('application-' + name + '.s'))
+        if not dump.exists():
+            raise RuntimeError('missing application dump: ' + str(dump))
+        matches = [line for line in dump.read_text().splitlines()
+                   if 'Bounded indirect prefetch' in line]
+        print('APPLICATION_DUMP', name, 'transformations=' + str(len(matches)),
+              *matches, 'path=' + str(dump), flush=True)
+    return 0
+
+
 def main():
     if sys.platform != 'cygwin':
         raise RuntimeError('use shared Cygwin python3')
     OUT.mkdir(exist_ok=True)
     os.environ['PATH'] = ':'.join(map(str, [TC/'cross/bin', TC/'cygwin/bin', os.environ['PATH']]))
+    if sys.argv[1:] == ['--application-dumps']:
+        return application_dumps()
     if sys.argv[1:] == ['--compiler-proof']:
         return build_compiler_proof()
     if sys.argv[1:] == ['--ice-sweep']:

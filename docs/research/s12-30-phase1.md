@@ -990,3 +990,87 @@ binary and return its complete output. No GCC change/build in this session;
 native proof, measured threshold choice, default-on, application A/B and
 x86 identity remain pending. The intermediate T1 and T0 passes do not
 make the ticket ready to submit.
+
+### Real application dump check and default-on preparation (2026-11-15)
+
+Followed the 05:19 ruling: no merge/rebase and no sandbox T2. The lead
+reported T2 36/0 at GCC `bfc31546ede`; the earlier pr32243 failure is fixed
+there and pr123221 is tracked as S12-38. No sweep or T0/T1 was repeated.
+
+Added `--application-dumps` to the existing Python tool. It compiles the
+actual NPB 3.4.2 class-A Fortran CG translation unit and HPCG 3.1 reference
+SpMV/SymGS translation units at `-O2 -march=knc -mknc-indirect-prefetch
+-fopenmp`, using lane gcc2. Sources stay in the shared corpus; outputs
+stay under `.work/_shared/S12-30/application-*`. This is compilation and
+dump inspection only, not a native or whole-application performance test.
+
+CG compiled successfully at `bfc31546ede` and its aprefetch dump contains
+zero `Bounded indirect prefetch` diagnostics. Both hot sparse nests are
+missed, not merely excluded by the 16384-row policy:
+
+| Nest in `conj_grad_._omp_fn.0` | Evidence in `application-cg.aprefetch` |
+| --- | --- |
+| Repeated `q = A.p` | Lines 5576-5592: `j_139 = _137 + 1`, descriptor data/offset loads and `# j_26 = PHI <j_139(31), _145(71)>`. Lines 5663-5668: column load, conversion, descriptor offset, indexed RHS load, product and ordered addition. |
+| Residual `r = A.z` | Lines 4997-5012: `j_292 = _290 + 1`, descriptor data/offset loads and `# j_13 = PHI <j_292(15), _298(63)>`. Lines 5084-5089: column load, conversion, descriptor offset, indexed RHS load, product and ordered addition. |
+
+For example the first nest has:
+
+```text
+5663: _159 = MEM <integer(kind=4)[0:]> [(integer(kind=4)[0:] *)_156][_158];
+5664: _160 = (integer(kind=8)) _159;
+5665: _161 = _155 + _160;
+5666: _162 = MEM <real(kind=8)[0:]> [(real(kind=8)[0:] *)_154][_161];
+5667: _163 = _153 * _162;
+5668: suml_164 = _163 + suml_364;
+```
+
+These references are array references with descriptor offsets, whereas
+`indirect_load_ref` accepts only a direct zero-offset MEM_REF and
+`indirect_product` expects an SSA pointer-plus address. That alone rejects
+the products. Cross-row matching also requires an outer start of zero;
+the OpenMP partition starts at a thread-dependent value plus one. The
+outer continuation compares the current row against the inclusive end
+(lines 5027 and 5606), whereas `indirect_counted` matches the incremented
+IV. Supporting these forms requires a general recognition/bounds change,
+not a program-name exception or a lower threshold. The stream hints in
+this dump do not establish indirect-prefetch coverage.
+
+The application-dump command had two infrastructure failures:
+
+1. First attempt: CG could not find `ieee_arithmetic.mod`. Fixed by passing
+   the lane build's `k1om-mpss-linux/libgfortran` as the intrinsic module
+   directory. Log: `.work/_state/logs/s12_30_application_dumps-20261115-052221.log`.
+2. Second attempt: CG succeeded, then HPCG SpMV stopped at
+   `bits/stl_pair.h:65:11: fatal error: compare: No such file or directory`.
+   The explicit C++ build-tree include directory lacks `compare`; the
+   corresponding installed lane-2 include directory contains it:
+   `.work/_shared/gcc-knc-16.2.0-2/k1om-mpss-linux/include/c++/16.2.0`.
+   Log: `.work/_state/logs/s12_30_application_dumps-20261115-052258.log`.
+
+No third attempt was made, per AGENTS.md. SpMV has no completed dump and
+SymGS was not compiled. Their char-count promotion, struct-field loads
+and minus reductions therefore remain source-level coverage risks, not
+newly proven dump misses. A resumed run should compile only those two
+remaining translation units, with the complete lane-2 C++ headers.
+
+Prepared default-on separately in the GCC tree as directed. The KNC
+option defaults now enable indirect prefetch at O2 and above, excluding
+size optimization, with `SET_OPTION_IF_UNSET` preserving an explicit
+`-mno-knc-indirect-prefetch`. The existing pass gate still honors
+`-fno-prefetch-loop-arrays`; the policy hook still requires TARGET_KNC.
+One named constant, `knc_indirect_prefetch_min_trips`, supplies the
+outer-row and lone-loop trip cutoff. Its value remains **provisional
+16384**, pending window 6; no measured threshold is claimed.
+
+The prepared T1 keeps scanner controls explicitly switch-off, checks
+plain default O2 for bounds-safe indirect hints, compares those probe
+bodies with explicit switch-on, and moves the scalar baseline identity
+comparison to the current compiler's switch-off build. These changes
+are unbuilt/untested; the accepted intermediate default-off green is
+the last T1 result. No GCC build is requested before the queued
+compiler-gate result. No coverage fix, new native result or application
+A/B is claimed; x86 not run.
+
+Default-on preparation commit: GCC `36cb8b9ff30`. Main-worktree whitespace
+and GCC diff against `knc` are clean; edits preserve LF. The installed
+and build-tree compilers still represent `bfc31546ede`, not this commit.
