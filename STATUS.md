@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-14 21:23.
+Updated automatically at every ticket change. Last update: 2026-11-14 21:24.
 
 **Next: GPT-6.1, on S12-21 (Scheduling model for M4's serial runs - measure density-1 tuning and the integer-multiply cost against today's density-4 defaults (S12-14 B02, B04, B05)).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
@@ -283,7 +283,7 @@ Current tickets: `[##################--]` 230 of 246
 ## Cost
 
 - From the script, engineer: 655 sessions, 1290.7M input tokens
-- From the script, lead: 432 sessions, 120.5M input tokens
+- From the script, lead: 433 sessions, 121.0M input tokens
 - Started by hand, Claude: 12 sessions, 3361.2M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
