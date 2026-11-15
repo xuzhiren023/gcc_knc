@@ -2,7 +2,7 @@
 
 Updated automatically at every ticket change. Last update: 2026-11-15 05:46.
 
-**Next: GPT-6.1, on S12-30 (Sparse indexed reductions faster than today - vector gather of products with an ordered scalar sum, and indirect prefetch, for CSR-style loops (NPB-CG, HPCG)).** Run `python tools/dispatch.py`, or ask the tech lead to.
+**Next: the tech lead, on S12-37.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[##################--]` 239 of 255
 
@@ -117,7 +117,7 @@ Current tickets: `[##################--]` 239 of 255
 | S12-34 | Unrecognizable insn for a truncating vector store to a 1-byte-aligned V16QI destination (found by S12-32) | Not started |  |
 | S12-35 | Clean single-compiler WRF build as dm+sm (MPI + OpenMP) against PhiWeather's k1om MPICH, plus a build recipe PhiWeather can apply to its own patched tree | Done | Upstream WRF 4.8.0 now builds clean as dm+sm (MPI + OpenMP) with the one GCC-KNC compiler (knc 7a3b34430e3,... |
 | S12-36 | card_run yields to a foreign queued row in the middle of our own turn - honor an open turn-level reservation so a multi-job window is not refused | Done | card_run --benchmark now keeps our turn across several jobs while an open claude-turn- ledger row was queue... |
-| S12-37 | Every T1/T2 check writes into the run's own output folder - no fixed paths in shared ticket folders (S10-01 vecarg, and any others) | In progress | One defect: some of the moved outputs were card inputs. tools/libgcc.py native() (lead card run) still read... |
+| S12-37 | Every T1/T2 check writes into the run's own output folder - no fixed paths in shared ticket folders (S10-01 vecarg, and any others) | Question for the tech lead | bb3f10cc fixes lead card handoff (red ffe52e80): check.py --stage-to explicitly exports successful run bina... |
 | S12-38 | ICE in the SLP vectorizer on gcc.dg vect-pr123221.c at -O3 -march=knc (found by S12-30's torture sweep) | Not started |  |
 | S12-39 | pm.py submit stops demanding an engineer-side rebase that the sandbox cannot perform (Permission denied on .git/worktrees/<id>/rebase-merge) | Done | Engineers no longer need to rebase before submitting: submit only refuses when main has real changes the br... |
 | S12-40 | Indirect prefetch recognizes Fortran sparse loops (array descriptors, ARRAY_REF offsets, nonzero and OpenMP-outlined starts) so NPB-CG benefits | draft |  |
@@ -280,6 +280,7 @@ Current tickets: `[##################--]` 239 of 255
 
 ## Recent activity
 
+- 2026-11-15 05:46 **S12-37** engineer ask: bb3f10cc fixes lead card handoff (red ffe52e80): check.py --stage-to explicitly exports successful run binaries; libgcc.py --stage-from reads them....
 - 2026-11-15 05:46 **S12-30** lead answer: Yes: run the corrected HPCG dump command in docs/research/s12-30-phase1.md (--application-dumps hpcg). Read 1d9532db: the fix is right. Checked: .w...
 - 2026-11-15 05:45 **S12-39** lead approve: Engineers no longer need to rebase before submitting: submit only refuses when main has real changes the branch lacks, and approve merges main (and...
 - 2026-11-15 05:34 **S12-39** engineer submit: Implementation committed at 29afee64. Red run failed as expected; all 23 host tests passed. Log: .work/_state/logs/s12_39_integration-20261115-0528...
@@ -287,7 +288,6 @@ Current tickets: `[##################--]` 239 of 255
 - 2026-11-15 05:33 **S12-30** engineer ask: 1d9532db: HPCG retry with installed C++ headers failed at ComputeSPMV_ref.cpp:28: omp.h missing. Prior launch failed: python3.exe absent; corrected...
 - 2026-11-15 05:32 **S12-37** lead changes: One defect: some of the moved outputs were card inputs. tools/libgcc.py native() (lead card run) still reads .work/_shared/tmp/S2-07/*-libgcc.mic, ...
 - 2026-11-15 05:31 **S12-39** engineer ask: Implementation committed at 29afee64; red run failed as expected and all 23 host tests passed. Submit refused only the soft test/code ratio: 123 te...
-- 2026-11-15 05:31 **S12-37** engineer submit: T1/T2 checks keep every generated file inside runner.out (9 modules incl. scalar_abi, libgcc, secondary_reload, storent, x87_spill); red b7660998 d...
 
 ## Cost
 
