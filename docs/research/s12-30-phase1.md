@@ -640,3 +640,41 @@ Per AGENTS.md's two-failed-attempt rule, ask whether to prove bounds in
 the transformation's SSA dump before ivopts (retaining optimized-dump
 loop controls/count checks), or add paired pointer-PHI recurrence
 normalization to the optimized-dump checker. No checks were weakened.
+
+### Pre-ivopts bounds dump attempt (2026-11-15)
+
+Applied the lead's 02:48 ruling: controls explicitly enable stream
+prefetch; bounds checks use `-fdump-tree-aprefetch` for controls and
+positive modes. Missing dumps or required function bodies fail. Presence,
+post-ivopts loop control, negatives, instruction counts, scalar folds and
+installed baseline identity still use optimized GIMPLE/assembly.
+
+The one T1 attempt still fails CSR and HPCG bounds controls, in addition
+to the four expected missing-switch compilations. Compile/assemble/lint,
+the required aprefetch bodies, presence controls, row-local rejection,
+scalar folds and baseline identity pass. Log:
+`.work/_state/logs/s12_30_phase2_aprefetch_red-20261115-030417.log`;
+inner results: `.work/_state/logs/check_gcc16_t1-20261115-030418.log`.
+
+Reduced GIMPLE in `.work/_shared/S12-30/phase2-controls.aprefetch`:
+
+* `explicit_csr` (function begins at line 2420): `_22 = (unsigned long)
+  row_27(D); _21 = _22 + _6; _7 = (const int *) _21;`, where
+  `_6 = (_1 + 4) * 4` and `_1` comes from the outer `i_40` PHI.
+  `bound_30 = *_7` is guarded by `rows_25(D) - i_40 > 3`;
+  the hinted index load is guarded by `bound_30 - j_41 > 32`.
+* `explicit_hpcg` (function begins at line 2675): `_35 = (unsigned long)
+  count_24(D); _19 = _35 + _3; _4 = (const int *) _19;` and
+  `_18 = (unsigned long) cols_26(D); _17 = _18 + _6;
+  _7 = (const int * const *) _17;`. Both offsets use `_31 + 1`,
+  scaled by four/eight. `_5 = *_4; if (_5 > j_37)` guards
+  `_8 = *_7; _11 = _8 + j_37 * 4; _12 = *_11` feeding the hint.
+
+Unlike the optimized dump, these addresses retain the outer integer PHI.
+The affine cast-removal regex accepts `long unsigned int` but does not
+accept `unsigned long` (its `long ` alternative requires a trailing space).
+Thus these pointer-to-integer casts remain unsupported expressions.
+This is a source inspection diagnosis, not a verified fix. Per ruling
+item 4, stopped after the failed aprefetch controls; no affine walker
+extension, second test, GCC change, build or native run. Ask whether to
+make the small cast-token parsing correction and rerun the T1 red.

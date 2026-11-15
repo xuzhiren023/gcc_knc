@@ -235,7 +235,8 @@ def t1(runner):
     eligible = ('sparse_rows', 'sparse_slice', 'sparse_hpcg')
     counts = {}
     for mode, options, expected in (
-            ('controls', ['-O2', '-ffp-contract=off'], False),
+            ('controls', ['-O2', '-ffp-contract=off',
+                          '-fprefetch-loop-arrays'], False),
             ('disabled', ['-O2', '-ffp-contract=off', disabled,
                           '-fprefetch-loop-arrays'], False),
             ('off', ['-O2', '-ffp-contract=off', enabled,
@@ -245,10 +246,15 @@ def t1(runner):
             ('size', ['-Os', '-ffp-contract=off', enabled], False)):
         asm = OUT / ('phase2-' + mode + '.s')
         dump = OUT / ('phase2-' + mode + '.optimized')
+        bounds_dump = OUT / ('phase2-' + mode + '.aprefetch')
         # Do not let an old dump masquerade as output from an unsupported flag.
         asm.unlink(missing_ok=True)
         dump.unlink(missing_ok=True)
+        bounds_dump.unlink(missing_ok=True)
+        bounds_flags = (['-fdump-tree-aprefetch=' + str(bounds_dump)]
+                        if mode == 'controls' or expected else [])
         compiled = runner.command(runner.cc, *runner.cc_flags, *source_flags, *options,
+                                  *bounds_flags,
                                   '-fdump-tree-optimized=' + str(dump), '-S', SOURCE,
                                   '-o', asm, check=False)
         if compiled.returncode:
@@ -261,6 +267,17 @@ def t1(runner):
         runner.result('t1 sparse ' + mode + ' compile/assemble/lint', [])
         chunks = re.split(r'^;; Function (\w+) .*$', dump.read_text(), flags=re.M)
         bodies = dict(zip(chunks[1::2], chunks[2::2]))
+        bounds_bodies = {}
+        if bounds_flags:
+            required = (('explicit_csr', 'explicit_rowlocal', 'explicit_hpcg')
+                        if mode == 'controls' else eligible)
+            if bounds_dump.exists():
+                chunks = re.split(r'^;; Function (\w+) .*$',
+                                  bounds_dump.read_text(), flags=re.M)
+                bounds_bodies = dict(zip(chunks[1::2], chunks[2::2]))
+            missing = [name for name in required if name not in bounds_bodies]
+            runner.result('t1 sparse ' + mode + ' pre-ivopts bounds dump',
+                          ['missing aprefetch function ' + name for name in missing])
         assembly = asm_bodies(asm.read_text())
         counts[mode] = {name: len(re.findall(r'\bvprefetch\w*\b', assembly[name]))
                         for name in eligible}
@@ -270,9 +287,9 @@ def t1(runner):
                 'affine stream rejected': not Gimple(bodies['explicit_stream']).indirect(),
                 'post-ivopts loop indexed hint': bool(Gimple(bodies['explicit_loop']).indirect()),
                 'loop has ivtmp PHI': bool(re.search(r'# ivtmp\.\d+_\d+ = PHI', bodies['explicit_loop'])),
-                'CSR future-bound guard': Gimple(bodies['explicit_csr']).cross_row('csr'),
-                'row-local d32 rejected': not Gimple(bodies['explicit_rowlocal']).cross_row('csr'),
-                'HPCG future-pointer/count guard': Gimple(bodies['explicit_hpcg']).cross_row('hpcg'),
+                'CSR future-bound guard': Gimple(bounds_bodies.get('explicit_csr', '')).cross_row('csr'),
+                'row-local d32 rejected': 'explicit_rowlocal' in bounds_bodies and not Gimple(bounds_bodies['explicit_rowlocal']).cross_row('csr'),
+                'HPCG future-pointer/count guard': Gimple(bounds_bodies.get('explicit_hpcg', '')).cross_row('hpcg'),
             }
             for label, ok in controls.items():
                 runner.result('t1 sparse scanner ' + label, [] if ok else ['control failed'])
@@ -287,14 +304,15 @@ def t1(runner):
             if mode != 'controls' and found != want:
                 errors.append(('missing' if want else 'unexpected') + ' automatic indirect prefetch')
             if want:
+                bounds_graph = Gimple(bounds_bodies.get(name, ''))
                 if 'disabled' not in counts or counts[mode][name] <= counts['disabled'][name]:
                     errors.append('vprefetch count must exceed switch-off with stream hints on')
                 if name in ('sparse_rows', 'sparse_hpcg'):
-                    if not graph.cross_row('csr' if name == 'sparse_rows' else 'hpcg'):
+                    if not bounds_graph.cross_row('csr' if name == 'sparse_rows' else 'hpcg'):
                         errors.append('hinted index lacks a dominating later-row bound')
-                elif not any(graph.bounded(load, graph.param('end'), index)
-                             for _, load in graph.indirect()
-                             for index in [graph.offset(load, graph.param('col'), 4)]
+                elif not any(bounds_graph.bounded(load, bounds_graph.param('end'), index)
+                             for _, load in bounds_graph.indirect()
+                             for index in [bounds_graph.offset(load, bounds_graph.param('col'), 4)]
                              if index is not None):
                     errors.append('slice hinted index lacks an end bound')
             if name in eligible:
