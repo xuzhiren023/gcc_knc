@@ -1,10 +1,12 @@
 # WRF 4.8.0 dm+sm with GCC-KNC (S12-35)
 
-**Draft: host build in progress.** The image's GCC 5 `mpi.mod` cannot be
-read by GCC-KNC 16. S12-35 authorizes rebuilding only the four MPICH
-`use mpi` interface modules with GCC-KNC 16, preserving the image's
-configured constants and linking its existing libraries. The module
-and data-model checks passed; WRF has resumed with the new include path.
+The upstream WRF host build completed with GCC-KNC commit `7a3b34430e3`.
+The image's GCC 5 `mpi.mod` cannot be read by GCC-KNC 16, so this recipe
+rebuilds only the four MPICH `use mpi` interface modules with GCC-KNC 16,
+preserving the image's configured constants and existing link libraries.
+The module/data-model, WRF build, link/ELF/dependency checks, and KNC
+instruction lint passed for the staged executables and libgomp.
+Native execution is a separate coordinated card check.
 
 The primary build uses the three prebuilt MPI inputs authorized in S12-35:
 `mpich-thr/libmpi.a`, `phi_thr_copy.o`, and `k17-memcpy/copy.o`.
@@ -342,7 +344,8 @@ make -C main -n -r em_wrf SOLVER=em WRF_SRC_ROOT_DIR="$WRF_ROOT" \
   LIB_LOCAL="$MPI/lib/libmpifort.a $MPI/lib/libmpi.a -lm -lpthread -lrt"
 ```
 
-Execute only the printed GCC-KNC `-o wrf.exe` command from `main`, changing
+Execute only the printed GCC-KNC `-o wrf.exe` command from `main` (its
+optional leading `time` is a shell timing wrapper), changing
 its output to the absolute staging path `wrf-stockmpi.exe`. Preserve the
 primary `wrf.exe` and `real.exe`. The alternate changes only MPI linkage.
 
@@ -356,3 +359,8 @@ Run `check-wrf-links.py`, ELF/dependency checks and `tools/knc_lint` through
 `tools/run.py`. Check all three executables and the staged libgomp. Native
 results require a separate coordinated card run; host checks cannot supply
 them. Freeze the staging directory after submission.
+
+The link reports that `mpifcmb9_` and `mpifcmb5_` from the image
+`libmpifort.a(lib_libmpifort_la-setbot.o)` have alignment 32, while WRF's
+common declarations request 64. Linking succeeds, but these warnings are
+retained in RUN-NOTES.md; host checks do not establish native behavior.
