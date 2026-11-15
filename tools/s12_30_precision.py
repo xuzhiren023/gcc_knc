@@ -406,6 +406,14 @@ def build(host=False, legal=False):
     return binary
 
 
+# Proof slots: name, switch, contraction.  min4 is the default-on compiler
+# with the cutoff at its minimum; manual is the hand-written policy.
+PROOF_SLOTS = (('donor', False, 'off'), ('knc', False, 'off'),
+               ('enabled', True, 'off'), ('fast', True, 'fast'),
+               ('min4', True, 'off'), ('manual', False, 'off'))
+MIN_TRIPS = '--param=knc-indirect-prefetch-min-trips='
+
+
 def build_compiler_proof():
     """Stage legal guard/timing fixtures with generated and manual hints.
 
@@ -416,11 +424,7 @@ def build_compiler_proof():
     project = ROOT.parent.parent
     gcc = Path(storage.gcc_build_dir(project, '2')) / 'gcc'
     objects = []
-    for name, enabled, contract in (('donor', False, 'off'),
-                                     ('knc', False, 'off'),
-                                     ('enabled', True, 'off'),
-                                     ('fast', True, 'fast'),
-                                     ('manual', False, 'off')):
+    for name, enabled, contract in PROOF_SLOTS:
         cc = corpus.compiler_path(corpus.DONOR) if name == 'donor' else gcc/'xgcc'
         flags = ['-O2', '-std=gnu99', '-ffp-contract=' + contract,
                  '-DLEGAL_PROOF', '-DCOMPILER_PROOF', '-DPREFIX=' + name + '_']
@@ -430,6 +434,8 @@ def build_compiler_proof():
             flags += ['-B' + str(gcc) + '/', '-march=knc',
                       '--sysroot=' + str(TC/'sysroot'),
                       '-mknc-indirect-prefetch' if enabled else '-mno-knc-indirect-prefetch']
+        if name == 'min4':
+            flags += [MIN_TRIPS + '4']
         stem = OUT/('compiler-' + name)
         asm, obj, dump = stem.with_suffix('.s'), stem.with_suffix('.o'), stem.with_suffix('.aprefetch')
         dump.unlink(missing_ok=True)
@@ -456,13 +462,12 @@ def build_compiler_proof():
                                     ('shape_forward', 'next-row pointers'),
                                     ('shape_backward', 'next-row pointers')):
                 body = bodies.get(name + '_' + function, '')
-                if not re.search(r'Bounded indirect prefetch in loop \d+: ' + shape, body):
+                if not re.search(r'Bounded indirect prefetch in loop \d+: ' + shape
+                                 + r'.*locality sample', body):
                     raise RuntimeError('compiler proof did not transform ' + name + '_' + function)
                 if '__builtin_prefetch' not in body:
                     raise RuntimeError('compiler proof lacks emitted hints: ' + name + '_' + function)
         objects.append(obj)
-    # Not 'compiler-gate': that binary, from the previous compiler head, is
-    # queued for card window 6 and must not change under the queue.
     binary = OUT/'compiler-gate-hpcg'
     run(corpus.compiler_path(corpus.DONOR), '-O2', '-std=gnu99',
         '-ffp-contract=off', '-fno-tree-vectorize', '-DLEGAL_PROOF',
@@ -470,44 +475,67 @@ def build_compiler_proof():
         *corpus.link_paths(), '-lrt', '-lm', '-o', binary)
     run(sys.executable, ROOT/'tools/knc_lint', binary)
     print('STAGED:', binary, '; lead card_run --threads 1 --timeout 590; argument: 12345',
-          '(add --correctness for the guard suites without timing)', flush=True)
+          '(add --correctness for the guard suites and decisions without timing)', flush=True)
     return 0
 
 
 def host_shapes():
     """Host model of the compiler-proof driver, control flow only.
 
-    Plain C must pass every fixture.  Then one slot gets a next-row hint
-    with no count/stored-vector overlap test: only that slot's overlap
-    child may die, which shows that the fixture can fail.
+    Plain C and the hand-written policy must pass every fixture, and the
+    policy must take the expected arm in every timing case (stencil, random,
+    ascending, below the cutoff).  Then one slot gets a next-row hint with
+    no count/stored-vector overlap test: only that slot's overlap child
+    may die, which shows that the fixture can fail.  Seeds 2 and 3 break
+    the hand-written sample (no row cutoff; no nonempty test): the manual
+    slot, and no other, must fault.
     """
     cc = TC/'cygwin/bin/gcc'
     flags = ['-O2', '-std=gnu99', '-ffp-contract=off', '-mfpmath=387',
              '-fexcess-precision=fast', '-DHOST_MODEL', '-DLEGAL_PROOF', '-DCOMPILER_PROOF']
     seeded = 'FAIL shape child struct-spmv count-in-stored-vector knc-switch-on status='
     errors = []
-    for seed in (0, 1):
+    for seed in (0, 1, 2, 3):
         objects = []
-        for name in ('donor', 'knc', 'enabled', 'fast', 'manual'):
+        for name, _, _ in PROOF_SLOTS:
             obj = OUT/('host-shape-' + name + '.o')
-            run(cc, *flags, '-DPREFIX=' + name + '_',
-                '-DSHAPE_SEED=' + str(int(seed and name == 'enabled')), '-c', SOURCE, '-o', obj)
+            run(cc, *flags, '-DPREFIX=' + name + '_', '-DMANUAL_PROOF=' + str(int(name == 'manual')),
+                '-DSHAPE_SEED=' + str(int(seed == 1 and name == 'enabled')),
+                '-DSAMPLE_SEED=' + str(seed-1 if seed > 1 and name == 'manual' else 0),
+                '-c', SOURCE, '-o', obj)
             objects.append(obj)
         binary = OUT/'host-shapes.exe'
         run(cc, *flags, '-DDRIVER', SOURCE, *objects, '-lrt', '-lm', '-o', binary)
         result = subprocess.run([str(binary), '12345', '--correctness'], cwd=OUT,
                                 stdout=subprocess.PIPE, text=True)
-        failed = [line for line in result.stdout.splitlines() if line.startswith('FAIL')]
-        shapes = sum(line.startswith('SHAPES') for line in result.stdout.splitlines())
+        lines = result.stdout.splitlines()
+        failed = [line for line in lines if line.startswith('FAIL')]
+        shapes = sum(line.startswith('SHAPES') for line in lines)
+        decisions = [line for line in lines if line.startswith('DECISION')]
         print('HOST_SHAPES seed=' + str(seed), 'exit=' + str(result.returncode),
-              'shape_children=' + str(shapes), *failed, sep=' | ', flush=True)
-        if seed:
+              'shape_children=' + str(shapes), 'decisions=' + str(len(decisions)),
+              *failed, sep=' | ', flush=True)
+        if seed == 1:
             if not result.returncode or len(failed) != 1 or not failed[0].startswith(seeded):
                 errors.append('seeded stale-count hint was not caught as the only failure')
-        elif result.returncode or failed or shapes != 24:
-            errors.append('plain C failed the fixtures')
+            continue
+        if seed:
+            if (not result.returncode or not failed
+                    or not all('knc-handwritten-policy' in line and 'status=11' in line
+                               for line in failed)):
+                errors.append('seeded sample defect %d was not caught in the manual slot alone' % (seed-1))
+            continue
+        print(*decisions, sep='\n', flush=True)
+        arms = {'hint': 0, 'scalar': 0}
+        for line in decisions:
+            arms[line.rsplit('=', 1)[1]] += 1
+        if result.returncode or failed or shapes != 6*len(PROOF_SLOTS):
+            errors.append('plain C or the hand-written policy failed the fixtures')
+        if len(decisions) != 34 or not arms['hint'] or not arms['scalar']:
+            errors.append('expected 34 policy decisions, some for each arm')
     print(('FAIL ' + '; '.join(errors)) if errors else
-          'PASS host shapes: plain C passes; seeded stale-count hint faults', flush=True)
+          'PASS host shapes: fixtures and policy decisions pass; the seeded stale-count hint and both seeded samples fault',
+          flush=True)
     return int(bool(errors))
 
 

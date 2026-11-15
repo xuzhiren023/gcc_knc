@@ -2,7 +2,9 @@
 /* Lead's 2026-11-14 Step 1: compiler-legal lookahead, no nnz ABI. */
 #define _GNU_SOURCE
 #include <stddef.h>
-#define LEGAL_MIN_ROWS 16384
+#ifndef LEGAL_MIN_ROWS
+#define LEGAL_MIN_ROWS 16384 /* the compiler's default cutoff */
+#endif
 #define LEGAL_DISTANCE 32
 #define LEGAL_ROW_LOOKAHEAD 3
 struct matrix {
@@ -73,25 +75,82 @@ static __attribute__((always_inline)) inline void hpcg_body(
   }
 }
 #ifdef COMPILER_PROOF
-/* The generated slots compile unhinted C; the separate manual slot
-   measures the original legal hint even below the current policy floor. */
+/* The generated slots compile unhinted C.  The manual slot is the policy
+   in hand-written form: the legal hints run only when the nest has
+   LEGAL_MIN_ROWS rows (a lone loop: iterations) and the first indices of
+   its first three rows (a lone loop: its first three indices) are each
+   more than LEGAL_NEAR elements apart.  Stencil and banded rows start a
+   few elements apart and keep the unhinted code; random rows do not.  The
+   first index of a row is read only if that row is nonempty, a per-row
+   pointer only if its count is positive, and nothing below LEGAL_MIN_ROWS. */
 #ifndef MANUAL_PROOF
 #define MANUAL_PROOF 0
 #endif
-/* Match the raw-argument T1 probes.  A struct-based loop reloads fields
-   in its outer body and currently receives only the row-local fallback;
-   that cannot exercise cross-row guards on 13/27-entry rows. */
-static __attribute__((noinline,noclone)) void FN(csr_raw)(int rows,
-    const int *row, const int *col, const double *val, const double *x, double *out)
+#define LEGAL_NEAR 8 /* one 64-byte line of FP64 values */
+/* One-time host defects in the manual slot: 1 samples below the row
+   cutoff, 2 reads the first index of rows it has not found nonempty.  */
+#ifndef SAMPLE_SEED
+#define SAMPLE_SEED 0
+#endif
+int FN(arm); /* manual slot: 1 when the last call took the hinted arm */
+static inline int far(int a, int b)
+{
+  long long d = (long long)b-a;
+  return d > LEGAL_NEAR || d < -LEGAL_NEAR;
+}
+/* Rows FIRST, FIRST+STEP, FIRST+2*STEP of an N-row interval.  OK holds
+   any proof the later counts need (bytes disjoint from the stores). */
+#define ROWS_RANDOM(count, cols, first, step, n, ok) __extension__ ({ \
+  long long a_ = (first), s_ = (step); \
+  int far_ = 0; \
+  if ((SAMPLE_SEED == 1 || (n) >= LEGAL_MIN_ROWS) && (ok) \
+      && (SAMPLE_SEED == 2 || ((count)[a_] > 0 && (count)[a_+s_] > 0 \
+                               && (count)[a_+2*s_] > 0))) \
+    far_ = far((cols)[a_][0],(cols)[a_+s_][0]) \
+           && far((cols)[a_+s_][0],(cols)[a_+2*s_][0]); \
+  far_; })
+/* Match the raw-argument T1 probes.  */
+static __attribute__((always_inline)) inline void csr_rows(int rows,
+    const int *row, const int *col, const double *val, const double *x,
+    double *out, int pf)
 {
   for (int i = 0; i < rows; ++i) {
     int end = row[i+1], bound = end;
-    if (MANUAL_PROOF && rows-i > LEGAL_ROW_LOOKAHEAD)
+    if (pf && rows-i > LEGAL_ROW_LOOKAHEAD)
       bound = row[i+LEGAL_ROW_LOOKAHEAD+1];
     double sum = 0;
     for (int j = row[i]; j < end; ++j) {
-      if (MANUAL_PROOF && (long long)bound-j > LEGAL_DISTANCE)
+      if (pf && (long long)bound-j > LEGAL_DISTANCE)
         hint(x+col[j+LEGAL_DISTANCE]);
+      sum += val[j]*x[col[j]];
+    }
+    out[i] = sum;
+  }
+}
+static __attribute__((noinline,noclone)) void FN(csr_raw)(int rows,
+    const int *row, const int *col, const double *val, const double *x, double *out)
+{
+#if MANUAL_PROOF
+  FN(arm) = 0;
+  if ((SAMPLE_SEED == 1 || rows >= LEGAL_MIN_ROWS)
+      && (SAMPLE_SEED == 2 || (row[0] < row[1] && row[1] < row[2] && row[2] < row[3])))
+    FN(arm) = far(col[row[0]],col[row[1]]) && far(col[row[1]],col[row[2]]);
+  if (FN(arm)) { csr_rows(rows,row,col,val,x,out,1); return; }
+#endif
+  csr_rows(rows,row,col,val,x,out,0);
+}
+static __attribute__((always_inline)) inline void hpcg_rows(int rows,
+    const int *count, const int *const *cols, const double *const *vals,
+    const double *x, double *out, int pf)
+{
+  for (int i = 0; i < rows; ++i) {
+    const int *col = cols[i], *future = NULL;
+    const double *val = vals[i];
+    int n = count[i], next = 0;
+    if (pf && rows-i > 1 && (next = count[i+1]) > 0) future = cols[i+1];
+    double sum = 0;
+    for (int j = 0; j < n; ++j) {
+      if (pf && j < next) hint(x+future[j]);
       sum += val[j]*x[col[j]];
     }
     out[i] = sum;
@@ -101,35 +160,38 @@ static __attribute__((noinline,noclone)) void FN(hpcg_raw)(int rows,
     const int *count, const int *const *cols, const double *const *vals,
     const double *x, double *out)
 {
-  for (int i = 0; i < rows; ++i) {
-    const int *col = cols[i], *future = NULL;
-    const double *val = vals[i];
-    int n = count[i], next = 0;
-    if (MANUAL_PROOF && rows-i > 1) { next = count[i+1]; future = cols[i+1]; }
-    double sum = 0;
-    for (int j = 0; j < n; ++j) {
-      if (MANUAL_PROOF && j < next) hint(x+future[j]);
-      sum += val[j]*x[col[j]];
-    }
-    out[i] = sum;
-  }
+#if MANUAL_PROOF
+  FN(arm) = ROWS_RANDOM(count,cols,0,1,rows,1);
+  if (FN(arm)) { hpcg_rows(rows,count,cols,vals,x,out,1); return; }
+#endif
+  hpcg_rows(rows,count,cols,vals,x,out,0);
 }
 void FN(csr_scalar)(const struct matrix *a, double *out)
 { FN(csr_raw)(a->rows,a->row,a->col,a->val,a->x,out); }
 void FN(hpcg_scalar)(const struct matrix *a, double *out)
 { FN(hpcg_raw)(a->rows,a->count,a->cols,a->vals,a->x,out); }
+static __attribute__((always_inline)) inline double lone_sum(int end,
+    const int *col, const double *val, const double *x, int pf)
+{
+  double sum = 0;
+  for (int j = 0; j < end; ++j) {
+    if (pf && (long long)end-j > LEGAL_DISTANCE)
+      hint(x+col[j+LEGAL_DISTANCE]);
+    sum += val[j]*x[col[j]];
+  }
+  return sum;
+}
 void FN(lone_scalar)(const struct matrix *a, double *out)
 {
   const int *col = a->col;
   const double *val = a->val, *x = a->x;
   int end = a->count[0];
-  double sum = 0;
-  for (int j = 0; j < end; ++j) {
-    if (MANUAL_PROOF && (long long)end-j > LEGAL_DISTANCE)
-      hint(x+col[j+LEGAL_DISTANCE]);
-    sum += val[j]*x[col[j]];
-  }
-  out[0] = sum;
+#if MANUAL_PROOF
+  FN(arm) = (SAMPLE_SEED == 1 || end >= LEGAL_MIN_ROWS)
+            && far(col[0],col[1]) && far(col[1],col[2]);
+  if (FN(arm)) { out[0] = lone_sum(end,col,val,x,1); return; }
+#endif
+  out[0] = lone_sum(end,col,val,x,0);
 }
 legal_kernel const FN(legal)[3][1] = {
   {FN(csr_scalar)}, {FN(hpcg_scalar)}, {FN(lone_scalar)}
@@ -141,8 +203,15 @@ legal_kernel const FN(legal)[3][1] = {
 #ifndef SHAPE_SEED
 #define SHAPE_SEED 0
 #endif
-void FN(shape_spmv)(int begin, int rows, const struct shape *m,
-                    const double *x, double *out)
+/* The count bytes of rows [BEGIN,ROWS) against the elements stored.  */
+static inline int disjoint(const char *count, const double *stored,
+                           int begin, int rows)
+{
+  const char *low = (const char *)(stored+begin), *high = (const char *)(stored+rows);
+  return count+rows <= low || high <= count+begin;
+}
+static __attribute__((always_inline)) inline void spmv_rows(int begin,
+    int rows, const struct shape *m, const double *x, double *out, int pf)
 {
   for (int i = begin; i < rows; ++i) {
     double sum = 0;
@@ -151,19 +220,57 @@ void FN(shape_spmv)(int begin, int rows, const struct shape *m,
     const int cur_nnz = m->count[i];
     const int *future = NULL;
     int next = 0;
-    if (SHAPE_SEED && rows-i > 1 && (next = m->count[i+1]) > 0)
+    if (pf && rows-i > 1 && (next = m->count[i+1]) > 0)
       future = m->cols[i+1];
     for (int j = 0; j < cur_nnz; ++j) {
-      if (SHAPE_SEED && j < next) hint(x+future[j]);
+      if (pf && j < next) hint(x+future[j]);
       sum += cur_vals[j] * x[cur_inds[j]];
     }
     out[i] = sum;
+  }
+}
+void FN(shape_spmv)(int begin, int rows, const struct shape *m,
+                    const double *x, double *out)
+{
+#if MANUAL_PROOF
+  FN(arm) = ROWS_RANDOM(m->count,m->cols,begin,1,(long long)rows-begin,
+                        disjoint(m->count,out,begin,rows));
+  if (FN(arm)) { spmv_rows(begin,rows,m,x,out,1); return; }
+#endif
+  spmv_rows(begin,rows,m,x,out,SHAPE_SEED);
+}
+/* DOWN sweeps rows-1..0 and looks ahead to row i-1.  Manual slot only:
+   the generated slots keep the two sweeps in the T1 probe form below.  */
+static __attribute__((always_inline)) inline void sweep_rows(int rows,
+    const struct shape *m, const double *rhs, double *x, int down)
+{
+  for (int i = down ? rows-1 : 0; down ? i >= 0 : i < rows; i += down ? -1 : 1) {
+    const double *const cur_vals = m->vals[i];
+    const int *const cur_inds = m->cols[i];
+    const int cur_nnz = m->count[i];
+    const double diag = m->diag[i][0];
+    const int *future = NULL;
+    int next = 0;
+    if ((down ? i > 0 : rows-i > 1)
+        && (next = m->count[down ? i-1 : i+1]) > 0)
+      future = m->cols[down ? i-1 : i+1];
+    double sum = rhs[i];
+    for (int j = 0; j < cur_nnz; ++j) {
+      if (j < next) hint(x+future[j]);
+      sum -= cur_vals[j] * x[cur_inds[j]];
+    }
+    sum += x[i] * diag;
+    x[i] = sum / diag;
   }
 }
 void FN(shape_forward)(int begin, int rows, const struct shape *m,
                        const double *rhs, double *x)
 {
   (void)begin;
+#if MANUAL_PROOF
+  FN(arm) = ROWS_RANDOM(m->count,m->cols,0,1,rows,disjoint(m->count,x,0,rows));
+  if (FN(arm)) { sweep_rows(rows,m,rhs,x,0); return; }
+#endif
   for (int i = 0; i < rows; ++i) {
     const double *const cur_vals = m->vals[i];
     const int *const cur_inds = m->cols[i];
@@ -180,6 +287,11 @@ void FN(shape_backward)(int begin, int rows, const struct shape *m,
                         const double *rhs, double *x)
 {
   (void)begin;
+#if MANUAL_PROOF
+  FN(arm) = ROWS_RANDOM(m->count,m->cols,(long long)rows-1,-1,rows,
+                        disjoint(m->count,x,0,rows));
+  if (FN(arm)) { sweep_rows(rows,m,rhs,x,1); return; }
+#endif
   for (int i = rows - 1; i >= 0; --i) {
     const double *const cur_vals = m->vals[i];
     const int *const cur_inds = m->cols[i];
@@ -228,21 +340,26 @@ legal_kernel const FN(legal)[2][3] = {
 #include <sys/wait.h>
 #include <sys/resource.h>
 #ifdef COMPILER_PROOF
-extern legal_kernel const donor_legal[3][1], knc_legal[3][1];
-extern legal_kernel const enabled_legal[3][1], fast_legal[3][1], manual_legal[3][1];
+/* Slot 4 is the default-on compiler with the row cutoff lowered to its
+   minimum, so the hinted arm also runs on the small guard fixtures and at
+   every size of the cutoff grid.  Slot 5 is the hand-written policy.  */
+enum { DONOR, OFF, ON, FAST, MIN4, MANUAL, SLOTS };
+extern legal_kernel const donor_legal[3][1], knc_legal[3][1], enabled_legal[3][1];
+extern legal_kernel const fast_legal[3][1], min4_legal[3][1], manual_legal[3][1];
 static legal_kernel const (*tables[])[1] = {
-  donor_legal, knc_legal, enabled_legal, fast_legal, manual_legal
+  donor_legal, knc_legal, enabled_legal, fast_legal, min4_legal, manual_legal
 };
 static const char *compilers[] = {
   "donor-off", "knc-switch-off", "knc-switch-on", "knc-switch-on-contract-fast",
-  "knc-handwritten-forced-hint"
+  "knc-switch-on-min4", "knc-handwritten-policy"
 };
 static const char *routes[] = {"compiler"};
-extern shape_kernel const donor_shapes[3], knc_shapes[3];
-extern shape_kernel const enabled_shapes[3], fast_shapes[3];
+extern shape_kernel const donor_shapes[3], knc_shapes[3], enabled_shapes[3];
+extern shape_kernel const fast_shapes[3], min4_shapes[3], manual_shapes[3];
 static shape_kernel const *shape_tables[] = {
-  donor_shapes, knc_shapes, enabled_shapes, fast_shapes
+  donor_shapes, knc_shapes, enabled_shapes, fast_shapes, min4_shapes, manual_shapes
 };
+extern int manual_arm;
 static const char *shape_names[] = {"struct-spmv", "struct-forward", "struct-backward"};
 #else
 extern legal_kernel const donor_legal[2][3], knc_legal[2][3], fast_legal[2][3];
@@ -296,7 +413,7 @@ static void reference(const struct matrix *a, int layout, double *out)
 static void guarded_cases(int layout, legal_kernel fn)
 {
   const int sizes[] = {0,1,2,4,7,LEGAL_MIN_ROWS,LEGAL_MIN_ROWS+1};
-  for (int n = 1; n <= 33; ++n) for (int shape = 0; shape < 3; ++shape)
+  for (int n = 1; n <= 33; ++n) for (int shape = 0; shape < 4; ++shape)
     for (unsigned z = 0; z < sizeof sizes/sizeof sizes[0]; ++z) {
       int rows = sizes[z], active = rows < 7 ? rows : 7;
       struct guard gr, gc, gv, gn, gcp, gvp;
@@ -305,19 +422,31 @@ static void guarded_cases(int layout, legal_kernel fn)
       const int **cols = guarded(rows*sizeof *cols,&gcp);
       const double **vals = guarded(rows*sizeof *vals,&gvp);
       /* The active rows sit at the array end, exercising final lookahead
-         and both policy arms without allocating a huge matrix fixture. */
+         and both policy arms without allocating a huge matrix fixture.
+         Shapes 0-2 of a long fixture start with three n-entry rows, the
+         rows a locality sample reads.  Shape 3 starts with four empty
+         rows bounded at the end of col: reading the first index of an
+         empty sampled row faults. */
+      int lead = shape < 3 && rows-active >= 3 ? 3 : 0;
+      int base = shape == 3 && rows-active < 4 ? 4 : rows-active;
       int nonmonotone[] = {0,1,2,1,3,2,3,3};
       for (int i = 0; i <= rows; ++i) {
-        int r = i-(rows-active);
-        row[i] = r <= 0 ? 0 : n*(shape == 2 ? nonmonotone[r] :
-                                (shape == 1 && r == active ? r-1 : r));
+        int r = i-base;
+        row[i] = i < lead ? i*n :
+                 lead*n + (r <= 0 ? 0 : n*(shape == 2 ? nonmonotone[r] :
+                                           (shape == 1 && r == active ? r-1 : r)));
       }
       int max = 0;
       for (int i = 0; i <= rows; ++i) if (row[i] > max) max = row[i];
+      for (int i = 0; shape == 3 && i <= 3 && i <= rows; ++i) row[i] = max;
       int *c = guarded(max*sizeof *c,&gc);
       double *v = guarded(max*sizeof *v,&gv), x[67];
       for (int i = 0; i < 67; ++i) x[i] = (int)(random32()%9)-4;
       for (int j = 0; j < max; ++j) { c[j] = random32()%67; v[j] = (int)(random32()%7)-3; }
+      /* Sampled rows start far apart, so the hinted arm runs; every
+         fourth length starts them on one line and keeps the plain arm. */
+      for (int k = 0; rows >= 4 && k < 3; ++k)
+        if (row[k] < row[k+1]) c[row[k]] = n%4 == 3 ? 5+k : 33*k;
       /* HPCG row allocations are independent, each ending at its own
          guard. Zero-count rows point directly at PROT_NONE. */
       struct guard *cg = alloc(rows*sizeof *cg), *vg = alloc(rows*sizeof *vg);
@@ -364,22 +493,43 @@ static void correctness(void)
     }
 }
 #ifdef COMPILER_PROOF
-static void lone_guards(void)
+static void lone_cases(legal_kernel fn)
 {
-  const int sizes[] = {0,1,32,33,16383,16384,16385};
-  for (unsigned z = 0; z < sizeof sizes/sizeof sizes[0]; ++z) {
-    int n = sizes[z], row[] = {0,n};
+  /* Below four iterations a three-index sample would cross the guard.  */
+  const int sizes[] = {0,1,2,3,4,5,32,33,16383,16384,16385};
+  for (unsigned z = 0; z < 2*sizeof sizes/sizeof sizes[0]; ++z) {
+    int n = sizes[z/2], row[] = {0,n};
     struct guard gc, gv;
     int *col = guarded(n*sizeof *col,&gc);
     double *val = guarded(n*sizeof *val,&gv), x[67], out, want;
     for (int i = 0; i < 67; ++i) x[i] = (int)(random32()%9)-4;
     for (int j = 0; j < n; ++j) { col[j] = random32()%67; val[j] = (int)(random32()%7)-3; }
+    for (int j = 0; j < 3 && j < n; ++j) col[j] = z%2 ? 5+j : 33*j;
     struct matrix a = {1,row,col,&n,val,x,NULL,NULL};
     reference(&a,0,&want);
-    for (unsigned t = 0; t < sizeof tables/sizeof tables[0]; ++t) {
-      tables[t][2][0](&a,&out); compare(out,want,0);
-    }
+    fn(&a,&out); compare(out,want,0);
     release(&gc); release(&gv);
+  }
+}
+static void lone_guards(void)
+{
+  for (unsigned t = 0; t < sizeof tables/sizeof tables[0]; ++t) {
+    fflush(stdout);
+    pid_t child = fork(); if (child < 0) die("fork");
+    if (!child) {
+      struct rlimit limit = {0,0}; setrlimit(RLIMIT_CORE,&limit);
+      failures = 0;
+      lone_cases(tables[t][2][0]);
+      printf("GUARDS %s %s/%s comparisons=%lu failures=%d\n",
+             layouts[2],compilers[t],routes[0],checks,failures);
+      _exit(failures ? 1 : 0);
+    }
+    int status; if (waitpid(child,&status,0) != child) die("waitpid");
+    ++checks;
+    if (!WIFEXITED(status) || WEXITSTATUS(status)) {
+      ++failures;
+      printf("FAIL guard child %s %s/%s status=%d\n",layouts[2],compilers[t],routes[0],status);
+    }
   }
 }
 /* Application-form fixtures.  LOW puts the tables after a guard page, so
@@ -423,7 +573,9 @@ static void shape_cases(int kind, shape_kernel fn, void *trap)
       for (int low = 0; low < 2; ++low) {
         int rows = sizes[z], active = rows < 7 ? rows : 7;
         int first = low ? 0 : rows-active, begin = kind ? 0 : 5;
-        int nx = kind ? rows : 67;
+        /* A sweep's vector extends past its rows, so that three first
+           indices can lie far apart even in a seven-row fixture.  */
+        int nx = kind ? rows+67 : 67, near = (l+z)%4 == 3;
         struct guard gn, gc, gv, gd;
         char *count = edge(rows,&gn,low);
         const int **cols = edge(rows*sizeof *cols,&gc,low);
@@ -432,22 +584,28 @@ static void shape_cases(int kind, shape_kernel fn, void *trap)
         struct guard *cg = alloc(rows*sizeof *cg), *vg = alloc(rows*sizeof *vg);
         double *x = alloc(nx*sizeof *x), *rhs = alloc(rows*sizeof *rhs);
         double *dv = alloc(rows*sizeof *dv);
-        double *got = alloc(rows*sizeof *got), *want = alloc(rows*sizeof *want);
+        size_t out = (kind ? nx : rows)*sizeof(double);
+        double *got = alloc(out), *want = alloc(out);
         for (int i = 0; i < nx; ++i) x[i] = (int)(random32()%9)-4;
         for (int i = 0; i < rows; ++i) {
-          int r = i-first;
+          /* K < 3: one of the three rows a locality sample reads, in
+             sweep order.  Shape 0 leaves those outside the active rows
+             empty behind the protected page; the other shapes fill them. */
+          int r = i-first, k = kind == 2 ? rows-1-i : i;
           count[i] = r < 0 || r >= active ? 0 : lengths[l]*(shape ? vary[shape-1][r] : 1);
+          if (rows >= 4 && k < 3 && shape && (r < 0 || r >= active)) count[i] = lengths[l];
           rhs[i] = (int)(random32()%9)-4; dv[i] = i&1 ? -1 : 1; diag[i] = &dv[i];
           cols[i] = trap; vals[i] = trap;
           if (count[i]) {
             int *ci = guarded(count[i]*sizeof *ci,&cg[i]);
             double *vi = guarded(count[i]*sizeof *vi,&vg[i]);
             for (int j = 0; j < count[i]; ++j) { ci[j] = random32()%nx; vi[j] = (int)(random32()%3)-1; }
+            if (rows >= 4 && k < 3) ci[0] = near ? 5+k : 33*k;
             cols[i] = ci; vals[i] = vi;
           }
         }
         struct shape m = {BIAS(count,begin),BIAS(cols,begin),BIAS(vals,begin),BIAS(diag,begin)};
-        if (kind) { memcpy(want,x,rows*sizeof *x); memcpy(got,x,rows*sizeof *x); }
+        if (kind) { memcpy(want,x,out); memcpy(got,x,out); }
         shape_reference(kind,begin,begin+rows,&m,kind ? rhs : x,BIAS(want,begin));
         fn(begin,begin+rows,&m,kind ? rhs : x,BIAS(got,begin));
         for (int i = 0; i < rows; ++i) compare(got[i],want[i],i);
@@ -460,11 +618,15 @@ static void shape_cases(int kind, shape_kernel fn, void *trap)
    five zero-valued entries and its store clears the count of the row that
    follows it in sweep order, which was 27 until then and whose index
    pointer is a protected page.  The program never enters that row; a
-   next-row hint taken from the stale count faults. */
+   next-row hint taken from the stale count faults.  The first three rows
+   in sweep order hold one zero-valued entry each, far apart, so that a
+   locality sample alone would choose the hinted arm; their count bytes
+   lie in an element that is stored unchanged after they are read. */
 static void shape_overlap(int kind, shape_kernel fn, void *trap)
 {
   enum { HOT = 3 };
   int rows = LEGAL_MIN_ROWS, index[5] = {0,1,2,3,4};
+  static const int apart[3] = {0,4096,8192};
   size_t bias = 7*HOT+(kind == 2);
   double zero[5] = {0}, *stored[2], hot;
   const int **cols = alloc(rows*sizeof *cols);
@@ -473,10 +635,15 @@ static void shape_overlap(int kind, shape_kernel fn, void *trap)
   double *in = alloc(rows*sizeof *in);
   for (int i = 0; i < rows; ++i) { cols[i] = trap; vals[i] = trap; diag[i] = &one; in[i] = 0; }
   cols[HOT] = index; vals[HOT] = zero;
+  for (int k = 0; k < 3; ++k) {
+    int i = kind == 2 ? rows-1-k : k;
+    cols[i] = &apart[k]; vals[i] = zero;
+  }
   for (int pass = 0; pass < 2; ++pass) {
     unsigned char *bytes = alloc(rows*sizeof(double));
     memset(bytes,0,rows*sizeof(double));
     bytes[bias+HOT] = 5; bytes[bias+HOT+(kind == 2 ? -1 : 1)] = 27;
+    for (int k = 0; k < 3; ++k) bytes[bias+(kind == 2 ? rows-1-k : k)] = 1;
     stored[pass] = (double *)bytes;
     memcpy(&hot,bytes+HOT*sizeof hot,sizeof hot);
     /* SpMV reads a separate nonnegative vector; a sweep cancels the stored
@@ -559,12 +726,38 @@ static double sample_time(legal_kernel fn, const struct matrix *a,
   return seconds;
 }
 #ifdef COMPILER_PROOF
+static int timing; /* 0 under --correctness: verify and decide, no clock */
+/* The hand-written policy must take the arm the case was built for.  */
+static void decision(const char *label, const char *form, int rows, int n, int expect)
+{
+  ++checks;
+  printf("DECISION %s %s n=%d rows=%d handwritten-policy=%s expected=%s\n",label,form,n,rows,
+         manual_arm ? "hint" : "scalar",expect ? "hint" : "scalar");
+  if (manual_arm != expect) { ++failures; printf("FAIL decision %s %s\n",label,form); }
+}
+/* IDS always starts with the donor and the switch-off build.  */
+static void print_times(int sample, const int *ids, int count,
+                        const double *seconds, const uint64_t *calls)
+{
+  for (int j = 0; j < count; ++j) {
+    double per = seconds[j]/calls[j];
+    printf("TIME sample=%d %s seconds=%.9f calls=%" PRIu64
+           " seconds_per_call=%.12g speedup_vs_knc=%.6f speedup_vs_donor=%.6f\n",
+           sample,compilers[ids[j]],seconds[j],calls[j],per,
+           seconds[1]/calls[1]/per,seconds[0]/calls[0]/per);
+  }
+}
+/* PATTERN 0: uniformly random columns.  1: the 27-point stencil of a
+   104-cubed grid.  2: ascending columns.  Every slot runs the same
+   matrix, so the work per call is the same; only the call count that
+   fills half a second differs.  */
 static void compiler_case(const char *label, int layout, int rows, int n,
-                          int nx, int stencil)
+                          int nx, int pattern, const int *ids, int count, int expect)
 {
   int nz = rows*n;
+  long long nnz = 0;
   int *row = alloc((rows+1)*sizeof *row), *c = alloc(nz*sizeof *c);
-  int *count = alloc(rows*sizeof *count);
+  int *counts = alloc(rows*sizeof *counts);
   const int **cols = alloc(rows*sizeof *cols);
   const double **vals = alloc(rows*sizeof *vals);
   double *v = alloc(nz*sizeof *v), *x = alloc(nx*sizeof *x);
@@ -572,8 +765,8 @@ static void compiler_case(const char *label, int layout, int rows, int n,
   for (int i = 0; i <= rows; ++i) row[i] = i*n;
   for (int i = 0; i < nx; ++i) x[i] = (int)(random32()%9)-4;
   for (int i = 0; i < rows; ++i) {
-    count[i] = n; cols[i] = c+i*n; vals[i] = v+i*n;
-    if (stencil) {
+    counts[i] = n; cols[i] = c+i*n; vals[i] = v+i*n;
+    if (pattern == 1) {
       int ix = i%104, iy = i/104%104, iz = i/(104*104), k = 0;
       for (int dz = -1; dz <= 1; ++dz)
         for (int dy = -1; dy <= 1; ++dy)
@@ -583,16 +776,18 @@ static void compiler_case(const char *label, int layout, int rows, int n,
               c[i*n+k] = i+dx+104*dy+104*104*dz;
               v[i*n+k++] = dx || dy || dz ? -1 : 26;
             }
-      count[i] = k;
+      counts[i] = k;
     } else for (int j = 0; j < n; ++j) {
-      c[i*n+j] = random32()%nx; v[i*n+j] = (int)(random32()%7)-3;
+      c[i*n+j] = pattern ? (i*n+j)%nx : (int)(random32()%nx);
+      v[i*n+j] = (int)(random32()%7)-3;
     }
+    nnz += counts[i];
   }
   /* Random pointer layout retains independent shuffled row allocations;
      the stencil uses contiguous row storage with genuine boundary counts. */
   int *perm = alloc(rows*sizeof *perm);
   for (int i = 0; i < rows; ++i) perm[i] = i;
-  if (layout == 1 && !stencil) {
+  if (layout == 1 && !pattern) {
     for (int i = rows-1; i > 0; --i) {
       int j = random32()%(i+1), t = perm[i]; perm[i] = perm[j]; perm[j] = t;
     }
@@ -602,50 +797,128 @@ static void compiler_case(const char *label, int layout, int rows, int n,
       cols[i] = ci; vals[i] = vi;
     }
   }
-  struct matrix a = {rows,row,c,count,v,x,cols,vals};
+  struct matrix a = {rows,row,c,counts,v,x,cols,vals};
   reference(&a,layout == 1,want);
-  const int ids[] = {0,1,2,4};
-  int batch[] = {1,1,1,1};
-  for (int id = 0; id < 4; ++id) {
-    tables[ids[id]][layout][0](&a,out);
+  for (int t = 0; t < SLOTS; ++t) {
+    tables[t][layout][0](&a,out);
     for (int i = 0; i < rows; ++i) compare(out[i],want[i],i);
   }
   if (failures) exit(1);
-  printf("CASE %s %s n=%d rows=%d rhs_bytes=%zu compiler_policy=%s manual=forced-on min_seconds=0.5 samples=5\n",
-         label,layouts[layout],n,rows,nx*sizeof *x,
-         (layout == 2 ? n : rows) >= LEGAL_MIN_ROWS ? "hint" : "scalar");
-  for (int sample = 0; sample < 5; ++sample) {
-    double seconds[4], per_call[4]; uint64_t calls[4];
-    for (int j = 0; j < 4; ++j) {
-      int id = sample%2 ? 3-j : j;
-      seconds[id] = sample_time(tables[ids[id]][layout][0],&a,out,&batch[id],&calls[id]);
-      per_call[id] = seconds[id]/calls[id];
+  decision(label,layouts[layout],rows,n,expect);
+  printf("CASE %s %s n=%d rows=%d nnz=%lld rhs_bytes=%zu columns=%s default_policy=%s min_seconds=0.5 samples=5\n",
+         label,layouts[layout],n,rows,nnz,nx*sizeof *x,
+         pattern == 1 ? "stencil" : pattern ? "ascending" : "random",
+         expect ? "hint" : "scalar");
+  int batch[SLOTS];
+  for (int j = 0; j < SLOTS; ++j) batch[j] = 1;
+  for (int sample = 0; timing && sample < 5; ++sample) {
+    double seconds[SLOTS]; uint64_t calls[SLOTS];
+    for (int j = 0; j < count; ++j) {
+      int k = sample%2 ? count-1-j : j;
+      seconds[k] = sample_time(tables[ids[k]][layout][0],&a,out,&batch[k],&calls[k]);
       for (int i = 0; i < rows; ++i) compare(out[i],want[i],i);
     }
-    for (int id = 0; id < 4; ++id)
-      printf("TIME sample=%d %s seconds=%.9f calls=%" PRIu64
-             " seconds_per_call=%.12g speedup_vs_knc=%.6f speedup_vs_donor=%.6f\n",
-             sample,compilers[ids[id]],seconds[id],calls[id],per_call[id],
-             per_call[1]/per_call[id],per_call[0]/per_call[id]);
+    print_times(sample,ids,count,seconds,calls);
   }
-  if (layout == 1 && !stencil)
+  if (layout == 1 && !pattern)
     for (int i = 0; i < rows; ++i) { free((void *)cols[i]); free((void *)vals[i]); }
-  free(perm); free(cols); free(vals); free(count); free(row); free(c); free(v); free(x); free(out); free(want);
+  free(perm); free(cols); free(vals); free(counts); free(row); free(c); free(v); free(x); free(out); free(want);
+}
+/* The same stencil in the application form: byte counts, pointer tables
+   and a pointer to each row's diagonal.  A sweep restarts from the same
+   vector before every call, outside the clock.  The values are inexact,
+   so every slot is compared bit for bit with the switch-off build; the
+   long-double reference is reported, not judged.  */
+static void shape_case(int kind)
+{
+  enum { G = 104 };
+  int rows = G*G*G;
+  size_t bytes = rows*sizeof(double);
+  long long nnz = 0;
+  char *count = alloc(rows);
+  int *c = alloc((size_t)rows*27*sizeof *c);
+  double *v = alloc((size_t)rows*27*sizeof *v);
+  const int **cols = alloc(rows*sizeof *cols);
+  const double **vals = alloc(rows*sizeof *vals);
+  double **diag = alloc(rows*sizeof *diag);
+  double *in = alloc(bytes), *start = alloc(bytes), *work = alloc(bytes);
+  double *base = alloc(bytes), *want = alloc(bytes);
+  for (int i = 0; i < rows; ++i) {
+    int ix = i%G, iy = i/G%G, iz = i/(G*G), k = 0;
+    cols[i] = c+(size_t)i*27; vals[i] = v+(size_t)i*27;
+    for (int dz = -1; dz <= 1; ++dz)
+      for (int dy = -1; dy <= 1; ++dy)
+        for (int dx = -1; dx <= 1; ++dx)
+          if (ix+dx >= 0 && ix+dx < G && iy+dy >= 0 && iy+dy < G
+              && iz+dz >= 0 && iz+dz < G) {
+            if (!dx && !dy && !dz) diag[i] = &v[(size_t)i*27+k];
+            c[(size_t)i*27+k] = i+dx+G*dy+G*G*dz;
+            v[(size_t)i*27+k++] = dx || dy || dz ? -1 : 26;
+          }
+    count[i] = k; nnz += k;
+    in[i] = (int)(random32()%9)-4; start[i] = (int)(random32()%9)-4;
+  }
+  struct shape m = {count,cols,vals,diag};
+  int unlike = 0;
+  memcpy(want,start,bytes);
+  shape_reference(kind,0,rows,&m,in,want);
+  memcpy(base,start,bytes);
+  shape_tables[OFF][kind](0,rows,&m,in,base);
+  for (int i = 0; i < rows; ++i) unlike += bits(base[i]) != bits(want[i]);
+  for (int t = 0; t < SLOTS; ++t) {
+    memcpy(work,start,bytes);
+    shape_tables[t][kind](0,rows,&m,in,work);
+    for (int i = 0; i < rows; ++i) compare(work[i],base[i],i);
+  }
+  if (failures) exit(1);
+  decision("stencil-104-cubed",shape_names[kind],rows,27,0);
+  printf("CASE stencil-104-cubed %s n=27 rows=%d nnz=%lld rhs_bytes=%zu columns=stencil default_policy=scalar"
+         " reference_mismatches=%d min_seconds=0.5 samples=5\n",shape_names[kind],rows,nnz,bytes,unlike);
+  static const int ids[] = {DONOR,OFF,ON};
+  for (int sample = 0; timing && sample < 5; ++sample) {
+    double seconds[3]; uint64_t calls[3];
+    for (int j = 0; j < 3; ++j) {
+      int k = sample%2 ? 2-j : j;
+      seconds[k] = 0; calls[k] = 0;
+      do {
+        memcpy(work,start,bytes);
+        double begin = now();
+        shape_tables[ids[k]][kind](0,rows,&m,in,work);
+        seconds[k] += now()-begin; ++calls[k];
+      } while (seconds[k] < 0.5);
+      for (int i = 0; i < rows; ++i) compare(work[i],base[i],i);
+    }
+    print_times(sample,ids,3,seconds,calls);
+  }
+  free(count); free(c); free(v); free(cols); free(vals); free(diag);
+  free(in); free(start); free(work); free(base); free(want);
 }
 static void performance(void)
 {
-  const int candidates[] = {32,4096,8192,14000,16384,32768};
-  for (unsigned z = 0; z < sizeof candidates/sizeof candidates[0]; ++z)
-    for (int layout = 0; layout < 2; ++layout)
-      for (int n = 13; n <= 27; n += 14)
-        compiler_case("cache-threshold",layout,candidates[z],n,4096,0);
+  static const int plain[] = {DONOR,OFF,ON}, forced[] = {DONOR,OFF,ON,MIN4};
+  static const int square[] = {14000,32768,65536,131072,262144};
+  /* Nests far below any cutoff: the plain arm against switch-off.  */
   for (int layout = 0; layout < 2; ++layout)
-    for (int n = 13; n <= 27; n += 14) {
-      compiler_case("CG-A-sized",layout,14000,n,14000,0);
-      compiler_case("memory-sized",layout,32768,n,2097152,0);
-    }
-  compiler_case("HPCG-104-cubed-stencil",1,104*104*104,27,104*104*104,1);
-  compiler_case("lone-memory",2,1,262144,2097152,0);
+    for (int n = 13; n <= 27; n += 14)
+      compiler_case("small",layout,32,n,4096,0,plain,3,0);
+  /* Cutoff grid: one x element per row, uniformly random columns.  Below
+     the default cutoff the min4 slot shows what the hint would do.  */
+  for (unsigned z = 0; z < sizeof square/sizeof square[0]; ++z)
+    for (int layout = 0; layout < 2; ++layout)
+      for (int n = 13; n <= 27; n += 14) {
+        int hinted = square[z] >= LEGAL_MIN_ROWS;
+        compiler_case("square",layout,square[z],n,square[z],0,
+                      hinted ? plain : forced,hinted ? 3 : 4,hinted);
+      }
+  /* Reported control: many rows over a 32 KiB x, which no row count sees. */
+  for (int layout = 0; layout < 2; ++layout)
+    compiler_case("small-x",layout,32768,13,4096,0,plain,3,1);
+  compiler_case("memory",0,32768,13,2097152,0,plain,3,1);
+  compiler_case("memory",1,32768,27,2097152,0,plain,3,1);
+  compiler_case("stencil-104-cubed",1,104*104*104,27,104*104*104,1,plain,3,0);
+  for (int kind = 0; kind < 3; ++kind) shape_case(kind);
+  compiler_case("lone-memory",2,1,262144,2097152,0,plain,3,1);
+  compiler_case("lone-ascending",2,1,262144,2097152,2,plain,3,0);
 }
 #else
 static void performance(void)
@@ -737,7 +1010,15 @@ int main(int argc, char **argv)
 #endif
   printf("CORRECTNESS children=%lu failures=%d\n",checks,failures);
   if (failures) return 1;
+#ifdef COMPILER_PROOF
+  /* --correctness still builds every case, checks every slot and the
+     hand-written decisions; only the clock is skipped.  */
+  timing = argc == 2;
+  if (timing) pin();
+  performance();
+#else
   if (argc == 2) { pin(); performance(); }
+#endif
   printf("%s S12-30 legal comparisons_and_children=%lu failures=%d\n",
          failures ? "FAIL" : "PASS",checks,failures);
   return failures ? 1 : 0;
