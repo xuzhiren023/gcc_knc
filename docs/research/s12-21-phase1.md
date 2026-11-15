@@ -380,3 +380,26 @@ compiler, not GCC 5. Logs are
 failure on an instruction) and `s12_21_imul_green_scan-20261114-212026.log`
 (pass). Passing unrelated T0/T1 checks were not repeated, and neither the
 cost value nor the compiler source changed to accommodate the scanner fix.
+
+### Complete torture sweep
+
+With `KNC_GCC_SLOT=2`, ran once:
+
+```text
+python tools/run.py --name s12-21-torture --inputs tools/torture_compile.py -- python tools/torture_compile.py --jobs 4 --output ../_shared/S12-21/phase2/torture --summary ../_shared/S12-21/phase2/torture.txt
+python tools/run.py --name s12-21-vect --inputs tools/vect_suite.py -- python tools/vect_suite.py --jobs 4 --compile-only --output ../_shared/S12-21/phase2/vect --summary ../_shared/S12-21/phase2/vect.txt
+```
+
+The torture sweep exited zero after 31 minutes: 2003 sources across O0, O2,
+O2 with debug information, and O3, for 8012 configurations. There were zero
+ICEs, hangs, assembler rejections of compiler-generated code, lint failures
+or infrastructure failures. The runner classified 7875 configurations as
+passing, 129 as compiler errors, and 8 as rejected user inline assembly;
+its exit-zero result does not mean all inputs compiled successfully. Detailed
+classifications are in `phase2/torture.txt`. Log:
+`.work/_state/logs/s12_21_torture-20261114-205847.log`.
+
+The vector outcome and the independently reproduced installed-compiler ICE
+are recorded above. All host commands have finished. The package and test
+evidence are ready for lead review, with acceptance still blocked by the
+rebase permission error, incomplete T2, and disposition of that vector ICE.
