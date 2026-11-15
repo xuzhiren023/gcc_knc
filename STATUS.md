@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-15 05:53.
+Updated automatically at every ticket change. Last update: 2026-11-15 05:55.
 
 **Next: the tech lead, on S12-30.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
@@ -117,7 +117,7 @@ Current tickets: `[##################--]` 239 of 255
 | S12-34 | Unrecognizable insn for a truncating vector store to a 1-byte-aligned V16QI destination (found by S12-32) | Not started |  |
 | S12-35 | Clean single-compiler WRF build as dm+sm (MPI + OpenMP) against PhiWeather's k1om MPICH, plus a build recipe PhiWeather can apply to its own patched tree | Done | Upstream WRF 4.8.0 now builds clean as dm+sm (MPI + OpenMP) with the one GCC-KNC compiler (knc 7a3b34430e3,... |
 | S12-36 | card_run yields to a foreign queued row in the middle of our own turn - honor an open turn-level reservation so a multi-job window is not refused | Done | card_run --benchmark now keeps our turn across several jobs while an open claude-turn- ledger row was queue... |
-| S12-37 | Every T1/T2 check writes into the run's own output folder - no fixed paths in shared ticket folders (S10-01 vecarg, and any others) | Waiting for review | After main merge, 3 Cygwin host tests pass; log .work/_state/logs/S12_37_merged-20261115-055233.log. Card m... |
+| S12-37 | Every T1/T2 check writes into the run's own output folder - no fixed paths in shared ticket folders (S10-01 vecarg, and any others) | Changes requested | 1. tools/x87_spill.py:185 breaks an existing test: tests/regress/test_shared_area.py:68-77 (test_x87_probe_... |
 | S12-38 | ICE in the SLP vectorizer on gcc.dg vect-pr123221.c at -O3 -march=knc (found by S12-30's torture sweep) | Not started |  |
 | S12-39 | pm.py submit stops demanding an engineer-side rebase that the sandbox cannot perform (Permission denied on .git/worktrees/<id>/rebase-merge) | Done | Engineers no longer need to rebase before submitting: submit only refuses when main has real changes the br... |
 | S12-40 | Indirect prefetch recognizes Fortran sparse loops (array descriptors, ARRAY_REF offsets, nonzero and OpenMP-outlined starts) so NPB-CG benefits | draft |  |
@@ -280,6 +280,7 @@ Current tickets: `[##################--]` 239 of 255
 
 ## Recent activity
 
+- 2026-11-15 05:55 **S12-37** lead changes: 1. tools/x87_spill.py:185 breaks an existing test: tests/regress/test_shared_area.py:68-77 (test_x87_probe_from_main_checkout) calls x87_spill t1 w...
 - 2026-11-15 05:53 **S12-37** engineer submit: After main merge, 3 Cygwin host tests pass; log .work/_state/logs/S12_37_merged-20261115-055233.log. Card mocked; no GCC/card run. Lead staging: ch...
 - 2026-11-15 05:52 **S12-30** engineer red: e3a0cf42: HPCG dumps compile PASS. SpMV has ineffective row-local hint; SymGS sweeps missed. Focused T1: compile/assemble/lint and off controls PAS...
 - 2026-11-15 05:51 **S12-37** lead answer: Merged; rerun and submit.
@@ -287,7 +288,6 @@ Current tickets: `[##################--]` 239 of 255
 - 2026-11-15 05:50 **S12-31** engineer submit: Green at f2cfc87f, GCC s12/S12-31 299aaf16b72: KNC compare/branch pairing kept adjacent in scalar blocks (pair hook leaves blocks with vector instr...
 - 2026-11-15 05:50 **S12-31** owner decide: Lead raises input_tokens 20M -> 40M (Fable engineer, owner wants Fable used fully): green done at f2cfc87f / GCC 299aaf16b72; the lead submits it w...
 - 2026-11-15 05:49 **S12-31** engineer escalate: budget: 36744556 input tokens used; the budget is 20000000
-- 2026-11-15 05:48 **S12-37** lead defer: Needs a git write the engineer sandbox cannot do: merge main into s12/S12-37 (branch tip bb3f10cc) in the S12-37 worktree. Since S12-39 (d6b753ab) ...
 
 ## Cost
 
