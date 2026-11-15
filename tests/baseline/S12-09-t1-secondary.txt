@@ -1,0 +1,28 @@
+Compiler: k1om-mpss-linux-gcc (GCC) 16.2.0
+Compiler ld: /cygdrive/c/Users/xuzhi/Documents/gcc_knc/.work/_shared/toolchain/cross/bin/k1om-mpss-linux-ld
+Compiler as: /cygdrive/c/Users/xuzhi/Documents/gcc_knc/.work/_shared/toolchain/cross/bin/k1om-mpss-linux-as
+Flags: -O2 -ftree-vectorize -ffp-contract=off / fast; separate driver translation unit
+T2 ABI reference: /cygdrive/c/Users/xuzhi/Documents/gcc_knc/.work/_shared/toolchain/sysroot (no native card execution in t0-t2)
+PASS t1 secondary Fortran deleted-store address setups
+PASS t1 secondary Fortran assembly and knc_lint
+PASS t1 secondary mixed pressure -O1 si
+PASS t1 secondary mixed pressure -O1 di
+PASS t1 secondary mixed pressure -O1 sf
+PASS t1 secondary mixed pressure -O1 df
+PASS t1 secondary mixed pressure -O1 sf_u32
+PASS t1 secondary mixed pressure -O1 u32_sf
+PASS t1 secondary mixed pressure -O1 df_u64
+PASS t1 secondary mixed pressure -O1 u64_df
+PASS t1 secondary mixed pressure -O1 ti
+PASS t1 secondary mixed pressure -O1 tf
+PASS t1 secondary mixed pressure -O2 si
+PASS t1 secondary mixed pressure -O2 di
+PASS t1 secondary mixed pressure -O2 sf
+PASS t1 secondary mixed pressure -O2 df
+PASS t1 secondary mixed pressure -O2 sf_u32
+PASS t1 secondary mixed pressure -O2 u32_sf
+PASS t1 secondary mixed pressure -O2 df_u64
+PASS t1 secondary mixed pressure -O2 u64_df
+PASS t1 secondary mixed pressure -O2 ti
+PASS t1 secondary mixed pressure -O2 tf
+Elapsed: 17.21 seconds

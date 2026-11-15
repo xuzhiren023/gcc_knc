@@ -1,0 +1,228 @@
+GCC 16 KNC C torture compile corpus (S1-05)
+Scope: gcc/testsuite/gcc.c-torture/compile/**/*.c
+dg-options and dg-additional-options without target selectors are appended; selected directives are skipped.
+Flags: -march=knc -S, plus each level below.
+Assembler: binutils 2.22, --march=k1om.
+Lint: tools/knc_lint source checks and decoded object checks after successful assembly.
+Outcome classes are exclusive: compiler failure, then assembler rejection, then lint failure.
+FP ABI class requires every compiler error to be the explicit SSE-disabled ABI diagnostic.
+User inline asm rejected requires every assembler error inside #APP/#NO_APP; source lint must be clean.
+Timeout policy: 60s, then one 600s compiler retry; both exceeded = hang.
+Slow is an additional timing class: retry completed; underlying outcome is counted too.
+Whole-run wall time: 1276.399 seconds (21.273 minutes), 4 workers.
+Files: 2003; measurements: 8012.
+
+level	pass	slow	hang	ICE	compiler error	float/double ABI error	assembler rejection	lint failure	infrastructure failure	user inline asm rejected
+O0	1968	0	0	0	33	0	0	0	0	2
+O2	1969	0	0	0	32	0	0	0	0	2
+O2-g	1969	0	0	0	32	0	0	0	0	2
+O3	1969	0	0	0	32	0	0	0	0	2
+
+O0 / slow (0)
+
+O0 / hang (0)
+
+O0 / ICE (0)
+
+O0 / compiler error (33)
+20030305-1.c
+20111209-1.c
+asmgoto-5.c
+dll.c
+mipscop-1.c
+mipscop-2.c
+mipscop-3.c
+mipscop-4.c
+pr100305.c
+pr10153-1.c
+pr10153-2.c
+pr106433.c
+pr108237.c
+pr110386-2.c
+pr28865.c
+pr29201.c
+pr33614.c
+pr34856.c
+pr39928-1.c
+pr48767.c
+pr83547.c
+pr86637-2.c
+pr88347.c
+pr89235.c
+pr92618.c
+pr97576.c
+pr99647.c
+vector-1.c
+vector-2.c
+vector-3.c
+vector-5.c
+vector-6.c
+vector-dup-1.c
+
+O0 / float/double ABI error (0)
+
+O0 / assembler rejection (0)
+
+O0 / lint failure (0)
+
+O0 / infrastructure failure (0)
+
+O0 / user inline asm rejected (2)
+920520-1.c; reason: every assembler error is inside #APP/#NO_APP
+920521-1.c; reason: every assembler error is inside #APP/#NO_APP
+
+O2 / slow (0)
+
+O2 / hang (0)
+
+O2 / ICE (0)
+
+O2 / compiler error (32)
+20030305-1.c
+20111209-1.c
+dll.c
+mipscop-1.c
+mipscop-2.c
+mipscop-3.c
+mipscop-4.c
+pr100305.c
+pr10153-1.c
+pr10153-2.c
+pr106433.c
+pr108237.c
+pr110386-2.c
+pr28865.c
+pr29201.c
+pr33614.c
+pr34856.c
+pr39928-1.c
+pr48767.c
+pr83547.c
+pr86637-2.c
+pr88347.c
+pr89235.c
+pr92618.c
+pr97576.c
+pr99647.c
+vector-1.c
+vector-2.c
+vector-3.c
+vector-5.c
+vector-6.c
+vector-dup-1.c
+
+O2 / float/double ABI error (0)
+
+O2 / assembler rejection (0)
+
+O2 / lint failure (0)
+
+O2 / infrastructure failure (0)
+
+O2 / user inline asm rejected (2)
+920520-1.c; reason: every assembler error is inside #APP/#NO_APP
+920521-1.c; reason: every assembler error is inside #APP/#NO_APP
+
+O2-g / slow (0)
+
+O2-g / hang (0)
+
+O2-g / ICE (0)
+
+O2-g / compiler error (32)
+20030305-1.c
+20111209-1.c
+dll.c
+mipscop-1.c
+mipscop-2.c
+mipscop-3.c
+mipscop-4.c
+pr100305.c
+pr10153-1.c
+pr10153-2.c
+pr106433.c
+pr108237.c
+pr110386-2.c
+pr28865.c
+pr29201.c
+pr33614.c
+pr34856.c
+pr39928-1.c
+pr48767.c
+pr83547.c
+pr86637-2.c
+pr88347.c
+pr89235.c
+pr92618.c
+pr97576.c
+pr99647.c
+vector-1.c
+vector-2.c
+vector-3.c
+vector-5.c
+vector-6.c
+vector-dup-1.c
+
+O2-g / float/double ABI error (0)
+
+O2-g / assembler rejection (0)
+
+O2-g / lint failure (0)
+
+O2-g / infrastructure failure (0)
+
+O2-g / user inline asm rejected (2)
+920520-1.c; reason: every assembler error is inside #APP/#NO_APP
+920521-1.c; reason: every assembler error is inside #APP/#NO_APP
+
+O3 / slow (0)
+
+O3 / hang (0)
+
+O3 / ICE (0)
+
+O3 / compiler error (32)
+20030305-1.c
+20111209-1.c
+dll.c
+mipscop-1.c
+mipscop-2.c
+mipscop-3.c
+mipscop-4.c
+pr100305.c
+pr10153-1.c
+pr10153-2.c
+pr106433.c
+pr108237.c
+pr110386-2.c
+pr28865.c
+pr29201.c
+pr33614.c
+pr34856.c
+pr39928-1.c
+pr48767.c
+pr83547.c
+pr86637-2.c
+pr88347.c
+pr89235.c
+pr92618.c
+pr97576.c
+pr99647.c
+vector-1.c
+vector-2.c
+vector-3.c
+vector-5.c
+vector-6.c
+vector-dup-1.c
+
+O3 / float/double ABI error (0)
+
+O3 / assembler rejection (0)
+
+O3 / lint failure (0)
+
+O3 / infrastructure failure (0)
+
+O3 / user inline asm rejected (2)
+920520-1.c; reason: every assembler error is inside #APP/#NO_APP
+920521-1.c; reason: every assembler error is inside #APP/#NO_APP
