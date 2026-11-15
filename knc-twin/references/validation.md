@@ -113,7 +113,9 @@ S12-31 (window 5 of `.work/_shared/S12-31/native-mb.log`; window 3 agrees within
 model is 16-32% fast and orders the variants wrongly: on the card the two orders with `faddp`
 before the compare (adj_0, mid_0) are 11% faster than the rest, and adding a dead `movl`
 (mov_*) costs nothing; the model makes adj/mid 8% slower than gas_0 and mov_* another 15%
-slower. Open (not tuned): the per-row cost of an x87 row loop with a memory-operand `fmull`,
+slower. Known defect (not fixed, timing-rule change pending a lead answer): x87 arithmetic with a memory
+operand gets its result at the load latency, without the multiply/divide latency or divider occupancy.
+Open (not tuned): the per-row cost of an x87 row loop with a memory-operand `fmull`,
 `movslq` costed as a one-cycle V-pairable scalar op (no source), and front-end effects of the
 instruction order. S12-30: 12-20% slow on a deterministic input (the card's columns are random);
 the model ranks two-nests slowest where the card measured it fastest (2% apart, inside the

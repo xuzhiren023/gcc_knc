@@ -86,7 +86,7 @@
       "shape": "x87_csr_spmv_rows_l1_resident"
     }
   ],
-  "frozen_profile_hash": "ad82d111c1f87a406d95ed7407b12b900a3585bf73e053209632c151d7c1bb96",
+  "frozen_profile_hash": "44e9c3bb3ae07b5f3f8a54a8854f2936c34cce38ac100fa99414234793a3a9ae",
   "measured_seconds_per_call": {
     "donor-off": 6.749e-06,
     "knc-switch-off": 6.853e-06,

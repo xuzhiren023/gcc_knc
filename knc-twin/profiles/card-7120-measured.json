@@ -161,7 +161,7 @@
       "unit": "cycles",
       "status": "measured",
       "source": "S6-03 l1.load_lat 3.03 (one thread)",
-      "uncertainty": "R08 and R17 document 1 (or 2) cycles."
+      "uncertainty": "R08 and R17 slides 13-14 (whose wording differs) document 1 (or 2) cycles."
     },
     "latency.vector_load_l1": {
       "value": 5,
@@ -301,7 +301,7 @@
       "value": 3,
       "unit": "cycles",
       "status": "assumed",
-      "source": "same pipeline as the measured x87 add (S6-03 x87_add.lat 3.02); fld from memory uses the load latency instead",
+      "source": "evidence E (estimate), inferred: same pipeline as the measured x87 add (S6-03 x87_add.lat 3.02), no KNC source for fld/fst/fxch/fldz; fld from memory uses the load latency instead",
       "alternatives": [
         1
       ],

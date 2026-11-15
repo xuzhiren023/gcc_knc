@@ -85,7 +85,7 @@ Extends `knc-common`; the rows below are this profile's own values (inherited ro
 | `latency.scalar_alu` | 1 | cycles | documented | R17 slide 10; S6-03 scalar_add.lat 2.08 (<=2 bound) |  |
 | `latency.scalar_idiv` | None | cycles | unknown | not measured (native request candidate) |  |
 | `latency.scalar_imul` | 10 | cycles | documented | R02 p.56; not measured on this card by the imported runs |  |
-| `latency.scalar_load_l1` | 3 | cycles | measured | S6-03 l1.load_lat 3.03 (one thread) | R08 and R17 document 1 (or 2) cycles. |
+| `latency.scalar_load_l1` | 3 | cycles | measured | S6-03 l1.load_lat 3.03 (one thread) | R08 and R17 slides 13-14 (whose wording differs) document 1 (or 2) cycles. |
 | `latency.spill_reload_chain` | 12 | cycles for a store followed by a dependent reload | measured | S6-03 spill_reload.lat 12.11 (one thread), 13.14 at four |  |
 | `latency.store_to_load_same_line` | 7 | cycles after a store issues before a load of the same line sees the data | derived | S8-12 C9 memory chain u1 11.07 per link = folded-load add (4) + store-to-load path; spill_reload.lat 12.11 = path + plain load (5) | alt: 3, 9 |
 | `latency.vector_arith` | 4 | cycles | measured | S6-03 vaddps.lat 4.02, vmulps.lat 4.03, vfmadd213ps.lat 4.02, vpaddd.lat 4.03, vpxord.lat 4.03, vaddpd/vmulpd/vfmadd213pd 4.03, vcvtfxpntdq2ps/ps2dq 4.03 |  |
@@ -97,7 +97,7 @@ Extends `knc-common`; the rows below are this profile's own values (inherited ro
 | `latency.x87_compare` | 3 | cycles | assumed | assumed equal to the measured x87 add latency | alt: 1, 4 |
 | `latency.x87_control` | None | cycles | unknown | fldcw/fnstcw/fnstsw not measured; a region using them stops with missing_parameter (native request candidate) |  |
 | `latency.x87_div` | 38 | cycles | measured | S6-03 x87_div.lat 39.25, .rt 38.24; one divide per 38 cycles per core at four threads |  |
-| `latency.x87_move` | 3 | cycles | assumed | same pipeline as the measured x87 add (S6-03 x87_add.lat 3.02); fld from memory uses the load latency instead | alt: 1; fxch may be cheaper; not measured |
+| `latency.x87_move` | 3 | cycles | assumed | evidence E (estimate), inferred: same pipeline as the measured x87 add (S6-03 x87_add.lat 3.02), no KNC source for fld/fst/fxch/fldz; fld from memory uses the load latency instead | alt: 1; fxch may be cheaper; not measured |
 | `latency.x87_mul` | 3 | cycles | measured | S6-03 x87_mul.lat 3.02 |  |
 | `latency.x87_sqrt` | None | cycles | unknown | not measured (native request candidate) |  |
 | `memory.core_service_cycles_per_line` | 20 | core cycles between memory fills for one core (sequential stream, hardware prefetcher active) | measured | S6-03 memory.load_rt per core at four threads 19.48 ticks per line (37.35 at one thread); modeled as the integer 20 | alt: 37; measured with the hardware prefetcher streaming; one core alone on the card; not a card-level bandwidth share |
@@ -132,17 +132,17 @@ Calibration: uncalibrated. No calibration block in profile.
 | `core.contexts` | 4 | hardware threads per core | documented | R01 §2.1; R17 slide 10 |  |
 | `core.decode_bubble_on_unsynchronized_refill` | None | cycles | unknown | R02 ch.4 mentions a one-clock bubble when picker and prefetch-buffer refill are not synchronized (e.g. after an I-cache miss) | Not modeled. Instruction fetch is assumed always to hit. |
 | `core.issue_width` | 2 | instructions per core cycle (U then V) | documented | R01 §2.1; R02 p.34; R17 slide 10 |  |
-| `core.min_issue_gap_same_context` | 2 | cycles between two issue events of one context | documented | R02 ch.4 ('not possible to issue instructions from the same context in back-to-back cycles'); R17 slide 11; consistent with S6-03 measured 2.08 ticks per independent op at one thread |  |
-| `core.picker` | round_robin_least_recent | policy | documented | R02 ch.4 (picker is round robin among ready contexts); R17 slide 10 ('smart round robin') | The 'smart' refinement is not documented in detail; the model uses least-recently-issued-first among eligible contexts. |
+| `core.min_issue_gap_same_context` | 2 | cycles between two issue events of one context | documented | R02 ch.4 (page locator missing): one context never issues in two consecutive cycles; R01 pp.19, 23-24 (same fact, docs/research/knc-machine.yaml thread_issue_interval); R17 slide 11; consistent with S6-03 measured 2.08 ticks per independent op at one thread |  |
+| `core.picker` | round_robin_least_recent | policy | documented | R02 ch.4 (picker is round robin among ready contexts); R17 slide 10 (a refined round-robin choice among contexts) | The refinement is not documented in detail; the model uses least-recently-issued-first among eligible contexts. |
 | `fp.default_nan_f32` | 0xFFC00000 | bits | assumed | x86 'real indefinite' (SDM vol.1 §4.8.3.7) |  |
 | `fp.default_nan_f64` | 0xFFF8000000000000 | bits | assumed | x86 'real indefinite' |  |
 | `fp.ftz_daz_default` | {"daz": false, "ftz": false} | MXCSR policy | documented | R27 §2.4 p.39 (MXCSR FTZ/DAZ bits, architectural default clear); R04 slide 18 (Intel compilers set FTZ at -O1 and above) | The kernel's numerical_policy decides; this is only the default when the kernel does not say. |
 | `fp.ftz_rule` | tiny | semantics | assumed | SDM vol.1 §10.2.3.3: with FTZ set and underflow masked, a tiny result is replaced by a signed zero; whether an exact tiny result is also flushed is not stated for KNC (R27 §2.4 defines the MXCSR bits only) | alt: tiny_and_inexact; The kernel's numerical_policy.ftz_rule can select the alternative. |
 | `fp.nan_propagation` | first_nan_operand_quieted | semantics | assumed | x86 SSE convention (SDM vol.1 §4.8.3.5); KNC-specific documentation not located | Expected-output comparison treats any NaN as matching any NaN unless numerical_policy.nan_compare is 'bits'. |
-| `fp.sp_denormals_supported` | True | boolean | documented | R04 slides 9 and 18 ('Denormals are supported by Intel IMCI (but slow, like host)') |  |
-| `l1.accesses_per_cycle` | 1 | L1 data accesses per core cycle (loads and stores, not prefetches) | documented | R17 slide 13 ('1 access per clock, read or write') | alt: 2; R02 p.55 describes U and V accessing memory in one cycle with bank-conflict delays, which implies two accesses are possible. |
+| `fp.sp_denormals_supported` | True | boolean | documented | R04 slides 9 and 18 (IMCI handles single-precision denormals without flushing, at reduced speed, as the host does) |  |
+| `l1.accesses_per_cycle` | 1 | L1 data accesses per core cycle (loads and stores, not prefetches) | documented | R17 slide 13 (one L1 access per cycle, load or store) | alt: 2; R02 p.55 describes U and V accessing memory in one cycle with bank-conflict delays, which implies two accesses are possible. |
 | `l1.demand_load_miss_stalls_context` | True | boolean | documented | R08 cache performance notes ('In-order design stalls thread on L1 Data Cache Misses (except for store misses); other threads on the same core can continue'); R02 ch.4 (thread-specific flush on a miss) |  |
-| `l1.line_bytes` | 64 | bytes | documented | R01; R08; R17 |  |
+| `l1.line_bytes` | 64 | bytes | documented | R01 pp.22-23; R08; R17 slides 13-14 |  |
 | `l1.outstanding_demand_misses_per_core` | 8 | cache lines | documented | R08 concurrency slide ('each core can only support 8 outstanding L1 Data Cache misses') | alt: 38; R01 p.19 gives about 38 combined requests; R06 §5.2.2 measures MSHRs on an engineering sample. |
 | `l1.replacement` | lru | policy | assumed | R17 slide 13 says pseudo-LRU; the model uses true LRU and records the difference as an assumption |  |
 | `l1.size_bytes` | 32768 | bytes | documented | R01 §2.1; R08; R17 slide 13 |  |
@@ -157,7 +157,7 @@ Calibration: uncalibrated. No calibration block in profile.
 | `l2.inclusive_of_l1` | True | boolean | documented | R08 ('L2 (unified, private, inclusive)') |  |
 | `l2.line_bytes` | 64 | bytes | documented | R17 slide 14 |  |
 | `l2.outstanding_prefetches_per_core` | None | cache lines | unknown | R06 §5.2.2 measured on an engineering sample; not imported as a production constant |  |
-| `l2.size_bytes` | 524288 | bytes | documented | R01; R08; R17 slide 14 |  |
+| `l2.size_bytes` | 524288 | bytes | documented | R01 pp.22-23; R08; R17 slide 14 |  |
 | `l2.ways` | 8 | ways | documented | R08; R17 slide 14 |  |
 | `latency.agi_cycles` | 3 | cycles from the issue of a write to a register until it can be used as an address | documented | R01 p.19 (three-clock address setup); R17 slide 13 (3-cycle address-generation interlock) | S6-03 point 7: a load right after its address write costs one extra tick at one thread, consistent with 3 (issue gap 2 + 1). |
 | `latency.branch_mispredict_penalty` | None | cycles per mispredicted branch | unknown | R02 ch.4 does not give a number; S8-01 C10 measured about 5 extra ticks per pseudorandom branch at one thread on the owner's card (rate not separated) | Card profiles may set it; scenarios that mispredict need it. |
@@ -170,10 +170,11 @@ Calibration: uncalibrated. No calibration block in profile.
 | `latency.memory` | None | cycles, idle demand miss to memory | unknown | Depends on clock and board. R08: ~275-280 ns (~300 cycles on SE10P); R06 §5.1.1: 318-346 cycles at 1 GHz engineering sample; R17 slide 13: about 275 ns | Card profiles set it. Left unknown here so a memory-level simulation needs a card profile. |
 | `latency.remote_l2_line_ns` | None | ns, read of a line held in another core's L2 | unknown | R08: ~275 ns average, independent of core distance; R06 §5.1.2: ~243 cycles average, sd 32 (engineering sample) | Card profiles set it. |
 | `latency.scalar_alu` | 1 | cycles, result ready for a dependent scalar instruction | documented | R17 slide 10 (1-cycle latency scalar unit) | S6-03 scalar_add.lat 2.08 at one thread only bounds it at <=2 because of the issue gap. |
+| `latency.scalar_extend_extra` | 0 | cycles added to the plain mov/ALU (register form) or scalar load (memory form) latency of movslq, movs*, movz*, cltq, cltd, cqto | assumed | evidence E (estimate), inferred: plain integer sign- or zero-extension costs what mov does; no KNC source (R02 p.34 Table 3-1 lists no MOVSX/MOVZX; never measured on the card). Lead decision 2026-11-15. | alt: 2; every S12-31 and S12-30 row executes one movslq index load per nonzero |
 | `latency.scalar_idiv` | None | cycles | unknown | not documented; not measured |  |
 | `latency.scalar_imul` | 10 | cycles | documented | R02 p.56 (imul executes in the x87 unit, 10 cycles) | Not measured on the owner's card by the imported characterization. |
-| `latency.scalar_load_l1` | 1 | cycles, L1 hit load to dependent use (scalar) | documented | R08 cache slide ('1 cycle latency for scalar loads'); R17 slide 13 ('1 cycle') vs slide 14 ('2 cycle') | alt: 2, 3; Documented values disagree; the owner's card measured 3 (card-7120-measured overrides). |
-| `latency.vector_arith` | 4 | cycles | documented | R17 slide 12 ('most vector operations: 4-cycle latency, 1-cycle throughput'); R02 ch.3 VPU pipeline |  |
+| `latency.scalar_load_l1` | 1 | cycles, L1 hit load to dependent use (scalar) | documented | R08 cache slide ('1 cycle latency for scalar loads'); R17 slides 13 and 14 (one and two cycles respectively) | alt: 2, 3; Documented values disagree; the owner's card measured 3 (card-7120-measured overrides). |
+| `latency.vector_arith` | 4 | cycles | documented | R17 slide 12 (typical vector operation: latency 4 cycles, one issue per cycle); R02 pp.32-33 VPU pipeline |  |
 | `latency.vector_convert_df` | None | cycles | unknown | R02 p.33 (DP pipeline paths are longer) |  |
 | `latency.vector_load_l1` | 3 | cycles, L1 hit plain (unmasked, unconverted) vector load to dependent use | documented | R08 cache slide ('3 cycles for vector loads') | alt: 12; the 12-cycle figure measured on the owner's card belongs to merge/convert forms (latency.vector_load_merge_l1) |
 | `latency.vector_load_merge_l1` | 3 | cycles | assumed | no documented difference between masked/converting and plain vector loads; the owner's card shows none either (S6-03 masked_load.lat equals spill_reload.lat) | alt: 12 |
@@ -194,7 +195,8 @@ Calibration: uncalibrated. No calibration block in profile.
 | `occupancy.x87_mul` | None | core cycles the x87 multiplier is busy | unknown |  |  |
 | `pairing.dependent_pairs_allowed` | [["cmp", "jcc"], ["test", "jcc"]] | U/V pairs allowed despite a flag dependency | documented | R02 p.56 (cmp/jcc, push/push, pop/pop); push/pop not modeled |  |
 | `pairing.encoding_rules` | {"max_bytes": 8, "no_displacement_and_immediate": true, "... | rules | documented | R02 p.56 | Applied only when a record carries encoding hints (encoding.bytes, encoding.disp32, encoding.imm). Without hints the model assumes the encoding is pairable and records that assumption. |
-| `pairing.u_instruction_can_be_branch` | False | boolean | assumed | model assumption: an instruction after a control transfer in the same issue slot is not paired |  |
+| `pairing.extend_v_pairs` | True | boolean: may movslq, movs*, movz*, cltq, cltd, cqto issue in the V slot | assumed | evidence E (estimate), inferred: treated like the other scalar integer ops of R02 p.34 Table 3-1, which does not list them; no KNC source. Lead decision 2026-11-15. | alt: False |
+| `pairing.u_instruction_can_be_branch` | False | boolean | assumed | evidence E (estimate), model assumption without a KNC source: an instruction after a control transfer in the same issue slot is not paired |  |
 | `pairing.u_nop_pairs` | False | boolean: may a nop in the U slot take a V partner | measured | S6-03 agi.gap1-4: each nop beyond the first costs a full issue slot (4.15, 6.16, 8.18, 10.19 ticks), so nop+nop never pair; a nop still fills a V slot |  |
 | `pairing.v_eligible_classes` | ["scalar_alu", "scalar_rmw", "scalar_load", "scalar_store... | instruction classes that may issue on the V pipe | documented | R02 p.34 Table 3-1 (mask, vector store, packstore, prefetch, scalar); R17 slide 10 (scalar dual issue) | Table 3-1 lists mnemonics; the class mapping here is the model's. Ordinary vector arithmetic is U-only. S6-03 pair.vector_vector (4.09 at one thread) confirms two vector arithmetic ops do not pair. |
 | `pairing.v_jmp_pairs` | False | boolean: may an unconditional jmp issue in the V slot | measured | S8-01 C10 fixed-direction row: cmp/je, add, jmp cost three issue events per unit (6.22 ticks at one thread), so the jmp did not pair with the add; conditional branches keep the cmp/jcc pairing (R02 p.56) |  |
@@ -204,12 +206,12 @@ Calibration: uncalibrated. No calibration block in profile.
 | `tlb.l1_entries_2m` | None | pages | unknown | not documented in the imported sources |  |
 | `tlb.l1_entries_4k` | 64 | pages | literature | R06 §5.1.3 (level-1 TLB miss cost measured beyond 64 4 KiB pages); gcc_knc C4 rerun (S8-12) finds the knee at 64 pages per core |  |
 | `tlb.l1_miss_penalty_cycles` | 29 | cycles added to a load that misses the first-level DTLB and hits the second level | literature | R06 Table II (level-1 TLB miss, 4 KiB page: 29 cycles); gcc_knc C4 rerun measured about 29 ticks (31.8 vs 3.0 at one thread) | alt: 91; a second-level TLB miss costs about 91 cycles (R06 Table II); not modeled |
-| `vpu.lanes_f32` | 16 | lanes | documented | R27; R17 slide 12 |  |
-| `vpu.lanes_f64` | 8 | lanes | documented | R27; R17 slide 12 |  |
-| `vpu.mask_registers` | 8 | registers per thread | documented | R17 slide 12; R27 |  |
-| `vpu.masking` | merge_only | semantics | documented | R27 (IMCI write masks merge; there is no zeroing form) |  |
+| `vpu.lanes_f32` | 16 | lanes | documented | R27 (locator missing); R17 slide 12 |  |
+| `vpu.lanes_f64` | 8 | lanes | documented | R27 (locator missing); R17 slide 12 |  |
+| `vpu.mask_registers` | 8 | registers per thread | documented | R17 slide 12; R27 (locator missing) |  |
+| `vpu.masking` | merge_only | semantics | documented | R27 (locator missing): IMCI write masks merge; there is no zeroing form |  |
 | `vpu.throughput_per_core` | 1 | vector instructions per core cycle | documented | R17 slide 12 (1-cycle throughput); S6-03 point 1 (two threads reach one vector op per cycle) |  |
-| `vpu.zmm_registers` | 32 | registers per thread | documented | R17 slide 12; R27 |  |
+| `vpu.zmm_registers` | 32 | registers per thread | documented | R17 slide 12; R27 (locator missing) |  |
 
 ## overlay-vector-load-12
 

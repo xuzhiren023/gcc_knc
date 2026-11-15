@@ -43,7 +43,7 @@
         },
         "engine_version": "0.2.0",
         "message": "sustained bandwidth for traffic type 'read_only' is unknown in profile card-7120-measured; give bandwidth_sweep_gbs: [...] to run a declared sweep, or import a native measurement",
-        "profile_hash": "ad82d111c1f87a406d95ed7407b12b900a3585bf73e053209632c151d7c1bb96",
+        "profile_hash": "44e9c3bb3ae07b5f3f8a54a8854f2936c34cce38ac100fa99414234793a3a9ae",
         "status": "needs_parameters"
       }
     },
@@ -82,7 +82,7 @@
         },
         "engine_version": "0.2.0",
         "message": "sustained bandwidth for traffic type 'read_only' is unknown in profile card-7120-measured; give bandwidth_sweep_gbs: [...] to run a declared sweep, or import a native measurement",
-        "profile_hash": "ad82d111c1f87a406d95ed7407b12b900a3585bf73e053209632c151d7c1bb96",
+        "profile_hash": "44e9c3bb3ae07b5f3f8a54a8854f2936c34cce38ac100fa99414234793a3a9ae",
         "status": "needs_parameters"
       }
     },
@@ -124,7 +124,7 @@
           "status": "ok"
         },
         "engine_version": "0.2.0",
-        "profile_hash": "ad82d111c1f87a406d95ed7407b12b900a3585bf73e053209632c151d7c1bb96",
+        "profile_hash": "44e9c3bb3ae07b5f3f8a54a8854f2936c34cce38ac100fa99414234793a3a9ae",
         "scenarios": [
           {
             "achieved_bandwidth_gbs_if_total": 156.5,
@@ -176,7 +176,7 @@
           "status": "ok"
         },
         "engine_version": "0.2.0",
-        "profile_hash": "ad82d111c1f87a406d95ed7407b12b900a3585bf73e053209632c151d7c1bb96",
+        "profile_hash": "44e9c3bb3ae07b5f3f8a54a8854f2936c34cce38ac100fa99414234793a3a9ae",
         "scenarios": [
           {
             "achieved_bandwidth_gbs_if_total": 152.73638554216868,
@@ -273,7 +273,7 @@
       "worst_abs_error_pct": 348.6
     }
   },
-  "generated_utc": "2026-11-15T20:58:43Z",
+  "generated_utc": "2026-11-15T21:14:04Z",
   "invocation": [
     "knc-twin/scripts/validate_heldout.py",
     "--kernels-s",
@@ -338,7 +338,7 @@
       "knc-common",
       "card-7120-measured"
     ],
-    "hash": "ad82d111c1f87a406d95ed7407b12b900a3585bf73e053209632c151d7c1bb96",
+    "hash": "44e9c3bb3ae07b5f3f8a54a8854f2936c34cce38ac100fa99414234793a3a9ae",
     "id": "card-7120-measured",
     "kind": "card",
     "native_measurement_ids": [
@@ -349,7 +349,7 @@
       "S8-17 C12: .work/_shared/tmp/claude-s8-17/c12.out (2026-11-08)"
     ],
     "parameter_status_counts": {
-      "assumed": 10,
+      "assumed": 12,
       "derived": 7,
       "documented": 37,
       "measured": 32,
@@ -358,7 +358,7 @@
     "synthetic": false,
     "version": "0.1.0"
   },
-  "python_seconds": 147.8,
+  "python_seconds": 139.2,
   "ranking": {
     "groups": {
       "agi_gap@threads_1": {

@@ -36,15 +36,15 @@
       "value": 2,
       "unit": "cycles between two issue events of one context",
       "status": "documented",
-      "source": "R02 ch.4 ('not possible to issue instructions from the same context in back-to-back cycles'); R17 slide 11; consistent with S6-03 measured 2.08 ticks per independent op at one thread",
+      "source": "R02 ch.4 (page locator missing): one context never issues in two consecutive cycles; R01 pp.19, 23-24 (same fact, docs/research/knc-machine.yaml thread_issue_interval); R17 slide 11; consistent with S6-03 measured 2.08 ticks per independent op at one thread",
       "applies_to": "all KNC"
     },
     "core.picker": {
       "value": "round_robin_least_recent",
       "unit": "policy",
       "status": "documented",
-      "source": "R02 ch.4 (picker is round robin among ready contexts); R17 slide 10 ('smart round robin')",
-      "uncertainty": "The 'smart' refinement is not documented in detail; the model uses least-recently-issued-first among eligible contexts."
+      "source": "R02 ch.4 (picker is round robin among ready contexts); R17 slide 10 (a refined round-robin choice among contexts)",
+      "uncertainty": "The refinement is not documented in detail; the model uses least-recently-issued-first among eligible contexts."
     },
     "core.decode_bubble_on_unsynchronized_refill": {
       "value": null,
@@ -101,7 +101,7 @@
       "value": false,
       "unit": "boolean",
       "status": "assumed",
-      "source": "model assumption: an instruction after a control transfer in the same issue slot is not paired"
+      "source": "evidence E (estimate), model assumption without a KNC source: an instruction after a control transfer in the same issue slot is not paired"
     },
     "latency.scalar_alu": {
       "value": 1,
@@ -109,6 +109,21 @@
       "status": "documented",
       "source": "R17 slide 10 (1-cycle latency scalar unit)",
       "uncertainty": "S6-03 scalar_add.lat 2.08 at one thread only bounds it at <=2 because of the issue gap."
+    },
+    "latency.scalar_extend_extra": {
+      "value": 0,
+      "unit": "cycles added to the plain mov/ALU (register form) or scalar load (memory form) latency of movslq, movs*, movz*, cltq, cltd, cqto",
+      "status": "assumed",
+      "source": "evidence E (estimate), inferred: plain integer sign- or zero-extension costs what mov does; no KNC source (R02 p.34 Table 3-1 lists no MOVSX/MOVZX; never measured on the card). Lead decision 2026-11-15.",
+      "alternatives": [2],
+      "uncertainty": "every S12-31 and S12-30 row executes one movslq index load per nonzero"
+    },
+    "pairing.extend_v_pairs": {
+      "value": true,
+      "unit": "boolean: may movslq, movs*, movz*, cltq, cltd, cqto issue in the V slot",
+      "status": "assumed",
+      "source": "evidence E (estimate), inferred: treated like the other scalar integer ops of R02 p.34 Table 3-1, which does not list them; no KNC source. Lead decision 2026-11-15.",
+      "alternatives": [false]
     },
     "latency.scalar_imul": {
       "value": 10,
@@ -130,7 +145,7 @@
       "value": 4,
       "unit": "cycles",
       "status": "documented",
-      "source": "R17 slide 12 ('most vector operations: 4-cycle latency, 1-cycle throughput'); R02 ch.3 VPU pipeline",
+      "source": "R17 slide 12 (typical vector operation: latency 4 cycles, one issue per cycle); R02 pp.32-33 VPU pipeline",
       "applies_to": "vaddps/vmulps/vfmadd*ps/pd, vpaddd, vpxord, dq<->ps conversions"
     },
     "latency.vector_long": {
@@ -152,7 +167,7 @@
       "value": 1,
       "unit": "cycles, L1 hit load to dependent use (scalar)",
       "status": "documented",
-      "source": "R08 cache slide ('1 cycle latency for scalar loads'); R17 slide 13 ('1 cycle') vs slide 14 ('2 cycle')",
+      "source": "R08 cache slide ('1 cycle latency for scalar loads'); R17 slides 13 and 14 (one and two cycles respectively)",
       "alternatives": [
         2,
         3
@@ -288,7 +303,7 @@
       "value": 64,
       "unit": "bytes",
       "status": "documented",
-      "source": "R01; R08; R17"
+      "source": "R01 pp.22-23; R08; R17 slides 13-14"
     },
     "l1.replacement": {
       "value": "lru",
@@ -300,7 +315,7 @@
       "value": 1,
       "unit": "L1 data accesses per core cycle (loads and stores, not prefetches)",
       "status": "documented",
-      "source": "R17 slide 13 ('1 access per clock, read or write')",
+      "source": "R17 slide 13 (one L1 access per cycle, load or store)",
       "alternatives": [
         2
       ],
@@ -338,7 +353,7 @@
       "value": 524288,
       "unit": "bytes",
       "status": "documented",
-      "source": "R01; R08; R17 slide 14"
+      "source": "R01 pp.22-23; R08; R17 slide 14"
     },
     "l2.ways": {
       "value": 8,
@@ -375,31 +390,31 @@
       "value": 16,
       "unit": "lanes",
       "status": "documented",
-      "source": "R27; R17 slide 12"
+      "source": "R27 (locator missing); R17 slide 12"
     },
     "vpu.lanes_f64": {
       "value": 8,
       "unit": "lanes",
       "status": "documented",
-      "source": "R27; R17 slide 12"
+      "source": "R27 (locator missing); R17 slide 12"
     },
     "vpu.zmm_registers": {
       "value": 32,
       "unit": "registers per thread",
       "status": "documented",
-      "source": "R17 slide 12; R27"
+      "source": "R17 slide 12; R27 (locator missing)"
     },
     "vpu.mask_registers": {
       "value": 8,
       "unit": "registers per thread",
       "status": "documented",
-      "source": "R17 slide 12; R27"
+      "source": "R17 slide 12; R27 (locator missing)"
     },
     "vpu.masking": {
       "value": "merge_only",
       "unit": "semantics",
       "status": "documented",
-      "source": "R27 (IMCI write masks merge; there is no zeroing form)"
+      "source": "R27 (locator missing): IMCI write masks merge; there is no zeroing form"
     },
     "vpu.throughput_per_core": {
       "value": 1,
@@ -411,7 +426,7 @@
       "value": true,
       "unit": "boolean",
       "status": "documented",
-      "source": "R04 slides 9 and 18 ('Denormals are supported by Intel IMCI (but slow, like host)')"
+      "source": "R04 slides 9 and 18 (IMCI handles single-precision denormals without flushing, at reduced speed, as the host does)"
     },
     "fp.ftz_daz_default": {
       "value": {

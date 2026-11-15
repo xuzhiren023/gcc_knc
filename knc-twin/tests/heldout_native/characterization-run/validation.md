@@ -1,6 +1,6 @@
 # Held-out validation against the characterization microbenchmarks
 
-Generated 2026-11-15T20:58:43Z. Profile card-7120-measured (hash ad82d111c1f8...). line_tracking cold memory, TLB modeled, hardware prefetcher off, memory service modeled
+Generated 2026-11-15T21:14:04Z. Profile card-7120-measured (hash 44e9c3bb3ae0...). line_tracking cold memory, TLB modeled, hardware prefetcher off, memory service modeled
 
 ## Error statistics (scenario A, per thread count)
 

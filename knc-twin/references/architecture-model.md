@@ -105,7 +105,7 @@ trace falls back to serializing x87 instructions. x87 instructions issue on U on
     R06 Table II); warm ranges also warm the TLB; the second-level TLB and page walks are not
     modeled.
   - `hardware_prefetcher: modeled`: a streaming L2 prefetcher with `l2.hw_prefetch_streams` (16,
-    R01) streams, one per 4 KiB page, confirmed after two accesses with the same stride of at
+    R01 p.19) streams, one per 4 KiB page, confirmed after two accesses with the same stride of at
     most `l2.hw_prefetch_max_stride_lines` (2, R08), prefetching `l2.hw_prefetch_depth_lines`
     (16, derived from memory.load_rt) lines ahead within the page into L2; it trains on loads and
     stores (R01 TUNE_PREFQ RFO bit).

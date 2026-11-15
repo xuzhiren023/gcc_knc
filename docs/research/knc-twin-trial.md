@@ -1,61 +1,45 @@
 # knc-twin trial and validation (S13-06 merged with knc-twin 0.2.0, 2026-11-15)
 
-Engine 0.2.0, profile `card-7120-measured` (hash `ad82d111c1f8...`). No card run, no GCC build. Numbers are
+Engine 0.2.0, profile `card-7120-measured` (hash `44e9c3bb3ae0...`). No card run, no GCC build. Numbers are
 **(pred)** (twin output, status ok) or **(meas)** (native, existing logs); simulated cycles are never measurements.
 This replaces the S13-06 branch report (engine 0.1.0). Full tables: `knc-twin/references/validation.md`,
 `knc-twin/tests/heldout_native/characterization-run/validation.md`.
 
 ## 1. What the twin covers
 
-One KNC core, 1-4 in-order contexts, exact functional execution plus a cycle model (U/V pairing with the
-measured exceptions, 2-cycle same-context spacing, AGI 3, L1/L2 line tracking, demand- and store-miss stalls,
-no-read stores, gathers, x87 stack with extended precision; optional DTLB, L2 hardware prefetcher and memory
-service sub-models). Card and pair scales are analytical (`needs_parameters` when a bandwidth is unknown).
-Input: GCC-KNC or GCC 5.1.1 `.s` through one adapter, `knc-twin/scripts/from_gcc_s.py` (whole function, one
-loop, or `--loop .L7 --spec` with a conversion report), or JSON records. Validated shapes (median/worst held-out
-error): register vector chains 1%/11%, scalar and mask 1%/5%, x87 register chains 1%/3%, L1/L2 dependent loads
-2%/14%, L1-resident stores and prefetch pairing 2%/12%. Everything else is an unvalidated estimate.
+One KNC core, 1-4 in-order contexts: exact functional execution plus a cycle model (U/V pairing, 2-cycle
+same-context spacing, AGI, L1/L2 line tracking, miss stalls, no-read stores, gathers, x87 stack; optional DTLB,
+L2 prefetcher and memory-service sub-models); analytical pair and card scales. Input: GCC `.s` through
+`knc-twin/scripts/from_gcc_s.py`, or JSON records. Validated shapes (median/worst held-out error): register
+vector chains 1/11%, scalar and mask 1/5%, x87 register chains 1/3%, L1/L2 dependent loads 2/14%, L1 stores
+and prefetch pairing 2/12%. Everything else is an unvalidated estimate.
 
 ## 2. Merge decisions
 
-- Branch `twin/merge-s13-06` from main d00f2d68: merged `twin/main-edits` c17216b3 (knc-twin/ content only; its
-  two board commits were already on main, so STATUS.md, CURRENT_STATE.md and work/tickets keep main's text),
-  then `s13/S13-06` 22944844. Root `.gitignore` unchanged; `knc-twin/.gitignore` (0.2.0) re-includes `*.s`/`*.c`.
-- Engine files (`asm.py`, `isa.py`, `functional.py`): 0.2.0 kept. It already has every form S13-06 added
-  (`jbe/ja/jnb/...`, `sal`, `vloadunpackl/hps`, `vpackstorel/hps`, now exact rather than timing only), and it
-  executes x87 memory forms and `movslq` exactly, so S13-06's rejections of those were dropped (see 10.1).
-- One converter: 0.2.0's (function regions, `.rept`, data symbols, audit). Ported from S13-06: `--loop LABEL`
-  without a function name, `--spec` (`stream_init`, `addr`/`lines` hints, `contexts`), the conversion report
-  (`knc-twin.conversion/1`, every unsupported line with exact text). New for S12-31's `mb.s`: `.skip N, 0x90` in
-  code runs as N nops; without `.size`, a function ends at the next `@function` label.
-- One harness: `knc-twin/scripts/validate_heldout.py` now also predicts every case in `tests/heldout_native/`
-  (`--cases`, `--record` writes `prediction.json`); `tests/trial/knc_trial.py` delegates to it. S12-31 became 7
-  function-level variants (input from `tools/s12_31_bench.cpp`, exact expected sum); S12-30 uses 0.2.0's
-  `fixtures/batch` kernels for the 4 measured variants (B's per-nonzero loop excerpt `csr.s` removed).
-- Trial cases (`tests/trial/make_cases.py`): five expectations changed because the merged engine reads what
-  0.1.0 rejected: `agi_gap1` (nop), `gcc_forms_movslq`, `gcc_forms_unpack`, `trial_fsum_L26` (x87) and
-  `trial_stencil_L51` (per-context buffers) now carry independently computed inputs and expected outputs and
-  pass `functional`; a deliberately wrong expected value fails each one. All prediction.json files were
-  re-recorded with the merged engine and profile (the engine changed, no parameter was set from them).
+- Branch `twin/merge-s13-06` from main d00f2d68: `twin/main-edits` c17216b3 (knc-twin/ only; board files keep
+  main's text), then `s13/S13-06` 22944844. Root `.gitignore` unchanged; `knc-twin/.gitignore` re-includes `*.s`.
+- Engine (`asm.py`, `isa.py`, `functional.py`): 0.2.0 kept; it has every form S13-06 added and executes x87
+  memory forms and `movslq` exactly, so S13-06's rejections of those were dropped.
+- One converter (0.2.0's `from_gcc_s.py`) with S13-06's `--loop LABEL`, `--spec`, `--contexts` and conversion
+  report ported; `.skip N, 0x90` in code runs as nops; without `.size` a function ends at the next one.
+- One harness: `validate_heldout.py --cases [--record]` predicts every `tests/heldout_native/` case;
+  `knc_trial.py` delegates to it. S12-31: 7 function-level variants with the bench's input; S12-30: the 4
+  measured variants as 0.2.0's `fixtures/batch` kernels. Five trial cases that 0.1.0 rejected now carry
+  independent inputs and expected outputs; a wrong expected value fails each one.
+- Follow-up (lead decisions): labelled assumptions (10), ADR-0013 rewording (8); profile hash ad82d111c1f8 ->
+  44e9c3bb3ae0; all prediction.json and the batch manifest re-recorded; no held-out number moved.
 
-## 3. Runs on the merged tree (Windows Python 3.8 through `tools/run.py`)
+## 3. Runs on the merged tree (Windows Python 3.8 through `tools/run.py`, after the follow-up commit)
 
-| run | result |
-|---|---|
-| `knc_twin.py selftest` | 95 tests, 0 failures, 0 errors |
-| `examples/run_examples.py` | 36 examples, statuses as recorded in `examples/RESULTS.md` (28 ok, 8 intended non-ok) |
-| `validate_heldout.py ... --cases --record` | 119 characterization rows (2 unsupported: `vrcp23ps` timing only) + 11 compiled rows + 4 card cases, 2.5 min |
-| `tests/trial/knc_trial.py` | 16 cases: 16 conversion ok, 16 functional ok |
-| `tests/regress/test_knc_twin.py` | 3 tests OK (selftest, 16 trial cases, 6 held-out predictions unchanged) |
+selftest 95 tests, 0 failures; `examples/run_examples.py` 36 examples (28 ok, 8 intended non-ok); `validate_heldout.py
+--cases --record` 119 characterization rows (2 unsupported, `vrcp23ps`) + 11 compiled rows + 4 card cases;
+`tests/trial/knc_trial.py` 16 of 16 converted and functional ok; `tests/regress/test_knc_twin.py` 3 tests OK.
 
 ## 4. Consistency with characterization (rows that built the profile; not validation)
 
-Ticks per unit per thread **(meas)** vs cycles per unit per thread **(pred)**, `tests/trial/char.s`:
-C9 register u1/u2/u4 at 1 thread 4.02/3.02/2.52 vs 4.016/3.016/2.516, at 2 threads 4.02/3.01/2.51 vs
-4.031/3.031/2.531; C7 1 and 2 accumulators at 4 threads 4.13/4.13 vs 4.156/4.156; pair.vector_scalar
-2.08/2.10/4.20 vs 2.133/2.141/4.281; pair.vector_vector 4.09/4.08/8.20 vs 4.070/4.078/8.156; agi.gap0
-3.11/3.17/4.26 vs 3.133/3.141/4.281; agi.gap1 4.15/4.15/8.27 vs 4.102/4.109/8.156. Largest difference 2.5%
-(pair.vector_scalar, 1 thread); the adapter's synthetic end `nop` adds about 0.016 per unit. Nothing tuned.
+Ticks per unit per thread **(meas)** vs **(pred)**, `tests/trial/char.s`: C9 register u1/u2/u4 4.02/3.02/2.52 vs
+4.016/3.016/2.516 (1 thread); C7 a1/a2 4.13/4.13 vs 4.156/4.156 (4 threads); pair.vector_scalar 2.08/2.10/4.20 vs
+2.133/2.141/4.281; pair.vector_vector, agi.gap0, agi.gap1 within 1.4%. Largest difference 2.5%. Nothing tuned.
 
 ## 5. Held-out validation (no row here set a parameter)
 
@@ -81,10 +65,9 @@ with `card.clock_hz` 1.238 GHz; characterization ticks treated as cycles (TSC 0.
 | STREAM RMW / write NGO, 60 thr (card scale, out of core model) | GB/s | 179.11 / 169.23 | 156.5 / 226.1 | -13% / +34% | profile bandwidth |
 | STREAM read, GEMV fp32 (card scale) | GB/s | 147.24 / 125.30 | needs_parameters | - | read bandwidth unknown |
 
-Ranking: 306 of 313 measured characterization orderings reproduced (0.978); S12-31 4 of 10: the card makes
-adj_0/mid_0 11% faster than the rest and a dead `movl` free, the twin makes adj/mid 8% slower than gas_0 and
-mov_* 15% slower again. S12-30 variants are within 3% of each other on the card (not ranked); the twin puts
-two-nests last, the card first. The card cases only test the profile's bandwidth entries (memory bound).
+Ranking: 306 of 313 characterization orderings (0.978); S12-31 4 of 10 (card: adj/mid 11% faster, dead `movl`
+free; twin: adj/mid 8% slower than gas_0, mov_* 15% slower again). S12-30: the twin puts two-nests last, the
+card first (within 3%). The card cases only test the profile's bandwidth entries.
 
 ## 6. Open misses (not tuned)
 
@@ -99,24 +82,22 @@ two-nests last, the card first. The card cases only test the profile's bandwidth
 
 ## 7. Forms still unsupported in real `-O2` output
 
-From 0.2.0's audit (`knc-twin/AUDIT.md`: 455 functions, 317 innermost loops, 295 functional- and 294
-timing-complete, 4848 of 5432 loop instructions; not rerun): `call` (region boundary, 3 functions),
-`vpmadd231d` (unknown, 2), a `ret` in an out-of-line block inside a loop region (16 loops), one exit redirect
-leaving an unreadable `__knc_twin_end` operand (1 loop), TLS `@gottpoff` displacements (4 functions), symbolic
-immediates such as `$.LC0` (6), lock prefixes other than `lock add` (1). Timing stops (`missing_parameter`):
-`latency.x87_control` (`fldcw`/`fnstcw`/`fnstsw`), `latency.x87_sqrt`, `latency.scalar_idiv`,
-`occupancy.scatter_cycles_per_line`, `latency.fence`. Timing only (no exact semantics): `vrcp23ps`.
+From 0.2.0's audit (`knc-twin/AUDIT.md`: 317 innermost loops, 294 timing-complete; not rerun): `call`,
+`vpmadd231d`, a `ret` in an out-of-line block inside a loop region (16 loops), one exit redirect leaving an
+unreadable `__knc_twin_end` operand, TLS `@gottpoff` displacements, symbolic immediates (`$.LC0`), lock prefixes
+other than `lock add`. Timing stops (`missing_parameter`): `latency.x87_control`, `latency.x87_sqrt`,
+`latency.scalar_idiv`, `occupancy.scatter_cycles_per_line`, `latency.fence`. Timing only: `vrcp23ps`.
 
-## 8. ADR-0013 check of `knc-twin/references/`
+## 8. ADR-0013 check of `knc-twin/references/` (after the rewording)
 
-Intel-authored citations: R01 (SSDG 328207) 18, R27 (ISA manual 327364) 9, SDM 3, R02 (Rahman, Intel/Apress)
-29, R17 (Klemm, Intel) 33, R04 (Cornea, Intel) 2; all are facts behind a parameter or rule, and all but 10 give
-a page, section, slide or table. Without a locator: R01 for `l1.line_bytes`, `l2.size_bytes` (`parameters.md`
-145, 160) and `architecture-model.md` 108; R17 for `l1.line_bytes` and line 88; R27 for `vpu.lanes_f32/f64`,
-`vpu.mask_registers`, `vpu.masking`, `vpu.zmm_registers` (207-212); SDM by section only. No long verbatim run
-(the Intel PDFs are not in the worktree, so no n-gram comparison). Three short quotations of Intel-authored
-text remain in `parameters.md` (generated from the profiles' `source` strings): R02 ch.4, 12 words (line 135);
-R04, 10 words (142); R17 slide 12, 8 words (176). R08 (McCalpin, TACC, not Intel) is quoted six times.
+Intel-authored citations (R01 18, R27 9, SDM 3, R02 29, R17 33, R04 2) are facts behind a parameter or rule.
+No Intel quotation remains: the R02 ch.4, R04 slides 9/18 and R17 slide 12 quotations, and three shorter R17
+ones (slides 10, 13, 14), are now our own words in the profile `source` strings. Locators added from
+`docs/research/knc-references.md`: R01 pp.22-23 (`l1.line_bytes`, `l2.size_bytes`), R01 p.19
+(`architecture-model.md` prefetch streams), R17 slides 13-14 (`l1.line_bytes`, `latency.scalar_load_l1`).
+Marked "locator missing" (the index gives none): R27 for `vpu.lanes_f32`, `vpu.lanes_f64`, `vpu.mask_registers`,
+`vpu.zmm_registers`, `vpu.masking`, and R02 ch.4 for `core.min_issue_gap_same_context` (R01 pp.19, 23-24 added
+for the same fact). No long verbatim run (Intel PDFs not in the worktree). R08 (TACC, not Intel) quotes remain.
 
 ## 9. `card-7120-measured` against `docs/research/knc-machine.yaml` (S13-05, on main)
 
@@ -134,16 +115,36 @@ R04, 10 words (142); R17 slide 12, 8 words (176). R08 (McCalpin, TACC, not Intel
 | `l2.hw_prefetch_depth_lines` / (`r08_l2_prefetched_lines`) | 16 per stream (derived) | no per-stream value; 24 per core historical | fitted to memory.load_rt vs R08 |
 | `latency.scalar_alu` / `scalar_add_dependency` | 1 (R17 slide 10) | no latency; 2.08/2.07/4.19 ticks, warns against 1 | documented vs measured |
 
-11 disagreements. Agreements: clock 1.238 GHz, TSC 1.232, 61/60 cores, 4 contexts, issue interval 2, vector
-latency 4/6/7, x87 add/mul 3, AGI 3, line 64 B, L1 32 KiB, L2 512 KiB, DTLB 64 pages, L1 3.03, L2 24.42,
-memory 356.53, 19.48 ticks per line per core, 16 L2 prefetch streams, no L1 prefetcher, scatter cost unknown.
+11 disagreements. Agreements: clocks, cores, contexts, issue interval 2, vector latency 4/6/7, x87 add/mul 3,
+AGI 3, cache geometry, DTLB 64, L1/L2/memory latency, 19.48 ticks per line, 16 L2 prefetch streams.
 
-## 10. For the lead
+## 10. Costs without a source that the compiled rows use (now labelled "evidence E" in the profile)
 
-1. `movslq`/`movsx*` are timed as a 1-cycle V-pairable scalar op without a source (R02 p.34 Table 3-1 lists no
-   MOVSX). Every S12-31/S12-30 row depends on it. Accept, or require a native microbenchmark first.
-2. The three Intel quotations and ten unlocated citations live in profile `source` strings; rewording them
-   changes the profile hash and so every recorded prediction and the frozen batch manifest.
-3. `calibration.held_out_validation_cases` in the profile stays 62 (characterization only) for the same reason.
-4. Staged native requests in `.work/_shared/S13-06/` carry engine-0.1.0 predictions (saxpy `.L7` 19.875;
-   now 13.125/13.25/17.5 **(pred)** at 1/2/4 contexts); re-stage before running them after M4.
+| parameter or rule | value | used by |
+|---|---|---|
+| `latency.scalar_extend_extra` (new) | 0 cycles over mov / scalar load | `movslq` index load per nonzero: every S12-31 and S12-30 row |
+| `pairing.extend_v_pairs` (new) | true | same |
+| `latency.x87_move` | 3 (as the measured x87 add) | `fldz`, `fld %st(i)`, `fstp %st`: S12-30, S12-31 prologue |
+| `pairing.u_instruction_can_be_branch` | false | every loop |
+| engine rule: x87 loads at the scalar load latency, x87 issues on U only | - | every `fldl`/`fmull` row |
+
+Results that use them list them under `parameters_used` (status assumed) and in `assumptions`. **Defect found**
+while listing: x87 arithmetic with a memory operand (`fmull (%rcx,%rax,8)`, `fdivl`) gets its result at the load
+latency only; the multiply or divide latency and the divider occupancy are not charged (an `fdivl` chain costs
+3 cycles per op, `fldl`+`fdivrp` 38). S12-31 and S12-30 contain such `fmull`s. Not fixed (a timing-rule
+change for the lead); fix it before trusting any x87 compiled-code prediction.
+
+## 11. How far to trust it
+
+Good on characterization-style microbenchmarks (median held-out error about 1%), with a caveat: those rows
+come from the same harness and instruction families as the calibration rows. On compiled loops it is
+currently 12-32% off and gets the order of close variants wrong (S12-31 4 of 10). Use it for bounds,
+mechanisms (what binds, which dependency or resource) and differences well above 30%; do not use it to choose
+between variants predicted within about 30% of each other.
+
+## 12. Native requests staged in `.work/_shared/S13-06/` (prepare-native, not built, not run)
+
+`s12_31_gas_0`/`adj_0`/`mov_adj_0` (S12-31 ordering miss; pred 346.6/373.6/427.6 per row in an 8-row call),
+`sr_alias`/`sr_noalias` (store/reload pairs: issue blocker or overlap; 9.25 vs 4.25 per pair at one thread),
+`st_seq`/`st_stride3` (memory.store_normal: is the speed the L2 prefetcher's; 39.1 vs 362.4 per store),
+`trial_saxpy_L7`, `trial_stencil_L51`, `c7_reduce_a1`/`a2` (new predictions); index `README.md`; 0.1.0 ones superseded.

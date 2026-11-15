@@ -77,6 +77,11 @@ for _n, _sw, _dw, _sx in (("movslq", 32, 64, True), ("movsbl", 8, 32, True), ("m
                            ("movzbl", 8, 32, False), ("movzbq", 8, 64, False), ("movzwl", 16, 32, False), ("movzwq", 16, 64, False),
                            ("movsbw", 8, 16, True), ("movzbw", 8, 16, False)):
     _add(_n, "scalar_alu", ["w:g", "r:gm"], fn="movx", src_width=_sw, dst_width=_dw, sign=_sx, mem_size=_sw // 8)
+# Sign/zero extension: no KNC source for their cost (R02 p.34 Table 3-1 lists no MOVSX/MOVZX); the timing
+# model charges latency.scalar_extend_extra on top of mov/load and pairs them per pairing.extend_v_pairs
+# (both evidence E, assumed in every profile).
+EXTEND_OPS = frozenset(("movslq", "movsbl", "movsbq", "movswl", "movswq", "movzbl", "movzbq", "movzwl", "movzwq",
+                        "movsbw", "movzbw", "cltq", "cltd", "cqto"))
 _add("cltq", "scalar_alu", [], fn="cltq", note="rax = sign-extend eax")
 _add("cltd", "scalar_alu", [], fn="cltd", note="edx = sign of eax")
 _add("cqto", "scalar_alu", [], fn="cqto", note="rdx = sign of rax")

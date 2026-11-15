@@ -129,7 +129,14 @@ class CoreSim(object):
         if insn.has_swizzle and cls == "vector_arith":
             self.assume("a swizzled register source raises the operation to the long-vector latency (S6-03 swizzle_*.lat 6)")
             return self._param("latency.vector_long")
-        return self._param(key)
+        return self._param(key) + self._extend_extra(insn)
+
+    def _extend_extra(self, insn):
+        if insn.op not in isa.EXTEND_OPS:
+            return 0
+        self.assume("sign/zero extensions (movslq, movs*, movz*, cltq) cost a plain mov or scalar load plus latency.scalar_extend_extra "
+                    "and pair per pairing.extend_v_pairs: evidence E, inferred, no KNC source")
+        return self._param("latency.scalar_extend_extra")
 
     def _encoding_pairable(self, insn):
         enc = insn.encoding
@@ -300,7 +307,7 @@ class CoreSim(object):
                     if level != "l1" and self.miss_stalls:
                         cs.stall_until = max(cs.stall_until, ready)
                 else:
-                    done = ready
+                    done = ready + self._extend_extra(insn)
                     if level != "l1" and self.miss_stalls:
                         cs.stall_until = max(cs.stall_until, ready)
                     if insn.is_store:
@@ -360,6 +367,10 @@ class CoreSim(object):
             return False
         if v.cls not in self.v_eligible:
             return False
+        if v.op in isa.EXTEND_OPS:
+            self._extend_extra(v)
+            if not self._param("pairing.extend_v_pairs"):
+                return False
         if isa.CLASSES[v.cls]["pipes"] == "UV_both" or isa.CLASSES[u.cls]["pipes"] == "UV_both":
             return False
         if not self._encoding_pairable(u) or not self._encoding_pairable(v):
