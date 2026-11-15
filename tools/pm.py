@@ -299,6 +299,21 @@ def free_knc(gcc):
             run_git("checkout", "-q", "--detach", cwd=tree)
 
 
+def merge_clean(cwd, ref, *options, integration="main"):
+    """Abort our failed merge and report conflicts before any board update can stage them."""
+    try:
+        run_git("merge", *options, ref, cwd=cwd)
+    except Refused as error:
+        paths = run_git("diff", "--name-only", "--diff-filter=U", cwd=cwd)
+        merge_head = run_git("rev-parse", "--git-path", "MERGE_HEAD", cwd=cwd)
+        if os.path.exists(os.path.join(cwd, merge_head)):
+            run_git("merge", "--abort", cwd=cwd)
+        if run_git("status", "--porcelain", cwd=cwd):
+            raise Refused("merge failed; checkout is not clean after abort: " + cwd) from error
+        raise Refused("merge refused (%s): %s; ask the lead to merge %s into the ticket branch.\n%s"
+                      % (cwd, paths or "no conflicting paths", integration, error)) from error
+
+
 def submit_problems(board, ticket, cwd):
     """Return (hard problems, budget problems) for this branch against main."""
     policy = board.policy
@@ -307,15 +322,21 @@ def submit_problems(board, ticket, cwd):
     if run_git("status", "--porcelain", cwd=cwd):
         hard.append("uncommitted changes in the worktree")
     base = run_git("merge-base", "main", "HEAD", cwd=cwd)
+    # Inspect every missing commit, including edits later reverted and rename sources.
+    missing_paths = run_git("log", "--format=", "--name-only", "--no-renames", "-m",
+                            "HEAD..main", cwd=cwd).splitlines()
+    if any(p and not (p.startswith("work/") or p in ("STATUS.md", "CURRENT_STATE.md"))
+           for p in missing_paths):
+        hard.append("the branch lacks real changes from main: ask the lead to merge main into the ticket branch")
     subjects = run_git("log", "--format=%s", base + "..HEAD", cwd=cwd).splitlines()
     gcc = gcc_checkout(board, ticket)
     gcc_diff = "knc..." + ticket.fields["branch"] if gcc else None
     if gcc:
         subjects += run_git("log", "--format=%s", "knc.." + ticket.fields["branch"], cwd=gcc).splitlines()
-        # Two GCC lanes merge into one knc: the branch must already hold its current head.
+        # GCC changes require lead integration; engineers cannot write worktree git metadata.
         if subprocess.call(["git", "merge-base", "--is-ancestor", "knc", ticket.fields["branch"]], cwd=gcc,
                            stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL):
-            hard.append("the GCC branch does not contain the current knc head: rebase it on knc first")
+            hard.append("the GCC branch lacks the current knc head: ask the lead to merge knc into the ticket branch")
     if not subjects:
         hard.append("no commits on this branch")
     if ticket.fields.get("type", "code") == "code" and not any("[red]" in s for s in subjects):
@@ -530,18 +551,37 @@ def cmd_approve(board, args):
         return
     branch = ticket.fields["branch"]
     worktree = board.worktree(ticket)
-    note = limit_text(board, args.note or "merged") + machine_check(worktree, gcc_slot(ticket))
+    note = limit_text(board, args.note or "merged")
     message = "Merge %s: %s" % (ticket.id, ticket.fields.get("title", ""))
     gcc = gcc_checkout(board, ticket)
+    if run_git("status", "--porcelain", cwd=board.root) or \
+            run_git("branch", "--show-current", cwd=board.root) != "main":
+        raise Refused("main checkout must be clean and on main before merging a ticket")
+    if run_git("status", "--porcelain", cwd=worktree) or \
+            run_git("branch", "--show-current", cwd=worktree) != branch:
+        raise Refused("ticket worktree must be clean and on " + branch)
+    if gcc and run_git("rev-parse", branch, cwd=gcc) != ticket.fields.get("gcc_head"):
+        raise Refused("GCC branch moved since submit; submit again before approval")
+    host_head = run_git("rev-parse", "HEAD", cwd=worktree)
     if gcc:
-        if run_git("rev-parse", branch, cwd=gcc) != ticket.fields.get("gcc_head"):
-            raise Refused("GCC branch moved since submit; submit again before approval")
-        if run_git("status", "--porcelain", cwd=board.root) or \
-                run_git("branch", "--show-current", cwd=board.root) != "main":
-            raise Refused("main checkout must be clean and on main before merging a GCC ticket")
+        gcc_head = run_git("rev-parse", branch, cwd=gcc)
+        previous = run_git("branch", "--show-current", cwd=gcc)
+        run_git("checkout", "-q", branch, cwd=gcc)
+    try:
+        merge_clean(worktree, "main", "--no-edit")
+        if gcc:
+            merge_clean(gcc, "knc", "--no-edit", integration="knc")
+        note += machine_check(worktree, gcc_slot(ticket))
+    except Refused:
+        # Keep submitted branch tips retryable if either integration or the check fails.
+        run_git("reset", "--hard", host_head, cwd=worktree)
+        if gcc:
+            run_git("reset", "--hard", gcc_head, cwd=gcc)
+            run_git("checkout", "-q", previous, cwd=gcc)
+        raise
+    if gcc:
         main_head = run_git("rev-parse", "HEAD", cwd=board.root)
         knc_head = run_git("rev-parse", "knc", cwd=gcc)
-        previous = run_git("branch", "--show-current", cwd=gcc)
         # When knc is an ancestor the merge tree is the branch tree. Build the commit and move
         # knc without a merge, so checkout rewrites no file (a rewrite forces a GCC rebuild).
         ancestor = subprocess.call(["git", "merge-base", "--is-ancestor", "knc", branch], cwd=gcc,
@@ -559,8 +599,8 @@ def cmd_approve(board, args):
         run_git("checkout", "-q", "knc", cwd=gcc)
         try:
             if not fast:
-                run_git("merge", "--no-ff", "-q", "-m", message, branch, cwd=gcc)
-            run_git("merge", "--no-ff", "-q", "-m", message, branch, cwd=board.root)
+                merge_clean(gcc, branch, "--no-ff", "-q", "-m", message, integration="knc")
+            merge_clean(board.root, branch, "--no-ff", "-q", "-m", message)
         except Refused:
             # Both checkouts were clean. Restore both integration tips and clear conflicts.
             run_git("reset", "--hard", main_head, cwd=board.root)
@@ -568,7 +608,7 @@ def cmd_approve(board, args):
             run_git("checkout", "-q", previous, cwd=gcc)
             raise
     else:
-        run_git("merge", "--no-ff", "-q", "-m", message, branch, cwd=board.root)
+        merge_clean(board.root, branch, "--no-ff", "-q", "-m", message)
     if os.path.isdir(worktree):
         run_git("worktree", "remove", "--force", worktree, cwd=board.root)
     ticket.fields["state"] = "done"
