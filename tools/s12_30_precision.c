@@ -565,20 +565,28 @@ void sparse_hpcg(int rows, const int *count, const int *const *cols,
   }
 }
 /* Reduced application shapes: byte counts and pointer tables arrive through
-   a struct.  The SpMV start models an outlined worker's assigned interval.
+   a struct, and each row's value pointer, index pointer and int count are
+   loaded to locals before the inner loop, so the field loads hoist out of
+   the nest and only the per-row loads remain in it.  The SpMV start models
+   an outlined worker's assigned interval.  The sweeps finish each row with
+   the diagonal update and store into the vector they read.
    These are compiler probes, not a numerical application implementation. */
 struct sparse_matrix_probe {
   const char *count;
   const int *const *cols;
   const double *const *vals;
+  double *const *diag;
 };
 void sparse_struct_spmv(int begin, int rows, const struct sparse_matrix_probe *m,
                         const double *x, double *out)
 {
   for (int i = begin; i < rows; ++i) {
     double sum = 0;
-    for (int j = 0; j < m->count[i]; ++j)
-      sum += m->vals[i][j] * x[m->cols[i][j]];
+    const double *const cur_vals = m->vals[i];
+    const int *const cur_inds = m->cols[i];
+    const int cur_nnz = m->count[i];
+    for (int j = 0; j < cur_nnz; ++j)
+      sum += cur_vals[j] * x[cur_inds[j]];
     out[i] = sum;
   }
 }
@@ -586,20 +594,43 @@ void sparse_struct_forward(int rows, const struct sparse_matrix_probe *m,
                            const double *rhs, double *x)
 {
   for (int i = 0; i < rows; ++i) {
+    const double *const cur_vals = m->vals[i];
+    const int *const cur_inds = m->cols[i];
+    const int cur_nnz = m->count[i];
+    const double diag = m->diag[i][0];
     double sum = rhs[i];
-    for (int j = 0; j < m->count[i]; ++j)
-      sum -= m->vals[i][j] * x[m->cols[i][j]];
-    x[i] = sum;
+    for (int j = 0; j < cur_nnz; ++j)
+      sum -= cur_vals[j] * x[cur_inds[j]];
+    sum += x[i] * diag;
+    x[i] = sum / diag;
   }
 }
 void sparse_struct_backward(int rows, const struct sparse_matrix_probe *m,
                             const double *rhs, double *x)
 {
   for (int i = rows - 1; i >= 0; --i) {
+    const double *const cur_vals = m->vals[i];
+    const int *const cur_inds = m->cols[i];
+    const int cur_nnz = m->count[i];
+    const double diag = m->diag[i][0];
     double sum = rhs[i];
-    for (int j = 0; j < m->count[i]; ++j)
-      sum -= m->vals[i][j] * x[m->cols[i][j]];
-    x[i] = sum;
+    for (int j = 0; j < cur_nnz; ++j)
+      sum -= cur_vals[j] * x[cur_inds[j]];
+    sum += x[i] * diag;
+    x[i] = sum / diag;
+  }
+}
+/* Scanner control for the struct nests: a hand-written next-row hint with
+   no reduction.  It must scan as indirect through the ->cols field load,
+   and the compiler must not report a transformation of it. */
+void explicit_struct(int rows, const struct sparse_matrix_probe *m,
+                     const double *x)
+{
+  for (int i = 0; i < rows; ++i) {
+    const int cur_nnz = m->count[i];
+    for (int j = 0; j < cur_nnz; ++j)
+      if (rows-i > 1 && j < m->count[i+1])
+        __builtin_prefetch(x + m->cols[i+1][j], 0, 3);
   }
 }
 /* int output may change a later row bound; no cross-row speculation. */

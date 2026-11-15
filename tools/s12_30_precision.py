@@ -138,6 +138,11 @@ class Gimple:
             return None
 
     def indirect(self):
+        # Index arrays arrive as a col/cols parameter or, in the struct
+        # nests, through a ->cols field load.
+        sources = {self.param('col'), self.param('cols')} - {None}
+        sources |= {name for name, value in self.defs.items()
+                    if re.search(r'->cols$', value)}
         result = []
         for bb, arg in self.hints:
             ancestors = self.ancestry(arg)
@@ -145,8 +150,7 @@ class Gimple:
                 continue
             for name in ancestors:
                 address = self.address(name)
-                if address and (self.param('col') in self.ancestry(address)
-                                or self.param('cols') in self.ancestry(address)):
+                if address and sources & self.ancestry(address):
                     result.append((bb, name))
         return result
 
@@ -539,6 +543,16 @@ def hpcg_shapes_t1():
         chunks = re.split(r'^;; Function (\w+) .*$', dump.read_text(), flags=re.M)
         bodies = dict(zip(chunks[1::2], chunks[2::2]))
         assembly = asm_bodies(asm.read_text())
+        # Scanner control: the hand-written struct next-row hint must be
+        # seen as indirect, and is not a compiler transformation.
+        control = bodies['explicit_struct']
+        errors = []
+        if not Gimple(control).indirect():
+            errors.append('scanner misses the hand-written ->cols hint')
+        if 'Bounded indirect prefetch' in control:
+            errors.append('hand-written hint reported as a transformation')
+        failures += bool(errors)
+        print(('FAIL' if errors else 'PASS'), stem, 'explicit_struct', '; '.join(errors), flush=True)
         for name in names:
             body = bodies[name]
             cross_row = bool(re.search(r'Bounded indirect prefetch in loop \d+: next-row pointers', body))

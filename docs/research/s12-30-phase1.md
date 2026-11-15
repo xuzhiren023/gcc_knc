@@ -1171,3 +1171,54 @@ source was changed or built in this session. The separate default-on
 commit and provisional 16384 threshold are unchanged. Window-6 results,
 native safety, measured threshold, default-on validation, application A/B,
 and lead x86 remain pending. Prior passing suites were not rerun.
+
+### Corrected HPCG-shape red (2026-11-15, after the 05:57 review)
+
+The previous red could not go green: `Gimple.indirect()` looked only for a
+`col`/`cols` parameter, and the struct probes have none, so the on-check
+failed for any compiler. Two corrections, same two files, no GCC change:
+
+* Gate: `indirect()` now also accepts an index load whose address ancestry
+  reaches a `->cols` field load. A hand-written control, `explicit_struct`
+  (next-row hint in a struct nest, guarded by `rows-i > 1` and
+  `j < count[i+1]`, no reduction), must scan as indirect and must not carry
+  a `Bounded indirect prefetch` message. It passes in both builds, so the
+  scanner is proven on the struct form and the message is proven to come
+  only from the transformation.
+* Probes: rewritten in HPCG form. `cur_vals`, `cur_inds` and `int cur_nnz`
+  are loaded to locals before the inner loop; both sweeps load a diagonal
+  and end with `sum += x[i]*diag; x[i] = sum/diag`. The switch-on dump now
+  has the real shape: the four field loads sit in the nest preheader
+  (forward: `_1 = m->vals; _5 = m->cols; _7 = m->count; _10 = m->diag`),
+  the byte count is loaded and widened in the outer body, the row pointers
+  are loaded behind the `cur_nnz > 0` test, the fold is
+  `sum_47 = sum_54 - _25`, the SpMV outer PHI starts at `begin_27(D)` and
+  the backward PHI starts at `rows - 1` with step -1.
+
+One run (lane gcc2 build of `bfc31546ede`, switch passed explicitly):
+compile, assemble and lint pass for both builds; switch-off passes all
+three probes and the control; switch-on passes the control and fails
+exactly the three probes with `missing cross-row indexed hint`. SpMV gets
+only the row-local fallback (`Bounded indirect prefetch in loop 2:
+row-local bound`, versioned on `_64 > 131071`), the two sweeps get nothing.
+Log: `.work/_state/logs/s12_30_hpcg_shapes_red-20261115-060050.log`.
+
+Policy test in the real outlined SpMV loop (ruling e; read from
+`application-spmv.aprefetch`, not measured): the outer loop runs from `_19`
+to `_20`, where `_20 - _19` is the worker's share `q.3_1` of the rows. A
+cross-row version test on outer trips therefore sees one worker interval,
+not the matrix: for 104^3 = 1,124,864 rows on 240 threads that is about
+4,687 rows, below the provisional 16384, so SpMV would take the unhinted
+arm at the current cutoff. Not changed here; the lead settles the
+threshold with the window-6 data.
+
+Still to do for green, per the 05:57 rulings: nonzero loop-invariant outer
+start for the C forms; byte count with a run-time overlap test against the
+outer double store in the versioning condition (`alias_bounds` stays
+statically rejected); `MINUS_EXPR` only as `sum - product`; descending
+outer loop with row `i-1` loaded only under `i-1 >=` the lower end; the
+struct/byte-count, subtract and backward kernels added to `compiler-gate`
+with a guard-page count and one overlapping-count case; then
+`--application-dumps hpcg` must print next-row pointers for SpMV and both
+sweeps. `compiler-gate` was not rebuilt: the staged binary is the one
+queued for window 6. No GCC change or build; no native run; x86 not run.
