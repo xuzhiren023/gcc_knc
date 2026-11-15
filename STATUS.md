@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-15 05:57.
+Updated automatically at every ticket change. Last update: 2026-11-15 05:58.
 
-**Waiting for you:** S12-37. Run `python tools/pm.py inbox`.
+**Next: the tech lead, on S12-31.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[##################--]` 239 of 255
 
@@ -117,7 +117,7 @@ Current tickets: `[##################--]` 239 of 255
 | S12-34 | Unrecognizable insn for a truncating vector store to a 1-byte-aligned V16QI destination (found by S12-32) | Not started |  |
 | S12-35 | Clean single-compiler WRF build as dm+sm (MPI + OpenMP) against PhiWeather's k1om MPICH, plus a build recipe PhiWeather can apply to its own patched tree | Done | Upstream WRF 4.8.0 now builds clean as dm+sm (MPI + OpenMP) with the one GCC-KNC compiler (knc 7a3b34430e3,... |
 | S12-36 | card_run yields to a foreign queued row in the middle of our own turn - honor an open turn-level reservation so a multi-job window is not refused | Done | card_run --benchmark now keeps our turn across several jobs while an open claude-turn- ledger row was queue... |
-| S12-37 | Every T1/T2 check writes into the run's own output folder - no fixed paths in shared ticket folders (S10-01 vecarg, and any others) | **Waiting for you** | budget: 6336450 input tokens used; the budget is 6000000 |
+| S12-37 | Every T1/T2 check writes into the run's own output folder - no fixed paths in shared ticket folders (S10-01 vecarg, and any others) | Changes requested | Lead raises input_tokens 6M -> 10M: one requested change (update test_shared_area.py in place) remains. |
 | S12-38 | ICE in the SLP vectorizer on gcc.dg vect-pr123221.c at -O3 -march=knc (found by S12-30's torture sweep) | Not started |  |
 | S12-39 | pm.py submit stops demanding an engineer-side rebase that the sandbox cannot perform (Permission denied on .git/worktrees/<id>/rebase-merge) | Done | Engineers no longer need to rebase before submitting: submit only refuses when main has real changes the br... |
 | S12-40 | Indirect prefetch recognizes Fortran sparse loops (array descriptors, ARRAY_REF offsets, nonzero and OpenMP-outlined starts) so NPB-CG benefits | draft |  |
@@ -280,6 +280,7 @@ Current tickets: `[##################--]` 239 of 255
 
 ## Recent activity
 
+- 2026-11-15 05:58 **S12-37** owner decide: Lead raises input_tokens 6M -> 10M: one requested change (update test_shared_area.py in place) remains.
 - 2026-11-15 05:57 **S12-30** owner decide: Owner rule (2026-11-14: Fable for troubleshooting): the recognizer now needs troubleshooting on real HPCG shapes (struct ->cols field loads, hoiste...
 - 2026-11-15 05:57 **S12-30** lead escalate: over 2 review rounds: Red not accepted: the three failures are the right kind, but the gate cannot go green and the probes are not in HPCG form. (1...
 - 2026-11-15 05:56 **S12-37** engineer escalate: budget: 6336450 input tokens used; the budget is 6000000
@@ -287,7 +288,6 @@ Current tickets: `[##################--]` 239 of 255
 - 2026-11-15 05:53 **S12-37** engineer submit: After main merge, 3 Cygwin host tests pass; log .work/_state/logs/S12_37_merged-20261115-055233.log. Card mocked; no GCC/card run. Lead staging: ch...
 - 2026-11-15 05:52 **S12-30** engineer red: e3a0cf42: HPCG dumps compile PASS. SpMV has ineffective row-local hint; SymGS sweeps missed. Focused T1: compile/assemble/lint and off controls PAS...
 - 2026-11-15 05:51 **S12-37** lead answer: Merged; rerun and submit.
-- 2026-11-15 05:50 **S12-37** lead resume: Lead: merged main into s12/S12-37 (clean). Rerun the 3 tests in tests/regress/test_check_outputs.py via tools/run.py and submit with the approved t...
 
 ## Cost
 
