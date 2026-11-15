@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-14 21:20.
+Updated automatically at every ticket change. Last update: 2026-11-14 21:23.
 
-**Next: the tech lead, on S12-30.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: GPT-6.1, on S12-21 (Scheduling model for M4's serial runs - measure density-1 tuning and the integer-multiply cost against today's density-4 defaults (S12-14 B02, B04, B05)).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
 Current tickets: `[##################--]` 230 of 246
 
@@ -110,7 +110,7 @@ Current tickets: `[##################--]` 230 of 246
 | S12-27 | Latency-aware scalar loops - GCC-KNC unrolls and interleaves independent iterations and hoists conversions so one thread's every-other-cycle issue and long latencies are hidden automatically | draft |  |
 | S12-28 | dispatch.py refuses to start a second dispatcher on a lane that already has a live one | Done | dispatch.py now refuses to start a second dispatcher on a lane that already has a live one (a lock per lane... |
 | S12-29 | Wrong code - vbroadcastsd reads a 4-byte-aligned SCmode constant (complex float) straight from the constant pool and faults on the card (gcc.c-torture pr38969.c, regression from S11-27) | Done | The pr38969 crash from S11-27 is fixed: GCC-KNC no longer broadcasts a vector from memory aligned below its... |
-| S12-30 | Sparse indexed reductions faster than today - vector gather of products with an ordered scalar sum, and indirect prefetch, for CSR-style loops (NPB-CG, HPCG) | Tests waiting for review | 570710ae: replacement red; target build/lint PASS. Host exit 1: nine missing A/B/A+B slots only; 60,458 sca... |
+| S12-30 | Sparse indexed reductions faster than today - vector gather of products with an ordered scalar sum, and indirect prefetch, for CSR-style loops (NPB-CG, HPCG) | In progress | The sparse-loop Phase 1 harness is accepted: it fails only because the three new routes do not exist yet, a... |
 | S12-31 | HPCG is 1.8% slower with GCC-KNC than with GCC 5.1.1 - find the cause and make it faster (owner: never slower than 5.1.1) | lead | Needs one card run by the interactive lead. Phase 1 at 6b413629 reviewed and sound; staged binary exists. I... |
 | S13-01 | M4 final gate - stage the ADR-0015 gate run at the final head (17 programs, held-out unsealed, six pairs, three profiles) | draft |  |
 | S13-02 | Libgomp per-region thread density - choose 1-4 workers per core per parallel region instead of once per program | draft |  |
@@ -271,6 +271,7 @@ Current tickets: `[##################--]` 230 of 246
 
 ## Recent activity
 
+- 2026-11-14 21:23 **S12-30** lead approve-red: The sparse-loop Phase 1 harness is accepted: it fails only because the three new routes do not exist yet, and its exact, ordering, 1-ULP and guard-...
 - 2026-11-14 21:19 **S12-31** lead defer: Needs one card run by the interactive lead. Phase 1 at 6b413629 reviewed and sound; staged binary exists. In our exclusive card turn run the comman...
 - 2026-11-14 21:18 **S12-30** engineer red: 570710ae: replacement red; target build/lint PASS. Host exit 1: nine missing A/B/A+B slots only; 60,458 scalar/reference/bounds checks pass. Both s...
 - 2026-11-14 21:14 **S12-31** engineer ask: Phase 1 at 6b413629, see docs/research/s12-31-hpcg.md. Loss is only SpMV (+2.1%) and SymGS/MG (+3.9%). Likely cause, unproven: -falign-loops=16 pad...
@@ -278,13 +279,12 @@ Current tickets: `[##################--]` 230 of 246
 - 2026-11-14 20:56 **S12-30** engineer red: f36bc172: host x87 model FAIL as intended at row lengths 2/13/27: -1+(1+2^-27)*(1-2^-27) yields -2^-54; double products yield zero. Both target sca...
 - 2026-11-14 20:56 **S12-24** lead approve-red: The WRF REMEZ compiler crash is now reproduced by a 10-line k=-k loop test (int and unsigned char) that fails with the ticket's ICE, and the root c...
 - 2026-11-14 20:55 **S12-21** lead answer: Built; run green and stage.
-- 2026-11-14 20:55 **S12-21** lead resume: Lead: lane gcc2 built at 1a4f5aab0a2 (log s12_21_build). Run T0-T2 with tests/t1/knc-imul-cost.c green, the ICE sweeps, and stage the short paired ...
 
 ## Cost
 
 - From the script, engineer: 655 sessions, 1290.7M input tokens
 - From the script, lead: 432 sessions, 120.5M input tokens
-- Started by hand, Claude: 12 sessions, 3357.5M input tokens
+- Started by hand, Claude: 12 sessions, 3361.2M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
