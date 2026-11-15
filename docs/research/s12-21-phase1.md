@@ -247,3 +247,27 @@ No GCC source changes, rebuild, whole-program restaging or native execution
 were made. Red review precedes the cost correction and lead-owned rebuild;
 T0-T2, ICE sweeps and the short affected-program/control A/B remain pending,
 with x86 identity reserved for the lead.
+
+## Phase two: scalar IMUL cost correction
+
+Following the lead's phase-two red approval, the KNC-only integer multiply
+cost is 10 for QI/HI/SI/DI and 20 for TI, preserving the existing estimate
+of two scalar multiplies for TI. R02 p.56 describes a ten-cycle scalar
+multiply path. The uncontended phase-one SI/DI register and memory results
+of approximately nine TSC ticks per operation, with no independent-chain
+throughput improvement, support replacing the old three-cycle estimate.
+Ten uses the documented cycle model without equating TSC ticks with exact
+core-cycle latency or choosing the smallest cost that flips the red test.
+QI/HI and the TI composition remain estimates, not new native measurements.
+
+Only the multiply entries in `knc_processor_costs` change. Density remains
+four; scheduler reservations, division costs and x86 cost tables are
+unchanged. The existing T1 red test supplies the intended strength-reduction
+decision check after the rebuild.
+
+The GCC change is committed before requesting a lane-2 build. Per AGENTS.md,
+Codex engineers cannot build the shared GCC tree, so no build or green tests
+were attempted in this continuation. After the lead builds, T0-T2 and ICE
+sweeps remain due, along with a short full-profile paired A/B for affected
+development programs and two controls, excluding HPCG, within 25 minutes.
+The lead owns x86 identity and card execution; neither has run for this change.
