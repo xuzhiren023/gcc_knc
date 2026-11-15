@@ -117,7 +117,7 @@ Current tickets: `[##################--]` 238 of 253
 | S12-34 | Unrecognizable insn for a truncating vector store to a 1-byte-aligned V16QI destination (found by S12-32) | Not started |  |
 | S12-35 | Clean single-compiler WRF build as dm+sm (MPI + OpenMP) against PhiWeather's k1om MPICH, plus a build recipe PhiWeather can apply to its own patched tree | Done | Upstream WRF 4.8.0 now builds clean as dm+sm (MPI + OpenMP) with the one GCC-KNC compiler (knc 7a3b34430e3,... |
 | S12-36 | card_run yields to a foreign queued row in the middle of our own turn - honor an open turn-level reservation so a multi-job window is not refused | Done | card_run --benchmark now keeps our turn across several jobs while an open claude-turn- ledger row was queue... |
-| S12-37 | Every T1/T2 check writes into the run's own output folder - no fixed paths in shared ticket folders (S10-01 vecarg, and any others) | In progress |  |
+| S12-37 | Every T1/T2 check writes into the run's own output folder - no fixed paths in shared ticket folders (S10-01 vecarg, and any others) | Question for the tech lead | Implementation committed at b1856e29 (red test 1a3a01af): nine fixed T1/T2 output destinations moved under ... |
 | S12-38 | ICE in the SLP vectorizer on gcc.dg vect-pr123221.c at -O3 -march=knc (found by S12-30's torture sweep) | Not started |  |
 | S13-01 | M4 final gate - stage the ADR-0015 gate run at the final head (17 programs, held-out unsealed, six pairs, three profiles) | draft |  |
 | S13-02 | Libgomp per-region thread density - choose 1-4 workers per core per parallel region instead of once per program | draft |  |
@@ -278,6 +278,7 @@ Current tickets: `[##################--]` 238 of 253
 
 ## Recent activity
 
+- 2026-11-15 05:17 **S12-37** engineer ask: Implementation committed at b1856e29 (red test 1a3a01af): nine fixed T1/T2 output destinations moved under runner.out. Host fake default T1/T2 plus...
 - 2026-11-15 05:17 **S12-30** engineer ask: The 05:14 resume requires merging main into this worktree for S12-33/S12-37. git merge main was rejected by the PreToolUse hook: The tech lead merg...
 - 2026-11-15 05:15 **S12-30** owner decide: Lead raises sessions 11 -> 14 (the last raise made progress: implementation, T1/T0 pass, knc merged, lead T2 36/0); most sessions went to build and...
 - 2026-11-15 05:15 **S12-30** engineer escalate: budget: 11 engineer sessions used; the budget is 11
@@ -285,7 +286,6 @@ Current tickets: `[##################--]` 238 of 253
 - 2026-11-15 05:14 **S12-30** lead resume: Lead 05:20: knc merged into s12/S12-30 (bfc31546ede, includes the S12-32 pr32243 fix); lane gcc2 rebuilt (PASS); lead T2 36/0 (log s12_30_t2_lead-2...
 - 2026-11-15 05:06 **S12-30** lead defer: Needs lead: (1) card_run --threads 1 --timeout 590 .work/_shared/S12-30/compiler-gate 12345; set threshold per 04:25 note. (2) Run T2: engineer san...
 - 2026-11-15 05:02 **S12-30** engineer ask: 01f3c80c: T1/T0 PASS. T2 permission denied on S10-01/vecarg-O0-O2.mic. Torture: zero ICEs; vect O3 ICEs: O3-vect-pr32243.c (reload), vect-pr123221....
-- 2026-11-15 04:38 **S12-31** lead approve-red: Red approved: the two new T1 tests fail on today's compiler for the intended reasons (x87 loops emit cmp; faddp; jg, and inner loop heads get unbou...
 
 ## Cost
 
