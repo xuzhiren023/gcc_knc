@@ -1,10 +1,10 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-15 05:21.
+Updated automatically at every ticket change. Last update: 2026-11-15 05:50.
 
-**Next: the tech lead, on S12-37.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: the tech lead, on S12-31.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
-Current tickets: `[##################--]` 238 of 253
+Current tickets: `[##################--]` 239 of 255
 
 ## Milestones
 
@@ -14,7 +14,7 @@ Current tickets: `[##################--]` 238 of 253
 | M1 | Mixed native code | Done | 43 of 43 tickets |
 | M2 | Useful vector target | Done | 51 of 51 tickets |
 | M3 | Runtimes | Done | 48 of 48 tickets |
-| M4 | Broad optimization | In progress | 56 of 71 tickets |
+| M4 | Broad optimization | In progress | 57 of 73 tickets |
 | M5 | Program corpus | Not started | Not planned in detail yet |
 | M6 | Release | Not started | Not planned in detail yet |
 
@@ -110,15 +110,17 @@ Current tickets: `[##################--]` 238 of 253
 | S12-27 | Latency-aware scalar loops - GCC-KNC unrolls and interleaves independent iterations and hoists conversions so one thread's every-other-cycle issue and long latencies are hidden automatically | draft |  |
 | S12-28 | dispatch.py refuses to start a second dispatcher on a lane that already has a live one | Done | dispatch.py now refuses to start a second dispatcher on a lane that already has a live one (a lock per lane... |
 | S12-29 | Wrong code - vbroadcastsd reads a 4-byte-aligned SCmode constant (complex float) straight from the constant pool and faults on the card (gcc.c-torture pr38969.c, regression from S11-27) | Done | The pr38969 crash from S11-27 is fixed: GCC-KNC no longer broadcasts a vector from memory aligned below its... |
-| S12-30 | Sparse indexed reductions faster than today - vector gather of products with an ordered scalar sum, and indirect prefetch, for CSR-style loops (NPB-CG, HPCG) | In progress | No merge needed: carry on without it, and do not try git merge or rebase again (the hook refuses both; the ... |
-| S12-31 | HPCG is 1.8% slower with GCC-KNC than with GCC 5.1.1 - find the cause and make it faster (owner: never slower than 5.1.1) | In progress | Red approved: the two new T1 tests fail on today's compiler for the intended reasons (x87 loops emit cmp; f... |
+| S12-30 | Sparse indexed reductions faster than today - vector gather of products with an ordered scalar sum, and indirect prefetch, for CSR-style loops (NPB-CG, HPCG) | In progress | Lead raises sessions 14 -> 18: progress continues (HPCG dump command fixed, 1d9532db reviewed right); sessi... |
+| S12-31 | HPCG is 1.8% slower with GCC-KNC than with GCC 5.1.1 - find the cause and make it faster (owner: never slower than 5.1.1) | Waiting for review | Green at f2cfc87f, GCC s12/S12-31 299aaf16b72: KNC compare/branch pairing kept adjacent in scalar blocks (p... |
 | S12-32 | ICE (reload) in gcc.c-torture O3-vect-pr32243.c on the installed GCC-KNC, found by the S12-21 torture sweep | Done | The -O3 vector reload crash in pr32243 is fixed: byte/word vector extends now reload through an aligned sta... |
 | S12-33 | T2 writes its short-vector test binaries into a per-run folder, so Claude, Codex and lead runs never block each other | Done | T2's short-vector cross-check now writes its binaries into the run's own output folder instead of the share... |
 | S12-34 | Unrecognizable insn for a truncating vector store to a 1-byte-aligned V16QI destination (found by S12-32) | Not started |  |
 | S12-35 | Clean single-compiler WRF build as dm+sm (MPI + OpenMP) against PhiWeather's k1om MPICH, plus a build recipe PhiWeather can apply to its own patched tree | Done | Upstream WRF 4.8.0 now builds clean as dm+sm (MPI + OpenMP) with the one GCC-KNC compiler (knc 7a3b34430e3,... |
 | S12-36 | card_run yields to a foreign queued row in the middle of our own turn - honor an open turn-level reservation so a multi-job window is not refused | Done | card_run --benchmark now keeps our turn across several jobs while an open claude-turn- ledger row was queue... |
-| S12-37 | Every T1/T2 check writes into the run's own output folder - no fixed paths in shared ticket folders (S10-01 vecarg, and any others) | Question for the tech lead | The authorized pre-submit git rebase main failed: error: could not create temporary C:/Users/xuzhi/Document... |
+| S12-37 | Every T1/T2 check writes into the run's own output folder - no fixed paths in shared ticket folders (S10-01 vecarg, and any others) | lead | Needs a git write the engineer sandbox cannot do: merge main into s12/S12-37 (branch tip bb3f10cc) in the S... |
 | S12-38 | ICE in the SLP vectorizer on gcc.dg vect-pr123221.c at -O3 -march=knc (found by S12-30's torture sweep) | Not started |  |
+| S12-39 | pm.py submit stops demanding an engineer-side rebase that the sandbox cannot perform (Permission denied on .git/worktrees/<id>/rebase-merge) | Done | Engineers no longer need to rebase before submitting: submit only refuses when main has real changes the br... |
+| S12-40 | Indirect prefetch recognizes Fortran sparse loops (array descriptors, ARRAY_REF offsets, nonzero and OpenMP-outlined starts) so NPB-CG benefits | draft |  |
 | S13-01 | M4 final gate - stage the ADR-0015 gate run at the final head (17 programs, held-out unsealed, six pairs, three profiles) | draft |  |
 | S13-02 | Libgomp per-region thread density - choose 1-4 workers per core per parallel region instead of once per program | draft |  |
 | S13-03 | M4 retrospective - what we did wrong, what worked, and the practice changes carried into the next milestone and the agent-team skill | draft |  |
@@ -278,20 +280,20 @@ Current tickets: `[##################--]` 238 of 253
 
 ## Recent activity
 
-- 2026-11-15 05:21 **S12-37** engineer ask: The authorized pre-submit git rebase main failed: error: could not create temporary C:/Users/xuzhi/Documents/gcc_knc/.git/worktrees/S12-37/rebase-m...
-- 2026-11-15 05:19 **S12-37** lead answer: Yes. This is a gcc: no ticket, so the pre-submit rebase target is main in the tools repository; knc exists only in .work/_shared/gcc and does not a...
-- 2026-11-15 05:19 **S12-30** lead answer: No merge needed: carry on without it, and do not try git merge or rebase again (the hook refuses both; the lead merges main into the branch at revi...
-- 2026-11-15 05:17 **S12-37** engineer ask: Implementation committed at b1856e29 (red test 1a3a01af): nine fixed T1/T2 output destinations moved under runner.out. Host fake default T1/T2 plus...
-- 2026-11-15 05:17 **S12-30** engineer ask: The 05:14 resume requires merging main into this worktree for S12-33/S12-37. git merge main was rejected by the PreToolUse hook: The tech lead merg...
-- 2026-11-15 05:15 **S12-30** owner decide: Lead raises sessions 11 -> 14 (the last raise made progress: implementation, T1/T0 pass, knc merged, lead T2 36/0); most sessions went to build and...
-- 2026-11-15 05:15 **S12-30** engineer escalate: budget: 11 engineer sessions used; the budget is 11
-- 2026-11-15 05:14 **S12-30** lead answer: Continue per the resume note.
+- 2026-11-15 05:50 **S12-31** engineer submit: Green at f2cfc87f, GCC s12/S12-31 299aaf16b72: KNC compare/branch pairing kept adjacent in scalar blocks (pair hook leaves blocks with vector instr...
+- 2026-11-15 05:50 **S12-31** owner decide: Lead raises input_tokens 20M -> 40M (Fable engineer, owner wants Fable used fully): green done at f2cfc87f / GCC 299aaf16b72; the lead submits it w...
+- 2026-11-15 05:49 **S12-31** engineer escalate: budget: 36744556 input tokens used; the budget is 20000000
+- 2026-11-15 05:48 **S12-37** lead defer: Needs a git write the engineer sandbox cannot do: merge main into s12/S12-37 (branch tip bb3f10cc) in the S12-37 worktree. Since S12-39 (d6b753ab) ...
+- 2026-11-15 05:48 **S12-31** lead answer: Size approved: resubmit with --override 'phase-1 diagnostics reviewed at 7bae9403 (892 lines of tools, 491-line note); GCC is +64/-8; nothing moves...
+- 2026-11-15 05:48 **S12-30** owner decide: Lead raises sessions 14 -> 18: progress continues (HPCG dump command fixed, 1d9532db reviewed right); sessions are short ask/answer rounds, not sta...
+- 2026-11-15 05:47 **S12-30** lead escalate: budget: 14 engineer sessions used; the budget is 14
+- 2026-11-15 05:46 **S12-37** engineer ask: bb3f10cc fixes lead card handoff (red ffe52e80): check.py --stage-to explicitly exports successful run binaries; libgcc.py --stage-from reads them....
 
 ## Cost
 
-- From the script, engineer: 686 sessions, 1367.5M input tokens
-- From the script, lead: 457 sessions, 128.8M input tokens
-- Started by hand, Claude: 12 sessions, 3519.9M input tokens
+- From the script, engineer: 693 sessions, 1392.3M input tokens
+- From the script, lead: 462 sessions, 129.7M input tokens
+- Started by hand, Claude: 12 sessions, 3551.5M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
