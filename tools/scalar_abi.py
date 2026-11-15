@@ -380,7 +380,7 @@ def t2_short_vector(runner):
         runner.command(sys.executable, runner.root / 'tools/knc_lint', asm, obj)
     runner.result('t2 V16HI hidden result pointer', failures)
     if runner.args.compiler == 'gcc16':
-        output = runner.tc.parent / 'S5-21'
+        output = runner.out / 'short-vector-cross'
         output.mkdir(exist_ok=True)
         for reverse in (False, True):
             t2_crosscheck(runner, source.parent, 'knc-short-vector',
