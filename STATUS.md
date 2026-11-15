@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-15 00:35.
+Updated automatically at every ticket change. Last update: 2026-11-15 00:45.
 
-**Next: the tech lead, on S12-32.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: the tech lead, on S12-26.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[##################--]` 234 of 249
 
@@ -106,7 +106,7 @@ Current tickets: `[##################--]` 234 of 249
 | S12-23 | Floating-point environment correctness on KNC - fix the underflow probe that cannot tell flushing from rounding, and handle x87 erratum CD28 (S12-14 N06, N07, B16, B17) | Done | GCC-KNC's floating-point environment handling is now correct on the card: x87 exception clearing uses the C... |
 | S12-24 | ICE in vect_transform_stmt (tree-vect-stmts.cc:13381) on WRF's REMEZ at -mphinix (-O3 -march=knc) | Done | The vectorizer crash in WRF's REMEZ routine at -mphinix is fixed in general (negative-step induction handli... |
 | S12-25 | WRF smpar build arm with --param=knc-threads-per-core=2 for PhiWeather's 2-threads-per-core runs (A/B against S11-26's default-4 build) | draft |  |
-| S12-26 | WRF hot scalar routines - classify with the S12-19 triage tool and stage bitwise-safe per-file flag arms for PhiWeather to time | In progress | Static, unsampled classification; no WRF adapter and no change to vec_triage.py. (1) Hotness: take the rout... |
+| S12-26 | WRF hot scalar routines - classify with the S12-19 triage tool and stage bitwise-safe per-file flag arms for PhiWeather to time | Question for the tech lead | 3bbc33a7: partial loop list + 10 reduced shapes in docs/research/s12-26-wrf-scalar.md. Six exact-flag -S co... |
 | S12-27 | Latency-aware scalar loops - GCC-KNC unrolls and interleaves independent iterations and hoists conversions so one thread's every-other-cycle issue and long latencies are hidden automatically | draft |  |
 | S12-28 | dispatch.py refuses to start a second dispatcher on a lane that already has a live one | Done | dispatch.py now refuses to start a second dispatcher on a lane that already has a live one (a lock per lane... |
 | S12-29 | Wrong code - vbroadcastsd reads a 4-byte-aligned SCmode constant (complex float) straight from the constant pool and faults on the card (gcc.c-torture pr38969.c, regression from S11-27) | Done | The pr38969 crash from S11-27 is fixed: GCC-KNC no longer broadcasts a vector from memory aligned below its... |
@@ -274,6 +274,7 @@ Current tickets: `[##################--]` 234 of 249
 
 ## Recent activity
 
+- 2026-11-15 00:45 **S12-26** engineer ask: 3bbc33a7: partial loop list + 10 reduced shapes in docs/research/s12-26-wrf-scalar.md. Six exact-flag -S compiles and shape compile PASS; ELF/funct...
 - 2026-11-15 00:35 **S12-26** lead answer: Static, unsampled classification; no WRF adapter and no change to vec_triage.py. (1) Hotness: take the routine ranking from the PhiWeather shares a...
 - 2026-11-15 00:33 **S12-26** engineer ask: Blocked by no-WRF-rebuild rule: vec_triage.py join --program WRF exits 2 (corpus-only choices). Log: .work/_state/logs/S12_26_wrf_triage_interface-...
 - 2026-11-15 00:30 **S11-26** lead approve: WRF 4.8.0 OpenMP (wrf.exe, real.exe) now builds at -mphinix -mknc-card=7120 with no per-file workarounds on knc 71e9b2d00fc and is staged in wrf-tr...
@@ -281,13 +282,12 @@ Current tickets: `[##################--]` 234 of 249
 - 2026-11-15 00:12 **S12-31** lead defer: Needs the interactive lead. (1) Card, our exclusive turn: the 4 commands in docs/research/s12-31-hpcg.md 'Second diagnostic' at 7bae9403 (1 core, a...
 - 2026-11-15 00:10 **S12-31** engineer ask: At 7bae9403, docs/research/s12-31-hpcg.md 'First diagnostic: result' onwards. Padding confirmed but small (0.3-0.5%, then level with donor); pilot ...
 - 2026-11-15 00:03 **S12-30** lead defer: Needs the Step 1 card run (lead, exclusive): tools/card_run --threads 1 --timeout 590, binary .work/_shared/S12-30/legal-gate, argument 12345. Then...
-- 2026-11-15 00:00 **S12-30** engineer ask: e49a34b8: Step 1 legal CSR R3/d32 and HPCG next-row hints plus rows>=16384 policy staged; no nnz or GCC change. Target build/lint and 18 host guard...
 
 ## Cost
 
 - From the script, engineer: 667 sessions, 1326.2M input tokens
 - From the script, lead: 442 sessions, 123.6M input tokens
-- Started by hand, Claude: 12 sessions, 3427.4M input tokens
+- Started by hand, Claude: 12 sessions, 3430.6M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
