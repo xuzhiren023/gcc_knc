@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-15 00:11.
+Updated automatically at every ticket change. Last update: 2026-11-15 00:12.
 
-**Next: the tech lead, on S12-31.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: the tech lead, on S12-32.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[##################--]` 233 of 249
 
@@ -111,7 +111,7 @@ Current tickets: `[##################--]` 233 of 249
 | S12-28 | dispatch.py refuses to start a second dispatcher on a lane that already has a live one | Done | dispatch.py now refuses to start a second dispatcher on a lane that already has a live one (a lock per lane... |
 | S12-29 | Wrong code - vbroadcastsd reads a 4-byte-aligned SCmode constant (complex float) straight from the constant pool and faults on the card (gcc.c-torture pr38969.c, regression from S11-27) | Done | The pr38969 crash from S11-27 is fixed: GCC-KNC no longer broadcasts a vector from memory aligned below its... |
 | S12-30 | Sparse indexed reductions faster than today - vector gather of products with an ordered scalar sum, and indirect prefetch, for CSR-style loops (NPB-CG, HPCG) | lead | Needs the Step 1 card run (lead, exclusive): tools/card_run --threads 1 --timeout 590, binary .work/_shared... |
-| S12-31 | HPCG is 1.8% slower with GCC-KNC than with GCC 5.1.1 - find the cause and make it faster (owner: never slower than 5.1.1) | Question for the tech lead | At 7bae9403, docs/research/s12-31-hpcg.md 'First diagnostic: result' onwards. Padding confirmed but small (... |
+| S12-31 | HPCG is 1.8% slower with GCC-KNC than with GCC 5.1.1 - find the cause and make it faster (owner: never slower than 5.1.1) | lead | Needs the interactive lead. (1) Card, our exclusive turn: the 4 commands in docs/research/s12-31-hpcg.md 'S... |
 | S12-32 | ICE (reload) in gcc.c-torture O3-vect-pr32243.c on the installed GCC-KNC, found by the S12-21 torture sweep | Waiting for review | Green: knc f559e49271c (imci.md Bm->Ba) + 6b79c6f0566 (sse.md: extend expanders passed a folded under-align... |
 | S12-33 | T2 writes its short-vector test binaries into a per-run folder, so Claude, Codex and lead runs never block each other | Done | T2's short-vector cross-check now writes its binaries into the run's own output folder instead of the share... |
 | S12-34 | Unrecognizable insn for a truncating vector store to a 1-byte-aligned V16QI destination (found by S12-32) | Not started |  |
@@ -274,6 +274,7 @@ Current tickets: `[##################--]` 233 of 249
 
 ## Recent activity
 
+- 2026-11-15 00:12 **S12-31** lead defer: Needs the interactive lead. (1) Card, our exclusive turn: the 4 commands in docs/research/s12-31-hpcg.md 'Second diagnostic' at 7bae9403 (1 core, a...
 - 2026-11-15 00:10 **S12-31** engineer ask: At 7bae9403, docs/research/s12-31-hpcg.md 'First diagnostic: result' onwards. Padding confirmed but small (0.3-0.5%, then level with donor); pilot ...
 - 2026-11-15 00:03 **S12-30** lead defer: Needs the Step 1 card run (lead, exclusive): tools/card_run --threads 1 --timeout 590, binary .work/_shared/S12-30/legal-gate, argument 12345. Then...
 - 2026-11-15 00:00 **S12-30** engineer ask: e49a34b8: Step 1 legal CSR R3/d32 and HPCG next-row hints plus rows>=16384 policy staged; no nnz or GCC change. Target build/lint and 18 host guard...
@@ -281,7 +282,6 @@ Current tickets: `[##################--]` 233 of 249
 - 2026-11-14 23:50 **S12-30** lead changes: Phase-2 red not accepted: the four failures are the right kind, but the positive checks do not prove the acceptance, and the form Phase 1 measured ...
 - 2026-11-14 23:45 **S12-30** engineer red: 489b7dc4: Phase-two T1 red: four missing indirect-prefetch failures; compile/lint, exclusions, scalar folds and installed O2 baseline identity PASS...
 - 2026-11-14 23:12 **S12-32** lead approve-red: Red accepted: knc-convert-byte-register.c reproduces the ticket's reload ICE and passes only when a register-held byte/word vector reloads through ...
-- 2026-11-14 23:10 **S12-32** engineer red: Red 044f1aa2: tests/t1/knc-convert-byte-register.c (--byte-word) ICEs in curr_insn_transform as the ticket; S12-29 does not fix it (build 71e9b2d00...
 
 ## Cost
 
@@ -293,4 +293,4 @@ Current tickets: `[##################--]` 233 of 249
 
 ## Disk
 
-The project uses 34.1 GiB of 100 GiB. 133 GiB free on the drive.
+The project uses 34.2 GiB of 100 GiB. 133 GiB free on the drive.
