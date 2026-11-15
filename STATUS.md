@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-15 05:50.
+Updated automatically at every ticket change. Last update: 2026-11-15 06:02.
 
-**Next: the tech lead, on S12-31.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: the tech lead, on S12-30.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[##################--]` 239 of 255
 
@@ -110,14 +110,14 @@ Current tickets: `[##################--]` 239 of 255
 | S12-27 | Latency-aware scalar loops - GCC-KNC unrolls and interleaves independent iterations and hoists conversions so one thread's every-other-cycle issue and long latencies are hidden automatically | draft |  |
 | S12-28 | dispatch.py refuses to start a second dispatcher on a lane that already has a live one | Done | dispatch.py now refuses to start a second dispatcher on a lane that already has a live one (a lock per lane... |
 | S12-29 | Wrong code - vbroadcastsd reads a 4-byte-aligned SCmode constant (complex float) straight from the constant pool and faults on the card (gcc.c-torture pr38969.c, regression from S11-27) | Done | The pr38969 crash from S11-27 is fixed: GCC-KNC no longer broadcasts a vector from memory aligned below its... |
-| S12-30 | Sparse indexed reductions faster than today - vector gather of products with an ordered scalar sum, and indirect prefetch, for CSR-style loops (NPB-CG, HPCG) | In progress | Lead raises sessions 14 -> 18: progress continues (HPCG dump command fixed, 1d9532db reviewed right); sessi... |
+| S12-30 | Sparse indexed reductions faster than today - vector gather of products with an ordered scalar sum, and indirect prefetch, for CSR-style loops (NPB-CG, HPCG) | Tests waiting for review | 6b7a02cc: corrected HPCG-shape red per 05:57 review. Scanner follows ->cols field loads; explicit_struct co... |
 | S12-31 | HPCG is 1.8% slower with GCC-KNC than with GCC 5.1.1 - find the cause and make it faster (owner: never slower than 5.1.1) | Waiting for review | Green at f2cfc87f, GCC s12/S12-31 299aaf16b72: KNC compare/branch pairing kept adjacent in scalar blocks (p... |
 | S12-32 | ICE (reload) in gcc.c-torture O3-vect-pr32243.c on the installed GCC-KNC, found by the S12-21 torture sweep | Done | The -O3 vector reload crash in pr32243 is fixed: byte/word vector extends now reload through an aligned sta... |
 | S12-33 | T2 writes its short-vector test binaries into a per-run folder, so Claude, Codex and lead runs never block each other | Done | T2's short-vector cross-check now writes its binaries into the run's own output folder instead of the share... |
 | S12-34 | Unrecognizable insn for a truncating vector store to a 1-byte-aligned V16QI destination (found by S12-32) | Not started |  |
 | S12-35 | Clean single-compiler WRF build as dm+sm (MPI + OpenMP) against PhiWeather's k1om MPICH, plus a build recipe PhiWeather can apply to its own patched tree | Done | Upstream WRF 4.8.0 now builds clean as dm+sm (MPI + OpenMP) with the one GCC-KNC compiler (knc 7a3b34430e3,... |
 | S12-36 | card_run yields to a foreign queued row in the middle of our own turn - honor an open turn-level reservation so a multi-job window is not refused | Done | card_run --benchmark now keeps our turn across several jobs while an open claude-turn- ledger row was queue... |
-| S12-37 | Every T1/T2 check writes into the run's own output folder - no fixed paths in shared ticket folders (S10-01 vecarg, and any others) | lead | Needs a git write the engineer sandbox cannot do: merge main into s12/S12-37 (branch tip bb3f10cc) in the S... |
+| S12-37 | Every T1/T2 check writes into the run's own output folder - no fixed paths in shared ticket folders (S10-01 vecarg, and any others) | Waiting for review | 6bab700d updates only existing x87 test for runner.out and no escaped outputs. Cygwin suites via run.py: sh... |
 | S12-38 | ICE in the SLP vectorizer on gcc.dg vect-pr123221.c at -O3 -march=knc (found by S12-30's torture sweep) | Not started |  |
 | S12-39 | pm.py submit stops demanding an engineer-side rebase that the sandbox cannot perform (Permission denied on .git/worktrees/<id>/rebase-merge) | Done | Engineers no longer need to rebase before submitting: submit only refuses when main has real changes the br... |
 | S12-40 | Indirect prefetch recognizes Fortran sparse loops (array descriptors, ARRAY_REF offsets, nonzero and OpenMP-outlined starts) so NPB-CG benefits | draft |  |
@@ -280,20 +280,20 @@ Current tickets: `[##################--]` 239 of 255
 
 ## Recent activity
 
-- 2026-11-15 05:50 **S12-31** engineer submit: Green at f2cfc87f, GCC s12/S12-31 299aaf16b72: KNC compare/branch pairing kept adjacent in scalar blocks (pair hook leaves blocks with vector instr...
-- 2026-11-15 05:50 **S12-31** owner decide: Lead raises input_tokens 20M -> 40M (Fable engineer, owner wants Fable used fully): green done at f2cfc87f / GCC 299aaf16b72; the lead submits it w...
-- 2026-11-15 05:49 **S12-31** engineer escalate: budget: 36744556 input tokens used; the budget is 20000000
-- 2026-11-15 05:48 **S12-37** lead defer: Needs a git write the engineer sandbox cannot do: merge main into s12/S12-37 (branch tip bb3f10cc) in the S12-37 worktree. Since S12-39 (d6b753ab) ...
-- 2026-11-15 05:48 **S12-31** lead answer: Size approved: resubmit with --override 'phase-1 diagnostics reviewed at 7bae9403 (892 lines of tools, 491-line note); GCC is +64/-8; nothing moves...
-- 2026-11-15 05:48 **S12-30** owner decide: Lead raises sessions 14 -> 18: progress continues (HPCG dump command fixed, 1d9532db reviewed right); sessions are short ask/answer rounds, not sta...
-- 2026-11-15 05:47 **S12-30** lead escalate: budget: 14 engineer sessions used; the budget is 14
-- 2026-11-15 05:46 **S12-37** engineer ask: bb3f10cc fixes lead card handoff (red ffe52e80): check.py --stage-to explicitly exports successful run binaries; libgcc.py --stage-from reads them....
+- 2026-11-15 06:01 **S12-37** engineer submit: 6bab700d updates only existing x87 test for runner.out and no escaped outputs. Cygwin suites via run.py: shared_area 3 PASS, check_outputs 3 PASS. ...
+- 2026-11-15 06:01 **S12-30** engineer red: 6b7a02cc: corrected HPCG-shape red per 05:57 review. Scanner follows ->cols field loads; explicit_struct control PASS on/off. Probes in HPCG form; ...
+- 2026-11-15 05:58 **S12-37** owner decide: Lead raises input_tokens 6M -> 10M: one requested change (update test_shared_area.py in place) remains.
+- 2026-11-15 05:57 **S12-30** owner decide: Owner rule (2026-11-14: Fable for troubleshooting): the recognizer now needs troubleshooting on real HPCG shapes (struct ->cols field loads, hoiste...
+- 2026-11-15 05:57 **S12-30** lead escalate: over 2 review rounds: Red not accepted: the three failures are the right kind, but the gate cannot go green and the probes are not in HPCG form. (1...
+- 2026-11-15 05:56 **S12-37** engineer escalate: budget: 6336450 input tokens used; the budget is 6000000
+- 2026-11-15 05:55 **S12-37** lead changes: 1. tools/x87_spill.py:185 breaks an existing test: tests/regress/test_shared_area.py:68-77 (test_x87_probe_from_main_checkout) calls x87_spill t1 w...
+- 2026-11-15 05:53 **S12-37** engineer submit: After main merge, 3 Cygwin host tests pass; log .work/_state/logs/S12_37_merged-20261115-055233.log. Card mocked; no GCC/card run. Lead staging: ch...
 
 ## Cost
 
-- From the script, engineer: 693 sessions, 1392.3M input tokens
-- From the script, lead: 462 sessions, 129.7M input tokens
-- Started by hand, Claude: 12 sessions, 3551.5M input tokens
+- From the script, engineer: 697 sessions, 1395.6M input tokens
+- From the script, lead: 464 sessions, 130.9M input tokens
+- Started by hand, Claude: 12 sessions, 3562.9M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
