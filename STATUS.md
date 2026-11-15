@@ -2,7 +2,7 @@
 
 Updated automatically at every ticket change. Last update: 2026-11-15 03:01.
 
-**Next: GPT-6.1, on S12-30 (Sparse indexed reductions faster than today - vector gather of products with an ordered scalar sum, and indirect prefetch, for CSR-style loops (NPB-CG, HPCG)).** Run `python tools/dispatch.py`, or ask the tech lead to.
+**Next: the tech lead, on S12-35.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[##################--]` 237 of 251
 
@@ -115,7 +115,7 @@ Current tickets: `[##################--]` 237 of 251
 | S12-32 | ICE (reload) in gcc.c-torture O3-vect-pr32243.c on the installed GCC-KNC, found by the S12-21 torture sweep | Done | The -O3 vector reload crash in pr32243 is fixed: byte/word vector extends now reload through an aligned sta... |
 | S12-33 | T2 writes its short-vector test binaries into a per-run folder, so Claude, Codex and lead runs never block each other | Done | T2's short-vector cross-check now writes its binaries into the run's own output folder instead of the share... |
 | S12-34 | Unrecognizable insn for a truncating vector store to a 1-byte-aligned V16QI destination (found by S12-32) | Not started |  |
-| S12-35 | Clean single-compiler WRF build as dm+sm (MPI + OpenMP) against PhiWeather's k1om MPICH, plus a build recipe PhiWeather can apply to its own patched tree | In progress | Lead 02:20: yes. Build only the MPICH 3.4.3 Fortran use-mpi module set with GCC-KNC 16 (mpi.mod and the mod... |
+| S12-35 | Clean single-compiler WRF build as dm+sm (MPI + OpenMP) against PhiWeather's k1om MPICH, plus a build recipe PhiWeather can apply to its own patched tree | Waiting for review | Staged .work/_shared/wrf-trial/dmsm/: wrf.exe, real.exe (image MPI), wrf-stockmpi.exe, libgomp.so.1, recipe... |
 | S12-36 | card_run yields to a foreign queued row in the middle of our own turn - honor an open turn-level reservation so a multi-job window is not refused | Done | card_run --benchmark now keeps our turn across several jobs while an open claude-turn- ledger row was queue... |
 | S13-01 | M4 final gate - stage the ADR-0015 gate run at the final head (17 programs, held-out unsealed, six pairs, three profiles) | draft |  |
 | S13-02 | Libgomp per-region thread density - choose 1-4 workers per core per parallel region instead of once per program | draft |  |
@@ -276,6 +276,7 @@ Current tickets: `[##################--]` 237 of 251
 
 ## Recent activity
 
+- 2026-11-15 03:01 **S12-35** engineer submit: Staged .work/_shared/wrf-trial/dmsm/: wrf.exe, real.exe (image MPI), wrf-stockmpi.exe, libgomp.so.1, recipe and notes. One WRF compiler 7a3b34430e3...
 - 2026-11-15 03:00 **S12-36** lead approve: card_run --benchmark now keeps our turn across several jobs while an open claude-turn- ledger row was queued before the other project's queue, and ...
 - 2026-11-15 02:48 **S12-30** lead answer: Use the pre-ivopts dump; do not add PHI-recurrence normalization. Source read 2cde1d8d: the scanner is already about 200 lines and a recurrence sol...
 - 2026-11-15 02:37 **S12-36** engineer submit: Lead rebased on main without conflicts. Reran python tests/tools/test_card_turn.py through tools/run.py: PASS, 3 tests. Log: C:/Users/xuzhi/Documen...
@@ -283,7 +284,6 @@ Current tickets: `[##################--]` 237 of 251
 - 2026-11-15 02:36 **S12-36** lead answer: Lead: rebased on main (no conflicts). Rerun tests/tools/test_card_turn.py via tools/run.py and submit.
 - 2026-11-15 02:35 **S12-36** engineer ask: Required git rebase main is blocked by filesystem permissions: error: could not create temporary C:/Users/xuzhi/Documents/gcc_knc/.git/worktrees/S1...
 - 2026-11-15 02:34 **S12-36** lead answer: Rebase on main. knc is the branch of the GCC repo (.work/_shared/gcc) and applies only to gcc: yes tickets; this ticket is gcc: no, tools-only, so ...
-- 2026-11-15 02:32 **S12-36** engineer ask: Fix e5f446dd follows red commit c1699bdd. Host test_card_turn.py via tools/run.py passed 3 tests: open turn starts immediately, finish closes turn ...
 
 ## Cost
 
