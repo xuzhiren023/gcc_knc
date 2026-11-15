@@ -1,6 +1,12 @@
 # S12-31: why HPCG is slower with GCC-KNC than with GCC 5.1.1
 
-2026-11-15, phase 1. **Status after the first card diagnostic:** the padding hypothesis below is right in
+2026-11-15. **Status after the second card diagnostic:** phase 2 has its red tests and its design
+("Second diagnostic: result" and "Phase 2 design"); green waits for the lead's approval. The compare
+and its jump must issue as one pair, which an x87 instruction between them prevents: that is worth
+8% on SpMV and 8% on MG in the pilot's own code, several times the loss. Part of the loss (about 1-2%)
+belongs to the process (where the C++ default puts HPCG's coarse arrays), not to generated code.
+
+**Status after the first card diagnostic:** the padding hypothesis below is right in
 direction but small: it explains about one eighth of the loss. The same run proves a much larger gain
 that is ours to take: the second scheduling pass puts the FP accumulate between `cmp` and `jg`, and
 without that the real HPCG kernels are 8.3% (SpMV) and 6.6% (SymGS) faster than the donor's. The other
@@ -245,6 +251,105 @@ How to read it. The pilot's gap is 2.1% (SpMV) and 3.9% (MG).
 | `knc_at` slower than `donor_at` by about the gap inside each process, `own` in `knc` not | The loss belongs to where the pilot linked the code. `knc_at_pf` and `knc_at_adj` show whether B or A removes it there. |
 | `knc_at` within 0.5% of `donor_at` everywhere and the processes level | Not reproduced outside the full benchmark run; the remaining step is the ticket's profile of the real binaries. |
 | `knc_at_adj` against `knc_at` | Rule A's gain in the pilot's own code, in place (expected near 8% SpMV, 7% SymGS). |
+
+## Second diagnostic: result (card window 5, 2026-11-15 09:17-09:23Z, exclusive, exit 0, PASS)
+
+`.work/_shared/S12-31/native-mb.log`, `native-layout-knc.log`, `native-layout-donor.log`. The fourth
+program (`knc98`) was not run. Every output byte for byte the reference.
+
+Microbench (`gas_0` 394.92 ns per 27-product row), ns per row against `gas_0`, and the issue groups
+after `fldl` that the model below gives:
+
+| Variant | Order after `fldl` | ns per row | Groups |
+|---|---|---|---|
+| `gas_0` (today's order) | `fmull; add; cmp; faddp; jg` | 0 | 5 |
+| `adj_0` | `fmull; faddp; add; cmp; jg` | -44.8 | 4 |
+| `mid_0` | `fmull; add; faddp; cmp; jg` | -45.6 | 4 |
+| `mov_adj_0` | `fmull; faddp; add; mov; cmp; jg` | -0.8 | 5 |
+| `mov_split_0` | `fmull; faddp; add; cmp; mov; jg` | -1.1 | 5 |
+| `inc_0` | today's order with `inc` | +0.1 | 5 |
+
+`mid_0` equals `adj_0`, so where the FP add sits against its multiply does not matter: **the gain is the
+compare and the jump issuing together.** One model fits all six: an x87 instruction issues alone; an
+integer instruction cannot share an issue with the instruction that produces its input (`add` then
+`cmp`, `add` then `mov`); `cmp` and `jg` share one. That is what R02 p.56 says (verified in the source;
+production or pre-production hardware not stated there): pairing is for independent single-cycle
+instructions, with compare-and-jump among the dependent pairs that the hardware accepts. One issue
+group is 44.8 / 27 = 1.66 ns per iteration, which is one issue opportunity of a thread (two core clocks
+in `knc.md`'s model). `mov_adj_0` shows that the compare must be the first of its pair: an independent
+integer instruction just before it takes it as partner and the jump is alone again. The scheduler's
+model (`knc.md`) lets a scalar instruction, the jump included, share an issue with an x87 instruction;
+the measurement says the jump cannot. Whether other scalar instructions can, and whether a jump can
+share with a vector instruction, is not measured (S12-14 B03's pairing table).
+
+Padding, second sample: the assembler's long NOPs cost +9.5 to +10.8 ns at 13-15 bytes and at most
++2.6 up to 10 bytes; prefix-free NOPs of any length at most +3.3; true single-byte NOPs about 1.5 ns
+each (15 of them +22.7).
+
+HPCG itself, set up as the pilot, `CG` 2 iterations, 3 alternating samples, median seconds:
+
+| Kernel code | SpMV, `knc` process | SpMV, `donor` process | MG, `knc` process | MG, `donor` process |
+|---|---|---|---|---|
+| `donor_at` (donor pilot code at its address) | 1.8791 | 1.8643 | 7.9533 | 7.8601 |
+| `knc_at` (GCC-KNC pilot code at its address) | 1.8819 | 1.8712 | 8.0327 | 7.8689 |
+| `knc_at_pf` (slow-prefix NOPs re-encoded) | 1.8738 | 1.8637 | 7.9929 | 7.8146 |
+| `knc_at_adj` (compare next to jump) | 1.7386 | 1.7223 | 7.4594 | 7.3028 |
+| `own` | 1.8830 | 1.8609 | 8.0328 | 7.8601 |
+
+1. **Part of the loss belongs to the process, not to the kernels' code.** The same bytes at the same
+   address are slower in the process built by GCC-KNC: `donor_at` by 0.8% (SpMV) and 1.2% (MG), the
+   three `knc_at` variants by 0.5-0.9% and 2.1-2.3%. Observed in the same logs: in the `knc` process the
+   coarse-level matrices and vectors and the fine level's `rc`/`xc` are on the heap at arbitrary page
+   offsets, in the `donor` process nearly all of them are separate mappings (offset 16 in the page).
+   That is the placement difference predicted from the row-map type (`__cplusplus` 202002 against
+   199711; HPCG picks `std::unordered_map` from C++11 on). It follows from the language default, not
+   from generated code. That the map is the cause is still not measured (`knc98` did not run), and why
+   that placement is slower is not known. No change is proposed for it.
+2. **The pilot's code in place adds little.** `knc_at` against `donor_at` is 0.4% (SpMV) and 0.1%
+   (MG) in the `donor` process, 0.1% and 1.0% in the `knc` process; re-encoding the NOPs takes back
+   0.4-0.7%. Pilot against pilot (`knc_at` in `knc`, `donor_at` in `donor`) is 0.9% on SpMV and 2.2% on
+   MG: about half of the pilot's 2.1% and 3.9%. The rest did not reproduce in 2 iterations.
+3. **Rule A in the pilot's own code, in place:** `knc_at_adj` against `knc_at` is 8.2% and 8.6% faster
+   on SpMV and 7.7% and 7.8% on MG. Against the donor's pilot (`knc_at_adj` in `knc`, `donor_at` in
+   `donor`) HPCG would be 7.2% faster on SpMV and 5.4% on MG, the process loss included. A prediction
+   from 2 iterations; the paired A/B decides.
+
+## Phase 2 design (red tests committed; green waits for the lead's approval of the red)
+
+Both changes are KNC only. No FP operation changes order or form.
+
+A. **Keep a scalar compare with its conditional jump in a block that has x87 instructions.**
+   `ix86_macro_fusion_p` (`x86-tune-sched.cc`) returns true for `CPU_KNC`, and
+   `ix86_macro_fusion_pair_p` hands KNC to a new helper in `i386-knc.cc` (one prototype in
+   `i386-knc.h`; the shared file changes by a few lines, in its own commit). The helper is true when
+   the second instruction is a conditional jump, the first is a `knc_pipe` scalar instruction that sets
+   the flags the jump reads, and the jump's block has an instruction of `knc_pipe` `fp`. The scheduler
+   then keeps the two adjacent (`SCHED_GROUP_P`, `sched-deps.cc`), which gives `adj_0` or `mid_0`.
+   Blocks without x87 are scheduled exactly as today: S6-06 switched grouping off so that a vector
+   instruction could take the compare or the jump as its partner, and nothing measured here says
+   otherwise. `pass_dep_fusion` also calls the pair hook, but it never moves a jump. Not done:
+   changing `knc.md` so that x87 takes both pipes (wider, and the greedy scheduler would still issue
+   the compare first); steering which instruction precedes the compare (`mov_adj_0`).
+   T1: `tests/t1/knc-scheduler-cmp-jump.c`.
+B. **Bound the loop-head skip at 7 bytes**: `align_loop` in the KNC cost table from `"16"` to
+   `"16:8:8"` (`.p2align 4,,7` then `.p2align 3`, the donor's rule; measured as `knc_skip7`).
+   Jump alignment stays: `final.cc` uses it only for a block with no fallthrough predecessor, so that
+   padding is never run. (My earlier sentence that `-falign-jumps` could put a NOP on a fallthrough
+   path was wrong.) `docs/research/knc-costs.md` "Code alignment" says loops are `.p2align 4,,10`;
+   they have been unbounded `.p2align 4`, and the green commit corrects that text.
+   T1: `tests/t1/knc-tune-align-loops.c`.
+
+Red, on the build of `knc` at 7a3b34430e3 (`python tools/check.py t1 --compiler gcc16
+--knc-scheduler --tune-align`, log `.work/_state/logs/check_gcc16_t1-20261115-043150.log`): both new
+tests fail on their first scan, for the reason they exist (`fmull; add; cmp; faddp; jg` in the short
+loop and `fmull; cmp; faddp; jne` in the unrolled one; `.p2align 4` before the inner loop). The three
+existing tests in those selections pass.
+
+Green, then: one GCC build (`tools/gcc_build.py --if-stale` through `tools/run.py`, after committing),
+the two selections, full T0-T2, the ICE sweeps (`tools/vect_ice_check.py`, `tools/torture_compile.py`),
+the paired HPCG A/B from `tools/hpcg_round.py stage` (S11-28 fixed work, two pairs per profile) and
+two controls: one with no x87 in its loops (expected identical code apart from loop padding) and one
+x87 loop program. x86 identity is the lead's.
 
 ## What phase 2 would change (written before the first run; superseded by "Phase 2" above)
 

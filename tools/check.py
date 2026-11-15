@@ -77,8 +77,8 @@ SELECTIONS = {
         't1': lambda runner: runner.t1_sources(runner.source_dir.glob('knc-pad-*.c'))}),
     'int_madd': ('S8-07 V16SI multiply-add as vpmadd231d', {
         't1': lambda runner: runner.t1_sources([runner.source_dir / 'knc-vec-imadd.c'])}),
-    'knc_scheduler': ('S6-06 vector/scalar pairing and address separation', {
-        't1': lambda runner: runner.t1_sources([runner.source_dir / 'knc-scheduler.c'])}),
+    'knc_scheduler': ('S6-06 vector/scalar pairing and address separation; S12-31 compare with its jump', {
+        't1': lambda runner: runner.t1_sources(runner.source_dir.glob('knc-scheduler*.c'))}),
     'knc_costs': ('S6-05 measured KNC vectorizer cost decisions', {
         't1': lambda runner: runner.t1_sources(runner.source_dir.glob('knc-cost-*.c'))}),
     'loop_reports': ('S6-04 KNC per-loop optimization reports', {
