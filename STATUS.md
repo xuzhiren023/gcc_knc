@@ -2,7 +2,7 @@
 
 Updated automatically at every ticket change. Last update: 2026-11-14 21:35.
 
-**Next: the tech lead, on S12-21.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: the tech lead, on S12-30.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[##################--]` 230 of 248
 
@@ -101,7 +101,7 @@ Current tickets: `[##################--]` 230 of 248
 | S12-18 | Double-precision vector exp, log and pow ran slower than scalar libm on the card (0.82x, 0.63x, 0.49x) - confirm with valid batches, then fix the library or stop the vectorizer calling them where they lose | Done | The vector math benchmark now always times valid 50-200 ms batches, and the valid card runs show double exp... |
 | S12-19 | Profile-guided missed-vectorization triage - join hot loops with the vectorizer's reasons and observed strides/masks, so tuning targets what is hot and fixable | Done | tools/vec_triage.py now ranks each development program's hot loops by sampled time with GCC's vectorizer ve... |
 | S12-20 | libknc_vmath accuracy and exception contract, with an independent validation design (rounding modes, special values, flags, scalar fallback) | draft |  |
-| S12-21 | Scheduling model for M4's serial runs - measure density-1 tuning and the integer-multiply cost against today's density-4 defaults (S12-14 B02, B04, B05) | Question for the tech lead | Lead 21:36: T2 run by the lead on lane gcc2: 36 PASS, 0 FAIL (log s12_21_t2-20261114-213433.log); the S5-21... |
+| S12-21 | Scheduling model for M4's serial runs - measure density-1 tuning and the integer-multiply cost against today's density-4 defaults (S12-14 B02, B04, B05) | In progress | Submit. |
 | S12-22 | Low-risk corrections from the S12-14 audit - wrong comments and citations (N01-N09) and the far-prefetch-distance range bug (B10) | Done | The audit's comment and citation fixes are in GCC-KNC and the far prefetch distance can no longer be set eq... |
 | S12-23 | Floating-point environment correctness on KNC - fix the underflow probe that cannot tell flushing from rounding, and handle x87 erratum CD28 (S12-14 N06, N07, B16, B17) | Done | GCC-KNC's floating-point environment handling is now correct on the card: x87 exception clearing uses the C... |
 | S12-24 | ICE in vect_transform_stmt (tree-vect-stmts.cc:13381) on WRF's REMEZ at -mphinix (-O3 -march=knc) | In progress | The WRF REMEZ compiler crash is now reproduced by a 10-line k=-k loop test (int and unsigned char) that fai... |
@@ -273,6 +273,7 @@ Current tickets: `[##################--]` 230 of 248
 
 ## Recent activity
 
+- 2026-11-14 21:35 **S12-21** lead answer: Submit.
 - 2026-11-14 21:35 **S12-21** lead resume: Lead 21:36: T2 run by the lead on lane gcc2: 36 PASS, 0 FAIL (log s12_21_t2-20261114-213433.log); the S5-21 file is fixed for good by S12-33. No re...
 - 2026-11-14 21:33 **S12-21** lead defer: Interactive lead needed; diff reviewed (one imul-cost hunk, scanner fix fine). (1) Rebase gcc s12/S12-21 onto knc 2e70e4115e2 (engineer: Permission...
 - 2026-11-14 21:32 **S12-30** engineer ask: 429c7653: A/B/A+B staged; target build/lint PASS; host model 599300 checks PASS. Log: .work/_state/logs/s12_30_phase1_routes-20261114-213007.log. A...
@@ -280,7 +281,6 @@ Current tickets: `[##################--]` 230 of 248
 - 2026-11-14 21:23 **S12-30** lead approve-red: The sparse-loop Phase 1 harness is accepted: it fails only because the three new routes do not exist yet, and its exact, ordering, 1-ULP and guard-...
 - 2026-11-14 21:19 **S12-31** lead defer: Needs one card run by the interactive lead. Phase 1 at 6b413629 reviewed and sound; staged binary exists. In our exclusive card turn run the comman...
 - 2026-11-14 21:18 **S12-30** engineer red: 570710ae: replacement red; target build/lint PASS. Host exit 1: nine missing A/B/A+B slots only; 60,458 scalar/reference/bounds checks pass. Both s...
-- 2026-11-14 21:14 **S12-31** engineer ask: Phase 1 at 6b413629, see docs/research/s12-31-hpcg.md. Loss is only SpMV (+2.1%) and SymGS/MG (+3.9%). Likely cause, unproven: -falign-loops=16 pad...
 
 ## Cost
 
