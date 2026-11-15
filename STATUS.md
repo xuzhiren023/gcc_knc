@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-14 23:03.
+Updated automatically at every ticket change. Last update: 2026-11-14 23:10.
 
-**Next: GPT-6.1, on S11-26 (WRF OpenMP build at -mphinix with no per-file workarounds (S11-23 and S11-25 fixed), restaged for PhiWeather).** Run `python tools/dispatch.py`, or ask the tech lead to.
+**Next: the tech lead, on S12-32.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[##################--]` 233 of 248
 
@@ -112,7 +112,7 @@ Current tickets: `[##################--]` 233 of 248
 | S12-29 | Wrong code - vbroadcastsd reads a 4-byte-aligned SCmode constant (complex float) straight from the constant pool and faults on the card (gcc.c-torture pr38969.c, regression from S11-27) | Done | The pr38969 crash from S11-27 is fixed: GCC-KNC no longer broadcasts a vector from memory aligned below its... |
 | S12-30 | Sparse indexed reductions faster than today - vector gather of products with an ordered scalar sum, and indirect prefetch, for CSR-style loops (NPB-CG, HPCG) | In progress | Route B wins; phase 2 for Route B. |
 | S12-31 | HPCG is 1.8% slower with GCC-KNC than with GCC 5.1.1 - find the cause and make it faster (owner: never slower than 5.1.1) | In progress | Results in; interpret and decide. |
-| S12-32 | ICE (reload) in gcc.c-torture O3-vect-pr32243.c on the installed GCC-KNC, found by the S12-21 torture sweep | In progress |  |
+| S12-32 | ICE (reload) in gcc.c-torture O3-vect-pr32243.c on the installed GCC-KNC, found by the S12-21 torture sweep | Tests waiting for review | Red 044f1aa2: tests/t1/knc-convert-byte-register.c (--byte-word) ICEs in curr_insn_transform as the ticket;... |
 | S12-33 | T2 writes its short-vector test binaries into a per-run folder, so Claude, Codex and lead runs never block each other | Done | T2's short-vector cross-check now writes its binaries into the run's own output folder instead of the share... |
 | S13-01 | M4 final gate - stage the ADR-0015 gate run at the final head (17 programs, held-out unsealed, six pairs, three profiles) | draft |  |
 | S13-02 | Libgomp per-region thread density - choose 1-4 workers per core per parallel region instead of once per program | draft |  |
@@ -273,6 +273,7 @@ Current tickets: `[##################--]` 233 of 248
 
 ## Recent activity
 
+- 2026-11-14 23:10 **S12-32** engineer red: Red 044f1aa2: tests/t1/knc-convert-byte-register.c (--byte-word) ICEs in curr_insn_transform as the ticket; S12-29 does not fix it (build 71e9b2d00...
 - 2026-11-14 23:03 **S11-26** lead answer: Prefix reinstalled; build now.
 - 2026-11-14 23:03 **S11-26** lead resume: Lead 23:02: S12-24 (REMEZ ICE fix) is merged and the prefix gcc-knc-16.2.0 is reinstalled from knc 71e9b2d00fc (includes S11-23, S11-25, S11-27, S1...
 - 2026-11-14 22:57 **S12-24** lead approve: The vectorizer crash in WRF's REMEZ routine at -mphinix is fixed in general (negative-step induction handling in tree-vect-loop.cc); the reproducer...
@@ -280,7 +281,6 @@ Current tickets: `[##################--]` 233 of 248
 - 2026-11-14 22:19 **S12-31** lead answer: Results in; interpret and decide.
 - 2026-11-14 22:19 **S12-31** lead resume: Lead, card window 3 (02:57-03:00Z, 152 s, exit 0, exclusive): .work/_shared/S12-31/native.log ends PASS. Loop-entry padding variants (mis_44..60, i...
 - 2026-11-14 22:19 **S12-30** lead answer: Route B wins; phase 2 for Route B.
-- 2026-11-14 22:18 **S12-30** lead resume: Lead, card window 3 (03:14-03:18Z, 256 s, exit 0, exclusive; output .work/_shared/tmp/claude-s12-window3/s12-30-sparse.out): PASS 2,178,308 compari...
 
 ## Cost
 
