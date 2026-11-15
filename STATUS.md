@@ -1,10 +1,10 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-14 19:53.
+Updated automatically at every ticket change. Last update: 2026-11-14 20:18.
 
-**Next: the tech lead, on S12-23.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: the tech lead, on S12-29.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
-Current tickets: `[##################--]` 227 of 244
+Current tickets: `[##################--]` 228 of 244
 
 ## Milestones
 
@@ -14,7 +14,7 @@ Current tickets: `[##################--]` 227 of 244
 | M1 | Mixed native code | Done | 43 of 43 tickets |
 | M2 | Useful vector target | Done | 51 of 51 tickets |
 | M3 | Runtimes | Done | 48 of 48 tickets |
-| M4 | Broad optimization | In progress | 45 of 62 tickets |
+| M4 | Broad optimization | In progress | 46 of 62 tickets |
 | M5 | Program corpus | Not started | Not planned in detail yet |
 | M6 | Release | Not started | Not planned in detail yet |
 
@@ -103,7 +103,7 @@ Current tickets: `[##################--]` 227 of 244
 | S12-20 | libknc_vmath accuracy and exception contract, with an independent validation design (rounding modes, special values, flags, scalar fallback) | draft |  |
 | S12-21 | Scheduling model for M4's serial runs - measure density-1 tuning and the integer-multiply cost against today's density-4 defaults (S12-14 B02, B04, B05) | lead | Card run needed (interactive lead): 037aee42 removes the shell timeout calls (card_run keeps the 1740 s lim... |
 | S12-22 | Low-risk corrections from the S12-14 audit - wrong comments and citations (N01-N09) and the far-prefetch-distance range bug (B10) | Done | The audit's comment and citation fixes are in GCC-KNC and the far prefetch distance can no longer be set eq... |
-| S12-23 | Floating-point environment correctness on KNC - fix the underflow probe that cannot tell flushing from rounding, and handle x87 erratum CD28 (S12-14 N06, N07, B16, B17) | Waiting for review | Green gate, payload build/lint, T0/T1 PASS (prior session). Lead T2: 36 PASS, 0 FAIL; log .work/_state/logs... |
+| S12-23 | Floating-point environment correctness on KNC - fix the underflow probe that cannot tell flushing from rounding, and handle x87 erratum CD28 (S12-14 N06, N07, B16, B17) | Done | GCC-KNC's floating-point environment handling is now correct on the card: x87 exception clearing uses the C... |
 | S12-24 | ICE in vect_transform_stmt (tree-vect-stmts.cc:13381) on WRF's REMEZ at -mphinix (-O3 -march=knc) | Not started |  |
 | S12-25 | WRF smpar build arm with --param=knc-threads-per-core=2 for PhiWeather's 2-threads-per-core runs (A/B against S11-26's default-4 build) | draft |  |
 | S12-26 | WRF hot scalar routines - classify with the S12-19 triage tool and stage bitwise-safe per-file flag arms for PhiWeather to time | draft |  |
@@ -269,6 +269,7 @@ Current tickets: `[##################--]` 227 of 244
 
 ## Recent activity
 
+- 2026-11-14 20:18 **S12-23** lead approve: GCC-KNC's floating-point environment handling is now correct on the card: x87 exception clearing uses the CD28 erratum sequence, reserved MXCSR bit...
 - 2026-11-14 19:52 **S12-29** engineer submit: NOT DONE: MG verify cases not restaged; NPB3.4.2 sources are DENY-ACL unreadable here (ACL untouched). Lead: stage.py --mg. At 1f0151972c7: green T...
 - 2026-11-14 19:24 **S12-29** owner decide: Owner 2026-11-14: troubleshooting tickets go to Fable. Lead moves S12-29 to backend claude, model claude-fable-5-2, sessions 6 -> 9: the fix is bui...
 - 2026-11-14 19:23 **S12-29** engineer escalate: budget: 6 engineer sessions used; the budget is 6
@@ -276,16 +277,15 @@ Current tickets: `[##################--]` 227 of 244
 - 2026-11-14 19:23 **S12-29** lead resume: Built at 1f0151972c7: see the 19:25 build note in the ticket body.
 - 2026-11-14 19:13 **S12-29** lead defer: GCC build needed, lane gcc at 1f0151972c7 (checked out in .work/_shared/gcc): interactive lead runs python tools/run.py --name s12_29_build3 -- pyt...
 - 2026-11-14 19:11 **S12-29** engineer ask: GCC build needed at 1f0151972c7, lane gcc. Fixed the reported gencondmd error by moving the mode-alignment test into ix86_knc_aligned_mem_p in i386...
-- 2026-11-14 19:09 **S12-29** lead answer: Fix the gencondmd build error as described and resubmit for build.
 
 ## Cost
 
 - From the script, engineer: 646 sessions, 1276.3M input tokens
 - From the script, lead: 425 sessions, 118.0M input tokens
-- Started by hand, Claude: 12 sessions, 3322.0M input tokens
+- Started by hand, Claude: 12 sessions, 3337.7M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 33.3 GiB of 100 GiB. 138 GiB free on the drive.
+The project uses 33.3 GiB of 100 GiB. 141 GiB free on the drive.
