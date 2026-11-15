@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-14 23:52.
+Updated automatically at every ticket change. Last update: 2026-11-14 23:59.
 
-**Next: GPT-6.1, on S11-26 (WRF OpenMP build at -mphinix with no per-file workarounds (S11-23 and S11-25 fixed), restaged for PhiWeather).** Run `python tools/dispatch.py`, or ask the tech lead to.
+**Next: the tech lead, on S12-32.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[##################--]` 233 of 248
 
@@ -112,7 +112,7 @@ Current tickets: `[##################--]` 233 of 248
 | S12-29 | Wrong code - vbroadcastsd reads a 4-byte-aligned SCmode constant (complex float) straight from the constant pool and faults on the card (gcc.c-torture pr38969.c, regression from S11-27) | Done | The pr38969 crash from S11-27 is fixed: GCC-KNC no longer broadcasts a vector from memory aligned below its... |
 | S12-30 | Sparse indexed reductions faster than today - vector gather of products with an ordered scalar sum, and indirect prefetch, for CSR-style loops (NPB-CG, HPCG) | In progress | Phase-2 red not accepted: the four failures are the right kind, but the positive checks do not prove the ac... |
 | S12-31 | HPCG is 1.8% slower with GCC-KNC than with GCC 5.1.1 - find the cause and make it faster (owner: never slower than 5.1.1) | In progress | Results in; interpret and decide. |
-| S12-32 | ICE (reload) in gcc.c-torture O3-vect-pr32243.c on the installed GCC-KNC, found by the S12-21 torture sweep | In progress | Red accepted: knc-convert-byte-register.c reproduces the ticket's reload ICE and passes only when a registe... |
+| S12-32 | ICE (reload) in gcc.c-torture O3-vect-pr32243.c on the installed GCC-KNC, found by the S12-21 torture sweep | Waiting for review | Green: knc f559e49271c (imci.md Bm->Ba) + 6b79c6f0566 (sse.md: extend expanders passed a folded under-align... |
 | S12-33 | T2 writes its short-vector test binaries into a per-run folder, so Claude, Codex and lead runs never block each other | Done | T2's short-vector cross-check now writes its binaries into the run's own output folder instead of the share... |
 | S13-01 | M4 final gate - stage the ADR-0015 gate run at the final head (17 programs, held-out unsealed, six pairs, three profiles) | draft |  |
 | S13-02 | Libgomp per-region thread density - choose 1-4 workers per core per parallel region instead of once per program | draft |  |
@@ -273,6 +273,7 @@ Current tickets: `[##################--]` 233 of 248
 
 ## Recent activity
 
+- 2026-11-14 23:59 **S12-32** engineer submit: Green: knc f559e49271c (imci.md Bm->Ba) + 6b79c6f0566 (sse.md: extend expanders passed a folded under-aligned MEM, a second ICE in vregs; red f422e...
 - 2026-11-14 23:50 **S12-30** lead changes: Phase-2 red not accepted: the four failures are the right kind, but the positive checks do not prove the acceptance, and the form Phase 1 measured ...
 - 2026-11-14 23:45 **S12-30** engineer red: 489b7dc4: Phase-two T1 red: four missing indirect-prefetch failures; compile/lint, exclusions, scalar folds and installed O2 baseline identity PASS...
 - 2026-11-14 23:12 **S12-32** lead approve-red: Red accepted: knc-convert-byte-register.c reproduces the ticket's reload ICE and passes only when a register-held byte/word vector reloads through ...
@@ -280,7 +281,6 @@ Current tickets: `[##################--]` 233 of 248
 - 2026-11-14 23:03 **S11-26** lead answer: Prefix reinstalled; build now.
 - 2026-11-14 23:03 **S11-26** lead resume: Lead 23:02: S12-24 (REMEZ ICE fix) is merged and the prefix gcc-knc-16.2.0 is reinstalled from knc 71e9b2d00fc (includes S11-23, S11-25, S11-27, S1...
 - 2026-11-14 22:57 **S12-24** lead approve: The vectorizer crash in WRF's REMEZ routine at -mphinix is fixed in general (negative-step induction handling in tree-vect-loop.cc); the reproducer...
-- 2026-11-14 22:39 **S12-21** lead approve: GCC-KNC now prices scalar integer multiply at its measured cost (about 10 cycles instead of 3) and keeps scheduling for 4 threads per core, which b...
 
 ## Cost
 
@@ -292,4 +292,4 @@ Current tickets: `[##################--]` 233 of 248
 
 ## Disk
 
-The project uses 33.8 GiB of 100 GiB. 139 GiB free on the drive.
+The project uses 33.7 GiB of 100 GiB. 139 GiB free on the drive.
