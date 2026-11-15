@@ -1,6 +1,8 @@
 # S12-24: ICE on a sign-alternating induction with a vector epilogue
 
-Status 2026-11-14: reduced and root cause read in the source and the vect dump. Not fixed yet.
+Status 2026-11-14: reduced, root cause read in the source and the vect dump, fixed in the GCC
+branch `s12/S12-24` (`e3c5b822619`). The test passes with both main loops vector (`vmulpd` and
+`vmulps` on zmm). Not run on the card, and x86 identity not run.
 
 ## Reproducer
 
@@ -36,12 +38,18 @@ has no integer vector negate. `ix86_knc_vectorize_vec_perm_const` accepts the in
 Upstream `master` at `fceddda853f` (2026-11-14) has the same code. It is a latent
 target-independent bug: x86 never reaches it because every SSE2 integer vector mode has a negate.
 
-## Planned fix
+## Fix
 
-In `vectorizable_nonlinear_induction`, run the negate and interleave check also when the start
-value will not be the analysed constant at transform time: `LOOP_VINFO_EPILOGUE_P`, and alignment
-peeling of the loop itself. Analysis then rejects what the transform cannot build. The change can
-only alter compiles that ICE today, so x86 output is unchanged by construction.
+In `vectorizable_nonlinear_induction`, the negate and interleave check now also runs when the
+start value may not be the analysed constant at transform time: `LOOP_VINFO_EPILOGUE_P`, and a
+peeled alignment prologue (`LOOP_VINFO_PEELING_FOR_ALIGNMENT` nonzero without
+`vect_use_loop_mask_for_alignment_p`). Analysis then rejects what the transform cannot build.
+
+The check is slightly wider than the ICE: an epilogue whose main loop has no skip guard (known
+iteration count) keeps a constant start and compiled before, and is now also rejected when the
+target lacks the negate or the interleave. Whether the guard exists is decided in
+`vect_do_peeling`, after the epilogue is analysed. A target with both operations in every integer
+vector mode it vectorizes with sees no change, since the check passes wherever it now runs.
 
 A KNC-only `negv16si2`/`negv8di2` is not a general fix: V16QI and V16HI inductions would still
 ICE.
