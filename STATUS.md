@@ -2,7 +2,7 @@
 
 Updated automatically at every ticket change. Last update: 2026-11-14 20:23.
 
-**Next: the tech lead, on S12-21.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: the tech lead, on S12-07.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[##################--]` 228 of 244
 
@@ -87,7 +87,7 @@ Current tickets: `[##################--]` 228 of 244
 | S12-04 | card_run profile memory monitor costs under 5% of one card thread | Done | card_run's profile memory monitor no longer floods stderr and scans /proc far less often: it uses usleep wi... |
 | S12-05 | DMA end-to-end time - overlap file read, DMA and file write, and copy on the card with more than one thread | draft |  |
 | S12-06 | M4 theme 1 - strict scalar FP conversions and call boundaries (NPB-EP transform and log path, NPB-IS randlc) | Done | Theme 1 (scalar FP conversions and calls in NPB-EP/IS) closed with no compiler change: a card diagnostic sh... |
-| S12-07 | M4 theme 2 - indexed-load scheduling with strict sparse reduction (NPB-CG) | In progress | Results in; analyse and decide. |
+| S12-07 | M4 theme 2 - indexed-load scheduling with strict sparse reduction (NPB-CG) | Question for the tech lead | 9cef3599 records all 168 timings in docs/research/s12-07-sparse.md; decision: stop, gain premise unproven. ... |
 | S12-08 | M4 theme 3 - dependency-preserving scalar updates and register pressure in dense loops (PB-ludcmp, x87 stack traffic) | Done | Theme 3 (register pressure in dense loops) closed with no compiler change: PB-ludcmp's extra x87 stack traf... |
 | S12-09 | Sprint 12 batch check - integrated themes at the final Sprint 12 head, regression evidence, optional modes frozen | draft |  |
 | S12-10 | Research - what KNC hardware and runtime knowledge are we still missing to tune GCC-KNC, the OS runtime and broad optimization, and where is it documented? | Done | KNC reference-gap research done: 16 gaps ranked, 32 primary sources (98 MB, outside git) with page-cited fa... |
@@ -270,13 +270,13 @@ Current tickets: `[##################--]` 228 of 244
 ## Recent activity
 
 - 2026-11-14 20:23 **S12-21** engineer ask: 01b172ea: collected 12 runs = 6 A/B pairs; checks PASS, batch timeout remains. MG density1 slower 8.7%; retain density4. IMUL medians 9.06-9.08 TSC...
+- 2026-11-14 20:23 **S12-07** engineer ask: 9cef3599 records all 168 timings in docs/research/s12-07-sparse.md; decision: stop, gain premise unproven. Lead log .work/_shared/tmp/claude-s12-wi...
 - 2026-11-14 20:19 **S12-21** lead answer: Collect the 12 pairs and decide.
 - 2026-11-14 20:19 **S12-21** lead resume: Lead, card window 2: r2/batch.sh ran 1765 s and hit the 1740 s card_run limit (exit 124) after 12 complete pairs; native.log in r2 holds them. Run ...
 - 2026-11-14 20:19 **S12-07** lead answer: Results in; analyse and decide.
 - 2026-11-14 20:19 **S12-07** lead resume: Lead, card window 2 (00:35Z, 41 s, exit 0; output .work/_shared/tmp/claude-s12-window2/s12-07-sparse.out): PASS ordered output comparison; sample 2...
 - 2026-11-14 20:18 **S12-23** lead approve: GCC-KNC's floating-point environment handling is now correct on the card: x87 exception clearing uses the CD28 erratum sequence, reserved MXCSR bit...
 - 2026-11-14 19:52 **S12-29** engineer submit: NOT DONE: MG verify cases not restaged; NPB3.4.2 sources are DENY-ACL unreadable here (ACL untouched). Lead: stage.py --mg. At 1f0151972c7: green T...
-- 2026-11-14 19:24 **S12-29** owner decide: Owner 2026-11-14: troubleshooting tickets go to Fable. Lead moves S12-29 to backend claude, model claude-fable-5-2, sessions 6 -> 9: the fix is bui...
 
 ## Cost
 
