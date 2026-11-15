@@ -1,10 +1,10 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-14 22:19.
+Updated automatically at every ticket change. Last update: 2026-11-14 22:39.
 
-**Next: the tech lead, on S12-21.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: the tech lead, on S12-24.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
-Current tickets: `[##################--]` 231 of 248
+Current tickets: `[##################--]` 232 of 248
 
 ## Milestones
 
@@ -14,7 +14,7 @@ Current tickets: `[##################--]` 231 of 248
 | M1 | Mixed native code | Done | 43 of 43 tickets |
 | M2 | Useful vector target | Done | 51 of 51 tickets |
 | M3 | Runtimes | Done | 48 of 48 tickets |
-| M4 | Broad optimization | In progress | 49 of 66 tickets |
+| M4 | Broad optimization | In progress | 50 of 66 tickets |
 | M5 | Program corpus | Not started | Not planned in detail yet |
 | M6 | Release | Not started | Not planned in detail yet |
 
@@ -101,7 +101,7 @@ Current tickets: `[##################--]` 231 of 248
 | S12-18 | Double-precision vector exp, log and pow ran slower than scalar libm on the card (0.82x, 0.63x, 0.49x) - confirm with valid batches, then fix the library or stop the vectorizer calling them where they lose | Done | The vector math benchmark now always times valid 50-200 ms batches, and the valid card runs show double exp... |
 | S12-19 | Profile-guided missed-vectorization triage - join hot loops with the vectorizer's reasons and observed strides/masks, so tuning targets what is hot and fixable | Done | tools/vec_triage.py now ranks each development program's hot loops by sampled time with GCC's vectorizer ve... |
 | S12-20 | libknc_vmath accuracy and exception contract, with an independent validation design (rounding modes, special values, flags, scalar fallback) | draft |  |
-| S12-21 | Scheduling model for M4's serial runs - measure density-1 tuning and the integer-multiply cost against today's density-4 defaults (S12-14 B02, B04, B05) | Waiting for review | KNC-only scalar integer multiply cost 3 -> 10 (QI/HI/SI/DI) and 6 -> 20 (TI) in knc_processor_costs (gcc 9c... |
+| S12-21 | Scheduling model for M4's serial runs - measure density-1 tuning and the integer-multiply cost against today's density-4 defaults (S12-14 B02, B04, B05) | Done | GCC-KNC now prices scalar integer multiply at its measured cost (about 10 cycles instead of 3) and keeps sc... |
 | S12-22 | Low-risk corrections from the S12-14 audit - wrong comments and citations (N01-N09) and the far-prefetch-distance range bug (B10) | Done | The audit's comment and citation fixes are in GCC-KNC and the far prefetch distance can no longer be set eq... |
 | S12-23 | Floating-point environment correctness on KNC - fix the underflow probe that cannot tell flushing from rounding, and handle x87 erratum CD28 (S12-14 N06, N07, B16, B17) | Done | GCC-KNC's floating-point environment handling is now correct on the card: x87 exception clearing uses the C... |
 | S12-24 | ICE in vect_transform_stmt (tree-vect-stmts.cc:13381) on WRF's REMEZ at -mphinix (-O3 -march=knc) | Waiting for review | GCC e3c5b822619 (tree-vect-loop.cc, on knc), lane gcc built. Green T1 PASS, both main loops vector incl. vm... |
@@ -273,6 +273,7 @@ Current tickets: `[##################--]` 231 of 248
 
 ## Recent activity
 
+- 2026-11-14 22:39 **S12-21** lead approve: GCC-KNC now prices scalar integer multiply at its measured cost (about 10 cycles instead of 3) and keeps scheduling for 4 threads per core, which b...
 - 2026-11-14 22:19 **S12-31** lead answer: Results in; interpret and decide.
 - 2026-11-14 22:19 **S12-31** lead resume: Lead, card window 3 (02:57-03:00Z, 152 s, exit 0, exclusive): .work/_shared/S12-31/native.log ends PASS. Loop-entry padding variants (mis_44..60, i...
 - 2026-11-14 22:19 **S12-30** lead answer: Route B wins; phase 2 for Route B.
@@ -280,16 +281,15 @@ Current tickets: `[##################--]` 231 of 248
 - 2026-11-14 22:02 **S12-33** lead approve: T2's short-vector cross-check now writes its binaries into the run's own output folder instead of the shared S5-21 path, so lead, Claude and Codex ...
 - 2026-11-14 21:50 **S12-33** engineer submit: Host regression passed (1 test). The earlier red commit 41691642 failed because the test double was incomplete; after simplifying the fixture, veri...
 - 2026-11-14 21:50 **S12-21** engineer submit: KNC-only scalar integer multiply cost 3 -> 10 (QI/HI/SI/DI) and 6 -> 20 (TI) in knc_processor_costs (gcc 9c9a66819fa, rebased on knc 2e70e4115e2 by...
-- 2026-11-14 21:46 **S12-33** lead answer: Yes, simplify. Replace t2_crosscheck with a recording stub (mock.patch.object(scalar_abi, 't2_crosscheck')) and make runner.command return returnco...
 
 ## Cost
 
 - From the script, engineer: 660 sessions, 1304.5M input tokens
 - From the script, lead: 436 sessions, 121.8M input tokens
-- Started by hand, Claude: 12 sessions, 3387.9M input tokens
+- Started by hand, Claude: 12 sessions, 3395.5M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 33.5 GiB of 100 GiB. 135 GiB free on the drive.
+The project uses 33.6 GiB of 100 GiB. 138 GiB free on the drive.
