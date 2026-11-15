@@ -65,6 +65,15 @@ static __attribute__((always_inline)) inline void hpcg_body(
     out[i] = sum;
   }
 }
+#ifdef COMPILER_PROOF
+/* All four TUs compile the same unhinted source.  Only compiler/options
+   differ; no handwritten hint or policy is present in this proof. */
+void FN(csr_scalar)(const struct matrix *a, double *out) { csr_body(a,out,0); }
+void FN(hpcg_scalar)(const struct matrix *a, double *out) { hpcg_body(a,out,0); }
+legal_kernel const FN(legal)[2][1] = {
+  {FN(csr_scalar)}, {FN(hpcg_scalar)}
+};
+#else
 void FN(csr_scalar)(const struct matrix *a, double *out) { csr_body(a,out,0); }
 void FN(csr_hint)(const struct matrix *a, double *out) { csr_body(a,out,1); }
 void FN(csr_policy)(const struct matrix *a, double *out)
@@ -83,6 +92,7 @@ legal_kernel const FN(legal)[2][3] = {
   {FN(csr_scalar), FN(csr_hint), FN(csr_policy)},
   {FN(hpcg_scalar), FN(hpcg_hint), FN(hpcg_policy)}
 };
+#endif /* COMPILER_PROOF */
 #else
 #include <stdio.h>
 #include <stdlib.h>
@@ -95,10 +105,22 @@ legal_kernel const FN(legal)[2][3] = {
 #include <sys/mman.h>
 #include <sys/wait.h>
 #include <sys/resource.h>
+#ifdef COMPILER_PROOF
+extern legal_kernel const donor_legal[2][1], knc_legal[2][1];
+extern legal_kernel const enabled_legal[2][1], fast_legal[2][1];
+static legal_kernel const (*tables[])[1] = {
+  donor_legal, knc_legal, enabled_legal, fast_legal
+};
+static const char *compilers[] = {
+  "donor-off", "knc-switch-off", "knc-switch-on", "knc-switch-on-contract-fast"
+};
+static const char *routes[] = {"compiler"};
+#else
 extern legal_kernel const donor_legal[2][3], knc_legal[2][3], fast_legal[2][3];
 static legal_kernel const (*tables[])[3] = {donor_legal, knc_legal, fast_legal};
 static const char *compilers[] = {"donor-off", "knc-off", "knc-contract-fast"};
 static const char *routes[] = {"scalar", "legal-hint", "legal-policy"};
+#endif
 static const char *layouts[] = {"CSR", "HPCG-pointers"};
 static uint32_t rng;
 static unsigned long checks;
@@ -191,8 +213,9 @@ static void guarded_cases(int layout, legal_kernel fn)
 }
 static void correctness(void)
 {
-  for (int layout = 0; layout < 2; ++layout) for (int t = 0; t < 3; ++t)
-    for (int k = 0; k < 3; ++k) {
+  for (int layout = 0; layout < 2; ++layout)
+    for (unsigned t = 0; t < sizeof tables/sizeof tables[0]; ++t)
+    for (unsigned k = 0; k < sizeof routes/sizeof routes[0]; ++k) {
       fflush(stdout);
       pid_t child = fork(); if (child < 0) die("fork");
       if (!child) {
@@ -280,7 +303,11 @@ static void performance(void)
       struct matrix a = {rows,row,c,count,v,x,cols,vals};
       for (int layout = 0; layout < 2; ++layout) {
         reference(&a,layout,want);
+#ifdef COMPILER_PROOF
+        const int compiler_ids[] = {0,1,2,3}, route_ids[] = {0,0,0,0};
+#else
         const int compiler_ids[] = {0,1,1,1}, route_ids[] = {0,0,1,2};
+#endif
         int before = failures, batch[4] = {1,1,1,1};
         for (int id = 0; id < 4; ++id) {
           tables[compiler_ids[id]][layout][route_ids[id]](&a,out);

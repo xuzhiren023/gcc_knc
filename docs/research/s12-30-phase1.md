@@ -703,3 +703,68 @@ ICE sweeps and x86 identity remain pending. The implementation must keep
 the switch explicit and default off, test the threshold outside a
 versioned nest, and insert hints in or before loop prefetch with target
 specifics behind a hook, as ruled on the ticket.
+
+### Compiler implementation awaiting the lead build (2026-11-15)
+
+The gcc2 branch now has an opt-in `-mknc-indirect-prefetch` policy hook
+and a transformation at the start of the existing loop-prefetch pass,
+before stream prefetch and ivopts. Shared i386 wiring is isolated in its
+own commit (ADR-0006); target policy lives in `i386-knc.cc`. The switch
+initially defaults off, as required for the compiler guard proof. The
+ticket's eventual default-on requirement still needs the application A/B.
+
+The recognizer requires a scalar add/product recurrence and a signed
+32-bit, unit-step counted index with a proven ascending entry test. It
+matches natural-stride indirect loads, without symbol or application-name
+tests. It leaves the original arithmetic and memory operations intact.
+Unsupported loop/address shapes fail closed. This first implementation
+does not claim complete coverage of application-generated GIMPLE.
+
+For a flat CSR nest it matches the same row array at outer index `i` and
+`i+1`, then guards `row[i+4]` by a widened `rows-i > 3`. The subsequent
+ordinary `col[j+32]` load is guarded by widened `bound-j > 32`. For a
+per-row-pointer nest it matches the count and pointer arrays at the same
+outer index, guards the next count by `rows-i > 1`, and guards the next
+pointer and index loads by `j < next_count`. Empty future rows therefore
+do not require a usable column pointer. These guards currently execute
+inside the original inner loop; performance is not inferred from the
+handwritten gate, whose metadata work was outside that loop.
+
+Cross-row eligibility requires a zero-based counted outer loop, one inner
+loop, an empty-row test executed on every outer iteration, no other
+conditionals, no calls/volatile operations, and no store whose alias type
+can overlap either metadata array. The store check is conservative for
+the whole array, rather than testing just the current element. It rejects
+cross-row speculation with strict aliasing disabled. A single loop, or a
+nest failing these extra checks, may still receive a row-local guarded
+hint if its inner loop has no stores, early exit, calls or volatile work.
+Non-call exceptions and trapping integer arithmetic disable the transform.
+
+Eligible nests are versioned before adding any hint, with a single outer
+trip-count policy test at 16384 rows. The unchanged arm remains available
+to the normal stream-prefetch pass. The guard scales a widened count, as
+the existing stream versioning helper does, to avoid introducing a new
+IV upper-bound constraint into the unchanged arm. Generated assembly and
+cache-sized timings remain unverified.
+
+The existing T1 checker now enforces the lead's accepted-red follow-ups:
+controls mode has no automatic hints and its probe bodies must equal
+explicit switch-off; `alias_bounds` may have a row-local hint but cannot
+have a later-row-bounded hint. No affine-walker changes or new test files.
+
+`tools/s12_30_precision.py --compiler-proof` is prepared to build the same
+legal guard-page and timing fixtures from unhinted C using donor, gcc2
+switch-off, gcc2 switch-on, and gcc2 switch-on/contract-fast TUs. It requires
+the pass to report both cross-row shapes in their dumps before linking;
+a missing transformation fails staging. This command has **not run** and
+`compiler-gate` has **not been staged**. After the lead's build, run through
+`tools/run.py`, then request one lead card run of
+`.work/_shared/S12-30/compiler-gate 12345` with
+`card_run --threads 1 --timeout 590`. The timing remains single-core,
+five samples of at least 0.5 seconds, with the existing cache/CG-A/memory
+fixtures and both layouts. A crash or timeout is not a correctness pass.
+
+No GCC build or new test was run in this session: AGENTS.md reserves GCC
+builds for the lead. T1 green, T0/T2, ICE sweeps, compiler-generated native
+guard/timing results, NPB-CG/HPCG/control A/B, and default-on are pending;
+x86 not run. Resume with the built gcc2 compiler, not the installed prefix.

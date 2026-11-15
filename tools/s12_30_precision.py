@@ -13,6 +13,7 @@ import subprocess
 import sys
 
 import corpus
+import storage
 
 ROOT = Path(__file__).resolve().parents[1]
 SHARED = ROOT.parent / '_shared'
@@ -234,6 +235,7 @@ def t1(runner):
     disabled = '-mno-knc-indirect-prefetch'
     eligible = ('sparse_rows', 'sparse_slice', 'sparse_hpcg')
     counts = {}
+    default_assembly = None
     for mode, options, expected in (
             ('controls', ['-O2', '-ffp-contract=off',
                           '-fprefetch-loop-arrays'], False),
@@ -270,7 +272,7 @@ def t1(runner):
         bounds_bodies = {}
         if bounds_flags:
             required = (('explicit_csr', 'explicit_rowlocal', 'explicit_hpcg')
-                        if mode == 'controls' else eligible)
+                        if mode == 'controls' else (*eligible, 'alias_bounds'))
             if bounds_dump.exists():
                 chunks = re.split(r'^;; Function (\w+) .*$',
                                   bounds_dump.read_text(), flags=re.M)
@@ -279,6 +281,8 @@ def t1(runner):
             runner.result('t1 sparse ' + mode + ' pre-ivopts bounds dump',
                           ['missing aprefetch function ' + name for name in missing])
         assembly = asm_bodies(asm.read_text())
+        if mode == 'controls':
+            default_assembly = assembly
         counts[mode] = {name: len(re.findall(r'\bvprefetch\w*\b', assembly[name]))
                         for name in eligible}
         if mode == 'controls':
@@ -296,12 +300,23 @@ def t1(runner):
         if mode == 'disabled':
             runner.result('t1 sparse disabled keeps stream prefetch enabled',
                           [] if counts[mode]['sparse_rows'] > 0 else ['no stream hints in CSR'])
+            runner.result('t1 sparse default-off probe identity',
+                          [name + ' differs from explicit switch-off'
+                           for name in (*eligible, 'volatile_indices',
+                                        'sentinel_slice', 'alias_bounds')
+                           if default_assembly is None
+                           or assembly[name] != default_assembly[name]])
         for name in (*eligible, 'volatile_indices', 'sentinel_slice', 'alias_bounds'):
             want = expected and name in eligible
             graph = Gimple(bodies[name])
             found = bool(graph.indirect())
             errors = []
-            if mode != 'controls' and found != want:
+            if expected and name == 'alias_bounds':
+                # A guarded row-local hint is legal; only cross-row
+                # speculation is forbidden when output may change row[].
+                if Gimple(bounds_bodies.get(name, '')).cross_row('csr'):
+                    errors.append('later-row hint crosses an aliasing bounds store')
+            elif found != want:
                 errors.append(('missing' if want else 'unexpected') + ' automatic indirect prefetch')
             if want:
                 bounds_graph = Gimple(bounds_bodies.get(name, ''))
@@ -382,14 +397,68 @@ def build(host=False, legal=False):
     return binary
 
 
+def build_compiler_proof():
+    """Stage the unchanged legal guard/timing fixtures with generated hints.
+
+    This requires the lead's built gcc2 compiler.  Assembly plus the
+    aprefetch dump must demonstrate actual automatic cross-row hints;
+    a scalar fallback cannot masquerade as a compiler correctness proof.
+    """
+    project = ROOT.parent.parent
+    gcc = Path(storage.gcc_build_dir(project, '2')) / 'gcc'
+    objects = []
+    for name, enabled, contract in (('donor', False, 'off'),
+                                     ('knc', False, 'off'),
+                                     ('enabled', True, 'off'),
+                                     ('fast', True, 'fast')):
+        cc = corpus.compiler_path(corpus.DONOR) if name == 'donor' else gcc/'xgcc'
+        flags = ['-O2', '-std=gnu99', '-ffp-contract=' + contract,
+                 '-DLEGAL_PROOF', '-DCOMPILER_PROOF', '-DPREFIX=' + name + '_']
+        if name != 'donor':
+            flags += ['-B' + str(gcc) + '/', '-march=knc',
+                      '--sysroot=' + str(TC/'sysroot'),
+                      '-mknc-indirect-prefetch' if enabled else '-mno-knc-indirect-prefetch']
+        stem = OUT/('compiler-' + name)
+        asm, obj, dump = stem.with_suffix('.s'), stem.with_suffix('.o'), stem.with_suffix('.aprefetch')
+        dump.unlink(missing_ok=True)
+        run(cc, *flags, '-fdump-tree-aprefetch=' + str(dump), '-S', SOURCE, '-o', asm)
+        run(TC/'cross/bin/k1om-mpss-linux-as', '--march=k1om', asm, '-o', obj)
+        run(sys.executable, ROOT/'tools/knc_lint', asm, obj)
+        if enabled:
+            # The structural scanner uses parameter names in the T1
+            # probes. These struct-based kernels instead require the
+            # pass's recognition diagnostic for each of their two bodies.
+            if not dump.exists():
+                raise RuntimeError('missing compiler proof aprefetch dump: ' + str(dump))
+            chunks = re.split(r'^;; Function (\w+) .*$', dump.read_text(), flags=re.M)
+            bodies = dict(zip(chunks[1::2], chunks[2::2]))
+            for layout, shape in (('csr', 'future row bound'), ('hpcg', 'next-row pointers')):
+                body = bodies.get(name + '_' + layout + '_scalar', '')
+                if not re.search(r'Bounded indirect prefetch in loop \d+: ' + shape, body):
+                    raise RuntimeError('compiler proof did not transform ' + name + '_' + layout)
+                if '__builtin_prefetch' not in body:
+                    raise RuntimeError('compiler proof lacks emitted hints: ' + name + '_' + layout)
+        objects.append(obj)
+    binary = OUT/'compiler-gate'
+    run(corpus.compiler_path(corpus.DONOR), '-O2', '-std=gnu99',
+        '-ffp-contract=off', '-fno-tree-vectorize', '-DLEGAL_PROOF',
+        '-DCOMPILER_PROOF', '-DDRIVER', SOURCE, *objects,
+        *corpus.link_paths(), '-lrt', '-lm', '-o', binary)
+    run(sys.executable, ROOT/'tools/knc_lint', binary)
+    print('STAGED:', binary, '; lead card_run --threads 1 --timeout 590; argument: 12345', flush=True)
+    return 0
+
+
 def main():
     if sys.platform != 'cygwin':
         raise RuntimeError('use shared Cygwin python3')
     OUT.mkdir(exist_ok=True)
     os.environ['PATH'] = ':'.join(map(str, [TC/'cross/bin', TC/'cygwin/bin', os.environ['PATH']]))
+    if sys.argv[1:] == ['--compiler-proof']:
+        return build_compiler_proof()
     legal = sys.argv[1:] == ['--legal']
     if sys.argv[1:] and not legal:
-        raise ValueError('expected --legal or no arguments')
+        raise ValueError('expected --compiler-proof, --legal or no arguments')
     binary = build(legal=legal)
     print('STAGED:', binary, '; lead card_run --threads 1 --timeout',
           590 if legal else 1150, '; binary argument: 12345', flush=True)
