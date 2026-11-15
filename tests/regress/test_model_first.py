@@ -64,7 +64,7 @@ def inline_yaml(value, anchors):
     if (value.startswith('"') or value in ("null", "true", "false")
             or re.fullmatch(r"-?(?:0|[1-9][0-9]*)(?:\.[0-9]+)?", value)):
         return json.loads(value)
-    if (not re.fullmatch(r"[A-Za-z_][^\[\]{}#\x00-\x1f]*", value)
+    if (not re.fullmatch(r"(?:[0-9]+ +)?[A-Za-z_][^\[\]{}#\x00-\x1f]*", value)
             or re.search(r":(?:\s|$)", value)
             or value.lower() in ("null", "true", "false", "yes", "no", "on", "off")):
         raise ValueError("unsupported scalar syntax: " + value)
