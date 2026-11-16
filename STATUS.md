@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-16 01:52.
+Updated automatically at every ticket change. Last update: 2026-11-16 03:03.
 
-**Next: the tech lead, on S13-01.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Waiting for you:** S14-15. Run `python tools/pm.py inbox`.
 
 Current tickets: `[#################---]` 244 of 279
 
@@ -139,14 +139,14 @@ Current tickets: `[#################---]` 244 of 279
 | S14-08 | Quantized GEMV kernels on KNC - multi-row activation reuse, FP vs int32 VPMADD231D vs VPERMD lookup table, bandwidth-normalized | draft |  |
 | S14-09 | KNC vs the Z840 host (dual E5-2690 v3) on the same algorithms and numerical contract - where running on the card actually pays | draft |  |
 | S14-10 | knc-twin: --jobs N for independent simulations and PyPy support (roadmap item 1) | In progress | No worktree needed. Export main's knc-twin into your shared dir: git -c safe.directory='*' archive main knc... |
-| S14-11 | knc-twin: close PhiWeather WRF coverage gaps (jump tables, vcvtps2pd ymm, loop-region and complete-listing modes, scatter and rcp-table import) | In progress | Lead merged main into s14/S14-11 (a merge, not a rebase: the worktree cannot create rebase state, and a mer... |
-| S14-12 | knc-twin: iteration and phase sampling for loop and whole-program wall-time estimates (roadmap item 2) | In progress | sessions 6 -> 9 under the owner's standing auto-extend rule: implementation committed, the hpcg-104 questio... |
+| S14-11 | knc-twin: close PhiWeather WRF coverage gaps (jump tables, vcvtps2pd ymm, loop-region and complete-listing modes, scatter and rcp-table import) | In progress | input_tokens 20M -> 30M under the owner's standing auto-extend rule: items A-G are committed and main is me... |
+| S14-12 | knc-twin: iteration and phase sampling for loop and whole-program wall-time estimates (roadmap item 2) | Waiting for review | Windows Python 3.8 validation: regress had only the hpcg-104 default-budget failure, tracked as S14-18; aut... |
 | S14-13 | knc-twin: 8-tile multi-core unit on the full ring with all memory controllers (roadmap item 3) | In progress | (1) Schema: offline, in memory only: s = json.load(kernel.schema.json); s.pop('$id'); jsonschema.Draft7Vali... |
-| S14-14 | knc-twin: scheduling explorer for modulo scheduling and reordering, evaluating S14-02/S14-03 (roadmap item 4) | In progress | Merged main into s14/S14-14 (9b699730, no conflicts), so the submit check passes. The 120 s budget_exhauste... |
-| S14-15 | knc-twin prepare-native: absolute memory operands come out as `N()` in kernel.S (k1om as 2.22 rejects them); emit them relocated into the image | In progress | sessions 6 -> 8 (final extension): the lead review above lists five concrete changes; two sessions are enou... |
+| S14-14 | knc-twin: scheduling explorer for modulo scheduling and reordering, evaluating S14-02/S14-03 (roadmap item 4) | lead | Review passed (approve note: knc-twin gains a schedule command: beam search up to 60 instructions, list ord... |
+| S14-15 | knc-twin prepare-native: absolute memory operands come out as `N()` in kernel.S (k1om as 2.22 rejects them); emit them relocated into the image | **Waiting for you** | budget: 10651104 input tokens used; the budget is 10000000 |
 | S14-16 | bzip2 slower than GCC 5.1.1: mask-to-GPR move cost below a GPR move makes RA park integers in k registers (M4 known limit, must-fix) | draft |  |
 | S14-17 | Compare not folded with its load in merged return blocks (GCC 16 middle end, about half the remaining bzip2 mainGtU gap) | draft |  |
-| S14-18 | knc-twin regress: held-out replay runs under a 120 s wall-clock budget, so a slow interpreter turns a prediction into a budget_exhausted stub and the test fails as a false mismatch | Not started |  |
+| S14-18 | knc-twin regress: held-out replay runs under a 120 s wall-clock budget, so a slow interpreter turns a prediction into a budget_exhausted stub and the test fails as a false mismatch | In progress | No acceptance edit needed. t0 runs tests/regress/test_*.py (tools/check.py:373), and nothing in tests/accep... |
 | S14-19 | knc-twin x87 integer-load widths - fildl reads 8 bytes (must be 4), filds reads 4 (must be 2) | Not started |  |
 | S14-20 | knc-twin: an indirect jmp/call (PLT tail call through the GOT) on a never-executed path must not refuse the whole region | Not started |  |
 | S2-01 | Design for zmm and mask registers under -march=knc | Done | The register design for KNC is settled on paper: all 32 zmm and 8 mask registers become usable under -march... |
@@ -304,23 +304,23 @@ Current tickets: `[#################---]` 244 of 279
 
 ## Recent activity
 
-- 2026-11-16 01:52 **S14-12** owner decide: sessions 6 -> 9 under the owner's standing auto-extend rule: implementation committed, the hpcg-104 question is answered (S14-18), held-out check a...
-- 2026-11-16 01:51 **S14-12** engineer escalate: budget: 6 engineer sessions used; the budget is 6
-- 2026-11-16 01:50 **S14-12** lead answer: Reproduced on main at 890ac9b4 by the lead: under Cygwin Python 3.12 all eight s12-31-hpcg-104 variants come back budget_exhausted at predict_case'...
-- 2026-11-16 01:49 **S14-15** owner decide: sessions 6 -> 8 (final extension): the lead review above lists five concrete changes; two sessions are enough for them and the submit. If not submi...
-- 2026-11-16 01:47 **S14-12** engineer ask: 83c60176 restores tight run() with shared setup and removes stray outputs; clean. predict_case(s12-31-hpcg-104), unchanged 120s deadline: all 8 var...
-- 2026-11-16 01:46 **S14-15** engineer escalate: budget: 6 engineer sessions used; the budget is 6
-- 2026-11-16 01:43 **S14-13** lead answer: (1) Schema: offline, in memory only: s = json.load(kernel.schema.json); s.pop('$id'); jsonschema.Draft7Validator(s).validate(instance). The only re...
-- 2026-11-16 01:41 **S14-15** lead answer: Commit the cleanup yourself as a new commit on s14/S14-15 (do not amend e443bf8f): stage only the test file change removing the validated rollup in...
+- 2026-11-16 03:03 **S14-12** engineer submit: Windows Python 3.8 validation: regress had only the hpcg-104 default-budget failure, tracked as S14-18; authorized focused --max-seconds 3600 match...
+- 2026-11-16 03:02 **S14-12** owner decide: input_tokens 20M -> 25M, final: the only remaining step is the submit command the 02:59 answer spells out (with --override and the three log names)...
+- 2026-11-16 03:01 **S14-18** lead answer: No acceptance edit needed. t0 runs tests/regress/test_*.py (tools/check.py:373), and nothing in tests/acceptance/ references the held-out replay. P...
+- 2026-11-16 03:00 **S14-12** lead escalate: budget: 22731536 input tokens used; the budget is 20000000
+- 2026-11-16 02:59 **S14-18** engineer ask: The ticket requires editing tests/acceptance/, which AGENTS.md explicitly forbids: acceptance requires heldout replay to leave tools/check t0, and ...
+- 2026-11-16 02:59 **S14-12** lead answer: Yes, submit now with --override 'size: 947 lines for a two-part brief (loop sampling + phase rollup): ~350 source, 264 in the two budgeted test fil...
+- 2026-11-16 02:58 **S14-12** engineer ask: Submit blocked: 947 changed lines exceeds 800-line budget; no new edits this session. Approve --override for existing implementation? Windows Pytho...
+- 2026-11-16 02:56 **S14-11** owner decide: input_tokens 20M -> 30M under the owner's standing auto-extend rule: items A-G are committed and main is merged; the held-out check (python 3.8 or ...
 
 ## Cost
 
-- From the script, engineer: 742 sessions, 1603.4M input tokens
-- From the script, lead: 502 sessions, 142.5M input tokens
-- Started by hand, Claude: 14 sessions, 4120.9M input tokens
+- From the script, engineer: 748 sessions, 1617.9M input tokens
+- From the script, lead: 506 sessions, 143.4M input tokens
+- Started by hand, Claude: 14 sessions, 4136.9M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 40.7 GiB of 100 GiB. 76 GiB free on the drive.
+The project uses 40.7 GiB of 100 GiB. 73 GiB free on the drive.
