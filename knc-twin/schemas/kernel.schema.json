@@ -23,7 +23,14 @@
         "ftz": {"type": "boolean", "default": false},
         "daz": {"type": "boolean", "default": false},
         "ftz_rule": {"enum": ["tiny", "tiny_and_inexact"], "default": "tiny"},
-        "nan_compare": {"enum": ["any_nan", "bits"], "default": "any_nan"}
+        "nan_compare": {"enum": ["any_nan", "bits"], "default": "any_nan"},
+        "reciprocal_tables": {
+          "type": "object", "additionalProperties": false,
+          "properties": {
+            "vrcp23ps": {"$ref": "#/definitions/reciprocal_table"},
+            "vrsqrt23ps": {"$ref": "#/definitions/reciprocal_table"}
+          }
+        }
       }
     },
     "memory_default": {"type": ["integer", "null"], "description": "byte value returned by reads of uninitialized memory; absent = such a read is invalid_input"},
@@ -31,6 +38,14 @@
     "init": {
       "type": "object", "additionalProperties": false,
       "properties": {
+        "heap": {
+          "type": "object", "required": ["addr", "size"], "additionalProperties": false,
+          "description": "Shared bump-allocator scenario region; must be disjoint from all other memory. Addresses align to 64 bytes and free never reuses storage.",
+          "properties": {
+            "addr": {"type": ["integer", "string"]},
+            "size": {"type": ["integer", "string"]}
+          }
+        },
         "memory": {"type": "array", "items": {"$ref": "#/definitions/memblock"}},
         "registers": {"$ref": "#/definitions/registers", "description": "applies to every stream; a stream's own init overrides"}
       }
@@ -87,6 +102,16 @@
     }
   },
   "definitions": {
+    "reciprocal_table": {
+      "type": "object", "required": ["file", "entries", "status", "source", "exponent_scaling_verified"],
+      "properties": {
+        "file": {"type": "string", "description": "basename under fixtures/tables"},
+        "entries": {"enum": [1024, 8388608, 16777216]},
+        "status": {"enum": ["measured", "synthetic"]},
+        "source": {"type": "string"},
+        "exponent_scaling_verified": {"const": true}
+      }
+    },
     "int": {"type": ["integer", "string"], "description": "integer, or a decimal/hex string such as \"0x1000\""},
     "level": {"enum": ["l1", "l2", "memory"]},
     "memblock": {
@@ -126,6 +151,7 @@
         "mask": {"type": "string", "pattern": "^k[0-7]$", "description": "write mask (merge semantics); gather: completion mask"},
         "rounding": {"enum": ["rn", "rd", "ru", "rz"], "description": "per-instruction rounding override (vector FP only)"},
         "label": {"type": "string"},
+        "targets": {"type": "array", "minItems": 1, "items": {"type": "string"}, "description": "ordered labels for jmp_table"},
         "width": {"enum": [32, 64], "description": "scalar operand width when no register implies it"},
         "encoding": {"type": "object", "properties": {"bytes": {"type": "integer"}, "disp32": {"type": "boolean"}, "disp": {"type": "boolean"}, "imm": {"type": "boolean"}}, "description": "optional hints for the R02 p.56 pairing rules"},
         "deps": {"type": "array", "items": {"type": "string"}, "description": "extra explicit dependencies on instruction ids"},

@@ -9,6 +9,8 @@ Schema: `schemas/kernel.schema.json` (`knc-twin.kernel/1`). Examples: `fixtures/
 from_binary.py FILE --function NAME [--disassembly DIS.txt | --objdump TOOL] [--with-callee NAME ...]
                [--calls CALLS.json] [--init INIT.json] [--out KERNEL.json] [--report REPORT.json]
 from_binary.py FILE --list
+from_binary.py FILE --function NAME --innermost --report REPORT.json
+from_binary.py FILE --loop ADDR|.A_xxxx [--function NAME] --out KERNEL.json --report REPORT.json
 ```
 
 `FILE` is a K1OM object file (`.o`) or a linked executable; `DIS.txt` is the text of
@@ -21,11 +23,126 @@ at synthetic addresses, in a linked file at their addresses), string addresses a
 immediates, TLS accesses through synthetic GOT slots. Trailing padding between functions is
 dropped (never executed). A callee named by `--with-callee` is converted into the same region and
 executed; any other callee must be declared in `--calls` (below); `__assert_fail`, `abort` and the
-usual noreturn runtime routines are declared automatically. Indirect jumps and calls are reported
-as unsupported. The kernel's `entry` is `function`: the stream starts at the ABI entry with a
+usual noreturn runtime routines are declared automatically. Relocated switch jumps of the form
+`jmp *disp(,%reg,8)` into `.rodata` or `.rodata.*` are resolved from absolute 64-bit relocations
+into the same function. Other indirect jumps and calls are unsupported. The kernel's `entry` is `function`: the stream starts at the ABI entry with a
 return sentinel on the stack and ends when the function returns to it. Arguments, heap data and
 expected results come from `--init` as for `from_gcc_s.py`; `provenance` records the file's
 SHA-256, the padding and prefix counts and every undeclared callee or unresolved symbol.
+
+`--report` visits every instruction, including instructions after an error. Its `rows` contain
+the original address, disassembled text, parser/ISA/functional/timing coverage and reason.
+`unsupported` lists every line without functional support. Missing timing parameters remain
+separate from unsupported instructions. A kernel is written only when all instructions have
+functional support; an incomplete conversion exits with code 2 and still writes the report.
+An existing output kernel is left untouched on failure; use the exit code before consuming it.
+
+`--loop` accepts a hexadecimal address (with or without `0x`) or `.A_xxxx` label. Specify the
+function when several object sections have the same address. The region runs from that head
+through its last direct backward branch; outward jumps, switch targets and returns go to a
+synthetic end. It has `entry: region`, retains layout, and lists zero-valued live-in placeholders
+in provenance. Supply the actual live-in registers, flags, arrays and expected outputs with
+`--init`; the first-order register list is not a control-flow liveness proof. Calls need costed
+stubs in loop mode (`--with-callee` is for whole functions). `--innermost` lists intervals that
+contain no smaller backward-branch interval, with addresses, instruction counts and coverage.
+The same list appears under `loops` in the report and in `wrf_coverage.py` output. This makes
+masked remainder loops selectable without assuming a vector main loop is executed.
+
+Switch records have `{"op":"jmp_table","ops":["rdx"],"targets":["case0","case1"]}`.
+The 64-bit register selects an ordered target; an index outside the captured entries is
+`invalid_input`. Table entries must be contiguous, aligned relocations into instructions in
+the function; referenced table starts and section/symbol bounds delimit adjacent tables.
+Timing treats this as a taken indirect branch and applies the scenario's branch rule. In
+`exit_mispredicted`, its direction is always taken, so changes of target are not predicted
+separately. This is a modeling assumption, not a claim about an indirect-target predictor.
+The table itself is resolved read-only data, with no separate table-load event. Reorder search
+rejects it, as it does other branches; functional tracing is required. Native export of this
+adapter-only record is explicitly unsupported; retain the original object for card execution.
+
+`%ymm0` through `%ymm31` are 256-bit aliases of the corresponding zmm registers, accepted only
+as the source of `vcvtps2pd`. It converts lanes 0–7, including when source and destination alias.
+Other YMM uses, including a YMM conversion destination, are rejected explicitly.
+The lower-half conversion semantics are verified in R27 p.184 (early KNC specification,
+not a production measurement); the YMM spelling is the supplied WRF object's disassembly form.
+
+### WRF call template
+
+`fixtures/wrf-calls.json` declares the callees named in the WRF brief, including the three
+Fortran helpers, vector exp, scalar `expf`, and memory/allocator calls. Every cost is an
+illustrative 100 cycles with `status: assumed`; replace it with a measured or justified scenario
+cost before interpreting timing. `expf` uses `libm.f32.exp`; `memcpy` and `memset` use byte models.
+Vector exp and Fortran helpers use `none`, so results after those calls are approximate.
+Include real helper bodies for their functional effects. `powf` uses `libm.f32.pow`.
+`malloc`, `calloc`, `realloc` and `free` use the functional heap models described below.
+
+```
+python scripts/from_binary.py module_bl_mynnedmf.o --function __module_bl_mynnedmf_MOD_mynn_tendencies --objdump k1om-mpss-linux-objdump --calls fixtures/wrf-calls.json --report coverage.json --out mynn.json
+```
+
+Add a disjoint heap region to the converted kernel, for example
+`"init": {"heap": {"addr": "0x10000000", "size": 16777216}}` (alongside its existing init
+fields). This is an explicit scenario, not a reproduction of the card's allocator. The four
+call models share one bump cursor across contexts. Returned addresses are rounded up to 64
+bytes; every allocation, including a zero-size allocation, reserves at least one aligned
+slot. `malloc` leaves bytes uninitialized; `calloc` initializes the product of its two sizes
+to zero. `realloc` allocates a distinct block and copies the smaller of the old and new sizes;
+`realloc(NULL,n)` allocates, and `realloc(p,0)` returns null without reclaiming storage.
+`free` is a no-op, including for null. The model never reuses addresses. Missing/invalid heap
+declarations, exhausted regions, size overflow, and unknown realloc pointers stop with
+`invalid_input`; it does not simulate allocation failure recovery. A calloc/copy effect over
+64 MiB per call is rejected to bound host work. The caller must keep the heap disjoint from
+initialized globals, stacks and other live-in memory. Normal uninitialized-read checks apply.
+
+Functional and simulation output record `heap_allocations` (address, requested size, context,
+model and bytes copied). Simulation output and its summary print `stub_cycles_total`, the
+sum of the actual charged call costs, including per-byte prices and integer rounding, over
+the selected contexts; `stub_calls` also gives each callee's total, cost status and source.
+This sum is not elapsed core time when contexts overlap. Use it to expose the assumed heap
+cost in a comparison against `-fstack-arrays`; simulate both complete variants because their
+memory behavior can also differ. Allocator internals are not simulated, and a result using
+stubs is an unvalidated scenario estimate. No assumed cost becomes a measurement.
+
+The `libc-calls` calibration-plan item includes malloc, free, memset/memcpy per byte, vector
+exp, expf and powf. Stage its aggregate ABI/link smoke skeleton with:
+
+```
+python scripts/knc_twin.py prepare-native fixtures/libc-calls.json --out <shared>/S14-11/libc-calls
+```
+
+The queue operator must split the named variants and baselines into isolated measurements,
+review the vector helper ABI, and link the project helper and libm. The aggregate request
+checks memory side effects; it cannot identify individual call costs. Card runs are lead-only.
+
+### Importing scatter occupancy and reciprocal captures
+
+`knc_twin.py import-native measurement.json --out DIR` accepts `kind: scatter` and
+`kind: rcp23-table` in the existing `knc-twin.native-measurement/1` envelope (`job_id`,
+`measured_utc`, `card_profile`, `results`). Neither kind takes `--prediction`.
+
+For scatter, give one isolated occupancy row: `"results":[{"cycles_per_line":3.25}]`
+(3.25 is an illustrative example, not a measurement). Positive finite values become the measured
+`occupancy.scatter_cycles_per_line` parameter in `overlay-profile.json`; apply it with `--overlay`.
+Summarize repeated measurements outside the importer; elapsed ticks are not silently converted
+to per-line occupancy. No bundled profile's scatter value is changed.
+
+For a reciprocal capture, each result is, for example,
+`{"op":"vrcp23ps","file":"rcp.bin","entries":8388608,"exponent_scaling_verified":true}`.
+The input path is relative to the measurement file. Words are little-endian u32 outputs for
+positive inputs: `vrcp23ps` indexes the 23 fraction bits at exponent 127; `vrsqrt23ps` needs
+16777216 words, first exponent 127 then exponent 128 (both exponent parities). The capture
+operator must check scaling across exponents before setting `exponent_scaling_verified`.
+The importer validates operation, count and byte size, stores captures in `fixtures/tables/`,
+and writes `numerical-policy.json`. Merge that object's `reciprocal_tables` into the kernel's
+`numerical_policy`. Tables are opt-in and read lazily only for active normal lanes; special
+values use the existing interpreter rules. Captured words are exponent-scaled, with tiny
+results flushed to zero, and replace the rounded stand-in. The used instruction is no longer
+listed in `approximate_instructions`; the result records the selected table and source in its
+assumptions. Other approximate instructions and stubs still mark the result approximate.
+
+An explicitly `synthetic: true` import may contain 1024 entries for tests. Its inputs must
+fall in that captured prefix (otherwise `unsupported`); its assumptions say synthetic, never
+hardware-validated. No native tables are bundled or enabled by default. Keep capture binaries
+out of git. Importing a capture does not calibrate timing or change any held-out prediction.
 
 ## From compiler assembly: `scripts/from_gcc_s.py`
 

@@ -24,7 +24,7 @@ SWIZZLE_MAP = {"cdab": (2, 3, 0, 1), "badc": (1, 0, 3, 2), "dacb": (3, 0, 2, 1),
 
 
 class TraceEvent(object):
-    __slots__ = ("ctx", "insn", "addr", "nbytes", "lines", "taken", "mask_bits", "seq", "pf_level", "xreads", "xwrites", "stub", "ret_target")
+    __slots__ = ("ctx", "insn", "addr", "nbytes", "lines", "taken", "mask_bits", "seq", "pf_level", "xreads", "xwrites", "stub", "ret_target", "branch_target")
 
     def __init__(self, ctx, insn, addr=None, nbytes=0, lines=(), taken=None, mask_bits=None, seq=0, pf_level=None):
         self.ctx = ctx
@@ -40,6 +40,7 @@ class TraceEvent(object):
         self.xwrites = None
         self.stub = None
         self.ret_target = None
+        self.branch_target = None
 
     def to_dict(self):
         return {"ctx": self.ctx, "id": self.insn.id, "op": self.insn.op, "addr": self.addr, "nbytes": self.nbytes,
@@ -386,8 +387,12 @@ class Interpreter(object):
         self.contexts = {}
         self.steps = {}
         self.stub_calls = {}
+        self.heap = None
+        self.heap_allocations = []
         self.approximate_stubs = set()
         self.approximate_instructions = set()
+        from .reciprocal_tables import Tables
+        self.reciprocal_tables = Tables(kernel.numerical_policy.get("reciprocal_tables", {}))
         self.gather_one_line = kernel.numerical_policy.get("gather_completion", "one_line") == "one_line"
         if any(i.cls in ("vector_gather", "vector_scatter") for s in kernel.streams for i in s.insns):
             if self.gather_one_line:
@@ -1147,9 +1152,18 @@ class Interpreter(object):
         pol = fp.Policy("rn", False, False, "tiny")
         a = self.vsrc(cx, src, insn, trace_mem, 4)
         kbits = self.kmask(cx, insn)
-        self._mark_approximate(insn)
+        captured = insn.op in self.reciprocal_tables.descriptors
+        if captured:
+            desc = self.reciprocal_tables.descriptors[insn.op]
+            self.assume("%s uses %s table %s (%s); exponent scaling was declared verified by the importer" %
+                        (insn.op, desc["status"], desc["file"], desc["source"]))
+        else:
+            self._mark_approximate(insn)
         out = []
         for i in range(16):
+            if not (kbits >> i) & 1:
+                out.append(0)  # merge preserves inactive lanes; no table read or flags
+                continue
             x = a[i]
             k, s, v = fp.classify(x, fmt, pol)
             if k == fp.NUM and ((x >> fmt.mant) & fmt.exp_mask) == 0:
@@ -1174,6 +1188,8 @@ class Interpreter(object):
             elif rsqrt and s:
                 self._fpflags(cx, insn, ["invalid"])
                 out.append(fmt.default_nan)
+            elif captured:
+                out.append(self.reciprocal_tables.lookup(insn.op, x))
             else:
                 if rsqrt:
                     r, _ = fp.fsqrt(x, fmt, pol)
@@ -1250,6 +1266,15 @@ class Interpreter(object):
 
     def h_jmp(self, cx, insn, ev, trace_mem, stream):
         return self._branch(cx, insn, ev, stream, True)
+
+    def h_jmp_table(self, cx, insn, ev, trace_mem, stream):
+        index = self.rget(cx, insn.operands[0], insn.operands[0].width)
+        if index >= len(insn.targets):
+            raise InvalidInput("%s: jump table index %d outside %d entries" % (insn.id, index, len(insn.targets)))
+        self.assume("resolved read-only jump table: targets are fixed; indirect target prediction follows the scenario branch rule (assumed, not a documented indirect predictor)")
+        ev.taken = True
+        ev.branch_target = stream.labels[insn.targets[index]]
+        return ev.branch_target
 
     def h_jcc(self, cx, insn, ev, trace_mem, stream):
         return self._branch(cx, insn, ev, stream, self._cond(cx, insn.spec["cond"]))

@@ -132,6 +132,7 @@ def cmd_capabilities(args):
         },
         "commands": ["capabilities", "selftest", "validate", "functional", "simulate", "sample-loop", "bounds", "schedule", "compare", "batch", "rollup", "prepare-native", "import-native"],
         "adapters": ["scripts/from_gcc_s.py: GCC-KNC / GCC 5.1.1 k1om assembly -> records (function or loop regions, data symbols, coverage audit)",
+                     "scripts/from_binary.py: objects/ELF listings -> whole functions, relocated switches, loop regions and complete per-line reports",
                      "scripts/validate_heldout.py: held-out validation against the gcc_knc characterization catalog"],
         "input_representations": ["normalized-records (JSON, knc-twin.kernel/1)", "gas-att-subset (GAS AT&T assembly, see references/input-format.md)"],
         "memory_scenarios": ["fixed_level", "classified", "line_tracking (LRU L1+L2, software prefetch; optional tlb/hardware_prefetcher/memory_service sub-models)"],
@@ -143,7 +144,7 @@ def cmd_capabilities(args):
         },
         "not_implemented": [
             "any mnemonic outside the table (rejected, no default cost); call/ret are region boundaries",
-            "transcendental approximations (vrcp23ps, vrsqrt23ps, vlog2ps, vexp223ps, vscaleps) exact bit patterns",
+            "vrcp23ps/vrsqrt23ps exact bit patterns without opt-in captured tables; vlog2ps/vexp223ps exact bit patterns",
             "second-level TLB and page walks; the instruction cache; cross-core coherence traffic in core scale; card-level bandwidth sharing",
             "contexts communicating through memory (functional model runs contexts sequentially)",
             "C, Fortran or binaries: no translation is attempted; ABI, encodings, executable loading",
@@ -239,6 +240,8 @@ def cmd_functional(args):
         r["assumptions"].extend(interp.assumptions)
         r["prediction"] = {"dynamic_instructions": steps, "contexts": len(kernel.streams), "functional_check_status": check["status"],
                            "checked_items": check["checked"], "mismatches": len(check["mismatches"])}
+        if interp.heap_allocations:
+            r["prediction"]["heap_allocations"] = interp.heap_allocations
         final = {str(c): interp.contexts[c].snapshot() for c in interp.contexts}
         dump_json(final, os.path.join(out, "final-state.json"))
         dump_json({"memory": interp.memory.snapshot()}, os.path.join(out, "final-memory.json"))
@@ -331,22 +334,28 @@ def _simulate_core(kernel, prof, args, r):
             "active_contexts": res["active_contexts"], "per_context": res["per_context"], "memory": res["memory"],
             "kind": "timing_prediction_core_cycles"}
     pred["frontend"] = res.get("frontend")
+    if res["stub_costs"]:
+        pred["stub_cycles_total"] = res["stub_cycles_total"]
+        pred["stub_calls"] = {n: dict(cost, cycles_each=kernel.calls[n].get("cycles"),
+                                    cycles_per_byte=kernel.calls[n].get("cycles_per_byte", 0),
+                                    model=kernel.calls[n].get("model", "none"),
+                                    status=kernel.calls[n].get("status", "assumed"),
+                                    source=kernel.calls[n].get("source"))
+                              for n, cost in sorted(res["stub_costs"].items())}
     interp = getattr(args, "_interp", None)
     args._interp = None
     if interp is not None:
         if interp.input_files:
             pred["input_files"] = interp.input_files
-        if interp.stub_calls:
-            pred["stub_calls"] = {n: {"calls": c, "cycles_each": kernel.calls[n].get("cycles"), "model": kernel.calls[n].get("model", "none"),
-                                      "status": kernel.calls[n].get("status", "assumed"), "source": kernel.calls[n].get("source")}
-                                  for n, c in sorted(interp.stub_calls.items())}
+        if interp.heap_allocations:
+            pred["heap_allocations"] = [a for a in interp.heap_allocations if a["context"] in traces]
         approx = sorted(interp.approximate_stubs) + sorted(interp.approximate_instructions)
         pred["functional_exactness"] = "exact" if not approx else "approximate: %s are not bit-exact (stub or approximate instruction)" % ", ".join(approx)
         if interp.approximate_instructions:
             pred["approximate_instructions"] = sorted(interp.approximate_instructions)
     pred["result_class"] = memory_result_class("simulate", kernel, prof, res["memory"].get("stats"), kernel.scenario)
-    if interp is not None and interp.stub_calls and pred["result_class"]["class"] == "calibrated_forecast":
-        pred["result_class"] = {"class": "unvalidated_scenario_estimate", "reasons": ["the region calls costed stubs (%s): their cycles are inputs, not validated model output" % ", ".join(sorted(interp.stub_calls))]}
+    if res["stub_costs"] and pred["result_class"]["class"] == "calibrated_forecast":
+        pred["result_class"] = {"class": "unvalidated_scenario_estimate", "reasons": ["the region calls costed stubs (%s): their cycles are inputs, not validated model output" % ", ".join(sorted(res["stub_costs"]))]}
     if sampling is not None:
         from .rollup import DEFAULT_UNVALIDATED_BAND_PCT
         model_class = pred["result_class"]
@@ -391,6 +400,8 @@ def cmd_simulate(args):
         r["message"] = "predicted %d core cycles (%.3f per unit) for %d dynamic instructions on %d context(s); %s%s" % (
             pred["predicted_cycles"], pred["predicted_cycles_per_unit"], res["dynamic_instructions"], len(res["active_contexts"]),
             pred["result_class"]["class"], "; SYNTHETIC profile" if prof.synthetic else "")
+        if "stub_cycles_total" in pred:
+            r["message"] += "; total stub cycles: %d (sum of declared costs across contexts)" % pred["stub_cycles_total"]
         return _finish(r, out, args)
     except TwinError as e:
         if prof is not None:

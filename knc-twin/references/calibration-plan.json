@@ -15,6 +15,25 @@
   },
   "microbenchmarks": [
     {
+      "id": "libc-calls",
+      "settles": "WRF heap-call costs and library-call costs by input size",
+      "parameters": [],
+      "body": [
+        "call malloc",
+        "call free",
+        "call memset",
+        "call memcpy",
+        "call __knc_vmath_expf_16",
+        "call expf",
+        "call powf"
+      ],
+      "variants": "Isolate malloc and free with a paired empty-harness baseline; measure memset and memcpy intercept and cycles per byte over the WRF size distribution; measure vector exp, expf and powf on representative finite and exceptional inputs. Run 1/2/4 pinned contexts. Do not infer individual costs from the aggregate smoke request.",
+      "why": "Heap stubs unblock functional execution but every template call cost is assumed. Report total stub cycles when comparing with -fstack-arrays.",
+      "owner_request": "PhiWeather, 2026-11-16, post-M4 window; card execution is lead-only",
+      "prepare_native": "python scripts/knc_twin.py prepare-native fixtures/libc-calls.json --out <shared>/S14-11/libc-calls",
+      "request_scope": "Reviewable aggregate ABI/link smoke skeleton for all seven callees; split the named variants and baselines before collecting calibration measurements. Link the GCC-KNC vector helper and libm. No measurements yet."
+    },
+    {
       "id": "fence",
       "settles": "cost of the publication fence and of locked read-modify-write instructions",
       "parameters": [

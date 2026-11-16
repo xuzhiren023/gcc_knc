@@ -3,6 +3,7 @@
 
   from_binary.py FILE --function NAME [--disassembly DIS.txt | --objdump TOOL]
                  [--with-callee NAME ...] [--calls CALLS.json] [--init INIT.json]
+                 [--loop ADDR|.A_xxxx] [--innermost]
                  [--out KERNEL.json] [--report REPORT.json] [--profile ID]
   from_binary.py FILE --list [--disassembly DIS.txt | --objdump TOOL]
 
@@ -15,8 +16,9 @@ with --disassembly, or let the adapter run the tool named by --objdump or $KNC_O
 
 Calls: a callee named by --with-callee is taken into the region and executed; any other
 callee must be declared in --calls (a costed stub, see knc_model/stubs.py). Well-known
-noreturn routines (__assert_fail, abort, ...) are declared automatically. Indirect jumps and
-calls are reported as unsupported.
+noreturn routines (__assert_fail, abort, ...) are declared automatically. Relocated read-only switch tables are resolved; other indirect jumps and calls are unsupported.
+--report collects every unsupported line and writes no partial kernel. --loop selects a
+loop head through its last backward branch; --innermost lists candidates with coverage.
 
 Data: sections the code refers to (constants, string tables, .data, .bss) are copied from the
 file. In an object file they are placed at synthetic addresses; in a linked file they keep
@@ -73,6 +75,8 @@ class Converter(object):
         self.notes = []
         self.got = {}
         self.tls = {}
+        self._insns = {}
+        self._tables = {}
 
     # ---- data ---------------------------------------------------------------------------------
     def _place_section(self, sec):
@@ -126,68 +130,172 @@ class Converter(object):
             self.unresolved.add(base)
         return base, addend
 
-    # ---- one function --------------------------------------------------------------------------
-    def function_lines(self, name, included, calls):
-        if name not in self.funcs:
+    # ---- code regions -------------------------------------------------------------------------
+    def instructions(self, name):
+        if name in self._insns:
+            return self._insns[name]
+        if name not in self.funcs or not self.funcs[name]:
             raise InvalidInput("function %r not in the disassembly; functions: %s" % (name, ", ".join(self.order[:40])))
         insns = list(self.funcs[name])
         while len(insns) > 1 and layout.is_nop_text(insns[-1].text.split("#")[0]):
-            insns.pop()     # padding between this function and the next symbol: never executed
-        lo = insns[0].addr
-        hi = insns[-1].addr + len(insns[-1].raw)
-        targets = set()
-        for di in insns:
-            m = _TARGET_RE.match(di.text)
-            if m and m.group(1).startswith("j"):
-                targets.add(int(m.group(2), 16))
-        out = []     # (gas text, DInsn or None)
-        out.append(("%s:" % _label(name), None))
-        for di in insns:
-            if di.addr in targets:
-                out.append((".A_%x:" % di.addr, None))
-            text = di.text.split("#")[0].strip()
-            if not text or text.startswith("(bad)"):
-                raise Unsupported("0x%x: bytes %s do not disassemble" % (di.addr, di.raw.hex()))
-            if layout.is_nop_text(text):
-                out.append(("\tnop", di))
-                continue
-            m = _TARGET_RE.match(text)
-            if m:
-                mnem, taddr, tsym, toff = m.group(1), int(m.group(2), 16), m.group(3), m.group(4)
-                kreg = m.group(5)
-                rel = [r for r in di.relocs if r[1] in ("R_X86_64_PC32", "R_X86_64_PLT32")]
-                if rel:
-                    callee = re.sub(r"[+-]0x[0-9a-fA-F]+$", "", rel[0][2])
+            insns.pop()
+        self._insns[name] = insns
+        return insns
+
+    def loop_ranges(self, name):
+        """One interval per head, ending at its last direct backward branch."""
+        insns = self.instructions(name)
+        positions = {di.addr: i for i, di in enumerate(insns)}
+        ends = {}
+        for i, di in enumerate(insns):
+            m = _TARGET_RE.match(di.text.split("#")[0].strip())
+            if m and m.group(1).startswith("j") and not di.relocs:
+                head = positions.get(int(m.group(2), 16))
+                if head is not None and head < i:
+                    ends[head] = i
+        return sorted(ends.items())
+
+    def loop_report(self, name, rows):
+        """Coverage from the same complete listing, including failed lines."""
+        insns = self.instructions(name)
+        ranges = self.loop_ranges(name)
+        inner = [(a, b) for a, b in ranges if not any(a <= c and d <= b and (a, b) != (c, d) for c, d in ranges)]
+        result = []
+        for a, b in inner:
+            start, end = insns[a].addr, insns[b].addr
+            body = [r for r in rows if r.get("function") == name and start <= r["address"] <= end]
+            result.append({"label": ".A_%x" % start, "address": start, "end_address": end,
+                           "instruction_count": b - a + 1, "summary": from_gcc_s.summarize(body),
+                           "unsupported": [r for r in body if not r["functional"]]})
+        return result
+
+    def loop_location(self, loop, func=None):
+        try:
+            addr = int(loop[3:] if loop.startswith(".A_") else loop, 16)
+        except ValueError:
+            raise InvalidInput("--loop needs a hexadecimal address or .A_xxxx label")
+        names = [func] if func else self.order
+        matches = [(name, a, b) for name in names for a, b in self.loop_ranges(name)
+                   if self.instructions(name)[a].addr == addr]
+        if len(matches) != 1:
+            raise InvalidInput("loop %s matches %d loops; specify --function for ambiguous object addresses" % (loop, len(matches)))
+        return matches[0]
+
+    def _symbol_offset(self, target):
+        m = re.fullmatch(r"(.*?)([+-]0x[0-9a-fA-F]+)?", target)
+        sym, add = m.group(1), int(m.group(2), 16) if m.group(2) else 0
+        rec = self.elf.symbols.get(sym)
+        if rec is None:
+            raise Unsupported("unresolved table symbol %s" % sym)
+        if not 0 < rec[0] < len(self.elf.sections):
+            raise Unsupported("undefined table symbol %s" % sym)
+        if rec[2] and not 0 <= add < rec[2]:
+            raise Unsupported("table reference is outside sized symbol %s" % sym)
+        return self.elf.sections[rec[0]], rec[1] + add, rec[2] - add if rec[2] else 0
+
+    def jump_table(self, di, name):
+        """Resolve contiguous absolute rodata entries; never guess indirect register targets."""
+        text = di.text.split("#")[0].strip()
+        match = re.fullmatch(r"jmpq?\s+\*(?:0x[0-9a-fA-F]+|[0-9]+)\(,\s*%([a-z0-9]+),\s*8\)", text)
+        if not match:
+            return None
+        rels = [r for r in di.relocs if r[1] in ("R_X86_64_32", "R_X86_64_32S", "R_X86_64_64")]
+        if len(rels) != 1:
+            raise Unsupported("indirect jump table needs one absolute rodata relocation")
+        sec, start, size = self._symbol_offset(rels[0][2])
+        if sec.name != ".rodata" and not sec.name.startswith(".rodata."):
+            raise Unsupported("jump table is not in rodata")
+        if start < 0 or start % 8 or start >= sec.size:
+            raise Unsupported("jump table start is outside rodata or unaligned")
+        insns = self.instructions(name)
+        addresses = {i.addr for i in insns}
+        function = self.elf.symbols.get(name)
+        if function is None:
+            raise Unsupported("jump table needs the function's ELF symbol")
+        relocations = {off: (kind, target) for off, kind, target in self.elf.relocations.get(sec.name, [])}
+        # An object symbol's size bounds a named table; section symbols have size zero.
+        stop = min(sec.size, start + size) if size else sec.size
+        if name not in self._tables:
+            starts = []
+            for instruction in insns:
+                if re.match(r"jmpq?\s+\*", instruction.text):
+                    for _, kind, target in instruction.relocs:
+                        if kind in ("R_X86_64_32", "R_X86_64_32S", "R_X86_64_64"):
+                            other, offset, _ = self._symbol_offset(target)
+                            starts.append((other.index, offset))
+            self._tables[name] = starts
+        stop = min([stop] + [offset for section, offset in self._tables[name] if section == sec.index and offset > start])
+        targets = []
+        for off in range(start, stop, 8):
+            if off not in relocations:
+                break
+            kind, target = relocations[off]
+            if kind != "R_X86_64_64":
+                raise Unsupported("jump table entry at 0x%x is not R_X86_64_64" % off)
+            dest, addr, _ = self._symbol_offset(target)
+            if dest.index != function[0] or addr not in addresses:
+                # A contiguous table belonging to the next function is not ours.
+                if targets:
+                    break
+                raise Unsupported("jump table target is outside the function or not an instruction")
+            targets.append(addr)
+        if not targets:
+            raise Unsupported("jump table has no resolvable entries")
+        return match.group(1), targets
+
+    def instruction_records(self, di, name, included, calls, region=None):
+        insns = self.instructions(name)
+        lo, hi = insns[0].addr, insns[-1].addr + len(insns[-1].raw)
+        prefix = "" if name == included[0] else _label(name)
+        def target_label(addr):
+            if region is not None and not region[0] <= addr <= region[1]:
+                return "__knc_twin_end"
+            return _label(name) if region is None and addr == lo else prefix + ".A_%x" % addr
+        text = di.text.split("#")[0].strip()
+        if not text or text.startswith("(bad)"):
+            raise Unsupported("bytes %s do not disassemble" % di.raw.hex())
+        table = self.jump_table(di, name)
+        if table:
+            reg, targets = table
+            return [{"op": "jmp_table", "ops": [reg], "targets": [target_label(a) for a in targets]}]
+        if layout.is_nop_text(text):
+            text = "nop"
+        m = _TARGET_RE.match(text)
+        tail = False
+        if m:
+            mnem, taddr, tsym, toff = m.group(1), int(m.group(2), 16), m.group(3), m.group(4)
+            kreg = m.group(5)
+            rel = [r for r in di.relocs if r[1] in ("R_X86_64_PC32", "R_X86_64_PLT32")]
+            callee = re.sub(r"[+-]0x[0-9a-fA-F]+$", "", rel[0][2]) if rel else (tsym.split("@")[0] if not toff else None)
+            internal = lo <= taddr < hi and not rel
+            if mnem.startswith("call"):
+                if internal and callee is None:
+                    raise Unsupported("call into the middle of %s" % name)
+                callee = callee or tsym
+                text = "call %s" % _label(callee)
+            elif region is not None or internal:
+                text = "%s %s%s" % ("jmp" if mnem == "jmpq" else mnem,
+                                       target_label(taddr) if internal else "__knc_twin_end",
+                                       (", " + kreg) if kreg else "")
+            else:
+                callee = callee or tsym
+                if mnem not in ("jmp", "jmpq"):
+                    raise Unsupported("conditional jump out of %s to %s" % (name, callee))
+                if callee in included:
+                    text = "jmp %s" % _label(callee)
                 else:
-                    callee = tsym.split("@")[0] if not toff else None
-                internal = lo <= taddr < hi and not rel
-                if mnem.startswith("call"):
-                    if internal and callee is None:
-                        raise Unsupported("0x%x: call into the middle of %s" % (di.addr, name))
-                    callee = callee or tsym
-                    if callee not in included and callee not in calls:
-                        if callee in NORETURN:
-                            calls[callee] = {"model": "noreturn", "source": "declared automatically (noreturn runtime routine)"}
-                    out.append(("\tcall %s" % _label(callee), di))
-                elif internal:
-                    out.append(("\t%s .A_%x%s" % (mnem.rstrip("q") if mnem == "jmpq" else mnem, taddr, (", " + kreg) if kreg else ""), di))
-                else:
-                    # a jump out of the function: tail call
-                    callee = callee or tsym
-                    if mnem.rstrip("q") != "jmp":
-                        raise Unsupported("0x%x: conditional jump out of %s to %s" % (di.addr, name, callee))
-                    if callee in included:
-                        out.append(("\tjmp %s" % _label(callee), di))
-                    else:
-                        if callee in NORETURN and callee not in calls:
-                            calls[callee] = {"model": "noreturn", "source": "declared automatically (noreturn runtime routine)"}
-                        out.append(("\tcall %s" % _label(callee), di))
-                        out.append(("\tret", None))
-                        self.notes.append("0x%x: tail call to %s converted to call plus ret" % (di.addr, callee))
-                continue
+                    text, tail = "call %s" % _label(callee), True
+                    self.notes.append("0x%x: tail call to %s converted to call plus ret" % (di.addr, callee))
+            if callee in NORETURN and callee not in included and callee not in calls:
+                calls[callee] = {"model": "noreturn", "source": "declared automatically (noreturn runtime routine)"}
+        else:
             text = self._rewrite_operands(di, text)
-            out.append(("\t" + text, di))
-        return out
+            if region is not None and text in ("ret", "retq", "rep ret", "repz retq"):
+                text = "jmp __knc_twin_end"
+        records, _ = asm_mod.parse_gas(text)
+        if tail:
+            records.append({"op": "ret", "ops": []})
+        return records
 
     def _rewrite_operands(self, di, text):
         text = re.sub(r"\s*<[^>]*>", "", text)
@@ -234,28 +342,45 @@ class Converter(object):
         return text
 
     # ---- kernel --------------------------------------------------------------------------------
-    def convert(self, func, with_callees=(), calls=None, init_overlay=None, profile=None):
+    def convert(self, func, with_callees=(), calls=None, init_overlay=None, profile=None, loop=None, report=False):
         calls = dict(calls or {})
+        selected = None
+        if loop is not None:
+            func, first, last = self.loop_location(loop, func)
+            selected = self.instructions(func)[first:last + 1]
         included = [func] + [c for c in with_callees if c != func]
-        lines = []
+        records, rows = [], []
         for f in included:
-            lines.extend(self.function_lines(f, included, calls))
-        text = "\n".join(t for t, _ in lines)
-        records, notes = asm_mod.parse_gas(text)
-        by_line = {i + 1: di for i, (t, di) in enumerate(lines)}
-        for rec in records:
-            di = by_line.get(rec.get("source"))
-            if di is not None:
-                rec["encoding"] = layout.encoding_of(di.raw, di.text, di.addr)
-                rec["id"] = "a%x" % di.addr
-            else:
-                rec["id"] = "s%d" % rec["source"]
-            rec.pop("source", None)
-        ids = set()
-        for rec in records:
-            while rec["id"] in ids:
-                rec["id"] += "_"
-            ids.add(rec["id"])
+            insns = selected if f == func and selected is not None else self.instructions(f)
+            prefix = "" if f == func else _label(f)
+            region = (insns[0].addr, insns[-1].addr) if f == func and selected is not None else None
+            for di in insns:
+                try:
+                    recs = self.instruction_records(di, f, included, calls, region)
+                    for i, rec in enumerate(recs):
+                        rec.pop("source", None)
+                        rec["id"] = "%sa%x%s" % (prefix + "_" if prefix else "", di.addr, "_%d" % i if i else "")
+                        if i == 0:
+                            rec["encoding"] = layout.encoding_of(di.raw, di.text, di.addr)
+                            rec["label"] = _label(f) if region is None and di is insns[0] else prefix + ".A_%x" % di.addr
+                    classified = from_gcc_s.classify_records(recs, profile)
+                    for row in classified:
+                        row.update(address=di.addr, text=di.text, function=f)
+                    if not report and any(not r["parser"] or not r["isa"] for r in classified):
+                        raise Unsupported(classified[0]["reason"])
+                    records.extend(recs)
+                    rows.extend(classified)
+                except TwinError as e:
+                    if not report:
+                        raise
+                    rows.append({"address": di.addr, "function": f, "line": None, "id": "%sa%x" % (prefix + "_" if prefix else "", di.addr),
+                                 "text": di.text, "parser": False, "isa": False, "functional": False,
+                                 "timing": False if profile else None, "memory": False, "class": None,
+                                 "reason": e.status + ": " + e.message})
+            if region is not None:
+                records.append({"id": "region_end", "op": "nop", "ops": [], "label": "__knc_twin_end"})
+                if with_callees:
+                    raise InvalidInput("--loop and --with-callee cannot be combined; use costed stubs for region calls")
         # symbols referenced
         syms = {}
         for rec in records:
@@ -293,22 +418,23 @@ class Converter(object):
         for r in live:
             if r != "rsp":
                 init["registers"][r] = 0
-        rows = from_gcc_s.classify_records(records, profile)
         summary = from_gcc_s.summarize(rows)
         callees = sorted(set(o for rec in records if rec["op"] == "call" for o in rec["ops"] if isinstance(o, str)) - set(_label(f) for f in included))
         undeclared = [c for c in callees if c not in calls]
         kernel = {"schema": "knc-twin.kernel/1", "name": "%s__%s" % (os.path.splitext(os.path.basename(self.path))[0], func),
                   "description": "function %s from %s (adapter from_binary.py: code layout, calls and returns kept)" % (func, self.path),
-                  "entry": "function", "unit_of_work": {"description": "TODO: define the unit", "count": 1}, "memory_default": 0,
+                  "entry": "region" if loop is not None else "function", "unit_of_work": {"description": "TODO: define the unit", "count": 1}, "memory_default": 0,
                   "init": init, "calls": calls, "streams": [{"context": 0, "instructions": records}],
                   "provenance": {"adapter": "from_binary.py", "source_file": os.path.abspath(self.path), "source_sha256": sha256_of_file(self.path),
-                                 "function": func, "included_callees": included[1:], "layout": True,
+                                 "function": func, "loop": loop, "included_callees": included[1:], "layout": True,
                                  "live_in_registers_placeholders": sorted(init["registers"]), "unresolved_symbols": sorted(self.unresolved),
                                  "undeclared_callees": undeclared, "coverage": summary, "notes": self.notes,
                                  "padding_nops": sum(1 for r in records if r["op"] == "nop" and r.get("encoding")),
                                  "slow_prefix_instructions": sum(1 for r in records if r.get("encoding", {}).get("slow_prefixes"))}}
         if init_overlay:
             from_gcc_s.apply_overlay(kernel, init_overlay)
+        if not all(summary["complete"][k] for k in ("parser", "isa", "functional")):
+            kernel = None
         return kernel, rows, summary
 
     def _got_slot(self, value):
@@ -326,6 +452,8 @@ def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("file")
     ap.add_argument("--function")
+    ap.add_argument("--loop", help="hexadecimal loop-head address or .A_xxxx label")
+    ap.add_argument("--innermost", action="store_true", help="list innermost loops and their coverage")
     ap.add_argument("--list", action="store_true")
     ap.add_argument("--disassembly")
     ap.add_argument("--objdump")
@@ -343,28 +471,36 @@ def main(argv=None):
                 ins = conv.funcs[name]
                 print("%-40s 0x%x %d instructions" % (name, conv.starts[name], len(ins)))
             return 0
-        if not args.function:
-            raise InvalidInput("give --function NAME (or --list)")
+        if not args.function and not args.loop:
+            raise InvalidInput("give --function NAME or --loop ADDR (or --list)")
+        if args.loop:
+            args.function = conv.loop_location(args.loop, args.function)[0]
         calls = load_json(args.calls, "calls") if args.calls else {}
         overlay = load_json(args.init, "init") if args.init else None
-        kernel, rows, summary = conv.convert(args.function, args.with_callee, calls, overlay, load_profile(args.profile))
+        kernel, rows, summary = conv.convert(args.function, args.with_callee, calls, overlay, load_profile(args.profile),
+                                             loop=args.loop, report=bool(args.report or args.innermost))
     except TwinError as e:
         sys.stderr.write("from_binary: %s: %s\n" % (e.status, e.message))
         return 2
-    if args.out:
+    if args.out and kernel is not None:
         dump_json(kernel, args.out)
+    loops = conv.loop_report(args.function, rows)
+    unsupported = [r for r in rows if not r["functional"]]
+    prov = kernel["provenance"] if kernel else {"function": args.function, "loop": args.loop, "notes": conv.notes}
     if args.report:
-        dump_json({"summary": summary, "rows": rows, "provenance": kernel["provenance"]}, args.report)
-    prov = kernel["provenance"]
-    print("function %s: %d instructions, %d padding nops, %d with two-cycle prefixes; complete: %s" % (
-        args.function, summary["instructions"], prov["padding_nops"], prov["slow_prefix_instructions"], summary["complete"]))
-    if prov["undeclared_callees"]:
+        dump_json({"summary": summary, "rows": rows, "unsupported": unsupported, "loops": loops, "provenance": prov}, args.report)
+    print("%s %s: %d instructions; complete: %s" % (
+        "loop" if args.loop else "function", args.loop or args.function, summary["instructions"], summary["complete"]))
+    if args.innermost:
+        for row in loops:
+            print("%s..0x%x: %d instructions; complete: %s" % (row["label"], row["end_address"], row["instruction_count"], row["summary"]["complete"]))
+    if prov.get("undeclared_callees"):
         print("callees without a stub (declare them in --calls): %s" % ", ".join(prov["undeclared_callees"]))
-    if prov["unresolved_symbols"]:
+    if prov.get("unresolved_symbols"):
         print("symbols to place in --init init.symbols: %s" % ", ".join(prov["unresolved_symbols"]))
     for u in summary["unsupported"]:
         print("unsupported: %s" % u)
-    return 0
+    return 0 if kernel is not None else 2
 
 
 if __name__ == "__main__":

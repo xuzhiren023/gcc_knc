@@ -118,6 +118,7 @@ class CoreSim(object):
         self.nr_store_free_at = 0
         self.gather_free_at = 0
         self.cycle = 0
+        self.stub_costs = {}
         self.issue_log = []
         self.branch_sc = kernel.scenario["branch"]
         self.mispredict_ids = set(self.branch_sc.get("ids", []))
@@ -283,6 +284,9 @@ class CoreSim(object):
             stub = self.kernel.calls[ev.stub]
             cost = stub["cycles"] + stub.get("cycles_per_byte", 0) * ev.nbytes
             cost = int(-(-cost // 1))
+            charged = self.stub_costs.setdefault(ev.stub, {"calls": 0, "cycles_total": 0})
+            charged["calls"] += 1
+            charged["cycles_total"] += cost
             if ev.lines and stub.get("model") in ("memcpy", "memmove", "memset"):
                 self.mem.commit_demand(ev.lines, now, False, stub.get("model") == "memset")
             done = now + cost
@@ -449,6 +453,8 @@ class CoreSim(object):
         insn = ev.insn
         if insn.op in ("call", "ret"):
             return True
+        if insn.op == "jmp_table" and ev.branch_target is not None:
+            return ev.branch_target > insn.index
         if insn.target is None:
             return True
         stream = self.kernel.stream_for(cs.ctx)
@@ -642,6 +648,8 @@ class CoreSim(object):
             "per_context": per_ctx,
             "memory": self.mem.describe(),
             "frontend": dict(self.frontend_stats),
+            "stub_cycles_total": sum(s["cycles_total"] for s in self.stub_costs.values()),
+            "stub_costs": self.stub_costs,
             "python_seconds": round(self.python_seconds, 4),
         }
 

@@ -22,28 +22,47 @@ What the report does not claim: the bar's breadth criterion is not met (the comp
 HPCG and one sparse microbenchmark family); the twin is a region model, not a system emulator; the
 card scale is formulas on measured bandwidths.
 
-## 1b. PhiWeather's WRF hot routines (0.3.1)
+## 1b. PhiWeather's WRF hot routines (S14-11)
 
-PhiWeather declined 0.3.0 because 13 mnemonics in its patched WRF build (GCC-KNC 16.2) were
-unsupported: `vgetexpps`, `vgetmantps`, `vscaleps`, `vrcp23ps`, `vgmaxps`, `vgminps`, `vpcmpneqd`,
-`vpcmpnled`, `vpblendmd`, `stmxcsr`, `fcoms`, `fcomps`, `vscatterdps` (plus `vgetexppd`,
-`vgetmantpd`, `vrsqrt23ps`, `vfixupnanps` in the full list). All are now read and executed with
-the R27 semantics; `vrcp23ps`/`vrsqrt23ps` are approximate until their tables are captured
-(calibration plan `rcp23-table`); scatters still stop the timing (`scatter`). Coverage by
-`tests/heldout_native/wrf_coverage.py` over the build's objects (read-only):
+The binary adapter now resolves relocated switch tables, accepts the low-eight-lane YMM
+source of `vcvtps2pd`, and supplies loop extraction, innermost-loop lists and complete per-line
+reports. The driver and sixth-order-diffusion entries point to their actual objects.
+Read-only coverage of the brief's patched WRF build:
 
-| routine | instructions | padding NOPs | prefixed | calls | twin status |
-|---|---:|---:|---:|---:|---|
-| mynn_tendencies | 28536 | 199 | 192 | 138 | parser, ISA, functional complete; timing waits for the scatter cost (137 scatters) |
-| dmp_mf | 17311 | 78 | 109 | 148 | same (91 scatters) |
-| mp_thompson | 32873 | 489 | 457 | 697 | 48 `vcvtps2pd %ymm` forms not read yet; otherwise complete |
-| mp_gt_driver, advance_uv, advance_mu_t, horizontal_diffusion_s, rk_update_scalar | 3585-10122 | | | | complete except the scatter cost |
-| rslf | 48 | | | 0 | complete |
-| advect_scalar, advect_scalar_pd | | | | | jump tables (`jmpq *table(,%reg,8)` through `.rodata` relocations): the adapter does not follow them yet |
-| mynnedmf_driver, sixth_order_diffusion | | | | | objects not in the routine table (`module_bl_mynnedmf_driver.o`, `module_big_step_utilities_em.o`); to add |
+| routine | instructions | innermost loops | timing-complete loops | functional coverage |
+|---|---:|---:|---:|---|
+| mynn_tendencies | 28536 | 653 | 516 | complete |
+| mynnedmf_driver | 14248 | 134 | 122 | complete |
+| dmp_mf | 17311 | 347 | 256 | complete |
+| mp_thompson | 32873 | 135 | 135 | complete |
+| mp_gt_driver | 5441 | 36 | 29 | complete |
+| rslf | 48 | 0 | 0 | complete |
+| advect_scalar | 29414 | 534 | 462 | complete |
+| advect_scalar_pd | 61270 | 286 | 259 | complete |
+| advance_uv | 7532 | 154 | 136 | complete |
+| advance_mu_t | 3847 | 85 | 71 | complete |
+| horizontal_diffusion_s | 10122 | 148 | 126 | complete |
+| sixth_order_diffusion | 1902 | 12 | 12 | complete |
+| rk_update_scalar | 3585 | 62 | 49 | complete |
 
-The callees these routines make (`__knc_vmath_expf_16`, `expf`, `qsat_blend`, `tridiag2`,
-`memcpy`, `malloc`) need costed stubs or inclusion with `--with-callee`.
+All 13 routines convert whole. The only missing instruction-timing parameter in this
+coverage run is `occupancy.scatter_cycles_per_line`; coverage is not native execution or
+proof of exact whole-function results. Calls still require stubs or included bodies, real
+inputs must replace live-in placeholders, and reciprocal instructions use approximate
+stand-ins until captures are selected.
+
+`import-native` accepts isolated scatter occupancy rows and reciprocal/rsqrt captures.
+Captures live under `fixtures/tables/`, load lazily, and are selected explicitly through the
+kernel numerical policy; no measured table or new timing value is bundled. Synthetic table
+tests establish importer and lookup behavior, not hardware agreement. The WRF call template
+is `fixtures/wrf-calls.json`, with assumed illustrative costs and explicit functional models.
+Heap calls now use a declared `init.heap` bump allocator: aligned distinct addresses,
+calloc zero filling, realloc copying, and no-op free. Allocation sizes and summed charged
+stub cycles are reported. Costs remain assumed and results using stubs remain unvalidated
+scenario estimates. The `libc-calls` plan and `fixtures/libc-calls.json` stage a post-M4
+native smoke request; separate measurements are still needed for each call and byte cost.
+See `references/input-format.md` for report fields, loop selection, indirect-branch assumptions
+and capture format.
 
 ## 2. Where native test time goes, and what the twin covers
 
