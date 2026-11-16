@@ -161,7 +161,7 @@ Current tickets: `[#################---]` 253 of 295
 | S14-30 | WRF built with GCC-KNC runs 1.21x slower per step than PhiWeather's production build - attribute the gap per cause before fixing (M5, owner rule) | draft |  |
 | S14-31 | knc-twin multi-core usability: compare across scales, stubs and repeated calls at unit/ring scale, multi-context sampling, separated ring/memory stall shares | Not started |  |
 | S14-33 | knc-twin: import the window-11 calibration rows (imci-math latency and throughput, div10, x87 fcoms, rcp23/rsqrt23 tables) and retire the assumed parameters they settle | Not started |  |
-| S14-35 | knc-twin prepare-native: the generated native program for PhiWeather's sixth_order_diffusion kernels segfaults on the card (exit 139 under claude-pin); find the cause, fix the generator, restage | Changes requested | 1. knc-twin/scripts/knc_model/native.py:97-102: when the kernel init has rsp, the wrapper overwrites %rsp a... |
+| S14-35 | knc-twin prepare-native: the generated native program for PhiWeather's sixth_order_diffusion kernels segfaults on the card (exit 139 under claude-pin); find the cause, fix the generator, restage | In progress | 1. knc-twin/scripts/knc_model/native.py:97-102: when the kernel init has rsp, the wrapper overwrites %rsp a... |
 | S14-37 | knc-twin x87 double rounding: _x87_binop rounds to the 64-bit significand and then to PC=53/24; real x87 rounds once (knc-boinc repro, 1 to 8 ULP errors) | Not started |  |
 | S14-38 | Card and twin dashboard - running card job, card queue and running twin work with remaining time, card temperature and utilization, host CPU, refreshed every 5 minutes | In progress | No rebase needed: the branch only adds tools/knc_dashboard.py and tests/tools/test_knc_dashboard.py and edi... |
 | S14-39 | knc-twin prepare-native: pointer-rich captures (heap addresses sparse over tens of GB) need a relocating or multi-segment native image | Not started |  |
@@ -333,7 +333,7 @@ Current tickets: `[#################---]` 253 of 295
 
 - From the script, engineer: 785 sessions, 1663.8M input tokens
 - From the script, lead: 531 sessions, 150.0M input tokens
-- Started by hand, Claude: 15 sessions, 4302.5M input tokens
+- Started by hand, Claude: 15 sessions, 4302.8M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
