@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-16 15:36.
+Updated automatically at every ticket change. Last update: 2026-11-16 15:38.
 
-**Next: the tech lead, on S14-33.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Waiting for you:** S14-33. Run `python tools/pm.py inbox`.
 
 Current tickets: `[#################---]` 257 of 296
 
@@ -160,7 +160,7 @@ Current tickets: `[#################---]` 257 of 296
 | S14-29 | knc-twin: schedule --block ADDR..ADDR for a straight-line block inside a function, and batch must not write a native request per candidate by default | Not started |  |
 | S14-30 | WRF built with GCC-KNC runs 1.21x slower per step than PhiWeather's production build - attribute the gap per cause before fixing (M5, owner rule) | draft |  |
 | S14-31 | knc-twin multi-core usability: compare across scales, stubs and repeated calls at unit/ring scale, multi-context sampling, separated ring/memory stall shares | Not started |  |
-| S14-33 | knc-twin: import the window-11 calibration rows (imci-math latency and throughput, div10, x87 fcoms, rcp23/rsqrt23 tables) and retire the assumed parameters they settle | Waiting for review | a69e96f6: all five review fixes. Full held-out recording PASS; selftest 221 tests, zero failures/errors; tr... |
+| S14-33 | knc-twin: import the window-11 calibration rows (imci-math latency and throughput, div10, x87 fcoms, rcp23/rsqrt23 tables) and retire the assumed parameters they settle | **Waiting for you** | lead session ended without a decision (exit 0) |
 | S14-35 | knc-twin prepare-native: the generated native program for PhiWeather's sixth_order_diffusion kernels segfaults on the card (exit 139 under claude-pin); find the cause, fix the generator, restage | Done | knc-twin prepare-native runs each kernel on its own stack (the kernel's in-image stack, or a private per-co... |
 | S14-37 | knc-twin x87 double rounding: _x87_binop rounds to the 64-bit significand and then to PC=53/24; real x87 rounds once (knc-boinc repro, 1 to 8 ULP errors) | Not started |  |
 | S14-38 | Card and twin dashboard - running card job, card queue and running twin work with remaining time, card temperature and utilization, host CPU, refreshed every 5 minutes | Done | A local dashboard (python tools/knc_dashboard.py serve) now shows the running card job, the card queue and ... |
@@ -321,6 +321,7 @@ Current tickets: `[#################---]` 257 of 296
 
 ## Recent activity
 
+- 2026-11-16 15:38 **S14-33** lead escalate: lead session ended without a decision (exit 0)
 - 2026-11-16 14:59 **S14-33** engineer submit: a69e96f6: all five review fixes. Full held-out recording PASS; selftest 221 tests, zero failures/errors; trial PASS. Scatter t1 +0.7%/+6.8%; scatte...
 - 2026-11-16 14:20 **S14-22** lead defer: Engineer cannot run card_run tests: tools/run.py hangs (>8 min, no log) and the pre-tool hook blocks direct 'python -m unittest tests.tools.test_ca...
 - 2026-11-16 14:18 **S14-22** engineer ask: The authorized test invocation through tools/run.py has hung for over 8 minutes without output or log; direct unittest invocation is blocked by the...
@@ -328,13 +329,12 @@ Current tickets: `[#################---]` 257 of 296
 - 2026-11-16 14:12 **S14-33** lead changes: 1. knc-twin/references/validation.md:303 (and :304): the scatter parameter does not reproduce the rows it was derived from: scatter_all_t1 +128.9%,...
 - 2026-11-16 14:12 **S14-26** lead defer: Reviewed b9056c7f: matches the 14:03 answer (static caps, no-go verdict, modulo unsupported evidence kept); ready to approve. Needs interactive lea...
 - 2026-11-16 14:10 **S14-26** engineer ask: Committed the requested static-cap table and no-go verdict as b9056c7f, retaining unsupported modulo evidence; no further model runs. Submit with y...
-- 2026-11-16 14:10 **S14-16** engineer red: 76490eea: synthetic byte decoder T1 fails on loop %k register scan, as expected. Log .work/_state/logs/S14_16_red-20261116-140840.log. Zlib scan fo...
 
 ## Cost
 
 - From the script, engineer: 811 sessions, 1704.3M input tokens
 - From the script, lead: 557 sessions, 156.5M input tokens
-- Started by hand, Claude: 68 sessions, 4429.1M input tokens
+- Started by hand, Claude: 68 sessions, 4431.4M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
