@@ -20,7 +20,7 @@ result is claimed.
 Donor: <https://github.com/apc-llc/gcc-5.1.1-knc>, commit
 `af7cc04cef723da3166f0d6f1539f02525fe5a93`.
 Local reference checkout:
-`C:/Users/xuzhi/Documents/PhiWeather/.tools/knc-bootstrap/gcc-source`.
+`<PhiWeather>/.tools/knc-bootstrap/gcc-source`.
 
 The earliest imported commit is
 `cfd753e8744fd1515a0640a6c162d20732412b47`. Its message identifies its input as
@@ -136,7 +136,7 @@ Details worth retaining as reference:
 ## Patch 0002: mechanism survives, memory fast path does not
 
 Inspected local patch:
-`C:/Users/xuzhi/Documents/PhiWeather/native/patches/gcc-knc/0002-preserve-secondary-move-address-reloads.patch`.
+`<PhiWeather>/native/patches/gcc-knc/0002-preserve-secondary-move-address-reloads.patch`.
 It moves `check_and_process_move` ahead of address processing in
 `curr_insn_transform`. The documented donor failure is that a secondary move
 deletes the original instruction after `process_address` accumulates BEFORE/AFTER
@@ -184,8 +184,8 @@ No card or assembler was invoked (`-S` is compile only).
 
 ```text
 python3.12.exe tools/run.py --name S0-05-donor-routing --inputs tests/out/module_channel_routing.F90 -- k1om-mpss-linux-gfortran -O1 -S -cpp -ffree-line-length-none -J tests/out tests/out/module_channel_routing.F90 -o tests/out/routing.s
-python3.12.exe tools/run.py --name S0-05-reference-routing --inputs tests/out/module_channel_routing.F90 -- k1om-mpss-linux-gfortran -BC:/Users/xuzhi/Documents/PhiWeather/.tools/knc-bootstrap/reference/gcc-lra-diagnostic/ -O1 -S -cpp -ffree-line-length-none -J tests/out tests/out/module_channel_routing.F90 -o tests/out/routing.s
-python3.12.exe tools/run.py --name S0-05-donor-routing-modules --inputs tests/out/module_channel_routing.F90 -- k1om-mpss-linux-gfortran -O1 -S -cpp -DMPP_LAND -ffree-line-length-none -I /cygdrive/c/Users/xuzhi/Documents/PhiWeather/.tools/knc-bootstrap/hydro-knc/src/mod -J tests/out tests/out/module_channel_routing.F90 -o tests/out/routing.s
+python3.12.exe tools/run.py --name S0-05-reference-routing --inputs tests/out/module_channel_routing.F90 -- k1om-mpss-linux-gfortran -B<PhiWeather>/.tools/knc-bootstrap/reference/gcc-lra-diagnostic/ -O1 -S -cpp -ffree-line-length-none -J tests/out tests/out/module_channel_routing.F90 -o tests/out/routing.s
+python3.12.exe tools/run.py --name S0-05-donor-routing-modules --inputs tests/out/module_channel_routing.F90 -- k1om-mpss-linux-gfortran -O1 -S -cpp -DMPP_LAND -ffree-line-length-none -I <PhiWeather>/.tools/knc-bootstrap/hydro-knc/src/mod -J tests/out tests/out/module_channel_routing.F90 -o tests/out/routing.s
 ```
 
 Results, all exit 1:
@@ -193,7 +193,7 @@ Results, all exit 1:
 | Attempt | Actual result | Log under `.work/_state/logs/` |
 | --- | --- | --- |
 | Donor, no defines | `int64` has no implicit type, reservoir CALL syntax errors, then missing `module_rt_data.mod` at line 1544; never reached LRA. | `S0_05_donor_routing-20261101-234024.log` |
-| Reference selection | Driver rejected `/Users/xuzhi/Documents/PhiWeather/.tools/knc-bootstrap/reference/gcc-lra-diagnostic/` as nonexistent: Windows drive-letter prefix was not a usable Cygwin `-B` argument. Reference f951 did not run. | `S0_05_reference_routing-20261101-234032.log` |
+| Reference selection | Driver rejected `<PhiWeather>/.tools/knc-bootstrap/reference/gcc-lra-diagnostic/` as nonexistent: Windows drive-letter prefix was not a usable Cygwin `-B` argument. Reference f951 did not run. | `S0_05_reference_routing-20261101-234032.log` |
 | Donor, MPP_LAND and module include | Missing `module_mpp_land.mod` at line 3; never reached LRA. | `S0_05_donor_routing_modules-20261101-234044.log` |
 
 Earlier PowerShell launches using the Cygwin symlink names `python`/`python3`
@@ -216,7 +216,7 @@ worktree through `tools/run.py`, with the bootstrap Cygwin `python3.12.exe`.
 In the shell commands below, `base` is the read-only bootstrap directory:
 
 ```sh
-base=/cygdrive/c/Users/xuzhi/Documents/PhiWeather/.tools/knc-bootstrap
+base=<PhiWeather>/.tools/knc-bootstrap
 export PATH="$base/cross/bin:/usr/bin:/bin"
 # Donor: extra is empty. Reference: extra=(-B"$base/reference/gcc-lra-diagnostic/").
 "$base/scientific-mpich/bin/mpif90" "${extra[@]}" \

@@ -1,6 +1,6 @@
 # Start prompt for a new GCC-KNC lead session
 
-Paste the block below into a new Claude Code session started in `C:\Users\xuzhi\Documents\gcc_knc`.
+Paste the block below into a new Claude Code session started in `<repo>`.
 
 ```text
 You are the GCC-KNC tech lead (CLAUDE.md "tech lead role"). You plan, write tickets, review, merge to local main and
@@ -25,7 +25,7 @@ as questions and act only on a clear go-ahead, except where a standing authoriza
 
 First tasks:
 - If S13-01 is still open: check the full-profile block (.work/_shared/S13-01/initial-full-raw.jsonl, the ledger
-  C:/Users/xuzhi/Documents/card-coordination/jobs.jsonl). When it completes, run
+  <card-coordination>/jobs.jsonl). When it completes, run
   `python .work/_shared/S13-01/runner/entry.py recheck --stage .work/_shared/S13-01 --profile full --block initial`
   then score with `entry.py score`, write the M4 decision with known limits, tag m4 in both repos, tell PhiWeather.
 - Then the release verification: fresh-clone GCC build at -j4 (scratchpad scripts are gone with the old session;

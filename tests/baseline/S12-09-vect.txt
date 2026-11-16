@@ -133,7 +133,7 @@ bb-slp-layout-14.c	compile	compiled	1	0	1
 bb-slp-layout-15.c	compile	compiled	1	0	1	
 bb-slp-layout-16.c	compile	compiled	1	0	1	
 bb-slp-layout-17.c	compile	compile error	0	0	0	      |      ^~
-bb-slp-layout-18.c	compile	compile error	0	0	2	/cygdrive/c/Users/xuzhi/Documents/gcc_knc/.work/_shared/gcc/gcc/testsuite/gcc.dg/vect/bb-slp-layout-18.c:8:1: error: unsupported KNC register ABI mode
+bb-slp-layout-18.c	compile	compile error	0	0	2	.work/_shared/gcc/gcc/testsuite/gcc.dg/vect/bb-slp-layout-18.c:8:1: error: unsupported KNC register ABI mode
 bb-slp-layout-19.c	compile	compiled	1	0	1	
 bb-slp-layout-2.c	compile	compiled	1	0	1	
 bb-slp-layout-20.c	compile	compiled	1	0	1	
@@ -157,7 +157,7 @@ bb-slp-pr101242.c	compile	compiled	1	0	0
 bb-slp-pr101615-1.c	run	compile error	0	0	0	      |   ^~~~~~~
 bb-slp-pr101615-2.c	run	compiled	1	0	0	
 bb-slp-pr101668.c	run	compiled	1	0	0	
-bb-slp-pr101756.c	compile	compile error	0	0	0	/cygdrive/c/Users/xuzhi/Documents/gcc_knc/.work/_shared/gcc/gcc/testsuite/gcc.dg/vect/bb-slp-pr101756.c:17: confused by earlier errors, bailing out
+bb-slp-pr101756.c	compile	compile error	0	0	0	.work/_shared/gcc/gcc/testsuite/gcc.dg/vect/bb-slp-pr101756.c:17: confused by earlier errors, bailing out
 bb-slp-pr103800.c	compile	compiled	1	0	0	
 bb-slp-pr104240.c	compile	skipped	0	0	1	vect_cond_mixed: capability unverified on KNC
 bb-slp-pr106019.c	compile	compiled	1	0	1	
@@ -331,7 +331,7 @@ pr101145_3.c	run	skipped	0	0	1	vect_long_long: capability unverified on KNC
 pr101145inf.c	run	compiled	1	0	0	
 pr101145inf_1.c	run	compiled	1	0	0	
 pr101445.c	run	compiled	1	0	0	
-pr101505.c	compile	compile error	0	0	0	/cygdrive/c/Users/xuzhi/Documents/gcc_knc/.work/_shared/gcc/gcc/testsuite/gcc.dg/vect/pr101505.c:16: confused by earlier errors, bailing out
+pr101505.c	compile	compile error	0	0	0	.work/_shared/gcc/gcc/testsuite/gcc.dg/vect/pr101505.c:16: confused by earlier errors, bailing out
 pr102046.c	compile	compiled	1	0	0	dg-additional-options: selector [' target x86_64-*-* i?86-*-* '] unmet
 pr102318.c	compile	compiled	1	0	0	
 pr102832.c	compile	compiled	1	0	0	dg-additional-options: selector [' target aarch64-*-* '] unmet
@@ -736,7 +736,7 @@ pr66677.c	compile	compiled	1	0	0	dg-additional-options: selector [' target x86_6
 pr66951.c	compile	compiled	1	0	0	
 pr67790.c	run	skipped	0	0	2	vect_perm: capability unverified on KNC
 pr68305.c	compile	compiled	1	0	0	dg-additional-options: selector [' target { i?86-*-* x86_64-*-* } '] unmet
-pr68339.c	compile	compile error	0	0	0	/cygdrive/c/Users/xuzhi/Documents/gcc_knc/.work/_shared/gcc/gcc/testsuite/gcc.dg/vect/pr68339.c:17: confused by earlier errors, bailing out
+pr68339.c	compile	compile error	0	0	0	.work/_shared/gcc/gcc/testsuite/gcc.dg/vect/pr68339.c:17: confused by earlier errors, bailing out
 pr68417.c	compile	skipped	0	0	1	vect_condition: capability unverified on KNC
 pr68445.c	compile	compiled	1	0	1	
 pr68482.c	compile	compiled	1	0	1	
@@ -817,10 +817,10 @@ pr87288-1.c	run	compiled	1	0	1
 pr87288-2.c	run	compiled	1	0	1	
 pr87288-3.c	run	compiled	1	0	1	
 pr88497-1.c	run	compiled	1	0	1	dg-require-effective-target: selector [' target { powerpc*-*-* } '] unmet; dg-require-effective-target: selector [' target { i?86-*-* x86_64-*-* } '] unmet; dg-additional-options: selector [' target { powerpc*-*-* } '] unmet; dg-additional-options: selector [' target { i?86-*-* x86_64-*-* } '] unmet
-pr88497-2.c	compile	compile error	0	0	1	dg-require-effective-target: selector [' target { powerpc*-*-* } '] unmet; dg-require-effective-target: selector [' target { i?86-*-* x86_64-*-* } '] unmet; dg-additional-options: selector [' target { powerpc*-*-* } '] unmet; dg-additional-options: selector [' target { i?86-*-* x86_64-*-* } '] unmet; /cygdrive/c/Users/xuzhi/Documents/gcc_knc/.work/_shared/gcc/gcc/testsuite/gcc.dg/vect/pr88497-2.c:29:1: error: unsupported KNC register ABI mode
-pr88497-3.c	compile	compile error	0	0	1	dg-require-effective-target: selector [' target { powerpc*-*-* } '] unmet; dg-require-effective-target: selector [' target { i?86-*-* x86_64-*-* } '] unmet; dg-additional-options: selector [' target { powerpc*-*-* } '] unmet; dg-additional-options: selector [' target { i?86-*-* x86_64-*-* } '] unmet; /cygdrive/c/Users/xuzhi/Documents/gcc_knc/.work/_shared/gcc/gcc/testsuite/gcc.dg/vect/pr88497-3.c:29:1: error: unsupported KNC register ABI mode
-pr88497-4.c	compile	compile error	0	0	1	dg-require-effective-target: selector [' target { powerpc*-*-* } '] unmet; dg-require-effective-target: selector [' target { i?86-*-* x86_64-*-* } '] unmet; dg-additional-options: selector [' target { powerpc*-*-* } '] unmet; dg-additional-options: selector [' target { i?86-*-* x86_64-*-* } '] unmet; /cygdrive/c/Users/xuzhi/Documents/gcc_knc/.work/_shared/gcc/gcc/testsuite/gcc.dg/vect/pr88497-4.c:29:1: error: unsupported KNC register ABI mode
-pr88497-5.c	compile	compile error	0	0	1	dg-require-effective-target: selector [' target { powerpc*-*-* } '] unmet; dg-require-effective-target: selector [' target { i?86-*-* x86_64-*-* } '] unmet; dg-additional-options: selector [' target { powerpc*-*-* } '] unmet; dg-additional-options: selector [' target { i?86-*-* x86_64-*-* } '] unmet; /cygdrive/c/Users/xuzhi/Documents/gcc_knc/.work/_shared/gcc/gcc/testsuite/gcc.dg/vect/pr88497-5.c:29:1: error: unsupported KNC register ABI mode
+pr88497-2.c	compile	compile error	0	0	1	dg-require-effective-target: selector [' target { powerpc*-*-* } '] unmet; dg-require-effective-target: selector [' target { i?86-*-* x86_64-*-* } '] unmet; dg-additional-options: selector [' target { powerpc*-*-* } '] unmet; dg-additional-options: selector [' target { i?86-*-* x86_64-*-* } '] unmet; .work/_shared/gcc/gcc/testsuite/gcc.dg/vect/pr88497-2.c:29:1: error: unsupported KNC register ABI mode
+pr88497-3.c	compile	compile error	0	0	1	dg-require-effective-target: selector [' target { powerpc*-*-* } '] unmet; dg-require-effective-target: selector [' target { i?86-*-* x86_64-*-* } '] unmet; dg-additional-options: selector [' target { powerpc*-*-* } '] unmet; dg-additional-options: selector [' target { i?86-*-* x86_64-*-* } '] unmet; .work/_shared/gcc/gcc/testsuite/gcc.dg/vect/pr88497-3.c:29:1: error: unsupported KNC register ABI mode
+pr88497-4.c	compile	compile error	0	0	1	dg-require-effective-target: selector [' target { powerpc*-*-* } '] unmet; dg-require-effective-target: selector [' target { i?86-*-* x86_64-*-* } '] unmet; dg-additional-options: selector [' target { powerpc*-*-* } '] unmet; dg-additional-options: selector [' target { i?86-*-* x86_64-*-* } '] unmet; .work/_shared/gcc/gcc/testsuite/gcc.dg/vect/pr88497-4.c:29:1: error: unsupported KNC register ABI mode
+pr88497-5.c	compile	compile error	0	0	1	dg-require-effective-target: selector [' target { powerpc*-*-* } '] unmet; dg-require-effective-target: selector [' target { i?86-*-* x86_64-*-* } '] unmet; dg-additional-options: selector [' target { powerpc*-*-* } '] unmet; dg-additional-options: selector [' target { i?86-*-* x86_64-*-* } '] unmet; .work/_shared/gcc/gcc/testsuite/gcc.dg/vect/pr88497-5.c:29:1: error: unsupported KNC register ABI mode
 pr88497-6.c	compile	skipped	0	0	1	avx512f: unsupported on KNC; non-KNC machine options: -mavx512f
 pr88497-7.c	run	skipped	0	0	1	avx512f_runtime: unsupported on KNC; non-KNC machine options: -mavx512f
 pr88598-1.c	run	compiled	1	0	1	
@@ -849,7 +849,7 @@ pr92324-4.c	run	compiled	1	0	1
 pr92347.c	compile	compiled	1	0	0	dg-additional-options: selector [' target { i?86-*-* x86_64-*-* } '] unmet
 pr92420.c	run	compiled	1	0	0	dg-additional-options: selector [' target avx_runtime '] unmet
 pr92429.c	compile	compiled	1	0	0	dg-additional-options: selector [' target { x86_64-*-* i?86-*-* } '] unmet
-pr92554.c	compile	compile error	0	0	0	/cygdrive/c/Users/xuzhi/Documents/gcc_knc/.work/_shared/gcc/gcc/testsuite/gcc.dg/vect/pr92554.c:11: confused by earlier errors, bailing out
+pr92554.c	compile	compile error	0	0	0	.work/_shared/gcc/gcc/testsuite/gcc.dg/vect/pr92554.c:11: confused by earlier errors, bailing out
 pr92555.c	compile	compiled	1	0	0	
 pr92558.c	run	compiled	1	0	1	dg-additional-options: selector [' target avx2_runtime '] unmet
 pr92677.c	compile	compiled	1	0	0	
@@ -1928,7 +1928,7 @@ vect-simd-clone-7.c	run	skipped	0	0	0	vect_simd_clones: capability unverified on
 vect-simd-clone-8.c	run	skipped	0	0	0	vect_simd_clones: capability unverified on KNC; dg-additional-options: selector [' target avx_runtime '] unmet; dg-warning: selector [' target amdgcn*-*-* '] unmet; dg-warning: selector [' target amdgcn*-*-* '] unmet
 vect-simd-clone-9.c	run	skipped	0	0	0	vect_simd_clones: capability unverified on KNC; dg-additional-options: selector [' target avx_runtime '] unmet
 vect-simd-clone-pr123794.c	compile	skipped	0	0	0	vect_simd_clones: capability unverified on KNC
-vect-simd-pr121130.c	compile	compile error	0	0	0	/cygdrive/c/Users/xuzhi/Documents/gcc_knc/.work/_shared/gcc/gcc/testsuite/gcc.dg/vect/vect-simd-pr121130.c:11: confused by earlier errors, bailing out
+vect-simd-pr121130.c	compile	compile error	0	0	0	.work/_shared/gcc/gcc/testsuite/gcc.dg/vect/vect-simd-pr121130.c:11: confused by earlier errors, bailing out
 vect-singleton_1.c	compile	compiled	1	0	0	
 vect-strided-a-mult.c	run	compiled	1	0	1	
 vect-strided-a-u16-i2.c	run	compiled	1	0	1	

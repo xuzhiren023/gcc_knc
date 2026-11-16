@@ -32,12 +32,12 @@ headers and static libraries.
 Run the following in the Cygwin supplied by PhiWeather's knc-bootstrap:
 
 ```sh
-BOOT=/cygdrive/c/Users/xuzhi/Documents/PhiWeather/.tools/knc-bootstrap
-SHARED=/cygdrive/c/Users/xuzhi/Documents/gcc_knc/.work/_shared
+BOOT=<PhiWeather>/.tools/knc-bootstrap
+SHARED=<repo>/.work/_shared
 TRIAL=$SHARED/wrf-trial
 PREFIX=$SHARED/gcc-knc-16.2.0
 MPI=$BOOT/experiments/mpich-nemesis-mmap/4cd8ccceb34a460d8841adf17c0b15b1/prefix
-IMAGE=/cygdrive/c/Users/xuzhi/Documents/PhiWeather/artifacts/test-state/claude-mentor-performance-20261105
+IMAGE=<PhiWeather>/artifacts/test-state/claude-mentor-performance-20261105
 ITEM21=$IMAGE/sirocco-gf-rlh-c1b2-01/item21
 export PATH="$PREFIX/bin:$BOOT/cross/bin:/usr/bin:/bin"
 unset MSYSTEM MSYSTEM_PREFIX MINGW_PREFIX MSYSTEM_CHOST
@@ -99,7 +99,7 @@ import shutil
 import subprocess
 
 trial = Path(os.environ['TRIAL'])
-experiment = Path('/cygdrive/c/Users/xuzhi/Documents/PhiWeather/.tools/knc-bootstrap/experiments/mpich-nemesis-mmap/4cd8ccceb34a460d8841adf17c0b15b1')
+experiment = Path('<PhiWeather>/.tools/knc-bootstrap/experiments/mpich-nemesis-mmap/4cd8ccceb34a460d8841adf17c0b15b1')
 source = experiment / 'source/mpich-3.4.3'
 configured = experiment / 'build/src/binding/fortran/use_mpi'
 output = trial / 'dmsm-mpi'
@@ -247,8 +247,8 @@ OMPCC           =       # -fopenmp
 SFC = k1om-mpss-linux-gfortran -static-libgcc -static-libgfortran
 SCC = k1om-mpss-linux-gcc -static-libgcc
 CCOMP = k1om-mpss-linux-gcc -static-libgcc
-DM_FC = $(SFC) -I/cygdrive/c/Users/xuzhi/Documents/gcc_knc/.work/_shared/wrf-trial/dmsm-mpi -I/cygdrive/c/Users/xuzhi/Documents/PhiWeather/.tools/knc-bootstrap/experiments/mpich-nemesis-mmap/4cd8ccceb34a460d8841adf17c0b15b1/prefix/include
-DM_CC = $(SCC) -I/cygdrive/c/Users/xuzhi/Documents/PhiWeather/.tools/knc-bootstrap/experiments/mpich-nemesis-mmap/4cd8ccceb34a460d8841adf17c0b15b1/prefix/include
+DM_FC = $(SFC) -I<repo>/.work/_shared/wrf-trial/dmsm-mpi -I<PhiWeather>/.tools/knc-bootstrap/experiments/mpich-nemesis-mmap/4cd8ccceb34a460d8841adf17c0b15b1/prefix/include
+DM_CC = $(SCC) -I<PhiWeather>/.tools/knc-bootstrap/experiments/mpich-nemesis-mmap/4cd8ccceb34a460d8841adf17c0b15b1/prefix/include
 FC              =       CONFIGURE_FC
 CC              =       CONFIGURE_CC
 LD              =       $(FC)
@@ -284,7 +284,7 @@ CC_TOOLS = gcc
 
 
 
-LIB_LOCAL = /cygdrive/c/Users/xuzhi/Documents/PhiWeather/.tools/knc-bootstrap/experiments/mpich-nemesis-mmap/4cd8ccceb34a460d8841adf17c0b15b1/prefix/lib/libmpifort.a /cygdrive/c/Users/xuzhi/Documents/PhiWeather/artifacts/test-state/claude-mentor-performance-20261105/sirocco-gf-rlh-c1b2-01/item21/mpich-thr/libmpi.a /cygdrive/c/Users/xuzhi/Documents/PhiWeather/artifacts/test-state/claude-mentor-performance-20261105/sirocco-gf-rlh-c1b2-01/item21/obj/thr/phi_thr_copy.o /cygdrive/c/Users/xuzhi/Documents/PhiWeather/artifacts/test-state/claude-mentor-performance-20261105/k17-memcpy/copy.o -lm -lpthread -lrt
+LIB_LOCAL = <PhiWeather>/.tools/knc-bootstrap/experiments/mpich-nemesis-mmap/4cd8ccceb34a460d8841adf17c0b15b1/prefix/lib/libmpifort.a <PhiWeather>/artifacts/test-state/claude-mentor-performance-20261105/sirocco-gf-rlh-c1b2-01/item21/mpich-thr/libmpi.a <PhiWeather>/artifacts/test-state/claude-mentor-performance-20261105/sirocco-gf-rlh-c1b2-01/item21/obj/thr/phi_thr_copy.o <PhiWeather>/artifacts/test-state/claude-mentor-performance-20261105/k17-memcpy/copy.o -lm -lpthread -lrt
 ```
 
 ## Configure and build
