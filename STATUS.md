@@ -1,10 +1,10 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-16 18:04.
+Updated automatically at every ticket change. Last update: 2026-11-16 18:31.
 
-**Next: the tech lead, on S14-42.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: GPT-6.1, on S14-10 (knc-twin: --jobs N for independent simulations and PyPy support (roadmap item 1)).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
-Current tickets: `[#################---]` 258 of 297
+Current tickets: `[#################---]` 259 of 297
 
 ## Milestones
 
@@ -15,7 +15,7 @@ Current tickets: `[#################---]` 258 of 297
 | M2 | Useful vector target | Done | 51 of 51 tickets |
 | M3 | Runtimes | Done | 48 of 48 tickets |
 | M4 | Broad optimization | Done | 63 of 65 tickets |
-| M5 | Program corpus | In progress | 13 of 50 tickets |
+| M5 | Program corpus | In progress | 14 of 50 tickets |
 | M6 | Release | Not started | Not planned in detail yet |
 
 ## Tickets
@@ -166,7 +166,7 @@ Current tickets: `[#################---]` 258 of 297
 | S14-38 | Card and twin dashboard - running card job, card queue and running twin work with remaining time, card temperature and utilization, host CPU, refreshed every 5 minutes | Done | A local dashboard (python tools/knc_dashboard.py serve) now shows the running card job, the card queue and ... |
 | S14-39 | knc-twin prepare-native: pointer-rich captures (heap addresses sparse over tens of GB) need a relocating or multi-segment native image | Not started |  |
 | S14-41 | knc-twin prepare-native: the generated driver.c uses mfence, which the K1OM assembler rejects; emit a k1om-legal fence and add a build-and-lint test for generated programs | Not started |  |
-| S14-42 | knc-optimize skill - Intel's recommended KNC optimization method, rechecked against our sources and card data, as a portable skill other projects can use | Waiting for review | knc-optimize is a portable skill that tells any agent how to tune code for the Xeon Phi card, step by step,... |
+| S14-42 | knc-optimize skill - Intel's recommended KNC optimization method, rechecked against our sources and card data, as a portable skill other projects can use | Done | Any agent in any project can now install the knc-optimize skill, which walks through tuning code for the Xe... |
 | S2-01 | Design for zmm and mask registers under -march=knc | Done | The register design for KNC is settled on paper: all 32 zmm and 8 mask registers become usable under -march... |
 | S2-02 | Float and double arguments and results in zmm lane 0 | Done | Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`). |
 | S2-03 | Varargs with the donor's register save area | Done | Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`). |
@@ -322,6 +322,7 @@ Current tickets: `[#################---]` 258 of 297
 
 ## Recent activity
 
+- 2026-11-16 18:31 **S14-42** lead approve: Any agent in any project can now install the knc-optimize skill, which walks through tuning code for the Xeon Phi card step by step and gives each ...
 - 2026-11-16 18:03 **S14-16** lead defer: GCC build needed: build gcc16 at .work/_shared/gcc 407f1c63cc7 (branch s14/S14-16; one-hunk change, i386-knc.cc mask_to_integer/integer_to_mask 1->...
 - 2026-11-16 17:51 **S14-26** lead defer: Review passed; approve as is. Approve refused: tools/check t0 failed in tests/regress/test_knc_twin.py (selftest, trial_cases) because .work/knc-tw...
 - 2026-11-16 17:51 **S13-03** lead defer: Review passed, approve with the note: 'The M4 retrospective is written (docs/research/m4-retrospective.md): it ranks where time was lost, settles a...
@@ -329,16 +330,15 @@ Current tickets: `[#################---]` 258 of 297
 - 2026-11-16 17:42 **S14-16** engineer ask: GCC build needed at 407f1c63cc7 (lane gcc). Both GPR/mask costs raised 1->6; mask moves/memory unchanged. Baseline: all 16 mask/gather T1 tests pas...
 - 2026-11-16 17:29 **S14-42** lead answer: Yes, use the override; remove nothing. The 1090 lines are docs and skill text plus the 228-line test, which this ticket asked for, and the owner's ...
 - 2026-11-16 17:16 **S14-42** engineer ask: Submit refused: 1092 changed lines exceeds the 800-line budget; the scope-cut commit e7b4956c trims SKILL.md to 60 lines and moves existing detail ...
-- 2026-11-16 17:15 **S14-26** engineer submit: SMS bound: no-go for S14-02; five of six M4 hot loops are resource-bound at ResMII, only CG has headroom.
 
 ## Cost
 
 - From the script, engineer: 818 sessions, 1720.9M input tokens
 - From the script, lead: 563 sessions, 157.4M input tokens
-- Started by hand, Claude: 97 sessions, 4559.0M input tokens
+- Started by hand, Claude: 102 sessions, 4600.1M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 42.2 GiB of 100 GiB. 37 GiB free on the drive.
+The project uses 42.3 GiB of 100 GiB. 35 GiB free on the drive.
