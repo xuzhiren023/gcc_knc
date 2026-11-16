@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-16 04:49.
+Updated automatically at every ticket change. Last update: 2026-11-16 04:51.
 
-**Waiting for you:** S14-15, S14-18. Run `python tools/pm.py inbox`.
+**Waiting for you:** S14-15. Run `python tools/pm.py inbox`.
 
 Current tickets: `[#################---]` 244 of 280
 
@@ -146,7 +146,7 @@ Current tickets: `[#################---]` 244 of 280
 | S14-15 | knc-twin prepare-native: absolute memory operands come out as `N()` in kernel.S (k1om as 2.22 rejects them); emit them relocated into the image | **Waiting for you** | budget: 10651104 input tokens used; the budget is 10000000 |
 | S14-16 | bzip2 slower than GCC 5.1.1: mask-to-GPR move cost below a GPR move makes RA park integers in k registers (M4 known limit, must-fix) | draft |  |
 | S14-17 | Compare not folded with its load in merged return blocks (GCC 16 middle end, about half the remaining bzip2 mainGtU gap) | draft |  |
-| S14-18 | knc-twin regress: held-out replay runs under a 120 s wall-clock budget, so a slow interpreter turns a prediction into a budget_exhausted stub and the test fails as a false mismatch | **Waiting for you** | budget: 8 engineer sessions used; the budget is 8 |
+| S14-18 | knc-twin regress: held-out replay runs under a 120 s wall-clock budget, so a slow interpreter turns a prediction into a budget_exhausted stub and the test fails as a false mismatch | In progress | sessions 8 -> 10 (the budget must exceed the 8 sessions already counted for a new one to start). Only step:... |
 | S14-19 | knc-twin x87 integer-load widths - fildl reads 8 bytes (must be 4), filds reads 4 (must be 2) | Not started |  |
 | S14-20 | knc-twin: an indirect jmp/call (PLT tail call through the GOT) on a never-executed path must not refuse the whole region | Not started |  |
 | S14-21 | knc-twin multi-core: held-out validation of the 8-tile ring model against the measured GEMV, triad and core-scaling rows | Not started |  |
@@ -305,6 +305,7 @@ Current tickets: `[#################---]` 244 of 280
 
 ## Recent activity
 
+- 2026-11-16 04:51 **S14-18** owner decide: sessions 8 -> 10 (the budget must exceed the 8 sessions already counted for a new one to start). Only step: pm.py submit S14-18 with the 09:40Z not...
 - 2026-11-16 04:49 **S14-18** engineer escalate: budget: 8 engineer sessions used; the budget is 8
 - 2026-11-16 04:47 **S14-18** owner decide: sessions 6 -> 8, input_tokens 6M -> 8M: the last two sessions were consumed by budget stops before the submit could run. Only step: pm.py submit S1...
 - 2026-11-16 04:46 **S14-18** engineer escalate: budget: 6 engineer sessions used; the budget is 6
@@ -312,13 +313,12 @@ Current tickets: `[#################---]` 244 of 280
 - 2026-11-16 04:14 **S14-18** owner decide: Everything but the submit is done and checked by the lead (09:40Z and 09:50Z notes). Run pm.py submit S14-18 with the 09:40Z note's one-sentence te...
 - 2026-11-16 04:00 **S14-13** engineer submit: ecf8f69d: three review edits done. Saturation/core-budget tests PASS; logs .work/_state/logs/S14_13_channel_consistency-20261116-035939.log and S14...
 - 2026-11-16 03:59 **S14-18** engineer escalate: Required cleanup commit is blocked: git rm -r --cached knc-twin-runs fails creating shared git index lock (Permission denied at C:/Users/xuzhi/Docu...
-- 2026-11-16 03:57 **S14-18** owner decide: input_tokens 3M -> 6M under the owner's standing rule; the four steps of the 09:05Z decide stand (rm --cached knc-twin-runs and commit; red proof a...
 
 ## Cost
 
 - From the script, engineer: 762 sessions, 1626.0M input tokens
 - From the script, lead: 515 sessions, 146.8M input tokens
-- Started by hand, Claude: 14 sessions, 4155.4M input tokens
+- Started by hand, Claude: 14 sessions, 4157.2M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
