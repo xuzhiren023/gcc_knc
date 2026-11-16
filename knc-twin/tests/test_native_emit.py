@@ -14,6 +14,84 @@ PHIWEATHER = ROOT.parent.parent / "twin-study-20261116" / "sixth" / "held-out"
 
 
 class NativeEmit(unittest.TestCase):
+    def test_prepare_native_places_initialized_stack_in_image(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp = Path(tmp)
+            kernel = tmp / "stack.json"
+            kernel.write_text(json.dumps({
+                "schema": "knc-twin.kernel/1",
+                "name": "initialized-stack",
+                "init": {"registers": {"rsp": "0x2000", "rbp": "0x2008"},
+                         "memory": [{"addr": "0x2000", "u64": [7, 9]}]},
+                "streams": [{"asm": "movq (%rsp), %rax\nmovq 8(%rbp), %rbx\nret"}],
+            }), encoding="utf-8")
+            output = tmp / "output"
+            result = subprocess.run([
+                sys.executable, str(SCRIPT), "prepare-native", str(kernel),
+                "--out", str(output), "--no-check",
+            ], cwd=tmp, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
+            self.assertEqual(result.returncode, 0, result.stdout[-3000:])
+            asm = (output / "kernel.S").read_text(encoding="utf-8")
+            self.assertIn("leaq knc_twin_mem+0(%rip), %rsp", asm)
+            self.assertIn("leaq knc_twin_mem+8(%rip), %rbp", asm)
+            self.assertLess(asm.index("movq %rsp, knc_twin_saved_rsp+0(%rip)"), asm.index("leaq knc_twin_mem+0(%rip), %rsp"))
+            self.assertLess(asm.index("movq knc_twin_saved_rsp+0(%rip), %rsp"), asm.index("popq %r15"))
+            self.assertNotIn("NOTE: the region adjusts rsp", asm)
+            self.assertLess(asm.index("knc_twin_saved_rsp:\n\t.zero 8"), asm.index("knc_twin_mem:"))
+            self.assertLess(asm.rindex(".p2align 12"), asm.index("knc_twin_mem:"))
+
+    def test_prepare_native_uses_private_stack_for_external_rsp(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp = Path(tmp)
+            kernel = tmp / "stack.json"
+            kernel.write_text(json.dumps({
+                "schema": "knc-twin.kernel/1",
+                "name": "external-stack",
+                "init": {"registers": {"rsp": "0x9000"}},
+                "streams": [{"asm": "pushq %rax\npopq %rbx\nret"}],
+            }), encoding="utf-8")
+            output = tmp / "output"
+            result = subprocess.run([
+                sys.executable, str(SCRIPT), "prepare-native", str(kernel),
+                "--out", str(output), "--no-check",
+            ], cwd=tmp, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
+            self.assertEqual(result.returncode, 0, result.stdout[-3000:])
+            asm = (output / "kernel.S").read_text(encoding="utf-8")
+            self.assertIn("leaq knc_twin_stack_top_ctx0(%rip), %rsp", asm)
+            self.assertLess(asm.index(".zero 65536"), asm.index("knc_twin_stack_top_ctx0:"))
+            self.assertLess(asm.index("movq knc_twin_saved_rsp+0(%rip), %rsp"), asm.index("popq %r15"))
+
+    def test_prepare_native_uses_per_context_stack_and_saved_rsp(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp = Path(tmp)
+            kernel = tmp / "streams.json"
+            kernel.write_text(json.dumps({
+                "schema": "knc-twin.kernel/1",
+                "name": "two-external-stacks",
+                "init": {"registers": {"rsp": "0x9000"}},
+                "streams": [
+                    {"context": 0, "asm": "pushq %rax\npopq %rbx\nret"},
+                    {"context": 1, "asm": "pushq %rax\npopq %rbx\nret"},
+                ],
+            }), encoding="utf-8")
+            output = tmp / "output"
+            result = subprocess.run([
+                sys.executable, str(SCRIPT), "prepare-native", str(kernel),
+                "--out", str(output), "--no-check",
+            ], cwd=tmp, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
+            self.assertEqual(result.returncode, 0, result.stdout[-3000:])
+            asm = (output / "kernel.S").read_text(encoding="utf-8")
+            self.assertIn("movq %rsp, knc_twin_saved_rsp+0(%rip)", asm)
+            self.assertIn("movq %rsp, knc_twin_saved_rsp+8(%rip)", asm)
+            self.assertIn("movq knc_twin_saved_rsp+0(%rip), %rsp", asm)
+            self.assertIn("movq knc_twin_saved_rsp+8(%rip), %rsp", asm)
+            self.assertIn("leaq knc_twin_stack_top_ctx0(%rip), %rsp", asm)
+            self.assertIn("leaq knc_twin_stack_top_ctx1(%rip), %rsp", asm)
+            self.assertLess(asm.index(".zero 131072"), asm.index("knc_twin_stack_top_ctx0:"))
+            self.assertLess(asm.index("knc_twin_stack_top_ctx0:"), asm.index("knc_twin_stack_top_ctx1:"))
+            self.assertLess(asm.index("knc_twin_saved_rsp:"), asm.index("knc_twin_mem:"))
+            self.assertLess(asm.rindex(".p2align 12"), asm.index("knc_twin_mem:"))
+
     def test_rollup_classification_requires_candidate_held_out_band(self):
         sys.path.insert(0, str(TWIN / "scripts"))
         from knc_model.cli import rollup_result_class

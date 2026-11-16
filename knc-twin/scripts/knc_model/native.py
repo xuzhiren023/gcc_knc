@@ -75,14 +75,12 @@ def gen_kernel_asm(kernel, mem_base, mem_span):
     for stream in kernel.streams:
         fn = "knc_twin_kernel_ctx%d" % stream.context
         regs = _reg_inits(kernel, stream)
-        uses_stack = any("rsp" in insn.writes for insn in stream.insns)
-        if uses_stack:
-            out.append("# NOTE: the region adjusts rsp (push/pop/sub): the driver's own stack is used, so rsp/rbp from the kernel's init are not loaded.")
         out.append("\t.globl %s" % fn)
         out.append("\t.p2align 6")
         out.append("%s:" % fn)
         for r in CALLEE_SAVED:
             out.append("\tpushq %%%s" % r)
+        out.append("\tmovq %%rsp, knc_twin_saved_rsp+%d(%%rip)" % (8 * stream.context))
         # mask registers first (uses r11 as scratch), then zmm, then gprs
         for name, val in regs.items():
             n = name.lower()
@@ -97,12 +95,27 @@ def gen_kernel_asm(kernel, mem_base, mem_span):
                 out.append("\tvmovaps knc_twin_zmm_init+%d(%%rip), %%%s" % (64 * idx, n))
         for name, val in regs.items():
             n = name.lower()
-            if n in GPR64 and n not in ("rsp", "rbp"):
+            if n in GPR64:
                 v = parse_int(val, name)
+                if n == "rsp":
+                    continue
                 if mem_base is not None and mem_base <= v < mem_base + mem_span:
                     out.append("\tleaq knc_twin_mem+%d(%%rip), %%%s" % (v - mem_base, n))
+                elif n == "rbp":
+                    rsp_value = next((parse_int(value, "rsp") for reg, value in regs.items() if reg.lower() == "rsp"), None)
+                    if rsp_value is None or mem_base is None or not (mem_base <= rsp_value < mem_base + mem_span):
+                        out.append("\tleaq knc_twin_stack_top_ctx%d(%%rip), %%%s" % (stream.context, n))
+                    else:
+                        out.append("\tmovabsq $0x%x, %%%s" % (v & 0xFFFFFFFFFFFFFFFF, n))
                 else:
                     out.append("\tmovabsq $0x%x, %%%s" % (v & 0xFFFFFFFFFFFFFFFF, n))
+        if "rsp" in {name.lower() for name in regs}:
+            val = next(val for name, val in regs.items() if name.lower() == "rsp")
+            v = parse_int(val, "rsp")
+            if mem_base is not None and mem_base <= v < mem_base + mem_span:
+                out.append("\tleaq knc_twin_mem+%d(%%rip), %%rsp" % (v - mem_base))
+            else:
+                out.append("\tleaq knc_twin_stack_top_ctx%d(%%rip), %%rsp" % stream.context)
         out.append("# ---- kernel body (context %d) ----" % stream.context)
         def relocate_memory(insn, addr):
             if mem_base is None or not (mem_base <= addr < mem_base + mem_span):
@@ -128,6 +141,7 @@ def gen_kernel_asm(kernel, mem_base, mem_span):
         gbase = 128 * stream.context
         for i, r in enumerate(GPR64):
             out.append("\tmovq %%%s, knc_twin_gpr_out+%d(%%rip)" % (r, gbase + 8 * i))
+        out.append("\tmovq knc_twin_saved_rsp+%d(%%rip), %%rsp" % (8 * stream.context))
         kbase = 32 * stream.context
         for i in range(8):
             out.append("\tkmov %%k%d, %%eax" % i)
@@ -146,6 +160,17 @@ def gen_kernel_asm(kernel, mem_base, mem_span):
     if not zmm_tables:
         out.append("\t.zero 64")
     out.append("\t.bss")
+    out.append("\t.p2align 12")
+    slots = max(s.context for s in kernel.streams) + 1
+    out.append("\t.zero %d" % (65536 * slots))
+    for context in range(slots):
+        out.append("\t.globl knc_twin_stack_top_ctx%d" % context)
+        out.append("knc_twin_stack_top_ctx%d:" % context)
+        if context + 1 < slots:
+            out.append("\t.zero 65536")
+    out.append("\t.p2align 3")
+    out.append("\t.globl knc_twin_saved_rsp")
+    out.append("knc_twin_saved_rsp:\n\t.zero %d" % (8 * slots))
     out.append("\t.p2align 12")
     out.append("\t.globl knc_twin_mem")
     out.append("knc_twin_mem:")
@@ -384,6 +409,7 @@ def prepare_native(kernel, profile, out_dir, kernel_hash, prediction_path=None):
         "files": {"kernel.S": "generated assembly (review; build with k1om-mpss-linux-gcc)", "driver.c": "generated driver skeleton"},
         "notes": [
             "This request needs no live connection. Submit it to the shared hardware queue (gcc_knc: tools/card_run) in a lead-only benchmark window.",
+            "The generated kernel uses the initialized rsp/rbp values when they point inside knc_twin_mem; otherwise both use a private 64 KiB stack image.",
             "The driver's correctness check compares saved registers/memory to the kernel's expected values; its exit code is 6 on mismatch.",
             "Record the card_run job id, the clock policy and the MPSS version in the measurement file.",
             "Import the measurement with: knc_twin.py import-native measurement.json --request request.json --out <dir>",
