@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-16 03:23.
+Updated automatically at every ticket change. Last update: 2026-11-16 03:24.
 
-**Waiting for you:** S14-15. Run `python tools/pm.py inbox`.
+**Waiting for you:** S14-11, S14-15. Run `python tools/pm.py inbox`.
 
 Current tickets: `[#################---]` 244 of 279
 
@@ -139,7 +139,7 @@ Current tickets: `[#################---]` 244 of 279
 | S14-08 | Quantized GEMV kernels on KNC - multi-row activation reuse, FP vs int32 VPMADD231D vs VPERMD lookup table, bandwidth-normalized | draft |  |
 | S14-09 | KNC vs the Z840 host (dual E5-2690 v3) on the same algorithms and numerical contract - where running on the card actually pays | draft |  |
 | S14-10 | knc-twin: --jobs N for independent simulations and PyPy support (roadmap item 1) | In progress | No worktree needed. Export main's knc-twin into your shared dir: git -c safe.directory='*' archive main knc... |
-| S14-11 | knc-twin: close PhiWeather WRF coverage gaps (jump tables, vcvtps2pd ymm, loop-region and complete-listing modes, scatter and rcp-table import) | In progress | input_tokens 20M -> 30M under the owner's standing auto-extend rule: items A-G are committed and main is me... |
+| S14-11 | knc-twin: close PhiWeather WRF coverage gaps (jump tables, vcvtps2pd ymm, loop-region and complete-listing modes, scatter and rcp-table import) | **Waiting for you** | Submit refused: 1925 changed lines exceed budget 800. Per owner instruction, next stall goes to owner. Plea... |
 | S14-12 | knc-twin: iteration and phase sampling for loop and whole-program wall-time estimates (roadmap item 2) | lead | Review passed, ready to approve: head 7f734b23 matches the pre-review and meets brief 04's done criteria. M... |
 | S14-13 | knc-twin: 8-tile multi-core unit on the full ring with all memory controllers (roadmap item 3) | Question for the tech lead | 72b57116: 8 multicore predictions and 11 schema instances pass. HPCG branch diagnostic: all 8 variants ok; ... |
 | S14-14 | knc-twin: scheduling explorer for modulo scheduling and reordering, evaluating S14-02/S14-03 (roadmap item 4) | lead | Review passed (approve note: knc-twin gains a schedule command: beam search up to 60 instructions, list ord... |
@@ -304,6 +304,7 @@ Current tickets: `[#################---]` 244 of 279
 
 ## Recent activity
 
+- 2026-11-16 03:24 **S14-11** engineer escalate: Submit refused: 1925 changed lines exceed budget 800. Per owner instruction, next stall goes to owner. Please approve size override for completed A...
 - 2026-11-16 03:23 **S14-18** owner decide: sessions 2 -> 4 under the owner's standing auto-extend rule: the change is complete in the worktree, only the two commits, one timed t0 and the sub...
 - 2026-11-16 03:23 **S14-13** engineer ask: 72b57116: 8 multicore predictions and 11 schema instances pass. HPCG branch diagnostic: all 8 variants ok; full prediction exactly equals recorded....
 - 2026-11-16 03:22 **S14-18** engineer escalate: budget: 2 engineer sessions used; the budget is 2
@@ -311,13 +312,12 @@ Current tickets: `[#################---]` 244 of 279
 - 2026-11-16 03:20 **S14-18** engineer escalate: Targeted twin tests pass. Required tools/check t0 remains running beyond 10 minutes with an empty log, so its required under-10-minute wall-time re...
 - 2026-11-16 03:17 **S14-12** lead defer: Review passed, ready to approve: head 7f734b23 matches the pre-review and meets brief 04's done criteria. Missing: pm.py approve S14-12 ran past th...
 - 2026-11-16 03:03 **S14-12** engineer submit: Windows Python 3.8 validation: regress had only the hpcg-104 default-budget failure, tracked as S14-18; authorized focused --max-seconds 3600 match...
-- 2026-11-16 03:02 **S14-12** owner decide: input_tokens 20M -> 25M, final: the only remaining step is the submit command the 02:59 answer spells out (with --override and the three log names)...
 
 ## Cost
 
 - From the script, engineer: 751 sessions, 1620.7M input tokens
 - From the script, lead: 507 sessions, 143.7M input tokens
-- Started by hand, Claude: 14 sessions, 4139.1M input tokens
+- Started by hand, Claude: 14 sessions, 4139.3M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
