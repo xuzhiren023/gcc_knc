@@ -1,10 +1,10 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-16 07:43.
+Updated automatically at every ticket change. Last update: 2026-11-16 08:26.
 
-**Next: the tech lead, on S14-15.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: GPT-6.1, on S14-10 (knc-twin: --jobs N for independent simulations and PyPy support (roadmap item 1)).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
-Current tickets: `[#################---]` 251 of 283
+Current tickets: `[#################---]` 252 of 288
 
 ## Milestones
 
@@ -15,7 +15,7 @@ Current tickets: `[#################---]` 251 of 283
 | M2 | Useful vector target | Done | 51 of 51 tickets |
 | M3 | Runtimes | Done | 48 of 48 tickets |
 | M4 | Broad optimization | Done | 63 of 65 tickets |
-| M5 | Program corpus | In progress | 6 of 36 tickets |
+| M5 | Program corpus | In progress | 7 of 41 tickets |
 | M6 | Release | Not started | Not planned in detail yet |
 
 ## Tickets
@@ -143,7 +143,7 @@ Current tickets: `[#################---]` 251 of 283
 | S14-12 | knc-twin: iteration and phase sampling for loop and whole-program wall-time estimates (roadmap item 2) | Done | knc-twin gains sample-loop (iteration sampling with a stated spread, stopping only once the input's period ... |
 | S14-13 | knc-twin: 8-tile multi-core unit on the full ring with all memory controllers (roadmap item 3) | Done | knc-twin simulates 1-8 detailed cores on the full 61-stop ring with all memory controllers and directory sl... |
 | S14-14 | knc-twin: scheduling explorer for modulo scheduling and reordering, evaluating S14-02/S14-03 (roadmap item 4) | Done | knc-twin gains a schedule command: beam search up to 60 instructions, list ordering, modulo II, GAS export ... |
-| S14-15 | knc-twin prepare-native: absolute memory operands come out as `N()` in kernel.S (k1om as 2.22 rejects them); emit them relocated into the image | Waiting for review | prepare-native emits absolute operands relocated as knc_twin_mem+off(%rip) (InvalidInput outside the image,... |
+| S14-15 | knc-twin prepare-native: absolute memory operands come out as `N()` in kernel.S (k1om as 2.22 rejects them); emit them relocated into the image | Done | prepare-native emits absolute operands relocated into the memory image (knc_twin_mem+off(%rip)) instead of ... |
 | S14-16 | bzip2 slower than GCC 5.1.1: mask-to-GPR move cost below a GPR move makes RA park integers in k registers (M4 known limit, must-fix) | draft |  |
 | S14-17 | Compare not folded with its load in merged return blocks (GCC 16 middle end, about half the remaining bzip2 mainGtU gap) | draft |  |
 | S14-18 | knc-twin regress: held-out replay runs under a 120 s wall-clock budget, so a slow interpreter turns a prediction into a budget_exhausted stub and the test fails as a false mismatch | Done | The knc-twin held-out replay no longer runs in t0 (KNC_TWIN_HELDOUT=1 or validate_heldout.py --max-seconds ... |
@@ -153,6 +153,11 @@ Current tickets: `[#################---]` 251 of 283
 | S14-22 | card_run turn row: refreshing an open turn row must keep its place in the queue | draft |  |
 | S14-23 | knc-twin: import the window-10 scatter rows (2 threads) and settle occupancy.scatter_cycles_per_line | Not started |  |
 | S14-24 | dispatch: refuse a session up front when its worktree git dir or ticket file is not writable from the sandbox | draft |  |
+| S14-25 | knc-twin: recorded outputs carry absolute host paths (C:/Users/<name>/...); write repo-relative paths and scrub the committed records | Not started |  |
+| S14-26 | knc-twin bound for software pipelining - how much could overlapping iterations gain on the M4 hot loops (go/no-go for S14-02) | Not started |  |
+| S14-27 | knc-twin bounds: the dependency critical path charges cold lines their full miss latency, so the "lower bound" can exceed the simulation | Not started |  |
+| S14-28 | knc-twin ranking of the four quantized GEMV kernel forms on one KNC core (phase 0 of S14-08) | Not started |  |
+| S14-29 | knc-twin: schedule --block ADDR..ADDR for a straight-line block inside a function, and batch must not write a native request per candidate by default | Not started |  |
 | S2-01 | Design for zmm and mask registers under -march=knc | Done | The register design for KNC is settled on paper: all 32 zmm and 8 mask registers become usable under -march... |
 | S2-02 | Float and double arguments and results in zmm lane 0 | Done | Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`). |
 | S2-03 | Varargs with the donor's register save area | Done | Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`). |
@@ -308,6 +313,7 @@ Current tickets: `[#################---]` 251 of 283
 
 ## Recent activity
 
+- 2026-11-16 08:26 **S14-15** lead approve: prepare-native emits absolute operands relocated into the memory image (knc_twin_mem+off(%rip)) instead of the invalid N(), and rollup labels a rol...
 - 2026-11-16 07:43 **S14-15** engineer submit: prepare-native emits absolute operands relocated as knc_twin_mem+off(%rip) (InvalidInput outside the image, plain N without an image), and rollup i...
 - 2026-11-16 07:41 **S13-01** lead approve: The M4 gate runner (SSH-only transfers, launch retry, adopt, full-profile scoring) and its card_run fixes are on main; M4 passed at a 2.16x lower b...
 - 2026-11-16 07:26 **S14-15** owner decide: Owner 2026-11-16: the lead records the red evidence as an empty [red] commit and submits and merges this ticket itself (engineer budget spent)
@@ -315,16 +321,15 @@ Current tickets: `[#################---]` 251 of 283
 - 2026-11-16 06:58 **S14-19** engineer submit: x87 integer loads and stores use the right widths (filds/fists 2 bytes, fildl/fistl 4, fildq 8) and 16-bit integer arithmetic forms exist; engine 0...
 - 2026-11-16 06:57 **S14-19** lead answer: Only step: pm.py submit S14-19 with the 06:47 note, then end the session. No edits, no runs, no git commands
 - 2026-11-16 06:57 **S14-19** lead resume: lead: branch complete, merged with main; moving to the engineer for the submit
-- 2026-11-16 06:55 **S14-19** lead defer: Branch s14/S14-19 now has the real diff (merge c3949557 clean; isa.py widths, test_extended.py red-then-green, engine 0.4.0, prediction.json versio...
 
 ## Cost
 
-- From the script, engineer: 770 sessions, 1632.3M input tokens
+- From the script, engineer: 772 sessions, 1635.7M input tokens
 - From the script, lead: 522 sessions, 148.0M input tokens
-- Started by hand, Claude: 14 sessions, 4211.6M input tokens
+- Started by hand, Claude: 14 sessions, 4231.2M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 40.6 GiB of 100 GiB. 69 GiB free on the drive.
+The project uses 40.8 GiB of 100 GiB. 64 GiB free on the drive.
