@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-16 14:08.
+Updated automatically at every ticket change. Last update: 2026-11-16 14:09.
 
 **Next: the tech lead, on S14-33.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
@@ -333,7 +333,7 @@ Current tickets: `[#################---]` 256 of 296
 ## Cost
 
 - From the script, engineer: 807 sessions, 1689.9M input tokens
-- From the script, lead: 551 sessions, 154.7M input tokens
+- From the script, lead: 552 sessions, 154.9M input tokens
 - Started by hand, Claude: 50 sessions, 4392.2M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
