@@ -1,18 +1,24 @@
-# S14-26: software-pipelining bound, incomplete
+# S14-26: software-pipelining static bound: no-go
 
-Evidence date: 2026-11-16. **No-go for starting S14-02 on the available
-evidence; the quantitative decision remains blocked.** Six current public-corpus
+Evidence date: 2026-11-16. **No-go for S14-02: five of six selected M4 hot loops
+have no SMS headroom under the static model, so fewer than two programs can
+reach the required 5% whole-program bound.** For the selected static bodies,
+the optimistic SMS cap is `1 - MII/max(MII, CP)`, where CP is the static-body
+critical path and `MII = max(ResMII, RecMII)`. GEMM, Jacobi, heat, MG and zlib
+have CP <= ResMII, giving a 0% cap; context spacing dominates their resources.
+Only CG has headroom: `1 - 12/16 = 25%` of its loop, or about 21% multiplied
+by its historical PC share. These are static upper bounds under the stated
+model assumptions, not predictions or measured gains; the historical shares
+are unqualified for current whole-program timing. Six current public-corpus
 objects were compiled with the installed GCC-KNC at `-O2 -march=knc`, and all six
 selected innermost regions converted with `from_binary.py --loop`. Static loop
-bounds succeeded. However, two actual modulo attempts (GEMM and Jacobi) returned
+bounds succeeded. Two actual modulo attempts (GEMM and Jacobi) returned
 `unsupported: explored region contains an interior label`: the binary adapter
 labels every instruction, while the scheduling explorer rejects interior labels.
 Neither attempt produced an II, register-pressure estimate, candidate, or result
-class. Thus the required >=5% whole-program bound on two programs is **not
-established**, rather than disproved. No labels or instructions were removed to
-work around an unsupported result. Real-trace simulation and rollup remain unrun;
-substituting adapter live-in zeros or an unchanged baseline as a modulo candidate
-would not answer the ticket. The two-failure rule requires a question to the lead.
+class. These unsupported results remain evidence; no labels or instructions were
+removed. Per the lead's 2026-11-16 answer, the static caps decide this ticket:
+no further modulo attempt, simulation, rollup or twin change is needed.
 
 ## Model
 
@@ -27,17 +33,20 @@ were read. The compile recipe is `tools/s14_26_sms_bound.py`.
 The installed driver reports GCC 16.2.0; its exact compiler commit is not
 established by that version string. No current-checkout commit is substituted.
 
-| Program; function; object-relative head | Body instructions | ResMII | RecMII | MII | Static critical path | Today's simulated cycles/iteration | Modulo II / register pressure | Status / result_class |
-| --- | ---: | ---: | ---: | ---: | ---: | --- | --- | --- |
-| PB-gemm; main; 0x9c8 | 10 | 10 | 1 | 10 | 10 | unknown, not run | unavailable / unavailable | bounds: ok / conditional_bound; modulo: unsupported / absent |
-| PB-jacobi-2d; main; 0x250 | 123 | 210 | 2 | 210 | 27 | unknown, not run | unavailable / unavailable | bounds: ok / conditional_bound; modulo: unsupported / absent |
-| PB-heat-3d; main; 0x660 | 29 | 48 | 1 | 48 | 30 | unknown, not run | not run / not run | bounds: ok / conditional_bound |
-| NPB-MG; resid_; 0x6470 | 21 | 32 | 1 | 32 | 22 | unknown, not run | not run / not run | bounds: ok / conditional_bound |
-| NPB-CG; conj_grad_; 0x10c8 | 8 | 8 | 12 | 12 | 16 | unknown, not run | not run / not run | bounds: ok / conditional_bound |
-| zlib; slide_hash; 0x58 | 10 | 10 | 3 | 10 | 6 | unknown, not run | not run / not run | bounds: ok / conditional_bound |
+| Program; function; object-relative head | Body instructions | ResMII | RecMII | MII | Static critical path (CP) | SMS cap = 1 - MII/max(MII, CP) (static upper bound) | cap x historical share (upper bound, unqualified share; static) | Today's simulated cycles/iteration | Modulo II / register pressure | Status / result_class |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | --- | --- | --- |
+| PB-gemm; main; 0x9c8 | 10 | 10 | 1 | 10 | 10 | 0% | 0% | unknown, not run | unavailable / unavailable | bounds: ok / conditional_bound; modulo: unsupported / absent |
+| PB-jacobi-2d; main; 0x250 | 123 | 210 | 2 | 210 | 27 | 0% | 0% | unknown, not run | unavailable / unavailable | bounds: ok / conditional_bound; modulo: unsupported / absent |
+| PB-heat-3d; main; 0x660 | 29 | 48 | 1 | 48 | 30 | 0% | 0% | unknown, not run | not run / not run | bounds: ok / conditional_bound |
+| NPB-MG; resid_; 0x6470 | 21 | 32 | 1 | 32 | 22 | 0% | 0% | unknown, not run | not run / not run | bounds: ok / conditional_bound |
+| NPB-CG; conj_grad_; 0x10c8 | 8 | 8 | 12 | 12 | 16 | 25% | 21.060% | unknown, not run | not run / not run | bounds: ok / conditional_bound |
+| zlib; slide_hash; 0x58 | 10 | 10 | 3 | 10 | 6 | 0% | 0% | unknown, not run | not run / not run | bounds: ok / conditional_bound |
 
-All numbers above are exactly the successful `bounds --loop --trace-source
-static` outputs. The zlib body has an internal conditional branch: the twin
+The cycle counts and instruction counts above are exactly the successful
+`bounds --loop --trace-source static` outputs; the cap columns are derived
+using the lead's specified static formula. The share-weighted cap is fractional
+program-time reduction, not a speedup factor or a rollup result. The zlib body
+has an internal conditional branch: the twin
 explicitly charges **both arms** in its static-body basis and says a dynamic
 iteration that skips an arm can be shorter. Its MII must not be treated as a
 universal bound on actual dynamic iterations. The chosen dense bodies are vector
@@ -53,7 +62,7 @@ The other bodies were not passed to modulo after the second failed attempt.
 | Recurrence | maximum modeled circuit latency/distance | same, `prediction.rec_mii` | 1 / 2 / 1 / 1 / 12 / 3 |
 | T_lb | max(ResMII, ceil(RecMII)) under stated static-body assumptions | same, `prediction.mii_cycles_per_iteration` | 10 / 210 / 48 / 32 / 12 / 10 |
 | T_pred; T_meas; utilization | unknown; no faithful live-in/input snapshot supplied for these selected current regions, no matching per-body measurement | adapter `provenance.live_in_registers_placeholders`; historical PC profiles below | unknown for every body |
-| Candidate gain; program gain | needs valid baseline cycles, achieved II, pressure and qualified share | modulo attempts did not produce a candidate | unknown for every program |
+| Achieved candidate gain; program prediction | needs valid baseline cycles, achieved II, pressure and qualified share | modulo attempts did not produce a candidate | unknown for every program |
 
 The machine input is `docs/research/knc-machine.yaml`, notably
 `thread_issue_interval` (V; R01 pp.19,23-24 and R17 slides 10-14;
@@ -64,8 +73,9 @@ No unknown transfer rate was filled in. The bounds do not use a trace's
 `dependency_critical_path` cold-start estimate.
 
 T_lb/T_meas, T_pred/T_meas and every term's T_i/T_meas are unknown, since no
-matched loop-cycle measurement exists here. A speculative regional speedup and
-Amdahl cap are not asserted. The 30% unvalidated-shape decision caution in the
+matched loop-cycle measurement exists here. The static upper bounds do not
+establish an achieved regional speedup or a whole-program prediction. The 30%
+unvalidated-shape decision caution in the
 handoff remains applicable; no candidate ranking or hardware win is claimed.
 
 ## Profile evidence and why no rollup is reported
@@ -75,8 +85,9 @@ run was started. They locate hot bodies but are conditional CPU-PC shares, not
 automatically whole-program wall-time shares. Historical addresses below are
 distinct from today's object-relative addresses above. Several profiles fail
 their own sample qualification. MG has only the OpenMP profile in the inspected
-batch, whereas today's selected object is serial. These are leads for obtaining
-matching shares, not values silently fed to rollup.
+batch, whereas today's selected object is serial. These shares are used
+explicitly only for the unqualified historical
+share-weighted static upper-bound column, not fed to rollup.
 
 | Program | Historical hot region / available PC share | Qualification |
 | --- | --- | --- |
@@ -138,7 +149,18 @@ Run logs under `.work/_state/logs/`:
 * `S14_26_modulo_gemm-20261116-135817.log`: FAIL, twin exit 3, unsupported interior label.
 * `S14_26_modulo_jacobi-20261116-135820.log`: FAIL, twin exit 3, same unsupported status.
 
-Lead question: should this ticket close as unsupported/no-go evidence, or wait
-for a twin fix accepting unreferenced adapter labels, matching loop inputs/shares,
-and an approved way to roll up hypothetical modulo II? A successful reorder-only
-rollup would not establish the requested overlapped-program bound.
+## Verdict
+
+**No-go for S14-02**, following the lead's 2026-11-16 static-bound decision.
+Overlapping iterations can at best reduce `max(MII, CP)` to MII under this
+model. GEMM, Jacobi, heat, MG and zlib are resource-bound at ResMII and have
+no latency left to hide by SMS. A slower current schedule would leave a list
+scheduling opportunity, not additional SMS headroom in this accounting. CG
+alone has a 25% loop cap and a 21.060% historical-share-weighted cap under the
+optimistic L1 scenario; its real limit is the indexed loads. The historical
+PC share is unqualified for current whole-program time, so this is an upper
+bound under those assumptions, not a prediction. Even granting CG that full
+headroom, only one program can reach 5%, below the required two. Zlib's cap
+retains the static both-arms qualification above. The unsupported modulo
+results and reproducer stand; simulation and rollup remain unrun as directed.
+No GCC change, GCC build or card run was performed.
