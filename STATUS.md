@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-16 01:13.
+Updated automatically at every ticket change. Last update: 2026-11-16 01:22.
 
 **Next: the tech lead, on S13-01.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
@@ -313,7 +313,7 @@ Current tickets: `[#################---]` 244 of 277
 
 ## Cost
 
-- From the script, engineer: 735 sessions, 1586.0M input tokens
+- From the script, engineer: 736 sessions, 1586.0M input tokens
 - From the script, lead: 499 sessions, 141.9M input tokens
 - Started by hand, Claude: 14 sessions, 4097.6M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
@@ -321,4 +321,4 @@ Current tickets: `[#################---]` 244 of 277
 
 ## Disk
 
-The project uses 40.7 GiB of 100 GiB. 80 GiB free on the drive.
+The project uses 40.7 GiB of 100 GiB. 75 GiB free on the drive.
