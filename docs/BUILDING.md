@@ -90,10 +90,11 @@ mkdir -p .work/_shared/gcc-build && cd .work/_shared/gcc-build
 make -j8 all-gcc CFLAGS='-O2 -g1' CXXFLAGS='-O2 -g1'
 ```
 
-- **(not yet run)** This configure, without `--with-as`, `--with-ld` and `--with-sysroot`, has
-  not run on any host yet. The project has only built with the binutils and sysroot of
-  section 3.1. Without an assembler, GCC's configure cannot probe assembler features and uses
-  its defaults, so the assembly may differ slightly from a full build's. See section 5.
+- This ran on the Windows host with `--enable-languages=c`, with no k1om binutils on `PATH`
+  and no sysroot (section 5). **(not yet run on Linux)**
+- Without an assembler, configure cannot probe assembler features and uses its defaults. The
+  instructions are the same as a full build's; only directives and local label numbers differ
+  (`.align` for `.p2align`, and `.LCFI` labels with a separate unwind table for `.cfi_*`).
 - `-O2 -g1` makes the compiler build faster and smaller than GCC's default `-O2 -g`.
 - Use `--enable-languages=c` for the fastest build if you need only C.
 
@@ -112,8 +113,8 @@ grep -E 'zmm' kernels.s | head
 ```
 
 `xgcc -B./gcc/` runs the compiler from the build tree without installing it. Look for IMCI
-instructions on `zmm` registers, such as `vfmadd231ps`. Pending: this example has not yet been
-checked on a fresh-clone build (section 5). [USING.md](USING.md) has more examples. A file that includes system headers
+instructions on `zmm` registers, such as `vfmadd231ps`; [USING.md](USING.md) shows the loop
+this example gives and has more examples. A file that includes system headers
 (`stdio.h`, `math.h`) needs the sysroot, or `-isystem` pointing at a copy of the card's
 `usr/include`.
 
@@ -243,14 +244,29 @@ The same configure by hand, from Cygwin `bash`, is section 3.1 with `/cygdrive/c
 
 ## 5. Fresh-clone check
 
-**Pending: build verification after M4.** A build from a fresh clone, with IMCI assembly from
-it, is not recorded yet. What has run so far, on the Windows host, 2026-11-15:
+Both paths were built from a fresh clone of the fork (`knc` `b2ce6a9eebf`) on the Windows host,
+2026-11-15 and 16, with the project's Cygwin toolchain. Both produce IMCI assembly.
 
-- `git clone -c core.autocrlf=false --branch knc` of the fork: about 1.5 minutes. Without
-  `core.autocrlf=false`, Git for Windows checked out CRLF files and `configure` failed.
-- Configure as in section 3.1: 62 s.
-- `make -j8 all-gcc` did not finish. The first run stopped in `libcody` with a Cygwin fork
-  failure ("Resource temporarily unavailable", 0xC000012D) while other jobs loaded the host.
-  Later runs were stopped on purpose, to keep the host free for card measurements. On a shared
-  host, use `-j4`.
-- The minimal configure of section 2.2 has not run.
+```sh
+git clone -c core.autocrlf=false --branch knc --single-branch <fork> gcc     # about 1.5 min
+```
+
+Without `core.autocrlf=false`, Git for Windows checked out CRLF files and `configure` failed.
+
+| | Full configure (section 3.1, all four languages) | Minimal configure (section 2.2, `--enable-languages=c`) |
+|---|---|---|
+| binutils, sysroot | `cross/bin` on `PATH`, `--with-as`, `--with-ld`, `--with-sysroot` | none; `cygwin/bin` only on `PATH` |
+| `configure` | 62 s | 284 s (host busy) |
+| `make all-gcc` | finished in 1,672 s at `nice -j4`, resuming two interrupted runs | 9,256 s at `nice -j4`, one run, below-normal priority on a shared host |
+| `xgcc -B gcc/ -O2 -march=knc -S kernels.c` | 207 lines with `zmm`; `tools/knc_lint` exit 0 | the same instructions, directives differ (2.2); assembles with binutils 2.22, `tools/knc_lint` exit 0 |
+
+`kernels.c` held saxpy, a `float` sum and a 3-point stencil. Saxpy and the stencil vectorize
+with `vfmadd231ps`/`vfmadd213ps` on `zmm`, `vloadunpack*`/`vpackstore*`, `vprefetch0`/`1`, and
+masked `vgatherdps`/`vscatterdps` tails. The sum stays x87 at `-O2`, as
+[USING.md](USING.md) explains.
+
+- The first `make -j8` stopped in `libcody` with a Cygwin fork failure ("Resource temporarily
+  unavailable", 0xC000012D) while other jobs loaded the host. On a shared host, use `-j4` and a
+  lower priority.
+- The times are from a busy host and are not benchmarks. An unloaded `-j8` C-only build took
+  1,392 s (S1-07).
