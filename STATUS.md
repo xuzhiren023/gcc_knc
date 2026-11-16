@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-16 03:55.
+Updated automatically at every ticket change. Last update: 2026-11-16 03:56.
 
 **Waiting for you:** S14-13, S14-15. Run `python tools/pm.py inbox`.
 
@@ -146,7 +146,7 @@ Current tickets: `[#################---]` 244 of 279
 | S14-15 | knc-twin prepare-native: absolute memory operands come out as `N()` in kernel.S (k1om as 2.22 rejects them); emit them relocated into the image | **Waiting for you** | budget: 10651104 input tokens used; the budget is 10000000 |
 | S14-16 | bzip2 slower than GCC 5.1.1: mask-to-GPR move cost below a GPR move makes RA park integers in k registers (M4 known limit, must-fix) | draft |  |
 | S14-17 | Compare not folded with its load in merged return blocks (GCC 16 middle end, about half the remaining bzip2 mainGtU gap) | draft |  |
-| S14-18 | knc-twin regress: held-out replay runs under a 120 s wall-clock budget, so a slow interpreter turns a prediction into a budget_exhausted stub and the test fails as a false mismatch | Question for the tech lead | Proceed without rewriting commits, as the 09:00Z lead note says: (1) git rm -r --cached knc-twin-runs and c... |
+| S14-18 | knc-twin regress: held-out replay runs under a 120 s wall-clock budget, so a slow interpreter turns a prediction into a budget_exhausted stub and the test fails as a false mismatch | In progress | Already settled by the 03:55 decide; no history rewrite needed. On the current branch: (1) git rm -r --cach... |
 | S14-19 | knc-twin x87 integer-load widths - fildl reads 8 bytes (must be 4), filds reads 4 (must be 2) | Not started |  |
 | S14-20 | knc-twin: an indirect jmp/call (PLT tail call through the GOT) on a never-executed path must not refuse the whole region | Not started |  |
 | S2-01 | Design for zmm and mask registers under -march=knc | Done | The register design for KNC is settled on paper: all 32 zmm and 8 mask registers become usable under -march... |
@@ -304,6 +304,7 @@ Current tickets: `[#################---]` 244 of 279
 
 ## Recent activity
 
+- 2026-11-16 03:56 **S14-18** lead answer: Already settled by the 03:55 decide; no history rewrite needed. On the current branch: (1) git rm -r --cached knc-twin-runs, add knc-twin-runs/ to ...
 - 2026-11-16 03:55 **S14-18** owner decide: Proceed without rewriting commits, as the 09:00Z lead note says: (1) git rm -r --cached knc-twin-runs and commit; (2) prove the red in the submit n...
 - 2026-11-16 03:54 **S14-18** engineer escalate: HEAD 105ac991 includes code/docs and committed knc-twin-runs output; worktree is clean, so no green changes remain to commit. pm.py ask was refused...
 - 2026-11-16 03:54 **S14-13** lead escalate: over 2 review rounds: Engine, protocol tests and staging are good; the brief's main done criterion (held-out rows of step 7 reproduced within bands...
@@ -311,13 +312,12 @@ Current tickets: `[#################---]` 244 of 279
 - 2026-11-16 03:52 **S14-18** owner decide: sessions 4 -> 6 under the owner's standing auto-extend rule: the [red] commit is in (105ac991); commit the green (code and docs) next, run t0 once ...
 - 2026-11-16 03:51 **S14-18** engineer escalate: budget: 4 engineer sessions used; the budget is 4
 - 2026-11-16 03:51 **S14-13** engineer submit: Prior unit/selftest/trial, 8 predictions and 11 schema checks passed; logs: knc-twin/references/multicore-design.md. Pending: HPCG-104 regress fail...
-- 2026-11-16 03:50 **S14-13** lead answer: Both gates are resolved: main is merged into s14/S14-13 (8fdc95a8, clean) and the size override is approved; sessions are 11 for this submit only. ...
 
 ## Cost
 
 - From the script, engineer: 758 sessions, 1624.7M input tokens
 - From the script, lead: 513 sessions, 145.9M input tokens
-- Started by hand, Claude: 14 sessions, 4146.8M input tokens
+- Started by hand, Claude: 14 sessions, 4147.1M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
