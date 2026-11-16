@@ -131,3 +131,4 @@ prefix/fence cost and scatter occupancy); nothing gets a silent default. Sensiti
 - `references/analytic-scales.md` pair and card scenario formulas and assumptions
 - `references/sources.md` which claims each source supports
 - `references/gcc-pipeline-mapping.md` relation to GCC's `knc.md` pipeline description
+- `references/handoff-prompt.md` a prompt that tells another agent what the twin does and its one good use
