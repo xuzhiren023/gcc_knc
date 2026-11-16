@@ -83,10 +83,14 @@ A ticket that makes code or a compiler heuristic faster follows `.claude/skills/
 come from `docs/research/knc-machine.yaml`, never from memory. For a loop or kernel on one core, get the
 bound and the prediction from knc-twin (`knc-twin/SKILL.md`, `python knc-twin/scripts/knc_twin.py`;
 `from_gcc_s.py` reads our `.s` output). Report its status, assumptions and unsupported forms as it prints
-them; a twin cycle count is a prediction, never a measurement. On compiled loops it is currently 12-32% off
-and can rank close variants wrongly (docs/research/knc-twin-trial.md): use it for bounds, mechanisms and large
-differences, never to choose between variants within about 30%; those are decided on the card. Put the Model table in the ticket note or the
-research note before the first timed run. Not for correctness, ABI or build tickets.
+them; a twin cycle count is a prediction, never a measurement. On the 105 held-out compiled loops of knc-twin 0.4
+the median error is 3.1% and the worst 17.9%, and it picked the right winner in 39 of 39 pairs more than 5% apart
+(knc-twin/references/validation.md). Those loops come from HPCG and one sparse microbenchmark family, so any other
+loop shape is still an estimate (the 0.3 trial in docs/research/knc-twin-trial.md found 12-32% error). Use it for
+bounds, mechanisms and large differences, never to choose between variants within about 20%; those are decided on
+the card. Until ticket S14-27 lands, `bounds` dependency_critical_path on a trace is a cold-start estimate, not a
+floor. Put the Model table in the ticket note or the research note before the first timed run. Not for
+correctness, ABI or build tickets.
 
 ## Report results as they are
 
