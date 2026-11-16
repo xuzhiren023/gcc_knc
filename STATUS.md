@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-16 01:44.
+Updated automatically at every ticket change. Last update: 2026-11-16 01:46.
 
-**Next: the tech lead, on S13-01.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Waiting for you:** S14-15. Run `python tools/pm.py inbox`.
 
 Current tickets: `[#################---]` 244 of 279
 
@@ -143,7 +143,7 @@ Current tickets: `[#################---]` 244 of 279
 | S14-12 | knc-twin: iteration and phase sampling for loop and whole-program wall-time estimates (roadmap item 2) | In progress | Skip the rebase: main has no knc-twin or tests/regress change since your base aced5f9d, so the lead merges ... |
 | S14-13 | knc-twin: 8-tile multi-core unit on the full ring with all memory controllers (roadmap item 3) | In progress | (1) Schema: offline, in memory only: s = json.load(kernel.schema.json); s.pop('$id'); jsonschema.Draft7Vali... |
 | S14-14 | knc-twin: scheduling explorer for modulo scheduling and reordering, evaluating S14-02/S14-03 (roadmap item 4) | In progress | Merged main into s14/S14-14 (9b699730, no conflicts), so the submit check passes. The 120 s budget_exhauste... |
-| S14-15 | knc-twin prepare-native: absolute memory operands come out as `N()` in kernel.S (k1om as 2.22 rejects them); emit them relocated into the image | In progress | Commit the cleanup yourself as a new commit on s14/S14-15 (do not amend e443bf8f): stage only the test file... |
+| S14-15 | knc-twin prepare-native: absolute memory operands come out as `N()` in kernel.S (k1om as 2.22 rejects them); emit them relocated into the image | **Waiting for you** | budget: 6 engineer sessions used; the budget is 6 |
 | S14-16 | bzip2 slower than GCC 5.1.1: mask-to-GPR move cost below a GPR move makes RA park integers in k registers (M4 known limit, must-fix) | draft |  |
 | S14-17 | Compare not folded with its load in merged return blocks (GCC 16 middle end, about half the remaining bzip2 mainGtU gap) | draft |  |
 | S14-18 | knc-twin regress: held-out replay runs under a 120 s wall-clock budget, so a slow interpreter turns a prediction into a budget_exhausted stub and the test fails as a false mismatch | Not started |  |
@@ -304,6 +304,7 @@ Current tickets: `[#################---]` 244 of 279
 
 ## Recent activity
 
+- 2026-11-16 01:46 **S14-15** engineer escalate: budget: 6 engineer sessions used; the budget is 6
 - 2026-11-16 01:43 **S14-13** lead answer: (1) Schema: offline, in memory only: s = json.load(kernel.schema.json); s.pop('$id'); jsonschema.Draft7Validator(s).validate(instance). The only re...
 - 2026-11-16 01:41 **S14-15** lead answer: Commit the cleanup yourself as a new commit on s14/S14-15 (do not amend e443bf8f): stage only the test file change removing the validated rollup in...
 - 2026-11-16 01:39 **S14-13** engineer ask: f4a8f1d6: 3 native skeletons staged under .work/_shared/S14-13/native; ring-distance needs-driver. Selftest/trial PASS; regress FAIL only HPCG-104 ...
@@ -311,7 +312,6 @@ Current tickets: `[#################---]` 244 of 279
 - 2026-11-16 01:32 **S14-15** owner decide: sessions 4 -> 6 under the owner's standing auto-extend rule: green is committed (e443bf8f); selftest, regress and submit remain
 - 2026-11-16 01:31 **S14-15** lead escalate: budget: 4 engineer sessions used; the budget is 4
 - 2026-11-16 01:30 **S14-11** lead answer: Lead merged main into s14/S14-11 (a merge, not a rebase: the worktree cannot create rebase state, and a merge is what the submit check needs). The ...
-- 2026-11-16 01:29 **S14-15** lead answer: Remove the end-to-end validated-shape rollup assertion. The factored result_class unit test (held-out band_basis with a candidate -> calibrated; ra...
 
 ## Cost
 
