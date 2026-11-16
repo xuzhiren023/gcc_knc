@@ -84,9 +84,11 @@ project.
 
 ## Licence
 
-- **This repository:** licence to be decided by the owner. Until then, no licence is granted.
-  Third-party code in `contrib/knc-vecmath` keeps its own licence files (Arm optimized-routines:
-  MIT or Apache-2.0 with LLVM exception; musl: MIT).
+- **This repository:** the project's own code, tests, docs and `knc-twin` are licensed under the
+  Apache License 2.0 ([LICENSE](LICENSE)).
+- **Third-party files** keep their own licences. In `contrib/knc-vecmath` these are the Arm
+  optimized-routines licence (MIT or Apache-2.0 with LLVM exception) and the musl licence (MIT),
+  as listed in its [PROVENANCE.md](contrib/knc-vecmath/PROVENANCE.md).
 - **The GCC fork:** GPL-3.0-or-later, with the GCC Runtime Library Exception for the runtime
   libraries, as upstream GCC.
 
