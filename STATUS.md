@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-16 18:50.
+Updated automatically at every ticket change. Last update: 2026-11-16 18:51.
 
 **Next: the tech lead, on S13-03.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
@@ -144,7 +144,7 @@ Current tickets: `[#################---]` 260 of 297
 | S14-13 | knc-twin: 8-tile multi-core unit on the full ring with all memory controllers (roadmap item 3) | Done | knc-twin simulates 1-8 detailed cores on the full 61-stop ring with all memory controllers and directory sl... |
 | S14-14 | knc-twin: scheduling explorer for modulo scheduling and reordering, evaluating S14-02/S14-03 (roadmap item 4) | Done | knc-twin gains a schedule command: beam search up to 60 instructions, list ordering, modulo II, GAS export ... |
 | S14-15 | knc-twin prepare-native: absolute memory operands come out as `N()` in kernel.S (k1om as 2.22 rejects them); emit them relocated into the image | Done | prepare-native emits absolute operands relocated into the memory image (knc_twin_mem+off(%rip)) instead of ... |
-| S14-16 | bzip2 slower than GCC 5.1.1: mask-to-GPR move cost below a GPR move makes RA park integers in k registers (M4 known limit, must-fix) | lead | GCC build needed: build gcc16 at .work/_shared/gcc 407f1c63cc7 (branch s14/S14-16; one-hunk change, i386-kn... |
+| S14-16 | bzip2 slower than GCC 5.1.1: mask-to-GPR move cost below a GPR move makes RA park integers in k registers (M4 known limit, must-fix) | Question for the tech lead | GCC built by the lead at 407f1c63cc7 (log .work/_state/logs/S14_16_gcc_build-20261116-184244.log, exit 0). ... |
 | S14-17 | Compare not folded with its load in merged return blocks (GCC 16 middle end, about half the remaining bzip2 mainGtU gap) | draft |  |
 | S14-18 | knc-twin regress: held-out replay runs under a 120 s wall-clock budget, so a slow interpreter turns a prediction into a budget_exhausted stub and the test fails as a false mismatch | Done | The knc-twin held-out replay no longer runs in t0 (KNC_TWIN_HELDOUT=1 or validate_heldout.py --max-seconds ... |
 | S14-19 | knc-twin x87 integer-load widths - fildl reads 8 bytes (must be 4), filds reads 4 (must be 2) | Done | The knc-twin now reads and writes x87 integer memory at the right widths (filds/fists 2 bytes, fildl/fistl ... |
@@ -322,6 +322,7 @@ Current tickets: `[#################---]` 260 of 297
 
 ## Recent activity
 
+- 2026-11-16 18:51 **S14-16** lead resume: GCC built by the lead at 407f1c63cc7 (log .work/_state/logs/S14_16_gcc_build-20261116-184244.log, exit 0). Continue: T1 green (tests/t1/knc-scalar-...
 - 2026-11-16 18:50 **S13-03** lead resume: lead approves
 - 2026-11-16 18:49 **S14-26** lead approve: SMS bound: no-go for S14-02; five of six M4 hot loops are resource-bound at ResMII, only CG has headroom. Machine check: tools/check t0 passed.
 - 2026-11-16 18:32 **S14-26** lead resume: lead approves
@@ -329,13 +330,12 @@ Current tickets: `[#################---]` 260 of 297
 - 2026-11-16 18:03 **S14-16** lead defer: GCC build needed: build gcc16 at .work/_shared/gcc 407f1c63cc7 (branch s14/S14-16; one-hunk change, i386-knc.cc mask_to_integer/integer_to_mask 1->...
 - 2026-11-16 17:51 **S14-26** lead defer: Review passed; approve as is. Approve refused: tools/check t0 failed in tests/regress/test_knc_twin.py (selftest, trial_cases) because .work/knc-tw...
 - 2026-11-16 17:51 **S13-03** lead defer: Review passed, approve with the note: 'The M4 retrospective is written (docs/research/m4-retrospective.md): it ranks where time was lost, settles a...
-- 2026-11-16 17:50 **S14-42** engineer submit: knc-optimize is a portable skill that tells any agent how to tune code for the Xeon Phi card, step by step, with each Intel practice checked agains...
 
 ## Cost
 
 - From the script, engineer: 818 sessions, 1720.9M input tokens
 - From the script, lead: 564 sessions, 157.6M input tokens
-- Started by hand, Claude: 106 sessions, 4619.4M input tokens
+- Started by hand, Claude: 106 sessions, 4619.9M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
