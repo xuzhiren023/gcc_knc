@@ -1,10 +1,10 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-15 23:45.
+Updated automatically at every ticket change. Last update: 2026-11-15 23:47.
 
 **Next: the tech lead, on S14-13.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
-Current tickets: `[#################---]` 244 of 273
+Current tickets: `[#################---]` 244 of 274
 
 ## Milestones
 
@@ -15,7 +15,7 @@ Current tickets: `[#################---]` 244 of 273
 | M2 | Useful vector target | Done | 51 of 51 tickets |
 | M3 | Runtimes | Done | 48 of 48 tickets |
 | M4 | Broad optimization | In progress | 62 of 65 tickets |
-| M5 | Program corpus | In progress | 0 of 26 tickets |
+| M5 | Program corpus | In progress | 0 of 27 tickets |
 | M6 | Release | Not started | Not planned in detail yet |
 
 ## Tickets
@@ -143,6 +143,7 @@ Current tickets: `[#################---]` 244 of 273
 | S14-12 | knc-twin: iteration and phase sampling for loop and whole-program wall-time estimates (roadmap item 2) | In progress | Yes, run the full knc-twin selftest and tests/regress/test_knc_twin.py now, one at a time, single-threaded ... |
 | S14-13 | knc-twin: 8-tile multi-core unit on the full ring with all memory controllers (roadmap item 3) | Question for the tech lead | Partial commit 4057b79b; two failed attempts. Background rounding fixed; conservation passes. Contention re... |
 | S14-14 | knc-twin: scheduling explorer for modulo scheduling and reordering, evaluating S14-02/S14-03 (roadmap item 4) | In progress | M4 is not finished (62 of 65) and the card may be in a timed block, but you do not need idle clearance for ... |
+| S14-15 | knc-twin prepare-native: absolute memory operands come out as `N()` in kernel.S (k1om as 2.22 rejects them); emit them relocated into the image | Not started |  |
 | S2-01 | Design for zmm and mask registers under -march=knc | Done | The register design for KNC is settled on paper: all 32 zmm and 8 mask registers become usable under -march... |
 | S2-02 | Float and double arguments and results in zmm lane 0 | Done | Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`). |
 | S2-03 | Varargs with the donor's register save area | Done | Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`). |
@@ -310,8 +311,8 @@ Current tickets: `[#################---]` 244 of 273
 ## Cost
 
 - From the script, engineer: 726 sessions, 1539.6M input tokens
-- From the script, lead: 491 sessions, 140.0M input tokens
-- Started by hand, Claude: 14 sessions, 4048.1M input tokens
+- From the script, lead: 492 sessions, 140.1M input tokens
+- Started by hand, Claude: 14 sessions, 4053.1M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
