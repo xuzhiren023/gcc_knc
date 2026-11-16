@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-16 10:55.
+Updated automatically at every ticket change. Last update: 2026-11-16 10:56.
 
 **Waiting for you:** S14-38. Run `python tools/pm.py inbox`.
 
@@ -161,7 +161,7 @@ Current tickets: `[#################---]` 253 of 295
 | S14-30 | WRF built with GCC-KNC runs 1.21x slower per step than PhiWeather's production build - attribute the gap per cause before fixing (M5, owner rule) | draft |  |
 | S14-31 | knc-twin multi-core usability: compare across scales, stubs and repeated calls at unit/ring scale, multi-context sampling, separated ring/memory stall shares | Not started |  |
 | S14-33 | knc-twin: import the window-11 calibration rows (imci-math latency and throughput, div10, x87 fcoms, rcp23/rsqrt23 tables) and retire the assumed parameters they settle | Not started |  |
-| S14-35 | knc-twin prepare-native: the generated native program for PhiWeather's sixth_order_diffusion kernels segfaults on the card (exit 139 under claude-pin); find the cause, fix the generator, restage | Question for the tech lead | Lead follow-up at 10:51 identified a remaining wrapper stack bug after the ticket was submitted: saved driv... |
+| S14-35 | knc-twin prepare-native: the generated native program for PhiWeather's sixth_order_diffusion kernels segfaults on the card (exit 139 under claude-pin); find the cause, fix the generator, restage | In progress | Yes, authorized: this is the requested-changes round of the same ticket. Commit the native.py fix and the t... |
 | S14-37 | knc-twin x87 double rounding: _x87_binop rounds to the 64-bit significand and then to PC=53/24; real x87 rounds once (knc-boinc repro, 1 to 8 ULP errors) | Not started |  |
 | S14-38 | Card and twin dashboard - running card job, card queue and running twin work with remaining time, card temperature and utilization, host CPU, refreshed every 5 minutes | **Waiting for you** | budget: 3 engineer sessions used; the budget is 3 |
 | S14-39 | knc-twin prepare-native: pointer-rich captures (heap addresses sparse over tens of GB) need a relocating or multi-segment native image | Not started |  |
@@ -320,6 +320,7 @@ Current tickets: `[#################---]` 253 of 295
 
 ## Recent activity
 
+- 2026-11-16 10:56 **S14-35** lead answer: Yes, authorized: this is the requested-changes round of the same ticket. Commit the native.py fix and the test on s14/S14-35, regenerate both resta...
 - 2026-11-16 10:55 **S14-35** engineer ask: Lead follow-up at 10:51 identified a remaining wrapper stack bug after the ticket was submitted: saved driver rsp must be restored before callee-sa...
 - 2026-11-16 10:53 **S14-38** lead escalate: budget: 3 engineer sessions used; the budget is 3
 - 2026-11-16 10:52 **S14-38** lead answer: No rebase needed: the branch only adds tools/knc_dashboard.py and tests/tools/test_knc_dashboard.py and edits docs/card-run.md, which main has not ...
@@ -327,13 +328,12 @@ Current tickets: `[#################---]` 253 of 295
 - 2026-11-16 10:50 **S14-38** engineer ask: Both requested changes are committed at 2a2328a5 after red fixture commit 88fb0722: twin sessions use the newest engineer/lead log filename and mod...
 - 2026-11-16 10:50 **S14-35** engineer submit: prepare-native keeps the kernel's own stack when it lies in the memory image and otherwise gives the program a private stack, so the PhiWeather pro...
 - 2026-11-16 10:48 **S14-35** owner decide: sessions 3 -> 5 for the submit only: the fix is committed and both probes are restaged by the lead. Run pm.py submit S14-35 --note 'prepare-native ...
-- 2026-11-16 10:47 **S14-38** lead answer: gcc: no, so there is no knc rebase; rebase onto main. Lead live check passed for the card job, queue, sensors and host CPU. Before resubmitting, tw...
 
 ## Cost
 
 - From the script, engineer: 786 sessions, 1664.5M input tokens
 - From the script, lead: 532 sessions, 150.3M input tokens
-- Started by hand, Claude: 15 sessions, 4305.7M input tokens
+- Started by hand, Claude: 15 sessions, 4306.2M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
