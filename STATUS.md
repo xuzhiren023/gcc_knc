@@ -1,10 +1,10 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-16 10:47.
+Updated automatically at every ticket change. Last update: 2026-11-16 10:48.
 
-**Waiting for you:** S14-35. Run `python tools/pm.py inbox`.
+**Next: GPT-6.1, on S14-10 (knc-twin: --jobs N for independent simulations and PyPy support (roadmap item 1)).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
-Current tickets: `[#################---]` 253 of 294
+Current tickets: `[#################---]` 253 of 295
 
 ## Milestones
 
@@ -15,7 +15,7 @@ Current tickets: `[#################---]` 253 of 294
 | M2 | Useful vector target | Done | 51 of 51 tickets |
 | M3 | Runtimes | Done | 48 of 48 tickets |
 | M4 | Broad optimization | Done | 63 of 65 tickets |
-| M5 | Program corpus | In progress | 8 of 47 tickets |
+| M5 | Program corpus | In progress | 8 of 48 tickets |
 | M6 | Release | Not started | Not planned in detail yet |
 
 ## Tickets
@@ -161,9 +161,10 @@ Current tickets: `[#################---]` 253 of 294
 | S14-30 | WRF built with GCC-KNC runs 1.21x slower per step than PhiWeather's production build - attribute the gap per cause before fixing (M5, owner rule) | draft |  |
 | S14-31 | knc-twin multi-core usability: compare across scales, stubs and repeated calls at unit/ring scale, multi-context sampling, separated ring/memory stall shares | Not started |  |
 | S14-33 | knc-twin: import the window-11 calibration rows (imci-math latency and throughput, div10, x87 fcoms, rcp23/rsqrt23 tables) and retire the assumed parameters they settle | Not started |  |
-| S14-35 | knc-twin prepare-native: the generated native program for PhiWeather's sixth_order_diffusion kernels segfaults on the card (exit 139 under claude-pin); find the cause, fix the generator, restage | **Waiting for you** | budget: 3 engineer sessions used; the budget is 3 |
+| S14-35 | knc-twin prepare-native: the generated native program for PhiWeather's sixth_order_diffusion kernels segfaults on the card (exit 139 under claude-pin); find the cause, fix the generator, restage | In progress | sessions 3 -> 5 for the submit only: the fix is committed and both probes are restaged by the lead. Run pm.... |
 | S14-37 | knc-twin x87 double rounding: _x87_binop rounds to the 64-bit significand and then to PC=53/24; real x87 rounds once (knc-boinc repro, 1 to 8 ULP errors) | Not started |  |
 | S14-38 | Card and twin dashboard - running card job, card queue and running twin work with remaining time, card temperature and utilization, host CPU, refreshed every 5 minutes | In progress | gcc: no, so there is no knc rebase; rebase onto main. Lead live check passed for the card job, queue, senso... |
+| S14-39 | knc-twin prepare-native: pointer-rich captures (heap addresses sparse over tens of GB) need a relocating or multi-segment native image | Not started |  |
 | S2-01 | Design for zmm and mask registers under -march=knc | Done | The register design for KNC is settled on paper: all 32 zmm and 8 mask registers become usable under -march... |
 | S2-02 | Float and double arguments and results in zmm lane 0 | Done | Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`). |
 | S2-03 | Varargs with the donor's register save area | Done | Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`). |
@@ -319,6 +320,7 @@ Current tickets: `[#################---]` 253 of 294
 
 ## Recent activity
 
+- 2026-11-16 10:48 **S14-35** owner decide: sessions 3 -> 5 for the submit only: the fix is committed and both probes are restaged by the lead. Run pm.py submit S14-35 --note 'prepare-native ...
 - 2026-11-16 10:47 **S14-38** lead answer: gcc: no, so there is no knc rebase; rebase onto main. Lead live check passed for the card job, queue, sensors and host CPU. Before resubmitting, tw...
 - 2026-11-16 10:45 **S14-35** engineer escalate: budget: 3 engineer sessions used; the budget is 3
 - 2026-11-16 10:42 **S14-38** engineer ask: Requested overdue queue fix committed at bb92aab8 after red test commit c0e4eaed; all 3 fixture/HTTP tests pass, log .work/_state/logs/S14_38_overd...
@@ -326,13 +328,12 @@ Current tickets: `[#################---]` 253 of 294
 - 2026-11-16 10:35 **S14-38** engineer submit: Dashboard ready via python tools/knc_dashboard.py serve; three fixture/HTTP tests passed (red first), log .work/_state/logs/S14_38_tests-20261116-1...
 - 2026-11-16 10:29 **S14-35** owner decide: input_tokens 6M -> 12M (standing rule). Lead review of the uncommitted native.py change: the direction is right (use the kernel's rsp/rbp when they...
 - 2026-11-16 10:28 **S14-35** engineer escalate: budget: 7993289 input tokens used; the budget is 6000000
-- 2026-11-16 10:26 **S14-23** owner decide: Owner closed the budget after the final session. The worktree is committed on s14/S14-23 as wip (converter, measurements, kernels, case, tests); th...
 
 ## Cost
 
 - From the script, engineer: 783 sessions, 1663.2M input tokens
 - From the script, lead: 530 sessions, 149.7M input tokens
-- Started by hand, Claude: 15 sessions, 4297.9M input tokens
+- Started by hand, Claude: 15 sessions, 4299.9M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
