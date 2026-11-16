@@ -172,7 +172,7 @@ def run_case(kernel_dict, test, profile, threads, rounds, scenario, max_seconds)
         streams.append(s)
     raw["streams"] = streams
     kernel = Kernel(raw, kernel_dict.get("_path"))
-    deadline = time.time() + max_seconds
+    deadline = None if max_seconds is None else time.time() + max_seconds
     interp, steps, check = functional.run_functional(kernel, deadline=deadline, pre_init=lambda it: prepare_memory(it, test, footprint, range(threads)))
     sim = timing.CoreSim(kernel, profile, interp.traces, deadline=deadline, record_issue=False)
     res = sim.run()
@@ -191,7 +191,7 @@ def _case_profile(profile_id):
 
 def _run_kernel(raw, path, profile, max_seconds):
     kernel = Kernel(raw, path)
-    deadline = time.time() + max_seconds
+    deadline = None if max_seconds is None else time.time() + max_seconds
     interp, steps, check = functional.run_functional(kernel, deadline=deadline)
     if check["status"] == "mismatch":
         raise TwinError("functional_mismatch: %s" % json.dumps(check["mismatches"][:3]))
@@ -516,7 +516,7 @@ def main(argv=None):
     card = []
     case_groups = {}
     if args.cases:
-        crow, card, case_groups = compiled_rows(args.cases, args.profile, record=args.record, max_seconds=max(args.max_seconds, 900.0), only=args.only_cases)
+        crow, card, case_groups = compiled_rows(args.cases, args.profile, record=args.record, max_seconds=900.0 if args.max_seconds is None else max(args.max_seconds, 900.0), only=args.only_cases)
         rows += crow
     report = summarize(rows, threads, profile, args, case_groups)
     report["decision_bar"] = decision_bar(rows, case_groups)

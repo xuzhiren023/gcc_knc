@@ -1,5 +1,16 @@
 # M4 corpus harness v2 (S11-18)
 
+S13-01 primary gate staging is now `tools/m4_gate.py stage`, through the same
+wrapper/Cygwin environment below. See [gate-readme.md](gate-readme.md) for the
+frozen prefix, independent references, native negative controls, three profile
+scripts, the conditional extension and lead-only scoring. The old `lead.ps1`
+below is a pilot entry point and must not be used for the final gate. Collection
+now requires independent PolyBench references; old donor-only pilot records
+cannot become valid gate samples. `stage --primary-only` generates those
+references and serial builds; the gate entry point also freezes the full plan
+and all SQLite assembly outcomes. STREAM now materializes and independently
+checks every component, preserving exact consecutive equal values as runs.
+
 Stage with the shared Cygwin Python through the run wrapper. Prepend the shared
 `toolchain/cross/bin` and `toolchain/cygwin/bin` to PATH:
 
@@ -133,8 +144,14 @@ Each launch produces one raw JSON line, including build and transport failures.
 or incorrect launches fail. Scoring belongs to S11-14 / ADR-0015;
 v2 collection emits no scores. The old summary helper remains a legacy API only.
 
-Independent references before the gate (follow-up owned by the lead, per the
-17:35 S11-18 answer; these are proposed checks, not implemented native passes):
+Independent references are implemented by S13-01 under the lead's 2026-11-15
+readiness authorization. Host fixtures are not native passes. The historical
+follow-up checklist below describes the obligations; the actual independent
+PolyBench reference is plain host C at -O0, not a high-precision library.
+Cholesky uses the input's known positive-diagonal triangular factor; ludcmp
+independently solves through that factor and its transpose rather than the
+tested LU algorithm. Both compare complete live-outs. Native verification is
+still pending the lead's gate run.
 
 | Program | Independent reference to freeze and validate |
 | --- | --- |

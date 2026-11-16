@@ -5,6 +5,8 @@ description: Run supported KNC/IMCI simulations, check kernels, compare schedule
 
 # knc-twin
 
+Engine version: 0.4.0.
+
 A standard-library Python twin of Intel Xeon Phi Knights Corner (K1OM, IMCI) cores,
 with simulated unit/ring and analytical pair/card scenario models. It runs on the host or in a code-execution sandbox and
 needs no card. Entry point: `scripts/knc_twin.py` (Python 3.8+). Everything bundled resolves

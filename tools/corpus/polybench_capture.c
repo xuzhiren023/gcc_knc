@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+extern void corpus_environment(const char *) __attribute__((weak));
 
 int corpus_fprintf(FILE *stream, const char *format, ...)
 {
@@ -16,6 +17,7 @@ int corpus_fprintf(FILE *stream, const char *format, ...)
   va_start(args, format);
   if (!strcmp(format, "begin dump: %s")) {
     char name[80] = {0};
+    if (!started && corpus_environment) corpus_environment("materialize");
     if (output) exit(2);
     output = fopen("arrays.bin", started++ ? "r+b" : "wb");
     if (!output || fseek(output, 0, SEEK_END)) exit(2);

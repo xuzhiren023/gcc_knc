@@ -118,6 +118,81 @@ def arrays_match(left, right):
     return True
 
 
+def reference_matches(actual, reference):
+    """ADR-0015: complete finite outputs, with the frozen additive bound."""
+    if not isinstance(actual, list) or not isinstance(reference, list) or not reference or len(actual) != len(reference):
+        return False
+    for a, r in zip(actual, reference):
+        if a.get('array') != r.get('array'):
+            return False
+        x, y = a.get('values'), r.get('values')
+        if not isinstance(x, list) or not isinstance(y, list) or not y or len(x) != len(y):
+            return False
+        for value, expected in zip(x, y):
+            if (type(value) not in (int, float) or type(expected) not in (int, float)
+                    or not math.isfinite(value) or not math.isfinite(expected)
+                    or abs(value - expected) > 1e-8 + 1e-6 * abs(expected)):
+                return False
+    return True
+
+
+def stream_expected():
+    # STREAM 5.10 initialization, timer warm-up, then the frozen 20 batches.
+    a, b, c = 2., 2., 0.
+    for _ in range(20):
+        c = a
+        b = 3. * c
+        c = a + b
+        a = b + 3. * c
+    return dict(a=a, b=b, c=c)
+
+
+def stream_matches(arrays, count=16777216):
+    if not isinstance(arrays, list) or len(arrays) != 3:
+        return False
+    for array, (name, expected) in zip(arrays, stream_expected().items()):
+        values = array.get('values')
+        if 'runs' in array:
+            runs = array['runs']
+            if (not isinstance(runs, list) or not runs or
+                    any(not isinstance(r, list) or len(r) != 2 or type(r[0]) is not int or r[0] < 1 for r in runs)
+                    or sum(r[0] for r in runs) != count):
+                return False
+            values = [r[1] for r in runs]
+            if array.get('array') != name:
+                return False
+            if any(type(v) not in (int, float) or not math.isfinite(v)
+                   or abs(v - expected) > 1e-8 + 1e-6 * abs(expected) for v in values):
+                return False
+            continue
+        if array.get('array') != name or not isinstance(values, list) or len(values) != count:
+            return False
+        if any(type(v) not in (int, float) or not math.isfinite(v)
+               or abs(v - expected) > 1e-8 + 1e-6 * abs(expected) for v in values):
+            return False
+    return True
+
+
+def load_reference(stage_dir, program):
+    base = sealed_dir(stage_dir) if program in HELD_OUT else stage_dir
+    return json.loads((base / 'references' / (program + '.json')).read_text())
+
+
+def stage_references(stage_dir):
+    with (stage_dir / 'support.log').open('a') as log:
+        binary = stage_dir / 'reference'
+        execute(['gcc', '-O0', '-ffp-contract=off', SUPPORT / 'reference.c', '-lm', '-o', binary], stage_dir, log)
+    for name, dims in PB.items():
+        program = 'PB-' + name
+        base = sealed_dir(stage_dir) if program in HELD_OUT else stage_dir
+        folder = base / 'references'
+        folder.mkdir(parents=True, exist_ok=True)
+        n = dims.get('N', dims.get('NI'))
+        with (folder / (program + '.json')).open('w') as output, (folder / (program + '.log')).open('w') as errors:
+            subprocess.run([str(binary), name, str(n), str(dims.get('M', n)), str(dims.get('TSTEPS', 1))],
+                           stdout=output, stderr=errors, check=True)
+
+
 def parse_results(text):
     rows = []
     for number, line in enumerate(text.splitlines(), 1):
@@ -305,7 +380,9 @@ def stage_runtimes(binary, compiler, directory, log):
 
 
 def build_program(program, compiler, flags, source, out, log, setparams, variant='openmp',
-                  runtime_stager=stage_runtimes):
+                  runtime_stager=None):
+    if runtime_stager is None:
+        runtime_stager = stage_runtimes
     cc = compiler_path(compiler)
     common = list(flags)
     sources, extra, language = [], [], 'gcc'
@@ -320,8 +397,8 @@ def build_program(program, compiler, flags, source, out, log, setparams, variant
                  '-c', benchmark, '-o', out / 'benchmark.o'], out, log)
         sources = [out / 'benchmark.o', pb / 'utilities/polybench.c', SUPPORT / 'polybench_capture.c']
     elif program == 'STREAM':
-        sources = [source / 'stream.c']
-        extra = ['-fopenmp', '-DSTREAM_ARRAY_SIZE=16777216', '-DNTIMES=20']
+        sources = [SUPPORT / 'stream_capture.c']
+        extra = ['-I' + str(source), '-fopenmp', '-DSTREAM_ARRAY_SIZE=16777216', '-DNTIMES=20']
     elif program.startswith('NPB-'):
         name = program[4:]
         npb = source / 'NPB3.4.2/NPB3.4-OMP'
@@ -374,6 +451,8 @@ def build_program(program, compiler, flags, source, out, log, setparams, variant
         extra = [f for f in extra if f != '-fopenmp']
         if program == 'HPCG':
             extra.append('-DHPCG_NO_OPENMP')
+    execute([cc, *common, '-c', SUPPORT / 'environment.c', '-o', out / 'environment.o'], out, log)
+    sources.append(out / 'environment.o')
     binary = out / 'workload'
     execute([compiler_path(compiler, language), *common, *extra, *sources, *link_paths(), '-lm', '-o', binary], out, log)
     execute([sys.executable, ROOT / 'tools/knc_lint', binary], out, log)
@@ -420,7 +499,7 @@ def stage_build(program, compiler, flags, variant, flag_index, source, stage_dir
     held = program in HELD_OUT
     base = sealed_dir(stage_dir) if held else stage_dir
     # Build diagnostics for held-out programs never enter the public build tree.
-    build_base = base / 'build' if held else SHARED / 'corpus-build/v2'
+    build_base = base / 'build'
     build_variant = variant
     if variant == 'optimization-fallback':
         build_variant += next(f for f in flags if re.fullmatch(r'-O[0-3]', f))
@@ -506,7 +585,15 @@ def stage(args):
             for program in PROGRAMS:
                 if args.only and program not in args.only:
                     continue
-                variants = ['openmp', 'serial'] if program in OPENMP else ['serial']
+                if getattr(args, 'primary_only', False) and program == 'SQLite' and compiler == DONOR:
+                    for level in ('-O3', '-O2', '-O1', '-O0'):
+                        attempt = stage_build(program, compiler, [level], 'optimization-fallback',
+                                              flag_index, source, stage_dir, 'ADR-0015 assembly pilot')
+                        attempt['requested_flags'] = flags
+                        records.append(attempt)
+                    continue
+                variants = (['openmp', 'serial'] if program in OPENMP and
+                            not getattr(args, 'primary_only', False) else ['serial'])
                 for variant in variants:
                     record = stage_build(program, compiler, flags, variant, flag_index,
                                          source, stage_dir,
@@ -530,6 +617,8 @@ def stage(args):
         'ready' if all(r['check'] == 'pass' for r in records if r['program'] == p) else 'fail'))
         for p in HELD_OUT if any(r['program'] == p for r in records)])
     write_json(stage_dir / 'settings.json', settings)
+    if getattr(args, 'primary_only', False):
+        stage_references(stage_dir)
     # Runtime dependencies are staged per compiler, all input and runtime files
     # are transferred by card_run; the lead invokes this script explicitly.
     write_lead_script(stage_dir)
@@ -571,6 +660,7 @@ def output_result(job, stdout, stderr, returncode):
                                     times[0], rel_tol=1e-9, abs_tol=1e-9)):
             raise ValueError('invalid launch-to-exit clock record')
         row.update(time_seconds=times[0], affinity=meta[0], timing=timing,
+                   environment=parse_environment(stdout, job['program']),
                    secondary_timing_output=[line for line in (stdout + '\n' + stderr).splitlines()
                        if re.search(r'Time in seconds|(?:time|Time|seconds|Seconds).*[:=]|Avg time|Min time|Max time', line)],
                    system_runtime=[line for line in stdout.splitlines() if line.startswith('CORPUS_RUNTIME ')])
@@ -578,17 +668,14 @@ def output_result(job, stdout, stderr, returncode):
             raise ValueError('card_run exit %d' % returncode)
         text = stdout + '\n' + stderr
         program = job['program']
-        if program.startswith('PB-'):
+        if program.startswith('PB-') or program == 'STREAM':
             checks = [json.loads(line[len('CORPUS_ARRAY '):]) for line in stdout.splitlines() if line.startswith('CORPUS_ARRAY ')]
-            if not arrays_match(checks, checks):
+            if not (stream_matches(checks) if program == 'STREAM' else arrays_match(checks, checks)):
                 raise ValueError('missing or nonfinite complete PolyBench output')
             row['arrays'] = checks
         elif program.startswith('NPB-'):
             if not re.search(r'Verification\s*=\s*SUCCESSFUL', text, re.I) or re.search(r'UNSUCCESSFUL|VERIFICATION FAILED', text, re.I):
                 raise ValueError('NPB verification failed or absent')
-        elif program == 'STREAM':
-            if 'Solution Validates:' not in text or 'Failed Validation' in text:
-                raise ValueError('STREAM verification failed or absent')
         elif program == 'HPCG':
             row['hpcg_work'] = hpcg_work(text)
         elif 'CORPUS_CHECK pass' not in stdout:
@@ -599,6 +686,55 @@ def output_result(job, stdout, stderr, returncode):
     except (ValueError, KeyError, TypeError) as exc:
         row.update(check='fail' if row['time_seconds'] is not None else 'error', cause=str(exc))
     return row
+
+
+# A codec launch runs three fresh processes in this order (launch.c): the timed
+# workload, the peer cross-decoder and the corrupted-stream rejection.
+CODEC_VERDICTS = ('CORPUS_CHECK ', 'CORPUS_CROSS ', 'CORPUS_CONTROL ')
+
+
+def parse_environment(stdout, program=None):
+    """Return the timed workload's environment snapshots (start/materialize/end).
+
+    Each process prints exactly one set, opened by 'start' and closed by 'end'.
+    Codec launches carry up to one set per process, and each verdict line must
+    lie inside its own process's set; other launches carry exactly one set.
+    """
+    codec = program in ('zlib', 'bzip2')
+    processes, current, phase = [], None, None
+    lines = stdout.splitlines()
+    for number, line in enumerate(lines):
+        if line.startswith('CORPUS_ENV_BEGIN '):
+            name = line.split()[-1]
+            if phase is not None:
+                raise ValueError('interleaved environment snapshot')
+            if current is None or 'end' in current['sets']:
+                if name != 'start':
+                    raise ValueError('environment snapshot outside a process')
+                current = dict(sets={}, first=number, last=len(lines))
+                processes.append(current)
+            elif name in current['sets'] or name == 'start':
+                raise ValueError('duplicate environment snapshot')
+            phase = name
+            current['sets'][phase] = defaultdict(list)
+        elif line.startswith('CORPUS_ENV_END '):
+            if phase is None or line.split()[-1] != phase:
+                raise ValueError('interleaved environment snapshot')
+            if phase == 'end':
+                current['last'] = number
+            phase = None
+        elif line.startswith('CORPUS_ENV ') and phase is not None:
+            key, _, value = line[len('CORPUS_ENV '):].partition(' ')
+            current['sets'][phase][key].append(value)
+    if len(processes) > (len(CODEC_VERDICTS) if codec else 1):
+        raise ValueError('duplicate environment snapshot')
+    if codec:
+        for number, line in enumerate(lines):
+            for index, verdict in enumerate(CODEC_VERDICTS):
+                if line.startswith(verdict) and not (index < len(processes) and
+                        processes[index]['first'] < number < processes[index]['last']):
+                    raise ValueError('codec environment snapshot not attributable to its process')
+    return processes[0]['sets'] if processes else {}
 
 
 def hpcg_work(text):
@@ -637,13 +773,15 @@ def hpcg_work(text):
     return work
 
 
-def card_call(stage_dir, files, mode, density, stdout, stderr, profile='full', timeout=3600):
+def card_call(stage_dir, files, mode, density, stdout, stderr, profile='full', timeout=3600, record=None):
     # Called only by the explicit lead subcommand, never by stage or collect.
     threads = {'full': 240, '3100': 224, '5100': 236}[profile]
     # card_run requires a transport record; keep only its transient working file.
     transport_record = stdout.parent / 'card-result.json'
+    # SSH transfers only: inputs are small, and the SCIF DMA helper and its
+    # cleanup latch stay out of timed blocks (S13-01, 2026-11-15).
     command = [sys.executable, str(ROOT / 'tools/card_run'), '--benchmark', '--threads', str(threads),
-               '--timeout', str(timeout),
+               '--timeout', str(timeout), '--transfer', 'ssh',
                '--receipt', str(transport_record)]
     if profile != 'full':
         command += ['--profile', profile]
@@ -652,8 +790,15 @@ def card_call(stage_dir, files, mode, density, stdout, stderr, profile='full', t
     command += [str(stage_dir / 'launch'), density, mode]
     try:
         with stdout.open('w') as out, stderr.open('w') as err:
-            return subprocess.run(command, stdout=out, stderr=err).returncode
+            try:
+                return subprocess.run(command, stdout=out, stderr=err).returncode
+            except OSError as error:
+                # card_run never started: an infrastructure failure without a receipt.
+                err.write('card_call: cannot start card_run: %s\n' % error)
+                return 126
     finally:
+        if record is not None and transport_record.exists():
+            record.update(json.loads(transport_record.read_text()))
         transport_record.unlink(missing_ok=True)
 
 
@@ -757,6 +902,14 @@ def collect(args):
         if row['compiler'] == DONOR and row['program'] == 'HPCG':
             donors[pair(row)].append(row)
     for row in rows:
+        if (row['program'].startswith('PB-') or row['program'] == 'STREAM') and row['check'] == 'pass':
+            try:
+                good = (stream_matches(row.get('arrays')) if row['program'] == 'STREAM' else
+                        reference_matches(row.get('arrays'), load_reference(stage_dir, row['program'])))
+            except (OSError, ValueError):
+                good = False
+            if not good:
+                row.update(check='fail', cause='independent complete-output reference failed or unavailable')
         if row['program'] == 'HPCG' and row['check'] == 'pass':
             work = row.get('hpcg_work')
             if not work or work.get('sets') != 1:
@@ -770,8 +923,8 @@ def collect(args):
                 row.update(check='fail', cause='missing or invalid complete PolyBench output')
             elif row['compiler'] == KNC:
                 paired = donors[pair(row)]
-                if not paired or any(d['check'] != 'pass' or not arrays_match(d.get('arrays'), row['arrays']) for d in paired):
-                    row.update(check='fail', cause='PolyBench elementwise mismatch or missing reference')
+                row['secondary_donor_agreement'] = ('pass' if paired and all(
+                    d['check'] == 'pass' and arrays_match(d.get('arrays'), row['arrays']) for d in paired) else 'fail')
     write_partition(stage_dir, 'results.jsonl', rows)
     observed = defaultdict(list)
     for row in rows:
@@ -802,6 +955,7 @@ def main():
     parser.add_argument('--timeout', type=int, default=3600, help='per-launch seconds, including serial NPB pilot')
     parser.add_argument('--only', nargs='+', choices=PROGRAMS,
                         help='stage only these programs, retaining previous build records and inputs')
+    parser.add_argument('--primary-only', action='store_true', help='serial gate builds and independent references')
     args = parser.parse_args()
     if args.repetitions is not None and args.repetitions < 3:
         parser.error('at least three repetitions')
