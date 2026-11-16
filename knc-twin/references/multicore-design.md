@@ -60,16 +60,34 @@ ring-distance input/output directory was removed. Remote-write and ring-mixed
 also remain `needs-driver`; no handoff framework was added.
 
 The kernel schema and input-format reference describe core/context identity,
-placement, background, maps and budgets. Finite cold-read scenario predictions
-are recorded under `tests/heldout_native/multicore-scenarios/`; they are not
-compiled native validation cases. `validation.md` lists the pending low-core
+placement, background, maps and budgets. The finite cold-read recorder `scripts/record_multicore.py` is implemented but
+not yet run. Its planned output under `tests/heldout_native/multicore-scenarios/`
+is not a compiled native validation case. `validation.md` lists the pending low-core
 rows, full-card read/triad/GEMV comparisons, retrospective sweep shape checks,
 remote latency, synchronization and background sensitivity. All multicore
 results remain unvalidated; no 10% band or held-out parameter was changed.
 
 No profile parameters changed in this continuation; the prior generated
-parameters.md remains current. No GCC build or card job was started. Host checks
-and their final outcome are recorded below when complete.
+parameters.md remains current. No GCC build or card job was started. Host checks:
+
+- `tests/regress/test_knc_twin.py`: full selftest PASS and trial regression PASS;
+  held-out comparison FAIL only for `s12-31-hpcg-104`. The assertion abbreviates
+  its actual rows, so runtime budget exhaustion is only a hypothesis. Other
+  existing held-out cases matched. Log
+  `.work/_state/logs/S14_13_regress_selftest-20261116-005843.log` (36.9 minutes).
+- Draft 7 schema metadata check passed. Two instance-validation attempts failed
+  in the installed jsonschema resolver: relative ID resolves to
+  `knc-twin.kernel/knc-twin.kernel/1`; substituting an absolute URN in memory
+  still fails with unknown URL type. No validation rules were removed or schema
+  ID changed on disk. Logs `S14_13_schema-20261116-013622.log` and
+  `S14_13_schema_local_refs-20261116-013703.log` under `.work/_state/logs/`.
+- Multicore prediction recording, a diagnostic for the HPCG mismatch, schema
+  instance validation, and rebase on `knc` remain pending. The read-only
+  `git merge-base --is-ancestor knc HEAD` query was blocked by the hook's merge
+  prohibition; it was not retried. No rebase has been attempted.
+
+The second schema failure requires a ticket question under AGENTS.md. This is
+an honest continuation checkpoint, not acceptance.
 
 ## Evidence and geometry
 
@@ -355,12 +373,13 @@ Unsupported lock/fence costs remain explicit. Requests retain calibration versus
 validation roles; the lead builds/runs them in coordinated card time. No card
 launch is authorized here.
 
-## Review required before implementation
+## Review record
 
-Approve or revise the contracted 61-position ring with **64 TD slices**, the
-52-background default for 60 usable cores (53 only for 61 active), the causal
-asynchronous memory interface and symmetry policy, and the calibration/held-out
-split. Identify available low-core scaling logs and independent full-card rows;
-the existing calibration winners cannot satisfy both roles. Confirm the proposed
-10% per-row engineering targets and when long host validation is allowed.
-Native request generation and the implementation/tests remain Phase 2 work.
+The lead approved this design on 2026-11-15: contracted 61-position geometry,
+64 TD slices, 60 total active cores by default, causal asynchronous memory,
+symmetry feedback, evidence split and fixed 10% targets. Red protocol tests were
+approved at 23:23. The later fixed-background/fixed-total test correction was
+explicitly approved at 23:49. Long host validation was authorized after M4 ended;
+card jobs remain lead-only. The 2026-11-16 00:45 answer authorized sibling staging
+inputs and deferring ring-distance when the minimal driver cannot preserve the
+required ownership state.

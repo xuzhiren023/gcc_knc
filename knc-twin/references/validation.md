@@ -118,15 +118,28 @@ remote reads, pending-fill visibility and contention, not hardware accuracy.
 The predeclared engineering target is 10% per comparable row; it has not been
 widened and no multi-core shape is promoted.
 
-Finite cold-read predictions for 1/2/4/8 detailed cores, both without background
-(`unit`) and with 60 total active cores (`ring`), are recorded separately in
-`tests/heldout_native/multicore-scenarios/prediction.json`. They have one context
-per core and 64 cold lines per context. They retain assumptions, parameters,
-unsupported forms and result classes. They are synthetic scenarios, not the
-compiled kernels or steady-state timed envelopes of the historical card rows.
-They therefore do not enter the held-out error/ranking statistics. Regenerate
-with `scripts/record_multicore.py --out <shared-output> --record
-tests/heldout_native/multicore-scenarios/prediction.json` from the knc-twin root.
+`scripts/record_multicore.py` is prepared to record finite cold-read predictions
+for 1/2/4/8 detailed cores, both without background (`unit`) and with 60 total
+active cores (`ring`), under `tests/heldout_native/multicore-scenarios/prediction.json`.
+**The recorder has not run yet; that record does not exist.** Inputs have one
+context per core and 64 cold lines per context. The recorder retains assumptions,
+parameters, unsupported forms and result classes. These are synthetic scenarios,
+not the compiled kernels or steady-state timed envelopes of historical card rows;
+they must not enter held-out error/ranking statistics. Pending command from the
+knc-twin root: `scripts/record_multicore.py --out <shared-output> --record
+tests/heldout_native/multicore-scenarios/prediction.json`.
+
+Host validation on 2026-11-16: the full selftest and trial regressions passed
+through `tests/regress/test_knc_twin.py`. Its held-out equality check failed only
+for `s12-31-hpcg-104`; the assertion abbreviates the returned rows, so the cause
+has not yet been established (budget exhaustion is a hypothesis, not a result).
+Do not rewrite its recorded predictions. Log:
+`.work/_state/logs/S14_13_regress_selftest-20261116-005843.log` (36.9 minutes).
+Schema metadata passed Draft 7 checking, but instance validation is pending:
+the installed jsonschema resolver failed first on the relative schema ID and
+then on an absolute in-memory URN. Logs are
+`S14_13_schema-20261116-013622.log` and
+`S14_13_schema_local_refs-20261116-013703.log` in the same log directory.
 
 | Evidence | Status and unresolved comparison |
 |---|---|

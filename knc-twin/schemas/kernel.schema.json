@@ -40,7 +40,7 @@
       "type": "object", "additionalProperties": false,
       "properties": {
         "memory": {"type": "array", "items": {"$ref": "#/definitions/memblock"}},
-        "registers": {"type": "object", "description": "context index (string) -> registers", "additionalProperties": {"$ref": "#/definitions/registers"}}
+        "registers": {"type": "object", "description": "context slot (string) -> registers; multicore slot is 4*core+context. Stream-local expected.registers avoids slot arithmetic.", "additionalProperties": {"$ref": "#/definitions/registers"}}
       }
     },
     "streams": {
