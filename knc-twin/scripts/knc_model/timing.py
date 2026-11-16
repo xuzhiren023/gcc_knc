@@ -118,6 +118,7 @@ class CoreSim(object):
         self.nr_store_free_at = 0
         self.gather_free_at = 0
         self.cycle = 0
+        self.stub_costs = {}
         self.issue_log = []
         self.branch_sc = kernel.scenario["branch"]
         self.mispredict_ids = set(self.branch_sc.get("ids", []))
@@ -283,6 +284,9 @@ class CoreSim(object):
             stub = self.kernel.calls[ev.stub]
             cost = stub["cycles"] + stub.get("cycles_per_byte", 0) * ev.nbytes
             cost = int(-(-cost // 1))
+            charged = self.stub_costs.setdefault(ev.stub, {"calls": 0, "cycles_total": 0})
+            charged["calls"] += 1
+            charged["cycles_total"] += cost
             if ev.lines and stub.get("model") in ("memcpy", "memmove", "memset"):
                 self.mem.commit_demand(ev.lines, now, False, stub.get("model") == "memset")
             done = now + cost
@@ -449,6 +453,8 @@ class CoreSim(object):
         insn = ev.insn
         if insn.op in ("call", "ret"):
             return True
+        if insn.op == "jmp_table" and ev.branch_target is not None:
+            return ev.branch_target > insn.index
         if insn.target is None:
             return True
         stream = self.kernel.stream_for(cs.ctx)
@@ -604,12 +610,19 @@ class CoreSim(object):
                 self.frontend_stats["decode_delay_cycles"] += max(0, cs.decode_until - cs.next_issue)
         self.cycle += 1
 
-    def run(self):
+    def run(self, stop_positions=None):
+        """Advance without draining/resetting state; optional event-index barriers.
+
+        Callers provide lookahead beyond each barrier so pairing and prefix decode
+        see the next instruction. A pair can cross a barrier by one event.
+        """
         t0 = time.time()
         active = self.ctx
         total_events = sum(len(c.events) for c in active)
-        while not all(c.done for c in active):
+        while True:
             now = self.cycle
+            if all(c.done or (stop_positions is not None and c.pos >= stop_positions[c.ctx]) for c in active):
+                break
             if self.max_cycles is not None and now > self.max_cycles:
                 raise BudgetExhausted("cycle budget %d exhausted; %d of %d dynamic instructions issued (partial, not a result)" % (self.max_cycles, sum(c.issued for c in active), total_events),
                                       {"cycles_simulated": now, "issued": sum(c.issued for c in active), "events": total_events},
@@ -620,13 +633,13 @@ class CoreSim(object):
             self.step()
         end_issue = max((c.last_issue_cycle or 0) for c in active) + 1
         completion = max(end_issue, max(c.max_done for c in active))
-        self.python_seconds = time.time() - t0
-        return self._result(end_issue, completion, total_events)
+        self.python_seconds = getattr(self, "python_seconds", 0.0) + time.time() - t0
+        return self._result(end_issue, completion, sum(c.issued for c in active))
 
     def _result(self, end_issue, completion, total_events):
         per_ctx = {}
         for c in self.ctx:
-            per_ctx[str(c.ctx)] = {"dynamic_instructions": len(c.events), "issued": c.issued, "pairs": c.pairs,
+            per_ctx[str(c.ctx)] = {"dynamic_instructions": c.issued, "issued": c.issued, "pairs": c.pairs,
                                   "first_issue": c.first_issue, "last_issue": c.last_issue_cycle, "completion": c.max_done,
                                   "stall_cycles": {k: v for k, v in c.stalls.items() if v}}
         issue_events = sum(c.issued - c.pairs for c in self.ctx)
@@ -641,6 +654,8 @@ class CoreSim(object):
             "per_context": per_ctx,
             "memory": self.mem.describe(),
             "frontend": dict(self.frontend_stats),
+            "stub_cycles_total": sum(s["cycles_total"] for s in self.stub_costs.values()),
+            "stub_costs": self.stub_costs,
             "python_seconds": round(self.python_seconds, 4),
         }
 

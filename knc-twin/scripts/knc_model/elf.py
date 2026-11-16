@@ -40,18 +40,41 @@ class Elf(object):
             s.name = self._str(strtab, s.name) if strtab is not None else ""
         self.relocatable = self.type == 1
         self.symbols = {}      # name -> (section index, value, size, type)
+        symbol_tables = {}
         for s in self.sections:
             if s.type == SHT_SYMTAB:
                 st = self.sections[s.link]
+                names = []
                 for k in range(s.size // 24):
                     nm, info, other, shndx, value, size = struct.unpack_from("<IBBHQQ", d, s.offset + 24 * k)
                     name = self._str(st, nm)
                     typ = info & 0xF
                     if typ == 3 and 0 < shndx < len(self.sections):
                         name = self.sections[shndx].name
+                    names.append(name)
                     rec = (shndx, value, size, typ)
                     if name and (name not in self.symbols or (info >> 4) != 0):
                         self.symbols[name] = rec
+                symbol_tables[s.index] = names
+        # Key by the relocated section, not by the relocation section's spelling.
+        self.relocations = {}
+        for s in self.sections:
+            if s.type != SHT_RELA or not (0 < s.info < len(self.sections)):
+                continue
+            target = self.sections[s.info]
+            if target.name != ".rodata" and not target.name.startswith(".rodata."):
+                continue
+            names = symbol_tables.get(s.link)
+            if names is None or s.entsize != 24 or s.size % 24:
+                raise InvalidInput("malformed relocation section %s" % s.name)
+            rows = self.relocations.setdefault(target.name, [])
+            for off in range(s.offset, s.offset + s.size, 24):
+                addr, info, addend = struct.unpack_from("<QQq", d, off)
+                index, kind = info >> 32, info & 0xffffffff
+                if index >= len(names):
+                    raise InvalidInput("bad symbol index in %s" % s.name)
+                name = names[index] + ("%s0x%x" % ("+" if addend >= 0 else "-", abs(addend)) if addend else "")
+                rows.append((addr, "R_X86_64_64" if kind == 1 else "R_X86_64_%d" % kind, name))
 
     def _str(self, strtab, off):
         d = self.data

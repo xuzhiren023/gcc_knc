@@ -79,10 +79,43 @@ def summary_markdown(r):
     if pred:
         L.append("")
         L.append("## Result")
+        if pred.get("result_class"):
+            classification = pred["result_class"]
+            L.append("- result_class: %s" % (classification.get("class", classification) if isinstance(classification, dict) else classification))
         for k, v in pred.items():
             if isinstance(v, (dict, list)):
                 continue
             L.append("- %s: %s" % (k, _fmt_val(v)))
+        for key in ("predicted_cycles_per_unit_band", "predicted_cycles_band",
+                    "predicted_time_ratio_band", "predicted_candidate_per_unit_band"):
+            if key in pred:
+                L.append("- %s: %s to %s" % (key, *pred[key]))
+        if pred.get("sampling"):
+            sample = pred["sampling"]
+            L.extend(["", "## Loop sampling (estimate)", "",
+                      "Stop: %s after %s iterations; %s warmup iterations discarded." %
+                      (sample["stop_reason"], sample["iterations_sampled"], sample["warmup_iterations"]),
+                      "Rule: %s." % sample["rule"], "",
+                      "| first iteration | last iteration | iterations | predicted cycles/iteration |",
+                      "|---:|---:|---:|---:|"])
+            for window in sample["windows"]:
+                L.append("| %s | %s | %s | %.6g |" % (window["first_iteration"], window["last_iteration"],
+                                                       window["iterations"], window["cycles_per_iteration"]))
+        if pred.get("phases"):
+            L.extend(["", "## Phases", "",
+                      "| phase | share of program time | covered fraction of phase | predicted time ratio | band | result class |",
+                      "|---|---:|---:|---:|---|---|"])
+            for phase in pred["phases"]:
+                L.append("| %s | %.1f%% | %.1f%% | %.5f | %.5f to %.5f | %s |" % (
+                    phase["name"], 100 * phase["share"], 100 * phase["modeled_share_of_phase_time"],
+                    phase["predicted_time_ratio"], *phase["predicted_time_ratio_band"], phase["result_class"]["class"]))
+            if all("predicted_candidate_per_unit" in phase for phase in pred["phases"]):
+                L.extend(["", "Phase contributions in %s:" % pred["unit"], "",
+                          "| phase | measured baseline | predicted candidate | band |", "|---|---:|---:|---|"])
+                for phase in pred["phases"]:
+                    L.append("| %s | %.6g | %.6g | %.6g to %.6g |" % (
+                        phase["name"], phase["measured_baseline_per_unit"], phase["predicted_candidate_per_unit"],
+                        *phase["predicted_candidate_per_unit_band"]))
         if isinstance(pred.get("terms"), dict):
             L.append("")
             L.append("| bound term | cycles |")

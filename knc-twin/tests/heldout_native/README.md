@@ -11,6 +11,10 @@ with assumptions and parameter statuses. Its planned destination is
 pending**. No `case.json` or invented `measurement.json` is supplied: independent
 native comparisons and faithful compiled full-card inputs remain pending, listed
 in `references/validation.md`. Synthetic scenarios do not enter held-out statistics.
+Replay a case without a wall-clock deadline with `python scripts/validate_heldout.py --cases
+tests/heldout_native --only-cases s12-31-hpcg-104 --max-seconds 0 --out /tmp/heldout-replay`.
+The regression replay is intentionally gated by `KNC_TWIN_HELDOUT=1` because the largest case
+can take tens of minutes on a host interpreter.
 
 - `measured-characterization.json`, `characterization-run/`: the 119 measured rows of the
   gcc_knc characterization catalog; rows listed in `CALIBRATION_ROWS` set a parameter or exposed
