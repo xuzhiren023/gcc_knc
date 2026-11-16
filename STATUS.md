@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-16 14:03.
+Updated automatically at every ticket change. Last update: 2026-11-16 14:04.
 
-**Next: the tech lead, on S14-22.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: the tech lead, on S13-03.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[#################---]` 256 of 296
 
@@ -125,7 +125,7 @@ Current tickets: `[#################---]` 256 of 296
 | S12-42 | Small sparse row loops are 1.5-3% slower than GCC 5.1.1, worse when two loop nests share one function (found by S12-30's window 8 gate) | Done | Card window 10 (post-S12-31 prefix b2ce6a9eebf, 1 thread, A-s12-42-small.out, all GUARDS failures=0): GCC-K... |
 | S13-01 | M4 final gate - stage the ADR-0015 gate run at the final head (17 programs, held-out unsealed, six pairs, three profiles) | Done | The M4 gate runner (SSH-only transfers, launch retry, adopt, full-profile scoring) and its card_run fixes a... |
 | S13-02 | Libgomp per-region thread density - choose 1-4 workers per core per parallel region instead of once per program | draft | Owner 2026-11-15 ("yes delay to M5"): deferred to M5 (sprint s14). The M4 primary score is serial -O2, so t... |
-| S13-03 | M4 retrospective - what we did wrong, what worked, and the practice changes carried into the next milestone and the agent-team skill | In progress |  |
+| S13-03 | M4 retrospective - what we did wrong, what worked, and the practice changes carried into the next milestone and the agent-team skill | Question for the tech lead | Retrospective complete at 63eb9e84 in docs/research/m4-retrospective.md: all 19 lesson rows, Sprint 11-13 n... |
 | S13-04 | Clean source repositories for a fresh build - GCC-KNC fork and project code without build artifacts, plus a Linux-host build recipe the owner runs on the new workstation | draft |  |
 | S13-05 | model-first skill - a project Claude Code skill that models a hot region and its run-time lower bound before any optimization, plus one sourced KNC machine file | Done | The model-first skill (.claude/skills/model-first with formulas, levers and a worked C7 example) and a sour... |
 | S13-06 | knc-twin trial and validation - run the KNC core twin on real GCC-KNC loop output, check it against characterization rows and held-out kernels we already timed, and report what it rejects or gets wrong | Done | knc-twin 0.2.1 is in the repo: it reads GCC-KNC assembly, predicts one-core cycles and loop bounds, and is ... |
@@ -322,19 +322,19 @@ Current tickets: `[#################---]` 256 of 296
 ## Recent activity
 
 - 2026-11-16 14:10 **S12-42** lead close: Card window 10 (post-S12-31 prefix b2ce6a9eebf, 1 thread, A-s12-42-small.out, all GUARDS failures=0): GCC-KNC is now faster than GCC 5.1.1 on all f...
+- 2026-11-16 14:04 **S13-03** engineer ask: Retrospective complete at 63eb9e84 in docs/research/m4-retrospective.md: all 19 lesson rows, Sprint 11-13 notes, five research inputs, ranked costs...
 - 2026-11-16 14:03 **S14-33** lead resume: lead committed the final files, merged main, checked tests (48 pass) and the validation note; approving
 - 2026-11-16 14:03 **S14-26** lead answer: Lead 2026-11-16: close it as no-go now; do not wait for a twin fix. Your static bounds already decide it. Overlapping iterations can at best take a...
 - 2026-11-16 14:01 **S14-22** engineer ask: Test invocation through tools/run.py hangs beyond 60 seconds with zero-byte logs; engineer role blocks card_run tests as expected. Need lead guidan...
 - 2026-11-16 14:01 **S14-16** lead answer: Yes, reduce again; do not use bzip2 source (held out). Your two cases had too few live values: the k0 use appears only when the caller-saved GPRs a...
 - 2026-11-16 14:00 **S14-26** engineer ask: 72b3d253 records six current corpus loop bounds (all ok); GEMM and Jacobi modulo both fail unsupported: interior label. Reproducer: python knc-twin...
 - 2026-11-16 13:58 **S14-16** engineer ask: Two synthetic T1 attempts failed to reproduce: eight byte accumulators and indexed byte/word comparisons both pass no-k scans on existing gcc16. Re...
-- 2026-11-16 13:48 **S14-33** lead defer: Interactive lead: commit the files in the 13:46 ask (log S14_33_final_regress-20261116-134356) as 'feat(S14-33): div10 vector-zero data, held-out r...
 
 ## Cost
 
 - From the script, engineer: 805 sessions, 1687.5M input tokens
 - From the script, lead: 549 sessions, 154.4M input tokens
-- Started by hand, Claude: 49 sessions, 4388.6M input tokens
+- Started by hand, Claude: 49 sessions, 4389.3M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
