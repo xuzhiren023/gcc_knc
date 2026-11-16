@@ -114,7 +114,7 @@ class TestLoopSampling(unittest.TestCase):
         pred = self.invoke("sample-loop", path, ".A_40f2f0", "--warmup", "104",
                            "--window", "104", "--max-iterations", "2080")
         self.assertLess(pred["sampling"]["iterations_sampled"], 8000)
-        self.assertEqual(pred["sampling"]["stop_reason"], "converged")
+        self.assertEqual(pred["sampling"]["stop_reason"], "converged", pred["sampling"])
         lo, hi = pred["predicted_cycles_per_unit_band"]
         self.assertGreater(lo, 0)
         self.assertGreaterEqual(hi, lo)

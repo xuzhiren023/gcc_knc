@@ -59,6 +59,13 @@ relative to that file; the current directory does not matter.
    - `functional <kernel>` exact results of supported operations vs expected outputs
    - `simulate <kernel> --profile <id>` core-cycle prediction (1-4 contexts), with front-end and
      memory statistics, stub calls and input-file hashes
+   - `sample-loop <kernel> --loop LABEL --warmup N --window W --tolerance T --max-iterations M`
+     sample a single-context loop, preserving functional and timing state between windows;
+     equivalent to `simulate --sample-loop --loop LABEL`. One iteration must be one unit of
+     work. Reports the window series, stopping rule, spread and extrapolated cycles. Both
+     trace and timing are sampled; final expected outputs are checked only if execution ends.
+     Every sampled prediction is an `unvalidated_scenario_estimate`, even for a validated shape.
+     See `references/rollup.md` for the stopping rule and its limits.
    - `bounds <kernel>` lower bounds; `--loop` ResMII/RecMII/critical path; `--search` exhaustive reorder
    - `bounds --scale card|pair --params <json>` labeled analytical scenario estimates
    - `compare <baseline result.json> <candidate result.json>` same model, same scenario, deltas
@@ -66,6 +73,9 @@ relative to that file; the current directory does not matter.
      native requests under `queue/`
    - `rollup <manifest.json>` weight region predictions by measured time shares: predicted
      change of seconds per step (or any program figure), with a band and the unmodeled share
+     (`phases` groups regions by measured phase share; region shares are within each phase).
+     Each side of a region can supply `sampling` options. Sampling spread is propagated into
+     the program band; a sampled or unvalidated region prevents a calibrated program forecast.
    - `calibration-plan` what to measure in the next card window (staged microbenchmarks, open
      misses, held-out cases to add)
    - `prepare-native <kernel>` reproducible request for the shared hardware queue (no card access)
