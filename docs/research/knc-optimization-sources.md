@@ -54,7 +54,7 @@ No document was unreachable. Fetched PDFs were saved by the fetch tool under
 2. **ISA 327364-001.** VPREFETCH (p.641): **the hardware drops a VPREFETCH that hits L1**, so a
    prefetch cannot warm L2 for a line already in L1. Prefetches never fault. The MVEX form scales disp8
    by 64. The hint table gives 0/NTA to L1, 1/2 to L2, an E variant for exclusive, and 2/NTA non-temporal.
-   VMOVNRAPS/PD (pp.388-391): the no-read saving applies **only on a cache miss, only unmasked, and only
+   VMOVNRAPS/PD (R27 pp.388-392): the no-read saving applies **only on a cache miss, only unmasked, and only
    without down-conversion**. VMOVNRNGOAPS/PD (pp.393-398) are weakly ordered "to increase the
    throughput", and need a fence (`lock add [rsp],0` or `xchg`) before other threads read.
    CLEVICT0/1 (pp.624-627) evict from L1 or L2, never fault, and are not broadcast.
