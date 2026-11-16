@@ -42,6 +42,16 @@ def words(text):
     return re.findall(r"[a-z0-9]+", text.casefold())
 
 
+def vendor_text(path):
+    # The supplied ISA extraction is Windows-1252; R01/R16 are UTF-8.
+    # Decode strictly in either format. Never drop undecodable source bytes.
+    data = path.read_bytes()
+    try:
+        return data.decode("utf-8")
+    except UnicodeDecodeError:
+        return data.decode("cp1252")
+
+
 def ngrams(tokens, length=12):
     for index in range(len(tokens) - length + 1):
         yield tuple(tokens[index:index + length])
@@ -208,7 +218,7 @@ class KncOptimizeSkill(unittest.TestCase):
                 skill_grams.setdefault(gram, path.relative_to(SKILL).as_posix())
         self.assertTrue(skill_grams, "skill is too short to exercise the overlap check")
         for source, path in CORPUS.items():
-            for gram in ngrams(words(path.read_text(encoding="utf-8"))):
+            for gram in ngrams(words(vendor_text(path))):
                 if gram in skill_grams:
                     self.fail("shared 12-word run: %s and %s (passage withheld)"
                               % (skill_grams[gram], source))
