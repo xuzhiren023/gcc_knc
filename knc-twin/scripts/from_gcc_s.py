@@ -274,7 +274,10 @@ def classify_records(records, profile):
         row["isa"] = True
         row["class"] = insn.cls
         row["functional"] = insn.functional_supported()
-        if not row["functional"]:
+        if insn.op == "indirect_transfer":
+            row["functional"] = False
+            row["reason"] = "indirect transfer: unsupported when executed"
+        elif not row["functional"]:
             row["reason"] = "timing only: " + (insn.spec.get("note") or "")
         row["memory"] = bool(insn.mem is not None or insn.cls in ("vector_gather", "vector_scatter"))
         if profile is not None:
