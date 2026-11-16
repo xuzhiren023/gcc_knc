@@ -77,7 +77,7 @@ toolchain at `.work/_shared/toolchain`. [BUILDING.md](docs/BUILDING.md) explains
 | [Project plan](docs/PROJECT_PLAN.md) | Goals, milestones and risks |
 | [Decisions](docs/adr/) | ISA, ABI, floating point, tuning and clean-room rules |
 | [Development cycle](docs/DEVELOPMENT_CYCLE.md), [Collaboration](docs/COLLABORATION.md) | How the work is done |
-| [`knc-twin/`](knc-twin/README.md) | A KNC core model for checking kernels on the host |
+| `knc-twin` | The KNC core model moved to its own repository on 2026-11-16: `C:/Users/xuzhi/Documents/knc-twin` (sibling folder; `KNC_TWIN_ROOT` overrides). The in-tree copy is removed once S14-33 lands. |
 
 `AGENTS.md`, `CLAUDE.md`, `KICKOFF.md` and `work/tickets/` are for the agents that build this
 project.

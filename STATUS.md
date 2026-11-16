@@ -1,10 +1,10 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-16 13:51.
+Updated automatically at every ticket change. Last update: 2026-11-16 16:54.
 
 **Next: GPT-6.1, on S14-10 (knc-twin: --jobs N for independent simulations and PyPy support (roadmap item 1)).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
-Current tickets: `[#################---]` 255 of 296
+Current tickets: `[#################---]` 258 of 297
 
 ## Milestones
 
@@ -15,7 +15,7 @@ Current tickets: `[#################---]` 255 of 296
 | M2 | Useful vector target | Done | 51 of 51 tickets |
 | M3 | Runtimes | Done | 48 of 48 tickets |
 | M4 | Broad optimization | Done | 63 of 65 tickets |
-| M5 | Program corpus | In progress | 10 of 49 tickets |
+| M5 | Program corpus | In progress | 13 of 50 tickets |
 | M6 | Release | Not started | Not planned in detail yet |
 
 ## Tickets
@@ -122,10 +122,10 @@ Current tickets: `[#################---]` 255 of 296
 | S12-39 | pm.py submit stops demanding an engineer-side rebase that the sandbox cannot perform (Permission denied on .git/worktrees/<id>/rebase-merge) | Done | Engineers no longer need to rebase before submitting: submit only refuses when main has real changes the br... |
 | S12-40 | Indirect prefetch recognizes Fortran sparse loops (array descriptors, ARRAY_REF offsets, nonzero and OpenMP-outlined starts) so NPB-CG benefits | draft | Deferred to M5 (sprint s14) by the owner's 2026-11-15 scope cut ("we are scope creeping the entire Sprint 1... |
 | S12-41 | Early donor check - corpus.py stages and runs only the development programs (no held-out build or run), smallest margins first, so the lead can measure every development program against GCC 5.1.1 now | draft | Deferred to M5 (sprint s14) by the owner's 2026-11-15 scope cut ("we are scope creeping the entire Sprint 1... |
-| S12-42 | Small sparse row loops are 1.5-3% slower than GCC 5.1.1, worse when two loop nests share one function (found by S12-30's window 8 gate) | draft | Owner 2026-11-15 ("I have reset Fable, so subagent back to codex with default selection rule"): Fable overr... |
+| S12-42 | Small sparse row loops are 1.5-3% slower than GCC 5.1.1, worse when two loop nests share one function (found by S12-30's window 8 gate) | Done | Card window 10 (post-S12-31 prefix b2ce6a9eebf, 1 thread, A-s12-42-small.out, all GUARDS failures=0): GCC-K... |
 | S13-01 | M4 final gate - stage the ADR-0015 gate run at the final head (17 programs, held-out unsealed, six pairs, three profiles) | Done | The M4 gate runner (SSH-only transfers, launch retry, adopt, full-profile scoring) and its card_run fixes a... |
 | S13-02 | Libgomp per-region thread density - choose 1-4 workers per core per parallel region instead of once per program | draft | Owner 2026-11-15 ("yes delay to M5"): deferred to M5 (sprint s14). The M4 primary score is serial -O2, so t... |
-| S13-03 | M4 retrospective - what we did wrong, what worked, and the practice changes carried into the next milestone and the agent-team skill | draft |  |
+| S13-03 | M4 retrospective - what we did wrong, what worked, and the practice changes carried into the next milestone and the agent-team skill | lead | Merge main into s13/S13-03 (21 commits behind, main touches non-work paths, so submit hard-refuses); the br... |
 | S13-04 | Clean source repositories for a fresh build - GCC-KNC fork and project code without build artifacts, plus a Linux-host build recipe the owner runs on the new workstation | draft |  |
 | S13-05 | model-first skill - a project Claude Code skill that models a hot region and its run-time lower bound before any optimization, plus one sourced KNC machine file | Done | The model-first skill (.claude/skills/model-first with formulas, levers and a worked C7 example) and a sour... |
 | S13-06 | knc-twin trial and validation - run the KNC core twin on real GCC-KNC loop output, check it against characterization rows and held-out kernels we already timed, and report what it rejects or gets wrong | Done | knc-twin 0.2.1 is in the repo: it reads GCC-KNC assembly, predicts one-core cycles and loop bounds, and is ... |
@@ -144,28 +144,29 @@ Current tickets: `[#################---]` 255 of 296
 | S14-13 | knc-twin: 8-tile multi-core unit on the full ring with all memory controllers (roadmap item 3) | Done | knc-twin simulates 1-8 detailed cores on the full 61-stop ring with all memory controllers and directory sl... |
 | S14-14 | knc-twin: scheduling explorer for modulo scheduling and reordering, evaluating S14-02/S14-03 (roadmap item 4) | Done | knc-twin gains a schedule command: beam search up to 60 instructions, list ordering, modulo II, GAS export ... |
 | S14-15 | knc-twin prepare-native: absolute memory operands come out as `N()` in kernel.S (k1om as 2.22 rejects them); emit them relocated into the image | Done | prepare-native emits absolute operands relocated into the memory image (knc_twin_mem+off(%rip)) instead of ... |
-| S14-16 | bzip2 slower than GCC 5.1.1: mask-to-GPR move cost below a GPR move makes RA park integers in k registers (M4 known limit, must-fix) | draft |  |
+| S14-16 | bzip2 slower than GCC 5.1.1: mask-to-GPR move cost below a GPR move makes RA park integers in k registers (M4 known limit, must-fix) | In progress | S14-16 has a red test: a synthetic byte decoder written from scratch fails because existing GCC parks scala... |
 | S14-17 | Compare not folded with its load in merged return blocks (GCC 16 middle end, about half the remaining bzip2 mainGtU gap) | draft |  |
 | S14-18 | knc-twin regress: held-out replay runs under a 120 s wall-clock budget, so a slow interpreter turns a prediction into a budget_exhausted stub and the test fails as a false mismatch | Done | The knc-twin held-out replay no longer runs in t0 (KNC_TWIN_HELDOUT=1 or validate_heldout.py --max-seconds ... |
 | S14-19 | knc-twin x87 integer-load widths - fildl reads 8 bytes (must be 4), filds reads 4 (must be 2) | Done | The knc-twin now reads and writes x87 integer memory at the right widths (filds/fists 2 bytes, fildl/fistl ... |
 | S14-20 | knc-twin: an indirect jmp/call (PLT tail call through the GOT) on a never-executed path must not refuse the whole region | Done | a region containing an indirect jmp or call that never executes now runs; an executed one fails with the in... |
 | S14-21 | knc-twin multi-core: held-out validation of the 8-tile ring model against the measured GEMV, triad and core-scaling rows | Not started |  |
-| S14-22 | card_run turn row: refreshing an open turn row must keep its place in the queue | draft |  |
-| S14-23 | knc-twin: import the window-10 scatter rows (2 threads) and settle occupancy.scatter_cycles_per_line | In progress | Owner closed the budget after the final session. The worktree is committed on s14/S14-23 as wip (converter,... |
-| S14-24 | dispatch: refuse a session up front when its worktree git dir or ticket file is not writable from the sandbox | draft |  |
+| S14-22 | card_run turn row: refreshing an open turn row must keep its place in the queue | lead | Engineer cannot run card_run tests: tools/run.py hangs (>8 min, no log) and the pre-tool hook blocks direct... |
+| S14-23 | knc-twin: import the window-10 scatter rows (2 threads) and settle occupancy.scatter_cycles_per_line | Done | superseded by S14-33, which carries this ticket's committed work (wip 8d846ffe cherry-picked onto s14/S14-3... |
+| S14-24 | dispatch: refuse a session up front when its worktree git dir or ticket file is not writable from the sandbox | Not started |  |
 | S14-25 | knc-twin: recorded outputs carry absolute host paths (C:/Users/<name>/...); write repo-relative paths and scrub the committed records | Not started |  |
-| S14-26 | knc-twin bound for software pipelining - how much could overlapping iterations gain on the M4 hot loops (go/no-go for S14-02) | In progress |  |
+| S14-26 | knc-twin bound for software pipelining - how much could overlapping iterations gain on the M4 hot loops (go/no-go for S14-02) | lead | Reviewed b9056c7f: matches the 14:03 answer (static caps, no-go verdict, modulo unsupported evidence kept);... |
 | S14-27 | knc-twin bounds: the dependency critical path charges cold lines their full miss latency, so the "lower bound" can exceed the simulation | Not started |  |
 | S14-28 | knc-twin ranking of the four quantized GEMV kernel forms on one KNC core (phase 0 of S14-08) | Not started |  |
 | S14-29 | knc-twin: schedule --block ADDR..ADDR for a straight-line block inside a function, and batch must not write a native request per candidate by default | Not started |  |
-| S14-30 | WRF built with GCC-KNC runs 1.21x slower per step than PhiWeather's production build - attribute the gap per cause before fixing (M5, owner rule) | draft |  |
+| S14-30 | WRF built with GCC-KNC runs 1.21x slower per step than PhiWeather's production build - attribute the gap per cause before fixing (M5, owner rule) | draft | issue #32 (short WRF tiles), PhiWeather knc-twin study of rk_update_scalar from our module_em.o (twin estim... |
 | S14-31 | knc-twin multi-core usability: compare across scales, stubs and repeated calls at unit/ring scale, multi-context sampling, separated ring/memory stall shares | Not started |  |
-| S14-33 | knc-twin: import the window-11 calibration rows (imci-math latency and throughput, div10, x87 fcoms, rcp23/rsqrt23 tables) and retire the assumed parameters they settle | lead | Interactive lead: commit the files in the 13:46 ask (log S14_33_final_regress-20261116-134356) as 'feat(S14... |
+| S14-33 | knc-twin: import the window-11 calibration rows (imci-math latency and throughput, div10, x87 fcoms, rcp23/rsqrt23 tables) and retire the assumed parameters they settle | Done | the branch's knc-twin commits were split and merged into the knc-twin repository (C:/Users/xuzhi/Documents/... |
 | S14-35 | knc-twin prepare-native: the generated native program for PhiWeather's sixth_order_diffusion kernels segfaults on the card (exit 139 under claude-pin); find the cause, fix the generator, restage | Done | knc-twin prepare-native runs each kernel on its own stack (the kernel's in-image stack, or a private per-co... |
 | S14-37 | knc-twin x87 double rounding: _x87_binop rounds to the 64-bit significand and then to PC=53/24; real x87 rounds once (knc-boinc repro, 1 to 8 ULP errors) | Not started |  |
 | S14-38 | Card and twin dashboard - running card job, card queue and running twin work with remaining time, card temperature and utilization, host CPU, refreshed every 5 minutes | Done | A local dashboard (python tools/knc_dashboard.py serve) now shows the running card job, the card queue and ... |
 | S14-39 | knc-twin prepare-native: pointer-rich captures (heap addresses sparse over tens of GB) need a relocating or multi-segment native image | Not started |  |
 | S14-41 | knc-twin prepare-native: the generated driver.c uses mfence, which the K1OM assembler rejects; emit a k1om-legal fence and add a build-and-lint test for generated programs | Not started |  |
+| S14-42 | knc-optimize skill - Intel's recommended KNC optimization method, rechecked against our sources and card data, as a portable skill other projects can use | In progress | Accept the gap; do not fetch anything. The ticket scope is local sources only. Keep the ICC option-guide GU... |
 | S2-01 | Design for zmm and mask registers under -march=knc | Done | The register design for KNC is settled on paper: all 32 zmm and 8 mask registers become usable under -march... |
 | S2-02 | Float and double arguments and results in zmm lane 0 | Done | Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`). |
 | S2-03 | Varargs with the donor's register save area | Done | Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`). |
@@ -321,23 +322,23 @@ Current tickets: `[#################---]` 255 of 296
 
 ## Recent activity
 
-- 2026-11-16 13:48 **S14-33** lead defer: Interactive lead: commit the files in the 13:46 ask (log S14_33_final_regress-20261116-134356) as 'feat(S14-33): div10 vector-zero data, held-out r...
-- 2026-11-16 13:46 **S14-33** engineer ask: Ready for lead commit/rebase (13:40 workflow; knc ref absent). Files: knc-twin/scripts/import_window11.py, references/validation.md, tests/heldout_...
-- 2026-11-16 13:40 **S14-33** lead answer: WIP committed by the lead. Yes: fix the case data, not the validator: import_window11.py must emit the zmm15/zmm9 zero initial values as a vector o...
-- 2026-11-16 13:40 **S14-33** lead resume: lead committed the wip
-- 2026-11-16 13:37 **S14-33** lead defer: Interactive lead: commit the WIP in worktree S14-33 (files in the 13:35 ask, log S14_33_heldout_remaining-20261116-133324) as 'wip(S14-33): ticks c...
-- 2026-11-16 13:35 **S14-33** engineer ask: Two record attempts failed. Normalize div10 zmm15/zmm9=0 to vector objects next? Commit WIP/resume. Selftest 218 pass; recording incomplete. Files:...
-- 2026-11-16 13:03 **S14-33** owner decide: sessions 5 -> 9, input_tokens 12M -> 20M under the owner's standing rule: steady progress (static catalog replay green, converter units red committ...
-- 2026-11-16 13:02 **S14-33** engineer escalate: budget: 5 engineer sessions used; the budget is 5
+- 2026-11-16 16:53 **S14-42** lead answer: Accept the gap; do not fetch anything. The ticket scope is local sources only. Keep the ICC option-guide GUIDs listed as unrechecked in the Source ...
+- 2026-11-16 16:49 **S14-42** engineer ask: 69b1e803 commits the portable skill, source audit, GEMV example and locator fixes. Six artifact checks and installer smoke passed; commands/logs ar...
+- 2026-11-16 16:25 **S14-30** lead note: issue #32 (short WRF tiles), PhiWeather knc-twin study of rk_update_scalar from our module_em.o (twin estimates, unvalidated_scenario_estimate; Phi...
+- 2026-11-16 16:19 **S14-42** lead approve-red: The red test for the knc-optimize skill is accepted: it checks the skill files, trigger words, a source locator and one of the four verdicts on eve...
+- 2026-11-16 16:16 **S14-42** engineer red: f625301c adds the six artifact checks; tools/run.py --name S14-42-red ran test_knc_optimize_skill.py under Cygwin Python 3.12 and produced 12 expec...
+- 2026-11-16 16:15 **S14-30** lead note: PhiWeather 25 h figure (their message, 2026-11-16): PGK-02 = patched GCC-KNC WRF (wrf.exe 890f58f8, classic CDF2 inputs, Miami 2024-01-06 12Z, 8x15...
+- 2026-11-16 15:38 **S14-33** lead escalate: lead session ended without a decision (exit 0)
+- 2026-11-16 14:59 **S14-33** engineer submit: a69e96f6: all five review fixes. Full held-out recording PASS; selftest 221 tests, zero failures/errors; trial PASS. Scatter t1 +0.7%/+6.8%; scatte...
 
 ## Cost
 
-- From the script, engineer: 802 sessions, 1682.7M input tokens
-- From the script, lead: 548 sessions, 154.3M input tokens
-- Started by hand, Claude: 47 sessions, 4377.6M input tokens
+- From the script, engineer: 813 sessions, 1713.7M input tokens
+- From the script, lead: 559 sessions, 156.9M input tokens
+- Started by hand, Claude: 83 sessions, 4490.3M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 41.3 GiB of 100 GiB. 52 GiB free on the drive.
+The project uses 42.2 GiB of 100 GiB. 41 GiB free on the drive.
