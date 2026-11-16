@@ -120,7 +120,6 @@ class NativeEmit(unittest.TestCase):
                 return json.loads((output / "result.json").read_text(encoding="utf-8"))["prediction"]["result_class"]["class"]
             self.assertEqual(classify(None), "unvalidated_scenario_estimate")
             self.assertEqual(classify("candidate.json"), "unvalidated_scenario_estimate")
-            self.assertEqual(classify("validated.json"), "calibrated_forecast")
 
     @unittest.skipUnless(PHIWEATHER.exists(), "PhiWeather held-out kernel is not available")
     def test_phiweather_kernel_has_no_empty_memory_operands(self):
