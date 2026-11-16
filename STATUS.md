@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-16 10:01.
+Updated automatically at every ticket change. Last update: 2026-11-16 10:04.
 
-**Next: GPT-6.1, on S14-10 (knc-twin: --jobs N for independent simulations and PyPy support (roadmap item 1)).** Run `python tools/dispatch.py`, or ask the tech lead to.
+**Next: the tech lead, on S14-35.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[#################---]` 253 of 292
 
@@ -160,7 +160,7 @@ Current tickets: `[#################---]` 253 of 292
 | S14-29 | knc-twin: schedule --block ADDR..ADDR for a straight-line block inside a function, and batch must not write a native request per candidate by default | Not started |  |
 | S14-31 | knc-twin multi-core usability: compare across scales, stubs and repeated calls at unit/ring scale, multi-context sampling, separated ring/memory stall shares | Not started |  |
 | S14-33 | knc-twin: import the window-11 calibration rows (imci-math latency and throughput, div10, x87 fcoms, rcp23/rsqrt23 tables) and retire the assumed parameters they settle | Not started |  |
-| S14-35 | knc-twin prepare-native: the generated native program for PhiWeather's sixth_order_diffusion kernels segfaults on the card (exit 139 under claude-pin); find the cause, fix the generator, restage | In progress |  |
+| S14-35 | knc-twin prepare-native: the generated native program for PhiWeather's sixth_order_diffusion kernels segfaults on the card (exit 139 under claude-pin); find the cause, fix the generator, restage | Question for the tech lead | Original kernel JSON is referenced by request.json but exists only under read-only C:\\Users\\xuzhi\\Docume... |
 | S14-37 | knc-twin x87 double rounding: _x87_binop rounds to the 64-bit significand and then to PC=53/24; real x87 rounds once (knc-boinc repro, 1 to 8 ULP errors) | Not started |  |
 | S2-01 | Design for zmm and mask registers under -march=knc | Done | The register design for KNC is settled on paper: all 32 zmm and 8 mask registers become usable under -march... |
 | S2-02 | Float and double arguments and results in zmm lane 0 | Done | Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`). |
@@ -317,6 +317,7 @@ Current tickets: `[#################---]` 253 of 292
 
 ## Recent activity
 
+- 2026-11-16 10:03 **S14-35** engineer ask: Original kernel JSON is referenced by request.json but exists only under read-only C:\\Users\\xuzhi\\Documents\\PhiWeather, outside allowed read ro...
 - 2026-11-16 10:01 **S14-23** owner decide: Owner: one more session (input_tokens 10M -> 14M), with the lead's scoped-down plan on the ticket: no functional replay of the catalog driver; reco...
 - 2026-11-16 09:51 **S14-23** engineer escalate: budget: 10609446 input tokens used; the budget is 10000000
 - 2026-11-16 09:22 **S14-23** owner decide: Continue in a fresh session (input_tokens 4M -> 10M, sessions 3 -> 6, standing rule). Your worktree keeps the uncommitted converter (scripts/import...
@@ -324,16 +325,15 @@ Current tickets: `[#################---]` 253 of 292
 - 2026-11-16 09:20 **S14-23** lead answer: Continue in a fresh session on the same branch: commit what you have now, then finish steps 2-4 (all three thread counts t1/t2/t4, held-out case, v...
 - 2026-11-16 09:18 **S14-23** engineer ask: The scatter import implementation and converter are prepared, but the required prediction/validation artifacts and profile overlay work could not b...
 - 2026-11-16 09:05 **S14-20** lead approve: a region containing an indirect jmp or call that never executes now runs; an executed one fails with the instruction and address, and the coverage ...
-- 2026-11-16 08:47 **S14-20** lead resume: lead committed the stray ticket change on main; approving
 
 ## Cost
 
-- From the script, engineer: 777 sessions, 1647.3M input tokens
+- From the script, engineer: 778 sessions, 1651.4M input tokens
 - From the script, lead: 527 sessions, 148.9M input tokens
-- Started by hand, Claude: 14 sessions, 4278.9M input tokens
+- Started by hand, Claude: 14 sessions, 4279.5M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 40.9 GiB of 100 GiB. 57 GiB free on the drive.
+The project uses 40.9 GiB of 100 GiB. 55 GiB free on the drive.
