@@ -5,6 +5,12 @@ parameter. One harness owns them: `scripts/validate_heldout.py` (the characteriz
 with `--kernels-s/--kernels-h/--measured`, plus every case directory here with `--cases`).
 Results: `characterization-run/validation.md` and `references/validation.md`.
 
+`multicore-scenarios/prediction.json` records finite synthetic unit/ring predictions
+from `scripts/record_multicore.py`, with full assumptions and parameter statuses.
+It deliberately has no `case.json` or invented `measurement.json`: independent
+native comparisons and faithful compiled full-card inputs remain pending, listed
+in `references/validation.md`. It does not enter held-out accuracy statistics.
+
 - `measured-characterization.json`, `characterization-run/`: the 119 measured rows of the
   gcc_knc characterization catalog; rows listed in `CALIBRATION_ROWS` set a parameter or exposed
   a rule and are excluded from the held-out statistics.

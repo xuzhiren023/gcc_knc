@@ -5,8 +5,8 @@ description: Run supported KNC/IMCI simulations, check kernels, compare schedule
 
 # knc-twin
 
-A standard-library Python twin of one Intel Xeon Phi Knights Corner (K1OM, IMCI) core, plus
-analytical pair/card scenario models. It runs on the host or in a code-execution sandbox and
+A standard-library Python twin of Intel Xeon Phi Knights Corner (K1OM, IMCI) cores,
+with simulated unit/ring and analytical pair/card scenario models. It runs on the host or in a code-execution sandbox and
 needs no card. Entry point: `scripts/knc_twin.py` (Python 3.8+). Everything bundled resolves
 relative to that file; the current directory does not matter.
 
@@ -59,6 +59,9 @@ relative to that file; the current directory does not matter.
    - `functional <kernel>` exact results of supported operations vs expected outputs
    - `simulate <kernel> --profile <id>` core-cycle prediction (1-4 contexts), with front-end and
      memory statistics, stub calls and input-file hashes
+   - `simulate <kernel> --scale unit|ring` 1-8 detailed cores sharing ring/TD/channel queues;
+     `streams[].core` places contexts on cores. Ring enables synthetic symmetry background.
+     These are unvalidated scenarios; see `references/multicore-design.md` and `input-format.md`.
    - `bounds <kernel>` lower bounds; `--loop` ResMII/RecMII/critical path; `--search` exhaustive reorder
    - `bounds --scale card|pair --params <json>` labeled analytical scenario estimates
    - `compare <baseline result.json> <candidate result.json>` same model, same scenario, deltas
@@ -107,6 +110,14 @@ per execution; calls, returns and costed stubs. `pair` and `card` are analytical
 models (formulas on measured bandwidths, no ring or memory-controller simulation) that need
 explicit parameters and return `needs_parameters` otherwise; they never multiply one-core
 throughput by the core count.
+
+`unit` and `ring` simulate up to eight detailed cores on a contracted 61-position
+ring, with 64 directory slices and eight two-channel controllers. Ring's remaining
+active cores offer synthetic prior-epoch traffic; they do not execute instructions.
+Every result is `unvalidated_scenario_estimate`. Geometry, maps and service terms
+include explicit assumptions; independent scaling/full-card validation is pending.
+Shared writes between functional streams, atomics, fences, scatter and stubs are
+unsupported at these scales. Pair/card remain analytical models.
 
 ## Profiles
 

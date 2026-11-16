@@ -54,10 +54,10 @@ def main():
             continue
         name = spec["id"]
         out = root / name
-        out.mkdir(parents=True, exist_ok=True)
         raw = kernel(name, 2 if name == "multicore-ring-distance" else 60)
         raw["provenance"] = {"description": spec["why"], "experimental_prerequisites": spec["prerequisites"]}
-        path = out / "input.json"
+        root.mkdir(parents=True, exist_ok=True)
+        path = root / (name + "-input.json")
         path.write_text(json.dumps(raw, indent=2) + "\n")
         code = cli.main(["prepare-native", str(path), "--out", str(out)])
         if code:

@@ -110,6 +110,48 @@ bytes-over-bandwidth formula with those same measurements, so they test the prof
 a model; the GEMV case (125.3 GB/s measured) shows how far a real kernel sits below the sweep
 winner.
 
+## Multi-core unit/ring (S14-13)
+
+Every unit/ring result remains `unvalidated_scenario_estimate`. Passing synthetic
+protocol tests establishes shared queues, transaction conservation, shortest-route
+remote reads, pending-fill visibility and contention, not hardware accuracy.
+The predeclared engineering target is 10% per comparable row; it has not been
+widened and no multi-core shape is promoted.
+
+Finite cold-read predictions for 1/2/4/8 detailed cores, both without background
+(`unit`) and with 60 total active cores (`ring`), are recorded separately in
+`tests/heldout_native/multicore-scenarios/prediction.json`. They have one context
+per core and 64 cold lines per context. They retain assumptions, parameters,
+unsupported forms and result classes. They are synthetic scenarios, not the
+compiled kernels or steady-state timed envelopes of the historical card rows.
+They therefore do not enter the held-out error/ranking statistics. Regenerate
+with `scripts/record_multicore.py --out <shared-output> --record
+tests/heldout_native/multicore-scenarios/prediction.json` from the knc-twin root.
+
+| Evidence | Status and unresolved comparison |
+|---|---|
+| 1/2/4/8-core STREAM bandwidth | Pending native rows: none exist in the repository, per the lead's evidence review. Do not interpolate from 15/60-core points. `multicore-symmetry` requests the missing measurements. |
+| S8-10 C11 remote L2, 190.6-195.0 ns | Calibration: the approved 192 ns endpoint residual is used. Protocol tests check residual/reference-path identity and exact route differences, not independent latency accuracy. Controlled ring-distance validation needs the deferred driver. |
+| S11-06 read winner, 186.14 GB/s | Calibration of channel interval, never held out. A faithful steady-state compiled STREAM comparison remains pending; finite cold-read scenarios do not establish it. |
+| First membw run, 60/120/240-spread and 60-compact (15 cores), small pages | Pending retrospective shape comparison with the original footprint, prefetch and completion envelope; short samples are not acceptance gates. |
+| S11-06 triad, 168.23 GB/s | Pending retrospective prediction of the matching compiled kernel and byte count. Write/read service ratio remains 1, never selected from this row. |
+| S11-09 fp32 GEMV, 125.30 GB/s weight bytes, 120 threads, small pages | Held-out target reserved; faithful compiled input binding and simulation remain pending. The existing analytical `gemv-fp32-card/core.s` is a stand-in, not this kernel. No synthetic read result is compared with this row. |
+| Libgomp/M4 barriers and scaling | Pending matching protocols, binaries and timed regions; custom C11 barriers are not libgomp validation. |
+
+These are open validation gaps, not numerical passes or measured misses. Possible
+sources of future error include assumed TD/channel mappings, effective ring/link
+service, a short cold warmup, prior-epoch symmetry feedback, page backing and
+start/stop scope. Epoch/placement sensitivity and independent full-card accuracy
+remain open. No held-out row was used to adjust a parameter in this ticket.
+
+Native request skeletons for channel saturation, TD contention and symmetry are
+staged under `.work/_shared/S14-13/native/` via `prepare-native`, each with 60
+workers, explicit affinity and a shared completion envelope. `experiment.json`
+states required cold preconditioning, address-map controls and count variants;
+the generated tiny warm loops are controls and cannot measure DRAM saturation
+as-is. Ring-distance, remote-write and ring-mixed are `needs-driver` specifications
+in `calibration-plan.json`. No native execution is claimed.
+
 ## A real candidate batch (`fixtures/batch`)
 
 The S12-30 gate's seven CSR builds, converted from the gate's objects with the timed entry and

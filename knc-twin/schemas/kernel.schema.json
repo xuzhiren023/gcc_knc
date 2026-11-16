@@ -11,6 +11,7 @@
     "name": {"type": "string"},
     "description": {"type": "string"},
     "notes": {"type": ["string", "array"]},
+    "provenance": {"type": "object", "description": "Input origin and experimental prerequisites; never evidence of native validation by itself."},
     "representation": {"enum": ["normalized-records", "gas-att-subset"], "description": "optional declaration; derived from the streams"},
     "unit_of_work": {
       "type": "object", "required": ["count"],
@@ -43,10 +44,15 @@
       }
     },
     "streams": {
-      "type": "array", "minItems": 1, "maxItems": 4,
+      "type": "array", "minItems": 1,
+      "description": "Without core IDs, at most four contexts. With core IDs, every stream declares core and each (core, context) pair is unique. Unit/ring simulation admits at most eight detailed cores; native export may have more workers.",
+      "if": {"contains": {"required": ["core"]}},
+      "then": {"items": {"required": ["core"]}},
+      "else": {"maxItems": 4},
       "items": {
         "type": "object",
         "properties": {
+          "core": {"type": "integer", "minimum": 0, "description": "Logical detailed-core identity, not a physical CPU or ring position."},
           "context": {"type": "integer", "minimum": 0, "maximum": 3},
           "init": {"type": "object", "properties": {"registers": {"$ref": "#/definitions/registers"}}},
           "expected": {"type": "object", "properties": {"registers": {"$ref": "#/definitions/registers"}}},
@@ -60,6 +66,24 @@
     "scenario": {
       "type": "object", "additionalProperties": false,
       "properties": {
+        "multicore": {
+          "type": "object", "additionalProperties": false,
+          "properties": {
+            "placement": {"type": "object", "propertyNames": {"pattern": "^[0-9]+$"}, "additionalProperties": {"type": "integer", "minimum": 0, "maximum": 60}, "description": "Every detailed core ID maps to a distinct contracted ring position; default spreads N cores as floor(i*61/N)."},
+            "channel_interleave": {"enum": ["line_modulo", "xor", "page", "single_channel"]},
+            "td_interleave": {"enum": ["xor", "line_modulo", "single_slice"]},
+            "td_positions": {"type": "array", "minItems": 64, "maxItems": 64, "items": {"type": "integer", "minimum": 0, "maximum": 60}},
+            "controller_positions": {"type": "array", "minItems": 8, "maxItems": 8, "items": {"type": "integer", "minimum": 0, "maximum": 60}},
+            "background": {"type": "object", "additionalProperties": false, "properties": {
+              "enabled": {"type": "boolean", "description": "Default false for unit, true for ring."},
+              "active_cores": {"type": "integer", "minimum": 1, "maximum": 61, "description": "Total active cores including detailed cores; default 60."},
+              "epoch_cycles": {"type": "integer", "minimum": 1},
+              "seed": {"type": "integer"}
+            }},
+            "max_events": {"type": "integer", "minimum": 1},
+            "max_pending": {"type": "integer", "minimum": 1}
+          }
+        },
         "memory": {
           "oneOf": [
             {"type": "object", "required": ["type", "level"], "properties": {"type": {"const": "fixed_level"}, "level": {"$ref": "#/definitions/level"}}},

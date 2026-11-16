@@ -232,7 +232,7 @@
     },
     {
       "id": "multicore-ring-distance",
-      "status": "request-skeleton",
+      "status": "needs-driver",
       "role": "calibration; reserve separate prospective validation rows",
       "parameters": [
         "ring.hop_cycles",
@@ -241,9 +241,9 @@
       ],
       "settles": "Owner/requester candidate distances 1/15/30, both directions; repeat allocations and pairs.",
       "variants": "Owner/requester candidate distances 1/15/30, both directions; repeat allocations and pairs.",
-      "prerequisites": "Two shared read streams are the generated control. Before the measured first read, the operator must pin and prime a remote owner, evict requester copies, and record actual placement uncertainty. Warm repeated calls are NOT remote-L2 latency. No handoff framework is implemented.",
+      "prerequisites": "Lead-approved deferral (S14-13, 2026-11-16): the current exporter warms each context serially and repeats timed calls. Reliable remote ownership across samples requires requester eviction and repeated owner publication; a single initial barrier does not preserve remote-hit state. No ring-distance request is staged. A future driver must pin owner/requester, prime ownership and measure the first read, with assumed placement reported.",
       "why": "S14-13 assumed geometry/service/background parameters need independent native evidence; no card result has been produced.",
-      "request_path": ".work/_shared/S14-13/native/multicore-ring-distance",
+      "request_path": null,
       "body": []
     },
     {

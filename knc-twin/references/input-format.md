@@ -71,6 +71,57 @@ reloads, scatter completion and flag effects are kept as emitted.
 
 ## Kernel
 
+### Multi-core placement
+
+`simulate --scale unit|ring` accepts one to eight detailed cores, with up to four
+contexts on each. Set `core` on **every** stream and `context` to its local 0-3
+context. Each `(core, context)` pair must be unique. Core IDs are logical labels;
+they are not Linux CPU IDs. Prefer stream-local expected registers; top-level
+register expectations use the internal slot `4 * core + context`.
+
+```json
+"scenario": {
+  "memory": {"type": "line_tracking", "cold_level": "memory"},
+  "multicore": {
+    "placement": {"0": 0, "1": 30},
+    "channel_interleave": "line_modulo",
+    "td_interleave": "xor",
+    "background": {"enabled": true, "active_cores": 60, "epoch_cycles": 256},
+    "max_events": 2000000,
+    "max_pending": 200000
+  }
+}
+```
+
+Placement names every detailed core exactly once, using distinct positions 0-60.
+Omitting it spreads the cores around the contracted 61-position ring. Optional
+`td_positions` (64 entries) and `controller_positions` (8 entries) specify assumed
+attachments. Channel maps are `line_modulo`, `xor`, `page`, or `single_channel`;
+TD maps are `xor`, `line_modulo`, or `single_slice`. These maps are hypotheses,
+not recovered physical-address hashes.
+
+`unit` defaults to background off and `ring` to background on. `active_cores`
+includes detailed cores (default 60, giving 52 background cores for eight tiles).
+`seed` sets deterministic background phase offsets. Background uses previous-epoch
+offers after an excluded cold warmup and drains admitted traffic at the end.
+Vary epoch and placement before interpreting a short stream as steady state.
+`--max-cycles`, `--max-seconds`, event and pending-transaction budgets stop with
+`budget_exhausted`; partial diagnostics are not predictions.
+
+The functional trace is sequential per context: shared reads are supported,
+but a line written by one core and accessed by another is rejected, as are stubs,
+fences, atomics and scatter at these scales. The internal protocol probes can
+exercise remote ownership; that does not provide functional shared-memory
+synchronization. Every unit/ring result remains `unvalidated_scenario_estimate`.
+Core-only simulation and analytical pair/card inputs keep their existing meaning.
+
+`prepare-native` also accepts more than eight cores. Its generated driver takes
+an explicit `--cpus` list in stream order, or uses exactly the granted affinity
+set, with one worker per CPU and a shared start/completion envelope. Stream count
+must match the CPU count. Generated warm repeated calls do not by themselves
+measure cold channels, TD contention or remote ownership; staged experiment
+specifications state the required preconditioning. Card execution is lead-only.
+
 ```json
 {
   "schema": "knc-twin.kernel/1",
