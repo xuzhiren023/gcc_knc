@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-16 03:49.
+Updated automatically at every ticket change. Last update: 2026-11-16 03:50.
 
 **Waiting for you:** S14-15. Run `python tools/pm.py inbox`.
 
@@ -141,7 +141,7 @@ Current tickets: `[#################---]` 244 of 279
 | S14-10 | knc-twin: --jobs N for independent simulations and PyPy support (roadmap item 1) | In progress | No worktree needed. Export main's knc-twin into your shared dir: git -c safe.directory='*' archive main knc... |
 | S14-11 | knc-twin: close PhiWeather WRF coverage gaps (jump tables, vcvtps2pd ymm, loop-region and complete-listing modes, scatter and rcp-table import) | lead | Review done, no findings: A-G match the brief and the 08:25Z pre-review; heap stubs pinned red-then-green i... |
 | S14-12 | knc-twin: iteration and phase sampling for loop and whole-program wall-time estimates (roadmap item 2) | lead | Review passed, ready to approve: head 7f734b23 matches the pre-review and meets brief 04's done criteria. M... |
-| S14-13 | knc-twin: 8-tile multi-core unit on the full ring with all memory controllers (roadmap item 3) | Question for the tech lead | Lead merged main into s14/S14-13 (8fdc95a8, clean). Size override approved; sessions 10 -> 11 for the submi... |
+| S14-13 | knc-twin: 8-tile multi-core unit on the full ring with all memory controllers (roadmap item 3) | In progress | Both gates are resolved: main is merged into s14/S14-13 (8fdc95a8, clean) and the size override is approved... |
 | S14-14 | knc-twin: scheduling explorer for modulo scheduling and reordering, evaluating S14-02/S14-03 (roadmap item 4) | lead | Review passed (approve note: knc-twin gains a schedule command: beam search up to 60 instructions, list ord... |
 | S14-15 | knc-twin prepare-native: absolute memory operands come out as `N()` in kernel.S (k1om as 2.22 rejects them); emit them relocated into the image | **Waiting for you** | budget: 10651104 input tokens used; the budget is 10000000 |
 | S14-16 | bzip2 slower than GCC 5.1.1: mask-to-GPR move cost below a GPR move makes RA park integers in k registers (M4 known limit, must-fix) | draft |  |
@@ -304,6 +304,7 @@ Current tickets: `[#################---]` 244 of 279
 
 ## Recent activity
 
+- 2026-11-16 03:50 **S14-13** lead answer: Both gates are resolved: main is merged into s14/S14-13 (8fdc95a8, clean) and the size override is approved; sessions are 11 for this submit only. ...
 - 2026-11-16 03:49 **S14-13** lead resume: Lead merged main into s14/S14-13 (8fdc95a8, clean). Size override approved; sessions 10 -> 11 for the submit only. Run first thing: pm.py submit S1...
 - 2026-11-16 03:47 **S14-13** lead defer: Interactive lead needed (sessions 10/10). (1) Merge main into s14/S14-13 by hand: the submit hard gate (pm.py:330) fires because main has non-work ...
 - 2026-11-16 03:46 **S14-11** lead defer: Review done, no findings: A-G match the brief and the 08:25Z pre-review; heap stubs pinned red-then-green in test_v03.py TestHeapStubs; 3600 s HPCG...
@@ -311,13 +312,12 @@ Current tickets: `[#################---]` 244 of 279
 - 2026-11-16 03:44 **S14-11** engineer submit: A-G complete; main merged; worktree clean. Windows Python 3.8 heldout HPCG check with --max-seconds 3600 passed all 8 variants, no differs or budge...
 - 2026-11-16 03:28 **S14-18** lead answer: Yes: remove the duplicate test_compiled_rows_record_disables_deadline (keep one copy, in the class it tests), then make the [red] test commit, the ...
 - 2026-11-16 03:28 **S14-11** owner decide: sessions 6 -> 7 (one more, for the submit only): run pm.py submit with the --override text of the 08:15Z decide first thing, then end the session. ...
-- 2026-11-16 03:27 **S14-13** owner decide: sessions 9 -> 10 (one more, for the submit only): the 03:24 answer stands; run pm.py submit first thing with the pending list it names, then end th...
 
 ## Cost
 
 - From the script, engineer: 755 sessions, 1623.9M input tokens
 - From the script, lead: 511 sessions, 144.8M input tokens
-- Started by hand, Claude: 14 sessions, 4144.6M input tokens
+- Started by hand, Claude: 14 sessions, 4144.8M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
