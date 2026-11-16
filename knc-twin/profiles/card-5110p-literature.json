@@ -1,29 +1,113 @@
 {
   "schema": "knc-twin.profile/1",
   "id": "card-5110p-literature",
-  "version": "0.1.0",
+  "version": "0.3.0",
   "kind": "card",
-  "extends": "knc-common",
+  "extends": "core-x100-measured",
   "synthetic": false,
-  "description": "Xeon Phi 5110P (60 cores, 1.053 GHz, 8 GB GDDR5, 320 GB/s peak). Card constants are Intel's published specification. Latencies come from published measurements on 5100-series or similar systems (R06 engineering sample at 1 GHz, R07 5100-series at 1.05 GHz, R08 SE10P). None was measured by this project; nothing here is calibrated against a card the project owns.",
+  "description": "Xeon Phi 5110P (60 cores, 1.053 GHz, 8 GB GDDR5, 320 GB/s peak). Card constants are Intel's published specification. Core timing in cycles is inherited from core-x100-measured (measured on the project's 7120-class card; same core design, not re-measured on a 5110P). L2 and memory latency are published measurements on 5100-series or similar systems (R06, R07, R08). The project's '--profile 5100' runs limit threads and memory on the 7120 card; they are not 5110P measurements.",
   "native_measurement_ids": [],
-  "calibration": {"state": "uncalibrated_literature_values", "statement": "No native measurement imported. Values marked literature were measured by other authors on other samples.", "held_out_validation_cases": 0},
+  "calibration": {
+    "state": "transferred_core_measurements_with_literature_memory",
+    "statement": "Core timing is transferred from the 7120-class card; L2 and memory latency are literature values from other samples; nothing was measured on a 5110P by this project. Every result is an unvalidated scenario estimate for this card.",
+    "held_out_validation_cases": 0
+  },
   "parameters": {
-    "card.model": {"value": "Xeon Phi 5110P", "unit": "text", "status": "documented", "source": "Intel product specification (ark.intel.com, Xeon Phi Coprocessor 5110P)"},
-    "card.clock_hz": {"value": 1053000000, "unit": "Hz", "status": "documented", "source": "Intel product specification 5110P (1.053 GHz)"},
-    "card.cores": {"value": 60, "unit": "cores", "status": "documented", "source": "Intel product specification 5110P"},
-    "card.usable_cores": {"value": 59, "unit": "cores", "status": "assumed", "source": "one core reserved for the card OS in the usual native configuration; not measured"},
-    "card.memory_bytes": {"value": 8589934592, "unit": "bytes", "status": "documented", "source": "Intel product specification 5110P (8 GB)"},
-    "card.peak_memory_bandwidth_gbs": {"value": 320, "unit": "GB/s", "status": "documented", "source": "Intel product specification 5110P"},
-    "latency.vector_long": {"value": 6, "unit": "cycles", "status": "assumed", "source": "transferred from the project's 7120-class card measurement (S6-03); same core design", "alternatives": [7]},
-    "latency.vector_convert_df": {"value": 7, "unit": "cycles", "status": "assumed", "source": "transferred from S6-03 on the 7120-class card"},
-    "latency.l2_hit": {"value": 23, "unit": "cycles", "status": "literature", "source": "R06 §5.1.1 (22-23 cycles, engineering sample); R07 §3.2", "alternatives": [11, 25]},
-    "latency.memory": {"value": 330, "unit": "cycles", "status": "literature", "source": "R06 §5.1.1 (318-346 cycles at 1 GHz on an engineering sample); R08 ~300 cycles at 1.1 GHz", "alternatives": [300, 346]},
-    "latency.remote_l2_line_ns": {"value": 243, "unit": "ns", "status": "literature", "source": "R06 §5.1.2 (about 243 cycles at 1 GHz, sd 32); R08 ~275 ns", "alternatives": [275]},
-    "latency.branch_mispredict_penalty": {"value": null, "unit": "cycles", "status": "unknown", "source": "not measured on a 5110P by any imported source"},
-    "latency.gather_first_line": {"value": 15, "unit": "cycles", "status": "assumed", "source": "transferred from S6-03 on the 7120-class card"},
-    "occupancy.gather_cycles_per_line": {"value": 7, "unit": "core cycles", "status": "assumed", "source": "transferred from S6-03 on the 7120-class card"},
-    "card.sustained_bandwidth_gbs": {"value": {"read_only": null, "read_modify_write": null, "write_normal": null, "write_ngo": null}, "unit": "GB/s", "status": "unknown", "source": "R09 reports pre-production STREAM figures only; not imported"},
-    "card.barrier_ns": {"value": {"tree": null, "counter": null}, "unit": "ns", "status": "unknown"}
+    "card.model": {
+      "value": "Xeon Phi 5110P",
+      "unit": "text",
+      "status": "documented",
+      "source": "Intel product specification (ark.intel.com, Xeon Phi Coprocessor 5110P)"
+    },
+    "card.clock_hz": {
+      "value": 1053000000,
+      "unit": "Hz",
+      "status": "documented",
+      "source": "Intel product specification 5110P (1.053 GHz)"
+    },
+    "card.cores": {
+      "value": 60,
+      "unit": "cores",
+      "status": "documented",
+      "source": "Intel product specification 5110P"
+    },
+    "card.usable_cores": {
+      "value": 59,
+      "unit": "cores",
+      "status": "assumed",
+      "source": "one core reserved for the card OS in the usual native configuration; not measured"
+    },
+    "card.memory_bytes": {
+      "value": 8589934592,
+      "unit": "bytes",
+      "status": "documented",
+      "source": "Intel product specification 5110P (8 GB)"
+    },
+    "card.peak_memory_bandwidth_gbs": {
+      "value": 320,
+      "unit": "GB/s",
+      "status": "documented",
+      "source": "Intel product specification 5110P"
+    },
+    "latency.l2_hit": {
+      "value": 23,
+      "unit": "cycles",
+      "status": "literature",
+      "source": "R06 §5.1.1 (22-23 cycles, engineering sample); R07 §3.2",
+      "alternatives": [
+        11,
+        25
+      ]
+    },
+    "latency.memory": {
+      "value": 330,
+      "unit": "cycles",
+      "status": "literature",
+      "source": "R06 §5.1.1 (318-346 cycles at 1 GHz on an engineering sample); R08 ~300 cycles at 1.1 GHz",
+      "alternatives": [
+        300,
+        346
+      ]
+    },
+    "latency.remote_l2_line_ns": {
+      "value": 243,
+      "unit": "ns",
+      "status": "literature",
+      "source": "R06 §5.1.2 (about 243 cycles at 1 GHz, sd 32); R08 ~275 ns",
+      "alternatives": [
+        275
+      ]
+    },
+    "latency.branch_mispredict_penalty": {
+      "value": null,
+      "unit": "cycles",
+      "status": "unknown",
+      "source": "not measured on a 5110P by any imported source"
+    },
+    "card.sustained_bandwidth_gbs": {
+      "value": {
+        "read_only": null,
+        "read_modify_write": null,
+        "write_normal": null,
+        "write_ngo": null
+      },
+      "unit": "GB/s",
+      "status": "unknown",
+      "source": "R09 reports pre-production STREAM figures only; not imported"
+    },
+    "card.barrier_ns": {
+      "value": {
+        "tree": null,
+        "counter": null
+      },
+      "unit": "ns",
+      "status": "unknown"
+    },
+    "memory.core_service_cycles_per_line": {
+      "value": 17,
+      "unit": "cycles per line per core",
+      "status": "assumed",
+      "source": "7120-class card: 20 cycles per line at 1.238 GHz = 16.2 ns, converted at 1.053 GHz; not measured on a 5110P"
+    }
   }
 }

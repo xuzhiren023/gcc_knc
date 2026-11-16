@@ -6,14 +6,27 @@
     "limiting": [
       {
         "constraint": "spacing",
-        "context_cycles": 16
+        "context_cycles": 9
+      },
+      {
+        "constraint": "core_busy",
+        "context_cycles": 7
       }
     ],
     "predicted_cycles": 33,
     "status": "ok"
   },
-  "engine_version": "0.2.1",
-  "message": "sustained bandwidth for traffic type 'read_only' is unknown in profile card-7120-measured; give bandwidth_sweep_gbs: [...] to run a declared sweep, or import a native measurement",
-  "profile_hash": "44e9c3bb3ae07b5f3f8a54a8854f2936c34cce38ac100fa99414234793a3a9ae",
-  "status": "needs_parameters"
+  "engine_version": "0.3.0",
+  "profile_hash": "0292e57ad671aaeadb5a638f9d9a9e4814d8502b27b498f4dacd84ccdedbcea5",
+  "scenarios": [
+    {
+      "achieved_bandwidth_gbs_if_total": 186.1,
+      "bandwidth_gbs": 186.1,
+      "binding": "memory",
+      "compute_seconds": 0.05962823134087238,
+      "memory_seconds": 0.369261024911338,
+      "total_seconds": 0.369261024911338
+    }
+  ],
+  "status": "ok"
 }

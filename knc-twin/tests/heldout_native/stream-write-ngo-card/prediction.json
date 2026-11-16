@@ -10,21 +10,25 @@
       },
       {
         "constraint": "spacing",
-        "context_cycles": 16
+        "context_cycles": 9
+      },
+      {
+        "constraint": "core_busy",
+        "context_cycles": 7
       }
     ],
     "predicted_cycles": 249,
     "status": "ok"
   },
-  "engine_version": "0.2.1",
-  "profile_hash": "44e9c3bb3ae07b5f3f8a54a8854f2936c34cce38ac100fa99414234793a3a9ae",
+  "engine_version": "0.3.0",
+  "profile_hash": "0292e57ad671aaeadb5a638f9d9a9e4814d8502b27b498f4dacd84ccdedbcea5",
   "scenarios": [
     {
       "achieved_bandwidth_gbs_if_total": 152.73638554216868,
-      "bandwidth_gbs": 226.1,
+      "bandwidth_gbs": 169.7,
       "binding": "compute",
       "compute_seconds": 0.4499221092084007,
-      "memory_seconds": 0.30393399706324636,
+      "memory_seconds": 0.40494682814378313,
       "total_seconds": 0.4499221092084007
     }
   ],

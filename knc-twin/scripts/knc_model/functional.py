@@ -7,6 +7,7 @@ communicate through memory is rejected (sequential execution would not reproduce
 the interleaving).
 """
 from fractions import Fraction
+import os
 import struct
 import time
 
@@ -17,11 +18,13 @@ from . import fp
 
 LINE = 64
 INT_INDEFINITE = {1: 0x80, 2: 0x8000, 4: 0x80000000, 8: 0x8000000000000000}
+ENTRY_SENTINEL = 0x7D5E4E7141E10000   # return address of the simulated function's caller
+ENTRY_STACK = 0x7F0000000000
 SWIZZLE_MAP = {"cdab": (2, 3, 0, 1), "badc": (1, 0, 3, 2), "dacb": (3, 0, 2, 1), "aaaa": (0, 0, 0, 0), "bbbb": (1, 1, 1, 1), "cccc": (2, 2, 2, 2), "dddd": (3, 3, 3, 3)}
 
 
 class TraceEvent(object):
-    __slots__ = ("ctx", "insn", "addr", "nbytes", "lines", "taken", "mask_bits", "seq", "pf_level", "xreads", "xwrites")
+    __slots__ = ("ctx", "insn", "addr", "nbytes", "lines", "taken", "mask_bits", "seq", "pf_level", "xreads", "xwrites", "stub", "ret_target")
 
     def __init__(self, ctx, insn, addr=None, nbytes=0, lines=(), taken=None, mask_bits=None, seq=0, pf_level=None):
         self.ctx = ctx
@@ -35,6 +38,8 @@ class TraceEvent(object):
         self.pf_level = pf_level
         self.xreads = None
         self.xwrites = None
+        self.stub = None
+        self.ret_target = None
 
     def to_dict(self):
         return {"ctx": self.ctx, "id": self.insn.id, "op": self.insn.op, "addr": self.addr, "nbytes": self.nbytes,
@@ -175,7 +180,49 @@ def encode_values(spec, what):
         return b"".join(struct.pack("<H", parse_int(v, what) & 0xFFFF) for v in spec["u16"])
     if "u8" in spec:
         return bytes(parse_int(v, what) & 0xFF for v in spec["u8"])
-    raise InvalidInput("%s: need one of f32, f64, f16, u32, i32, u64, u16, u8" % what)
+    if "i64" in spec:
+        return b"".join(struct.pack("<q", to_signed(parse_int(v, what), 64)) for v in spec["i64"])
+    if "hex" in spec:
+        try:
+            return bytes.fromhex(spec["hex"])
+        except ValueError:
+            raise InvalidInput("%s: 'hex' is not a hexadecimal byte string" % what)
+    raise InvalidInput("%s: need one of f32, f64, f16, u32, i32, i64, u64, u16, u8, hex, file" % what)
+
+
+_TEXT_FORMATS = {"i32": "<i", "u32": "<I", "i64": "<q", "u64": "<Q", "f32": "<f", "f64": "<d", "u8": "<B", "i8": "<b", "u16": "<H", "i16": "<h"}
+
+
+def load_input_file(blk, kernel_dir, what):
+    """init.memory block {"addr", "file", "format"?, "offset"?, "length"?}: bytes of a file captured from the
+    measured run (raw dump, default) or a text file of numbers in the named element format.
+    Returns (data, record) where record names the file and its SHA-256 for the report."""
+    import hashlib
+    path = blk["file"]
+    if not os.path.isabs(path):
+        path = os.path.join(kernel_dir, path)
+    if not os.path.isfile(path):
+        raise InvalidInput("%s: input file %s not found" % (what, path))
+    with open(path, "rb") as f:
+        raw = f.read()
+    fmt = blk.get("format", "raw")
+    if fmt == "raw":
+        off = parse_int(blk.get("offset", 0), what + ".offset")
+        ln = parse_int(blk["length"], what + ".length") if "length" in blk else len(raw) - off
+        data = raw[off:off + ln]
+        if len(data) != ln:
+            raise InvalidInput("%s: file %s has %d bytes after offset %d, %d wanted" % (what, path, len(raw) - off, off, ln))
+    elif fmt in _TEXT_FORMATS:
+        toks = raw.decode("ascii", errors="replace").replace(",", " ").split()
+        try:
+            vals = [float(t) if fmt in ("f32", "f64") else int(t, 0) for t in toks]
+            data = b"".join(struct.pack(_TEXT_FORMATS[fmt], v) for v in vals)
+        except (ValueError, struct.error) as e:
+            raise InvalidInput("%s: file %s is not a list of %s values (%s)" % (what, path, fmt, e))
+    else:
+        raise InvalidInput("%s: format %r; use raw or one of %s" % (what, fmt, ", ".join(sorted(_TEXT_FORMATS))))
+    rec = {"file": os.path.basename(path), "sha256": hashlib.sha256(raw).hexdigest(), "bytes": len(data), "format": fmt}
+    return data, rec
 
 
 def zmm_from_spec(spec, what):
@@ -227,6 +274,8 @@ class Context(object):
         self.ftop = 0
         self.fcw = fcw
         self.fcc = {"C0": 0, "C1": 0, "C2": 0, "C3": 0}
+        self.seg_base = {"fs": 0x7E0000000000 + (ctx << 32), "gs": 0x7E8000000000 + (ctx << 32)}
+        self.call_depth = 0
 
     # x87 helpers
     def fphys(self, i):
@@ -277,6 +326,8 @@ class Context(object):
                     self.fst[self.ftop] = bits
             elif n == "fcw":
                 self.fcw = parse_int(val, what + ".fcw") & 0xFFFF
+            elif n in ("fs_base", "gs_base"):
+                self.seg_base[n[:2]] = mask64(parse_int(val, what + "." + name))
             else:
                 raise InvalidInput("%s: unknown register %r" % (what, name))
 
@@ -302,12 +353,27 @@ class Interpreter(object):
         self.traces = {}
         self.contexts = {}
         self.steps = {}
+        self.stub_calls = {}
+        self.approximate_stubs = set()
+        self.gather_one_line = kernel.numerical_policy.get("gather_completion", "one_line") == "one_line"
+        if any(i.cls in ("vector_gather", "vector_scatter") for s in kernel.streams for i in s.insns):
+            if self.gather_one_line:
+                self.assume("a gather or scatter execution completes the pending lanes that share the cache line of the lowest pending lane and leaves the rest in the mask (R05 section V.D; the jknzd loop re-executes it); numerical_policy.gather_completion 'all' restores one-shot completion")
+            else:
+                self.assume("numerical_policy.gather_completion 'all': every pending lane completes in one execution (not the hardware's behaviour for lanes on several cache lines)")
         pol = kernel.numerical_policy
         self.base_policy = fp.Policy(pol["rounding"], bool(pol.get("ftz")), bool(pol.get("daz")), pol.get("ftz_rule", "tiny"))
+        self.input_files = []
         for i, blk in enumerate(kernel.init.get("memory", [])):
             if "addr" not in blk:
                 raise InvalidInput("init.memory[%d] needs addr" % i)
             addr = parse_int(blk["addr"], "init.memory[%d].addr" % i)
+            if "file" in blk:
+                data, rec = load_input_file(blk, kernel.dir, "init.memory[%d]" % i)
+                rec["addr"] = "0x%x" % addr
+                self.input_files.append(rec)
+                self.memory.init_block(addr, data)
+                continue
             if "fill" in blk:
                 f = blk["fill"]
                 unit = encode_values({k: [f[k]] for k in f if k in ("f32", "f64", "f16", "u32", "i32", "u64", "u16", "u8")}, "init.memory[%d].fill" % i)
@@ -330,6 +396,10 @@ class Interpreter(object):
             cx.apply_init(self.kernel.init.get("registers", {}), "init.registers")
             cx.apply_init(stream.init.get("registers", {}), "streams[%d].init.registers" % stream.context)
             self.contexts[stream.context] = cx
+            if self.kernel.entry == "function":
+                if cx.gpr["rsp"] == 0:
+                    cx.gpr["rsp"] = ENTRY_STACK - (stream.context << 24) - 8
+                self.memory.write(cx.gpr["rsp"], ENTRY_SENTINEL.to_bytes(8, "little"))
             trace = []
             self.traces[stream.context] = trace
             steps = 0
@@ -375,6 +445,8 @@ class Interpreter(object):
             a += cx.gpr[mem.index.base] * mem.scale
         if lane_index is not None:
             a += lane_index * mem.scale
+        if mem.segment is not None:
+            a += cx.seg_base[mem.segment]
         return mask64(a)
 
     # scalar register access with widths
@@ -558,16 +630,17 @@ class Interpreter(object):
         a = self.sval(cx, dst, w, trace_mem)
         b = self.sval(cx, src, w, trace_mem)
         m = (1 << w) - 1
-        if insn.op in ("add", "adc"):
-            cin = cx.flags["CF"] if insn.op == "adc" else 0
+        opn = insn.spec.get("base_op", insn.op)
+        if opn in ("add", "adc"):
+            cin = cx.flags["CF"] if opn == "adc" else 0
             r = (a + b + cin) & m
             self._set_flags_arith(cx, a, b, r, w, "add", cin)
-        elif insn.op in ("sub", "sbb"):
-            cin = cx.flags["CF"] if insn.op == "sbb" else 0
+        elif opn in ("sub", "sbb"):
+            cin = cx.flags["CF"] if opn == "sbb" else 0
             r = (a - b - cin) & m
             self._set_flags_arith(cx, a, b, r, w, "sub", cin)
         else:
-            r = {"and": a & b, "or": a | b, "xor": a ^ b}[insn.op] & m
+            r = {"and": a & b, "or": a | b, "xor": a ^ b}[opn] & m
             self._set_flags_logic(cx, r, w)
         self.sset(cx, dst, r, w, trace_mem)
 
@@ -627,7 +700,7 @@ class Interpreter(object):
         w = insn.width
         a = self.sval(cx, dst, w, trace_mem)
         cf = cx.flags["CF"]
-        if insn.op == "inc":
+        if insn.spec.get("base_op", insn.op) == "inc":
             r = (a + 1) & ((1 << w) - 1)
             self._set_flags_arith(cx, a, 1, r, w, "add")
         else:
@@ -750,6 +823,88 @@ class Interpreter(object):
         trace_mem.append((cx.gpr["rsp"], 8))
         cx.gpr["rbp"] = int.from_bytes(data, "little")
         cx.gpr["rsp"] = mask64(cx.gpr["rsp"] + 8)
+
+    def h_xchg(self, cx, insn, ev, trace_mem, stream):
+        a_op, b_op = insn.operands
+        w = insn.width
+        a = self.sval(cx, a_op, w, trace_mem)
+        b = self.sval(cx, b_op, w, trace_mem)
+        self.sset(cx, a_op, b, w, trace_mem)
+        self.sset(cx, b_op, a, w, trace_mem)
+
+    def h_xadd(self, cx, insn, ev, trace_mem, stream):
+        dst, src = insn.operands
+        w = insn.width
+        a = self.sval(cx, dst, w, trace_mem)
+        b = self.sval(cx, src, w, trace_mem)
+        r = (a + b) & ((1 << w) - 1)
+        self._set_flags_arith(cx, a, b, r, w, "add")
+        self.sset(cx, src, a, w, trace_mem)
+        self.sset(cx, dst, r, w, trace_mem)
+
+    def h_cmpxchg(self, cx, insn, ev, trace_mem, stream):
+        dst, src = insn.operands
+        w = insn.width
+        a = self.sval(cx, dst, w, trace_mem)
+        acc = cx.gpr["rax"] & ((1 << w) - 1)
+        self._set_flags_arith(cx, acc, a, (acc - a) & ((1 << w) - 1), w, "sub")
+        if acc == a:
+            self.sset(cx, dst, self.sval(cx, src, w, trace_mem), w, trace_mem)
+        else:
+            self.rset(cx, Reg({64: "rax", 32: "eax", 16: "ax", 8: "al"}[w]), a, w)
+
+    def h_sahf(self, cx, insn, ev, trace_mem, stream):
+        ah = (cx.gpr["rax"] >> 8) & 0xFF
+        cx.flags["SF"] = (ah >> 7) & 1
+        cx.flags["ZF"] = (ah >> 6) & 1
+        cx.flags["PF"] = (ah >> 2) & 1
+        cx.flags["CF"] = ah & 1
+
+    # --- calls ---------------------------------------------------------------------------------
+    def h_call(self, cx, insn, ev, trace_mem, stream):
+        target = insn.target
+        if target in stream.labels:
+            ret_value = stream.return_value(insn.index)
+            cx.gpr["rsp"] = mask64(cx.gpr["rsp"] - 8)
+            self.memory.write(cx.gpr["rsp"], ret_value.to_bytes(8, "little"), cx.ctx)
+            trace_mem.append((cx.gpr["rsp"], 8))
+            ev.taken = True
+            cx.call_depth += 1
+            return stream.labels[target]
+        stub = self.kernel.calls.get(target)
+        if stub is None:
+            raise Unsupported("instruction %s: call to %r, which is neither in the region nor declared in the kernel's 'calls'" % (insn.id, target),
+                              {"instruction": insn.id, "callee": target})
+        from . import stubs
+        ev.stub = target
+        self.stub_calls[target] = self.stub_calls.get(target, 0) + 1
+        ev.taken = False
+        stubs.run_stub(self, cx, insn, target, stub, trace_mem)
+        return None
+
+    def h_ret(self, cx, insn, ev, trace_mem, stream):
+        data = self.memory.read(cx.gpr["rsp"], 8, cx.ctx)
+        trace_mem.append((cx.gpr["rsp"], 8))
+        cx.gpr["rsp"] = mask64(cx.gpr["rsp"] + 8)
+        value = int.from_bytes(data, "little")
+        ev.taken = True
+        if value == ENTRY_SENTINEL:
+            ev.ret_target = -1
+            return len(stream.insns)
+        idx = stream.return_sites.get(value)
+        if idx is None:
+            raise InvalidInput("instruction %s: ret to 0x%x, which is not a return site of this region (stack corrupted, or no entry sentinel: set kernel 'entry' to 'function')" % (insn.id, value))
+        cx.call_depth -= 1
+        ev.ret_target = idx
+        return idx
+
+    def h_vpmadd231d(self, cx, insn, ev, trace_mem, stream):
+        dst, a_op, b_op = insn.operands
+        a = cx.zmm[a_op.base]
+        b = self.vsrc(cx, b_op, insn, trace_mem, 4, False)
+        old = cx.zmm[dst.base]
+        out = [(old[i] + to_signed(a[i], 32) * to_signed(b[i], 32)) & 0xFFFFFFFF for i in range(16)]
+        self.merge32(cx, dst, out, self.kmask(cx, insn))
 
     def h_nop(self, cx, insn, ev, trace_mem, stream):
         return None
@@ -1319,18 +1474,23 @@ class Interpreter(object):
         out = list(cx.zmm[dst.base]) if elem == 4 else u32s_to_u64s(cx.zmm[dst.base])
         lines = set()
         first = None
+        done_bits = 0
+        one_line = self.gather_one_line
         for i, a in enumerate(addrs):
             if not (kbits >> i) & 1:
                 continue
+            if one_line and first is not None and lines_of(a, elem)[0] != lines_of(first, elem)[0]:
+                continue  # another cache line: left pending in the mask for the next execution
             data = self.memory.read(a, elem, cx.ctx)
             out[i] = struct.unpack("<I" if elem == 4 else "<Q", data)[0]
             lines.update(lines_of(a, elem))
+            done_bits |= 1 << i
             if first is None:
                 first = a
         cx.zmm[dst.base] = out if elem == 4 else u64s_to_u32s(out)
-        cx.k[insn.mask.base] = 0
+        cx.k[insn.mask.base] = kbits & ~done_bits
         ev.addr = first
-        ev.nbytes = elem * bin(kbits).count("1")
+        ev.nbytes = elem * bin(done_bits).count("1")
         ev.lines = tuple(sorted(lines))
         ev.mask_bits = kbits
 
@@ -1346,16 +1506,21 @@ class Interpreter(object):
         data = struct.pack("<16I", *cx.zmm[src.base])
         lines = set()
         first = None
+        done_bits = 0
+        one_line = self.gather_one_line
         for i, a in enumerate(addrs):
             if not (kbits >> i) & 1:
                 continue
+            if one_line and first is not None and lines_of(a, elem)[0] != lines_of(first, elem)[0]:
+                continue
             self.memory.write(a, data[elem * i:elem * i + elem], cx.ctx)
             lines.update(lines_of(a, elem))
+            done_bits |= 1 << i
             if first is None:
                 first = a
-        cx.k[insn.mask.base] = 0
+        cx.k[insn.mask.base] = kbits & ~done_bits
         ev.addr = first
-        ev.nbytes = elem * bin(kbits).count("1")
+        ev.nbytes = elem * bin(done_bits).count("1")
         ev.lines = tuple(sorted(lines))
         ev.mask_bits = kbits
 
@@ -1615,6 +1780,45 @@ class Interpreter(object):
                 if pops == 2:
                     cx.fpop(insn)
             return None
+        if op == "fxam":
+            v = cx.fst[cx.fphys(0)]
+            if v is None:
+                c3, c2, c0, c1 = 1, 0, 1, 0
+            else:
+                c1 = 1 if v & fp.F80.sign_bit else 0
+                kind = fp.classify(v, fp.F80)[0]
+                if kind == fp.ZERO:
+                    c3, c2, c0 = 1, 0, 0
+                elif kind == fp.INF:
+                    c3, c2, c0 = 0, 1, 1
+                elif kind == fp.NAN:
+                    c3, c2, c0 = 0, 0, 1
+                elif ((v >> fp.F80.mant) & fp.F80.exp_mask) == 0:
+                    c3, c2, c0 = 1, 1, 0
+                else:
+                    c3, c2, c0 = 0, 1, 0
+            cx.fcc["C0"], cx.fcc["C1"], cx.fcc["C2"], cx.fcc["C3"] = c0, c1, c2, c3
+            self._x87_mark(ev, cx, [0] if v is not None else [], [])
+            return None
+        if op == "ftst":
+            a = cx.fget(0, insn)
+            c = fp.fcompare(a, 0, fp.F80)
+            cc = {"unordered": (1, 1, 1), "lt": (1, 0, 0), "eq": (0, 0, 1)}.get(c, (0, 0, 0))
+            cx.fcc["C0"], cx.fcc["C2"], cx.fcc["C3"] = cc
+            cx.fcc["C1"] = 0
+            self._x87_mark(ev, cx, [0], [])
+            return None
+        if op == "frndint":
+            v = cx.fget(0, insn)
+            kind = fp.classify(v, fp.F80)[0]
+            if kind == fp.NUM:
+                q, err = fp.float_to_int(v, fp.F80, pol, signed=True, width=20000)
+                r = fp.round_exact(Fraction(q), fp.F80, pol)[0]
+                if q == 0 and (v & fp.F80.sign_bit):
+                    r |= fp.F80.sign_bit
+                cx.fst[cx.fphys(0)] = r
+            self._x87_mark(ev, cx, [0], [0])
+            return None
         if op == "fnstsw":
             sw = (cx.fcc["C0"] << 8) | (cx.fcc["C1"] << 9) | (cx.fcc["C2"] << 10) | (cx.ftop << 11) | (cx.fcc["C3"] << 14)
             (dst,) = insn.operands
@@ -1755,8 +1959,17 @@ def check_expected(kernel, interp):
             got = interp.memory.read(addr, len(want))
             if got != want:
                 mism.append({"where": what, "got": got.hex(), "want": want.hex()})
+        elif "hex" in blk or "file" in blk:
+            if "file" in blk:
+                want, _ = load_input_file(blk, kernel.dir, "expected.memory[%d]" % i)
+            else:
+                want = bytes.fromhex(blk["hex"])
+            got = interp.memory.read(addr, len(want))
+            if got != want:
+                k = next(j for j in range(len(want)) if got[j] != want[j])
+                mism.append({"where": "%s+%d" % (what, k), "got": got[k:k + 8].hex(), "want": want[k:k + 8].hex()})
         else:
-            raise InvalidInput("%s: expected memory needs f32/f64/f16/u32/i32/u64/u16/u8" % what)
+            raise InvalidInput("%s: expected memory needs f32/f64/f16/u32/i32/u64/u16/u8/hex/file" % what)
     if checked == 0:
         return {"status": "not_specified", "mismatches": [], "checked": 0}
     return {"status": "ok" if not mism else "mismatch", "mismatches": mism, "checked": checked}

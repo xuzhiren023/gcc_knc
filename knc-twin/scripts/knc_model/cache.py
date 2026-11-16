@@ -106,7 +106,12 @@ class MemoryModel(object):
                         self.l2.insert(la, -1)
                     la += LINE
             assume("line_tracking: true LRU replacement stands in for the hardware's pseudo-LRU; the L1 and L2 are modeled as private to the core with no coherence traffic")
-            if self.sc.get("tlb") == "modeled":
+            def want(key, *params):
+                v = self.sc.get(key, "auto")
+                if v == "auto":
+                    return all(profile.has(p) for p in params)
+                return v == "modeled"
+            if want("tlb", "tlb.l1_entries_4k", "tlb.l1_miss_penalty_cycles"):
                 self.page = self.sc.get("page_bytes", 4096)
                 entries = profile.get("tlb.l1_entries_4k") if self.page == 4096 else profile.get("tlb.l1_entries_2m")
                 self.tlb = LRU(entries)
@@ -119,7 +124,7 @@ class MemoryModel(object):
                 assume("TLB sub-model: %d-entry fully associative LRU first-level DTLB for %d-byte pages; a miss adds %d cycles; second-level TLB reach and page walks are not modeled" % (entries, self.page, self.tlb_penalty))
             else:
                 assume("TLB not modeled: every access is assumed to hit the first-level DTLB")
-            if self.sc.get("hardware_prefetcher") == "modeled":
+            if want("hardware_prefetcher", "l2.hw_prefetch_streams", "l2.hw_prefetch_depth_lines", "l2.hw_prefetch_max_stride_lines", "latency.memory"):
                 self.hwp_streams = LRU(profile.get("l2.hw_prefetch_streams"))
                 self.hwp_depth = profile.get("l2.hw_prefetch_depth_lines")
                 self.hwp_max_stride = profile.get("l2.hw_prefetch_max_stride_lines")
@@ -129,7 +134,7 @@ class MemoryModel(object):
                 assume("L2 hardware prefetcher sub-model: a stream per 4 KiB page after two accesses with the same stride (<= %d lines), prefetching %d lines ahead within the page into L2; prefetched fills do not use L1 demand-miss slots (assumed)" % (self.hwp_max_stride, self.hwp_depth))
             else:
                 assume("L2 hardware prefetcher not modeled")
-            if self.sc.get("memory_service") == "modeled":
+            if want("memory_service", "memory.core_service_cycles_per_line"):
                 self.service = profile.get("memory.core_service_cycles_per_line")
                 self.channel_free = 0
                 self.submodels.append("memory_service")

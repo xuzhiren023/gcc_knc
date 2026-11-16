@@ -23,7 +23,7 @@ def f32(x):
 
 def write(name, obj):
     path = os.path.join(HERE, name)
-    with open(path, "w", encoding="utf-8") as f:
+    with open(path, "w", encoding="utf-8", newline=chr(10)) as f:
         json.dump(obj, f, indent=1)
         f.write("\n")
     print("wrote", path)
@@ -196,12 +196,13 @@ write("fp_edge_ftz.json", k2)
 table = list(range(0, 4096))  # u32 table at 0x300000: value == index
 for name, idx, desc in (("gather_one_line", list(range(16)), "all 16 lanes in one cache line"),
                         ("gather_scattered", [i * 16 for i in range(16)], "each lane in a different cache line (stride 64 bytes)")):
-    k = {"schema": SCHEMA, "name": name, "description": "vgatherdps %s; expected lanes are the gathered indices themselves" % desc,
+    k = {"schema": SCHEMA, "name": name, "description": "vgatherdps %s, in the completion loop the hardware needs (one cache line per execution); expected lanes are the gathered indices themselves" % desc,
          "unit_of_work": {"description": "one 16-lane gather", "count": 1},
          "init": {"memory": [{"addr": "0x300000", "u32": table[:256]}],
                   "registers": {"rax": "0x300000", "k1": "0xffff", "zmm1": {"u32": idx}}},
          "streams": [{"context": 0, "instructions": [
-             {"id": "g", "op": "vgatherdps", "ops": ["zmm0", {"base": "rax", "vindex": "zmm1", "scale": 4}], "mask": "k1", "lines": 1 if name == "gather_one_line" else 16},
+             {"id": "g", "label": "again", "op": "vgatherdps", "ops": ["zmm0", {"base": "rax", "vindex": "zmm1", "scale": 4}], "mask": "k1"},
+             {"id": "loop", "op": "jknzd", "ops": ["k1", "again"]},
              {"id": "use", "op": "vpaddd", "ops": ["zmm2", "zmm0", "zmm0"]},
          ]}],
          "expected": {"registers": {"0": {"zmm0": {"u32": idx}, "k1": 0, "zmm2": {"u32": [2 * i for i in idx]}}}}}

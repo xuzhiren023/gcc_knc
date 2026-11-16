@@ -103,6 +103,13 @@ class TestMaskAndVector(unittest.TestCase):
                  "registers": {"rax": "0x2000", "k1": "0x000f", "zmm1": {"u32": [0, 16, 32, 48] + [0] * 12}, "zmm0": {"u32_broadcast": 9}}})
         interp, _ = run(k)
         cx = interp.contexts[0]
+        # one execution completes the lanes of one cache line and leaves the others in the mask (0.3.0)
+        self.assertEqual(cx.zmm["zmm0"][:4], [0, 9, 9, 9])
+        self.assertEqual(cx.k["k1"], 0x000e)
+        self.assertEqual(len(interp.traces[0][0].lines), 1)
+        k.numerical_policy["gather_completion"] = "all"
+        interp, _ = run(k)
+        cx = interp.contexts[0]
         self.assertEqual(cx.zmm["zmm0"][:4], [0, 16, 32, 48])
         self.assertEqual(cx.zmm["zmm0"][4:], [9] * 12)
         self.assertEqual(cx.k["k1"], 0)

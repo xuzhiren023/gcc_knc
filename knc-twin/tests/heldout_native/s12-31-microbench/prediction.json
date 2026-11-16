@@ -1,38 +1,851 @@
 {
   "case": "s12-31-microbench",
-  "engine_version": "0.2.1",
-  "profile_hash": "44e9c3bb3ae07b5f3f8a54a8854f2936c34cce38ac100fa99414234793a3a9ae",
-  "scenario": "harness scenario A (line tracking, TLB modeled, hardware prefetcher off), arrays warm in L1, branches predicted",
+  "engine_version": "0.3.0",
+  "profile_hash": "0292e57ad671aaeadb5a638f9d9a9e4814d8502b27b498f4dacd84ccdedbcea5",
+  "scenario": "arrays warm in L1, default memory sub-models, branches predicted from their history",
   "unit": "one 27-product row (27 inner iterations plus the outer loop step)",
   "variants": [
     {
       "completion_cycles": [
-        1665,
-        3205
+        2141,
+        4153
       ],
+      "frontend": {
+        "decode_delay_cycles": 0,
+        "icache_misses": 0,
+        "layout": true,
+        "padding_nops": 60,
+        "slow_prefix_instructions": 0,
+        "taken_branch_bubbles": 216
+      },
       "functional": [
         "ok",
         "ok"
       ],
       "limiting": [
         {
-          "constraint": "spacing",
-          "context_cycles": 1166
+          "constraint": "miss_stall",
+          "context_cycles": 1080
         },
         {
-          "constraint": "dependency",
-          "context_cycles": 864
+          "constraint": "spacing",
+          "context_cycles": 1031
         }
       ],
-      "predicted_cycles_per_unit": 385.0,
+      "memory_submodels": [
+        "tlb",
+        "hardware_prefetcher",
+        "memory_service"
+      ],
+      "predicted_cycles_per_unit": 503.0,
       "status": "ok",
       "variant": "gas_0"
     },
     {
       "completion_cycles": [
-        1625,
-        3165
+        2143,
+        4159
       ],
+      "frontend": {
+        "decode_delay_cycles": 0,
+        "icache_misses": 0,
+        "layout": true,
+        "padding_nops": 67,
+        "slow_prefix_instructions": 0,
+        "taken_branch_bubbles": 216
+      },
+      "functional": [
+        "ok",
+        "ok"
+      ],
+      "limiting": [
+        {
+          "constraint": "miss_stall",
+          "context_cycles": 1080
+        },
+        {
+          "constraint": "spacing",
+          "context_cycles": 1038
+        }
+      ],
+      "memory_submodels": [
+        "tlb",
+        "hardware_prefetcher",
+        "memory_service"
+      ],
+      "predicted_cycles_per_unit": 504.0,
+      "status": "ok",
+      "variant": "gas_1"
+    },
+    {
+      "completion_cycles": [
+        2141,
+        4157
+      ],
+      "frontend": {
+        "decode_delay_cycles": 0,
+        "icache_misses": 0,
+        "layout": true,
+        "padding_nops": 66,
+        "slow_prefix_instructions": 8,
+        "taken_branch_bubbles": 216
+      },
+      "functional": [
+        "ok",
+        "ok"
+      ],
+      "limiting": [
+        {
+          "constraint": "miss_stall",
+          "context_cycles": 1080
+        },
+        {
+          "constraint": "spacing",
+          "context_cycles": 1037
+        }
+      ],
+      "memory_submodels": [
+        "tlb",
+        "hardware_prefetcher",
+        "memory_service"
+      ],
+      "predicted_cycles_per_unit": 504.0,
+      "status": "ok",
+      "variant": "gas_2"
+    },
+    {
+      "completion_cycles": [
+        2139,
+        4155
+      ],
+      "frontend": {
+        "decode_delay_cycles": 0,
+        "icache_misses": 0,
+        "layout": true,
+        "padding_nops": 65,
+        "slow_prefix_instructions": 0,
+        "taken_branch_bubbles": 216
+      },
+      "functional": [
+        "ok",
+        "ok"
+      ],
+      "limiting": [
+        {
+          "constraint": "miss_stall",
+          "context_cycles": 1080
+        },
+        {
+          "constraint": "spacing",
+          "context_cycles": 1036
+        }
+      ],
+      "memory_submodels": [
+        "tlb",
+        "hardware_prefetcher",
+        "memory_service"
+      ],
+      "predicted_cycles_per_unit": 504.0,
+      "status": "ok",
+      "variant": "gas_3"
+    },
+    {
+      "completion_cycles": [
+        2137,
+        4153
+      ],
+      "frontend": {
+        "decode_delay_cycles": 0,
+        "icache_misses": 0,
+        "layout": true,
+        "padding_nops": 64,
+        "slow_prefix_instructions": 0,
+        "taken_branch_bubbles": 216
+      },
+      "functional": [
+        "ok",
+        "ok"
+      ],
+      "limiting": [
+        {
+          "constraint": "miss_stall",
+          "context_cycles": 1080
+        },
+        {
+          "constraint": "spacing",
+          "context_cycles": 1035
+        }
+      ],
+      "memory_submodels": [
+        "tlb",
+        "hardware_prefetcher",
+        "memory_service"
+      ],
+      "predicted_cycles_per_unit": 504.0,
+      "status": "ok",
+      "variant": "gas_4"
+    },
+    {
+      "completion_cycles": [
+        2135,
+        4151
+      ],
+      "frontend": {
+        "decode_delay_cycles": 0,
+        "icache_misses": 0,
+        "layout": true,
+        "padding_nops": 63,
+        "slow_prefix_instructions": 0,
+        "taken_branch_bubbles": 216
+      },
+      "functional": [
+        "ok",
+        "ok"
+      ],
+      "limiting": [
+        {
+          "constraint": "miss_stall",
+          "context_cycles": 1080
+        },
+        {
+          "constraint": "spacing",
+          "context_cycles": 1034
+        }
+      ],
+      "memory_submodels": [
+        "tlb",
+        "hardware_prefetcher",
+        "memory_service"
+      ],
+      "predicted_cycles_per_unit": 504.0,
+      "status": "ok",
+      "variant": "gas_5"
+    },
+    {
+      "completion_cycles": [
+        2133,
+        4149
+      ],
+      "frontend": {
+        "decode_delay_cycles": 0,
+        "icache_misses": 0,
+        "layout": true,
+        "padding_nops": 62,
+        "slow_prefix_instructions": 8,
+        "taken_branch_bubbles": 216
+      },
+      "functional": [
+        "ok",
+        "ok"
+      ],
+      "limiting": [
+        {
+          "constraint": "miss_stall",
+          "context_cycles": 1080
+        },
+        {
+          "constraint": "spacing",
+          "context_cycles": 1033
+        }
+      ],
+      "memory_submodels": [
+        "tlb",
+        "hardware_prefetcher",
+        "memory_service"
+      ],
+      "predicted_cycles_per_unit": 504.0,
+      "status": "ok",
+      "variant": "gas_6"
+    },
+    {
+      "completion_cycles": [
+        2131,
+        4147
+      ],
+      "frontend": {
+        "decode_delay_cycles": 0,
+        "icache_misses": 0,
+        "layout": true,
+        "padding_nops": 61,
+        "slow_prefix_instructions": 0,
+        "taken_branch_bubbles": 216
+      },
+      "functional": [
+        "ok",
+        "ok"
+      ],
+      "limiting": [
+        {
+          "constraint": "miss_stall",
+          "context_cycles": 1080
+        },
+        {
+          "constraint": "spacing",
+          "context_cycles": 1032
+        }
+      ],
+      "memory_submodels": [
+        "tlb",
+        "hardware_prefetcher",
+        "memory_service"
+      ],
+      "predicted_cycles_per_unit": 504.0,
+      "status": "ok",
+      "variant": "gas_7"
+    },
+    {
+      "completion_cycles": [
+        2129,
+        4145
+      ],
+      "frontend": {
+        "decode_delay_cycles": 0,
+        "icache_misses": 0,
+        "layout": true,
+        "padding_nops": 60,
+        "slow_prefix_instructions": 0,
+        "taken_branch_bubbles": 216
+      },
+      "functional": [
+        "ok",
+        "ok"
+      ],
+      "limiting": [
+        {
+          "constraint": "miss_stall",
+          "context_cycles": 1080
+        },
+        {
+          "constraint": "spacing",
+          "context_cycles": 1031
+        }
+      ],
+      "memory_submodels": [
+        "tlb",
+        "hardware_prefetcher",
+        "memory_service"
+      ],
+      "predicted_cycles_per_unit": 504.0,
+      "status": "ok",
+      "variant": "gas_8"
+    },
+    {
+      "completion_cycles": [
+        2127,
+        4143
+      ],
+      "frontend": {
+        "decode_delay_cycles": 0,
+        "icache_misses": 0,
+        "layout": true,
+        "padding_nops": 59,
+        "slow_prefix_instructions": 8,
+        "taken_branch_bubbles": 216
+      },
+      "functional": [
+        "ok",
+        "ok"
+      ],
+      "limiting": [
+        {
+          "constraint": "miss_stall",
+          "context_cycles": 1080
+        },
+        {
+          "constraint": "spacing",
+          "context_cycles": 1030
+        }
+      ],
+      "memory_submodels": [
+        "tlb",
+        "hardware_prefetcher",
+        "memory_service"
+      ],
+      "predicted_cycles_per_unit": 504.0,
+      "status": "ok",
+      "variant": "gas_9"
+    },
+    {
+      "completion_cycles": [
+        2133,
+        4157
+      ],
+      "frontend": {
+        "decode_delay_cycles": 16,
+        "icache_misses": 0,
+        "layout": true,
+        "padding_nops": 58,
+        "slow_prefix_instructions": 8,
+        "taken_branch_bubbles": 216
+      },
+      "functional": [
+        "ok",
+        "ok"
+      ],
+      "limiting": [
+        {
+          "constraint": "miss_stall",
+          "context_cycles": 1080
+        },
+        {
+          "constraint": "spacing",
+          "context_cycles": 1029
+        }
+      ],
+      "memory_submodels": [
+        "tlb",
+        "hardware_prefetcher",
+        "memory_service"
+      ],
+      "predicted_cycles_per_unit": 506.0,
+      "status": "ok",
+      "variant": "gas_10"
+    },
+    {
+      "completion_cycles": [
+        2139,
+        4171
+      ],
+      "frontend": {
+        "decode_delay_cycles": 32,
+        "icache_misses": 0,
+        "layout": true,
+        "padding_nops": 57,
+        "slow_prefix_instructions": 8,
+        "taken_branch_bubbles": 216
+      },
+      "functional": [
+        "ok",
+        "ok"
+      ],
+      "limiting": [
+        {
+          "constraint": "miss_stall",
+          "context_cycles": 1080
+        },
+        {
+          "constraint": "spacing",
+          "context_cycles": 1028
+        }
+      ],
+      "memory_submodels": [
+        "tlb",
+        "hardware_prefetcher",
+        "memory_service"
+      ],
+      "predicted_cycles_per_unit": 508.0,
+      "status": "ok",
+      "variant": "gas_11"
+    },
+    {
+      "completion_cycles": [
+        2145,
+        4185
+      ],
+      "frontend": {
+        "decode_delay_cycles": 48,
+        "icache_misses": 0,
+        "layout": true,
+        "padding_nops": 56,
+        "slow_prefix_instructions": 8,
+        "taken_branch_bubbles": 216
+      },
+      "functional": [
+        "ok",
+        "ok"
+      ],
+      "limiting": [
+        {
+          "constraint": "miss_stall",
+          "context_cycles": 1080
+        },
+        {
+          "constraint": "spacing",
+          "context_cycles": 1027
+        }
+      ],
+      "memory_submodels": [
+        "tlb",
+        "hardware_prefetcher",
+        "memory_service"
+      ],
+      "predicted_cycles_per_unit": 510.0,
+      "status": "ok",
+      "variant": "gas_12"
+    },
+    {
+      "completion_cycles": [
+        2151,
+        4199
+      ],
+      "frontend": {
+        "decode_delay_cycles": 64,
+        "icache_misses": 0,
+        "layout": true,
+        "padding_nops": 55,
+        "slow_prefix_instructions": 8,
+        "taken_branch_bubbles": 216
+      },
+      "functional": [
+        "ok",
+        "ok"
+      ],
+      "limiting": [
+        {
+          "constraint": "miss_stall",
+          "context_cycles": 1080
+        },
+        {
+          "constraint": "spacing",
+          "context_cycles": 1026
+        }
+      ],
+      "memory_submodels": [
+        "tlb",
+        "hardware_prefetcher",
+        "memory_service"
+      ],
+      "predicted_cycles_per_unit": 512.0,
+      "status": "ok",
+      "variant": "gas_13"
+    },
+    {
+      "completion_cycles": [
+        2157,
+        4213
+      ],
+      "frontend": {
+        "decode_delay_cycles": 80,
+        "icache_misses": 0,
+        "layout": true,
+        "padding_nops": 54,
+        "slow_prefix_instructions": 8,
+        "taken_branch_bubbles": 216
+      },
+      "functional": [
+        "ok",
+        "ok"
+      ],
+      "limiting": [
+        {
+          "constraint": "miss_stall",
+          "context_cycles": 1080
+        },
+        {
+          "constraint": "spacing",
+          "context_cycles": 1025
+        }
+      ],
+      "memory_submodels": [
+        "tlb",
+        "hardware_prefetcher",
+        "memory_service"
+      ],
+      "predicted_cycles_per_unit": 514.0,
+      "status": "ok",
+      "variant": "gas_14"
+    },
+    {
+      "completion_cycles": [
+        2163,
+        4227
+      ],
+      "frontend": {
+        "decode_delay_cycles": 96,
+        "icache_misses": 0,
+        "layout": true,
+        "padding_nops": 53,
+        "slow_prefix_instructions": 8,
+        "taken_branch_bubbles": 216
+      },
+      "functional": [
+        "ok",
+        "ok"
+      ],
+      "limiting": [
+        {
+          "constraint": "miss_stall",
+          "context_cycles": 1080
+        },
+        {
+          "constraint": "spacing",
+          "context_cycles": 1024
+        }
+      ],
+      "memory_submodels": [
+        "tlb",
+        "hardware_prefetcher",
+        "memory_service"
+      ],
+      "predicted_cycles_per_unit": 516.0,
+      "status": "ok",
+      "variant": "gas_15"
+    },
+    {
+      "completion_cycles": [
+        2141,
+        4153
+      ],
+      "frontend": {
+        "decode_delay_cycles": 0,
+        "icache_misses": 0,
+        "layout": true,
+        "padding_nops": 60,
+        "slow_prefix_instructions": 0,
+        "taken_branch_bubbles": 216
+      },
+      "functional": [
+        "ok",
+        "ok"
+      ],
+      "limiting": [
+        {
+          "constraint": "miss_stall",
+          "context_cycles": 1080
+        },
+        {
+          "constraint": "spacing",
+          "context_cycles": 1031
+        }
+      ],
+      "memory_submodels": [
+        "tlb",
+        "hardware_prefetcher",
+        "memory_service"
+      ],
+      "predicted_cycles_per_unit": 503.0,
+      "status": "ok",
+      "variant": "one_0"
+    },
+    {
+      "completion_cycles": [
+        2143,
+        4159
+      ],
+      "frontend": {
+        "decode_delay_cycles": 0,
+        "icache_misses": 0,
+        "layout": true,
+        "padding_nops": 67,
+        "slow_prefix_instructions": 0,
+        "taken_branch_bubbles": 216
+      },
+      "functional": [
+        "ok",
+        "ok"
+      ],
+      "limiting": [
+        {
+          "constraint": "miss_stall",
+          "context_cycles": 1080
+        },
+        {
+          "constraint": "spacing",
+          "context_cycles": 1038
+        }
+      ],
+      "memory_submodels": [
+        "tlb",
+        "hardware_prefetcher",
+        "memory_service"
+      ],
+      "predicted_cycles_per_unit": 504.0,
+      "status": "ok",
+      "variant": "one_1"
+    },
+    {
+      "completion_cycles": [
+        2149,
+        4173
+      ],
+      "frontend": {
+        "decode_delay_cycles": 0,
+        "icache_misses": 0,
+        "layout": true,
+        "padding_nops": 74,
+        "slow_prefix_instructions": 0,
+        "taken_branch_bubbles": 216
+      },
+      "functional": [
+        "ok",
+        "ok"
+      ],
+      "limiting": [
+        {
+          "constraint": "miss_stall",
+          "context_cycles": 1080
+        },
+        {
+          "constraint": "spacing",
+          "context_cycles": 1045
+        }
+      ],
+      "memory_submodels": [
+        "tlb",
+        "hardware_prefetcher",
+        "memory_service"
+      ],
+      "predicted_cycles_per_unit": 506.0,
+      "status": "ok",
+      "variant": "one_2"
+    },
+    {
+      "completion_cycles": [
+        2155,
+        4187
+      ],
+      "frontend": {
+        "decode_delay_cycles": 0,
+        "icache_misses": 0,
+        "layout": true,
+        "padding_nops": 81,
+        "slow_prefix_instructions": 0,
+        "taken_branch_bubbles": 216
+      },
+      "functional": [
+        "ok",
+        "ok"
+      ],
+      "limiting": [
+        {
+          "constraint": "miss_stall",
+          "context_cycles": 1080
+        },
+        {
+          "constraint": "spacing",
+          "context_cycles": 1052
+        }
+      ],
+      "memory_submodels": [
+        "tlb",
+        "hardware_prefetcher",
+        "memory_service"
+      ],
+      "predicted_cycles_per_unit": 508.0,
+      "status": "ok",
+      "variant": "one_3"
+    },
+    {
+      "completion_cycles": [
+        2161,
+        4201
+      ],
+      "frontend": {
+        "decode_delay_cycles": 0,
+        "icache_misses": 0,
+        "layout": true,
+        "padding_nops": 88,
+        "slow_prefix_instructions": 0,
+        "taken_branch_bubbles": 216
+      },
+      "functional": [
+        "ok",
+        "ok"
+      ],
+      "limiting": [
+        {
+          "constraint": "miss_stall",
+          "context_cycles": 1080
+        },
+        {
+          "constraint": "spacing",
+          "context_cycles": 1059
+        }
+      ],
+      "memory_submodels": [
+        "tlb",
+        "hardware_prefetcher",
+        "memory_service"
+      ],
+      "predicted_cycles_per_unit": 510.0,
+      "status": "ok",
+      "variant": "one_4"
+    },
+    {
+      "completion_cycles": [
+        2167,
+        4215
+      ],
+      "frontend": {
+        "decode_delay_cycles": 0,
+        "icache_misses": 0,
+        "layout": true,
+        "padding_nops": 95,
+        "slow_prefix_instructions": 0,
+        "taken_branch_bubbles": 216
+      },
+      "functional": [
+        "ok",
+        "ok"
+      ],
+      "limiting": [
+        {
+          "constraint": "miss_stall",
+          "context_cycles": 1080
+        },
+        {
+          "constraint": "spacing",
+          "context_cycles": 1066
+        }
+      ],
+      "memory_submodels": [
+        "tlb",
+        "hardware_prefetcher",
+        "memory_service"
+      ],
+      "predicted_cycles_per_unit": 512.0,
+      "status": "ok",
+      "variant": "one_5"
+    },
+    {
+      "completion_cycles": [
+        2173,
+        4229
+      ],
+      "frontend": {
+        "decode_delay_cycles": 0,
+        "icache_misses": 0,
+        "layout": true,
+        "padding_nops": 102,
+        "slow_prefix_instructions": 0,
+        "taken_branch_bubbles": 216
+      },
+      "functional": [
+        "ok",
+        "ok"
+      ],
+      "limiting": [
+        {
+          "constraint": "miss_stall",
+          "context_cycles": 1080
+        },
+        {
+          "constraint": "spacing",
+          "context_cycles": 1073
+        }
+      ],
+      "memory_submodels": [
+        "tlb",
+        "hardware_prefetcher",
+        "memory_service"
+      ],
+      "predicted_cycles_per_unit": 514.0,
+      "status": "ok",
+      "variant": "one_6"
+    },
+    {
+      "completion_cycles": [
+        2179,
+        4243
+      ],
+      "frontend": {
+        "decode_delay_cycles": 0,
+        "icache_misses": 0,
+        "layout": true,
+        "padding_nops": 109,
+        "slow_prefix_instructions": 0,
+        "taken_branch_bubbles": 216
+      },
       "functional": [
         "ok",
         "ok"
@@ -40,129 +853,1603 @@
       "limiting": [
         {
           "constraint": "spacing",
-          "context_cycles": 1146
+          "context_cycles": 1080
         },
         {
-          "constraint": "dependency",
-          "context_cycles": 864
+          "constraint": "miss_stall",
+          "context_cycles": 1080
         }
       ],
-      "predicted_cycles_per_unit": 385.0,
+      "memory_submodels": [
+        "tlb",
+        "hardware_prefetcher",
+        "memory_service"
+      ],
+      "predicted_cycles_per_unit": 516.0,
+      "status": "ok",
+      "variant": "one_7"
+    },
+    {
+      "completion_cycles": [
+        2185,
+        4257
+      ],
+      "frontend": {
+        "decode_delay_cycles": 0,
+        "icache_misses": 0,
+        "layout": true,
+        "padding_nops": 116,
+        "slow_prefix_instructions": 0,
+        "taken_branch_bubbles": 216
+      },
+      "functional": [
+        "ok",
+        "ok"
+      ],
+      "limiting": [
+        {
+          "constraint": "spacing",
+          "context_cycles": 1087
+        },
+        {
+          "constraint": "miss_stall",
+          "context_cycles": 1080
+        }
+      ],
+      "memory_submodels": [
+        "tlb",
+        "hardware_prefetcher",
+        "memory_service"
+      ],
+      "predicted_cycles_per_unit": 518.0,
+      "status": "ok",
+      "variant": "one_8"
+    },
+    {
+      "completion_cycles": [
+        2191,
+        4271
+      ],
+      "frontend": {
+        "decode_delay_cycles": 0,
+        "icache_misses": 0,
+        "layout": true,
+        "padding_nops": 123,
+        "slow_prefix_instructions": 0,
+        "taken_branch_bubbles": 216
+      },
+      "functional": [
+        "ok",
+        "ok"
+      ],
+      "limiting": [
+        {
+          "constraint": "spacing",
+          "context_cycles": 1094
+        },
+        {
+          "constraint": "miss_stall",
+          "context_cycles": 1080
+        }
+      ],
+      "memory_submodels": [
+        "tlb",
+        "hardware_prefetcher",
+        "memory_service"
+      ],
+      "predicted_cycles_per_unit": 520.0,
+      "status": "ok",
+      "variant": "one_9"
+    },
+    {
+      "completion_cycles": [
+        2197,
+        4285
+      ],
+      "frontend": {
+        "decode_delay_cycles": 0,
+        "icache_misses": 0,
+        "layout": true,
+        "padding_nops": 130,
+        "slow_prefix_instructions": 0,
+        "taken_branch_bubbles": 216
+      },
+      "functional": [
+        "ok",
+        "ok"
+      ],
+      "limiting": [
+        {
+          "constraint": "spacing",
+          "context_cycles": 1101
+        },
+        {
+          "constraint": "miss_stall",
+          "context_cycles": 1080
+        }
+      ],
+      "memory_submodels": [
+        "tlb",
+        "hardware_prefetcher",
+        "memory_service"
+      ],
+      "predicted_cycles_per_unit": 522.0,
+      "status": "ok",
+      "variant": "one_10"
+    },
+    {
+      "completion_cycles": [
+        2203,
+        4299
+      ],
+      "frontend": {
+        "decode_delay_cycles": 0,
+        "icache_misses": 0,
+        "layout": true,
+        "padding_nops": 137,
+        "slow_prefix_instructions": 0,
+        "taken_branch_bubbles": 216
+      },
+      "functional": [
+        "ok",
+        "ok"
+      ],
+      "limiting": [
+        {
+          "constraint": "spacing",
+          "context_cycles": 1108
+        },
+        {
+          "constraint": "miss_stall",
+          "context_cycles": 1080
+        }
+      ],
+      "memory_submodels": [
+        "tlb",
+        "hardware_prefetcher",
+        "memory_service"
+      ],
+      "predicted_cycles_per_unit": 524.0,
+      "status": "ok",
+      "variant": "one_11"
+    },
+    {
+      "completion_cycles": [
+        2209,
+        4313
+      ],
+      "frontend": {
+        "decode_delay_cycles": 0,
+        "icache_misses": 0,
+        "layout": true,
+        "padding_nops": 144,
+        "slow_prefix_instructions": 0,
+        "taken_branch_bubbles": 216
+      },
+      "functional": [
+        "ok",
+        "ok"
+      ],
+      "limiting": [
+        {
+          "constraint": "spacing",
+          "context_cycles": 1115
+        },
+        {
+          "constraint": "miss_stall",
+          "context_cycles": 1080
+        }
+      ],
+      "memory_submodels": [
+        "tlb",
+        "hardware_prefetcher",
+        "memory_service"
+      ],
+      "predicted_cycles_per_unit": 526.0,
+      "status": "ok",
+      "variant": "one_12"
+    },
+    {
+      "completion_cycles": [
+        2215,
+        4327
+      ],
+      "frontend": {
+        "decode_delay_cycles": 0,
+        "icache_misses": 0,
+        "layout": true,
+        "padding_nops": 151,
+        "slow_prefix_instructions": 0,
+        "taken_branch_bubbles": 216
+      },
+      "functional": [
+        "ok",
+        "ok"
+      ],
+      "limiting": [
+        {
+          "constraint": "spacing",
+          "context_cycles": 1122
+        },
+        {
+          "constraint": "miss_stall",
+          "context_cycles": 1080
+        }
+      ],
+      "memory_submodels": [
+        "tlb",
+        "hardware_prefetcher",
+        "memory_service"
+      ],
+      "predicted_cycles_per_unit": 528.0,
+      "status": "ok",
+      "variant": "one_13"
+    },
+    {
+      "completion_cycles": [
+        2221,
+        4341
+      ],
+      "frontend": {
+        "decode_delay_cycles": 0,
+        "icache_misses": 0,
+        "layout": true,
+        "padding_nops": 158,
+        "slow_prefix_instructions": 0,
+        "taken_branch_bubbles": 216
+      },
+      "functional": [
+        "ok",
+        "ok"
+      ],
+      "limiting": [
+        {
+          "constraint": "spacing",
+          "context_cycles": 1129
+        },
+        {
+          "constraint": "miss_stall",
+          "context_cycles": 1080
+        }
+      ],
+      "memory_submodels": [
+        "tlb",
+        "hardware_prefetcher",
+        "memory_service"
+      ],
+      "predicted_cycles_per_unit": 530.0,
+      "status": "ok",
+      "variant": "one_14"
+    },
+    {
+      "completion_cycles": [
+        2227,
+        4355
+      ],
+      "frontend": {
+        "decode_delay_cycles": 0,
+        "icache_misses": 0,
+        "layout": true,
+        "padding_nops": 165,
+        "slow_prefix_instructions": 0,
+        "taken_branch_bubbles": 216
+      },
+      "functional": [
+        "ok",
+        "ok"
+      ],
+      "limiting": [
+        {
+          "constraint": "spacing",
+          "context_cycles": 1136
+        },
+        {
+          "constraint": "miss_stall",
+          "context_cycles": 1080
+        }
+      ],
+      "memory_submodels": [
+        "tlb",
+        "hardware_prefetcher",
+        "memory_service"
+      ],
+      "predicted_cycles_per_unit": 532.0,
+      "status": "ok",
+      "variant": "one_15"
+    },
+    {
+      "completion_cycles": [
+        2141,
+        4153
+      ],
+      "frontend": {
+        "decode_delay_cycles": 0,
+        "icache_misses": 0,
+        "layout": true,
+        "padding_nops": 60,
+        "slow_prefix_instructions": 0,
+        "taken_branch_bubbles": 216
+      },
+      "functional": [
+        "ok",
+        "ok"
+      ],
+      "limiting": [
+        {
+          "constraint": "miss_stall",
+          "context_cycles": 1080
+        },
+        {
+          "constraint": "spacing",
+          "context_cycles": 1031
+        }
+      ],
+      "memory_submodels": [
+        "tlb",
+        "hardware_prefetcher",
+        "memory_service"
+      ],
+      "predicted_cycles_per_unit": 503.0,
+      "status": "ok",
+      "variant": "pf_0"
+    },
+    {
+      "completion_cycles": [
+        2143,
+        4159
+      ],
+      "frontend": {
+        "decode_delay_cycles": 0,
+        "icache_misses": 0,
+        "layout": true,
+        "padding_nops": 67,
+        "slow_prefix_instructions": 0,
+        "taken_branch_bubbles": 216
+      },
+      "functional": [
+        "ok",
+        "ok"
+      ],
+      "limiting": [
+        {
+          "constraint": "miss_stall",
+          "context_cycles": 1080
+        },
+        {
+          "constraint": "spacing",
+          "context_cycles": 1038
+        }
+      ],
+      "memory_submodels": [
+        "tlb",
+        "hardware_prefetcher",
+        "memory_service"
+      ],
+      "predicted_cycles_per_unit": 504.0,
+      "status": "ok",
+      "variant": "pf_1"
+    },
+    {
+      "completion_cycles": [
+        2149,
+        4173
+      ],
+      "frontend": {
+        "decode_delay_cycles": 0,
+        "icache_misses": 0,
+        "layout": true,
+        "padding_nops": 74,
+        "slow_prefix_instructions": 0,
+        "taken_branch_bubbles": 216
+      },
+      "functional": [
+        "ok",
+        "ok"
+      ],
+      "limiting": [
+        {
+          "constraint": "miss_stall",
+          "context_cycles": 1080
+        },
+        {
+          "constraint": "spacing",
+          "context_cycles": 1045
+        }
+      ],
+      "memory_submodels": [
+        "tlb",
+        "hardware_prefetcher",
+        "memory_service"
+      ],
+      "predicted_cycles_per_unit": 506.0,
+      "status": "ok",
+      "variant": "pf_2"
+    },
+    {
+      "completion_cycles": [
+        2139,
+        4155
+      ],
+      "frontend": {
+        "decode_delay_cycles": 0,
+        "icache_misses": 0,
+        "layout": true,
+        "padding_nops": 65,
+        "slow_prefix_instructions": 0,
+        "taken_branch_bubbles": 216
+      },
+      "functional": [
+        "ok",
+        "ok"
+      ],
+      "limiting": [
+        {
+          "constraint": "miss_stall",
+          "context_cycles": 1080
+        },
+        {
+          "constraint": "spacing",
+          "context_cycles": 1036
+        }
+      ],
+      "memory_submodels": [
+        "tlb",
+        "hardware_prefetcher",
+        "memory_service"
+      ],
+      "predicted_cycles_per_unit": 504.0,
+      "status": "ok",
+      "variant": "pf_3"
+    },
+    {
+      "completion_cycles": [
+        2137,
+        4153
+      ],
+      "frontend": {
+        "decode_delay_cycles": 0,
+        "icache_misses": 0,
+        "layout": true,
+        "padding_nops": 64,
+        "slow_prefix_instructions": 0,
+        "taken_branch_bubbles": 216
+      },
+      "functional": [
+        "ok",
+        "ok"
+      ],
+      "limiting": [
+        {
+          "constraint": "miss_stall",
+          "context_cycles": 1080
+        },
+        {
+          "constraint": "spacing",
+          "context_cycles": 1035
+        }
+      ],
+      "memory_submodels": [
+        "tlb",
+        "hardware_prefetcher",
+        "memory_service"
+      ],
+      "predicted_cycles_per_unit": 504.0,
+      "status": "ok",
+      "variant": "pf_4"
+    },
+    {
+      "completion_cycles": [
+        2135,
+        4151
+      ],
+      "frontend": {
+        "decode_delay_cycles": 0,
+        "icache_misses": 0,
+        "layout": true,
+        "padding_nops": 63,
+        "slow_prefix_instructions": 0,
+        "taken_branch_bubbles": 216
+      },
+      "functional": [
+        "ok",
+        "ok"
+      ],
+      "limiting": [
+        {
+          "constraint": "miss_stall",
+          "context_cycles": 1080
+        },
+        {
+          "constraint": "spacing",
+          "context_cycles": 1034
+        }
+      ],
+      "memory_submodels": [
+        "tlb",
+        "hardware_prefetcher",
+        "memory_service"
+      ],
+      "predicted_cycles_per_unit": 504.0,
+      "status": "ok",
+      "variant": "pf_5"
+    },
+    {
+      "completion_cycles": [
+        2141,
+        4165
+      ],
+      "frontend": {
+        "decode_delay_cycles": 0,
+        "icache_misses": 0,
+        "layout": true,
+        "padding_nops": 70,
+        "slow_prefix_instructions": 0,
+        "taken_branch_bubbles": 216
+      },
+      "functional": [
+        "ok",
+        "ok"
+      ],
+      "limiting": [
+        {
+          "constraint": "miss_stall",
+          "context_cycles": 1080
+        },
+        {
+          "constraint": "spacing",
+          "context_cycles": 1041
+        }
+      ],
+      "memory_submodels": [
+        "tlb",
+        "hardware_prefetcher",
+        "memory_service"
+      ],
+      "predicted_cycles_per_unit": 506.0,
+      "status": "ok",
+      "variant": "pf_6"
+    },
+    {
+      "completion_cycles": [
+        2131,
+        4147
+      ],
+      "frontend": {
+        "decode_delay_cycles": 0,
+        "icache_misses": 0,
+        "layout": true,
+        "padding_nops": 61,
+        "slow_prefix_instructions": 0,
+        "taken_branch_bubbles": 216
+      },
+      "functional": [
+        "ok",
+        "ok"
+      ],
+      "limiting": [
+        {
+          "constraint": "miss_stall",
+          "context_cycles": 1080
+        },
+        {
+          "constraint": "spacing",
+          "context_cycles": 1032
+        }
+      ],
+      "memory_submodels": [
+        "tlb",
+        "hardware_prefetcher",
+        "memory_service"
+      ],
+      "predicted_cycles_per_unit": 504.0,
+      "status": "ok",
+      "variant": "pf_7"
+    },
+    {
+      "completion_cycles": [
+        2129,
+        4145
+      ],
+      "frontend": {
+        "decode_delay_cycles": 0,
+        "icache_misses": 0,
+        "layout": true,
+        "padding_nops": 60,
+        "slow_prefix_instructions": 0,
+        "taken_branch_bubbles": 216
+      },
+      "functional": [
+        "ok",
+        "ok"
+      ],
+      "limiting": [
+        {
+          "constraint": "miss_stall",
+          "context_cycles": 1080
+        },
+        {
+          "constraint": "spacing",
+          "context_cycles": 1031
+        }
+      ],
+      "memory_submodels": [
+        "tlb",
+        "hardware_prefetcher",
+        "memory_service"
+      ],
+      "predicted_cycles_per_unit": 504.0,
+      "status": "ok",
+      "variant": "pf_8"
+    },
+    {
+      "completion_cycles": [
+        2135,
+        4159
+      ],
+      "frontend": {
+        "decode_delay_cycles": 0,
+        "icache_misses": 0,
+        "layout": true,
+        "padding_nops": 67,
+        "slow_prefix_instructions": 0,
+        "taken_branch_bubbles": 216
+      },
+      "functional": [
+        "ok",
+        "ok"
+      ],
+      "limiting": [
+        {
+          "constraint": "miss_stall",
+          "context_cycles": 1080
+        },
+        {
+          "constraint": "spacing",
+          "context_cycles": 1038
+        }
+      ],
+      "memory_submodels": [
+        "tlb",
+        "hardware_prefetcher",
+        "memory_service"
+      ],
+      "predicted_cycles_per_unit": 506.0,
+      "status": "ok",
+      "variant": "pf_9"
+    },
+    {
+      "completion_cycles": [
+        2133,
+        4157
+      ],
+      "frontend": {
+        "decode_delay_cycles": 0,
+        "icache_misses": 0,
+        "layout": true,
+        "padding_nops": 66,
+        "slow_prefix_instructions": 0,
+        "taken_branch_bubbles": 216
+      },
+      "functional": [
+        "ok",
+        "ok"
+      ],
+      "limiting": [
+        {
+          "constraint": "miss_stall",
+          "context_cycles": 1080
+        },
+        {
+          "constraint": "spacing",
+          "context_cycles": 1037
+        }
+      ],
+      "memory_submodels": [
+        "tlb",
+        "hardware_prefetcher",
+        "memory_service"
+      ],
+      "predicted_cycles_per_unit": 506.0,
+      "status": "ok",
+      "variant": "pf_10"
+    },
+    {
+      "completion_cycles": [
+        2131,
+        4155
+      ],
+      "frontend": {
+        "decode_delay_cycles": 0,
+        "icache_misses": 0,
+        "layout": true,
+        "padding_nops": 65,
+        "slow_prefix_instructions": 0,
+        "taken_branch_bubbles": 216
+      },
+      "functional": [
+        "ok",
+        "ok"
+      ],
+      "limiting": [
+        {
+          "constraint": "miss_stall",
+          "context_cycles": 1080
+        },
+        {
+          "constraint": "spacing",
+          "context_cycles": 1036
+        }
+      ],
+      "memory_submodels": [
+        "tlb",
+        "hardware_prefetcher",
+        "memory_service"
+      ],
+      "predicted_cycles_per_unit": 506.0,
+      "status": "ok",
+      "variant": "pf_11"
+    },
+    {
+      "completion_cycles": [
+        2129,
+        4153
+      ],
+      "frontend": {
+        "decode_delay_cycles": 0,
+        "icache_misses": 0,
+        "layout": true,
+        "padding_nops": 64,
+        "slow_prefix_instructions": 0,
+        "taken_branch_bubbles": 216
+      },
+      "functional": [
+        "ok",
+        "ok"
+      ],
+      "limiting": [
+        {
+          "constraint": "miss_stall",
+          "context_cycles": 1080
+        },
+        {
+          "constraint": "spacing",
+          "context_cycles": 1035
+        }
+      ],
+      "memory_submodels": [
+        "tlb",
+        "hardware_prefetcher",
+        "memory_service"
+      ],
+      "predicted_cycles_per_unit": 506.0,
+      "status": "ok",
+      "variant": "pf_12"
+    },
+    {
+      "completion_cycles": [
+        2127,
+        4151
+      ],
+      "frontend": {
+        "decode_delay_cycles": 0,
+        "icache_misses": 0,
+        "layout": true,
+        "padding_nops": 63,
+        "slow_prefix_instructions": 0,
+        "taken_branch_bubbles": 216
+      },
+      "functional": [
+        "ok",
+        "ok"
+      ],
+      "limiting": [
+        {
+          "constraint": "miss_stall",
+          "context_cycles": 1080
+        },
+        {
+          "constraint": "spacing",
+          "context_cycles": 1034
+        }
+      ],
+      "memory_submodels": [
+        "tlb",
+        "hardware_prefetcher",
+        "memory_service"
+      ],
+      "predicted_cycles_per_unit": 506.0,
+      "status": "ok",
+      "variant": "pf_13"
+    },
+    {
+      "completion_cycles": [
+        2125,
+        4149
+      ],
+      "frontend": {
+        "decode_delay_cycles": 0,
+        "icache_misses": 0,
+        "layout": true,
+        "padding_nops": 62,
+        "slow_prefix_instructions": 0,
+        "taken_branch_bubbles": 216
+      },
+      "functional": [
+        "ok",
+        "ok"
+      ],
+      "limiting": [
+        {
+          "constraint": "miss_stall",
+          "context_cycles": 1080
+        },
+        {
+          "constraint": "spacing",
+          "context_cycles": 1033
+        }
+      ],
+      "memory_submodels": [
+        "tlb",
+        "hardware_prefetcher",
+        "memory_service"
+      ],
+      "predicted_cycles_per_unit": 506.0,
+      "status": "ok",
+      "variant": "pf_14"
+    },
+    {
+      "completion_cycles": [
+        2123,
+        4147
+      ],
+      "frontend": {
+        "decode_delay_cycles": 0,
+        "icache_misses": 0,
+        "layout": true,
+        "padding_nops": 61,
+        "slow_prefix_instructions": 0,
+        "taken_branch_bubbles": 216
+      },
+      "functional": [
+        "ok",
+        "ok"
+      ],
+      "limiting": [
+        {
+          "constraint": "miss_stall",
+          "context_cycles": 1080
+        },
+        {
+          "constraint": "spacing",
+          "context_cycles": 1032
+        }
+      ],
+      "memory_submodels": [
+        "tlb",
+        "hardware_prefetcher",
+        "memory_service"
+      ],
+      "predicted_cycles_per_unit": 506.0,
+      "status": "ok",
+      "variant": "pf_15"
+    },
+    {
+      "completion_cycles": [
+        2021,
+        4033
+      ],
+      "frontend": {
+        "decode_delay_cycles": 0,
+        "icache_misses": 0,
+        "layout": true,
+        "padding_nops": 0,
+        "slow_prefix_instructions": 0,
+        "taken_branch_bubbles": 216
+      },
+      "functional": [
+        "ok",
+        "ok"
+      ],
+      "limiting": [
+        {
+          "constraint": "miss_stall",
+          "context_cycles": 1080
+        },
+        {
+          "constraint": "spacing",
+          "context_cycles": 971
+        }
+      ],
+      "memory_submodels": [
+        "tlb",
+        "hardware_prefetcher",
+        "memory_service"
+      ],
+      "predicted_cycles_per_unit": 503.0,
+      "status": "ok",
+      "variant": "mis_4"
+    },
+    {
+      "completion_cycles": [
+        2029,
+        4041
+      ],
+      "frontend": {
+        "decode_delay_cycles": 0,
+        "icache_misses": 0,
+        "layout": true,
+        "padding_nops": 4,
+        "slow_prefix_instructions": 0,
+        "taken_branch_bubbles": 216
+      },
+      "functional": [
+        "ok",
+        "ok"
+      ],
+      "limiting": [
+        {
+          "constraint": "miss_stall",
+          "context_cycles": 1080
+        },
+        {
+          "constraint": "spacing",
+          "context_cycles": 975
+        }
+      ],
+      "memory_submodels": [
+        "tlb",
+        "hardware_prefetcher",
+        "memory_service"
+      ],
+      "predicted_cycles_per_unit": 503.0,
+      "status": "ok",
+      "variant": "mis_8"
+    },
+    {
+      "completion_cycles": [
+        2037,
+        4049
+      ],
+      "frontend": {
+        "decode_delay_cycles": 0,
+        "icache_misses": 0,
+        "layout": true,
+        "padding_nops": 8,
+        "slow_prefix_instructions": 0,
+        "taken_branch_bubbles": 216
+      },
+      "functional": [
+        "ok",
+        "ok"
+      ],
+      "limiting": [
+        {
+          "constraint": "miss_stall",
+          "context_cycles": 1080
+        },
+        {
+          "constraint": "spacing",
+          "context_cycles": 979
+        }
+      ],
+      "memory_submodels": [
+        "tlb",
+        "hardware_prefetcher",
+        "memory_service"
+      ],
+      "predicted_cycles_per_unit": 503.0,
+      "status": "ok",
+      "variant": "mis_12"
+    },
+    {
+      "completion_cycles": [
+        2045,
+        4057
+      ],
+      "frontend": {
+        "decode_delay_cycles": 0,
+        "icache_misses": 0,
+        "layout": true,
+        "padding_nops": 12,
+        "slow_prefix_instructions": 0,
+        "taken_branch_bubbles": 216
+      },
+      "functional": [
+        "ok",
+        "ok"
+      ],
+      "limiting": [
+        {
+          "constraint": "miss_stall",
+          "context_cycles": 1080
+        },
+        {
+          "constraint": "spacing",
+          "context_cycles": 983
+        }
+      ],
+      "memory_submodels": [
+        "tlb",
+        "hardware_prefetcher",
+        "memory_service"
+      ],
+      "predicted_cycles_per_unit": 503.0,
+      "status": "ok",
+      "variant": "mis_16"
+    },
+    {
+      "completion_cycles": [
+        2053,
+        4065
+      ],
+      "frontend": {
+        "decode_delay_cycles": 0,
+        "icache_misses": 0,
+        "layout": true,
+        "padding_nops": 16,
+        "slow_prefix_instructions": 0,
+        "taken_branch_bubbles": 216
+      },
+      "functional": [
+        "ok",
+        "ok"
+      ],
+      "limiting": [
+        {
+          "constraint": "miss_stall",
+          "context_cycles": 1080
+        },
+        {
+          "constraint": "spacing",
+          "context_cycles": 987
+        }
+      ],
+      "memory_submodels": [
+        "tlb",
+        "hardware_prefetcher",
+        "memory_service"
+      ],
+      "predicted_cycles_per_unit": 503.0,
+      "status": "ok",
+      "variant": "mis_20"
+    },
+    {
+      "completion_cycles": [
+        2061,
+        4073
+      ],
+      "frontend": {
+        "decode_delay_cycles": 0,
+        "icache_misses": 0,
+        "layout": true,
+        "padding_nops": 20,
+        "slow_prefix_instructions": 0,
+        "taken_branch_bubbles": 216
+      },
+      "functional": [
+        "ok",
+        "ok"
+      ],
+      "limiting": [
+        {
+          "constraint": "miss_stall",
+          "context_cycles": 1080
+        },
+        {
+          "constraint": "spacing",
+          "context_cycles": 991
+        }
+      ],
+      "memory_submodels": [
+        "tlb",
+        "hardware_prefetcher",
+        "memory_service"
+      ],
+      "predicted_cycles_per_unit": 503.0,
+      "status": "ok",
+      "variant": "mis_24"
+    },
+    {
+      "completion_cycles": [
+        2069,
+        4081
+      ],
+      "frontend": {
+        "decode_delay_cycles": 0,
+        "icache_misses": 0,
+        "layout": true,
+        "padding_nops": 24,
+        "slow_prefix_instructions": 0,
+        "taken_branch_bubbles": 216
+      },
+      "functional": [
+        "ok",
+        "ok"
+      ],
+      "limiting": [
+        {
+          "constraint": "miss_stall",
+          "context_cycles": 1080
+        },
+        {
+          "constraint": "spacing",
+          "context_cycles": 995
+        }
+      ],
+      "memory_submodels": [
+        "tlb",
+        "hardware_prefetcher",
+        "memory_service"
+      ],
+      "predicted_cycles_per_unit": 503.0,
+      "status": "ok",
+      "variant": "mis_28"
+    },
+    {
+      "completion_cycles": [
+        2077,
+        4089
+      ],
+      "frontend": {
+        "decode_delay_cycles": 0,
+        "icache_misses": 0,
+        "layout": true,
+        "padding_nops": 28,
+        "slow_prefix_instructions": 0,
+        "taken_branch_bubbles": 216
+      },
+      "functional": [
+        "ok",
+        "ok"
+      ],
+      "limiting": [
+        {
+          "constraint": "miss_stall",
+          "context_cycles": 1080
+        },
+        {
+          "constraint": "spacing",
+          "context_cycles": 999
+        }
+      ],
+      "memory_submodels": [
+        "tlb",
+        "hardware_prefetcher",
+        "memory_service"
+      ],
+      "predicted_cycles_per_unit": 503.0,
+      "status": "ok",
+      "variant": "mis_32"
+    },
+    {
+      "completion_cycles": [
+        2085,
+        4097
+      ],
+      "frontend": {
+        "decode_delay_cycles": 0,
+        "icache_misses": 0,
+        "layout": true,
+        "padding_nops": 32,
+        "slow_prefix_instructions": 0,
+        "taken_branch_bubbles": 216
+      },
+      "functional": [
+        "ok",
+        "ok"
+      ],
+      "limiting": [
+        {
+          "constraint": "miss_stall",
+          "context_cycles": 1080
+        },
+        {
+          "constraint": "spacing",
+          "context_cycles": 1003
+        }
+      ],
+      "memory_submodels": [
+        "tlb",
+        "hardware_prefetcher",
+        "memory_service"
+      ],
+      "predicted_cycles_per_unit": 503.0,
+      "status": "ok",
+      "variant": "mis_36"
+    },
+    {
+      "completion_cycles": [
+        2093,
+        4105
+      ],
+      "frontend": {
+        "decode_delay_cycles": 0,
+        "icache_misses": 0,
+        "layout": true,
+        "padding_nops": 36,
+        "slow_prefix_instructions": 0,
+        "taken_branch_bubbles": 216
+      },
+      "functional": [
+        "ok",
+        "ok"
+      ],
+      "limiting": [
+        {
+          "constraint": "miss_stall",
+          "context_cycles": 1080
+        },
+        {
+          "constraint": "spacing",
+          "context_cycles": 1007
+        }
+      ],
+      "memory_submodels": [
+        "tlb",
+        "hardware_prefetcher",
+        "memory_service"
+      ],
+      "predicted_cycles_per_unit": 503.0,
+      "status": "ok",
+      "variant": "mis_40"
+    },
+    {
+      "completion_cycles": [
+        2101,
+        4113
+      ],
+      "frontend": {
+        "decode_delay_cycles": 0,
+        "icache_misses": 0,
+        "layout": true,
+        "padding_nops": 40,
+        "slow_prefix_instructions": 0,
+        "taken_branch_bubbles": 216
+      },
+      "functional": [
+        "ok",
+        "ok"
+      ],
+      "limiting": [
+        {
+          "constraint": "miss_stall",
+          "context_cycles": 1080
+        },
+        {
+          "constraint": "spacing",
+          "context_cycles": 1011
+        }
+      ],
+      "memory_submodels": [
+        "tlb",
+        "hardware_prefetcher",
+        "memory_service"
+      ],
+      "predicted_cycles_per_unit": 503.0,
       "status": "ok",
       "variant": "mis_44"
     },
     {
       "completion_cycles": [
-        1665,
-        3205
+        2109,
+        4121
       ],
+      "frontend": {
+        "decode_delay_cycles": 0,
+        "icache_misses": 0,
+        "layout": true,
+        "padding_nops": 44,
+        "slow_prefix_instructions": 0,
+        "taken_branch_bubbles": 216
+      },
       "functional": [
         "ok",
         "ok"
       ],
       "limiting": [
         {
-          "constraint": "spacing",
-          "context_cycles": 1166
+          "constraint": "miss_stall",
+          "context_cycles": 1080
         },
         {
-          "constraint": "dependency",
-          "context_cycles": 864
+          "constraint": "spacing",
+          "context_cycles": 1015
         }
       ],
-      "predicted_cycles_per_unit": 385.0,
+      "memory_submodels": [
+        "tlb",
+        "hardware_prefetcher",
+        "memory_service"
+      ],
+      "predicted_cycles_per_unit": 503.0,
+      "status": "ok",
+      "variant": "mis_48"
+    },
+    {
+      "completion_cycles": [
+        2117,
+        4129
+      ],
+      "frontend": {
+        "decode_delay_cycles": 0,
+        "icache_misses": 0,
+        "layout": true,
+        "padding_nops": 48,
+        "slow_prefix_instructions": 0,
+        "taken_branch_bubbles": 216
+      },
+      "functional": [
+        "ok",
+        "ok"
+      ],
+      "limiting": [
+        {
+          "constraint": "miss_stall",
+          "context_cycles": 1080
+        },
+        {
+          "constraint": "spacing",
+          "context_cycles": 1019
+        }
+      ],
+      "memory_submodels": [
+        "tlb",
+        "hardware_prefetcher",
+        "memory_service"
+      ],
+      "predicted_cycles_per_unit": 503.0,
+      "status": "ok",
+      "variant": "mis_52"
+    },
+    {
+      "completion_cycles": [
+        2125,
+        4137
+      ],
+      "frontend": {
+        "decode_delay_cycles": 0,
+        "icache_misses": 0,
+        "layout": true,
+        "padding_nops": 52,
+        "slow_prefix_instructions": 0,
+        "taken_branch_bubbles": 216
+      },
+      "functional": [
+        "ok",
+        "ok"
+      ],
+      "limiting": [
+        {
+          "constraint": "miss_stall",
+          "context_cycles": 1080
+        },
+        {
+          "constraint": "spacing",
+          "context_cycles": 1023
+        }
+      ],
+      "memory_submodels": [
+        "tlb",
+        "hardware_prefetcher",
+        "memory_service"
+      ],
+      "predicted_cycles_per_unit": 503.0,
+      "status": "ok",
+      "variant": "mis_56"
+    },
+    {
+      "completion_cycles": [
+        2133,
+        4145
+      ],
+      "frontend": {
+        "decode_delay_cycles": 0,
+        "icache_misses": 0,
+        "layout": true,
+        "padding_nops": 56,
+        "slow_prefix_instructions": 0,
+        "taken_branch_bubbles": 216
+      },
+      "functional": [
+        "ok",
+        "ok"
+      ],
+      "limiting": [
+        {
+          "constraint": "miss_stall",
+          "context_cycles": 1080
+        },
+        {
+          "constraint": "spacing",
+          "context_cycles": 1027
+        }
+      ],
+      "memory_submodels": [
+        "tlb",
+        "hardware_prefetcher",
+        "memory_service"
+      ],
+      "predicted_cycles_per_unit": 503.0,
+      "status": "ok",
+      "variant": "mis_60"
+    },
+    {
+      "completion_cycles": [
+        2141,
+        4153
+      ],
+      "frontend": {
+        "decode_delay_cycles": 0,
+        "icache_misses": 0,
+        "layout": true,
+        "padding_nops": 60,
+        "slow_prefix_instructions": 0,
+        "taken_branch_bubbles": 216
+      },
+      "functional": [
+        "ok",
+        "ok"
+      ],
+      "limiting": [
+        {
+          "constraint": "miss_stall",
+          "context_cycles": 1080
+        },
+        {
+          "constraint": "spacing",
+          "context_cycles": 1031
+        }
+      ],
+      "memory_submodels": [
+        "tlb",
+        "hardware_prefetcher",
+        "memory_service"
+      ],
+      "predicted_cycles_per_unit": 503.0,
       "status": "ok",
       "variant": "inc_0"
     },
     {
       "completion_cycles": [
-        1881,
-        3637
+        1925,
+        3721
       ],
+      "frontend": {
+        "decode_delay_cycles": 0,
+        "icache_misses": 0,
+        "layout": true,
+        "padding_nops": 60,
+        "slow_prefix_instructions": 0,
+        "taken_branch_bubbles": 216
+      },
       "functional": [
         "ok",
         "ok"
       ],
       "limiting": [
         {
-          "constraint": "dependency",
-          "context_cycles": 1296
+          "constraint": "miss_stall",
+          "context_cycles": 1080
         },
         {
           "constraint": "spacing",
-          "context_cycles": 1166
+          "context_cycles": 815
         }
       ],
-      "predicted_cycles_per_unit": 439.0,
+      "memory_submodels": [
+        "tlb",
+        "hardware_prefetcher",
+        "memory_service"
+      ],
+      "predicted_cycles_per_unit": 449.0,
       "status": "ok",
       "variant": "adj_0"
     },
     {
       "completion_cycles": [
-        1881,
-        3637
+        1925,
+        3721
       ],
+      "frontend": {
+        "decode_delay_cycles": 0,
+        "icache_misses": 0,
+        "layout": true,
+        "padding_nops": 60,
+        "slow_prefix_instructions": 0,
+        "taken_branch_bubbles": 216
+      },
       "functional": [
         "ok",
         "ok"
       ],
       "limiting": [
         {
-          "constraint": "dependency",
-          "context_cycles": 1296
+          "constraint": "miss_stall",
+          "context_cycles": 1080
         },
         {
           "constraint": "spacing",
-          "context_cycles": 1166
+          "context_cycles": 815
         }
       ],
-      "predicted_cycles_per_unit": 439.0,
+      "memory_submodels": [
+        "tlb",
+        "hardware_prefetcher",
+        "memory_service"
+      ],
+      "predicted_cycles_per_unit": 449.0,
       "status": "ok",
       "variant": "mid_0"
     },
     {
       "completion_cycles": [
-        2097,
-        4069
+        2141,
+        4153
       ],
+      "frontend": {
+        "decode_delay_cycles": 0,
+        "icache_misses": 0,
+        "layout": true,
+        "padding_nops": 60,
+        "slow_prefix_instructions": 0,
+        "taken_branch_bubbles": 216
+      },
       "functional": [
         "ok",
         "ok"
       ],
       "limiting": [
         {
-          "constraint": "spacing",
-          "context_cycles": 1382
+          "constraint": "miss_stall",
+          "context_cycles": 1080
         },
         {
-          "constraint": "dependency",
-          "context_cycles": 1296
+          "constraint": "spacing",
+          "context_cycles": 1031
         }
       ],
-      "predicted_cycles_per_unit": 493.0,
+      "memory_submodels": [
+        "tlb",
+        "hardware_prefetcher",
+        "memory_service"
+      ],
+      "predicted_cycles_per_unit": 503.0,
       "status": "ok",
       "variant": "mov_adj_0"
     },
     {
       "completion_cycles": [
-        2097,
-        4069
+        2141,
+        4153
       ],
+      "frontend": {
+        "decode_delay_cycles": 0,
+        "icache_misses": 0,
+        "layout": true,
+        "padding_nops": 60,
+        "slow_prefix_instructions": 0,
+        "taken_branch_bubbles": 216
+      },
       "functional": [
         "ok",
         "ok"
       ],
       "limiting": [
         {
-          "constraint": "spacing",
-          "context_cycles": 1382
+          "constraint": "miss_stall",
+          "context_cycles": 1080
         },
         {
-          "constraint": "dependency",
-          "context_cycles": 1296
+          "constraint": "spacing",
+          "context_cycles": 1031
         }
       ],
-      "predicted_cycles_per_unit": 493.0,
+      "memory_submodels": [
+        "tlb",
+        "hardware_prefetcher",
+        "memory_service"
+      ],
+      "predicted_cycles_per_unit": 503.0,
       "status": "ok",
       "variant": "mov_split_0"
     }

@@ -3,7 +3,31 @@
 Schema: `schemas/kernel.schema.json` (`knc-twin.kernel/1`). Examples: `fixtures/*.json`,
 `fixtures/gcc/` (real GCC-KNC output with inputs and expected results).
 
-## From compiler output: `scripts/from_gcc_s.py`
+## From the binary that ran: `scripts/from_binary.py` (preferred)
+
+```
+from_binary.py FILE --function NAME [--disassembly DIS.txt | --objdump TOOL] [--with-callee NAME ...]
+               [--calls CALLS.json] [--init INIT.json] [--out KERNEL.json] [--report REPORT.json]
+from_binary.py FILE --list
+```
+
+`FILE` is a K1OM object file (`.o`) or a linked executable; `DIS.txt` is the text of
+`k1om-mpss-linux-objdump -dr FILE` (or name the tool with `--objdump` / `$KNC_OBJDUMP`). The
+whole function is converted as the assembler and linker left it: entry code, alignment padding as
+the NOP instructions it consists of (with their 66/2e prefixes), every instruction's address,
+length, prefixes and displacement/immediate facts (`encoding` on each record, used by the decode
+and pairing rules), `call` and `ret`, constants and other data sections (copied; in an object file
+at synthetic addresses, in a linked file at their addresses), string addresses as symbolic
+immediates, TLS accesses through synthetic GOT slots. Trailing padding between functions is
+dropped (never executed). A callee named by `--with-callee` is converted into the same region and
+executed; any other callee must be declared in `--calls` (below); `__assert_fail`, `abort` and the
+usual noreturn runtime routines are declared automatically. Indirect jumps and calls are reported
+as unsupported. The kernel's `entry` is `function`: the stream starts at the ABI entry with a
+return sentinel on the stack and ends when the function returns to it. Arguments, heap data and
+expected results come from `--init` as for `from_gcc_s.py`; `provenance` records the file's
+SHA-256, the padding and prefix counts and every undeclared callee or unresolved symbol.
+
+## From compiler assembly: `scripts/from_gcc_s.py`
 
 ```
 from_gcc_s.py FILE.s --function NAME [--init INIT.json] --out KERNEL.json [--profile ID]
@@ -14,10 +38,12 @@ from_gcc_s.py FILE.s --loop LABEL [--function NAME] [--spec SPEC.json] [--contex
 
 - A **function** region is the whole function; every `ret` becomes a jump to a synthetic end
   label so the stream terminates. A **loop** region is the label and its last backward branch;
-  branches that leave the loop are redirected to the synthetic end label. `call` stays in the
-  records and makes the kernel fail to load with "region boundary": cut the region or treat the
-  callee separately. Nothing is dropped: every instruction the twin cannot read is listed with
-  its source line and reason in `KERNEL.coverage.json` and in the audit.
+  branches that leave the loop are redirected to the synthetic end label. A `call` to a function
+  in the same file is followed when that function is in the region; otherwise it needs a stub in
+  `calls` (below). This path has no code layout: prefix decode, padding and encoding pairing
+  limits are not modeled and the result's assumptions say so. Nothing is dropped: every
+  instruction the twin cannot read is listed with its source line and reason in
+  `KERNEL.coverage.json` and in the audit.
 - `.rept/.endr` are expanded; data symbols referenced `symbol(%rip)` are copied from the file's
   data directives (`.long .quad .byte .short .zero .string .float .double`) into a synthetic data
   area (`init.symbols`, `init.memory`), 64-byte aligned per symbol. Unknown symbols (externs,
@@ -76,6 +102,23 @@ reloads, scatter completion and flag effects are kept as emitted.
   extended value rounded to double) or `{"f80": "0x..."}`, and `x87_depth`.
 - `provenance.shape`: optional declared kernel shape for result classification
   (`validation.md` lists the validated shapes).
+- `entry`: `region` (default: start at the first record, end after the last) or `function`
+  (ABI entry: the stack holds a return sentinel at `rsp`, which is set to a private stack when
+  it is zero; the stream ends when a `ret` pops the sentinel).
+- `calls`: costed stubs for callees outside the region, by label:
+  `{"exp": {"cycles": 180, "model": "libm.f64.exp", "status": "measured", "source": "..."},
+    "memcpy": {"cycles": 40, "cycles_per_byte": 0.25, "model": "memcpy"},
+    "__assert_fail": {"model": "noreturn"}}`. `cycles` is required for timing and never
+  defaulted. Models: `none` (no functional effect; the result is marked approximate), `noreturn`
+  (reaching it is an error), `memcpy`/`memmove`/`memset` (exact; rdi, rsi, rdx; return in rax),
+  `libm.f64.NAME` / `libm.f32.NAME` (argument in the low element of zmm0 and zmm1, result in
+  zmm0; `sqrt`, `fabs`, `floor`, `ceil`, `trunc`, `fmin`, `fmax`, `copysign` exact; `exp`,
+  `log`, `sin`, `cos`, `pow`, ... from the host library, marked approximate).
+- `init.memory` file blocks: `{"addr": "0x...", "file": "cols.bin"}` (raw bytes, optional
+  `offset`/`length`) or `{"addr": ..., "file": "x.txt", "format": "f64"}` (text list; formats
+  i8 u8 i16 u16 i32 u32 i64 u64 f32 f64), relative to the kernel file. This is how the measured
+  run's arrays are bound; the result lists each file with its SHA-256. `expected.memory` accepts
+  `file` and `hex` blocks the same way. `hex` and `i64` are also accepted inline.
 
 ## Records (Intel operand order, destination first)
 
@@ -102,8 +145,12 @@ reloads, scatter completion and flag effects are kept as emitted.
 - `encoding`: optional hints (`bytes`, `disp32`, `disp`, `imm`) for the pairing rules.
 - `deps`: extra explicit dependencies on earlier ids.
 - `addr {start, stride}` and `lines`: address descriptions for static traces (below).
-- Rejected: `call`/`ret` (region boundaries), one-operand `imul`, `cmov*` (not on KNC),
-  swizzles other than the seven above, symbolic immediates, TLS operands.
+- Symbolic immediates: `{"imm": 8, "imm_symbol": ".LC0"}` (the symbol's address from
+  `init.symbols` is added). Thread-local access: a memory operand with `"segment": "fs"` or
+  `"gs"` (the base comes from `init.registers.fs_base`/`gs_base`; default per-context values).
+  Absolute addresses: `{"disp": 4198400, "abs": true}`.
+- Rejected: indirect jumps and calls, one-operand `imul`, `cmov*` (not on KNC), swizzles other
+  than the seven above, segments other than fs/gs, `rep`-prefixed string instructions.
 
 ## GAS AT&T subset
 
@@ -115,15 +162,18 @@ operands `%reg`, `$imm`, `disp(%base,%index,scale)` with displacement expression
 `4+0(%rsi)`, `symbol(%rip)`, `%st`/`%st(i)`, a write mask `{%k1}`, rounding `{rn}`/`{rd}`/
 `{ru}`/`{rz}`, swizzles `{cdab}`..., `{1to16}`/`{4to16}`/`{1to8}`/`{4to8}` and `{float16}`/
 `{uint8}`/`{sint8}`/`{uint16}`/`{sint16}` on a memory operand (up-conversion) or on a store's
-register source (down-conversion), `lock addl $imm, mem`, `rep ret`. Operands are reversed
-into Intel order; record ids become `L<line>`.
+register source (down-conversion), `lock` with add/sub/and/or/xor/inc/dec/xadd/cmpxchg/xchg,
+`rep ret`, `call label`, `ret`, `$symbol+disp` immediates, `symbol@gottpoff(%rip)`,
+`%fs:disp` and `%fs:(%reg)`, the disassembler's spellings (`retq`, `callq`, `nopw %cs:...`,
+`data16`, `xchg %ax,%ax`). Operands are reversed into Intel order; record ids become `L<line>`.
 
 ## Scenarios
 
 - `memory.type`: `fixed_level` (`level`), `classified` (`default`, `ranges` of `{start,end,level}`),
   `line_tracking` (`cold_level`, optional `warm` ranges, and the sub-models `tlb`,
-  `hardware_prefetcher`, `memory_service`, each `"off"` or `"modeled"`; `page_bytes` 4096 or
-  2097152).
+  `hardware_prefetcher`, `memory_service`, each `"auto"` (default: on when the profile has the
+  parameters), `"modeled"` or `"off"`; `page_bytes` 4096 or 2097152).
+- `frontend.icache`: `warm` (default), `cold_l2` or `cold_memory` (needs code layout).
 - `branch.type`: `all_predicted`, `all_mispredicted`, `exit_mispredicted` (a branch whose direction
   differs from its previous instance), `ids_mispredicted` with `ids`.
 
@@ -149,6 +199,11 @@ reported as not run. No trace from the card is ever required.
 that reach status `ok`, and writes a native request under `queue/<name>/` for every candidate it
 cannot rank: non-ok status, memory behaviour beyond L1 without a validated shape, or a ratio to
 the baseline within `too_close_fraction`.
+
+## Roll-up manifests (`knc-twin.rollup/1`)
+
+See `rollup.md`: regions with measured time shares and baseline/candidate kernels; the program
+figure to scale; an optional card bandwidth floor.
 
 ## Analytic parameters
 

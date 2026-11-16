@@ -52,9 +52,9 @@ def memory_result_class(kind, kernel, prof, mem_stats=None, scenario=None):
         sm = scenario.get("memory", {})
         if sm.get("type") in ("fixed_level", "classified"):
             reason.append("memory levels are asserted by the scenario (%s)" % sm.get("type"))
-        for sub in ("tlb", "hardware_prefetcher", "memory_service"):
-            if sm.get(sub) == "modeled":
-                reason.append("%s sub-model active (assumed parameters)" % sub)
+        if sm.get("type") == "line_tracking":
+            reason.append("TLB, L2 hardware prefetcher and memory service sub-models are part of the memory domain (scenario: %s)" % ", ".join(
+                "%s=%s" % (sub, sm.get(sub, "auto")) for sub in ("tlb", "hardware_prefetcher", "memory_service")))
     if mem_stats and (mem_stats.get("l2_hits") or mem_stats.get("memory")):
         reason.append("the trace misses L1 (%d L2, %d memory accesses): cache behaviour is modeled, not validated" % (mem_stats.get("l2_hits", 0), mem_stats.get("memory", 0)))
     return {"class": "unvalidated_scenario_estimate", "reasons": reason}
@@ -261,6 +261,7 @@ def _traces_for(kernel, args, r):
     if args.trace_source == "functional":
         interp, steps, check = _run_functional(kernel, args)
         r["functional_check"] = check
+        r["_interp"] = interp
         r["assumptions"].extend(interp.assumptions)
         if check["status"] == "mismatch":
             raise FunctionalMismatch("candidate produced wrong results (%d mismatches); its timing is not reported as a valid result" % len(check["mismatches"]),
@@ -304,7 +305,19 @@ def _simulate_core(kernel, prof, args, r):
             "core_issue_utilization": res["core_issue_utilization"], "pair_fraction": res["pair_fraction"],
             "active_contexts": res["active_contexts"], "per_context": res["per_context"], "memory": res["memory"],
             "kind": "timing_prediction_core_cycles"}
+    pred["frontend"] = res.get("frontend")
+    interp = r.pop("_interp", None)
+    if interp is not None:
+        if interp.input_files:
+            pred["input_files"] = interp.input_files
+        if interp.stub_calls:
+            pred["stub_calls"] = {n: {"calls": c, "cycles_each": kernel.calls[n].get("cycles"), "model": kernel.calls[n].get("model", "none"),
+                                      "status": kernel.calls[n].get("status", "assumed"), "source": kernel.calls[n].get("source")}
+                                  for n, c in sorted(interp.stub_calls.items())}
+        pred["functional_exactness"] = "exact" if not interp.approximate_stubs else "approximate: stub(s) %s are not bit-exact" % ", ".join(sorted(interp.approximate_stubs))
     pred["result_class"] = memory_result_class("simulate", kernel, prof, res["memory"].get("stats"), kernel.scenario)
+    if interp is not None and interp.stub_calls and pred["result_class"]["class"] == "calibrated_forecast":
+        pred["result_class"] = {"class": "unvalidated_scenario_estimate", "reasons": ["the region calls costed stubs (%s): their cycles are inputs, not validated model output" % ", ".join(sorted(interp.stub_calls))]}
     return sim, res, pred
 
 
@@ -643,6 +656,112 @@ def cmd_import_native(args):
 
 # --- parser --------------------------------------------------------------------------------------
 
+def cmd_rollup(args):
+    """Program-level roll-up: per-region predicted ratios weighted by each region's measured share of run time."""
+    from . import rollup as rmod
+    args._t0 = time.time()
+    out = _prepare_out(args, "rollup", os.path.basename(args.manifest))
+    r = base_result("program_rollup", "ok", "rollup", out_dir=out, scale="region")
+    try:
+        m = rmod.load_rollup(args.manifest)
+        base_dir = os.path.dirname(os.path.abspath(args.manifest))
+        prof = load_profile(m.get("profile", args.profile), args.overlay)
+        if m.get("frozen_profile_hash") and m["frozen_profile_hash"] != prof.hash:
+            raise InvalidInput("the manifest freezes profile hash %s... but %s resolves to %s...; rerun with the frozen profile or re-freeze the manifest" % (
+                m["frozen_profile_hash"][:12], prof.id, prof.hash[:12]))
+        r["profile"] = prof.describe()
+        r["calibration_status"] = _calib(prof)
+        r["input"] = {"path": os.path.abspath(args.manifest), "hash_sha256": sha256_of_obj(m), "manifest": {k: m.get(k) for k in ("name", "program", "card")}}
+        band_default = float(m.get("unvalidated_band_pct", rmod.DEFAULT_UNVALIDATED_BAND_PCT))
+        regions = []
+        for reg in m["regions"]:
+            row = {"name": reg["name"], "share": float(reg["share"]), "share_source": reg.get("share_source")}
+            sides = {}
+            for side in ("baseline", "candidate"):
+                if reg.get(side) is None:
+                    continue
+                kpath = os.path.join(base_dir, reg[side])
+                sub = {"assumptions": []}
+                try:
+                    kernel, h = _kernel_and_hash(kpath)
+                    sim, res, pred = _simulate_core(kernel, prof, args, sub)
+                    sides[side] = {"status": "ok", "kernel": reg[side], "kernel_hash": h, "cycles_per_unit": pred["predicted_cycles_per_unit"],
+                                   "result_class": pred["result_class"], "limiting": timing.limiting_constraints(res)[:2]}
+                    for a in sub["assumptions"]:
+                        if a not in r["assumptions"]:
+                            r["assumptions"].append(a)
+                except TwinError as e:
+                    sides[side] = {"status": e.status, "kernel": reg[side], "message": e.message}
+            row.update(sides)
+            if "candidate" not in sides:
+                row.update(ratio=1.0, band_pct=0.0, note="no candidate: region unchanged")
+            elif sides["baseline"]["status"] == "ok" and sides["candidate"]["status"] == "ok":
+                row["ratio"] = sides["candidate"]["cycles_per_unit"] / sides["baseline"]["cycles_per_unit"]
+                b1, basis1 = rmod.band_of(sides["baseline"]["result_class"], band_default)
+                b2, basis2 = rmod.band_of(sides["candidate"]["result_class"], band_default)
+                row["band_pct"] = max(b1, b2)
+                row["band_basis"] = basis1 if b1 >= b2 else basis2
+            else:
+                bad = [s for s in ("baseline", "candidate") if sides[s]["status"] != "ok"]
+                row.update(ratio=None, note="not modeled (%s): %s" % (", ".join(bad), "; ".join(sides[s]["message"] for s in bad)[:300]))
+            regions.append(row)
+        usable = [x for x in regions if x.get("ratio") is not None]
+        skipped = [x for x in regions if x.get("ratio") is None]
+        bw = None
+        card = m.get("card")
+        if card:
+            bw = prof.get_sub("card.sustained_bandwidth_gbs", card.get("traffic", "read_modify_write"))
+        summary = rmod.combine(usable, m.get("program"), card, bw)
+        summary["regions_not_modeled"] = [{"name": x["name"], "share": x["share"], "reason": x["note"]} for x in skipped]
+        summary["result_class"] = {"class": "calibrated_forecast" if usable and all(x.get("band_basis", "").startswith("held-out") or x["ratio"] == 1.0 for x in usable) and not skipped
+                                   else "unvalidated_scenario_estimate",
+                                   "note": "a ranking aid for compiler or loop changes; the program's final speed is a card measurement"}
+        summary["kind"] = "program_rollup"
+        r["prediction"] = dict(summary, regions=regions)
+        r["parameters_used"] = prof.used_summary()
+        lines = ["%-40s share %5.1f%%  ratio %s  band +/-%s%%" % (x["name"][:40], 100 * x["share"], ("%.4f" % x["ratio"]) if x.get("ratio") is not None else "not modeled",
+                                                                 ("%.0f" % x["band_pct"]) if x.get("band_pct") is not None else "-") for x in regions]
+        lines.append("modeled share %.1f%%; predicted time ratio %.4f (band %.4f to %.4f)" % (100 * summary["modeled_share_of_run_time"], summary["predicted_time_ratio"],
+                                                                                              summary["predicted_time_ratio_band"][0], summary["predicted_time_ratio_band"][1]))
+        if "predicted_candidate_per_unit" in summary:
+            lines.append("%s: measured baseline %s -> predicted %s (band %s to %s)" % (summary["unit"], summary["measured_baseline_per_unit"], summary["predicted_candidate_per_unit"],
+                                                                                         summary["predicted_candidate_per_unit_band"][0], summary["predicted_candidate_per_unit_band"][1]))
+        r["message"] = "program roll-up over %d region(s) covering %.1f%% of measured run time: predicted time ratio %.4f; %s" % (
+            len(usable), 100 * summary["modeled_share_of_run_time"], summary["predicted_time_ratio"], summary["result_class"]["class"])
+        if skipped:
+            r["unsupported"].extend("%s: %s" % (x["name"], x["note"]) for x in skipped)
+        return _finish(r, out, args, lines)
+    except TwinError as e:
+        return _fail(r, out, args, e)
+
+
+def cmd_calibration_plan(args):
+    """What to measure in the next card window (no card connection)."""
+    from . import rollup as rmod
+    args._t0 = time.time()
+    out = _prepare_out(args, "calibration-plan", args.profile)
+    r = base_result("calibration_plan", "ok", "calibration-plan", out_dir=out, scale="core")
+    try:
+        prof = load_profile(args.profile, args.overlay)
+        r["profile"] = prof.describe()
+        r["calibration_status"] = _calib(prof)
+        plan = rmod.plan_for(prof)
+        counts = prof.status_counts()
+        not_measured = sorted(n for n, p in prof.params.items() if p.status in ("assumed", "derived", "unknown", "literature"))
+        plan["parameters_not_measured"] = not_measured
+        r["prediction"] = plan
+        dump_json(plan, os.path.join(out, "calibration-plan.json"))
+        r["artifacts"]["plan"] = os.path.join(out, "calibration-plan.json")
+        open_items = [it for it in plan["microbenchmarks"] if it["state"] == "open"]
+        lines = ["%-18s %s" % (it["id"], it["settles"]) for it in open_items]
+        lines.append("%d open microbenchmarks; %d parameters of %s are not measured (%s)" % (len(open_items), len(not_measured), prof.id,
+                                                                                            ", ".join("%s %d" % kv for kv in sorted(counts.items()))))
+        r["message"] = "%d staged microbenchmarks open for %s; %d open misses; see calibration-plan.json" % (len(open_items), prof.id, len(plan["open_misses"]))
+        return _finish(r, out, args, lines)
+    except TwinError as e:
+        return _fail(r, out, args, e)
+
+
 def build_parser():
     p = argparse.ArgumentParser(prog="knc_twin.py", description="knc-twin %s: Knights Corner functional/timing twin (standard library only)" % ENGINE_VERSION)
     p.add_argument("--version", action="version", version="knc-twin %s" % ENGINE_VERSION)
@@ -660,7 +779,7 @@ def build_parser():
             sp.add_argument("kernel", help="kernel JSON (knc-twin.kernel/1)")
         if budgets:
             sp.add_argument("--max-steps", type=int, default=None, help="functional step budget (default kernel.max_steps or 200000)")
-            sp.add_argument("--max-cycles", type=int, default=2000000, help="simulated cycle budget")
+            sp.add_argument("--max-cycles", type=int, default=20000000, help="simulated cycle budget")
             sp.add_argument("--max-seconds", type=float, default=120.0, help="python wall-time budget")
 
     s = sub.add_parser("capabilities", help="what is implemented, unsupported, and which profiles exist")
@@ -713,6 +832,15 @@ def build_parser():
     common(s, kernel=False)
     s.add_argument("manifest", help="batch manifest JSON (knc-twin.batch/1)")
     s.set_defaults(fn=cmd_batch)
+
+    s = sub.add_parser("rollup", help="weight per-region predictions by measured time shares: predicted change of a program-level figure (e.g. seconds per step)")
+    common(s, kernel=False)
+    s.add_argument("manifest", help="rollup manifest JSON (knc-twin.rollup/1)")
+    s.set_defaults(fn=cmd_rollup, trace_source="functional", trip_count=None, contexts=None, no_issue_log=True)
+
+    s = sub.add_parser("calibration-plan", help="what to measure in the next card window: staged microbenchmarks, open misses, held-out cases to add")
+    common(s, kernel=False, budgets=False)
+    s.set_defaults(fn=cmd_calibration_plan)
 
     s = sub.add_parser("prepare-native", help="export a reproducible request for the shared hardware queue (no card connection)")
     common(s)

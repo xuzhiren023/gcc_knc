@@ -41,6 +41,9 @@ CLASSES = {
     "x87_compare":       {"pipes": "U", "latency": "latency.x87_compare", "kind": "x87"},
     "x87_control":       {"pipes": "UV_both", "latency": "latency.x87_control", "kind": "x87"},
     "fence":             {"pipes": "UV_both", "latency": "latency.fence", "kind": "fence"},
+    "locked_rmw":        {"pipes": "UV_both", "latency": "latency.fence", "kind": "rmw", "occupancy": "latency.fence"},
+    "call":              {"pipes": "U", "latency": None, "kind": "branch"},
+    "ret":               {"pipes": "U", "latency": None, "kind": "branch"},
 }
 
 FLAGS = ("ZF", "SF", "CF", "OF", "PF")
@@ -101,8 +104,11 @@ _add("pop", "scalar_load", ["w:gm"], fn="pop", mem_size=8, note="load; rsp += 8"
 _add("leave", "scalar_load", [], fn="leave", mem_size=8, note="rsp = rbp; pop rbp")
 _add("nop", "scalar_alu", [], fn="nop", note="costs an issue slot only")
 _add("movzx", "scalar_alu", ["w:g", "r:gm"], fn=None, note="use the GAS mnemonics movzbl/movzwl/movzbq/movzwq")
-_add("call", "branch", ["t"], fn=None, note="REGION BOUNDARY: calls are not simulated; cut the region at the call or treat the callee as unsupported")
-_add("ret", "branch", [], fn=None, note="REGION BOUNDARY: a region ends before ret")
+_add("call", "call", ["t"], fn="call", mem_size=8,
+     note="pushes the return address and enters the callee when it is in the region; otherwise the callee must be declared in the kernel's 'calls' (costed stub)")
+_add("ret", "ret", [], fn="ret", mem_size=8, note="pops the return address; returning to the entry sentinel ends the stream")
+_add("xchg", "scalar_alu", ["rw:g", "rw:g"], fn="xchg", note="register-register exchange only (the memory form is implicitly locked: use lock_xchg)")
+_add("sahf", "scalar_alu", [], fn="sahf", flags_w=True, note="SF, ZF, PF, CF from AH (AF not modeled); OF unchanged")
 for _n in ("cmove", "cmovne", "cmovl", "cmovg", "cmovle", "cmovge", "cmova", "cmovb", "cmovae", "cmovbe"):
     _add(_n, "scalar_alu", ["rw:g", "r:gm"], fn=None, note="KNC has no CMOV; -march=knc never emits it (S1-04)")
 
@@ -160,6 +166,8 @@ for _n, _k in (("vpaddd", "add"), ("vpsubd", "sub"), ("vpsubrd", "subr"), ("vpan
                ("vpmulld", "mullo"), ("vpmulhd", "mulhs"), ("vpmulhud", "mulhu"), ("vpminsd", "mins"), ("vpmaxsd", "maxs"), ("vpminud", "minu"), ("vpmaxud", "maxu"),
                ("vpsllvd", "shlv"), ("vpsrlvd", "shrv"), ("vpsravd", "sarv")):
     _add(_n, "vector_arith", ["w:v", "r:v", "r:vm"], fn="vint2", opk=_k, mem_size=64)
+_add("vpmadd231d", "vector_arith", ["rw:v", "r:v", "r:vm"], fn="vpmadd231d", mem_size=64,
+     note="dst = dst + low32(src1 * src2) per lane; costed like vpmulld (class vector_arith; the integer multiply latency is not measured separately)")
 for _n, _k in (("vpandq", "and"), ("vporq", "or"), ("vpxorq", "xor"), ("vpandnq", "andn")):
     _add(_n, "vector_arith", ["w:v", "r:v", "r:vm"], fn="vint2q", opk=_k, mem_size=64, note="64-bit logic (KNC has no 64-bit integer arithmetic)")
 for _n, _k in (("vpslld", "shl"), ("vpsrld", "shr"), ("vpsrad", "sar")):
@@ -240,12 +248,27 @@ for _op in ("fcomi", "fcomip", "fucomi", "fucomip"):
 _add("fnstsw", "x87_control", ["w:gm"], fn="x87", op="fnstsw", mem_size=2, note="status word: C0 bit 8, C1 bit 9, C2 bit 10, C3 bit 14, TOP bits 11-13")
 _add("fnstcw", "x87_control", ["w:m"], fn="x87", op="fnstcw", mem_size=2)
 _add("fldcw", "x87_control", ["r:m"], fn="x87", op="fldcw", mem_size=2, note="RC bits 10-11 and PC bits 8-9 take effect for later instructions")
+_add("fxam", "x87_compare", [], fn="x87", op="fxam", note="classifies st0 into C3/C2/C0 and its sign into C1 (empty 101, zero 100, normal 010, infinity 011, NaN 001, denormal 110)")
+_add("ftst", "x87_compare", [], fn="x87", op="ftst", note="compares st0 with +0.0")
+_add("frndint", "x87_add", [], fn="x87", op="frndint", note="rounds st0 to an integer with the control word's RC; costed as an x87 add (assumed)")
 _add("fwait", "x87_move", [], fn="x87", op="nop")
 _add("fnclex", "x87_control", [], fn="x87", op="nop")
 
 # ---- fences ------------------------------------------------------------------------------------
-_add("lock_add", "fence", ["rw:m", "r:gi"], fn=None, note="lock add used as a publication fence; latency.fence must be known")
+for _n in ("add", "sub", "and", "or", "xor"):
+    _add("lock_" + _n, "locked_rmw", ["rw:m", "r:gi"], fn="alu2", flags_w=True, base_op=_n,
+         note="locked read-modify-write (also the publication fence 'lock add $0,(%rsp)'); exact on the sequential functional model; latency.fence must be known")
+for _n in ("inc", "dec"):
+    _add("lock_" + _n, "locked_rmw", ["rw:m"], fn="incdec", flags_w=True, base_op=_n)
+_add("lock_xadd", "locked_rmw", ["rw:m", "rw:g"], fn="xadd", flags_w=True, note="tmp = mem; mem += reg; reg = tmp")
+_add("lock_cmpxchg", "locked_rmw", ["rw:m", "r:g"], fn="cmpxchg", flags_w=True, note="compare rax with mem; equal: mem = reg, ZF=1; else rax = mem, ZF=0")
+_add("lock_xchg", "locked_rmw", ["rw:m", "rw:g"], fn="xchg")
 _add("mfence", "fence", [], fn=None, note="latency.fence must be known")
+
+
+for _a, _b in (("fildll", "fildq"), ("fistpll", "fistpq"), ("fisttpll", "fisttpq"), ("fistll", "fistq")):
+    if _b in INSTRUCTIONS:
+        INSTRUCTIONS[_a] = dict(INSTRUCTIONS[_b], name=_a, alias_of=_b)
 
 
 def lookup(mnemonic):

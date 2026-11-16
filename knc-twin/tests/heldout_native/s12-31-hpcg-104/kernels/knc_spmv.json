@@ -1,0 +1,1221 @@
+{
+  "calls": {
+    "__assert_fail": {
+      "model": "noreturn",
+      "source": "declared automatically (noreturn runtime routine)"
+    }
+  },
+  "description": "HPCG 3.1 ComputeSPMV_ref (knc build) from the linked S12-31 bench binary on a window of interior rows of the 104-cubed problem (rows 563472 onward), streaming from memory",
+  "entry": "function",
+  "init": {
+    "memory": [
+      {
+        "addr": "0x30000000",
+        "hex": "00000000000000000000000000000000401f000000000000c04b030000000000401f0000002a1100c04b030000000000000001300000000000000000000000000000103000000000000020300000000000000000000000000000000000000000"
+      },
+      {
+        "addr": "0x30000100",
+        "hex": "002a1100000000001000006000000000"
+      },
+      {
+        "addr": "0x30000140",
+        "hex": "401f0000000000000000007000000000"
+      },
+      {
+        "addr": "0x30010000",
+        "file": "../input/nnz.bin"
+      },
+      {
+        "addr": "0x30100000",
+        "file": "../input/ind_ptrs.bin"
+      },
+      {
+        "addr": "0x30200000",
+        "file": "../input/val_ptrs.bin"
+      },
+      {
+        "addr": "0x40000020",
+        "file": "../input/ind_rows.bin"
+      },
+      {
+        "addr": "0x50000020",
+        "file": "../input/val_rows.bin"
+      },
+      {
+        "addr": "0x60437348",
+        "file": "../input/x.bin"
+      }
+    ],
+    "registers": {},
+    "symbols": {}
+  },
+  "max_steps": 8000000,
+  "memory_default": 0,
+  "name": "s12-31-hpcg104-knc_spmv",
+  "provenance": {
+    "adapter": "from_binary.py",
+    "coverage": {
+      "complete": {
+        "functional": true,
+        "isa": true,
+        "parser": true,
+        "timing": null
+      },
+      "functional_exact": 70,
+      "instructions": 70,
+      "isa_known": 70,
+      "memory_records": 29,
+      "mnemonics_unknown": [],
+      "parser_ok": 70,
+      "timing_only_or_missing": [],
+      "timing_params_known": null,
+      "unsupported": []
+    },
+    "function": "knc_spmv",
+    "included_callees": [],
+    "layout": true,
+    "live_in_registers_placeholders": [
+      "r12",
+      "r9",
+      "rbp",
+      "rbx",
+      "rdi",
+      "rdx",
+      "rsi"
+    ],
+    "notes": [],
+    "padding_nops": 3,
+    "shape": "x87_sparse_rows_memory_stream",
+    "slow_prefix_instructions": 1,
+    "source_file": ".work/_shared/S12-31/build/s12-31-bench",
+    "source_sha256": "77713a9be5f4b56bf8be54591c0fb972869f253b7ca83d812a1e2a370429ae66",
+    "undeclared_callees": [],
+    "unresolved_symbols": []
+  },
+  "scenario": {
+    "branch": {
+      "type": "exit_mispredicted"
+    },
+    "memory": {
+      "cold_level": "memory",
+      "type": "line_tracking",
+      "warm": [
+        {
+          "end": "0x30000040",
+          "level": "l1",
+          "start": "0x30000000"
+        },
+        {
+          "end": "0x30000140",
+          "level": "l1",
+          "start": "0x30000100"
+        },
+        {
+          "end": "0x30000180",
+          "level": "l1",
+          "start": "0x30000140"
+        },
+        {
+          "end": "0x7f0000000100",
+          "level": "l1",
+          "start": "0x7efffffff000"
+        }
+      ]
+    }
+  },
+  "schema": "knc-twin.kernel/1",
+  "streams": [
+    {
+      "context": 0,
+      "instructions": [
+        {
+          "id": "drv_a",
+          "op": "mov",
+          "ops": [
+            "rdi",
+            {
+              "imm": 805306368
+            }
+          ],
+          "width": 64
+        },
+        {
+          "id": "drv_x",
+          "op": "mov",
+          "ops": [
+            "rsi",
+            {
+              "imm": 805306624
+            }
+          ],
+          "width": 64
+        },
+        {
+          "id": "drv_y",
+          "op": "mov",
+          "ops": [
+            "rdx",
+            {
+              "imm": 805306688
+            }
+          ],
+          "width": 64
+        },
+        {
+          "id": "drv_call",
+          "op": "call",
+          "ops": [
+            "knc_spmv"
+          ]
+        },
+        {
+          "id": "drv_ret",
+          "op": "ret",
+          "ops": []
+        },
+        {
+          "encoding": {
+            "addr": 4257536,
+            "bytes": 4,
+            "imm": true,
+            "slow_prefixes": 0
+          },
+          "id": "a40f700",
+          "label": "knc_spmv",
+          "op": "sub",
+          "ops": [
+            "rsp",
+            {
+              "imm": 24
+            }
+          ]
+        },
+        {
+          "encoding": {
+            "addr": 4257540,
+            "bytes": 3,
+            "disp": true,
+            "slow_prefixes": 0
+          },
+          "id": "a40f704",
+          "op": "mov",
+          "ops": [
+            "eax",
+            {
+              "base": "rdi",
+              "disp": 36
+            }
+          ]
+        },
+        {
+          "encoding": {
+            "addr": 4257543,
+            "bytes": 2,
+            "slow_prefixes": 0
+          },
+          "id": "a40f707",
+          "op": "cmp",
+          "ops": [
+            {
+              "base": "rsi"
+            },
+            "eax"
+          ]
+        },
+        {
+          "encoding": {
+            "addr": 4257545,
+            "bytes": 6,
+            "slow_prefixes": 0
+          },
+          "id": "a40f709",
+          "op": "jl",
+          "ops": [
+            ".A_40f7c3"
+          ]
+        },
+        {
+          "encoding": {
+            "addr": 4257551,
+            "bytes": 4,
+            "disp": true,
+            "slow_prefixes": 0
+          },
+          "id": "a40f70f",
+          "op": "mov",
+          "ops": [
+            "r10d",
+            {
+              "base": "rdi",
+              "disp": 32
+            }
+          ]
+        },
+        {
+          "encoding": {
+            "addr": 4257555,
+            "bytes": 3,
+            "slow_prefixes": 0
+          },
+          "id": "a40f713",
+          "op": "cmp",
+          "ops": [
+            {
+              "base": "rdx"
+            },
+            "r10d"
+          ]
+        },
+        {
+          "encoding": {
+            "addr": 4257558,
+            "bytes": 6,
+            "slow_prefixes": 0
+          },
+          "id": "a40f716",
+          "op": "jl",
+          "ops": [
+            ".A_40f7ea"
+          ]
+        },
+        {
+          "encoding": {
+            "addr": 4257564,
+            "bytes": 3,
+            "slow_prefixes": 0
+          },
+          "id": "a40f71c",
+          "op": "test",
+          "ops": [
+            "r10d",
+            "r10d"
+          ]
+        },
+        {
+          "encoding": {
+            "addr": 4257567,
+            "bytes": 6,
+            "slow_prefixes": 0
+          },
+          "id": "a40f71f",
+          "op": "jle",
+          "ops": [
+            ".A_40f7a2"
+          ]
+        },
+        {
+          "encoding": {
+            "addr": 4257573,
+            "bytes": 4,
+            "slow_prefixes": 0
+          },
+          "id": "a40f725",
+          "op": "mov",
+          "ops": [
+            {
+              "base": "rsp"
+            },
+            "rbx"
+          ]
+        },
+        {
+          "encoding": {
+            "addr": 4257577,
+            "bytes": 5,
+            "disp": true,
+            "slow_prefixes": 0
+          },
+          "id": "a40f729",
+          "op": "mov",
+          "ops": [
+            {
+              "base": "rsp",
+              "disp": 8
+            },
+            "rbp"
+          ]
+        },
+        {
+          "encoding": {
+            "addr": 4257582,
+            "bytes": 5,
+            "disp": true,
+            "slow_prefixes": 0
+          },
+          "id": "a40f72e",
+          "op": "mov",
+          "ops": [
+            {
+              "base": "rsp",
+              "disp": 16
+            },
+            "r12"
+          ]
+        },
+        {
+          "encoding": {
+            "addr": 4257587,
+            "bytes": 4,
+            "disp": true,
+            "slow_prefixes": 0
+          },
+          "id": "a40f733",
+          "op": "mov",
+          "ops": [
+            "r8",
+            {
+              "base": "rsi",
+              "disp": 8
+            }
+          ]
+        },
+        {
+          "encoding": {
+            "addr": 4257591,
+            "bytes": 4,
+            "disp": true,
+            "slow_prefixes": 0
+          },
+          "id": "a40f737",
+          "op": "mov",
+          "ops": [
+            "rbx",
+            {
+              "base": "rdx",
+              "disp": 8
+            }
+          ]
+        },
+        {
+          "encoding": {
+            "addr": 4257595,
+            "bytes": 4,
+            "disp": true,
+            "slow_prefixes": 0
+          },
+          "id": "a40f73b",
+          "op": "mov",
+          "ops": [
+            "r12",
+            {
+              "base": "rdi",
+              "disp": 72
+            }
+          ]
+        },
+        {
+          "encoding": {
+            "addr": 4257599,
+            "bytes": 4,
+            "disp": true,
+            "slow_prefixes": 0
+          },
+          "id": "a40f73f",
+          "op": "mov",
+          "ops": [
+            "rbp",
+            {
+              "base": "rdi",
+              "disp": 64
+            }
+          ]
+        },
+        {
+          "encoding": {
+            "addr": 4257603,
+            "bytes": 4,
+            "disp": true,
+            "slow_prefixes": 0
+          },
+          "id": "a40f743",
+          "op": "mov",
+          "ops": [
+            "r11",
+            {
+              "base": "rdi",
+              "disp": 48
+            }
+          ]
+        },
+        {
+          "encoding": {
+            "addr": 4257607,
+            "bytes": 2,
+            "slow_prefixes": 0
+          },
+          "id": "a40f747",
+          "op": "fldz",
+          "ops": []
+        },
+        {
+          "encoding": {
+            "addr": 4257609,
+            "bytes": 3,
+            "slow_prefixes": 0
+          },
+          "id": "a40f749",
+          "op": "xor",
+          "ops": [
+            "r9d",
+            "r9d"
+          ]
+        },
+        {
+          "encoding": {
+            "addr": 4257612,
+            "bytes": 4,
+            "disp": true,
+            "slow_prefixes": 0
+          },
+          "id": "a40f74c",
+          "op": "nop",
+          "ops": []
+        },
+        {
+          "encoding": {
+            "addr": 4257616,
+            "bytes": 5,
+            "slow_prefixes": 0
+          },
+          "id": "a40f750",
+          "label": ".A_40f750",
+          "op": "movsbl",
+          "ops": [
+            "ecx",
+            {
+              "base": "r11",
+              "index": "r9",
+              "scale": 1
+            }
+          ]
+        },
+        {
+          "encoding": {
+            "addr": 4257621,
+            "bytes": 2,
+            "slow_prefixes": 0
+          },
+          "id": "a40f755",
+          "op": "test",
+          "ops": [
+            "ecx",
+            "ecx"
+          ]
+        },
+        {
+          "encoding": {
+            "addr": 4257623,
+            "bytes": 2,
+            "slow_prefixes": 0
+          },
+          "id": "a40f757",
+          "op": "jle",
+          "ops": [
+            ".A_40f7b0"
+          ]
+        },
+        {
+          "encoding": {
+            "addr": 4257625,
+            "bytes": 4,
+            "slow_prefixes": 0
+          },
+          "id": "a40f759",
+          "op": "mov",
+          "ops": [
+            "rdi",
+            {
+              "base": "r12",
+              "index": "r9",
+              "scale": 8
+            }
+          ]
+        },
+        {
+          "encoding": {
+            "addr": 4257629,
+            "bytes": 5,
+            "disp": true,
+            "slow_prefixes": 0
+          },
+          "id": "a40f75d",
+          "op": "mov",
+          "ops": [
+            "rsi",
+            {
+              "base": "rbp",
+              "index": "r9",
+              "scale": 8
+            }
+          ]
+        },
+        {
+          "encoding": {
+            "addr": 4257634,
+            "bytes": 2,
+            "slow_prefixes": 0
+          },
+          "id": "a40f762",
+          "op": "fld",
+          "ops": [
+            "st(0)"
+          ]
+        },
+        {
+          "encoding": {
+            "addr": 4257636,
+            "bytes": 2,
+            "slow_prefixes": 0
+          },
+          "id": "a40f764",
+          "op": "xor",
+          "ops": [
+            "eax",
+            "eax"
+          ]
+        },
+        {
+          "encoding": {
+            "addr": 4257638,
+            "bytes": 10,
+            "disp": true,
+            "disp32": true,
+            "prefixes": [
+              "66",
+              "cs"
+            ],
+            "slow_prefixes": 2
+          },
+          "id": "a40f766",
+          "op": "nop",
+          "ops": []
+        },
+        {
+          "encoding": {
+            "addr": 4257648,
+            "bytes": 4,
+            "slow_prefixes": 0
+          },
+          "id": "a40f770",
+          "label": ".A_40f770",
+          "op": "movslq",
+          "ops": [
+            "rdx",
+            {
+              "base": "rsi",
+              "index": "rax",
+              "scale": 4
+            }
+          ]
+        },
+        {
+          "encoding": {
+            "addr": 4257652,
+            "bytes": 4,
+            "slow_prefixes": 0
+          },
+          "id": "a40f774",
+          "op": "fldl",
+          "ops": [
+            {
+              "base": "r8",
+              "index": "rdx",
+              "scale": 8
+            }
+          ]
+        },
+        {
+          "encoding": {
+            "addr": 4257656,
+            "bytes": 3,
+            "slow_prefixes": 0
+          },
+          "id": "a40f778",
+          "op": "fmull",
+          "ops": [
+            {
+              "base": "rdi",
+              "index": "rax",
+              "scale": 8
+            }
+          ]
+        },
+        {
+          "encoding": {
+            "addr": 4257659,
+            "bytes": 4,
+            "imm": true,
+            "slow_prefixes": 0
+          },
+          "id": "a40f77b",
+          "op": "add",
+          "ops": [
+            "rax",
+            {
+              "imm": 1
+            }
+          ]
+        },
+        {
+          "encoding": {
+            "addr": 4257663,
+            "bytes": 2,
+            "slow_prefixes": 0
+          },
+          "id": "a40f77f",
+          "op": "cmp",
+          "ops": [
+            "ecx",
+            "eax"
+          ]
+        },
+        {
+          "encoding": {
+            "addr": 4257665,
+            "bytes": 2,
+            "slow_prefixes": 0
+          },
+          "id": "a40f781",
+          "op": "faddp",
+          "ops": [
+            "st(1)",
+            "st"
+          ]
+        },
+        {
+          "encoding": {
+            "addr": 4257667,
+            "bytes": 2,
+            "slow_prefixes": 0
+          },
+          "id": "a40f783",
+          "op": "jg",
+          "ops": [
+            ".A_40f770"
+          ]
+        },
+        {
+          "encoding": {
+            "addr": 4257669,
+            "bytes": 4,
+            "slow_prefixes": 0
+          },
+          "id": "a40f785",
+          "op": "fstpl",
+          "ops": [
+            {
+              "base": "rbx",
+              "index": "r9",
+              "scale": 8
+            }
+          ]
+        },
+        {
+          "encoding": {
+            "addr": 4257673,
+            "bytes": 4,
+            "imm": true,
+            "slow_prefixes": 0
+          },
+          "id": "a40f789",
+          "op": "add",
+          "ops": [
+            "r9",
+            {
+              "imm": 1
+            }
+          ]
+        },
+        {
+          "encoding": {
+            "addr": 4257677,
+            "bytes": 3,
+            "slow_prefixes": 0
+          },
+          "id": "a40f78d",
+          "op": "cmp",
+          "ops": [
+            "r9",
+            "r10"
+          ]
+        },
+        {
+          "encoding": {
+            "addr": 4257680,
+            "bytes": 2,
+            "slow_prefixes": 0
+          },
+          "id": "a40f790",
+          "op": "jne",
+          "ops": [
+            ".A_40f750"
+          ]
+        },
+        {
+          "encoding": {
+            "addr": 4257682,
+            "bytes": 2,
+            "slow_prefixes": 0
+          },
+          "id": "a40f792",
+          "op": "fstp",
+          "ops": [
+            "st(0)"
+          ]
+        },
+        {
+          "encoding": {
+            "addr": 4257684,
+            "bytes": 4,
+            "slow_prefixes": 0
+          },
+          "id": "a40f794",
+          "label": ".A_40f794",
+          "op": "mov",
+          "ops": [
+            "rbx",
+            {
+              "base": "rsp"
+            }
+          ]
+        },
+        {
+          "encoding": {
+            "addr": 4257688,
+            "bytes": 5,
+            "disp": true,
+            "slow_prefixes": 0
+          },
+          "id": "a40f798",
+          "op": "mov",
+          "ops": [
+            "rbp",
+            {
+              "base": "rsp",
+              "disp": 8
+            }
+          ]
+        },
+        {
+          "encoding": {
+            "addr": 4257693,
+            "bytes": 5,
+            "disp": true,
+            "slow_prefixes": 0
+          },
+          "id": "a40f79d",
+          "op": "mov",
+          "ops": [
+            "r12",
+            {
+              "base": "rsp",
+              "disp": 16
+            }
+          ]
+        },
+        {
+          "encoding": {
+            "addr": 4257698,
+            "bytes": 2,
+            "slow_prefixes": 0
+          },
+          "id": "a40f7a2",
+          "label": ".A_40f7a2",
+          "op": "xor",
+          "ops": [
+            "eax",
+            "eax"
+          ]
+        },
+        {
+          "encoding": {
+            "addr": 4257700,
+            "bytes": 4,
+            "imm": true,
+            "slow_prefixes": 0
+          },
+          "id": "a40f7a4",
+          "op": "add",
+          "ops": [
+            "rsp",
+            {
+              "imm": 24
+            }
+          ]
+        },
+        {
+          "encoding": {
+            "addr": 4257704,
+            "bytes": 1,
+            "slow_prefixes": 0
+          },
+          "id": "a40f7a8",
+          "op": "ret",
+          "ops": []
+        },
+        {
+          "encoding": {
+            "addr": 4257705,
+            "bytes": 7,
+            "disp": true,
+            "disp32": true,
+            "slow_prefixes": 0
+          },
+          "id": "a40f7a9",
+          "op": "nop",
+          "ops": []
+        },
+        {
+          "encoding": {
+            "addr": 4257712,
+            "bytes": 2,
+            "slow_prefixes": 0
+          },
+          "id": "a40f7b0",
+          "label": ".A_40f7b0",
+          "op": "fld",
+          "ops": [
+            "st(0)"
+          ]
+        },
+        {
+          "encoding": {
+            "addr": 4257714,
+            "bytes": 4,
+            "slow_prefixes": 0
+          },
+          "id": "a40f7b2",
+          "op": "fstpl",
+          "ops": [
+            {
+              "base": "rbx",
+              "index": "r9",
+              "scale": 8
+            }
+          ]
+        },
+        {
+          "encoding": {
+            "addr": 4257718,
+            "bytes": 4,
+            "imm": true,
+            "slow_prefixes": 0
+          },
+          "id": "a40f7b6",
+          "op": "add",
+          "ops": [
+            "r9",
+            {
+              "imm": 1
+            }
+          ]
+        },
+        {
+          "encoding": {
+            "addr": 4257722,
+            "bytes": 3,
+            "slow_prefixes": 0
+          },
+          "id": "a40f7ba",
+          "op": "cmp",
+          "ops": [
+            "r9",
+            "r10"
+          ]
+        },
+        {
+          "encoding": {
+            "addr": 4257725,
+            "bytes": 2,
+            "slow_prefixes": 0
+          },
+          "id": "a40f7bd",
+          "op": "jne",
+          "ops": [
+            ".A_40f750"
+          ]
+        },
+        {
+          "encoding": {
+            "addr": 4257727,
+            "bytes": 2,
+            "slow_prefixes": 0
+          },
+          "id": "a40f7bf",
+          "op": "fstp",
+          "ops": [
+            "st(0)"
+          ]
+        },
+        {
+          "encoding": {
+            "addr": 4257729,
+            "bytes": 2,
+            "slow_prefixes": 0
+          },
+          "id": "a40f7c1",
+          "op": "jmp",
+          "ops": [
+            ".A_40f794"
+          ]
+        },
+        {
+          "encoding": {
+            "addr": 4257731,
+            "bytes": 5,
+            "imm": true,
+            "slow_prefixes": 0
+          },
+          "id": "a40f7c3",
+          "label": ".A_40f7c3",
+          "op": "mov",
+          "ops": [
+            "ecx",
+            {
+              "imm": 4807432
+            }
+          ]
+        },
+        {
+          "encoding": {
+            "addr": 4257736,
+            "bytes": 5,
+            "imm": true,
+            "slow_prefixes": 0
+          },
+          "id": "a40f7c8",
+          "op": "mov",
+          "ops": [
+            "edx",
+            {
+              "imm": 49
+            }
+          ]
+        },
+        {
+          "encoding": {
+            "addr": 4257741,
+            "bytes": 5,
+            "imm": true,
+            "slow_prefixes": 0
+          },
+          "id": "a40f7cd",
+          "op": "mov",
+          "ops": [
+            "esi",
+            {
+              "imm": 4806784
+            }
+          ]
+        },
+        {
+          "encoding": {
+            "addr": 4257746,
+            "bytes": 5,
+            "imm": true,
+            "slow_prefixes": 0
+          },
+          "id": "a40f7d2",
+          "op": "mov",
+          "ops": [
+            "edi",
+            {
+              "imm": 4806896
+            }
+          ]
+        },
+        {
+          "encoding": {
+            "addr": 4257751,
+            "bytes": 4,
+            "slow_prefixes": 0
+          },
+          "id": "a40f7d7",
+          "op": "mov",
+          "ops": [
+            {
+              "base": "rsp"
+            },
+            "rbx"
+          ]
+        },
+        {
+          "encoding": {
+            "addr": 4257755,
+            "bytes": 5,
+            "disp": true,
+            "slow_prefixes": 0
+          },
+          "id": "a40f7db",
+          "op": "mov",
+          "ops": [
+            {
+              "base": "rsp",
+              "disp": 8
+            },
+            "rbp"
+          ]
+        },
+        {
+          "encoding": {
+            "addr": 4257760,
+            "bytes": 5,
+            "disp": true,
+            "slow_prefixes": 0
+          },
+          "id": "a40f7e0",
+          "op": "mov",
+          "ops": [
+            {
+              "base": "rsp",
+              "disp": 16
+            },
+            "r12"
+          ]
+        },
+        {
+          "encoding": {
+            "addr": 4257765,
+            "bytes": 5,
+            "slow_prefixes": 0
+          },
+          "id": "a40f7e5",
+          "op": "call",
+          "ops": [
+            "__assert_fail"
+          ]
+        },
+        {
+          "encoding": {
+            "addr": 4257770,
+            "bytes": 5,
+            "imm": true,
+            "slow_prefixes": 0
+          },
+          "id": "a40f7ea",
+          "label": ".A_40f7ea",
+          "op": "mov",
+          "ops": [
+            "ecx",
+            {
+              "imm": 4807432
+            }
+          ]
+        },
+        {
+          "encoding": {
+            "addr": 4257775,
+            "bytes": 5,
+            "imm": true,
+            "slow_prefixes": 0
+          },
+          "id": "a40f7ef",
+          "op": "mov",
+          "ops": [
+            "edx",
+            {
+              "imm": 50
+            }
+          ]
+        },
+        {
+          "encoding": {
+            "addr": 4257780,
+            "bytes": 5,
+            "imm": true,
+            "slow_prefixes": 0
+          },
+          "id": "a40f7f4",
+          "op": "mov",
+          "ops": [
+            "esi",
+            {
+              "imm": 4806784
+            }
+          ]
+        },
+        {
+          "encoding": {
+            "addr": 4257785,
+            "bytes": 5,
+            "imm": true,
+            "slow_prefixes": 0
+          },
+          "id": "a40f7f9",
+          "op": "mov",
+          "ops": [
+            "edi",
+            {
+              "imm": 4806936
+            }
+          ]
+        },
+        {
+          "encoding": {
+            "addr": 4257790,
+            "bytes": 4,
+            "slow_prefixes": 0
+          },
+          "id": "a40f7fe",
+          "op": "mov",
+          "ops": [
+            {
+              "base": "rsp"
+            },
+            "rbx"
+          ]
+        },
+        {
+          "encoding": {
+            "addr": 4257794,
+            "bytes": 5,
+            "disp": true,
+            "slow_prefixes": 0
+          },
+          "id": "a40f802",
+          "op": "mov",
+          "ops": [
+            {
+              "base": "rsp",
+              "disp": 8
+            },
+            "rbp"
+          ]
+        },
+        {
+          "encoding": {
+            "addr": 4257799,
+            "bytes": 5,
+            "disp": true,
+            "slow_prefixes": 0
+          },
+          "id": "a40f807",
+          "op": "mov",
+          "ops": [
+            {
+              "base": "rsp",
+              "disp": 16
+            },
+            "r12"
+          ]
+        },
+        {
+          "encoding": {
+            "addr": 4257804,
+            "bytes": 5,
+            "slow_prefixes": 0
+          },
+          "id": "a40f80c",
+          "op": "call",
+          "ops": [
+            "__assert_fail"
+          ]
+        }
+      ]
+    }
+  ],
+  "unit_of_work": {
+    "count": 8000,
+    "description": "one interior row (27 nonzeros)"
+  }
+}

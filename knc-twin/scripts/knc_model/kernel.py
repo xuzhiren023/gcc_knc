@@ -74,12 +74,12 @@ class Reg(object):
 
 
 class Mem(object):
-    __slots__ = ("base", "index", "scale", "disp", "broadcast", "conv", "size", "vindex", "symbol")
+    __slots__ = ("base", "index", "scale", "disp", "broadcast", "conv", "size", "vindex", "symbol", "segment", "absolute")
 
     def __init__(self, d, what):
         if not isinstance(d, dict):
             raise InvalidInput("%s: memory operand must be an object" % what)
-        allowed = {"base", "index", "scale", "disp", "broadcast", "conv", "size", "mem", "vindex", "symbol"}
+        allowed = {"base", "index", "scale", "disp", "broadcast", "conv", "size", "mem", "vindex", "symbol", "segment", "abs"}
         extra = set(d) - allowed
         if extra:
             raise InvalidInput("%s: unknown memory operand keys %s" % (what, sorted(extra)))
@@ -92,6 +92,10 @@ class Mem(object):
         self.conv = d.get("conv")
         self.symbol = d.get("symbol")
         self.size = d.get("size")
+        self.segment = d.get("segment")
+        self.absolute = bool(d.get("abs"))
+        if self.segment is not None and self.segment not in ("fs", "gs"):
+            raise Unsupported("%s: segment %r not supported (fs and gs only: thread-local access)" % (what, self.segment))
         if self.scale not in (1, 2, 4, 8):
             raise InvalidInput("%s: scale must be 1, 2, 4 or 8" % what)
         if self.base is not None and self.base.kind != "g":
@@ -104,7 +108,7 @@ class Mem(object):
             raise Unsupported("%s: broadcast %r not supported (%s)" % (what, self.broadcast, ", ".join(isa.BROADCASTS)))
         if self.conv is not None and self.conv not in isa.UPCONV_PS:
             raise Unsupported("%s: conversion %r not supported (%s)" % (what, self.conv, ", ".join(isa.UPCONV_PS)))
-        if self.base is None and self.index is None and self.vindex is None and self.symbol is None:
+        if self.base is None and self.index is None and self.vindex is None and self.symbol is None and not self.absolute and self.segment is None:
             raise InvalidInput("%s: memory operand needs a base, index, vindex register or a symbol" % what)
 
     def regs(self):
@@ -116,6 +120,8 @@ class Mem(object):
 
     def __repr__(self):
         parts = []
+        if self.segment:
+            parts.append("%" + self.segment + ":")
         if self.symbol:
             parts.append(self.symbol)
         if self.base:
@@ -136,10 +142,11 @@ class Mem(object):
 
 
 class Imm(object):
-    __slots__ = ("value",)
+    __slots__ = ("value", "symbol")
 
-    def __init__(self, v):
+    def __init__(self, v, symbol=None):
         self.value = v
+        self.symbol = symbol
 
     def __repr__(self):
         return "$%d" % self.value
@@ -166,7 +173,7 @@ def _parse_operand(raw, role, what):
         if "imm" in raw:
             if "i" not in kinds:
                 raise InvalidInput("%s: immediate not allowed here" % what)
-            return Imm(parse_int(raw["imm"], what))
+            return Imm(parse_int(raw["imm"], what), raw.get("imm_symbol"))
         if "reg" in raw:
             r = Reg(raw["reg"], swizzle=raw.get("swizzle"), conv=raw.get("conv"))
             _check_reg_kind(r, kinds, what, role)
@@ -228,8 +235,6 @@ class Insn(object):
         if spec is None:
             raise Unsupported("instruction %s: mnemonic %r is not in the supported subset; it gets no default cost" % (self.id, op),
                               {"mnemonic": op, "instruction": self.id})
-        if spec["fn"] is None and spec["class"] == "branch" and self.op in ("call", "ret"):
-            raise Unsupported("instruction %s: %s is a region boundary (%s)" % (self.id, self.op, spec["note"]), {"mnemonic": self.op, "instruction": self.id})
         self.spec = spec
         self.cls = spec["class"]
         self.label = d.get("label")
@@ -339,8 +344,22 @@ class Insn(object):
                 self.writes.add(self.mask.base)  # completion mask is cleared
         self.flags_r = bool(self.spec.get("flags_r"))
         self.flags_w = bool(self.spec.get("flags_w"))
-        self.is_branch = self.cls == "branch"
-        if self.is_branch and self.target is None:
+        self.is_branch = self.cls in ("branch", "call", "ret")
+        if self.op in ("call", "ret"):
+            self.reads.add("rsp")
+            self.writes.add("rsp")
+            self.addr_regs.add("rsp")
+        if self.op in ("xchg", "lock_xchg", "lock_xadd"):
+            for o in self.operands:
+                if isinstance(o, Reg):
+                    self.reads.add(o.base)
+                    self.writes.add(o.base)
+        if self.op == "lock_cmpxchg":
+            self.reads.add("rax")
+            self.writes.add("rax")
+        if self.op == "sahf":
+            self.reads.add("rax")
+        if self.is_branch and self.target is None and self.op != "ret":
             raise InvalidInput("instruction %s: branch needs a target label" % self.id)
         # memory forms and effective timing class
         self.is_load = False
@@ -356,6 +375,10 @@ class Insn(object):
         if self.op in ("push", "pop", "leave"):
             self.is_store = self.op == "push"
             self.is_load = self.op != "push"
+        if self.op == "call":
+            self.is_store = True
+        if self.op == "ret":
+            self.is_load = True
         if self.op.startswith("vloadunpack"):
             # the two halves merge in the load unit: the destination's old value is not waited for (S6-03 unpack.lat)
             self.reads.discard(self.operands[0].base)
@@ -384,6 +407,8 @@ class Insn(object):
             self.folded_load = True
         if self.cls == "vector_gather":
             self.is_load = True
+            # the gathered lanes merge into the destination: a re-executed gather waits for the previous one's data
+            self.reads.add(self.operands[0].base)
         if self.cls == "vector_scatter":
             self.is_store = True
         if self.cls == "x87_load" and self.mem is None:
@@ -451,7 +476,7 @@ class Insn(object):
 
 
 class Stream(object):
-    def __init__(self, d, kernel_dir, idx, symbols=None):
+    def __init__(self, d, kernel_dir, idx, symbols=None, calls=None):
         if not isinstance(d, dict):
             raise InvalidInput("streams[%d] must be an object" % idx)
         self.context = d.get("context", idx)
@@ -488,6 +513,12 @@ class Stream(object):
                     if not symbols or o.symbol not in symbols:
                         raise InvalidInput("streams[%d]: instruction %s refers to symbol %r; give its address in init.symbols" % (idx, i.id, o.symbol))
                     o.disp += parse_int(symbols[o.symbol], "init.symbols." + o.symbol)
+                elif isinstance(o, Imm) and o.symbol is not None:
+                    if not symbols or o.symbol not in symbols:
+                        raise InvalidInput("streams[%d]: instruction %s uses the address of symbol %r; give it in init.symbols" % (idx, i.id, o.symbol))
+                    o.value += parse_int(symbols[o.symbol], "init.symbols." + o.symbol)
+            if i.imm is not None and any(isinstance(o, Imm) for o in i.operands):
+                i.imm = [o for o in i.operands if isinstance(o, Imm)][-1].value
         ids = [i.id for i in self.insns]
         if len(set(ids)) != len(ids):
             raise InvalidInput("streams[%d]: duplicate instruction ids" % idx)
@@ -497,19 +528,42 @@ class Stream(object):
                 if i.label in self.labels:
                     raise InvalidInput("streams[%d]: duplicate label %r" % (idx, i.label))
                 self.labels[i.label] = i.index
+        self.external_calls = []
         for i in self.insns:
             if i.target is not None and i.target not in self.labels:
+                if i.op == "call":
+                    if not calls or i.target not in calls:
+                        raise Unsupported("streams[%d]: instruction %s calls %r, which is not in the region and has no entry in the kernel's 'calls' (declare a costed stub: {\"cycles\": N, \"model\": ...})" % (idx, i.id, i.target),
+                                          {"instruction": i.id, "callee": i.target})
+                    self.external_calls.append(i.target)
+                    continue
                 raise InvalidInput("streams[%d]: branch %s targets unknown label %r" % (idx, i.id, i.target))
             for dep in i.explicit_deps:
                 if dep not in ids:
                     raise InvalidInput("streams[%d]: instruction %s depends on unknown id %r" % (idx, i.id, dep))
         self.by_id = {i.id: i for i in self.insns}
+        # return sites: the value a call pushes (the real return address when the layout is known)
+        self.return_sites = {}
+        self._ret_values = {}
+        for i in self.insns:
+            if i.op == "call" and i.target in self.labels:
+                enc = i.encoding
+                if enc.get("addr") is not None and enc.get("bytes"):
+                    v = parse_int(enc["addr"], "encoding.addr") + enc["bytes"]
+                else:
+                    v = 0x7D0000000000 + (i.index + 1) * 16
+                self._ret_values[i.index] = v
+                self.return_sites[v] = i.index + 1
+
+    def return_value(self, index):
+        return self._ret_values[index]
 
     def has_control_flow(self):
         return any(i.is_branch for i in self.insns)
 
 
-DEFAULT_NUMERICAL_POLICY = {"rounding": "rn", "ftz": False, "daz": False, "nan_compare": "any_nan", "ftz_rule": "tiny", "x87_control_word": "0x037f"}
+DEFAULT_NUMERICAL_POLICY = {"rounding": "rn", "ftz": False, "daz": False, "nan_compare": "any_nan", "ftz_rule": "tiny", "x87_control_word": "0x037f",
+                            "gather_completion": "one_line"}
 
 
 class Kernel(object):
@@ -519,7 +573,7 @@ class Kernel(object):
         if raw.get("schema") != KERNEL_SCHEMA:
             raise InvalidInput("kernel schema must be %r (got %r)" % (KERNEL_SCHEMA, raw.get("schema")))
         allowed = {"schema", "name", "description", "representation", "unit_of_work", "numerical_policy", "init", "expected",
-                   "streams", "scenario", "loop", "max_steps", "memory_default", "notes", "provenance"}
+                   "streams", "scenario", "loop", "max_steps", "memory_default", "notes", "provenance", "calls", "entry", "inputs"}
         extra = set(raw) - allowed
         if extra:
             raise InvalidInput("kernel: unknown top-level keys %s" % sorted(extra))
@@ -539,6 +593,8 @@ class Kernel(object):
         if pol["nan_compare"] not in ("any_nan", "bits"):
             raise InvalidInput("numerical_policy.nan_compare must be any_nan or bits")
         pol["x87_control_word"] = parse_int(pol["x87_control_word"], "numerical_policy.x87_control_word")
+        if pol["gather_completion"] not in ("one_line", "all"):
+            raise InvalidInput("numerical_policy.gather_completion must be one_line or all")
         self.numerical_policy = pol
         self.init = raw.get("init", {})
         self.expected = raw.get("expected", {})
@@ -550,7 +606,19 @@ class Kernel(object):
         if len(streams) > 4:
             raise InvalidInput("at most 4 streams (hardware contexts)")
         symbols = self.init.get("symbols", {})
-        self.streams = [Stream(s, self.dir, i, symbols) for i, s in enumerate(streams)]
+        self.calls = raw.get("calls", {})
+        if not isinstance(self.calls, dict):
+            raise InvalidInput("'calls' must be an object: callee name -> {cycles, model?, status?, source?}")
+        for cname, c in self.calls.items():
+            if not isinstance(c, dict):
+                raise InvalidInput("calls.%s must be an object" % cname)
+            extra_c = set(c) - {"cycles", "cycles_per_byte", "model", "status", "source", "note", "touches"}
+            if extra_c:
+                raise InvalidInput("calls.%s: unknown keys %s" % (cname, sorted(extra_c)))
+        self.entry = raw.get("entry", "region")
+        if self.entry not in ("region", "function"):
+            raise InvalidInput("'entry' must be 'region' (start at the first record) or 'function' (ABI entry: return sentinel on the stack)")
+        self.streams = [Stream(s, self.dir, i, symbols, self.calls) for i, s in enumerate(streams)]
         ctxs = [s.context for s in self.streams]
         if len(set(ctxs)) != len(ctxs):
             raise InvalidInput("two streams use the same context")
@@ -599,21 +667,21 @@ class Kernel(object):
                         raise InvalidInput("scenario.memory.warm[%d] needs start, end, level" % i)
                 rng["start"] = parse_int(rng["start"], "warm.start")
                 rng["end"] = parse_int(rng["end"], "warm.end")
-            hwp = mem.get("hardware_prefetcher", "off")
-            if hwp not in ("off", "modeled"):
-                raise Unsupported("scenario.memory.hardware_prefetcher=%r: use 'off' or 'modeled' (streaming L2 prefetcher model)" % hwp)
+            hwp = mem.get("hardware_prefetcher", "auto")
+            if hwp not in ("off", "modeled", "auto"):
+                raise Unsupported("scenario.memory.hardware_prefetcher=%r: use 'auto', 'off' or 'modeled' (streaming L2 prefetcher model)" % hwp)
             mem["hardware_prefetcher"] = hwp
-            tlb = mem.get("tlb", "off")
-            if tlb not in ("off", "modeled"):
-                raise Unsupported("scenario.memory.tlb=%r: use 'off' or 'modeled'" % tlb)
+            tlb = mem.get("tlb", "auto")
+            if tlb not in ("off", "modeled", "auto"):
+                raise Unsupported("scenario.memory.tlb=%r: use 'auto', 'off' or 'modeled'" % tlb)
             mem["tlb"] = tlb
             ps = mem.get("page_bytes", 4096)
             if ps not in (4096, 2097152):
                 raise Unsupported("scenario.memory.page_bytes must be 4096 or 2097152")
             mem["page_bytes"] = ps
-            svc = mem.get("memory_service", "unlimited")
-            if svc not in ("unlimited", "modeled"):
-                raise Unsupported("scenario.memory.memory_service must be unlimited or modeled")
+            svc = mem.get("memory_service", "auto")
+            if svc not in ("unlimited", "modeled", "auto"):
+                raise Unsupported("scenario.memory.memory_service must be auto, unlimited or modeled")
             mem["memory_service"] = svc
         else:
             raise Unsupported("scenario.memory.type %r not supported (fixed_level, classified, line_tracking)" % t)
@@ -622,7 +690,14 @@ class Kernel(object):
             raise Unsupported("scenario.branch.type %r not supported (all_predicted, all_mispredicted, exit_mispredicted, ids_mispredicted)" % bt)
         if bt == "ids_mispredicted" and not isinstance(br.get("ids"), list):
             raise InvalidInput("scenario.branch.ids must be a list of instruction ids")
-        return {"memory": mem, "branch": br}
+        fe = dict(sc.get("frontend", {"icache": "warm"}))
+        if fe.get("icache", "warm") not in ("warm", "cold_l2", "cold_memory"):
+            raise Unsupported("scenario.frontend.icache must be warm, cold_l2 or cold_memory")
+        fe.setdefault("icache", "warm")
+        extra_sc = set(sc) - {"memory", "branch", "frontend"}
+        if extra_sc:
+            raise InvalidInput("scenario: unknown keys %s" % sorted(extra_sc))
+        return {"memory": mem, "branch": br, "frontend": fe}
 
     def stream_for(self, ctx):
         for s in self.streams:
