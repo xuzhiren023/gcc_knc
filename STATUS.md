@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-16 09:20.
+Updated automatically at every ticket change. Last update: 2026-11-16 09:21.
 
-**Next: GPT-6.1, on S14-10 (knc-twin: --jobs N for independent simulations and PyPy support (roadmap item 1)).** Run `python tools/dispatch.py`, or ask the tech lead to.
+**Waiting for you:** S14-23. Run `python tools/pm.py inbox`.
 
 Current tickets: `[#################---]` 253 of 292
 
@@ -151,7 +151,7 @@ Current tickets: `[#################---]` 253 of 292
 | S14-20 | knc-twin: an indirect jmp/call (PLT tail call through the GOT) on a never-executed path must not refuse the whole region | Done | a region containing an indirect jmp or call that never executes now runs; an executed one fails with the in... |
 | S14-21 | knc-twin multi-core: held-out validation of the 8-tile ring model against the measured GEMV, triad and core-scaling rows | Not started |  |
 | S14-22 | card_run turn row: refreshing an open turn row must keep its place in the queue | draft |  |
-| S14-23 | knc-twin: import the window-10 scatter rows (2 threads) and settle occupancy.scatter_cycles_per_line | In progress | Continue in a fresh session on the same branch: commit what you have now, then finish steps 2-4 (all three ... |
+| S14-23 | knc-twin: import the window-10 scatter rows (2 threads) and settle occupancy.scatter_cycles_per_line | **Waiting for you** | budget: 4552427 input tokens used; the budget is 4000000 |
 | S14-24 | dispatch: refuse a session up front when its worktree git dir or ticket file is not writable from the sandbox | draft |  |
 | S14-25 | knc-twin: recorded outputs carry absolute host paths (C:/Users/<name>/...); write repo-relative paths and scrub the committed records | Not started |  |
 | S14-26 | knc-twin bound for software pipelining - how much could overlapping iterations gain on the M4 hot loops (go/no-go for S14-02) | Not started |  |
@@ -317,6 +317,7 @@ Current tickets: `[#################---]` 253 of 292
 
 ## Recent activity
 
+- 2026-11-16 09:21 **S14-23** lead escalate: budget: 4552427 input tokens used; the budget is 4000000
 - 2026-11-16 09:20 **S14-23** lead answer: Continue in a fresh session on the same branch: commit what you have now, then finish steps 2-4 (all three thread counts t1/t2/t4, held-out case, v...
 - 2026-11-16 09:18 **S14-23** engineer ask: The scatter import implementation and converter are prepared, but the required prediction/validation artifacts and profile overlay work could not b...
 - 2026-11-16 09:05 **S14-20** lead approve: a region containing an indirect jmp or call that never executes now runs; an executed one fails with the instruction and address, and the coverage ...
@@ -324,13 +325,12 @@ Current tickets: `[#################---]` 253 of 292
 - 2026-11-16 08:46 **S14-20** lead defer: Review passed (red-then-green verified, coverage regression fixed in e0826ac3); approve is refused because the main checkout has an uncommitted cha...
 - 2026-11-16 08:44 **S14-20** engineer submit: a region containing an indirect jmp or call that never executes now runs; an executed one fails with the instruction and address, and the coverage ...
 - 2026-11-16 08:43 **S14-20** owner decide: input_tokens 4M -> 8M (standing rule); the fix is committed (e0826ac3), only the submit remains
-- 2026-11-16 08:43 **S14-20** lead escalate: budget: 4392282 input tokens used; the budget is 4000000
 
 ## Cost
 
 - From the script, engineer: 776 sessions, 1641.3M input tokens
 - From the script, lead: 527 sessions, 148.9M input tokens
-- Started by hand, Claude: 14 sessions, 4264.7M input tokens
+- Started by hand, Claude: 14 sessions, 4266.8M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
