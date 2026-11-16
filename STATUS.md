@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-15 22:40.
+Updated automatically at every ticket change. Last update: 2026-11-15 22:41.
 
-**Next: GPT-6.1, on S14-10 (knc-twin: --jobs N for independent simulations and PyPy support (roadmap item 1)).** Run `python tools/dispatch.py`, or ask the tech lead to.
+**Next: the tech lead, on S14-10.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[#################---]` 244 of 273
 
@@ -138,7 +138,7 @@ Current tickets: `[#################---]` 244 of 273
 | S14-07 | C++ abstraction removal on KNC - does LTO work for k1om, and do devirtualization and indirect-call promotion fire at -O2 -march=knc | draft |  |
 | S14-08 | Quantized GEMV kernels on KNC - multi-row activation reuse, FP vs int32 VPMADD231D vs VPERMD lookup table, bandwidth-normalized | draft |  |
 | S14-09 | KNC vs the Z840 host (dual E5-2690 v3) on the same algorithms and numerical contract - where running on the card actually pays | draft |  |
-| S14-10 | knc-twin: --jobs N for independent simulations and PyPy support (roadmap item 1) | In progress |  |
+| S14-10 | knc-twin: --jobs N for independent simulations and PyPy support (roadmap item 1) | Question for the tech lead | The brief gates --jobs 4 identity tests, validation comparisons, PyPy selftest/examples and speed runs on M... |
 | S14-11 | knc-twin: close PhiWeather WRF coverage gaps (jump tables, vcvtps2pd ymm, loop-region and complete-listing modes, scatter and rcp-table import) | Not started |  |
 | S14-12 | knc-twin: iteration and phase sampling for loop and whole-program wall-time estimates (roadmap item 2) | Not started |  |
 | S14-13 | knc-twin: 8-tile multi-core unit on the full ring with all memory controllers (roadmap item 3) | Not started |  |
@@ -298,6 +298,7 @@ Current tickets: `[#################---]` 244 of 273
 
 ## Recent activity
 
+- 2026-11-15 22:41 **S14-10** engineer ask: The brief gates --jobs 4 identity tests, validation comparisons, PyPy selftest/examples and speed runs on M4 completion; the ticket also requires c...
 - 2026-11-15 17:45 **S12-09** lead approve: Sprint 12 is closed: the final GCC-KNC (knc b2ce6a9eebf) has every runtime library rebuilt from the same compiler, passes T0-T2, ICE sweeps, x86 id...
 - 2026-11-15 16:47 **S13-06** lead approve: knc-twin 0.2.1 is in the repo: it reads GCC-KNC assembly, predicts one-core cycles and loop bounds, and is checked against card data (median 0.4-1....
 - 2026-11-15 16:35 **S13-06** engineer submit: Submitted by the lead: one knc-twin (0.2.1) with GCC .s converter, held-out harness (119 characterization rows, 11 compiled rows, 4 card cases), re...
@@ -305,13 +306,12 @@ Current tickets: `[#################---]` 244 of 273
 - 2026-11-15 16:34 **S13-06** lead resume: Lead: knc-twin 0.2.0 (twin session) and this ticket's validation merged on twin/merge-s13-06 by a lead subagent, plus ADR-0013 rewording, labelled ...
 - 2026-11-15 15:45 **S12-09** engineer submit: T0 PASS (59 tests), T1 PASS, T2 retained PASS. Logs: .work/_state/logs/check_gcc16_t0-20261115-151528.log and check_gcc16_t1-20261115-151543.log. E...
 - 2026-11-15 15:42 **S12-09** lead answer: The size is not from the merge: main...s12/S12-09 is only your own c31011cb/c87d5c15, and ~2900 of the 3183 lines are the tests/baseline/S12-09-* e...
-- 2026-11-15 15:37 **S12-09** engineer ask: After the lead merge 4f40bda2, submit refuses: 3190 changed lines (budget 500), 5 new test files (budget 0), and 2887 test lines for 303 code lines...
 
 ## Cost
 
 - From the script, engineer: 712 sessions, 1501.1M input tokens
 - From the script, lead: 479 sessions, 136.4M input tokens
-- Started by hand, Claude: 14 sessions, 3991.2M input tokens
+- Started by hand, Claude: 14 sessions, 3994.8M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
