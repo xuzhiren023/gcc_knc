@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-16 14:12.
+Updated automatically at every ticket change. Last update: 2026-11-16 14:13.
 
 **Next: the tech lead, on S14-16.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
@@ -160,7 +160,7 @@ Current tickets: `[#################---]` 256 of 296
 | S14-29 | knc-twin: schedule --block ADDR..ADDR for a straight-line block inside a function, and batch must not write a native request per candidate by default | Not started |  |
 | S14-30 | WRF built with GCC-KNC runs 1.21x slower per step than PhiWeather's production build - attribute the gap per cause before fixing (M5, owner rule) | draft |  |
 | S14-31 | knc-twin multi-core usability: compare across scales, stubs and repeated calls at unit/ring scale, multi-context sampling, separated ring/memory stall shares | Not started |  |
-| S14-33 | knc-twin: import the window-11 calibration rows (imci-math latency and throughput, div10, x87 fcoms, rcp23/rsqrt23 tables) and retire the assumed parameters they settle | Changes requested | 1. knc-twin/references/validation.md:303 (and :304): the scatter parameter does not reproduce the rows it w... |
+| S14-33 | knc-twin: import the window-11 calibration rows (imci-math latency and throughput, div10, x87 fcoms, rcp23/rsqrt23 tables) and retire the assumed parameters they settle | In progress | 1. knc-twin/references/validation.md:303 (and :304): the scatter parameter does not reproduce the rows it w... |
 | S14-35 | knc-twin prepare-native: the generated native program for PhiWeather's sixth_order_diffusion kernels segfaults on the card (exit 139 under claude-pin); find the cause, fix the generator, restage | Done | knc-twin prepare-native runs each kernel on its own stack (the kernel's in-image stack, or a private per-co... |
 | S14-37 | knc-twin x87 double rounding: _x87_binop rounds to the 64-bit significand and then to PC=53/24; real x87 rounds once (knc-boinc repro, 1 to 8 ULP errors) | Not started |  |
 | S14-38 | Card and twin dashboard - running card job, card queue and running twin work with remaining time, card temperature and utilization, host CPU, refreshed every 5 minutes | Done | A local dashboard (python tools/knc_dashboard.py serve) now shows the running card job, the card queue and ... |
@@ -340,4 +340,4 @@ Current tickets: `[#################---]` 256 of 296
 
 ## Disk
 
-The project uses 41.3 GiB of 100 GiB. 51 GiB free on the drive.
+The project uses 41.3 GiB of 100 GiB. 50 GiB free on the drive.
