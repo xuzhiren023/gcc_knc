@@ -2,7 +2,7 @@
 
 Updated automatically at every ticket change. Last update: 2026-11-16 03:52.
 
-**Waiting for you:** S14-15, S14-18. Run `python tools/pm.py inbox`.
+**Waiting for you:** S14-15. Run `python tools/pm.py inbox`.
 
 Current tickets: `[#################---]` 244 of 279
 
@@ -146,7 +146,7 @@ Current tickets: `[#################---]` 244 of 279
 | S14-15 | knc-twin prepare-native: absolute memory operands come out as `N()` in kernel.S (k1om as 2.22 rejects them); emit them relocated into the image | **Waiting for you** | budget: 10651104 input tokens used; the budget is 10000000 |
 | S14-16 | bzip2 slower than GCC 5.1.1: mask-to-GPR move cost below a GPR move makes RA park integers in k registers (M4 known limit, must-fix) | draft |  |
 | S14-17 | Compare not folded with its load in merged return blocks (GCC 16 middle end, about half the remaining bzip2 mainGtU gap) | draft |  |
-| S14-18 | knc-twin regress: held-out replay runs under a 120 s wall-clock budget, so a slow interpreter turns a prediction into a budget_exhausted stub and the test fails as a false mismatch | **Waiting for you** | budget: 4 engineer sessions used; the budget is 4 |
+| S14-18 | knc-twin regress: held-out replay runs under a 120 s wall-clock budget, so a slow interpreter turns a prediction into a budget_exhausted stub and the test fails as a false mismatch | In progress | sessions 4 -> 6 under the owner's standing auto-extend rule: the [red] commit is in (105ac991); commit the ... |
 | S14-19 | knc-twin x87 integer-load widths - fildl reads 8 bytes (must be 4), filds reads 4 (must be 2) | Not started |  |
 | S14-20 | knc-twin: an indirect jmp/call (PLT tail call through the GOT) on a never-executed path must not refuse the whole region | Not started |  |
 | S2-01 | Design for zmm and mask registers under -march=knc | Done | The register design for KNC is settled on paper: all 32 zmm and 8 mask registers become usable under -march... |
@@ -304,6 +304,7 @@ Current tickets: `[#################---]` 244 of 279
 
 ## Recent activity
 
+- 2026-11-16 03:52 **S14-18** owner decide: sessions 4 -> 6 under the owner's standing auto-extend rule: the [red] commit is in (105ac991); commit the green (code and docs) next, run t0 once ...
 - 2026-11-16 03:51 **S14-18** engineer escalate: budget: 4 engineer sessions used; the budget is 4
 - 2026-11-16 03:51 **S14-13** engineer submit: Prior unit/selftest/trial, 8 predictions and 11 schema checks passed; logs: knc-twin/references/multicore-design.md. Pending: HPCG-104 regress fail...
 - 2026-11-16 03:50 **S14-13** lead answer: Both gates are resolved: main is merged into s14/S14-13 (8fdc95a8, clean) and the size override is approved; sessions are 11 for this submit only. ...
@@ -311,13 +312,12 @@ Current tickets: `[#################---]` 244 of 279
 - 2026-11-16 03:47 **S14-13** lead defer: Interactive lead needed (sessions 10/10). (1) Merge main into s14/S14-13 by hand: the submit hard gate (pm.py:330) fires because main has non-work ...
 - 2026-11-16 03:46 **S14-11** lead defer: Review done, no findings: A-G match the brief and the 08:25Z pre-review; heap stubs pinned red-then-green in test_v03.py TestHeapStubs; 3600 s HPCG...
 - 2026-11-16 03:45 **S14-13** engineer ask: Submit-only owner instruction attempted; submit refused: branch lacks real changes from main (asks lead to merge main into ticket branch), and 6137...
-- 2026-11-16 03:44 **S14-11** engineer submit: A-G complete; main merged; worktree clean. Windows Python 3.8 heldout HPCG check with --max-seconds 3600 passed all 8 variants, no differs or budge...
 
 ## Cost
 
 - From the script, engineer: 757 sessions, 1624.5M input tokens
 - From the script, lead: 512 sessions, 145.1M input tokens
-- Started by hand, Claude: 14 sessions, 4145.4M input tokens
+- Started by hand, Claude: 14 sessions, 4145.7M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
