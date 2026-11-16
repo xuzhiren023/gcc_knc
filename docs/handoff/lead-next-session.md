@@ -1,6 +1,6 @@
 # Next lead session prompt (written 2026-11-04 05:40)
 
-Paste everything below the line into a new Claude session in `C:\Users\xuzhi\Documents\gcc_knc`.
+Paste everything below the line into a new Claude session in `<repo>`.
 
 ---
 

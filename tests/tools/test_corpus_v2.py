@@ -28,6 +28,236 @@ from unittest.mock import patch
 sys.path.insert(0, str(Path(__file__).resolve().parents[2] / 'tools'))
 import corpus
 
+
+class GateReadiness(unittest.TestCase):
+    def test_gate_scorer_requires_all_raw_pairs_and_reports_owner_misses(self):
+        import m4_gate as gate
+        import m4_score as scorer
+        from dataclasses import asdict
+        spec = scorer.freeze_primary_spec({level: dict(assembled=True,diagnostic='')
+                                           for level in scorer.SQLITE_LEVELS})
+        with tempfile.TemporaryDirectory() as temporary:
+            stage = Path(temporary)
+            records = {}
+            for profile in ('full','3100','5100'):
+                rows = gate.schedule(profile)
+                for row in rows:
+                    speedup = 1.0 if row['program'] in ('PB-gemm','PB-adi') else 1.5
+                    row.update(check='pass',time_seconds=3. if row['compiler']==corpus.DONOR else 3./speedup,
+                               primary=json.loads(json.dumps(asdict(spec[row['program']]))),
+                               flags=list(spec[row['program']].donor_flags if row['compiler']==corpus.DONOR
+                                          else spec[row['program']].new_flags),
+                               timing=dict(utc_start_ns=row['launch_order']+1),
+                               lead_environment_policy=dict(lead_verified=True,exclusive_window='fixture',
+                                                            clock_power_policy='fixed fixture'),
+                               environment=dict(start={}))
+                records['initial-'+profile+'-checked.jsonl']=rows
+            output = io.StringIO()
+            with patch.object(gate,'load_freeze',return_value=({},spec)), \
+                    patch.object(gate,'check_block',return_value=True), \
+                    patch.object(corpus,'read_partition',side_effect=lambda stage,name: records[name]), \
+                    patch.object(corpus,'sealed_dir',return_value=stage), \
+                    patch.object(scorer,'SEALED_ROOT',stage), redirect_stdout(output):
+                gate.score(SimpleNamespace(stage=stage,extended=False))
+                report=json.loads((stage/'score.json').read_text())
+                self.assertTrue(report['ready'] and report['pass'])
+                self.assertTrue(len(report['owner_target_misses'])==6)
+                self.assertTrue(all(r['status']==('found; held out, never tuned' if r['program']=='PB-adi'
+                                                else 'development defect') for r in report['owner_target_misses']))
+                records['initial-5100-checked.jsonl'].pop()
+                gate.score(SimpleNamespace(stage=stage,extended=False))
+                report=json.loads((stage/'score.json').read_text())
+                self.assertTrue(not report['ready'] and not report['passed'])
+            self.assertNotIn('speedup',output.getvalue())
+
+    def test_gate_scores_full_profile_only_on_explicit_owner_flag(self):
+        import m4_gate as gate
+        import m4_score as scorer
+        from dataclasses import asdict
+        spec = scorer.freeze_primary_spec({level: dict(assembled=True,diagnostic='')
+                                           for level in scorer.SQLITE_LEVELS})
+        with tempfile.TemporaryDirectory() as temporary:
+            stage = Path(temporary)
+            rows = gate.schedule('full')
+            for row in rows:
+                speedup = 1.0 if row['program'] == 'PB-gemm' else 1.5
+                row.update(check='pass',time_seconds=3. if row['compiler']==corpus.DONOR else 3./speedup,
+                           primary=json.loads(json.dumps(asdict(spec[row['program']]))),
+                           flags=list(spec[row['program']].donor_flags if row['compiler']==corpus.DONOR
+                                      else spec[row['program']].new_flags),
+                           timing=dict(utc_start_ns=row['launch_order']+1),
+                           lead_environment_policy=dict(lead_verified=True,exclusive_window='fixture',
+                                                        clock_power_policy='fixed fixture'),
+                           environment=dict(start={}))
+            records = {'initial-full-checked.jsonl': rows}  # 3100/5100 were never run
+            asked = []
+            def read(stage, name):
+                asked.append(name)
+                return records.get(name, [])
+            def run(profiles):
+                gate.score(SimpleNamespace(stage=stage,extended=False,profiles=profiles))
+                return json.loads((stage/'score.json').read_text())
+            with patch.object(gate,'load_freeze',return_value=({},spec)), \
+                    patch.object(gate,'check_block',return_value=True), \
+                    patch.object(corpus,'read_partition',side_effect=read), \
+                    patch.object(corpus,'sealed_dir',return_value=stage), \
+                    patch.object(scorer,'SEALED_ROOT',stage), redirect_stdout(io.StringIO()):
+                report = run('full')
+                self.assertTrue(report['ready'] and report['pass'])
+                self.assertEqual((report['profiles'], list(report['models'])), (['full'], ['7120']))
+                self.assertIn('amendment 1', report['owner_decision'])
+                self.assertEqual(report['models']['7120']['draws'], 10000)
+                self.assertEqual(report['models']['7120']['seed'], 1514)
+                self.assertEqual(asked, ['initial-full-checked.jsonl'])
+                self.assertEqual([(r['model'], r['program']) for r in report['owner_target_misses']],
+                                 [('7120', 'PB-gemm')])
+                last = rows.pop()  # a missing full launch still fails the full-only score
+                report = run('full')
+                self.assertTrue(not report['ready'] and not report['passed'])
+                self.assertEqual(report['profiles'], ['full'])
+                rows.append(last)
+                report = run('all')  # default still requires 3100 and 5100
+                self.assertFalse(report['ready'])
+                self.assertNotIn('profiles', report)
+                self.assertEqual({f['profile'] for f in report['failures']}, {'3100', '5100'})
+
+    def test_initial_and_extension_have_exact_pairs_and_separate_profiles(self):
+        import m4_gate as gate
+        for profile in ('full', '3100', '5100'):
+            for extended in (False, True):
+                plan = gate.schedule(profile, extended)
+                self.assertEqual(len(plan), 204)
+                self.assertEqual({j['profile'] for j in plan}, {profile})
+                self.assertEqual({j['panel'] for j in plan}, {'primary'})
+                for offset in range(0, len(plan), 34):
+                    round_rows = plan[offset:offset+34]
+                    self.assertEqual([r['program'] for r in round_rows[::2]], list(corpus.PROGRAMS))
+                    for a,b in zip(round_rows[::2], round_rows[1::2]):
+                        expected = ((corpus.DONOR, corpus.KNC) if (a['run']%2 == 0) != extended
+                                    else (corpus.KNC, corpus.DONOR))
+                        self.assertEqual((a['compiler'],b['compiler']), expected)
+                        self.assertEqual((a['start_order'],b['start_order']), (0,1))
+                        self.assertEqual(a['pair_id'],b['pair_id'])
+                        self.assertEqual(a['threads'],1)
+
+    def test_package_checker_corruption_uses_output_result(self):
+        clock = ('CORPUS_META {"threads":1}\nCORPUS_TIME 1\n'
+                 'CORPUS_CLOCK {"clock":"CLOCK_MONOTONIC_RAW","boundary":"launch-to-exit",'
+                 '"start_ns":1,"end_ns":1000000001,"utc_start_ns":2}\n')
+        hpcg = 'HPCG result is VALID\n'
+        for section in ('Spectral Convergence Tests','Iteration Count Information','Reproducibility Information'):
+            hpcg += section + '::Result=PASSED\n'
+        hpcg += 'Departure from Symmetry test::Result=PASSED\n'
+        for label in ('Reference CG iterations per set','Optimized CG iterations per set',
+                      'Total number of reference iterations','Total number of optimized iterations'):
+            hpcg += 'Iteration Count Information::' + label + '=50\n'
+        for program, good, corrupt in (('NPB-CG','Verification = SUCCESSFUL\n','VERIFICATION FAILED\n'),
+                                       ('HPCG',hpcg,'INVALID\n')):
+            self.assertEqual(corpus.output_result(dict(program=program,threads=1),clock+good,'',0)['check'],'pass')
+            self.assertEqual(corpus.output_result(dict(program=program,threads=1),clock+good+corrupt,'',0)['check'],'fail')
+
+    def test_stream_run_encoding_covers_every_component(self):
+        arrays = [dict(array=k,runs=[[3,v]]) for k,v in corpus.stream_expected().items()]
+        self.assertTrue(corpus.stream_matches(arrays,count=3))
+        arrays[2]['runs'][0][0] = 2
+        self.assertFalse(corpus.stream_matches(arrays,count=3))
+        arrays[2]['runs'] = [[2,corpus.stream_expected()['c']],[1,float('inf')]]
+        self.assertFalse(corpus.stream_matches(arrays,count=3))
+
+    def test_native_sqlite_corruption_reaches_integer_checker(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            folder = Path(temporary)
+            binary = folder / 'workload'
+            lib = corpus.SHARED / 'corpus-build/sources/sqlite-amalgamation-3460100'
+            subprocess.run(['gcc','-O0','-I'+str(lib),str(lib/'sqlite3.c'),str(corpus.SUPPORT/'sqlite.c'),
+                            '-lpthread','-ldl','-lm','-o',str(binary)],check=True,capture_output=True)
+            (folder / 'input.sql').write_bytes((corpus.SUPPORT / 'input.sql').read_bytes())
+            clean = subprocess.run([str(binary)],cwd=folder,capture_output=True,text=True)
+            bad = subprocess.run([str(binary)],cwd=folder,capture_output=True,text=True,
+                                 env=dict(os.environ,CORPUS_CORRUPT='1'))
+            self.assertEqual(clean.returncode,0)
+            self.assertIn('CORPUS_CHECK pass',clean.stdout)
+            self.assertEqual(bad.returncode,1)
+            self.assertIn('CORPUS_INJECTED SQLite',bad.stdout)
+            self.assertNotIn('CORPUS_CHECK pass',bad.stdout)
+
+    def test_native_stream_capture_keeps_full_precision(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            folder = Path(temporary)
+            binary = folder / 'workload'
+            source = corpus.SHARED / 'corpus-build/sources'
+            subprocess.run(['gcc','-O0','-I'+str(source),'-DSTREAM_ARRAY_SIZE=256','-DNTIMES=20',
+                            str(corpus.SUPPORT/'stream_capture.c'),'-lm','-o',str(binary)],check=True,capture_output=True)
+            result = subprocess.run([str(binary)],cwd=folder,capture_output=True)
+            self.assertEqual(result.returncode,0)
+            arrays=[]
+            with (folder/'arrays.bin').open('rb') as data:
+                while name := data.read(80):
+                    count,=struct.unpack('=Q',data.read(8))
+                    values=struct.unpack('='+'d'*count,data.read(8*count))
+                    arrays.append(dict(array=name.rstrip(b'\0').decode(),values=list(values)))
+            self.assertTrue(corpus.stream_matches(arrays,count=256))
+            arrays[-1]['values'][-1]*=1.01
+            self.assertFalse(corpus.stream_matches(arrays,count=256))
+    def test_host_references_against_small_package_workloads(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            folder = Path(temporary)
+            reference = folder / 'reference'
+            subprocess.run(['gcc', '-O0', '-ffp-contract=off', str(corpus.SUPPORT / 'reference.c'),
+                            '-lm', '-o', str(reference)], check=True, capture_output=True)
+            sources = corpus.SHARED / 'corpus-build/sources/polybench-c-4.2.1-beta'
+            for name in corpus.PB:
+                # Held-out fixtures deliberately expose only the pass/fail assertion.
+                with self.subTest(program=name):
+                    benchmark = next(sources.rglob(name + '.c'))
+                    binary = folder / 'workload'
+                    compile_run = subprocess.run(['gcc', '-O0', '-ffp-contract=off',
+                        '-I' + str(sources / 'utilities'), '-DPOLYBENCH_DUMP_ARRAYS', '-DDATA_TYPE_IS_DOUBLE',
+                        '-DN=8', '-DM=8', '-DNI=8', '-DNJ=8', '-DNK=8', '-DTSTEPS=3',
+                        '-include', str(corpus.SUPPORT / 'polybench_capture.h'),
+                        str(benchmark), str(sources / 'utilities/polybench.c'),
+                        str(corpus.SUPPORT / 'polybench_capture.c'), '-lm', '-o', str(binary)], capture_output=True)
+                    self.assertTrue(compile_run.returncode == 0)
+                    result = subprocess.run([str(binary)], cwd=folder, capture_output=True)
+                    self.assertTrue(result.returncode == 0)
+                    arrays = []
+                    with (folder / 'arrays.bin').open('rb') as data:
+                        while raw_name := data.read(80):
+                            count, = struct.unpack('=Q', data.read(8))
+                            values = struct.unpack('=' + 'd' * count, data.read(count * 8))
+                            arrays.append(dict(array=raw_name.rstrip(b'\0').decode(), values=list(values)))
+                    ref = subprocess.run([str(reference), name, '8', '8', '3'], capture_output=True)
+                    self.assertTrue(ref.returncode == 0)
+                    expected = json.loads(ref.stdout)
+                    self.assertTrue(corpus.reference_matches(arrays, expected))
+                    arrays[0]['values'][0] += 1.
+                    self.assertFalse(corpus.reference_matches(arrays, expected))
+    def test_independent_reference_rejects_agreeing_wrong_compilers(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            stage = Path(temporary) / 'S13-01'
+            plan, rows = observations('PB-gemm')
+            for row in rows:
+                row['arrays'][0]['values'][1] = 99.
+            with patch.object(corpus, 'load_reference', return_value=[
+                    dict(array='A', values=[1., 3., 2.])]), redirect_stdout(io.StringIO()):
+                collect_at(stage, plan, rows)
+            result = corpus.parse_results((stage / 'results.jsonl').read_text())
+            self.assertTrue(all(r['check'] == 'fail' for r in result))
+
+    def test_frozen_element_tolerance_and_finiteness(self):
+        ref = [dict(array='x', values=[0., 10.])]
+        self.assertTrue(corpus.reference_matches([dict(array='x', values=[1e-8, 10.00001])], ref))
+        for values in ([2e-8, 10.], [0., float('nan')], [0., float('inf')]):
+            self.assertFalse(corpus.reference_matches([dict(array='x', values=values)], ref))
+
+    def test_stream_checks_each_component_not_package_marker(self):
+        expected = corpus.stream_expected()
+        arrays = [dict(array=k, values=[v] * 3) for k, v in expected.items()]
+        self.assertTrue(corpus.stream_matches(arrays, count=3))
+        arrays[1]['values'][1] *= 1.01
+        self.assertFalse(corpus.stream_matches(arrays, count=3))
+        self.assertFalse(corpus.stream_matches([], count=3))
+
 OPENMP_PANEL = 'the donor toolchain has no OpenMP runtime'
 
 
@@ -53,6 +283,12 @@ def observations(program, candidate=(1., 3., 2.)):
 
 def collect_at(stage, plan, rows):
     stage.mkdir(parents=True, exist_ok=True)
+    # Explicit independent synthetic fixture, never a copy of the observations.
+    for program in {j['program'] for j in plan if j['program'].startswith('PB-')}:
+        base = corpus.sealed_dir(stage) if program in corpus.HELD_OUT else stage
+        (base / 'references').mkdir(parents=True, exist_ok=True)
+        corpus.write_json(base / 'references' / (program + '.json'),
+                          [dict(array='A', values=[1., 3., 2.])])
     corpus.write_json(stage / 'plan.json', plan)
     (stage / 'raw-results.jsonl').write_text(
         ''.join(json.dumps(row) + '\n' for row in rows))
@@ -430,6 +666,11 @@ int main(void) {
                 self.assertEqual(missing.returncode, 2)
                 self.assertNotIn('CORPUS_CONTROL rejected', missing.stdout)
                 self.assertEqual((directory / 'packed.bin').read_bytes(), packed)
+                bad = subprocess.run([str(binary)],cwd=directory,capture_output=True,text=True,
+                                     env=dict(os.environ,CORPUS_CORRUPT='1'))
+                self.assertEqual(bad.returncode,1)
+                self.assertIn('CORPUS_INJECTED '+name,bad.stdout)
+                self.assertNotIn('CORPUS_CHECK pass',bad.stdout)
 
 
 class PgoPeerPackaging(unittest.TestCase):
@@ -496,6 +737,341 @@ class PgoPeerPackaging(unittest.TestCase):
                         self.assertIn('Evaluation failed: full 0 base', result.stderr)
                     else:
                         self.assertEqual(result.returncode, 0, result.stderr)
+
+
+class CodecSnapshots(unittest.TestCase):
+    """Real initial-full zlib captures (launches 034/035): workload, peer decode, control."""
+    DATA = Path(__file__).resolve().parent / 'data/s13_01_codec'
+    TRANSPORT = dict(result_class='program', exit_code=0, program_exit_code=0,
+                     foreign_processes=[], overlapping_jobs=[])
+
+    def job(self, compiler, program='zlib'):
+        return dict(program=program, compiler=compiler, flags=['-O2'], run=0, threads=1,
+                    input=corpus.INPUTS['zlib'], profile='full', variant='serial', block='initial')
+
+    def test_one_snapshot_set_per_process_attributes_the_timed_workload(self):
+        import m4_gate as gate
+        for compiler in (corpus.DONOR, corpus.KNC):
+            text = (self.DATA / ('zlib-%s.stdout' % compiler)).read_text()
+            row = corpus.output_result(self.job(compiler), text, '', 0)
+            workload = text[:text.index('CORPUS_ENV_END end\n')] + 'CORPUS_ENV_END end\n'
+            with self.subTest(compiler=compiler):
+                self.assertEqual(text.count('CORPUS_ENV_BEGIN start'), 3)
+                self.assertEqual(row['check'], 'pass', row.get('cause'))
+                self.assertEqual(row['environment'], corpus.parse_environment(workload, 'zlib'))
+                self.assertEqual(sorted(row['environment']), ['end', 'materialize', 'start'])
+                self.assertTrue(gate.environment_valid(row))
+        first = text.index('CORPUS_ENV_END start\n') + len('CORPUS_ENV_END start\n')
+        start = text[text.index('CORPUS_ENV_BEGIN start'):first]
+        materialize = text[first:text.index('CORPUS_ENV_END materialize\n') + len('CORPUS_ENV_END materialize\n')]
+        inside = first - len('CORPUS_ENV_END start\n')
+        for case, bad, program in (
+                ('repeated start in one process', text[:first] + start + text[first:], 'zlib'),
+                ('repeated materialize in one process', text.replace(materialize, materialize * 2, 1), 'zlib'),
+                ('interleaved set', text[:inside] + start + text[inside:], 'zlib'),
+                ('peer verdict in the wrong process', text.replace('CORPUS_CROSS pass\n', '', 1).replace(
+                    'CORPUS_CONTROL rejected\n', 'CORPUS_CONTROL rejected\nCORPUS_CROSS pass\n', 1), 'zlib'),
+                ('several sets outside a codec launch', text, 'SQLite')):
+            row = corpus.output_result(self.job(corpus.KNC, program), bad, '', 0)
+            with self.subTest(case=case):
+                self.assertEqual(row['check'], 'error')
+                self.assertRegex(row['cause'], 'duplicate|interleaved|attributable')
+
+    def test_recheck_rederives_a_completed_block_from_captures_only(self):
+        import m4_gate as gate
+        with tempfile.TemporaryDirectory() as temporary:
+            stage, sealed = Path(temporary) / 'S13-01', Path(temporary) / 'sealed'
+            capture = stage / 'initial-full-capture'
+            capture.mkdir(parents=True); sealed.mkdir()
+            plan, raw = [], []
+            for number, compiler in enumerate((corpus.DONOR, corpus.KNC)):
+                (capture / ('%03d.stdout' % number)).write_bytes((self.DATA / ('zlib-%s.stdout' % compiler)).read_bytes())
+                (capture / ('%03d.stderr' % number)).write_text('')
+                plan.append(self.job(compiler))
+                # As written by the original parser at launch time.
+                raw.append(dict(self.job(compiler), check='error', time_seconds=None, cause='duplicate environment snapshot',
+                                stdout=str(capture / ('%03d.stdout' % number)), stderr=str(capture / ('%03d.stderr' % number)),
+                                transport=self.TRANSPORT, lead_environment_policy=dict(lead_verified=True)))
+            (stage / 'initial-full-raw.jsonl').write_text(''.join(json.dumps(r) + '\n' for r in raw))
+            (stage / 'initial-full-done.json').write_text('{"ready": true, "passed": false}\n')
+            frozen = {p: p.read_bytes() for p in [stage / 'initial-full-raw.jsonl', *capture.iterdir()]}
+            with patch.object(corpus, 'sealed_dir', return_value=sealed), \
+                    patch.object(gate, 'load_freeze', return_value=({}, {})), \
+                    patch.object(gate, 'launches', return_value=([], plan)), \
+                    patch.object(gate, 'prepare_job', return_value=dict(files=['runtime-prefix.json'])), \
+                    redirect_stdout(io.StringIO()):
+                self.assertFalse(gate.check_block(stage, 'full', 'initial'))  # stored field: error
+                gate.recheck(SimpleNamespace(stage=stage, profile='full', block='initial'))
+                checked = corpus.read_partition(stage, 'initial-full-checked.jsonl')
+                gate.check_block(stage, 'full', 'initial')  # score's path keeps re-deriving
+                again = corpus.read_partition(stage, 'initial-full-checked.jsonl')
+            self.assertEqual({p: p.read_bytes() for p in frozen}, frozen)
+            for rows in (checked, again):
+                self.assertEqual([r['check'] for r in rows], ['pass', 'pass'])
+                self.assertTrue(all(gate.environment_valid(r) and r['lead_environment_policy'] for r in rows))
+            record = json.loads((stage / 'initial-full-recheck.json').read_text())
+            self.assertEqual([(r['launch'], r['stored_check'], r['check']) for r in record],
+                             [('000.stdout', 'error', 'pass'), ('001.stdout', 'error', 'pass')])
+            self.assertTrue(json.loads((stage / 'initial-full-done.json').read_text())['rechecked'])
+
+
+class TransportResume(unittest.TestCase):
+    """S13-01 gate: SSH-only transfers; a launch without a workload result is re-attempted."""
+    CLOCK = ('CORPUS_META {"threads":1}\nCORPUS_TIME 1\n'
+             'CORPUS_CLOCK {"clock":"CLOCK_MONOTONIC_RAW","boundary":"launch-to-exit",'
+             '"start_ns":1,"end_ns":1000000001,"utc_start_ns":2}\n')
+    # (stdout, receipt or None, card_run exit status)
+    OUTCOMES = {
+        'ok': (CLOCK, dict(result_class='program', exit_code=0, program_exit_code=0, card_minutes=0.1), 0),
+        'transport': ('', dict(result_class='infrastructure', exit_code=126, program_exit_code=None,
+                               card_minutes=0.0, detail='ssh: connect failed'), 126),
+        'no-receipt': ('', None, 3221225794),  # ssh.exe/python.exe failed to start (0xC0000142)
+        'timed-then-lost': (CLOCK, dict(result_class='infrastructure', exit_code=126, program_exit_code=0,
+                                        card_minutes=0.1, detail='finalization failed'), 126),
+        'started-then-lost': ('CORPUS_META {"threads":1}\n', dict(
+            result_class='infrastructure', exit_code=126, program_exit_code=None,
+            card_minutes=0.2, detail='session lost'), 126),
+        'latch': ('', dict(result_class='refused', exit_code=125, program_exit_code=None, card_minutes=0.0,
+                           detail='DMA cleanup unresolved; lead must inspect card-dma-active.lock'), 125),
+    }
+
+    def jobs(self):
+        return [dict(program=p, compiler=compiler, run=0, profile='full', block='initial', threads=1,
+                     input=corpus.INPUTS[p], variant='serial', flags=['-O2'])
+                for p, compiler in (('PB-gemm', corpus.DONOR), ('PB-gemm', corpus.KNC), ('PB-adi', corpus.KNC))]
+
+    def gate(self, temporary, script, resume=False):
+        """Run the block with card outcomes scripted per launch (probes always reach the card)."""
+        import m4_gate as gate
+        stage, sealed = Path(temporary) / 'S13-01', Path(temporary) / 'sealed'
+        stage.mkdir(exist_ok=True); sealed.mkdir(exist_ok=True)
+        (stage / 'environment-policy.json').write_text(json.dumps(
+            dict(lead_verified=True, clock_power_policy='fixed fixture', exclusive_window='fixture')))
+        calls, sleeps = [], []
+        def card_call(stage_dir, files, mode, density, out, err, profile='full', timeout=3600, record=None):
+            outcome = 'ok' if mode == 'probe' else script[mode].pop(0) if script.get(mode) else 'ok'
+            calls.append((mode, outcome))
+            stdout, receipt, rc = self.OUTCOMES[outcome]
+            out.write_text(stdout + (json.dumps(receipt) + '\n' if receipt else ''))
+            err.write_text('')
+            if receipt and record is not None:
+                record.update(receipt)
+            return rc
+        error = io.StringIO()
+        args = SimpleNamespace(stage=stage, profile='full', block='initial', acl_verified=True,
+                               timeout=3600, resume=resume)
+        with patch.object(corpus, 'sealed_dir', return_value=sealed), \
+                patch.object(corpus, 'card_call', side_effect=card_call), \
+                patch.object(gate, 'load_freeze', return_value=({}, {})), \
+                patch.object(gate, 'launches', side_effect=lambda *a: ([], self.jobs())), \
+                patch.object(gate, 'prepare_job', return_value=dict(files=['runtime-prefix.json'])), \
+                patch.object(gate, 'check_block', return_value=True), \
+                patch.object(gate, '_sleep', side_effect=sleeps.append), redirect_stderr(error):
+            code = gate.run(args)
+        log = lambda d: json.loads((d / 'initial-full-transport-retries.json').read_text())
+        raw = [json.loads(l) for d in (stage, sealed) for l in (d / 'initial-full-raw.jsonl').read_text().splitlines()]
+        return SimpleNamespace(code=code, calls=calls, sleeps=sleeps, stderr=error.getvalue(), raw=raw,
+                               public_log=log(stage), sealed_log=log(sealed), stage=stage, sealed=sealed)
+
+    def test_card_call_transfers_by_ssh_only(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            out, err = Path(temporary) / 'a.stdout', Path(temporary) / 'a.stderr'
+            with patch.object(corpus.subprocess, 'run', return_value=SimpleNamespace(returncode=0)) as run:
+                corpus.card_call(Path(temporary), [], 'probe', 'probe', out, err)
+            command = run.call_args[0][0]
+            self.assertEqual(command[command.index('--transfer') + 1], 'ssh')
+            # A card_run process that cannot start is an infrastructure failure, not a crash.
+            with patch.object(corpus.subprocess, 'run', side_effect=OSError('0xC0000142')):
+                self.assertEqual(corpus.card_call(Path(temporary), [], 'probe', 'probe', out, err), 126)
+
+    def test_two_transport_failures_then_one_final_row(self):
+        import m4_gate as gate
+        with tempfile.TemporaryDirectory() as temporary:
+            result = self.gate(temporary, {'PB-gemm': ['transport', 'no-receipt', 'ok'],
+                                           'PB-adi': ['transport', 'ok']})
+            self.assertEqual(result.code, 0)
+            self.assertEqual(result.sleeps, [30, 60, 30])
+            self.assertEqual([(r['program'], r['compiler'], r['transport_retries']) for r in result.raw],
+                             [('PB-gemm', corpus.DONOR, 2), ('PB-gemm', corpus.KNC, 0), ('PB-adi', corpus.KNC, 1)])
+            self.assertTrue(all(Path(r['stdout']).name == '%03d.stdout' % n for n, r in enumerate(result.raw)))
+            failed = [e for e in result.public_log if e['event'] == 'launch']
+            self.assertEqual([(e['launch'], e['attempt'], e['result_class']) for e in failed],
+                             [('000', 1, 'infrastructure'), ('000', 2, 'infrastructure')])
+            self.assertEqual(sum(e['event'] == 'probe' and e['reachable'] for e in result.public_log), 2)
+            capture = result.stage / 'initial-full-capture'
+            self.assertTrue((capture / '000.transport-1.stdout').exists() and (capture / '000.transport-2.stdout').exists())
+            # Held-out retries stay sealed.
+            self.assertEqual({e['program'] for e in result.public_log}, {'PB-gemm'})
+            self.assertEqual([(e['launch'], e['event']) for e in result.sealed_log], [('002', 'launch'), ('002', 'probe')])
+            done = json.loads((result.stage / 'initial-full-done.json').read_text())
+            self.assertEqual(done['transport_retries'], 3)
+            self.assertEqual(gate.backoff_seconds(6), 600)
+
+    def test_launch_that_started_or_timed_is_never_retried(self):
+        import m4_gate as gate
+        for outcome in ('timed-then-lost', 'started-then-lost'):
+            with self.subTest(outcome=outcome), tempfile.TemporaryDirectory() as temporary:
+                result = self.gate(temporary, {'PB-gemm': [outcome]})
+                self.assertEqual(result.calls[0], ('PB-gemm', outcome))
+                self.assertEqual([m for m, _ in result.calls], ['PB-gemm', 'PB-gemm', 'PB-adi'])
+                self.assertEqual(result.raw[0]['check'], 'fail')
+                self.assertEqual(result.sleeps, [])
+                self.assertEqual(result.public_log, [])
+        # Resume never repeats an interrupted launch whose capture holds a time.
+        with tempfile.TemporaryDirectory() as temporary:
+            result = self.gate(temporary, {'PB-gemm': ['ok', 'transport'] + ['transport'] * 4})
+            self.assertEqual(result.code, gate.PAUSED_EXIT)
+            (result.stage / 'initial-full-capture' / '001.stdout').write_text(self.CLOCK)
+            again = self.gate(temporary, {}, resume=True)
+            self.assertEqual((again.code, again.calls), (1, []))
+            self.assertIn('not repeated', again.stderr)
+
+    def test_five_failures_pause_and_resume_continues_the_block(self):
+        import m4_gate as gate
+        with tempfile.TemporaryDirectory() as temporary:
+            first = self.gate(temporary, {'PB-gemm': ['ok'] + ['transport'] * 5})
+            self.assertEqual(first.code, gate.PAUSED_EXIT)
+            self.assertEqual(first.sleeps, [30, 60, 120, 240])
+            self.assertIn('Card unreachable', first.stderr)
+            self.assertIn('--resume', first.stderr)
+            self.assertEqual(len(first.raw), 1)
+            self.assertFalse((first.stage / 'initial-full-done.json').exists())
+            self.assertEqual(json.loads((first.stage / 'initial-full-paused.json').read_text())['launch'], '001')
+            kept = (first.stage / 'initial-full-raw.jsonl').read_bytes()
+            with self.assertRaises(ValueError):  # a plain rerun still refuses a started block
+                self.gate(temporary, {})
+            again = self.gate(temporary, {}, resume=True)
+            self.assertEqual(again.code, 0)
+            self.assertEqual(again.calls, [('PB-gemm', 'ok'), ('PB-adi', 'ok')])
+            self.assertTrue((first.stage / 'initial-full-raw.jsonl').read_bytes().startswith(kept))
+            self.assertEqual([r['compiler'] for r in again.raw if r['program'] == 'PB-gemm'], [corpus.DONOR, corpus.KNC])
+            self.assertEqual([e['event'] for e in again.public_log][-2:], ['pause', 'resume'])
+            self.assertFalse((first.stage / 'initial-full-paused.json').exists())
+        # A DMA latch refusal stops at once and leaves the latch to the lead.
+        with tempfile.TemporaryDirectory() as temporary:
+            latch = self.gate(temporary, {'PB-gemm': ['latch']})
+            self.assertEqual((latch.code, latch.sleeps, len(latch.calls)), (gate.LATCH_EXIT, [], 1))
+            self.assertIn('Not deleted: latch recovery is a lead decision', latch.stderr)
+
+
+class AdoptBlock(unittest.TestCase):
+    """S13-01: a new block adopts a preserved block's timed launches; resume runs the rest."""
+    RECEIPT = dict(result_class='program', exit_code=0, program_exit_code=0, card_minutes=0.1,
+                   foreign_processes=[], overlapping_jobs=[])
+    # launch: (program, compiler, run, control, timed in the source block)
+    LAUNCHES = [('PB-gemm', corpus.KNC, 0, True, True), ('STREAM', corpus.KNC, 0, True, False),
+                ('PB-gemm', corpus.DONOR, 0, False, True), ('PB-gemm', corpus.KNC, 0, False, True),
+                ('PB-adi', corpus.DONOR, 0, False, True), ('PB-adi', corpus.KNC, 0, False, False),
+                ('PB-gemm', corpus.KNC, 1, False, False), ('PB-gemm', corpus.DONOR, 1, False, False),
+                ('PB-gemm', corpus.DONOR, 2, False, True), ('PB-gemm', corpus.KNC, 2, False, True),
+                ('PB-adi', corpus.KNC, 1, False, True), ('PB-adi', corpus.DONOR, 1, False, True)]
+
+    def jobs(self):
+        controls, plan = [], []
+        for program, compiler, run, control, _ in self.LAUNCHES:
+            job = dict(program=program, compiler=compiler, run=run, profile='full', block='initial', threads=1,
+                       input=corpus.INPUTS[program], variant='serial', flags=['-O2'],
+                       pair_id='full/%s/0/%d' % (program, run))
+            (controls if control else plan).append(dict(job, control=True) if control else job)
+        return controls, plan
+
+    def setUp(self):
+        import m4_gate as gate
+        self.gate = gate
+        self.temporary = tempfile.TemporaryDirectory()
+        self.stage, self.sealed = Path(self.temporary.name) / 'S13-01', Path(self.temporary.name) / 'sealed'
+        self.stage.mkdir(); self.sealed.mkdir()
+        (self.stage / 'environment-policy.json').write_text(json.dumps(
+            dict(lead_verified=True, clock_power_policy='fixed fixture', exclusive_window='fixture')))
+        source = 'aborted-2-initial-full'
+        (self.stage / (source + '-started.json')).write_text('{"attempted": true}\n')
+        rows = []
+        for number, (job, launch) in enumerate(zip(sum(self.jobs(), []), self.LAUNCHES)):
+            folder = (self.sealed if job['program'] in corpus.HELD_OUT else self.stage) / (source + '-capture')
+            folder.mkdir(exist_ok=True)
+            timed = launch[-1]
+            (folder / ('%03d.stdout' % number)).write_text(
+                TransportResume.CLOCK + json.dumps(self.RECEIPT) + '\n' if timed else '')
+            (folder / ('%03d.stderr' % number)).write_text('' if timed else 'ssh.exe 0xC0000142\n')
+            # Written by the launch-time parser; paths name the block before it was preserved.
+            rows.append(dict(job, check='error', time_seconds=1.0 if timed else None,
+                             stdout=str(self.stage / 'initial-full-capture' / ('%03d.stdout' % number)),
+                             transport=self.RECEIPT if timed else {},
+                             lead_environment_policy=dict(lead_verified=True), negative_control=launch[3]))
+        corpus_sealed = patch.object(corpus, 'sealed_dir', return_value=self.sealed)
+        corpus_sealed.start(); self.addCleanup(corpus_sealed.stop)
+        corpus.write_partition(self.stage, source + '-raw.jsonl', rows)
+        self.source = {p: p.read_bytes() for p in self.source_files()}
+        self.patches = [patch.object(gate, 'load_freeze', return_value=({}, {})),
+                        patch.object(gate, 'launches', side_effect=lambda *a: self.jobs()),
+                        patch.object(gate, 'prepare_job', return_value=dict(files=['runtime-prefix.json']))]
+        for p in self.patches:
+            p.start(); self.addCleanup(p.stop)
+        self.addCleanup(self.temporary.cleanup)
+
+    def source_files(self):
+        return [p for d in (self.stage, self.sealed) for p in d.rglob('*')
+                if p.is_file() and p.relative_to(d).parts[0].startswith('aborted-2-')]
+
+    def adopt(self):
+        args = SimpleNamespace(stage=self.stage, profile='full', block='initial', source='aborted-2', timeout=3600)
+        with redirect_stdout(io.StringIO()):
+            return self.gate.adopt(args)
+
+    def test_adopt_keeps_timed_launches_and_marks_untimed_and_split_pairs_unfinished(self):
+        self.assertEqual(self.adopt(), 0)
+        raw = lambda d: [json.loads(l) for l in (d / 'initial-full-raw.jsonl').read_text().splitlines()]
+        number = lambda r: Path(r['stdout']).name
+        self.assertEqual([number(r) for r in raw(self.stage)],
+                         ['000.stdout', '002.stdout', '003.stdout', '008.stdout', '009.stdout'])
+        self.assertEqual([(number(r), r['program']) for r in raw(self.sealed)],
+                         [('010.stdout', 'PB-adi'), ('011.stdout', 'PB-adi')])
+        for row in raw(self.stage) + raw(self.sealed):  # re-derived from the copied captures
+            self.assertEqual((row['time_seconds'], row['adopted_from']), (1.0, 'aborted-2-initial-full'))
+            self.assertEqual(Path(row['stdout']).parent.name, 'initial-full-capture')
+            self.assertTrue(Path(row['stdout']).exists())
+        self.assertTrue(raw(self.stage)[0]['negative_control'])
+        log = lambda d: [(e['launch'], e['reason']) for e in json.loads((d / 'initial-full-transport-retries.json').read_text())]
+        self.assertEqual(log(self.stage), [('001', self.gate.ADOPT_UNTIMED), ('006', self.gate.ADOPT_UNTIMED),
+                                           ('007', self.gate.ADOPT_UNTIMED)])
+        self.assertEqual(log(self.sealed), [('004', self.gate.ADOPT_SPLIT), ('005', self.gate.ADOPT_SPLIT)])
+        public = json.loads((self.stage / 'initial-full-adopted.json').read_text())
+        sealed = json.loads((self.sealed / 'initial-full-adopted.json').read_text())
+        self.assertEqual((public['kept'], public['unfinished'], public['split_pairs'], public['controls_kept'],
+                          public['controls_rerun'], public['source']), (5, 3, 0, 1, 1, 'aborted-2-initial-full'))
+        self.assertEqual((sealed['kept'], sealed['unfinished'], sealed['split_pairs']), (2, 2, 1))
+        # Unfinished captures are kept aside, so resume does not take them as interrupted launches.
+        capture = self.stage / 'initial-full-capture'
+        self.assertTrue((capture / '006.adopted-1.stdout').exists() and not (capture / '006.stdout').exists())
+        self.assertTrue((self.sealed / 'initial-full-capture' / '004.adopted-1.stdout').exists())
+        self.assertFalse(list(capture.glob('004.*')) + list(capture.glob('010.*')))
+        self.assertEqual({p: p.read_bytes() for p in self.source}, self.source)
+        self.assertEqual(sorted(self.source_files()), sorted(self.source))
+        with self.assertRaises(ValueError):  # never over an existing target block
+            self.adopt()
+
+    def test_resume_after_adopt_runs_exactly_the_unfinished_launches(self):
+        self.adopt()
+        calls = []
+        def card_call(stage_dir, files, mode, density, out, err, profile='full', timeout=3600, record=None):
+            calls.append((out.name, mode))
+            out.write_text(TransportResume.CLOCK + json.dumps(self.RECEIPT) + '\n'); err.write_text('')
+            record.update(self.RECEIPT)
+            return 0
+        args = SimpleNamespace(stage=self.stage, profile='full', block='initial', acl_verified=True,
+                               timeout=3600, resume=True)
+        with patch.object(corpus, 'card_call', side_effect=card_call), \
+                patch.object(self.gate, 'check_block', return_value=True), redirect_stderr(io.StringIO()):
+            self.assertEqual(self.gate.run(args), 0)
+        self.assertEqual(calls, [('001.stdout', 'STREAM-control'), ('004.stdout', 'PB-adi'), ('005.stdout', 'PB-adi'),
+                                 ('006.stdout', 'PB-gemm'), ('007.stdout', 'PB-gemm')])
+        public, sealed = ([Path(json.loads(l)['stdout']).name for l in (d / 'initial-full-raw.jsonl').read_text().splitlines()]
+                          for d in (self.stage, self.sealed))
+        self.assertEqual(sorted(public + sealed), ['%03d.stdout' % n for n in range(12)])
+        self.assertEqual(sealed, ['010.stdout', '011.stdout', '004.stdout', '005.stdout'])
+        events = json.loads((self.stage / 'initial-full-transport-retries.json').read_text())
+        self.assertEqual((events[-1]['event'], events[-1]['launch']), ('resume', '001'))
+        self.assertTrue((self.stage / 'initial-full-done.json').exists())
 
 
 if __name__ == '__main__':

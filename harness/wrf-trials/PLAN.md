@@ -4,7 +4,7 @@ Owner, 2026-11-08: the PhiWeather WRF project's final optimization sprint tests,
 scale, optimizations that GCC-KNC and PhiNix plan to build later. GCC-KNC supplies this plan, a
 card-side telemetry script (`telemetry.sh`) and an analysis script (`analyze.py`); PhiWeather runs
 the trials in its own tree and writes results to
-`C:\Users\xuzhi\Documents\card-coordination\wrf-trials\` (shared, outside both repos).
+`<card-coordination>\wrf-trials\` (shared, outside both repos).
 
 ## 1. Questions and what each decides for us
 

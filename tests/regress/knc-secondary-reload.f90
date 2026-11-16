@@ -6,7 +6,7 @@
 ! can let the index pseudo get a hard register and hide the address-reload loss.
 !
 ! Exact commands from worktree root, in bootstrap Cygwin bash:
-! base=/cygdrive/c/Users/xuzhi/Documents/PhiWeather/.tools/knc-bootstrap
+! base=<PhiWeather>/.tools/knc-bootstrap
 ! export PATH="$base/cross/bin:/usr/bin:/bin"
 ! mkdir -p tests/out
 ! k1om-mpss-linux-gfortran -w -ffree-form -ffree-line-length-none \

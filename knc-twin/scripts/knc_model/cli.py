@@ -68,6 +68,13 @@ def _default_out(cmd, name):
     return os.path.join(os.getcwd(), "knc-twin-runs", "%s-%s-%s" % (stamp, cmd, safe))
 
 
+def rollup_result_class(regions, skipped):
+    """Kept for callers and tests; the rule lives in rollup.result_class."""
+    from . import rollup as _rmod
+    return _rmod.result_class(regions, skipped)
+
+
+
 def _prepare_out(args, cmd, name):
     out = args.out or _default_out(cmd, name)
     if os.path.isdir(out) and os.listdir(out) and not getattr(args, "force", False):
@@ -879,7 +886,7 @@ def cmd_rollup(args):
             bw = prof.get_sub("card.sustained_bandwidth_gbs", card.get("traffic", "read_modify_write"))
         summary = rmod.combine(usable, m.get("program"), card, bw)
         summary["regions_not_modeled"] = [{"name": x["name"], "share": x["share"], "reason": x["note"]} for x in skipped]
-        summary["result_class"] = rmod.result_class(regions)
+        summary["result_class"] = rmod.result_class(usable, skipped)
         if "phases" in m:
             summary["phases"] = rmod.phase_results(m, regions)
         summary["sampled"] = any(x["sampled"] for x in regions)

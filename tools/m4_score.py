@@ -17,6 +17,9 @@ from types import MappingProxyType
 from corpus import PROGRAMS
 
 MODELS = ("7120", "3100", "5100")
+FULL_ONLY_MODELS = ("7120",)
+FULL_ONLY_DECISION = ("ADR-0015 amendment 1: owner 2026-11-15, M4 is decided on the "
+                      "7120 full profile only (3100 and 5100 not run)")
 SQLITE_LEVELS = ("-O3", "-O2", "-O1", "-O0")
 OPENMP_PANEL_LABEL = "the donor toolchain has no OpenMP runtime"
 HPCG_SOURCE_FIX = "default(none): add n to shared list; both compilers"
@@ -223,20 +226,31 @@ def score_model(rows, *, primary_spec, known_causes=None, seed=1514, draws=10000
     }
 
 
-def score_models(rows, *, primary_spec, known_causes=None, seed=1514, draws=10000):
-    """All three models must independently pass the primary-track gate."""
-    if set(rows) != set(MODELS):
-        raise ValueError("expected full 7120 and both 3100/5100 profiles")
+def score_models(rows, *, primary_spec, known_causes=None, seed=1514, draws=10000,
+                 full_only=False):
+    """All scored models must independently pass the primary-track gate.
+
+    By default these are the full 7120 and both 3100/5100 profiles. full_only
+    applies the same frozen rules to the 7120 full profile alone; it is legal
+    only on the owner decision recorded in FULL_ONLY_DECISION.
+    """
+    expected = FULL_ONLY_MODELS if full_only else MODELS
+    if set(rows) != set(expected):
+        raise ValueError("expected only the full 7120 profile" if full_only
+                         else "expected full 7120 and both 3100/5100 profiles")
     known_causes = known_causes or {}
     models = {name: score_model(rows[name], primary_spec=primary_spec,
                                 known_causes=known_causes.get(name),
-                                seed=seed, draws=draws) for name in MODELS}
+                                seed=seed, draws=draws) for name in expected}
     if len({model["pairs"] for model in models.values()}) != 1:
         raise ValueError("extension must include every model")
-    return {"held_out": True, "models": models,
-            "pass": all(model["pass"] for model in models.values()),
-            "extend": (models["7120"]["pairs"] == 6 and
-                       any(model["inconclusive"] for model in models.values()))}
+    report = {"held_out": True, "models": models,
+              "pass": all(model["pass"] for model in models.values()),
+              "extend": (models["7120"]["pairs"] == 6 and
+                         any(model["inconclusive"] for model in models.values()))}
+    if full_only:
+        report.update(profiles=["full"], owner_decision=FULL_ONLY_DECISION)
+    return report
 
 
 def write_report(report, destination, *, held_out, ready, passed):

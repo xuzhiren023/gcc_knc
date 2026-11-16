@@ -74,7 +74,7 @@ static int corrupt_stream(void)
 }
 
 /* Convert materialized doubles only after launch-to-exit has been recorded. */
-static int arrays(void)
+static int arrays(int runs)
 {
   FILE *input = fopen("arrays.bin", "rb");
   char name[80];
@@ -85,12 +85,23 @@ static int arrays(void)
     if (got != sizeof name || !memchr(name, 0, sizeof name) || !name[0] ||
         strspn(name, "_abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789") != strlen(name) ||
         fread(&count, sizeof count, 1, input) != 1 || !count) { fclose(input); return 2; }
-    printf("CORPUS_ARRAY {\"array\":\"%s\",\"values\":[", name);
+    double previous = 0.;
+    uint64_t length = 0;
+    int first = 1;
+    printf("CORPUS_ARRAY {\"array\":\"%s\",\"%s\":[", name, runs ? "runs" : "values");
     for (i = 0; i < count; ++i) {
       double value;
       if (fread(&value, sizeof value, 1, input) != 1) { fclose(input); return 2; }
-      printf("%s%.17g", i ? "," : "", value);
+      if (!runs) printf("%s%.17g", i ? "," : "", value);
+      else {
+        if (length && memcmp(&value, &previous, sizeof value)) {
+          printf("%s[%llu,%.17g]", first ? "" : ",", (unsigned long long)length, previous);
+          first = 0; length = 0;
+        }
+        previous = value; ++length;
+      }
     }
+    if (runs) printf("%s[%llu,%.17g]", first ? "" : ",", (unsigned long long)length, previous);
     puts("]}");
   }
   i = ferror(input);
@@ -102,11 +113,17 @@ int main(int argc, char **argv)
 {
   cpu_set_t granted, selected;
   int cores[CPU_SETSIZE], packages[CPU_SETSIZE], percore[CPU_SETSIZE] = {0}, ncores = 0, ncpus = 0;
-  int cpu, i, count = 0, status;
+  int cpu, i, count = 0, status, control = 0;
   char affinity[CPU_SETSIZE * 6], threads[32];
   size_t used = 0;
   pid_t child;
   if (argc != 3 || sched_getaffinity(0, sizeof granted, &granted)) return 2;
+  unsetenv("CORPUS_CORRUPT");
+  if (strlen(argv[2]) > 8 && !strcmp(argv[2]+strlen(argv[2])-8, "-control")) {
+    control = 1;
+    argv[2][strlen(argv[2])-8] = 0;
+    setenv("CORPUS_CORRUPT", "1", 1);
+  }
   CPU_ZERO(&selected);
   for (cpu = 0; cpu < CPU_SETSIZE; ++cpu) {
     int core, package, first;
@@ -155,7 +172,20 @@ int main(int argc, char **argv)
       system("mkdir -p peer && tar -xf peer.tar -C peer")) return 2;
   fflush(stdout);
   if (corpus_timed_workload(&status)) return 2;
-  if (!strncmp(argv[2], "PB-", 3) && arrays()) return 2;
+  if (control && WIFEXITED(status) && WEXITSTATUS(status) == 0) {
+    if (!strncmp(argv[2], "PB-", 3) || !strcmp(argv[2], "STREAM")) {
+      double wrong = 1e300;
+      FILE *f = fopen("arrays.bin", "r+b");
+      if (!f || fseek(f, 88, SEEK_SET) || fwrite(&wrong, sizeof wrong, 1, f)!=1 || fclose(f)) return 2;
+      printf("CORPUS_INJECTED %s\n", argv[2]);
+    } else if (!strncmp(argv[2], "NPB-", 4)) {
+      printf("CORPUS_INJECTED %s\nVERIFICATION FAILED\n", argv[2]);
+    } else if (!strcmp(argv[2], "HPCG")) {
+      printf("CORPUS_INJECTED HPCG\nINVALID\n");
+    }
+  }
+  if ((!strncmp(argv[2], "PB-", 3) || !strcmp(argv[2], "STREAM")) &&
+      arrays(!strcmp(argv[2], "STREAM"))) return 2;
   if (!strcmp(argv[2], "HPCG")) reports();
   if ((!strcmp(argv[2], "zlib") || !strcmp(argv[2], "bzip2")) &&
       WIFEXITED(status) && WEXITSTATUS(status) == 0) {

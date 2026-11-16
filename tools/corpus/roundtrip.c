@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+extern void corpus_environment(const char *) __attribute__((weak));
 #ifdef CORPUS_ZLIB
 #include <zlib.h>
 #else
@@ -32,8 +33,10 @@ int main(int argc, char **argv)
     uLongf compressed = size * 2 + 4096, restored = size;
     if (decode) compressed = packed_size;
     if ((decode || compress2(packed, &compressed, input, size, 6) == Z_OK) &&
-        uncompress(output, &restored, packed, compressed) == Z_OK)
+        uncompress(output, &restored, packed, compressed) == Z_OK) {
+      if (!decode && getenv("CORPUS_CORRUPT")) { output[0] ^= 1; puts("CORPUS_INJECTED zlib"); }
       good = restored == size && !memcmp(input, output, size);
+    }
     packed_size = compressed;
   }
 #else
@@ -41,8 +44,10 @@ int main(int argc, char **argv)
     unsigned int compressed = size * 2 + 4096, restored = size;
     if (decode) compressed = packed_size;
     if ((decode || BZ2_bzBuffToBuffCompress((char *)packed, &compressed, (char *)input, size, 9, 0, 30) == BZ_OK) &&
-        BZ2_bzBuffToBuffDecompress((char *)output, &restored, (char *)packed, compressed, 0, 0) == BZ_OK)
+        BZ2_bzBuffToBuffDecompress((char *)output, &restored, (char *)packed, compressed, 0, 0) == BZ_OK) {
+      if (!decode && getenv("CORPUS_CORRUPT")) { output[0] ^= 1; puts("CORPUS_INJECTED bzip2"); }
       good = restored == size && !memcmp(input, output, size);
+    }
     packed_size = compressed;
   }
 #endif
@@ -52,6 +57,7 @@ int main(int argc, char **argv)
     f = fopen("restored.bin", "wb");
     if (!f || fwrite(output, 1, size, f) != size || fclose(f)) return 2;
   }
+  if (corpus_environment) corpus_environment("materialize");
   free(input); free(packed); free(output);
   if (control) {
     puts(good ? "CORPUS_CONTROL accepted" : "CORPUS_CONTROL rejected");

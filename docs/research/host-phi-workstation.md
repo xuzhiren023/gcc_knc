@@ -15,7 +15,7 @@ Research for S12-11, 2026-11-14. The intended host has two 12-core E5-2690 v3 pr
 
 **Verified (read)** means the cited primary document or data was inspected; it does not mean its results were reproduced here. **Reported** identifies an author's measurement or an owner/community claim, with its original hardware and software limits. **Derived** marks arithmetic or an engineering inference. Suggestions at the end are future measurements, not completed tests.
 
-Downloaded references are outside git at `C:\Users\xuzhi\Documents\gcc_knc\.work\_shared\host-phi-refs\` (called `refs/` below). PDF page numbers are viewer pages unless a printed page is specified. Extracted `.txt` companions aid searching; the PDFs govern ambiguous tables. Web-only entries are identified explicitly. No vendor header, Intrinsics Guide XML, or ISPC implementation was consulted.
+Downloaded references are outside git at `.work\_shared\host-phi-refs\` (called `refs/` below). PDF page numbers are viewer pages unless a printed page is specified. Extracted `.txt` companions aid searching; the PDFs govern ambiguous tables. Web-only entries are identified explicitly. No vendor header, Intrinsics Guide XML, or ISPC implementation was consulted.
 
 ## 1. Slots, firmware, memory, power and cooling
 

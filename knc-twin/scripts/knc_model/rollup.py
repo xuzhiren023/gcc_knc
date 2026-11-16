@@ -75,11 +75,13 @@ def region_specs(manifest):
             for phase in manifest["phases"] for region in phase["regions"]]
 
 
-def result_class(regions):
-    calibrated = bool(regions) and all(
-        r.get("ratio") is not None and not r.get("sampled") and
-        all(s.get("status") == "ok" and s["result_class"]["class"] == "calibrated_forecast"
-            for s in (r[side] for side in ("baseline", "candidate") if side in r))
+def result_class(regions, skipped=()):
+    """calibrated_forecast only when at least one region has a candidate, every candidate region's band comes
+    from a held-out shape, no region is sampled and nothing was skipped (S14-15 rule plus S14-12's sampled exclusion).
+    A manifest with no candidates, or with only ratio-1.0 regions, is never calibrated."""
+    candidates = [r for r in regions if "candidate" in r]
+    calibrated = bool(regions) and bool(candidates) and not skipped and all(
+        not r.get("sampled") and ("candidate" not in r or str(r.get("band_basis", "")).startswith("held-out"))
         for r in regions)
     return {"class": "calibrated_forecast" if calibrated else "unvalidated_scenario_estimate",
             "note": "a ranking aid for compiler or loop changes; the program's final speed is a card measurement"}

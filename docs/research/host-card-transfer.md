@@ -21,11 +21,11 @@ proof that DMA reads, buffer registration, or a particular MPSS driver caused it
 
 References used for facts, without copying implementation or vendor prose:
 
-* **PC**: [PhiChat transfer notes](</C:/Users/xuzhi/Documents/PhiChat/docs/SCIF-TRANSFER.md>),
+* **PC**: [PhiChat transfer notes](</<PhiChat>/docs/SCIF-TRANSFER.md>),
   including the separately labelled 1.6.13 and 1.6.14 behavior and measurements.
-* **PW**: [PhiWeather plan](</C:/Users/xuzhi/Documents/PhiWeather/PLAN.md:1446>),
-  [reuse analysis](</C:/Users/xuzhi/Documents/PhiWeather/native/translation/SCIF_TRANSPORT_REUSE.md>),
-  [recovery report](</C:/Users/xuzhi/Documents/PhiWeather/native/translation/L8_REBOOT_RECOVERY_20261027.md:47>),
+* **PW**: [PhiWeather plan](</<PhiWeather>/PLAN.md:1446>),
+  [reuse analysis](</<PhiWeather>/native/translation/SCIF_TRANSPORT_REUSE.md>),
+  [recovery report](</<PhiWeather>/native/translation/L8_REBOOT_RECOVERY_20261027.md:47>),
   and the report's referenced
   `artifacts/test-state/link-smoke-20261027/reboot-recovery/interruption.json`.
 * **PW-code**: read-only inspection of `scripts/KncDmaTransport.py:69-160`,
@@ -181,7 +181,7 @@ Lead command, only inside the coordinated exclusive card turn, from the main
 checkout (set the config path to the existing configuration):
 
 ```powershell
-python tools/run.py --name s11-01-native --inputs tools/host_card_transfer.py tools/transfer_bench.c -- python .work/_shared/S11-01/host_card_transfer.py run --project C:/Users/xuzhi/Documents/gcc_knc --config C:/Users/xuzhi/Documents/gcc_knc/config/card.local.json --host-address 192.168.1.99 --lead-exclusive-turn
+python tools/run.py --name s11-01-native --inputs tools/host_card_transfer.py tools/transfer_bench.c -- python .work/_shared/S11-01/host_card_transfer.py run --project <repo> --config <repo>/config/card.local.json --host-address 192.168.1.99 --lead-exclusive-turn
 ```
 
 The runner starts a `card_run --benchmark --threads 240` lease and stages the

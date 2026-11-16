@@ -1,6 +1,6 @@
 # What the WRF/IMCI project offers gcc_knc (survey, 2026-11-04)
 
-The owner asked for this. A read-only Claude survey of `C:\Users\xuzhi\Documents\PhiWeather` (another
+The owner asked for this. A read-only Claude survey of `<PhiWeather>` (another
 project; read-only for us, and not a requirement). Paths are relative to that folder. Nothing was
 copied.
 

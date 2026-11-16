@@ -155,13 +155,13 @@ Release packaging is blocked on that review.
 the PRACE, McCalpin and Fang sources. The report's statements about them are plausible,
 and they are inputs to experiments rather than decisions. Treat them as leads.
 
-The local report also uses absolute paths under `C:\Users\xuzhi`, which is fine in a
+The local report also uses absolute paths under `~`, which is fine in a
 private repository. Check the repository's visibility before the first push.
 
 ## Appendix: reproducing the probes
 
 ```bash
-K=/c/Users/xuzhi/Documents/PhiWeather/.tools/knc-bootstrap
+K=<PhiWeather>/.tools/knc-bootstrap
 export PATH=$K/cross/bin:$K/cygwin/bin:$PATH
 k1om-mpss-linux-gcc -std=gnu99 -O3 -fopt-info-vec-missed -S affine.c -o affine.s
 k1om-mpss-linux-gcc -std=gnu99 -O3 -mavx512f -S affine.c -o a512.s
