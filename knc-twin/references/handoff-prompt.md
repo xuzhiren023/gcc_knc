@@ -63,6 +63,15 @@ bounds, mechanisms and large differences, not for choosing between variants with
    then add the window's runs as held-out cases. The twin improves only through that habit.
 
 **Known issues on 2026-11-16 (check the ticket board for their state)**
+- x87 results under precision control 53 or 24 bits are double-rounded (computed to 64 bits, then to 53): add, sub,
+  mul, div and possibly sqrt can be 1 ULP off, and the error grows through a chain (8 ULP seen). A functional
+  check against a native x87 result can therefore report a mismatch that is the twin's fault. Fix is S14-37; until
+  it lands, compare x87 outputs with a tolerance of a few ULP, or against an SSE reference only where the source
+  used SSE.
+- `bounds` can report a lower bound above `simulate`'s prediction: the dependency_critical_path term charges cold
+  cache lines their full miss latency and charges assumed x87 move/compare latencies the engine does not. Read
+  that term as a cold-start critical path, not a floor; the other terms (issue, L1 port, memory concurrency, x87
+  unit) are true bounds. Fix is S14-27.
 - Scatter cost per cache line is still unmeasured: a region with a scatter stops with
   `missing_parameter`. Card window 10 measured it at 2 threads; S14-23 imports that value, and the 1- and
   4-thread points come with the next card turn. The lock-prefix fence cost is also unmeasured.
