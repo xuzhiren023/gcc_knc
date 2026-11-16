@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-16 11:57.
+Updated automatically at every ticket change. Last update: 2026-11-16 11:58.
 
-**Next: GPT-6.1, on S14-10 (knc-twin: --jobs N for independent simulations and PyPy support (roadmap item 1)).** Run `python tools/dispatch.py`, or ask the tech lead to.
+**Waiting for you:** S14-35. Run `python tools/pm.py inbox`.
 
 Current tickets: `[#################---]` 254 of 295
 
@@ -161,7 +161,7 @@ Current tickets: `[#################---]` 254 of 295
 | S14-30 | WRF built with GCC-KNC runs 1.21x slower per step than PhiWeather's production build - attribute the gap per cause before fixing (M5, owner rule) | draft |  |
 | S14-31 | knc-twin multi-core usability: compare across scales, stubs and repeated calls at unit/ring scale, multi-context sampling, separated ring/memory stall shares | Not started |  |
 | S14-33 | knc-twin: import the window-11 calibration rows (imci-math latency and throughput, div10, x87 fcoms, rcp23/rsqrt23 tables) and retire the assumed parameters they settle | Not started |  |
-| S14-35 | knc-twin prepare-native: the generated native program for PhiWeather's sixth_order_diffusion kernels segfaults on the card (exit 139 under claude-pin); find the cause, fix the generator, restage | In progress | Lead decision (owner's delegation): one more change round, sessions 9 -> 11, input_tokens 16M -> 20M. The 1... |
+| S14-35 | knc-twin prepare-native: the generated native program for PhiWeather's sixth_order_diffusion kernels segfaults on the card (exit 139 under claude-pin); find the cause, fix the generator, restage | **Waiting for you** | budget: 11 engineer sessions used; the budget is 11 |
 | S14-37 | knc-twin x87 double rounding: _x87_binop rounds to the 64-bit significand and then to PC=53/24; real x87 rounds once (knc-boinc repro, 1 to 8 ULP errors) | Not started |  |
 | S14-38 | Card and twin dashboard - running card job, card queue and running twin work with remaining time, card temperature and utilization, host CPU, refreshed every 5 minutes | Done | A local dashboard (python tools/knc_dashboard.py serve) now shows the running card job, the card queue and ... |
 | S14-39 | knc-twin prepare-native: pointer-rich captures (heap addresses sparse over tens of GB) need a relocating or multi-segment native image | Not started |  |
@@ -320,6 +320,7 @@ Current tickets: `[#################---]` 254 of 295
 
 ## Recent activity
 
+- 2026-11-16 11:58 **S14-35** engineer escalate: budget: 11 engineer sessions used; the budget is 11
 - 2026-11-16 11:55 **S14-38** lead approve: A local dashboard (python tools/knc_dashboard.py serve) now shows the running card job, the card queue and twin work with estimated remaining time,...
 - 2026-11-16 11:36 **S14-38** lead resume: Worktree reset to 2a2328a5; approve was not hung, T0 takes ~10 min and was killed early. Rerunning approve.
 - 2026-11-16 11:34 **S14-38** lead defer: Review passed (overdue clamp, log-based twin session liveness, command-line only, live card check recorded), but pm.py approve hung in the machine ...
@@ -327,7 +328,6 @@ Current tickets: `[#################---]` 254 of 295
 - 2026-11-16 11:16 **S14-38** owner decide: Owner 2026-11-16 (in chat: 'Yes raise it'): budget raised to 4 sessions. Resubmit 2a2328a5 as is with the one-sentence note; no rebase needed.
 - 2026-11-16 11:12 **S14-35** owner decide: Lead decision (owner's delegation): one more change round, sessions 9 -> 11, input_tokens 16M -> 20M. The 11:10 review findings are correct and mus...
 - 2026-11-16 11:10 **S14-35** lead escalate: over 2 review rounds: 1. .work/_shared/calib-w10/phiweather/sixth_{1,2}ctx_l2_031/restaged/: all files still dated 10:43/10:47, before 228c8ccd and...
-- 2026-11-16 11:09 **S14-35** engineer submit: prepare-native preserves the driver stack while using the kernel's in-image stack or private fallback; updated test assertions. Commits 228c8ccd an...
 
 ## Cost
 
