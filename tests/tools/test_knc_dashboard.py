@@ -34,8 +34,9 @@ class DashboardTests(unittest.TestCase):
         self.assertEqual(result['order'][0], 'claude-turn-x')
         self.assertEqual(result['queue'][0]['duration_seconds'], 120)
         self.assertEqual(result['queue'][0]['basis'], 'purpose')
+        self.assertEqual(result['queue'][0]['estimated_start'], '2026-11-16T12:00:00+00:00')
         self.assertIsNone(result['queue'][1]['duration_seconds'])
-        self.assertEqual(result['queue'][1]['estimated_start'], '2026-11-16T12:01:00+00:00')
+        self.assertEqual(result['queue'][1]['estimated_start'], '2026-11-16T12:02:00+00:00')
         self.assertIsNone(result['queue'][2]['estimated_start'])
         rows[2]['expectedEnd'] = '2026-11-16T12:10:00Z'
         rows[0].update(project='x', agent='a')
