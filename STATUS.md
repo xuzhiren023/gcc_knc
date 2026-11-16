@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-16 12:55.
+Updated automatically at every ticket change. Last update: 2026-11-16 12:59.
 
-**Next: GPT-6.1, on S14-10 (knc-twin: --jobs N for independent simulations and PyPy support (roadmap item 1)).** Run `python tools/dispatch.py`, or ask the tech lead to.
+**Next: the tech lead, on S14-33.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[#################---]` 255 of 296
 
@@ -160,7 +160,7 @@ Current tickets: `[#################---]` 255 of 296
 | S14-29 | knc-twin: schedule --block ADDR..ADDR for a straight-line block inside a function, and batch must not write a native request per candidate by default | Not started |  |
 | S14-30 | WRF built with GCC-KNC runs 1.21x slower per step than PhiWeather's production build - attribute the gap per cause before fixing (M5, owner rule) | draft |  |
 | S14-31 | knc-twin multi-core usability: compare across scales, stubs and repeated calls at unit/ring scale, multi-context sampling, separated ring/memory stall shares | Not started |  |
-| S14-33 | knc-twin: import the window-11 calibration rows (imci-math latency and throughput, div10, x87 fcoms, rcp23/rsqrt23 tables) and retire the assumed parameters they settle | In progress | Plain copies of the captures (same bytes, length-checked) are at .work/_shared/calib-w10/out/rcp23-readable... |
+| S14-33 | knc-twin: import the window-11 calibration rows (imci-math latency and throughput, div10, x87 fcoms, rcp23/rsqrt23 tables) and retire the assumed parameters they settle | Question for the tech lead | Commit red: knc-twin/tests/test_catalog_calibration.py and test_cli.py (same directory). Converter-units-re... |
 | S14-35 | knc-twin prepare-native: the generated native program for PhiWeather's sixth_order_diffusion kernels segfaults on the card (exit 139 under claude-pin); find the cause, fix the generator, restage | Done | knc-twin prepare-native runs each kernel on its own stack (the kernel's in-image stack, or a private per-co... |
 | S14-37 | knc-twin x87 double rounding: _x87_binop rounds to the 64-bit significand and then to PC=53/24; real x87 rounds once (knc-boinc repro, 1 to 8 ULP errors) | Not started |  |
 | S14-38 | Card and twin dashboard - running card job, card queue and running twin work with remaining time, card temperature and utilization, host CPU, refreshed every 5 minutes | Done | A local dashboard (python tools/knc_dashboard.py serve) now shows the running card job, the card queue and ... |
@@ -321,6 +321,7 @@ Current tickets: `[#################---]` 255 of 296
 
 ## Recent activity
 
+- 2026-11-16 12:59 **S14-33** engineer ask: Commit red: knc-twin/tests/test_catalog_calibration.py and test_cli.py (same directory). Converter-units-red: 3 tests, converter fails, replay/tabl...
 - 2026-11-16 12:55 **S14-33** lead answer: Plain copies of the captures (same bytes, length-checked) are at .work/_shared/calib-w10/out/rcp23-readable/claude-rcp23.bin and claude-rsqrt23.bin...
 - 2026-11-16 12:55 **S14-33** lead resume: lead copied the tables
 - 2026-11-16 12:53 **S14-33** lead defer: Interactive lead: make .work/_shared/calib-w10/out/rcp23/claude-rcp23.bin and claude-rsqrt23.bin readable by the engineer sandbox (copy both, lengt...
@@ -328,13 +329,12 @@ Current tickets: `[#################---]` 255 of 296
 - 2026-11-16 12:50 **S14-33** lead answer: Green committed by the lead (static catalog replay). Guidance from the review: rsqrt23: the card capture is right and the checker is wrong (inputs ...
 - 2026-11-16 12:49 **S14-33** lead resume: lead committed the green
 - 2026-11-16 12:48 **S14-33** lead defer: Lead: commit knc-twin/scripts/validate_heldout.py [green] (log S14_33_catalog_green-20261116-124536), then resume. rsqrt23: card is right, checker ...
-- 2026-11-16 12:46 **S14-33** engineer ask: Commit knc-twin/scripts/validate_heldout.py: static catalog replay green (3 tests). Log .work/_state/logs/S14_33_catalog_green-20261116-124536.log....
 
 ## Cost
 
 - From the script, engineer: 799 sessions, 1671.9M input tokens
 - From the script, lead: 545 sessions, 153.5M input tokens
-- Started by hand, Claude: 34 sessions, 4363.1M input tokens
+- Started by hand, Claude: 35 sessions, 4363.4M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
