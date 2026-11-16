@@ -31,6 +31,3 @@ __pycache__/
 *.opt-record.json.gz
 /tmp*/
 dist/
-
-# knc-twin run output (default --out of knc_twin.py); never committed
-knc-twin-runs/
