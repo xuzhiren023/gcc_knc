@@ -306,14 +306,15 @@ Run builds through `tools/run.py`. With the shared toolchain's `cross/bin` and
 Cygwin shell in this worktree, the donor build commands inside the wrapper are:
 
 ```sh
-k1om-mpss-linux-gcc -O2 -static --sysroot=../_shared/toolchain/sysroot -L/cygdrive/c/Users/xuzhi/Documents/PhiWeather/.tools/knc-bootstrap/sysroot/usr/lib64 tools/claude-pin.c -o ../_shared/claude-pin.mic
-k1om-mpss-linux-gcc -O2 -Wall -Wextra -Werror -static --sysroot=../_shared/toolchain/sysroot -L/cygdrive/c/Users/xuzhi/Documents/PhiWeather/.tools/knc-bootstrap/sysroot/usr/lib64 tools/claude-unpack.c -o ../_shared/claude-unpack.mic
+k1om-mpss-linux-gcc -O2 -static --sysroot=../_shared/toolchain/sysroot -L<static-sysroot>/usr/lib64 tools/claude-pin.c -o ../_shared/claude-pin.mic
+k1om-mpss-linux-gcc -O2 -Wall -Wextra -Werror -static --sysroot=../_shared/toolchain/sysroot -L<static-sysroot>/usr/lib64 tools/claude-unpack.c -o ../_shared/claude-unpack.mic
 k1om-mpss-linux-gcc -O2 --sysroot=../_shared/toolchain/sysroot tests/tools/card_hello.c -o ../_shared/claude-hello.mic
 ```
 
 The shared sysroot lacks static `libc.a`. The helper link uses the original
 bootstrap sysroot's static library in place with `-L`; no toolchain or library
-is copied. Quote that entire `-L...` argument when invoking from PowerShell.
+is copied. `<static-sysroot>` is a K1OM sysroot that has `usr/lib64/libc.a` (on the
+project's first host, the PhiWeather bootstrap sysroot). Quote that entire `-L...` argument when invoking from PowerShell.
 
 The static helper is host-built for KNC and is never executed on the host.
 The main checkout can use its default helper path; `pinHelper` can name that
