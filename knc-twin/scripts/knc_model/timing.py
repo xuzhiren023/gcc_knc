@@ -549,13 +549,18 @@ class CoreSim(object):
         return False
 
     # --------------------------------------------------------------------------------------------
-    def run(self):
+    def run(self, stop_positions=None):
+        """Advance without draining/resetting state; optional event-index barriers.
+
+        Callers provide lookahead beyond each barrier so pairing and prefix decode
+        see the next instruction. A pair can cross a barrier by one event.
+        """
         t0 = time.time()
         active = self.ctx
         total_events = sum(len(c.events) for c in active)
         while True:
             now = self.cycle
-            if all(c.done for c in active):
+            if all(c.done or (stop_positions is not None and c.pos >= stop_positions[c.ctx]) for c in active):
                 break
             if self.max_cycles is not None and now > self.max_cycles:
                 raise BudgetExhausted("cycle budget %d exhausted; %d of %d dynamic instructions issued (partial, not a result)" % (self.max_cycles, sum(c.issued for c in active), total_events),
@@ -622,13 +627,13 @@ class CoreSim(object):
             self.cycle += 1
         end_issue = max((c.last_issue_cycle or 0) for c in active) + 1
         completion = max(end_issue, max(c.max_done for c in active))
-        self.python_seconds = time.time() - t0
-        return self._result(end_issue, completion, total_events)
+        self.python_seconds = getattr(self, "python_seconds", 0.0) + time.time() - t0
+        return self._result(end_issue, completion, sum(c.issued for c in active))
 
     def _result(self, end_issue, completion, total_events):
         per_ctx = {}
         for c in self.ctx:
-            per_ctx[str(c.ctx)] = {"dynamic_instructions": len(c.events), "issued": c.issued, "pairs": c.pairs,
+            per_ctx[str(c.ctx)] = {"dynamic_instructions": c.issued, "issued": c.issued, "pairs": c.pairs,
                                   "first_issue": c.first_issue, "last_issue": c.last_issue_cycle, "completion": c.max_done,
                                   "stall_cycles": {k: v for k, v in c.stalls.items() if v}}
         issue_events = sum(c.issued - c.pairs for c in self.ctx)

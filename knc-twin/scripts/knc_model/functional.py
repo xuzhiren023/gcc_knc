@@ -430,19 +430,11 @@ class Interpreter(object):
     def run(self):
         total = 0
         for stream in self.kernel.streams:
-            cx = Context(stream.context, self.kernel.numerical_policy["x87_control_word"])
-            cx.mxcsr = mxcsr_from_policy(self.kernel.numerical_policy)
-            cx.apply_init(self.kernel.init.get("registers", {}), "init.registers")
-            cx.apply_init(stream.init.get("registers", {}), "streams[%d].init.registers" % stream.context)
-            self.contexts[stream.context] = cx
-            if self.kernel.entry == "function":
-                if cx.gpr["rsp"] == 0:
-                    cx.gpr["rsp"] = ENTRY_STACK - (stream.context << 24) - 8
-                self.memory.write(cx.gpr["rsp"], ENTRY_SENTINEL.to_bytes(8, "little"))
-            trace = []
-            self.traces[stream.context] = trace
+            cx, trace = self._start_stream(stream)
             steps = 0
             n = len(stream.insns)
+            # Keep full execution on the original tight loop. Yielding and
+            # publishing the step count per instruction is only for sampling.
             while cx.pc < n:
                 if steps >= self.max_steps:
                     raise BudgetExhausted("functional step budget (%d) exhausted in context %d at %s; the kernel did not finish" % (self.max_steps, stream.context, stream.insns[cx.pc].id),
@@ -468,6 +460,46 @@ class Interpreter(object):
         if self.memory.touched_default:
             self.assume("reads of uninitialized memory returned the kernel's memory_default byte 0x%02x" % (self.kernel.memory_default or 0))
         return total
+
+    def _start_stream(self, stream):
+        """Initialize the same context and trace for full and sampled execution."""
+        cx = Context(stream.context, self.kernel.numerical_policy["x87_control_word"])
+        cx.mxcsr = mxcsr_from_policy(self.kernel.numerical_policy)
+        cx.apply_init(self.kernel.init.get("registers", {}), "init.registers")
+        cx.apply_init(stream.init.get("registers", {}), "streams[%d].init.registers" % stream.context)
+        self.contexts[stream.context] = cx
+        if self.kernel.entry == "function":
+            if cx.gpr["rsp"] == 0:
+                cx.gpr["rsp"] = ENTRY_STACK - (stream.context << 24) - 8
+            self.memory.write(cx.gpr["rsp"], ENTRY_SENTINEL.to_bytes(8, "little"))
+        trace = []
+        self.traces[stream.context] = trace
+        return cx, trace
+
+    def iter_stream(self, stream):
+        """Execute one stream incrementally, preserving state and the dynamic trace.
+
+        Consumers that stop early must not check final expected outputs or claim
+        whole-function correctness. Full execution uses run() without yielding.
+        """
+        cx, trace = self._start_stream(stream)
+        steps = 0
+        n = len(stream.insns)
+        while cx.pc < n:
+            if steps >= self.max_steps:
+                raise BudgetExhausted("functional step budget (%d) exhausted in context %d at %s; the kernel did not finish" % (self.max_steps, stream.context, stream.insns[cx.pc].id),
+                                      {"context": stream.context, "steps": steps, "pc": stream.insns[cx.pc].id},
+                                      partial={"contexts_completed": sorted(k for k in self.traces if k != stream.context)})
+            if self.deadline is not None and (steps & 255) == 0 and time.time() > self.deadline:
+                raise BudgetExhausted("python time budget exhausted during functional execution (context %d, step %d)" % (stream.context, steps),
+                                      {"context": stream.context, "steps": steps})
+            insn = stream.insns[cx.pc]
+            nxt = self.execute(cx, insn, stream, trace, steps)
+            cx.pc = nxt
+            steps += 1
+            self.steps[stream.context] = steps
+            yield trace[-1]
+        self.steps[stream.context] = steps
 
     # ---------------------------------------------------------------------------------------
     def policy_for(self, insn, imm_rounding=None):

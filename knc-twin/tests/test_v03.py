@@ -7,6 +7,7 @@ import struct
 import sys
 import tempfile
 import unittest
+from unittest import mock
 
 import helpers
 from helpers import issue_cycles, kernel, profile, simulate, FIXTURES, ROOT, SCRIPTS
@@ -462,6 +463,32 @@ class TestLayoutAndBinaryAdapter(unittest.TestCase):
 
 
 class TestRollupAndBar(unittest.TestCase):
+    def test_compiled_rows_record_disables_deadline(self):
+        with tempfile.TemporaryDirectory() as d:
+            case_dir = os.path.join(d, "case")
+            os.mkdir(case_dir)
+            with open(os.path.join(case_dir, "case.json"), "w") as f:
+                json.dump({"scale": "core", "variants": [], "rank_groups": []}, f)
+            with open(os.path.join(case_dir, "measurement.json"), "w") as f:
+                json.dump({"per_variant": {}}, f)
+            with mock.patch.object(validate_heldout, "predict_case", return_value={"variants": []}) as predict:
+                validate_heldout.compiled_rows(d, "profile", record=True, max_seconds=1)
+            self.assertIsNone(predict.call_args.kwargs["max_seconds"])
+
+    def test_compiled_rows_record_rejects_failed_variant(self):
+        with tempfile.TemporaryDirectory() as d:
+            case_dir = os.path.join(d, "case")
+            os.mkdir(case_dir)
+            with open(os.path.join(case_dir, "case.json"), "w") as f:
+                json.dump({"scale": "core", "variants": [], "rank_groups": []}, f)
+            with open(os.path.join(case_dir, "measurement.json"), "w") as f:
+                json.dump({"per_variant": {}}, f)
+            failed = {"variants": [{"variant": "broken", "status": "budget_exhausted", "message": "too slow"}]}
+            with mock.patch.object(validate_heldout, "predict_case", return_value=failed):
+                with self.assertRaisesRegex(ValueError, "broken: too slow"):
+                    validate_heldout.compiled_rows(d, "profile", record=True)
+            self.assertFalse(os.path.exists(os.path.join(case_dir, "prediction.json")))
+
     def test_combine(self):
         regs = [{"name": "a", "share": 0.4, "ratio": 0.5, "band_pct": 10.0}, {"name": "b", "share": 0.2, "ratio": 1.0, "band_pct": 0.0}]
         out = rollup.combine(regs, {"measured_per_unit": 10.0, "unit": "s/step"})

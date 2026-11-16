@@ -122,6 +122,11 @@ change up over the HPCG pilot's SpMV and SymGS shares: predicted time ratio 0.91
 
 ## Regenerating
 
+Replay a specific case without a wall-clock deadline with `python scripts/validate_heldout.py
+--cases tests/heldout_native --only-cases s12-31-hpcg-104 --max-seconds 0 --out /tmp/heldout-replay`.
+The full prediction check in `tests/regress/test_knc_twin.py` runs only when `KNC_TWIN_HELDOUT=1`
+is set; the ordinary regression suite skips it because the replay can take tens of minutes.
+
 ```
 cd tests/bench/knc-char && python -c "from pathlib import Path; import kernels; kernels.emit(Path(OUT))"
 python scripts/validate_heldout.py --kernels-s OUT/kernels.s --kernels-h OUT/kernels.h \

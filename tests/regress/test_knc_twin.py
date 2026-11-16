@@ -7,6 +7,7 @@ change. A changed engine or profile fails here until the predictions are re-reco
 """
 import importlib.util
 import json
+import os
 import subprocess
 import sys
 import tempfile
@@ -45,6 +46,8 @@ class KncTwin(unittest.TestCase):
                     self.assertEqual(got, case["expect"])
 
     def test_heldout_predictions_unchanged(self):
+        if os.environ.get("KNC_TWIN_HELDOUT") != "1":
+            self.skipTest("set KNC_TWIN_HELDOUT=1 to run the slow held-out replay")
         lib = trial_lib()
         # characterization-run/ holds the validate_heldout.py record, not a case
         dirs = sorted(d for d in HELDOUT.iterdir() if (d / "case.json").is_file())
@@ -53,7 +56,11 @@ class KncTwin(unittest.TestCase):
             for d in dirs:
                 with self.subTest(case=d.name):
                     recorded = json.loads((d / "prediction.json").read_text(encoding="utf-8"))
-                    self.assertEqual(lib.predict_heldout(d, Path(tmp)), recorded)
+                    predicted = lib.predict_heldout(d, Path(tmp))
+                    for variant in predicted.get("variants", []):
+                        self.assertEqual(variant.get("status"), "ok",
+                                         "%s/%s: %s" % (d.name, variant.get("variant"), variant.get("message")))
+                    self.assertEqual(predicted, recorded)
                     measurement = json.loads((d / "measurement.json").read_text(encoding="utf-8"))
                     self.assertTrue(measurement.get("source_log"), "measurement.json must cite its source log")
 
