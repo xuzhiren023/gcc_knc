@@ -154,7 +154,7 @@ Current tickets: `[#################---]` 256 of 296
 | S14-23 | knc-twin: import the window-10 scatter rows (2 threads) and settle occupancy.scatter_cycles_per_line | In progress | Owner closed the budget after the final session. The worktree is committed on s14/S14-23 as wip (converter,... |
 | S14-24 | dispatch: refuse a session up front when its worktree git dir or ticket file is not writable from the sandbox | Not started |  |
 | S14-25 | knc-twin: recorded outputs carry absolute host paths (C:/Users/<name>/...); write repo-relative paths and scrub the committed records | Not started |  |
-| S14-26 | knc-twin bound for software pipelining - how much could overlapping iterations gain on the M4 hot loops (go/no-go for S14-02) | Question for the tech lead | 72b3d253 records six current corpus loop bounds (all ok); GEMM and Jacobi modulo both fail unsupported: int... |
+| S14-26 | knc-twin bound for software pipelining - how much could overlapping iterations gain on the M4 hot loops (go/no-go for S14-02) | In progress | Lead 2026-11-16: close it as no-go now; do not wait for a twin fix. Your static bounds already decide it. O... |
 | S14-27 | knc-twin bounds: the dependency critical path charges cold lines their full miss latency, so the "lower bound" can exceed the simulation | Not started |  |
 | S14-28 | knc-twin ranking of the four quantized GEMV kernel forms on one KNC core (phase 0 of S14-08) | Not started |  |
 | S14-29 | knc-twin: schedule --block ADDR..ADDR for a straight-line block inside a function, and batch must not write a native request per candidate by default | Not started |  |
@@ -323,18 +323,18 @@ Current tickets: `[#################---]` 256 of 296
 
 - 2026-11-16 14:10 **S12-42** lead close: Card window 10 (post-S12-31 prefix b2ce6a9eebf, 1 thread, A-s12-42-small.out, all GUARDS failures=0): GCC-KNC is now faster than GCC 5.1.1 on all f...
 - 2026-11-16 14:03 **S14-33** lead resume: lead committed the final files, merged main, checked tests (48 pass) and the validation note; approving
+- 2026-11-16 14:03 **S14-26** lead answer: Lead 2026-11-16: close it as no-go now; do not wait for a twin fix. Your static bounds already decide it. Overlapping iterations can at best take a...
 - 2026-11-16 14:01 **S14-22** engineer ask: Test invocation through tools/run.py hangs beyond 60 seconds with zero-byte logs; engineer role blocks card_run tests as expected. Need lead guidan...
 - 2026-11-16 14:01 **S14-16** lead answer: Yes, reduce again; do not use bzip2 source (held out). Your two cases had too few live values: the k0 use appears only when the caller-saved GPRs a...
 - 2026-11-16 14:00 **S14-26** engineer ask: 72b3d253 records six current corpus loop bounds (all ok); GEMM and Jacobi modulo both fail unsupported: interior label. Reproducer: python knc-twin...
 - 2026-11-16 13:58 **S14-16** engineer ask: Two synthetic T1 attempts failed to reproduce: eight byte accumulators and indexed byte/word comparisons both pass no-k scans on existing gcc16. Re...
 - 2026-11-16 13:48 **S14-33** lead defer: Interactive lead: commit the files in the 13:46 ask (log S14_33_final_regress-20261116-134356) as 'feat(S14-33): div10 vector-zero data, held-out r...
-- 2026-11-16 13:46 **S14-33** engineer ask: Ready for lead commit/rebase (13:40 workflow; knc ref absent). Files: knc-twin/scripts/import_window11.py, references/validation.md, tests/heldout_...
 
 ## Cost
 
 - From the script, engineer: 805 sessions, 1687.5M input tokens
 - From the script, lead: 549 sessions, 154.4M input tokens
-- Started by hand, Claude: 49 sessions, 4388.0M input tokens
+- Started by hand, Claude: 49 sessions, 4388.6M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
