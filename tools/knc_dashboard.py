@@ -145,41 +145,6 @@ def powershell(script):
                     "$ErrorActionPreference='Stop'; [Console]::OutputEncoding=[Text.Encoding]::UTF8; " + script])
 
 
-def process_folder(pid):
-    """Read the current directory from a same-bitness Windows process, if permitted."""
-    try:
-        import ctypes as c
-        from ctypes import wintypes as w
-        kernel, ntdll = c.WinDLL('kernel32', use_last_error=True), c.WinDLL('ntdll')
-        kernel.OpenProcess.restype = w.HANDLE
-        kernel.ReadProcessMemory.argtypes = [w.HANDLE, c.c_void_p, c.c_void_p, c.c_size_t, c.c_void_p]
-        kernel.CloseHandle.argtypes = [w.HANDLE]
-        ntdll.NtQueryInformationProcess.argtypes = [w.HANDLE, w.ULONG, c.c_void_p, w.ULONG, c.c_void_p]
-        handle = kernel.OpenProcess(0x410, False, pid)
-        if not handle:
-            return None
-        try:
-            info = (c.c_void_p * 6)()
-            if ntdll.NtQueryInformationProcess(handle, 0, c.byref(info), c.sizeof(info), None):
-                return None
-            def read(address, value):
-                if not kernel.ReadProcessMemory(handle, address, c.byref(value), c.sizeof(value), None):
-                    raise OSError('process memory unavailable')
-                return value
-            wide = c.sizeof(c.c_void_p) == 8
-            params = read(info[1] + (0x20 if wide else 0x10), c.c_void_p()).value
-            class UnicodeString(c.Structure):
-                _fields_ = [('length', w.USHORT), ('maximum', w.USHORT), ('buffer', c.c_void_p)]
-            name = read(params + (0x38 if wide else 0x24), UnicodeString())
-            if name.length > 65534:
-                return None
-            return bytes(read(name.buffer, (c.c_char * name.length)())).decode('utf-16-le')
-        finally:
-            kernel.CloseHandle(handle)
-    except (OSError, ValueError, TypeError, AttributeError, OverflowError):
-        return None
-
-
 def twin_processes():
     raw = powershell("@(Get-CimInstance Win32_Process | Where-Object { $_.Name -match '^python' -and $_.CommandLine -match 'knc_twin\\.py' } | ForEach-Object { @{pid=$_.ProcessId; command=$_.CommandLine; start=$_.CreationDate.ToUniversalTime().ToString('o')} }) | ConvertTo-Json -Compress")
     rows = json.loads(raw or '[]')
@@ -190,21 +155,37 @@ def twin_processes():
         start = timestamp(row.get('start'))
         result.append(dict(key='%s:%s' % (row['pid'], row['start']), pid=row['pid'],
                            subcommand=match[1] if match else 'unknown', command=row['command'],
-                           working_folder=process_folder(row['pid']), start_time=row['start'],
+                           start_time=row['start'],
                            start_epoch=start.timestamp() if start else None))
     return result
 
 
 def twin_tickets(board, now):
     rows = []
+    logs = Path(board.root) / '.work/_state/logs'
+    timeout = board.policy['session_timeout_minutes'] * 60
     for ticket in board.tickets():
         if ticket.state != 'doing' or not pm.lane_of(ticket).startswith('twin-'):
             continue
-        # Do not mistake the ticket's creation/start event for a current agent session.
-        start = timestamp(ticket.fields.get('session_start'))
+        sessions = []
+        for path in logs.glob(ticket.id + '-*.jsonl'):
+            match = re.fullmatch(re.escape(ticket.id) + r'-(?:engineer|lead)-(\d{4}-\d{2}-\d{2}T\d{6})\.jsonl', path.name)
+            if match:
+                try:
+                    # Dispatcher filenames use host local time, including its DST rules.
+                    start = dt.datetime.strptime(match[1], '%Y-%m-%dT%H%M%S').astimezone(UTC)
+                    sessions.append((start, path))
+                except ValueError:
+                    continue
+        start = None
+        if sessions:
+            candidate, path = max(sessions, key=lambda session: session[0])
+            if now.timestamp() - path.stat().st_mtime <= timeout:
+                start = candidate
         rows.append(dict(id=ticket.id, title=ticket.fields.get('title'),
                          session_start=start.isoformat() if start else None,
-                         remaining_seconds=board.policy['session_timeout_minutes'] * 60 - (now - start).total_seconds()
+                         session_status='live' if start else 'no live session',
+                         remaining_seconds=timeout - (now - start).total_seconds()
                          if start else None, basis='session timeout upper bound'))
     return rows
 
@@ -262,7 +243,7 @@ async function refresh(force=false){el('refresh').disabled=true;try{
  el('status').textContent='Collected '+s.collected_at;
  const c=s.card;el('card').innerHTML=c.status==='ok'?stamp(c)+rows(c.data.running,r=>job(r)+'<br>Remaining: '+duration(r.remaining_seconds)):unavailable(c);
  el('queue').innerHTML=c.status==='ok'?stamp(c)+rows(c.data.turns,r=>'Turn marker: '+job(r))+'<p>Ledger order: '+esc(c.data.order.join(' → '))+'</p>'+rows(c.data.queue,r=>job(r)+'<br>Estimated start: '+esc(r.estimated_start)+'<br>Duration: '+duration(r.duration_seconds)+' ('+esc(r.basis)+')'):unavailable(c);
- const p=s.twin_processes,t=s.twin_tickets;el('twins').innerHTML='<h3>Host processes</h3>'+(p.status==='ok'?stamp(p)+rows(p.data,r=>'<b>'+esc(r.subcommand)+'</b> / PID '+esc(r.pid)+'<br>Folder: '+esc(r.working_folder)+'<br>Start: '+esc(r.start_time)+'<br>Elapsed: '+duration(r.elapsed_seconds)+'<br>Remaining: '+duration(r.remaining_seconds)+'<br>'+esc(r.basis)):unavailable(p))+'<h3>Board tickets</h3>'+(t.status==='ok'?stamp(t)+rows(t.data,r=>esc(r.id)+' '+esc(r.title)+'<br>Session start: '+esc(r.session_start)+'<br>Remaining upper bound: '+duration(r.remaining_seconds)):unavailable(t));
+ const p=s.twin_processes,t=s.twin_tickets;el('twins').innerHTML='<h3>Host processes</h3>'+(p.status==='ok'?stamp(p)+rows(p.data,r=>'<b>'+esc(r.subcommand)+'</b> / PID '+esc(r.pid)+'<br>Command: '+esc(r.command)+'<br>Start: '+esc(r.start_time)+'<br>Elapsed: '+duration(r.elapsed_seconds)+'<br>Remaining: '+duration(r.remaining_seconds)+'<br>'+esc(r.basis)):unavailable(p))+'<h3>Board tickets</h3>'+(t.status==='ok'?stamp(t)+rows(t.data,r=>esc(r.id)+' '+esc(r.title)+'<br>Session: '+esc(r.session_status)+'<br>Session start: '+esc(r.session_start)+'<br>Remaining upper bound: '+duration(r.remaining_seconds)):unavailable(t));
  const m=s.sensors;el('sensors').innerHTML=m.status==='ok'?stamp(m)+Object.entries(m.data).map(([name,d])=>'<article><b>'+esc(name)+'</b><pre>'+esc(Object.keys(d.temperatures).length?JSON.stringify(d.temperatures,null,2):'unknown')+' °C</pre><p>Device user/system/idle: '+(d.utilization?['user','system','idle'].map(k=>esc(d.utilization[k])+'%').join(' / '):'unknown')+'</p><div class="strip">'+Array.from({length:61},(_,index)=>{const i=index+('0' in d.cores?0:1),v=d.cores[i],busy=v?100-v.idle:null;return '<span class="core" title="'+esc('Core '+i+': '+(v?JSON.stringify(v):'unknown'))+'" style="background:'+(busy==null?'#aaa':'hsl('+(120-busy*1.2)+',75%,65%)')+'">'+i+'</span>'}).join('')+'</div><small>Core busy = user + system; gray = unknown. Hover for percentages.</small></article>').join(''):unavailable(m);
  const h=s.host;el('host').innerHTML=h.status==='ok'?stamp(h)+'<p>'+esc(h.data)+'%</p>':unavailable(h);
  }catch(e){el('status').textContent='unavailable: '+e.message}finally{el('refresh').disabled=false}}
