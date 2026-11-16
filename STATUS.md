@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-16 02:59.
+Updated automatically at every ticket change. Last update: 2026-11-16 03:00.
 
 **Waiting for you:** S14-15. Run `python tools/pm.py inbox`.
 
@@ -146,7 +146,7 @@ Current tickets: `[#################---]` 244 of 279
 | S14-15 | knc-twin prepare-native: absolute memory operands come out as `N()` in kernel.S (k1om as 2.22 rejects them); emit them relocated into the image | **Waiting for you** | budget: 10651104 input tokens used; the budget is 10000000 |
 | S14-16 | bzip2 slower than GCC 5.1.1: mask-to-GPR move cost below a GPR move makes RA park integers in k registers (M4 known limit, must-fix) | draft |  |
 | S14-17 | Compare not folded with its load in merged return blocks (GCC 16 middle end, about half the remaining bzip2 mainGtU gap) | draft |  |
-| S14-18 | knc-twin regress: held-out replay runs under a 120 s wall-clock budget, so a slow interpreter turns a prediction into a budget_exhausted stub and the test fails as a false mismatch | In progress |  |
+| S14-18 | knc-twin regress: held-out replay runs under a 120 s wall-clock budget, so a slow interpreter turns a prediction into a budget_exhausted stub and the test fails as a false mismatch | Question for the tech lead | The ticket requires editing tests/acceptance/, which AGENTS.md explicitly forbids: acceptance requires held... |
 | S14-19 | knc-twin x87 integer-load widths - fildl reads 8 bytes (must be 4), filds reads 4 (must be 2) | Not started |  |
 | S14-20 | knc-twin: an indirect jmp/call (PLT tail call through the GOT) on a never-executed path must not refuse the whole region | Not started |  |
 | S2-01 | Design for zmm and mask registers under -march=knc | Done | The register design for KNC is settled on paper: all 32 zmm and 8 mask registers become usable under -march... |
@@ -304,6 +304,7 @@ Current tickets: `[#################---]` 244 of 279
 
 ## Recent activity
 
+- 2026-11-16 02:59 **S14-18** engineer ask: The ticket requires editing tests/acceptance/, which AGENTS.md explicitly forbids: acceptance requires heldout replay to leave tools/check t0, and ...
 - 2026-11-16 02:59 **S14-12** lead answer: Yes, submit now with --override 'size: 947 lines for a two-part brief (loop sampling + phase rollup): ~350 source, 264 in the two budgeted test fil...
 - 2026-11-16 02:58 **S14-12** engineer ask: Submit blocked: 947 changed lines exceeds 800-line budget; no new edits this session. Approve --override for existing implementation? Windows Pytho...
 - 2026-11-16 02:56 **S14-11** owner decide: input_tokens 20M -> 30M under the owner's standing auto-extend rule: items A-G are committed and main is merged; the held-out check (python 3.8 or ...
@@ -311,12 +312,11 @@ Current tickets: `[#################---]` 244 of 279
 - 2026-11-16 02:54 **S14-14** lead defer: Review passed (approve note: knc-twin gains a schedule command: beam search up to 60 instructions, list ordering, modulo II, GAS export and frozen-...
 - 2026-11-16 02:07 **S14-14** engineer submit: Green 2e975d5b; main merged at 9b699730. Prior checks: 7 acceptance tests, selftest and trial checks passed. Held-out check passed: Windows Python ...
 - 2026-11-16 02:05 **S14-15** lead escalate: budget: 10651104 input tokens used; the budget is 10000000
-- 2026-11-16 02:00 **S14-15** lead answer: Do both on the branch, no review rerun: (1) Merge-main: git merge main into s14/S14-15 (a merge commit, not a rebase of main); resolve any conflict...
 
 ## Cost
 
 - From the script, engineer: 746 sessions, 1617.5M input tokens
-- From the script, lead: 504 sessions, 143.0M input tokens
+- From the script, lead: 505 sessions, 143.2M input tokens
 - Started by hand, Claude: 14 sessions, 4135.4M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
