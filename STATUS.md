@@ -2,7 +2,7 @@
 
 Updated automatically at every ticket change. Last update: 2026-11-15 23:01.
 
-**Next: the tech lead, on S14-12.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: the tech lead, on S14-13.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[#################---]` 244 of 273
 
@@ -140,7 +140,7 @@ Current tickets: `[#################---]` 244 of 273
 | S14-09 | KNC vs the Z840 host (dual E5-2690 v3) on the same algorithms and numerical contract - where running on the card actually pays | draft |  |
 | S14-10 | knc-twin: --jobs N for independent simulations and PyPy support (roadmap item 1) | In progress | M4 is not done (62 of 65 tickets, not accepted), so the gated runs wait and you should not block on them. N... |
 | S14-11 | knc-twin: close PhiWeather WRF coverage gaps (jump tables, vcvtps2pd ymm, loop-region and complete-listing modes, scatter and rcp-table import) | In progress | S14-11 red accepted: failing tests now pin knc-twin's WRF switch jump-table resolution (entry order, out-of... |
-| S14-12 | knc-twin: iteration and phase sampling for loop and whole-program wall-time estimates (roadmap item 2) | Tests waiting for review | Red commit 0d1e239a. Focused selftest test_sampling_*.py: 7 expected failures, 0 errors; sample-loop absent... |
+| S14-12 | knc-twin: iteration and phase sampling for loop and whole-program wall-time estimates (roadmap item 2) | Changes requested | Red review: loop series/spread/extrapolation, simulate option, budget stop, S12-30 widening and the phase-v... |
 | S14-13 | knc-twin: 8-tile multi-core unit on the full ring with all memory controllers (roadmap item 3) | Question for the tech lead | Phase 1 committed: 12328478, knc-twin/references/multicore-design.md. Brief 03 requires review before code.... |
 | S14-14 | knc-twin: scheduling explorer for modulo scheduling and reordering, evaluating S14-02/S14-03 (roadmap item 4) | Tests waiting for review | Red commit 47ec4e41. Evaluation: knc-twin/references/scheduling-explorer.md. Ran tools/run.py S14-14-red wi... |
 | S2-01 | Design for zmm and mask registers under -march=knc | Done | The register design for KNC is settled on paper: all 32 zmm and 8 mask registers become usable under -march... |
@@ -299,13 +299,13 @@ Current tickets: `[#################---]` 244 of 273
 ## Recent activity
 
 - 2026-11-15 23:01 **S14-13** engineer ask: Phase 1 committed: 12328478, knc-twin/references/multicore-design.md. Brief 03 requires review before code. Approve contracted 61 positions/64 TDs,...
+- 2026-11-15 23:01 **S14-12** lead changes: Red review: loop series/spread/extrapolation, simulate option, budget stop, S12-30 widening and the phase-vs-flat algebra are good. Three gaps befo...
 - 2026-11-15 23:00 **S14-11** lead approve-red: S14-11 red accepted: failing tests now pin knc-twin's WRF switch jump-table resolution (entry order, out-of-range index) and the vcvtps2pd %ymm low...
 - 2026-11-15 22:59 **S14-14** engineer red: Red commit 47ec4e41. Evaluation: knc-twin/references/scheduling-explorer.md. Ran tools/run.py S14-14-red with Cygwin python3.12 unittest: 6 expecte...
 - 2026-11-15 22:59 **S14-12** engineer red: Red commit 0d1e239a. Focused selftest test_sampling_*.py: 7 expected failures, 0 errors; sample-loop absent (5), phases rejected (2). Covers series...
 - 2026-11-15 22:58 **S14-11** engineer red: Red commit da3ce616: brief 01 A/B regression tests for relocated switch resolution/execution/index bounds and ymm aliases/conversion/rejection. too...
 - 2026-11-15 22:43 **S14-10** lead answer: M4 is not done (62 of 65 tickets, not accepted), so the gated runs wait and you should not block on them. Now: implement --jobs and the PyPy change...
 - 2026-11-15 22:41 **S14-10** engineer ask: The brief gates --jobs 4 identity tests, validation comparisons, PyPy selftest/examples and speed runs on M4 completion; the ticket also requires c...
-- 2026-11-15 17:45 **S12-09** lead approve: Sprint 12 is closed: the final GCC-KNC (knc b2ce6a9eebf) has every runtime library rebuilt from the same compiler, passes T0-T2, ICE sweeps, x86 id...
 
 ## Cost
 
