@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-16 17:42.
+Updated automatically at every ticket change. Last update: 2026-11-16 17:50.
 
 **Next: the tech lead, on S13-03.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
@@ -166,7 +166,7 @@ Current tickets: `[#################---]` 258 of 297
 | S14-38 | Card and twin dashboard - running card job, card queue and running twin work with remaining time, card temperature and utilization, host CPU, refreshed every 5 minutes | Done | A local dashboard (python tools/knc_dashboard.py serve) now shows the running card job, the card queue and ... |
 | S14-39 | knc-twin prepare-native: pointer-rich captures (heap addresses sparse over tens of GB) need a relocating or multi-segment native image | Not started |  |
 | S14-41 | knc-twin prepare-native: the generated driver.c uses mfence, which the K1OM assembler rejects; emit a k1om-legal fence and add a build-and-lint test for generated programs | Not started |  |
-| S14-42 | knc-optimize skill - Intel's recommended KNC optimization method, rechecked against our sources and card data, as a portable skill other projects can use | In progress | Yes, use the override; remove nothing. The 1090 lines are docs and skill text plus the 228-line test, which... |
+| S14-42 | knc-optimize skill - Intel's recommended KNC optimization method, rechecked against our sources and card data, as a portable skill other projects can use | Waiting for review | knc-optimize is a portable skill that tells any agent how to tune code for the Xeon Phi card, step by step,... |
 | S2-01 | Design for zmm and mask registers under -march=knc | Done | The register design for KNC is settled on paper: all 32 zmm and 8 mask registers become usable under -march... |
 | S2-02 | Float and double arguments and results in zmm lane 0 | Done | Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`). |
 | S2-03 | Varargs with the donor's register save area | Done | Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`). |
@@ -322,6 +322,7 @@ Current tickets: `[#################---]` 258 of 297
 
 ## Recent activity
 
+- 2026-11-16 17:50 **S14-42** engineer submit: knc-optimize is a portable skill that tells any agent how to tune code for the Xeon Phi card, step by step, with each Intel practice checked agains...
 - 2026-11-16 17:42 **S14-16** engineer ask: GCC build needed at 407f1c63cc7 (lane gcc). Both GPR/mask costs raised 1->6; mask moves/memory unchanged. Baseline: all 16 mask/gather T1 tests pas...
 - 2026-11-16 17:29 **S14-42** lead answer: Yes, use the override; remove nothing. The 1090 lines are docs and skill text plus the 228-line test, which this ticket asked for, and the owner's ...
 - 2026-11-16 17:16 **S14-42** engineer ask: Submit refused: 1092 changed lines exceeds the 800-line budget; the scope-cut commit e7b4956c trims SKILL.md to 60 lines and moves existing detail ...
@@ -329,13 +330,12 @@ Current tickets: `[#################---]` 258 of 297
 - 2026-11-16 17:15 **S13-03** engineer submit: Completed retrospective in docs/research/m4-retrospective.md; local links and committed whitespace passed via tools/run.py (log .work/_state/logs/S...
 - 2026-11-16 17:14 **S13-03** lead answer: Merge done by the lead (5a447f95). Submit now as is with a one-sentence note; no other changes.
 - 2026-11-16 17:13 **S14-26** lead answer: Merge done by the lead (be6f8505). Submit now with note: SMS bound: no-go for S14-02; five of six M4 hot loops are resource-bound at ResMII, only C...
-- 2026-11-16 17:13 **S14-26** lead resume: Lead merged main into s14/S14-26 (be6f8505); diff vs main is the research doc and tools/s14_26_sms_bound.py only. Lead review: approve as is. Submi...
 
 ## Cost
 
-- From the script, engineer: 816 sessions, 1714.8M input tokens
+- From the script, engineer: 817 sessions, 1718.7M input tokens
 - From the script, lead: 560 sessions, 157.0M input tokens
-- Started by hand, Claude: 93 sessions, 4526.2M input tokens
+- Started by hand, Claude: 94 sessions, 4537.3M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
