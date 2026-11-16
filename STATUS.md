@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-16 16:17.
+Updated automatically at every ticket change. Last update: 2026-11-16 16:19.
 
-**Next: the tech lead, on S14-42.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: GPT-6.1, on S14-10 (knc-twin: --jobs N for independent simulations and PyPy support (roadmap item 1)).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
 Current tickets: `[#################---]` 258 of 297
 
@@ -158,7 +158,7 @@ Current tickets: `[#################---]` 258 of 297
 | S14-27 | knc-twin bounds: the dependency critical path charges cold lines their full miss latency, so the "lower bound" can exceed the simulation | Not started |  |
 | S14-28 | knc-twin ranking of the four quantized GEMV kernel forms on one KNC core (phase 0 of S14-08) | Not started |  |
 | S14-29 | knc-twin: schedule --block ADDR..ADDR for a straight-line block inside a function, and batch must not write a native request per candidate by default | Not started |  |
-| S14-30 | WRF built with GCC-KNC runs 1.21x slower per step than PhiWeather's production build - attribute the gap per cause before fixing (M5, owner rule) | draft | PhiWeather 25 h figure (their message, 2026-11-16): PGK-02 = patched GCC-KNC WRF (wrf.exe 890f58f8, classic... |
+| S14-30 | WRF built with GCC-KNC runs 1.21x slower per step than PhiWeather's production build - attribute the gap per cause before fixing (M5, owner rule) | draft | issue #32 (short WRF tiles), PhiWeather knc-twin study of rk_update_scalar from our module_em.o (twin estim... |
 | S14-31 | knc-twin multi-core usability: compare across scales, stubs and repeated calls at unit/ring scale, multi-context sampling, separated ring/memory stall shares | Not started |  |
 | S14-33 | knc-twin: import the window-11 calibration rows (imci-math latency and throughput, div10, x87 fcoms, rcp23/rsqrt23 tables) and retire the assumed parameters they settle | Done | the branch's knc-twin commits were split and merged into the knc-twin repository (C:/Users/xuzhi/Documents/... |
 | S14-35 | knc-twin prepare-native: the generated native program for PhiWeather's sixth_order_diffusion kernels segfaults on the card (exit 139 under claude-pin); find the cause, fix the generator, restage | Done | knc-twin prepare-native runs each kernel on its own stack (the kernel's in-image stack, or a private per-co... |
@@ -166,7 +166,7 @@ Current tickets: `[#################---]` 258 of 297
 | S14-38 | Card and twin dashboard - running card job, card queue and running twin work with remaining time, card temperature and utilization, host CPU, refreshed every 5 minutes | Done | A local dashboard (python tools/knc_dashboard.py serve) now shows the running card job, the card queue and ... |
 | S14-39 | knc-twin prepare-native: pointer-rich captures (heap addresses sparse over tens of GB) need a relocating or multi-segment native image | Not started |  |
 | S14-41 | knc-twin prepare-native: the generated driver.c uses mfence, which the K1OM assembler rejects; emit a k1om-legal fence and add a build-and-lint test for generated programs | Not started |  |
-| S14-42 | knc-optimize skill - Intel's recommended KNC optimization method, rechecked against our sources and card data, as a portable skill other projects can use | Tests waiting for review | f625301c adds the six artifact checks; tools/run.py --name S14-42-red ran test_knc_optimize_skill.py under ... |
+| S14-42 | knc-optimize skill - Intel's recommended KNC optimization method, rechecked against our sources and card data, as a portable skill other projects can use | In progress | The red test for the knc-optimize skill is accepted: it checks the skill files, trigger words, a source loc... |
 | S2-01 | Design for zmm and mask registers under -march=knc | Done | The register design for KNC is settled on paper: all 32 zmm and 8 mask registers become usable under -march... |
 | S2-02 | Float and double arguments and results in zmm lane 0 | Done | Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`). |
 | S2-03 | Varargs with the donor's register save area | Done | Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`). |
@@ -322,20 +322,20 @@ Current tickets: `[#################---]` 258 of 297
 
 ## Recent activity
 
+- 2026-11-16 16:25 **S14-30** lead note: issue #32 (short WRF tiles), PhiWeather knc-twin study of rk_update_scalar from our module_em.o (twin estimates, unvalidated_scenario_estimate; Phi...
+- 2026-11-16 16:19 **S14-42** lead approve-red: The red test for the knc-optimize skill is accepted: it checks the skill files, trigger words, a source locator and one of the four verdicts on eve...
 - 2026-11-16 16:16 **S14-42** engineer red: f625301c adds the six artifact checks; tools/run.py --name S14-42-red ran test_knc_optimize_skill.py under Cygwin Python 3.12 and produced 12 expec...
 - 2026-11-16 16:15 **S14-30** lead note: PhiWeather 25 h figure (their message, 2026-11-16): PGK-02 = patched GCC-KNC WRF (wrf.exe 890f58f8, classic CDF2 inputs, Miami 2024-01-06 12Z, 8x15...
 - 2026-11-16 15:38 **S14-33** lead escalate: lead session ended without a decision (exit 0)
 - 2026-11-16 14:59 **S14-33** engineer submit: a69e96f6: all five review fixes. Full held-out recording PASS; selftest 221 tests, zero failures/errors; trial PASS. Scatter t1 +0.7%/+6.8%; scatte...
 - 2026-11-16 14:20 **S14-22** lead defer: Engineer cannot run card_run tests: tools/run.py hangs (>8 min, no log) and the pre-tool hook blocks direct 'python -m unittest tests.tools.test_ca...
 - 2026-11-16 14:18 **S14-22** engineer ask: The authorized test invocation through tools/run.py has hung for over 8 minutes without output or log; direct unittest invocation is blocked by the...
-- 2026-11-16 14:14 **S14-16** lead approve-red: S14-16 has a red test: a synthetic byte decoder written from scratch fails because existing GCC parks scalar integers in mask registers inside its ...
-- 2026-11-16 14:12 **S14-33** lead changes: 1. knc-twin/references/validation.md:303 (and :304): the scatter parameter does not reproduce the rows it was derived from: scatter_all_t1 +128.9%,...
 
 ## Cost
 
 - From the script, engineer: 812 sessions, 1705.1M input tokens
 - From the script, lead: 557 sessions, 156.5M input tokens
-- Started by hand, Claude: 76 sessions, 4461.7M input tokens
+- Started by hand, Claude: 76 sessions, 4462.3M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
