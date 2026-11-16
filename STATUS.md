@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-16 03:01.
+Updated automatically at every ticket change. Last update: 2026-11-16 03:02.
 
-**Waiting for you:** S14-12, S14-15. Run `python tools/pm.py inbox`.
+**Waiting for you:** S14-15. Run `python tools/pm.py inbox`.
 
 Current tickets: `[#################---]` 244 of 279
 
@@ -140,7 +140,7 @@ Current tickets: `[#################---]` 244 of 279
 | S14-09 | KNC vs the Z840 host (dual E5-2690 v3) on the same algorithms and numerical contract - where running on the card actually pays | draft |  |
 | S14-10 | knc-twin: --jobs N for independent simulations and PyPy support (roadmap item 1) | In progress | No worktree needed. Export main's knc-twin into your shared dir: git -c safe.directory='*' archive main knc... |
 | S14-11 | knc-twin: close PhiWeather WRF coverage gaps (jump tables, vcvtps2pd ymm, loop-region and complete-listing modes, scatter and rcp-table import) | In progress | input_tokens 20M -> 30M under the owner's standing auto-extend rule: items A-G are committed and main is me... |
-| S14-12 | knc-twin: iteration and phase sampling for loop and whole-program wall-time estimates (roadmap item 2) | **Waiting for you** | budget: 22731536 input tokens used; the budget is 20000000 |
+| S14-12 | knc-twin: iteration and phase sampling for loop and whole-program wall-time estimates (roadmap item 2) | In progress | input_tokens 20M -> 25M, final: the only remaining step is the submit command the 02:59 answer spells out (... |
 | S14-13 | knc-twin: 8-tile multi-core unit on the full ring with all memory controllers (roadmap item 3) | In progress | (1) Schema: offline, in memory only: s = json.load(kernel.schema.json); s.pop('$id'); jsonschema.Draft7Vali... |
 | S14-14 | knc-twin: scheduling explorer for modulo scheduling and reordering, evaluating S14-02/S14-03 (roadmap item 4) | lead | Review passed (approve note: knc-twin gains a schedule command: beam search up to 60 instructions, list ord... |
 | S14-15 | knc-twin prepare-native: absolute memory operands come out as `N()` in kernel.S (k1om as 2.22 rejects them); emit them relocated into the image | **Waiting for you** | budget: 10651104 input tokens used; the budget is 10000000 |
@@ -304,6 +304,7 @@ Current tickets: `[#################---]` 244 of 279
 
 ## Recent activity
 
+- 2026-11-16 03:02 **S14-12** owner decide: input_tokens 20M -> 25M, final: the only remaining step is the submit command the 02:59 answer spells out (with --override and the three log names)...
 - 2026-11-16 03:01 **S14-18** lead answer: No acceptance edit needed. t0 runs tests/regress/test_*.py (tools/check.py:373), and nothing in tests/acceptance/ references the held-out replay. P...
 - 2026-11-16 03:00 **S14-12** lead escalate: budget: 22731536 input tokens used; the budget is 20000000
 - 2026-11-16 02:59 **S14-18** engineer ask: The ticket requires editing tests/acceptance/, which AGENTS.md explicitly forbids: acceptance requires heldout replay to leave tools/check t0, and ...
@@ -311,13 +312,12 @@ Current tickets: `[#################---]` 244 of 279
 - 2026-11-16 02:58 **S14-12** engineer ask: Submit blocked: 947 changed lines exceeds 800-line budget; no new edits this session. Approve --override for existing implementation? Windows Pytho...
 - 2026-11-16 02:56 **S14-11** owner decide: input_tokens 20M -> 30M under the owner's standing auto-extend rule: items A-G are committed and main is merged; the held-out check (python 3.8 or ...
 - 2026-11-16 02:55 **S14-11** engineer escalate: budget: 20910113 input tokens used; the budget is 20000000
-- 2026-11-16 02:54 **S14-14** lead defer: Review passed (approve note: knc-twin gains a schedule command: beam search up to 60 instructions, list ordering, modulo II, GAS export and frozen-...
 
 ## Cost
 
 - From the script, engineer: 747 sessions, 1617.7M input tokens
 - From the script, lead: 506 sessions, 143.4M input tokens
-- Started by hand, Claude: 14 sessions, 4136.0M input tokens
+- Started by hand, Claude: 14 sessions, 4136.2M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
