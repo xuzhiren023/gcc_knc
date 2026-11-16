@@ -1,10 +1,10 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-16 01:07.
+Updated automatically at every ticket change. Last update: 2026-11-16 02:08.
 
 **Waiting for you:** S14-15. Run `python tools/pm.py inbox`.
 
-Current tickets: `[#################---]` 244 of 277
+Current tickets: `[#################---]` 244 of 279
 
 ## Milestones
 
@@ -15,7 +15,7 @@ Current tickets: `[#################---]` 244 of 277
 | M2 | Useful vector target | Done | 51 of 51 tickets |
 | M3 | Runtimes | Done | 48 of 48 tickets |
 | M4 | Broad optimization | Done | 62 of 65 tickets |
-| M5 | Program corpus | In progress | 0 of 30 tickets |
+| M5 | Program corpus | In progress | 0 of 32 tickets |
 | M6 | Release | Not started | Not planned in detail yet |
 
 ## Tickets
@@ -139,14 +139,16 @@ Current tickets: `[#################---]` 244 of 277
 | S14-08 | Quantized GEMV kernels on KNC - multi-row activation reuse, FP vs int32 VPMADD231D vs VPERMD lookup table, bandwidth-normalized | draft |  |
 | S14-09 | KNC vs the Z840 host (dual E5-2690 v3) on the same algorithms and numerical contract - where running on the card actually pays | draft |  |
 | S14-10 | knc-twin: --jobs N for independent simulations and PyPy support (roadmap item 1) | In progress | No worktree needed. Export main's knc-twin into your shared dir: git -c safe.directory='*' archive main knc... |
-| S14-11 | knc-twin: close PhiWeather WRF coverage gaps (jump tables, vcvtps2pd ymm, loop-region and complete-listing modes, scatter and rcp-table import) | In progress | Yes, run them now: the M4 card block finished 04:20Z and the host limits are lifted. Run tests/regress/test... |
-| S14-12 | knc-twin: iteration and phase sampling for loop and whole-program wall-time estimates (roadmap item 2) | In progress | Skip the rebase: main has no knc-twin or tests/regress change since your base aced5f9d, so the lead merges ... |
-| S14-13 | knc-twin: 8-tile multi-core unit on the full ring with all memory controllers (roadmap item 3) | In progress | input_tokens 20M -> 30M under the owner's standing auto-extend rule (second extension; design note done, st... |
-| S14-14 | knc-twin: scheduling explorer for modulo scheduling and reordering, evaluating S14-02/S14-03 (roadmap item 4) | lead | Needs the interactive lead: merge main (810ff930, adds docs/research/m4-bzip2-diagnosis.md and m4-result.md... |
-| S14-15 | knc-twin prepare-native: absolute memory operands come out as `N()` in kernel.S (k1om as 2.22 rejects them); emit them relocated into the image | **Waiting for you** | budget: 7163819 input tokens used; the budget is 4000000 |
+| S14-11 | knc-twin: close PhiWeather WRF coverage gaps (jump tables, vcvtps2pd ymm, loop-region and complete-listing modes, scatter and rcp-table import) | In progress | Lead merged main into s14/S14-11 (a merge, not a rebase: the worktree cannot create rebase state, and a mer... |
+| S14-12 | knc-twin: iteration and phase sampling for loop and whole-program wall-time estimates (roadmap item 2) | In progress | sessions 6 -> 9 under the owner's standing auto-extend rule: implementation committed, the hpcg-104 questio... |
+| S14-13 | knc-twin: 8-tile multi-core unit on the full ring with all memory controllers (roadmap item 3) | In progress | (1) Schema: offline, in memory only: s = json.load(kernel.schema.json); s.pop('$id'); jsonschema.Draft7Vali... |
+| S14-14 | knc-twin: scheduling explorer for modulo scheduling and reordering, evaluating S14-02/S14-03 (roadmap item 4) | Waiting for review | Green 2e975d5b; main merged at 9b699730. Prior checks: 7 acceptance tests, selftest and trial checks passed... |
+| S14-15 | knc-twin prepare-native: absolute memory operands come out as `N()` in kernel.S (k1om as 2.22 rejects them); emit them relocated into the image | **Waiting for you** | budget: 10651104 input tokens used; the budget is 10000000 |
 | S14-16 | bzip2 slower than GCC 5.1.1: mask-to-GPR move cost below a GPR move makes RA park integers in k registers (M4 known limit, must-fix) | draft |  |
 | S14-17 | Compare not folded with its load in merged return blocks (GCC 16 middle end, about half the remaining bzip2 mainGtU gap) | draft |  |
 | S14-18 | knc-twin regress: held-out replay runs under a 120 s wall-clock budget, so a slow interpreter turns a prediction into a budget_exhausted stub and the test fails as a false mismatch | Not started |  |
+| S14-19 | knc-twin x87 integer-load widths - fildl reads 8 bytes (must be 4), filds reads 4 (must be 2) | Not started |  |
+| S14-20 | knc-twin: an indirect jmp/call (PLT tail call through the GOT) on a never-executed path must not refuse the whole region | Not started |  |
 | S2-01 | Design for zmm and mask registers under -march=knc | Done | The register design for KNC is settled on paper: all 32 zmm and 8 mask registers become usable under -march... |
 | S2-02 | Float and double arguments and results in zmm lane 0 | Done | Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`). |
 | S2-03 | Varargs with the donor's register save area | Done | Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`). |
@@ -302,23 +304,23 @@ Current tickets: `[#################---]` 244 of 277
 
 ## Recent activity
 
-- 2026-11-16 01:07 **S14-15** lead escalate: budget: 7163819 input tokens used; the budget is 4000000
-- 2026-11-16 01:06 **S14-14** lead defer: Needs the interactive lead: merge main (810ff930, adds docs/research/m4-bzip2-diagnosis.md and m4-result.md) into s14/S14-14 so the submit check pa...
-- 2026-11-16 01:05 **S14-15** lead answer: (1) Raw numeric disp(%rip) is out of scope: it is instruction-relative, not absolute, and the parser correctly rejects it. Drop that case. The rip ...
-- 2026-11-16 01:02 **S14-14** engineer ask: Green 2e975d5b; 7 acceptance pass, selftest/trial pass. Authorized predict_case(s12-31-hpcg-104), once, 16 min: all 8 variants hit 120s budget_exha...
-- 2026-11-16 01:01 **S14-15** engineer ask: The new regression still fails after repeated attempts: raw numeric disp(%rip) parsing currently exits with 8() in kernel.S; the parser's rip-relat...
-- 2026-11-16 00:51 **S14-13** owner decide: input_tokens 20M -> 30M under the owner's standing auto-extend rule (second extension; design note done, staging and submit remain). If the next se...
-- 2026-11-16 00:50 **S14-13** engineer escalate: budget: 20776413 input tokens used; the budget is 20000000
-- 2026-11-16 00:49 **S14-13** owner decide: sessions 6 -> 9 under the owner's standing auto-extend rule: the design note is reviewed, staging and submit remain; next extension only if a sessi...
+- 2026-11-16 02:07 **S14-14** engineer submit: Green 2e975d5b; main merged at 9b699730. Prior checks: 7 acceptance tests, selftest and trial checks passed. Held-out check passed: Windows Python ...
+- 2026-11-16 02:05 **S14-15** lead escalate: budget: 10651104 input tokens used; the budget is 10000000
+- 2026-11-16 02:00 **S14-15** lead answer: Do both on the branch, no review rerun: (1) Merge-main: git merge main into s14/S14-15 (a merge commit, not a rebase of main); resolve any conflict...
+- 2026-11-16 01:57 **S14-15** engineer ask: Submit refused: branch lacks changes from main and no [red] test commit. Lead review required five edits; completed them and committed d450ff6e (se...
+- 2026-11-16 01:52 **S14-12** owner decide: sessions 6 -> 9 under the owner's standing auto-extend rule: implementation committed, the hpcg-104 question is answered (S14-18), held-out check a...
+- 2026-11-16 01:51 **S14-12** engineer escalate: budget: 6 engineer sessions used; the budget is 6
+- 2026-11-16 01:50 **S14-12** lead answer: Reproduced on main at 890ac9b4 by the lead: under Cygwin Python 3.12 all eight s12-31-hpcg-104 variants come back budget_exhausted at predict_case'...
+- 2026-11-16 01:49 **S14-15** owner decide: sessions 6 -> 8 (final extension): the lead review above lists five concrete changes; two sessions are enough for them and the submit. If not submi...
 
 ## Cost
 
-- From the script, engineer: 735 sessions, 1586.0M input tokens
-- From the script, lead: 499 sessions, 141.9M input tokens
-- Started by hand, Claude: 14 sessions, 4096.0M input tokens
+- From the script, engineer: 744 sessions, 1609.4M input tokens
+- From the script, lead: 503 sessions, 142.7M input tokens
+- Started by hand, Claude: 14 sessions, 4127.4M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 40.7 GiB of 100 GiB. 80 GiB free on the drive.
+The project uses 40.7 GiB of 100 GiB. 75 GiB free on the drive.
