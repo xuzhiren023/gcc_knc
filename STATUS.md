@@ -1,10 +1,10 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-16 18:32.
+Updated automatically at every ticket change. Last update: 2026-11-16 18:49.
 
-**Next: the tech lead, on S14-26.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: GPT-6.1, on S14-10 (knc-twin: --jobs N for independent simulations and PyPy support (roadmap item 1)).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
-Current tickets: `[#################---]` 259 of 297
+Current tickets: `[#################---]` 260 of 297
 
 ## Milestones
 
@@ -15,7 +15,7 @@ Current tickets: `[#################---]` 259 of 297
 | M2 | Useful vector target | Done | 51 of 51 tickets |
 | M3 | Runtimes | Done | 48 of 48 tickets |
 | M4 | Broad optimization | Done | 63 of 65 tickets |
-| M5 | Program corpus | In progress | 14 of 50 tickets |
+| M5 | Program corpus | In progress | 15 of 50 tickets |
 | M6 | Release | Not started | Not planned in detail yet |
 
 ## Tickets
@@ -154,7 +154,7 @@ Current tickets: `[#################---]` 259 of 297
 | S14-23 | knc-twin: import the window-10 scatter rows (2 threads) and settle occupancy.scatter_cycles_per_line | Done | superseded by S14-33, which carries this ticket's committed work (wip 8d846ffe cherry-picked onto s14/S14-3... |
 | S14-24 | dispatch: refuse a session up front when its worktree git dir or ticket file is not writable from the sandbox | Not started |  |
 | S14-25 | knc-twin: recorded outputs carry absolute host paths (C:/Users/<name>/...); write repo-relative paths and scrub the committed records | Not started |  |
-| S14-26 | knc-twin bound for software pipelining - how much could overlapping iterations gain on the M4 hot loops (go/no-go for S14-02) | Waiting for review | lead approves |
+| S14-26 | knc-twin bound for software pipelining - how much could overlapping iterations gain on the M4 hot loops (go/no-go for S14-02) | Done | SMS bound: no-go for S14-02; five of six M4 hot loops are resource-bound at ResMII, only CG has headroom. M... |
 | S14-27 | knc-twin bounds: the dependency critical path charges cold lines their full miss latency, so the "lower bound" can exceed the simulation | Not started |  |
 | S14-28 | knc-twin ranking of the four quantized GEMV kernel forms on one KNC core (phase 0 of S14-08) | Not started |  |
 | S14-29 | knc-twin: schedule --block ADDR..ADDR for a straight-line block inside a function, and batch must not write a native request per candidate by default | Not started |  |
@@ -322,6 +322,7 @@ Current tickets: `[#################---]` 259 of 297
 
 ## Recent activity
 
+- 2026-11-16 18:49 **S14-26** lead approve: SMS bound: no-go for S14-02; five of six M4 hot loops are resource-bound at ResMII, only CG has headroom. Machine check: tools/check t0 passed.
 - 2026-11-16 18:32 **S14-26** lead resume: lead approves
 - 2026-11-16 18:31 **S14-42** lead approve: Any agent in any project can now install the knc-optimize skill, which walks through tuning code for the Xeon Phi card step by step and gives each ...
 - 2026-11-16 18:03 **S14-16** lead defer: GCC build needed: build gcc16 at .work/_shared/gcc 407f1c63cc7 (branch s14/S14-16; one-hunk change, i386-knc.cc mask_to_integer/integer_to_mask 1->...
@@ -329,16 +330,15 @@ Current tickets: `[#################---]` 259 of 297
 - 2026-11-16 17:51 **S13-03** lead defer: Review passed, approve with the note: 'The M4 retrospective is written (docs/research/m4-retrospective.md): it ranks where time was lost, settles a...
 - 2026-11-16 17:50 **S14-42** engineer submit: knc-optimize is a portable skill that tells any agent how to tune code for the Xeon Phi card, step by step, with each Intel practice checked agains...
 - 2026-11-16 17:42 **S14-16** engineer ask: GCC build needed at 407f1c63cc7 (lane gcc). Both GPR/mask costs raised 1->6; mask moves/memory unchanged. Baseline: all 16 mask/gather T1 tests pas...
-- 2026-11-16 17:29 **S14-42** lead answer: Yes, use the override; remove nothing. The 1090 lines are docs and skill text plus the 228-line test, which this ticket asked for, and the owner's ...
 
 ## Cost
 
 - From the script, engineer: 818 sessions, 1720.9M input tokens
 - From the script, lead: 564 sessions, 157.6M input tokens
-- Started by hand, Claude: 103 sessions, 4601.2M input tokens
+- Started by hand, Claude: 106 sessions, 4618.5M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 42.3 GiB of 100 GiB. 34 GiB free on the drive.
+The project uses 42.7 GiB of 100 GiB. 33 GiB free on the drive.
