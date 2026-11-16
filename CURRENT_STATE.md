@@ -96,6 +96,23 @@ M5 definition frozen: ADR-0016 accepted by the owner 2026-11-16 15:15 EST (A 1.2
 
 ## Not proven yet
 
+- knc-optimize installed at ~/.claude/skills/knc-optimize/ (2026-11-16 18:14 EST, from the reviewed S14-42 branch
+  e7b4956c; approve to main still running). knc-boinc asked (owner request) to optimize MilkyWay N-body toward a
+  1-2 TFLOPS GPU's time-to-solution with knc-optimize and knc-twin, Model table first, batched card windows via the lead.
+  Owner 18:25 EST: time-critical; knc-boinc must not run the unoptimized task; optimize first, check candidates in window 12,
+  run the BOINC task only with a build faster than the host CPU, else skip it at the 02:59Z cap.
+- S14-22 waits on the lead: tools/run.py hangs (>8 min, no log) on tests.tools.test_card_turn/test_card_run and the
+  engineer hook blocks running them directly. Investigate after window 12 closes (the tests may touch card locks).
+  S14-26 and S13-03: lead merged main into their branches and answered; engineers submit next (review approve-ready).
+- Window 13 approved by the owner 2026-11-16 16:27 EST ("yes approved run these without asking me"): PhiWeather's
+  rk_update_scalar n=8 objects B0/P2/P0/S0 at 1 and 2 contexts (issue #32, twin T1-09), after window 12 closes.
+  Twin session rebuilds them into `.work/_shared/calib-w13/wrf-n8/`; the lead writes run-list-w13.txt and runs it.
+  Status 16:40 EST: only S0-1ctx/2ctx build; the six masked/P0 objects wait on twin T1-11 (generator: %k label prefix
+  on jknzd, {rn} suffix instead of leading {rn-sae}). Lead decision: hold window 13 until all eight build, so the four
+  settings are compared in one window.
+  16:55 EST: all eight build (T1-11) and lint clean. Lead decision: run them inside window 12, after the two sixth_*
+  probes and before knc-boinc (appended to run-list-w12.txt; copy in calib-w13/run-list-w13.txt), so they keep the
+  queue place a separate window would lose; about 15 min added before knc-boinc.
 - knc-twin tree left gcc_knc main at a1734baa (twin session). `tests/regress/test_knc_twin.py` reads `../knc-twin`
   (KNC_TWIN_ROOT overrides) and **fails, not skips, when the sibling is absent**: a fresh public clone fails t0. Fix it
   before the M5 Linux-host build check (ADR-0016 rule 5). S14-42 (knc-optimize skill, owner request) dispatched, lane skill.
