@@ -1,10 +1,10 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-16 01:22.
+Updated automatically at every ticket change. Last update: 2026-11-16 01:27.
 
 **Next: the tech lead, on S13-01.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
-Current tickets: `[#################---]` 244 of 277
+Current tickets: `[#################---]` 244 of 278
 
 ## Milestones
 
@@ -15,7 +15,7 @@ Current tickets: `[#################---]` 244 of 277
 | M2 | Useful vector target | Done | 51 of 51 tickets |
 | M3 | Runtimes | Done | 48 of 48 tickets |
 | M4 | Broad optimization | Done | 62 of 65 tickets |
-| M5 | Program corpus | In progress | 0 of 30 tickets |
+| M5 | Program corpus | In progress | 0 of 31 tickets |
 | M6 | Release | Not started | Not planned in detail yet |
 
 ## Tickets
@@ -143,10 +143,11 @@ Current tickets: `[#################---]` 244 of 277
 | S14-12 | knc-twin: iteration and phase sampling for loop and whole-program wall-time estimates (roadmap item 2) | In progress | Skip the rebase: main has no knc-twin or tests/regress change since your base aced5f9d, so the lead merges ... |
 | S14-13 | knc-twin: 8-tile multi-core unit on the full ring with all memory controllers (roadmap item 3) | In progress | input_tokens 20M -> 30M under the owner's standing auto-extend rule (second extension; design note done, st... |
 | S14-14 | knc-twin: scheduling explorer for modulo scheduling and reordering, evaluating S14-02/S14-03 (roadmap item 4) | In progress | Merged main into s14/S14-14 (9b699730, no conflicts), so the submit check passes. The 120 s budget_exhauste... |
-| S14-15 | knc-twin prepare-native: absolute memory operands come out as `N()` in kernel.S (k1om as 2.22 rejects them); emit them relocated into the image | In progress | input_tokens 4M -> 10M under the owner's standing auto-extend rule (second extension; red tests exist, both... |
+| S14-15 | knc-twin prepare-native: absolute memory operands come out as `N()` in kernel.S (k1om as 2.22 rejects them); emit them relocated into the image | Question for the tech lead | The end-to-end validated-shape rollup fixture remains unvalidated because its test kernels model zero dynam... |
 | S14-16 | bzip2 slower than GCC 5.1.1: mask-to-GPR move cost below a GPR move makes RA park integers in k registers (M4 known limit, must-fix) | draft |  |
 | S14-17 | Compare not folded with its load in merged return blocks (GCC 16 middle end, about half the remaining bzip2 mainGtU gap) | draft |  |
 | S14-18 | knc-twin regress: held-out replay runs under a 120 s wall-clock budget, so a slow interpreter turns a prediction into a budget_exhausted stub and the test fails as a false mismatch | Not started |  |
+| S14-19 | knc-twin x87 integer-load widths - fildl reads 8 bytes (must be 4), filds reads 4 (must be 2) | draft |  |
 | S2-01 | Design for zmm and mask registers under -march=knc | Done | The register design for KNC is settled on paper: all 32 zmm and 8 mask registers become usable under -march... |
 | S2-02 | Float and double arguments and results in zmm lane 0 | Done | Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`). |
 | S2-03 | Varargs with the donor's register save area | Done | Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`). |
@@ -302,6 +303,7 @@ Current tickets: `[#################---]` 244 of 277
 
 ## Recent activity
 
+- 2026-11-16 01:26 **S14-15** engineer ask: The end-to-end validated-shape rollup fixture remains unvalidated because its test kernels model zero dynamic instructions and do not produce candi...
 - 2026-11-16 01:13 **S14-15** owner decide: input_tokens 4M -> 10M under the owner's standing auto-extend rule (second extension; red tests exist, both answers are on the ticket, implement gr...
 - 2026-11-16 01:10 **S14-14** lead answer: Merged main into s14/S14-14 (9b699730, no conflicts), so the submit check passes. The 120 s budget_exhausted regress run is S14-18, not your defect...
 - 2026-11-16 01:09 **S14-14** lead resume: interactive lead merged main into s14/S14-14 (9b699730, no conflicts); continue: held-out check per the 05:55Z note, then submit
@@ -309,16 +311,15 @@ Current tickets: `[#################---]` 244 of 277
 - 2026-11-16 01:06 **S14-14** lead defer: Needs the interactive lead: merge main (810ff930, adds docs/research/m4-bzip2-diagnosis.md and m4-result.md) into s14/S14-14 so the submit check pa...
 - 2026-11-16 01:05 **S14-15** lead answer: (1) Raw numeric disp(%rip) is out of scope: it is instruction-relative, not absolute, and the parser correctly rejects it. Drop that case. The rip ...
 - 2026-11-16 01:02 **S14-14** engineer ask: Green 2e975d5b; 7 acceptance pass, selftest/trial pass. Authorized predict_case(s12-31-hpcg-104), once, 16 min: all 8 variants hit 120s budget_exha...
-- 2026-11-16 01:01 **S14-15** engineer ask: The new regression still fails after repeated attempts: raw numeric disp(%rip) parsing currently exits with 8() in kernel.S; the parser's rip-relat...
 
 ## Cost
 
-- From the script, engineer: 736 sessions, 1586.0M input tokens
+- From the script, engineer: 737 sessions, 1588.0M input tokens
 - From the script, lead: 499 sessions, 141.9M input tokens
-- Started by hand, Claude: 14 sessions, 4097.6M input tokens
+- Started by hand, Claude: 14 sessions, 4100.3M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 40.7 GiB of 100 GiB. 75 GiB free on the drive.
+The project uses 40.7 GiB of 100 GiB. 76 GiB free on the drive.
