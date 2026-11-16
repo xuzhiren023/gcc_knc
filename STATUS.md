@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-16 12:49.
+Updated automatically at every ticket change. Last update: 2026-11-16 12:50.
 
-**Next: the tech lead, on S14-33.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: GPT-6.1, on S14-10 (knc-twin: --jobs N for independent simulations and PyPy support (roadmap item 1)).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
 Current tickets: `[#################---]` 255 of 296
 
@@ -160,7 +160,7 @@ Current tickets: `[#################---]` 255 of 296
 | S14-29 | knc-twin: schedule --block ADDR..ADDR for a straight-line block inside a function, and batch must not write a native request per candidate by default | Not started |  |
 | S14-30 | WRF built with GCC-KNC runs 1.21x slower per step than PhiWeather's production build - attribute the gap per cause before fixing (M5, owner rule) | draft |  |
 | S14-31 | knc-twin multi-core usability: compare across scales, stubs and repeated calls at unit/ring scale, multi-context sampling, separated ring/memory stall shares | Not started |  |
-| S14-33 | knc-twin: import the window-11 calibration rows (imci-math latency and throughput, div10, x87 fcoms, rcp23/rsqrt23 tables) and retire the assumed parameters they settle | Question for the tech lead | lead committed the green |
+| S14-33 | knc-twin: import the window-11 calibration rows (imci-math latency and throughput, div10, x87 fcoms, rcp23/rsqrt23 tables) and retire the assumed parameters they settle | In progress | Green committed by the lead (static catalog replay). Guidance from the review: rsqrt23: the card capture is... |
 | S14-35 | knc-twin prepare-native: the generated native program for PhiWeather's sixth_order_diffusion kernels segfaults on the card (exit 139 under claude-pin); find the cause, fix the generator, restage | Done | knc-twin prepare-native runs each kernel on its own stack (the kernel's in-image stack, or a private per-co... |
 | S14-37 | knc-twin x87 double rounding: _x87_binop rounds to the 64-bit significand and then to PC=53/24; real x87 rounds once (knc-boinc repro, 1 to 8 ULP errors) | Not started |  |
 | S14-38 | Card and twin dashboard - running card job, card queue and running twin work with remaining time, card temperature and utilization, host CPU, refreshed every 5 minutes | Done | A local dashboard (python tools/knc_dashboard.py serve) now shows the running card job, the card queue and ... |
@@ -321,6 +321,7 @@ Current tickets: `[#################---]` 255 of 296
 
 ## Recent activity
 
+- 2026-11-16 12:50 **S14-33** lead answer: Green committed by the lead (static catalog replay). Guidance from the review: rsqrt23: the card capture is right and the checker is wrong (inputs ...
 - 2026-11-16 12:49 **S14-33** lead resume: lead committed the green
 - 2026-11-16 12:48 **S14-33** lead defer: Lead: commit knc-twin/scripts/validate_heldout.py [green] (log S14_33_catalog_green-20261116-124536), then resume. rsqrt23: card is right, checker ...
 - 2026-11-16 12:46 **S14-33** engineer ask: Commit knc-twin/scripts/validate_heldout.py: static catalog replay green (3 tests). Log .work/_state/logs/S14_33_catalog_green-20261116-124536.log....
@@ -328,13 +329,12 @@ Current tickets: `[#################---]` 255 of 296
 - 2026-11-16 12:42 **S14-33** lead resume: lead committed the red test. Denominator correction from the scripted lead's check stands: the unrolled body has 32 vscatterdps, so the per-instruc...
 - 2026-11-16 12:40 **S14-33** lead defer: Interactive lead: commit knc-twin/tests/test_catalog_calibration.py in worktree S14-33 as 'test(S14-33): require static catalog replay [red]' (log ...
 - 2026-11-16 12:39 **S14-33** engineer ask: Please commit knc-twin/tests/test_catalog_calibration.py as test(S14-33): require static catalog replay [red] before implementation (12:35 lead wor...
-- 2026-11-16 12:35 **S14-33** lead answer: Lead cherry-picked 8d846ffe (the S14-23 wip: converter, w10 scatter measurements t1/t2/t4, kernels, case, tests) onto s14/S14-33 in your worktree. ...
 
 ## Cost
 
 - From the script, engineer: 798 sessions, 1671.2M input tokens
 - From the script, lead: 544 sessions, 153.3M input tokens
-- Started by hand, Claude: 33 sessions, 4359.8M input tokens
+- Started by hand, Claude: 33 sessions, 4360.4M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
