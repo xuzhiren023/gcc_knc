@@ -2,10 +2,10 @@ Historical initial T0-T2 run below: initial T0/T1 adapter failures are supersede
 by the full wrapper rerun results at the end. T2 passed in this initial run.
 
 Compiler: k1om-mpss-linux-gcc (GCC) 16.2.0
-Compiler ld: /cygdrive/c/Users/xuzhi/Documents/gcc_knc/.work/_shared/toolchain/cross/bin/k1om-mpss-linux-ld
-Compiler as: /cygdrive/c/Users/xuzhi/Documents/gcc_knc/.work/_shared/toolchain/cross/bin/k1om-mpss-linux-as
+Compiler ld: .work/_shared/toolchain/cross/bin/k1om-mpss-linux-ld
+Compiler as: .work/_shared/toolchain/cross/bin/k1om-mpss-linux-as
 Flags: -O2 -ftree-vectorize -ffp-contract=off / fast; separate driver translation unit
-T2 ABI reference: /cygdrive/c/Users/xuzhi/Documents/gcc_knc/.work/_shared/toolchain/sysroot (no native card execution in t0-t2)
+T2 ABI reference: .work/_shared/toolchain/sysroot (no native card execution in t0-t2)
 FAIL t0 tests/regress/test_*.py: command /usr/bin/python3.12.exe -m unittest discover -s tests/regress -p test_*.py exited 1: estimate=6 bits: runs=8322 s_inexact=0 eg_inexact=0 g1_unfaithful=0 g1_not_RN=78 d_inexact=4 fail RN=1 RD=0 RU=0 RZ=0 inexact_flag_wrong=0
 S2 sqrt p=14 estimate=7 bits: runs=33026 s_inexact=0 eg_inexact=0 g1_unfaithful=0 g1_not_RN=151 d_inexact=9 fail RN=1 RD=0 RU=0 RZ=0 inexact_flag_wrong=0
 S2 sqrt p=16 estimate=8 bits: runs=131586 s_inexact=0 eg_inexact=0 g1_unfaithful=0 g1_not_RN=301 d_inexact=12 fail RN=1 RD=0 RU=0 RZ=0 inexact_flag_wrong=0
@@ -23,13 +23,13 @@ div_blend=1 sqrt_blend=0 failures=2057
 ERROR: test_fake_t1_t2_with_old_destinations_unwritable (test_check_outputs.CheckOutputs.test_fake_t1_t2_with_old_destinations_unwritable)
 ----------------------------------------------------------------------
 Traceback (most recent call last):
-  File "/cygdrive/c/Users/xuzhi/Documents/gcc_knc/.work/S12-09/tests/regress/test_check_outputs.py", line 126, in test_fake_t1_t2_with_old_destinations_unwritable
+  File ".work/S12-09/tests/regress/test_check_outputs.py", line 126, in test_fake_t1_t2_with_old_destinations_unwritable
     runner.t1()
-  File "/cygdrive/c/Users/xuzhi/Documents/gcc_knc/.work/S12-09/tools/check.py", line 432, in t1
+  File ".work/S12-09/tools/check.py", line 432, in t1
     affine_fortran.t1(self)
-  File "/cygdrive/c/Users/xuzhi/Documents/gcc_knc/.work/S12-09/tools/affine_fortran.py", line 52, in t1
+  File ".work/S12-09/tools/affine_fortran.py", line 52, in t1
     compile_object(runner, mode, scan=True)
-  File "/cygdrive/c/Users/xuzhi/Documents/gcc_knc/.work/S12-09/tools/affine_fortran.py", line 12, in compile_object
+  File ".work/S12-09/tools/affine_fortran.py", line 12, in compile_object
     compiler = runner.cc.with_name(runner.cc.name.replace('gcc', 'gfortran')) if runner.args.cc else runner.cc.with_name('gfortran')
                                                                                  ^^^^^^^^^^^^^^
 AttributeError: 'types.SimpleNamespace' object has no attribute 'cc'
@@ -388,64 +388,64 @@ PASS t1 affine Fortran fast assembly --march=k1om
 PASS t1 affine Fortran fast knc_lint
 PASS t1 affine Fortran fast vectorization
 PASS t2 V16HI hidden result pointer
-T2 link trace: /cygdrive/c/Users/xuzhi/Documents/gcc_knc/.work/_shared/toolchain/sysroot/lib64/libc.so.6
-T2 link trace: /cygdrive/c/Users/xuzhi/Documents/gcc_knc/.work/_shared/toolchain/sysroot/lib64/ld-linux-k1om.so.2
+T2 link trace: .work/_shared/toolchain/sysroot/lib64/libc.so.6
+T2 link trace: .work/_shared/toolchain/sysroot/lib64/ld-linux-k1om.so.2
 PASS t2 ELF machine and interpreter
 PASS t2 symbol versions against card sysroot
 PASS t2 knc-short-vector -O2 GCC16 caller / donor callee
-T2 link trace: /cygdrive/c/Users/xuzhi/Documents/gcc_knc/.work/_shared/toolchain/sysroot/lib64/libc.so.6
-T2 link trace: /cygdrive/c/Users/xuzhi/Documents/gcc_knc/.work/_shared/toolchain/sysroot/lib64/ld-linux-k1om.so.2
+T2 link trace: .work/_shared/toolchain/sysroot/lib64/libc.so.6
+T2 link trace: .work/_shared/toolchain/sysroot/lib64/ld-linux-k1om.so.2
 PASS t2 ELF machine and interpreter
 PASS t2 symbol versions against card sysroot
 PASS t2 knc-short-vector -O2 donor caller / GCC16 callee
-T2 link trace: /cygdrive/c/Users/xuzhi/Documents/gcc_knc/.work/_shared/toolchain/sysroot/lib64/libc.so.6
-T2 link trace: /cygdrive/c/Users/xuzhi/Documents/gcc_knc/.work/_shared/toolchain/sysroot/lib64/ld-linux-k1om.so.2
+T2 link trace: .work/_shared/toolchain/sysroot/lib64/libc.so.6
+T2 link trace: .work/_shared/toolchain/sysroot/lib64/ld-linux-k1om.so.2
 PASS t2 ELF machine and interpreter
 PASS t2 symbol versions against card sysroot
 PASS t2 knc-vecarg caller -O0 / callee -O2
-T2 link trace: /cygdrive/c/Users/xuzhi/Documents/gcc_knc/.work/_shared/toolchain/sysroot/lib64/libc.so.6
-T2 link trace: /cygdrive/c/Users/xuzhi/Documents/gcc_knc/.work/_shared/toolchain/sysroot/lib64/ld-linux-k1om.so.2
+T2 link trace: .work/_shared/toolchain/sysroot/lib64/libc.so.6
+T2 link trace: .work/_shared/toolchain/sysroot/lib64/ld-linux-k1om.so.2
 PASS t2 ELF machine and interpreter
 PASS t2 symbol versions against card sysroot
 PASS t2 knc-vecarg caller -O2 / callee -O0
-T2 link trace: /cygdrive/c/Users/xuzhi/Documents/gcc_knc/.work/_shared/toolchain/sysroot/lib64/libc.so.6
-T2 link trace: /cygdrive/c/Users/xuzhi/Documents/gcc_knc/.work/_shared/toolchain/sysroot/lib64/ld-linux-k1om.so.2
+T2 link trace: .work/_shared/toolchain/sysroot/lib64/libc.so.6
+T2 link trace: .work/_shared/toolchain/sysroot/lib64/ld-linux-k1om.so.2
 PASS t2 ELF machine and interpreter
 PASS t2 symbol versions against card sysroot
 PASS t2 knc-scalar-abi -O2 GCC16 caller / donor callee
-T2 link trace: /cygdrive/c/Users/xuzhi/Documents/gcc_knc/.work/_shared/toolchain/sysroot/lib64/libc.so.6
-T2 link trace: /cygdrive/c/Users/xuzhi/Documents/gcc_knc/.work/_shared/toolchain/sysroot/lib64/ld-linux-k1om.so.2
+T2 link trace: .work/_shared/toolchain/sysroot/lib64/libc.so.6
+T2 link trace: .work/_shared/toolchain/sysroot/lib64/ld-linux-k1om.so.2
 PASS t2 ELF machine and interpreter
 PASS t2 symbol versions against card sysroot
 PASS t2 knc-scalar-abi -O2 donor caller / GCC16 callee
-T2 link trace: /cygdrive/c/Users/xuzhi/Documents/gcc_knc/.work/_shared/toolchain/sysroot/lib64/libc.so.6
-T2 link trace: /cygdrive/c/Users/xuzhi/Documents/gcc_knc/.work/_shared/toolchain/sysroot/lib64/ld-linux-k1om.so.2
+T2 link trace: .work/_shared/toolchain/sysroot/lib64/libc.so.6
+T2 link trace: .work/_shared/toolchain/sysroot/lib64/ld-linux-k1om.so.2
 PASS t2 ELF machine and interpreter
 PASS t2 symbol versions against card sysroot
 PASS t2 knc-abi-gaps -O0 GCC16 caller / donor callee
-T2 link trace: /cygdrive/c/Users/xuzhi/Documents/gcc_knc/.work/_shared/toolchain/sysroot/lib64/libc.so.6
-T2 link trace: /cygdrive/c/Users/xuzhi/Documents/gcc_knc/.work/_shared/toolchain/sysroot/lib64/ld-linux-k1om.so.2
+T2 link trace: .work/_shared/toolchain/sysroot/lib64/libc.so.6
+T2 link trace: .work/_shared/toolchain/sysroot/lib64/ld-linux-k1om.so.2
 PASS t2 ELF machine and interpreter
 PASS t2 symbol versions against card sysroot
 PASS t2 knc-abi-gaps -O0 donor caller / GCC16 callee
-T2 link trace: /cygdrive/c/Users/xuzhi/Documents/gcc_knc/.work/_shared/toolchain/sysroot/lib64/libc.so.6
-T2 link trace: /cygdrive/c/Users/xuzhi/Documents/gcc_knc/.work/_shared/toolchain/sysroot/lib64/ld-linux-k1om.so.2
+T2 link trace: .work/_shared/toolchain/sysroot/lib64/libc.so.6
+T2 link trace: .work/_shared/toolchain/sysroot/lib64/ld-linux-k1om.so.2
 PASS t2 ELF machine and interpreter
 PASS t2 symbol versions against card sysroot
 PASS t2 knc-abi-gaps -O2 GCC16 caller / donor callee
-T2 link trace: /cygdrive/c/Users/xuzhi/Documents/gcc_knc/.work/_shared/toolchain/sysroot/lib64/libc.so.6
-T2 link trace: /cygdrive/c/Users/xuzhi/Documents/gcc_knc/.work/_shared/toolchain/sysroot/lib64/ld-linux-k1om.so.2
+T2 link trace: .work/_shared/toolchain/sysroot/lib64/libc.so.6
+T2 link trace: .work/_shared/toolchain/sysroot/lib64/ld-linux-k1om.so.2
 PASS t2 ELF machine and interpreter
 PASS t2 symbol versions against card sysroot
 PASS t2 knc-abi-gaps -O2 donor caller / GCC16 callee
-T2 link trace: /cygdrive/c/Users/xuzhi/Documents/gcc_knc/.work/_shared/toolchain/sysroot/lib64/libc.so.6
-T2 link trace: /cygdrive/c/Users/xuzhi/Documents/gcc_knc/.work/_shared/toolchain/sysroot/lib64/ld-linux-k1om.so.2
+T2 link trace: .work/_shared/toolchain/sysroot/lib64/libc.so.6
+T2 link trace: .work/_shared/toolchain/sysroot/lib64/ld-linux-k1om.so.2
 PASS t2 ELF machine and interpreter
 PASS t2 symbol versions against card sysroot
 PASS t2 affine Fortran driver and runtime-free link
 T2 affine ABI cross-check: donor-built driver, GCC 16 loops
-T2 link trace: /cygdrive/c/Users/xuzhi/Documents/gcc_knc/.work/_shared/toolchain/sysroot/lib64/libc.so.6
-T2 link trace: /cygdrive/c/Users/xuzhi/Documents/gcc_knc/.work/_shared/toolchain/sysroot/lib64/ld-linux-k1om.so.2
+T2 link trace: .work/_shared/toolchain/sysroot/lib64/libc.so.6
+T2 link trace: .work/_shared/toolchain/sysroot/lib64/ld-linux-k1om.so.2
 PASS t2 ELF machine and interpreter
 PASS t2 symbol versions against card sysroot
 Elapsed: 1164.12 seconds

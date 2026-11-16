@@ -4,7 +4,7 @@
 
 This is S11-22's read-only review, dated 2026-11-12. No build, test suite or card job was run. Direct inspection covered the requested scripts, training plans and all 34 retained gcda files; the compiler was queried with `-v` only. Native outcomes below are attributed to PhiWeather's records. `pgo-01/AB_RESULT.md` was absent at inspection, so the early timing pair is **ticket-supplied**, not independently recovered. RESULT section 8 supersedes its earlier prospective text and obsolete gcno-reference description.
 
-Source notation (paths in the PhiWeather tree, `C:/Users/xuzhi/Documents/PhiWeather`):
+Source notation (paths in the PhiWeather tree, `<PhiWeather>`):
 
 - **L**: `docs/implementation/PGO_KNC_LESSONS_20261112.md`, cited by section.
 - **R**: `artifacts/test-state/claude-mentor-performance-20261105/pgo-01/RESULT.md`, cited by section.

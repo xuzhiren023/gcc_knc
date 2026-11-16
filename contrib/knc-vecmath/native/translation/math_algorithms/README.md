@@ -73,11 +73,11 @@ failed attempts are retained separately. Each run writes its own
 `experiment.json`, not a public G5 receipt.
 
 ```powershell
-& 'C:/Users/xuzhi/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe' scripts/Check-HostExpf.py
-& 'C:/Users/xuzhi/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe' scripts/Check-HostLogf.py
-& 'C:/Users/xuzhi/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe' scripts/Check-HostExp.py
-& 'C:/Users/xuzhi/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe' scripts/Check-HostLog.py
-& 'C:/Users/xuzhi/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe' -m unittest discover -s tests -p 'test_host_*py'
+& '~/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe' scripts/Check-HostExpf.py
+& '~/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe' scripts/Check-HostLogf.py
+& '~/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe' scripts/Check-HostExp.py
+& '~/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe' scripts/Check-HostLog.py
+& '~/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe' -m unittest discover -s tests -p 'test_host_*py'
 ```
 
 The first expf experiment retained at

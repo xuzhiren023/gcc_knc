@@ -75,7 +75,7 @@ Published results establish hypotheses and experiment design. They are not inter
 
 ### 4.1 GCC 5.1.1 K1OM source
 
-The local checkout points to [apc-llc/gcc-5.1.1-knc](https://github.com/apc-llc/gcc-5.1.1-knc), whose README identifies MPSS 3.6.1 origins. It is a third-party repository preserving source, not Intel's current compiler. The project's [source lock](/C:/Users/xuzhi/Documents/PhiWeather/native/toolchains/gcc-knc-lra.lock.json) records commit `af7cc04cef723da3166f0d6f1539f02525fe5a93` for the examined candidate work.
+The local checkout points to [apc-llc/gcc-5.1.1-knc](https://github.com/apc-llc/gcc-5.1.1-knc), whose README identifies MPSS 3.6.1 origins. It is a third-party repository preserving source, not Intel's current compiler. The project's [source lock](/<PhiWeather>/native/toolchains/gcc-knc-lra.lock.json) records commit `af7cc04cef723da3166f0d6f1539f02525fe5a93` for the examined candidate work.
 
 The target is distributed across the i386 backend. A small `knc.md` file is not the complete implementation or a credible estimate of porting effort.
 
@@ -87,15 +87,15 @@ The target is distributed across the i386 backend. A small `knc.md` file is not 
 | `constraints.md`, `i386.opt` | Register constraints and target options | Audit interaction with reloads, masks and modern feature selection |
 | Intrinsic headers/builtins | Existing user-facing operations and expansion recipes | Separate intrinsic acceptance from ordinary-loop automatic vectorization |
 
-Source entry points: [local compiler README](/C:/Users/xuzhi/Documents/PhiWeather/.tools/knc-bootstrap/gcc-source/README.md), [KNC patterns](/C:/Users/xuzhi/Documents/PhiWeather/.tools/knc-bootstrap/gcc-source/gcc/config/i386/knc.md), [i386 backend](/C:/Users/xuzhi/Documents/PhiWeather/.tools/knc-bootstrap/gcc-source/gcc/config/i386/i386.c), [K1OM configuration](/C:/Users/xuzhi/Documents/PhiWeather/.tools/knc-bootstrap/gcc-source/gcc/config/i386/linuxk1om.h).
+Source entry points: [local compiler README](/<PhiWeather>/.tools/knc-bootstrap/gcc-source/README.md), [KNC patterns](/<PhiWeather>/.tools/knc-bootstrap/gcc-source/gcc/config/i386/knc.md), [i386 backend](/<PhiWeather>/.tools/knc-bootstrap/gcc-source/gcc/config/i386/i386.c), [K1OM configuration](/<PhiWeather>/.tools/knc-bootstrap/gcc-source/gcc/config/i386/linuxk1om.h).
 
 The README's split compilation example is informative: intrinsic code and ordinary scalar code do not travel safely through every advertised flag combination. It is not proof of a complete automatic vectorizer. The README's sample disabling libgomp is also not evidence that KNC or gfortran cannot support OpenMP; PhiWeather already runs that combination.
 
-The [secondary-move reload repair](/C:/Users/xuzhi/Documents/PhiWeather/native/patches/gcc-knc/0002-preserve-secondary-move-address-reloads.patch) captures another valuable lesson. A deleted original move could lose address-reload work and leave an address pseudo uninitialized. Preserve the reproducer and failure mechanism. A patch to GCC 5's internals must not be transplanted into GCC 16 without checking whether that mechanism still exists.
+The [secondary-move reload repair](/<PhiWeather>/native/patches/gcc-knc/0002-preserve-secondary-move-address-reloads.patch) captures another valuable lesson. A deleted original move could lose address-reload work and leave an address pseudo uninitialized. Preserve the reproducer and failure mechanism. A patch to GCC 5's internals must not be transplanted into GCC 16 without checking whether that mechanism still exists.
 
 ### 4.2 Assembler, linker and sysroot
 
-The project has a pinned MPSS binutils source/build route, including IMCI opcode support, and a card-derived sysroot. These are stronger starting assets than speculative support in a current generic x86 assembler. [Build script](/C:/Users/xuzhi/Documents/PhiWeather/native/toolchains/build-knc-binutils.sh), [source lock](/C:/Users/xuzhi/Documents/PhiWeather/native/toolchains/gnu-knc-sources.lock.json), [environment record](/C:/Users/xuzhi/Documents/PhiWeather/ENVIRONMENT.md).
+The project has a pinned MPSS binutils source/build route, including IMCI opcode support, and a card-derived sysroot. These are stronger starting assets than speculative support in a current generic x86 assembler. [Build script](/<PhiWeather>/native/toolchains/build-knc-binutils.sh), [source lock](/<PhiWeather>/native/toolchains/gnu-knc-sources.lock.json), [environment record](/<PhiWeather>/ENVIRONMENT.md).
 
 Initially retain known-working assembly/link tools and constrain generated directives/debug formats to what they support. LTO, newer relocation types and newer assembler features require separate integration. Do not “solve” unsupported instructions by emitting opaque bytes while bypassing the assembler's architecture checks.
 
@@ -168,7 +168,7 @@ These are proposed compiler policies, not claims that the current compiler imple
 
 Using one active ZMM lane can avoid excess precision, but it is not free vectorization. If each scalar expression needs repeated packing, masking, memory transfers or helper calls, it can be slower than x87. Optimize connected regions of scalar arithmetic and their call boundaries, then measure them.
 
-Scalar and vector FP control domains also need deliberate treatment. When an existing program legally configures them differently, moving an operation between domains can change its result. A compatibility mode must preserve its promised behavior; a new mode must state its own contract. The project's [FP environment contract](/C:/Users/xuzhi/Documents/PhiWeather/native/translation/FP_ENVIRONMENT_CONTRACT_20261023.md) supplies relevant measured constraints, including legal dirty state and caller-state preservation.
+Scalar and vector FP control domains also need deliberate treatment. When an existing program legally configures them differently, moving an operation between domains can change its result. A compatibility mode must preserve its promised behavior; a new mode must state its own contract. The project's [FP environment contract](/<PhiWeather>/native/translation/FP_ENVIRONMENT_CONTRACT_20261023.md) supplies relevant measured constraints, including legal dirty state and caller-state preservation.
 
 ### 7.2 Precision is not inferred from desired forecast accuracy
 
@@ -180,7 +180,7 @@ FMA contraction, reassociation and reciprocal approximation are separate decisio
 
 KNC has hardware x87 extended precision. In the inspected GCC target, 16-byte storage for `long double` does not itself mean IEEE binary128. Keep format, storage, alignment, passing and library support separate. Fortran extended kinds and libquadmath need their own support decisions; do not demote them to double to obtain a working link.
 
-Local ABI inspection shows scalar FP arguments/results using vector registers with x87 computation in some bodies, rather than a universal stack-only convention. That makes mixed-object experiments essential. [Project ABI record](/C:/Users/xuzhi/Documents/PhiWeather/native/translation/ABI.md).
+Local ABI inspection shows scalar FP arguments/results using vector registers with x87 computation in some bodies, rather than a universal stack-only convention. That makes mixed-object experiments essential. [Project ABI record](/<PhiWeather>/native/translation/ABI.md).
 
 ## 8. Optimization strategy: where the performance should come from
 
@@ -330,7 +330,7 @@ For MPICH and netCDF, preserving compatible C libraries while rebuilding the For
 
 ### 11.3 Old system, new language runtimes
 
-Check generated symbol-version requirements, TLS models, atomic helper dependencies, unwinding and required syscalls against the card environment. A library may compile yet fail to load, create threads or unwind. The project's native TLS probe is useful evidence for its tested mechanism, not blanket support for every modern TLS model. [Retained TLS capability record](/C:/Users/xuzhi/Documents/PhiWeather/native/translation/FS_TLS_NATIVE_CAPABILITY_20261025.md).
+Check generated symbol-version requirements, TLS models, atomic helper dependencies, unwinding and required syscalls against the card environment. A library may compile yet fail to load, create threads or unwind. The project's native TLS probe is useful evidence for its tested mechanism, not blanket support for every modern TLS model. [Retained TLS capability record](/<PhiWeather>/native/translation/FS_TLS_NATIVE_CAPABILITY_20261025.md).
 
 Native OpenMP is a threading-runtime problem; it does not require reviving Intel's offload infrastructure. Keep host/card transport and deployment separate from compiler language support. Similarly, do not replace libc or port every optional sanitizer/runtime before reaching the first useful application.
 
@@ -351,7 +351,7 @@ These are retained project measurements, not results of a new run. Different inp
 | PhiChat DECODE3 paired runs | LFM 3.046 to 6.156 tokens/s at unchanged 120 threads; Llama 1.184 to 2.677 with 120 to 240 threads | Data/kernel improvements can be large; the Llama result also changes thread count |
 | PhiChat R4 evaluation | Workload-specific gains, but LFM long-context first-response regressions led to retaining DECODE3 there | Selective dispatch beats assuming one globally best kernel; latency, throughput and context reuse must be separated |
 
-Sources: [F7 attribution](/C:/Users/xuzhi/Documents/PhiWeather/native/translation/F7_ATTRIBUTION.md), [G1 measurements](/C:/Users/xuzhi/Documents/PhiWeather/native/translation/G1_PERFORMANCE.md), [Fairborn flux report](/C:/Users/xuzhi/Documents/PhiWeather/docs/science/FAIRBORN_FLUX_OPTIMIZATION_RESULT_20261029.md), [U/V ordering report](/C:/Users/xuzhi/Documents/PhiWeather/docs/science/WRF_IMCI_PAIR_ORDER_BENCHMARK_20261030.md), [F/P retirement](/C:/Users/xuzhi/Documents/PhiWeather/docs/implementation/wrf-two-agent-20261030/agent-b-fp-retirement-conclusion-20261031.json), [R continuation results](/C:/Users/xuzhi/Documents/PhiWeather/docs/implementation/wrf-two-agent-20261030/agent-b-r-run-guide-20261031.md), [Phoenix validation progress](/C:/Users/xuzhi/Documents/PhiWeather/docs/science/SCIENTIFIC_ACCEPTANCE_V2_PROGRESS_20261031.md), [PhiChat DECODE3](/C:/Users/xuzhi/Documents/PhiChat/docs/DECODE3.md), [PhiChat R4](/C:/Users/xuzhi/Documents/PhiChat/docs/R4.md), [PhiChat validation](/C:/Users/xuzhi/Documents/PhiChat/docs/VALIDATION.md).
+Sources: [F7 attribution](/<PhiWeather>/native/translation/F7_ATTRIBUTION.md), [G1 measurements](/<PhiWeather>/native/translation/G1_PERFORMANCE.md), [Fairborn flux report](/<PhiWeather>/docs/science/FAIRBORN_FLUX_OPTIMIZATION_RESULT_20261029.md), [U/V ordering report](/<PhiWeather>/docs/science/WRF_IMCI_PAIR_ORDER_BENCHMARK_20261030.md), [F/P retirement](/<PhiWeather>/docs/implementation/wrf-two-agent-20261030/agent-b-fp-retirement-conclusion-20261031.json), [R continuation results](/<PhiWeather>/docs/implementation/wrf-two-agent-20261030/agent-b-r-run-guide-20261031.md), [Phoenix validation progress](/<PhiWeather>/docs/science/SCIENTIFIC_ACCEPTANCE_V2_PROGRESS_20261031.md), [PhiChat DECODE3](/<PhiChat>/docs/DECODE3.md), [PhiChat R4](/<PhiChat>/docs/R4.md), [PhiChat validation](/<PhiChat>/docs/VALIDATION.md).
 
 Three lessons should shape compiler defaults. First, avoid expanding common operations into very large generic sequences. Second, retain shape-sensitive implementations and a reliable fallback. Third, distinguish gains caused by generated code from changes in runtime configuration, physics, data reuse or workload. Total ELF size is an investigation clue, not a direct measurement of hot instruction-cache pressure; the F/P evidence does not establish the root cause by itself.
 

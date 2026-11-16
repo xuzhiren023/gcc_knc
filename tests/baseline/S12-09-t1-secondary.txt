@@ -1,8 +1,8 @@
 Compiler: k1om-mpss-linux-gcc (GCC) 16.2.0
-Compiler ld: /cygdrive/c/Users/xuzhi/Documents/gcc_knc/.work/_shared/toolchain/cross/bin/k1om-mpss-linux-ld
-Compiler as: /cygdrive/c/Users/xuzhi/Documents/gcc_knc/.work/_shared/toolchain/cross/bin/k1om-mpss-linux-as
+Compiler ld: .work/_shared/toolchain/cross/bin/k1om-mpss-linux-ld
+Compiler as: .work/_shared/toolchain/cross/bin/k1om-mpss-linux-as
 Flags: -O2 -ftree-vectorize -ffp-contract=off / fast; separate driver translation unit
-T2 ABI reference: /cygdrive/c/Users/xuzhi/Documents/gcc_knc/.work/_shared/toolchain/sysroot (no native card execution in t0-t2)
+T2 ABI reference: .work/_shared/toolchain/sysroot (no native card execution in t0-t2)
 PASS t1 secondary Fortran deleted-store address setups
 PASS t1 secondary Fortran assembly and knc_lint
 PASS t1 secondary mixed pressure -O1 si

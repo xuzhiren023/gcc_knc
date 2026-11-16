@@ -1,6 +1,6 @@
 # knc-vecmath: provenance
 
-Copied 2026-11-06 by the GCC-KNC lead from `C:\Users\xuzhi\Documents\PhiWeather`, commit `bfc0977d`
+Copied 2026-11-06 by the GCC-KNC lead from `<PhiWeather>`, commit `bfc0977d`
 (both source folders clean at that commit), on the owner's decision (ADR-0011). GCC-KNC does not
 depend on the PhiWeather tree; this is a copy.
 
