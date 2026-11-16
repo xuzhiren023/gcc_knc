@@ -237,6 +237,32 @@ Calibration: uncalibrated. No calibration block in profile.
 | `vpu.zmm_registers` | 32 | registers per thread | documented | R17 slide 12; R27 (locator missing) |  |
 | `x87.mem_operand_serializes` | False | boolean | assumed | not documented: whether an x87 instruction with a memory operand holds its context until its result is complete | alt: True |
 
+## multicore-assumed
+
+Explicit assumed multi-core geometry and queue parameters; automatically overlaid only for unit/ring simulations. No native validation. Channel interval and latency residuals are derived at run time from the selected card profile and maps.
+
+Calibration: unvalidated. Low-core scaling and independent full-card validation pending.
+
+| parameter | value | unit | status | source | alternatives / uncertainty |
+|---|---|---|---|---|---|
+| `memory.channel_interleave` | line_modulo | map | assumed | S14-13 approved multicore-design.md; modeling assumption, not a hardware measurement | alt: xor, page, single_channel |
+| `memory.channels_per_controller` | 2 | channels | documented | R01 p.13, verified in early architecture guide (production stepping unspecified) |  |
+| `memory.controllers` | 8 | controllers | documented | R01 p.13, verified in early architecture guide (production stepping unspecified) |  |
+| `memory.write_read_service_ratio` | 1 | ratio | assumed | S14-13 approved multicore-design.md; modeling assumption, not a hardware measurement | alt: 1.25, 2 |
+| `multicore.background_epoch_cycles` | 256 | cycles | assumed | S14-13 approved multicore-design.md; modeling assumption, not a hardware measurement | alt: 64, 1024 |
+| `multicore.background_seed` | 0 | seed | assumed | S14-13 approved multicore-design.md; modeling assumption, not a hardware measurement | alt: 1, 2 |
+| `multicore.remote_extra_cycles` | 0 | cycles | assumed | S14-13 approved multicore-design.md; modeling assumption, not a hardware measurement | alt: 16, 64 |
+| `ring.control_service_cycles` | 1 | cycles | assumed | S14-13 approved multicore-design.md; modeling assumption, not a hardware measurement | alt: 2, 4 |
+| `ring.data_slot_bytes` | 32 | bytes | assumed | S14-13 approved multicore-design.md; modeling assumption, not a hardware measurement | alt: 16, 64 |
+| `ring.hop_cycles` | 1 | cycles | assumed | S14-13 approved multicore-design.md; modeling assumption, not a hardware measurement | alt: 2, 4 |
+| `ring.injection_credits` | 32 | transactions | assumed | S14-13 approved multicore-design.md; modeling assumption, not a hardware measurement | alt: 16, 64 |
+| `ring.positions` | 61 | positions | assumed | S14-13 approved multicore-design.md; modeling assumption, not a hardware measurement | alt: 60, 64 |
+| `ring.shared_fabrics` | False | boolean | assumed | S14-13 approved multicore-design.md; modeling assumption, not a hardware measurement | alt: True |
+| `td.initiation_cycles` | 1 | cycles | assumed | S14-13 approved multicore-design.md; modeling assumption, not a hardware measurement | alt: 2, 4 |
+| `td.interleave` | xor | map | assumed | S14-13 approved multicore-design.md; modeling assumption, not a hardware measurement | alt: line_modulo, single_slice |
+| `td.lookup_cycles` | 8 | cycles | assumed | S14-13 approved multicore-design.md; modeling assumption, not a hardware measurement | alt: 4, 16, 32 |
+| `td.slices` | 64 | slices | documented | R01 p.22, verified in early architecture guide (production stepping unspecified); R08 slide 46 corroborates directory routing |  |
+
 ## overlay-no-branch-bubble
 
 Sensitivity overlay: no core issue cycle lost after a taken branch (the 0.2.x model). Apply with --overlay profiles/overlay-no-branch-bubble.json to see how much a multi-thread prediction depends on the value derived from the S8-01 C10 four-thread row.
