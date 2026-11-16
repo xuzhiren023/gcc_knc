@@ -30,6 +30,8 @@
      control, then the store), so they are not always correctly rounded. Tests must not treat x87
      FP64 output as the reference.
    - FP32 is implemented in Sprint 5. FP64 stays scalar until S5-03's two open proof steps close.
+   *Amended 2026-11-16:* FP64 (V8DF division, cond_div, sqrt, cond_sqrt) vectorizes since S10-09
+   (knc `717fe8a72f7`), proven in `knc-div-sqrt.md` section 3 and card-checked 2026-11-12 in all four modes.
 5. **Approximate forms are opt-in only,** behind `-mrecip`-style or `-ffast-math`-style
    options. Each has a documented error bound.
 

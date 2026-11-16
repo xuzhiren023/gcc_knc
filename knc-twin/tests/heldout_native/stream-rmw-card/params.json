@@ -1,8 +1,0 @@
-{
- "schema": "knc-twin.analytic-params/1",
- "description": "stream-rmw-card: 1073741824 units of 128 logical bytes (2048 MiB x 32 passes); per_core_cycles_per_unit comes from the core.s simulate",
- "units": 1073741824,
- "bytes_per_unit": 128,
- "traffic_type": "read_modify_write",
- "barriers": 0
-}

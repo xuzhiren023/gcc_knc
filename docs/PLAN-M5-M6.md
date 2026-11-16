@@ -34,7 +34,7 @@ the GPT Pro triage (`docs/research/gpt-pro-2026-11-15-triage.md`), `model-first-
 
 ## M5 - Broad and correct (Sprints 14-15)
 
-Pass rule (proposed, owner to confirm; frozen in ADR-0016 before Sprint 15 measures anything):
+Pass rule (accepted by the owner 2026-11-16, frozen in ADR-0016, which governs where this summary differs):
 - **Correctness:** zero known ICEs and zero known wrong-code at -O2 and -O3 on the GCC torture and vect suites and the
   corpus; execute suite all pass on the card.
 - **Breadth:** a widened corpus of at least 25 programs that adds the N, C and G styles (S11-20 Q1-Q6 generality set as

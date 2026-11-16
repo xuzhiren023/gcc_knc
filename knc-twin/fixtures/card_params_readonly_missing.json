@@ -1,8 +1,0 @@
-{
- "schema": "knc-twin.analytic-params/1",
- "description": "same as the sweep file but without a sweep: on a profile without a measured bandwidth (--profile card-3120-documented) it must stop with needs_parameters",
- "units": 16777216,
- "bytes_per_unit": 64,
- "traffic_type": "read_only",
- "per_core_cycles_per_unit": 3.0
-}

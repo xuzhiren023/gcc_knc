@@ -15,7 +15,11 @@ import unittest
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
-TWIN = ROOT / "knc-twin"
+# knc-twin lives in its own repository beside this one since 2026-11-16 (KNC_TWIN_ROOT overrides);
+# the in-tree copy is used only while it still exists.
+TWIN = Path(os.environ.get("KNC_TWIN_ROOT", str(ROOT.parent / "knc-twin")))
+if not (TWIN / "SKILL.md").exists() and (ROOT / "knc-twin" / "SKILL.md").exists():
+    TWIN = ROOT / "knc-twin"
 TRIAL = TWIN / "tests" / "trial"
 HELDOUT = TWIN / "tests" / "heldout_native"
 
