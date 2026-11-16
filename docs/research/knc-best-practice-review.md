@@ -12,7 +12,7 @@ Facts and references only (ADR-0013). Where each item went is in the last column
 
 | # | Practice | Source | Status before | Goes to |
 |---|---|---|---|---|
-| 1 | Prefetch for indirect access: the index stream and the gathered lines, gather prefetch hints, unrolled gather completion | ICC `-qopt-gather-scatter-unroll` (GUID-9AE10FC5-BB6C-4F22-A346-E84CDD79BF33); Rahman ch. 11; ISA pp. 303-310 | Not adopted (`knc-gather-reduce.md:87`) | BACKLOG E7-09 |
+| 1 | Prefetch for indirect access: the index stream and the gathered lines, gather prefetch hints, unrolled gather completion | ICC `-qopt-gather-scatter-unroll` (GUID-9AE10FC5-BB6C-4F22-A346-E84CDD79BF33); R02 ch. 10 p.161 (PDF p.160); R27 pp.303-310 | Not adopted (`knc-gather-reduce.md:87`) | BACKLOG E7-09 |
 | 2 | 2 MB pages for large arrays | R08 slides 23–25; R09 p.4 ([index](knc-references.md)) | ~~THP never promotes on the card; hugetlbfs needs root~~ **Superseded S12-13:** earlier snapshot only. Card-side THP is documented for a named MPSS update; later local sweep has actual explicit huge pages. Ordinary malloc backing remains unestablished. | S12-12 G08; kernel changes only if evidence warrants |
 | 3 | Spin longer before sleeping between parallel regions | R18 §§13.2.4–5 pp.59–61 | ~~Our 3 ms default is unmeasured~~ **Superseded S12-13:** current `card.h` defaults to delay 128 and 200 ms; Intel runtime advice does not establish libgomp performance. | Implemented; realistic wait/barrier follow-up is G09, later |
 | 4 | Reuse large heap blocks instead of repeated mmap/munmap; allocation is serial and page zeroing slow | ICC `-qopt-malloc-options` (GUID-D0078E73-2EAA-4944-8D67-81E7D2D7CD26); Colfax | Not adopted | S9-17 (user guidance); E6-08 if an option is warranted |
