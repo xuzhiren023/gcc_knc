@@ -81,7 +81,7 @@ def summary_markdown(r):
         L.append("## Result")
         if pred.get("result_class"):
             classification = pred["result_class"]
-            L.append("- result_class: %s" % classification.get("class", classification))
+            L.append("- result_class: %s" % (classification.get("class", classification) if isinstance(classification, dict) else classification))
         for k, v in pred.items():
             if isinstance(v, (dict, list)):
                 continue
