@@ -359,6 +359,8 @@ def cmd_simulate(args):
         r["message"] = "predicted %d core cycles (%.3f per unit) for %d dynamic instructions on %d context(s); %s%s" % (
             res["completion_cycles"], pred["predicted_cycles_per_unit"], res["dynamic_instructions"], len(res["active_contexts"]),
             pred["result_class"]["class"], "; SYNTHETIC profile" if prof.synthetic else "")
+        if "stub_cycles_total" in pred:
+            r["message"] += "; total stub cycles: %d (sum of declared costs across contexts)" % pred["stub_cycles_total"]
         return _finish(r, out, args)
     except TwinError as e:
         if prof is not None:

@@ -19,7 +19,8 @@ model           functional effect:
                                   the others use the host math library and are NOT bit-exact
                                   with the card's libm (reported as approximate)
 
-A stub never gets a default cost. Its memory traffic is modeled only for the mem* models.
+A stub never gets a default cost. mem*, calloc and realloc trace their byte effects;
+allocator internal memory traffic is not modeled.
 """
 import math
 import struct

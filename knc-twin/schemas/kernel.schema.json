@@ -38,6 +38,14 @@
     "init": {
       "type": "object", "additionalProperties": false,
       "properties": {
+        "heap": {
+          "type": "object", "required": ["addr", "size"], "additionalProperties": false,
+          "description": "Shared bump-allocator scenario region; must be disjoint from all other memory. Addresses align to 64 bytes and free never reuses storage.",
+          "properties": {
+            "addr": {"type": ["integer", "string"]},
+            "size": {"type": ["integer", "string"]}
+          }
+        },
         "memory": {"type": "array", "items": {"$ref": "#/definitions/memblock"}},
         "registers": {"$ref": "#/definitions/registers", "description": "applies to every stream; a stream's own init overrides"}
       }
