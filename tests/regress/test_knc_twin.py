@@ -15,11 +15,29 @@ import unittest
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
-# knc-twin lives in its own repository beside this one since 2026-11-16 (KNC_TWIN_ROOT overrides);
-# the in-tree copy is used only while it still exists.
-TWIN = Path(os.environ.get("KNC_TWIN_ROOT", str(ROOT.parent / "knc-twin")))
-if not (TWIN / "SKILL.md").exists() and (ROOT / "knc-twin" / "SKILL.md").exists():
-    TWIN = ROOT / "knc-twin"
+# knc-twin lives in its own repository beside this one since 2026-11-16. KNC_TWIN_ROOT overrides; otherwise the
+# sibling of the MAIN checkout (not of a merge worktree under .work/), found through git's common dir. When no twin
+# is found (a fresh public clone, ADR-0016 rule 5) the twin tests skip with a printed reason.
+def _twin_root():
+    env = os.environ.get("KNC_TWIN_ROOT")
+    if env:
+        return Path(env)
+    try:
+        common = subprocess.run(["git", "rev-parse", "--git-common-dir"], cwd=str(ROOT), stdout=subprocess.PIPE,
+                                stderr=subprocess.DEVNULL, universal_newlines=True, check=True).stdout.strip()
+        main_checkout = Path(common).resolve().parent if common else ROOT
+    except (OSError, subprocess.CalledProcessError):
+        main_checkout = ROOT
+    for cand in (main_checkout.parent / "knc-twin", ROOT.parent / "knc-twin", ROOT / "knc-twin"):
+        if (cand / "SKILL.md").exists():
+            return cand
+    return main_checkout.parent / "knc-twin"
+
+
+TWIN = _twin_root()
+TWIN_PRESENT = (TWIN / "SKILL.md").exists()
+if not TWIN_PRESENT:
+    print("knc-twin not found at %s (set KNC_TWIN_ROOT); twin tests skip" % TWIN)
 TRIAL = TWIN / "tests" / "trial"
 HELDOUT = TWIN / "tests" / "heldout_native"
 
@@ -31,6 +49,7 @@ def trial_lib():
     return module
 
 
+@unittest.skipUnless(TWIN_PRESENT, "knc-twin repository not found; set KNC_TWIN_ROOT")
 class KncTwin(unittest.TestCase):
     def test_selftest_passes(self):
         with tempfile.TemporaryDirectory() as tmp:
