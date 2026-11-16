@@ -3,6 +3,10 @@ import copy
 import importlib
 import importlib.util
 import os
+import contextlib
+import io
+import json
+import tempfile
 import unittest
 
 import helpers
@@ -152,6 +156,40 @@ class TestSchedulingExplorer(unittest.TestCase):
                     self.assertGreaterEqual(b - a, gap)
                 self.assertAlmostEqual(modulo["simulation_minus_estimate_cycles_per_iteration"],
                                        candidate["cycles_per_iteration"] - ii)
+                cycles = {e["id"]: e["cycle"] for e in entries}
+                for edge in modulo["dependencies"]:
+                    self.assertGreaterEqual(cycles[edge["to"]] + edge["distance"] * ii,
+                                            cycles[edge["from"]] + edge["latency"])
+
+    def test_cli_exports_candidate_ranked_by_frozen_batch(self):
+        from knc_model.cli import main
+        k = kernel([
+            {"id": "a", "op": "vaddps", "ops": ["zmm0", "zmm1", "zmm2"]},
+            {"id": "b", "op": "vaddps", "ops": ["zmm3", "zmm0", "zmm2"]},
+            {"id": "c", "op": "vaddps", "ops": ["zmm4", "zmm5", "zmm6"]},
+        ], expected={"registers": {"0": {"zmm3": {"f32_broadcast": 0.0}}}})
+        with tempfile.TemporaryDirectory() as tmp, contextlib.redirect_stdout(io.StringIO()):
+            path = os.path.join(tmp, "input.json")
+            with open(path, "w") as f:
+                json.dump(k.raw, f)
+            out = os.path.join(tmp, "schedule")
+            self.assertEqual(main(["schedule", path, "--out", out]), 0)
+            manifest = os.path.join(out, "batch.json")
+            with open(manifest) as f:
+                man = json.load(f)
+            self.assertEqual(man["frozen_profile_hash"], self.prof.hash)
+            ranked = os.path.join(tmp, "ranked")
+            self.assertEqual(main(["batch", manifest, "--out", ranked]), 0)
+            with open(os.path.join(ranked, "result.json")) as f:
+                result = json.load(f)
+            self.assertEqual(result["prediction"]["ranking"], ["beam", "baseline"])
+            rows = result["prediction"]["candidates"]
+            self.assertTrue(all(r["functional_check"] == "ok" for r in rows))
+            self.assertEqual([r["predicted_cycles"] for r in rows], [10, 8])
+            man["frozen_profile_hash"] = "wrong-profile"
+            with open(manifest, "w") as f:
+                json.dump(man, f)
+            self.assertEqual(main(["batch", manifest, "--out", ranked, "--force"]), 2)
 
     def test_s12_31_finds_compare_next_to_jump_without_changing_inputs(self):
         path = os.path.join(helpers.ROOT, "tests", "heldout_native",
@@ -171,6 +209,24 @@ class TestSchedulingExplorer(unittest.TestCase):
                 # x87 order is a semantic stack constraint, not a tuning target.
                 self.assertLess(ids.index("a4108c4"), ids.index("a4108c8"))
                 self.assertLess(ids.index("a4108c8"), ids.index("a4108d1"))
+                if method == "modulo":
+                    from knc_model import isa
+                    modulo = result["modulo"]
+                    ii = modulo["ii"]
+                    entries = modulo["schedule"]
+                    rebuilt = Kernel(candidate["kernel"], None)
+                    phases = sorted(set(e["cycle"] % ii for e in entries))
+                    for e in entries:
+                        insn = rebuilt.streams[0].by_id[e["id"]]
+                        if insn.kind.startswith("x87"):
+                            phase = e["cycle"] % ii
+                            self.assertEqual(sum(x["cycle"] % ii == phase for x in entries), 1)
+                            if insn.is_load:
+                                latency = (self.prof.get("latency.x87_load") if insn.cls == "x87_load" else
+                                           self.prof.get("latency.x87_mem_operand_load") +
+                                           self.prof.get(isa.CLASSES[insn.cls]["latency"]))
+                                next_phase = next((t for t in phases if t > phase), phases[0] + ii)
+                                self.assertGreaterEqual(next_phase - phase, latency)
 
 
 if __name__ == "__main__":
