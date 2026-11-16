@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-16 00:51.
+Updated automatically at every ticket change. Last update: 2026-11-16 01:01.
 
 **Next: the tech lead, on S13-01.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
@@ -143,7 +143,7 @@ Current tickets: `[#################---]` 244 of 277
 | S14-12 | knc-twin: iteration and phase sampling for loop and whole-program wall-time estimates (roadmap item 2) | In progress | Skip the rebase: main has no knc-twin or tests/regress change since your base aced5f9d, so the lead merges ... |
 | S14-13 | knc-twin: 8-tile multi-core unit on the full ring with all memory controllers (roadmap item 3) | In progress | input_tokens 20M -> 30M under the owner's standing auto-extend rule (second extension; design note done, st... |
 | S14-14 | knc-twin: scheduling explorer for modulo scheduling and reordering, evaluating S14-02/S14-03 (roadmap item 4) | In progress | Yes, run it: the card block ended 04:20Z and host limits are lifted (lead note 04:25Z), so run validate_hel... |
-| S14-15 | knc-twin prepare-native: absolute memory operands come out as `N()` in kernel.S (k1om as 2.22 rejects them); emit them relocated into the image | In progress | sessions 2 -> 4 under the owner's standing auto-extend rule (2026-11-09/10); fix needed before the ~06:30Z ... |
+| S14-15 | knc-twin prepare-native: absolute memory operands come out as `N()` in kernel.S (k1om as 2.22 rejects them); emit them relocated into the image | Question for the tech lead | The new regression still fails after repeated attempts: raw numeric disp(%rip) parsing currently exits with... |
 | S14-16 | bzip2 slower than GCC 5.1.1: mask-to-GPR move cost below a GPR move makes RA park integers in k registers (M4 known limit, must-fix) | draft |  |
 | S14-17 | Compare not folded with its load in merged return blocks (GCC 16 middle end, about half the remaining bzip2 mainGtU gap) | draft |  |
 | S14-18 | knc-twin regress: held-out replay runs under a 120 s wall-clock budget, so a slow interpreter turns a prediction into a budget_exhausted stub and the test fails as a false mismatch | Not started |  |
@@ -302,6 +302,7 @@ Current tickets: `[#################---]` 244 of 277
 
 ## Recent activity
 
+- 2026-11-16 01:01 **S14-15** engineer ask: The new regression still fails after repeated attempts: raw numeric disp(%rip) parsing currently exits with 8() in kernel.S; the parser's rip-relat...
 - 2026-11-16 00:51 **S14-13** owner decide: input_tokens 20M -> 30M under the owner's standing auto-extend rule (second extension; design note done, staging and submit remain). If the next se...
 - 2026-11-16 00:50 **S14-13** engineer escalate: budget: 20776413 input tokens used; the budget is 20000000
 - 2026-11-16 00:49 **S14-13** owner decide: sessions 6 -> 9 under the owner's standing auto-extend rule: the design note is reviewed, staging and submit remain; next extension only if a sessi...
@@ -309,16 +310,15 @@ Current tickets: `[#################---]` 244 of 277
 - 2026-11-16 00:46 **S14-15** owner decide: sessions 2 -> 4 under the owner's standing auto-extend rule (2026-11-09/10); fix needed before the ~06:30Z calibration window
 - 2026-11-16 00:46 **S14-12** lead answer: Skip the rebase: main has no knc-twin or tests/regress change since your base aced5f9d, so the lead merges as is. Run the diagnostic yourself (host...
 - 2026-11-16 00:45 **S14-13** lead answer: (1) Yes: put each input JSON outside the output directory (a sibling such as <req>-input.json next to it, or under .work/_state/), and give each re...
-- 2026-11-16 00:42 **S14-12** engineer ask: HEAD 3441cb94 clean. Selftest: 162 passed; log ../_state/logs/S14_12_selftest-20261115-232927.log. Regression: 1/3 failed, s12-31-hpcg-104 predicti...
 
 ## Cost
 
-- From the script, engineer: 733 sessions, 1579.3M input tokens
+- From the script, engineer: 734 sessions, 1583.7M input tokens
 - From the script, lead: 497 sessions, 141.4M input tokens
-- Started by hand, Claude: 14 sessions, 4094.4M input tokens
+- Started by hand, Claude: 14 sessions, 4094.7M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 40.6 GiB of 100 GiB. 81 GiB free on the drive.
+The project uses 40.7 GiB of 100 GiB. 80 GiB free on the drive.
