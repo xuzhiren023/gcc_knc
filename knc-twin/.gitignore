@@ -1,9 +1,0 @@
-knc-twin-runs/
-examples/out-*/
-__pycache__/
-*.pyc
-!*.s
-!*.c
-!fixtures/**/*.s
-!fixtures/**/*.c
-!fixtures/binary/*.o
