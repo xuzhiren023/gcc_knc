@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-16 12:39.
+Updated automatically at every ticket change. Last update: 2026-11-16 12:40.
 
-**Next: the tech lead, on S14-33.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: GPT-6.1, on S14-10 (knc-twin: --jobs N for independent simulations and PyPy support (roadmap item 1)).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
 Current tickets: `[#################---]` 255 of 296
 
@@ -160,7 +160,7 @@ Current tickets: `[#################---]` 255 of 296
 | S14-29 | knc-twin: schedule --block ADDR..ADDR for a straight-line block inside a function, and batch must not write a native request per candidate by default | Not started |  |
 | S14-30 | WRF built with GCC-KNC runs 1.21x slower per step than PhiWeather's production build - attribute the gap per cause before fixing (M5, owner rule) | draft |  |
 | S14-31 | knc-twin multi-core usability: compare across scales, stubs and repeated calls at unit/ring scale, multi-context sampling, separated ring/memory stall shares | Not started |  |
-| S14-33 | knc-twin: import the window-11 calibration rows (imci-math latency and throughput, div10, x87 fcoms, rcp23/rsqrt23 tables) and retire the assumed parameters they settle | Question for the tech lead | Please commit knc-twin/tests/test_catalog_calibration.py as test(S14-33): require static catalog replay [re... |
+| S14-33 | knc-twin: import the window-11 calibration rows (imci-math latency and throughput, div10, x87 fcoms, rcp23/rsqrt23 tables) and retire the assumed parameters they settle | lead | Interactive lead: commit knc-twin/tests/test_catalog_calibration.py in worktree S14-33 as 'test(S14-33): re... |
 | S14-35 | knc-twin prepare-native: the generated native program for PhiWeather's sixth_order_diffusion kernels segfaults on the card (exit 139 under claude-pin); find the cause, fix the generator, restage | Done | knc-twin prepare-native runs each kernel on its own stack (the kernel's in-image stack, or a private per-co... |
 | S14-37 | knc-twin x87 double rounding: _x87_binop rounds to the 64-bit significand and then to PC=53/24; real x87 rounds once (knc-boinc repro, 1 to 8 ULP errors) | Not started |  |
 | S14-38 | Card and twin dashboard - running card job, card queue and running twin work with remaining time, card temperature and utilization, host CPU, refreshed every 5 minutes | Done | A local dashboard (python tools/knc_dashboard.py serve) now shows the running card job, the card queue and ... |
@@ -321,6 +321,7 @@ Current tickets: `[#################---]` 255 of 296
 
 ## Recent activity
 
+- 2026-11-16 12:40 **S14-33** lead defer: Interactive lead: commit knc-twin/tests/test_catalog_calibration.py in worktree S14-33 as 'test(S14-33): require static catalog replay [red]' (log ...
 - 2026-11-16 12:39 **S14-33** engineer ask: Please commit knc-twin/tests/test_catalog_calibration.py as test(S14-33): require static catalog replay [red] before implementation (12:35 lead wor...
 - 2026-11-16 12:35 **S14-33** lead answer: Lead cherry-picked 8d846ffe (the S14-23 wip: converter, w10 scatter measurements t1/t2/t4, kernels, case, tests) onto s14/S14-33 in your worktree. ...
 - 2026-11-16 12:34 **S14-33** engineer ask: Required first step blocked: git cherry-pick 8d846ffe (head of s14/S14-23) fails with Unable to create C:/Users/xuzhi/Documents/gcc_knc/.git/worktr...
@@ -328,7 +329,6 @@ Current tickets: `[#################---]` 255 of 296
 - 2026-11-16 12:12 **S14-35** lead resume: lead cleaned main; approving
 - 2026-11-16 12:11 **S14-35** lead defer: Interactive lead: review passed (per-context saved-rsp slots and private stacks, rsp restored before the epilogue pops, knc_twin_mem 4 KiB aligned,...
 - 2026-11-16 12:09 **S14-35** engineer submit: prepare-native keeps the kernel's own stack when it lies in the memory image and otherwise gives each context a private stack, with the memory imag...
-- 2026-11-16 12:08 **S14-35** lead answer: sessions 13 -> 15 for the submit only. Run: pm.py submit S14-35 --note 'prepare-native keeps the kernel's own stack when it lies in the memory imag...
 
 ## Cost
 
