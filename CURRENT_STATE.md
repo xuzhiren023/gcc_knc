@@ -99,6 +99,9 @@ M5 definition frozen: ADR-0016 accepted by the owner 2026-11-16 15:15 EST (A 1.2
 - Window 13 approved by the owner 2026-11-16 16:27 EST ("yes approved run these without asking me"): PhiWeather's
   rk_update_scalar n=8 objects B0/P2/P0/S0 at 1 and 2 contexts (issue #32, twin T1-09), after window 12 closes.
   Twin session rebuilds them into `.work/_shared/calib-w13/wrf-n8/`; the lead writes run-list-w13.txt and runs it.
+  Status 16:40 EST: only S0-1ctx/2ctx build; the six masked/P0 objects wait on twin T1-11 (generator: %k label prefix
+  on jknzd, {rn} suffix instead of leading {rn-sae}). Lead decision: hold window 13 until all eight build, so the four
+  settings are compared in one window.
 - knc-twin tree left gcc_knc main at a1734baa (twin session). `tests/regress/test_knc_twin.py` reads `../knc-twin`
   (KNC_TWIN_ROOT overrides) and **fails, not skips, when the sibling is absent**: a fresh public clone fails t0. Fix it
   before the M5 Linux-host build check (ADR-0016 rule 5). S14-42 (knc-optimize skill, owner request) dispatched, lane skill.
