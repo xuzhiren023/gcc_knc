@@ -48,6 +48,28 @@ Vocabulary from Rau, *Iterative Modulo Scheduling* (HPL-94-115):
 Under `line_tracking` the loop bound assumes steady-state L1 hits; use `fixed_level` to bound a
 miss-dominated loop.
 
+## Scheduling explorer (`schedule`)
+
+Beam covers up to 60 instructions. Its pruning bound uses only invariant trace
+issue, same-context spacing and L1-port terms; UV-both prevents pairing without
+adding an issue event. Order-sensitive dependency/memory terms are excluded.
+Prefix timing ranks candidates, never bounds them. This is a conditional model bound.
+`max_states` counts expanded prefixes, each with at most body-length successors;
+`beam_width` limits retained prefixes. The baseline/list seed is separate fixed
+preparation (`list_steps`); `orders_evaluated` includes baseline. Fixed input,
+profile, seed and budgets give deterministic work, without wall-clock selection.
+`space_exhausted` requires every legal order explored without width/budget truncation.
+A long-search bound hit is reported separately. Otherwise the result is best found,
+not proven optimal; `ok` means a complete evaluated candidate, even after a budget hit.
+List supports longer bodies with bounded `lookahead`; beam reports `list_cycles` and its delta.
+Modulo tries integer IIs from existing MII upward, greedily placing a fixed order.
+Each attempted cycle consumes a state; failure at a smaller II proves no infeasibility.
+Checks cover carried hazards, declared memory recurrences, latency/AGI, U/V pairing,
+cyclic spacing, L1 ports and x87 occupancy/holds from the timing engine. X87 resource
+reservations conservatively include operand-load lead-in. Estimates assume L1 with
+no decode/refill stalls. Gather/scatter, prefetch, fences, no-read stores and serial
+division/control resources are unsupported. No II is claimed minimal; placement
+budget exhaustion yields `budget_exhausted`. Methods/output: `scheduling-explorer.md`.
 ## Reading a result
 
 `binding_term` names the constraint that sets the bound. Compare it with the simulated

@@ -1,0 +1,3540 @@
+{
+  "schema": "knc-twin.multicore-scenarios/1",
+  "description": "Finite synthetic predictions, not measured bandwidth or held-out accuracy rows",
+  "engineering_target_pct": 10,
+  "native_comparisons": "pending; see references/validation.md, multicore section",
+  "scenarios": [
+    {
+      "name": "unit-1-cold-read",
+      "scale": "unit",
+      "detailed_cores": 1,
+      "lines_per_core": 64,
+      "contexts_per_core": 1,
+      "status": "ok",
+      "functional_check": {
+        "checked": 1,
+        "mismatches": [],
+        "status": "ok"
+      },
+      "predicted_cycles": 21176.266009221312,
+      "mean_per_core_cycles": 21176.266009221312,
+      "detailed_useful_bytes": 4096,
+      "detailed_bytes_per_cycle": 0.1934240908296286,
+      "symmetry_full_card_bytes_per_cycle": null,
+      "background": {
+        "approximation": "previous-epoch offered traffic; cold one-epoch warmup resets caches; phase/epoch sensitivity pending",
+        "cores": 0,
+        "drain_cycle": 21176.266009221312,
+        "enabled": false,
+        "stop_cycle": 20877,
+        "warmup_cycles": 0
+      },
+      "result_class": {
+        "class": "unvalidated_scenario_estimate",
+        "reasons": [
+          "multi-core scaling and full-card held-out validation pending"
+        ]
+      },
+      "assumptions": [
+        "61 contracted ring positions and assumed TD/channel maps; virtual addresses are physical surrogates",
+        "separate pipelined address/data/ack link queues (or explicit shared-fabric overlay); R01 pp.13,19,22 verified early guide, production stepping unspecified",
+        "private inclusive LRU caches; reduced owner/sharer protocol; compatible pending reads share a fill and forward its data",
+        "memory delay decomposed once; channel interval derived from sustained read calibration; banks/refresh/turnaround not simulated",
+        "background is synthetic prior-epoch traffic with excluded cold warmup, not additional executed work; symmetry stability and epoch sensitivity unvalidated",
+        "TLB sub-model: 64-entry fully associative LRU first-level DTLB for 4096-byte pages; a miss adds 29 cycles; second-level TLB reach and page walks are not modeled",
+        "L2 hardware prefetcher not modeled",
+        "no code layout (records without encoding.bytes): prefix decode delays, alignment padding and encoding pairing limits are not modeled; convert a disassembly with scripts/from_binary.py to include them",
+        "instruction cache: code is assumed resident in the L1 instruction cache (steady-state hot region)",
+        "a taken forward branch, call or return costs the core 1 issue cycle(s) for the prefetch-buffer refill (R02 ch.4; S8-01 C10 fixed-direction row at four threads); loop back-edges pay nothing (S8-01 C9 at two threads); hidden at one thread by the same-context spacing",
+        "register results are available to any context's dependent instruction exactly latency cycles after issue; no bypass penalties beyond the measured latencies",
+        "no record carries encoding hints, so every V-eligible instruction is assumed to satisfy the R02 p.56 encoding pairing rules"
+      ],
+      "unsupported": [],
+      "limiting_constraints": [
+        {
+          "constraint": "miss_stall",
+          "context_cycles": 20750,
+          "core": 0
+        },
+        {
+          "constraint": "spacing",
+          "context_cycles": 63,
+          "core": 0
+        }
+      ],
+      "calibration_status": {
+        "note": "Simulated/analytical outputs are model results, never native measurements. ",
+        "state": "unvalidated",
+        "statement": "Low-core scaling and independent full-card validation pending.",
+        "synthetic": false
+      },
+      "parameters_used": {
+        "card.clock_hz": {
+          "source": "S6-01 run logs (governor performance, 1,238,094 kHz; S8-17 C12 confirmed no throttling)",
+          "status": "measured",
+          "unit": "Hz",
+          "value": 1238000000
+        },
+        "card.sustained_bandwidth_gbs": {
+          "source": "read_only 186.14, read_modify_write 179.39, write_ngo 169.74: S11-06 sweep 2 winner table (lead run 2026-11-12, 2048 MiB x 32 passes, five samples, completion envelope; read with 120 threads, the others with 60; docs/research/knc-memory-bandwidth.md and knc-machine.yaml stream_sweep2_bandwidth). write_normal 82.4: S8-01 C1 60-core table, slowest-worker completion estimate (c1_completed_store_bandwidth)",
+          "status": "measured",
+          "unit": "GB/s of useful bytes by traffic type, whole card, best measured configuration",
+          "value": {
+            "read_modify_write": 179.4,
+            "read_only": 186.1,
+            "write_ngo": 169.7,
+            "write_normal": 82.4
+          }
+        },
+        "card.usable_cores": {
+          "source": "S6-01 placement protocol: cores 0-59 for jobs, OS core CPUs {0,241,242,243} excluded",
+          "status": "measured",
+          "unit": "cores",
+          "value": 60
+        },
+        "core.contexts": {
+          "source": "R01 \u00a72.1; R17 slide 10",
+          "status": "documented",
+          "unit": "hardware threads per core",
+          "value": 4
+        },
+        "core.min_issue_gap_same_context": {
+          "source": "R02 ch.4 (page locator missing): one context never issues in two consecutive cycles; R01 pp.19, 23-24 (same fact, docs/research/knc-machine.yaml thread_issue_interval); R17 slide 11; consistent with S6-03 measured 2.08 ticks per independent op at one thread",
+          "status": "documented",
+          "unit": "cycles between two issue events of one context",
+          "value": 2
+        },
+        "frontend.slow_prefix_decode_cycles": {
+          "source": "R02 p.56 (prefix decode): 62, c4/c5, REX and 0f prefixes decode with no penalty; 66, 67, lock, segment and rep prefixes take two cycles each",
+          "status": "documented",
+          "unit": "decode cycles per prefix",
+          "value": 2
+        },
+        "frontend.taken_branch_core_bubble_cycles": {
+          "source": "S8-01 C10 fixed-direction row: 6.22 per branch at one thread, 17.02 at four (three issues plus about one core cycle per unit); R02 ch.4 one-clock refill bubble. Hidden at one thread by the same-context spacing. Scope: forward transfers only (S8-01 C9 register chains at two threads show no cost for the loop back-edge).",
+          "status": "derived",
+          "unit": "core issue cycles lost after a taken branch",
+          "value": 1
+        },
+        "l1.accesses_per_cycle": {
+          "source": "R17 slide 13 (one L1 access per cycle, load or store)",
+          "status": "documented",
+          "unit": "L1 data accesses per core cycle (loads and stores, not prefetches)",
+          "value": 1
+        },
+        "l1.demand_load_miss_stalls_context": {
+          "source": "R08 cache performance notes ('In-order design stalls thread on L1 Data Cache Misses (except for store misses); other threads on the same core can continue'); R02 ch.4 (thread-specific flush on a miss)",
+          "status": "documented",
+          "unit": "boolean",
+          "value": true
+        },
+        "l1.outstanding_demand_misses_per_core": {
+          "source": "R08 concurrency slide ('each core can only support 8 outstanding L1 Data Cache misses')",
+          "status": "documented",
+          "unit": "cache lines",
+          "value": 8
+        },
+        "l1.size_bytes": {
+          "source": "R01 \u00a72.1; R08; R17 slide 13",
+          "status": "documented",
+          "unit": "bytes",
+          "value": 32768
+        },
+        "l1.ways": {
+          "source": "R01 \u00a72.1; R17 slide 13",
+          "status": "documented",
+          "unit": "ways",
+          "value": 8
+        },
+        "l2.size_bytes": {
+          "source": "R01 pp.22-23; R08; R17 slide 14",
+          "status": "documented",
+          "unit": "bytes",
+          "value": 524288
+        },
+        "l2.ways": {
+          "source": "R08; R17 slide 14",
+          "status": "documented",
+          "unit": "ways",
+          "value": 8
+        },
+        "latency.agi_cycles": {
+          "source": "S6-03 agi.gap0 3.11 vs 2.08 baseline at one thread: the dependent load issued one cycle after its earliest slot, i.e. address usable 3 cycles after the write issued; R01 p.19",
+          "status": "measured",
+          "unit": "cycles",
+          "value": 3
+        },
+        "latency.branch_taken_bubble": {
+          "source": "S8-01 C9: loop costs about 2 ticks per vector op plus 2 per loop branch at one thread (the branch costs its issue slot only)",
+          "status": "derived",
+          "unit": "cycles",
+          "value": 0
+        },
+        "latency.l2_hit": {
+          "source": "S6-03 l2.load_lat 24.42 (one thread), 25.68 at four threads",
+          "status": "measured",
+          "unit": "cycles",
+          "value": 24
+        },
+        "latency.memory": {
+          "source": "S6-03 memory.load_lat 356.53 per dependent hop at one thread (idle) minus the first-level TLB miss of 29 cycles (tlb.l1_miss_penalty_cycles): the measured chain touches a new 4 KiB page at every hop and the TLB sub-model charges that miss explicitly. 0.2.x used 357 and double-counted it when the TLB was modeled.",
+          "status": "derived",
+          "unit": "cycles",
+          "value": 328
+        },
+        "latency.remote_l2_line_ns": {
+          "source": "S8-10 C11: 190.6-195.0 ns, near and far owner alike",
+          "status": "measured",
+          "unit": "ns per load of a line in another core's L2",
+          "value": 192
+        },
+        "latency.scalar_load_l1": {
+          "source": "S6-03 l1.load_lat 3.03 (one thread)",
+          "status": "measured",
+          "unit": "cycles",
+          "value": 3
+        },
+        "latency.vector_load_l1": {
+          "source": "S6-03 spill_reload.lat 12.11 = store-to-load path (7, from c9.memory.u1) + load-to-use; R08 documents 3 for vector loads",
+          "status": "derived",
+          "unit": "cycles, L1 hit plain vector load to dependent use",
+          "value": 5
+        },
+        "memory.channel_interleave": {
+          "source": "S14-13 approved multicore-design.md; modeling assumption, not a hardware measurement",
+          "status": "assumed",
+          "unit": "map",
+          "value": "line_modulo"
+        },
+        "memory.channel_service_cycles_per_line": {
+          "source": "equal channel sharing derived from selected card read calibration; not a channel measurement",
+          "status": "derived",
+          "unit": "cycles",
+          "value": 6.811993551853842
+        },
+        "memory.channels_per_controller": {
+          "source": "R01 p.13, verified in early architecture guide (production stepping unspecified)",
+          "status": "documented",
+          "unit": "channels",
+          "value": 2
+        },
+        "memory.controllers": {
+          "source": "R01 p.13, verified in early architecture guide (production stepping unspecified)",
+          "status": "documented",
+          "unit": "controllers",
+          "value": 8
+        },
+        "memory.core_service_cycles_per_line": {
+          "source": "S6-03 memory.load_rt per core at four threads 19.48 ticks per line (37.35 at one thread); modeled as the integer 20",
+          "status": "measured",
+          "unit": "core cycles between memory fills for one core (sequential stream, hardware prefetcher active)",
+          "value": 20
+        },
+        "memory.write_read_service_ratio": {
+          "source": "S14-13 approved multicore-design.md; modeling assumption, not a hardware measurement",
+          "status": "assumed",
+          "unit": "ratio",
+          "value": 1
+        },
+        "multicore.background_epoch_cycles": {
+          "source": "S14-13 approved multicore-design.md; modeling assumption, not a hardware measurement",
+          "status": "assumed",
+          "unit": "cycles",
+          "value": 256
+        },
+        "multicore.background_seed": {
+          "source": "S14-13 approved multicore-design.md; modeling assumption, not a hardware measurement",
+          "status": "assumed",
+          "unit": "seed",
+          "value": 0
+        },
+        "multicore.memory_endpoint_residual_cycles": {
+          "source": "S6-03 memory latency calibration minus reference route/TD; DTLB charged separately",
+          "status": "derived",
+          "unit": "cycles",
+          "value": 270.2660092213115
+        },
+        "multicore.memory_reference_path_cycles": {
+          "source": "unloaded requester/TD/controller paths averaged over contracted geometry",
+          "status": "derived",
+          "unit": "cycles",
+          "value": 57.73399077868852
+        },
+        "multicore.remote_endpoint_residual_cycles": {
+          "source": "S8-10 C11 192 ns anchor (reported production card), minus reference route/TD/L2 costs; calibration",
+          "status": "derived",
+          "unit": "cycles",
+          "value": 155.9582950819672
+        },
+        "multicore.remote_extra_cycles": {
+          "source": "S14-13 approved multicore-design.md; modeling assumption, not a hardware measurement",
+          "status": "assumed",
+          "unit": "cycles",
+          "value": 0
+        },
+        "multicore.remote_reference_path_cycles": {
+          "source": "unloaded requester/TD/source paths averaged over contracted geometry",
+          "status": "derived",
+          "unit": "cycles",
+          "value": 81.73770491803279
+        },
+        "pairing.dependent_pairs_allowed": {
+          "source": "R02 p.56 (cmp/jcc, push/push, pop/pop); push/pop not modeled",
+          "status": "documented",
+          "unit": "U/V pairs allowed despite a flag dependency",
+          "value": [
+            [
+              "cmp",
+              "jcc"
+            ],
+            [
+              "test",
+              "jcc"
+            ]
+          ]
+        },
+        "pairing.encoding_rules": {
+          "source": "R02 p.56",
+          "status": "documented",
+          "unit": "rules",
+          "value": {
+            "max_bytes": 8,
+            "no_displacement_and_immediate": true,
+            "no_vex_mvex_with_disp32": true
+          }
+        },
+        "pairing.load_store_pair": {
+          "source": "S6-03 spill_reload.rt at four threads: 1.07 core cycles per vector store plus reload, so a U-pipe load and a V-pipe store issue in one cycle; the L1 access limit is applied to loads only",
+          "status": "derived",
+          "unit": "boolean",
+          "value": true
+        },
+        "pairing.v_eligible_classes": {
+          "source": "R02 p.34 Table 3-1 (mask, vector store, packstore, prefetch, scalar); R17 slide 10 (scalar dual issue)",
+          "status": "documented",
+          "unit": "instruction classes that may issue on the V pipe",
+          "value": [
+            "scalar_alu",
+            "scalar_rmw",
+            "scalar_load",
+            "scalar_store",
+            "branch",
+            "mask_op",
+            "vector_store",
+            "vector_packstore",
+            "prefetch_l1",
+            "prefetch_l2"
+          ]
+        },
+        "pairing.v_nop_pairs": {
+          "source": "S12-31 microbench window 5: fifteen single-byte NOPs before the loop cost 22.7 ns per row, 1.51 ns (one issue) each; S6-03 agi.gap1-4 for the U side",
+          "status": "measured",
+          "unit": "boolean",
+          "value": false
+        },
+        "pairing.x87_pairs_with_scalar": {
+          "source": "S12-31 microbench, card windows 3 and 5 (2026-11-15): moving faddp out from between cmp and jg saves one issue per iteration (adj_0 and mid_0 -44.8/-45.6 ns per 27-product row, 1.66 ns per iteration); an x87 instruction issues alone",
+          "status": "measured",
+          "unit": "boolean",
+          "value": false
+        },
+        "ring.control_service_cycles": {
+          "source": "S14-13 approved multicore-design.md; modeling assumption, not a hardware measurement",
+          "status": "assumed",
+          "unit": "cycles",
+          "value": 1
+        },
+        "ring.data_slot_bytes": {
+          "source": "S14-13 approved multicore-design.md; modeling assumption, not a hardware measurement",
+          "status": "assumed",
+          "unit": "bytes",
+          "value": 32
+        },
+        "ring.hop_cycles": {
+          "source": "S14-13 approved multicore-design.md; modeling assumption, not a hardware measurement",
+          "status": "assumed",
+          "unit": "cycles",
+          "value": 1
+        },
+        "ring.injection_credits": {
+          "source": "S14-13 approved multicore-design.md; modeling assumption, not a hardware measurement",
+          "status": "assumed",
+          "unit": "transactions",
+          "value": 32
+        },
+        "ring.positions": {
+          "source": "S14-13 approved multicore-design.md; modeling assumption, not a hardware measurement",
+          "status": "assumed",
+          "unit": "positions",
+          "value": 61
+        },
+        "ring.shared_fabrics": {
+          "source": "S14-13 approved multicore-design.md; modeling assumption, not a hardware measurement",
+          "status": "assumed",
+          "unit": "boolean",
+          "value": false
+        },
+        "store.load_after_store_interlock_cycles": {
+          "source": "S6-03 spill_reload.rt 4.20/4.26 per pair at two/four threads and S8-12 C9 memory chains u2/u4 8.56/8.30 per link at one thread (two issues plus four cycles); vector rows only, applied to scalar stores as well (assumed)",
+          "status": "derived",
+          "unit": "cycles after a store before the same context may issue a load",
+          "value": 4
+        },
+        "td.initiation_cycles": {
+          "source": "S14-13 approved multicore-design.md; modeling assumption, not a hardware measurement",
+          "status": "assumed",
+          "unit": "cycles",
+          "value": 1
+        },
+        "td.interleave": {
+          "source": "S14-13 approved multicore-design.md; modeling assumption, not a hardware measurement",
+          "status": "assumed",
+          "unit": "map",
+          "value": "xor"
+        },
+        "td.lookup_cycles": {
+          "source": "S14-13 approved multicore-design.md; modeling assumption, not a hardware measurement",
+          "status": "assumed",
+          "unit": "cycles",
+          "value": 8
+        },
+        "td.slices": {
+          "source": "R01 p.22, verified in early architecture guide (production stepping unspecified); R08 slide 46 corroborates directory routing",
+          "status": "documented",
+          "unit": "slices",
+          "value": 64
+        },
+        "tlb.l1_entries_4k": {
+          "source": "S8-12 C4 rerun (2026-11-08): loads cost L1 latency up to 64 4 KiB pages per core and about 29 ticks more beyond",
+          "status": "measured",
+          "unit": "pages",
+          "value": 64
+        },
+        "tlb.l1_miss_penalty_cycles": {
+          "source": "S8-12 C4 rerun: 31.76-31.79 vs 3.01-3.02 ticks per load at one thread",
+          "status": "measured",
+          "unit": "cycles",
+          "value": 29
+        }
+      }
+    },
+    {
+      "name": "unit-2-cold-read",
+      "scale": "unit",
+      "detailed_cores": 2,
+      "lines_per_core": 64,
+      "contexts_per_core": 1,
+      "status": "ok",
+      "functional_check": {
+        "checked": 2,
+        "mismatches": [],
+        "status": "ok"
+      },
+      "predicted_cycles": 21222.266009221312,
+      "mean_per_core_cycles": 21190.17200599724,
+      "detailed_useful_bytes": 8192,
+      "detailed_bytes_per_cycle": 0.3860096747651963,
+      "symmetry_full_card_bytes_per_cycle": null,
+      "background": {
+        "approximation": "previous-epoch offered traffic; cold one-epoch warmup resets caches; phase/epoch sensitivity pending",
+        "cores": 0,
+        "drain_cycle": 21222.266009221312,
+        "enabled": false,
+        "stop_cycle": 20880,
+        "warmup_cycles": 0
+      },
+      "result_class": {
+        "class": "unvalidated_scenario_estimate",
+        "reasons": [
+          "multi-core scaling and full-card held-out validation pending"
+        ]
+      },
+      "assumptions": [
+        "61 contracted ring positions and assumed TD/channel maps; virtual addresses are physical surrogates",
+        "separate pipelined address/data/ack link queues (or explicit shared-fabric overlay); R01 pp.13,19,22 verified early guide, production stepping unspecified",
+        "private inclusive LRU caches; reduced owner/sharer protocol; compatible pending reads share a fill and forward its data",
+        "memory delay decomposed once; channel interval derived from sustained read calibration; banks/refresh/turnaround not simulated",
+        "background is synthetic prior-epoch traffic with excluded cold warmup, not additional executed work; symmetry stability and epoch sensitivity unvalidated",
+        "TLB sub-model: 64-entry fully associative LRU first-level DTLB for 4096-byte pages; a miss adds 29 cycles; second-level TLB reach and page walks are not modeled",
+        "L2 hardware prefetcher not modeled",
+        "no code layout (records without encoding.bytes): prefix decode delays, alignment padding and encoding pairing limits are not modeled; convert a disassembly with scripts/from_binary.py to include them",
+        "instruction cache: code is assumed resident in the L1 instruction cache (steady-state hot region)",
+        "a taken forward branch, call or return costs the core 1 issue cycle(s) for the prefetch-buffer refill (R02 ch.4; S8-01 C10 fixed-direction row at four threads); loop back-edges pay nothing (S8-01 C9 at two threads); hidden at one thread by the same-context spacing",
+        "register results are available to any context's dependent instruction exactly latency cycles after issue; no bypass penalties beyond the measured latencies",
+        "no record carries encoding hints, so every V-eligible instruction is assumed to satisfy the R02 p.56 encoding pairing rules"
+      ],
+      "unsupported": [],
+      "limiting_constraints": [
+        {
+          "constraint": "miss_stall",
+          "context_cycles": 20753,
+          "core": 0
+        },
+        {
+          "constraint": "spacing",
+          "context_cycles": 63,
+          "core": 0
+        },
+        {
+          "constraint": "miss_stall",
+          "context_cycles": 20726,
+          "core": 1
+        },
+        {
+          "constraint": "spacing",
+          "context_cycles": 63,
+          "core": 1
+        }
+      ],
+      "calibration_status": {
+        "note": "Simulated/analytical outputs are model results, never native measurements. ",
+        "state": "unvalidated",
+        "statement": "Low-core scaling and independent full-card validation pending.",
+        "synthetic": false
+      },
+      "parameters_used": {
+        "card.clock_hz": {
+          "source": "S6-01 run logs (governor performance, 1,238,094 kHz; S8-17 C12 confirmed no throttling)",
+          "status": "measured",
+          "unit": "Hz",
+          "value": 1238000000
+        },
+        "card.sustained_bandwidth_gbs": {
+          "source": "read_only 186.14, read_modify_write 179.39, write_ngo 169.74: S11-06 sweep 2 winner table (lead run 2026-11-12, 2048 MiB x 32 passes, five samples, completion envelope; read with 120 threads, the others with 60; docs/research/knc-memory-bandwidth.md and knc-machine.yaml stream_sweep2_bandwidth). write_normal 82.4: S8-01 C1 60-core table, slowest-worker completion estimate (c1_completed_store_bandwidth)",
+          "status": "measured",
+          "unit": "GB/s of useful bytes by traffic type, whole card, best measured configuration",
+          "value": {
+            "read_modify_write": 179.4,
+            "read_only": 186.1,
+            "write_ngo": 169.7,
+            "write_normal": 82.4
+          }
+        },
+        "card.usable_cores": {
+          "source": "S6-01 placement protocol: cores 0-59 for jobs, OS core CPUs {0,241,242,243} excluded",
+          "status": "measured",
+          "unit": "cores",
+          "value": 60
+        },
+        "core.contexts": {
+          "source": "R01 \u00a72.1; R17 slide 10",
+          "status": "documented",
+          "unit": "hardware threads per core",
+          "value": 4
+        },
+        "core.min_issue_gap_same_context": {
+          "source": "R02 ch.4 (page locator missing): one context never issues in two consecutive cycles; R01 pp.19, 23-24 (same fact, docs/research/knc-machine.yaml thread_issue_interval); R17 slide 11; consistent with S6-03 measured 2.08 ticks per independent op at one thread",
+          "status": "documented",
+          "unit": "cycles between two issue events of one context",
+          "value": 2
+        },
+        "frontend.slow_prefix_decode_cycles": {
+          "source": "R02 p.56 (prefix decode): 62, c4/c5, REX and 0f prefixes decode with no penalty; 66, 67, lock, segment and rep prefixes take two cycles each",
+          "status": "documented",
+          "unit": "decode cycles per prefix",
+          "value": 2
+        },
+        "frontend.taken_branch_core_bubble_cycles": {
+          "source": "S8-01 C10 fixed-direction row: 6.22 per branch at one thread, 17.02 at four (three issues plus about one core cycle per unit); R02 ch.4 one-clock refill bubble. Hidden at one thread by the same-context spacing. Scope: forward transfers only (S8-01 C9 register chains at two threads show no cost for the loop back-edge).",
+          "status": "derived",
+          "unit": "core issue cycles lost after a taken branch",
+          "value": 1
+        },
+        "l1.accesses_per_cycle": {
+          "source": "R17 slide 13 (one L1 access per cycle, load or store)",
+          "status": "documented",
+          "unit": "L1 data accesses per core cycle (loads and stores, not prefetches)",
+          "value": 1
+        },
+        "l1.demand_load_miss_stalls_context": {
+          "source": "R08 cache performance notes ('In-order design stalls thread on L1 Data Cache Misses (except for store misses); other threads on the same core can continue'); R02 ch.4 (thread-specific flush on a miss)",
+          "status": "documented",
+          "unit": "boolean",
+          "value": true
+        },
+        "l1.outstanding_demand_misses_per_core": {
+          "source": "R08 concurrency slide ('each core can only support 8 outstanding L1 Data Cache misses')",
+          "status": "documented",
+          "unit": "cache lines",
+          "value": 8
+        },
+        "l1.size_bytes": {
+          "source": "R01 \u00a72.1; R08; R17 slide 13",
+          "status": "documented",
+          "unit": "bytes",
+          "value": 32768
+        },
+        "l1.ways": {
+          "source": "R01 \u00a72.1; R17 slide 13",
+          "status": "documented",
+          "unit": "ways",
+          "value": 8
+        },
+        "l2.size_bytes": {
+          "source": "R01 pp.22-23; R08; R17 slide 14",
+          "status": "documented",
+          "unit": "bytes",
+          "value": 524288
+        },
+        "l2.ways": {
+          "source": "R08; R17 slide 14",
+          "status": "documented",
+          "unit": "ways",
+          "value": 8
+        },
+        "latency.agi_cycles": {
+          "source": "S6-03 agi.gap0 3.11 vs 2.08 baseline at one thread: the dependent load issued one cycle after its earliest slot, i.e. address usable 3 cycles after the write issued; R01 p.19",
+          "status": "measured",
+          "unit": "cycles",
+          "value": 3
+        },
+        "latency.branch_taken_bubble": {
+          "source": "S8-01 C9: loop costs about 2 ticks per vector op plus 2 per loop branch at one thread (the branch costs its issue slot only)",
+          "status": "derived",
+          "unit": "cycles",
+          "value": 0
+        },
+        "latency.l2_hit": {
+          "source": "S6-03 l2.load_lat 24.42 (one thread), 25.68 at four threads",
+          "status": "measured",
+          "unit": "cycles",
+          "value": 24
+        },
+        "latency.memory": {
+          "source": "S6-03 memory.load_lat 356.53 per dependent hop at one thread (idle) minus the first-level TLB miss of 29 cycles (tlb.l1_miss_penalty_cycles): the measured chain touches a new 4 KiB page at every hop and the TLB sub-model charges that miss explicitly. 0.2.x used 357 and double-counted it when the TLB was modeled.",
+          "status": "derived",
+          "unit": "cycles",
+          "value": 328
+        },
+        "latency.remote_l2_line_ns": {
+          "source": "S8-10 C11: 190.6-195.0 ns, near and far owner alike",
+          "status": "measured",
+          "unit": "ns per load of a line in another core's L2",
+          "value": 192
+        },
+        "latency.scalar_load_l1": {
+          "source": "S6-03 l1.load_lat 3.03 (one thread)",
+          "status": "measured",
+          "unit": "cycles",
+          "value": 3
+        },
+        "latency.vector_load_l1": {
+          "source": "S6-03 spill_reload.lat 12.11 = store-to-load path (7, from c9.memory.u1) + load-to-use; R08 documents 3 for vector loads",
+          "status": "derived",
+          "unit": "cycles, L1 hit plain vector load to dependent use",
+          "value": 5
+        },
+        "memory.channel_interleave": {
+          "source": "S14-13 approved multicore-design.md; modeling assumption, not a hardware measurement",
+          "status": "assumed",
+          "unit": "map",
+          "value": "line_modulo"
+        },
+        "memory.channel_service_cycles_per_line": {
+          "source": "equal channel sharing derived from selected card read calibration; not a channel measurement",
+          "status": "derived",
+          "unit": "cycles",
+          "value": 6.811993551853842
+        },
+        "memory.channels_per_controller": {
+          "source": "R01 p.13, verified in early architecture guide (production stepping unspecified)",
+          "status": "documented",
+          "unit": "channels",
+          "value": 2
+        },
+        "memory.controllers": {
+          "source": "R01 p.13, verified in early architecture guide (production stepping unspecified)",
+          "status": "documented",
+          "unit": "controllers",
+          "value": 8
+        },
+        "memory.core_service_cycles_per_line": {
+          "source": "S6-03 memory.load_rt per core at four threads 19.48 ticks per line (37.35 at one thread); modeled as the integer 20",
+          "status": "measured",
+          "unit": "core cycles between memory fills for one core (sequential stream, hardware prefetcher active)",
+          "value": 20
+        },
+        "memory.write_read_service_ratio": {
+          "source": "S14-13 approved multicore-design.md; modeling assumption, not a hardware measurement",
+          "status": "assumed",
+          "unit": "ratio",
+          "value": 1
+        },
+        "multicore.background_epoch_cycles": {
+          "source": "S14-13 approved multicore-design.md; modeling assumption, not a hardware measurement",
+          "status": "assumed",
+          "unit": "cycles",
+          "value": 256
+        },
+        "multicore.background_seed": {
+          "source": "S14-13 approved multicore-design.md; modeling assumption, not a hardware measurement",
+          "status": "assumed",
+          "unit": "seed",
+          "value": 0
+        },
+        "multicore.memory_endpoint_residual_cycles": {
+          "source": "S6-03 memory latency calibration minus reference route/TD; DTLB charged separately",
+          "status": "derived",
+          "unit": "cycles",
+          "value": 270.2660092213115
+        },
+        "multicore.memory_reference_path_cycles": {
+          "source": "unloaded requester/TD/controller paths averaged over contracted geometry",
+          "status": "derived",
+          "unit": "cycles",
+          "value": 57.73399077868852
+        },
+        "multicore.remote_endpoint_residual_cycles": {
+          "source": "S8-10 C11 192 ns anchor (reported production card), minus reference route/TD/L2 costs; calibration",
+          "status": "derived",
+          "unit": "cycles",
+          "value": 155.9582950819672
+        },
+        "multicore.remote_extra_cycles": {
+          "source": "S14-13 approved multicore-design.md; modeling assumption, not a hardware measurement",
+          "status": "assumed",
+          "unit": "cycles",
+          "value": 0
+        },
+        "multicore.remote_reference_path_cycles": {
+          "source": "unloaded requester/TD/source paths averaged over contracted geometry",
+          "status": "derived",
+          "unit": "cycles",
+          "value": 81.73770491803279
+        },
+        "pairing.dependent_pairs_allowed": {
+          "source": "R02 p.56 (cmp/jcc, push/push, pop/pop); push/pop not modeled",
+          "status": "documented",
+          "unit": "U/V pairs allowed despite a flag dependency",
+          "value": [
+            [
+              "cmp",
+              "jcc"
+            ],
+            [
+              "test",
+              "jcc"
+            ]
+          ]
+        },
+        "pairing.encoding_rules": {
+          "source": "R02 p.56",
+          "status": "documented",
+          "unit": "rules",
+          "value": {
+            "max_bytes": 8,
+            "no_displacement_and_immediate": true,
+            "no_vex_mvex_with_disp32": true
+          }
+        },
+        "pairing.load_store_pair": {
+          "source": "S6-03 spill_reload.rt at four threads: 1.07 core cycles per vector store plus reload, so a U-pipe load and a V-pipe store issue in one cycle; the L1 access limit is applied to loads only",
+          "status": "derived",
+          "unit": "boolean",
+          "value": true
+        },
+        "pairing.v_eligible_classes": {
+          "source": "R02 p.34 Table 3-1 (mask, vector store, packstore, prefetch, scalar); R17 slide 10 (scalar dual issue)",
+          "status": "documented",
+          "unit": "instruction classes that may issue on the V pipe",
+          "value": [
+            "scalar_alu",
+            "scalar_rmw",
+            "scalar_load",
+            "scalar_store",
+            "branch",
+            "mask_op",
+            "vector_store",
+            "vector_packstore",
+            "prefetch_l1",
+            "prefetch_l2"
+          ]
+        },
+        "pairing.v_nop_pairs": {
+          "source": "S12-31 microbench window 5: fifteen single-byte NOPs before the loop cost 22.7 ns per row, 1.51 ns (one issue) each; S6-03 agi.gap1-4 for the U side",
+          "status": "measured",
+          "unit": "boolean",
+          "value": false
+        },
+        "pairing.x87_pairs_with_scalar": {
+          "source": "S12-31 microbench, card windows 3 and 5 (2026-11-15): moving faddp out from between cmp and jg saves one issue per iteration (adj_0 and mid_0 -44.8/-45.6 ns per 27-product row, 1.66 ns per iteration); an x87 instruction issues alone",
+          "status": "measured",
+          "unit": "boolean",
+          "value": false
+        },
+        "ring.control_service_cycles": {
+          "source": "S14-13 approved multicore-design.md; modeling assumption, not a hardware measurement",
+          "status": "assumed",
+          "unit": "cycles",
+          "value": 1
+        },
+        "ring.data_slot_bytes": {
+          "source": "S14-13 approved multicore-design.md; modeling assumption, not a hardware measurement",
+          "status": "assumed",
+          "unit": "bytes",
+          "value": 32
+        },
+        "ring.hop_cycles": {
+          "source": "S14-13 approved multicore-design.md; modeling assumption, not a hardware measurement",
+          "status": "assumed",
+          "unit": "cycles",
+          "value": 1
+        },
+        "ring.injection_credits": {
+          "source": "S14-13 approved multicore-design.md; modeling assumption, not a hardware measurement",
+          "status": "assumed",
+          "unit": "transactions",
+          "value": 32
+        },
+        "ring.positions": {
+          "source": "S14-13 approved multicore-design.md; modeling assumption, not a hardware measurement",
+          "status": "assumed",
+          "unit": "positions",
+          "value": 61
+        },
+        "ring.shared_fabrics": {
+          "source": "S14-13 approved multicore-design.md; modeling assumption, not a hardware measurement",
+          "status": "assumed",
+          "unit": "boolean",
+          "value": false
+        },
+        "store.load_after_store_interlock_cycles": {
+          "source": "S6-03 spill_reload.rt 4.20/4.26 per pair at two/four threads and S8-12 C9 memory chains u2/u4 8.56/8.30 per link at one thread (two issues plus four cycles); vector rows only, applied to scalar stores as well (assumed)",
+          "status": "derived",
+          "unit": "cycles after a store before the same context may issue a load",
+          "value": 4
+        },
+        "td.initiation_cycles": {
+          "source": "S14-13 approved multicore-design.md; modeling assumption, not a hardware measurement",
+          "status": "assumed",
+          "unit": "cycles",
+          "value": 1
+        },
+        "td.interleave": {
+          "source": "S14-13 approved multicore-design.md; modeling assumption, not a hardware measurement",
+          "status": "assumed",
+          "unit": "map",
+          "value": "xor"
+        },
+        "td.lookup_cycles": {
+          "source": "S14-13 approved multicore-design.md; modeling assumption, not a hardware measurement",
+          "status": "assumed",
+          "unit": "cycles",
+          "value": 8
+        },
+        "td.slices": {
+          "source": "R01 p.22, verified in early architecture guide (production stepping unspecified); R08 slide 46 corroborates directory routing",
+          "status": "documented",
+          "unit": "slices",
+          "value": 64
+        },
+        "tlb.l1_entries_4k": {
+          "source": "S8-12 C4 rerun (2026-11-08): loads cost L1 latency up to 64 4 KiB pages per core and about 29 ticks more beyond",
+          "status": "measured",
+          "unit": "pages",
+          "value": 64
+        },
+        "tlb.l1_miss_penalty_cycles": {
+          "source": "S8-12 C4 rerun: 31.76-31.79 vs 3.01-3.02 ticks per load at one thread",
+          "status": "measured",
+          "unit": "cycles",
+          "value": 29
+        }
+      }
+    },
+    {
+      "name": "unit-4-cold-read",
+      "scale": "unit",
+      "detailed_cores": 4,
+      "lines_per_core": 64,
+      "contexts_per_core": 1,
+      "status": "ok",
+      "functional_check": {
+        "checked": 4,
+        "mismatches": [],
+        "status": "ok"
+      },
+      "predicted_cycles": 21223.078002773167,
+      "mean_per_core_cycles": 21191.983999549095,
+      "detailed_useful_bytes": 16384,
+      "detailed_bytes_per_cycle": 0.7719898121214624,
+      "symmetry_full_card_bytes_per_cycle": null,
+      "background": {
+        "approximation": "previous-epoch offered traffic; cold one-epoch warmup resets caches; phase/epoch sensitivity pending",
+        "cores": 0,
+        "drain_cycle": 21223.078002773167,
+        "enabled": false,
+        "stop_cycle": 20886,
+        "warmup_cycles": 0
+      },
+      "result_class": {
+        "class": "unvalidated_scenario_estimate",
+        "reasons": [
+          "multi-core scaling and full-card held-out validation pending"
+        ]
+      },
+      "assumptions": [
+        "61 contracted ring positions and assumed TD/channel maps; virtual addresses are physical surrogates",
+        "separate pipelined address/data/ack link queues (or explicit shared-fabric overlay); R01 pp.13,19,22 verified early guide, production stepping unspecified",
+        "private inclusive LRU caches; reduced owner/sharer protocol; compatible pending reads share a fill and forward its data",
+        "memory delay decomposed once; channel interval derived from sustained read calibration; banks/refresh/turnaround not simulated",
+        "background is synthetic prior-epoch traffic with excluded cold warmup, not additional executed work; symmetry stability and epoch sensitivity unvalidated",
+        "TLB sub-model: 64-entry fully associative LRU first-level DTLB for 4096-byte pages; a miss adds 29 cycles; second-level TLB reach and page walks are not modeled",
+        "L2 hardware prefetcher not modeled",
+        "no code layout (records without encoding.bytes): prefix decode delays, alignment padding and encoding pairing limits are not modeled; convert a disassembly with scripts/from_binary.py to include them",
+        "instruction cache: code is assumed resident in the L1 instruction cache (steady-state hot region)",
+        "a taken forward branch, call or return costs the core 1 issue cycle(s) for the prefetch-buffer refill (R02 ch.4; S8-01 C10 fixed-direction row at four threads); loop back-edges pay nothing (S8-01 C9 at two threads); hidden at one thread by the same-context spacing",
+        "register results are available to any context's dependent instruction exactly latency cycles after issue; no bypass penalties beyond the measured latencies",
+        "no record carries encoding hints, so every V-eligible instruction is assumed to satisfy the R02 p.56 encoding pairing rules"
+      ],
+      "unsupported": [],
+      "limiting_constraints": [
+        {
+          "constraint": "miss_stall",
+          "context_cycles": 20752,
+          "core": 0
+        },
+        {
+          "constraint": "spacing",
+          "context_cycles": 63,
+          "core": 0
+        },
+        {
+          "constraint": "miss_stall",
+          "context_cycles": 20733,
+          "core": 1
+        },
+        {
+          "constraint": "spacing",
+          "context_cycles": 63,
+          "core": 1
+        },
+        {
+          "constraint": "miss_stall",
+          "context_cycles": 20726,
+          "core": 2
+        },
+        {
+          "constraint": "spacing",
+          "context_cycles": 63,
+          "core": 2
+        },
+        {
+          "constraint": "miss_stall",
+          "context_cycles": 20759,
+          "core": 3
+        },
+        {
+          "constraint": "spacing",
+          "context_cycles": 63,
+          "core": 3
+        }
+      ],
+      "calibration_status": {
+        "note": "Simulated/analytical outputs are model results, never native measurements. ",
+        "state": "unvalidated",
+        "statement": "Low-core scaling and independent full-card validation pending.",
+        "synthetic": false
+      },
+      "parameters_used": {
+        "card.clock_hz": {
+          "source": "S6-01 run logs (governor performance, 1,238,094 kHz; S8-17 C12 confirmed no throttling)",
+          "status": "measured",
+          "unit": "Hz",
+          "value": 1238000000
+        },
+        "card.sustained_bandwidth_gbs": {
+          "source": "read_only 186.14, read_modify_write 179.39, write_ngo 169.74: S11-06 sweep 2 winner table (lead run 2026-11-12, 2048 MiB x 32 passes, five samples, completion envelope; read with 120 threads, the others with 60; docs/research/knc-memory-bandwidth.md and knc-machine.yaml stream_sweep2_bandwidth). write_normal 82.4: S8-01 C1 60-core table, slowest-worker completion estimate (c1_completed_store_bandwidth)",
+          "status": "measured",
+          "unit": "GB/s of useful bytes by traffic type, whole card, best measured configuration",
+          "value": {
+            "read_modify_write": 179.4,
+            "read_only": 186.1,
+            "write_ngo": 169.7,
+            "write_normal": 82.4
+          }
+        },
+        "card.usable_cores": {
+          "source": "S6-01 placement protocol: cores 0-59 for jobs, OS core CPUs {0,241,242,243} excluded",
+          "status": "measured",
+          "unit": "cores",
+          "value": 60
+        },
+        "core.contexts": {
+          "source": "R01 \u00a72.1; R17 slide 10",
+          "status": "documented",
+          "unit": "hardware threads per core",
+          "value": 4
+        },
+        "core.min_issue_gap_same_context": {
+          "source": "R02 ch.4 (page locator missing): one context never issues in two consecutive cycles; R01 pp.19, 23-24 (same fact, docs/research/knc-machine.yaml thread_issue_interval); R17 slide 11; consistent with S6-03 measured 2.08 ticks per independent op at one thread",
+          "status": "documented",
+          "unit": "cycles between two issue events of one context",
+          "value": 2
+        },
+        "frontend.slow_prefix_decode_cycles": {
+          "source": "R02 p.56 (prefix decode): 62, c4/c5, REX and 0f prefixes decode with no penalty; 66, 67, lock, segment and rep prefixes take two cycles each",
+          "status": "documented",
+          "unit": "decode cycles per prefix",
+          "value": 2
+        },
+        "frontend.taken_branch_core_bubble_cycles": {
+          "source": "S8-01 C10 fixed-direction row: 6.22 per branch at one thread, 17.02 at four (three issues plus about one core cycle per unit); R02 ch.4 one-clock refill bubble. Hidden at one thread by the same-context spacing. Scope: forward transfers only (S8-01 C9 register chains at two threads show no cost for the loop back-edge).",
+          "status": "derived",
+          "unit": "core issue cycles lost after a taken branch",
+          "value": 1
+        },
+        "l1.accesses_per_cycle": {
+          "source": "R17 slide 13 (one L1 access per cycle, load or store)",
+          "status": "documented",
+          "unit": "L1 data accesses per core cycle (loads and stores, not prefetches)",
+          "value": 1
+        },
+        "l1.demand_load_miss_stalls_context": {
+          "source": "R08 cache performance notes ('In-order design stalls thread on L1 Data Cache Misses (except for store misses); other threads on the same core can continue'); R02 ch.4 (thread-specific flush on a miss)",
+          "status": "documented",
+          "unit": "boolean",
+          "value": true
+        },
+        "l1.outstanding_demand_misses_per_core": {
+          "source": "R08 concurrency slide ('each core can only support 8 outstanding L1 Data Cache misses')",
+          "status": "documented",
+          "unit": "cache lines",
+          "value": 8
+        },
+        "l1.size_bytes": {
+          "source": "R01 \u00a72.1; R08; R17 slide 13",
+          "status": "documented",
+          "unit": "bytes",
+          "value": 32768
+        },
+        "l1.ways": {
+          "source": "R01 \u00a72.1; R17 slide 13",
+          "status": "documented",
+          "unit": "ways",
+          "value": 8
+        },
+        "l2.size_bytes": {
+          "source": "R01 pp.22-23; R08; R17 slide 14",
+          "status": "documented",
+          "unit": "bytes",
+          "value": 524288
+        },
+        "l2.ways": {
+          "source": "R08; R17 slide 14",
+          "status": "documented",
+          "unit": "ways",
+          "value": 8
+        },
+        "latency.agi_cycles": {
+          "source": "S6-03 agi.gap0 3.11 vs 2.08 baseline at one thread: the dependent load issued one cycle after its earliest slot, i.e. address usable 3 cycles after the write issued; R01 p.19",
+          "status": "measured",
+          "unit": "cycles",
+          "value": 3
+        },
+        "latency.branch_taken_bubble": {
+          "source": "S8-01 C9: loop costs about 2 ticks per vector op plus 2 per loop branch at one thread (the branch costs its issue slot only)",
+          "status": "derived",
+          "unit": "cycles",
+          "value": 0
+        },
+        "latency.l2_hit": {
+          "source": "S6-03 l2.load_lat 24.42 (one thread), 25.68 at four threads",
+          "status": "measured",
+          "unit": "cycles",
+          "value": 24
+        },
+        "latency.memory": {
+          "source": "S6-03 memory.load_lat 356.53 per dependent hop at one thread (idle) minus the first-level TLB miss of 29 cycles (tlb.l1_miss_penalty_cycles): the measured chain touches a new 4 KiB page at every hop and the TLB sub-model charges that miss explicitly. 0.2.x used 357 and double-counted it when the TLB was modeled.",
+          "status": "derived",
+          "unit": "cycles",
+          "value": 328
+        },
+        "latency.remote_l2_line_ns": {
+          "source": "S8-10 C11: 190.6-195.0 ns, near and far owner alike",
+          "status": "measured",
+          "unit": "ns per load of a line in another core's L2",
+          "value": 192
+        },
+        "latency.scalar_load_l1": {
+          "source": "S6-03 l1.load_lat 3.03 (one thread)",
+          "status": "measured",
+          "unit": "cycles",
+          "value": 3
+        },
+        "latency.vector_load_l1": {
+          "source": "S6-03 spill_reload.lat 12.11 = store-to-load path (7, from c9.memory.u1) + load-to-use; R08 documents 3 for vector loads",
+          "status": "derived",
+          "unit": "cycles, L1 hit plain vector load to dependent use",
+          "value": 5
+        },
+        "memory.channel_interleave": {
+          "source": "S14-13 approved multicore-design.md; modeling assumption, not a hardware measurement",
+          "status": "assumed",
+          "unit": "map",
+          "value": "line_modulo"
+        },
+        "memory.channel_service_cycles_per_line": {
+          "source": "equal channel sharing derived from selected card read calibration; not a channel measurement",
+          "status": "derived",
+          "unit": "cycles",
+          "value": 6.811993551853842
+        },
+        "memory.channels_per_controller": {
+          "source": "R01 p.13, verified in early architecture guide (production stepping unspecified)",
+          "status": "documented",
+          "unit": "channels",
+          "value": 2
+        },
+        "memory.controllers": {
+          "source": "R01 p.13, verified in early architecture guide (production stepping unspecified)",
+          "status": "documented",
+          "unit": "controllers",
+          "value": 8
+        },
+        "memory.core_service_cycles_per_line": {
+          "source": "S6-03 memory.load_rt per core at four threads 19.48 ticks per line (37.35 at one thread); modeled as the integer 20",
+          "status": "measured",
+          "unit": "core cycles between memory fills for one core (sequential stream, hardware prefetcher active)",
+          "value": 20
+        },
+        "memory.write_read_service_ratio": {
+          "source": "S14-13 approved multicore-design.md; modeling assumption, not a hardware measurement",
+          "status": "assumed",
+          "unit": "ratio",
+          "value": 1
+        },
+        "multicore.background_epoch_cycles": {
+          "source": "S14-13 approved multicore-design.md; modeling assumption, not a hardware measurement",
+          "status": "assumed",
+          "unit": "cycles",
+          "value": 256
+        },
+        "multicore.background_seed": {
+          "source": "S14-13 approved multicore-design.md; modeling assumption, not a hardware measurement",
+          "status": "assumed",
+          "unit": "seed",
+          "value": 0
+        },
+        "multicore.memory_endpoint_residual_cycles": {
+          "source": "S6-03 memory latency calibration minus reference route/TD; DTLB charged separately",
+          "status": "derived",
+          "unit": "cycles",
+          "value": 270.2660092213115
+        },
+        "multicore.memory_reference_path_cycles": {
+          "source": "unloaded requester/TD/controller paths averaged over contracted geometry",
+          "status": "derived",
+          "unit": "cycles",
+          "value": 57.73399077868852
+        },
+        "multicore.remote_endpoint_residual_cycles": {
+          "source": "S8-10 C11 192 ns anchor (reported production card), minus reference route/TD/L2 costs; calibration",
+          "status": "derived",
+          "unit": "cycles",
+          "value": 155.9582950819672
+        },
+        "multicore.remote_extra_cycles": {
+          "source": "S14-13 approved multicore-design.md; modeling assumption, not a hardware measurement",
+          "status": "assumed",
+          "unit": "cycles",
+          "value": 0
+        },
+        "multicore.remote_reference_path_cycles": {
+          "source": "unloaded requester/TD/source paths averaged over contracted geometry",
+          "status": "derived",
+          "unit": "cycles",
+          "value": 81.73770491803279
+        },
+        "pairing.dependent_pairs_allowed": {
+          "source": "R02 p.56 (cmp/jcc, push/push, pop/pop); push/pop not modeled",
+          "status": "documented",
+          "unit": "U/V pairs allowed despite a flag dependency",
+          "value": [
+            [
+              "cmp",
+              "jcc"
+            ],
+            [
+              "test",
+              "jcc"
+            ]
+          ]
+        },
+        "pairing.encoding_rules": {
+          "source": "R02 p.56",
+          "status": "documented",
+          "unit": "rules",
+          "value": {
+            "max_bytes": 8,
+            "no_displacement_and_immediate": true,
+            "no_vex_mvex_with_disp32": true
+          }
+        },
+        "pairing.load_store_pair": {
+          "source": "S6-03 spill_reload.rt at four threads: 1.07 core cycles per vector store plus reload, so a U-pipe load and a V-pipe store issue in one cycle; the L1 access limit is applied to loads only",
+          "status": "derived",
+          "unit": "boolean",
+          "value": true
+        },
+        "pairing.v_eligible_classes": {
+          "source": "R02 p.34 Table 3-1 (mask, vector store, packstore, prefetch, scalar); R17 slide 10 (scalar dual issue)",
+          "status": "documented",
+          "unit": "instruction classes that may issue on the V pipe",
+          "value": [
+            "scalar_alu",
+            "scalar_rmw",
+            "scalar_load",
+            "scalar_store",
+            "branch",
+            "mask_op",
+            "vector_store",
+            "vector_packstore",
+            "prefetch_l1",
+            "prefetch_l2"
+          ]
+        },
+        "pairing.v_nop_pairs": {
+          "source": "S12-31 microbench window 5: fifteen single-byte NOPs before the loop cost 22.7 ns per row, 1.51 ns (one issue) each; S6-03 agi.gap1-4 for the U side",
+          "status": "measured",
+          "unit": "boolean",
+          "value": false
+        },
+        "pairing.x87_pairs_with_scalar": {
+          "source": "S12-31 microbench, card windows 3 and 5 (2026-11-15): moving faddp out from between cmp and jg saves one issue per iteration (adj_0 and mid_0 -44.8/-45.6 ns per 27-product row, 1.66 ns per iteration); an x87 instruction issues alone",
+          "status": "measured",
+          "unit": "boolean",
+          "value": false
+        },
+        "ring.control_service_cycles": {
+          "source": "S14-13 approved multicore-design.md; modeling assumption, not a hardware measurement",
+          "status": "assumed",
+          "unit": "cycles",
+          "value": 1
+        },
+        "ring.data_slot_bytes": {
+          "source": "S14-13 approved multicore-design.md; modeling assumption, not a hardware measurement",
+          "status": "assumed",
+          "unit": "bytes",
+          "value": 32
+        },
+        "ring.hop_cycles": {
+          "source": "S14-13 approved multicore-design.md; modeling assumption, not a hardware measurement",
+          "status": "assumed",
+          "unit": "cycles",
+          "value": 1
+        },
+        "ring.injection_credits": {
+          "source": "S14-13 approved multicore-design.md; modeling assumption, not a hardware measurement",
+          "status": "assumed",
+          "unit": "transactions",
+          "value": 32
+        },
+        "ring.positions": {
+          "source": "S14-13 approved multicore-design.md; modeling assumption, not a hardware measurement",
+          "status": "assumed",
+          "unit": "positions",
+          "value": 61
+        },
+        "ring.shared_fabrics": {
+          "source": "S14-13 approved multicore-design.md; modeling assumption, not a hardware measurement",
+          "status": "assumed",
+          "unit": "boolean",
+          "value": false
+        },
+        "store.load_after_store_interlock_cycles": {
+          "source": "S6-03 spill_reload.rt 4.20/4.26 per pair at two/four threads and S8-12 C9 memory chains u2/u4 8.56/8.30 per link at one thread (two issues plus four cycles); vector rows only, applied to scalar stores as well (assumed)",
+          "status": "derived",
+          "unit": "cycles after a store before the same context may issue a load",
+          "value": 4
+        },
+        "td.initiation_cycles": {
+          "source": "S14-13 approved multicore-design.md; modeling assumption, not a hardware measurement",
+          "status": "assumed",
+          "unit": "cycles",
+          "value": 1
+        },
+        "td.interleave": {
+          "source": "S14-13 approved multicore-design.md; modeling assumption, not a hardware measurement",
+          "status": "assumed",
+          "unit": "map",
+          "value": "xor"
+        },
+        "td.lookup_cycles": {
+          "source": "S14-13 approved multicore-design.md; modeling assumption, not a hardware measurement",
+          "status": "assumed",
+          "unit": "cycles",
+          "value": 8
+        },
+        "td.slices": {
+          "source": "R01 p.22, verified in early architecture guide (production stepping unspecified); R08 slide 46 corroborates directory routing",
+          "status": "documented",
+          "unit": "slices",
+          "value": 64
+        },
+        "tlb.l1_entries_4k": {
+          "source": "S8-12 C4 rerun (2026-11-08): loads cost L1 latency up to 64 4 KiB pages per core and about 29 ticks more beyond",
+          "status": "measured",
+          "unit": "pages",
+          "value": 64
+        },
+        "tlb.l1_miss_penalty_cycles": {
+          "source": "S8-12 C4 rerun: 31.76-31.79 vs 3.01-3.02 ticks per load at one thread",
+          "status": "measured",
+          "unit": "cycles",
+          "value": 29
+        }
+      }
+    },
+    {
+      "name": "unit-8-cold-read",
+      "scale": "unit",
+      "detailed_cores": 8,
+      "lines_per_core": 64,
+      "contexts_per_core": 1,
+      "status": "ok",
+      "functional_check": {
+        "checked": 8,
+        "mismatches": [],
+        "status": "ok"
+      },
+      "predicted_cycles": 21249.078002773167,
+      "mean_per_core_cycles": 21209.257500355114,
+      "detailed_useful_bytes": 32768,
+      "detailed_bytes_per_cycle": 1.5420904377932787,
+      "symmetry_full_card_bytes_per_cycle": null,
+      "background": {
+        "approximation": "previous-epoch offered traffic; cold one-epoch warmup resets caches; phase/epoch sensitivity pending",
+        "cores": 0,
+        "drain_cycle": 21249.078002773167,
+        "enabled": false,
+        "stop_cycle": 20923,
+        "warmup_cycles": 0
+      },
+      "result_class": {
+        "class": "unvalidated_scenario_estimate",
+        "reasons": [
+          "multi-core scaling and full-card held-out validation pending"
+        ]
+      },
+      "assumptions": [
+        "61 contracted ring positions and assumed TD/channel maps; virtual addresses are physical surrogates",
+        "separate pipelined address/data/ack link queues (or explicit shared-fabric overlay); R01 pp.13,19,22 verified early guide, production stepping unspecified",
+        "private inclusive LRU caches; reduced owner/sharer protocol; compatible pending reads share a fill and forward its data",
+        "memory delay decomposed once; channel interval derived from sustained read calibration; banks/refresh/turnaround not simulated",
+        "background is synthetic prior-epoch traffic with excluded cold warmup, not additional executed work; symmetry stability and epoch sensitivity unvalidated",
+        "TLB sub-model: 64-entry fully associative LRU first-level DTLB for 4096-byte pages; a miss adds 29 cycles; second-level TLB reach and page walks are not modeled",
+        "L2 hardware prefetcher not modeled",
+        "no code layout (records without encoding.bytes): prefix decode delays, alignment padding and encoding pairing limits are not modeled; convert a disassembly with scripts/from_binary.py to include them",
+        "instruction cache: code is assumed resident in the L1 instruction cache (steady-state hot region)",
+        "a taken forward branch, call or return costs the core 1 issue cycle(s) for the prefetch-buffer refill (R02 ch.4; S8-01 C10 fixed-direction row at four threads); loop back-edges pay nothing (S8-01 C9 at two threads); hidden at one thread by the same-context spacing",
+        "register results are available to any context's dependent instruction exactly latency cycles after issue; no bypass penalties beyond the measured latencies",
+        "no record carries encoding hints, so every V-eligible instruction is assumed to satisfy the R02 p.56 encoding pairing rules"
+      ],
+      "unsupported": [],
+      "limiting_constraints": [
+        {
+          "constraint": "miss_stall",
+          "context_cycles": 20780,
+          "core": 0
+        },
+        {
+          "constraint": "spacing",
+          "context_cycles": 63,
+          "core": 0
+        },
+        {
+          "constraint": "miss_stall",
+          "context_cycles": 20754,
+          "core": 1
+        },
+        {
+          "constraint": "spacing",
+          "context_cycles": 63,
+          "core": 1
+        },
+        {
+          "constraint": "miss_stall",
+          "context_cycles": 20722,
+          "core": 2
+        },
+        {
+          "constraint": "spacing",
+          "context_cycles": 63,
+          "core": 2
+        },
+        {
+          "constraint": "miss_stall",
+          "context_cycles": 20736,
+          "core": 3
+        },
+        {
+          "constraint": "spacing",
+          "context_cycles": 63,
+          "core": 3
+        },
+        {
+          "constraint": "miss_stall",
+          "context_cycles": 20755,
+          "core": 4
+        },
+        {
+          "constraint": "spacing",
+          "context_cycles": 63,
+          "core": 4
+        },
+        {
+          "constraint": "miss_stall",
+          "context_cycles": 20774,
+          "core": 5
+        },
+        {
+          "constraint": "spacing",
+          "context_cycles": 63,
+          "core": 5
+        },
+        {
+          "constraint": "miss_stall",
+          "context_cycles": 20774,
+          "core": 6
+        },
+        {
+          "constraint": "spacing",
+          "context_cycles": 63,
+          "core": 6
+        },
+        {
+          "constraint": "miss_stall",
+          "context_cycles": 20796,
+          "core": 7
+        },
+        {
+          "constraint": "spacing",
+          "context_cycles": 63,
+          "core": 7
+        }
+      ],
+      "calibration_status": {
+        "note": "Simulated/analytical outputs are model results, never native measurements. ",
+        "state": "unvalidated",
+        "statement": "Low-core scaling and independent full-card validation pending.",
+        "synthetic": false
+      },
+      "parameters_used": {
+        "card.clock_hz": {
+          "source": "S6-01 run logs (governor performance, 1,238,094 kHz; S8-17 C12 confirmed no throttling)",
+          "status": "measured",
+          "unit": "Hz",
+          "value": 1238000000
+        },
+        "card.sustained_bandwidth_gbs": {
+          "source": "read_only 186.14, read_modify_write 179.39, write_ngo 169.74: S11-06 sweep 2 winner table (lead run 2026-11-12, 2048 MiB x 32 passes, five samples, completion envelope; read with 120 threads, the others with 60; docs/research/knc-memory-bandwidth.md and knc-machine.yaml stream_sweep2_bandwidth). write_normal 82.4: S8-01 C1 60-core table, slowest-worker completion estimate (c1_completed_store_bandwidth)",
+          "status": "measured",
+          "unit": "GB/s of useful bytes by traffic type, whole card, best measured configuration",
+          "value": {
+            "read_modify_write": 179.4,
+            "read_only": 186.1,
+            "write_ngo": 169.7,
+            "write_normal": 82.4
+          }
+        },
+        "card.usable_cores": {
+          "source": "S6-01 placement protocol: cores 0-59 for jobs, OS core CPUs {0,241,242,243} excluded",
+          "status": "measured",
+          "unit": "cores",
+          "value": 60
+        },
+        "core.contexts": {
+          "source": "R01 \u00a72.1; R17 slide 10",
+          "status": "documented",
+          "unit": "hardware threads per core",
+          "value": 4
+        },
+        "core.min_issue_gap_same_context": {
+          "source": "R02 ch.4 (page locator missing): one context never issues in two consecutive cycles; R01 pp.19, 23-24 (same fact, docs/research/knc-machine.yaml thread_issue_interval); R17 slide 11; consistent with S6-03 measured 2.08 ticks per independent op at one thread",
+          "status": "documented",
+          "unit": "cycles between two issue events of one context",
+          "value": 2
+        },
+        "frontend.slow_prefix_decode_cycles": {
+          "source": "R02 p.56 (prefix decode): 62, c4/c5, REX and 0f prefixes decode with no penalty; 66, 67, lock, segment and rep prefixes take two cycles each",
+          "status": "documented",
+          "unit": "decode cycles per prefix",
+          "value": 2
+        },
+        "frontend.taken_branch_core_bubble_cycles": {
+          "source": "S8-01 C10 fixed-direction row: 6.22 per branch at one thread, 17.02 at four (three issues plus about one core cycle per unit); R02 ch.4 one-clock refill bubble. Hidden at one thread by the same-context spacing. Scope: forward transfers only (S8-01 C9 register chains at two threads show no cost for the loop back-edge).",
+          "status": "derived",
+          "unit": "core issue cycles lost after a taken branch",
+          "value": 1
+        },
+        "l1.accesses_per_cycle": {
+          "source": "R17 slide 13 (one L1 access per cycle, load or store)",
+          "status": "documented",
+          "unit": "L1 data accesses per core cycle (loads and stores, not prefetches)",
+          "value": 1
+        },
+        "l1.demand_load_miss_stalls_context": {
+          "source": "R08 cache performance notes ('In-order design stalls thread on L1 Data Cache Misses (except for store misses); other threads on the same core can continue'); R02 ch.4 (thread-specific flush on a miss)",
+          "status": "documented",
+          "unit": "boolean",
+          "value": true
+        },
+        "l1.outstanding_demand_misses_per_core": {
+          "source": "R08 concurrency slide ('each core can only support 8 outstanding L1 Data Cache misses')",
+          "status": "documented",
+          "unit": "cache lines",
+          "value": 8
+        },
+        "l1.size_bytes": {
+          "source": "R01 \u00a72.1; R08; R17 slide 13",
+          "status": "documented",
+          "unit": "bytes",
+          "value": 32768
+        },
+        "l1.ways": {
+          "source": "R01 \u00a72.1; R17 slide 13",
+          "status": "documented",
+          "unit": "ways",
+          "value": 8
+        },
+        "l2.size_bytes": {
+          "source": "R01 pp.22-23; R08; R17 slide 14",
+          "status": "documented",
+          "unit": "bytes",
+          "value": 524288
+        },
+        "l2.ways": {
+          "source": "R08; R17 slide 14",
+          "status": "documented",
+          "unit": "ways",
+          "value": 8
+        },
+        "latency.agi_cycles": {
+          "source": "S6-03 agi.gap0 3.11 vs 2.08 baseline at one thread: the dependent load issued one cycle after its earliest slot, i.e. address usable 3 cycles after the write issued; R01 p.19",
+          "status": "measured",
+          "unit": "cycles",
+          "value": 3
+        },
+        "latency.branch_taken_bubble": {
+          "source": "S8-01 C9: loop costs about 2 ticks per vector op plus 2 per loop branch at one thread (the branch costs its issue slot only)",
+          "status": "derived",
+          "unit": "cycles",
+          "value": 0
+        },
+        "latency.l2_hit": {
+          "source": "S6-03 l2.load_lat 24.42 (one thread), 25.68 at four threads",
+          "status": "measured",
+          "unit": "cycles",
+          "value": 24
+        },
+        "latency.memory": {
+          "source": "S6-03 memory.load_lat 356.53 per dependent hop at one thread (idle) minus the first-level TLB miss of 29 cycles (tlb.l1_miss_penalty_cycles): the measured chain touches a new 4 KiB page at every hop and the TLB sub-model charges that miss explicitly. 0.2.x used 357 and double-counted it when the TLB was modeled.",
+          "status": "derived",
+          "unit": "cycles",
+          "value": 328
+        },
+        "latency.remote_l2_line_ns": {
+          "source": "S8-10 C11: 190.6-195.0 ns, near and far owner alike",
+          "status": "measured",
+          "unit": "ns per load of a line in another core's L2",
+          "value": 192
+        },
+        "latency.scalar_load_l1": {
+          "source": "S6-03 l1.load_lat 3.03 (one thread)",
+          "status": "measured",
+          "unit": "cycles",
+          "value": 3
+        },
+        "latency.vector_load_l1": {
+          "source": "S6-03 spill_reload.lat 12.11 = store-to-load path (7, from c9.memory.u1) + load-to-use; R08 documents 3 for vector loads",
+          "status": "derived",
+          "unit": "cycles, L1 hit plain vector load to dependent use",
+          "value": 5
+        },
+        "memory.channel_interleave": {
+          "source": "S14-13 approved multicore-design.md; modeling assumption, not a hardware measurement",
+          "status": "assumed",
+          "unit": "map",
+          "value": "line_modulo"
+        },
+        "memory.channel_service_cycles_per_line": {
+          "source": "equal channel sharing derived from selected card read calibration; not a channel measurement",
+          "status": "derived",
+          "unit": "cycles",
+          "value": 6.811993551853842
+        },
+        "memory.channels_per_controller": {
+          "source": "R01 p.13, verified in early architecture guide (production stepping unspecified)",
+          "status": "documented",
+          "unit": "channels",
+          "value": 2
+        },
+        "memory.controllers": {
+          "source": "R01 p.13, verified in early architecture guide (production stepping unspecified)",
+          "status": "documented",
+          "unit": "controllers",
+          "value": 8
+        },
+        "memory.core_service_cycles_per_line": {
+          "source": "S6-03 memory.load_rt per core at four threads 19.48 ticks per line (37.35 at one thread); modeled as the integer 20",
+          "status": "measured",
+          "unit": "core cycles between memory fills for one core (sequential stream, hardware prefetcher active)",
+          "value": 20
+        },
+        "memory.write_read_service_ratio": {
+          "source": "S14-13 approved multicore-design.md; modeling assumption, not a hardware measurement",
+          "status": "assumed",
+          "unit": "ratio",
+          "value": 1
+        },
+        "multicore.background_epoch_cycles": {
+          "source": "S14-13 approved multicore-design.md; modeling assumption, not a hardware measurement",
+          "status": "assumed",
+          "unit": "cycles",
+          "value": 256
+        },
+        "multicore.background_seed": {
+          "source": "S14-13 approved multicore-design.md; modeling assumption, not a hardware measurement",
+          "status": "assumed",
+          "unit": "seed",
+          "value": 0
+        },
+        "multicore.memory_endpoint_residual_cycles": {
+          "source": "S6-03 memory latency calibration minus reference route/TD; DTLB charged separately",
+          "status": "derived",
+          "unit": "cycles",
+          "value": 270.2660092213115
+        },
+        "multicore.memory_reference_path_cycles": {
+          "source": "unloaded requester/TD/controller paths averaged over contracted geometry",
+          "status": "derived",
+          "unit": "cycles",
+          "value": 57.73399077868852
+        },
+        "multicore.remote_endpoint_residual_cycles": {
+          "source": "S8-10 C11 192 ns anchor (reported production card), minus reference route/TD/L2 costs; calibration",
+          "status": "derived",
+          "unit": "cycles",
+          "value": 155.9582950819672
+        },
+        "multicore.remote_extra_cycles": {
+          "source": "S14-13 approved multicore-design.md; modeling assumption, not a hardware measurement",
+          "status": "assumed",
+          "unit": "cycles",
+          "value": 0
+        },
+        "multicore.remote_reference_path_cycles": {
+          "source": "unloaded requester/TD/source paths averaged over contracted geometry",
+          "status": "derived",
+          "unit": "cycles",
+          "value": 81.73770491803279
+        },
+        "pairing.dependent_pairs_allowed": {
+          "source": "R02 p.56 (cmp/jcc, push/push, pop/pop); push/pop not modeled",
+          "status": "documented",
+          "unit": "U/V pairs allowed despite a flag dependency",
+          "value": [
+            [
+              "cmp",
+              "jcc"
+            ],
+            [
+              "test",
+              "jcc"
+            ]
+          ]
+        },
+        "pairing.encoding_rules": {
+          "source": "R02 p.56",
+          "status": "documented",
+          "unit": "rules",
+          "value": {
+            "max_bytes": 8,
+            "no_displacement_and_immediate": true,
+            "no_vex_mvex_with_disp32": true
+          }
+        },
+        "pairing.load_store_pair": {
+          "source": "S6-03 spill_reload.rt at four threads: 1.07 core cycles per vector store plus reload, so a U-pipe load and a V-pipe store issue in one cycle; the L1 access limit is applied to loads only",
+          "status": "derived",
+          "unit": "boolean",
+          "value": true
+        },
+        "pairing.v_eligible_classes": {
+          "source": "R02 p.34 Table 3-1 (mask, vector store, packstore, prefetch, scalar); R17 slide 10 (scalar dual issue)",
+          "status": "documented",
+          "unit": "instruction classes that may issue on the V pipe",
+          "value": [
+            "scalar_alu",
+            "scalar_rmw",
+            "scalar_load",
+            "scalar_store",
+            "branch",
+            "mask_op",
+            "vector_store",
+            "vector_packstore",
+            "prefetch_l1",
+            "prefetch_l2"
+          ]
+        },
+        "pairing.v_nop_pairs": {
+          "source": "S12-31 microbench window 5: fifteen single-byte NOPs before the loop cost 22.7 ns per row, 1.51 ns (one issue) each; S6-03 agi.gap1-4 for the U side",
+          "status": "measured",
+          "unit": "boolean",
+          "value": false
+        },
+        "pairing.x87_pairs_with_scalar": {
+          "source": "S12-31 microbench, card windows 3 and 5 (2026-11-15): moving faddp out from between cmp and jg saves one issue per iteration (adj_0 and mid_0 -44.8/-45.6 ns per 27-product row, 1.66 ns per iteration); an x87 instruction issues alone",
+          "status": "measured",
+          "unit": "boolean",
+          "value": false
+        },
+        "ring.control_service_cycles": {
+          "source": "S14-13 approved multicore-design.md; modeling assumption, not a hardware measurement",
+          "status": "assumed",
+          "unit": "cycles",
+          "value": 1
+        },
+        "ring.data_slot_bytes": {
+          "source": "S14-13 approved multicore-design.md; modeling assumption, not a hardware measurement",
+          "status": "assumed",
+          "unit": "bytes",
+          "value": 32
+        },
+        "ring.hop_cycles": {
+          "source": "S14-13 approved multicore-design.md; modeling assumption, not a hardware measurement",
+          "status": "assumed",
+          "unit": "cycles",
+          "value": 1
+        },
+        "ring.injection_credits": {
+          "source": "S14-13 approved multicore-design.md; modeling assumption, not a hardware measurement",
+          "status": "assumed",
+          "unit": "transactions",
+          "value": 32
+        },
+        "ring.positions": {
+          "source": "S14-13 approved multicore-design.md; modeling assumption, not a hardware measurement",
+          "status": "assumed",
+          "unit": "positions",
+          "value": 61
+        },
+        "ring.shared_fabrics": {
+          "source": "S14-13 approved multicore-design.md; modeling assumption, not a hardware measurement",
+          "status": "assumed",
+          "unit": "boolean",
+          "value": false
+        },
+        "store.load_after_store_interlock_cycles": {
+          "source": "S6-03 spill_reload.rt 4.20/4.26 per pair at two/four threads and S8-12 C9 memory chains u2/u4 8.56/8.30 per link at one thread (two issues plus four cycles); vector rows only, applied to scalar stores as well (assumed)",
+          "status": "derived",
+          "unit": "cycles after a store before the same context may issue a load",
+          "value": 4
+        },
+        "td.initiation_cycles": {
+          "source": "S14-13 approved multicore-design.md; modeling assumption, not a hardware measurement",
+          "status": "assumed",
+          "unit": "cycles",
+          "value": 1
+        },
+        "td.interleave": {
+          "source": "S14-13 approved multicore-design.md; modeling assumption, not a hardware measurement",
+          "status": "assumed",
+          "unit": "map",
+          "value": "xor"
+        },
+        "td.lookup_cycles": {
+          "source": "S14-13 approved multicore-design.md; modeling assumption, not a hardware measurement",
+          "status": "assumed",
+          "unit": "cycles",
+          "value": 8
+        },
+        "td.slices": {
+          "source": "R01 p.22, verified in early architecture guide (production stepping unspecified); R08 slide 46 corroborates directory routing",
+          "status": "documented",
+          "unit": "slices",
+          "value": 64
+        },
+        "tlb.l1_entries_4k": {
+          "source": "S8-12 C4 rerun (2026-11-08): loads cost L1 latency up to 64 4 KiB pages per core and about 29 ticks more beyond",
+          "status": "measured",
+          "unit": "pages",
+          "value": 64
+        },
+        "tlb.l1_miss_penalty_cycles": {
+          "source": "S8-12 C4 rerun: 31.76-31.79 vs 3.01-3.02 ticks per load at one thread",
+          "status": "measured",
+          "unit": "cycles",
+          "value": 29
+        }
+      }
+    },
+    {
+      "name": "ring-1-cold-read",
+      "scale": "ring",
+      "detailed_cores": 1,
+      "lines_per_core": 64,
+      "contexts_per_core": 1,
+      "status": "ok",
+      "functional_check": {
+        "checked": 1,
+        "mismatches": [],
+        "status": "ok"
+      },
+      "predicted_cycles": 21324.463953918817,
+      "mean_per_core_cycles": 21191.266009221312,
+      "detailed_useful_bytes": 4096,
+      "detailed_bytes_per_cycle": 0.19207985761570687,
+      "symmetry_full_card_bytes_per_cycle": 11.524791456942411,
+      "background": {
+        "approximation": "previous-epoch offered traffic; cold one-epoch warmup resets caches; phase/epoch sensitivity pending",
+        "cores": 59,
+        "drain_cycle": 21324.463953918817,
+        "enabled": true,
+        "stop_cycle": 20892,
+        "warmup_cycles": 256
+      },
+      "result_class": {
+        "class": "unvalidated_scenario_estimate",
+        "reasons": [
+          "multi-core scaling and full-card held-out validation pending"
+        ]
+      },
+      "assumptions": [
+        "61 contracted ring positions and assumed TD/channel maps; virtual addresses are physical surrogates",
+        "separate pipelined address/data/ack link queues (or explicit shared-fabric overlay); R01 pp.13,19,22 verified early guide, production stepping unspecified",
+        "private inclusive LRU caches; reduced owner/sharer protocol; compatible pending reads share a fill and forward its data",
+        "memory delay decomposed once; channel interval derived from sustained read calibration; banks/refresh/turnaround not simulated",
+        "background is synthetic prior-epoch traffic with excluded cold warmup, not additional executed work; symmetry stability and epoch sensitivity unvalidated",
+        "TLB sub-model: 64-entry fully associative LRU first-level DTLB for 4096-byte pages; a miss adds 29 cycles; second-level TLB reach and page walks are not modeled",
+        "L2 hardware prefetcher not modeled",
+        "no code layout (records without encoding.bytes): prefix decode delays, alignment padding and encoding pairing limits are not modeled; convert a disassembly with scripts/from_binary.py to include them",
+        "instruction cache: code is assumed resident in the L1 instruction cache (steady-state hot region)",
+        "a taken forward branch, call or return costs the core 1 issue cycle(s) for the prefetch-buffer refill (R02 ch.4; S8-01 C10 fixed-direction row at four threads); loop back-edges pay nothing (S8-01 C9 at two threads); hidden at one thread by the same-context spacing",
+        "register results are available to any context's dependent instruction exactly latency cycles after issue; no bypass penalties beyond the measured latencies",
+        "no record carries encoding hints, so every V-eligible instruction is assumed to satisfy the R02 p.56 encoding pairing rules"
+      ],
+      "unsupported": [],
+      "limiting_constraints": [
+        {
+          "constraint": "miss_stall",
+          "context_cycles": 20765,
+          "core": 0
+        },
+        {
+          "constraint": "spacing",
+          "context_cycles": 63,
+          "core": 0
+        }
+      ],
+      "calibration_status": {
+        "note": "Simulated/analytical outputs are model results, never native measurements. ",
+        "state": "unvalidated",
+        "statement": "Low-core scaling and independent full-card validation pending.",
+        "synthetic": false
+      },
+      "parameters_used": {
+        "card.clock_hz": {
+          "source": "S6-01 run logs (governor performance, 1,238,094 kHz; S8-17 C12 confirmed no throttling)",
+          "status": "measured",
+          "unit": "Hz",
+          "value": 1238000000
+        },
+        "card.sustained_bandwidth_gbs": {
+          "source": "read_only 186.14, read_modify_write 179.39, write_ngo 169.74: S11-06 sweep 2 winner table (lead run 2026-11-12, 2048 MiB x 32 passes, five samples, completion envelope; read with 120 threads, the others with 60; docs/research/knc-memory-bandwidth.md and knc-machine.yaml stream_sweep2_bandwidth). write_normal 82.4: S8-01 C1 60-core table, slowest-worker completion estimate (c1_completed_store_bandwidth)",
+          "status": "measured",
+          "unit": "GB/s of useful bytes by traffic type, whole card, best measured configuration",
+          "value": {
+            "read_modify_write": 179.4,
+            "read_only": 186.1,
+            "write_ngo": 169.7,
+            "write_normal": 82.4
+          }
+        },
+        "card.usable_cores": {
+          "source": "S6-01 placement protocol: cores 0-59 for jobs, OS core CPUs {0,241,242,243} excluded",
+          "status": "measured",
+          "unit": "cores",
+          "value": 60
+        },
+        "core.contexts": {
+          "source": "R01 \u00a72.1; R17 slide 10",
+          "status": "documented",
+          "unit": "hardware threads per core",
+          "value": 4
+        },
+        "core.min_issue_gap_same_context": {
+          "source": "R02 ch.4 (page locator missing): one context never issues in two consecutive cycles; R01 pp.19, 23-24 (same fact, docs/research/knc-machine.yaml thread_issue_interval); R17 slide 11; consistent with S6-03 measured 2.08 ticks per independent op at one thread",
+          "status": "documented",
+          "unit": "cycles between two issue events of one context",
+          "value": 2
+        },
+        "frontend.slow_prefix_decode_cycles": {
+          "source": "R02 p.56 (prefix decode): 62, c4/c5, REX and 0f prefixes decode with no penalty; 66, 67, lock, segment and rep prefixes take two cycles each",
+          "status": "documented",
+          "unit": "decode cycles per prefix",
+          "value": 2
+        },
+        "frontend.taken_branch_core_bubble_cycles": {
+          "source": "S8-01 C10 fixed-direction row: 6.22 per branch at one thread, 17.02 at four (three issues plus about one core cycle per unit); R02 ch.4 one-clock refill bubble. Hidden at one thread by the same-context spacing. Scope: forward transfers only (S8-01 C9 register chains at two threads show no cost for the loop back-edge).",
+          "status": "derived",
+          "unit": "core issue cycles lost after a taken branch",
+          "value": 1
+        },
+        "l1.accesses_per_cycle": {
+          "source": "R17 slide 13 (one L1 access per cycle, load or store)",
+          "status": "documented",
+          "unit": "L1 data accesses per core cycle (loads and stores, not prefetches)",
+          "value": 1
+        },
+        "l1.demand_load_miss_stalls_context": {
+          "source": "R08 cache performance notes ('In-order design stalls thread on L1 Data Cache Misses (except for store misses); other threads on the same core can continue'); R02 ch.4 (thread-specific flush on a miss)",
+          "status": "documented",
+          "unit": "boolean",
+          "value": true
+        },
+        "l1.outstanding_demand_misses_per_core": {
+          "source": "R08 concurrency slide ('each core can only support 8 outstanding L1 Data Cache misses')",
+          "status": "documented",
+          "unit": "cache lines",
+          "value": 8
+        },
+        "l1.size_bytes": {
+          "source": "R01 \u00a72.1; R08; R17 slide 13",
+          "status": "documented",
+          "unit": "bytes",
+          "value": 32768
+        },
+        "l1.ways": {
+          "source": "R01 \u00a72.1; R17 slide 13",
+          "status": "documented",
+          "unit": "ways",
+          "value": 8
+        },
+        "l2.size_bytes": {
+          "source": "R01 pp.22-23; R08; R17 slide 14",
+          "status": "documented",
+          "unit": "bytes",
+          "value": 524288
+        },
+        "l2.ways": {
+          "source": "R08; R17 slide 14",
+          "status": "documented",
+          "unit": "ways",
+          "value": 8
+        },
+        "latency.agi_cycles": {
+          "source": "S6-03 agi.gap0 3.11 vs 2.08 baseline at one thread: the dependent load issued one cycle after its earliest slot, i.e. address usable 3 cycles after the write issued; R01 p.19",
+          "status": "measured",
+          "unit": "cycles",
+          "value": 3
+        },
+        "latency.branch_taken_bubble": {
+          "source": "S8-01 C9: loop costs about 2 ticks per vector op plus 2 per loop branch at one thread (the branch costs its issue slot only)",
+          "status": "derived",
+          "unit": "cycles",
+          "value": 0
+        },
+        "latency.l2_hit": {
+          "source": "S6-03 l2.load_lat 24.42 (one thread), 25.68 at four threads",
+          "status": "measured",
+          "unit": "cycles",
+          "value": 24
+        },
+        "latency.memory": {
+          "source": "S6-03 memory.load_lat 356.53 per dependent hop at one thread (idle) minus the first-level TLB miss of 29 cycles (tlb.l1_miss_penalty_cycles): the measured chain touches a new 4 KiB page at every hop and the TLB sub-model charges that miss explicitly. 0.2.x used 357 and double-counted it when the TLB was modeled.",
+          "status": "derived",
+          "unit": "cycles",
+          "value": 328
+        },
+        "latency.remote_l2_line_ns": {
+          "source": "S8-10 C11: 190.6-195.0 ns, near and far owner alike",
+          "status": "measured",
+          "unit": "ns per load of a line in another core's L2",
+          "value": 192
+        },
+        "latency.scalar_load_l1": {
+          "source": "S6-03 l1.load_lat 3.03 (one thread)",
+          "status": "measured",
+          "unit": "cycles",
+          "value": 3
+        },
+        "latency.vector_load_l1": {
+          "source": "S6-03 spill_reload.lat 12.11 = store-to-load path (7, from c9.memory.u1) + load-to-use; R08 documents 3 for vector loads",
+          "status": "derived",
+          "unit": "cycles, L1 hit plain vector load to dependent use",
+          "value": 5
+        },
+        "memory.channel_interleave": {
+          "source": "S14-13 approved multicore-design.md; modeling assumption, not a hardware measurement",
+          "status": "assumed",
+          "unit": "map",
+          "value": "line_modulo"
+        },
+        "memory.channel_service_cycles_per_line": {
+          "source": "equal channel sharing derived from selected card read calibration; not a channel measurement",
+          "status": "derived",
+          "unit": "cycles",
+          "value": 6.811993551853842
+        },
+        "memory.channels_per_controller": {
+          "source": "R01 p.13, verified in early architecture guide (production stepping unspecified)",
+          "status": "documented",
+          "unit": "channels",
+          "value": 2
+        },
+        "memory.controllers": {
+          "source": "R01 p.13, verified in early architecture guide (production stepping unspecified)",
+          "status": "documented",
+          "unit": "controllers",
+          "value": 8
+        },
+        "memory.core_service_cycles_per_line": {
+          "source": "S6-03 memory.load_rt per core at four threads 19.48 ticks per line (37.35 at one thread); modeled as the integer 20",
+          "status": "measured",
+          "unit": "core cycles between memory fills for one core (sequential stream, hardware prefetcher active)",
+          "value": 20
+        },
+        "memory.write_read_service_ratio": {
+          "source": "S14-13 approved multicore-design.md; modeling assumption, not a hardware measurement",
+          "status": "assumed",
+          "unit": "ratio",
+          "value": 1
+        },
+        "multicore.background_epoch_cycles": {
+          "source": "S14-13 approved multicore-design.md; modeling assumption, not a hardware measurement",
+          "status": "assumed",
+          "unit": "cycles",
+          "value": 256
+        },
+        "multicore.background_seed": {
+          "source": "S14-13 approved multicore-design.md; modeling assumption, not a hardware measurement",
+          "status": "assumed",
+          "unit": "seed",
+          "value": 0
+        },
+        "multicore.memory_endpoint_residual_cycles": {
+          "source": "S6-03 memory latency calibration minus reference route/TD; DTLB charged separately",
+          "status": "derived",
+          "unit": "cycles",
+          "value": 270.2660092213115
+        },
+        "multicore.memory_reference_path_cycles": {
+          "source": "unloaded requester/TD/controller paths averaged over contracted geometry",
+          "status": "derived",
+          "unit": "cycles",
+          "value": 57.73399077868852
+        },
+        "multicore.remote_endpoint_residual_cycles": {
+          "source": "S8-10 C11 192 ns anchor (reported production card), minus reference route/TD/L2 costs; calibration",
+          "status": "derived",
+          "unit": "cycles",
+          "value": 155.9582950819672
+        },
+        "multicore.remote_extra_cycles": {
+          "source": "S14-13 approved multicore-design.md; modeling assumption, not a hardware measurement",
+          "status": "assumed",
+          "unit": "cycles",
+          "value": 0
+        },
+        "multicore.remote_reference_path_cycles": {
+          "source": "unloaded requester/TD/source paths averaged over contracted geometry",
+          "status": "derived",
+          "unit": "cycles",
+          "value": 81.73770491803279
+        },
+        "pairing.dependent_pairs_allowed": {
+          "source": "R02 p.56 (cmp/jcc, push/push, pop/pop); push/pop not modeled",
+          "status": "documented",
+          "unit": "U/V pairs allowed despite a flag dependency",
+          "value": [
+            [
+              "cmp",
+              "jcc"
+            ],
+            [
+              "test",
+              "jcc"
+            ]
+          ]
+        },
+        "pairing.encoding_rules": {
+          "source": "R02 p.56",
+          "status": "documented",
+          "unit": "rules",
+          "value": {
+            "max_bytes": 8,
+            "no_displacement_and_immediate": true,
+            "no_vex_mvex_with_disp32": true
+          }
+        },
+        "pairing.load_store_pair": {
+          "source": "S6-03 spill_reload.rt at four threads: 1.07 core cycles per vector store plus reload, so a U-pipe load and a V-pipe store issue in one cycle; the L1 access limit is applied to loads only",
+          "status": "derived",
+          "unit": "boolean",
+          "value": true
+        },
+        "pairing.v_eligible_classes": {
+          "source": "R02 p.34 Table 3-1 (mask, vector store, packstore, prefetch, scalar); R17 slide 10 (scalar dual issue)",
+          "status": "documented",
+          "unit": "instruction classes that may issue on the V pipe",
+          "value": [
+            "scalar_alu",
+            "scalar_rmw",
+            "scalar_load",
+            "scalar_store",
+            "branch",
+            "mask_op",
+            "vector_store",
+            "vector_packstore",
+            "prefetch_l1",
+            "prefetch_l2"
+          ]
+        },
+        "pairing.v_nop_pairs": {
+          "source": "S12-31 microbench window 5: fifteen single-byte NOPs before the loop cost 22.7 ns per row, 1.51 ns (one issue) each; S6-03 agi.gap1-4 for the U side",
+          "status": "measured",
+          "unit": "boolean",
+          "value": false
+        },
+        "pairing.x87_pairs_with_scalar": {
+          "source": "S12-31 microbench, card windows 3 and 5 (2026-11-15): moving faddp out from between cmp and jg saves one issue per iteration (adj_0 and mid_0 -44.8/-45.6 ns per 27-product row, 1.66 ns per iteration); an x87 instruction issues alone",
+          "status": "measured",
+          "unit": "boolean",
+          "value": false
+        },
+        "ring.control_service_cycles": {
+          "source": "S14-13 approved multicore-design.md; modeling assumption, not a hardware measurement",
+          "status": "assumed",
+          "unit": "cycles",
+          "value": 1
+        },
+        "ring.data_slot_bytes": {
+          "source": "S14-13 approved multicore-design.md; modeling assumption, not a hardware measurement",
+          "status": "assumed",
+          "unit": "bytes",
+          "value": 32
+        },
+        "ring.hop_cycles": {
+          "source": "S14-13 approved multicore-design.md; modeling assumption, not a hardware measurement",
+          "status": "assumed",
+          "unit": "cycles",
+          "value": 1
+        },
+        "ring.injection_credits": {
+          "source": "S14-13 approved multicore-design.md; modeling assumption, not a hardware measurement",
+          "status": "assumed",
+          "unit": "transactions",
+          "value": 32
+        },
+        "ring.positions": {
+          "source": "S14-13 approved multicore-design.md; modeling assumption, not a hardware measurement",
+          "status": "assumed",
+          "unit": "positions",
+          "value": 61
+        },
+        "ring.shared_fabrics": {
+          "source": "S14-13 approved multicore-design.md; modeling assumption, not a hardware measurement",
+          "status": "assumed",
+          "unit": "boolean",
+          "value": false
+        },
+        "store.load_after_store_interlock_cycles": {
+          "source": "S6-03 spill_reload.rt 4.20/4.26 per pair at two/four threads and S8-12 C9 memory chains u2/u4 8.56/8.30 per link at one thread (two issues plus four cycles); vector rows only, applied to scalar stores as well (assumed)",
+          "status": "derived",
+          "unit": "cycles after a store before the same context may issue a load",
+          "value": 4
+        },
+        "td.initiation_cycles": {
+          "source": "S14-13 approved multicore-design.md; modeling assumption, not a hardware measurement",
+          "status": "assumed",
+          "unit": "cycles",
+          "value": 1
+        },
+        "td.interleave": {
+          "source": "S14-13 approved multicore-design.md; modeling assumption, not a hardware measurement",
+          "status": "assumed",
+          "unit": "map",
+          "value": "xor"
+        },
+        "td.lookup_cycles": {
+          "source": "S14-13 approved multicore-design.md; modeling assumption, not a hardware measurement",
+          "status": "assumed",
+          "unit": "cycles",
+          "value": 8
+        },
+        "td.slices": {
+          "source": "R01 p.22, verified in early architecture guide (production stepping unspecified); R08 slide 46 corroborates directory routing",
+          "status": "documented",
+          "unit": "slices",
+          "value": 64
+        },
+        "tlb.l1_entries_4k": {
+          "source": "S8-12 C4 rerun (2026-11-08): loads cost L1 latency up to 64 4 KiB pages per core and about 29 ticks more beyond",
+          "status": "measured",
+          "unit": "pages",
+          "value": 64
+        },
+        "tlb.l1_miss_penalty_cycles": {
+          "source": "S8-12 C4 rerun: 31.76-31.79 vs 3.01-3.02 ticks per load at one thread",
+          "status": "measured",
+          "unit": "cycles",
+          "value": 29
+        }
+      }
+    },
+    {
+      "name": "ring-2-cold-read",
+      "scale": "ring",
+      "detailed_cores": 2,
+      "lines_per_core": 64,
+      "contexts_per_core": 1,
+      "status": "ok",
+      "functional_check": {
+        "checked": 2,
+        "mismatches": [],
+        "status": "ok"
+      },
+      "predicted_cycles": 21753.567071403722,
+      "mean_per_core_cycles": 21647.91715200553,
+      "detailed_useful_bytes": 8192,
+      "detailed_bytes_per_cycle": 0.3765819174901592,
+      "symmetry_full_card_bytes_per_cycle": 11.297457524704775,
+      "background": {
+        "approximation": "previous-epoch offered traffic; cold one-epoch warmup resets caches; phase/epoch sensitivity pending",
+        "cores": 58,
+        "drain_cycle": 21753.567071403722,
+        "enabled": true,
+        "stop_cycle": 21274,
+        "warmup_cycles": 256
+      },
+      "result_class": {
+        "class": "unvalidated_scenario_estimate",
+        "reasons": [
+          "multi-core scaling and full-card held-out validation pending"
+        ]
+      },
+      "assumptions": [
+        "61 contracted ring positions and assumed TD/channel maps; virtual addresses are physical surrogates",
+        "separate pipelined address/data/ack link queues (or explicit shared-fabric overlay); R01 pp.13,19,22 verified early guide, production stepping unspecified",
+        "private inclusive LRU caches; reduced owner/sharer protocol; compatible pending reads share a fill and forward its data",
+        "memory delay decomposed once; channel interval derived from sustained read calibration; banks/refresh/turnaround not simulated",
+        "background is synthetic prior-epoch traffic with excluded cold warmup, not additional executed work; symmetry stability and epoch sensitivity unvalidated",
+        "TLB sub-model: 64-entry fully associative LRU first-level DTLB for 4096-byte pages; a miss adds 29 cycles; second-level TLB reach and page walks are not modeled",
+        "L2 hardware prefetcher not modeled",
+        "no code layout (records without encoding.bytes): prefix decode delays, alignment padding and encoding pairing limits are not modeled; convert a disassembly with scripts/from_binary.py to include them",
+        "instruction cache: code is assumed resident in the L1 instruction cache (steady-state hot region)",
+        "a taken forward branch, call or return costs the core 1 issue cycle(s) for the prefetch-buffer refill (R02 ch.4; S8-01 C10 fixed-direction row at four threads); loop back-edges pay nothing (S8-01 C9 at two threads); hidden at one thread by the same-context spacing",
+        "register results are available to any context's dependent instruction exactly latency cycles after issue; no bypass penalties beyond the measured latencies",
+        "no record carries encoding hints, so every V-eligible instruction is assumed to satisfy the R02 p.56 encoding pairing rules"
+      ],
+      "unsupported": [],
+      "limiting_constraints": [
+        {
+          "constraint": "miss_stall",
+          "context_cycles": 21147,
+          "core": 0
+        },
+        {
+          "constraint": "spacing",
+          "context_cycles": 63,
+          "core": 0
+        },
+        {
+          "constraint": "miss_stall",
+          "context_cycles": 21025,
+          "core": 1
+        },
+        {
+          "constraint": "spacing",
+          "context_cycles": 63,
+          "core": 1
+        }
+      ],
+      "calibration_status": {
+        "note": "Simulated/analytical outputs are model results, never native measurements. ",
+        "state": "unvalidated",
+        "statement": "Low-core scaling and independent full-card validation pending.",
+        "synthetic": false
+      },
+      "parameters_used": {
+        "card.clock_hz": {
+          "source": "S6-01 run logs (governor performance, 1,238,094 kHz; S8-17 C12 confirmed no throttling)",
+          "status": "measured",
+          "unit": "Hz",
+          "value": 1238000000
+        },
+        "card.sustained_bandwidth_gbs": {
+          "source": "read_only 186.14, read_modify_write 179.39, write_ngo 169.74: S11-06 sweep 2 winner table (lead run 2026-11-12, 2048 MiB x 32 passes, five samples, completion envelope; read with 120 threads, the others with 60; docs/research/knc-memory-bandwidth.md and knc-machine.yaml stream_sweep2_bandwidth). write_normal 82.4: S8-01 C1 60-core table, slowest-worker completion estimate (c1_completed_store_bandwidth)",
+          "status": "measured",
+          "unit": "GB/s of useful bytes by traffic type, whole card, best measured configuration",
+          "value": {
+            "read_modify_write": 179.4,
+            "read_only": 186.1,
+            "write_ngo": 169.7,
+            "write_normal": 82.4
+          }
+        },
+        "card.usable_cores": {
+          "source": "S6-01 placement protocol: cores 0-59 for jobs, OS core CPUs {0,241,242,243} excluded",
+          "status": "measured",
+          "unit": "cores",
+          "value": 60
+        },
+        "core.contexts": {
+          "source": "R01 \u00a72.1; R17 slide 10",
+          "status": "documented",
+          "unit": "hardware threads per core",
+          "value": 4
+        },
+        "core.min_issue_gap_same_context": {
+          "source": "R02 ch.4 (page locator missing): one context never issues in two consecutive cycles; R01 pp.19, 23-24 (same fact, docs/research/knc-machine.yaml thread_issue_interval); R17 slide 11; consistent with S6-03 measured 2.08 ticks per independent op at one thread",
+          "status": "documented",
+          "unit": "cycles between two issue events of one context",
+          "value": 2
+        },
+        "frontend.slow_prefix_decode_cycles": {
+          "source": "R02 p.56 (prefix decode): 62, c4/c5, REX and 0f prefixes decode with no penalty; 66, 67, lock, segment and rep prefixes take two cycles each",
+          "status": "documented",
+          "unit": "decode cycles per prefix",
+          "value": 2
+        },
+        "frontend.taken_branch_core_bubble_cycles": {
+          "source": "S8-01 C10 fixed-direction row: 6.22 per branch at one thread, 17.02 at four (three issues plus about one core cycle per unit); R02 ch.4 one-clock refill bubble. Hidden at one thread by the same-context spacing. Scope: forward transfers only (S8-01 C9 register chains at two threads show no cost for the loop back-edge).",
+          "status": "derived",
+          "unit": "core issue cycles lost after a taken branch",
+          "value": 1
+        },
+        "l1.accesses_per_cycle": {
+          "source": "R17 slide 13 (one L1 access per cycle, load or store)",
+          "status": "documented",
+          "unit": "L1 data accesses per core cycle (loads and stores, not prefetches)",
+          "value": 1
+        },
+        "l1.demand_load_miss_stalls_context": {
+          "source": "R08 cache performance notes ('In-order design stalls thread on L1 Data Cache Misses (except for store misses); other threads on the same core can continue'); R02 ch.4 (thread-specific flush on a miss)",
+          "status": "documented",
+          "unit": "boolean",
+          "value": true
+        },
+        "l1.outstanding_demand_misses_per_core": {
+          "source": "R08 concurrency slide ('each core can only support 8 outstanding L1 Data Cache misses')",
+          "status": "documented",
+          "unit": "cache lines",
+          "value": 8
+        },
+        "l1.size_bytes": {
+          "source": "R01 \u00a72.1; R08; R17 slide 13",
+          "status": "documented",
+          "unit": "bytes",
+          "value": 32768
+        },
+        "l1.ways": {
+          "source": "R01 \u00a72.1; R17 slide 13",
+          "status": "documented",
+          "unit": "ways",
+          "value": 8
+        },
+        "l2.size_bytes": {
+          "source": "R01 pp.22-23; R08; R17 slide 14",
+          "status": "documented",
+          "unit": "bytes",
+          "value": 524288
+        },
+        "l2.ways": {
+          "source": "R08; R17 slide 14",
+          "status": "documented",
+          "unit": "ways",
+          "value": 8
+        },
+        "latency.agi_cycles": {
+          "source": "S6-03 agi.gap0 3.11 vs 2.08 baseline at one thread: the dependent load issued one cycle after its earliest slot, i.e. address usable 3 cycles after the write issued; R01 p.19",
+          "status": "measured",
+          "unit": "cycles",
+          "value": 3
+        },
+        "latency.branch_taken_bubble": {
+          "source": "S8-01 C9: loop costs about 2 ticks per vector op plus 2 per loop branch at one thread (the branch costs its issue slot only)",
+          "status": "derived",
+          "unit": "cycles",
+          "value": 0
+        },
+        "latency.l2_hit": {
+          "source": "S6-03 l2.load_lat 24.42 (one thread), 25.68 at four threads",
+          "status": "measured",
+          "unit": "cycles",
+          "value": 24
+        },
+        "latency.memory": {
+          "source": "S6-03 memory.load_lat 356.53 per dependent hop at one thread (idle) minus the first-level TLB miss of 29 cycles (tlb.l1_miss_penalty_cycles): the measured chain touches a new 4 KiB page at every hop and the TLB sub-model charges that miss explicitly. 0.2.x used 357 and double-counted it when the TLB was modeled.",
+          "status": "derived",
+          "unit": "cycles",
+          "value": 328
+        },
+        "latency.remote_l2_line_ns": {
+          "source": "S8-10 C11: 190.6-195.0 ns, near and far owner alike",
+          "status": "measured",
+          "unit": "ns per load of a line in another core's L2",
+          "value": 192
+        },
+        "latency.scalar_load_l1": {
+          "source": "S6-03 l1.load_lat 3.03 (one thread)",
+          "status": "measured",
+          "unit": "cycles",
+          "value": 3
+        },
+        "latency.vector_load_l1": {
+          "source": "S6-03 spill_reload.lat 12.11 = store-to-load path (7, from c9.memory.u1) + load-to-use; R08 documents 3 for vector loads",
+          "status": "derived",
+          "unit": "cycles, L1 hit plain vector load to dependent use",
+          "value": 5
+        },
+        "memory.channel_interleave": {
+          "source": "S14-13 approved multicore-design.md; modeling assumption, not a hardware measurement",
+          "status": "assumed",
+          "unit": "map",
+          "value": "line_modulo"
+        },
+        "memory.channel_service_cycles_per_line": {
+          "source": "equal channel sharing derived from selected card read calibration; not a channel measurement",
+          "status": "derived",
+          "unit": "cycles",
+          "value": 6.811993551853842
+        },
+        "memory.channels_per_controller": {
+          "source": "R01 p.13, verified in early architecture guide (production stepping unspecified)",
+          "status": "documented",
+          "unit": "channels",
+          "value": 2
+        },
+        "memory.controllers": {
+          "source": "R01 p.13, verified in early architecture guide (production stepping unspecified)",
+          "status": "documented",
+          "unit": "controllers",
+          "value": 8
+        },
+        "memory.core_service_cycles_per_line": {
+          "source": "S6-03 memory.load_rt per core at four threads 19.48 ticks per line (37.35 at one thread); modeled as the integer 20",
+          "status": "measured",
+          "unit": "core cycles between memory fills for one core (sequential stream, hardware prefetcher active)",
+          "value": 20
+        },
+        "memory.write_read_service_ratio": {
+          "source": "S14-13 approved multicore-design.md; modeling assumption, not a hardware measurement",
+          "status": "assumed",
+          "unit": "ratio",
+          "value": 1
+        },
+        "multicore.background_epoch_cycles": {
+          "source": "S14-13 approved multicore-design.md; modeling assumption, not a hardware measurement",
+          "status": "assumed",
+          "unit": "cycles",
+          "value": 256
+        },
+        "multicore.background_seed": {
+          "source": "S14-13 approved multicore-design.md; modeling assumption, not a hardware measurement",
+          "status": "assumed",
+          "unit": "seed",
+          "value": 0
+        },
+        "multicore.memory_endpoint_residual_cycles": {
+          "source": "S6-03 memory latency calibration minus reference route/TD; DTLB charged separately",
+          "status": "derived",
+          "unit": "cycles",
+          "value": 270.2660092213115
+        },
+        "multicore.memory_reference_path_cycles": {
+          "source": "unloaded requester/TD/controller paths averaged over contracted geometry",
+          "status": "derived",
+          "unit": "cycles",
+          "value": 57.73399077868852
+        },
+        "multicore.remote_endpoint_residual_cycles": {
+          "source": "S8-10 C11 192 ns anchor (reported production card), minus reference route/TD/L2 costs; calibration",
+          "status": "derived",
+          "unit": "cycles",
+          "value": 155.9582950819672
+        },
+        "multicore.remote_extra_cycles": {
+          "source": "S14-13 approved multicore-design.md; modeling assumption, not a hardware measurement",
+          "status": "assumed",
+          "unit": "cycles",
+          "value": 0
+        },
+        "multicore.remote_reference_path_cycles": {
+          "source": "unloaded requester/TD/source paths averaged over contracted geometry",
+          "status": "derived",
+          "unit": "cycles",
+          "value": 81.73770491803279
+        },
+        "pairing.dependent_pairs_allowed": {
+          "source": "R02 p.56 (cmp/jcc, push/push, pop/pop); push/pop not modeled",
+          "status": "documented",
+          "unit": "U/V pairs allowed despite a flag dependency",
+          "value": [
+            [
+              "cmp",
+              "jcc"
+            ],
+            [
+              "test",
+              "jcc"
+            ]
+          ]
+        },
+        "pairing.encoding_rules": {
+          "source": "R02 p.56",
+          "status": "documented",
+          "unit": "rules",
+          "value": {
+            "max_bytes": 8,
+            "no_displacement_and_immediate": true,
+            "no_vex_mvex_with_disp32": true
+          }
+        },
+        "pairing.load_store_pair": {
+          "source": "S6-03 spill_reload.rt at four threads: 1.07 core cycles per vector store plus reload, so a U-pipe load and a V-pipe store issue in one cycle; the L1 access limit is applied to loads only",
+          "status": "derived",
+          "unit": "boolean",
+          "value": true
+        },
+        "pairing.v_eligible_classes": {
+          "source": "R02 p.34 Table 3-1 (mask, vector store, packstore, prefetch, scalar); R17 slide 10 (scalar dual issue)",
+          "status": "documented",
+          "unit": "instruction classes that may issue on the V pipe",
+          "value": [
+            "scalar_alu",
+            "scalar_rmw",
+            "scalar_load",
+            "scalar_store",
+            "branch",
+            "mask_op",
+            "vector_store",
+            "vector_packstore",
+            "prefetch_l1",
+            "prefetch_l2"
+          ]
+        },
+        "pairing.v_nop_pairs": {
+          "source": "S12-31 microbench window 5: fifteen single-byte NOPs before the loop cost 22.7 ns per row, 1.51 ns (one issue) each; S6-03 agi.gap1-4 for the U side",
+          "status": "measured",
+          "unit": "boolean",
+          "value": false
+        },
+        "pairing.x87_pairs_with_scalar": {
+          "source": "S12-31 microbench, card windows 3 and 5 (2026-11-15): moving faddp out from between cmp and jg saves one issue per iteration (adj_0 and mid_0 -44.8/-45.6 ns per 27-product row, 1.66 ns per iteration); an x87 instruction issues alone",
+          "status": "measured",
+          "unit": "boolean",
+          "value": false
+        },
+        "ring.control_service_cycles": {
+          "source": "S14-13 approved multicore-design.md; modeling assumption, not a hardware measurement",
+          "status": "assumed",
+          "unit": "cycles",
+          "value": 1
+        },
+        "ring.data_slot_bytes": {
+          "source": "S14-13 approved multicore-design.md; modeling assumption, not a hardware measurement",
+          "status": "assumed",
+          "unit": "bytes",
+          "value": 32
+        },
+        "ring.hop_cycles": {
+          "source": "S14-13 approved multicore-design.md; modeling assumption, not a hardware measurement",
+          "status": "assumed",
+          "unit": "cycles",
+          "value": 1
+        },
+        "ring.injection_credits": {
+          "source": "S14-13 approved multicore-design.md; modeling assumption, not a hardware measurement",
+          "status": "assumed",
+          "unit": "transactions",
+          "value": 32
+        },
+        "ring.positions": {
+          "source": "S14-13 approved multicore-design.md; modeling assumption, not a hardware measurement",
+          "status": "assumed",
+          "unit": "positions",
+          "value": 61
+        },
+        "ring.shared_fabrics": {
+          "source": "S14-13 approved multicore-design.md; modeling assumption, not a hardware measurement",
+          "status": "assumed",
+          "unit": "boolean",
+          "value": false
+        },
+        "store.load_after_store_interlock_cycles": {
+          "source": "S6-03 spill_reload.rt 4.20/4.26 per pair at two/four threads and S8-12 C9 memory chains u2/u4 8.56/8.30 per link at one thread (two issues plus four cycles); vector rows only, applied to scalar stores as well (assumed)",
+          "status": "derived",
+          "unit": "cycles after a store before the same context may issue a load",
+          "value": 4
+        },
+        "td.initiation_cycles": {
+          "source": "S14-13 approved multicore-design.md; modeling assumption, not a hardware measurement",
+          "status": "assumed",
+          "unit": "cycles",
+          "value": 1
+        },
+        "td.interleave": {
+          "source": "S14-13 approved multicore-design.md; modeling assumption, not a hardware measurement",
+          "status": "assumed",
+          "unit": "map",
+          "value": "xor"
+        },
+        "td.lookup_cycles": {
+          "source": "S14-13 approved multicore-design.md; modeling assumption, not a hardware measurement",
+          "status": "assumed",
+          "unit": "cycles",
+          "value": 8
+        },
+        "td.slices": {
+          "source": "R01 p.22, verified in early architecture guide (production stepping unspecified); R08 slide 46 corroborates directory routing",
+          "status": "documented",
+          "unit": "slices",
+          "value": 64
+        },
+        "tlb.l1_entries_4k": {
+          "source": "S8-12 C4 rerun (2026-11-08): loads cost L1 latency up to 64 4 KiB pages per core and about 29 ticks more beyond",
+          "status": "measured",
+          "unit": "pages",
+          "value": 64
+        },
+        "tlb.l1_miss_penalty_cycles": {
+          "source": "S8-12 C4 rerun: 31.76-31.79 vs 3.01-3.02 ticks per load at one thread",
+          "status": "measured",
+          "unit": "cycles",
+          "value": 29
+        }
+      }
+    },
+    {
+      "name": "ring-4-cold-read",
+      "scale": "ring",
+      "detailed_cores": 4,
+      "lines_per_core": 64,
+      "contexts_per_core": 1,
+      "status": "ok",
+      "functional_check": {
+        "checked": 4,
+        "mismatches": [],
+        "status": "ok"
+      },
+      "predicted_cycles": 21920.266009221312,
+      "mean_per_core_cycles": 21518.007706352244,
+      "detailed_useful_bytes": 16384,
+      "detailed_bytes_per_cycle": 0.7474361849946373,
+      "symmetry_full_card_bytes_per_cycle": 11.21154277491956,
+      "background": {
+        "approximation": "previous-epoch offered traffic; cold one-epoch warmup resets caches; phase/epoch sensitivity pending",
+        "cores": 56,
+        "drain_cycle": 21920.266009221312,
+        "enabled": true,
+        "stop_cycle": 21554,
+        "warmup_cycles": 256
+      },
+      "result_class": {
+        "class": "unvalidated_scenario_estimate",
+        "reasons": [
+          "multi-core scaling and full-card held-out validation pending"
+        ]
+      },
+      "assumptions": [
+        "61 contracted ring positions and assumed TD/channel maps; virtual addresses are physical surrogates",
+        "separate pipelined address/data/ack link queues (or explicit shared-fabric overlay); R01 pp.13,19,22 verified early guide, production stepping unspecified",
+        "private inclusive LRU caches; reduced owner/sharer protocol; compatible pending reads share a fill and forward its data",
+        "memory delay decomposed once; channel interval derived from sustained read calibration; banks/refresh/turnaround not simulated",
+        "background is synthetic prior-epoch traffic with excluded cold warmup, not additional executed work; symmetry stability and epoch sensitivity unvalidated",
+        "TLB sub-model: 64-entry fully associative LRU first-level DTLB for 4096-byte pages; a miss adds 29 cycles; second-level TLB reach and page walks are not modeled",
+        "L2 hardware prefetcher not modeled",
+        "no code layout (records without encoding.bytes): prefix decode delays, alignment padding and encoding pairing limits are not modeled; convert a disassembly with scripts/from_binary.py to include them",
+        "instruction cache: code is assumed resident in the L1 instruction cache (steady-state hot region)",
+        "a taken forward branch, call or return costs the core 1 issue cycle(s) for the prefetch-buffer refill (R02 ch.4; S8-01 C10 fixed-direction row at four threads); loop back-edges pay nothing (S8-01 C9 at two threads); hidden at one thread by the same-context spacing",
+        "register results are available to any context's dependent instruction exactly latency cycles after issue; no bypass penalties beyond the measured latencies",
+        "no record carries encoding hints, so every V-eligible instruction is assumed to satisfy the R02 p.56 encoding pairing rules"
+      ],
+      "unsupported": [],
+      "limiting_constraints": [
+        {
+          "constraint": "miss_stall",
+          "context_cycles": 20804,
+          "core": 0
+        },
+        {
+          "constraint": "spacing",
+          "context_cycles": 63,
+          "core": 0
+        },
+        {
+          "constraint": "miss_stall",
+          "context_cycles": 20734,
+          "core": 1
+        },
+        {
+          "constraint": "spacing",
+          "context_cycles": 63,
+          "core": 1
+        },
+        {
+          "constraint": "miss_stall",
+          "context_cycles": 21427,
+          "core": 2
+        },
+        {
+          "constraint": "spacing",
+          "context_cycles": 63,
+          "core": 2
+        },
+        {
+          "constraint": "miss_stall",
+          "context_cycles": 21322,
+          "core": 3
+        },
+        {
+          "constraint": "spacing",
+          "context_cycles": 63,
+          "core": 3
+        }
+      ],
+      "calibration_status": {
+        "note": "Simulated/analytical outputs are model results, never native measurements. ",
+        "state": "unvalidated",
+        "statement": "Low-core scaling and independent full-card validation pending.",
+        "synthetic": false
+      },
+      "parameters_used": {
+        "card.clock_hz": {
+          "source": "S6-01 run logs (governor performance, 1,238,094 kHz; S8-17 C12 confirmed no throttling)",
+          "status": "measured",
+          "unit": "Hz",
+          "value": 1238000000
+        },
+        "card.sustained_bandwidth_gbs": {
+          "source": "read_only 186.14, read_modify_write 179.39, write_ngo 169.74: S11-06 sweep 2 winner table (lead run 2026-11-12, 2048 MiB x 32 passes, five samples, completion envelope; read with 120 threads, the others with 60; docs/research/knc-memory-bandwidth.md and knc-machine.yaml stream_sweep2_bandwidth). write_normal 82.4: S8-01 C1 60-core table, slowest-worker completion estimate (c1_completed_store_bandwidth)",
+          "status": "measured",
+          "unit": "GB/s of useful bytes by traffic type, whole card, best measured configuration",
+          "value": {
+            "read_modify_write": 179.4,
+            "read_only": 186.1,
+            "write_ngo": 169.7,
+            "write_normal": 82.4
+          }
+        },
+        "card.usable_cores": {
+          "source": "S6-01 placement protocol: cores 0-59 for jobs, OS core CPUs {0,241,242,243} excluded",
+          "status": "measured",
+          "unit": "cores",
+          "value": 60
+        },
+        "core.contexts": {
+          "source": "R01 \u00a72.1; R17 slide 10",
+          "status": "documented",
+          "unit": "hardware threads per core",
+          "value": 4
+        },
+        "core.min_issue_gap_same_context": {
+          "source": "R02 ch.4 (page locator missing): one context never issues in two consecutive cycles; R01 pp.19, 23-24 (same fact, docs/research/knc-machine.yaml thread_issue_interval); R17 slide 11; consistent with S6-03 measured 2.08 ticks per independent op at one thread",
+          "status": "documented",
+          "unit": "cycles between two issue events of one context",
+          "value": 2
+        },
+        "frontend.slow_prefix_decode_cycles": {
+          "source": "R02 p.56 (prefix decode): 62, c4/c5, REX and 0f prefixes decode with no penalty; 66, 67, lock, segment and rep prefixes take two cycles each",
+          "status": "documented",
+          "unit": "decode cycles per prefix",
+          "value": 2
+        },
+        "frontend.taken_branch_core_bubble_cycles": {
+          "source": "S8-01 C10 fixed-direction row: 6.22 per branch at one thread, 17.02 at four (three issues plus about one core cycle per unit); R02 ch.4 one-clock refill bubble. Hidden at one thread by the same-context spacing. Scope: forward transfers only (S8-01 C9 register chains at two threads show no cost for the loop back-edge).",
+          "status": "derived",
+          "unit": "core issue cycles lost after a taken branch",
+          "value": 1
+        },
+        "l1.accesses_per_cycle": {
+          "source": "R17 slide 13 (one L1 access per cycle, load or store)",
+          "status": "documented",
+          "unit": "L1 data accesses per core cycle (loads and stores, not prefetches)",
+          "value": 1
+        },
+        "l1.demand_load_miss_stalls_context": {
+          "source": "R08 cache performance notes ('In-order design stalls thread on L1 Data Cache Misses (except for store misses); other threads on the same core can continue'); R02 ch.4 (thread-specific flush on a miss)",
+          "status": "documented",
+          "unit": "boolean",
+          "value": true
+        },
+        "l1.outstanding_demand_misses_per_core": {
+          "source": "R08 concurrency slide ('each core can only support 8 outstanding L1 Data Cache misses')",
+          "status": "documented",
+          "unit": "cache lines",
+          "value": 8
+        },
+        "l1.size_bytes": {
+          "source": "R01 \u00a72.1; R08; R17 slide 13",
+          "status": "documented",
+          "unit": "bytes",
+          "value": 32768
+        },
+        "l1.ways": {
+          "source": "R01 \u00a72.1; R17 slide 13",
+          "status": "documented",
+          "unit": "ways",
+          "value": 8
+        },
+        "l2.size_bytes": {
+          "source": "R01 pp.22-23; R08; R17 slide 14",
+          "status": "documented",
+          "unit": "bytes",
+          "value": 524288
+        },
+        "l2.ways": {
+          "source": "R08; R17 slide 14",
+          "status": "documented",
+          "unit": "ways",
+          "value": 8
+        },
+        "latency.agi_cycles": {
+          "source": "S6-03 agi.gap0 3.11 vs 2.08 baseline at one thread: the dependent load issued one cycle after its earliest slot, i.e. address usable 3 cycles after the write issued; R01 p.19",
+          "status": "measured",
+          "unit": "cycles",
+          "value": 3
+        },
+        "latency.branch_taken_bubble": {
+          "source": "S8-01 C9: loop costs about 2 ticks per vector op plus 2 per loop branch at one thread (the branch costs its issue slot only)",
+          "status": "derived",
+          "unit": "cycles",
+          "value": 0
+        },
+        "latency.l2_hit": {
+          "source": "S6-03 l2.load_lat 24.42 (one thread), 25.68 at four threads",
+          "status": "measured",
+          "unit": "cycles",
+          "value": 24
+        },
+        "latency.memory": {
+          "source": "S6-03 memory.load_lat 356.53 per dependent hop at one thread (idle) minus the first-level TLB miss of 29 cycles (tlb.l1_miss_penalty_cycles): the measured chain touches a new 4 KiB page at every hop and the TLB sub-model charges that miss explicitly. 0.2.x used 357 and double-counted it when the TLB was modeled.",
+          "status": "derived",
+          "unit": "cycles",
+          "value": 328
+        },
+        "latency.remote_l2_line_ns": {
+          "source": "S8-10 C11: 190.6-195.0 ns, near and far owner alike",
+          "status": "measured",
+          "unit": "ns per load of a line in another core's L2",
+          "value": 192
+        },
+        "latency.scalar_load_l1": {
+          "source": "S6-03 l1.load_lat 3.03 (one thread)",
+          "status": "measured",
+          "unit": "cycles",
+          "value": 3
+        },
+        "latency.vector_load_l1": {
+          "source": "S6-03 spill_reload.lat 12.11 = store-to-load path (7, from c9.memory.u1) + load-to-use; R08 documents 3 for vector loads",
+          "status": "derived",
+          "unit": "cycles, L1 hit plain vector load to dependent use",
+          "value": 5
+        },
+        "memory.channel_interleave": {
+          "source": "S14-13 approved multicore-design.md; modeling assumption, not a hardware measurement",
+          "status": "assumed",
+          "unit": "map",
+          "value": "line_modulo"
+        },
+        "memory.channel_service_cycles_per_line": {
+          "source": "equal channel sharing derived from selected card read calibration; not a channel measurement",
+          "status": "derived",
+          "unit": "cycles",
+          "value": 6.811993551853842
+        },
+        "memory.channels_per_controller": {
+          "source": "R01 p.13, verified in early architecture guide (production stepping unspecified)",
+          "status": "documented",
+          "unit": "channels",
+          "value": 2
+        },
+        "memory.controllers": {
+          "source": "R01 p.13, verified in early architecture guide (production stepping unspecified)",
+          "status": "documented",
+          "unit": "controllers",
+          "value": 8
+        },
+        "memory.core_service_cycles_per_line": {
+          "source": "S6-03 memory.load_rt per core at four threads 19.48 ticks per line (37.35 at one thread); modeled as the integer 20",
+          "status": "measured",
+          "unit": "core cycles between memory fills for one core (sequential stream, hardware prefetcher active)",
+          "value": 20
+        },
+        "memory.write_read_service_ratio": {
+          "source": "S14-13 approved multicore-design.md; modeling assumption, not a hardware measurement",
+          "status": "assumed",
+          "unit": "ratio",
+          "value": 1
+        },
+        "multicore.background_epoch_cycles": {
+          "source": "S14-13 approved multicore-design.md; modeling assumption, not a hardware measurement",
+          "status": "assumed",
+          "unit": "cycles",
+          "value": 256
+        },
+        "multicore.background_seed": {
+          "source": "S14-13 approved multicore-design.md; modeling assumption, not a hardware measurement",
+          "status": "assumed",
+          "unit": "seed",
+          "value": 0
+        },
+        "multicore.memory_endpoint_residual_cycles": {
+          "source": "S6-03 memory latency calibration minus reference route/TD; DTLB charged separately",
+          "status": "derived",
+          "unit": "cycles",
+          "value": 270.2660092213115
+        },
+        "multicore.memory_reference_path_cycles": {
+          "source": "unloaded requester/TD/controller paths averaged over contracted geometry",
+          "status": "derived",
+          "unit": "cycles",
+          "value": 57.73399077868852
+        },
+        "multicore.remote_endpoint_residual_cycles": {
+          "source": "S8-10 C11 192 ns anchor (reported production card), minus reference route/TD/L2 costs; calibration",
+          "status": "derived",
+          "unit": "cycles",
+          "value": 155.9582950819672
+        },
+        "multicore.remote_extra_cycles": {
+          "source": "S14-13 approved multicore-design.md; modeling assumption, not a hardware measurement",
+          "status": "assumed",
+          "unit": "cycles",
+          "value": 0
+        },
+        "multicore.remote_reference_path_cycles": {
+          "source": "unloaded requester/TD/source paths averaged over contracted geometry",
+          "status": "derived",
+          "unit": "cycles",
+          "value": 81.73770491803279
+        },
+        "pairing.dependent_pairs_allowed": {
+          "source": "R02 p.56 (cmp/jcc, push/push, pop/pop); push/pop not modeled",
+          "status": "documented",
+          "unit": "U/V pairs allowed despite a flag dependency",
+          "value": [
+            [
+              "cmp",
+              "jcc"
+            ],
+            [
+              "test",
+              "jcc"
+            ]
+          ]
+        },
+        "pairing.encoding_rules": {
+          "source": "R02 p.56",
+          "status": "documented",
+          "unit": "rules",
+          "value": {
+            "max_bytes": 8,
+            "no_displacement_and_immediate": true,
+            "no_vex_mvex_with_disp32": true
+          }
+        },
+        "pairing.load_store_pair": {
+          "source": "S6-03 spill_reload.rt at four threads: 1.07 core cycles per vector store plus reload, so a U-pipe load and a V-pipe store issue in one cycle; the L1 access limit is applied to loads only",
+          "status": "derived",
+          "unit": "boolean",
+          "value": true
+        },
+        "pairing.v_eligible_classes": {
+          "source": "R02 p.34 Table 3-1 (mask, vector store, packstore, prefetch, scalar); R17 slide 10 (scalar dual issue)",
+          "status": "documented",
+          "unit": "instruction classes that may issue on the V pipe",
+          "value": [
+            "scalar_alu",
+            "scalar_rmw",
+            "scalar_load",
+            "scalar_store",
+            "branch",
+            "mask_op",
+            "vector_store",
+            "vector_packstore",
+            "prefetch_l1",
+            "prefetch_l2"
+          ]
+        },
+        "pairing.v_nop_pairs": {
+          "source": "S12-31 microbench window 5: fifteen single-byte NOPs before the loop cost 22.7 ns per row, 1.51 ns (one issue) each; S6-03 agi.gap1-4 for the U side",
+          "status": "measured",
+          "unit": "boolean",
+          "value": false
+        },
+        "pairing.x87_pairs_with_scalar": {
+          "source": "S12-31 microbench, card windows 3 and 5 (2026-11-15): moving faddp out from between cmp and jg saves one issue per iteration (adj_0 and mid_0 -44.8/-45.6 ns per 27-product row, 1.66 ns per iteration); an x87 instruction issues alone",
+          "status": "measured",
+          "unit": "boolean",
+          "value": false
+        },
+        "ring.control_service_cycles": {
+          "source": "S14-13 approved multicore-design.md; modeling assumption, not a hardware measurement",
+          "status": "assumed",
+          "unit": "cycles",
+          "value": 1
+        },
+        "ring.data_slot_bytes": {
+          "source": "S14-13 approved multicore-design.md; modeling assumption, not a hardware measurement",
+          "status": "assumed",
+          "unit": "bytes",
+          "value": 32
+        },
+        "ring.hop_cycles": {
+          "source": "S14-13 approved multicore-design.md; modeling assumption, not a hardware measurement",
+          "status": "assumed",
+          "unit": "cycles",
+          "value": 1
+        },
+        "ring.injection_credits": {
+          "source": "S14-13 approved multicore-design.md; modeling assumption, not a hardware measurement",
+          "status": "assumed",
+          "unit": "transactions",
+          "value": 32
+        },
+        "ring.positions": {
+          "source": "S14-13 approved multicore-design.md; modeling assumption, not a hardware measurement",
+          "status": "assumed",
+          "unit": "positions",
+          "value": 61
+        },
+        "ring.shared_fabrics": {
+          "source": "S14-13 approved multicore-design.md; modeling assumption, not a hardware measurement",
+          "status": "assumed",
+          "unit": "boolean",
+          "value": false
+        },
+        "store.load_after_store_interlock_cycles": {
+          "source": "S6-03 spill_reload.rt 4.20/4.26 per pair at two/four threads and S8-12 C9 memory chains u2/u4 8.56/8.30 per link at one thread (two issues plus four cycles); vector rows only, applied to scalar stores as well (assumed)",
+          "status": "derived",
+          "unit": "cycles after a store before the same context may issue a load",
+          "value": 4
+        },
+        "td.initiation_cycles": {
+          "source": "S14-13 approved multicore-design.md; modeling assumption, not a hardware measurement",
+          "status": "assumed",
+          "unit": "cycles",
+          "value": 1
+        },
+        "td.interleave": {
+          "source": "S14-13 approved multicore-design.md; modeling assumption, not a hardware measurement",
+          "status": "assumed",
+          "unit": "map",
+          "value": "xor"
+        },
+        "td.lookup_cycles": {
+          "source": "S14-13 approved multicore-design.md; modeling assumption, not a hardware measurement",
+          "status": "assumed",
+          "unit": "cycles",
+          "value": 8
+        },
+        "td.slices": {
+          "source": "R01 p.22, verified in early architecture guide (production stepping unspecified); R08 slide 46 corroborates directory routing",
+          "status": "documented",
+          "unit": "slices",
+          "value": 64
+        },
+        "tlb.l1_entries_4k": {
+          "source": "S8-12 C4 rerun (2026-11-08): loads cost L1 latency up to 64 4 KiB pages per core and about 29 ticks more beyond",
+          "status": "measured",
+          "unit": "pages",
+          "value": 64
+        },
+        "tlb.l1_miss_penalty_cycles": {
+          "source": "S8-12 C4 rerun: 31.76-31.79 vs 3.01-3.02 ticks per load at one thread",
+          "status": "measured",
+          "unit": "cycles",
+          "value": 29
+        }
+      }
+    },
+    {
+      "name": "ring-8-cold-read",
+      "scale": "ring",
+      "detailed_cores": 8,
+      "lines_per_core": 64,
+      "contexts_per_core": 1,
+      "status": "ok",
+      "functional_check": {
+        "checked": 8,
+        "mismatches": [],
+        "status": "ok"
+      },
+      "predicted_cycles": 21388.139193918472,
+      "mean_per_core_cycles": 21227.250004385205,
+      "detailed_useful_bytes": 32768,
+      "detailed_bytes_per_cycle": 1.5320640894892479,
+      "symmetry_full_card_bytes_per_cycle": 11.49048067116936,
+      "background": {
+        "approximation": "previous-epoch offered traffic; cold one-epoch warmup resets caches; phase/epoch sensitivity pending",
+        "cores": 52,
+        "drain_cycle": 21388.139193918472,
+        "enabled": true,
+        "stop_cycle": 20952,
+        "warmup_cycles": 256
+      },
+      "result_class": {
+        "class": "unvalidated_scenario_estimate",
+        "reasons": [
+          "multi-core scaling and full-card held-out validation pending"
+        ]
+      },
+      "assumptions": [
+        "61 contracted ring positions and assumed TD/channel maps; virtual addresses are physical surrogates",
+        "separate pipelined address/data/ack link queues (or explicit shared-fabric overlay); R01 pp.13,19,22 verified early guide, production stepping unspecified",
+        "private inclusive LRU caches; reduced owner/sharer protocol; compatible pending reads share a fill and forward its data",
+        "memory delay decomposed once; channel interval derived from sustained read calibration; banks/refresh/turnaround not simulated",
+        "background is synthetic prior-epoch traffic with excluded cold warmup, not additional executed work; symmetry stability and epoch sensitivity unvalidated",
+        "TLB sub-model: 64-entry fully associative LRU first-level DTLB for 4096-byte pages; a miss adds 29 cycles; second-level TLB reach and page walks are not modeled",
+        "L2 hardware prefetcher not modeled",
+        "no code layout (records without encoding.bytes): prefix decode delays, alignment padding and encoding pairing limits are not modeled; convert a disassembly with scripts/from_binary.py to include them",
+        "instruction cache: code is assumed resident in the L1 instruction cache (steady-state hot region)",
+        "a taken forward branch, call or return costs the core 1 issue cycle(s) for the prefetch-buffer refill (R02 ch.4; S8-01 C10 fixed-direction row at four threads); loop back-edges pay nothing (S8-01 C9 at two threads); hidden at one thread by the same-context spacing",
+        "register results are available to any context's dependent instruction exactly latency cycles after issue; no bypass penalties beyond the measured latencies",
+        "no record carries encoding hints, so every V-eligible instruction is assumed to satisfy the R02 p.56 encoding pairing rules"
+      ],
+      "unsupported": [],
+      "limiting_constraints": [
+        {
+          "constraint": "miss_stall",
+          "context_cycles": 20769,
+          "core": 0
+        },
+        {
+          "constraint": "spacing",
+          "context_cycles": 63,
+          "core": 0
+        },
+        {
+          "constraint": "miss_stall",
+          "context_cycles": 20825,
+          "core": 1
+        },
+        {
+          "constraint": "spacing",
+          "context_cycles": 63,
+          "core": 1
+        },
+        {
+          "constraint": "miss_stall",
+          "context_cycles": 20739,
+          "core": 2
+        },
+        {
+          "constraint": "spacing",
+          "context_cycles": 63,
+          "core": 2
+        },
+        {
+          "constraint": "miss_stall",
+          "context_cycles": 20754,
+          "core": 3
+        },
+        {
+          "constraint": "spacing",
+          "context_cycles": 63,
+          "core": 3
+        },
+        {
+          "constraint": "miss_stall",
+          "context_cycles": 20777,
+          "core": 4
+        },
+        {
+          "constraint": "spacing",
+          "context_cycles": 63,
+          "core": 4
+        },
+        {
+          "constraint": "miss_stall",
+          "context_cycles": 20789,
+          "core": 5
+        },
+        {
+          "constraint": "spacing",
+          "context_cycles": 63,
+          "core": 5
+        },
+        {
+          "constraint": "miss_stall",
+          "context_cycles": 20792,
+          "core": 6
+        },
+        {
+          "constraint": "spacing",
+          "context_cycles": 63,
+          "core": 6
+        },
+        {
+          "constraint": "miss_stall",
+          "context_cycles": 20815,
+          "core": 7
+        },
+        {
+          "constraint": "spacing",
+          "context_cycles": 63,
+          "core": 7
+        }
+      ],
+      "calibration_status": {
+        "note": "Simulated/analytical outputs are model results, never native measurements. ",
+        "state": "unvalidated",
+        "statement": "Low-core scaling and independent full-card validation pending.",
+        "synthetic": false
+      },
+      "parameters_used": {
+        "card.clock_hz": {
+          "source": "S6-01 run logs (governor performance, 1,238,094 kHz; S8-17 C12 confirmed no throttling)",
+          "status": "measured",
+          "unit": "Hz",
+          "value": 1238000000
+        },
+        "card.sustained_bandwidth_gbs": {
+          "source": "read_only 186.14, read_modify_write 179.39, write_ngo 169.74: S11-06 sweep 2 winner table (lead run 2026-11-12, 2048 MiB x 32 passes, five samples, completion envelope; read with 120 threads, the others with 60; docs/research/knc-memory-bandwidth.md and knc-machine.yaml stream_sweep2_bandwidth). write_normal 82.4: S8-01 C1 60-core table, slowest-worker completion estimate (c1_completed_store_bandwidth)",
+          "status": "measured",
+          "unit": "GB/s of useful bytes by traffic type, whole card, best measured configuration",
+          "value": {
+            "read_modify_write": 179.4,
+            "read_only": 186.1,
+            "write_ngo": 169.7,
+            "write_normal": 82.4
+          }
+        },
+        "card.usable_cores": {
+          "source": "S6-01 placement protocol: cores 0-59 for jobs, OS core CPUs {0,241,242,243} excluded",
+          "status": "measured",
+          "unit": "cores",
+          "value": 60
+        },
+        "core.contexts": {
+          "source": "R01 \u00a72.1; R17 slide 10",
+          "status": "documented",
+          "unit": "hardware threads per core",
+          "value": 4
+        },
+        "core.min_issue_gap_same_context": {
+          "source": "R02 ch.4 (page locator missing): one context never issues in two consecutive cycles; R01 pp.19, 23-24 (same fact, docs/research/knc-machine.yaml thread_issue_interval); R17 slide 11; consistent with S6-03 measured 2.08 ticks per independent op at one thread",
+          "status": "documented",
+          "unit": "cycles between two issue events of one context",
+          "value": 2
+        },
+        "frontend.slow_prefix_decode_cycles": {
+          "source": "R02 p.56 (prefix decode): 62, c4/c5, REX and 0f prefixes decode with no penalty; 66, 67, lock, segment and rep prefixes take two cycles each",
+          "status": "documented",
+          "unit": "decode cycles per prefix",
+          "value": 2
+        },
+        "frontend.taken_branch_core_bubble_cycles": {
+          "source": "S8-01 C10 fixed-direction row: 6.22 per branch at one thread, 17.02 at four (three issues plus about one core cycle per unit); R02 ch.4 one-clock refill bubble. Hidden at one thread by the same-context spacing. Scope: forward transfers only (S8-01 C9 register chains at two threads show no cost for the loop back-edge).",
+          "status": "derived",
+          "unit": "core issue cycles lost after a taken branch",
+          "value": 1
+        },
+        "l1.accesses_per_cycle": {
+          "source": "R17 slide 13 (one L1 access per cycle, load or store)",
+          "status": "documented",
+          "unit": "L1 data accesses per core cycle (loads and stores, not prefetches)",
+          "value": 1
+        },
+        "l1.demand_load_miss_stalls_context": {
+          "source": "R08 cache performance notes ('In-order design stalls thread on L1 Data Cache Misses (except for store misses); other threads on the same core can continue'); R02 ch.4 (thread-specific flush on a miss)",
+          "status": "documented",
+          "unit": "boolean",
+          "value": true
+        },
+        "l1.outstanding_demand_misses_per_core": {
+          "source": "R08 concurrency slide ('each core can only support 8 outstanding L1 Data Cache misses')",
+          "status": "documented",
+          "unit": "cache lines",
+          "value": 8
+        },
+        "l1.size_bytes": {
+          "source": "R01 \u00a72.1; R08; R17 slide 13",
+          "status": "documented",
+          "unit": "bytes",
+          "value": 32768
+        },
+        "l1.ways": {
+          "source": "R01 \u00a72.1; R17 slide 13",
+          "status": "documented",
+          "unit": "ways",
+          "value": 8
+        },
+        "l2.size_bytes": {
+          "source": "R01 pp.22-23; R08; R17 slide 14",
+          "status": "documented",
+          "unit": "bytes",
+          "value": 524288
+        },
+        "l2.ways": {
+          "source": "R08; R17 slide 14",
+          "status": "documented",
+          "unit": "ways",
+          "value": 8
+        },
+        "latency.agi_cycles": {
+          "source": "S6-03 agi.gap0 3.11 vs 2.08 baseline at one thread: the dependent load issued one cycle after its earliest slot, i.e. address usable 3 cycles after the write issued; R01 p.19",
+          "status": "measured",
+          "unit": "cycles",
+          "value": 3
+        },
+        "latency.branch_taken_bubble": {
+          "source": "S8-01 C9: loop costs about 2 ticks per vector op plus 2 per loop branch at one thread (the branch costs its issue slot only)",
+          "status": "derived",
+          "unit": "cycles",
+          "value": 0
+        },
+        "latency.l2_hit": {
+          "source": "S6-03 l2.load_lat 24.42 (one thread), 25.68 at four threads",
+          "status": "measured",
+          "unit": "cycles",
+          "value": 24
+        },
+        "latency.memory": {
+          "source": "S6-03 memory.load_lat 356.53 per dependent hop at one thread (idle) minus the first-level TLB miss of 29 cycles (tlb.l1_miss_penalty_cycles): the measured chain touches a new 4 KiB page at every hop and the TLB sub-model charges that miss explicitly. 0.2.x used 357 and double-counted it when the TLB was modeled.",
+          "status": "derived",
+          "unit": "cycles",
+          "value": 328
+        },
+        "latency.remote_l2_line_ns": {
+          "source": "S8-10 C11: 190.6-195.0 ns, near and far owner alike",
+          "status": "measured",
+          "unit": "ns per load of a line in another core's L2",
+          "value": 192
+        },
+        "latency.scalar_load_l1": {
+          "source": "S6-03 l1.load_lat 3.03 (one thread)",
+          "status": "measured",
+          "unit": "cycles",
+          "value": 3
+        },
+        "latency.vector_load_l1": {
+          "source": "S6-03 spill_reload.lat 12.11 = store-to-load path (7, from c9.memory.u1) + load-to-use; R08 documents 3 for vector loads",
+          "status": "derived",
+          "unit": "cycles, L1 hit plain vector load to dependent use",
+          "value": 5
+        },
+        "memory.channel_interleave": {
+          "source": "S14-13 approved multicore-design.md; modeling assumption, not a hardware measurement",
+          "status": "assumed",
+          "unit": "map",
+          "value": "line_modulo"
+        },
+        "memory.channel_service_cycles_per_line": {
+          "source": "equal channel sharing derived from selected card read calibration; not a channel measurement",
+          "status": "derived",
+          "unit": "cycles",
+          "value": 6.811993551853842
+        },
+        "memory.channels_per_controller": {
+          "source": "R01 p.13, verified in early architecture guide (production stepping unspecified)",
+          "status": "documented",
+          "unit": "channels",
+          "value": 2
+        },
+        "memory.controllers": {
+          "source": "R01 p.13, verified in early architecture guide (production stepping unspecified)",
+          "status": "documented",
+          "unit": "controllers",
+          "value": 8
+        },
+        "memory.core_service_cycles_per_line": {
+          "source": "S6-03 memory.load_rt per core at four threads 19.48 ticks per line (37.35 at one thread); modeled as the integer 20",
+          "status": "measured",
+          "unit": "core cycles between memory fills for one core (sequential stream, hardware prefetcher active)",
+          "value": 20
+        },
+        "memory.write_read_service_ratio": {
+          "source": "S14-13 approved multicore-design.md; modeling assumption, not a hardware measurement",
+          "status": "assumed",
+          "unit": "ratio",
+          "value": 1
+        },
+        "multicore.background_epoch_cycles": {
+          "source": "S14-13 approved multicore-design.md; modeling assumption, not a hardware measurement",
+          "status": "assumed",
+          "unit": "cycles",
+          "value": 256
+        },
+        "multicore.background_seed": {
+          "source": "S14-13 approved multicore-design.md; modeling assumption, not a hardware measurement",
+          "status": "assumed",
+          "unit": "seed",
+          "value": 0
+        },
+        "multicore.memory_endpoint_residual_cycles": {
+          "source": "S6-03 memory latency calibration minus reference route/TD; DTLB charged separately",
+          "status": "derived",
+          "unit": "cycles",
+          "value": 270.2660092213115
+        },
+        "multicore.memory_reference_path_cycles": {
+          "source": "unloaded requester/TD/controller paths averaged over contracted geometry",
+          "status": "derived",
+          "unit": "cycles",
+          "value": 57.73399077868852
+        },
+        "multicore.remote_endpoint_residual_cycles": {
+          "source": "S8-10 C11 192 ns anchor (reported production card), minus reference route/TD/L2 costs; calibration",
+          "status": "derived",
+          "unit": "cycles",
+          "value": 155.9582950819672
+        },
+        "multicore.remote_extra_cycles": {
+          "source": "S14-13 approved multicore-design.md; modeling assumption, not a hardware measurement",
+          "status": "assumed",
+          "unit": "cycles",
+          "value": 0
+        },
+        "multicore.remote_reference_path_cycles": {
+          "source": "unloaded requester/TD/source paths averaged over contracted geometry",
+          "status": "derived",
+          "unit": "cycles",
+          "value": 81.73770491803279
+        },
+        "pairing.dependent_pairs_allowed": {
+          "source": "R02 p.56 (cmp/jcc, push/push, pop/pop); push/pop not modeled",
+          "status": "documented",
+          "unit": "U/V pairs allowed despite a flag dependency",
+          "value": [
+            [
+              "cmp",
+              "jcc"
+            ],
+            [
+              "test",
+              "jcc"
+            ]
+          ]
+        },
+        "pairing.encoding_rules": {
+          "source": "R02 p.56",
+          "status": "documented",
+          "unit": "rules",
+          "value": {
+            "max_bytes": 8,
+            "no_displacement_and_immediate": true,
+            "no_vex_mvex_with_disp32": true
+          }
+        },
+        "pairing.load_store_pair": {
+          "source": "S6-03 spill_reload.rt at four threads: 1.07 core cycles per vector store plus reload, so a U-pipe load and a V-pipe store issue in one cycle; the L1 access limit is applied to loads only",
+          "status": "derived",
+          "unit": "boolean",
+          "value": true
+        },
+        "pairing.v_eligible_classes": {
+          "source": "R02 p.34 Table 3-1 (mask, vector store, packstore, prefetch, scalar); R17 slide 10 (scalar dual issue)",
+          "status": "documented",
+          "unit": "instruction classes that may issue on the V pipe",
+          "value": [
+            "scalar_alu",
+            "scalar_rmw",
+            "scalar_load",
+            "scalar_store",
+            "branch",
+            "mask_op",
+            "vector_store",
+            "vector_packstore",
+            "prefetch_l1",
+            "prefetch_l2"
+          ]
+        },
+        "pairing.v_nop_pairs": {
+          "source": "S12-31 microbench window 5: fifteen single-byte NOPs before the loop cost 22.7 ns per row, 1.51 ns (one issue) each; S6-03 agi.gap1-4 for the U side",
+          "status": "measured",
+          "unit": "boolean",
+          "value": false
+        },
+        "pairing.x87_pairs_with_scalar": {
+          "source": "S12-31 microbench, card windows 3 and 5 (2026-11-15): moving faddp out from between cmp and jg saves one issue per iteration (adj_0 and mid_0 -44.8/-45.6 ns per 27-product row, 1.66 ns per iteration); an x87 instruction issues alone",
+          "status": "measured",
+          "unit": "boolean",
+          "value": false
+        },
+        "ring.control_service_cycles": {
+          "source": "S14-13 approved multicore-design.md; modeling assumption, not a hardware measurement",
+          "status": "assumed",
+          "unit": "cycles",
+          "value": 1
+        },
+        "ring.data_slot_bytes": {
+          "source": "S14-13 approved multicore-design.md; modeling assumption, not a hardware measurement",
+          "status": "assumed",
+          "unit": "bytes",
+          "value": 32
+        },
+        "ring.hop_cycles": {
+          "source": "S14-13 approved multicore-design.md; modeling assumption, not a hardware measurement",
+          "status": "assumed",
+          "unit": "cycles",
+          "value": 1
+        },
+        "ring.injection_credits": {
+          "source": "S14-13 approved multicore-design.md; modeling assumption, not a hardware measurement",
+          "status": "assumed",
+          "unit": "transactions",
+          "value": 32
+        },
+        "ring.positions": {
+          "source": "S14-13 approved multicore-design.md; modeling assumption, not a hardware measurement",
+          "status": "assumed",
+          "unit": "positions",
+          "value": 61
+        },
+        "ring.shared_fabrics": {
+          "source": "S14-13 approved multicore-design.md; modeling assumption, not a hardware measurement",
+          "status": "assumed",
+          "unit": "boolean",
+          "value": false
+        },
+        "store.load_after_store_interlock_cycles": {
+          "source": "S6-03 spill_reload.rt 4.20/4.26 per pair at two/four threads and S8-12 C9 memory chains u2/u4 8.56/8.30 per link at one thread (two issues plus four cycles); vector rows only, applied to scalar stores as well (assumed)",
+          "status": "derived",
+          "unit": "cycles after a store before the same context may issue a load",
+          "value": 4
+        },
+        "td.initiation_cycles": {
+          "source": "S14-13 approved multicore-design.md; modeling assumption, not a hardware measurement",
+          "status": "assumed",
+          "unit": "cycles",
+          "value": 1
+        },
+        "td.interleave": {
+          "source": "S14-13 approved multicore-design.md; modeling assumption, not a hardware measurement",
+          "status": "assumed",
+          "unit": "map",
+          "value": "xor"
+        },
+        "td.lookup_cycles": {
+          "source": "S14-13 approved multicore-design.md; modeling assumption, not a hardware measurement",
+          "status": "assumed",
+          "unit": "cycles",
+          "value": 8
+        },
+        "td.slices": {
+          "source": "R01 p.22, verified in early architecture guide (production stepping unspecified); R08 slide 46 corroborates directory routing",
+          "status": "documented",
+          "unit": "slices",
+          "value": 64
+        },
+        "tlb.l1_entries_4k": {
+          "source": "S8-12 C4 rerun (2026-11-08): loads cost L1 latency up to 64 4 KiB pages per core and about 29 ticks more beyond",
+          "status": "measured",
+          "unit": "pages",
+          "value": 64
+        },
+        "tlb.l1_miss_penalty_cycles": {
+          "source": "S8-12 C4 rerun: 31.76-31.79 vs 3.01-3.02 ticks per load at one thread",
+          "status": "measured",
+          "unit": "cycles",
+          "value": 29
+        }
+      }
+    }
+  ]
+}

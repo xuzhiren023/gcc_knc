@@ -1,6 +1,7 @@
 """Command-line entry: capabilities, selftest, validate, functional, simulate, bounds, compare,
 batch, prepare-native, import-native."""
 import argparse
+import copy
 import datetime
 import json
 import os
@@ -19,6 +20,7 @@ from .report import base_result, write_result
 from . import functional as fmod
 from . import trace as tmod
 from . import timing
+from . import sampling as smod
 from . import bounds as bmod
 from . import analytic
 from . import native as nmod
@@ -125,11 +127,14 @@ def cmd_capabilities(args):
             "instruction": "implemented: latency/pipe class per supported mnemonic (capabilities table), exact functional semantics where 'functional' is true",
             "region": "implemented: function or loop regions from GCC-KNC assembly (scripts/from_gcc_s.py) or hand-written records, 1-4 contexts; functional execution, timing, bounds, exhaustive reorder search (<= 12 instructions)",
             "core": "implemented: 1-4 in-order contexts, U/V pairing rules, same-context issue spacing, round-robin picker, x87 stack with physical-register dependencies, AGI, demand-miss stalls, nonblocking prefetch, outstanding-miss limit, L1/L2 LRU line tracking, optional first-level DTLB, streaming L2 hardware prefetcher and per-core memory service sub-models, gather/scatter/x87/L2-prefetch occupancy",
+            "unit": "simulated: 1-8 detailed cores in lockstep, private caches, 61-position ring, 64 TDs, 8 controllers/16 channels; assumed maps and queues, background off by default",
+            "ring": "simulated: same detailed unit with synthetic previous-epoch symmetry background; all results unvalidated scenario estimates",
             "pair": "analytical scenario only (two cores exchanging lines over the ring); needs core-scale cycles and transfer counts as parameters",
             "card": "analytical scenario only (compute vs bandwidth roofline with barriers and imbalance); never one-core throughput x cores",
         },
-        "commands": ["capabilities", "selftest", "validate", "functional", "simulate", "bounds", "compare", "batch", "prepare-native", "import-native"],
+        "commands": ["capabilities", "selftest", "validate", "functional", "simulate", "sample-loop", "bounds", "schedule", "compare", "batch", "rollup", "prepare-native", "import-native"],
         "adapters": ["scripts/from_gcc_s.py: GCC-KNC / GCC 5.1.1 k1om assembly -> records (function or loop regions, data symbols, coverage audit)",
+                     "scripts/from_binary.py: objects/ELF listings -> whole functions, relocated switches, loop regions and complete per-line reports",
                      "scripts/validate_heldout.py: held-out validation against the gcc_knc characterization catalog"],
         "input_representations": ["normalized-records (JSON, knc-twin.kernel/1)", "gas-att-subset (GAS AT&T assembly, see references/input-format.md)"],
         "memory_scenarios": ["fixed_level", "classified", "line_tracking (LRU L1+L2, software prefetch; optional tlb/hardware_prefetcher/memory_service sub-models)"],
@@ -141,7 +146,7 @@ def cmd_capabilities(args):
         },
         "not_implemented": [
             "any mnemonic outside the table (rejected, no default cost); call/ret are region boundaries",
-            "transcendental approximations (vrcp23ps, vrsqrt23ps, vlog2ps, vexp223ps, vscaleps) exact bit patterns",
+            "vrcp23ps/vrsqrt23ps exact bit patterns without opt-in captured tables; vlog2ps/vexp223ps exact bit patterns",
             "second-level TLB and page walks; the instruction cache; cross-core coherence traffic in core scale; card-level bandwidth sharing",
             "contexts communicating through memory (functional model runs contexts sequentially)",
             "C, Fortran or binaries: no translation is attempted; ABI, encodings, executable loading",
@@ -237,6 +242,8 @@ def cmd_functional(args):
         r["assumptions"].extend(interp.assumptions)
         r["prediction"] = {"dynamic_instructions": steps, "contexts": len(kernel.streams), "functional_check_status": check["status"],
                            "checked_items": check["checked"], "mismatches": len(check["mismatches"])}
+        if interp.heap_allocations:
+            r["prediction"]["heap_allocations"] = interp.heap_allocations
         final = {str(c): interp.contexts[c].snapshot() for c in interp.contexts}
         dump_json(final, os.path.join(out, "final-state.json"))
         dump_json({"memory": interp.memory.snapshot()}, os.path.join(out, "final-memory.json"))
@@ -288,9 +295,32 @@ def _select_contexts(kernel, traces, args):
 
 def _simulate_core(kernel, prof, args, r):
     """Shared by simulate and batch: traces, simulation, prediction block."""
-    traces = _select_contexts(kernel, _traces_for(kernel, args, r), args)
-    sim = timing.CoreSim(kernel, prof, traces, max_cycles=args.max_cycles, deadline=_deadline(args), record_issue=not getattr(args, "no_issue_log", False))
-    res = sim.run()
+    sampling = None
+    if getattr(args, "sample_loop", False):
+        if args.trace_source != "functional" or getattr(args, "trip_count", None) is not None:
+            raise InvalidInput("loop sampling requires functional tracing without a static trip-count override")
+        config = {key: getattr(args, key, default) for key, default in smod.DEFAULTS.items()}
+        config["loop"] = getattr(args, "loop", None)
+        sim, res, interp, check, sampling, cpi, functional_seconds = smod.run(
+            kernel, prof, config, args.max_steps, args.max_cycles, _deadline(args),
+            record_issue=not getattr(args, "no_issue_log", False))
+        traces = _select_contexts(kernel, interp.traces, args)
+        args._interp = interp
+        r["functional_check"] = check
+        r["sampled"] = True
+        r["python_execution_seconds_functional"] = round(functional_seconds, 4)
+        r["assumptions"].extend(interp.assumptions)
+        r["assumptions"].extend([
+            "sampling executes and times only a functional prefix; Python functional and timing costs are reported separately",
+            "one selected loop iteration is one unit_of_work.count unit; extrapolation excludes entry/exit overhead",
+            "observed windows represent unsampled iterations; unseen longer periods and later control-flow changes cannot be ruled out by a finite prefix",
+            "sampling spread is the last three windows' range, not a confidence interval or a native measurement"])
+        if config["warmup"] is None:
+            r["assumptions"].append("automatic warmup stops at the first iteration with no newly touched lines, capped at 64 iterations; this does not prove coverage of unseen input")
+    else:
+        traces = _select_contexts(kernel, _traces_for(kernel, args, r), args)
+        sim = timing.CoreSim(kernel, prof, traces, max_cycles=args.max_cycles, deadline=_deadline(args), record_issue=not getattr(args, "no_issue_log", False))
+        res = sim.run()
     r["assumptions"].extend(sim.assumptions)
     units = kernel.unit_count
     if len(traces) != len(kernel.streams):
@@ -306,39 +336,84 @@ def _simulate_core(kernel, prof, args, r):
             "active_contexts": res["active_contexts"], "per_context": res["per_context"], "memory": res["memory"],
             "kind": "timing_prediction_core_cycles"}
     pred["frontend"] = res.get("frontend")
+    if res["stub_costs"]:
+        pred["stub_cycles_total"] = res["stub_cycles_total"]
+        pred["stub_calls"] = {n: dict(cost, cycles_each=kernel.calls[n].get("cycles"),
+                                    cycles_per_byte=kernel.calls[n].get("cycles_per_byte", 0),
+                                    model=kernel.calls[n].get("model", "none"),
+                                    status=kernel.calls[n].get("status", "assumed"),
+                                    source=kernel.calls[n].get("source"))
+                              for n, cost in sorted(res["stub_costs"].items())}
     interp = getattr(args, "_interp", None)
     args._interp = None
     if interp is not None:
         if interp.input_files:
             pred["input_files"] = interp.input_files
-        if interp.stub_calls:
-            pred["stub_calls"] = {n: {"calls": c, "cycles_each": kernel.calls[n].get("cycles"), "model": kernel.calls[n].get("model", "none"),
-                                      "status": kernel.calls[n].get("status", "assumed"), "source": kernel.calls[n].get("source")}
-                                  for n, c in sorted(interp.stub_calls.items())}
+        if interp.heap_allocations:
+            pred["heap_allocations"] = [a for a in interp.heap_allocations if a["context"] in traces]
         approx = sorted(interp.approximate_stubs) + sorted(interp.approximate_instructions)
         pred["functional_exactness"] = "exact" if not approx else "approximate: %s are not bit-exact (stub or approximate instruction)" % ", ".join(approx)
         if interp.approximate_instructions:
             pred["approximate_instructions"] = sorted(interp.approximate_instructions)
     pred["result_class"] = memory_result_class("simulate", kernel, prof, res["memory"].get("stats"), kernel.scenario)
-    if interp is not None and interp.stub_calls and pred["result_class"]["class"] == "calibrated_forecast":
-        pred["result_class"] = {"class": "unvalidated_scenario_estimate", "reasons": ["the region calls costed stubs (%s): their cycles are inputs, not validated model output" % ", ".join(sorted(interp.stub_calls))]}
+    if res["stub_costs"] and pred["result_class"]["class"] == "calibrated_forecast":
+        pred["result_class"] = {"class": "unvalidated_scenario_estimate", "reasons": ["the region calls costed stubs (%s): their cycles are inputs, not validated model output" % ", ".join(sorted(res["stub_costs"]))]}
+    if sampling is not None:
+        from .rollup import DEFAULT_UNVALIDATED_BAND_PCT
+        model_class = pred["result_class"]
+        evidence = model_class.get("evidence", {})
+        pct = float(evidence.get("worst_abs_error_pct", DEFAULT_UNVALIDATED_BAND_PCT))
+        lo, hi = sampling["cycles_per_iteration_band"]
+        band = [max(0.0, lo - cpi * pct / 100.0), hi + cpi * pct / 100.0]
+        pred.update(sampled=True, sampling=sampling, predicted_cycles=cpi * units,
+                    predicted_cycles_per_unit=cpi, predicted_cycles_per_unit_band=band,
+                    predicted_cycles_band=[x * units for x in band],
+                    model_result_class=model_class, model_band_pct=pct,
+                    sampled_completion_cycles=res["completion_cycles"])
+        pred["result_class"] = {"class": "unvalidated_scenario_estimate",
+                                "reasons": ["iteration sampling is not validated; shape error plus observed window spread"],
+                                "shape": model_class.get("shape")}
     return sim, res, pred
 
 
 def cmd_simulate(args):
     args._t0 = time.time()
-    out = _prepare_out(args, "simulate", os.path.basename(args.kernel))
-    r = base_result("timing_prediction", "ok", "simulate", out_dir=out, scale=args.scale)
+    command = "sample-loop" if getattr(args, "sample_loop", False) else "simulate"
+    out = _prepare_out(args, command, os.path.basename(args.kernel))
+    r = base_result("timing_prediction", "ok", command, out_dir=out, scale=args.scale)
     prof = None
     try:
-        if args.scale not in ("instruction", "region", "core"):
+        if args.scale not in ("instruction", "region", "core", "unit", "ring"):
             raise Unsupported("simulate supports instruction, region and core scales; pair and card are analytical (use bounds --scale pair|card)")
         kernel, h = _kernel_and_hash(args.kernel)
-        prof = load_profile(args.profile, args.overlay)
+        overlays = ([resource_path("profiles", "multicore-assumed.json")] if args.scale in ("unit", "ring") else []) + args.overlay
+        prof = load_profile(args.profile, overlays)
         r["profile"] = prof.describe()
         r["calibration_status"] = _calib(prof)
         r["input"] = {"path": os.path.abspath(kernel.path), "hash_sha256": h, "kernel": kernel.describe()}
         r["representation_evaluated"] = kernel.representation
+        if args.scale in ("unit", "ring"):
+            from . import multicore
+            if args.contexts:
+                raise Unsupported("unit/ring uses streams[].core/context; --contexts selects a single core only")
+            if args.trace_source != "functional":
+                raise Unsupported("unit/ring needs functional traces to reject inter-stream communication")
+            traces = _traces_for(kernel, args, r)
+            pred, assumptions, elapsed, issue_log = multicore.simulate(
+                kernel, prof, traces, args.scale, args.max_cycles, _deadline(args), not args.no_issue_log)
+            r["prediction"] = pred
+            r["parameters_used"] = prof.used_summary()
+            r["assumptions"].extend(assumptions)
+            r["input"]["kernel"] = kernel.describe()
+            r["limiting_constraints"] = [{"core": c["core"], **v} for c in pred["cores"] for v in timing.limiting_constraints(c)]
+            r["python_execution_seconds_simulation"] = elapsed
+            if issue_log:
+                dump_json(issue_log, os.path.join(out, "issue-log.json"))
+                r["artifacts"]["issue_log"] = os.path.join(out, "issue-log.json")
+            args._interp = None
+            return _finish(r, out, args)
+        if kernel.multicore and len({s.core for s in kernel.streams}) > 1:
+            raise InvalidInput("multiple cores require --scale unit or ring")
         sim, res, pred = _simulate_core(kernel, prof, args, r)
         r["parameters_used"] = prof.used_summary()
         r["prediction"] = pred
@@ -348,8 +423,10 @@ def cmd_simulate(args):
             dump_json(sim.issue_log, os.path.join(out, "issue-log.json"))
             r["artifacts"]["issue_log"] = os.path.join(out, "issue-log.json")
         r["message"] = "predicted %d core cycles (%.3f per unit) for %d dynamic instructions on %d context(s); %s%s" % (
-            res["completion_cycles"], pred["predicted_cycles_per_unit"], res["dynamic_instructions"], len(res["active_contexts"]),
+            pred["predicted_cycles"], pred["predicted_cycles_per_unit"], res["dynamic_instructions"], len(res["active_contexts"]),
             pred["result_class"]["class"], "; SYNTHETIC profile" if prof.synthetic else "")
+        if "stub_cycles_total" in pred:
+            r["message"] += "; total stub cycles: %d (sum of declared costs across contexts)" % pred["stub_cycles_total"]
         return _finish(r, out, args)
     except TwinError as e:
         if prof is not None:
@@ -437,6 +514,62 @@ def cmd_bounds(args):
     except TwinError as e:
         if prof is not None:
             r["parameters_used"] = prof.used_summary()
+        return _fail(r, out, args, e)
+
+
+def cmd_schedule(args):
+    """Export ordinary kernels so batch uses its existing frozen-profile path."""
+    import copy
+    from . import scheduling
+    args._t0 = time.time()
+    out = _prepare_out(args, "schedule", os.path.basename(args.kernel))
+    r = base_result("search", "ok", "schedule", out_dir=out, scale="core")
+    try:
+        kernel = load_kernel(args.kernel)
+        prof = load_profile(args.profile, args.overlay)
+        r["profile"] = prof.describe()
+        r["calibration_status"] = _calib(prof)
+        result = scheduling.explore(kernel, prof, method=args.method, seed=args.seed,
+                                    max_states=args.max_states, beam_width=args.beam_width,
+                                    lookahead=args.lookahead)
+        r.update(result)
+        r["prediction"] = {k: v for k, v in result["candidate"].items() if k not in ("kernel", "gas")}
+        # Input files retain their meaning after export to a different directory.
+        def export(raw, name):
+            raw = copy.deepcopy(raw)
+            def resolve(value):
+                if isinstance(value, dict):
+                    if isinstance(value.get("file"), str) and not os.path.isabs(value["file"]):
+                        value["file"] = os.path.abspath(os.path.join(kernel.dir, value["file"]))
+                    for child in value.values():
+                        resolve(child)
+                elif isinstance(value, list):
+                    for child in value:
+                        resolve(child)
+            resolve(raw)
+            path = os.path.join(out, name)
+            dump_json(raw, path)
+            return path
+        r["artifacts"]["candidate_kernel"] = export(result["candidate"]["kernel"], "candidate.json")
+        r["artifacts"]["baseline_kernel"] = export(scheduling._normalized(kernel), "baseline.json")
+        gas_path = os.path.join(out, "candidate.s")
+        with open(gas_path, "w", encoding="utf-8") as f:
+            f.write(result["candidate"]["gas"])
+        r["artifacts"]["candidate_gas"] = gas_path
+        profile_arg = os.path.abspath(args.profile) if os.path.isfile(args.profile) else args.profile
+        manifest = {"schema": BATCH_SCHEMA, "name": kernel.name + " schedules", "profile": profile_arg,
+                    "overlays": [os.path.abspath(p) for p in args.overlay], "frozen_profile_hash": prof.hash,
+                    "baseline": "baseline", "queue_uncertain": False,
+                    "candidates": [{"name": "baseline", "kernel": "baseline.json"},
+                                   {"name": args.method, "kernel": "candidate.json"}]}
+        manifest_path = os.path.join(out, "batch.json")
+        dump_json(manifest, manifest_path)
+        r["artifacts"]["batch_manifest"] = manifest_path
+        r["message"] = "%s: %d cycles (baseline %d, bound %d); %s" % (
+            args.method, result["candidate"]["cycles"], result["baseline_cycles"],
+            result["lower_bound_cycles"], result["result_class"])
+        return _finish(r, out, args)
+    except TwinError as e:
         return _fail(r, out, args, e)
 
 
@@ -678,9 +811,12 @@ def cmd_rollup(args):
         r["input"] = {"path": os.path.abspath(args.manifest), "hash_sha256": sha256_of_obj(m), "manifest": {k: m.get(k) for k in ("name", "program", "card")}}
         band_default = float(m.get("unvalidated_band_pct", rmod.DEFAULT_UNVALIDATED_BAND_PCT))
         regions = []
-        for reg in m["regions"]:
+        for reg in rmod.region_specs(m):
             row = {"name": reg["name"], "share": float(reg["share"]), "share_source": reg.get("share_source")}
+            if "phase" in reg:
+                row.update(phase=reg["phase"], share_within_phase=reg["share_within_phase"])
             sides = {}
+            kernels = {}
             for side in ("baseline", "candidate"):
                 if reg.get(side) is None:
                     continue
@@ -688,23 +824,49 @@ def cmd_rollup(args):
                 sub = {"assumptions": []}
                 try:
                     kernel, h = _kernel_and_hash(kpath)
-                    sim, res, pred = _simulate_core(kernel, prof, args, sub)
+                    kernels[side] = kernel
+                    cargs = copy.copy(args)
+                    if side in reg.get("sampling", {}):
+                        config = smod.options(reg["sampling"][side])
+                        for key, value in config.items():
+                            setattr(cargs, key, value)
+                        cargs.sample_loop = True
+                    sim, res, pred = _simulate_core(kernel, prof, cargs, sub)
                     sides[side] = {"status": "ok", "kernel": reg[side], "kernel_hash": h, "cycles_per_unit": pred["predicted_cycles_per_unit"],
                                    "result_class": pred["result_class"], "limiting": timing.limiting_constraints(res)[:2]}
+                    if pred.get("sampled"):
+                        sides[side].update(sampled=True, sampling=pred["sampling"],
+                                           model_result_class=pred["model_result_class"],
+                                           cycles_per_unit_band=pred["predicted_cycles_per_unit_band"])
                     for a in sub["assumptions"]:
                         if a not in r["assumptions"]:
                             r["assumptions"].append(a)
                 except TwinError as e:
                     sides[side] = {"status": e.status, "kernel": reg[side], "message": e.message}
             row.update(sides)
+            row["sampled"] = any(s.get("sampled") for s in sides.values())
             if "candidate" not in sides:
                 row.update(ratio=1.0, band_pct=0.0, note="no candidate: region unchanged")
             elif sides["baseline"]["status"] == "ok" and sides["candidate"]["status"] == "ok":
+                a, b = kernels["baseline"], kernels["candidate"]
+                if a.scenario != b.scenario or a.numerical_policy != b.numerical_policy or a.unit_of_work.get("description") != b.unit_of_work.get("description"):
+                    raise InvalidInput("region %s baseline/candidate differ in scenario, numerical policy or unit of work" % reg["name"])
                 row["ratio"] = sides["candidate"]["cycles_per_unit"] / sides["baseline"]["cycles_per_unit"]
-                b1, basis1 = rmod.band_of(sides["baseline"]["result_class"], band_default)
-                b2, basis2 = rmod.band_of(sides["candidate"]["result_class"], band_default)
+                b1, basis1 = rmod.band_of(sides["baseline"].get("model_result_class", sides["baseline"]["result_class"]), band_default)
+                b2, basis2 = rmod.band_of(sides["candidate"].get("model_result_class", sides["candidate"]["result_class"]), band_default)
                 row["band_pct"] = max(b1, b2)
                 row["band_basis"] = basis1 if b1 >= b2 else basis2
+                if row["sampled"]:
+                    spread = {}
+                    for side, result in sides.items():
+                        mid = result["cycles_per_unit"]
+                        spread[side] = result.get("sampling", {}).get("cycles_per_iteration_band", [mid, mid])
+                    if spread["baseline"][0] <= 0:
+                        raise InvalidInput("sampled baseline has a nonpositive cycles-per-unit lower bound")
+                    error = row["ratio"] * row["band_pct"] / 100.0
+                    row["ratio_band"] = [max(0.0, spread["candidate"][0] / spread["baseline"][1] - error),
+                                         spread["candidate"][1] / spread["baseline"][0] + error]
+                    row["band_basis"] += " plus propagated sampling spread"
             else:
                 bad = [s for s in ("baseline", "candidate") if sides[s]["status"] != "ok"]
                 row.update(ratio=None, note="not modeled (%s): %s" % (", ".join(bad), "; ".join(sides[s]["message"] for s in bad)[:300]))
@@ -717,9 +879,10 @@ def cmd_rollup(args):
             bw = prof.get_sub("card.sustained_bandwidth_gbs", card.get("traffic", "read_modify_write"))
         summary = rmod.combine(usable, m.get("program"), card, bw)
         summary["regions_not_modeled"] = [{"name": x["name"], "share": x["share"], "reason": x["note"]} for x in skipped]
-        summary["result_class"] = {"class": "calibrated_forecast" if usable and all(x.get("band_basis", "").startswith("held-out") or x["ratio"] == 1.0 for x in usable) and not skipped
-                                   else "unvalidated_scenario_estimate",
-                                   "note": "a ranking aid for compiler or loop changes; the program's final speed is a card measurement"}
+        summary["result_class"] = rmod.result_class(regions)
+        if "phases" in m:
+            summary["phases"] = rmod.phase_results(m, regions)
+        summary["sampled"] = any(x["sampled"] for x in regions)
         summary["kind"] = "program_rollup"
         r["prediction"] = dict(summary, regions=regions)
         r["parameters_used"] = prof.used_summary()
@@ -804,14 +967,21 @@ def build_parser():
     s.add_argument("--trace", action="store_true", help="also write trace.json")
     s.set_defaults(fn=cmd_functional)
 
-    s = sub.add_parser("simulate", help="predict core cycles for the kernel")
-    common(s)
-    s.add_argument("--scale", default="core", choices=SCALES)
-    s.add_argument("--trace-source", default="functional", choices=("functional", "static"))
-    s.add_argument("--trip-count", type=int, default=None, help="override kernel.loop.trip_count for static traces")
-    s.add_argument("--contexts", default=None, help="comma-separated contexts to activate (default: all streams)")
-    s.add_argument("--no-issue-log", action="store_true")
-    s.set_defaults(fn=cmd_simulate)
+    for command in ("simulate", "sample-loop"):
+        s = sub.add_parser(command, help="predict core cycles" if command == "simulate" else "sample loop iterations and extrapolate with an uncertainty band")
+        common(s)
+        s.add_argument("--scale", default="core", choices=SCALES + ("unit", "ring"))
+        s.add_argument("--trace-source", default="functional", choices=("functional", "static"))
+        s.add_argument("--trip-count", type=int, default=None, help="override kernel.loop.trip_count for static traces")
+        s.add_argument("--contexts", default=None, help="comma-separated contexts to activate (default: all streams)")
+        s.add_argument("--no-issue-log", action="store_true")
+        s.add_argument("--sample-loop", action="store_true", default=command == "sample-loop")
+        s.add_argument("--loop", required=command == "sample-loop", help="sample this loop label; one iteration must equal one unit of work")
+        s.add_argument("--warmup", type=int, default=None, help="discard N iterations (default: first-touch warmup capped at 64)")
+        s.add_argument("--window", type=int, default=smod.DEFAULTS["window"])
+        s.add_argument("--tolerance", type=float, default=smod.DEFAULTS["tolerance"], help="relative agreement of three windows (default 0.01)")
+        s.add_argument("--max-iterations", type=int, default=smod.DEFAULTS["max_iterations"])
+        s.set_defaults(fn=cmd_simulate)
 
     s = sub.add_parser("bounds", help="analytical lower bounds (core), loop MII (--loop), reorder search (--search), pair/card scenarios (--scale pair|card --params)")
     common(s, kernel=False)
@@ -825,6 +995,15 @@ def build_parser():
     s.add_argument("--trip-count", type=int, default=None)
     s.add_argument("--contexts", default=None)
     s.set_defaults(fn=cmd_bounds)
+
+    s = sub.add_parser("schedule", help="bounded beam, lookahead list or modulo scheduling; export GAS and a frozen-profile batch")
+    common(s, budgets=False)
+    s.add_argument("--method", choices=("beam", "list", "modulo"), default="beam")
+    s.add_argument("--seed", type=int, default=0)
+    s.add_argument("--max-states", type=int, default=512)
+    s.add_argument("--beam-width", type=int, default=8)
+    s.add_argument("--lookahead", type=int, default=8)
+    s.set_defaults(fn=cmd_schedule)
 
     s = sub.add_parser("compare", help="compare two result.json files (same engine, profile hash, scenario)")
     common(s, profile=False, kernel=False, budgets=False)

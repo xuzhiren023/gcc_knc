@@ -5,8 +5,10 @@ description: Run supported KNC/IMCI simulations, check kernels, compare schedule
 
 # knc-twin
 
-A standard-library Python twin of one Intel Xeon Phi Knights Corner (K1OM, IMCI) core, plus
-analytical pair/card scenario models. It runs on the host or in a code-execution sandbox and
+Engine version: 0.4.0.
+
+A standard-library Python twin of Intel Xeon Phi Knights Corner (K1OM, IMCI) cores,
+with simulated unit/ring and analytical pair/card scenario models. It runs on the host or in a code-execution sandbox and
 needs no card. Entry point: `scripts/knc_twin.py` (Python 3.8+). Everything bundled resolves
 relative to that file; the current directory does not matter.
 
@@ -59,13 +61,30 @@ relative to that file; the current directory does not matter.
    - `functional <kernel>` exact results of supported operations vs expected outputs
    - `simulate <kernel> --profile <id>` core-cycle prediction (1-4 contexts), with front-end and
      memory statistics, stub calls and input-file hashes
+   - `simulate <kernel> --scale unit|ring` 1-8 detailed cores sharing ring/TD/channel queues;
+     `streams[].core` places contexts on cores. Ring enables synthetic symmetry background.
+     These are unvalidated scenarios; see `references/multicore-design.md` and `input-format.md`.
+   - `sample-loop <kernel> --loop LABEL --warmup N --window W --tolerance T --max-iterations M`
+     sample a single-context loop, preserving functional and timing state between windows;
+     equivalent to `simulate --sample-loop --loop LABEL`. One iteration must be one unit of
+     work. Reports the window series, stopping rule, spread and extrapolated cycles. Both
+     trace and timing are sampled; final expected outputs are checked only if execution ends.
+     Every sampled prediction is an `unvalidated_scenario_estimate`, even for a validated shape.
+     See `references/rollup.md` for the stopping rule and its limits.
    - `bounds <kernel>` lower bounds; `--loop` ResMII/RecMII/critical path; `--search` exhaustive reorder
+   - `schedule <kernel> --method beam|list|modulo --max-states 4096 --out <dir>`
+     candidate GAS, normalized kernel and `batch.json` with the frozen profile; beam handles
+     up to 60 body instructions, list uses bounded lookahead, modulo reports a feasible II
+     separately from simulation of the executable body order (no pipeline generation)
    - `bounds --scale card|pair --params <json>` labeled analytical scenario estimates
    - `compare <baseline result.json> <candidate result.json>` same model, same scenario, deltas
    - `batch <manifest.json>` rank a candidate set with a frozen profile hash; uncertain cases get
      native requests under `queue/`
    - `rollup <manifest.json>` weight region predictions by measured time shares: predicted
      change of seconds per step (or any program figure), with a band and the unmodeled share
+     (`phases` groups regions by measured phase share; region shares are within each phase).
+     Each side of a region can supply `sampling` options. Sampling spread is propagated into
+     the program band; a sampled or unvalidated region prevents a calibrated program forecast.
    - `calibration-plan` what to measure in the next card window (staged microbenchmarks, open
      misses, held-out cases to add)
    - `prepare-native <kernel>` reproducible request for the shared hardware queue (no card access)
@@ -108,6 +127,14 @@ models (formulas on measured bandwidths, no ring or memory-controller simulation
 explicit parameters and return `needs_parameters` otherwise; they never multiply one-core
 throughput by the core count.
 
+`unit` and `ring` simulate up to eight detailed cores on a contracted 61-position
+ring, with 64 directory slices and eight two-channel controllers. Ring's remaining
+active cores offer synthetic prior-epoch traffic; they do not execute instructions.
+Every result is `unvalidated_scenario_estimate`. Geometry, maps and service terms
+include explicit assumptions; independent scaling/full-card validation is pending.
+Shared writes between functional streams, atomics, fences, scatter and stubs are
+unsupported at these scales. Pair/card remain analytical models.
+
 ## Profiles
 
 `card-7120-measured` (the gcc_knc project's card) extends `core-x100-measured` (core timing in
@@ -128,6 +155,7 @@ prefix/fence cost and scatter occupancy); nothing gets a silent default. Sensiti
 - `references/calibration.md` the calibration habit: plan, prepare-native, import-native, held-out rules
 - `references/rollup.md` program roll-up manifest and what its number means
 - `references/bounds.md` bound terms, MII vocabulary, search-space claims
+- `references/scheduling-explorer.md` scheduling methods, limits and compiler-ticket workflow
 - `references/analytic-scales.md` pair and card scenario formulas and assumptions
 - `references/sources.md` which claims each source supports
 - `references/gcc-pipeline-mapping.md` relation to GCC's `knc.md` pipeline description

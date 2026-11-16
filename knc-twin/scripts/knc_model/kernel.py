@@ -21,6 +21,7 @@ _TO64 = {}
 for _lst in (GPR32, GPR16, GPR8):
     _TO64.update(dict(zip(_lst, GPR64)))
 ZMM = ["zmm%d" % i for i in range(32)]
+YMM = ["ymm%d" % i for i in range(32)]
 KREG = ["k%d" % i for i in range(8)]
 VALID_ROUNDING = ("rn", "rd", "ru", "rz")
 MEMORY_LEVELS = ("l1", "l2", "memory")
@@ -47,6 +48,8 @@ class Reg(object):
             self.kind, self.base, self.width, self.high = "g", GPR8H[n], 8, True
         elif n in ZMM:
             self.kind, self.base, self.width = "v", n, 512
+        elif n in YMM:
+            self.kind, self.base, self.width = "v", "zmm" + n[3:], 256
         elif n in KREG:
             self.kind, self.base, self.width = "k", n, 16
         elif n == "st" or n == "st(0)":
@@ -163,7 +166,7 @@ class Label(object):
 
 
 def _is_reg_name(low):
-    return (low in GPR64 or low in GPR32 or low in GPR16 or low in GPR8 or low in GPR8H or low in ZMM or low in KREG
+    return (low in GPR64 or low in GPR32 or low in GPR16 or low in GPR8 or low in GPR8H or low in ZMM or low in YMM or low in KREG
             or low == "st" or (low.startswith("st(") and low.endswith(")")))
 
 
@@ -221,7 +224,7 @@ class Insn(object):
     def __init__(self, d, index, stream_id):
         if not isinstance(d, dict):
             raise InvalidInput("stream %s instruction %d: record must be an object" % (stream_id, index))
-        allowed = {"id", "op", "ops", "mask", "rounding", "label", "encoding", "deps", "addr", "width", "comment", "x87_deps", "lines", "source", "sae"}
+        allowed = {"id", "op", "ops", "mask", "rounding", "label", "encoding", "deps", "addr", "width", "comment", "x87_deps", "lines", "source", "sae", "targets"}
         extra = set(d) - allowed
         if extra:
             raise InvalidInput("stream %s instruction %d: unknown record keys %s" % (stream_id, index, sorted(extra)))
@@ -269,6 +272,20 @@ class Insn(object):
             if len(raw_ops) != len(roles):
                 raise InvalidInput("instruction %s (%s): expected %d operands %s, got %d" % (self.id, self.op, len(roles), roles, len(raw_ops)))
         self.operands = [_parse_operand(r, role, "instruction %s operand %d" % (self.id, i)) for i, (r, role) in enumerate(zip(raw_ops, roles))]
+        self.targets = d.get("targets", [])
+        if self.op == "jmp_table":
+            if not isinstance(self.targets, list) or not self.targets or not all(isinstance(t, str) and t for t in self.targets):
+                raise InvalidInput("jmp_table needs a non-empty targets list")
+            if self.operands[0].width != 64:
+                raise InvalidInput("jmp_table index needs a 64-bit general register")
+        elif "targets" in d:
+            raise InvalidInput("targets is only valid on jmp_table")
+        for i, operand in enumerate(self.operands):
+            regs = operand.regs() if isinstance(operand, Mem) else [operand]
+            for reg in regs:
+                if isinstance(reg, Reg) and reg.name in YMM:
+                    if not (self.op == "vcvtps2pd" and i == 1 and operand is reg and not reg.swizzle and not reg.conv):
+                        raise Unsupported("%s: ymm is supported only as the vcvtps2pd source" % self.id)
         self.roles = roles
         self._derive()
 
@@ -360,7 +377,7 @@ class Insn(object):
             self.writes.add("rax")
         if self.op == "sahf":
             self.reads.add("rax")
-        if self.is_branch and self.target is None and self.op != "ret":
+        if self.is_branch and self.target is None and self.op not in ("ret", "jmp_table"):
             raise InvalidInput("instruction %s: branch needs a target label" % self.id)
         # memory forms and effective timing class
         self.is_load = False
@@ -489,6 +506,12 @@ class Stream(object):
         self.context = d.get("context", idx)
         if not isinstance(self.context, int) or not 0 <= self.context <= 3:
             raise InvalidInput("streams[%d]: context must be 0..3" % idx)
+        self.local_context = self.context
+        self.core = d.get("core", 0)
+        if isinstance(self.core, bool) or not isinstance(self.core, int) or self.core < 0:
+            raise InvalidInput("streams[%d]: core must be a nonnegative integer" % idx)
+        # The interpreter uses a unique stream key; issue arbitration remains local.
+        self.context = self.core * 4 + self.local_context
         self.init = d.get("init", {})
         self.expected = d.get("expected", {})
         self.representation = "normalized-records"
@@ -537,6 +560,9 @@ class Stream(object):
                 self.labels[i.label] = i.index
         self.external_calls = []
         for i in self.insns:
+            for target in i.targets:
+                if target not in self.labels:
+                    raise InvalidInput("streams[%d]: jump table %s targets unknown label %r" % (idx, i.id, target))
             if i.target is not None and i.target not in self.labels:
                 if i.op == "call":
                     if not calls or i.target not in calls:
@@ -610,8 +636,11 @@ class Kernel(object):
         streams = raw.get("streams")
         if not isinstance(streams, list) or not streams:
             raise InvalidInput("kernel needs a non-empty 'streams' list")
-        if len(streams) > 4:
+        self.multicore = any("core" in s for s in streams if isinstance(s, dict))
+        if len(streams) > 4 and not self.multicore:
             raise InvalidInput("at most 4 streams (hardware contexts)")
+        if self.multicore and any("core" not in s for s in streams):
+            raise InvalidInput("every stream must specify core when any stream does")
         symbols = self.init.get("symbols", {})
         self.calls = raw.get("calls", {})
         if not isinstance(self.calls, dict):
@@ -701,10 +730,15 @@ class Kernel(object):
         if fe.get("icache", "warm") not in ("warm", "cold_l2", "cold_memory"):
             raise Unsupported("scenario.frontend.icache must be warm, cold_l2 or cold_memory")
         fe.setdefault("icache", "warm")
-        extra_sc = set(sc) - {"memory", "branch", "frontend"}
+        extra_sc = set(sc) - {"memory", "branch", "frontend", "multicore"}
         if extra_sc:
             raise InvalidInput("scenario: unknown keys %s" % sorted(extra_sc))
-        return {"memory": mem, "branch": br, "frontend": fe}
+        result = {"memory": mem, "branch": br, "frontend": fe}
+        if "multicore" in sc:
+            if not isinstance(sc["multicore"], dict):
+                raise InvalidInput("scenario.multicore must be an object")
+            result["multicore"] = sc["multicore"]
+        return result
 
     def stream_for(self, ctx):
         for s in self.streams:

@@ -47,11 +47,32 @@ void saxpy(int n, float a, const float *restrict x, float *restrict y)
 }
 ```
 
-the vectorizer should make the inner loop IMCI on 16 floats at a time, with a fused
-multiply-add on `zmm` registers:
+the inner loop is IMCI on 16 floats at a time: unaligned loads (`vloadunpacklps`/`hps`),
+two-level prefetches, a fused multiply-add on `zmm` registers and unaligned stores. This is
+the `-O2 -march=knc -S` output of a fresh-clone build of `knc` `b2ce6a9eebf`
+([BUILDING.md](BUILDING.md) section 5):
 
-Pending: build verification after M4. An excerpt from a fresh-clone build goes here once that
-build has run ([BUILDING.md](BUILDING.md) section 5).
+```text
+.L5:
+        vloadunpacklps  (%rax), %zmm0
+        vloadunpackhps  64(%rax), %zmm0
+        vloadunpacklps  (%rdx), %zmm5
+        vloadunpackhps  64(%rdx), %zmm5
+        vprefetch1      2048(%rdx)
+        vprefetch0      1024(%rdx)
+        addq    $64, %rdx
+        vprefetch1      2048(%rax)
+        vprefetch0      1024(%rax)
+        addq    $64, %rax
+        vfmadd231ps     %zmm1, %zmm5, %zmm0
+        vpackstorelps   %zmm0, -64(%rax)
+        vpackstorehps   %zmm0, (%rax)
+        cmpq    %rcx, %rdx
+        jne     .L5
+```
+
+The last 1 to 15 elements run as one masked vector step (`vgatherdps` and `vscatterdps` under a
+`k` mask), not as a scalar loop.
 
 Ask the vectorizer what it did with `-fopt-info-vec-optimized` and `-fopt-info-vec-missed`.
 

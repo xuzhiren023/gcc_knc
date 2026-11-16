@@ -172,7 +172,7 @@ def run_case(kernel_dict, test, profile, threads, rounds, scenario, max_seconds)
         streams.append(s)
     raw["streams"] = streams
     kernel = Kernel(raw, kernel_dict.get("_path"))
-    deadline = time.time() + max_seconds
+    deadline = None if max_seconds is None else time.time() + max_seconds
     interp, steps, check = functional.run_functional(kernel, deadline=deadline, pre_init=lambda it: prepare_memory(it, test, footprint, range(threads)))
     sim = timing.CoreSim(kernel, profile, interp.traces, deadline=deadline, record_issue=False)
     res = sim.run()
@@ -191,7 +191,7 @@ def _case_profile(profile_id):
 
 def _run_kernel(raw, path, profile, max_seconds):
     kernel = Kernel(raw, path)
-    deadline = time.time() + max_seconds
+    deadline = None if max_seconds is None else time.time() + max_seconds
     interp, steps, check = functional.run_functional(kernel, deadline=deadline)
     if check["status"] == "mismatch":
         raise TwinError("functional_mismatch: %s" % json.dumps(check["mismatches"][:3]))
@@ -344,10 +344,14 @@ def compiled_rows(cases_dir, profile_id, record=False, max_seconds=120.0, only=N
         if only and not re.search(only, name):
             continue
         case = load_json(os.path.join(d, "case.json"), "case")
-        pred = predict_case(d, profile_id, max_seconds=max_seconds)
+        pred = predict_case(d, profile_id, max_seconds=None if record else max_seconds)
         rec_path = os.path.join(d, "prediction.json")
         recorded = load_json(rec_path, "prediction") if os.path.exists(rec_path) else None
         if record:
+            bad = [v for v in pred.get("variants", []) if v.get("status") != "ok"]
+            if bad:
+                raise ValueError("refusing to record %s: variant %s: %s" %
+                                 (name, bad[0].get("variant"), bad[0].get("message", bad[0].get("status"))))
             dump_json(pred, rec_path)
         elif recorded != pred:
             print("%-28s prediction differs from the recorded prediction.json (engine or profile changed?)" % name, flush=True)
@@ -431,8 +435,11 @@ def main(argv=None):
     ap.add_argument("--only", default=None)
     ap.add_argument("--threads", default="1,2,4")
     ap.add_argument("--rounds", default="2,4")
-    ap.add_argument("--max-seconds", type=float, default=90.0)
+    ap.add_argument("--max-seconds", type=float, default=90.0,
+                    help="simulation wall-clock budget; 0 disables the deadline (held-out replay) ")
     args = ap.parse_args(argv)
+    if args.max_seconds == 0:
+        args.max_seconds = None
     os.makedirs(args.out, exist_ok=True)
     profile = load_profile(args.profile)
     measured = load_json(args.measured, "measured")["rows"] if args.kernels_s else {}
@@ -509,7 +516,7 @@ def main(argv=None):
     card = []
     case_groups = {}
     if args.cases:
-        crow, card, case_groups = compiled_rows(args.cases, args.profile, record=args.record, max_seconds=max(args.max_seconds, 900.0), only=args.only_cases)
+        crow, card, case_groups = compiled_rows(args.cases, args.profile, record=args.record, max_seconds=900.0 if args.max_seconds is None else max(args.max_seconds, 900.0), only=args.only_cases)
         rows += crow
     report = summarize(rows, threads, profile, args, case_groups)
     report["decision_bar"] = decision_bar(rows, case_groups)

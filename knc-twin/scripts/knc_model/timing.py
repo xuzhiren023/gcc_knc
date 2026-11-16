@@ -118,6 +118,7 @@ class CoreSim(object):
         self.nr_store_free_at = 0
         self.gather_free_at = 0
         self.cycle = 0
+        self.stub_costs = {}
         self.issue_log = []
         self.branch_sc = kernel.scenario["branch"]
         self.mispredict_ids = set(self.branch_sc.get("ids", []))
@@ -283,6 +284,9 @@ class CoreSim(object):
             stub = self.kernel.calls[ev.stub]
             cost = stub["cycles"] + stub.get("cycles_per_byte", 0) * ev.nbytes
             cost = int(-(-cost // 1))
+            charged = self.stub_costs.setdefault(ev.stub, {"calls": 0, "cycles_total": 0})
+            charged["calls"] += 1
+            charged["cycles_total"] += cost
             if ev.lines and stub.get("model") in ("memcpy", "memmove", "memset"):
                 self.mem.commit_demand(ev.lines, now, False, stub.get("model") == "memset")
             done = now + cost
@@ -449,6 +453,8 @@ class CoreSim(object):
         insn = ev.insn
         if insn.op in ("call", "ret"):
             return True
+        if insn.op == "jmp_table" and ev.branch_target is not None:
+            return ev.branch_target > insn.index
         if insn.target is None:
             return True
         stream = self.kernel.stream_for(cs.ctx)
@@ -543,13 +549,79 @@ class CoreSim(object):
         return False
 
     # --------------------------------------------------------------------------------------------
-    def run(self):
+    def step(self):
+        """One unchanged issue decision; shared fabrics apply completions before this call."""
+        active = self.ctx
+        now = self.cycle
+        if self.core_busy_until > now:
+            for c in active:
+                if not c.done:
+                    c.stalls["core_busy"] += 1
+            self.cycle += 1
+            return
+        eligible = []
+        for c in active:
+            if c.done:
+                continue
+            if c.stall_until > now:
+                c.stalls[c.stall_reason or "miss_stall"] += 1
+                continue
+            if c.next_issue > now:
+                c.stalls["spacing"] += 1
+                continue
+            ev = c.events[c.pos]
+            if c.decode_until > now:
+                c.stalls["decode"] += 1
+                continue
+            if self.icache is not None and c.fetch_checked != c.pos:
+                if not self._fetch_ok(c, ev, now):
+                    c.stalls["icache_miss"] += 1
+                    continue
+                c.fetch_checked = c.pos
+            why = self._blockers(c, ev, now, 0)
+            if why is not None:
+                c.stalls[why] += 1
+                continue
+            eligible.append(c)
+        if not eligible:
+            self.cycle += 1
+            return
+        eligible.sort(key=lambda c: (c.last_issue, c.ctx))
+        cs = eligible[0]
+        for c in eligible[1:]:
+            c.stalls["not_picked"] += 1
+        u_ev = cs.events[cs.pos]
+        ui = u_ev.insn
+        l1_used = (1 if (ui.is_load or ui.folded_load) else 0) | (2 if ui.is_store else 0)
+        cs.pos += 1
+        self._retire(cs, u_ev, now, "U")
+        if cs.pos < len(cs.events) and cs.stall_until <= now and self.core_busy_until <= now:
+            v_ev = cs.events[cs.pos]
+            if self._can_pair(cs, u_ev, v_ev, now, l1_used):
+                cs.pos += 1
+                cs.pairs += 1
+                self._retire(cs, v_ev, now, "V")
+        cs.last_issue = now
+        cs.next_issue = max(cs.next_issue, now + self.gap)
+        if self.has_layout and cs.pos < len(cs.events):
+            k = cs.events[cs.pos].insn.encoding.get("slow_prefixes", 0)
+            if k:
+                cs.decode_until = now + self.slow_prefix * k
+                self.frontend_stats["decode_delay_cycles"] += max(0, cs.decode_until - cs.next_issue)
+        self.cycle += 1
+
+    def run(self, stop_positions=None):
+        """Advance without draining/resetting state; optional event-index barriers.
+
+        Callers provide lookahead beyond each barrier so pairing and prefix decode
+        see the next instruction. A pair can cross a barrier by one event.
+        """
         t0 = time.time()
         active = self.ctx
         total_events = sum(len(c.events) for c in active)
         while True:
             now = self.cycle
-            if all(c.done for c in active):
+            if all(c.done or (stop_positions is not None and c.pos >= stop_positions[c.ctx]) for c in active):
                 break
             if self.max_cycles is not None and now > self.max_cycles:
                 raise BudgetExhausted("cycle budget %d exhausted; %d of %d dynamic instructions issued (partial, not a result)" % (self.max_cycles, sum(c.issued for c in active), total_events),
@@ -558,71 +630,16 @@ class CoreSim(object):
             if self.deadline is not None and (now & 1023) == 0 and time.time() > self.deadline:
                 raise BudgetExhausted("python time budget exhausted after %d simulated cycles (partial, not a result)" % now,
                                       {"cycles_simulated": now, "issued": sum(c.issued for c in active)})
-            if self.core_busy_until > now:
-                for c in active:
-                    if not c.done:
-                        c.stalls["core_busy"] += 1
-                self.cycle += 1
-                continue
-            eligible = []
-            for c in active:
-                if c.done:
-                    continue
-                if c.stall_until > now:
-                    c.stalls[c.stall_reason or "miss_stall"] += 1
-                    continue
-                if c.next_issue > now:
-                    c.stalls["spacing"] += 1
-                    continue
-                ev = c.events[c.pos]
-                if c.decode_until > now:
-                    c.stalls["decode"] += 1
-                    continue
-                if self.icache is not None and c.fetch_checked != c.pos:
-                    if not self._fetch_ok(c, ev, now):
-                        c.stalls["icache_miss"] += 1
-                        continue
-                    c.fetch_checked = c.pos
-                why = self._blockers(c, ev, now, 0)
-                if why is not None:
-                    c.stalls[why] += 1
-                    continue
-                eligible.append(c)
-            if not eligible:
-                self.cycle += 1
-                continue
-            eligible.sort(key=lambda c: (c.last_issue, c.ctx))
-            cs = eligible[0]
-            for c in eligible[1:]:
-                c.stalls["not_picked"] += 1
-            u_ev = cs.events[cs.pos]
-            ui = u_ev.insn
-            l1_used = (1 if (ui.is_load or ui.folded_load) else 0) | (2 if ui.is_store else 0)
-            cs.pos += 1
-            self._retire(cs, u_ev, now, "U")
-            if cs.pos < len(cs.events) and cs.stall_until <= now and self.core_busy_until <= now:
-                v_ev = cs.events[cs.pos]
-                if self._can_pair(cs, u_ev, v_ev, now, l1_used):
-                    cs.pos += 1
-                    cs.pairs += 1
-                    self._retire(cs, v_ev, now, "V")
-            cs.last_issue = now
-            cs.next_issue = max(cs.next_issue, now + self.gap)
-            if self.has_layout and cs.pos < len(cs.events):
-                k = cs.events[cs.pos].insn.encoding.get("slow_prefixes", 0)
-                if k:
-                    cs.decode_until = now + self.slow_prefix * k
-                    self.frontend_stats["decode_delay_cycles"] += max(0, cs.decode_until - cs.next_issue)
-            self.cycle += 1
+            self.step()
         end_issue = max((c.last_issue_cycle or 0) for c in active) + 1
         completion = max(end_issue, max(c.max_done for c in active))
-        self.python_seconds = time.time() - t0
-        return self._result(end_issue, completion, total_events)
+        self.python_seconds = getattr(self, "python_seconds", 0.0) + time.time() - t0
+        return self._result(end_issue, completion, sum(c.issued for c in active))
 
     def _result(self, end_issue, completion, total_events):
         per_ctx = {}
         for c in self.ctx:
-            per_ctx[str(c.ctx)] = {"dynamic_instructions": len(c.events), "issued": c.issued, "pairs": c.pairs,
+            per_ctx[str(c.ctx)] = {"dynamic_instructions": c.issued, "issued": c.issued, "pairs": c.pairs,
                                   "first_issue": c.first_issue, "last_issue": c.last_issue_cycle, "completion": c.max_done,
                                   "stall_cycles": {k: v for k, v in c.stalls.items() if v}}
         issue_events = sum(c.issued - c.pairs for c in self.ctx)
@@ -637,6 +654,8 @@ class CoreSim(object):
             "per_context": per_ctx,
             "memory": self.mem.describe(),
             "frontend": dict(self.frontend_stats),
+            "stub_cycles_total": sum(s["cycles_total"] for s in self.stub_costs.values()),
+            "stub_costs": self.stub_costs,
             "python_seconds": round(self.python_seconds, 4),
         }
 
