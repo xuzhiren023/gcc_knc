@@ -20,6 +20,7 @@ CLASSES = {
     "scalar_load":       {"pipes": "UV", "latency": "memory", "kind": "load"},
     "scalar_store":      {"pipes": "UV", "latency": None, "kind": "store"},
     "branch":            {"pipes": "UV", "latency": None, "kind": "branch"},
+    "indirect_transfer":  {"pipes": "U", "latency": None, "kind": "branch"},
     "mask_op":           {"pipes": "UV", "latency": "latency.mask_op", "kind": "scalar"},
     "vector_arith":      {"pipes": "U", "latency": "latency.vector_arith", "kind": "vector"},
     "vector_long":       {"pipes": "U", "latency": "latency.vector_long", "kind": "vector"},
@@ -117,6 +118,8 @@ _COND = {"z": "zf", "e": "zf", "nz": "nzf", "ne": "nzf", "l": "lt", "nge": "lt",
          "le": "le", "ng": "le", "b": "cf", "c": "cf", "nae": "cf", "ae": "ncf", "nb": "ncf", "nc": "ncf", "a": "a", "nbe": "a",
          "be": "be", "na": "be", "s": "sf", "ns": "nsf", "p": "pf", "pe": "pf", "np": "npf", "po": "npf"}
 _add("jmp", "branch", ["t"], fn="jmp")
+_add("indirect_transfer", "indirect_transfer", [], fn="indirect_transfer",
+     note="indirect transfers are accepted when never executed")
 _add("jmp_table", "branch", ["r:g"], fn="jmp_table", note="resolved read-only switch table; indirect prediction follows the branch scenario (assumed)")
 for _suf, _c in _COND.items():
     _add("j" + _suf, "branch", ["t"], fn="jcc", flags_r=True, cond=_c)

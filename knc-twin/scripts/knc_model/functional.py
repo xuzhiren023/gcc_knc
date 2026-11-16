@@ -658,6 +658,13 @@ class Interpreter(object):
     # ---------------------------------------------------------------------------------------
     def execute(self, cx, insn, stream, trace, seq):
         fn = insn.spec.get("fn")
+        if fn == "indirect_transfer":
+            addr = insn.encoding.get("addr", insn.index)
+            if isinstance(addr, str):
+                addr = int(addr, 0)
+            raise Unsupported("instruction %s at 0x%x: indirect branch or call %r is not supported (jump tables, function pointers)" %
+                              (insn.id, addr, insn.spec.get("operand", "*")),
+                              {"instruction": insn.id, "mnemonic": insn.spec.get("transfer", "jmp"), "address": addr})
         if fn is None:
             raise Unsupported("instruction %s (%s) has timing support only; functional execution is not implemented for it" % (insn.id, insn.op),
                               {"instruction": insn.id, "mnemonic": insn.op})

@@ -224,7 +224,7 @@ class Insn(object):
     def __init__(self, d, index, stream_id):
         if not isinstance(d, dict):
             raise InvalidInput("stream %s instruction %d: record must be an object" % (stream_id, index))
-        allowed = {"id", "op", "ops", "mask", "rounding", "label", "encoding", "deps", "addr", "width", "comment", "x87_deps", "lines", "source", "sae", "targets"}
+        allowed = {"id", "op", "ops", "mask", "rounding", "label", "encoding", "deps", "addr", "width", "comment", "x87_deps", "lines", "source", "sae", "targets", "transfer", "operand"}
         extra = set(d) - allowed
         if extra:
             raise InvalidInput("stream %s instruction %d: unknown record keys %s" % (stream_id, index, sorted(extra)))
@@ -239,6 +239,8 @@ class Insn(object):
             raise Unsupported("instruction %s: mnemonic %r is not in the supported subset; it gets no default cost" % (self.id, op),
                               {"mnemonic": op, "instruction": self.id})
         self.spec = spec
+        if self.op == "indirect_transfer":
+            self.spec = dict(spec, transfer=d.get("transfer", "jmp"), operand=d.get("operand", "*"))
         self.cls = spec["class"]
         self.label = d.get("label")
         self.comment = d.get("comment", "")
