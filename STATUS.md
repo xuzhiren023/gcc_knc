@@ -2,7 +2,7 @@
 
 Updated automatically at every ticket change. Last update: 2026-11-16 10:52.
 
-**Next: the tech lead, on S14-38.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: GPT-6.1, on S14-10 (knc-twin: --jobs N for independent simulations and PyPy support (roadmap item 1)).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
 Current tickets: `[#################---]` 253 of 295
 
@@ -163,7 +163,7 @@ Current tickets: `[#################---]` 253 of 295
 | S14-33 | knc-twin: import the window-11 calibration rows (imci-math latency and throughput, div10, x87 fcoms, rcp23/rsqrt23 tables) and retire the assumed parameters they settle | Not started |  |
 | S14-35 | knc-twin prepare-native: the generated native program for PhiWeather's sixth_order_diffusion kernels segfaults on the card (exit 139 under claude-pin); find the cause, fix the generator, restage | Changes requested | 1. knc-twin/scripts/knc_model/native.py:97-102: when the kernel init has rsp, the wrapper overwrites %rsp a... |
 | S14-37 | knc-twin x87 double rounding: _x87_binop rounds to the 64-bit significand and then to PC=53/24; real x87 rounds once (knc-boinc repro, 1 to 8 ULP errors) | Not started |  |
-| S14-38 | Card and twin dashboard - running card job, card queue and running twin work with remaining time, card temperature and utilization, host CPU, refreshed every 5 minutes | Question for the tech lead | Both requested changes are committed at 2a2328a5 after red fixture commit 88fb0722: twin sessions use the n... |
+| S14-38 | Card and twin dashboard - running card job, card queue and running twin work with remaining time, card temperature and utilization, host CPU, refreshed every 5 minutes | In progress | No rebase needed: the branch only adds tools/knc_dashboard.py and tests/tools/test_knc_dashboard.py and edi... |
 | S14-39 | knc-twin prepare-native: pointer-rich captures (heap addresses sparse over tens of GB) need a relocating or multi-segment native image | Not started |  |
 | S2-01 | Design for zmm and mask registers under -march=knc | Done | The register design for KNC is settled on paper: all 32 zmm and 8 mask registers become usable under -march... |
 | S2-02 | Float and double arguments and results in zmm lane 0 | Done | Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`). |
@@ -320,6 +320,7 @@ Current tickets: `[#################---]` 253 of 295
 
 ## Recent activity
 
+- 2026-11-16 10:52 **S14-38** lead answer: No rebase needed: the branch only adds tools/knc_dashboard.py and tests/tools/test_knc_dashboard.py and edits docs/card-run.md, which main has not ...
 - 2026-11-16 10:51 **S14-35** lead changes: 1. knc-twin/scripts/knc_model/native.py:97-102: when the kernel init has rsp, the wrapper overwrites %rsp after pushing CALLEE_SAVED and never save...
 - 2026-11-16 10:50 **S14-38** engineer ask: Both requested changes are committed at 2a2328a5 after red fixture commit 88fb0722: twin sessions use the newest engineer/lead log filename and mod...
 - 2026-11-16 10:50 **S14-35** engineer submit: prepare-native keeps the kernel's own stack when it lies in the memory image and otherwise gives the program a private stack, so the PhiWeather pro...
@@ -327,7 +328,6 @@ Current tickets: `[#################---]` 253 of 295
 - 2026-11-16 10:47 **S14-38** lead answer: gcc: no, so there is no knc rebase; rebase onto main. Lead live check passed for the card job, queue, sensors and host CPU. Before resubmitting, tw...
 - 2026-11-16 10:45 **S14-35** engineer escalate: budget: 3 engineer sessions used; the budget is 3
 - 2026-11-16 10:42 **S14-38** engineer ask: Requested overdue queue fix committed at bb92aab8 after red test commit c0e4eaed; all 3 fixture/HTTP tests pass, log .work/_state/logs/S14_38_overd...
-- 2026-11-16 10:38 **S14-38** lead changes: 1. tools/knc_dashboard.py:59: when the running job is overdue, cursor starts at its past expectedEnd, so the first queued job gets an estimated sta...
 
 ## Cost
 
