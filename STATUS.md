@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-16 10:16.
+Updated automatically at every ticket change. Last update: 2026-11-16 10:19.
 
-**Next: the tech lead, on S14-23.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: GPT-6.1, on S14-10 (knc-twin: --jobs N for independent simulations and PyPy support (roadmap item 1)).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
 Current tickets: `[#################---]` 253 of 293
 
@@ -151,7 +151,7 @@ Current tickets: `[#################---]` 253 of 293
 | S14-20 | knc-twin: an indirect jmp/call (PLT tail call through the GOT) on a never-executed path must not refuse the whole region | Done | a region containing an indirect jmp or call that never executes now runs; an executed one fails with the in... |
 | S14-21 | knc-twin multi-core: held-out validation of the 8-tile ring model against the measured GEMV, triad and core-scaling rows | Not started |  |
 | S14-22 | card_run turn row: refreshing an open turn row must keep its place in the queue | draft |  |
-| S14-23 | knc-twin: import the window-10 scatter rows (2 threads) and settle occupancy.scatter_cycles_per_line | Question for the tech lead | Completed t1/t2/t4 summaries and scatter overlay import. Held-out prediction remains blocked: catalog kerne... |
+| S14-23 | knc-twin: import the window-10 scatter rows (2 threads) and settle occupancy.scatter_cycles_per_line | In progress | No new case format and no change to validate_heldout. Record the prediction the way the characterization ca... |
 | S14-24 | dispatch: refuse a session up front when its worktree git dir or ticket file is not writable from the sandbox | draft |  |
 | S14-25 | knc-twin: recorded outputs carry absolute host paths (C:/Users/<name>/...); write repo-relative paths and scrub the committed records | Not started |  |
 | S14-26 | knc-twin bound for software pipelining - how much could overlapping iterations gain on the M4 hot loops (go/no-go for S14-02) | Not started |  |
@@ -318,6 +318,7 @@ Current tickets: `[#################---]` 253 of 293
 
 ## Recent activity
 
+- 2026-11-16 10:19 **S14-23** lead answer: No new case format and no change to validate_heldout. Record the prediction the way the characterization catalog cases do: run the twin's existing ...
 - 2026-11-16 10:16 **S14-23** engineer ask: Completed t1/t2/t4 summaries and scatter overlay import. Held-out prediction remains blocked: catalog kernel has a nonterminating outer jnz; valida...
 - 2026-11-16 10:08 **S14-35** lead answer: Originals are in .work/_shared/calib-w10/phiweather/sixth_{1,2}ctx_l2_031/orig/: kernel.json is the kernel embedded in each request.json (the exact...
 - 2026-11-16 10:08 **S14-35** lead resume: lead placed the originals
@@ -325,7 +326,6 @@ Current tickets: `[#################---]` 253 of 293
 - 2026-11-16 10:03 **S14-35** engineer ask: Original kernel JSON is referenced by request.json but exists only under read-only C:\\Users\\xuzhi\\Documents\\PhiWeather, outside allowed read ro...
 - 2026-11-16 10:01 **S14-23** owner decide: Owner: one more session (input_tokens 10M -> 14M), with the lead's scoped-down plan on the ticket: no functional replay of the catalog driver; reco...
 - 2026-11-16 09:51 **S14-23** engineer escalate: budget: 10609446 input tokens used; the budget is 10000000
-- 2026-11-16 09:22 **S14-23** owner decide: Continue in a fresh session (input_tokens 4M -> 10M, sessions 3 -> 6, standing rule). Your worktree keeps the uncommitted converter (scripts/import...
 
 ## Cost
 
