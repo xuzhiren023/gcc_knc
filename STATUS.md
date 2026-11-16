@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-16 01:31.
+Updated automatically at every ticket change. Last update: 2026-11-16 01:32.
 
-**Waiting for you:** S14-15. Run `python tools/pm.py inbox`.
+**Next: the tech lead, on S13-01.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[#################---]` 244 of 278
 
@@ -143,7 +143,7 @@ Current tickets: `[#################---]` 244 of 278
 | S14-12 | knc-twin: iteration and phase sampling for loop and whole-program wall-time estimates (roadmap item 2) | In progress | Skip the rebase: main has no knc-twin or tests/regress change since your base aced5f9d, so the lead merges ... |
 | S14-13 | knc-twin: 8-tile multi-core unit on the full ring with all memory controllers (roadmap item 3) | In progress | input_tokens 20M -> 30M under the owner's standing auto-extend rule (second extension; design note done, st... |
 | S14-14 | knc-twin: scheduling explorer for modulo scheduling and reordering, evaluating S14-02/S14-03 (roadmap item 4) | In progress | Merged main into s14/S14-14 (9b699730, no conflicts), so the submit check passes. The 120 s budget_exhauste... |
-| S14-15 | knc-twin prepare-native: absolute memory operands come out as `N()` in kernel.S (k1om as 2.22 rejects them); emit them relocated into the image | **Waiting for you** | budget: 4 engineer sessions used; the budget is 4 |
+| S14-15 | knc-twin prepare-native: absolute memory operands come out as `N()` in kernel.S (k1om as 2.22 rejects them); emit them relocated into the image | In progress | sessions 4 -> 6 under the owner's standing auto-extend rule: green is committed (e443bf8f); selftest, regre... |
 | S14-16 | bzip2 slower than GCC 5.1.1: mask-to-GPR move cost below a GPR move makes RA park integers in k registers (M4 known limit, must-fix) | draft |  |
 | S14-17 | Compare not folded with its load in merged return blocks (GCC 16 middle end, about half the remaining bzip2 mainGtU gap) | draft |  |
 | S14-18 | knc-twin regress: held-out replay runs under a 120 s wall-clock budget, so a slow interpreter turns a prediction into a budget_exhausted stub and the test fails as a false mismatch | Not started |  |
@@ -303,6 +303,7 @@ Current tickets: `[#################---]` 244 of 278
 
 ## Recent activity
 
+- 2026-11-16 01:32 **S14-15** owner decide: sessions 4 -> 6 under the owner's standing auto-extend rule: green is committed (e443bf8f); selftest, regress and submit remain
 - 2026-11-16 01:31 **S14-15** lead escalate: budget: 4 engineer sessions used; the budget is 4
 - 2026-11-16 01:30 **S14-11** lead answer: Lead merged main into s14/S14-11 (a merge, not a rebase: the worktree cannot create rebase state, and a merge is what the submit check needs). The ...
 - 2026-11-16 01:29 **S14-15** lead answer: Remove the end-to-end validated-shape rollup assertion. The factored result_class unit test (held-out band_basis with a candidate -> calibrated; ra...
@@ -310,13 +311,12 @@ Current tickets: `[#################---]` 244 of 278
 - 2026-11-16 01:26 **S14-15** engineer ask: The end-to-end validated-shape rollup fixture remains unvalidated because its test kernels model zero dynamic instructions and do not produce candi...
 - 2026-11-16 01:13 **S14-15** owner decide: input_tokens 4M -> 10M under the owner's standing auto-extend rule (second extension; red tests exist, both answers are on the ticket, implement gr...
 - 2026-11-16 01:10 **S14-14** lead answer: Merged main into s14/S14-14 (9b699730, no conflicts), so the submit check passes. The 120 s budget_exhausted regress run is S14-18, not your defect...
-- 2026-11-16 01:09 **S14-14** lead resume: interactive lead merged main into s14/S14-14 (9b699730, no conflicts); continue: held-out check per the 05:55Z note, then submit
 
 ## Cost
 
 - From the script, engineer: 738 sessions, 1588.5M input tokens
 - From the script, lead: 500 sessions, 142.0M input tokens
-- Started by hand, Claude: 14 sessions, 4102.7M input tokens
+- Started by hand, Claude: 14 sessions, 4105.2M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
