@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-16 10:22.
+Updated automatically at every ticket change. Last update: 2026-11-16 10:26.
 
-**Waiting for you:** S14-23. Run `python tools/pm.py inbox`.
+**Next: GPT-6.1, on S14-10 (knc-twin: --jobs N for independent simulations and PyPy support (roadmap item 1)).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
 Current tickets: `[#################---]` 253 of 293
 
@@ -151,7 +151,7 @@ Current tickets: `[#################---]` 253 of 293
 | S14-20 | knc-twin: an indirect jmp/call (PLT tail call through the GOT) on a never-executed path must not refuse the whole region | Done | a region containing an indirect jmp or call that never executes now runs; an executed one fails with the in... |
 | S14-21 | knc-twin multi-core: held-out validation of the 8-tile ring model against the measured GEMV, triad and core-scaling rows | Not started |  |
 | S14-22 | card_run turn row: refreshing an open turn row must keep its place in the queue | draft |  |
-| S14-23 | knc-twin: import the window-10 scatter rows (2 threads) and settle occupancy.scatter_cycles_per_line | **Waiting for you** | budget: 14370671 input tokens used; the budget is 14000000 |
+| S14-23 | knc-twin: import the window-10 scatter rows (2 threads) and settle occupancy.scatter_cycles_per_line | In progress | Owner closed the budget after the final session. The worktree is committed on s14/S14-23 as wip (converter,... |
 | S14-24 | dispatch: refuse a session up front when its worktree git dir or ticket file is not writable from the sandbox | draft |  |
 | S14-25 | knc-twin: recorded outputs carry absolute host paths (C:/Users/<name>/...); write repo-relative paths and scrub the committed records | Not started |  |
 | S14-26 | knc-twin bound for software pipelining - how much could overlapping iterations gain on the M4 hot loops (go/no-go for S14-02) | Not started |  |
@@ -318,6 +318,7 @@ Current tickets: `[#################---]` 253 of 293
 
 ## Recent activity
 
+- 2026-11-16 10:26 **S14-23** owner decide: Owner closed the budget after the final session. The worktree is committed on s14/S14-23 as wip (converter, measurements, kernels, case, tests); th...
 - 2026-11-16 10:22 **S14-23** lead escalate: budget: 14370671 input tokens used; the budget is 14000000
 - 2026-11-16 10:19 **S14-23** lead answer: No new case format and no change to validate_heldout. Record the prediction the way the characterization catalog cases do: run the twin's existing ...
 - 2026-11-16 10:16 **S14-23** engineer ask: Completed t1/t2/t4 summaries and scatter overlay import. Held-out prediction remains blocked: catalog kernel has a nonterminating outer jnz; valida...
@@ -325,13 +326,12 @@ Current tickets: `[#################---]` 253 of 293
 - 2026-11-16 10:08 **S14-35** lead resume: lead placed the originals
 - 2026-11-16 10:05 **S14-35** lead defer: Interactive lead: copy the two original sixth_order_diffusion kernel JSONs referenced by .work/_shared/calib-w10/phiweather/sixth_{1,2}ctx_l2_031/k...
 - 2026-11-16 10:03 **S14-35** engineer ask: Original kernel JSON is referenced by request.json but exists only under read-only C:\\Users\\xuzhi\\Documents\\PhiWeather, outside allowed read ro...
-- 2026-11-16 10:01 **S14-23** owner decide: Owner: one more session (input_tokens 10M -> 14M), with the lead's scoped-down plan on the ticket: no functional replay of the catalog driver; reco...
 
 ## Cost
 
 - From the script, engineer: 779 sessions, 1655.1M input tokens
 - From the script, lead: 529 sessions, 149.2M input tokens
-- Started by hand, Claude: 14 sessions, 4285.6M input tokens
+- Started by hand, Claude: 15 sessions, 4289.3M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
