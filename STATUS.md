@@ -154,7 +154,7 @@ Current tickets: `[#################---]` 258 of 297
 | S14-23 | knc-twin: import the window-10 scatter rows (2 threads) and settle occupancy.scatter_cycles_per_line | Done | superseded by S14-33, which carries this ticket's committed work (wip 8d846ffe cherry-picked onto s14/S14-3... |
 | S14-24 | dispatch: refuse a session up front when its worktree git dir or ticket file is not writable from the sandbox | Not started |  |
 | S14-25 | knc-twin: recorded outputs carry absolute host paths (C:/Users/<name>/...); write repo-relative paths and scrub the committed records | Not started |  |
-| S14-26 | knc-twin bound for software pipelining - how much could overlapping iterations gain on the M4 hot loops (go/no-go for S14-02) | Waiting for review | SMS bound: no-go for S14-02; five of six M4 hot loops are resource-bound at ResMII, only CG has headroom. |
+| S14-26 | knc-twin bound for software pipelining - how much could overlapping iterations gain on the M4 hot loops (go/no-go for S14-02) | lead | Review passed; approve as is. Approve refused: tools/check t0 failed in tests/regress/test_knc_twin.py (sel... |
 | S14-27 | knc-twin bounds: the dependency critical path charges cold lines their full miss latency, so the "lower bound" can exceed the simulation | Not started |  |
 | S14-28 | knc-twin ranking of the four quantized GEMV kernel forms on one KNC core (phase 0 of S14-08) | Not started |  |
 | S14-29 | knc-twin: schedule --block ADDR..ADDR for a straight-line block inside a function, and batch must not write a native request per candidate by default | Not started |  |
@@ -322,6 +322,7 @@ Current tickets: `[#################---]` 258 of 297
 
 ## Recent activity
 
+- 2026-11-16 17:51 **S14-26** lead defer: Review passed; approve as is. Approve refused: tools/check t0 failed in tests/regress/test_knc_twin.py (selftest, trial_cases) because .work/knc-tw...
 - 2026-11-16 17:51 **S13-03** lead defer: Review passed, approve with the note: 'The M4 retrospective is written (docs/research/m4-retrospective.md): it ranks where time was lost, settles a...
 - 2026-11-16 17:50 **S14-42** engineer submit: knc-optimize is a portable skill that tells any agent how to tune code for the Xeon Phi card, step by step, with each Intel practice checked agains...
 - 2026-11-16 17:42 **S14-16** engineer ask: GCC build needed at 407f1c63cc7 (lane gcc). Both GPR/mask costs raised 1->6; mask moves/memory unchanged. Baseline: all 16 mask/gather T1 tests pas...
@@ -329,13 +330,12 @@ Current tickets: `[#################---]` 258 of 297
 - 2026-11-16 17:16 **S14-42** engineer ask: Submit refused: 1092 changed lines exceeds the 800-line budget; the scope-cut commit e7b4956c trims SKILL.md to 60 lines and moves existing detail ...
 - 2026-11-16 17:15 **S14-26** engineer submit: SMS bound: no-go for S14-02; five of six M4 hot loops are resource-bound at ResMII, only CG has headroom.
 - 2026-11-16 17:15 **S13-03** engineer submit: Completed retrospective in docs/research/m4-retrospective.md; local links and committed whitespace passed via tools/run.py (log .work/_state/logs/S...
-- 2026-11-16 17:14 **S13-03** lead answer: Merge done by the lead (5a447f95). Submit now as is with a one-sentence note; no other changes.
 
 ## Cost
 
 - From the script, engineer: 817 sessions, 1718.7M input tokens
 - From the script, lead: 560 sessions, 157.0M input tokens
-- Started by hand, Claude: 94 sessions, 4538.1M input tokens
+- Started by hand, Claude: 94 sessions, 4538.4M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
