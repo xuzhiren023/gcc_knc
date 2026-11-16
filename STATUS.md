@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-16 14:09.
+Updated automatically at every ticket change. Last update: 2026-11-16 14:10.
 
-**Next: the tech lead, on S14-33.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: the tech lead, on S14-26.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[#################---]` 256 of 296
 
@@ -154,7 +154,7 @@ Current tickets: `[#################---]` 256 of 296
 | S14-23 | knc-twin: import the window-10 scatter rows (2 threads) and settle occupancy.scatter_cycles_per_line | In progress | Owner closed the budget after the final session. The worktree is committed on s14/S14-23 as wip (converter,... |
 | S14-24 | dispatch: refuse a session up front when its worktree git dir or ticket file is not writable from the sandbox | Not started |  |
 | S14-25 | knc-twin: recorded outputs carry absolute host paths (C:/Users/<name>/...); write repo-relative paths and scrub the committed records | Not started |  |
-| S14-26 | knc-twin bound for software pipelining - how much could overlapping iterations gain on the M4 hot loops (go/no-go for S14-02) | In progress | Lead 2026-11-16: close it as no-go now; do not wait for a twin fix. Your static bounds already decide it. O... |
+| S14-26 | knc-twin bound for software pipelining - how much could overlapping iterations gain on the M4 hot loops (go/no-go for S14-02) | Question for the tech lead | Committed the requested static-cap table and no-go verdict as b9056c7f, retaining unsupported modulo eviden... |
 | S14-27 | knc-twin bounds: the dependency critical path charges cold lines their full miss latency, so the "lower bound" can exceed the simulation | Not started |  |
 | S14-28 | knc-twin ranking of the four quantized GEMV kernel forms on one KNC core (phase 0 of S14-08) | Not started |  |
 | S14-29 | knc-twin: schedule --block ADDR..ADDR for a straight-line block inside a function, and batch must not write a native request per candidate by default | Not started |  |
@@ -321,6 +321,7 @@ Current tickets: `[#################---]` 256 of 296
 
 ## Recent activity
 
+- 2026-11-16 14:10 **S14-26** engineer ask: Committed the requested static-cap table and no-go verdict as b9056c7f, retaining unsupported modulo evidence; no further model runs. Submit with y...
 - 2026-11-16 14:10 **S12-42** lead close: Card window 10 (post-S12-31 prefix b2ce6a9eebf, 1 thread, A-s12-42-small.out, all GUARDS failures=0): GCC-KNC is now faster than GCC 5.1.1 on all f...
 - 2026-11-16 14:08 **S13-03** lead defer: Merge main into s13/S13-03 (21 commits behind, main touches non-work paths, so submit hard-refuses); the branch adds only docs/research/m4-retrospe...
 - 2026-11-16 14:07 **S14-33** engineer submit: knc-twin imports card windows 10 and 11: the scatter cost per cache line is measured (11.2 cycles, so scatter regions now get a prediction), vrsqrt...
@@ -328,7 +329,6 @@ Current tickets: `[#################---]` 256 of 296
 - 2026-11-16 14:05 **S14-33** lead answer: Lead committed the final files (06b4c78a), merged main (clean), checked tests (48 pass) and the validation note. Only step: pm.py submit S14-33 --n...
 - 2026-11-16 14:04 **S13-03** engineer ask: Retrospective complete at 63eb9e84 in docs/research/m4-retrospective.md: all 19 lesson rows, Sprint 11-13 notes, five research inputs, ranked costs...
 - 2026-11-16 14:03 **S14-33** lead resume: lead committed the final files, merged main, checked tests (48 pass) and the validation note; approving
-- 2026-11-16 14:03 **S14-26** lead answer: Lead 2026-11-16: close it as no-go now; do not wait for a twin fix. Your static bounds already decide it. Overlapping iterations can at best take a...
 
 ## Cost
 
