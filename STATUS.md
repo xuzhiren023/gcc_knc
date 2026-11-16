@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-16 01:27.
+Updated automatically at every ticket change. Last update: 2026-11-16 01:28.
 
 **Next: the tech lead, on S13-01.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
@@ -139,7 +139,7 @@ Current tickets: `[#################---]` 244 of 278
 | S14-08 | Quantized GEMV kernels on KNC - multi-row activation reuse, FP vs int32 VPMADD231D vs VPERMD lookup table, bandwidth-normalized | draft |  |
 | S14-09 | KNC vs the Z840 host (dual E5-2690 v3) on the same algorithms and numerical contract - where running on the card actually pays | draft |  |
 | S14-10 | knc-twin: --jobs N for independent simulations and PyPy support (roadmap item 1) | In progress | No worktree needed. Export main's knc-twin into your shared dir: git -c safe.directory='*' archive main knc... |
-| S14-11 | knc-twin: close PhiWeather WRF coverage gaps (jump tables, vcvtps2pd ymm, loop-region and complete-listing modes, scatter and rcp-table import) | In progress | Yes, run them now: the M4 card block finished 04:20Z and the host limits are lifted. Run tests/regress/test... |
+| S14-11 | knc-twin: close PhiWeather WRF coverage gaps (jump tables, vcvtps2pd ymm, loop-region and complete-listing modes, scatter and rcp-table import) | Question for the tech lead | A-G committed through 8323b581; libc-calls request staged at .work/_shared/S14-11/libc-calls. git rebase ma... |
 | S14-12 | knc-twin: iteration and phase sampling for loop and whole-program wall-time estimates (roadmap item 2) | In progress | Skip the rebase: main has no knc-twin or tests/regress change since your base aced5f9d, so the lead merges ... |
 | S14-13 | knc-twin: 8-tile multi-core unit on the full ring with all memory controllers (roadmap item 3) | In progress | input_tokens 20M -> 30M under the owner's standing auto-extend rule (second extension; design note done, st... |
 | S14-14 | knc-twin: scheduling explorer for modulo scheduling and reordering, evaluating S14-02/S14-03 (roadmap item 4) | In progress | Merged main into s14/S14-14 (9b699730, no conflicts), so the submit check passes. The 120 s budget_exhauste... |
@@ -303,6 +303,7 @@ Current tickets: `[#################---]` 244 of 278
 
 ## Recent activity
 
+- 2026-11-16 01:28 **S14-11** engineer ask: A-G committed through 8323b581; libc-calls request staged at .work/_shared/S14-11/libc-calls. git rebase main failed: cannot create .git/worktrees/...
 - 2026-11-16 01:26 **S14-15** engineer ask: The end-to-end validated-shape rollup fixture remains unvalidated because its test kernels model zero dynamic instructions and do not produce candi...
 - 2026-11-16 01:13 **S14-15** owner decide: input_tokens 4M -> 10M under the owner's standing auto-extend rule (second extension; red tests exist, both answers are on the ticket, implement gr...
 - 2026-11-16 01:10 **S14-14** lead answer: Merged main into s14/S14-14 (9b699730, no conflicts), so the submit check passes. The 120 s budget_exhausted regress run is S14-18, not your defect...
@@ -310,7 +311,6 @@ Current tickets: `[#################---]` 244 of 278
 - 2026-11-16 01:07 **S14-15** lead escalate: budget: 7163819 input tokens used; the budget is 4000000
 - 2026-11-16 01:06 **S14-14** lead defer: Needs the interactive lead: merge main (810ff930, adds docs/research/m4-bzip2-diagnosis.md and m4-result.md) into s14/S14-14 so the submit check pa...
 - 2026-11-16 01:05 **S14-15** lead answer: (1) Raw numeric disp(%rip) is out of scope: it is instruction-relative, not absolute, and the parser correctly rejects it. Drop that case. The rip ...
-- 2026-11-16 01:02 **S14-14** engineer ask: Green 2e975d5b; 7 acceptance pass, selftest/trial pass. Authorized predict_case(s12-31-hpcg-104), once, 16 min: all 8 variants hit 120s budget_exha...
 
 ## Cost
 
