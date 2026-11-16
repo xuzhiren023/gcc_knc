@@ -102,6 +102,9 @@ M5 definition frozen: ADR-0016 accepted by the owner 2026-11-16 15:15 EST (A 1.2
   Status 16:40 EST: only S0-1ctx/2ctx build; the six masked/P0 objects wait on twin T1-11 (generator: %k label prefix
   on jknzd, {rn} suffix instead of leading {rn-sae}). Lead decision: hold window 13 until all eight build, so the four
   settings are compared in one window.
+  16:55 EST: all eight build (T1-11) and lint clean. Lead decision: run them inside window 12, after the two sixth_*
+  probes and before knc-boinc (appended to run-list-w12.txt; copy in calib-w13/run-list-w13.txt), so they keep the
+  queue place a separate window would lose; about 15 min added before knc-boinc.
 - knc-twin tree left gcc_knc main at a1734baa (twin session). `tests/regress/test_knc_twin.py` reads `../knc-twin`
   (KNC_TWIN_ROOT overrides) and **fails, not skips, when the sibling is absent**: a fresh public clone fails t0. Fix it
   before the M5 Linux-host build check (ADR-0016 rule 5). S14-42 (knc-optimize skill, owner request) dispatched, lane skill.
