@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-16 03:53.
+Updated automatically at every ticket change. Last update: 2026-11-16 03:54.
 
-**Waiting for you:** S14-15. Run `python tools/pm.py inbox`.
+**Waiting for you:** S14-15, S14-18. Run `python tools/pm.py inbox`.
 
 Current tickets: `[#################---]` 244 of 279
 
@@ -146,7 +146,7 @@ Current tickets: `[#################---]` 244 of 279
 | S14-15 | knc-twin prepare-native: absolute memory operands come out as `N()` in kernel.S (k1om as 2.22 rejects them); emit them relocated into the image | **Waiting for you** | budget: 10651104 input tokens used; the budget is 10000000 |
 | S14-16 | bzip2 slower than GCC 5.1.1: mask-to-GPR move cost below a GPR move makes RA park integers in k registers (M4 known limit, must-fix) | draft |  |
 | S14-17 | Compare not folded with its load in merged return blocks (GCC 16 middle end, about half the remaining bzip2 mainGtU gap) | draft |  |
-| S14-18 | knc-twin regress: held-out replay runs under a 120 s wall-clock budget, so a slow interpreter turns a prediction into a budget_exhausted stub and the test fails as a false mismatch | Question for the tech lead | The instructed red evidence and green commit cannot proceed: the worktree is clean and HEAD 105ac991 alread... |
+| S14-18 | knc-twin regress: held-out replay runs under a 120 s wall-clock budget, so a slow interpreter turns a prediction into a budget_exhausted stub and the test fails as a false mismatch | **Waiting for you** | HEAD 105ac991 includes code/docs and committed knc-twin-runs output; worktree is clean, so no green changes... |
 | S14-19 | knc-twin x87 integer-load widths - fildl reads 8 bytes (must be 4), filds reads 4 (must be 2) | Not started |  |
 | S14-20 | knc-twin: an indirect jmp/call (PLT tail call through the GOT) on a never-executed path must not refuse the whole region | Not started |  |
 | S2-01 | Design for zmm and mask registers under -march=knc | Done | The register design for KNC is settled on paper: all 32 zmm and 8 mask registers become usable under -march... |
@@ -304,6 +304,7 @@ Current tickets: `[#################---]` 244 of 279
 
 ## Recent activity
 
+- 2026-11-16 03:54 **S14-18** engineer escalate: HEAD 105ac991 includes code/docs and committed knc-twin-runs output; worktree is clean, so no green changes remain to commit. pm.py ask was refused...
 - 2026-11-16 03:53 **S14-18** engineer ask: The instructed red evidence and green commit cannot proceed: the worktree is clean and HEAD 105ac991 already contains the intended code and docs pl...
 - 2026-11-16 03:52 **S14-18** owner decide: sessions 4 -> 6 under the owner's standing auto-extend rule: the [red] commit is in (105ac991); commit the green (code and docs) next, run t0 once ...
 - 2026-11-16 03:51 **S14-18** engineer escalate: budget: 4 engineer sessions used; the budget is 4
@@ -311,11 +312,10 @@ Current tickets: `[#################---]` 244 of 279
 - 2026-11-16 03:50 **S14-13** lead answer: Both gates are resolved: main is merged into s14/S14-13 (8fdc95a8, clean) and the size override is approved; sessions are 11 for this submit only. ...
 - 2026-11-16 03:49 **S14-13** lead resume: Lead merged main into s14/S14-13 (8fdc95a8, clean). Size override approved; sessions 10 -> 11 for the submit only. Run first thing: pm.py submit S1...
 - 2026-11-16 03:47 **S14-13** lead defer: Interactive lead needed (sessions 10/10). (1) Merge main into s14/S14-13 by hand: the submit hard gate (pm.py:330) fires because main has non-work ...
-- 2026-11-16 03:46 **S14-11** lead defer: Review done, no findings: A-G match the brief and the 08:25Z pre-review; heap stubs pinned red-then-green in test_v03.py TestHeapStubs; 3600 s HPCG...
 
 ## Cost
 
-- From the script, engineer: 757 sessions, 1624.5M input tokens
+- From the script, engineer: 758 sessions, 1624.7M input tokens
 - From the script, lead: 512 sessions, 145.1M input tokens
 - Started by hand, Claude: 14 sessions, 4146.2M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
