@@ -1,10 +1,10 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-16 13:55.
+Updated automatically at every ticket change. Last update: 2026-11-16 13:58.
 
-**Next: GPT-6.1, on S13-03 (M4 retrospective - what we did wrong, what worked, and the practice changes carried into the next milestone and the agent-team skill).** Run `python tools/dispatch.py`, or ask the tech lead to.
+**Next: the tech lead, on S14-16.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
-Current tickets: `[#################---]` 255 of 296
+Current tickets: `[#################---]` 256 of 296
 
 ## Milestones
 
@@ -15,7 +15,7 @@ Current tickets: `[#################---]` 255 of 296
 | M2 | Useful vector target | Done | 51 of 51 tickets |
 | M3 | Runtimes | Done | 48 of 48 tickets |
 | M4 | Broad optimization | Done | 63 of 65 tickets |
-| M5 | Program corpus | In progress | 10 of 49 tickets |
+| M5 | Program corpus | In progress | 11 of 49 tickets |
 | M6 | Release | Not started | Not planned in detail yet |
 
 ## Tickets
@@ -122,7 +122,7 @@ Current tickets: `[#################---]` 255 of 296
 | S12-39 | pm.py submit stops demanding an engineer-side rebase that the sandbox cannot perform (Permission denied on .git/worktrees/<id>/rebase-merge) | Done | Engineers no longer need to rebase before submitting: submit only refuses when main has real changes the br... |
 | S12-40 | Indirect prefetch recognizes Fortran sparse loops (array descriptors, ARRAY_REF offsets, nonzero and OpenMP-outlined starts) so NPB-CG benefits | draft | Deferred to M5 (sprint s14) by the owner's 2026-11-15 scope cut ("we are scope creeping the entire Sprint 1... |
 | S12-41 | Early donor check - corpus.py stages and runs only the development programs (no held-out build or run), smallest margins first, so the lead can measure every development program against GCC 5.1.1 now | draft | Deferred to M5 (sprint s14) by the owner's 2026-11-15 scope cut ("we are scope creeping the entire Sprint 1... |
-| S12-42 | Small sparse row loops are 1.5-3% slower than GCC 5.1.1, worse when two loop nests share one function (found by S12-30's window 8 gate) | draft | Owner 2026-11-15 ("I have reset Fable, so subagent back to codex with default selection rule"): Fable overr... |
+| S12-42 | Small sparse row loops are 1.5-3% slower than GCC 5.1.1, worse when two loop nests share one function (found by S12-30's window 8 gate) | Done | Card window 10 (post-S12-31 prefix b2ce6a9eebf, 1 thread, A-s12-42-small.out, all GUARDS failures=0): GCC-K... |
 | S13-01 | M4 final gate - stage the ADR-0015 gate run at the final head (17 programs, held-out unsealed, six pairs, three profiles) | Done | The M4 gate runner (SSH-only transfers, launch retry, adopt, full-profile scoring) and its card_run fixes a... |
 | S13-02 | Libgomp per-region thread density - choose 1-4 workers per core per parallel region instead of once per program | draft | Owner 2026-11-15 ("yes delay to M5"): deferred to M5 (sprint s14). The M4 primary score is serial -O2, so t... |
 | S13-03 | M4 retrospective - what we did wrong, what worked, and the practice changes carried into the next milestone and the agent-team skill | In progress |  |
@@ -144,7 +144,7 @@ Current tickets: `[#################---]` 255 of 296
 | S14-13 | knc-twin: 8-tile multi-core unit on the full ring with all memory controllers (roadmap item 3) | Done | knc-twin simulates 1-8 detailed cores on the full 61-stop ring with all memory controllers and directory sl... |
 | S14-14 | knc-twin: scheduling explorer for modulo scheduling and reordering, evaluating S14-02/S14-03 (roadmap item 4) | Done | knc-twin gains a schedule command: beam search up to 60 instructions, list ordering, modulo II, GAS export ... |
 | S14-15 | knc-twin prepare-native: absolute memory operands come out as `N()` in kernel.S (k1om as 2.22 rejects them); emit them relocated into the image | Done | prepare-native emits absolute operands relocated into the memory image (knc_twin_mem+off(%rip)) instead of ... |
-| S14-16 | bzip2 slower than GCC 5.1.1: mask-to-GPR move cost below a GPR move makes RA park integers in k registers (M4 known limit, must-fix) | In progress |  |
+| S14-16 | bzip2 slower than GCC 5.1.1: mask-to-GPR move cost below a GPR move makes RA park integers in k registers (M4 known limit, must-fix) | Question for the tech lead | Two synthetic T1 attempts failed to reproduce: eight byte accumulators and indexed byte/word comparisons bo... |
 | S14-17 | Compare not folded with its load in merged return blocks (GCC 16 middle end, about half the remaining bzip2 mainGtU gap) | draft |  |
 | S14-18 | knc-twin regress: held-out replay runs under a 120 s wall-clock budget, so a slow interpreter turns a prediction into a budget_exhausted stub and the test fails as a false mismatch | Done | The knc-twin held-out replay no longer runs in t0 (KNC_TWIN_HELDOUT=1 or validate_heldout.py --max-seconds ... |
 | S14-19 | knc-twin x87 integer-load widths - fildl reads 8 bytes (must be 4), filds reads 4 (must be 2) | Done | The knc-twin now reads and writes x87 integer memory at the right widths (filds/fists 2 bytes, fildl/fistl ... |
@@ -321,20 +321,20 @@ Current tickets: `[#################---]` 255 of 296
 
 ## Recent activity
 
+- 2026-11-16 14:10 **S12-42** lead close: Card window 10 (post-S12-31 prefix b2ce6a9eebf, 1 thread, A-s12-42-small.out, all GUARDS failures=0): GCC-KNC is now faster than GCC 5.1.1 on all f...
+- 2026-11-16 13:58 **S14-16** engineer ask: Two synthetic T1 attempts failed to reproduce: eight byte accumulators and indexed byte/word comparisons both pass no-k scans on existing gcc16. Re...
 - 2026-11-16 13:48 **S14-33** lead defer: Interactive lead: commit the files in the 13:46 ask (log S14_33_final_regress-20261116-134356) as 'feat(S14-33): div10 vector-zero data, held-out r...
 - 2026-11-16 13:46 **S14-33** engineer ask: Ready for lead commit/rebase (13:40 workflow; knc ref absent). Files: knc-twin/scripts/import_window11.py, references/validation.md, tests/heldout_...
 - 2026-11-16 13:40 **S14-33** lead answer: WIP committed by the lead. Yes: fix the case data, not the validator: import_window11.py must emit the zmm15/zmm9 zero initial values as a vector o...
 - 2026-11-16 13:40 **S14-33** lead resume: lead committed the wip
 - 2026-11-16 13:37 **S14-33** lead defer: Interactive lead: commit the WIP in worktree S14-33 (files in the 13:35 ask, log S14_33_heldout_remaining-20261116-133324) as 'wip(S14-33): ticks c...
 - 2026-11-16 13:35 **S14-33** engineer ask: Two record attempts failed. Normalize div10 zmm15/zmm9=0 to vector objects next? Commit WIP/resume. Selftest 218 pass; recording incomplete. Files:...
-- 2026-11-16 13:03 **S14-33** owner decide: sessions 5 -> 9, input_tokens 12M -> 20M under the owner's standing rule: steady progress (static catalog replay green, converter units red committ...
-- 2026-11-16 13:02 **S14-33** engineer escalate: budget: 5 engineer sessions used; the budget is 5
 
 ## Cost
 
 - From the script, engineer: 802 sessions, 1682.7M input tokens
 - From the script, lead: 548 sessions, 154.3M input tokens
-- Started by hand, Claude: 47 sessions, 4380.2M input tokens
+- Started by hand, Claude: 48 sessions, 4385.4M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
