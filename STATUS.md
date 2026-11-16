@@ -146,7 +146,7 @@ Current tickets: `[#################---]` 244 of 280
 | S14-15 | knc-twin prepare-native: absolute memory operands come out as `N()` in kernel.S (k1om as 2.22 rejects them); emit them relocated into the image | **Waiting for you** | budget: 10651104 input tokens used; the budget is 10000000 |
 | S14-16 | bzip2 slower than GCC 5.1.1: mask-to-GPR move cost below a GPR move makes RA park integers in k registers (M4 known limit, must-fix) | draft |  |
 | S14-17 | Compare not folded with its load in merged return blocks (GCC 16 middle end, about half the remaining bzip2 mainGtU gap) | draft |  |
-| S14-18 | knc-twin regress: held-out replay runs under a 120 s wall-clock budget, so a slow interpreter turns a prediction into a budget_exhausted stub and the test fails as a false mismatch | In progress | Protected-path issue resolved: the branch's .gitignore change is reverted and the ignore line is on main (m... |
+| S14-18 | knc-twin regress: held-out replay runs under a 120 s wall-clock budget, so a slow interpreter turns a prediction into a budget_exhausted stub and the test fails as a false mismatch | Waiting for review | the held-out replay leaves t0 (KNC_TWIN_HELDOUT=1 runs it; --max-seconds 0 disables the deadline), the regr... |
 | S14-19 | knc-twin x87 integer-load widths - fildl reads 8 bytes (must be 4), filds reads 4 (must be 2) | Not started |  |
 | S14-20 | knc-twin: an indirect jmp/call (PLT tail call through the GOT) on a never-executed path must not refuse the whole region | Not started |  |
 | S14-21 | knc-twin multi-core: held-out validation of the 8-tile ring model against the measured GEMV, triad and core-scaling rows | Not started |  |
@@ -305,6 +305,7 @@ Current tickets: `[#################---]` 244 of 280
 
 ## Recent activity
 
+- 2026-11-16 05:00 **S14-18** engineer submit: the held-out replay leaves t0 (KNC_TWIN_HELDOUT=1 runs it; --max-seconds 0 disables the deadline), the regress fails on a non-ok variant with its m...
 - 2026-11-16 04:59 **S14-18** lead answer: Protected-path issue resolved: the branch's .gitignore change is reverted and the ignore line is on main (merged in, branch clean; diff touches onl...
 - 2026-11-16 04:58 **S14-18** lead resume: Lead reverted the branch's .gitignore commit (protected path), landed the knc-twin-runs/ ignore line on main, and merged main into s14/S14-18 (clea...
 - 2026-11-16 04:57 **S14-18** lead defer: Interactive lead needed: submit is refused because the branch changes protected .gitignore (the lead's knc-twin-runs/ line). Either revert that .gi...
@@ -312,7 +313,6 @@ Current tickets: `[#################---]` 244 of 280
 - 2026-11-16 04:55 **S14-18** owner decide: The four refused submits were 'uncommitted changes in the worktree': the untracked knc-twin-runs/ left by the lead's own t0 run. The lead deleted i...
 - 2026-11-16 04:53 **S14-18** engineer escalate: budget: 10 engineer sessions used; the budget is 10
 - 2026-11-16 04:51 **S14-18** owner decide: sessions 8 -> 10 (the budget must exceed the 8 sessions already counted for a new one to start). Only step: pm.py submit S14-18 with the 09:40Z not...
-- 2026-11-16 04:49 **S14-18** engineer escalate: budget: 8 engineer sessions used; the budget is 8
 
 ## Cost
 
