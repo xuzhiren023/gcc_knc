@@ -1,10 +1,10 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-16 08:45.
+Updated automatically at every ticket change. Last update: 2026-11-16 08:46.
 
-**Next: the tech lead, on S14-20.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: GPT-6.1, on S14-10 (knc-twin: --jobs N for independent simulations and PyPy support (roadmap item 1)).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
-Current tickets: `[#################---]` 252 of 289
+Current tickets: `[#################---]` 252 of 291
 
 ## Milestones
 
@@ -15,7 +15,7 @@ Current tickets: `[#################---]` 252 of 289
 | M2 | Useful vector target | Done | 51 of 51 tickets |
 | M3 | Runtimes | Done | 48 of 48 tickets |
 | M4 | Broad optimization | Done | 63 of 65 tickets |
-| M5 | Program corpus | In progress | 7 of 42 tickets |
+| M5 | Program corpus | In progress | 7 of 44 tickets |
 | M6 | Release | Not started | Not planned in detail yet |
 
 ## Tickets
@@ -148,7 +148,7 @@ Current tickets: `[#################---]` 252 of 289
 | S14-17 | Compare not folded with its load in merged return blocks (GCC 16 middle end, about half the remaining bzip2 mainGtU gap) | draft |  |
 | S14-18 | knc-twin regress: held-out replay runs under a 120 s wall-clock budget, so a slow interpreter turns a prediction into a budget_exhausted stub and the test fails as a false mismatch | Done | The knc-twin held-out replay no longer runs in t0 (KNC_TWIN_HELDOUT=1 or validate_heldout.py --max-seconds ... |
 | S14-19 | knc-twin x87 integer-load widths - fildl reads 8 bytes (must be 4), filds reads 4 (must be 2) | Done | The knc-twin now reads and writes x87 integer memory at the right widths (filds/fists 2 bytes, fildl/fistl ... |
-| S14-20 | knc-twin: an indirect jmp/call (PLT tail call through the GOT) on a never-executed path must not refuse the whole region | Waiting for review | a region containing an indirect jmp or call that never executes now runs; an executed one fails with the in... |
+| S14-20 | knc-twin: an indirect jmp/call (PLT tail call through the GOT) on a never-executed path must not refuse the whole region | lead | Review passed (red-then-green verified, coverage regression fixed in e0826ac3); approve is refused because ... |
 | S14-21 | knc-twin multi-core: held-out validation of the 8-tile ring model against the measured GEMV, triad and core-scaling rows | Not started |  |
 | S14-22 | card_run turn row: refreshing an open turn row must keep its place in the queue | draft |  |
 | S14-23 | knc-twin: import the window-10 scatter rows (2 threads) and settle occupancy.scatter_cycles_per_line | Not started |  |
@@ -159,6 +159,8 @@ Current tickets: `[#################---]` 252 of 289
 | S14-28 | knc-twin ranking of the four quantized GEMV kernel forms on one KNC core (phase 0 of S14-08) | Not started |  |
 | S14-29 | knc-twin: schedule --block ADDR..ADDR for a straight-line block inside a function, and batch must not write a native request per candidate by default | Not started |  |
 | S14-31 | knc-twin multi-core usability: compare across scales, stubs and repeated calls at unit/ring scale, multi-context sampling, separated ring/memory stall shares | Not started |  |
+| S14-33 | knc-twin: import the window-11 calibration rows (imci-math latency and throughput, div10, x87 fcoms, rcp23/rsqrt23 tables) and retire the assumed parameters they settle | Not started |  |
+| S14-35 | knc-twin prepare-native: the generated native program for PhiWeather's sixth_order_diffusion kernels segfaults on the card (exit 139 under claude-pin); find the cause, fix the generator, restage | Not started |  |
 | S2-01 | Design for zmm and mask registers under -march=knc | Done | The register design for KNC is settled on paper: all 32 zmm and 8 mask registers become usable under -march... |
 | S2-02 | Float and double arguments and results in zmm lane 0 | Done | Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`). |
 | S2-03 | Varargs with the donor's register save area | Done | Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`). |
@@ -314,6 +316,7 @@ Current tickets: `[#################---]` 252 of 289
 
 ## Recent activity
 
+- 2026-11-16 08:46 **S14-20** lead defer: Review passed (red-then-green verified, coverage regression fixed in e0826ac3); approve is refused because the main checkout has an uncommitted cha...
 - 2026-11-16 08:44 **S14-20** engineer submit: a region containing an indirect jmp or call that never executes now runs; an executed one fails with the instruction and address, and the coverage ...
 - 2026-11-16 08:43 **S14-20** owner decide: input_tokens 4M -> 8M (standing rule); the fix is committed (e0826ac3), only the submit remains
 - 2026-11-16 08:43 **S14-20** lead escalate: budget: 4392282 input tokens used; the budget is 4000000
@@ -321,13 +324,12 @@ Current tickets: `[#################---]` 252 of 289
 - 2026-11-16 08:40 **S14-20** lead resume: lead reviewed and committed the coverage fix (test_wrf_coverage, test_v03, test_wrf_imports: 61 pass); sessions 4 -> 6. Only step: pm.py submit S14...
 - 2026-11-16 08:39 **S14-20** lead defer: Engineer changed knc-twin/scripts/from_gcc_s.py in the S14-20 worktree (uncommitted; sandbox cannot write the git index, S14-24) and reports test_w...
 - 2026-11-16 08:37 **S14-20** engineer ask: Lead instructed worktree-only change; submit refused due to uncommitted change. Changed knc-twin/scripts/from_gcc_s.py and ran test_wrf_coverage (9...
-- 2026-11-16 08:34 **S14-20** lead changes: One regression on the branch (aaae555d, merged with main): knc-twin/tests/test_wrf_coverage.py test_complete_listing_keeps_all_errors_and_never_wri...
 
 ## Cost
 
 - From the script, engineer: 775 sessions, 1636.7M input tokens
 - From the script, lead: 525 sessions, 148.7M input tokens
-- Started by hand, Claude: 14 sessions, 4248.4M input tokens
+- Started by hand, Claude: 14 sessions, 4249.6M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
