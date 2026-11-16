@@ -1,10 +1,10 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-16 07:26.
+Updated automatically at every ticket change. Last update: 2026-11-16 07:41.
 
-**Next: the tech lead, on S13-01.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: GPT-6.1, on S14-10 (knc-twin: --jobs N for independent simulations and PyPy support (roadmap item 1)).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
-Current tickets: `[#################---]` 250 of 283
+Current tickets: `[#################---]` 251 of 283
 
 ## Milestones
 
@@ -14,7 +14,7 @@ Current tickets: `[#################---]` 250 of 283
 | M1 | Mixed native code | Done | 43 of 43 tickets |
 | M2 | Useful vector target | Done | 51 of 51 tickets |
 | M3 | Runtimes | Done | 48 of 48 tickets |
-| M4 | Broad optimization | Done | 62 of 65 tickets |
+| M4 | Broad optimization | Done | 63 of 65 tickets |
 | M5 | Program corpus | In progress | 6 of 36 tickets |
 | M6 | Release | Not started | Not planned in detail yet |
 
@@ -123,7 +123,7 @@ Current tickets: `[#################---]` 250 of 283
 | S12-40 | Indirect prefetch recognizes Fortran sparse loops (array descriptors, ARRAY_REF offsets, nonzero and OpenMP-outlined starts) so NPB-CG benefits | draft | Deferred to M5 (sprint s14) by the owner's 2026-11-15 scope cut ("we are scope creeping the entire Sprint 1... |
 | S12-41 | Early donor check - corpus.py stages and runs only the development programs (no held-out build or run), smallest margins first, so the lead can measure every development program against GCC 5.1.1 now | draft | Deferred to M5 (sprint s14) by the owner's 2026-11-15 scope cut ("we are scope creeping the entire Sprint 1... |
 | S12-42 | Small sparse row loops are 1.5-3% slower than GCC 5.1.1, worse when two loop nests share one function (found by S12-30's window 8 gate) | draft | Owner 2026-11-15 ("I have reset Fable, so subagent back to codex with default selection rule"): Fable overr... |
-| S13-01 | M4 final gate - stage the ADR-0015 gate run at the final head (17 programs, held-out unsealed, six pairs, three profiles) | Waiting for review | Submitted by the lead after M4 acceptance: gate tools (m4_gate.py, m4_score.py, corpus.py changes), host te... |
+| S13-01 | M4 final gate - stage the ADR-0015 gate run at the final head (17 programs, held-out unsealed, six pairs, three profiles) | Done | The M4 gate runner (SSH-only transfers, launch retry, adopt, full-profile scoring) and its card_run fixes a... |
 | S13-02 | Libgomp per-region thread density - choose 1-4 workers per core per parallel region instead of once per program | draft | Owner 2026-11-15 ("yes delay to M5"): deferred to M5 (sprint s14). The M4 primary score is serial -O2, so t... |
 | S13-03 | M4 retrospective - what we did wrong, what worked, and the practice changes carried into the next milestone and the agent-team skill | draft |  |
 | S13-04 | Clean source repositories for a fresh build - GCC-KNC fork and project code without build artifacts, plus a Linux-host build recipe the owner runs on the new workstation | draft |  |
@@ -308,6 +308,7 @@ Current tickets: `[#################---]` 250 of 283
 
 ## Recent activity
 
+- 2026-11-16 07:41 **S13-01** lead approve: The M4 gate runner (SSH-only transfers, launch retry, adopt, full-profile scoring) and its card_run fixes are on main; M4 passed at a 2.16x lower b...
 - 2026-11-16 07:26 **S14-15** owner decide: Owner 2026-11-16: the lead records the red evidence as an empty [red] commit and submits and merges this ticket itself (engineer budget spent)
 - 2026-11-16 07:25 **S14-19** lead approve: The knc-twin now reads and writes x87 integer memory at the right widths (filds/fists 2 bytes, fildl/fistl 4, fildq 8), so crlibm log(1.0) and simi...
 - 2026-11-16 06:58 **S14-19** engineer submit: x87 integer loads and stores use the right widths (filds/fists 2 bytes, fildl/fistl 4, fildq 8) and 16-bit integer arithmetic forms exist; engine 0...
@@ -315,16 +316,15 @@ Current tickets: `[#################---]` 250 of 283
 - 2026-11-16 06:57 **S14-19** lead resume: lead: branch complete, merged with main; moving to the engineer for the submit
 - 2026-11-16 06:55 **S14-19** lead defer: Branch s14/S14-19 now has the real diff (merge c3949557 clean; isa.py widths, test_extended.py red-then-green, engine 0.4.0, prediction.json versio...
 - 2026-11-16 06:54 **S14-19** lead resume: lead merged main into s14/S14-19 (clean); only step: pm.py submit S14-19 with the 06:47 note
-- 2026-11-16 06:53 **S14-19** lead defer: Interactive lead: s14/S14-19 (worktree .work/S14-19, head 70109317) is behind main by non-board commits, so submit refuses ('lacks real changes fro...
 
 ## Cost
 
 - From the script, engineer: 770 sessions, 1632.3M input tokens
-- From the script, lead: 521 sessions, 147.9M input tokens
-- Started by hand, Claude: 14 sessions, 4203.5M input tokens
+- From the script, lead: 522 sessions, 148.0M input tokens
+- Started by hand, Claude: 14 sessions, 4208.3M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 40.6 GiB of 100 GiB. 70 GiB free on the drive.
+The project uses 40.6 GiB of 100 GiB. 69 GiB free on the drive.
