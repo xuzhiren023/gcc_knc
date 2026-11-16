@@ -141,7 +141,7 @@ Current tickets: `[#################---]` 244 of 273
 | S14-10 | knc-twin: --jobs N for independent simulations and PyPy support (roadmap item 1) | In progress | Yes, go ahead. One single-threaded process at a time is always allowed, so you can run the single-case HPCG... |
 | S14-11 | knc-twin: close PhiWeather WRF coverage gaps (jump tables, vcvtps2pd ymm, loop-region and complete-listing modes, scatter and rcp-table import) | In progress | S14-11 red accepted: failing tests now pin knc-twin's WRF switch jump-table resolution (entry order, out-of... |
 | S14-12 | knc-twin: iteration and phase sampling for loop and whole-program wall-time estimates (roadmap item 2) | Question for the tech lead | Committed 479a2204: loop sampling, period-aware windows/bands, phase rollups, docs/fixture. Focused selftes... |
-| S14-13 | knc-twin: 8-tile multi-core unit on the full ring with all memory controllers (roadmap item 3) | Tests waiting for review | Red correction 73eee70b: remote-owner probe compares elapsed differences with hop-delay differences for dis... |
+| S14-13 | knc-twin: 8-tile multi-core unit on the full ring with all memory controllers (roadmap item 3) | In progress | S14-13 red tests approved: they now require the shared 8-tile multicore model (channel contention across 1-... |
 | S14-14 | knc-twin: scheduling explorer for modulo scheduling and reordering, evaluating S14-02/S14-03 (roadmap item 4) | In progress | M4 is not finished (62 of 65) and the card may be in a timed block, but you do not need idle clearance for ... |
 | S2-01 | Design for zmm and mask registers under -march=knc | Done | The register design for KNC is settled on paper: all 32 zmm and 8 mask registers become usable under -march... |
 | S2-02 | Float and double arguments and results in zmm lane 0 | Done | Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`). |
@@ -298,6 +298,7 @@ Current tickets: `[#################---]` 244 of 273
 
 ## Recent activity
 
+- 2026-11-15 23:23 **S14-13** lead approve-red: S14-13 red tests approved: they now require the shared 8-tile multicore model (channel contention across 1-8 tiles, remote L2 reads through the tag...
 - 2026-11-15 23:22 **S14-10** lead answer: Yes, go ahead. One single-threaded process at a time is always allowed, so you can run the single-case HPCG-104 reproducer now, and the 900-second ...
 - 2026-11-15 23:21 **S14-12** engineer ask: Committed 479a2204: loop sampling, period-aware windows/bands, phase rollups, docs/fixture. Focused selftest: 8 passed; log ../_state/logs/S14_12_s...
 - 2026-11-15 23:20 **S14-13** engineer red: Red correction 73eee70b: remote-owner probe compares elapsed differences with hop-delay differences for distances 15/30/31 versus 1; distance 1 bou...
@@ -305,7 +306,6 @@ Current tickets: `[#################---]` 244 of 273
 - 2026-11-15 23:16 **S14-13** lead changes: One fix in test_remote_owner_read_uses_td_and_shortest_route before green; everything else stands (contention, conservation, ring-vs-unit and the s...
 - 2026-11-15 23:14 **S14-13** engineer red: Red extension f9c3c319 adds second test file: shared-channel 1/2/4/8-tile contention; TD remote-owner latency from residual/route parameters and sh...
 - 2026-11-15 23:10 **S14-13** lead changes: Red tests check CLI structure but not the multicore behaviour the brief adds: running each stream on an independent copy of the core model would pa...
-- 2026-11-15 23:08 **S14-13** engineer red: Red commit 6dfe9298: one new CLI test file covers 1/2/4/8 tiles, per-core contexts, cold-copy outputs, result class, placement and budgets. Cygwin ...
 
 ## Cost
 
@@ -317,4 +317,4 @@ Current tickets: `[#################---]` 244 of 273
 
 ## Disk
 
-The project uses 40.5 GiB of 100 GiB. 86 GiB free on the drive.
+The project uses 40.2 GiB of 100 GiB. 86 GiB free on the drive.
