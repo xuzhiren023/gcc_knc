@@ -10833,20 +10833,18 @@
           "loops": [],
           "summary": {
             "complete": {
-              "functional": false,
+              "functional": true,
               "isa": true,
               "parser": true,
               "timing": true
             },
-            "functional_exact": 41,
+            "functional_exact": 73,
             "instructions": 73,
             "isa_known": 73,
             "memory_records": 2,
             "mnemonics_unknown": [],
             "parser_ok": 73,
-            "timing_only_or_missing": [
-              "timing only: timing only (23-bit approximate reciprocal; exact bit pattern not modeled)"
-            ],
+            "timing_only_or_missing": [],
             "timing_params_known": 73,
             "unsupported": []
           }
@@ -10856,20 +10854,18 @@
           "loops": [],
           "summary": {
             "complete": {
-              "functional": false,
+              "functional": true,
               "isa": true,
               "parser": true,
               "timing": true
             },
-            "functional_exact": 41,
+            "functional_exact": 73,
             "instructions": 73,
             "isa_known": 73,
             "memory_records": 2,
             "mnemonics_unknown": [],
             "parser_ok": 73,
-            "timing_only_or_missing": [
-              "timing only: timing only (23-bit approximate reciprocal; exact bit pattern not modeled)"
-            ],
+            "timing_only_or_missing": [],
             "timing_params_known": 73,
             "unsupported": []
           }

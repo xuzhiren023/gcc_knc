@@ -110,8 +110,8 @@ Per function: instructions, how many the twin reads (parser), knows (isa), execu
 | kernels.s | char_kernel_15 | 73 | 73 | 73 | 73 | 73 |  |  |  |
 | kernels.s | char_kernel_16 | 73 | 73 | 73 | 73 | 73 |  |  |  |
 | kernels.s | char_kernel_17 | 73 | 73 | 73 | 73 | 73 |  |  |  |
-| kernels.s | char_kernel_18 | 73 | 73 | 73 | 41 | 73 | timing only: timing only (23-bit approximate reciprocal; exa |  |  |
-| kernels.s | char_kernel_19 | 73 | 73 | 73 | 41 | 73 | timing only: timing only (23-bit approximate reciprocal; exa |  |  |
+| kernels.s | char_kernel_18 | 73 | 73 | 73 | 73 | 73 |  |  |  |
+| kernels.s | char_kernel_19 | 73 | 73 | 73 | 73 | 73 |  |  |  |
 | kernels.s | char_kernel_20 | 73 | 73 | 73 | 73 | 73 |  |  |  |
 | kernels.s | char_kernel_21 | 73 | 73 | 73 | 73 | 73 |  |  |  |
 | kernels.s | char_kernel_22 | 73 | 73 | 73 | 73 | 73 |  |  |  |

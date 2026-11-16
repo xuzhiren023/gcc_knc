@@ -130,6 +130,7 @@ def cmd_capabilities(args):
         },
         "commands": ["capabilities", "selftest", "validate", "functional", "simulate", "bounds", "compare", "batch", "prepare-native", "import-native"],
         "adapters": ["scripts/from_gcc_s.py: GCC-KNC / GCC 5.1.1 k1om assembly -> records (function or loop regions, data symbols, coverage audit)",
+                     "scripts/from_binary.py: objects/ELF listings -> whole functions, relocated switches, loop regions and complete per-line reports",
                      "scripts/validate_heldout.py: held-out validation against the gcc_knc characterization catalog"],
         "input_representations": ["normalized-records (JSON, knc-twin.kernel/1)", "gas-att-subset (GAS AT&T assembly, see references/input-format.md)"],
         "memory_scenarios": ["fixed_level", "classified", "line_tracking (LRU L1+L2, software prefetch; optional tlb/hardware_prefetcher/memory_service sub-models)"],
@@ -141,7 +142,7 @@ def cmd_capabilities(args):
         },
         "not_implemented": [
             "any mnemonic outside the table (rejected, no default cost); call/ret are region boundaries",
-            "transcendental approximations (vrcp23ps, vrsqrt23ps, vlog2ps, vexp223ps, vscaleps) exact bit patterns",
+            "vrcp23ps/vrsqrt23ps exact bit patterns without opt-in captured tables; vlog2ps/vexp223ps exact bit patterns",
             "second-level TLB and page walks; the instruction cache; cross-core coherence traffic in core scale; card-level bandwidth sharing",
             "contexts communicating through memory (functional model runs contexts sequentially)",
             "C, Fortran or binaries: no translation is attempted; ABI, encodings, executable loading",

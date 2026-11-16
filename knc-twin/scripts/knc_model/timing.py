@@ -449,6 +449,8 @@ class CoreSim(object):
         insn = ev.insn
         if insn.op in ("call", "ret"):
             return True
+        if insn.op == "jmp_table" and ev.branch_target is not None:
+            return ev.branch_target > insn.index
         if insn.target is None:
             return True
         stream = self.kernel.stream_for(cs.ctx)

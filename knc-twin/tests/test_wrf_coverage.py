@@ -4,6 +4,9 @@ The switch is a reduced listing using the WRF relocation form recorded in the
 brief. Its case bodies and data are synthetic; no WRF object is required.
 """
 import struct
+import json
+import tempfile
+from pathlib import Path
 import unittest
 from types import SimpleNamespace
 from unittest.mock import patch
@@ -55,6 +58,19 @@ class SwitchElf(Elf):
 
 
 class TestWrfSwitch(unittest.TestCase):
+    def test_named_table_addend_stays_within_symbol_size(self):
+        elf = SwitchElf()
+        elf.symbols["table"] = (2, 0x80, 0x10, 1)
+        listing = SWITCH.replace(".rodata+0x88", "table+0x8")
+        with patch.object(from_binary, "Elf", return_value=elf):
+            conv = from_binary.Converter(__file__, listing)
+        raw, _, _ = conv.convert("switch_case")
+        jump = raw["streams"][0]["instructions"][0]
+        self.assertEqual(len(jump["targets"]), 1)
+        raw["init"]["registers"]["rdx"] = 1
+        with self.assertRaises(InvalidInput):
+            functional.run_functional(Kernel(raw, None))
+
     def converted(self):
         with patch.object(from_binary, "Elf", return_value=SwitchElf()):
             converter = from_binary.Converter(__file__, SWITCH)
@@ -71,6 +87,7 @@ class TestWrfSwitch(unittest.TestCase):
         for index, expected in ((0, 22), (1, 11)):
             with self.subTest(index=index):
                 raw["init"]["registers"]["rdx"] = index
+                raw["expected"] = {"registers": {"0": {"rax": expected}}}
                 interp, _, check = functional.run_functional(Kernel(raw, None))
                 self.assertEqual(check["status"], "ok", check)
                 self.assertEqual(interp.contexts[0].gpr["rax"], expected)
@@ -99,7 +116,7 @@ class TestWrfYmmConversion(unittest.TestCase):
         for number in (0, 31):
             with self.subTest(number=number):
                 name = "zmm%d" % number
-                k = kernel(None, init={"registers": {
+                k = kernel(None, expected={"registers": {"0": {name: {"u64": expected}}}}, init={"registers": {
                     name: {"u32": bits + [0x7fc00000] * 8}}},
                     streams=[{"context": 0, "asm":
                               "vcvtps2pd %%ymm%d,%%%s" % (number, name)}])
@@ -116,6 +133,69 @@ class TestWrfYmmConversion(unittest.TestCase):
                 with self.assertRaisesRegex((InvalidInput, Unsupported), "ymm"):
                     k = kernel(None, streams=[{"context": 0, "asm": text}])
                     functional.run_functional(k)
+
+
+LOOP = """Disassembly of section .text:
+0000000000000000 <loop_case>:
+   0:\tb8 00 00 00 00 \tmov $0,%eax
+   5:\t83 c0 01 \tadd $1,%eax
+   8:\t39 c8 \tcmp %ecx,%eax
+   a:\t74 05 \tje 11 <loop_case+0x11>
+   c:\t39 d0 \tcmp %edx,%eax
+   e:\t7c f5 \tjl 5 <loop_case+0x5>
+  10:\t90 \tnop
+  11:\tc3 \tretq
+"""
+
+
+class TestWrfRegions(unittest.TestCase):
+    def converter(self, text=LOOP):
+        with patch.object(from_binary, "Elf", return_value=SwitchElf()):
+            return from_binary.Converter(__file__, text)
+
+    def test_loop_exits_and_fallthrough_and_live_ins(self):
+        conv = self.converter()
+        for head in ("5", "0x5", ".A_5"):
+            raw, rows, summary = conv.convert(None, loop=head, report=True)
+            self.assertEqual(raw["entry"], "region")
+            self.assertEqual(len(rows), 5)
+            self.assertEqual(set(raw["provenance"]["live_in_registers_placeholders"]), {"rax", "rcx", "rdx"})
+            for limit, stop, expected in ((5, 3, 3), (2, 9, 2)):
+                raw["init"]["registers"].update(rax=0, rcx=stop, rdx=limit)
+                raw["expected"] = {"registers": {"0": {"rax": expected}}}
+                _, _, check = functional.run_functional(Kernel(raw, None))
+                self.assertEqual(check["status"], "ok", check)
+        _, rows, _ = conv.convert("loop_case", report=True)
+        loops = conv.loop_report("loop_case", rows)
+        self.assertEqual([(r["address"], r["end_address"], r["instruction_count"]) for r in loops], [(5, 14, 5)])
+
+    def test_complete_listing_keeps_all_errors_and_never_writes_partial_kernel(self):
+        text = LOOP.replace("add $1,%eax", "unrecognized %eax").replace("cmp %edx,%eax", "jmpq *%rax")
+        conv = self.converter(text)
+        raw, rows, summary = conv.convert("loop_case", report=True)
+        self.assertIsNone(raw)
+        self.assertEqual(len(rows), 8)
+        self.assertEqual([r["address"] for r in rows if not r["functional"]], [5, 12])
+        loops = conv.loop_report("loop_case", rows)
+        self.assertFalse(loops[0]["summary"]["complete"]["functional"])
+        with tempfile.TemporaryDirectory() as tmp:
+            out, report = str(Path(tmp) / "kernel.json"), str(Path(tmp) / "report.json")
+            with patch.object(from_binary, "Converter", return_value=self.converter(text)), patch.object(from_binary, "disassemble", return_value=text):
+                code = from_binary.main([__file__, "--function", "loop_case", "--report", report, "--out", out])
+            self.assertEqual(code, 2)
+            self.assertFalse(Path(out).exists())
+            saved = json.loads(Path(report).read_text())
+            self.assertEqual([r["address"] for r in saved["unsupported"]], [5, 12])
+
+    def test_switch_targets_outside_selected_region_exit(self):
+        text = SWITCH.replace("retq", "jmp 0 <switch_case>", 1)
+        conv = self.converter(text)
+        raw, _, _ = conv.convert("switch_case", loop="0")
+        self.assertEqual(raw["entry"], "region")
+        raw["init"]["registers"]["rdx"] = 0  # case at d is outside the selected backedge at c
+        raw["expected"] = {"registers": {"0": {"rax": 0}}}
+        _, _, check = functional.run_functional(Kernel(raw, None))
+        self.assertEqual(check["status"], "ok", check)
 
 
 if __name__ == "__main__":

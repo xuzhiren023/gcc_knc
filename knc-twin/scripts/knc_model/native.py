@@ -6,6 +6,8 @@ k1om toolchain that must be reviewed and built by whoever runs the queue.
 """
 import json
 import os
+import re
+import shutil
 import struct
 
 from . import ENGINE_VERSION, NATIVE_MEASUREMENT_SCHEMA, NATIVE_REQUEST_SCHEMA, PROFILE_SCHEMA
@@ -372,8 +374,43 @@ def import_native(measurement_path, request_path, out_dir, prediction_path=None)
             raise InvalidInput("measurement is missing %r" % key)
     if not isinstance(m["results"], list) or not m["results"]:
         raise InvalidInput("measurement.results must be a non-empty list")
+    kind = m.get("kind", "timing")
+    if kind not in ("timing", "scatter", "rcp23-table"):
+        raise InvalidInput("unknown native measurement kind %r" % kind)
+    table_imports = []
+    if kind == "scatter":
+        from .reciprocal_tables import scatter_parameter
+        params = [scatter_parameter(r) for r in m["results"]]
+        if len(params) != 1:
+            raise InvalidInput("scatter import needs one isolated per-line occupancy row; summarize repeats first")
+        if m.get("parameters"):
+            raise InvalidInput("scatter import derives its parameter from results; do not also supply parameters")
+        m["parameters"] = params
+    elif kind == "rcp23-table":
+        from .reciprocal_tables import table_path, validate_descriptor
+        seen = set()
+        for row in m["results"]:
+            op = row.get("op")
+            if op in seen:
+                raise InvalidInput("duplicate reciprocal table %s" % op)
+            seen.add(op)
+            file = row.get("file")
+            if not isinstance(file, str):
+                raise InvalidInput("reciprocal table result needs file")
+            src = os.path.join(os.path.dirname(os.path.abspath(measurement_path)), file)
+            name = re.sub(r"[^A-Za-z0-9_.-]", "_", str(m["job_id"])) + "-" + str(op) + ".bin"
+            desc = {"file": name, "entries": row.get("entries"), "status": "synthetic" if m.get("synthetic") is True else "measured",
+                    "exponent_scaling_verified": row.get("exponent_scaling_verified"),
+                    "source": "native capture %s (%s) on %s" % (m["job_id"], m["measured_utc"], m["card_profile"])}
+            validate_descriptor(op, desc)
+            try:
+                if os.path.getsize(src) != desc["entries"] * 4:
+                    raise InvalidInput("%s capture byte length does not match entries" % op)
+            except OSError as e:
+                raise InvalidInput("cannot read capture %s: %s" % (src, e))
+            table_imports.append((op, src, table_path(name), desc))
     for i, r in enumerate(m["results"]):
-        for key in ("threads_per_core", "ticks_per_unit_per_thread"):
+        for key in (("threads_per_core", "ticks_per_unit_per_thread") if kind == "timing" else ()):
             if key not in r:
                 raise InvalidInput("results[%d] needs %r" % (i, key))
     req = None
@@ -384,6 +421,9 @@ def import_native(measurement_path, request_path, out_dir, prediction_path=None)
         if m.get("request_hash_sha256") and m["request_hash_sha256"] != req.get("request_hash_sha256"):
             raise InvalidInput("measurement.request_hash_sha256 does not match request.json; the measurement belongs to another request")
     overlay = None
+    if prediction_path and kind != "timing":
+        raise InvalidInput("--prediction applies to timing rows, not scatter occupancy or table captures")
+    os.makedirs(out_dir, exist_ok=True)
     if m.get("parameters"):
         params = {}
         for p in m["parameters"]:
@@ -410,4 +450,13 @@ def import_native(measurement_path, request_path, out_dir, prediction_path=None)
                              "check": r.get("check")})
             comparison = {"prediction_result": os.path.abspath(prediction_path), "rows": rows,
                           "note": "ticks are TSC ticks per thread; the prediction is core cycles per unit for the simulated context count. Compare like with like (same thread count, same unit)."}
-    return {"measurement": m, "request_hash": req.get("request_hash_sha256") if req else None, "overlay_written": overlay is not None, "comparison": comparison}
+    policy = None
+    if table_imports:
+        policy = {"reciprocal_tables": {op: desc for op, _, _, desc in table_imports}}
+        for op, src, dest, desc in table_imports:
+            os.makedirs(os.path.dirname(dest), exist_ok=True)
+            if os.path.abspath(src) != os.path.abspath(dest):
+                shutil.copyfile(src, dest)
+        dump_json(policy, os.path.join(out_dir, "numerical-policy.json"))
+    return {"measurement": m, "request_hash": req.get("request_hash_sha256") if req else None,
+            "overlay_written": overlay is not None, "comparison": comparison, "numerical_policy": policy}
