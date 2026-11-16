@@ -238,7 +238,7 @@ for _suf, _sz in _X87_MEM.items():
     _add("fld" + _suf, "x87_load", ["r:m"], fn="x87", op="fld", mem_size=_sz)
     _add("fst" + _suf, "x87_store", ["w:m"], fn="x87", op="fst", mem_size=_sz, pop=False)
     _add("fstp" + _suf, "x87_store", ["w:m"], fn="x87", op="fst", mem_size=_sz, pop=True)
-for _suf, _sz in (("s", 4), ("l", 8), ("q", 8)):
+for _suf, _sz in (("s", 2), ("l", 4), ("q", 8)):
     _add("fild" + _suf, "x87_load", ["r:m"], fn="x87", op="fild", mem_size=_sz)
     _add("fistp" + _suf, "x87_store", ["w:m"], fn="x87", op="fistp", mem_size=_sz, pop=True, note="rounds with the control word's RC")
     _add("fisttp" + _suf, "x87_store", ["w:m"], fn="x87", op="fisttp", mem_size=_sz, pop=True, note="truncates")
@@ -258,8 +258,8 @@ for _op, _cls in (("fadd", "x87_add"), ("fsub", "x87_add"), ("fsubr", "x87_add")
     _add(_op + "p", _cls, [["rw:x", "r:x"], []], fn="x87", op=_op, pop=True)
     for _suf, _sz in (("s", 4), ("l", 8)):
         _add(_op + _suf, _cls, ["r:m"], fn="x87", op=_op, mem=True, mem_size=_sz, note="memory source: st0 = st0 OP mem (OP reversed for fsubr/fdivr)")
-for _op, _sz in (("fiadd", 4), ("fisub", 4), ("fisubr", 4), ("fimul", 4), ("fidiv", 4), ("fidivr", 4)):
-    _add(_op + "l", "x87_add" if "mul" not in _op and "div" not in _op else ("x87_mul" if "mul" in _op else "x87_div"), ["r:m"], fn="x87", op=_op[1:], mem=True, mem_int=True, mem_size=_sz)
+for _op, _suf, _sz in ((op, suf, sz) for op in ("fiadd", "fisub", "fisubr", "fimul", "fidiv", "fidivr") for suf, sz in (("s", 2), ("l", 4))):
+    _add(_op + _suf, "x87_add" if "mul" not in _op and "div" not in _op else ("x87_mul" if "mul" in _op else "x87_div"), ["r:m"], fn="x87", op=_op[1:], mem=True, mem_int=True, mem_size=_sz)
 for _op in ("fcom", "fcomp", "fucom", "fucomp"):
     _add(_op, "x87_compare", [["r:x"], []], fn="x87", op="fcom", pop=_op.endswith("p"), unordered_ok=_op.startswith("fu"), note="sets C0/C2/C3 in the status word")
 for _op in ("fcom", "fcomp"):

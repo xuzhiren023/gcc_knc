@@ -1,6 +1,6 @@
 {
   "case": "s12-31-hpcg-104",
-  "engine_version": "0.3.1",
+  "engine_version": "0.4.0",
   "profile_hash": "2058f0ec2d803051ea99b503bb10920e40ea33e9f84f19ea060727bc6aa3e468",
   "scenario": "cold start, every array from memory, default memory sub-models (TLB with 4 KiB pages, L2 hardware prefetcher, memory service), branches predicted from their history",
   "unit": "27 nonzeros (one interior row)",

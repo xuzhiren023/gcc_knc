@@ -16,7 +16,7 @@
     "predicted_cycles": 249,
     "status": "ok"
   },
-  "engine_version": "0.3.1",
+  "engine_version": "0.4.0",
   "profile_hash": "2058f0ec2d803051ea99b503bb10920e40ea33e9f84f19ea060727bc6aa3e468",
   "scenarios": [
     {

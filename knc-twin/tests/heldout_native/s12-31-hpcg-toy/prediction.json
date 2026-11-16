@@ -1,6 +1,6 @@
 {
   "case": "s12-31-hpcg-toy",
-  "engine_version": "0.3.1",
+  "engine_version": "0.4.0",
   "profile_hash": "2058f0ec2d803051ea99b503bb10920e40ea33e9f84f19ea060727bc6aa3e468",
   "scenario": "arrays resident in L2 (touched by the preceding run), output vector in L1, default memory sub-models, branches predicted from their history",
   "unit": "the bench's timed call (SpMV: two passes; SymGS: one call)",
