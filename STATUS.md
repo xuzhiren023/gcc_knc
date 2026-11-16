@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-16 14:07.
+Updated automatically at every ticket change. Last update: 2026-11-16 14:08.
 
-**Next: the tech lead, on S13-03.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: the tech lead, on S14-33.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[#################---]` 256 of 296
 
@@ -125,7 +125,7 @@ Current tickets: `[#################---]` 256 of 296
 | S12-42 | Small sparse row loops are 1.5-3% slower than GCC 5.1.1, worse when two loop nests share one function (found by S12-30's window 8 gate) | Done | Card window 10 (post-S12-31 prefix b2ce6a9eebf, 1 thread, A-s12-42-small.out, all GUARDS failures=0): GCC-K... |
 | S13-01 | M4 final gate - stage the ADR-0015 gate run at the final head (17 programs, held-out unsealed, six pairs, three profiles) | Done | The M4 gate runner (SSH-only transfers, launch retry, adopt, full-profile scoring) and its card_run fixes a... |
 | S13-02 | Libgomp per-region thread density - choose 1-4 workers per core per parallel region instead of once per program | draft | Owner 2026-11-15 ("yes delay to M5"): deferred to M5 (sprint s14). The M4 primary score is serial -O2, so t... |
-| S13-03 | M4 retrospective - what we did wrong, what worked, and the practice changes carried into the next milestone and the agent-team skill | Question for the tech lead | Retrospective complete at 63eb9e84 in docs/research/m4-retrospective.md: all 19 lesson rows, Sprint 11-13 n... |
+| S13-03 | M4 retrospective - what we did wrong, what worked, and the practice changes carried into the next milestone and the agent-team skill | lead | Merge main into s13/S13-03 (21 commits behind, main touches non-work paths, so submit hard-refuses); the br... |
 | S13-04 | Clean source repositories for a fresh build - GCC-KNC fork and project code without build artifacts, plus a Linux-host build recipe the owner runs on the new workstation | draft |  |
 | S13-05 | model-first skill - a project Claude Code skill that models a hot region and its run-time lower bound before any optimization, plus one sourced KNC machine file | Done | The model-first skill (.claude/skills/model-first with formulas, levers and a worked C7 example) and a sour... |
 | S13-06 | knc-twin trial and validation - run the KNC core twin on real GCC-KNC loop output, check it against characterization rows and held-out kernels we already timed, and report what it rejects or gets wrong | Done | knc-twin 0.2.1 is in the repo: it reads GCC-KNC assembly, predicts one-core cycles and loop bounds, and is ... |
@@ -322,13 +322,13 @@ Current tickets: `[#################---]` 256 of 296
 ## Recent activity
 
 - 2026-11-16 14:10 **S12-42** lead close: Card window 10 (post-S12-31 prefix b2ce6a9eebf, 1 thread, A-s12-42-small.out, all GUARDS failures=0): GCC-KNC is now faster than GCC 5.1.1 on all f...
+- 2026-11-16 14:08 **S13-03** lead defer: Merge main into s13/S13-03 (21 commits behind, main touches non-work paths, so submit hard-refuses); the branch adds only docs/research/m4-retrospe...
 - 2026-11-16 14:07 **S14-33** engineer submit: knc-twin imports card windows 10 and 11: the scatter cost per cache line is measured (11.2 cycles, so scatter regions now get a prediction), vrsqrt...
 - 2026-11-16 14:06 **S14-22** lead answer: Run the card_run unit tests directly, not through tools/run.py: python -m unittest tests.tools.test_card_turn tests.tools.test_card_run -v (add a p...
 - 2026-11-16 14:05 **S14-33** lead answer: Lead committed the final files (06b4c78a), merged main (clean), checked tests (48 pass) and the validation note. Only step: pm.py submit S14-33 --n...
 - 2026-11-16 14:04 **S13-03** engineer ask: Retrospective complete at 63eb9e84 in docs/research/m4-retrospective.md: all 19 lesson rows, Sprint 11-13 notes, five research inputs, ranked costs...
 - 2026-11-16 14:03 **S14-33** lead resume: lead committed the final files, merged main, checked tests (48 pass) and the validation note; approving
 - 2026-11-16 14:03 **S14-26** lead answer: Lead 2026-11-16: close it as no-go now; do not wait for a twin fix. Your static bounds already decide it. Overlapping iterations can at best take a...
-- 2026-11-16 14:01 **S14-22** engineer ask: Test invocation through tools/run.py hangs beyond 60 seconds with zero-byte logs; engineer role blocks card_run tests as expected. Need lead guidan...
 
 ## Cost
 
