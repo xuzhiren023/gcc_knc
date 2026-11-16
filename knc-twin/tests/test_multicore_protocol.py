@@ -96,6 +96,7 @@ class TestMulticoreProtocol(unittest.TestCase):
         self.assertEqual(result["status"], "ok")
         self.assertEqual(result["functional_check"]["status"], "ok")
         self.assertEqual(result["parameters_used"]["memory.channel_service_cycles_per_line"]["value"], 256)
+        self.channel_service_cycles = result["parameters_used"]["memory.channel_service_cycles_per_line"]["value"]
         pred = result["prediction"]
         self.assertEqual(pred["result_class"]["class"], "unvalidated_scenario_estimate")
         return pred
@@ -103,7 +104,11 @@ class TestMulticoreProtocol(unittest.TestCase):
     def test_one_channel_contention_grows_with_detailed_tiles(self):
         means = []
         for count in (1, 2, 4, 8):
-            pred = self.bottleneck_prediction(read_kernel(count, True))
+            # Lead-approved test correction, S14-13 answer 2026-11-15:
+            # hold background at 52 so adding detailed cores adds offered load.
+            raw = read_kernel(count, True)
+            raw["scenario"]["multicore"]["background"]["active_cores"] = count + 52
+            pred = self.bottleneck_prediction(raw)
             cores = pred["cores"]
             self.assertEqual(sorted(c["core"] for c in cores), list(range(count)))
             means.append(sum(c["predicted_cycles"] for c in cores) / float(count))
@@ -114,6 +119,14 @@ class TestMulticoreProtocol(unittest.TestCase):
             self.assertGreater(controllers[0]["queue_wait_cycles"], 0)
         self.assertEqual(means, sorted(means), "per-core cycles must not fall as tiles grow")
         self.assertGreater(means[-1], means[0], "independent copies of CoreSim cannot pass")
+        print("fixed-background 1/2/4/8 means:", means)
+        symmetry = []
+        for count in (1, 2, 4, 8):
+            pred = self.bottleneck_prediction(read_kernel(count, True))
+            symmetry.append(sum(c["predicted_cycles"] for c in pred["cores"]) / float(count))
+            self.assertLessEqual(abs(symmetry[-1] - symmetry[0]),
+                                 count * self.channel_service_cycles)
+        print("fixed-total 1/2/4/8 means:", symmetry)
 
     def test_remote_owner_read_uses_td_and_shortest_route(self):
         name = "knc_model.multicore"
