@@ -1,10 +1,10 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-15 17:45.
+Updated automatically at every ticket change. Last update: 2026-11-15 22:40.
 
-Nothing can move right now.
+**Next: GPT-6.1, on S14-10 (knc-twin: --jobs N for independent simulations and PyPy support (roadmap item 1)).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
-Current tickets: `[##################--]` 244 of 268
+Current tickets: `[#################---]` 244 of 273
 
 ## Milestones
 
@@ -15,7 +15,7 @@ Current tickets: `[##################--]` 244 of 268
 | M2 | Useful vector target | Done | 51 of 51 tickets |
 | M3 | Runtimes | Done | 48 of 48 tickets |
 | M4 | Broad optimization | In progress | 62 of 65 tickets |
-| M5 | Program corpus | In progress | 0 of 21 tickets |
+| M5 | Program corpus | In progress | 0 of 26 tickets |
 | M6 | Release | Not started | Not planned in detail yet |
 
 ## Tickets
@@ -138,6 +138,11 @@ Current tickets: `[##################--]` 244 of 268
 | S14-07 | C++ abstraction removal on KNC - does LTO work for k1om, and do devirtualization and indirect-call promotion fire at -O2 -march=knc | draft |  |
 | S14-08 | Quantized GEMV kernels on KNC - multi-row activation reuse, FP vs int32 VPMADD231D vs VPERMD lookup table, bandwidth-normalized | draft |  |
 | S14-09 | KNC vs the Z840 host (dual E5-2690 v3) on the same algorithms and numerical contract - where running on the card actually pays | draft |  |
+| S14-10 | knc-twin: --jobs N for independent simulations and PyPy support (roadmap item 1) | In progress |  |
+| S14-11 | knc-twin: close PhiWeather WRF coverage gaps (jump tables, vcvtps2pd ymm, loop-region and complete-listing modes, scatter and rcp-table import) | Not started |  |
+| S14-12 | knc-twin: iteration and phase sampling for loop and whole-program wall-time estimates (roadmap item 2) | Not started |  |
+| S14-13 | knc-twin: 8-tile multi-core unit on the full ring with all memory controllers (roadmap item 3) | Not started |  |
+| S14-14 | knc-twin: scheduling explorer for modulo scheduling and reordering, evaluating S14-02/S14-03 (roadmap item 4) | Not started |  |
 | S2-01 | Design for zmm and mask registers under -march=knc | Done | The register design for KNC is settled on paper: all 32 zmm and 8 mask registers become usable under -march... |
 | S2-02 | Float and double arguments and results in zmm lane 0 | Done | Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`). |
 | S2-03 | Varargs with the donor's register save area | Done | Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`). |
@@ -306,10 +311,10 @@ Current tickets: `[##################--]` 244 of 268
 
 - From the script, engineer: 712 sessions, 1501.1M input tokens
 - From the script, lead: 479 sessions, 136.4M input tokens
-- Started by hand, Claude: 13 sessions, 3759.6M input tokens
+- Started by hand, Claude: 14 sessions, 3991.2M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 36.7 GiB of 100 GiB. 104 GiB free on the drive.
+The project uses 39.7 GiB of 100 GiB. 88 GiB free on the drive.
