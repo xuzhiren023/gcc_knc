@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-16 11:12.
+Updated automatically at every ticket change. Last update: 2026-11-16 11:16.
 
-**Waiting for you:** S14-38. Run `python tools/pm.py inbox`.
+**Next: GPT-6.1, on S14-10 (knc-twin: --jobs N for independent simulations and PyPy support (roadmap item 1)).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
 Current tickets: `[#################---]` 253 of 295
 
@@ -163,7 +163,7 @@ Current tickets: `[#################---]` 253 of 295
 | S14-33 | knc-twin: import the window-11 calibration rows (imci-math latency and throughput, div10, x87 fcoms, rcp23/rsqrt23 tables) and retire the assumed parameters they settle | Not started |  |
 | S14-35 | knc-twin prepare-native: the generated native program for PhiWeather's sixth_order_diffusion kernels segfaults on the card (exit 139 under claude-pin); find the cause, fix the generator, restage | In progress | Lead decision (owner's delegation): one more change round, sessions 9 -> 11, input_tokens 16M -> 20M. The 1... |
 | S14-37 | knc-twin x87 double rounding: _x87_binop rounds to the 64-bit significand and then to PC=53/24; real x87 rounds once (knc-boinc repro, 1 to 8 ULP errors) | Not started |  |
-| S14-38 | Card and twin dashboard - running card job, card queue and running twin work with remaining time, card temperature and utilization, host CPU, refreshed every 5 minutes | **Waiting for you** | budget: 3 engineer sessions used; the budget is 3 |
+| S14-38 | Card and twin dashboard - running card job, card queue and running twin work with remaining time, card temperature and utilization, host CPU, refreshed every 5 minutes | In progress | Owner 2026-11-16 (in chat: 'Yes raise it'): budget raised to 4 sessions. Resubmit 2a2328a5 as is with the o... |
 | S14-39 | knc-twin prepare-native: pointer-rich captures (heap addresses sparse over tens of GB) need a relocating or multi-segment native image | Not started |  |
 | S2-01 | Design for zmm and mask registers under -march=knc | Done | The register design for KNC is settled on paper: all 32 zmm and 8 mask registers become usable under -march... |
 | S2-02 | Float and double arguments and results in zmm lane 0 | Done | Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`). |
@@ -320,6 +320,7 @@ Current tickets: `[#################---]` 253 of 295
 
 ## Recent activity
 
+- 2026-11-16 11:16 **S14-38** owner decide: Owner 2026-11-16 (in chat: 'Yes raise it'): budget raised to 4 sessions. Resubmit 2a2328a5 as is with the one-sentence note; no rebase needed.
 - 2026-11-16 11:12 **S14-35** owner decide: Lead decision (owner's delegation): one more change round, sessions 9 -> 11, input_tokens 16M -> 20M. The 11:10 review findings are correct and mus...
 - 2026-11-16 11:10 **S14-35** lead escalate: over 2 review rounds: 1. .work/_shared/calib-w10/phiweather/sixth_{1,2}ctx_l2_031/restaged/: all files still dated 10:43/10:47, before 228c8ccd and...
 - 2026-11-16 11:09 **S14-35** engineer submit: prepare-native preserves the driver stack while using the kernel's in-image stack or private fallback; updated test assertions. Commits 228c8ccd an...
@@ -327,13 +328,12 @@ Current tickets: `[#################---]` 253 of 295
 - 2026-11-16 11:06 **S14-35** lead escalate: budget: 7 engineer sessions used; the budget is 7
 - 2026-11-16 11:05 **S14-35** lead answer: Amend in this round: fix the test so it searches real newlines (use '\n' in normal strings, not raw r'\n' or doubled backslashes), keep the asserti...
 - 2026-11-16 11:04 **S14-35** engineer ask: The committed alignment fix (db26f1e0) is not passing the requested unit test: tests search emitted kernel.S as literal backslash-n strings rather ...
-- 2026-11-16 11:00 **S14-35** lead changes: 1. knc-twin/scripts/knc_model/native.py:163-165: knc_twin_saved_rsp (.zero 8) now sits directly before knc_twin_mem, so knc_twin_mem lands at page+...
 
 ## Cost
 
 - From the script, engineer: 789 sessions, 1665.6M input tokens
 - From the script, lead: 536 sessions, 151.1M input tokens
-- Started by hand, Claude: 16 sessions, 4314.3M input tokens
+- Started by hand, Claude: 16 sessions, 4316.2M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
