@@ -70,6 +70,8 @@ whole-function correctness. If the entire function finishes, its expected output
 normally. The result reports functional Python seconds separately from timing Python seconds
 and predicted KNC cycles, so users can assess the cost of tracing on their input. Up to two
 instructions of functional lookahead preserve timing pairing and decode across boundaries.
+The tracing-versus-timing cost comparison was not measured for this ticket; both are sampled
+without claiming that either dominates host execution time.
 
 `--warmup N` discards exactly N iterations. With the option omitted, warmup ends when an iteration
 touches no new lines, capped at 64 iterations (and below the iteration budget). This is observed
@@ -148,3 +150,5 @@ an unvalidated region (even at ratio one), or a skipped region prevents `calibra
 The existing HPCG pilot fixture exercises this arithmetic with its measured region shares;
 splitting that fixture into phases is an algebraic check, not new phase-profile evidence. WRF
 timestep validation requires the run's measured phase shares and dumped inputs from PhiWeather.
+The WRF timestep case waits for a PhiWeather profile; no phase shares or dumped arrays were
+supplied for this ticket.
