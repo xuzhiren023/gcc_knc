@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-16 10:40.
+Updated automatically at every ticket change. Last update: 2026-11-16 10:42.
 
-**Next: GPT-6.1, on S14-10 (knc-twin: --jobs N for independent simulations and PyPy support (roadmap item 1)).** Run `python tools/dispatch.py`, or ask the tech lead to.
+**Next: the tech lead, on S14-38.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[#################---]` 253 of 294
 
@@ -163,7 +163,7 @@ Current tickets: `[#################---]` 253 of 294
 | S14-33 | knc-twin: import the window-11 calibration rows (imci-math latency and throughput, div10, x87 fcoms, rcp23/rsqrt23 tables) and retire the assumed parameters they settle | Not started |  |
 | S14-35 | knc-twin prepare-native: the generated native program for PhiWeather's sixth_order_diffusion kernels segfaults on the card (exit 139 under claude-pin); find the cause, fix the generator, restage | In progress | input_tokens 6M -> 12M (standing rule). Lead review of the uncommitted native.py change: the direction is r... |
 | S14-37 | knc-twin x87 double rounding: _x87_binop rounds to the 64-bit significand and then to PC=53/24; real x87 rounds once (knc-boinc repro, 1 to 8 ULP errors) | Not started |  |
-| S14-38 | Card and twin dashboard - running card job, card queue and running twin work with remaining time, card temperature and utilization, host CPU, refreshed every 5 minutes | In progress | 1. tools/knc_dashboard.py:59: when the running job is overdue, cursor starts at its past expectedEnd, so th... |
+| S14-38 | Card and twin dashboard - running card job, card queue and running twin work with remaining time, card temperature and utilization, host CPU, refreshed every 5 minutes | Question for the tech lead | Requested overdue queue fix committed at bb92aab8 after red test commit c0e4eaed; all 3 fixture/HTTP tests ... |
 | S2-01 | Design for zmm and mask registers under -march=knc | Done | The register design for KNC is settled on paper: all 32 zmm and 8 mask registers become usable under -march... |
 | S2-02 | Float and double arguments and results in zmm lane 0 | Done | Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`). |
 | S2-03 | Varargs with the donor's register save area | Done | Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`). |
@@ -319,6 +319,7 @@ Current tickets: `[#################---]` 253 of 294
 
 ## Recent activity
 
+- 2026-11-16 10:42 **S14-38** engineer ask: Requested overdue queue fix committed at bb92aab8 after red test commit c0e4eaed; all 3 fixture/HTTP tests pass, log .work/_state/logs/S14_38_overd...
 - 2026-11-16 10:38 **S14-38** lead changes: 1. tools/knc_dashboard.py:59: when the running job is overdue, cursor starts at its past expectedEnd, so the first queued job gets an estimated sta...
 - 2026-11-16 10:35 **S14-38** engineer submit: Dashboard ready via python tools/knc_dashboard.py serve; three fixture/HTTP tests passed (red first), log .work/_state/logs/S14_38_tests-20261116-1...
 - 2026-11-16 10:29 **S14-35** owner decide: input_tokens 6M -> 12M (standing rule). Lead review of the uncommitted native.py change: the direction is right (use the kernel's rsp/rbp when they...
@@ -326,7 +327,6 @@ Current tickets: `[#################---]` 253 of 294
 - 2026-11-16 10:26 **S14-23** owner decide: Owner closed the budget after the final session. The worktree is committed on s14/S14-23 as wip (converter, measurements, kernels, case, tests); th...
 - 2026-11-16 10:22 **S14-23** lead escalate: budget: 14370671 input tokens used; the budget is 14000000
 - 2026-11-16 10:19 **S14-23** lead answer: No new case format and no change to validate_heldout. Record the prediction the way the characterization catalog cases do: run the twin's existing ...
-- 2026-11-16 10:16 **S14-23** engineer ask: Completed t1/t2/t4 summaries and scatter overlay import. Held-out prediction remains blocked: catalog kernel has a nonterminating outer jnz; valida...
 
 ## Cost
 
