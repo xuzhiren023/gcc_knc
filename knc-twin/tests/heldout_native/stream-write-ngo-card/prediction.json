@@ -10,18 +10,14 @@
       },
       {
         "constraint": "spacing",
-        "context_cycles": 9
-      },
-      {
-        "constraint": "core_busy",
-        "context_cycles": 7
+        "context_cycles": 16
       }
     ],
     "predicted_cycles": 249,
     "status": "ok"
   },
   "engine_version": "0.3.0",
-  "profile_hash": "0292e57ad671aaeadb5a638f9d9a9e4814d8502b27b498f4dacd84ccdedbcea5",
+  "profile_hash": "2058f0ec2d803051ea99b503bb10920e40ea33e9f84f19ea060727bc6aa3e468",
   "scenarios": [
     {
       "achieved_bandwidth_gbs_if_total": 152.73638554216868,

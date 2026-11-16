@@ -1,14 +1,14 @@
 {
   "case": "s12-31-hpcg-104",
   "engine_version": "0.3.0",
-  "profile_hash": "0292e57ad671aaeadb5a638f9d9a9e4814d8502b27b498f4dacd84ccdedbcea5",
+  "profile_hash": "2058f0ec2d803051ea99b503bb10920e40ea33e9f84f19ea060727bc6aa3e468",
   "scenario": "cold start, every array from memory, default memory sub-models (TLB with 4 KiB pages, L2 hardware prefetcher, memory service), branches predicted from their history",
   "unit": "27 nonzeros (one interior row)",
   "variants": [
     {
       "completion_cycles": [
-        2921836,
-        5836704
+        2898599,
+        5790769
       ],
       "frontend": {
         "decode_delay_cycles": 0,
@@ -16,7 +16,7 @@
         "layout": true,
         "padding_nops": 8001,
         "slow_prefix_instructions": 8000,
-        "taken_branch_bubbles": 214625
+        "taken_branch_bubbles": 3
       },
       "functional": [
         "ok",
@@ -25,11 +25,11 @@
       "limiting": [
         {
           "constraint": "miss_stall",
-          "context_cycles": 2841672
+          "context_cycles": 2795737
         },
         {
           "constraint": "x87_serial",
-          "context_cycles": 1762536
+          "context_cycles": 1733925
         }
       ],
       "memory_submodels": [
@@ -37,14 +37,14 @@
         "hardware_prefetcher",
         "memory_service"
       ],
-      "predicted_cycles_per_unit": 728.717,
+      "predicted_cycles_per_unit": 723.043,
       "status": "ok",
       "variant": "donor"
     },
     {
       "completion_cycles": [
-        2929836,
-        5852704
+        2906599,
+        5806769
       ],
       "frontend": {
         "decode_delay_cycles": 0,
@@ -52,7 +52,7 @@
         "layout": true,
         "padding_nops": 16001,
         "slow_prefix_instructions": 0,
-        "taken_branch_bubbles": 214625
+        "taken_branch_bubbles": 3
       },
       "functional": [
         "ok",
@@ -61,11 +61,11 @@
       "limiting": [
         {
           "constraint": "miss_stall",
-          "context_cycles": 2841672
+          "context_cycles": 2795737
         },
         {
           "constraint": "x87_serial",
-          "context_cycles": 1762536
+          "context_cycles": 1733925
         }
       ],
       "memory_submodels": [
@@ -73,14 +73,14 @@
         "hardware_prefetcher",
         "memory_service"
       ],
-      "predicted_cycles_per_unit": 730.717,
+      "predicted_cycles_per_unit": 725.043,
       "status": "ok",
       "variant": "donor_pf"
     },
     {
       "completion_cycles": [
-        2933774,
-        5860580
+        2910539,
+        5814647
       ],
       "frontend": {
         "decode_delay_cycles": 16000,
@@ -88,7 +88,7 @@
         "layout": true,
         "padding_nops": 8001,
         "slow_prefix_instructions": 8000,
-        "taken_branch_bubbles": 214625
+        "taken_branch_bubbles": 3
       },
       "functional": [
         "ok",
@@ -97,11 +97,11 @@
       "limiting": [
         {
           "constraint": "miss_stall",
-          "context_cycles": 2841676
+          "context_cycles": 2795741
         },
         {
           "constraint": "x87_serial",
-          "context_cycles": 1762536
+          "context_cycles": 1733925
         }
       ],
       "memory_submodels": [
@@ -109,14 +109,14 @@
         "hardware_prefetcher",
         "memory_service"
       ],
-      "predicted_cycles_per_unit": 731.702,
+      "predicted_cycles_per_unit": 726.027,
       "status": "ok",
       "variant": "knc"
     },
     {
       "completion_cycles": [
-        2933774,
-        5860580
+        2910539,
+        5814647
       ],
       "frontend": {
         "decode_delay_cycles": 0,
@@ -124,7 +124,7 @@
         "layout": true,
         "padding_nops": 16001,
         "slow_prefix_instructions": 0,
-        "taken_branch_bubbles": 214625
+        "taken_branch_bubbles": 3
       },
       "functional": [
         "ok",
@@ -133,11 +133,11 @@
       "limiting": [
         {
           "constraint": "miss_stall",
-          "context_cycles": 2841676
+          "context_cycles": 2795741
         },
         {
           "constraint": "x87_serial",
-          "context_cycles": 1762536
+          "context_cycles": 1733925
         }
       ],
       "memory_submodels": [
@@ -145,14 +145,14 @@
         "hardware_prefetcher",
         "memory_service"
       ],
-      "predicted_cycles_per_unit": 731.702,
+      "predicted_cycles_per_unit": 726.027,
       "status": "ok",
       "variant": "knc_pf"
     },
     {
       "completion_cycles": [
-        2921773,
-        5836579
+        2898538,
+        5790646
       ],
       "frontend": {
         "decode_delay_cycles": 0,
@@ -160,7 +160,7 @@
         "layout": true,
         "padding_nops": 0,
         "slow_prefix_instructions": 0,
-        "taken_branch_bubbles": 214625
+        "taken_branch_bubbles": 3
       },
       "functional": [
         "ok",
@@ -169,11 +169,11 @@
       "limiting": [
         {
           "constraint": "miss_stall",
-          "context_cycles": 2841676
+          "context_cycles": 2795741
         },
         {
           "constraint": "x87_serial",
-          "context_cycles": 1762536
+          "context_cycles": 1733925
         }
       ],
       "memory_submodels": [
@@ -181,14 +181,14 @@
         "hardware_prefetcher",
         "memory_service"
       ],
-      "predicted_cycles_per_unit": 728.702,
+      "predicted_cycles_per_unit": 723.027,
       "status": "ok",
       "variant": "knc_noalign"
     },
     {
       "completion_cycles": [
-        2925773,
-        5844579
+        2902538,
+        5798646
       ],
       "frontend": {
         "decode_delay_cycles": 0,
@@ -196,7 +196,7 @@
         "layout": true,
         "padding_nops": 8000,
         "slow_prefix_instructions": 8000,
-        "taken_branch_bubbles": 214625
+        "taken_branch_bubbles": 3
       },
       "functional": [
         "ok",
@@ -205,11 +205,11 @@
       "limiting": [
         {
           "constraint": "miss_stall",
-          "context_cycles": 2841676
+          "context_cycles": 2795741
         },
         {
           "constraint": "x87_serial",
-          "context_cycles": 1762536
+          "context_cycles": 1733925
         }
       ],
       "memory_submodels": [
@@ -217,14 +217,14 @@
         "hardware_prefetcher",
         "memory_service"
       ],
-      "predicted_cycles_per_unit": 729.702,
+      "predicted_cycles_per_unit": 724.027,
       "status": "ok",
       "variant": "knc_skip7"
     },
     {
       "completion_cycles": [
-        2712176,
-        5417350
+        2688941,
+        5371417
       ],
       "frontend": {
         "decode_delay_cycles": 16000,
@@ -232,7 +232,7 @@
         "layout": true,
         "padding_nops": 8001,
         "slow_prefix_instructions": 8000,
-        "taken_branch_bubbles": 214625
+        "taken_branch_bubbles": 3
       },
       "functional": [
         "ok",
@@ -241,11 +241,11 @@
       "limiting": [
         {
           "constraint": "miss_stall",
-          "context_cycles": 2841694
+          "context_cycles": 2795759
         },
         {
           "constraint": "x87_serial",
-          "context_cycles": 1762554
+          "context_cycles": 1733943
         }
       ],
       "memory_submodels": [
@@ -253,14 +253,14 @@
         "hardware_prefetcher",
         "memory_service"
       ],
-      "predicted_cycles_per_unit": 676.293,
+      "predicted_cycles_per_unit": 670.619,
       "status": "ok",
       "variant": "knc_nosched"
     },
     {
       "completion_cycles": [
-        2696174,
-        5385348
+        2672939,
+        5339415
       ],
       "frontend": {
         "decode_delay_cycles": 0,
@@ -268,7 +268,7 @@
         "layout": true,
         "padding_nops": 0,
         "slow_prefix_instructions": 0,
-        "taken_branch_bubbles": 214625
+        "taken_branch_bubbles": 3
       },
       "functional": [
         "ok",
@@ -277,11 +277,11 @@
       "limiting": [
         {
           "constraint": "miss_stall",
-          "context_cycles": 2841694
+          "context_cycles": 2795759
         },
         {
           "constraint": "x87_serial",
-          "context_cycles": 1762554
+          "context_cycles": 1733943
         }
       ],
       "memory_submodels": [
@@ -289,7 +289,7 @@
         "hardware_prefetcher",
         "memory_service"
       ],
-      "predicted_cycles_per_unit": 672.293,
+      "predicted_cycles_per_unit": 666.619,
       "status": "ok",
       "variant": "knc_nosched_noalign"
     }

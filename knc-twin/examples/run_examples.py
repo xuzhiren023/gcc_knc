@@ -38,7 +38,7 @@ CASES = [
     ("bounds-loop-2acc", "loop MII, two accumulators (resource-bound)", ["bounds", "reduce_2acc.json", "--loop"]),
     ("bounds-search", "exhaustive reorder search on a small block", ["bounds", "agi_gap1.json", "--search"]),
     ("card-stream", "card scenario: bandwidth-bound stream", ["bounds", "--scale", "card", "--params", "card_params_stream.json"]),
-    ("card-readonly-missing", "card scenario needing an unknown bandwidth: needs_parameters", ["bounds", "--scale", "card", "--params", "card_params_readonly_missing.json"]),
+    ("card-readonly-missing", "card scenario on a profile without a measured bandwidth (3120): needs_parameters", ["bounds", "--scale", "card", "--params", "card_params_readonly_missing.json", "--profile", "card-3120-documented"]),
     ("card-readonly-sweep", "card scenario with a declared bandwidth sweep", ["bounds", "--scale", "card", "--params", "card_params_readonly_sweep.json"]),
     ("pair", "pair scenario with a concurrency sweep", ["bounds", "--scale", "pair", "--params", "pair_params.json"]),
     ("unsupported-insn", "unknown mnemonic: unsupported", ["simulate", "unknown_insn.json"]),

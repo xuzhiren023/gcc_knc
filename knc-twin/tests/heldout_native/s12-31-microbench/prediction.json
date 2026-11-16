@@ -1,7 +1,7 @@
 {
   "case": "s12-31-microbench",
   "engine_version": "0.3.0",
-  "profile_hash": "0292e57ad671aaeadb5a638f9d9a9e4814d8502b27b498f4dacd84ccdedbcea5",
+  "profile_hash": "2058f0ec2d803051ea99b503bb10920e40ea33e9f84f19ea060727bc6aa3e468",
   "scenario": "arrays warm in L1, default memory sub-models, branches predicted from their history",
   "unit": "one 27-product row (27 inner iterations plus the outer loop step)",
   "variants": [
@@ -16,7 +16,7 @@
         "layout": true,
         "padding_nops": 60,
         "slow_prefix_instructions": 0,
-        "taken_branch_bubbles": 216
+        "taken_branch_bubbles": 1
       },
       "functional": [
         "ok",
@@ -24,12 +24,12 @@
       ],
       "limiting": [
         {
-          "constraint": "miss_stall",
-          "context_cycles": 1080
+          "constraint": "spacing",
+          "context_cycles": 1246
         },
         {
-          "constraint": "spacing",
-          "context_cycles": 1031
+          "constraint": "miss_stall",
+          "context_cycles": 1080
         }
       ],
       "memory_submodels": [
@@ -52,7 +52,7 @@
         "layout": true,
         "padding_nops": 67,
         "slow_prefix_instructions": 0,
-        "taken_branch_bubbles": 216
+        "taken_branch_bubbles": 1
       },
       "functional": [
         "ok",
@@ -60,12 +60,12 @@
       ],
       "limiting": [
         {
-          "constraint": "miss_stall",
-          "context_cycles": 1080
+          "constraint": "spacing",
+          "context_cycles": 1253
         },
         {
-          "constraint": "spacing",
-          "context_cycles": 1038
+          "constraint": "miss_stall",
+          "context_cycles": 1080
         }
       ],
       "memory_submodels": [
@@ -88,7 +88,7 @@
         "layout": true,
         "padding_nops": 66,
         "slow_prefix_instructions": 8,
-        "taken_branch_bubbles": 216
+        "taken_branch_bubbles": 1
       },
       "functional": [
         "ok",
@@ -96,12 +96,12 @@
       ],
       "limiting": [
         {
-          "constraint": "miss_stall",
-          "context_cycles": 1080
+          "constraint": "spacing",
+          "context_cycles": 1252
         },
         {
-          "constraint": "spacing",
-          "context_cycles": 1037
+          "constraint": "miss_stall",
+          "context_cycles": 1080
         }
       ],
       "memory_submodels": [
@@ -124,7 +124,7 @@
         "layout": true,
         "padding_nops": 65,
         "slow_prefix_instructions": 0,
-        "taken_branch_bubbles": 216
+        "taken_branch_bubbles": 1
       },
       "functional": [
         "ok",
@@ -132,12 +132,12 @@
       ],
       "limiting": [
         {
-          "constraint": "miss_stall",
-          "context_cycles": 1080
+          "constraint": "spacing",
+          "context_cycles": 1251
         },
         {
-          "constraint": "spacing",
-          "context_cycles": 1036
+          "constraint": "miss_stall",
+          "context_cycles": 1080
         }
       ],
       "memory_submodels": [
@@ -160,7 +160,7 @@
         "layout": true,
         "padding_nops": 64,
         "slow_prefix_instructions": 0,
-        "taken_branch_bubbles": 216
+        "taken_branch_bubbles": 1
       },
       "functional": [
         "ok",
@@ -168,12 +168,12 @@
       ],
       "limiting": [
         {
-          "constraint": "miss_stall",
-          "context_cycles": 1080
+          "constraint": "spacing",
+          "context_cycles": 1250
         },
         {
-          "constraint": "spacing",
-          "context_cycles": 1035
+          "constraint": "miss_stall",
+          "context_cycles": 1080
         }
       ],
       "memory_submodels": [
@@ -196,7 +196,7 @@
         "layout": true,
         "padding_nops": 63,
         "slow_prefix_instructions": 0,
-        "taken_branch_bubbles": 216
+        "taken_branch_bubbles": 1
       },
       "functional": [
         "ok",
@@ -204,12 +204,12 @@
       ],
       "limiting": [
         {
-          "constraint": "miss_stall",
-          "context_cycles": 1080
+          "constraint": "spacing",
+          "context_cycles": 1249
         },
         {
-          "constraint": "spacing",
-          "context_cycles": 1034
+          "constraint": "miss_stall",
+          "context_cycles": 1080
         }
       ],
       "memory_submodels": [
@@ -232,7 +232,7 @@
         "layout": true,
         "padding_nops": 62,
         "slow_prefix_instructions": 8,
-        "taken_branch_bubbles": 216
+        "taken_branch_bubbles": 1
       },
       "functional": [
         "ok",
@@ -240,12 +240,12 @@
       ],
       "limiting": [
         {
-          "constraint": "miss_stall",
-          "context_cycles": 1080
+          "constraint": "spacing",
+          "context_cycles": 1248
         },
         {
-          "constraint": "spacing",
-          "context_cycles": 1033
+          "constraint": "miss_stall",
+          "context_cycles": 1080
         }
       ],
       "memory_submodels": [
@@ -268,7 +268,7 @@
         "layout": true,
         "padding_nops": 61,
         "slow_prefix_instructions": 0,
-        "taken_branch_bubbles": 216
+        "taken_branch_bubbles": 1
       },
       "functional": [
         "ok",
@@ -276,12 +276,12 @@
       ],
       "limiting": [
         {
-          "constraint": "miss_stall",
-          "context_cycles": 1080
+          "constraint": "spacing",
+          "context_cycles": 1247
         },
         {
-          "constraint": "spacing",
-          "context_cycles": 1032
+          "constraint": "miss_stall",
+          "context_cycles": 1080
         }
       ],
       "memory_submodels": [
@@ -304,7 +304,7 @@
         "layout": true,
         "padding_nops": 60,
         "slow_prefix_instructions": 0,
-        "taken_branch_bubbles": 216
+        "taken_branch_bubbles": 1
       },
       "functional": [
         "ok",
@@ -312,12 +312,12 @@
       ],
       "limiting": [
         {
-          "constraint": "miss_stall",
-          "context_cycles": 1080
+          "constraint": "spacing",
+          "context_cycles": 1246
         },
         {
-          "constraint": "spacing",
-          "context_cycles": 1031
+          "constraint": "miss_stall",
+          "context_cycles": 1080
         }
       ],
       "memory_submodels": [
@@ -340,7 +340,7 @@
         "layout": true,
         "padding_nops": 59,
         "slow_prefix_instructions": 8,
-        "taken_branch_bubbles": 216
+        "taken_branch_bubbles": 1
       },
       "functional": [
         "ok",
@@ -348,12 +348,12 @@
       ],
       "limiting": [
         {
-          "constraint": "miss_stall",
-          "context_cycles": 1080
+          "constraint": "spacing",
+          "context_cycles": 1245
         },
         {
-          "constraint": "spacing",
-          "context_cycles": 1030
+          "constraint": "miss_stall",
+          "context_cycles": 1080
         }
       ],
       "memory_submodels": [
@@ -376,7 +376,7 @@
         "layout": true,
         "padding_nops": 58,
         "slow_prefix_instructions": 8,
-        "taken_branch_bubbles": 216
+        "taken_branch_bubbles": 1
       },
       "functional": [
         "ok",
@@ -384,12 +384,12 @@
       ],
       "limiting": [
         {
-          "constraint": "miss_stall",
-          "context_cycles": 1080
+          "constraint": "spacing",
+          "context_cycles": 1244
         },
         {
-          "constraint": "spacing",
-          "context_cycles": 1029
+          "constraint": "miss_stall",
+          "context_cycles": 1080
         }
       ],
       "memory_submodels": [
@@ -412,7 +412,7 @@
         "layout": true,
         "padding_nops": 57,
         "slow_prefix_instructions": 8,
-        "taken_branch_bubbles": 216
+        "taken_branch_bubbles": 1
       },
       "functional": [
         "ok",
@@ -420,12 +420,12 @@
       ],
       "limiting": [
         {
-          "constraint": "miss_stall",
-          "context_cycles": 1080
+          "constraint": "spacing",
+          "context_cycles": 1243
         },
         {
-          "constraint": "spacing",
-          "context_cycles": 1028
+          "constraint": "miss_stall",
+          "context_cycles": 1080
         }
       ],
       "memory_submodels": [
@@ -448,7 +448,7 @@
         "layout": true,
         "padding_nops": 56,
         "slow_prefix_instructions": 8,
-        "taken_branch_bubbles": 216
+        "taken_branch_bubbles": 1
       },
       "functional": [
         "ok",
@@ -456,12 +456,12 @@
       ],
       "limiting": [
         {
-          "constraint": "miss_stall",
-          "context_cycles": 1080
+          "constraint": "spacing",
+          "context_cycles": 1242
         },
         {
-          "constraint": "spacing",
-          "context_cycles": 1027
+          "constraint": "miss_stall",
+          "context_cycles": 1080
         }
       ],
       "memory_submodels": [
@@ -484,7 +484,7 @@
         "layout": true,
         "padding_nops": 55,
         "slow_prefix_instructions": 8,
-        "taken_branch_bubbles": 216
+        "taken_branch_bubbles": 1
       },
       "functional": [
         "ok",
@@ -492,12 +492,12 @@
       ],
       "limiting": [
         {
-          "constraint": "miss_stall",
-          "context_cycles": 1080
+          "constraint": "spacing",
+          "context_cycles": 1241
         },
         {
-          "constraint": "spacing",
-          "context_cycles": 1026
+          "constraint": "miss_stall",
+          "context_cycles": 1080
         }
       ],
       "memory_submodels": [
@@ -520,7 +520,7 @@
         "layout": true,
         "padding_nops": 54,
         "slow_prefix_instructions": 8,
-        "taken_branch_bubbles": 216
+        "taken_branch_bubbles": 1
       },
       "functional": [
         "ok",
@@ -528,12 +528,12 @@
       ],
       "limiting": [
         {
-          "constraint": "miss_stall",
-          "context_cycles": 1080
+          "constraint": "spacing",
+          "context_cycles": 1240
         },
         {
-          "constraint": "spacing",
-          "context_cycles": 1025
+          "constraint": "miss_stall",
+          "context_cycles": 1080
         }
       ],
       "memory_submodels": [
@@ -556,7 +556,7 @@
         "layout": true,
         "padding_nops": 53,
         "slow_prefix_instructions": 8,
-        "taken_branch_bubbles": 216
+        "taken_branch_bubbles": 1
       },
       "functional": [
         "ok",
@@ -564,12 +564,12 @@
       ],
       "limiting": [
         {
-          "constraint": "miss_stall",
-          "context_cycles": 1080
+          "constraint": "spacing",
+          "context_cycles": 1239
         },
         {
-          "constraint": "spacing",
-          "context_cycles": 1024
+          "constraint": "miss_stall",
+          "context_cycles": 1080
         }
       ],
       "memory_submodels": [
@@ -592,7 +592,7 @@
         "layout": true,
         "padding_nops": 60,
         "slow_prefix_instructions": 0,
-        "taken_branch_bubbles": 216
+        "taken_branch_bubbles": 1
       },
       "functional": [
         "ok",
@@ -600,12 +600,12 @@
       ],
       "limiting": [
         {
-          "constraint": "miss_stall",
-          "context_cycles": 1080
+          "constraint": "spacing",
+          "context_cycles": 1246
         },
         {
-          "constraint": "spacing",
-          "context_cycles": 1031
+          "constraint": "miss_stall",
+          "context_cycles": 1080
         }
       ],
       "memory_submodels": [
@@ -628,7 +628,7 @@
         "layout": true,
         "padding_nops": 67,
         "slow_prefix_instructions": 0,
-        "taken_branch_bubbles": 216
+        "taken_branch_bubbles": 1
       },
       "functional": [
         "ok",
@@ -636,12 +636,12 @@
       ],
       "limiting": [
         {
-          "constraint": "miss_stall",
-          "context_cycles": 1080
+          "constraint": "spacing",
+          "context_cycles": 1253
         },
         {
-          "constraint": "spacing",
-          "context_cycles": 1038
+          "constraint": "miss_stall",
+          "context_cycles": 1080
         }
       ],
       "memory_submodels": [
@@ -664,7 +664,7 @@
         "layout": true,
         "padding_nops": 74,
         "slow_prefix_instructions": 0,
-        "taken_branch_bubbles": 216
+        "taken_branch_bubbles": 1
       },
       "functional": [
         "ok",
@@ -672,12 +672,12 @@
       ],
       "limiting": [
         {
-          "constraint": "miss_stall",
-          "context_cycles": 1080
+          "constraint": "spacing",
+          "context_cycles": 1260
         },
         {
-          "constraint": "spacing",
-          "context_cycles": 1045
+          "constraint": "miss_stall",
+          "context_cycles": 1080
         }
       ],
       "memory_submodels": [
@@ -700,7 +700,7 @@
         "layout": true,
         "padding_nops": 81,
         "slow_prefix_instructions": 0,
-        "taken_branch_bubbles": 216
+        "taken_branch_bubbles": 1
       },
       "functional": [
         "ok",
@@ -708,12 +708,12 @@
       ],
       "limiting": [
         {
-          "constraint": "miss_stall",
-          "context_cycles": 1080
+          "constraint": "spacing",
+          "context_cycles": 1267
         },
         {
-          "constraint": "spacing",
-          "context_cycles": 1052
+          "constraint": "miss_stall",
+          "context_cycles": 1080
         }
       ],
       "memory_submodels": [
@@ -736,7 +736,7 @@
         "layout": true,
         "padding_nops": 88,
         "slow_prefix_instructions": 0,
-        "taken_branch_bubbles": 216
+        "taken_branch_bubbles": 1
       },
       "functional": [
         "ok",
@@ -744,12 +744,12 @@
       ],
       "limiting": [
         {
-          "constraint": "miss_stall",
-          "context_cycles": 1080
+          "constraint": "spacing",
+          "context_cycles": 1274
         },
         {
-          "constraint": "spacing",
-          "context_cycles": 1059
+          "constraint": "miss_stall",
+          "context_cycles": 1080
         }
       ],
       "memory_submodels": [
@@ -772,7 +772,7 @@
         "layout": true,
         "padding_nops": 95,
         "slow_prefix_instructions": 0,
-        "taken_branch_bubbles": 216
+        "taken_branch_bubbles": 1
       },
       "functional": [
         "ok",
@@ -780,12 +780,12 @@
       ],
       "limiting": [
         {
-          "constraint": "miss_stall",
-          "context_cycles": 1080
+          "constraint": "spacing",
+          "context_cycles": 1281
         },
         {
-          "constraint": "spacing",
-          "context_cycles": 1066
+          "constraint": "miss_stall",
+          "context_cycles": 1080
         }
       ],
       "memory_submodels": [
@@ -808,7 +808,7 @@
         "layout": true,
         "padding_nops": 102,
         "slow_prefix_instructions": 0,
-        "taken_branch_bubbles": 216
+        "taken_branch_bubbles": 1
       },
       "functional": [
         "ok",
@@ -816,12 +816,12 @@
       ],
       "limiting": [
         {
-          "constraint": "miss_stall",
-          "context_cycles": 1080
+          "constraint": "spacing",
+          "context_cycles": 1288
         },
         {
-          "constraint": "spacing",
-          "context_cycles": 1073
+          "constraint": "miss_stall",
+          "context_cycles": 1080
         }
       ],
       "memory_submodels": [
@@ -844,7 +844,7 @@
         "layout": true,
         "padding_nops": 109,
         "slow_prefix_instructions": 0,
-        "taken_branch_bubbles": 216
+        "taken_branch_bubbles": 1
       },
       "functional": [
         "ok",
@@ -853,7 +853,7 @@
       "limiting": [
         {
           "constraint": "spacing",
-          "context_cycles": 1080
+          "context_cycles": 1295
         },
         {
           "constraint": "miss_stall",
@@ -880,7 +880,7 @@
         "layout": true,
         "padding_nops": 116,
         "slow_prefix_instructions": 0,
-        "taken_branch_bubbles": 216
+        "taken_branch_bubbles": 1
       },
       "functional": [
         "ok",
@@ -889,7 +889,7 @@
       "limiting": [
         {
           "constraint": "spacing",
-          "context_cycles": 1087
+          "context_cycles": 1302
         },
         {
           "constraint": "miss_stall",
@@ -916,7 +916,7 @@
         "layout": true,
         "padding_nops": 123,
         "slow_prefix_instructions": 0,
-        "taken_branch_bubbles": 216
+        "taken_branch_bubbles": 1
       },
       "functional": [
         "ok",
@@ -925,7 +925,7 @@
       "limiting": [
         {
           "constraint": "spacing",
-          "context_cycles": 1094
+          "context_cycles": 1309
         },
         {
           "constraint": "miss_stall",
@@ -952,7 +952,7 @@
         "layout": true,
         "padding_nops": 130,
         "slow_prefix_instructions": 0,
-        "taken_branch_bubbles": 216
+        "taken_branch_bubbles": 1
       },
       "functional": [
         "ok",
@@ -961,7 +961,7 @@
       "limiting": [
         {
           "constraint": "spacing",
-          "context_cycles": 1101
+          "context_cycles": 1316
         },
         {
           "constraint": "miss_stall",
@@ -988,7 +988,7 @@
         "layout": true,
         "padding_nops": 137,
         "slow_prefix_instructions": 0,
-        "taken_branch_bubbles": 216
+        "taken_branch_bubbles": 1
       },
       "functional": [
         "ok",
@@ -997,7 +997,7 @@
       "limiting": [
         {
           "constraint": "spacing",
-          "context_cycles": 1108
+          "context_cycles": 1323
         },
         {
           "constraint": "miss_stall",
@@ -1024,7 +1024,7 @@
         "layout": true,
         "padding_nops": 144,
         "slow_prefix_instructions": 0,
-        "taken_branch_bubbles": 216
+        "taken_branch_bubbles": 1
       },
       "functional": [
         "ok",
@@ -1033,7 +1033,7 @@
       "limiting": [
         {
           "constraint": "spacing",
-          "context_cycles": 1115
+          "context_cycles": 1330
         },
         {
           "constraint": "miss_stall",
@@ -1060,7 +1060,7 @@
         "layout": true,
         "padding_nops": 151,
         "slow_prefix_instructions": 0,
-        "taken_branch_bubbles": 216
+        "taken_branch_bubbles": 1
       },
       "functional": [
         "ok",
@@ -1069,7 +1069,7 @@
       "limiting": [
         {
           "constraint": "spacing",
-          "context_cycles": 1122
+          "context_cycles": 1337
         },
         {
           "constraint": "miss_stall",
@@ -1096,7 +1096,7 @@
         "layout": true,
         "padding_nops": 158,
         "slow_prefix_instructions": 0,
-        "taken_branch_bubbles": 216
+        "taken_branch_bubbles": 1
       },
       "functional": [
         "ok",
@@ -1105,7 +1105,7 @@
       "limiting": [
         {
           "constraint": "spacing",
-          "context_cycles": 1129
+          "context_cycles": 1344
         },
         {
           "constraint": "miss_stall",
@@ -1132,7 +1132,7 @@
         "layout": true,
         "padding_nops": 165,
         "slow_prefix_instructions": 0,
-        "taken_branch_bubbles": 216
+        "taken_branch_bubbles": 1
       },
       "functional": [
         "ok",
@@ -1141,7 +1141,7 @@
       "limiting": [
         {
           "constraint": "spacing",
-          "context_cycles": 1136
+          "context_cycles": 1351
         },
         {
           "constraint": "miss_stall",
@@ -1168,7 +1168,7 @@
         "layout": true,
         "padding_nops": 60,
         "slow_prefix_instructions": 0,
-        "taken_branch_bubbles": 216
+        "taken_branch_bubbles": 1
       },
       "functional": [
         "ok",
@@ -1176,12 +1176,12 @@
       ],
       "limiting": [
         {
-          "constraint": "miss_stall",
-          "context_cycles": 1080
+          "constraint": "spacing",
+          "context_cycles": 1246
         },
         {
-          "constraint": "spacing",
-          "context_cycles": 1031
+          "constraint": "miss_stall",
+          "context_cycles": 1080
         }
       ],
       "memory_submodels": [
@@ -1204,7 +1204,7 @@
         "layout": true,
         "padding_nops": 67,
         "slow_prefix_instructions": 0,
-        "taken_branch_bubbles": 216
+        "taken_branch_bubbles": 1
       },
       "functional": [
         "ok",
@@ -1212,12 +1212,12 @@
       ],
       "limiting": [
         {
-          "constraint": "miss_stall",
-          "context_cycles": 1080
+          "constraint": "spacing",
+          "context_cycles": 1253
         },
         {
-          "constraint": "spacing",
-          "context_cycles": 1038
+          "constraint": "miss_stall",
+          "context_cycles": 1080
         }
       ],
       "memory_submodels": [
@@ -1240,7 +1240,7 @@
         "layout": true,
         "padding_nops": 74,
         "slow_prefix_instructions": 0,
-        "taken_branch_bubbles": 216
+        "taken_branch_bubbles": 1
       },
       "functional": [
         "ok",
@@ -1248,12 +1248,12 @@
       ],
       "limiting": [
         {
-          "constraint": "miss_stall",
-          "context_cycles": 1080
+          "constraint": "spacing",
+          "context_cycles": 1260
         },
         {
-          "constraint": "spacing",
-          "context_cycles": 1045
+          "constraint": "miss_stall",
+          "context_cycles": 1080
         }
       ],
       "memory_submodels": [
@@ -1276,7 +1276,7 @@
         "layout": true,
         "padding_nops": 65,
         "slow_prefix_instructions": 0,
-        "taken_branch_bubbles": 216
+        "taken_branch_bubbles": 1
       },
       "functional": [
         "ok",
@@ -1284,12 +1284,12 @@
       ],
       "limiting": [
         {
-          "constraint": "miss_stall",
-          "context_cycles": 1080
+          "constraint": "spacing",
+          "context_cycles": 1251
         },
         {
-          "constraint": "spacing",
-          "context_cycles": 1036
+          "constraint": "miss_stall",
+          "context_cycles": 1080
         }
       ],
       "memory_submodels": [
@@ -1312,7 +1312,7 @@
         "layout": true,
         "padding_nops": 64,
         "slow_prefix_instructions": 0,
-        "taken_branch_bubbles": 216
+        "taken_branch_bubbles": 1
       },
       "functional": [
         "ok",
@@ -1320,12 +1320,12 @@
       ],
       "limiting": [
         {
-          "constraint": "miss_stall",
-          "context_cycles": 1080
+          "constraint": "spacing",
+          "context_cycles": 1250
         },
         {
-          "constraint": "spacing",
-          "context_cycles": 1035
+          "constraint": "miss_stall",
+          "context_cycles": 1080
         }
       ],
       "memory_submodels": [
@@ -1348,7 +1348,7 @@
         "layout": true,
         "padding_nops": 63,
         "slow_prefix_instructions": 0,
-        "taken_branch_bubbles": 216
+        "taken_branch_bubbles": 1
       },
       "functional": [
         "ok",
@@ -1356,12 +1356,12 @@
       ],
       "limiting": [
         {
-          "constraint": "miss_stall",
-          "context_cycles": 1080
+          "constraint": "spacing",
+          "context_cycles": 1249
         },
         {
-          "constraint": "spacing",
-          "context_cycles": 1034
+          "constraint": "miss_stall",
+          "context_cycles": 1080
         }
       ],
       "memory_submodels": [
@@ -1384,7 +1384,7 @@
         "layout": true,
         "padding_nops": 70,
         "slow_prefix_instructions": 0,
-        "taken_branch_bubbles": 216
+        "taken_branch_bubbles": 1
       },
       "functional": [
         "ok",
@@ -1392,12 +1392,12 @@
       ],
       "limiting": [
         {
-          "constraint": "miss_stall",
-          "context_cycles": 1080
+          "constraint": "spacing",
+          "context_cycles": 1256
         },
         {
-          "constraint": "spacing",
-          "context_cycles": 1041
+          "constraint": "miss_stall",
+          "context_cycles": 1080
         }
       ],
       "memory_submodels": [
@@ -1420,7 +1420,7 @@
         "layout": true,
         "padding_nops": 61,
         "slow_prefix_instructions": 0,
-        "taken_branch_bubbles": 216
+        "taken_branch_bubbles": 1
       },
       "functional": [
         "ok",
@@ -1428,12 +1428,12 @@
       ],
       "limiting": [
         {
-          "constraint": "miss_stall",
-          "context_cycles": 1080
+          "constraint": "spacing",
+          "context_cycles": 1247
         },
         {
-          "constraint": "spacing",
-          "context_cycles": 1032
+          "constraint": "miss_stall",
+          "context_cycles": 1080
         }
       ],
       "memory_submodels": [
@@ -1456,7 +1456,7 @@
         "layout": true,
         "padding_nops": 60,
         "slow_prefix_instructions": 0,
-        "taken_branch_bubbles": 216
+        "taken_branch_bubbles": 1
       },
       "functional": [
         "ok",
@@ -1464,12 +1464,12 @@
       ],
       "limiting": [
         {
-          "constraint": "miss_stall",
-          "context_cycles": 1080
+          "constraint": "spacing",
+          "context_cycles": 1246
         },
         {
-          "constraint": "spacing",
-          "context_cycles": 1031
+          "constraint": "miss_stall",
+          "context_cycles": 1080
         }
       ],
       "memory_submodels": [
@@ -1492,7 +1492,7 @@
         "layout": true,
         "padding_nops": 67,
         "slow_prefix_instructions": 0,
-        "taken_branch_bubbles": 216
+        "taken_branch_bubbles": 1
       },
       "functional": [
         "ok",
@@ -1500,12 +1500,12 @@
       ],
       "limiting": [
         {
-          "constraint": "miss_stall",
-          "context_cycles": 1080
+          "constraint": "spacing",
+          "context_cycles": 1253
         },
         {
-          "constraint": "spacing",
-          "context_cycles": 1038
+          "constraint": "miss_stall",
+          "context_cycles": 1080
         }
       ],
       "memory_submodels": [
@@ -1528,7 +1528,7 @@
         "layout": true,
         "padding_nops": 66,
         "slow_prefix_instructions": 0,
-        "taken_branch_bubbles": 216
+        "taken_branch_bubbles": 1
       },
       "functional": [
         "ok",
@@ -1536,12 +1536,12 @@
       ],
       "limiting": [
         {
-          "constraint": "miss_stall",
-          "context_cycles": 1080
+          "constraint": "spacing",
+          "context_cycles": 1252
         },
         {
-          "constraint": "spacing",
-          "context_cycles": 1037
+          "constraint": "miss_stall",
+          "context_cycles": 1080
         }
       ],
       "memory_submodels": [
@@ -1564,7 +1564,7 @@
         "layout": true,
         "padding_nops": 65,
         "slow_prefix_instructions": 0,
-        "taken_branch_bubbles": 216
+        "taken_branch_bubbles": 1
       },
       "functional": [
         "ok",
@@ -1572,12 +1572,12 @@
       ],
       "limiting": [
         {
-          "constraint": "miss_stall",
-          "context_cycles": 1080
+          "constraint": "spacing",
+          "context_cycles": 1251
         },
         {
-          "constraint": "spacing",
-          "context_cycles": 1036
+          "constraint": "miss_stall",
+          "context_cycles": 1080
         }
       ],
       "memory_submodels": [
@@ -1600,7 +1600,7 @@
         "layout": true,
         "padding_nops": 64,
         "slow_prefix_instructions": 0,
-        "taken_branch_bubbles": 216
+        "taken_branch_bubbles": 1
       },
       "functional": [
         "ok",
@@ -1608,12 +1608,12 @@
       ],
       "limiting": [
         {
-          "constraint": "miss_stall",
-          "context_cycles": 1080
+          "constraint": "spacing",
+          "context_cycles": 1250
         },
         {
-          "constraint": "spacing",
-          "context_cycles": 1035
+          "constraint": "miss_stall",
+          "context_cycles": 1080
         }
       ],
       "memory_submodels": [
@@ -1636,7 +1636,7 @@
         "layout": true,
         "padding_nops": 63,
         "slow_prefix_instructions": 0,
-        "taken_branch_bubbles": 216
+        "taken_branch_bubbles": 1
       },
       "functional": [
         "ok",
@@ -1644,12 +1644,12 @@
       ],
       "limiting": [
         {
-          "constraint": "miss_stall",
-          "context_cycles": 1080
+          "constraint": "spacing",
+          "context_cycles": 1249
         },
         {
-          "constraint": "spacing",
-          "context_cycles": 1034
+          "constraint": "miss_stall",
+          "context_cycles": 1080
         }
       ],
       "memory_submodels": [
@@ -1672,7 +1672,7 @@
         "layout": true,
         "padding_nops": 62,
         "slow_prefix_instructions": 0,
-        "taken_branch_bubbles": 216
+        "taken_branch_bubbles": 1
       },
       "functional": [
         "ok",
@@ -1680,12 +1680,12 @@
       ],
       "limiting": [
         {
-          "constraint": "miss_stall",
-          "context_cycles": 1080
+          "constraint": "spacing",
+          "context_cycles": 1248
         },
         {
-          "constraint": "spacing",
-          "context_cycles": 1033
+          "constraint": "miss_stall",
+          "context_cycles": 1080
         }
       ],
       "memory_submodels": [
@@ -1708,7 +1708,7 @@
         "layout": true,
         "padding_nops": 61,
         "slow_prefix_instructions": 0,
-        "taken_branch_bubbles": 216
+        "taken_branch_bubbles": 1
       },
       "functional": [
         "ok",
@@ -1716,12 +1716,12 @@
       ],
       "limiting": [
         {
-          "constraint": "miss_stall",
-          "context_cycles": 1080
+          "constraint": "spacing",
+          "context_cycles": 1247
         },
         {
-          "constraint": "spacing",
-          "context_cycles": 1032
+          "constraint": "miss_stall",
+          "context_cycles": 1080
         }
       ],
       "memory_submodels": [
@@ -1744,7 +1744,7 @@
         "layout": true,
         "padding_nops": 0,
         "slow_prefix_instructions": 0,
-        "taken_branch_bubbles": 216
+        "taken_branch_bubbles": 1
       },
       "functional": [
         "ok",
@@ -1752,12 +1752,12 @@
       ],
       "limiting": [
         {
-          "constraint": "miss_stall",
-          "context_cycles": 1080
+          "constraint": "spacing",
+          "context_cycles": 1186
         },
         {
-          "constraint": "spacing",
-          "context_cycles": 971
+          "constraint": "miss_stall",
+          "context_cycles": 1080
         }
       ],
       "memory_submodels": [
@@ -1780,7 +1780,7 @@
         "layout": true,
         "padding_nops": 4,
         "slow_prefix_instructions": 0,
-        "taken_branch_bubbles": 216
+        "taken_branch_bubbles": 1
       },
       "functional": [
         "ok",
@@ -1788,12 +1788,12 @@
       ],
       "limiting": [
         {
-          "constraint": "miss_stall",
-          "context_cycles": 1080
+          "constraint": "spacing",
+          "context_cycles": 1190
         },
         {
-          "constraint": "spacing",
-          "context_cycles": 975
+          "constraint": "miss_stall",
+          "context_cycles": 1080
         }
       ],
       "memory_submodels": [
@@ -1816,7 +1816,7 @@
         "layout": true,
         "padding_nops": 8,
         "slow_prefix_instructions": 0,
-        "taken_branch_bubbles": 216
+        "taken_branch_bubbles": 1
       },
       "functional": [
         "ok",
@@ -1824,12 +1824,12 @@
       ],
       "limiting": [
         {
-          "constraint": "miss_stall",
-          "context_cycles": 1080
+          "constraint": "spacing",
+          "context_cycles": 1194
         },
         {
-          "constraint": "spacing",
-          "context_cycles": 979
+          "constraint": "miss_stall",
+          "context_cycles": 1080
         }
       ],
       "memory_submodels": [
@@ -1852,7 +1852,7 @@
         "layout": true,
         "padding_nops": 12,
         "slow_prefix_instructions": 0,
-        "taken_branch_bubbles": 216
+        "taken_branch_bubbles": 1
       },
       "functional": [
         "ok",
@@ -1860,12 +1860,12 @@
       ],
       "limiting": [
         {
-          "constraint": "miss_stall",
-          "context_cycles": 1080
+          "constraint": "spacing",
+          "context_cycles": 1198
         },
         {
-          "constraint": "spacing",
-          "context_cycles": 983
+          "constraint": "miss_stall",
+          "context_cycles": 1080
         }
       ],
       "memory_submodels": [
@@ -1888,7 +1888,7 @@
         "layout": true,
         "padding_nops": 16,
         "slow_prefix_instructions": 0,
-        "taken_branch_bubbles": 216
+        "taken_branch_bubbles": 1
       },
       "functional": [
         "ok",
@@ -1896,12 +1896,12 @@
       ],
       "limiting": [
         {
-          "constraint": "miss_stall",
-          "context_cycles": 1080
+          "constraint": "spacing",
+          "context_cycles": 1202
         },
         {
-          "constraint": "spacing",
-          "context_cycles": 987
+          "constraint": "miss_stall",
+          "context_cycles": 1080
         }
       ],
       "memory_submodels": [
@@ -1924,7 +1924,7 @@
         "layout": true,
         "padding_nops": 20,
         "slow_prefix_instructions": 0,
-        "taken_branch_bubbles": 216
+        "taken_branch_bubbles": 1
       },
       "functional": [
         "ok",
@@ -1932,12 +1932,12 @@
       ],
       "limiting": [
         {
-          "constraint": "miss_stall",
-          "context_cycles": 1080
+          "constraint": "spacing",
+          "context_cycles": 1206
         },
         {
-          "constraint": "spacing",
-          "context_cycles": 991
+          "constraint": "miss_stall",
+          "context_cycles": 1080
         }
       ],
       "memory_submodels": [
@@ -1960,7 +1960,7 @@
         "layout": true,
         "padding_nops": 24,
         "slow_prefix_instructions": 0,
-        "taken_branch_bubbles": 216
+        "taken_branch_bubbles": 1
       },
       "functional": [
         "ok",
@@ -1968,12 +1968,12 @@
       ],
       "limiting": [
         {
-          "constraint": "miss_stall",
-          "context_cycles": 1080
+          "constraint": "spacing",
+          "context_cycles": 1210
         },
         {
-          "constraint": "spacing",
-          "context_cycles": 995
+          "constraint": "miss_stall",
+          "context_cycles": 1080
         }
       ],
       "memory_submodels": [
@@ -1996,7 +1996,7 @@
         "layout": true,
         "padding_nops": 28,
         "slow_prefix_instructions": 0,
-        "taken_branch_bubbles": 216
+        "taken_branch_bubbles": 1
       },
       "functional": [
         "ok",
@@ -2004,12 +2004,12 @@
       ],
       "limiting": [
         {
-          "constraint": "miss_stall",
-          "context_cycles": 1080
+          "constraint": "spacing",
+          "context_cycles": 1214
         },
         {
-          "constraint": "spacing",
-          "context_cycles": 999
+          "constraint": "miss_stall",
+          "context_cycles": 1080
         }
       ],
       "memory_submodels": [
@@ -2032,7 +2032,7 @@
         "layout": true,
         "padding_nops": 32,
         "slow_prefix_instructions": 0,
-        "taken_branch_bubbles": 216
+        "taken_branch_bubbles": 1
       },
       "functional": [
         "ok",
@@ -2040,12 +2040,12 @@
       ],
       "limiting": [
         {
-          "constraint": "miss_stall",
-          "context_cycles": 1080
+          "constraint": "spacing",
+          "context_cycles": 1218
         },
         {
-          "constraint": "spacing",
-          "context_cycles": 1003
+          "constraint": "miss_stall",
+          "context_cycles": 1080
         }
       ],
       "memory_submodels": [
@@ -2068,7 +2068,7 @@
         "layout": true,
         "padding_nops": 36,
         "slow_prefix_instructions": 0,
-        "taken_branch_bubbles": 216
+        "taken_branch_bubbles": 1
       },
       "functional": [
         "ok",
@@ -2076,12 +2076,12 @@
       ],
       "limiting": [
         {
-          "constraint": "miss_stall",
-          "context_cycles": 1080
+          "constraint": "spacing",
+          "context_cycles": 1222
         },
         {
-          "constraint": "spacing",
-          "context_cycles": 1007
+          "constraint": "miss_stall",
+          "context_cycles": 1080
         }
       ],
       "memory_submodels": [
@@ -2104,7 +2104,7 @@
         "layout": true,
         "padding_nops": 40,
         "slow_prefix_instructions": 0,
-        "taken_branch_bubbles": 216
+        "taken_branch_bubbles": 1
       },
       "functional": [
         "ok",
@@ -2112,12 +2112,12 @@
       ],
       "limiting": [
         {
-          "constraint": "miss_stall",
-          "context_cycles": 1080
+          "constraint": "spacing",
+          "context_cycles": 1226
         },
         {
-          "constraint": "spacing",
-          "context_cycles": 1011
+          "constraint": "miss_stall",
+          "context_cycles": 1080
         }
       ],
       "memory_submodels": [
@@ -2140,7 +2140,7 @@
         "layout": true,
         "padding_nops": 44,
         "slow_prefix_instructions": 0,
-        "taken_branch_bubbles": 216
+        "taken_branch_bubbles": 1
       },
       "functional": [
         "ok",
@@ -2148,12 +2148,12 @@
       ],
       "limiting": [
         {
-          "constraint": "miss_stall",
-          "context_cycles": 1080
+          "constraint": "spacing",
+          "context_cycles": 1230
         },
         {
-          "constraint": "spacing",
-          "context_cycles": 1015
+          "constraint": "miss_stall",
+          "context_cycles": 1080
         }
       ],
       "memory_submodels": [
@@ -2176,7 +2176,7 @@
         "layout": true,
         "padding_nops": 48,
         "slow_prefix_instructions": 0,
-        "taken_branch_bubbles": 216
+        "taken_branch_bubbles": 1
       },
       "functional": [
         "ok",
@@ -2184,12 +2184,12 @@
       ],
       "limiting": [
         {
-          "constraint": "miss_stall",
-          "context_cycles": 1080
+          "constraint": "spacing",
+          "context_cycles": 1234
         },
         {
-          "constraint": "spacing",
-          "context_cycles": 1019
+          "constraint": "miss_stall",
+          "context_cycles": 1080
         }
       ],
       "memory_submodels": [
@@ -2212,7 +2212,7 @@
         "layout": true,
         "padding_nops": 52,
         "slow_prefix_instructions": 0,
-        "taken_branch_bubbles": 216
+        "taken_branch_bubbles": 1
       },
       "functional": [
         "ok",
@@ -2220,12 +2220,12 @@
       ],
       "limiting": [
         {
-          "constraint": "miss_stall",
-          "context_cycles": 1080
+          "constraint": "spacing",
+          "context_cycles": 1238
         },
         {
-          "constraint": "spacing",
-          "context_cycles": 1023
+          "constraint": "miss_stall",
+          "context_cycles": 1080
         }
       ],
       "memory_submodels": [
@@ -2248,7 +2248,7 @@
         "layout": true,
         "padding_nops": 56,
         "slow_prefix_instructions": 0,
-        "taken_branch_bubbles": 216
+        "taken_branch_bubbles": 1
       },
       "functional": [
         "ok",
@@ -2256,12 +2256,12 @@
       ],
       "limiting": [
         {
-          "constraint": "miss_stall",
-          "context_cycles": 1080
+          "constraint": "spacing",
+          "context_cycles": 1242
         },
         {
-          "constraint": "spacing",
-          "context_cycles": 1027
+          "constraint": "miss_stall",
+          "context_cycles": 1080
         }
       ],
       "memory_submodels": [
@@ -2284,7 +2284,7 @@
         "layout": true,
         "padding_nops": 60,
         "slow_prefix_instructions": 0,
-        "taken_branch_bubbles": 216
+        "taken_branch_bubbles": 1
       },
       "functional": [
         "ok",
@@ -2292,12 +2292,12 @@
       ],
       "limiting": [
         {
-          "constraint": "miss_stall",
-          "context_cycles": 1080
+          "constraint": "spacing",
+          "context_cycles": 1246
         },
         {
-          "constraint": "spacing",
-          "context_cycles": 1031
+          "constraint": "miss_stall",
+          "context_cycles": 1080
         }
       ],
       "memory_submodels": [
@@ -2320,7 +2320,7 @@
         "layout": true,
         "padding_nops": 60,
         "slow_prefix_instructions": 0,
-        "taken_branch_bubbles": 216
+        "taken_branch_bubbles": 1
       },
       "functional": [
         "ok",
@@ -2333,7 +2333,7 @@
         },
         {
           "constraint": "spacing",
-          "context_cycles": 815
+          "context_cycles": 1030
         }
       ],
       "memory_submodels": [
@@ -2356,7 +2356,7 @@
         "layout": true,
         "padding_nops": 60,
         "slow_prefix_instructions": 0,
-        "taken_branch_bubbles": 216
+        "taken_branch_bubbles": 1
       },
       "functional": [
         "ok",
@@ -2369,7 +2369,7 @@
         },
         {
           "constraint": "spacing",
-          "context_cycles": 815
+          "context_cycles": 1030
         }
       ],
       "memory_submodels": [
@@ -2392,7 +2392,7 @@
         "layout": true,
         "padding_nops": 60,
         "slow_prefix_instructions": 0,
-        "taken_branch_bubbles": 216
+        "taken_branch_bubbles": 1
       },
       "functional": [
         "ok",
@@ -2400,12 +2400,12 @@
       ],
       "limiting": [
         {
-          "constraint": "miss_stall",
-          "context_cycles": 1080
+          "constraint": "spacing",
+          "context_cycles": 1246
         },
         {
-          "constraint": "spacing",
-          "context_cycles": 1031
+          "constraint": "miss_stall",
+          "context_cycles": 1080
         }
       ],
       "memory_submodels": [
@@ -2428,7 +2428,7 @@
         "layout": true,
         "padding_nops": 60,
         "slow_prefix_instructions": 0,
-        "taken_branch_bubbles": 216
+        "taken_branch_bubbles": 1
       },
       "functional": [
         "ok",
@@ -2436,12 +2436,12 @@
       ],
       "limiting": [
         {
-          "constraint": "miss_stall",
-          "context_cycles": 1080
+          "constraint": "spacing",
+          "context_cycles": 1246
         },
         {
-          "constraint": "spacing",
-          "context_cycles": 1031
+          "constraint": "miss_stall",
+          "context_cycles": 1080
         }
       ],
       "memory_submodels": [

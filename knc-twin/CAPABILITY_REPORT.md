@@ -42,7 +42,7 @@ plan.
 
 Native time displaced so far: the S12-31 microbench window (68 variants, one card window) is
 reproduced to 2 to 4% and its two rankings fully; the S12-31 HPCG toy and the 104-cubed SpMV
-runs (two more windows) to 2 to 7% with every ranking right; the S12-30 gate's small cases are 12
+runs (two more windows) to 1 to 7% with every ranking right; the S12-30 gate's small cases are 12
 to 18% high but ranked right where the builds differ by more than 5%. A new variant of these
 shapes gets a first answer off-card in seconds to minutes. The M4 gate itself (15 to 21 hours of
 card time) is not displaced: it runs whole programs, outside the region model.

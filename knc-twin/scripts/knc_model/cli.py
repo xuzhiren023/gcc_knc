@@ -261,7 +261,7 @@ def _traces_for(kernel, args, r):
     if args.trace_source == "functional":
         interp, steps, check = _run_functional(kernel, args)
         r["functional_check"] = check
-        r["_interp"] = interp
+        args._interp = interp
         r["assumptions"].extend(interp.assumptions)
         if check["status"] == "mismatch":
             raise FunctionalMismatch("candidate produced wrong results (%d mismatches); its timing is not reported as a valid result" % len(check["mismatches"]),
@@ -306,7 +306,8 @@ def _simulate_core(kernel, prof, args, r):
             "active_contexts": res["active_contexts"], "per_context": res["per_context"], "memory": res["memory"],
             "kind": "timing_prediction_core_cycles"}
     pred["frontend"] = res.get("frontend")
-    interp = r.pop("_interp", None)
+    interp = getattr(args, "_interp", None)
+    args._interp = None
     if interp is not None:
         if interp.input_files:
             pred["input_files"] = interp.input_files

@@ -16,6 +16,7 @@ from .kernel import GPR64
 from .util import dump_json, load_json, parse_int, sha256_of_obj, utc_now_iso
 
 CALLEE_SAVED = ("rbx", "rbp", "r12", "r13", "r14", "r15")
+MAX_IMAGE_BYTES = 32 << 20   # the driver embeds the image as a C initializer (about 5 bytes of source per byte); larger images are not a native request anyone would build
 
 
 def _memory_image(kernel):
@@ -39,6 +40,9 @@ def _memory_image(kernel):
     base = min(a for a, _ in blocks) & ~0xFFF
     end = max(a + len(d) for a, d in blocks)
     span = (end - base + 63) & ~63
+    if span > MAX_IMAGE_BYTES:
+        raise InvalidInput("the kernel's memory blocks span %d bytes (0x%x to 0x%x); prepare-native relocates one contiguous image of at most %d bytes. "
+                           "Place the kernel's arrays near its data sections (or drop data sections it does not use) before exporting a native request." % (span, base, end, MAX_IMAGE_BYTES))
     img = bytearray(span)
     for a, d in sorted(blocks, key=lambda t: 1 if any(t[1]) else 0):
         img[a - base:a - base + len(d)] = d

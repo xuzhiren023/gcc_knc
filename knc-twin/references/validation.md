@@ -5,14 +5,11 @@ Full tables: `tests/heldout_native/characterization-run/validation.md` and `vali
 measured columns are native TSC ticks or seconds on the project's 7120-class card, converted to
 core cycles at 1.238 GHz.
 
-**Status of this file (0.3.0, 2026-11-16).** The tables are the first full pass of the 0.3.0
-engine over 119 characterization rows and 108 compiled rows. Three corrections were made after
-that pass from rows it flagged (store/load port pairing, the taken-branch bubble limited to
-forward transfers, memory latency 328 without the TLB miss; all recorded as calibration rows
-below); their spot checks are quoted where they apply. The full rerun, which also re-records every
-case's `prediction.json`, was stopped at the GCC-KNC lead's request (laptop load during the M4
-card block) and is the first thing to run when the window opens; until then
-`tests/regress/test_knc_twin.py` reports the recorded predictions as stale.
+**Status (0.3.0, 2026-11-16).** Final engine, profile hash 2058f0ec...: every table below is the recording
+run of `validate_heldout.py --cases --record`, so each case's `prediction.json` matches these numbers and
+`tests/regress/test_knc_twin.py` reproduces them. Three corrections were made between the first 0.3.0 pass and
+this run from rows the first pass flagged (store/load port pairing, the taken-branch bubble limited to forward
+transfers, memory latency 328 without the TLB miss); they are recorded as calibration rows below.
 
 ## Compiled code (held out)
 
@@ -23,24 +20,20 @@ inputs where the run defines them (S12-31) and the gate's generator where it doe
 | case | rows | measured unit | median abs error | mean signed | worst | rankings right (pairs > 5% apart) |
 |---|---:|---|---:|---:|---:|---|
 | S12-31 row-loop microbench: 68 variants of padding (assembler NOPs with 66/2e prefixes, single-byte NOPs, prefix-free NOPs, 0-15 bytes), loop-top offsets, loop-body orders | 65 held out (gas_0, adj_0, one_15 calibrate x87 and NOP pairing) | cycles per 27-product row | 2.9% | +3.0% | +3.8% | 22 of 22 (orders 8 of 8, padding styles 14 of 14) |
-| S12-31 HPCG 3.1 ComputeSPMV_ref and ComputeSYMGS_ref, eight builds, whole functions, 8x8x8 problem (L2-resident) | 16 | cycles per timed call | 3.9% | +4.2% | +6.8% | 24 of 24 |
-| S12-31 HPCG ComputeSPMV_ref, eight builds, 104-cubed problem (memory-bound; window of interior rows of the real matrix) | 8 | cycles per 27 nonzeros | 4.6% | +4.5% | +5.0% | 12 of 12 |
+| S12-31 HPCG 3.1 ComputeSPMV_ref and ComputeSYMGS_ref, eight builds, whole functions, 8x8x8 problem (L2-resident) | 16 | cycles per timed call | 3.7% | +4.0% | +6.6% | 24 of 24 |
+| S12-31 HPCG ComputeSPMV_ref, eight builds, 104-cubed problem (memory-bound; window of interior rows of the real matrix) | 8 | cycles per 27 nonzeros | 3.7% | +3.7% | +4.1% | 12 of 12 |
 | S12-30 gate small cases: CSR and HPCG-pointer layouts, 13 and 27 nonzeros, 32 rows, random columns into a 32 KiB x, four builds | 16 | cycles per call | 16.0% | +15.4% | +17.9% | 2 of 2 |
-| all compiled held out | 105 | | 3.2% | +5.2% | 17.9% | 39 of 39 |
+| all compiled held out | 105 | | 3.1% | +5.1% | 17.9% | 39 of 39 |
 
 What the 0.2 feedback measured as 17 to 32% off with the S12-31 ranking mostly wrong is now 2 to
 7% with every ranking right. The S12-30 small cases are the open miss (below): uniformly 12 to 18%
 slow, so their rankings hold.
 
-Spot checks after the three corrections (same rows, final engine): gas_0 503 (measured 488.9),
-adj_0 449 (433.5), one_15 532 (517.0); the compiled rows do not use the corrected rules except
-through `latency.memory`, which lowers the 104-cubed rows by about 1%.
-
 ### Decision bar
 
 | criterion | limit | result | met |
 |---|---|---|---|
-| median absolute error on held-out compiled loops | at most 10% | 3.2% over 105 rows (89 within 10%, worst 17.9%) | yes |
+| median absolute error on held-out compiled loops | at most 10% | 3.1% over 105 rows (89 within 10%, worst 17.9%) | yes |
 | right winner when the measured times differ by more than 5% | at least 90% | 39 of 39 | yes |
 | held-out compiled loops | at least 50 rows from at least 5 M4 programs | 105 rows, but from HPCG (one M4 program) and the S12-30 sparse microbenchmark family | no |
 
@@ -57,20 +50,20 @@ A `simulate` result is a `calibrated_forecast` only when the kernel declares one
 | shape | case | median / worst abs error | note |
 |---|---|---|---|
 | `x87_row_loop_l1` | S12-31 microbench | 2.9% / 3.8% | x87 sparse row products, data in L1, with code layout |
-| `x87_sparse_rows_l2` | S12-31 HPCG toy | 3.9% / 6.8% | HPCG SpMV/SymGS shapes, matrix resident in L2 |
-| `x87_sparse_rows_memory_stream` | S12-31 HPCG 104-cubed | 4.6% / 5.0% | the same shapes streaming from memory, one thread |
-| `x87_sparse_rows_l1` | S12-30 small | 16% / 18% | random-column sparse products; the band is wide (open miss) |
+| `x87_sparse_rows_l2` | S12-31 HPCG toy | 3.7% / 6.6% | HPCG SpMV/SymGS shapes, matrix resident in L2 |
+| `x87_sparse_rows_memory_stream` | S12-31 HPCG 104-cubed | 3.7% / 4.1% | the same shapes streaming from memory, one thread |
+| (`x87_sparse_rows_l1`, S12-30 small: 16% / 18%) | not validated | the error exceeds the 10% bar, so this shape stays `unvalidated_scenario_estimate`; listed in the profile under `not_validated_shapes` |
 | `register_vector_chain_l1`, `scalar_mask_l1`, `x87_register_chain`, `l1_l2_dependent_loads`, `l1_resident_stores_prefetch_pairing` | characterization rows | 1-2% / 5-14% | as in 0.2 |
 
 ## Characterization microbenchmarks (119 rows, 1/2/4 threads)
 
-Held-out rows (no parameter or rule set from them): median absolute error 0.9% / 2.7% / 1.4% at
-1 / 2 / 4 threads (58 / 58 / 57 rows). Ranking reliability over the named groups: 367 of 373
-pairs (0.984); the six disagreements are rows within 12% of each other
-(masked_load.lat vs unpack.lat and vs spill_reload.lat at two threads; masked_load.rt 2.37 at two
-threads, a flagged measurement, against three 2.07 rows; gather_all.lat vs .rt at four threads).
+Held-out rows (no parameter or rule set from them): median absolute error 0.9% / 0.4% / 1.6% at
+1 / 2 / 4 threads (55 / 55 / 57 rows), worst 14.2% / 18.2% / 13.4%, every row within 30%. Ranking
+reliability over the named groups: 369 of 373 pairs (0.989); the four disagreements are rows within
+15% of each other (masked_load.lat vs spill_reload.lat at two threads, 12.17 vs 12.98; masked_load.rt
+2.37 at two threads, a flagged measurement, against three 2.07 rows).
 
-Rows the first pass flagged that led to the three corrections (now calibration rows):
+Rows the first 0.3.0 pass flagged that led to the three corrections (now calibration rows):
 
 | rows | first pass | mechanism found | after |
 |---|---|---|---|
@@ -100,8 +93,9 @@ store-miss stalls, nop/jmp pairing, gather mask, HWP depth) stand.
 | S12-30 small cases (16 compiled rows) | 8284-23765 per call | +12 to +18% | L1 conflict misses of the random column accesses under true LRU, and the input instance (the card's generator state is not reproducible; seed spread 2.5-6%); calibration-plan `l1-conflict`, a dump of the gate's arrays |
 | S12-31 row loops and HPCG kernels | | +2 to +7% | per-iteration cost 17.5 measured against 18 modeled: the `fldl`/`fmull` split; calibration-plan `x87-memory-split` |
 | spill_reload.rt at one thread | 5.09 | 4.1 (-19%) | the interlock is one cycle longer at one thread; `store-to-load` |
+| c2.prefetch1 / c2.vector_prefetch1 at two and four threads | 4.5/9.0 | 4.0/8.0 (-11%) | the `vprefetch1` issue rate of one per two core cycles is a little optimistic with several threads |
 | c9.memory.u1/u2/u4 at two threads | 13.1/12.0/11.0 | 11.0/8.5/8.3 | store and load contention between two threads; `store-to-load` |
-| unpack.lat at two and four threads | 16.8/24.4 | 12.0/13.2 | the four unaligned halves per unit contend on the L1 port; not modeled |
+| unpack.lat (calibration row for the merge rule) | 12.1/16.8/24.4 | 14.0/14.0/17.1 | the store-to-load interlock charges the unaligned halves 2 cycles too much at one thread; the contention of the four halves per unit on the L1 port at two and four threads is not modeled |
 | c10.branch.random at four threads | 27.8 | 18.3 | the mispredict penalty (5, one thread) grows with threads; `taken-branch` |
 | l2.load_rt | 23.4 | 26.7 (+14%) | independent L2 loads overlap less in the model than measured, or TLB reach (footprint of 64 pages); `prefetcher-depth` |
 | gather_scattered.lat/.rt at two and four threads | 275/509, 260/507 | 226/448 (-12 to -18%) | the gather unit shared by threads costs more than the one-thread 11 per line; `gather-lines` |

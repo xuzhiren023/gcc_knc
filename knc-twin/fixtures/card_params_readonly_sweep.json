@@ -1,6 +1,6 @@
 {
  "schema": "knc-twin.analytic-params/1",
- "description": "read-only traffic has no measured bandwidth in the 7120 profile; without bandwidth_sweep_gbs the result is needs_parameters",
+ "description": "read-only traffic on a profile without a measured sustained bandwidth (card-3120-documented); without bandwidth_sweep_gbs the result is needs_parameters",
  "units": 16777216,
  "bytes_per_unit": 64,
  "traffic_type": "read_only",

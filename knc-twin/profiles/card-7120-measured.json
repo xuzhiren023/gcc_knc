@@ -15,8 +15,8 @@
   ],
   "calibration": {
     "state": "imported_microbenchmarks_with_compiled_heldout_check",
-    "statement": "Core timing is inherited from core-x100-measured (measured or derived on this card: S6-03, S8-01, S8-12, S12-31). Predictions were compared with 119 characterization rows (held-out median error 0.9/2.7/1.4% at 1/2/4 threads, ranking 0.984) and with 105 held-out compiled rows from the binaries that ran on the card (S12-31 row loops, HPCG kernels L2-resident and memory-bound, S12-30 sparse products): median error 3.2%, right winner 39 of 39 pairs more than 5% apart. The decision bar's error and ranking criteria are met; its breadth (loops from at least five M4 programs) is not: shapes outside validated_shapes are unvalidated_scenario_estimate. First 0.3.0 pass; see references/validation.md for the status of the rerun.",
-    "held_out_validation_cases": 163,
+    "statement": "Core timing is inherited from core-x100-measured (measured or derived on this card: S6-03, S8-01, S8-12, S12-31). Predictions were compared with 119 characterization rows (held-out median error 0.9/0.4/1.6% at 1/2/4 threads, ranking 0.989) and with 105 held-out compiled rows from the binaries that ran on the card (S12-31 row loops, HPCG kernels L2-resident and memory-bound, S12-30 sparse products): median error 3.1%, right winner 39 of 39 pairs more than 5% apart. The decision bar's error and ranking criteria are met; its breadth (loops from at least five M4 programs) is not: shapes outside validated_shapes are unvalidated_scenario_estimate. Recording run of the final engine (profile hash 2058f0ec...).",
+    "held_out_validation_cases": 160,
     "validated_shapes": {
       "register_vector_chain_l1": {
         "evidence": "S6-03 vector .lat/.rt rows, swizzles, conversions, C7, C9 register chains at 1/2/4 threads",
@@ -56,21 +56,23 @@
       },
       "x87_sparse_rows_l2": {
         "evidence": "S12-31 HPCG toy, 16 held-out kernels (ComputeSPMV_ref, ComputeSYMGS_ref, eight builds), one thread",
-        "median_abs_error_pct": 3.9,
-        "worst_abs_error_pct": 6.8,
+        "median_abs_error_pct": 3.7,
+        "worst_abs_error_pct": 6.6,
         "note": "HPCG-shaped x87 sparse rows with the matrix resident in L2"
       },
       "x87_sparse_rows_memory_stream": {
         "evidence": "S12-31 HPCG 104-cubed SpMV, 8 held-out builds, one thread",
-        "median_abs_error_pct": 4.6,
-        "worst_abs_error_pct": 5.0,
+        "median_abs_error_pct": 3.7,
+        "worst_abs_error_pct": 4.1,
         "note": "the same shape streaming from memory on one thread (TLB, L2 prefetcher and memory service modeled); not validated at several threads"
-      },
+      }
+    },
+    "not_validated_shapes": {
       "x87_sparse_rows_l1": {
         "evidence": "S12-30 small cases, 16 held-out rows, one thread",
         "median_abs_error_pct": 16.0,
         "worst_abs_error_pct": 17.9,
-        "note": "random-column sparse products into a 32 KiB x; uniformly 12 to 18% slow (open miss: L1 conflict misses, input instance), rankings right"
+        "note": "random-column sparse products into a 32 KiB x: uniformly 12 to 18% slow (L1 conflict misses under true LRU, input instance), rankings right; the error exceeds the 10% bar, so results stay unvalidated_scenario_estimate"
       }
     }
   },

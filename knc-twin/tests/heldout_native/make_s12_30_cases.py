@@ -39,8 +39,10 @@ SLOTS = [("donor-off", "compiler-donor.o", "donor"), ("knc-switch-off", "compile
 BATCH_SLOTS = SLOTS + [("knc-switch-on-contract-fast", "compiler-fast.o", "fast"), ("knc-switch-on-min4", "compiler-min4.o", "min4"),
                        ("knc-handwritten-policy", "compiler-manual.o", "manual")]
 ROWS, NX = 32, 4096
+# arrays sit just above the object's data sections (from_binary.DATA_BASE 0x20000000) so that a native request's
+# relocated image stays compact; low 12 address bits of every array are as in the 0.2 layout
 MATRIX, OUT, ROWPTR, COL, COUNT, VAL, X, COLS_PTRS, VALS_PTRS, ROW_HEAP = (
-    0x1000000, 0x1001000, 0x1002000, 0x1010000, 0x1003000, 0x1020000, 0x1040000, 0x1004000, 0x1005000, 0x1060000)
+    0x20100000, 0x20101000, 0x20102000, 0x20110000, 0x20103000, 0x20120000, 0x20140000, 0x20104000, 0x20105000, 0x20160000)
 STACK_TOP = 0x7F0000000000
 
 
@@ -126,7 +128,7 @@ def make_kernel(obj, prefix, layout, n, seed, calls, objdump):
     kernel["init"]["registers"] = {"r15": calls}
     kernel["init"]["memory"] = kernel["init"]["memory"] + mem
     for s in kernel["provenance"]["unresolved_symbols"]:
-        kernel["init"]["symbols"][s] = "0x1006000"     # the build's volatile two-nest switch: zero, as in the timed run
+        kernel["init"]["symbols"][s] = "0x20106000"    # the build's volatile two-nest switch: zero, as in the timed run
     kernel["scenario"] = {"memory": {"type": "line_tracking", "cold_level": "memory", "warm": warm}, "branch": {"type": "exit_mispredicted"}}
     kernel["expected"] = {"memory": [{"addr": "0x%x" % OUT, "f64": want}]}
     kernel["max_steps"] = 4000000

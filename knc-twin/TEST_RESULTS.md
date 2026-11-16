@@ -3,20 +3,23 @@
 Status on 2026-11-16 (host: Windows 10, Python 3.8.5). Model tests plus checks against independent
 oracles; they are not validation against hardware (that is `references/validation.md`).
 
-## What ran after the last engine change
+## Runs on the final engine (2026-11-16)
 
-`python -m unittest test_fp test_asm test_functional test_bounds test_timing test_extended test_v03`
-in `tests/`: 123 tests, 0 failures, 0 errors. `tests/trial/knc_trial.py` cases: 16 of 16 convert
-and check as recorded.
+- `python scripts/knc_twin.py selftest`: 137 tests, 0 failures, 0 errors (test_fp 14, test_functional 13,
+  test_asm 4, test_bounds 9, test_timing 24, test_extended 19, test_cli 14, test_v03 40).
+- `examples/run_examples.py` (`examples/RESULTS.md`): 41 commands, 34 ok and 7 with the intended non-ok
+  status and exit code (functional_mismatch 6, needs_parameters 7, unsupported 3, missing_parameter 4 twice,
+  budget_exhausted 5, incompatible 8). New examples: HPCG ComputeSPMV_ref from the linked S12-31 binary,
+  the S12-31 row loop behind a 13-byte prefixed NOP and with the compare next to its jump, the roll-up,
+  the calibration plan, the 3120 profile.
+- `tests/trial/knc_trial.py` cases: 16 of 16 convert and check as recorded.
+- `scripts/validate_heldout.py --cases --record`: see `references/validation.md`.
 
-## What did not rerun
-
-The full `knc_twin.py selftest` (which adds `test_cli`, 14 tests that drive every command through
-the CLI, including the S12-30 batch) and `examples/run_examples.py` were stopped on 2026-11-16 at the
-GCC-KNC lead's request (no CPU load on the laptop during the M4 card block). The last complete
-`test_cli` run before the final two fixes had 2 errors from a result-serialization bug that the
-fixes removed, and 12 passes. Both runs are the first thing to repeat when the window opens; until
-then the figures above are the evidence.
+Two defects found by these runs and fixed before the commit: `bounds` with a functional trace wrote an
+unreadable result.json (an internal object leaked into the result), and `prepare-native` built one contiguous
+memory image from the lowest to the highest address a kernel touched, which for the S12-30 batch kernels
+(data sections 500 MB away from the arrays) consumed 24 GB; the image is now capped at 32 MiB with a
+clear error and the batch kernels place their arrays next to the data sections (the batch runs in 9 s).
 
 ## New in 0.3 (`tests/test_v03.py`, 40 tests)
 
