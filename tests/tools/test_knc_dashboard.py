@@ -1,9 +1,10 @@
 import datetime as dt
-import importlib.util
 import json
 from pathlib import Path
 import sys
+import threading
 import unittest
+from urllib.request import urlopen
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[2] / 'tools'))
 import knc_dashboard as d
@@ -23,16 +24,26 @@ class DashboardTests(unittest.TestCase):
                 row('queued', 'sup'), row('superseded', 'sup'),
                 row('queued', 'stale', firstQueuedTime='2026-11-16T08:00:00Z')]
         rows[-1]['queuedTime'] = '2026-11-16T08:00:00Z'
-        rows += [row('queued', 'claude-turn-x', cores=[], firstQueuedTime='2026-11-16T11:00:00Z')]
+        rows += [row('queued', 'claude-turn-x', cores=[]),
+                 row('queued', 'claude-turn-x', cores=[], firstQueuedTime='2026-11-16T11:00:00Z'),
+                 row('queued', 'later')]
         result = d.ledger_status('\n'.join(map(json.dumps, rows)) + '\ninvalid', now)
         self.assertEqual(result['running'][0]['remaining_seconds'], -60)
-        self.assertEqual([r['jobId'] for r in result['queue']], ['known', 'unknown'])
+        self.assertEqual([r['jobId'] for r in result['queue']], ['known', 'unknown', 'later'])
         self.assertEqual(result['turns'][0]['jobId'], 'claude-turn-x')
         self.assertEqual(result['order'][0], 'claude-turn-x')
         self.assertEqual(result['queue'][0]['duration_seconds'], 120)
         self.assertEqual(result['queue'][0]['basis'], 'purpose')
         self.assertIsNone(result['queue'][1]['duration_seconds'])
-        self.assertEqual(result['queue'][1]['estimated_start'], '2026-11-16T12:02:00+00:00')
+        self.assertEqual(result['queue'][1]['estimated_start'], '2026-11-16T12:01:00+00:00')
+        self.assertIsNone(result['queue'][2]['estimated_start'])
+        rows[2]['expectedEnd'] = '2026-11-16T12:10:00Z'
+        rows[0].update(project='x', agent='a')
+        rows[3].update(purpose='other', project='x', agent='a')
+        result = d.ledger_status('\n'.join(map(json.dumps, rows)), now)
+        self.assertEqual(result['running'][0]['remaining_seconds'], 600)
+        self.assertEqual(result['queue'][0]['basis'], 'project and agent')
+        self.assertEqual(result['queue'][0]['estimated_start'], '2026-11-16T12:10:00+00:00')
 
     def test_sensors(self):
         text = '''mic0 (temp):
@@ -58,8 +69,18 @@ mic1 (temp):
         self.assertEqual(updated['durations']['predict'], [10, 30, 20])
         updated, runs = d.update_history(updated, [dict(key='2', subcommand='predict', start_epoch=15)], 25)
         self.assertEqual(runs[0]['remaining_seconds'], 10)
-        for name in ('Card job', 'Card queue', 'Twin work', 'Card sensors', 'Host CPU'):
-            self.assertIn(name, d.HTML)
+        server = d.ThreadingHTTPServer(('127.0.0.1', 0), d.handler(None))
+        worker = threading.Thread(target=server.serve_forever)
+        worker.start()
+        try:
+            with urlopen('http://127.0.0.1:%d/' % server.server_port) as response:
+                page = response.read().decode('utf-8')
+            for name in ('Card job', 'Card queue', 'Twin work', 'Card sensors', 'Host CPU'):
+                self.assertIn(name, page)
+        finally:
+            server.shutdown()
+            server.server_close()
+            worker.join()
 
 
 if __name__ == '__main__':
