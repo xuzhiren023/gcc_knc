@@ -1,10 +1,10 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-16 00:49.
+Updated automatically at every ticket change. Last update: 2026-11-16 00:50.
 
-**Next: the tech lead, on S13-01.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Waiting for you:** S14-13. Run `python tools/pm.py inbox`.
 
-Current tickets: `[#################---]` 244 of 276
+Current tickets: `[#################---]` 244 of 277
 
 ## Milestones
 
@@ -15,7 +15,7 @@ Current tickets: `[#################---]` 244 of 276
 | M2 | Useful vector target | Done | 51 of 51 tickets |
 | M3 | Runtimes | Done | 48 of 48 tickets |
 | M4 | Broad optimization | Done | 62 of 65 tickets |
-| M5 | Program corpus | In progress | 0 of 29 tickets |
+| M5 | Program corpus | In progress | 0 of 30 tickets |
 | M6 | Release | Not started | Not planned in detail yet |
 
 ## Tickets
@@ -141,11 +141,12 @@ Current tickets: `[#################---]` 244 of 276
 | S14-10 | knc-twin: --jobs N for independent simulations and PyPy support (roadmap item 1) | In progress | No worktree needed. Export main's knc-twin into your shared dir: git -c safe.directory='*' archive main knc... |
 | S14-11 | knc-twin: close PhiWeather WRF coverage gaps (jump tables, vcvtps2pd ymm, loop-region and complete-listing modes, scatter and rcp-table import) | In progress | Yes, run them now: the M4 card block finished 04:20Z and the host limits are lifted. Run tests/regress/test... |
 | S14-12 | knc-twin: iteration and phase sampling for loop and whole-program wall-time estimates (roadmap item 2) | In progress | Skip the rebase: main has no knc-twin or tests/regress change since your base aced5f9d, so the lead merges ... |
-| S14-13 | knc-twin: 8-tile multi-core unit on the full ring with all memory controllers (roadmap item 3) | In progress | sessions 6 -> 9 under the owner's standing auto-extend rule: the design note is reviewed, staging and submi... |
+| S14-13 | knc-twin: 8-tile multi-core unit on the full ring with all memory controllers (roadmap item 3) | **Waiting for you** | budget: 20776413 input tokens used; the budget is 20000000 |
 | S14-14 | knc-twin: scheduling explorer for modulo scheduling and reordering, evaluating S14-02/S14-03 (roadmap item 4) | In progress | Yes, run it: the card block ended 04:20Z and host limits are lifted (lead note 04:25Z), so run validate_hel... |
 | S14-15 | knc-twin prepare-native: absolute memory operands come out as `N()` in kernel.S (k1om as 2.22 rejects them); emit them relocated into the image | In progress | sessions 2 -> 4 under the owner's standing auto-extend rule (2026-11-09/10); fix needed before the ~06:30Z ... |
 | S14-16 | bzip2 slower than GCC 5.1.1: mask-to-GPR move cost below a GPR move makes RA park integers in k registers (M4 known limit, must-fix) | draft |  |
 | S14-17 | Compare not folded with its load in merged return blocks (GCC 16 middle end, about half the remaining bzip2 mainGtU gap) | draft |  |
+| S14-18 | knc-twin regress: held-out replay runs under a 120 s wall-clock budget, so a slow interpreter turns a prediction into a budget_exhausted stub and the test fails as a false mismatch | Not started |  |
 | S2-01 | Design for zmm and mask registers under -march=knc | Done | The register design for KNC is settled on paper: all 32 zmm and 8 mask registers become usable under -march... |
 | S2-02 | Float and double arguments and results in zmm lane 0 | Done | Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`). |
 | S2-03 | Varargs with the donor's register save area | Done | Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`). |
@@ -301,6 +302,7 @@ Current tickets: `[#################---]` 244 of 276
 
 ## Recent activity
 
+- 2026-11-16 00:50 **S14-13** engineer escalate: budget: 20776413 input tokens used; the budget is 20000000
 - 2026-11-16 00:49 **S14-13** owner decide: sessions 6 -> 9 under the owner's standing auto-extend rule: the design note is reviewed, staging and submit remain; next extension only if a sessi...
 - 2026-11-16 00:47 **S14-13** engineer escalate: budget: 6 engineer sessions used; the budget is 6
 - 2026-11-16 00:46 **S14-15** owner decide: sessions 2 -> 4 under the owner's standing auto-extend rule (2026-11-09/10); fix needed before the ~06:30Z calibration window
@@ -308,16 +310,15 @@ Current tickets: `[#################---]` 244 of 276
 - 2026-11-16 00:45 **S14-13** lead answer: (1) Yes: put each input JSON outside the output directory (a sibling such as <req>-input.json next to it, or under .work/_state/), and give each re...
 - 2026-11-16 00:42 **S14-12** engineer ask: HEAD 3441cb94 clean. Selftest: 162 passed; log ../_state/logs/S14_12_selftest-20261115-232927.log. Regression: 1/3 failed, s12-31-hpcg-104 predicti...
 - 2026-11-16 00:41 **S14-15** engineer escalate: budget: 2 engineer sessions used; the budget is 2
-- 2026-11-16 00:41 **S14-13** engineer ask: Two staging attempts failed: unsupported --check (removed), then input.json inside --out triggers nonempty-output refusal. Resume with sibling inpu...
 
 ## Cost
 
 - From the script, engineer: 733 sessions, 1579.3M input tokens
 - From the script, lead: 497 sessions, 141.4M input tokens
-- Started by hand, Claude: 14 sessions, 4092.5M input tokens
+- Started by hand, Claude: 14 sessions, 4093.7M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 40.6 GiB of 100 GiB. 82 GiB free on the drive.
+The project uses 40.6 GiB of 100 GiB. 81 GiB free on the drive.
