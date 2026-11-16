@@ -335,7 +335,7 @@ Current tickets: `[#################---]` 258 of 297
 
 - From the script, engineer: 818 sessions, 1720.9M input tokens
 - From the script, lead: 562 sessions, 157.3M input tokens
-- Started by hand, Claude: 97 sessions, 4557.4M input tokens
+- Started by hand, Claude: 97 sessions, 4558.2M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
