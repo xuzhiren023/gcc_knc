@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-16 06:49.
+Updated automatically at every ticket change. Last update: 2026-11-16 06:50.
 
-**Waiting for you:** S14-15. Run `python tools/pm.py inbox`.
+**Waiting for you:** S14-15, S14-19. Run `python tools/pm.py inbox`.
 
 Current tickets: `[#################---]` 249 of 283
 
@@ -147,7 +147,7 @@ Current tickets: `[#################---]` 249 of 283
 | S14-16 | bzip2 slower than GCC 5.1.1: mask-to-GPR move cost below a GPR move makes RA park integers in k registers (M4 known limit, must-fix) | draft |  |
 | S14-17 | Compare not folded with its load in merged return blocks (GCC 16 middle end, about half the remaining bzip2 mainGtU gap) | draft |  |
 | S14-18 | knc-twin regress: held-out replay runs under a 120 s wall-clock budget, so a slow interpreter turns a prediction into a budget_exhausted stub and the test fails as a false mismatch | Done | The knc-twin held-out replay no longer runs in t0 (KNC_TWIN_HELDOUT=1 or validate_heldout.py --max-seconds ... |
-| S14-19 | knc-twin x87 integer-load widths - fildl reads 8 bytes (must be 4), filds reads 4 (must be 2) | In progress | input_tokens 4M -> 8M under the owner's standing rule (the 45-minute re-recording run consumed the budget; ... |
+| S14-19 | knc-twin x87 integer-load widths - fildl reads 8 bytes (must be 4), filds reads 4 (must be 2) | **Waiting for you** | budget: 2 engineer sessions used; the budget is 2 |
 | S14-20 | knc-twin: an indirect jmp/call (PLT tail call through the GOT) on a never-executed path must not refuse the whole region | Not started |  |
 | S14-21 | knc-twin multi-core: held-out validation of the 8-tile ring model against the measured GEMV, triad and core-scaling rows | Not started |  |
 | S14-22 | card_run turn row: refreshing an open turn row must keep its place in the queue | draft |  |
@@ -308,6 +308,7 @@ Current tickets: `[#################---]` 249 of 283
 
 ## Recent activity
 
+- 2026-11-16 06:50 **S14-19** engineer escalate: budget: 2 engineer sessions used; the budget is 2
 - 2026-11-16 06:49 **S14-19** owner decide: input_tokens 4M -> 8M under the owner's standing rule (the 45-minute re-recording run consumed the budget; the work is committed by the lead). Only...
 - 2026-11-16 06:48 **S14-19** engineer escalate: budget: 5605920 input tokens used; the budget is 4000000
 - 2026-11-16 06:47 **S14-19** lead answer: Your changes are committed on s14/S14-19 by the lead (two commits: [red] tests, then the fix with engine 0.4.0 and the re-recorded predictions). On...
@@ -315,7 +316,6 @@ Current tickets: `[#################---]` 249 of 283
 - 2026-11-16 06:44 **S14-19** lead defer: Interactive lead: the engineer's worktree could not write .git/worktrees/S14-19/index.lock (Permission denied), so its changes are uncommitted. Ple...
 - 2026-11-16 06:43 **S14-19** engineer ask: Commit wrapper refused: git add -A cannot create C:/Users/xuzhi/Documents/gcc_knc/.git/worktrees/S14-19/index.lock (Permission denied). Test passes...
 - 2026-11-16 06:13 **S14-13** lead approve: knc-twin simulates 1-8 detailed cores on the full 61-stop ring with all memory controllers and directory slices (simulate --scale unit|ring); every...
-- 2026-11-16 05:59 **S14-13** lead resume: main merged into the branch by the lead with four conflicts resolved (timing.py step/run, cli.py parser, SKILL.md, README); 107 twin tests pass on ...
 
 ## Cost
 
