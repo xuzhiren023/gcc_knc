@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-16 03:56.
+Updated automatically at every ticket change. Last update: 2026-11-16 03:57.
 
 **Waiting for you:** S14-15, S14-18. Run `python tools/pm.py inbox`.
 
@@ -141,7 +141,7 @@ Current tickets: `[#################---]` 244 of 280
 | S14-10 | knc-twin: --jobs N for independent simulations and PyPy support (roadmap item 1) | In progress | No worktree needed. Export main's knc-twin into your shared dir: git -c safe.directory='*' archive main knc... |
 | S14-11 | knc-twin: close PhiWeather WRF coverage gaps (jump tables, vcvtps2pd ymm, loop-region and complete-listing modes, scatter and rcp-table import) | lead | Review done, no findings: A-G match the brief and the 08:25Z pre-review; heap stubs pinned red-then-green i... |
 | S14-12 | knc-twin: iteration and phase sampling for loop and whole-program wall-time estimates (roadmap item 2) | lead | Review passed, ready to approve: head 7f734b23 matches the pre-review and meets brief 04's done criteria. M... |
-| S14-13 | knc-twin: 8-tile multi-core unit on the full ring with all memory controllers (roadmap item 3) | Changes requested | Lead decision (owner's delegation): scope split. The held-out validation of the brief's step 7 becomes S14-... |
+| S14-13 | knc-twin: 8-tile multi-core unit on the full ring with all memory controllers (roadmap item 3) | In progress | Lead decision (owner's delegation): scope split. The held-out validation of the brief's step 7 becomes S14-... |
 | S14-14 | knc-twin: scheduling explorer for modulo scheduling and reordering, evaluating S14-02/S14-03 (roadmap item 4) | lead | Review passed (approve note: knc-twin gains a schedule command: beam search up to 60 instructions, list ord... |
 | S14-15 | knc-twin prepare-native: absolute memory operands come out as `N()` in kernel.S (k1om as 2.22 rejects them); emit them relocated into the image | **Waiting for you** | budget: 10651104 input tokens used; the budget is 10000000 |
 | S14-16 | bzip2 slower than GCC 5.1.1: mask-to-GPR move cost below a GPR move makes RA park integers in k registers (M4 known limit, must-fix) | draft |  |
