@@ -118,28 +118,62 @@ remote reads, pending-fill visibility and contention, not hardware accuracy.
 The predeclared engineering target is 10% per comparable row; it has not been
 widened and no multi-core shape is promoted.
 
-`scripts/record_multicore.py` is prepared to record finite cold-read predictions
+`scripts/record_multicore.py` recorded eight finite cold-read predictions
 for 1/2/4/8 detailed cores, both without background (`unit`) and with 60 total
 active cores (`ring`), under `tests/heldout_native/multicore-scenarios/prediction.json`.
-**The recorder has not run yet; that record does not exist.** Inputs have one
+All eight returned status `ok` and remain unvalidated scenario estimates. Inputs have one
 context per core and 64 cold lines per context. The recorder retains assumptions,
 parameters, unsupported forms and result classes. These are synthetic scenarios,
 not the compiled kernels or steady-state timed envelopes of historical card rows;
-they must not enter held-out error/ranking statistics. Pending command from the
-knc-twin root: `scripts/record_multicore.py --out <shared-output> --record
-tests/heldout_native/multicore-scenarios/prediction.json`.
+they must not enter held-out error/ranking statistics. Full results are under
+`.work/_shared/S14-13/predictions/`; the recorder log is
+`.work/_state/logs/S14_13_record_multicore-20261116-014756.log`.
+
+| Detailed cores | Unit completion cycles | Ring completion cycles |
+|---|---:|---:|
+| 1 | 21176.266009221312 | 21324.463953918817 |
+| 2 | 21222.266009221312 | 21753.567071403722 |
+| 4 | 21223.078002773167 | 21920.266009221312 |
+| 8 | 21249.078002773167 | 21388.139193918472 |
+
+These are finite completion envelopes, including admitted traffic draining;
+they do not establish steady-state bandwidth or a monotonic scaling curve.
 
 Host validation on 2026-11-16: the full selftest and trial regressions passed
 through `tests/regress/test_knc_twin.py`. Its held-out equality check failed only
-for `s12-31-hpcg-104`; the assertion abbreviates the returned rows, so the cause
-has not yet been established (budget exhaustion is a hypothesis, not a result).
-Do not rewrite its recorded predictions. Log:
+for `s12-31-hpcg-104`; the assertion abbreviates the returned rows. Log:
 `.work/_state/logs/S14_13_regress_selftest-20261116-005843.log` (36.9 minutes).
-Schema metadata passed Draft 7 checking, but instance validation is pending:
-the installed jsonschema resolver failed first on the relative schema ID and
-then on an absolute in-memory URN. Logs are
-`S14_13_schema-20261116-013622.log` and
-`S14_13_schema_local_refs-20261116-013703.log` in the same log directory.
+The approved branch diagnostic with a 900-second budget subsequently returned
+`ok` for every variant and its full prediction object exactly equals the existing
+record. Actual/recorded rows and the equality verdict are in
+`.work/_state/logs/S14_13_hpcg_branch-20261116-015114.log`.
+
+| HPCG variant | Branch cycles/unit | Recorded cycles/unit |
+|---|---:|---:|
+| donor | 723.043 | 723.043 |
+| donor_pf | 725.043 | 725.043 |
+| knc | 726.027 | 726.027 |
+| knc_pf | 726.027 | 726.027 |
+| knc_noalign | 723.027 | 723.027 |
+| knc_skip7 | 724.027 | 724.027 |
+| knc_nosched | 670.619 | 670.619 |
+| knc_nosched_noalign | 666.619 | 666.619 |
+
+The comparison using main code (`868b1eac`, clean export) stopped after six
+variant timing messages without a final report or retained prediction. No
+Cygwin Python process remains. Log:
+`.work/_state/logs/S14_13_hpcg_main-20261116-024600.log`.
+The cause of that interruption is unknown. The original regression failure is
+not yet diagnosed: budget exhaustion remains a hypothesis, not an observed
+result. Main/branch equality remains pending permission to repeat the interrupted
+main run beyond the lead's two-run budget. No model change or re-recording of
+HPCG predictions was made; the full regression is still reported as failed.
+
+Schema metadata passed Draft 7 checking. Offline instance validation now passes
+for all three staged native inputs and all eight recorded scenario inputs:
+the lead-approved removal of `$id` from the in-memory schema fixes local reference
+resolution. The schema and its `$id` on disk are unchanged. Log:
+`.work/_state/logs/S14_13_schema_without_id-20261116-015011.log`.
 
 | Evidence | Status and unresolved comparison |
 |---|---|

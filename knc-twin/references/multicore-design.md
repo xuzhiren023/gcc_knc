@@ -60,9 +60,13 @@ ring-distance input/output directory was removed. Remote-write and ring-mixed
 also remain `needs-driver`; no handoff framework was added.
 
 The kernel schema and input-format reference describe core/context identity,
-placement, background, maps and budgets. The finite cold-read recorder `scripts/record_multicore.py` is implemented but
-not yet run. Its planned output under `tests/heldout_native/multicore-scenarios/`
-is not a compiled native validation case. `validation.md` lists the pending low-core
+placement, background, maps and budgets. The finite cold-read recorder
+`scripts/record_multicore.py` has recorded all eight unit/ring scenarios (1/2/4/8
+detailed cores), each with status `ok`, under
+`tests/heldout_native/multicore-scenarios/prediction.json`. These are not compiled
+native validation cases. Full results are under `.work/_shared/S14-13/predictions/`;
+log `.work/_state/logs/S14_13_record_multicore-20261116-014756.log`.
+`validation.md` lists their completion cycles and the pending low-core
 rows, full-card read/triad/GEMV comparisons, retrospective sweep shape checks,
 remote latency, synchronization and background sensitivity. All multicore
 results remain unvalidated; no 10% band or held-out parameter was changed.
@@ -75,19 +79,38 @@ parameters.md remains current. No GCC build or card job was started. Host checks
   its actual rows, so runtime budget exhaustion is only a hypothesis. Other
   existing held-out cases matched. Log
   `.work/_state/logs/S14_13_regress_selftest-20261116-005843.log` (36.9 minutes).
-- Draft 7 schema metadata check passed. Two instance-validation attempts failed
-  in the installed jsonschema resolver: relative ID resolves to
-  `knc-twin.kernel/knc-twin.kernel/1`; substituting an absolute URN in memory
-  still fails with unknown URL type. No validation rules were removed or schema
-  ID changed on disk. Logs `S14_13_schema-20261116-013622.log` and
-  `S14_13_schema_local_refs-20261116-013703.log` under `.work/_state/logs/`.
-- Multicore prediction recording, a diagnostic for the HPCG mismatch, schema
-  instance validation, and rebase on `knc` remain pending. The read-only
-  `git merge-base --is-ancestor knc HEAD` query was blocked by the hook's merge
-  prohibition; it was not retried. No rebase has been attempted.
+- Draft 7 schema metadata and instance checks passed. The lead's 01:43 answer
+  resolved the previous local-reference failures by dropping `$id` in memory
+  only. All three native request inputs and eight prediction inputs validated;
+  no schema rules or on-disk ID changed. Log
+  `.work/_state/logs/S14_13_schema_without_id-20261116-015011.log`.
+- The lead explicitly waived rebase in the 01:43 answer: this is a `gcc: no`
+  roadmap branch on main, and the lead merges the roadmap branches. No rebase
+  was attempted. The hook refused a detached main worktree for the HPCG
+  comparison; the explicitly approved fallback exported only main's `knc-twin/`
+  under `.work/_state/S14-13-main/`, at main commit `868b1eac`.
 
-The second schema failure requires a ticket question under AGENTS.md. This is
-an honest continuation checkpoint, not acceptance.
+### HPCG diagnostic continuation
+
+The branch-only diagnostic completed with the approved 900-second budget and
+all eight HPCG variants returned `ok`. Its entire prediction object equals the
+existing `s12-31-hpcg-104/prediction.json`, including completion cycles, functional
+results and counters. Actual and recorded rows are printed side by side in
+`.work/_state/logs/S14_13_hpcg_branch-20261116-015114.log`; the final equality is
+`True`. Full diagnostic output is under `.work/_shared/S14-13/hpcg-branch/`.
+No recorded HPCG prediction or model code was changed.
+
+The main-code comparison did not finish: its log ends after six variant timing
+messages, without actual rows, equality verdict or a final report. The main
+output directory is empty and no Cygwin Python process remains. Log:
+`.work/_state/logs/S14_13_hpcg_main-20261116-024600.log`. The interruption's cause
+is unknown; this is not a model failure or a passing main comparison. Both
+authorized diagnostic runs have been started. Repeating main needs the lead's
+approval under the explicit two-run limit (the extra run allowed after a code
+fix does not apply). The original regression failure's cause therefore remains
+unconfirmed, although the completed branch diagnostic rules out a changed
+prediction on that run. Recorder/schema work is complete; the main comparison
+is the remaining host-validation blocker.
 
 ## Evidence and geometry
 
