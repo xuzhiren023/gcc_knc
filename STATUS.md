@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-16 02:05.
+Updated automatically at every ticket change. Last update: 2026-11-16 02:07.
 
 **Waiting for you:** S14-15. Run `python tools/pm.py inbox`.
 
@@ -142,7 +142,7 @@ Current tickets: `[#################---]` 244 of 279
 | S14-11 | knc-twin: close PhiWeather WRF coverage gaps (jump tables, vcvtps2pd ymm, loop-region and complete-listing modes, scatter and rcp-table import) | In progress | Lead merged main into s14/S14-11 (a merge, not a rebase: the worktree cannot create rebase state, and a mer... |
 | S14-12 | knc-twin: iteration and phase sampling for loop and whole-program wall-time estimates (roadmap item 2) | In progress | sessions 6 -> 9 under the owner's standing auto-extend rule: implementation committed, the hpcg-104 questio... |
 | S14-13 | knc-twin: 8-tile multi-core unit on the full ring with all memory controllers (roadmap item 3) | In progress | (1) Schema: offline, in memory only: s = json.load(kernel.schema.json); s.pop('$id'); jsonschema.Draft7Vali... |
-| S14-14 | knc-twin: scheduling explorer for modulo scheduling and reordering, evaluating S14-02/S14-03 (roadmap item 4) | In progress | Merged main into s14/S14-14 (9b699730, no conflicts), so the submit check passes. The 120 s budget_exhauste... |
+| S14-14 | knc-twin: scheduling explorer for modulo scheduling and reordering, evaluating S14-02/S14-03 (roadmap item 4) | Waiting for review | Green 2e975d5b; main merged at 9b699730. Prior checks: 7 acceptance tests, selftest and trial checks passed... |
 | S14-15 | knc-twin prepare-native: absolute memory operands come out as `N()` in kernel.S (k1om as 2.22 rejects them); emit them relocated into the image | **Waiting for you** | budget: 10651104 input tokens used; the budget is 10000000 |
 | S14-16 | bzip2 slower than GCC 5.1.1: mask-to-GPR move cost below a GPR move makes RA park integers in k registers (M4 known limit, must-fix) | draft |  |
 | S14-17 | Compare not folded with its load in merged return blocks (GCC 16 middle end, about half the remaining bzip2 mainGtU gap) | draft |  |
@@ -304,6 +304,7 @@ Current tickets: `[#################---]` 244 of 279
 
 ## Recent activity
 
+- 2026-11-16 02:07 **S14-14** engineer submit: Green 2e975d5b; main merged at 9b699730. Prior checks: 7 acceptance tests, selftest and trial checks passed. Held-out check passed: Windows Python ...
 - 2026-11-16 02:05 **S14-15** lead escalate: budget: 10651104 input tokens used; the budget is 10000000
 - 2026-11-16 02:00 **S14-15** lead answer: Do both on the branch, no review rerun: (1) Merge-main: git merge main into s14/S14-15 (a merge commit, not a rebase of main); resolve any conflict...
 - 2026-11-16 01:57 **S14-15** engineer ask: Submit refused: branch lacks changes from main and no [red] test commit. Lead review required five edits; completed them and committed d450ff6e (se...
@@ -311,13 +312,12 @@ Current tickets: `[#################---]` 244 of 279
 - 2026-11-16 01:51 **S14-12** engineer escalate: budget: 6 engineer sessions used; the budget is 6
 - 2026-11-16 01:50 **S14-12** lead answer: Reproduced on main at 890ac9b4 by the lead: under Cygwin Python 3.12 all eight s12-31-hpcg-104 variants come back budget_exhausted at predict_case'...
 - 2026-11-16 01:49 **S14-15** owner decide: sessions 6 -> 8 (final extension): the lead review above lists five concrete changes; two sessions are enough for them and the submit. If not submi...
-- 2026-11-16 01:47 **S14-12** engineer ask: 83c60176 restores tight run() with shared setup and removes stray outputs; clean. predict_case(s12-31-hpcg-104), unchanged 120s deadline: all 8 var...
 
 ## Cost
 
 - From the script, engineer: 743 sessions, 1604.4M input tokens
 - From the script, lead: 503 sessions, 142.7M input tokens
-- Started by hand, Claude: 14 sessions, 4122.8M input tokens
+- Started by hand, Claude: 14 sessions, 4126.8M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
