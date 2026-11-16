@@ -1,10 +1,10 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-15 23:24.
+Updated automatically at every ticket change. Last update: 2026-11-16 02:08.
 
-**Next: GPT-6.1, on S14-10 (knc-twin: --jobs N for independent simulations and PyPy support (roadmap item 1)).** Run `python tools/dispatch.py`, or ask the tech lead to.
+**Waiting for you:** S14-15. Run `python tools/pm.py inbox`.
 
-Current tickets: `[#################---]` 244 of 273
+Current tickets: `[#################---]` 244 of 279
 
 ## Milestones
 
@@ -14,8 +14,8 @@ Current tickets: `[#################---]` 244 of 273
 | M1 | Mixed native code | Done | 43 of 43 tickets |
 | M2 | Useful vector target | Done | 51 of 51 tickets |
 | M3 | Runtimes | Done | 48 of 48 tickets |
-| M4 | Broad optimization | In progress | 62 of 65 tickets |
-| M5 | Program corpus | In progress | 0 of 26 tickets |
+| M4 | Broad optimization | Done | 62 of 65 tickets |
+| M5 | Program corpus | In progress | 0 of 32 tickets |
 | M6 | Release | Not started | Not planned in detail yet |
 
 ## Tickets
@@ -123,7 +123,7 @@ Current tickets: `[#################---]` 244 of 273
 | S12-40 | Indirect prefetch recognizes Fortran sparse loops (array descriptors, ARRAY_REF offsets, nonzero and OpenMP-outlined starts) so NPB-CG benefits | draft | Deferred to M5 (sprint s14) by the owner's 2026-11-15 scope cut ("we are scope creeping the entire Sprint 1... |
 | S12-41 | Early donor check - corpus.py stages and runs only the development programs (no held-out build or run), smallest margins first, so the lead can measure every development program against GCC 5.1.1 now | draft | Deferred to M5 (sprint s14) by the owner's 2026-11-15 scope cut ("we are scope creeping the entire Sprint 1... |
 | S12-42 | Small sparse row loops are 1.5-3% slower than GCC 5.1.1, worse when two loop nests share one function (found by S12-30's window 8 gate) | draft | Owner 2026-11-15 ("I have reset Fable, so subagent back to codex with default selection rule"): Fable overr... |
-| S13-01 | M4 final gate - stage the ADR-0015 gate run at the final head (17 programs, held-out unsealed, six pairs, three profiles) | lead | Primary gate staged at a74a0c2e; spot-check OK (frozen 1e-8+1e-6/r/ bound, full STREAM element check, AB/BA... |
+| S13-01 | M4 final gate - stage the ADR-0015 gate run at the final head (17 programs, held-out unsealed, six pairs, three profiles) | Waiting for review | Submitted by the lead after M4 acceptance: gate tools (m4_gate.py, m4_score.py, corpus.py changes), host te... |
 | S13-02 | Libgomp per-region thread density - choose 1-4 workers per core per parallel region instead of once per program | draft | Owner 2026-11-15 ("yes delay to M5"): deferred to M5 (sprint s14). The M4 primary score is serial -O2, so t... |
 | S13-03 | M4 retrospective - what we did wrong, what worked, and the practice changes carried into the next milestone and the agent-team skill | draft |  |
 | S13-04 | Clean source repositories for a fresh build - GCC-KNC fork and project code without build artifacts, plus a Linux-host build recipe the owner runs on the new workstation | draft |  |
@@ -138,11 +138,17 @@ Current tickets: `[#################---]` 244 of 273
 | S14-07 | C++ abstraction removal on KNC - does LTO work for k1om, and do devirtualization and indirect-call promotion fire at -O2 -march=knc | draft |  |
 | S14-08 | Quantized GEMV kernels on KNC - multi-row activation reuse, FP vs int32 VPMADD231D vs VPERMD lookup table, bandwidth-normalized | draft |  |
 | S14-09 | KNC vs the Z840 host (dual E5-2690 v3) on the same algorithms and numerical contract - where running on the card actually pays | draft |  |
-| S14-10 | knc-twin: --jobs N for independent simulations and PyPy support (roadmap item 1) | In progress | Yes, go ahead. One single-threaded process at a time is always allowed, so you can run the single-case HPCG... |
-| S14-11 | knc-twin: close PhiWeather WRF coverage gaps (jump tables, vcvtps2pd ymm, loop-region and complete-listing modes, scatter and rcp-table import) | In progress | S14-11 red accepted: failing tests now pin knc-twin's WRF switch jump-table resolution (entry order, out-of... |
-| S14-12 | knc-twin: iteration and phase sampling for loop and whole-program wall-time estimates (roadmap item 2) | In progress | Yes, run the full knc-twin selftest and tests/regress/test_knc_twin.py now, one at a time, single-threaded ... |
-| S14-13 | knc-twin: 8-tile multi-core unit on the full ring with all memory controllers (roadmap item 3) | In progress | S14-13 red tests approved: they now require the shared 8-tile multicore model (channel contention across 1-... |
-| S14-14 | knc-twin: scheduling explorer for modulo scheduling and reordering, evaluating S14-02/S14-03 (roadmap item 4) | In progress | M4 is not finished (62 of 65) and the card may be in a timed block, but you do not need idle clearance for ... |
+| S14-10 | knc-twin: --jobs N for independent simulations and PyPy support (roadmap item 1) | In progress | No worktree needed. Export main's knc-twin into your shared dir: git -c safe.directory='*' archive main knc... |
+| S14-11 | knc-twin: close PhiWeather WRF coverage gaps (jump tables, vcvtps2pd ymm, loop-region and complete-listing modes, scatter and rcp-table import) | In progress | Lead merged main into s14/S14-11 (a merge, not a rebase: the worktree cannot create rebase state, and a mer... |
+| S14-12 | knc-twin: iteration and phase sampling for loop and whole-program wall-time estimates (roadmap item 2) | In progress | sessions 6 -> 9 under the owner's standing auto-extend rule: implementation committed, the hpcg-104 questio... |
+| S14-13 | knc-twin: 8-tile multi-core unit on the full ring with all memory controllers (roadmap item 3) | In progress | (1) Schema: offline, in memory only: s = json.load(kernel.schema.json); s.pop('$id'); jsonschema.Draft7Vali... |
+| S14-14 | knc-twin: scheduling explorer for modulo scheduling and reordering, evaluating S14-02/S14-03 (roadmap item 4) | Waiting for review | Green 2e975d5b; main merged at 9b699730. Prior checks: 7 acceptance tests, selftest and trial checks passed... |
+| S14-15 | knc-twin prepare-native: absolute memory operands come out as `N()` in kernel.S (k1om as 2.22 rejects them); emit them relocated into the image | **Waiting for you** | budget: 10651104 input tokens used; the budget is 10000000 |
+| S14-16 | bzip2 slower than GCC 5.1.1: mask-to-GPR move cost below a GPR move makes RA park integers in k registers (M4 known limit, must-fix) | draft |  |
+| S14-17 | Compare not folded with its load in merged return blocks (GCC 16 middle end, about half the remaining bzip2 mainGtU gap) | draft |  |
+| S14-18 | knc-twin regress: held-out replay runs under a 120 s wall-clock budget, so a slow interpreter turns a prediction into a budget_exhausted stub and the test fails as a false mismatch | Not started |  |
+| S14-19 | knc-twin x87 integer-load widths - fildl reads 8 bytes (must be 4), filds reads 4 (must be 2) | Not started |  |
+| S14-20 | knc-twin: an indirect jmp/call (PLT tail call through the GOT) on a never-executed path must not refuse the whole region | Not started |  |
 | S2-01 | Design for zmm and mask registers under -march=knc | Done | The register design for KNC is settled on paper: all 32 zmm and 8 mask registers become usable under -march... |
 | S2-02 | Float and double arguments and results in zmm lane 0 | Done | Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`). |
 | S2-03 | Varargs with the donor's register save area | Done | Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`). |
@@ -298,23 +304,23 @@ Current tickets: `[#################---]` 244 of 273
 
 ## Recent activity
 
-- 2026-11-15 23:23 **S14-13** lead approve-red: S14-13 red tests approved: they now require the shared 8-tile multicore model (channel contention across 1-8 tiles, remote L2 reads through the tag...
-- 2026-11-15 23:23 **S14-12** lead answer: Yes, run the full knc-twin selftest and tests/regress/test_knc_twin.py now, one at a time, single-threaded (no -j/--jobs, no builds): that is insid...
-- 2026-11-15 23:22 **S14-10** lead answer: Yes, go ahead. One single-threaded process at a time is always allowed, so you can run the single-case HPCG-104 reproducer now, and the 900-second ...
-- 2026-11-15 23:21 **S14-12** engineer ask: Committed 479a2204: loop sampling, period-aware windows/bands, phase rollups, docs/fixture. Focused selftest: 8 passed; log ../_state/logs/S14_12_s...
-- 2026-11-15 23:20 **S14-13** engineer red: Red correction 73eee70b: remote-owner probe compares elapsed differences with hop-delay differences for distances 15/30/31 versus 1; distance 1 bou...
-- 2026-11-15 23:20 **S14-10** engineer ask: Committed 9950928b. Selftest 155 passed; syntax passed. Serial regression failed only HPCG-104 (2 tests passed, 25.2 min); cause unknown, diff trun...
-- 2026-11-15 23:16 **S14-13** lead changes: One fix in test_remote_owner_read_uses_td_and_shortest_route before green; everything else stands (contention, conservation, ring-vs-unit and the s...
-- 2026-11-15 23:14 **S14-13** engineer red: Red extension f9c3c319 adds second test file: shared-channel 1/2/4/8-tile contention; TD remote-owner latency from residual/route parameters and sh...
+- 2026-11-16 02:07 **S14-14** engineer submit: Green 2e975d5b; main merged at 9b699730. Prior checks: 7 acceptance tests, selftest and trial checks passed. Held-out check passed: Windows Python ...
+- 2026-11-16 02:05 **S14-15** lead escalate: budget: 10651104 input tokens used; the budget is 10000000
+- 2026-11-16 02:00 **S14-15** lead answer: Do both on the branch, no review rerun: (1) Merge-main: git merge main into s14/S14-15 (a merge commit, not a rebase of main); resolve any conflict...
+- 2026-11-16 01:57 **S14-15** engineer ask: Submit refused: branch lacks changes from main and no [red] test commit. Lead review required five edits; completed them and committed d450ff6e (se...
+- 2026-11-16 01:52 **S14-12** owner decide: sessions 6 -> 9 under the owner's standing auto-extend rule: implementation committed, the hpcg-104 question is answered (S14-18), held-out check a...
+- 2026-11-16 01:51 **S14-12** engineer escalate: budget: 6 engineer sessions used; the budget is 6
+- 2026-11-16 01:50 **S14-12** lead answer: Reproduced on main at 890ac9b4 by the lead: under Cygwin Python 3.12 all eight s12-31-hpcg-104 variants come back budget_exhausted at predict_case'...
+- 2026-11-16 01:49 **S14-15** owner decide: sessions 6 -> 8 (final extension): the lead review above lists five concrete changes; two sessions are enough for them and the submit. If not submi...
 
 ## Cost
 
-- From the script, engineer: 724 sessions, 1519.3M input tokens
-- From the script, lead: 491 sessions, 140.0M input tokens
-- Started by hand, Claude: 14 sessions, 4020.0M input tokens
+- From the script, engineer: 744 sessions, 1609.4M input tokens
+- From the script, lead: 503 sessions, 142.7M input tokens
+- Started by hand, Claude: 14 sessions, 4127.4M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 40.3 GiB of 100 GiB. 86 GiB free on the drive.
+The project uses 40.7 GiB of 100 GiB. 75 GiB free on the drive.
