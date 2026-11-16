@@ -1,10 +1,10 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-16 10:26.
+Updated automatically at every ticket change. Last update: 2026-11-16 10:27.
 
 **Next: GPT-6.1, on S14-10 (knc-twin: --jobs N for independent simulations and PyPy support (roadmap item 1)).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
-Current tickets: `[#################---]` 253 of 293
+Current tickets: `[#################---]` 253 of 294
 
 ## Milestones
 
@@ -15,7 +15,7 @@ Current tickets: `[#################---]` 253 of 293
 | M2 | Useful vector target | Done | 51 of 51 tickets |
 | M3 | Runtimes | Done | 48 of 48 tickets |
 | M4 | Broad optimization | Done | 63 of 65 tickets |
-| M5 | Program corpus | In progress | 8 of 46 tickets |
+| M5 | Program corpus | In progress | 8 of 47 tickets |
 | M6 | Release | Not started | Not planned in detail yet |
 
 ## Tickets
@@ -163,6 +163,7 @@ Current tickets: `[#################---]` 253 of 293
 | S14-33 | knc-twin: import the window-11 calibration rows (imci-math latency and throughput, div10, x87 fcoms, rcp23/rsqrt23 tables) and retire the assumed parameters they settle | Not started |  |
 | S14-35 | knc-twin prepare-native: the generated native program for PhiWeather's sixth_order_diffusion kernels segfaults on the card (exit 139 under claude-pin); find the cause, fix the generator, restage | In progress | Originals are in .work/_shared/calib-w10/phiweather/sixth_{1,2}ctx_l2_031/orig/: kernel.json is the kernel ... |
 | S14-37 | knc-twin x87 double rounding: _x87_binop rounds to the 64-bit significand and then to PC=53/24; real x87 rounds once (knc-boinc repro, 1 to 8 ULP errors) | Not started |  |
+| S14-38 | Card and twin dashboard - running card job, card queue and running twin work with remaining time, card temperature and utilization, host CPU, refreshed every 5 minutes | In progress |  |
 | S2-01 | Design for zmm and mask registers under -march=knc | Done | The register design for KNC is settled on paper: all 32 zmm and 8 mask registers become usable under -march... |
 | S2-02 | Float and double arguments and results in zmm lane 0 | Done | Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`). |
 | S2-03 | Varargs with the donor's register save area | Done | Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`). |
@@ -331,7 +332,7 @@ Current tickets: `[#################---]` 253 of 293
 
 - From the script, engineer: 780 sessions, 1659.1M input tokens
 - From the script, lead: 529 sessions, 149.2M input tokens
-- Started by hand, Claude: 15 sessions, 4289.8M input tokens
+- Started by hand, Claude: 15 sessions, 4291.2M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
