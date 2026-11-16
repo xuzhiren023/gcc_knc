@@ -1,10 +1,10 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-16 05:59.
+Updated automatically at every ticket change. Last update: 2026-11-16 06:13.
 
 **Waiting for you:** S14-15. Run `python tools/pm.py inbox`.
 
-Current tickets: `[#################---]` 248 of 280
+Current tickets: `[#################---]` 249 of 280
 
 ## Milestones
 
@@ -15,7 +15,7 @@ Current tickets: `[#################---]` 248 of 280
 | M2 | Useful vector target | Done | 51 of 51 tickets |
 | M3 | Runtimes | Done | 48 of 48 tickets |
 | M4 | Broad optimization | Done | 62 of 65 tickets |
-| M5 | Program corpus | In progress | 4 of 33 tickets |
+| M5 | Program corpus | In progress | 5 of 33 tickets |
 | M6 | Release | Not started | Not planned in detail yet |
 
 ## Tickets
@@ -141,7 +141,7 @@ Current tickets: `[#################---]` 248 of 280
 | S14-10 | knc-twin: --jobs N for independent simulations and PyPy support (roadmap item 1) | In progress | No worktree needed. Export main's knc-twin into your shared dir: git -c safe.directory='*' archive main knc... |
 | S14-11 | knc-twin: close PhiWeather WRF coverage gaps (jump tables, vcvtps2pd ymm, loop-region and complete-listing modes, scatter and rcp-table import) | Done | knc-twin handles WRF jump tables, vcvtps2pd ymm, loop-region and complete-listing modes, scatter and rcp23 ... |
 | S14-12 | knc-twin: iteration and phase sampling for loop and whole-program wall-time estimates (roadmap item 2) | Done | knc-twin gains sample-loop (iteration sampling with a stated spread, stopping only once the input's period ... |
-| S14-13 | knc-twin: 8-tile multi-core unit on the full ring with all memory controllers (roadmap item 3) | Waiting for review | main merged into the branch by the lead with four conflicts resolved (timing.py step/run, cli.py parser, SK... |
+| S14-13 | knc-twin: 8-tile multi-core unit on the full ring with all memory controllers (roadmap item 3) | Done | knc-twin simulates 1-8 detailed cores on the full 61-stop ring with all memory controllers and directory sl... |
 | S14-14 | knc-twin: scheduling explorer for modulo scheduling and reordering, evaluating S14-02/S14-03 (roadmap item 4) | Done | knc-twin gains a schedule command: beam search up to 60 instructions, list ordering, modulo II, GAS export ... |
 | S14-15 | knc-twin prepare-native: absolute memory operands come out as `N()` in kernel.S (k1om as 2.22 rejects them); emit them relocated into the image | **Waiting for you** | budget: 10651104 input tokens used; the budget is 10000000 |
 | S14-16 | bzip2 slower than GCC 5.1.1: mask-to-GPR move cost below a GPR move makes RA park integers in k registers (M4 known limit, must-fix) | draft |  |
@@ -305,6 +305,7 @@ Current tickets: `[#################---]` 248 of 280
 
 ## Recent activity
 
+- 2026-11-16 06:13 **S14-13** lead approve: knc-twin simulates 1-8 detailed cores on the full 61-stop ring with all memory controllers and directory slices (simulate --scale unit|ring); every...
 - 2026-11-16 05:59 **S14-13** lead resume: main merged into the branch by the lead with four conflicts resolved (timing.py step/run, cli.py parser, SKILL.md, README); 107 twin tests pass on ...
 - 2026-11-16 05:54 **S14-11** lead approve: knc-twin handles WRF jump tables, vcvtps2pd ymm, loop-region and complete-listing modes, scatter and rcp23 imports, and heap calls through a bump-a...
 - 2026-11-16 05:43 **S14-11** lead resume: S14-18, S14-14 and S14-12 merged; main merged into the branch by the lead (8c0a2a97, cli.py conflict resolved); approving
@@ -312,13 +313,12 @@ Current tickets: `[#################---]` 248 of 280
 - 2026-11-16 05:15 **S14-12** lead resume: S14-18 and S14-14 merged; approving
 - 2026-11-16 05:14 **S14-14** lead approve: knc-twin gains a schedule command: beam search up to 60 instructions, list ordering, modulo II, GAS export and frozen-profile batch ranking; on the...
 - 2026-11-16 05:03 **S14-14** lead resume: S14-18 merged; approving
-- 2026-11-16 05:02 **S14-18** lead approve: The knc-twin held-out replay no longer runs in t0 (KNC_TWIN_HELDOUT=1 or validate_heldout.py --max-seconds 0 runs it with no deadline), a timed-out...
 
 ## Cost
 
 - From the script, engineer: 766 sessions, 1626.4M input tokens
 - From the script, lead: 518 sessions, 147.4M input tokens
-- Started by hand, Claude: 14 sessions, 4175.5M input tokens
+- Started by hand, Claude: 14 sessions, 4177.4M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
