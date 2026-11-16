@@ -1,10 +1,10 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-16 08:28.
+Updated automatically at every ticket change. Last update: 2026-11-16 08:30.
 
-**Next: GPT-6.1, on S14-10 (knc-twin: --jobs N for independent simulations and PyPy support (roadmap item 1)).** Run `python tools/dispatch.py`, or ask the tech lead to.
+**Next: the tech lead, on S14-20.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
-Current tickets: `[#################---]` 252 of 288
+Current tickets: `[#################---]` 252 of 289
 
 ## Milestones
 
@@ -15,7 +15,7 @@ Current tickets: `[#################---]` 252 of 288
 | M2 | Useful vector target | Done | 51 of 51 tickets |
 | M3 | Runtimes | Done | 48 of 48 tickets |
 | M4 | Broad optimization | Done | 63 of 65 tickets |
-| M5 | Program corpus | In progress | 7 of 41 tickets |
+| M5 | Program corpus | In progress | 7 of 42 tickets |
 | M6 | Release | Not started | Not planned in detail yet |
 
 ## Tickets
@@ -148,7 +148,7 @@ Current tickets: `[#################---]` 252 of 288
 | S14-17 | Compare not folded with its load in merged return blocks (GCC 16 middle end, about half the remaining bzip2 mainGtU gap) | draft |  |
 | S14-18 | knc-twin regress: held-out replay runs under a 120 s wall-clock budget, so a slow interpreter turns a prediction into a budget_exhausted stub and the test fails as a false mismatch | Done | The knc-twin held-out replay no longer runs in t0 (KNC_TWIN_HELDOUT=1 or validate_heldout.py --max-seconds ... |
 | S14-19 | knc-twin x87 integer-load widths - fildl reads 8 bytes (must be 4), filds reads 4 (must be 2) | Done | The knc-twin now reads and writes x87 integer memory at the right widths (filds/fists 2 bytes, fildl/fistl ... |
-| S14-20 | knc-twin: an indirect jmp/call (PLT tail call through the GOT) on a never-executed path must not refuse the whole region | In progress | sessions 2 -> 4: your worktree could not write its git index (S14-24); the lead committed your change as [r... |
+| S14-20 | knc-twin: an indirect jmp/call (PLT tail call through the GOT) on a never-executed path must not refuse the whole region | Waiting for review | a region containing an indirect jmp or call that never executes now runs; an executed one fails with the in... |
 | S14-21 | knc-twin multi-core: held-out validation of the 8-tile ring model against the measured GEMV, triad and core-scaling rows | Not started |  |
 | S14-22 | card_run turn row: refreshing an open turn row must keep its place in the queue | draft |  |
 | S14-23 | knc-twin: import the window-10 scatter rows (2 threads) and settle occupancy.scatter_cycles_per_line | Not started |  |
@@ -158,6 +158,7 @@ Current tickets: `[#################---]` 252 of 288
 | S14-27 | knc-twin bounds: the dependency critical path charges cold lines their full miss latency, so the "lower bound" can exceed the simulation | Not started |  |
 | S14-28 | knc-twin ranking of the four quantized GEMV kernel forms on one KNC core (phase 0 of S14-08) | Not started |  |
 | S14-29 | knc-twin: schedule --block ADDR..ADDR for a straight-line block inside a function, and batch must not write a native request per candidate by default | Not started |  |
+| S14-31 | knc-twin multi-core usability: compare across scales, stubs and repeated calls at unit/ring scale, multi-context sampling, separated ring/memory stall shares | Not started |  |
 | S2-01 | Design for zmm and mask registers under -march=knc | Done | The register design for KNC is settled on paper: all 32 zmm and 8 mask registers become usable under -march... |
 | S2-02 | Float and double arguments and results in zmm lane 0 | Done | Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`). |
 | S2-03 | Varargs with the donor's register save area | Done | Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`). |
@@ -313,6 +314,7 @@ Current tickets: `[#################---]` 252 of 288
 
 ## Recent activity
 
+- 2026-11-16 08:29 **S14-20** engineer submit: a region containing an indirect jmp or call that never executes now runs; an executed one fails with the instruction and address
 - 2026-11-16 08:28 **S14-20** owner decide: sessions 2 -> 4: your worktree could not write its git index (S14-24); the lead committed your change as [red] tests then the fix, red verified aga...
 - 2026-11-16 08:27 **S14-20** engineer escalate: budget: 2 engineer sessions used; the budget is 2
 - 2026-11-16 08:26 **S14-15** lead approve: prepare-native emits absolute operands relocated into the memory image (knc_twin_mem+off(%rip)) instead of the invalid N(), and rollup labels a rol...
@@ -320,13 +322,12 @@ Current tickets: `[#################---]` 252 of 288
 - 2026-11-16 07:41 **S13-01** lead approve: The M4 gate runner (SSH-only transfers, launch retry, adopt, full-profile scoring) and its card_run fixes are on main; M4 passed at a 2.16x lower b...
 - 2026-11-16 07:26 **S14-15** owner decide: Owner 2026-11-16: the lead records the red evidence as an empty [red] commit and submits and merges this ticket itself (engineer budget spent)
 - 2026-11-16 07:25 **S14-19** lead approve: The knc-twin now reads and writes x87 integer memory at the right widths (filds/fists 2 bytes, fildl/fistl 4, fildq 8), so crlibm log(1.0) and simi...
-- 2026-11-16 06:58 **S14-19** engineer submit: x87 integer loads and stores use the right widths (filds/fists 2 bytes, fildl/fistl 4, fildq 8) and 16-bit integer arithmetic forms exist; engine 0...
 
 ## Cost
 
-- From the script, engineer: 772 sessions, 1635.7M input tokens
+- From the script, engineer: 773 sessions, 1635.8M input tokens
 - From the script, lead: 522 sessions, 148.0M input tokens
-- Started by hand, Claude: 14 sessions, 4236.7M input tokens
+- Started by hand, Claude: 14 sessions, 4237.8M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
