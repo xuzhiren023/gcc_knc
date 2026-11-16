@@ -7,14 +7,17 @@ engineer sees readiness/pass/fail only. Optional panels are separate work.
 import argparse
 from collections import Counter
 from dataclasses import asdict
+from datetime import datetime, timezone
 import json
 import math
 import os
 from pathlib import Path, PureWindowsPath
+import re
 import shutil
 import subprocess
 import sys
 import tarfile
+import time
 from types import SimpleNamespace
 
 import corpus as c
@@ -24,6 +27,18 @@ PREFIX_REVISION = 'b2ce6a9eebf'
 DISCLOSURE = ('Serial -O2 GCC-KNC versus GCC 5.1.1, with the SQLite donor assembly exception. '
               '3100/5100 model cores and memory on a 7120, not clock or per-core bandwidth.')
 CONTROLS = ('PB-gemm', 'STREAM', 'NPB-CG', 'HPCG', 'zlib', 'SQLite')
+# Transport-failure resume (ADR-0015 protocol note): a launch that observed no
+# workload result is attempted again, at most this many attempts in all.
+TRANSPORT_ATTEMPTS = 5
+PROBE_TIMEOUT = 300
+PAUSED_EXIT, LATCH_EXIT = 3, 4
+DMA_LATCH = 'DMA cleanup unresolved'
+_sleep = time.sleep  # tests replace the backoff wait
+
+
+def backoff_seconds(retry):
+    """Wait before re-attempt number `retry` (1-based): 30 s doubling, capped at 10 min."""
+    return min(30 * 2 ** (retry - 1), 600)
 
 
 def schedule(profile, extension=False):
@@ -164,7 +179,9 @@ def run_job(stage, job, build, builds, folder, number, timeout):
     transport = {}
     rc = c.card_call(stage, files, program + ('-control' if job.get('control') else ''),
                      'serial', out, err, job['profile'], timeout, record=transport)
-    return derive_row(job, build, out, err, rc, transport)
+    row = derive_row(job, build, out, err, rc, transport)
+    row['card_run_exit'] = rc
+    return row
 
 
 def derive_row(job, build, out, err, rc, transport):
@@ -180,6 +197,154 @@ def derive_row(job, build, out, err, rc, transport):
             or transport.get('timingValid') is False):
         row.update(check='fail', cause='transport, exclusivity or resource validity failure')
     return row
+
+
+def transport_failure(stdout, transport):
+    """The card_run class when a launch has no workload result because the
+    transport failed before the program started; None when the launch is final.
+
+    Qualifies only: class refused or infrastructure (no receipt at all counts as
+    infrastructure), no program exit status, no card execution time and no
+    CORPUS_ line in stdout, so no CORPUS_TIME. Pass, fail, timeout, resource and
+    any launch whose program reported start are final.
+    """
+    kind = transport.get('result_class') or 'infrastructure'
+    if kind not in ('refused', 'infrastructure'):
+        return None
+    if re.search(r'^CORPUS_', stdout, re.M) or 'CORPUS_TIME' in stdout:
+        return None
+    if transport.get('program_exit_code') is not None or transport.get('card_minutes'):
+        return None
+    return kind
+
+
+def dma_latch(transport):
+    return transport.get('result_class') == 'refused' and DMA_LATCH in str(transport.get('detail', ''))
+
+
+def stdout_receipt(stdout):
+    """card_run prints its result record as the last JSON line of stdout."""
+    for line in reversed(stdout.splitlines()):
+        if line.startswith('{') and '"result_class"' in line:
+            try:
+                return json.loads(line)
+            except ValueError:
+                return {}
+    return {}
+
+
+class RetryLog:
+    """Per-block transport-retry log; held-out launches go to the sealed copy."""
+
+    def __init__(self, stage, tag):
+        self.stage, self.name = stage, tag + '-transport-retries.json'
+        self.entries = c.read_partition(stage, self.name)
+        c.write_partition(stage, self.name, self.entries)  # an empty log records zero retries
+
+    def add(self, job, number, **fields):
+        entry = dict(launch='%03d' % number, program=job['program'], compiler=job['compiler'],
+                     run=job['run'], profile=job['profile'], block=job['block'],
+                     control=bool(job.get('control')), utc=datetime.now(timezone.utc).isoformat(), **fields)
+        self.entries.append(entry)
+        c.write_partition(self.stage, self.name, self.entries)
+
+    def failed_launches(self):
+        return sum(e['event'] == 'launch' for e in self.entries)
+
+
+def keep_attempt(folder, number, kind):
+    """Move the canonical NNN captures aside as the next numbered attempt."""
+    index = 1 + len(list(folder.glob('%03d.%s-*.stdout' % (number, kind))))
+    kept = []
+    for stream in ('stdout', 'stderr'):
+        source = folder / ('%03d.%s' % (number, stream))
+        target = folder / ('%03d.%s-%d.%s' % (number, kind, index, stream))
+        if source.exists():
+            source.replace(target)
+        kept.append(str(target))
+    return kept
+
+
+def launch_until_result(stage, job, build, builds, folder, number, timeout, log):
+    """Run one launch until its workload produces a result, pass or fail.
+
+    Returns (row, None), or (None, 'dma-latch' | 'unreachable') when the block
+    must pause. A failed transport attempt keeps its captures as
+    NNN.transport-K.* plus a retry-log entry and writes no row; only the
+    attempt with a workload result is final, under the canonical NNN names.
+    """
+    out = folder / ('%03d.stdout' % number)
+    failures = 0
+    for attempt in range(1, TRANSPORT_ATTEMPTS + 1):
+        if attempt > 1:
+            wait = backoff_seconds(attempt - 1)
+            _sleep(wait)
+            index = 1 + len(list(folder.glob('%03d.probe-*.stdout' % number)))
+            probe_out, probe_err = (folder / ('%03d.probe-%d.%s' % (number, index, s)) for s in ('stdout', 'stderr'))
+            probe = {}
+            rc = c.card_call(stage, [], 'probe', 'probe', probe_out, probe_err, job['profile'],
+                             PROBE_TIMEOUT, record=probe)
+            reachable = rc == 0 and probe.get('result_class') == 'program'
+            log.add(job, number, event='probe', attempt=attempt, waited_seconds=wait, reachable=reachable,
+                    result_class=probe.get('result_class'), exit_code=rc,
+                    detail=str(probe.get('detail', ''))[:300], stdout=str(probe_out), stderr=str(probe_err))
+            if dma_latch(probe):
+                return None, 'dma-latch'
+            if not reachable:
+                continue
+        row = run_job(stage, job, build, builds, folder, number, timeout)
+        transport = row['transport']
+        kind = transport_failure(out.read_text(errors='replace'), transport)
+        if kind is None:
+            row['transport_retries'] = failures
+            return row, None
+        failures += 1
+        stdout, stderr = keep_attempt(folder, number, 'transport')
+        log.add(job, number, event='launch', attempt=attempt, result_class=kind,
+                exit_code=row['card_run_exit'], detail=str(transport.get('detail', ''))[:300],
+                stdout=stdout, stderr=stderr)
+        if dma_latch(transport):
+            return None, 'dma-latch'
+    return None, 'unreachable'
+
+
+def finished_launches(stage, tag, jobs):
+    """Launches with a final row; they must be exactly the first ones in schedule order."""
+    rows = c.read_partition(stage, tag + '-raw.jsonl')
+    numbers = sorted(int(PureWindowsPath(r['stdout']).name.split('.')[0]) for r in rows)
+    if numbers != list(range(len(rows))):
+        raise ValueError('stored launch records are not a prefix of the frozen schedule')
+    for row in rows:
+        job = jobs[int(PureWindowsPath(row['stdout']).name.split('.')[0])]
+        if any(row.get(k) != job.get(k) for k in ('program','compiler','run','profile','block','control')):
+            raise ValueError('stored launch record does not match the frozen schedule')
+    return len(rows)
+
+
+def resume_command(args):
+    entry = Path(sys.argv[0]).resolve() if sys.argv and sys.argv[0] else Path(__file__).resolve()
+    command = 'python.exe "%s" run --stage "%s" --profile %s --block %s --acl-verified --resume' % (
+        c.windows_path(entry), c.windows_path(args.stage), args.profile, args.block)
+    if getattr(args, 'timeout', 3600) != 3600:
+        command += ' --timeout %d' % args.timeout
+    return command
+
+
+def pause_block(args, tag, job, number, reason, log):
+    """Stop the block without a row for this launch; --resume continues here."""
+    log.add(job, number, event='pause', reason=reason)
+    c.write_json(args.stage / (tag + '-paused.json'), dict(
+        paused=True, launch='%03d' % number, reason=reason, utc=datetime.now(timezone.utc).isoformat()))
+    if reason == 'dma-latch':
+        print('card_run refused: DMA cleanup latch present (.work/_state/card-dma-active.lock). '
+              'Not deleted: latch recovery is a lead decision. Block %s paused at launch %03d; '
+              'finished launches are kept. After recovery, resume with: %s'
+              % (tag, number, resume_command(args)), file=sys.stderr)
+        return LATCH_EXIT
+    print('Card unreachable: launch %03d of block %s had %d transport attempts (launch or probe) and no '
+          'workload result; nothing recorded for it. Block paused; finished launches are kept. Resume with: %s'
+          % (number, tag, TRANSPORT_ATTEMPTS, resume_command(args)), file=sys.stderr)
+    return PAUSED_EXIT
 
 
 def launches(profile, block, builds, spec):
@@ -217,6 +382,7 @@ def rederive_block(stage, profile, block):
         row = derive_row(job, build, folder / name, folder / ('%03d.stderr' % number),
                          transport.get('exit_code', 255), transport)
         row['lead_environment_policy'] = raw.get('lead_environment_policy')
+        row['transport_retries'] = raw.get('transport_retries', 0)
         if raw.get('negative_control'):
             row['negative_control'] = True
         rows.append(row)
@@ -269,28 +435,61 @@ def run(args):
         for p in ('full','3100','5100'):
             if not (args.stage / ('initial-' + p + '-done.json')).exists():
                 raise ValueError('all three initial profiles must finish first')
-    if (args.stage / (tag + '-started.json')).exists():
+    resume = getattr(args, 'resume', False)
+    started = (args.stage / (tag + '-started.json')).exists()
+    if resume:
+        if not started or (args.stage / (tag + '-done.json')).exists():
+            raise ValueError('--resume continues a started, unfinished block only')
+    elif started:
         raise ValueError('block already attempted; preserve it and obtain a lead recovery decision')
     controls, plan = launches(args.profile, args.block, builds, spec)
-    c.write_json(args.stage / (tag + '-started.json'), dict(attempted=True))
-    c.write_partition(args.stage, 'plan.json', controls + plan)
+    jobs = controls + plan
+    finished = finished_launches(args.stage, tag, jobs) if resume else 0
+    if not resume:
+        c.write_json(args.stage / (tag + '-started.json'), dict(attempted=True))
+    c.write_partition(args.stage, 'plan.json', jobs)
     public_folder = args.stage / (tag + '-capture')
     private_folder = c.sealed_dir(args.stage) / (tag + '-capture')
     public_folder.mkdir(exist_ok=True); private_folder.mkdir(exist_ok=True)
-    public_rows, private_rows = [], []
-    # Streams are flushed per launch, including interrupted/invalid attempts.
-    with (args.stage / (tag + '-raw.jsonl')).open('w') as public, (c.sealed_dir(args.stage) / (tag + '-raw.jsonl')).open('w') as private:
-        for number, job in enumerate(controls + plan):
+    folder_of = lambda job: private_folder if job['program'] in c.HELD_OUT else public_folder
+    log = RetryLog(args.stage, tag)
+    if resume and finished < len(jobs):
+        job, folder = jobs[finished], folder_of(jobs[finished])
+        orphan = folder / ('%03d.stdout' % finished)
+        if orphan.exists():
+            # Captures without a row: interrupted. Retry only if no timing was observed.
+            text = orphan.read_text(errors='replace')
+            receipt = stdout_receipt(text)
+            if transport_failure(text, receipt) is None:
+                print('Launch %03d of block %s has program output but no recorded row; not repeated. '
+                      'Lead recovery decision required.' % (finished, tag), file=sys.stderr)
+                return 1
+            stdout, stderr = keep_attempt(folder, finished, 'transport')
+            log.add(job, finished, event='launch', attempt=0, result_class=transport_failure(text, receipt),
+                    exit_code=receipt.get('exit_code'), detail='interrupted before a row was recorded',
+                    stdout=stdout, stderr=stderr)
+        log.add(job, finished, event='resume')
+        (args.stage / (tag + '-paused.json')).unlink(missing_ok=True)
+    # Streams are flushed per launch; a resume appends after the finished launches.
+    mode = 'a' if resume else 'w'
+    with (args.stage / (tag + '-raw.jsonl')).open(mode) as public, (c.sealed_dir(args.stage) / (tag + '-raw.jsonl')).open(mode) as private:
+        for number, job in enumerate(jobs):
+            if number < finished:
+                continue
             build = prepare_job(job, builds, spec)
             held = job['program'] in c.HELD_OUT
-            row = run_job(args.stage, job, build, builds, private_folder if held else public_folder, number, args.timeout)
+            row, pause = launch_until_result(args.stage, job, build, builds, folder_of(job), number,
+                                             args.timeout, log)
+            if pause:
+                return pause_block(args, tag, job, number, pause, log)
             row['lead_environment_policy'] = policy
             if job.get('control'):
                 row['negative_control'] = True
             output = private if held else public
             output.write(json.dumps(row, allow_nan=False) + '\n'); output.flush()
     checked = check_block(args.stage, args.profile, args.block)
-    c.write_json(args.stage / (tag + '-done.json'), dict(ready=True, passed=checked))
+    c.write_json(args.stage / (tag + '-done.json'), dict(ready=True, passed=checked,
+                                                        transport_retries=log.failed_launches()))
     print('Primary block: ' + ('pass' if checked else 'fail'))
     return 0 if checked else 1
 
@@ -396,6 +595,8 @@ def main():
     parser.add_argument('--profile', choices=('full','3100','5100'))
     parser.add_argument('--block', choices=('initial','extension'), default='initial')
     parser.add_argument('--acl-verified', action='store_true')
+    parser.add_argument('--resume', action='store_true',
+                        help='run: continue a paused block from its next unfinished launch')
     parser.add_argument('--extended', action='store_true')
     parser.add_argument('--timeout', type=int, default=3600)
     args = parser.parse_args()

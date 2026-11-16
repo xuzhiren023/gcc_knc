@@ -778,8 +778,10 @@ def card_call(stage_dir, files, mode, density, stdout, stderr, profile='full', t
     threads = {'full': 240, '3100': 224, '5100': 236}[profile]
     # card_run requires a transport record; keep only its transient working file.
     transport_record = stdout.parent / 'card-result.json'
+    # SSH transfers only: inputs are small, and the SCIF DMA helper and its
+    # cleanup latch stay out of timed blocks (S13-01, 2026-11-15).
     command = [sys.executable, str(ROOT / 'tools/card_run'), '--benchmark', '--threads', str(threads),
-               '--timeout', str(timeout),
+               '--timeout', str(timeout), '--transfer', 'ssh',
                '--receipt', str(transport_record)]
     if profile != 'full':
         command += ['--profile', profile]
@@ -788,7 +790,12 @@ def card_call(stage_dir, files, mode, density, stdout, stderr, profile='full', t
     command += [str(stage_dir / 'launch'), density, mode]
     try:
         with stdout.open('w') as out, stderr.open('w') as err:
-            return subprocess.run(command, stdout=out, stderr=err).returncode
+            try:
+                return subprocess.run(command, stdout=out, stderr=err).returncode
+            except OSError as error:
+                # card_run never started: an infrastructure failure without a receipt.
+                err.write('card_call: cannot start card_run: %s\n' % error)
+                return 126
     finally:
         if record is not None and transport_record.exists():
             record.update(json.loads(transport_record.read_text()))

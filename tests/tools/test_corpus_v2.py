@@ -764,5 +764,144 @@ class CodecSnapshots(unittest.TestCase):
             self.assertTrue(json.loads((stage / 'initial-full-done.json').read_text())['rechecked'])
 
 
+class TransportResume(unittest.TestCase):
+    """S13-01 gate: SSH-only transfers; a launch without a workload result is re-attempted."""
+    CLOCK = ('CORPUS_META {"threads":1}\nCORPUS_TIME 1\n'
+             'CORPUS_CLOCK {"clock":"CLOCK_MONOTONIC_RAW","boundary":"launch-to-exit",'
+             '"start_ns":1,"end_ns":1000000001,"utc_start_ns":2}\n')
+    # (stdout, receipt or None, card_run exit status)
+    OUTCOMES = {
+        'ok': (CLOCK, dict(result_class='program', exit_code=0, program_exit_code=0, card_minutes=0.1), 0),
+        'transport': ('', dict(result_class='infrastructure', exit_code=126, program_exit_code=None,
+                               card_minutes=0.0, detail='ssh: connect failed'), 126),
+        'no-receipt': ('', None, 3221225794),  # ssh.exe/python.exe failed to start (0xC0000142)
+        'timed-then-lost': (CLOCK, dict(result_class='infrastructure', exit_code=126, program_exit_code=0,
+                                        card_minutes=0.1, detail='finalization failed'), 126),
+        'started-then-lost': ('CORPUS_META {"threads":1}\n', dict(
+            result_class='infrastructure', exit_code=126, program_exit_code=None,
+            card_minutes=0.2, detail='session lost'), 126),
+        'latch': ('', dict(result_class='refused', exit_code=125, program_exit_code=None, card_minutes=0.0,
+                           detail='DMA cleanup unresolved; lead must inspect card-dma-active.lock'), 125),
+    }
+
+    def jobs(self):
+        return [dict(program=p, compiler=compiler, run=0, profile='full', block='initial', threads=1,
+                     input=corpus.INPUTS[p], variant='serial', flags=['-O2'])
+                for p, compiler in (('PB-gemm', corpus.DONOR), ('PB-gemm', corpus.KNC), ('PB-adi', corpus.KNC))]
+
+    def gate(self, temporary, script, resume=False):
+        """Run the block with card outcomes scripted per launch (probes always reach the card)."""
+        import m4_gate as gate
+        stage, sealed = Path(temporary) / 'S13-01', Path(temporary) / 'sealed'
+        stage.mkdir(exist_ok=True); sealed.mkdir(exist_ok=True)
+        (stage / 'environment-policy.json').write_text(json.dumps(
+            dict(lead_verified=True, clock_power_policy='fixed fixture', exclusive_window='fixture')))
+        calls, sleeps = [], []
+        def card_call(stage_dir, files, mode, density, out, err, profile='full', timeout=3600, record=None):
+            outcome = 'ok' if mode == 'probe' else script[mode].pop(0) if script.get(mode) else 'ok'
+            calls.append((mode, outcome))
+            stdout, receipt, rc = self.OUTCOMES[outcome]
+            out.write_text(stdout + (json.dumps(receipt) + '\n' if receipt else ''))
+            err.write_text('')
+            if receipt and record is not None:
+                record.update(receipt)
+            return rc
+        error = io.StringIO()
+        args = SimpleNamespace(stage=stage, profile='full', block='initial', acl_verified=True,
+                               timeout=3600, resume=resume)
+        with patch.object(corpus, 'sealed_dir', return_value=sealed), \
+                patch.object(corpus, 'card_call', side_effect=card_call), \
+                patch.object(gate, 'load_freeze', return_value=({}, {})), \
+                patch.object(gate, 'launches', side_effect=lambda *a: ([], self.jobs())), \
+                patch.object(gate, 'prepare_job', return_value=dict(files=['runtime-prefix.json'])), \
+                patch.object(gate, 'check_block', return_value=True), \
+                patch.object(gate, '_sleep', side_effect=sleeps.append), redirect_stderr(error):
+            code = gate.run(args)
+        log = lambda d: json.loads((d / 'initial-full-transport-retries.json').read_text())
+        raw = [json.loads(l) for d in (stage, sealed) for l in (d / 'initial-full-raw.jsonl').read_text().splitlines()]
+        return SimpleNamespace(code=code, calls=calls, sleeps=sleeps, stderr=error.getvalue(), raw=raw,
+                               public_log=log(stage), sealed_log=log(sealed), stage=stage, sealed=sealed)
+
+    def test_card_call_transfers_by_ssh_only(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            out, err = Path(temporary) / 'a.stdout', Path(temporary) / 'a.stderr'
+            with patch.object(corpus.subprocess, 'run', return_value=SimpleNamespace(returncode=0)) as run:
+                corpus.card_call(Path(temporary), [], 'probe', 'probe', out, err)
+            command = run.call_args[0][0]
+            self.assertEqual(command[command.index('--transfer') + 1], 'ssh')
+            # A card_run process that cannot start is an infrastructure failure, not a crash.
+            with patch.object(corpus.subprocess, 'run', side_effect=OSError('0xC0000142')):
+                self.assertEqual(corpus.card_call(Path(temporary), [], 'probe', 'probe', out, err), 126)
+
+    def test_two_transport_failures_then_one_final_row(self):
+        import m4_gate as gate
+        with tempfile.TemporaryDirectory() as temporary:
+            result = self.gate(temporary, {'PB-gemm': ['transport', 'no-receipt', 'ok'],
+                                           'PB-adi': ['transport', 'ok']})
+            self.assertEqual(result.code, 0)
+            self.assertEqual(result.sleeps, [30, 60, 30])
+            self.assertEqual([(r['program'], r['compiler'], r['transport_retries']) for r in result.raw],
+                             [('PB-gemm', corpus.DONOR, 2), ('PB-gemm', corpus.KNC, 0), ('PB-adi', corpus.KNC, 1)])
+            self.assertTrue(all(Path(r['stdout']).name == '%03d.stdout' % n for n, r in enumerate(result.raw)))
+            failed = [e for e in result.public_log if e['event'] == 'launch']
+            self.assertEqual([(e['launch'], e['attempt'], e['result_class']) for e in failed],
+                             [('000', 1, 'infrastructure'), ('000', 2, 'infrastructure')])
+            self.assertEqual(sum(e['event'] == 'probe' and e['reachable'] for e in result.public_log), 2)
+            capture = result.stage / 'initial-full-capture'
+            self.assertTrue((capture / '000.transport-1.stdout').exists() and (capture / '000.transport-2.stdout').exists())
+            # Held-out retries stay sealed.
+            self.assertEqual({e['program'] for e in result.public_log}, {'PB-gemm'})
+            self.assertEqual([(e['launch'], e['event']) for e in result.sealed_log], [('002', 'launch'), ('002', 'probe')])
+            done = json.loads((result.stage / 'initial-full-done.json').read_text())
+            self.assertEqual(done['transport_retries'], 3)
+            self.assertEqual(gate.backoff_seconds(6), 600)
+
+    def test_launch_that_started_or_timed_is_never_retried(self):
+        import m4_gate as gate
+        for outcome in ('timed-then-lost', 'started-then-lost'):
+            with self.subTest(outcome=outcome), tempfile.TemporaryDirectory() as temporary:
+                result = self.gate(temporary, {'PB-gemm': [outcome]})
+                self.assertEqual(result.calls[0], ('PB-gemm', outcome))
+                self.assertEqual([m for m, _ in result.calls], ['PB-gemm', 'PB-gemm', 'PB-adi'])
+                self.assertEqual(result.raw[0]['check'], 'fail')
+                self.assertEqual(result.sleeps, [])
+                self.assertEqual(result.public_log, [])
+        # Resume never repeats an interrupted launch whose capture holds a time.
+        with tempfile.TemporaryDirectory() as temporary:
+            result = self.gate(temporary, {'PB-gemm': ['ok', 'transport'] + ['transport'] * 4})
+            self.assertEqual(result.code, gate.PAUSED_EXIT)
+            (result.stage / 'initial-full-capture' / '001.stdout').write_text(self.CLOCK)
+            again = self.gate(temporary, {}, resume=True)
+            self.assertEqual((again.code, again.calls), (1, []))
+            self.assertIn('not repeated', again.stderr)
+
+    def test_five_failures_pause_and_resume_continues_the_block(self):
+        import m4_gate as gate
+        with tempfile.TemporaryDirectory() as temporary:
+            first = self.gate(temporary, {'PB-gemm': ['ok'] + ['transport'] * 5})
+            self.assertEqual(first.code, gate.PAUSED_EXIT)
+            self.assertEqual(first.sleeps, [30, 60, 120, 240])
+            self.assertIn('Card unreachable', first.stderr)
+            self.assertIn('--resume', first.stderr)
+            self.assertEqual(len(first.raw), 1)
+            self.assertFalse((first.stage / 'initial-full-done.json').exists())
+            self.assertEqual(json.loads((first.stage / 'initial-full-paused.json').read_text())['launch'], '001')
+            kept = (first.stage / 'initial-full-raw.jsonl').read_bytes()
+            with self.assertRaises(ValueError):  # a plain rerun still refuses a started block
+                self.gate(temporary, {})
+            again = self.gate(temporary, {}, resume=True)
+            self.assertEqual(again.code, 0)
+            self.assertEqual(again.calls, [('PB-gemm', 'ok'), ('PB-adi', 'ok')])
+            self.assertTrue((first.stage / 'initial-full-raw.jsonl').read_bytes().startswith(kept))
+            self.assertEqual([r['compiler'] for r in again.raw if r['program'] == 'PB-gemm'], [corpus.DONOR, corpus.KNC])
+            self.assertEqual([e['event'] for e in again.public_log][-2:], ['pause', 'resume'])
+            self.assertFalse((first.stage / 'initial-full-paused.json').exists())
+        # A DMA latch refusal stops at once and leaves the latch to the lead.
+        with tempfile.TemporaryDirectory() as temporary:
+            latch = self.gate(temporary, {'PB-gemm': ['latch']})
+            self.assertEqual((latch.code, latch.sleeps, len(latch.calls)), (gate.LATCH_EXIT, [], 1))
+            self.assertIn('Not deleted: latch recovery is a lead decision', latch.stderr)
+
+
 if __name__ == '__main__':
     unittest.main()
