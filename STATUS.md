@@ -1,10 +1,10 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-16 03:47.
+Updated automatically at every ticket change. Last update: 2026-11-16 04:01.
 
-**Waiting for you:** S14-15. Run `python tools/pm.py inbox`.
+**Waiting for you:** S14-15, S14-18. Run `python tools/pm.py inbox`.
 
-Current tickets: `[#################---]` 244 of 279
+Current tickets: `[#################---]` 244 of 280
 
 ## Milestones
 
@@ -15,7 +15,7 @@ Current tickets: `[#################---]` 244 of 279
 | M2 | Useful vector target | Done | 51 of 51 tickets |
 | M3 | Runtimes | Done | 48 of 48 tickets |
 | M4 | Broad optimization | Done | 62 of 65 tickets |
-| M5 | Program corpus | In progress | 0 of 32 tickets |
+| M5 | Program corpus | In progress | 0 of 33 tickets |
 | M6 | Release | Not started | Not planned in detail yet |
 
 ## Tickets
@@ -141,14 +141,15 @@ Current tickets: `[#################---]` 244 of 279
 | S14-10 | knc-twin: --jobs N for independent simulations and PyPy support (roadmap item 1) | In progress | No worktree needed. Export main's knc-twin into your shared dir: git -c safe.directory='*' archive main knc... |
 | S14-11 | knc-twin: close PhiWeather WRF coverage gaps (jump tables, vcvtps2pd ymm, loop-region and complete-listing modes, scatter and rcp-table import) | lead | Review done, no findings: A-G match the brief and the 08:25Z pre-review; heap stubs pinned red-then-green i... |
 | S14-12 | knc-twin: iteration and phase sampling for loop and whole-program wall-time estimates (roadmap item 2) | lead | Review passed, ready to approve: head 7f734b23 matches the pre-review and meets brief 04's done criteria. M... |
-| S14-13 | knc-twin: 8-tile multi-core unit on the full ring with all memory controllers (roadmap item 3) | lead | Interactive lead needed (sessions 10/10). (1) Merge main into s14/S14-13 by hand: the submit hard gate (pm.... |
+| S14-13 | knc-twin: 8-tile multi-core unit on the full ring with all memory controllers (roadmap item 3) | Waiting for review | ecf8f69d: three review edits done. Saturation/core-budget tests PASS; logs .work/_state/logs/S14_13_channel... |
 | S14-14 | knc-twin: scheduling explorer for modulo scheduling and reordering, evaluating S14-02/S14-03 (roadmap item 4) | lead | Review passed (approve note: knc-twin gains a schedule command: beam search up to 60 instructions, list ord... |
 | S14-15 | knc-twin prepare-native: absolute memory operands come out as `N()` in kernel.S (k1om as 2.22 rejects them); emit them relocated into the image | **Waiting for you** | budget: 10651104 input tokens used; the budget is 10000000 |
 | S14-16 | bzip2 slower than GCC 5.1.1: mask-to-GPR move cost below a GPR move makes RA park integers in k registers (M4 known limit, must-fix) | draft |  |
 | S14-17 | Compare not folded with its load in merged return blocks (GCC 16 middle end, about half the remaining bzip2 mainGtU gap) | draft |  |
-| S14-18 | knc-twin regress: held-out replay runs under a 120 s wall-clock budget, so a slow interpreter turns a prediction into a budget_exhausted stub and the test fails as a false mismatch | In progress | Yes: remove the duplicate test_compiled_rows_record_disables_deadline (keep one copy, in the class it tests... |
+| S14-18 | knc-twin regress: held-out replay runs under a 120 s wall-clock budget, so a slow interpreter turns a prediction into a budget_exhausted stub and the test fails as a false mismatch | **Waiting for you** | Required cleanup commit is blocked: git rm -r --cached knc-twin-runs fails creating shared git index lock (... |
 | S14-19 | knc-twin x87 integer-load widths - fildl reads 8 bytes (must be 4), filds reads 4 (must be 2) | Not started |  |
 | S14-20 | knc-twin: an indirect jmp/call (PLT tail call through the GOT) on a never-executed path must not refuse the whole region | Not started |  |
+| S14-21 | knc-twin multi-core: held-out validation of the 8-tile ring model against the measured GEMV, triad and core-scaling rows | Not started |  |
 | S2-01 | Design for zmm and mask registers under -march=knc | Done | The register design for KNC is settled on paper: all 32 zmm and 8 mask registers become usable under -march... |
 | S2-02 | Float and double arguments and results in zmm lane 0 | Done | Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`). |
 | S2-03 | Varargs with the donor's register save area | Done | Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`). |
@@ -304,20 +305,20 @@ Current tickets: `[#################---]` 244 of 279
 
 ## Recent activity
 
-- 2026-11-16 03:47 **S14-13** lead defer: Interactive lead needed (sessions 10/10). (1) Merge main into s14/S14-13 by hand: the submit hard gate (pm.py:330) fires because main has non-work ...
-- 2026-11-16 03:46 **S14-11** lead defer: Review done, no findings: A-G match the brief and the 08:25Z pre-review; heap stubs pinned red-then-green in test_v03.py TestHeapStubs; 3600 s HPCG...
-- 2026-11-16 03:45 **S14-13** engineer ask: Submit-only owner instruction attempted; submit refused: branch lacks real changes from main (asks lead to merge main into ticket branch), and 6137...
-- 2026-11-16 03:44 **S14-11** engineer submit: A-G complete; main merged; worktree clean. Windows Python 3.8 heldout HPCG check with --max-seconds 3600 passed all 8 variants, no differs or budge...
-- 2026-11-16 03:28 **S14-18** lead answer: Yes: remove the duplicate test_compiled_rows_record_disables_deadline (keep one copy, in the class it tests), then make the [red] test commit, the ...
-- 2026-11-16 03:28 **S14-11** owner decide: sessions 6 -> 7 (one more, for the submit only): run pm.py submit with the --override text of the 08:15Z decide first thing, then end the session. ...
-- 2026-11-16 03:27 **S14-13** owner decide: sessions 9 -> 10 (one more, for the submit only): the 03:24 answer stands; run pm.py submit first thing with the pending list it names, then end th...
-- 2026-11-16 03:27 **S14-11** engineer escalate: budget: 6 engineer sessions used; the budget is 6
+- 2026-11-16 04:00 **S14-13** engineer submit: ecf8f69d: three review edits done. Saturation/core-budget tests PASS; logs .work/_state/logs/S14_13_channel_consistency-20261116-035939.log and S14...
+- 2026-11-16 03:59 **S14-18** engineer escalate: Required cleanup commit is blocked: git rm -r --cached knc-twin-runs fails creating shared git index lock (Permission denied at C:/Users/xuzhi/Docu...
+- 2026-11-16 03:57 **S14-18** owner decide: input_tokens 3M -> 6M under the owner's standing rule; the four steps of the 09:05Z decide stand (rm --cached knc-twin-runs and commit; red proof a...
+- 2026-11-16 03:56 **S14-18** lead escalate: budget: 3187441 input tokens used; the budget is 3000000
+- 2026-11-16 03:56 **S14-18** lead answer: Already settled by the 03:55 decide; no history rewrite needed. On the current branch: (1) git rm -r --cached knc-twin-runs, add knc-twin-runs/ to ...
+- 2026-11-16 03:56 **S14-13** owner decide: Lead decision (owner's delegation): scope split. The held-out validation of the brief's step 7 becomes S14-21 (ready, this lane, after this ticket)...
+- 2026-11-16 03:55 **S14-18** owner decide: Proceed without rewriting commits, as the 09:00Z lead note says: (1) git rm -r --cached knc-twin-runs and commit; (2) prove the red in the submit n...
+- 2026-11-16 03:54 **S14-18** engineer escalate: HEAD 105ac991 includes code/docs and committed knc-twin-runs output; worktree is clean, so no green changes remain to commit. pm.py ask was refused...
 
 ## Cost
 
-- From the script, engineer: 755 sessions, 1623.9M input tokens
-- From the script, lead: 511 sessions, 144.8M input tokens
-- Started by hand, Claude: 14 sessions, 4142.9M input tokens
+- From the script, engineer: 760 sessions, 1625.8M input tokens
+- From the script, lead: 514 sessions, 146.0M input tokens
+- Started by hand, Claude: 14 sessions, 4149.7M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
