@@ -2,7 +2,7 @@
 
 Updated automatically at every ticket change. Last update: 2026-11-16 03:28.
 
-**Waiting for you:** S14-11, S14-15. Run `python tools/pm.py inbox`.
+**Waiting for you:** S14-15. Run `python tools/pm.py inbox`.
 
 Current tickets: `[#################---]` 244 of 279
 
@@ -139,7 +139,7 @@ Current tickets: `[#################---]` 244 of 279
 | S14-08 | Quantized GEMV kernels on KNC - multi-row activation reuse, FP vs int32 VPMADD231D vs VPERMD lookup table, bandwidth-normalized | draft |  |
 | S14-09 | KNC vs the Z840 host (dual E5-2690 v3) on the same algorithms and numerical contract - where running on the card actually pays | draft |  |
 | S14-10 | knc-twin: --jobs N for independent simulations and PyPy support (roadmap item 1) | In progress | No worktree needed. Export main's knc-twin into your shared dir: git -c safe.directory='*' archive main knc... |
-| S14-11 | knc-twin: close PhiWeather WRF coverage gaps (jump tables, vcvtps2pd ymm, loop-region and complete-listing modes, scatter and rcp-table import) | **Waiting for you** | budget: 6 engineer sessions used; the budget is 6 |
+| S14-11 | knc-twin: close PhiWeather WRF coverage gaps (jump tables, vcvtps2pd ymm, loop-region and complete-listing modes, scatter and rcp-table import) | In progress | sessions 6 -> 7 (one more, for the submit only): run pm.py submit with the --override text of the 08:15Z de... |
 | S14-12 | knc-twin: iteration and phase sampling for loop and whole-program wall-time estimates (roadmap item 2) | lead | Review passed, ready to approve: head 7f734b23 matches the pre-review and meets brief 04's done criteria. M... |
 | S14-13 | knc-twin: 8-tile multi-core unit on the full ring with all memory controllers (roadmap item 3) | In progress | sessions 9 -> 10 (one more, for the submit only): the 03:24 answer stands; run pm.py submit first thing wit... |
 | S14-14 | knc-twin: scheduling explorer for modulo scheduling and reordering, evaluating S14-02/S14-03 (roadmap item 4) | lead | Review passed (approve note: knc-twin gains a schedule command: beam search up to 60 instructions, list ord... |
@@ -305,13 +305,13 @@ Current tickets: `[#################---]` 244 of 279
 ## Recent activity
 
 - 2026-11-16 03:28 **S14-18** lead answer: Yes: remove the duplicate test_compiled_rows_record_disables_deadline (keep one copy, in the class it tests), then make the [red] test commit, the ...
+- 2026-11-16 03:28 **S14-11** owner decide: sessions 6 -> 7 (one more, for the submit only): run pm.py submit with the --override text of the 08:15Z decide first thing, then end the session. ...
 - 2026-11-16 03:27 **S14-13** owner decide: sessions 9 -> 10 (one more, for the submit only): the 03:24 answer stands; run pm.py submit first thing with the pending list it names, then end th...
 - 2026-11-16 03:27 **S14-11** engineer escalate: budget: 6 engineer sessions used; the budget is 6
 - 2026-11-16 03:26 **S14-13** lead escalate: budget: 9 engineer sessions used; the budget is 9
 - 2026-11-16 03:26 **S14-11** owner decide: Size override approved by the lead (owner's standing delegation): resubmit at once with --override 'size: 1925 lines for the seven brief items A-G;...
 - 2026-11-16 03:25 **S14-18** engineer ask: The current worktree has a duplicate test_compiled_rows_record_disables_deadline definition in knc-twin/tests/test_v03.py (one in TestRollupAndBar ...
 - 2026-11-16 03:24 **S14-13** lead answer: No main repeat. The branch run equals the recorded s12-31-hpcg-104 prediction.json exactly, so this branch did not change that prediction, and a ma...
-- 2026-11-16 03:24 **S14-11** engineer escalate: Submit refused: 1925 changed lines exceed budget 800. Per owner instruction, next stall goes to owner. Please approve size override for completed A...
 
 ## Cost
 
@@ -323,4 +323,4 @@ Current tickets: `[#################---]` 244 of 279
 
 ## Disk
 
-The project uses 40.7 GiB of 100 GiB. 72 GiB free on the drive.
+The project uses 40.7 GiB of 100 GiB. 73 GiB free on the drive.
