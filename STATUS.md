@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-16 08:27.
+Updated automatically at every ticket change. Last update: 2026-11-16 08:28.
 
-**Waiting for you:** S14-20. Run `python tools/pm.py inbox`.
+**Next: GPT-6.1, on S14-10 (knc-twin: --jobs N for independent simulations and PyPy support (roadmap item 1)).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
 Current tickets: `[#################---]` 252 of 288
 
@@ -148,7 +148,7 @@ Current tickets: `[#################---]` 252 of 288
 | S14-17 | Compare not folded with its load in merged return blocks (GCC 16 middle end, about half the remaining bzip2 mainGtU gap) | draft |  |
 | S14-18 | knc-twin regress: held-out replay runs under a 120 s wall-clock budget, so a slow interpreter turns a prediction into a budget_exhausted stub and the test fails as a false mismatch | Done | The knc-twin held-out replay no longer runs in t0 (KNC_TWIN_HELDOUT=1 or validate_heldout.py --max-seconds ... |
 | S14-19 | knc-twin x87 integer-load widths - fildl reads 8 bytes (must be 4), filds reads 4 (must be 2) | Done | The knc-twin now reads and writes x87 integer memory at the right widths (filds/fists 2 bytes, fildl/fistl ... |
-| S14-20 | knc-twin: an indirect jmp/call (PLT tail call through the GOT) on a never-executed path must not refuse the whole region | **Waiting for you** | budget: 2 engineer sessions used; the budget is 2 |
+| S14-20 | knc-twin: an indirect jmp/call (PLT tail call through the GOT) on a never-executed path must not refuse the whole region | In progress | sessions 2 -> 4: your worktree could not write its git index (S14-24); the lead committed your change as [r... |
 | S14-21 | knc-twin multi-core: held-out validation of the 8-tile ring model against the measured GEMV, triad and core-scaling rows | Not started |  |
 | S14-22 | card_run turn row: refreshing an open turn row must keep its place in the queue | draft |  |
 | S14-23 | knc-twin: import the window-10 scatter rows (2 threads) and settle occupancy.scatter_cycles_per_line | Not started |  |
@@ -313,6 +313,7 @@ Current tickets: `[#################---]` 252 of 288
 
 ## Recent activity
 
+- 2026-11-16 08:28 **S14-20** owner decide: sessions 2 -> 4: your worktree could not write its git index (S14-24); the lead committed your change as [red] tests then the fix, red verified aga...
 - 2026-11-16 08:27 **S14-20** engineer escalate: budget: 2 engineer sessions used; the budget is 2
 - 2026-11-16 08:26 **S14-15** lead approve: prepare-native emits absolute operands relocated into the memory image (knc_twin_mem+off(%rip)) instead of the invalid N(), and rollup labels a rol...
 - 2026-11-16 07:43 **S14-15** engineer submit: prepare-native emits absolute operands relocated as knc_twin_mem+off(%rip) (InvalidInput outside the image, plain N without an image), and rollup i...
@@ -320,13 +321,12 @@ Current tickets: `[#################---]` 252 of 288
 - 2026-11-16 07:26 **S14-15** owner decide: Owner 2026-11-16: the lead records the red evidence as an empty [red] commit and submits and merges this ticket itself (engineer budget spent)
 - 2026-11-16 07:25 **S14-19** lead approve: The knc-twin now reads and writes x87 integer memory at the right widths (filds/fists 2 bytes, fildl/fistl 4, fildq 8), so crlibm log(1.0) and simi...
 - 2026-11-16 06:58 **S14-19** engineer submit: x87 integer loads and stores use the right widths (filds/fists 2 bytes, fildl/fistl 4, fildq 8) and 16-bit integer arithmetic forms exist; engine 0...
-- 2026-11-16 06:57 **S14-19** lead answer: Only step: pm.py submit S14-19 with the 06:47 note, then end the session. No edits, no runs, no git commands
 
 ## Cost
 
 - From the script, engineer: 772 sessions, 1635.7M input tokens
 - From the script, lead: 522 sessions, 148.0M input tokens
-- Started by hand, Claude: 14 sessions, 4233.5M input tokens
+- Started by hand, Claude: 14 sessions, 4236.7M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
