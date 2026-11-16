@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-16 00:08.
+Updated automatically at every ticket change. Last update: 2026-11-16 00:41.
 
 **Next: the tech lead, on S13-01.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
@@ -141,7 +141,7 @@ Current tickets: `[#################---]` 244 of 276
 | S14-10 | knc-twin: --jobs N for independent simulations and PyPy support (roadmap item 1) | In progress | No worktree needed. Export main's knc-twin into your shared dir: git -c safe.directory='*' archive main knc... |
 | S14-11 | knc-twin: close PhiWeather WRF coverage gaps (jump tables, vcvtps2pd ymm, loop-region and complete-listing modes, scatter and rcp-table import) | In progress | Yes, run them now: the M4 card block finished 04:20Z and the host limits are lifted. Run tests/regress/test... |
 | S14-12 | knc-twin: iteration and phase sampling for loop and whole-program wall-time estimates (roadmap item 2) | In progress | Yes, run the full knc-twin selftest and tests/regress/test_knc_twin.py now, one at a time, single-threaded ... |
-| S14-13 | knc-twin: 8-tile multi-core unit on the full ring with all memory controllers (roadmap item 3) | In progress | Yes. Your diagnosis is right, and the flaw is in my test spec: with 60 active cores in total, each added de... |
+| S14-13 | knc-twin: 8-tile multi-core unit on the full ring with all memory controllers (roadmap item 3) | Question for the tech lead | Two staging attempts failed: unsupported --check (removed), then input.json inside --out triggers nonempty-... |
 | S14-14 | knc-twin: scheduling explorer for modulo scheduling and reordering, evaluating S14-02/S14-03 (roadmap item 4) | In progress | Yes, run it: the card block ended 04:20Z and host limits are lifted (lead note 04:25Z), so run validate_hel... |
 | S14-15 | knc-twin prepare-native: absolute memory operands come out as `N()` in kernel.S (k1om as 2.22 rejects them); emit them relocated into the image | In progress |  |
 | S14-16 | bzip2 slower than GCC 5.1.1: mask-to-GPR move cost below a GPR move makes RA park integers in k registers (M4 known limit, must-fix) | draft |  |
@@ -301,6 +301,7 @@ Current tickets: `[#################---]` 244 of 276
 
 ## Recent activity
 
+- 2026-11-16 00:41 **S14-13** engineer ask: Two staging attempts failed: unsupported --check (removed), then input.json inside --out triggers nonempty-output refusal. Resume with sibling inpu...
 - 2026-11-16 00:06 **S13-01** engineer submit: Submitted by the lead after M4 acceptance: gate tools (m4_gate.py, m4_score.py, corpus.py changes), host tests, staged runner; M4 passed on the 712...
 - 2026-11-16 00:05 **S14-14** lead answer: Yes, run it: the card block ended 04:20Z and host limits are lifted (lead note 04:25Z), so run validate_heldout.predict_case on knc-twin/tests/held...
 - 2026-11-16 00:04 **S13-01** lead answer: Lead submits.
@@ -308,16 +309,15 @@ Current tickets: `[#################---]` 244 of 276
 - 2026-11-16 00:00 **S14-10** lead answer: No worktree needed. Export main's knc-twin into your shared dir: git -c safe.directory='*' archive main knc-twin | tar -x -C .work/_shared/S14-10/m...
 - 2026-11-15 23:58 **S14-14** engineer ask: Green committed: 2e975d5b, clean, 799 lines. Acceptance 7 pass. Regress: bundled selftest and trial checks pass; held-out s12-31-hpcg-104 mismatche...
 - 2026-11-15 23:54 **S14-10** engineer ask: 7a41d127 documents diagnostic: all 8 HPCG-104 variants budget_exhausted at 120s; non-variant fields including scenario match record. JSON: .work/_s...
-- 2026-11-15 23:49 **S14-13** lead answer: Yes. Your diagnosis is right, and the flaw is in my test spec: with 60 active cores in total, each added detailed tile replaces a background core, ...
 
 ## Cost
 
-- From the script, engineer: 729 sessions, 1556.4M input tokens
+- From the script, engineer: 731 sessions, 1565.7M input tokens
 - From the script, lead: 495 sessions, 140.6M input tokens
-- Started by hand, Claude: 14 sessions, 4063.2M input tokens
+- Started by hand, Claude: 14 sessions, 4081.1M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 40.6 GiB of 100 GiB. 84 GiB free on the drive.
+The project uses 40.6 GiB of 100 GiB. 82 GiB free on the drive.
