@@ -22,6 +22,29 @@ What the report does not claim: the bar's breadth criterion is not met (the comp
 HPCG and one sparse microbenchmark family); the twin is a region model, not a system emulator; the
 card scale is formulas on measured bandwidths.
 
+## 1b. PhiWeather's WRF hot routines (0.3.1)
+
+PhiWeather declined 0.3.0 because 13 mnemonics in its patched WRF build (GCC-KNC 16.2) were
+unsupported: `vgetexpps`, `vgetmantps`, `vscaleps`, `vrcp23ps`, `vgmaxps`, `vgminps`, `vpcmpneqd`,
+`vpcmpnled`, `vpblendmd`, `stmxcsr`, `fcoms`, `fcomps`, `vscatterdps` (plus `vgetexppd`,
+`vgetmantpd`, `vrsqrt23ps`, `vfixupnanps` in the full list). All are now read and executed with
+the R27 semantics; `vrcp23ps`/`vrsqrt23ps` are approximate until their tables are captured
+(calibration plan `rcp23-table`); scatters still stop the timing (`scatter`). Coverage by
+`tests/heldout_native/wrf_coverage.py` over the build's objects (read-only):
+
+| routine | instructions | padding NOPs | prefixed | calls | twin status |
+|---|---:|---:|---:|---:|---|
+| mynn_tendencies | 28536 | 199 | 192 | 138 | parser, ISA, functional complete; timing waits for the scatter cost (137 scatters) |
+| dmp_mf | 17311 | 78 | 109 | 148 | same (91 scatters) |
+| mp_thompson | 32873 | 489 | 457 | 697 | 48 `vcvtps2pd %ymm` forms not read yet; otherwise complete |
+| mp_gt_driver, advance_uv, advance_mu_t, horizontal_diffusion_s, rk_update_scalar | 3585-10122 | | | | complete except the scatter cost |
+| rslf | 48 | | | 0 | complete |
+| advect_scalar, advect_scalar_pd | | | | | jump tables (`jmpq *table(,%reg,8)` through `.rodata` relocations): the adapter does not follow them yet |
+| mynnedmf_driver, sixth_order_diffusion | | | | | objects not in the routine table (`module_bl_mynnedmf_driver.o`, `module_big_step_utilities_em.o`); to add |
+
+The callees these routines make (`__knc_vmath_expf_16`, `expf`, `qsat_blend`, `tridiag2`,
+`memcpy`, `malloc`) need costed stubs or inclusion with `--with-callee`.
+
 ## 2. Where native test time goes, and what the twin covers
 
 Regions that consume repeated native testing in gcc_knc: the M4 programs (HPCG and its CSR/SymGS

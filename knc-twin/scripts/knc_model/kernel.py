@@ -221,7 +221,7 @@ class Insn(object):
     def __init__(self, d, index, stream_id):
         if not isinstance(d, dict):
             raise InvalidInput("stream %s instruction %d: record must be an object" % (stream_id, index))
-        allowed = {"id", "op", "ops", "mask", "rounding", "label", "encoding", "deps", "addr", "width", "comment", "x87_deps", "lines", "source"}
+        allowed = {"id", "op", "ops", "mask", "rounding", "label", "encoding", "deps", "addr", "width", "comment", "x87_deps", "lines", "source", "sae"}
         extra = set(d) - allowed
         if extra:
             raise InvalidInput("stream %s instruction %d: unknown record keys %s" % (stream_id, index, sorted(extra)))
@@ -251,6 +251,7 @@ class Insn(object):
                 raise InvalidInput("instruction %s: addr must be {start, stride?}" % self.id)
             self.addr_desc = {"start": parse_int(a["start"], self.id + ".addr.start"), "stride": parse_int(a.get("stride", 0), self.id + ".addr.stride")}
         self.rounding = d.get("rounding")
+        self.sae = bool(d.get("sae", False))
         if self.rounding is not None and self.rounding not in VALID_ROUNDING:
             raise Unsupported("instruction %s: rounding %r not supported" % (self.id, self.rounding))
         self.mask = Reg(d["mask"]) if d.get("mask") else None
@@ -415,6 +416,12 @@ class Insn(object):
             raise InvalidInput("instruction %s: memory operand required" % self.id)
         if self.spec.get("fn") == "x87" and self.spec.get("mem") and self.mem is not None:
             self.is_load = True
+        if self.op == "stmxcsr":
+            self.reads.add("mxcsr")
+        # vector FP instructions OR their exception flags into MXCSR when they complete; this is a sticky side effect,
+        # not a register dependency between them (only stmxcsr reads it)
+        self.sets_mxcsr = bool(self.spec.get("fn") in ("vfp2", "vfma", "vscale", "vrcp23", "vrsqrt23", "vgetexp", "vgetmant", "vfixupnan", "vcvt_i2f", "vcvt_u2f",
+                                                       "vcvt_f2i", "vcvt_d2i", "vcvt_s2d", "vcvt_d2s", "vrnd", "vgminmax") and not self.sae)
         if self.cls == "x87_control" and self.mem is not None:
             if self.spec.get("op") == "fldcw":
                 self.is_load = True

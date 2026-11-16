@@ -5,8 +5,8 @@ Full tables: `tests/heldout_native/characterization-run/validation.md` and `vali
 measured columns are native TSC ticks or seconds on the project's 7120-class card, converted to
 core cycles at 1.238 GHz.
 
-**Status (0.3.0, 2026-11-16).** Final engine, profile hash 2058f0ec...: every table below is the recording
-run of `validate_heldout.py --cases --record`, so each case's `prediction.json` matches these numbers and
+**Status (0.3.1, 2026-11-16).** Engine 0.3.1, profile hash 2058f0ec...: every table below is the recording
+run of `validate_heldout.py --cases --record` (0.3.1 re-recorded the compiled cases: same cycles, stall causes now attributed; the characterization rows are the 0.3.0 run of the same engine rules), so each case's `prediction.json` matches these numbers and
 `tests/regress/test_knc_twin.py` reproduces them. Three corrections were made between the first 0.3.0 pass and
 this run from rows the first pass flagged (store/load port pairing, the taken-branch bubble limited to forward
 transfers, memory latency 328 without the TLB miss); they are recorded as calibration rows below.

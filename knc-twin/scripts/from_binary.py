@@ -42,7 +42,7 @@ import from_gcc_s  # noqa: E402
 DATA_BASE = 0x20000000
 NORETURN = ("__assert_fail", "abort", "__stack_chk_fail", "_Unwind_Resume", "exit", "_exit", "__cxa_throw", "__cxa_bad_alloc",
             "_gfortran_runtime_error", "_gfortran_runtime_error_at", "_gfortran_os_error", "_gfortran_stop_string", "__GI_abort")
-_TARGET_RE = re.compile(r"^(\S+)\s+([0-9a-fA-F]+)\s+<([^>+]+)(\+0x[0-9a-fA-F]+)?>\s*$")
+_TARGET_RE = re.compile(r"^(\S+)\s+([0-9a-fA-F]+)\s+<([^>+]+)(\+0x[0-9a-fA-F]+)?>(?:,(%k[0-7]))?\s*$")
 MAX_SECTION = 8 << 20
 
 
@@ -154,6 +154,7 @@ class Converter(object):
             m = _TARGET_RE.match(text)
             if m:
                 mnem, taddr, tsym, toff = m.group(1), int(m.group(2), 16), m.group(3), m.group(4)
+                kreg = m.group(5)
                 rel = [r for r in di.relocs if r[1] in ("R_X86_64_PC32", "R_X86_64_PLT32")]
                 if rel:
                     callee = re.sub(r"[+-]0x[0-9a-fA-F]+$", "", rel[0][2])
@@ -169,7 +170,7 @@ class Converter(object):
                             calls[callee] = {"model": "noreturn", "source": "declared automatically (noreturn runtime routine)"}
                     out.append(("\tcall %s" % _label(callee), di))
                 elif internal:
-                    out.append(("\t%s .A_%x" % (mnem.rstrip("q") if mnem == "jmpq" else mnem, taddr), di))
+                    out.append(("\t%s .A_%x%s" % (mnem.rstrip("q") if mnem == "jmpq" else mnem, taddr, (", " + kreg) if kreg else ""), di))
                 else:
                     # a jump out of the function: tail call
                     callee = callee or tsym

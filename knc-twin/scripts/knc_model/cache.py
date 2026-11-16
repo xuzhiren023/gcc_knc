@@ -174,6 +174,13 @@ class MemoryModel(object):
         self._reap(now)
         return len(self.inflight) + n <= self.max_outstanding
 
+    def _cold_arrival(self, now, extra_latency=0):
+        """Arrival of a line that is in no modeled cache: from the scenario's cold level (L2 hit latency, or a memory fill)."""
+        if self.type == "line_tracking" and self.sc.get("cold_level") == "l2":
+            self.stats["cold_l2_fills"] = self.stats.get("cold_l2_fills", 0) + 1
+            return now + self.p.get("latency.l2_hit") + extra_latency
+        return self._memory_arrival(now, extra_latency)
+
     def _memory_arrival(self, now, extra_latency=0):
         """Arrival time of a memory fill issued now, under the optional service model."""
         lat = self.p.get("latency.memory") + extra_latency
@@ -306,7 +313,7 @@ class MemoryModel(object):
                             self.stats["hw_prefetch_hits"] += 0  # in-flight line (software or hardware prefetch)
                         arrival = (arr2 if arr2 > now else now) + self.p.get("latency.l2_hit") + tlb
                     else:
-                        arrival = self._memory_arrival(now, tlb)
+                        arrival = self._cold_arrival(now, tlb)
                         self.l2.insert(la, arrival)
                     self.l1.insert(la, arrival)
                     self.inflight.append(arrival)
@@ -338,14 +345,14 @@ class MemoryModel(object):
             if arr2 is not None:
                 self.stats["prefetches_useless"] += 1
                 return False
-            arrival = self._memory_arrival(now, tlb)
+            arrival = self._cold_arrival(now, tlb)
             self.l2.insert(la, arrival)
             self.inflight.append(arrival)
             return True
         if arr2 is not None:
             arrival = (arr2 if arr2 > now else now) + self.p.get("latency.l2_hit") + tlb
         else:
-            arrival = self._memory_arrival(now, tlb)
+            arrival = self._cold_arrival(now, tlb)
             self.l2.insert(la, arrival)
         self.l1.insert(la, arrival)
         self.inflight.append(arrival)

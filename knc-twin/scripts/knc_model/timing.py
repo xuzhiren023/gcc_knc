@@ -15,7 +15,7 @@ from . import isa
 X87_ARITH = ("x87_add", "x87_mul", "x87_div", "x87_sqrt")
 STALL_REASONS = ("spacing", "miss_stall", "dependency", "agi", "flags", "explicit_dep", "x87_serial", "resource",
                  "outstanding_limit", "l1_port", "core_busy", "not_picked", "branch_penalty", "done",
-                 "decode", "icache_miss", "store_interlock", "stub_call")
+                 "decode", "icache_miss", "store_interlock", "stub_call", "nr_store")
 
 
 def _vector_access(insn):
@@ -60,6 +60,7 @@ class CtxState(object):
         self.last_issue_cycle = None
         self.max_done = 0
         self.last_store_issue = -10 ** 9
+        self.stall_reason = None
         self.decode_until = 0
         self.fetch_checked = -1
         self.prev_ret_target = {}
@@ -285,8 +286,7 @@ class CoreSim(object):
             if ev.lines and stub.get("model") in ("memcpy", "memmove", "memset"):
                 self.mem.commit_demand(ev.lines, now, False, stub.get("model") == "memset")
             done = now + cost
-            cs.stall_until = max(cs.stall_until, done)
-            cs.stalls["stub_call"] += cost
+            self._stall(cs, done, "stub_call")
             self.assume("calls that leave the region are costed stubs: the calling context stalls for the declared cycles; the callee's own cache and resource use is not modeled (mem* stubs touch their lines)")
         elif cls in ("prefetch_l1", "prefetch_l2"):
             if ev.lines:
@@ -305,7 +305,7 @@ class CoreSim(object):
             self.gather_free_at = max(self.gather_free_at, now) + per * n
             done = now + first + per * (n - 1) + extra
             if extra and self.miss_stalls:
-                cs.stall_until = max(cs.stall_until, done)
+                self._stall(cs, done, "miss_stall")
             if insn.mask is not None:
                 # the completion mask is readable long before the data (S6-03 gather_all.rt 7 vs .lat 15)
                 cs.reg_ready[insn.mask.base] = now + self._param("latency.gather_mask_cycles") + (per * (n - 1) if n > 1 else 0)
@@ -356,11 +356,11 @@ class CoreSim(object):
                 if ngo:
                     stall = self._param("store.nr_stall_cycles_resident") if level in ("l1", "l2") else self._param("store.nr_stall_cycles_memory")
                     self.nr_store_free_at = now + self._param("store.nr_occupancy_core_cycles")
-                    cs.stall_until = max(cs.stall_until, now + stall)
+                    self._stall(cs, now + stall, "nr_store")
                     done = now + stall
                     self.assume("no-read stores stall their context for the measured per-line cost and occupy a shared store path (S6-03 store_stream rows)")
                 elif level != "l1" and self._param("l1.store_miss_stalls_context"):
-                    cs.stall_until = max(cs.stall_until, ready)
+                    self._stall(cs, ready, "miss_stall")
                     done = ready
             else:
                 if insn.folded_load:
@@ -370,7 +370,7 @@ class CoreSim(object):
                     if fwd > now:
                         done = max(done, fwd + base_lat)
                     if level != "l1" and self.miss_stalls:
-                        cs.stall_until = max(cs.stall_until, ready - l1lat)
+                        self._stall(cs, ready - l1lat, "miss_stall")
                 elif cls == "scalar_rmw":
                     alu = self._param("latency.scalar_alu")
                     done = ready + alu
@@ -393,14 +393,15 @@ class CoreSim(object):
                         if occ:
                             self.x87_free_at = max(self.x87_free_at, start) + self._param(occ)
                     if self._param("x87.mem_operand_serializes"):
-                        cs.stall_until = max(cs.stall_until, done)
-                        cs.stalls["x87_serial"] += max(0, done - now - self.gap)
+                        if level != "l1" and self.miss_stalls:
+                            self._stall(cs, ready, "miss_stall")
+                        self._stall(cs, done, "x87_serial")
                     elif level != "l1" and self.miss_stalls:
-                        cs.stall_until = max(cs.stall_until, ready)
+                        self._stall(cs, ready, "miss_stall")
                 else:
                     done = ready + self._extend_extra(insn)
                     if level != "l1" and self.miss_stalls:
-                        cs.stall_until = max(cs.stall_until, ready)
+                        self._stall(cs, ready, "miss_stall")
                     if insn.is_store:
                         for la in ev.lines:
                             self.mem.line_store_ready[la] = done
@@ -417,6 +418,8 @@ class CoreSim(object):
                 continue
             cs.reg_ready[r] = done
             cs.reg_written_at[r] = now
+        if getattr(insn, "sets_mxcsr", False):
+            cs.reg_ready["mxcsr"] = max(cs.reg_ready.get("mxcsr", 0), done)   # stmxcsr waits for the flags of every earlier FP op
         if insn.flags_w:
             if cls in ("scalar_alu", "scalar_imul", "mask_op", "x87_compare"):
                 cs.flags_ready = now + (self.latency_of(insn, ev) or 1)
@@ -451,6 +454,14 @@ class CoreSim(object):
         stream = self.kernel.stream_for(cs.ctx)
         tgt = stream.labels.get(insn.target)
         return tgt is None or tgt > insn.index
+
+    def _stall(self, cs, until, reason):
+        """Hold the context until `until`; the stall cycles are attributed to `reason` (the latest, longest cause wins)."""
+        if until > cs.stall_until:
+            cs.stall_until = until
+            cs.stall_reason = reason
+        elif until > self.cycle and cs.stall_reason is None:
+            cs.stall_reason = reason
 
     def _mispredicted(self, cs, ev):
         t = self.branch_sc["type"]
@@ -528,7 +539,7 @@ class CoreSim(object):
         for la in miss:
             self.icache.insert(la, now + self.icache_latency)
         self.frontend_stats["icache_misses"] += len(miss)
-        cs.stall_until = max(cs.stall_until, now + self.icache_latency)
+        self._stall(cs, now + self.icache_latency, "icache_miss")
         return False
 
     # --------------------------------------------------------------------------------------------
@@ -558,7 +569,7 @@ class CoreSim(object):
                 if c.done:
                     continue
                 if c.stall_until > now:
-                    c.stalls["miss_stall"] += 1
+                    c.stalls[c.stall_reason or "miss_stall"] += 1
                     continue
                 if c.next_issue > now:
                     c.stalls["spacing"] += 1

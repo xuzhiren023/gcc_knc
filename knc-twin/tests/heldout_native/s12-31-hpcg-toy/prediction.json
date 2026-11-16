@@ -1,6 +1,6 @@
 {
   "case": "s12-31-hpcg-toy",
-  "engine_version": "0.3.0",
+  "engine_version": "0.3.1",
   "profile_hash": "2058f0ec2d803051ea99b503bb10920e40ea33e9f84f19ea060727bc6aa3e468",
   "scenario": "arrays resident in L2 (touched by the preceding run), output vector in L1, default memory sub-models, branches predicted from their history",
   "unit": "the bench's timed call (SpMV: two passes; SymGS: one call)",
@@ -22,12 +22,12 @@
       ],
       "limiting": [
         {
-          "constraint": "miss_stall",
-          "context_cycles": 243536
+          "constraint": "x87_serial",
+          "context_cycles": 175248
         },
         {
-          "constraint": "x87_serial",
-          "context_cycles": 136332
+          "constraint": "spacing",
+          "context_cycles": 124570
         }
       ],
       "memory_submodels": [
@@ -56,12 +56,12 @@
       ],
       "limiting": [
         {
-          "constraint": "miss_stall",
-          "context_cycles": 243534
+          "constraint": "x87_serial",
+          "context_cycles": 175248
         },
         {
-          "constraint": "x87_serial",
-          "context_cycles": 136332
+          "constraint": "spacing",
+          "context_cycles": 125594
         }
       ],
       "memory_submodels": [
@@ -90,12 +90,12 @@
       ],
       "limiting": [
         {
-          "constraint": "miss_stall",
-          "context_cycles": 243544
+          "constraint": "x87_serial",
+          "context_cycles": 175248
         },
         {
-          "constraint": "x87_serial",
-          "context_cycles": 136332
+          "constraint": "spacing",
+          "context_cycles": 124570
         }
       ],
       "memory_submodels": [
@@ -124,12 +124,12 @@
       ],
       "limiting": [
         {
-          "constraint": "miss_stall",
-          "context_cycles": 243544
+          "constraint": "x87_serial",
+          "context_cycles": 175248
         },
         {
-          "constraint": "x87_serial",
-          "context_cycles": 136332
+          "constraint": "spacing",
+          "context_cycles": 125594
         }
       ],
       "memory_submodels": [
@@ -158,12 +158,12 @@
       ],
       "limiting": [
         {
-          "constraint": "miss_stall",
-          "context_cycles": 243547
+          "constraint": "x87_serial",
+          "context_cycles": 175248
         },
         {
-          "constraint": "x87_serial",
-          "context_cycles": 136332
+          "constraint": "spacing",
+          "context_cycles": 123544
         }
       ],
       "memory_submodels": [
@@ -192,12 +192,12 @@
       ],
       "limiting": [
         {
-          "constraint": "miss_stall",
-          "context_cycles": 243546
+          "constraint": "x87_serial",
+          "context_cycles": 175248
         },
         {
-          "constraint": "x87_serial",
-          "context_cycles": 136332
+          "constraint": "spacing",
+          "context_cycles": 124568
         }
       ],
       "memory_submodels": [
@@ -226,12 +226,12 @@
       ],
       "limiting": [
         {
-          "constraint": "miss_stall",
-          "context_cycles": 243564
+          "constraint": "x87_serial",
+          "context_cycles": 175248
         },
         {
-          "constraint": "x87_serial",
-          "context_cycles": 136348
+          "constraint": "spacing",
+          "context_cycles": 102376
         }
       ],
       "memory_submodels": [
@@ -260,12 +260,12 @@
       ],
       "limiting": [
         {
-          "constraint": "miss_stall",
-          "context_cycles": 243568
+          "constraint": "x87_serial",
+          "context_cycles": 175248
         },
         {
-          "constraint": "x87_serial",
-          "context_cycles": 136348
+          "constraint": "spacing",
+          "context_cycles": 101350
         }
       ],
       "memory_submodels": [
@@ -294,12 +294,12 @@
       ],
       "limiting": [
         {
-          "constraint": "miss_stall",
-          "context_cycles": 243041
+          "constraint": "x87_serial",
+          "context_cycles": 153519
         },
         {
-          "constraint": "x87_serial",
-          "context_cycles": 137649
+          "constraint": "spacing",
+          "context_cycles": 128836
         }
       ],
       "memory_submodels": [
@@ -328,12 +328,12 @@
       ],
       "limiting": [
         {
-          "constraint": "miss_stall",
-          "context_cycles": 243041
+          "constraint": "x87_serial",
+          "context_cycles": 153519
         },
         {
-          "constraint": "x87_serial",
-          "context_cycles": 137649
+          "constraint": "spacing",
+          "context_cycles": 128837
         }
       ],
       "memory_submodels": [
@@ -362,12 +362,12 @@
       ],
       "limiting": [
         {
-          "constraint": "miss_stall",
-          "context_cycles": 241721
+          "constraint": "x87_serial",
+          "context_cycles": 153215
         },
         {
-          "constraint": "x87_serial",
-          "context_cycles": 137041
+          "constraint": "spacing",
+          "context_cycles": 127941
         }
       ],
       "memory_submodels": [
@@ -396,12 +396,12 @@
       ],
       "limiting": [
         {
-          "constraint": "miss_stall",
-          "context_cycles": 241729
+          "constraint": "x87_serial",
+          "context_cycles": 153215
         },
         {
-          "constraint": "x87_serial",
-          "context_cycles": 137041
+          "constraint": "spacing",
+          "context_cycles": 128454
         }
       ],
       "memory_submodels": [
@@ -430,12 +430,12 @@
       ],
       "limiting": [
         {
-          "constraint": "miss_stall",
-          "context_cycles": 241733
+          "constraint": "x87_serial",
+          "context_cycles": 153215
         },
         {
-          "constraint": "x87_serial",
-          "context_cycles": 137041
+          "constraint": "spacing",
+          "context_cycles": 126915
         }
       ],
       "memory_submodels": [
@@ -464,12 +464,12 @@
       ],
       "limiting": [
         {
-          "constraint": "miss_stall",
-          "context_cycles": 241731
+          "constraint": "x87_serial",
+          "context_cycles": 153215
         },
         {
-          "constraint": "x87_serial",
-          "context_cycles": 137041
+          "constraint": "spacing",
+          "context_cycles": 127941
         }
       ],
       "memory_submodels": [
@@ -498,12 +498,12 @@
       ],
       "limiting": [
         {
-          "constraint": "miss_stall",
-          "context_cycles": 241737
+          "constraint": "x87_serial",
+          "context_cycles": 153215
         },
         {
-          "constraint": "x87_serial",
-          "context_cycles": 137041
+          "constraint": "spacing",
+          "context_cycles": 105622
         }
       ],
       "memory_submodels": [
@@ -532,12 +532,12 @@
       ],
       "limiting": [
         {
-          "constraint": "miss_stall",
-          "context_cycles": 241749
+          "constraint": "x87_serial",
+          "context_cycles": 153215
         },
         {
-          "constraint": "x87_serial",
-          "context_cycles": 137041
+          "constraint": "spacing",
+          "context_cycles": 104596
         }
       ],
       "memory_submodels": [

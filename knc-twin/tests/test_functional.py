@@ -156,7 +156,7 @@ class TestChecksAndRejections(unittest.TestCase):
         self.assertIn("no default cost", str(cm.exception))
 
     def test_timing_only_instruction_rejected_in_functional(self):
-        k = kernel([{"op": "vrcp23ps", "ops": ["zmm0", "zmm1"]}])
+        k = kernel([{"op": "vlog2ps", "ops": ["zmm0", "zmm1"]}])
         with self.assertRaises(Unsupported):
             run(k)
 

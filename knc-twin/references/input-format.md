@@ -143,6 +143,7 @@ reloads, scatter completion and flag effects are kept as emitted.
 - `mask`: write mask with merge semantics; on gathers/scatters it is the completion mask (cleared).
 - `width`: 8, 16, 32 or 64 for scalar memory forms with no register to imply it.
 - `encoding`: optional hints (`bytes`, `disp32`, `disp`, `imm`) for the pairing rules.
+- `sae`: true when the instruction suppresses its exception flags (`{sae}`); `rounding` and `sae` are independent.
 - `deps`: extra explicit dependencies on earlier ids.
 - `addr {start, stride}` and `lines`: address descriptions for static traces (below).
 - Symbolic immediates: `{"imm": 8, "imm_symbol": ".LC0"}` (the symbol's address from
@@ -160,7 +161,8 @@ comments, ignored directives (`.text`, `.globl`, `.p2align`, `.type`, `.size`, `
 `.section`, `.file`, `.loc`), mnemonics with `q`/`l`/`w`/`b` size suffixes on scalar ops,
 operands `%reg`, `$imm`, `disp(%base,%index,scale)` with displacement expressions such as
 `4+0(%rsi)`, `symbol(%rip)`, `%st`/`%st(i)`, a write mask `{%k1}`, rounding `{rn}`/`{rd}`/
-`{ru}`/`{rz}`, swizzles `{cdab}`..., `{1to16}`/`{4to16}`/`{1to8}`/`{4to8}` and `{float16}`/
+`{ru}`/`{rz}`, `{sae}` and `{rn-sae}`... (suppress exception flags; also as a standalone first operand, as the
+compiler writes `vgetmantps {sae}, $5, %zmm1, %zmm0` and `vscaleps {ru}, ...`), swizzles `{cdab}`..., `{1to16}`/`{4to16}`/`{1to8}`/`{4to8}` and `{float16}`/
 `{uint8}`/`{sint8}`/`{uint16}`/`{sint16}` on a memory operand (up-conversion) or on a store's
 register source (down-conversion), `lock` with add/sub/and/or/xor/inc/dec/xadd/cmpxchg/xchg,
 `rep ret`, `call label`, `ret`, `$symbol+disp` immediates, `symbol@gottpoff(%rip)`,

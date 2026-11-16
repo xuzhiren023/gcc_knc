@@ -1,12 +1,17 @@
-# Test results, knc-twin 0.3.0
+# Test results, knc-twin 0.3.1
 
 Status on 2026-11-16 (host: Windows 10, Python 3.8.5). Model tests plus checks against independent
 oracles; they are not validation against hardware (that is `references/validation.md`).
 
 ## Runs on the final engine (2026-11-16)
 
-- `python scripts/knc_twin.py selftest`: 137 tests, 0 failures, 0 errors (test_fp 14, test_functional 13,
-  test_asm 4, test_bounds 9, test_timing 24, test_extended 19, test_cli 14, test_v03 40).
+- `python scripts/knc_twin.py selftest` (0.3.1): 154 tests, 0 failures, 0 errors (test_fp 14, test_functional 13,
+  test_asm 4, test_bounds 9, test_timing 24, test_extended 19, test_cli 14, test_v03 42, test_wrf_forms 15).
+  test_wrf_forms checks the IMCI forms PhiWeather's WRF loops use against the R27 operation descriptions:
+  exponent and mantissa extraction (intervals, sign control, denormals, specials), scaling with rounding
+  overrides and range, vgmax/vgmin NaN and signed-zero rules, named integer predicates and blend, MXCSR
+  contents and flag accumulation with {sae} suppression, x87 memory compares, the approximate reciprocals'
+  special values and marking, the fix-up token table.
 - `examples/run_examples.py` (`examples/RESULTS.md`): 41 commands, 34 ok and 7 with the intended non-ok
   status and exit code (functional_mismatch 6, needs_parameters 7, unsupported 3, missing_parameter 4 twice,
   budget_exhausted 5, incompatible 8). New examples: HPCG ComputeSPMV_ref from the linked S12-31 binary,

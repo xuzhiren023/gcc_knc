@@ -186,7 +186,7 @@ class TestCallsAndStubs(unittest.TestCase):
         self.assertEqual(lanes[0] | (lanes[1] << 32), 0x3FF6A09E667F3BCD)   # sqrt(2) correctly rounded
         self.assertEqual(interp.approximate_stubs, set())
         res, sim, _ = simulate(k)
-        self.assertGreaterEqual(res["per_context"]["0"]["stall_cycles"]["stub_call"], 10 + 8 + 70)
+        self.assertGreaterEqual(res["per_context"]["0"]["stall_cycles"]["stub_call"], 10 + 8 + 70 - 3)   # stall cycles exclude the issue cycles themselves
 
 
 class TestInputBinding(unittest.TestCase):
@@ -417,3 +417,30 @@ class TestRollupAndBar(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class TestDefectsReportedByPhiWeather(unittest.TestCase):
+    """Study of 13 WRF routines, 2026-11-16 (STUDY.md section 9)."""
+
+    def test_cold_level_l2_is_an_l2_fill_not_a_memory_fill(self):
+        recs = [{"op": "vmovaps", "ops": ["zmm%d" % (i % 8), {"base": "rax", "disp": 64 * i}], "id": "ld%d" % i} for i in range(8)]
+        base = {"registers": {"rax": "0x100000"}}
+        off = {"tlb": "off", "hardware_prefetcher": "off", "memory_service": "unlimited"}
+        mem = simulate(kernel(recs, init=base, memory_default=0, scenario={"memory": dict({"type": "line_tracking", "cold_level": "memory"}, **off)}))[0]
+        l2 = simulate(kernel(recs, init=base, memory_default=0, scenario={"memory": dict({"type": "line_tracking", "cold_level": "l2"}, **off)}))[0]
+        self.assertLess(l2["completion_cycles"], mem["completion_cycles"] / 3)
+        self.assertEqual(l2["memory"]["stats"]["memory"], 0)
+        self.assertEqual(l2["memory"]["stats"]["cold_l2_fills"], 8)
+
+    def test_context_stalls_are_attributed_to_their_cause(self):
+        text = "fldz\n" + "fmull 0(%rsi)\n" * 8 + "fstp %st(0)"
+        k = asm_kernel(text, init={"registers": {"rsi": "0x1000"}, "memory": [{"addr": "0x1000", "f64": [1.5]}]},
+                       scenario={"memory": {"type": "fixed_level", "level": "l1"}})
+        res, sim, _ = simulate(k)
+        st = res["per_context"]["0"]["stall_cycles"]
+        self.assertGreater(st.get("x87_serial", 0), 0)
+        self.assertEqual(st.get("miss_stall", 0), 0, "no cache miss: nothing is attributed to miss_stall")
+        k2 = asm_kernel("call helper\nret", entry="function", calls={"helper": {"model": "none", "cycles": 50}})
+        st2 = simulate(k2)[0]["per_context"]["0"]["stall_cycles"]
+        self.assertGreaterEqual(st2.get("stub_call", 0), 48)
+        self.assertEqual(st2.get("miss_stall", 0), 0)

@@ -315,7 +315,10 @@ def _simulate_core(kernel, prof, args, r):
             pred["stub_calls"] = {n: {"calls": c, "cycles_each": kernel.calls[n].get("cycles"), "model": kernel.calls[n].get("model", "none"),
                                       "status": kernel.calls[n].get("status", "assumed"), "source": kernel.calls[n].get("source")}
                                   for n, c in sorted(interp.stub_calls.items())}
-        pred["functional_exactness"] = "exact" if not interp.approximate_stubs else "approximate: stub(s) %s are not bit-exact" % ", ".join(sorted(interp.approximate_stubs))
+        approx = sorted(interp.approximate_stubs) + sorted(interp.approximate_instructions)
+        pred["functional_exactness"] = "exact" if not approx else "approximate: %s are not bit-exact (stub or approximate instruction)" % ", ".join(approx)
+        if interp.approximate_instructions:
+            pred["approximate_instructions"] = sorted(interp.approximate_instructions)
     pred["result_class"] = memory_result_class("simulate", kernel, prof, res["memory"].get("stats"), kernel.scenario)
     if interp is not None and interp.stub_calls and pred["result_class"]["class"] == "calibrated_forecast":
         pred["result_class"] = {"class": "unvalidated_scenario_estimate", "reasons": ["the region calls costed stubs (%s): their cycles are inputs, not validated model output" % ", ".join(sorted(interp.stub_calls))]}
@@ -403,7 +406,7 @@ def cmd_bounds(args):
                     body_events = None
             res = bmod.loop_bounds(kernel, prof, assume, body_events)
             r["prediction"] = res
-            r["message"] = "loop lower bound: MII %d cycles/iteration (ResMII %d, RecMII %s), one-iteration critical path %d cycles; conditional_bound" % (
+            r["message"] = "loop lower bound over the STATIC body (every instruction of the loop body once, both arms of a branch): MII %d cycles/iteration (ResMII %d, RecMII %s), one-iteration critical path %d cycles; conditional_bound" % (
                 res["mii_cycles_per_iteration"], res["res_mii"], res["rec_mii"], res["iteration_critical_path_cycles"])
         else:
             traces = _select_contexts(kernel, _traces_for(kernel, args, r), args)

@@ -177,11 +177,22 @@ policy, compares to masks, blends, conversions (dq<->ps, pd->dq, ps<->pd, round)
 swizzles, broadcasts, up/down conversions (float16/uint8/sint8/uint16/sint16), masked loads
 and stores (merge semantics: IMCI has no zeroing masks), vloadunpack/vpackstore halves with the
 64-byte boundary rule, dword/qword gather and scatter with completion masks, `vpermd`,
-`vpermf32x4`, and the x87 stack. Python floats are never used as the IMCI implementation; see
+`vpermf32x4`, `vgetexpps/pd`, `vgetmantps/pd` (intervals and sign control), `vscaleps`, `vgmaxps/pd`,
+`vgminps/pd` (R27 FpMax/FpMin: NaN yields the other operand), the full `vpcmpd`/`vpcmpud` predicate
+family, `vpblendmd/q`, `vfixupnanps/pd`, `stmxcsr`, and the x87 stack including `fcoms/fcoml/fcomps/fcompl`
+(0.3.1, for PhiWeather's WRF loops). MXCSR is modeled: rounding mode, FTZ and DAZ from the numerical
+policy, all exceptions masked, and the sticky flags (invalid, denormal, zero-divide, overflow,
+underflow, inexact) that each vector FP instruction's active lanes raise unless it carries `{sae}`;
+`stmxcsr` stores it, and the divide/sqrt sequences GCC-KNC emits read its rounding bits from there.
+`vrcp23ps` and `vrsqrt23ps` are APPROXIMATE: the hardware guarantees 0.912 and 0.775 ulp (R27
+pp.577, 588), not a bit pattern, so the twin substitutes the correctly rounded value with the
+manual's special-value and flag behaviour and marks every result that depends on them
+(`functional_exactness`, `approximate_instructions`); the calibration plan captures the hardware
+tables that make them exact. Python floats are never used as the IMCI implementation; see
 `fp.py`. NaN propagation follows the x86 first-operand rule (assumed); default NaN is the x86
-real indefinite. Timing-only instructions (approximations, `vcvtfxpntpd2*` are exact now;
-`vrcp23ps`, `vrsqrt23ps`, `vlog2ps`, `vexp223ps`, `vscaleps`) make `functional` fail with
-`unsupported` and are only usable in static traces.
+real indefinite. Timing-only instructions (`vlog2ps`, `vexp223ps`) make `functional` fail with
+`unsupported` and are only usable in static traces; `vmaxps/vminps/vmaxpd/vminpd` are not IMCI
+instructions and are rejected.
 
 ## What this is not
 

@@ -3,7 +3,7 @@
 Standard-library only. Engine semantics are described in ../../references/.
 """
 
-ENGINE_VERSION = "0.3.0"
+ENGINE_VERSION = "0.3.1"
 KERNEL_SCHEMA = "knc-twin.kernel/1"
 PROFILE_SCHEMA = "knc-twin.profile/1"
 RESULT_SCHEMA = "knc-twin.result/1"

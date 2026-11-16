@@ -104,6 +104,35 @@ class Memory(object):
         return {("0x%x" % la): bytes(buf).hex() for la, buf in sorted(self.lines.items())}
 
 
+def _info_flags(info, *args):
+    """Flags of one lane from an fp.* result info dict, plus the invalid flag for an sNaN operand.
+    args: the operand bit patterns followed by the format."""
+    fmt = args[-1]
+    flags = set(info.get("flags", ()))
+    if info.get("invalid"):
+        flags.add("invalid")
+    for b in args[:-1]:
+        if fp.is_snan(b, fmt):
+            flags.add("invalid")
+    return flags
+
+
+def mxcsr_from_policy(pol):
+    """MXCSR as the numerical policy sets it: all exceptions masked (0x1F80), RC from the rounding mode, FZ and DAZ (R27 section 2.4)."""
+    rc = {"rn": 0, "rd": 1, "ru": 2, "rz": 3}[pol["rounding"]]
+    v = 0x1F80 | (rc << 13)
+    if pol.get("ftz"):
+        v |= 1 << 15
+    if pol.get("daz"):
+        v |= 1 << 6
+    return v
+
+
+def round_exact_overflow(fmt, pol, sign):
+    """The overflow result of a huge scaling: inf or the largest finite, by rounding mode (R27 p.591: as vmulps would)."""
+    return fp.round_exact((Fraction(-1) if sign else Fraction(1)) * (Fraction(2) ** 2000), fmt, pol)
+
+
 def lines_of(addr, n):
     if n <= 0:
         return ()
@@ -274,6 +303,7 @@ class Context(object):
         self.ftop = 0
         self.fcw = fcw
         self.fcc = {"C0": 0, "C1": 0, "C2": 0, "C3": 0}
+        self.mxcsr = 0x1F80
         self.seg_base = {"fs": 0x7E0000000000 + (ctx << 32), "gs": 0x7E8000000000 + (ctx << 32)}
         self.call_depth = 0
 
@@ -328,6 +358,8 @@ class Context(object):
                 self.fcw = parse_int(val, what + ".fcw") & 0xFFFF
             elif n in ("fs_base", "gs_base"):
                 self.seg_base[n[:2]] = mask64(parse_int(val, what + "." + name))
+            elif n == "mxcsr":
+                self.mxcsr = parse_int(val, what + ".mxcsr") & 0xFFFF
             else:
                 raise InvalidInput("%s: unknown register %r" % (what, name))
 
@@ -355,6 +387,7 @@ class Interpreter(object):
         self.steps = {}
         self.stub_calls = {}
         self.approximate_stubs = set()
+        self.approximate_instructions = set()
         self.gather_one_line = kernel.numerical_policy.get("gather_completion", "one_line") == "one_line"
         if any(i.cls in ("vector_gather", "vector_scatter") for s in kernel.streams for i in s.insns):
             if self.gather_one_line:
@@ -393,6 +426,7 @@ class Interpreter(object):
         total = 0
         for stream in self.kernel.streams:
             cx = Context(stream.context, self.kernel.numerical_policy["x87_control_word"])
+            cx.mxcsr = mxcsr_from_policy(self.kernel.numerical_policy)
             cx.apply_init(self.kernel.init.get("registers", {}), "init.registers")
             cx.apply_init(stream.init.get("registers", {}), "streams[%d].init.registers" % stream.context)
             self.contexts[stream.context] = cx
@@ -906,6 +940,265 @@ class Interpreter(object):
         out = [(old[i] + to_signed(a[i], 32) * to_signed(b[i], 32)) & 0xFFFFFFFF for i in range(16)]
         self.merge32(cx, dst, out, self.kmask(cx, insn))
 
+
+    # --- MXCSR and the IMCI special-value instructions (0.3.1) ---------------------------------------
+    MXCSR_FLAG_BITS = {"invalid": 0, "denormal": 1, "zero_divide": 2, "overflow": 3, "underflow": 4, "inexact": 5}
+
+    def _fpflags(self, cx, insn, flags, operands=(), fmt=None):
+        """OR the exception flags of one lane into MXCSR unless the instruction suppresses them ({sae}).
+        A subnormal operand raises the denormal flag when DAZ is off (R27 section 4.1.3)."""
+        if insn.sae:
+            return
+        bits = 0
+        for f in flags or ():
+            b = self.MXCSR_FLAG_BITS.get(f)
+            if b is not None:
+                bits |= 1 << b
+        if fmt is not None and not self.base_policy.daz:
+            for o in operands:
+                if (o & fmt.exp_mask << fmt.mant) == 0 and (o & fmt.mant_mask) != 0:
+                    bits |= 1 << 1
+        cx.mxcsr |= bits
+
+    def _mark_approximate(self, insn):
+        self.approximate_instructions.add(insn.op)
+        self.assume("%s is approximate on the hardware (R27 gives a relative-error bound, not the bit pattern); the twin substitutes the correctly rounded value, "
+                    "so values that depend on its exact bits are not bit-exact (calibration plan: capture the hardware table)" % insn.op)
+
+    def _lanes_in(self, cx, insn, opnd, fmt, trace_mem):
+        elem = 4 if fmt is fp.F32 else 8
+        v = self.vsrc(cx, opnd, insn, trace_mem, elem)
+        return v if fmt is fp.F32 else u32s_to_u64s(v)
+
+    def _lanes_out(self, cx, dst, out, fmt, kbits):
+        if fmt is fp.F32:
+            self.merge32(cx, dst, out, kbits)
+        else:
+            self.merge64(cx, dst, out, kbits & 0xFF)
+
+    def h_vgminmax(self, cx, insn, ev, trace_mem, stream):
+        dst, s1, s2 = insn.operands
+        fmt = self._fmt(insn)
+        pol = self.policy_for(insn)
+        a = self._lanes_in(cx, insn, s1, fmt, trace_mem)
+        b = self._lanes_in(cx, insn, s2, fmt, trace_mem)
+        kbits = self.kmask(cx, insn)
+        want_max = insn.spec["want_max"]
+        out = []
+        for i in range(16 if fmt is fp.F32 else 8):
+            x, y = a[i], b[i]
+            kx, sx, _ = fp.classify(x, fmt, pol)
+            ky, sy, _ = fp.classify(y, fmt, pol)
+            if kx == fp.ZERO and ky == fp.ZERO and sx != sy:
+                # FpMax(-0,+0) = B, FpMax(+0,-0) = A; FpMin(-0,+0) = A, FpMin(+0,-0) = B  (R27 pp.337, 345)
+                r = (y if sx else x) if want_max else (x if sx else y)
+            elif kx == fp.NAN and ky == fp.NAN:
+                r = x
+            elif kx == fp.NAN:
+                r = y
+            elif ky == fp.NAN:
+                r = x
+            else:
+                c = fp.fcompare(x, y, fmt, pol)
+                if want_max:
+                    r = x if c in ("gt", "eq") else y
+                else:
+                    r = x if c == "lt" else y
+            if (kx == fp.NAN and fp.is_snan(x, fmt)) or (ky == fp.NAN and fp.is_snan(y, fmt)):
+                self._fpflags(cx, insn, ["invalid"])
+            out.append(r)
+        self._fpflags(cx, insn, [], [a[i] for i in range(len(out)) if (kbits >> i) & 1] + [b[i] for i in range(len(out)) if (kbits >> i) & 1], fmt)
+        self._lanes_out(cx, dst, out, fmt, kbits)
+        ev.mask_bits = kbits
+
+    def h_vgetexp(self, cx, insn, ev, trace_mem, stream):
+        dst, src = insn.operands
+        fmt = self._fmt(insn)
+        pol = self.policy_for(insn)
+        a = self._lanes_in(cx, insn, src, fmt, trace_mem)
+        kbits = self.kmask(cx, insn)
+        out = []
+        for i in range(16 if fmt is fp.F32 else 8):
+            x = a[i]
+            k, s, v = fp.classify(x, fmt, pol)
+            if k == fp.NAN:
+                if fp.is_snan(x, fmt):
+                    self._fpflags(cx, insn, ["invalid"])
+                out.append(fp.quiet(x, fmt))
+            elif k == fp.INF:
+                out.append(fmt.inf)
+            elif k == fp.ZERO:
+                out.append(fmt.inf | fmt.sign_bit)
+            else:
+                e = fp._floor_log2(abs(v))          # unbiased exponent of the normalized value (denormals normalized)
+                out.append(fp.round_exact(Fraction(e), fmt, pol)[0])
+        self._fpflags(cx, insn, [], [a[i] for i in range(len(out)) if (kbits >> i) & 1], fmt)
+        self._lanes_out(cx, dst, out, fmt, kbits)
+        ev.mask_bits = kbits
+
+    def h_vgetmant(self, cx, insn, ev, trace_mem, stream):
+        dst, src, imm = insn.operands
+        fmt = self._fmt(insn)
+        pol = self.policy_for(insn)
+        interv, sc = imm.value & 3, (imm.value >> 2) & 3
+        a = self._lanes_in(cx, insn, src, fmt, trace_mem)
+        kbits = self.kmask(cx, insn)
+        out = []
+        for i in range(16 if fmt is fp.F32 else 8):
+            x = a[i]
+            k, s, v = fp.classify(x, fmt, pol)
+            sign = 0 if (sc & 1) else s
+            if k == fp.NAN:
+                if fp.is_snan(x, fmt):
+                    self._fpflags(cx, insn, ["invalid"])
+                out.append(fp.quiet(x, fmt))
+                continue
+            if (sc & 2) and s:
+                self._fpflags(cx, insn, ["invalid"])
+                out.append(fmt.default_nan)
+                continue
+            if k == fp.INF:
+                out.append(fmt.inf | (fmt.sign_bit if sign else 0))
+                continue
+            if k == fp.ZERO:
+                out.append(fmt.sign_bit if sign else 0)
+                continue
+            # normalized significand: v = m * 2^e with 1 <= m < 2 (denormals are normalized here)
+            e = fp._floor_log2(abs(v))
+            m = abs(v) / (Fraction(2) ** e)
+            mant_bits = int((m - 1) * (1 << fmt.mant))     # exact: m has at most fmt.mant fraction bits
+            odd = e & 1
+            if interv == 2 or (interv == 1 and odd) or (interv == 3 and (mant_bits >> (fmt.mant - 1)) & 1):
+                exp_field = fmt.bias - 1       # [1/2,1)
+            else:
+                exp_field = fmt.bias           # [1,2)
+            out.append((fmt.sign_bit if sign else 0) | (exp_field << fmt.mant) | mant_bits)
+        self._fpflags(cx, insn, [], [a[i] for i in range(len(out)) if (kbits >> i) & 1], fmt)
+        self._lanes_out(cx, dst, out, fmt, kbits)
+        ev.mask_bits = kbits
+
+    def h_vscale(self, cx, insn, ev, trace_mem, stream):
+        dst, s1, s2 = insn.operands
+        fmt = fp.F32
+        pol = self.policy_for(insn)
+        a = self.vsrc(cx, s1, insn, trace_mem, 4)
+        kv = self.vsrc(cx, s2, insn, trace_mem, 4, target_float=False)
+        kbits = self.kmask(cx, insn)
+        out = []
+        for i in range(16):
+            x = a[i]
+            k, s, v = fp.classify(x, fmt, pol)
+            n = to_signed(kv[i], 32)
+            if k == fp.NAN:
+                if fp.is_snan(x, fmt):
+                    self._fpflags(cx, insn, ["invalid"])
+                out.append(fp.quiet(x, fmt))
+                continue
+            if k in (fp.INF, fp.ZERO):
+                out.append(x)
+                continue
+            if n > 400:
+                bits, flags = round_exact_overflow(fmt, pol, s)
+            elif n < -400:
+                bits, flags = fp.round_exact(Fraction(1 if not s else -1, 1 << 2000), fmt, pol)
+            else:
+                bits, flags = fp.round_exact(v * (Fraction(2) ** n), fmt, pol)
+            self._fpflags(cx, insn, flags)
+            out.append(bits)
+        self._fpflags(cx, insn, [], [a[i] for i in range(16) if (kbits >> i) & 1], fmt)
+        self.merge32(cx, dst, out, kbits)
+        ev.mask_bits = kbits
+
+    def _recip_like(self, cx, insn, ev, trace_mem, stream, rsqrt):
+        dst, src = insn.operands
+        fmt = fp.F32
+        pol = fp.Policy("rn", False, False, "tiny")
+        a = self.vsrc(cx, src, insn, trace_mem, 4)
+        kbits = self.kmask(cx, insn)
+        self._mark_approximate(insn)
+        out = []
+        for i in range(16):
+            x = a[i]
+            k, s, v = fp.classify(x, fmt, pol)
+            if k == fp.NUM and ((x >> fmt.mant) & fmt.exp_mask) == 0:
+                k, v = fp.ZERO, None      # both instructions treat input denormals as zeros (R27 pp.577, 588)
+            if k == fp.NAN:
+                if fp.is_snan(x, fmt):
+                    self._fpflags(cx, insn, ["invalid"])
+                out.append(fp.quiet(x, fmt))
+            elif k == fp.ZERO:
+                if rsqrt and s:
+                    self._fpflags(cx, insn, ["zero_divide"])   # -0: -inf and #Z per the project reading of Table 6.29 (knc-div-sqrt.md)
+                    out.append(fmt.inf | fmt.sign_bit)
+                else:
+                    self._fpflags(cx, insn, ["zero_divide"])
+                    out.append(fmt.inf | (fmt.sign_bit if s else 0))
+            elif k == fp.INF:
+                if rsqrt and s:
+                    self._fpflags(cx, insn, ["invalid"])
+                    out.append(fmt.default_nan)
+                else:
+                    out.append(fmt.sign_bit if s else 0)
+            elif rsqrt and s:
+                self._fpflags(cx, insn, ["invalid"])
+                out.append(fmt.default_nan)
+            else:
+                if rsqrt:
+                    r, _ = fp.fsqrt(x, fmt, pol)
+                    kk, _, vv = fp.classify(r, fmt, pol)
+                    bits, flags = fp.round_exact(1 / vv, fmt, pol)
+                else:
+                    bits, flags = fp.round_exact(1 / v, fmt, pol)
+                if "underflow" in flags and not ((bits & ~fmt.sign_bit) == 0):
+                    pass
+                if (bits & ~fmt.sign_bit) and ((bits >> fmt.mant) & fmt.exp_mask) == 0:
+                    bits &= fmt.sign_bit   # tiny results are flushed to zero by these instructions (knc-div-sqrt.md section 1.1)
+                out.append(bits)
+        self.merge32(cx, dst, out, kbits)
+        ev.mask_bits = kbits
+
+    def h_vrcp23(self, cx, insn, ev, trace_mem, stream):
+        return self._recip_like(cx, insn, ev, trace_mem, stream, False)
+
+    def h_vrsqrt23(self, cx, insn, ev, trace_mem, stream):
+        return self._recip_like(cx, insn, ev, trace_mem, stream, True)
+
+    def h_vfixupnan(self, cx, insn, ev, trace_mem, stream):
+        dst, s1, s2 = insn.operands
+        fmt = self._fmt(insn)
+        pol = self.policy_for(insn)
+        a = self._lanes_in(cx, insn, s1, fmt, trace_mem)
+        tbl = self.vsrc(cx, s2, insn, trace_mem, 4, target_float=False)
+        if fmt is fp.F64:
+            tbl = u32s_to_u64s(tbl)
+        kbits = self.kmask(cx, insn)
+        old = cx.zmm[dst.base] if fmt is fp.F32 else u32s_to_u64s(cx.zmm[dst.base])
+        out = []
+        for i in range(16 if fmt is fp.F32 else 8):
+            x = a[i]
+            k, s, v = fp.classify(x, fmt, pol)
+            if k == fp.NAN:
+                if fp.is_snan(x, fmt):
+                    self._fpflags(cx, insn, ["invalid"])
+                out.append(fp.quiet(x, fmt))
+                continue
+            if k == fp.INF:
+                cls = 0 if s else 5
+            elif k == fp.ZERO:
+                cls = 2 if s else 3
+            else:
+                cls = 1 if s else 4
+            token = (tbl[i] >> (3 * cls)) & 7
+            r = {0: old[i], 1: fmt.inf | fmt.sign_bit, 2: fmt.sign_bit, 3: 0, 4: fmt.inf, 5: fmt.default_nan,
+                 6: fmt.max_finite, 7: fmt.max_finite | fmt.sign_bit}[token]
+            out.append(r)
+        self._lanes_out(cx, dst, out, fmt, kbits)
+        ev.mask_bits = kbits
+
+    def h_stmxcsr(self, cx, insn, ev, trace_mem, stream):
+        (dst,) = insn.operands
+        self.mstore(cx, dst, cx.mxcsr, 4, trace_mem)
+
     def h_nop(self, cx, insn, ev, trace_mem, stream):
         return None
 
@@ -996,20 +1289,16 @@ class Interpreter(object):
         out = []
         for i in range(16 if fmt is fp.F32 else 8):
             if opk == "add":
-                r, _ = fp.fadd(a[i], b[i], fmt, pol)
+                r, info = fp.fadd(a[i], b[i], fmt, pol)
             elif opk == "sub":
-                r, _ = fp.fsub(a[i], b[i], fmt, pol)
+                r, info = fp.fsub(a[i], b[i], fmt, pol)
             elif opk == "subr":
-                r, _ = fp.fsub(b[i], a[i], fmt, pol)
-            elif opk == "mul":
-                r, _ = fp.fmul(a[i], b[i], fmt, pol)
-            elif opk == "max":
-                r = self._minmax(a[i], b[i], fmt, pol, True)
+                r, info = fp.fsub(b[i], a[i], fmt, pol)
             else:
-                r = self._minmax(a[i], b[i], fmt, pol, False)
+                r, info = fp.fmul(a[i], b[i], fmt, pol)
+            if (kbits >> i) & 1:
+                self._fpflags(cx, insn, _info_flags(info, a[i], b[i], fmt), [a[i], b[i]], fmt)
             out.append(r)
-        if opk in ("max", "min"):
-            self.assume("vmax/vmin return the second source for NaN or equal operands (x86 SSE rule; assumed for KNC)")
         if fmt is fp.F32:
             self.merge32(cx, dst, out, kbits)
         else:
@@ -1035,11 +1324,21 @@ class Interpreter(object):
                 return b[i], a[i], c[i]
             return b[i], c[i], a[i]
         if fmt is fp.F32:
-            out = [fp.ffma(*pick(i, v1, v2, v3), fmt=fmt, policy=pol, negate_product=negp, negate_c=negc)[0] for i in range(16)]
+            srcs = (v1, v2, v3)
+            lanes = 16
+        else:
+            srcs = (u32s_to_u64s(v1), u32s_to_u64s(v2), u32s_to_u64s(v3))
+            lanes = 8
+        out = []
+        for i in range(lanes):
+            x, y, z = pick(i, *srcs)
+            r, info = fp.ffma(x, y, z, fmt=fmt, policy=pol, negate_product=negp, negate_c=negc)
+            if (kbits >> i) & 1:
+                self._fpflags(cx, insn, _info_flags(info, x, y, z, fmt), [x, y, z], fmt)
+            out.append(r)
+        if fmt is fp.F32:
             self.merge32(cx, o1, out, kbits)
         else:
-            a64, b64, c64 = u32s_to_u64s(v1), u32s_to_u64s(v2), u32s_to_u64s(v3)
-            out = [fp.ffma(*pick(i, a64, b64, c64), fmt=fmt, policy=pol, negate_product=negp, negate_c=negc)[0] for i in range(8)]
             self.merge64(cx, o1, out, kbits & 0xFF)
         ev.mask_bits = kbits
 
@@ -1073,7 +1372,7 @@ class Interpreter(object):
 
     def h_vblendm(self, cx, insn, ev, trace_mem, stream):
         dst, s1, s2 = insn.operands
-        fmt = self._fmt(insn)
+        fmt = fp.F32 if insn.spec.get("fmt") in ("f32", "i32") else fp.F64
         elem = 4 if fmt is fp.F32 else 8
         a = self.vsrc(cx, s1, insn, trace_mem, elem)
         b = self.vsrc(cx, s2, insn, trace_mem, elem)
@@ -1753,11 +2052,18 @@ class Interpreter(object):
                 a_i, b_i = insn.operands[0].index, insn.operands[1].index
                 if a_i != 0:
                     a_i, b_i = b_i, a_i
+            elif spec.get("mem"):
+                a_i, b_i = 0, None
             else:
                 a_i = 0
                 b_i = insn.operands[0].index if insn.operands else 1
             a = cx.fget(a_i, insn)
-            b = cx.fget(b_i, insn)
+            if b_i is None:
+                n = spec["mem_size"]
+                raw, _ = self.mload(cx, insn.operands[0], n, trace_mem)
+                b = fp.convert(raw, fp.F32 if n == 4 else fp.F64, fp.F80)[0]
+            else:
+                b = cx.fget(b_i, insn)
             c = fp.fcompare(a, b, fp.F80)
             if c == "unordered":
                 cc = (1, 1, 1)
@@ -1773,7 +2079,7 @@ class Interpreter(object):
             else:
                 cx.flags["CF"], cx.flags["PF"], cx.flags["ZF"] = cc
                 cx.flags["OF"] = cx.flags["SF"] = 0
-            self._x87_mark(ev, cx, [a_i, b_i], [])
+            self._x87_mark(ev, cx, [a_i] + ([b_i] if b_i is not None else []), [])
             pops = spec.get("pop")
             if pops:
                 cx.fpop(insn)

@@ -1,6 +1,6 @@
 {
   "case": "s12-31-microbench",
-  "engine_version": "0.3.0",
+  "engine_version": "0.3.1",
   "profile_hash": "2058f0ec2d803051ea99b503bb10920e40ea33e9f84f19ea060727bc6aa3e468",
   "scenario": "arrays warm in L1, default memory sub-models, branches predicted from their history",
   "unit": "one 27-product row (27 inner iterations plus the outer loop step)",
@@ -28,7 +28,7 @@
           "context_cycles": 1246
         },
         {
-          "constraint": "miss_stall",
+          "constraint": "x87_serial",
           "context_cycles": 1080
         }
       ],
@@ -64,7 +64,7 @@
           "context_cycles": 1253
         },
         {
-          "constraint": "miss_stall",
+          "constraint": "x87_serial",
           "context_cycles": 1080
         }
       ],
@@ -100,7 +100,7 @@
           "context_cycles": 1252
         },
         {
-          "constraint": "miss_stall",
+          "constraint": "x87_serial",
           "context_cycles": 1080
         }
       ],
@@ -136,7 +136,7 @@
           "context_cycles": 1251
         },
         {
-          "constraint": "miss_stall",
+          "constraint": "x87_serial",
           "context_cycles": 1080
         }
       ],
@@ -172,7 +172,7 @@
           "context_cycles": 1250
         },
         {
-          "constraint": "miss_stall",
+          "constraint": "x87_serial",
           "context_cycles": 1080
         }
       ],
@@ -208,7 +208,7 @@
           "context_cycles": 1249
         },
         {
-          "constraint": "miss_stall",
+          "constraint": "x87_serial",
           "context_cycles": 1080
         }
       ],
@@ -244,7 +244,7 @@
           "context_cycles": 1248
         },
         {
-          "constraint": "miss_stall",
+          "constraint": "x87_serial",
           "context_cycles": 1080
         }
       ],
@@ -280,7 +280,7 @@
           "context_cycles": 1247
         },
         {
-          "constraint": "miss_stall",
+          "constraint": "x87_serial",
           "context_cycles": 1080
         }
       ],
@@ -316,7 +316,7 @@
           "context_cycles": 1246
         },
         {
-          "constraint": "miss_stall",
+          "constraint": "x87_serial",
           "context_cycles": 1080
         }
       ],
@@ -352,7 +352,7 @@
           "context_cycles": 1245
         },
         {
-          "constraint": "miss_stall",
+          "constraint": "x87_serial",
           "context_cycles": 1080
         }
       ],
@@ -388,7 +388,7 @@
           "context_cycles": 1244
         },
         {
-          "constraint": "miss_stall",
+          "constraint": "x87_serial",
           "context_cycles": 1080
         }
       ],
@@ -424,7 +424,7 @@
           "context_cycles": 1243
         },
         {
-          "constraint": "miss_stall",
+          "constraint": "x87_serial",
           "context_cycles": 1080
         }
       ],
@@ -460,7 +460,7 @@
           "context_cycles": 1242
         },
         {
-          "constraint": "miss_stall",
+          "constraint": "x87_serial",
           "context_cycles": 1080
         }
       ],
@@ -496,7 +496,7 @@
           "context_cycles": 1241
         },
         {
-          "constraint": "miss_stall",
+          "constraint": "x87_serial",
           "context_cycles": 1080
         }
       ],
@@ -532,7 +532,7 @@
           "context_cycles": 1240
         },
         {
-          "constraint": "miss_stall",
+          "constraint": "x87_serial",
           "context_cycles": 1080
         }
       ],
@@ -568,7 +568,7 @@
           "context_cycles": 1239
         },
         {
-          "constraint": "miss_stall",
+          "constraint": "x87_serial",
           "context_cycles": 1080
         }
       ],
@@ -604,7 +604,7 @@
           "context_cycles": 1246
         },
         {
-          "constraint": "miss_stall",
+          "constraint": "x87_serial",
           "context_cycles": 1080
         }
       ],
@@ -640,7 +640,7 @@
           "context_cycles": 1253
         },
         {
-          "constraint": "miss_stall",
+          "constraint": "x87_serial",
           "context_cycles": 1080
         }
       ],
@@ -676,7 +676,7 @@
           "context_cycles": 1260
         },
         {
-          "constraint": "miss_stall",
+          "constraint": "x87_serial",
           "context_cycles": 1080
         }
       ],
@@ -712,7 +712,7 @@
           "context_cycles": 1267
         },
         {
-          "constraint": "miss_stall",
+          "constraint": "x87_serial",
           "context_cycles": 1080
         }
       ],
@@ -748,7 +748,7 @@
           "context_cycles": 1274
         },
         {
-          "constraint": "miss_stall",
+          "constraint": "x87_serial",
           "context_cycles": 1080
         }
       ],
@@ -784,7 +784,7 @@
           "context_cycles": 1281
         },
         {
-          "constraint": "miss_stall",
+          "constraint": "x87_serial",
           "context_cycles": 1080
         }
       ],
@@ -820,7 +820,7 @@
           "context_cycles": 1288
         },
         {
-          "constraint": "miss_stall",
+          "constraint": "x87_serial",
           "context_cycles": 1080
         }
       ],
@@ -856,7 +856,7 @@
           "context_cycles": 1295
         },
         {
-          "constraint": "miss_stall",
+          "constraint": "x87_serial",
           "context_cycles": 1080
         }
       ],
@@ -892,7 +892,7 @@
           "context_cycles": 1302
         },
         {
-          "constraint": "miss_stall",
+          "constraint": "x87_serial",
           "context_cycles": 1080
         }
       ],
@@ -928,7 +928,7 @@
           "context_cycles": 1309
         },
         {
-          "constraint": "miss_stall",
+          "constraint": "x87_serial",
           "context_cycles": 1080
         }
       ],
@@ -964,7 +964,7 @@
           "context_cycles": 1316
         },
         {
-          "constraint": "miss_stall",
+          "constraint": "x87_serial",
           "context_cycles": 1080
         }
       ],
@@ -1000,7 +1000,7 @@
           "context_cycles": 1323
         },
         {
-          "constraint": "miss_stall",
+          "constraint": "x87_serial",
           "context_cycles": 1080
         }
       ],
@@ -1036,7 +1036,7 @@
           "context_cycles": 1330
         },
         {
-          "constraint": "miss_stall",
+          "constraint": "x87_serial",
           "context_cycles": 1080
         }
       ],
@@ -1072,7 +1072,7 @@
           "context_cycles": 1337
         },
         {
-          "constraint": "miss_stall",
+          "constraint": "x87_serial",
           "context_cycles": 1080
         }
       ],
@@ -1108,7 +1108,7 @@
           "context_cycles": 1344
         },
         {
-          "constraint": "miss_stall",
+          "constraint": "x87_serial",
           "context_cycles": 1080
         }
       ],
@@ -1144,7 +1144,7 @@
           "context_cycles": 1351
         },
         {
-          "constraint": "miss_stall",
+          "constraint": "x87_serial",
           "context_cycles": 1080
         }
       ],
@@ -1180,7 +1180,7 @@
           "context_cycles": 1246
         },
         {
-          "constraint": "miss_stall",
+          "constraint": "x87_serial",
           "context_cycles": 1080
         }
       ],
@@ -1216,7 +1216,7 @@
           "context_cycles": 1253
         },
         {
-          "constraint": "miss_stall",
+          "constraint": "x87_serial",
           "context_cycles": 1080
         }
       ],
@@ -1252,7 +1252,7 @@
           "context_cycles": 1260
         },
         {
-          "constraint": "miss_stall",
+          "constraint": "x87_serial",
           "context_cycles": 1080
         }
       ],
@@ -1288,7 +1288,7 @@
           "context_cycles": 1251
         },
         {
-          "constraint": "miss_stall",
+          "constraint": "x87_serial",
           "context_cycles": 1080
         }
       ],
@@ -1324,7 +1324,7 @@
           "context_cycles": 1250
         },
         {
-          "constraint": "miss_stall",
+          "constraint": "x87_serial",
           "context_cycles": 1080
         }
       ],
@@ -1360,7 +1360,7 @@
           "context_cycles": 1249
         },
         {
-          "constraint": "miss_stall",
+          "constraint": "x87_serial",
           "context_cycles": 1080
         }
       ],
@@ -1396,7 +1396,7 @@
           "context_cycles": 1256
         },
         {
-          "constraint": "miss_stall",
+          "constraint": "x87_serial",
           "context_cycles": 1080
         }
       ],
@@ -1432,7 +1432,7 @@
           "context_cycles": 1247
         },
         {
-          "constraint": "miss_stall",
+          "constraint": "x87_serial",
           "context_cycles": 1080
         }
       ],
@@ -1468,7 +1468,7 @@
           "context_cycles": 1246
         },
         {
-          "constraint": "miss_stall",
+          "constraint": "x87_serial",
           "context_cycles": 1080
         }
       ],
@@ -1504,7 +1504,7 @@
           "context_cycles": 1253
         },
         {
-          "constraint": "miss_stall",
+          "constraint": "x87_serial",
           "context_cycles": 1080
         }
       ],
@@ -1540,7 +1540,7 @@
           "context_cycles": 1252
         },
         {
-          "constraint": "miss_stall",
+          "constraint": "x87_serial",
           "context_cycles": 1080
         }
       ],
@@ -1576,7 +1576,7 @@
           "context_cycles": 1251
         },
         {
-          "constraint": "miss_stall",
+          "constraint": "x87_serial",
           "context_cycles": 1080
         }
       ],
@@ -1612,7 +1612,7 @@
           "context_cycles": 1250
         },
         {
-          "constraint": "miss_stall",
+          "constraint": "x87_serial",
           "context_cycles": 1080
         }
       ],
@@ -1648,7 +1648,7 @@
           "context_cycles": 1249
         },
         {
-          "constraint": "miss_stall",
+          "constraint": "x87_serial",
           "context_cycles": 1080
         }
       ],
@@ -1684,7 +1684,7 @@
           "context_cycles": 1248
         },
         {
-          "constraint": "miss_stall",
+          "constraint": "x87_serial",
           "context_cycles": 1080
         }
       ],
@@ -1720,7 +1720,7 @@
           "context_cycles": 1247
         },
         {
-          "constraint": "miss_stall",
+          "constraint": "x87_serial",
           "context_cycles": 1080
         }
       ],
@@ -1756,7 +1756,7 @@
           "context_cycles": 1186
         },
         {
-          "constraint": "miss_stall",
+          "constraint": "x87_serial",
           "context_cycles": 1080
         }
       ],
@@ -1792,7 +1792,7 @@
           "context_cycles": 1190
         },
         {
-          "constraint": "miss_stall",
+          "constraint": "x87_serial",
           "context_cycles": 1080
         }
       ],
@@ -1828,7 +1828,7 @@
           "context_cycles": 1194
         },
         {
-          "constraint": "miss_stall",
+          "constraint": "x87_serial",
           "context_cycles": 1080
         }
       ],
@@ -1864,7 +1864,7 @@
           "context_cycles": 1198
         },
         {
-          "constraint": "miss_stall",
+          "constraint": "x87_serial",
           "context_cycles": 1080
         }
       ],
@@ -1900,7 +1900,7 @@
           "context_cycles": 1202
         },
         {
-          "constraint": "miss_stall",
+          "constraint": "x87_serial",
           "context_cycles": 1080
         }
       ],
@@ -1936,7 +1936,7 @@
           "context_cycles": 1206
         },
         {
-          "constraint": "miss_stall",
+          "constraint": "x87_serial",
           "context_cycles": 1080
         }
       ],
@@ -1972,7 +1972,7 @@
           "context_cycles": 1210
         },
         {
-          "constraint": "miss_stall",
+          "constraint": "x87_serial",
           "context_cycles": 1080
         }
       ],
@@ -2008,7 +2008,7 @@
           "context_cycles": 1214
         },
         {
-          "constraint": "miss_stall",
+          "constraint": "x87_serial",
           "context_cycles": 1080
         }
       ],
@@ -2044,7 +2044,7 @@
           "context_cycles": 1218
         },
         {
-          "constraint": "miss_stall",
+          "constraint": "x87_serial",
           "context_cycles": 1080
         }
       ],
@@ -2080,7 +2080,7 @@
           "context_cycles": 1222
         },
         {
-          "constraint": "miss_stall",
+          "constraint": "x87_serial",
           "context_cycles": 1080
         }
       ],
@@ -2116,7 +2116,7 @@
           "context_cycles": 1226
         },
         {
-          "constraint": "miss_stall",
+          "constraint": "x87_serial",
           "context_cycles": 1080
         }
       ],
@@ -2152,7 +2152,7 @@
           "context_cycles": 1230
         },
         {
-          "constraint": "miss_stall",
+          "constraint": "x87_serial",
           "context_cycles": 1080
         }
       ],
@@ -2188,7 +2188,7 @@
           "context_cycles": 1234
         },
         {
-          "constraint": "miss_stall",
+          "constraint": "x87_serial",
           "context_cycles": 1080
         }
       ],
@@ -2224,7 +2224,7 @@
           "context_cycles": 1238
         },
         {
-          "constraint": "miss_stall",
+          "constraint": "x87_serial",
           "context_cycles": 1080
         }
       ],
@@ -2260,7 +2260,7 @@
           "context_cycles": 1242
         },
         {
-          "constraint": "miss_stall",
+          "constraint": "x87_serial",
           "context_cycles": 1080
         }
       ],
@@ -2296,7 +2296,7 @@
           "context_cycles": 1246
         },
         {
-          "constraint": "miss_stall",
+          "constraint": "x87_serial",
           "context_cycles": 1080
         }
       ],
@@ -2328,7 +2328,7 @@
       ],
       "limiting": [
         {
-          "constraint": "miss_stall",
+          "constraint": "x87_serial",
           "context_cycles": 1080
         },
         {
@@ -2364,7 +2364,7 @@
       ],
       "limiting": [
         {
-          "constraint": "miss_stall",
+          "constraint": "x87_serial",
           "context_cycles": 1080
         },
         {
@@ -2404,7 +2404,7 @@
           "context_cycles": 1246
         },
         {
-          "constraint": "miss_stall",
+          "constraint": "x87_serial",
           "context_cycles": 1080
         }
       ],
@@ -2440,7 +2440,7 @@
           "context_cycles": 1246
         },
         {
-          "constraint": "miss_stall",
+          "constraint": "x87_serial",
           "context_cycles": 1080
         }
       ],

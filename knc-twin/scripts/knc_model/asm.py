@@ -30,6 +30,7 @@ _MEM_RE = re.compile(r"^(?P<disp>[^()]*)\((?P<inner>[^)]*)\)$")
 _SIZE_SUFFIX_OPS = ("mov", "add", "sub", "and", "or", "xor", "adc", "sbb", "cmp", "test", "lea", "inc", "dec", "neg", "not",
                     "shl", "shr", "sar", "sal", "imul", "idiv", "div", "push", "pop", "bt", "xchg", "xadd", "cmpxchg")
 _ROUNDING = {"rn": "rn", "rd": "rd", "ru": "ru", "rz": "rz", "rn-sae": "rn", "rd-sae": "rd", "ru-sae": "ru", "rz-sae": "rz"}
+_SAE = {"sae", "rn-sae", "rd-sae", "ru-sae", "rz-sae"}
 _ALIASES = {"retq": "ret", "callq": "call", "jmpq": "jmp", "repz": "rep", "pushq": "push", "popq": "pop", "leaveq": "leave"}
 _NO_SUFFIX = {"movslq", "movsbl", "movsbq", "movswl", "movswq", "movzbl", "movzbq", "movzwl", "movzwq", "movsbw", "movzbw",
               "cltq", "cltd", "cqto", "leave", "nop", "ret", "call", "jmp", "movabsq"}
@@ -79,9 +80,14 @@ def _parse_reg(tok, where):
 
 
 def _parse_operand(tok, where, branch=False):
-    """Returns (operand, mask, rounding)."""
+    """Returns (operand, mask, rounding); a standalone modifier token such as {sae} or {ru} returns (None, None, modifier)."""
     mask = None
     rounding = None
+    if tok.startswith("{") and tok.endswith("}") and "{" not in tok[1:]:
+        grp = tok[1:-1].strip()
+        if grp in _ROUNDING or grp in _SAE:
+            return None, None, grp
+        raise Unsupported("%s: modifier {%s} is not supported" % (where, grp))
     broadcast = None
     conv = None
     swizzle = None
@@ -93,8 +99,8 @@ def _parse_operand(tok, where, branch=False):
         tok = tok[:pos].strip()
         if grp.startswith("%k"):
             mask = grp[1:].lower()
-        elif grp in _ROUNDING:
-            rounding = _ROUNDING[grp]
+        elif grp in _ROUNDING or grp in _SAE:
+            rounding = grp
         elif grp in isa.BROADCASTS:
             broadcast = grp
         elif grp in isa.SWIZZLES:
@@ -266,19 +272,31 @@ def parse_gas(text):
         mask = None
         rounding = None
         is_branch = base.startswith("j") or base == "call"
+        sae = False
         for tok in toks:
             o, mk, rd = _parse_operand(tok, where, is_branch)
+            if o is None and mk is None and rd is not None:
+                # standalone modifier (the compiler writes "vscaleps {ru}, %zmm2, %zmm1, %zmm0{%k1}" and "vgetexpps {sae}, ...")
+                if rd in _SAE:
+                    sae = True
+                if rd in _ROUNDING:
+                    rounding = _ROUNDING[rd]
+                continue
             ops.append(o)
             if mk:
                 mask = mk
             if rd:
-                rounding = rd
+                if rd in _SAE:
+                    sae = True
+                rounding = _ROUNDING.get(rd, rd)
         ops.reverse()  # AT&T source-first -> Intel destination-first
         rec = {"id": "L%d" % lineno, "op": base, "ops": ops, "source": lineno}
         if mask:
             rec["mask"] = mask
         if rounding:
             rec["rounding"] = rounding
+        if sae:
+            rec["sae"] = True
         if width:
             rec["width"] = width
         if pending_labels:
