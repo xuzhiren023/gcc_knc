@@ -136,6 +136,8 @@ def _parse_operand(tok, where, branch=False):
                 d["conv"] = conv
             return d, mask, rounding
         return name, mask, rounding
+    if tok.startswith("*") and branch:
+        return {"indirect": tok[1:].strip()}, mask, rounding
     m = _MEM_RE.match(tok)
     if m:
         d = {}
@@ -170,6 +172,8 @@ def _parse_operand(tok, where, branch=False):
             d["conv"] = conv
         return d, mask, rounding
     if tok.startswith("*"):
+        if branch:
+            return {"indirect": tok[1:].strip()}, mask, rounding
         raise Unsupported("%s: indirect branch or call %r is not supported (jump tables, function pointers)" % (where, tok))
     if branch:
         if re.match(r"^[A-Za-z_.$][\w.$]*(@PLT|@plt)?$", tok):
@@ -290,6 +294,16 @@ def parse_gas(text):
                     sae = True
                 rounding = _ROUNDING.get(rd, rd)
         ops.reverse()  # AT&T source-first -> Intel destination-first
+        if base in ("jmp", "call") and any(isinstance(o, dict) and "indirect" in o for o in ops):
+            if len(ops) != 1:
+                raise InvalidInput("%s: indirect branch or call requires one operand" % where)
+            rec = {"id": "L%d" % lineno, "op": "indirect_transfer", "ops": [], "source": lineno,
+                   "transfer": base, "operand": ops[0]["indirect"]}
+            if pending_labels:
+                rec["label"] = pending_labels[0]
+                pending_labels = pending_labels[1:]
+            records.append(rec)
+            continue
         rec = {"id": "L%d" % lineno, "op": base, "ops": ops, "source": lineno}
         if mask:
             rec["mask"] = mask

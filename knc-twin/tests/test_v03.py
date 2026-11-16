@@ -55,10 +55,26 @@ class TestParserForms(unittest.TestCase):
         recs, _ = asm.parse_gas("nopw %cs:0x0(%rax,%rax,1)\ndata16 nopw %cs:0x0(%rax,%rax,1)\nxchg %ax,%ax\nnopl 0x0(%rax)\nretq")
         self.assertEqual([r["op"] for r in recs], ["nop", "nop", "nop", "nop", "ret"])
 
-    def test_indirect_jump_is_explicitly_unsupported(self):
+    def test_unexecuted_indirect_jump_is_accepted_but_executed_is_unsupported(self):
+        text = """testq %rax, %rax
+        jnz execute
+        jmp *fprintf@GOTPCREL(%rip)
+        execute:
+        jmp *%rax
+        """
+        recs, _ = asm.parse_gas(text)
+        self.assertEqual([r["op"] for r in recs], ["test", "jnz", "indirect_transfer", "indirect_transfer"])
+        k = asm_kernel("testq %rax, %rax\njz done\njmp *fprintf@GOTPCREL(%rip)\ndone:\nret",
+                       init={"registers": {"rax": 0}}, entry="function")
+        interp, check = run(k)
+        self.assertEqual(check["status"], "not_specified", check)
+        self.assertEqual(interp.steps[0], 3)
+        k = asm_kernel("testq %rax, %rax\njnz execute\njmp *fprintf@GOTPCREL(%rip)\nexecute:\njmp *%rax",
+                       init={"registers": {"rax": 1}})
         with self.assertRaises(Unsupported) as cm:
-            asm.parse_gas("jmpq *%rax")
-        self.assertIn("indirect", cm.exception.message)
+            run(k)
+        self.assertIn("L5", cm.exception.message)
+        self.assertIn("0x", cm.exception.message)
 
     def test_lock_family(self):
         recs, _ = asm.parse_gas("lock xaddl %eax, (%rdi)\nlock cmpxchgq %rcx, (%rdi)\nlock incl (%rdi)\nlock orq $0, (%rsp)")
