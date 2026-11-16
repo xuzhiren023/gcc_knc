@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-15 23:39.
+Updated automatically at every ticket change. Last update: 2026-11-15 23:42.
 
 **Next: the tech lead, on S14-11.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
@@ -141,7 +141,7 @@ Current tickets: `[#################---]` 244 of 273
 | S14-10 | knc-twin: --jobs N for independent simulations and PyPy support (roadmap item 1) | In progress | Yes, go ahead. One single-threaded process at a time is always allowed, so you can run the single-case HPCG... |
 | S14-11 | knc-twin: close PhiWeather WRF coverage gaps (jump tables, vcvtps2pd ymm, loop-region and complete-listing modes, scatter and rcp-table import) | Question for the tech lead | 4dc7eee2 implements A-F. WRF: 13/13 functional-complete; only scatter occupancy missing. Report: .work/_sha... |
 | S14-12 | knc-twin: iteration and phase sampling for loop and whole-program wall-time estimates (roadmap item 2) | In progress | Yes, run the full knc-twin selftest and tests/regress/test_knc_twin.py now, one at a time, single-threaded ... |
-| S14-13 | knc-twin: 8-tile multi-core unit on the full ring with all memory controllers (roadmap item 3) | In progress | S14-13 red tests approved: they now require the shared 8-tile multicore model (channel contention across 1-... |
+| S14-13 | knc-twin: 8-tile multi-core unit on the full ring with all memory controllers (roadmap item 3) | Question for the tech lead | Partial commit 4057b79b; two failed attempts. Background rounding fixed; conservation passes. Contention re... |
 | S14-14 | knc-twin: scheduling explorer for modulo scheduling and reordering, evaluating S14-02/S14-03 (roadmap item 4) | In progress | M4 is not finished (62 of 65) and the card may be in a timed block, but you do not need idle clearance for ... |
 | S2-01 | Design for zmm and mask registers under -march=knc | Done | The register design for KNC is settled on paper: all 32 zmm and 8 mask registers become usable under -march... |
 | S2-02 | Float and double arguments and results in zmm lane 0 | Done | Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`). |
@@ -298,6 +298,7 @@ Current tickets: `[#################---]` 244 of 273
 
 ## Recent activity
 
+- 2026-11-15 23:42 **S14-13** engineer ask: Partial commit 4057b79b; two failed attempts. Background rounding fixed; conservation passes. Contention reproducer: test_multicore_protocol, 32 li...
 - 2026-11-15 23:37 **S14-11** engineer ask: 4dc7eee2 implements A-F. WRF: 13/13 functional-complete; only scatter occupancy missing. Report: .work/_shared/S14-11/wrf-coverage.json. Selftest 1...
 - 2026-11-15 23:23 **S14-13** lead approve-red: S14-13 red tests approved: they now require the shared 8-tile multicore model (channel contention across 1-8 tiles, remote L2 reads through the tag...
 - 2026-11-15 23:23 **S14-12** lead answer: Yes, run the full knc-twin selftest and tests/regress/test_knc_twin.py now, one at a time, single-threaded (no -j/--jobs, no builds): that is insid...
@@ -305,13 +306,12 @@ Current tickets: `[#################---]` 244 of 273
 - 2026-11-15 23:21 **S14-12** engineer ask: Committed 479a2204: loop sampling, period-aware windows/bands, phase rollups, docs/fixture. Focused selftest: 8 passed; log ../_state/logs/S14_12_s...
 - 2026-11-15 23:20 **S14-13** engineer red: Red correction 73eee70b: remote-owner probe compares elapsed differences with hop-delay differences for distances 15/30/31 versus 1; distance 1 bou...
 - 2026-11-15 23:20 **S14-10** engineer ask: Committed 9950928b. Selftest 155 passed; syntax passed. Serial regression failed only HPCG-104 (2 tests passed, 25.2 min); cause unknown, diff trun...
-- 2026-11-15 23:16 **S14-13** lead changes: One fix in test_remote_owner_read_uses_td_and_shortest_route before green; everything else stands (contention, conservation, ring-vs-unit and the s...
 
 ## Cost
 
 - From the script, engineer: 725 sessions, 1534.9M input tokens
 - From the script, lead: 491 sessions, 140.0M input tokens
-- Started by hand, Claude: 14 sessions, 4043.0M input tokens
+- Started by hand, Claude: 14 sessions, 4045.8M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
