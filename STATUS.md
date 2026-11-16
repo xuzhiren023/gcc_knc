@@ -1,10 +1,10 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-16 10:08.
+Updated automatically at every ticket change. Last update: 2026-11-16 10:16.
 
-**Next: GPT-6.1, on S14-10 (knc-twin: --jobs N for independent simulations and PyPy support (roadmap item 1)).** Run `python tools/dispatch.py`, or ask the tech lead to.
+**Next: the tech lead, on S14-23.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
-Current tickets: `[#################---]` 253 of 292
+Current tickets: `[#################---]` 253 of 293
 
 ## Milestones
 
@@ -15,7 +15,7 @@ Current tickets: `[#################---]` 253 of 292
 | M2 | Useful vector target | Done | 51 of 51 tickets |
 | M3 | Runtimes | Done | 48 of 48 tickets |
 | M4 | Broad optimization | Done | 63 of 65 tickets |
-| M5 | Program corpus | In progress | 8 of 45 tickets |
+| M5 | Program corpus | In progress | 8 of 46 tickets |
 | M6 | Release | Not started | Not planned in detail yet |
 
 ## Tickets
@@ -151,13 +151,14 @@ Current tickets: `[#################---]` 253 of 292
 | S14-20 | knc-twin: an indirect jmp/call (PLT tail call through the GOT) on a never-executed path must not refuse the whole region | Done | a region containing an indirect jmp or call that never executes now runs; an executed one fails with the in... |
 | S14-21 | knc-twin multi-core: held-out validation of the 8-tile ring model against the measured GEMV, triad and core-scaling rows | Not started |  |
 | S14-22 | card_run turn row: refreshing an open turn row must keep its place in the queue | draft |  |
-| S14-23 | knc-twin: import the window-10 scatter rows (2 threads) and settle occupancy.scatter_cycles_per_line | In progress | Owner: one more session (input_tokens 10M -> 14M), with the lead's scoped-down plan on the ticket: no funct... |
+| S14-23 | knc-twin: import the window-10 scatter rows (2 threads) and settle occupancy.scatter_cycles_per_line | Question for the tech lead | Completed t1/t2/t4 summaries and scatter overlay import. Held-out prediction remains blocked: catalog kerne... |
 | S14-24 | dispatch: refuse a session up front when its worktree git dir or ticket file is not writable from the sandbox | draft |  |
 | S14-25 | knc-twin: recorded outputs carry absolute host paths (C:/Users/<name>/...); write repo-relative paths and scrub the committed records | Not started |  |
 | S14-26 | knc-twin bound for software pipelining - how much could overlapping iterations gain on the M4 hot loops (go/no-go for S14-02) | Not started |  |
 | S14-27 | knc-twin bounds: the dependency critical path charges cold lines their full miss latency, so the "lower bound" can exceed the simulation | Not started |  |
 | S14-28 | knc-twin ranking of the four quantized GEMV kernel forms on one KNC core (phase 0 of S14-08) | Not started |  |
 | S14-29 | knc-twin: schedule --block ADDR..ADDR for a straight-line block inside a function, and batch must not write a native request per candidate by default | Not started |  |
+| S14-30 | WRF built with GCC-KNC runs 1.21x slower per step than PhiWeather's production build - attribute the gap per cause before fixing (M5, owner rule) | draft |  |
 | S14-31 | knc-twin multi-core usability: compare across scales, stubs and repeated calls at unit/ring scale, multi-context sampling, separated ring/memory stall shares | Not started |  |
 | S14-33 | knc-twin: import the window-11 calibration rows (imci-math latency and throughput, div10, x87 fcoms, rcp23/rsqrt23 tables) and retire the assumed parameters they settle | Not started |  |
 | S14-35 | knc-twin prepare-native: the generated native program for PhiWeather's sixth_order_diffusion kernels segfaults on the card (exit 139 under claude-pin); find the cause, fix the generator, restage | In progress | Originals are in .work/_shared/calib-w10/phiweather/sixth_{1,2}ctx_l2_031/orig/: kernel.json is the kernel ... |
@@ -317,6 +318,7 @@ Current tickets: `[#################---]` 253 of 292
 
 ## Recent activity
 
+- 2026-11-16 10:16 **S14-23** engineer ask: Completed t1/t2/t4 summaries and scatter overlay import. Held-out prediction remains blocked: catalog kernel has a nonterminating outer jnz; valida...
 - 2026-11-16 10:08 **S14-35** lead answer: Originals are in .work/_shared/calib-w10/phiweather/sixth_{1,2}ctx_l2_031/orig/: kernel.json is the kernel embedded in each request.json (the exact...
 - 2026-11-16 10:08 **S14-35** lead resume: lead placed the originals
 - 2026-11-16 10:05 **S14-35** lead defer: Interactive lead: copy the two original sixth_order_diffusion kernel JSONs referenced by .work/_shared/calib-w10/phiweather/sixth_{1,2}ctx_l2_031/k...
@@ -324,13 +326,12 @@ Current tickets: `[#################---]` 253 of 292
 - 2026-11-16 10:01 **S14-23** owner decide: Owner: one more session (input_tokens 10M -> 14M), with the lead's scoped-down plan on the ticket: no functional replay of the catalog driver; reco...
 - 2026-11-16 09:51 **S14-23** engineer escalate: budget: 10609446 input tokens used; the budget is 10000000
 - 2026-11-16 09:22 **S14-23** owner decide: Continue in a fresh session (input_tokens 4M -> 10M, sessions 3 -> 6, standing rule). Your worktree keeps the uncommitted converter (scripts/import...
-- 2026-11-16 09:21 **S14-23** lead escalate: budget: 4552427 input tokens used; the budget is 4000000
 
 ## Cost
 
-- From the script, engineer: 778 sessions, 1651.4M input tokens
+- From the script, engineer: 779 sessions, 1655.1M input tokens
 - From the script, lead: 528 sessions, 149.1M input tokens
-- Started by hand, Claude: 14 sessions, 4283.2M input tokens
+- Started by hand, Claude: 14 sessions, 4285.6M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
