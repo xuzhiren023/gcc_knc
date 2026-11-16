@@ -11,6 +11,7 @@
     "name": {"type": "string"},
     "description": {"type": "string"},
     "notes": {"type": ["string", "array"]},
+    "provenance": {"type": "object", "description": "Input origin and experimental prerequisites; never evidence of native validation by itself."},
     "representation": {"enum": ["normalized-records", "gas-att-subset"], "description": "optional declaration; derived from the streams"},
     "unit_of_work": {
       "type": "object", "required": ["count"],
@@ -23,7 +24,14 @@
         "ftz": {"type": "boolean", "default": false},
         "daz": {"type": "boolean", "default": false},
         "ftz_rule": {"enum": ["tiny", "tiny_and_inexact"], "default": "tiny"},
-        "nan_compare": {"enum": ["any_nan", "bits"], "default": "any_nan"}
+        "nan_compare": {"enum": ["any_nan", "bits"], "default": "any_nan"},
+        "reciprocal_tables": {
+          "type": "object", "additionalProperties": false,
+          "properties": {
+            "vrcp23ps": {"$ref": "#/definitions/reciprocal_table"},
+            "vrsqrt23ps": {"$ref": "#/definitions/reciprocal_table"}
+          }
+        }
       }
     },
     "memory_default": {"type": ["integer", "null"], "description": "byte value returned by reads of uninitialized memory; absent = such a read is invalid_input"},
@@ -31,6 +39,14 @@
     "init": {
       "type": "object", "additionalProperties": false,
       "properties": {
+        "heap": {
+          "type": "object", "required": ["addr", "size"], "additionalProperties": false,
+          "description": "Shared bump-allocator scenario region; must be disjoint from all other memory. Addresses align to 64 bytes and free never reuses storage.",
+          "properties": {
+            "addr": {"type": ["integer", "string"]},
+            "size": {"type": ["integer", "string"]}
+          }
+        },
         "memory": {"type": "array", "items": {"$ref": "#/definitions/memblock"}},
         "registers": {"$ref": "#/definitions/registers", "description": "applies to every stream; a stream's own init overrides"}
       }
@@ -39,14 +55,19 @@
       "type": "object", "additionalProperties": false,
       "properties": {
         "memory": {"type": "array", "items": {"$ref": "#/definitions/memblock"}},
-        "registers": {"type": "object", "description": "context index (string) -> registers", "additionalProperties": {"$ref": "#/definitions/registers"}}
+        "registers": {"type": "object", "description": "context slot (string) -> registers; multicore slot is 4*core+context. Stream-local expected.registers avoids slot arithmetic.", "additionalProperties": {"$ref": "#/definitions/registers"}}
       }
     },
     "streams": {
-      "type": "array", "minItems": 1, "maxItems": 4,
+      "type": "array", "minItems": 1,
+      "description": "Without core IDs, at most four contexts. With core IDs, every stream declares core and each (core, context) pair is unique. Unit/ring simulation admits at most eight detailed cores; native export may have more workers.",
+      "if": {"contains": {"required": ["core"]}},
+      "then": {"items": {"required": ["core"]}},
+      "else": {"maxItems": 4},
       "items": {
         "type": "object",
         "properties": {
+          "core": {"type": "integer", "minimum": 0, "description": "Logical detailed-core identity, not a physical CPU or ring position."},
           "context": {"type": "integer", "minimum": 0, "maximum": 3},
           "init": {"type": "object", "properties": {"registers": {"$ref": "#/definitions/registers"}}},
           "expected": {"type": "object", "properties": {"registers": {"$ref": "#/definitions/registers"}}},
@@ -60,6 +81,24 @@
     "scenario": {
       "type": "object", "additionalProperties": false,
       "properties": {
+        "multicore": {
+          "type": "object", "additionalProperties": false,
+          "properties": {
+            "placement": {"type": "object", "propertyNames": {"pattern": "^[0-9]+$"}, "additionalProperties": {"type": "integer", "minimum": 0, "maximum": 60}, "description": "Every detailed core ID maps to a distinct contracted ring position; default spreads N cores as floor(i*61/N)."},
+            "channel_interleave": {"enum": ["line_modulo", "xor", "page", "single_channel"]},
+            "td_interleave": {"enum": ["xor", "line_modulo", "single_slice"]},
+            "td_positions": {"type": "array", "minItems": 64, "maxItems": 64, "items": {"type": "integer", "minimum": 0, "maximum": 60}},
+            "controller_positions": {"type": "array", "minItems": 8, "maxItems": 8, "items": {"type": "integer", "minimum": 0, "maximum": 60}},
+            "background": {"type": "object", "additionalProperties": false, "properties": {
+              "enabled": {"type": "boolean", "description": "Default false for unit, true for ring."},
+              "active_cores": {"type": "integer", "minimum": 1, "maximum": 61, "description": "Total active cores including detailed cores; default 60."},
+              "epoch_cycles": {"type": "integer", "minimum": 1},
+              "seed": {"type": "integer"}
+            }},
+            "max_events": {"type": "integer", "minimum": 1},
+            "max_pending": {"type": "integer", "minimum": 1}
+          }
+        },
         "memory": {
           "oneOf": [
             {"type": "object", "required": ["type", "level"], "properties": {"type": {"const": "fixed_level"}, "level": {"$ref": "#/definitions/level"}}},
@@ -87,6 +126,16 @@
     }
   },
   "definitions": {
+    "reciprocal_table": {
+      "type": "object", "required": ["file", "entries", "status", "source", "exponent_scaling_verified"],
+      "properties": {
+        "file": {"type": "string", "description": "basename under fixtures/tables"},
+        "entries": {"enum": [1024, 8388608, 16777216]},
+        "status": {"enum": ["measured", "synthetic"]},
+        "source": {"type": "string"},
+        "exponent_scaling_verified": {"const": true}
+      }
+    },
     "int": {"type": ["integer", "string"], "description": "integer, or a decimal/hex string such as \"0x1000\""},
     "level": {"enum": ["l1", "l2", "memory"]},
     "memblock": {
@@ -126,6 +175,7 @@
         "mask": {"type": "string", "pattern": "^k[0-7]$", "description": "write mask (merge semantics); gather: completion mask"},
         "rounding": {"enum": ["rn", "rd", "ru", "rz"], "description": "per-instruction rounding override (vector FP only)"},
         "label": {"type": "string"},
+        "targets": {"type": "array", "minItems": 1, "items": {"type": "string"}, "description": "ordered labels for jmp_table"},
         "width": {"enum": [32, 64], "description": "scalar operand width when no register implies it"},
         "encoding": {"type": "object", "properties": {"bytes": {"type": "integer"}, "disp32": {"type": "boolean"}, "disp": {"type": "boolean"}, "imm": {"type": "boolean"}}, "description": "optional hints for the R02 p.56 pairing rules"},
         "deps": {"type": "array", "items": {"type": "string"}, "description": "extra explicit dependencies on instruction ids"},

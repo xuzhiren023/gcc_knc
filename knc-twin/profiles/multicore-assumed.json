@@ -1,0 +1,175 @@
+{
+  "schema": "knc-twin.profile/1",
+  "id": "multicore-assumed",
+  "version": "1",
+  "kind": "overlay",
+  "description": "Explicit assumed multi-core geometry and queue parameters; automatically overlaid only for unit/ring simulations. No native validation. Channel interval and latency residuals are derived at run time from the selected card profile and maps.",
+  "calibration": {
+    "state": "unvalidated",
+    "statement": "Low-core scaling and independent full-card validation pending."
+  },
+  "parameters": {
+    "ring.positions": {
+      "value": 61,
+      "unit": "positions",
+      "status": "assumed",
+      "source": "S14-13 approved multicore-design.md; modeling assumption, not a hardware measurement",
+      "alternatives": [
+        60,
+        64
+      ]
+    },
+    "ring.hop_cycles": {
+      "value": 1,
+      "unit": "cycles",
+      "status": "assumed",
+      "source": "S14-13 approved multicore-design.md; modeling assumption, not a hardware measurement",
+      "alternatives": [
+        2,
+        4
+      ]
+    },
+    "ring.data_slot_bytes": {
+      "value": 32,
+      "unit": "bytes",
+      "status": "assumed",
+      "source": "S14-13 approved multicore-design.md; modeling assumption, not a hardware measurement",
+      "alternatives": [
+        16,
+        64
+      ]
+    },
+    "ring.control_service_cycles": {
+      "value": 1,
+      "unit": "cycles",
+      "status": "assumed",
+      "source": "S14-13 approved multicore-design.md; modeling assumption, not a hardware measurement",
+      "alternatives": [
+        2,
+        4
+      ]
+    },
+    "ring.injection_credits": {
+      "value": 32,
+      "unit": "transactions",
+      "status": "assumed",
+      "source": "S14-13 approved multicore-design.md; modeling assumption, not a hardware measurement",
+      "alternatives": [
+        16,
+        64
+      ]
+    },
+    "ring.shared_fabrics": {
+      "value": false,
+      "unit": "boolean",
+      "status": "assumed",
+      "source": "S14-13 approved multicore-design.md; modeling assumption, not a hardware measurement",
+      "alternatives": [
+        true
+      ]
+    },
+    "td.slices": {
+      "value": 64,
+      "unit": "slices",
+      "status": "documented",
+      "source": "R01 p.22, verified in early architecture guide (production stepping unspecified); R08 slide 46 corroborates directory routing",
+      "alternatives": []
+    },
+    "td.lookup_cycles": {
+      "value": 8,
+      "unit": "cycles",
+      "status": "assumed",
+      "source": "S14-13 approved multicore-design.md; modeling assumption, not a hardware measurement",
+      "alternatives": [
+        4,
+        16,
+        32
+      ]
+    },
+    "td.initiation_cycles": {
+      "value": 1,
+      "unit": "cycles",
+      "status": "assumed",
+      "source": "S14-13 approved multicore-design.md; modeling assumption, not a hardware measurement",
+      "alternatives": [
+        2,
+        4
+      ]
+    },
+    "td.interleave": {
+      "value": "xor",
+      "unit": "map",
+      "status": "assumed",
+      "source": "S14-13 approved multicore-design.md; modeling assumption, not a hardware measurement",
+      "alternatives": [
+        "line_modulo",
+        "single_slice"
+      ]
+    },
+    "memory.controllers": {
+      "value": 8,
+      "unit": "controllers",
+      "status": "documented",
+      "source": "R01 p.13, verified in early architecture guide (production stepping unspecified)",
+      "alternatives": []
+    },
+    "memory.channels_per_controller": {
+      "value": 2,
+      "unit": "channels",
+      "status": "documented",
+      "source": "R01 p.13, verified in early architecture guide (production stepping unspecified)",
+      "alternatives": []
+    },
+    "memory.channel_interleave": {
+      "value": "line_modulo",
+      "unit": "map",
+      "status": "assumed",
+      "source": "S14-13 approved multicore-design.md; modeling assumption, not a hardware measurement",
+      "alternatives": [
+        "xor",
+        "page",
+        "single_channel"
+      ]
+    },
+    "memory.write_read_service_ratio": {
+      "value": 1,
+      "unit": "ratio",
+      "status": "assumed",
+      "source": "S14-13 approved multicore-design.md; modeling assumption, not a hardware measurement",
+      "alternatives": [
+        1.25,
+        2
+      ]
+    },
+    "multicore.remote_extra_cycles": {
+      "value": 0,
+      "unit": "cycles",
+      "status": "assumed",
+      "source": "S14-13 approved multicore-design.md; modeling assumption, not a hardware measurement",
+      "alternatives": [
+        16,
+        64
+      ]
+    },
+    "multicore.background_epoch_cycles": {
+      "value": 256,
+      "unit": "cycles",
+      "status": "assumed",
+      "source": "S14-13 approved multicore-design.md; modeling assumption, not a hardware measurement",
+      "alternatives": [
+        64,
+        1024
+      ]
+    },
+    "multicore.background_seed": {
+      "value": 0,
+      "unit": "seed",
+      "status": "assumed",
+      "source": "S14-13 approved multicore-design.md; modeling assumption, not a hardware measurement",
+      "alternatives": [
+        1,
+        2
+      ]
+    }
+  }
+}

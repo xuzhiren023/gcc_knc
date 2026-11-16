@@ -6,6 +6,8 @@ k1om toolchain that must be reviewed and built by whoever runs the queue.
 """
 import json
 import os
+import re
+import shutil
 import struct
 
 from . import ENGINE_VERSION, NATIVE_MEASUREMENT_SCHEMA, NATIVE_REQUEST_SCHEMA, PROFILE_SCHEMA
@@ -150,11 +152,12 @@ def gen_kernel_asm(kernel, mem_base, mem_span):
     out.append("\t.zero %d" % max(64, mem_span))
     out.append("\t.p2align 6")
     out.append("\t.globl knc_twin_zmm_out")
-    out.append("knc_twin_zmm_out:\n\t.zero %d" % (2048 * 4))
+    slots = max(s.context for s in kernel.streams) + 1
+    out.append("knc_twin_zmm_out:\n\t.zero %d" % (2048 * slots))
     out.append("\t.globl knc_twin_gpr_out")
-    out.append("knc_twin_gpr_out:\n\t.zero %d" % (128 * 4))
+    out.append("knc_twin_gpr_out:\n\t.zero %d" % (128 * slots))
     out.append("\t.globl knc_twin_k_out")
-    out.append("knc_twin_k_out:\n\t.zero %d" % (32 * 4))
+    out.append("knc_twin_k_out:\n\t.zero %d" % (32 * slots))
     out.append('\t.section .note.GNU-stack,"",@progbits')
     return "\n".join(out) + "\n"
 
@@ -192,12 +195,16 @@ static const int n_expects = %(n_expects)d;
 
 typedef void (*kfn)(void);
 static kfn kernels[] = { %(kernels)s };
+static const int context_ids[] = { %(context_ids)s };
 static const int n_ctx = %(n_ctx)d;
 static const int unit_count = %(unit_count)d;
+static uint64_t shared_start, finish_ticks[%(n_ctx)d];
+static uint64_t envelope_samples[21];
 
 static inline uint64_t rdtsc(void) { uint32_t lo, hi; __asm__ __volatile__("rdtsc" : "=a"(lo), "=d"(hi)); return ((uint64_t)hi << 32) | lo; }
 
 static int cmpu64(const void *a, const void *b) { uint64_t x = *(const uint64_t *)a, y = *(const uint64_t *)b; return x < y ? -1 : x > y; }
+static int cmpdouble(const void *a, const void *b) { double x = *(const double *)a, y = *(const double *)b; return x < y ? -1 : x > y; }
 
 typedef struct { int ctx; int cpu; long reps; pthread_barrier_t *bar; double median_ticks; } targ_t;
 
@@ -206,12 +213,28 @@ static void *worker(void *p) {
     cpu_set_t set; CPU_ZERO(&set); CPU_SET(t->cpu, &set);
     if (sched_setaffinity(0, sizeof set, &set)) { perror("sched_setaffinity"); exit(2); }
     uint64_t samples[21];
-    for (int w = 0; w < 3; w++) { pthread_barrier_wait(t->bar); for (long r = 0; r < t->reps; r++) kernels[t->ctx](); }
+    for (int w = 0; w < 3; w++) {
+        pthread_barrier_wait(t->bar);
+        for (long r = 0; r < t->reps; r++) kernels[t->ctx]();
+        __asm__ __volatile__("mfence" ::: "memory");
+        pthread_barrier_wait(t->bar);
+    }
     for (int b = 0; b < 21; b++) {
+        pthread_barrier_wait(t->bar);
+        if (t->ctx == 0) shared_start = rdtsc();
         pthread_barrier_wait(t->bar);
         uint64_t t0 = rdtsc();
         for (long r = 0; r < t->reps; r++) kernels[t->ctx]();
+        __asm__ __volatile__("mfence" ::: "memory");
         samples[b] = rdtsc() - t0;
+        finish_ticks[t->ctx] = rdtsc();
+        pthread_barrier_wait(t->bar);
+        if (t->ctx == 0) {
+            uint64_t end = finish_ticks[0];
+            for (int c = 1; c < n_ctx; c++) if (finish_ticks[c] > end) end = finish_ticks[c];
+            envelope_samples[b] = end - shared_start;
+        }
+        pthread_barrier_wait(t->bar);
     }
     qsort(samples, 21, sizeof samples[0], cmpu64);
     t->median_ticks = (double)samples[10] / (double)t->reps;
@@ -219,14 +242,30 @@ static void *worker(void *p) {
 }
 
 int main(int argc, char **argv) {
-    long reps = 1000; const char *cpus = "1";
+    long reps = 1000; const char *cpus = NULL;
     for (int i = 1; i < argc; i++) {
         if (!strcmp(argv[i], "--reps") && i + 1 < argc) reps = atol(argv[++i]);
         else if (!strcmp(argv[i], "--cpus") && i + 1 < argc) cpus = argv[++i];
     }
-    int cpu[4] = {0, 0, 0, 0}; int ncpu = 0;
-    { char buf[128]; strncpy(buf, cpus, 127); buf[127] = 0; for (char *tok = strtok(buf, ","); tok && ncpu < 4; tok = strtok(NULL, ",")) cpu[ncpu++] = atoi(tok); }
-    if (ncpu < n_ctx) { fprintf(stderr, "need %%d cpus\n", n_ctx); return 2; }
+    int cpu[CPU_SETSIZE]; int ncpu = 0;
+    cpu_set_t allowed; CPU_ZERO(&allowed);
+    if (sched_getaffinity(0, sizeof allowed, &allowed)) { perror("sched_getaffinity"); return 2; }
+    if (reps < 1) { fprintf(stderr, "reps must be positive\n"); return 2; }
+    if (cpus) {
+        char *buf = strdup(cpus);
+        for (char *tok = strtok(buf, ","); tok; tok = strtok(NULL, ",")) {
+            char *end; long value = strtol(tok, &end, 10);
+            if (*end || value < 0 || value >= CPU_SETSIZE || !CPU_ISSET(value, &allowed) || ncpu >= CPU_SETSIZE) {
+                fprintf(stderr, "invalid or unavailable CPU: %%s\n", tok); free(buf); return 2;
+            }
+            for (int c = 0; c < ncpu; c++) if (cpu[c] == value) { fprintf(stderr, "duplicate CPU\n"); free(buf); return 2; }
+            cpu[ncpu++] = (int)value;
+        }
+        free(buf);
+    } else {
+        for (int c = 0; c < CPU_SETSIZE; c++) if (CPU_ISSET(c, &allowed)) cpu[ncpu++] = c;
+    }
+    if (ncpu != n_ctx) { fprintf(stderr, "need exactly %%d CPUs, one worker per supplied CPU (got %%d)\n", n_ctx, ncpu); return 2; }
     /* correctness check: contexts one after another, as the model executes them */
     memset(knc_twin_mem, 0, mem_init_size); memcpy(knc_twin_mem, mem_init, mem_init_size);
     for (int c = 0; c < n_ctx; c++) kernels[c]();
@@ -243,14 +282,17 @@ int main(int argc, char **argv) {
     double group_medians[5];
     for (int g = 0; g < 5; g++) {
         pthread_barrier_t bar; pthread_barrier_init(&bar, NULL, n_ctx);
-        pthread_t th[4]; targ_t ta[4];
-        for (int c = 0; c < n_ctx; c++) { ta[c].ctx = c; ta[c].cpu = cpu[c]; ta[c].reps = reps; ta[c].bar = &bar; pthread_create(&th[c], NULL, worker, &ta[c]); }
+        pthread_t th[%(n_ctx)d]; targ_t ta[%(n_ctx)d];
+        for (int c = 0; c < n_ctx; c++) { ta[c].ctx = c; ta[c].cpu = cpu[c]; ta[c].reps = reps; ta[c].bar = &bar; if (pthread_create(&th[c], NULL, worker, &ta[c])) { fprintf(stderr, "pthread_create failed\n"); exit(2); } }
         double worst = 0;
         for (int c = 0; c < n_ctx; c++) { pthread_join(th[c], NULL); if (ta[c].median_ticks > worst) worst = ta[c].median_ticks;
-            printf("{\"group\":%%d,\"ctx\":%%d,\"cpu\":%%d,\"ticks_per_call\":%%.3f,\"ticks_per_unit\":%%.3f}\n", g, c, ta[c].cpu, ta[c].median_ticks, ta[c].median_ticks / unit_count); }
-        group_medians[g] = worst; pthread_barrier_destroy(&bar);
+            printf("{\"group\":%%d,\"ctx\":%%d,\"cpu\":%%d,\"ticks_per_call\":%%.3f,\"ticks_per_unit\":%%.3f}\n", g, context_ids[c], ta[c].cpu, ta[c].median_ticks, ta[c].median_ticks / unit_count); }
+        qsort(envelope_samples, 21, sizeof envelope_samples[0], cmpu64);
+        group_medians[g] = (double)envelope_samples[10] / reps;
+        printf("{\"group\":%%d,\"completion_envelope_ticks_per_call\":%%.3f,\"worst_thread_median\":%%.3f}\n", g, group_medians[g], worst);
+        pthread_barrier_destroy(&bar);
     }
-    qsort(group_medians, 5, sizeof(double), (int (*)(const void *, const void *))cmpu64);
+    qsort(group_medians, 5, sizeof(double), cmpdouble);
     double lo = group_medians[0], hi = group_medians[4], med = group_medians[2];
     printf("{\"summary\":{\"threads\":%%d,\"reps\":%%ld,\"median_ticks_per_call\":%%.3f,\"median_ticks_per_unit\":%%.3f,\"spread_pct\":%%.3f}}\n", n_ctx, reps, med, med / unit_count, 100.0 * (hi - lo) / med);
     return bad ? 6 : 0;
@@ -316,6 +358,7 @@ def prepare_native(kernel, profile, out_dir, kernel_hash, prediction_path=None):
         "expect_entries": ", ".join(entries) if entries else "{0,0,0,0,0}",
         "n_expects": len(entries),
         "kernels": ", ".join("knc_twin_kernel_ctx%d" % s.context for s in kernel.streams),
+        "context_ids": ", ".join(str(s.context) for s in kernel.streams),
         "n_ctx": len(kernel.streams),
         "unit_count": kernel.unit_count,
     }
@@ -346,6 +389,21 @@ def prepare_native(kernel, profile, out_dir, kernel_hash, prediction_path=None):
             "Import the measurement with: knc_twin.py import-native measurement.json --request request.json --out <dir>",
         ],
     }
+    if kernel.multicore:
+        request["requested_measurements"] = [{
+            "threads": len(kernel.streams), "metric": "completion_envelope_ticks_per_call",
+            "groups": 5, "batches_per_group": 21, "warmup_batches": 3,
+            "accept_if_spread_pct_below": 2.0,
+            "placement": "explicit --cpus list in stream order, or exactly the granted sched_getaffinity set",
+            "streams": [{"worker": i, "core": s.core, "context": s.local_context,
+                         "state_slot": s.context} for i, s in enumerate(kernel.streams)],
+        }]
+        request["notes"].extend([
+            "Multicore envelope includes the shared-start barrier and ends after all worker completion fences; report start skew separately when comparing a different driver.",
+            "One worker per supplied CPU; no implicit replication of a four-context kernel. Generate matching streams for 1/2/4/8/16/30/60 cores and each sibling count.",
+            "Repeated calls retain data in cache. Cold-memory and remote-owner experiments require explicit cache/ownership preconditioning by the queue operator; this skeleton does not implement handoffs.",
+            "Multicore envelope rows are not core latency measurements; do not import them as core profile parameters.",
+        ])
     request["request_hash_sha256"] = sha256_of_obj({k: v for k, v in request.items() if k != "created_utc"})
     dump_json(request, os.path.join(out_dir, "request.json"))
     readme = """# knc-twin native request: %s
@@ -357,8 +415,12 @@ with register/memory setup and state save), driver.c (timing and correctness dri
 
 Procedure for the queue operator:
 1. Review kernel.S and driver.c. Build natively: `k1om-mpss-linux-gcc -O2 -pthread -o knc_twin_native driver.c kernel.S`.
-2. Run in an exclusive window with pinned siblings, e.g. `./knc_twin_native --reps 1000 --cpus 1` (1 thread),
-   `--cpus 1,2` (2 threads), `--cpus 1,2,3,4` (4 threads) for a kernel with that many contexts.
+2. Run in an exclusive window with exactly one CPU per generated stream, in stream order:
+   `./knc_twin_native --reps 1000 --cpus CPU0,CPU1,...`. Without `--cpus`, every granted
+   CPU from `sched_getaffinity` is used and the count must equal the generated stream count.
+   Single-core requests use pinned siblings; multicore requests state their placement separately.
+   The envelope includes the release barrier and all completion fences. Repeated calls retain
+   cache state; a cold-memory or remote-owner measurement needs operator preconditioning.
 3. Fill measurement.json (schema %s) with the summary lines, job id, date, clock policy;
    list parameters only if the kernel is a calibration microbenchmark whose result isolates them.
 4. `python knc_twin.py import-native measurement.json --request request.json --out <dir>`.
@@ -377,8 +439,43 @@ def import_native(measurement_path, request_path, out_dir, prediction_path=None)
             raise InvalidInput("measurement is missing %r" % key)
     if not isinstance(m["results"], list) or not m["results"]:
         raise InvalidInput("measurement.results must be a non-empty list")
+    kind = m.get("kind", "timing")
+    if kind not in ("timing", "scatter", "rcp23-table"):
+        raise InvalidInput("unknown native measurement kind %r" % kind)
+    table_imports = []
+    if kind == "scatter":
+        from .reciprocal_tables import scatter_parameter
+        params = [scatter_parameter(r) for r in m["results"]]
+        if len(params) != 1:
+            raise InvalidInput("scatter import needs one isolated per-line occupancy row; summarize repeats first")
+        if m.get("parameters"):
+            raise InvalidInput("scatter import derives its parameter from results; do not also supply parameters")
+        m["parameters"] = params
+    elif kind == "rcp23-table":
+        from .reciprocal_tables import table_path, validate_descriptor
+        seen = set()
+        for row in m["results"]:
+            op = row.get("op")
+            if op in seen:
+                raise InvalidInput("duplicate reciprocal table %s" % op)
+            seen.add(op)
+            file = row.get("file")
+            if not isinstance(file, str):
+                raise InvalidInput("reciprocal table result needs file")
+            src = os.path.join(os.path.dirname(os.path.abspath(measurement_path)), file)
+            name = re.sub(r"[^A-Za-z0-9_.-]", "_", str(m["job_id"])) + "-" + str(op) + ".bin"
+            desc = {"file": name, "entries": row.get("entries"), "status": "synthetic" if m.get("synthetic") is True else "measured",
+                    "exponent_scaling_verified": row.get("exponent_scaling_verified"),
+                    "source": "native capture %s (%s) on %s" % (m["job_id"], m["measured_utc"], m["card_profile"])}
+            validate_descriptor(op, desc)
+            try:
+                if os.path.getsize(src) != desc["entries"] * 4:
+                    raise InvalidInput("%s capture byte length does not match entries" % op)
+            except OSError as e:
+                raise InvalidInput("cannot read capture %s: %s" % (src, e))
+            table_imports.append((op, src, table_path(name), desc))
     for i, r in enumerate(m["results"]):
-        for key in ("threads_per_core", "ticks_per_unit_per_thread"):
+        for key in (("threads_per_core", "ticks_per_unit_per_thread") if kind == "timing" else ()):
             if key not in r:
                 raise InvalidInput("results[%d] needs %r" % (i, key))
     req = None
@@ -389,6 +486,9 @@ def import_native(measurement_path, request_path, out_dir, prediction_path=None)
         if m.get("request_hash_sha256") and m["request_hash_sha256"] != req.get("request_hash_sha256"):
             raise InvalidInput("measurement.request_hash_sha256 does not match request.json; the measurement belongs to another request")
     overlay = None
+    if prediction_path and kind != "timing":
+        raise InvalidInput("--prediction applies to timing rows, not scatter occupancy or table captures")
+    os.makedirs(out_dir, exist_ok=True)
     if m.get("parameters"):
         params = {}
         for p in m["parameters"]:
@@ -415,4 +515,13 @@ def import_native(measurement_path, request_path, out_dir, prediction_path=None)
                              "check": r.get("check")})
             comparison = {"prediction_result": os.path.abspath(prediction_path), "rows": rows,
                           "note": "ticks are TSC ticks per thread; the prediction is core cycles per unit for the simulated context count. Compare like with like (same thread count, same unit)."}
-    return {"measurement": m, "request_hash": req.get("request_hash_sha256") if req else None, "overlay_written": overlay is not None, "comparison": comparison}
+    policy = None
+    if table_imports:
+        policy = {"reciprocal_tables": {op: desc for op, _, _, desc in table_imports}}
+        for op, src, dest, desc in table_imports:
+            os.makedirs(os.path.dirname(dest), exist_ok=True)
+            if os.path.abspath(src) != os.path.abspath(dest):
+                shutil.copyfile(src, dest)
+        dump_json(policy, os.path.join(out_dir, "numerical-policy.json"))
+    return {"measurement": m, "request_hash": req.get("request_hash_sha256") if req else None,
+            "overlay_written": overlay is not None, "comparison": comparison, "numerical_policy": policy}

@@ -1,0 +1,85 @@
+{
+  "__knc_vmath_expf_16": {
+    "cycles": 100,
+    "model": "none",
+    "status": "assumed",
+    "source": "Illustrative template cost only; replace with a measured or explicitly justified scenario cost.",
+    "note": "Include this vector helper with --with-callee for functional effects; scalar libm is not a 16-lane substitute."
+  },
+  "expf": {
+    "cycles": 100,
+    "model": "libm.f32.exp",
+    "status": "assumed",
+    "source": "Illustrative template cost only; replace with a measured or explicitly justified scenario cost.",
+    "note": "Host exp on the low f32 lane; approximate relative to the card library."
+  },
+  "__module_bl_mynnedmf_MOD_qsat_blend": {
+    "cycles": 100,
+    "model": "none",
+    "status": "assumed",
+    "source": "Illustrative template cost only; replace with a measured or explicitly justified scenario cost.",
+    "note": "Fortran helper: include with --with-callee for functional effects."
+  },
+  "__module_bl_mynnedmf_MOD_tridiag2": {
+    "cycles": 100,
+    "model": "none",
+    "status": "assumed",
+    "source": "Illustrative template cost only; replace with a measured or explicitly justified scenario cost.",
+    "note": "Fortran helper: include with --with-callee for functional effects."
+  },
+  "__module_bl_mynnedmf_MOD_moisture_check": {
+    "cycles": 100,
+    "model": "none",
+    "status": "assumed",
+    "source": "Illustrative template cost only; replace with a measured or explicitly justified scenario cost.",
+    "note": "Fortran helper: include with --with-callee for functional effects."
+  },
+  "memcpy": {
+    "cycles": 100,
+    "model": "memcpy",
+    "status": "assumed",
+    "source": "Illustrative template cost only; replace with a measured or explicitly justified scenario cost.",
+    "note": "Byte copying is modeled; replace the illustrative cost using the measured length distribution."
+  },
+  "memset": {
+    "cycles": 100,
+    "model": "memset",
+    "status": "assumed",
+    "source": "Illustrative template cost only; replace with a measured or explicitly justified scenario cost.",
+    "note": "Byte filling is modeled; replace the illustrative cost using the measured length distribution."
+  },
+  "malloc": {
+    "cycles": 100,
+    "model": "malloc",
+    "status": "assumed",
+    "source": "Illustrative template cost only; replace with a measured or explicitly justified scenario cost.",
+    "note": "Declared init.heap bump allocator; 64-byte alignment, no address reuse, free is a no-op."
+  },
+  "free": {
+    "cycles": 100,
+    "model": "free",
+    "status": "assumed",
+    "source": "Illustrative template cost only; replace with a measured or explicitly justified scenario cost.",
+    "note": "Declared init.heap bump allocator; 64-byte alignment, no address reuse, free is a no-op."
+  },
+  "calloc": {
+    "cycles": 100,
+    "model": "calloc",
+    "status": "assumed",
+    "source": "Illustrative template cost only; replace with a measured or explicitly justified scenario cost.",
+    "note": "Declared init.heap bump allocator; 64-byte alignment, no address reuse, free is a no-op."
+  },
+  "realloc": {
+    "cycles": 100,
+    "model": "realloc",
+    "status": "assumed",
+    "source": "Illustrative template cost only; replace with a measured or explicitly justified scenario cost.",
+    "note": "Declared init.heap bump allocator; 64-byte alignment, no address reuse, free is a no-op."
+  },
+  "powf": {
+    "cycles": 100,
+    "model": "libm.f32.pow",
+    "status": "assumed",
+    "source": "Illustrative template cost only; replace with a measured or explicitly justified scenario cost."
+  }
+}

@@ -336,6 +336,8 @@ def emit_gas(stream, relocate=None):
     for insn in stream.insns:
         if insn.label:
             lines.append("%s:" % insn.label)
+        if insn.op == "jmp_table":
+            raise Unsupported("native export of resolved jmp_table records is not supported; use the original object")
         mnem = insn.op
         if insn.op in _SIZE_SUFFIX_OPS and insn.width and insn.spec.get("fn") != "x87":
             mnem = insn.op + {64: "q", 32: "l", 16: "w", 8: "b"}[insn.width]

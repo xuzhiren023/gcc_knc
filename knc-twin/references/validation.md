@@ -110,6 +110,103 @@ bytes-over-bandwidth formula with those same measurements, so they test the prof
 a model; the GEMV case (125.3 GB/s measured) shows how far a real kernel sits below the sweep
 winner.
 
+## Multi-core unit/ring (S14-13)
+
+Every unit/ring result remains `unvalidated_scenario_estimate`. Passing synthetic
+protocol tests establishes shared queues, transaction conservation, shortest-route
+remote reads, pending-fill visibility and contention, not hardware accuracy.
+The predeclared engineering target is 10% per comparable row; it has not been
+widened and no multi-core shape is promoted.
+
+`scripts/record_multicore.py` recorded eight finite cold-read predictions
+for 1/2/4/8 detailed cores, both without background (`unit`) and with 60 total
+active cores (`ring`), under `tests/heldout_native/multicore-scenarios/prediction.json`.
+All eight returned status `ok` and remain unvalidated scenario estimates. Inputs have one
+context per core and 64 cold lines per context. The recorder retains assumptions,
+parameters, unsupported forms and result classes. These are synthetic scenarios,
+not the compiled kernels or steady-state timed envelopes of historical card rows;
+they must not enter held-out error/ranking statistics. Full results are under
+`.work/_shared/S14-13/predictions/`; the recorder log is
+`.work/_state/logs/S14_13_record_multicore-20261116-014756.log`.
+
+| Detailed cores | Unit completion cycles | Ring completion cycles |
+|---|---:|---:|
+| 1 | 21176.266009221312 | 21324.463953918817 |
+| 2 | 21222.266009221312 | 21753.567071403722 |
+| 4 | 21223.078002773167 | 21920.266009221312 |
+| 8 | 21249.078002773167 | 21388.139193918472 |
+
+These are finite completion envelopes, including admitted traffic draining;
+they do not establish steady-state bandwidth or a monotonic scaling curve.
+
+Host validation on 2026-11-16: the full selftest and trial regressions passed
+through `tests/regress/test_knc_twin.py`. Its held-out equality check failed only
+for `s12-31-hpcg-104`; the assertion abbreviates the returned rows. Log:
+`.work/_state/logs/S14_13_regress_selftest-20261116-005843.log` (36.9 minutes).
+The approved branch diagnostic with a 900-second budget subsequently returned
+`ok` for every variant and its full prediction object exactly equals the existing
+record. Actual/recorded rows and the equality verdict are in
+`.work/_state/logs/S14_13_hpcg_branch-20261116-015114.log`.
+
+| HPCG variant | Branch cycles/unit | Recorded cycles/unit |
+|---|---:|---:|
+| donor | 723.043 | 723.043 |
+| donor_pf | 725.043 | 725.043 |
+| knc | 726.027 | 726.027 |
+| knc_pf | 726.027 | 726.027 |
+| knc_noalign | 723.027 | 723.027 |
+| knc_skip7 | 724.027 | 724.027 |
+| knc_nosched | 670.619 | 670.619 |
+| knc_nosched_noalign | 666.619 | 666.619 |
+
+The comparison using main code (`868b1eac`, clean export) stopped after six
+variant timing messages without a final report or retained prediction. No
+Cygwin Python process remains. Log:
+`.work/_state/logs/S14_13_hpcg_main-20261116-024600.log`.
+The cause of that interruption is unknown. The original regression failure is
+not yet diagnosed: budget exhaustion remains a hypothesis, not an observed
+result. The lead accepted the branch's exact agreement with the recorded
+prediction as the held-out equality check (2026-11-16); no main rerun is planned.
+The regression failure is not attributed to this branch and remains pending a
+lead rerun with full output. No model change or re-recording of HPCG predictions
+was made; the full regression is still reported as failed.
+
+Schema metadata passed Draft 7 checking. Offline instance validation now passes
+for all three staged native inputs and all eight recorded scenario inputs:
+the lead-approved removal of `$id` from the in-memory schema fixes local reference
+resolution. The schema and its `$id` on disk are unchanged. Log:
+`.work/_state/logs/S14_13_schema_without_id-20261116-015011.log`.
+
+The owner's 2026-11-16 scope split assigns the brief's step 7 held-out and
+retrospective comparisons to **S14-21**. S14-13 delivers the engine, protocol
+tests, design and staged requests; every multi-core result remains
+`unvalidated_scenario_estimate`. The table records deferred evidence, not a
+promise of completed validation in S14-13.
+
+| Evidence | Status and unresolved comparison (S14-21) |
+|---|---|
+| 1/2/4/8-core STREAM bandwidth | Pending native rows: none exist in the repository, per the lead's evidence review. Do not interpolate from 15/60-core points. `multicore-symmetry` requests the missing measurements. |
+| S8-10 C11 remote L2, 190.6-195.0 ns | Calibration: the approved 192 ns endpoint residual is used. Protocol tests check residual/reference-path identity and exact route differences, not independent latency accuracy. Controlled ring-distance validation needs the deferred driver. |
+| S11-06 read winner, 186.14 GB/s | Calibration of channel interval, never held out. A faithful steady-state compiled STREAM comparison remains pending; finite cold-read scenarios do not establish it. |
+| First membw run, 60/120/240-spread and 60-compact (15 cores), small pages | Pending retrospective shape comparison with the original footprint, prefetch and completion envelope; short samples are not acceptance gates. |
+| S11-06 triad, 168.23 GB/s | Pending retrospective prediction of the matching compiled kernel and byte count. Write/read service ratio remains 1, never selected from this row. |
+| S11-09 fp32 GEMV, 125.30 GB/s weight bytes, 120 threads, small pages | Held-out target reserved; faithful compiled input binding and simulation remain pending. The existing analytical `gemv-fp32-card/core.s` is a stand-in, not this kernel. No synthetic read result is compared with this row. |
+| Libgomp/M4 barriers and scaling | Pending matching protocols, binaries and timed regions; custom C11 barriers are not libgomp validation. |
+
+These are open validation gaps, not numerical passes or measured misses. Possible
+sources of future error include assumed TD/channel mappings, effective ring/link
+service, a short cold warmup, prior-epoch symmetry feedback, page backing and
+start/stop scope. Epoch/placement sensitivity and independent full-card accuracy
+remain open. No held-out row was used to adjust a parameter in this ticket.
+
+Native request skeletons for channel saturation, TD contention and symmetry are
+staged under `.work/_shared/S14-13/native/` via `prepare-native`, each with 60
+workers, explicit affinity and a shared completion envelope. `experiment.json`
+states required cold preconditioning, address-map controls and count variants;
+the generated tiny warm loops are controls and cannot measure DRAM saturation
+as-is. Ring-distance, remote-write and ring-mixed are `needs-driver` specifications
+in `calibration-plan.json`. No native execution is claimed.
+
 ## A real candidate batch (`fixtures/batch`)
 
 The S12-30 gate's seven CSR builds, converted from the gate's objects with the timed entry and
@@ -121,6 +218,11 @@ change up over the HPCG pilot's SpMV and SymGS shares: predicted time ratio 0.91
 1.14, unvalidated shape); the card measured 1/1.088 = 0.92.
 
 ## Regenerating
+
+Replay a specific case without a wall-clock deadline with `python scripts/validate_heldout.py
+--cases tests/heldout_native --only-cases s12-31-hpcg-104 --max-seconds 0 --out /tmp/heldout-replay`.
+The full prediction check in `tests/regress/test_knc_twin.py` runs only when `KNC_TWIN_HELDOUT=1`
+is set; the ordinary regression suite skips it because the replay can take tens of minutes.
 
 ```
 cd tests/bench/knc-char && python -c "from pathlib import Path; import kernels; kernels.emit(Path(OUT))"

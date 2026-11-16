@@ -117,6 +117,7 @@ _COND = {"z": "zf", "e": "zf", "nz": "nzf", "ne": "nzf", "l": "lt", "nge": "lt",
          "le": "le", "ng": "le", "b": "cf", "c": "cf", "nae": "cf", "ae": "ncf", "nb": "ncf", "nc": "ncf", "a": "a", "nbe": "a",
          "be": "be", "na": "be", "s": "sf", "ns": "nsf", "p": "pf", "pe": "pf", "np": "npf", "po": "npf"}
 _add("jmp", "branch", ["t"], fn="jmp")
+_add("jmp_table", "branch", ["r:g"], fn="jmp_table", note="resolved read-only switch table; indirect prediction follows the branch scenario (assumed)")
 for _suf, _c in _COND.items():
     _add("j" + _suf, "branch", ["t"], fn="jcc", flags_r=True, cond=_c)
     _add("set" + _suf, "scalar_alu", ["w:gm"], fn="setcc", flags_r=True, cond=_c, mem_size=1)

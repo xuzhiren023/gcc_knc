@@ -25,7 +25,7 @@ from knc_model.util import dump_json  # noqa: E402
 
 ROUTINES = {
     "mynn_tendencies": ("phys/module_bl_mynnedmf.o", "__module_bl_mynnedmf_MOD_mynn_tendencies"),
-    "mynnedmf_driver": ("phys/module_bl_mynnedmf.o", "__module_bl_mynnedmf_MOD_mynnedmf_driver"),
+    "mynnedmf_driver": ("phys/module_bl_mynnedmf_driver.o", "__module_bl_mynnedmf_driver_MOD_mynnedmf_driver"),
     "dmp_mf": ("phys/module_bl_mynnedmf.o", "__module_bl_mynnedmf_MOD_dmp_mf"),
     "mp_thompson": ("phys/module_mp_thompson.o", "__module_mp_thompson_MOD_mp_thompson"),
     "mp_gt_driver": ("phys/module_mp_thompson.o", "__module_mp_thompson_MOD_mp_gt_driver"),
@@ -35,25 +35,9 @@ ROUTINES = {
     "advance_uv": ("dyn_em/module_small_step_em.o", "__module_small_step_em_MOD_advance_uv"),
     "advance_mu_t": ("dyn_em/module_small_step_em.o", "__module_small_step_em_MOD_advance_mu_t"),
     "horizontal_diffusion_s": ("dyn_em/module_diffusion_em.o", "__module_diffusion_em_MOD_horizontal_diffusion_s"),
-    "sixth_order_diffusion": ("dyn_em/module_em.o", "__module_em_MOD_sixth_order_diffusion"),
+    "sixth_order_diffusion": ("dyn_em/module_big_step_utilities_em.o", "__module_big_step_utilities_em_MOD_sixth_order_diffusion"),
     "rk_update_scalar": ("dyn_em/module_em.o", "__module_em_MOD_rk_update_scalar"),
 }
-
-
-def innermost_loops(records):
-    """Innermost loops of the converted records: a backward branch whose target has no other backward branch inside."""
-    labels = {}
-    for i, r in enumerate(records):
-        if r.get("label"):
-            labels[r["label"]] = i
-    loops = []
-    for i, r in enumerate(records):
-        if r["op"].startswith("j") and r["op"] != "jmp" or r["op"] == "jmp":
-            tgt = [o for o in r["ops"] if isinstance(o, str) and o in labels]
-            if tgt and labels[tgt[0]] < i:
-                loops.append((labels[tgt[0]], i))
-    inner = [(a, b) for a, b in loops if not any(a < c and d < b for c, d in loops if (c, d) != (a, b))]
-    return inner
 
 
 def main():
@@ -75,21 +59,21 @@ def main():
         row = {"routine": name, "object": obj, "function": fn}
         try:
             conv = from_binary.Converter(path, dis_cache[path])
-            kernel, rows, summary = conv.convert(fn, profile=prof)
+            kernel, rows, summary = conv.convert(fn, profile=prof, report=True)
         except TwinError as e:
             row.update(status=e.status, message=e.message)
             report["routines"].append(row)
             print("%-24s %s: %s" % (name, e.status, e.message[:90]))
             continue
-        recs = kernel["streams"][0]["instructions"]
+        recs = kernel["streams"][0]["instructions"] if kernel else []
+        provenance = kernel["provenance"] if kernel else {}
         reasons = collections.Counter(r["reason"].split(":")[0] + ": " + r["text"].split()[0] for r in rows if r["reason"])
-        loops = innermost_loops(recs)
-        bad_by_index = {i for i, r in enumerate(rows) if r["reason"]}
-        complete = sum(1 for a, b in loops if not any(a <= i <= b for i in bad_by_index))
-        row.update(status="ok", instructions=summary["instructions"], padding_nops=kernel["provenance"]["padding_nops"],
-                   prefixed=kernel["provenance"]["slow_prefix_instructions"], calls=sum(1 for r in recs if r["op"] == "call"),
-                   undeclared_callees=kernel["provenance"]["undeclared_callees"], complete=summary["complete"],
-                   innermost_loops=len(loops), innermost_loops_complete=complete, blockers=dict(reasons))
+        loops = conv.loop_report(fn, rows)
+        complete = sum(1 for loop in loops if loop["summary"]["complete"]["timing"])
+        row.update(status="ok" if kernel else "unsupported", instructions=summary["instructions"], padding_nops=provenance.get("padding_nops", 0),
+                   prefixed=provenance.get("slow_prefix_instructions", 0), calls=sum(1 for r in recs if r["op"] == "call"),
+                   undeclared_callees=provenance.get("undeclared_callees", []), complete=summary["complete"],
+                   innermost_loops=len(loops), innermost_loops_complete=complete, blockers=dict(reasons), loops=loops, unsupported=[r for r in rows if not r["functional"]])
         for k, v in reasons.items():
             report["unsupported_total"][k] += v
         report["routines"].append(row)

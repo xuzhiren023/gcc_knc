@@ -12,19 +12,22 @@ model           functional effect:
                   noreturn        reaching the call is an error (assert/abort paths)
                   none            no functional effect (results after the call are NOT exact)
                   memcpy memmove memset    exact (rdi, rsi, rdx; returns rdi in rax)
+                  malloc calloc realloc free    declared init.heap bump allocator; free is a no-op
                   libm.f64.NAME / libm.f32.NAME   argument(s) in the low element of zmm0 (zmm1),
                                   result in the low element of zmm0 (K1OM calling convention).
                                   sqrt fabs floor ceil trunc fmin fmax copysign are exact;
                                   the others use the host math library and are NOT bit-exact
                                   with the card's libm (reported as approximate)
 
-A stub never gets a default cost. Its memory traffic is modeled only for the mem* models.
+A stub never gets a default cost. mem*, calloc and realloc trace their byte effects;
+allocator internal memory traffic is not modeled.
 """
 import math
 import struct
 
 from .errors import InvalidInput, Unsupported
 from . import fp
+from .util import parse_int
 
 _EXACT1 = {"fabs": abs, "floor": math.floor, "ceil": math.ceil, "trunc": math.trunc}
 _APPROX1 = ("exp", "log", "log10", "log2", "sin", "cos", "tan", "tanh", "sinh", "cosh", "atan", "asin", "acos", "expm1", "log1p", "erf", "erfc", "cbrt")
@@ -53,8 +56,62 @@ def _set_f32_low(cx, reg, bits):
     cx.zmm[reg] = lanes
 
 
+def _heap_call(interp, cx, model, trace_mem):
+    """Functional scenario allocator, not a model of the card's libc internals."""
+    if model == "free":
+        interp.assume("heap stubs: free is a no-op; storage is never reused")
+        return
+    if interp.heap is None:
+        spec = interp.kernel.init.get("heap")
+        if not isinstance(spec, dict) or "addr" not in spec or "size" not in spec:
+            raise InvalidInput("heap stubs require init.heap with addr and size")
+        start = parse_int(spec["addr"], "init.heap.addr")
+        size = parse_int(spec["size"], "init.heap.size")
+        if start <= 0 or size <= 0 or start + size > (1 << 64):
+            raise InvalidInput("init.heap must be a nonempty non-null 64-bit address range")
+        interp.heap = {"next": (start + 63) & ~63, "end": start + size, "sizes": {}}
+        interp.assume("heap stubs use a shared declared init.heap, 64-byte aligned bump allocations, no address reuse; caller must keep the heap disjoint from other memory; allocator internals and allocator cache traffic are not modeled")
+    heap = interp.heap
+    old = 0
+    n = cx.gpr["rdi"]
+    if model == "calloc":
+        n *= cx.gpr["rsi"]
+        if n >= (1 << 64):
+            raise InvalidInput("calloc size overflow")
+    elif model == "realloc":
+        old, n = n, cx.gpr["rsi"]
+        if old and old not in heap["sizes"]:
+            raise InvalidInput("realloc pointer is not a recorded heap allocation")
+        if old and n == 0:
+            cx.gpr["rax"] = 0
+            interp.assume("realloc(p, 0) returns null and retains the old storage in this bump-allocator scenario")
+            return
+    addr = heap["next"]
+    # Zero-sized allocations still occupy one aligned slot and return distinct pointers.
+    if addr + max(1, n) > heap["end"]:
+        raise InvalidInput("declared init.heap exhausted allocating %d bytes" % n)
+    copied = min(heap["sizes"].get(old, 0), n)
+    if (model == "calloc" and n > (1 << 26)) or copied > (1 << 26):
+        raise InvalidInput("heap stub memory effect exceeds the 64 MiB per-call limit")
+    if model == "calloc" and n:
+        interp.memory.write(addr, bytes(n), cx.ctx)
+        trace_mem.append((addr, n))
+    elif copied:
+        data = interp.memory.read(old, copied, cx.ctx)
+        interp.memory.write(addr, data, cx.ctx)
+        trace_mem.extend(((old, copied), (addr, copied)))
+    heap["next"] = (addr + max(1, n) + 63) & ~63
+    heap["sizes"][addr] = n
+    interp.heap_allocations.append({"model": model, "context": cx.ctx, "addr": addr,
+                                    "size": n, "old_addr": old, "copied_bytes": copied})
+    cx.gpr["rax"] = addr
+
+
 def run_stub(interp, cx, insn, name, stub, trace_mem):
     model = stub.get("model", "none")
+    if model in ("malloc", "calloc", "realloc", "free"):
+        _heap_call(interp, cx, model, trace_mem)
+        return
     if model == "noreturn":
         raise Unsupported("instruction %s: the region reached %s, declared noreturn (an assert or abort path); the input drives the code off its normal path" % (insn.id, name),
                           {"instruction": insn.id, "callee": name})
@@ -120,4 +177,4 @@ def run_stub(interp, cx, insn, name, stub, trace_mem):
         else:
             put(cx, "zmm0", struct.unpack("<Q", struct.pack("<d", r))[0])
         return
-    raise InvalidInput("calls.%s.model %r is not a stub model (noreturn, none, memcpy, memmove, memset, libm.f64.NAME, libm.f32.NAME)" % (name, model))
+    raise InvalidInput("calls.%s.model %r is not a stub model (noreturn, none, malloc, calloc, realloc, free, memcpy, memmove, memset, libm.f64.NAME, libm.f32.NAME)" % (name, model))
