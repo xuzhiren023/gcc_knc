@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-16 00:05.
+Updated automatically at every ticket change. Last update: 2026-11-16 00:06.
 
-**Next: GPT-6.1, on S13-01 (M4 final gate - stage the ADR-0015 gate run at the final head (17 programs, held-out unsealed, six pairs, three profiles)).** Run `python tools/dispatch.py`, or ask the tech lead to.
+**Next: the tech lead, on S13-01.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[#################---]` 244 of 276
 
@@ -123,7 +123,7 @@ Current tickets: `[#################---]` 244 of 276
 | S12-40 | Indirect prefetch recognizes Fortran sparse loops (array descriptors, ARRAY_REF offsets, nonzero and OpenMP-outlined starts) so NPB-CG benefits | draft | Deferred to M5 (sprint s14) by the owner's 2026-11-15 scope cut ("we are scope creeping the entire Sprint 1... |
 | S12-41 | Early donor check - corpus.py stages and runs only the development programs (no held-out build or run), smallest margins first, so the lead can measure every development program against GCC 5.1.1 now | draft | Deferred to M5 (sprint s14) by the owner's 2026-11-15 scope cut ("we are scope creeping the entire Sprint 1... |
 | S12-42 | Small sparse row loops are 1.5-3% slower than GCC 5.1.1, worse when two loop nests share one function (found by S12-30's window 8 gate) | draft | Owner 2026-11-15 ("I have reset Fable, so subagent back to codex with default selection rule"): Fable overr... |
-| S13-01 | M4 final gate - stage the ADR-0015 gate run at the final head (17 programs, held-out unsealed, six pairs, three profiles) | In progress | Lead submits. |
+| S13-01 | M4 final gate - stage the ADR-0015 gate run at the final head (17 programs, held-out unsealed, six pairs, three profiles) | Waiting for review | Submitted by the lead after M4 acceptance: gate tools (m4_gate.py, m4_score.py, corpus.py changes), host te... |
 | S13-02 | Libgomp per-region thread density - choose 1-4 workers per core per parallel region instead of once per program | draft | Owner 2026-11-15 ("yes delay to M5"): deferred to M5 (sprint s14). The M4 primary score is serial -O2, so t... |
 | S13-03 | M4 retrospective - what we did wrong, what worked, and the practice changes carried into the next milestone and the agent-team skill | draft |  |
 | S13-04 | Clean source repositories for a fresh build - GCC-KNC fork and project code without build artifacts, plus a Linux-host build recipe the owner runs on the new workstation | draft |  |
@@ -301,6 +301,7 @@ Current tickets: `[#################---]` 244 of 276
 
 ## Recent activity
 
+- 2026-11-16 00:06 **S13-01** engineer submit: Submitted by the lead after M4 acceptance: gate tools (m4_gate.py, m4_score.py, corpus.py changes), host tests, staged runner; M4 passed on the 712...
 - 2026-11-16 00:05 **S14-14** lead answer: Yes, run it: the card block ended 04:20Z and host limits are lifted (lead note 04:25Z), so run validate_heldout.predict_case on knc-twin/tests/held...
 - 2026-11-16 00:04 **S13-01** lead answer: Lead submits.
 - 2026-11-16 00:03 **S13-01** lead resume: Lead: M4 accepted (docs/research/m4-result.md). Branch carries the gate tools incl. codec fix, SSH-only transport retry, adopt/resume and score --p...
@@ -308,12 +309,11 @@ Current tickets: `[#################---]` 244 of 276
 - 2026-11-15 23:58 **S14-14** engineer ask: Green committed: 2e975d5b, clean, 799 lines. Acceptance 7 pass. Regress: bundled selftest and trial checks pass; held-out s12-31-hpcg-104 mismatche...
 - 2026-11-15 23:54 **S14-10** engineer ask: 7a41d127 documents diagnostic: all 8 HPCG-104 variants budget_exhausted at 120s; non-variant fields including scenario match record. JSON: .work/_s...
 - 2026-11-15 23:49 **S14-13** lead answer: Yes. Your diagnosis is right, and the flaw is in my test spec: with 60 active cores in total, each added detailed tile replaces a background core, ...
-- 2026-11-15 23:45 **S14-11** lead answer: Yes, run them now: the M4 card block finished 04:20Z and the host limits are lifted. Run tests/regress/test_knc_twin.py, the full selftest and vali...
 
 ## Cost
 
 - From the script, engineer: 729 sessions, 1556.4M input tokens
-- From the script, lead: 494 sessions, 140.4M input tokens
+- From the script, lead: 495 sessions, 140.6M input tokens
 - Started by hand, Claude: 14 sessions, 4059.9M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
