@@ -175,3 +175,12 @@ disconnect at 64 MiB) and `scif_mmap` (2.5-9 MiB/s) are not for bulk data. Raw T
 host firewall blocks inbound TCP from the card. Safe practice: reusable 64 MiB registered windows, synchronous RMA,
 explicit completion before reuse or unregister, in-memory SHA-256, bugcheck check between groups, no force-kill or
 auto-retry of DMA. Sent to the WRF lead 2026-11-12 15:45 EST.
+
+## 2026-11-16 - WRF 1.21x vs Sirocco: cause status (lead answer to PhiWeather)
+
+1. Sirocco hand IMCI kernels (~4% wall): by design; M6 intrinsics header would allow them in C.
+2. Short tiles (6-10 in i), masked epilogue gathers/scatters, x87 scalar tails: planned, GitHub #32 (M5) and S12-27 (Sprint 15).
+3. Heap automatic arrays: known, not planned on the compiler side; twin can price it (S14-11 heap stubs); -fstack-arrays untested (card/OMP stack limits). In S14-30.
+4. IEEE-strict math: by design (owner); vector libm S12-18 done, S12-20 contract M6.
+5. mp_thompson vcvtps2pd: twin side done (S14-11, 0.4.0).
+Missing: a like-for-like baseline (same source, GCC 5.1.1 without hand kernels, same thread layout) and per-routine profiles; -mphinix prefetch/unroll on short tiles. Ticket S14-30 attributes the gap first. Asked PhiWeather for Sirocco's compiler, flags, runtimes, threads per core, and per-routine profiles from the 25 h runs.
