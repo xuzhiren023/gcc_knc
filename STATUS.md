@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-16 03:50.
+Updated automatically at every ticket change. Last update: 2026-11-16 03:51.
 
-**Waiting for you:** S14-15. Run `python tools/pm.py inbox`.
+**Waiting for you:** S14-15, S14-18. Run `python tools/pm.py inbox`.
 
 Current tickets: `[#################---]` 244 of 279
 
@@ -146,7 +146,7 @@ Current tickets: `[#################---]` 244 of 279
 | S14-15 | knc-twin prepare-native: absolute memory operands come out as `N()` in kernel.S (k1om as 2.22 rejects them); emit them relocated into the image | **Waiting for you** | budget: 10651104 input tokens used; the budget is 10000000 |
 | S14-16 | bzip2 slower than GCC 5.1.1: mask-to-GPR move cost below a GPR move makes RA park integers in k registers (M4 known limit, must-fix) | draft |  |
 | S14-17 | Compare not folded with its load in merged return blocks (GCC 16 middle end, about half the remaining bzip2 mainGtU gap) | draft |  |
-| S14-18 | knc-twin regress: held-out replay runs under a 120 s wall-clock budget, so a slow interpreter turns a prediction into a budget_exhausted stub and the test fails as a false mismatch | In progress | Yes: remove the duplicate test_compiled_rows_record_disables_deadline (keep one copy, in the class it tests... |
+| S14-18 | knc-twin regress: held-out replay runs under a 120 s wall-clock budget, so a slow interpreter turns a prediction into a budget_exhausted stub and the test fails as a false mismatch | **Waiting for you** | budget: 4 engineer sessions used; the budget is 4 |
 | S14-19 | knc-twin x87 integer-load widths - fildl reads 8 bytes (must be 4), filds reads 4 (must be 2) | Not started |  |
 | S14-20 | knc-twin: an indirect jmp/call (PLT tail call through the GOT) on a never-executed path must not refuse the whole region | Not started |  |
 | S2-01 | Design for zmm and mask registers under -march=knc | Done | The register design for KNC is settled on paper: all 32 zmm and 8 mask registers become usable under -march... |
@@ -304,6 +304,7 @@ Current tickets: `[#################---]` 244 of 279
 
 ## Recent activity
 
+- 2026-11-16 03:51 **S14-18** engineer escalate: budget: 4 engineer sessions used; the budget is 4
 - 2026-11-16 03:50 **S14-13** lead answer: Both gates are resolved: main is merged into s14/S14-13 (8fdc95a8, clean) and the size override is approved; sessions are 11 for this submit only. ...
 - 2026-11-16 03:49 **S14-13** lead resume: Lead merged main into s14/S14-13 (8fdc95a8, clean). Size override approved; sessions 10 -> 11 for the submit only. Run first thing: pm.py submit S1...
 - 2026-11-16 03:47 **S14-13** lead defer: Interactive lead needed (sessions 10/10). (1) Merge main into s14/S14-13 by hand: the submit hard gate (pm.py:330) fires because main has non-work ...
@@ -311,7 +312,6 @@ Current tickets: `[#################---]` 244 of 279
 - 2026-11-16 03:45 **S14-13** engineer ask: Submit-only owner instruction attempted; submit refused: branch lacks real changes from main (asks lead to merge main into ticket branch), and 6137...
 - 2026-11-16 03:44 **S14-11** engineer submit: A-G complete; main merged; worktree clean. Windows Python 3.8 heldout HPCG check with --max-seconds 3600 passed all 8 variants, no differs or budge...
 - 2026-11-16 03:28 **S14-18** lead answer: Yes: remove the duplicate test_compiled_rows_record_disables_deadline (keep one copy, in the class it tests), then make the [red] test commit, the ...
-- 2026-11-16 03:28 **S14-11** owner decide: sessions 6 -> 7 (one more, for the submit only): run pm.py submit with the --override text of the 08:15Z decide first thing, then end the session. ...
 
 ## Cost
 
