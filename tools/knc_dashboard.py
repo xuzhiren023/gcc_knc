@@ -57,7 +57,7 @@ def ledger_status(text, now):
     queue = sorted((r for r in active.values() if r['event'] == 'queued' and _runner.live_queue(r, now)),
                    key=lambda r: timestamp(r.get('firstQueuedTime')) or timestamp(r.get('queuedTime')))
     ends = [timestamp(r.get('expectedEnd')) for r in running]
-    cursor = max(ends) if ends and all(ends) else (now if not ends else None)
+    cursor = max(now, max(ends)) if ends and all(ends) else (now if not ends else None)
     jobs, turns = [], []
     for row in queue:
         if str(row['jobId']).startswith('claude-turn-') and row.get('cores') == []:
