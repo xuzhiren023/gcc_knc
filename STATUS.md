@@ -148,7 +148,7 @@ Current tickets: `[#################---]` 252 of 289
 | S14-17 | Compare not folded with its load in merged return blocks (GCC 16 middle end, about half the remaining bzip2 mainGtU gap) | draft |  |
 | S14-18 | knc-twin regress: held-out replay runs under a 120 s wall-clock budget, so a slow interpreter turns a prediction into a budget_exhausted stub and the test fails as a false mismatch | Done | The knc-twin held-out replay no longer runs in t0 (KNC_TWIN_HELDOUT=1 or validate_heldout.py --max-seconds ... |
 | S14-19 | knc-twin x87 integer-load widths - fildl reads 8 bytes (must be 4), filds reads 4 (must be 2) | Done | The knc-twin now reads and writes x87 integer memory at the right widths (filds/fists 2 bytes, fildl/fistl ... |
-| S14-20 | knc-twin: an indirect jmp/call (PLT tail call through the GOT) on a never-executed path must not refuse the whole region | Changes requested | One regression on the branch (aaae555d, merged with main): knc-twin/tests/test_wrf_coverage.py test_complet... |
+| S14-20 | knc-twin: an indirect jmp/call (PLT tail call through the GOT) on a never-executed path must not refuse the whole region | In progress | One regression on the branch (aaae555d, merged with main): knc-twin/tests/test_wrf_coverage.py test_complet... |
 | S14-21 | knc-twin multi-core: held-out validation of the 8-tile ring model against the measured GEMV, triad and core-scaling rows | Not started |  |
 | S14-22 | card_run turn row: refreshing an open turn row must keep its place in the queue | draft |  |
 | S14-23 | knc-twin: import the window-10 scatter rows (2 threads) and settle occupancy.scatter_cycles_per_line | Not started |  |
@@ -327,7 +327,7 @@ Current tickets: `[#################---]` 252 of 289
 
 - From the script, engineer: 773 sessions, 1635.8M input tokens
 - From the script, lead: 523 sessions, 148.3M input tokens
-- Started by hand, Claude: 14 sessions, 4241.2M input tokens
+- Started by hand, Claude: 14 sessions, 4241.4M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
