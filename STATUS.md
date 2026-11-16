@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-16 02:55.
+Updated automatically at every ticket change. Last update: 2026-11-16 02:56.
 
-**Waiting for you:** S14-11, S14-15. Run `python tools/pm.py inbox`.
+**Waiting for you:** S14-15. Run `python tools/pm.py inbox`.
 
 Current tickets: `[#################---]` 244 of 279
 
@@ -139,7 +139,7 @@ Current tickets: `[#################---]` 244 of 279
 | S14-08 | Quantized GEMV kernels on KNC - multi-row activation reuse, FP vs int32 VPMADD231D vs VPERMD lookup table, bandwidth-normalized | draft |  |
 | S14-09 | KNC vs the Z840 host (dual E5-2690 v3) on the same algorithms and numerical contract - where running on the card actually pays | draft |  |
 | S14-10 | knc-twin: --jobs N for independent simulations and PyPy support (roadmap item 1) | In progress | No worktree needed. Export main's knc-twin into your shared dir: git -c safe.directory='*' archive main knc... |
-| S14-11 | knc-twin: close PhiWeather WRF coverage gaps (jump tables, vcvtps2pd ymm, loop-region and complete-listing modes, scatter and rcp-table import) | **Waiting for you** | budget: 20910113 input tokens used; the budget is 20000000 |
+| S14-11 | knc-twin: close PhiWeather WRF coverage gaps (jump tables, vcvtps2pd ymm, loop-region and complete-listing modes, scatter and rcp-table import) | In progress | input_tokens 20M -> 30M under the owner's standing auto-extend rule: items A-G are committed and main is me... |
 | S14-12 | knc-twin: iteration and phase sampling for loop and whole-program wall-time estimates (roadmap item 2) | In progress | sessions 6 -> 9 under the owner's standing auto-extend rule: implementation committed, the hpcg-104 questio... |
 | S14-13 | knc-twin: 8-tile multi-core unit on the full ring with all memory controllers (roadmap item 3) | In progress | (1) Schema: offline, in memory only: s = json.load(kernel.schema.json); s.pop('$id'); jsonschema.Draft7Vali... |
 | S14-14 | knc-twin: scheduling explorer for modulo scheduling and reordering, evaluating S14-02/S14-03 (roadmap item 4) | lead | Review passed (approve note: knc-twin gains a schedule command: beam search up to 60 instructions, list ord... |
@@ -304,6 +304,7 @@ Current tickets: `[#################---]` 244 of 279
 
 ## Recent activity
 
+- 2026-11-16 02:56 **S14-11** owner decide: input_tokens 20M -> 30M under the owner's standing auto-extend rule: items A-G are committed and main is merged; the held-out check (python 3.8 or ...
 - 2026-11-16 02:55 **S14-11** engineer escalate: budget: 20910113 input tokens used; the budget is 20000000
 - 2026-11-16 02:54 **S14-14** lead defer: Review passed (approve note: knc-twin gains a schedule command: beam search up to 60 instructions, list ordering, modulo II, GAS export and frozen-...
 - 2026-11-16 02:07 **S14-14** engineer submit: Green 2e975d5b; main merged at 9b699730. Prior checks: 7 acceptance tests, selftest and trial checks passed. Held-out check passed: Windows Python ...
@@ -311,13 +312,12 @@ Current tickets: `[#################---]` 244 of 279
 - 2026-11-16 02:00 **S14-15** lead answer: Do both on the branch, no review rerun: (1) Merge-main: git merge main into s14/S14-15 (a merge commit, not a rebase of main); resolve any conflict...
 - 2026-11-16 01:57 **S14-15** engineer ask: Submit refused: branch lacks changes from main and no [red] test commit. Lead review required five edits; completed them and committed d450ff6e (se...
 - 2026-11-16 01:52 **S14-12** owner decide: sessions 6 -> 9 under the owner's standing auto-extend rule: implementation committed, the hpcg-104 question is answered (S14-18), held-out check a...
-- 2026-11-16 01:51 **S14-12** engineer escalate: budget: 6 engineer sessions used; the budget is 6
 
 ## Cost
 
 - From the script, engineer: 745 sessions, 1613.4M input tokens
 - From the script, lead: 504 sessions, 143.0M input tokens
-- Started by hand, Claude: 14 sessions, 4133.1M input tokens
+- Started by hand, Claude: 14 sessions, 4133.7M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
