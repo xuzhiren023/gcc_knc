@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-16 06:51.
+Updated automatically at every ticket change. Last update: 2026-11-16 06:52.
 
 **Waiting for you:** S14-15. Run `python tools/pm.py inbox`.
 
@@ -147,7 +147,7 @@ Current tickets: `[#################---]` 249 of 283
 | S14-16 | bzip2 slower than GCC 5.1.1: mask-to-GPR move cost below a GPR move makes RA park integers in k registers (M4 known limit, must-fix) | draft |  |
 | S14-17 | Compare not folded with its load in merged return blocks (GCC 16 middle end, about half the remaining bzip2 mainGtU gap) | draft |  |
 | S14-18 | knc-twin regress: held-out replay runs under a 120 s wall-clock budget, so a slow interpreter turns a prediction into a budget_exhausted stub and the test fails as a false mismatch | Done | The knc-twin held-out replay no longer runs in t0 (KNC_TWIN_HELDOUT=1 or validate_heldout.py --max-seconds ... |
-| S14-19 | knc-twin x87 integer-load widths - fildl reads 8 bytes (must be 4), filds reads 4 (must be 2) | In progress | sessions 2 -> 4 (the count already equals the budget, so no session could start). Only step: pm.py submit S... |
+| S14-19 | knc-twin x87 integer-load widths - fildl reads 8 bytes (must be 4), filds reads 4 (must be 2) | Question for the tech lead | Submit is refused because the branch lacks real changes from main, although the ticket log says the lead co... |
 | S14-20 | knc-twin: an indirect jmp/call (PLT tail call through the GOT) on a never-executed path must not refuse the whole region | Not started |  |
 | S14-21 | knc-twin multi-core: held-out validation of the 8-tile ring model against the measured GEMV, triad and core-scaling rows | Not started |  |
 | S14-22 | card_run turn row: refreshing an open turn row must keep its place in the queue | draft |  |
@@ -308,6 +308,7 @@ Current tickets: `[#################---]` 249 of 283
 
 ## Recent activity
 
+- 2026-11-16 06:52 **S14-19** engineer ask: Submit is refused because the branch lacks real changes from main, although the ticket log says the lead committed the red test and fix. Please mer...
 - 2026-11-16 06:51 **S14-19** owner decide: sessions 2 -> 4 (the count already equals the budget, so no session could start). Only step: pm.py submit S14-19 with the 06:47 answer's note, then...
 - 2026-11-16 06:50 **S14-19** engineer escalate: budget: 2 engineer sessions used; the budget is 2
 - 2026-11-16 06:49 **S14-19** owner decide: input_tokens 4M -> 8M under the owner's standing rule (the 45-minute re-recording run consumed the budget; the work is committed by the lead). Only...
@@ -315,13 +316,12 @@ Current tickets: `[#################---]` 249 of 283
 - 2026-11-16 06:47 **S14-19** lead answer: Your changes are committed on s14/S14-19 by the lead (two commits: [red] tests, then the fix with engine 0.4.0 and the re-recorded predictions). On...
 - 2026-11-16 06:47 **S14-19** lead resume: lead committed the worktree: 105-style red commit (tests only, verified failing on main's code: 'mismatch' != 'ok') then the fix; run outputs valid...
 - 2026-11-16 06:44 **S14-19** lead defer: Interactive lead: the engineer's worktree could not write .git/worktrees/S14-19/index.lock (Permission denied), so its changes are uncommitted. Ple...
-- 2026-11-16 06:43 **S14-19** engineer ask: Commit wrapper refused: git add -A cannot create C:/Users/xuzhi/Documents/gcc_knc/.git/worktrees/S14-19/index.lock (Permission denied). Test passes...
 
 ## Cost
 
 - From the script, engineer: 768 sessions, 1632.1M input tokens
 - From the script, lead: 519 sessions, 147.5M input tokens
-- Started by hand, Claude: 14 sessions, 4194.5M input tokens
+- Started by hand, Claude: 14 sessions, 4194.9M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
