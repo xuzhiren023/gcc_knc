@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-15 23:44.
+Updated automatically at every ticket change. Last update: 2026-11-15 23:45.
 
-**Next: the tech lead, on S14-11.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: the tech lead, on S14-13.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[#################---]` 244 of 273
 
@@ -139,7 +139,7 @@ Current tickets: `[#################---]` 244 of 273
 | S14-08 | Quantized GEMV kernels on KNC - multi-row activation reuse, FP vs int32 VPMADD231D vs VPERMD lookup table, bandwidth-normalized | draft |  |
 | S14-09 | KNC vs the Z840 host (dual E5-2690 v3) on the same algorithms and numerical contract - where running on the card actually pays | draft |  |
 | S14-10 | knc-twin: --jobs N for independent simulations and PyPy support (roadmap item 1) | In progress | Yes, go ahead. One single-threaded process at a time is always allowed, so you can run the single-case HPCG... |
-| S14-11 | knc-twin: close PhiWeather WRF coverage gaps (jump tables, vcvtps2pd ymm, loop-region and complete-listing modes, scatter and rcp-table import) | Question for the tech lead | 4dc7eee2 implements A-F. WRF: 13/13 functional-complete; only scatter occupancy missing. Report: .work/_sha... |
+| S14-11 | knc-twin: close PhiWeather WRF coverage gaps (jump tables, vcvtps2pd ymm, loop-region and complete-listing modes, scatter and rcp-table import) | In progress | Yes, run them now: the M4 card block finished 04:20Z and the host limits are lifted. Run tests/regress/test... |
 | S14-12 | knc-twin: iteration and phase sampling for loop and whole-program wall-time estimates (roadmap item 2) | In progress | Yes, run the full knc-twin selftest and tests/regress/test_knc_twin.py now, one at a time, single-threaded ... |
 | S14-13 | knc-twin: 8-tile multi-core unit on the full ring with all memory controllers (roadmap item 3) | Question for the tech lead | Partial commit 4057b79b; two failed attempts. Background rounding fixed; conservation passes. Contention re... |
 | S14-14 | knc-twin: scheduling explorer for modulo scheduling and reordering, evaluating S14-02/S14-03 (roadmap item 4) | In progress | M4 is not finished (62 of 65) and the card may be in a timed block, but you do not need idle clearance for ... |
@@ -298,6 +298,7 @@ Current tickets: `[#################---]` 244 of 273
 
 ## Recent activity
 
+- 2026-11-15 23:45 **S14-11** lead answer: Yes, run them now: the M4 card block finished 04:20Z and the host limits are lifted. Run tests/regress/test_knc_twin.py, the full selftest and vali...
 - 2026-11-15 23:42 **S14-13** engineer ask: Partial commit 4057b79b; two failed attempts. Background rounding fixed; conservation passes. Contention reproducer: test_multicore_protocol, 32 li...
 - 2026-11-15 23:37 **S14-11** engineer ask: 4dc7eee2 implements A-F. WRF: 13/13 functional-complete; only scatter occupancy missing. Report: .work/_shared/S14-11/wrf-coverage.json. Selftest 1...
 - 2026-11-15 23:23 **S14-13** lead approve-red: S14-13 red tests approved: they now require the shared 8-tile multicore model (channel contention across 1-8 tiles, remote L2 reads through the tag...
@@ -305,13 +306,12 @@ Current tickets: `[#################---]` 244 of 273
 - 2026-11-15 23:22 **S14-10** lead answer: Yes, go ahead. One single-threaded process at a time is always allowed, so you can run the single-case HPCG-104 reproducer now, and the 900-second ...
 - 2026-11-15 23:21 **S14-12** engineer ask: Committed 479a2204: loop sampling, period-aware windows/bands, phase rollups, docs/fixture. Focused selftest: 8 passed; log ../_state/logs/S14_12_s...
 - 2026-11-15 23:20 **S14-13** engineer red: Red correction 73eee70b: remote-owner probe compares elapsed differences with hop-delay differences for distances 15/30/31 versus 1; distance 1 bou...
-- 2026-11-15 23:20 **S14-10** engineer ask: Committed 9950928b. Selftest 155 passed; syntax passed. Serial regression failed only HPCG-104 (2 tests passed, 25.2 min); cause unknown, diff trun...
 
 ## Cost
 
 - From the script, engineer: 726 sessions, 1539.6M input tokens
 - From the script, lead: 491 sessions, 140.0M input tokens
-- Started by hand, Claude: 14 sessions, 4046.0M input tokens
+- Started by hand, Claude: 14 sessions, 4048.1M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
