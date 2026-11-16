@@ -66,6 +66,33 @@ class TestCompiledFunctions(unittest.TestCase):
 
 
 class TestX87Semantics(unittest.TestCase):
+    def test_x87_integer_memory_widths(self):
+        k = kernel(None, streams=[{"context": 0, "asm": """
+            movl $1, (%rdi)
+            fildl (%rdi)
+            fstpl (%rsi)
+            movw $2, 8(%rdi)
+            filds 8(%rdi)
+            fstpl 8(%rsi)
+            fldl 16(%rdi)
+            fistpl 16(%rsi)
+            fldl 16(%rdi)
+            fistps 24(%rsi)
+        """}], init={"registers": {"rdi": "0x1000", "rsi": "0x2000"},
+            "memory": [{"addr": "0x1000", "hex": "000000007f7f7f7f"},
+                       {"addr": "0x1004", "u8": [0x7f, 0x7f, 0x7f, 0x7f]},
+                       {"addr": "0x1008", "u8": [0x7f]},
+                       {"addr": "0x1009", "u8": [0x7f]},
+                       {"addr": "0x100a", "u8": [0x7f]},
+                       {"addr": "0x100b", "u8": [0x7f]},
+                       {"addr": "0x1010", "f64": [42.0]}]},
+            expected={"memory": [{"addr": "0x2000", "f64": [1.0, 2.0]},
+                                  {"addr": "0x2010", "hex": "2a000000"},
+                                  {"addr": "0x2018", "hex": "2a00"},
+                                  {"addr": "0x201a", "hex": "00"}]})
+        interp, check = run(k)
+        self.assertEqual(check["status"], "ok", check["mismatches"])
+
     def test_att_subtraction_forms(self):
         # fsub %st(1), %st : st0 = st0 - st1 ; fsubrp %st, %st(1): st1 = st1 - st0 ; fsubp %st, %st(1): st1 = st0 - st1
         k = kernel(None, streams=[{"context": 0, "asm": """
