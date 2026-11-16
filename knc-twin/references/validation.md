@@ -165,9 +165,11 @@ Cygwin Python process remains. Log:
 `.work/_state/logs/S14_13_hpcg_main-20261116-024600.log`.
 The cause of that interruption is unknown. The original regression failure is
 not yet diagnosed: budget exhaustion remains a hypothesis, not an observed
-result. Main/branch equality remains pending permission to repeat the interrupted
-main run beyond the lead's two-run budget. No model change or re-recording of
-HPCG predictions was made; the full regression is still reported as failed.
+result. The lead accepted the branch's exact agreement with the recorded
+prediction as the held-out equality check (2026-11-16); no main rerun is planned.
+The regression failure is not attributed to this branch and remains pending a
+lead rerun with full output. No model change or re-recording of HPCG predictions
+was made; the full regression is still reported as failed.
 
 Schema metadata passed Draft 7 checking. Offline instance validation now passes
 for all three staged native inputs and all eight recorded scenario inputs:
@@ -175,7 +177,13 @@ the lead-approved removal of `$id` from the in-memory schema fixes local referen
 resolution. The schema and its `$id` on disk are unchanged. Log:
 `.work/_state/logs/S14_13_schema_without_id-20261116-015011.log`.
 
-| Evidence | Status and unresolved comparison |
+The owner's 2026-11-16 scope split assigns the brief's step 7 held-out and
+retrospective comparisons to **S14-21**. S14-13 delivers the engine, protocol
+tests, design and staged requests; every multi-core result remains
+`unvalidated_scenario_estimate`. The table records deferred evidence, not a
+promise of completed validation in S14-13.
+
+| Evidence | Status and unresolved comparison (S14-21) |
 |---|---|
 | 1/2/4/8-core STREAM bandwidth | Pending native rows: none exist in the repository, per the lead's evidence review. Do not interpolate from 15/60-core points. `multicore-symmetry` requests the missing measurements. |
 | S8-10 C11 remote L2, 190.6-195.0 ns | Calibration: the approved 192 ns endpoint residual is used. Protocol tests check residual/reference-path identity and exact route differences, not independent latency accuracy. Controlled ring-distance validation needs the deferred driver. |

@@ -261,6 +261,36 @@ class TestMulticoreProtocol(unittest.TestCase):
         self.assertLess(b.result()["completed_cycle"], c.result()["completed_cycle"])
         self.assertEqual({fabric.directory(i * 64) for i in range(64)}, set(range(64)))
 
+    def test_saturated_ring_read_matches_channel_service(self):
+        from knc_model.multicore import Fabric
+        # Full occupancy: eight detailed sources and 52 synthetic sources,
+        # each with a queued, disjoint cold stream. No held-out target is used.
+        fabric = Fabric(helpers.profile(), {core: core for core in range(60)},
+                        scenario={"channel_interleave": "line_modulo"})
+        requests = []
+        for line in range(256):
+            for core in range(60):
+                requests.append(fabric.request(core, (line * 60 + core) * 64,
+                                               "read", background=core >= 8))
+        fabric.drain()
+        p = {key: item["value"] for key, item in fabric.parameters_used().items()}
+        channels = p["memory.controllers"] * p["memory.channels_per_controller"]
+        interval = p["memory.channel_service_cycles_per_line"]
+        clock = p["card.clock_hz"]
+        expected = channels * 64 / interval * clock
+        elapsed = max(tx.result()["completed_cycle"] for tx in requests)
+        bandwidth = len(requests) * 64 / elapsed * clock
+        # Bound finite startup/drain by an unloaded worst-distance read plus
+        # one channel batch; do not widen this tolerance after a miss.
+        drain = (p["multicore.memory_endpoint_residual_cycles"]
+                 + p["td.lookup_cycles"]
+                 + 3 * (p["ring.positions"] // 2) * p["ring.hop_cycles"]
+                 + 2 * p["ring.control_service_cycles"]
+                 + fabric.data + interval)
+        ideal_cycles = len(requests) / channels * interval
+        self.assertAlmostEqual(bandwidth, expected,
+                               delta=expected * drain / (ideal_cycles + drain))
+
     def test_background_changes_ring_but_not_analytical_scales(self):
         raw = read_kernel(2, False)
         unit = self.prediction(raw, "unit")

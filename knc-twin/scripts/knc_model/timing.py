@@ -611,10 +611,12 @@ class CoreSim(object):
         while not all(c.done for c in active):
             now = self.cycle
             if self.max_cycles is not None and now > self.max_cycles:
-                raise BudgetExhausted("cycle budget exhausted (partial, not a result)",
+                raise BudgetExhausted("cycle budget %d exhausted; %d of %d dynamic instructions issued (partial, not a result)" % (self.max_cycles, sum(c.issued for c in active), total_events),
+                                      {"cycles_simulated": now, "issued": sum(c.issued for c in active), "events": total_events},
                                       partial={"cycles": now, "issued": sum(c.issued for c in active)})
             if self.deadline is not None and (now & 1023) == 0 and time.time() > self.deadline:
-                raise BudgetExhausted("python time budget exhausted", partial={"cycles": now})
+                raise BudgetExhausted("python time budget exhausted after %d simulated cycles (partial, not a result)" % now,
+                                      {"cycles_simulated": now, "issued": sum(c.issued for c in active)})
             self.step()
         end_issue = max((c.last_issue_cycle or 0) for c in active) + 1
         completion = max(end_issue, max(c.max_done for c in active))
