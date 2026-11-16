@@ -96,6 +96,9 @@ M5 definition frozen: ADR-0016 accepted by the owner 2026-11-16 15:15 EST (A 1.2
 
 ## Not proven yet
 
+- knc-twin tree left gcc_knc main at a1734baa (twin session). `tests/regress/test_knc_twin.py` reads `../knc-twin`
+  (KNC_TWIN_ROOT overrides) and **fails, not skips, when the sibling is absent**: a fresh public clone fails t0. Fix it
+  before the M5 Linux-host build check (ADR-0016 rule 5). S14-42 (knc-optimize skill, owner request) dispatched, lane skill.
 - Next card window (needs owner approval): `.work/_shared/calib-w10/run-list-w12.txt` holds the two PhiWeather
   sixth_{1,2}ctx_l2_031 probes rebuilt with twin T1-08 (no mfence, knc_lint clean, 2026-11-16 15:17). The k1om gcc run
   from a non-Cygwin shell needs `.work/_shared/toolchain/cygwin/bin` on PATH (cygmpc-3.dll).
