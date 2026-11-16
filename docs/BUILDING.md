@@ -90,8 +90,10 @@ mkdir -p .work/_shared/gcc-build && cd .work/_shared/gcc-build
 make -j8 all-gcc CFLAGS='-O2 -g1' CXXFLAGS='-O2 -g1'
 ```
 
-- **(not yet run on Linux)** The same configure without `--with-as`, `--with-ld` and
-  `--with-sysroot` ran on the Windows host; see section 5.
+- **(not yet run)** This configure, without `--with-as`, `--with-ld` and `--with-sysroot`, has
+  not run on any host yet. The project has only built with the binutils and sysroot of
+  section 3.1. Without an assembler, GCC's configure cannot probe assembler features and uses
+  its defaults, so the assembly may differ slightly from a full build's. See section 5.
 - `-O2 -g1` makes the compiler build faster and smaller than GCC's default `-O2 -g`.
 - Use `--enable-languages=c` for the fastest build if you need only C.
 
@@ -109,9 +111,9 @@ EOF
 grep -E 'zmm' kernels.s | head
 ```
 
-`xgcc -B./gcc/` runs the compiler from the build tree without installing it. The output has
-IMCI instructions on `zmm` registers, such as `vfmadd231ps` and `vmovaps`, and `k` mask registers
-for the loop tail. [USING.md](USING.md) has more examples. A file that includes system headers
+`xgcc -B./gcc/` runs the compiler from the build tree without installing it. Look for IMCI
+instructions on `zmm` registers, such as `vfmadd231ps`. Pending: this example has not yet been
+checked on a fresh-clone build (section 5). [USING.md](USING.md) has more examples. A file that includes system headers
 (`stdio.h`, `math.h`) needs the sysroot, or `-isystem` pointing at a copy of the card's
 `usr/include`.
 
@@ -241,11 +243,14 @@ The same configure by hand, from Cygwin `bash`, is section 3.1 with `/cygdrive/c
 
 ## 5. Fresh-clone check
 
-The minimal and full configures were checked from a fresh clone of the fork. See the record
-below.
+**Pending: build verification after M4.** A build from a fresh clone, with IMCI assembly from
+it, is not recorded yet. What has run so far, on the Windows host, 2026-11-15:
 
-- 2026-11-15, Windows host: the clone of the fork's `knc` branch took about 1.5 minutes.
-  Configure as in section 3.1 took 62 s.
-- The first `make -j8 all-gcc` stopped in `libcody` with a Cygwin fork failure ("Resource
-  temporarily unavailable", 0xC000012D) while other jobs loaded the host. It was restarted once.
-  Its result, and the minimal configure of section 2.2, are not recorded yet.
+- `git clone -c core.autocrlf=false --branch knc` of the fork: about 1.5 minutes. Without
+  `core.autocrlf=false`, Git for Windows checked out CRLF files and `configure` failed.
+- Configure as in section 3.1: 62 s.
+- `make -j8 all-gcc` did not finish. The first run stopped in `libcody` with a Cygwin fork
+  failure ("Resource temporarily unavailable", 0xC000012D) while other jobs loaded the host.
+  Later runs were stopped on purpose, to keep the host free for card measurements. On a shared
+  host, use `-j4`.
+- The minimal configure of section 2.2 has not run.

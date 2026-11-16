@@ -47,10 +47,11 @@ void saxpy(int n, float a, const float *restrict x, float *restrict y)
 }
 ```
 
-the inner loop is IMCI on 16 floats at a time, with a fused multiply-add and prefetches:
+the vectorizer should make the inner loop IMCI on 16 floats at a time, with a fused
+multiply-add on `zmm` registers:
 
-(An excerpt from the fresh-clone build goes here once that build is checked; see
-[BUILDING.md](BUILDING.md) section 5.)
+Pending: build verification after M4. An excerpt from a fresh-clone build goes here once that
+build has run ([BUILDING.md](BUILDING.md) section 5).
 
 Ask the vectorizer what it did with `-fopt-info-vec-optimized` and `-fopt-info-vec-missed`.
 
