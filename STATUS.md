@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-16 14:13.
+Updated automatically at every ticket change. Last update: 2026-11-16 14:14.
 
-**Next: the tech lead, on S14-16.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: GPT-6.1, on S14-10 (knc-twin: --jobs N for independent simulations and PyPy support (roadmap item 1)).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
 Current tickets: `[#################---]` 256 of 296
 
@@ -144,7 +144,7 @@ Current tickets: `[#################---]` 256 of 296
 | S14-13 | knc-twin: 8-tile multi-core unit on the full ring with all memory controllers (roadmap item 3) | Done | knc-twin simulates 1-8 detailed cores on the full 61-stop ring with all memory controllers and directory sl... |
 | S14-14 | knc-twin: scheduling explorer for modulo scheduling and reordering, evaluating S14-02/S14-03 (roadmap item 4) | Done | knc-twin gains a schedule command: beam search up to 60 instructions, list ordering, modulo II, GAS export ... |
 | S14-15 | knc-twin prepare-native: absolute memory operands come out as `N()` in kernel.S (k1om as 2.22 rejects them); emit them relocated into the image | Done | prepare-native emits absolute operands relocated into the memory image (knc_twin_mem+off(%rip)) instead of ... |
-| S14-16 | bzip2 slower than GCC 5.1.1: mask-to-GPR move cost below a GPR move makes RA park integers in k registers (M4 known limit, must-fix) | Tests waiting for review | 76490eea: synthetic byte decoder T1 fails on loop %k register scan, as expected. Log .work/_state/logs/S14_... |
+| S14-16 | bzip2 slower than GCC 5.1.1: mask-to-GPR move cost below a GPR move makes RA park integers in k registers (M4 known limit, must-fix) | In progress | S14-16 has a red test: a synthetic byte decoder written from scratch fails because existing GCC parks scala... |
 | S14-17 | Compare not folded with its load in merged return blocks (GCC 16 middle end, about half the remaining bzip2 mainGtU gap) | draft |  |
 | S14-18 | knc-twin regress: held-out replay runs under a 120 s wall-clock budget, so a slow interpreter turns a prediction into a budget_exhausted stub and the test fails as a false mismatch | Done | The knc-twin held-out replay no longer runs in t0 (KNC_TWIN_HELDOUT=1 or validate_heldout.py --max-seconds ... |
 | S14-19 | knc-twin x87 integer-load widths - fildl reads 8 bytes (must be 4), filds reads 4 (must be 2) | Done | The knc-twin now reads and writes x87 integer memory at the right widths (filds/fists 2 bytes, fildl/fistl ... |
@@ -321,6 +321,7 @@ Current tickets: `[#################---]` 256 of 296
 
 ## Recent activity
 
+- 2026-11-16 14:14 **S14-16** lead approve-red: S14-16 has a red test: a synthetic byte decoder written from scratch fails because existing GCC parks scalar integers in mask registers inside its ...
 - 2026-11-16 14:12 **S14-33** lead changes: 1. knc-twin/references/validation.md:303 (and :304): the scatter parameter does not reproduce the rows it was derived from: scatter_all_t1 +128.9%,...
 - 2026-11-16 14:12 **S14-26** lead defer: Reviewed b9056c7f: matches the 14:03 answer (static caps, no-go verdict, modulo unsupported evidence kept); ready to approve. Needs interactive lea...
 - 2026-11-16 14:10 **S14-26** engineer ask: Committed the requested static-cap table and no-go verdict as b9056c7f, retaining unsupported modulo evidence; no further model runs. Submit with y...
@@ -328,13 +329,12 @@ Current tickets: `[#################---]` 256 of 296
 - 2026-11-16 14:10 **S12-42** lead close: Card window 10 (post-S12-31 prefix b2ce6a9eebf, 1 thread, A-s12-42-small.out, all GUARDS failures=0): GCC-KNC is now faster than GCC 5.1.1 on all f...
 - 2026-11-16 14:08 **S13-03** lead defer: Merge main into s13/S13-03 (21 commits behind, main touches non-work paths, so submit hard-refuses); the branch adds only docs/research/m4-retrospe...
 - 2026-11-16 14:07 **S14-33** engineer submit: knc-twin imports card windows 10 and 11: the scatter cost per cache line is measured (11.2 cycles, so scatter regions now get a prediction), vrsqrt...
-- 2026-11-16 14:06 **S14-22** lead answer: Run the card_run unit tests directly, not through tools/run.py: python -m unittest tests.tools.test_card_turn tests.tools.test_card_run -v (add a p...
 
 ## Cost
 
 - From the script, engineer: 809 sessions, 1692.4M input tokens
 - From the script, lead: 554 sessions, 155.8M input tokens
-- Started by hand, Claude: 51 sessions, 4393.9M input tokens
+- Started by hand, Claude: 51 sessions, 4394.6M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
