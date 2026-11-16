@@ -189,6 +189,98 @@ class TestCallsAndStubs(unittest.TestCase):
         self.assertGreaterEqual(res["per_context"]["0"]["stall_cycles"]["stub_call"], 10 + 8 + 70 - 3)   # stall cycles exclude the issue cycles themselves
 
 
+class TestHeapStubs(unittest.TestCase):
+    def heap_kernel(self, text, heap=None, **kw):
+        calls = {n: {"model": n, "cycles": 17, "status": "assumed"}
+                 for n in ("malloc", "calloc", "realloc", "free")}
+        return asm_kernel(text, init={"heap": heap or {"addr": "0x10003", "size": 1024}},
+                          calls=calls, **kw)
+
+    def test_allocate_zero_fill_reallocate_and_free(self):
+        k = self.heap_kernel("""
+            movq $8, %rdi
+            call malloc
+            movq %rax, %r12
+            movq $123, (%rax)
+            movq $2, %rdi
+            movq $8, %rsi
+            call calloc
+            movq %rax, %r13
+            movq %r12, %rdi
+            movq $24, %rsi
+            call realloc
+            movq %rax, %r14
+            movq %r12, %rdi
+            call free
+            movq $0, %rdi
+            call malloc
+        """)
+        interp, _ = run(k)
+        regs = interp.contexts[0].gpr
+        self.assertEqual([regs[n] for n in ("r12", "r13", "r14", "rax")],
+                         [0x10040, 0x10080, 0x100c0, 0x10100])
+        self.assertEqual(interp.memory.read(regs["r13"], 16), bytes(16))
+        self.assertEqual(interp.memory.read(regs["r14"], 8), (123).to_bytes(8, "little"))
+        self.assertEqual(interp.memory.read(regs["r12"], 8), (123).to_bytes(8, "little"))
+        self.assertEqual([a["size"] for a in interp.heap_allocations], [8, 16, 24, 0])
+        self.assertEqual(interp.approximate_stubs, set())
+
+    def test_realloc_null_shrink_and_zero(self):
+        k = self.heap_kernel("""
+            movq $0, %rdi
+            movq $8, %rsi
+            call realloc
+            movq $789, (%rax)
+            movq %rax, %rdi
+            movq $4, %rsi
+            call realloc
+            movq %rax, %r12
+            movq %rax, %rdi
+            movq $0, %rsi
+            call realloc
+        """)
+        interp, _ = run(k)
+        self.assertEqual(interp.memory.read(interp.contexts[0].gpr["r12"], 4),
+                         (789).to_bytes(4, "little"))
+        self.assertEqual(interp.contexts[0].gpr["rax"], 0)
+
+    def test_heap_errors_are_explicit(self):
+        cases = [
+            ("call malloc", {"addr": 0, "size": 64}, "heap"),
+            ("movq $65, %rdi\ncall malloc", {"addr": 0x10000, "size": 64}, "exhausted"),
+            ("movq $-1, %rdi\nmovq $2, %rsi\ncall calloc", None, "overflow"),
+            ("movq $123, %rdi\nmovq $4, %rsi\ncall realloc", None, "allocation"),
+        ]
+        for text, heap, reason in cases:
+            with self.subTest(reason=reason), self.assertRaisesRegex(InvalidInput, reason):
+                run(self.heap_kernel(text, heap))
+        with self.assertRaisesRegex(InvalidInput, "init.heap"):
+            run(asm_kernel("call malloc", calls={"malloc": {"model": "malloc", "cycles": 1}}))
+
+    def test_heap_is_shared_across_contexts(self):
+        k = self.heap_kernel("call malloc")
+        k.raw["streams"].append({"context": 1, "asm": "call malloc"})
+        interp, _ = run(Kernel(k.raw, None))
+        self.assertNotEqual(interp.contexts[0].gpr["rax"], interp.contexts[1].gpr["rax"])
+
+    def test_output_reports_actual_stub_costs_and_sizes(self):
+        from knc_model import cli
+        k = self.heap_kernel("movq $8, %rdi\ncall malloc\nmovq %rax, %rdi\ncall free")
+        args = cli.build_parser().parse_args(["simulate", "unused.json"])
+        _, res, pred = cli._simulate_core(k, profile(), args, {"assumptions": []})
+        self.assertEqual(res["stub_cycles_total"], 34)
+        self.assertEqual(pred["stub_cycles_total"], 34)
+        self.assertEqual(pred["stub_calls"]["malloc"]["cycles_total"], 17)
+        self.assertEqual(pred["stub_calls"]["malloc"]["status"], "assumed")
+        self.assertEqual(pred["heap_allocations"][0]["size"], 8)
+        self.assertEqual(pred["result_class"]["class"], "unvalidated_scenario_estimate")
+        # memcpy reads and writes n bytes, but its per-byte price applies to n, not 2*n.
+        k = asm_kernel("call memcpy", calls={"memcpy": {"model": "memcpy", "cycles": 10, "cycles_per_byte": 0.5}},
+                       init={"registers": {"rdi": 0x2000, "rsi": 0x1000, "rdx": 16},
+                             "memory": [{"addr": 0x1000, "u64": [1, 2]}]})
+        self.assertEqual(simulate(k)[0]["stub_cycles_total"], 18)
+
+
 class TestInputBinding(unittest.TestCase):
     def test_file_blocks_and_file_expected(self):
         with tempfile.TemporaryDirectory() as d:
