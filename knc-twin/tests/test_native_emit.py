@@ -38,6 +38,8 @@ class NativeEmit(unittest.TestCase):
             self.assertLess(asm.index("movq %rsp, knc_twin_saved_rsp(%rip)"), asm.index("leaq knc_twin_mem+0(%rip), %rsp"))
             self.assertLess(asm.index("movq knc_twin_saved_rsp(%rip), %rsp"), asm.index("popq %r15"))
             self.assertNotIn("NOTE: the region adjusts rsp", asm)
+            self.assertLess(asm.index("knc_twin_saved_rsp:\\n\\t.zero 8"), asm.index(".p2align 12\\n\\t.globl knc_twin_mem"))
+            self.assertLess(asm.index(".p2align 12\\n\\t.globl knc_twin_mem"), asm.index("knc_twin_mem:"))
 
     def test_prepare_native_uses_private_stack_for_external_rsp(self):
         with tempfile.TemporaryDirectory() as tmp:
