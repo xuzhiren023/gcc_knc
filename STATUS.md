@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-16 03:57.
+Updated automatically at every ticket change. Last update: 2026-11-16 03:59.
 
-**Waiting for you:** S14-15. Run `python tools/pm.py inbox`.
+**Waiting for you:** S14-15, S14-18. Run `python tools/pm.py inbox`.
 
 Current tickets: `[#################---]` 244 of 280
 
@@ -146,7 +146,7 @@ Current tickets: `[#################---]` 244 of 280
 | S14-15 | knc-twin prepare-native: absolute memory operands come out as `N()` in kernel.S (k1om as 2.22 rejects them); emit them relocated into the image | **Waiting for you** | budget: 10651104 input tokens used; the budget is 10000000 |
 | S14-16 | bzip2 slower than GCC 5.1.1: mask-to-GPR move cost below a GPR move makes RA park integers in k registers (M4 known limit, must-fix) | draft |  |
 | S14-17 | Compare not folded with its load in merged return blocks (GCC 16 middle end, about half the remaining bzip2 mainGtU gap) | draft |  |
-| S14-18 | knc-twin regress: held-out replay runs under a 120 s wall-clock budget, so a slow interpreter turns a prediction into a budget_exhausted stub and the test fails as a false mismatch | In progress | input_tokens 3M -> 6M under the owner's standing rule; the four steps of the 09:05Z decide stand (rm --cach... |
+| S14-18 | knc-twin regress: held-out replay runs under a 120 s wall-clock budget, so a slow interpreter turns a prediction into a budget_exhausted stub and the test fails as a false mismatch | **Waiting for you** | Required cleanup commit is blocked: git rm -r --cached knc-twin-runs fails creating shared git index lock (... |
 | S14-19 | knc-twin x87 integer-load widths - fildl reads 8 bytes (must be 4), filds reads 4 (must be 2) | Not started |  |
 | S14-20 | knc-twin: an indirect jmp/call (PLT tail call through the GOT) on a never-executed path must not refuse the whole region | Not started |  |
 | S14-21 | knc-twin multi-core: held-out validation of the 8-tile ring model against the measured GEMV, triad and core-scaling rows | Not started |  |
@@ -305,6 +305,7 @@ Current tickets: `[#################---]` 244 of 280
 
 ## Recent activity
 
+- 2026-11-16 03:59 **S14-18** engineer escalate: Required cleanup commit is blocked: git rm -r --cached knc-twin-runs fails creating shared git index lock (Permission denied at C:/Users/xuzhi/Docu...
 - 2026-11-16 03:57 **S14-18** owner decide: input_tokens 3M -> 6M under the owner's standing rule; the four steps of the 09:05Z decide stand (rm --cached knc-twin-runs and commit; red proof a...
 - 2026-11-16 03:56 **S14-18** lead escalate: budget: 3187441 input tokens used; the budget is 3000000
 - 2026-11-16 03:56 **S14-18** lead answer: Already settled by the 03:55 decide; no history rewrite needed. On the current branch: (1) git rm -r --cached knc-twin-runs, add knc-twin-runs/ to ...
@@ -312,13 +313,12 @@ Current tickets: `[#################---]` 244 of 280
 - 2026-11-16 03:55 **S14-18** owner decide: Proceed without rewriting commits, as the 09:00Z lead note says: (1) git rm -r --cached knc-twin-runs and commit; (2) prove the red in the submit n...
 - 2026-11-16 03:54 **S14-18** engineer escalate: HEAD 105ac991 includes code/docs and committed knc-twin-runs output; worktree is clean, so no green changes remain to commit. pm.py ask was refused...
 - 2026-11-16 03:54 **S14-13** lead escalate: over 2 review rounds: Engine, protocol tests and staging are good; the brief's main done criterion (held-out rows of step 7 reproduced within bands...
-- 2026-11-16 03:53 **S14-18** engineer ask: The instructed red evidence and green commit cannot proceed: the worktree is clean and HEAD 105ac991 already contains the intended code and docs pl...
 
 ## Cost
 
 - From the script, engineer: 758 sessions, 1624.7M input tokens
 - From the script, lead: 514 sessions, 146.0M input tokens
-- Started by hand, Claude: 14 sessions, 4148.2M input tokens
+- Started by hand, Claude: 14 sessions, 4148.5M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
