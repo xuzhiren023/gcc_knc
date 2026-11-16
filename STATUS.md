@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-16 17:50.
+Updated automatically at every ticket change. Last update: 2026-11-16 17:51.
 
-**Next: the tech lead, on S13-03.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: the tech lead, on S14-16.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[#################---]` 258 of 297
 
@@ -125,7 +125,7 @@ Current tickets: `[#################---]` 258 of 297
 | S12-42 | Small sparse row loops are 1.5-3% slower than GCC 5.1.1, worse when two loop nests share one function (found by S12-30's window 8 gate) | Done | Card window 10 (post-S12-31 prefix b2ce6a9eebf, 1 thread, A-s12-42-small.out, all GUARDS failures=0): GCC-K... |
 | S13-01 | M4 final gate - stage the ADR-0015 gate run at the final head (17 programs, held-out unsealed, six pairs, three profiles) | Done | The M4 gate runner (SSH-only transfers, launch retry, adopt, full-profile scoring) and its card_run fixes a... |
 | S13-02 | Libgomp per-region thread density - choose 1-4 workers per core per parallel region instead of once per program | draft | Owner 2026-11-15 ("yes delay to M5"): deferred to M5 (sprint s14). The M4 primary score is serial -O2, so t... |
-| S13-03 | M4 retrospective - what we did wrong, what worked, and the practice changes carried into the next milestone and the agent-team skill | Waiting for review | Completed retrospective in docs/research/m4-retrospective.md; local links and committed whitespace passed v... |
+| S13-03 | M4 retrospective - what we did wrong, what worked, and the practice changes carried into the next milestone and the agent-team skill | lead | Review passed, approve with the note: 'The M4 retrospective is written (docs/research/m4-retrospective.md):... |
 | S13-04 | Clean source repositories for a fresh build - GCC-KNC fork and project code without build artifacts, plus a Linux-host build recipe the owner runs on the new workstation | draft |  |
 | S13-05 | model-first skill - a project Claude Code skill that models a hot region and its run-time lower bound before any optimization, plus one sourced KNC machine file | Done | The model-first skill (.claude/skills/model-first with formulas, levers and a worked C7 example) and a sour... |
 | S13-06 | knc-twin trial and validation - run the KNC core twin on real GCC-KNC loop output, check it against characterization rows and held-out kernels we already timed, and report what it rejects or gets wrong | Done | knc-twin 0.2.1 is in the repo: it reads GCC-KNC assembly, predicts one-core cycles and loop bounds, and is ... |
@@ -322,6 +322,7 @@ Current tickets: `[#################---]` 258 of 297
 
 ## Recent activity
 
+- 2026-11-16 17:51 **S13-03** lead defer: Review passed, approve with the note: 'The M4 retrospective is written (docs/research/m4-retrospective.md): it ranks where time was lost, settles a...
 - 2026-11-16 17:50 **S14-42** engineer submit: knc-optimize is a portable skill that tells any agent how to tune code for the Xeon Phi card, step by step, with each Intel practice checked agains...
 - 2026-11-16 17:42 **S14-16** engineer ask: GCC build needed at 407f1c63cc7 (lane gcc). Both GPR/mask costs raised 1->6; mask moves/memory unchanged. Baseline: all 16 mask/gather T1 tests pas...
 - 2026-11-16 17:29 **S14-42** lead answer: Yes, use the override; remove nothing. The 1090 lines are docs and skill text plus the 228-line test, which this ticket asked for, and the owner's ...
@@ -329,13 +330,12 @@ Current tickets: `[#################---]` 258 of 297
 - 2026-11-16 17:15 **S14-26** engineer submit: SMS bound: no-go for S14-02; five of six M4 hot loops are resource-bound at ResMII, only CG has headroom.
 - 2026-11-16 17:15 **S13-03** engineer submit: Completed retrospective in docs/research/m4-retrospective.md; local links and committed whitespace passed via tools/run.py (log .work/_state/logs/S...
 - 2026-11-16 17:14 **S13-03** lead answer: Merge done by the lead (5a447f95). Submit now as is with a one-sentence note; no other changes.
-- 2026-11-16 17:13 **S14-26** lead answer: Merge done by the lead (be6f8505). Submit now with note: SMS bound: no-go for S14-02; five of six M4 hot loops are resource-bound at ResMII, only C...
 
 ## Cost
 
 - From the script, engineer: 817 sessions, 1718.7M input tokens
 - From the script, lead: 560 sessions, 157.0M input tokens
-- Started by hand, Claude: 94 sessions, 4537.3M input tokens
+- Started by hand, Claude: 94 sessions, 4538.1M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
