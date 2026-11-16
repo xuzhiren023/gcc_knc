@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-16 01:07.
+Updated automatically at every ticket change. Last update: 2026-11-16 01:09.
 
 **Waiting for you:** S14-15. Run `python tools/pm.py inbox`.
 
@@ -142,7 +142,7 @@ Current tickets: `[#################---]` 244 of 277
 | S14-11 | knc-twin: close PhiWeather WRF coverage gaps (jump tables, vcvtps2pd ymm, loop-region and complete-listing modes, scatter and rcp-table import) | In progress | Yes, run them now: the M4 card block finished 04:20Z and the host limits are lifted. Run tests/regress/test... |
 | S14-12 | knc-twin: iteration and phase sampling for loop and whole-program wall-time estimates (roadmap item 2) | In progress | Skip the rebase: main has no knc-twin or tests/regress change since your base aced5f9d, so the lead merges ... |
 | S14-13 | knc-twin: 8-tile multi-core unit on the full ring with all memory controllers (roadmap item 3) | In progress | input_tokens 20M -> 30M under the owner's standing auto-extend rule (second extension; design note done, st... |
-| S14-14 | knc-twin: scheduling explorer for modulo scheduling and reordering, evaluating S14-02/S14-03 (roadmap item 4) | lead | Needs the interactive lead: merge main (810ff930, adds docs/research/m4-bzip2-diagnosis.md and m4-result.md... |
+| S14-14 | knc-twin: scheduling explorer for modulo scheduling and reordering, evaluating S14-02/S14-03 (roadmap item 4) | Question for the tech lead | interactive lead merged main into s14/S14-14 (9b699730, no conflicts); continue: held-out check per the 05:... |
 | S14-15 | knc-twin prepare-native: absolute memory operands come out as `N()` in kernel.S (k1om as 2.22 rejects them); emit them relocated into the image | **Waiting for you** | budget: 7163819 input tokens used; the budget is 4000000 |
 | S14-16 | bzip2 slower than GCC 5.1.1: mask-to-GPR move cost below a GPR move makes RA park integers in k registers (M4 known limit, must-fix) | draft |  |
 | S14-17 | Compare not folded with its load in merged return blocks (GCC 16 middle end, about half the remaining bzip2 mainGtU gap) | draft |  |
@@ -302,6 +302,7 @@ Current tickets: `[#################---]` 244 of 277
 
 ## Recent activity
 
+- 2026-11-16 01:09 **S14-14** lead resume: interactive lead merged main into s14/S14-14 (9b699730, no conflicts); continue: held-out check per the 05:55Z note, then submit
 - 2026-11-16 01:07 **S14-15** lead escalate: budget: 7163819 input tokens used; the budget is 4000000
 - 2026-11-16 01:06 **S14-14** lead defer: Needs the interactive lead: merge main (810ff930, adds docs/research/m4-bzip2-diagnosis.md and m4-result.md) into s14/S14-14 so the submit check pa...
 - 2026-11-16 01:05 **S14-15** lead answer: (1) Raw numeric disp(%rip) is out of scope: it is instruction-relative, not absolute, and the parser correctly rejects it. Drop that case. The rip ...
@@ -309,13 +310,12 @@ Current tickets: `[#################---]` 244 of 277
 - 2026-11-16 01:01 **S14-15** engineer ask: The new regression still fails after repeated attempts: raw numeric disp(%rip) parsing currently exits with 8() in kernel.S; the parser's rip-relat...
 - 2026-11-16 00:51 **S14-13** owner decide: input_tokens 20M -> 30M under the owner's standing auto-extend rule (second extension; design note done, staging and submit remain). If the next se...
 - 2026-11-16 00:50 **S14-13** engineer escalate: budget: 20776413 input tokens used; the budget is 20000000
-- 2026-11-16 00:49 **S14-13** owner decide: sessions 6 -> 9 under the owner's standing auto-extend rule: the design note is reviewed, staging and submit remain; next extension only if a sessi...
 
 ## Cost
 
 - From the script, engineer: 735 sessions, 1586.0M input tokens
 - From the script, lead: 499 sessions, 141.9M input tokens
-- Started by hand, Claude: 14 sessions, 4096.0M input tokens
+- Started by hand, Claude: 14 sessions, 4096.6M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
