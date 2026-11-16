@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-16 17:15.
+Updated automatically at every ticket change. Last update: 2026-11-16 17:16.
 
 **Next: the tech lead, on S13-03.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
@@ -166,7 +166,7 @@ Current tickets: `[#################---]` 258 of 297
 | S14-38 | Card and twin dashboard - running card job, card queue and running twin work with remaining time, card temperature and utilization, host CPU, refreshed every 5 minutes | Done | A local dashboard (python tools/knc_dashboard.py serve) now shows the running card job, the card queue and ... |
 | S14-39 | knc-twin prepare-native: pointer-rich captures (heap addresses sparse over tens of GB) need a relocating or multi-segment native image | Not started |  |
 | S14-41 | knc-twin prepare-native: the generated driver.c uses mfence, which the K1OM assembler rejects; emit a k1om-legal fence and add a build-and-lint test for generated programs | Not started |  |
-| S14-42 | knc-optimize skill - Intel's recommended KNC optimization method, rechecked against our sources and card data, as a portable skill other projects can use | In progress | Scope cut (owner 2026-11-16, "cut it down"). Read no more sources. Finish from what is already written: mak... |
+| S14-42 | knc-optimize skill - Intel's recommended KNC optimization method, rechecked against our sources and card data, as a portable skill other projects can use | Question for the tech lead | Submit refused: 1092 changed lines exceeds the 800-line budget; the scope-cut commit e7b4956c trims SKILL.m... |
 | S2-01 | Design for zmm and mask registers under -march=knc | Done | The register design for KNC is settled on paper: all 32 zmm and 8 mask registers become usable under -march... |
 | S2-02 | Float and double arguments and results in zmm lane 0 | Done | Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`). |
 | S2-03 | Varargs with the donor's register save area | Done | Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`). |
@@ -322,6 +322,7 @@ Current tickets: `[#################---]` 258 of 297
 
 ## Recent activity
 
+- 2026-11-16 17:16 **S14-42** engineer ask: Submit refused: 1092 changed lines exceeds the 800-line budget; the scope-cut commit e7b4956c trims SKILL.md to 60 lines and moves existing detail ...
 - 2026-11-16 17:15 **S14-26** engineer submit: SMS bound: no-go for S14-02; five of six M4 hot loops are resource-bound at ResMII, only CG has headroom.
 - 2026-11-16 17:15 **S13-03** engineer submit: Completed retrospective in docs/research/m4-retrospective.md; local links and committed whitespace passed via tools/run.py (log .work/_state/logs/S...
 - 2026-11-16 17:14 **S13-03** lead answer: Merge done by the lead (5a447f95). Submit now as is with a one-sentence note; no other changes.
@@ -329,13 +330,12 @@ Current tickets: `[#################---]` 258 of 297
 - 2026-11-16 17:13 **S14-26** lead resume: Lead merged main into s14/S14-26 (be6f8505); diff vs main is the research doc and tools/s14_26_sms_bound.py only. Lead review: approve as is. Submi...
 - 2026-11-16 17:13 **S13-03** lead resume: Lead merged main into s13/S13-03 (5a447f95); diff vs main is docs/research/m4-retrospective.md only. Submit now as is, with a one-sentence note; no...
 - 2026-11-16 17:05 **S14-42** lead note: Scope cut (owner 2026-11-16, "cut it down"). Read no more sources. Finish from what is already written: make test_knc_optimize_skill.py green, trim...
-- 2026-11-16 16:53 **S14-42** lead answer: Accept the gap; do not fetch anything. The ticket scope is local sources only. Keep the ICC option-guide GUIDs listed as unrechecked in the Source ...
 
 ## Cost
 
-- From the script, engineer: 814 sessions, 1713.9M input tokens
+- From the script, engineer: 815 sessions, 1714.0M input tokens
 - From the script, lead: 559 sessions, 156.9M input tokens
-- Started by hand, Claude: 87 sessions, 4511.6M input tokens
+- Started by hand, Claude: 87 sessions, 4511.8M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
