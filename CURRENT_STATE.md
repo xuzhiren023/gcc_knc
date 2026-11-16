@@ -96,6 +96,9 @@ M5 definition frozen: ADR-0016 accepted by the owner 2026-11-16 15:15 EST (A 1.2
 
 ## Not proven yet
 
+- Next card window (needs owner approval): `.work/_shared/calib-w10/run-list-w12.txt` holds the two PhiWeather
+  sixth_{1,2}ctx_l2_031 probes rebuilt with twin T1-08 (no mfence, knc_lint clean, 2026-11-16 15:17). The k1om gcc run
+  from a non-Cygwin shell needs `.work/_shared/toolchain/cygwin/bin` on PATH (cygmpc-3.dll).
 - The public repos build on a Linux host (docs say so; not run). Target-library rebuild from a fresh clone not run.
 - Lead session 2026-11-16 14:00 EST: S14-22, S14-24 (lane harness), S14-16 (gcc), S13-03 (review) made ready;
   dispatchers started detached for lanes twin-use, harness, review and gcc (logs `.work/_state/logs/dispatch-*-2026111*`,
