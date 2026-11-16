@@ -5,6 +5,17 @@ card. The owner rules on ticket S2-11 dated 2026-11-03 supersede S0-04's
 foreign-process refusal and the old external workload lock.
 Card jobs are lead-only; Codex sandbox accounts are refused before admission, so leave built binaries for the lead.
 
+## Local status dashboard
+
+Run `python tools/knc_dashboard.py serve` and open `http://127.0.0.1:8765/`
+(`--port PORT` selects another port). `snapshot` prints the same JSON as
+`/api/status`. Collections are cached for 300 seconds; **Refresh now** can
+collect once per 30 seconds. This reads the shared ledger, host MicSmc and
+Windows CPU/process data without contacting the card. Unknown estimates stay
+unknown. Twin completion medians include refresh sampling delay and only cover
+runs observed by this dashboard; its only saved data is
+`.work/_state/dashboard-twin-history.json`. The lead checks live card readings.
+
 ## Configuration
 
 The default configuration is the main checkout's gitignored
