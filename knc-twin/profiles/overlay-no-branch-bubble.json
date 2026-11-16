@@ -1,0 +1,18 @@
+{
+  "schema": "knc-twin.profile/1",
+  "id": "overlay-no-branch-bubble",
+  "version": "0.3.0",
+  "kind": "overlay",
+  "synthetic": false,
+  "description": "Sensitivity overlay: no core issue cycle lost after a taken branch (the 0.2.x model). Apply with --overlay profiles/overlay-no-branch-bubble.json to see how much a multi-thread prediction depends on the value derived from the S8-01 C10 four-thread row.",
+  "native_measurement_ids": [],
+  "parameters": {
+    "frontend.taken_branch_core_bubble_cycles": {
+      "value": 0,
+      "unit": "core issue cycles lost after a taken branch",
+      "status": "assumed",
+      "source": "alternative to the value 1 derived from S8-01 C10 (four threads)",
+      "alternatives": [1]
+    }
+  }
+}

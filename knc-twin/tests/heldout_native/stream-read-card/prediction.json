@@ -1,0 +1,28 @@
+{
+  "case": "stream-read-card",
+  "core": {
+    "contexts": 1,
+    "cycles_per_unit_core": 4.125,
+    "limiting": [
+      {
+        "constraint": "spacing",
+        "context_cycles": 16
+      }
+    ],
+    "predicted_cycles": 33,
+    "status": "ok"
+  },
+  "engine_version": "0.3.1",
+  "profile_hash": "2058f0ec2d803051ea99b503bb10920e40ea33e9f84f19ea060727bc6aa3e468",
+  "scenarios": [
+    {
+      "achieved_bandwidth_gbs_if_total": 186.1,
+      "bandwidth_gbs": 186.1,
+      "binding": "memory",
+      "compute_seconds": 0.05962823134087238,
+      "memory_seconds": 0.369261024911338,
+      "total_seconds": 0.369261024911338
+    }
+  ],
+  "status": "ok"
+}

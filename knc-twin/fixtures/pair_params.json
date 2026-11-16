@@ -1,0 +1,8 @@
+{
+ "schema": "knc-twin.analytic-params/1",
+ "description": "producer/consumer pair exchanging 64 lines per unit with one handoff",
+ "core_a_cycles": 2000,
+ "core_b_cycles": 1500,
+ "lines_exchanged": 64,
+ "handoffs": 1
+}

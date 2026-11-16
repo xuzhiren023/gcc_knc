@@ -1,0 +1,1002 @@
+{
+  "calls": {},
+  "description": "S12-31 microbench mb_one_1 from the linked bench binary (27 products per row, data in L1)",
+  "entry": "function",
+  "expected": {
+    "memory": [
+      {
+        "addr": "0x103000",
+        "f64": [
+          77.5
+        ]
+      }
+    ]
+  },
+  "init": {
+    "memory": [
+      {
+        "addr": "0x100000",
+        "f64": [
+          0.5,
+          0.53125,
+          0.5625,
+          0.59375,
+          0.625,
+          0.65625,
+          0.6875,
+          0.71875,
+          0.75,
+          0.78125,
+          0.8125,
+          0.84375,
+          0.875,
+          0.90625,
+          0.9375,
+          0.96875,
+          1.0,
+          1.03125,
+          1.0625,
+          1.09375,
+          1.125,
+          1.15625,
+          1.1875,
+          1.21875,
+          1.25,
+          1.28125,
+          1.3125,
+          1.34375,
+          1.375,
+          1.40625,
+          1.4375,
+          1.46875
+        ]
+      },
+      {
+        "addr": "0x101000",
+        "f64": [
+          1.0,
+          0.5,
+          0.25,
+          0.125,
+          0.0625,
+          1.0,
+          0.5,
+          0.25,
+          0.125,
+          0.0625,
+          1.0,
+          0.5,
+          0.25,
+          0.125,
+          0.0625,
+          1.0,
+          0.5,
+          0.25,
+          0.125,
+          0.0625,
+          1.0,
+          0.5,
+          0.25,
+          0.125,
+          0.0625,
+          1.0,
+          0.5
+        ]
+      },
+      {
+        "addr": "0x102000",
+        "i32": [
+          0,
+          7,
+          14,
+          21,
+          28,
+          3,
+          10,
+          17,
+          24,
+          31,
+          6,
+          13,
+          20,
+          27,
+          2,
+          9,
+          16,
+          23,
+          30,
+          5,
+          12,
+          19,
+          26,
+          1,
+          8,
+          15,
+          22
+        ]
+      }
+    ],
+    "registers": {
+      "r8": "0x102000",
+      "r9": "0x103000",
+      "rax": 0,
+      "rcx": "0x101000",
+      "rdi": 8,
+      "rdx": "0x100000",
+      "rsi": 27
+    },
+    "symbols": {}
+  },
+  "max_steps": 4000000,
+  "memory_default": 0,
+  "name": "s12-31-mb-one_1",
+  "provenance": {
+    "adapter": "from_binary.py",
+    "coverage": {
+      "complete": {
+        "functional": true,
+        "isa": true,
+        "parser": true,
+        "timing": null
+      },
+      "functional_exact": 73,
+      "instructions": 73,
+      "isa_known": 73,
+      "memory_records": 4,
+      "mnemonics_unknown": [],
+      "parser_ok": 73,
+      "timing_only_or_missing": [],
+      "timing_params_known": null,
+      "unsupported": []
+    },
+    "function": "mb_one_1",
+    "included_callees": [],
+    "layout": true,
+    "live_in_registers_placeholders": [
+      "r8",
+      "r9",
+      "rax",
+      "rcx",
+      "rdi",
+      "rdx",
+      "rsi"
+    ],
+    "notes": [],
+    "padding_nops": 60,
+    "shape": "x87_row_loop_l1",
+    "slow_prefix_instructions": 0,
+    "source_file": ".work/_shared/S12-31/build/s12-31-bench",
+    "source_sha256": "77713a9be5f4b56bf8be54591c0fb972869f253b7ca83d812a1e2a370429ae66",
+    "undeclared_callees": [],
+    "unresolved_symbols": []
+  },
+  "scenario": {
+    "branch": {
+      "type": "exit_mispredicted"
+    },
+    "memory": {
+      "cold_level": "memory",
+      "type": "line_tracking",
+      "warm": [
+        {
+          "end": "0x100100",
+          "level": "l1",
+          "start": "0x100000"
+        },
+        {
+          "end": "0x1010d8",
+          "level": "l1",
+          "start": "0x101000"
+        },
+        {
+          "end": "0x10206c",
+          "level": "l1",
+          "start": "0x102000"
+        },
+        {
+          "end": "0x103008",
+          "level": "l1",
+          "start": "0x103000"
+        },
+        {
+          "end": "0x7f0000000100",
+          "level": "l1",
+          "start": "0x7efffffff000"
+        }
+      ]
+    }
+  },
+  "schema": "knc-twin.kernel/1",
+  "streams": [
+    {
+      "context": 0,
+      "instructions": [
+        {
+          "encoding": {
+            "addr": 4262400,
+            "bytes": 2,
+            "slow_prefixes": 0
+          },
+          "id": "a410a00",
+          "label": "mb_one_1",
+          "op": "fldz",
+          "ops": []
+        },
+        {
+          "encoding": {
+            "addr": 4262402,
+            "bytes": 1,
+            "slow_prefixes": 0
+          },
+          "id": "a410a02",
+          "op": "nop",
+          "ops": []
+        },
+        {
+          "encoding": {
+            "addr": 4262403,
+            "bytes": 1,
+            "slow_prefixes": 0
+          },
+          "id": "a410a03",
+          "op": "nop",
+          "ops": []
+        },
+        {
+          "encoding": {
+            "addr": 4262404,
+            "bytes": 1,
+            "slow_prefixes": 0
+          },
+          "id": "a410a04",
+          "op": "nop",
+          "ops": []
+        },
+        {
+          "encoding": {
+            "addr": 4262405,
+            "bytes": 1,
+            "slow_prefixes": 0
+          },
+          "id": "a410a05",
+          "op": "nop",
+          "ops": []
+        },
+        {
+          "encoding": {
+            "addr": 4262406,
+            "bytes": 1,
+            "slow_prefixes": 0
+          },
+          "id": "a410a06",
+          "op": "nop",
+          "ops": []
+        },
+        {
+          "encoding": {
+            "addr": 4262407,
+            "bytes": 1,
+            "slow_prefixes": 0
+          },
+          "id": "a410a07",
+          "op": "nop",
+          "ops": []
+        },
+        {
+          "encoding": {
+            "addr": 4262408,
+            "bytes": 1,
+            "slow_prefixes": 0
+          },
+          "id": "a410a08",
+          "op": "nop",
+          "ops": []
+        },
+        {
+          "encoding": {
+            "addr": 4262409,
+            "bytes": 1,
+            "slow_prefixes": 0
+          },
+          "id": "a410a09",
+          "op": "nop",
+          "ops": []
+        },
+        {
+          "encoding": {
+            "addr": 4262410,
+            "bytes": 1,
+            "slow_prefixes": 0
+          },
+          "id": "a410a0a",
+          "op": "nop",
+          "ops": []
+        },
+        {
+          "encoding": {
+            "addr": 4262411,
+            "bytes": 1,
+            "slow_prefixes": 0
+          },
+          "id": "a410a0b",
+          "op": "nop",
+          "ops": []
+        },
+        {
+          "encoding": {
+            "addr": 4262412,
+            "bytes": 1,
+            "slow_prefixes": 0
+          },
+          "id": "a410a0c",
+          "op": "nop",
+          "ops": []
+        },
+        {
+          "encoding": {
+            "addr": 4262413,
+            "bytes": 1,
+            "slow_prefixes": 0
+          },
+          "id": "a410a0d",
+          "op": "nop",
+          "ops": []
+        },
+        {
+          "encoding": {
+            "addr": 4262414,
+            "bytes": 1,
+            "slow_prefixes": 0
+          },
+          "id": "a410a0e",
+          "op": "nop",
+          "ops": []
+        },
+        {
+          "encoding": {
+            "addr": 4262415,
+            "bytes": 1,
+            "slow_prefixes": 0
+          },
+          "id": "a410a0f",
+          "op": "nop",
+          "ops": []
+        },
+        {
+          "encoding": {
+            "addr": 4262416,
+            "bytes": 1,
+            "slow_prefixes": 0
+          },
+          "id": "a410a10",
+          "op": "nop",
+          "ops": []
+        },
+        {
+          "encoding": {
+            "addr": 4262417,
+            "bytes": 1,
+            "slow_prefixes": 0
+          },
+          "id": "a410a11",
+          "op": "nop",
+          "ops": []
+        },
+        {
+          "encoding": {
+            "addr": 4262418,
+            "bytes": 1,
+            "slow_prefixes": 0
+          },
+          "id": "a410a12",
+          "op": "nop",
+          "ops": []
+        },
+        {
+          "encoding": {
+            "addr": 4262419,
+            "bytes": 1,
+            "slow_prefixes": 0
+          },
+          "id": "a410a13",
+          "op": "nop",
+          "ops": []
+        },
+        {
+          "encoding": {
+            "addr": 4262420,
+            "bytes": 1,
+            "slow_prefixes": 0
+          },
+          "id": "a410a14",
+          "op": "nop",
+          "ops": []
+        },
+        {
+          "encoding": {
+            "addr": 4262421,
+            "bytes": 1,
+            "slow_prefixes": 0
+          },
+          "id": "a410a15",
+          "op": "nop",
+          "ops": []
+        },
+        {
+          "encoding": {
+            "addr": 4262422,
+            "bytes": 1,
+            "slow_prefixes": 0
+          },
+          "id": "a410a16",
+          "op": "nop",
+          "ops": []
+        },
+        {
+          "encoding": {
+            "addr": 4262423,
+            "bytes": 1,
+            "slow_prefixes": 0
+          },
+          "id": "a410a17",
+          "op": "nop",
+          "ops": []
+        },
+        {
+          "encoding": {
+            "addr": 4262424,
+            "bytes": 1,
+            "slow_prefixes": 0
+          },
+          "id": "a410a18",
+          "op": "nop",
+          "ops": []
+        },
+        {
+          "encoding": {
+            "addr": 4262425,
+            "bytes": 1,
+            "slow_prefixes": 0
+          },
+          "id": "a410a19",
+          "op": "nop",
+          "ops": []
+        },
+        {
+          "encoding": {
+            "addr": 4262426,
+            "bytes": 1,
+            "slow_prefixes": 0
+          },
+          "id": "a410a1a",
+          "op": "nop",
+          "ops": []
+        },
+        {
+          "encoding": {
+            "addr": 4262427,
+            "bytes": 1,
+            "slow_prefixes": 0
+          },
+          "id": "a410a1b",
+          "op": "nop",
+          "ops": []
+        },
+        {
+          "encoding": {
+            "addr": 4262428,
+            "bytes": 1,
+            "slow_prefixes": 0
+          },
+          "id": "a410a1c",
+          "op": "nop",
+          "ops": []
+        },
+        {
+          "encoding": {
+            "addr": 4262429,
+            "bytes": 1,
+            "slow_prefixes": 0
+          },
+          "id": "a410a1d",
+          "op": "nop",
+          "ops": []
+        },
+        {
+          "encoding": {
+            "addr": 4262430,
+            "bytes": 1,
+            "slow_prefixes": 0
+          },
+          "id": "a410a1e",
+          "op": "nop",
+          "ops": []
+        },
+        {
+          "encoding": {
+            "addr": 4262431,
+            "bytes": 1,
+            "slow_prefixes": 0
+          },
+          "id": "a410a1f",
+          "op": "nop",
+          "ops": []
+        },
+        {
+          "encoding": {
+            "addr": 4262432,
+            "bytes": 1,
+            "slow_prefixes": 0
+          },
+          "id": "a410a20",
+          "op": "nop",
+          "ops": []
+        },
+        {
+          "encoding": {
+            "addr": 4262433,
+            "bytes": 1,
+            "slow_prefixes": 0
+          },
+          "id": "a410a21",
+          "op": "nop",
+          "ops": []
+        },
+        {
+          "encoding": {
+            "addr": 4262434,
+            "bytes": 1,
+            "slow_prefixes": 0
+          },
+          "id": "a410a22",
+          "op": "nop",
+          "ops": []
+        },
+        {
+          "encoding": {
+            "addr": 4262435,
+            "bytes": 1,
+            "slow_prefixes": 0
+          },
+          "id": "a410a23",
+          "op": "nop",
+          "ops": []
+        },
+        {
+          "encoding": {
+            "addr": 4262436,
+            "bytes": 1,
+            "slow_prefixes": 0
+          },
+          "id": "a410a24",
+          "op": "nop",
+          "ops": []
+        },
+        {
+          "encoding": {
+            "addr": 4262437,
+            "bytes": 1,
+            "slow_prefixes": 0
+          },
+          "id": "a410a25",
+          "op": "nop",
+          "ops": []
+        },
+        {
+          "encoding": {
+            "addr": 4262438,
+            "bytes": 1,
+            "slow_prefixes": 0
+          },
+          "id": "a410a26",
+          "op": "nop",
+          "ops": []
+        },
+        {
+          "encoding": {
+            "addr": 4262439,
+            "bytes": 1,
+            "slow_prefixes": 0
+          },
+          "id": "a410a27",
+          "op": "nop",
+          "ops": []
+        },
+        {
+          "encoding": {
+            "addr": 4262440,
+            "bytes": 1,
+            "slow_prefixes": 0
+          },
+          "id": "a410a28",
+          "op": "nop",
+          "ops": []
+        },
+        {
+          "encoding": {
+            "addr": 4262441,
+            "bytes": 1,
+            "slow_prefixes": 0
+          },
+          "id": "a410a29",
+          "op": "nop",
+          "ops": []
+        },
+        {
+          "encoding": {
+            "addr": 4262442,
+            "bytes": 1,
+            "slow_prefixes": 0
+          },
+          "id": "a410a2a",
+          "op": "nop",
+          "ops": []
+        },
+        {
+          "encoding": {
+            "addr": 4262443,
+            "bytes": 1,
+            "slow_prefixes": 0
+          },
+          "id": "a410a2b",
+          "op": "nop",
+          "ops": []
+        },
+        {
+          "encoding": {
+            "addr": 4262444,
+            "bytes": 1,
+            "slow_prefixes": 0
+          },
+          "id": "a410a2c",
+          "op": "nop",
+          "ops": []
+        },
+        {
+          "encoding": {
+            "addr": 4262445,
+            "bytes": 1,
+            "slow_prefixes": 0
+          },
+          "id": "a410a2d",
+          "op": "nop",
+          "ops": []
+        },
+        {
+          "encoding": {
+            "addr": 4262446,
+            "bytes": 1,
+            "slow_prefixes": 0
+          },
+          "id": "a410a2e",
+          "op": "nop",
+          "ops": []
+        },
+        {
+          "encoding": {
+            "addr": 4262447,
+            "bytes": 1,
+            "slow_prefixes": 0
+          },
+          "id": "a410a2f",
+          "op": "nop",
+          "ops": []
+        },
+        {
+          "encoding": {
+            "addr": 4262448,
+            "bytes": 1,
+            "slow_prefixes": 0
+          },
+          "id": "a410a30",
+          "op": "nop",
+          "ops": []
+        },
+        {
+          "encoding": {
+            "addr": 4262449,
+            "bytes": 1,
+            "slow_prefixes": 0
+          },
+          "id": "a410a31",
+          "op": "nop",
+          "ops": []
+        },
+        {
+          "encoding": {
+            "addr": 4262450,
+            "bytes": 1,
+            "slow_prefixes": 0
+          },
+          "id": "a410a32",
+          "op": "nop",
+          "ops": []
+        },
+        {
+          "encoding": {
+            "addr": 4262451,
+            "bytes": 1,
+            "slow_prefixes": 0
+          },
+          "id": "a410a33",
+          "op": "nop",
+          "ops": []
+        },
+        {
+          "encoding": {
+            "addr": 4262452,
+            "bytes": 1,
+            "slow_prefixes": 0
+          },
+          "id": "a410a34",
+          "op": "nop",
+          "ops": []
+        },
+        {
+          "encoding": {
+            "addr": 4262453,
+            "bytes": 1,
+            "slow_prefixes": 0
+          },
+          "id": "a410a35",
+          "op": "nop",
+          "ops": []
+        },
+        {
+          "encoding": {
+            "addr": 4262454,
+            "bytes": 1,
+            "slow_prefixes": 0
+          },
+          "id": "a410a36",
+          "op": "nop",
+          "ops": []
+        },
+        {
+          "encoding": {
+            "addr": 4262455,
+            "bytes": 1,
+            "slow_prefixes": 0
+          },
+          "id": "a410a37",
+          "op": "nop",
+          "ops": []
+        },
+        {
+          "encoding": {
+            "addr": 4262456,
+            "bytes": 1,
+            "slow_prefixes": 0
+          },
+          "id": "a410a38",
+          "op": "nop",
+          "ops": []
+        },
+        {
+          "encoding": {
+            "addr": 4262457,
+            "bytes": 1,
+            "slow_prefixes": 0
+          },
+          "id": "a410a39",
+          "op": "nop",
+          "ops": []
+        },
+        {
+          "encoding": {
+            "addr": 4262458,
+            "bytes": 1,
+            "slow_prefixes": 0
+          },
+          "id": "a410a3a",
+          "op": "nop",
+          "ops": []
+        },
+        {
+          "encoding": {
+            "addr": 4262459,
+            "bytes": 1,
+            "slow_prefixes": 0
+          },
+          "id": "a410a3b",
+          "op": "nop",
+          "ops": []
+        },
+        {
+          "encoding": {
+            "addr": 4262460,
+            "bytes": 1,
+            "slow_prefixes": 0
+          },
+          "id": "a410a3c",
+          "op": "nop",
+          "ops": []
+        },
+        {
+          "encoding": {
+            "addr": 4262461,
+            "bytes": 2,
+            "slow_prefixes": 0
+          },
+          "id": "a410a3d",
+          "label": ".A_410a3d",
+          "op": "xor",
+          "ops": [
+            "eax",
+            "eax"
+          ]
+        },
+        {
+          "encoding": {
+            "addr": 4262463,
+            "bytes": 1,
+            "slow_prefixes": 0
+          },
+          "id": "a410a3f",
+          "op": "nop",
+          "ops": []
+        },
+        {
+          "encoding": {
+            "addr": 4262464,
+            "bytes": 4,
+            "slow_prefixes": 0
+          },
+          "id": "a410a40",
+          "label": ".A_410a40",
+          "op": "movslq",
+          "ops": [
+            "r10",
+            {
+              "base": "r8",
+              "index": "rax",
+              "scale": 4
+            }
+          ]
+        },
+        {
+          "encoding": {
+            "addr": 4262468,
+            "bytes": 4,
+            "slow_prefixes": 0
+          },
+          "id": "a410a44",
+          "op": "fldl",
+          "ops": [
+            {
+              "base": "rdx",
+              "index": "r10",
+              "scale": 8
+            }
+          ]
+        },
+        {
+          "encoding": {
+            "addr": 4262472,
+            "bytes": 3,
+            "slow_prefixes": 0
+          },
+          "id": "a410a48",
+          "op": "fmull",
+          "ops": [
+            {
+              "base": "rcx",
+              "index": "rax",
+              "scale": 8
+            }
+          ]
+        },
+        {
+          "encoding": {
+            "addr": 4262475,
+            "bytes": 4,
+            "imm": true,
+            "slow_prefixes": 0
+          },
+          "id": "a410a4b",
+          "op": "add",
+          "ops": [
+            "rax",
+            {
+              "imm": 1
+            }
+          ]
+        },
+        {
+          "encoding": {
+            "addr": 4262479,
+            "bytes": 2,
+            "slow_prefixes": 0
+          },
+          "id": "a410a4f",
+          "op": "cmp",
+          "ops": [
+            "esi",
+            "eax"
+          ]
+        },
+        {
+          "encoding": {
+            "addr": 4262481,
+            "bytes": 2,
+            "slow_prefixes": 0
+          },
+          "id": "a410a51",
+          "op": "faddp",
+          "ops": [
+            "st(1)",
+            "st"
+          ]
+        },
+        {
+          "encoding": {
+            "addr": 4262483,
+            "bytes": 2,
+            "slow_prefixes": 0
+          },
+          "id": "a410a53",
+          "op": "jg",
+          "ops": [
+            ".A_410a40"
+          ]
+        },
+        {
+          "encoding": {
+            "addr": 4262485,
+            "bytes": 4,
+            "imm": true,
+            "slow_prefixes": 0
+          },
+          "id": "a410a55",
+          "op": "sub",
+          "ops": [
+            "rdi",
+            {
+              "imm": 1
+            }
+          ]
+        },
+        {
+          "encoding": {
+            "addr": 4262489,
+            "bytes": 2,
+            "slow_prefixes": 0
+          },
+          "id": "a410a59",
+          "op": "jne",
+          "ops": [
+            ".A_410a3d"
+          ]
+        },
+        {
+          "encoding": {
+            "addr": 4262491,
+            "bytes": 3,
+            "slow_prefixes": 0
+          },
+          "id": "a410a5b",
+          "op": "fstpl",
+          "ops": [
+            {
+              "base": "r9"
+            }
+          ]
+        },
+        {
+          "encoding": {
+            "addr": 4262494,
+            "bytes": 1,
+            "slow_prefixes": 0
+          },
+          "id": "a410a5e",
+          "op": "ret",
+          "ops": []
+        }
+      ]
+    }
+  ],
+  "unit_of_work": {
+    "count": 8,
+    "description": "one 27-product row"
+  }
+}

@@ -9,7 +9,8 @@ def compile_object(runner, mode='off', scan=False):
     source = runner.fixture / 'affine_fortran.f90'
     asm = runner.out / ('affine-fortran-' + mode + '.s')
     obj = asm.with_suffix('.o')
-    compiler = runner.cc.with_name('gfortran')
+    name = runner.cc.name.replace('gcc', 'gfortran') if getattr(runner.args, 'cc', None) else 'gfortran'
+    compiler = runner.cc.with_name(name)
     report = runner.command(compiler, *runner.cc_flags, *runner.flags,
                             '-ffp-contract=' + mode, '-fopt-info-vec-all',
                             '-S', source, '-o', asm)

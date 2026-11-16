@@ -1,10 +1,10 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-15 11:25.
+Updated automatically at every ticket change. Last update: 2026-11-16 00:00.
 
-**Next: GPT-6.1, on S12-09 (Sprint 12 batch check - integrated themes at the final Sprint 12 head, regression evidence, optional modes frozen).** Run `python tools/dispatch.py`, or ask the tech lead to.
+**Next: the tech lead, on S14-14.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
-Current tickets: `[##################--]` 241 of 258
+Current tickets: `[#################---]` 244 of 276
 
 ## Milestones
 
@@ -14,8 +14,8 @@ Current tickets: `[##################--]` 241 of 258
 | M1 | Mixed native code | Done | 43 of 43 tickets |
 | M2 | Useful vector target | Done | 51 of 51 tickets |
 | M3 | Runtimes | Done | 48 of 48 tickets |
-| M4 | Broad optimization | In progress | 59 of 63 tickets |
-| M5 | Program corpus | In progress | 0 of 13 tickets |
+| M4 | Broad optimization | In progress | 62 of 65 tickets |
+| M5 | Program corpus | In progress | 0 of 29 tickets |
 | M6 | Release | Not started | Not planned in detail yet |
 
 ## Tickets
@@ -89,7 +89,7 @@ Current tickets: `[##################--]` 241 of 258
 | S12-06 | M4 theme 1 - strict scalar FP conversions and call boundaries (NPB-EP transform and log path, NPB-IS randlc) | Done | Theme 1 (scalar FP conversions and calls in NPB-EP/IS) closed with no compiler change: a card diagnostic sh... |
 | S12-07 | M4 theme 2 - indexed-load scheduling with strict sparse reduction (NPB-CG) | Done | Theme 2 (sparse indexed loads in NPB-CG/HPCG) closed with no compiler change: GCC-KNC is already at parity ... |
 | S12-08 | M4 theme 3 - dependency-preserving scalar updates and register pressure in dense loops (PB-ludcmp, x87 stack traffic) | Done | Theme 3 (register pressure in dense loops) closed with no compiler change: PB-ludcmp's extra x87 stack traf... |
-| S12-09 | Sprint 12 batch check - integrated themes at the final Sprint 12 head, regression evidence, optional modes frozen | In progress | Lead raises input_tokens 6M -> 12M (owner rule 2026-11-09: lead extends budgets): the check is nearly done ... |
+| S12-09 | Sprint 12 batch check - integrated themes at the final Sprint 12 head, regression evidence, optional modes frozen | Done | Sprint 12 is closed: the final GCC-KNC (knc b2ce6a9eebf) has every runtime library rebuilt from the same co... |
 | S12-10 | Research - what KNC hardware and runtime knowledge are we still missing to tune GCC-KNC, the OS runtime and broad optimization, and where is it documented? | Done | KNC reference-gap research done: 16 gaps ranked, 32 primary sources (98 MB, outside git) with page-cited fa... |
 | S12-11 | Research - best practices for a dual Xeon E5-2690 v3 + Xeon Phi (KNC) workstation (HP Z840) for LLM inference and scientific computing | Done | Z840 dual E5-2690 v3 + Xeon Phi setup guide done: slot/BIOS/memory/power/cooling checklist, MPSS-on-modern-... |
 | S12-12 | Stage S12-10's residual-gap card experiments as one combined Sprint 12 diagnostic batch (PMU access, prefetch, page backing, libm route, branches, allocator) | Done | The six follow-up card experiments (counter access, prefetch, page backing, libm route, branches, allocator... |
@@ -110,24 +110,42 @@ Current tickets: `[##################--]` 241 of 258
 | S12-27 | Latency-aware scalar loops - GCC-KNC unrolls and interleaves independent iterations and hoists conversions so one thread's every-other-cycle issue and long latencies are hidden automatically | draft | Deferred to M5 (sprint s14) by the owner's 2026-11-15 scope cut ("we are scope creeping the entire Sprint 1... |
 | S12-28 | dispatch.py refuses to start a second dispatcher on a lane that already has a live one | Done | dispatch.py now refuses to start a second dispatcher on a lane that already has a live one (a lock per lane... |
 | S12-29 | Wrong code - vbroadcastsd reads a 4-byte-aligned SCmode constant (complex float) straight from the constant pool and faults on the card (gcc.c-torture pr38969.c, regression from S11-27) | Done | The pr38969 crash from S11-27 is fixed: GCC-KNC no longer broadcasts a vector from memory aligned below its... |
-| S12-30 | Sparse indexed reductions faster than today - vector gather of products with an ordered scalar sum, and indirect prefetch, for CSR-style loops (NPB-CG, HPCG) | draft | Deferred to M5 (sprint s14) by the owner's 2026-11-15 scope cut ("we are scope creeping the entire Sprint 1... |
+| S12-30 | Sparse indexed reductions faster than today - vector gather of products with an ordered scalar sum, and indirect prefetch, for CSR-style loops (NPB-CG, HPCG) | draft | Owner 2026-11-15 ("I have reset Fable, so subagent back to codex with default selection rule"): Fable overr... |
 | S12-31 | HPCG is 1.8% slower with GCC-KNC than with GCC 5.1.1 - find the cause and make it faster (owner: never slower than 5.1.1) | Done | HPCG is now about 7% faster than GCC 5.1.1 instead of 1.8% slower (8.8% gain on full/3100/5100); zlib gives... |
 | S12-32 | ICE (reload) in gcc.c-torture O3-vect-pr32243.c on the installed GCC-KNC, found by the S12-21 torture sweep | Done | The -O3 vector reload crash in pr32243 is fixed: byte/word vector extends now reload through an aligned sta... |
 | S12-33 | T2 writes its short-vector test binaries into a per-run folder, so Claude, Codex and lead runs never block each other | Done | T2's short-vector cross-check now writes its binaries into the run's own output folder instead of the share... |
-| S12-34 | Unrecognizable insn for a truncating vector store to a 1-byte-aligned V16QI destination (found by S12-32) | draft | Deferred to M5 (sprint s14) by the owner's 2026-11-15 scope cut ("we are scope creeping the entire Sprint 1... |
+| S12-34 | Unrecognizable insn for a truncating vector store to a 1-byte-aligned V16QI destination (found by S12-32) | draft | Owner 2026-11-15 ("I have reset Fable, so subagent back to codex with default selection rule"): Fable overr... |
 | S12-35 | Clean single-compiler WRF build as dm+sm (MPI + OpenMP) against PhiWeather's k1om MPICH, plus a build recipe PhiWeather can apply to its own patched tree | Done | Upstream WRF 4.8.0 now builds clean as dm+sm (MPI + OpenMP) with the one GCC-KNC compiler (knc 7a3b34430e3,... |
 | S12-36 | card_run yields to a foreign queued row in the middle of our own turn - honor an open turn-level reservation so a multi-job window is not refused | Done | card_run --benchmark now keeps our turn across several jobs while an open claude-turn- ledger row was queue... |
 | S12-37 | Every T1/T2 check writes into the run's own output folder - no fixed paths in shared ticket folders (S10-01 vecarg, and any others) | Done | T1 and T2 checks now write every generated file into the run's own output folder, so a file left by another... |
-| S12-38 | ICE in the SLP vectorizer on gcc.dg vect-pr123221.c at -O3 -march=knc (found by S12-30's torture sweep) | draft | Deferred to M5 (sprint s14) by the owner's 2026-11-15 scope cut ("we are scope creeping the entire Sprint 1... |
+| S12-38 | ICE in the SLP vectorizer on gcc.dg vect-pr123221.c at -O3 -march=knc (found by S12-30's torture sweep) | draft | Owner 2026-11-15 ("I have reset Fable, so subagent back to codex with default selection rule"): Fable overr... |
 | S12-39 | pm.py submit stops demanding an engineer-side rebase that the sandbox cannot perform (Permission denied on .git/worktrees/<id>/rebase-merge) | Done | Engineers no longer need to rebase before submitting: submit only refuses when main has real changes the br... |
 | S12-40 | Indirect prefetch recognizes Fortran sparse loops (array descriptors, ARRAY_REF offsets, nonzero and OpenMP-outlined starts) so NPB-CG benefits | draft | Deferred to M5 (sprint s14) by the owner's 2026-11-15 scope cut ("we are scope creeping the entire Sprint 1... |
 | S12-41 | Early donor check - corpus.py stages and runs only the development programs (no held-out build or run), smallest margins first, so the lead can measure every development program against GCC 5.1.1 now | draft | Deferred to M5 (sprint s14) by the owner's 2026-11-15 scope cut ("we are scope creeping the entire Sprint 1... |
-| S12-42 | Small sparse row loops are 1.5-3% slower than GCC 5.1.1, worse when two loop nests share one function (found by S12-30's window 8 gate) | draft | Deferred to M5 (sprint s14) by the owner's 2026-11-15 scope cut ("we are scope creeping the entire Sprint 1... |
-| S13-01 | M4 final gate - stage the ADR-0015 gate run at the final head (17 programs, held-out unsealed, six pairs, three profiles) | draft |  |
+| S12-42 | Small sparse row loops are 1.5-3% slower than GCC 5.1.1, worse when two loop nests share one function (found by S12-30's window 8 gate) | draft | Owner 2026-11-15 ("I have reset Fable, so subagent back to codex with default selection rule"): Fable overr... |
+| S13-01 | M4 final gate - stage the ADR-0015 gate run at the final head (17 programs, held-out unsealed, six pairs, three profiles) | lead | Primary gate staged at a74a0c2e; spot-check OK (frozen 1e-8+1e-6/r/ bound, full STREAM element check, AB/BA... |
 | S13-02 | Libgomp per-region thread density - choose 1-4 workers per core per parallel region instead of once per program | draft | Owner 2026-11-15 ("yes delay to M5"): deferred to M5 (sprint s14). The M4 primary score is serial -O2, so t... |
 | S13-03 | M4 retrospective - what we did wrong, what worked, and the practice changes carried into the next milestone and the agent-team skill | draft |  |
 | S13-04 | Clean source repositories for a fresh build - GCC-KNC fork and project code without build artifacts, plus a Linux-host build recipe the owner runs on the new workstation | draft |  |
+| S13-05 | model-first skill - a project Claude Code skill that models a hot region and its run-time lower bound before any optimization, plus one sourced KNC machine file | Done | The model-first skill (.claude/skills/model-first with formulas, levers and a worked C7 example) and a sour... |
+| S13-06 | knc-twin trial and validation - run the KNC core twin on real GCC-KNC loop output, check it against characterization rows and held-out kernels we already timed, and report what it rejects or gets wrong | Done | knc-twin 0.2.1 is in the repo: it reads GCC-KNC assembly, predicts one-core cycles and loop bounds, and is ... |
 | S14-01 | 16- and 32-byte GCC generic vectors compile to IMCI in the low lanes of a zmm register, with a by-value ABI, so FFTW's generic-simd128/256 paths run vectorized | draft |  |
+| S14-02 | Software pipelining on KNC - probe whether SMS can run (a KNC counted-loop pattern) and whether it speeds up in-order loops | draft |  |
+| S14-03 | KNC scheduler model completeness - bypasses, folded memory operand cost, pairing by encoding, checked on post-RA schedules | draft |  |
+| S14-04 | M5 measurement method - per-hot-region properties, a lower bound per region, four separately reported outcomes, four measurement levels | draft |  |
+| S14-05 | Paired source-form generality cases for N, C and G code (one algorithm written several ways), unscored, for M5 | draft |  |
+| S14-06 | Branch cost and if-conversion thresholds for KNC from measured branch loss (C10 plus S12-12 G07), judged by cycles | draft |  |
+| S14-07 | C++ abstraction removal on KNC - does LTO work for k1om, and do devirtualization and indirect-call promotion fire at -O2 -march=knc | draft |  |
+| S14-08 | Quantized GEMV kernels on KNC - multi-row activation reuse, FP vs int32 VPMADD231D vs VPERMD lookup table, bandwidth-normalized | draft |  |
+| S14-09 | KNC vs the Z840 host (dual E5-2690 v3) on the same algorithms and numerical contract - where running on the card actually pays | draft |  |
+| S14-10 | knc-twin: --jobs N for independent simulations and PyPy support (roadmap item 1) | In progress | No worktree needed. Export main's knc-twin into your shared dir: git -c safe.directory='*' archive main knc... |
+| S14-11 | knc-twin: close PhiWeather WRF coverage gaps (jump tables, vcvtps2pd ymm, loop-region and complete-listing modes, scatter and rcp-table import) | In progress | Yes, run them now: the M4 card block finished 04:20Z and the host limits are lifted. Run tests/regress/test... |
+| S14-12 | knc-twin: iteration and phase sampling for loop and whole-program wall-time estimates (roadmap item 2) | In progress | Yes, run the full knc-twin selftest and tests/regress/test_knc_twin.py now, one at a time, single-threaded ... |
+| S14-13 | knc-twin: 8-tile multi-core unit on the full ring with all memory controllers (roadmap item 3) | In progress | Yes. Your diagnosis is right, and the flaw is in my test spec: with 60 active cores in total, each added de... |
+| S14-14 | knc-twin: scheduling explorer for modulo scheduling and reordering, evaluating S14-02/S14-03 (roadmap item 4) | Question for the tech lead | Green committed: 2e975d5b, clean, 799 lines. Acceptance 7 pass. Regress: bundled selftest and trial checks ... |
+| S14-15 | knc-twin prepare-native: absolute memory operands come out as `N()` in kernel.S (k1om as 2.22 rejects them); emit them relocated into the image | In progress |  |
+| S14-16 | bzip2 slower than GCC 5.1.1: mask-to-GPR move cost below a GPR move makes RA park integers in k registers (M4 known limit, must-fix) | draft |  |
+| S14-17 | Compare not folded with its load in merged return blocks (GCC 16 middle end, about half the remaining bzip2 mainGtU gap) | draft |  |
 | S2-01 | Design for zmm and mask registers under -march=knc | Done | The register design for KNC is settled on paper: all 32 zmm and 8 mask registers become usable under -march... |
 | S2-02 | Float and double arguments and results in zmm lane 0 | Done | Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`). |
 | S2-03 | Varargs with the donor's register save area | Done | Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`). |
@@ -283,23 +301,23 @@ Current tickets: `[##################--]` 241 of 258
 
 ## Recent activity
 
-- 2026-11-15 11:25 **S12-09** owner decide: Lead raises input_tokens 6M -> 12M (owner rule 2026-11-09: lead extends budgets): the check is nearly done (ICE sweeps clean, x86 1962/0, card jobs...
-- 2026-11-15 10:37 **S12-09** lead escalate: budget: 7466553 input tokens used; the budget is 6000000
-- 2026-11-15 10:36 **S12-09** lead answer: 1) Log access: _state/logs/check_donor_t0-20261102-114234.log no longer exists (checked 10:40 EST), so the prune should pass now; rerun the full T0...
-- 2026-11-15 10:33 **S12-09** engineer ask: c31011cb: GCC b2ce6a9eebf; records tests/baseline/S12-09-*. Torture/vect: zero ICEs, no new failures. Drill: 14/4 conflicts. Fixed T0/T1 adapter fa...
-- 2026-11-15 10:10 **S13-02** lead note: Owner 2026-11-15 ("yes delay to M5"): deferred to M5 (sprint s14). The M4 primary score is serial -O2, so this does not affect the M4 target.
-- 2026-11-15 10:10 **S12-09** lead note: Target libraries rebuilt from scratch at knc b2ce6a9eebf (old objects moved to .work/_shared/gcc-build/target-libs-pre-s12-09-20261115; new libgcc_...
-- 2026-11-15 09:50 **S12-42** lead note: Deferred to M5 (sprint s14) by the owner's 2026-11-15 scope cut ("we are scope creeping the entire Sprint 12 ... make sure the whole Sprint 12 can ...
-- 2026-11-15 09:50 **S12-41** lead note: Deferred to M5 (sprint s14) by the owner's 2026-11-15 scope cut ("we are scope creeping the entire Sprint 12 ... make sure the whole Sprint 12 can ...
+- 2026-11-16 00:00 **S14-10** lead answer: No worktree needed. Export main's knc-twin into your shared dir: git -c safe.directory='*' archive main knc-twin | tar -x -C .work/_shared/S14-10/m...
+- 2026-11-15 23:58 **S14-14** engineer ask: Green committed: 2e975d5b, clean, 799 lines. Acceptance 7 pass. Regress: bundled selftest and trial checks pass; held-out s12-31-hpcg-104 mismatche...
+- 2026-11-15 23:54 **S14-10** engineer ask: 7a41d127 documents diagnostic: all 8 HPCG-104 variants budget_exhausted at 120s; non-variant fields including scenario match record. JSON: .work/_s...
+- 2026-11-15 23:49 **S14-13** lead answer: Yes. Your diagnosis is right, and the flaw is in my test spec: with 60 active cores in total, each added detailed tile replaces a background core, ...
+- 2026-11-15 23:45 **S14-11** lead answer: Yes, run them now: the M4 card block finished 04:20Z and the host limits are lifted. Run tests/regress/test_knc_twin.py, the full selftest and vali...
+- 2026-11-15 23:42 **S14-13** engineer ask: Partial commit 4057b79b; two failed attempts. Background rounding fixed; conservation passes. Contention reproducer: test_multicore_protocol, 32 li...
+- 2026-11-15 23:37 **S14-11** engineer ask: 4dc7eee2 implements A-F. WRF: 13/13 functional-complete; only scatter occupancy missing. Report: .work/_shared/S14-11/wrf-coverage.json. Selftest 1...
+- 2026-11-15 23:23 **S14-13** lead approve-red: S14-13 red tests approved: they now require the shared 8-tile multicore model (channel contention across 1-8 tiles, remote L2 reads through the tag...
 
 ## Cost
 
-- From the script, engineer: 701 sessions, 1459.0M input tokens
-- From the script, lead: 469 sessions, 133.6M input tokens
-- Started by hand, Claude: 12 sessions, 3592.6M input tokens
+- From the script, engineer: 729 sessions, 1556.4M input tokens
+- From the script, lead: 493 sessions, 140.2M input tokens
+- Started by hand, Claude: 14 sessions, 4057.7M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 36.1 GiB of 100 GiB. 115 GiB free on the drive.
+The project uses 40.6 GiB of 100 GiB. 84 GiB free on the drive.

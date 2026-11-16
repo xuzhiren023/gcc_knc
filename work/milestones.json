@@ -48,7 +48,10 @@
    "s11",
    "s12",
    "s13"
-  ]
+  ],
+  "accepted": "2026-11-16",
+  "done": true,
+  "decision": "pass on the 7120 full profile (owner: 3100/5100 not run, ADR-0015 am.1): median 2.19x, LB 2.16x; bzip2 0.927x documented known limit (owner option 1); evidence docs/research/m4-result.md"
  },
  {
   "id": "M5",

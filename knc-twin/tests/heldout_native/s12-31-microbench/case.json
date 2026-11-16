@@ -1,0 +1,387 @@
+{
+  "description": "S12-31 SpMV-shaped x87 row loop (27 products per row, data in L1, one thread) in 68 variants: assembler padding of 0-15 bytes before the loop top (gas_K), the same in single-byte NOPs (one_K) and in prefix-free long NOPs (pf_K), the loop top at other offsets with no padding (mis_K), and loop-body orders (inc, adj, mid, mov_adj, mov_split). Converted from the binary that ran.",
+  "kind": "compiled_kernel",
+  "rank_groups": [
+    {
+      "name": "S12-31 loop-body orders",
+      "variants": [
+        "gas_0",
+        "inc_0",
+        "adj_0",
+        "mid_0",
+        "mov_adj_0",
+        "mov_split_0"
+      ]
+    },
+    {
+      "name": "S12-31 padding styles at 13-15 bytes",
+      "variants": [
+        "gas_13",
+        "gas_14",
+        "gas_15",
+        "pf_13",
+        "pf_14",
+        "pf_15",
+        "one_13",
+        "one_14",
+        "one_15",
+        "gas_0"
+      ]
+    }
+  ],
+  "scale": "core",
+  "scenario_name": "arrays warm in L1, default memory sub-models, branches predicted from their history",
+  "schema": "knc-twin.heldout-case/3",
+  "slope": {
+    "expected_addr": "0x103000",
+    "expected_f64_per_unit": 9.6875,
+    "register": "rdi",
+    "units": [
+      4,
+      8
+    ]
+  },
+  "unit": "one 27-product row (27 inner iterations plus the outer loop step)",
+  "variants": [
+    {
+      "calibrates": "pairing.x87_pairs_with_scalar",
+      "kernel": "kernels/gas_0.json",
+      "name": "gas_0"
+    },
+    {
+      "calibrates": null,
+      "kernel": "kernels/gas_1.json",
+      "name": "gas_1"
+    },
+    {
+      "calibrates": null,
+      "kernel": "kernels/gas_2.json",
+      "name": "gas_2"
+    },
+    {
+      "calibrates": null,
+      "kernel": "kernels/gas_3.json",
+      "name": "gas_3"
+    },
+    {
+      "calibrates": null,
+      "kernel": "kernels/gas_4.json",
+      "name": "gas_4"
+    },
+    {
+      "calibrates": null,
+      "kernel": "kernels/gas_5.json",
+      "name": "gas_5"
+    },
+    {
+      "calibrates": null,
+      "kernel": "kernels/gas_6.json",
+      "name": "gas_6"
+    },
+    {
+      "calibrates": null,
+      "kernel": "kernels/gas_7.json",
+      "name": "gas_7"
+    },
+    {
+      "calibrates": null,
+      "kernel": "kernels/gas_8.json",
+      "name": "gas_8"
+    },
+    {
+      "calibrates": null,
+      "kernel": "kernels/gas_9.json",
+      "name": "gas_9"
+    },
+    {
+      "calibrates": null,
+      "kernel": "kernels/gas_10.json",
+      "name": "gas_10"
+    },
+    {
+      "calibrates": null,
+      "kernel": "kernels/gas_11.json",
+      "name": "gas_11"
+    },
+    {
+      "calibrates": null,
+      "kernel": "kernels/gas_12.json",
+      "name": "gas_12"
+    },
+    {
+      "calibrates": null,
+      "kernel": "kernels/gas_13.json",
+      "name": "gas_13"
+    },
+    {
+      "calibrates": null,
+      "kernel": "kernels/gas_14.json",
+      "name": "gas_14"
+    },
+    {
+      "calibrates": null,
+      "kernel": "kernels/gas_15.json",
+      "name": "gas_15"
+    },
+    {
+      "calibrates": null,
+      "kernel": "kernels/one_0.json",
+      "name": "one_0"
+    },
+    {
+      "calibrates": null,
+      "kernel": "kernels/one_1.json",
+      "name": "one_1"
+    },
+    {
+      "calibrates": null,
+      "kernel": "kernels/one_2.json",
+      "name": "one_2"
+    },
+    {
+      "calibrates": null,
+      "kernel": "kernels/one_3.json",
+      "name": "one_3"
+    },
+    {
+      "calibrates": null,
+      "kernel": "kernels/one_4.json",
+      "name": "one_4"
+    },
+    {
+      "calibrates": null,
+      "kernel": "kernels/one_5.json",
+      "name": "one_5"
+    },
+    {
+      "calibrates": null,
+      "kernel": "kernels/one_6.json",
+      "name": "one_6"
+    },
+    {
+      "calibrates": null,
+      "kernel": "kernels/one_7.json",
+      "name": "one_7"
+    },
+    {
+      "calibrates": null,
+      "kernel": "kernels/one_8.json",
+      "name": "one_8"
+    },
+    {
+      "calibrates": null,
+      "kernel": "kernels/one_9.json",
+      "name": "one_9"
+    },
+    {
+      "calibrates": null,
+      "kernel": "kernels/one_10.json",
+      "name": "one_10"
+    },
+    {
+      "calibrates": null,
+      "kernel": "kernels/one_11.json",
+      "name": "one_11"
+    },
+    {
+      "calibrates": null,
+      "kernel": "kernels/one_12.json",
+      "name": "one_12"
+    },
+    {
+      "calibrates": null,
+      "kernel": "kernels/one_13.json",
+      "name": "one_13"
+    },
+    {
+      "calibrates": null,
+      "kernel": "kernels/one_14.json",
+      "name": "one_14"
+    },
+    {
+      "calibrates": "pairing.v_nop_pairs",
+      "kernel": "kernels/one_15.json",
+      "name": "one_15"
+    },
+    {
+      "calibrates": null,
+      "kernel": "kernels/pf_0.json",
+      "name": "pf_0"
+    },
+    {
+      "calibrates": null,
+      "kernel": "kernels/pf_1.json",
+      "name": "pf_1"
+    },
+    {
+      "calibrates": null,
+      "kernel": "kernels/pf_2.json",
+      "name": "pf_2"
+    },
+    {
+      "calibrates": null,
+      "kernel": "kernels/pf_3.json",
+      "name": "pf_3"
+    },
+    {
+      "calibrates": null,
+      "kernel": "kernels/pf_4.json",
+      "name": "pf_4"
+    },
+    {
+      "calibrates": null,
+      "kernel": "kernels/pf_5.json",
+      "name": "pf_5"
+    },
+    {
+      "calibrates": null,
+      "kernel": "kernels/pf_6.json",
+      "name": "pf_6"
+    },
+    {
+      "calibrates": null,
+      "kernel": "kernels/pf_7.json",
+      "name": "pf_7"
+    },
+    {
+      "calibrates": null,
+      "kernel": "kernels/pf_8.json",
+      "name": "pf_8"
+    },
+    {
+      "calibrates": null,
+      "kernel": "kernels/pf_9.json",
+      "name": "pf_9"
+    },
+    {
+      "calibrates": null,
+      "kernel": "kernels/pf_10.json",
+      "name": "pf_10"
+    },
+    {
+      "calibrates": null,
+      "kernel": "kernels/pf_11.json",
+      "name": "pf_11"
+    },
+    {
+      "calibrates": null,
+      "kernel": "kernels/pf_12.json",
+      "name": "pf_12"
+    },
+    {
+      "calibrates": null,
+      "kernel": "kernels/pf_13.json",
+      "name": "pf_13"
+    },
+    {
+      "calibrates": null,
+      "kernel": "kernels/pf_14.json",
+      "name": "pf_14"
+    },
+    {
+      "calibrates": null,
+      "kernel": "kernels/pf_15.json",
+      "name": "pf_15"
+    },
+    {
+      "calibrates": null,
+      "kernel": "kernels/mis_4.json",
+      "name": "mis_4"
+    },
+    {
+      "calibrates": null,
+      "kernel": "kernels/mis_8.json",
+      "name": "mis_8"
+    },
+    {
+      "calibrates": null,
+      "kernel": "kernels/mis_12.json",
+      "name": "mis_12"
+    },
+    {
+      "calibrates": null,
+      "kernel": "kernels/mis_16.json",
+      "name": "mis_16"
+    },
+    {
+      "calibrates": null,
+      "kernel": "kernels/mis_20.json",
+      "name": "mis_20"
+    },
+    {
+      "calibrates": null,
+      "kernel": "kernels/mis_24.json",
+      "name": "mis_24"
+    },
+    {
+      "calibrates": null,
+      "kernel": "kernels/mis_28.json",
+      "name": "mis_28"
+    },
+    {
+      "calibrates": null,
+      "kernel": "kernels/mis_32.json",
+      "name": "mis_32"
+    },
+    {
+      "calibrates": null,
+      "kernel": "kernels/mis_36.json",
+      "name": "mis_36"
+    },
+    {
+      "calibrates": null,
+      "kernel": "kernels/mis_40.json",
+      "name": "mis_40"
+    },
+    {
+      "calibrates": null,
+      "kernel": "kernels/mis_44.json",
+      "name": "mis_44"
+    },
+    {
+      "calibrates": null,
+      "kernel": "kernels/mis_48.json",
+      "name": "mis_48"
+    },
+    {
+      "calibrates": null,
+      "kernel": "kernels/mis_52.json",
+      "name": "mis_52"
+    },
+    {
+      "calibrates": null,
+      "kernel": "kernels/mis_56.json",
+      "name": "mis_56"
+    },
+    {
+      "calibrates": null,
+      "kernel": "kernels/mis_60.json",
+      "name": "mis_60"
+    },
+    {
+      "calibrates": null,
+      "kernel": "kernels/inc_0.json",
+      "name": "inc_0"
+    },
+    {
+      "calibrates": "pairing.x87_pairs_with_scalar",
+      "kernel": "kernels/adj_0.json",
+      "name": "adj_0"
+    },
+    {
+      "calibrates": null,
+      "kernel": "kernels/mid_0.json",
+      "name": "mid_0"
+    },
+    {
+      "calibrates": null,
+      "kernel": "kernels/mov_adj_0.json",
+      "name": "mov_adj_0"
+    },
+    {
+      "calibrates": null,
+      "kernel": "kernels/mov_split_0.json",
+      "name": "mov_split_0"
+    }
+  ]
+}

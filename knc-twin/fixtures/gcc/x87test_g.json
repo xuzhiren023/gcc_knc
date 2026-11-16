@@ -1,0 +1,1031 @@
+{
+  "description": "function region from x87test.s (adapter from_gcc_s.py)",
+  "expected": {
+    "registers": {
+      "0": {
+        "x87_depth": 0,
+        "zmm0": {
+          "f32_broadcast": 22140.0
+        }
+      }
+    }
+  },
+  "init": {
+    "memory": [
+      {
+        "addr": "0x1000",
+        "f32": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31,
+          32,
+          33,
+          34,
+          35,
+          36,
+          37,
+          38,
+          39,
+          40
+        ]
+      }
+    ],
+    "registers": {
+      "rdi": "0x1000",
+      "rdx": 0,
+      "rsi": 40,
+      "rsp": "0x7f000"
+    },
+    "symbols": {}
+  },
+  "memory_default": 0,
+  "name": "x87test__g",
+  "provenance": {
+    "adapter": "from_gcc_s.py",
+    "coverage": {
+      "complete": {
+        "functional": true,
+        "isa": true,
+        "parser": true,
+        "timing": false
+      },
+      "functional_exact": 92,
+      "instructions": 92,
+      "isa_known": 92,
+      "memory_records": 26,
+      "mnemonics_unknown": [],
+      "parser_ok": 92,
+      "timing_only_or_missing": [
+        "missing parameter(s): latency.x87_move"
+      ],
+      "timing_params_known": 89,
+      "unsupported": []
+    },
+    "function": "g",
+    "live_in_registers_placeholders": [
+      "rdi",
+      "rdx",
+      "rsi",
+      "rsp"
+    ],
+    "loop_label": null,
+    "parser_notes": [
+      "line 32: labels g and .LFB1 name the same instruction; .LFB1 kept as alias",
+      "line 291: labels .LFE1 and __knc_twin_end name the same instruction; __knc_twin_end kept as alias"
+    ],
+    "source_file": "C:\\Users\\xuzhi\\AppData\\Local\\Temp\\kt\\cc\\x87test.s",
+    "source_sha256": "1d660704f55a154e22664e1663b572730e2f68118ab6d6c3277c6368c7cc4ad6",
+    "unresolved_symbols": []
+  },
+  "schema": "knc-twin.kernel/1",
+  "streams": [
+    {
+      "context": 0,
+      "instructions": [
+        {
+          "id": "L32",
+          "label": "g",
+          "op": "test",
+          "ops": [
+            "esi",
+            "esi"
+          ],
+          "source": 32,
+          "width": 32
+        },
+        {
+          "id": "L33",
+          "op": "jle",
+          "ops": [
+            ".L9"
+          ],
+          "source": 33
+        },
+        {
+          "id": "L34",
+          "op": "lea",
+          "ops": [
+            "eax",
+            {
+              "base": "rsi",
+              "disp": -1
+            }
+          ],
+          "source": 34,
+          "width": 32
+        },
+        {
+          "id": "L35",
+          "op": "cmp",
+          "ops": [
+            "eax",
+            {
+              "imm": 2046
+            }
+          ],
+          "source": 35,
+          "width": 32
+        },
+        {
+          "id": "L36",
+          "op": "jbe",
+          "ops": [
+            ".L5"
+          ],
+          "source": 36
+        },
+        {
+          "id": "L37",
+          "op": "lea",
+          "ops": [
+            "ecx",
+            {
+              "base": "rsi",
+              "disp": -17
+            }
+          ],
+          "source": 37,
+          "width": 32
+        },
+        {
+          "id": "L38",
+          "op": "mov",
+          "ops": [
+            "rax",
+            "rdi"
+          ],
+          "source": 38,
+          "width": 64
+        },
+        {
+          "id": "L39",
+          "op": "and",
+          "ops": [
+            "ecx",
+            {
+              "imm": -16
+            }
+          ],
+          "source": 39,
+          "width": 32
+        },
+        {
+          "id": "L40",
+          "op": "xor",
+          "ops": [
+            "edx",
+            "edx"
+          ],
+          "source": 40,
+          "width": 32
+        },
+        {
+          "id": "L41",
+          "op": "fldz",
+          "ops": [],
+          "source": 41
+        },
+        {
+          "id": "L42",
+          "op": "add",
+          "ops": [
+            "ecx",
+            {
+              "imm": 16
+            }
+          ],
+          "source": 42,
+          "width": 32
+        },
+        {
+          "id": "L46",
+          "label": ".L6",
+          "op": "flds",
+          "ops": [
+            {
+              "base": "rax"
+            }
+          ],
+          "source": 46
+        },
+        {
+          "id": "L47",
+          "op": "add",
+          "ops": [
+            "edx",
+            {
+              "imm": 16
+            }
+          ],
+          "source": 47,
+          "width": 32
+        },
+        {
+          "id": "L48",
+          "op": "fmul",
+          "ops": [
+            "st",
+            "st(0)"
+          ],
+          "source": 48
+        },
+        {
+          "id": "L49",
+          "op": "vprefetch1",
+          "ops": [
+            {
+              "base": "rax",
+              "disp": 2048
+            }
+          ],
+          "source": 49
+        },
+        {
+          "id": "L50",
+          "op": "vprefetch0",
+          "ops": [
+            {
+              "base": "rax",
+              "disp": 1024
+            }
+          ],
+          "source": 50
+        },
+        {
+          "id": "L51",
+          "op": "add",
+          "ops": [
+            "rax",
+            {
+              "imm": 64
+            }
+          ],
+          "source": 51,
+          "width": 64
+        },
+        {
+          "id": "L52",
+          "op": "faddp",
+          "ops": [
+            "st(1)",
+            "st"
+          ],
+          "source": 52
+        },
+        {
+          "id": "L53",
+          "op": "flds",
+          "ops": [
+            {
+              "base": "rax",
+              "disp": -60
+            }
+          ],
+          "source": 53
+        },
+        {
+          "id": "L54",
+          "op": "fmul",
+          "ops": [
+            "st",
+            "st(0)"
+          ],
+          "source": 54
+        },
+        {
+          "id": "L55",
+          "op": "faddp",
+          "ops": [
+            "st(1)",
+            "st"
+          ],
+          "source": 55
+        },
+        {
+          "id": "L56",
+          "op": "flds",
+          "ops": [
+            {
+              "base": "rax",
+              "disp": -56
+            }
+          ],
+          "source": 56
+        },
+        {
+          "id": "L57",
+          "op": "fmul",
+          "ops": [
+            "st",
+            "st(0)"
+          ],
+          "source": 57
+        },
+        {
+          "id": "L58",
+          "op": "faddp",
+          "ops": [
+            "st(1)",
+            "st"
+          ],
+          "source": 58
+        },
+        {
+          "id": "L59",
+          "op": "flds",
+          "ops": [
+            {
+              "base": "rax",
+              "disp": -52
+            }
+          ],
+          "source": 59
+        },
+        {
+          "id": "L60",
+          "op": "fmul",
+          "ops": [
+            "st",
+            "st(0)"
+          ],
+          "source": 60
+        },
+        {
+          "id": "L61",
+          "op": "faddp",
+          "ops": [
+            "st(1)",
+            "st"
+          ],
+          "source": 61
+        },
+        {
+          "id": "L62",
+          "op": "flds",
+          "ops": [
+            {
+              "base": "rax",
+              "disp": -48
+            }
+          ],
+          "source": 62
+        },
+        {
+          "id": "L63",
+          "op": "fmul",
+          "ops": [
+            "st",
+            "st(0)"
+          ],
+          "source": 63
+        },
+        {
+          "id": "L64",
+          "op": "faddp",
+          "ops": [
+            "st(1)",
+            "st"
+          ],
+          "source": 64
+        },
+        {
+          "id": "L65",
+          "op": "flds",
+          "ops": [
+            {
+              "base": "rax",
+              "disp": -44
+            }
+          ],
+          "source": 65
+        },
+        {
+          "id": "L66",
+          "op": "fmul",
+          "ops": [
+            "st",
+            "st(0)"
+          ],
+          "source": 66
+        },
+        {
+          "id": "L67",
+          "op": "faddp",
+          "ops": [
+            "st(1)",
+            "st"
+          ],
+          "source": 67
+        },
+        {
+          "id": "L68",
+          "op": "flds",
+          "ops": [
+            {
+              "base": "rax",
+              "disp": -40
+            }
+          ],
+          "source": 68
+        },
+        {
+          "id": "L69",
+          "op": "fmul",
+          "ops": [
+            "st",
+            "st(0)"
+          ],
+          "source": 69
+        },
+        {
+          "id": "L70",
+          "op": "faddp",
+          "ops": [
+            "st(1)",
+            "st"
+          ],
+          "source": 70
+        },
+        {
+          "id": "L71",
+          "op": "flds",
+          "ops": [
+            {
+              "base": "rax",
+              "disp": -36
+            }
+          ],
+          "source": 71
+        },
+        {
+          "id": "L72",
+          "op": "fmul",
+          "ops": [
+            "st",
+            "st(0)"
+          ],
+          "source": 72
+        },
+        {
+          "id": "L73",
+          "op": "faddp",
+          "ops": [
+            "st(1)",
+            "st"
+          ],
+          "source": 73
+        },
+        {
+          "id": "L74",
+          "op": "flds",
+          "ops": [
+            {
+              "base": "rax",
+              "disp": -32
+            }
+          ],
+          "source": 74
+        },
+        {
+          "id": "L75",
+          "op": "fmul",
+          "ops": [
+            "st",
+            "st(0)"
+          ],
+          "source": 75
+        },
+        {
+          "id": "L76",
+          "op": "faddp",
+          "ops": [
+            "st(1)",
+            "st"
+          ],
+          "source": 76
+        },
+        {
+          "id": "L77",
+          "op": "flds",
+          "ops": [
+            {
+              "base": "rax",
+              "disp": -28
+            }
+          ],
+          "source": 77
+        },
+        {
+          "id": "L78",
+          "op": "fmul",
+          "ops": [
+            "st",
+            "st(0)"
+          ],
+          "source": 78
+        },
+        {
+          "id": "L79",
+          "op": "faddp",
+          "ops": [
+            "st(1)",
+            "st"
+          ],
+          "source": 79
+        },
+        {
+          "id": "L80",
+          "op": "flds",
+          "ops": [
+            {
+              "base": "rax",
+              "disp": -24
+            }
+          ],
+          "source": 80
+        },
+        {
+          "id": "L81",
+          "op": "fmul",
+          "ops": [
+            "st",
+            "st(0)"
+          ],
+          "source": 81
+        },
+        {
+          "id": "L82",
+          "op": "faddp",
+          "ops": [
+            "st(1)",
+            "st"
+          ],
+          "source": 82
+        },
+        {
+          "id": "L83",
+          "op": "flds",
+          "ops": [
+            {
+              "base": "rax",
+              "disp": -20
+            }
+          ],
+          "source": 83
+        },
+        {
+          "id": "L84",
+          "op": "fmul",
+          "ops": [
+            "st",
+            "st(0)"
+          ],
+          "source": 84
+        },
+        {
+          "id": "L85",
+          "op": "faddp",
+          "ops": [
+            "st(1)",
+            "st"
+          ],
+          "source": 85
+        },
+        {
+          "id": "L86",
+          "op": "flds",
+          "ops": [
+            {
+              "base": "rax",
+              "disp": -16
+            }
+          ],
+          "source": 86
+        },
+        {
+          "id": "L87",
+          "op": "fmul",
+          "ops": [
+            "st",
+            "st(0)"
+          ],
+          "source": 87
+        },
+        {
+          "id": "L88",
+          "op": "faddp",
+          "ops": [
+            "st(1)",
+            "st"
+          ],
+          "source": 88
+        },
+        {
+          "id": "L89",
+          "op": "flds",
+          "ops": [
+            {
+              "base": "rax",
+              "disp": -12
+            }
+          ],
+          "source": 89
+        },
+        {
+          "id": "L90",
+          "op": "fmul",
+          "ops": [
+            "st",
+            "st(0)"
+          ],
+          "source": 90
+        },
+        {
+          "id": "L91",
+          "op": "faddp",
+          "ops": [
+            "st(1)",
+            "st"
+          ],
+          "source": 91
+        },
+        {
+          "id": "L92",
+          "op": "flds",
+          "ops": [
+            {
+              "base": "rax",
+              "disp": -8
+            }
+          ],
+          "source": 92
+        },
+        {
+          "id": "L93",
+          "op": "fmul",
+          "ops": [
+            "st",
+            "st(0)"
+          ],
+          "source": 93
+        },
+        {
+          "id": "L94",
+          "op": "faddp",
+          "ops": [
+            "st(1)",
+            "st"
+          ],
+          "source": 94
+        },
+        {
+          "id": "L95",
+          "op": "flds",
+          "ops": [
+            {
+              "base": "rax",
+              "disp": -4
+            }
+          ],
+          "source": 95
+        },
+        {
+          "id": "L96",
+          "op": "fmul",
+          "ops": [
+            "st",
+            "st(0)"
+          ],
+          "source": 96
+        },
+        {
+          "id": "L97",
+          "op": "faddp",
+          "ops": [
+            "st(1)",
+            "st"
+          ],
+          "source": 97
+        },
+        {
+          "id": "L98",
+          "op": "cmp",
+          "ops": [
+            "edx",
+            "ecx"
+          ],
+          "source": 98,
+          "width": 32
+        },
+        {
+          "id": "L99",
+          "op": "jne",
+          "ops": [
+            ".L6"
+          ],
+          "source": 99
+        },
+        {
+          "id": "L100",
+          "op": "mov",
+          "ops": [
+            "eax",
+            "edx"
+          ],
+          "source": 100,
+          "width": 32
+        },
+        {
+          "id": "L104",
+          "label": ".L7",
+          "op": "flds",
+          "ops": [
+            {
+              "base": "rdi",
+              "index": "rax",
+              "scale": 4
+            }
+          ],
+          "source": 104
+        },
+        {
+          "id": "L105",
+          "op": "add",
+          "ops": [
+            "rax",
+            {
+              "imm": 1
+            }
+          ],
+          "source": 105,
+          "width": 64
+        },
+        {
+          "id": "L106",
+          "op": "fmul",
+          "ops": [
+            "st",
+            "st(0)"
+          ],
+          "source": 106
+        },
+        {
+          "id": "L107",
+          "op": "faddp",
+          "ops": [
+            "st(1)",
+            "st"
+          ],
+          "source": 107
+        },
+        {
+          "id": "L108",
+          "op": "cmp",
+          "ops": [
+            "esi",
+            "eax"
+          ],
+          "source": 108,
+          "width": 32
+        },
+        {
+          "id": "L109",
+          "op": "jg",
+          "ops": [
+            ".L7"
+          ],
+          "source": 109
+        },
+        {
+          "id": "L110",
+          "op": "fstps",
+          "ops": [
+            {
+              "base": "rsp",
+              "disp": -8
+            }
+          ],
+          "source": 110
+        },
+        {
+          "id": "L111",
+          "op": "vbroadcastss",
+          "ops": [
+            "zmm0",
+            {
+              "base": "rsp",
+              "disp": -8
+            }
+          ],
+          "source": 111
+        },
+        {
+          "id": "L112",
+          "op": "jmp",
+          "ops": [
+            ".LFE1"
+          ],
+          "source": 112
+        },
+        {
+          "id": "L116",
+          "label": ".L5",
+          "op": "fldz",
+          "ops": [],
+          "source": 116
+        },
+        {
+          "id": "L117",
+          "op": "mov",
+          "ops": [
+            "esi",
+            "esi"
+          ],
+          "source": 117,
+          "width": 32
+        },
+        {
+          "id": "L118",
+          "op": "lea",
+          "ops": [
+            "rax",
+            {
+              "base": "rdi",
+              "index": "rsi",
+              "scale": 4
+            }
+          ],
+          "source": 118,
+          "width": 64
+        },
+        {
+          "id": "L122",
+          "label": ".L8",
+          "op": "flds",
+          "ops": [
+            {
+              "base": "rdi"
+            }
+          ],
+          "source": 122
+        },
+        {
+          "id": "L123",
+          "op": "add",
+          "ops": [
+            "rdi",
+            {
+              "imm": 4
+            }
+          ],
+          "source": 123,
+          "width": 64
+        },
+        {
+          "id": "L124",
+          "op": "fmul",
+          "ops": [
+            "st",
+            "st(0)"
+          ],
+          "source": 124
+        },
+        {
+          "id": "L125",
+          "op": "faddp",
+          "ops": [
+            "st(1)",
+            "st"
+          ],
+          "source": 125
+        },
+        {
+          "id": "L126",
+          "op": "cmp",
+          "ops": [
+            "rax",
+            "rdi"
+          ],
+          "source": 126,
+          "width": 64
+        },
+        {
+          "id": "L127",
+          "op": "jne",
+          "ops": [
+            ".L8"
+          ],
+          "source": 127
+        },
+        {
+          "id": "L128",
+          "op": "fstps",
+          "ops": [
+            {
+              "base": "rsp",
+              "disp": -8
+            }
+          ],
+          "source": 128
+        },
+        {
+          "id": "L129",
+          "op": "vbroadcastss",
+          "ops": [
+            "zmm0",
+            {
+              "base": "rsp",
+              "disp": -8
+            }
+          ],
+          "source": 129
+        },
+        {
+          "id": "L130",
+          "op": "jmp",
+          "ops": [
+            ".LFE1"
+          ],
+          "source": 130
+        },
+        {
+          "id": "L134",
+          "label": ".L9",
+          "op": "fldz",
+          "ops": [],
+          "source": 134
+        },
+        {
+          "id": "L135",
+          "op": "fstps",
+          "ops": [
+            {
+              "base": "rsp",
+              "disp": -8
+            }
+          ],
+          "source": 135
+        },
+        {
+          "id": "L136",
+          "op": "vbroadcastss",
+          "ops": [
+            "zmm0",
+            {
+              "base": "rsp",
+              "disp": -8
+            }
+          ],
+          "source": 136
+        },
+        {
+          "id": "L137",
+          "op": "jmp",
+          "ops": [
+            ".LFE1"
+          ],
+          "source": 137
+        },
+        {
+          "id": "L291",
+          "label": ".LFE1",
+          "op": "nop",
+          "ops": [],
+          "source": 291
+        }
+      ]
+    }
+  ],
+  "unit_of_work": {
+    "count": 40,
+    "description": "one call of g with n=40"
+  }
+}

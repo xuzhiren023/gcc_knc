@@ -1,0 +1,43 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "knc-twin.profile/1",
+  "title": "knc-twin hardware profile",
+  "description": "Common KNC rules (kind common) or card-specific values (kind card), overlays (kind overlay) and synthetic demos (kind synthetic). Every parameter carries its provenance.",
+  "type": "object",
+  "required": ["schema", "id", "version", "parameters"],
+  "properties": {
+    "schema": {"const": "knc-twin.profile/1"},
+    "id": {"type": "string"},
+    "version": {"type": "string"},
+    "kind": {"enum": ["common", "card", "overlay", "synthetic"]},
+    "extends": {"type": "string", "description": "id of the base profile"},
+    "synthetic": {"type": "boolean", "description": "must be true for invented values; the engine labels every result from a synthetic chain"},
+    "description": {"type": "string"},
+    "sources": {"type": "object", "additionalProperties": {"type": "string"}},
+    "native_measurement_ids": {"type": "array", "items": {"type": "string"}},
+    "calibration": {
+      "type": "object",
+      "properties": {
+        "state": {"type": "string", "description": "e.g. uncalibrated, imported_microbenchmarks, synthetic"},
+        "statement": {"type": "string"},
+        "held_out_validation_cases": {"type": "integer"}
+      }
+    },
+    "parameters": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object", "required": ["value"],
+        "properties": {
+          "value": {"description": "number, string, boolean, object or null (unknown)"},
+          "unit": {"type": "string"},
+          "status": {"enum": ["documented", "measured", "literature", "derived", "assumed", "unknown", "synthetic"]},
+          "source": {"type": "string", "description": "URL, document id and page/slide, or native measurement identifier"},
+          "applies_to": {"type": "string"},
+          "uncertainty": {"type": "string"},
+          "alternatives": {"type": "array", "description": "alternative values for sensitivity scenarios"},
+          "note": {"type": "string"}
+        }
+      }
+    }
+  }
+}

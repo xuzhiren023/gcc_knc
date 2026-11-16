@@ -1,0 +1,484 @@
+Historical initial T0-T2 run below: initial T0/T1 adapter failures are superseded
+by the full wrapper rerun results at the end. T2 passed in this initial run.
+
+Compiler: k1om-mpss-linux-gcc (GCC) 16.2.0
+Compiler ld: /cygdrive/c/Users/xuzhi/Documents/gcc_knc/.work/_shared/toolchain/cross/bin/k1om-mpss-linux-ld
+Compiler as: /cygdrive/c/Users/xuzhi/Documents/gcc_knc/.work/_shared/toolchain/cross/bin/k1om-mpss-linux-as
+Flags: -O2 -ftree-vectorize -ffp-contract=off / fast; separate driver translation unit
+T2 ABI reference: /cygdrive/c/Users/xuzhi/Documents/gcc_knc/.work/_shared/toolchain/sysroot (no native card execution in t0-t2)
+FAIL t0 tests/regress/test_*.py: command /usr/bin/python3.12.exe -m unittest discover -s tests/regress -p test_*.py exited 1: estimate=6 bits: runs=8322 s_inexact=0 eg_inexact=0 g1_unfaithful=0 g1_not_RN=78 d_inexact=4 fail RN=1 RD=0 RU=0 RZ=0 inexact_flag_wrong=0
+S2 sqrt p=14 estimate=7 bits: runs=33026 s_inexact=0 eg_inexact=0 g1_unfaithful=0 g1_not_RN=151 d_inexact=9 fail RN=1 RD=0 RU=0 RZ=0 inexact_flag_wrong=0
+S2 sqrt p=16 estimate=8 bits: runs=131586 s_inexact=0 eg_inexact=0 g1_unfaithful=0 g1_not_RN=301 d_inexact=12 fail RN=1 RD=0 RU=0 RZ=0 inexact_flag_wrong=0
+S2 sqrt p=18 estimate=9 bits: runs=525314 s_inexact=0 eg_inexact=0 g1_unfaithful=0 g1_not_RN=636 d_inexact=19 fail RN=1 RD=0 RU=0 RZ=0 inexact_flag_wrong=0
+S2 sqrt p=20 estimate=10 bits: runs=2099202 s_inexact=0 eg_inexact=0 g1_unfaithful=0 g1_not_RN=1150 d_inexact=31 fail RN=1 RD=0 RU=0 RZ=0 inexact_flag_wrong=0
+sqrt-midpoint: cases=23277 runs=187240 fail RN=2 RD=0 RU=0 RZ=0 flags_wrong=0
+sqrt-double: cases=46250 runs=371024 fail RN=0 RD=0 RU=0 RZ=0 flags_wrong=0
+sqrt-exponent: cases=26824 runs=231240 fail RN=2048 RD=0 RU=0 RZ=0 flags_wrong=0
+sqrt-special: cases=17 runs=104 fail RN=2 RD=0 RU=0 RZ=0 flags_wrong=0
+sqrt p=53 claims: s_inexact=0 eg_inexact=0 g1_unfaithful=0 g1_not_RN=26025 d_inexact=280
+div_blend=1 sqrt_blend=0 failures=2057
+
+...
+======================================================================
+ERROR: test_fake_t1_t2_with_old_destinations_unwritable (test_check_outputs.CheckOutputs.test_fake_t1_t2_with_old_destinations_unwritable)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/cygdrive/c/Users/xuzhi/Documents/gcc_knc/.work/S12-09/tests/regress/test_check_outputs.py", line 126, in test_fake_t1_t2_with_old_destinations_unwritable
+    runner.t1()
+  File "/cygdrive/c/Users/xuzhi/Documents/gcc_knc/.work/S12-09/tools/check.py", line 432, in t1
+    affine_fortran.t1(self)
+  File "/cygdrive/c/Users/xuzhi/Documents/gcc_knc/.work/S12-09/tools/affine_fortran.py", line 52, in t1
+    compile_object(runner, mode, scan=True)
+  File "/cygdrive/c/Users/xuzhi/Documents/gcc_knc/.work/S12-09/tools/affine_fortran.py", line 12, in compile_object
+    compiler = runner.cc.with_name(runner.cc.name.replace('gcc', 'gfortran')) if runner.args.cc else runner.cc.with_name('gfortran')
+                                                                                 ^^^^^^^^^^^^^^
+AttributeError: 'types.SimpleNamespace' object has no attribute 'cc'
+
+----------------------------------------------------------------------
+Ran 39 tests in 926.857s
+
+FAILED (errors=1)
+
+PASS t0 tests/tools/test_doctor.py: Ran 8 tests in 1.138s  OK
+PASS t0 tests/tools/test_portability.py: Ran 6 tests in 22.389s  OK
+PASS t0 tests/tools/test_knc_lint.py: Ran 6 tests in 20.355s  OK
+PASS t1 knc-short-vector.c
+PASS t1 V16HI argument at entry RSP + 8
+PASS t1 KNC accepts vector_parameter -O0
+PASS t1 KNC accepts vector_parameter -O2
+PASS t1 KNC accepts vector_result -O0
+PASS t1 KNC accepts vector_result -O2
+PASS t1 KNC rejects 64-byte int vector ABI field -O0
+PASS t1 KNC rejects 64-byte int vector ABI field -O2
+PASS t1 KNC rejects 64-byte float vector unnamed variadic argument -O0
+PASS t1 KNC rejects 64-byte float vector unnamed variadic argument -O2
+PASS t1 KNC rejects 64-byte float vector named variadic parameter -O0
+PASS t1 KNC rejects 64-byte float vector named variadic parameter -O2
+PASS t1 KNC preserves vector32_parameter -O0
+PASS t1 KNC preserves vector32_parameter -O2
+PASS t1 KNC preserves vector1_parameter -O0
+PASS t1 KNC preserves vector1_parameter -O2
+PASS t1 KNC preserves vector1_result -O0
+PASS t1 KNC preserves vector1_result -O2
+PASS t1 packed ABI float vector VAR_CALL -O0
+PASS t1 packed ABI float vector VAR_CALL -O2
+PASS t1 packed ABI float vector VAR_GET -O0
+PASS t1 packed ABI float vector VAR_GET -O2
+PASS t1 packed ABI float vector MS_CALL -O0
+PASS t1 packed ABI float vector MS_CALL -O2
+PASS t1 packed ABI float vector MS_PARAM -O0
+PASS t1 packed ABI float vector MS_PARAM -O2
+PASS t1 packed ABI float vector MS_RETURN_CALL -O0
+PASS t1 packed ABI float vector MS_RETURN_CALL -O2
+PASS t1 packed ABI float vector MS_RETURN_DEF -O0
+PASS t1 packed ABI float vector MS_RETURN_DEF -O2
+PASS t1 packed ABI float record VAR_CALL -O0
+PASS t1 packed ABI float record VAR_CALL -O2
+PASS t1 packed ABI float record VAR_GET -O0
+PASS t1 packed ABI float record VAR_GET -O2
+PASS t1 packed ABI float record MS_CALL -O0
+PASS t1 packed ABI float record MS_CALL -O2
+PASS t1 packed ABI float record MS_PARAM -O0
+PASS t1 packed ABI float record MS_PARAM -O2
+PASS t1 packed ABI float record MS_RETURN_CALL -O0
+PASS t1 packed ABI float record MS_RETURN_CALL -O2
+PASS t1 packed ABI float record MS_RETURN_DEF -O0
+PASS t1 packed ABI float record MS_RETURN_DEF -O2
+PASS t1 packed ABI double vector VAR_CALL -O0
+PASS t1 packed ABI double vector VAR_CALL -O2
+PASS t1 packed ABI double vector VAR_GET -O0
+PASS t1 packed ABI double vector VAR_GET -O2
+PASS t1 packed ABI double vector MS_CALL -O0
+PASS t1 packed ABI double vector MS_CALL -O2
+PASS t1 packed ABI double vector MS_PARAM -O0
+PASS t1 packed ABI double vector MS_PARAM -O2
+PASS t1 packed ABI double vector MS_RETURN_CALL -O0
+PASS t1 packed ABI double vector MS_RETURN_CALL -O2
+PASS t1 packed ABI double vector MS_RETURN_DEF -O0
+PASS t1 packed ABI double vector MS_RETURN_DEF -O2
+PASS t1 packed ABI double record VAR_CALL -O0
+PASS t1 packed ABI double record VAR_CALL -O2
+PASS t1 packed ABI double record VAR_GET -O0
+PASS t1 packed ABI double record VAR_GET -O2
+PASS t1 packed ABI double record MS_CALL -O0
+PASS t1 packed ABI double record MS_CALL -O2
+PASS t1 packed ABI double record MS_PARAM -O0
+PASS t1 packed ABI double record MS_PARAM -O2
+PASS t1 packed ABI double record MS_RETURN_CALL -O0
+PASS t1 packed ABI double record MS_RETURN_CALL -O2
+PASS t1 packed ABI double record MS_RETURN_DEF -O0
+PASS t1 packed ABI double record MS_RETURN_DEF -O2
+PASS t1 packed ABI int vector VAR_CALL -O0
+PASS t1 packed ABI int vector VAR_CALL -O2
+PASS t1 packed ABI int vector VAR_GET -O0
+PASS t1 packed ABI int vector VAR_GET -O2
+PASS t1 packed ABI int vector MS_CALL -O0
+PASS t1 packed ABI int vector MS_CALL -O2
+PASS t1 packed ABI int vector MS_PARAM -O0
+PASS t1 packed ABI int vector MS_PARAM -O2
+PASS t1 packed ABI int vector MS_RETURN_CALL -O0
+PASS t1 packed ABI int vector MS_RETURN_CALL -O2
+PASS t1 packed ABI int vector MS_RETURN_DEF -O0
+PASS t1 packed ABI int vector MS_RETURN_DEF -O2
+PASS t1 packed ABI int record VAR_CALL -O0
+PASS t1 packed ABI int record VAR_CALL -O2
+PASS t1 packed ABI int record VAR_GET -O0
+PASS t1 packed ABI int record VAR_GET -O2
+PASS t1 packed ABI int record MS_CALL -O0
+PASS t1 packed ABI int record MS_CALL -O2
+PASS t1 packed ABI int record MS_PARAM -O0
+PASS t1 packed ABI int record MS_PARAM -O2
+PASS t1 packed ABI int record MS_RETURN_CALL -O0
+PASS t1 packed ABI int record MS_RETURN_CALL -O2
+PASS t1 packed ABI int record MS_RETURN_DEF -O0
+PASS t1 packed ABI int record MS_RETURN_DEF -O2
+PASS t1 packed ABI long long vector VAR_CALL -O0
+PASS t1 packed ABI long long vector VAR_CALL -O2
+PASS t1 packed ABI long long vector VAR_GET -O0
+PASS t1 packed ABI long long vector VAR_GET -O2
+PASS t1 packed ABI long long vector MS_CALL -O0
+PASS t1 packed ABI long long vector MS_CALL -O2
+PASS t1 packed ABI long long vector MS_PARAM -O0
+PASS t1 packed ABI long long vector MS_PARAM -O2
+PASS t1 packed ABI long long vector MS_RETURN_CALL -O0
+PASS t1 packed ABI long long vector MS_RETURN_CALL -O2
+PASS t1 packed ABI long long vector MS_RETURN_DEF -O0
+PASS t1 packed ABI long long vector MS_RETURN_DEF -O2
+PASS t1 packed ABI long long record VAR_CALL -O0
+PASS t1 packed ABI long long record VAR_CALL -O2
+PASS t1 packed ABI long long record VAR_GET -O0
+PASS t1 packed ABI long long record VAR_GET -O2
+PASS t1 packed ABI long long record MS_CALL -O0
+PASS t1 packed ABI long long record MS_CALL -O2
+PASS t1 packed ABI long long record MS_PARAM -O0
+PASS t1 packed ABI long long record MS_PARAM -O2
+PASS t1 packed ABI long long record MS_RETURN_CALL -O0
+PASS t1 packed ABI long long record MS_RETURN_CALL -O2
+PASS t1 packed ABI long long record MS_RETURN_DEF -O0
+PASS t1 packed ABI long long record MS_RETURN_DEF -O2
+PASS t1 scalar ABI knc-abi-double.c -O0
+PASS t1 scalar ABI knc-abi-double.c -O2
+PASS t1 scalar ABI knc-abi-double.c -Os
+PASS t1 scalar ABI knc-abi-float.c -O0
+PASS t1 scalar ABI knc-abi-float.c -O2
+PASS t1 scalar ABI knc-abi-float.c -Os
+PASS t1 scalar ABI knc-abi-mixed.c -O0
+PASS t1 scalar ABI knc-abi-mixed.c -O2
+PASS t1 scalar ABI knc-abi-mixed.c -Os
+PASS t1 scalar ABI knc-abi-overflow.c -O0
+PASS t1 scalar ABI knc-abi-overflow.c -O2
+PASS t1 scalar ABI knc-abi-overflow.c -Os
+PASS t1 scalar ABI abi_in_df_d -O0
+PASS t1 scalar ABI abi_in_df_f -O0
+PASS t1 scalar ABI abi_in_ff_a -O0 [donor -O2 fallback; GCC16 -O0]
+PASS t1 scalar ABI abi_in_ff_b -O0 [donor -O2 fallback; GCC16 -O0]
+PASS t1 scalar ABI abi_out_df -O0
+PASS t1 scalar ABI abi_out_ff -O0
+PASS t1 scalar ABI abi_in_stack_df_d -O0
+PASS t1 scalar ABI abi_in_stack_df_f -O0
+PASS t1 scalar ABI abi_in_stack_tail -O0
+PASS t1 scalar ABI knc-abi-structs.c -O2
+PASS t1 scalar ABI knc-abi-structs.c -Os
+PASS t1 m1_affine ABI donor locations
+PASS t1 KNC rejects target attribute sse
+PASS t1 KNC rejects target attribute sse2
+PASS t1 KNC rejects target attribute avx
+PASS t1 KNC rejects target attribute avx512f
+PASS t1 KNC zero-call-used-regs legal code or unsupported diagnostic
+FAIL t1 secondary Fortran infrastructure: missing Fortran driver: ../_shared/gcc-knc-16.2.0/bin/gfortran
+PASS t1 secondary mixed pressure -O1 si
+PASS t1 secondary mixed pressure -O1 di
+PASS t1 secondary mixed pressure -O1 sf
+PASS t1 secondary mixed pressure -O1 df
+PASS t1 secondary mixed pressure -O1 sf_u32
+PASS t1 secondary mixed pressure -O1 u32_sf
+PASS t1 secondary mixed pressure -O1 df_u64
+PASS t1 secondary mixed pressure -O1 u64_df
+PASS t1 secondary mixed pressure -O1 ti
+PASS t1 secondary mixed pressure -O1 tf
+PASS t1 secondary mixed pressure -O2 si
+PASS t1 secondary mixed pressure -O2 di
+PASS t1 secondary mixed pressure -O2 sf
+PASS t1 secondary mixed pressure -O2 df
+PASS t1 secondary mixed pressure -O2 sf_u32
+PASS t1 secondary mixed pressure -O2 u32_sf
+PASS t1 secondary mixed pressure -O2 df_u64
+PASS t1 secondary mixed pressure -O2 u64_df
+PASS t1 secondary mixed pressure -O2 ti
+PASS t1 secondary mixed pressure -O2 tf
+PASS t1 knc-align-data.c
+PASS t1 knc-align-params.c
+PASS t1 knc-atomics.c
+PASS t1 knc-broadcast-load.c
+PASS t1 knc-complex-broadcast-align.c
+PASS t1 knc-convert-byte-init.c
+PASS t1 knc-convert-byte-negative.c
+PASS t1 knc-convert-byte-positive.c
+PASS t1 knc-convert-byte-register.c
+PASS t1 knc-convert-byte-reload.c
+PASS t1 knc-convert-same.c
+PASS t1 knc-convert-width.c
+PASS t1 knc-cost-gather.c
+PASS t1 knc-cost-reduce-one-thread.c
+PASS t1 knc-cost-reduce.c
+PASS t1 knc-debug.c
+PASS t1 knc-defaults.c
+PASS t1 knc-div-f32.c
+PASS t1 knc-divsqrt-f64.c
+PASS t1 knc-fp-constant-store.c
+PASS t1 knc-fp-minmax-finite.c
+PASS t1 knc-fp-minmax-strict.c
+PASS t1 knc-gather16-f32.c
+PASS t1 knc-gather16-i32.c
+PASS t1 knc-gather16-masked.c
+PASS t1 knc-gather16-negative.c
+PASS t1 knc-gather8-f64.c
+PASS t1 knc-gather8-i64.c
+PASS t1 knc-imul-cost.c
+PASS t1 knc-link-defaults.c
+PASS t1 knc-loop-report-affine.c
+PASS t1 knc-loop-report-gather.c
+PASS t1 knc-loop-report-rejected.c
+PASS t1 knc-loop-report-tail.c
+PASS t1 knc-loop-store-mask.c
+PASS t1 knc-macros-default.c
+PASS t1 knc-macros-march.c
+PASS t1 knc-mask-cmp-f32.c
+PASS t1 knc-mask-cmp-f64.c
+PASS t1 knc-mask-cmp-i32.c
+PASS t1 knc-mask-cond-O2.c
+PASS t1 knc-mask-cond-O3.c
+PASS t1 knc-mask-spill.c
+PASS t1 knc-mask-split.c
+PASS t1 knc-mask-tail-O2.c
+PASS t1 knc-mask-tail-O3.c
+PASS t1 knc-mask-tail-len.c
+PASS t1 knc-no-cmov.c
+PASS t1 knc-no-fcomi.c
+PASS t1 knc-no-mfence.c
+PASS t1 knc-o2-vect-user.c
+PASS t1 knc-o2-vect.c
+PASS t1 knc-pad-reduction.c
+PASS t1 knc-pad-tls.c
+PASS t1 knc-perm-loops.c
+PASS t1 knc-perm-shuffle.c
+PASS t1 knc-phinix-nest.c
+PASS t1 knc-phinix.c
+PASS t1 knc-prefetch-O2.c
+PASS t1 knc-prefetch-O3.c
+PASS t1 knc-prefetch-density.c
+PASS t1 knc-prefetch-distance-boundary.c
+PASS t1 knc-prefetch-masked.c
+PASS t1 knc-prefetch-param.c
+PASS t1 knc-reduce-fast.c
+PASS t1 knc-reduce-int.c
+PASS t1 knc-reduce-strict-O2.c
+PASS t1 knc-reduce-strict-O3.c
+PASS t1 knc-reject-avx.c
+PASS t1 knc-reject-avx512f.c
+PASS t1 knc-reject-mmx.c
+PASS t1 knc-reject-sse.c
+PASS t1 knc-reject-sse2.c
+PASS t1 knc-scatter8-f64.c
+PASS t1 knc-scatter8-i64.c
+PASS t1 knc-scheduler-cmp-jump.c
+PASS t1 knc-scheduler.c
+PASS t1 knc-spin-hint.c
+PASS t1 knc-sqrt-f64-errno.c
+PASS t1 knc-storent.c
+PASS t1 knc-torture-options.c
+PASS t1 knc-tune-align-loops.c
+PASS t1 knc-tune-align-user.c
+PASS t1 knc-tune-align.c
+PASS t1 knc-tune-prefix.c
+PASS t1 knc-tune-tight-loops-ctrl.c
+PASS t1 knc-tune-tight-loops.c
+PASS t1 knc-unroll-density1.c
+PASS t1 knc-unroll-small.c
+PASS t1 knc-varargs.c
+PASS t1 knc-vec-autovec.c
+PASS t1 knc-vec-fold-O2.c
+PASS t1 knc-vec-fold-O3.c
+PASS t1 knc-vec-fold-fma.c
+PASS t1 knc-vec-imadd.c
+PASS t1 knc-vec-int-loop.c
+PASS t1 knc-vec-int-ops.c
+PASS t1 knc-vec-neg-induction.c
+PASS t1 knc-vec-reduction.c
+PASS t1 knc-vec-v16sf.c
+PASS t1 knc-vec-v16si.c
+PASS t1 knc-vec-v8df.c
+PASS t1 knc-vec-v8di.c
+PASS t1 knc-vecarg.c
+PASS t1 knc-vmath-call.c
+PASS t1 knc-vmath-errno.c
+PASS t1 knc-vmath-phinix.c
+PASS t1 knc-vmath-v1a.c
+PASS t1 knc-vmath-v1b.c
+PASS t1 knc-x87-compare.c
+PASS t1 knc-xi-copy-O0.c
+PASS t1 knc-xi-copy-O1.c
+PASS t1 knc-xi-copy-O2.c
+PASS t1 knc-xi-spill.c
+PASS t1 smoke.c
+PASS t1 sqrt errno
+PASS t1 sqrt noerrno
+PASS t1 byte-aligned v16sf -O2 element-aligned controls
+PASS t1 byte-aligned v16sf -O2
+PASS t1 byte-aligned v16sf -O3 element-aligned controls
+PASS t1 byte-aligned v16sf -O3
+PASS t1 byte-aligned v8df -O2 element-aligned controls
+PASS t1 byte-aligned v8df -O2
+PASS t1 byte-aligned v8df -O3 element-aligned controls
+PASS t1 byte-aligned v8df -O3
+PASS t1 byte-aligned v16si -O2 element-aligned controls
+PASS t1 byte-aligned v16si -O2
+PASS t1 byte-aligned v16si -O3 element-aligned controls
+PASS t1 byte-aligned v16si -O3
+PASS t1 byte-aligned v8di -O2 element-aligned controls
+PASS t1 byte-aligned v8di -O2
+PASS t1 byte-aligned v8di -O3 element-aligned controls
+PASS t1 byte-aligned v8di -O3
+TLS donor O2 read_defined: ['%fs:', 'tv@tpoff']
+TLS donor O2 read_external: ['te@gottpoff', '%fs:']
+PASS t1 native TLS donor O2
+TLS selected O2 read_defined: ['%fs:', 'tv@tpoff']
+TLS selected O2 read_external: ['te@gottpoff', '%fs:']
+PASS t1 native TLS selected O2
+TLS donor O2-PIC read_defined: ['tv@tlsgd', '__tls_get_addr']
+TLS donor O2-PIC read_external: ['te@tlsgd', '__tls_get_addr']
+PASS t1 native TLS donor O2-PIC
+TLS selected O2-PIC read_defined: ['tv@tlsgd', '__tls_get_addr']
+TLS selected O2-PIC read_external: ['te@tlsgd', '__tls_get_addr']
+PASS t1 native TLS selected O2-PIC
+TLS donor O0 read_defined: ['%fs:', 'tv@tpoff']
+TLS donor O0 read_external: ['te@gottpoff', '%fs:']
+PASS t1 native TLS donor O0
+TLS selected O0 read_defined: ['%fs:', 'tv@tpoff']
+TLS selected O0 read_external: ['te@gottpoff', '%fs:']
+PASS t1 native TLS selected O0
+PASS t1 cbrtl cbrtl.c -O0 knc
+PASS t1 cbrtl cbrtl.c -O0 quiet
+PASS t1 cbrtl cbrtl.c -O0 x86
+PASS t1 cbrtl cbrtl.c -O2 knc
+PASS t1 cbrtl cbrtl.c -O2 quiet
+PASS t1 cbrtl cbrtl.c -O2 x86
+PASS t1 cbrtl cbrtl.cc -O0 knc
+PASS t1 cbrtl cbrtl.cc -O0 quiet
+PASS t1 cbrtl cbrtl.cc -O0 x86
+PASS t1 cbrtl cbrtl.cc -O2 knc
+PASS t1 cbrtl cbrtl.cc -O2 quiet
+PASS t1 cbrtl cbrtl.cc -O2 x86
+PASS t1 cbrtl cbrtl-generic.c -O0 knc
+PASS t1 cbrtl cbrtl-generic.c -O0 quiet
+PASS t1 cbrtl cbrtl-generic.c -O0 x86
+PASS t1 cbrtl cbrtl-generic.c -O2 knc
+PASS t1 cbrtl cbrtl-generic.c -O2 quiet
+PASS t1 cbrtl cbrtl-generic.c -O2 x86
+PASS t1 off assembly --march=k1om
+PASS t1 off knc_lint
+PASS t1 off function scans
+PASS t1 fast assembly --march=k1om
+PASS t1 fast knc_lint
+PASS t1 fast function scans
+PASS t1 affine Fortran off assembly --march=k1om
+PASS t1 affine Fortran off knc_lint
+PASS t1 affine Fortran off vectorization
+PASS t1 affine Fortran fast assembly --march=k1om
+PASS t1 affine Fortran fast knc_lint
+PASS t1 affine Fortran fast vectorization
+PASS t2 V16HI hidden result pointer
+T2 link trace: /cygdrive/c/Users/xuzhi/Documents/gcc_knc/.work/_shared/toolchain/sysroot/lib64/libc.so.6
+T2 link trace: /cygdrive/c/Users/xuzhi/Documents/gcc_knc/.work/_shared/toolchain/sysroot/lib64/ld-linux-k1om.so.2
+PASS t2 ELF machine and interpreter
+PASS t2 symbol versions against card sysroot
+PASS t2 knc-short-vector -O2 GCC16 caller / donor callee
+T2 link trace: /cygdrive/c/Users/xuzhi/Documents/gcc_knc/.work/_shared/toolchain/sysroot/lib64/libc.so.6
+T2 link trace: /cygdrive/c/Users/xuzhi/Documents/gcc_knc/.work/_shared/toolchain/sysroot/lib64/ld-linux-k1om.so.2
+PASS t2 ELF machine and interpreter
+PASS t2 symbol versions against card sysroot
+PASS t2 knc-short-vector -O2 donor caller / GCC16 callee
+T2 link trace: /cygdrive/c/Users/xuzhi/Documents/gcc_knc/.work/_shared/toolchain/sysroot/lib64/libc.so.6
+T2 link trace: /cygdrive/c/Users/xuzhi/Documents/gcc_knc/.work/_shared/toolchain/sysroot/lib64/ld-linux-k1om.so.2
+PASS t2 ELF machine and interpreter
+PASS t2 symbol versions against card sysroot
+PASS t2 knc-vecarg caller -O0 / callee -O2
+T2 link trace: /cygdrive/c/Users/xuzhi/Documents/gcc_knc/.work/_shared/toolchain/sysroot/lib64/libc.so.6
+T2 link trace: /cygdrive/c/Users/xuzhi/Documents/gcc_knc/.work/_shared/toolchain/sysroot/lib64/ld-linux-k1om.so.2
+PASS t2 ELF machine and interpreter
+PASS t2 symbol versions against card sysroot
+PASS t2 knc-vecarg caller -O2 / callee -O0
+T2 link trace: /cygdrive/c/Users/xuzhi/Documents/gcc_knc/.work/_shared/toolchain/sysroot/lib64/libc.so.6
+T2 link trace: /cygdrive/c/Users/xuzhi/Documents/gcc_knc/.work/_shared/toolchain/sysroot/lib64/ld-linux-k1om.so.2
+PASS t2 ELF machine and interpreter
+PASS t2 symbol versions against card sysroot
+PASS t2 knc-scalar-abi -O2 GCC16 caller / donor callee
+T2 link trace: /cygdrive/c/Users/xuzhi/Documents/gcc_knc/.work/_shared/toolchain/sysroot/lib64/libc.so.6
+T2 link trace: /cygdrive/c/Users/xuzhi/Documents/gcc_knc/.work/_shared/toolchain/sysroot/lib64/ld-linux-k1om.so.2
+PASS t2 ELF machine and interpreter
+PASS t2 symbol versions against card sysroot
+PASS t2 knc-scalar-abi -O2 donor caller / GCC16 callee
+T2 link trace: /cygdrive/c/Users/xuzhi/Documents/gcc_knc/.work/_shared/toolchain/sysroot/lib64/libc.so.6
+T2 link trace: /cygdrive/c/Users/xuzhi/Documents/gcc_knc/.work/_shared/toolchain/sysroot/lib64/ld-linux-k1om.so.2
+PASS t2 ELF machine and interpreter
+PASS t2 symbol versions against card sysroot
+PASS t2 knc-abi-gaps -O0 GCC16 caller / donor callee
+T2 link trace: /cygdrive/c/Users/xuzhi/Documents/gcc_knc/.work/_shared/toolchain/sysroot/lib64/libc.so.6
+T2 link trace: /cygdrive/c/Users/xuzhi/Documents/gcc_knc/.work/_shared/toolchain/sysroot/lib64/ld-linux-k1om.so.2
+PASS t2 ELF machine and interpreter
+PASS t2 symbol versions against card sysroot
+PASS t2 knc-abi-gaps -O0 donor caller / GCC16 callee
+T2 link trace: /cygdrive/c/Users/xuzhi/Documents/gcc_knc/.work/_shared/toolchain/sysroot/lib64/libc.so.6
+T2 link trace: /cygdrive/c/Users/xuzhi/Documents/gcc_knc/.work/_shared/toolchain/sysroot/lib64/ld-linux-k1om.so.2
+PASS t2 ELF machine and interpreter
+PASS t2 symbol versions against card sysroot
+PASS t2 knc-abi-gaps -O2 GCC16 caller / donor callee
+T2 link trace: /cygdrive/c/Users/xuzhi/Documents/gcc_knc/.work/_shared/toolchain/sysroot/lib64/libc.so.6
+T2 link trace: /cygdrive/c/Users/xuzhi/Documents/gcc_knc/.work/_shared/toolchain/sysroot/lib64/ld-linux-k1om.so.2
+PASS t2 ELF machine and interpreter
+PASS t2 symbol versions against card sysroot
+PASS t2 knc-abi-gaps -O2 donor caller / GCC16 callee
+T2 link trace: /cygdrive/c/Users/xuzhi/Documents/gcc_knc/.work/_shared/toolchain/sysroot/lib64/libc.so.6
+T2 link trace: /cygdrive/c/Users/xuzhi/Documents/gcc_knc/.work/_shared/toolchain/sysroot/lib64/ld-linux-k1om.so.2
+PASS t2 ELF machine and interpreter
+PASS t2 symbol versions against card sysroot
+PASS t2 affine Fortran driver and runtime-free link
+T2 affine ABI cross-check: donor-built driver, GCC 16 loops
+T2 link trace: /cygdrive/c/Users/xuzhi/Documents/gcc_knc/.work/_shared/toolchain/sysroot/lib64/libc.so.6
+T2 link trace: /cygdrive/c/Users/xuzhi/Documents/gcc_knc/.work/_shared/toolchain/sysroot/lib64/ld-linux-k1om.so.2
+PASS t2 ELF machine and interpreter
+PASS t2 symbol versions against card sysroot
+Elapsed: 1164.12 seconds
+
+S12-09 native and x86 evidence (lead-reported, 2026-11-15)
+GCC lane 1 b2ce6a9eebffcb5c23512c2cec4ba3d8b9e2f046.
+Card window 9: 18:31-18:51Z, exclusive.
+Execute: 1680 PASS; 1 FAIL 930529-1.c, exit 4.
+Builder inspected: tools/s12_09_stage.py:execute; its options regex accepts
+quoted or bare options but not brace-form dg-options. Source line 1 is
+/* { dg-options { "-fwrapv" } } */
+Consequently flags=[] and the constructed command is:
+$SHARED/gcc-knc-16.2.0/bin/k1om-mpss-linux-gcc -march=knc -O2 -w $SHARED/gcc/gcc/testsuite/gcc.c-torture/execute/930529-1.c -lm -o $SHARED/S12-09/execute/claude-t-930529-1.mic
+No -fwrapv is passed. Record this as the known harness miss from S3/S6,
+not a compiler failure. Lead reports prior -fwrapv passes in S3-21/S6-08.
+No rerun or builder change in this check.
+
+Vmath: all six launches valid; zero invalid rows. Vector faster everywhere
+(1.22-3.40x) except double log at density 1: l2 0.85x, mem 0.87x.
+Double log at density 4: 1.25-1.32x. Density 1 is a known minor M4 limit.
+Log: .work/_state/logs/s12_09_vmath_summary-20261115-135441.log
+
+Lead x86: knc b2ce6a9eebf vs releases/gcc-16.2.0, -O2 -mavx512f;
+identical=1962 different=0 both-failed=41 (header-only, both trees) errors=0.
+Log: .work/_state/logs/s12_09_x86-20261115-100743.log
+
+Full wrapper rerun after the lead repaired log pruning (2026-11-15):
+T1 PASS (exit 0), 144.23 seconds, 352 log lines.
+Command: python tools/check.py t1 --compiler gcc16 --cc ../_shared/gcc-knc-16.2.0/bin/k1om-mpss-linux-gcc --record ../_shared/S12-09/t1-rerun.txt
+Log: .work/_state/logs/check_gcc16_t1-20261115-151543.log
+T0 PASS (exit 0), 669.39 seconds: regress 39, doctor 8, portability 6,
+knc_lint 6 tests, all OK. Full wrappers completed without log ACL errors.
+Command: python tools/check.py t0 --compiler gcc16 --cc ../_shared/gcc-knc-16.2.0/bin/k1om-mpss-linux-gcc --record ../_shared/S12-09/t0-rerun.txt
+Log: .work/_state/logs/check_gcc16_t0-20261115-151528.log
+Final T0/T1 status: PASS. T2 retains the initial passing result above;
+not rerun, as requested by the lead.

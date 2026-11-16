@@ -262,9 +262,19 @@ def foreign_processes(snapshot, run_dir, baseline_names):
     directories = [run_dir]
     if snapshot.get("physical_run_dir"):
         directories.append(snapshot["physical_run_dir"])
-    return [p for p in snapshot["processes"]
-               if not any(inside(p.get(field), directory)
-                          for directory in directories for field in ("exe", "cwd"))
+    processes = snapshot["processes"]
+    # Ours: the control shell's children (never listed themselves), processes in the run
+    # directory, and every descendant of either, whatever exe and cwd it shows.
+    ours = {str(pid) for pid in snapshot.get("own_pids", ())} | {
+        str(p.get("pid")) for p in processes
+        if any(inside(p.get(field), directory) for directory in directories for field in ("exe", "cwd"))}
+    while True:
+        children = {str(p.get("pid")) for p in processes if str(p.get("ppid")) in ours} - ours
+        if not children:
+            break
+        ours |= children
+    return [p for p in processes
+               if str(p.get("pid")) not in ours
                and str(p.get("pid")) != "2" and str(p.get("ppid")) != "2"
                and (not p.get("name") or p["name"] not in baseline_names)]
 
@@ -530,7 +540,8 @@ def run(program, argv, *, lock_path, external_locks, baseline_names, timeout,
         result.update(session.reap_stale(result["boot_id_before"], timeout=transport_timeout))
         now = datetime.now(timezone.utc)
         ledger_offset = len(lines)
-        overlaps.update(active)
+        # Overlap means another job running: not a queue row, nor our own turn reservation.
+        overlaps.update(key for key, job in active.items() if job.get("event") == "start")
         # A timed job keeps the whole card to itself even when its profile uses fewer cores.
         ledger_job = dict(agent="claude", project=PROJECT, jobId=job_id,
                           cores=list(range(60)) if benchmark else sorted(set(mapping.values())),
@@ -841,7 +852,7 @@ class SSHSession:
         if not records or not records[0].startswith("BOOT\t"):
             raise OSError("malformed process/boot snapshot")
         boot = records[0][5:]
-        processes, skipped = [], []
+        processes, skipped, own = [], [], []
         cpuinfo, meminfo = [], []
         physical_run_dir = None
         for line in records[1:]:
@@ -854,6 +865,9 @@ class SSHSession:
                 continue
             if fields[0] == "MEM":
                 meminfo.append(line[4:])
+                continue
+            if len(fields) == 2 and fields[0] == "OWN" and fields[1].isdigit():
+                own.append(fields[1])
                 continue
             diagnostic = "unknown process identity in snapshot: %r" % line.encode("utf8")[:200]
             # A partial record may still identify one of our own processes.
@@ -872,7 +886,7 @@ class SSHSession:
             processes.append(dict(zip(("pid", "ppid", "name", "exe", "cwd"), fields[1:])))
         if self.boot_id is None:
             self.boot_id = boot
-        return dict(boot_id=boot, processes=processes, skipped_processes=skipped,
+        return dict(boot_id=boot, processes=processes, skipped_processes=skipped, own_pids=own,
                     physical_run_dir=physical_run_dir,
                     cpuinfo="\n".join(cpuinfo),
                     meminfo="\n".join(meminfo))

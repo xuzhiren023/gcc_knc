@@ -330,7 +330,7 @@ class Runner:
         self.gcc_build = Path(storage.gcc_build_dir(PROJECT))
         build = self.gcc_build / 'gcc'
         self.cc = Path(args.cc) if args.cc else (build / 'xgcc' if args.compiler == 'gcc16' else self.tool('gcc'))
-        self.cc_flags = ['-B' + str(build) + '/'] if args.compiler == 'gcc16' else []
+        self.cc_flags = ['-B' + str(build) + '/'] if args.compiler == 'gcc16' and not args.cc else []
         self.env = os.environ.copy()
         self.env['PATH'] = os.pathsep.join(str(self.tc / p) for p in ('cross/bin', 'cygwin/bin')) + os.pathsep + self.env.get('PATH', '')
         output_root = PROJECT / '.work/_shared/check'
@@ -545,6 +545,8 @@ class Runner:
         elf = self.out / 'knc-link-defaults.mic'
         # libgcc's all target installs its results into the GCC build dir.
         runtime = self.gcc_build / 'gcc'
+        if getattr(self.args, 'cc', None):
+            runtime = Path(self.command(self.cc, '-print-file-name=libgcc.a').strip()).parent
         linked = self.command(self.cc, *self.cc_flags,
                               '-v', '-Wl,--trace', ROOT / 'tests/t2/knc-link-defaults.c',
                               '-o', elf, check=False)

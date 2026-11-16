@@ -1,0 +1,17 @@
+{
+ "schema": "knc-twin.heldout-measurement/1",
+ "case": "gemv-fp32-card",
+ "source_log": ".work/_shared/tmp/claude-next28/membw-gemv.out lines 100-102 (CASE 14: fp32 GEMV, 11008 columns, block 1024, 120 threads spread, small pages, prefetch 8/64)",
+ "source_doc": "docs/research/knc-memory-bandwidth.md, S11-09 native evidence (fp32 winner)",
+ "measured_on": "2026-11-12 21:41-21:57Z, boot da3144f1",
+ "unit": "decimal GB/s, logical bytes over wall time (min/median/max of five samples)",
+ "rows": [
+  {
+   "threads": 120,
+   "median_GBs": 125.302161,
+   "min_GBs": 112.382919,
+   "max_GBs": 128.078487
+  }
+ ],
+ "used_to_set_parameters": false
+}
