@@ -67,6 +67,10 @@ relative to that file; the current directory does not matter.
      Every sampled prediction is an `unvalidated_scenario_estimate`, even for a validated shape.
      See `references/rollup.md` for the stopping rule and its limits.
    - `bounds <kernel>` lower bounds; `--loop` ResMII/RecMII/critical path; `--search` exhaustive reorder
+   - `schedule <kernel> --method beam|list|modulo --max-states 4096 --out <dir>`
+     candidate GAS, normalized kernel and `batch.json` with the frozen profile; beam handles
+     up to 60 body instructions, list uses bounded lookahead, modulo reports a feasible II
+     separately from simulation of the executable body order (no pipeline generation)
    - `bounds --scale card|pair --params <json>` labeled analytical scenario estimates
    - `compare <baseline result.json> <candidate result.json>` same model, same scenario, deltas
    - `batch <manifest.json>` rank a candidate set with a frozen profile hash; uncertain cases get
@@ -138,6 +142,7 @@ prefix/fence cost and scatter occupancy); nothing gets a silent default. Sensiti
 - `references/calibration.md` the calibration habit: plan, prepare-native, import-native, held-out rules
 - `references/rollup.md` program roll-up manifest and what its number means
 - `references/bounds.md` bound terms, MII vocabulary, search-space claims
+- `references/scheduling-explorer.md` scheduling methods, limits and compiler-ticket workflow
 - `references/analytic-scales.md` pair and card scenario formulas and assumptions
 - `references/sources.md` which claims each source supports
 - `references/gcc-pipeline-mapping.md` relation to GCC's `knc.md` pipeline description

@@ -1,10 +1,10 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-16 03:03.
+Updated automatically at every ticket change. Last update: 2026-11-16 05:15.
 
 **Waiting for you:** S14-15. Run `python tools/pm.py inbox`.
 
-Current tickets: `[#################---]` 244 of 279
+Current tickets: `[#################---]` 246 of 280
 
 ## Milestones
 
@@ -15,7 +15,7 @@ Current tickets: `[#################---]` 244 of 279
 | M2 | Useful vector target | Done | 51 of 51 tickets |
 | M3 | Runtimes | Done | 48 of 48 tickets |
 | M4 | Broad optimization | Done | 62 of 65 tickets |
-| M5 | Program corpus | In progress | 0 of 32 tickets |
+| M5 | Program corpus | In progress | 2 of 33 tickets |
 | M6 | Release | Not started | Not planned in detail yet |
 
 ## Tickets
@@ -139,16 +139,17 @@ Current tickets: `[#################---]` 244 of 279
 | S14-08 | Quantized GEMV kernels on KNC - multi-row activation reuse, FP vs int32 VPMADD231D vs VPERMD lookup table, bandwidth-normalized | draft |  |
 | S14-09 | KNC vs the Z840 host (dual E5-2690 v3) on the same algorithms and numerical contract - where running on the card actually pays | draft |  |
 | S14-10 | knc-twin: --jobs N for independent simulations and PyPy support (roadmap item 1) | In progress | No worktree needed. Export main's knc-twin into your shared dir: git -c safe.directory='*' archive main knc... |
-| S14-11 | knc-twin: close PhiWeather WRF coverage gaps (jump tables, vcvtps2pd ymm, loop-region and complete-listing modes, scatter and rcp-table import) | In progress | input_tokens 20M -> 30M under the owner's standing auto-extend rule: items A-G are committed and main is me... |
-| S14-12 | knc-twin: iteration and phase sampling for loop and whole-program wall-time estimates (roadmap item 2) | Waiting for review | Windows Python 3.8 validation: regress had only the hpcg-104 default-budget failure, tracked as S14-18; aut... |
-| S14-13 | knc-twin: 8-tile multi-core unit on the full ring with all memory controllers (roadmap item 3) | In progress | (1) Schema: offline, in memory only: s = json.load(kernel.schema.json); s.pop('$id'); jsonschema.Draft7Vali... |
-| S14-14 | knc-twin: scheduling explorer for modulo scheduling and reordering, evaluating S14-02/S14-03 (roadmap item 4) | lead | Review passed (approve note: knc-twin gains a schedule command: beam search up to 60 instructions, list ord... |
+| S14-11 | knc-twin: close PhiWeather WRF coverage gaps (jump tables, vcvtps2pd ymm, loop-region and complete-listing modes, scatter and rcp-table import) | lead | Review done, no findings: A-G match the brief and the 08:25Z pre-review; heap stubs pinned red-then-green i... |
+| S14-12 | knc-twin: iteration and phase sampling for loop and whole-program wall-time estimates (roadmap item 2) | Waiting for review | S14-18 and S14-14 merged; approving |
+| S14-13 | knc-twin: 8-tile multi-core unit on the full ring with all memory controllers (roadmap item 3) | lead | Review passed, but approve's merge was refused: t0 ran past 20 min (pm.py:534); main's t0 is 640 s. Interac... |
+| S14-14 | knc-twin: scheduling explorer for modulo scheduling and reordering, evaluating S14-02/S14-03 (roadmap item 4) | Done | knc-twin gains a schedule command: beam search up to 60 instructions, list ordering, modulo II, GAS export ... |
 | S14-15 | knc-twin prepare-native: absolute memory operands come out as `N()` in kernel.S (k1om as 2.22 rejects them); emit them relocated into the image | **Waiting for you** | budget: 10651104 input tokens used; the budget is 10000000 |
 | S14-16 | bzip2 slower than GCC 5.1.1: mask-to-GPR move cost below a GPR move makes RA park integers in k registers (M4 known limit, must-fix) | draft |  |
 | S14-17 | Compare not folded with its load in merged return blocks (GCC 16 middle end, about half the remaining bzip2 mainGtU gap) | draft |  |
-| S14-18 | knc-twin regress: held-out replay runs under a 120 s wall-clock budget, so a slow interpreter turns a prediction into a budget_exhausted stub and the test fails as a false mismatch | In progress | No acceptance edit needed. t0 runs tests/regress/test_*.py (tools/check.py:373), and nothing in tests/accep... |
+| S14-18 | knc-twin regress: held-out replay runs under a 120 s wall-clock budget, so a slow interpreter turns a prediction into a budget_exhausted stub and the test fails as a false mismatch | Done | The knc-twin held-out replay no longer runs in t0 (KNC_TWIN_HELDOUT=1 or validate_heldout.py --max-seconds ... |
 | S14-19 | knc-twin x87 integer-load widths - fildl reads 8 bytes (must be 4), filds reads 4 (must be 2) | Not started |  |
 | S14-20 | knc-twin: an indirect jmp/call (PLT tail call through the GOT) on a never-executed path must not refuse the whole region | Not started |  |
+| S14-21 | knc-twin multi-core: held-out validation of the 8-tile ring model against the measured GEMV, triad and core-scaling rows | Not started |  |
 | S2-01 | Design for zmm and mask registers under -march=knc | Done | The register design for KNC is settled on paper: all 32 zmm and 8 mask registers become usable under -march... |
 | S2-02 | Float and double arguments and results in zmm lane 0 | Done | Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`). |
 | S2-03 | Varargs with the donor's register save area | Done | Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`). |
@@ -304,20 +305,20 @@ Current tickets: `[#################---]` 244 of 279
 
 ## Recent activity
 
-- 2026-11-16 03:03 **S14-12** engineer submit: Windows Python 3.8 validation: regress had only the hpcg-104 default-budget failure, tracked as S14-18; authorized focused --max-seconds 3600 match...
-- 2026-11-16 03:02 **S14-12** owner decide: input_tokens 20M -> 25M, final: the only remaining step is the submit command the 02:59 answer spells out (with --override and the three log names)...
-- 2026-11-16 03:01 **S14-18** lead answer: No acceptance edit needed. t0 runs tests/regress/test_*.py (tools/check.py:373), and nothing in tests/acceptance/ references the held-out replay. P...
-- 2026-11-16 03:00 **S14-12** lead escalate: budget: 22731536 input tokens used; the budget is 20000000
-- 2026-11-16 02:59 **S14-18** engineer ask: The ticket requires editing tests/acceptance/, which AGENTS.md explicitly forbids: acceptance requires heldout replay to leave tools/check t0, and ...
-- 2026-11-16 02:59 **S14-12** lead answer: Yes, submit now with --override 'size: 947 lines for a two-part brief (loop sampling + phase rollup): ~350 source, 264 in the two budgeted test fil...
-- 2026-11-16 02:58 **S14-12** engineer ask: Submit blocked: 947 changed lines exceeds 800-line budget; no new edits this session. Approve --override for existing implementation? Windows Pytho...
-- 2026-11-16 02:56 **S14-11** owner decide: input_tokens 20M -> 30M under the owner's standing auto-extend rule: items A-G are committed and main is merged; the held-out check (python 3.8 or ...
+- 2026-11-16 05:15 **S14-12** lead resume: S14-18 and S14-14 merged; approving
+- 2026-11-16 05:14 **S14-14** lead approve: knc-twin gains a schedule command: beam search up to 60 instructions, list ordering, modulo II, GAS export and frozen-profile batch ranking; on the...
+- 2026-11-16 05:03 **S14-14** lead resume: S14-18 merged; approving
+- 2026-11-16 05:02 **S14-18** lead approve: The knc-twin held-out replay no longer runs in t0 (KNC_TWIN_HELDOUT=1 or validate_heldout.py --max-seconds 0 runs it with no deadline), a timed-out...
+- 2026-11-16 05:00 **S14-18** engineer submit: the held-out replay leaves t0 (KNC_TWIN_HELDOUT=1 runs it; --max-seconds 0 disables the deadline), the regress fails on a non-ok variant with its m...
+- 2026-11-16 04:59 **S14-18** lead answer: Protected-path issue resolved: the branch's .gitignore change is reverted and the ignore line is on main (merged in, branch clean; diff touches onl...
+- 2026-11-16 04:58 **S14-18** lead resume: Lead reverted the branch's .gitignore commit (protected path), landed the knc-twin-runs/ ignore line on main, and merged main into s14/S14-18 (clea...
+- 2026-11-16 04:57 **S14-18** lead defer: Interactive lead needed: submit is refused because the branch changes protected .gitignore (the lead's knc-twin-runs/ line). Either revert that .gi...
 
 ## Cost
 
-- From the script, engineer: 748 sessions, 1617.9M input tokens
-- From the script, lead: 506 sessions, 143.4M input tokens
-- Started by hand, Claude: 14 sessions, 4136.9M input tokens
+- From the script, engineer: 766 sessions, 1626.4M input tokens
+- From the script, lead: 518 sessions, 147.4M input tokens
+- Started by hand, Claude: 14 sessions, 4162.7M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
