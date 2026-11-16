@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-15 23:06.
+Updated automatically at every ticket change. Last update: 2026-11-15 23:07.
 
-**Next: the tech lead, on S14-12.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: GPT-6.1, on S14-10 (knc-twin: --jobs N for independent simulations and PyPy support (roadmap item 1)).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
 Current tickets: `[#################---]` 244 of 273
 
@@ -140,7 +140,7 @@ Current tickets: `[#################---]` 244 of 273
 | S14-09 | KNC vs the Z840 host (dual E5-2690 v3) on the same algorithms and numerical contract - where running on the card actually pays | draft |  |
 | S14-10 | knc-twin: --jobs N for independent simulations and PyPy support (roadmap item 1) | In progress | M4 is not done (62 of 65 tickets, not accepted), so the gated runs wait and you should not block on them. N... |
 | S14-11 | knc-twin: close PhiWeather WRF coverage gaps (jump tables, vcvtps2pd ymm, loop-region and complete-listing modes, scatter and rcp-table import) | In progress | S14-11 red accepted: failing tests now pin knc-twin's WRF switch jump-table resolution (entry order, out-of... |
-| S14-12 | knc-twin: iteration and phase sampling for loop and whole-program wall-time estimates (roadmap item 2) | Tests waiting for review | Red 73383e26 closes review gaps: HPCG estimate inside band; width capped by profile shape error plus sample... |
+| S14-12 | knc-twin: iteration and phase sampling for loop and whole-program wall-time estimates (roadmap item 2) | In progress | The red tests for knc-twin loop and phase sampling now pin down the behaviour: a sampled HPCG loop must rea... |
 | S14-13 | knc-twin: 8-tile multi-core unit on the full ring with all memory controllers (roadmap item 3) | In progress | Design note approved; start Phase 2 (red commit first). (1) Approve: 61 abstract positions, 64 TD slices, 8... |
 | S14-14 | knc-twin: scheduling explorer for modulo scheduling and reordering, evaluating S14-02/S14-03 (roadmap item 4) | In progress | M4 is not finished (62 of 65) and the card may be in a timed block, but you do not need idle clearance for ... |
 | S2-01 | Design for zmm and mask registers under -march=knc | Done | The register design for KNC is settled on paper: all 32 zmm and 8 mask registers become usable under -march... |
@@ -298,6 +298,7 @@ Current tickets: `[#################---]` 244 of 273
 
 ## Recent activity
 
+- 2026-11-15 23:07 **S14-12** lead approve-red: The red tests for knc-twin loop and phase sampling now pin down the behaviour: a sampled HPCG loop must reach a steady state and land inside its ow...
 - 2026-11-15 23:06 **S14-14** lead answer: M4 is not finished (62 of 65) and the card may be in a timed block, but you do not need idle clearance for this: the scheduling acceptance tests, k...
 - 2026-11-15 23:05 **S14-12** engineer red: Red 73383e26 closes review gaps: HPCG estimate inside band; width capped by profile shape error plus sample spread; convergence required. Sampled p...
 - 2026-11-15 23:04 **S14-14** engineer ask: Host-idle clearance is missing: the approved red commit is 47ec4e41, and the last engineer note explicitly leaves green implementation and selftest...
@@ -305,13 +306,12 @@ Current tickets: `[#################---]` 244 of 273
 - 2026-11-15 23:01 **S14-14** lead approve-red: S14-14 red approved: six failing tests (failing only because knc_model.scheduling is missing) now pin down the scheduling explorer's beam, list and...
 - 2026-11-15 23:01 **S14-13** engineer ask: Phase 1 committed: 12328478, knc-twin/references/multicore-design.md. Brief 03 requires review before code. Approve contracted 61 positions/64 TDs,...
 - 2026-11-15 23:01 **S14-12** lead changes: Red review: loop series/spread/extrapolation, simulate option, budget stop, S12-30 widening and the phase-vs-flat algebra are good. Three gaps befo...
-- 2026-11-15 23:00 **S14-11** lead approve-red: S14-11 red accepted: failing tests now pin knc-twin's WRF switch jump-table resolution (entry order, out-of-range index) and the vcvtps2pd %ymm low...
 
 ## Cost
 
 - From the script, engineer: 719 sessions, 1506.0M input tokens
 - From the script, lead: 485 sessions, 138.4M input tokens
-- Started by hand, Claude: 14 sessions, 4009.1M input tokens
+- Started by hand, Claude: 14 sessions, 4009.5M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
