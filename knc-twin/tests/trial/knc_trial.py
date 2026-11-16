@@ -127,7 +127,7 @@ def run_case(case, tmp):
 
 def predict_heldout(case_dir, tmp):
     """Re-run the prediction a held-out case records in prediction.json (scripts/validate_heldout.py owns it)."""
-    return validate_heldout.predict_case(Path(case_dir), tmp=str(tmp))
+    return validate_heldout.predict_case(Path(case_dir), tmp=str(tmp), max_seconds=None)
 
 
 def main(argv=None):
