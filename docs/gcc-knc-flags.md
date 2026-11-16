@@ -104,8 +104,10 @@ branch cost yet.
 
 **Where GCC-KNC deliberately differs: floating point** (ADR-0003, ADR-0009 point 7). ICC defaults
 to `-fp-model fast=1`, which reassociates, contracts and approximates. GCC-KNC keeps IEEE
-semantics at every `-O` level: vector division and square root are correctly rounded (FP32; FP64
-division stays scalar x87), and no approximation is used without an opt-in. `-ffast-math` is the
+semantics at every `-O` level: vector FP32 and FP64 division and square root are correctly rounded
+in every rounding mode (FP64 since [S10-09](../work/tickets/S10-09.md)). The expansions use FMA
+internally, which `-ffp-contract` does not affect because the result equals the IEEE operation. No
+approximation is used without an opt-in. `-ffast-math` is the
 nearest match to ICC's default; it also links `crtfastmath`, which flushes subnormals. ICC's
 `-no-prec-div` / `-fimf-precision=low` approximate forms are not built yet (ADR-0003 point 5).
 `-ffp-contract` is GCC's default (`fast` in GNU C modes, `off` with `-std=c11`).
