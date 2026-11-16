@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-16 01:36.
+Updated automatically at every ticket change. Last update: 2026-11-16 01:39.
 
 **Next: the tech lead, on S13-01.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
@@ -141,7 +141,7 @@ Current tickets: `[#################---]` 244 of 279
 | S14-10 | knc-twin: --jobs N for independent simulations and PyPy support (roadmap item 1) | In progress | No worktree needed. Export main's knc-twin into your shared dir: git -c safe.directory='*' archive main knc... |
 | S14-11 | knc-twin: close PhiWeather WRF coverage gaps (jump tables, vcvtps2pd ymm, loop-region and complete-listing modes, scatter and rcp-table import) | In progress | Lead merged main into s14/S14-11 (a merge, not a rebase: the worktree cannot create rebase state, and a mer... |
 | S14-12 | knc-twin: iteration and phase sampling for loop and whole-program wall-time estimates (roadmap item 2) | In progress | Skip the rebase: main has no knc-twin or tests/regress change since your base aced5f9d, so the lead merges ... |
-| S14-13 | knc-twin: 8-tile multi-core unit on the full ring with all memory controllers (roadmap item 3) | In progress | input_tokens 20M -> 30M under the owner's standing auto-extend rule (second extension; design note done, st... |
+| S14-13 | knc-twin: 8-tile multi-core unit on the full ring with all memory controllers (roadmap item 3) | Question for the tech lead | f4a8f1d6: 3 native skeletons staged under .work/_shared/S14-13/native; ring-distance needs-driver. Selftest... |
 | S14-14 | knc-twin: scheduling explorer for modulo scheduling and reordering, evaluating S14-02/S14-03 (roadmap item 4) | In progress | Merged main into s14/S14-14 (9b699730, no conflicts), so the submit check passes. The 120 s budget_exhauste... |
 | S14-15 | knc-twin prepare-native: absolute memory operands come out as `N()` in kernel.S (k1om as 2.22 rejects them); emit them relocated into the image | Question for the tech lead | Required selftest and regression commands completed (selftest exit 0; tests/regress/test_knc_twin.py exit 0... |
 | S14-16 | bzip2 slower than GCC 5.1.1: mask-to-GPR move cost below a GPR move makes RA park integers in k registers (M4 known limit, must-fix) | draft |  |
@@ -304,6 +304,7 @@ Current tickets: `[#################---]` 244 of 279
 
 ## Recent activity
 
+- 2026-11-16 01:39 **S14-13** engineer ask: f4a8f1d6: 3 native skeletons staged under .work/_shared/S14-13/native; ring-distance needs-driver. Selftest/trial PASS; regress FAIL only HPCG-104 ...
 - 2026-11-16 01:36 **S14-15** engineer ask: Required selftest and regression commands completed (selftest exit 0; tests/regress/test_knc_twin.py exit 0 via unittest discovery). Existing commi...
 - 2026-11-16 01:32 **S14-15** owner decide: sessions 4 -> 6 under the owner's standing auto-extend rule: green is committed (e443bf8f); selftest, regress and submit remain
 - 2026-11-16 01:31 **S14-15** lead escalate: budget: 4 engineer sessions used; the budget is 4
@@ -311,13 +312,12 @@ Current tickets: `[#################---]` 244 of 279
 - 2026-11-16 01:29 **S14-15** lead answer: Remove the end-to-end validated-shape rollup assertion. The factored result_class unit test (held-out band_basis with a candidate -> calibrated; ra...
 - 2026-11-16 01:28 **S14-11** engineer ask: A-G committed through 8323b581; libc-calls request staged at .work/_shared/S14-11/libc-calls. git rebase main failed: cannot create .git/worktrees/...
 - 2026-11-16 01:26 **S14-15** engineer ask: The end-to-end validated-shape rollup fixture remains unvalidated because its test kernels model zero dynamic instructions and do not produce candi...
-- 2026-11-16 01:13 **S14-15** owner decide: input_tokens 4M -> 10M under the owner's standing auto-extend rule (second extension; red tests exist, both answers are on the ticket, implement gr...
 
 ## Cost
 
 - From the script, engineer: 739 sessions, 1588.8M input tokens
 - From the script, lead: 500 sessions, 142.0M input tokens
-- Started by hand, Claude: 14 sessions, 4118.1M input tokens
+- Started by hand, Claude: 14 sessions, 4118.9M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
