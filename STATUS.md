@@ -2,7 +2,7 @@
 
 Updated automatically at every ticket change. Last update: 2026-11-16 18:03.
 
-**Next: the tech lead, on S14-16.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: the tech lead, on S14-42.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[#################---]` 258 of 297
 
@@ -144,7 +144,7 @@ Current tickets: `[#################---]` 258 of 297
 | S14-13 | knc-twin: 8-tile multi-core unit on the full ring with all memory controllers (roadmap item 3) | Done | knc-twin simulates 1-8 detailed cores on the full 61-stop ring with all memory controllers and directory sl... |
 | S14-14 | knc-twin: scheduling explorer for modulo scheduling and reordering, evaluating S14-02/S14-03 (roadmap item 4) | Done | knc-twin gains a schedule command: beam search up to 60 instructions, list ordering, modulo II, GAS export ... |
 | S14-15 | knc-twin prepare-native: absolute memory operands come out as `N()` in kernel.S (k1om as 2.22 rejects them); emit them relocated into the image | Done | prepare-native emits absolute operands relocated into the memory image (knc_twin_mem+off(%rip)) instead of ... |
-| S14-16 | bzip2 slower than GCC 5.1.1: mask-to-GPR move cost below a GPR move makes RA park integers in k registers (M4 known limit, must-fix) | Question for the tech lead | GCC build needed at 407f1c63cc7 (lane gcc). Both GPR/mask costs raised 1->6; mask moves/memory unchanged. B... |
+| S14-16 | bzip2 slower than GCC 5.1.1: mask-to-GPR move cost below a GPR move makes RA park integers in k registers (M4 known limit, must-fix) | lead | GCC build needed: build gcc16 at .work/_shared/gcc 407f1c63cc7 (branch s14/S14-16; one-hunk change, i386-kn... |
 | S14-17 | Compare not folded with its load in merged return blocks (GCC 16 middle end, about half the remaining bzip2 mainGtU gap) | draft |  |
 | S14-18 | knc-twin regress: held-out replay runs under a 120 s wall-clock budget, so a slow interpreter turns a prediction into a budget_exhausted stub and the test fails as a false mismatch | Done | The knc-twin held-out replay no longer runs in t0 (KNC_TWIN_HELDOUT=1 or validate_heldout.py --max-seconds ... |
 | S14-19 | knc-twin x87 integer-load widths - fildl reads 8 bytes (must be 4), filds reads 4 (must be 2) | Done | The knc-twin now reads and writes x87 integer memory at the right widths (filds/fists 2 bytes, fildl/fistl ... |
@@ -322,6 +322,7 @@ Current tickets: `[#################---]` 258 of 297
 
 ## Recent activity
 
+- 2026-11-16 18:03 **S14-16** lead defer: GCC build needed: build gcc16 at .work/_shared/gcc 407f1c63cc7 (branch s14/S14-16; one-hunk change, i386-knc.cc mask_to_integer/integer_to_mask 1->...
 - 2026-11-16 17:51 **S14-26** lead defer: Review passed; approve as is. Approve refused: tools/check t0 failed in tests/regress/test_knc_twin.py (selftest, trial_cases) because .work/knc-tw...
 - 2026-11-16 17:51 **S13-03** lead defer: Review passed, approve with the note: 'The M4 retrospective is written (docs/research/m4-retrospective.md): it ranks where time was lost, settles a...
 - 2026-11-16 17:50 **S14-42** engineer submit: knc-optimize is a portable skill that tells any agent how to tune code for the Xeon Phi card, step by step, with each Intel practice checked agains...
@@ -329,13 +330,12 @@ Current tickets: `[#################---]` 258 of 297
 - 2026-11-16 17:29 **S14-42** lead answer: Yes, use the override; remove nothing. The 1090 lines are docs and skill text plus the 228-line test, which this ticket asked for, and the owner's ...
 - 2026-11-16 17:16 **S14-42** engineer ask: Submit refused: 1092 changed lines exceeds the 800-line budget; the scope-cut commit e7b4956c trims SKILL.md to 60 lines and moves existing detail ...
 - 2026-11-16 17:15 **S14-26** engineer submit: SMS bound: no-go for S14-02; five of six M4 hot loops are resource-bound at ResMII, only CG has headroom.
-- 2026-11-16 17:15 **S13-03** engineer submit: Completed retrospective in docs/research/m4-retrospective.md; local links and committed whitespace passed via tools/run.py (log .work/_state/logs/S...
 
 ## Cost
 
 - From the script, engineer: 818 sessions, 1720.9M input tokens
 - From the script, lead: 562 sessions, 157.3M input tokens
-- Started by hand, Claude: 97 sessions, 4556.5M input tokens
+- Started by hand, Claude: 97 sessions, 4557.4M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
