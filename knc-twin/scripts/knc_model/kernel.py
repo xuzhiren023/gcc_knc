@@ -489,6 +489,12 @@ class Stream(object):
         self.context = d.get("context", idx)
         if not isinstance(self.context, int) or not 0 <= self.context <= 3:
             raise InvalidInput("streams[%d]: context must be 0..3" % idx)
+        self.local_context = self.context
+        self.core = d.get("core", 0)
+        if isinstance(self.core, bool) or not isinstance(self.core, int) or self.core < 0:
+            raise InvalidInput("streams[%d]: core must be a nonnegative integer" % idx)
+        # The interpreter uses a unique stream key; issue arbitration remains local.
+        self.context = self.core * 4 + self.local_context
         self.init = d.get("init", {})
         self.expected = d.get("expected", {})
         self.representation = "normalized-records"
@@ -610,8 +616,11 @@ class Kernel(object):
         streams = raw.get("streams")
         if not isinstance(streams, list) or not streams:
             raise InvalidInput("kernel needs a non-empty 'streams' list")
-        if len(streams) > 4:
+        self.multicore = any("core" in s for s in streams if isinstance(s, dict))
+        if len(streams) > 4 and not self.multicore:
             raise InvalidInput("at most 4 streams (hardware contexts)")
+        if self.multicore and any("core" not in s for s in streams):
+            raise InvalidInput("every stream must specify core when any stream does")
         symbols = self.init.get("symbols", {})
         self.calls = raw.get("calls", {})
         if not isinstance(self.calls, dict):
@@ -701,10 +710,15 @@ class Kernel(object):
         if fe.get("icache", "warm") not in ("warm", "cold_l2", "cold_memory"):
             raise Unsupported("scenario.frontend.icache must be warm, cold_l2 or cold_memory")
         fe.setdefault("icache", "warm")
-        extra_sc = set(sc) - {"memory", "branch", "frontend"}
+        extra_sc = set(sc) - {"memory", "branch", "frontend", "multicore"}
         if extra_sc:
             raise InvalidInput("scenario: unknown keys %s" % sorted(extra_sc))
-        return {"memory": mem, "branch": br, "frontend": fe}
+        result = {"memory": mem, "branch": br, "frontend": fe}
+        if "multicore" in sc:
+            if not isinstance(sc["multicore"], dict):
+                raise InvalidInput("scenario.multicore must be an object")
+            result["multicore"] = sc["multicore"]
+        return result
 
     def stream_for(self, ctx):
         for s in self.streams:

@@ -543,77 +543,79 @@ class CoreSim(object):
         return False
 
     # --------------------------------------------------------------------------------------------
+    def step(self):
+        """One unchanged issue decision; shared fabrics apply completions before this call."""
+        active = self.ctx
+        now = self.cycle
+        if self.core_busy_until > now:
+            for c in active:
+                if not c.done:
+                    c.stalls["core_busy"] += 1
+            self.cycle += 1
+            return
+        eligible = []
+        for c in active:
+            if c.done:
+                continue
+            if c.stall_until > now:
+                c.stalls[c.stall_reason or "miss_stall"] += 1
+                continue
+            if c.next_issue > now:
+                c.stalls["spacing"] += 1
+                continue
+            ev = c.events[c.pos]
+            if c.decode_until > now:
+                c.stalls["decode"] += 1
+                continue
+            if self.icache is not None and c.fetch_checked != c.pos:
+                if not self._fetch_ok(c, ev, now):
+                    c.stalls["icache_miss"] += 1
+                    continue
+                c.fetch_checked = c.pos
+            why = self._blockers(c, ev, now, 0)
+            if why is not None:
+                c.stalls[why] += 1
+                continue
+            eligible.append(c)
+        if not eligible:
+            self.cycle += 1
+            return
+        eligible.sort(key=lambda c: (c.last_issue, c.ctx))
+        cs = eligible[0]
+        for c in eligible[1:]:
+            c.stalls["not_picked"] += 1
+        u_ev = cs.events[cs.pos]
+        ui = u_ev.insn
+        l1_used = (1 if (ui.is_load or ui.folded_load) else 0) | (2 if ui.is_store else 0)
+        cs.pos += 1
+        self._retire(cs, u_ev, now, "U")
+        if cs.pos < len(cs.events) and cs.stall_until <= now and self.core_busy_until <= now:
+            v_ev = cs.events[cs.pos]
+            if self._can_pair(cs, u_ev, v_ev, now, l1_used):
+                cs.pos += 1
+                cs.pairs += 1
+                self._retire(cs, v_ev, now, "V")
+        cs.last_issue = now
+        cs.next_issue = max(cs.next_issue, now + self.gap)
+        if self.has_layout and cs.pos < len(cs.events):
+            k = cs.events[cs.pos].insn.encoding.get("slow_prefixes", 0)
+            if k:
+                cs.decode_until = now + self.slow_prefix * k
+                self.frontend_stats["decode_delay_cycles"] += max(0, cs.decode_until - cs.next_issue)
+        self.cycle += 1
+
     def run(self):
         t0 = time.time()
         active = self.ctx
         total_events = sum(len(c.events) for c in active)
-        while True:
+        while not all(c.done for c in active):
             now = self.cycle
-            if all(c.done for c in active):
-                break
             if self.max_cycles is not None and now > self.max_cycles:
-                raise BudgetExhausted("cycle budget %d exhausted; %d of %d dynamic instructions issued (partial, not a result)" % (self.max_cycles, sum(c.issued for c in active), total_events),
-                                      {"cycles_simulated": now, "issued": sum(c.issued for c in active), "events": total_events},
+                raise BudgetExhausted("cycle budget exhausted (partial, not a result)",
                                       partial={"cycles": now, "issued": sum(c.issued for c in active)})
             if self.deadline is not None and (now & 1023) == 0 and time.time() > self.deadline:
-                raise BudgetExhausted("python time budget exhausted after %d simulated cycles (partial, not a result)" % now,
-                                      {"cycles_simulated": now, "issued": sum(c.issued for c in active)})
-            if self.core_busy_until > now:
-                for c in active:
-                    if not c.done:
-                        c.stalls["core_busy"] += 1
-                self.cycle += 1
-                continue
-            eligible = []
-            for c in active:
-                if c.done:
-                    continue
-                if c.stall_until > now:
-                    c.stalls[c.stall_reason or "miss_stall"] += 1
-                    continue
-                if c.next_issue > now:
-                    c.stalls["spacing"] += 1
-                    continue
-                ev = c.events[c.pos]
-                if c.decode_until > now:
-                    c.stalls["decode"] += 1
-                    continue
-                if self.icache is not None and c.fetch_checked != c.pos:
-                    if not self._fetch_ok(c, ev, now):
-                        c.stalls["icache_miss"] += 1
-                        continue
-                    c.fetch_checked = c.pos
-                why = self._blockers(c, ev, now, 0)
-                if why is not None:
-                    c.stalls[why] += 1
-                    continue
-                eligible.append(c)
-            if not eligible:
-                self.cycle += 1
-                continue
-            eligible.sort(key=lambda c: (c.last_issue, c.ctx))
-            cs = eligible[0]
-            for c in eligible[1:]:
-                c.stalls["not_picked"] += 1
-            u_ev = cs.events[cs.pos]
-            ui = u_ev.insn
-            l1_used = (1 if (ui.is_load or ui.folded_load) else 0) | (2 if ui.is_store else 0)
-            cs.pos += 1
-            self._retire(cs, u_ev, now, "U")
-            if cs.pos < len(cs.events) and cs.stall_until <= now and self.core_busy_until <= now:
-                v_ev = cs.events[cs.pos]
-                if self._can_pair(cs, u_ev, v_ev, now, l1_used):
-                    cs.pos += 1
-                    cs.pairs += 1
-                    self._retire(cs, v_ev, now, "V")
-            cs.last_issue = now
-            cs.next_issue = max(cs.next_issue, now + self.gap)
-            if self.has_layout and cs.pos < len(cs.events):
-                k = cs.events[cs.pos].insn.encoding.get("slow_prefixes", 0)
-                if k:
-                    cs.decode_until = now + self.slow_prefix * k
-                    self.frontend_stats["decode_delay_cycles"] += max(0, cs.decode_until - cs.next_issue)
-            self.cycle += 1
+                raise BudgetExhausted("python time budget exhausted", partial={"cycles": now})
+            self.step()
         end_issue = max((c.last_issue_cycle or 0) for c in active) + 1
         completion = max(end_issue, max(c.max_done for c in active))
         self.python_seconds = time.time() - t0

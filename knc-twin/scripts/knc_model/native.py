@@ -145,11 +145,12 @@ def gen_kernel_asm(kernel, mem_base, mem_span):
     out.append("\t.zero %d" % max(64, mem_span))
     out.append("\t.p2align 6")
     out.append("\t.globl knc_twin_zmm_out")
-    out.append("knc_twin_zmm_out:\n\t.zero %d" % (2048 * 4))
+    slots = max(s.context for s in kernel.streams) + 1
+    out.append("knc_twin_zmm_out:\n\t.zero %d" % (2048 * slots))
     out.append("\t.globl knc_twin_gpr_out")
-    out.append("knc_twin_gpr_out:\n\t.zero %d" % (128 * 4))
+    out.append("knc_twin_gpr_out:\n\t.zero %d" % (128 * slots))
     out.append("\t.globl knc_twin_k_out")
-    out.append("knc_twin_k_out:\n\t.zero %d" % (32 * 4))
+    out.append("knc_twin_k_out:\n\t.zero %d" % (32 * slots))
     out.append('\t.section .note.GNU-stack,"",@progbits')
     return "\n".join(out) + "\n"
 
@@ -189,10 +190,13 @@ typedef void (*kfn)(void);
 static kfn kernels[] = { %(kernels)s };
 static const int n_ctx = %(n_ctx)d;
 static const int unit_count = %(unit_count)d;
+static uint64_t shared_start, finish_ticks[%(n_ctx)d];
+static uint64_t envelope_samples[21];
 
 static inline uint64_t rdtsc(void) { uint32_t lo, hi; __asm__ __volatile__("rdtsc" : "=a"(lo), "=d"(hi)); return ((uint64_t)hi << 32) | lo; }
 
 static int cmpu64(const void *a, const void *b) { uint64_t x = *(const uint64_t *)a, y = *(const uint64_t *)b; return x < y ? -1 : x > y; }
+static int cmpdouble(const void *a, const void *b) { double x = *(const double *)a, y = *(const double *)b; return x < y ? -1 : x > y; }
 
 typedef struct { int ctx; int cpu; long reps; pthread_barrier_t *bar; double median_ticks; } targ_t;
 
@@ -201,12 +205,28 @@ static void *worker(void *p) {
     cpu_set_t set; CPU_ZERO(&set); CPU_SET(t->cpu, &set);
     if (sched_setaffinity(0, sizeof set, &set)) { perror("sched_setaffinity"); exit(2); }
     uint64_t samples[21];
-    for (int w = 0; w < 3; w++) { pthread_barrier_wait(t->bar); for (long r = 0; r < t->reps; r++) kernels[t->ctx](); }
+    for (int w = 0; w < 3; w++) {
+        pthread_barrier_wait(t->bar);
+        for (long r = 0; r < t->reps; r++) kernels[t->ctx]();
+        __asm__ __volatile__("mfence" ::: "memory");
+        pthread_barrier_wait(t->bar);
+    }
     for (int b = 0; b < 21; b++) {
+        pthread_barrier_wait(t->bar);
+        if (t->ctx == 0) shared_start = rdtsc();
         pthread_barrier_wait(t->bar);
         uint64_t t0 = rdtsc();
         for (long r = 0; r < t->reps; r++) kernels[t->ctx]();
+        __asm__ __volatile__("mfence" ::: "memory");
         samples[b] = rdtsc() - t0;
+        finish_ticks[t->ctx] = rdtsc();
+        pthread_barrier_wait(t->bar);
+        if (t->ctx == 0) {
+            uint64_t end = finish_ticks[0];
+            for (int c = 1; c < n_ctx; c++) if (finish_ticks[c] > end) end = finish_ticks[c];
+            envelope_samples[b] = end - shared_start;
+        }
+        pthread_barrier_wait(t->bar);
     }
     qsort(samples, 21, sizeof samples[0], cmpu64);
     t->median_ticks = (double)samples[10] / (double)t->reps;
@@ -214,14 +234,30 @@ static void *worker(void *p) {
 }
 
 int main(int argc, char **argv) {
-    long reps = 1000; const char *cpus = "1";
+    long reps = 1000; const char *cpus = NULL;
     for (int i = 1; i < argc; i++) {
         if (!strcmp(argv[i], "--reps") && i + 1 < argc) reps = atol(argv[++i]);
         else if (!strcmp(argv[i], "--cpus") && i + 1 < argc) cpus = argv[++i];
     }
-    int cpu[4] = {0, 0, 0, 0}; int ncpu = 0;
-    { char buf[128]; strncpy(buf, cpus, 127); buf[127] = 0; for (char *tok = strtok(buf, ","); tok && ncpu < 4; tok = strtok(NULL, ",")) cpu[ncpu++] = atoi(tok); }
-    if (ncpu < n_ctx) { fprintf(stderr, "need %%d cpus\n", n_ctx); return 2; }
+    int cpu[CPU_SETSIZE]; int ncpu = 0;
+    cpu_set_t allowed; CPU_ZERO(&allowed);
+    if (sched_getaffinity(0, sizeof allowed, &allowed)) { perror("sched_getaffinity"); return 2; }
+    if (reps < 1) { fprintf(stderr, "reps must be positive\n"); return 2; }
+    if (cpus) {
+        char *buf = strdup(cpus);
+        for (char *tok = strtok(buf, ","); tok; tok = strtok(NULL, ",")) {
+            char *end; long value = strtol(tok, &end, 10);
+            if (*end || value < 0 || value >= CPU_SETSIZE || !CPU_ISSET(value, &allowed) || ncpu >= CPU_SETSIZE) {
+                fprintf(stderr, "invalid or unavailable CPU: %%s\n", tok); free(buf); return 2;
+            }
+            for (int c = 0; c < ncpu; c++) if (cpu[c] == value) { fprintf(stderr, "duplicate CPU\n"); free(buf); return 2; }
+            cpu[ncpu++] = (int)value;
+        }
+        free(buf);
+    } else {
+        for (int c = 0; c < CPU_SETSIZE; c++) if (CPU_ISSET(c, &allowed)) cpu[ncpu++] = c;
+    }
+    if (ncpu != n_ctx) { fprintf(stderr, "need exactly %%d CPUs, one worker per supplied CPU (got %%d)\n", n_ctx, ncpu); return 2; }
     /* correctness check: contexts one after another, as the model executes them */
     memset(knc_twin_mem, 0, mem_init_size); memcpy(knc_twin_mem, mem_init, mem_init_size);
     for (int c = 0; c < n_ctx; c++) kernels[c]();
@@ -238,14 +274,17 @@ int main(int argc, char **argv) {
     double group_medians[5];
     for (int g = 0; g < 5; g++) {
         pthread_barrier_t bar; pthread_barrier_init(&bar, NULL, n_ctx);
-        pthread_t th[4]; targ_t ta[4];
-        for (int c = 0; c < n_ctx; c++) { ta[c].ctx = c; ta[c].cpu = cpu[c]; ta[c].reps = reps; ta[c].bar = &bar; pthread_create(&th[c], NULL, worker, &ta[c]); }
+        pthread_t th[%(n_ctx)d]; targ_t ta[%(n_ctx)d];
+        for (int c = 0; c < n_ctx; c++) { ta[c].ctx = c; ta[c].cpu = cpu[c]; ta[c].reps = reps; ta[c].bar = &bar; if (pthread_create(&th[c], NULL, worker, &ta[c])) { fprintf(stderr, "pthread_create failed\n"); exit(2); } }
         double worst = 0;
         for (int c = 0; c < n_ctx; c++) { pthread_join(th[c], NULL); if (ta[c].median_ticks > worst) worst = ta[c].median_ticks;
             printf("{\"group\":%%d,\"ctx\":%%d,\"cpu\":%%d,\"ticks_per_call\":%%.3f,\"ticks_per_unit\":%%.3f}\n", g, c, ta[c].cpu, ta[c].median_ticks, ta[c].median_ticks / unit_count); }
-        group_medians[g] = worst; pthread_barrier_destroy(&bar);
+        qsort(envelope_samples, 21, sizeof envelope_samples[0], cmpu64);
+        group_medians[g] = (double)envelope_samples[10] / reps;
+        printf("{\"group\":%%d,\"completion_envelope_ticks_per_call\":%%.3f,\"worst_thread_median\":%%.3f}\n", g, group_medians[g], worst);
+        pthread_barrier_destroy(&bar);
     }
-    qsort(group_medians, 5, sizeof(double), (int (*)(const void *, const void *))cmpu64);
+    qsort(group_medians, 5, sizeof(double), cmpdouble);
     double lo = group_medians[0], hi = group_medians[4], med = group_medians[2];
     printf("{\"summary\":{\"threads\":%%d,\"reps\":%%ld,\"median_ticks_per_call\":%%.3f,\"median_ticks_per_unit\":%%.3f,\"spread_pct\":%%.3f}}\n", n_ctx, reps, med, med / unit_count, 100.0 * (hi - lo) / med);
     return bad ? 6 : 0;

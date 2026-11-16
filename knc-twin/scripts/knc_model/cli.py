@@ -125,6 +125,8 @@ def cmd_capabilities(args):
             "instruction": "implemented: latency/pipe class per supported mnemonic (capabilities table), exact functional semantics where 'functional' is true",
             "region": "implemented: function or loop regions from GCC-KNC assembly (scripts/from_gcc_s.py) or hand-written records, 1-4 contexts; functional execution, timing, bounds, exhaustive reorder search (<= 12 instructions)",
             "core": "implemented: 1-4 in-order contexts, U/V pairing rules, same-context issue spacing, round-robin picker, x87 stack with physical-register dependencies, AGI, demand-miss stalls, nonblocking prefetch, outstanding-miss limit, L1/L2 LRU line tracking, optional first-level DTLB, streaming L2 hardware prefetcher and per-core memory service sub-models, gather/scatter/x87/L2-prefetch occupancy",
+            "unit": "simulated: 1-8 detailed cores in lockstep, private caches, 61-position ring, 64 TDs, 8 controllers/16 channels; assumed maps and queues, background off by default",
+            "ring": "simulated: same detailed unit with synthetic previous-epoch symmetry background; all results unvalidated scenario estimates",
             "pair": "analytical scenario only (two cores exchanging lines over the ring); needs core-scale cycles and transfer counts as parameters",
             "card": "analytical scenario only (compute vs bandwidth roofline with barriers and imbalance); never one-core throughput x cores",
         },
@@ -331,14 +333,37 @@ def cmd_simulate(args):
     r = base_result("timing_prediction", "ok", "simulate", out_dir=out, scale=args.scale)
     prof = None
     try:
-        if args.scale not in ("instruction", "region", "core"):
+        if args.scale not in ("instruction", "region", "core", "unit", "ring"):
             raise Unsupported("simulate supports instruction, region and core scales; pair and card are analytical (use bounds --scale pair|card)")
         kernel, h = _kernel_and_hash(args.kernel)
-        prof = load_profile(args.profile, args.overlay)
+        overlays = ([resource_path("profiles", "multicore-assumed.json")] if args.scale in ("unit", "ring") else []) + args.overlay
+        prof = load_profile(args.profile, overlays)
         r["profile"] = prof.describe()
         r["calibration_status"] = _calib(prof)
         r["input"] = {"path": os.path.abspath(kernel.path), "hash_sha256": h, "kernel": kernel.describe()}
         r["representation_evaluated"] = kernel.representation
+        if args.scale in ("unit", "ring"):
+            from . import multicore
+            if args.contexts:
+                raise Unsupported("unit/ring uses streams[].core/context; --contexts selects a single core only")
+            if args.trace_source != "functional":
+                raise Unsupported("unit/ring needs functional traces to reject inter-stream communication")
+            traces = _traces_for(kernel, args, r)
+            pred, assumptions, elapsed, issue_log = multicore.simulate(
+                kernel, prof, traces, args.scale, args.max_cycles, _deadline(args), not args.no_issue_log)
+            r["prediction"] = pred
+            r["parameters_used"] = prof.used_summary()
+            r["assumptions"].extend(assumptions)
+            r["input"]["kernel"] = kernel.describe()
+            r["limiting_constraints"] = [{"core": c["core"], **v} for c in pred["cores"] for v in timing.limiting_constraints(c)]
+            r["python_execution_seconds_simulation"] = elapsed
+            if issue_log:
+                dump_json(issue_log, os.path.join(out, "issue-log.json"))
+                r["artifacts"]["issue_log"] = os.path.join(out, "issue-log.json")
+            args._interp = None
+            return _finish(r, out, args)
+        if kernel.multicore and len({s.core for s in kernel.streams}) > 1:
+            raise InvalidInput("multiple cores require --scale unit or ring")
         sim, res, pred = _simulate_core(kernel, prof, args, r)
         r["parameters_used"] = prof.used_summary()
         r["prediction"] = pred
@@ -806,7 +831,7 @@ def build_parser():
 
     s = sub.add_parser("simulate", help="predict core cycles for the kernel")
     common(s)
-    s.add_argument("--scale", default="core", choices=SCALES)
+    s.add_argument("--scale", default="core", choices=SCALES + ("unit", "ring"))
     s.add_argument("--trace-source", default="functional", choices=("functional", "static"))
     s.add_argument("--trip-count", type=int, default=None, help="override kernel.loop.trip_count for static traces")
     s.add_argument("--contexts", default=None, help="comma-separated contexts to activate (default: all streams)")

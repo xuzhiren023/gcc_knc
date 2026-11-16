@@ -1,9 +1,55 @@
 # Multi-core unit and full-ring simulation: design for review
 
-S14-13, Phase 1. **Pending lead review; Phase 2 has not started.** This is an
+S14-13, Phase 1. **Approved by the lead on 2026-11-15; Phase 2 in progress.** This is an
 implementation contract and validation plan, not a simulation result. No native
 measurement, new parameter fit, or multi-core prediction was made in this phase.
 The scope is brief `codex-briefs/03-multicore-unit.md`; brief 02 owns `--jobs`.
+
+### Implementation checkpoint (2026-11-15)
+
+The first implementation adds a causal fabric, transaction handles, private tile
+memory backends and a shared cycle loop. The existing core loop's issue decision
+is extracted as `step`; pair/card formulas and existing profiles are unchanged.
+`multicore-assumed.json` is a separate automatic unit/ring overlay. Native driver
+changes for explicit placement, larger thread counts and a common completion
+envelope are provisional and have not been tested or staged.
+
+Two unit-test attempts preceded this checkpoint. The first ran all ten approved
+CLI/protocol tests: CLI structure, functional cold copies, core register schedules,
+remote-owner routes, budgets, and ring-vs-unit/analytical behavior passed. Two
+conservation subcases had zero background traffic because rounding separately
+for every destination starved short streams. The contention relation also failed.
+The correction carries total per-background-core packet credits, distributing
+packets by cumulative destination debt; it does not change an offered traffic rate.
+
+The second run reran only conservation and contention. Conservation passed for
+2/4/8 tiles. With the unchanged synthetic single-channel test (32 lines per tile,
+256-cycle channel interval, 60 total active cores, 64-cycle background epoch),
+mean detailed per-core completion cycles were:
+
+| Detailed tiles | Mean completion cycles (model prediction) |
+|---|---:|
+| 1 | 491544.2660092213 |
+| 2 | 491417.7660092213 |
+| 4 | 491163.2660092213 |
+| 8 | 490653.5160092213 |
+
+These fail the required nondecreasing/strict-growth assertion. Hypothesis, not
+hardware evidence: with fixed 60 total active cores, symmetry holds aggregate
+offered work approximately constant; averaging completion times of more detailed
+requests in the final channel batch lowers the mean by approximately half a
+service interval per added tile. Increasing total offered work by holding the
+background core count fixed would test contention growth without this averaging
+effect. The tests and approved 60-core policy have not been changed. Lead guidance
+is requested before another implementation/test attempt, per AGENTS.md.
+
+Logs: `.work/_state/logs/S14_13_multicore_green-20261115-233326.log` and
+`.work/_state/logs/S14_13_background_correction-20261115-233728.log`.
+No native runs, GCC builds, long comparisons, selftest or repository regression
+run at this checkpoint. Parameters documentation was regenerated. Native requests,
+held-out fixtures/predictions and the rest of Phase 2 remain incomplete. Compatible
+TD reads currently serialize rather than merge, and protocol tests beyond the
+approved red set still need implementation. This checkpoint is not acceptance.
 
 ## Evidence and geometry
 
