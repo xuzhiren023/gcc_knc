@@ -142,7 +142,7 @@ Current tickets: `[#################---]` 244 of 279
 | S14-11 | knc-twin: close PhiWeather WRF coverage gaps (jump tables, vcvtps2pd ymm, loop-region and complete-listing modes, scatter and rcp-table import) | In progress | Lead merged main into s14/S14-11 (a merge, not a rebase: the worktree cannot create rebase state, and a mer... |
 | S14-12 | knc-twin: iteration and phase sampling for loop and whole-program wall-time estimates (roadmap item 2) | In progress | sessions 6 -> 9 under the owner's standing auto-extend rule: implementation committed, the hpcg-104 questio... |
 | S14-13 | knc-twin: 8-tile multi-core unit on the full ring with all memory controllers (roadmap item 3) | In progress | (1) Schema: offline, in memory only: s = json.load(kernel.schema.json); s.pop('$id'); jsonschema.Draft7Vali... |
-| S14-14 | knc-twin: scheduling explorer for modulo scheduling and reordering, evaluating S14-02/S14-03 (roadmap item 4) | Waiting for review | Green 2e975d5b; main merged at 9b699730. Prior checks: 7 acceptance tests, selftest and trial checks passed... |
+| S14-14 | knc-twin: scheduling explorer for modulo scheduling and reordering, evaluating S14-02/S14-03 (roadmap item 4) | lead | Review passed (approve note: knc-twin gains a schedule command: beam search up to 60 instructions, list ord... |
 | S14-15 | knc-twin prepare-native: absolute memory operands come out as `N()` in kernel.S (k1om as 2.22 rejects them); emit them relocated into the image | **Waiting for you** | budget: 10651104 input tokens used; the budget is 10000000 |
 | S14-16 | bzip2 slower than GCC 5.1.1: mask-to-GPR move cost below a GPR move makes RA park integers in k registers (M4 known limit, must-fix) | draft |  |
 | S14-17 | Compare not folded with its load in merged return blocks (GCC 16 middle end, about half the remaining bzip2 mainGtU gap) | draft |  |
@@ -304,6 +304,7 @@ Current tickets: `[#################---]` 244 of 279
 
 ## Recent activity
 
+- 2026-11-16 02:54 **S14-14** lead defer: Review passed (approve note: knc-twin gains a schedule command: beam search up to 60 instructions, list ordering, modulo II, GAS export and frozen-...
 - 2026-11-16 02:07 **S14-14** engineer submit: Green 2e975d5b; main merged at 9b699730. Prior checks: 7 acceptance tests, selftest and trial checks passed. Held-out check passed: Windows Python ...
 - 2026-11-16 02:05 **S14-15** lead escalate: budget: 10651104 input tokens used; the budget is 10000000
 - 2026-11-16 02:00 **S14-15** lead answer: Do both on the branch, no review rerun: (1) Merge-main: git merge main into s14/S14-15 (a merge commit, not a rebase of main); resolve any conflict...
@@ -311,7 +312,6 @@ Current tickets: `[#################---]` 244 of 279
 - 2026-11-16 01:52 **S14-12** owner decide: sessions 6 -> 9 under the owner's standing auto-extend rule: implementation committed, the hpcg-104 question is answered (S14-18), held-out check a...
 - 2026-11-16 01:51 **S14-12** engineer escalate: budget: 6 engineer sessions used; the budget is 6
 - 2026-11-16 01:50 **S14-12** lead answer: Reproduced on main at 890ac9b4 by the lead: under Cygwin Python 3.12 all eight s12-31-hpcg-104 variants come back budget_exhausted at predict_case'...
-- 2026-11-16 01:49 **S14-15** owner decide: sessions 6 -> 8 (final extension): the lead review above lists five concrete changes; two sessions are enough for them and the submit. If not submi...
 
 ## Cost
 
