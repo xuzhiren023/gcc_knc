@@ -141,7 +141,7 @@ Current tickets: `[#################---]` 244 of 273
 | S14-10 | knc-twin: --jobs N for independent simulations and PyPy support (roadmap item 1) | Question for the tech lead | Committed 9950928b. Selftest 155 passed; syntax passed. Serial regression failed only HPCG-104 (2 tests pas... |
 | S14-11 | knc-twin: close PhiWeather WRF coverage gaps (jump tables, vcvtps2pd ymm, loop-region and complete-listing modes, scatter and rcp-table import) | In progress | S14-11 red accepted: failing tests now pin knc-twin's WRF switch jump-table resolution (entry order, out-of... |
 | S14-12 | knc-twin: iteration and phase sampling for loop and whole-program wall-time estimates (roadmap item 2) | In progress | The red tests for knc-twin loop and phase sampling now pin down the behaviour: a sampled HPCG loop must rea... |
-| S14-13 | knc-twin: 8-tile multi-core unit on the full ring with all memory controllers (roadmap item 3) | In progress | One fix in test_remote_owner_read_uses_td_and_shortest_route before green; everything else stands (contenti... |
+| S14-13 | knc-twin: 8-tile multi-core unit on the full ring with all memory controllers (roadmap item 3) | Tests waiting for review | Red correction 73eee70b: remote-owner probe compares elapsed differences with hop-delay differences for dis... |
 | S14-14 | knc-twin: scheduling explorer for modulo scheduling and reordering, evaluating S14-02/S14-03 (roadmap item 4) | In progress | M4 is not finished (62 of 65) and the card may be in a timed block, but you do not need idle clearance for ... |
 | S2-01 | Design for zmm and mask registers under -march=knc | Done | The register design for KNC is settled on paper: all 32 zmm and 8 mask registers become usable under -march... |
 | S2-02 | Float and double arguments and results in zmm lane 0 | Done | Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`). |
@@ -298,6 +298,7 @@ Current tickets: `[#################---]` 244 of 273
 
 ## Recent activity
 
+- 2026-11-15 23:20 **S14-13** engineer red: Red correction 73eee70b: remote-owner probe compares elapsed differences with hop-delay differences for distances 15/30/31 versus 1; distance 1 bou...
 - 2026-11-15 23:20 **S14-10** engineer ask: Committed 9950928b. Selftest 155 passed; syntax passed. Serial regression failed only HPCG-104 (2 tests passed, 25.2 min); cause unknown, diff trun...
 - 2026-11-15 23:16 **S14-13** lead changes: One fix in test_remote_owner_read_uses_td_and_shortest_route before green; everything else stands (contention, conservation, ring-vs-unit and the s...
 - 2026-11-15 23:14 **S14-13** engineer red: Red extension f9c3c319 adds second test file: shared-channel 1/2/4/8-tile contention; TD remote-owner latency from residual/route parameters and sh...
@@ -305,11 +306,10 @@ Current tickets: `[#################---]` 244 of 273
 - 2026-11-15 23:08 **S14-13** engineer red: Red commit 6dfe9298: one new CLI test file covers 1/2/4/8 tiles, per-core contexts, cold-copy outputs, result class, placement and budgets. Cygwin ...
 - 2026-11-15 23:07 **S14-12** lead approve-red: The red tests for knc-twin loop and phase sampling now pin down the behaviour: a sampled HPCG loop must reach a steady state and land inside its ow...
 - 2026-11-15 23:06 **S14-14** lead answer: M4 is not finished (62 of 65) and the card may be in a timed block, but you do not need idle clearance for this: the scheduling acceptance tests, k...
-- 2026-11-15 23:05 **S14-12** engineer red: Red 73383e26 closes review gaps: HPCG estimate inside band; width capped by profile shape error plus sample spread; convergence required. Sampled p...
 
 ## Cost
 
-- From the script, engineer: 721 sessions, 1507.9M input tokens
+- From the script, engineer: 722 sessions, 1516.4M input tokens
 - From the script, lead: 488 sessions, 139.3M input tokens
 - Started by hand, Claude: 14 sessions, 4017.8M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
@@ -317,4 +317,4 @@ Current tickets: `[#################---]` 244 of 273
 
 ## Disk
 
-The project uses 40.3 GiB of 100 GiB. 86 GiB free on the drive.
+The project uses 40.5 GiB of 100 GiB. 86 GiB free on the drive.
