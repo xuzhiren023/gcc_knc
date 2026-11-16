@@ -75,9 +75,6 @@ def gen_kernel_asm(kernel, mem_base, mem_span):
     for stream in kernel.streams:
         fn = "knc_twin_kernel_ctx%d" % stream.context
         regs = _reg_inits(kernel, stream)
-        uses_stack = any("rsp" in insn.writes for insn in stream.insns)
-        if uses_stack:
-            out.append("# NOTE: the region adjusts rsp (push/pop/sub): the driver's own stack is used, so rsp/rbp from the kernel's init are not loaded.")
         out.append("\t.globl %s" % fn)
         out.append("\t.p2align 6")
         out.append("%s:" % fn)
@@ -97,10 +94,12 @@ def gen_kernel_asm(kernel, mem_base, mem_span):
                 out.append("\tvmovaps knc_twin_zmm_init+%d(%%rip), %%%s" % (64 * idx, n))
         for name, val in regs.items():
             n = name.lower()
-            if n in GPR64 and n not in ("rsp", "rbp"):
+            if n in GPR64:
                 v = parse_int(val, name)
                 if mem_base is not None and mem_base <= v < mem_base + mem_span:
                     out.append("\tleaq knc_twin_mem+%d(%%rip), %%%s" % (v - mem_base, n))
+                elif n in ("rsp", "rbp"):
+                    out.append("\tleaq knc_twin_stack_top(%%rip), %%%s" % n)
                 else:
                     out.append("\tmovabsq $0x%x, %%%s" % (v & 0xFFFFFFFFFFFFFFFF, n))
         out.append("# ---- kernel body (context %d) ----" % stream.context)
@@ -147,6 +146,9 @@ def gen_kernel_asm(kernel, mem_base, mem_span):
         out.append("\t.zero 64")
     out.append("\t.bss")
     out.append("\t.p2align 12")
+    out.append("\t.zero 65536")
+    out.append("\t.globl knc_twin_stack_top")
+    out.append("knc_twin_stack_top:")
     out.append("\t.globl knc_twin_mem")
     out.append("knc_twin_mem:")
     out.append("\t.zero %d" % max(64, mem_span))
@@ -384,6 +386,7 @@ def prepare_native(kernel, profile, out_dir, kernel_hash, prediction_path=None):
         "files": {"kernel.S": "generated assembly (review; build with k1om-mpss-linux-gcc)", "driver.c": "generated driver skeleton"},
         "notes": [
             "This request needs no live connection. Submit it to the shared hardware queue (gcc_knc: tools/card_run) in a lead-only benchmark window.",
+            "The generated kernel uses the initialized rsp/rbp values when they point inside knc_twin_mem; otherwise both use a private 64 KiB stack image.",
             "The driver's correctness check compares saved registers/memory to the kernel's expected values; its exit code is 6 on mismatch.",
             "Record the card_run job id, the clock policy and the MPSS version in the measurement file.",
             "Import the measurement with: knc_twin.py import-native measurement.json --request request.json --out <dir>",
