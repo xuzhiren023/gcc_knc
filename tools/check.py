@@ -30,6 +30,8 @@ PACKED = re.compile(r'\bv(?:addn?|subr?|mul|div|max|min|sqrt|rcp(?:23)?|rsqrt(?:
 # Each entry supplies its CLI help and handlers for the tiers it selects.
 # Imports stay lazy so T0 and source-only selections need no probe modules.
 SELECTIONS = {
+    'scalar_mask_cost': ('S14-16 scalar byte values stay out of mask registers', {
+        't1': lambda runner: runner.t1_sources([runner.source_dir / 'knc-scalar-mask-cost.c'])}),
     'neg_induction': ('S12-24 sign-alternating induction with a vector epilogue', {
         't1': lambda runner: runner.t1_sources([runner.source_dir / 'knc-vec-neg-induction.c'])}),
     'imul_cost': ('S12-21 scalar constant multiply strength reduction', {
