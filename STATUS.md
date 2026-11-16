@@ -1,10 +1,10 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-16 10:26.
+Updated automatically at every ticket change. Last update: 2026-11-16 11:36.
 
-**Next: GPT-6.1, on S14-10 (knc-twin: --jobs N for independent simulations and PyPy support (roadmap item 1)).** Run `python tools/dispatch.py`, or ask the tech lead to.
+**Next: the tech lead, on S14-38.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
-Current tickets: `[#################---]` 253 of 293
+Current tickets: `[#################---]` 253 of 295
 
 ## Milestones
 
@@ -15,7 +15,7 @@ Current tickets: `[#################---]` 253 of 293
 | M2 | Useful vector target | Done | 51 of 51 tickets |
 | M3 | Runtimes | Done | 48 of 48 tickets |
 | M4 | Broad optimization | Done | 63 of 65 tickets |
-| M5 | Program corpus | In progress | 8 of 46 tickets |
+| M5 | Program corpus | In progress | 8 of 48 tickets |
 | M6 | Release | Not started | Not planned in detail yet |
 
 ## Tickets
@@ -161,8 +161,10 @@ Current tickets: `[#################---]` 253 of 293
 | S14-30 | WRF built with GCC-KNC runs 1.21x slower per step than PhiWeather's production build - attribute the gap per cause before fixing (M5, owner rule) | draft |  |
 | S14-31 | knc-twin multi-core usability: compare across scales, stubs and repeated calls at unit/ring scale, multi-context sampling, separated ring/memory stall shares | Not started |  |
 | S14-33 | knc-twin: import the window-11 calibration rows (imci-math latency and throughput, div10, x87 fcoms, rcp23/rsqrt23 tables) and retire the assumed parameters they settle | Not started |  |
-| S14-35 | knc-twin prepare-native: the generated native program for PhiWeather's sixth_order_diffusion kernels segfaults on the card (exit 139 under claude-pin); find the cause, fix the generator, restage | In progress | Originals are in .work/_shared/calib-w10/phiweather/sixth_{1,2}ctx_l2_031/orig/: kernel.json is the kernel ... |
+| S14-35 | knc-twin prepare-native: the generated native program for PhiWeather's sixth_order_diffusion kernels segfaults on the card (exit 139 under claude-pin); find the cause, fix the generator, restage | In progress | Lead decision (owner's delegation): one more change round, sessions 9 -> 11, input_tokens 16M -> 20M. The 1... |
 | S14-37 | knc-twin x87 double rounding: _x87_binop rounds to the 64-bit significand and then to PC=53/24; real x87 rounds once (knc-boinc repro, 1 to 8 ULP errors) | Not started |  |
+| S14-38 | Card and twin dashboard - running card job, card queue and running twin work with remaining time, card temperature and utilization, host CPU, refreshed every 5 minutes | Waiting for review | Worktree reset to 2a2328a5; approve was not hung, T0 takes ~10 min and was killed early. Rerunning approve. |
+| S14-39 | knc-twin prepare-native: pointer-rich captures (heap addresses sparse over tens of GB) need a relocating or multi-segment native image | Not started |  |
 | S2-01 | Design for zmm and mask registers under -march=knc | Done | The register design for KNC is settled on paper: all 32 zmm and 8 mask registers become usable under -march... |
 | S2-02 | Float and double arguments and results in zmm lane 0 | Done | Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`). |
 | S2-03 | Varargs with the donor's register save area | Done | Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`). |
@@ -318,23 +320,23 @@ Current tickets: `[#################---]` 253 of 293
 
 ## Recent activity
 
-- 2026-11-16 10:26 **S14-23** owner decide: Owner closed the budget after the final session. The worktree is committed on s14/S14-23 as wip (converter, measurements, kernels, case, tests); th...
-- 2026-11-16 10:22 **S14-23** lead escalate: budget: 14370671 input tokens used; the budget is 14000000
-- 2026-11-16 10:19 **S14-23** lead answer: No new case format and no change to validate_heldout. Record the prediction the way the characterization catalog cases do: run the twin's existing ...
-- 2026-11-16 10:16 **S14-23** engineer ask: Completed t1/t2/t4 summaries and scatter overlay import. Held-out prediction remains blocked: catalog kernel has a nonterminating outer jnz; valida...
-- 2026-11-16 10:08 **S14-35** lead answer: Originals are in .work/_shared/calib-w10/phiweather/sixth_{1,2}ctx_l2_031/orig/: kernel.json is the kernel embedded in each request.json (the exact...
-- 2026-11-16 10:08 **S14-35** lead resume: lead placed the originals
-- 2026-11-16 10:05 **S14-35** lead defer: Interactive lead: copy the two original sixth_order_diffusion kernel JSONs referenced by .work/_shared/calib-w10/phiweather/sixth_{1,2}ctx_l2_031/k...
-- 2026-11-16 10:03 **S14-35** engineer ask: Original kernel JSON is referenced by request.json but exists only under read-only C:\\Users\\xuzhi\\Documents\\PhiWeather, outside allowed read ro...
+- 2026-11-16 11:36 **S14-38** lead resume: Worktree reset to 2a2328a5; approve was not hung, T0 takes ~10 min and was killed early. Rerunning approve.
+- 2026-11-16 11:34 **S14-38** lead defer: Review passed (overdue clamp, log-based twin session liveness, command-line only, live card check recorded), but pm.py approve hung in the machine ...
+- 2026-11-16 11:18 **S14-38** engineer submit: Dashboard ready via python tools/knc_dashboard.py serve at 2a2328a5; all four fixture/HTTP tests passed (red first), log .work/_state/logs/S14_38_s...
+- 2026-11-16 11:16 **S14-38** owner decide: Owner 2026-11-16 (in chat: 'Yes raise it'): budget raised to 4 sessions. Resubmit 2a2328a5 as is with the one-sentence note; no rebase needed.
+- 2026-11-16 11:12 **S14-35** owner decide: Lead decision (owner's delegation): one more change round, sessions 9 -> 11, input_tokens 16M -> 20M. The 11:10 review findings are correct and mus...
+- 2026-11-16 11:10 **S14-35** lead escalate: over 2 review rounds: 1. .work/_shared/calib-w10/phiweather/sixth_{1,2}ctx_l2_031/restaged/: all files still dated 10:43/10:47, before 228c8ccd and...
+- 2026-11-16 11:09 **S14-35** engineer submit: prepare-native preserves the driver stack while using the kernel's in-image stack or private fallback; updated test assertions. Commits 228c8ccd an...
+- 2026-11-16 11:07 **S14-35** owner decide: sessions 7 -> 9, input_tokens 12M -> 16M (standing rule; the alignment finding and its fix are real progress). Do in order: fix the test's newline ...
 
 ## Cost
 
-- From the script, engineer: 780 sessions, 1659.1M input tokens
-- From the script, lead: 529 sessions, 149.2M input tokens
-- Started by hand, Claude: 15 sessions, 4289.8M input tokens
+- From the script, engineer: 791 sessions, 1667.5M input tokens
+- From the script, lead: 537 sessions, 151.5M input tokens
+- Started by hand, Claude: 19 sessions, 4323.2M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 41.0 GiB of 100 GiB. 58 GiB free on the drive.
+The project uses 41.1 GiB of 100 GiB. 56 GiB free on the drive.
